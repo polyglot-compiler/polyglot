@@ -102,6 +102,15 @@ public class Initializer_c extends Node_c implements Initializer
         return initializerInstance(ii);
     }
 
+    public Node disambiguateOverride_(AmbiguityRemover ar) throws SemanticException {
+        // Do not visit body on the clean-super and clean-signatures passes.
+        if (ar.kind() != AmbiguityRemover.ALL) {
+            return this;
+        }
+
+        return null;
+    }
+
     /** Type check the initializer. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
