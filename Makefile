@@ -46,6 +46,7 @@ PACKAGES = \
 	jltools.frontend \
 	jltools.lex \
 	jltools.main \
+	jltools.parse \
 	jltools.types \
 	jltools.util \
 	jltools.visit \
@@ -63,6 +64,7 @@ PACKAGES = \
 	jltools.ext.polyj \
 	jltools.ext.polyj.ast \
 	jltools.ext.polyj.extension \
+	jltools.ext.polyj.parse \
 	jltools.ext.polyj.types \
 	jltools.ext.polyj.visit \
 	jltools.ext.jmatch \
