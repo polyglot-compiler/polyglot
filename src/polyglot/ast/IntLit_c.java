@@ -89,4 +89,13 @@ public class IntLit_c extends NumLit_c implements IntLit
             return new Integer((int) value);
 	}
     }
+
+    public Precedence precedence() {
+        if (value < 0) {
+            return Precedence.UNARY;
+        }
+        else {
+            return Precedence.LITERAL;
+        }
+    }
 }

@@ -197,10 +197,10 @@ public class Unary_c extends Expr_c implements Unary
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (op.isPrefix()) {
 	    w.write(op.toString());
-	    printSubExpr(expr, w, tr);
+	    printSubExpr(expr, false, w, tr);
 	}
 	else {
-	    printSubExpr(expr, w, tr);
+	    printSubExpr(expr, false, w, tr);
 	    w.write(op.toString());
 	}
     }

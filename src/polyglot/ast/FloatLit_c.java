@@ -93,4 +93,13 @@ public class FloatLit_c extends Lit_c implements FloatLit
         return new Double(value);
       }
     }
+
+    public Precedence precedence() {
+        if (value < 0) {
+            return Precedence.UNARY;
+        }
+        else {
+            return Precedence.LITERAL;
+        }
+    }
 }
