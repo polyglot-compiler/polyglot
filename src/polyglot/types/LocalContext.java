@@ -36,7 +36,7 @@ public class LocalContext
    * class is.
    */
   public LocalContext( ImportTable itImports, TypeSystem ts,
-                       NodeVisitor visitor)
+                       NodeVisitor visitor) 
   {  
     this.itImports = itImports;
     this.ts = ts;
