@@ -7,11 +7,11 @@
 <H2>JLtools CVS Access</H2>
 
 <OL>
-   <LI>Make sure you have ssh version 1 installed on your computer.
    <LI>If you do not have a CVS account set up for you on ensemble01.cs.cornell.edu:
    <OL>
       <LI>If you don't have a ssh public key, then run <TT>ssh-keygen</TT>. If you do not
-      want your key to be protected by a passfrase, then press enter when asked for one.
+      want your key to be protected by a passfrase, then press Enter when asked for one.
+   Make sure you are using the <tt>ssh-keygen</tt> from ssh version 1.
       <LI>Send your public key (~/.ssh/identity.pub) and your desired login to
       <A HREF="mailto:nogin@cs.cornell.edu">Aleksey Nogin (nogin@cs.cornell.edu)</A>
    </OL>
@@ -25,11 +25,16 @@ ForwardX11 no
 User &lt;your login on ensemble01&gt;</PRE>
 
    <LI>Set the environment variable <TT>CVS_RSH</TT> to <TT>ssh</TT>.
-   You may want to add this to your <TT>~/.profile</TT> or <TT>~/.cshrc</TT> file.
 
-   <LI>Make sure you are using cvs version &gt;=1.9 (<TT>cvs -v</TT> prints version).
+<p>
+   On Unix, add this to your <TT>~/.profile</TT> or <TT>~/.cshrc</TT>
+   file. On NT, make it part of your environment <b>(Control Panel/System/Environment)</b>
 
-   <LI>To create a new working copy:
+   <LI>Make sure you are using cvs version &gt;=1.9 (<TT>cvs -v</TT>
+   prints version). You may need to download it from somewhere but it should
+   be installed already on your machine.
+
+   <LI>To create a new working copy of the source repository, run this:
    <PRE>cvs -d :ext:ensemble01.cs.cornell.edu:/cvsroot checkout jltools</PRE>
 </OL>
 </BODY>
