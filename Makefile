@@ -97,8 +97,8 @@ REL_LIBS = \
 	jif.jar \
 
 release_clean: FORCE
+	rm -rf $(RELPATH)
 	mkdir -p $(RELPATH)
-	rm -rf $(RELPATH)/*
 
 release_doc: FORCE
 	cp LICENSE README README-JIF.txt $(RELPATH)
@@ -112,7 +112,7 @@ release: jar release_clean release_doc release_src
 	$(subdirs)
 	mkdir -p $(REL_LIB)
 	cp $(REL_LIBS) $(REL_LIB)
-	cp lib/fs.* $(REL_LIB)
+	cp lib/*fs.* $(REL_LIB)
 	chmod a+x $(RELPATH)/configure
 	rm jltools.jar jif.jar
 	

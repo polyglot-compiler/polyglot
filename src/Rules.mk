@@ -32,8 +32,21 @@ REL_LIB			= $(RELPATH)/lib
 
 REL_SOURCES		= $(SOURCES)
 
-REL_SRC = $(RELPATH)/src/$(DIR)/$(PACKAGE)
-REL_DEMO = $(RELPATH)/demo/$(DEMO_DIR)/$(PACKAGE)
+# To avoid repeated slashes
+DIR_ = $(DIR)
+PACKAGE_ = $(PACKAGE)
+DEMO_DIR_ = $(DEMO_DIR)
+ifneq ($(DIR)foo, foo) 
+DIR_ = /$(DIR)
+endif
+ifneq ($(PACKAGE)foo, foo)
+PACKAGE_ = /$(PACKAGE)
+endif
+ifneq ($(DEMO_DIR)foo, foo)
+DEMO_DIR_ = /$(DEMO_DIR)
+endif
+REL_SRC = $(RELPATH)/src$(DIR_)$(PACKAGE_)
+REL_DEMO = $(RELPATH)/demo$(DEMO_DIR_)$(PACKAGE_)
 
 all clean clobber javadoc release:
 

@@ -273,6 +273,7 @@ then
 fi
 
 ${LIBPATH}=\$TOP${FILE_SEP}lib${PATH_SEP}\$${LIBPATH}
+export ${LIBPATH}
 
 \$JAVA ${JLC_CP} -Dprincipal.path=\$1 jif.policy.Passwd 
 EOF
