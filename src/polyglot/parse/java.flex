@@ -455,7 +455,8 @@ OctalEscape = \\ [0-7]
                                               yytext() + "\"", pos()); }
 
     /* Unclosed string literal */
-    {LineTerminator}             { eq.enqueue(ErrorInfo.LEXICAL_ERROR,
+    {LineTerminator}             { yybegin(YYINITIAL);
+                                   eq.enqueue(ErrorInfo.LEXICAL_ERROR,
                                               "Unclosed string literal",
                                               pos()); }
 
