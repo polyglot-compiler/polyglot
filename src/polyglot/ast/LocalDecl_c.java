@@ -174,7 +174,7 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
             // not found, so not multiply defined
         }
 
-	if (outerLocal != null) {
+	if (outerLocal != null && c.isLocal(li.name())) {
 	    throw new SemanticException("Local variable \"" + name +
 					"\" multiply defined.  " +
 					"Previous definition at " +
