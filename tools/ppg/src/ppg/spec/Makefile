@@ -5,7 +5,7 @@ SUBDIRS =
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
-	CupSpec.java \
+	CUPSpec.java \
 	JLgenSpec.java \
 	Spec.java
 

@@ -1,6 +1,6 @@
 SOURCE = ../..
 PACKAGE = jltools/util
-SUBDIRS = typedump
+SUBDIRS = typedump jlgen
 
 include $(SOURCE)/Rules.mk
 
