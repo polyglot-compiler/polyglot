@@ -17,6 +17,8 @@ jl: FORCE
 	$(MAKE) -C $@ all
 jif: jl FORCE
 	$(MAKE) -C $@ all
+pragma: jl FORCE
+	$(MAKE) -C $@ all
 split: jif FORCE
 	$(MAKE) -C $@ all
 polyj: jl FORCE
