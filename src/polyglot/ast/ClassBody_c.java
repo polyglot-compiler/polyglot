@@ -62,16 +62,6 @@ public class ClassBody_c extends Term_c implements ClassBody
         return reconstruct(members);
     }
 
-    public Context enterScope(Context c) {
-        return enterScope(c, true);
-    }
-
-    public Context enterScope(Context c, boolean inherit) {
-        ClassType type = c.currentClass();
-        addMembers(c, type, new HashSet(), inherit);
-        return c;
-    }
-
     public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
         // We can't clean-super any member classes yet until we are finished
         // with this class and all at the same nesting level.
@@ -135,65 +125,6 @@ public class ClassBody_c extends Term_c implements ClassBody
         }
 
         return this;
-    }
-
-    protected void addMembers(Context c, ReferenceType type,
-                              Set visited, boolean inherit) {
-        if (Report.should_report(TOPICS, 2))
-	    Report.report(2, "addMembers(" + type + ")");
-
-        if (visited.contains(type)) {
-            return;
-        }
-
-        visited.add(type);
-
-        if (inherit) {
-            // Add supertype members first to ensure overrides work correctly.
-            if (type.superType() != null) {
-                if (! type.superType().isReference()) {
-                    throw new InternalCompilerError(
-                        "Super class \"" + type.superType() +
-                        "\" of \"" + type + "\" is ambiguous.  " +
-                        "An error must have occurred earlier.",
-                        type.position());
-                }
-
-                addMembers(c, type.superType().toReference(), visited, true);
-            }
-
-            for (Iterator i = type.interfaces().iterator(); i.hasNext(); ) {
-                Type t = (Type) i.next();
-
-                if (! t.isReference()) {
-                    throw new InternalCompilerError(
-                        "Interface \"" + t + "\" of \"" + type +
-                        "\" is ambiguous.  " +
-                        "An error must have occurred earlier.",
-                        type.position());
-                }
-
-                addMembers(c, t.toReference(), visited, true);
-            }
-        }
-
-        for (Iterator i = type.methods().iterator(); i.hasNext(); ) {
-            MethodInstance mi = (MethodInstance) i.next();
-            c.addMethod(mi);
-        }
-
-        for (Iterator i = type.fields().iterator(); i.hasNext(); ) {
-            FieldInstance fi = (FieldInstance) i.next();
-            c.addVariable(fi);
-        }
-
-        if (type.isClass()) {
-            for (Iterator i = type.toClass().memberClasses().iterator();
-                 i.hasNext(); ) {
-                ClassType mct = (ClassType) i.next();
-                c.addNamed(mct);
-            }
-        }
     }
 
     public String toString() {

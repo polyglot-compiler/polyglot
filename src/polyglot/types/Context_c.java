@@ -68,7 +68,6 @@ public class Context_c implements Context
         Context_c v = (Context_c) this.copy();
         v.outer = this;
         v.types = null;
-        v.methods = null;
         v.vars = null;
         return v;
     }
@@ -82,7 +81,6 @@ public class Context_c implements Context
     protected ParsedClassType scope;
     protected CodeInstance code;
     protected Map types;
-    protected Map methods;
     protected Map vars;
     protected boolean inCode;
 
@@ -137,15 +135,19 @@ public class Context_c implements Context
         if (Report.should_report(TOPICS, 3))
           Report.report(3, "find-method " + name + argTypes + " in " + this);
 
-        ReferenceType rt = findMethodContainerInThisScope(name);
-
-        if (rt != null) {
+        // Check for any method with the appropriate name.
+        // If found, stop the search since it shadows any enclosing
+        // classes method of the same name.
+        if (this.currentClass() != null &&
+            ! this.currentClass().methodsNamed(name).isEmpty()) {
             if (Report.should_report(TOPICS, 3))
-              Report.report(3, "find-method " + name + argTypes + " -> " + rt);
+              Report.report(3, "find-method " + name + argTypes + " -> " +
+                                this.currentClass());
 
             // Found a class which has a method of the right name.
             // Now need to check if the method is of the correct type.
-            return ts.findMethod(rt, name, argTypes, this.currentClass());
+            return ts.findMethod(this.currentClass(),
+                                 name, argTypes, this.currentClass());
         }
 
         if (outer != null) {
@@ -196,12 +198,12 @@ public class Context_c implements Context
         if (Report.should_report(TOPICS, 3))
           Report.report(3, "find-method-scope " + name + " in " + this);
 
-        ClassType container = findMethodContainerInThisScope(name);
-
-        if (container != null) {
+        if (this.currentClass() != null &&
+            ! this.currentClass().methodsNamed(name).isEmpty()) {
             if (Report.should_report(TOPICS, 3))
-              Report.report(3, "find-method-scope " + name + " -> " + container);
-            return type;
+              Report.report(3, "find-method-scope " + name + " -> " +
+                                this.currentClass());
+            return this.currentClass();
         }
 
         if (outer != null) {
@@ -270,7 +272,7 @@ public class Context_c implements Context
     }
 
     protected String mapsToString() {
-        return "types=" + types + " vars=" + vars + " methods=" + methods;
+        return "types=" + types + " vars=" + vars;
     }
 
     public String toString() {
@@ -438,11 +440,12 @@ public class Context_c implements Context
 
     /**
      * Adds a method to the current scoping level.
+     * Actually, this does nothing now.
+     * @deprecated
      */
     public void addMethod(MethodInstance mi) {
         if (Report.should_report(TOPICS, 3))
           Report.report(3, "Adding " + mi + " to context.");
-        addMethodContainerToThisScope(mi);
     }
 
     /**
@@ -455,8 +458,24 @@ public class Context_c implements Context
     }
 
     public Named findInThisScope(String name) {
-        if (types == null) return null;
-        return (Named) types.get(name);
+        Named t = null;
+        if (types != null) {
+            t = (Named) types.get(name);
+        }
+        if (t == null && isClass()) {
+            if (! this.type.isAnonymous() &&
+                this.type.name().equals(name)) {
+                return this.type;
+            }
+            else {
+                try {
+                    return ts.findMemberClass(this.type, name, this.type);
+                }
+                catch (SemanticException e) {
+                }
+            }
+        }
+        return t;
     }
 
     public void addNamedToThisScope(Named type) {
@@ -465,18 +484,28 @@ public class Context_c implements Context
     }
 
     public ClassType findMethodContainerInThisScope(String name) {
-        if (methods == null) return null;
-        return (ClassType) methods.get(name);
-    }
-
-    public void addMethodContainerToThisScope(MethodInstance mi) {
-        if (methods == null) methods = new HashMap();
-        methods.put(mi.name(), currentClass());
+        if (isClass()) {
+            if (! this.type.methodsNamed(name).isEmpty()) {
+                return this.type;
+            }
+        }
+        return null;
     }
 
     public VarInstance findVariableInThisScope(String name) {
-        if (vars == null) return null;
-        return (VarInstance) vars.get(name);
+        VarInstance vi = null;
+        if (vars != null) {
+            vi = (VarInstance) vars.get(name);
+        }
+        if (vi == null && isClass()) {
+            try {
+                return ts.findField(this.type, name, this.type);
+            }
+            catch (SemanticException e) {
+                return null;
+            }
+        }
+        return vi;
     }
 
     public void addVariableToThisScope(VarInstance var) {
