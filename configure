@@ -93,6 +93,21 @@ if [ -f "${ESC_JAVA_HOME}${FILE_SEP}lib${FILE_SEP}rt.jar" ]; then
 fi
 echo escaped Java home directory is "${ESC_JAVA_HOME}"
 
+if [ -d ${JAVA_HOME}/include/win32 ]
+then
+    OS=win32
+elif [ -d ${JAVA_HOME}/include/linux ]
+then
+    OS=linux
+elif [ -d ${JAVA_HOME}/include/solaris ]
+then
+    OS=solaris
+else
+    echo Cannot determine operating system.
+    exit 1
+fi
+
+echo Operating system is ${OS}.
 
 # ESC_TOOLS_JAR="${ESC_JAVA_HOME}${FILE_SEP}lib${FILE_SEP}tools.jar"
 # echo escaped tools.jar is "${ESC_TOOLS_JAR}"
@@ -118,12 +133,15 @@ echo creating Defs.mk
     echo JC = "${JAVAC}"
     echo JAVA = "${JAVA}"
     echo JAVADOC = "${JAVADOC}"
-    echo JAR = "${JAR}"
+    echo
+    echo OS = "${OS}"
     echo
     echo TOOLS_JAR = "${TOOLS_JAR}"
     echo RT_JAR = "${RT_JAR}"
     echo
     echo CRYPT_PATH = '$(ESC_SOURCE)'${FILE_SEP}'jsse.jar'${PATH_SEP}'$(ESC_SOURCE)'${FILE_SEP}'jnet.jar'${PATH_SEP}'$(ESC_SOURCE)'${FILE_SEP}'jcert.jar'${PATH_SEP}'$(ESC_SOURCE)'${FILE_SEP}'cryptix32.jar'
+    echo
+    echo OUTPUT = '$(ESC_SOURCE)'${FILE_SEP}classes
     echo
     echo LEX_RUNTIME = '$(ESC_SOURCE)'${FILE_SEP}'jlex.jar'
     echo CUP_RUNTIME = '$(ESC_SOURCE)'${FILE_SEP}'java_cup.jar'
