@@ -33,10 +33,11 @@ public class SourceJob extends Job
   public void parse() {
     ExtensionInfo extInfo = compiler.getExtensionInfo();
     java_cup.runtime.Symbol sym = null;
+    java_cup.runtime.lr_parser grm;
 
     try {
       Reader reader = t.getSourceReader();
-      java_cup.runtime.lr_parser grm = extInfo.getParser(reader, eq);
+      grm = extInfo.getParser(reader, eq);
       sym = grm.parse();
     }
     catch (IOException e) {
@@ -49,7 +50,8 @@ public class SourceJob extends Job
     }
     catch (Exception e) {
       e.printStackTrace();
-      eq.enqueue( ErrorInfo.INTERNAL_ERROR, e.getMessage());
+      eq.enqueue( ErrorInfo.INTERNAL_ERROR, "Unhandled exception: " +
+					    e.getMessage());
       return;
     }
 

@@ -6,6 +6,7 @@ import jltools.util.*;
 import jltools.visit.*;
 import jltools.main.UsageError;
 import jltools.main.Options;
+import jltools.main.Main;
 
 import java.io.*;
 import java.util.*;
@@ -120,4 +121,5 @@ public class StandardExtensionInfo implements ExtensionInfo {
 	jltools.lex.Lexer lexer = new jltools.lex.Lexer(reader, eq);
 	return new jltools.parse.Grm( lexer, ts, eq);
     }
+    static { Main.report_topics.add("verbose"); }
 }
