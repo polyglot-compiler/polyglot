@@ -469,7 +469,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean canCoerceToString(Type t, Context c) {
         // every Object can be coerced to a string, as can any primitive,
         // except void.
-        return ! t.isVoid()
+        return ! t.isVoid();
     }
 
     /**
