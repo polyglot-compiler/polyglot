@@ -97,6 +97,7 @@ BAD = \
 	BadSwitch1.jl \
 	BadSwitch2.jl \
 	CircularConstructor.jl \
+	DoubleFlags.jl \
 	Errors2.jl \
 	Errors.jl \
 	NoInit10.jl \
