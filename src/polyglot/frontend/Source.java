@@ -20,11 +20,20 @@ public class Source
 	    throw new FileNotFoundException(name);
 	}
 
-	if (! name.endsWith("." + sourceExtension)) {
-	    throw new IOException(
-		"Source \"" + name + "\" does not have the extension \"." +
-		sourceExtension + "\".");
+	StringTokenizer st = new StringTokenizer(sourceExtension, ";, ");
+	
+	boolean sat = false;
+	while (st.hasMoreTokens() && !sat) {
+	    String ext = st.nextToken();
+	    
+	    if (name.endsWith("." + ext)) 
+		sat = true;
 	}
+	
+	if (!sat) 
+	    throw new IOException(
+		    "Source \"" + name + "\" does not have the extension \"." +
+		    sourceExtension + "\".");
 
 	lastModified = new Date(file.lastModified());
     }
