@@ -129,7 +129,7 @@ public class ClassSerializer extends NodeVisitor
 	    f = nf.FieldDecl(fi.position(), fi.flags(),
 		             nf.CanonicalTypeNode(fi.position(), fi.type()),
 			     fi.name(),
-			     largeStringLiteral(te.encode(ct)).type(ts.String()));
+			     nf.StringLit(pos, te.encode(ct)).type(ts.String()));
 
 	    f = f.fieldInstance(fi);
             f = f.initializerInstance(ii);
@@ -141,47 +141,6 @@ public class ClassSerializer extends NodeVisitor
 	    eq.enqueue(ErrorInfo.IO_ERROR,
 		       "Unable to serialize class information.");
 	    return n;
-	}
-    }
-
-    /**
-     * Break a long string literal into a sum of small string literals.
-     * This avoids messing up the pretty printer and editors. However, it
-     * does not entirely solve the formatting problem if the pretty-printer
-     * output is post-processed by a unicode transformation (which it is),
-     * since the pretty-printer doesn't realize that the unicode characters
-     * expand to multiple characters.
-     */
-    private final Expr largeStringLiteral(String x) {
-	Expr result = null;
-	int n = x.length();
-	int i = 0;
-
-	for (;;) {
-	    int j;
-	    // Compensate for the unicode transformation by computing
-	    // the length of the encoded string (or something close to it).
-	    int len = 0;
-	    for (j = i; len < 60 && j < n; j++) {
-		if (x.charAt(j) > 0xff) len += 6;
-		len += StringUtil.escape(x.charAt(j)).length();
-	    }
-
-	    Expr s = nf.StringLit(Position.COMPILER_GENERATED,
-                                  x.substring(i, j)).type(ts.String());
-
-	    if (result == null) {
-		result = s;
-	    }
-	    else {
-		result = nf.Binary(Position.COMPILER_GENERATED,
-                                   result, Binary.ADD, s).type(ts.String());
-	    }
-
-	    if (j == n)
-		return result;
-
-	    i = j;
 	}
     }
 }

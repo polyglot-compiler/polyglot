@@ -42,23 +42,42 @@ public class StringUtil
     }
  
     public static String escape(String s) {
+        return escape(s, false);
+    }
+
+    public static String escape(char c) {
+        return escape("" + c, false);
+    }
+
+    public static String unicodeEscape(String s) {
+        return escape(s, true);
+    }
+
+    public static String unicodeEscape(char c) {
+        return escape("" + c, true);
+    }
+
+    public static String escape(String s, boolean unicode) {
         StringBuffer sb = new StringBuffer(s.length());
 
 	for (int i = 0; i < s.length(); i++) {
 	    char c = s.charAt(i);
-	    escape(sb, c);
+	    escape(sb, c, unicode);
 	}
 
 	return sb.toString();
     }
 
-    public static String escape(char c) {
-        return escape("" + c);
-    }
-
-    private static void escape(StringBuffer sb, char c) {
+    private static void escape(StringBuffer sb, char c, boolean unicode) {
         if (c > 0xff) {
-            sb.append(c);
+            if (unicode) {
+                String s = Integer.toHexString(c);
+                while (s.length() < 4) s = "0" + s;
+                sb.append("\\u" + s);
+            }
+            else {
+                sb.append(c);
+            }
 	    return;
 	}
 
