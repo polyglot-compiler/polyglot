@@ -243,7 +243,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         }
         
         if (Report.should_report(Report.frontend, 1))
-            Report.report(1, "Trying to run pass " + pass);
+            Report.report(1, "Trying to run pass " + pass + " on " + job.source());
 
         if (job.isRunning()) {
             // We're currently running.  We can't reach the goal.
