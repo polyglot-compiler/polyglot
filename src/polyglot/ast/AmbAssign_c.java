@@ -46,7 +46,6 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
           return ar.nodeFactory().ArrayAccessAssign(n.position(), (ArrayAccess)left(), operator(), right());
       }
 
-      new Exception().printStackTrace();
       throw new SemanticException("Could not disambiguate left side of assignment!", n.position());
   }
   
