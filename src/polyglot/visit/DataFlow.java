@@ -20,6 +20,7 @@ import polyglot.frontend.Job;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
+import polyglot.util.IdentityKey;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
 
@@ -287,6 +288,26 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         }
         
         return this;
+    }
+
+    /**
+     * Overridden superclass method, to make sure that if a subclass has changed
+     * a Term, that we update the peermaps appropriately, since they are based
+     * on <code>IdentityKey</code>s.
+     */
+    public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
+        if (old != n) {            
+            if (dataflowOnEntry && currentFlowGraph() != null) {
+                // We currently only update the key in the peerMap.
+                // We DO NOT update the Terms inside the peers, nor the
+                // List of Terms that are the path maps. 
+                Object o = currentFlowGraph().peerMap.get(new IdentityKey(old));
+                if (o != null) {
+                    currentFlowGraph().peerMap.put(new IdentityKey(n), o);
+                }
+            }
+        }
+        return super.leave(parent, old, n, v);
     }
 
     /**
