@@ -297,7 +297,7 @@ public class Binary_c extends Expr_c implements Binary
 	    if (op == SUB && r == 0L) return left;
 	    if (op == MUL && r == 1L) return left;
 	    if (op == DIV && r == 1L) return left;
-	    if (op == MOD && r == 1L) return left;
+	    if (op == MOD && r == 1L) return num(0);
 	    if (op == BIT_OR && r == 0L) return left;
 	    if (op == BIT_XOR && r == 0L) return left;
 	    if (op == SHL && r == 0L) return left;
