@@ -342,13 +342,13 @@ public class StandardTypeSystem extends TypeSystem {
     // Types are distinct.
     ////
 
-    if (fromType instanceof PrimitiveType) {
-      if (! (toType instanceof PrimitiveType)) return false;
+    if (fromType.isPrimitive()) {
+      if (! (toType.isPrimitive())) return false;
       ////
       // Both types are primitive...
       ////
-      PrimitiveType ptFromType = (PrimitiveType) fromType;
-      PrimitiveType ptToType = (PrimitiveType) toType;
+      PrimitiveType ptFromType = fromType.toPrimitiveType();
+      PrimitiveType ptToType = toType.toPrimitiveType();
       
       if (! ptFromType.isNumeric() || ! ptToType.isNumeric())       
 	return false;
@@ -937,7 +937,7 @@ public class StandardTypeSystem extends TypeSystem {
       type = (ReferenceType)typeQueue.removeFirst();
       if (visitedTypes.contains(type))
 	continue;
-      // System.out.println("collecting methods of " + type.getTypeString());
+
       for (Iterator i = type.getMethods().iterator(); i.hasNext() ; )
       {
 	mti = (MethodTypeInstance)i.next();
@@ -961,7 +961,6 @@ public class StandardTypeSystem extends TypeSystem {
 
     }
 
-    // System.out.println("done collecting methods");
   }
 
   /**
@@ -1171,6 +1170,7 @@ public class StandardTypeSystem extends TypeSystem {
   public boolean methodCallValid( MethodTypeInstance prototype, MethodType call) 
     throws SemanticException
   {
+
     if ( ! prototype.getName().equals(call.getName()))
       return false;
 
