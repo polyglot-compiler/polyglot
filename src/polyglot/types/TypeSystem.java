@@ -137,6 +137,9 @@ public interface TypeSystem {
     /** Get an unknown type. */
     UnknownType unknownType(Position pos);
 
+    /** Get an unknown package. */
+    UnknownPackage unknownPackage(Position pos);
+
     /** Get an unknown type qualifier. */
     UnknownQualifier unknownQualifier(Position pos);
 

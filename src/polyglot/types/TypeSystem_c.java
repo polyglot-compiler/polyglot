@@ -1368,10 +1368,15 @@ public class TypeSystem_c implements TypeSystem
     }
 
     protected UnknownType unknownType = new UnknownType_c(this);
+    protected UnknownPackage unknownPackage = new UnknownPackage_c(this);
     protected UnknownQualifier unknownQualifier = new UnknownQualifier_c(this);
 
     public UnknownType unknownType(Position pos) {
 	return unknownType;
+    }
+
+    public UnknownPackage unknownPackage(Position pos) {
+	return unknownPackage;
     }
 
     public UnknownQualifier unknownQualifier(Position pos) {
