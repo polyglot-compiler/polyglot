@@ -128,7 +128,7 @@ new SemanticException("Method " + methodName + " not found").printStackTrace(Sys
   }
 
   /**
-   * Gets a local of a particular name.
+   * Gets a local or field of a particular name.
    */  
   public VariableInstance getVariable(String fieldName) throws SemanticException
   {
@@ -142,7 +142,33 @@ new SemanticException("Method " + methodName + " not found").printStackTrace(Sys
       }
     }
 
-// new Exception("Field or local " + fieldName + " not found").printStackTrace(System.out);
+    throw new SemanticException("Field or local " + fieldName + " not found");
+  }
+
+  public ClassType getFieldContainingClass(String fieldName)
+    throws SemanticException
+  {
+    boolean found = false;
+
+    ListIterator iter = scopes.listIterator(scopes.size());
+
+    while (iter.hasPrevious()) {
+      Scope scope = (Scope) iter.previous();
+
+      if (! found) {
+	VariableInstance var = scope.getVariable(fieldName);
+	if (var != null) {
+	  found = true;
+	}
+      }
+
+      if (found) {
+	if (scope instanceof ClassScope) {
+	  return ((ClassScope) scope).getClassType();
+	}
+      }
+    }
+
     throw new SemanticException("Field or local " + fieldName + " not found");
   }
 

@@ -181,12 +181,18 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 		    new TypeNode(fi.getEnclosingType()), fi );
 	    }
 	    else {
+		ClassType container = c.getFieldContainingClass(name);
+
+		TypeNode base = null;
+
+		if (container != c.getCurrentClass()) {
+		    base = new TypeNode(container);
+		}
+
 		top = new FieldExpression(
 		    c.getTypeSystem().getNewFieldExpressionExtension(),
-		    new SpecialExpression(
-			(TypeNode) null,
-			SpecialExpression.THIS),
-			fi );
+		    new SpecialExpression(base, SpecialExpression.THIS),
+		    fi);
 	    }
 	}
 	else if (vi instanceof LocalInstance) {
