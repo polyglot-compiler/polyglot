@@ -15,7 +15,7 @@ if [ ! -d $source ]; then
 fi
 
 if [ `basename $source` != jltools ]; then
-  echo cannot merge $source into $PWD/target
+  echo cannot merge $source into $PWD/jltools
   exit 1
 fi
 
@@ -23,7 +23,10 @@ set -x
 
 target=$PWD/jltools
 
-cvs checkout jltools
+if [ ! -d $target ]
+then
+    cvs checkout jltools
+fi
 
 (
 cd $source
@@ -34,20 +37,12 @@ do
                    -e 's/jltools/polyglot/g'`
 
   mkdir -p `dirname $target/$g` 2>/dev/null
-  cp $f $target/$g
-done
-)
-
-(
-cd $target
-
-find . -type f -exec egrep -li jltools | grep -v CVS | while read f; do
   sed -e 's/\<jlgen\>/ppg/g' \
-      -e 's/\<JLgen\>/PPG/g' \
+      -e 's/\.jlg\>/.ppg/g' \
+      -e 's/JLgen/PPG/g' \
       -e 's/\<jltools\>/polyglot/g' \
       -e 's/\<JLtools\>/Polyglot/g' \
       -e 's/\<JLTools\>/Polyglot/g' \
-      -e 's/\<JLTOOLS\>/POLYGLOT/g' $f > $f.x
-  mv $f.x $f
+      -e 's/\<JLTOOLS\>/POLYGLOT/g' $f > $target/$g
 done
 )
