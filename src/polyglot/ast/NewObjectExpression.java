@@ -187,6 +187,7 @@ public class NewObjectExpression extends Expression
     try
     {
       mti = c.getMethod( ct, new ConstructorType( c.getTypeSystem(), 
+                                                  ct, 
                                                   argTypes));
     }
     catch (SemanticException e)
@@ -197,6 +198,7 @@ public class NewObjectExpression extends Expression
         Type t = (Type)i.next();
       }
       */
+      System.out.println( ct.getTypeString() );
       throw new SemanticException ( 
               "No acceptable constructor found for the creation of \"" 
               + ct.getTypeString() + "\".");
@@ -216,9 +218,9 @@ public class NewObjectExpression extends Expression
   public Node exceptionCheck( ExceptionChecker ec) 
     throws SemanticException 
   {
-    
+    // something didn't work in the type check phase, so just ignore it.
     if (mti == null) 
-      throw new InternalCompilerError("MTI null in exception Checker!");
+      return this; 
 
     for (Iterator i = mti.exceptionTypes().iterator(); i.hasNext(); )
     {

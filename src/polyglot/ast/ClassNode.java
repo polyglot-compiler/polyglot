@@ -215,8 +215,35 @@ public class ClassNode extends ClassMember
     type.setAccessFlags( accessFlags);
 
     visitChildren( sr);
-
     sr.popClass();
+    
+    if ( accessFlags.isAbstract() || accessFlags.isInterface())
+      return this;
+
+
+    // if no constructor was declared in a Class, add the default constructor.
+    boolean bHasConstructor = false;
+    for ( Iterator i = type.getMethods().iterator() ; i.hasNext(); )
+    {
+      if ( i.next() instanceof ConstructorTypeInstance) 
+      {
+        bHasConstructor = true;
+        break;
+      }
+    }
+    if (!bHasConstructor)
+    {
+      AccessFlags afPublic = new AccessFlags();
+      afPublic.setPublic(true);
+      ((ParsedClassType)type).addMethod ( new ConstructorTypeInstance( 
+                                                                      sr.getTypeSystem(), 
+                                                                      type, 
+                                                                      Collections.EMPTY_LIST, 
+                                                                      Collections.EMPTY_LIST, 
+                                                                      afPublic));
+    }
+
+
     return this;
   }
 

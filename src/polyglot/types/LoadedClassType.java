@@ -30,7 +30,7 @@ public class LoadedClassType extends ClassTypeImpl  {
   {
     super( typeSys);    
     this.theClass = theClass;
-    
+
     // Set up names and classType.    
     String rawName = theClass.getName(); // pkg1.pkg2.class$inner1$inner2
     this.packageName = TypeSystem.getPackageComponent(rawName);
@@ -179,7 +179,7 @@ public class LoadedClassType extends ClassTypeImpl  {
     for(int idx = 0; idx < excpns.length; idx++) {
       excpList.add(ts.typeForClass(excpns[idx]));
     }
-
+    
     return new ConstructorTypeInstance(ts, this, argList, excpList, flags);
   }
 

@@ -18,7 +18,7 @@ import java.util.List;
  *    lookup.
  **/
 public class ConstructorType extends MethodType {
-  public ConstructorType(TypeSystem ts, List argumentTypes) {
-    super(ts, "[Constructor]", argumentTypes);
+  public ConstructorType(TypeSystem ts, ClassType ct, List argumentTypes) {
+    super(ts, ct.getTypeString() + ".[Constructor]", argumentTypes);
   }
 }

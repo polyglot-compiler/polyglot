@@ -25,7 +25,7 @@ public class ConstructorTypeInstance extends MethodTypeInstance {
                                  List argumentTypes,
                                  List exceptionTypes,
                                  AccessFlags flags) {
-    super(ts, enclosingType, "[Constructor]", ts.getVoid(), 
+    super(ts, enclosingType, enclosingType.getTypeString() + ".[Constructor]", ts.getVoid(), 
           argumentTypes, exceptionTypes, flags);
   }
 }

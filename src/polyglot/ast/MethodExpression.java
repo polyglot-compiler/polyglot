@@ -202,8 +202,9 @@ public class MethodExpression extends Expression
   public Node exceptionCheck( ExceptionChecker ec) 
     throws SemanticException 
   {
+    // something went wrong in the typecheck phase. so don't do exception checking.
     if (mti == null) 
-      throw new InternalCompilerError("MTI null in exception Checker!");
+      return this;
 
     for (Iterator i = mti.exceptionTypes().iterator(); i.hasNext(); )
     {
