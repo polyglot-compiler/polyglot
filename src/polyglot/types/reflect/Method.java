@@ -61,7 +61,7 @@ class Method
         attrs[i] = exceptions;
       }
       else {
-	attrs[i] = new GenericAttribute(in, nameIndex, length);
+        in.skip(length);
       }
     }
   }

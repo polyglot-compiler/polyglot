@@ -183,7 +183,7 @@ class Field {
             }
 
 	    if (attrs[i] == null) {
-                attrs[i] = new GenericAttribute(in, nameIndex, length);
+                in.skip(length);
             }
 	}
     }

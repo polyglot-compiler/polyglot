@@ -677,7 +677,7 @@ public class ClassFile implements LazyClassInitializer {
           attrs[i] = innerClasses;
       }
       else {
-          attrs[i] = new GenericAttribute(in, nameIndex, length);
+          in.skip(length);
       }
     }
   }
