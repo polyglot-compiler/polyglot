@@ -79,6 +79,8 @@ public class FieldExpression extends Expression
    */
   Node visitChildren( NodeVisitor v) 
   {
+    if ( target == null) 
+      return this;
     return reconstruct( target.visit( v), name);
   }
 
@@ -86,7 +88,9 @@ public class FieldExpression extends Expression
   {
     Type ltype;
 
-    if( target instanceof Expression) {
+    if (target == null)
+      ltype = null;
+    else if( target instanceof Expression) {
       ltype = ((Expression)target).getCheckedType();
     }
     else if( target instanceof TypeNode) {
@@ -98,7 +102,8 @@ public class FieldExpression extends Expression
                               + target.getClass().getName());
     }
 
-    if( ltype instanceof ClassType ||
+    if( ltype == null ||
+        ltype instanceof ClassType ||
         ltype instanceof ArrayType) {
       if (name.equals("class"))
       {
@@ -109,7 +114,8 @@ public class FieldExpression extends Expression
       {
         fi = c.getField( ltype, name);
         
-        Annotate.setExpectedType( target, fi.getEnclosingType());
+        if (target != null)
+          Annotate.setExpectedType( target, fi.getEnclosingType());
         setCheckedType( fi.getType());
       }
     }

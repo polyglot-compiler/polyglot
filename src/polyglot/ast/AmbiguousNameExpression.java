@@ -135,7 +135,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
         }
         else {
           if( top == null) {
- 	    top = new FieldExpression( new TypeNode( c.getCurrentClass()), 
+ 	    top = new FieldExpression( null, //new TypeNode( c.getCurrentClass()), 
                                        fi.getName());
           }
           else {

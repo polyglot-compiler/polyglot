@@ -639,6 +639,7 @@ public class StandardTypeSystem extends TypeSystem {
           fi = fiTemp;
           bFound = true;
         }
+        tEnclosing = tEnclosing.getContainingClass();
       }
       if ( fi != null && fiEnclosing != null)
       {
