@@ -152,33 +152,67 @@ import java.math.BigInteger;
     }
 
     private Token int_lit(String s, int radix) {
-	BigInteger x = new BigInteger(s, radix);
-    	BigInteger max = BigInteger.valueOf(Integer.MAX_VALUE);
-	BigInteger min = BigInteger.valueOf(Integer.MIN_VALUE);
-	if (x.compareTo(min) < 0 || x.compareTo(max) > 0) {
-	    eq.enqueue(ErrorInfo.LEXICAL_ERROR, "Integer literal \"" +
-	               yytext() + "\" too large.", pos());
-	    return null;
+	if (radix == 10) {
+	    try {
+		Integer x = Integer.valueOf(s);
+		return new IntegerLiteral(pos(), x.intValue(), sym.INTEGER_LITERAL);
+	    }
+	    catch (NumberFormatException e) {
+		eq.enqueue(ErrorInfo.LEXICAL_ERROR, "Integer literal \"" +
+			   yytext() + "\" out of range.", pos());
+		return null;
+	    }
 	}
-	return new IntegerLiteral(pos(), x.intValue(), sym.INTEGER_LITERAL);
+	else {
+	    BigInteger x = new BigInteger(s, radix);
+	    if (x.bitLength() > 32) {
+		eq.enqueue(ErrorInfo.LEXICAL_ERROR, "Integer literal \"" +
+			   yytext() + "\" out of range.", pos());
+		return null;
+	    }
+	    return new IntegerLiteral(pos(), x.intValue(), sym.INTEGER_LITERAL);
+	}
     }
 
     private Token long_lit(String s, int radix) {
-	BigInteger x = new BigInteger(s, radix);
-    	BigInteger max = BigInteger.valueOf(Long.MAX_VALUE);
-	BigInteger min = BigInteger.valueOf(Long.MIN_VALUE);
-	if (x.compareTo(min) < 0 || x.compareTo(max) > 0) {
-	    eq.enqueue(ErrorInfo.LEXICAL_ERROR, "Long literal \"" +
-	               yytext() + "\" too large.", pos());
-	    return null;
+	if (radix == 10) {
+	    try {
+		Long x = Long.valueOf(s);
+		return new LongLiteral(pos(), x.longValue(), sym.LONG_LITERAL);
+	    }
+	    catch (NumberFormatException e) {
+		eq.enqueue(ErrorInfo.LEXICAL_ERROR, "Long literal \"" +
+			   yytext() + "\" out of range.", pos());
+		return null;
+	    }
 	}
-	return new LongLiteral(pos(), x.longValue(), sym.LONG_LITERAL);
+	else {
+	    BigInteger x = new BigInteger(s, radix);
+	    if (x.bitLength() > 64) {
+		eq.enqueue(ErrorInfo.LEXICAL_ERROR, "Long literal \"" +
+			   yytext() + "\" out of range.", pos());
+		return null;
+	    }
+	    return new LongLiteral(pos(), x.longValue(), sym.LONG_LITERAL);
+	}
     }
 
     private Token float_lit(String s) {
         try {
-            float x = Float.parseFloat(s);
-            return new FloatLiteral(pos(), x, sym.FLOAT_LITERAL);
+            Float x = Float.valueOf(s);
+	    boolean zero = true;
+	    for (int i = 0; i < s.length(); i++) {
+		if ('1' <= s.charAt(i) && s.charAt(i) <= '9') {
+		    zero = false;
+		    break;
+		}
+	    }
+	    if (x.isInfinite() || x.isNaN() || (x.floatValue() == 0 && ! zero)) {
+		eq.enqueue(ErrorInfo.LEXICAL_ERROR,
+			   "Illegal float literal \"" + yytext() + "\"", pos());
+		return null;
+	    }
+            return new FloatLiteral(pos(), x.floatValue(), sym.FLOAT_LITERAL);
         }
         catch (NumberFormatException e) {
             eq.enqueue(ErrorInfo.LEXICAL_ERROR,
@@ -189,12 +223,24 @@ import java.math.BigInteger;
 
     private Token double_lit(String s) {
         try {
-            double x = Double.parseDouble(s);
-            return new DoubleLiteral(pos(), x, sym.DOUBLE_LITERAL);
+            Double x = Double.valueOf(s);
+	    boolean zero = true;
+	    for (int i = 0; i < s.length(); i++) {
+		if ('1' <= s.charAt(i) && s.charAt(i) <= '9') {
+		    zero = false;
+		    break;
+		}
+	    }
+	    if (x.isInfinite() || x.isNaN() || (x.floatValue() == 0 && ! zero)) {
+		eq.enqueue(ErrorInfo.LEXICAL_ERROR,
+			   "Illegal double literal \"" + yytext() + "\"", pos());
+		return null;
+	    }
+            return new DoubleLiteral(pos(), x.doubleValue(), sym.DOUBLE_LITERAL);
         }
         catch (NumberFormatException e) {
             eq.enqueue(ErrorInfo.LEXICAL_ERROR,
-                       "Illegal float literal \"" + yytext() + "\"", pos());
+                       "Illegal double literal \"" + yytext() + "\"", pos());
             return null;
         }
     }
