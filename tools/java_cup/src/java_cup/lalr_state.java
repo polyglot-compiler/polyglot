@@ -757,6 +757,13 @@ public class lalr_state {
 	}
     }
 
+  private void errOutput(ByteArrayOutputStream s) {
+    try {
+      System.err.print(s.toString("UTF-8"));
+    } catch(java.io.UnsupportedEncodingException e) {
+      System.err.print("<UNENCODABLE>");
+    }
+  }
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
   /** Produce a warning message for one reduce/reduce conflict. 
@@ -773,34 +780,27 @@ public class lalr_state {
       System.err.print  ("  between ");
       System.err.println(itm1.to_simple_string());
 /* ACM extension */
-      ByteArrayOutputStream es = new ByteArrayOutputStream();
       ByteArrayOutputStream ds = new ByteArrayOutputStream();
       if (Main.report_counterexamples) {
-	try {
- 	  report_shortest_path(itm1, new PrintStream(es), new PrintStream(ds));
   	  System.err.print("    Example:    ");
-	  es.writeTo(System.err);
+ 	  report_shortest_path(itm1, System.err, new PrintStream(ds));
 	  System.err.println(" (*)");
   	  System.err.print("    Derivation: ");
-	  ds.writeTo(System.err);
-	  System.err.println("] (*)\n");
-	} catch (java.io.IOException e) { throw new internal_error("impossible"); }
+	  errOutput(ds);
+	  System.err.println(" ] (*)\n");
       }
 /* End ACM extension */
       System.err.print  ("  and     ");
       System.err.println(itm2.to_simple_string());
 /* ACM extension */
-      es.reset(); ds.reset();
+      ds.reset();
       if (Main.report_counterexamples) {
-	try {
- 	  report_shortest_path(itm2, new PrintStream(es), new PrintStream(ds));
   	  System.err.print("    Example:    ");
-	  es.writeTo(System.err);
+ 	  report_shortest_path(itm2, System.err, new PrintStream(ds));
 	  System.err.println(" (*)");
   	  System.err.print("    Derivation: ");
-	  ds.writeTo(System.err);
-	  System.err.println("] (*)\n");
-	} catch (java.io.IOException e) { throw new internal_error("impossible"); }
+	  errOutput(ds);
+	  System.err.println(" ] (*)\n");
       }
 /* End ACM extension */
       System.err.print("  under symbols: {" );
@@ -844,21 +844,17 @@ public class lalr_state {
       System.err.print  ("  between reduction on ");
       System.err.println(red_itm.to_simple_string());
 /* ACM extension */
-      ByteArrayOutputStream es = new ByteArrayOutputStream();
       ByteArrayOutputStream ds = new ByteArrayOutputStream();
       if (Main.report_counterexamples) {
-	try {
-	    System.err.print("    Example:    ");
-	    report_shortest_path(red_itm, new PrintStream(es), new PrintStream(ds));
-	    es.writeTo(System.err);
-	    System.err.print(" (*) ");
-	    System.err.println(terminal.find(conflict_sym).name());
-	    System.err.print("    Derivation: ");
-	    ds.writeTo(System.err);
-	    System.err.print("] (*) ");
-	    System.err.println(terminal.find(conflict_sym).name());
-	    System.err.println("");
-	} catch (java.io.IOException e) { throw new internal_error("impossible"); }
+	System.err.print("    Example:    ");
+	report_shortest_path(red_itm, System.err, new PrintStream(ds));
+	System.err.print(" (*) ");
+	System.err.println(terminal.find(conflict_sym).name());
+	System.err.print("    Derivation: ");
+	errOutput(ds);
+	System.err.print(" ] (*) ");
+	System.err.println(terminal.find(conflict_sym).name());
+	System.err.println("");
       }
 /* end ACM extension */
 
@@ -878,22 +874,17 @@ public class lalr_state {
                   System.err.println("  and shift on " + itm.to_simple_string());
 /* ACM extension */
 		  if (Main.report_counterexamples) {
-		    try {
-		      es.reset();
 		      ds.reset();
-		      report_shortest_path(itm, new PrintStream(es),
-						new PrintStream(ds));
 		      System.err.print("    Example:    ");
-		      es.writeTo(System.err);
+		      report_shortest_path(itm, System.err,
+						new PrintStream(ds));
 		      System.err.print(" (*) ");
 		      System.err.println(right_of_dot(itm));
 		      System.err.print("    Derivation: ");
-		      ds.writeTo(System.err);
+		      errOutput(ds);
 		      System.err.print(" (*) ");
 		      System.err.println(right_of_dot(itm));
 		      System.err.println("");
-	            } catch (java.io.IOException e)
-			{ throw new internal_error("impossible"); }
 		  }
 /* end ACM extension */
 		}
@@ -952,21 +943,23 @@ public class lalr_state {
 	production current = null;
 	boolean first = true;
 	for (Iterator i = p.steps.listIterator(); i.hasNext();) {
-	    if (!first) {
-		derivation_s.print(" ");
-	    }
-	    first = false;
 	    Object o = i.next();
 	    if (o instanceof lalr_transition) {
 		lalr_transition tr = (lalr_transition)o;
 		String name = tr.on_symbol().name();
+		if (!first) {
+		    derivation_s.print(" ");
+		    example_s.print(" ");
+		}
 		example_s.print(name);
 		derivation_s.print(name);
 	    } else if (o instanceof production) {
 		production pr = (production)o;
 		/* production: don't add anything to the example */
+		if (!first) derivation_s.print(" ");
 		derivation_s.print("[" + pr.lhs().the_symbol().name() + "::=");
 	    }
+	    first = false;
 	}
     }
 
