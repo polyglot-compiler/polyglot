@@ -706,7 +706,7 @@ public class StandardTypeSystem extends TypeSystem {
       throw new SemanticException( "Field \"" + name + "\" not found");
     // ah ha! we have a type. to work against.
     if (rest.length() == 0)
-      throw new SemanticException( "Field \"" + name + "\" not fount");
+      throw new SemanticException( "Field \"" + name + "\" not found");
 
     // We must make sure this class is clean before we start looking for 
     // fields in it and its supertypes.
