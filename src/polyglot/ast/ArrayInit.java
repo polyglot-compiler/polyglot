@@ -1,5 +1,6 @@
 package jltools.ast;
 
+import jltools.types.*;
 import java.util.List;
 
 /**
@@ -12,4 +13,10 @@ public interface ArrayInit extends Expr
 {
     List elements();
     ArrayInit elements(List elements);
+
+    /**
+     * Type check the individual elements of the array initializer against
+     * the left-hand-side type.
+     */
+    void typeCheckElements(Type lhsType) throws SemanticException;
 }
