@@ -1,4 +1,4 @@
-public class Return5 {
+public class Return3 {
   int m5() {
     int i = 5;
     switch (i) {

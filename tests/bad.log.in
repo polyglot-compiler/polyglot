@@ -1,67 +1,3 @@
-Errors.jl:5: No valid method call found for m(int) in Errors.
-    return m(4) + (((null - 1) - 1) - (null - 1));
-           ^
-
-1 error.
-Errors2.jl:2: Could not find type "foo".
-  void m(foo x) {
-         ^
-
-1 error.
-Except3.jl:3: Method "m" throws the undeclared exception
-    "java.lang.Exception".
-  Object m(Except3 a) {
-         ^
-
-1 error.
-Except4.jl:2: Type "Except4" is not a subclass of "java.lang.Throwable".
-  void m() throws Except4 { }
-                  ^
-
-1 error.
-NoInit.java:6: variable i might not have been initialized
-        this.foo(i);
-                 ^
-NoInit.java:15: variable i might not have been initialized
-        this.foo(i);
-                 ^
-NoInit.java:22: unreachable statement
-            i = 3;
-            ^
-NoInit.java:24: variable i might not have been initialized
-        this.foo(i);
-                 ^
-NoInit.java:52: variable j might not have been initialized
-        this.foo(j);
-                 ^
-NoInit.java:66: variable i might not have been initialized
-        this.foo(i);
-                 ^
-6 errors
-NoReturns.java:2: missing return statement
-    int m1() {  }
-             ^
-NoReturns.java:6: missing return statement
-    int m3() { while (true) { if (true) { break; } } }
-             ^
-NoReturns.java:8: missing return statement
-    int m4() { l1: while (true) { l2: while (true) { break l1; } } }
-             ^
-NoReturns.java:21: missing return statement
-    int m6() {
-             ^
-NoReturns.java:26: missing return statement
-    int m7() {
-             ^
-5 errors
-Unreachable.jl:50: Syntax error.
-      System.out.println("ouch!"); // BAD (52)
-      ^
-
-jlc: Couldn't repair and continue parse
-jlc: Unable to recover from previous errors.
-jlc: Couldn't repair and continue parse
-4 errors.
 BadAbstract.jl:1: Class "C0" should be declared abstract; it does not
     implement method C0 m0().
 class C0
@@ -78,11 +14,16 @@ BadCtor.jl:2: Constructor name "B" does not match name of containing class
   B() { }
   ^
 
-BadCtor.jl:3: Cannot declare a constructor inside an anonymous class.
+BadCtor.jl:3: Could not disambiguate body of anonymous subclass of "C".
   C m() { return new C() { C() { } }; }
-                           ^
+                 ^
 
 2 errors.
+BadExcept2.jl:10: Could not find type "MisspelledException".
+    } catch (MisspelledException e) {}
+             ^
+
+1 error.
 BadExcept.jl:9: Cannot override method void method1() in Except1 with method
     void method1() throws e1 in Except1sub.
   void method1() throws e1 {}
@@ -94,11 +35,6 @@ BadExcept.jl:11: Cannot override method void method3() throws e2 in Except1
        ^
 
 2 errors.
-BadExcept2.jl:10: Could not find type "MisspelledException".
-    } catch (MisspelledException e) {}
-             ^
-
-1 error.
 BadExpCC.jl:8: Syntax error.
     super();
          ^
@@ -115,11 +51,6 @@ BadExtends.jl:3: Cannot extend final class "C0".
 BadInit.jl:4: Method no_such_fn not found.
     int a = no_such_fn();
             ^
-
-1 error.
-BadInner.jl:8: Could not find non-static member class "Inner".
-	  Object o = new Outer.Inner();
-	             ^
 
 1 error.
 BadInner2.jl:7: Cannot specify a containing instance for static classes.
@@ -157,9 +88,9 @@ BadInner7.jl:2: Cannot declare member class "BadInner7.BadInner7" inside class
   ^
 
 1 error.
-BadInterface.jl:17: Interface methods must be public.
-    private abstract C1 m0 ();
-                        ^
+BadInner.jl:8: Could not find non-static member class "Inner".
+	  Object o = new Outer.Inner();
+	             ^
 
 1 error.
 BadInterface2.jl:1: Could not find type "I0".
@@ -167,7 +98,12 @@ class C0 implements I0
                     ^
 
 1 error.
-BadOverride.java:76: method() in Sub cannot implement method() in Override; attempting to assign weaker access privileges; was public
+BadInterface.jl:17: Interface methods must be public.
+    private abstract C1 m0 ();
+                        ^
+
+1 error.
+BadOverride.java:79: method() in Sub cannot implement method() in Override; attempting to assign weaker access privileges; was public
 class Sub implements Override {
 ^
 1 error
@@ -179,6 +115,121 @@ BadPrim.jl:6: No valid method call found for m(int) in BadPrim.
 BadProt.jl:6: Interface methods must be public.
   protected abstract I0 m0 ();
                         ^
+
+1 error.
+BadStaticContext.java:8: cannot reference this before supertype constructor has been called
+        Y() { super(this.m()); }
+                    ^
+1 error
+BadSwitch1.jl:8: Case label must be a constant.
+      case x: System.out.println("x");
+      ^
+
+1 error.
+BadSwitch2.jl:8: Duplicate case label: BadSwitch2.x (0).
+      case x: System.out.println("x"); // duplicate label
+      ^
+
+1 error.
+Errors2.jl:2: Could not find type "foo".
+  void m(foo x) {
+         ^
+
+1 error.
+Errors.jl:5: No valid method call found for m(int) in Errors.
+    return m(4) + (((null - 1) - 1) - (null - 1));
+           ^
+
+1 error.
+NoInit10.jl:17: Local variable "x" may not have been initialized.
+    x++; // BAD
+    ^
+
+1 error.
+NoInit11.jl:7: Local variable "x" may not have been initialized.
+    return x; // BAD
+           ^
+
+1 error.
+NoInit12.jl:9: Local variable "x" may not have been initialized.
+    return x; // BAD
+           ^
+
+1 error.
+NoInit1.jl:9: Local variable "i" may not have been initialized.
+    foo(i); // BAD (m1)
+        ^
+
+1 error.
+NoInit2.jl:15: Local variable "i" may not have been initialized.
+    foo(i);
+        ^
+
+1 error.
+NoInit3.jl:15: Unreachable statement.
+      i = 3; // BAD (m3) -- unreachable
+      ^
+
+1 error.
+NoInit4.jl:34: Local variable "j" may not have been initialized.
+    foo(j); // BAD (m4)
+        ^
+
+1 error.
+NoInit5.jl:29: Local variable "i" may not have been initialized.
+    foo(i); // BAD (m5)
+        ^
+
+1 error.
+NoInit6.jl:20: Local variable "i" may not have been initialized.
+    i++; // BAD uninitialized (m11)
+    ^
+
+1 error.
+NoInit7.jl:9: Local variable "x" may not have been initialized.
+    x++; // BAD
+    ^
+
+1 error.
+NoInit8.jl:4: Local variable "x" may not have been initialized.
+    return x; // BAD
+           ^
+
+1 error.
+NoInit9.jl:7: Local variable "x" may not have been initialized.
+    return x; // BAD
+           ^
+
+1 error.
+NoReturn1.jl:2: Missing return statement.
+  int m1() {
+      ^
+
+1 error.
+NoReturn2.jl:2: Missing return statement.
+  int m6() {
+      ^
+
+1 error.
+NoReturn3.jl:2: Missing return statement.
+  int m3() {
+      ^
+
+1 error.
+NoReturn4.jl:2: Missing return statement.
+  int m4() {
+      ^
+
+1 error.
+NoReturn5.jl:2: Missing return statement.
+  int m7() {
+      ^
+
+1 error.
+Protection2.jl:6: Cannot override method final void f() in Protection2 with
+    method void f() in p2.
+  void f() {}
+       ^
 
 1 error.
 Protection.jl:5: Cannot declare method that is both abstract and static.
@@ -194,13 +245,83 @@ Protection.jl:8: Cannot declare method that is both abstract and native.
                        ^
 
 3 errors.
-Protection2.jl:6: Cannot override method final void f() in Protection2 with
-    method void f() in p2.
-  void f() {}
-       ^
+Unreachable10.jl:10: Unreachable statement.
+    System.out.println("Bad."); // BAD (m10)
+    ^
 
 1 error.
-BadStaticContext.java:8: cannot reference this before supertype constructor has been called
-        Y() { super(this.m()); }
-                    ^
-1 error
+Unreachable11.jl:10: Unreachable statement.
+      System.out.println("Bad"); // BAD (m11)
+      ^
+
+1 error.
+Unreachable12.jl:7: Unreachable statement.
+    return;
+    ^
+
+1 error.
+Unreachable13.jl:7: Unreachable statement.
+    return;
+    ^
+
+1 error.
+Unreachable14.jl:7: Unreachable statement.
+    return;
+    ^
+
+1 error.
+Unreachable15.jl:8: Unreachable statement.
+    return 1;
+    ^
+
+1 error.
+Unreachable16.jl:7: Unreachable statement.
+    return 1;
+    ^
+
+1 error.
+Unreachable1.jl:6: Unreachable statement.
+    System.out.println("Never happens."); // BAD (m1)
+    ^
+
+1 error.
+Unreachable2.jl:6: Unreachable statement.
+    System.out.println("Not likely."); // BAD (m2)
+    ^
+
+1 error.
+Unreachable3.jl:17: Unreachable statement.
+	return; // BAD (m3)
+	^
+
+1 error.
+Unreachable4.jl:9: Unreachable statement.
+      return; // BAD (m4)
+      ^
+
+1 error.
+Unreachable5.jl:11: Unreachable statement.
+      System.out.println("No good"); // BAD. (m5)
+      ^
+
+1 error.
+Unreachable6.jl:9: Unreachable statement.
+      System.out.println("no good"); // BAD (m6)
+      ^
+
+1 error.
+Unreachable7.jl:12: Unreachable statement.
+    System.out.println("no good"); // BAD (m7)
+    ^
+
+1 error.
+Unreachable8.jl:11: Unreachable statement.
+    System.out.println("Won't happen."); // BAD (m8)
+    ^
+
+1 error.
+Unreachable9.jl:10: Unreachable statement.
+    System.out.println("Bad."); // BAD (m9)
+    ^
+
+1 error.

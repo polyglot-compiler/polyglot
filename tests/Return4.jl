@@ -1,4 +1,4 @@
-public class Return8 {
+public class Return4 {
   int m8() {
     try {
       return 9;
