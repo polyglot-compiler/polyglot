@@ -126,6 +126,16 @@ extend class_member_declaration ::=
 	       RESULT = l; :}
     ;
 
+switch_block_statement_groups ::=
+        COMMA_LIST:a
+            {: RESULT = a.list(); :}
+    ;
+
+block_statements ::=
+        COMMA_LIST:a
+            {: RESULT = a.list(); :}
+    ;
+
 extend interface_member_declarations ::=
         COMMA_LIST:a
 	    {: RESULT = a.list(); :}
@@ -139,6 +149,11 @@ extend class_body_declarations ::=
 extend formal_parameter_list ::=
 	COMMA_LIST:a
 	    {: RESULT = a.list(); :}
+    ;
+
+extend formal_parameter ::=
+        COMMA_FORM:a
+	    {: RESULT = (Formal) a.node(); :}
     ;
 
 extend throws ::=
