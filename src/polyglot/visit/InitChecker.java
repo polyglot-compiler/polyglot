@@ -557,12 +557,6 @@ public class InitChecker extends DataFlow
         }
         else if (n instanceof Expr && ((Expr)n).type().isBoolean() && 
                     (n instanceof Binary || n instanceof Unary)) {
-            if (trueItem == null) {
-                trueItem = inDFItem;
-            }
-            if (falseItem == null) {
-                falseItem =  inDFItem;
-            }            
             ret = flowBooleanConditions(trueItem, falseItem, inDFItem, graph, (Expr)n, succEdgeKeys);                        
         } 
         if (ret != null) {

@@ -231,12 +231,6 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      */
     protected Map flowBooleanConditions(Item trueItem, Item falseItem, Item otherItem, 
                                         FlowGraph graph, Expr n, Set edgeKeys) {
-        if (trueItem == null || falseItem == null) {
-            throw new InternalCompilerError("The true and false items cannot be null. " +
-                "It is often correct to set them to otherItem, but this should be " +
-                "done by the caller.");
-        }
-        
         if (!n.type().isBoolean() || !(n instanceof Binary || n instanceof Unary)) {
             throw new InternalCompilerError("This method only takes binary " +
                       "or unary operators of boolean type");
@@ -453,7 +447,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                     }
                 }
             }
-    
+                
             // calculate the out item
             Map oldOutItems = p.outItems;
             p.inItem = this.safeConfluence(inItems, inItemKeys, p.node, graph);
@@ -474,12 +468,13 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                 // to (re)calculate the flow for the successors of p.
                 // Add each successor of p back onto the queue. 
                 for (Iterator i = p.succs.iterator(); i.hasNext(); ) {
-                    Peer q = ((Edge) i.next()).getTarget();
+                    Edge e = (Edge)i.next();
+                    Peer q = e.getTarget();
                     
                     // System.out.println("// " + p.node + " -> " + q.node);
                     
                     // Edge p -> q.
-                    if (!queue.contains(q)) {
+                    if (p.outItems.get(e.getKey()) != null && !queue.contains(q)) {
                         queue.addLast(q);
                     }  
                 }
