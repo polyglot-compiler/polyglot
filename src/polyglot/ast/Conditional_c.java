@@ -215,10 +215,10 @@ public class Conditional_c extends Expr_c implements Conditional
     /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr)
     {
-	translateSubexpr(cond, w, tr);
+	translateSubexpr(cond, false, w, tr);
 	w.write(" ? ");
-	translateSubexpr(consequent, w, tr);
+	translateSubexpr(consequent, false, w, tr);
 	w.write(" : ");
-	translateSubexpr(alternative, w, tr);
+	translateSubexpr(alternative, false, w, tr);
     }
 }

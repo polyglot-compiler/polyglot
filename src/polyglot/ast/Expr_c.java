@@ -78,20 +78,31 @@ public abstract class Expr_c extends Node_c implements Expr
     /**
      * Correctly parenthesize the subexpression <code>expr<code> given
      * the its precendence and the precedence of the current expression.
+     */
+    public void translateSubexpr(Expr expr, CodeWriter w, Translator tr) {
+        translateSubexpr(expr, true, w, tr);
+    }
+
+    /**
+     * Correctly parenthesize the subexpression <code>expr<code> given
+     * the its precendence and the precedence of the current expression.
      *
      * @param expr The subexpression.
+     * @param associative Whether expr is the left (right) child of a left-
+     * (right-) associative operator.
      * @param c The context of translation.
      * @param w The output writer.
      */
-    public void translateSubexpr(Expr expr, CodeWriter w, Translator tr) {
-	if (precedence().isTighter(expr.precedence())) {
+    public void translateSubexpr(Expr expr, boolean associative,
+                                 CodeWriter w, Translator tr) {
+        if (! associative && precedence().isSame(expr.precedence()) ||
+	    precedence().isTighter(expr.precedence())) {
 	    w.write("(");
-	}
-
-	translateBlock(expr, w, tr);
-
-	if (precedence().isTighter(expr.precedence())) {
+            translateBlock(expr, w, tr);
 	    w.write( ")");
 	}
+        else {
+            translateBlock(expr, w, tr);
+        }
     }
 }

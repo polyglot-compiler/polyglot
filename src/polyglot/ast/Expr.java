@@ -32,6 +32,20 @@ public interface Expr extends Receiver {
     /**
      * Correctly parenthesize the subexpression <code>expr<code> given
      * based on its precedence and the precedence of this expression.
+     *
+     * If the sub-expression has the same precedence as this expression
+     * we parenthesize if the sub-expression does not associate; e.g.,
+     * we parenthesis the right sub-expression of a left-associative
+     * operator.
+     */
+    void translateSubexpr(Expr expr, boolean associative,
+                          CodeWriter w, Translator tr);
+
+    /**
+     * Correctly parenthesize the subexpression <code>expr<code> given
+     * based on its precedence and the precedence of this expression.
+     *
+     * This is equivalent to <code>translateSubexpr(expr, true, w, tr)</code>
      */
     void translateSubexpr(Expr expr, CodeWriter w, Translator tr);
 }

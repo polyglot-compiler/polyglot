@@ -388,11 +388,11 @@ public class Binary_c extends Expr_c implements Binary
     public void translate_(CodeWriter w, Translator tr) {
 	TypeSystem ts = tr.typeSystem();
 
-	translateSubexpr(left, w, tr);
+	translateSubexpr(left, true, w, tr);
 	w.write(" ");
 	w.write(op.toString());
 	w.allowBreak(type().isSame(ts.String()) ? 0 : 2, " ");
-	translateSubexpr(right, w, tr);
+	translateSubexpr(right, false, w, tr);
     }
 
   public void dump(CodeWriter w) {

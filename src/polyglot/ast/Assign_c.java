@@ -200,11 +200,11 @@ public class Assign_c extends Expr_c implements Assign
 
   /** Write the expression to an output file. */
   public void translate_(CodeWriter w, Translator tr) {
-    translateSubexpr(left, w, tr);
+    translateSubexpr(left, true, w, tr);
     w.write(" ");
     w.write(op.toString());
     w.allowBreak(2, " ");
-    translateSubexpr(right, w, tr);
+    translateSubexpr(right, false, w, tr);
   }
 
   /** Dumps the AST. */
