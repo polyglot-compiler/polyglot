@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * A <code>NodeFactory</code> constructs AST nodes.  All node construction
- * should go through this factory or by done with the <code>copy()</code>
+ * should go through this factory or be done with the <code>copy()</code>
  * method of <code>Node</code>.
  */
 public interface NodeFactory

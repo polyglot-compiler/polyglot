@@ -943,6 +943,11 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     protected Ext extArrayAccessAssignImpl() {
         return extAssignImpl();
     }
+
+    /**
+     * Create the <code>Ext</code> object for a <code>Binary</code> AST node.
+     * @return the <code>Ext</code> object for a <code>Binary</code> AST node.
+     */
     protected Ext extBinaryImpl() {
         return extExprImpl();
     }
