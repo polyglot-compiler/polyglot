@@ -45,4 +45,17 @@ public interface Type extends Qualifier
     boolean isClass();
     boolean isThrowable();
     boolean isUncheckedException();
+
+    /**
+     * Yields a string representing this type.  The string
+     * should be consistent with equality.  That is,
+     * if this.isSame(anotherType), then it should be
+     * that this.toString().equals(anotherType.toString()).
+     *
+     * The string does not have to be a legal Java identifier.
+     * It is suggested, but not required, that it be an
+     * easily human readable representation, and thus useful
+     * in error messages and generated output.
+     */
+    String toString();
 }
