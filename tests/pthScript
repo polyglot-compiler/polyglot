@@ -104,7 +104,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         Initializer4.jl ;
         Inner0.jl ; Inner1.jl ; Inner2.jl ; Inner3.jl ; Inner4.jl ;
         Inner5.jl ; Inner6.jl ; Inner7.jl ; Inner8.jl ; Inner9.jl ;
-        Inner10.jl ; Inner11.jl ; Inner12.jl ;
+        Inner10.jl ; Inner11.jl ; Inner12.jl ; Inner13.jl ;
         InnerSuperConstructor1.jl;
         InnerSuperConstructor2.jl (Semantic, ".*must have an enclosing instance that is a subtype.*");
         InnerSuperConstructor3.jl;
