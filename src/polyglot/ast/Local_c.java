@@ -121,6 +121,13 @@ public class Local_c extends Expr_c implements Local
   public void dump(CodeWriter w) {
     super.dump(w);
 
+    if (li != null) {
+	w.allowBreak(4, " ");
+	w.begin(0);
+	w.write("(instance " + li + ")");
+	w.end();
+    }
+
     w.allowBreak(4, " ");
     w.begin(0);
     w.write("(name " + name + ")");
