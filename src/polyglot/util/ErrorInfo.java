@@ -48,7 +48,7 @@ public class ErrorInfo
     case WARNING:
       return "Warning";
     case INTERNAL_ERROR:
-      return "Interal Error";
+      return "Internal Error";
     case IO_ERROR:
       return "I/O Error";
     case LEXICAL_ERROR:
@@ -62,6 +62,6 @@ public class ErrorInfo
     default:
       return "(Unknown)";
     }
-  }
+  }  
 }
 
