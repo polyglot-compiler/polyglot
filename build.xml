@@ -426,9 +426,13 @@ ext=''
     <delete file="${bin}/defs"/>
   </target>
 
-  <target name="jar" depends="jl">
+  <target name="polyglot-jar" depends="jl">
     <jar jarfile="${lib}/polyglot.jar" basedir="${classes}"
       includes="polyglot/ast/**,polyglot/ext/jl/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**"/>
+  </target>
+
+  <target name="ppg-jar" depends="jl">
+    <jar jarfile="${lib}/ppg.jar" basedir="${classes}" includes="ppg/**"/>
   </target>
 
   <target name="pao-jar" depends="pao">
@@ -474,7 +478,7 @@ ext=''
     </copy>
   </target>
 
-  <target name="jl-dist" depends="jar,dist-dir,bin">
+  <target name="jl-dist" depends="cup,ppg-jar,polyglot-jar,dist-dir,bin">
     <copy todir="${dist}/lib" file="${lib}/polyglot.jar"/>
 
     <copy todir="${dist}/src/polyglot/ast">
@@ -519,7 +523,8 @@ ext=''
     </copy>
 
     <copy todir="${dist}/src/ppg">
-      <fileset dir="${src}/ppg"/>
+      <fileset dir="${src}/ppg"
+        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
     </copy>
 
     <copy todir="${dist}/src/polyglot/ext/jl/tests" file="${src}/polyglot/ext/jl/tests/Makefile"/>
@@ -527,7 +532,10 @@ ext=''
     <copy file="${bin}/jlc.in" todir="${dist}/bin"/>
     <copy file="doc/Overview.txt" todir="${dist}/doc"/>
     <copy file="${lib}/jlex.jar" todir="${dist}/lib"/>
+    <copy file="${lib}/java_cup.jar" todir="${dist}/lib"/>
+    <copy file="${lib}/ppg.jar" todir="${dist}/lib"/>
     <copy file="build.xml" todir="${dist}"/>
+    <copy file="configure.xml" todir="${dist}"/>
     <copy file="README" todir="${dist}"/>
     <copy file="LICENSE" todir="${dist}"/>
   </target>
