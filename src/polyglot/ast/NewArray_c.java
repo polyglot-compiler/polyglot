@@ -107,7 +107,15 @@ public class NewArray_c extends Expr_c implements NewArray
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-	ArrayType type = ts.arrayOf(baseType.type(), dims.size() + addDims);
+        for (Iterator i = dims.iterator(); i.hasNext(); ) {
+            Expr expr = (Expr) i.next();
+            if (! ts.isImplicitCastValid(expr.type(), ts.Int())) {
+                throw new SemanticException("Array dimension must be an integer.",
+                        expr.position());
+            }
+        }
+
+        ArrayType type = ts.arrayOf(baseType.type(), dims.size() + addDims);
 
 	if (init != null) {
             init.typeCheckElements(type);
