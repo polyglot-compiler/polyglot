@@ -56,7 +56,7 @@ public class Main
 	  + (options.output_directory != null ?
 		  options.output_directory + File.pathSeparator + "." +
 		  File.pathSeparator
-		: "") 
+		: "." + File.pathSeparator)
 	  + System.getProperty("java.class.path") + " "
 	  + outfile;
 	
