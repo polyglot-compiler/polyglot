@@ -1,11 +1,11 @@
-package polyglot.util.ppg;
+package ppg;
 
 import java.io.*;
-import polyglot.util.ppg.cmds.*;
-import polyglot.util.ppg.lex.*;
-import polyglot.util.ppg.parse.*;
-import polyglot.util.ppg.spec.*;
-import polyglot.util.ppg.util.*;
+import ppg.cmds.*;
+import ppg.lex.*;
+import ppg.parse.*;
+import ppg.spec.*;
+import ppg.util.*;
 
 public class PPG
 {

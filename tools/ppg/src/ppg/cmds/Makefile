@@ -1,5 +1,5 @@
 SOURCE = ../../../..
-PACKAGE = polyglot/util/ppg/cmds
+PACKAGE = ppg/cmds
 SUBDIRS = 
 
 include $(SOURCE)/Rules.mk
@@ -13,6 +13,7 @@ SOURCES = \
 	TransferCmd.java \
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+
 MANIFEST = Makefile $(SOURCES)
 JAR_FILE = polyglot.jar
 

@@ -3,7 +3,7 @@
  * For use in Cornell University Computer Science CS 412/413
  */
 
-package polyglot.util.ppg.util;
+package ppg.util;
 
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;

@@ -1,8 +1,8 @@
-package polyglot.util.ppg.cmds;
+package ppg.cmds;
 
 import java.util.*;
-import polyglot.util.ppg.atoms.*;
-import polyglot.util.ppg.util.*;
+import ppg.atoms.*;
+import ppg.util.*;
 public class DropCmd implements Command
 {
 	private Production prod; // productions to be dropped for some nonterminal

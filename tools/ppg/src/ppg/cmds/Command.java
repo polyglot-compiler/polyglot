@@ -1,6 +1,6 @@
-package polyglot.util.ppg.cmds;
+package ppg.cmds;
 
-import polyglot.util.ppg.parse.*;
+import ppg.parse.*;
 
 public interface Command extends Unparse
 {

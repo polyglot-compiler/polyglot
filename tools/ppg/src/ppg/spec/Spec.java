@@ -1,9 +1,9 @@
-package polyglot.util.ppg.spec;
+package ppg.spec;
 
 import java.util.*;
-import polyglot.util.ppg.*;
-import polyglot.util.ppg.code.*;
-import polyglot.util.ppg.parse.*;
+import ppg.*;
+import ppg.code.*;
+import ppg.parse.*;
 
 public abstract class Spec implements Unparse
 {

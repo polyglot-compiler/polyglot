@@ -1,10 +1,10 @@
-package polyglot.util.ppg.parse;
+package ppg.parse;
 
 import java.io.*;
-import polyglot.util.ppg.*;
-import polyglot.util.ppg.lex.*;
-import polyglot.util.ppg.spec.*;
-import polyglot.util.ppg.util.*;
+import ppg.*;
+import ppg.lex.*;
+import ppg.spec.*;
+import ppg.util.*;
 
 public class ParseTest
 {

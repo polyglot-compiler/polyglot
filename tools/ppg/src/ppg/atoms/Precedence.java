@@ -1,4 +1,4 @@
-package polyglot.util.ppg.atoms;
+package ppg.atoms;
 
 import java.util.*;
 

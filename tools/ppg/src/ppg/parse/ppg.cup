@@ -1,14 +1,14 @@
-package polyglot.util.ppg.parse;
+package ppg.parse;
 
 import java.io.*;
 import java.util.*;
 import java_cup.runtime.Symbol; 
-import polyglot.util.ppg.*;
-import polyglot.util.ppg.atoms.*;
-import polyglot.util.ppg.cmds.*;
-import polyglot.util.ppg.code.*;
-import polyglot.util.ppg.lex.*;
-import polyglot.util.ppg.spec.*;
+import ppg.*;
+import ppg.atoms.*;
+import ppg.cmds.*;
+import ppg.code.*;
+import ppg.lex.*;
+import ppg.spec.*;
 
 parser Parser {: 
     private Lexer lexer;           

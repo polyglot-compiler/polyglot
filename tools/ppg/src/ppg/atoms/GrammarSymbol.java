@@ -1,6 +1,6 @@
-package polyglot.util.ppg.atoms;
+package ppg.atoms;
 
-import polyglot.util.ppg.util.*;
+import ppg.util.*;
 
 public abstract class GrammarSymbol extends GrammarPart implements Equatable
 {

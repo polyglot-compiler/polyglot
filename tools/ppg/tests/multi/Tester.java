@@ -1,4 +1,4 @@
-package polyglot.util.ppg.test.multi;
+package ppg.test.multi;
 
 import java.io.*;
 import java_cup.runtime.*;

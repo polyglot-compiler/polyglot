@@ -1,6 +1,6 @@
-package polyglot.util.ppg.atoms;
+package ppg.atoms;
 
-import polyglot.util.ppg.parse.*;
+import ppg.parse.*;
 
 public abstract class GrammarPart implements Unparse
 {

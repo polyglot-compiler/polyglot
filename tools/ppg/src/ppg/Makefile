@@ -1,5 +1,5 @@
 SOURCE = ../../..
-PACKAGE = polyglot/util/ppg
+PACKAGE = ppg
 SUBDIRS = atoms cmds code lex parse spec util
 
 include $(SOURCE)/Rules.mk
@@ -9,6 +9,7 @@ SOURCES = \
 	PPGError.java 
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+
 MANIFEST = Makefile $(SOURCES) tests
 JAR_FILE = polyglot.jar
 

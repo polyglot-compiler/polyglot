@@ -1,14 +1,14 @@
-package polyglot.util.ppg.spec;
+package ppg.spec;
 
 import java.io.*;
 import java.util.*;
-import polyglot.util.ppg.*;
-import polyglot.util.ppg.atoms.*;
-import polyglot.util.ppg.cmds.*;
-import polyglot.util.ppg.code.*;
-import polyglot.util.ppg.lex.*;
-import polyglot.util.ppg.parse.*;
-import polyglot.util.ppg.util.*;
+import ppg.*;
+import ppg.atoms.*;
+import ppg.cmds.*;
+import ppg.code.*;
+import ppg.lex.*;
+import ppg.parse.*;
+import ppg.util.*;
 
 public class PPGSpec extends Spec
 {

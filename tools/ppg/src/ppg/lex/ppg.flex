@@ -1,8 +1,7 @@
-package polyglot.util.ppg.lex;
+package ppg.lex;
 
 import java.io.InputStream;
-import polyglot.util.ppg.parse.*;
-//import polyglot.util.Position;
+import ppg.parse.*;
 
 %%
 

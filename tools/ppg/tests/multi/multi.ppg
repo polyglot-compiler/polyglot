@@ -1,6 +1,6 @@
 include "multi.cup"
 
-package polyglot.util.ppg.test.multi;
+package ppg.test.multi;
 
 terminal Token EXPR, PAREN_EXPR;
 

@@ -11,6 +11,7 @@ SOURCES = \
 	Token.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+
 MANIFEST = Makefile $(SOURCES) ppg.flex
 JAR_FILE = polyglot.jar
 

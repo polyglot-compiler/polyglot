@@ -1,4 +1,4 @@
-package polyglot.util.ppg.code;
+package ppg.code;
 
 public class ParserCode extends Code
 {

@@ -1,7 +1,7 @@
-package polyglot.util.ppg.cmds;
+package ppg.cmds;
 
-import polyglot.util.ppg.atoms.*;
-import polyglot.util.ppg.util.*;
+import ppg.atoms.*;
+import ppg.util.*;
 
 public class NewProdCmd implements Command
 {

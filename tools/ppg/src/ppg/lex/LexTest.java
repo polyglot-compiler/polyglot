@@ -1,7 +1,7 @@
-package polyglot.util.ppg.lex;
+package ppg.lex;
 
 import java.io.*;
-import polyglot.util.ppg.parse.*;
+import ppg.parse.*;
 
 public class LexTest
 {

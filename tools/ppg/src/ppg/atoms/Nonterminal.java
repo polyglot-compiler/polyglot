@@ -1,8 +1,8 @@
-package polyglot.util.ppg.atoms;
+package ppg.atoms;
 
 import java.util.*;
-import polyglot.util.ppg.parse.*;
-import polyglot.util.ppg.util.*;
+import ppg.parse.*;
+import ppg.util.*;
 
 public class Nonterminal extends GrammarSymbol
 {

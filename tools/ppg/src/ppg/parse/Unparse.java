@@ -1,6 +1,6 @@
-package polyglot.util.ppg.parse;
+package ppg.parse;
 
-import polyglot.util.ppg.util.*;
+import ppg.util.*;
 
 public interface Unparse { 
     /**

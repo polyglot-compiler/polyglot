@@ -1,7 +1,7 @@
-package polyglot.util.ppg.parse;
+package ppg.parse;
 
 import java.io.*;
-import polyglot.util.ppg.lex.*;
+import ppg.lex.*;
 
 /** 
  * This error is thrown when the parser has an internal error -- the user should not see these

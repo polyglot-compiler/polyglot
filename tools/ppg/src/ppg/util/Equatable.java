@@ -1,4 +1,4 @@
-package polyglot.util.ppg.util;
+package ppg.util;
 
 public interface Equatable
 {

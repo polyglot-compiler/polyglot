@@ -1,9 +1,8 @@
-package polyglot.util.ppg.lex;
+package ppg.lex;
 
 import java.io.*;
 import java_cup.runtime.Symbol;
-import polyglot.util.ppg.parse.*;
-//import polyglot.util.Position;
+import ppg.parse.*;
 
 public class Token /* extends Symbol */ implements LexerResult {
 

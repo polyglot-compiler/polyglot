@@ -11,6 +11,7 @@ SOURCES = \
 	Unparse.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+
 MANIFEST = Makefile $(SOURCES) ppg.cup
 JAR_FILE = polyglot.jar
 

@@ -1,4 +1,4 @@
-package polyglot.util.ppg;
+package ppg;
 
 public class PPGError extends Throwable
 {

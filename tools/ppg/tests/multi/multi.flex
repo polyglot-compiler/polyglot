@@ -1,7 +1,6 @@
-package polyglot.util.ppg.test.multi;
+package ppg.test.multi;
 
 import java.io.InputStream;
-//import polyglot.util.Position;
 
 %%
 

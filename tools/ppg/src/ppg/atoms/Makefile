@@ -1,5 +1,5 @@
 SOURCE = ../../../..
-PACKAGE = polyglot/util/ppg/atoms
+PACKAGE = ppg/atoms
 SUBDIRS = 
 
 include $(SOURCE)/Rules.mk
@@ -16,6 +16,7 @@ SOURCES = \
 	TerminalList.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+
 MANIFEST = Makefile $(SOURCES)
 JAR_FILE = polyglot.jar
 

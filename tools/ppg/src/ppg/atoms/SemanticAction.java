@@ -1,7 +1,7 @@
-package polyglot.util.ppg.atoms;
+package ppg.atoms;
 
-import polyglot.util.ppg.parse.*;
-import polyglot.util.ppg.util.*;
+import ppg.parse.*;
+import ppg.util.*;
 public class SemanticAction extends GrammarPart
 {
 	private String action;
