@@ -408,25 +408,137 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                     flowgraphStack.addFirst(new FlowGraphSource(g, cd));
             }
         }
-    } 
-    
-	/**
+    }
+
+    /** A "stack frame" for recursive DFS */
+    static private class Frame {
+	Peer peer;
+	Iterator edges;
+	Frame(Peer p, boolean forward) {
+	    peer = p;
+	    if (forward) edges = p.succs().iterator();
+	    else edges = p.preds().iterator();
+	}
+    }
+
+    /** Returns the linked list [by_scc, scc_head] where
+     *  by_scc is an array in which SCCs occur in topologically
+     *  order. 
+     *  scc_head[n] where n is the first peer in an SCC is set to -1.
+     *  scc_head[n] where n is the last peer in a (non-singleton) SCC is set
+     *  to the index of the first peer. Otherwise it is -2. */
+    protected LinkedList findSCCs(FlowGraph graph) {
+	Collection peers = graph.peers();
+	Peer[] sorted = new Peer[peers.size()];
+        Collection start = graph.peers(graph.startNode());
+	  // if start == peers, making all nodes reachable,
+	  // the problem still arises.
+
+	//System.out.println("scc: npeers = " + peers.size());
+
+// First, topologically sort the nodes (put in postorder)
+	int n = 0;
+	LinkedList stack = new LinkedList();
+	Set reachable = new HashSet();
+	for (Iterator i = start.iterator(); i.hasNext(); ) {
+	  Peer peer = (Peer)i.next();
+	  if (!reachable.contains(peer)) {
+	    reachable.add(peer);
+	    stack.addFirst(new Frame(peer, true));
+	    while (stack.size() != 0) {
+		Frame top = (Frame)stack.getFirst();
+		if (top.edges.hasNext()) {
+		    Edge e = (Edge)top.edges.next();
+		    Peer q = e.getTarget();
+		    if (!reachable.contains(q)) {
+			reachable.add(q);
+			stack.addFirst(new Frame(q, true));
+		    }
+		} else {
+		    stack.removeFirst();
+		    sorted[n++] = top.peer;
+		}
+	    }
+	  }
+	}
+	//System.out.println("scc: reached " + n);
+// Now, walk the transposed graph picking nodes in reverse
+// postorder, thus picking out one SCC at a time and
+// appending it to "by_scc".
+	Peer[] by_scc = new Peer[n];
+	int[] scc_head = new int[n];
+	Set visited = new HashSet();
+	int n2 = 0;
+	for (int i=n-1; i>=0; i--) {
+	    if (!visited.contains(sorted[i])) {
+		visited.add(sorted[i]);
+		int head = n2;
+		by_scc[n2++] = sorted[i]; // XXX shouldn't be necessary
+		                          // XXX but makes some analyses work
+		//System.out.println("scc: found scc starting at " + head);
+		stack.add(new Frame(sorted[i], false));
+		while (stack.size() != 0) {
+		    Frame top = (Frame)stack.getFirst();
+		    if (top.edges.hasNext()) {
+			Edge e = (Edge)top.edges.next();
+			Peer q = e.getTarget();
+			if (reachable.contains(q) && !visited.contains(q)) {
+			    visited.add(q);
+			    Frame f = new Frame(q, false);
+			    stack.addFirst(f);
+			}
+		    } else {
+			stack.removeFirst();
+			if (stack.size() != 0) { // XXX else is the head
+			    scc_head[n2] = -2;
+			    by_scc[n2++] = top.peer;
+			}
+		    }
+		}
+		scc_head[n2-1] = head;
+		scc_head[head] = -1;
+	    }
+	}
+/*
+	for (int j = 0; j < n; j++) {
+	    switch(scc_head[j]) {
+		case -1: System.out.println(j + "[HEAD] : " + by_scc[j]); break;
+		case -2: System.out.println(j + "       : " + by_scc[j]); break;
+		default: System.out.println(j + " ->"+ scc_head[j] + " : " + by_scc[j]);
+	    }
+	}
+*/
+	LinkedList ret = new LinkedList();
+	ret.addFirst(scc_head);
+	ret.addFirst(by_scc);
+	return ret;
+    }
+
+    /**
      * Perform the dataflow on the flowgraph provided.
      */
     protected void dataflow(FlowGraph graph) {
-        // queue of Peers whose flow needs to be updated.
-        // initially this is only the start node of the graph.
-        // Thus, unreachable nodes will have no flow through them at all.
-        LinkedList queue = new LinkedList(graph.peers(graph.startNode()));
-        
-                
-        // ### we could be a bit smarter and determine the strongly connected
-        // components of the flow graph, and process those in topographic
-        // order.
-        while (! queue.isEmpty()) {
-            Peer p = (Peer) queue.removeFirst();
-            
-            // get the in items by examining the out items of all 
+	LinkedList pair = findSCCs(graph);
+	Peer[] by_scc = (Peer[])pair.getFirst();
+	int[] scc_head = (int[])pair.getLast();
+	int npeers = by_scc.length;
+
+	/* by_scc contains the peers grouped by SCC.
+	   scc_head marks where the SCCs are. The SCC
+	   begins with a -1 and ends with the index of
+	   the beginning of the SCC.
+	*/
+
+	int current = 0;
+	boolean change = false;
+
+	while (current < npeers) {
+            Peer p = by_scc[current];
+	    if (scc_head[current] == -1) {
+		change = false; // just started working on a new SCC
+	    }
+
+            // get the in items by examining the out items of all
             // the predecessors of p
             List inItems = new ArrayList(p.preds.size());
             List inItemKeys = new ArrayList(p.preds.size());
@@ -461,24 +573,19 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                         "outputs for " + p.outItems.keySet() + "; needs to " +
                         "define outputs for all of: " + p.succEdgeKeys());
             }
-            
-            if (oldOutItems != p.outItems && 
+
+            if (oldOutItems != p.outItems &&
                  (oldOutItems == null || !oldOutItems.equals(p.outItems))) {
-                // the outItems of p has changed, so we will 
-                // to (re)calculate the flow for the successors of p.
-                // Add each successor of p back onto the queue. 
-                for (Iterator i = p.succs.iterator(); i.hasNext(); ) {
-                    Edge e = (Edge)i.next();
-                    Peer q = e.getTarget();
-                    
-                    // System.out.println("// " + p.node + " -> " + q.node);
-                    
-                    // Edge p -> q.
-                    if (p.outItems.get(e.getKey()) != null && !queue.contains(q)) {
-                        queue.addLast(q);
-                    }  
-                }
+                // the outItems of p has changed, so we will
+                // loop when we get to the end of the current SCC.
+		change = true;
             }
+	    if (change && scc_head[current] >= 0) {
+		current = scc_head[current]; // loop!
+		/* now scc_head[current] == -1 */
+	    } else {
+		current++;
+	    }
         }
     }
 
