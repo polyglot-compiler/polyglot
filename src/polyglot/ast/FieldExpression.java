@@ -30,7 +30,7 @@ public class FieldExpression extends Expression
    * <code>Expression</code>.
    */
 
-  private FieldExpression( Node ext, Node target, String name, FieldInstance fi)
+  protected FieldExpression( Node ext, Node target, String name, FieldInstance fi)
   {
     if (target != null && ! (target instanceof TypeNode ||
 			     target instanceof Expression))
