@@ -12,6 +12,7 @@ import java.util.List;
 public interface PClass extends Importable {
     /**
      * The formal type parameters associated with <code>this</code>.
+     * XXX What is this a list OF?
      */
     List formals();
     

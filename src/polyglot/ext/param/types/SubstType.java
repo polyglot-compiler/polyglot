@@ -4,7 +4,7 @@ import polyglot.types.*;
 import java.util.Iterator;
 
 /**
- * A type on that substitutions have been applied.
+ * A type on which substitutions have been applied.
  */
 public interface SubstType extends Type
 {
