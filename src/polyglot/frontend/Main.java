@@ -33,7 +33,8 @@ public class Main
                                 (Collection)options.get( MAIN_OPT_SOURCE_PATH),
                                 (File)options.get( MAIN_OPT_OUTPUT_DIRECTORY),
                                 (String)options.get( MAIN_OPT_OUTPUT_EXT),
-                                (Boolean)options.get( MAIN_OPT_STDOUT));
+                                (Boolean)options.get( MAIN_OPT_STDOUT),
+                                source);
 
     /* Must initialize before instantiating any compilers. */
     Compiler.initialize( options, tf, new MainErrorQueueFactory());

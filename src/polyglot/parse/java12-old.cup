@@ -453,9 +453,10 @@ import_declarations ::=
 type_declarations ::=
 					// List of ClassNode
 		type_declaration:a
-			{: List l = new LinkedList(); l.add(a); RESULT = l; :}
+			{: List l = new LinkedList(); 
+				if( a != null) { l.add(a); } RESULT = l; :}
 	|	type_declarations:a type_declaration:b
-			{: RESULT = a; a.add(b); :}
+			{: RESULT = a; if( b != null) { a.add(b); } :}
 	;
 package_declaration ::=
 					// AmbiguousNameExpression
@@ -490,6 +491,7 @@ type_declaration ::=
 	|	interface_declaration:a
 			{: RESULT = a; :}	
 	|	SEMICOLON
+			{: RESULT = null; :}
 	;
 
 // 19.7) Productions used only in the LALR(1) grammar

@@ -406,13 +406,38 @@ public class BinaryExpression extends Expression {
   
    public void translate(LocalContext c, CodeWriter w) 
    {
-     translateExpression( left, c, w);
-
-     w.write( " ");
-     w.write( getOperatorString( operator));
-     w.write( " ");
-
-     translateExpression( right, c, w);
+     /* Extra checks are need here to see if we have a numeric binary
+      * expression inside of a String concatenation. */
+     try
+     {
+       if( getCheckedType().equals( c.getType( "java.lang.String")) 
+           && left.getCheckedType().isPrimitive()) {
+         w.write( "(");
+         left.translate( c, w);
+         w.write( ")");
+       }
+       else {
+         translateExpression( left, c, w);
+       }
+       
+       w.write( " ");
+       w.write( getOperatorString( operator));
+       w.write( " ");
+       
+       if( getCheckedType().equals( c.getType( "java.lang.String")) 
+           && right.getCheckedType().isPrimitive()) {
+         w.write( "(");
+         right.translate( c, w);
+         w.write( ")");
+       }
+       else {
+         translateExpression( right, c, w);
+       }
+     }
+     catch( TypeCheckException e) 
+     {
+       throw new InternalCompilerError( e.getMessage());
+     }
    }
 
    public Node dump( CodeWriter w)

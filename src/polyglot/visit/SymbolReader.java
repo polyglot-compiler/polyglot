@@ -2,15 +2,20 @@ package jltools.visit;
 
 
 import jltools.ast.*;
-import jltools.frontend.Compiler;
+import jltools.frontend.*;
 import jltools.types.*;
 import jltools.util.*;
 
+import java.io.IOException;
 
 public class SymbolReader extends NodeVisitor
 {
   private ClassResolver systemResolver;
   private TableClassResolver currentResolver;
+
+  private Target target;
+  private TargetFactory tf;
+
   private TypeSystem ts;
   private ErrorQueue eq;
 
@@ -21,10 +26,15 @@ public class SymbolReader extends NodeVisitor
 
   public SymbolReader( ClassResolver systemResolver, 
                        TableClassResolver currentResolver, 
+                       Target target, TargetFactory tf,
                        TypeSystem ts, ErrorQueue eq)
   {
     this.systemResolver = systemResolver;
     this.currentResolver = currentResolver;
+
+    this.target = target;
+    this.tf = tf;
+
     this.ts = ts;
     this.eq = eq;
     current = null;
@@ -88,6 +98,20 @@ public class SymbolReader extends NodeVisitor
     it.addPackageImport("java.lang");
     if( packageName != null) {
       it.addPackageImport( packageName);
+    }
+
+    /* Now add the "root" of this source file's package tree to the 
+     * source path. This will also throw an exception if the source
+     * file is not located in an appropriate directory. */
+    try
+    {
+      tf.addSourceDirectory( target, packageName);
+    }
+    catch( IOException e)
+    {
+      throw new TypeCheckException( "Expected to find \"" + target.getName()
+                      + "\" in a directory matching the package name \"" 
+                      + packageName + "\".");
     }
   }
 

@@ -160,10 +160,10 @@ public class Compiler implements TargetTable, ClassCleaner
   }
  
  
- /* Public Methods. */
+  /* Public Methods. */
   public boolean compileFile( String filename) throws IOException 
   {
-    return compile( tf.createFileTarget( filename)) ;
+    return compile( tf.createFileTarget( filename));
   }
 
   public boolean compileClass( String classname) throws IOException
@@ -251,7 +251,7 @@ public class Compiler implements TargetTable, ClassCleaner
         verbose( this, "reading " + job.t.getName() + "...");
         job.cr = new TableClassResolver( this);
         parsedResolver.addClassResolver( job.cr);
-        job.it = readSymbols( job.ast, job.cr, job.eq);
+        job.it = readSymbols( job.ast, job.cr, job.t, job.eq);
 
         job.status |= READ;
       }
@@ -443,9 +443,9 @@ public class Compiler implements TargetTable, ClassCleaner
   }
 
   protected ImportTable readSymbols( Node ast, TableClassResolver cr,
-                                     ErrorQueue eq)
+                                     Target t, ErrorQueue eq)
   {
-    SymbolReader sr = new SymbolReader( systemResolver, cr, ts, eq);
+    SymbolReader sr = new SymbolReader( systemResolver, cr, t, tf, ts, eq);
     ast.visit( sr);
 
     return sr.getImportTable();
