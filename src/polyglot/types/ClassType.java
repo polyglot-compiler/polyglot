@@ -33,8 +33,23 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance
     /**
      * Return true if the class is an inner class.
      * Equivalent to kind() == MEMBER || kind() == LOCAL || kind() == ANONYMOUS.
+     * @deprecated Was incorrectly defined. Use isNested for nested classes, 
+     *          and isInnerClass for inner classes.
      */
     boolean isInner();
+
+    /**
+     * Return true if the class is a nested.
+     * Equivalent to kind() == MEMBER || kind() == LOCAL || kind() == ANONYMOUS.
+     */
+    boolean isNested();
+
+    /**
+     * Return true if the class is an inner class, that is, it is a nested
+     * class that is not explicitly or implicitly declared static; an interface
+     * is never an inner class.
+     */
+    boolean isInnerClass();
 
     /**
      * Return true if the class is a member class.
@@ -84,6 +99,6 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance
      */
     boolean isEnclosedImpl(ClassType outer);
 
-    /** The class's outer class if this is an inner class, or null. */
+    /** The class's outer class if this is a nested class, or null. */
     ClassType outer();
 }

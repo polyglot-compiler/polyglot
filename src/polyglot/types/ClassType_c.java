@@ -37,7 +37,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         if (! isMember())
             throw new InternalCompilerError("Non-member classes cannot have container classes.");
         if (outer() == null)
-            throw new InternalCompilerError("Inner classes must have outer classes.");
+            throw new InternalCompilerError("Nested classes must have outer classes.");
         return outer();
     }
 
@@ -59,12 +59,25 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     public boolean isLocal() { return kind() == LOCAL; }
     public boolean isAnonymous() { return kind() == ANONYMOUS; }
 
+    /**
+    * @deprecated Was incorrectly defined. Use isNested for nested classes, 
+    *          and isInnerClass for inner classes.
+    */
     public boolean isInner() {
+        return isNested();
+    }
+
+    public boolean isNested() {
         // Implement this way rather than with ! isTopLevel() so that
         // extensions can add more kinds.
         return kind() == MEMBER || kind() == LOCAL || kind() == ANONYMOUS;
     }
-
+    
+    public boolean isInnerClass() {
+        
+        return !flags().isInterface() && isNested() && !flags().isStatic();
+    }
+    
     public boolean isCanonical() { return true; }
     public boolean isClass() { return true; }
     public ClassType toClass() { return this; }
