@@ -366,22 +366,22 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     public List passes(Job job, Pass.ID begin, Pass.ID end) {
         List l = passes(job);
+        Pass p = null;
 
         Iterator i = l.iterator();
 
         while (i.hasNext()) {
-            Pass p = (Pass) i.next();
+            p = (Pass) i.next();
             if (begin == p.id()) break;
             if (! (p instanceof BarrierPass)) i.remove();
         }
 
-        while (i.hasNext()) {
-            Pass p = (Pass) i.next();
-            if (end == p.id()) break;
+        while (p.id() != end && i.hasNext()) {
+            p = (Pass) i.next();
         }
 
         while (i.hasNext()) {
-            Pass p = (Pass) i.next();
+            p = (Pass) i.next();
             i.remove();
         }
 
