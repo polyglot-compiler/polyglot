@@ -203,4 +203,9 @@ public class IntLiteral extends NumericalLiteral
     w.write( " < " + value + " > ");
     dumpNodeInfo( w);
   }
+  
+  public String toString() {
+	  String str = "" + value;
+	  return str;
+  }
 }

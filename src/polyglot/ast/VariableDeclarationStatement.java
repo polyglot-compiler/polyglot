@@ -358,4 +358,6 @@ public class VariableDeclarationStatement extends Statement
     dumpNodeInfo( w);
     
   }
+  
+  public TypeNode getTypeNode() { return tn; }
 }

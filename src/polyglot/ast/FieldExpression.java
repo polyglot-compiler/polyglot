@@ -164,6 +164,10 @@ public class FieldExpression extends Expression
   {
     return PRECEDENCE_OTHER;
   }
+  
+  public String toString() {
+	  return name; //TO FIX
+  }
 }
     
   

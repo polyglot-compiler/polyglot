@@ -65,7 +65,31 @@ public class PrimitiveType extends Type
         return "???";
     }
   }
-        
+  
+  public String getWrapperTypeString() {
+    switch(kind)
+    {
+      case BOOLEAN:
+        return "Boolean";
+      case CHAR:
+        return "Char";
+      case BYTE:
+        return "Byte";
+      case SHORT:
+        return "Short";
+      case INT:
+        return "Integer";
+      case LONG:
+        return "Long";
+      case FLOAT:
+        return "Float";
+      case DOUBLE:
+        return "Double";
+      default:
+        return "???";
+    }
+  }
+  
   public final boolean isPrimitive() {
     return true;
   }

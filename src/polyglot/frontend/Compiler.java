@@ -12,6 +12,7 @@ import jltools.ext.jif.visit.*;
 import jltools.ext.jif.types.*;
 
 import splitter.config.*;
+import splitter.*;
 
 import java.io.*;
 import java.util.*;
@@ -172,7 +173,7 @@ public class Compiler implements TargetTable, ClassCleaner
     if (jif) {
 	serialize = false;
 	/* setup the splitter configuration */
-	jifSplitConfig = new Config("filename");
+	jifSplitConfig = new Config("config");
     }
 
     /* Set up the resolvers. */
@@ -462,7 +463,7 @@ public class Compiler implements TargetTable, ClassCleaner
 
 	  if (jif) {
 	      verbose( this, "label checking " + job.t.getName() + "...");
-	      job.ast = labelCheck( job.ast, job.it, eq);    
+	     // job.ast = labelCheck( job.ast, job.it, eq);  ***********  
 	  }
 	      
 
@@ -755,7 +756,22 @@ public class Compiler implements TargetTable, ClassCleaner
   {
     if (jif) {
 	verbose(this, "Splitting the file...");
-	
+	{CodeWriter w = new CodeWriter(new UnicodeWriter( 
+                                          new FileWriter( "ast001.dump")),
+								  outputWidth);
+	DumpAst d = new DumpAst(w);
+	ast.visit(d);
+	w.flush(); }
+
+	Splitter splitter = new Splitter(jifSplitConfig, ts);
+	Node instAst = ast.visit(splitter);
+	CodeWriter w = new CodeWriter(new UnicodeWriter( 
+                                          new FileWriter( "instAst.dump" )),
+								  outputWidth);
+	DumpAst d = new DumpAst(w);
+	instAst.visit(d);
+	w.flush();
+	verbose(this, "Splitting end");
     } else {
 	SourceFileNode sfn = (SourceFileNode)ast;
 	Writer ofw = t.getOutputWriter( sfn.getPackageName());

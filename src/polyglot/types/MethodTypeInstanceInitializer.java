@@ -1,7 +1,6 @@
 package jltools.types;
 
 import java.util.Collections;
-import jltools.types.*;
 
 /**
  * A method type instance which is actually an initializer block (either static 

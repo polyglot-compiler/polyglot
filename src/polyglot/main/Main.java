@@ -47,11 +47,11 @@ public class Main
   {
     options = new HashMap();
     source = new TreeSet();
-    MainTargetFactory tf; 
+    //MainTargetFactory tf; 
     
     parseCommandLine(args, options, source);
 
-    tf = new MainTargetFactory( (String)options.get( MAIN_OPT_SOURCE_EXT),
+    MainTargetFactory tf = new MainTargetFactory( (String)options.get( MAIN_OPT_SOURCE_EXT),
                                (Collection)options.get( MAIN_OPT_SOURCE_PATH),
                                 (File)options.get( MAIN_OPT_OUTPUT_DIRECTORY),
                                 (String)options.get( MAIN_OPT_OUTPUT_EXT),

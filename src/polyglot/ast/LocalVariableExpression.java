@@ -93,4 +93,17 @@ public class LocalVariableExpression extends Expression
   {
     return PRECEDENCE_OTHER;
   }
+  
+  public String toString() {
+	  return name;
+  }
+  
+  public boolean equals(Object obj) {
+	  if (!(obj instanceof LocalVariableExpression)) return false;
+	  return name.equals(((LocalVariableExpression)obj).name);
+  }
+  
+  public int hashCode() {
+	  return name.hashCode();
+  }
 }

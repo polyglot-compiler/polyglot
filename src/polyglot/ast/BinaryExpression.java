@@ -474,6 +474,13 @@ public class BinaryExpression extends Expression
       dumpNodeInfo( w);
       w.write( ")");
    }
+   
+   public String toString() {
+	   String str = left.toString();
+	   str += getOperatorString(operator);
+	   str += right.toString();
+	   return str;
+   }
 
     public boolean isAssignment() {
 	switch( operator) {

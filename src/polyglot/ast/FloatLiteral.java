@@ -135,4 +135,9 @@ public class FloatLiteral extends Literal
                                         + Double.toString( value ) ) + " > ");
     dumpNodeInfo( w);
   }
+  
+  public String toString() {
+	  String str = "" + value;
+	  return str;
+  }
 }

@@ -151,6 +151,10 @@ public class NestedMap extends AbstractMap implements Map {
     }
   }
  
+  private HashMap myMap;
+  private int nShadowed;
+  private Set setView; // the set view of this.
+  private Map superMap;
   private Predicate entryKeyNotInMyMap = new Predicate() {
     public boolean isTrue(Object o) {
       Map.Entry ent = (Map.Entry) o;
@@ -162,9 +166,6 @@ public class NestedMap extends AbstractMap implements Map {
       return ! myMap.containsKey(o);
     }
   };
-  private HashMap myMap;
-  private int nShadowed;
-  private Set setView; // the set view of this.
-  private Map superMap;
+
 }
 

@@ -241,7 +241,7 @@ public class MainTargetFactory implements TargetFactory
     }
   }
    
-  class MainErrorQueue extends ErrorQueue
+  static class MainErrorQueue extends ErrorQueue
   {
     private static final int ERROR_COUNT_LIMIT = 99;
     
