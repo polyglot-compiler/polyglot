@@ -136,163 +136,170 @@ public class Main
       System.exit(1);
     }
 
-    for(int i = 0; i < args.length; )
-    {
-      if (args[i].equals("-h")) {
-        options.usage();
-        System.exit(0);
-      }
-      else if (args[i].equals("-version")) {
-	if (options.extension != null)
-	    System.out.println(options.extension.compilerName() +
-		" version " + options.extension.version());
-        System.out.println("JLtools compiler toolkit version " +
-	    new jltools.ext.jl.Version());
-        System.exit(0);
-      }
-      else if (args[i].equals("-d"))
+    try {
+      for(int i = 0; i < args.length; )
       {
-        i++;
-        options.output_directory = new File(args[i]);
-        i++;
-      }
-      else if (args[i].equals("-classpath") ||
-               args[i].equals("-cp")) {
-	i++;
-	options.classpath = args[i] + System.getProperty("path.separator") +
-			options.default_classpath;
-        i++;
-      }
-      else if (args[i].equals("-sourcepath"))
-      {
-        i++;
-        StringTokenizer st = new StringTokenizer(args[i], File.pathSeparator);
-        while(st.hasMoreTokens())
-        {
-          options.source_path.add(new File(st.nextToken()));
+        if (args[i].equals("-h")) {
+          options.usage();
+          System.exit(0);
         }
-        i++;
-      }
-      else if (args[i].equals("-fqcn")) 
-      {
-        i++;
-        options.fully_qualified_names = true;
-      }
-      else if (args[i].equals("-c"))
-      {
-        options.post_compiler = null;
-        i++;
-      }
-      else if (args[i].equals("-errors"))
-      {
-        i++;
-	try {
-	  options.error_count = Integer.parseInt(args[i]);
-	} catch (NumberFormatException e) {}
-        i++;
-      }
-      else if (args[i].equals("-w"))
-      {
-        i++;
-	try {
-	  options.output_width = Integer.parseInt(args[i]);
-	} catch (NumberFormatException e) {}
-        i++;
-      }
-      else if (args[i].equals("-post"))
-      {
-        i++;
-        options.post_compiler = args[i];
-        i++;
-      }
-      else if (args[i].equals("-stdout")) 
-      {
-        i++;
-        options.output_stdout = true;
-      }
-      else if (args[i].equals("-ext") || args[i].equals("-extension")) 
-      {
-        i++;
-	loadExtension(args[i]);
-	i++;
-      }
-      else if (args[i].equals("-sx")) 
-      {
-        i++;
-        options.source_ext = args[i];
-        i++;
-      }
-      else if (args[i].equals("-ox"))
-      {
-        i++;
-        options.output_ext = args[i];
-        i++;
-      }
-      else if (args[i].equals("-noserial"))
-      {
-        i++;
-	options.serialize_type_info = false;
-      }
-      else if (args[i].equals("-dump"))
-      {
-        i++;
-	options.dump_ast = true;
-      }
+        else if (args[i].equals("-version")) {
+          if (options.extension != null)
+              System.out.println(options.extension.compilerName() +
+                  " version " + options.extension.version());
+          System.out.println("JLtools compiler toolkit version " +
+              new jltools.ext.jl.Version());
+          System.exit(0);
+        }
+        else if (args[i].equals("-d"))
+        {
+          i++;
+          options.output_directory = new File(args[i]);
+          i++;
+        }
+        else if (args[i].equals("-classpath") ||
+                args[i].equals("-cp")) {
+          i++;
+          options.classpath = args[i] + System.getProperty("path.separator") +
+                          options.default_classpath;
+          i++;
+        }
+        else if (args[i].equals("-sourcepath"))
+        {
+          i++;
+          StringTokenizer st = new StringTokenizer(args[i], File.pathSeparator);
+          while(st.hasMoreTokens())
+          {
+            options.source_path.add(new File(st.nextToken()));
+          }
+          i++;
+        }
+        else if (args[i].equals("-fqcn")) 
+        {
+          i++;
+          options.fully_qualified_names = true;
+        }
+        else if (args[i].equals("-c"))
+        {
+          options.post_compiler = null;
+          i++;
+        }
+        else if (args[i].equals("-errors"))
+        {
+          i++;
+          try {
+            options.error_count = Integer.parseInt(args[i]);
+          } catch (NumberFormatException e) {}
+          i++;
+        }
+        else if (args[i].equals("-w"))
+        {
+          i++;
+          try {
+            options.output_width = Integer.parseInt(args[i]);
+          } catch (NumberFormatException e) {}
+          i++;
+        }
+        else if (args[i].equals("-post"))
+        {
+          i++;
+          options.post_compiler = args[i];
+          i++;
+        }
+        else if (args[i].equals("-stdout")) 
+        {
+          i++;
+          options.output_stdout = true;
+        }
+        else if (args[i].equals("-ext") || args[i].equals("-extension")) 
+        {
+          i++;
+          loadExtension(args[i]);
+          i++;
+        }
+        else if (args[i].equals("-sx")) 
+        {
+          i++;
+          options.source_ext = args[i];
+          i++;
+        }
+        else if (args[i].equals("-ox"))
+        {
+          i++;
+          options.output_ext = args[i];
+          i++;
+        }
+        else if (args[i].equals("-noserial"))
+        {
+          i++;
+          options.serialize_type_info = false;
+        }
+        else if (args[i].equals("-dump"))
+        {
+          i++;
+          options.dump_ast = true;
+        }
 
-      else if (args[i].equals("-nooutput"))
-      {
-	i++;
-	options.keep_output_files = false;
+        else if (args[i].equals("-nooutput"))
+        {
+          i++;
+          options.keep_output_files = false;
+        }
+        else if (args[i].equals("-nosourcecheck")) 
+        {
+          i++;
+          options.no_source_check = true;
+        }
+        else if (args[i].equals("-v") || args[i].equals("-verbose"))
+        {
+          i++;
+          Integer level = (Integer) options.report.get("verbose");
+          if (level == null) options.report.put("verbose", new Integer(1));
+        }
+        else if (args[i].equals("-report")) {
+          i++;
+          String report_option = args[i];
+          StringTokenizer st = new StringTokenizer(args[i], "=");
+          String topic = ""; int level = 0;
+          if (st.hasMoreTokens()) topic = st.nextToken();
+          if (st.hasMoreTokens())
+            try {
+              level = Integer.parseInt(st.nextToken());
+            } catch (NumberFormatException e) {}
+          options.report.put(topic, new Integer(level));
+          i++;
+        }
+        else if (args[i].startsWith("-")) {
+          int i2 = i;
+          if (options.extension != null) {
+              try  {
+                  i2 = options.extension.parseCommandLine(args, i, options);
+              }
+              catch (UsageError u) {
+                  System.err.println(u.getMessage());
+                  options.usage();
+                  System.exit(1);
+              }
+          } 
+          if (i2 == i) {
+              System.err.println(compilerName() + ": illegal option -- " 
+                                  + args[i]);
+              i++;
+              System.exit(1);
+          }
+          //System.err.println("Extension: " + i + " to " + i2);
+          i = i2;
+        } else {
+          source.add(args[i]);
+          options.source_path.add(new File(args[i]).getParentFile());
+          i++;
+        }
       }
-      else if (args[i].equals("-nosourcecheck")) 
-      {
-        i++;
-	options.no_source_check = true;
-      }
-      else if (args[i].equals("-v") || args[i].equals("-verbose"))
-      {
-        i++;
-	Integer level = (Integer) options.report.get("verbose");
-	if (level == null) options.report.put("verbose", new Integer(1));
-      }
-      else if (args[i].equals("-report")) {
-        i++;
-	String report_option = args[i];
-        StringTokenizer st = new StringTokenizer(args[i], "=");
-	String topic = ""; int level = 0;
-	if (st.hasMoreTokens()) topic = st.nextToken();
-	if (st.hasMoreTokens())
-	  try {
-	    level = Integer.parseInt(st.nextToken());
-	  } catch (NumberFormatException e) {}
-	options.report.put(topic, new Integer(level));
-	i++;
-      }
-      else if (args[i].startsWith("-")) {
-	int i2 = i;
-	if (options.extension != null) {
-	    try  {
-		i2 = options.extension.parseCommandLine(args, i, options);
-	    }
-	    catch (UsageError u) {
-		System.err.println(u.getMessage());
-		options.usage();
-		System.exit(1);
-	    }
-	} 
-	if (i2 == i) {
-	    System.err.println(compilerName() + ": illegal option -- " 
-				+ args[i]);
-	    i++;
-	    System.exit(1);
-	}
-	//System.err.println("Extension: " + i + " to " + i2);
-	i = i2;
-      } else {
-        source.add(args[i]);
-        options.source_path.add(new File(args[i]).getParentFile());
-        i++;
-      }
+    }
+    catch (ArrayIndexOutOfBoundsException e) {
+      System.err.println(compilerName() + ": missing argument");
+      options.usage();
+      System.exit(1);
     }
 
     if (source.size() < 1) {

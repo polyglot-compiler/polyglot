@@ -1,6 +1,7 @@
 package jltools.main;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -44,4 +45,14 @@ public class Report {
     }
   }
 
+  /** This is the standard way to report debugging information in the
+   *  compiler.  It conditionally reports a message if it is related to
+   *  the specified topic. The obscurity of the message is indicated
+   *  by <code>level</code>.  The message is reported only if the user
+   *  has requested (via the -report command-line option) that messages
+   *  of that obscurity be reported for one of the specified topics.
+   */
+  public static void report(String topic, int level, String message) {
+    report(Collections.singleton(topic), level, message);
+  }
 }
