@@ -912,6 +912,11 @@ public class TypeSystem_c implements TypeSystem
 	    	type1.isByte() && type2.isChar()) {
 		return Int();
 	    }
+
+	    if (type1.isChar() && type2.isShort() ||
+	    	type1.isShort() && type2.isChar()) {
+		return Int();
+	    }
 	}
 
 	if (type1.isArray() && type2.isArray()) {
