@@ -469,7 +469,7 @@ import_declaration ::=
     ;
 single_type_import_declaration ::=
                     // Import
-        IMPORT:a name:b SEMICOLON:c
+        IMPORT:a qualified_name:b SEMICOLON:c
             {: RESULT = parser.nf.Import(parser.pos(a, c), Import.CLASS, b.toString()); :}
     ;
 type_import_on_demand_declaration ::=
