@@ -48,6 +48,11 @@ public class StringLiteral extends Literal
     return value;
   }
 
+  public Node visitChildren( NodeVisitor v) 
+  {
+      return reconstruct(Node.condVisit(ext, v), value);
+  }
+
   public Node typeCheck( LocalContext c) throws SemanticException
   {
     setCheckedType( c.getTypeSystem().getString());

@@ -38,6 +38,12 @@ public class BooleanLiteral extends Literal
 	return reconstruct(this.ext, value);
     }
 
+  public Node visitChildren( NodeVisitor v) 
+  {
+      return reconstruct(Node.condVisit(ext, v), value);
+  }
+
+
   public boolean getBooleanValue()
   {
     return value;

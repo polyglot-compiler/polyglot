@@ -72,6 +72,12 @@ public class FloatLiteral extends Literal
 	return reconstruct(this.ext, kind, value);
     }
 
+  public Node visitChildren( NodeVisitor v) 
+  {
+      return reconstruct(Node.condVisit(ext, v), kind, value);
+  }
+
+
   /**
    * Returns the kind of this <code>FloatLiteral</code> as specified by the
    * <code>public static</code> constants in this class.

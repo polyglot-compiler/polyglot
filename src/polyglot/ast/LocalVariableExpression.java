@@ -58,8 +58,7 @@ public class LocalVariableExpression extends Expression
 
   public Node visitChildren( NodeVisitor v) 
   {
-    /* Nothing to do. */
-    return this;
+      return reconstruct(Node.condVisit(ext, v), name);
   }
 
   public Node typeCheck( LocalContext c) throws SemanticException

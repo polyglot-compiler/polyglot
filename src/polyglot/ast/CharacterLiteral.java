@@ -72,8 +72,7 @@ public class CharacterLiteral extends NumericalLiteral
 
   public Node visitChildren( NodeVisitor v) 
   {
-    /* Nothing to do. */
-    return this;
+    return reconstruct(Node.condVisit(ext, v), value, escaped);
   }
 
   public Node typeCheck( LocalContext c) throws SemanticException

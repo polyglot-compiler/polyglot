@@ -26,10 +26,11 @@ public class EmptyStatement extends Statement
 	return this;
     }
 
-  public Node visitChildren(NodeVisitor nv)
+  public Node visitChildren(NodeVisitor v)
   {
-    return this;
+      return reconstruct(Node.condVisit(ext, v));
   }
+
   public Node typeCheck( LocalContext tc)
   {
     return this;

@@ -170,6 +170,7 @@ public class Compiler implements TargetTable, ClassCleaner
     jif = ((Boolean)options.get( Main.MAIN_OPT_EXT_JIF)).booleanValue();
 
     if (jif) {
+	serialize = false;
 	/* setup the splitter configuration */
 	jifSplitConfig = new Config("filename");
     }
