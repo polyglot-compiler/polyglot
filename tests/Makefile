@@ -9,6 +9,8 @@ GOOD =  \
 	Constants4.jl \
 	Constants5.jl \
 	Constants6.jl \
+	Constants7.jl \
+	Constants8.jl \
 	Ctor.jl \
 	Dep1.jl \
 	Empty.jl \
