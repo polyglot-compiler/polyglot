@@ -182,42 +182,54 @@ public class PPGSpec extends Spec
 	}
 	
 
-	/**
-	 * Parse the chain of inheritance via include files
-	 */
-	public void parseChain (String basePath) {
-		File file = null;
-		String fullPath = "";
-		try {
-			fullPath = ((basePath == "") ?
-						"" : basePath + System.getProperty("file.separator")) +
-					   include;
-			FileInputStream fileInput = new FileInputStream(fullPath);
-			file = new File(fullPath);
-			String simpleName = file.getName();
-			Lexer lex = new Lexer(fileInput, simpleName);
-			Parser parser = new Parser(simpleName, lex);
-			PPG.DEBUG("parsing "+simpleName);
-			parser.parse();
-			parent = (Spec)parser.getProgramNode();
-			fileInput.close();
-		} catch (FileNotFoundException e) {
-			System.out.println(PPG.HEADER+fullPath+" not found.");
-			System.exit(1);
-		} catch (Exception e) {
-			System.out.println(PPG.HEADER+"Exception: "+e.getMessage());
-			System.exit(1);
-		}
-		parent.setChild(this);
-		/*
-		String parentDir = file.getPath();
-		parent.parseChain(parentDir == null ? "" : parentDir);
-		*/
-		String parentDir = file.getParent();
-		parent.parseChain(parentDir == null ? "" : parentDir);
+        /**
+         * Parse the chain of inheritance via include files
+         */
+        public void parseChain (String basePath) {
+            InputStream is;
+            File file = null;
+            String simpleName = include;
+            try {
+                // first look on the classpath.
+                is = ClassLoader.getSystemResourceAsStream(include);
+                if (is != null) {    
+                    PPG.DEBUG("found " + include + " as a resource");
+                }
+                else {
+                    // nothing was found on the class path. Try the basePath...
+                    String fullPath = ((basePath == "") ?
+                                       "" : basePath + System.getProperty("file.separator")) +
+                                      include;
+                    PPG.DEBUG("looking for " + fullPath + " as a file");
+                    file = new File(fullPath);
+                    is = new FileInputStream(file);
+                    simpleName = file.getName();
+                }
 
-	}
-	
+                Lexer lex = new Lexer(is, simpleName);
+                Parser parser = new Parser(simpleName, lex);
+
+                PPG.DEBUG("parsing "+simpleName);
+                parser.parse();
+                parent = (Spec)parser.getProgramNode();
+                is.close();
+
+            } catch (FileNotFoundException e) {
+                System.out.println(PPG.HEADER + simpleName + " not found.");
+                System.exit(1);
+            } catch (Exception e) {
+                System.out.println(PPG.HEADER+"Exception: "+e.getMessage());
+                System.exit(1);
+            }
+            parent.setChild(this);
+
+            String parentDir = null;
+            if (file != null) {
+                parentDir = file.getParent();
+            }
+            parent.parseChain(parentDir == null ? "" : parentDir);            
+        }
+
 	public CUPSpec coalesce() throws PPGError {
 		// parent cannot be null by definition
 		CUPSpec combined = parent.coalesce();
