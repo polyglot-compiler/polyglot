@@ -40,6 +40,7 @@ public class LoadedClassResolver extends ClassResolver implements TopLevelResolv
    * @param classpath The class path
    * @param loader The class file loader to use.
    * @param version The version of classes to load.
+   * @param allowRawClasses allow class files without encoded type information 
    */
   public LoadedClassResolver(TypeSystem ts, String classpath,
                              ClassFileLoader loader, Version version,

@@ -10,9 +10,9 @@ import polyglot.types.Package;
  */
 public class PackageContextResolver implements Resolver
 {
-    Package p;
-    TypeSystem ts;
-    Resolver cr;
+    protected Package p;
+    protected TypeSystem ts;
+    protected Resolver cr;
 
     /**
      * Create a package context resolver.
@@ -31,6 +31,13 @@ public class PackageContextResolver implements Resolver
      */
     public Package package_() {
         return p;
+    }
+
+    /**
+     * The system resolver.
+     */
+    public Resolver outer() {
+        return cr;
     }
 
     /**
