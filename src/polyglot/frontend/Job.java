@@ -9,9 +9,10 @@ import java.util.*;
 
 /**
  * A <code>Job</code> encapsulates work done by the compiler. <code>Job</code>s 
- * are typcially either for a nested class (<code>InnerJob</code>s) or a source 
- * file (<code>SourceJob</code>s). A job contains all information carried 
- * between phases of the compiler.
+ * are typically associated either with a nested class (<code>InnerJob</code>s) or a source 
+ * file (<code>SourceJob</code>s). A Job contains all information carried 
+ * between phases of the compiler. A Job consists of a set of scheduled passes over
+ * the associated code.
  */
 public abstract class Job
 {
