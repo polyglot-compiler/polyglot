@@ -116,7 +116,8 @@ public class TypeSystem_c implements TypeSystem
      * Returns true if the package named <code>name</code> exists.
      */
     public boolean packageExists(String name) {
-        return loadedResolver.packageExists(name);
+        return parsedResolver.packageExists(name) ||
+               loadedResolver.packageExists(name);
     }
 
     protected void assert_(Collection l) {

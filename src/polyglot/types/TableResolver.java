@@ -34,6 +34,23 @@ public class TableResolver extends ClassResolver {
 	table.put(name, type);
     }
 
+    public boolean packageExists(String name) {
+        /* Check if a package exists in the table. */
+        for (Iterator i = table.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry e = (Map.Entry) i.next();
+            Named type = (Named) e.getValue();
+            if (type instanceof Importable) {
+                Importable im = (Importable) type;
+                if (im.package_() != null &&
+                    im.package_().fullName().startsWith(name)) {
+                    return true;
+                }
+            }
+        }
+      
+        return false;
+    }
+
     /**
      * Find a type by name.
      */
