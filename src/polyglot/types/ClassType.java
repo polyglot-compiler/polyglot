@@ -17,6 +17,7 @@ public class ClassType extends Type {
   public ClassType(TypeSystem ts, String name, boolean canonical) {
     super(ts);
     this.name = name;
+    this.filename = filename;
     this.canonical = canonical;
   }
   
@@ -30,8 +31,12 @@ public class ClassType extends Type {
   public String getShortName() {
     return TypeSystem.getShortNameComponent(name);
   }
+  public String getFilename()
+  {
+    return filename;
+  }
 
-  private String name;
+  private String name, filename;
   private boolean canonical;
 
   public boolean isPrimitive() { return false; }

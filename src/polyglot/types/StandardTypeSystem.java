@@ -6,6 +6,7 @@ package jltools.types;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.LinkedList;
 
 /**
  * StandardTypeSystem
@@ -13,7 +14,7 @@ import java.util.List;
  * Overview:
  *    A StandardTypeSystem is a universe of types, including all Java types.
  **/
-public abstract class StandardTypeSystem extends TypeSystem {
+public class StandardTypeSystem extends TypeSystem {
 
   // FIXME: Documentation.
   // resolver should handle caching.
@@ -50,14 +51,18 @@ public abstract class StandardTypeSystem extends TypeSystem {
 	! (ancestorType instanceof ClassType))
       return false;
 
-    JavaClass childClass = resolver.findClass(childType);
+    JavaClass childClass;
+    try
+    {  childClass = resolver.findClass(((ClassType)childType).getName()); }
+    catch (NoClassException nce)
+    { return false;   }
 
     if (! childClass.getAccessFlags().isInterface()) {
       // If the child isn't an interface, check whether its supertype is or
       // descends from the ancestorType
-      JavaClass parentType = getSuperType(childType);
+      JavaClass parentType = getClassForType ( getSuperType( childClass.getType()) );
       if (parentType.equals(ancestorType) ||
-	  descendsFrom(parentType, ancestorType))
+	  descendsFrom(parentType.getType(), ancestorType))
 	return true;
     } else {
       // if it _is_ an interface, check whether the ancestor is Object.
@@ -100,13 +105,13 @@ public abstract class StandardTypeSystem extends TypeSystem {
 	ArrayType ancestor = (ArrayType) ancestorType;
 	if (child.getDimensions() == ancestor.getDimensions()) {
 	  // Both types are arrays, of the same dimensionality.	
-	  Type childbase = childType.getBaseType();
+	  Type childbase = child.getBaseType();
 	  Type ancestorbase = ancestor.getBaseType();
-	  return isAssignableSubtype(childBase, ancestorBase);
+	  return isAssignableSubtype(childbase, ancestorbase);
 	} else {
 	  // Both type are arrays, of different dimensionality.
 	  return (ancestor.getBaseType().equals(OBJECT_) &&
-		  ancestor.detDimensions() < child.getDimensions());
+		  ancestor.getDimensions() < child.getDimensions());
 	}
       } else {
 	// childType is an array, but ancestorType not an array.
@@ -123,7 +128,7 @@ public abstract class StandardTypeSystem extends TypeSystem {
     ////
     // So childType is definitely a ClassType.
     ////
-    if (! ancestorType instanceof ClassType)
+    if (! (ancestorType instanceof ClassType))
       return false;
     
     return (childType.equals(ancestorType) || 
@@ -149,7 +154,8 @@ public abstract class StandardTypeSystem extends TypeSystem {
 	return false;
 
       // Distinct primitive types are only convertable if type are numeric.
-      if (fromType.isNumeric() && toType.isNumeric()) return true;
+      if (((PrimitiveType)fromType).isNumeric() && ((PrimitiveType)toType).isNumeric()) 
+        return true;
       
       return false;
     }
@@ -240,26 +246,26 @@ public abstract class StandardTypeSystem extends TypeSystem {
       ////
       // Both types are primitive...
       ////
-      PrimitiveType child = (PrimitiveType) childType;
-      PrimitiveType ancestor = (PrimitiveType) ancestorType;
+      PrimitiveType ptFromType = (PrimitiveType) fromType;
+      PrimitiveType ptToType = (PrimitiveType) toType;
       
-      if (! child.isNumeric() || ! ancestor.isNumeric())       
+      if (! ptFromType.isNumeric() || ! ptToType.isNumeric())       
 	return false;
 
       // ...and numeric.
-      switch (fromType.kind) 
+      switch (ptFromType.getKind()) 
 	{
 	  
 	case PrimitiveType.BYTE:
 	case PrimitiveType.SHORT:
 	case PrimitiveType.CHAR:
-	  if (this.kind == PrimitiveType.INT) return true;
+	  if (ptToType.getKind() == PrimitiveType.INT) return true;
 	case PrimitiveType.INT:
-	  if (this.kind == LONG) return true;
+	  if (ptToType.getKind() == PrimitiveType.LONG) return true;
 	case PrimitiveType.LONG:
-	  if (this.kind == FLOAT) return true;
+	  if (ptToType.getKind() == PrimitiveType.FLOAT) return true;
 	case PrimitiveType.FLOAT:
-	  if (this.kind == DOUBLE) return true;
+	  if (ptToType.getKind() == PrimitiveType.DOUBLE) return true;
 	case PrimitiveType.DOUBLE:
 	default:
 	  ;
@@ -292,14 +298,38 @@ public abstract class StandardTypeSystem extends TypeSystem {
   }
       
   /**
-   * Tries to return the canonical (fully qualified) form of <type> in
-   * the provided context, which may be null.  Returns null if no such
-   * type exists.
-   **/
-  public Type getCanonicalType(Type type, Context context) {
-    Object res = checkAndResolveType(type, context);
-    return (res instanceof String) ? null : (Type) res;
+   * Checks whether a method, field or inner class  within tEnclosingClass with access flags 'flags' can
+   * be accessed from Context context, where context is a class type.
+   */
+  public boolean isAccessible(ClassType ctEnclosingClass, AccessFlags flags, Context context)
+  {
+    // check if in same class or public 
+    if ( isSameType( ctEnclosingClass, context.inClass) ||
+         flags.isPublic())
+      return true;
+
+    if ( ! (context.inClass instanceof ClassType))
+    {
+      throw new TypeCheckError("Internal error: Context is not a Classtype");
+    }
+
+    ClassType ctContext = (ClassType)context.inClass;
+    
+    // check for package level scope. ( same package and flags has package level scope.
+    if (getPackageComponent(ctEnclosingClass.getName() ).equals
+        (getPackageComponent(ctContext.getName())) &&
+        flags.isPackage())
+      return true;
+    
+    // protected
+    if ( ctContext.descendsFrom( ctEnclosingClass ) &&
+         flags.isProtected())
+      return true;
+    
+    // else, 
+    return false;
   }
+
   /**
    * Checks whether <type> is a valid type in the given context,
    * which may be null.  Returns a description of the error, if any.
@@ -313,21 +343,18 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * canonical form of that type.  Otherwise, returns a String
    * describing the error.
    **/
-  public Object checkAndResolveType(Type type, Context context) {
+  public Type checkAndResolveType(Type type, Context context) throws TypeCheckError {
     if (type.isCanonical()) return type;
     if (type instanceof ArrayType) {
       ArrayType at = (ArrayType) type;
       Type base = at.getBaseType();
       int dims = at.getDimensions();
-      Object result = checkAndResolveType(base, context);
-      if (result instanceof Type)
-	return new ArrayType(this, result, dims);
-      else
-	return result;
+      Type result = checkAndResolveType(base, context);
+      return new ArrayType(this, (Type)result, dims);
     }
     
     if (! (type instanceof ClassType)) 
-      throw new Error("Found a non-canonical, non-array, non-class type.");
+      throw new TypeCheckError("Found a non-canonical, non-array, non-class type.");
 
     // We have a class type on our hands.
     String className = ((ClassType) type).getName();
@@ -352,7 +379,7 @@ public abstract class StandardTypeSystem extends TypeSystem {
 	// any inners by that name.  If they _both_ do, that's an error.
 	Type resultFromOuter = null;
 	Type resultFromParent = null;
-	Type parentType = inClass.getSuperType();
+	Type parentType = inClass.getSupertype();
 	Type outerType = inClass.getContainingClass();
 	if (outerType != null) {
 	  Context outerContext = new Context(emptyImportTable,
@@ -367,7 +394,7 @@ public abstract class StandardTypeSystem extends TypeSystem {
 	if ((resultFromOuter instanceof ClassType) &&
 	    (resultFromParent instanceof ClassType)) {
 	  // FIXME: Better error message needed.
-	  return "Found " + className + " in both outer and parent.";
+	  throw new TypeCheckError ("Found " + className + " in both outer and parent.");
 	} else if (resultFromOuter instanceof ClassType) {
 	  return resultFromOuter;
 	} else if (resultFromParent instanceof ClassType) {
@@ -377,7 +404,11 @@ public abstract class StandardTypeSystem extends TypeSystem {
 
       // STEP 3
       // Check the import table.  Default to the null package.
-      return Context.table.findClass(className);
+      try 
+      {  return context.table.findClass(className).getType(); }
+      catch (NoClassException nce) 
+      { throw new TypeCheckError(" No \"" + className + "\" found in context or import table."); }
+
     }
 
     // It looks like we've got a long name.  It can be of only one of
@@ -399,9 +430,7 @@ public abstract class StandardTypeSystem extends TypeSystem {
     String prefix = TypeSystem.getFirstComponent(className);
     String rest = TypeSystem.removeFirstComponent(className);
     result = getCanonicalType(new ClassType(this, prefix, false), context);
-    if (result instanceof String) 
-      result = null;
-    while (result == null && rest.size() > 0) {
+    while (result == null && rest.length() > 0) {
       prefix = prefix + "." + TypeSystem.getFirstComponent(rest);
       rest = TypeSystem.removeFirstComponent(rest);
       try {
@@ -409,15 +438,15 @@ public abstract class StandardTypeSystem extends TypeSystem {
       } catch (NoClassException e) {}
     }
     if (result == null)
-      return "No class found for " + className;
+      throw new TypeCheckError( "No class found for " + className );
     
     Type outer = result;
     JavaClass resultClass = getClassForType(outer);
-    while (rest.size() > 0) {
+    while (rest.length() > 0) {
       String innerName = TypeSystem.getFirstComponent(rest);
       result = resultClass.getInnerNamed(innerName);
       if (result == null)
-	return "Class " + prefix + " has no inner class named " + innerName;
+	throw new TypeCheckError ("Class " + prefix + " has no inner class named " + innerName);
       resultClass = getClassForType(result);
       prefix = prefix + "." + innerName;
       rest = TypeSystem.removeFirstComponent(rest);
@@ -450,6 +479,7 @@ public abstract class StandardTypeSystem extends TypeSystem {
   ////
   // Functions for type membership.
   ////
+
   /**
    * Requires: all type arguments are canonical.
    *
@@ -457,15 +487,9 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * type (if any).  The iterator is guaranteed to yeild fields
    * defined on subclasses before those defined on superclasses.
    **/
-  public Iterator getFieldsForType(Type type) {
-    if (! type.isCanonical() )
-      throw new TypeCheckError("Type: \"" + type + "\" not a canoncial type.");
-    
-    JavaClass class_ = getClassForType(type);
-    
-    
-    // FIXME: TODO
-    return null;
+  public Iterator getFieldsForType(Type type) 
+  {
+    return getField(type, null, null);
   }
 
   /**
@@ -475,23 +499,36 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * type (if any).  The iterator is guaranteed to yield methods
    * defined on subclasses before those defined on superclasses.
    **/  
+
   public Iterator getMethodsForType(Type type)
   {
-    //FIXME: implement
-    return null;
+    return getMethod(type, null, null);
   }
+  
 
   /**
    * Requires: all type arguments are canonical.
    *
    * Returns an immutable iterator of all the FieldMatches named 'name' defined
-   * on type (if any).  The iterator is guaranteed to yield methods
-   * defined on subclasses before those defined on superclasses.
+   * on type (if any).  If 'name' is null, matches all.  The iterator is guaranteed 
+   * to yield fields defined on subclasses before those defined on superclasses.
    **/
   public Iterator getFieldsNamed(Type type, String name)
   {
-    //FIXME: implement
-    return null;
+    return getField( type, name, null);
+  }
+  
+  
+  /**
+   * Requries all type are canonical.
+   * 
+   * Returns an immutable iterator of all the MethodMatches named 'name' defined
+   * on type (if any).  If 'name' is null, mathces all. The iterator is guaranteed
+   * to yield methods defined on subclasses before those defined on superclasses.
+   */
+  public  Iterator getMethodsNamed(Type type, String name)
+  {
+    return getMethod(type, name, null);
   }
 
   /**
@@ -499,25 +536,109 @@ public abstract class StandardTypeSystem extends TypeSystem {
    *
    * Returns the fieldMatch named 'name' defined on 'type' visible in
    * context.  If no such field may be found, returns a fieldmatch
-   * with an error explaining why.
+   * with an error explaining why. name and context may be null, in which case
+   * they will not restrict the output.
    **/
-  public Iterator getField(Type type, String name, Context context)
+  public Iterator getField(Type type, String name, Context context  )
   {
-    //FIXME: implement
-    return null;
+    if (! type.isCanonical() )
+      throw new TypeCheckError("Type: \"" + type + "\" not a canoncial type.");
+    
+    JavaClass class_ = getClassForType(type);
+    LinkedList worklistEnclosingTypes = new LinkedList();
+    List lResults = new LinkedList();
+    List lTempResult; // Typed list containing FieldInstances
+    Type tEnclosing;
+
+    // first add all that we descend from
+    while (class_ != null)
+    {
+      lTempResult = class_.getFields();
+      // wrap all the fieldinstances in fieldmatches, and add them to our list.
+      for (Iterator i = lTempResult.listIterator(); i.hasNext(); )
+      {
+        FieldInstance fi = (FieldInstance)i.next();
+        // only add those fields which match our input criteria, namely, 
+        //   - make sure that the names match (if specified) and 
+        //   - make sure that we have proper access from  this context.
+        if ( (fi.getName().equals (name) || name == null) &&
+             (context == null || 
+                isAccessible( (ClassType)class_.getType(), fi.getAccessFlags(),  context)) )
+          
+          lResults.add( new FieldMatch ( class_.getType(), fi ));
+      }
+      // if we have an enclosing class, throw it in the worklist.
+      tEnclosing = class_.getContainingClass();
+      if (tEnclosing != null && ! worklistEnclosingTypes.contains(tEnclosing))
+        worklistEnclosingTypes.add( tEnclosing );
+      class_ = getClassForType( class_.getSupertype());
+    }
+
+    // now go through our worklist.
+    for (Iterator iWorklist = worklistEnclosingTypes.iterator(); iWorklist.hasNext() ; )
+    {
+      Iterator iResult = getFieldsForType( (Type)iWorklist.next() );
+      // and add 'em to our result list.
+      for (; iResult.hasNext() ; )
+      {
+        lResults.add ( iResult.next() );
+      }
+    }
+    return lResults.iterator();
   }
 
-  /**
+ /**
    * Requires: all type arguments are canonical.
-   *
-   * Returns an immutable of all the MethodMatches named 'name' defined on
-   * type (if any).  The iterator is guaranteed to yield methods
-   * defined on subclasses before those defined on superclasses.
-   **/  
-  // FIXME
-  public Iterator getMethodsNamed(Type type, String name)
+   * 
+   * Returns the MethodMatch named 'name' defined on 'type' visibile in
+   * context.  If no such field may be found, returns a fieldmatch
+   * with an error explaining why. Considers accessflags.
+   **/
+  public Iterator getMethod(Type type, String name, Context context)
   {
-    return null;
+    if (! type.isCanonical() )
+      throw new TypeCheckError("Type: \"" + type + "\" not a canoncial type.");
+    
+    JavaClass class_ = getClassForType(type);
+    LinkedList worklistEnclosingTypes = new LinkedList();
+    List lResults = new LinkedList();
+    List lTempResult; // Typed list containing MethodTypeIstances
+    Type tEnclosing;
+
+    // first add all that we descend from
+    while (class_ != null)
+    {
+      lTempResult = class_.getMethods();
+      // wrap all the MethodTypeInstances in MethodMatches, and add them to our list.
+      for (Iterator i = lTempResult.listIterator(); i.hasNext(); )
+      {
+        MethodTypeInstance mti =  (MethodTypeInstance)i.next();
+        // only add those methods which match our input criteria, namely, 
+        //   - make sure that the names match (if specified) and 
+        //   - make sure that we have proper access from this context (if specified)
+        if ( (mti.getName().equals( name) || name == null) &&
+             (context == null || isAccessible( (ClassType) class_.getType(), 
+                                               mti.getAccessFlags(), context)))
+          lResults.add( new MethodMatch ( class_.getType(), mti));
+      }
+      // if we have an enclosing class, throw it in the worklist.
+      tEnclosing = class_.getContainingClass();
+      if (tEnclosing != null && ! worklistEnclosingTypes.contains(tEnclosing))
+        worklistEnclosingTypes.add( tEnclosing );
+      class_ = getClassForType( class_.getSupertype());
+    }
+
+    // now go through our worklist.
+    for (Iterator iWorklist = worklistEnclosingTypes.iterator(); iWorklist.hasNext() ; )
+    {
+      Iterator iResult = getMethodsForType( (Type)iWorklist.next() );
+      // and add 'em to our result list.
+      for (; iResult.hasNext() ; )
+      {
+        lResults.add ( iResult.next() );
+      }
+    }
+    return lResults.iterator();
   }
 
   /**
@@ -525,10 +646,10 @@ public abstract class StandardTypeSystem extends TypeSystem {
    *
    * Returns the supertype of type, or null if type has no supertype.
    **/
-  // FIXME
   public Type getSuperType(Type type)
   {
-    return null;
+    JavaClass class_ = getClassForType( type);
+    return class_.getSupertype();
   }
 
   /**
@@ -537,13 +658,11 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * Returns an immutable list of all the interface types which type
    * implements.
    **/
-  // FIXME
   public List getInterfaces(Type type)
   {
-    return null;
+    JavaClass class_ = getClassForType( type );
+    return class_.getInterfaces();
   }
-
-  
 
   ////
   // Functions for method testing.
@@ -553,8 +672,7 @@ public abstract class StandardTypeSystem extends TypeSystem {
    **/
   public boolean isSameType(MethodType type1, MethodType type2)
   {
-    //FIXME: implement
-    return null;
+    return ( type1.equals(type2));
   }
 
   /**
@@ -562,8 +680,42 @@ public abstract class StandardTypeSystem extends TypeSystem {
    **/
   public boolean hasSameArguments(MethodType type1, MethodType type2)
   {
-    //FIXME: implement
-    return null;
+    List lArgumentTypes1 = type1.argumentTypes();
+    List lArgumentTypes2 = type2.argumentTypes();
+    
+    if (lArgumentTypes1.size() != lArgumentTypes2.size())
+      return false;
+    
+    Iterator iArgumentTypes1 = lArgumentTypes1.iterator();
+    Iterator iArgumentTypes2 = lArgumentTypes2.iterator();
+    
+    for ( ; iArgumentTypes1.hasNext() ; )
+      if ( ! isSameType ( (Type)iArgumentTypes1.next(), (Type)iArgumentTypes2.next() ) )
+        return false;
+    return true;
+  }
+
+  /**
+   * Returns whether the arguments for MethodType call can call MethodTypeInstance prototype
+   */
+  public boolean methodCallValid( MethodTypeInstance prototype, MethodType call)
+  {
+    if ( ! prototype.getName().equals(call.getName()))
+      return false;
+
+    List lArgumentTypesProto = prototype.argumentTypes();
+    List lArgumentTypesCall = call.argumentTypes();
+    
+    if (lArgumentTypesProto.size() != lArgumentTypesCall.size())
+      return false;
+    
+    Iterator iArgumentTypesProto = lArgumentTypesProto.iterator();
+    Iterator iArgumentTypesCall  = lArgumentTypesCall.iterator();
+    
+    for ( ; iArgumentTypesProto.hasNext() ; )
+      if ( ! descendsFrom ( (Type)iArgumentTypesCall.next(), (Type)iArgumentTypesProto.next() ) )
+        return false;
+    return true;
   }
 
   /**
@@ -583,11 +735,32 @@ public abstract class StandardTypeSystem extends TypeSystem {
    *
    * (Guavac gets this wrong.)
    **/
-  // FIXME
   public MethodMatch getMethod(Type type, MethodType method, 
-					Context context, boolean isThis)
+                               Context context, boolean isThis)
   {
-    return null;
+    // we first get the list of methods which match our type, method name and 
+    // are accessible from our context.  We make use of the fact that 
+    // the methods come back such taht those in the subclass come before those in a 
+    // super class.
+    MethodMatch match = null, temp = null;
+    for ( Iterator i = getMethod( type, method.getName() , context)   ; i.hasNext() ; )
+    {
+      temp = (MethodMatch)temp;
+      // if isThis is true, make sure we don't check enclosing classes (checking super
+      // classes is ok, though) & that the type signatures are compatible
+      if (   ( ( !isThis ) || context.inClass.descendsFrom ( temp.onClass ) ) &&
+             methodCallValid( temp.method, method) )
+        // new ==> this is our candidation.  keep looking to make sure that this  isn't
+        //         ambiguous
+        if (match == null)
+          match = temp;
+        else 
+          // we have a match already. if our temp refines the signature of our current match
+          // (from the subclass), then we have an ambiguous situation.
+          if ( methodCallValid( temp.method, match.method) )
+            return new MethodMatch(" The call is ambiguous; more than 1 prototype will match");
+    }
+    return match;
   }
 
   /**
@@ -609,7 +782,7 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * (Guavac gets this wrong.)
    **/
   public MethodMatch getMethodInClass(Type type, MethodType method, 
-					      Context context, boolean isThis)
+                                      Context context, boolean isThis)
   {
     //FIXME: implement
     return null;
@@ -643,12 +816,15 @@ public abstract class StandardTypeSystem extends TypeSystem {
   public JavaClass getClassForType(Type type) {
     if (! (type instanceof ClassType)) return null;
     String fullName = ((ClassType) type).getName();
-    return resolver.findClass(fullName);
+    try { return resolver.findClass(fullName); }
+    catch (NoClassException nce) 
+    { return null; }
   }
 
   ////
   // Functions which yield particular types.
   ////
+  public Type getNull()    { return NULL_; }
   public Type getVoid()    { return VOID_; }
   public Type getBoolean() { return BOOLEAN_; }
   public Type getChar()    { return CHAR_; }
@@ -701,8 +877,8 @@ public abstract class StandardTypeSystem extends TypeSystem {
     int newDims = dims;
     if (type instanceof ArrayType) {
       ArrayType t = (ArrayType) type;
-      base = type.getBaseType();
-      newDims += type.getDimensions();
+      base = t.getBaseType();
+      newDims += t.getDimensions();
     }
     if (newDims == 0) 
       return base;
@@ -715,11 +891,23 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * registered in this typeSystem.  Does not register the type in
    * this TypeSystem.  For use only by JavaClass implementations.
    **/
-  public ClassType typeForClass(Class theClass)
+  public ClassType typeForClass(JavaClass theClass)
   {
-    //FIXME: implement
+    return (ClassType)theClass.getType();
+  }
+
+  /**
+   * Returns a canonical type corresponding to the Java Class object
+   * theClass.  Does not require that <theClass> have a JavaClass
+   * registered in this typeSystem.  Does not register the type in
+   * this TypeSystem.  For use only by JavaClass implementations.
+   **/
+  public  ClassType typeForClass(Class theClass)
+  {
+    // FIXME: implement
     return null;
   }
+
 
 }
 

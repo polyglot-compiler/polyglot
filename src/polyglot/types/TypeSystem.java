@@ -45,10 +45,11 @@ public abstract class TypeSystem {
    **/
   public static class MethodMatch {
     public final Type onClass;
-    public final MethodType method;
+    public final MethodTypeInstance method;
     public String error;
 
-    public MethodMatch(Type c, MethodType m) { onClass = c; method = m; }    
+    public MethodMatch(Type c, MethodTypeInstance m) { onClass = c; method = m; }    
+    public MethodMatch(String error) { this(null, null); this.error = error; }
   }
 
   /**
@@ -98,6 +99,7 @@ public abstract class TypeSystem {
    **/
   public abstract boolean isCastValid(Type fromType, Type toType);
 
+
   /**
    * Requires: all type arguments are canonical.
    *
@@ -127,9 +129,17 @@ public abstract class TypeSystem {
    * type exists.
    **/
   public Type getCanonicalType(Type type, Context context) {
-    Object res = checkAndResolveType(type, context);
-    return (res instanceof String) ? null : (Type) res;
+    try { return checkAndResolveType(type, context); }
+    catch (TypeCheckError tce )
+    { return null; }
   }
+
+  /**
+   * Checks whether a method or field within tEnclosingClass with access flags 'flags' can
+   * be accessed from Context context. 
+   */
+  public abstract boolean isAccessible(ClassType tEnclosingClass, AccessFlags flags, Context context);
+
   /**
    * Checks whether <type> is a valid type in the given context,
    * which may be null.  Returns a description of the error, if any.
@@ -143,7 +153,7 @@ public abstract class TypeSystem {
    * canonical form of that type.  Otherwise, returns a String
    * describing the error.
    **/
-  public abstract Object checkAndResolveType(Type type, Context context);
+  public abstract Type checkAndResolveType(Type type, Context context);
 
   ////
   // Various one-type predicates.
@@ -173,6 +183,7 @@ public abstract class TypeSystem {
    * defined on subclasses before those defined on superclasses.
    **/
   public abstract Iterator getFieldsForType(Type type);
+
   /**
    * Requires: all type arguments are canonical.
    *
@@ -181,32 +192,44 @@ public abstract class TypeSystem {
    * defined on subclasses before those defined on superclasses.
    **/  
   public abstract Iterator getMethodsForType(Type type);
+
   /**
    * Requires: all type arguments are canonical.
    *
    * Returns an immutable iterator of all the FieldMatches named 'name' defined
-   * on type (if any).  The iterator is guaranteed to yield methods
-   * defined on subclasses before those defined on superclasses.
+   * on type (if any).  If 'name' is null, matches all.  The iterator is guaranteed 
+   * to yield fields defined on subclasses before those defined on superclasses.
    **/
   public abstract Iterator getFieldsNamed(Type type, String name);
+
+  /**
+   * Requries all type are canonical.
+   * 
+   * Returns an immutable iterator of all the MethodMatches named 'name' defined
+   * on type (if any).  If 'name' is null, mathces all. The iterator is guaranteed
+   * to yield methods defined on subclasses before those defined on superclasses.
+   **/
+  public abstract Iterator getMethodsNamed(Type type, String name);
 
   /**
    * Requires: all type arguments are canonical.
    *
    * Returns the fieldMatch named 'name' defined on 'type' visible in
    * context.  If no such field may be found, returns a fieldmatch
-   * with an error explaining why.
+   * with an error explaining why. Considers accessflags
    **/
   public abstract Iterator getField(Type type, String name, Context context);
 
   /**
    * Requires: all type arguments are canonical.
-   *
-   * Returns an immutable of all the MethodMatches named 'name' defined on
-   * type (if any).  The iterator is guaranteed to yield methods
-   * defined on subclasses before those defined on superclasses.
-   **/  
-  public abstract Iterator getMethodsNamed(Type type, String name);
+   * 
+   * Returns the MethodMatch named 'name' defined on 'type' visibile in
+   * context.  If no such field may be found, returns a fieldmatch
+   * with an error explaining why. Considers accessflags.
+   **/
+  public abstract Iterator getMethod(Type type, String name, Context context);
+ 
+
   /**
    * Requires: all type arguments are canonical.
    *

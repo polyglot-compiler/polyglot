@@ -17,7 +17,7 @@ import java.util.Iterator;
  * class imports, which caches the results of lookups for future
  * reference.
  **/
-public abstract class ImportTable implements ClassResolver {
+public  class ImportTable implements ClassResolver {
   // DOCME
   public ImportTable(ClassResolver base) {
     resolver = base;

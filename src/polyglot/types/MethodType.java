@@ -28,7 +28,6 @@ public class MethodType extends Type implements Cloneable {
     this.argumentTypes = TypedList.copy(argumentTypes, Type.class, true);
   }  
 
-
   public MethodType copy() {
     return new MethodType(getTypeSystem(), name,
 			  argumentTypes.copy());
@@ -49,6 +48,15 @@ public class MethodType extends Type implements Cloneable {
   // FIXME: is this correct?
   public  boolean isCanonical() { return true; }
 
+  public boolean equals(Object o)
+  {
+    if (o instanceof MethodType)
+    {
+      return (name.equals ( ((MethodType)o).name) &&
+              getTypeSystem().hasSameArguments( this, (MethodType)o));
+    }
+    return false;
+  }
 
   private String name;
   // RI: every element is a Type.  Immutable.

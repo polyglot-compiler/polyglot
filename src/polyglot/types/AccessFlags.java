@@ -9,6 +9,8 @@ package jltools.types;
  *
  * Overview:
  *    A mutable set of access flags.
+ *    We represent pacakge protection as the abscence of private, public
+ *    and protected.
  **/
 public class AccessFlags implements Cloneable {
 
@@ -38,24 +40,28 @@ public class AccessFlags implements Cloneable {
    **/
   public static AccessFlags flagsForInt(int fl) {
     AccessFlags flags = new AccessFlags();
-    if ((fl & 0x1) != 0)   { flags.setPublic(true); }
-    if ((fl & 0x2) != 0)   { flags.setPrivate(true); }
-    if ((fl & 0x4) != 0)   { flags.setProtected(true); }
-    if ((fl & 0x8) != 0)   { flags.setStatic(true); }
-    if ((fl & 0x10) != 0)  { flags.setFinal(true); }
-    if ((fl & 0x20) != 0)  { flags.setSynchronized(true); }
-    if ((fl & 0x40) != 0)  { flags.setVolatile(true); }
-    if ((fl & 0x80) != 0)  { flags.setTransient(true); }
-    if ((fl & 0x100) != 0) { flags.setNative(true); }
-    if ((fl & 0x200) != 0) { flags.setInterface(true); }
-    if ((fl & 0x400) != 0) { flags.setAbstract(true); }
-    if ((fl & 0x800) != 0) { flags.setStrictFloatingPoint(true); }
+    if ((fl & PUBLIC_BIT) != 0)   { flags.setPublic(true); }
+    if ((fl & PRIVATE_BIT) != 0)   { flags.setPrivate(true); }
+    if ((fl & PROTECTED_BIT) != 0)   { flags.setProtected(true); }
+    if ((fl & STATIC_BIT) != 0)   { flags.setStatic(true); }
+    if ((fl & FINAL_BIT) != 0)  { flags.setFinal(true); }
+    if ((fl & SYNCHRONIZED_BIT) != 0)  { flags.setSynchronized(true); }
+    if ((fl & VOLATILE_BIT) != 0)  { flags.setVolatile(true); }
+    if ((fl & TRANSIENT_BIT) != 0)  { flags.setTransient(true); }
+    if ((fl & NATIVE_BIT) != 0) { flags.setNative(true); }
+    if ((fl & INTERFACE_BIT) != 0) { flags.setInterface(true); }
+    if ((fl & ABSTRACT_BIT) != 0) { flags.setAbstract(true); }
+    if ((fl & STRICTFP_BIT) != 0) { flags.setStrictFloatingPoint(true); }
     return flags;
   }
 
   public void setPublic(boolean val) {
     if (val)
+    {
       bits |= PUBLIC_BIT;
+      bits &= ~PROTECTED_BIT;
+      bits &= ~PRIVATE_BIT;
+    }
     else
       bits &= ~PUBLIC_BIT;
   }
@@ -66,7 +72,11 @@ public class AccessFlags implements Cloneable {
 
   public void setPrivate(boolean val) {
     if (val)
+    {
       bits |= PRIVATE_BIT;
+      bits &= ~PUBLIC_BIT;
+      bits &= ~PROTECTED_BIT;
+    }
     else
       bits &= ~PRIVATE_BIT;
   }
@@ -77,13 +87,27 @@ public class AccessFlags implements Cloneable {
 
   public void setProtected(boolean val) {
     if (val)
+    {
       bits |= PROTECTED_BIT;
+      bits &= ~PRIVATE_BIT;
+      bits &= ~PUBLIC_BIT;
+    }
     else
       bits &= ~PROTECTED_BIT;
   }
 
   public boolean isProtected() {
     return (bits & PROTECTED_BIT) != 0;
+  }
+
+  public void  setPackage()
+  {
+    bits &= ~ ( PUBLIC_BIT | PROTECTED_BIT | PRIVATE_BIT) ;
+  }
+
+  public boolean isPackage()
+  {
+    return ((bits & ( PUBLIC_BIT | PROTECTED_BIT | PRIVATE_BIT))  == 0);
   }
 
   public void setStatic(boolean val) {
@@ -204,8 +228,9 @@ public class AccessFlags implements Cloneable {
   }
 
   private static int PUBLIC_BIT       = 1;
-  private static int PRIVATE_BIT      = 2;
-  private static int PROTECTED_BIT    = 4;
+  private static int PROTECTED_BIT    = 2;
+  private static int PRIVATE_BIT      = 4;
+  
   private static int STATIC_BIT       = 8;
   private static int FINAL_BIT        = 16;
   private static int SYNCHRONIZED_BIT = 32;

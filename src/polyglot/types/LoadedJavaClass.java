@@ -84,7 +84,7 @@ public class LoadedJavaClass extends JavaClassImpl {
     Type type = ts.typeForClass(f.getType());
     AccessFlags flags = AccessFlags.flagsForInt(f.getModifiers());    
     
-    return new FieldInstance(fieldName, type, flags);
+    return new FieldInstance(fieldName, type, this.classType,  flags);
   }
 
   protected MethodType methodTypeForMethod(Method m) {

@@ -69,6 +69,7 @@ public class LocalContext
    */
   public TypeSystem.MethodMatch getMethod( String methodName, List argumentTypes)
   {
+    // FIXME: implement
     return null;
   }
 
@@ -77,8 +78,7 @@ public class LocalContext
    */
   public TypeSystem.FieldMatch getField (String fieldName)
   {
-
-    return null;
+    return getField(null, fieldName);
   }
 
   /**
@@ -86,7 +86,40 @@ public class LocalContext
    */  
   public TypeSystem.FieldMatch getField( Type type, String fieldName)
   {
-    return null;
+    // look up locally (only if type is null)
+    if ( type == null)
+    {
+      Object o = htLocalVariables.get(fieldName);
+      if (o != null) 
+        return new TypeSystem.FieldMatch(null, 
+                              new FieldInstance (fieldName, 
+                                                 (Type)o, 
+                                                 null, 
+                                                 AccessFlags.flagsForInt(0)
+                                                 )
+                                );
+    }
+    if (lcParent != null)
+    {
+      return lcParent.getField(type, fieldName);
+    }
+    else 
+    {
+      // Fixme: implement
+      // pass on call to typesystem.
+      return null;
+    }
+
+  }
+
+  /**
+   * If <type> is a valid type in the given context, returns a
+   * canonical form of that type.  
+   **/
+  public Type checkAndResolveType( Type type ) throws TypeCheckError
+  {
+    return ts.checkAndResolveType(type, 
+                               new TypeSystem.Context ( itImports, tEnclosingClass , null)) ;
   }
 
   /**
@@ -94,6 +127,7 @@ public class LocalContext
    */
   public Type getType( String s)
   {
+    // FIXME: implement
     return null;
   }
   

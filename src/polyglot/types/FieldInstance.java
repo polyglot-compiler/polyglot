@@ -14,9 +14,10 @@ package jltools.types;
  **/
 public class FieldInstance implements Cloneable, TypeInstance {
 
-  public FieldInstance(String fieldName, Type fieldType, AccessFlags fieldFlags) {
+  public FieldInstance(String fieldName, Type fieldType, Type enclosingType, AccessFlags fieldFlags) {
     this.name = fieldName;
     this.type = fieldType;
+    this.enclosingType = enclosingType;
     this.flags = fieldFlags.copy();
   }
 
@@ -25,6 +26,6 @@ public class FieldInstance implements Cloneable, TypeInstance {
   public String getName()       { return name; }
 
   private String name;
-  private Type type;
+  private Type type, enclosingType;
   private AccessFlags flags;
 }

@@ -6,6 +6,7 @@ tp_files 	= AccessFlags.java	\
 			ClassResolver.java \
 			ClassType.java \
 			ConstructorType.java \
+			ConstructorTypeInstance.java \
 			FieldInstance.java \
 			ImportTable.java \
 			JavaClass.java \
@@ -20,8 +21,8 @@ tp_files 	= AccessFlags.java	\
 			Type.java \
 			TypeCheckError.java \
 			TypeInstance.java \
-			TypeSystem.java 
-#			StandardTypeSystem.java \
+			TypeSystem.java \
+			StandardTypeSystem.java 
 
 
 TYPES_TARGET = $(patsubst %.java, $(tp_package)/%.class, $(tp_files))
