@@ -273,11 +273,7 @@ public class LoadedClassResolver extends ClassResolver
       Types.report(2, "Returning serialized ClassType for " +
 		  clazz.getName() + ".");
 
-      ClassType ret = (ClassType) t.restore();
-      if (ret instanceof ParsedClassType) {
-	  ((ParsedClassType)ret).setClean(true);
-      }
-      return ret;
+      return (ClassType) t.restore();
     }
     catch (SemanticException e) {
       throw e;

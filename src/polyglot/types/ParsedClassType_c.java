@@ -18,7 +18,6 @@ import java.util.*;
 public abstract class ParsedClassType_c extends ClassType_c
 				     implements ParsedClassType
 {
-    protected transient boolean clean = false;
     protected transient Job job;
     
     protected ParsedClassType_c() {
@@ -39,14 +38,6 @@ public abstract class ParsedClassType_c extends ClassType_c
 	this.fields.add(ts.fieldInstance(position(), this,
 	    Flags.PUBLIC.set(Flags.STATIC).set(Flags.FINAL),
 	    ts.Class(), "class"));
-    }
-
-    public void setClean(boolean clean) {
-        this.clean = clean;
-    }
-
-    public boolean isClean() {
-        return clean;
     }
 
     public Job job() {
@@ -140,7 +131,6 @@ public abstract class ParsedClassType_c extends ClassType_c
 	if (in instanceof TypeInputStream) {
 	    TypeSystem ts = ((TypeInputStream) in).getTypeSystem();
 	    job = null;
-	    clean = false;
 	}
     }
 
