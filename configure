@@ -233,6 +233,7 @@ cat > ${BIN}/defs <<EOF
 JAVA='${JAVA}'
 FILE_SEP="${FILE_SEP}"
 PATH_SEP="${NOT_ESC_PATH_SEP}"
+TOP="${TOP}"
 
 EOF
 
