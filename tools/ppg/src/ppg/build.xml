@@ -74,7 +74,8 @@
 	<target name="compile" depends="init,parser">
 		<javac 	srcdir="${src.dir}" 
 			destdir="${dst.dir}"
-			classpath="${java_cup.jar}"/>
+			classpath="${java_cup.jar}"
+			excludes="test/**"/>
 	</target>
 
 	<target name="jar" depends="compile">
