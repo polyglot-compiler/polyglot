@@ -74,21 +74,21 @@ public class PrimitiveType extends Type
     switch(kind)
     {
       case BOOLEAN:
-        return "Boolean";
+        return "jltools.ext.polyj.wrappers.BoolWrap";
       case CHAR:
-        return "Char";
+        return "jltools.ext.polyj.wrappers.CharWrap";
       case BYTE:
-        return "Byte";
+        return "jltools.ext.polyj.wrappers.ByteWrap";
       case SHORT:
-        return "Short";
+        return "jltools.ext.polyj.wrappers.ShortWrap";
       case INT:
-        return "Integer";
+        return "jltools.ext.polyj.wrappers.IntWrap";
       case LONG:
-        return "Long";
+        return "jltools.ext.polyj.wrappers.LongWrap";
       case FLOAT:
-        return "Float";
+        return "jltools.ext.polyj.wrappers.FloatWrap";
       case DOUBLE:
-        return "Double";
+        return "jltools.ext.polyj.wrappers.DoubleWrap";
       default:
         return "???";
     }
