@@ -77,4 +77,8 @@ public class ClassLit_c extends Lit_c implements ClassLit
   public boolean isConstant() {
     return false;
   }
+
+  public Object constantValue() {
+    return null;
+  }
 }
