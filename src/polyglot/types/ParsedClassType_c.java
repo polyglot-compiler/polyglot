@@ -222,13 +222,13 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         return constructors().isEmpty();
     }
     
-    /** Return a mutable list of constructors */
+    /** Return a immutable list of constructors */
     public List constructors() {
         init.initConstructors();
         return Collections.unmodifiableList(constructors);
     }
 
-    /** Return a mutable list of member classes */
+    /** Return a immutable list of member classes */
     public List memberClasses() {
         init.initMemberClasses();
         return Collections.unmodifiableList(memberClasses);
@@ -240,13 +240,13 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         return Collections.unmodifiableList(methods);
     }
 
-    /** Return a mutable list of fields */
+    /** Return a immutable list of fields */
     public List fields() {
         init.initFields();
         return Collections.unmodifiableList(fields);
     }
 
-    /** Return a mutable list of interfaces */
+    /** Return a immutable list of interfaces */
     public List interfaces() {
         init.initInterfaces();
         return Collections.unmodifiableList(interfaces);
