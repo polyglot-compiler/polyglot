@@ -108,12 +108,12 @@ public class CachingResolver implements TopLevelResolver {
                 throw e;
             }
 
-            addNamed(name, q);
-
             if (q instanceof ClassType) {
                 Package p = ((ClassType) q).package_();
                 cachePackage(p);
             }
+
+            addNamed(name, q);
 
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "CachingResolver: loaded: " + name);
