@@ -450,9 +450,13 @@ public class InitChecker extends DataFlow
      */
     public Item createInitialItem(FlowGraph graph, Term node) {
         if (node == graph.startNode()) {
-            return new DataFlowItem(new HashMap(currCBI.currClassFinalFieldInitCounts));
+            return createInitDFI();
         }
         return null;
+    }
+
+    private DataFlowItem createInitDFI() {
+        return new DataFlowItem(new HashMap(currCBI.currClassFinalFieldInitCounts));
     }
     
     /**
@@ -468,7 +472,7 @@ public class InitChecker extends DataFlow
         if (node instanceof Initializer || node instanceof ConstructorDecl) {
             List filtered = filterItemsNonException(items, itemKeys);
             if (filtered.isEmpty()) {
-                return new DataFlowItem(new HashMap(currCBI.currClassFinalFieldInitCounts));
+                return createInitDFI();
             }
             else if (filtered.size() == 1) {
                 return (Item)filtered.get(0);
@@ -736,8 +740,9 @@ public class InitChecker extends DataFlow
             // no unreachable statement, the Java Language Spec permits it.
             
             // Set inItem to a default Item
-            dfIn = (DataFlowItem)createInitialItem(graph, n);
+            dfIn = createInitDFI();
         }
+        
         DataFlowItem dfOut = null;
         if (outItems != null && !outItems.isEmpty()) {
             // due to the flow equations, all DataFlowItems in the outItems map
