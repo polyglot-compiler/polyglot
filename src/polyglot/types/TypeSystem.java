@@ -531,6 +531,16 @@ public interface TypeSystem {
      */
     Set getTypeEncoderRootSet(Type clazz);
 
+    /**
+     * Get the transformed class name of a class.
+     * This utility method returns the "mangled" name of the given class,
+     * whereby all periods ('.') following the toplevel class name
+     * are replaced with dollar signs ('$'). If any of the containing
+     * classes is not a member class or a top level class, then null is
+     * returned.
+     */
+    public String getTransformedClassName(ClassType ct);
+
     /** Get a place-holder for serializing a type object.
      * @param o The object to get the place-holder for.
      * @param roots The root objects for the serialization.  Place holders

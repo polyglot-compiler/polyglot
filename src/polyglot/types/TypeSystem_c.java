@@ -1,53 +1,11 @@
 package polyglot.ext.jl.types;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 import polyglot.main.Report;
-import polyglot.types.ArrayType;
-import polyglot.types.CachingResolver;
-import polyglot.types.ClassContextResolver;
-import polyglot.types.ClassType;
-import polyglot.types.CompoundResolver;
-import polyglot.types.ConstructorInstance;
-import polyglot.types.Context;
-import polyglot.types.FieldInstance;
-import polyglot.types.Flags;
-import polyglot.types.ImportTable;
-import polyglot.types.InitializerInstance;
-import polyglot.types.LazyClassInitializer;
-import polyglot.types.LoadedClassResolver;
-import polyglot.types.LocalInstance;
-import polyglot.types.MemberInstance;
-import polyglot.types.MethodInstance;
-import polyglot.types.NoClassException;
-import polyglot.types.NoMemberException;
-import polyglot.types.NullType;
+import polyglot.types.*;
 import polyglot.types.Package;
-import polyglot.types.PackageContextResolver;
-import polyglot.types.ParsedClassType;
-import polyglot.types.PrimitiveType;
-import polyglot.types.ProcedureInstance;
-import polyglot.types.ReferenceType;
-import polyglot.types.Resolver;
-import polyglot.types.SemanticException;
-import polyglot.types.TableResolver;
-import polyglot.types.Type;
-import polyglot.types.TypeObject;
-import polyglot.types.TypeSystem;
-import polyglot.types.UnknownQualifier;
-import polyglot.types.UnknownType;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.StringUtil;
@@ -1227,6 +1185,32 @@ public class TypeSystem_c implements TypeSystem
         // The root set is now just the type itself. Previously it contained
         // the member classes tool
 	return Collections.singleton(t);
+    }
+
+    /**
+     * Get the transformed class name of a class.
+     * This utility method returns the "mangled" name of the given class,
+     * whereby all periods ('.') following the toplevel class name
+     * are replaced with dollar signs ('$'). If any of the containing
+     * classes is not a member class or a top level class, then null is
+     * returned.
+     */
+    public String getTransformedClassName(ClassType ct) {
+        StringBuffer sb = new StringBuffer(ct.fullName().length());
+        if (!ct.isMember() && !ct.isTopLevel()) {
+            return null;
+        }
+        while (ct.isMember()) {
+            sb.insert(0, ct.name());
+            sb.insert(0, '$');
+            ct = ct.outer();
+            if (!ct.isMember() && !ct.isTopLevel()) {
+                return null;
+            }
+        }
+            
+        sb.insert(0, ct.fullName());
+        return sb.toString();
     }
 
     public String translatePackage(Resolver c, Package p) {
