@@ -20,25 +20,6 @@ import jltools.visit.SymbolReader;
  **/
 public abstract class Node extends jltools.util.AnnotatedObject {
 
-  /**
-   * Node copy()
-   *
-   * Returns a new node with the same, contents, and annotations as
-   *  this.  This is a shallow copy; if some object is stored under
-   *  this node, an identical object will be stored under the copied
-   *  node.
-   **/
-  public abstract Node copy();
-
-  /**
-   * Node deepCopy()
-   *
-   * Returns a new node with the same type, contents, and annotations
-   * as this.  Any changes made to the new node, or any subnode of
-   * that node, are guaranteed not to affect this.  In other words,
-   * this method performs a deep copy.
-   **/
-  public abstract Node deepCopy();
   
   /**
    * Object visitChildren(NodeVisitor vis)
@@ -64,43 +45,24 @@ public abstract class Node extends jltools.util.AnnotatedObject {
       return vis.visitAfter( this, vinfo);
     }
   }
+
+  public abstract Node readSymbols( SymbolReader sr) throws TypeCheckException;
+
+  public Node adjustScope( LocalContext c)
+  {
+    return null; 
+  }
   
   public Node resolveAmbiguities(LocalContext c) throws TypeCheckException
   {
     return this;
   }
 
-   /**
-    * Dumps the attributes to the writer, if the attributes have been set
-    */
-   public void dumpNodeInfo( CodeWriter w)
-   {
-     Type type = Annotate.getCheckedType( this);
-     if( type != null) {
-       w.write( "T: " + type.getTypeString() + " ");
-     }
-     type = Annotate.getExpectedType( this);
-     if( type != null) {
-       w.write( "E: " + type.getTypeString() + " ");
-     }
-     Object o = Annotate.getVisitorInfo( this);
-     if( o != null) {
-       w.write( "ERROR ");
-     }
-   }
-
-  public abstract Node readSymbols( SymbolReader sr) throws TypeCheckException;
-  
-  public Node adjustScope( LocalContext c)
-  {
-    return null; 
-  }
-
   public Node removeAmbiguities( NodeVisitor vis, LocalContext c) throws TypeCheckException
   {
     return removeAmbiguities( c ) ;
   }
-  
+
   public Node removeAmbiguities( LocalContext c) throws TypeCheckException
   { 
     return this; 
@@ -111,6 +73,45 @@ public abstract class Node extends jltools.util.AnnotatedObject {
   public abstract void translate( LocalContext c, CodeWriter w);
   
   public abstract Node dump( CodeWriter w) throws TypeCheckException;
+
+  /**
+   * Dumps the attributes to the writer, if the attributes have been set
+   */
+  public void dumpNodeInfo( CodeWriter w)
+  {
+    Type type = Annotate.getCheckedType( this);
+    if( type != null) {
+      w.write( "T: " + type.getTypeString() + " ");
+    }
+    type = Annotate.getExpectedType( this);
+    if( type != null) {
+      w.write( "E: " + type.getTypeString() + " ");
+    }
+    Object o = Annotate.getVisitorInfo( this);
+    if( o != null) {
+      w.write( "ERROR ");
+    }
+  }
+
+  /**
+   * Node copy()
+   *
+   * Returns a new node with the same, contents, and annotations as
+   *  this.  This is a shallow copy; if some object is stored under
+   *  this node, an identical object will be stored under the copied
+   *  node.
+   **/
+  public abstract Node copy();
+
+  /**
+   * Node deepCopy()
+   *
+   * Returns a new node with the same type, contents, and annotations
+   * as this.  Any changes made to the new node, or any subnode of
+   * that node, are guaranteed not to affect this.  In other words,
+   * this method performs a deep copy.
+   **/
+  public abstract Node deepCopy();
 
   /**
    * Return a new array containing all the elements of lst, in the same order.
@@ -148,6 +149,27 @@ public abstract class Node extends jltools.util.AnnotatedObject {
   {
     return Annotate.getThrows ( this ) ;
   }
-  
+
+  public boolean completesNormally( )
+  {
+    return Annotate.completesNormally( this );
+  }
+
+  public void setCompletesNormally( boolean b )
+  {
+    Annotate.setCompletesNormally( this , b);
+  }
+
+  public boolean isReachable()
+  {
+    return Annotate.isReachable( this ) ;
+  }
+
+  public void setReachable(boolean b)
+  {
+    Annotate.setReachable(this, b);
+  }
+
+
 }
 

@@ -92,8 +92,11 @@ public class CatchBlock extends Node {
     return this;
   }
 
-  public Node typeCheck( LocalContext c)
+  public Node typeCheck( LocalContext c) throws TypeCheckException
   {
+    if ( ! formalParameter.getType().descendsFrom ( c.getTypeSystem().getThrowable()) &&
+         ! formalParameter.getType().equals (c.getTypeSystem().getThrowable() ) )
+      throw new TypeCheckException("Can only catch Objects which descend from Throwable");
     Annotate.setTerminatesOnAllPaths ( this, Annotate.terminatesOnAllPaths(block));
     addThrows ( block.getThrows () );
 

@@ -399,8 +399,6 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public Type checkAndResolveType(Type type, Context context) throws TypeCheckException {
 
-    //    System.out.println( "resolving: " + type.getTypeString() + " (" + type.getClass().getName() + ") ");
-
     if (type.isCanonical()) return type;
     if (type instanceof ArrayType) {
       ArrayType at = (ArrayType) type;
@@ -428,6 +426,11 @@ public class StandardTypeSystem extends TypeSystem {
       // a bit hazy here, so we'll use the compiler as a reference.
 
       if (inClass != null) {
+        // STEP 0
+        // Check whether type is the class we're in.
+        if ( inClass.getShortName().equals( className ) )
+          return inClass;
+        
 	// STEP 1
 	// First, we see if the current class has any inners by that name.
 	Type innerType = inClass.getInnerNamed(className);
@@ -462,7 +465,8 @@ public class StandardTypeSystem extends TypeSystem {
           //  System.out.println( "back from parent!");
 	}
 	if ((resultFromOuter != null) &&
-	    (resultFromParent != null)) {
+	    (resultFromParent != null) &&
+            (resultFromParent != resultFromOuter)) {
 	  // FIXME: Better error message needed.
 	  throw new TypeCheckException ("Found " + className + " in both outer and parent.");
 	} else if (resultFromOuter != null) {
@@ -590,13 +594,15 @@ public class StandardTypeSystem extends TypeSystem {
             {
               return fi;
             }
-            throw new TypeCheckException(" Field \"" + name + "\" found in \"" + type.getFullName() + 
+            throw new TypeCheckException(" Field \"" + name + "\" found in \"" + 
+                                         type.getFullName() + 
                                          "\", but with wrong access permissions.");
           }
         }
       }
       while ( (type = (ClassType)type.getSuperType()) != null);
-      throw new TypeCheckException( "Field \"" + name + "\" not found");
+      throw new TypeCheckException( "Field \"" + name + "\" not found in context"
+                                    + t.getTypeString() );
     }
     else // type == null, ==> no starting point. so check superclasses as well as enclosing classes.
     {
@@ -1020,6 +1026,8 @@ public class StandardTypeSystem extends TypeSystem {
   public Type getDouble()  { return DOUBLE_; }
   public Type getObject()  { return OBJECT_; }
   public Type getThrowable() {return THROWABLE_; }
+  public Type getError() { return ERROR_; }
+  public Type getRTException() { return RTEXCEPTION_; }
 
   private final Type NULL_    = new NullType(this);
   private final Type VOID_    = new PrimitiveType(this, PrimitiveType.VOID);

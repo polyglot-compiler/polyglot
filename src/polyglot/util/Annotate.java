@@ -22,8 +22,12 @@ public class Annotate {
   static final int VISITOR                = 3;
   static final int THROWS_SET             = 4;
   // true if the node has all paths ending in function termination (either throws or return).
-  static final int TERMINATE_ALL_PATHS    = 5;
-  static final int EXPECTED_TYPE          = 6;
+  static final int EXPECTED_TYPE          = 5;
+  static final int COMPLETES_NORMALLY     = 6;
+  static final int IS_REACHABLE           = 7;
+  
+
+    
 
   /**
    * Notes that o appeared at line i of the source.
@@ -112,19 +116,32 @@ public class Annotate {
     return (SubtypeSet) o.getAnnotation(THROWS_SET);
   }
   
-  public static boolean terminatesOnAllPaths(AnnotatedObject o)
+  public static boolean completesNormally(AnnotatedObject o )
   {
-    Boolean b = (Boolean) o.getAnnotation (TERMINATE_ALL_PATHS);
-    if (b == null ) return false;
+    Boolean b = ((Boolean)o.getAnnotation(COMPLETES_NORMALLY));
+    if (b == null) 
+      return false;
     return b.booleanValue();
   }
 
-  public static void setTerminatesOnAllPaths ( AnnotatedObject o, boolean b)
+  public static void setCompletesNormally( AnnotatedObject o, boolean b )
   {
-    o.setAnnotation ( TERMINATE_ALL_PATHS, new Boolean ( b ) );
+    o.setAnnotation( COMPLETES_NORMALLY, new Boolean (b ) );
+  }
+
+  public static boolean isReachable(AnnotatedObject o)
+  {
+    Boolean b = ((Boolean)o.getAnnotation(IS_REACHABLE));
+    if (b == null) 
+      return false;
+    return b.booleanValue();
+  }
+
+  public static void setReachable(AnnotatedObject o, boolean b)
+  {
+    o.setAnnotation( IS_REACHABLE, new Boolean (b ) );
   }
   
-
   // Never instantiate this class.
   private Annotate() {}
 }

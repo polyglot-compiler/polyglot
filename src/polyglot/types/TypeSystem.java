@@ -221,6 +221,8 @@ public abstract class TypeSystem {
   public abstract Type getDouble();
   public abstract Type getObject();
   public abstract Type getThrowable();
+  public abstract Type getError();
+  public abstract Type getRTException();
   /**
    * Returns a non-canonical type object for a class type whose name
    * is the provided string.  This type may not correspond to a valid

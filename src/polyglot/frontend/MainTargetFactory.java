@@ -35,6 +35,8 @@ public class MainTargetFactory implements TargetFactory
   public void addSourceDirectory( Target t, String packageName) 
     throws IOException
   {
+    if (packageName == null) 
+      return;
     MainTarget mt = (MainTarget)t;
     String path = mt.sourceFile.getAbsolutePath();
     

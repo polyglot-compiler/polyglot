@@ -108,6 +108,10 @@ public class SwitchStatement extends Statement {
        {
          iValue = (int)((IntLiteral)expr).getLongValue();
        }
+       else if (expr instanceof CharacterLiteral)
+       {
+         iValue = (int) ((CharacterLiteral)expr).getCharValue() ;
+       }
        else if ( expr instanceof FieldExpression || 
                  expr instanceof LocalVariableExpression)
        {
@@ -132,7 +136,7 @@ public class SwitchStatement extends Statement {
            
        }
        else
-         throw new TypeCheckException (" Cast must be a constant");
+         throw new TypeCheckException (" Case must be a constant");
        
        return this;
      }
@@ -347,7 +351,7 @@ public class SwitchStatement extends Statement {
            key = new Long ( ((CaseStatement)se).iValue);
          
          if ( lDefinedCaseLabels.contains( key ) )
-           throw new TypeCheckException( " Duplicate case label.", 
+           throw new TypeCheckException( "Duplicate case label: " + key, 
                                          Annotate.getLineNumber( se ) );
          lDefinedCaseLabels.add ( key );                                        
        }

@@ -98,22 +98,42 @@ public class TryStatement extends Statement {
 
    public Node typeCheck(LocalContext c) throws TypeCheckException
    {
-     SubtypeSet s = tryBlock.getThrows() ;
-     boolean bTerminates = true;
+     SubtypeSet sCaught = new SubtypeSet();
+     SubtypeSet sThrown = tryBlock.getThrows();
+     boolean bTerminates = Annotate.terminatesOnAllPaths( tryBlock );
 
      for (Iterator it = catchBlocks.listIterator() ; it.hasNext() ; )
      {
        CatchBlock cb = (CatchBlock)it.next();
-       if ( (s == null) ||
-            ! s.remove ( cb.getCatchBlockType() ))
+       if ( (sThrown != null) && (sThrown.remove( cb.getCatchBlockType() ) ) )
+       {
+         if ( ! sCaught.add ( cb.getCatchBlockType() ) )
+           throw new TypeCheckException (" The exception \"" +
+                                         cb.getCatchBlockType().getTypeString() + 
+                                         "\" has already been caught in this try block.", 
+                                         Annotate.getLineNumber ( cb ));
+       }
+       else if ( sThrown.contains( cb.getCatchBlockType( ) ) )
+         throw new TypeCheckException (" The exception \"" +
+                                       cb.getCatchBlockType().getTypeString() + 
+                                       "\" has already been caught in this try blcok.", 
+                                       Annotate.getLineNumber ( cb ));
+       else if ( cb.getCatchBlockType().descendsFrom ( c.getTypeSystem().getError() ) ||
+                 cb.getCatchBlockType().descendsFrom ( c.getTypeSystem().getRTException() ) ||
+                 cb.getCatchBlockType().equals ( c.getTypeSystem().getRTException() ) ||
+                 cb.getCatchBlockType().equals ( c.getTypeSystem().getError() ) ||
+                 c.getTypeSystem().getRTException().descendsFrom(cb.getCatchBlockType() ))
+         sThrown.add ( cb.getCatchBlockType() );
+       else
          throw new TypeCheckException ( 
             "The catch block is unreachable since no exceptions of type " 
             + "\"" + cb.getCatchBlockType().getTypeString() 
             + "\" can reach this point.", 
             Annotate.getLineNumber ( cb ));
+
        bTerminates &= Annotate.terminatesOnAllPaths ( cb );
      }
-     addThrows ( s );
+     addThrows ( sThrown );
      if (finallyBlock != null)
      {
        addThrows ( finallyBlock.getThrows() );

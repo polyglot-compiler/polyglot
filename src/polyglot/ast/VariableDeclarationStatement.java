@@ -200,7 +200,7 @@ public class VariableDeclarationStatement extends Statement {
    {
      Declarator d;
      Iterator iter = declarators();
-     
+
      // only add to context if inside a method, 
      // hence a local variable declaration
      if ( c.getCurrentMethod() != null)
@@ -226,9 +226,12 @@ public class VariableDeclarationStatement extends Statement {
       Declarator pair = (Declarator)it.next();
       if (pair.initializer != null)
       {
+        Type t = pair.additionalDimensions == 0 ? type.getType() : 
+          new ArrayType(c.getTypeSystem(), type.getType(), pair.additionalDimensions);
+
         if ( ! c.getTypeSystem().isImplicitCastValid( 
                pair.initializer.getCheckedType(), 
-               type.getType() ) )
+               t) )
           throw new TypeCheckException( "The type of the variable initializer "
                                         + "(\"" 
                                         + pair.initializer.getCheckedType().getTypeString() + 
