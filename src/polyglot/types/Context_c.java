@@ -23,8 +23,14 @@ import polyglot.types.VarInstance;
 import polyglot.util.InternalCompilerError;
 
 /**
- * A visitor which maintains a context.  This is the base class of the
- * disambiguation and type checking visitors.
+ * This class maintains a context for looking up named variables, types,
+ * and methods.
+ * It's implemented as a stack of Context objects.  Each Context
+ * points to an outer context.  To enter a new scope, call one of the
+ * pushXXX methods.  To leave a scope, just follow the outer() pointer.
+ * NodeVisitors handle leaving scope automatically.
+ * Each context object contains maps from names to variable, type, and
+ * method objects declared in that scope.
  */
 public class Context_c implements Context
 {
@@ -114,7 +120,7 @@ public class Context_c implements Context
         }
 
         if (kind == BLOCK &&
-            (localFindVariable(name) != null || localFind(name) != null)) {
+            (findVariableInThisScope(name) != null || findInThisScope(name) != null)) {
             return true;
         }
 
@@ -133,7 +139,7 @@ public class Context_c implements Context
         if (Report.should_report(new String[] {Report.types, Report.context}, 3))
           Report.report(3, "find-method " + name + argTypes + " in " + this);
 
-        ReferenceType rt = localFindMethodContainer(name);
+        ReferenceType rt = findMethodContainerInThisScope(name);
 
         if (rt != null) {
             if (Report.should_report(new String[] {Report.types, Report.context}, 3))
@@ -171,7 +177,7 @@ public class Context_c implements Context
         if (Report.should_report(new String[] {Report.types, Report.context}, 3))
           Report.report(3, "find-field-scope " + name + " in " + this);
 
-	VarInstance vi = localFindVariable(name);
+	VarInstance vi = findVariableInThisScope(name);
 
         if (vi instanceof FieldInstance) {
             if (Report.should_report(new String[] {Report.types, Report.context}, 3))
@@ -192,7 +198,7 @@ public class Context_c implements Context
         if (Report.should_report(new String[] {Report.types, Report.context}, 3))
           Report.report(3, "find-method-scope " + name + " in " + this);
 
-        ClassType container = localFindMethodContainer(name);
+        ClassType container = findMethodContainerInThisScope(name);
 
         if (container != null) {
             if (Report.should_report(new String[] {Report.types, Report.context}, 3))
@@ -250,7 +256,7 @@ public class Context_c implements Context
         if (Report.should_report(new String[] {Report.types, Report.context}, 3))
           Report.report(3, "find-var " + name + " in " + this);
 
-        VarInstance vi = localFindVariable(name);
+        VarInstance vi = findVariableInThisScope(name);
 
         if (vi != null) {
             if (Report.should_report(new String[] {Report.types, Report.context}, 3))
@@ -287,7 +293,7 @@ public class Context_c implements Context
         if (kind == OUTER) return outerResolver().find(name);
         if (kind == SOURCE) return it.find(name);
 
-        Named type = localFind(name);
+        Named type = findInThisScope(name);
 
         if (type != null) {
             if (Report.should_report(new String[] {Report.types, Report.context}, 3))
@@ -414,7 +420,7 @@ public class Context_c implements Context
     public void addVariable(VarInstance vi) {
         if (Report.should_report(new String[] {Report.types, Report.context}, 3))
           Report.report(3, "Adding " + vi + " to context.");
-        localAddVariable(vi);
+        addVariableToThisScope(vi);
     }
 
     /**
@@ -423,7 +429,7 @@ public class Context_c implements Context
     public void addMethod(MethodInstance mi) {
         if (Report.should_report(new String[] {Report.types, Report.context}, 3))
           Report.report(3, "Adding " + mi + " to context.");
-        localAddMethodContainer(mi);
+        addMethodContainerToThisScope(mi);
     }
 
     /**
@@ -432,35 +438,35 @@ public class Context_c implements Context
     public void addNamed(Named t) {
         if (Report.should_report(new String[] {Report.types, Report.context}, 3))
           Report.report(3, "Adding type " + t + " to context.");
-        localAddNamed(t);
+        addNamedToThisScope(t);
     }
 
-    public Named localFind(String name) {
+    public Named findInThisScope(String name) {
         if (types == null) return null;
         return (Named) types.get(name);
     }
 
-    public void localAddNamed(Named type) {
+    public void addNamedToThisScope(Named type) {
         if (types == null) types = new HashMap();
         types.put(type.name(), type);
     }
 
-    public ClassType localFindMethodContainer(String name) {
+    public ClassType findMethodContainerInThisScope(String name) {
         if (methods == null) return null;
         return (ClassType) methods.get(name);
     }
 
-    public void localAddMethodContainer(MethodInstance mi) {
+    public void addMethodContainerToThisScope(MethodInstance mi) {
         if (methods == null) methods = new HashMap();
         methods.put(mi.name(), mi.container());
     }
 
-    public VarInstance localFindVariable(String name) {
+    public VarInstance findVariableInThisScope(String name) {
         if (vars == null) return null;
         return (VarInstance) vars.get(name);
     }
 
-    public void localAddVariable(VarInstance var) {
+    public void addVariableToThisScope(VarInstance var) {
         if (vars == null) vars = new HashMap();
         vars.put(var.name(), var);
     }
