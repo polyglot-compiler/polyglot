@@ -199,9 +199,10 @@ Next, you can implement L by creating a jltools extension.  Implementing
 the extension will require the following tasks.
 
     0. (Optionally) Begin with the skeleton extension found in
-    jltools/ext/skel.  Copy it to jltools/ext/L, and run the
-    customization script X.  FIXME: need this script, which would do
-    s/skel/L on file names and text.
+    jltools/ext/skel.  Run the customization script found at
+    jltools/ext/newext, which will copy the skeleton to jltools/ext/L,
+    and substitute your language's name at all the appropriate places
+    in the skeleton.
 
     1. Implement a new parser using JLgen.  To do this, modify
     jltools/ext/L/parse/L.jlg using the syntactic changes you defined
