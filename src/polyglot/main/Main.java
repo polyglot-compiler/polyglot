@@ -15,14 +15,14 @@ import java.util.*;
  */
 public class Main
 {
+  /** A collection of string names of topics which can be used with the
+      -report command-line switch */
+  public static Collection report_topics = new HashSet();
+
   /** Compiler options. Access to compiler options via the Compiler object,
       rather than through this static variable, is encouraged for future
       extensibility. */
   public static Options options = new Options();
-
-  /** A collection of string names of topics which can be used with the
-      -report command-line switch */
-  public static Collection report_topics = new HashSet();
 
   /** Source files specified on the command line */
   private static Set source;
@@ -261,21 +261,25 @@ public class Main
 	i++;
       }
       else if (args[i].startsWith("-")) {
+	int i2 = i;
 	if (options.extension != null) {
 	    try  {
-		i = options.extension.parseCommandLine(args, i, options);
+		i2 = options.extension.parseCommandLine(args, i, options);
 	    }
 	    catch (UsageError u) {
 		System.err.println(u.getMessage());
 		usage();
 		System.exit(1);
 	    }
-	} else {
+	} 
+	if (i2 == i) {
 	    System.err.println(compilerName() + ": illegal option -- " 
-				+ args[ i]);
+				+ args[i]);
 	    i++;
 	    System.exit(1);
 	}
+	//System.err.println("Extension: " + i + " to " + i2);
+	i = i2;
       } else {
         source.add(args[i]);
         options.source_path.add(new File(args[i]).getParentFile());
