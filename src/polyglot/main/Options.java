@@ -273,6 +273,9 @@ public class Options {
         {
             i++;
             keep_output_files = false;
+            output_width = 1000; // we do not keep the output files, so
+                                 // set the output_width to a large number
+                                 // to reduce the time spent pretty-printing 
         }
         else if (args[i].equals("-nosourcecheck")) 
         {
