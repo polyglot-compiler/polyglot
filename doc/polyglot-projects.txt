@@ -1,0 +1,19 @@
+The following are some Polyglot-based projects that we know about.
+The list is incomplete.
+
+HydroJ, Object-Oriented Pattern Matching for Evolvable Distributed Systems,
+    OOPSLA 2003. Keunwoo Lee, Anthony LaMarca, and Craig Chambers, UW.
+http://www.cs.washington.edu/research/projects/cecil/www/pubs/hydroj.html
+
+PinPoint, a source code bug injection tool. Emre Kiciman.
+
+XJ, adding XML support to Java (at IBM)
+
+JPred, a language that extends Java with predicate dispatching (Todd Millstein)
+
+Jedd, a BDD-based relational extension of Java (Ondrej Lhotak, McGill)
+http://www.sable.mcgill.ca/jedd/
+
+MAO, a Modular Aspect-Oriented language (Curtis Clifton, Iowa State)
+
+abc, the AspectBench Compiler (Oege De Moor, Laurie Hendren, Aske Christiansen et al.)
