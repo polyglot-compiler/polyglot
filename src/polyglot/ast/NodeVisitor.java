@@ -34,6 +34,17 @@ public interface NodeVisitor {
 
   // Expressions
   public Node visitNullLiteral(NullLiteral nl);
+  public Node visitStringLiteral(StringLiteral sl);
+  
+  public Node visitCastExpression(CastExpression ce);
+  public Node visitUnaryExpression(UnaryExpression ue);
+  public Node visitBinaryExpression(BinaryExpression be);
+  public Node visitTernaryExpression(TernaryExpression te);
+  
+  public Node visitLocalVariableExpression(LocalVariableExpression ve);
+  public Node visitNewArrayExpression(NewArrayExpression ae);
+ 
+	 
 }
 
 

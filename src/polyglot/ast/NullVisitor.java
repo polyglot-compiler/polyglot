@@ -28,6 +28,41 @@ public class NullVisitor implements NodeVisitor {
   public Node visitNullLiteral(NullLiteral nl) {
     return nl;
   }
+
+  public Node visitStringLiteral(StringLiteral sl) {
+    return sl;
+  }
+
+  public Node visitCastExpression(CastExpression ce) {
+    ce.visitChildren(this);
+    return ce;
+  }
+
+  public Node visitUnaryExpression(UnaryExpression ue) {
+    ue.visitChildren(this);
+    return ue;
+  }
+  
+  public Node visitBinaryExpression(BinaryExpression be) {
+    be.visitChildren(this);
+    return be;
+  }
+    
+  public Node visitTernaryExpression(TernaryExpression te) {
+    te.visitChildren(this);
+    return te;
+  }
+
+  public Node visitLocalVariableExpression(LocalVariableExpression ve) {
+    return ve;
+  }
+
+  public Node visitNewArrayExpression(NewArrayExpression ae) {
+    ae.visitChildren(this);
+    return ae;
+  }
+
+  
 }
 
 
