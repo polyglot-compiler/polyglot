@@ -113,6 +113,13 @@ public class ClassDecl_c extends Node_c implements ClassDecl
     public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
 	TypeSystem ts = tb.typeSystem();
 	tb.pushClass(position(), flags, name);
+        
+        // Member classes of interfaces are implicitly static.
+        ParsedClassType ct = tb.currentClass();
+        if (ct.isMember() && ct.toMember().outer().flags().isInterface()) {
+            ct.flags(ct.flags().setStatic());
+        }
+
         return this;
     }
 
