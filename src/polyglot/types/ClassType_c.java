@@ -113,13 +113,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     }
 
     public boolean isSameImpl(Type t) {
-        if (t.isClass()) {
-            return package_() != null
-                        ? package_().isSame(t.toClass().package_())
-                        : package_() == t.toClass().package_();
-        }
-
-        return false;
+        return t == this;
     }
 
     public boolean descendsFromImpl(Type ancestor) {
