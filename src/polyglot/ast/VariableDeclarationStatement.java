@@ -6,6 +6,7 @@ import jltools.visit.AmbiguityRemover;
 import jltools.visit.SignatureCleaner;
 import java.util.*;
 import java.lang.ref.WeakReference;
+import java.io.IOException;
 
 /** 
  * A <code>VariableDeclarationStatement</code> is an immutable representation 
@@ -94,9 +95,13 @@ public class VariableDeclarationStatement extends Statement
       if( c.inMethodScope() ) {
         VariableDeclarationStatement vdsEnclosing = 
           (VariableDeclarationStatement)wrVDS.get();
-        LocalInstance li = c.getTypeSystem().newLocalInstance( name, 
-                                              vdsEnclosing.typeForDeclarator(this),
+	LocalInstance oldLi = li;
+        li = c.getTypeSystem().newLocalInstance( name, 
+					  vdsEnclosing.typeForDeclarator(this),
                                               vdsEnclosing.accessFlags );
+	if (oldLi != null) {
+	    li.copyAnnotationsFrom(oldLi);
+	}
         /* If it is a constant numeric expression (final + initializer is 
          * IntLiteral) then mark it "constant" under FieldInstance. */
         // FIXME other literal types?
@@ -108,6 +113,35 @@ public class VariableDeclarationStatement extends Statement
         c.addSymbol( name, li);
       }
       return this;
+    }
+      
+    public Node cleanupSignatures( LocalContext c, SignatureCleaner sc)
+	throws SemanticException, IOException
+    {
+      /* Only add to context if inside a method, hence a local variable 
+       * declaration. */
+      if( c.inMethodScope() ) {
+        VariableDeclarationStatement vdsEnclosing = 
+          (VariableDeclarationStatement)wrVDS.get();
+	LocalInstance oldLi = li;
+        li = c.getTypeSystem().newLocalInstance( name, 
+					  vdsEnclosing.typeForDeclarator(this),
+                                              vdsEnclosing.accessFlags );
+	if (oldLi != null) {
+	    li.copyAnnotationsFrom(oldLi);
+	}
+        /* If it is a constant numeric expression (final + initializer is 
+         * IntLiteral) then mark it "constant" under FieldInstance. */
+        // FIXME other literal types?
+        if( initializer instanceof NumericalLiteral 
+            && initializer != null && vdsEnclosing.accessFlags.isFinal()) {
+          li.setConstantValue( new Long(
+              ((NumericalLiteral)initializer).getValue())); 
+        }
+        c.addSymbol( name, li);
+      }
+
+      return visitChildren(sc);
     }
       
     public Node typeCheck( LocalContext c) throws SemanticException
@@ -126,9 +160,13 @@ public class VariableDeclarationStatement extends Statement
         /* If it is a constant numeric expression (final + initializer is 
          * IntLiteral) then mark it "constant" under FieldInstance. */
         // FIXME other literal types?
+	LocalInstance oldLi = li;
         li = c.getTypeSystem().newLocalInstance( name, 
-                                              vdsEnclosing.typeForDeclarator(this),
+					  vdsEnclosing.typeForDeclarator(this),
                                               vdsEnclosing.accessFlags );
+	if (oldLi != null) {
+	    li.copyAnnotationsFrom(oldLi);
+	}
         if( initializer instanceof NumericalLiteral 
             && initializer != null && vdsEnclosing.accessFlags.isFinal()) {
           li.setConstantValue( new Long(
@@ -327,7 +365,7 @@ public class VariableDeclarationStatement extends Statement
   public Node cleanupSignatures( LocalContext c, SignatureCleaner sc) 
     throws SemanticException
   {
-    TypeNode newTn = (TypeNode)tn.visit(sc);
+    TypeNode newTn = (TypeNode) tn.visit(sc);
     
     VariableDeclarationStatement vds = reconstruct ( ext, accessFlags, 
                                                      newTn, declarators);
@@ -336,6 +374,7 @@ public class VariableDeclarationStatement extends Statement
     {
       newDeclarators.add( ((Declarator)iter.next()).visit( sc ));
     }
+
     return vds.reconstruct ( accessFlags, newTn, newDeclarators);
   }
 

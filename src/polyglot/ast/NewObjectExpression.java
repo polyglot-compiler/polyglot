@@ -186,6 +186,15 @@ public class NewObjectExpression extends Expression
 
     return reconstruct( Node.condVisit(this.ext, v),newPrimary, newTn, newArgs, newCn);
   }
+
+  public Node removeAmbiguities(LocalContext c) throws SemanticException
+  {
+    if (tn.getType().isPackageType()) {
+      throw new SemanticException("Class type \"" +
+	tn.getType().getTypeString() + "\" not found.");
+    }
+    return this;
+  }
   
   public Node typeCheck( LocalContext c) throws SemanticException
   {
@@ -198,8 +207,9 @@ public class NewObjectExpression extends Expression
       ct = (ClassType)
 	c.getTypeSystem().checkAndResolveType(tn.getType(),
 					      primary.getCheckedType());
-    } else
+    } else {
       ct = (ClassType) tn.getCheckedType();
+    }
 
     // make sure that primary is the "containing" class for the inner class, 
     // if appropriate

@@ -218,6 +218,22 @@ public class LocalContext implements TypeContext
     throw new SemanticException("Type " + name + " not found");
   }
 
+  public Mark getMark() {
+      return (Mark) scopes.peek();
+  }
+
+  public void assertMark(Mark mark) {
+      if (getMark() != mark) {
+	  throw new InternalCompilerError("Unexpected scope.");
+      }
+  }
+
+  public void popToMark(Mark mark) {
+      while (getMark() != mark) {
+	  scopes.pop();
+      }
+  }
+
   /**
    * Returns the current type system
    */
@@ -486,7 +502,10 @@ public class LocalContext implements TypeContext
     return visitor;
   }
 
-  protected interface Scope {
+  public interface Mark {
+  }
+
+  protected interface Scope extends Mark {
     Type getType(String name);
     void putType(String name, Type type);
 

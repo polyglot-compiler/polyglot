@@ -59,9 +59,12 @@ public class AmbiguityRemover extends NodeVisitor
   {
     if ( n instanceof VariableDeclarationStatement)
     {
+      LocalContext.Mark mark = c.getMark();
+
       try
       {
         Node m = ((VariableDeclarationStatement)n).removeAmbiguities(c, this);
+	c.assertMark(mark);
         return m;
       }
       catch ( SemanticException e)
@@ -69,9 +72,11 @@ public class AmbiguityRemover extends NodeVisitor
         eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
                     Annotate.getLineNumber(n ));
         // FIXME: n.setHasError(true);
+	c.popToMark(mark);
         return n;
       }
     }
+
     return null;
   }
 

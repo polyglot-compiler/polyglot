@@ -27,7 +27,11 @@ public class FormalParameter extends Node
     this.tn = tn;
     this.name = name;
     this.isFinal = isFinal;
-    this.li = null;
+
+    TypeSystem ts = tn.getType().getTypeSystem();
+    AccessFlags modifiers = new AccessFlags();
+    modifiers.setFinal( isFinal);
+    this.li = ts.newLocalInstance( name, tn.getType(), modifiers );
   }
 
     public FormalParameter( TypeNode tn, String name, boolean isFinal) {
@@ -107,8 +111,12 @@ public class FormalParameter extends Node
 
     AccessFlags modifiers = new AccessFlags();
     modifiers.setFinal( isFinal);
-    c.addSymbol( name, c.getTypeSystem().newLocalInstance( name,
-	newTN.getType(), modifiers ));
+
+    LocalInstance oldLi = li;
+    li = c.getTypeSystem().newLocalInstance( name, newTN.getType(), modifiers );
+    li.copyAnnotationsFrom(oldLi);
+
+    c.addSymbol( name, li );
     return reconstruct( Node.condVisit(this.ext, sc), newTN, name, isFinal);
   }
 
@@ -116,8 +124,12 @@ public class FormalParameter extends Node
   {
     AccessFlags modifiers = new AccessFlags();
     modifiers.setFinal( isFinal);
-    c.addSymbol( name, c.getTypeSystem().newLocalInstance( name, tn.getType(),
-                                          modifiers ));
+
+    LocalInstance oldLi = li;
+    li = c.getTypeSystem().newLocalInstance( name, tn.getType(), modifiers );
+    li.copyAnnotationsFrom(oldLi);
+
+    c.addSymbol( name, li );
     return this;
   }
 
@@ -129,7 +141,11 @@ public class FormalParameter extends Node
     
     AccessFlags modifiers = new AccessFlags();
     modifiers.setFinal( isFinal);
+
+    LocalInstance oldLi = li;
     li = c.getTypeSystem().newLocalInstance( name, tn.getType(), modifiers );
+    li.copyAnnotationsFrom(oldLi);
+
     c.addSymbol( name, li );
 
     Annotate.setCheckedType( this, tn.getType());

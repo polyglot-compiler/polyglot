@@ -55,9 +55,13 @@ public class SignatureCleaner extends NodeVisitor
 
   public Node override( Node n)
   {
+    LocalContext.Mark mark = c.getMark();
+
     try
     {
-      return n.cleanupSignatures(c, this);
+      Node m = n.cleanupSignatures(c, this);
+      c.assertMark(mark);
+      return m;
     }
     catch( SemanticException e)
     {
@@ -65,15 +69,18 @@ public class SignatureCleaner extends NodeVisitor
                   (e.getLineNumber() == SemanticException.INVALID_LINE ?
 		   Annotate.getLineNumber( n) :
 		   e.getLineNumber()) );
+      c.popToMark(mark);
       // FIXME n.setHasError( true);
     }
     catch( IOException e)
     {
       eq.enqueue( ErrorInfo.IO_ERROR, e.getMessage(), 
                   Annotate.getLineNumber( n));
+      c.popToMark(mark);
       // FIXME n.setHasError( true);
     }
 
+    c.assertMark(mark);
     return null;
   }
 
