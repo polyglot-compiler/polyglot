@@ -70,15 +70,16 @@ public class Subst_c implements Subst
                 Map.Entry e = (Map.Entry) i.next();
                 Object formal = e.getKey();
                 Object actual = e.getValue();
-
-                if (subst.containsKey(actual)) {
+                
+                Object existent = getSubstValueAsKey(actual);
+                if (existent != null) {
                     // In this case:
                     //   this.base is C[T], where T is a formal of C
                     //   t.base is D[U], where U is a formal of D
                     //   t.subst has U -> T, thus t is D[T]
                     //   this.subst has T -> X
                     // so replace U -> T in t.subst with U -> X
-                    newSubst.put(formal, subst.get(actual));
+                    newSubst.put(formal, existent);
                 }
                 else {
                     newSubst.put(formal, actual);
@@ -101,6 +102,19 @@ public class Subst_c implements Subst
         return t;
     }
 
+    /**
+     * When adding a new substitution A->B to the map, we need to check if 
+     * there are already any existing substitutions, say C->A, and if so,
+     * replace them appropriately, i.e. with C->B.
+     * 
+     * This method allows subclasses to check if a value (B in the 
+     * example above) is present as a key. Subclasses may need to override this
+     * if the keys and values are not the same object.
+     */
+    protected Object getSubstValueAsKey(Object v) {
+        return substitutions().get(v);
+    }
+    
     /** Perform substitutions on a class type. Substitutions are performed
      * lazily. */
     public ClassType substClassType(ClassType t) {
