@@ -1,13 +1,7 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
-import polyglot.ast.Assert;
-import polyglot.types.Flags;
-import polyglot.types.Package;
-import polyglot.types.Type;
-import polyglot.types.Qualifier;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.ast.Ext;
+import polyglot.ast.ExtFactory;
 
 /**
  * This abstract implementation of <code>ExtFactory</code> provides
@@ -902,11 +896,11 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext extClassBodyImpl() {
-        return extNodeImpl();
+        return extTermImpl();
     }
 
     protected Ext extClassDeclImpl() {
-        return extNodeImpl();
+        return extTermImpl();
     }
 
     protected Ext extClassMemberImpl() {
@@ -1207,11 +1201,11 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtClassBody(Ext ext) {
-        return postExtNode(ext);
+        return postExtTerm(ext);
     }
 
     protected Ext postExtClassDecl(Ext ext) {
-        return postExtNode(ext);
+        return postExtTerm(ext);
     }
 
     protected Ext postExtClassMember(Ext ext) {

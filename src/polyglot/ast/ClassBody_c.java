@@ -1,18 +1,42 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import polyglot.frontend.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassMember;
+import polyglot.ast.Node;
+import polyglot.frontend.Job;
+import polyglot.frontend.Pass;
 import polyglot.main.Report;
-import java.util.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.FieldInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.TypedList;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>ClassBody</code> represents the body of a class or interface
  * declaration or the body of an anonymous class.
  */
-public class ClassBody_c extends Node_c implements ClassBody
+public class ClassBody_c extends Term_c implements ClassBody
 {
     protected List members;
 

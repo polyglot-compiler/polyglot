@@ -6,7 +6,7 @@ import java.util.List;
  * A <code>ClassBody</code> represents the body of a class or interface
  * declaration or the body of an anonymous class.
  */
-public interface ClassBody extends Node
+public interface ClassBody extends Term
 {
     /**
      * List of the class's members.

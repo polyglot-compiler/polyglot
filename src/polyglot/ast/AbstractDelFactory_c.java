@@ -1,13 +1,8 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
-import polyglot.ast.Assert;
-import polyglot.types.Flags;
-import polyglot.types.Package;
-import polyglot.types.Type;
-import polyglot.types.Qualifier;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.ast.DelFactory;
+import polyglot.ast.JL;
+import polyglot.util.InternalCompilerError;
 
 /**
  * This abstract implementation of <code>DelFactory</code> provides
@@ -903,11 +898,11 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL delClassBodyImpl() {
-        return delNodeImpl();
+        return delTermImpl();
     }
 
     protected JL delClassDeclImpl() {
-        return delNodeImpl();
+        return delTermImpl();
     }
 
     protected JL delClassMemberImpl() {
@@ -1208,11 +1203,11 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelClassBody(JL del) {
-        return postDelNode(del);
+        return postDelTerm(del);
     }
 
     protected JL postDelClassDecl(JL del) {
-        return postDelNode(del);
+        return postDelTerm(del);
     }
 
     protected JL postDelClassMember(JL del) {

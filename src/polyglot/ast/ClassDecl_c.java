@@ -9,6 +9,7 @@ import polyglot.ast.ClassDecl;
 import polyglot.ast.ConstructorDecl;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
+import polyglot.ast.Term;
 import polyglot.ast.TypeNode;
 import polyglot.main.Report;
 import polyglot.types.ClassType;
@@ -26,6 +27,7 @@ import polyglot.util.Position;
 import polyglot.util.TypedList;
 import polyglot.visit.AddMemberVisitor;
 import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
@@ -36,7 +38,7 @@ import polyglot.visit.TypeChecker;
  * or interface. It may be a public or other top-level class, or an inner
  * named class, or an anonymous class.
  */
-public class ClassDecl_c extends Node_c implements ClassDecl
+public class ClassDecl_c extends Term_c implements ClassDecl
 {
     protected Flags flags;
     protected String name;
@@ -125,6 +127,22 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 	    }
 
 	    return this;
+    }
+
+    /**
+     * Return the first (sub)term performed when evaluating this
+     * term.
+     */
+    public Term entry() {
+        return this.body().entry();
+    }
+
+    /**
+     * Visit this term in evaluation order.
+     */
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFG(this.body(), this);
+        return succs;
     }
 
     public Node visitChildren(NodeVisitor v) {
