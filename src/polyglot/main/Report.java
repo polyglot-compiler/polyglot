@@ -16,8 +16,9 @@ public class Report {
    * when the computation of the message to be reported is expensive.
    */
   public static boolean should_report(Collection topics, int level) {
+    if (Options.global.level("verbose") >= level) return true;
     if (topics == null) {
-      if (Options.global.level("verbose") >= level) return true;
+	// if (Options.global.level("verbose") >= level) return true;
     } else {
 	for (Iterator i = topics.iterator(); i.hasNext();) {
 	    String topic = (String) i.next();
