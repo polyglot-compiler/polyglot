@@ -16,7 +16,8 @@ public class SymbolList
 		this.type = type;
 		symbols = syms;
 	}	
-	
+		public Object clone() {		String newType = (type == null) ? null : type.toString();		Vector newSyms = new Vector();		for (int i=0; i < symbols.size(); i++) {			newSyms.addElement( ((String)symbols.elementAt(i)).toString() );		}		return new SymbolList(variety, newType, newSyms);
+	}	
 	public String toString() {
 		String result = "";
 

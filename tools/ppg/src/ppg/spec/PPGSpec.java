@@ -12,19 +12,13 @@ import jltools.util.jlgen.util.*;
 public class JLgenSpec extends Spec
 {
 	private String include;
-	private Vector commands;
+	private Vector commands, code;
 	private Spec parent;
 	private final String HEADER = "jlgen [spec]: ";
 	
 	/**
 	 * JLgen spec
-	 */
-	public JLgenSpec (String incFile, Vector cmds)
-	{		super();
-		include = incFile;
-		commands = cmds;
-		parent = null;
-	}		public JLgenSpec (String incFile, String pkg, Vector imp,
+	 */	public JLgenSpec (String incFile, String pkg, Vector imp,
 					  Vector codeParts, Vector syms,					  Vector precedence, String startSym, Vector cmds)
 	{		super();		include = incFile;
 		packageName = pkg;
@@ -70,7 +64,9 @@ public class JLgenSpec extends Spec
 				// override start symbol
 		newSpec.setStart(start);		
 		// combine this spec with the rest 
-		// of the chain and return the result		processTransferL(combined, newSpec);		processDrop(combined, newSpec);		processOverride(combined, newSpec);		processTransferR(combined, newSpec);		processExtend(combined, newSpec);		processNew(combined, newSpec);		
+		// of the chain and return the result
+		processTransferL(combined, newSpec);		processDrop(combined, newSpec);		processOverride(combined, newSpec);
+		processTransferR(combined, newSpec);		processExtend(combined, newSpec);		processNew(combined, newSpec);		
 		// clean the spec, remove nonterminals with no productions
 		newSpec.removeEmptyProductions();
 				return newSpec;
@@ -122,12 +118,15 @@ public class JLgenSpec extends Spec
 	}		private void processTransferR (CUPSpec combined, CUPSpec newSpec) {
 		// TRANSFER_R
 		Command cmd;
-		TransferCmd transfer;		Production prod, prodTransfer;		Vector prodList;		for (int i=0; i < commands.size(); i++) {
+		TransferCmd transfer;		Production prod, prodTransfer;		Vector prodList;
+		Nonterminal target;		for (int i=0; i < commands.size(); i++) {
 			cmd = (Command) commands.elementAt(i);			if (cmd instanceof TransferCmd) {
 				transfer = (TransferCmd) cmd;
 				prodList = transfer.getTransferList();				for (int j=0; j < prodList.size(); j++) {
 					prod = (Production) prodList.elementAt(j);
-					prodTransfer = combined.findProduction(prod);
+					target = prod.getLHS();					// make sure we get the productions from the source!
+					prod.setLHS(transfer.getSource());
+					prodTransfer = combined.findProduction(prod);					// but set the LHS back to the actual target					// so it is added to the right nonterminal					prodTransfer.setLHS(target);
 					newSpec.addProductions(prodTransfer);
 					//newSpec.addProductions(prod);				}			}
 		}	}		private void processNew (CUPSpec combined, CUPSpec newSpec) {

@@ -1,3 +1,9 @@
+package pakg;
+
+parser code {:
+	original parser code
+:}
+
 nonterminal B;
 terminal a, c, d;
 

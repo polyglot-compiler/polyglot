@@ -1,5 +1,127 @@
 include "java12.cup"
 
+package jltools.ext.polyj.parse;
+
+import jltools.ext.polyj.ast.*;
+import jltools.ext.polyj.extension.*;
+import jltools.ext.polyj.types.*;
+
+parser code  {:
+	ErrorQueue eq;
+	Lexer lexer;
+	PolyJTypeSystem ts;
+	PolyJNodeFactory nf;
+	PolyJUtil util;
+
+	public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
+		this();
+		eq = q;
+		lexer = l;
+		ts = (PolyJTypeSystem) t;
+		nf = (PolyJNodeFactory) n;
+		util = new PolyJUtil(new PolyJParserWrapper(this));
+	}
+
+	/**
+	 * Run the parser.
+     */
+    public java_cup.runtime.Symbol parse() throws Exception {
+        java_cup.runtime.Symbol sym = super.parse();
+
+		if (sym == null || sym.value == null || !(sym.value instanceof Node)) {
+			return null;
+		}
+
+		// After we parse as usual, the AST may contain Parse nodes wrapped via Wrappers
+		// as Exprs.  These should be the only remaining Parse (and Sub) nodes left in the
+		// AST at this point, although there may be ambiguous types, qualifiers, etc.
+		// Here, we make a visitor pass over the AST to unwrap these ambiguous
+		// nodes and convert them to (possibly ambiguous) expressions.
+		//
+		// This pass is done after parsing to avoid having to convert expressions
+		// into types.
+		Node n = (Node) sym.value;
+		sym.value = n.visit(new UnwrapVisitor());	
+		return sym;
+    }
+
+    /**
+	 * Override the default CUP routine.
+	 */
+    public void syntax_error(java_cup.runtime.Symbol current) {
+        Position p = ((Token) current.value).getPosition();
+
+        if (current.sym == sym.EOF) {
+            report_error("Unexpected end of file.", p);
+        } else {
+            report_error("Syntax error.", p);
+        }
+    }
+
+	/**
+	 * Override the default CUP routine.
+	 */
+    public void report_error(String message, Object info) {
+        if (info instanceof Position) {
+            eq.enqueue(ErrorInfo.SYNTAX_ERROR, message, (Position) info);
+        } else {
+            eq.enqueue(ErrorInfo.SYNTAX_ERROR, message);
+        }
+    }
+
+	/**
+	 * Override the default CUP routine.
+	 */
+	public void report_fatal_error(String message, Object info) {
+		report_error(message, info);
+		eq.enqueue(ErrorInfo.SYNTAX_ERROR, "Unable to recover from previous errors.");
+	}
+	
+	/**
+	 * Report a fatal error then abort parsing.
+	 */
+    public void die(String msg, Position pos) throws Exception {
+		report_fatal_error(msg, pos);
+		die();
+    }
+
+	/**
+	 * Report a fatal error then abort parsing.
+	 */
+    public void die(Position pos) throws Exception {
+		report_fatal_error("Syntax error.", pos);
+		die();
+    }
+
+	/**
+	 * Report a fatal error then abort parsing.
+	 */
+    public void die() throws Exception {
+		throw new Exception("Couldn't repair and continue parse");
+    }
+
+:};
+
+// PolyJ Extensions
+terminal Token WHERE;
+
+non terminal Expr primary_no_array;
+non terminal List parameters, parameter_list;
+non terminal List where_opt, where_list;
+non terminal ClassConstraint where;
+non terminal List where_decls;
+non terminal ProcedureConstraint where_decl;
+non terminal MethodConstraint method_sig;
+non terminal ConstructorConstraint constructor_sig;
+non terminal Parse ambiguous, simple_ambiguous;
+non terminal TypeNode simple_instantiation_type;
+non terminal List subscript_list;
+non terminal Sub subscript;
+non terminal List type_list;
+non terminal List formal_parameter_type_list_opt, formal_parameter_type_list;
+non terminal TypeNode formal_parameter_or_type;
+
+
 override class_or_interface_type ::=
 	ambiguous:a {: RESULT = a.toType(); :}
 	;
@@ -10,8 +132,7 @@ drop { array_type ::= name dims; }
 // 19.8.1) Class Declarations
 
 extend class_declaration ::=
-	modifiers_opt:a CLASS:n IDENTIFIER:b
-	parameters:p where_opt:w
+	modifiers_opt:a CLASS:n IDENTIFIER:b parameters:p where_opt:w
 	super_opt:c interfaces_opt:d class_body:e {:
 		RESULT = parser.nf.PolyJClassDecl(parser.util.pos(n),
 						a, b.getIdentifier(), p, w, c, d, e);
@@ -31,10 +152,10 @@ extend class_member_declaration ::=	// List of ClassMember
 // 19.8.5) Constructor Declarations
 	
 extend explicit_constructor_invocation ::= // ConstructorCall
-	primary_no_array:a DOT THIS:n LPAREN argument_list_opt:b RPAREN SEMICOLON {:
+	primary_no_new_array:a DOT THIS:n LPAREN argument_list_opt:b RPAREN SEMICOLON {:
 		RESULT = parser.nf.ThisCall(parser.util.pos(n), a, b);
 	:}
-|   primary_no_array:a DOT SUPER:n LPAREN argument_list_opt:b RPAREN SEMICOLON {:
+|   primary_no_new_array:a DOT SUPER:n LPAREN argument_list_opt:b RPAREN SEMICOLON {:
 		RESULT = parser.nf.SuperCall(parser.util.pos(n), a, b);
 	:}
 	;
@@ -189,12 +310,11 @@ constructor_sig ::=			// ConstructorConstraint
 // 19.9.1) Interface Declarations
 	
 extend interface_declaration ::= 			// PolyJClassDecl
-	modifiers_opt:a INTERFACE:n IDENTIFIER:b
+	modifiers_opt:a INTERFACE:n IDENTIFIER:b 
 	parameters:p where_opt:w
 	extends_interfaces_opt:c interface_body:d {:
-		a = a.setInterface();
 		RESULT = parser.nf.PolyJClassDecl(parser.util.pos(n),
-							a,
+							a.setInterface(),
 							b.getIdentifier(), p, w, null, c, d);
 	:};
 			
@@ -216,14 +336,8 @@ override statement_expression ::=
 		{: ((PolyJExt)a.ext()).setStmtExpr(); RESULT = a; :};
 	
 // 19.12) Expressions
-    
+
 primary_no_array ::=
-	primary_no_new_array:a
-		{: RESULT = a; :}
-|	array_access:a
-		{: RESULT = a; :};
-	
-extend primary_no_new_array ::=
 				// Expr
 	ambiguous:a DOT DEFAULT
 		{: RESULT = parser.nf.Field(parser.util.pos(a), a.toType(), "default"); :}
@@ -232,13 +346,26 @@ extend primary_no_new_array ::=
 |	ambiguous:a DOT THIS
 		{: RESULT = parser.nf.This(parser.util.pos(a), a.toType()); :};
 
+transfer primary_no_new_array to
+	primary_no_array { 
+			literal:a
+		|	THIS:a
+		|	LPAREN expression:a RPAREN
+		|	class_instance_creation_expression:a
+		|	field_access:a
+		|	method_invocation:a
+		|	primitive_type:a DOT CLASS:n
+		|   VOID:a DOT CLASS:n
+		|	array_type:a DOT CLASS:n
+	}
+
 drop {
 	primary_no_new_array ::=
-		array_access 
-	|	name DOT CLASS
-	|	name DOT THIS;
-}
-	
+			array_access
+		|	name DOT CLASS
+		|	name DOT THIS;
+	}
+
 override class_instance_creation_expression ::=
 				// Expr
 	NEW:n simple_ambiguous:a LPAREN argument_list_opt:b RPAREN
@@ -282,8 +409,7 @@ drop {
 	
 extend field_access ::=
                     // Field
-    /* FIXME: below should be primary ??? */
-    primary_no_array:a DOT IDENTIFIER:b
+    primary_no_new_array:a DOT IDENTIFIER:b
         {: RESULT = parser.nf.Field(parser.util.pos(b), a,
                                 b.getIdentifier()); :}
 |	ambiguous:a DOT SUPER:n DOT IDENTIFIER:b {:
@@ -301,7 +427,7 @@ extend method_invocation ::=
 					// PolyJCall
 		ambiguous:a LPAREN argument_list_opt:b RPAREN
 			{: RESULT = a.toCall(b); :}
-	|	primary_no_array:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
+	|	primary_no_new_array:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
 			{: RESULT = parser.nf.Call(parser.util.pos(b), a, b.getIdentifier(), c); :}
 	|	ambiguous:a DOT SUPER:n DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
         	{: RESULT = parser.nf.Call(parser.util.pos(b),

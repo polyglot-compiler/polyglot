@@ -19,14 +19,16 @@ public class CUPSpec extends Spec
 	{		super();
 		packageName = pkg;
 		imports = imp;
-		code = codeParts; replaceCode(code);
+		replaceCode(codeParts);
 		symbols = syms;
 		prec = precedence;
 		start = startSym;
 		productions = prods;
-		hashNonterminals();
+		ntProds = new Hashtable();		hashNonterminals();
 	}
-	private void hashNonterminals() {		ntProds = new Hashtable();		if (productions == null)			return;				Production prod;
+
+	private void hashNonterminals() {
+		ntProds.clear();		if (productions == null)			return;				Production prod;
 		for (int i=0; i < productions.size(); i++) {			prod = (Production) productions.elementAt(i);
 			ntProds.put(prod.getLHS().getName(), new Integer(i));
 		}	}
@@ -40,8 +42,7 @@ public class CUPSpec extends Spec
 	public Production findProduction (Production p) {
 		// find the nonterminal which would contain this production
 		Nonterminal nt = p.getLHS();		int pos = errorNotFound(findNonterminal(nt), nt);
-		Production sourceProd = (Production) productions.elementAt(pos);
-		Vector sourceRHSList = sourceProd.getRHS();
+		Production sourceProd = (Production) productions.elementAt(pos);				Vector sourceRHSList = sourceProd.getRHS();
 
 		Vector rhs = p.getRHS();
 		Production result = new Production(nt, new Vector());
@@ -63,22 +64,34 @@ public class CUPSpec extends Spec
 			}
 		}
 		
-		return result;
-	}
+		return result;			}
 	
 	public void removeEmptyProductions () {
 		Production prod;		for (int i=0; i < productions.size(); i++) {
 			prod = (Production) productions.elementAt(i);			if (prod.getRHS().size() == 0) {				productions.removeElementAt(i);				i--;			}
 		}	}
 		public Object clone() {
-		String newPkgName = (packageName == null) ? null : new String(packageName);
-		String newStart = (start == null) ? null : new String(start);		return new CUPSpec(newPkgName,
+		String newPkgName = (packageName == null) ? null : packageName.toString();		/*******************/
+		Vector newImports = new Vector();		for (int i=0; i < imports.size(); i++) {			newImports.addElement( ((String) imports.elementAt(i)).toString());		}		/*******************/
+		Vector newCode = new Vector();
+		if (actionCode != null) newCode.addElement(actionCode);
+		if (initCode != null) newCode.addElement(initCode);
+		if (parserCode != null) newCode.addElement(parserCode);
+		if (scanCode != null) newCode.addElement(scanCode);
+		/*for (int i=0; i < code.size(); i++) {			newCode.addElement( ((Code) code.elementAt(i)).clone());		}*/		/*******************/
+		Vector newSymbols = new Vector();		for (int i=0; i < symbols.size(); i++) {			newSymbols.addElement( ((SymbolList) symbols.elementAt(i)).clone());		}		/*******************/
+		Vector newPrec = new Vector();		for (int i=0; i < prec.size(); i++) {			newPrec.addElement( ((Precedence) prec.elementAt(i)).clone());		}		/*******************/
+		String newStart = (start == null) ? null : start.toString();		/*******************/
+		Vector newProductions = new Vector();		for (int i=0; i < productions.size(); i++) {			newProductions.addElement( ((Production) productions.elementAt(i)).clone());		}		return new CUPSpec(newPkgName, newImports, newCode, newSymbols, 
+						   newPrec, newStart, newProductions);		
+		/*		return new CUPSpec(newPkgName,
 						   (Vector) imports.clone(),
 						   (Vector) code.clone(),
 						   (Vector) symbols.clone(),
 						   (Vector) prec.clone(),
 						   newStart,
-						   (Vector) productions.clone());	}
+						   (Vector) productions.clone());
+		*/	}
 		public void addSymbols(Vector syms) {		if (syms == null)
 			return;				for (int i=0; i < syms.size(); i++) {			symbols.addElement(syms.elementAt(i));		}
 	}	
@@ -131,19 +144,24 @@ public class CUPSpec extends Spec
 		// import
 		for (int i=0; i < imports.size(); i++) {
 			cw.write("import " + (String) imports.elementAt(i) + ";");
-			cw.newline();		}
-		cw.newline();
+			cw.newline();		}		if (imports.size() > 0)
+			cw.newline();
 
 		// code
-		for (int i=0; i < code.size(); i++) {
-			cw.write( ((Code) code.elementAt(i)).toString() );			cw.newline();		}
+		if (actionCode != null)
+			cw.write(actionCode.toString());
+		if (initCode != null)
+			cw.write(initCode.toString());
+		if (parserCode != null)
+			cw.write(parserCode.toString());
+		if (scanCode != null)
+			cw.write(scanCode.toString());
 		cw.newline();
 		
 		// symbols
 		for (int i=0; i < symbols.size(); i++) {
 			cw.write( ((SymbolList) symbols.elementAt(i)).toString() );
-			cw.newline();		}
-		cw.newline();
+			cw.newline();		}		cw.newline();
 		
 		// precedence
 		
@@ -178,9 +196,16 @@ public class CUPSpec extends Spec
 			out.println("import " + (String) imports.elementAt(i) + ";");
 		out.println();
 
-		// code
+		// code		/*
 		for (int i=0; i < code.size(); i++)
-			out.println( ((Code) code.elementAt(i)).toString() );
+			out.println( ((Code) code.elementAt(i)).toString() );		*/		if (actionCode != null)
+			out.println(actionCode.toString());
+		if (initCode != null)
+			out.println(initCode.toString());
+		if (parserCode != null)
+			out.println(parserCode.toString());
+		if (scanCode != null)
+			out.println(scanCode.toString());
 		out.println();
 		
 		// symbols

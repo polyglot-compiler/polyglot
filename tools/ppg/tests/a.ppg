@@ -1,5 +1,11 @@
 include "b.cup"
 
+import pack1.pack2.ext.*;
+import pack1.pack2.ext3.*;
+
+parser code {:
+	parser code replaced
+:}
 
 drop {
 	B ::= d r o p ;
@@ -11,10 +17,8 @@ D ::= d is a new nt;
 override B ::= b l a h;
 
 transfer C
-	//to C { d e f }
+	to C { d e f }
 	to B { d e f }
-
-drop { C ::= d e f; }
 
 
 drop {

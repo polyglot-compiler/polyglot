@@ -38,7 +38,6 @@ parser code {:
         System.exit(1);
     } 
 
-	//TODO : Modify these methods to work with your AST Nodes
     private static Object program; 
     public static Object getProgramNode() { return program; } 
     public static void setProgramNode(Object n) { program = n; } 
@@ -95,10 +94,9 @@ nonterminal Production production;nonterminal Vector production_list;
 nonterminal String nt_id, symbol_id, label_id, opt_label, terminal_id,
 					term_id, robust_id;
 /* CUP */
-nonterminal String package_spec, import_id, import_spec, multipart_id, start_spec,
-					type_id, new_non_term_id, new_term_id;nonterminal Vector non_term_name_list, import_list, term_name_list,
-					symbol_list, code_parts, terminal_list,
-					precedence_l, precedence_list,
+nonterminal String package_spec, import_id, import_spec,					multipart_id, start_spec, type_id, new_non_term_id, 
+					new_term_id;nonterminal Vector non_term_name_list, import_list, term_name_list,
+					symbol_list, symbol_list_opt, code_parts, 					terminal_list, precedence_l, precedence_list, 
 					declares_term, declares_non_term;
 nonterminal SymbolList symbol;
 					
@@ -114,19 +112,20 @@ spec ::=
  * JLGEN                                                            *
  ********************************************************************/
 jlgen_spec ::=
-	include_spec:a command_list_opt:b
+	include_spec:inc package_spec:pkg import_list:imp 	code_parts:code symbol_list_opt:sym_list precedence_list:prec_list	start_spec:start command_list_opt:cmd_list
 	{:
-		RESULT = new JLgenSpec(a, b);
+		RESULT = new JLgenSpec(inc, pkg, imp, code, sym_list,								prec_list, start, cmd_list);
 	:}
 	;
-	
+ 
 include_spec ::=
 	INCLUDE STRING_CONST:a 
 	{:
 		RESULT = (String)a.getValue();
 	:}
 	;
-
+symbol_list_opt ::=
+	symbol_list:sym_list {: RESULT = sym_list; :}|	{: RESULT = null; :};
 command_list_opt ::=
 	command_list_opt:b command:a
 	{:

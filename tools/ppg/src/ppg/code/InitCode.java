@@ -8,6 +8,9 @@ public class InitCode extends Code
 		init = initCode;
 	}
 
+	public Object clone () {
+		return new InitCode(init.toString());	
+	}	
 	public String toString () {
 		return "init code {:\n" + init + "\n:}\n";
 	}

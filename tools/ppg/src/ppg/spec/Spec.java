@@ -3,25 +3,26 @@ package jltools.util.jlgen.spec;
 import jltools.util.jlgen.code.*;import jltools.util.jlgen.parse.*;
 
 public abstract class Spec implements Unparse
-{	protected String packageName, start;
-	protected Vector code, imports, symbols, prec;	protected InitCode initCode;
+{	protected static String HEADER = "jlgen [spec]: ";	protected String packageName, start;
+	protected Vector imports, symbols, prec;	protected InitCode initCode;
 	protected ActionCode actionCode;	protected ParserCode parserCode;	protected ScanCode scanCode;
 	protected JLgenSpec child;		public Spec () {		initCode = null;		actionCode = null;		parserCode = null;		scanCode = null;
 		child = null;
 	}	
-	public void setStart (String startSym) {
-		start = startSym;
-	}		public void setPkgName (String pkgName) {
-		packageName = pkgName;
+	public void setStart (String startSym) {		if (startSym != null)
+			start = startSym;
+	}		public void setPkgName (String pkgName) {		if (pkgName != null)
+			packageName = pkgName;
 	}
 	
-	public void replaceCode (Vector codeParts) {		if (codeParts == null) 			return;				Code code;
+	public void replaceCode (Vector codeParts) {		if (codeParts == null) 			return;				Code code=null;
 		for (int i=0; i < codeParts.size(); i++) {
-			try {				code = (Code) codeParts.elementAt(i);				if (code instanceof ActionCode) {					actionCode = (ActionCode) code;				} else if (code instanceof InitCode) {					initCode = (InitCode) code;				} else if (code instanceof ParserCode) {					parserCode = (ParserCode) code;				} else { // must be ScanCode 					scanCode = (ScanCode) code;				}
+			try {				code = (Code) codeParts.elementAt(i);				if (code instanceof ActionCode && code != null) {					actionCode = (ActionCode) code.clone();				} else if (code instanceof InitCode && code != null) {					initCode = (InitCode) code.clone();				} else if (code instanceof ParserCode && code != null) {					parserCode = (ParserCode) code.clone();				} else { // must be ScanCode
+					if (code != null)						scanCode = (ScanCode) code.clone();				}
 			} catch (Exception e) {
-				// (!instanceof Code), so just skip it	
-			}		}
-	}	
+				System.err.println(HEADER+" Spec::replaceCode(): not a code segment "+
+								   "found in code Vector: "+								   ((code == null) ? "null" : code.toString()));
+				System.exit(1);			}		}	}	
 	public void addImports (Vector imp) {
 		if (imp == null)			return;
 				for (int i=0; i < imp.size(); i++) {			imports.addElement(imp.elementAt(i));		}	}

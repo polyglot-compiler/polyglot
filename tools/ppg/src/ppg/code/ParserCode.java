@@ -7,7 +7,9 @@ public class ParserCode extends Code
 	public ParserCode (String parserCode) {
 		parser = parserCode;
 	}
-
+	public Object clone () {
+		return new ParserCode(parser.toString());	
+	}
 	public String toString () {
 		return "parser code {:\n" + parser + "\n:}\n";
 	}
