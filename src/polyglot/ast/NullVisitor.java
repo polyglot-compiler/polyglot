@@ -66,6 +66,11 @@ public class NullVisitor implements NodeVisitor {
     return ss;
   }
 
+  public Node visitLabelledStatement(LabelledStatement ls) {
+    ls.visitChildren(this);
+    return ls;
+  }
+
   // Expressions
   public Node visitNullLiteral(NullLiteral nl) {
     return nl;

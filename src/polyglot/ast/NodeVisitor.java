@@ -39,6 +39,8 @@ public interface NodeVisitor {
   public Node visitDoStatement(DoStatement ds);
   public Node visitForStatement(ForStatement fs);
   public Node visitSynchronizedStatement(SynchronizedStatement ss);
+  public Node visitLabelledStatement(LabelledStatement ss);
+
 
   // Expressions
   public Node visitNullLiteral(NullLiteral nl);
