@@ -113,7 +113,7 @@ public class Special_c extends Expr_c implements Special
     /** Write the expression to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	if (qualifier != null) {
-	    tr.print(qualifier, w);
+	    print(qualifier, w, tr);
 	    w.write(".");
 	}
 

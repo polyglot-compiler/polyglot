@@ -10,6 +10,18 @@ import java.util.*;
 /**
  * A visitor which maintains a context throughout the visitor's pass.  This is 
  * the base class of the disambiguation and type checking visitors.
+ *
+ * For a node <code>n</code> methods are called in this order:
+ * <pre>
+ * v.enter(n)
+ *   v.enterScope(n);
+ *     c' = n.enterScope(c)
+ *   v' = copy(v) with c' for c
+ * n' = n.visitChildren(v')
+ * v.leave(n, n', v')
+ *   v.addDecls(n')
+ *     n.addDecls(c)
+ * </pre>
  */
 public class ContextVisitor extends ErrorHandlingVisitor
 {
@@ -58,24 +70,23 @@ public class ContextVisitor extends ErrorHandlingVisitor
         return v;
     }
 
-    /** Returns a new context based on the current context and the
-     *  Node that is being entered.
+    /**
+     * Returns a new context based on the current context and the
+     * Node that is being entered.  This new context is to be used
+     * for visiting the children of <code>n</code>
      *
-     *  @return The new context after entering Node <code>n</code>.
+     * @return The new context after entering Node <code>n</code>.
      */
     protected Context enterScope(Node n) {
 	return n.enterScope(context);
     }
 
-    /** Returns a new context based on the current context and the
-     *  Node that is updating the scope of the context.
-     *
-     *  @return The new context after <code>n</code> updates the context.
+    /**
+     * Imperatively update the context with declarations to be added after
+     * visiting the node.
      */
-
-     //FIXME does this make sense?
-    protected Context updateScope(Node n) {
-        return n.updateScope(context);
+    protected void addDecls(Node n) {
+        n.addDecls(context);
     }
 
     /** Return true if we should catch errors thrown when visiting the node. */
@@ -111,10 +122,7 @@ public class ContextVisitor extends ErrorHandlingVisitor
     public Node leave(Node old, Node n, NodeVisitor v) {
         Node m = super.leave(old, n, v);
 
-        // FIXME: hack to allow locals added to the context by enterScope to
-        // propagate outward.  We need this until we have true "let"-style
-        // local decls.  This, of course, makes this visitor imperative.
-        this.context = this.updateScope(m);
+        this.addDecls(m);
 
         return m;
     }

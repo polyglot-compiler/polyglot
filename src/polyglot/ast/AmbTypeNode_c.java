@@ -85,7 +85,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
     if (qual != null) {
-        tr.print(qual, w);
+        print(qual, w, tr);
         w.write(".");
     }
             

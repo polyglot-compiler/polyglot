@@ -512,24 +512,21 @@ FIXME: check super types as well.
             "new " + tn + "(...)" + (body != null ? " " + body : "");
     }
 
-    /** Write the expression to an output file. */
-    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+    protected void printQualifier(CodeWriter w, PrettyPrinter tr) {
         if (qualifier != null) {
-            tr.print(qualifier, w);
+            print(qualifier, w, tr);
             w.write(".");
         }
+    }
 
-	w.write("new ");
-
-        tr.print(tn, w);
-
+    protected void printArgs(CodeWriter w, PrettyPrinter tr) {
 	w.write("(");
 	w.begin(0);
 
 	for (Iterator i = arguments.iterator(); i.hasNext();) {
 	    Expr e = (Expr) i.next();
 
-	    tr.print(e, w);
+	    print(e, w, tr);
 
 	    if (i.hasNext()) {
 		w.write(",");
@@ -539,19 +536,26 @@ FIXME: check super types as well.
 
 	w.end();
 	w.write(")");
+    }
 
+    protected void printBody(CodeWriter w, PrettyPrinter tr) {
 	if (body != null) {
 	    w.write(" {");
-	    tr.print(body, w);
+	    print(body, w, tr);
             w.write("}");
 	}
     }
 
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        printQualifier(w, tr);
+	w.write("new ");
+        print(tn, w, tr);
+        printArgs(w, tr);
+        printBody(w, tr);
+    }
+
     public void translate(CodeWriter w, Translator tr) {
-        if (qualifier != null) {
-            tr.print(qualifier, w);
-            w.write(".");
-        }
+        printQualifier(w, tr);
 
 	w.write("new ");
 
@@ -564,35 +568,15 @@ FIXME: check super types as well.
             }
 
             tr.setOuterClass(ct.toMember().outer());
-            tr.print(tn, w);
+            print(tn, w, tr);
             tr.setOuterClass(null);
         }
         else {
-            tr.print(tn, w);
+            print(tn, w, tr);
         }
 
-	w.write("(");
-	w.begin(0);
-
-	for (Iterator i = arguments.iterator(); i.hasNext();) {
-	    Expr e = (Expr) i.next();
-
-	    tr.print(e, w);
-
-	    if (i.hasNext()) {
-		w.write(",");
-		w.allowBreak(0);
-	    }
-	}
-
-	w.end();
-	w.write(")");
-
-	if (body != null) {
-	    w.write(" {");
-	    tr.print(body, w);
-            w.write(" }");
-	}
+        printArgs(w, tr);
+        printBody(w, tr);
     }
 
     public Term entry() {

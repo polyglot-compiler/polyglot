@@ -55,7 +55,7 @@ public class SourceCollection_c extends Node_c implements SourceCollection
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         for (Iterator i = sources.iterator(); i.hasNext(); ) {
             SourceFile s = (SourceFile) i.next();
-            tr.print(s, w);
+            print(s, w, tr);
             w.newline(0);
         }
     }

@@ -227,7 +227,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     /** Write the call to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	if (qualifier != null) {
-	    tr.print(qualifier, w);
+	    print(qualifier, w, tr);
 	    w.write(".");
 	} 
 
@@ -237,7 +237,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
 	for (Iterator i = arguments.iterator(); i.hasNext(); ) {
 	    Expr e = (Expr) i.next();
-	    tr.print(e, w);
+	    print(e, w, tr);
 
 	    if (i.hasNext()) {
 		w.write(",");

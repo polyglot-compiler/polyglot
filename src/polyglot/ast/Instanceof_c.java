@@ -106,7 +106,7 @@ public class Instanceof_c extends Expr_c implements Instanceof
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	printSubExpr(expr, w, tr);
 	w.write(" instanceof ");
-	tr.print(compareType, w);
+	print(compareType, w, tr);
     }
 
     public Term entry() {

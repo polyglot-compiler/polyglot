@@ -81,7 +81,7 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
     /** Write the prefix to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	if (prefix != null) {
-            tr.print(prefix, w);
+            print(prefix, w, tr);
             w.write(".");
         }
                 

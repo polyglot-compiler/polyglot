@@ -23,11 +23,11 @@ public class StringPrettyPrinter extends PrettyPrinter
         this.depth = 0;
     }
 
-    public void print(Node ast, CodeWriter w) {
+    public void print(Node parent, Node child, CodeWriter w) {
         depth++;
 
         if (depth < maxdepth) {
-            super.print(ast, w);
+            super.print(parent, child, w);
         }
         else {
             w.write("...");
@@ -39,7 +39,7 @@ public class StringPrettyPrinter extends PrettyPrinter
     public String toString(Node ast) {
         StringCodeWriter w = new StringCodeWriter(new CharArrayWriter());
 
-        print(ast, w);
+        print(null, ast, w);
 
         try {
             w.flush();

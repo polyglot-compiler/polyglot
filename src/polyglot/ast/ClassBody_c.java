@@ -62,11 +62,8 @@ public class ClassBody_c extends Node_c implements ClassBody
 
     public Context enterScope(Context c, boolean inherit) {
         c = c.pushBlock();
-
         ClassType type = c.currentClass();
-
         addMembers(c, type, new HashSet(), inherit);
-
         return c;
     }
 

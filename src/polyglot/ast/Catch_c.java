@@ -100,15 +100,6 @@ public class Catch_c extends Stmt_c implements Catch
 	printSubStmt(body, w, tr);
     }
 
-    public void translate(CodeWriter w, Translator tr) {
-	w.write("catch (");
-	printBlock(formal, w, tr);
-	w.write(")");
-
-	Context c = enterScope(tr.context());
-	printSubStmt(body, w, tr.context(c));
-    }
-
     public Term entry() {
         return body.entry();
     }

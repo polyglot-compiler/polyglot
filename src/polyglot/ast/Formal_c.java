@@ -8,58 +8,63 @@ import polyglot.visit.*;
 import java.util.*;
 
 /**
- * A <code>Formal</code> represents a formal parameter to a method
- * or constructor or to a catch block.  It consists of a type and a variable
- * identifier.
+ * A <code>Formal</code> represents a formal parameter for a procedure
+ * or catch block.  It consists of a type and a variable identifier.
  */
 public class Formal_c extends Node_c implements Formal
 {
-    Declarator decl;
     LocalInstance li;
+    Flags flags;
+    TypeNode type;
+    String name;
 
-    public Formal_c(Del ext, Position pos, Flags flags, TypeNode type, String name) {
+    public Formal_c(Del ext, Position pos, Flags flags, TypeNode type,
+                    String name)
+    {
 	super(ext, pos);
-	this.decl = new Declarator_c(flags, type, name, null);
+        this.flags = flags;
+        this.type = type;
+        this.name = name;
     }
 
     /** Get the type of the formal. */
     public Type declType() {
-        return decl.declType();
+        return type.type();
     }
 
     /** Get the flags of the formal. */
     public Flags flags() {
-	return decl.flags();
+	return flags;
     }
 
     /** Set the flags of the formal. */
     public Formal flags(Flags flags) {
 	Formal_c n = (Formal_c) copy();
-	n.decl = decl.flags(flags);
+	n.flags = flags;
 	return n;
     }
 
     /** Get the type node of the formal. */
     public TypeNode type() {
-	return decl.type();
+	return type;
     }
 
     /** Set the type node of the formal. */
     public Formal type(TypeNode type) {
 	Formal_c n = (Formal_c) copy();
-	n.decl = decl.type(type);
+	n.type = type;
 	return n;
     }
 
     /** Get the name of the formal. */
     public String name() {
-	return decl.name();
+	return name;
     }
 
     /** Set the name of the formal. */
     public Formal name(String name) {
 	Formal_c n = (Formal_c) copy();
-	n.decl = decl.name(name);
+	n.name = name;
 	return n;
     }
 
@@ -77,10 +82,9 @@ public class Formal_c extends Node_c implements Formal
 
     /** Reconstruct the formal. */
     protected Formal_c reconstruct(TypeNode type) {
-	if (type() != type) {
+	if (this.type != type) {
 	    Formal_c n = (Formal_c) copy();
-	    n.decl = (Declarator_c) decl.copy();
-	    n.decl = n.decl.type(type);
+	    n.type = type;
 	    return n;
 	}
 
@@ -89,18 +93,20 @@ public class Formal_c extends Node_c implements Formal
 
     /** Visit the children of the formal. */
     public Node visitChildren(NodeVisitor v) {
-	TypeNode type = (TypeNode) visitChild(type(), v);
+	TypeNode type = (TypeNode) visitChild(this.type, v);
 	return reconstruct(type);
     }
 
-    public Context enterScope(Context c) {
+    public void addDecls(Context c) {
         c.addVariable(li);
-        return c;
     }
 
     /** Write the formal to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        decl.prettyPrint(w, tr, false);
+        w.write(flags.translate());
+        print(type, w, tr);
+        w.write(" ");
+        w.write(name);
     }
 
     /** Build type objects for the formal. */
@@ -137,8 +143,6 @@ public class Formal_c extends Node_c implements Formal
 	    throw new SemanticException(e.getMessage(), position());
 	}
 
-	decl.typeCheck(tc);
-
 	return this;
     }
 
@@ -162,6 +166,6 @@ public class Formal_c extends Node_c implements Formal
     }
 
     public String toString() {
-	return decl.toString();
+        return flags.translate() + type + " " + name;
     }
 }

@@ -189,7 +189,7 @@ public class SourceFile_c extends Node_c implements SourceFile
 
 	if (package_ != null) {
 	    w.write("package ");
-	    tr.print(package_, w);
+	    print(package_, w, tr);
 	    w.write(";");
 	    w.newline(0);
 	    w.newline(0);
@@ -197,7 +197,7 @@ public class SourceFile_c extends Node_c implements SourceFile
 
 	for (Iterator i = imports.iterator(); i.hasNext(); ) {
 	    Import im = (Import) i.next();
-	    tr.print(im, w);
+	    print(im, w, tr);
 	}
 	 
 	if (! imports.isEmpty()) {
@@ -206,7 +206,7 @@ public class SourceFile_c extends Node_c implements SourceFile
 
 	for (Iterator i = decls.iterator(); i.hasNext(); ) {
 	    ClassDecl cd = (ClassDecl) i.next();
-	    tr.print(cd, w);
+	    print(cd, w, tr);
 	}
     }
 }

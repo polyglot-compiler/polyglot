@@ -84,11 +84,6 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 	w.end();
     }
 
-    public void translate(CodeWriter w, Translator tr) {
-        Context c = enterScope(tr.context());
-        super.translate(w, tr.context(c));
-    }
-
     public Term entry() {
         return listEntry(statements, this);
     }

@@ -49,11 +49,10 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
         return reconstruct(decl);
     }
 
-    public Context updateScope(Context c) {
+    public void addDecls(Context c) {
         // We should now be back in the scope of the enclosing block.
         // Add the type.
         c.addType(decl.type().toClass().toLocal());
-        return c;
     }
 
     public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {

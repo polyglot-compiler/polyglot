@@ -123,7 +123,7 @@ public class Cast_c extends Expr_c implements Cast
     {
 	w.begin(0);
 	w.write("(");
-	tr.print(castType, w);
+	print(castType, w, tr);
 	w.write(")");
 	w.allowBreak(2, " ");
 	printSubExpr(expr, w, tr);

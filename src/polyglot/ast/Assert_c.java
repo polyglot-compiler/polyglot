@@ -118,11 +118,11 @@ public class Assert_c extends Stmt_c implements Assert
     /** Write the statement to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("assert ");
-	tr.print(cond, w);
+	print(cond, w, tr);
 
         if (errorMessage != null) {
             w.write(": ");
-            tr.print(errorMessage, w);
+            print(errorMessage, w, tr);
         }
 
         w.write(";");

@@ -301,7 +301,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 
 	for (Iterator i = formals.iterator(); i.hasNext(); ) {
 	    Formal f = (Formal) i.next();
-	    tr.print(f, w);
+	    print(f, w, tr);
 
 	    if (i.hasNext()) {
 		w.write(",");
@@ -318,7 +318,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 
 	    for (Iterator i = exceptionTypes.iterator(); i.hasNext(); ) {
 	        TypeNode tn = (TypeNode) i.next();
-		tr.print(tn, w);
+		print(tn, w, tr);
 
 		if (i.hasNext()) {
 		    w.write(",");
@@ -335,17 +335,6 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 
 	if (body != null) {
 	    printSubStmt(body, w, tr);
-	}
-	else {
-	    w.write(";");
-	}
-    }
-
-    public void translate(CodeWriter w, Translator tr) {
-        prettyPrintHeader(w, tr);
-
-	if (body != null) {
-	    printSubStmt(body, w, tr.context(enterScope(tr.context())));
 	}
 	else {
 	    w.write(";");

@@ -77,7 +77,7 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        tr.print(base, w);
+        print(base, w, tr);
         w.write("[]");
     }
 

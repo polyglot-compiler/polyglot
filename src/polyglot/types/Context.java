@@ -5,13 +5,15 @@ import java.util.List;
 
 /**
  * A context represents a stack of scopes used for looking up types, methods,
- * and variables.
+ * and variables.  To push a new scope call one of the <code>push*</code>
+ * methods to return a new context.  The old context may still be used
+ * and may be accessed directly through a call to <code>pop()</code>.
+ * While the stack of scopes is treated functionally, each individual
+ * scope is updated in place.  Names added to the context are added
+ * in the current scope.
  */
 public interface Context extends Resolver, Copy
 {
-    /** Pop the context. */
-    Context pop();
-
     /** The type system. */
     TypeSystem typeSystem();
 
@@ -73,6 +75,9 @@ public interface Context extends Resolver, Copy
 
     /** Enter the scope of a block. */
     Context pushBlock();
+
+    /** Pop the context. */
+    Context pop();
 
     /** Return whether innermost non-block scope is a code scope. */
     boolean inCode();

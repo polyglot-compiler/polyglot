@@ -146,13 +146,17 @@ public abstract class Node_c implements Node
 	return this;
     }
 
-    /** Adjust the environment for entering a new scope. */
+    /**
+     * Push a new scope for visiting children and add any declarations to the
+     * context that should be in scope when visiting children.
+     */
     public Context enterScope(Context c) { return c; }
 
-    /** Adjust the environment when leaving a scope.
-     * This is called to add local variables to the parent's scope.
+    /**
+     * Add any declarations to the context that should be in scope when
+     * visiting later sibling nodes.
      */
-    public Context updateScope(Context c) { return c; }
+    public void addDecls(Context c) { }
 
     // These methods override the methods in Ext_c.
     // These are the default implementation of these passes.
@@ -242,41 +246,45 @@ public abstract class Node_c implements Node
     public void prettyPrint(CodeWriter w, PrettyPrinter pp) { }
 
     public void printBlock(Node n, CodeWriter w, PrettyPrinter pp) {
-            w.begin(0);
-            pp.print(n, w);
-            w.end();
+        w.begin(0);
+        print(n, w, pp);
+        w.end();
     }
 
     public void printSubStmt(Stmt stmt, CodeWriter w, PrettyPrinter pp) {
-            if (stmt instanceof Block) {
-                w.write(" ");
-                pp.print(stmt, w);
-            }
-            else {
-                w.allowBreak(4, " ");
-                printBlock(stmt, w, pp);
-            }
+        if (stmt instanceof Block) {
+            w.write(" ");
+            print(stmt, w, pp);
+        }
+        else {
+            w.allowBreak(4, " ");
+            printBlock(stmt, w, pp);
+        }
+    }
+
+    public void print(Node child, CodeWriter w, PrettyPrinter pp) {
+        pp.print(this, child, w);
     }
 
     /** Translate the AST using the given <code>CodeWriter</code>. */
     public void translate(CodeWriter w, Translator tr) {
-            // By default, just rely on the pretty printer.
-            this.del().prettyPrint(w, tr.context(enterScope(tr.context())));
+        // By default, just rely on the pretty printer.
+        this.del().prettyPrint(w, tr);
     }
 
     public void dump(CodeWriter w) {
-            w.write(StringUtil.getShortNameComponent(getClass().getName()));
+        w.write(StringUtil.getShortNameComponent(getClass().getName()));
 
-            w.allowBreak(4, " ");
-            w.begin(0);
-            w.write("(del " + del() + ")");
-            w.end();
+        w.allowBreak(4, " ");
+        w.begin(0);
+        w.write("(del " + del() + ")");
+        w.end();
 
-            w.allowBreak(4, " ");
-            w.begin(0);
-            w.write("(position " + (position != null ? position.toString()
-                                                     : "UNKNOWN") + ")");
-            w.end();
+        w.allowBreak(4, " ");
+        w.begin(0);
+        w.write("(position " + (position != null ? position.toString()
+                                                  : "UNKNOWN") + ")");
+        w.end();
     }
 
     public String toString() {

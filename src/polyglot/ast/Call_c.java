@@ -308,7 +308,7 @@ public class Call_c extends Expr_c implements Call
       w.write(".");
     }
     else if (target != null) {
-      tr.print(target, w);
+      print(target, w, tr);
       w.write(".");
     }
 
@@ -317,7 +317,7 @@ public class Call_c extends Expr_c implements Call
 		
     for(Iterator i = arguments.iterator(); i.hasNext();) {
       Expr e = (Expr) i.next();
-      tr.print(e, w);
+      print(e, w, tr);
 
       if (i.hasNext()) {
         w.write(",");

@@ -121,8 +121,22 @@ public class Translator extends PrettyPrinter implements Copy
      * <code>translate(Node)</code> instead.  This method should only be called
      * by nodes to print their children.
      */
-    public void print(Node ast, CodeWriter w) {
-        ast.del().translate(w, this);
+    public void print(Node parent, Node child, CodeWriter w) {
+        Translator tr;
+
+        if (parent != null) {
+            Context c = parent.enterScope(context);
+            tr = this.context(c);
+        }
+        else {
+            tr = this;
+        }
+
+        child.del().translate(w, tr);
+
+        if (parent != null) {
+            parent.addDecls(context);
+        }
     }
 
     /** Translate the entire AST. */

@@ -166,7 +166,7 @@ public class Field_c extends Expr_c implements Field
       printSubExpr((Expr) target, w, tr);
     }
     else if (target instanceof TypeNode) {
-      tr.print(target, w);
+      print(target, w, tr);
     }
 
     w.write(".");

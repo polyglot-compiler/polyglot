@@ -131,7 +131,7 @@ public class NewArray_c extends Expr_c implements NewArray
     /** Write the expression to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("new ");
-	tr.print(baseType, w);
+	print(baseType, w, tr);
 
 	for (Iterator i = dims.iterator(); i.hasNext();) {
 	  Expr e = (Expr) i.next();
@@ -146,7 +146,7 @@ public class NewArray_c extends Expr_c implements NewArray
 
 	if (init != null) {
 	    w.write(" ");
-	    tr.print(init, w);
+	    print(init, w, tr);
 	}
     }
 

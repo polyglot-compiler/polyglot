@@ -162,7 +162,7 @@ public class Case_c extends Stmt_c implements Case
 	}
 	else {
 	    w.write("case ");
-	    tr.print(expr, w);
+	    print(expr, w, tr);
 	    w.write(":");
 	}
     }

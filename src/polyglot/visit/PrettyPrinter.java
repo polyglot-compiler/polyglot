@@ -41,16 +41,16 @@ public class PrettyPrinter
      * method to print the entire AST; this method should only be called by
      * nodes to print their children.
      */
-    public void print(Node ast, CodeWriter w) {
-        if (ast != null) {
-            ast.del().prettyPrint(w, this);
+    public void print(Node parent, Node child, CodeWriter w) {
+        if (child != null) {
+            child.del().prettyPrint(w, this);
         }
     }
 
     /** Print an AST node using the given code writer.  The code writer
      * is flushed by this method. */
     public void printAst(Node ast, CodeWriter w) {
-        print(ast, w);
+        print(null, ast, w);
 
         try {
             w.flush();

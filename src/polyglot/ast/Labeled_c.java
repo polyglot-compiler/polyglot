@@ -69,7 +69,7 @@ public class Labeled_c extends Stmt_c implements Labeled
     /** Write the statement to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write(label + ": ");
-	tr.print(statement, w);
+	print(statement, w, tr);
     }
 
     public Term entry() {

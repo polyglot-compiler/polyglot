@@ -146,7 +146,7 @@ public class Switch_c extends Stmt_c implements Switch
             }
             else {
                 w.allowBreak(4," ");
-                tr.print(s, w);
+                print(s, w, tr);
                 lastWasCase = false;
             }
 

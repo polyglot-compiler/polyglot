@@ -345,14 +345,14 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
 	w.begin(0);
 	w.write(flags.translate());
-	tr.print(returnType, w);
+	print(returnType, w, tr);
 	w.write(" " + name + "(");
 
 	w.begin(0);
 
 	for (Iterator i = formals.iterator(); i.hasNext(); ) {
 	    Formal f = (Formal) i.next();
-	    tr.print(f, w);
+	    print(f, w, tr);
 
 	    if (i.hasNext()) {
 		w.write(",");
@@ -369,7 +369,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 
 	    for (Iterator i = exceptionTypes.iterator(); i.hasNext(); ) {
 	        TypeNode tn = (TypeNode) i.next();
-		tr.print(tn, w);
+		print(tn, w, tr);
 
 		if (i.hasNext()) {
 		    w.write(",");
@@ -404,7 +404,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
         prettyPrintHeader(flags, w, tr);
 
 	if (body != null) {
-	    printSubStmt(body, w, tr.context(enterScope(c)));
+	    printSubStmt(body, w, tr);
 	}
 	else {
 	    w.write(";");

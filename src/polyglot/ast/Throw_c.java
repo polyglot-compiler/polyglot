@@ -85,7 +85,7 @@ public class Throw_c extends Stmt_c implements Throw
     /** Write the statement to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("throw ");
-	tr.print(expr, w);
+	print(expr, w, tr);
 	w.write(";");
     }
 

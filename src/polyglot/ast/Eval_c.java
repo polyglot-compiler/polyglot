@@ -66,7 +66,7 @@ public class Eval_c extends Stmt_c implements Eval
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	boolean semi = tr.appendSemicolon(true);
 
-	tr.print(expr, w);
+	print(expr, w, tr);
 
 	if (semi) {
 	    w.write(";");

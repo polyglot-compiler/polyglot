@@ -77,17 +77,18 @@ public interface Node extends NodeOps, Copy
     Node visitChild(Node child, NodeVisitor v);
 
     /**
-     * Adjust the environment on entering the scope of the node.
+     * Push a new scope for visiting children and add any declarations to the
+     * new context that should be in scope when visiting children.
+     * This should <i>not</i> update the old context imperatively.  Use
+     * <code>addDecls</code> when leaving the node for that.
      */
     Context enterScope(Context c);
 
     /**
-     * Adjust the environment on leaving the scope of the node.
-     * This method is used to add local variables to the context of
-     * the enclosing block.  The method is deprecated and should 
-     * eventually be removed by making locals decls behave more like "let".
+     * Add any declarations to the context that should be in scope when
+     * visiting later sibling nodes.
      */
-    Context updateScope(Context c);
+    void addDecls(Context c);
 
     /**
      * Get the expected type of a child expression of <code>this</code>.
@@ -99,7 +100,7 @@ public interface Node extends NodeOps, Copy
      * @param av An ascription visitor.
      * @return The expected type of <code>child</code>.
      */
-    public Type childExpectedType(Expr child, AscriptionVisitor av);
+    Type childExpectedType(Expr child, AscriptionVisitor av);
 
     /**
      * Dump the AST node for debugging purposes.
@@ -112,43 +113,43 @@ public interface Node extends NodeOps, Copy
     //////////////////////////////////////////////////////////////// 
 
     /** @deprectated */
-    public Node buildTypesOverride(TypeBuilder tb) throws SemanticException;
+    Node buildTypesOverride(TypeBuilder tb) throws SemanticException;
     /** @deprectated */
-    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException;
+    NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException;
     /** @deprectated */
-    public Node buildTypes(TypeBuilder tb) throws SemanticException;
+    Node buildTypes(TypeBuilder tb) throws SemanticException;
     /** @deprectated */
-    public Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException;
+    Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException;
     /** @deprectated */
-    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException;
+    NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException;
     /** @deprectated */
-    public Node disambiguate(AmbiguityRemover ar) throws SemanticException;
+    Node disambiguate(AmbiguityRemover ar) throws SemanticException;
     /** @deprectated */
-    public Node addMembersOverride(AddMemberVisitor am) throws SemanticException;
+    Node addMembersOverride(AddMemberVisitor am) throws SemanticException;
     /** @deprectated */
-    public NodeVisitor addMembersEnter(AddMemberVisitor am) throws SemanticException;
+    NodeVisitor addMembersEnter(AddMemberVisitor am) throws SemanticException;
     /** @deprectated */
-    public Node addMembers(AddMemberVisitor am) throws SemanticException;
+    Node addMembers(AddMemberVisitor am) throws SemanticException;
     /** @deprectated */
-    public Node foldConstantsOverride(ConstantFolder cf);
+    Node foldConstantsOverride(ConstantFolder cf);
     /** @deprectated */
-    public NodeVisitor foldConstantsEnter(ConstantFolder cf);
+    NodeVisitor foldConstantsEnter(ConstantFolder cf);
     /** @deprectated */
-    public Node foldConstants(ConstantFolder cf);
+    Node foldConstants(ConstantFolder cf);
     /** @deprectated */
-    public Node typeCheckOverride(TypeChecker tc) throws SemanticException;
+    Node typeCheckOverride(TypeChecker tc) throws SemanticException;
     /** @deprectated */
-    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException;
+    NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException;
     /** @deprectated */
-    public Node typeCheck(TypeChecker tc) throws SemanticException;
+    Node typeCheck(TypeChecker tc) throws SemanticException;
     /** @deprectated */
-    public Node exceptionCheckOverride(ExceptionChecker ec) throws SemanticException;
+    Node exceptionCheckOverride(ExceptionChecker ec) throws SemanticException;
     /** @deprectated */
-    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException;
+    NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException;
     /** @deprectated */
-    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException;
+    Node exceptionCheck(ExceptionChecker ec) throws SemanticException;
     /** @deprectated */
-    public void translate(CodeWriter w, Translator tr);
+    void translate(CodeWriter w, Translator tr);
     /** @deprectated */
-    public void prettyPrint(CodeWriter w, PrettyPrinter pp);
+    void prettyPrint(CodeWriter w, PrettyPrinter pp);
 }

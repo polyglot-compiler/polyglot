@@ -94,7 +94,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	if (qual != null) {
-            tr.print(qual, w);
+            print(qual, w, tr);
             w.write(".");
         }
                 
