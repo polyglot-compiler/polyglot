@@ -339,4 +339,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         in.defaultReadObject();
     }
 
+    public void clearConstructors() {
+    	constructors.clear();
+    }
 }

@@ -94,4 +94,9 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
     void setMembersAdded(boolean flag);
     void setSupertypesResolved(boolean flag);
     void setSignaturesResolved(boolean flag);
+    
+    /**
+     * Clear all the constructor instances in the class type.
+     */
+    void clearConstructors();
 }
