@@ -11,7 +11,7 @@ import polyglot.util.Enum;
  */
 public interface Pass
 {
-    /** 
+    /** Pass identifiers. These should be unique within a Job. */
     public static class ID extends Enum {
         public ID(String name) { super(name); }
     }
