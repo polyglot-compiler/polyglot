@@ -10,10 +10,7 @@ import polyglot.types.TypeSystem;
 import polyglot.util.IdentityKey;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
-import polyglot.visit.FlowGraph.Edge;
-import polyglot.visit.FlowGraph.EdgeKey;
-import polyglot.visit.FlowGraph.Peer;
-import polyglot.visit.FlowGraph.ExceptionEdgeKey;
+import polyglot.visit.FlowGraph.*;
 
 /**
  * Abstract dataflow Visitor, to allow simple dataflow equations to be easily
@@ -177,7 +174,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
      *          entries for all EdgeKeys in edgeKeys. 
      */
-    protected Map flowToBooleanFlow(List inItems, List inItemKeys, FlowGraph graph, Term n, Set edgeKeys) {
+    protected final Map flowToBooleanFlow(List inItems, List inItemKeys, FlowGraph graph, Term n, Set edgeKeys) {
         List trueItems = new ArrayList();
         List trueItemKeys = new ArrayList();
         List falseItems = new ArrayList();
@@ -185,7 +182,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         List otherItems = new ArrayList();
         List otherItemKeys = new ArrayList();
         
-        Iterator i = inItemKeys.iterator();
+        Iterator i = inItems.iterator();
         Iterator j = inItemKeys.iterator();
         while (i.hasNext() || j.hasNext()) {
             Item item = (Item)i.next();
@@ -205,9 +202,9 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             }
         }
         
-        Item trueItem = this.safeConfluence(trueItems, trueItemKeys, n, graph);
-        Item falseItem = this.safeConfluence(falseItems, falseItemKeys, n, graph);
-        Item otherItem = this.safeConfluence(otherItems, otherItemKeys, n, graph);
+        Item trueItem = trueItems.isEmpty() ? null : this.safeConfluence(trueItems, trueItemKeys, n, graph);
+        Item falseItem = falseItems.isEmpty() ? null : this.safeConfluence(falseItems, falseItemKeys, n, graph);
+        Item otherItem = otherItems.isEmpty() ? null : this.safeConfluence(otherItems, otherItemKeys, n, graph);
 
         return this.flow(trueItem, falseItem, otherItem, graph, n, edgeKeys);
     }
@@ -217,6 +214,57 @@ public abstract class DataFlow extends ErrorHandlingVisitor
        throw new InternalCompilerError("Unimplemented: should be " +
                                        "implemented by subclasses if " +
                                        "needed");        
+    }
+    
+    protected Map flowBooleanConditions(Item trueItem, Item falseItem, Item otherItem, 
+                                        FlowGraph graph, Expr n, Set edgeKeys) {
+        if (trueItem == null) trueItem = createInitialItem(graph);
+        if (falseItem == null) falseItem = createInitialItem(graph);
+        
+        if (!n.type().isBoolean() || !(n instanceof Binary || n instanceof Unary)) {
+            throw new InternalCompilerError("This method only takes binary " +
+                      "or unary operators of boolean type");
+        }
+        if (n instanceof Unary) {
+            Unary u = (Unary)n;
+            if (u.operator() == Unary.NOT) {
+                return itemsToMap(falseItem, trueItem, otherItem, edgeKeys);                
+            }
+        }
+        else {
+            Binary b = (Binary)n;
+            if (b.operator() == Binary.COND_AND) {
+                // the only true item coming into this node should be
+                // if the second operand was true.
+                return itemsToMap(trueItem, falseItem, otherItem, edgeKeys);                
+            }
+            else if (b.operator() == Binary.COND_OR) {
+                // the only false item coming into this node should be
+                // if the second operand was false.
+                return itemsToMap(trueItem, falseItem, otherItem, edgeKeys);                
+            }
+            else if (b.operator() == Binary.BIT_AND) {
+                // there is both a true and a false item coming into this node, 
+                // from the second operand. However, this operator could be false
+                // if either the first or the second argument returned false.
+                Item bitANDFalse = 
+                     this.safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE,
+                                         falseItem, FlowGraph.EDGE_KEY_FALSE, 
+                                         n, graph);
+                return itemsToMap(trueItem, bitANDFalse, otherItem, edgeKeys);                
+            }
+            else if (b.operator() == Binary.BIT_OR) {
+                // there is both a true and a false item coming into this node, 
+                // from the second operand. However, this operator could be true
+                // if either the first or the second argument returned true.
+                Item bitORTrue = 
+                    this.safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE,
+                                        falseItem, FlowGraph.EDGE_KEY_FALSE, 
+                                        n, graph);
+                return itemsToMap(bitORTrue, falseItem, otherItem, edgeKeys);                
+            }
+        }
+        return null;
     }
     
     /**
@@ -275,6 +323,34 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             return (Item)items.get(0);
         }
         return confluence(items, itemKeys, node); 
+    }
+
+    protected Item safeConfluence(Item item1, FlowGraph.EdgeKey key1,
+                                  Item item2, FlowGraph.EdgeKey key2,
+                                  Term node, FlowGraph graph) {
+        return safeConfluence(item1, key1, item2, key2, null, null, node, graph);
+    }
+                                  
+    protected Item safeConfluence(Item item1, FlowGraph.EdgeKey key1,
+                                  Item item2, FlowGraph.EdgeKey key2,
+                                  Item item3, FlowGraph.EdgeKey key3,
+                                  Term node, FlowGraph graph) {
+        List items = new ArrayList(3);
+        List itemKeys = new ArrayList(3);
+        
+        if (item1 != null) {
+            items.add(item1);
+            itemKeys.add(key1);
+        }
+        if (item2 != null) {
+            items.add(item2);
+            itemKeys.add(key2);
+        }
+        if (item3 != null) {
+            items.add(item3);
+            itemKeys.add(key3);
+        }
+        return safeConfluence(items, itemKeys, node, graph); 
     }
     
     /**
@@ -514,7 +590,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     /**
      * This utility methods is for subclasses to convert a single Item into
      * a <code>Map</code>, to return from the
-     * <code>flow(Item, FlowGraph, Term, Set)</code> method. This
+     * <code>flow</code> methods. This
      * method should be used when the same output <code>Item</code> from the
      * flow is to be used for all edges leaving the node.
      * 
@@ -532,6 +608,49 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         for (Iterator iter = edgeKeys.iterator(); iter.hasNext(); ) {
             Object o = iter.next();
             m.put(o, i);
+        }
+        return m;
+    }
+
+    /**
+     * This utility methods is for subclasses to convert a Items into
+     * a <code>Map</code>, to return from the
+     * <code>flow</code> methods. 
+     * 
+     * @param trueItem the <code>Item</code> to be placed in the returned
+     *          <code>Map</code> as the value for the 
+     *          <code>FlowGraph.EDGE_KEY_TRUE</code>, if that key is present in
+     *          <code>edgeKeys.</code>
+     * @param falseItem the <code>Item</code> to be placed in the returned
+     *          <code>Map</code> as the value for the 
+     *          <code>FlowGraph.EDGE_KEY_FALSE</code>, if that key is present in
+     *          <code>edgeKeys.</code>
+     * @param remainingItem the <code>Item</code> to be placed in the returned
+     *          <code>Map</code> as the value for any edge key other than 
+     *          <code>FlowGraph.EDGE_KEY_TRUE</code> or 
+     *          <code>FlowGraph.EDGE_KEY_FALSE</code>, if any happen to be 
+     *          present in
+     *          <code>edgeKeys.</code>
+     * @param edgeKeys the <code>Set</code> of <code>EdgeKey</code>s to be used
+     *           as keys in the returned <code>Map</code>.
+     * @return a <code>Map</code> containing a mapping from every
+     *           <code>EdgeKey</code> in <code>edgeKeys</code> to the
+     *           <code>Item i</code>.
+     */
+    protected static final Map itemsToMap(Item trueItem, Item falseItem, Item remainingItem, Set edgeKeys) {
+        Map m = new HashMap();
+        
+        for (Iterator iter = edgeKeys.iterator(); iter.hasNext(); ) {
+            FlowGraph.EdgeKey k = (EdgeKey)iter.next();
+            if (FlowGraph.EDGE_KEY_TRUE.equals(k)) {
+                m.put(k, trueItem);
+            }
+            else if (FlowGraph.EDGE_KEY_TRUE.equals(k)) {
+                m.put(k, falseItem);
+            }
+            else { 
+                m.put(k, remainingItem);
+            }
         }
         return m;
     }
