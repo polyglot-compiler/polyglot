@@ -1,5 +1,6 @@
 package jltools.util;
 
+/** String utilities. */
 public class StringUtil
 {
     /**

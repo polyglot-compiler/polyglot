@@ -2,8 +2,10 @@ package jltools.util;
 
 import java.util.*;
 
+/** Collection utilities. */
 public class CollectionUtil
 {
+	/** Return a new list with <code>o</code> appended to <code>l</code>. */
 	public static List add(List l, Object o) {
 		l.add(o);
 		return l;
@@ -43,10 +45,12 @@ public class CollectionUtil
 		return true;
 	}
 
+	/** Return a singleton list containing <code>o</code>. */
 	public static List list(Object o) {
 		return Collections.singletonList(o);
 	}
 
+	/** Return a list containing <code>o1</code> and <code>o2</code>. */
 	public static List list(Object o1, Object o2) {
 		List l = new ArrayList(2);
 		l.add(o1);
@@ -54,6 +58,7 @@ public class CollectionUtil
 		return l;
 	}
 
+	/** Return a list containing <code>o1</code>, ..., <code>o3</code>. */
 	public static List list(Object o1, Object o2, Object o3) {
 		List l = new ArrayList(3);
 		l.add(o1);
@@ -62,6 +67,7 @@ public class CollectionUtil
 		return l;
 	}
 
+	/** Return a list containing <code>o1</code>, ..., <code>o4</code>. */
 	public static List list(Object o1, Object o2, Object o3, Object o4) {
 		List l = new ArrayList(3);
 		l.add(o1);

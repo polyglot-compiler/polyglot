@@ -25,48 +25,30 @@ escape() {
     sed -e 's%\\%\\\\%g' -e 's%;%\\;%g' | sed 's%%%g'
 }
 
+JAVA=`find_in_path java`
 JAVAC=`find_in_path javac`
+JAVAH=`find_in_path javah`
+JAVADOC=`find_in_path javadoc`
+JAR=`find_in_path jar`
+RMIC=`find_in_path rmic`
 
-if [ -z "${JAVAC}" ]; then
-    echo javac not found
-    exit 1
-fi
+exists -x "${JAVA}"
+echo java is "${JAVA}"
 
 exists -x "${JAVAC}"
 echo javac is "${JAVAC}"
 
-tmp=`dirname "${JAVAC}"`
-JAVA_HOME=`dirname "$tmp"`
-exists -d "${JAVA_HOME}"
-echo Java home directory is "${JAVA_HOME}"
-
-JAVA="${JAVA_HOME}/bin/java"
-exists -x "${JAVA}"
-echo java is "${JAVA}"
-
-JAVAH="${JAVA_HOME}/bin/javah"
 exists -x "${JAVAH}"
 echo javah is "${JAVAH}"
 
-RMIC="${JAVA_HOME}/bin/rmic"
-exists -x "${RMIC}"
-echo rmic is "${RMIC}"
-
-JAVADOC="${JAVA_HOME}/bin/javadoc"
 exists -x "${JAVADOC}"
 echo javadoc is "${JAVADOC}"
 
-JAR="${JAVA_HOME}/bin/jar"
 exists -x "${JAR}"
 echo jar is "${JAR}"
 
-TOOLS_JAR="${JAVA_HOME}/lib/tools.jar"
-exists -f "${TOOLS_JAR}"
-echo tools.jar is "${TOOLS_JAR}"
-
-RT_JAR="${JAVA_HOME}/jre/lib/rt.jar"
-exists -f "${RT_JAR}"
-echo rt.jar is "${RT_JAR}"
+exists -x "${RMIC}"
+echo rmic is "${RMIC}"
 
 if [ ! -d src ] 
 then
@@ -107,11 +89,22 @@ echo file separator is ${FILE_SEP}
 CWD=`"${JAVA}" -cp . PrintProperty user.dir | escape`
 echo current directory is ${CWD}
 
-ESC_JAVA_HOME=`"${JAVA}" -cp . PrintProperty java.home | escape`
-if [ -f "${ESC_JAVA_HOME}${FILE_SEP}lib${FILE_SEP}rt.jar" ]; then
-    ESC_JAVA_HOME="${ESC_JAVA_HOME}${FILE_SEP}.." # %%${FILE_SEP}jre}
+JAVA_HOME=`"${JAVA}" -cp . PrintProperty java.home | escape`
+if [ -f "${JAVA_HOME}/lib/rt.jar" ]; then
+    JAVA_HOME=`dirname ${JAVA_HOME}`
 fi
+echo Java home directory is ${JAVA_HOME}
+
+ESC_JAVA_HOME=`echo ${JAVA_HOME} | escape`
 echo escaped Java home directory is "${ESC_JAVA_HOME}"
+
+TOOLS_JAR="${JAVA_HOME}/lib/tools.jar"
+exists -f "${TOOLS_JAR}"
+echo tools.jar is "${TOOLS_JAR}"
+
+RT_JAR="${JAVA_HOME}/jre/lib/rt.jar"
+exists -f "${RT_JAR}"
+echo rt.jar is "${RT_JAR}"
 
 if [ -d ${JAVA_HOME}/include/win32 ]
 then
@@ -248,7 +241,7 @@ chmod a+x ${BIN}/jlc
 echo creating $BIN/jifc
 cat > ${BIN}/jifc <<EOF
 #!/bin/sh
-jlc -ext jif \$*
+${TOP}/bin/jlc -ext jif \$*
 EOF
 exists -f ${BIN}/jifc
 chmod a+x ${BIN}/jifc

@@ -6,7 +6,10 @@ import jltools.visit.*;
 import jltools.util.*;
 import java.util.*;
 
-
+/**
+ * A <code>ClassBody</code> represents the body of a class or interface
+ * declaration or the body of an anonymous class.
+ */
 public class ClassBody_c extends Node_c implements ClassBody
 {
 	protected List members;

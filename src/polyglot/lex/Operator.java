@@ -4,6 +4,7 @@ import java.util.Hashtable;
 import jltools.util.Position;
 import java_cup.runtime.Symbol;
 
+/** A token class for operators. */
 public class Operator extends Token {
   String which;
   public Operator(Position position, String which, int sym) {

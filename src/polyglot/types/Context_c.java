@@ -6,8 +6,8 @@ import jltools.types.*;
 import java.util.*;
 
 /**
- * A context to be used within the scope of a method body.  
- * It provides a convenient wrapper for the Type System.
+ * A context represents a stack of scopes used for looking up types, methods,
+ * and variables.
  */
 public class Context_c implements Context
 {
@@ -21,6 +21,9 @@ public class Context_c implements Context
      */
     protected ImportTable it;
 
+    /**
+     * The type system.
+     */
     protected TypeSystem ts;
 
     public Context_c(TypeSystem ts, ImportTable it) {
@@ -248,30 +251,36 @@ public class Context_c implements Context
 	return it.findType(name);
     }
 
+    /** Return the mark at the top of the stack. */
     public Mark mark() {
 	return (Mark) scopes.peek();
     }
 
+    /** Assert that the mark at the top of the stack is <code>mark</code>. */
     public void assertMark(Mark mark) {
 	if (mark() != mark) {
 	    throw new InternalCompilerError("Unexpected scope.");
 	}
     }
 
+    /** Pop the stack until the top of the stack is <code>mark</code>. */
     public void popToMark(Mark mark) {
 	while (mark() != mark) {
 	    scopes.pop();
 	}
     }
 
+    /** Get a new scope mark. */
     protected Scope getScope() {
 	return new JLScope();
     }
 
+    /** Get a new class mark. */
     protected ClassMark getClassMark(ParsedClassType c) {
 	return new JLClassMark(c);
     }
 
+    /** Get a new code mark. */
     protected CodeMark getCodeMark(CodeInstance ci) {
 	return new JLCodeMark(ci);
     }
@@ -454,20 +463,33 @@ public class Context_c implements Context
 	}
     }
 
+    /**
+     * The outer mark.  An instance of this class is at the bottom of the
+     * stack.
+     */
     protected static class OuterMark implements Mark {
 	public String toString() {
 	    return "(outer)";
 	}
     }
 
+    /**
+     * A class mark.
+     */
     protected static interface ClassMark extends Mark {
 	ParsedClassType type();
     }
 
+    /**
+     * A code (method, procedure, initializer) mark.
+     */
     protected static interface CodeMark extends Mark {
 	CodeInstance code();
     }
 
+    /**
+     * A scope mark.
+     */
     protected static interface Scope extends Mark {
         Collection types();
 
@@ -481,6 +503,9 @@ public class Context_c implements Context
 	void addVariable(VarInstance var);
     }
 
+    /**
+     * A concrete implementation of a scope mark.
+     */
     protected static class JLScope implements Scope {
 	Map types;
 	Map methods;
@@ -527,6 +552,9 @@ public class Context_c implements Context
 	}
     }
 
+    /**
+     * A concrete implementation of a class mark.
+     */
     protected static class JLClassMark implements ClassMark {
         ParsedClassType ct;
         JLClassMark(ParsedClassType ct) { this.ct = ct; }
@@ -537,6 +565,9 @@ public class Context_c implements Context
 	}
     }
 
+    /**
+     * A concrete implementation of a code mark.
+     */
     protected static class JLCodeMark implements CodeMark {
         CodeInstance ci;
         JLCodeMark(CodeInstance ci) { this.ci = ci; }

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
+/** Class used for reporting debug messages. */
 public class Report {
   /** A collection of string names of topics which can be used with the
       -report command-line switch */

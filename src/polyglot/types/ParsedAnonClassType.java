@@ -1,7 +1,7 @@
 package jltools.types;
 
 /**
- * An <code>AnonClassType</code> represents an anonymous class.
+ * A <code>ParsedAnonClassType</code> represents a parsed anonymous class.
  */
 public interface ParsedAnonClassType extends ParsedInnerClassType, AnonClassType
 {

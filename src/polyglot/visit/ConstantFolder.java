@@ -5,6 +5,7 @@ import jltools.types.TypeSystem;
 import jltools.frontend.Pass;
 import jltools.frontend.Job;
 
+/** Visitor which performs constant folding. */
 public class ConstantFolder extends BaseVisitor
 {
     public ConstantFolder(Job job) {

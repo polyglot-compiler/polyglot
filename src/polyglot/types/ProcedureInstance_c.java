@@ -4,6 +4,10 @@ import jltools.types.*;
 import jltools.util.*;
 import java.util.*;
 
+/**
+ * A <code>ProcedureInstance</code> contains the type information for a Java
+ * procedure (either a method or a constructor).
+ */
 public abstract class ProcedureInstance_c extends TypeObject_c
                                        implements ProcedureInstance
 {

@@ -8,6 +8,12 @@ import jltools.util.*;
 import java.io.*;
 import java.util.*;
 
+/**
+ * A <code>Node</code> represents an AST node.  All AST nodes must implement
+ * this interface.  Nodes should be immutable: methods which set fields
+ * of the node should copy the node, set the field in the copy, and then
+ * return the copy.
+ */
 public abstract class Node_c implements Node
 {
 	protected Ext ext;

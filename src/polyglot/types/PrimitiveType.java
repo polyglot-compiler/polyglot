@@ -11,6 +11,7 @@ import jltools.util.Enum;
  */
 public interface PrimitiveType extends Type 
 {
+    /** The kind of the primitive type. */
     public class Kind extends Enum {
 	public Kind(String name) { super(name); }
     }

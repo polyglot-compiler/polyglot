@@ -9,6 +9,7 @@ import jltools.types.Package;
 import java.io.IOException;
 import java.util.*;
 
+/** Visitor which traverses the AST constructing type objects. */
 public class TypeBuilder extends BaseVisitor
 {
     protected Stack stack;

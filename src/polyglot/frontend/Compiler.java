@@ -142,6 +142,7 @@ public class Compiler
 	return job;
     }
 
+    /** Return a collection of all jobs in the compilation. */
     public Collection jobs() {
 	return jobs.values();
     }
@@ -185,6 +186,7 @@ public class Compiler
 	return okay;
     }
 
+    /** Add a pass to the worklist. */
     public void addPass(Pass pass) {
 	if (pass.status() == Pass.NEW) {
 	    worklist.add(pass);
@@ -193,6 +195,7 @@ public class Compiler
 	}
     }
 
+    /** Run all passes in the worklist until the <code>goal</code> pass completes. */
     public boolean runToPass(Pass goal) {
 	report(1, "Running to pass " + goal);
 
@@ -277,6 +280,7 @@ OUTER:
 	return goal.status() == Pass.DONE;
     }
 
+    /** Run all jobs in the worklist to completion. */
     protected boolean finish() {
 	boolean okay = true;
 
@@ -351,12 +355,13 @@ OUTER:
 	return eq;
     }
 
-    static Collection topics = new ArrayList(1);
+    private static Collection topics = new ArrayList(1);
 
     static {
 	topics.add("frontend");
     }
 
+    /** Debug reporting for the frontend. */
     public static void report(int level, String msg) {
 	Report.report(topics, level, msg);
     }

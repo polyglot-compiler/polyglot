@@ -2,6 +2,10 @@ package jltools.util;
 
 import java.io.*;
 
+/**
+ * Output stream for writing unicode.  Non-ASCII Unicode characters
+ * are escaped.
+ */
 public class UnicodeWriter extends FilterWriter
 {
   public UnicodeWriter(Writer out)

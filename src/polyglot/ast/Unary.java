@@ -8,6 +8,7 @@ import jltools.util.Enum;
  */
 public interface Unary extends Expr 
 {
+    /** Unary expression operator. */
     public static class Operator extends Enum {
 	boolean prefix;
 
@@ -16,6 +17,7 @@ public interface Unary extends Expr
 	    this.prefix = prefix;
 	}
 
+	/** Returns true of the operator is a prefix operator, false if postfix. */
 	public boolean isPrefix() { return prefix; }
     }
 

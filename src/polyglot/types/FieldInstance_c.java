@@ -3,6 +3,9 @@ package jltools.ext.jl.types;
 import jltools.types.*;
 import jltools.util.*;
 
+/**
+ * A <code>FieldInstance</code> contains type information for a field.
+ */
 public class FieldInstance_c extends VarInstance_c implements FieldInstance
 {
     protected ReferenceType container;

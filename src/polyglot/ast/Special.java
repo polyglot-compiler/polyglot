@@ -10,12 +10,13 @@ import jltools.util.Enum;
  */
 public interface Special extends Expr 
 {    
+    /** Special expression kind: either "super" or "this". */
     public static class Kind extends Enum {
         public Kind(String name) { super(name); }
     }
 
     public static final Kind SUPER = new Kind("super");
-    public static final Kind THIS    = new Kind("this");
+    public static final Kind THIS  = new Kind("this");
 
     Kind kind();
     Special kind(Kind kind);

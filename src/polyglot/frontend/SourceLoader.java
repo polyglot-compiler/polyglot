@@ -15,6 +15,7 @@ public class SourceLoader
 	this.sourceExtension = sourceExtension;
     }
 
+    /** Load a source from a specific file. */
     public Source fileSource(String fileName) throws IOException {
 	File sourceFile = new File(fileName);
 
@@ -27,6 +28,7 @@ public class SourceLoader
 	return new Source(fileName, sourceExtension);
     }
 
+    /** Load the source file for the given class name using the source path. */
     public Source classSource(String className) throws IOException {
 	/* Search the source path. */
 	String fileName = className.replace('.', File.separatorChar) 

@@ -4,6 +4,10 @@ import jltools.types.*;
 import jltools.util.*;
 import java.util.*;
 
+/**
+ * A <code>MethodInstance</code> represents the type information for a Java
+ * method.
+ */
 public class MethodInstance_c extends ProcedureInstance_c
                                 implements MethodInstance
 {

@@ -8,6 +8,7 @@ import jltools.util.Enum;
  */
 public interface Branch extends Stmt
 {
+    /** Branch kind: either break or continue. */
     public static class Kind extends Enum {
         Kind(String name) { super(name); }
     }

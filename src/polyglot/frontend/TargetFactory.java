@@ -28,11 +28,13 @@ public class TargetFactory
 		outputExtension;
     }
 
+    /** Open a writer to the output file for the class in the given package. */
     public Writer outputWriter(String packageName, String className)
 	throws IOException {
 	return outputWriter(outputFile(packageName, className));
     }
 
+    /** Open a writer to the output file. */
     public Writer outputWriter(File outputFile) throws IOException {
 	Compiler.report(1, "Opening " + outputFile + " for output.");
 
@@ -48,6 +50,7 @@ public class TargetFactory
 	return new UnicodeWriter(new FileWriter(outputFile));
     }
 
+    /** Return a file object for the output of the source file in the given package. */
     public File outputFile(String packageName, Source source) {
 	String name;
 	name = new File(source.name()).getName();
@@ -55,6 +58,7 @@ public class TargetFactory
 	return outputFile(packageName, name);
     }
 
+    /** Return a file object for the output of the class in the given package. */
     public File outputFile(String packageName, String className) {
 	if (outputDirectory == null) {
 	      throw new InternalCompilerError("Output directory not set.");

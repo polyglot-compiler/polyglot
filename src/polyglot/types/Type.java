@@ -2,6 +2,10 @@ package jltools.types;
 
 import jltools.util.Position;
 
+/**
+ * A <code>Type</code> is the base type of all classes which represent
+ * types.
+ */
 public interface Type extends Qualifier
 {
     String translate(Context c);

@@ -1,5 +1,6 @@
 package jltools.util;
 
+/** A bit vector class implemented more naively than java.util.BitSet. */
 public class BitVector
 {
   private int size;

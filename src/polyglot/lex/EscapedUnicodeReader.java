@@ -4,6 +4,7 @@ import java.io.Reader;
 import java.io.FilterReader;
 import java.io.IOException;
 
+/** A reader that translates escaped unicode into unicode characters. */
 public class EscapedUnicodeReader extends FilterReader {
 
   int pushback=-1;

@@ -7,6 +7,7 @@ import jltools.util.Enum;
  */
 public interface Assign extends Expr 
 {
+    /** Assignment operator. */
     public static class Operator extends Enum {
 	protected Operator(String name) { super(name); } 
     }

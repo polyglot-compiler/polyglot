@@ -3,6 +3,7 @@ package jltools.lex;
 import java_cup.runtime.Symbol;
 import jltools.util.Position;
 
+/** Token class for boolean literals. */
 public class BooleanLiteral extends Literal {
   Boolean val;
   public BooleanLiteral(Position position, boolean b, int sym) {

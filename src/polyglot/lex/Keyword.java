@@ -3,6 +3,7 @@ package jltools.lex;
 import java_cup.runtime.Symbol;
 import jltools.util.Position;
 
+/** A token class for keywords. */
 public class Keyword extends Token {
   String keyword;
 

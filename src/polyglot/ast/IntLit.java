@@ -8,6 +8,7 @@ import jltools.util.Enum;
  */
 public interface IntLit extends NumLit 
 {
+    /** Integer literal kinds: byte, short, int, or long. */
     public static class Kind extends Enum {
         protected Kind(String name) { super(name); }
     }

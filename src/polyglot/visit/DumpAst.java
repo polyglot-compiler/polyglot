@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.FileWriter;
 import java.io.Writer;
 
+/** Visitor which dumps the AST to a file. */
 public class DumpAst extends NodeVisitor
 {
     private Writer fw;

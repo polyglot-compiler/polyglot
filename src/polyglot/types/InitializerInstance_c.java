@@ -3,6 +3,10 @@ package jltools.ext.jl.types;
 import jltools.types.*;
 import jltools.util.*;
 
+/**
+ * A <code>InitializerInstance</code> contains the type information for a
+ * static or anonymous initializer.
+ */
 public class InitializerInstance_c extends TypeObject_c
                                 implements InitializerInstance
 {

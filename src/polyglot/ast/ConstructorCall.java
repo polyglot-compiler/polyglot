@@ -11,6 +11,7 @@ import java.util.List;
  */
 public interface ConstructorCall extends Stmt
 {
+    /** Constructor call kind: either "super" or "this". */
     public static class Kind extends Enum {
         public Kind(String name) { super(name); }
     }

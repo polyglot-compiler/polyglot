@@ -2,6 +2,7 @@ package jltools.types;
 
 import java.util.*;
 
+/** A class used for reporting debug output related to types. */
 public class Types
 {
     static Collection topics = new ArrayList();

@@ -42,10 +42,12 @@ public class Source
 	return file.getAbsolutePath().hashCode();
     }
 
+    /** The name of the source file. */
     public String name() {
 	return name;
     }
 
+    /** Open the source file. */
     public Reader open() throws IOException {
 	if (reader == null) {
 	    reader = new FileReader(file);
@@ -54,6 +56,7 @@ public class Source
 	return reader;
     }
 
+    /** Close the source file. */
     public void close() throws IOException {
 	if (reader != null) {
 	    reader.close();
@@ -61,6 +64,7 @@ public class Source
 	}
     }
 
+    /** Return the date the source file was last modified. */
     public Date lastModified() {
 	return lastModified;
     }

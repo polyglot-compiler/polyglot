@@ -1,5 +1,6 @@
 package jltools.main;
 
+/** This class encapsulates the version of the compiler. */
 public abstract class Version {
     /** 
      * Marks major changes in the output format of the files produced by the

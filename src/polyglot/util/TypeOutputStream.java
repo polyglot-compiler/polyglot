@@ -5,7 +5,7 @@ import jltools.types.*;
 import java.io.*;
 import java.util.Set;
 
-
+/** Output stream for writing type objects. */
 public class TypeOutputStream extends ObjectOutputStream
 {
   protected TypeSystem ts;

@@ -1,6 +1,6 @@
 package jltools.util;
 
-
+/** Information about an error message. */
 public class ErrorInfo
 {
   public static final int WARNING            = 0;

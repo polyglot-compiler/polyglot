@@ -7,7 +7,7 @@ import jltools.util.*;
 
 /**
  * An <code>AmbPrefix</code> is an ambiguous AST node composed of dot-separated
- * list of identifiers.  It must resolve to a prefix.
+ * list of identifiers that must resolve to a prefix.
  */
 public class AmbPrefix_c extends Node_c implements AmbPrefix
 {

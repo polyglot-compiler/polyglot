@@ -3,6 +3,7 @@ package jltools.lex;
 import java_cup.runtime.Symbol;
 import jltools.util.Position;
 
+/** Token class for char literals. */
 public class CharacterLiteral extends Literal {
   Character val;
 

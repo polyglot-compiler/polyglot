@@ -3,6 +3,7 @@ package jltools.types;
 import jltools.util.*;
 import java.util.*;
 
+/** A class resolver implemented as a map from names to types. */
 public class TableResolver extends ClassResolver
 {
     protected Map table;

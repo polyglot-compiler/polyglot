@@ -2,14 +2,28 @@ package jltools.types;
 
 import java.util.List;
 
+/**
+ * A context represents a stack of scopes used for looking up types, methods,
+ * and variables.
+ */
 public interface Context extends Resolver
 {
+    /**
+     * A <code>Mark</code> is used to indicate a point in the stack
+     * of scopes.
+     */
     static interface Mark { }
 
+    /** Return the mark at the top of the stack. */
     Mark mark();
+
+    /** Pop the stack until the top of the stack is <code>mark</code>. */
     void popToMark(Mark m);
+
+    /** Assert that the mark at the top of the stack is <code>mark</code>. */
     void assertMark(Mark m);
 
+    /** The type system. */
     TypeSystem typeSystem();
 
     /** Add a variable to the current scope. */

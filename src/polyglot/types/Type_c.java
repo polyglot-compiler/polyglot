@@ -5,6 +5,11 @@ import jltools.util.*;
 import jltools.types.Package;
 import java.io.*;
 
+/**
+ * Abstract implementation of a <code>Type</code>.  This implements most of
+ * the "isa" and "cast" methods of the type and methods which just dispatch to
+ * the type system.
+ */
 public abstract class Type_c extends TypeObject_c implements Type
 {
     /** Used for deserializing types. */

@@ -8,6 +8,7 @@ import jltools.util.Enum;
  */
 public interface Binary extends Expr 
 {
+    /** Binary expression operator. */
     public static class Operator extends Enum {
 	protected Precedence prec;
 
@@ -16,6 +17,7 @@ public interface Binary extends Expr
 	    this.prec = prec;
 	}
 
+	/** Returns the precedence of the operator. */
 	public Precedence precedence() { return prec; }
     }
 

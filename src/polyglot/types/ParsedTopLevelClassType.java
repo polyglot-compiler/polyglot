@@ -1,7 +1,7 @@
 package jltools.types;
 
 /**
- * A <code>TopLevelClassType</code> represents a top-level class.
+ * A <code>ParsedTopLevelClassType</code> represents a parsed top-level class.
  */
 public interface ParsedTopLevelClassType extends ParsedClassType,
                                                  TopLevelClassType

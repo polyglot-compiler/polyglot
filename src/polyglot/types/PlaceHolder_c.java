@@ -5,6 +5,9 @@ import jltools.util.*;
 import jltools.types.Package;
 import java.io.*;
 
+/**
+ * A place holder type used to serialize types that cannot be serialized.  
+ */
 public class PlaceHolder_c extends Type_c
 {
     boolean primitive;
@@ -14,7 +17,7 @@ public class PlaceHolder_c extends Type_c
     /** Used for deserializing types. */
     protected PlaceHolder_c() { }
     
-    /** Creates a new type in the given a TypeSystem. */
+    /** Creates a place holder type for the type. */
     public PlaceHolder_c(Type t) {
         super(t.typeSystem(), t.position());
 
@@ -36,6 +39,7 @@ public class PlaceHolder_c extends Type_c
 	}
     }
 
+    /** Restore the placeholder into a proper type. */ 
     public TypeObject restore_() throws SemanticException {
 	if (primitive) {
 	    return ts.primitiveForName(name);

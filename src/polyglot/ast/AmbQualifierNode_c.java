@@ -5,6 +5,10 @@ import jltools.types.*;
 import jltools.visit.*;
 import jltools.util.*;
 
+/**
+ * An <code>AmbQualifierNode</code> is an ambiguous AST node composed of
+ * dot-separated list of identifiers that must resolve to a type qualifier.
+ */
 public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 {
     protected Qualifier qualifier;

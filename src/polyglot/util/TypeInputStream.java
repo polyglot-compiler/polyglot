@@ -4,7 +4,7 @@ import jltools.types.*;
 
 import java.io.*;
 
-
+/** Input stream for reading type objects. */
 public class TypeInputStream extends ObjectInputStream
 {
   protected TypeSystem ts;

@@ -3,6 +3,9 @@ package jltools.ext.jl.types;
 import jltools.types.*;
 import jltools.util.*;
 
+/**
+ * A <code>LocalInstance</code> contains type information for a local variable.
+ */
 public class LocalInstance_c extends VarInstance_c implements LocalInstance
 {
     /** Used for deserializing types. */

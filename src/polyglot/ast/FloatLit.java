@@ -8,6 +8,7 @@ import jltools.util.Enum;
  */
 public interface FloatLit extends Lit 
 {    
+    /** Floating point literal kind: either float or double. */
     public static class Kind extends Enum {
         Kind(String name) { super(name); }
     }

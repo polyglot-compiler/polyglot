@@ -5,6 +5,10 @@ import jltools.util.*;
 import jltools.types.Package;
 import java.io.*;
 
+/**
+ * An unknown type.  This is used as a place-holder until types are
+ * disambiguated.
+ */
 public class UnknownType_c extends Type_c implements UnknownType
 {
     /** Used for deserializing types. */

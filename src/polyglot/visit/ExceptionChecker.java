@@ -5,6 +5,7 @@ import jltools.util.*;
 import jltools.types.*;
 import java.util.*;
 
+/** Visitor which checks if exceptions are caught or declared properly. */
 public class ExceptionChecker extends NodeVisitor
 {
     protected SubtypeSet thrown;

@@ -5,6 +5,7 @@ import jltools.types.*;
 import jltools.util.*;
 import jltools.frontend.Job;
 
+/** Abstract class that is the base of visitors associated with a Job. */
 public abstract class BaseVisitor extends NodeVisitor
 {
     protected Job job;

@@ -9,8 +9,7 @@ import jltools.types.Package;
 import java.io.*;
 import java.util.*;
 
-/** A Translator generates output code from the processed AST.
- */
+/** A Translator generates output code from the processed AST. */
 public class Translator extends AbstractPass
 {
     protected Job job;

@@ -5,6 +5,11 @@ import jltools.types.*;
 import jltools.visit.*;
 import jltools.util.*;
 
+/**
+ * <code>Ext</code> is the super type of all node extension objects.
+ * It defines default implementations of the methods which implement compiler
+ * passes, dispatching to the node to perform the actual work of the pass.
+ */
 public class Ext_c implements Ext {
     Node n;
 

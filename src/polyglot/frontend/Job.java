@@ -16,12 +16,19 @@ import java.io.IOException;
  */
 public abstract class Job
 {
+    /** The source file for the job. */
     protected Source source;
+
+    /** The compiler which performs work for the job. */
     protected Compiler compiler;
 
+    /** The import table constructed from the source file. */
     protected ImportTable it;
+
+    /** The AST constructed from the source file. */
     protected Node ast;
 
+    /** Construct a new job for a given source and compiler. */
     public Job(Source s, Compiler c) {
 	this.source = s;
 	this.compiler = c;
@@ -29,11 +36,16 @@ public abstract class Job
 	                          c.systemResolver(), s, c.errorQueue());
     }
 
+    /** Get the job's AST. */
     public Node ast() { return ast; }
+    /** Set the job's AST. */
     public void ast(Node ast) { this.ast = ast; }
 
+    /** The build types pass. */
     public abstract Pass buildPass();
+    /** The disambiguate types pass. */
     public abstract Pass disambTypesPass();
+    /** The translate pass. */
     public abstract Pass translatePass();
 
     public String toString() {
@@ -53,14 +65,17 @@ public abstract class Job
 	return false;
     }
 
+    /** The compiler which performs work for the job. */
     public Compiler compiler() {
 	return compiler;
     }
 
+    /** The import table constructed from the source file. */
     public ImportTable importTable() {
 	return it;
     }
 
+    /** The source file for the job. */
     public Source source() {
 	return source;
     }

@@ -3,6 +3,10 @@ package jltools.ext.jl.types;
 import jltools.types.*;
 import jltools.util.*;
 
+/**
+ * A <code>VarInstance</code> contains type information for a variable.  It may
+ * be either a local or a field.
+ */
 public abstract class VarInstance_c extends TypeObject_c implements VarInstance
 {
     protected Flags flags;

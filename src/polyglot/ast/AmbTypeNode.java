@@ -2,7 +2,7 @@ package jltools.ast;
 
 /**
  * An <code>AmbTypeNode</code> is an ambiguous AST node composed of
- * dot-separated list of identifiers.  It must resolve to a type.
+ * dot-separated list of identifiers that must resolve to a type.
  */
 public interface AmbTypeNode extends TypeNode, Ambiguous
 {

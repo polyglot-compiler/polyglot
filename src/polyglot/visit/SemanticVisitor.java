@@ -7,8 +7,8 @@ import jltools.frontend.Job;
 import java.util.*;
 
 /**
- * A visitor which traverses the AST and remove ambiguities found in fields,
- * method signatures and the code itself. 
+ * A visitor which maintains a context.  This is the base class of the
+ * disambiguation and type checking visitors.
  */
 public abstract class SemanticVisitor extends BaseVisitor
 {
@@ -43,6 +43,13 @@ public abstract class SemanticVisitor extends BaseVisitor
 	n.leaveScope(context);
     }
 
+    /**
+     * Class used to implement error propagation.  We maintain a linked list
+     * of nodes where exceptions are caught error messages output, before
+     * continuing with the visitor pass.  If a node does not catch an exception
+     * thrown by one of its children (or by itself), its siblings will not be
+     * visited.
+     */
     protected static class Catcher {
 	Node node;
 	Catcher next;
@@ -53,10 +60,12 @@ public abstract class SemanticVisitor extends BaseVisitor
 	}
     }
 
+    /** Exception used to abort a visitor pass. */
     protected static class Abort extends RuntimeException { }
 
     protected Catcher catcher = null;
 
+    /** Return true if we should catch errors thrown when visiting the node. */
     protected boolean catchErrors(Node n) {
 	/*
 	return n instanceof Stmt
@@ -67,6 +76,13 @@ public abstract class SemanticVisitor extends BaseVisitor
 	return true;
     }
 
+    /**
+     * Create a new exception catcher for the node.  If a catcher is already
+     * created for this node or we should not catch exceptions at this node,
+     * return false, otherwise return true.  Returning true will indicate to
+     * the <code>override()<code> method that exceptions should be caught when
+     * visiting the node.
+     */
     protected boolean newCatcher(Node n) {
 	if (catcher != null && catcher.node == n) {
 	    return false;

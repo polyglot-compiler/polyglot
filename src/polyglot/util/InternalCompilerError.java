@@ -1,6 +1,6 @@
-
 package jltools.util;
 
+/** Exception thrown when the compiler is confused. */
 public class InternalCompilerError extends RuntimeException
 {
     Position pos;

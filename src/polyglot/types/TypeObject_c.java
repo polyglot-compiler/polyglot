@@ -4,6 +4,10 @@ import jltools.types.*;
 import jltools.util.*;
 import java.io.*;
 
+/**
+ * Abstract implementation of a type object.  Contains a reference to the
+ * type system and to the object's position in the code.
+ */  
 public abstract class TypeObject_c implements TypeObject
 {
     protected transient TypeSystem ts;
@@ -53,11 +57,11 @@ public abstract class TypeObject_c implements TypeObject
 	return o;
     }
 
-    private void writeObject( ObjectOutputStream out) throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
 	out.writeObject(position);
     }
 
-    private void readObject( ObjectInputStream in) throws IOException,
+    private void readObject(ObjectInputStream in) throws IOException,
 					       ClassNotFoundException {
 	if (in instanceof TypeInputStream) {
 	    ts = ((TypeInputStream) in).getTypeSystem();

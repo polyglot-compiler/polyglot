@@ -1,7 +1,8 @@
 package jltools.lex;
 
 import jltools.util.Position;
-
+ 
+/** The base class of all tokens. */
 public abstract class Token {
   Position position;
   int symbol;

@@ -10,6 +10,10 @@ import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 
+/**
+ * Visitor which serializes class objects and adds a field to the class
+ * containing the serialization.
+ */
 public class ClassSerializer extends NodeVisitor
 {
     protected TypeEncoder te;

@@ -7,7 +7,7 @@ import jltools.util.*;
 
 /**
  * An <code>AmbExpr</code> is an ambiguous AST node composed of a single
- * identifier.  It must resolve to an expression.
+ * identifier that must resolve to an expression.
  */
 public class AmbExpr_c extends Expr_c implements AmbExpr
 {

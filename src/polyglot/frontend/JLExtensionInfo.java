@@ -18,18 +18,24 @@ import java.util.*;
 /** 
  * This is the default <code>ExtensionInfo</code> for the Java language. 
  * 
- * Compilation Passes and visitors:
- * 1. parse
- * 2. build types (TypeBuilder)
- * 3. disambiguate types (TypeAmbiguityRemover)
- * 4. disambiguate (AmbiguityRemover)
- * 5. constant folding (ConstantFolder)
- * ------------------barrier
- * 6. type checking (TypeChecker)
- * 7. exception checking (ExceptionChecker)
- * ------------------barrier
- * 8. serialization (ClassSerializer), optional
- * 9. translation (Translator)
+ * Compilation passes and visitors:
+ * <ol>
+ * <li> parse </li>
+ * <li> build types (TypeBuilder) </li>
+ * <li> disambiguate types (TypeAmbiguityRemover) </li>
+ * <li> disambiguate (AmbiguityRemover) </li>
+ * <li> constant folding (ConstantFolder)
+ * <hr>
+ * <center>BARRIER</center>
+ * <hr>
+ * <li> type checking (TypeChecker) </li>
+ * <li> exception checking (ExceptionChecker)
+ * <hr>
+ * <center>BARRIER</center>
+ * <hr>
+ * <li> serialization (ClassSerializer), optional </li>
+ * <li> translation (Translator) </li>
+ * </ol>
  */
 public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
     protected jltools.frontend.Compiler compiler;
@@ -74,6 +80,7 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	return index;
     }
 
+    /** Create the type system for this extension. */
     protected TypeSystem createTypeSystem() {
 	return new TypeSystem_c();
     }
@@ -112,6 +119,7 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 				 options.output_stdout);
     }
 
+    /** Create the node factory for this extension. */
     protected NodeFactory createNodeFactory() {
 	return new NodeFactory_c();
     }
@@ -135,13 +143,16 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	return new CupParser(grm, job);
     }
 
+    /** An implementation of the Job class.   We make it an inner class to avoid creating a ext/jl/frontend directory. */
     protected static class JLJob extends Job {
 	protected JLJob(Source s, Compiler c) {
 	    super(s, c);
 	}
 
+	/** The parse pass. */
 	protected Pass parse;
 
+	/** The parse pass. */
 	public Pass parsePass() {
 	    if (parse == null) {
 		parse = new ParserPass(this, compiler().extensionInfo());
@@ -150,8 +161,10 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	    return parse;
 	}
 
+	/** The build pass. */
 	protected Pass build;
 
+	/** The build pass. */
 	public Pass buildPass() {
 	    if (build == null) {
 		build = new VisitorPass(this, new TypeBuilder(this));
@@ -161,41 +174,49 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	    return build;
 	}
 
-	protected Pass dt;
+	/** The disambiguate types pass. */
+	protected Pass disambTypes;
 
+	/** The disambiguate types pass. */
 	public Pass disambTypesPass() {
-	    if (dt == null) {
-		dt = new VisitorPass(this, new TypeAmbiguityRemover(this));
-		dt.runAfter(buildPass());
+	    if (disambTypes == null) {
+		disambTypes = new VisitorPass(this, new TypeAmbiguityRemover(this));
+		disambTypes.runAfter(buildPass());
 	    }
 
-	    return dt;
+	    return disambTypes;
 	}
 
-	protected Pass de;
+	/** The disambiguate pass. */
+	protected Pass disamb;
 
+	/** The disambiguate pass. */
 	public Pass disambPass() {
-	    if (de == null) {
-		de = new VisitorPass(this, new AmbiguityRemover(this));
-		de.runAfter(disambTypesPass());
+	    if (disamb == null) {
+		disamb = new VisitorPass(this, new AmbiguityRemover(this));
+		disamb.runAfter(disambTypesPass());
 	    }
 
-	    return de;
+	    return disamb;
 	}
 
-	protected Pass cf;
+	/** The constant fold pass. */
+	protected Pass fold;
 
+	/** The constant fold pass. */
 	public Pass foldPass() {
-	    if (cf == null) {
-		cf = new VisitorPass(this, new ConstantFolder(this));
-		cf.runAfter(disambPass());
+	    if (fold == null) {
+		fold = new VisitorPass(this, new ConstantFolder(this));
+		fold.runAfter(disambPass());
 	    }
 
-	    return cf;
+	    return fold;
 	}
 
+	/** A barrier pass that runs before type checking. */
 	protected Pass beforeCheck;
 
+	/** A barrier pass that runs before type checking. */
 	public Pass beforeCheckPass() {
 	    if (beforeCheck == null) {
 		beforeCheck = new BarrierPass(compiler()) {
@@ -208,31 +229,37 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	    return beforeCheck;
 	}
 
-	protected Pass tc;
+	/** The type check pass. */
+	protected Pass typeCheck;
 
+	/** The type check pass. */
 	public Pass checkPass() {
-	    if (tc == null) {
-		tc = new VisitorPass(this, new TypeChecker(this));
-		tc.runAfter(beforeCheckPass());
+	    if (typeCheck == null) {
+		typeCheck = new VisitorPass(this, new TypeChecker(this));
+		typeCheck.runAfter(beforeCheckPass());
 	    }
 
-	    return tc;
+	    return typeCheck;
 	}
 
-	protected Pass ec;
+	/** The exception check pass. */
+	protected Pass excCheck;
 
+	/** The exception check pass. */
 	public Pass excCheckPass() {
-	    if (ec == null) {
-		ec = new VisitorPass(this, new ExceptionChecker(
+	    if (excCheck == null) {
+		excCheck = new VisitorPass(this, new ExceptionChecker(
 			    compiler().typeSystem(), compiler().errorQueue()));
-		ec.runAfter(checkPass());
+		excCheck.runAfter(checkPass());
 	    }
 
-	    return ec;
+	    return excCheck;
 	}
 
+	/** A barrier pass that runs before translation. */
 	protected Pass beforeTranslate;
 
+	/** A barrier pass that runs before translation. */
 	public Pass beforeTranslatePass() {
 	    if (beforeTranslate == null) {
 		beforeTranslate = new BarrierPass(compiler()) {
@@ -245,8 +272,10 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	    return beforeTranslate;
 	}
 
+	/** The class serialization pass. */
 	protected Pass serialize;
 
+	/** The class serialization pass. */
 	public Pass serializePass() {
 	    if (serialize == null) {
 		Source source = source();
@@ -269,15 +298,17 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	    return serialize;
 	}
 
-	protected Pass tr;
+	/** The translation pass. */
+	protected Pass translate;
 
+	/** The translation pass. */
 	public Pass translatePass() {
-	    if (tr == null) {
-		tr = new Translator(this);
-		tr.runAfter(serializePass());
+	    if (translate == null) {
+		translate = new Translator(this);
+		translate.runAfter(serializePass());
 	    }
 
-	    return tr;
+	    return translate;
 	}
     }
 

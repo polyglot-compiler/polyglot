@@ -2,6 +2,7 @@ package jltools.lex;
 
 import jltools.util.Position;
 
+/** A token class for numerical literals. */
 public abstract class NumericLiteral extends Literal {
   Number val;
 

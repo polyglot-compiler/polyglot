@@ -4,6 +4,10 @@ import jltools.types.*;
 import jltools.util.*;
 import java.util.*;
 
+/**
+ * A <code>ConstructorInstance</code> contains type information for a
+ * constructor.
+ */
 public class ConstructorInstance_c extends ProcedureInstance_c
                                 implements ConstructorInstance
 {

@@ -10,6 +10,8 @@ import jltools.util.Enum;
  */
 public interface Import extends Node 
 {
+    /** Import kinds: class (e.g., import java.util.Set) or package (e.g.,
+     *  import java.util.*). */
     public static class Kind extends Enum {
         protected Kind(String name) { super(name); }
     }

@@ -6,6 +6,7 @@ import jltools.util.*;
 import jltools.frontend.Job;
 import jltools.types.Package;
 
+/** Visitor which performs type checking on the AST. */
 public class TypeChecker extends SemanticVisitor
 {
     public TypeChecker(Job job) {
