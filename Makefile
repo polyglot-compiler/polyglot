@@ -53,7 +53,7 @@ jar: all
 	$(JAR) $(JAR_FLAGS) ../$(JAR_FILE) `find polyglot -name \*.class`; \
 	$(JAR) $(JAR_FLAGS) ../jif.jar `find jif -name \*.class`
 
-export:
+export: javadoc
 	rm -rf release
 	mkdir release
 	cvs rtag $(TAG) polyglot
