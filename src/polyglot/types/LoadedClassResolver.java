@@ -102,15 +102,23 @@ public class LoadedClassResolver extends ClassResolver
   /** Load a type from a class file. */
   public Type loadType(String name) throws SemanticException
   {
-    Types.report(1, "LoadedCR.loadType(" + name + ")");
+    Types.report(3, "LoadedCR.loadType(" + name + ")");
 
     Class clazz = null;
 
     // Now, try the class file.
     try {
       clazz = Class.forName(name);
+      Types.report(4, "Class " + name + " found in classpath " +
+                   System.getProperty("java.class.path"));
+    }
+    catch (UnsatisfiedLinkError e) {
+      Types.report(4, "Class " + name + " could not be loaded due to " +
+                   e.getMessage());
     }
     catch (Throwable e) {
+      Types.report(4, "Class " + name + " not found in classpath " +
+                   System.getProperty("java.class.path"));
     }
 
     if (clazz != null) {
@@ -122,7 +130,7 @@ public class LoadedClassResolver extends ClassResolver
 
   public Type findType(String name) throws SemanticException
   {
-    Types.report(1, "LoadedCR.findType(" + name + ")");
+    Types.report(3, "LoadedCR.findType(" + name + ")");
 
     Class clazz = null;
     Source source = null;
@@ -130,16 +138,26 @@ public class LoadedClassResolver extends ClassResolver
     // First, try and find the source file.
     try {
       source = compiler.sourceLoader().classSource(name);
+      Types.report(4, "Class " + name + " found in source " + source);
     }
     catch (IOException e) {
+      Types.report(4, "Class " + name + " not found in source file");
       source = null;
     }
 
     // Now, try the class file.
     try {
       clazz = Class.forName(name);
+      Types.report(4, "Class " + name + " found in classpath " +
+                   System.getProperty("java.class.path"));
+    }
+    catch (UnsatisfiedLinkError e) {
+      Types.report(4, "Class " + name + " could not be loaded due to " +
+                   e.getMessage());
     }
     catch (Throwable e) {
+      Types.report(4, "Class " + name + " not found in classpath " +
+                   System.getProperty("java.class.path"));
     }
 
     boolean useClassFile = clazz != null;
@@ -163,7 +181,7 @@ public class LoadedClassResolver extends ClassResolver
 	long sourceModTime = source.lastModified().getTime();
 
 	if (classModTime < sourceModTime) {
-	  Types.report(2, "Source file version is newer than compiled for " +
+	  Types.report(3, "Source file version is newer than compiled for " +
 		       name + ".");
 	  useClassFile = false;
 	}
@@ -175,7 +193,7 @@ public class LoadedClassResolver extends ClassResolver
 
 	  if (comp != COMPATIBLE) {
 	    // Incompatible or older version, so go with the source.
-	    Types.report(2, "Incompatible source file version for " +
+	    Types.report(3, "Incompatible source file version for " +
 			 name + ".");
 	    useClassFile = false;
 	  }
@@ -246,7 +264,7 @@ public class LoadedClassResolver extends ClassResolver
       //HACK: storing median result to avoid circular resolving
       ((CachingResolver)ts.systemResolver()).medianResult(name, t);
 
-      Types.report(1, "Returning serialized ClassType for " +
+      Types.report(2, "Returning serialized ClassType for " +
 		  clazz.getName() + ".");
 
       ClassType ret = (ClassType) t.restore();
@@ -259,7 +277,7 @@ public class LoadedClassResolver extends ClassResolver
       throw e;
     }
     catch (NoSuchFieldException e) {
-      Types.report(1, "Returning LoadedClassType for " +
+      Types.report(2, "Returning LoadedClassType for " +
 				clazz.getName() + ".");
       return ts.forClass(clazz);
     }
