@@ -114,6 +114,15 @@ public class Binary_c extends Expr_c implements Binary
             return new Boolean(((String) lv).intern() != ((String) rv).intern());
         }
 
+        // promote chars to ints.
+        if (lv instanceof Character) {
+            lv = new Integer(((Character) lv).charValue());
+        }
+
+        if (rv instanceof Character) {
+            rv = new Integer(((Character) rv).charValue());
+        }
+
         try {
             if (lv instanceof Number && rv instanceof Number) {
                 if (lv instanceof Double || rv instanceof Double) {
@@ -181,9 +190,10 @@ public class Binary_c extends Expr_c implements Binary
                 // At this point, both lv and rv must be ints.
                 int l = ((Number) lv).intValue();
                 int r = ((Number) rv).intValue();
+
                 if (op == ADD) return new Integer(l + r);
                 if (op == SUB) return new Integer(l - r);
-                if (op == MUL) return new Integer(l - r);
+                if (op == MUL) return new Integer(l * r);
                 if (op == DIV) return new Integer(l / r);
                 if (op == MOD) return new Integer(l % r);
                 if (op == EQ) return new Boolean(l == r);
