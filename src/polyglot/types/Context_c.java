@@ -9,6 +9,7 @@ import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.types.Package;
 import polyglot.util.CollectionUtil;
+import polyglot.util.Enum;
 import polyglot.util.InternalCompilerError;
 
 /**
@@ -25,12 +26,30 @@ public class Context_c implements Context
 {
     protected Context outer;
     protected TypeSystem ts;
+
+    public static class Kind extends Enum {
+	public Kind(String name) {
+	    super(name);
+	}
+    }
+
+    public static final Kind BLOCK = new Kind("block");
+    public static final Kind CLASS = new Kind("class");
+    public static final Kind CODE = new Kind("code");
+    public static final Kind OUTER = new Kind("outer");
+    public static final Kind SOURCE = new Kind("source");
     
     public Context_c(TypeSystem ts) {
         this.ts = ts;
         this.outer = null;
         this.kind = OUTER;
     }
+
+    public boolean isBlock() { return kind == BLOCK; }
+    public boolean isClass() { return kind == CLASS; }
+    public boolean isCode() { return kind == CODE; }
+    public boolean isOuter() { return kind == OUTER; }
+    public boolean isSource() { return kind == SOURCE; }
 
     public TypeSystem typeSystem() {
         return ts;
@@ -58,7 +77,7 @@ public class Context_c implements Context
      * The import table for the file
      */
     protected ImportTable it;
-    protected int kind;
+    protected Kind kind;
     protected ClassType type;
     protected ParsedClassType scope;
     protected CodeInstance code;
@@ -71,21 +90,6 @@ public class Context_c implements Context
      * Is the context static?
      */
     protected boolean staticContext;
-
-    public static final int BLOCK = 0;
-    public static final int CLASS = 1;
-    public static final int CODE  = 2;
-    public static final int OUTER = 3;
-    public static final int SOURCE = 4;
-
-    private String kindStr() {
-        if (kind == BLOCK) return "block";
-        if (kind == CLASS) return "class";
-        if (kind == CODE) return "code";
-        if (kind == OUTER) return "outer";
-        if (kind == SOURCE) return "source";
-        return "unknown-scope";
-    }
 
     public Resolver outerResolver() {
         if (it != null) {
@@ -109,11 +113,11 @@ public class Context_c implements Context
      * classes.
      */
     public boolean isLocal(String name) {
-        if (kind == CLASS) {
+        if (isClass()) {
             return false;
         }
         
-        if ((kind == BLOCK || kind == CODE) &&
+        if ((isBlock() || isCode()) &&
             (findVariableInThisScope(name) != null || findInThisScope(name) != null)) {
             return true;
         }
@@ -270,7 +274,7 @@ public class Context_c implements Context
     }
 
     public String toString() {
-        return "(" + kindStr() + " " + mapsToString() + " " + outer + ")";
+        return "(" + kind + " " + mapsToString() + " " + outer + ")";
     }
 
     public Context pop() {
@@ -284,8 +288,8 @@ public class Context_c implements Context
         if (Report.should_report(TOPICS, 3))
           Report.report(3, "find-type " + name + " in " + this);
 
-        if (kind == OUTER) return outerResolver().find(name);
-        if (kind == SOURCE) return it.find(name);
+        if (isOuter()) return outerResolver().find(name);
+        if (isSource()) return it.find(name);
 
         Named type = findInThisScope(name);
 
