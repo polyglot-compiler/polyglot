@@ -843,7 +843,8 @@ public class TypeSystem_c implements TypeSystem
 		    isAccessible(mi, currClass)) {
 
 		    if (Report.should_report(Report.types, 3))
-			Report.report(3, "->acceptable: " + mi);
+			Report.report(3, "->acceptable: " + mi +
+                                      " in " + mi.container());
 
 		    acceptable.add(mi);
 		}

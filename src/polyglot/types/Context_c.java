@@ -6,21 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import polyglot.main.Report;
-import polyglot.types.ClassType;
-import polyglot.types.CodeInstance;
-import polyglot.types.Context;
-import polyglot.types.FieldInstance;
-import polyglot.types.ImportTable;
-import polyglot.types.LocalInstance;
-import polyglot.types.MethodInstance;
-import polyglot.types.Named;
-import polyglot.types.NoMemberException;
-import polyglot.types.ParsedClassType;
-import polyglot.types.ReferenceType;
-import polyglot.types.Resolver;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
-import polyglot.types.VarInstance;
+import polyglot.types.*;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 
@@ -465,7 +451,8 @@ public class Context_c implements Context
 
     public void addMethodContainerToThisScope(MethodInstance mi) {
         if (methods == null) methods = new HashMap();
-        methods.put(mi.name(), mi.container());
+        // methods.put(mi.name(), mi.container());
+        methods.put(mi.name(), currentClass());
     }
 
     public VarInstance findVariableInThisScope(String name) {
