@@ -113,6 +113,7 @@
       <classpath refid="standard.classpath"/>
       <arg line="${ppg.file}"/>
     </java>
+    <antcall target="cup-parser"/>
   </target>
 
   <!-- Set the property ppg.parser.up-to-date if the parser is in fact
@@ -121,10 +122,19 @@
   <target name="ppg-parser-deps">
     <dependset>
       <srcfileset dir="${parser.dir}" includes="${ppg.file}"/>
-      <targetfileset dir="${parser.dir}" includes="${cup.file}"/>
+      <targetfileset dir="${parser.dir}">
+        <include name="${cup.file}"/>
+        <include name="${parser.class}.java"/>
+	<include name="${symbol.class}.java"/>
+      </targetfileset>
     </dependset>
-    <available property="ppg.parser.up-to-date" 
-               file="${parser.dir}/${cup.file}"/>
+    <condition property="ppg.parser.up-to-date">
+      <and>
+        <available file="${parser.dir}/${cup.file}"/>
+        <available file="${parser.dir}/${parser.class}.java"/>
+        <available file="${parser.dir}/${symbol.class}.java"/>	   
+      </and>	       
+    </condition>
   </target>
 
   <!-- Build a CUP parser based on parameters supplied to the target.
@@ -252,10 +262,6 @@
       <param name="parser.dir" value="polyglot/ext/${ext}/qq"/>
       <param name="ppg.file" value="qq.ppg"/>
       <param name="cup.file" value="qq_ppg.cup"/>
-    </antcall>
-    <antcall target="cup-parser">
-      <param name="parser.dir" value="polyglot/ext/${ext}/qq"/>
-      <param name="cup.file" value="qq_ppg.cup"/>
       <param name="parser.class" value="Grm"/>
       <param name="symbol.class" value="sym"/>
     </antcall>
@@ -270,10 +276,6 @@
     <antcall target="ppg-parser">
       <param name="parser.dir" value="polyglot/ext/${ext}/parse"/>
       <param name="ppg.file" value="${ext}.ppg"/>
-      <param name="cup.file" value="${ext}_ppg.cup"/>
-    </antcall>
-    <antcall target="cup-parser">
-      <param name="parser.dir" value="polyglot/ext/${ext}/parse"/>
       <param name="cup.file" value="${ext}_ppg.cup"/>
       <param name="parser.class" value="Grm"/>
       <param name="symbol.class" value="sym"/>
