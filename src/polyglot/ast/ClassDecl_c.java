@@ -4,34 +4,14 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import polyglot.ast.ClassBody;
-import polyglot.ast.ClassDecl;
-import polyglot.ast.ConstructorDecl;
-import polyglot.ast.Node;
-import polyglot.ast.NodeFactory;
-import polyglot.ast.Term;
-import polyglot.ast.TypeNode;
+import polyglot.ast.*;
 import polyglot.main.Report;
-import polyglot.types.ClassType;
-import polyglot.types.ConstructorInstance;
-import polyglot.types.Context;
-import polyglot.types.Flags;
-import polyglot.types.Named;
-import polyglot.types.ParsedClassType;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.types.TypeSystem;
+import polyglot.types.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
 import polyglot.util.TypedList;
-import polyglot.visit.AddMemberVisitor;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.CFGBuilder;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeBuilder;
-import polyglot.visit.TypeChecker;
+import polyglot.visit.*;
 
 /**
  * A <code>ClassDecl</code> is the definition of a class, abstract class,
@@ -307,12 +287,19 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     protected Node addDefaultConstructor(TypeSystem ts, NodeFactory nf) {
         ConstructorInstance ci = ts.defaultConstructor(position(), this.type);
         this.type.addConstructor(ci);
+        Block block = null;
+        if (this.type.superType() == null) {
+            block = nf.Block(position());
+        }
+        else {
+            block = nf.Block(position(),
+                            nf.SuperCall(position(), 
+                                         Collections.EMPTY_LIST));
+        }
         ConstructorDecl cd = nf.ConstructorDecl(position(), Flags.PUBLIC,
                                                 name, Collections.EMPTY_LIST,
                                                 Collections.EMPTY_LIST,
-                                                nf.Block(position(),
-                                                nf.SuperCall(position(), 
-                                                             Collections.EMPTY_LIST)));
+                                                block);
         cd = (ConstructorDecl) cd.constructorInstance(ci);
         return body(body.addMember(cd));
     }
