@@ -12,7 +12,7 @@ import java.util.*;
 
 public class PaoCastExt_c extends PaoExt_c {
     // Insert boxing and unboxing code.
-    public Node rewrite(PaoTypeSystem ts, PaoNodeFactory nf) {
+    public Node rewrite(PaoTypeSystem ts, NodeFactory nf) {
 
         Cast c = (Cast) node();
         Type rtype = c.expr().type();

@@ -10,5 +10,5 @@ import polyglot.visit.*;
 import polyglot.util.*;
 
 public interface PaoExt extends Ext {
-    public Node rewrite(PaoTypeSystem ts, PaoNodeFactory nf);
+    public Node rewrite(PaoTypeSystem ts, NodeFactory nf);
 }

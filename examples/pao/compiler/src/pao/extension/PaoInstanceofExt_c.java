@@ -10,7 +10,7 @@ import polyglot.visit.*;
 import polyglot.util.*;
 
 public class PaoInstanceofExt_c extends PaoExt_c {
-  public Node rewrite(PaoTypeSystem ts, PaoNodeFactory nf) {
+  public Node rewrite(PaoTypeSystem ts, NodeFactory nf) {
       Instanceof n = (Instanceof) node();
       Type rtype = n.compareType().type();
 

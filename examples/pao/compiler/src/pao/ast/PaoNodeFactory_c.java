@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * NodeFactory for pao extension.
  */
-public class PaoNodeFactory_c extends NodeFactory_c implements PaoNodeFactory {
+public class PaoNodeFactory_c extends NodeFactory_c {
     public PaoNodeFactory_c() {
         super(new PaoExtFactory_c());
     }

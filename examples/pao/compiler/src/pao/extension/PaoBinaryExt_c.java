@@ -11,7 +11,7 @@ import polyglot.util.*;
 
 public class PaoBinaryExt_c extends PaoExt_c {
     // Rewrite == and != to invoke Primitive.equals(o, p).
-    public Node rewrite(PaoTypeSystem ts, PaoNodeFactory nf) {
+    public Node rewrite(PaoTypeSystem ts, NodeFactory nf) {
         Binary b = (Binary) node();
         Expr l = b.left();
         Expr r = b.right();

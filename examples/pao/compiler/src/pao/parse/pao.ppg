@@ -3,17 +3,16 @@ include "../../jl/parse/java12.cup"
 package polyglot.ext.pao.parse;
 
 import polyglot.ext.pao.types.PaoTypeSystem;
-import polyglot.ext.pao.ast.PaoNodeFactory;
 import polyglot.ext.jl.parse.Name;
 
 parser Grm extends polyglot.ext.jl.parse.Grm {:
 	public final PaoTypeSystem ts;
-	public final PaoNodeFactory nf;
+	public final NodeFactory nf;
 
 	public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
                 super(l,t,n,q);
 		ts = (PaoTypeSystem) t;
-		nf = (PaoNodeFactory) n;
+		nf = n;
 	}
 :};
 

@@ -42,7 +42,7 @@ public class PaoBoxer extends AscriptionVisitor
 
         if (n.ext() instanceof PaoExt) {
             return ((PaoExt) n.ext()).rewrite((PaoTypeSystem) typeSystem(),
-                                              (PaoNodeFactory) nodeFactory());
+                                              nodeFactory());
         }
 
         return n;

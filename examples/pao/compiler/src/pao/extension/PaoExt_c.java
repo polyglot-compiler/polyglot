@@ -10,7 +10,7 @@ import polyglot.visit.*;
 import polyglot.util.*;
 
 public class PaoExt_c extends Ext_c implements PaoExt {
-    public Node rewrite(PaoTypeSystem ts, PaoNodeFactory nf) {
+    public Node rewrite(PaoTypeSystem ts, NodeFactory nf) {
         return node();
     }
 }
