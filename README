@@ -1,4 +1,6 @@
-jltools 0.8
+JLtools 0.9
+		    JLtools Extensible Compiler Toolkit
+
 Build Instructions
 ------------------
 
@@ -10,7 +12,37 @@ On Unix, do:
 	sh ./configure
 	make
 
-On NT, you will need the Cygnus tools.  While running sh, do:
+On NT, you will need the Cygwin environment. While running sh, do:
 
 	sh ./configure
 	make
+    
+For more information:
+---------------------
+
+For information on specific Java language extensions included with
+this release (e.g. Jif, PolyJ, etc.), see the appropriate README-*
+file in this directory.
+
+
+Restrictions on distribution
+----------------------------
+
+This release of the JLtools distribution is governed by the GPL
+license as described by the following copyright notice.
+
+JLtools extensible compiler toolkit
+Copyright (C) 2000-2001 JLtools project group, Cornell University
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+A copy of the GNU General Public License can be found in the file
+LICENSE, included in this distribution.

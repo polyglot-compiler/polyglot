@@ -19,6 +19,9 @@ clean:
 classes:
 	mkdir classes
 
+bin:
+	mkdir bin
+
 clobber:
 	-rm -rf $(JAVADOC_OUTPUT)
 	-rm -f $(JAR_FILE)
@@ -81,4 +84,3 @@ jar: all
 	$(JAR) $(JAR_FLAGS) ../$(JAR_FILE) `find jltools -name \*.class`
 
 FORCE:
-

@@ -17,31 +17,6 @@ import java.util.*;
  */
 public class Compiler
 {
-    /** 
-     * Marks major changes in the output format of the files produced by the
-     * compiler. Files produced be different major versions are considered
-     * incompatible and will not be used as source of class information.
-     */
-    public static int VERSION_MAJOR = 0;
-    
-    /** 
-     * Indicates a change in the compiler that does not affect the output
-     * format.  Source files will be prefered over class files build by
-     * compilers with different minor versions, but if no source file is
-     * available, then the class file will be used.
-     */
-    public static int VERSION_MINOR = 3;
-
-    /**
-     * Denote minor changes and bugfixes to the compiler. Class files compiled
-     * with versions of the compiler that only differ in patchlevel (from the
-     * current instantiation) will always be preferred over source files
-     * (unless the source files have newer modification dates).
-     */
-    public static int VERSION_PATCHLEVEL = 0;
-
-    /* Global options and state. */
-
     /** Command-line options */
     private Options options;
 

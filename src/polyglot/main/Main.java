@@ -125,10 +125,11 @@ public class Main
         System.exit(0);
       }
       else if (args[i].equals("-version")) {
-        System.out.println("jltools Compiler version "
-                           + Compiler.VERSION_MAJOR + "."
-                           + Compiler.VERSION_MINOR + "."
-                           + Compiler.VERSION_PATCHLEVEL);
+	if (options.extension != null)
+	    System.out.println(options.extension.compilerName() +
+		" version " + options.extension.version());
+        System.out.println("JLtools compiler toolkit version " +
+	    new jltools.ext.jl.Version());
         System.exit(0);
       }
       else if (args[i].equals("-d"))

@@ -35,7 +35,11 @@ public interface ExtensionInfo {
     /** The name of the compiler for usage messages */
     String compilerName();
 
-    /** Options accepted by the extension. Newline terminated if non-empty */
+    /** Report the version of the extension. */
+    jltools.main.Version version();
+
+    /** Report the options accepted by the extension.
+        Output is newline-terminated if non-empty. */
     String options();
 
     /**

@@ -49,6 +49,9 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
     public String options() {
 	return "";
     }
+    public jltools.main.Version version() {
+	return new Version();
+    }
 
     /** By default, don't parse anything */
     public int parseCommandLine(String args[], int index, Options options)
