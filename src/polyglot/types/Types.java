@@ -17,4 +17,11 @@ public class Types
     public static void report(int level, String msg) {
         polyglot.main.Report.report(topics, level, msg);
     }
+
+    /**
+     * Return true if we should print debug messages with topic "types".
+     */
+    public static boolean should_report(int level) {
+        return polyglot.main.Report.should_report(topics, level);
+    }
 }
