@@ -28,7 +28,7 @@ public class ExtensionInfo extends jltools.ext.jl.ExtensionInfo {
     }
 
     protected NodeFactory createNodeFactory() {
-        return new CarrayNodeFactory();
+        return new CarrayNodeFactory_c();
     }
     protected TypeSystem createTypeSystem() {
         return new CarrayTypeSystem();

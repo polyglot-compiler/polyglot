@@ -33,7 +33,7 @@ package jltools.ext.carray.parse;
 
 import java_cup.runtime.Symbol;
 import jltools.lex.*;
-import jltools.ext.op.sym;
+import jltools.ext.carray.parse.sym;
 import jltools.util.Position;
 import jltools.util.ErrorQueue;
 import jltools.util.ErrorInfo;

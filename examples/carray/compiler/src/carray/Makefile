@@ -1,7 +1,6 @@
 SOURCE = ../../..
 PACKAGE = jltools/ext/carray
-#SUBDIRS = parse ast extension visit types
-# runtime util wrappers
+SUBDIRS = parse ast types
 
 include $(SOURCE)/Rules.mk
 
@@ -11,23 +10,16 @@ SOURCES = \
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
-
 all: parse $(CLASSES)
 	$(subdirs)
 
 parse: FORCE
 	$(MAKE) -C parse all
 
+release: release_src
+	$(subdirs)
+
+clean clobber: cleanclasses
+	$(subdirs)
+
 FORCE:
-
-
-
-
-
-
-
-
-
-
-
-
