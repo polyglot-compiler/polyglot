@@ -27,4 +27,10 @@ public interface IntLit extends NumLit
 
     /** Set the kind of the literal: INT or LONG. */
     IntLit kind(Kind kind);
+
+    /** Is this a boundary case, i.e., max int or max long + 1? */
+    boolean boundary();
+
+    /** Print the string as a positive number. */
+    String positiveToString();
 }

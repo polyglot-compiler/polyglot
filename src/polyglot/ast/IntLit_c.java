@@ -23,7 +23,7 @@ public class IntLit_c extends NumLit_c implements IntLit
      * @return True if this is a boundary case: the literal can only appear
      * as the operand of a unary minus.
      */
-    protected boolean boundary() {
+    public boolean boundary() {
         return (kind == INT && (int) value == Integer.MIN_VALUE)
             || (kind == LONG && value == Long.MIN_VALUE);
     }
@@ -69,7 +69,7 @@ public class IntLit_c extends NumLit_c implements IntLit
 	}
     }
 
-    public String toString() {
+    public String positiveToString() {
 	if (kind() == LONG) {
             if (boundary()) {
                 // the literal is negative, but print it as positive.
@@ -87,6 +87,15 @@ public class IntLit_c extends NumLit_c implements IntLit
             else {
                 return Long.toString(value);
             }
+	}
+    }
+
+    public String toString() {
+	if (kind() == LONG) {
+            return Long.toString(value) + "L";
+	}
+	else {
+            return Long.toString(value);
 	}
     }
 

@@ -164,7 +164,10 @@ public class Unary_c extends Expr_c implements Unary
 
     /** Check exceptions thrown by the statement. */
     public String toString() {
-        if (op.isPrefix()) {
+        if (op == NEG && expr instanceof IntLit && ((IntLit) expr).boundary()) {
+            return op.toString() + ((IntLit) expr).positiveToString();
+        }
+        else if (op.isPrefix()) {
 	    return op.toString() + expr.toString();
 	}
 	else {
@@ -173,7 +176,11 @@ public class Unary_c extends Expr_c implements Unary
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        if (op.isPrefix()) {
+        if (op == NEG && expr instanceof IntLit && ((IntLit) expr).boundary()) {
+	    w.write(op.toString());
+            w.write(((IntLit) expr).positiveToString());
+        }
+        else if (op.isPrefix()) {
 	    w.write(op.toString());
 	    printSubExpr(expr, false, w, tr);
 	}
