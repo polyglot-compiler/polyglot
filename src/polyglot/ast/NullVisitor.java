@@ -81,6 +81,16 @@ public class NullVisitor implements NodeVisitor {
     return cs;
   }
 
+  public Node visitClassDeclarationStatement(ClassDeclarationStatement cs) {
+    cs.visitChildren(this);
+    return cs;
+  }
+
+  public Node visitSwitchStatement(SwitchStatement ss) {
+    ss.visitChildren(this);
+    return ss;
+  }
+
   public Node visitTryStatement (TryStatement ts) {
     ts.visitChildren(this);
     return ts;

@@ -42,6 +42,8 @@ public interface NodeVisitor {
   public Node visitLabelledStatement(LabelledStatement ss);
   public Node visitBranchStatement(BranchStatement bs);
   public Node visitConstructorCallStatement(ConstructorCallStatement cs);
+  public Node visitClassDeclarationStatement(ClassDeclarationStatement cs);
+  public Node visitSwitchStatement(SwitchStatement ss);
   public Node visitTryStatement(TryStatement ts);
 
   public Node visitCatchBlock(CatchBlock cb);

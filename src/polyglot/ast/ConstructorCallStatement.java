@@ -117,7 +117,7 @@ public class ConstructorCallStatement extends Statement {
 
   public Node deepCopy() {
     List newArgumentList = new ArrayList(argumentList.size());
-    for (ListIterator it = newArgumentList.listIterator(); it.hasNext(); ) {
+    for (ListIterator it = argumentList.listIterator(); it.hasNext(); ) {
       Expression e = (Expression) it.next();
       newArgumentList.add(e.deepCopy());
     }
