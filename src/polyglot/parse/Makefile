@@ -1,22 +1,23 @@
+SOURCE = ../..
+PACKAGE = jltools.parse
+SUBDIRS =
 
-prs_package	= jltools/parse
-prs_codebase	= ../..
-prs_files 	= Grm.java sym.java
+SOURCES = \
+	Grm.java \
+	sym.java
 
-PARSE_GEN    = $(patsubst %.java, $(prs_package)/%.java, $(prs_files))
-PARSE_TARGET = $(patsubst %.java, $(prs_package)/%.class, $(prs_files))
+CLASSES = $(patsubst %.java, %.class, $(SOURCES))
 
-ifndef CALLED_FROM_PARENT
-all:	
-	cd ../.. && $(MAKE) parse
-%:
-	cd ../.. && $(MAKE) $@
-endif
+include $(SOURCE)/Rules.mk
 
-$(prs_package)/Grm.class: $(prs_package)/Grm.java
-$(prs_package)/sym.class: $(prs_package)/sym.java
+all: $(CLASSES)
 
-$(prs_package)/Grm.java $(prs_package)/sym.java:  $(prs_package)/java12.cup
-	cd $(prs_package) && awk 'BEGIN {FS = "\n"; s = 1} \
-		{print $$1, "\t // ", s++}' java12.cup | \
-		$(JAVA) $(CLASSPATHFLAG) java_cup.Main -parser Grm 
+clean:
+	-rm -f *.class 
+
+clobber:
+	-rm -f *.class 
+	-rm -f Grm.java sym.java
+
+Grm.java sym.java: java12.cup
+	$(yacc)

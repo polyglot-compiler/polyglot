@@ -1,38 +1,39 @@
+SOURCE = ../..
+PACKAGE = jltools.util
+SUBDIRS =
 
-utl_package	= jltools/util
-utl_codebase	= ../..
-utl_files 	= Annotate.java \
-		  AnnotatedObject.java \
-		  Assert.java \
-		  BitVector.java \
-		  CodeWriter.java \
-		  ConcatenatedIterator.java \
-		  ErrorInfo.java \
-		  ErrorQueue.java \
-		  ErrorLimitError.java \
-		  FilteringIterator.java \
-		  InternalCompilerError.java \
-		  NestedMap.java \
-		  NilMap.java \
-		  Predicate.java \
-		  SubtypeSet.java \
-		  Transformation.java \
-		  TransformingIterator.java \
-		  TypedList.java \
-		  TypedListIterator.java \
-		  TypeInputStream.java \
-		  TypeOutputStream.java \
-		  TypeEncoder.java \
-		  UnicodeWriter.java \
-		  UniqueID.java \
-		  WorkList.java \
+SOURCES = \
+	Annotate.java \
+	AnnotatedObject.java \
+	Assert.java \
+	BitVector.java \
+	CodeWriter.java \
+	ConcatenatedIterator.java \
+	ErrorInfo.java \
+	ErrorLimitError.java \
+	ErrorQueue.java \
+	FilteringIterator.java \
+	InternalCompilerError.java \
+	NestedMap.java \
+	NilMap.java \
+	Predicate.java \
+	SubtypeSet.java \
+	Transformation.java \
+	TransformingIterator.java \
+	TypeEncoder.java \
+	TypeInputStream.java \
+	TypeOutputStream.java \
+	TypedList.java \
+	TypedListIterator.java \
+	UnicodeWriter.java \
+	UniqueID.java \
+	WorkList.java
 
+CLASSES = $(patsubst %.java, %.class, $(SOURCES))
 
-UTIL_TARGET = $(patsubst %.java, $(utl_package)/%.class, $(utl_files))
+include $(SOURCE)/Rules.mk
 
-ifndef CALLED_FROM_PARENT
-all:	
-	cd ../.. && $(MAKE) util
-%:
-	cd ../.. && $(MAKE) $@
-endif
+all: $(CLASSES)
+
+clean clobber:
+	-rm -f *.class
