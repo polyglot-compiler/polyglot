@@ -185,6 +185,18 @@ public class Cast_c extends Expr_c implements Cast
             if (castType.type().isByte()) return new Byte((byte) vv);
         }
 
+        if (v instanceof Character) {
+            char vv = ((Character) v).charValue();
+
+            if (castType.type().isDouble()) return new Double((double) vv);
+            if (castType.type().isFloat()) return new Float((float) vv);
+            if (castType.type().isLong()) return new Long((long) vv);
+            if (castType.type().isInt()) return new Integer((int) vv);
+            if (castType.type().isChar()) return new Character((char) vv);
+            if (castType.type().isShort()) return new Short((short) vv);
+            if (castType.type().isByte()) return new Byte((byte) vv);
+        }
+
         // not a constant
         return null;
     }

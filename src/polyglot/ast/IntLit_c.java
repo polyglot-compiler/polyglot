@@ -60,7 +60,12 @@ public class IntLit_c extends NumLit_c implements IntLit
     }
 
     public String toString() {
-	return Long.toString(value);
+	if (kind() == LONG) {
+            return Long.toString(value) + "L";
+        }
+        else {
+            return Long.toString(value);
+        }
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
@@ -77,6 +82,11 @@ public class IntLit_c extends NumLit_c implements IntLit
     }
 
     public Object constantValue() {
-      return new Integer((int) value);
+	if (kind() == LONG) {
+            return new Long(value);
+	}
+	else {
+            return new Integer((int) value);
+	}
     }
 }
