@@ -6,6 +6,7 @@ import polyglot.util.InternalCompilerError;
 import java.io.*;
 import java.util.*;
 import java.util.zip.*;
+import java.util.jar.*;
 
 /**
  * We implement our own class loader.  All this pain is so
@@ -20,6 +21,11 @@ public class ClassFileLoader
     Map zipCache;
 
     /**
+     * A cache of directories found in zip files.
+     */
+    Set packageCache;
+
+    /**
      * Directory contents cache. Cache the first level of the directory
      * so that we get less FileNotFoundExceptions
      */
@@ -30,6 +36,7 @@ public class ClassFileLoader
     public ClassFileLoader() {
         this.zipCache = new HashMap();
         this.dirContentsCache = new HashMap();
+	this.packageCache = new HashSet();
     }
 
     /**
@@ -46,35 +53,17 @@ public class ClassFileLoader
             if (dir.getName().endsWith(".jar") ||
                 dir.getName().endsWith(".zip")) {
 
-                ZipFile zip = loadZip(dir);
-
                 String entryName = name.replace('.', '/');
+		
+		if (packageCache.contains(entryName)) {
+		    return true;
+		}
 
-		// Try to find the entry with and without a leading "/".
-                ZipEntry e = zip.getEntry(entryName);
-
-                if (e != null && e.isDirectory()) {
-                    return true;
-                }
-                else {
-                    e = zip.getEntry(entryName + "/");
-                    return e != null;
-                }
-
-                /*
-                // ZipFile.getEntry() one returns file entries.
-                // Walk through the entries to see if the directory
-                // is there.
-
-                for (Enumeration i = zip.entries(); i.hasMoreElements(); ) {
-                    ZipEntry e = (ZipEntry) i.nextElement();
-                    if (e.getName().startsWith(entryName + "/")) {
-                        return true;
-                    }
-                }
-
-                return false;
-                */
+		// load the zip file, forcing the package cache to be initialized
+		// with its contents.
+                loadZip(dir);
+    		
+		return packageCache.contains(entryName);
 	    }
             else {
                 String entryName = name.replace('.', File.separatorChar);
@@ -145,8 +134,26 @@ public class ClassFileLoader
                     // get the zip and put it in the cache.
                     if (Report.should_report(verbose, 2))
                         Report.report(2, "Opening zip " + dir);
-                    zip = new ZipFile(dir);
-                    zipCache.put(dir, zip);
+		    if (dir.getName().endsWith(".jar")) {
+			zip = new JarFile(dir);
+		    }
+		    else {
+			zip = new ZipFile(dir);
+		    }
+		    zipCache.put(dir, zip);
+		    
+		    // Load the package cache.
+		    for (Enumeration i = zip.entries(); i.hasMoreElements(); ) {
+			ZipEntry ei = (ZipEntry) i.nextElement();
+			String n = ei.getName();
+			
+			int index = n.indexOf('/');
+			while (index >= 0) {
+			    packageCache.add(n.substring(0, index));
+			    index = n.indexOf('/', index+1);
+			}
+		    }
+		    
                     return zip;
                 }
             }
