@@ -129,8 +129,8 @@ to create jar files in the lib directory for Polyglot and for each extension.
 4. Update PATH and CLASSPATH.
 
 Add $POLYGLOT/bin to your PATH environment variable.  Add
-$POLYGLOT/classes (or $POLYGLOT/polyglot.jar) and $POLYGLOT/java_cup.jar
-to your CLASSPATH.
+$POLYGLOT/classes (or $POLYGLOT/lib/polyglot.jar) and
+$POLYGLOT/lib/java_cup.jar to your CLASSPATH.
 
 5. You are now ready create your own extensions to Java.  See
 doc/Overview.txt for instructions on building an extension.  See the
