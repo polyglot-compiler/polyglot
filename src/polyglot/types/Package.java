@@ -15,9 +15,4 @@ public interface Package extends Qualifier, Named
      * @param c A resolver in which to look up the package.
      */
     String translate(Resolver c);
-
-    /**
-     * Return true if <code>this</code> is the same package as <code>p</code>.
-     */
-    boolean equals(Package p);
 }

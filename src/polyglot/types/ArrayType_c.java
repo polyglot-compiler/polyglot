@@ -136,7 +136,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	return base().hashCode() << 1;
     }
 
-    protected boolean equalsImpl(TypeObject t) {
+    public boolean equalsImpl(TypeObject t) {
         if (t instanceof ArrayType) {
             ArrayType a = (ArrayType) t;
             return ts.equals(base(), a.base());

@@ -35,5 +35,5 @@ public interface TypeObject extends Copy, Serializable
      * @see polyglot.ext.jl.TypeObject_c#equalsImpl(TypeObject)
      * @see java.lang.Object#hashCode()
      */
-    boolean equals(Object t);
+    boolean equalsImpl(TypeObject t);
 }

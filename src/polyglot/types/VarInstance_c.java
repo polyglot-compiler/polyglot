@@ -50,7 +50,7 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
         return flags.hashCode() + name.hashCode();
     }
 
-    protected boolean equalsImpl(Object o) {
+    public boolean equalsImpl(TypeObject o) {
         if (o instanceof VarInstance) {
 	    VarInstance i = (VarInstance) o;
 	    return flags.equals(i.flags())

@@ -2,6 +2,7 @@ package polyglot.ext.jl.types;
 
 import polyglot.types.*;
 import polyglot.util.*;
+import polyglot.main.Report;
 import java.util.*;
 
 /**
@@ -76,12 +77,12 @@ public class MethodInstance_c extends ProcedureInstance_c
 	return flags.hashCode() + name.hashCode();
     }
 
-    protected boolean equalsImpl(Object o) {
+    public boolean equalsImpl(TypeObject o) {
         if (o instanceof MethodInstance) {
 	    MethodInstance i = (MethodInstance) o;
 	    return ts.equals(returnType, i.returnType())
 	        && name.equals(i.name())
-		&& super.equals(i);
+		&& super.equalsImpl(i);
 	}
 
 	return false;
@@ -183,22 +184,36 @@ public class MethodInstance_c extends ProcedureInstance_c
         MethodInstance mi = this;
 
         if (! ts.equals(mi.returnType(), mj.returnType())) {
+            if (Report.should_report(Report.types, 3))
+                Report.report(3, "return type " + mi.returnType() +
+                              " != " + mj.returnType());
             return false;
         } 
 
         if (! ts.throwsSubset(mi, mj)) {
+            if (Report.should_report(Report.types, 3))
+                Report.report(3, mi.throwTypes() + " not subset of " +
+                              mj.throwTypes());
             return false;
         }   
 
         if (mi.flags().moreRestrictiveThan(mj.flags())) {
+            if (Report.should_report(Report.types, 3))
+                Report.report(3, mi.flags() + " more restrictive than " +
+                              mj.flags());
             return false;
         }
 
         if (! mi.flags().isStatic() && mj.flags().isStatic()) {
+            if (Report.should_report(Report.types, 3))
+                Report.report(3, mi.flags() + " not static but " +
+                              mj.flags() + " static");
             return false;
         }
 
         if (mj.flags().isFinal()) {
+            if (Report.should_report(Report.types, 3))
+                Report.report(3, mj.flags() + " final");
             return false;
         }
 

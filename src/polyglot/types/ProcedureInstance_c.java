@@ -49,7 +49,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         return container.hashCode() + flags.hashCode();
     }
 
-    protected boolean equalsImpl(Object o) {
+    public boolean equalsImpl(TypeObject o) {
         if (o instanceof ProcedureInstance) {
 	    ProcedureInstance i = (ProcedureInstance) o;
 	    // FIXME: Check excTypes too?

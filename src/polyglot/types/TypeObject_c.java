@@ -68,7 +68,13 @@ public abstract class TypeObject_c implements TypeObject
     /**
      * Default implementation is pointer equality.
      */
-    protected boolean equalsImpl(TypeObject t) {
+    public boolean equalsImpl(TypeObject t) {
         return t == this;
     }
+
+    /**
+     * Overload equalsImpl to find inadvertant overridding errors.
+     * Make package-scope and void to break callers.
+     */ 
+    void equalsImpl(Object o) { }
 }

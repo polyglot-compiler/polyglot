@@ -69,9 +69,9 @@ public class ConstructorInstance_c extends ProcedureInstance_c
         return "constructor";
     }
 
-    protected boolean equalsImpl(Object o) {
+    public boolean equalsImpl(TypeObject o) {
         if (! (o instanceof ConstructorInstance) ) return false;
-        return super.equals(o);
+        return super.equalsImpl(o);
     }
 
     public boolean isCanonical() {

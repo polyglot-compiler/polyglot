@@ -52,7 +52,7 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
             return kind.hashCode();
     }
 
-    protected boolean equalsImpl(TypeObject t) {
+    public boolean equalsImpl(TypeObject t) {
         if (t instanceof PrimitiveType) {
             PrimitiveType p = (PrimitiveType) t;
             return kind() == p.kind();

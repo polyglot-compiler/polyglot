@@ -24,7 +24,7 @@ public class NullType_c extends Type_c implements NullType
 	return "type(null)";
     }
     
-    protected boolean equalsImpl(TypeObject t) {
+    public boolean equalsImpl(TypeObject t) {
         return t instanceof NullType;
     }
 

@@ -25,7 +25,7 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
         return base.toString() + (isConst ? " const" : "") + "[]";
     }
 
-    protected boolean equalsImpl(Object o) {
+    public boolean equalsImpl(TypeObject o) {
         if (o instanceof ConstArrayType) {
             ConstArrayType t = (ConstArrayType) o;
             return t.isConst() == isConst && ts.equals(base, t.base());
