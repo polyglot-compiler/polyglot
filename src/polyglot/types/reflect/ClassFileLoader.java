@@ -14,12 +14,6 @@ import java.util.jar.*;
 public class ClassFileLoader
 {
     /**
-     * Map from directories to maps from names to ClassFiles
-     * Map[File -> Map[String -> (ClassFile or not_found)]]
-     */
-    Map cache;
-    
-    /**
      * Keep a cache of the zips and jars so we don't have to keep 
      * opening them from the file system. 
      */
@@ -28,7 +22,6 @@ public class ClassFileLoader
     final static Object not_found = new Object();
 
     public ClassFileLoader() {
-        this.cache = new HashMap();
         this.jarCache = new HashMap();
     }
 
@@ -40,52 +33,6 @@ public class ClassFileLoader
      */
     public ClassFile loadClass(File dir, String name)
     {
-        if (Report.should_report(verbose, 2))
-	    Report.report(2, "attempting to load class " + name +
-                      " from " + dir);
-
-        Map dirMap = (Map)cache.get(dir);
-        if (dirMap == null) {
-            dirMap = new HashMap();
-            cache.put(dir, dirMap);
-        }
-        
-        Object o = dirMap.get(name);
-
-        if (o != not_found) {
-            ClassFile c = (ClassFile) o;
-
-            if (c != null) {
-                if (Report.should_report(verbose, 3))
-		    Report.report(3, "already loaded " + c.name());
-                return c;
-            }
-
-            c = findClass(dir, name);
-
-            // We cache here since more than one type system may attempt
-            // to load the same class file.  But, we use a weak hash map
-            // to allow garbage collection of ClassFiles when we need it.
-            if (c != null) {
-                if (Report.should_report(verbose, 2))
-		    Report.report(2, "loaded class " + c.name());
-                dirMap.put(name, c);
-                return c;
-            }
-
-            dirMap.put(name, not_found);
-        }
-
-        return null;
-    }
-
-    /**
-     * Try to find the class <code>name</code> in the directory or jar or zip 
-     * file <code>dir</code>.
-     * If the class does not exist in the specified file/directory, then 
-     * <code>null</code> is returned.
-     */
-    protected ClassFile findClass(File dir, String name) {
         if (Report.should_report(verbose, 3)) {
 	    Report.report(3, "looking in " + dir + " for " + 
                              name.replace('.', File.separatorChar) + ".class");
