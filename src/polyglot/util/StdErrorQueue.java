@@ -10,7 +10,6 @@ public class StdErrorQueue implements ErrorQueue
 {
     private PrintStream err;
 
-    private boolean hasErrors;
     private int errorCount;
     private boolean flushed;
     private int limit;
@@ -19,7 +18,6 @@ public class StdErrorQueue implements ErrorQueue
     public StdErrorQueue(PrintStream err, int limit, String name) {
 	this.err = err;
 	this.errorCount = 0;
-	this.hasErrors = false;
 	this.flushed = true;
 	this.limit = limit;
 	this.name = name;
@@ -35,7 +33,6 @@ public class StdErrorQueue implements ErrorQueue
 
     public void enqueue(ErrorInfo e) {
 	if (e.getErrorKind() != ErrorInfo.WARNING) {
-	    hasErrors = true;
 	    errorCount++;
 	}
 
@@ -191,7 +188,7 @@ public class StdErrorQueue implements ErrorQueue
     }
 
     public boolean hasErrors() {
-      return hasErrors;
+      return errorCount > 0;
     }
 
     public int errorCount() {

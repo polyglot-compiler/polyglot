@@ -7,6 +7,7 @@ include $(SOURCE)/Rules.mk
 SOURCES = \
 	Assert.java \
 	BitVector.java \
+	IdentityKey.java \
 	CachingTransformingList.java \
 	CodeWriter.java \
 	Copy.java \
