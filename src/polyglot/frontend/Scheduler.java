@@ -603,6 +603,8 @@ public abstract class Scheduler {
     public abstract Goal Serialized(Job job);
     public abstract Goal CodeGenerated(Job job);
     
+    public abstract Goal InnerTranslated(Job job);
+    
     /** Return all compilation units currently being compiled. */
     public Collection jobs() {
         ArrayList l = new ArrayList(jobs.size());

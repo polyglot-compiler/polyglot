@@ -123,4 +123,10 @@ public class JLScheduler extends Scheduler {
     public Goal CodeGenerated(Job job) {
         return internGoal(new CodeGenerated(job));
     }
+    
+    public Goal InnerTranslated(Job job) {
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        return internGoal(new VisitorGoal(job, new InnerTranslator(ts, nf)));
+    }
 }
