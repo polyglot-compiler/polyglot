@@ -100,7 +100,8 @@ polyglot.ext.jl.ExtensionInfo {
         BadIncrement3.jl (Semantic, "Operand of .* operator must be a variable");
         BadIncrement4.jl (Semantic, "Operand of .* operator must be a variable");
 
-        BadInit.jl (Semantic, "Method .* not found");
+        BadInit.jl (Semantic, "Method .* not found"),
+                   (Semantic, "Method .* not found");
         BadInner.jl (Semantic, "Could not find non-static member class");
         BadInner2.jl (Semantic, "Cannot specify a containing instance for static classes"),
                      (Semantic, "Cannot specify a containing instance for static classes");
@@ -117,7 +118,8 @@ polyglot.ext.jl.ExtensionInfo {
 	BadOverride.jl (Semantic, "cannot override.*attempting to assign weaker access privileges");
 	BadPrim.jl (Semantic, "No valid method call found"); 
 	BadProt.jl (Semantic, "Interface methods must be public");
-	BadStaticContext.jl (Semantic);        BadSwitch1.jl (Semantic, "Case label must be an integral constant");
+	BadStaticContext.jl (Semantic); 
+        BadSwitch1.jl (Semantic, "Case label must be an integral constant");
 	BadSwitch2.jl (Semantic, "Duplicate case label");
 	CircularConstructor.jl (Semantic, "Recursive constructor invocation");
 	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
