@@ -4,6 +4,7 @@ import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
 import java.util.*;
+import jltools.frontend.VisitorPass;
 
 
 /**
@@ -153,21 +154,6 @@ public class MethodExpression extends Expression
     return reconstruct( Node.condVisit(this.ext, v),newTarget, name, newArgs);
   }
 
-  public Node removeAmbiguities( LocalContext c)
-  {
-    //FIXME: should this be rectified in the grammar and not here?
-    // i.e, should name always come in as a short name?
-    if( !c.getTypeSystem().getPackageComponent(name).equals( ""))
-    {
-      Node n = reconstruct( this.ext, new AmbiguousNameExpression( 
-                                c.getTypeSystem().getPackageComponent( name)),
-                          c.getTypeSystem().getShortNameComponent( name),
-                          args);
-      return n.visit( c.getVisitor());
-    }
-    return this;
-  }
-
   public Node typeCheck( LocalContext c) throws SemanticException
   {
     ReferenceType ct; 
@@ -187,13 +173,13 @@ public class MethodExpression extends Expression
       else {
         throw new SemanticException( "Cannot invoke method \""
 			 + name + "\" on an expression of non-reference type.",
-				  Annotate.getLineNumber(target));
+				  Annotate.getPosition(target));
       }
     }
     else {
       throw new SemanticException( 
 		       "Target of method invocation must be a reference type.",
-				  Annotate.getLineNumber(target));
+				  Annotate.getPosition(target));
     }
 
     List argTypes = new ArrayList( args.size());

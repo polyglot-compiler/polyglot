@@ -8,9 +8,29 @@ import java.util.*;
 import jltools.main.UsageError;
 import jltools.main.Options;
 
+/**
+ * <code>ExtensionInfo</code> is the main interface for defining language
+ * extensions.  The frontend will load the <code>ExtensionInfo</code>
+ * specified on the command-line.  It defines the type system, AST node
+ * factory, parser, and other parameters of a language extension.
+ */
 public interface ExtensionInfo {
-    /** The extension that source files are expected to have */
-    String fileExtension();
+    /** Parse as much of the command line as this extension understands,
+     *  up to the first source file. Return the index of the first
+     *  switch not understood by the extension, or of the first
+     *  source file, or args.length if neither. */
+    int parseCommandLine(String args[], int index, Options options)
+	throws UsageError;
+
+    /**
+     * Initialize the extension with the command-line options.
+     * This must be called before any other method of the extension except
+     * the command-line parsing methods:
+     *     compilerName()
+     *     options()
+     *     parseCommandLine()
+     */
+    void setOptions(Options options) throws UsageError;
 
     /** The name of the compiler for usage messages */
     String compilerName();
@@ -18,37 +38,38 @@ public interface ExtensionInfo {
     /** Options accepted by the extension. Newline terminated if non-empty */
     String options();
 
+    /**
+     * Initialize the extension with a particular compiler.  This must
+     * be called after the compiler is initialized, but before the compiler
+     * starts work.
+     */
+    void initCompiler(jltools.frontend.Compiler compiler);
+
+    /** The default extension that source files are expected to have */
+    String fileExtension();
+
     /** Produce a type system for this language extension. */
-    TypeSystem getTypeSystem();
+    TypeSystem typeSystem();
+    
+    /** Produce a node factory for this language extension. */
+    // NodeFactory nodeFactory();
+    ExtensionFactory extensionFactory();
 
-    /** Produce an extension factory for this language extension. */
-    ExtensionFactory getExtensionFactory();
+    /** Produce a source factory for this language extension. */
+    SourceLoader sourceLoader();
 
-    /** This method, when given a job and a compiler stage (such as Job.CHECKED)
-     * returns a list of NodeVisitors that will be run at the specified
-     * stage of compilation.  For example, the standard compiler runs a 
-     * ConstantFolder visitor after the AmbiguityRemover during the 
-     * Job.DISAMBIGUATE phase, so StandardExtensionInfo returns a list 
-     * containing those two visitors when given the stage Job.DISAMBIGUATE.
-     * The visitors will eventually be run in the order specified in the list
-     */
-    List getNodeVisitors(Compiler c, SourceJob job, int stage);
+    /** Produce a job used to compile the given source. */
+    Job createJob(Source source);
 
-    /** Parse as much of the command line as this extension understands,
-     *  up to the first source file. Return the index of the first
-     *  switch not understood by the extension, or of the first
-     *  source file, or args.length if neither. */
-    int parseCommandLine(String args[], int index, Options options)
-      throws UsageError;
+    /** Produce a target factory for this language extension. */
+    TargetFactory targetFactory();
 
-    /** Return true if all source files should be compiled to 
-     *  stage <code>stage</code> before making further progress.
-     *  The standard is to wait for all classes to be cleaned before 
-     *  typechecking, but the Split extension needs to have all typechecked
-     *  before translating.
-     */
-    boolean compileAllToStage(int stage);
+    /** Get a list of compiler passes for a given job. */
+    Scheduler scheduler();
 
-    /** Construct and return a parser for the extended language. */
-    java_cup.runtime.lr_parser getParser(Reader reader, ErrorQueue eq);
+    /** Create a pass for a particular job. */
+    Pass getPass(Job job, PassID key);
+
+    /** Get a parser for this language extension. */
+    Parser parser(Reader reader, Job job);
 }

@@ -4,8 +4,12 @@
 
 package jltools.types;
 
+import jltools.frontend.Pass;
+
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collection;
+import java.util.ArrayList;
 import jltools.ast.*;
 
 /**
@@ -22,14 +26,13 @@ public abstract class TypeSystem {
   /**
    * performs any initialization necessary that requires resolvers.
    */
-  public abstract void initializeTypeSystem( ClassResolver resolver,
-                                             ClassCleaner cleaner)
+  public abstract void initializeTypeSystem( ClassResolver resolver)
     throws SemanticException;
 
   public abstract String getWrapperTypeString(PrimitiveType t);
 
   public abstract LocalContext getLocalContext( ImportTable it,
-	ExtensionFactory ef, NodeVisitor visitor );
+	ExtensionFactory ef, Pass pass );
 
   public abstract FieldInstance newFieldInstance( String name, Type type,
 	ReferenceType enclosingType, AccessFlags af);
@@ -120,6 +123,12 @@ public abstract class TypeSystem {
    * canonical form of that type.  Otherwise, returns a String
    * describing the error.
    **/
+  public abstract void cleanClass(ClassType type)
+    throws SemanticException;
+  public abstract void cleanSuperTypes(ClassType type, TypeContext context)
+    throws SemanticException;
+  public abstract void cleanClass(ClassType type, TypeContext context)
+    throws SemanticException;
   public abstract Type checkAndResolveType(Type type, TypeContext context)
     throws SemanticException;
   public abstract Type checkAndResolveType(Type type, Type contextType)
@@ -311,6 +320,9 @@ public abstract class TypeSystem {
   public abstract TypeContext getPackageContext(ClassResolver resolver, PackageType type) throws SemanticException;
   public abstract TypeContext getPackageContext(ClassResolver resolver, String name) throws SemanticException;
 
+  public abstract ParsedClassType newParsedClassType(ClassType container);
+  public abstract List defaultPackageImports();
+
   /**
    * return the set of objects that should be serialized into the
    * type information for the given ClassType. 
@@ -326,4 +338,10 @@ public abstract class TypeSystem {
   public abstract String translateArrayType(LocalContext c, ArrayType array);
   public abstract String translateClassType(LocalContext c, ClassType clazz);
   public abstract String translatePrimitiveType(LocalContext c, PrimitiveType prim);
+
+  public static void report(int level, String msg) {
+    Collection c = new ArrayList(1);
+    c.add("types");
+    jltools.main.Main.report(c, level, msg);
+  }
 }

@@ -3,7 +3,7 @@ package jltools.visit;
 import jltools.ast.*;
 import jltools.types.*;
 import jltools.util.*;
-
+import jltools.frontend.Pass;
 
 /**
  * A visitor which traverses the AST and remove ambiguities found in fields,
@@ -16,14 +16,14 @@ public class AmbiguityRemover extends NodeVisitor
   protected LocalContext c;
   protected ImportTable it;
 
-  public AmbiguityRemover( ExtensionFactory ef,
+  public AmbiguityRemover(Pass pass, ExtensionFactory ef,
     TypeSystem ts, ImportTable it, ErrorQueue eq)
   {
     this.ts = ts;
     this.it = it;
     this.eq = eq;
     
-    c = ts.getLocalContext( it, ef, this);
+    c = ts.getLocalContext(it, ef, pass);
   }
 
   public NodeVisitor enter( Node n)
@@ -43,13 +43,13 @@ public class AmbiguityRemover extends NodeVisitor
     }
     catch( SemanticException e)
     {
-      int line = e.getLineNumber();
+      Position position = e.getPosition();
 
-      if( line == SemanticException.INVALID_LINE) {
-	  line = Annotate.getLineNumber( n);
+      if( position == null) {
+	  position = Annotate.getPosition( n);
       }
 
-      eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), line);
+      eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), position);
 
       n.leaveScope( c);
       return n;
@@ -73,7 +73,7 @@ public class AmbiguityRemover extends NodeVisitor
     }
     catch (SemanticException e) {
       eq.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
-		 Annotate.getLineNumber(n));
+		 Annotate.getPosition(n));
       c.popToMark(mark);
       return n;
     }

@@ -177,7 +177,7 @@ public class ForStatement extends Statement
                       c.getTypeSystem().getBoolean())) {
       throw new SemanticException("The condition of a for statement must "
                                   + "evaluate to a boolean expression.",
-				  Annotate.getLineNumber(cond));
+				  Annotate.getPosition(cond));
     }
 
     /*

@@ -179,7 +179,7 @@ public class NewArrayExpression extends Expression
 	! c.getTypeSystem().isAssignableSubtype(init.getCheckedType(), type)) {
       throw new SemanticException("An array initializer must be the same " +
 				  "type as the array declaration",
-				  Annotate.getLineNumber(init));
+				  Annotate.getPosition(init));
     }
 
     setCheckedType( type );

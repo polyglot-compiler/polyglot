@@ -106,7 +106,7 @@ public class SwitchStatement extends Statement
       {
         throw new SemanticException ( "The case label must be a byte, char,"
                                        + " short or int.",
-				      Annotate.getLineNumber(expr));
+				      Annotate.getPosition(expr));
       }
       
       if ( expr instanceof NumericalLiteral)
@@ -129,19 +129,19 @@ public class SwitchStatement extends Statement
           throw new InternalCompilerError(this, "Variable Instance not defined!");
         if ( ! vi.isConstant())
           throw new SemanticException("Case must be a constant.",
-				      Annotate.getLineNumber(expr));
+				      Annotate.getPosition(expr));
         
         if ( vi.getConstantValue() instanceof Integer)
           iValue = (int)((Integer)vi.getConstantValue()).intValue();
         else if ( vi.getConstantValue() instanceof Long)
           iValue = (int)((Long)vi.getConstantValue()).longValue();
         else throw new SemanticException("Case must be a constant.",
-					  Annotate.getLineNumber(expr));
+					  Annotate.getPosition(expr));
         
       }
       else
         throw new SemanticException ("Case must be a constant",
-				      Annotate.getLineNumber(expr));
+				      Annotate.getPosition(expr));
       
       return this;
     }
@@ -327,7 +327,7 @@ public class SwitchStatement extends Statement
 
          if ( lDefinedCaseLabels.contains( key ) )
            throw new SemanticException( "Duplicate case label: " + key, 
-                                         Annotate.getLineNumber( se ) );
+                                         Annotate.getPosition( se ) );
          lDefinedCaseLabels.add ( key );                                        
        }
      }     

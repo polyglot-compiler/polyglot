@@ -210,17 +210,17 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 	}
 	else {
 	  throw new SemanticException("No field or variable with name \"" + 
-	    getFullName() + "\".", Annotate.getLineNumber(this));
+	    getFullName() + "\".", Annotate.getPosition(this));
 	}
     }
 
     if( top != null) {
-      Annotate.setLineNumber( top, Annotate.getLineNumber( this));
+      Annotate.setPosition( top, Annotate.getPosition( this));
     }
     else {
       throw new SemanticException( "No field or variable " +
 				    "with name \"" + getFullName() + "\".",
-				    Annotate.getLineNumber(this) );
+				    Annotate.getPosition(this) );
     }
 
     return top;

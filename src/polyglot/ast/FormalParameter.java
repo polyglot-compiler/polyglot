@@ -4,8 +4,6 @@ import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
 
-import java.io.IOException;
-
 /**
  * A <code>FormalParameter</code> is immutable representation of a ordered 
  * pair: a type and a variable declarator identifier, used as formal
@@ -109,19 +107,18 @@ public class FormalParameter extends Node
     return null;
   }
 
-  public Node cleanupSignatures( LocalContext c, SignatureCleaner sc) throws SemanticException, IOException
+  public Node cleanupSignatures( LocalContext c, SignatureCleaner sc) throws SemanticException
   {
-    TypeNode newTN = (TypeNode) tn.visit(sc);
-
     AccessFlags modifiers = new AccessFlags();
     modifiers.setFinal( isFinal);
 
     LocalInstance oldLi = li;
-    li = c.getTypeSystem().newLocalInstance( name, newTN.getType(), modifiers );
+
+    li = c.getTypeSystem().newLocalInstance( name, tn.getType(), modifiers );
     li.copyAnnotationsFrom(oldLi);
 
     c.addSymbol( name, li );
-    return reconstruct( Node.condVisit(this.ext, sc), newTN, name, isFinal);
+    return this;
   }
 
   public Node removeAmbiguities( LocalContext c) throws SemanticException
@@ -141,7 +138,7 @@ public class FormalParameter extends Node
   {
     if (c.isDefinedLocally( name) )
       throw new SemanticException("Duplicate declaration of \"" + name + "\"",
-				  Annotate.getLineNumber(this));
+				  Annotate.getPosition(this));
     
     AccessFlags modifiers = new AccessFlags();
     modifiers.setFinal( isFinal);

@@ -10,12 +10,12 @@ SOURCES = \
 	ConstantFolder.java \
 	DumpAst.java \
 	ExceptionChecker.java \
-	FlowChecker.java \
 	FlattenVisitor.java \
+	FlowChecker.java \
 	NodeScrambler.java \
 	SignatureCleaner.java \
 	SymbolReader.java \
-	TranslationVisitor.java \
+	Translator.java \
 	TypeChecker.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))

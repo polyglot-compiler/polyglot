@@ -1,11 +1,9 @@
 package jltools.lex;
 
 import java_cup.runtime.Symbol;
+import jltools.util.Position;
 
 public class NullLiteral extends Literal {
-  NullLiteral(int line) { super(line); }
-
-  public Symbol symbol() { return new Symbol(jltools.parse.sym.NULL_LITERAL, this); }
-
+  public NullLiteral(Position position, int sym) { super(position, sym); }
   public String toString() { return "NullLiteral <null>"; }
 }

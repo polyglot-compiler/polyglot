@@ -1,13 +1,14 @@
 package jltools.lex;
 
 import java_cup.runtime.Symbol;
+import jltools.util.Position;
 
 public class CharacterLiteral extends Literal {
   char val;
 
-  CharacterLiteral(int line, char c) 
+  public CharacterLiteral(Position position, char c, int sym)
   {
-    super(line); 
+    super(position, sym); 
     this.val = c; 
   }
   
@@ -19,11 +20,6 @@ public class CharacterLiteral extends Literal {
   public String getEscapedValue()
   {
     return Token.escape( String.valueOf( val));
-  }
-
-  public Symbol symbol() 
-  {
-    return new Symbol(jltools.parse.sym.CHARACTER_LITERAL, this); 
   }
 
   public String toString() 

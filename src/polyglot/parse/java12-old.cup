@@ -39,14 +39,14 @@ parser code  {:
   
   public static Node ln(Node n, Token t) {
     if( n != null && t != null) {
-    	Annotate.setLineNumber(n, t.getLineNumber()); 
+    	Annotate.setPosition(n, t.getPosition()); 
     }
     return n;
   }
   
   public static Node ln(Node n, Node m) {
     if( n != null && m != null) {
-    	Annotate.setLineNumber(n, Annotate.getLineNumber(m)); 
+    	Annotate.setPosition(n, Annotate.getPosition(m)); 
     }
     return n;
   }
@@ -72,12 +72,12 @@ parser code  {:
   public void syntax_error(java_cup.runtime.Symbol current) {
     if( current.sym == sym.EOF) {
       eq.enqueue( ErrorInfo.SYNTAX_ERROR,
-		  "Unexpected end of file.");
+		  "Unexpected end of file.", new Position(lexer.file()));
     }
     else {
       eq.enqueue( ErrorInfo.SYNTAX_ERROR, 
 		  "Syntax error.", 
-		  ((Token)current.value).getLineNumber());
+		  ((Token)current.value).getPosition());
     }
   }
 
@@ -146,7 +146,8 @@ terminal Token ANDEQ, XOREQ, OREQ; // assignment_operator
 
 terminal jltools.lex.IntegerLiteral INTEGER_LITERAL;
 terminal jltools.lex.LongLiteral LONG_LITERAL;
-terminal jltools.lex.DoubleLiteral FLOATING_POINT_LITERAL;
+terminal jltools.lex.DoubleLiteral DOUBLE_LITERAL;
+terminal jltools.lex.FloatLiteral FLOAT_LITERAL;
 terminal jltools.lex.BooleanLiteral BOOLEAN_LITERAL;
 terminal jltools.lex.CharacterLiteral CHARACTER_LITERAL;
 terminal jltools.lex.StringLiteral STRING_LITERAL;
@@ -296,10 +297,14 @@ literal ::=
 	|	LONG_LITERAL:a	
 			{: RESULT = (jltools.ast.Literal)Grm.ln(new IntLiteral(
 					a.getValue().longValue()), a); :} 
-	|	FLOATING_POINT_LITERAL:a
+	|	DOUBLE_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(new 
 					jltools.ast.FloatLiteral(
 					a.getValue().doubleValue()), a); :}
+	|	FLOAT_LITERAL:a
+			{: RESULT = (jltools.ast.Literal)Grm.ln(new 
+					jltools.ast.FloatLiteral(
+					a.getValue().floatValue()), a); :}
 	|	BOOLEAN_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(new 
 					jltools.ast.BooleanLiteral(

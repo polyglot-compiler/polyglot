@@ -6,6 +6,7 @@ include $(SOURCE)/Rules.mk
 
 SOURCES = \
 	SyntaxException.java \
+	Lexer.java \
 	Grm.java \
 	sym.java
 
@@ -16,7 +17,10 @@ all: $(CLASSES)
 clean: cleanclasses
 
 clobber: cleanclasses
-	-rm -f Grm.java sym.java
+	-rm -f Grm.java sym.java Lexer.java
 
 Grm.java sym.java: java12.cup
 	$(yacc)
+
+Lexer.java: java.flex sym.java
+	$(flex)

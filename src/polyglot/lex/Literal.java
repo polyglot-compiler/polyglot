@@ -1,6 +1,8 @@
 package jltools.lex;
 
-abstract class Literal extends Token
+import jltools.util.Position;
+
+public abstract class Literal extends Token
 {
-  public Literal(int line) { super(line); }
+  public Literal(Position position, int sym) { super(position, sym); }
 }

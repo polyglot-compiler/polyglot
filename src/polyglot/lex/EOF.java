@@ -1,9 +1,9 @@
 package jltools.lex;
 
 import java_cup.runtime.Symbol;
+import jltools.util.Position;
 
-class EOF extends Token {
-  EOF(int line) { super(line); }
-  public Symbol symbol() { return new Symbol(jltools.parse.sym.EOF); }
+public class EOF extends Token {
+  public EOF(Position position, int sym) { super(position, sym); }
   public String toString() { return "EOF"; }
 }

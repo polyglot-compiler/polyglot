@@ -53,3 +53,7 @@ define yacc
 awk 'BEGIN {FS = "\n"; s = 1} {print $$1, "\t // ", s++}' $< | \
 	"$(JAVA)" -classpath "$(CLASSPATH)" java_cup.Main -parser Grm
 endef
+
+define flex
+	"$(JAVA)" -classpath "$(CLASSPATH)" JFlex.Main $<
+endef

@@ -1,12 +1,11 @@
 package jltools.lex;
 
 import java_cup.runtime.Symbol;
+import jltools.util.Position;
 
 public class DoubleLiteral extends NumericLiteral {
-  DoubleLiteral(int line, double d) { super(line); this.val = new Double(d); }
-
-  public Symbol symbol()
-  {
-    return new Symbol(jltools.parse.sym.FLOATING_POINT_LITERAL, this); 
+  public DoubleLiteral(Position position, double d, int sym) {
+      super(position, sym);
+      this.val = new Double(d);
   }
 }

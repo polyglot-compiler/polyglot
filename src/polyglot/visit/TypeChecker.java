@@ -3,7 +3,7 @@ package jltools.visit;
 import jltools.ast.*;
 import jltools.types.*;
 import jltools.util.*;
-
+import jltools.frontend.Pass;
 
 public class TypeChecker extends NodeVisitor
 {
@@ -12,12 +12,12 @@ public class TypeChecker extends NodeVisitor
   protected BitVector errors;
   protected int depth;
   
-  public TypeChecker(ExtensionFactory ef,
+  public TypeChecker(Pass pass, ExtensionFactory ef,
     TypeSystem ts, ImportTable im, ErrorQueue eq)
   {
     this.eq = eq;
 
-    this.c = ts.getLocalContext(im, ef, this);
+    this.c = ts.getLocalContext(im, ef, pass);
     this.errors = new BitVector();
     this.depth = 0;
   }
@@ -32,7 +32,7 @@ public class TypeChecker extends NodeVisitor
       }
       catch ( SemanticException e) {
         eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
-                    Annotate.getLineNumber(n ));
+                    Annotate.getPosition(n ));
         c.popToMark(mark);
         return n;
       }
@@ -83,12 +83,12 @@ public class TypeChecker extends NodeVisitor
     }
     catch( SemanticException e)
     {
-      int line = e.getLineNumber();
-      if( line == SemanticException.INVALID_LINE) {
-        line = Annotate.getLineNumber( n);
+      Position position = e.getPosition();
+      if( position == null) {
+        position = Annotate.getPosition( n);
       }
 
-      eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), line);
+      eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), position);
       errors.setBit( depth, true);
 
       n.leaveScope( c);

@@ -7,13 +7,12 @@ public class InternalCompilerError extends Error
   {
     super ( msg ); 
   }
-  public InternalCompilerError(int linenum, String msg) 
+  public InternalCompilerError(Position position, String msg) 
   {
-    super ( "line " + linenum + ": " + msg ); 
+    super ( position == null ? msg : position + ": " + msg );
   }
   public InternalCompilerError(jltools.util.AnnotatedObject n, String msg) 
   {
-    super ( ((n == null) ? "" : ("line " + Annotate.getLineNumber(n) + ": "))
-	    + msg ); 
+    this( n == null ? null : Annotate.getPosition(n), msg );
   }
 }

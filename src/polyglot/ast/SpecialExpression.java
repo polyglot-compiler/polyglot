@@ -98,7 +98,7 @@ public class SpecialExpression extends Expression
 	throw new SemanticException("Qualified " +
 				    (kind == THIS ? "this" : "super") +
 				    " expression must be of a class type",
-				    Annotate.getLineNumber(tn));
+				    Annotate.getPosition(tn));
       }
 
       t = (ClassType) tn.getType();

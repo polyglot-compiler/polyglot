@@ -102,7 +102,7 @@ public class InitializerBlock extends ClassMember
     SubtypeSet s = (SubtypeSet)ec.getThrowsSet();
     if (s.size() != 0 )
       ec.reportError("An initializer block may not throw"+ 
-                     " any exceptions.", Annotate.getLineNumber(this));
+                     " any exceptions.", Annotate.getPosition(this));
     return this;
   }
 

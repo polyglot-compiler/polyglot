@@ -10,7 +10,6 @@ SOURCES = \
 	AmbiguousType.java \
 	ArrayType.java \
 	CachingClassResolver.java \
-	ClassCleaner.java \
 	ClassContext.java \
 	ClassResolver.java \
 	ClassType.java \
@@ -37,7 +36,6 @@ SOURCES = \
 	SemanticException.java \
 	StandardTypeSystem.java \
 	TableClassResolver.java \
-	TargetTable.java \
 	Type.java \
 	TypeContext.java \
 	TypeInstance.java \

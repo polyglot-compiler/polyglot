@@ -195,7 +195,7 @@ public class FieldExpression extends Expression
       throw new SemanticException( 
                     "Cannot access a field of an expression of type "
                     + ltype.getTypeString(),
-		    Annotate.getLineNumber(this));
+		    Annotate.getPosition(this));
     }
 
     return this;

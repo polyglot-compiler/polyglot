@@ -17,38 +17,35 @@ import java.util.*;
  **/
 public class Annotate {
 
-  static final int LINE_NUMBER            = 1;
-  static final int CHECKED_TYPE           = 2;
+  static final int POSITION               = UniqueID.newIntID();
+  static final int CHECKED_TYPE           = UniqueID.newIntID();
 
-  static final int THROWS_SET             = 4;
+  static final int THROWS_SET             = UniqueID.newIntID();
   // true if the node has all paths ending in function termination (either throws or return).
-  static final int EXPECTED_TYPE          = 5;
-  static final int COMPLETES_NORMALLY     = 6;
-  static final int IS_REACHABLE           = 7;
+  static final int EXPECTED_TYPE          = UniqueID.newIntID();
+  static final int COMPLETES_NORMALLY     = UniqueID.newIntID();
+  static final int IS_REACHABLE           = UniqueID.newIntID();
   
   // True for (PolyJ) expressions that are children of an ExpressionStatement
-  static final int IS_EXPR_STATEMENT      = 8; 
+  static final int IS_EXPR_STATEMENT      = UniqueID.newIntID(); 
   // True for (PolyJ) expressions that are the left-hand side of an assignment.
   // Set during translation.
-  static final int IS_LVALUE		  = 9; 
+  static final int IS_LVALUE		  = UniqueID.newIntID(); 
 
     
 
   /**
-   * Notes that o appeared at line i of the source.
+   * Notes that o appeared at position p of the source.
    **/
-  public static void setLineNumber(AnnotatedObject o, int i) {
-    o.setAnnotation(LINE_NUMBER, new Integer(i));
+  public static void setPosition(AnnotatedObject o, Position p) {
+    o.setAnnotation(POSITION, p);
   }
 
   /**
-   * Gets the line number for o. (-1 for none.
+   * Gets the source file position for o.
    **/
-  public static int getLineNumber(AnnotatedObject o) {
-    Integer i = (Integer) o.getAnnotation(LINE_NUMBER);
-    if (i == null) 
-      return -1;
-    return i.intValue();
+  public static Position getPosition(AnnotatedObject o) {
+    return (Position) o.getAnnotation(POSITION);
   }
 
   /**

@@ -1,7 +1,7 @@
 package jltools.types;
 
 import jltools.util.InternalCompilerError;
-import jltools.ast.NodeVisitor;
+import jltools.frontend.Pass;
 import jltools.ast.ExtensionFactory;
 
 import java.util.*;
@@ -29,17 +29,17 @@ public class LocalContext implements TypeContext
    */
   protected ImportTable itImports;
   /**
-   * The current node visitor.
+   * The current compiler pass.
    */
-  protected NodeVisitor visitor;
+  protected Pass pass;
 
   public LocalContext(ImportTable itImports, TypeSystem ts,
-		      ExtensionFactory ef, NodeVisitor visitor) 
+		      ExtensionFactory ef, Pass pass) 
   {  
     this.itImports = itImports;
     this.ef = ef;
     this.ts = ts;
-    this.visitor = visitor;
+    this.pass = pass;
     
     scopes = new Stack();
 
@@ -280,10 +280,6 @@ public class LocalContext implements TypeContext
   {
     if ( c == null)
       throw new InternalCompilerError("Tried to push a null class.");
-    if ( c.getSuperType() instanceof AmbiguousType)
-      throw new InternalCompilerError("Tried to push a class with an " +
-				      "ambiguous supertype: \"" +
-				      c.getSuperType().getTypeString() + "\".");
 
     ClassScope scope = getClassScope(c);
     scopes.push( scope );
@@ -297,40 +293,51 @@ public class LocalContext implements TypeContext
     }
 
     while (!typeQueue.isEmpty()) {
-      c = (ClassType)typeQueue.removeFirst();
-      if (visitedTypes.contains(c))
+      Type s = (Type) typeQueue.removeFirst();
+
+      if (s instanceof AmbiguousType) {
+	throw new InternalCompilerError("Tried to enter the scope of a class " +
+					"with an ambiguous supertype: \"" +
+					s.getTypeString() + "\".");
+      }
+
+      if (visitedTypes.contains(s)) {
 	continue;
+      }
 
-	for (Iterator iter = c.getMethods().iterator(); iter.hasNext(); ) {
-	    MethodTypeInstance mti = (MethodTypeInstance) iter.next();
-	    if (scope.getMethodEnclosingType(mti.getName()) == null) {
-	      scope.putMethodEnclosingType(mti.getName(), c);
-	    }
-	}
-	for (Iterator iter = c.getFields().iterator(); iter.hasNext(); ) {
-	    FieldInstance fi = (FieldInstance) iter.next();
-	    if (scope.getVariable(fi.getName()) == null) {
-	      scope.putVariable(fi.getName(), fi);
-	    }
-	}
-	for (Iterator iter = c.getInnerClasses().iterator(); iter.hasNext(); ) {
-	    ClassType t = (ClassType) iter.next();
-	    if (! t.isLocal() && ! t.isAnonymous()) {
-	      if (scope.getType(t.getShortName()) == null) {
-		scope.putType(t.getShortName(), t);
-	      }
-	    }
-	}
+      visitedTypes.add(s);
 
-	visitedTypes.add(c);
-	if (c.getSuperType() != null)
-	  typeQueue.addLast(c.getSuperType());
+      c = (ClassType) s;
 
-	for (Iterator i = c.getInterfaces().iterator(); i.hasNext(); ) {
-	  Object iface = i.next();
-	  if (iface != null)
-	    typeQueue.addLast(iface);
-	}
+      for (Iterator iter = c.getMethods().iterator(); iter.hasNext(); ) {
+	  MethodTypeInstance mti = (MethodTypeInstance) iter.next();
+	  if (scope.getMethodEnclosingType(mti.getName()) == null) {
+	    scope.putMethodEnclosingType(mti.getName(), c);
+	  }
+      }
+      for (Iterator iter = c.getFields().iterator(); iter.hasNext(); ) {
+	  FieldInstance fi = (FieldInstance) iter.next();
+	  if (scope.getVariable(fi.getName()) == null) {
+	    scope.putVariable(fi.getName(), fi);
+	  }
+      }
+      for (Iterator iter = c.getInnerClasses().iterator(); iter.hasNext(); ) {
+	  ClassType t = (ClassType) iter.next();
+	  if (! t.isLocal() && ! t.isAnonymous()) {
+	    if (scope.getType(t.getShortName()) == null) {
+	      scope.putType(t.getShortName(), t);
+	    }
+	  }
+      }
+
+      if (c.getSuperType() != null)
+	typeQueue.addLast(c.getSuperType());
+
+      for (Iterator i = c.getInterfaces().iterator(); i.hasNext(); ) {
+	Object iface = i.next();
+	if (iface != null)
+	  typeQueue.addLast(iface);
+      }
     }
   }
 
@@ -510,8 +517,8 @@ public class LocalContext implements TypeContext
     return itImports;
   }
 
-  public NodeVisitor getVisitor() {
-    return visitor;
+  public Pass getPass() {
+    return pass;
   }
 
   public interface Mark {
@@ -622,18 +629,10 @@ public class LocalContext implements TypeContext
   public class JavaTopScope implements TopScope {
     public Type getType(String name) {
 	try {
-	  Type t = itImports.findClass(name);
-	  return t;
+	  return itImports.findClass(name);
 	}
 	catch (SemanticException e2) {
-	  try {
-	    itImports.findPackage(name);
-	    Type t = new PackageType(ts, name);
-	    return t;
-	  }
-	  catch (NoClassException e) {
-	    return null;
-	  }
+	  return new PackageType(ts, name);
 	}
     }
 

@@ -1,32 +1,69 @@
 package jltools.util;
 
-public abstract class ErrorQueue
+import java.io.*;
+
+/**
+ * A <code>ErrorQueue</code> handles outputing error messages.
+ */
+public class ErrorQueue
 {
-  protected boolean hasErrors;
+    private static final int ERROR_COUNT_LIMIT = 100;
+    
+    private PrintStream err;
 
-  public ErrorQueue()
-  {
-    hasErrors = false;
-  }
+    private boolean hasErrors;
+    private int errorCount;
+    private boolean flushed;
+    
+    public ErrorQueue(PrintStream err) {
+	this.err = err;
+	this.errorCount = 0;
+	this.hasErrors = false;
+	this.flushed = true;
+    }
 
-  public void enqueue( int type, String message)
-  {
-    enqueue( type, message, -1);
-  }
+    public void enqueue( int type, String message) {
+	enqueue( type, message, null);
+    }
 
-  public void enqueue( int type, String message, int lineNumber)
-  {
-    enqueue( new ErrorInfo( type, message, lineNumber));
-  }
+    public void enqueue( int type, String message, Position position) {
+	enqueue( new ErrorInfo( type, message, position));
+    }
 
-  public abstract void enqueue( ErrorInfo e);
+    public void enqueue(ErrorInfo e) {
+	if (e.getErrorKind() != ErrorInfo.WARNING) {
+	    hasErrors = true;
+	    errorCount++;
+	}
 
-  public boolean hasErrors()
-  {
-    return hasErrors;
-  }
+	flushed = false;
 
-  public void flush() 
-  {
-  }
+	String message = e.getErrorKind() != ErrorInfo.WARNING
+		       ? e.getMessage()
+		       : e.getErrorString() + " -- " + e.getMessage();
+
+	Position position = e.getPosition();
+
+	String prefix = position != null ? (position.toString() + ": ") : "";
+
+	err.println(prefix + message);
+
+	if (errorCount >= ERROR_COUNT_LIMIT) {
+	    prefix = position != null ? (position.file() + ": ") : "";
+	    err.println(prefix + "Too many errors.  Aborting compilation.");
+	    flush();
+	    throw new ErrorLimitError();
+	}
+    }
+    
+    public void flush() {
+	if (! flushed) {
+	    err.println(errorCount + " error" + (errorCount > 1 ? "s." : "."));
+	    flushed = true;
+	}
+    }
+
+    public boolean hasErrors() {
+      return hasErrors;
+    }
 }

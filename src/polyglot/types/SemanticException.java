@@ -1,39 +1,40 @@
 package jltools.types;
 
+import jltools.util.Position;
+
 /**
  * Thrown during any number of phases of the compiler during which a semantic
  * error may be detected.
  */
 public class SemanticException extends Exception
 {
-  public static final int INVALID_LINE = -1;
-
-  protected int line;
+  protected Position position;
   
   public SemanticException()
   {
-    this( INVALID_LINE);
+    super();
   }
 
-  public SemanticException( int line)
+  public SemanticException( Position position)
   {
     super();
-    this.line = line;
+    this.position = position;
   }
 
   public SemanticException( String m)
   {
-    this( m, INVALID_LINE);
+    super(m);
+    this.position = position;
   }
 
-  public SemanticException( String m, int line)
+  public SemanticException( String m, Position position)
   {
     super(m);
-    this.line = line;
+    this.position = position;
   }
 
-  public int getLineNumber()
+  public Position getPosition()
   {
-    return line;
+    return position;
   }
 }

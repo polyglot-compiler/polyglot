@@ -34,13 +34,7 @@ public class EmptyContext implements TypeContext {
       return resolver.findClass(name);
     }
     catch (SemanticException e) {
-      try {
-	  resolver.findPackage(name);
-	  return new PackageType(ts, null, name);
-      }
-      catch (NoClassException e2) {
-	throw new SemanticException("Package " + name + " not found");
-      }
+      return new PackageType(ts, null, name);
     }
   }
 }

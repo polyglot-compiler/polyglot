@@ -101,9 +101,9 @@ public class TypeNode extends Node
   }
 
   public Node cleanupSignatures( LocalContext c, SignatureCleaner sc)
-    throws SemanticException, IOException
+    throws SemanticException
   {
-    return null;
+    return this;
   }
 
   public Node typeCheck(LocalContext c) throws SemanticException
@@ -112,7 +112,7 @@ public class TypeNode extends Node
     if (type.isPackageType()) {
 	throw new SemanticException("Type " + type.getTypeString() +
 				    " not defined",
-				    Annotate.getLineNumber(this));
+				    Annotate.getPosition(this));
     }
     return this;
   }

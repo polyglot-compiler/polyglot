@@ -1,19 +1,25 @@
 package jltools.lex;
 
-public abstract class Token extends InputElement {
-  int lineNumber;
+import jltools.util.Position;
 
-  public Token(int lineNumber)
+public abstract class Token {
+  Position position;
+  int symbol;
+
+  public Token(Position position, int symbol)
   {
-    this.lineNumber = lineNumber;
+    this.position = position;
+    this.symbol = symbol;
   }
 
-  public int getLineNumber()
+  public Position getPosition()
   {
-    return lineNumber;
+    return position;
   }
 
-  public abstract java_cup.runtime.Symbol symbol();
+  public java_cup.runtime.Symbol symbol() {
+      return new java_cup.runtime.Symbol(symbol, this);
+  }
 
   protected static String escape(String s) {
     StringBuffer sb = new StringBuffer();

@@ -1,5 +1,7 @@
 package jltools.parse;
 
+import jltools.util.Position;
+
 /**
  * Thrown during the parser phase when a syntax error is detected that
  * is not caught be the automatically-generated parser because it accepts
@@ -7,34 +9,31 @@ package jltools.parse;
  */
 public class SyntaxException extends Exception
 {
-  public static final int INVALID_LINE = -1;
-
-  protected int line;
+  protected Position position;
   
   public SyntaxException()
   {
-    this( INVALID_LINE);
+    this("Syntax error.", null);
   }
 
-  public SyntaxException( int line)
+  public SyntaxException(Position position)
   {
-    super("Syntax error.");
-    this.line = line;
+    this("Syntax error.", position);
   }
 
-  public SyntaxException( String m)
+  public SyntaxException(String m)
   {
-    this( m, INVALID_LINE);
+    this(m, null);
   }
 
-  public SyntaxException( String m, int line)
+  public SyntaxException(String m, Position position)
   {
-    super("Syntax Error: " + m);
-    this.line = line;
+    super("Syntax error: " + m);
+    this.position = position;
   }
 
-  public int getLineNumber()
+  public Position getPosition()
   {
-    return line;
+    return position;
   }
 }

@@ -6,14 +6,12 @@ import jltools.types.*;
 import jltools.util.*;
 
 import java.io.IOException;
+import java.util.*;
 
 
 public class SymbolReader extends NodeVisitor
 {
   protected TableClassResolver currentResolver;
-
-  protected Target target;
-  protected TargetFactory tf;
 
   protected TypeSystem ts;
   protected ErrorQueue eq;
@@ -25,14 +23,10 @@ public class SymbolReader extends NodeVisitor
 
   public SymbolReader( ImportTable it,
                        TableClassResolver currentResolver, 
-                       Target target, TargetFactory tf,
                        TypeSystem ts, ErrorQueue eq)
   {
     this.it = it;
     this.currentResolver = currentResolver;
-
-    this.target = target;
-    this.tf = tf;
 
     this.ts = ts;
     this.eq = eq;
@@ -52,13 +46,9 @@ public class SymbolReader extends NodeVisitor
     catch( SemanticException e)
     {
       eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
-		  Annotate.getLineNumber( n));
+		  Annotate.getPosition( n));
       return n;
     }
-  }
-
-  protected ParsedClassType newParsedClassType() {
-    return new ParsedClassType( ts, current);
   }
 
   public ParsedClassType pushClass( String name,
@@ -67,7 +57,7 @@ public class SymbolReader extends NodeVisitor
     String fullName;
     ParsedClassType newClass;
 
-    newClass = newParsedClassType();
+    newClass = ts.newParsedClassType(current);
 
     if( current == null) {
       if (isLocal || isAnonymous) {
@@ -103,7 +93,9 @@ public class SymbolReader extends NodeVisitor
     newClass.setIsLocal(isLocal);
     newClass.setIsAnonymous(isAnonymous);
 
-    currentResolver.addClass( fullName, newClass);
+    if (current == null && ! isLocal && ! isAnonymous) {
+	currentResolver.addClass( fullName, newClass);
+    }
 
     current = newClass;
     return current;
@@ -125,7 +117,10 @@ public class SymbolReader extends NodeVisitor
   }
 
   protected void addDefaultPackageImports() throws SemanticException {
-    it.addPackageImport("java.lang");
+    for (Iterator i = ts.defaultPackageImports().iterator(); i.hasNext(); ) {
+	String pkg = (String) i.next();
+	it.addPackageImport(pkg);
+    }
   }
 
   public void setPackageName( String packageName) throws SemanticException
@@ -137,22 +132,6 @@ public class SymbolReader extends NodeVisitor
     if( packageName != null) {
       it.addPackageImport( packageName);
     }
-
-    /* Now add the "root" of this source file's package tree to the 
-     * source path. This will also throw an exception if the source
-     * file is not located in an appropriate directory. */
-    /* FIXME
-    try
-    {
-      tf.addSourceDirectory( target, packageName);
-    }
-    catch( IOException e)
-    {
-      throw new SemanticException( "Expected to find \"" + target.getName()
-                      + "\" in a directory matching the package name \"" 
-                      + packageName + "\".");
-    }
-    */
   }
 
   public TableClassResolver getCurrentResolver() {

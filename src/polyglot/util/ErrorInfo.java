@@ -12,13 +12,13 @@ public class ErrorInfo
 
   protected int kind;
   protected String message;
-  protected int lineNumber;
+  protected Position position;
   
-  public ErrorInfo(int kind, String message, int lineNumber)
+  public ErrorInfo(int kind, String message, Position position)
   {
     this.kind = kind;
     this.message = message;
-    this.lineNumber = lineNumber;
+    this.position = position;
   }
 
   public int getErrorKind()
@@ -31,9 +31,9 @@ public class ErrorInfo
     return message;
   }
 
-  public int getLineNumber()
+  public Position getPosition()
   {
-    return lineNumber;
+    return position;
   }
 
   public String getErrorString()

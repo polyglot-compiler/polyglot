@@ -60,7 +60,7 @@ public class Main {
 
 
 	try {
-	    TypeSystem ts = extInfo.getTypeSystem();
+	    TypeSystem ts = extInfo.typeSystem();
 	    TypeDumper t = TypeDumper.load(className, ts);
 
 	    CodeWriter cw = new CodeWriter(System.out, 72);

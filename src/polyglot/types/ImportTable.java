@@ -1,6 +1,7 @@
 package jltools.types;
 
 import jltools.util.*;
+import jltools.frontend.Source;
 
 import java.util.*;
 
@@ -26,12 +27,16 @@ public  class ImportTable implements ClassResolver
   protected List lazyImports;
   /** Used to report errors for lazily added imports. */
   protected ErrorQueue eq;
+  /** The source file associated with the import table. */
+  protected Source source;
 
   // DOCME
-  public ImportTable( ClassResolver base, boolean caching, ErrorQueue eq)
+  public ImportTable( ClassResolver base, boolean caching, Source source,
+	  ErrorQueue eq)
   {
     resolver = base;
     this.caching = caching;
+    this.source = source;
     this.eq = eq;
 
     map = new HashMap();
@@ -45,14 +50,9 @@ public  class ImportTable implements ClassResolver
   }
   
   public void addPackageImport( String pkgName) throws NoClassException {
-    resolver.findPackage(pkgName);
     packageImports.add(pkgName);
   }
     
-  public void findPackage( String name) throws NoClassException {
-    resolver.findPackage(name);
-  }
-
   public ClassType findClass( String name)  throws SemanticException {
     // FIXME: need to keep on looking to find conflicts.
 
@@ -70,7 +70,8 @@ public  class ImportTable implements ClassResolver
         }
         catch( NoClassException e)
         {
-          eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), -1);
+          eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
+		  	new Position(source.name()));
         }
       }
 

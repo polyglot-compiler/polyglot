@@ -110,7 +110,7 @@ public class IfStatement extends Statement
     Type ctype = cond.getCheckedType();
     if( !ctype.equals( c.getTypeSystem().getBoolean())) {
       throw new SemanticException( "Conditional must have boolean type.",
-				    Annotate.getLineNumber(cond));
+				    Annotate.getPosition(cond));
     }
 
     return this;

@@ -36,8 +36,7 @@ public class Main
     
     parseCommandLine(args, options, source);
 
-    MainTargetFactory tf = new MainTargetFactory(options);
-    Compiler compiler = new Compiler(options, tf);
+    Compiler compiler = new Compiler(options);
 
     String targetName = null;
     if (!compiler.compile(source)) System.exit(1);
@@ -53,10 +52,8 @@ public class Main
 	String outfile = (String)iter.next(); 
 	
 	String command = options.post_compiler + " -classpath " 
-	  + (options.output_directory != null ?
-		  options.output_directory + File.pathSeparator + "." +
-		  File.pathSeparator
-		: "." + File.pathSeparator)
+	  + options.output_directory + File.pathSeparator
+	  + "." + File.pathSeparator
 	  + System.getProperty("java.class.path") + " "
 	  + outfile;
 	
@@ -213,6 +210,11 @@ public class Main
         i++;
         options.fully_qualified_names = true;
       }
+      else if (args[i].equals("-c"))
+      {
+        options.post_compiler = null;
+        i++;
+      }
       else if (args[i].equals("-post"))
       {
         i++;
@@ -229,6 +231,12 @@ public class Main
         i++;
 	loadExtension(args[i]);
 	i++;
+      }
+      else if (args[i].equals("-sx")) 
+      {
+        i++;
+        options.source_ext = args[i];
+        i++;
       }
       else if (args[i].equals("-ox")) 
       {
@@ -293,6 +301,17 @@ public class Main
       usage();
       System.exit(1);
     }
+
+    if (options.extension != null) {
+	try {
+	    options.extension.setOptions(options);
+	}
+	catch (UsageError u) {
+	    System.err.println(u.getMessage());
+	    usage();
+	    System.exit(1);
+	}
+    }
   }
 
   private static String compilerName() {
@@ -319,6 +338,7 @@ public class Main
     System.err.println(" -noserial               disable class"
                         + " serialization");
     System.err.println(" -ext <extension>        use language extension");
+    System.err.println(" -c                      compile only to .java");
     System.err.println(" -post <compiler>        run javac-like compiler" 
                         + " after translation");
     System.err.println(" -v -verbose             print verbose " 

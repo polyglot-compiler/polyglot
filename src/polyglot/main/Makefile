@@ -6,8 +6,7 @@ include $(SOURCE)/Rules.mk
 
 SOURCES = \
 	Main.java \
-	Options.java \
-	MainTargetFactory.java
+	Options.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 

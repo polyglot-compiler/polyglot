@@ -3,8 +3,9 @@ package jltools.visit;
 import jltools.ast.*;
 import jltools.types.*;
 import jltools.util.*;
-import java.io.IOException;
-
+import jltools.frontend.Pass;
+import jltools.frontend.Job;
+import java.util.LinkedList;
 
 /**
  * A visitor which traverses the AST and remove ambiguities found in fields,
@@ -17,76 +18,41 @@ public class SignatureCleaner extends NodeVisitor
   protected ErrorQueue eq;
   protected LocalContext c;
   protected ImportTable it;
-  protected TableClassResolver cr;
-  protected ClassCleaner cc;
 
-  public SignatureCleaner( ExtensionFactory ef,
-			   TypeSystem ts, ImportTable it,
-			   TableClassResolver cr,
-			   ErrorQueue eq, ClassCleaner cc)
+  public SignatureCleaner( Pass pass, ExtensionFactory ef,
+	  TypeSystem ts, ImportTable it, ErrorQueue eq)
   {
     this.ef = ef;
     this.ts = ts;
     this.it = it;
-    this.cr = cr;
-    this.cc = cc;
     this.eq = eq;
     
-    c = ts.getLocalContext( it, ef, this);
+    c = ts.getLocalContext( it, ef, pass);
   }
 
-  public boolean cleanClass(ClassType type) throws IOException
-  {
-    return cc.cleanClass(type);
-  }
+  public Node override(Node n) {
+    if (n instanceof VariableDeclarationStatement || n instanceof ClassNode) {
+      try {
+	Node m;
 
-  public boolean containsClass(String name)
-  {
-    return cr.containsClass(name);
-  }
+	if (n.ext instanceof CleanupSignaturesOverride) {
+	  m = ((CleanupSignaturesOverride) n.ext).cleanupSignatures(n, this, c);
+	}
+	else {
+	  m = n.cleanupSignatures(c, this);
+	}
 
-  public boolean cleanPrerequisiteClass(ClassType clazz) throws IOException {
-    if (clazz instanceof ParsedClassType) {
-      if (! containsClass(clazz.getFullName())) {
-	return cleanClass(clazz);
-      } else {
-	return true;
+	return m;
       }
-    } else {
-      return true;
-    }
-  }
-
-  public Node override( Node n)
-  {
-    LocalContext.Mark mark = c.getMark();
-
-    try {
-      Node m;
-      if (n.ext instanceof CleanupSignaturesOverride) {
-        m = ((CleanupSignaturesOverride) n.ext).cleanupSignatures(n, this, c);
+      catch (SemanticException e) {
+	eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
+		    (e.getPosition() == null ?
+		     Annotate.getPosition(n) :
+		     e.getPosition()) );
+	return n;
       }
-      else {
-	m = n.cleanupSignatures(c, this);
-      }
-
-      c.assertMark(mark);
-      return m;
-    }
-    catch (SemanticException e) {
-      eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
-                  (e.getLineNumber() == SemanticException.INVALID_LINE ?
-		   Annotate.getLineNumber( n) :
-		   e.getLineNumber()) );
-      c.popToMark(mark);
-    }
-    catch (IOException e) {
-      eq.enqueue( ErrorInfo.IO_ERROR, e.getMessage(), 
-                  Annotate.getLineNumber( n));
-      c.popToMark(mark);
     }
 
-    c.assertMark(mark);
     return null;
   }
 
@@ -98,7 +64,29 @@ public class SignatureCleaner extends NodeVisitor
 
   public Node leave( Node old, Node n, NodeVisitor v)
   {
+    try {
+      Node m;
+
+      if (n.ext instanceof CleanupSignaturesOverride) {
+        m = ((CleanupSignaturesOverride) n.ext).cleanupSignatures(n, this, c);
+      }
+      else {
+	m = n.cleanupSignatures(c, this);
+      }
+
+      m.leaveScope(c);
+
+      return m;
+    }
+    catch (SemanticException e) {
+      eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
+                  (e.getPosition() == null ?
+		   Annotate.getPosition(n) :
+		   e.getPosition()) );
+    }
+
     n.leaveScope(c);
+
     return n;
   }
 

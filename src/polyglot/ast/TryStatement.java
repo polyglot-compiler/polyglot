@@ -195,7 +195,7 @@ public class TryStatement extends Statement {
               ecTryBlock.reportError( " The exception \"" +
                         cb.getCatchType().getTypeString()+ 
                         "\" has already been caught in this try block.", 
-                        Annotate.getLineNumber ( cb )); 
+                        Annotate.getPosition ( cb )); 
           }
           else
           {
@@ -204,7 +204,7 @@ public class TryStatement extends Statement {
                                     " since no exceptions of type \"" + 
                                     cb.getCatchType().getTypeString() 
                                     + "\" can reach this point.", 
-                                    Annotate.getLineNumber ( cb ));
+                                    Annotate.getPosition ( cb ));
           }
         }
       }
@@ -220,7 +220,7 @@ public class TryStatement extends Statement {
               ecTryBlock.reportError( " The exception \"" +
                     cb.getCatchType().getTypeString() + 
                     "\" has already been caught in this try block.", 
-                    Annotate.getLineNumber ( cb )); 
+                    Annotate.getPosition ( cb )); 
           }
           else
           {
@@ -229,7 +229,7 @@ public class TryStatement extends Statement {
                                     "since no exceptions of type \"" +
                                     cb.getCatchType().getTypeString() 
                                     + "\" can reach this point.", 
-                                    Annotate.getLineNumber ( cb ));
+                                    Annotate.getPosition ( cb ));
           }
         }
       }

@@ -275,6 +275,7 @@ public class ClassNode extends ClassMember implements GlobalDeclaration
   public Node readSymbols( SymbolReader sr) throws SemanticException
   {
     type = sr.pushClass( name, isLocal, isAnonymous );
+    Annotate.setPosition(type, Annotate.getPosition(this));
 
     if( superClass != null) {
       type.setSuperType( superClass.getType());
@@ -332,140 +333,16 @@ public class ClassNode extends ClassMember implements GlobalDeclaration
     c.popClass();
   }
 
-  public Node cleanupSignatures( LocalContext c, SignatureCleaner sc)
-    throws SemanticException, IOException
+  public Node cleanupSignatures(LocalContext c, SignatureCleaner sc)
+    throws SemanticException
   {
-    if (isAnonymous) {
-      // If the class is anonymous, the parser created the node assuming
-      // the super type is an interface, not a class.  After cleaning the
-      // super type, if the assumption proves false, correct the mistake.
-
-      if (type.getSuperType() != null || type.getInterfaces().size() != 1) {
-	throw new InternalCompilerError(this, "Anonymous classes should be " +
-	  "constructed with a null superclass and one super-interface");
-      }
-
-      Type superType = (Type) type.getInterfaces().get(0);
-      ClassType superClazz = (ClassType) c.getType(superType);
-
-      //kliger: this block wasn't here before... bug(?)
-      if (! sc.cleanPrerequisiteClass(superClazz)) {
-	throw new SemanticException("Errors while compiling " +
-				    "superclass " +
-				    superClazz.getTypeString() +
-				    " of "+ type.getTypeString() + "." +
-				    Annotate.getLineNumber(this));
-      }
-
-      if (! superClazz.getAccessFlags().isInterface()) {
-	type.setSuperType(superClazz);
-	type.getInterfaces().clear();
-      }
-      else {
-	type.setSuperType((ClassType) c.getTypeSystem().getObject());
-      }
-    }
-    else {
-      Type superType = type.getSuperType();
-
-      if (superType != null) {
-	ClassType superClazz = (ClassType) c.getType(superType);
-
-	if (superClazz.getAccessFlags().isInterface()) {
-	  throw new SemanticException("Superclass " +
-	    superClazz.getTypeString() + " of " + type.getTypeString() +
-	    " is an interface",
-	    Annotate.getLineNumber(this));
-	}
-
-	//kliger: this block wasn't here before... bug(?)
-	if (! sc.cleanPrerequisiteClass(superClazz)) {
-	  throw new SemanticException("Errors while compiling " +
-				      "superclass " +
-				      superClazz.getTypeString() +
-				      " of "+ type.getTypeString() + "." +
-				      Annotate.getLineNumber(this));
-	}
-
-	type.setSuperType(superClazz);
-      }
-      else {
-	type.setSuperType((ClassType) c.getTypeSystem().getObject());
-      }
-
-      for (ListIterator i = type.getInterfaces().listIterator(); i.hasNext();) {
-	Type interfaceType = (Type) i.next();
-
-	ClassType interfaceClazz = (ClassType) c.getType(interfaceType);
-
-	if (! interfaceClazz.getAccessFlags().isInterface()) {
-	  throw new SemanticException("Super-interface " +
-	    interfaceClazz.getTypeString() + " of " + type.getTypeString() +
-	    " is not an interface",
-	    Annotate.getLineNumber(this));
-	}
-
-	if (! sc.cleanPrerequisiteClass(interfaceClazz)) {
-	      throw new SemanticException("Errors while compiling " +
-		  "super-interface " + interfaceClazz.getTypeString() +
-		  " of " + type.getTypeString() + ".",
-		  Annotate.getLineNumber(this) );
-	}
-
-	i.set(interfaceClazz);
-      }
-    }
+    c.getTypeSystem().cleanSuperTypes(this.type, c);
 
     enterScope(c);
 
-    ClassNode n = (ClassNode) visitChildren(sc);
+    c.getTypeSystem().cleanClass(this.type, c);
 
-    // We do methods and fields here because it's simpler to do it here than
-    // in MethodNode or FieldNode.
-
-    for (ListIterator i = n.type.getMethods().listIterator(); i.hasNext(); ) {
-      MethodTypeInstance mti = (MethodTypeInstance) i.next();
-
-      try {
-	Type rt = mti.getReturnType();
-	mti.setReturnType( c.getType(rt) );
-
-	List argTypes = mti.argumentTypes();
-	for (ListIterator j = argTypes.listIterator(); j.hasNext(); ) {
-	  Type t = (Type) j.next();
-	  j.set( c.getType(t) );
-	}
-
-	List excTypes = mti.exceptionTypes();
-	for (ListIterator j = excTypes.listIterator(); j.hasNext(); ) {
-	  Type t = (Type) j.next();
-	  j.set( c.getType(t) );
-	}
-      } catch (SemanticException exn) {
-	//rethrow with line number of current method type instance
-	System.err.println("rethrowing a semantic exception");
-	if (exn.getLineNumber() == SemanticException.INVALID_LINE) {
-	  System.err.println("adjusting line number to be "+
-			     Annotate.getLineNumber(mti));
-	  throw new SemanticException(exn.getMessage(),
-				      Annotate.getLineNumber(mti));
-	}
-      }
-    }
-
-    for (ListIterator i = n.type.getFields().listIterator(); i.hasNext(); ) {
-      FieldInstance fi = (FieldInstance) i.next();
-
-      try {
-	Type t = fi.getType();
-	fi.setType( c.getType(t) );
-      } catch (SemanticException exn) {
-	//rethrow with line number of current field instance
-	if (exn.getLineNumber() == SemanticException.INVALID_LINE)
-	  throw new SemanticException(exn.getMessage(),
-				      Annotate.getLineNumber(fi));
-      }
-    }
+    Node n = visitChildren(sc);
 
     n.leaveScope(c);
 

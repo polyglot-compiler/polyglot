@@ -112,7 +112,7 @@ public class FieldNode extends ClassMember
             ((IntLiteral)decl.initializer).getValue())); 
       }
 
-      Annotate.setLineNumber( fi, Annotate.getLineNumber( this));
+      Annotate.setPosition( fi, Annotate.getPosition( this));
       clazz.addField( fi);
     }
   

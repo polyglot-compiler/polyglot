@@ -1,9 +1,11 @@
 package jltools.lex;
 
 import java_cup.runtime.Symbol;
+import jltools.util.Position;
 
 public class LongLiteral extends NumericLiteral {
-  LongLiteral(int line, long l) { super(line); this.val = new Long(l); }
-
-  public Symbol symbol() { return new Symbol(jltools.parse.sym.LONG_LITERAL, this); }
+  public LongLiteral(Position position, long l, int sym) {
+      super(position, sym);
+      this.val = new Long(l);
+  }
 }

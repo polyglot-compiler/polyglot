@@ -182,11 +182,9 @@ public class ExceptionChecker extends NodeVisitor
     }    
   }
 
-  public void reportError( String description, int iLine)
+  public void reportError( String description, Position position)
   {
-    eq.enqueue( ErrorInfo.SEMANTIC_ERROR, 
-                description, 
-                  iLine);    
+    eq.enqueue( ErrorInfo.SEMANTIC_ERROR, description, position);    
   }
   
 }

@@ -5,6 +5,7 @@
 package jltools.types;
 
 import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Set;
@@ -13,7 +14,9 @@ import java.util.HashSet;
 import jltools.ast.NodeVisitor;
 import jltools.ast.ExtensionFactory;
 import jltools.util.InternalCompilerError;
-
+import jltools.util.Annotate;
+import jltools.util.Position;
+import jltools.frontend.Pass;
 
 /**
  * StandardTypeSystem
@@ -30,12 +33,10 @@ public class StandardTypeSystem extends TypeSystem {
    * Initializes the type system and its internal constants (which depend on
    * the resolver).
    */
-  public void initializeTypeSystem( ClassResolver resolver, 
-                                    ClassCleaner cleaner) 
+  public void initializeTypeSystem( ClassResolver resolver)
     throws SemanticException
   {
     this.resolver = resolver;
-    this.cleaner = cleaner;
     this.emptyResolver = new CompoundClassResolver();
 
     OBJECT_ = resolver.findClass( "java.lang.Object");
@@ -78,9 +79,9 @@ public class StandardTypeSystem extends TypeSystem {
   }
 
   public LocalContext getLocalContext( ImportTable it, ExtensionFactory ef,
-	NodeVisitor visitor )
+	Pass pass )
   {
-    return new LocalContext( it, this, ef, visitor );
+    return new LocalContext( it, this, ef, pass );
   }
 
   public FieldInstance newFieldInstance( String name, Type type,
@@ -485,6 +486,159 @@ public class StandardTypeSystem extends TypeSystem {
     return ct != null;
   }
 
+  public void cleanClass(ClassType type) throws SemanticException {
+    class HackedTypeContext extends ClassContext {
+	HackedTypeContext(ClassType type) {
+	    super(type);
+	}
+
+	public Type getType(String name) throws SemanticException {
+	    try {
+		return super.getType(name);
+	    }
+	    catch (SemanticException e) {
+		try {
+		    return StandardTypeSystem.this.resolver.findClass(name);
+		}
+		catch (SemanticException e2) {
+		    if (TypeSystem.isNameShort(name)) {
+			return new PackageType(StandardTypeSystem.this, name);
+		    }
+		    throw e2;
+		}
+	    }
+	}
+    };
+
+    cleanSuperTypes(type, getEmptyContext(resolver));
+    cleanClass(type, new HackedTypeContext(type));
+  }
+
+  public void cleanSuperTypes(ClassType type, TypeContext tc)
+      throws SemanticException {
+    TypeSystem.report(1, "Cleaning super types of " + type);
+
+    if (! (type instanceof ParsedClassType)) {
+        return;
+    }
+
+    ParsedClassType ct = (ParsedClassType) type;
+
+    Type superType = ct.getSuperType();
+
+    if (superType != null) {
+	ClassType superClazz = (ClassType) checkAndResolveType(superType, tc);
+	cleanClass(superClazz);
+	ct.setSuperType(superClazz);
+    }
+
+    for (ListIterator i = ct.getInterfaces().listIterator(); i.hasNext(); ) {
+      Type s = (Type) i.next();
+      ClassType cs = (ClassType) checkAndResolveType(s, tc);
+      cleanClass(cs);
+      i.set(cs);
+    }
+
+    if (ct.isAnonymous()) {
+      // If the class is anonymous, the parser created the node assuming
+      // the super type is an interface, not a class.  After cleaning the
+      // super type, if the assumption proves false, correct the mistake.
+
+      if (ct.getSuperType() != null || ct.getInterfaces().size() != 1) {
+	throw new InternalCompilerError(ct, "Anonymous classes should be " +
+	  "constructed with a null superclass and one super-interface");
+      }
+
+      ClassType s = (ClassType) ct.getInterfaces().get(0);
+
+      if (! s.getAccessFlags().isInterface()) {
+	ct.setSuperType(s);
+	ct.getInterfaces().clear();
+      }
+      else {
+	ct.setSuperType((ClassType) getObject());
+      }
+    }
+    else {
+      ClassType s = (ClassType) ct.getSuperType();
+
+      if (s != null && s.getAccessFlags().isInterface()) {
+	  throw new SemanticException("Class " + ct +
+				      " cannot extend interface " + s + ".",
+				      Annotate.getPosition(ct));
+      }
+
+      for (Iterator i = ct.getInterfaces().iterator(); i.hasNext(); ) {
+	ClassType si = (ClassType) i.next();
+	if (! si.getAccessFlags().isInterface()) {
+	  throw new SemanticException("Class " + ct +
+				      " cannot implement class " + s + ".",
+				      Annotate.getPosition(ct));
+	}
+      }
+    }
+  }
+
+  public void cleanClass(ClassType type, TypeContext tc)
+      throws SemanticException {
+    TypeSystem.report(1, "Cleaning " + type);
+
+    if (! (type instanceof ParsedClassType)) {
+        return;
+    }
+
+    ParsedClassType ct = (ParsedClassType) type;
+
+    if (ct.getContainingClass() != null) {
+      ct.setContainingClass(
+	(ClassType) checkAndResolveType(ct.getContainingClass(), tc));
+    }
+
+    for (Iterator i = ct.getMethods().iterator(); i.hasNext(); ) {
+      MethodTypeInstance mti = (MethodTypeInstance) i.next();
+
+      try {
+	  mti.setReturnType(checkAndResolveType(mti.getReturnType(), tc));
+
+	  ListIterator j;
+
+	  j = mti.argumentTypes().listIterator();
+
+	  while (j.hasNext()) {
+	    j.set(checkAndResolveType((Type) j.next(), tc));
+	  }
+
+	  j = mti.exceptionTypes().listIterator();
+
+	  while (j.hasNext()) {
+	    j.set(checkAndResolveType((Type) j.next(), tc));
+	  }
+      }
+      catch (SemanticException e) {
+	  if (e.getPosition() == null) {
+	      throw new SemanticException(e.getMessage(),
+		      			  Annotate.getPosition(mti));
+	  }
+	  throw e;
+      }
+    }
+
+    for (Iterator i = ct.getFields().iterator(); i.hasNext(); ) {
+      FieldInstance fi = (FieldInstance) i.next();
+
+      try {
+	  fi.setType(checkAndResolveType(fi.getType(), tc));
+      }
+      catch (SemanticException e) {
+	  if (e.getPosition() == null) {
+	      throw new SemanticException(e.getMessage(),
+		      			  Annotate.getPosition(fi));
+	  }
+	  throw e;
+      }
+    }
+  }
+
   /**
    * If <type> is a valid type in the given context, returns a
    * canonical form of that type.  Otherwise, returns a String
@@ -492,42 +646,71 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public Type checkAndResolveType(Type type, TypeContext context)
     throws SemanticException {
-    // System.out.println( "Checking: " + type + " " + type.getTypeString());
 
-    if (type.isCanonical()) return type;
+    Type t = checkAndResolve(type, context);
 
-    if (type instanceof ArrayType) {
-      ArrayType at = (ArrayType) type;
-      Type base = at.getBaseType();
-      Type result = checkAndResolveType(base, context);
+    if (t.isPackageType()) {
+	new Exception().printStackTrace();
+	throw new SemanticException("Type " + type.getTypeString() +
+	    " not found.");
+    }
 
-      if (result.isPackageType()) {
-	throw new SemanticException("Type " + result.getTypeString() +
-		" is undefined");
+    return t;
+  }
+
+  public Type checkAndResolve(Type type, TypeContext context)
+    throws SemanticException {
+
+    try {
+      TypeSystem.report(2, "Checking: " + type);
+
+      if (type.isCanonical()) {
+	TypeSystem.report(2, "::Resolved: canonical to " + type);
+	return type;
       }
 
-      return new ArrayType(this, (Type)result);
-    }
-    
-    if (! (type instanceof AmbiguousType)) 
-      throw new InternalCompilerError(
-	"Found a non-canonical, non-array, non-ambiguous type: " + type.getTypeString() + ".");
+      if (type instanceof ArrayType) {
+	ArrayType at = (ArrayType) type;
+	Type base = at.getBaseType();
+	Type result = checkAndResolveType(base, context);
 
-    return checkAndResolveAmbiguousType((AmbiguousType) type, context);
+	Type t = new ArrayType(this, (Type)result);
+
+	TypeSystem.report(2, "::Resolved: " + type + " to " + t);
+
+	return t;
+      }
+      
+      if (! (type instanceof AmbiguousType)) 
+	throw new InternalCompilerError(
+	  "Found a non-canonical, non-array, non-ambiguous type: " +
+	      type.getTypeString() + ".");
+
+      Type t = checkAndResolveAmbiguousType((AmbiguousType) type, context);
+
+      TypeSystem.report(2, "::Resolved: " + type + " to " + t);
+
+      return t;
+    }
+    catch (SemanticException e) {
+      TypeSystem.report(2, "::Exception: " + e.getMessage());
+      throw e;
+    }
   }
 
   public Type checkAndResolveType(Type type, Type contextType) throws SemanticException {
     if (contextType.isClassType()) {
 	TypeContext classContext = getClassContext((ClassType) contextType);
-	return checkAndResolveType(type, classContext);
+	return checkAndResolve(type, classContext);
     }
     else if (contextType.isPackageType()) {
 	TypeContext packageContext = getPackageContext(resolver,
 	    (PackageType) contextType);
-	return checkAndResolveType(type, packageContext);
+	return checkAndResolve(type, packageContext);
     }
     else {
-	throw new SemanticException("Type " + type + " not found in context");
+	throw new SemanticException("Type " + type.getTypeString() +
+		" not found.");
     }
   }
 
@@ -566,7 +749,7 @@ public class StandardTypeSystem extends TypeSystem {
 	return packageContext.getType(ambType.getName());
     }
     else {
-	throw new SemanticException("Type " + type + " not found in context");
+	throw new SemanticException("Type " + type + " not found.");
     }
   }
 
@@ -1059,7 +1242,6 @@ public class StandardTypeSystem extends TypeSystem {
   protected Type ARITHMETIC_EXN_;
   
   protected ClassResolver resolver; //Should do its own caching.
-  protected ClassCleaner cleaner;
   protected ClassResolver emptyResolver;
 
   /**
@@ -1205,5 +1387,14 @@ public class StandardTypeSystem extends TypeSystem {
       return prim.getTypeString();
   }
 
+  public ParsedClassType newParsedClassType(ClassType container) {
+      return new ParsedClassType(this, container);
+  }
+
+  public List defaultPackageImports() {
+      List l = new LinkedList();
+      l.add("java.lang");
+      return l;
+  }
 }
 

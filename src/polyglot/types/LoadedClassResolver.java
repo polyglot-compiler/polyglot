@@ -6,7 +6,6 @@ import jltools.visit.ClassSerializer;
 import jltools.util.*;
 import jltools.main.Main;
 
-import java.lang.reflect.*;
 import java.io.*;
 import java.util.*;
 
@@ -84,193 +83,181 @@ public class LoadedClassResolver implements ClassResolver
   protected final static int MINOR_NOT_COMPATIBLE = 1;
   protected final static int COMPATIBLE = 0;
 
-  TargetFactory tf;
-  TargetTable tt;
+  jltools.frontend.Compiler compiler;
   TypeSystem ts;
   TypeEncoder te;
 
-  public LoadedClassResolver( TargetFactory tf, TargetTable tt,
+  public LoadedClassResolver( jltools.frontend.Compiler compiler,
                               TypeSystem ts)
   {
-    this.tf = tf;
-    this.tt = tt;
+    this.compiler = compiler;
     this.ts = ts;
-    this.te = new TypeEncoder( ts);
+    this.te = new TypeEncoder(ts);
   }
 
-  public ClassType findClass( String name) throws SemanticException
+  public ClassType findClass(String name) throws SemanticException
   {
-    Target t;
-    Class clazz;
-    ClassType ct;
+    TypeSystem.report(1, "LoadedCR.findClass(" + name + ")");
+
+    Class clazz = null;
+    Source source = null;
     
-    /* First try and find the source file. */
-    try
-    {
-      t = tf.createClassTarget( name);
+    // First, try and find the source file.
+    try {
+      source = compiler.sourceLoader().classSource(name);
     }
-    catch( IOException e1)
-    {
-      /* No source file, look for the class file. */
-      try
-      {
-        clazz = Class.forName( name);
-      }
-      catch( Exception e)
-      {
-        throw new NoClassException( "Class " + name + " not found.");
-      }
-      return getTypeFromClass( clazz);
+    catch (IOException e) {
+      source = null;
     }
 
-    /* Now look for the class file. */
-    try
-    {
+    // Now, try the class file.
+    try {
       clazz = Class.forName( name);
     }
-    catch( Exception e)
-    {
-      /* No class file, so we must compile from the source. */
-      // System.err.println( "No class file for " + name + ".");
-      return getTypeFromTarget( t, name);
+    catch (Exception e) {
     }
 
-    /* Now we have both source and class files. That is, we have a target
-     * for the source file and a java.lang.Class for the class. We need to 
-     * figure out whether or not the class file is up to date and if
-     * it contains any jlc information. */
-    try
-    {
+    boolean useClassFile = clazz != null;
 
-      Field field = clazz.getDeclaredField( "jlc$SourceLastModified");
-      field.setAccessible( true);
-      if( !checkSourceModificationDate( (Long)field.get( null), 
-                                        t.getLastModifiedDate())) {
-        // System.err.println( "More recent source for " + name + ".");
-        return getTypeFromTarget( t, name);
+    if (clazz != null && source != null) {
+      // Now we have both source and class files. We need to figure out
+      // whether or not the class file is up to date and if it contains any
+      // jlc information.  If we can use the class file, drop the source.
+      // Otherwise drop the class file and use the source.
+      try {
+	java.lang.reflect.Field field;
+
+	field = clazz.getDeclaredField("jlc$SourceLastModified");
+	field.setAccessible(true);
+
+	if (((Long) field.get(null)).longValue() < source.lastModified().getTime()) {
+	  TypeSystem.report(1, "Source file version is newer than compiled for "
+		      + name + ".");
+	  useClassFile = false;
+	}
+	else {
+	  field = clazz.getDeclaredField("jlc$CompilerVersion");
+	  field.setAccessible(true);
+
+	  int comp = checkCompilerVersion((String) field.get(null));
+
+	  if (comp != COMPATIBLE) {
+	    // Incompatible or older version, so go with the source.
+	    TypeSystem.report(1, "Incompatible source file version for "
+			+ name + ".");
+	    useClassFile = false;
+	  }
+	}
       }
-
-      field = clazz.getDeclaredField( "jlc$CompilerVersion");
-      field.setAccessible( true);
-      int i = checkCompilerVersion( (String)field.get( null));
-      if( i != COMPATIBLE ) {
-        /* Incompatible or older version, so go with the source. */
-        Main.report(null, 1, "Incompatible source file version for " + name + ".");
-        return getTypeFromTarget( t, name);
-      }
-
-      /* Okay, the class file is good enough. De-serialize the ClassType. */
-      return getTypeFromClass( clazz);
+      catch (Exception e) {
+	// System.err.println( "Exception while checking fields: " + e);
+	useClassFile = false;
+      } 
     }
-    catch( Exception e)
-    {
-      // System.err.println( "Exception while checking fields: " + e);
-      return getTypeFromTarget( t, name);
-    } 
+
+    if (useClassFile) {
+      return getTypeFromClass(clazz);
+    }
+
+    if (source != null) {
+      return getTypeFromSource(source, name);
+    }
+
+    throw new NoClassException("Class " + name + " not found.");
   }
 
-  protected ClassType getTypeFromTarget( Target t, String name) 
+  protected ClassType getTypeFromSource(Source source, String name) 
     throws SemanticException
   {
-    ClassResolver cr;
+    TypeSystem.report(1, "Returning ClassType for " + name + ".");
 
-    try
-    {
-      cr = tt.getResolver( t);
-      if( cr == null) {
-        throw new NoClassException( "Errors while parsing " + t.getName());
+    // Compile the source file just enough to get the type information out.
+    try {
+      if (compiler.cleanSource(source)) {
+	return compiler.parsedResolver().findClass(name);
       }
     }
-    catch( IOException e2)
-    {
-      throw new NoClassException( "IOException while reading "
-                                  + t.getName() + ": " + e2.getMessage());
+    catch (IOException e) {
     }
 
-    // System.err.println( "Returning ParsedClassType for " + name + "...");
-    return cr.findClass( name);
+    throw new SemanticException("Error while compiling " + source.name() + ".");
   }
 
-  protected ClassType getTypeFromClass( Class clazz)
+  protected ClassType getTypeFromClass(Class clazz)
     throws SemanticException
   {
-    /* At this point we've decided to go with the Class. So if something
-     * goes wrong here, we have only one choice, to throw an exception. */
-    try
-    {
-      /* Check to see if it has serialized info. If so then check the
-       * version. */
-      Field field = clazz.getDeclaredField( "jlc$CompilerVersion");
+    // At this point we've decided to go with the Class. So if something
+    // goes wrong here, we have only one choice, to throw an exception. */
+    try {
+      // Check to see if it has serialized info. If so then check the
+      // version.
+      java.lang.reflect.Field field;
+
+      field = clazz.getDeclaredField("jlc$CompilerVersion");
       field.setAccessible( true);
-      int i = checkCompilerVersion( (String)field.get( null));
-      if( i == NOT_COMPATIBLE ) {
-        // System.err.println( "Throwing exception for " + clazz.getName() + " (Bad Version)...");
-        throw new SemanticException( "Unable to find a suitable definition of "
-                                     + clazz.getName() 
-                                     + ". Try recompiling or obtaining "
-                                     + " a newer version of the class file.");
+
+      int comp = checkCompilerVersion((String) field.get(null));
+
+      if (comp == NOT_COMPATIBLE) {
+        throw new SemanticException("Unable to find a suitable definition of "
+                                    + clazz.getName() 
+                                    + ". Try recompiling or obtaining "
+                                    + " a newer version of the class file.");
       }
       
-      /* Alright, go with it! */
-      field = clazz.getDeclaredField( "jlc$ClassType");
+      // Alright, go with it!
+      field = clazz.getDeclaredField("jlc$ClassType");
       field.setAccessible( true);
-      Type t = te.decode( (String)field.get( null));
-      // System.err.println( "The type: " + t);
-      // System.err.println( "Get type: " + t.getTypeString() + " " + t.getClass().getName());
-      ClassType ct = (ClassType)t;
-      //ClassType ct = (ClassType)te.decode( (String)field.get( null));
-      
-      // System.err.println( "Returning serialized ClassType for " + clazz.getName() + "...");
-      // ((ClassTypeImpl)ct).dump();
-      
-      /* Add the class to the target list so that it will be cleaned later. */
-      tt.addTarget( ct);
-      
-      return ct;
+
+      ClassType t = (ClassType) te.decode((String) field.get(null));
+
+      TypeSystem.report(1, "Returning serialized ClassType for " +
+		  clazz.getName() + ".");
+
+      ts.cleanClass(t);
+      return t;
     }
-    catch( SemanticException e)
-    {
+    catch (SemanticException e) {
       throw e;
     }
-    catch( NoSuchFieldException e)
-    {
-      // System.err.println( "Returning LoadedClassType for " + clazz.getName() + " (Not Serialized)...");
-      return new LoadedClassType( ts, clazz);
+    catch (NoSuchFieldException e) {
+      TypeSystem.report(1, "Returning LoadedClassType for " +
+				clazz.getName() + ".");
+      return new LoadedClassType(ts, clazz);
     }
-    catch( Exception e)
-    {
-      // e.printStackTrace();
-      // System.err.println( "Throwing exception for " + clazz.getName() + " (Error While Deserializing)...");
-      throw new SemanticException( "There was an error while reading type "
-                                   + "information from the class file for \""
-                                   + clazz.getName() + "\". Delete the class "
-                                   + "file and recompile, or obtain a newer "
-                                   + "version of the file.");
+    catch( Exception e) {
+      throw new SemanticException("There was an error while reading type "
+                                  + "information from the class file for \""
+                                  + clazz.getName() + "\". Delete the class "
+                                  + "file and recompile, or obtain a newer "
+                                  + "version of the file.");
     }
   }
 
-  protected int checkCompilerVersion( String clazzVersion)
-  {
-    StringTokenizer st = new StringTokenizer( clazzVersion, ".");
-    int v = Integer.parseInt( st.nextToken());
-    if( v != jltools.frontend.Compiler.VERSION_MAJOR) {
-      /* Incompatible. */
+  protected int checkCompilerVersion(String clazzVersion) {
+    StringTokenizer st = new StringTokenizer(clazzVersion, ".");
+
+    try {
+      int v;
+      v = Integer.parseInt(st.nextToken());
+
+      if (v != jltools.frontend.Compiler.VERSION_MAJOR) {
+	// Incompatible.
+	return NOT_COMPATIBLE;
+      }
+
+      v = Integer.parseInt(st.nextToken());
+
+      if (v != jltools.frontend.Compiler.VERSION_MINOR) {
+	// Not the best option, but will work if its the only one.
+	return MINOR_NOT_COMPATIBLE;
+      }
+    }
+    catch (NumberFormatException e) {
       return NOT_COMPATIBLE;
     }
-    v = Integer.parseInt( st.nextToken());
-    if( v != jltools.frontend.Compiler.VERSION_MINOR) {
-      /* Not the best option, but will work if its the only one. */
-      return MINOR_NOT_COMPATIBLE;
-    }
 
-    /* Everything is way cool. */
+    // Everything is way cool.
     return COMPATIBLE;
   }
-
-  protected boolean checkSourceModificationDate( Long time, Date target)
-  {
-    return time.longValue() >= target.getTime();
-  }
-
-  public void findPackage( String name) throws NoClassException {}
 }

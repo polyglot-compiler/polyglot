@@ -24,14 +24,6 @@ public class PackageContext implements TypeContext {
 
     this.resolver = resolver;
     this.type = type;
-
-    try {
-	resolver.findPackage(type.getTypeString());
-    }
-    catch (NoClassException e) {
-      throw new SemanticException("Package " + type.getTypeString() +
-				  " not found");
-    }
   }
 
   public Type getType(String name) throws SemanticException {
@@ -44,14 +36,7 @@ public class PackageContext implements TypeContext {
 	return resolver.findClass(type.getTypeString() + "." + name);
     }
     catch (SemanticException e) {
-	try {
-	    resolver.findPackage(type.getTypeString() + "." + name);
-	    return new PackageType(type.getTypeSystem(), type, name);
-	}
-	catch (NoClassException e2) {
-	  throw new SemanticException("Package " + type.getTypeString() +
-				      "." + name + " not found");
-	}
+	return new PackageType(type.getTypeSystem(), type, name);
     }
   }
 }

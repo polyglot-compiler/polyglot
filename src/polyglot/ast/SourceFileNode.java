@@ -174,7 +174,7 @@ public class SourceFileNode extends Node
       if (vNames.contains(s)) {
 	throw new SemanticException(
 	  "The source file contains two global declarations named \"" +
-	  s + "\".", Annotate.getLineNumber((Node) cn));
+	  s + "\".", Annotate.getPosition((Node) cn));
       }
 
       vNames.add(s);
@@ -184,7 +184,7 @@ public class SourceFileNode extends Node
 	if (! publicDecls.isEmpty()) {
 	  throw new SemanticException(
 	    "The source file contains more than one public global declaration.",
-	    Annotate.getLineNumber((Node) cn));
+	    Annotate.getPosition((Node) cn));
 	}
 
 	publicDecls.add(cn);
@@ -194,7 +194,7 @@ public class SourceFileNode extends Node
       if (cn.getAccessFlags().isPublic() && ! s.equals(sSourceName)) {
 	throw new SemanticException("The name of the public declaration \"" +
 	  s + "\" must match the source file name",
-	  Annotate.getLineNumber((Node) cn));
+	  Annotate.getPosition((Node) cn));
       }
       */
     }

@@ -143,9 +143,9 @@ public abstract class Node extends AnnotatedObject {
    * @return See notes for <code>visit</code> and <code>visitChildren</code>.
    */
   public Node cleanupSignatures(LocalContext c, SignatureCleaner sc)
-    throws SemanticException, IOException
+    throws SemanticException
   { 
-    return null; 
+    return this; 
   }
 
   /**

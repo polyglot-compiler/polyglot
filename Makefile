@@ -24,7 +24,7 @@ clobber:
 	-rm -f $(JAR_FILE)
 	$(subdirs)
 
-norecurse: classes jif polyj split op
+norecurse: classes jif polyj split op jmatch
 	$(JC) $(JC_FLAGS) jltools/main/Main.java
 
 jif:
@@ -35,6 +35,8 @@ op:
 	$(JC) $(JC_FLAGS) jltools/ext/op/ExtensionInfo.java
 split:
 	$(JC) $(JC_FLAGS) jltools/ext/split/ExtensionInfo.java
+jmatch:
+	$(JC) $(JC_FLAGS) jltools/ext/jmatch/ExtensionInfo.java
 
 
 PACKAGES = \

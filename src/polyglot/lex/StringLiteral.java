@@ -1,12 +1,14 @@
 package jltools.lex;
 
 import java_cup.runtime.Symbol;
+import jltools.util.Position;
 
 public class StringLiteral extends Literal {
   String val;
-  StringLiteral(int line, String s) { super(line); this.val = s; }
-
-  public Symbol symbol() { return new Symbol(jltools.parse.sym.STRING_LITERAL, this); }
+  public StringLiteral(Position position, String s, int sym) {
+      super(position, sym);
+      this.val = s;
+  }
 
   public String getValue() { return val; }
 

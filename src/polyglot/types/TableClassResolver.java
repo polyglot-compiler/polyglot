@@ -9,22 +9,22 @@ import java.util.*;
 
 public class TableClassResolver implements ClassResolver
 {
-  protected ClassCleaner cc;
   protected Map table;
   protected List queue;
+  protected LinkedList dirty;
 
-  public TableClassResolver( ClassCleaner cc)
+  public TableClassResolver()
   {
-    this.cc = cc;
-
     table = new HashMap();
     queue = new LinkedList();
+    dirty = new LinkedList();
   }
   
   public void addClass( String fullName, ClassType clazz)
   {
     table.put( fullName, clazz);
     queue.add( clazz);
+    dirty.add( clazz);
   }
 
   /**
@@ -45,6 +45,13 @@ public class TableClassResolver implements ClassResolver
     return queue.iterator();
   }
 
+  public void cleanupSignatures() throws SemanticException {
+      while (! dirty.isEmpty()) {
+	  ClassType ct = (ClassType) dirty.removeFirst();
+	  ct.getTypeSystem().cleanClass(ct);
+      }
+  }
+
   public boolean containsClass( String name)
   {
     return table.containsKey( name);
@@ -57,6 +64,4 @@ public class TableClassResolver implements ClassResolver
       throw new NoClassException( "Class \"" + name + "\" not found.");
     return clazz;
   }
-
-  public void findPackage( String name) throws NoClassException {}
 }

@@ -245,7 +245,7 @@ public class AmbiguousName extends Node implements AmbiguousNode {
 	    }
 	    else {
 	      throw new SemanticException("No field or variable with name \"" + 
-		getFullName() + "\".", Annotate.getLineNumber(this));
+		getFullName() + "\".", Annotate.getPosition(this));
 	    }
 	}
 	catch (SemanticException e) {
@@ -258,12 +258,12 @@ public class AmbiguousName extends Node implements AmbiguousNode {
     }
 
     if( top != null) {
-      Annotate.setLineNumber( top, Annotate.getLineNumber( this));
+      Annotate.setPosition( top, Annotate.getPosition( this));
     }
     else {
       throw new SemanticException( "No package, type, field, or variable " +
 				   "with name \"" + getFullName() + "\".",
-				   Annotate.getLineNumber(this));
+				   Annotate.getPosition(this));
     }
 
     return top;

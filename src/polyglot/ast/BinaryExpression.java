@@ -240,7 +240,7 @@ public class BinaryExpression extends Expression
 
     // copy the line number:
     if ( newNode != this)
-      Annotate.setLineNumber( newNode, Annotate.getLineNumber ( left ));
+      Annotate.setPosition( newNode, Annotate.getPosition ( left ));
     return newNode;
   }
 
@@ -260,7 +260,7 @@ public class BinaryExpression extends Expression
         throw new SemanticException( "Unable to assign \"" + 
                                       rtype.getTypeString() + "\" to \""
                                       + ltype.getTypeString() + "\".",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
       }
       setCheckedType( ltype);
       right.setExpectedType( ltype);
@@ -274,13 +274,13 @@ public class BinaryExpression extends Expression
       if( !ltype.isPrimitive() || !rtype.isPrimitive()) {
         throw new SemanticException( 
                   "Operands of numeric comparison operators must be numeric.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
       }
       if( !(ltype.toPrimitiveType()).isNumeric() ||
           !(rtype.toPrimitiveType()).isNumeric()) {
         throw new SemanticException(
                  "Operands of numeric comparison operators must be numeric.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
       }
       setCheckedType( c.getTypeSystem().getBoolean());
       break;
@@ -293,12 +293,12 @@ public class BinaryExpression extends Expression
           if( !rtype.isPrimitive()) {
             throw new SemanticException(
                       "Can only compare two expressions of similar type.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
           }
           else if( !(rtype.toPrimitiveType()).isNumeric()) {
             throw new SemanticException(
                       "Can only compare two expressions of similar type.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
           }
         }
         else {
@@ -306,12 +306,12 @@ public class BinaryExpression extends Expression
           if( !rtype.isPrimitive()) {
             throw new SemanticException(
                       "Can only compare two expressions of similar type.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
           }
           else if( (rtype.toPrimitiveType()).isNumeric()) {
             throw new SemanticException(
                       "Can only compare two expressions of similar type.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
           }
         }
       }
@@ -320,12 +320,12 @@ public class BinaryExpression extends Expression
         if( rtype.isPrimitive()) {
           throw new SemanticException(
                     "Can only compare two expressions of similar type.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
         }
         else if( !(rtype.isReferenceType() || rtype instanceof NullType)) {
           throw new SemanticException(
                     "Can only compare two expressions of similar type.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
         }
       }
       setCheckedType( c.getTypeSystem().getBoolean());
@@ -337,7 +337,7 @@ public class BinaryExpression extends Expression
             && rtype.isSameType( c.getTypeSystem().getBoolean()))) {
         throw new SemanticException(
                   "Operands of logical operator must be boolean.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
       }
       setCheckedType( c.getTypeSystem().getBoolean());
       break;
@@ -359,22 +359,22 @@ public class BinaryExpression extends Expression
       if( !ltype.isPrimitive()) {
         throw new SemanticException( 
                   "Additive operators must have numeric operands.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
       }
       else if( !(ltype.toPrimitiveType()).isNumeric()) {
         throw new SemanticException( 
                   "Additive operators must have numeric operands.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
       }
       else if( !rtype.isPrimitive()) {
         throw new SemanticException(
                   "Additive operators must have numeric operands.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
       }
       else if( !(rtype.toPrimitiveType()).isNumeric()) {
         throw new SemanticException(
                   "Additive operators must have numeric operands.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
       }
       else {
         setCheckedType( PrimitiveType.binaryPromotion( ltype.toPrimitiveType(),
@@ -391,13 +391,13 @@ public class BinaryExpression extends Expression
       if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
         throw new SemanticException(
                   "Expected numeric operands to multiplicative operator.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
       }
       else if( !((ltype.toPrimitiveType()).isNumeric()
                  && (rtype.toPrimitiveType()).isNumeric())) {
         throw new SemanticException(
                   "Expected numeric operands to multiplicative operator.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
       }
       else {
         setCheckedType( PrimitiveType.binaryPromotion( ltype.toPrimitiveType(),
@@ -415,7 +415,7 @@ public class BinaryExpression extends Expression
       if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
         throw new SemanticException(
                  "Expected primitive operands to bitwise binary operator.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
       }
       else if( (ltype.toPrimitiveType()).isNumeric()
                && (rtype.toPrimitiveType()).isNumeric()) {
@@ -429,7 +429,7 @@ public class BinaryExpression extends Expression
       else {
         throw new SemanticException(
             "Bitwise operators require two boolean or two numeric operands.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
       }
       break;
       
@@ -442,13 +442,13 @@ public class BinaryExpression extends Expression
       if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
         throw new SemanticException(
                   "Expected numeric operands to shift operator.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
       }
       else if( !((ltype.toPrimitiveType()).isNumeric()
                  && (rtype.toPrimitiveType()).isNumeric())) {
         throw new SemanticException(
                   "Expected numeric operands to shift operator.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
       }
       else {
         setCheckedType( PrimitiveType.unaryPromotion( ltype.toPrimitiveType()));
@@ -458,7 +458,7 @@ public class BinaryExpression extends Expression
     default:
       throw new SemanticException(
                 "Internal error: unknown binary operator.",
-				     Annotate.getLineNumber(this) );
+				     Annotate.getPosition(this) );
     }
     
     return this;

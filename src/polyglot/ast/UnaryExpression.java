@@ -119,7 +119,7 @@ public class UnaryExpression extends Expression
 
     // copy the line number:
     if ( newNode != this)
-      Annotate.setLineNumber( newNode, Annotate.getLineNumber ( expr ));
+      Annotate.setPosition( newNode, Annotate.getPosition ( expr ));
     return newNode;
   }
 
@@ -135,12 +135,12 @@ public class UnaryExpression extends Expression
       if( !type.isPrimitive()) {
         throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be numeric.",
-		Annotate.getLineNumber(this));
+		Annotate.getPosition(this));
       }
       if( !(type.toPrimitiveType()).isNumeric()) {
         throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be numeric.",
-		Annotate.getLineNumber(this));
+		Annotate.getPosition(this));
       }
       setCheckedType( type);
       break;
@@ -151,12 +151,12 @@ public class UnaryExpression extends Expression
       if( !type.isPrimitive()) {
         throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be numeric.",
-		Annotate.getLineNumber(this));
+		Annotate.getPosition(this));
       }
       if( !(type.toPrimitiveType()).isNumeric()) {
         throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be numeric.",
-		Annotate.getLineNumber(this));
+		Annotate.getPosition(this));
       }
       setCheckedType( PrimitiveType.unaryPromotion( type.toPrimitiveType()));
       break;
@@ -165,12 +165,12 @@ public class UnaryExpression extends Expression
       if( !type.isPrimitive()) {
         throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be boolean.",
-		Annotate.getLineNumber(this));
+		Annotate.getPosition(this));
       }
       if( !(type.toPrimitiveType()).isBoolean()) {
         throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be boolean.",
-		Annotate.getLineNumber(this));
+		Annotate.getPosition(this));
       }
       setCheckedType( type);
       break;

@@ -5,14 +5,24 @@ SUBDIRS =
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
-	ClassTypeJob.java \
+	BarrierID.java \
+	BarrierPass.java \
 	Compiler.java \
+	CompoundPass.java \
+	CupParser.java \
+	EmptyPass.java \
 	ExtensionInfo.java \
 	Job.java \
-	SourceJob.java \
+	Parser.java \
+	ParserPass.java \
+	PassID.java \
+	Pass.java \
+	Scheduler.java \
+	Source.java \
+	SourceLoader.java \
 	StandardExtensionInfo.java \
-	Target.java \
-	TargetFactory.java
+	TargetFactory.java \
+	VisitorPass.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 

@@ -135,7 +135,7 @@ public class VariableDeclarationStatement extends Statement
     }
       
     public Node cleanupSignatures( LocalContext c, SignatureCleaner sc)
-	throws SemanticException, IOException
+	throws SemanticException
     {
       /* Only add to context if inside a method, hence a local variable 
        * declaration. */
@@ -160,20 +160,17 @@ public class VariableDeclarationStatement extends Statement
         c.addSymbol( name, vi);
       }
 
-      Declarator d = (Declarator) visitChildren(sc);
-
       // HACK: Update the type of the variable instance.
       VariableDeclarationStatement vdsEnclosing = 
-	(VariableDeclarationStatement) d.wrVDS.get();
-      VariableInstance vi = d.getVariableInstance();
-      vi.setType(vdsEnclosing.typeForDeclarator(d));
+	(VariableDeclarationStatement) wrVDS.get();
+      VariableInstance vi = getVariableInstance();
+      vi.setType(vdsEnclosing.typeForDeclarator(this));
 
-      return d;
+      return this;
     }
       
     public Node typeCheck( LocalContext c) throws SemanticException
     {
-
       VariableDeclarationStatement vdsEnclosing = 
         (VariableDeclarationStatement)wrVDS.get();
       /* Only add to context if inside a method, hence a local variable 
@@ -182,7 +179,7 @@ public class VariableDeclarationStatement extends Statement
         if (c.isDefinedLocally( name) )
           throw new SemanticException("Duplicate declaration of \"" + 
                                       name + "\"",
-				      Annotate.getLineNumber(this));
+				      Annotate.getPosition(this));
           
         /* If it is a constant numeric expression (final + initializer is 
          * IntLiteral) then mark it "constant" under FieldInstance. */
@@ -212,7 +209,7 @@ public class VariableDeclarationStatement extends Statement
                            + initializer.getCheckedType().getTypeString()
                            + "\" does not match that of the declaration \"" 
                            + type.getTypeString() + "\".",
-			   Annotate.getLineNumber(this));
+			   Annotate.getPosition(this));
           }
       }
       return this;

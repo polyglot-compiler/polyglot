@@ -221,7 +221,7 @@ public class NewObjectExpression extends Expression
       throw new SemanticException (
               "The containing instance must be the containing class of \"" +
               tn.getType().getTypeString() + "\".",
-	      Annotate.getLineNumber(primary));
+	      Annotate.getPosition(primary));
     }
 
     if( primary != null && 
@@ -229,12 +229,12 @@ public class NewObjectExpression extends Expression
       // FIXME is this really true?
       throw new SemanticException(
              "Cannot specify a containing instance for static classes.",
-	      Annotate.getLineNumber(primary));
+	      Annotate.getPosition(primary));
     }
 
     if( ct.getAccessFlags().isAbstract()) {
       throw new SemanticException( "Cannot instantiate an abstract class.",
-	      Annotate.getLineNumber(this));
+	      Annotate.getPosition(this));
     }
 
     List argTypes = new ArrayList( args.size());
@@ -267,11 +267,10 @@ public class NewObjectExpression extends Expression
       for( Iterator iter = argTypes.iterator(); iter.hasNext() ; ) {
         Type t = (Type)i.next();
       } */
-      System.out.println( ct.getTypeString() );
       throw new SemanticException ( 
               "No acceptable constructor found for the creation of \"" 
               + ct.getTypeString() + "\".",
-	      Annotate.getLineNumber(this));
+	      Annotate.getPosition(this));
     }
     setCheckedType( ct);
 

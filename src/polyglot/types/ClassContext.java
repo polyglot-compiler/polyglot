@@ -19,7 +19,7 @@ public class ClassContext implements TypeContext {
   ClassType type;
   TypeSystem ts;
 
-  ClassContext(ClassType type) throws SemanticException {
+  ClassContext(ClassType type) {
     this.type = type;
     this.ts = type.getTypeSystem();
   }

@@ -83,7 +83,7 @@ public class SynchronizedStatement extends Statement
        throw new SemanticException( "The type of the expression \"" + 
                                      expr.getCheckedType().getTypeString() + 
                                      "\" is not valid to synchronize on.",
-				    Annotate.getLineNumber(expr));
+				    Annotate.getPosition(expr));
     }
     expr.setExpectedType( c.getTypeSystem().getObject()) ;
     return this;

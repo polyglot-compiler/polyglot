@@ -101,7 +101,7 @@ public class CastExpression extends Expression
                                    + "\" to type \"" 
                                    + tn.getType().getTypeString() 
                                    + "\".",
-				   Annotate.getLineNumber(this) );
+				   Annotate.getPosition(this) );
 
     setCheckedType( tn.getType());
     return this;

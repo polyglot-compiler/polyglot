@@ -133,7 +133,7 @@ public class CatchBlock extends Node
           !fp.getParameterType().equals( throwable)) {
       throw new SemanticException(
                 "Can only catch objects whose type descends from Throwable.",
-				   Annotate.getLineNumber(fp) );
+				   Annotate.getPosition(fp) );
     }
     return this;
   }

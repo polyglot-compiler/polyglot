@@ -217,7 +217,6 @@ public class MethodNode extends ClassMember
        return reconstruct(this.ext, isConstructor, accessFlags, returns, name, formals, exceptions, body, addDims);
    }
 
-
   /**
    * Returns <code>true</code> iff this node represents a constructor.
    */
@@ -422,7 +421,7 @@ public class MethodNode extends ClassMember
                           argTypes, excTypes, accessFlags);     
     }
 
-    Annotate.setLineNumber( mtiThis, Annotate.getLineNumber( this));
+    Annotate.setPosition( mtiThis, Annotate.getPosition( this));
     clazz.addMethod( mtiThis);
 
     visitChildren(sr);
@@ -470,7 +469,7 @@ public class MethodNode extends ClassMember
         if ( ! bThrowDeclared)
           ec.reportError("Method \"" + name + "\" throws the undeclared "
                          + "exception \"" + t.getTypeString() + "\".", 
-                         Annotate.getLineNumber( this ) );
+                         Annotate.getPosition( this ) );
       }
     }
     ec.getThrowsSet().clear();

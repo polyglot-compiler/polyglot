@@ -28,9 +28,4 @@ public class CachingClassResolver implements ClassResolver
       return ct;
     }
   }
-
-  public void findPackage( String name) throws NoClassException
-  {
-    resolver.findPackage( name);
-  }
 }
