@@ -152,7 +152,7 @@ echo creating ${DEFS_MK}
 
 if [ -z $(echo ${JAVA_VER} | grep "1.4") ]
 then
-    JSSE_JAR="\${ESC_SOURCE}${FILE_SPE}jsse.jar"
+    JSSE_JAR="\${ESC_SOURCE}${FILE_SEP}jsse.jar"
 fi
 
 cat > ${DEFS_MK} << EOF
