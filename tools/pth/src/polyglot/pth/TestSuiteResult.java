@@ -13,16 +13,18 @@ import java.util.Map;
  */
 public final class TestSuiteResult extends TestResult {
     private static final String RESULT_FILE_SUFFIX = ".results";
+    private static final String RESULT_FILE_PREFIX = "";
     /**
-     * The results file is the script file, with a preceding period, and
-     * RESULT_FILE_SUFFIX appended. 
+     * The name of the results file is the name of script file,
+     * bracketed with RESULTS_FILE_PREFIX and RESULT_FILE_SUFFIX.
      */
     protected static String getResultsFileName(File script) {
         String parent = "";
         if (script.getParent() != null) {
             parent = script.getParent() + File.separator;
         }
-        return parent + '.' + script.getName() + RESULT_FILE_SUFFIX;
+        return parent + RESULT_FILE_PREFIX + script.getName() +
+                        RESULT_FILE_SUFFIX;
     }
     public final Map testResults;
     public TestSuiteResult(Test t, Date dateTestRun, Map testResults, Date dateLastSuccess) {
