@@ -4,7 +4,8 @@ import java.util.Hashtable;
 import java.util.List;
 
 /**
- * A context to be used within the scope of a method body.  
+ * A context to be used within the scope of a method body.  It provides a convenient wrapper
+ * for the Type System.
  */
 public class LocalContext 
 {
@@ -40,32 +41,6 @@ public class LocalContext
     this.ts = ts;
     htLocalVariables = new Hashtable();
   }
-
-  /**
-   * Finds the type of a particular string within a context. If it is not found
-   * in this context, checks the parent context.
-   */
-  public Type lookup(String s) throws TypeCheckError
-  {
-    Type t = (Type)htLocalVariables.get(s);
-    
-    if ( t != null ) 
-      return t;
-    
-    if (lcParent != null)
-      return lcParent.lookup(s);
-    
-    if (ts != null)
-    {
-      // FIXME: properly figure out if it's canonical or not 
-      Object o =  ts.checkAndResolveType( new ClassType ( ts, s, true) , 
-                                 new TypeSystem.Context ( itImports, tEnclosingClass , null));
-      if (o instanceof Type)
-        return (Type)o;
-      throw new TypeCheckError((String)o);
-    }
-    return null;
-  }
   
   /**
    * Returns whether the particular symbol is defined locally. If it isn't in this 
@@ -96,7 +71,40 @@ public class LocalContext
   {
     return null;
   }
+
+  /**
+   * Finds a particular field within the current type system.
+   */
+  public TypeSystem.FieldMatch getField (String fieldName)
+  {
+
+    return null;
+  }
+
+  /**
+   * Gets a field matched against a particular type
+   */  
+  public TypeSystem.FieldMatch getField( Type type, String fieldName)
+  {
+    return null;
+  }
+
+  /**
+   * Finds the definition of a particular type
+   */
+  public Type getType( String s)
+  {
+    return null;
+  }
   
+  /**
+   * Returns the current type system
+   */
+  public TypeSystem getTypeSystem()
+  {
+    return ts;
+  }
+
   /**
    * Returns a new LocalContext with an additional scoping level.
    */
