@@ -23,13 +23,11 @@ public class JLgen
 		String filename = null;				for (int i=0; i < args.length; i++) {
 			// assume all switches begin with a dash '-'
 			if (args[i].charAt(0) == '-') {
-				if (args[i].equals("-t")) {
-					// token function
-				} else if (args[i].equals("-c")) {
+				if (args[i].equals("-c")) {
 					// constant class
 				}
 				else { // invalid switch
-					System.err.println("Error: invalid switch: "+args[i]);
+					System.err.println(HEADER+" invalid switch: "+args[i]);
 					usage();
 				}
 			} else {
@@ -85,8 +83,7 @@ public class JLgen
 		}	}	
 	
 	public static void usage() {
-		System.err.println("Usage: jlgen [-t token_func] [-c ConstClass] <input file>\nwhere:\n"+
-						   "\t-t <func>\tfunction will accept an int and return a token\n"+
+		System.err.println("Usage: jlgen [-c ConstClass] <input file>\nwhere:\n"+
 						   "\t-c <Class>\tclass prepended to token names to pass to <func>\n"+
 						   "\t<input>\ta JLgen or CUP source file\n");
 		System.exit(1);	}}

@@ -1,3 +1,5 @@
+package jltools.util.jlgen.test.multi;
+
 public class Expr
 {
 	int lNum, rNum;

@@ -187,6 +187,17 @@ public class JLgenSpec extends Spec
 		newSpec.setPkgName(packageName);
 		
 		// add imported classes		newSpec.addImports(imports);
+		
+		/* override precedence, using these rules:
+		 *
+		 * precedence list null: delete precedence list of parent
+		 * precedence list of length 0: leave precedence of parent
+		 * precedence list of length >0: override with current list
+		 */
+		//TODO: test precedence inheritance/overriding/ignoring
+		if (prec == null) {			newSpec.prec.removeAllElements();			} else if (prec.size() == 0) {			// do nothing to parent's precedence list		} else {
+			// override with current			newSpec.prec.removeAllElements();
+			newSpec.prec.addAll(prec);		}
 				// override action/parser/init/scan code		newSpec.replaceCode(code);
 				// add in (non)terminals
 		newSpec.addSymbols(symbols);
@@ -267,9 +278,7 @@ public class JLgenSpec extends Spec
 			cmd = (Command) commands.elementAt(i);			if (cmd instanceof NewProdCmd) {				newProd = (NewProdCmd) cmd;
 				newSpec.addProductions(newProd.getProduction());			}
 		}
-	}		/**
-	 * Write out contents to a CodeWriter
-	 */
+	}		/**	 * Write out contents to a CodeWriter	 */
 	public void unparse (CodeWriter cw) {
 		cw.begin(0);
 		if (include != null) {

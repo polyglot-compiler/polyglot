@@ -1,3 +1,5 @@
+package jltools.util.jlgen.test.multi;
+
 import java.io.*;
 
 public class LexicalError extends Exception implements LexerResult {

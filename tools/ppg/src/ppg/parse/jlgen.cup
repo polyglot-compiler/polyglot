@@ -89,6 +89,7 @@ nonterminal Spec spec, jlgen_spec, cup_spec;
 
 /* JLgen */nonterminal String include_spec;
 nonterminal Vector command_list_opt, prod_part_list, rhs_list, transfer_list,
+					jlgen_precedence_list,
 					jlgen_start_spec, jlgen_start_spec_elt, jlgen_start_spec_list,					nt_id_list;
 nonterminal Command command;
 /* Common */
@@ -114,7 +115,7 @@ spec ::=
  * JLGEN                                                            *
  ********************************************************************/
 jlgen_spec ::=
-	include_spec:inc package_spec:pkg import_list:imp 	code_parts:code symbol_list_opt:sym_list precedence_list:prec_list	jlgen_start_spec:start command_list_opt:cmd_list
+	include_spec:inc package_spec:pkg import_list:imp 	code_parts:code symbol_list_opt:sym_list jlgen_precedence_list:prec_list	jlgen_start_spec:start command_list_opt:cmd_list
 	{:
 		RESULT = new JLgenSpec(inc, pkg, imp, code, sym_list,								prec_list, start, cmd_list);
 	:}
@@ -128,6 +129,12 @@ include_spec ::=
 	;
 symbol_list_opt ::=
 	symbol_list:sym_list {: RESULT = sym_list; :}|	{: RESULT = null; :};
+jlgen_precedence_list ::=
+	precedence_list:p_l {: RESULT = p_l; :}
+|	PRECEDENCE SEMI // remove all precedence instructions from grammar
+	{: RESULT = null; :}
+;
+
 jlgen_start_spec ::=
 	START WITH nt_id:start SEMI {: 
 		Vector v = new Vector();
@@ -298,10 +305,7 @@ empty ::= /* nothing */;
 
 cup_spec ::= 
 	package_spec:pkg import_list:imp code_parts:code	symbol_list:sym_list precedence_list:prec_list
-	start_spec:start production_list:prod_list {:		RESULT = new CUPSpec(pkg, imp, code, sym_list, prec_list, start, prod_list);	:}/*
-|
-	error symbol_list precedence_list start_spec production_list
-*/;
+	start_spec:start production_list:prod_list {:		RESULT = new CUPSpec(pkg, imp, code, sym_list, prec_list, start, prod_list);	:};
 package_spec ::= 
 	PACKAGE multipart_id:m_id SEMI {: RESULT = m_id; :}
 |	empty {: RESULT = null; :}

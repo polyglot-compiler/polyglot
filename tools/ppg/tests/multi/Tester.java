@@ -1,5 +1,6 @@
-import java.io.*;
+package jltools.util.jlgen.test.multi;
 
+import java.io.*;
 import java_cup.runtime.*;
 
 public class Tester {

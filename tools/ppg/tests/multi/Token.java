@@ -1,3 +1,5 @@
+package jltools.util.jlgen.test.multi;
+
 import java.io.*;
 import java_cup.runtime.Symbol;
 //import jltools.util.Position;
