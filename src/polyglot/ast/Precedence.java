@@ -9,7 +9,7 @@ import polyglot.util.Enum;
 public class Precedence extends Enum {
     private int value;
 
-    protected Precedence(String name, int value) {
+    public Precedence(String name, int value) {
 	super("prec_" + name);
 	this.value = value;
     }

@@ -9,7 +9,7 @@ public interface Assign extends Expr, Thrower
 {
     /** Assignment operator. */
     public static class Operator extends Enum {
-	protected Operator(String name) { super(name); } 
+	public Operator(String name) { super(name); } 
     }
 
     public static final Operator ASSIGN         = new Operator("=");

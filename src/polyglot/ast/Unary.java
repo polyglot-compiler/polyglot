@@ -13,7 +13,7 @@ public interface Unary extends Expr
 	boolean prefix;
         String name;
 
-        protected Operator(String name, boolean prefix) {
+        public Operator(String name, boolean prefix) {
 	    super(name + (prefix ? "" : "post"));
             this.name = name;
 	    this.prefix = prefix;

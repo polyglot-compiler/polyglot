@@ -10,7 +10,7 @@ public interface IntLit extends NumLit
 {
     /** Integer literal kinds: int (e.g., 0) or long (e.g., 0L). */
     public static class Kind extends Enum {
-        protected Kind(String name) { super(name); }
+        public Kind(String name) { super(name); }
     }
 
     public static final Kind INT   = new Kind("int");

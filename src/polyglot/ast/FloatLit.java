@@ -10,7 +10,7 @@ public interface FloatLit extends Lit
 {    
     /** Integer literal kinds: float (e.g., 0.0F) or double (e.g., 0.0). */
     public static class Kind extends Enum {
-        Kind(String name) { super(name); }
+        public Kind(String name) { super(name); }
     }
 
     public static final Kind FLOAT = new Kind("float");

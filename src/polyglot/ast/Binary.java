@@ -10,9 +10,9 @@ public interface Binary extends Expr, Thrower
 {
     /** Binary expression operator. */
     public static class Operator extends Enum {
-	protected Precedence prec;
+	Precedence prec;
 
-        protected Operator(String name, Precedence prec) {
+        public Operator(String name, Precedence prec) {
 	    super(name);
 	    this.prec = prec;
 	}
