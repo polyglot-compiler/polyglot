@@ -86,7 +86,15 @@ public class ImportTable extends ClassResolver
      * Add a package import.
      */
     public void addPackageImport(String pkgName) {
-	packageImports.add(pkgName);
+        // don't add the import if it is the same as the current package,
+        // the same as a default import, or has already been imported
+        if ((pkg != null && pkg.fullName().equals(pkgName)) ||
+                ts.defaultPackageImports().contains(pkgName) ||
+                packageImports.contains(pkgName)) {
+            return;
+        }
+        
+        packageImports.add(pkgName);
     }
 
     /**
