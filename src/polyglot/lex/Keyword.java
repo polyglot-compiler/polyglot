@@ -13,6 +13,6 @@ public class Keyword extends Token {
   }
 
   public String toString() {
-      return "Keyword<" + keyword + ">";
+      return keyword;
   }
 }

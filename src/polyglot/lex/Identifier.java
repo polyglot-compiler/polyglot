@@ -14,5 +14,5 @@ public class Identifier extends Token {
 
   public String getIdentifier() { return identifier; }
 
-  public String toString() { return "Identifier <"+identifier+">"; }
+  public String toString() { return "identifier \"" + identifier + "\""; }
 }

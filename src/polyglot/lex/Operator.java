@@ -12,5 +12,5 @@ public class Operator extends Token {
       this.which = which;
   }
 
-  public String toString() { return "Operator <"+which+">"; }
+  public String toString() { return "operator " + which; }
 }

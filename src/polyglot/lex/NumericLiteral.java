@@ -10,5 +10,5 @@ public abstract class NumericLiteral extends Literal {
 
   public Number getValue() { return val; }
 
-  public String toString() { return "NumericLiteral <"+val.toString()+">"; }
+  public String toString() { return "numeric literal " + val.toString(); }
 }

@@ -14,6 +14,6 @@ public class StringLiteral extends Literal {
   public String getValue() { return val; }
 
   public String toString() {
-    return "StringLiteral <"+Token.escape(val)+">";
+    return "string literal \""+Token.escape(val)+"\"";
   }
 }

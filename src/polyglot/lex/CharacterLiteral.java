@@ -25,6 +25,6 @@ public class CharacterLiteral extends Literal {
 
   public String toString() 
   {
-    return "CharacterLiteral <" + Token.escape( String.valueOf( val)) + ">";
+    return "char literal '" + getEscapedValue() + "'";
   }
 }

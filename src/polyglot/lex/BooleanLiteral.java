@@ -13,5 +13,5 @@ public class BooleanLiteral extends Literal {
   
   public Boolean getValue() { return val; }
 
-  public String toString() { return "BooleanLiteral <"+val.toString()+">"; }
+  public String toString() { return "boolean literal " + val.toString(); }
 }
