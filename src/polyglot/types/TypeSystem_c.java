@@ -995,7 +995,14 @@ public class TypeSystem_c implements TypeSystem
         s1.addAll(p1.exceptionTypes());
         s2.addAll(p2.exceptionTypes());
 
-        return s2.containsAll(s1);
+        for (Iterator i = s1.iterator(); i.hasNext(); ) {
+            Type t = (Type) i.next();
+            if (! t.isUncheckedException() && ! s2.contains(t)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
