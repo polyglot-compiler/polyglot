@@ -70,7 +70,7 @@ public abstract class VariableInstance extends AnnotatedObject
   }
 
   public String toString() {
-    return getType() + " " + getName();
+    return getType() + " " + getName() + (oValue == null ? "" : " = " + oValue);
   }
 
   private String name;

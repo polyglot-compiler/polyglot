@@ -167,6 +167,10 @@ public class SwitchStatement extends Statement
     private boolean def;
     private Expression expr;
     private int iValue;
+
+    public String toString() {
+      if (def) return "default:"; else return "case " + expr + ":";
+    }
    }
 
    public static class SwitchBlock extends Statement{
@@ -232,6 +236,10 @@ public class SwitchStatement extends Statement
 
      public void  dump ( CodeWriter cw)
      {
+     }
+
+     public String toString() {
+       return block.toString();
      }
    }
 
@@ -312,8 +320,7 @@ public class SwitchStatement extends Statement
 
    public Node typeCheck(LocalContext c) throws SemanticException
    {
-     List lDefinedCaseLabels = new ArrayList();
-
+     Set lDefinedCaseLabels = new HashSet();
 
      for (ListIterator it = switchElems.listIterator(); it.hasNext(); ) {
        Statement se = (Statement) it.next();
@@ -325,9 +332,10 @@ public class SwitchStatement extends Statement
          else
            key = new Long ( ((CaseStatement)se).iValue);
 
-         if ( lDefinedCaseLabels.contains( key ) )
+         if ( lDefinedCaseLabels.contains( key ) ) {
            throw new SemanticException( "Duplicate case label: " + key, 
                                          Annotate.getPosition( se ) );
+	 }
          lDefinedCaseLabels.add ( key );                                        
        }
      }     

@@ -215,6 +215,14 @@ public class Main
         options.post_compiler = null;
         i++;
       }
+      else if (args[i].equals("-w"))
+      {
+        i++;
+	try {
+	  options.output_width = Integer.parseInt(args[i]);
+	} catch (NumberFormatException e) {}
+        i++;
+      }
       else if (args[i].equals("-post"))
       {
         i++;
