@@ -11,7 +11,7 @@ import java.util.*;
  * A <code>Formal</code> represents a formal parameter for a procedure
  * or catch block.  It consists of a type and a variable identifier.
  */
-public class Formal_c extends Node_c implements Formal
+public class Formal_c extends Term_c implements Formal
 {
     LocalInstance li;
     Flags flags;
@@ -153,29 +153,6 @@ public class Formal_c extends Node_c implements Formal
 
     public List acceptCFG(CFGBuilder v, List succs) {
         return succs;
-    }
-
-    /**
-     * Return true if this term is reachable. This attribute is not
-     * guaranteed correct until after the reachability pass
-     *
-     * @see polyglot.visit.ReachChecker
-     */
-    public boolean reachable() {
-        return reachable;
-    }
-
-    /**
-     * Set the reachability of this term.
-     */
-    public Term reachable(boolean reachability) {
-        if (this.reachable == reachability) {
-            return this;
-        }
-        
-        Formal_c t = (Formal_c) copy();
-        t.reachable = reachability;
-        return t;
     }
 
     public void dump(CodeWriter w) {
