@@ -261,7 +261,21 @@ public class Subst_c implements Subst
             str += "<" + key + ": " + subst.get(key) + ">";
             if (iter.hasNext())
                 str += ", ";
-        }
+        }	
         return str + "]";
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) 
+	throws java.io.IOException
+    {
+	out.writeObject(subst);
+    }
+
+    private void readObject(java.io.ObjectInputStream in) 
+	throws java.io.IOException, ClassNotFoundException
+    {
+	this.subst = (Map) in.readObject();
+	this.cache = new HashMap();
+	this.ts = (ParamTypeSystem) ((TypeInputStream)in).getTypeSystem();
     }
 }
