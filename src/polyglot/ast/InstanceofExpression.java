@@ -84,7 +84,7 @@ public class InstanceofExpression extends Expression
   {
     Type rtype = tn.getType();
 
-    if( rtype instanceof PrimitiveType) {
+    if( !rtype.isReferenceType()) {
       throw new SemanticException( 
                  "Right operand of \"instanceof\" must be a reference type.",
 				  Annotate.getLineNumber(tn));

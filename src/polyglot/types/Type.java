@@ -140,6 +140,10 @@ public abstract class Type extends AnnotatedObject implements Serializable
       ts = ((TypeInputStream)in).getTypeSystem();
     }
   }
+
+  public final String toString() {
+    return getTypeString()+(this instanceof AmbiguousType ? "{amb}" : "");
+  }
 }
 
 

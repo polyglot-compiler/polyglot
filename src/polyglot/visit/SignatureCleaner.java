@@ -41,6 +41,18 @@ public class SignatureCleaner extends NodeVisitor
     return cr.containsClass(name);
   }
 
+  public boolean cleanPrerequisiteClass(ClassType clazz) throws IOException {
+    if (clazz instanceof ParsedClassType) {
+      if (! containsClass(clazz.getFullName())) {
+	return cleanClass(clazz);
+      } else {
+	return true;
+      }
+    } else {
+      return true;
+    }
+  }
+
   public Node override( Node n)
   {
     try

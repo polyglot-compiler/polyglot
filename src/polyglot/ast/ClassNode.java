@@ -364,6 +364,15 @@ public class ClassNode extends ClassMember
 	    Annotate.getLineNumber(this));
 	}
 
+	//kliger: this block wasn't here before... bug(?)
+	if (! sc.cleanPrerequisiteClass(superClazz)) {
+	  throw new SemanticException("Errors while compiling " +
+				      "superclass " +
+				      superClazz.getTypeString() +
+				      " of "+ type.getTypeString() + "." +
+				      Annotate.getLineNumber(this));
+	}
+
 	type.setSuperType(superClazz);
       }
       else {
@@ -382,15 +391,11 @@ public class ClassNode extends ClassMember
 	    Annotate.getLineNumber(this));
 	}
 
-	if (interfaceClazz instanceof ParsedClassType) {
-	  if (! sc.containsClass(interfaceClazz.getFullName())) {
-	    if (! sc.cleanClass(interfaceClazz)) {
+	if (! sc.cleanPrerequisiteClass(interfaceClazz)) {
 	      throw new SemanticException("Errors while compiling " +
 		  "super-interface " + interfaceClazz.getTypeString() +
 		  " of " + type.getTypeString() + ".",
 		  Annotate.getLineNumber(this) );
-	    }
-	  }
 	}
 
 	i.set(interfaceClazz);

@@ -172,6 +172,8 @@ public class TypedList implements List, java.io.Serializable
     { return backing_list.toArray(); }
   public Object[] toArray(Object[] oa)
     { return backing_list.toArray(oa); }
+  public String toString()
+    { return backing_list.toString(); }
 
   private final void tryIns(Object o) {
     if (immutable) 
