@@ -9,4 +9,5 @@ public interface LocalInstance extends VarInstance
     LocalInstance name(String name);
     LocalInstance type(Type type);
     LocalInstance constantValue(Object value);
+    void setType(Type type); //destructive update
 }

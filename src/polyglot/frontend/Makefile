@@ -24,4 +24,6 @@ CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
 all: $(CLASSES)
 
+release: release_src
+
 clean clobber: cleanclasses

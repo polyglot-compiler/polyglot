@@ -45,6 +45,10 @@ public class LocalInstance_c extends VarInstance_c implements LocalInstance
 	n.type = type;
 	return n;
     }
+    
+    public void setType(Type type) {
+	this.type = type;
+    }
 
     public String toString() {
         return "local " + flags.translate() + type + " " + name +

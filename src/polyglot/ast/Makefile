@@ -65,6 +65,7 @@ SOURCES = \
 	PackageNode.java \
 	Precedence.java \
 	Prefix.java \
+	ProcedureDecl.java \
 	QualifiedNew.java \
 	QualifierNode.java \
 	Receiver.java \
@@ -90,3 +91,5 @@ CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 all: $(CLASSES)
 
 clean clobber: cleanclasses
+
+release: release_src

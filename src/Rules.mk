@@ -25,8 +25,22 @@ SOURCEPATH		= $(SOURCE)
 BIN 			= $(SOURCE)/bin
 PACKAGEPATH		= $(SOURCE)/classes/$(PACKAGE)
 VPATH			= $(PACKAGEPATH)
+RELPATH			= $(SOURCE)/release
+REL_DOC			= $(RELPATH)/doc
+REL_IMG			= $(RELPATH)/images
+REL_LIB			= $(RELPATH)/lib
 
-all clean clobber javadoc:
+REL_SOURCES		= $(SOURCES)
+
+ifeq (x$(DIR),x)
+REL_SRC = $(RELPATH)/src/$(PACKAGE)
+REL_DEMO = $(RELPATH)/demo/$(PACKAGE)
+else
+REL_SRC = $(RELPATH)/src/$(DIR)
+REL_DEMO = $(RELPATH)/demo/$(DIR)
+endif
+
+all clean clobber javadoc release:
 
 $(PACKAGEPATH)/%.class: %.java
 	$(JC) $(JC_FLAGS) $<
@@ -36,6 +50,16 @@ cleanclasses:
 
 classpath:
 	@echo "setenv CLASSPATH $(CLASSPATH)"
+
+release_src:
+	mkdir -p $(REL_SRC)
+	@cp -f $(REL_SOURCES) Makefile $(REL_SRC)
+	@if [ -f package.html ]; then cp package.html $(REL_SRC); fi
+
+release_demo:
+	mkdir -p $(REL_DEMO)
+	@if [ -n "$(DEMOS)" ]; then cp -f $(DEMOS) $(REL_DEMO); fi
+	@if [ -f package.html ]; then cp package.html $(REL_DEMO); fi
 
 define subdirs
 @for i in $(SUBDIRS) ""; do \
@@ -72,3 +96,5 @@ endef
 define flex
 	"$(JAVA)" -classpath "$(CLASSPATH)" JFlex.Main $<
 endef
+
+

@@ -1,8 +1,16 @@
 JLtools 0.9
 		    JLtools Extensible Compiler Toolkit
 
-Build Instructions
-------------------
+When reading this file you have already downloaded and unpacked the JLtools Distribution. Your installation directory contains the following sub-folders:
+
+  - src: the complete source code of JLtools 0.9
+  - lib: the JLtools library files and the "CUP Parser Generator for Java" library (a Copyright notice for CUP can be found at the end of this document) 
+  - doc: the documentations about writing JLtools extensions 
+  - demo: Jif sample programs
+  - images: Logos
+
+Installation Instructions
+--------------------------
 
 First ensure javac is in your path and that you are using JDK 1.2
 or later.  
@@ -10,19 +18,24 @@ or later.
 On Unix, do:
 
 	sh ./configure
-	make
+	PATH=$PATH:<your-install-directory>/bin
 
 On NT, you will need the Cygwin environment. While running sh, do:
 
 	sh ./configure
-	make
-    
+	set PATH=%PATH%;<your-install-directory>\bin
+
+
 For more information:
 ---------------------
+
+For information on how to run the JLtools translator (jlc) from the command line, see the file README-JLC.txt
 
 For information on specific Java language extensions included with
 this release (e.g. Jif, PolyJ, etc.), see the appropriate README-*
 file in this directory.
+
+For information on rebuilding JLtools, see the file src/README.
 
 
 Restrictions on distribution
@@ -46,3 +59,14 @@ GNU General Public License for more details.
 
 A copy of the GNU General Public License can be found in the file
 LICENSE, included in this distribution.
+
+
+
+CUP Parser Generator Copyright Notice, License, and Disclaimer
+---------------------------------------------------------------
+Copyright 1996-1999 by Scott Hudson, Frank Flannery, C. Scott Ananian 
+Permission to use, copy, modify, and distribute this software and its documentation for any purpose and without fee is hereby granted, provided that the above copyright notice appear in all copies and that both the copyright notice and this permission notice and warranty disclaimer appear in supporting documentation, and that the names of the authors or their employers not be used in advertising or publicity pertaining to distribution of the software without specific, written prior permission. 
+
+The authors and their employers disclaim all warranties with regard to this software, including all implied warranties of merchantability and fitness. In no event shall the authors or their employers be liable for any special, indirect or consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action of contract, negligence or other tortious action, arising out of or in connection with the use or performance of this software. 
+
+

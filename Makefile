@@ -9,6 +9,7 @@ SUBDIRS = jltools
 
 include Rules.mk
 
+
 all: classes
 	$(subdirs)
 
@@ -83,6 +84,41 @@ javadoc: FORCE
 
 jar: all
 	cd classes ; \
-	$(JAR) $(JAR_FLAGS) ../$(JAR_FILE) `find jltools -name \*.class`
+	$(JAR) $(JAR_FLAGS) ../$(JAR_FILE) `find jltools -name \*.class`; \
+	$(JAR) $(JAR_FLAGS) ../jif.jar `find jif -name \*.class`
+
+REL_SOURCES = \
+	Rules.mk \
+	configure \
+	README \
+	java_cup.jar \
+	jlex.jar \
+	iDoclet.jar \
+
+REL_LIBS = \
+	jltools.jar \
+	java_cup.jar \
+	jif.jar \
+
+release_clean: FORCE
+	mkdir -p $(RELPATH)
+	rm -rf $(RELPATH)/*
+
+release_doc: FORCE
+	cp LICENSE $(RELPATH)
+	mkdir -p $(REL_DOC)
+	$(MAKE) -C doc release
+
+release_demo: FORCE
+	mkdir -p $(REL_DEMO)
+
+release: jar release_clean release_doc release_src
+	cp -f configure.rel $(RELPATH)/configure
+	$(subdirs)
+	mkdir -p $(REL_LIB)
+	cp $(REL_LIBS) $(REL_LIB)
+	rm jltools.jar jif.jar
+	
+#cd $(RELPATH); zip -r jltools .
 
 FORCE:
