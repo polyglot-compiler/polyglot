@@ -74,6 +74,10 @@ public interface ExtFactory
     Ext extClassBody();
     
     Ext extClassDecl();
+
+    Ext extClassMember();
+
+    Ext extCodeDecl();
     
     Ext extConditional();
     
@@ -135,6 +139,8 @@ public interface ExtFactory
     
     Ext extPackageNode();
     
+    Ext extProcedureDecl();
+
     Ext extReturn();
     
     Ext extSourceCollection();

@@ -312,6 +312,26 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtClassDecl(e);
     }
 
+    public final Ext extClassMember() {
+        Ext e = extClassMemberImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extClassMember();
+            e = composeExts(e, e2);
+        }
+        return postExtClassMember(e);
+    }
+
+    public final Ext extCodeDecl() {
+        Ext e = extCodeDeclImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extCodeDecl();
+            e = composeExts(e, e2);
+        }
+        return postExtCodeDecl(e);
+    }
+
     public final Ext extConditional() {
         Ext e = extConditionalImpl();
 
@@ -612,6 +632,16 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtPackageNode(e);
     }
 
+    public final Ext extProcedureDecl() {
+        Ext e = extProcedureDeclImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extProcedureDecl();
+            e = composeExts(e, e2);
+        }
+        return postExtProcedureDecl(e);
+    }
+
     public final Ext extReturn() {
         Ext e = extReturnImpl();
 
@@ -879,6 +909,14 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return extNodeImpl();
     }
 
+    protected Ext extClassMemberImpl() {
+        return extNodeImpl();
+    }
+
+    protected Ext extCodeDeclImpl() {
+        return extClassMemberImpl();
+    }
+
     protected Ext extConditionalImpl() {
         return extExprImpl();
     }
@@ -888,7 +926,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext extConstructorDeclImpl() {
-        return extTermImpl();
+        return extProcedureDeclImpl();
     }
 
     protected Ext extDoImpl() {
@@ -912,7 +950,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext extFieldDeclImpl() {
-        return extNodeImpl();
+        return extClassMemberImpl();
     }
 
     protected Ext extFloatLitImpl() {
@@ -936,7 +974,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext extInitializerImpl() {
-        return extTermImpl();
+        return extCodeDeclImpl();
     }
 
     protected Ext extInstanceofImpl() {
@@ -972,7 +1010,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext extMethodDeclImpl() {
-        return extTermImpl();
+        return extProcedureDeclImpl();
     }
 
     protected Ext extNewArrayImpl() {
@@ -997,6 +1035,10 @@ public abstract class AbstractExtFactory_c implements ExtFactory
 
     protected Ext extPackageNodeImpl() {
         return extNodeImpl();
+    }
+
+    protected Ext extProcedureDeclImpl() {
+        return extCodeDeclImpl();
     }
 
     protected Ext extReturnImpl() {
@@ -1172,6 +1214,14 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtNode(ext);
     }
 
+    protected Ext postExtClassMember(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtCodeDecl(Ext ext) {
+        return postExtClassMember(ext);
+    }
+
     protected Ext postExtConditional(Ext ext) {
         return postExtExpr(ext);
     }
@@ -1181,7 +1231,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtConstructorDecl(Ext ext) {
-        return postExtTerm(ext);
+        return postExtProcedureDecl(ext);
     }
 
     protected Ext postExtDo(Ext ext) {
@@ -1205,7 +1255,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtFieldDecl(Ext ext) {
-        return postExtNode(ext);
+        return postExtClassMember(ext);
     }
 
     protected Ext postExtFloatLit(Ext ext) {
@@ -1229,7 +1279,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtInitializer(Ext ext) {
-        return postExtTerm(ext);
+        return postExtCodeDecl(ext);
     }
 
     protected Ext postExtInstanceof(Ext ext) {
@@ -1265,7 +1315,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtMethodDecl(Ext ext) {
-        return postExtTerm(ext);
+        return postExtProcedureDecl(ext);
     }
 
     protected Ext postExtNewArray(Ext ext) {
@@ -1290,6 +1340,10 @@ public abstract class AbstractExtFactory_c implements ExtFactory
 
     protected Ext postExtPackageNode(Ext ext) {
         return postExtNode(ext);
+    }
+
+    protected Ext postExtProcedureDecl(Ext ext) {
+        return postExtCodeDecl(ext);
     }
 
     protected Ext postExtReturn(Ext ext) {

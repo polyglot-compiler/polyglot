@@ -68,6 +68,10 @@ public interface DelFactory
     
     JL delClassDecl();
     
+    JL delClassMember();
+
+    JL delCodeDecl();
+
     JL delConditional();
     
     JL delConstructorCall();
@@ -128,6 +132,8 @@ public interface DelFactory
     
     JL delPackageNode();
     
+    JL delProcedureDecl();
+
     JL delReturn();
     
     JL delSourceCollection();

@@ -313,6 +313,26 @@ public abstract class AbstractDelFactory_c implements DelFactory
         return postDelClassDecl(e);
     }
 
+    public final JL delClassMember() {
+        JL e = delClassMemberImpl();
+
+        if (nextDelFactory != null) {
+            JL e2 = nextDelFactory.delClassMember();
+            e = composeDels(e, e2);
+        }
+        return postDelClassMember(e);
+    }
+
+    public final JL delCodeDecl() {
+        JL e = delCodeDeclImpl();
+
+        if (nextDelFactory != null) {
+            JL e2 = nextDelFactory.delCodeDecl();
+            e = composeDels(e, e2);
+        }
+        return postDelCodeDecl(e);
+    }
+
     public final JL delConditional() {
         JL e = delConditionalImpl();
 
@@ -613,6 +633,16 @@ public abstract class AbstractDelFactory_c implements DelFactory
         return postDelPackageNode(e);
     }
 
+    public final JL delProcedureDecl() {
+        JL e = delProcedureDeclImpl();
+
+        if (nextDelFactory != null) {
+            JL e2 = nextDelFactory.delProcedureDecl();
+            e = composeDels(e, e2);
+        }
+        return postDelProcedureDecl(e);
+    }
+
     public final JL delReturn() {
         JL e = delReturnImpl();
 
@@ -880,6 +910,14 @@ public abstract class AbstractDelFactory_c implements DelFactory
         return delNodeImpl();
     }
 
+    protected JL delClassMemberImpl() {
+        return delNodeImpl();
+    }
+
+    protected JL delCodeDeclImpl() {
+        return delClassMemberImpl();
+    }
+
     protected JL delConditionalImpl() {
         return delExprImpl();
     }
@@ -889,7 +927,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL delConstructorDeclImpl() {
-        return delTermImpl();
+        return delProcedureDeclImpl();
     }
 
     protected JL delDoImpl() {
@@ -913,7 +951,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL delFieldDeclImpl() {
-        return delNodeImpl();
+        return delClassMemberImpl();
     }
 
     protected JL delFloatLitImpl() {
@@ -937,7 +975,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL delInitializerImpl() {
-        return delTermImpl();
+        return delCodeDeclImpl();
     }
 
     protected JL delInstanceofImpl() {
@@ -973,7 +1011,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL delMethodDeclImpl() {
-        return delTermImpl();
+        return delProcedureDeclImpl();
     }
 
     protected JL delNewArrayImpl() {
@@ -998,6 +1036,10 @@ public abstract class AbstractDelFactory_c implements DelFactory
 
     protected JL delPackageNodeImpl() {
         return delNodeImpl();
+    }
+
+    protected JL delProcedureDeclImpl() {
+        return delCodeDeclImpl();
     }
 
     protected JL delReturnImpl() {
@@ -1173,6 +1215,14 @@ public abstract class AbstractDelFactory_c implements DelFactory
         return postDelNode(del);
     }
 
+    protected JL postDelClassMember(JL del) {
+        return postDelNode(del);
+    }
+
+    protected JL postDelCodeDecl(JL del) {
+        return postDelClassMember(del);
+    }
+
     protected JL postDelConditional(JL del) {
         return postDelExpr(del);
     }
@@ -1182,7 +1232,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelConstructorDecl(JL del) {
-        return postDelTerm(del);
+        return postDelProcedureDecl(del);
     }
 
     protected JL postDelDo(JL del) {
@@ -1206,7 +1256,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelFieldDecl(JL del) {
-        return postDelNode(del);
+        return postDelClassMember(del);
     }
 
     protected JL postDelFloatLit(JL del) {
@@ -1230,7 +1280,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelInitializer(JL del) {
-        return postDelTerm(del);
+        return postDelCodeDecl(del);
     }
 
     protected JL postDelInstanceof(JL del) {
@@ -1266,7 +1316,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelMethodDecl(JL del) {
-        return postDelTerm(del);
+        return postDelProcedureDecl(del);
     }
 
     protected JL postDelNewArray(JL del) {
@@ -1291,6 +1341,10 @@ public abstract class AbstractDelFactory_c implements DelFactory
 
     protected JL postDelPackageNode(JL del) {
         return postDelNode(del);
+    }
+
+    protected JL postDelProcedureDecl(JL del) {
+        return postDelCodeDecl(del);
     }
 
     protected JL postDelReturn(JL del) {
