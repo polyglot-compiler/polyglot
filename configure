@@ -187,7 +187,7 @@ FILE_SEP="${FILE_SEP}"
 PATH_SEP="${PATH_SEP}"
 TOP="${TOP}"
 
-if test ! -z \$verbose
+if test ! -z "\$verbose"
 then
   echo $R
 fi
