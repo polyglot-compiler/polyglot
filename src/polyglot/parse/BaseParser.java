@@ -14,12 +14,16 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
   public final ErrorQueue eq;
   public final TypeSystem ts;
   public final NodeFactory nf;
+  protected Position prev_pos;
+  protected Position position;
 
   public BaseParser (Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
     lexer = l;
     eq = q;
     ts = t;
     nf = n;
+    prev_pos = Position.COMPILER_GENERATED;
+    position = Position.COMPILER_GENERATED;
   }
 
   /**
@@ -28,7 +32,15 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
    *   scan with {: return nextSymbol(); :}
    */
   public Symbol nextSymbol() throws java.io.IOException {
-    return lexer.nextToken().symbol();
+    Token t = lexer.nextToken();
+    // use two positions, since the parser does one token lookahead
+    position = prev_pos;
+    prev_pos = t.getPosition();
+    return t.symbol();
+  }
+
+  public Position position() {
+    return position;
   }
 
  /**

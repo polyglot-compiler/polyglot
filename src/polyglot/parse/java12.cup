@@ -483,7 +483,8 @@ modifiers ::=
         modifier:a 
             {: RESULT = a; :}
     |   modifiers:a modifier:b
-            {: RESULT = a.set(b); :}
+            {: if (a.intersects(b)) parser.die(parser.position());
+               RESULT = a.set(b); :}
     ;
 modifier ::=
                     // Flags
