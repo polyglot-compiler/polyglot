@@ -74,12 +74,9 @@ public class VariableDeclarationStatement extends Statement
     
     public Node visitChildren( NodeVisitor v)
     {
-      
-      if (initializer != null)
         return reconstruct ( Node.condVisit(this.ext, v), (VariableDeclarationStatement)wrVDS.get(), name, 
                              additionalDimensions, 
-                             (Expression)initializer.visit( v ) );
-      return this;
+                             (Expression)Node.condVisit(initializer, v) );
     }
 
     public Node removeAmbiguities( LocalContext c) throws SemanticException
@@ -250,6 +247,10 @@ public class VariableDeclarationStatement extends Statement
   {
     return accessFlags;
   }
+
+    public int numDeclarators() {
+	return declarators.size();
+    }
 
   /**
    * Yields all the declarators in this node, in order. 
