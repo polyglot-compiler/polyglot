@@ -114,4 +114,15 @@ public class Special_c extends Expr_c implements Special
 
 	w.write(kind.toString());
     }
+
+  public void dump(CodeWriter w) {
+    super.dump(w);
+
+    if (type != null) {
+      w.allowBreak(4, " ");
+      w.begin(0);
+      w.write("(kind " + kind + ")");
+      w.end();
+    }
+  }
 }

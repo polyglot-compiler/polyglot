@@ -466,10 +466,18 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 	public void dump(CodeWriter w) {
 		super.dump(w);
 
+		w.allowBreak(4, " ");
+		w.begin(0);
+		w.write("(name " + name + ")");
+		w.end();
+
 		if (type != null) {
 			w.allowBreak(4, " ");
 			w.begin(0);
 			w.write("(type " + type + ")");
+			w.end();
+			w.begin(0);
+			w.write("(members " + type.fields() + ")");
 			w.end();
 		}
 	}

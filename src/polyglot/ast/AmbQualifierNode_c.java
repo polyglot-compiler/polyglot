@@ -110,4 +110,13 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 		? name
 		: qual.toString() + "." + name) + "{amb}";
     }
+
+  public void dump(CodeWriter w) {
+    super.dump(w);
+
+    w.allowBreak(4, " ");
+    w.begin(0);
+    w.write("(name \"" + name + "\")");
+    w.end();
+  }
 }
