@@ -1414,6 +1414,37 @@ public class TypeSystem_c implements TypeSystem
     }
     
     /**
+     * Utility method to gather all the superclasses and interfaces of 
+     * <code>ct</code> that may contain abstract methods that must be 
+     * implemented by <code>ct</code>. The list returned also contains 
+     * <code>ct</code>.
+     */
+    protected List abstractSuperInterfaces(ReferenceType rt) {
+        List superInterfaces = new LinkedList();
+        superInterfaces.add(rt);
+        
+        for (Iterator iter = rt.interfaces().iterator(); iter.hasNext(); ) {
+            ClassType interf = (ClassType)iter.next();
+            superInterfaces.addAll(abstractSuperInterfaces(interf));
+        }
+        
+        if (rt.superType() != null) {
+            ClassType c = rt.superType().toClass();
+            if (c.flags().isAbstract()) {
+                // the superclass is abstract, so it may contain methods
+                // that must be implemented.
+                superInterfaces.addAll(abstractSuperInterfaces(c));
+            }
+            else {
+                // the superclass is not abstract, so it must implement
+                // all abstract methods of any interfaces it implements, and
+                // any superclasses it may have.                
+            }
+        }    
+        return superInterfaces;
+    }
+    
+    /**
      * Assert that <code>ct</code> implements all abstract methods that it 
      * has to, i.e. if it is a concrete class, then it must implement all
      * interfaces and abstract methods that it or it's superclasses declare.
@@ -1425,33 +1456,11 @@ public class TypeSystem_c implements TypeSystem
             return;
         }
         
-        // build up a list of superclasses and interfaces that ct that may
-        // contain abstract methods that ct must implement.
-        List superInterfaces = new LinkedList();
+        // build up a list of superclasses and interfaces that ct 
+        // extends/implements that may contain abstract methods that 
+        // ct must define.
+        List superInterfaces = abstractSuperInterfaces(ct);
 
-        superInterfaces.add(ct);
-        superInterfaces.addAll(ct.interfaces());
-
-
-        Type t = ct.superType();
-
-        while (t != null) {
-            ClassType c = t.toClass();
-            if (!c.flags().isAbstract()) {
-                // the superclass is not abstract, so it must implement
-                // all abstract methods of any interfaces it implements, and
-                // any superclasses it may have.
-                break;
-            }
-            superInterfaces.add(c);
-            superInterfaces.addAll(c.interfaces());
-            t = c.superType();
-        }
-        
-        // the list superInterfaces now contains all the interfaces and
-        // superclasses that may contain abstract methods that the class ct 
-        // must implement.
-        
         // check each abstract method of the classes and interfaces in 
         // superInterfaces
         for (Iterator i = superInterfaces.iterator(); i.hasNext(); ) {
@@ -1488,7 +1497,7 @@ public class TypeSystem_c implements TypeSystem
                 if (!implFound) {
                     throw new SemanticException(ct.name() + " should be " +
                             "declared abstract; it does not define " +
-                            mi.signature() +", which is declared in " +
+                            mi.signature() + ", which is declared in " +
                             rt.toClass().fullName(), ct.position());
                 }
             }
