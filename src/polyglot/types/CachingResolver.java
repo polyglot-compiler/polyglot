@@ -78,6 +78,10 @@ public class CachingResolver implements TopLevelResolver {
             extInfo.addDependencyToCurrentJob(((ParsedClassType)q).fromSource());
         }
 
+	if (q instanceof Type && packageExists(name)) {
+	    throw new SemanticException("Type \"" + name +
+					"\" clashes with package of the same name.");
+	}
 
 	return q;
     }
