@@ -337,7 +337,7 @@ ext=""
                file="${lexer.dir}/${lexer.class}.java"/>
   </target>
   
-  <target name="base" depends="bin,compile-base">
+  <target name="base" depends="bin,cup,compile-base">
   </target>
 
   <!-- Builds PPG -->
@@ -465,18 +465,18 @@ ext=""
   </target>
   
   <!-- SKEL: When using the newext script, copy and modify this target by
-       replacing the name "skel" with the new extension name. -->
-  <target name="skel" depends="jl">
+       replacing the name "aspectj" with the new extension name. -->
+  <target name="aspectj" depends="jl">
     <antcall target="standard-ext">
-      <param name="ext" value="skel"/>
+      <param name="ext" value="aspectj"/>
       <param name="parser.type" value="ppg"/>
     </antcall>
   </target>
 
   <!-- SKEL: When using the newext script, copy and modify this target by
-       replacing the name "skel" with the new extension name. -->
-  <target name="skel-jar" depends="skel">
-    <jar jarfile="${lib}/skel.jar" basedir="${classes}" includes="polyglot/ext/skel/**"/>
+       replacing the name "aspectj" with the new extension name. -->
+  <target name="aspectj-jar" depends="aspectj">
+    <jar jarfile="${lib}/aspectj.jar" basedir="${classes}" includes="polyglot/ext/aspectj/**"/>
   </target>
 
   <target name="param" depends="jl">
@@ -565,9 +565,9 @@ ext=""
     </copy>
   </target>
 
-  <target name="skel-dist" depends="jl-dist">
-    <copy todir="${dist}/src/polyglot/ext/skel">
-      <fileset dir="${src}/polyglot/ext/skel"
+  <target name="aspectj-dist" depends="jl-dist">
+    <copy todir="${dist}/src/polyglot/ext/aspectj">
+      <fileset dir="${src}/polyglot/ext/aspectj"
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/**/*.results"/>
     </copy>
 
@@ -668,7 +668,7 @@ ext=""
       <packageset dir="${src}" defaultexcludes="yes">
         <include name="polyglot/**"/>
         <include name="ppg/**"/>
-        <exclude name="polyglot/ext/skel/**"/>
+        <exclude name="polyglot/ext/aspectj/**"/>
         <exclude name="**/tests"/>
         <exclude name="**/test"/>
       </packageset>
@@ -676,7 +676,7 @@ ext=""
   </target>
 
   <target name="jar" depends="polyglot-jar"/>
-  <target name="polyglot-dist" depends="jl-dist,skel-dist,param-dist,pao-dist,coffer-dist,pth-dist"/>
+  <target name="polyglot-dist" depends="jl-dist,aspectj-dist,param-dist,pao-dist,coffer-dist,pth-dist"/>
   <target name="polyglot-dist-javadoc" depends="polyglot-dist,dist-javadoc"/>
   <target name="dist" depends="polyglot-dist-javadoc"/>
 
