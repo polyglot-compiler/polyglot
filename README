@@ -35,7 +35,9 @@ Requirements
 Polyglot builds on Unix and on Windows using the Cygwin environment.  We
 recommend that you use JDK 1.3 or later.  We have experienced problems with
 versions of the JDK older than 1.3.  You must ensure that java and javac are in
-your path.
+your path.  Polyglot is compiled with the Ant build tool
+(http://jakarta.apache.org/ant).  GNU make is used for compiling
+and running test cases.
 
 Creating an extension
 ---------------------
@@ -55,7 +57,7 @@ README is in) is $POLYGLOT.
 
     $ cd $POLYGLOT
 
-3. Run ant to build the base compiler (jl) and some extensions.
+3. Run ant to build the base compiler (the "jl" target) and some extensions.
 
     $ ant jl coffer pao
   

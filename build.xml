@@ -418,15 +418,32 @@ ext=''
   </target>
 
   <target name="coffer-jar" depends="coffer">
-    <jar jarfile="coffer.jar" basedir="${classes}" includes="polyglot/ext/coffer/**"/>
+    <jar jarfile="coffer.jar" basedir="${classes}" includes="polyglot/ext/coffer/**,polyglot/ext/param/**"/>
   </target>
 
   <target name="pao-dist" depends="base-dist,pao-jar">
     <copy todir="${dist}/lib" file="pao.jar"/>
+
+    <copy todir="${dist}/polyglot/ext/pao">
+      <fileset dir="${src}/polyglot/ext/pao"
+        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
+    </copy>
   </target>
 
-  <target name="coffer-dist" depends="base-dist,coffer-jar">
+  <target name="param-dist" depends="base-dist">
+    <copy todir="${dist}/polyglot/ext/param">
+      <fileset dir="${src}/polyglot/ext/param"
+        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
+    </copy>
+  </target>
+
+  <target name="coffer-dist" depends="param-dist,coffer-jar">
     <copy todir="${dist}/lib" file="coffer.jar"/>
+
+    <copy todir="${dist}/polyglot/ext/coffer">
+      <fileset dir="${src}/polyglot/ext/coffer"
+        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
+    </copy>
   </target>
 
   <target name="base-dist" depends="jar,dist,bin">
@@ -437,7 +454,8 @@ ext=''
     </copy>
 
     <copy todir="${dist}/polyglot/ext/jl">
-      <fileset dir="${src}/polyglot/ext/jl" excludes="**/Makefile"/>
+      <fileset dir="${src}/polyglot/ext/jl"
+        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
     </copy>
 
     <copy todir="${dist}/polyglot/frontend">
@@ -472,6 +490,8 @@ ext=''
       <fileset dir="java_cup"/>
     </copy>
 
+    <copy todir="${dist}/polyglot/ext/jl/tests" file="${src}/polyglot/ext/jl/tests/Makefile"/>
+
     <copy file="${bin}/jlc.in" todir="${dist}/bin"/>
     <copy file="doc/Overview.txt" todir="${dist}/doc"/>
     <copy file="jlex.jar" todir="${dist}"/>
@@ -496,6 +516,7 @@ ext=''
   </target>
 
   <target name="polyglot-dist" depends="base-dist,pao-dist,coffer-dist,dist-javadoc"/>
+  <target name="polyglot-dist-javadoc" depends="polyglot-dist,dist-javadoc"/>
   <target name="jif-dist" depends="base-dist,jif"/>
   <target name="split-dist" depends="base-dist,split"/>
   <target name="polyj-dist" depends="base-dist,polyj"/>
