@@ -23,7 +23,7 @@
   <path id="standard.classpath">
     <pathelement location="${classes}"/>
     <pathelement location="${lib}/java_cup.jar"/>
-    <pathelement location="${lib}/jlex.jar"/>
+    <pathelement location="${lib}/JFlex.jar"/>
   </path>
 
   <target name="configure" description="Configure Polyglot"
