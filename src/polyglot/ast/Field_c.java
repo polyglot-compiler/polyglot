@@ -109,7 +109,7 @@ public class Field_c extends Expr_c implements Field
       if (! fi.flags().isStatic()) {
         throw new SemanticException(
                                     "Cannot access non-static field " + name +
-                                    " of " + type + " is static context.");
+                                    " of " + type + " in static context.");
       }
 
       return fieldInstance(fi).type(fi.type());
