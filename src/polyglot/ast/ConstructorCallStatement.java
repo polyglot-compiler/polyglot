@@ -18,7 +18,9 @@ import java.util.List;
  *    a direct call to a constructor of a class in the form of
  *    super(...)  or this(...).  It consists of a type of the call
  *    (either super or this) and a list of expressions to be
- *    parameters of the call.  
+ *    parameters of the call.  A constructor call statement may also
+ *    contain an expression providing the context in which it is
+ *    executed.
  */
 
 public class ConstructorCallStatement extends Statement {
@@ -36,12 +38,29 @@ public class ConstructorCallStatement extends Statement {
    *
    * Effects: Creates a new ConstructorCallStatement of type <type>
    *    which contains the elements of <arguments> as arguments to the
-   *    call.
+   *    call, and optionally in the context of <primary>.
    */
-  public ConstructorCallStatement(int type, List arguments) {
+  public ConstructorCallStatement(Expression primary,
+				  int type, List arguments) {
     setType(type);
+    this.primary = primary;
     TypedList.check(arguments, Expression.class);
     argumentList = new ArrayList(arguments);
+  }
+
+  /**
+   * Effects: Returns the expression providing the context in which
+   * this constructor is executed or null if none. 
+   */
+  public Expression getPrimary() {
+    return primary;
+  }
+
+  /**
+   * Effects: Sets the primary expression of this to be <newPrimary>.
+   */
+  public void setPrimary(Expression newPrimary) {
+    primary = newPrimary;
   }
 
   /**
@@ -96,6 +115,10 @@ public class ConstructorCallStatement extends Statement {
    *    removed.
    */
   public void visitChildren(NodeVisitor v) {
+    if (primary != null) {
+      primary = (Expression) primary.accept(v);
+    }
+
     for(ListIterator i=argumentList.listIterator(); i.hasNext(); ) {
       Expression e = (Expression) i.next();
       e = (Expression) e.accept(v);
@@ -109,7 +132,8 @@ public class ConstructorCallStatement extends Statement {
   }
 
   public Node copy() {
-    ConstructorCallStatement ca = new ConstructorCallStatement(type,
+    ConstructorCallStatement ca = new ConstructorCallStatement(primary,
+							       type,
 							       argumentList);
     ca.copyAnnotationsFrom(this);
     return ca;
@@ -117,17 +141,20 @@ public class ConstructorCallStatement extends Statement {
 
   public Node deepCopy() {
     List newArgumentList = new ArrayList(argumentList.size());
+    Expression newPrimary =
+      (Expression) (primary==null?null:primary.deepCopy());
     for (ListIterator it = argumentList.listIterator(); it.hasNext(); ) {
       Expression e = (Expression) it.next();
       newArgumentList.add(e.deepCopy());
     }
     ConstructorCallStatement ca = 
-      new ConstructorCallStatement(type, newArgumentList);
+      new ConstructorCallStatement(newPrimary, type, newArgumentList);
     ca.copyAnnotationsFrom(this);        
     return ca;
   }
 
 
+  private Expression primary;
   private int type;
   private List argumentList;
 }

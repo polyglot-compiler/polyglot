@@ -20,7 +20,9 @@ import java.util.List;
  * addition to the type of the class being created, a
  * NewObjectExpression has a list of arguments to be passed to the
  * constructor of the object and an optional ClassNode used to support
- * anonymous classes.
+ * anonymous classes.  A new object expression may also be proceeded
+ * by an primary expression which specifies the context in which the
+ * object is being created.
  */
 
 public class NewObjectExpression extends Expression {
@@ -34,23 +36,39 @@ public class NewObjectExpression extends Expression {
    * extend the class.  If an anonymous class is not being created
    * classNode should be null.
    */
-  public NewObjectExpression(TypeNode type, List arguments, 
-			     ClassNode classNode) {
+  public NewObjectExpression(Expression primary, TypeNode type,
+			     List arguments, ClassNode classNode) {
+    this.primary = primary;
     this.type = type;
     TypedList.check(arguments, Expression.class);
     argumentList = new ArrayList(arguments);
     this.classNode = classNode;
   }
 
-  public NewObjectExpression(Type type, List arguments, 
-			     ClassNode classNode) {
-    this(new TypeNode(type), arguments, classNode);
+  public NewObjectExpression(Expression primary, Type type,
+			     List arguments, ClassNode classNode) {
+    this(primary, new TypeNode(type), arguments, classNode);
+  }
+
+  /**
+   * Effects: Returns the primary expression of this node or null if
+   * there is none.
+   */
+  public Expression getPrimary() {
+    return primary;
+  }
+
+  /**
+   * Effects: Sets the primary expression which specifies the context
+   * of the creation of the new object to <newPrimary>.
+   */
+  public void setPrimary(Expression newPrimary) {
+    primary = newPrimary;
   }
 
   /**
    * Effects: Returns the type of the object being created by this
-   * NewObjectExpression.
-   */
+   * NewObjectExpression.  */
   public TypeNode getType() {
     return getType();
   }
@@ -119,6 +137,9 @@ public class NewObjectExpression extends Expression {
    * for a memeber of the class body, then that member is removed. 
    */
   public void visitChildren(NodeVisitor v) {
+    if (primary != null) {
+      primary = (Expression) primary.accept(v);
+    }
     type = (TypeNode) type.accept(v);
     for(ListIterator i=argumentList.listIterator(); i.hasNext(); ) {
       Expression e = (Expression) i.next();
@@ -136,7 +157,8 @@ public class NewObjectExpression extends Expression {
   }
 
   public Node copy() {
-    NewObjectExpression no = new NewObjectExpression(type,
+    NewObjectExpression no = new NewObjectExpression(primary,
+						     type,
 						     argumentList,
 						     classNode);
     no.copyAnnotationsFrom(this);
@@ -145,14 +167,18 @@ public class NewObjectExpression extends Expression {
 
   public Node deepCopy() {
     List newArgumentList = Node.deepCopyList(argumentList);
+    Expression newPrimary =
+      (Expression) (primary==null?null:primary.deepCopy());
     NewObjectExpression no =
-      new NewObjectExpression((TypeNode) type.deepCopy(), 
+      new NewObjectExpression(newPrimary,
+			      (TypeNode) type.deepCopy(), 
 			      newArgumentList, 
 			      (ClassNode) classNode.deepCopy());
     no.copyAnnotationsFrom(this);
     return no;
   }
 
+  private Expression primary;
   private TypeNode type;
   private List argumentList;
   private ClassNode classNode;

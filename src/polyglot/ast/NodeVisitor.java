@@ -63,6 +63,7 @@ public interface NodeVisitor {
   public Node visitLocalVariableExpression(LocalVariableExpression ve);
   public Node visitNewArrayExpression(NewArrayExpression ae);
   public Node visitNewObjectExpression(NewObjectExpression oe);
+  public Node visitSpecialExpression(SpecialExpression se);
   public Node visitInstanceofExpression(InstanceofExpression ie);
   public Node visitArrayInitializerExpression(ArrayInitializerExpression aie);
   public Node visitArrayIndexExpression(ArrayIndexExpression aie);
@@ -73,6 +74,7 @@ public interface NodeVisitor {
   // ClassMemebers
   public Node visitClassNode(ClassNode cn);
   public Node visitMethodNode(MethodNode mn);
+  public Node visitFieldNode(FieldNode fn);
   public Node visitInitializerBlock(InitializerBlock ib);
 
 

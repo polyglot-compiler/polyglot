@@ -160,6 +160,11 @@ public class NullVisitor implements NodeVisitor {
     return oe;
   }
 
+  public Node visitSpecialExpression(SpecialExpression se) {
+    se.visitChildren(this);
+    return se;
+  }
+
   public Node visitInstanceofExpression(InstanceofExpression ie) {
     ie.visitChildren(this);
     return ie;
@@ -199,6 +204,11 @@ public class NullVisitor implements NodeVisitor {
   public Node visitMethodNode(MethodNode mn) {
     mn.visitChildren(this);
     return mn;
+  }
+
+  public Node visitFieldNode(FieldNode fn) {
+    fn.visitChildren(this);
+    return fn;
   }
   
   public Node visitInitializerBlock(InitializerBlock ib) {
