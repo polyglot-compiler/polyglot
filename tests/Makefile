@@ -90,6 +90,7 @@ BAD = \
 	BadStaticContext.jl \
 	BadSwitch1.jl \
 	BadSwitch2.jl \
+	CircularConstructor.jl \
 	Errors2.jl \
 	Errors.jl \
 	NoInit10.jl \
