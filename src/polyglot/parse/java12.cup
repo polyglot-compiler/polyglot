@@ -427,11 +427,11 @@ import_declarations_opt ::=
             {: RESULT = new TypedList(new LinkedList(), Import.class, false); :}
     ;
 type_declarations_opt   ::=
-                    // List of ClassDecl
+                    // List of TopLevelDecl
         type_declarations:a 
             {: RESULT = a; :} 
     |   
-            {: RESULT = new TypedList(new LinkedList(), ClassDecl.class, false); :}
+            {: RESULT = new TypedList(new LinkedList(), TopLevelDecl.class, false); :}
     ;
 import_declarations ::=
                     // List of Import
@@ -444,9 +444,9 @@ import_declarations ::=
                a.add(b); :}
     ;
 type_declarations ::=
-                    // List of ClassDecl
+                    // List of TopLevelDecl
         type_declaration:a
-            {: List l = new TypedList(new LinkedList(), ClassDecl.class, false); 
+            {: List l = new TypedList(new LinkedList(), TopLevelDecl.class, false); 
                if (a != null)
                    l.add(a);
                RESULT = l; :}
