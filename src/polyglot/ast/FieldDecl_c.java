@@ -2,33 +2,11 @@ package polyglot.ext.jl.ast;
 
 import java.util.Iterator;
 
-import polyglot.ast.ArrayInit;
-import polyglot.ast.Expr;
-import polyglot.ast.FieldDecl;
-import polyglot.ast.Node;
-import polyglot.ast.TypeNode;
+import polyglot.ast.*;
 import polyglot.main.Report;
-import polyglot.types.ClassType;
-import polyglot.types.Context;
-import polyglot.types.FieldInstance;
-import polyglot.types.Flags;
-import polyglot.types.InitializerInstance;
-import polyglot.types.ParsedClassType;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.types.TypeSystem;
-import polyglot.util.CodeWriter;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
-import polyglot.util.SubtypeSet;
-import polyglot.visit.AddMemberVisitor;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.AscriptionVisitor;
-import polyglot.visit.ExceptionChecker;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeBuilder;
-import polyglot.visit.TypeChecker;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
 
 /**
  * A <code>FieldDecl</code> is an immutable representation of the declaration
@@ -212,15 +190,19 @@ public class FieldDecl_c extends Node_c implements FieldDecl {
         }
 
         if (ar.kind() == AmbiguityRemover.ALL) {
-            FieldInstance fi = this.fi;
-
-            if (init != null && fi.flags().isFinal() && init.isConstant()) {
-                Object value = init.constantValue();
-                fi.setConstantValue(value);
-            }
+            checkFieldInstanceConstant();
         }
 
         return this;
+    }
+
+    protected void checkFieldInstanceConstant() {
+        FieldInstance fi = this.fi;
+
+        if (init != null && fi.flags().isFinal() && init.isConstant()) {
+            Object value = init.constantValue();
+            fi.setConstantValue(value);
+        }
     }
 
     public NodeVisitor addMembersEnter(AddMemberVisitor am) {
@@ -251,6 +233,8 @@ public class FieldDecl_c extends Node_c implements FieldDecl {
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
+        checkFieldInstanceConstant();
+        
         try {
             ts.checkFieldFlags(flags);
         }
