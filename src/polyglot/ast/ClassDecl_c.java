@@ -370,20 +370,25 @@ public class ClassDecl_c extends Node_c implements ClassDecl
             }
         }
 
-        w.write(" ");
+        w.write(" {");
     }
 
+    public void prettyPrintFooter(CodeWriter w, PrettyPrinter tr) {
+        w.write("}");
+        w.newline(0);
+    }
+    
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         prettyPrintHeader(w, tr);
         tr.print(body(), w);
-        w.newline(0);
+        prettyPrintFooter(w, tr);
     }
 
     public void translate(CodeWriter w, Translator tr) {
         prettyPrintHeader(w, tr);
         Context c = enterScope(tr.context());
         tr.context(c).print(body(), w);
-        w.newline(0);
+        prettyPrintFooter(w, tr);
     }
 
     public void dump(CodeWriter w) {

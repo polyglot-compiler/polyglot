@@ -266,10 +266,7 @@ public class ClassBody_c extends Node_c implements ClassBody
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        if (members.isEmpty()) {
-            w.write("{ }");
-        } else {
-            w.write("{");
+        if (!members.isEmpty()) {
             w.newline(4);
             w.begin(0);
 
@@ -284,7 +281,6 @@ public class ClassBody_c extends Node_c implements ClassBody
 
             w.end();
             w.newline(0);
-            w.write("}");
         }
     }
 }

@@ -541,8 +541,9 @@ FIXME: check super types as well.
 	w.write(")");
 
 	if (body != null) {
-	    w.write(" ");
+	    w.write(" {");
 	    tr.print(body, w);
+            w.write("}");
 	}
     }
 
@@ -588,8 +589,9 @@ FIXME: check super types as well.
 	w.write(")");
 
 	if (body != null) {
-	    w.write(" ");
+	    w.write(" {");
 	    tr.print(body, w);
+            w.write(" }");
 	}
     }
 

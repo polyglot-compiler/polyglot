@@ -58,6 +58,13 @@ public class Translator extends PrettyPrinter implements Copy
         }
     }
 
+    /**
+     * Return the job associated with this Translator.
+     */
+    public Job job() { 
+        return job;
+    }
+    
     /** Create a new <code>Translator</code> identical to <code>this</code> but
      * with new context <code>c</code> */
     public Translator context(Context c) {
