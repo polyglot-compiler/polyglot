@@ -109,7 +109,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     protected abstract Item createInitialItem(FlowGraph graph);
     
     /**
-     * Produce a new <code>Item</code> as appropriate for the
+     * Produce new <code>Item</code>s as appropriate for the
      * <code>Term n</code> and the input <code>Item in</code>. 
      * 
      * @param in the Item flowing into the node. Note that if the Term n 
@@ -123,7 +123,125 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
      *          entries for all EdgeKeys in edgeKeys. 
      */
-    protected abstract Map flow(Item in, FlowGraph graph, Term n, Set edgeKeys);
+    protected Map flow(Item in, FlowGraph graph, Term n, Set edgeKeys) {
+        throw new InternalCompilerError("Unimplemented: should be " +
+                                        "implemented by subclasses if " +
+                                        "needed");
+    }
+    
+    /**
+     * Produce new <code>Item</code>s as appropriate for the
+     * <code>Term n</code> and the input <code>Item</code>s. The default
+     * implementation of this method is simply to call <code>confluence</code> 
+     * for the list of inItems, and pass the result to flow(Item, FlowGraph,
+     * Term, Set). Subclasses may want to override this method if a finer grain
+     * dataflow is required. Some subclasses may wish to override this method
+     * to call <code>flowToBooleanFlow</code>.
+     * 
+     * @param inItems all the Items flowing into the node. 
+     * @param inItemKeys the FlowGraph.EdgeKeys for the items in the list inItems 
+     * @param graph the FlowGraph which the dataflow is operating on
+     * @param n the Term which this method must calculate the flow for.
+     * @param edgeKeys a set of FlowGraph.EdgeKeys, being all the 
+     *          EdgeKeys of the edges leaving this node. The 
+     *          returned Map must have mappings for all objects in this set.
+     * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
+     *          entries for all EdgeKeys in edgeKeys. 
+     */
+    protected Map flow(List inItems, List inItemKeys, FlowGraph graph, Term n, Set edgeKeys) {
+        Item inItem;
+        if (inItems.isEmpty()) {
+            inItem = this.createInitialItem(graph);
+        }
+        else if (inItems.size() == 1) {
+            inItem = (Item)inItems.get(0);
+        }
+        else {
+            inItem = this.confluence(inItems, inItemKeys, n);
+        }
+        return this.flow(inItem, graph, n, edgeKeys);
+    }
+
+    /**
+     * A utility method that simply collects together all the 
+     * TRUE items, FALSE items, and all other items (including ExceptionEdgeKey
+     * items), calls <code>confluence</code> on each of these three collections
+     * as neccessary, and passes the results to 
+     * flow(Item, Item, Item, FlowGraph, Term, Set). It is expected that 
+     * this method will typically be called by subclasses overriding the
+     * flow(List, List, FlowGraph, Term, Set) method, due to the need for
+     * a finer grain dataflow analysis.
+     * 
+     * @param inItems all the Items flowing into the node. 
+     * @param inItemKeys the FlowGraph.EdgeKeys for the items in the list inItems 
+     * @param graph the FlowGraph which the dataflow is operating on
+     * @param n the Term which this method must calculate the flow for.
+     * @param edgeKeys a set of FlowGraph.EdgeKeys, being all the 
+     *          EdgeKeys of the edges leaving this node. The 
+     *          returned Map must have mappings for all objects in this set.
+     * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
+     *          entries for all EdgeKeys in edgeKeys. 
+     */
+    protected Map flowToBooleanFlow(List inItems, List inItemKeys, FlowGraph graph, Term n, Set edgeKeys) {
+        List trueItems = new ArrayList();
+        List trueItemKeys = new ArrayList();
+        List falseItems = new ArrayList();
+        List falseItemKeys = new ArrayList();
+        List otherItems = new ArrayList();
+        List otherItemKeys = new ArrayList();
+        
+        Iterator i = inItemKeys.iterator();
+        Iterator j = inItemKeys.iterator();
+        while (i.hasNext() || j.hasNext()) {
+            Item item = (Item)i.next();
+            EdgeKey key = (EdgeKey)j.next();
+            
+            if (FlowGraph.EDGE_KEY_TRUE.equals(key)) {
+                trueItems.add(item);
+                trueItemKeys.add(key);
+            }
+            else if (FlowGraph.EDGE_KEY_FALSE.equals(key)) {
+                falseItems.add(item);
+                falseItemKeys.add(key);
+            }
+            else {
+                otherItems.add(item);
+                otherItemKeys.add(key);
+            }
+        }
+        
+        Item trueItem = null;
+        Item falseItem = null;
+        Item otherItem = null;
+        
+        if (trueItems.size() == 1) {
+            trueItem = (Item)trueItems.get(0);
+        }
+        else if (trueItems.size() > 1) {
+            trueItem = this.confluence(trueItems, trueItemKeys, n);
+        }
+        if (falseItems.size() == 1) {
+            falseItem = (Item)falseItems.get(0);
+        }
+        else if (falseItems.size() > 1) {
+            falseItem = this.confluence(falseItems, falseItemKeys, n);
+        }
+        if (otherItems.size() == 1) {
+            otherItem = (Item)otherItems.get(0);
+        }
+        else if (otherItems.size() > 1) {
+            otherItem = this.confluence(otherItems, otherItemKeys, n);
+        }
+
+        return this.flow(trueItem, falseItem, otherItem, graph, n, edgeKeys);
+    }
+
+    protected Map flow(Item trueItem, Item falseItem, Item otherItem, 
+                       FlowGraph graph, Term n, Set edgeKeys) {
+       throw new InternalCompilerError("Unimplemented: should be " +
+                                       "implemented by subclasses if " +
+                                       "needed");        
+    }
     
     /**
      * The confluence operator for many flows. This method produces a single
@@ -232,27 +350,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                 }
             }
     
-            if (inItems.isEmpty()) {
-                // there are no input Items as yet (or possibly never). Use an 
-                // inital Item, provided by the concrete subclass.
-                p.inItem = this.createInitialItem(graph);
-            }
-            else if (inItems.size() == 1) {
-                // There is only one input Item, no need to use the confluence 
-                // operator.
-                p.inItem = (Item)inItems.get(0);
-            }
-            else {
-                // more than one inItem, so join them together using the
-                // confluence operator.
-                p.inItem = this.confluence(inItems, inItemKeys, p.node);
-            }
-
-
             // calculate the out item
             Map oldOutItems = p.outItems;
-            p.outItems = this.flow(p.inItem, graph, p.node, p.succEdgeKeys());
-                    
+            p.outItems = this.flow(inItems, inItemKeys, graph, p.node, p.succEdgeKeys());
+                                
             if (!p.succEdgeKeys().equals(p.outItems.keySet())) {
                 // This check is more for developers to ensure that they
                 // have implemented their dataflow correctly. If performance
@@ -488,6 +589,39 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             
             if (!(key instanceof ExceptionEdgeKey)) {
                 // the key is not an exception edge key.
+                filtered.add(item);
+            }
+        }
+        
+        if (i.hasNext() || j.hasNext()) {
+            throw new InternalCompilerError("item and item key lists " +
+                                            "have different sizes.");
+        }
+        
+        return filtered;
+    }
+ 
+    /**
+     * Filter a list of <code>Item</code>s to contain only <code>Item</code>s
+     * that are associated with the given <code>EdgeKey</code>.
+     * 
+     * @param items List of Items to filter
+     * @param itemKeys List of <code>EdgeKey</code>s corresponding
+     *            to the edge keys for the <code>Item</code>s in <code>items</code>.
+     * @param filterEdgeKey the <code>EdgeKey</code> to use as a filter.
+     * @return a filtered list of items, containing only those whose edge keys
+     *            are the same as <code>filterEdgeKey</code>s.
+     */    
+    protected final List filterItems(List items, List itemKeys, FlowGraph.EdgeKey filterEdgeKey) {
+        List filtered = new ArrayList(items.size());
+        Iterator i = items.iterator();
+        Iterator j = itemKeys.iterator();
+        while (i.hasNext() && j.hasNext()) {
+            Item item = (Item)i.next();
+            EdgeKey key = (EdgeKey)j.next();
+            
+            if (filterEdgeKey.equals(key)) {
+                // the key matches the filter
                 filtered.add(item);
             }
         }
