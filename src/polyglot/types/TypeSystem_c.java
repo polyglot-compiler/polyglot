@@ -505,8 +505,8 @@ public class TypeSystem_c implements TypeSystem
 	}
 
 	if (goal == superType) {
-	    throw new SemanticException("Type " + goal +
-		" is a supertype of itself.");
+	    throw new SemanticException("Circular inheritance involving " + goal, 
+                                        curr.position());
 	}
 
 	checkCycles(superType, goal);
@@ -515,12 +515,15 @@ public class TypeSystem_c implements TypeSystem
 	    Type si = (Type) i.next();
 
 	    if (si == goal) {
-		throw new SemanticException("Type " + goal +
-		    " is a supertype of itself.");
+                throw new SemanticException("Circular inheritance involving " + goal, 
+                                            curr.position());
 	    }
 
 	    checkCycles(si.toReference(), goal);
-	}
+        }    
+        if (curr.isClass()) {
+            checkCycles(curr.toClass().outer(), goal);
+        }
     }
 
     ////
