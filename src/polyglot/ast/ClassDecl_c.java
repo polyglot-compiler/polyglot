@@ -253,7 +253,9 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         ConstructorDecl cd = nf.ConstructorDecl(position(), Flags.PUBLIC,
                                                 name, Collections.EMPTY_LIST,
                                                 Collections.EMPTY_LIST,
-                                                nf.Block(position(),nf.Empty(position())));
+                                                nf.Block(position(),
+                                                nf.SuperCall(position(), 
+                                                             Collections.EMPTY_LIST)));
         cd = (ConstructorDecl) cd.constructorInstance(ci);
         return body(body.addMember(cd));
     }
