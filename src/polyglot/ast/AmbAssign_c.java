@@ -34,7 +34,7 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
   }
   
   public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-      Assign n = (Assign)super.disambiguate(ar);
+      Assign n = (Assign) super.disambiguate(ar);
       
       if (n.left() instanceof Local) {
           return ar.nodeFactory().LocalAssign(n.position(), (Local)left(), operator(), right());

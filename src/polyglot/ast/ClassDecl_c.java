@@ -48,7 +48,8 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 
     protected ParsedClassType type;
 
-    public ClassDecl_c(Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body) {
+    public ClassDecl_c(Position pos, Flags flags, String name,
+                       TypeNode superClass, List interfaces, ClassBody body) {
 	    super(pos);
 	    this.flags = flags;
 	    this.name = name;

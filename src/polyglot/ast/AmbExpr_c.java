@@ -32,7 +32,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
 
   /** Disambiguate the expression. */
   public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-    Node n = ar.nodeFactory().disamb().disambiguate(ar, position(),
+    Node n = ar.nodeFactory().disamb().disambiguate(this, ar, position(),
                                                     null, name);
 
     if (n instanceof Expr) {

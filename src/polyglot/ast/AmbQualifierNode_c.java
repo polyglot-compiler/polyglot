@@ -72,7 +72,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
     }
 
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-	Node n = sc.nodeFactory().disamb().disambiguate(sc, position(), qual, name);
+	Node n = sc.nodeFactory().disamb().disambiguate(this, sc, position(), qual, name);
 
 	if (n instanceof QualifierNode) {
 	    return n;
