@@ -9,7 +9,7 @@ SOURCES = \
 	Options.java \
 	Report.java \
 	UsageError.java \
-	Version.java \
+	Version.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
