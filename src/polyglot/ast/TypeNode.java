@@ -125,10 +125,10 @@ public class TypeNode extends Node
    */
   public void translate_no_override(LocalContext c, CodeWriter w)
   {
-    if (Main.options.fully_qualified_names) {
-      w.write( type.translate(c) );
+    if (!Main.options.fully_qualified_names) {
+      w.write(type.translate(c));
     } else {
-      w.write( type.translate(null) );
+      w.write(type.translate(null));
     }
   }
 

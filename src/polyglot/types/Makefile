@@ -1,5 +1,5 @@
 SOURCE = ../..
-PACKAGE = jltools.types
+PACKAGE = jltools/types
 SUBDIRS =
 
 SOURCES = \

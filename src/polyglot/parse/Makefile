@@ -1,5 +1,5 @@
 SOURCE = ../..
-PACKAGE = jltools.parse
+PACKAGE = jltools/parse
 SUBDIRS =
 
 SOURCES = \

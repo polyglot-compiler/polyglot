@@ -486,8 +486,9 @@ public class MethodNode extends ClassMember
       w.write( " " + name + "(");
     }
     else {
-      returns.translate( c, w);
-      w.write( "(");
+      ClassType ct = (ClassType) returns.getType();
+      w.write(ct.getShortName());
+      w.write("(");
     }
     w.begin(0);
 

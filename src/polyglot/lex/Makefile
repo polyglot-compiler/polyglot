@@ -1,5 +1,5 @@
 SOURCE = ../..
-PACKAGE = jltools.lex
+PACKAGE = jltools/lex
 SUBDIRS =
 
 SOURCES = \

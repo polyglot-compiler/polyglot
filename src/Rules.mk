@@ -7,6 +7,8 @@
 # set up some reasonable defaults (for building in CUCS)
 include $(SOURCE)/Defs.mk
 
+.SUFFIXES: .class .java
+
 JC_FLAGS 		= -g -d $(SOURCE)/classes $(JAVAC_PATHS)
 
 JAR_FILE		= jltools.jar
@@ -19,19 +21,16 @@ JAVADOC_FLAGS		= -mx40m -ms40m -classpath "$(JAVADOC_CLASSPATH)"
 
 SOURCEPATH		= $(SOURCE)
 BIN 			= $(SOURCE)
-
-%.class: %.java
-	@if command test ! -f $(SOURCE)/classes/$(subst .,/,$(PACKAGE))/$@ || command test $< -nt $(SOURCE)/classes/$(subst .,/,$(PACKAGE))/$@ ; then \
-		echo "$(JC)" $(JC_FLAGS) $< ; \
-		"$(JC)" $(JC_FLAGS) $< ; \
-	else \
-		true echo "$<" ; \
-	fi
+PACKAGEPATH		= $(SOURCE)/classes/$(PACKAGE)
+VPATH			= $(PACKAGEPATH)
 
 all clean clobber javadoc:
 
+.java.class:
+	$(JC) $(JC_FLAGS) $<
+
 cleanclasses:
-	-rm -f $(SOURCE)/classes/$(subst .,/,$(PACKAGE))/*.class
+	-rm -f $(PACKAGEPATH)/*.class
 
 define subdirs
 @for i in $(SUBDIRS) ""; do \

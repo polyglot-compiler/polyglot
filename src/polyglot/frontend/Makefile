@@ -1,5 +1,5 @@
 SOURCE = ../..
-PACKAGE = jltools.frontend
+PACKAGE = jltools/frontend
 SUBDIRS =
 
 SOURCES = \

@@ -1,5 +1,5 @@
 SOURCE = ../../..
-PACKAGE = jltools.util.typedump
+PACKAGE = jltools/util/typedump
 SUBDIRS = 
 
 SOURCES = \

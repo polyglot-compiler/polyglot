@@ -1,5 +1,5 @@
 SOURCE = ../..
-PACKAGE = jltools.visit
+PACKAGE = jltools/visit
 SUBDIRS =k
 
 SOURCES = \

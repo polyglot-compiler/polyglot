@@ -1,16 +1,8 @@
 SOURCE = ../..
-PACKAGE = jltools.ast
+PACKAGE = jltools/ast
 SUBDIRS =
 
 SOURCES = \
-	CleanupSignaturesOverride.java \
-	ReadSymbolsOverride.java \
-	RemoveAmbiguitiesOverride.java \
-	TranslateBodyOverride.java \
-	TranslateOverride.java \
-	TypeCheckOverride.java \
-	ExtensionFactory.java \
-	StandardExtensionFactory.java \
 	AmbiguousExpression.java \
 	AmbiguousName.java \
 	AmbiguousNameExpression.java \
@@ -27,11 +19,13 @@ SOURCES = \
 	ClassDeclarationStatement.java \
 	ClassMember.java \
 	ClassNode.java \
+	CleanupSignaturesOverride.java \
 	ConstructorCallStatement.java \
 	DoStatement.java \
 	EmptyStatement.java \
 	Expression.java \
 	ExpressionStatement.java \
+	ExtensionFactory.java \
 	FieldExpression.java \
 	FieldNode.java \
 	FloatLiteral.java \
@@ -54,22 +48,28 @@ SOURCES = \
 	NodeVisitor.java \
 	NullLiteral.java \
 	NumericalLiteral.java \
+	ReadSymbolsOverride.java \
+	RemoveAmbiguitiesOverride.java \
 	ReturnStatement.java \
 	SourceFileNode.java \
 	SpecialExpression.java \
+	StandardExtensionFactory.java \
 	Statement.java \
 	StringLiteral.java \
 	SwitchStatement.java \
 	SynchronizedStatement.java \
 	TernaryExpression.java \
 	ThrowStatement.java \
+	TranslateBodyOverride.java \
+	TranslateOverride.java \
 	TryStatement.java \
+	TypeCheckOverride.java \
 	TypeNode.java \
 	UnaryExpression.java \
 	VariableDeclarationStatement.java \
 	WhileStatement.java
 
-CLASSES = $(patsubst %.java, %.class, $(SOURCES))
+CLASSES = $(SOURCES:.java=.class)
 
 include $(SOURCE)/Rules.mk
 
