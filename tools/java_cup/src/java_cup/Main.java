@@ -35,7 +35,7 @@ import java.io.*;
  *   <dd> compact tables by defaulting to most frequent reduce
  *   <dt> -max_actions #
  *   <dd> maximum number of actions per method in generated code
- *        (useful if javac complains about code size &gt;64K) [default 1000]
+ *        (useful if javac complains about code size &gt;64K) [default 400]
  *   <dt> -nowarn        
  *   <dd> don't warn about useless productions, etc.
  *   <dt> -nosummary     
@@ -100,7 +100,7 @@ public class Main {
   /** User option -- do not print a summary. */
   protected static boolean no_summary = false;
   /** User option -- maximum number of actions per method in generated code */
-  protected static int max_actions = 1000;
+  protected static int max_actions = 400;
   /** User option -- number of conflicts to expect */
   protected static int expect_conflicts = 0;
   /** Whether to report counterexamples when conflicts are found.
@@ -258,7 +258,7 @@ public class Main {
 "    -compact_red   compact tables by defaulting to most frequent reduce\n" +
 "    -max_actions   maximum number of actions per method in generated code\n" +
 "                   (useful if javac complains about code size >64K)\n" +
-"                   [default 1000]\n" +
+"                   [default 400]\n" +
 "    -nowarn        don't warn about useless productions, etc.\n" +
 "    -nosummary     don't print the usual summary of parse states, etc.\n" +
 "    -nopositions   don't propagate the left and right token position values\n" +
