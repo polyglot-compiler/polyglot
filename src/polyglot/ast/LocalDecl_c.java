@@ -11,13 +11,12 @@ import java.util.*;
  * A <code>LocalDecl</code> is an immutable representation of the declaration
  * of a local variable.
  */
-public class LocalDecl_c extends Node_c implements LocalDecl {
+public class LocalDecl_c extends Stmt_c implements LocalDecl {
     Flags flags;
     TypeNode type;
     String name;
     Expr init;
     LocalInstance li;
-    boolean reachable;
 
     public LocalDecl_c(Position pos, Flags flags, TypeNode type,
                        String name, Expr init)
@@ -285,28 +284,5 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
         }
 
         return succs;
-    }
-    
-    /**
-     * Is this term reachable? This attribute is not guaranteed correct until
-     * after the reachability pass
-     *
-     * @see polyglot.visit.ReachChecker
-     */
-    public boolean reachable() {
-        return reachable;
-    }
-
-    /**
-     * Set the reachability of this term.
-     */
-    public Term reachable(boolean reachability) {
-        if (this.reachable = reachability) {
-            return this;
-        }
-        
-        Local_c t = (Local_c) copy();
-        t.reachable = reachability;
-        return t;
     }
 }
