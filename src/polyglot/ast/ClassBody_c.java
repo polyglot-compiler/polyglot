@@ -243,11 +243,37 @@ public class ClassBody_c extends Node_c implements ClassBody
         }
     }
 
+    protected void abstractMethodCheck(TypeChecker tc) throws SemanticException {
+        ClassType type = tc.context().currentClass();
+        TypeSystem ts = tc.typeSystem();
+
+        // FIXME: check that we implement methods of interfaces and abstract
+        // superclasses.
+        if (type.flags().isAbstract() || type.flags().isInterface()) {
+            return;
+        }
+
+        // Check for abstract methods.
+        for (Iterator i = type.methods().iterator(); i.hasNext(); ) {
+            MethodInstance mi = (MethodInstance) i.next();
+
+            if (mi.flags().isAbstract()) {
+                // Clear all flags for the error message.
+                MethodInstance x = mi.flags(mi.flags().clear());
+                throw new SemanticException("Class \"" + type +
+                                            "\" should be declared abstract; " +
+                                            "it does not implement " + x + ".",
+                                            type.position());
+            }
+        }
+    }
+
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         duplicateFieldCheck(tc);
         duplicateConstructorCheck(tc);
         duplicateMethodCheck(tc);
         overrideMethodCheck(tc);
+        abstractMethodCheck(tc);
 
         return this;
     }
