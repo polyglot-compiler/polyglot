@@ -425,7 +425,7 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public Type checkAndResolveType(Type type, Context context) throws SemanticException {
 
-    System.out.println( "Checking: " + type + " " + type.getTypeString());
+      // System.out.println( "Checking: " + type + " " + type.getTypeString());
 
     if (type.isCanonical()) return type;
     if (type instanceof ArrayType) {
@@ -665,7 +665,7 @@ public class StandardTypeSystem extends TypeSystem {
 
         if (bFound && fiTemp != null)
         {
-          throw new SemanticException("Ambiguous referenct to field \"" + name + "\"");
+          throw new SemanticException("Ambiguous reference to field \"" + name + "\"");
         }
         else if (fiTemp != null)
         {
@@ -676,7 +676,7 @@ public class StandardTypeSystem extends TypeSystem {
       }
       if ( fi != null && fiEnclosing != null)
       {
-        throw new SemanticException("Ambiguous referenct to field \"" + name + "\"");
+        throw new SemanticException("Ambiguous reference to field \"" + name + "\"");
       }
     }
     if ( fi!= null) return fi;
@@ -1057,25 +1057,25 @@ public class StandardTypeSystem extends TypeSystem {
   public Type getException() { return EXCEPTION_; }
   public Type getRTException() { return RTEXCEPTION_; }
 
-  private final Type NULL_    = new NullType(this);
-  private final Type VOID_    = new PrimitiveType(this, PrimitiveType.VOID);
-  private final Type BOOLEAN_ = new PrimitiveType(this, PrimitiveType.BOOLEAN);
-  private final Type CHAR_    = new PrimitiveType(this, PrimitiveType.CHAR);
-  private final Type BYTE_    = new PrimitiveType(this, PrimitiveType.BYTE);
-  private final Type SHORT_   = new PrimitiveType(this, PrimitiveType.SHORT);
-  private final Type INT_     = new PrimitiveType(this, PrimitiveType.INT);
-  private final Type LONG_    = new PrimitiveType(this, PrimitiveType.LONG);
-  private final Type FLOAT_   = new PrimitiveType(this, PrimitiveType.FLOAT);
-  private final Type DOUBLE_  = new PrimitiveType(this, PrimitiveType.DOUBLE);
-  private Type OBJECT_      ;
-  private Type CLASS_       ;
-  private Type STRING_      ;
-  private Type THROWABLE_   ;
-  private Type ERROR_       ;
-  private Type EXCEPTION_   ;
-  private Type RTEXCEPTION_ ;
-  private Type CLONEABLE_   ;
-  private Type SERIALIZABLE_;
+  protected final Type NULL_    = new NullType(this);
+  protected final Type VOID_    = new PrimitiveType(this, PrimitiveType.VOID);
+  protected final Type BOOLEAN_ = new PrimitiveType(this, PrimitiveType.BOOLEAN);
+  protected final Type CHAR_    = new PrimitiveType(this, PrimitiveType.CHAR);
+  protected final Type BYTE_    = new PrimitiveType(this, PrimitiveType.BYTE);
+  protected final Type SHORT_   = new PrimitiveType(this, PrimitiveType.SHORT);
+  protected final Type INT_     = new PrimitiveType(this, PrimitiveType.INT);
+  protected final Type LONG_    = new PrimitiveType(this, PrimitiveType.LONG);
+  protected final Type FLOAT_   = new PrimitiveType(this, PrimitiveType.FLOAT);
+  protected final Type DOUBLE_  = new PrimitiveType(this, PrimitiveType.DOUBLE);
+  protected Type OBJECT_      ;
+  protected Type CLASS_       ;
+  protected Type STRING_      ;
+  protected Type THROWABLE_   ;
+  protected Type ERROR_       ;
+  protected Type EXCEPTION_   ;
+  protected Type RTEXCEPTION_ ;
+  protected Type CLONEABLE_   ;
+  protected Type SERIALIZABLE_;
   
   protected ClassResolver resolver; //Should do its own caching.
   protected ClassCleaner cleaner;

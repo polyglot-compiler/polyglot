@@ -31,7 +31,7 @@ public class Main
                                         = "Scramble Random Seed (Long)";
   private static final String MAIN_OPT_EXT_OP
                                         = "Use ObjectPrimitive Ext (Boolean)";
-  private static final String MAIN_OPT_EXT_JIF
+  public static final String MAIN_OPT_EXT_JIF
                                         = "Use Jif Ext (Boolean)";
   private static final String MAIN_OPT_THREADS
                                         = "Use multiple threads (Boolean)";

@@ -6,6 +6,9 @@ import jltools.lex.*;
 import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
+import jltools.main.Main;
+
+import jltools.ext.jif.visit.*;
 
 import java.io.*;
 import java.util.*;
@@ -51,6 +54,7 @@ public class Compiler implements TargetTable, ClassCleaner
   private static boolean useFqcn;
   private static boolean serialize;
   private static boolean verbose;
+  private static boolean jif;
 
   private static boolean initialized = false;
 
@@ -158,6 +162,8 @@ public class Compiler implements TargetTable, ClassCleaner
     verbose = ((Boolean)options.get( OPT_VERBOSE)).booleanValue();
     
     serialize = ((Boolean)options.get( OPT_SERIALIZE)).booleanValue();
+
+    jif = ((Boolean)options.get( Main.MAIN_OPT_EXT_JIF)).booleanValue();
 
     /* Set up the resolvers. */
     Compiler compiler = new Compiler( null);
@@ -670,8 +676,15 @@ public class Compiler implements TargetTable, ClassCleaner
   protected ImportTable readSymbols( Node ast, TableClassResolver cr,
                                      Target t) throws IOException
   {
-    SymbolReader sr = new SymbolReader( systemResolver, cr, t, tf, ts, 
+    SymbolReader sr;
+    if (jif) {
+	verbose(this, "Using Jif Symbol Reader");
+	sr = new JifSymbolReader(  systemResolver, cr, t, tf, ts, 
                                         t.getErrorQueue());
+    } else {
+	sr = new SymbolReader( systemResolver, cr, t, tf, ts, 
+			       t.getErrorQueue());
+    }
     ast.visit( sr);
 
     return sr.getImportTable();

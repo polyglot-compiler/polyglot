@@ -21,13 +21,13 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
   static final long serialVersionUID = 327848486110215910L;
 
   // RI: every element is a Type.  May be null.  Immutable.
-  private TypedList exceptionTypes;
+  protected TypedList exceptionTypes;
   // RI: May be null.
-  private AccessFlags flags;
+  protected AccessFlags flags;
   // RI: May be null.
-  private Type returnType;
+  protected Type returnType;
   // The encompassing class
-  private ClassType enclosingType;
+  protected ClassType enclosingType;
   
   /**
    *    ExceptionTypes, returnType, and AccessFlags may be null.

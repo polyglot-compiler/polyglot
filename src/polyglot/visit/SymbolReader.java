@@ -10,19 +10,19 @@ import java.io.IOException;
 
 public class SymbolReader extends NodeVisitor
 {
-  private ClassResolver systemResolver;
-  private TableClassResolver currentResolver;
+  protected ClassResolver systemResolver;
+  protected TableClassResolver currentResolver;
 
-  private Target target;
-  private TargetFactory tf;
+  protected Target target;
+  protected TargetFactory tf;
 
-  private TypeSystem ts;
-  private ErrorQueue eq;
+  protected TypeSystem ts;
+  protected ErrorQueue eq;
 
-  private ParsedClassType current;
+  protected ParsedClassType current;
 
-  private String packageName;
-  private ImportTable it;
+  protected String packageName;
+  protected ImportTable it;
 
   public SymbolReader( ClassResolver systemResolver, 
                        TableClassResolver currentResolver, 

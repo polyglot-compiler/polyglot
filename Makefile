@@ -61,7 +61,7 @@ include jltools/ext/jif/lex/Makefile
 include jltools/ext/jif/parse/Makefile
 include jltools/ext/jif/ast/Makefile
 include jltools/ext/jif/types/Makefile
-
+include jltools/ext/jif/visit/Makefile
 
 #other targets:
 util: $(UTIL_TARGET) 
@@ -83,7 +83,7 @@ ext/op/runtime: $(EXT_OP_RUNTIME_TARGET)
 frontend: util types lex parse ast visit $(FRONTEND_TARGET)
 
 #jif
-jif: util types ast ext/jif/lex ext/jif/parse ext/jif/ast ext/jif/types
+jif: util types ast ext/jif/lex ext/jif/parse ext/jif/ast ext/jif/types ext/jif/visit
 
 ext/jif/lex: util $(EXTJIFLEX_TARGET)
 
@@ -92,6 +92,8 @@ ext/jif/parse: util $(EXTJIFPARSE_TARGET)
 ext/jif/ast: util types ast  $(EXTJIFAST_TARGET)
 
 ext/jif/types: util $(JIFTYPES_TARGET)
+
+ext/jif/visit: util $(JIFVISIT_TARGET)
 
 main: $(BIN)/jlc $(BIN)/jlcd frontend jif ext/op ext/op/runtime $(MAIN_TARGET)
 
@@ -117,6 +119,7 @@ clean:
 	rm -f jltools/ext/jif/ast/*.class
 	rm -f jltools/ext/jif/lex/*.class
 	rm -f jltools/ext/jif/types/*.class
+	rm -f jltools/ext/jif/visit/*.class
 
 # Delete class files as well as the grammar files, so that we can regenerate 
 # them. Also delete the javadoc & jar file, if they exis, as well as the jlc and 
@@ -154,7 +157,10 @@ javadoc: FORCE
 			jltools.ext.op   \
 			jltools.ext.op.runtime \
 			jltools.ext.jif.ast \
-			jltools.ext.jif.parse
+			jltools.ext.jif.lex \
+			jltools.ext.jif.parse \
+			jltools.ext.jif.types \
+			jltools.ext.jif.visit
 
 FORCE:
 
