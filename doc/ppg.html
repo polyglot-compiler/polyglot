@@ -1,0 +1,71 @@
+<html>
+<head>
+<title>JLgen documentation</title>
+</head>
+
+<body>
+<h1>JLgen Documentation</h1>
+<p>November 30, 2001</p>
+<hr>
+<h2>Table of Contents</h2>
+<ul>
+  <li><a href="#what">What</a> is it?
+  <li><a href="#usage">Usage</a>
+  <li><a href="#features">Features</a>
+  <li><a href="#semantics">Semantics</a>
+</ul>
+
+<a name="what"><h3>What is JLgen?</h3></a>
+JLgen provides the ability of extending languages by inheriting
+grammars, thus simplifying language grammar management, revision, and
+modifying base grammars automatically extends modifications to all
+inherting grammars, so changes are localized.
+
+<a name="usage"><h3>Using JLgen</h3></a>
+A JLgen file differs from a CUP grammar in several key ways:
+<ol>
+  <li>The first line of a JLgen file is
+    <ul><tt><b>include &quot;</b><i>filename</i><b>&quot;</b></tt></ul>
+    A JLgen file can include a CUP spec or another JLgen file.
+  <li>A JLgen grammar specification can modify the results of its
+    inheritance using the following commands:
+  <ul>
+    <li><tt><b>drop {</b></tt> <i>symbol</i> <tt><b>}</b></tt><br>
+      where <i>symbol</i> is an <u>inherited</u> terminal or
+      nonterminal.<br> Result: symbol is removed from grammar, and
+      if a nonterminal, all productions where it is on the
+      <b>left-hand side</b> are also eliminated. It is up to the user
+      to drop productions where this symbol appears on the right hand side.
+    <li><tt><b>drop {</b></tt> <i>S</i> <tt><b>::=</b></tt> &lt;
+      <i>productions</i>&gt; <tt><b>; }</b></tt><br>
+      where <i>S</i> is an <u>inherited</u> nonterminal, productions
+      are inherited productions of S present before evaluation of the
+      current JLgen file, terminated with a semicolon.<br>
+      Result: only these productions are removed from the specified
+      nonterminal, the nonterminal remains, even if ALL of its
+      productions are dropped in this way. To get rid of the symbol
+      entirely, use the syntax above.
+    <li><tt><b>override</b></tt> - FIXME
+    <li><tt><b>extend</b></tt> - FIXME
+    <li><tt><b>transfer</b></tt> - FIXME
+    <li>Adding productions: same syntax as in CUP.
+  </ul>
+</ol>
+
+
+Syntax for invocation of JLgen is simply<br>
+<ul><tt><b>jlgen &lt;grammar file&gt;</b></tt></ul>
+for either a standard CUP file or for a JLgen-based grammar
+inheritance file.<p>
+
+In the case of inherited grammars, file inclusion is treated as
+relative to where the base file is located.
+
+<a name="semantics"><h3>Semantics of JLgen</h3></a>
+
+
+
+
+</body>
+
+</html>
