@@ -61,13 +61,14 @@ The default set of passes is:
         each type in the source file and stores it in a Resolver
         associated with the source.
     * clean-super (AmbiguityRemover):  Removes any ambiguities found
-        in the supertypes of a type.
+	in the declaration of the supertypes of a type (e.g., the "extends"
+	clause).
     * clean-sigs (AmbiguityRemover):  Removes any ambiguities found in
-        the members of a class or interface.
+        the signatures of class or interface members.
     * add-members (AddMemberVisitor):  Adds the members of a class or
         interface to its type object.
     * disambiguate (AmbiguityRemover):  Removes any ambiguities found
-        in the bodies of methods.
+        in the bodies of methods, constructors, or initializers.
     * constant folding (ConstantFolder):  Performs a simple constant
         folding optimization.
     * type checking (TypeChecker):  Performs semantic analysis for Java.
