@@ -21,13 +21,25 @@ public abstract class TypeSystem {
   /**
    * This class represents the context in which a type lookup is
    * proceeding.
+   *
+   * The 'ImportTable' field is required for type lookups (like checkType and
+   * getCanonicalType).  
+   *
+   * The Type field is required for all method and field lookups.
+   *
+   * The MethodType field may be null.
    **/
-  public static class Context {   
-    public final JavaClass inClass;
+  public static class Context {
+    public final ImportTable table;
+    public final Type inClass;
     public final MethodType inMethod;
     
-    public Context(JavaClass c, MethodType m) { inClass = c; inMethod = m; }
+    public Context(ImportTable t, Type type, MethodType m) 
+      { table = t; inClass = type; inMethod = m; }
+    public Context(Type type, MethodType m) 
+      { table = null; inClass = type; inMethod = m; }
   }
+
 
   /**
    * This class represents the <Type, methodType> pair of a method lookup.
@@ -35,6 +47,7 @@ public abstract class TypeSystem {
   public static class MethodMatch {
     public final Type onClass;
     public final MethodType method;
+    public String error;
 
     public MethodMatch(Type c, MethodType m) { onClass = c; method = m; }    
   }
@@ -45,6 +58,7 @@ public abstract class TypeSystem {
   public static class FieldMatch {
     public final Type onClass;
     public final FieldType field;
+    public String error;
 
     public FieldMatch(Type c, FieldType f) { onClass = c; field = f; }
   }
@@ -110,15 +124,28 @@ public abstract class TypeSystem {
    **/
   public abstract boolean isCanonical(Type type);
   /**
-   * Tries to return the canonical (fully qualified) form of <type>
-   * in the provided context, which may be null.
+   * Tries to return the canonical (fully qualified) form of <type> in
+   * the provided context, which may be null.  Returns null if no such
+   * type exists.
    **/
-  public abstract Type getCanonicalType(Type type, Context context);
+  public Type getCanonicalType(Type type, Context context) {
+    Object res = checkAndResolveType(type, context);
+    return (res instanceof String) ? null : (Type) res;
+  }
   /**
    * Checks whether <type> is a valid type in the given context,
    * which may be null.  Returns a description of the error, if any.
    **/
-  public abstract String checkTypeOk(Type type, Context context);
+  public String checkTypeOk(Type type, Context context) {
+    Object res = checkAndResolveType(type, context);
+    return (res instanceof String) ? (String) res : null;
+  }
+  /**
+   * If <type> is a valid type in the given context, returns a
+   * canonical form of that type.  Otherwise, returns a String
+   * describing the error.
+   **/
+  public abstract Object checkAndResolveType(Type type, Context context);
 
   ////
   // Various one-type predicates.
@@ -164,6 +191,16 @@ public abstract class TypeSystem {
    * defined on subclasses before those defined on superclasses.
    **/
   public abstract Iterator getFieldsNamed(Type type, String name);
+
+  /**
+   * Requires: all type arguments are canonical.
+   *
+   * Returns the fieldMatch named 'name' defined on 'type' visible in
+   * context.  If no such field may be found, returns a fieldmatch
+   * with an error explaining why.
+   **/
+  public abstract Iterator getField(Type type, String name, Context context);
+
   /**
    * Requires: all type arguments are canonical.
    *
@@ -200,10 +237,14 @@ public abstract class TypeSystem {
   /**
    * If an attempt to call a method of type <method> on <type> would
    * be successful, returns the actual MethodMatch for the method that
-   * would be called.  Otherwise returns null.
+   * would be called.  Otherwise returns a MethodMatch with an error string
+   * explaining why no method could be found.
    *
    * If <context> is non-null, only those methods visible in context are
    * considered.
+   *
+   * Iff <isThis> is true, methods are considered which would only be valid
+   * if the target object were equal to the "this" object.
    *
    * This method uses the name, argument types, and access flags of <method>.
    * The access flags are used to select which protections may be accepted.
@@ -211,15 +252,19 @@ public abstract class TypeSystem {
    * (Guavac gets this wrong.)
    **/
   public abstract MethodMatch getMethod(Type type, MethodType method, 
-					Context context);
+					Context context, boolean isThis);
   /**
    * If an attempt to call a method of type <method> on <type> would
    * be successful, and the method would match on the given <type>,
    * returns the actual MethodMatch for the method that would be
-   * called.  Otherwise returns null.
+   * called.  Otherwise returns a MethodMatch with an error string
+   * explaining why no method could be found.
    *
    * If <context> is non-null, only those methods visible in context are
    * considered.
+   *
+   * Iff <isThis> is true, methods are considered which would only be valid
+   * if the target object were equal to the "this" object.
    *
    * This method uses the name, argument types, and access flags of <method>.
    * The access flags are used to select which protections may be accepted.
@@ -227,7 +272,7 @@ public abstract class TypeSystem {
    * (Guavac gets this wrong.)
    **/
   public abstract MethodMatch getMethodInClass(Type type, MethodType method, 
-					       Context context);
+					      Context context, boolean isThis);
   /**
    * As above, except only returns a match if the argument types are identical,
    * and disregards context.
@@ -235,10 +280,13 @@ public abstract class TypeSystem {
   public abstract MethodMatch getExactMethod(Type type, MethodType method);
   public abstract MethodMatch getExactMethodInClass(Type type, MethodType method); 
 
-  
   ////
   // Functions for type->class mapping.
   ////
+  /**
+   * Returns the JavaClass object corresponding to a given type, or null
+   * if there is none.
+   **/
   public abstract JavaClass getClassForType(Type type);
 
   ////
@@ -256,15 +304,23 @@ public abstract class TypeSystem {
   public abstract Type getObject();
   public abstract Type getThrowable();
   /**
-   * Returns a type object for a class type whose name is the provided string.
-   * This type may not correspond to a valid class.
+   * Returns a non-canonical type object for a class type whose name
+   * is the provided string.  This type may not correspond to a valid
+   * class.
    **/
-  public abstract Type getTypeWithName(String name);
+  public abstract ClassType getTypeWithName(String name);
   /**
    * Returns a type identical to <type>, but with <dims> more array
-   * dimensions.
+   * dimensions.  If dims is < 0, array dimensions are stripped.
    **/
   public abstract Type extendArrayDims(Type type, int dims);
+  /**
+   * Returns a canonical type corresponding to the Java Class object
+   * theClass.  Does not require that <theClass> have a JavaClass
+   * registered in this typeSystem.  Does not register the type in
+   * this TypeSystem.  For use only by JavaClass implementations.
+   **/
+  public abstract ClassType typeForClass(Class theClass);
 
 }
 

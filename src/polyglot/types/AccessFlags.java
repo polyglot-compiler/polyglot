@@ -28,6 +28,26 @@ public class AccessFlags implements Cloneable {
     return other;
   }
 
+  /**
+   * Given the JVM encoding of a set of flags, returns the AccessFlags object
+   * for that encoding.
+   **/
+  public static AccessFlags flagsForInt(int fl) {
+    AccessFlags flags = new AccessFlags();
+    if ((fl & 0x1) != 0)   { flags.setPublic(true); }
+    if ((fl & 0x2) != 0)   { flags.setPrivate(true); }
+    if ((fl & 0x4) != 0)   { flags.setProtected(true); }
+    if ((fl & 0x8) != 0)   { flags.setStatic(true); }
+    if ((fl & 0x10) != 0)  { flags.setFinal(true); }
+    if ((fl & 0x20) != 0)  { flags.setSynchronized(true); }
+    if ((fl & 0x40) != 0)  { flags.setVolatile(true); }
+    if ((fl & 0x80) != 0)  { flags.setTransient(true); }
+    if ((fl & 0x100) != 0) { flags.setNative(true); }
+    if ((fl & 0x200) != 0) { flags.setInterface(true); }
+    if ((fl & 0x400) != 0) { flags.setAbstract(true); }
+    return flags;
+  }
+
   public void setPublic(boolean val) {
     if (val)
       bits |= PUBLIC_BIT;

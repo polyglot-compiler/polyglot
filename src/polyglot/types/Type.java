@@ -28,7 +28,7 @@ public abstract class Type {
   // Methods which dispatch to typeSystem
   ////
   public final Type extendArrayDims(int dims)
-    { return ts.extendArrayDims(this,dims); }
+    { return ts.extendArrayDims(this,dims); }  
   public final boolean isSameType(Type t)
     { return ts.isSameType(this,t); }
   public final Type getCanonicalType(TypeSystem.Context context)
