@@ -19,6 +19,18 @@ public class Position implements Serializable
     public static final int UNKNOWN = -1;
     public static final int END_UNUSED = -2;
 	public static final Position COMPILER_GENERATED = new Position("Compiler Generated");
+	
+	/** Get a compiler generated position. */ 
+	public static Position compilerGenerated() {
+		Position p = new Position();
+		StackTraceElement[] stack = new Exception().getStackTrace();
+		if (stack.length >= 2) {
+			return new Position(stack[1].getFileName() + " (compiler generated)", stack[1].getLineNumber());
+		}
+		else {
+			return COMPILER_GENERATED;
+		}
+	}
 
     /** For deserialization. */
     protected Position() { }
