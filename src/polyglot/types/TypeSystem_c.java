@@ -689,9 +689,9 @@ public class TypeSystem_c implements TypeSystem
 
 	if (acceptable.size() == 0) {
 	    throw new SemanticException(
-		"No valid method call found for \"" + name +
+		"No valid method call found for " + name +
 		"(" + listToString(argTypes) + ")" +
-		"\" in " +
+		" in " +
 		container + ".");
 	}
 
@@ -700,8 +700,8 @@ public class TypeSystem_c implements TypeSystem
 
 	if (mi == null) {
 	    throw new SemanticException(
-		"Ambiguous method \"" + name + "\".  More than one " +
-		"call is valid from this context: " + acceptable);
+		"Reference to " + name + " is ambiguous, multiple methods match: "
+		+ acceptable);
 	}
 
 	return mi;
@@ -714,8 +714,8 @@ public class TypeSystem_c implements TypeSystem
 	List acceptable = findAcceptableConstructors(container, argTypes, c);
 
 	if (acceptable.size() == 0) {
-	    throw new SemanticException("No valid constructor for " +
-		                        container + ".");
+	    throw new SemanticException("No valid constructor found for " +
+			container + "(" + listToString(argTypes) + ").");
 	}
 
 	ConstructorInstance ci = (ConstructorInstance)
@@ -723,9 +723,8 @@ public class TypeSystem_c implements TypeSystem
 
 	if (ci == null) {
 	    throw new SemanticException(
-		"Ambiguous constructor for class " + container +
-		".  More than one call is valid from this context: " +
-		acceptable);
+		"Reference to " + container + " is ambiguous, multiple " +
+		"constructors match: " + acceptable);
 	}
 
 	return ci;
