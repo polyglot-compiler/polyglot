@@ -6,32 +6,25 @@ import java.util.Map;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.types.TypeSystem;
-import polyglot.util.ErrorQueue;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
-import polyglot.util.SubtypeSet;
+import polyglot.types.*;
+import polyglot.util.*;
 
 /** Visitor which checks if exceptions are caught or declared properly. */
 public class ExceptionChecker extends ErrorHandlingVisitor
 {
     protected ExceptionChecker outer;
-    protected SubtypeSet scope;
+    private SubtypeSet scope = null; // lazily instantiated
     protected Map exceptionPositions;
 
     public ExceptionChecker(Job job, TypeSystem ts, NodeFactory nf) {
 	super(job, ts, nf);
 	this.outer = null;
-        this.scope = new SubtypeSet(ts.Throwable());
         this.exceptionPositions = new HashMap();
     }
 
     public ExceptionChecker push() {
         ExceptionChecker ec = (ExceptionChecker) this.visitChildren();
         ec.outer = this;
-        ec.scope = new SubtypeSet(ts.Throwable());
         ec.exceptionPositions = new HashMap();
         return ec;
     }
@@ -107,7 +100,10 @@ public class ExceptionChecker extends ErrorHandlingVisitor
      * modify the throwsSet.
      */
     public SubtypeSet throwsSet() {
-        return (SubtypeSet) scope;
+        if (scope == null) {
+            scope = new SubtypeSet(ts.Throwable());
+        }
+        return scope;
     }
     
     /**
