@@ -13,14 +13,14 @@ public interface ProcedureInstance extends CodeInstance
      * @return A list of <code>Type</code>.
      * @see polyglot.types.Type
      */
-    List argumentTypes();
+    List formalTypes();
 
     /**
      * List of declared exception types thrown.
      * @return A list of <code>Type</code>.
      * @see polyglot.types.Type
      */
-    List exceptionTypes();
+    List throwTypes();
 
     /**
      * Returns a String representing the signature of the procedure.
@@ -43,7 +43,7 @@ public interface ProcedureInstance extends CodeInstance
     /**
      * Returns true if the procedure has the given arguments.
      */
-    boolean hasArguments(List arguments);
+    boolean hasFormals(List arguments);
 
     /**
      * Returns true if the procedure throws a subset of the exceptions
@@ -65,7 +65,7 @@ public interface ProcedureInstance extends CodeInstance
     /**
      * Returns true if the procedure has the given arguments.
      */
-    boolean hasArgumentsImpl(List arguments);
+    boolean hasFormalsImpl(List arguments);
 
     /**
      * Returns true if the procedure throws a subset of the exceptions

@@ -17,17 +17,17 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     protected TypeNode returnType;
     protected String name;
     protected List formals;
-    protected List exceptionTypes;
+    protected List throwTypes;
     protected Block body;
     protected MethodInstance mi;
 
-    public MethodDecl_c(Del ext, Position pos, Flags flags, TypeNode returnType, String name, List formals, List exceptionTypes, Block body) {
+    public MethodDecl_c(Del ext, Position pos, Flags flags, TypeNode returnType, String name, List formals, List throwTypes, Block body) {
 	super(ext, pos);
 	this.flags = flags;
 	this.returnType = returnType;
 	this.name = name;
 	this.formals = TypedList.copyAndCheck(formals, Formal.class, true);
-	this.exceptionTypes = TypedList.copyAndCheck(exceptionTypes, TypeNode.class, true);
+	this.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
 	this.body = body;
     }
 
@@ -80,14 +80,14 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     }
 
     /** Get the exception types of the method. */
-    public List exceptionTypes() {
-	return Collections.unmodifiableList(this.exceptionTypes);
+    public List throwTypes() {
+	return Collections.unmodifiableList(this.throwTypes);
     }
 
     /** Set the exception types of the method. */
-    public MethodDecl exceptionTypes(List exceptionTypes) {
+    public MethodDecl throwTypes(List throwTypes) {
 	MethodDecl_c n = (MethodDecl_c) copy();
-	n.exceptionTypes = TypedList.copyAndCheck(exceptionTypes, TypeNode.class, true);
+	n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
 	return n;
     }
 
@@ -125,12 +125,12 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     }
 
     /** Reconstruct the method. */
-    protected MethodDecl_c reconstruct(TypeNode returnType, List formals, List exceptionTypes, Block body) {
-	if (returnType != this.returnType || ! CollectionUtil.equals(formals, this.formals) || ! CollectionUtil.equals(exceptionTypes, this.exceptionTypes) || body != this.body) {
+    protected MethodDecl_c reconstruct(TypeNode returnType, List formals, List throwTypes, Block body) {
+	if (returnType != this.returnType || ! CollectionUtil.equals(formals, this.formals) || ! CollectionUtil.equals(throwTypes, this.throwTypes) || body != this.body) {
 	    MethodDecl_c n = (MethodDecl_c) copy();
 	    n.returnType = returnType;
 	    n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
-	    n.exceptionTypes = TypedList.copyAndCheck(exceptionTypes, TypeNode.class, true);
+	    n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
 	    n.body = body;
 	    return n;
 	}
@@ -142,9 +142,9 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     public Node visitChildren(NodeVisitor v) {
 	TypeNode returnType = (TypeNode) visitChild(this.returnType, v);
 	List formals = visitList(this.formals, v);
-	List exceptionTypes = visitList(this.exceptionTypes, v);
+	List throwTypes = visitList(this.throwTypes, v);
 	Block body = (Block) visitChild(this.body, v);
-	return reconstruct(returnType, formals, exceptionTypes, body);
+	return reconstruct(returnType, formals, throwTypes, body);
     }
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
@@ -159,8 +159,8 @@ public class MethodDecl_c extends Term_c implements MethodDecl
           l.add(ts.unknownType(position()));
         }
 
-        List m = new ArrayList(exceptionTypes().size());
-        for (int i = 0; i < exceptionTypes().size(); i++) {
+        List m = new ArrayList(throwTypes().size());
+        for (int i = 0; i < throwTypes().size(); i++) {
           m.add(ts.unknownType(position()));
         }
 
@@ -245,7 +245,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 		"A native method cannot have a body.", position());
 	}
 
-        for (Iterator i = exceptionTypes().iterator(); i.hasNext(); ) {
+        for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
             TypeNode tn = (TypeNode) i.next();
             Type t = tn.type();
             if (! t.isThrowable()) {
@@ -313,7 +313,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 	    boolean throwDeclared = false;
 
 	    if (! t.isUncheckedException()) {
-		for (Iterator j = exceptionTypes().iterator(); j.hasNext(); ) {
+		for (Iterator j = throwTypes().iterator(); j.hasNext(); ) {
 		    TypeNode tn = (TypeNode) j.next();
 		    Type tj = tn.type();
 
@@ -363,11 +363,11 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 	w.end();
 	w.write(")");
 
-	if (! exceptionTypes().isEmpty()) {
+	if (! throwTypes().isEmpty()) {
 	    w.allowBreak(6);
 	    w.write("throws ");
 
-	    for (Iterator i = exceptionTypes().iterator(); i.hasNext(); ) {
+	    for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
 	        TypeNode tn = (TypeNode) i.next();
 		print(tn, w, tr);
 
@@ -438,7 +438,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 	    argTypes.add(f.declType());
 	}
 
-	for (Iterator i = exceptionTypes().iterator(); i.hasNext(); ) {
+	for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
 	    TypeNode tn = (TypeNode) i.next();
 	    excTypes.add(tn.type());
 	}

@@ -49,16 +49,20 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	return n;
     }
 
-    /** Get the arguments of the constructor call. */
+    /** Get the actual arguments of the constructor call. */
     public List arguments() {
 	return Collections.unmodifiableList(this.arguments);
     }
 
-    /** Set the arguments of the constructor call. */
+    /** Set the actual arguments of the constructor call. */
     public ConstructorCall arguments(List arguments) {
 	ConstructorCall_c n = (ConstructorCall_c) copy();
 	n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
 	return n;
+    }
+
+    public ProcedureInstance procedureInstance() {
+	return constructorInstance();
     }
 
     /** Get the constructor we are calling. */
@@ -205,7 +209,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
         }
 
         Iterator i = this.arguments.iterator();
-        Iterator j = ci.argumentTypes().iterator();
+        Iterator j = ci.formalTypes().iterator();
 
         while (i.hasNext() && j.hasNext()) {
 	    Expr e = (Expr) i.next();
@@ -268,7 +272,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
     public List throwTypes(TypeSystem ts) {
         List l = new LinkedList();
-        l.addAll(ci.exceptionTypes());
+        l.addAll(ci.throwTypes());
         l.addAll(ts.uncheckedExceptions());
         return l;
     }

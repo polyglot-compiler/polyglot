@@ -202,6 +202,7 @@ public class Field_c extends Expr_c implements Field
           if (assign.operator() != Assign.ASSIGN) {
               // o.f OP= e: visit o -> o.f -> e -> (o.f OP= e)
               v.visitCFG(o, this);
+              v.visitThrow(this);
               v.edge(this, assign.right().entry());
               v.visitCFG(assign.right(), assign);
           }
@@ -217,12 +218,14 @@ public class Field_c extends Expr_c implements Field
               // o.f = e: visit o -> e -> o.f -> (o.f = e)
               v.visitCFG(o, assign.right().entry());
               v.visitCFG(assign.right(), this);
+              v.visitThrow(this);
               v.edge(this, assign);
           }
       }
       else {
           if (assign.operator() != Assign.ASSIGN) {
               // T.f OP= e: visit T.f -> e -> (T.f OP= e)
+              v.visitThrow(this);
               v.edge(this, assign.right().entry());
               v.visitCFG(assign.right(), assign);
           }
@@ -236,6 +239,7 @@ public class Field_c extends Expr_c implements Field
               //       T.f = e: visit e -> T.f -> (T.f OP= e)
 
               v.visitCFG(assign.right(), this);
+              v.visitThrow(this);
               v.edge(this, assign);
           }
       }

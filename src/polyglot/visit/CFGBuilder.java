@@ -283,7 +283,7 @@ public class CFGBuilder implements Copy
      * @param a the source node for the edges.
      * @param succs a list of <code>EdgeKeyTermPair</code>s
      */
-    private void visitCFG(Term a, List succs) { 
+    private void visitCFG(Term a, List succs) {
         if (Report.should_report(Report.cfg, 2))
             Report.report(2, "// node " + a + " -> " + succs);
 
@@ -293,10 +293,14 @@ public class CFGBuilder implements Copy
             EdgeKeyTermPair pair = (EdgeKeyTermPair)i.next();
             edge(a, pair.term, pair.edgeKey);
         }
-        
+
+        visitThrow(a);
+    }
+
+    public void visitThrow(Term a) {
         if (a instanceof Thrower) {
             Thrower t = (Thrower) a;
-            
+
             for (Iterator i = t.throwTypes(ts).iterator(); i.hasNext(); ) {
                 Type type = (Type) i.next();
                 visitThrow(t, type);

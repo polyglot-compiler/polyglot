@@ -223,7 +223,7 @@ public class ClassBody_c extends Node_c implements ClassBody
             for (int j = i+1; j < l.size(); j++) {
                 ConstructorInstance cj = (ConstructorInstance) l.get(j);
 
-                if (ci.hasArguments(cj.argumentTypes())) {
+                if (ci.hasFormals(cj.formalTypes())) {
                     throw new SemanticException("Duplicate constructor \"" + cj + "\".", cj.position());
                 }
             }

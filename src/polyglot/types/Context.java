@@ -27,10 +27,10 @@ public interface Context extends Resolver, Copy
     void addType(NamedType t);
 
     /** Looks up a method in the current scope.
-     * @param argumentTypes A list of <code>Type</code>.
+     * @param formalTypes A list of <code>Type</code>.
      * @see polyglot.types.Type
      */
-    MethodInstance findMethod(String name, List argumentTypes) throws SemanticException;
+    MethodInstance findMethod(String name, List formalTypes) throws SemanticException;
 
     /** Looks up a local variable or field in the current scope. */
     VarInstance findVariable(String name) throws SemanticException;

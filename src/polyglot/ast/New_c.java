@@ -65,6 +65,10 @@ public class New_c extends Expr_c implements New
 	return n;
     }
 
+    public ProcedureInstance procedureInstance() {
+	return constructorInstance();
+    }
+
     public ConstructorInstance constructorInstance() {
 	return this.ci;
     }
@@ -473,7 +477,7 @@ FIXME: check super types as well.
         }
 
         Iterator i = this.arguments.iterator();
-        Iterator j = ci.argumentTypes().iterator();
+        Iterator j = ci.formalTypes().iterator();
 
         while (i.hasNext() && j.hasNext()) {
 	    Expr e = (Expr) i.next();
@@ -494,7 +498,7 @@ FIXME: check super types as well.
 		"Null constructor instance after type check.");
 	}
 
-	for (Iterator i = ci.exceptionTypes().iterator(); i.hasNext(); ) {
+	for (Iterator i = ci.throwTypes().iterator(); i.hasNext(); ) {
 	    Type t = (Type) i.next();
 	    ec.throwsException(t);
 	}
@@ -596,7 +600,7 @@ FIXME: check super types as well.
 
     public List throwTypes(TypeSystem ts) {
       List l = new LinkedList();
-      l.addAll(ci.exceptionTypes());
+      l.addAll(ci.throwTypes());
       l.addAll(ts.uncheckedExceptions());
       return l;
     }

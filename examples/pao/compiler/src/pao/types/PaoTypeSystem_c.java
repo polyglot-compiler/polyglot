@@ -61,7 +61,7 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
         for (Iterator i = ci.container().methods().iterator();
               i.hasNext(); ) {
             MethodInstance mi = (MethodInstance) i.next();
-            if (mi.name().equals(methodName) && mi.argumentTypes().isEmpty()) {
+            if (mi.name().equals(methodName) && mi.formalTypes().isEmpty()) {
                 return mi;
             }
         }
@@ -90,8 +90,8 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
             for (Iterator i = ct.toClass().constructors().iterator();
                  i.hasNext(); ) {
                 ConstructorInstance ci = (ConstructorInstance) i.next();
-                if (ci.argumentTypes().size() == 1) {
-                    Type argType = (Type) ci.argumentTypes().get(0);
+                if (ci.formalTypes().size() == 1) {
+                    Type argType = (Type) ci.formalTypes().get(0);
                     if (isSame(argType, t)) {
                         return ci;
                     }

@@ -64,7 +64,7 @@ public interface Node extends NodeOps, Copy
      * @param v The visitor which will traverse/rewrite the AST.
      * @return A new AST if a change was made, or <code>this</code>.
      */
-    Node visitChildren(NodeVisitor v);
+    // Node visitChildren(NodeVisitor v);
 
     /**
      * Visit a single child of the node.
@@ -82,13 +82,13 @@ public interface Node extends NodeOps, Copy
      * This should <i>not</i> update the old context imperatively.  Use
      * <code>addDecls</code> when leaving the node for that.
      */
-    Context enterScope(Context c);
+    // Context enterScope(Context c);
 
     /**
      * Add any declarations to the context that should be in scope when
      * visiting later sibling nodes.
      */
-    void addDecls(Context c);
+    // void addDecls(Context c);
 
     /**
      * Get the expected type of a child expression of <code>this</code>.

@@ -131,26 +131,26 @@ public class Subst_c implements Subst
 
         Type rt = substType(mi.returnType());
 
-        List formalTypes = mi.argumentTypes();
+        List formalTypes = mi.formalTypes();
         formalTypes = substTypeList(formalTypes);
 
-        List throwTypes = mi.exceptionTypes();
+        List throwTypes = mi.throwTypes();
         throwTypes = substTypeList(throwTypes);
 
-        return (MethodInstance) mi.returnType(rt).argumentTypes(formalTypes).exceptionTypes(throwTypes).container(ct);
+        return (MethodInstance) mi.returnType(rt).formalTypes(formalTypes).throwTypes(throwTypes).container(ct);
     }
 
     /** Perform substititions on a constructor. */
     public ConstructorInstance substConstructor(ConstructorInstance ci) {
         ClassType ct = (ClassType) substType(ci.container());
 
-        List formalTypes = ci.argumentTypes();
+        List formalTypes = ci.formalTypes();
         formalTypes = substTypeList(formalTypes);
 
-        List throwTypes = ci.exceptionTypes();
+        List throwTypes = ci.throwTypes();
         throwTypes = substTypeList(throwTypes);
 
-        return (ConstructorInstance) ci.argumentTypes(formalTypes).exceptionTypes(throwTypes).container(ct);
+        return (ConstructorInstance) ci.formalTypes(formalTypes).throwTypes(throwTypes).container(ct);
     }
 
     public List substTypeList(List list) {

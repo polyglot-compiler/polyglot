@@ -122,7 +122,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
 
         for (Iterator i = methodsNamed(name).iterator(); i.hasNext(); ) {
             MethodInstance mi = (MethodInstance) i.next();
-            if (mi.hasArguments(argTypes)) {
+            if (mi.hasFormals(argTypes)) {
                 l.add(mi);
             }
         }

@@ -132,6 +132,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
             // a[i] OP= e: visit a -> i -> a[i] -> e -> (a[i] OP= e)
             v.visitCFG(array, index.entry());
             v.visitCFG(index, this);
+            v.visitThrow(this);
             v.edge(this, assign.right().entry());
             v.visitCFG(assign.right(), assign);
         }
@@ -146,11 +147,13 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
             v.visitCFG(array, index.entry());
             v.visitCFG(index, assign.right().entry());
             v.visitCFG(assign.right(), this);
+            v.visitThrow(this);
             v.edge(this, assign);
         }
     }
 
     public List throwTypes(TypeSystem ts) {
-        return CollectionUtil.list(ts.OutOfBoundsException(), ts.NullPointerException());
+        return CollectionUtil.list(ts.OutOfBoundsException(),
+                                   ts.NullPointerException());
     }
 }

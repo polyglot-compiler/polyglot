@@ -16,16 +16,16 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     protected Flags flags;
     protected String name;
     protected List formals;
-    protected List exceptionTypes;
+    protected List throwTypes;
     protected Block body;
     protected ConstructorInstance ci;
 
-    public ConstructorDecl_c(Del ext, Position pos, Flags flags, String name, List formals, List exceptionTypes, Block body) {
+    public ConstructorDecl_c(Del ext, Position pos, Flags flags, String name, List formals, List throwTypes, Block body) {
 	super(ext, pos);
 	this.flags = flags;
 	this.name = name;
 	this.formals = TypedList.copyAndCheck(formals, Formal.class, true);
-	this.exceptionTypes = TypedList.copyAndCheck(exceptionTypes, TypeNode.class, true);
+	this.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
 	this.body = body;
     }
 
@@ -65,15 +65,15 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	return n;
     }
 
-    /** Get the exceptionTypes of the constructor. */
-    public List exceptionTypes() {
-	return Collections.unmodifiableList(this.exceptionTypes);
+    /** Get the throwTypes of the constructor. */
+    public List throwTypes() {
+	return Collections.unmodifiableList(this.throwTypes);
     }
 
-    /** Set the exceptionTypes of the constructor. */
-    public ConstructorDecl exceptionTypes(List exceptionTypes) {
+    /** Set the throwTypes of the constructor. */
+    public ConstructorDecl throwTypes(List throwTypes) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
-	n.exceptionTypes = TypedList.copyAndCheck(exceptionTypes, TypeNode.class, true);
+	n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
 	return n;
     }
 
@@ -112,11 +112,11 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     }
 
     /** Reconstruct the constructor. */
-    protected ConstructorDecl_c reconstruct(List formals, List exceptionTypes, Block body) {
-	if (! CollectionUtil.equals(formals, this.formals) || ! CollectionUtil.equals(exceptionTypes, this.exceptionTypes) || body != this.body) {
+    protected ConstructorDecl_c reconstruct(List formals, List throwTypes, Block body) {
+	if (! CollectionUtil.equals(formals, this.formals) || ! CollectionUtil.equals(throwTypes, this.throwTypes) || body != this.body) {
 	    ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	    n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
-	    n.exceptionTypes = TypedList.copyAndCheck(exceptionTypes, TypeNode.class, true);
+	    n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
 	    n.body = body;
 	    return n;
 	}
@@ -127,9 +127,9 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     /** Visit the children of the constructor. */
     public Node visitChildren(NodeVisitor v) {
 	List formals = visitList(this.formals, v);
-	List exceptionTypes = visitList(this.exceptionTypes, v);
+	List throwTypes = visitList(this.throwTypes, v);
 	Block body = (Block) visitChild(this.body, v);
-	return reconstruct(formals, exceptionTypes, body);
+	return reconstruct(formals, throwTypes, body);
     }
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
@@ -144,8 +144,8 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
             l.add(ts.unknownType(position()));
         }
 
-        List m = new ArrayList(exceptionTypes().size());
-        for (int i = 0; i < exceptionTypes().size(); i++) {
+        List m = new ArrayList(throwTypes().size());
+        for (int i = 0; i < throwTypes().size(); i++) {
             m.add(ts.unknownType(position()));
         }
 
@@ -236,7 +236,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 		"A native constructor cannot have a body.", position());
 	}
 
-        for (Iterator i = exceptionTypes().iterator(); i.hasNext(); ) {
+        for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
             TypeNode tn = (TypeNode) i.next();
             Type t = tn.type();
             if (! t.isThrowable()) {
@@ -261,7 +261,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	    boolean throwDeclared = false;
 
 	    if (! t.isUncheckedException()) {
-		for (Iterator j = exceptionTypes().iterator(); j.hasNext(); ) {
+		for (Iterator j = throwTypes().iterator(); j.hasNext(); ) {
 		    TypeNode tn = (TypeNode) j.next();
 		    Type tj = tn.type();
 
@@ -312,11 +312,11 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	w.end();
 	w.write(")");
 
-	if (! exceptionTypes().isEmpty()) {
+	if (! throwTypes().isEmpty()) {
 	    w.allowBreak(6);
 	    w.write("throws ");
 
-	    for (Iterator i = exceptionTypes().iterator(); i.hasNext(); ) {
+	    for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
 	        TypeNode tn = (TypeNode) i.next();
 		print(tn, w, tr);
 
@@ -363,7 +363,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	    argTypes.add(f.declType());
 	}
 
-	for (Iterator i = exceptionTypes().iterator(); i.hasNext(); ) {
+	for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
 	    TypeNode tn = (TypeNode) i.next();
 	    excTypes.add(tn.type());
 	}

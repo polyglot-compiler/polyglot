@@ -52,13 +52,13 @@ public class MethodInstance_c extends ProcedureInstance_c
 	return n;
     }
 
-    public MethodInstance argumentTypes(List l) {
+    public MethodInstance formalTypes(List l) {
         MethodInstance_c n = (MethodInstance_c) copy();
 	n.argTypes = new ArrayList(l);
 	return n;
     }
 
-    public MethodInstance exceptionTypes(List l) {
+    public MethodInstance throwTypes(List l) {
         MethodInstance_c n = (MethodInstance_c) copy();
 	n.excTypes = new ArrayList(l);
 	return n;
@@ -135,7 +135,7 @@ public class MethodInstance_c extends ProcedureInstance_c
 
     /** Returns true iff <this> is the same method as <m> */
     public boolean isSameMethodImpl(MethodInstance m) {
-        return this.name().equals(m.name()) && hasArguments(m.argumentTypes());
+        return this.name().equals(m.name()) && hasFormals(m.formalTypes());
     }
 
     public boolean isCanonical() {

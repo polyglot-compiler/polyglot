@@ -38,14 +38,14 @@ public interface MethodInstance extends ProcedureInstance
      * @param l A list of <code>Type</code>.
      * @see polyglot.types.Type
      */
-    MethodInstance argumentTypes(List l);
+    MethodInstance formalTypes(List l);
 
     /**
      * Set the method's exception throw types.
      * @param l A list of <code>Type</code>.
      * @see polyglot.types.Type
      */
-    MethodInstance exceptionTypes(List l);
+    MethodInstance throwTypes(List l);
 
     /**
      * Set the method's containing type.

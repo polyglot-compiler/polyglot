@@ -101,7 +101,7 @@ class Method
     // Get a method instance for the <init> method.
     MethodInstance mi = methodInstance(ts, ct);
     return ts.constructorInstance(mi.position(), ct,
-                                  mi.flags(), mi.argumentTypes(),
-                                  mi.exceptionTypes());
+                                  mi.flags(), mi.formalTypes(),
+                                  mi.throwTypes());
   }
 }

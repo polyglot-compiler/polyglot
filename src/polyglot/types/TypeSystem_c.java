@@ -892,10 +892,10 @@ public class TypeSystem_c implements TypeSystem
     }
 
     /** Return true if t overrides mi */
-    public boolean hasArguments(ProcedureInstance pi, List argumentTypes) {
+    public boolean hasFormals(ProcedureInstance pi, List formalTypes) {
         assert_(pi);
-        assert_(argumentTypes);
-        return pi.hasArgumentsImpl(argumentTypes);
+        assert_(formalTypes);
+        return pi.hasFormalsImpl(formalTypes);
     }
 
     /** Return true if t overrides mi */

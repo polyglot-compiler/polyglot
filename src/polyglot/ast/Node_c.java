@@ -83,7 +83,7 @@ public abstract class Node_c implements Node
 		    "NodeVisitor.enter() returned null.");
 	    }
 
-	    n = this.visitChildren(v_);
+	    n = this.del().visitChildren(v_);
 
 	    if (n == null) {
 		throw new InternalCompilerError(
@@ -116,32 +116,22 @@ public abstract class Node_c implements Node
 	if (l == null) {
 	    return null;
 	}
-	
-	List vl = makeVisitedList(l);
+
+        List result = l;
+	List vl = new ArrayList(l.size());
+
 	for (Iterator i = l.iterator(); i.hasNext(); ) {
 	    Node n = (Node) i.next();
-	    n = visitChild(n, v);
-	    vl.add(n);
+	    Node m = visitChild(n, v);
+            if (n != m) {
+                result = vl;
+            }
+	    vl.add(m);
 	}
-	return vl;
+
+	return result;
     }
-    
-    /**
-     * Helper method for visitList().
-     * @return A List of capacity the same as the size of <code>l</code>, 
-     *             and also typed the same as <code>l</code>, if <code>l</code>
-     *         is a TypedList.
-     */
-    private static List makeVisitedList(List l) {
-	ArrayList a = new ArrayList(l.size());
-	if (l instanceof TypedList) {
-	    TypedList t = (TypedList) l;
-	    return new TypedList(a, t.getAllowedType(), false);
-	} else {
-	    return a;
-	}
-    }
-    
+
     public Node visitChildren(NodeVisitor v) {
 	return this;
     }

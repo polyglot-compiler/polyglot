@@ -114,7 +114,7 @@ public interface NodeFactory
 	                            Expr outer, List args);
 
     ConstructorDecl ConstructorDecl(Position pos, Flags flags, String name,
-	                            List formals, List exceptionTypes,
+	                            List formals, List throwTypes,
 				    Block body);
 
     FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, String name);
@@ -156,7 +156,7 @@ public interface NodeFactory
     LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, String name, Expr init);
 
     MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType, String name,
-	                  List formals, List exceptionTypes, Block body);
+	                  List formals, List throwTypes, Block body);
 
     New New(Position pos, TypeNode type, List args);
     New New(Position pos, TypeNode type, List args, ClassBody body);

@@ -116,7 +116,8 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
 
     /*
     public Context enterScope(Context c) {
-        c = c.pushBlock();
+        // Add the local to the _current_ scope.  This ensures li is in scope
+        // when evaluating the initializer.
         c.addVariable(li);
         return c;
     }

@@ -2,6 +2,7 @@ package polyglot.ast;
 
 import polyglot.util.CodeWriter;
 import polyglot.types.SemanticException;
+import polyglot.types.Context;
 import polyglot.visit.*;
 
 /**
@@ -12,6 +13,33 @@ import polyglot.visit.*;
  */
 public interface NodeOps
 {
+    /**
+     * Visit the children of the node.
+     *
+     * @param v The visitor that will traverse/rewrite the AST.
+     * @return A new AST if a change was made, or <code>this</code>.
+     */
+    Node visitChildren(NodeVisitor v);
+
+    /**
+     * Push a new scope for visiting children and add any declarations
+     * to the new context that should be in scope when visiting
+     * children.  This should <i>not</i> update the old context
+     * imperatively.  Use <code>addDecls</code> when leaving the node
+     * for that.
+     *
+     * @param c The context in which to enter scope. 
+     */
+    Context enterScope(Context c);
+
+    /**
+     * Add any declarations to the context that should be in scope when
+     * visiting later sibling nodes.
+     *
+     * @param c The context to which to add declarations.
+     */
+    void addDecls(Context c);
+
     /**
      * Collects classes, methods, and fields from the AST rooted at this node
      * and constructs type objects for these.  These type objects may be

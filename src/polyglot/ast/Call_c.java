@@ -56,6 +56,10 @@ public class Call_c extends Expr_c implements Call
     return n;
   }
 
+  public ProcedureInstance procedureInstance() {
+      return methodInstance();
+  }
+
   /** Get the method instance of the call. */
   public MethodInstance methodInstance() {
     return this.mi;
@@ -68,12 +72,12 @@ public class Call_c extends Expr_c implements Call
     return n;
   }
 
-  /** Get the arguments of the call. */
+  /** Get the actual arguments of the call. */
   public List arguments() {
     return this.arguments;
   }
 
-  /** Set the arguments of the call. */
+  /** Set the actual arguments of the call. */
   public Call arguments(List arguments) {
     Call_c n = (Call_c) copy();
     n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
@@ -240,7 +244,7 @@ public class Call_c extends Expr_c implements Call
       }
 
       Iterator i = this.arguments.iterator();
-      Iterator j = mi.argumentTypes().iterator();
+      Iterator j = mi.formalTypes().iterator();
 
       while (i.hasNext() && j.hasNext()) {
           Expr e = (Expr) i.next();
@@ -360,7 +364,7 @@ public class Call_c extends Expr_c implements Call
   public List throwTypes(TypeSystem ts) {
     List l = new LinkedList();
 
-    l.addAll(mi.exceptionTypes());
+    l.addAll(mi.throwTypes());
     l.addAll(ts.uncheckedExceptions());
 
     if (target instanceof Expr && ! (target instanceof Special)) {

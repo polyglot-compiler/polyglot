@@ -312,7 +312,7 @@ public interface TypeSystem {
     /**
      * Returns true iff <m1> is more specific than <m2>.
      */
-    boolean hasArguments(ProcedureInstance p, List argumentTypes);
+    boolean hasFormals(ProcedureInstance p, List formalTypes);
 
     ////
     // Functions which yield particular types.

@@ -37,11 +37,11 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         return flags;
     }
 
-    public List argumentTypes() {
+    public List formalTypes() {
         return Collections.unmodifiableList(argTypes);
     }
 
-    public List exceptionTypes() {
+    public List throwTypes() {
         return Collections.unmodifiableList(excTypes);
     }
 
@@ -55,7 +55,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 	    // FIXME: Check excTypes too?
 	    return flags.equals(i.flags())
 	        && ts.isSame(container, i.container())
-	        && ts.hasArguments(this, i.argumentTypes());
+	        && ts.hasFormals(this, i.formalTypes());
 	}
 
 	return false;
@@ -108,15 +108,15 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         }
 
         // rule 2:
-        return p2.callValid(p1.argumentTypes());
+        return p2.callValid(p1.formalTypes());
     }
 
-    public final boolean hasArguments(List argTypes) {
-        return ts.hasArguments(this, argTypes);
+    public final boolean hasFormals(List argTypes) {
+        return ts.hasFormals(this, argTypes);
     }
 
-    public boolean hasArgumentsImpl(List argTypes) {
-        List l1 = this.argumentTypes();
+    public boolean hasFormalsImpl(List argTypes) {
+        List l1 = this.formalTypes();
         List l2 = argTypes;
 
         Iterator i1 = l1.iterator();
@@ -144,8 +144,8 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         SubtypeSet s1 = new SubtypeSet(ts);
         SubtypeSet s2 = new SubtypeSet(ts);
 
-        s1.addAll(this.exceptionTypes());
-        s2.addAll(p.exceptionTypes());
+        s1.addAll(this.throwTypes());
+        s2.addAll(p.throwTypes());
 
         for (Iterator i = s1.iterator(); i.hasNext(); ) {
             Type t = (Type) i.next();
@@ -162,7 +162,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
     }
 
     public boolean callValidImpl(List argTypes) {
-        List l1 = this.argumentTypes();
+        List l1 = this.formalTypes();
         List l2 = argTypes;
 
         Iterator i1 = l1.iterator();

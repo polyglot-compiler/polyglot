@@ -108,8 +108,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return new ConstructorCall_c(defaultExt(), pos, kind, outer, args);
     }
 
-    public ConstructorDecl ConstructorDecl(Position pos, Flags flags, String name, List formals, List exceptionTypes, Block body) {
-        return new ConstructorDecl_c(defaultExt(), pos, flags, name, formals, exceptionTypes, body);
+    public ConstructorDecl ConstructorDecl(Position pos, Flags flags, String name, List formals, List throwTypes, Block body) {
+        return new ConstructorDecl_c(defaultExt(), pos, flags, name, formals, throwTypes, body);
     }
 
     public FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, String name, Expr init) {
@@ -180,8 +180,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return new LocalDecl_c(defaultExt(), pos, flags, type, name, init);
     }
 
-    public MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType, String name, List formals, List exceptionTypes, Block body) {
-        return new MethodDecl_c(defaultExt(), pos, flags, returnType, name, formals, exceptionTypes, body);
+    public MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType, String name, List formals, List throwTypes, Block body) {
+        return new MethodDecl_c(defaultExt(), pos, flags, returnType, name, formals, throwTypes, body);
     }
 
     public New New(Position pos, Expr outer, TypeNode objectType, List args, ClassBody body) {

@@ -40,12 +40,12 @@ public interface MethodDecl extends ProcedureDecl
     /** The method's exception throw types.
      * @return A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
-    List exceptionTypes();
+    List throwTypes();
 
     /** Set the method's exception throw types.
-     * @param exceptionTypes A list of {@link polyglot.ast.TypeNode TypeNode}.
+     * @param throwTypes A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
-    MethodDecl exceptionTypes(List exceptionTypes);
+    MethodDecl throwTypes(List throwTypes);
 
     /**
      * The method type object.  This field may not be valid until

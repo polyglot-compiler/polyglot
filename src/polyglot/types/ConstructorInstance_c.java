@@ -26,13 +26,13 @@ public class ConstructorInstance_c extends ProcedureInstance_c
 	return n;
     }
 
-    public ConstructorInstance argumentTypes(List l) {
+    public ConstructorInstance formalTypes(List l) {
         ConstructorInstance_c n = (ConstructorInstance_c) copy();
 	n.argTypes = new ArrayList(l);
 	return n;
     }
 
-    public ConstructorInstance exceptionTypes(List l) {
+    public ConstructorInstance throwTypes(List l) {
         ConstructorInstance_c n = (ConstructorInstance_c) copy();
 	n.excTypes = new ArrayList(l);
 	return n;
