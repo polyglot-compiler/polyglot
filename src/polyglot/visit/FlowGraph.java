@@ -26,24 +26,55 @@ public class FlowGraph {
   public Computation root() { return root; }
   public boolean forward() { return forward; }
   public boolean replicateFinally() { return replicateFinally; }
-  public Collection peers() { return peerMap.values(); }
+
+  public Collection pathMaps() {
+    return peerMap.values();
+  }
+
+  public Map pathMap(Node n) {
+    return (Map) peerMap.get(new IdentityKey(n));
+  }
+
+  public Collection peers() {
+    Collection c = new ArrayList();
+    for (Iterator i = peerMap.values().iterator(); i.hasNext(); ) {
+      Map m = (Map) i.next();
+      for (Iterator j = m.values().iterator(); j.hasNext(); ) {
+        c.add(j.next());
+      }
+    }
+    return c;
+  }
 
   public Peer peer(Computation n, DataFlow df) {
     return peer(n, Collections.EMPTY_LIST, df);
   }
 
+  public Collection peers(Computation n) {
+    IdentityKey k = new IdentityKey(n);
+    Map pathMap = (Map) peerMap.get(k);
+    return pathMap.values();
+  }
+
   public Peer peer(Computation n, List path_to_finally, DataFlow df) {
-    NodeKey k = new NodeKey(n, path_to_finally);
-    Peer p = (Peer) peerMap.get(k);
+    IdentityKey k = new IdentityKey(n);
+    Map pathMap = (Map) peerMap.get(k);
+    if (pathMap == null) {
+      pathMap = new HashMap();
+      peerMap.put(k, pathMap);
+    }
+
+    ListKey lk = new ListKey(path_to_finally);
+    Peer p = (Peer) pathMap.get(lk);
     if (p == null) {
       DataFlow.Item item = df.createItem(this, n);
       p = new Peer(n, path_to_finally, item);
-      peerMap.put(k, p);
+      pathMap.put(lk, p);
     }
     return p;
   }
 
-  class Peer {
+  static class Peer {
     DataFlow.Item item;
     Computation node;
     List succs;
@@ -61,28 +92,27 @@ public class FlowGraph {
     }
   }
 
-  class NodeKey {
-    Computation node;
-    List path_to_finally;
+  static class ListKey {
+    List list;
 
-    NodeKey(Computation node, List path_to_finally) {
-      this.node = node;
-      this.path_to_finally = path_to_finally;
+    ListKey(List list) {
+      this.list = list;
     }
 
     public int hashCode() {
-      return System.identityHashCode(node);
+      return list.hashCode();
     }
 
     public boolean equals(Object other) {
-      if (other instanceof NodeKey) {
-          NodeKey k = (NodeKey) other;
-          if (k.node != node) return false;
-          if (k.path_to_finally.size() != path_to_finally.size()) return false;
-          for (int i = 0; i < path_to_finally.size(); i++) {
-            Computation kfrom = (Computation) k.path_to_finally.get(i);
-            Computation from = (Computation) path_to_finally.get(i);
-            if (kfrom != from) return false;
+      if (other instanceof ListKey) {
+          ListKey k = (ListKey) other;
+          if (k.list.size() != list.size())
+            return false;
+          for (int i = 0; i < list.size(); i++) {
+            Object kfrom = k.list.get(i);
+            Object from = list.get(i);
+            if (kfrom != from)
+              return false;
           }
 
           return true;

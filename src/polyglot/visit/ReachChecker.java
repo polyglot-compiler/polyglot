@@ -17,7 +17,7 @@ public class ReachChecker extends DataFlow
     public ReachChecker(Job job, TypeSystem ts, NodeFactory nf) {
 	super(job, ts, nf,
               true /* forward analysis */,
-              false /* replicate finally */);
+              true /* replicate finally */);
     }
 
     public Item createItem(FlowGraph graph, Computation n) {
@@ -49,19 +49,45 @@ public class ReachChecker extends DataFlow
         }
 
         public void check(FlowGraph graph, Computation n) throws SemanticException {
-            // Check for unreachable statements; compound statements are
-            // allowed to be unreachable (e.g., "{ return; }" or
-            // "while (true) S").  If a compound statement is truly
-            // unreachable, one of its sub-statements will be also and we will
-            // report an error there.
-            if ((n instanceof Block && ((Block) n).statements().isEmpty()) ||
-                (n instanceof Stmt && ! (n instanceof CompoundStmt))) {
+        }
 
-                if (! reachable) {
-                    throw new SemanticException("Unreachable statement.",
-                                                n.position());
+    }
+
+    public Block post(FlowGraph graph, Block root) throws SemanticException {
+        MAPS:
+        for (Iterator i = graph.pathMaps().iterator(); i.hasNext(); ) {
+            Map m = (Map) i.next();
+
+            if (m.isEmpty()) {
+                continue;
+            }
+
+            Node n = null;
+
+            // Check that some path to a node makes the node reachable.
+            for (Iterator j = m.values().iterator(); j.hasNext(); ) {
+                FlowGraph.Peer p = (FlowGraph.Peer) j.next();
+                n = p.node;
+
+                DataFlowItem item = (DataFlowItem) p.item;
+
+                if (item.reachable) {
+                    continue MAPS;
                 }
             }
+
+            // Compound statements are allowed to be unreachable
+            // (e.g., "{ // return; }" or "while (true) S").  If a compound
+            // statement is truly unreachable, one of its sub-statements will
+            // be also and we will report an error there.
+
+            if ((n instanceof Block && ((Block) n).statements().isEmpty()) ||
+                (n instanceof Stmt && ! (n instanceof CompoundStmt))) {
+                throw new SemanticException("Unreachable statement.",
+                                            n.position());
+            }
         }
+
+        return root;
     }
 }
