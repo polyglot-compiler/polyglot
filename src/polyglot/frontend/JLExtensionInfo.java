@@ -140,7 +140,7 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
         
         l.add(innerTranslate);
         
-//        l.add(serialize);
+        l.add(serialize);
         l.add(output);
         
         return l;

@@ -262,6 +262,7 @@ public class InnerTranslator extends NodeVisitor {
 				cinfo.insideCode(codeInfo);
 				ct.kind(ClassType.MEMBER);
 				ct.outer(classInfo.classType());
+				ct.needSerialization(false); // local classes don't need serialization.
 				String className = classInfo.localClassName(cd.name(), classInfo.addLocalClassName(cd.name()));
 				ct.name(className);
 				for (Iterator it = codeInfo.finalList().iterator(); it.hasNext(); ) {
@@ -301,6 +302,7 @@ public class InnerTranslator extends NodeVisitor {
 				cinfo.insideCode(codeInfo);
 				ct.kind(ClassType.MEMBER);
 				ct.outer(classInfo.classType());
+				ct.needSerialization(false); // anonymous classes don't need serialization.
 				String className = classInfo.localClassName("", classInfo.addLocalClassName(""));
 				ct.name(className);
 				for (Iterator it = codeInfo.finalList().iterator(); it.hasNext(); ) {

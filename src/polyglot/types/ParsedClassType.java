@@ -1,5 +1,7 @@
 package polyglot.types;
 
+import java.util.*;
+
 import polyglot.frontend.*;
 import polyglot.frontend.Job;
 import polyglot.frontend.Source;
@@ -99,4 +101,7 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
      * Clear all the constructor instances in the class type.
      */
     void clearConstructors();
+    
+    boolean needSerialization();
+    void needSerialization(boolean b);
 }
