@@ -57,35 +57,37 @@ parser code {:
         }
     }
 
-    /**
-     * Override the default CUP routine.
-     */
-    public void report_fatal_error(String message, Object info) {
+	/**
+	 * Override the default CUP routine.
+	 */
+	public void report_fatal_error(String message, Object info)
+        throws Exception
+    {
         report_error(message, info);
-        eq.enqueue(ErrorInfo.SYNTAX_ERROR, "Unable to recover from previous errors.");
-    }
-    
-    /**
-     * Report a fatal error then abort parsing.
-     */
-    public void die(String msg, Position pos) throws Exception {
-        report_fatal_error(msg, pos);
+		eq.enqueue(ErrorInfo.SYNTAX_ERROR,
+            "Unable to recover from previous errors.");
         die();
+	}
+
+	/**
+	 * Report a fatal error then abort parsing.
+	 */
+    public void die(String msg, Position pos) throws Exception {
+		report_fatal_error(msg, pos);
     }
 
-    /**
-     * Report a fatal error then abort parsing.
-     */
+	/**
+	 * Report a fatal error then abort parsing.
+	 */
     public void die(Position pos) throws Exception {
-        report_fatal_error("Syntax error.", pos);
-        die();
+		report_fatal_error("Syntax error.", pos);
     }
-   
-    /**
-     * Report a fatal error then abort parsing.
-     */
+
+	/**
+	 * Report a fatal error then abort parsing.
+	 */
     public void die() throws Exception {
-        throw new Exception("Couldn't repair and continue parse");
+		throw new Exception("Couldn't repair and continue parse");
     }
 
 :};
