@@ -231,7 +231,6 @@ public class TypeBuilder extends HaltingVisitor
             Named dup = ((CachingResolver) typeSystem().systemResolver()).check(ct.fullName());
 
             if (dup != null && dup.fullName().equals(ct.fullName())) {
-              new Exception().printStackTrace();
                 throw new SemanticException("Duplicate class \"" +
                                             ct.fullName() + "\".", pos);
             }
