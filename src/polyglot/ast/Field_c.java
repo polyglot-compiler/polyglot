@@ -50,8 +50,8 @@ public class Field_c extends Expr_c implements Field
 
     if (target == null) {
       throw new InternalCompilerError("Cannot create a field with a null "
-                                      + "null target.  Use AmbExpr or prefix "
-                                      + "with the appropriate type node or"
+                                      + "target.  Use AmbExpr or prefix "
+                                      + "with the appropriate type node or "
                                       + "this.");
     }
   }
