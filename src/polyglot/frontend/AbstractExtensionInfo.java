@@ -128,57 +128,68 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         while (! job.pendingPasses().isEmpty()) {
             Pass pass = (Pass) job.pendingPasses().get(0);
 
-            if (Report.should_report(Report.frontend, 1))
-		Report.report(1, "Trying to run pass " + pass);
-
-            if (job.isRunning()) {
-                // We're currently running.  We can't reach the goal.
-                throw new InternalCompilerError(job + " cannot reach pass " +
-                                                pass);
+            if (options.disable_passes.contains(pass.name())) {
+                if (Report.should_report(Report.frontend, 1))
+                    Report.report(1, "Skipping pass " + pass);
             }
+            else {
+                if (Report.should_report(Report.frontend, 1))
+                    Report.report(1, "Trying to run pass " + pass);
 
-            long start_time = System.currentTimeMillis();
-
-            if (okay) {
-                Job oldCurrentJob = currentJob;
-                currentJob = job;
-
-                Report.should_report.push(pass.name());
-
-                job.setIsRunning(true);
-                okay &= pass.run();
-                job.setIsRunning(false);
-
-                Report.should_report.pop();
-
-                if (options.dump_ast.contains(pass.name())) {
-                    System.err.println("------------------------------------" +
-                                       "------------------------------------");
-                    System.err.println("Dumping AST for " + job +
-                                       " after " + pass.name());
-
-                    PrettyPrinter pp = new PrettyPrinter();
-                    pp.printAst(job.ast(), new CodeWriter(System.err, 78));
+                if (job.isRunning()) {
+                    // We're currently running.  We can't reach the goal.
+                    throw new InternalCompilerError(job +
+                                                    " cannot reach pass " +
+                                                    pass);
                 }
 
-                // This seems to work around a VM bug on linux with JDK 1.4.0.
-                // The mark-sweep collector will sometimes crash.
-                // Running the GC explicitly here makes the bug go away.
-                // If this fails, maybe run with bigger heap.
+                long start_time = System.currentTimeMillis();
 
-                // System.gc();
+                if (okay) {
+                    Job oldCurrentJob = currentJob;
+                    currentJob = job;
 
-                currentJob = oldCurrentJob;
+                    Report.should_report.push(pass.name());
+
+                    job.setIsRunning(true);
+                    okay &= pass.run();
+                    job.setIsRunning(false);
+
+                    Report.should_report.pop();
+
+                    if (options.dump_ast.contains(pass.name())) {
+                        System.err.println("--------------------------------" +
+                                           "--------------------------------");
+                        System.err.println("Dumping AST for " + job +
+                                           " after " + pass.name());
+
+                        PrettyPrinter pp = new PrettyPrinter();
+                        pp.printAst(job.ast(), new CodeWriter(System.err, 78));
+                    }
+
+                    // This seems to work around a VM bug on linux with JDK
+                    // 1.4.0.  The mark-sweep collector will sometimes crash.
+                    // Running the GC explicitly here makes the bug go away.
+                    // If this fails, maybe run with bigger heap.
+
+                    // System.gc();
+
+
+                    currentJob = oldCurrentJob;
+                }
+
+                if (Report.should_report(Report.time, 1)) {
+                    Report.report(1, "Finished " + pass +
+                                  " status=" + str(okay) + " time=" +
+                                  (System.currentTimeMillis() - start_time));
+                }
+                else if (Report.should_report(Report.frontend, 1)) {
+                    Report.report(1, "Finished " + pass +
+                                  " status=" + str(okay));
+                }
             }
 
             job.finishPass(pass, okay);
-
-            if (Report.should_report(Report.frontend, 1))
-		Report.report(1, "Finished " + pass + " status=" + str(okay));
-            if (Report.should_report(Report.time, 1))
-		Report.report(1, "Finished " + pass +
-                              " status=" + str(okay) + " time=" +
-                              (System.currentTimeMillis() - start_time));
 
             if (pass == goal) {
                 break;

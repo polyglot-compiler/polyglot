@@ -55,6 +55,9 @@ public final class Options {
   /** Dump the AST after the following passes? */
   public Set dump_ast = new HashSet();
 
+  /** Disable the following passes? */
+  public Set disable_passes = new HashSet();
+
   /** keep output files */
   public boolean keep_output_files = true;
 
@@ -115,7 +118,8 @@ public final class Options {
     System.err.println(" -sx <ext>               set source extension");
     System.err.println(" -ox <ext>               set output extension");
     System.err.println(" -dump <pass>            dump the ast after " +
-                       "pass <pass>");
+                                                "pass <pass>");
+    System.err.println(" -disable <pass>         disable pass <pass>");
     System.err.println(" -scramble [seed]        scramble the ast " +
                        "(for testing)");
     System.err.println(" -noserial               disable class"

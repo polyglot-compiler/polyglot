@@ -252,6 +252,13 @@ public class Main
           options.dump_ast.add(pass_name);
           i++;
         }
+        else if (args[i].equals("-disable"))
+        {
+          i++;
+          String pass_name = args[i];
+          options.disable_passes.add(pass_name);
+          i++;
+        }
         else if (args[i].equals("-nooutput"))
         {
           i++;
