@@ -79,6 +79,24 @@ public class SourceLoader
      * keep on making copies of it. 
      */
     protected static File current_dir = null;
+
+    /** Check if a directory for a package exists. */
+    public boolean packageExists(String name) {
+        String fileName = name.replace('.', File.separatorChar);
+
+	/* Search the source path. */
+        for (Iterator i = sourcePath.iterator(); i.hasNext(); ) {
+            File directory = (File) i.next();
+
+            File f = new File(directory, fileName);
+
+            if (f.exists() && f.isDirectory()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
     
     /** Load the source file for the given class name using the source path. */
     public FileSource classSource(String className) {

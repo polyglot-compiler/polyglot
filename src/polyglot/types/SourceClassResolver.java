@@ -98,6 +98,18 @@ public class SourceClassResolver extends LoadedClassResolver
     this.ext = ext;
   }
 
+  public boolean packageExists(String name) {
+    if (super.packageExists(name)) {
+        return true;
+    }
+
+    if (ext.sourceLoader().packageExists(name)) {
+        return true;
+    }
+
+    return false;
+  }
+
   /**
    * Find a type by name.
    */
