@@ -56,7 +56,7 @@ public final class Options {
   /** keep output files */
   public boolean keep_output_files = true;
 
-  public ExtensionInfo extension = new polyglot.ext.jl.ExtensionInfo();
+  public ExtensionInfo extension = null; 
      // The extension information
 
   public static Map report = new HashMap(); // Map[String, Integer]

@@ -8,7 +8,7 @@ import polyglot.frontend.ExtensionInfo;
 
 public class Main {
     public static void main(String args[]) {
-	String extension = null;
+	String extension = "jl";
 	String className;
 	if (args.length == 3 && args[0].equals("-ext"))
 	    extension = args[1];
@@ -27,36 +27,29 @@ public class Main {
 
 	ExtensionInfo extInfo = null;
 
-	if (extension != null) {
-	    String extClassName =
-		"polyglot.ext." + extension + ".ExtensionInfo";
-	    Class extClass = null;
-	    
-	    try {
-		extClass = Class.forName(extClassName);
-	    }
-	    catch (ClassNotFoundException e) {
-		System.err.println( "Extension " + extension +
-				    " not found: could not find class " +
-				    extClassName + ".");
-		System.exit( 1);
-	    }
-	    
-	    try {
-		extInfo = (ExtensionInfo) extClass.newInstance();
-	    }
-	    catch (Exception e) {
-		System.err.println( "Extension " + extension +
-				    " could not be loaded: "+
-				    "could not instantiate " + extClassName + ".");
-		System.exit( 1);
-	    }
-	} else {
-	
-	    extInfo = new polyglot.ext.jl.ExtensionInfo();
-	}
-	
+        String extClassName =
+            "polyglot.ext." + extension + ".ExtensionInfo";
+        Class extClass = null;
 
+        try {
+            extClass = Class.forName(extClassName);
+        }
+        catch (ClassNotFoundException e) {
+            System.err.println( "Extension " + extension +
+                                " not found: could not find class " +
+                                extClassName + ".");
+            System.exit( 1);
+        }
+
+        try {
+            extInfo = (ExtensionInfo) extClass.newInstance();
+        }
+        catch (Exception e) {
+            System.err.println( "Extension " + extension +
+                                " could not be loaded: "+
+                                "could not instantiate " + extClassName + ".");
+            System.exit( 1);
+        }
 
 	try {
 	    TypeSystem ts = extInfo.typeSystem();

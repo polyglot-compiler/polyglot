@@ -26,6 +26,7 @@ public class Main
   {      
     source = new HashSet();
     Options options = Options.global;
+    loadExtension("jl");
     
     parseCommandLine(args, options, source);
 
