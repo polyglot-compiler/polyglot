@@ -68,6 +68,13 @@ public class CFGBuilder implements Copy
      * edges for an exception throw?
      */
     protected boolean skipInnermostCatches;
+    
+    /**
+     * Should we add edges for uncaught Errors to the exit node of the graph?
+     * By default, we do not, but subclasses can change this behavior if 
+     * needed.
+     */
+    protected boolean errorEdgesToExitNode;
 
     public CFGBuilder(TypeSystem ts, FlowGraph graph, DataFlow df) {
         this.ts = ts;
@@ -77,6 +84,7 @@ public class CFGBuilder implements Copy
         this.outer = null;
         this.innermostTarget = null;
         this.skipInnermostCatches = false;
+        this.errorEdgesToExitNode = false;
     }
 
     /** Get the type system. */
@@ -382,7 +390,9 @@ public class CFGBuilder implements Copy
         }
 
         // If not caught, insert a node from the thrower to exit.
-        edge(last_visitor, last, graph.exitNode(), new FlowGraph.ExceptionEdgeKey(type));
+        if (errorEdgesToExitNode || !type.isSubtype(ts.Error())) {
+            edge(last_visitor, last, graph.exitNode(), new FlowGraph.ExceptionEdgeKey(type));
+        }
     }
 
     /** Create edges for a try finally block. */
