@@ -5,6 +5,7 @@ import polyglot.types.*;
 import polyglot.types.Package;
 import polyglot.util.*;
 import java.util.*;
+import java.io.IOException;
 
 import polyglot.ext.param.Topics;
 import polyglot.main.Report;
@@ -20,7 +21,7 @@ public class Subst_c implements Subst
     protected Map subst;
 
     /** Cache of types. */
-    protected Map cache;
+    protected transient Map cache;
 
     protected transient ParamTypeSystem ts;
 
@@ -266,16 +267,20 @@ public class Subst_c implements Subst
     }
 
     private void writeObject(java.io.ObjectOutputStream out) 
-	throws java.io.IOException
+	throws IOException
     {
-	out.writeObject(subst);
+        out.defaultWriteObject();
     }
 
     private void readObject(java.io.ObjectInputStream in) 
-	throws java.io.IOException, ClassNotFoundException
+	throws IOException, ClassNotFoundException
     {
-	this.subst = (Map) in.readObject();
+        if (in instanceof TypeInputStream) {
+            this.ts = (ParamTypeSystem) ((TypeInputStream) in).getTypeSystem();
+        }
+
 	this.cache = new HashMap();
-	this.ts = (ParamTypeSystem) ((TypeInputStream)in).getTypeSystem();
+
+        in.defaultReadObject();
     }
 }
