@@ -72,6 +72,10 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
         throw new InternalCompilerError("Could not find getter for " + t);
     }
 
+    public Type boxedType(PrimitiveType t) {
+        return wrapper(t).container();
+    }
+
     public ConstructorInstance wrapper(PrimitiveType t) {
         if (wrapper == null) {
             wrapper = new HashMap();

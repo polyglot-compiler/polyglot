@@ -15,9 +15,9 @@ public class PaoInstanceofExt_c extends PaoExt_c {
       Type rtype = n.compareType().type();
 
       if (rtype.isPrimitive()) {
-          ConstructorInstance ci = ts.wrapper(rtype.toPrimitive());
+          Type t = ts.boxedType(rtype.toPrimitive());
           return n.compareType(nf.CanonicalTypeNode(n.compareType().position(),
-                                                    ci.container()));
+                                                    t));
       }
 
       return n;

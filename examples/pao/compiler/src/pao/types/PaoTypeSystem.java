@@ -14,4 +14,7 @@ public interface PaoTypeSystem extends TypeSystem {
 
     /** Return the constructor instance for runtime.T.T(t) */
     ConstructorInstance wrapper(PrimitiveType t);
+
+    /** Return boxed type runtime.T for primitive t. */
+    Type boxedType(PrimitiveType t);
 }
