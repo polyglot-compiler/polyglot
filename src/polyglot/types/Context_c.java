@@ -34,18 +34,27 @@ public class Context_c implements Context
         }
     }
 
+    protected Context_c push() {
+        Context_c v = (Context_c) this.copy();
+        v.outer = this;
+        v.types = null;
+        v.methods = null;
+        v.vars = null;
+        return v;
+    }
+
     /**
      * The import table for the file
      */
     protected ImportTable it;
-    int kind;
-    ClassType type;
-    ParsedClassType scope;
-    CodeInstance code;
-    Map types;
-    Map methods;
-    Map vars;
-    boolean inCode;
+    protected int kind;
+    protected ClassType type;
+    protected ParsedClassType scope;
+    protected CodeInstance code;
+    protected Map types;
+    protected Map methods;
+    protected Map vars;
+    protected boolean inCode;
 
     public static final int BLOCK = 0;
     public static final int CLASS = 1;
@@ -279,13 +288,9 @@ public class Context_c implements Context
      * Push a source file scope.
      */
     public Context pushSource(ImportTable it) {
-        Context_c v = (Context_c) this.copy();
-        v.outer = this;
+        Context_c v = push();
         v.kind = SOURCE;
         v.it = it;
-        v.types = null;
-        v.methods = null;
-        v.vars = null;
         v.inCode = false;
         return v;
     }
@@ -296,14 +301,10 @@ public class Context_c implements Context
     public Context pushClass(ParsedClassType c, ClassType t) {
         if (Report.should_report(new String[] {Report.types, Report.context}, 4))
           Report.report(4, "push class " + c + " " + c.position());
-        Context_c v = (Context_c) this.copy();
-        v.outer = this;
+        Context_c v = push();
         v.kind = CLASS;
         v.scope = c;
         v.type = t;
-        v.types = null;
-        v.methods = null;
-        v.vars = null;
         v.inCode = false;
         return v;
     }
@@ -312,12 +313,8 @@ public class Context_c implements Context
      * pushes an additional block-scoping level.
      */
     public Context pushBlock() {
-        Context_c v = (Context_c) this.copy();
-        v.outer = this;
+        Context_c v = push();
         v.kind = BLOCK;
-        v.types = null;
-        v.methods = null;
-        v.vars = null;
         return v;
     }
 
@@ -327,13 +324,9 @@ public class Context_c implements Context
     public Context pushCode(CodeInstance ci) {
         if (Report.should_report(new String[] {Report.types, Report.context}, 4))
           Report.report(4, "push code " + ci + " " + ci.position());
-        Context_c v = (Context_c) this.copy();
-        v.outer = this;
+        Context_c v = push();
         v.kind = CODE;
         v.code = ci;
-        v.types = null;
-        v.methods = null;
-        v.vars = null;
         v.inCode = true;
         return v;
     }
