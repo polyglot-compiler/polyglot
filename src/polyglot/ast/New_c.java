@@ -166,8 +166,15 @@ public class New_c extends Expr_c implements New
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         if (body != null) {
-            return tb.bypassChildren(body);
+            // bybass the visiting of the body of the anonymous class. We'll
+            // get around to visiting it in the buildTypes method.
+            // We do this because we need to visit the body of the anonymous
+            // class after we've pushed an anon class onto the type builder, 
+            // but we need to check the arguments, and qualifier, etc. outside 
+            // of the scope of the anon class.            
+            return tb.bypass(body);
         }
+        
 
         return tb;
     }
@@ -175,17 +182,23 @@ public class New_c extends Expr_c implements New
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         New_c n = this;
         
-        if (body != null) {
-            TypeBuilder bodyTB = tb.pushAnonClass(position());
-            n = (New_c) this.visit(bodyTB);
+        if (n.body() != null) {
+            // let's get a type builder that is prepared to visit the
+            // body; tb wants to bypass it, due to the builtTypesEnter method.
+            TypeBuilder bodyTB = (TypeBuilder)tb.visitChildren();
+            
+            // push an anonymous class on the stack.
+            bodyTB = bodyTB.pushAnonClass(position());
+
+            n = (New_c) n.body((ClassBody)n.body().visit(bodyTB));
             ParsedClassType type = (ParsedClassType) bodyTB.currentClass();
-            n = (New_c) anonType(type);
+            n = (New_c) n.anonType(type);
         }
 
         TypeSystem ts = tb.typeSystem();
 
-        List l = new ArrayList(arguments.size());
-        for (int i = 0; i < arguments.size(); i++) {
+        List l = new ArrayList(n.arguments.size());
+        for (int i = 0; i < n.arguments.size(); i++) {
             l.add(ts.unknownType(position()));
         }
 
