@@ -6,7 +6,7 @@ import polyglot.types.Package;
 
 /**
  * A <code>PackageContextResolver</code> is responsible for looking up types
- * and packages in a packge by name.
+ * and packages in a package by name.
  */
 public class PackageContextResolver implements Resolver
 {
