@@ -27,6 +27,7 @@
 
 polyglot.ext.jl.ExtensionInfo "-cp ." {
         ArrayInit.jl ;
+        BoolTest.jl ;
         ClassLit.jl ;
         Conditional1.jl ;
 	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
@@ -66,6 +67,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         Import.jl ;
         Increment.jl ;
         Infinite.jl (Post, ".*finally clause cannot complete normally.*"); // javac warning
+        Inherit.jl (Semantic, "No valid method call found");
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
         LiteralsCf.jl   (Lexical, "Illegal float literal"),
                         (Lexical, "Illegal float literal"),
