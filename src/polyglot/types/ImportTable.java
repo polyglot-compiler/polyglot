@@ -25,6 +25,8 @@ public class ImportTable extends ClassResolver
     protected Map map;
     /** List of imports which will be lazily added to the table. */
     protected List lazyImports;
+    /** List of imports which will be lazily added to the table. */
+    protected List classImports;
     /** Source name to use for debugging and error reporting */
     protected String sourceName;
     /** Position to use for error reporting */
@@ -46,6 +48,7 @@ public class ImportTable extends ClassResolver
 	this.map = new HashMap();
 	this.packageImports = new ArrayList();
 	this.lazyImports = new ArrayList();
+	this.classImports = new ArrayList();
     }
 
     public Package package_() {
@@ -55,10 +58,23 @@ public class ImportTable extends ClassResolver
     public void addClassImport(String className) {
 	Types.report(1, this + ": lazy import " + className);
 	lazyImports.add(className);
+        classImports.add(className);
     }
 
     public void addPackageImport(String pkgName) {
 	packageImports.add(pkgName);
+    }
+
+    public List packageImports() {
+        return packageImports;
+    }
+
+    public List classImports() {
+        return classImports;
+    }
+
+    public String sourceName() {
+        return sourceName;
     }
 
     public Type findType(String name) throws SemanticException {
