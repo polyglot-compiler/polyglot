@@ -107,18 +107,14 @@ public class SourceClassResolver extends LoadedClassResolver
     FileSource source = null;
 
     // First try the class file.
-    try {
-      clazz = loadFile(name);
-
+    clazz = loadFile(name);
+    if (clazz != null) {
       // Check for encoded type information.
       if (clazz.encodedClassType(version.name()) != null) {
         if (Report.should_report(report_topics, 4))
           Report.report(4, "Class " + name + " has encoded type info");
         encodedClazz = clazz;
       }
-    }
-    catch (NoClassException e) {
-      clazz = null;
     }
 
     // Now, try and find the source file.

@@ -56,33 +56,36 @@ public class LoadedClassResolver extends ClassResolver
   /**
    * Load a class file for class <code>name</code>.
    */
-  protected ClassFile loadFile(String name) throws SemanticException {
-    if (! nocache.contains(name)) {
-      try {
+  protected ClassFile loadFile(String name) {
+    if (nocache.contains(name)) {
+        return null;
+    }
+    
+    try {
         ClassFile clazz = loader.loadClass(name);
 
         if (clazz == null) {
-            if (Report.should_report(report_topics, 4))
-              Report.report(4, "Class " + name + " not found in classpath " +
-                            loader.classpath());
+            if (Report.should_report(report_topics, 4)) {
+                Report.report(4, "Class " + name + " not found in classpath "
+                        + loader.classpath());
+            }
         }
         else {
-            if (Report.should_report(report_topics, 4))
-              Report.report(4, "Class " + name + " found in classpath " +
-                            loader.classpath());
-    
+            if (Report.should_report(report_topics, 4)) {
+                Report.report(4, "Class " + name + " found in classpath "
+                        + loader.classpath());
+            }
             return clazz;
         }
-      }
-      catch (ClassFormatError e) {
+    }
+    catch (ClassFormatError e) {
         if (Report.should_report(report_topics, 4))
-          Report.report(4, "Class " + name + " format error");
-      }
+            Report.report(4, "Class " + name + " format error");
     }
 
     nocache.add(name);
 
-    throw new NoClassException(name);
+    return null;
   }
 
   /**
@@ -94,6 +97,9 @@ public class LoadedClassResolver extends ClassResolver
 
     // First try the class file.
     ClassFile clazz = loadFile(name);
+    if (clazz == null) {
+        throw new NoClassException(name);
+    }
 
     // Check for encoded type information.
     if (clazz.encodedClassType(version.name()) != null) {

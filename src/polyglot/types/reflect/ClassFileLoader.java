@@ -40,8 +40,16 @@ public class ClassFileLoader
 
         try {
             if (dir.isDirectory()) {
-                String fileName = name.replace('.', File.separatorChar) + ".class";
-                File file = new File(dir, fileName);
+                StringBuffer filename = new StringBuffer(name.length() + 8);
+                filename.append(name);
+                // our own replace, to save a suprising amount of memory
+                for (int i = 0; i < filename.length(); i++) {
+                    if (filename.charAt(i) == '.') 
+                        filename.setCharAt(i, File.separatorChar);
+                }
+                filename.append(".class");
+                
+                File file = new File(dir, filename.toString());
 
                 if (file.exists()) {
                     if (Report.should_report(verbose, 3))
