@@ -232,11 +232,10 @@ ext=""
           unless="ppg.parser.up-to-date">
     <java classname="ppg.PPG"
           fork="true"
-          dir="${parser.dir}"
-	  output="${parser.dir}/${cup.file}"
 	  failonerror="true">
       <classpath refid="standard.classpath"/>
-      <arg line="${ppg.file}"/>
+      <arg line="${parser.dir}/${ppg.file}"/>
+      <arg line="-o ${parser.dir}/${cup.file}"/>
     </java>
     <antcall target="cup-parser"/>
   </target>
@@ -246,7 +245,10 @@ ext=""
    -->
   <target name="ppg-parser-deps">
     <dependset>
-      <srcfileset dir="${parser.dir}" includes="${ppg.file}"/>
+      <srcfileset dir="${parser.dir}">
+        <include name="${ppg.file}"/>
+        <include name="${base.parser}"/>
+      </srcfileset>
       <targetfileset dir="${parser.dir}">
         <include name="${cup.file}"/>
         <include name="${parser.class}.java"/>
@@ -398,6 +400,7 @@ ext=""
     <antcall target="ppg-parser">
       <param name="parser.dir" value="${src}/polyglot/ext/${ext}/qq"/>
       <param name="ppg.file" value="qq.ppg"/>
+      <param name="base.parser" value="${src}/polyglot/ext/${ext}/parse/${ext}_ppg.cup"/>
       <param name="cup.file" value="qq_ppg.cup"/>
       <param name="parser.class" value="Grm"/>
       <param name="symbol.class" value="sym"/>
@@ -453,6 +456,7 @@ ext=""
   <!-- Build a standard extension
        @param ext          The name of the extension.
        @param parser.type  Either "cup" or "ppg".
+       @param base.parser  The base parser.  Pass in iff parser.type is "ppg".
        @param has-qq       Pass in iff the extension has a qq package.
    -->
   <target name="standard-ext">
@@ -470,6 +474,7 @@ ext=""
     <antcall target="standard-ext">
       <param name="ext" value="skel"/>
       <param name="parser.type" value="ppg"/>
+      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
     </antcall>
   </target>
 
@@ -489,6 +494,7 @@ ext=""
     <antcall target="standard-ext">
       <param name="ext" value="polyj"/>
       <param name="parser.type" value="ppg"/>
+      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
       <param name="has-qq" value=""/>
     </antcall>
   </target>
@@ -496,6 +502,7 @@ ext=""
   <target name="jmatch" depends="jl">
     <antcall target="standard-ext">
       <param name="ext" value="jmatch"/>
+      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
       <param name="parser.type" value="ppg"/>
     </antcall>
     <!-- compile the JMatch runtime -->
@@ -508,6 +515,7 @@ ext=""
   <target name="jx" depends="jl">
     <antcall target="standard-ext">
       <param name="ext" value="jx"/>
+      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
       <param name="parser.type" value="ppg"/>
     </antcall>
   </target>
@@ -515,6 +523,7 @@ ext=""
   <target name="pao" depends="jl">
     <antcall target="standard-ext">
       <param name="ext" value="pao"/>
+      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
       <param name="parser.type" value="ppg"/>
     </antcall>
     <!-- compile the PAO runtime -->
@@ -527,6 +536,7 @@ ext=""
   <target name="coffer" depends="param">
     <antcall target="standard-ext">
       <param name="ext" value="coffer"/>
+      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
       <param name="parser.type" value="ppg"/>
     </antcall>
   </target>
