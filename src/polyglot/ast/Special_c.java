@@ -120,7 +120,7 @@ public class Special_c extends Expr_c implements Special
     public void dump(CodeWriter w) {
       super.dump(w);
 
-      if (type != null) {
+      if (kind != null) {
         w.allowBreak(4, " ");
         w.begin(0);
         w.write("(kind " + kind + ")");
