@@ -1,6 +1,7 @@
 package polyglot.ast;
 
 import polyglot.types.ProcedureInstance;
+import polyglot.types.CodeInstance;
 import polyglot.types.Flags;
 import java.util.List;
 
@@ -15,4 +16,7 @@ public interface CodeDecl extends ClassMember
 
     /** Set the body. */
     CodeDecl body(Block body);
+    
+    /** The CodeInstance of the method, constructor, or initializer. */
+    CodeInstance codeInstance();
 }

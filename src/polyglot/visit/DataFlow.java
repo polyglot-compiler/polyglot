@@ -81,20 +81,44 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     protected abstract void check(FlowGraph graph, Computation n, Item inItem, Item outItem) throws SemanticException;
 
     /**
+     * Construct a flow graph for the CodeDecl provided, and call 
+     * dataflow(FlowGraph). Is also responsible for calling 
+     * post(FlowGraph, Block) after dataflow(FlowGraph) has been called. 
+     * Returns the (possibly new) AST. 
+     */
+    protected CodeDecl dataflow(CodeDecl cd) throws SemanticException {
+        Block body = cd.body();
+
+        if (body != null) {
+            // Compute the successor of each child node.
+            FlowGraph g = initGraph(cd, body);
+
+            if (g != null) {
+                // Build the control flow graph.
+                CFGBuilder v = new CFGBuilder(ts, g, this);
+                v.visitGraph();
+
+                dataflow(g);
+                
+                return cd.body(post(g, body));
+            }
+        }
+        
+        return cd;
+    } 
+    
+    /**
      * Perform the dataflow on the flowgraph provided.
      */
-    public void dataflow(FlowGraph graph) {
+    protected void dataflow(FlowGraph graph) {
         // queue of Peers whose flow needs to be updated.
-        LinkedList queue = new LinkedList();
-      
-        // Initially put all the Peers in the queue. 
-        // ###We could probably be smarter and just put the
-        // start peers in, 
-        //    i.e. queue = new LinkedList(graph.peers(graph.startNode()));
-        for (Iterator i = graph.peers().iterator(); i.hasNext(); ) {
-            queue.addLast(i.next());
-        }
-
+        // initially this is only the start node of the graph.
+        // Thus, unreachable nodes will have no flow through them at all.
+        LinkedList queue = new LinkedList(graph.peers(graph.startNode()));
+        
+        // ### we could be a bit smarter and determine the strongly connected
+        // components of the flow graph, and process those in topographic
+        // order.
         while (! queue.isEmpty()) {
             FlowGraph.Peer p = (FlowGraph.Peer) queue.removeFirst();
             
@@ -164,22 +188,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      */
     public Node leaveCall(Node n) throws SemanticException {
         if (n instanceof CodeDecl) {
-            Block body = ((CodeDecl) n).body();
-
-            if (body != null) {
-                // Compute the successor of each child node.
-                FlowGraph g = initGraph((CodeDecl) n, body);
-
-                if (g != null) {
-                    // Build the control flow graph.
-                    CFGBuilder v = new CFGBuilder(ts, g, this);
-                    v.visitGraph();
-
-                    dataflow(g);
-
-                    return ((CodeDecl) n).body(post(g, body));
-                }
-            }
+            return dataflow((CodeDecl)n);
         }
 
         return n;
@@ -190,9 +199,29 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * been performed.
      */
     public Block post(FlowGraph graph, Block root) throws SemanticException {
-        for (Iterator i = graph.peers().iterator(); i.hasNext(); ) {
-            FlowGraph.Peer p = (FlowGraph.Peer) i.next();
+        // Check the nodes in approximately flow order.
+        Set uncheckedPeers = new HashSet(graph.peers());
+        LinkedList peersToCheck = new LinkedList(graph.peers(graph.startNode()));
+        while (!peersToCheck.isEmpty()) {
+            FlowGraph.Peer p = (FlowGraph.Peer) peersToCheck.removeFirst();
+            uncheckedPeers.remove(p);
             this.check(graph, p.node, p.inItem, p.outItem);
+            
+            for (Iterator iter = p.succs.iterator(); iter.hasNext(); ) {
+                FlowGraph.Peer q = (FlowGraph.Peer)iter.next();
+                if (uncheckedPeers.contains(q) && !peersToCheck.contains(q)) {
+                    // q hasn't been checked yet.
+                    peersToCheck.addLast(q);
+                }
+            }
+            
+            if (peersToCheck.isEmpty() && !uncheckedPeers.isEmpty()) {
+                // done all the we can reach...
+                Iterator i = uncheckedPeers.iterator();                
+                peersToCheck.add(i.next());
+                i.remove();
+            }
+            
         }
 
         return root;

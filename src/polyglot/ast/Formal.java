@@ -10,7 +10,7 @@ import polyglot.types.SemanticException;
  * or constructor or to a catch block.  It consists of a type and a variable
  * identifier.
  */
-public interface Formal extends Node
+public interface Formal extends Computation
 {
     /** Get the type object for the declaration's type. */
     Type declType();

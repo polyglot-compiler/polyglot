@@ -5,6 +5,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
+import java.util.*;
 
 /**
  * A <code>Formal</code> represents a formal parameter to a method
@@ -139,6 +140,14 @@ public class Formal_c extends Node_c implements Formal
 	decl.typeCheck(tc);
 
 	return this;
+    }
+
+    public Computation entry() {
+        return this;
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        return succs;
     }
 
     public void dump(CodeWriter w) {

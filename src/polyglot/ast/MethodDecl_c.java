@@ -115,6 +115,10 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	return n;
     }
 
+    public CodeInstance codeInstance() {
+	return procedureInstance();
+    }
+
     /** Get the procedure instance of the method. */
     public ProcedureInstance procedureInstance() {
 	return mi;

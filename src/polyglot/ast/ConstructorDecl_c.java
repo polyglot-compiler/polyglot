@@ -94,11 +94,16 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	return ci;
     }
 
+
     /** Get the procedureInstance of the constructor. */
     public ProcedureInstance procedureInstance() {
 	return ci;
     }
 
+    public CodeInstance codeInstance() {
+	return procedureInstance();
+    }
+    
     /** Set the constructorInstance of the constructor. */
     public ConstructorDecl constructorInstance(ConstructorInstance ci) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();

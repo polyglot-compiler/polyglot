@@ -97,7 +97,7 @@ public class ExitChecker extends DataFlow
         // unreachable, one of its sub-statements will be also and we will
         // report an error there.
         if (n == graph.entryNode()) {
-            if (! ((DataFlowItem)out).exits) { 
+            if (out != null && !((DataFlowItem)out).exits) { 
                 throw new SemanticException("Missing return statement.",
                                             code.position());
                 }

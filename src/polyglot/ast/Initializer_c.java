@@ -43,6 +43,10 @@ public class Initializer_c extends Node_c implements Initializer
         return ii;
     }
 
+    public CodeInstance codeInstance() {
+	return initializerInstance();
+    }
+
     /** Set the initializer instance of the initializer. */
     public Initializer initializerInstance(InitializerInstance ii) {
 	Initializer_c n = (Initializer_c) copy();

@@ -7,7 +7,12 @@ import polyglot.frontend.*;
 import java.util.*;
 
 /**
- * Visitor which checks that all local variables must be defined before use
+ * Visitor which checks that all local variables must be defined before use, 
+ * and that final variables and fields are initialized correctly.
+ * 
+ * The checking of the rules is implemented in the methods leaveCall(Node)
+ * and check(FlowGraph, Computation, Item, Item).
+ * 
  */
 public class InitChecker extends DataFlow
 {
@@ -16,86 +21,508 @@ public class InitChecker extends DataFlow
               true /* forward analysis */,
               true /* replicate finally */);
     }
+    
+    /** The current CodeDecl being processed by the dataflow equations */
+    private CodeDecl currentCodeDecl = null;
+    /** 
+     * A Map of all the final fields in the class currently being processed
+     * to MinMaxInitCounts. This Map is used as the basis for the Maps returned
+     * in createInitialItem(). 
+     * */
+    private Map currentClassFinalFieldInitCounts = null;
+    /**
+     * List of the constructors that need to be checked once all of the
+     * initializer blocks have been processed.
+     */
+    private List constructorsToCheck = null;
 
-    public Item createInitialItem() {
-        return new DataFlowItem();
-    }
-
-    static class DataFlowItem extends Item {
-        Set undefined;
-
-        DataFlowItem() {
-            this.undefined = new HashSet();
+    /**
+     * Class representing the initialization counts of variables. The
+     * different values of the counts that we are interested in are ZERO,
+     * ONE and MANY.
+     */
+    private static class InitCount {
+        static InitCount ZERO = new InitCount(0); 
+        static InitCount ONE = new InitCount(1); 
+        static InitCount MANY = new InitCount(2); 
+        private int count;
+        private InitCount(int i) {
+            count = i;
         }
-        DataFlowItem(Set s) {
-            this.undefined = s;
+        
+        public boolean equals(Object o) {
+            if (o instanceof InitCount) {
+                return this.count == ((InitCount)o).count;
+            }
+            return false;
+        }
+        
+        public String toString() {
+            if (count == 0) {
+                return "0";
+            }
+            else if (count == 1) {
+                return "1";
+            }
+            else if (count == 2) {
+                return "many";
+            }
+            throw new RuntimeException("Unexpected value for count");            
+        }
+        
+        public InitCount increment() {
+            if (count == 0) {
+                return ONE;
+            }
+            return MANY;
+        }
+        public static InitCount min(InitCount a, InitCount b) {
+            if (ZERO.equals(a) || ZERO.equals(b)) {
+                return ZERO;
+            }
+            if (ONE.equals(a) || ONE.equals(b)) {
+                return ONE;
+            }
+            return MANY;
+        }
+        public static InitCount max(InitCount a, InitCount b) {
+            if (MANY.equals(a) || MANY.equals(b)) {
+                return MANY;
+            }
+            if (ONE.equals(a) || ONE.equals(b)) {
+                return ONE;
+            }
+            return ZERO;
+        }
+        
+    }
+    
+    /**
+     * Class to record counts of the minimum and maximum number of times
+     * a variable or field has been initialized or assigned to.
+     */
+    private static class MinMaxInitCount {
+        private InitCount min, max;
+        MinMaxInitCount(InitCount min, InitCount max) {
+            MinMaxInitCount.this.min = min;
+            MinMaxInitCount.this.max = max;
+        }
+        InitCount getMin() { return min; }
+        InitCount getMax() { return max; }
+        public String toString() {
+            return "[ min: " + min + "; max: " + max + " ]";
+        }
+        public boolean equals(Object o) {
+            if (o instanceof MinMaxInitCount) {
+                return this.min.equals(((MinMaxInitCount)o).min) &&
+                       this.max.equals(((MinMaxInitCount)o).max);
+            }
+            return false;
+        }
+        static MinMaxInitCount join(MinMaxInitCount initCount1, MinMaxInitCount initCount2) {
+            if (initCount1 == null) {
+                return initCount2;
+            }
+            if (initCount2 == null) {
+                return initCount1;
+            }
+            MinMaxInitCount t = new MinMaxInitCount(
+                                  InitCount.min(initCount1.getMin(), initCount2.getMin()),
+                                  InitCount.max(initCount1.getMax(), initCount2.getMax()));
+            return t;
+
+        }
+    }
+        
+    /**
+     * Dataflow items for this dataflow are maps of VarInstances to counts
+     * of the min and max number of times those variables/fields have
+     * been initialized. These min and max counts are then used to determine
+     * if variables have been initialized before use, and that final variables
+     * are not initialized too many times.
+     * 
+     * This class is immutable.
+     */
+    static class DataFlowItem extends Item {
+        Map initStatus; // map of VarInstances to MinMaxInitCount
+
+        DataFlowItem(Map m) {
+            this.initStatus = Collections.unmodifiableMap(m);
         }
 
         public String toString() {
-            return undefined.toString();
+            return initStatus.toString();
         }
 
         public boolean equals(Object o) {
             if (o instanceof DataFlowItem) {
-                return this.undefined.equals(((DataFlowItem)o).undefined);
+                return this.initStatus.equals(((DataFlowItem)o).initStatus);
             }
             return false;
         }
         
         public int hashCode() {
-            return (undefined.hashCode());
+            return (initStatus.hashCode());
         }
 
     }
 
-    public Item flow(Item inItem, FlowGraph graph, Computation n) {
-        // We need not consider Formals -- they are never undefined.
+    /**
+     * Initialise the FlowGraph to be used in the dataflow analysis.
+     * @return null if no dataflow analysis should be performed for this
+     *         code declaration; otherwise, an apropriately initialized
+     *         FlowGraph.
+     */
+    protected FlowGraph initGraph(CodeDecl code, Computation root) {
+        currentCodeDecl = code;
+        return new FlowGraph(root, forward, replicateFinally);
+    }
 
-        if (n instanceof LocalDecl) {
-            LocalDecl l = (LocalDecl) n;
+    /**
+     * Overridden superclass method.
+     * 
+     * Set up the state that must be tracked during a Class Declaration.
+     */
+    protected NodeVisitor enterCall(Node n) throws SemanticException {
+        if (n instanceof ClassDecl) {
+            // we are starting to process a class declaration, but have yet
+            // to do any of the dataflow analysis.
+            
+            constructorsToCheck = new ArrayList();
+            
+            // set up currentClassFinalFieldInitCounts to contain mappings
+            // for all the final fields of the class.
+            currentClassFinalFieldInitCounts = new HashMap();            
+            
+            
+            Iterator classMembers = ((ClassDecl)n).body().members().iterator();            
+            while (classMembers.hasNext()) {
+                ClassMember cm = (ClassMember)classMembers.next();
+                if (cm instanceof FieldDecl) {
+                    FieldDecl fd = (FieldDecl)cm;
+                    if (fd.flags().isFinal()) {
+                        MinMaxInitCount initCount;
+                        if (fd.init() != null) {
+                            // the field has an initializer
+                            initCount = new MinMaxInitCount(InitCount.ONE,InitCount.ONE);
+                        }
+                        else {
+                            // the field does not have an initializer
+                            initCount = new MinMaxInitCount(InitCount.ZERO,InitCount.ZERO);
+                        }
+                        currentClassFinalFieldInitCounts.put(fd.fieldInstance(),
+                                                             initCount);
+                    }
+                }
+            }             
+        }
+        return super.enterCall(n);
+    }
 
-            if (l.init() == null) {
-                DataFlowItem x = new DataFlowItem();
-                x.undefined.addAll(((DataFlowItem)inItem).undefined);
-                x.undefined.add(l.localInstance());
-                return x;
+    /**
+     * Postpone the checking of constructors until the end of the class 
+     * declaration is encountered, to ensure that all initializers are 
+     * processed first.
+     * 
+     * Also, at the end of the class declaration, check that all static final
+     * fields have been initialized at least once.
+     */
+    public Node leaveCall(Node n) throws SemanticException {
+        if (n instanceof ConstructorDecl) {
+            // postpone the checking of the constructors until all the 
+            // initializer blocks have been processed.
+            constructorsToCheck.add(n);
+            return n;
+        }
+        if (n instanceof ClassDecl) {
+            // Now that we are at the end of the class declaration, and can
+            // be sure that all of the initializer blocks have been processed,
+            // we can now process the constructors.
+            while (!constructorsToCheck.isEmpty()) {
+                ConstructorDecl cd = (ConstructorDecl)constructorsToCheck.remove(0);
+                
+                // rely on the fact that our dataflow does not change the AST,
+                // so we can discard the result of this call.
+                dataflow(cd);                
             }
+            
+            // check that all static fields have been initialized exactly once. 
+            Iterator iter = currentClassFinalFieldInitCounts.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry e = (Map.Entry)iter.next();
+                if (e.getKey() instanceof FieldInstance) {
+                    FieldInstance fi = (FieldInstance)e.getKey();
+                    if (fi.flags().isStatic() && fi.flags().isFinal()) {
+                        MinMaxInitCount initCount = (MinMaxInitCount)e.getValue();
+                        if (InitCount.ZERO.equals(initCount.getMin())) {
+                            throw new SemanticException("variable \"" + fi.name() +
+                                                        "\" might not have been initialized",
+                                                        n.position());                                
+                        }
+                    }
+                }
+            }            
+        }
+
+        return super.leaveCall(n);
+    }
+    /**
+     * The initial item to be given to the entry point of the dataflow contains
+     * the init counts for the final fields.
+     */
+    public Item createInitialItem() {
+        return new DataFlowItem(new HashMap(currentClassFinalFieldInitCounts));
+    }
+    
+    /**
+     * The confluence operator is essentially the union of all of the
+     * inItems. However, if two or more of the initCount maps from
+     * the inItems each have a MinMaxInitCounts entry for the same
+     * VarInstance, the conflict must be resolved, by using the
+     * minimum of all mins and the maximum of all maxs. 
+     */
+    public Item confluence(List inItems) {        
+        // Resolve any conflicts pairwise.
+        Iterator iter = inItems.iterator();
+        Map m = new HashMap(((DataFlowItem)iter.next()).initStatus);
+        while (iter.hasNext()) {
+            Map n = ((DataFlowItem)iter.next()).initStatus;
+            for (Iterator iter2 = n.entrySet().iterator(); iter2.hasNext(); ) {
+                Map.Entry entry = (Map.Entry)iter2.next();
+                VarInstance v = (VarInstance)entry.getKey();
+                MinMaxInitCount initCount1 = (MinMaxInitCount)m.get(v);
+                MinMaxInitCount initCount2 = (MinMaxInitCount)entry.getValue();
+                m.put(v, MinMaxInitCount.join(initCount1, initCount2));                                        
+            }
+        }
+        
+        return new DataFlowItem(m);
+    }
+    
+
+    /**
+     * Perform the appropriate flow operations for the Computations.
+     * 
+     * To summarize:
+     * - Formals: declaration of a Formal param, just insert a new 
+     *              MinMaxInitCount for the LocalInstance.
+     * - LocalDecl: a declaration of a local variable, just insert a new 
+     *              MinMaxInitCount for the LocalInstance as appropriate
+     *              based on whether the declaration has an initializer or not.
+     * - Assign: if the LHS of the assign is a local var or a field that we
+     *              are interested in, then increment the min and max counts
+     *              for that local var or field.   
+     */
+    public Item flow(Item inItem, FlowGraph graph, Computation n) {
+        DataFlowItem inDFItem = ((DataFlowItem)inItem);
+        
+        if (n instanceof Formal) {
+            // formal argument declaration.
+            Formal f = (Formal) n;
+            Map m = new HashMap(inDFItem.initStatus);
+            // a formal argument is always defined.            
+            m.put(f.localInstance(), new MinMaxInitCount(InitCount.ONE,InitCount.ONE));
+            return new DataFlowItem(m);
+        }
+        
+        if (n instanceof LocalDecl) {
+            // local variable declaration.
+            LocalDecl l = (LocalDecl) n;
+            Map m = new HashMap(inDFItem.initStatus);
+            if (l.init() == null) {
+                // declaration of local var with no initialization
+                m.put(l.localInstance(), new MinMaxInitCount(InitCount.ZERO,InitCount.ZERO));
+            }
+            else {
+                // declaration of local var with initialization.
+                m.put(l.localInstance(), new MinMaxInitCount(InitCount.ONE,InitCount.ONE));
+            }
+            return new DataFlowItem(m);
         }
 
         if (n instanceof Assign) {
             Assign a = (Assign) n;
-
             if (a.left() instanceof Local) {
                 Local l = (Local) a.left();
-
-                DataFlowItem x = new DataFlowItem();
-                x.undefined.addAll(((DataFlowItem)inItem).undefined);
-                x.undefined.remove(l.localInstance());
-                return x;
-            }
+                Map m = new HashMap(inDFItem.initStatus);
+                MinMaxInitCount initCount = (MinMaxInitCount)m.get(l.localInstance());
+                
+                if (initCount == null) {
+                    //### At the moment (19 August 02) assume that a
+                    // null entry in the map for the local instance
+                    // means that the local variable is actually a Formal,
+                    // and there is no entry as Formals are not yet threaded
+                    // onto the dataflow graph. Since we assume the variable
+                    // is a Formal, we assume that it is already defined.
+                    initCount = new MinMaxInitCount(InitCount.ONE, InitCount.ONE);
+                }
+                initCount = new MinMaxInitCount(initCount.getMin().increment(),
+                                                initCount.getMax().increment());
+                m.put(l.localInstance(), initCount);
+                return new DataFlowItem(m);                
+            }            
+            if (a.left() instanceof Field) {
+                Field f = (Field)a.left();
+                FieldInstance fi = f.fieldInstance();
+                if (fi.flags().isFinal() && isFieldsTargetAppropriate(f)) {
+                    // this field is final and the target for this field is 
+                    // appropriate for what we are interested in.
+                    Map m = new HashMap(inDFItem.initStatus);
+                    MinMaxInitCount initCount = (MinMaxInitCount)m.get(fi);
+                    initCount = new MinMaxInitCount(initCount.getMin().increment(),
+                                                    initCount.getMax().increment());
+                    m.put(fi, initCount);
+                    return new DataFlowItem(m);
+                }                
+            }            
         }
 
         return inItem;
     }
 
-    public Item confluence(List inItems) {
-        // confluence operator is union
-        Set undef = new HashSet();
-        for (Iterator i = inItems.iterator(); i.hasNext(); ) {
-            undef.addAll(((DataFlowItem)i.next()).undefined);
+    /**
+     * Determine if we are interested in this field on the basis of the
+     * target of the field. To wit, if the field
+     * is static, then the target of the field must be the current class; if
+     * the field is not static then the target must be "this".
+     */
+    private boolean isFieldsTargetAppropriate(Field f) {
+        if (f.fieldInstance().flags().isStatic()) {
+            ClassType containingClass = (ClassType)currentCodeDecl.codeInstance().container();
+            return containingClass.equals(f.fieldInstance().container());
         }
-        return new DataFlowItem(undef);
+        else {
+            return (f.target() instanceof Special && 
+                    Special.THIS.equals(((Special)f.target()).kind()));
+        }
     }
-
+    /**
+     * Check that the conditions of initialization are not broken.
+     * 
+     * To summarize the conditions:
+     * - Local variables must be initialized before use, (i.e. min count > 0)
+     * - Final local variables (including Formals) cannot be assigned to more 
+     *               than once (i.e. max count <= 1)
+     * - Final non-static fields whose target is this cannot be assigned to
+     *               more than once 
+     * - Final static fields whose target is the current class cannot be 
+     *               assigned to more than once
+     * - At the end of a constructor, all non-static final fields must have 
+     *               been initialized at least once. 
+     *               
+     * 
+     * This method is also responsible for maintaining state between the 
+     * dataflows over Initializers, by copying back the appropriate 
+     * MinMaxInitCounts to the map currentClassFinalFieldInitCounts.
+     */
     public void check(FlowGraph graph, Computation n, Item in, Item out) throws SemanticException {
+        DataFlowItem dfIn = (DataFlowItem)in;
+        DataFlowItem dfOut = (DataFlowItem)out;
         if (n instanceof Local) {
             Local l = (Local) n;
-
-            if (((DataFlowItem)in).undefined.contains(l.localInstance())) {
+            MinMaxInitCount initCount = (MinMaxInitCount) 
+                      dfIn.initStatus.get(l.localInstance());
+            if (initCount != null && InitCount.ZERO.equals(initCount.getMin())) {
+                // if initCount == null for a LocalInstance, it is assumed 
+                // that the Local is a Formal, and as such is always defined.
+                // ### This assumption can be removed once Formals are threaded
+                // into the dataflow.
                 throw new SemanticException("Local variable \"" + l.name() +
-                                            "\" may not have been initialized.",
+                                            "\" may not have been initialized",
                                             l.position());
             }
         }
+        
+        if (n instanceof Assign) {
+            Assign a = (Assign)n;
+            if (a.left() instanceof Local) {
+                LocalInstance li = ((Local)a.left()).localInstance();
+                MinMaxInitCount initCount = (MinMaxInitCount) 
+                                       dfOut.initStatus.get(li);                                
+                if (li.flags().isFinal() && InitCount.MANY.equals(initCount.getMax())) {
+                    throw new SemanticException("variable \"" + li.name() +
+                                                "\" might already have been assigned to",
+                                                a.position());
+                }
+            }
+            
+            if (a.left() instanceof Field) {
+                Field f = (Field)a.left();
+                FieldInstance fi = f.fieldInstance();
+                if (fi.flags().isFinal()) {
+                    if ((currentCodeDecl instanceof ConstructorDecl ||
+                        currentCodeDecl instanceof Initializer) &&
+                        isFieldsTargetAppropriate(f)) {
+                        // we are in a constructor or initializer block and 
+                        // if the field is static then the target is the class
+                        // at hand, and if it is not static then the
+                        // target of the field is this. 
+                        // So a final field in this situation can be 
+                        // assigned to at most once.                    
+                        MinMaxInitCount initCount = (MinMaxInitCount) 
+                                               dfOut.initStatus.get(fi);                                
+                        if (InitCount.MANY.equals(initCount.getMax())) {
+                            throw new SemanticException("variable \"" + fi.name() +
+                                                        "\" might already have been assigned to",
+                                                        a.position());
+                        }
+                    }
+                    else {
+                        // not in a constructor or intializer, or the target is
+                        // not appropriate. So we cannot assign 
+                        // to a final field at all.
+                        System.out.println("Here I am ");
+                        throw new SemanticException("cannot assign a value " +
+                                   "to final variable \"" + fi.name() + "\"",
+                                   a.position());
+                    }
+                }                        
+            }
+        }
+        
+        if (n == graph.finishNode()) {
+            if (currentCodeDecl instanceof ConstructorDecl) {
+                // we are finishing the checking of a constructor
+                // Any final static fields must be assigned to exactly once.
+                Iterator iter = dfOut.initStatus.entrySet().iterator();
+                while (iter.hasNext()) {
+                    Map.Entry e = (Map.Entry)iter.next();
+                    if (e.getKey() instanceof FieldInstance) {
+                        FieldInstance fi = (FieldInstance)e.getKey();
+                        if (fi.flags().isFinal() && !fi.flags().isStatic()) {
+                            // the field is final and not static
+                            // it must be initialized exactly once.
+                            if (InitCount.ZERO.equals(((MinMaxInitCount)e.getValue()).getMin())) {
+                                System.out.println("Here i is again");
+                                throw new SemanticException("variable \"" + fi.name() +
+                                                            "\" might not have been initialized",
+                                                            graph.entryNode().position());                                
+                            } 
+                        }
+                    }
+                }
+            }
+            
+            if (currentCodeDecl instanceof Initializer) {
+                // We are finishing the checking of an intializer.
+                // We need to copy back the init counts of any fields back into
+                // currentClassFinalFieldInitCounts, so that the counts are 
+                // correct for the next initializer or constructor.
+                Iterator iter = dfOut.initStatus.entrySet().iterator();
+                while (iter.hasNext()) {
+                    Map.Entry e = (Map.Entry)iter.next();
+                    if (e.getKey() instanceof FieldInstance) {
+                        FieldInstance fi = (FieldInstance)e.getKey();
+                        if (fi.flags().isFinal()) {
+                            // we don't need to join the init counts, as all
+                            // dataflows will go through all of the 
+                            // initializers
+                            currentClassFinalFieldInitCounts.put(fi, 
+                                    e.getValue());
+                        }
+                    }
+                }                
+            }
+        }        
     }
 }

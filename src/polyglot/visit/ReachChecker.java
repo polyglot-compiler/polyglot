@@ -86,7 +86,7 @@ public class ReachChecker extends DataFlow
 
                 DataFlowItem item = (DataFlowItem) p.outItem;
 
-                if (item.reachable) {
+                if (item != null && item.reachable) {
                     continue MAPS;
                 }
             }
