@@ -72,7 +72,15 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 
         return base;
     }
-    
+
+    public int dims() {
+        if (!base.isArray()) {
+            return 1;
+        } else {
+            return 1 + base.toArray().dims();
+        }
+    }
+
     public String toString() {
         return base.toString() + "[]";
     }
