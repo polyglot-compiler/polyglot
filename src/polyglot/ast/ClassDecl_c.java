@@ -188,8 +188,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 	    ClassDecl_c n = (ClassDecl_c) type(type).flags(type.flags());
 	    return n.addDefaultConstructorIfNeeded(tb.typeSystem(), tb.nodeFactory());
         }
-
-        return this;
+	else {
+	    throw new InternalCompilerError("Missing type.", position());
+	}
     }
 
     public Context enterScope(Node child, Context c) {

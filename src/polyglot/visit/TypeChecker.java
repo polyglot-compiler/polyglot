@@ -65,10 +65,7 @@ public class TypeChecker extends DisambiguationDriver
         
         n.visitChildren(new NodeVisitor() {
             public Node override(Node n) {    
-                if (n instanceof Ambiguous) {
-                    amb[0] = true;
-                }
-                if (n instanceof Expr && ! ((Expr) n).type().isCanonical()) {
+                if (! n.isCanonical()) {
                     amb[0] = true;
                 }
                 return n;

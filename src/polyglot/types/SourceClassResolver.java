@@ -9,6 +9,7 @@ import polyglot.frontend.goals.TypeExists;
 import polyglot.main.Report;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLoader;
+import polyglot.util.InternalCompilerError;
 
 /**
  * Loads class information from source files, class files, or serialized
@@ -222,23 +223,25 @@ public class SourceClassResolver extends LoadedClassResolver
     throws SemanticException
   {
     Job job = ext.scheduler().loadSource(source);
+
+    if (job == null) {
+        // the source has already been compiled; what are we doing here?
+        throw new InternalCompilerError("Attempted to load source " + source + ", but it's already loaded.");
+    }
     
-    // job is null if the source has already been compiled
-    if (job != null) {
-        boolean result = false;
-        try {
-            // Compile the source file just enough to get the type information out.
-            result = ext.scheduler().attemptGoal(new TypesInitialized(job));
-        }
-        catch (CyclicDependencyException e) {
-            ext.scheduler().addConcurrentDependency(ext.scheduler().currentGoal(),
-                                                    new TypeExists(name));
-            throw new UnavailableTypeException(job, name);
-        }
-        
-        if (!result) {
-            throw new NoClassException(name);
-        }
+    boolean result = false;
+    try {
+        // Compile the source file just enough to get the type information out.
+        result = ext.scheduler().attemptGoal(new TypesInitialized(job));
+    }
+    catch (CyclicDependencyException e) {
+        ext.scheduler().addConcurrentDependency(ext.scheduler().currentGoal(),
+                                                new TypeExists(name));
+        throw new UnavailableTypeException(job, name);
+    }
+    
+    if (!result) {
+        throw new NoClassException(name);
     }
     
     // Even if there was an error when compiling the source file, we may
