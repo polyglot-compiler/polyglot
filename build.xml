@@ -727,16 +727,35 @@ ext=""
   </target>
 
   <target name="jmatch-dist" depends="jl-dist,jmatch-jar">
+    <!-- copy in JMatch jar files -->
     <copy todir="${dist}/lib" file="${lib}/jmatch.jar"/>
+    <copy todir="${dist}/lib" file="${lib}/jmatch-runtime.jar"/>
 
+    <!-- copy in JMatch sources -->
     <copy todir="${dist}/src/polyglot/ext/jmatch">
       <fileset dir="${src}/polyglot/ext/jmatch"
-	excludes="**/Makefile,**/tests/attic/**,**/doc/**"/>
+	excludes="**/tests/**,**/doc/**"/>
     </copy>
 
+    <!-- copy in JMatch examples -->
+    <copy todir="${dist}/examples">
+      <fileset dir="${src}/polyglot/ext/jmatch/tests"
+	includes="**/*.jm"
+	excludes="**/attic/**,**/unused/**,**/collections/**,**/output/**,**/*PerfTest.jm,**/*ProfTest.jm"/>
+    </copy>
+
+    <!-- copy in JMatch Ant files -->
     <copy file="${basedir}/configure-jmatch.xml" tofile="${dist}/configure-jmatch.xml"/>
+
+    <!-- readme, licences, &c. -->
     <move file="${dist}/README" tofile="${dist}/README-POLYGLOT"/>
     <copy file="${src}/polyglot/ext/jmatch/doc/README" tofile="${dist}/README"/>
+    <delete file="${dist}/CHANGES"/>
+    <delete file="${dist}/LICENSE"/>
+    <copy file="${src}/polyglot/ext/jmatch/doc/LICENSE" tofile="${dist}/LICENSE"/>
+
+    <!-- omit JFlex -->
+    <delete file="${dist}/lib/JFlex.jar"/>
   </target>
   
   <!-- compile pth (Polyglot Test Harness) -->

@@ -4,6 +4,7 @@ while true; do
 	-profile)
 	  shift; hprof="-Xrunhprof:cpu=samples,file=$1,depth=10"; shift;;
         -classpath) shift; extra_cp=$1; shift;;
+        -cp) shift; extra_cp=$1; shift;;
         *) args="$args '$1'"; shift;;
     esac
 done
