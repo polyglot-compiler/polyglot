@@ -339,12 +339,17 @@ public class TypeSystem_c implements TypeSystem
 
 	ClassType ctt = target.toClass();
 
-	// If the current class is enclosed in the target class,
-	// protection doesn't matter.
-	if (isEnclosed(ctc, ctt)) return true;
-
-	// Similarly, if the target is enclosed in this class.
-	if (isEnclosed(ctt, ctc)) return true;
+        // If the current class and the target class are both in the
+        // same class body, then protection doesn't matter, i.e.
+        // protected and private members may be accessed. Do this by 
+        // working up through ctc's containers.
+        if (isEnclosed(ctc, ctt)) return true;                    
+        if (isEnclosed(ctt, ctc)) return true;                        
+        ClassType ctcContainer = ctc;
+        while (!ctcContainer.isTopLevel()) {
+            ctcContainer = ctcContainer.outer();
+            if (isEnclosed(ctt, ctcContainer)) return true;                        
+        };
 
 	// Check for package level scope.
 	// FIXME: protected too?
@@ -366,7 +371,22 @@ public class TypeSystem_c implements TypeSystem
 	}
 
 	// protected
-	if (descendsFrom(ctc, ctt) && flags.isProtected()) return true;
+        if (flags.isProtected()) {
+            // If the current class is in a
+            // class body that extends/implements the target class, then 
+            // protected members can be accessed. Do this by 
+            // working up through ctc's containers.
+            if (descendsFrom(ctc, ctt)) {
+                return true;
+            }            
+            ctcContainer = ctc;
+            while (!ctcContainer.isTopLevel()) {
+                ctcContainer = ctcContainer.outer();
+                if (descendsFrom(ctcContainer, ctt)) {
+                    return true;
+                }            
+            }         
+        }
 
 	// else,
 	return false;
