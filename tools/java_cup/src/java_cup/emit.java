@@ -128,6 +128,12 @@ public class emit {
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
+  /** Extends and implements declarations for the parser class */
+  /** ACM extension */
+  public static String extendsimpls = "";
+
+  /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
+
   /** User declarations for direct inclusion in user action class. */
   public static String action_code = null;
 
@@ -786,18 +792,23 @@ public class emit {
       out.println("/** "+version.title_str+" generated parser.");
       out.println("  * @version " + new Date());
       out.println("  */");
-      out.println("public class " + parser_class_name + 
-		  " extends java_cup.runtime.lr_parser {");
+      out.println("public class " + parser_class_name);
+      if (extendsimpls.equals(""))
+	out.println(" extends java_cup.runtime.lr_parser");
+      else out.println(extendsimpls);
 
       /* constructors [CSA/davidm, 24-jul-99] */
-      out.println();
-      out.println("  /** Default constructor. */");
-      out.println("  public " + parser_class_name + "() {super();}");
-      if (!suppress_scanner) {
-	  out.println();
-	  out.println("  /** Constructor which sets the default scanner. */");
-	  out.println("  public " + parser_class_name + 
-		      "(java_cup.runtime.Scanner s) {super(s);}");
+	
+      out.println("{");
+      if (extendsimpls.equals("")) {
+        out.println("  /** Default constructor. */");
+	out.println("  public " + parser_class_name + "() {super();}");
+	if (!suppress_scanner) {
+	    out.println();
+	    out.println("  /** Constructor which sets the default scanner. */");
+	    out.println("  public " + parser_class_name + 
+			"(java_cup.runtime.Scanner s) {super(s);}");
+	}
       }
 
       /* emit the various tables */

@@ -140,6 +140,8 @@ public class lexer {
       keywords.put("left",       new Integer(sym.LEFT));
       keywords.put("right",      new Integer(sym.RIGHT));
       keywords.put("nonassoc",   new Integer(sym.NONASSOC));
+      keywords.put("extends",    new Integer(sym.EXTENDS));
+      keywords.put("implements", new Integer(sym.IMPLEMENTS));
 
       /* set up the table of single character symbols */
       char_symbols.put(new Integer(';'), new Integer(sym.SEMI));

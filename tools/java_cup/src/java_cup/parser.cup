@@ -216,7 +216,9 @@ scan with {: return lexer.next_token(); :};
 terminal
   PACKAGE, IMPORT, CODE, ACTION, PARSER, TERMINAL, NON, INIT, SCAN, WITH, 
   START, SEMI, COMMA, STAR, DOT, COLON, COLON_COLON_EQUALS, BAR, PRECEDENCE,
-  LEFT, RIGHT, NONASSOC, PERCENT_PREC, LBRACK, RBRACK, NONTERMINAL;
+  LEFT, RIGHT, NONASSOC, PERCENT_PREC, LBRACK, RBRACK, NONTERMINAL,
+  EXTENDS, IMPLEMENTS /* ACM extension */
+  ;
 
 terminal String  ID, CODE_STRING;
 
@@ -232,6 +234,8 @@ non terminal
 
 non terminal String  nt_id, symbol_id, label_id, opt_label, terminal_id,
                      term_id, robust_id;
+
+non terminal String qualified_identifier, extendsimpls; /* ACM extension */
 
 /*----------------------------------------------------------------*/ 
 
@@ -339,7 +343,39 @@ parser_code_part ::=
 	  else /* save the user included code string */
 	    emit.parser_code = user_code;
 	:}
+/* ACM extension starts here */
+    |   PARSER ID:classname extendsimpls:e CODE_STRING:user_code opt_semi
+	{:
+	  if (emit.parser_code!=null) {
+	    lexer.emit_error("Redundant parser code (skipping)");
+	  } else {
+	    emit.parser_code = user_code;
+	    emit.parser_class_name = classname;
+	    emit.extendsimpls = e;
+	  }
+	:}
 	;
+
+extendsimpls ::=
+	/* nothing */
+	{: RESULT = ""; :}
+    |	extendsimpls:e EXTENDS qualified_identifier:qid
+        {: RESULT = e + " extends " + qid; :}
+    |	extendsimpls:e IMPLEMENTS qualified_identifier:qid
+        {: RESULT = e + " implements " + qid; :}
+    ;
+
+qualified_identifier ::=
+	ID:x
+	{:
+	    RESULT = x;
+	:}
+    |	qualified_identifier:qid DOT ID:x
+    	{:
+	    RESULT = qid + "." + x;
+	:}
+    ;
+/* end ACM extension */
 
 /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */ 
 
