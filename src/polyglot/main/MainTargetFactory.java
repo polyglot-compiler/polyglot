@@ -53,7 +53,7 @@ public class MainTargetFactory implements TargetFactory
         outputFile = new File( parentDirectory, 
                                name.substring( 0, name.lastIndexOf(
                                                     sourceExtension)) 
-                               + ".java$");
+                               + outputExtension + "$");
       }
     }
     else {
@@ -94,7 +94,7 @@ public class MainTargetFactory implements TargetFactory
     if( sourceFile.equals( outputFile)) {
         outputFile = new File( outputDirectory, 
                                className.replace( '.', File.separatorChar)
-                               + ".java$");
+                               + outputExtension + "$");
     }
 
     return new MainTarget( sourceFile.getName(), sourceFile, outputFile);
