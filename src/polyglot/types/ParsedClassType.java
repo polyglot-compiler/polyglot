@@ -1,5 +1,5 @@
 /*
- * ParsedJavaClass.java
+ * ParsedClassType.java
  */
 
 package jltools.types;
@@ -11,23 +11,23 @@ import jltools.util.AnnotatedObject;
 
 
 /**
- * ParsedJavaClass
+ * ParsedClassType
  *
  * Overview: 
- * A ParsedJavaClass represents a information that has been parsed (but not
+ * A ParsedClassType represents a information that has been parsed (but not
  * necessarily type checked) from a .java file.
  **/
 public class ParsedClassType extends ClassTypeImpl 
 {
 
-  public ParsedJavaClass( TypeSystem ts)
+  public ParsedClassType( TypeSystem ts)
   {
     super( ts);
     interfaces = new TypedList( new LinkedList(), ClassType.class, false);
     methods = new TypedList( new LinkedList(), MethodTypeInstance.class,
                              false);
     fields = new TypedList( new LinkedList(), FieldInstance.class, false);
-    innerClasses = new TypedList( new LinkedList(), JavaClass.class, false);
+    innerClasses = new TypedList( new LinkedList(), ClassType.class, false);
   }
 
   public void setPackageName( String packageName)
@@ -90,7 +90,7 @@ public class ParsedClassType extends ClassTypeImpl
     this.innerName = innerName;
   }
 
-  public void addInnerClass( JavaClass innerClass)
+  public void addInnerClass( ClassType innerClass)
   {
     innerClasses.add( innerClass);
   }

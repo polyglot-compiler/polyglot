@@ -1,5 +1,5 @@
 /*
- * LoadedJavaClass.java
+ * LoadedClassType.java
  */
 
 package jltools.types;
@@ -12,25 +12,25 @@ import java.util.ArrayList;
 import jltools.util.TypedList;
 
 /**
- * LoadedJavaClass
+ * LoadedClassType
  *
  * Overview: 
- *    A LoadedJavaClass is a JavaClass which derives from a file
+ *    A LoadedClassType is a ClassType which derives from a file
  *    loaded at run time.
  **/
 public class LoadedClassType extends ClassTypeImpl  {
 
   /**
-   * Constructs a new LoadedJavaClass from a given class, within a given
+   * Constructs a new LoadedClassType from a given class, within a given
    * typeSystem.
    **/
-  public LoadedJavaClass(Class theClass, TypeSystem typeSys) {
+  public LoadedClassType(Class theClass, TypeSystem typeSys) {
     super( typeSys);    
     
     // Set up names and classType.    
     String rawName = theClass.getName(); // pkg1.pkg2.class$inner1$inner2
     this.packageName = TypeSystem.getPackageComponent(rawName);
-    this.fullName = classType.getName();
+    this.fullName = theClass.getName();
     this.shortName = TypeSystem.getShortNameComponent(fullName);
 
     // Set up the rest of the typing information
@@ -83,7 +83,7 @@ public class LoadedClassType extends ClassTypeImpl  {
     Type type = ts.typeForClass(f.getType());
     AccessFlags flags = AccessFlags.flagsForInt(f.getModifiers());    
     
-    return new FieldInstance(fieldName, type, this.classType,  flags);
+    return new FieldInstance(fieldName, type, this,  flags);
   }
 
   protected MethodType methodTypeForMethod(Method m) {

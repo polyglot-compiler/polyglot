@@ -1,5 +1,5 @@
 /*
- * JavaClassImpl.java
+ * ClassTypeImpl.java
  */
 
 package jltools.types;
@@ -10,14 +10,13 @@ import jltools.util.AnnotatedObject;
 import java.util.Iterator;
 
 /**
- * JavaClassImpl
+ * ClassTypeImpl
  *
  * Overview: 
- *    A JavaClassImpl is used to implement non-lazy Java classes: ones where
+ *    A ClassTypeImpl is used to implement non-lazy Java classes: ones where
  *    information is computed once, rather than on demand. 
  **/
-public abstract class ClassTypeImpl extends AnnotatedObject 
-  extends ClassType {
+public abstract class ClassTypeImpl extends ClassType {
 
   public ClassTypeImpl( TypeSystem ts)
   {

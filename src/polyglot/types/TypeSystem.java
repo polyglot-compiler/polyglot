@@ -72,8 +72,8 @@ public abstract class TypeSystem {
    * Returns true iff childClass is not ancestorClass, but childClass descends
    * from ancestorClass.
    **/
-  public abstract boolean descendsFrom(JavaClass childClass, 
-				       JavaClass ancestorClass);
+  public abstract boolean descendsFrom(ClassType childClass, 
+				       ClassType ancestorClass);
   /**
    * Requires: all type arguments are canonical.
    *
@@ -305,10 +305,10 @@ public abstract class TypeSystem {
   // Functions for type->class mapping.
   ////
   /**
-   * Returns the JavaClass object corresponding to a given type, or null
+   * Returns the ClassType object corresponding to a given type, or null
    * if there is none.
    **/
-  public abstract JavaClass getClassForType(Type type);
+  public abstract ClassType getClassForType(Type type);
 
   ////
   // Functions which yield particular types.
@@ -338,9 +338,9 @@ public abstract class TypeSystem {
   public abstract Type extendArrayDims(Type type, int dims);
   /**
    * Returns a canonical type corresponding to the Java Class object
-   * theClass.  Does not require that <theClass> have a JavaClass
+   * theClass.  Does not require that <theClass> have a ClassType
    * registered in this typeSystem.  Does not register the type in
-   * this TypeSystem.  For use only by JavaClass implementations.
+   * this TypeSystem.  For use only by ClassType implementations.
    **/
   public abstract ClassType typeForClass(Class theClass);
 

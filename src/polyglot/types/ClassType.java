@@ -1,5 +1,5 @@
 /*
- * JavaClass.java
+ * ClassType.java
  */
 
 package jltools.types;
@@ -7,10 +7,10 @@ package jltools.types;
 import java.util.List;
 
 /**
- * JavaClass
+ * ClassType
  *
  * Overview: FIXME DOC OUT OF DATE!
- *    A JavaClass represents a class -- either loaded from a ClassPath, 
+ *    A ClassType represents a class -- either loaded from a ClassPath, 
  *    parsed from a source file, or obtained from other source.
  *
  *    The Type, Name, and Package of a class are immutable.  All other
