@@ -6,6 +6,7 @@
 
 SOURCE = .
 SUBDIRS = polyglot
+TAG = POLYGLOT_0_9_0
 
 include Rules.mk
 
@@ -51,6 +52,22 @@ jar: all
 	cd classes ; \
 	$(JAR) $(JAR_FLAGS) ../$(JAR_FILE) `find polyglot -name \*.class`; \
 	$(JAR) $(JAR_FLAGS) ../jif.jar `find jif -name \*.class`
+
+export:
+	rm -rf release
+	mkdir release
+	cvs rtag $(TAG) polyglot
+	cd release; cvs export -r $(TAG) -f polyglot
+	cvs rtag -d $(TAG) polyglot
+	for i in $(EXT) skel; do \
+		mv release/polyglot/polyglot/ext/$$i release; \
+	done
+	rm -rf release/polyglot/polyglot/ext/*/
+	for i in $(EXT) skel; do \
+		mv release/$$i release/polyglot/polyglot/ext; \
+	done
+	mv javadoc release
+	cd release; jar cf polyglot-src.jar polyglot
 
 REL_SOURCES = \
 	Rules.mk \
