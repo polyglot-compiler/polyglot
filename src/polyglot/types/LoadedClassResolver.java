@@ -54,7 +54,10 @@ public class LoadedClassResolver extends ClassResolver implements TopLevelResolv
   }
 
   public boolean packageExists(String name) {
-    return loader.packageExists(name);
+    // A package exists only if a class is loaded from the package.
+    // The outer resolver knows this; this resolver does not.
+    // return loader.packageExists(name);
+    return false;
   }
 
   /**
