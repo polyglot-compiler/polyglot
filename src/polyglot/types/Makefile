@@ -16,7 +16,6 @@ SOURCES = \
 	CompoundResolver.java \
 	ConstructorInstance.java \
 	Context.java \
-	EmptyContextResolver.java \
 	FieldInstance.java \
 	Flags.java \
 	ImportTable.java \
