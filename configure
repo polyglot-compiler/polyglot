@@ -123,7 +123,7 @@ echo creating Defs.mk
     echo TOOLS_JAR = "${TOOLS_JAR}"
     echo RT_JAR = "${RT_JAR}"
     echo
-    echo CRYPT_PATH = '$(ESC_SOURCE)'${FILE_SEP}'jsse.jar'${PATH_SEP}'$(ESC_SOURCE)'${FILE_SEP}'jnet.jar'${PATH_SEP}'$(ESC_SOURCE)'${FILE_SEP}'jcert.jar'
+    echo CRYPT_PATH = '$(ESC_SOURCE)'${FILE_SEP}'jsse.jar'${PATH_SEP}'$(ESC_SOURCE)'${FILE_SEP}'jnet.jar'${PATH_SEP}'$(ESC_SOURCE)'${FILE_SEP}'jcert.jar'${PATH_SEP}'$(ESC_SOURCE)'${FILE_SEP}'cryptix32.jar'
     echo
     echo LEX_RUNTIME = '$(ESC_SOURCE)'${FILE_SEP}'jlex.jar'
     echo CUP_RUNTIME = '$(ESC_SOURCE)'${FILE_SEP}'java_cup.jar'
