@@ -1,7 +1,6 @@
 package jltools.types;
 
 import java.util.*;
-import jltools.ext.polyj.types.*;
 
 /**
  * An <code>ArrayType</code> represents an array of base java types.
