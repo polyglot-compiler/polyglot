@@ -83,12 +83,12 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
             Job sj = ar.job().spawn(ar.context(), decl,
                                     Pass.CLEAN_SUPER, Pass.ADD_MEMBERS_ALL);
 
-            if (! sj.reportedErrors()) {
-                throw new SemanticException("Could not disambiguate local " +
-                                            "class \"" + decl.name() + "\".",
-                                            position());
-            }
-            else if (! sj.status()) {
+            if (! sj.status()) {
+                if (! sj.reportedErrors()) {
+                    throw new SemanticException("Could not disambiguate local " +
+                                                "class \"" + decl.name() + "\".",
+                                                position());
+                }
                 throw new SemanticException();
             }
 

@@ -461,11 +461,11 @@ FIXME: check super types as well.
         Job sj = tc.job().spawn(tc.context(), tn,
                                 Pass.CLEAN_SUPER, Pass.DISAM_ALL);
 
-        if (! sj.reportedErrors()) {
-            throw new SemanticException("Could not disambiguate type.",
-                                        this.tn.position());
-        }
-        else if (! sj.status()) {
+        if (! sj.status()) {
+            if (! sj.reportedErrors()) {
+                throw new SemanticException("Could not disambiguate type.",
+                                            this.tn.position());
+            }
             throw new SemanticException();
         }
 

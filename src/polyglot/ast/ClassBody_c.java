@@ -114,12 +114,12 @@ public class ClassBody_c extends Term_c implements ClassBody
                     Job sj = j.spawn(ar.context(), n,
                                      Pass.CLEAN_SUPER, Pass.CLEAN_SUPER_ALL);
 
-                    if (! sj.reportedErrors()) {
-                        throw new SemanticException("Could not disambiguate " +
-                                                    "class member.",
-                                                    n.position());
-                    }
-                    else if (! sj.status()) {
+                    if (! sj.status()) {                       
+                        if (! sj.reportedErrors()) {
+                            throw new SemanticException("Could not disambiguate " +
+                                                        "class member.",
+                                                        n.position());
+                        }
                         throw new SemanticException();
                     }
 
