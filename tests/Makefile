@@ -58,6 +58,7 @@ GOOD =  \
 
 BAD = \
 	BadAbstract.jl \
+	BadOverride2.jl \
 	BadAlloc.jl \
 	BadCtor.jl \
 	BadExcept2.jl \
