@@ -45,7 +45,7 @@ public class VerboseOutputController extends OutputController{
 
         out.println("  " + 
             sts.getSuccesfulTestCount() + " out of " + sts.getTotalTestCount() + 
-            " tests suceeded.");
+            " tests succeeded.");
     }
 
     protected void startSourceFileTest(SourceFileTest sft) {

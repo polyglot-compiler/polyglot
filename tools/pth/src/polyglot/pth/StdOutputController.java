@@ -27,7 +27,7 @@ public class StdOutputController extends OutputController{
 
         out.println(sts.getName() + ": " + 
             sts.getSuccesfulTestCount() + " out of " + sts.getTotalTestCount() + 
-            " tests suceeded.");
+            " tests succeeded.");
     }
 
     protected void startSourceFileTest(SourceFileTest sft) {
