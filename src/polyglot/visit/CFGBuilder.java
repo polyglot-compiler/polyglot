@@ -1,29 +1,12 @@
 package polyglot.visit;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
-import polyglot.ast.Block;
-import polyglot.ast.Branch;
-import polyglot.ast.Catch;
-import polyglot.ast.CodeDecl;
-import polyglot.ast.CompoundStmt;
-import polyglot.ast.Labeled;
-import polyglot.ast.Loop;
-import polyglot.ast.Return;
-import polyglot.ast.Stmt;
-import polyglot.ast.Switch;
-import polyglot.ast.Term;
-import polyglot.ast.Try;
+import polyglot.ast.*;
 import polyglot.main.Report;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
-import polyglot.util.CollectionUtil;
-import polyglot.util.Copy;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.StringUtil;
+import polyglot.util.*;
 
 /**
  * Class used to construct a CFG.
@@ -399,19 +382,38 @@ public class CFGBuilder implements Copy
         }
     }
 
-    /** Create edges for a try finally block. */
-    public CFGBuilder tryFinally(CFGBuilder v, Term last,
-                                 CFGBuilder last_visitor, Term f) {
+    /**
+     * Create edges for the finally block of a try-finally construct. 
+     * 
+     * @param v v.innermostTarget is the Try term that the finallyBlock is assoicated with. @@@XXX
+     * @param last the last term visited before the finally block is entered.
+     * @param last_visitor @@@XXX
+     * @param finallyBlock the finally block associated with a try finally block.
+     */
+    protected static CFGBuilder tryFinally(CFGBuilder v, Term last,
+                                 CFGBuilder last_visitor, Block finallyBlock) {
+        //###@@@ I think that we may be using the wrong visitor to perform the
+        // enterFinally on; should it maybe be last_visitor? we want to make 
+        // sure that the path_to_finally list grows correctly.
         CFGBuilder v_ = v.outer.enterFinally(last);
-        v_.edge(last_visitor, last, f.entry(), FlowGraph.EDGE_KEY_OTHER); 
-        v_.visitCFG(f, Collections.EMPTY_LIST);
+        
+        // @@@XXX
+        v_.edge(last_visitor, last, finallyBlock.entry(), FlowGraph.EDGE_KEY_OTHER);
+        
+        // visit the finally block.  
+        v_.visitCFG(finallyBlock, Collections.EMPTY_LIST);
         return v_;
     }
 
-    /** Enter a finally block. */
-    public CFGBuilder enterFinally(Term from) {
-      CFGBuilder v = (CFGBuilder) copy();
+    /** 
+     * Enter a finally block. This method returns a new CFGBuilder
+     * with the path_to_finally field pointing to a list that has the
+     * Term <code>from</code> appended.
+     */
+    protected CFGBuilder enterFinally(Term from) {
+      CFGBuilder v = (CFGBuilder) this.copy();
       v.path_to_finally = new ArrayList(path_to_finally.size()+1);
+      v.path_to_finally.addAll(path_to_finally);
       v.path_to_finally.add(from);
       return v;
     }
