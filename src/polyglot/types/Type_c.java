@@ -24,7 +24,7 @@ public abstract class Type_c extends TypeObject_c implements Type
         super(ts, pos);
     }
 
-    public abstract String translate(Context c);
+    public abstract String translate(Resolver c);
 
     public boolean isType() { return true; }
     public boolean isPackage() { return false; }

@@ -1,7 +1,7 @@
 package jltools.ast;
 
 import jltools.types.ConstructorInstance;
-import jltools.types.ClassType;
+import jltools.types.ParsedAnonClassType;
 import java.util.List;
 
 /**
@@ -13,8 +13,14 @@ import java.util.List;
  */
 public interface New extends Expr
 {
-    ClassType anonType();
+    ParsedAnonClassType anonType();
+    New anonType(ParsedAnonClassType anonType);
+
     ConstructorInstance constructorInstance();
+    New constructorInstance(ConstructorInstance ci);
+
+    Expr qualifier();
+    New qualifier(Expr qualifier);
 
     TypeNode objectType();
     New objectType(TypeNode t);

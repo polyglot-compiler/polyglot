@@ -71,12 +71,13 @@ public class Special_c extends Expr_c implements Special
     /** Type check the expression. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
+        Context c = tc.context();
 
 	ClassType t;
 
 	if (qualifier == null) {
 	    // Unqualified this expression
-	    t = tc.context().currentClass();
+	    t = c.currentClass();
 	}
 	else {
 	    if (! qualifier.type().isClass()) {
@@ -86,6 +87,12 @@ public class Special_c extends Expr_c implements Special
 	    }
 
 	    t = qualifier.type().toClass();
+
+            if (! ts.isEnclosed(c.currentClass(), t)) {
+                throw new SemanticException("Qualifier type \"" + t +
+                                            "\" is not an enclosing class.",
+                                            qualifier.position());
+            }
 	}
 
 	if (kind == THIS) {

@@ -16,7 +16,7 @@ public class NullType_c extends Type_c implements NullType
 	super(ts);
     }
     
-    public String translate(Context c) {
+    public String translate(Resolver c) {
 	throw new InternalCompilerError("Cannot translate a null type.");
     }
 

@@ -40,7 +40,7 @@ public class Package_c extends TypeObject_c implements Package
 	return name;
     }
     
-    public String translate(Context c) {
+    public String translate(Resolver c) {
 	return ts.translatePackage(c, this);
     }
 

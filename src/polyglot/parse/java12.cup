@@ -1295,17 +1295,17 @@ class_instance_creation_expression ::=
     |   NEW:n class_type:a LPAREN argument_list_opt:b RPAREN class_body:c
             {: RESULT = parser.nf.New(parser.util.pos(n), a, b, c); :}
     |   primary:a DOT NEW simple_name:b LPAREN argument_list_opt:c RPAREN
-            {: RESULT = parser.nf.QualifiedNew(parser.util.pos(a), a,
-                                               b.toType(), c); :}
+            {: RESULT = parser.nf.New(parser.util.pos(a), a,
+				      b.toType(), c); :}
     |   primary:a DOT NEW simple_name:b LPAREN argument_list_opt:c RPAREN class_body:d
-            {: RESULT = parser.nf.QualifiedNew(parser.util.pos(a), a,
-                                               b.toType(), c, d); :}
+            {: RESULT = parser.nf.New(parser.util.pos(a), a,
+				      b.toType(), c, d); :}
     |   name:a DOT NEW simple_name:b LPAREN argument_list_opt:c RPAREN
-            {: RESULT = parser.nf.QualifiedNew(parser.util.pos(a), a.toExpr(),
-                                               b.toType(), c); :}
+            {: RESULT = parser.nf.New(parser.util.pos(a), a.toExpr(),
+				      b.toType(), c); :}
     |   name:a DOT NEW simple_name:b LPAREN argument_list_opt:c RPAREN class_body:d
-            {: RESULT = parser.nf.QualifiedNew(parser.util.pos(a), a.toExpr(),
-                                               b.toType(), c, d); :}
+            {: RESULT = parser.nf.New(parser.util.pos(a), a.toExpr(),
+				      b.toType(), c, d); :}
     ;
 argument_list_opt ::=
                     // List of Expr

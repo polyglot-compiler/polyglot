@@ -26,7 +26,7 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
 		return kind.toString();
 	}
 
-	public String translate(Context c) {
+	public String translate(Resolver c) {
 		return ts.translatePrimitive(c, this);
 	}
 

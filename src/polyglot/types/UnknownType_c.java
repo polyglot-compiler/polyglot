@@ -23,7 +23,7 @@ public class UnknownType_c extends Type_c implements UnknownType
         super(ts, pos);
     }
 
-    public String translate(Context c) {
+    public String translate(Resolver c) {
 	throw new InternalCompilerError("Cannot translate an unknown type.");
     }
 

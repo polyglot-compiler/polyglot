@@ -625,49 +625,104 @@ public class TypeSystem_c implements TypeSystem
      **/
     public FieldInstance findField(ReferenceType container, String name,
 	                           Context c) throws SemanticException {
-        Type t = container;
 
-	do {
+        FieldInstance fi = findField(container, name);
+
+        if (! isAccessible(fi, c)) {
+            throw new SemanticException("Cannot access " + fi + ".");
+        }
+
+        return fi;
+    }
+
+    public FieldInstance findField(ReferenceType container, String name)
+                                   throws SemanticException {
+        Stack s = new Stack();
+        s.push(container);
+
+        while (! s.isEmpty()) {
+            Type t = (Type) s.pop();
+
 	    if (! t.isReference()) {
 	        throw new SemanticException("Cannot access a field in " +
 		    " non-reference type " + t + ".");
 	    }
 
-	    for (Iterator i = t.toReference().fields().iterator();
-		 i.hasNext(); ) {
-	        FieldInstance fi = (FieldInstance) i.next();
+            ReferenceType rt = t.toReference();
 
-		if (name.equals(fi.name())) {
-		    if (! isAccessible(fi, c)) {
-			throw new SemanticException("Cannot access " +
-			    fi + ".");
-		    }
-		    return fi;
-		}
-	    }
+            FieldInstance fi = rt.fieldNamed(name);
 
-	    t = t.toReference().superType();
-	} while (t != null);
+            if (fi != null) {
+                return fi;
+            }
+
+            if (rt.isClass()) {
+                // Need to check interfaces for static fields.
+                ClassType ct = rt.toClass();
+
+                for (Iterator i = ct.interfaces().iterator(); i.hasNext(); ) {
+                    Type it = (Type) i.next();
+                    s.push(it);
+                }
+            }
+
+            if (rt.superType() != null) {
+                s.push(rt.superType());
+            }
+	}
 
 	throw new SemanticException("Field \"" + name +
-				    "\" not found in type " + container + ".");
+				    "\" not found in type \"" +
+                                    container + "\".");
     }
 
     public MemberClassType findMemberClass(ClassType container, String name,
 	                                   Context c) throws SemanticException {
 
-	MemberClassType t = container.memberClassNamed(name);
+        MemberClassType t = findMemberClass(container, name);
 
-	if (t == null) {
-	    throw new SemanticException("Member class \"" + name +
-		"\" not found in class " + container + ".");
+        if (! isAccessible(t, c)) {
+            throw new SemanticException("Cannot access member \"" + t + "\".");
+        }
+
+        return t;
+    }
+
+    public MemberClassType findMemberClass(ClassType container, String name)
+                                           throws SemanticException {
+
+        Stack s = new Stack();
+        s.push(container);
+
+        while (! s.isEmpty()) {
+            Type t = (Type) s.pop();
+
+	    if (! t.isClass()) {
+	        throw new SemanticException("Cannot access a field in " +
+		    " non-class type " + t + ".");
+	    }
+
+            ClassType ct = t.toClass();
+
+            MemberClassType mt = ct.memberClassNamed(name);
+
+            if (mt != null) {
+                return mt;
+            }
+
+            for (Iterator i = ct.interfaces().iterator(); i.hasNext(); ) {
+                Type it = (Type) i.next();
+                s.push(it);
+            }
+
+            if (ct.superType() != null) {
+                s.push(ct.superType());
+            }
 	}
 
-	if (! isAccessible(t, c)) {
-	    throw new SemanticException("Cannot access " + t + ".");
-	}
-
-	return t;
+	throw new SemanticException("Member class \"" + name +
+				    "\" not found in type \"" +
+                                    container + "\".");
     }
 
     private String listToString(List l) {
@@ -1258,7 +1313,7 @@ public class TypeSystem_c implements TypeSystem
 	return s;
     }
 
-    public String translatePackage(Context c, Package p) {
+    public String translatePackage(Resolver c, Package p) {
         if (p.prefix() == null) {
 	    return p.name();
 	}
@@ -1266,11 +1321,11 @@ public class TypeSystem_c implements TypeSystem
 	return p.prefix().translate(c) + "." + p.name();
     }
 
-    public String translateArray(Context c, ArrayType t) {
+    public String translateArray(Resolver c, ArrayType t) {
 	return t.base().translate(c) + "[]";
     }
 
-    public String translateTopLevelClass(Context c, TopLevelClassType t) {
+    public String translateTopLevelClass(Resolver c, TopLevelClassType t) {
 	if (t.package_() == null) {
 	    return t.name();
 	}
@@ -1292,7 +1347,7 @@ public class TypeSystem_c implements TypeSystem
 	return t.package_().translate(c) + "." + t.name();
     }
 
-    public String translateMemberClass(Context c, MemberClassType t) {
+    public String translateMemberClass(Resolver c, MemberClassType t) {
         // Use only the short name if the outer class is anonymous.
         if (t.container().toClass().isAnonymous()) {
 	    return t.name();
@@ -1314,11 +1369,11 @@ public class TypeSystem_c implements TypeSystem
 	return t.container().translate(c) + "." + t.name();
     }
 
-    public String translateLocalClass(Context c, LocalClassType t) {
+    public String translateLocalClass(Resolver c, LocalClassType t) {
 	return t.name();
     }
 
-    public String translatePrimitive(Context c, PrimitiveType t) {
+    public String translatePrimitive(Resolver c, PrimitiveType t) {
 	return t.kind().toString();
     }
 
@@ -1546,6 +1601,10 @@ public class TypeSystem_c implements TypeSystem
 		f.clear(TOP_LEVEL_CLASS_FLAGS) + ".");
 	}
 
+        if (f.isFinal() && f.isInterface()) {
+            throw new SemanticException("Cannot declare a final interface.");
+        }
+
 	checkAccessFlags(f);
     }
 
@@ -1556,6 +1615,10 @@ public class TypeSystem_c implements TypeSystem
 		f.clear(MEMBER_CLASS_FLAGS) + ".");
 	}
 
+        if (f.isFinal() && f.isInterface()) {
+            throw new SemanticException("Cannot declare a final interface.");
+        }
+
 	checkAccessFlags(f);
     }
 
@@ -1565,6 +1628,10 @@ public class TypeSystem_c implements TypeSystem
 		"Cannot declare member class with flags " +
 		f.clear(LOCAL_CLASS_FLAGS) + ".");
 	}
+
+        if (f.isFinal() && f.isInterface()) {
+            throw new SemanticException("Cannot declare a final interface.");
+        }
 
 	checkAccessFlags(f);
     }

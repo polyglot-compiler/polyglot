@@ -67,7 +67,6 @@ SOURCES = \
 	Precedence.java \
 	Prefix.java \
 	ProcedureDecl.java \
-	QualifiedNew.java \
 	QualifierNode.java \
 	Receiver.java \
 	Return.java \

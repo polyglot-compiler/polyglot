@@ -78,7 +78,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
     }
 
     /** Translate the type. */
-    public String translate(Context c) {
+    public String translate(Resolver c) {
 	return ts.translateArray(c, this);
     }
 

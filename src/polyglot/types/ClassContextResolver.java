@@ -38,6 +38,7 @@ public class ClassContextResolver extends ClassResolver {
 		    "Cannot lookup qualified name " + name);
 	    }
 
+            /*
 	    // Check if the name is for this class.
 	    if (type instanceof NamedType) {
 		String typeName = ((NamedType) type).name();
@@ -46,14 +47,16 @@ public class ClassContextResolver extends ClassResolver {
 		    return type;
 		}
 	    }
+            */
 
 	    // Check if the name is for a member class.
-	    MemberClassType inner = type.memberClassNamed(name);
+	    MemberClassType inner = ts.findMemberClass(type, name);
 
 	    if (inner != null) {
 		return inner;
 	    }
 
+            /*
 	    // Check super types and enclosing types.
 	    Set found = new HashSet();
 
@@ -102,6 +105,7 @@ public class ClassContextResolver extends ClassResolver {
 		throw new SemanticException("Duplicate classes " + name +
 		    " found in scope of " + type + ": " + found);
 	    }
+            */
 
 	    throw new NoClassException("Could not find type " + name +
 		" in scope of " + type + ".");

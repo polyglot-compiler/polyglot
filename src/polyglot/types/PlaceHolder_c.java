@@ -60,7 +60,7 @@ public class PlaceHolder_c extends Type_c
 	}
     }
 
-    public String translate(Context c) {
+    public String translate(Resolver c) {
 	throw new InternalCompilerError("Cannot translate place holder type.");
     }
 

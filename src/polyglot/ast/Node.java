@@ -167,7 +167,17 @@ public interface Node extends Copy, Serializable
     Node typeCheckOverride_(TypeChecker tc) throws SemanticException;
     Node typeCheckEnter_(TypeChecker tc) throws SemanticException;
     Node typeCheck_(TypeChecker tc) throws SemanticException;
-    Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc) throws SemanticException;
+
+    /**
+     * Set the expected type of <code>child</code>.  This method is called
+     * by the visitor just before the child expression is visited.
+     *
+     * @param child An immediate subexpression of <code>this</code>.
+     * @param tc The expected type visitor.
+     * @return A new version of child with the expected type field set.
+     */
+    Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+        throws SemanticException;
 
     /**
      * Check that exceptions are properly propagated throughout the AST.

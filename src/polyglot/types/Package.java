@@ -6,5 +6,5 @@ package jltools.types;
 public interface Package extends NamedQualifier
 {
     Package prefix();
-    String translate(Context c);
+    String translate(Resolver c);
 }

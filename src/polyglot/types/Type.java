@@ -8,7 +8,7 @@ import jltools.util.Position;
  */
 public interface Type extends Qualifier
 {
-    String translate(Context c);
+    String translate(Resolver c);
     ArrayType arrayOf();
     ArrayType arrayOf(int dims);
 

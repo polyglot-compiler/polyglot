@@ -370,19 +370,19 @@ public class NodeFactory_c implements NodeFactory
     }
 
     public New New(Position pos, TypeNode type, List args) {
-        return New(pos, type, args, null);
+        return New(pos, null, type, args, null);
     }
 
     public New New(Position pos, TypeNode type, List args, ClassBody body) {
-	return new New_c(new Ext_c(), pos, type, args, body);
+	return New(pos, null, type, args, body);
     }
 
-    public QualifiedNew QualifiedNew(Position pos, Expr outer, TypeNode objectType, List args) {
-        return QualifiedNew(pos, outer, objectType, args, null);
+    public New New(Position pos, Expr outer, TypeNode objectType, List args) {
+        return New(pos, outer, objectType, args, null);
     }
 
-    public QualifiedNew QualifiedNew(Position pos, Expr outer, TypeNode objectType, List args, ClassBody body) {
-		return new QualifiedNew_c(new Ext_c(), pos, outer, objectType, args, body);
+    public New New(Position pos, Expr outer, TypeNode objectType, List args, ClassBody body) {
+        return new New_c(new Ext_c(), pos, outer, objectType, args, body);
     }
 
     public NewArray NewArray(Position pos, TypeNode base, List dims) {

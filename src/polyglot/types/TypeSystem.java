@@ -174,29 +174,44 @@ public interface TypeSystem {
 
     /**
      * Returns the field named 'name' defined on 'type'.
+     * We check if the field is accessible from the context 'c'.
      */
     FieldInstance findField(ReferenceType container, String name, Context c)
 	throws SemanticException;
 
     /**
+     * Returns the field named 'name' defined on 'type'.
+     */
+    FieldInstance findField(ReferenceType container, String name)
+	throws SemanticException;
+
+    /**
      * Find a method.  We need to pass the context because the method
      * we find depends on whether the method is accessible from the context.
+     * We also check if the field is accessible from the context 'c'.
      */
     MethodInstance findMethod(ReferenceType container,
 	String name, List argTypes, Context c) throws SemanticException;
 
     /**
-     * Find a constructor.  We need to pass the context because the method
+     * Find a constructor.  We need to pass the context because the constructor
      * we find depends on whether the method is accessible from the context.
+     * We also check if the field is accessible from the context 'c'.
      */
     ConstructorInstance findConstructor(ClassType container,
 	List argTypes, Context c) throws SemanticException;
 
     /**
-     * Find a member class.  We need to pass the context because the method
-     * we find depends on whether the method is accessible from the context.
+     * Find a member class.
+     * We check if the field is accessible from the context 'c'.
      */
     MemberClassType findMemberClass(ClassType container, String name, Context c)
+	throws SemanticException;
+
+    /**
+     * Find a member class.
+     */
+    MemberClassType findMemberClass(ClassType container, String name)
 	throws SemanticException;
 
     /**
@@ -302,12 +317,12 @@ public interface TypeSystem {
      */
     Set getTypeEncoderRootSet(Type clazz);
 
-    String translatePackage(Context c, Package p);
-    String translatePrimitive(Context c, PrimitiveType t);
-    String translateArray(Context c, ArrayType t);
-    String translateTopLevelClass(Context c, TopLevelClassType t);
-    String translateMemberClass(Context c, MemberClassType t);
-    String translateLocalClass(Context c, LocalClassType t);
+    String translatePackage(Resolver c, Package p);
+    String translatePrimitive(Resolver c, PrimitiveType t);
+    String translateArray(Resolver c, ArrayType t);
+    String translateTopLevelClass(Resolver c, TopLevelClassType t);
+    String translateMemberClass(Resolver c, MemberClassType t);
+    String translateLocalClass(Resolver c, LocalClassType t);
     String wrapperTypeString(PrimitiveType t);
 
     PrimitiveType primitiveForName(String name) throws SemanticException;
