@@ -1050,9 +1050,16 @@ public class TypeSystem_c implements TypeSystem
 
     public ArrayType arrayOf(Position pos, Type type) {
         assert_(type);
-	return new ArrayType_c(this, pos, type);
+	return arrayType(pos, type);
     }
 
+    /**
+     * Factory method for ArrayTypes.
+     */
+    protected ArrayType arrayType(Position pos, Type type) {
+	return new ArrayType_c(this, pos, type);
+    }
+    
     public ArrayType arrayOf(Type type, int dims) {
         return arrayOf(null, type, dims);
     }
