@@ -76,4 +76,22 @@ public class CollectionUtil
 		l.add(o4);
 		return l;
 	}
+
+        public static Object firstOrElse(Collection l, Object alt) {
+                Iterator i = l.iterator();
+                if (i.hasNext()) return i.next();
+                return alt;
+        }
+
+
+        public static Iterator pairs(Collection l) {
+                List x = new LinkedList();
+                Object prev = null;
+                for (Iterator i = l.iterator(); i.hasNext(); ) {
+                    Object curr = i.next();
+                    if (prev != null) x.add(new Object[] { prev, curr });
+                    prev = curr;
+                }
+                return x.iterator();
+        }
 }
