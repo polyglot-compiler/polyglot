@@ -48,6 +48,8 @@ Nov 19, 2003: Polyglot 1.1.0
     A utility class PolyglotAntTask (in $POLYGLOT/tools) facilitates
     the compilation of language extensions in the ANT framework.
 
+    PPG now passes through precedence modifiers to JavaCUP.
+
     Numerous bug fixes, including:
       - numeric conversions of short, int, etc.
       - constant folding
