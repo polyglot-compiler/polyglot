@@ -245,13 +245,20 @@ public interface TypeSystem {
     ////
 
     /**
+     * Deprecated version of the findField method.
+     * @deprecated
+     */
+    FieldInstance findField(ReferenceType container, String name, Context c)
+        throws SemanticException;
+
+    /**
      * Returns the field named 'name' defined on 'type'.
-     * We check if the field is accessible from the context 'c'.
+     * We check if the field is accessible from the class currClass.
      * @exception SemanticException if the field cannot be found or is
      * inaccessible.
      */
-    FieldInstance findField(ReferenceType container, String name, Context c)
-	throws SemanticException;
+    FieldInstance findField(ReferenceType container, String name, ClassType currClass)
+        throws SemanticException;
 
     /**
      * Returns the field named 'name' defined on 'type'.

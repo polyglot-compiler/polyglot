@@ -495,15 +495,24 @@ public class TypeSystem_c implements TypeSystem
     ////
 
     /**
+     * @deprecated
+     */
+    public FieldInstance findField(ReferenceType container, String name,
+                               Context c) throws SemanticException {
+        ClassType ct = null;
+        if (c != null) ct = c.currentClass();
+        return findField(container, name, ct);
+    }
+    /**
      * Requires: all type arguments are canonical.
      *
-     * Returns the fieldMatch named 'name' defined on 'type' visible in
-     * context.  If no such field may be found, returns a fieldmatch
-     * with an error explaining why. name and context may be null, in which case
+     * Returns the fieldMatch named 'name' defined on 'type' visible from
+     * cirrClass.  If no such field may be found, returns a fieldmatch
+     * with an error explaining why. name and currClass may be null, in which case
      * they will not restrict the output.
      **/
     public FieldInstance findField(ReferenceType container, String name,
-	                           Context c) throws SemanticException {
+	                           ClassType currClass) throws SemanticException {
 
         assert_(container);
 
@@ -514,7 +523,7 @@ public class TypeSystem_c implements TypeSystem
 
         FieldInstance fi = findField(container, name);
 
-        if (! isAccessible(fi, c)) {
+        if (! isAccessible(fi, currClass)) {
             throw new SemanticException("Cannot access " + fi + ".");
         }
 
