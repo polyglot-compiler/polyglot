@@ -54,6 +54,7 @@ public class Import_c extends Node_c implements Import
 
 	if (kind == CLASS) {
 	    it.addClassImport(name);
+            tb.typeSystem().typeForName(name);
 	}
 	else if (kind == PACKAGE) {
 	    it.addPackageImport(name);
@@ -61,6 +62,15 @@ public class Import_c extends Node_c implements Import
 
 	return this;
     }
+
+    /*
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        if (kind == CLASS) {
+            tc.typeSystem().typeForName(name);
+        }
+        return this;
+    }
+    */
    
     public String toString() {
 	return "import " + name + (kind == PACKAGE ? ".*" : "");
