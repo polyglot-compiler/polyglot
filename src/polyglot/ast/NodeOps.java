@@ -145,33 +145,6 @@ public interface NodeOps
     Node addMembers(AddMemberVisitor am) throws SemanticException;
 
     /**
-     * Fold constants in the AST.
-     *
-     * This method is called by the <code>enter()</code> method of the
-     * visitor.  The * method should perform work that should be done
-     * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
-     * invoked.
-     *
-     * @param cf The constant folding visitor.
-     */
-    NodeVisitor foldConstantsEnter(ConstantFolder cf);
-
-    /**
-     * Fold constants in the AST.
-     *
-     * This method is called by the <code>leave()</code> method of the
-     * visitor.  The method should perform work that should be done
-     * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
-     * installed as a child of the node's parent.
-     *
-     * @param cf The constant folding visitor.
-     */
-    Node foldConstants(ConstantFolder cf);
-
-    /**
      * Type check the AST.
      *
      * This method is called by the <code>enter()</code> method of the

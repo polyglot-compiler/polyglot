@@ -64,39 +64,6 @@ public class Unary_c extends Expr_c implements Unary
 	return reconstruct(expr);
     }
 
-    protected Node num(NodeFactory nf, long value) {
-        // Unary promotion
-        IntLit.Kind kind = IntLit.INT;
-
-        if (expr instanceof IntLit) {
-            kind = ((IntLit) expr).kind();
-        }
-
-        return nf.IntLit(position(), kind, value).type(type());
-    }
-
-    protected Node bool(NodeFactory nf, boolean value) {
-        return nf.BooleanLit(position(), value).type(type());
-    }
-
-    /** Fold constants for the expression. */
-    public Node foldConstants(ConstantFolder cf) {
-      	NodeFactory nf = cf.nodeFactory();
-
-        if (expr instanceof NumLit) {
-	    long x = ((NumLit) expr).longValue();
-	    if (op == BIT_NOT) return num(nf, ~x);
-	    if (op == NEG) return num(nf, -x);
-	    if (op == POS) return num(nf, +x);
-	}
-	else if (expr instanceof BooleanLit) {
-	    boolean x = ((BooleanLit) expr).value();
-	    if (op == NOT) return bool(nf, !x);
-	}
-
-        return this;
-    }
-
     /** Type check the expression. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -230,9 +197,17 @@ public class Unary_c extends Expr_c implements Unary
         }
         return succs;
     }
+    
+    public boolean isConstant() {
+	return expr.isConstant();
+    }
 
     public Object constantValue() {
-        Object v = expr.constantValue();
+        if (! isConstant()) {
+	    return null;
+	}
+	
+	Object v = expr.constantValue();
 
         if (v instanceof Boolean) {
             boolean vv = ((Boolean) v).booleanValue();

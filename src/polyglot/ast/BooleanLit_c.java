@@ -29,11 +29,6 @@ public class BooleanLit_c extends Lit_c implements BooleanLit
     return n;
   }
 
-  /** Get the value of the expression, as an object. */
-  public Object objValue() {
-    return new Boolean(this.value);
-  }
-
   /** Type check the expression. */
   public Node typeCheck(TypeChecker tc) throws SemanticException {
     return type(tc.typeSystem().Boolean());
@@ -56,10 +51,6 @@ public class BooleanLit_c extends Lit_c implements BooleanLit
     w.begin(0);
     w.write("(value " + value + ")");
     w.end();
-  }
-
-  public boolean isConstant() {
-    return true;
   }
 
   public Object constantValue() {

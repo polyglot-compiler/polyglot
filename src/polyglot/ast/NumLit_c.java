@@ -22,11 +22,6 @@ public abstract class NumLit_c extends Lit_c implements NumLit
 	return this.value;
     }
 
-    /** Get the value of the expression, as an object. */
-    public Object objValue() {
-        return new Long(this.value);
-    }
-
     public void dump(CodeWriter w) {
         super.dump(w);
 

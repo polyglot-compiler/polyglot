@@ -15,8 +15,6 @@ public abstract class Lit_c extends Expr_c implements Lit
 	super(pos);
     }
 
-    public abstract Object objValue();
-
     /** Get the precedence of the expression. */
     public Precedence precedence() {
         return Precedence.LITERAL;
@@ -37,4 +35,9 @@ public abstract class Lit_c extends Expr_c implements Lit
         return succs;
     }
 
+    public boolean isConstant() {
+	return true;
+    }
+    
+    public abstract Object constantValue();
 }

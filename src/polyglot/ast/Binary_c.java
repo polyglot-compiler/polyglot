@@ -91,20 +91,25 @@ public class Binary_c extends Expr_c implements Binary
 	Expr right = (Expr) visitChild(this.right, v);
 	return reconstruct(left, right);
     }
-
+    
+    public boolean isConstant() {
+	return left.isConstant() && right.isConstant();
+    }
+    
     public Object constantValue() {
         Object lv = left.constantValue();
         Object rv = right.constantValue();
 
-        // if one of the operands is not constant, return null now.
-        if (lv == null || rv == null) {
-            return null;
-        }
+	if (! isConstant()) {
+	    return null;
+	}
 
         if (op == ADD && (lv instanceof String || rv instanceof String)) {
             // toString() does what we want for String, Number, and Boolean
-            return lv.toString() + rv.toString();
-        }
+	    if (lv == null) lv = "null";
+	    if (rv == null) rv = "null";
+            return lv.toString() + rv.toString();       
+	}
 
         if (op == EQ && (lv instanceof String && rv instanceof String)) {
             return new Boolean(((String) lv).intern() == ((String) rv).intern());
@@ -230,118 +235,6 @@ public class Binary_c extends Expr_c implements Binary
         }
 
         return null;
-    }
-
-    protected Node num(NodeFactory nf, long value) {
-        Position p = position();
-        Type t = type();
-        TypeSystem ts = t.typeSystem();
-
-        // Binary promotion
-        IntLit.Kind kind = IntLit.INT;
-
-        if (left instanceof IntLit && ((IntLit) left).kind() == IntLit.LONG) {
-            kind = IntLit.LONG;
-        }
-
-        if (right instanceof IntLit && ((IntLit) right).kind() == IntLit.LONG) {
-            kind = IntLit.LONG;
-        }
-
-        return nf.IntLit(p, kind, value).type(t);
-    }
-
-    protected Node bool(NodeFactory nf, boolean value) {
-        return nf.BooleanLit(position(), value).type(type());
-    }
-
-    /** Fold constants for the expression. */
-    public Node foldConstants(ConstantFolder cf) {
-      	NodeFactory nf = cf.nodeFactory();
-
-        if (left instanceof NumLit && right instanceof NumLit) {
-	    long l = ((NumLit) left).longValue();
-	    long r = ((NumLit) right).longValue();
-
-	    if (op == ADD) return num(nf, l + r);
-	    if (op == SUB) return num(nf, l - r);
-	    if (op == MUL) return num(nf, l * r);
-	    if (op == DIV && r != 0) return num(nf, l / r);
-	    if (op == MOD && r != 0) return num(nf, l % r);
-	    if (op == BIT_OR) return num(nf, l | r);
-	    if (op == BIT_AND) return num(nf, l & r);
-	    if (op == BIT_XOR) return num(nf, l ^ r);
-	    if (op == SHL) return num(nf, l << r);
-	    if (op == SHR) return num(nf, l >> r);
-	    if (op == USHR) return num(nf, l >>> r);
-	    if (op == GT) return bool(nf, l > r);
-	    if (op == LT) return bool(nf, l < r);
-	    if (op == GE) return bool(nf, l >= r);
-	    if (op == LE) return bool(nf, l <= r);
-	    if (op == NE) return bool(nf, l != r);
-	    if (op == EQ) return bool(nf, l == r);
-	}
-	else if (left instanceof NumLit) {
-	    long l = ((NumLit) left).longValue();
-
-	    if (op == ADD && l == 0L) return right;
-	    if (op == SUB && l == 0L) return right;
-	    if (op == MUL && l == 1L) return right;
-	    if (op == BIT_OR && l == 0L) return right;
-	    if (op == BIT_XOR && l == 0L) return right;
-	}
-	else if (right instanceof NumLit) {
-	    long r = ((NumLit) right).longValue();
-
-	    if (op == ADD && r == 0L) return left;
-	    if (op == SUB && r == 0L) return left;
-	    if (op == MUL && r == 1L) return left;
-	    if (op == DIV && r == 1L) return left;
-	    if (op == MOD && r == 1L) return num(nf, 0);
-	    if (op == BIT_OR && r == 0L) return left;
-	    if (op == BIT_XOR && r == 0L) return left;
-	    if (op == SHL && r == 0L) return left;
-	    if (op == SHR && r == 0L) return left;
-	    if (op == USHR && r == 0L) return left;
-	}
-	else if (left instanceof BooleanLit && right instanceof BooleanLit) {
-	    boolean l = ((BooleanLit) left).value();
-	    boolean r = ((BooleanLit) right).value();
-
-	    if (op == BIT_OR) return nf.BooleanLit(position(), l | r).type(type());
-	    if (op == BIT_AND) return nf.BooleanLit(position(), l & r).type(type());
-	    if (op == BIT_XOR) return nf.BooleanLit(position(), l ^ r).type(type());
-	    if (op == COND_OR) return nf.BooleanLit(position(), l || r).type(type());
-	    if (op == COND_AND) return nf.BooleanLit(position(), l && r).type(type());
-	    if (op == NE) return nf.BooleanLit(position(), l != r).type(type());
-	    if (op == EQ) return nf.BooleanLit(position(), l == r).type(type());
-	}
-	else if (left instanceof BooleanLit) {
-	    boolean l = ((BooleanLit) left).value();
-
-	    // These are safe because the right expression would have been
-	    // short-circuited.  BIT_OR and BIT_AND are not safe here.
-	    if (op == COND_OR && l) return nf.BooleanLit(position(), true).type(type());
-	    if (op == COND_AND && ! l) return nf.BooleanLit(position(), false).type(type());
-
-	    // Here, the non-literal is always evaluated, so this is safe.
-	    if (op == COND_OR && ! l) return right;
-	    if (op == COND_AND && l) return right;
-	    if (op == BIT_OR && ! l) return right;
-	    if (op == BIT_AND && l) return right;
-	}
-	else if (left instanceof StringLit && right instanceof StringLit) {
-	    String l = ((StringLit) left).value();
-	    String r = ((StringLit) right).value();
-
-	    // Don't do this.  Strings literals are usually broken for
-	    // formatting reasons.
-	    /*
-	    if (op == ADD) return nf.StringLit(position(), l + r);
-	    */
-	}
-
-        return this;
     }
 
     /** Type check the expression. */

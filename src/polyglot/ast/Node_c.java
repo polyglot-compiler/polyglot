@@ -287,19 +287,6 @@ public abstract class Node_c implements Node
 	return this;
     }
 
-    /** Fold all constants. */
-    public Node foldConstantsOverride(ConstantFolder cf) {
-	return null;
-    }
-
-    public NodeVisitor foldConstantsEnter(ConstantFolder cf) {
-	return cf;
-    }
-
-    public Node foldConstants(ConstantFolder cf) {
-	return this;
-    }
-
     /** Type check the AST. */
     public Node typeCheckOverride(TypeChecker tc) throws SemanticException {
 	return null;

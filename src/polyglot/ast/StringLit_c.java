@@ -31,11 +31,6 @@ public class StringLit_c extends Lit_c implements StringLit
 	return n;
     }
 
-    /** Get the value of the expression, as an object. */
-    public Object objValue() {
-	return this.value;
-    }
-
     /** Type check the expression. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         return type(tc.typeSystem().String());
@@ -122,12 +117,8 @@ public class StringLit_c extends Lit_c implements StringLit
 
         return result;
     }
-
-    public boolean isConstant() {
-      return true;
-    }
-
+    
     public Object constantValue() {
-      return value;
+	return value;
     }
 }

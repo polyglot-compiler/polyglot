@@ -207,6 +207,10 @@ public class Conditional_c extends Expr_c implements Conditional
 
         return succs;
     }
+    
+    public boolean isConstant() {
+	return cond.isConstant() && consequent.isConstant() && alternative.isConstant();
+    }
 
     public Object constantValue() {
         Object cond_ = cond.constantValue();

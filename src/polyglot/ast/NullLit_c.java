@@ -33,10 +33,6 @@ public class NullLit_c extends Lit_c implements NullLit
 	w.write("null");
     }
 
-    public boolean isConstant() {
-        return true;
-    }
-
     public Object constantValue() {
         return null;
     }

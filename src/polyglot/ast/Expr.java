@@ -26,7 +26,7 @@ public interface Expr extends Receiver, Term
 
     /** Returns the constant value of the expression, if any. */
     Object constantValue();
-
+    
     /**
      * Correctly parenthesize the subexpression <code>expr<code>
      * based on its precedence and the precedence of this expression.

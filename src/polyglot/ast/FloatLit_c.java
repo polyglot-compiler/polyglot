@@ -37,11 +37,6 @@ public class FloatLit_c extends Lit_c implements FloatLit
 	return this.value;
     }
 
-    /** Get the value of the expression, as an object. */
-    public Object objValue() {
-	return new Double(this.value);
-    }
-
     /** Set the value of the expression. */
     public FloatLit value(double value) {
 	FloatLit_c n = (FloatLit_c) copy();
@@ -79,10 +74,6 @@ public class FloatLit_c extends Lit_c implements FloatLit
 	    throw new InternalCompilerError("Unrecognized FloatLit kind " +
 		kind);
 	}
-    }
-
-    public boolean isConstant() {
-      return true;
     }
 
     public Object constantValue() {

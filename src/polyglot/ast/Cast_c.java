@@ -136,10 +136,18 @@ public class Cast_c extends Expr_c implements Cast
 
         return Collections.EMPTY_LIST;
     }
-
+    
+    public boolean isConstant() {
+	return expr.isConstant() && castType.type().isPrimitive();
+    }
+    
     public Object constantValue() {
         Object v = expr.constantValue();
 
+	if (v == null) {
+	    return null;
+	}
+	
         if (v instanceof Boolean) {
             if (castType.type().isBoolean()) return v;
         }

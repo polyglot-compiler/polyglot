@@ -51,7 +51,7 @@ public abstract class Expr_c extends Term_c implements Expr
     }
 
     public boolean isConstant() {
-        return constantValue() != null;
+        return false;
     }
 
     public Object constantValue() {

@@ -176,37 +176,6 @@ public class JL_c extends Ext_c implements JL {
     }
 
     /**
-     * Fold constants in the AST.
-     *
-     * This method is called by the <code>enter()</code> method of the
-     * visitor.  The * method should perform work that should be done
-     * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
-     * invoked.
-     *
-     * @param cf The constant folding visitor.
-     */
-    public NodeVisitor foldConstantsEnter(ConstantFolder cf) {
-	return jl().foldConstantsEnter(cf);
-    }
-
-    /**
-     * Fold constants in the AST.
-     *
-     * This method is called by the <code>leave()</code> method of the
-     * visitor.  The method should perform work that should be done
-     * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
-     * installed as a child of the node's parent.
-     *
-     * @param cf The constant folding visitor.
-     */
-    public Node foldConstants(ConstantFolder cf) {
-	return jl().foldConstants(cf);
-    }
-
-    /**
      * Type check the AST.
      *
      * This method is called by the <code>enter()</code> method of the

@@ -77,10 +77,6 @@ public class IntLit_c extends NumLit_c implements IntLit
 	}
     }
 
-    public boolean isConstant() {
-      return true;
-    }
-
     public Object constantValue() {
 	if (kind() == LONG) {
             return new Long(value);
