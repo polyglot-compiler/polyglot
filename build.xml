@@ -628,16 +628,15 @@ ext=""
     <copy file="doc/Overview.txt" todir="${dist}/doc"/>
     <copy file="doc/ppg.html" todir="${dist}/doc"/>
     <copy file="${lib}/java_cup.jar" todir="${dist}/lib"/>
+    <copy file="${lib}/JFlex.jar" todir="${dist}/lib"/>
     <copy file="build.xml" todir="${dist}"/>
     <copy file="README" todir="${dist}"/>
     <copy file="LICENSE" todir="${dist}"/>
   </target>
 
   <target name="dist-javadoc" depends="jl-dist">
-    <copy file="${lib}/JFlex.jar" todir="${dist}/lib"/>
     <ant inheritAll="false" antfile="${dist}/build.xml" dir="${dist}" target="javadoc"/>
     <ant inheritAll="false" antfile="${dist}/build.xml" dir="${dist}" target="clobber"/>
-    <delete file="${dist}/lib/JFlex.jar"/>
   </target>
 
   <target name="javadoc" depends="jl">
