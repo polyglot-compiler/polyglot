@@ -4,6 +4,7 @@ SUBDIRS =
 
 SOURCES = \
 	AmbiguousExpression.java \
+	AmbiguousNode.java \
 	AmbiguousName.java \
 	AmbiguousNameExpression.java \
 	ArrayIndexExpression.java \

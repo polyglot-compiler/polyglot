@@ -51,6 +51,10 @@ public class SourceJob extends Job
       eq.enqueue( ErrorInfo.IO_ERROR, e.getMessage());
       return;
     }
+    catch (SyntaxException e) {
+      eq.enqueue( ErrorInfo.SYNTAX_ERROR, e.getMessage(), e.getLineNumber());
+      return;
+    }
     catch (Exception e) {
       e.printStackTrace();
       eq.enqueue( ErrorInfo.INTERNAL_ERROR, e.getMessage());

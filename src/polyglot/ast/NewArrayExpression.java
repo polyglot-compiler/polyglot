@@ -175,7 +175,8 @@ public class NewArrayExpression extends Expression
                                    getDimensions());
 
     // Check that the initializer has the correct type.
-    if (! c.getTypeSystem().isAssignableSubtype(init.getCheckedType(), type)) {
+    if (init != null &&
+	! c.getTypeSystem().isAssignableSubtype(init.getCheckedType(), type)) {
       throw new SemanticException("An array initializer must be the same " +
 				  "type as the array declaration",
 				  Annotate.getLineNumber(init));

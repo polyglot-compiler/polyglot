@@ -232,7 +232,8 @@ new SemanticException("Method " + methodName + " not found").printStackTrace(Sys
       throw new InternalCompilerError("Tried to push a null class.");
     if ( c.getSuperType() instanceof AmbiguousType)
       throw new InternalCompilerError("Tried to push a class with an " +
-				      "ambiguous supertype.");
+				      "ambiguous supertype: \"" +
+				      c.getSuperType().getTypeString() + "\".");
 
     ClassScope scope = getClassScope(c);
     scopes.push( scope );

@@ -335,6 +335,10 @@ public class ClassNode extends ClassMember
     throws SemanticException, IOException
   {
     if (isAnonymous) {
+      // If the class is anonymous, the parser created the node assuming
+      // the super type is an interface, not a class.  After cleaning the
+      // super type, if the assumption proves false, correct the mistake.
+
       if (type.getSuperType() != null || type.getInterfaces().size() != 1) {
 	throw new InternalCompilerError("Anonymous classes should be " +
 	  "constructed with a null superclass and one super-interface");
@@ -342,6 +346,15 @@ public class ClassNode extends ClassMember
 
       Type superType = (Type) type.getInterfaces().get(0);
       ClassType superClazz = (ClassType) c.getType(superType);
+
+      //kliger: this block wasn't here before... bug(?)
+      if (! sc.cleanPrerequisiteClass(superClazz)) {
+	throw new SemanticException("Errors while compiling " +
+				    "superclass " +
+				    superClazz.getTypeString() +
+				    " of "+ type.getTypeString() + "." +
+				    Annotate.getLineNumber(this));
+      }
 
       if (! superClazz.getAccessFlags().isInterface()) {
 	type.setSuperType(superClazz);

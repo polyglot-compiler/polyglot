@@ -14,7 +14,7 @@ import java.util.*;
  * The name may represent a <code>TypeNode</code> or an
  * <code>Expression</code>.
  **/
-public class AmbiguousName extends Node {
+public class AmbiguousName extends Node implements AmbiguousNode {
 
   Node prefix;
   String name;

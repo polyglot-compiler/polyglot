@@ -36,14 +36,19 @@ public class MethodExpression extends Expression
    */
   public MethodExpression( Node ext, Node target, String name, List args) 
   {
-    if (target != null && ! (target instanceof AmbiguousName ||
+    if (target != null && ! (target instanceof AmbiguousNode ||
 			     target instanceof TypeNode ||
 			     target instanceof Expression))
-      throw new Error("Target of a method call must be an ambiguous name, a type, or an expression.");
+      throw new Error("Target of a method call must be an ambiguous node, a type, or an expression.");
     this.ext = ext;
     this.target = target;
     this.name = name;
     this.args = TypedList.copyAndCheck( args, Expression.class, true);
+
+    if (! TypeSystem.isNameShort(name)) {
+      throw new InternalCompilerError("Method name \"" + name +
+	  "\" should be short.");
+    }
   }
   
     public MethodExpression( Node target, String name, List args) {
