@@ -76,8 +76,8 @@ public class BranchStatement extends Statement {
 
   public void translate ( Context c, CodeWriter w)
   {
-    w.write ( ( type == BREAK ? " break " : " continue " ) + 
-              ( label == null ? "; " : label + "; " ));
+    w.write ( ( type == BREAK ? "break" : "continue" ) + 
+              ( label == null ? "; " : " " + label + "; " ));
   }
   
   public void dump (Context c, CodeWriter w)

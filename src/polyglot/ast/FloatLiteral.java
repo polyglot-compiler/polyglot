@@ -58,7 +58,7 @@ public class FloatLiteral extends Literal {
 
   public void translate(Context c, CodeWriter w)
   {
-    w.write ( type == FLOAT ? Float.toString( (float)value) : Double.toString( value ));
+    w.write ( type == FLOAT ? Float.toString( (float)value) /* + 'F' */: Double.toString( value ));
   }
 
   public void dump(Context c, CodeWriter w)

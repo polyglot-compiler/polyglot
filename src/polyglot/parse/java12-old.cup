@@ -48,6 +48,18 @@ parser code  {:
       return n;
   }
   
+  public static Node ln(Node n, Number s) {
+        return n;
+  }
+  
+  public static Node ln(Node n, Boolean s) {
+          return n;
+  }
+  
+  public static Node ln(Node n, Character s) {
+          return n;
+  }
+  
   public static TypeNode dim(TypeNode n, int additionalDims) {
     if(additionalDims > 0)
     {
@@ -116,10 +128,14 @@ terminal Token MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ; // assignment_operator
 terminal Token LSHIFTEQ, RSHIFTEQ, URSHIFTEQ; // assignment_operator
 terminal Token ANDEQ, XOREQ, OREQ; // assignment_operator
 
-terminal IntegerLiteral INTEGER_LITERAL;
-terminal jltools.lex.FloatLiteral FLOATING_POINT_LITERAL;
-terminal BooleanLiteral BOOLEAN_LITERAL;
-terminal CharacterLiteral CHARACTER_LITERAL;
+//terminal IntegerLiteral INTEGER_LITERAL;
+terminal Number INTEGER_LITERAL;
+//terminal jltools.lex.FloatLiteral FLOATING_POINT_LITERAL;
+terminal Number FLOATING_POINT_LITERAL;
+//terminal BooleanLiteral BOOLEAN_LITERAL;
+terminal Boolean BOOLEAN_LITERAL;
+//terminal CharacterLiteral CHARACTER_LITERAL;
+terminal Character CHARACTER_LITERAL;
 //terminal jltools.lex.StringLiteral STRING_LITERAL;
 terminal String STRING_LITERAL;
 terminal jltools.lex.NullLiteral NULL_LITERAL;
@@ -264,17 +280,17 @@ literal ::=
 					// jltools.ast.Literal
 		INTEGER_LITERAL:a	
 			{: RESULT = (jltools.ast.Literal)Grm.ln(new IntLiteral(
-					a.getValue().intValue()), a); :}
+					a./* getValue(). */intValue()), a); :} 
 	|	FLOATING_POINT_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(new 
 					jltools.ast.FloatLiteral(
-					a.getValue().floatValue()), a); :}
+					a./* getValue(). */floatValue()), a); :}
 	|	BOOLEAN_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(new IntLiteral(
-					a.getValue().booleanValue()), a); :}
+					a./* getValue(). */booleanValue()), a); :}
 	|	CHARACTER_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(new IntLiteral(
-					a.getValue().charValue()), a); :}
+					a./* getValue(). */charValue()), a); :}
 	|	STRING_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(
 				new jltools.ast.StringLiteral(a/* .getValue() */), a); :}
@@ -1109,12 +1125,12 @@ for_statement_no_short_if ::=
 				new ForStatement(a, b, c, d), n); :}
 	;
 for_init_opt ::=
-					// List of Expression
+					// List of Statement
 	|	for_init:a
 			{: RESULT = a; :}
 	;
 for_init ::=
-					// List of Expression
+					// List of Statement
 		statement_expression_list:a
 			{: RESULT = a; :}
 	|	local_variable_declaration:a
@@ -1122,21 +1138,23 @@ for_init ::=
 				RESULT = l; :}
 	;
 for_update_opt ::=
-					// List of Expression
+					// List of Statement
 	|	for_update:a
 			{: RESULT = a; :}
 	;
 for_update ::=
-					// List of Expression
+					// List of Statement
 		statement_expression_list:a
 			{: RESULT = a; :}
 	;
 statement_expression_list ::=
-					// List of Expression
+					// List of Statement
 		statement_expression:a
-			{: List l = new LinkedList(); l.add(a); RESULT = l; :}				
+			{: List l = new LinkedList(); l.add(Grm.ln(
+			new ExpressionStatement(a), a)); RESULT = l; :}				
 	|	statement_expression_list:a COMMA statement_expression:b
-			{: RESULT = a; a.add(b); :}
+			{: RESULT = a; a.add(Grm.ln(new ExpressionStatement(
+			b), b)); :}
 	;
 
 identifier_opt ::=
@@ -1153,7 +1171,8 @@ break_statement ::=
 			{: RESULT = (BranchStatement)Grm.ln(
 				new BranchStatement(
 				BranchStatement.BREAK, 
-				a.getName()), a); :}
+				(a == null ? null : a.getName())), a); :}
+				// FIXME
 	;
 
 continue_statement ::=
@@ -1162,7 +1181,8 @@ continue_statement ::=
 			{: RESULT = (BranchStatement)Grm.ln(
 				new BranchStatement(
 				BranchStatement.CONTINUE,
-				a.getName()), a); :}
+				(a == null ? null : a.getName())), a); :}
+				// FIXME
 
 	;
 return_statement ::=

@@ -175,13 +175,14 @@ public class VariableDeclarationStatement extends Statement {
    {
       w.write( modifiers.getStringRepresentation());
       type.translate(c, w);
+      w.write(" ");
       ListIterator it = variables.listIterator();
       while (it.hasNext())
       {
          Declarator pair = (Declarator)it.next();
          if (pair.initializer != null)
          {
-            w.write(pair.name + "= ");
+            w.write(pair.name + " = ");
             pair.initializer.translate(c, w);
          }
          else
@@ -189,7 +190,7 @@ public class VariableDeclarationStatement extends Statement {
          if (it.hasNext())
             w.write(", ");
       }
-      w.write(";");
+      w.write("; ");
 
    }
 

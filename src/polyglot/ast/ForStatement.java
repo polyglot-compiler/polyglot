@@ -31,12 +31,46 @@ public class ForStatement extends Statement {
 		      Expression condition,
 		      List incrementors,
 		      Statement body) {
-    TypedList.check(initializers, Expression.class);
-    TypedList.check(incrementors, Expression.class);
-    this.initializers = new ArrayList(initializers);
+    
+    Iterator i = initializers.iterator();
+    if(initializers.size() == 1)
+    {
+      Object o = i.next();
+      if(o instanceof VariableDeclarationStatement)
+      {
+        this.initializer = (VariableDeclarationStatement)o;
+        this.hasSingleInitializer = true;
+      }
+      else
+      {
+        TypedList.check(initializers, Statement.class);
+        this.initializers = new ArrayList(initializers);
+        this.hasSingleInitializer = false;
+      }
+    }
+    else
+    {
+      TypedList.check(initializers, Statement.class);
+      this.initializers = new ArrayList(initializers);
+      this.hasSingleInitializer = false;
+    }
+
+    TypedList.check(incrementors, Statement.class);    
     this.condition = condition;
     this.body = body;
     this.incrementors = new ArrayList(incrementors);
+  }
+  
+  public ForStatement(Statement initializer,
+            Expression condition,
+            List incrementors,
+            Statement body) {
+      TypedList.check(incrementors, Statement.class);
+      this.initializer = initializer;
+      this.hasSingleInitializer = true;
+      this.condition = condition;
+      this.body = body;
+      this.incrementors = new ArrayList(incrementors);
   }
 
   /**
@@ -68,42 +102,72 @@ public class ForStatement extends Statement {
   }
 
   public TypedList getInitializers() {
-      return new TypedList(initializers, Expression.class, false);
+    if(hasSingleInitializer) {
+      TypedList l = new TypedList(null, Statement.class, false);
+      l.add(initializer);
+      return l;
+    }
+    else
+      return new TypedList(initializers, Statement.class, false);
   }
 
   /**
    * Returns a TypedList for the incremenetors of <this>, which only
-   * accepts Expressions as members.
+   * accepts Statement as members.
    **/
   public TypedList getIncrementors() {
-    return new TypedList(incrementors, Expression.class, false);
+    return new TypedList(incrementors, Statement.class, false);
   }
 
 
   public void translate(Context c, CodeWriter w)
   {
     w.write ( " for ( " );
-    for ( ListIterator iter = initializers.listIterator(); iter.hasNext(); )
+    if(hasSingleInitializer)
     {
-      ((Expression)iter.next()).translate(c, w);
-      if (iter.hasNext())
-        w.write (", " );
+      initializer.translate(c, w);  
+    }
+    else
+    {
+      for ( ListIterator iter = initializers.listIterator(); iter.hasNext(); )
+      {
+        Statement next = (Statement)iter.next();
+        if(next instanceof ExpressionStatement)
+          ((ExpressionStatement)next).getExpression().translate(c, w);      
+        else
+          next.translate(c, w);
+          
+        if (iter.hasNext())
+          w.write (", " );
+      }
+      w.write ("; " ); 
     }
     // don't have to write a semicolon because initializer is a statemnt
     // except it is, so we do have to.
-    w.write (" ; " ); 
+    
     condition.translate(c, w);
-    w.write (" ; " ); // condition is a expr, so write semicolon.
+    w.write ("; " ); // condition is a expr, so write semicolon.
     for ( ListIterator iter = incrementors.listIterator(); iter.hasNext(); )
     {
-      ((Expression)iter.next()).translate(c, w);
+      Statement next = (Statement)iter.next();
+      if(next instanceof ExpressionStatement)
+        ((ExpressionStatement)next).getExpression().translate(c, w);      
+      else
+        next.translate(c, w);
+        
       if (iter.hasNext())
         w.write (", " );
     }
     w.write ( " ) " );
-    w.beginBlock();
-    body.translate(c, w);
-    w.endBlock();
+    
+    if(!(body instanceof BlockStatement))
+    {
+      w.beginBlock();
+      body.translate(c, w);
+      w.endBlock();
+    }
+    else
+      body.translate(c, w);
   }
 
   public void dump(Context c, CodeWriter w)
@@ -111,12 +175,12 @@ public class ForStatement extends Statement {
     w.write (" ( FOR " );
     for (ListIterator iter = initializers.listIterator(); iter.hasNext(); )
     {
-      ((Expression)iter.next()).dump(c, w);
+      ((Statement)iter.next()).dump(c, w);
     }    
     condition.dump(c, w);
     for (ListIterator iter = incrementors.listIterator(); iter.hasNext(); )
     {
-      ((Expression)iter.next()).dump(c, w);
+      ((Statement)iter.next()).dump(c, w);
     }
     w.beginBlock();
     body.dump(c, w);
@@ -174,10 +238,13 @@ public class ForStatement extends Statement {
     return fs;
   }
   
-  // RI: every member is an Expression.
+  // RI: every member is a Statement.
   private List initializers;
+  private Statement initializer;
+  private boolean hasSingleInitializer;
+  
   private Expression condition;
-  // RI: every member is an Expression.
+  // RI: every member is a Statement.
   private List incrementors;
   private Statement body;
 }

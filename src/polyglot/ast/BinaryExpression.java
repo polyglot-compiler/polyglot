@@ -238,6 +238,10 @@ public class BinaryExpression extends Expression {
          return ">>=";
       case RUSHIFTASSIGN:
          return ">>>=";
+      case PLUS:
+         return "+";
+      case MINUS:
+         return "-";      
       default:
          return "???";
 	}

@@ -91,12 +91,15 @@ public class SpecialExpression extends Expression {
 
    public void translate(Context c, CodeWriter w)
    {
-     w.write(type.getType().getTypeString() + 
-             ( kind == SUPER ? ".super" : ".this") );
+     if(type != null) {
+       w.write(type.getType().getTypeString() + ".");
+     }
+     w.write((kind == SUPER ? "super" : "this"));
    }
 
    public void dump(Context c, CodeWriter w)
    {
+     // FIXME
      w.write( " ( (" + type.getType().getTypeString() + " ) ( " + 
               (kind == SUPER ? "SUPER" : "THIS" ) + ") )");
      

@@ -126,9 +126,13 @@ public class IntLiteral extends Literal {
     {
       w.write( (value != 0 ? "true" : "false")  );
     }
-    else
+    else if(type == LONG)
     {
-      w.write( Long.toString( value ) );
+      w.write( Long.toString( value ) /* + 'L' */);
+    }
+    else 
+    {
+      w.write( Long.toString( value ));
     }
   }
 

@@ -91,9 +91,16 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
   public void translate ( Context c, CodeWriter w)
   {
     // FIXME: Shouldn't get in here.
-    w.write ("< AMBIGOUS NAME: ");
-    dump(c, w);
-    w.write ( "> ");
+    //w.write ("< AMBIGOUS NAME: ");
+    //dump(c, w);
+    //w.write ( "> ");
+    
+    for (Iterator i = names.listIterator(); i.hasNext(); )
+    {
+      w.write ((String)i.next());
+      if(i.hasNext())
+        w.write(".");
+    }
   }
 
   public void dump (Context c, CodeWriter w)
