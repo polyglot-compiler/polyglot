@@ -202,8 +202,21 @@ public class TypeSystem_c implements TypeSystem
     public ConstructorInstance defaultConstructor(Position pos,
                                                   ClassType container) {
         assert_(container);
+        
+        // access for the default constructor is determined by the 
+        // access of the containing class. See the JLS, 2nd Ed., 8.8.7.
+        Flags access = Flags.NONE;
+        if (container.flags().isPrivate()) {
+            access = access.Private();
+        }
+        if (container.flags().isProtected()) {
+            access = access.Protected();            
+        }
+        if (container.flags().isPublic()) {
+            access = access.Public();            
+        }
         return constructorInstance(pos, container,
-                                   Public(), Collections.EMPTY_LIST,
+                                   access, Collections.EMPTY_LIST,
                                    Collections.EMPTY_LIST);
     }
 
@@ -921,7 +934,7 @@ public class TypeSystem_c implements TypeSystem
         assert_(container);
         assert_(argTypes);
 
-	List acceptable = new ArrayList();
+        List acceptable = new ArrayList();
 
 	Set visitedTypes = new HashSet();
 
@@ -958,12 +971,12 @@ public class TypeSystem_c implements TypeSystem
 		    isAccessible(mi, currClass)) {
 
 		    if (Report.should_report(Report.types, 3))
-			Report.report(3, "->acceptable: " + mi +
-                                      " in " + mi.container());
+	                    Report.report(3, "->acceptable: " + mi +
+	                                      " in " + mi.container());
 
-		    acceptable.add(mi);
-		}
-	    }
+			acceptable.add(mi);
+		    }
+                        }
 
 	    if (type.toReference().superType() != null) {
 		typeQueue.addLast(type.toReference().superType());
@@ -971,7 +984,7 @@ public class TypeSystem_c implements TypeSystem
 
 	    typeQueue.addAll(type.toReference().interfaces());
 	}
-
+    
 	return acceptable;
     }
 
