@@ -78,7 +78,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 		"Subscript can only follow an array type.", position());
 	}
 
-	if (! index.type().isImplicitCastValid(ts.Int())) {
+	if (! ts.isImplicitCastValid(index.type(), ts.Int())) {
 	    throw new SemanticException(
 		"Array subscript must be an integer.", position());
 	}

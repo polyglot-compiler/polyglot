@@ -97,8 +97,8 @@ public class Assign_c extends Expr_c implements Assign
     }
 
     if (op == ASSIGN) {
-      if (! s.isAssignableSubtype(t) &&
-          ! s.isSame(t) &&
+      if (! ts.isImplicitCastValid(s, t) &&
+          ! ts.isSame(s, t) &&
           ! intConversion) {
 
         throw new SemanticException("Cannot assign " + s + " to " + t + ".",
@@ -109,7 +109,7 @@ public class Assign_c extends Expr_c implements Assign
     }
 
     if (op == ADD_ASSIGN) {
-      if (t.isSame(ts.String()) || s.isSame(ts.String())) {
+      if (ts.isSame(t, ts.String()) || ts.isSame(s, ts.String())) {
         return type(ts.String());
       }
     }

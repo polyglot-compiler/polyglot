@@ -102,7 +102,7 @@ public class Unary_c extends Expr_c implements Unary
 	}
 
 	if (op == BIT_NOT) {
-	    if (! expr.type().isImplicitCastValid(ts.Long())) {
+	    if (! ts.isImplicitCastValid(expr.type(), ts.Long())) {
 		throw new SemanticException("Operand of " + op +
 		    " operator must be numeric.", expr.position());
 	    }

@@ -54,7 +54,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 	    ProcedureInstance i = (ProcedureInstance) o;
 	    // FIXME: Check excTypes too?
 	    return flags.equals(i.flags())
-	        && container.isSame(i.container())
+	        && ts.isSame(container, i.container())
 	        && ts.hasSameArguments(this, i);
 	}
 
@@ -85,5 +85,70 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 	}
 
 	return true;
+    }
+
+    /** Returns true iff <this> has the same arguments as <p> */
+    public boolean hasSameArguments(ProcedureInstance p) {
+        return hasArguments(p.argumentTypes());
+    }
+
+    public boolean hasArguments(List argTypes) {
+        List l1 = this.argumentTypes();
+        List l2 = argTypes;
+
+        Iterator i1 = l1.iterator();
+        Iterator i2 = l2.iterator();
+
+        while (i1.hasNext() && i2.hasNext()) {
+            Type t1 = (Type) i1.next();
+            Type t2 = (Type) i2.next();
+
+            if (! ts.isSame(t1, t2)) {
+                return false;
+            }
+        }
+
+        return ! (i1.hasNext() || i2.hasNext());
+    }
+
+    /** Returns true iff <this> throws fewer exceptions than <p>. */
+    public boolean throwsSubset(TypeSystem ts, ProcedureInstance p) {
+        SubtypeSet s1 = new SubtypeSet(ts);
+        SubtypeSet s2 = new SubtypeSet(ts);
+
+        s1.addAll(this.exceptionTypes());
+        s2.addAll(p.exceptionTypes());
+
+        for (Iterator i = s1.iterator(); i.hasNext(); ) {
+            Type t = (Type) i.next();
+            if (! ts.isUncheckedException(t) && ! s2.contains(t)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean callValid(TypeSystem ts, ProcedureInstance call) {
+        return ts.callValid(this, call.argumentTypes());
+    }
+
+    public boolean callValid(TypeSystem ts, List argTypes) {
+        List l1 = this.argumentTypes();
+        List l2 = argTypes;
+
+        Iterator i1 = l1.iterator();
+        Iterator i2 = l2.iterator();
+
+        while (i1.hasNext() && i2.hasNext()) {
+            Type t1 = (Type) i1.next();
+            Type t2 = (Type) i2.next();
+
+            if (! ts.isImplicitCastValid(t2, t1)) {
+                return false;
+            }
+        }
+
+        return ! (i1.hasNext() || i2.hasNext());
     }
 }

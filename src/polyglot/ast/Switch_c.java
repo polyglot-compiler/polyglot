@@ -72,7 +72,7 @@ public class Switch_c extends Stmt_c implements Switch
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-        if (! expr.type().isImplicitCastValid(ts.Int())) {
+        if (! ts.isImplicitCastValid(expr.type(), ts.Int())) {
             throw new SemanticException("Switch index must be an integer.",
                                         position());
         }

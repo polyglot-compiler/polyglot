@@ -69,7 +69,7 @@ public class Do_c extends Stmt_c implements Do
     {
         TypeSystem ts = tc.typeSystem();
 
-        if (! cond.type().isSame(ts.Boolean())) {
+        if (! ts.isSame(cond.type(), ts.Boolean())) {
 	    throw new SemanticException(
 		"Condition of do statement must have boolean type.",
 		cond.position());

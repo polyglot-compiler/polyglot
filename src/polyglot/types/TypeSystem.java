@@ -89,13 +89,6 @@ public interface TypeSystem {
     boolean descendsFrom(Type child, Type ancestor);
 
     /**
-     * Returns true iff child and ancestor are non-primitive types, and a
-     * variable of type child may be legally assigned to a variable of type
-     * ancestor.
-     */
-    boolean isAssignableSubtype(Type child, Type ancestor);
-
-    /**
      * Requires: all type arguments are canonical.
      *
      * Returns true iff a cast from fromType to toType is valid; in other
@@ -336,6 +329,14 @@ public interface TypeSystem {
     String translateMemberClass(Resolver c, MemberClassType t);
     String translateLocalClass(Resolver c, LocalClassType t);
     String wrapperTypeString(PrimitiveType t);
+
+    boolean methodCallValid(MethodInstance prototype, MethodInstance call);
+    boolean methodCallValid(MethodInstance prototype, String name, List argTypes);
+    boolean callValid(ProcedureInstance prototype, ProcedureInstance call);
+    boolean callValid(ProcedureInstance prototype, List argTypes);
+
+    List overrides(MethodInstance mi);
+    boolean canOverride(MethodInstance mi, MethodInstance mj);
 
     PrimitiveType primitiveForName(String name) throws SemanticException;
 

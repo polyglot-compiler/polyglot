@@ -68,7 +68,7 @@ public class While_c extends Stmt_c implements While
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 	
-	if (! cond.type().isSame(ts.Boolean())) {
+	if (! ts.isSame(cond.type(), ts.Boolean())) {
 	    throw new SemanticException(
 		"Condition of while statement must have boolean type.",
 		cond.position());

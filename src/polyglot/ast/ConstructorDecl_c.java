@@ -260,14 +260,14 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 		    TypeNode tn = (TypeNode) j.next();
 		    Type tj = tn.type();
 
-		    if (ts.isSame(t, tj) || ts.descendsFrom(t, tj)) {
+		    if (ts.isSubtype(t, tj)) {
 			throwDeclared = true;
 			break;
 		    }
 		}
 
 		if (! throwDeclared) {
-			ec.throwsSet().clear();
+                    ec.throwsSet().clear();
 		    throw new SemanticException("Constructor \"" + name +
 			"\" throws the undeclared exception \"" + t + "\".",
 		        position());

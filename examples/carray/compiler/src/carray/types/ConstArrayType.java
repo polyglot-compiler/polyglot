@@ -7,4 +7,5 @@ import polyglot.types.*;
  */
 public interface ConstArrayType extends ArrayType
 {
+    boolean isConst();
 }

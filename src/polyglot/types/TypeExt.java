@@ -10,4 +10,6 @@ public interface TypeExt extends Copy, Serializable
 {
     TypeObject base();
     void init(TypeObject base);
+
+    TypeExt restore() throws SemanticException;
 }

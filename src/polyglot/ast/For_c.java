@@ -106,7 +106,7 @@ public class For_c extends Stmt_c implements For
 	TypeSystem ts = tc.typeSystem();
 
 	if (cond != null &&
-	    ! cond.type().isImplicitCastValid(ts.Boolean())) {
+	    ! ts.isImplicitCastValid(cond.type(), ts.Boolean())) {
 	    throw new SemanticException(
 		"The condition of a for statement must have boolean type.",
 		cond.position());

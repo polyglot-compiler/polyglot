@@ -18,12 +18,14 @@ import polyglot.types.*;
 public class SubtypeSet implements java.util.Set
 {
     Vector v; 
+    TypeSystem ts;
 
     /**
      * Creates an empty SubtypeSet
      */
-    public SubtypeSet() {
+    public SubtypeSet(TypeSystem ts) {
 	v = new Vector();
+        this.ts = ts;
     }
 
     /**
@@ -47,11 +49,11 @@ public class SubtypeSet implements java.util.Set
 		for (Iterator i = v.iterator(); i.hasNext(); ) {
 		    Type t = (Type) i.next();
 
-		    if (t.descendsFrom(type)) {
+		    if (ts.descendsFrom(t, type)) {
 			i.remove();
 		    }
 
-		    if (type.isSubtype(t)) {
+		    if (ts.isSubtype(type, t)) {
 			haveToAdd = false;
 			break;
 		    }
@@ -104,7 +106,7 @@ public class SubtypeSet implements java.util.Set
 	    
 	    for (Iterator i = v.iterator(); i.hasNext(); ) {
 		Type t = (Type) i.next();
-		if (type.isSubtype(t)) {
+		if (ts.isSubtype(type, t)) {
 		    return true;
 		}
 	    }
@@ -148,7 +150,7 @@ public class SubtypeSet implements java.util.Set
 	for (Iterator i = v.iterator(); i.hasNext(); ) {
 	    Type t = (Type) i.next();
 
-	    if (t.isSubtype(type)) {
+	    if (ts.isSubtype(t, type)) {
 		removed = true;
 		i.remove(); 
 	    }

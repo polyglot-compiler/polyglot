@@ -209,7 +209,7 @@ public class New_c extends Expr_c implements New
                 try {
                     ClassType mt = ts.findMemberClass(t, name, c);
 
-                    if (mt.isSame(ct)) {
+                    if (ts.isSame(mt, ct)) {
                         outer = t;
                         break;
                     }

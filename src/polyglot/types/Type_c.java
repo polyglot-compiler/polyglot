@@ -53,14 +53,14 @@ public abstract class Type_c extends TypeObject_c implements Type
     public boolean isClass() { return false; }
     public boolean isArray() { return false; }
 
-    public final boolean isThrowable() {
-	return ts.isThrowable(this); 
-    }
-    
-    public final boolean isUncheckedException() {
-	return ts.isUncheckedException(this); 
+    public boolean isThrowable() {
+	return false;
     }
 
+    public boolean isUncheckedException() {
+	return false;
+    }
+    
     // Required for 
     /** Returns a non-null iff isClass() returns true. */
     public ClassType toClass() {
@@ -95,33 +95,40 @@ public abstract class Type_c extends TypeObject_c implements Type
 	return ts.arrayOf(this);
     }  
     
-    public final boolean isSubtype(Type t) {
-	return ts.isSubtype(this, t); 
+    public boolean isSubtype(TypeSystem ts, Type t) {
+	return ts.isSame(this, t) || ts.descendsFrom(this, t);
     }
     
-    public final boolean isSame(Type t) {
-	return ts.isSame(this, t); 
+    public boolean descendsFrom(TypeSystem ts, Type t) {
+        return false;
+    }
+
+    public boolean isSame(TypeSystem ts, Type t) {
+        return equals(t);
     }
     
-    public final boolean descendsFrom(Type ancestor) { 
-	return ts.descendsFrom(this, ancestor); 
+    public boolean isCastValid(TypeSystem ts, Type toType) {
+	return false;
     }
     
-    public final boolean isAssignableSubtype(Type ancestor) {
-	return ts.isAssignableSubtype(this, ancestor); 
+    public boolean isImplicitCastValid(TypeSystem ts, Type toType) {
+        return false;
+    }
+
+    public boolean numericConversionValid(TypeSystem ts, long value) {
+        return false;
     }
     
-    public final boolean isCastValid(Type toType) {
-	return ts.isCastValid(this, toType); 
-    }
-    
-    public final boolean isImplicitCastValid(Type toType) {
-	return ts.isImplicitCastValid(this, toType); 
-    }
-    
-    public final boolean isComparable(Type t) {
+    public boolean isComparable(Type t) {
 	return t.typeSystem() == ts;
     }
 
     public abstract String toString();
+
+    public final void isSubtype(Type t) { }
+    public final void descendsFrom(Type t) { }
+    public final void isSame(Type t) { }
+    public final void isCastValid(Type toType) { }
+    public final void isImplicitCastValid(Type toType) { }
+    public final void numericConversionValid(long value) { }
 }

@@ -11,22 +11,56 @@ import java.util.*;
  */
 public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
 {
+    protected boolean isConst;
 
     /** Used for deserializing types. */
     protected ConstArrayType_c() { }
 
-    public ConstArrayType_c(TypeSystem ts, Position pos, Type base) {
+    public ConstArrayType_c(TypeSystem ts, Position pos, Type base, boolean isConst) {
         super(ts, pos, base);
+        this.isConst = isConst;
     }
 
     public String toString() {
-        return base.toString() + " const []";
+        return base.toString() + (isConst ? " const" : "") + "[]";
     }
 
     public boolean equals(Object o) {
         if (o instanceof ConstArrayType) {
             ConstArrayType t = (ConstArrayType) o;
-            return base.isSame(t.base());
+            return t.isConst() == isConst && ts.isSame(base, t.base());
+        }
+
+        if (o instanceof ArrayType) {
+            ArrayType t = (ArrayType) o;
+            return ! isConst && ts.isSame(base, t.base());
+        }
+
+        return false;
+    }
+
+    public boolean isConst() {
+        return isConst;
+    }
+
+    public boolean isImplicitCastValid(TypeSystem ts, Type toType) {
+        if (toType instanceof ConstArrayType &&
+            ((ConstArrayType) toType).isConst()) {
+            // int const[] = int[] 
+            return super.isImplicitCastValid(ts, toType);
+        }
+
+        // From this point, toType is not a const array
+
+        if (! isConst) {
+            if (toType.isArray()) {
+                // non-const arrays are invariant.
+                return ts.isSame(this, toType);
+            }
+            else {
+                // Object = int[] 
+                return super.isImplicitCastValid(ts, toType);
+            }
         }
 
         return false;

@@ -87,7 +87,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 
     /** Translate the type. */
     public String translate(Resolver c) {
-	return ts.translateArray(c, this);
+        return base().translate(c) + "[]"; 
     }
 
     /** Returns true iff the type is canonical. */
@@ -141,7 +141,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
     public boolean equals(Object o) {
         if (o instanceof ArrayType) {
 	    ArrayType t = (ArrayType) o;
-	    return base.isSame(t.base());
+	    return ts.isSame(base, t.base());
 	}
 
 	return false;
@@ -156,5 +156,45 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	}
 
 	return this;
+    }
+
+    public boolean isImplicitCastValid(TypeSystem ts, Type toType) {
+        if (toType.isArray()) {
+            return ts.isImplicitCastValid(base(), toType.toArray().base());
+        }
+
+        // toType is not an array, but this is.  Check if the array
+        // is a subtype of the toType.  This happens when toType
+        // is java.lang.Object.
+        return ts.isSubtype(this, toType);
+    }
+
+    /**
+     * Requires: all type arguments are canonical.  ToType is not a NullType.
+     *
+     * Returns true iff a cast from this to toType is valid; in other
+     * words, some non-null members of this are also members of toType.
+     **/
+    public boolean isCastValid(TypeSystem ts, Type toType) {
+        if (! toType.isReference()) return false;
+
+	if (toType.isArray()) {
+	    Type fromBase = base();
+	    Type toBase = toType.toArray().base();
+
+	    if (fromBase.isPrimitive()) return ts.isSame(toBase, fromBase);
+	    if (toBase.isPrimitive()) return false;
+
+	    if (fromBase.isNull()) return false;
+	    if (toBase.isNull()) return false;
+
+	    // Both are reference types.
+	    return ts.isCastValid(fromBase, toBase);
+	}
+
+        // Ancestor is not an array, but child is.  Check if the array
+        // is a subtype of the ancestor.  This happens when ancestor
+        // is java.lang.Object.
+        return ts.isSubtype(this, toType);
     }
 }

@@ -28,5 +28,5 @@ public interface PrimitiveType extends NamedType
 
     Kind kind();
 
-    String wrapperTypeString();
+    String wrapperTypeString(TypeSystem ts);
 }

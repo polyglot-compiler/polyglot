@@ -4,12 +4,20 @@ Polyglot 0.9
 When reading this file you have already downloaded and unpacked the Polyglot
 Distribution. Your installation directory contains the following sub-folders:
 
-  - src: the complete source code of Polyglot 0.9
-  - lib: the Polyglot library files and the "CUP Parser Generator for Java"
-    library (a Copyright notice for CUP can be found at the end of this document)
-  - doc: the documentations about writing Polyglot extensions
+  - polyglot: the complete source code of Polyglot 0.9
+  - doc: old documentation about writing Polyglot extensions
+  - javadoc: Javadoc descriptions of Polyglot classes
   - demo: Jif sample programs
   - images: Logos
+
+Disclaimer
+----------
+
+Polglot is ALPHA software.  Some of the interfaces in the framework may change.
+This may require some extensions to be changed to conform to the new
+interfaces.  Also, Polyglot is not well-documented; in particular, some of the
+javadoc is missing or out-of-date.  We are working on writing better
+documentation.  Watch the web page for further updates.
 
 Installation Instructions
 --------------------------

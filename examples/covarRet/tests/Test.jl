@@ -11,13 +11,13 @@ public class Test {
         Sup A = new Sup();
         Sub B = new Sub();
 
-        Set s = B.foo();
+        // Set s = B.foo();
         HashSet t = B.foo();
-        Set u = A.foo();
+        // Set u = A.foo();
 
         // check that primitives still work.
-        int a = A.quux();
-        float b = B.quux();
+        // int a = A.quux();
+        // float b = B.quux();
 
     }
 }

@@ -41,7 +41,11 @@ public class Package_c extends TypeObject_c implements Package
     }
     
     public String translate(Resolver c) {
-	return ts.translatePackage(c, this);
+        if (prefix() == null) {
+              return name();
+        }
+
+        return prefix().translate(c) + "." + name();
     }
 
     public String fullName() {

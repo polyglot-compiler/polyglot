@@ -193,84 +193,10 @@ public class ClassBody_c extends Node_c implements ClassBody
         return ts.isSameMethod(mi, mj);
     }
 
-    protected void overrideMethodCheck(TypeChecker tc) throws SemanticException {
-        ClassType type = tc.context().currentClass();
-        TypeSystem ts = tc.typeSystem();
-
-        for (Iterator i = type.methods().iterator(); i.hasNext(); ) {
-            MethodInstance mi = (MethodInstance) i.next();
-
-            Type t = type.superType();
-
-            while (t instanceof ReferenceType) {
-                ReferenceType rt = (ReferenceType) t;
-                t = rt.superType();
-
-                for (Iterator j = rt.methods().iterator(); j.hasNext(); ) {
-                    MethodInstance mj = (MethodInstance) j.next();
-
-                    if (! mi.name().equals(mj.name()) ||
-                        ! ts.hasSameArguments(mi, mj) ||
-                        ! ts.isAccessible(mj, tc.context())) {
-
-                        continue;
-                    }
-
-                    if (! ts.isSame(mi.returnType(), mj.returnType())) {
-                        throw new SemanticException("Cannot override " + mj + " in " + rt + " with " + mi + " in " + type + "; overridden method returns " + mi.returnType() + " not " + mj.returnType() + ".", mi.position());
-                    }
-
-                    if (! ts.throwsSubset(mi, mj)) {
-                        throw new SemanticException("Cannot override " + mj + " in " + rt + " with " + mi + " in " + type + "; throws more exceptions than overridden method.", mi.position());
-                    }
-
-                    if (mi.flags().moreRestrictiveThan(mj.flags())) {
-                        throw new SemanticException("Cannot override " + mj + " in " + rt + " with " + mi + " in " + type + "; overridden method is more restrictive.", mi.position());
-                    }
-
-                    if (! mi.flags().isStatic() && mj.flags().isStatic()) {
-                        throw new SemanticException("Cannot override " + mj + " in " + rt + " with " + mi + " in " + type + "; overridden method is static.", mi.position());
-                    }
-
-                    if (mj.flags().isFinal()) {
-                        throw new SemanticException("Cannot override " + mj + " in " + rt + " with " + mi + " in " + type + "; overridden method is final.", mi.position());
-                    }
-                }
-            }
-        }
-    }
-
-    protected void abstractMethodCheck(TypeChecker tc) throws SemanticException {
-        ClassType type = tc.context().currentClass();
-        TypeSystem ts = tc.typeSystem();
-
-        // FIXME: check that we implement methods of interfaces and abstract
-        // superclasses.
-        if (type.flags().isAbstract() || type.flags().isInterface()) {
-            return;
-        }
-
-        // Check for abstract methods.
-        for (Iterator i = type.methods().iterator(); i.hasNext(); ) {
-            MethodInstance mi = (MethodInstance) i.next();
-
-            if (mi.flags().isAbstract()) {
-                // Clear all flags for the error message.
-                MethodInstance x = mi.flags(mi.flags().clear());
-                throw new SemanticException("Class \"" + type +
-                                            "\" should be declared abstract; " +
-                                            "it does not implement " + x + ".",
-                                            type.position());
-            }
-        }
-    }
-
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         duplicateFieldCheck(tc);
         duplicateConstructorCheck(tc);
         duplicateMethodCheck(tc);
-        overrideMethodCheck(tc);
-        abstractMethodCheck(tc);
 
         return this;
     }

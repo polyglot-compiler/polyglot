@@ -78,7 +78,7 @@ public class MethodInstance_c extends ProcedureInstance_c
     public boolean equals(Object o) {
         if (o instanceof MethodInstance) {
 	    MethodInstance i = (MethodInstance) o;
-	    return returnType.isSame(i.returnType())
+	    return ts.isSame(returnType, i.returnType())
 	        && name.equals(i.name())
 		&& super.equals(i);
 	}
@@ -87,19 +87,8 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     public String toString() {
-	String s = "method " + flags.translate() + returnType +
-	    " " + name + "(";
-
-	for (Iterator i = argTypes.iterator(); i.hasNext(); ) {
-	    Type t = (Type) i.next();
-	    s += t.toString();
-
-	    if (i.hasNext()) {
-	        s += ", ";
-	    }
-	}
-
-	s += ")";
+	String s = designator() + flags.translate() + returnType + " " +
+                   signature();
 
 	if (! excTypes.isEmpty()) {
 	    s += " throws ";
@@ -118,20 +107,20 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     public String signature() {
-		String s = name + "(";
+        String s = name + "(";
 
-		for (Iterator i = argTypes.iterator(); i.hasNext(); ) {
-		    Type t = (Type) i.next();
-		    s += t.toString();
+        for (Iterator i = argTypes.iterator(); i.hasNext(); ) {
+            Type t = (Type) i.next();
+            s += t.toString();
 
-		    if (i.hasNext()) {
-		        s += ",";
-		    }
-		}
+            if (i.hasNext()) {
+                s += ",";
+            }
+        }
 
-		s += ")";
+        s += ")";
 
-		return s;
+        return s;
     }
 
     public String designator() {
@@ -155,10 +144,67 @@ public class MethodInstance_c extends ProcedureInstance_c
 	return mi;
     }
 
+    /** Returns true iff <this> is the same method as <m> */
+    public boolean isSameMethod(TypeSystem ts, MethodInstance m) {
+        return this.name().equals(m.name()) && ts.hasSameArguments(this, m);
+    }
+
+    public List overrides(TypeSystem ts) {
+        List l = new LinkedList();
+
+        Type t = container().superType();
+
+        while (t instanceof ReferenceType) {
+            ReferenceType rt = (ReferenceType) t;
+            t = rt.superType();
+
+            for (Iterator i = rt.methods(name, argTypes).iterator(); i.hasNext(); ) {
+                MethodInstance mi = (MethodInstance) i.next();
+                l.add(mi);
+            }
+        }
+
+        return l;
+    }
+
     public boolean isCanonical() {
 	return container.isCanonical()
 	    && returnType.isCanonical()
 	    && listIsCanonical(argTypes)
 	    && listIsCanonical(excTypes);
+    }
+
+    public boolean methodCallValid(TypeSystem ts, MethodInstance call) {
+        return name().equals(call.name()) && ts.callValid(this, call);
+    }
+
+    public boolean methodCallValid(TypeSystem ts, String name, List argTypes) {
+        return name().equals(name) && ts.callValid(this, argTypes);
+    }
+
+    public boolean canOverride(TypeSystem ts, MethodInstance mj) {
+        MethodInstance mi = this;
+
+        if (! ts.isSame(mi.returnType(), mj.returnType())) {
+            return false;
+        } 
+
+        if (! ts.throwsSubset(mi, mj)) {
+            return false;
+        }   
+
+        if (mi.flags().moreRestrictiveThan(mj.flags())) {
+            return false;
+        }
+
+        if (! mi.flags().isStatic() && mj.flags().isStatic()) {
+            return false;
+        }
+
+        if (mj.flags().isFinal()) {
+            return false;
+        }
+
+        return true;
     }
 }

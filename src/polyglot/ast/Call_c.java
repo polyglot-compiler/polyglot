@@ -215,11 +215,7 @@ public class Call_c extends Expr_c implements Call
         // of the class we want.
         ClassType scope = c.findMethodScope(name);
 
-        if (! scope.isSame(c.currentClass())) {
-//System.out.println("scope = " + scope);
-//System.out.println("current = " + c.currentClass());
-//System.out.println("scope.type = " + scope.getClass().getName());
-//System.out.println("current.type = " + c.currentClass().getClass().getName());
+        if (! ts.isSame(scope, c.currentClass())) {
           r = nf.This(position(),
                       nf.CanonicalTypeNode(position(), scope)).type(scope);
         }

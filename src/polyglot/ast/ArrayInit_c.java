@@ -122,8 +122,8 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
                 intConversion = ts.numericConversionValid(t, value);
             }
 
-            if (! s.isAssignableSubtype(t) &&
-                ! s.isSame(t) &&
+            if (! ts.isImplicitCastValid(s, t) &&
+                ! ts.isSame(s, t) &&
                 ! intConversion) {
                 throw new SemanticException("Cannot assign " + s +
                                             " to " + t + ".", e.position());

@@ -79,7 +79,7 @@ public class Case_c extends Stmt_c implements Case
 
 	TypeSystem ts = tc.typeSystem();
 
-	if (! expr.type().isImplicitCastValid(ts.Int())) {
+	if (! ts.isImplicitCastValid(expr.type(), ts.Int())) {
 	    throw new SemanticException(
 		"Case label must be an byte, char, short, or int.",
 		position());

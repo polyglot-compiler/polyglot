@@ -22,4 +22,10 @@ public interface ProcedureInstance extends CodeInstance
      * Returns either "method" or "constructor"
      */
     String designator();
+
+    boolean hasSameArguments(ProcedureInstance pi);
+    boolean hasArguments(List arguments);
+    boolean throwsSubset(TypeSystem ts, ProcedureInstance pi);
+    boolean callValid(TypeSystem ts, ProcedureInstance call);
+    boolean callValid(TypeSystem ts, List actualTypes);
 }

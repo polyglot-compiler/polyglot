@@ -11,11 +11,11 @@ public class CarrayTypeSystem extends TypeSystem_c
     // Methods to give back ConstArrayType objects
     // ************************************************
     public ConstArrayType constArrayOf(Type type) {
-        return new ConstArrayType_c(this, type.position(), type);
+        return constArrayOf(type.position(), type);
     }
 
     public ConstArrayType constArrayOf(Position pos, Type type) {
-        return new ConstArrayType_c(this, pos, type);
+        return new ConstArrayType_c(this, pos, type, true);
     }
 
     public ConstArrayType constArrayOf(Type type, int dims) {
@@ -23,49 +23,19 @@ public class CarrayTypeSystem extends TypeSystem_c
     }
 
     public ConstArrayType constArrayOf(Position pos, Type type, int dims) {
-    if (dims > 1) {
-        return constArrayOf(pos, constArrayOf(pos, type, dims-1));
-    }
-    else if (dims == 1) {
-        return constArrayOf(pos, type);
-    }
-    else {
-        throw new InternalCompilerError(
-        "Must call constArrayOf(type, dims) with dims > 0");
-    }
-    }
-
-    // ************************************************
-    // Override methods to specify where const arrays can and can't be used.
-    // ************************************************
-
-    /**
-     * Requires: all type arguments are canonical.
-     *
-     * Returns true iff child and ancestor are non-primitive
-     * types, and a variable of type child may be legally assigned
-     * to a variable of type ancestor.
-     */
-    public boolean isAssignableSubtype(Type child, Type ancestor) {
-        if (child instanceof ConstArrayType && !(ancestor instanceof ConstArrayType)) {
-            return false;
+        if (dims > 1) {
+            return constArrayOf(pos, constArrayOf(pos, type, dims-1));
         }
-
-        if (child.isArray() && ancestor.isArray()) {
-            // both types are arrays.
-            // allow const arrays to be covariantly assignable, but
-            // non-constant arrays are invariant.
-            if (child instanceof ConstArrayType &&
-                  ancestor instanceof ConstArrayType) {
-                return isAssignableSubtype(child.toArray().base(),
-                                           ancestor.toArray().base());
-            }
-            else {
-                // non-const arrays are invariant.
-                return isSame(child, ancestor);
-            }
+        else if (dims == 1) {
+            return constArrayOf(pos, type);
         }
+        else {
+            throw new InternalCompilerError(
+            "Must call constArrayOf(type, dims) with dims > 0");
+        }
+    }
 
-        return super.isAssignableSubtype(child, ancestor);
+    public ArrayType arrayOf(Position pos, Type type) {
+        return new ConstArrayType_c(this, pos, type, false);
     }
 }

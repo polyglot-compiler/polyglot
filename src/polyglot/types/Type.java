@@ -18,12 +18,12 @@ public interface Type extends Qualifier
     PrimitiveType toPrimitive();
     ArrayType toArray();
 
-    boolean isSame(Type t);
-    boolean isSubtype(Type t);
-    boolean descendsFrom(Type t);
-    boolean isAssignableSubtype(Type t);
-    boolean isCastValid(Type t);
-    boolean isImplicitCastValid(Type t);
+    boolean isSame(TypeSystem ts, Type t);
+    boolean isSubtype(TypeSystem ts, Type t);
+    boolean descendsFrom(TypeSystem ts, Type t);
+    boolean isCastValid(TypeSystem ts, Type t);
+    boolean isImplicitCastValid(TypeSystem ts, Type t);
+    boolean numericConversionValid(TypeSystem ts, long value);
 
     boolean isPrimitive();
     boolean isVoid();

@@ -19,17 +19,17 @@ public class CovarRetRewriter extends AscriptionVisitor
 
     public Expr ascribe(Expr e, Type toType) {
         if (e instanceof Call) {
-            /* Add a cast to the appropriate subclass, if neccssary */
+            /* Add a cast to the appropriate subclass, if necessary */
             Call c = (Call) e;
 
             Position p = c.position();
 
-            // Insert a cast, (always at the moment)
+            // Insert a cast
             MethodInstance mi = c.methodInstance();
             Type overridenRetType = getOverridenReturnType(mi);
 
             if (overridenRetType != null &&
-                ! overridenRetType.isImplicitCastValid(toType)) {
+                ! ts.isImplicitCastValid(overridenRetType, toType)) {
 
                 // The overriden return type cannot be implicitly cast to the
                 // expected type, so explicitly cast it.
@@ -67,31 +67,22 @@ public class CovarRetRewriter extends AscriptionVisitor
      * Return null otherwise.
      */
     private Type getOverridenReturnType(MethodInstance mi) {
-      Type t = mi.container().superType();
-      Type retType = null;
+        Type retType = null;
 
-      while (t instanceof ReferenceType) {
-          ReferenceType rt = (ReferenceType) t;
-          t = rt.superType();
+        for (Iterator j = ts.overrides(mi).iterator(); j.hasNext(); ) {
+            MethodInstance mj = (MethodInstance) j.next();
 
-          for (Iterator j = rt.methods().iterator(); j.hasNext(); ) {
-              MethodInstance mj = (MethodInstance) j.next();
+            if (! ts.isAccessible(mj, this.context)) {
+                break;
+            }
 
-              if (! mi.name().equals(mj.name()) ||
-                  ! ts.hasSameArguments(mi, mj) ||
-                  ! ts.isAccessible(mj, this.context)) {
-
-                  continue;
-              }
-
-              if (ts.isSubtype(mi.returnType(), mj.returnType()) &&
-                  !ts.isSame(mi.returnType(), mj.returnType())) {
+            if (ts.isSubtype(mi.returnType(), mj.returnType()) &&
+                !ts.isSame(mi.returnType(), mj.returnType())) {
                 // mj.returnType() is the type to use!
                 retType = mj.returnType();
-              }
+            }
+        }
 
-          }
-      }
-      return retType;
+        return retType;
     }
 }

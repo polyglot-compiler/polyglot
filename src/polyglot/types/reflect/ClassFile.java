@@ -139,7 +139,7 @@ public class ClassFile implements LazyClassInitializer {
     public ParsedClassType type(TypeSystem ts) throws SemanticException {
         ParsedClassType ct = createType(ts);
 
-        if (ct.isSame(ts.Object())) {
+        if (ts.isSame(ct, ts.Object())) {
             ct.superType(null);
         }
         else {

@@ -225,7 +225,7 @@ public class Binary_c extends Expr_c implements Binary
 	}
 
 	if (op == ADD) {
-	    if (l.isSame(ts.String()) || r.isSame(ts.String())) {
+	    if (ts.isSame(l, ts.String()) || ts.isSame(r, ts.String())) {
 		return precedence(Precedence.STRING_ADD).type(ts.String());
 	    }
 	}
@@ -251,13 +251,13 @@ public class Binary_c extends Expr_c implements Binary
         }
 
         if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
-            if (! l.isImplicitCastValid(ts.Long())) {
+            if (! ts.isImplicitCastValid(l, ts.Long())) {
                 throw new SemanticException("The " + op +
                     " operator must have numeric or boolean operands.",
                     left.position());
             }
 
-            if (! r.isImplicitCastValid(ts.Long())) {
+            if (! ts.isImplicitCastValid(r, ts.Long())) {
                 throw new SemanticException("The " + op +
                     " operator must have numeric or boolean operands.",
                     right.position());
@@ -277,12 +277,12 @@ public class Binary_c extends Expr_c implements Binary
         }
 
         if (op == SHL || op == SHR || op == USHR) {
-            if (! l.isImplicitCastValid(ts.Long())) {
+            if (! ts.isImplicitCastValid(l, ts.Long())) {
                 throw new SemanticException("The " + op +
                     " operator must have numeric operands.", left.position());
             }
 
-            if (! r.isImplicitCastValid(ts.Long())) {
+            if (! ts.isImplicitCastValid(r, ts.Long())) {
                 throw new SemanticException("The " + op +
                     " operator must have numeric operands.", right.position());
             }
@@ -326,7 +326,7 @@ public class Binary_c extends Expr_c implements Binary
             }
         }
 
-        if (op == ADD && type.isSame(ts.String())) {
+        if (op == ADD && ts.isSame(type, ts.String())) {
             // Implicit coercion to String.
             return ts.String();
         }

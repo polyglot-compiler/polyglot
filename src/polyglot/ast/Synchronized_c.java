@@ -68,7 +68,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
-	if (! expr.type().isSubtype(ts.Object()) ) {
+	if (! ts.isSubtype(expr.type(), ts.Object()) ) {
 	     throw new SemanticException(
 		 "Cannot synchronize on an expression of type \"" +
 		 expr.type() + "\".", expr.position());

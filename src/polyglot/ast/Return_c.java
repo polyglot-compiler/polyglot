@@ -87,7 +87,7 @@ public class Return_c extends Stmt_c implements Return
 		    mi + ".", position());
 	    }
 
-	    if (expr.type().isImplicitCastValid(mi.returnType())) {
+	    if (ts.isImplicitCastValid(expr.type(), mi.returnType())) {
 	        return this;
 	    }
 

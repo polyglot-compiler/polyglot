@@ -88,7 +88,7 @@ public class Conditional_c extends Expr_c implements Conditional
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
-	if (! cond.type().isSame(ts.Boolean())) {
+	if (! ts.isSame(cond.type(), ts.Boolean())) {
 	     throw new SemanticException(
 		 "Condition of ternary expression must be of type boolean.",
 		 cond.position());
@@ -168,10 +168,10 @@ public class Conditional_c extends Expr_c implements Conditional
 	// if neither type is assignment compatible with the other type.
 
 	if (t1.isReference() && t2.isReference()) {
-	    if (t1.isAssignableSubtype(t2)) {
+	    if (ts.isImplicitCastValid(t1, t2)) {
 		return type(t2);
 	    }
-	    if (t2.isAssignableSubtype(t1)) {
+	    if (ts.isImplicitCastValid(t2, t1)) {
 		return type(t1);
 	    }
 	}
