@@ -18,14 +18,14 @@ Interfaces are written in (parenthesis).
 CLASSES
 =======
 Type							[jltools.types]
-  PrimitiveType					 <<*>>  [jltools.types]
+  PrimitiveType						[jltools.types]
   ClassType					 <<*>>  [jltools.types]
 MethodType					        [jltools.types]
 FieldType                                               [jltools.types]
 AccessFlags					        [jltools.types]
 
 TypeSystem (I)					        [jltools.types]
-JavaTypeSystem (TypeSystem)			 <<*>>  [jltools.types]
+StandardTypeSystem (TypeSystem)			 <<*>>  [jltools.types]
 
 JavaClass (A)					        [jltools.types]
   ClassFileClass				 <<*>>  [jltools.types]
@@ -77,15 +77,17 @@ AnnotatedObject	(A)					[jltools.util]
       SwitchStatement				 <<*>>  [jltools.ast] 
       LabelledStatement				 <<*>>	[jltools.ast]
     VariableDeclaration				 <<*>>  [jltools.ast]
-    ClassMember	(A)				 <<*>>  [jltools.ast]
+    ClassMember	(A)				        [jltools.ast]
       ClassNode					 <<*>>  [jltools.ast]
       FieldNode					 <<*>>  [jltools.ast]
       MethodNode				 <<*>>  [jltools.ast]
+      InitializerBlock				 <<*>>  [jltools.ast]
     SourceFileNode				 <<*>>  [jltools.ast]
 
 Annotate (S)						[jltools.util]
 Assert (S)						[jltools.util]
 ErrMsgs						 <<*>>  [jltools.util]
+PPrint						 <<*>>  [jltools.util]
 
 TypedCollection					 <<*>>  [jltools.util]
 TypedList					 	[jltools.util]
