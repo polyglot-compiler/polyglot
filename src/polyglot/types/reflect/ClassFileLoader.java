@@ -61,6 +61,7 @@ public class ClassFileLoader
 
     protected ClassFile findClass(String name) throws ClassNotFoundException {
 	String fileName = name.replace('.', File.separatorChar) + ".class";
+	String entryName = name.replace('.', '/') + ".class";
 
         Report.report(verbose, 2, "classpath = " + classpath);
 
@@ -83,7 +84,7 @@ public class ClassFileLoader
                 }
                 else if (dir.getName().endsWith(".jar")) {
                     JarFile jar = new JarFile(dir);
-                    JarEntry entry = jar.getJarEntry(fileName);
+                    JarEntry entry = jar.getJarEntry(entryName);
                     if (entry != null) {
                         Report.report(verbose, 2, "found jar entry " + entry);
                         InputStream in = jar.getInputStream(entry);
@@ -95,7 +96,7 @@ public class ClassFileLoader
                 }
                 else if (dir.getName().endsWith(".zip")) {
                     ZipFile zip = new ZipFile(dir);
-                    ZipEntry entry = zip.getEntry(fileName);
+                    ZipEntry entry = zip.getEntry(entryName);
                     if (entry != null) {
                         Report.report(verbose, 2, "found zip entry " + entry);
                         InputStream in = zip.getInputStream(entry);
@@ -107,7 +108,6 @@ public class ClassFileLoader
                 }
             }
             catch (IOException e) {
-                e.printStackTrace();
             }
 	}
 
