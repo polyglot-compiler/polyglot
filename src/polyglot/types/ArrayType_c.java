@@ -162,7 +162,12 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 
     public boolean isImplicitCastValidImpl(Type toType) {
         if (toType.isArray()) {
-            return ts.isImplicitCastValid(base(), toType.toArray().base());
+            if (base().isPrimitive() || toType.toArray().base().isPrimitive()) {
+                return ts.equals(base(), toType.toArray().base());
+            }
+            else {
+                return ts.isImplicitCastValid(base(), toType.toArray().base());
+            }
         }
 
         // toType is not an array, but this is.  Check if the array
