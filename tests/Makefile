@@ -88,6 +88,9 @@ BAD = \
 	Protection.jl \
 	Unreachable10.jl \
 	Unreachable11.jl \
+	Unreachable12.jl \
+	Unreachable13.jl \
+	Unreachable14.jl \
 	Unreachable1.jl \
 	Unreachable2.jl \
 	Unreachable3.jl \
