@@ -854,7 +854,7 @@ public class lalr_state {
 		      System.err.print("    Example:\n    ");
 		      report_shortest_path(itm);
 		      System.err.print(" (*) ");
-		      System.err.println(terminal.find(conflict_sym).name());
+		      System.err.println(right_of_dot(itm));
 		      System.err.println("\n    ");
 		  }
 /* end ACM extension */
@@ -979,6 +979,22 @@ public class lalr_state {
 	}
 	return null;
     }
+
+    String right_of_dot(lalr_item itm) throws internal_error {
+	String result = "";
+	production prod = itm.the_production();
+	int pos = itm.dot_pos();
+	for (int i = pos; i < prod.rhs_length(); i++) {
+	    if (i != pos) result += " ";
+	    production_part pp = prod.rhs(i);
+	    if (pp instanceof symbol_part) {
+		result = result + ((symbol_part)pp).the_symbol().name();
+	    }
+	}
+	return result;
+    }
+
+
 /* End ACM extension */
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/

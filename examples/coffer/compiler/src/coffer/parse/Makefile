@@ -5,7 +5,7 @@ SUBDIRS =
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
-	Lexer.java \
+	Lexer_c.java \
 	Grm.java \
 	sym.java \
 	$(SRC) \
@@ -26,7 +26,7 @@ Grm.java sym.java: coffer_ppg.cup
 coffer_ppg.cup: coffer.ppg $(SOURCE)/polyglot/ext/jl/parse/java12.cup
 	$(ppg) coffer.ppg > coffer_ppg.cup
 
-Lexer.java: coffer.flex sym.java
+Lexer_c.java: coffer.flex sym.java
 	$(flex)
 
 clean: cleanclasses
@@ -34,5 +34,5 @@ clean: cleanclasses
 
 clobber: cleanclasses
 	$(subdirs)
-	-rm -f Grm.java sym.java Lexer.java coffer_ppg.cup
+	-rm -f Grm.java sym.java Lexer_c.java coffer_ppg.cup
 

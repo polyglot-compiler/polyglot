@@ -14,7 +14,7 @@ CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 MANIFEST = Makefile $(SOURCES) ppg.flex
 JAR_FILE = polyglot.jar
 
-Lexer.java: ppg.flex
+Lexer_c.java: ppg.flex
 	$(flex)
 
 all: $(CLASSES)
@@ -23,5 +23,4 @@ all: $(CLASSES)
 clean: cleanclasses
 
 clobber: cleanclasses
-	-rm -f Lexer.java
-
+	-rm -f Lexer_c.java

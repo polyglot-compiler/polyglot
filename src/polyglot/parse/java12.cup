@@ -54,6 +54,16 @@ parser Grm extends BaseParser {:
     if (n == null) return null;
     else return n.pos;
   }
+
+  List variableDeclarators(TypeNode a, List b, Flags flags) throws Exception {
+    List l = new TypedList(new LinkedList(), LocalDecl.class, false);
+    for (Iterator i = b.iterator(); i.hasNext(); ) {
+	VarDeclarator d = (VarDeclarator) i.next();
+	l.add(nf.LocalDecl(pos(a), flags, array(a, d.dims),
+				  d.name, d.init));
+    }
+    return l;
+  }
 :};
 
 scan with {: return nextSymbol(); :};
@@ -905,23 +915,9 @@ local_variable_declaration_statement ::=
 local_variable_declaration ::=
                     // List of LocalDecl
         type:a variable_declarators:b
-            {: List l = new TypedList(new LinkedList(), LocalDecl.class, false);
-               for (Iterator i = b.iterator(); i.hasNext(); ) {
-                   VarDeclarator d = (VarDeclarator) i.next();
-                   l.add(parser.nf.LocalDecl(parser.pos(a), Flags.NONE,
-                                             parser.array(a, d.dims),
-                                             d.name, d.init));
-               }
-               RESULT = l; :}
+            {: RESULT = parser.variableDeclarators(a, b, Flags.NONE); :}
     |   FINAL type:a variable_declarators:b
-            {: List l = new TypedList(new LinkedList(), LocalDecl.class, false);
-               for (Iterator i = b.iterator(); i.hasNext(); ) {
-                   VarDeclarator d = (VarDeclarator) i.next();
-                   l.add(parser.nf.LocalDecl(parser.pos(a), Flags.FINAL,
-                                             parser.array(a, d.dims),
-                                             d.name, d.init));
-               }
-               RESULT = l; :}
+            {: RESULT = parser.variableDeclarators(a, b, Flags.FINAL); :}
     ;
 statement ::=
                     // Stmt

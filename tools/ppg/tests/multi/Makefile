@@ -4,7 +4,7 @@ SUBDIRS =
 
 include $(SOURCE)/Rules.mk
 
-Lexer.java: multi.flex
+Lexer_c.java: multi.flex
 	java -cp $(SOURCE)/jlex.jar JFlex.Main multi.flex
 
 Parser.java Constant.java: out.cup
@@ -20,7 +20,7 @@ SOURCES = \
 	LexicalError.java \
 	Token.java \
 	Expr.java \
-	Lexer.java \
+	Lexer_c.java \
 	ParenExpr.java \
 	Parser.java \
 	Tester.java \
@@ -35,6 +35,6 @@ test:
 
 clean clobber: cleanclasses
 	$(subdirs)
-	rm -f out.cup Parser.java Constant.java Lexer.java Lexer.java~
+	rm -f out.cup Parser.java Constant.java Lexer_c.java Lexer_c.java~
 
 MANIFEST = Makefile $(SOURCES)

@@ -76,6 +76,12 @@
 
   <target name="cup" depends="init" 
           description="compile the extended CUP parser generator">
+    <antcall target="cup-parser-using-jar">
+      <param name="parser.dir" value="java_cup"/>
+      <param name="cup.file" value="parser.cup"/>
+      <param name="parser.class" value="parser"/>
+      <param name="symbol.class" value="sym"/>
+    </antcall>
     <javac srcdir="${src}" destdir="${cup-classes}" debug="on"
       includes="java_cup/**">
       <classpath refid="standard.classpath"/>
@@ -144,7 +150,14 @@
        @param symbol.class  The name to be passed to CUP with -symbols.
        @param cup.file      The name of the CUP file.
    -->
-  <target name="cup-parser" depends="cup,cup-parser-deps" 
+  <target name="cup-parser" depends="cup,cup-parser-using-jar" 
+          unless="cup.parser.up-to-date">
+  </target>
+
+  <!-- The following target builds a cup parser using the version of
+       cup already sitting in the java_cup.jar file. This is needed to
+       allow the building of cup to be bootstrapped. -->
+  <target name="cup-parser-using-jar" depends="cup-parser-deps" 
           unless="cup.parser.up-to-date">
     <java classname="java_cup.Main"
           fork="true"
@@ -156,7 +169,7 @@
   </target>
 
   <!-- Set the property cup.parser.up-to-date if the parser is in fact
-       up to date.  Called by the cup-parser target.
+       up to date.  Called by the cup-parser-using-jar target.
    -->
   <target name="cup-parser-deps">
     <dependset>
