@@ -157,20 +157,22 @@ follows:
     when extracting extension-specific type information from .class files.
 
 
-AST nodes and delegates
------------------------
+AST nodes, extensions, and delegates
+------------------------------------
 
-To allow for greater flexibility in overriding the behavior of an AST
-node, each node has a pointer to a delegate object.  Delegate objects
-are useful for adding a field or a method to many different AST nodes.
-They provide functionality similar to mixins.  Their purpose is to allow
-a uniform extension of many AST nodes, not to be the primary vehicle
-through which a language extension is implemented.
+To allow for greater flexibility in overriding the behavior of an AST node,
+each node has a pointer to a delegate object and a (possibly null) list of
+extension objects.  Extension objects are useful for adding a field or a method
+to many different AST nodes.  They provide functionality similar to mixins.
+Their purpose is to allow a uniform extension of many AST nodes, not to be the
+primary vehicle through which a language extension is implemented.  Delegate
+objects are similar to extension objects and are used for overriding existing
+methods of many different AST nodes.  For more details, see the tech report
+(Cornell CS-TR 2002-1883).
 
-In order for the delegates to override the AST node, most calls
-to the AST node object should be dispatched through the extension
-object.  The default delegate of every AST node just calls the
-corresponding method in the AST node.
+In order for the delegates to override the AST node, most calls to the AST node
+object should be dispatched through the delegate object.  The default delegate
+of every AST node just calls the corresponding method in the AST node.
 
 So for instance, to invoke the typeCheck() method on an AST node n, we
 do:
@@ -189,10 +191,20 @@ classes, this approach also permits more convenient access to instance
 variables of the nodes; delegates access the instance variables of their
 associated node through accessor methods. 
 
-In writing an extension, the designer should avoid using this approach and put
-the pass implementation in the delegates themselves; this leads to less 
-work in the numver of AST nodes that need to be extended. For more details,
-see the tech report (Cornell CS-TR 2002-1871).
+In writing a language extension, the designer should avoid using this approach
+and put the pass implementation in the delegates themselves; this leads to less
+work in the number of AST nodes that need to be extended.
+
+In deciding whether to put add functionality via inheritance, an extension
+object, or a delegate object, use the following guidelines:
+
+1. If extending the interface of many different AST node classes, including
+adding a member to the common base class of several classes, use an extension.
+
+2. If overriding an existing method of many different AST node classes,
+use a delegate.
+
+3. Otherwise, use inheritance.
 
 Writing an extension
 --------------------
@@ -329,20 +341,21 @@ polyglot/ext/pao.
     descendsFrom(), isImplicitCastValid(), and isCastValid() to
     allow primitives to be used as Objects.
     
-    We also create a subclass of ParsedTopLevelClassType to allow primitives
+    We also create a subclass of ParsedClassType to allow primitives
     to be cast to Object.
 
-    5. We create a new Delegate interface, PaoDel, that extends the Del
-    interface. This delegate has the signature for a new method, rewrite,
-    which we will use to rewrite the the new Pao code into valid Java code.
-    We also create a class PaoDel_c which extends Del_c and implements PaoDel.
-    The default action for the rewrite function is to return the node
+    5. We create a new extension interface, PaoExt, that extends the Ext
+    interface. This extension interface has the signature for a new method,
+    rewrite, which we will use to rewrite the the new Pao code into valid Java
+    code.  We also create a class PaoExt_c which extends Ext_c and implements
+    PaoExt.  The default action for the rewrite function is to return the node
     unchanged, which is the behavior that is desired for most nodes.
 
     6. We override type checking for the instanceof operation.  To do so, we
-    create a new delegate, PaoInstanceofDel_c, that subclasses the PaoDel_c
-    delegate.  In it, we override the typeCheck() to allow primitive types to
-    occur in the instanceof expression.
+    create a new delegate, PaoInstanceofDel_c, that subclasses the JL_c class
+    in the base compiler.  In it, we override the typeCheck() to allow
+    primitive types to occur in the instanceof expression.  JL_c implements all
+    other methods of the JL interface by dispatching back to the node.
 
     7. We define the translation that will take our Pao language to standard
     Java by defining the implementation of the rewrite function. 
@@ -351,14 +364,14 @@ polyglot/ext/pao.
     to be rewritten: casts, instanceof operations, and the == and !=
     operations.
 
-    In PaoInstanceofDel_c, we override the rewrite method to allow for
+    In PaoInstanceofExt_c, we override the rewrite method to allow for
     instanceof operations on primitive types.
 
-    We also create a PaoCastDel_c which extends PaoDel_c, in which we override
+    We also create a PaoCastExt_c which extends PaoExt_c, in which we override
     the rewrite method to box and unbox primitives appropriately to allow
     casting to and from primitive types.
 
-    In addition, we create a PaoBinaryDel_c that also exends PaoDel_c, which
+    In addition, we create a PaoBinaryExt_c that also exends PaoExt_c, which
     overrides the rewrite method to rewrite == and != expressions to call
     Primitive.equals(o, p) when comparing two Objects or boxed primitives.
     This method allows boxed primitives to be compared using == and !=.
