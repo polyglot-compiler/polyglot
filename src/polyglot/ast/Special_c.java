@@ -1,20 +1,12 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.Node;
-import polyglot.ast.Precedence;
-import polyglot.ast.Special;
-import polyglot.ast.TypeNode;
-import polyglot.types.ClassType;
-import polyglot.types.Context;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
+import java.util.List;
+
+import polyglot.ast.*;
+import polyglot.types.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeChecker;
-import polyglot.visit.CFGBuilder;
-import java.util.List;
+import polyglot.visit.*;
 
 /**
  * A <code>Special</code> is an immutable representation of a
@@ -117,9 +109,10 @@ public class Special_c extends Expr_c implements Special
 	if (kind == THIS) {
 	    return type(t);
 	}
-	else {
+	else if (kind == SUPER) {
 	    return type(t.superType());
 	}
+        return this;
     }
 
     /**
