@@ -1,7 +1,6 @@
 package polyglot.frontend;
 
 import polyglot.util.Enum;
-import java.util.*;
 
 /** A <code>Pass</code> represents a compiler pass. */
 public interface Pass
@@ -28,6 +27,7 @@ public interface Pass
     public static final ID EXC_CHECK = new ID("exc-check");
     public static final ID FOLD = new ID("fold");
     public static final ID INIT_CHECK = new ID("init-check");
+    public static final ID CONSTRUCTOR_CHECK = new ID("constructor-check");
     public static final ID REACH_CHECK = new ID("reach-check");
     public static final ID EXIT_CHECK = new ID("exit-check");
     public static final ID DUMP = new ID("dump");

@@ -1,21 +1,41 @@
 package polyglot.ext.jl;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.ext.jl.ast.*;
-import polyglot.ext.jl.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import polyglot.frontend.*;
-import polyglot.main.UsageError;
-import polyglot.main.Options;
-import polyglot.main.Report;
-import polyglot.frontend.Compiler;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
+
+import polyglot.ast.NodeFactory;
+import polyglot.ext.jl.ast.NodeFactory_c;
 import polyglot.ext.jl.parse.Grm;
 import polyglot.ext.jl.parse.Lexer_c;
-
-import java.io.*;
-import java.util.*;
+import polyglot.ext.jl.types.TypeSystem_c;
+import polyglot.frontend.BarrierPass;
+import polyglot.frontend.CupParser;
+import polyglot.frontend.FileSource;
+import polyglot.frontend.Job;
+import polyglot.frontend.JobExt;
+import polyglot.frontend.OutputPass;
+import polyglot.frontend.Parser;
+import polyglot.frontend.ParserPass;
+import polyglot.frontend.Pass;
+import polyglot.frontend.VisitorPass;
+import polyglot.types.LoadedClassResolver;
+import polyglot.types.SemanticException;
+import polyglot.types.SourceClassResolver;
+import polyglot.types.TypeSystem;
+import polyglot.util.ErrorQueue;
+import polyglot.util.InternalCompilerError;
+import polyglot.visit.AddMemberVisitor;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.ClassSerializer;
+import polyglot.visit.ConstructorCallChecker;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.ExitChecker;
+import polyglot.visit.InitChecker;
+import polyglot.visit.ReachChecker;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * This is the default <code>ExtensionInfo</code> for the Java language.
@@ -119,6 +139,7 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
         l.add(new VisitorPass(Pass.REACH_CHECK, job, new ReachChecker(job, ts, nf)));
         l.add(new VisitorPass(Pass.EXIT_CHECK, job, new ExitChecker(job, ts, nf)));
         l.add(new VisitorPass(Pass.INIT_CHECK, job, new InitChecker(job, ts, nf)));
+        l.add(new VisitorPass(Pass.CONSTRUCTOR_CHECK, job, new ConstructorCallChecker(job, ts, nf)));
 	l.add(new BarrierPass(Pass.PRE_OUTPUT_ALL, job));
 
 	if (compiler.serializeClassInfo()) {
