@@ -50,8 +50,7 @@ public class ClassFileLoader
 
                 String entryName = name.replace('.', '/');
 
-                /*
-		// The "/" must be appended for the entry to be found;
+		// Try to find the entry with and without a leading "/".
                 ZipEntry e = zip.getEntry(entryName);
 
                 if (e != null && e.isDirectory()) {
@@ -61,8 +60,8 @@ public class ClassFileLoader
                     e = zip.getEntry(entryName + "/");
                     return e != null;
                 }
-                */
 
+                /*
                 // ZipFile.getEntry() one returns file entries.
                 // Walk through the entries to see if the directory
                 // is there.
@@ -75,6 +74,7 @@ public class ClassFileLoader
                 }
 
                 return false;
+                */
 	    }
             else {
                 String entryName = name.replace('.', File.separatorChar);
