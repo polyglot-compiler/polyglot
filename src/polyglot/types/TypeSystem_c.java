@@ -55,6 +55,8 @@ public class TypeSystem_c implements TypeSystem
     }
 
     protected void initTypes() throws SemanticException {
+        // FIXME: don't do this when rewriting a type system!
+
         // Prime the resolver cache so that we don't need to check
         // later if these are loaded.
 
@@ -88,16 +90,33 @@ public class TypeSystem_c implements TypeSystem
         return loadedResolver;
     }
 
-
     public ImportTable importTable(String sourceName, Package pkg) {
+        assert_(pkg);
         return new ImportTable(this, systemResolver, pkg, sourceName);
     }
 
     public ImportTable importTable(Package pkg) {
+        assert_(pkg);
         return new ImportTable(this, systemResolver, pkg);
     }
 
+    protected void assert_(Collection l) {
+        for (Iterator i = l.iterator(); i.hasNext(); ) {
+            TypeObject o = (TypeObject) i.next();
+            assert_(o);
+        }
+    }
+
+    protected void assert_(TypeObject o) {
+        if (o != null && o.typeSystem() != this) {
+            throw new InternalCompilerError("we are " + this + " but " + o +
+                                            " is from " + o.typeSystem());
+        }
+    }
+
     public String wrapperTypeString(PrimitiveType t) {
+        assert_(t);
+
 	if (t.kind() == PrimitiveType.BOOLEAN) {
 	    return "java.lang.Boolean";
 	}
@@ -137,26 +156,32 @@ public class TypeSystem_c implements TypeSystem
     }
 
     public Resolver packageContextResolver(Resolver cr, Package p) {
+        assert_(p);
 	return new PackageContextResolver(this, p, cr);
     }
 
     public Resolver classContextResolver(ClassType type) {
+        assert_(type);
 	return new ClassContextResolver(this, type);
     }
 
     public FieldInstance fieldInstance(Position pos,
 	                               ReferenceType container, Flags flags,
 				       Type type, String name) {
+        assert_(container);
+        assert_(type);
 	return new FieldInstance_c(this, pos, container, flags, type, name);
     }
 
     public LocalInstance localInstance(Position pos,
 	                               Flags flags, Type type, String name) {
+        assert_(type);
 	return new LocalInstance_c(this, pos, flags, type, name);
     }
 
     public ConstructorInstance defaultConstructor(Position pos,
                                                   ClassType container) {
+        assert_(container);
         return constructorInstance(pos, container,
                                    Flags.PUBLIC, Collections.EMPTY_LIST,
                                    Collections.EMPTY_LIST);
@@ -166,6 +191,9 @@ public class TypeSystem_c implements TypeSystem
 	                                           ClassType container,
 						   Flags flags, List argTypes,
 						   List excTypes) {
+        assert_(container);
+        assert_(argTypes);
+        assert_(excTypes);
 	return new ConstructorInstance_c(this, pos, container, flags,
 	                                 argTypes, excTypes);
     }
@@ -173,6 +201,7 @@ public class TypeSystem_c implements TypeSystem
     public InitializerInstance initializerInstance(Position pos,
 	                                           ClassType container,
 						   Flags flags) {
+        assert_(container);
 	return new InitializerInstance_c(this, pos, container, flags);
     }
 
@@ -181,6 +210,10 @@ public class TypeSystem_c implements TypeSystem
 					 Type returnType, String name,
 					 List argTypes, List excTypes) {
 
+        assert_(container);
+        assert_(returnType);
+        assert_(argTypes);
+        assert_(excTypes);
 	return new MethodInstance_c(this, pos, container, flags,
 				    returnType, name, argTypes, excTypes);
     }
@@ -190,6 +223,9 @@ public class TypeSystem_c implements TypeSystem
      * reference types, and child descends from ancestor.
      **/
     public boolean descendsFrom(Type child, Type ancestor) {
+        assert_(child);
+        assert_(ancestor);
+
 	if (! child.isCanonical() || ! ancestor.isCanonical()) {
 	    return false;
 	}
@@ -253,6 +289,9 @@ public class TypeSystem_c implements TypeSystem
      * to a variable of type ancestor.
      */
     public boolean isAssignableSubtype(Type child, Type ancestor) {
+        assert_(child);
+        assert_(ancestor);
+
 	if (! child.isCanonical() || ! ancestor.isCanonical()) {
 	    return false;
 	}
@@ -300,6 +339,9 @@ public class TypeSystem_c implements TypeSystem
      * words, some non-null members of fromType are also members of toType.
      **/
     public boolean isCastValid(Type fromType, Type toType) {
+        assert_(fromType);
+        assert_(toType);
+
 	if (! fromType.isCanonical() || ! toType.isCanonical()) {
 	    return false;
 	}
@@ -400,6 +442,9 @@ public class TypeSystem_c implements TypeSystem
      * in other words, every member of fromType is member of toType.
      **/
     public boolean isImplicitCastValid(Type fromType, Type toType) {
+        assert_(fromType);
+        assert_(toType);
+
 	if (! fromType.isCanonical() || ! toType.isCanonical()) {
 	    return false;
 	}
@@ -420,6 +465,9 @@ public class TypeSystem_c implements TypeSystem
 
     protected boolean primitiveImplicitCastValid(PrimitiveType f,
 					         PrimitiveType t) {
+
+        assert_(f);
+        assert_(t);
 
 	if (t.isVoid()) return false;
 	if (f.isVoid()) return false;
@@ -459,6 +507,8 @@ public class TypeSystem_c implements TypeSystem
      * Returns true iff type1 and type2 are the same type.
      */
     public boolean isSame(Type type1, Type type2) {
+        assert_(type1);
+        assert_(type2);
 	return type1.equals(type2);
     }
 
@@ -467,6 +517,8 @@ public class TypeSystem_c implements TypeSystem
      * type <code>t</code>.
      */
     public boolean numericConversionValid(Type t, long value) {
+        assert_(t);
+
 	if (! t.isCanonical()) {
 	    return false;
 	}
@@ -493,6 +545,7 @@ public class TypeSystem_c implements TypeSystem
      * Returns true iff <type> is a canonical (fully qualified) type.
      */
     public boolean isCanonical(Type type) {
+        assert_(type);
 	return type.isCanonical();
     }
 
@@ -501,6 +554,8 @@ public class TypeSystem_c implements TypeSystem
      * flags "flags" can be accessed from Context "context".
      */
     public boolean isAccessible(MemberInstance mi, Context context) {
+        assert_(mi);
+
         ReferenceType target = mi.container();
 	Flags flags = mi.flags();
 
@@ -548,6 +603,9 @@ public class TypeSystem_c implements TypeSystem
     }
 
     public boolean isEnclosed(ClassType inner, ClassType outer) {
+        assert_(inner);
+        assert_(outer);
+
         if (inner.isInner()) {
 	    ClassType c = inner.toInner().outer();
 
@@ -572,6 +630,9 @@ public class TypeSystem_c implements TypeSystem
 
     protected void checkCycles(ReferenceType curr, ReferenceType goal)
 	throws SemanticException {
+
+        assert_(curr);
+        assert_(goal);
 
 	if (curr == null) {
 	    return;
@@ -610,6 +671,7 @@ public class TypeSystem_c implements TypeSystem
      * Returns true iff an object of type <type> may be thrown.
      **/
     public boolean isThrowable(Type type) {
+        assert_(type);
 	return isSubtype(type, Throwable());
     }
 
@@ -618,6 +680,8 @@ public class TypeSystem_c implements TypeSystem
      * returned by uncheckedExceptions().
      */
     public boolean isUncheckedException(Type type) {
+        assert_(type);
+
 	// Since we're trying to be extensible, walk through the collection
 	// rather than just checking RuntimeException and Error.
         if (isThrowable(type)) {
@@ -647,6 +711,8 @@ public class TypeSystem_c implements TypeSystem
     }
 
     public boolean isSubtype(Type t1, Type t2) {
+        assert_(t1);
+        assert_(t2);
         return isSame(t1, t2) || descendsFrom(t1, t2);
     }
 
@@ -665,6 +731,8 @@ public class TypeSystem_c implements TypeSystem
     public FieldInstance findField(ReferenceType container, String name,
 	                           Context c) throws SemanticException {
 
+        assert_(container);
+
         FieldInstance fi = findField(container, name);
 
         if (! isAccessible(fi, c)) {
@@ -676,6 +744,8 @@ public class TypeSystem_c implements TypeSystem
 
     public FieldInstance findField(ReferenceType container, String name)
                                    throws SemanticException {
+        assert_(container);
+
         Stack s = new Stack();
         s.push(container);
 
@@ -718,6 +788,8 @@ public class TypeSystem_c implements TypeSystem
     public MemberClassType findMemberClass(ClassType container, String name,
 	                                   Context c) throws SemanticException {
 
+        assert_(container);
+
         MemberClassType t = findMemberClass(container, name);
 
         if (! isAccessible(t, c)) {
@@ -729,6 +801,8 @@ public class TypeSystem_c implements TypeSystem
 
     public MemberClassType findMemberClass(ClassType container, String name)
                                            throws SemanticException {
+
+        assert_(container);
 
         Stack s = new Stack();
         s.push(container);
@@ -790,6 +864,9 @@ public class TypeSystem_c implements TypeSystem
 	                             String name, List argTypes, Context c)
 	throws SemanticException {
 
+        assert_(container);
+        assert_(argTypes);
+
 	List acceptable = findAcceptableMethods(container, name, argTypes, c);
 
 	if (acceptable.size() == 0) {
@@ -816,6 +893,9 @@ public class TypeSystem_c implements TypeSystem
 					       List argTypes, Context c)
 	throws SemanticException {
 
+        assert_(container);
+        assert_(argTypes);
+
 	List acceptable = findAcceptableConstructors(container, argTypes, c);
 
 	if (acceptable.size() == 0) {
@@ -840,6 +920,9 @@ public class TypeSystem_c implements TypeSystem
 					      List argTypes,
 					      Context c)
 	throws SemanticException {
+
+        assert_(container);
+        assert_(argTypes);
 
 	// now, use JLS 15.11.2.2
 	// First sort from most- to least-specific.
@@ -888,6 +971,9 @@ public class TypeSystem_c implements TypeSystem
     protected List findAcceptableMethods(ReferenceType container, String name,
 	                                 List argTypes, Context context)
 	throws SemanticException {
+
+        assert_(container);
+        assert_(argTypes);
 
 	List acceptable = new ArrayList();
 
@@ -945,6 +1031,9 @@ public class TypeSystem_c implements TypeSystem
      */
     protected List findAcceptableConstructors(ClassType container,
 					      List argTypes, Context context) {
+        assert_(container);
+        assert_(argTypes);
+
 	List acceptable = new ArrayList();
 
 	Types.report(1, "Searching type " + container + " for constructor " +
@@ -1001,6 +1090,7 @@ public class TypeSystem_c implements TypeSystem
      * Returns the supertype of type, or null if type has no supertype.
      **/
     public Type superType(ReferenceType type) {
+        assert_(type);
 	return type.superType();
     }
 
@@ -1009,6 +1099,7 @@ public class TypeSystem_c implements TypeSystem
      * implements.
      **/
     public List interfaces(ReferenceType type) {
+        assert_(type);
 	return type.interfaces();
     }
 
@@ -1019,6 +1110,9 @@ public class TypeSystem_c implements TypeSystem
     public Type leastCommonAncestor(Type type1, Type type2)
         throws SemanticException
     {
+        assert_(type1);
+        assert_(type2);
+
 	if (isSame(type1, type2)) return type1;
 
 	if (type1.isNumeric() && type2.isNumeric()) {
@@ -1087,6 +1181,9 @@ public class TypeSystem_c implements TypeSystem
      * Returns true iff <p1> throws fewer exceptions as <p2>.
      */
     public boolean throwsSubset(ProcedureInstance p1, ProcedureInstance p2) {
+        assert_(p1);
+        assert_(p2);
+
         SubtypeSet s1 = new SubtypeSet();
         SubtypeSet s2 = new SubtypeSet();
 
@@ -1108,6 +1205,9 @@ public class TypeSystem_c implements TypeSystem
      **/
     public boolean hasSameArguments(ProcedureInstance p1,
 				    ProcedureInstance p2) {
+
+        assert_(p1);
+        assert_(p2);
 
 	List l1 = p1.argumentTypes();
 	List l2 = p2.argumentTypes();
@@ -1131,26 +1231,37 @@ public class TypeSystem_c implements TypeSystem
      * Returns true iff <m1> is the same method as <m2>
      */
     public boolean isSameMethod(MethodInstance m1, MethodInstance m2) {
+        assert_(m1);
+        assert_(m2);
         return m1.name().equals(m2.name()) && hasSameArguments(m1, m2);
     }
 
     public boolean methodCallValid(MethodInstance prototype,
 	                           MethodInstance call) {
+        assert_(prototype);
+        assert_(call);
 	return methodCallValid(prototype, call.name(), call.argumentTypes());
     }
 
     protected boolean callValid(ProcedureInstance prototype,
 			        ProcedureInstance call)
     {
+        assert_(prototype);
+        assert_(call);
 	return callValid(prototype, call.argumentTypes());
     }
 
     public boolean methodCallValid(MethodInstance prototype,
 				   String name, List argTypes) {
+        assert_(prototype);
+        assert_(argTypes);
 	return prototype.name().equals(name) && callValid(prototype, argTypes);
     }
 
     protected boolean callValid(ProcedureInstance prototype, List argTypes) {
+        assert_(prototype);
+        assert_(argTypes);
+
 	List l1 = argTypes;
 	List l2 = prototype.argumentTypes();
 
@@ -1234,10 +1345,13 @@ public class TypeSystem_c implements TypeSystem
     protected final PrimitiveType DOUBLE_  = new PrimitiveType_c(this, PrimitiveType.DOUBLE);
 
     public TypeObject placeHolder(TypeObject o) {
+        assert_(o);
     	return placeHolder(o, new HashSet());
     }
 
     public TypeObject placeHolder(TypeObject o, Set roots) {
+        assert_(o);
+
 	// This should never happen: anonymous and local types cannot
 	// appear in signatures.
 
@@ -1267,6 +1381,7 @@ public class TypeSystem_c implements TypeSystem
     }
 
     public Package packageForName(Package prefix, String name) {
+        assert_(prefix);
 	return new Package_c(this, prefix, name);
     }
 
@@ -1286,10 +1401,12 @@ public class TypeSystem_c implements TypeSystem
      * dimensions.
      */
     public ArrayType arrayOf(Type type) {
-	return new ArrayType_c(this, type.position(), type);
+        assert_(type);
+        return arrayOf(type.position(), type);
     }
 
     public ArrayType arrayOf(Position pos, Type type) {
+        assert_(type);
 	return new ArrayType_c(this, pos, type);
     }
 
@@ -1698,5 +1815,9 @@ public class TypeSystem_c implements TypeSystem
     public Type staticTarget(Type t) throws SemanticException {
         // Nothing needs done in standard Java.
         return t;
+    }
+
+    public String toString() {
+        return StringUtil.getShortNameComponent(getClass().getName());
     }
 }
