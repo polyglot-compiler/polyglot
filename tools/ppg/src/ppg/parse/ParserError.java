@@ -12,35 +12,36 @@ import ppg.lex.*;
 public class ParserError extends Exception
 {
 	/**
-	 *	This contains the errorMessage for that caused the exception 
+	 * This contains the errorMessage for that caused the exception 
 	 */
 	protected String errorMessage;
 	
 	/**
-	 *	@param The massage that contains a description of the error	 
+	 * @param message The massage that contains a description of the error	 
 	 */
 	public ParserError(String message){
 		errorMessage = message;	
 	}
 
 	/**
-	 * @param The massage that contains a description of the error	 
-	 * @param String filename, the file where the error came from 
-	 * @param Token to get the line number and the text of the error token
+	 * @param file The file where the error came from.
+	 * @param msg The message that contains a description of the error.
+	 * @param tok Token from which to get the line number and the text
+         *            of the error token.
 	 */
 	public ParserError(String file, String msg, Token tok) {
 		//errorMessage = file+ ":" +tok.lineNumber() + ": at " +tok.tokenText+ " :" +msg;	
 	}
 
 	/**
-	 *	In rare cases when no error message is know return a generic message	 
+	 * In rare cases when no error message is know return a generic message	 
 	 */
 	public ParserError() {
 		this("There is a parse error in your code...");	
 	}
 	
 	/**
-	 *	@return String that is the message of the error  
+	 * @return String that is the message of the error  
 	 */
 	public String getErrorMessage(){
 		return errorMessage;

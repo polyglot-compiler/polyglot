@@ -81,10 +81,13 @@ public class SourceClassResolver extends LoadedClassResolver
 
   /**
    * Create a loaded class resolver.
-   * @param ts The type system
+   * @param compiler The compiler.
    * @param ext The extension to load sources for.
-   * @param classpath The class path
+   * @param classpath The class path.
    * @param loader The class file loader to use.
+   * @param allowRawClasses True if vanilla Java class files without
+   *                        Polyglot-embedded type information should be
+   *                        allowed.
    */
   public SourceClassResolver(Compiler compiler, ExtensionInfo ext,
                              String classpath, ClassFileLoader loader,
