@@ -25,6 +25,6 @@ public class BarrierPass extends AbstractPass
 	    Report.report(2, "dependencies of " + job.sourceJob() + 
                         " = " + job.sourceJob().dependencies());
 
-        return !job.compiler().errorQueue().hasErrors();
+        return true;
     }
 }
