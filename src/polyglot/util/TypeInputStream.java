@@ -13,12 +13,17 @@ public class TypeInputStream extends ObjectInputStream
     throws IOException
   {
     super( in);
-
+    enableResolveObject(true);
     this.ts = ts;
   }
 
   public TypeSystem getTypeSystem()
   {
     return ts;
+  }
+
+  protected Object resolveObject(Object o) {
+    //System.out.println("- " + o + " : " + o.getClass());
+    return o;
   }
 }

@@ -19,18 +19,24 @@ public class TypeOutputStream extends ObjectOutputStream
     this.ts = ts;
     this.roots = ts.getTypeEncoderRootSet(root);
 
+    //System.out.println("------------------------------");
+    //System.out.println("roots: " + roots);
+
     enableReplaceObject( true);
   }
 
   protected Object replaceObject(Object o) throws IOException
   {
     if (roots.contains(o)) {
+      //System.out.println("+ In roots: " + o + " : " + o.getClass());
       return o;
     }
     else if (o instanceof TypeObject) {
+      //System.out.println("+ Replacing: " + o + " : " + o.getClass());
       return ts.placeHolder((TypeObject) o, roots);
     }
     else {
+      //System.out.println("+ " + o + " : " + o.getClass());
       return o;
     }
   }
