@@ -210,6 +210,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
 	NoReturn3.jl (Semantic, "Missing return statement");
 	NoReturn4.jl (Semantic, "Missing return statement");
 	NoReturn5.jl (Semantic, "Missing return statement");
+        packA/ProtMethA.jl packB/ProtMethB.jl (Semantic, "No valid method call"); 
 	Unreachable1.jl (Semantic, "Unreachable statement");
 	Unreachable10.jl (Semantic, "Unreachable statement");
 	Unreachable11.jl (Semantic, "Unreachable statement");
