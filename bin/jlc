@@ -8,7 +8,7 @@ while true; do
         "") break;;
         -v) verbose="1"; shift;;
         -classpath) shift; extra_cp=$1; shift;;
-        -profile) shift; profile="-Xrunhprof:cpu=samples"; shift;;
+        -profile) profile="-Xrunhprof:cpu=samples"; shift;;
         *) args="$args $1"; shift;;
     esac
 done
