@@ -35,7 +35,7 @@ op:
 	$(JC) $(JC_FLAGS) jltools/ext/op/ExtensionInfo.java
 split:
 	$(JC) $(JC_FLAGS) jltools/ext/split/ExtensionInfo.java
-	
+
 
 PACKAGES = \
 	jltools.ast \
@@ -62,6 +62,15 @@ PACKAGES = \
 	jltools.ext.jif.parse \
 	jltools.ext.jif.types \
 	jltools.ext.jif.visit \
+	jltools.ext.split \
+	jltools.ext.split.ast \
+	jltools.ext.split.dataflow \
+	jltools.ext.split.extension \
+	jltools.ext.split.lex \
+	jltools.ext.split.parse \
+	jltools.ext.split.runtime \
+	jltools.ext.split.types \
+	jltools.ext.split.visit \
 	jif.lang
 
 javadoc: FORCE
