@@ -9,34 +9,11 @@ import polyglot.ext.jl.ast.NodeFactory_c;
 import polyglot.ext.jl.parse.Grm;
 import polyglot.ext.jl.parse.Lexer_c;
 import polyglot.ext.jl.types.TypeSystem_c;
-import polyglot.frontend.BarrierPass;
-import polyglot.frontend.CupParser;
-import polyglot.frontend.EmptyPass;
-import polyglot.frontend.FileSource;
-import polyglot.frontend.Job;
-import polyglot.frontend.JobExt;
-import polyglot.frontend.OutputPass;
-import polyglot.frontend.Parser;
-import polyglot.frontend.ParserPass;
-import polyglot.frontend.Pass;
-import polyglot.frontend.VisitorPass;
-import polyglot.types.LoadedClassResolver;
-import polyglot.types.SemanticException;
-import polyglot.types.SourceClassResolver;
-import polyglot.types.TypeSystem;
+import polyglot.frontend.*;
+import polyglot.types.*;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
-import polyglot.visit.AddMemberVisitor;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.ClassSerializer;
-import polyglot.visit.ConstructorCallChecker;
-import polyglot.visit.ExceptionChecker;
-import polyglot.visit.ExitChecker;
-import polyglot.visit.InitChecker;
-import polyglot.visit.ReachChecker;
-import polyglot.visit.Translator;
-import polyglot.visit.TypeBuilder;
-import polyglot.visit.TypeChecker;
+import polyglot.visit.*;
 
 /**
  * This is the default <code>ExtensionInfo</code> for the Java language.
@@ -123,7 +100,7 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
 
 	l.add(new ParserPass(Pass.PARSE, compiler, job));
         l.add(new VisitorPass(Pass.BUILD_TYPES, job, new TypeBuilder(job, ts, nf)));
-	l.add(new BarrierPass(Pass.BUILD_TYPES_ALL, job));
+	l.add(new GlobalBarrierPass(Pass.BUILD_TYPES_ALL, job));
 	l.add(new VisitorPass(Pass.CLEAN_SUPER, job,
                               new AmbiguityRemover(job, ts, nf, AmbiguityRemover.SUPER)));
 	l.add(new BarrierPass(Pass.CLEAN_SUPER_ALL, job));

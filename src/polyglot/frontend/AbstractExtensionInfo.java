@@ -341,6 +341,36 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                 }
             }
         }
+        
+        if (pass instanceof GlobalBarrierPass) {
+            // need to make sure that _all_ jobs have completed just up to
+            // this global barrier.
+            List allSrcJobs = new ArrayList(jobs.values());
+            Iterator i = allSrcJobs.iterator();
+            while (i.hasNext()) {
+                Object o = i.next();
+                if (o == COMPLETED_JOB) continue;
+                SourceJob sj = (SourceJob)o;
+                if (sj.completed(pass.id()) ||
+                    sj.nextPass() == sj.passByID(pass.id())) {
+                    // the source job has either done this global pass
+                    // (which is possible if the job was loaded late in the
+                    // game), or is right up to the global barrier.
+                    continue;
+                }
+                
+                // Make the job run up to just before the global barrier.
+                // We ignore the return result, since even if the job 
+                // fails, we will keep on going and see
+                // how far we get...
+                Pass beforeGlobal = sj.getPreviousTo(pass.id());
+                if (Report.should_report(Report.frontend, 3)) {
+                    Report.report(3, "Running " + sj +
+                              " to " + beforeGlobal.id() + " for " + job);
+                } 
+                runToPass(sj, beforeGlobal);
+            }
+        }
     }
              
     private static String str(boolean okay) {
@@ -459,12 +489,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             // No appropriate job yet exists, we will create one.
             
             job = this.createSourceJob(source, ast);
-
-            // if the current source job caused this job to load, record the
-            // dependency.
-            if (currentJob instanceof SourceJob) {
-               ((SourceJob)currentJob).addDependency(source);
-            }
             
             // record the job in the map and the worklist.
             jobs.put(source, job);
@@ -477,6 +501,12 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         }
         else {
             job = (SourceJob)o;
+        }
+
+        // if the current source job caused this job to load, record the
+        // dependency.
+        if (currentJob instanceof SourceJob) {
+           ((SourceJob)currentJob).addDependency(source);
         }
 
         return job;

@@ -218,6 +218,22 @@ public abstract class Job
     }
 
     /**
+     * Return the pass immediately before the pass identified by <code>id</code>.
+     * Return <code>null</code> if no such pass exists. 
+     */
+    public Pass getPreviousTo(Pass.ID id) {
+        Integer i = (Integer) passMap().get(id);
+
+        if (i != null) {
+            if (i.intValue() == 0) 
+                return null;
+            return (Pass) passes().get(i.intValue() - 1);
+        }
+
+        throw new InternalCompilerError("No pass named \"" + id + "\".");
+    }
+    
+    /**
      * Return the next pass to be performed. Return null if there are no
      * passes left to be performed.
      */

@@ -4,7 +4,9 @@ import polyglot.main.Report;
 
 /**
  * A <code>BarrierPass</code> is a special pass that ensures that
- * all jobs complete a goal pass before any job continues.
+ * all jobs that a given job <code>J</code> depends on have completed at 
+ * least up to the last <code>BarrierPass</code> that <code>J</code> has 
+ * completed.
  */
 public class BarrierPass extends AbstractPass
 {
