@@ -13,7 +13,7 @@ import java.util.List;
  * Overview:
  *    A StandardTypeSystem is a universe of types, including all Java types.
  **/
-public class StandardTypeSystem extends TypeSystem {
+public abstract class StandardTypeSystem extends TypeSystem {
 
   // FIXME: Documentation.
   // resolver should handle caching.
@@ -495,20 +495,26 @@ public class StandardTypeSystem extends TypeSystem {
    * type (if any).  The iterator is guaranteed to yield methods
    * defined on subclasses before those defined on superclasses.
    **/  
-  public Iterator getMethodsNamed(Type type, String name);
+  // FIXME
+  //public Iterator getMethodsNamed(Type type, String name);
+  public abstract Iterator getMethodsNamed(Type type, String name);
   /**
    * Requires: all type arguments are canonical.
    *
    * Returns the supertype of type, or null if type has no supertype.
    **/
-  public Type getSuperType(Type type);
+  // FIXME
+  //public Type getSuperType(Type type);
+  public abstract Type getSuperType(Type type);
   /**
    * Requires: all type arguments are canonical.
    *
    * Returns an immutable list of all the interface types which type
    * implements.
    **/
-  public List getInterfaces(Type type);
+  // FIXME
+  //public List getInterfaces(Type type);
+  public abstract List getInterfaces(Type type);
 
   ////
   // Functions for method testing.
@@ -538,7 +544,9 @@ public class StandardTypeSystem extends TypeSystem {
    *
    * (Guavac gets this wrong.)
    **/
-  public MethodMatch getMethod(Type type, MethodType method, 
+  // FIXME
+  //public MethodMatch getMethod(Type type, MethodType method, 
+  public abstract MethodMatch getMethod(Type type, MethodType method, 
 					Context context, boolean isThis);
   /**
    * If an attempt to call a method of type <method> on <type> would
@@ -588,14 +596,14 @@ public class StandardTypeSystem extends TypeSystem {
   public Type getVoid()    { return VOID_; }
   public Type getBoolean() { return BOOLEAN_; }
   public Type getChar()    { return CHAR_; }
-  public Type getByte();   { return BYTE_; }
-  public Type getShort();  { return SHORT_; }
-  public Type getInt();    { return INT_; }
-  public Type getLong();   { return LONG_; }
-  public Type getFloat();  { return FLOAT_; }
-  public Type getDouble(); { return DOUBLE_; }
-  public Type getObject(); { return OBJECT_; }
-  public Type getThrowable(); {return THROWABLE_; }
+  public Type getByte()    { return BYTE_; }
+  public Type getShort()   { return SHORT_; }
+  public Type getInt()    { return INT_; }
+  public Type getLong()    { return LONG_; }
+  public Type getFloat()   { return FLOAT_; }
+  public Type getDouble()  { return DOUBLE_; }
+  public Type getObject()  { return OBJECT_; }
+  public Type getThrowable() {return THROWABLE_; }
 
   private final Type NULL_    = new NullType(this);
   private final Type VOID_    = new PrimitiveType(this, PrimitiveType.VOID);

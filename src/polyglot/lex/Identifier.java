@@ -10,6 +10,8 @@ public class Identifier extends Token {
 	this.identifier=identifier;
   }
 
+  public String getIdentifier() { return identifier; }
+
   public String toString() { return "Identifier <"+identifier+">"; }
 
   /* Ben Walter <bwalter@mit.edu> correctly pointed out that
@@ -17,5 +19,5 @@ public class Identifier extends Token {
    * return the string value of the identifier in the parser token.
    * Should be fixed now. ;-) <cananian@alumni.princeton.edu>
    */
-  Symbol symbol() { return new Symbol(Sym.IDENTIFIER, identifier); }
+  public Symbol symbol() { return new Symbol(Sym.IDENTIFIER, identifier); }
 }

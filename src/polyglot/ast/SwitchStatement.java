@@ -28,7 +28,7 @@ public class SwitchStatement extends Statement {
     * Overview: An element of a switch statement.  This can either be
     * a case label, or a BlockStatement.
     */
-   public abstract class SwitchElement {
+   public static abstract class SwitchElement {
       public abstract SwitchElement copy();
       public abstract SwitchElement deepCopy();
    }
@@ -36,7 +36,7 @@ public class SwitchStatement extends Statement {
    /**
     * Overview: A case statement or a default label in a switch block.  
     */
-   public class CaseStatement extends SwitchElement {
+   public static class CaseStatement extends SwitchElement {
       /**
        * Effects: Creates a new CaseStement with <expr> as the value
        * for the case.
@@ -113,12 +113,16 @@ public class SwitchStatement extends Statement {
       private Expression expr;
    }
 
-   public class SwitchBlock extends SwitchElement {
+   public static class SwitchBlock extends SwitchElement {
       /**
        * Effects: Creates a new SwitchBlock which contains <block>.
        */
       public SwitchBlock (BlockStatement block) {
          this.block = block;
+      }
+      
+      public SwitchBlock () {
+         this( new BlockStatement());
       }
 
       /** 

@@ -37,7 +37,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
    **/
   public AmbiguousNameExpression(List lst) {
     names = TypedList.copyAndCheck(lst, String.class, false);
-    if (lst.size() < 1) throw new Error();    
+    if (lst.size() < 1) throw new Error();
   }
 
   /**
@@ -52,12 +52,30 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
       names.add(enum.nextElement());
   }
 
+  public void addIdentifier(String strng) {
+    names.add(strng);
+  }
+
   /**
    * Returns a mutable TypedList of the identifiers in this
    * AmbiguousExpression.
-   **/   
+   **/
   public TypedList getIdentifiers() {
     return names;
+  }
+
+  public String getName() {
+    StringBuffer sb = new StringBuffer();
+    Iterator iter = names.iterator();
+    while(iter.hasNext())
+    {
+      sb.append((String)iter.next());
+      if(iter.hasNext())
+        sb.append('.');
+      else
+        sb.append(' ');
+    }
+    return sb.toString();
   }
 
   public Node copy() {
@@ -69,6 +87,8 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
   public Node deepCopy() {
     return copy();
   }
+  
+  public void visitChildren(NodeVisitor vis) { }
 
   public void translate ( Context c, CodeWriter w)
   {
@@ -77,7 +97,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     dump(c, w);
     w.write ( "> ");
   }
-  
+
   public void dump (Context c, CodeWriter w)
   {
     w.write ("( AMBIGOUS NAME ");
@@ -94,8 +114,6 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     // FIXME: implement;
     return this;
   }
-
-  public void visitChildren(NodeVisitor v) { }
 
   TypedList names;
 }

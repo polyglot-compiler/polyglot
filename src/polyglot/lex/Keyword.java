@@ -7,7 +7,7 @@ class Keyword extends Token {
   String keyword;
   Keyword(int line, String s) { super(line); keyword = s; }
 
-  Symbol symbol() {
+  public Symbol symbol() {
     Integer i = (Integer) key_table.get(keyword);
     return new Symbol(i.intValue());
   }

@@ -1,6 +1,6 @@
 package jltools.lex;
 
-abstract class Token extends InputElement {
+public abstract class Token extends InputElement {
   int line;
 
   public Token(int lineNumber)
@@ -10,10 +10,10 @@ abstract class Token extends InputElement {
 
   public int getLine()
   {
-	return line;
+    return line;
   }
 
-  abstract java_cup.runtime.Symbol symbol();
+  public abstract java_cup.runtime.Symbol symbol();
 
   protected static String escape(String s) {
     StringBuffer sb = new StringBuffer();

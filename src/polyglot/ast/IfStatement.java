@@ -27,6 +27,10 @@ public class IfStatement extends Statement {
     this.elseStatement = elseStatement;
   }
 
+  public IfStatement (Expression condExpr, Statement thenStatement) {
+    this(condExpr, thenStatement, null);
+  }
+
   /**
    * Effects: Returns the Expression that this IfStatement is
    * conditioned on.
@@ -90,12 +94,12 @@ public class IfStatement extends Statement {
       elseStatement.translate(c, w);
       w.endBlock();
     }
-    
+
   }
 
   public void dump(Context c, CodeWriter w)
   {
-    w.write ( "( IF " ) ; 
+    w.write ( "( IF " ) ;
     dumpNodeInfo(c, w);
     w.write (" ( " );
     condExpr.dump ( c, w);
@@ -122,7 +126,7 @@ public class IfStatement extends Statement {
     return this;
   }
 
-  /** 
+  /**
    * Requires: v will not transform an expression into anything other
    *    than another expression, and that v will not transform a
    *    Statement into anything other than another Statement or
@@ -157,11 +161,11 @@ public class IfStatement extends Statement {
   }
 
   public Node deepCopy() {
-    IfStatement is = new IfStatement((Expression) condExpr.deepCopy(), 
-				     (Statement) thenStatement.deepCopy(), 
+    IfStatement is = new IfStatement((Expression) condExpr.deepCopy(),
+				     (Statement) thenStatement.deepCopy(),
 				     (Statement) elseStatement.deepCopy());
     is.copyAnnotationsFrom(this);
-    return is;    
+    return is;
   }
 
   private Expression condExpr;

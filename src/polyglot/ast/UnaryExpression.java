@@ -20,9 +20,11 @@ public class UnaryExpression extends Expression {
     public static final int POSTDECR       = 32; // <?>-- operator
     public static final int PREINCR        = 33; // ++<?> operator
     public static final int PREDECR        = 34; // --<?> operator
+    public static final int POSITIVE       = 35; // + operator
+    public static final int LOGICALNOT     = 36; // ! operator
 
     public static final int MIN_OPERATOR = BITCOMP;
-    public static final int MAX_OPERATOR = PREDECR;  
+    public static final int MAX_OPERATOR = LOGICALNOT;
 
     /** 
      * Requires: A valid value for <operator> as listed in public

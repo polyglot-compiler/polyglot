@@ -15,9 +15,9 @@ public class AccessFlags implements Cloneable {
   /**
    * Effects: returns a new accessflags object with no accessflags set.
    **/
-  public AccessFlags() { 
+  public AccessFlags() {
     // bits defaults to 0.
-  }    
+  }
 
   /**
    * Returns a copy of this.
@@ -26,6 +26,10 @@ public class AccessFlags implements Cloneable {
     AccessFlags other = new AccessFlags();
     other.bits = bits;
     return other;
+  }
+
+  public void merge(AccessFlags other) {
+    bits = bits | other.bits;
   }
 
   /**
@@ -45,6 +49,7 @@ public class AccessFlags implements Cloneable {
     if ((fl & 0x100) != 0) { flags.setNative(true); }
     if ((fl & 0x200) != 0) { flags.setInterface(true); }
     if ((fl & 0x400) != 0) { flags.setAbstract(true); }
+    if ((fl & 0x800) != 0) { flags.setStrictFloatingPoint(true); }
     return flags;
   }
 
@@ -169,6 +174,17 @@ public class AccessFlags implements Cloneable {
     return (bits & VOLATILE_BIT) != 0;
   }
 
+  public void setStrictFloatingPoint(boolean val) {
+      if (val)
+        bits |= STRICTFP_BIT;
+      else
+        bits &= ~STRICTFP_BIT;
+    }
+
+    public boolean isStrictFloatingPoint() {
+      return (bits & STRICTFP_BIT) != 0;
+  }
+
   public String getStringRepresentation()
   {
      String s = "";
@@ -183,6 +199,7 @@ public class AccessFlags implements Cloneable {
      s += ((bits & INTERFACE_BIT)     != 0 ? "interface " : "");
      s += ((bits & ABSTRACT_BIT)      != 0 ? "abstract " : "");
      s += ((bits & VOLATILE_BIT)      != 0 ? "volatile " : "");
+     s += ((bits & STRICTFP_BIT)      != 0 ? "strictfp " : "");
      return s;
   }
 
@@ -197,7 +214,8 @@ public class AccessFlags implements Cloneable {
   private static int INTERFACE_BIT    = 256;
   private static int ABSTRACT_BIT     = 512;
   private static int VOLATILE_BIT     = 1024;
-  
+  private static int STRICTFP_BIT     = 2048;
+
   // Currently, the above bits fit into a short.  We provide an int here
   // for subclasses.
   protected int bits;

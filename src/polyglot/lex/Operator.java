@@ -9,7 +9,7 @@ class Operator extends Token {
 
   public String toString() { return "Operator <"+which+">"; }
 
-  Symbol symbol() {
+  public Symbol symbol() {
     Integer i = (Integer) op_table.get(which);
     return new Symbol(i.intValue());
   }

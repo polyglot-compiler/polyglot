@@ -26,7 +26,8 @@ public class CodeWriter
 
     public void write(String s) {
         // Print the string "s" on the output stream
-        current.add(new StringItem(s));
+        if(s != null)
+          current.add(new StringItem(s));
     }
    
     public void beginBlock()

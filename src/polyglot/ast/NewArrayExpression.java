@@ -41,7 +41,7 @@ public class NewArrayExpression extends Expression {
   public NewArrayExpression(TypeNode elemType, 
 			    List lengthExpressions, 
 			    int additionalDim, 
-                            ArrayInitializerExpression optInitializer) {
+          ArrayInitializerExpression optInitializer) {
     if (additionalDim < 0) {
       throw new IllegalArgumentException("additionalDim must be positive");
     }

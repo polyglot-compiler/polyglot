@@ -2,6 +2,12 @@ package jltools.parse;
 
 import java_cup.runtime.*;
 
+import jltools.ast.*;
+import jltools.lex.*;
+import jltools.types.*;
+import jltools.util.*;
+import java.util.*;
+
 /* Java 1.2 parser for CUP.  
  * Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
  * This program is released under the terms of the GPL; see the file
@@ -25,6 +31,31 @@ parser code  {:
     this();
     lexer=l;
   }
+  
+  public static Node ln(Node n, Token t) {
+    if(n != null && t != null)
+    	Annotate.setLineNumber(n, t.getLine()); 
+    return n;
+  }
+  
+  public static Node ln(Node n, Node m) {
+    if(n != null && m != null)
+    	Annotate.setLineNumber(n, Annotate.getLineNumber(m)); 
+    return n;
+  }
+  
+  public static Node ln(Node n, String s) {
+      return n;
+  }
+  
+  public static TypeNode dim(TypeNode n, int additionalDims) {
+    if(additionalDims > 0)
+    {
+      Type type = n.getType();
+      n.setType(new ArrayType(type.getTypeSystem(), type, additionalDims));
+    }
+    return n;
+  }
 
   public void syntax_error(java_cup.runtime.Symbol current) {
     report_error("Syntax error (" + current.sym + ")", current);
@@ -40,7 +71,8 @@ terminal Token BOOLEAN; // primitive_type
 terminal Token BYTE, SHORT, INT, LONG, CHAR; // integral_type
 terminal Token FLOAT, DOUBLE; // floating_point_type
 terminal Token LBRACK, RBRACK; // array_type
-terminal Token IDENTIFIER; // name
+//terminal Identifier IDENTIFIER; // name
+terminal String IDENTIFIER; // name
 terminal Token DOT; // qualified_name
 terminal Token SEMICOLON, MULT, COMMA, LBRACE, RBRACE, EQ, LPAREN, RPAREN, COLON;
 terminal Token PACKAGE; // package_declaration
@@ -84,817 +116,1572 @@ terminal Token MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ; // assignment_operator
 terminal Token LSHIFTEQ, RSHIFTEQ, URSHIFTEQ; // assignment_operator
 terminal Token ANDEQ, XOREQ, OREQ; // assignment_operator
 
-terminal Token INTEGER_LITERAL;
-terminal Token FLOATING_POINT_LITERAL;
-terminal Token BOOLEAN_LITERAL;
-terminal Token CHARACTER_LITERAL;
-terminal Token STRING_LITERAL;
-terminal Token NULL_LITERAL;
+terminal IntegerLiteral INTEGER_LITERAL;
+terminal jltools.lex.FloatLiteral FLOATING_POINT_LITERAL;
+terminal BooleanLiteral BOOLEAN_LITERAL;
+terminal CharacterLiteral CHARACTER_LITERAL;
+//terminal jltools.lex.StringLiteral STRING_LITERAL;
+terminal String STRING_LITERAL;
+terminal jltools.lex.NullLiteral NULL_LITERAL;
 
 // strictfp keyword, new in Java 1.2
-terminal STRICTFP;
+terminal Token STRICTFP;
 
 // Reserved but unused:
 terminal CONST, GOTO;
 
 // 19.2) The Syntactic Grammar
-non terminal goal;
+non terminal SourceFileNode goal;
 // 19.3) Lexical Structure
-non terminal literal;
+non terminal jltools.ast.Literal literal;
 // 19.4) Types, Values, and Variables
-non terminal type, primitive_type, numeric_type;
-non terminal integral_type, floating_point_type;
-non terminal reference_type;
-non terminal class_or_interface_type;
-non terminal class_type, interface_type;
-non terminal array_type;
+non terminal TypeNode type, primitive_type, numeric_type;
+non terminal TypeNode integral_type, floating_point_type;
+non terminal TypeNode reference_type;
+non terminal TypeNode class_or_interface_type;
+non terminal TypeNode class_type, interface_type;
+non terminal TypeNode array_type;
 // 19.5) Names
-non terminal name, simple_name, qualified_name;
+non terminal AmbiguousNameExpression name, simple_name, qualified_name;
 // 19.6) Packages
-non terminal compilation_unit;
-non terminal package_declaration_opt, package_declaration;
-non terminal import_declarations_opt, import_declarations;
-non terminal type_declarations_opt, type_declarations;
-non terminal import_declaration;
-non terminal single_type_import_declaration;
-non terminal type_import_on_demand_declaration;
-non terminal type_declaration;
+non terminal SourceFileNode compilation_unit;
+non terminal AmbiguousNameExpression package_declaration_opt, package_declaration;
+non terminal List import_declarations_opt, import_declarations;
+non terminal List type_declarations_opt, type_declarations;
+non terminal ImportNode import_declaration;
+non terminal ImportNode single_type_import_declaration;
+non terminal ImportNode type_import_on_demand_declaration;
+non terminal ClassNode type_declaration;
 // 19.7) Productions used only in the LALR(1) grammar
-non terminal modifiers_opt, modifiers, modifier;
+non terminal AccessFlags modifiers_opt, modifiers, modifier;
 // 19.8.1) Class Declaration
-non terminal class_declaration, super, super_opt;
-non terminal interfaces, interfaces_opt, interface_type_list;
-non terminal class_body;
-non terminal class_body_declarations, class_body_declarations_opt;
+non terminal ClassNode class_declaration;
+non terminal TypeNode super, super_opt;
+non terminal List interfaces, interfaces_opt, interface_type_list;
+non terminal List class_body;
+non terminal List class_body_declarations, class_body_declarations_opt;
 non terminal class_body_declaration, class_member_declaration;
 // 19.8.2) Field Declarations
-non terminal field_declaration, variable_declarators, variable_declarator;
-non terminal variable_declarator_id, variable_initializer;
+non terminal FieldNode field_declaration;
+non terminal List variable_declarators;
+non terminal VariableDeclarationStatement.Declarator variable_declarator;
+non terminal VariableDeclarationStatement.Declarator variable_declarator_id;
+non terminal Expression variable_initializer;
 // 19.8.3) Method Declarations
-non terminal method_declaration, method_header, method_declarator;
-non terminal formal_parameter_list_opt, formal_parameter_list;
-non terminal formal_parameter;
-non terminal throws_opt, throws;
-non terminal class_type_list, method_body;
+non terminal MethodNode method_declaration, method_header, method_declarator;
+non terminal List formal_parameter_list_opt, formal_parameter_list;
+non terminal FormalParameter formal_parameter;
+non terminal List throws_opt, throws;
+non terminal List class_type_list;
+non terminal BlockStatement method_body;
 // 19.8.4) Static Initializers
-non terminal static_initializer;
+non terminal BlockStatement static_initializer;
 // 19.8.5) Constructor Declarations
-non terminal constructor_declaration, constructor_declarator;
-non terminal constructor_body;
-non terminal explicit_constructor_invocation;
+non terminal MethodNode constructor_declaration, constructor_declarator;
+non terminal BlockStatement constructor_body;
+non terminal Statement explicit_constructor_invocation;
 // 19.9.1) Interface Declarations
-non terminal interface_declaration;
-non terminal extends_interfaces_opt, extends_interfaces;
-non terminal interface_body;
-non terminal interface_member_declarations_opt, interface_member_declarations;
-non terminal interface_member_declaration, constant_declaration;
-non terminal abstract_method_declaration;
+non terminal ClassNode interface_declaration;
+non terminal List extends_interfaces_opt, extends_interfaces;
+non terminal List interface_body;
+non terminal List interface_member_declarations_opt, interface_member_declarations;
+non terminal ClassMember interface_member_declaration;
+non terminal FieldNode constant_declaration;
+non terminal MethodNode abstract_method_declaration;
 // 19.10) Arrays
-non terminal array_initializer;
-non terminal variable_initializers;
+non terminal ArrayInitializerExpression array_initializer;
+non terminal List variable_initializers;
 // 19.11) Blocks and Statements
-non terminal block;
-non terminal block_statements_opt, block_statements, block_statement;
-non terminal local_variable_declaration_statement, local_variable_declaration;
-non terminal statement, statement_no_short_if;
-non terminal statement_without_trailing_substatement;
-non terminal empty_statement;
-non terminal labeled_statement, labeled_statement_no_short_if;
-non terminal expression_statement, statement_expression;
-non terminal if_then_statement;
-non terminal if_then_else_statement, if_then_else_statement_no_short_if;
-non terminal switch_statement, switch_block;
-non terminal switch_block_statement_groups;
-non terminal switch_block_statement_group;
-non terminal switch_labels, switch_label;
-non terminal while_statement, while_statement_no_short_if;
-non terminal do_statement;
-non terminal for_statement, for_statement_no_short_if;
-non terminal for_init_opt, for_init;
-non terminal for_update_opt, for_update;
-non terminal statement_expression_list;
-non terminal identifier_opt;
-non terminal break_statement, continue_statement;
-non terminal return_statement, throw_statement;
-non terminal synchronized_statement, try_statement;
-non terminal catches_opt, catches, catch_clause;
-non terminal finally;
+non terminal BlockStatement block, block_statements_opt, block_statements;
+non terminal Statement block_statement;
+non terminal VariableDeclarationStatement local_variable_declaration_statement;
+non terminal VariableDeclarationStatement local_variable_declaration;
+non terminal Statement statement, statement_no_short_if;
+non terminal Statement statement_without_trailing_substatement;
+non terminal Statement empty_statement;
+non terminal LabelledStatement labeled_statement, labeled_statement_no_short_if;
+non terminal Statement expression_statement;
+non terminal Expression statement_expression;
+non terminal IfStatement if_then_statement;
+non terminal IfStatement if_then_else_statement, if_then_else_statement_no_short_if;
+non terminal SwitchStatement switch_statement;
+non terminal List switch_block, switch_block_statement_groups;
+non terminal List switch_block_statement_group, switch_labels;
+non terminal SwitchStatement.CaseStatement switch_label;
+non terminal WhileStatement while_statement, while_statement_no_short_if;
+non terminal DoStatement do_statement;
+non terminal ForStatement for_statement, for_statement_no_short_if;
+non terminal List for_init_opt, for_init;
+non terminal List for_update_opt, for_update;
+non terminal List statement_expression_list;
+non terminal AmbiguousNameExpression identifier_opt;
+non terminal BranchStatement break_statement, continue_statement;
+non terminal ReturnStatement return_statement;
+non terminal ThrowStatement throw_statement;
+non terminal SynchronizedStatement synchronized_statement;
+non terminal TryStatement try_statement;
+non terminal List catches_opt, catches;
+non terminal CatchBlock catch_clause;
+non terminal BlockStatement finally;
 // 19.12) Expressions
-non terminal primary, primary_no_new_array;
-non terminal class_instance_creation_expression;
-non terminal argument_list_opt, argument_list;
-non terminal array_creation_expression;
-non terminal dim_exprs, dim_expr, dims_opt, dims;
-non terminal field_access, method_invocation, array_access;
-non terminal postfix_expression;
-non terminal postincrement_expression, postdecrement_expression;
-non terminal unary_expression, unary_expression_not_plus_minus;
-non terminal preincrement_expression, predecrement_expression;
-non terminal cast_expression;
-non terminal multiplicative_expression, additive_expression;
-non terminal shift_expression, relational_expression, equality_expression;
-non terminal and_expression, exclusive_or_expression, inclusive_or_expression;
-non terminal conditional_and_expression, conditional_or_expression;
-non terminal conditional_expression, assignment_expression;
-non terminal assignment;
-non terminal left_hand_side;
-non terminal assignment_operator;
-non terminal expression_opt, expression;
-non terminal constant_expression;
+non terminal Expression primary, primary_no_new_array;
+non terminal NewObjectExpression class_instance_creation_expression;
+non terminal List argument_list_opt, argument_list;
+non terminal NewArrayExpression array_creation_expression;
+non terminal List dim_exprs;
+non terminal Expression dim_expr;
+non terminal Integer dims_opt, dims;
+non terminal FieldExpression field_access;
+non terminal MethodExpression method_invocation;
+non terminal ArrayIndexExpression array_access;
+non terminal Expression postfix_expression;
+non terminal UnaryExpression postincrement_expression, postdecrement_expression;
+non terminal Expression unary_expression, unary_expression_not_plus_minus;
+non terminal UnaryExpression preincrement_expression, predecrement_expression;
+non terminal CastExpression cast_expression;
+non terminal Expression multiplicative_expression, additive_expression;
+non terminal Expression shift_expression, relational_expression, equality_expression;
+non terminal Expression and_expression, exclusive_or_expression, inclusive_or_expression;
+non terminal Expression conditional_and_expression, conditional_or_expression;
+non terminal Expression conditional_expression, assignment_expression;
+non terminal Expression assignment;
+non terminal Expression left_hand_side;
+non terminal Integer assignment_operator;
+non terminal Expression expression_opt, expression;
+non terminal Expression constant_expression;
 
 start with goal;
 
 // 19.2) The Syntactic Grammar
-goal ::=	compilation_unit:a
+goal ::=	
+					// SourceFileNode
+		compilation_unit:a
 			{: RESULT = a; :}
 	;
 
 // 19.3) Lexical Structure.
-literal ::=	INTEGER_LITERAL:a	
-			{: RESULT = new IntLiteral(a.intValue()); :}
+literal ::=
+					// jltools.ast.Literal
+		INTEGER_LITERAL:a	
+			{: RESULT = (jltools.ast.Literal)Grm.ln(new IntLiteral(
+					a.getValue().intValue()), a); :}
 	|	FLOATING_POINT_LITERAL:a
-			{: RESULT = new IntLiteral(a.floatValue()); :}
+			{: RESULT = (jltools.ast.Literal)Grm.ln(new 
+					jltools.ast.FloatLiteral(
+					a.getValue().floatValue()), a); :}
 	|	BOOLEAN_LITERAL:a
-			{: RESULT = new IntLiteral(a.booleanValue()); :}
+			{: RESULT = (jltools.ast.Literal)Grm.ln(new IntLiteral(
+					a.getValue().booleanValue()), a); :}
 	|	CHARACTER_LITERAL:a
-			{: RESULT = new IntLiteral(a.charValue()); :}
+			{: RESULT = (jltools.ast.Literal)Grm.ln(new IntLiteral(
+					a.getValue().charValue()), a); :}
 	|	STRING_LITERAL:a
-			{: RESULT = new StringLiteral(a); :}
-	|	NULL_LITERAL
-			{: RESULT = new NullLiteral(); :}
+			{: RESULT = (jltools.ast.Literal)Grm.ln(
+				new jltools.ast.StringLiteral(a/* .getValue() */), a); :}
+	|	NULL_LITERAL:a
+			{: RESULT = (jltools.ast.Literal)Grm.ln(
+				new jltools.ast.NullLiteral(), a); :}
 	;
 
 // 19.4) Types, Values, and Variables
-type	::=	primitive_type:a
+type	::=
+					// TypeNode
+		primitive_type:a
 			{: RESULT = a; :}
 	|	reference_type:a
-			{: 
-			   RESULT = a; :}
+			{: RESULT = a; :}
 	;
 primitive_type ::=
+					// TypeNode
 		numeric_type:a
 			{: RESULT = a; :}
-	|	BOOLEAN
-			{: RESULT = new PrimitiveType(null,
-						PrimitiveType.BOOLEAN); :}
+	|	BOOLEAN:a
+			{: RESULT = (TypeNode)Grm.ln(new TypeNode(
+				new PrimitiveType(
+				null, PrimitiveType.BOOLEAN)), a); :}
 	;
-numeric_type::=	integral_type:a
+numeric_type::=
+					// TypeNode
+		integral_type:a
 			{: RESULT = a; :}
 	|	floating_point_type:a
 			{: RESULT = a; :}
 	;
-integral_type ::= 
-		BYTE 
-			{: RESULT = new PrimitiveType(null,
-						PrimitiveType.BYTE); :}
-	|	SHORT 
-			{: RESULT = new PrimitiveType(null,
-						PrimitiveType.SHORT); :}
-	|	INT 
-			{: RESULT = new PrimitiveType(null, 
-						PrimitiveType.INT); :}
-	|	LONG 
-			{: RESULT = new PrimitiveType(null,
-						PrimitiveType.LONG); :}
-	|	CHAR 
-			{: RESULT = new PrimitiveType(null, 
-						PrimitiveType.CHAR); :}
+integral_type ::=
+					// TypeNode
+		BYTE:a 
+			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new PrimitiveType(
+					null, PrimitiveType.BYTE)), a); :}
+	|	SHORT:a 
+			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new PrimitiveType(
+					null, PrimitiveType.SHORT)), a); :}
+	|	INT:a 
+			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new PrimitiveType(
+					null, PrimitiveType.INT)), a); :}
+	|	LONG:a 
+			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new PrimitiveType(
+					null, PrimitiveType.LONG)), a); :}
+	|	CHAR:a 
+			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new PrimitiveType(
+					null, PrimitiveType.CHAR)), a); :}
 	;
-floating_point_type ::= 
-		FLOAT 
-			{: RESULT = new PrimitiveType(null, 
-						PrimitiveType.FLOAT); :}
-	|	DOUBLE
-			{: RESULT = new PrimitiveType(null,
-						PrimitiveType.DOUBLE); :}
+floating_point_type ::=
+					// TypeNode
+		FLOAT:a 
+			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new PrimitiveType(
+					null, PrimitiveType.FLOAT)), a); :}
+	|	DOUBLE:a
+			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new PrimitiveType(
+					null, PrimitiveType.DOUBLE)), a); :}
 	;
-
 reference_type ::=
+					// TypeNode
 		class_or_interface_type:a
 			{: RESULT = a; :}
 	|	array_type:a
 			{: RESULT = a; :}
 	;
-
-class_or_interface_type ::= 
+class_or_interface_type ::=
+					// TypeNode
 		name:a
+			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new ClassType(
+				null,a.getName(),false)),a); :}
+	;
+class_type ::=
+					// TypeNode
+		class_or_interface_type:a
 			{: RESULT = a; :}
 	;
-
-class_type ::=	class_or_interface_type;
-interface_type ::= class_or_interface_type;		
-
-array_type ::=	primitive_type dims
-	|	name dims
+interface_type ::=
+					// TypeNode
+		class_or_interface_type:a
+			{: RESULT = a; :}
+	;		
+array_type ::=
+					// TypeNode
+		primitive_type:a dims:b
+			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new ArrayType(
+				null, a.getType(), b.intValue())), a); :}
+	|	name:a dims:b
+			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new ArrayType(
+				null, new ClassType(null, a.getName(), false),
+				b.intValue())), a); :}
 	;
-
 // 19.5) Names
-name	::=	simple_name
-	|	qualified_name
+name	::=
+					// AmbiguousNameExpression
+		simple_name:a
+			{: RESULT = a; :}
+	|	qualified_name:a
+			{: RESULT = a; :}
 	;
-simple_name ::=	IDENTIFIER
+simple_name ::=
+					// AmbiguousNameExpression
+		IDENTIFIER:a
+			{: RESULT = (AmbiguousNameExpression)Grm.ln
+				(new AmbiguousNameExpression(
+				a/* .getIdentifier() */), a); :}
 	;
 qualified_name ::=
-		name DOT IDENTIFIER
+					// AmbiguousNameExpression
+		name:a DOT IDENTIFIER:b
+			{: a.getIdentifiers().add(b/* .getIdentifier() */); 
+				RESULT = a; :}
 	;
-
 // 19.6) Packages
 compilation_unit ::=
-		package_declaration_opt 
-		import_declarations_opt
-		type_declarations_opt
+					// SourceFileNode
+		package_declaration_opt:a
+		import_declarations_opt:b
+		type_declarations_opt:c
+			{: RESULT = (SourceFileNode)Grm.ln
+				(new SourceFileNode(/* FIXME */ null, 
+				(a == null ? null : a.getName()),
+				b, c), a); :}
 		;
-package_declaration_opt ::= package_declaration | ;
-import_declarations_opt ::= import_declarations | ;
-type_declarations_opt   ::= type_declarations   | ;
-
-import_declarations ::= 
-		import_declaration
-	|	import_declarations import_declaration
+package_declaration_opt ::=
+					// AmbiguousNameExpression
+		package_declaration:a {: RESULT = a; :} | ;
+import_declarations_opt ::=
+					// List of ImportNode
+		import_declarations:a 
+			{: RESULT = a; :} 
+	|		{: RESULT = new LinkedList(); :}
 	;
-type_declarations ::= 
-		type_declaration
-	|	type_declarations type_declaration
+type_declarations_opt   ::=
+					// List of ClassNode
+		type_declarations:a {: RESULT = a; :} 
+	|	{: RESULT = new LinkedList(); :}
 	;
-package_declaration ::= 
-		PACKAGE name SEMICOLON
+import_declarations ::=
+					// List of ImportNode
+		import_declaration:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}
+	|	import_declarations:a import_declaration:b
+			{: RESULT = a; a.add(b); :}
 	;
-import_declaration ::= 
-		single_type_import_declaration
-	|	type_import_on_demand_declaration
+type_declarations ::=
+					// List of ClassNode
+		type_declaration:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}
+	|	type_declarations:a type_declaration:b
+			{: RESULT = a; a.add(b); :}
 	;
-single_type_import_declaration ::= 
-		IMPORT name SEMICOLON
+package_declaration ::=
+					// AmbiguousNameExpression
+		PACKAGE name:a SEMICOLON
+			{: RESULT = a; :}
+	;
+import_declaration ::=
+					// ImportNode
+		single_type_import_declaration:a
+			{: RESULT = a; :}
+	|	type_import_on_demand_declaration:a
+			{: RESULT = a; :}
+	;
+single_type_import_declaration ::=
+					// ImportNode
+		IMPORT name:a SEMICOLON
+			{: RESULT = (ImportNode)Grm.ln
+				(new ImportNode(ImportNode.CLASS, 
+				a.getName()), a); :}
 	;
 type_import_on_demand_declaration ::=
-		IMPORT name DOT MULT SEMICOLON
+					// ImportNode
+		IMPORT name:a DOT MULT SEMICOLON
+			{: RESULT = (ImportNode)Grm.ln(
+				new ImportNode(ImportNode.PACKAGE, 
+				a.getName()), a); :}
 	;
 type_declaration ::=
-		class_declaration
-	|	interface_declaration
+					// ClassNode
+		class_declaration:a
+			{: RESULT = a; :}
+	|	interface_declaration:a
+			{: RESULT = a; :}	
 	|	SEMICOLON
 	;
 
 // 19.7) Productions used only in the LALR(1) grammar
 modifiers_opt::=
-	|	modifiers
+					// AccessFlags
+			{: RESULT = new AccessFlags(); :}
+	|	modifiers:a
+			{: RESULT = a; :}
 	;
-modifiers ::= 	modifier
-	|	modifiers modifier
+modifiers ::=
+					// AccessFlags
+		modifier:a 
+			{: RESULT = a; :}
+	|	modifiers:a modifier:b
+			{: RESULT = a; a.merge(b); :}
 	;
-modifier ::=	PUBLIC | PROTECTED | PRIVATE
-	|	STATIC
-	|	ABSTRACT | FINAL | NATIVE | SYNCHRONIZED | TRANSIENT | VOLATILE
-	|	STRICTFP // note that semantic analysis must check that the
+modifier ::=
+					// AccessFlags
+		PUBLIC:a
+			{: AccessFlags af = new AccessFlags();
+				af.setPublic(true); 
+				RESULT = af; :}	
+	|	 PROTECTED:a 
+			{: AccessFlags af = new AccessFlags();
+				af.setProtected(true); 
+				RESULT = af; :}	
+	|	 PRIVATE:a
+			{: AccessFlags af = new AccessFlags();
+				af.setPrivate(true); 
+				RESULT = af; :}	
+	|	 STATIC:a
+			{: AccessFlags af = new AccessFlags();
+				af.setStatic(true); 
+				RESULT = af; :}	
+	|	 ABSTRACT:a 
+			{: AccessFlags af = new AccessFlags();
+				af.setAbstract(true); 
+				RESULT = af; :}	
+	|	 FINAL:a 
+			{: AccessFlags af = new AccessFlags();
+				af.setFinal(true); 
+				RESULT = af; :}	
+	|	 NATIVE:a 
+			{: AccessFlags af = new AccessFlags();
+				af.setNative(true); 
+				RESULT = af; :}	
+	|	 SYNCHRONIZED:a
+			{: AccessFlags af = new AccessFlags();
+				af.setSynchronized(true); 
+				RESULT = af; :}	
+	|	 TRANSIENT:a 
+			{: AccessFlags af = new AccessFlags();
+				af.setTransient(true); 
+				RESULT = af; :}	
+	|	 VOLATILE:a
+			{: AccessFlags af = new AccessFlags();
+				af.setVolatile(true); 
+				RESULT = af; :}	
+	|	 STRICTFP:a // note that semantic analysis must check that the
 	                 // context of the modifier allows strictfp.
+			{: AccessFlags af = new AccessFlags();
+				af.setStrictFloatingPoint(true); 
+				RESULT = af; :}	
 	;
-
 // 19.8) Classes
 
-// 19.8.1) Class Declaration:
-class_declaration ::= 
-	modifiers_opt CLASS IDENTIFIER super_opt interfaces_opt class_body
+// 19.8.1) Class Declarations
+class_declaration ::=
+					// ClassNode
+		modifiers_opt:a CLASS:n IDENTIFIER:b super_opt:c 
+						interfaces_opt:d class_body:e
+			{: RESULT = (ClassNode)Grm.ln(new ClassNode(a,
+				b/* .getIdentifier() */, c, d, e), n); :}
 	;
-super ::=	EXTENDS class_type
+super ::=
+					// TypeNode
+		EXTENDS class_type:a 
+			{: RESULT = a; :}		
 	;
-super_opt ::=	
-	|	super
+super_opt ::=
+					// TypeNode
+	|	super:a
+			{: RESULT = a; :}
 	;
-interfaces ::=	IMPLEMENTS interface_type_list
+interfaces ::=
+					// List of TypeNode
+		IMPLEMENTS interface_type_list:a
+			{: RESULT = a; :}
 	;
 interfaces_opt::=
-	|	interfaces 
+					// List of TypeNode
+			{: RESULT = new LinkedList(); :}
+	|	interfaces:a
+			{: RESULT = a; :} 
 	;
-interface_type_list ::= 
-		interface_type
-	|	interface_type_list COMMA interface_type
+interface_type_list ::=
+					// List of TypeNode
+		interface_type:a 
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}
+	|	interface_type_list:a COMMA interface_type:b
+			{: RESULT = a; a.add(b); :}
 	;
-class_body ::=	LBRACE class_body_declarations_opt RBRACE 
+class_body ::=
+					// List of ClassMember
+		LBRACE class_body_declarations_opt:a RBRACE 
+			{: RESULT = a; :}
 	;
-class_body_declarations_opt ::= 
-	|	class_body_declarations ;
-class_body_declarations ::= 
-		class_body_declaration
-	|	class_body_declarations class_body_declaration
+class_body_declarations_opt ::=
+					// List of ClassMember
+			{: RESULT = new LinkedList(); :}
+	|	class_body_declarations:a
+			{: RESULT = a; :}
+	;
+class_body_declarations ::=
+					// List of ClassMember
+		class_body_declaration:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}
+	|	class_body_declarations:a class_body_declaration:b
+			{: RESULT = a; a.add(b); :}
 	;
 class_body_declaration ::=
-		class_member_declaration
-	|	static_initializer
-	|	constructor_declaration
-	|	block
+					// ClassMember
+		class_member_declaration:a
+			{: RESULT = a; :}
+	|	static_initializer:a
+			{: RESULT = (ClassMember)Grm.ln(
+				new InitializerBlock(a,true), a); :}
+	|	constructor_declaration:a
+			{: RESULT = a; :}
+	|	block:a
+			{: RESULT = (ClassMember)Grm.ln
+				(new InitializerBlock(a,false), a); :}
 	;
 class_member_declaration ::=
-		field_declaration
-	|	method_declaration
+					// ClassMember
+		field_declaration:a
+			{: RESULT = a; :}
+	|	method_declaration:a
+			{: RESULT = a; :}
 	/* repeat the prod for 'class_declaration' here: */
-	|	modifiers_opt CLASS IDENTIFIER super_opt interfaces_opt class_body
-	|	interface_declaration
+	|	modifiers_opt:a CLASS:n IDENTIFIER:b super_opt:c 
+						interfaces_opt:d class_body:e
+			{: RESULT = (ClassMember)Grm.ln(new ClassNode(
+				a, b/* .getIdentifier() */, c, d, e), n); :}
+	|	interface_declaration:a
+			{: RESULT = a; :}
 	;
 
 // 19.8.2) Field Declarations
-field_declaration ::= 
-		modifiers_opt type variable_declarators SEMICOLON
+field_declaration ::=
+					// FieldNode
+		modifiers_opt:a type:b variable_declarators:c SEMICOLON
+			{: RESULT = (FieldNode)Grm.ln(new FieldNode(a, 
+				(VariableDeclarationStatement)
+				Grm.ln(new VariableDeclarationStatement(a, 
+				b, c), b)), b); :}
 	;
 variable_declarators ::=
-		variable_declarator
-	|	variable_declarators COMMA variable_declarator
+					// List of Declarator
+		variable_declarator:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}
+	|	variable_declarators:a COMMA variable_declarator:b
+			{: RESULT = a; a.add(b); :}
 	;
 variable_declarator ::=
-		variable_declarator_id
-	|	variable_declarator_id EQ variable_initializer
+				// VariableDeclarationStatement.Declarator
+		variable_declarator_id:a
+			{: RESULT = a; :}
+	|	variable_declarator_id:a EQ variable_initializer:b
+			{: RESULT = a; a.initializer = b; :}
 	;
 variable_declarator_id ::=
-		IDENTIFIER
-	|	variable_declarator_id LBRACK RBRACK
+				// VariableDeclarationStatement.Declarator
+		IDENTIFIER:a
+			{: RESULT = new VariableDeclarationStatement.
+				Declarator(a/* .getIdentifier() */,0,null); :}
+	|	variable_declarator_id:a LBRACK RBRACK
+			{: RESULT = a; a.additionalDims++; :}
 	;
 variable_initializer ::=
-		expression
-	|	array_initializer
+					// Expression
+		expression:a
+			{: RESULT = a; :}
+	|	array_initializer:a
+			{: RESULT = a; :}
 	;
 
 // 19.8.3) Method Declarations
 method_declaration ::=
-		method_header method_body
+					// MethodNode
+		method_header:a method_body:b
+			{: RESULT = a; a.setBody(b); :}
 	;
 method_header ::=
-		modifiers_opt type method_declarator throws_opt
-	|	modifiers_opt VOID method_declarator throws_opt
+					// MethodNode
+		modifiers_opt:a type:b method_declarator:c throws_opt:d
+			{: RESULT = (MethodNode)Grm.ln(c, b);
+				c.setAccessFlags(a); c.setReturnType(b); 
+				c.setExceptions(d); :}
+					
+	|	modifiers_opt:a VOID:n method_declarator:c throws_opt:d
+			{: RESULT = (MethodNode)Grm.ln(c, n);
+				c.setAccessFlags(a); 
+				c.setReturnType(new PrimitiveType(null,
+				PrimitiveType.VOID)); c.setExceptions(d); :}
 	;
 method_declarator ::=
-		IDENTIFIER LPAREN formal_parameter_list_opt RPAREN
-	|	method_declarator LBRACK RBRACK // deprecated
+					// MethodNode
+		IDENTIFIER:a LPAREN formal_parameter_list_opt:b RPAREN
+			{: RESULT = (MethodNode)Grm.ln(new MethodNode(null, 
+				null, a/* .getIdentifier() */, b, new LinkedList(), 
+				null), a); :}
+	|	method_declarator:a LBRACK RBRACK // deprecated
+			{: RESULT = a; a.addAdditionalDimension(); :}
 	// be careful; the above production also allows 'void foo() []'
 	;
-formal_parameter_list_opt ::=
-	|	formal_parameter_list
+formal_parameter_list_opt ::=		
+					// List of FormalParameters
+			{: RESULT = new LinkedList(); :} 
+	|	formal_parameter_list:a
+			{: RESULT = a; :}
 	;
 formal_parameter_list ::=
-		formal_parameter
-	|	formal_parameter_list COMMA formal_parameter
+					// List of FormalParameters
+		formal_parameter:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}
+	|	formal_parameter_list:a COMMA formal_parameter:b
+			{: RESULT = a; a.add(b); :}	
 	;
 formal_parameter ::=
-		type variable_declarator_id
-	|	FINAL type variable_declarator_id
+					// FormalParameter
+		type:a variable_declarator_id:b
+			{: RESULT = (FormalParameter)Grm.ln(new FormalParameter(
+				Grm.dim(a,b.additionalDims), b.name, false), a); :}
+	|	FINAL type:a variable_declarator_id:b
+			{: RESULT = (FormalParameter)Grm.ln(new FormalParameter(
+				Grm.dim(a,b.additionalDims), b.name, true), a); :}
 	;
-throws_opt ::=	
-	|	throws
+throws_opt ::=				
+					// List of TypeNode
+			{: RESULT = new LinkedList(); :}
+	|	throws:a
+			{: RESULT = a; :}
 	;
-throws ::=	THROWS class_type_list
+throws ::=				
+					// List of TypeNode
+		THROWS class_type_list:a
+			{: RESULT = a; :}
 	;
 class_type_list ::=
-		class_type
-	|	class_type_list COMMA class_type
+					// List of TypeNode
+		class_type:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}
+	|	class_type_list:a COMMA class_type:b
+			{: RESULT = a; a.add(b); :}	
 	;
-method_body ::=	block
+method_body ::=
+					// BlockStatement
+		block:a
+			{: RESULT = a; :}
 	|	SEMICOLON
+			{: RESULT = new BlockStatement(); :}
 	;
 
 // 19.8.4) Static Initializers
 static_initializer ::=
-		STATIC block
+					// BlockStatement
+		STATIC block:a
+			{: RESULT = a; :}
 	;
 
 // 19.8.5) Constructor Declarations
 constructor_declaration ::=
-		modifiers_opt constructor_declarator throws_opt 
-			constructor_body
+					// MethodNode
+		modifiers_opt:a constructor_declarator:b throws_opt:c 
+			constructor_body:d
+			{: RESULT = b; b.setAccessFlags(a); b.setExceptions(c);
+				b.setBody(d); :}
 	;
 constructor_declarator ::=
-		simple_name LPAREN formal_parameter_list_opt RPAREN
+					// MethodNode
+		simple_name:a LPAREN formal_parameter_list_opt:b RPAREN
+			{: RESULT = (MethodNode)Grm.ln(new MethodNode(null,
+				a.getName(), b, new LinkedList(), 
+				null), a); :}
 	;
 constructor_body ::=
-		LBRACE explicit_constructor_invocation
-			block_statements RBRACE
-	|	LBRACE explicit_constructor_invocation RBRACE
-	|	LBRACE block_statements RBRACE
-	|	LBRACE RBRACE
+					// BlockStatement
+		LBRACE explicit_constructor_invocation:a
+			block_statements:b RBRACE
+			{: RESULT = (BlockStatement)Grm.ln(b, a); 
+				b.addStatement(a, 0); :}
+	|	LBRACE explicit_constructor_invocation:a RBRACE
+			{: BlockStatement b = new BlockStatement();
+				b.addStatement(a); 
+				RESULT = (BlockStatement)Grm.ln(b, a); :}
+	|	LBRACE block_statements:a RBRACE
+			{: RESULT = a; :}		
+	|	LBRACE:a RBRACE
+			{: RESULT = (BlockStatement)Grm.ln(
+				new BlockStatement(), a); :}
 	;
 explicit_constructor_invocation ::=
-		THIS LPAREN argument_list_opt RPAREN SEMICOLON
-	|	SUPER LPAREN argument_list_opt RPAREN SEMICOLON
-	|	primary DOT THIS LPAREN argument_list_opt RPAREN SEMICOLON
-	|	primary DOT SUPER LPAREN argument_list_opt RPAREN SEMICOLON
+					// Statement
+		THIS:a LPAREN argument_list_opt:b RPAREN SEMICOLON
+			{: RESULT = (Statement)Grm.ln(new ConstructorCallStatement(
+				null, ConstructorCallStatement.THIS, b), a); :}
+	|	SUPER:a LPAREN argument_list_opt:b RPAREN SEMICOLON
+			{: RESULT = (Statement)Grm.ln(new ConstructorCallStatement(
+				null, ConstructorCallStatement.SUPER, b), a); :}
+	|	primary:a DOT THIS LPAREN argument_list_opt:b RPAREN SEMICOLON
+			{: RESULT = (Statement)Grm.ln(new ConstructorCallStatement(
+				a, ConstructorCallStatement.THIS, b), a); :}
+	|	primary:a DOT SUPER LPAREN argument_list_opt:b RPAREN SEMICOLON
+			{: RESULT = (Statement)Grm.ln(new ConstructorCallStatement(
+				a, ConstructorCallStatement.SUPER, b), a); :}
 	;
 
 // 19.9) Interfaces
 
 // 19.9.1) Interface Declarations
 interface_declaration ::=
-		modifiers_opt INTERFACE IDENTIFIER extends_interfaces_opt 
-			interface_body
+					// ClassNode
+		modifiers_opt:a INTERFACE:n IDENTIFIER:b extends_interfaces_opt:c
+				interface_body:d
+			{: RESULT = (ClassNode)Grm.ln(new ClassNode(a,	
+				b/* .getIdentifier() */, (TypeNode)null, c, d), n); 
+				a.setInterface(true); :}
 	;
 extends_interfaces_opt ::=
-	|	extends_interfaces
+					// List of TypeNode
+	|	extends_interfaces:a
+			{: RESULT = a; :}
 	;
 extends_interfaces ::=
-		EXTENDS interface_type
-	|	extends_interfaces COMMA interface_type
+					// List of TypeNode
+		EXTENDS interface_type:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}			
+	|	extends_interfaces:a COMMA interface_type:b
+			{: RESULT = a; a.add(b); :}	
 	;
 interface_body ::=
-		LBRACE interface_member_declarations_opt RBRACE
+					// List of ClassMember
+		LBRACE interface_member_declarations_opt:a RBRACE
+			{: RESULT = a; :}
 	;
 interface_member_declarations_opt ::=
-	|	interface_member_declarations
+					// List of ClassMember
+	|	interface_member_declarations:a
+			{: RESULT = a; :}
 	;
 interface_member_declarations ::=
-		interface_member_declaration
-	|	interface_member_declarations interface_member_declaration
+					// List of ClassMember
+		interface_member_declaration:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}		
+	|	interface_member_declarations:a interface_member_declaration:b
+			{: RESULT = a; a.add(b); :}
 	;
 interface_member_declaration ::=
-		constant_declaration
-	|	abstract_method_declaration
-	|	class_declaration
-	|	interface_declaration
+					// ClassMember
+		constant_declaration:a
+			{: RESULT = a; :}
+	|	abstract_method_declaration:a
+			{: RESULT = a; :}
+	|	class_declaration:a 
+			{: RESULT = a; :}
+	|	interface_declaration:a
+			{: RESULT = a; :}
 	;
 constant_declaration ::=
-		field_declaration
+					// FieldNode
+		field_declaration:a
+			{: RESULT = a; :}
 	// need to semantically check that modifiers of field declaration
-	// include only PUBIC, STATIC, or FINAL.  Other modifiers are
+	// include only PUBLIC, STATIC, or FINAL.  Other modifiers are
 	// disallowed.
 	;
 abstract_method_declaration ::=
-		method_header SEMICOLON
+					// MethodNode
+		method_header:a SEMICOLON
+			{: RESULT = a; :}
 	;
 
 // 19.10) Arrays
 array_initializer ::=
-		LBRACE variable_initializers COMMA RBRACE
-	|	LBRACE variable_initializers RBRACE
-	|	LBRACE COMMA RBRACE
-	|	LBRACE RBRACE
+					// ArrayInitializerExpression
+		LBRACE:n variable_initializers:a COMMA RBRACE
+			{: RESULT = (ArrayInitializerExpression)
+				Grm.ln(new ArrayInitializerExpression(a), n); :}		
+	|	LBRACE:n variable_initializers:a RBRACE
+			{: RESULT = (ArrayInitializerExpression)
+				Grm.ln(new ArrayInitializerExpression(a), n); :}	
+	|	LBRACE:a COMMA RBRACE
+			{: RESULT = (ArrayInitializerExpression)
+				Grm.ln(new ArrayInitializerExpression(), a); :}
+	|	LBRACE:a RBRACE
+			{: RESULT = (ArrayInitializerExpression)
+				Grm.ln(new ArrayInitializerExpression(), a); :}
 	;
 variable_initializers ::=
-		variable_initializer
-	|	variable_initializers COMMA variable_initializer
+					// List of Expression
+		variable_initializer:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}
+	|	variable_initializers:a COMMA variable_initializer:b
+			{: RESULT = a; a.add(b); :}	
 	;
 
 // 19.11) Blocks and Statements
-block ::=	LBRACE block_statements_opt RBRACE
+block ::=
+					// BlockStatement
+		LBRACE block_statements_opt:a RBRACE
+			{: RESULT = a; :}
 	;
 block_statements_opt ::=
-	|	block_statements
+					// BlockStatement
+	|	block_statements:a
+			{: RESULT = a; :}
 	;
 block_statements ::=
-		block_statement
-	|	block_statements block_statement
+					// BlockStatement
+		block_statement:a
+			{: BlockStatement b = new BlockStatement();
+				b.addStatement(a); 
+				RESULT = (BlockStatement)Grm.ln(b,a); :}
+	|	block_statements:a block_statement:b
+			{: RESULT = a; a.addStatement(b); :}
 	;
 block_statement ::=
-		local_variable_declaration_statement
-	|	statement
-	|	class_declaration
-	|	interface_declaration
+					// Statement
+		local_variable_declaration_statement:a
+			{: RESULT = a; :}
+	|	statement:a
+			{: RESULT = a; :}
+	|	class_declaration:a
+			{: RESULT = (Statement)Grm.ln(
+				new ClassDeclarationStatement(a), a); :}
+	|	interface_declaration:a
+			{: RESULT = (Statement)Grm.ln(
+				new ClassDeclarationStatement(a), a); :}
 	;
 local_variable_declaration_statement ::=
-		local_variable_declaration SEMICOLON
+					// VariableDeclarationStatement
+		local_variable_declaration:a SEMICOLON
+			{: RESULT = a; :}
 	;
 local_variable_declaration ::=
-		type variable_declarators
-	|	FINAL type variable_declarators
+					// VariableDeclarationStatement
+		type:a variable_declarators:b
+			{: RESULT = (VariableDeclarationStatement)Grm.ln(
+				new VariableDeclarationStatement(
+				new AccessFlags(), a, b), a); :}
+	|	FINAL type:a variable_declarators:b
+			{: AccessFlags af = new AccessFlags(); af.setFinal(true);
+				RESULT = (VariableDeclarationStatement)Grm.ln(
+				new VariableDeclarationStatement(
+				af, a, b), a); :}
 	;
-statement ::=	statement_without_trailing_substatement
-	|	labeled_statement
-	|	if_then_statement
-	|	if_then_else_statement
-	|	while_statement
-	|	for_statement
+statement ::=
+					// Statement
+		statement_without_trailing_substatement:a
+			{: RESULT = a; :}
+	|	labeled_statement:a
+			{: RESULT = a; :}
+	|	if_then_statement:a
+			{: RESULT = a; :}
+	|	if_then_else_statement:a
+			{: RESULT = a; :}
+	|	while_statement:a
+			{: RESULT = a; :}
+	|	for_statement:a
+			{: RESULT = a; :}
 	;
 statement_no_short_if ::=
-		statement_without_trailing_substatement
-	|	labeled_statement_no_short_if
-	|	if_then_else_statement_no_short_if
-	|	while_statement_no_short_if
-	|	for_statement_no_short_if
+					// Statement
+		statement_without_trailing_substatement:a
+			{: RESULT = a; :}
+	|	labeled_statement_no_short_if:a
+			{: RESULT = a; :}
+	|	if_then_else_statement_no_short_if:a
+			{: RESULT = a; :}
+	|	while_statement_no_short_if:a
+			{: RESULT = a; :}
+	|	for_statement_no_short_if:a
+			{: RESULT = a; :}
 	;
 statement_without_trailing_substatement ::=
-		block
-	|	empty_statement
-	|	expression_statement
-	|	switch_statement
-	|	do_statement
-	|	break_statement
-	|	continue_statement
-	|	return_statement
-	|	synchronized_statement
-	|	throw_statement
-	|	try_statement
+					// Statement 
+		block:a
+			{: RESULT = a; :}
+	|	empty_statement:a
+			{: RESULT = a; :}
+	|	expression_statement:a
+			{: RESULT = a; :}
+	|	switch_statement:a
+			{: RESULT = a; :}
+	|	do_statement:a
+			{: RESULT = a; :}
+	|	break_statement:a
+			{: RESULT = a; :}
+	|	continue_statement:a
+			{: RESULT = a; :}
+	|	return_statement:a
+			{: RESULT = a; :}
+	|	synchronized_statement:a
+			{: RESULT = a; :}
+	|	throw_statement:a
+			{: RESULT = a; :}
+	|	try_statement:a
+			{: RESULT = a; :}
 	;
 empty_statement ::=
+					// Statement
 		SEMICOLON
 	;
 labeled_statement ::=
-		IDENTIFIER COLON statement
+					// LabelledStatement
+		IDENTIFIER:a COLON statement:b
+			{: RESULT = (LabelledStatement)Grm.ln(
+				new LabelledStatement(
+				a/* .getIdentifier() */, b), a); :}
 	;
 labeled_statement_no_short_if ::=
-		IDENTIFIER COLON statement_no_short_if
+					// LabelledStatement
+		IDENTIFIER:a COLON statement_no_short_if:b
+			{: RESULT = (LabelledStatement)Grm.ln(
+				new LabelledStatement(
+				a/* .getIdentifier() */, b), a); :}
 	;
 expression_statement ::=
-		statement_expression SEMICOLON
+					// Statement
+		statement_expression:a SEMICOLON
+			{: RESULT = (Statement)Grm.ln(
+				new ExpressionStatement(a), a); :}
 	;
 statement_expression ::=
-		assignment
-	|	preincrement_expression
-	|	predecrement_expression
-	|	postincrement_expression
-	|	postdecrement_expression
-	|	method_invocation
-	|	class_instance_creation_expression
+					// Expression
+		assignment:a
+			{: RESULT = a; :}
+	|	preincrement_expression:a
+			{: RESULT = a; :}
+	|	predecrement_expression:a
+			{: RESULT = a; :}
+	|	postincrement_expression:a
+			{: RESULT = a; :}
+	|	postdecrement_expression:a
+			{: RESULT = a; :}
+	|	method_invocation:a
+			{: RESULT = a; :}
+	|	class_instance_creation_expression:a
+			{: RESULT = a; :}
 	;
 if_then_statement ::=
-		IF LPAREN expression RPAREN statement
+					// IfStatement
+		IF LPAREN expression:a RPAREN statement:b
+			{: RESULT = (IfStatement)Grm.ln(
+				new IfStatement(a, b), a); :}
 	;
 if_then_else_statement ::=
-		IF LPAREN expression RPAREN statement_no_short_if 
-			ELSE statement
+					// IfStatement
+		IF LPAREN expression:a RPAREN statement_no_short_if:b 
+			ELSE statement:c
+			{: RESULT = (IfStatement)Grm.ln(
+				new IfStatement(a, b, c), a); :}
 	;
 if_then_else_statement_no_short_if ::=
-		IF LPAREN expression RPAREN statement_no_short_if
-			ELSE statement_no_short_if
+					// IfStatement
+		IF LPAREN expression:a RPAREN statement_no_short_if:b
+			ELSE statement_no_short_if:c
+			{: RESULT = (IfStatement)Grm.ln(
+				new IfStatement(a, b, c), a); :}
 	;
 switch_statement ::=
-		SWITCH LPAREN expression RPAREN switch_block
+					// SwitchStatement
+		SWITCH LPAREN expression:a RPAREN switch_block:b
+			{: RESULT = (SwitchStatement)Grm.ln(
+				new SwitchStatement(a, b), a); :}
 	;
 switch_block ::=
-		LBRACE switch_block_statement_groups switch_labels RBRACE
-	|	LBRACE switch_block_statement_groups RBRACE
-	|	LBRACE switch_labels RBRACE
+					// List of SwitchElement
+		LBRACE switch_block_statement_groups:a switch_labels:b RBRACE
+			{: RESULT = a; a.addAll(b); :}
+	|	LBRACE switch_block_statement_groups:a RBRACE
+			{: RESULT = a; :}
+	|	LBRACE switch_labels:a RBRACE
+			{: RESULT = a; :}
 	|	LBRACE RBRACE
+			{: RESULT = new LinkedList(); :}
 	;
 switch_block_statement_groups ::=
-		switch_block_statement_group
-	|	switch_block_statement_groups switch_block_statement_group
+					// List of SwitchBlock
+		switch_block_statement_group:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}		
+	|	switch_block_statement_groups:a switch_block_statement_group:b
+			{: RESULT = a; a.add(b); :}
 	;
 switch_block_statement_group ::=
-		switch_labels block_statements
+					// List of SwitchElement
+		switch_labels:a block_statements:b
+			{: List l = new LinkedList(); RESULT = l; l.addAll(a); 
+				l.add(new SwitchStatement.SwitchBlock(b)); :}
 	;
 switch_labels ::=
-		switch_label
-	|	switch_labels switch_label
+					// List of CaseStatement
+		switch_label:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}				
+	|	switch_labels:a switch_label:b
+			{: RESULT = a; a.add(b); :}
 	;
 switch_label ::=
-		CASE constant_expression COLON
+					// SwitchStatement.CaseStatement
+		CASE constant_expression:a COLON
+			{: RESULT = new SwitchStatement.CaseStatement(a); :}
 	|	DEFAULT COLON
+			{: RESULT = new SwitchStatement.CaseStatement(); :}
 	;
 
 while_statement ::=
-		WHILE LPAREN expression:a RPAREN statement:b
-			{: RESULT = new WhileExpression( a, b); :}
+					// WhileStatement
+		WHILE:n LPAREN expression:a RPAREN statement:b
+			{: RESULT = (WhileStatement)Grm.ln(
+				new WhileStatement( a, b), n); :}
 	;
 while_statement_no_short_if ::=
-		WHILE LPAREN expression RPAREN statement_no_short_if
+					// WhileStatement
+		WHILE:n LPAREN expression:a RPAREN statement_no_short_if:b
+			{: RESULT = (WhileStatement)Grm.ln(
+				new WhileStatement( a, b), n); :}
 	;
-do_statement ::=
-		DO statement WHILE LPAREN expression RPAREN SEMICOLON
+do_statement ::=			
+					// DoStatement
+		DO:n statement:a WHILE LPAREN expression:b RPAREN SEMICOLON
+			{: RESULT = (DoStatement)Grm.ln(
+				new DoStatement(a, b), n); :}
 	;
 for_statement ::=
-		FOR LPAREN for_init_opt SEMICOLON expression_opt SEMICOLON
-			for_update_opt RPAREN statement
+					// ForStatement 
+	       FOR:n LPAREN for_init_opt:a SEMICOLON expression_opt:b SEMICOLON
+			for_update_opt:c RPAREN statement:d
+			{: RESULT = (ForStatement)Grm.ln(
+				new ForStatement(a, b, c, d), n); :}
 	;
 for_statement_no_short_if ::=
-		FOR LPAREN for_init_opt SEMICOLON expression_opt SEMICOLON
-			for_update_opt RPAREN statement_no_short_if
+					// ForStatement
+	       FOR:n LPAREN for_init_opt:a SEMICOLON expression_opt:b SEMICOLON
+			for_update_opt:c RPAREN statement_no_short_if:d
+			{: RESULT = (ForStatement)Grm.ln(
+				new ForStatement(a, b, c, d), n); :}
 	;
 for_init_opt ::=
-	|	for_init
+					// List of Expression
+	|	for_init:a
+			{: RESULT = a; :}
 	;
-for_init ::=	statement_expression_list
-	|	local_variable_declaration
+for_init ::=
+					// List of Expression
+		statement_expression_list:a
+			{: RESULT = a; :}
+	|	local_variable_declaration:a
+			{: List l = new LinkedList(); l.add(a);
+				RESULT = l; :}
 	;
 for_update_opt ::=
-	|	for_update
+					// List of Expression
+	|	for_update:a
+			{: RESULT = a; :}
 	;
-for_update ::=	statement_expression_list
+for_update ::=
+					// List of Expression
+		statement_expression_list:a
+			{: RESULT = a; :}
 	;
 statement_expression_list ::=
-		statement_expression
-	|	statement_expression_list COMMA statement_expression
+					// List of Expression
+		statement_expression:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}				
+	|	statement_expression_list:a COMMA statement_expression:b
+			{: RESULT = a; a.add(b); :}
 	;
 
-identifier_opt ::= 
-	|	IDENTIFIER
+identifier_opt ::=
+					// AmbiguousNameExpression
+	|	IDENTIFIER:a
+			{: RESULT = (AmbiguousNameExpression)Grm.ln(
+				new AmbiguousNameExpression(
+				a/* .getIdentifier() */), a); :}
 	;
 
 break_statement ::=
-		BREAK identifier_opt SEMICOLON
+					// BranchStatement
+		BREAK identifier_opt:a SEMICOLON
+			{: RESULT = (BranchStatement)Grm.ln(
+				new BranchStatement(
+				BranchStatement.BREAK, 
+				a.getName()), a); :}
 	;
 
 continue_statement ::=
-		CONTINUE identifier_opt SEMICOLON
+					// BranchStatement
+		CONTINUE identifier_opt:a SEMICOLON
+			{: RESULT = (BranchStatement)Grm.ln(
+				new BranchStatement(
+				BranchStatement.CONTINUE,
+				a.getName()), a); :}
+
 	;
 return_statement ::=
-		RETURN expression_opt SEMICOLON
+					// ReturnStatement
+		RETURN expression_opt:a SEMICOLON
+			{: RESULT = (ReturnStatement)Grm.ln(
+				new ReturnStatement(a), a); :}
 	;
 throw_statement ::=
-		THROW expression SEMICOLON
+					// ThrowStatement
+		THROW expression:a SEMICOLON
+			{: RESULT = (ThrowStatement)Grm.ln(
+				new ThrowStatement(a), a); :}
 	;
 synchronized_statement ::=
-		SYNCHRONIZED LPAREN expression RPAREN block
+					// SynchronizedStatement
+		SYNCHRONIZED LPAREN expression:a RPAREN block:b
+			{: RESULT = (SynchronizedStatement)Grm.ln(
+				new SynchronizedStatement(a, b), a); :}
 	;
 try_statement ::=
-		TRY block catches
-	|	TRY block catches_opt finally
+					// TryStatement
+		TRY block:a catches:b
+			{: RESULT = (TryStatement)Grm.ln(
+				new TryStatement(a, b, null), a); :}
+	|	TRY block:a catches_opt:b finally:c
+			{: RESULT = (TryStatement)Grm.ln(
+				new TryStatement(a, b, c), a); :}
 	;
 catches_opt ::=
-	|	catches
+					// List of CatchBlock
+	|	catches:a
+			{: RESULT = a; :}
 	;
-catches ::=	catch_clause
-	|	catches catch_clause
+catches ::=
+					// List of CatchBlock
+		catch_clause:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}		
+	|	catches:a catch_clause:b
+			{: RESULT = a; a.add(b); :}
 	;
 catch_clause ::=
-		CATCH LPAREN formal_parameter RPAREN block
+					// CatchBlock
+		CATCH LPAREN formal_parameter:a RPAREN block:b
+			{: RESULT = (CatchBlock)Grm.ln(
+				new CatchBlock(a, b), a); :}
 	;
-finally ::=	FINALLY block
+finally ::=
+					FINALLY block:a		// BlockStatement
+			{: RESULT = a; :}
 	;
 
-// 19.12) Expressions
-primary ::=	primary_no_new_array
-	|	array_creation_expression
+// 19.12) Expressions			// Expression
+primary ::=
+					primary_no_new_array:a
+			{: RESULT = a; :}
+	|	array_creation_expression:a
+			{: RESULT = a; :}
 	;
 primary_no_new_array ::=
-		literal
-	|	THIS
-	|	LPAREN expression RPAREN
-	|	class_instance_creation_expression
-	|	field_access
-	|	method_invocation
-	|	array_access
-	|	primitive_type DOT CLASS
-	|	VOID DOT CLASS
-	|	array_type DOT CLASS
-	|	name DOT CLASS
-	|	name DOT THIS
+					// Expression
+		literal:a
+			{: RESULT = a; :}
+	|	THIS:a
+			{: RESULT = (Expression)Grm.ln(
+				new SpecialExpression((TypeNode)null,
+				SpecialExpression.THIS), a); :}
+	|	LPAREN expression:a RPAREN
+			{: RESULT = a; :}
+	|	class_instance_creation_expression:a
+			{: RESULT = a; :}
+	|	field_access:a
+			{: RESULT = a; :}
+	|	method_invocation:a
+			{: RESULT = a; :}
+	|	array_access:a
+			{: RESULT = a; :}
+	|	primitive_type:a DOT CLASS
+			{: RESULT = (Expression)Grm.ln(
+				new FieldExpression((TypeNode)Grm.ln(
+				new TypeNode(a), a), "class"), a); :}
+	|	VOID:a DOT CLASS
+			{: RESULT = (Expression)Grm.ln(new FieldExpression( 
+				Grm.ln(new TypeNode(new PrimitiveType(null, 
+				PrimitiveType.VOID)), a), "class"), a); :}				
+	|	array_type:a DOT CLASS
+			{: RESULT = (Expression)Grm.ln(
+				new FieldExpression(a, "class"), a); :}
+	|	name:a DOT CLASS
+			{: RESULT = (Expression)Grm.ln(
+				new FieldExpression(a, "class"), a); :}
+	|	name:a DOT THIS
+			{: RESULT = (Expression)Grm.ln(
+			new FieldExpression(a, "this"), a); :}
 	;
 class_instance_creation_expression ::=
-		NEW class_type LPAREN argument_list_opt RPAREN
-	|	NEW class_type LPAREN argument_list_opt RPAREN class_body
-	|	primary DOT NEW IDENTIFIER
-			LPAREN argument_list_opt RPAREN
-	|	primary DOT NEW IDENTIFIER
-			LPAREN argument_list_opt RPAREN class_body
+					// NewObjectExpression
+		NEW class_type:a LPAREN argument_list_opt:b RPAREN
+			{: RESULT = (NewObjectExpression)Grm.ln(
+				new NewObjectExpression(null, 
+				a, b, null), a); :}
+	|	NEW class_type:a LPAREN argument_list_opt:b RPAREN class_body:c
+			{: List l = new LinkedList(); l.add(a);
+				RESULT = (NewObjectExpression)Grm.ln(
+				new NewObjectExpression(null, a, b, 
+				(ClassNode)Grm.ln(new ClassNode(
+				new AccessFlags(), "$Anonymous$", 
+				(TypeNode)null, l, c), a)), a); :}
+	|	primary:a DOT NEW IDENTIFIER:b
+			LPAREN argument_list_opt:c RPAREN
+			{: RESULT = (NewObjectExpression)Grm.ln(
+				new NewObjectExpression(a, (TypeNode)
+				Grm.ln(new TypeNode(new ClassType(null, 
+				b/* .getIdentifier() */, false)), b), 
+				c, null), a); :}
+	|	primary:a DOT NEW IDENTIFIER:b
+			LPAREN argument_list_opt:c RPAREN class_body:d
+			{: TypeNode t = (TypeNode)Grm.ln(new TypeNode(
+				new ClassType(null,b/* .getIdentifier() */,
+				false)), b); List l = new LinkedList(); 
+				l.add(t); 
+				RESULT = (NewObjectExpression)Grm.ln(
+				new NewObjectExpression(a, t, c,
+				(ClassNode)Grm.ln(new ClassNode( 
+				new AccessFlags(), "$Anonymous$", 
+				(TypeNode)null, l, null), a)), a); :}
 	;
 argument_list_opt ::=
-	|	argument_list
+					// List of Expression
+	|	argument_list:a
+			{: RESULT = a; :}
 	;
 argument_list ::=
-		expression
-	|	argument_list COMMA expression
+					// List of Exprssion
+		expression:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}
+	|	argument_list:a COMMA expression:b
+			{: RESULT = a; a.add(b); :}
 	;
 array_creation_expression ::=
-		NEW primitive_type dim_exprs dims_opt
-	|	NEW class_or_interface_type dim_exprs dims_opt
-	|	NEW primitive_type dims array_initializer
-	|	NEW class_or_interface_type dims array_initializer
+					// NewArrayExpression
+		NEW primitive_type:a dim_exprs:b dims_opt:c
+			{: RESULT = (NewArrayExpression)Grm.ln(
+				new NewArrayExpression(a, b,
+				c.intValue(), null), a); :}
+	|	NEW class_or_interface_type:a dim_exprs:b dims_opt:c
+			{: RESULT = (NewArrayExpression)Grm.ln(
+				new NewArrayExpression(a, b,
+				c.intValue(), null), a); :}
+	|	NEW primitive_type:a dims:b array_initializer:c
+			{: RESULT = (NewArrayExpression)Grm.ln(
+				new NewArrayExpression(a, new LinkedList(),
+				b.intValue(), c), a); :}
+	|	NEW class_or_interface_type:a dims:b array_initializer:c
+			{: RESULT = (NewArrayExpression)Grm.ln(
+				new NewArrayExpression(a, new LinkedList(),
+				b.intValue(), c), a); :}
 	;
-dim_exprs ::=	dim_expr
-	|	dim_exprs dim_expr
+dim_exprs ::=
+					// List of Expression
+		dim_expr:a
+			{: List l = new LinkedList(); l.add(a); RESULT = l; :}			
+	|	dim_exprs:a dim_expr:b
+			{: RESULT = a; a.add(b); :}
 	;
-dim_expr ::=	LBRACK expression RBRACK
+dim_expr ::=
+					// Expression
+		LBRACK expression:a RBRACK
+			{: RESULT = a; :}
 	;
 dims_opt ::=
+					// Integer
 	|	dims
 	;
-dims ::=	LBRACK RBRACK
-	|	dims LBRACK RBRACK
+dims ::=
+					// Integer
+		LBRACK RBRACK
+			{: RESULT = new Integer(1); :}
+	|	dims:a LBRACK RBRACK
+			{: RESULT = new Integer(a.intValue() + 1); :}
 	;
 field_access ::=
-		primary DOT IDENTIFIER
-	|	SUPER DOT IDENTIFIER
-	|	name DOT SUPER DOT IDENTIFIER
+					// FieldExpression
+		primary:a DOT IDENTIFIER:b
+			{: RESULT = (FieldExpression)Grm.ln(
+				new FieldExpression(a, 
+				b/* .getIdentifier() */), a); :}
+	|	SUPER:n DOT IDENTIFIER:a
+			{: RESULT = (FieldExpression)Grm.ln(
+				new FieldExpression(
+				(SpecialExpression)Grm.ln(
+				new SpecialExpression((TypeNode)null,
+				SpecialExpression.SUPER), n), 
+				a/* .getIdentifier() */), a); :}
+	|	name:a DOT SUPER DOT IDENTIFIER:b
+			{: RESULT = (FieldExpression)Grm.ln(
+				new FieldExpression(a,
+				b/* .getIdentifier() */), a); 
+				a.addIdentifier("super"); :}
 	;
 method_invocation ::=
-		name LPAREN argument_list_opt RPAREN
-	|	primary DOT IDENTIFIER LPAREN argument_list_opt RPAREN
-	|	SUPER DOT IDENTIFIER LPAREN argument_list_opt RPAREN
-	|	name DOT SUPER DOT IDENTIFIER LPAREN argument_list_opt RPAREN
+					// MethodExpression
+		name:a LPAREN argument_list_opt:b RPAREN
+			{: RESULT = (MethodExpression)Grm.ln(
+				new MethodExpression(null, a.getName(), b), 
+				a); :}
+	|	primary:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
+			{: RESULT = (MethodExpression)Grm.ln(
+				new MethodExpression(a, b/* .getIdentifier() */, c),
+				a); :}
+	|	SUPER:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
+			{: RESULT = (MethodExpression)Grm.ln(
+				new MethodExpression((Expression)Grm.ln(
+				new SpecialExpression((TypeNode)null, 
+				SpecialExpression.SUPER), a),
+				b/* .getIdentifier() */, c), a); :}	
+	|	name:a DOT SUPER DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
+			{: RESULT = (MethodExpression)Grm.ln(
+				new MethodExpression(a, b/* .getIdentifier() */, c),
+				a); :}	
 	;
 array_access ::=
-		name LBRACK expression RBRACK
-	|	primary_no_new_array LBRACK expression RBRACK
+					// ArrayIndexExpression
+		name:a LBRACK expression:b RBRACK
+			{: RESULT = (ArrayIndexExpression)Grm.ln(
+				new ArrayIndexExpression(a, b), a); :}
+	|	primary_no_new_array:a LBRACK expression:b RBRACK
+			{: RESULT = (ArrayIndexExpression)Grm.ln(
+				new ArrayIndexExpression(a, b), a); :}
 	;
 postfix_expression ::=
-		primary
-	|	name
-	|	postincrement_expression
-	|	postdecrement_expression
+					// Expression
+		primary:a
+			{: RESULT = a; :}
+	|	name:a
+			{: RESULT = a; :}
+	|	postincrement_expression:a
+			{: RESULT = a; :}
+	|	postdecrement_expression:a
+			{: RESULT = a; :}
 	;
 postincrement_expression ::=
-		postfix_expression PLUSPLUS
-	;
+					// UnaryExpression
+		postfix_expression:a PLUSPLUS
+			{: RESULT = (UnaryExpression)Grm.ln(
+				new UnaryExpression(a, 
+				UnaryExpression.POSTINCR), a); :}
+	;	
 postdecrement_expression ::=
-		postfix_expression MINUSMINUS
+					// UnaryExpression
+		postfix_expression:a MINUSMINUS
+			{: RESULT = (UnaryExpression)Grm.ln(
+				new UnaryExpression(a, 
+				UnaryExpression.POSTDECR), a); :}
 	;
 unary_expression ::=
-		preincrement_expression
-	|	predecrement_expression
-	|	PLUS unary_expression
-	|	MINUS unary_expression
-	|	unary_expression_not_plus_minus
+					// Expression
+		preincrement_expression:a
+			{: RESULT = a; :}
+	|	predecrement_expression:a
+			{: RESULT = a; :}
+	|	PLUS unary_expression:a
+			{: RESULT = (Expression)Grm.ln(
+				new UnaryExpression(a, 
+				UnaryExpression.POSITIVE), a); :}
+	|	MINUS unary_expression:a
+			{: RESULT = (Expression)Grm.ln(
+				new UnaryExpression(a, 
+				UnaryExpression.NEGATIVE), a); :}
+	|	unary_expression_not_plus_minus:a
+			{: RESULT = a; :}
 	;
 preincrement_expression ::=
-		PLUSPLUS unary_expression
+					// UnaryExpression
+		PLUSPLUS unary_expression:a
+			{: RESULT = (UnaryExpression)Grm.ln(
+				new UnaryExpression(a, 
+				UnaryExpression.PREINCR), a); :}
 	;
 predecrement_expression ::=
-		MINUSMINUS unary_expression
+					// UnaryExpression
+		MINUSMINUS unary_expression:a
+			{: RESULT = (UnaryExpression)Grm.ln(
+				new UnaryExpression(a, 
+				UnaryExpression.PREDECR), a); :}
 	;
 unary_expression_not_plus_minus ::=
-		postfix_expression
-	|	COMP unary_expression
-	|	NOT unary_expression
-	|	cast_expression
+					// Expression
+		postfix_expression:a
+			{: RESULT = a; :}
+	|	COMP unary_expression:a
+			{: RESULT = (Expression)Grm.ln(
+				new UnaryExpression(a, 
+				UnaryExpression.BITCOMP), a); :}
+	|	NOT unary_expression:a
+			{: RESULT = (Expression)Grm.ln(
+				new UnaryExpression(a, 
+				UnaryExpression.LOGICALNOT), a); :}
+	|	cast_expression:a
+			{: RESULT = a; :}
 	;
 cast_expression ::=
-		LPAREN primitive_type dims_opt RPAREN unary_expression
-	|	LPAREN expression RPAREN unary_expression_not_plus_minus
-	|	LPAREN name dims RPAREN unary_expression_not_plus_minus
+					// CastExpression
+		LPAREN primitive_type:a dims_opt:b RPAREN unary_expression:c
+			{: RESULT = (CastExpression)Grm.ln(
+				new CastExpression( a, c), a);
+				Type t = a.getType(); a.setType(
+				t.extendArrayDims(b.intValue())); :}
+//	|	LPAREN expression:a RPAREN 
+//				unary_expression_not_plus_minus:b
+//			{: RESULT = (CastExpression)Grm.ln(
+//				new CastExpression( a, b), a); :}
+	|	LPAREN name:a dims:b RPAREN unary_expression_not_plus_minus:c
+			{: Type t = new ArrayType(null, new ClassType(null, 
+				a.getName(), false), b.intValue());
+				RESULT = (CastExpression)Grm.ln(
+				new CastExpression( new TypeNode(t), c), a); :}
 	;
 multiplicative_expression ::=
-		unary_expression
-	|	multiplicative_expression MULT unary_expression
-	|	multiplicative_expression DIV unary_expression
-	|	multiplicative_expression MOD unary_expression
+					// Expression
+		unary_expression:a
+			{: RESULT = a; :}
+	|	multiplicative_expression:a MULT unary_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.MULT, b), a); :}
+	|	multiplicative_expression:a DIV unary_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.DIV, b), a); :}
+	|	multiplicative_expression:a MOD unary_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.MOD, b), a); :}
 	;
 additive_expression ::=
-		multiplicative_expression
-	|	additive_expression PLUS multiplicative_expression
-	|	additive_expression MINUS multiplicative_expression
+					// Expression
+		multiplicative_expression:a
+			{: RESULT = a; :}
+	|	additive_expression:a PLUS multiplicative_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.PLUS, b), a); :}
+	|	additive_expression:a MINUS multiplicative_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.MINUS, b), a); :}
 	;
 shift_expression ::=
-		additive_expression
-	|	shift_expression LSHIFT additive_expression
-	|	shift_expression RSHIFT additive_expression
-	|	shift_expression URSHIFT additive_expression
+					// Expression
+		additive_expression:a
+			{: RESULT = a; :}
+	|	shift_expression:a LSHIFT additive_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.LSHIFT, b), a); :}
+	|	shift_expression:a RSHIFT additive_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.RSHIFT, b), a); :}
+	|	shift_expression:a URSHIFT additive_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.RUSHIFT, b), a); :}
 	;
 relational_expression ::=
-		shift_expression
-	|	relational_expression LT shift_expression
-	|	relational_expression GT shift_expression
-	|	relational_expression LTEQ shift_expression
-	|	relational_expression GTEQ shift_expression
-	|	relational_expression INSTANCEOF reference_type
+					// Expression
+		shift_expression:a
+			{: RESULT = a; :}
+	|	relational_expression:a LT shift_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.LT, b), a); :}
+	|	relational_expression:a GT shift_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.GT, b), a); :}
+	|	relational_expression:a LTEQ shift_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.LE, b), a); :}
+	|	relational_expression:a GTEQ shift_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.GE, b), a); :}
+	|	relational_expression:a INSTANCEOF reference_type:b
+			{: RESULT = (Expression)Grm.ln(
+				new InstanceofExpression(a,
+				b), a); :}
 	;
 equality_expression ::=
-		relational_expression
-	|	equality_expression EQEQ relational_expression
-	|	equality_expression NOTEQ relational_expression
+					// Expression
+		relational_expression:a
+			{: RESULT = a; :}
+	|	equality_expression:a EQEQ relational_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.EQUAL, b), a); :}
+	|	equality_expression:a NOTEQ relational_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.NE, b), a); :}
 	;
 and_expression ::=
-		equality_expression
-	|	and_expression AND equality_expression
+					// Expression	
+		equality_expression:a
+			{: RESULT = a; :}
+	|	and_expression:a AND equality_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.BIT_AND, b), a); :}
 	;
 exclusive_or_expression ::=
-		and_expression
-	|	exclusive_or_expression XOR and_expression
+					// Expression
+		and_expression:a
+			{: RESULT = a; :}
+	|	exclusive_or_expression:a XOR and_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.BIT_XOR, b), a); :}
 	;
 inclusive_or_expression ::=
-		exclusive_or_expression
-	|	inclusive_or_expression OR exclusive_or_expression
+					// Expression
+		exclusive_or_expression:a
+			{: RESULT = a; :}
+	|	inclusive_or_expression:a OR exclusive_or_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a, 
+				BinaryExpression.BIT_OR, b), a); :}
 	;
 conditional_and_expression ::=
-		inclusive_or_expression
-	|	conditional_and_expression ANDAND inclusive_or_expression
+					// Expression
+		inclusive_or_expression:a
+			{: RESULT = a; :}
+	|	conditional_and_expression:a ANDAND inclusive_or_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a,
+				BinaryExpression.LOGIC_AND, b), a); :}
 	;
 conditional_or_expression ::=
-		conditional_and_expression
-	|	conditional_or_expression OROR conditional_and_expression
+					// Expression
+		conditional_and_expression:a
+			{: RESULT = a; :}
+	|	conditional_or_expression:a OROR conditional_and_expression:b
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a, 
+				BinaryExpression.LOGIC_OR, b), a); :}
 	;
 conditional_expression ::=
-		conditional_or_expression
-	|	conditional_or_expression QUESTION expression 
-			COLON conditional_expression
+					// Expression
+		conditional_or_expression:a
+			{: RESULT = a; :}
+	|	conditional_or_expression:a QUESTION expression:b 
+			COLON conditional_expression:c
+			{: RESULT = (Expression)Grm.ln(
+				new TernaryExpression(a, b, c), a); :}
 	;
 assignment_expression ::=
-		conditional_expression
-	|	assignment
+					// Expression
+		conditional_expression:a
+			{: RESULT = a; :}
+	|	assignment:a
+			{: RESULT = a; :}
 	;
-assignment ::=	left_hand_side assignment_operator assignment_expression
+assignment ::=
+					// Expression
+		left_hand_side:a assignment_operator:b assignment_expression:c
+			{: RESULT = (Expression)Grm.ln(
+				new BinaryExpression(a, b.intValue(), 
+				c), a); :}
 	;
 left_hand_side ::=
-		name
-	|	field_access
-	|	array_access
+					// Expression
+		name:a
+			{: RESULT = a; :}
+	|	field_access:a
+			{: RESULT = a; :}
+	|	array_access:a
+			{: RESULT = a; :}
 	;
 assignment_operator ::=
+					// Integer
 		EQ
+			{: RESULT = new Integer(BinaryExpression.ASSIGN); :}
 	|	MULTEQ
+			{: RESULT = new Integer(BinaryExpression.MULTASSIGN); :}
 	|	DIVEQ
+			{: RESULT = new Integer(BinaryExpression.DIVASSIGN); :}
 	|	MODEQ
+			{: RESULT = new Integer(BinaryExpression.MODASSIGN); :}
 	|	PLUSEQ
+			{: RESULT = new Integer(BinaryExpression.PLUSASSIGN); :}
 	|	MINUSEQ
+			{: RESULT = new Integer(BinaryExpression.SUBASSIGN); :}
 	|	LSHIFTEQ
+			{: RESULT = new Integer(BinaryExpression.LSHIFTASSIGN); :}
 	|	RSHIFTEQ
+			{: RESULT = new Integer(BinaryExpression.RSHIFTASSIGN); :}
 	|	URSHIFTEQ
+			{: RESULT = new Integer(BinaryExpression.RUSHIFTASSIGN); :}
 	|	ANDEQ
+			{: RESULT = new Integer(BinaryExpression.ANDASSIGN); :}
 	|	XOREQ
+			{: RESULT = new Integer(BinaryExpression.XORASSIGN); :}
 	|	OREQ
+			{: RESULT = new Integer(BinaryExpression.ORASSIGN); :}
 	;
 expression_opt ::=
+					// Expression
 	|	expression:a
 			{: RESULT = a; :}
 	;
-expression ::=	
+expression ::=
+					// Expression
 		assignment_expression:a
 			{: RESULT = a; :}
 	;
 constant_expression ::=
-		expression
+					// Expression
+		expression:a
 			{: RESULT = a; :}
 	;

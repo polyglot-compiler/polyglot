@@ -29,9 +29,9 @@ public class VariableDeclarationStatement extends Statement {
    **/
   public static final class Declarator {
     public String name;
-    public final int additionalDims;    
+    public int additionalDims;    
     // will be null for uninitialized variable.
-    public final Expression initializer;
+    public Expression initializer;
     /**
      * Creates a new Declarator for a variable named <n>, with <dims>
      *   dimensions beyond those of the declarations's base type.

@@ -19,7 +19,7 @@ import java.util.ListIterator;
  * Overview: A mutable representation of a Java language For
  *   statment.  Contains a statement to be executed and an expression
  *   to be tested indicating whether to reexecute the statement.
- */ 
+ */
 public class ForStatement extends Statement {
   /**
    * Checks: Every element of incrementors is an Expression.
@@ -27,22 +27,16 @@ public class ForStatement extends Statement {
    *    initializer <initializer>, condition <condition>, and incrementors
    *    <incrementors>.
    */
-  public ForStatement(Statement initializer,
+  public ForStatement(List initializers,
 		      Expression condition,
 		      List incrementors,
 		      Statement body) {
+    TypedList.check(initializers, Expression.class);
     TypedList.check(incrementors, Expression.class);
-    this.initializer = initializer;
+    this.initializers = new ArrayList(initializers);
     this.condition = condition;
     this.body = body;
     this.incrementors = new ArrayList(incrementors);
-  }
-
-  /**
-   * Returns the initializer of this for statement.
-   **/
-  public Statement getInitializer() {
-    return initializer;
   }
 
   /**
@@ -60,25 +54,22 @@ public class ForStatement extends Statement {
   }
 
   /**
-   * Sets the initializer of this for statement to equal <initializer>
-   **/
-  public void setInitializer(Statement initializer) {
-   this.initializer = initializer ;
-  } 
-
-  /**
    * Sets the condition of this for statement to equal <condition>
    **/
   public void setCondition(Expression condition) {
    this.condition = condition;
-  } 
+  }
 
   /**
    * Sets the body of this for statement to equal <body>
    **/
   public void setBody(Statement body) {
    this.body = body;
-  } 
+  }
+
+  public TypedList getInitializers() {
+      return new TypedList(initializers, Expression.class, false);
+  }
 
   /**
    * Returns a TypedList for the incremenetors of <this>, which only
@@ -92,8 +83,15 @@ public class ForStatement extends Statement {
   public void translate(Context c, CodeWriter w)
   {
     w.write ( " for ( " );
-    initializer.translate(c, w);
+    for ( ListIterator iter = initializers.listIterator(); iter.hasNext(); )
+    {
+      ((Expression)iter.next()).translate(c, w);
+      if (iter.hasNext())
+        w.write (", " );
+    }
     // don't have to write a semicolon because initializer is a statemnt
+    // except it is, so we do have to.
+    w.write (" ; " ); 
     condition.translate(c, w);
     w.write (" ; " ); // condition is a expr, so write semicolon.
     for ( ListIterator iter = incrementors.listIterator(); iter.hasNext(); )
@@ -111,7 +109,10 @@ public class ForStatement extends Statement {
   public void dump(Context c, CodeWriter w)
   {
     w.write (" ( FOR " );
-    initializer.dump(c, w);
+    for (ListIterator iter = initializers.listIterator(); iter.hasNext(); )
+    {
+      ((Expression)iter.next()).dump(c, w);
+    }    
     condition.dump(c, w);
     for (ListIterator iter = incrementors.listIterator(); iter.hasNext(); )
     {
@@ -130,40 +131,51 @@ public class ForStatement extends Statement {
   }
 
   public void visitChildren(NodeVisitor v) {
-    initializer = (Statement) initializer.visit(v);
-    condition = (Expression) initializer.visit(v);
+    for(ListIterator iter = initializers.listIterator(); iter.hasNext(); ) {
+      Expression expr = (Expression) iter.next();
+      Expression newExpr = (Expression) expr.visit(v);
+      if (expr != newExpr)
+        iter.set(newExpr);
+    }
+    condition = (Expression) condition.visit(v);
     for(ListIterator iter = incrementors.listIterator(); iter.hasNext(); ) {
       Expression expr = (Expression) iter.next();
       Expression newExpr = (Expression) expr.visit(v);
       if (expr != newExpr)
-	iter.set(newExpr);
+	      iter.set(newExpr);
     }
     body = (Statement) body.visit(v);
   }
 
-  public Node copy() {    
-    ForStatement fs = 
-      new ForStatement(initializer,condition,incrementors,body);
+  public Node copy() {
+    ForStatement fs =
+      new ForStatement(initializers,condition,incrementors,body);
     fs.copyAnnotationsFrom(this);
     return fs;
   }
 
   public Node deepCopy() {
+    ArrayList initList = new ArrayList();
     ArrayList incrList = new ArrayList();
+    for (Iterator iter = initializers.iterator(); iter.hasNext(); ) {
+      Expression expr = (Expression) iter.next();
+      initList.add(expr.deepCopy());
+    }
     for (Iterator iter = incrementors.iterator(); iter.hasNext(); ) {
       Expression expr = (Expression) iter.next();
       incrList.add(expr.deepCopy());
     }
-    ForStatement fs = 
-      new ForStatement((Statement) initializer.deepCopy(),
+    ForStatement fs =
+      new ForStatement(initList,
 		       (Expression) condition.deepCopy(),
 		       incrList,
 		       (Statement) body.deepCopy());
     fs.copyAnnotationsFrom(this);
     return fs;
   }
-
-  private Statement initializer;
+  
+  // RI: every member is an Expression.
+  private List initializers;
   private Expression condition;
   // RI: every member is an Expression.
   private List incrementors;

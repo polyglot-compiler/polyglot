@@ -6,7 +6,7 @@ class Separator extends Token {
   char which;
   Separator(int line, char which) { super(line); this.which = which; }
 
-  Symbol symbol() {
+  public Symbol symbol() {
     switch(which) {
     case '(': return new Symbol(Sym.LPAREN);
     case ')': return new Symbol(Sym.RPAREN);

@@ -45,8 +45,11 @@ public class BinaryExpression extends Expression {
     public static final int RSHIFTASSIGN   = 27; // >>= operator
     public static final int RUSHIFTASSIGN  = 28; // >>>= operator
 
+    public static final int PLUS           = 29; // + operator
+    public static final int MINUS          = 30; // - operator
+
     // Largest operator used.
-    public static final int MAX_OPERATOR   = RUSHIFTASSIGN;
+    public static final int MAX_OPERATOR   = MINUS;
 
     /**
      * Requires: A valid value for <operator> as listed in public

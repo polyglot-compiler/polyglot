@@ -7,6 +7,7 @@ package jltools.ast;
 import jltools.types.Type;
 import jltools.types.AccessFlags;
 import jltools.types.Context;
+import jltools.types.ArrayType;
 import jltools.util.CodeWriter;
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
@@ -31,9 +32,10 @@ public class MethodNode extends ClassMember {
    * Overview: Creates a new MethodNode to represent a constructor
    * which takes <formals> as parameters, may throw exceptions in
    * <exceptions>, is modified by <accessFlags> and contains <body>
-   * for a body.  
+   * for a body.
    */
   public MethodNode(AccessFlags accessFlags,
+        String name,
 		    List formals,
 		    List exceptions,
 		    BlockStatement body) {
@@ -43,11 +45,12 @@ public class MethodNode extends ClassMember {
     TypedList.check(exceptions, TypeNode.class);
     this.exceptions = new ArrayList(exceptions);
     this.body = body;
-    this.name = null;
+    this.name = name;
     this.returnType = null;
     this.constructor = true;
+    this.additionalDims = 0;
   }
-  
+
   /**
    * Requires: all elements of <formals> are of type FormalParameter,
    * all elements of <exceptions> are of type Type.
@@ -72,6 +75,7 @@ public class MethodNode extends ClassMember {
     this.name = name;
     this.returnType = returnType;
     this.constructor = false;
+    this.additionalDims = 0;
   }
 
   /**
@@ -91,7 +95,7 @@ public class MethodNode extends ClassMember {
   /**
    * Effects: Sets the AccessFlags for this Method to be <newFlags>.
    */
-  public void setAccssFlags(AccessFlags newFlags) {
+  public void setAccessFlags(AccessFlags newFlags) {
     accessFlags = newFlags;
   }
 
@@ -107,6 +111,12 @@ public class MethodNode extends ClassMember {
    * <newReturnType>.
    */
   public void setReturnType(TypeNode newReturnType) {
+    if(additionalDims > 0)
+    {
+      Type type = newReturnType.getType();
+      newReturnType.setType(new ArrayType(type.getTypeSystem(),
+          type, additionalDims));
+    }
     returnType = newReturnType;
   }
 
@@ -115,7 +125,15 @@ public class MethodNode extends ClassMember {
    * <newReturnType>.
    */
   public void setReturnType(Type newReturnType) {
+    if(additionalDims > 0)
+    {
+      newReturnType = new ArrayType(null, newReturnType, additionalDims);
+    }
     returnType = new TypeNode(newReturnType);
+  }
+
+  public void addAdditionalDimension() {
+    additionalDims++;
   }
 
   /**
@@ -131,7 +149,7 @@ public class MethodNode extends ClassMember {
   public void setName(String newName) {
     name = newName;
   }
-   
+
   /**
    * Effects: Adds a formal parameter <fp> to the list of arguments taken
    * by this method.
@@ -190,6 +208,10 @@ public class MethodNode extends ClassMember {
     exceptions.remove(pos);
   }
 
+  public void setExceptions(List exceptions) {
+    this.exceptions = exceptions;
+  }
+
   /**
    * Effects: Returns a typed list iterator which returns the
    * exceptions thrown by this in order.
@@ -199,7 +221,7 @@ public class MethodNode extends ClassMember {
 				 TypeNode.class,
 				 false);
   }
-  
+
   /**
    * Effects: Returns the BlockStatement representing the body of this
    * method.
@@ -229,7 +251,7 @@ public class MethodNode extends ClassMember {
     }
     for (Iterator i = formals.iterator(); i.hasNext(); )
     {
-      ((Expression)i.next()).translate(c, w);
+      ((FormalParameter)i.next()).translate(c, w);
       if (i.hasNext())
         w.write (" , ");
     }
@@ -255,7 +277,7 @@ public class MethodNode extends ClassMember {
     for (Iterator i = formals.iterator(); i.hasNext(); )
     {
       w.write("(");
-      ((Expression)i.next()).translate(c, w);
+      ((FormalParameter)i.next()).translate(c, w);
       w.write(")");
     }
     w.write(")");
@@ -295,9 +317,10 @@ public class MethodNode extends ClassMember {
     }
     if (isConstructor()) {
       mn = new MethodNode(accessFlags.copy(),
-			  newFormals,
+        name, newFormals, 
 			  deep ? Node.deepCopyList(exceptions) : exceptions,
 			  deep ? (BlockStatement) body.deepCopy() : body);
+      mn.additionalDims = additionalDims;
     } else {
       mn = new MethodNode(accessFlags.copy(),
 			  deep ? (TypeNode)returnType.deepCopy() :returnType,
@@ -305,6 +328,7 @@ public class MethodNode extends ClassMember {
 			  newFormals,
 			  deep ? Node.deepCopyList(exceptions) : exceptions,
 			  deep ? (BlockStatement) body.deepCopy() : body);
+      mn.additionalDims = additionalDims;
     }
     return mn;
   }
@@ -316,4 +340,5 @@ public class MethodNode extends ClassMember {
   private List formals;
   private List exceptions;
   private BlockStatement body;
+  private int additionalDims;
 }
