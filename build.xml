@@ -752,6 +752,39 @@ ext=""
 
   <target name="polyj-dist" depends="jl-dist,polyj"/>
 
+  <!-- Creates the Windows and UNIX distributions for j0. -->
+  <target name="j0-dist" depends="j0-jar,polyglot-jar,cup" 
+    description="Builds the j0 Windows and UNIX distribution files and puts them in the dist directory.">
+
+    <!-- Creates the Windows distribution .zip. -->
+    <zip destfile="${dist}/j0.zip">
+      <zipfileset dir="${src}/polyglot/ext/j0/doc/" includes="LICENSE,README.txt" prefix="j0"/>
+      <zipfileset dir="${src}/polyglot/ext/j0/j0-dist/" includes="*.bat" prefix="j0"/>
+      <zipfileset dir="${lib}/" includes="polyglot.jar, j0.jar, java_cup.jar" prefix="j0"/>
+      <zipfileset dir="${src}/polyglot/ext/j0/tests/demo" prefix="j0/demo"/>
+    </zip>   
+
+    <!-- Creates the UNIX distribution. -->
+    <tar destfile="${dist}/j0.tar">
+      <tarfileset dir="${src}/polyglot/ext/j0/doc/" mode="644" prefix="j0">
+        <include name="LICENSE"/>
+        <include name="README.txt"/>
+      </tarfileset>
+      <tarfileset dir="${src}/polyglot/ext/j0/j0-dist/" mode="755" prefix="j0">
+        <include name="*.sh"/>
+      </tarfileset>
+      <tarfileset dir="${lib}/" mode="755" prefix="j0">
+        <include name="polyglot.jar"/>
+        <include name="j0.jar"/>
+        <include name="java_cup.jar"/>
+      </tarfileset>
+      <tarfileset dir="${src}/polyglot/ext/j0/tests/demo" prefix="j0/demo">
+      </tarfileset>
+    </tar>
+    <gzip zipfile="${dist}/j0.tar.gz" src="${dist}/j0.tar"/>
+    <delete file="${dist}/j0.tar"/>
+  </target>
+
   <target name="jx-jar" depends="jx">
     <jar jarfile="${lib}/jx.jar" basedir="${classes}" includes="polyglot/ext/jx/**"/>
     <jar jarfile="${lib}/jxrt.jar" basedir="${classes}" includes="jx/runtime/**"/>
