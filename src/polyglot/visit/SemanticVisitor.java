@@ -123,8 +123,6 @@ public abstract class SemanticVisitor extends BaseVisitor
     }
 
     public Node leave(Node old, Node n, NodeVisitor v) {
-        Context.Mark mark = context.mark();
-
         int oldDepth = depth - 1;
 
 	try {
@@ -161,7 +159,7 @@ public abstract class SemanticVisitor extends BaseVisitor
 	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
 		                 e.getMessage(), position);
 
-            context.popToMark(mark);
+            leaveScope(n);
 
             if (! catchErrors(n)) {
                 errorDepth = oldDepth;
