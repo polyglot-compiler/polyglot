@@ -4,6 +4,7 @@ import jltools.frontend.*;
 import jltools.ast.Node;
 import jltools.visit.ClassSerializer;
 import jltools.util.*;
+import jltools.main.Main;
 
 import java.lang.reflect.*;
 import java.io.*;
@@ -154,7 +155,7 @@ public class LoadedClassResolver implements ClassResolver
       int i = checkCompilerVersion( (String)field.get( null));
       if( i != COMPATIBLE ) {
         /* Incompatible or older version, so go with the source. */
-        // System.err.println( "Incompatible version for " + name + ".");
+        Main.report(null, 1, "Incompatible source file version for " + name + ".");
         return getTypeFromTarget( t, name);
       }
 

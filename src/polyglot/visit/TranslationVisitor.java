@@ -6,7 +6,10 @@ import jltools.types.*;
 import jltools.util.*;
 
 import java.io.*;
+import java.util.Collection;
 
+/** A TranslationVisitor generates output code from the processed AST.
+ */
 public class TranslationVisitor extends NodeVisitor
 {
   protected ExtensionFactory ef;
@@ -15,13 +18,19 @@ public class TranslationVisitor extends NodeVisitor
   protected TypeSystem ts;
   protected ErrorQueue eq;
   protected int outputWidth;
+  protected Collection outputFiles;
 
+  /**
+   * Create a TranslationVisitor. The output of the visitor is a collection
+   * of files whose names are added to the collection <code>outputFiles</code>.
+   */
   public TranslationVisitor(ExtensionFactory ef,
 			    ImportTable it,
 			    Target target,
 			    TypeSystem ts,
 			    ErrorQueue eq,
-			    int outputWidth)
+			    int outputWidth,
+			    Collection outputFiles)
   {
     this.ef = ef;
     this.it = it;
@@ -29,6 +38,7 @@ public class TranslationVisitor extends NodeVisitor
     this.ts = ts;
     this.eq = eq;
     this.outputWidth = outputWidth;
+    this.outputFiles = outputFiles;
   }
 
   public Node override(Node n)
@@ -44,6 +54,7 @@ public class TranslationVisitor extends NodeVisitor
 	    w.flush();
 	    System.out.flush();
 	    target.closeDestination();
+	    outputFiles.addAll(target.outputFiles());
 	}
 	catch (IOException e) {
 	  eq.enqueue(ErrorInfo.IO_ERROR,

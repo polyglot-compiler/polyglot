@@ -10,595 +10,305 @@ import jltools.util.*;
 import java.io.*;
 import java.util.*;
 
-
 public class Main
 {
-  private static final String MAIN_OPT_SOURCE_PATH 
-                                        = "Source Path (Coll'n of File";
-  private static final String MAIN_OPT_OUTPUT_DIRECTORY
-                                        = "Output Directory (File)";
-  private static final String MAIN_OPT_SOURCE_EXT 
-                                        = "Source Extension (String)";
-  private static final String MAIN_OPT_OUTPUT_EXT 
-                                        = "Output Extension (String)";
-  private static final String MAIN_OPT_STDOUT
-                                        = "Output to stdout (Boolean)";
-  private static final String MAIN_OPT_POST_COMPILER
-                                        = "Name of Post Compiler (String)";
-  private static final String MAIN_OPT_DUMP             
-                                        = "Dump AST (Boolean)";
-  private static final String MAIN_OPT_SCRAMBLE         
-                                        = "Scramble AST (Boolean)";
-  private static final String MAIN_OPT_SCRAMBLE_SEED  
-                                        = "Scramble Random Seed (Long)";
-  private static final String MAIN_OPT_THREADS
-                                        = "Use multiple threads (Boolean)";
-  private static final String MAIN_OPT_EXT
-                                        = "Use language extension (String)";
+  /** Compiler options. Access to compiler options via the Compiler object,
+      rather than through this static variable, is encouraged for future
+      extensibility. */
+  public static Options options = new Options();
+  public static Collection report_topics = new HashSet();
 
-  private static final int MAX_THREADS = 2;
-
-  private static Map options;
+  /** Source files specified on the command line */
   private static Set source;
-  private static boolean hasErrors = false;
 
-  static String ext = "";
-  static Class extClass = null;
-  static ExtensionInfo extInfo = null;
+  /** Whether any errors seen yet */
+  private boolean hasErrors = false;
 
   public static final void main(String args[])
   {
-    options = new HashMap();
-    source = new TreeSet();
+    source = new HashSet();
     
     parseCommandLine(args, options, source);
 
-    MainTargetFactory tf = new MainTargetFactory( (String)options.get( MAIN_OPT_SOURCE_EXT),
-                               (Collection)options.get( MAIN_OPT_SOURCE_PATH),
-                                (File)options.get( MAIN_OPT_OUTPUT_DIRECTORY),
-                                (String)options.get( MAIN_OPT_OUTPUT_EXT),
-                                (Boolean)options.get( MAIN_OPT_STDOUT));
+    MainTargetFactory tf = new MainTargetFactory(options);
+    Compiler compiler = new Compiler(options, tf);
 
-    if (extInfo == null) {
-	extInfo = new StandardExtensionInfo();
-    }
+    String targetName = null;
+    if (!compiler.compile(source)) System.exit(1);
 
-    /* Must initialize before instantiating any compilers. */
+    Main.report(null, 1, "Output files: " + compiler.outputFiles());
 
-    Compiler.initialize( options, tf, extInfo);
-    
-    /* Now compile each file. */
-    int totalThreads;
-
-    if( ((Boolean)options.get( MAIN_OPT_THREADS)).booleanValue()) {
-      totalThreads = Math.min( source.size(), MAX_THREADS);
-    }
-    else {
-      totalThreads = 1;
-    }
-
-    TargetSet tl = new TargetSet( source, totalThreads);
-    Compiler compiler = new Compiler();
-
-    /* A note about threads: the multithreaded implementation is not entirely 
-     * complete. It will translate any file given on the command-line, but
-     * will not translate dependent class files. Also the -post options does
-     * not work with the multithreaded implementation. (It could but was 
-     * never fully implemented.) The rationale here is that the multithreaded
-     * version really isn't any faster and so there was no reason to finish it.
-     */
-
-    if( totalThreads > 1) {
-      /* Start the threads. */
-      for( int i = 0; i < totalThreads; i++) {
-        WorkThread wt = new WorkThread( tl, compiler);
-        Thread thread = new Thread( wt);
-	Compiler.verbose( Main.class, "Starting a thread.");
-        thread.start();
-      }
-    }
-    else {
-      /* Single threaded mode. */
-      Iterator iter;
-      String targetName = null;
-
-      try
-      {
-        Compiler.verbose( Main.class, "read all files from the command-line.");
-        
-        iter = source.iterator();
-        while( iter.hasNext()) {
-          targetName = (String)iter.next();
-          if( !compiler.readFile( targetName)) {
-            hasErrors = true;
-          }
-        }
-        
-        Compiler.verbose( Main.class, "done reading, now translating...");
-        
-        iter = source.iterator();
-        while( iter.hasNext()) {
-          targetName = (String)iter.next();
-          if( !compiler.compileFile( targetName)) {
-            hasErrors = true;
-          }
-        }
-        
-      }
-      catch( FileNotFoundException fnfe)
-      {
-        System.err.println( compilerName()
-                            + ": cannot find source file -- " + targetName);
-        System.exit( 1);
-      }
-      catch( IOException e)
-      {
-        System.err.println( compilerName()
-                            + ": caught IOException while compiling -- " 
-                            + targetName + ": " + e.getMessage());
-        System.exit( 1);
-      }
-      catch( ErrorLimitError ele)
-      {
-        System.exit( 1);
-      }
+    /* Now call javac or jikes, if necessary. */
+    if (options.post_compiler != null && !options.output_stdout) {
+      Runtime runtime = Runtime.getRuntime();
       
-      /* Make sure we do this before we exit. */
-      Collection completed = new LinkedList();
-      try
-      {
-        if( !compiler.cleanup( completed)) {
-          System.exit( 1);
-        }
+      Iterator iter = compiler.outputFiles().iterator();
+      while(iter.hasNext()) {
+	String outfile = (String)iter.next(); 
+	
+	String command = options.post_compiler + " -classpath " 
+	  + (options.output_directory != null ?
+		  options.output_directory + File.pathSeparator + "." +
+		  File.pathSeparator
+		: "") 
+	  + System.getProperty("java.class.path") + " "
+	  + outfile;
+	
+	report(null, 1, "Executing post-compiler " + command);
+	
+	try 
+	{
+	  Process proc = runtime.exec(command);
+	  
+	  InputStreamReader err = 
+	    new InputStreamReader(proc.getErrorStream());
+	  char[] c = new char[72];
+	  int len;
+	  while((len = err.read(c)) > 0) {
+	    System.err.print(String.valueOf(c, 0, len));
+	  }
+	  
+	  proc.waitFor();
+	  if (proc.exitValue() > 0) {
+	    System.exit(proc.exitValue());
+	  }
+	}
+	catch(Exception e) 
+	{ 
+	  System.err.println("Caught Exception while running compiler: "
+			      + e.getMessage());
+	  System.exit(1);
+	}
       }
-      catch( IOException e)
-      {
-        System.err.println( "Caught IOException while compiling: "
-                            + e.getMessage());
-        System.exit( 1);
-      }
-      
-      if( hasErrors) {
-        System.exit( 1);
-      }
-      
-      /* Now call javac or jikes, if necessary. */
-      if( options.get( MAIN_OPT_POST_COMPILER) != null
-          && !((Boolean)options.get( MAIN_OPT_STDOUT)).booleanValue()) {
-        Runtime runtime = Runtime.getRuntime();
-        Process proc;
-        MainTargetFactory.MainTarget t;
-        String command;
-        
-        iter = completed.iterator();
-        while( iter.hasNext()) {
-          t = (MainTargetFactory.MainTarget)iter.next(); 
-          
-          if( t.outputFileName == null) {
-            continue;
-          }
-          
-          command =  (String)options.get( MAIN_OPT_POST_COMPILER) 
-            + " -classpath " 
-            + ( options.get(MAIN_OPT_OUTPUT_DIRECTORY) != null ?
-                options.get(MAIN_OPT_OUTPUT_DIRECTORY) 
-                + File.pathSeparator + "." + File.pathSeparator :
-                "") 
-            + System.getProperty( "java.class.path") + " "
-            + t.outputFileName;
-          
-          Compiler.verbose( Main.class, "executing " + command);
-          
-          try 
-          {
-            proc = runtime.exec( command);
-            
-            InputStreamReader err = 
-              new InputStreamReader( proc.getErrorStream());
-            char[] c = new char[ 72];
-            int len;
-            while( (len = err.read( c)) > 0) {
-              System.err.print( String.valueOf( c, 0, len));
-            }
-            
-            proc.waitFor();
-            if( proc.exitValue() > 0) {
-              System.exit( proc.exitValue());
-            }
-          }
-          catch( Exception e) 
-          { 
-            System.err.println( "Caught Exception while running compiler: "
-                                + e.getMessage());
-            System.exit( 1);
-          }
-        }
-      }
-    }
-  }    public static File getOutputDirectory() {
-      return (File)options.get( MAIN_OPT_OUTPUT_DIRECTORY);  }
-
-
-  private static void setHasErrors( boolean b)
-  {
-    hasErrors = b;
-  }
-  
-  private static class TargetSet 
-  {
-    private static final int READ = 0;
-    private static final int COMPILE = 1;
-
-    private Set source;
-    private int totalThreads;
-    private int phase = READ;
-
-    private Iterator sourceIter;
-
-    private Object countLock = new Object();
-    private int threadsInNext = 0;
-    
-    private Object sourceLock = new Object();
-    
-    TargetSet( Set source, int totalThreads)
-    {
-      this.source = source;
-      this.totalThreads = totalThreads;
-
-      sourceIter = source.iterator();
-
-      Compiler.verbose( Main.class, "read all files from the command-line.");
-    }
-
-    String nextTarget()
-    {
-      String result;
-      
-      synchronized( countLock) {
-        threadsInNext++;
-      }
-
-      synchronized( sourceLock) {
-        if( !sourceIter.hasNext()) {
-          /* There is nothing to do, so figure out if there are still threads
-           * reading something, if so, then wait, otherwise, just fall out
-           * and return null.
-           */
-          if( threadsInNext == totalThreads && phase == READ) {
-            Compiler.verbose( Main.class, "done reading, now translating...");
-
-            phase = COMPILE;
-
-            sourceIter = source.iterator();
-            sourceLock.notifyAll();
-
-            result = null;
-          }
-          else if( phase == COMPILE) {
-            /* If we are compiling then there is no need to wait. */
-            result = null;
-          }
-          else {
-            /* Nope, still threads reading, we need to wait. */
-            try
-            {
-              sourceLock.wait();
-            }
-            catch( InterruptedException e)
-            {
-              setHasErrors( true);
-            }
-
-            /* When we wake up we will to return null. */
-            result = null;
-          }
-
-        }
-        else {
-          /* There is something to do... */
-          result = (String)sourceIter.next();
-        }
-      }
-      
-      
-      synchronized( countLock) {
-        threadsInNext--;
-      }
-      
-      return result;
     }
   }
 
-  private static class WorkThread implements Runnable
-  {
-    TargetSet tl;
-    Compiler compiler;
-
-    WorkThread( TargetSet tl, Compiler compiler)
-    {
-      this.tl = tl;
-      this.compiler = compiler;
-    }
-    
-    public void run()
-    {
-      String targetName = null;
-      try
-      {
-        while( (targetName = tl.nextTarget()) != null) {
-          if( !compiler.readFile( targetName)) {
-            setHasErrors( true);
-          }
-        }
-          
-        while( (targetName = tl.nextTarget()) != null) {
-          if( !compiler.compileFile( targetName)) {
-            setHasErrors( true);
-          }
-        }
-      }  
-      catch( FileNotFoundException fnfe)
-      {
-        System.err.println( compilerName()
-                            + ": cannot find source file -- " + targetName);
-          setHasErrors( true);
+  /** This is the standard 
+      Conditionally report a message that is related to one of the specified
+      topics. The variable <code>topics</code> is a collection of strings.
+      The obscurity of the message is indicated by <code>level</code>.
+      The message is reported only if the user has requested (via the
+      -report command-line option) that messages of that obscurity be reported
+      for one of the specified topics.
+  */
+  public static void report(Collection topics, int level, String message) {
+    if (topics == null) {
+      Object lvo = options.report.get("verbose");
+      if (lvo != null && ((Integer) lvo).intValue() >= level) {
+	for (int j = 1; j < level; j++) System.err.print("  ");
+	System.err.println(message);
+	return;
       }
-      catch( IOException e)
-      {
-        System.err.println( compilerName()
-                            + ": caught IOException while compiling -- " 
-                            + targetName + ": " + e.getMessage());
-        setHasErrors( true);
-        }
-      catch( ErrorLimitError ele)
-      {
-        setHasErrors( true);
-      }
+    } else
+	for (Iterator i = topics.iterator(); i.hasNext();) {
+	    String topic = (String) i.next();
+	    Object lvo = options.report.get(topic);
+	    if (lvo != null && ((Integer) lvo).intValue() >= level) {
+		for (int j = 1; j < level; j++) System.err.print("  ");
+		System.err.println(message);
+		return;
+	    }
+	}
     }
-  }
 
   static final void loadExtension(String ext) {
     if (ext != null && ! ext.equals("")) {
       String extClassName = "jltools.ext." + ext + ".ExtensionInfo";
 
+      Class extClass;
       try {
 	extClass = Class.forName(extClassName);
       }
       catch (ClassNotFoundException e) {
-	System.err.println( "Extension " + ext +
+	System.err.println("Extension " + ext +
 	  " not found: could not find class " + extClassName + "." +
 	  e.getMessage());
-	System.exit( 1);
+	System.exit(1);
+	return;
       }
 
       try {
-	extInfo = (ExtensionInfo) extClass.newInstance();
+	options.extension = (ExtensionInfo) extClass.newInstance();
       }
       catch (ClassCastException e) {
-	System.err.println( ext + " is not a valid jltools extension:" +
+	System.err.println(ext + " is not a valid jltools extension:" +
 	    " extension class " + extClassName +
 	    " exists but is not a subclass of ExtensionInfo");
-	System.exit( 1);
+	System.exit(1);
       }
       catch (Exception e) {
-	System.err.println( "Extension " + ext +
+	System.err.println("Extension " + ext +
 	  " could not be loaded: could not instantiate " + extClassName + ".");
-	System.exit( 1);
+	System.exit(1);
       }
     }
   }
 
-  static final void parseCommandLine(String args[], Map options, Set source)
+  static final void parseCommandLine(String args[], Options options, Set source)
   {
-    if(args.length < 1)
-    {
+    if(args.length < 1) {
       usage();
-      System.exit( 1);
+      System.exit(1);
     }
 
-    boolean hasError = false;
-
-    /* Set defaults. */
-    Collection sourcePath = new LinkedList();
-    sourcePath.add( new File( "."));
-    options.put( MAIN_OPT_SOURCE_PATH, sourcePath);
-    options.put( MAIN_OPT_DUMP, new Boolean( false));
-    options.put( MAIN_OPT_STDOUT, new Boolean( false));
-    options.put( MAIN_OPT_SCRAMBLE, new Boolean( false));
-
-    options.put( MAIN_OPT_EXT, new String(""));
-
-    options.put( MAIN_OPT_THREADS, new Boolean( false));
-    
-    options.put( Compiler.OPT_OUTPUT_WIDTH, new Integer(120));
-    options.put( Compiler.OPT_VERBOSE, new Boolean( false));
-    options.put( Compiler.OPT_FQCN, new Boolean( false));
-    options.put( Compiler.OPT_SERIALIZE, new Boolean( true));
-
-    for( int i = 0; i < args.length; )
+    for(int i = 0; i < args.length; )
     {
-      if( args[i].equals( "-h")) {
+      if (args[i].equals("-h")) {
         usage();
-        System.exit( 0);
+        System.exit(0);
       }
-      else if( args[i].equals( "-version")) {
-        System.out.println( "jltools Compiler version "
+      else if (args[i].equals("-version")) {
+        System.out.println("jltools Compiler version "
                            + Compiler.VERSION_MAJOR + "."
                            + Compiler.VERSION_MINOR + "."
                            + Compiler.VERSION_PATCHLEVEL);
-        System.exit( 0);
+        System.exit(0);
       }
-      else if( args[i].equals( "-d"))
+      else if (args[i].equals("-d"))
       {
         i++;
-        options.put( MAIN_OPT_OUTPUT_DIRECTORY, new File( args[i]));
+        options.output_directory = new File(args[i]);
         i++;
       }
-      else if( args[i].equals( "-sourcepath"))
+      else if (args[i].equals("-classpath") ||
+               args[i].equals("-cp")) {
+	i++;
+	String current_path = System.getProperty("java.class.path");
+	current_path = args[i] + System.getProperty("path.separator") +
+			current_path;
+	System.setProperty("java.class.path", current_path);
+	System.err.println("Warning: -classpath not implemented\n");
+	// Does the system class loader really keep looking at this?
+	// No -- this doesn't work
+      }
+      else if (args[i].equals("-sourcepath"))
       {
         i++;
-        StringTokenizer st = new StringTokenizer( args[i], File.pathSeparator);
-        while( st.hasMoreTokens())
+        StringTokenizer st = new StringTokenizer(args[i], File.pathSeparator);
+        while(st.hasMoreTokens())
         {
-          sourcePath.add( new File( st.nextToken()));
+          options.source_path.add(new File(st.nextToken()));
         }
         i++;
       }
-      else if( args[i].equals( "-fqcn")) 
+      else if (args[i].equals("-fqcn")) 
       {
         i++;
-        options.put( Compiler.OPT_FQCN, new Boolean( true));
+        options.fully_qualified_names = true;
       }
-      else if( args[i].equals( "-post"))
+      else if (args[i].equals("-post"))
       {
         i++;
-        options.put( MAIN_OPT_POST_COMPILER, args[i]);
+        options.post_compiler = args[i];
         i++;
       }
-      else if( args[i].equals( "-stdout")) 
+      else if (args[i].equals("-stdout")) 
       {
         i++;
-        options.put( MAIN_OPT_STDOUT, new Boolean( true));
+        options.output_stdout = true;
       }
-      else if( args[i].equals( "-ext")) 
+      else if (args[i].equals("-ext") || args[i].equals("-extension")) 
       {
         i++;
-        options.put( MAIN_OPT_EXT, args[i]);
 	loadExtension(args[i]);
 	i++;
-	try  {
-	    i = extInfo.parseCommandLine(args, i, options);
-	}
-	catch (UsageError u) {
-	    System.err.println(u.getMessage());
-	    usage();
+      }
+      else if (args[i].equals("-ox")) 
+      {
+        i++;
+        options.output_ext = args[i];
+        i++;
+      }
+      else if (args[i].equals("-noserial")) 
+      {
+        i++;
+	options.serialize_type_info = false;
+      }
+      else if (args[i].equals("-v") || args[i].equals("-verbose"))
+      {
+        i++;
+	Integer level = (Integer) options.report.get("verbose");
+	if (level != null) options.report.put("verbose", new Integer(1));
+      }
+      else if (args[i].equals("-report")) {
+        i++;
+	String report_option = args[i];
+        StringTokenizer st = new StringTokenizer(args[i], "=");
+	String topic = ""; int level = 0;
+	if (st.hasMoreTokens()) topic = st.nextToken();
+	if (st.hasMoreTokens())
+	  try {
+	    level = Integer.parseInt(st.nextToken());
+	  } catch (NumberFormatException e) {}
+	options.report.put(topic, new Integer(level));
+	i++;
+      }
+      else if (args[i].startsWith("-")) {
+	if (options.extension != null) {
+	    try  {
+		i = options.extension.parseCommandLine(args, i, options);
+	    }
+	    catch (UsageError u) {
+		System.err.println(u.getMessage());
+		usage();
+		System.exit(1);
+	    }
+	} else {
+	    System.err.println(compilerName() + ": illegal option -- " 
+				+ args[ i]);
+	    i++;
 	    System.exit(1);
 	}
-      }
-      else if( args[i].equals( "-sx")) 
-      {
-        i++;
-        options.put( MAIN_OPT_SOURCE_EXT, args[i]);
-        i++;
-      }
-      else if( args[i].equals( "-ox")) 
-      {
-        i++;
-        options.put( MAIN_OPT_OUTPUT_EXT, args[i]);
-        i++;
-      }
-      else if( args[i].equals( "-dump"))
-      {
-        i++;
-        options.put( MAIN_OPT_DUMP, new Boolean( true));
-      }
-      else if( args[i].equals( "-scramble"))
-      {
-        i++;
-        options.put( MAIN_OPT_SCRAMBLE, new Boolean( true));
-        try
-        {
-          long l = Long.parseLong( args[i]);
-          options.put( MAIN_OPT_SCRAMBLE_SEED, new Long( l));
-          i++;
-        }
-        catch( NumberFormatException e) {}
-      }
-      else if( args[i].equals( "-noserial")) 
-      {
-        i++;
-        options.put( Compiler.OPT_SERIALIZE, new Boolean( false));
-      }
-      else if( args[i].equals( "-threads")) 
-      {
-        i++;
-        options.put( MAIN_OPT_THREADS, new Boolean( true));
-      }
-      else if( args[i].equals( "-v") || args[i].equals( "-verbose"))
-      {
-        i++;
-        options.put( Compiler.OPT_VERBOSE, new Boolean( true));
-      }
-      else if( args[i].startsWith( "-"))
-      {
-        System.err.println( compilerName() + ": illegal option -- " 
-                            + args[ i]);
-        i++;
-        hasError = true;
-      }
-      else
-      {
-        if( hasError) {
-          usage();
-          System.exit( 1);
-        }
-
-        if( options.get( MAIN_OPT_SOURCE_EXT) == null
-            && args[i].indexOf( '.') != -1) {
-          options.put( MAIN_OPT_SOURCE_EXT, args[i].substring( 
-                           args[i].lastIndexOf( '.')));
-        }
-        source.add( args[i]);
-        sourcePath.add( new File( args[i]).getParentFile());
+      } else {
+        source.add(args[i]);
+        options.source_path.add(new File(args[i]).getParentFile());
         i++;
       }
     }
 
-    if( hasError) {
-      usage();
-      System.exit( 1);
-    }
-
-    if( source.size() < 1) {
-      System.err.println( compilerName()
+    if (source.size() < 1) {
+      System.err.println(compilerName()
                           + ": must specify at least one source file");
       usage();
-      System.exit( 1);
-    }
-
-    /* Check first for a source extension. */
-    if( options.get( MAIN_OPT_SOURCE_EXT) == null) {
-      options.put( MAIN_OPT_SOURCE_EXT, ".java");
-    }
-
-    /* Now check for an output extension. */
-    if( options.get( MAIN_OPT_OUTPUT_EXT) == null) {
-      options.put( MAIN_OPT_OUTPUT_EXT, ".java");
+      System.exit(1);
     }
   }
 
   private static String compilerName() {
-    if (extInfo == null) return "jlc";
-      else return extInfo.compilerName();
+    if (options.extension == null) return "jlc";
+      else return options.extension.compilerName();
   }
 
   private static void usage()
   {
     String fileext, compilerName;
-    if (extInfo == null) fileext = "jl";
-      else fileext = extInfo.fileExtension();
+    fileext = options.extension.fileExtension();
 
     System.err.println("usage: " + compilerName() + " [options] " +
                         "<source-file>." + fileext + " ...\n");
-    System.err.println( "where [options] includes:");
-    System.err.println( " -d <directory>          output directory");
-    System.err.println( " -sourcepath <path list> source path");
-    System.err.println( " -fqcn                   use fully-qualified class"
+    System.err.println("where [options] includes:");
+    System.err.println(" -d <directory>          output directory");
+    System.err.println(" -sourcepath <path list> source path");
+    System.err.println(" -fqcn                   use fully-qualified class"
                         + " names");
-    System.err.println( " -sx <ext>               set source extension");
-    System.err.println( " -ox <ext>               set output extension");
-    System.err.println( " -dump                   dump the ast");
-    System.err.println( " -scramble [seed]        scramble the ast");
-    System.err.println( " -noserial               disable class"
+    System.err.println(" -sx <ext>               set source extension");
+    System.err.println(" -ox <ext>               set output extension");
+    System.err.println(" -dump                   dump the ast");
+    System.err.println(" -scramble [seed]        scramble the ast");
+    System.err.println(" -noserial               disable class"
                         + " serialization");
-    System.err.println( " -ext <extension>        use language extension");
-    System.err.println( " -post <compiler>        run javac-like compiler" 
+    System.err.println(" -ext <extension>        use language extension");
+    System.err.println(" -post <compiler>        run javac-like compiler" 
                         + " after translation");
-    System.err.println( " -v -verbose             print verbose " 
-                        + "debugging info");
-    System.err.println( " -version                print version info");
-    System.err.println( " -h                      print this message");
+    System.err.println(" -v -verbose             print verbose " 
+                        + "debugging information");
+    System.err.println(" -report <topic>=<level> print verbose debugging" +
+                        " information about topic\n" +
+			"                         at specified verbosity");
+    System.err.println("   (Allowed topics: "+report_topics+")");
+    System.err.println(" -version                print version info");
+    System.err.println(" -h                      print this message");
     System.err.println();
-    if (extInfo != null) System.err.println(extInfo.options());
+    System.err.println(options.extension.options());
   }
 }

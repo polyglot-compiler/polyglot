@@ -5,6 +5,7 @@ import jltools.frontend.Compiler;
 import jltools.util.*;
 import jltools.types.*;
 import jltools.visit.*;
+import jltools.main.Main;
 
 import java.io.IOException;
 
@@ -124,10 +125,9 @@ public class TypeNode extends Node
    */
   public void translate_no_override(LocalContext c, CodeWriter w)
   {
-    if (! Compiler.useFullyQualifiedNames()) {
+    if (Main.options.fully_qualified_names) {
       w.write( type.translate(c) );
-    }
-    else {
+    } else {
       w.write( type.translate(null) );
     }
   }

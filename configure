@@ -16,7 +16,7 @@ find_in_path() {
 
 exists() {
     if [ ! "$1" "$2" ]; then
-	echo $2 not found
+	echo "** Error: $2 not found"
 	exit 1
     fi
 }
@@ -94,8 +94,8 @@ fi
 echo escaped Java home directory is "${ESC_JAVA_HOME}"
 
 
-ESC_TOOLS_JAR="${ESC_JAVA_HOME}${FILE_SEP}lib${FILE_SEP}tools.jar"
-echo escaped tools.jar is "${ESC_TOOLS_JAR}"
+# ESC_TOOLS_JAR="${ESC_JAVA_HOME}${FILE_SEP}lib${FILE_SEP}tools.jar"
+# echo escaped tools.jar is "${ESC_TOOLS_JAR}"
 
 TOP=`echo $0 | sed -e 's@[^'${FILE_SEP}']*$@@' -e 's@'${FILE_SEP}'$@@' `
 if test -z "$TOP" || test "$TOP"

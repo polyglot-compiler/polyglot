@@ -11,26 +11,19 @@ import java.util.*;
 
 public class MainTargetFactory implements TargetFactory
 {
-  String sourceExtension;
-  Collection sourcePath;
-  File outputDirectory;
+  Options options;
   String outputExtension;
-  boolean stdout;
-
-  public MainTargetFactory( String sourceExtension, Collection sourcePath,
-                            File outputDirectory, String outputExtension,
-                            Boolean stdout)
-  {
-    if (outputDirectory == null)
-	outputDirectory = new File(".");
-
-    this.sourceExtension = sourceExtension;
-    this.sourcePath = sourcePath;
-    this.outputDirectory = outputDirectory;
-    this.outputExtension = outputExtension;
-    this.stdout = (stdout != null) && (stdout.booleanValue());
+  String sourceExtension;
+  public MainTargetFactory(Options options_) {
+    options = options_;
+    outputExtension = options.output_ext;
+    sourceExtension = options.extension.fileExtension();
   }
 
+  private String fixExt(String name) {
+      return name.substring(0, name.lastIndexOf(sourceExtension)) +
+	      outputExtension;
+  }
 
   public Target createFileTarget( String fileName) throws IOException
   {
@@ -41,23 +34,17 @@ public class MainTargetFactory implements TargetFactory
       throw new FileNotFoundException( fileName);
     }
 
-    if( fileName.indexOf( sourceExtension) == -1) {
+    if (fileName.indexOf(sourceExtension) == -1) {
       throw new IOException( "All source files must have the same extension.");
     }
 
-    if( outputDirectory == null) {
+    if (options.output_directory == null) {
       /* Then it goes with the source. */
       File parentDirectory = sourceFile.getParentFile();
       String name = sourceFile.getName();
-      outputFile = new File( parentDirectory, 
-                             name.substring( 0, name.lastIndexOf(
-                                                  sourceExtension)) 
-                             + outputExtension);
-      if( sourceFile.equals( outputFile)) {
-        outputFile = new File( parentDirectory, 
-                               name.substring( 0, name.lastIndexOf(
-                                                    sourceExtension)) 
-                               + outputExtension + "$");
+      outputFile = new File(parentDirectory, fixExt(name));
+      if (sourceFile.equals(outputFile)) {
+        outputFile = new File( parentDirectory, fixExt(name) + "$");
       }
     }
     else {
@@ -74,13 +61,13 @@ public class MainTargetFactory implements TargetFactory
     /* Search the source path. */
     File sourceFile = null;
     File directory;
-    File outputFile = new File( outputDirectory, 
+    File outputFile = new File( options.output_directory,
                                 className.replace( '.', File.separatorChar)
                                 + outputExtension);
 
-    String fileName = className.replace( '.', File.separatorChar) 
+    String fileName = className.replace('.', File.separatorChar) 
                                          + sourceExtension;
-    Iterator iter = sourcePath.iterator();
+    Iterator iter = options.source_path.iterator();
 
     while( iter.hasNext())
     {
@@ -98,7 +85,7 @@ public class MainTargetFactory implements TargetFactory
     }    
 
     if( sourceFile.equals( outputFile)) {
-        outputFile = new File( outputDirectory, 
+        outputFile = new File( options.output_directory, 
                                className.replace( '.', File.separatorChar)
                                + outputExtension + "$");
     }
@@ -142,6 +129,12 @@ public class MainTargetFactory implements TargetFactory
       }
     }
 
+    public Collection outputFiles() {
+	LinkedList ret = new LinkedList();
+	ret.add(outputFile);
+	return ret;
+    }
+
     public Reader getSourceReader() throws IOException
     {
       if (sourceFileReader != null) return sourceFileReader;
@@ -152,27 +145,21 @@ public class MainTargetFactory implements TargetFactory
     {
       if (outputWriter != null) return outputWriter;
 
-      if( stdout) {
+      if( options.output_stdout) {
         return (outputWriter = new UnicodeWriter( 
                                      new PrintWriter( System.out)));
       }
       else {
         if( outputFile == null) {
           if( packageName == null) {
-            outputFile = new File( outputDirectory, 
-                                   File.separatorChar
-                                   + name.substring( 0, name.lastIndexOf( 
-                                       sourceExtension))
-                                   + outputExtension);
+            outputFile = new File(options.output_directory, 
+                                  File.separatorChar + fixExt(name));
           }
           else {
-            outputFile = new File( outputDirectory, 
+            outputFile = new File( options.output_directory, 
                                    packageName.replace( '.', 
-                                                        File.separatorChar)
-                                   + File.separatorChar
-                                   + name.substring( 0, name.lastIndexOf( 
-                                       sourceExtension))
-                                   + outputExtension);
+                                                        File.separatorChar) +
+                                     File.separatorChar + fixExt(name));
           }
         }
         if( !outputFile.getParentFile().exists()) {

@@ -20,10 +20,10 @@ public class ClassTypeJob extends Job
   ErrorQueue eq;
 
   // New job for a decoded class type -- need to do just a clean.
-  public ClassTypeJob( Target t, ClassType type,
+  public ClassTypeJob( Compiler c, Target t, ClassType type,
 			ErrorQueue eq, ClassResolver systemResolver )
   {
-    super(t);
+    super(c, t);
     this.type = type;
     this.eq = eq;
 
@@ -76,7 +76,7 @@ public class ClassTypeJob extends Job
 
       if (superClazz instanceof ParsedClassType) {
 	try {
-	  if (! Compiler.getCompiler().cleanClass(superClazz)) {
+	  if (! compiler.cleanClass(superClazz)) {
 	    eq.enqueue( ErrorInfo.SEMANTIC_ERROR, "Errors while compiling " +
 	      "superclass " + superClazz.getTypeString() + " of " +
 	      type.getTypeString() + "." );
@@ -122,7 +122,7 @@ public class ClassTypeJob extends Job
 
       if (interfaceClazz instanceof ParsedClassType) {
 	try {
-	  if (! Compiler.getCompiler().cleanClass(interfaceClazz)) {
+	  if (! compiler.cleanClass(interfaceClazz)) {
 	    eq.enqueue( ErrorInfo.SEMANTIC_ERROR, "Errors while compiling " +
 	      "super-interface " + interfaceClazz.getTypeString() + " of " +
 	      type.getTypeString() + "." );

@@ -4,7 +4,7 @@ import jltools.frontend.Compiler;
 import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
-
+import jltools.main.Main;
 
 /**
  * An <code>ImportNode</code> is an immutable representation of a Java
@@ -110,7 +110,7 @@ public class ImportNode extends Node
 
   public void translate_no_override( LocalContext c, CodeWriter w)
   {
-    if( !Compiler.useFullyQualifiedNames()) {
+    if (!Main.options.fully_qualified_names) {
       w.write( "import " + imports + (kind == PACKAGE ? ".*;" : ";"));
       w.newline(0);
     }

@@ -19,19 +19,11 @@ import java.util.*;
 public class SourceJob extends Job
 {
   Node ast;
-  TableClassResolver parsedResolver; 
-  ClassResolver systemResolver; 
   ErrorQueue eq;
 
-  public SourceJob(Target t,
-		   ErrorQueue eq,
-		   ClassResolver systemResolver,
-		   TableClassResolver parsedResolver)
-  {
-    super(t);
+  public SourceJob(Target t, ErrorQueue eq, Compiler c) {
+    super(c, t);
     this.eq = eq;
-    this.systemResolver = systemResolver;
-    this.parsedResolver = parsedResolver;
   }
 
   public Node getAST() {
@@ -39,7 +31,7 @@ public class SourceJob extends Job
   }
 
   public void parse() {
-    ExtensionInfo extInfo = Compiler.getExtensionInfo();
+    ExtensionInfo extInfo = compiler.getExtensionInfo();
     java_cup.runtime.Symbol sym = null;
 
     try {
@@ -70,13 +62,9 @@ public class SourceJob extends Job
       return;
     }
 
-    /* Try and figure out whether or not the parser was successful. */
-    if (sym == null) {
-      eq.enqueue( ErrorInfo.SYNTAX_ERROR, "Unable to parse source file.");
-      return;
-    }
-
-    if (! (sym.value instanceof Node)) {
+    /* Figure out whether or not the parser was successful. */
+    if (sym == null ||
+        !(sym.value instanceof Node)) {
       eq.enqueue( ErrorInfo.SYNTAX_ERROR, "Unable to parse source file.");
       return;
     }
@@ -87,12 +75,12 @@ public class SourceJob extends Job
   }
 
   public void read() {
-    it = new ImportTable(systemResolver, true, eq);
+    it = new ImportTable(compiler.getSystemResolver(), true, eq);
     runVisitors(READ);
     if (eq.hasErrors()) {
       return;
     }
-    parsedResolver.include(cr);
+    compiler.getParsedResolver().include(cr);
   }
 
   public void clean() {
@@ -113,15 +101,15 @@ public class SourceJob extends Job
     NodeVisitor v;
     Node result = ast;
 
-    ExtensionInfo extInfo = Compiler.getExtensionInfo();
+    ExtensionInfo extInfo = compiler.getExtensionInfo();
 
-    for (Iterator iter = extInfo.getNodeVisitors(this, stage).iterator();
+    for (Iterator iter = extInfo.getNodeVisitors(compiler, this, stage).iterator();
          iter.hasNext(); ) {
 
       v = (NodeVisitor) iter.next();
 
-      Compiler.verbose( this,
-	"running visitor " + v.getClass().getName() + "...");
+      Main.report(null, 2,
+	"  Running visitor " + v.getClass().getName() + "...");
 
       result = result.visit( v);
       v.finish();

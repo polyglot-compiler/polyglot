@@ -20,7 +20,7 @@ import jltools.ast.*;
 public abstract class TypeSystem {
 
   /**
-   * performs any initizlation necessary that requries resolvers.
+   * performs any initialization necessary that requires resolvers.
    */
   public abstract void initializeTypeSystem( ClassResolver resolver,
                                              ClassCleaner cleaner)

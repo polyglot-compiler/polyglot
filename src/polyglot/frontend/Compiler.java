@@ -7,6 +7,7 @@ import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
 import jltools.main.Main;
+import jltools.main.Options;
 
 import java.io.*;
 import java.util.*;
@@ -18,18 +19,12 @@ import java.util.*;
  */
 public class Compiler implements TargetTable, ClassCleaner
 {
-  /* Global constants. */
-  public static String OPT_OUTPUT_WIDTH     = "Output Width (Integer)";
-  public static String OPT_VERBOSE          = "Verbose (Boolean)";
-  public static String OPT_FQCN             = "FQCN (Boolean)";
-  public static String OPT_SERIALIZE        = "Class Serialization (Boolean)";
-
   /** 
    * Marks major changes in the output format of the files produced by the
    * compiler. Files produced be different major versions are considered 
    * incompatible and will not be used as source of class information.
    */
-  public static int VERSION_MAJOR           = 1;
+  public static int VERSION_MAJOR           = 0;
   
   /** 
    * Indicates a change in the compiler that does not affect the output format.
@@ -37,7 +32,7 @@ public class Compiler implements TargetTable, ClassCleaner
    * different minor versions, but if no source file is available, then the
    * class file will be used.
    */
-  public static int VERSION_MINOR           = 0;
+  public static int VERSION_MINOR           = 3;
 
   /**
    * Denote minor changes and bugfixes to the compiler. Class files compiled
@@ -48,146 +43,185 @@ public class Compiler implements TargetTable, ClassCleaner
   public static int VERSION_PATCHLEVEL      = 0;
 
   /* Global options and state. */
-  private static Map options;
-  private static int outputWidth;
-  private static boolean useFqcn;
-  private static boolean serialize;
-  private static boolean verbose;
 
-  private static boolean initialized = false;
+  /** Whether any errors have been seen yet in this compilation request. */
+  private boolean hasErrors = false;
+  private Options options;
 
-  /* Static fields. */
-  private static TypeSystem ts;
-  private static ExtensionFactory ef;
-  private static ExtensionInfo extInfo;
-  private static Compiler compiler;
+  private CachingClassResolver systemResolver;
+  private TableClassResolver parsedResolver;
+  private LoadedClassResolver sourceResolver;
 
-  private static CachingClassResolver systemResolver;
-  private static TableClassResolver parsedResolver;
-  private static LoadedClassResolver sourceResolver;
-
-  protected static TargetFactory tf;
+  protected TypeSystem type_system;
+  protected ExtensionFactory extension_factory;
+  protected TargetFactory target_factory;
 
   /** What's done and what needs work. */  
-  protected static List workList;
-  protected static Map workListMap;
+  protected List workList;
+  protected Map workListMap;
+
+  private Collection outputFiles = new HashSet();
 
   /**
-   * Initialize the compiler. Must be called before any instaniation of
+   * Initialize the compiler. Must be called before any instantiation of
    * objects in this class. Behavior for multiple invocations of this method
    * are undefined.
    *
-   * @param options Should contain options defined be the OPT_* constants.
-   * @param tf Allows the compiler to draw in new source as necessary.
-   * @param extInfo Specifies which parser and visitors to use.
+   * @param options Contains jltools options
+   * @param tf Allows the compiler to pull in new source files as necessary.
    */
-  public static void initialize( Map options, 
-                                 TargetFactory tf, ExtensionInfo extInfo )
-  {
-    Compiler.options = options;
-    Compiler.ts = extInfo.getTypeSystem();
-    Compiler.ef = extInfo.getExtensionFactory();
-    Compiler.tf = tf;
-    Compiler.extInfo = extInfo;
+  public Compiler(Options options_, 
+		  TargetFactory tf_) {
+    options = options_;
+    type_system = options.extension.getTypeSystem();
+    extension_factory = options.extension.getExtensionFactory();
+    target_factory = tf_;
  
-    // Read the options.
-    outputWidth = ((Integer)options.get( OPT_OUTPUT_WIDTH)).intValue();
-    useFqcn = ((Boolean)options.get( OPT_FQCN)).booleanValue();
-    verbose = ((Boolean)options.get( OPT_VERBOSE)).booleanValue();
-    serialize = ((Boolean)options.get( OPT_SERIALIZE)).booleanValue();
-
     // Create the compiler and set up the resolvers.
-    compiler = new Compiler( null);
-
     CompoundClassResolver compoundResolver = new CompoundClassResolver();
         
-    parsedResolver = new TableClassResolver( compiler);
-    compoundResolver.addClassResolver( parsedResolver);
+    parsedResolver = new TableClassResolver(this);
+    compoundResolver.addClassResolver(parsedResolver);
     
-    sourceResolver = new LoadedClassResolver( tf, compiler, ts);
-    compoundResolver.addClassResolver( sourceResolver);
+    sourceResolver = new LoadedClassResolver(target_factory, this, type_system);
+    compoundResolver.addClassResolver(sourceResolver);
 
-    systemResolver = new CachingClassResolver( compoundResolver);
+    systemResolver = new CachingClassResolver(compoundResolver);
 
     /* Other setup. */
     workList = Collections.synchronizedList( new LinkedList());
     workListMap = Collections.synchronizedMap( new HashMap());
     
     try {
-      ts.initializeTypeSystem( systemResolver, compiler);
+      type_system.initializeTypeSystem(systemResolver, this);
     }
     catch (SemanticException e) {
       throw new InternalCompilerError( "Unable to initialize compiler. " + 
                                        "Failed to initialize type system: " +
                                        e.getMessage());
     }
+  }
+
+  /** Return a set of output filenames resulting from a successful compilation.
+    */
+  public Collection outputFiles() {
+    return outputFiles;
+  }
+
+  /** Compile all the files listed in the set of strings <code>source</code>.
+      Return true on success. The method <code>outputFiles</code> can be
+      used to obtain the output of the compilation. */
+  public boolean compile(Collection source) {
+    String targetName = null;
+    try {
+      Main.report(null, 1, "Read all files from the command-line.");
+      
+      Iterator iter = source.iterator();
+      while (iter.hasNext()) {
+	targetName = (String)iter.next();
+	if (!readFile(targetName))
+	    hasErrors = true;
+      }
+      
+      Main.report(null, 1, "Done reading, now translating...");
+      
+      iter = source.iterator();
+      while(iter.hasNext()) {
+	targetName = (String)iter.next();
+	if (!compileFile(targetName))
+	  hasErrors = true;
+      }
+      
+    }
+    catch (FileNotFoundException fnfe)
+    {
+      System.err.println(options.extension.compilerName() +
+			 ": cannot find source file -- " + targetName);
+      return false;
+    }
+    catch(IOException e)
+    {
+      System.err.println(options.extension.compilerName() +
+			 ": caught IOException while compiling -- " +
+			 e.getMessage());
+      return false;
+    }
+    catch(ErrorLimitError ele)
+    {
+      return false;
+    }
     
-    initialized = true;
+    /* Make sure we do this before we exit. */
+    Collection completed = new LinkedList();
+    try {
+      if (!cleanup(completed)) {
+	return false;
+      }
+    }
+    catch(IOException e)
+    {
+      System.err.println("Caught IOException while compiling: "
+			  + e.getMessage());
+      System.exit(1);
+    }
+    return true;
   }
-
-  public static boolean useFullyQualifiedNames()
+    
+  public boolean useFullyQualifiedNames()
   {
-    return useFqcn;
+    return options.fully_qualified_names;
   }
 
-  public static TargetFactory getTargetFactory()
+  public TargetFactory getTargetFactory()
   {
-    return tf;
+    return target_factory;
   }
 
-  public static ExtensionFactory getExtensionFactory()
+  public ExtensionFactory getExtensionFactory()
   {
-    return ef;
+    return extension_factory;
   }
 
-  public static TypeSystem getTypeSystem()
+  public TypeSystem getTypeSystem()
   {
-    return ts;
+    return type_system;
   }
 
-  public static ExtensionInfo getExtensionInfo()
+  public ExtensionInfo getExtensionInfo()
   {
-    return extInfo;
+    return options.extension;
   }
 
-  public static int getOutputWidth()
+  public ClassResolver getSystemResolver()
   {
-    return outputWidth;
+    return systemResolver;
   }
 
-  public static boolean serializeClassInfo()
+  public TableClassResolver getParsedResolver()
   {
-    return serialize;
+    return parsedResolver;
   }
 
+  public int getOutputWidth()
+  {
+    return options.output_width;
+  }
+
+  public boolean serializeClassInfo()
+  {
+    return options.serialize_type_info;
+  }
+
+/*
   public static Compiler getCompiler()
   {
-    return compiler;
+    System.err.println("Warning: getting static compiler variable");
+    throw new NullPointerException();
+    //return the_compiler;
   }
+*/
 
-  public static void verbose( Object o, String s)
-  {
-    if( verbose) {
-      int thread = Thread.currentThread().hashCode();
-
-      if( o instanceof Class) {
-        System.err.println( ((Class)o).getName() + ":" + thread + ": " + s);
-      }
-      else {
-        System.err.println( o.getClass().getName() + ":" + thread + ": " + s);
-      }
-      System.err.flush();
-    }
-  }
- 
   /* Public constructor. */
-  public Compiler()
-  {
-    if( !initialized) {
-      throw new InternalCompilerError( "Unable to construct compiler "
-                       + "instance before static initialization.");
-    }
-  }
 
   /**
    * This constructor is used by the static initializer to create new
@@ -201,12 +235,12 @@ public class Compiler implements TargetTable, ClassCleaner
   /* Public Methods. */
   public boolean readFile( String filename) throws IOException
   {
-    return compile( tf.createFileTarget( filename), Job.READ);
+    return compile(target_factory.createFileTarget( filename), Job.READ);
   }
   
   public boolean compileFile( String filename) throws IOException 
   {
-    return compile( tf.createFileTarget( filename), Job.TRANSLATED);
+    return compile(target_factory.createFileTarget( filename), Job.TRANSLATED);
   }
 
   public boolean compileClass( String classname) throws IOException
@@ -318,7 +352,7 @@ public class Compiler implements TargetTable, ClassCleaner
       if (! job.isParsed()) {
         acquireJob( job);
 	if (! job.isParsed()) {
-          verbose( this, "parsing " + job.getTarget().getName() + "...");
+          Main.report(null, 2, "Parsing " + job.getTarget().getName() + "...");
 	  job.parse();
         }
         releaseJob( job);
@@ -329,7 +363,7 @@ public class Compiler implements TargetTable, ClassCleaner
 
       if( goal == Job.PARSED) { return true; }
 
-      if( extInfo.compileAllToStage(Job.PARSED) ) {
+      if( options.extension.compileAllToStage(Job.PARSED) ) {
 	  boolean okay = bringAllToStage(Job.PARSED);
 	  if (! okay) return false;
       }
@@ -338,7 +372,7 @@ public class Compiler implements TargetTable, ClassCleaner
       if (! job.isRead()) {
         acquireJob( job);
 	if (! job.isRead()) {
-          verbose( this, "reading " + job.getTarget().getName() + "...");
+          Main.report(null, 2, "Reading " + job.getTarget().getName() + "...");
 	  job.read();
         }
         releaseJob( job);
@@ -349,7 +383,7 @@ public class Compiler implements TargetTable, ClassCleaner
 
       if( goal == Job.READ) { return true; }
 
-      if( extInfo.compileAllToStage(Job.READ) ) {
+      if( options.extension.compileAllToStage(Job.READ) ) {
 	  boolean okay = bringAllToStage(Job.READ);
 	  if (! okay) return false;
       }
@@ -359,7 +393,7 @@ public class Compiler implements TargetTable, ClassCleaner
       if (! job.isCleaned()) {
         acquireJob( job);
 	if (! job.isCleaned()) {
-          verbose( this, "cleaning " + job.getTarget().getName() + "...");
+          Main.report(null, 2, "Cleaning " + job.getTarget().getName() + "...");
 	  job.clean();
         }
         releaseJob( job);
@@ -370,7 +404,7 @@ public class Compiler implements TargetTable, ClassCleaner
 
       if( goal == Job.CLEANED) { return true; }
 
-      if( extInfo.compileAllToStage(Job.CLEANED) ) {
+      if( options.extension.compileAllToStage(Job.CLEANED) ) {
 	  boolean okay = bringAllToStage(Job.CLEANED);
 	  if (! okay) return false;
       }
@@ -384,7 +418,8 @@ public class Compiler implements TargetTable, ClassCleaner
       if (! job.isDisambiguated()) {
         acquireJob( job);
 	if (! job.isDisambiguated()) {
-          verbose( this, "disambiguating " + job.getTarget().getName() + "...");
+          Main.report( null, 2,
+	    "Disambiguating " + job.getTarget().getName() + "...");
 	  job.disambiguate();
         }
         releaseJob( job);
@@ -395,7 +430,7 @@ public class Compiler implements TargetTable, ClassCleaner
 
       if( goal == Job.DISAMBIGUATED) { return true; } 
 
-      if( extInfo.compileAllToStage(Job.DISAMBIGUATED) ) {
+      if( options.extension.compileAllToStage(Job.DISAMBIGUATED) ) {
 	  boolean okay = bringAllToStage(Job.DISAMBIGUATED);
 	  if (! okay) return false;
       }
@@ -404,7 +439,7 @@ public class Compiler implements TargetTable, ClassCleaner
       if (! job.isChecked()) {
         acquireJob( job);
 	if (! job.isChecked()) {
-          verbose( this, "checking " + job.getTarget().getName() + "...");
+          Main.report(null, 2, "Checking " + job.getTarget().getName() + "...");
 	  job.check();
         }
         releaseJob( job);
@@ -415,7 +450,7 @@ public class Compiler implements TargetTable, ClassCleaner
 
       if( goal == Job.CHECKED) { return true; }
 
-      if( extInfo.compileAllToStage(Job.CHECKED) ) {
+      if( options.extension.compileAllToStage(Job.CHECKED) ) {
 	  boolean okay = bringAllToStage(Job.CHECKED);
 	  if (! okay) return false;
       }
@@ -424,7 +459,7 @@ public class Compiler implements TargetTable, ClassCleaner
       if (! job.isTranslated()) {
         acquireJob( job);
 	if (! job.isTranslated()) {
-          verbose( this, "translating " + job.getTarget().getName() + "...");
+          Main.report(null, 2, "Translating " + job.getTarget().getName() + "...");
           job.translate();
         }
         releaseJob( job);
@@ -444,7 +479,7 @@ public class Compiler implements TargetTable, ClassCleaner
     {
       CodeWriter cw = new CodeWriter(new UnicodeWriter( 
 				     new FileWriter( "ast.dump")), 
-				     outputWidth);
+				     options.output_width);
       job.dump(cw);
       throw rte;
     }
@@ -452,7 +487,7 @@ public class Compiler implements TargetTable, ClassCleaner
     {
       CodeWriter cw = new CodeWriter(new UnicodeWriter( 
 				     new FileWriter( "ast.dump")), 
-				     outputWidth);
+				     options.output_width);
       job.dump(cw);
       throw err;
     }
@@ -481,8 +516,9 @@ public class Compiler implements TargetTable, ClassCleaner
       }
     }
 
-    Target t = tf.createClassTarget( clazz);
-    Job job = new ClassTypeJob(t, clazz, t.getErrorQueue(), systemResolver);
+    Target t = target_factory.createClassTarget( clazz);
+    Job job = new ClassTypeJob(this, t, clazz, t.getErrorQueue(),
+				systemResolver);
 
     synchronized (workList)
     {
@@ -509,7 +545,7 @@ public class Compiler implements TargetTable, ClassCleaner
       }
     }
 
-    return lookupJob(tf.createClassTarget( classname)); 
+    return lookupJob(target_factory.createClassTarget( classname)); 
   }
 
   protected Job lookupJob( Target t) throws IOException
@@ -523,7 +559,7 @@ public class Compiler implements TargetTable, ClassCleaner
       job = (Job) workListMap.get(t);
 
       if (job == null) {
-	job = new SourceJob( t, eq, systemResolver, parsedResolver);
+	job = new SourceJob( t, eq, this);
         workList.add( job);
         workListMap.put(t, job);
       }

@@ -90,12 +90,14 @@ public abstract class Job
   protected Target t;
   protected ImportTable it;
   protected TableClassResolver cr;
+  protected Compiler compiler;
 
-  public Job( Target t )
+  public Job(Compiler compiler, Target t)
   {
     this.t = t;
     it = null;
-    cr = new TableClassResolver(Compiler.getCompiler());
+    this.compiler = compiler;
+    cr = new TableClassResolver(compiler);
     status = 0;
   }
 

@@ -44,6 +44,12 @@ public abstract class Target
     return eq;
   }
 
+  /**
+   * Return a collection of the names of source files generated in
+   * completing this target.
+   */
+  abstract public Collection outputFiles(); 
+
   abstract public void closeSource() throws IOException;
   abstract public void closeDestination() throws IOException;
   

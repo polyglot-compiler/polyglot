@@ -5,16 +5,18 @@ import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
 import jltools.main.UsageError;
+import jltools.main.Options;
 
 import java.io.*;
 import java.util.*;
 
+/** StandardExtensionInfo is a template for implementing ExtensionInfos. */
 public class StandardExtensionInfo implements ExtensionInfo {
     protected TypeSystem ts = null;
     protected ExtensionFactory ef = null;
 
     public String fileExtension() {
-	return "jl";
+	return "java";
     }
     public String compilerName() {
 	return "jltools";
@@ -23,7 +25,8 @@ public class StandardExtensionInfo implements ExtensionInfo {
 	return "";
     }
 
-    public int parseCommandLine(String args[], int index, Map options)
+    /** By default, don't parse anything */
+    public int parseCommandLine(String args[], int index, Options options)
 	throws UsageError
     {
 	return index;
@@ -52,15 +55,14 @@ public class StandardExtensionInfo implements ExtensionInfo {
 	return ef;
     }
 
-    public List getNodeVisitors(SourceJob job, int goal) {
+    public List getNodeVisitors(Compiler compiler, SourceJob job, int goal) {
 	LinkedList l = new LinkedList();
 
 	Target t = job.getTarget();
 	TableClassResolver cr = job.getClassResolver();
 	ImportTable it = job.getImportTable();
-        Compiler compiler = Compiler.getCompiler();
-        int outputWidth = Compiler.getOutputWidth();
-	TargetFactory tf = Compiler.getTargetFactory();
+        int outputWidth = compiler.getOutputWidth();
+	TargetFactory tf = compiler.getTargetFactory();
 
 	ErrorQueue eq;
 
@@ -89,10 +91,11 @@ public class StandardExtensionInfo implements ExtensionInfo {
 		l.add(new ExceptionChecker(ts, eq));
 		break;
 	    case Job.TRANSLATED:
-		if (Compiler.serializeClassInfo()) {
+		if (compiler.serializeClassInfo()) {
 		    l.add(new ClassSerializer(ts, t.getLastModifiedDate(), eq));
 		}
-		l.add(new TranslationVisitor(ef, it, t, ts, eq, outputWidth));
+		l.add(new TranslationVisitor(ef, it, t, ts, eq, outputWidth,
+			compiler.outputFiles()));
 		break;
 	    default:
 		throw new InternalCompilerError("Invalid compiler stage: " +
@@ -102,7 +105,7 @@ public class StandardExtensionInfo implements ExtensionInfo {
 	return l;
     }
 
-    // Standard Typechecking requires all files to be in the CLEANED state
+    // Standard type-checking requires all files to be in the CLEANED state
     // so we force them to be cleaned before proceeding.
     public boolean compileAllToStage(int stage) {
 	if( stage == Job.CLEANED ) {
