@@ -165,7 +165,16 @@ polyglot.ext.jl.ExtensionInfo {
         // on the following file, javac produces an error, but we intentionally do not.
         //  BadFinalInit13.jl (Post); 
 
-	BadForwardRef.jl (Semantic); // we should be preventing forward reference here.
-	ForwardRef4.jl (Semantic); // we should be preventing forward reference here.
+	BadForwardRef.jl (Semantic, "Illegal forward ref"); 
+	BadForwardRef2.jl (Semantic, "Illegal forward ref"); 
+	BadForwardRef3.jl (Semantic, "Illegal forward ref"); 
+	ForwardRef4.jl (Semantic, "Illegal forward ref"); 
+	ForwardRef5.jl; 
+	// the following test has exactly 4 errors in it
+	ForwardRef6.jl (Semantic, "Illegal forward ref"), 
+		       (Semantic, "Illegal forward ref"), 
+		       (Semantic, "Illegal forward ref"), 
+		       (Semantic, "Illegal forward ref"); 
+
 	BadStaticContext.jl (Semantic); // we should be checking that "this" is not referenced before the super constructor has been called.
 }
