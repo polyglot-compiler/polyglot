@@ -521,8 +521,21 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * debugging of data flow.
      */
     private void dumpFlowGraph(FlowGraph graph, Term root) {
-        Report.report(2, "digraph Flow" + (flowCounter++) + " {");
-        Report.report(2, "  center=true; ratio=auto; size = \"8.5,11\";");
+        String name = StringUtil.getShortNameComponent(this.getClass().getName());
+        name += flowCounter++;
+
+        String rootName = "";
+        if (graph.root() instanceof CodeDecl) {
+            CodeDecl cd = (CodeDecl)graph.root();
+            rootName = cd.codeInstance().toString() + " in " + 
+                        cd.codeInstance().container().toString();
+        }
+
+
+        Report.report(2, "digraph DataFlow" + name + " {");
+        Report.report(2, "  label=\"Dataflow: " + name + "\\n" + rootName +
+            "\"; fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
+
         // Loop around the nodes...
         for (Iterator iter = graph.peers().iterator(); iter.hasNext(); ) {
             FlowGraph.Peer p = (FlowGraph.Peer)iter.next();
@@ -530,7 +543,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             // dump out this node
             Report.report(2,
                           p.hashCode() + " [ label = \"" +
-                          StringUtil.escape(p.node.toString()) + " (" + 
+                          StringUtil.escape(p.node.toString()) + "\\n(" + 
                           StringUtil.escape(StringUtil.getShortNameComponent(p.node.getClass().getName()))+ ")\" ];");
             
             // dump out the successors.
@@ -542,10 +555,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                               StringUtil.escape(StringUtil.getShortNameComponent(q.getTarget().node.getClass().getName()))+ ")\" ];");
                 String label = q.getKey().toString();
                 if (q.getTarget().outItems != null) {
-                    label += ": " + q.getTarget().outItems.get(q.getKey());
+                    label += "\\n" + q.getTarget().outItems.get(q.getKey());
                 }
                 else {
-                    label += " [no dataflow available]";
+                    label += "\\n[no dataflow available]";
                 }
                 Report.report(2, p.hashCode() + " -> " + q.getTarget().hashCode() + 
                               " [label=\"" + label + "\"];");

@@ -1,10 +1,29 @@
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import polyglot.ast.Block;
+import polyglot.ast.Branch;
+import polyglot.ast.Catch;
+import polyglot.ast.CodeDecl;
+import polyglot.ast.CompoundStmt;
+import polyglot.ast.Labeled;
+import polyglot.ast.Loop;
+import polyglot.ast.Return;
+import polyglot.ast.Stmt;
+import polyglot.ast.Switch;
+import polyglot.ast.Term;
+import polyglot.ast.Try;
 import polyglot.main.Report;
-import java.util.*;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CollectionUtil;
+import polyglot.util.Copy;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.StringUtil;
 
 /**
  * Class used to construct a CFG.
@@ -192,8 +211,16 @@ public class CFGBuilder implements Copy
         name += counter++;
 
 	if (Report.should_report(Report.cfg, 2)) {
-            Report.report(2, "digraph " + name + " {");
-            Report.report(2, "  center=true; ratio=auto; size = \"8.5,11\";");
+            String rootName = "";
+            if (graph.root() instanceof CodeDecl) {
+                CodeDecl cd = (CodeDecl)graph.root();
+                rootName = cd.codeInstance().toString() + " in " + 
+                            cd.codeInstance().container().toString();
+            }
+
+            Report.report(2, "digraph CFGBuild" + name + " {");
+            Report.report(2, "  label=\"CFGBuilder: " + name + "\\n" + rootName +
+                "\"; fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
         }
 
         // create peers for the entry and exit nodes.
