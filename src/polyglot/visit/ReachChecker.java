@@ -98,7 +98,6 @@ public class ReachChecker extends DataFlow
                 // an exception that is not caught by the method). So we need 
                 // to also check the inItem.
                 if (p.inItem != null && ((DataFlowItem)p.inItem).reachable) {
-                    System.out.println("Setting term " + n + " to reachable");
                     return n.reachable(true);                
                 }
                 
