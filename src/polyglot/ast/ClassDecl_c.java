@@ -138,26 +138,48 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 		// FIXME: This should be done non-destructively.
 		this.type = type;
 
-		ClassDecl_c n = (ClassDecl_c) this.visitChildren(tb);
+		ClassDecl n = (ClassDecl) this.visitChildren(tb);
+
+        n = addDefaultConstructorIfNeeded(tb, n);
 
 		tb.popClass();
 
-		// If the class has no constructor, add a default constructor.
-		if (flags.isAbstract() || flags.isInterface()) {
-			return n;
-		}
-
-		if (n.type.constructors().isEmpty()) {
-			n.type.addConstructor(
-								  ts.constructorInstance(position(),
-														 n.type,
-														 Flags.PUBLIC,
-														 Collections.EMPTY_LIST,
-														 Collections.EMPTY_LIST));
-		}
-
 		return n;
 	}
+
+    /**
+     * Add a default constructor to n, if it is needed.
+     */
+    protected ClassDecl addDefaultConstructorIfNeeded(TypeBuilder tb, ClassDecl n) {
+        if (defaultConstructorNeeded(tb, n)) {
+            return addDefaultConstructor(tb, n);
+		} else {
+            return n;
+        }
+    }
+
+    /**
+     * Return whether n needs a default constructor
+     * added to it.
+     */
+    protected boolean defaultConstructorNeeded(TypeBuilder tb, ClassDecl n) {
+        if (n.flags().isAbstract() || n.flags().isInterface()) {
+            return false;
+        }
+        return n.type().constructors().isEmpty();
+    }
+
+    /**
+     * Add a default constructor to n.  The base
+     * JL implementation only adds a constructor to the
+     * type representing the class, not the AST itself.
+     */
+    protected ClassDecl addDefaultConstructor(TypeBuilder tb, ClassDecl n) {
+		n.type().addConstructor(
+			tb.typeSystem().constructorInstance(position(), n.type(),
+			Flags.PUBLIC, Collections.EMPTY_LIST, Collections.EMPTY_LIST));
+        return n;
+    }
 
 	public void enterScope(Context c) {
 		c.pushClass(type);
