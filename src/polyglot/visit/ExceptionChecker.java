@@ -7,24 +7,26 @@ import java.util.*;
 
 
 /**
- * FIXME: SERIOUS FLAW: the error queue is being reused across different 
- * source files, which isn't correct. 
+ * DOCME
  */
 public class ExceptionChecker extends NodeVisitor
 {  
   SubtypeSet s;
   ErrorQueue eq;
-  private static List oldExceptionCheckers;
-  static 
-  {
-    oldExceptionCheckers = new ArrayList();
-  }
+  private List oldExceptionCheckers;
 
   public ExceptionChecker( ErrorQueue eq )
   {
     this.eq = eq;
-
+    oldExceptionCheckers = new Vector();
     s = new SubtypeSet();
+  }
+
+  private ExceptionChecker (ErrorQueue eq, List oldExceptionCheckers)
+  {
+    s = new SubtypeSet();
+    this. eq = eq; 
+    this.oldExceptionCheckers = oldExceptionCheckers;
   }
 
   public Node override( Node n)
@@ -36,7 +38,7 @@ public class ExceptionChecker extends NodeVisitor
       // bit differently.
 
       TryStatement ts = (TryStatement)n;
-      ExceptionChecker ec = new ExceptionChecker( eq ) ;
+      ExceptionChecker ec = getExceptionChecker();
 
       ts.getTryBlock().visit( ec );
       try
@@ -160,7 +162,7 @@ public class ExceptionChecker extends NodeVisitor
                     oldExceptionCheckers.size() -1 ) ;
     }
     if ( e != null) return e;
-    return new ExceptionChecker(eq); 
+    return new ExceptionChecker(eq, oldExceptionCheckers); 
   }
   
   private void releaseExceptionChecker(ExceptionChecker oldEC)

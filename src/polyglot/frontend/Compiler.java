@@ -547,6 +547,7 @@ public class Compiler implements TargetTable, ClassCleaner
     try
     {
       sym = grm.parse();
+      t.getSourceReader().close();
     }
     catch( IOException e)
     {
@@ -608,12 +609,13 @@ public class Compiler implements TargetTable, ClassCleaner
     throws IOException
   {
     SourceFileNode sfn = (SourceFileNode)ast;
-    CodeWriter w = new CodeWriter( t.getOutputWriter( sfn.getPackageName()), 
-                                    outputWidth);
+    Writer ofw = t.getOutputWriter( sfn.getPackageName());
+    CodeWriter w = new CodeWriter( ofw, outputWidth);
     
     ast.translate( new LocalContext(it, ts, null), w);
     
     w.flush();
+    ofw.close();
     System.out.flush();
   }
 

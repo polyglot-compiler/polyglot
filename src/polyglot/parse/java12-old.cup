@@ -1049,7 +1049,9 @@ statement_without_trailing_substatement ::=
 	;
 empty_statement ::=
 					// Statement
-		SEMICOLON
+		SEMICOLON: a
+			{: RESULT = (EmptyStatement)Grm.ln(
+				new EmptyStatement(), a ); :}
 	;
 labeled_statement ::=
 					// LabelledStatement

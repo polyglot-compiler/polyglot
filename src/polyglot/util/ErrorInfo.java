@@ -3,12 +3,12 @@ package jltools.util;
 
 public class ErrorInfo
 {
-  public static final int WARNING            = -1;
-  public static final int INTERNAL_ERROR     = 0;
-  public static final int IO_ERROR           = 1;
-  public static final int LEXICAL_ERROR      = 2;
-  public static final int SYNTAX_ERROR       = 3;
-  public static final int SEMANTIC_ERROR     = 4;
+  public static final int WARNING            = 0;
+  public static final int INTERNAL_ERROR     = 1;
+  public static final int IO_ERROR           = 2;
+  public static final int LEXICAL_ERROR      = 3;
+  public static final int SYNTAX_ERROR       = 4;
+  public static final int SEMANTIC_ERROR     = 5;
 
   protected int kind;
   protected String message;

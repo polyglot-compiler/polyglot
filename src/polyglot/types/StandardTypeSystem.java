@@ -347,6 +347,7 @@ public class StandardTypeSystem extends TypeSystem {
   public boolean isAccessible(ClassType ctTarget, AccessFlags flags, Context context) 
     throws SemanticException 
   {
+
     // check if in same class or public 
     if ( isSameType( ctTarget, context.inClass) ||
          flags.isPublic())
@@ -784,7 +785,9 @@ public class StandardTypeSystem extends TypeSystem {
         try { getMethodSet(lAcceptable, tEnclosing, method, context); }
         catch (SemanticException tce ) 
         { /* must have been something we couldn't access */ }
+        tEnclosing = tEnclosing.getContainingClass();
       }
+
     }
   }
 

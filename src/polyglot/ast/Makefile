@@ -17,6 +17,7 @@ ast_files     =	AmbiguousExpression.java \
 		ClassNode.java \
 		ConstructorCallStatement.java \
 		DoStatement.java \
+		EmptyStatement.java \
 		Expression.java \
 		ExpressionStatement.java \
 		FieldExpression.java \

@@ -145,7 +145,8 @@ public class MethodExpression extends Expression
     ClassType ct; 
 
     if( target == null) {
-      ct = c.getCurrentClass();
+      //      ct = c.getCurrentClass();
+      ct = null;
     }
     else if( target instanceof TypeNode 
                 && ((TypeNode)target).getType() instanceof ClassType) {
