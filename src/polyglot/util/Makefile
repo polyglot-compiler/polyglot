@@ -24,6 +24,7 @@ utl_files 	= Annotate.java \
 		  TypeOutputStream.java \
 		  TypeEncoder.java \
 		  UnicodeWriter.java \
+		  UniqueID.java \
 		  WorkList.java \
 
 

@@ -63,14 +63,17 @@ include jltools/ext/jif/ast/Makefile
 include jltools/ext/jif/types/Makefile
 include jltools/ext/jif/visit/Makefile
 
+#generated files:
+gen: $(PARSE_GEN) $(EXTOP_GEN) $(JIFPARSE_GEN)
+
 #other targets:
-util: $(UTIL_TARGET) 
+util: gen $(UTIL_TARGET) 
 
 types: util $(TYPES_TARGET)
 
 lex: util types parse $(LEX_TARGET)
 
-parse: util $(PARSE_TARGET)
+parse: $(PARSE_TARGET)
 
 ast: util types $(AST_TARGET)
 
@@ -83,7 +86,7 @@ ext/op/runtime: $(EXT_OP_RUNTIME_TARGET)
 frontend: util types lex parse ast visit $(FRONTEND_TARGET)
 
 #jif
-jif: ext/jif/parse ext/jif/lex ext/jif/ast ext/jif/types ext/jif/visit
+jif: gen ext/jif/parse ext/jif/lex ext/jif/ast ext/jif/types ext/jif/visit
 
 ext/jif/parse: util $(EXTJIFPARSE_TARGET)
 

@@ -3,6 +3,7 @@ prs_package	= jltools/parse
 prs_codebase	= ../..
 prs_files 	= Grm.java sym.java
 
+PARSE_GEN    = $(patsubst %.java, $(prs_package)/%.java, $(prs_files))
 PARSE_TARGET = $(patsubst %.java, $(prs_package)/%.class, $(prs_files))
 
 ifndef CALLED_FROM_PARENT
