@@ -66,6 +66,7 @@ public class NewObjectExpression extends Expression
       NewObjectExpression n = new NewObjectExpression( ext, primary, tn,
                                                        args, cn);
       n.copyAnnotationsFrom( this);
+	  n.mti = mti;
       return n;
     }
     else {
@@ -74,6 +75,7 @@ public class NewObjectExpression extends Expression
           NewObjectExpression n = new NewObjectExpression( ext, primary, tn,
                                                            args, cn);
           n.copyAnnotationsFrom( this);
+     	  n.mti = mti;
           return n;
         }
       }
