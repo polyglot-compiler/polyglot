@@ -67,6 +67,8 @@ public interface DelFactory
     JL delClassBody();
     
     JL delClassDecl();
+
+    JL delClassLit();
     
     JL delClassMember();
 

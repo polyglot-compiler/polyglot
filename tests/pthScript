@@ -27,6 +27,7 @@
 
 polyglot.ext.jl.ExtensionInfo {
         ArrayInit.jl ;
+        ClassLit.jl ;
         Conditional1.jl ;
         ConformanceCheck3.jl ;
         Constants.jl ;  Constants2.jl ; Constants3.jl ; Constants4.jl ;

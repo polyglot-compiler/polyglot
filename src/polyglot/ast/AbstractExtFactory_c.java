@@ -306,6 +306,16 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return postExtClassDecl(e);
     }
 
+    public final Ext extClassLit() {
+        Ext e = extClassLitImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extClassLit();
+            e = composeExts(e, e2);
+        }
+        return postExtClassLit(e);
+    }
+
     public final Ext extClassMember() {
         Ext e = extClassMemberImpl();
 
@@ -903,6 +913,10 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return extTermImpl();
     }
 
+    protected Ext extClassLitImpl() {
+        return extLitImpl();
+    }
+
     protected Ext extClassMemberImpl() {
         return extNodeImpl();
     }
@@ -1206,6 +1220,10 @@ public abstract class AbstractExtFactory_c implements ExtFactory
 
     protected Ext postExtClassDecl(Ext ext) {
         return postExtTerm(ext);
+    }
+
+    protected Ext postExtClassLit(Ext ext) {
+        return postExtLit(ext);
     }
 
     protected Ext postExtClassMember(Ext ext) {

@@ -75,6 +75,8 @@ public interface ExtFactory
     
     Ext extClassDecl();
 
+    Ext extClassLit();
+
     Ext extClassMember();
 
     Ext extCodeDecl();

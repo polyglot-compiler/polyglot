@@ -107,6 +107,8 @@ public interface NodeFactory
     ClassDecl ClassDecl(Position pos, Flags flags, String name,
 	                TypeNode superClass, List interfaces, ClassBody body);
 
+    ClassLit ClassLit(Position pos, TypeNode typeNode);
+
     Conditional Conditional(Position pos, Expr cond, Expr consequent, Expr alternative);
 
     ConstructorCall ThisCall(Position pos, List args);

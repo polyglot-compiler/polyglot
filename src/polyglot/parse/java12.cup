@@ -1266,15 +1266,15 @@ primary_no_new_array ::=
     |   array_access:a
             {: RESULT = a; :}
     |   primitive_type:a DOT CLASS:n
-            {: RESULT = parser.nf.Field(parser.pos(a, n, n), a, "class"); :}
+            {: RESULT = parser.nf.ClassLit(parser.pos(a, n, n), a); :}
     |   VOID:a DOT CLASS:n
-            {: RESULT = parser.nf.Field(parser.pos(a, n, n), 
+            {: RESULT = parser.nf.ClassLit(parser.pos(a, n, n), 
                 parser.nf.CanonicalTypeNode(parser.pos(a),
-                parser.ts.Void()), "class"); :}
+                                            parser.ts.Void())); :}
     |   array_type:a DOT CLASS:n
-            {: RESULT = parser.nf.Field(parser.pos(a, n, n), a, "class"); :}
+            {: RESULT = parser.nf.ClassLit(parser.pos(a, n, n), a); :}
     |   name:a DOT CLASS:n
-            {: RESULT = parser.nf.Field(parser.pos(a, n, n), a.toType(), "class"); :}
+            {: RESULT = parser.nf.ClassLit(parser.pos(a, n, n), a.toType()); :}
     |   name:a DOT THIS:n
             {: RESULT = parser.nf.This(parser.pos(a, n, n), a.toType()); :}
     ;

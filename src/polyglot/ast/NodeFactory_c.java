@@ -114,7 +114,6 @@ public class NodeFactory_c extends AbstractNodeFactory_c
     }
 
     public Assign Assign(Position pos, Expr left, Assign.Operator op, Expr right) {
-        Assign n;
         if (left instanceof Local) {
             return LocalAssign(pos, (Local)left, op, right);
         }
@@ -234,6 +233,13 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         ClassDecl n = new ClassDecl_c(pos, flags, name, superClass, interfaces, body);
         n = (ClassDecl)n.ext(extFactory.extClassDecl());
         n = (ClassDecl)n.del(delFactory.delClassDecl());
+        return n;
+    }
+
+    public ClassLit ClassLit(Position pos, TypeNode typeNode) {
+        ClassLit n = new ClassLit_c(pos, typeNode);
+        n = (ClassLit)n.ext(extFactory.extClassLit());
+        n = (ClassLit)n.del(delFactory.delClassLit());
         return n;
     }
 

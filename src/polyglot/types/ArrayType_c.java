@@ -49,13 +49,6 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
                                         ts.Public().Final(),
                                         ts.Int(),
                                         "length"));
-
-            // Add field public static final Class class
-            fields.add(ts.fieldInstance(position(),
-                                        this,
-                                        ts.Public().Static().Final(),
-                                        ts.Class(),
-                                        "class"));
         }
 
         if (interfaces == null) {
