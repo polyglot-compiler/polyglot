@@ -7,7 +7,7 @@ import java.util.List;
  * A <code>ProcedureCall</code> is an interface representing a
  * method or constructor call.
  */
-public interface ProcedureCall
+public interface ProcedureCall extends Term
 {
     /**
      * The call's actual arguments.
