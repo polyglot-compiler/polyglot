@@ -84,6 +84,7 @@ public class ClassSerializer extends NodeVisitor
 	    f = f.fieldInstance(ts.fieldInstance(null, ct,
 						 flags, ts.String(),
 						 "jlc$CompilerVersion"));
+            f = f.initializerInstance(ts.initializerInstance(null, ct, Flags.STATIC));
 	    body = body.addMember(f);
 
 	    /* Add the date of the last source file modification. */
@@ -96,6 +97,7 @@ public class ClassSerializer extends NodeVisitor
 	    f = f.fieldInstance(ts.fieldInstance(null, ct,
 						 flags, ts.Long(),
 						 "jlc$SourceLastModified"));
+            f = f.initializerInstance(ts.initializerInstance(null, ct, Flags.STATIC));
 	    body = body.addMember(f);
 
 	    /* Add the class type info. */
@@ -106,6 +108,7 @@ public class ClassSerializer extends NodeVisitor
 	    f = f.fieldInstance(ts.fieldInstance(null, ct,
 						 flags, ts.String(),
 						 "jlc$ClassType"));
+            f = f.initializerInstance(ts.initializerInstance(null, ct, Flags.STATIC));
 	    body = body.addMember(f);
 
 	    return cn.body(body);
