@@ -273,6 +273,7 @@ public class lalr_state {
    */
 
   private static lalr_state start_state;
+  private static lalr_item start_itm;
 
   public static lalr_state build_machine(production start_prod) 
     throws internal_error
@@ -297,10 +298,10 @@ public class lalr_state {
       /* build item with dot at front of start production and EOF lookahead */
       start_items = new lalr_item_set();
 
-      itm = new lalr_item(start_prod);
-      itm.lookahead().add(terminal.EOF);
+      start_itm = new lalr_item(start_prod);
+      start_itm.lookahead().add(terminal.EOF);
 
-      start_items.add(itm);
+      start_items.add(start_itm);
 
       /* create copy the item set to form the kernel */
       kernel = new lalr_item_set(start_items);
@@ -768,8 +769,22 @@ public class lalr_state {
       System.err.println("*** Reduce/Reduce conflict found in state #"+index());
       System.err.print  ("  between ");
       System.err.println(itm1.to_simple_string());
+/* ACM extension */
+      if (Main.report_counterexamples) {
+  	  System.err.print("    Example:\n    ");
+ 	  report_shortest_path(itm1);
+	  System.err.println("] (*)\n");
+      }
+/* End ACM extension */
       System.err.print  ("  and     ");
       System.err.println(itm2.to_simple_string());
+/* ACM extension */
+      if (Main.report_counterexamples) {
+  	  System.err.print("    Example:\n    ");
+ 	  report_shortest_path(itm2);
+	  System.err.println("] (*)\n");
+      }
+/* End ACM extension */
       System.err.print("  under symbols: {" );
       for (int t = 0; t < terminal.number(); t++)
 	{
@@ -785,13 +800,6 @@ public class lalr_state {
 	System.err.println("the first production.\n");
       else
 	System.err.println("the second production.\n");
-/* ACM extension */
-      if (Main.report_counterexamples) {
-	System.err.println("Example producing conflict: ");
- 	report_shortest_path();
-	System.err.println(" (*)\n");
-      }
-/* end ACM extension */
 
       /* count the conflict */
       emit.num_conflicts++;
@@ -817,6 +825,15 @@ public class lalr_state {
       System.err.println("*** Shift/Reduce conflict found in state #"+index());
       System.err.print  ("  between ");
       System.err.println(red_itm.to_simple_string());
+/* ACM extension */
+      if (Main.report_counterexamples) {
+	System.err.print("    Example:\n    ");
+ 	report_shortest_path(red_itm);
+	System.err.print("] (*) ");
+	System.err.println(terminal.find(conflict_sym).name());
+	System.err.println("");
+      }
+/* end ACM extension */
 
       /* find and report on all items that shift under our conflict symbol */
       for (Enumeration itms = items().all(); itms.hasMoreElements(); )
@@ -832,70 +849,137 @@ public class lalr_state {
 	        {
 		  /* yes, report on it */
                   System.err.println("  and     " + itm.to_simple_string());
+/* ACM extension */
+		  if (Main.report_counterexamples) {
+		      System.err.print("    Example:\n    ");
+		      report_shortest_path(itm);
+		      System.err.print(" (*) ");
+		      System.err.println(terminal.find(conflict_sym).name());
+		      System.err.println("\n    ");
+		  }
+/* end ACM extension */
 		}
 	    }
 	}
       System.err.println("  under symbol "+ terminal.find(conflict_sym).name());
       System.err.println("  Resolved in favor of shifting.\n");
-/* ACM extension */
-      if (Main.report_counterexamples) {
-	System.err.println("Example producing conflict: ");
- 	report_shortest_path();
-	System.err.print(" (*) ");
-	System.err.println(terminal.find(conflict_sym).name());
-	System.err.println("");
-      }
-/* end ACM extension */
 
       /* count the conflict */
       emit.num_conflicts++;
       lexer.warning_count++;
     }
 
-    class Path {
-	Path(LinkedList t, lalr_state s) {
-	    transitions = t;
-	    last = s;
+/* ACM extension */
+    /** A Path represents a path through the DFA, with edges between different
+     *  items in the same state represented explicitly.
+     */
+    private class Path {
+	Path(LinkedList t, StateItem si) {
+	    steps = t;
+	    last = si;
 	}
-	LinkedList transitions; /* of lalr_transition */
-	lalr_state last; /* last state reached */
+	/** steps is a linked list of lalr_transition _or_ production.
+         * The latter are found in the path when a "push" occurs to work
+         * on a new production. */
+	LinkedList steps;
+	/** last is the last state and item reached on the path. */
+	StateItem last;
     }
 
-    protected void report_shortest_path() {
-	Path p = shortest_path();
+    private class StateItem {
+	lalr_state state;
+	lalr_item item;
+	StateItem(lalr_state s, lalr_item i) { state = s; item = i; }
+	public boolean equals(Object o) {
+	    StateItem si2 = (StateItem) o;
+	    return (state.equals(si2.state) &&
+	            item.equals(si2.item));
+	}
+	public int hashCode() {
+	    return state.hashCode() + item.hashCode();
+	}
+    }
+
+    /**
+     * Report on standard error a textual version of the shortest
+     * path from the start state and start item to the current state
+     * and item itm. This is useful for diagnosing errors.
+     */
+    protected void report_shortest_path(lalr_item itm) throws internal_error {
+	Path p = shortest_path(itm);
+	production current = null;
 	boolean first = true;
-	for (Iterator i = p.transitions.listIterator(); i.hasNext();) {
-	    lalr_transition tr = (lalr_transition)i.next();
+	for (Iterator i = p.steps.listIterator(); i.hasNext();) {
 	    if (!first) System.err.print(" ");
 	    first = false;
-	    System.err.print(tr.on_symbol().name());
+	    Object o = i.next();
+	    if (o instanceof lalr_transition) {
+		lalr_transition tr = (lalr_transition)o;
+		System.err.print(tr.on_symbol().name());
+	    } else if (o instanceof production) {
+		production pr = (production)o;
+		System.err.print("[" + pr.lhs().the_symbol().name() + "::=");
+	    }
 	}
     }
 
-    protected Path shortest_path() {
-	HashSet visited = new HashSet(); /* of lalr_state */
+    /**
+     * Find the shortest way to get from the start state and start item
+     * to the current state and the item "itm". The steps that change
+     * the item being transitioned on (corresponding to items formed
+     * through closure computation) are represented explicitly in this
+     * path.
+     */
+    protected Path shortest_path(lalr_item itm) throws internal_error {
+	HashSet visited = new HashSet(); /* of StateItem */
 	LinkedList active = new LinkedList(); /* of paths */
-	Path p = new Path(new LinkedList(), start_state);
+	StateItem start = new StateItem(start_state, start_itm);
+
+	Path p = new Path(new LinkedList(), start);
 	active.add(p);
 	while (!active.isEmpty()) {
 	    Path p1 = (Path)active.removeFirst();
-	    lalr_state s = p1.last;
-	    if (visited.contains(s)) continue; /* saw it already */
-	    visited.add(s);
-	    if (equals(s)) {
+	    StateItem si = p1.last;
+	    if (visited.contains(si)) continue; /* saw it already */
+	    visited.add(si);
+	    lalr_state s = si.state;
+	    lalr_item i = si.item; 
+	    if (equals(s) && itm.equals(i)) {
 		p = p1;
 		return p;
 	    }
+	    /* try taking transitions */
 	    for (lalr_transition tr = s.transitions(); tr != null;
 		 tr = tr.next()) {
-		LinkedList newt = new LinkedList(p1.transitions);
-		newt.add(tr);
-		Path p2 = new Path(newt, tr.to_state());
-		active.add(p2);
+		if (tr.on_symbol().equals(i.symbol_after_dot())) {
+		    lalr_item i2 = i.shift();
+		    LinkedList newt = new LinkedList(p1.steps);
+		    newt.add(tr);
+		    Path p2 = new Path(newt, new StateItem(tr.to_state(), i2));
+		    active.add(p2);
+		}
+	    }
+	    /* try changing the production (one step of closure) */
+	    non_terminal nt = i.dot_before_nt();
+	    if (nt != null) {
+		for (Enumeration pi = nt.productions();
+			pi.hasMoreElements(); ){
+		    terminal_set new_lookaheads =
+			i.calc_lookahead(i.lookahead());
+		    boolean need_prop = i.lookahead_visible();
+		    production prod = (production)pi.nextElement();
+		    lalr_item i2 = new lalr_item(prod, 
+				    new terminal_set(new_lookaheads));
+		    LinkedList newt = new LinkedList(p1.steps);
+		    newt.add(prod);
+		    Path p2 = new Path(newt, new StateItem(s, i2));
+		    active.add(p2);
+		}
 	    }
 	}
 	return null;
     }
+/* End ACM extension */
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
