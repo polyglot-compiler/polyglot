@@ -18,29 +18,37 @@ public class Position implements Serializable
 
     public static final int UNKNOWN = -1;
     public static final int END_UNUSED = -2;
-	public static final Position COMPILER_GENERATED = new Position("Compiler Generated");
-	
-	/** Get a compiler generated position. */ 
-	public static Position compilerGenerated() {
-		Position p = new Position();
-		StackTraceElement[] stack = new Exception().getStackTrace();
-		if (stack.length >= 2) {
-			return new Position(stack[1].getFileName() + " (compiler generated)", stack[1].getLineNumber());
-		}
-		else {
-			return COMPILER_GENERATED;
-		}
-	}
+    public static final Position COMPILER_GENERATED = new Position("Compiler Generated");
+    
+    /**
+     * Get a compiler generated position using the caller at the given stack
+     * depth.  Depth 1 is the caller.  Depth 2 is the caller's caller, etc.
+     */ 
+    public static Position compilerGenerated(int depth) {
+        Position p = new Position();
+        StackTraceElement[] stack = new Exception().getStackTrace();
+        if (depth < stack.length) {
+            return new Position(stack[depth].getFileName() + " (compiler generated)", stack[depth].getLineNumber());
+        }
+        else {
+            return COMPILER_GENERATED;
+        }
+    }
+
+    /** Get a compiler generated position. */ 
+    public static Position compilerGenerated() {
+        return compilerGenerated(2);
+    }
 
     /** For deserialization. */
     protected Position() { }
 
     public Position(String file) {
-	this(file, UNKNOWN, UNKNOWN);
+    this(file, UNKNOWN, UNKNOWN);
     }
 
     public Position(String file, int line) {
-	this(file, line, UNKNOWN);
+    this(file, line, UNKNOWN);
     }
 
     public Position(String file, int line, int column) {
@@ -60,11 +68,11 @@ public class Position implements Serializable
     }
     
     public int line() {
-	return line;
+    return line;
     }
 
     public int column() {
-	return column;
+    return column;
     }
 
     public int endLine() {
@@ -82,21 +90,21 @@ public class Position implements Serializable
     }
 
     public String file() {
-	return file;
+    return file;
     }
 
     public String nameAndLineString() {
-	String s = file;
+    String s = file;
 
-	if (line != UNKNOWN) {
-	    s += ":" + line;
+    if (line != UNKNOWN) {
+        s += ":" + line;
             if (endLine != line &&
                       endLine != UNKNOWN && endLine != END_UNUSED) {
                 s += "-" + endLine;
             }
-	}
+    }
 
-	return s;
+    return s;
     }
 
     public String toString() {

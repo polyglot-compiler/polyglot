@@ -712,6 +712,15 @@ public class QQ {
             }
         }
 
+        Position pos = this.pos;
+
+        if (pos == Position.COMPILER_GENERATED) {
+            // this method is frame 1
+            // parseXXX is frame 2
+            // the client of QQ is frame 3
+            pos = Position.compilerGenerated(3);
+        }
+
         polyglot.lex.Lexer lexer = lexer(fmt, pos, subst);
         QQParser grm = parser(lexer, ts, nf, eq);
 
