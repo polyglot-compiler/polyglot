@@ -81,7 +81,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign
   }
 
   public List throwTypes(TypeSystem ts) {
-      List l = super.throwTypes(ts);
+      List l = new ArrayList(super.throwTypes(ts));
 
       Field f = (Field)left();
       if (f.target() instanceof Expr) {
@@ -89,15 +89,5 @@ public class FieldAssign_c extends Assign_c implements FieldAssign
       }
 
       return l;
-  }
-  
-  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException { 
-      if (this instanceof Thrower) {
-          List l = ((Thrower)this).throwTypes(ec.typeSystem());
-          for (Iterator i = l.iterator(); i.hasNext(); ) {
-              ec.throwsException((Type)i.next());
-          }
-      }
-      return this;
-  }
+  }  
 }

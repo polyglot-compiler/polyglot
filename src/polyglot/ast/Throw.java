@@ -5,7 +5,7 @@ package polyglot.ast;
  * statement. Such a statement contains a single <code>Expr</code> which
  * evaluates to the object being thrown.
  */
-public interface Throw extends Stmt, Thrower
+public interface Throw extends Stmt
 {
     /* The expression to throw. */
     Expr expr();

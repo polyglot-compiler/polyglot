@@ -1,8 +1,11 @@
 package polyglot.ast;
 
+import java.util.List;
+
 import polyglot.util.CodeWriter;
 import polyglot.types.SemanticException;
 import polyglot.types.Context;
+import polyglot.types.TypeSystem;
 import polyglot.visit.*;
 
 /**
@@ -207,6 +210,12 @@ public interface NodeOps
      * @param ec The visitor.
      */
     Node exceptionCheck(ExceptionChecker ec) throws SemanticException;
+
+    /** 
+     * List of Types of exceptions that might get thrown.  The result is
+     * not necessarily correct until after type checking. 
+     */
+    List throwTypes(TypeSystem ts);
 
     /**
      * Pretty-print the AST using the given code writer.

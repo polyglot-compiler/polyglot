@@ -6,7 +6,6 @@ import java.util.List;
  * An immutable representation of a <code>try</code> block, one or more
  * <code>catch</code> blocks, and an optional <code>finally</code> block.
  *
- * We subtype Thrower in order to handle unchecked exceptions.
  */
 public interface Try extends CompoundStmt
 {

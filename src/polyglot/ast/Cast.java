@@ -5,7 +5,7 @@ package polyglot.ast;
  * operation.  It consists of an <code>Expr</code> being cast and a
  * <code>TypeNode</code> being cast to.
  */ 
-public interface Cast extends Expr, Thrower
+public interface Cast extends Expr
 {
     /**
      * The type to cast to.

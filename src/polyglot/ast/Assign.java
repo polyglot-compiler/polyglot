@@ -5,7 +5,7 @@ import polyglot.util.Enum;
 /**
  * An <code>Assign</code> represents a Java assignment expression.
  */
-public interface Assign extends Expr, Thrower
+public interface Assign extends Expr
 {
     /** Assignment operator. */
     public static class Operator extends Enum {

@@ -8,7 +8,7 @@ import polyglot.types.FieldInstance;
  * <code>Type</code> or an <code>Expr</code> containing the field being 
  * accessed.
  */
-public interface Field extends Expr, Thrower
+public interface Field extends Expr
 {
     /**
      * Get the type object for the field.  This field may not be valid until

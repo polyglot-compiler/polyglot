@@ -1,5 +1,8 @@
 package polyglot.ext.jl.ast;
 
+import java.util.Collections;
+import java.util.List;
+
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
@@ -247,6 +250,14 @@ public class JL_c extends Ext_c implements JL {
      */
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
 	return jl().exceptionCheck(ec);
+    }
+
+    /** 
+     * List of Types of exceptions that might get thrown.  The result is
+     * not necessarily correct until after type checking. 
+     */
+    public List throwTypes(TypeSystem ts) {
+	   return jl().throwTypes(ts);
     }
 
     /**

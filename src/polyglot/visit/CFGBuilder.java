@@ -3,7 +3,6 @@ package polyglot.visit;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
-import polyglot.frontend.*;
 import polyglot.main.Report;
 import java.util.*;
 
@@ -298,15 +297,11 @@ public class CFGBuilder implements Copy
     }
 
     public void visitThrow(Term a) {
-        if (a instanceof Thrower) {
-            Thrower t = (Thrower) a;
-
-            for (Iterator i = t.throwTypes(ts).iterator(); i.hasNext(); ) {
-                Type type = (Type) i.next();
-                visitThrow(t, type);
-            }
+        for (Iterator i = a.del().throwTypes(ts).iterator(); i.hasNext(); ) {
+            Type type = (Type) i.next();
+            visitThrow(a, type);
         }
-        
+
         // Every statement can throw an error.
         // This is probably too inefficient.
         if ((a instanceof Stmt && ! (a instanceof CompoundStmt)) ||

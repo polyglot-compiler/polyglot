@@ -5,7 +5,6 @@ import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
 
-import java.io.*;
 import java.util.*;
 
 /**
@@ -21,19 +20,15 @@ public abstract class Node_c implements Node
     protected Ext ext;
 
     public Node_c(Position pos) {
-        this.del = del;
-
         if (del != null) {
             this.del.init(this);
         }
-
-        this.ext = ext;
 
         if (ext != null) {
             this.ext.init(this);
         }
 
-	this.position = pos;
+        this.position = pos;
     }
 
     public void init(Node node) {
@@ -314,13 +309,15 @@ public abstract class Node_c implements Node
     }
 
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException { 
-        if (this instanceof Thrower) {
-            List l = ((Thrower)this).throwTypes(ec.typeSystem());
-            for (Iterator i = l.iterator(); i.hasNext(); ) {
-                ec.throwsException((Type)i.next());
-            }
+        List l = this.del().throwTypes(ec.typeSystem());
+        for (Iterator i = l.iterator(); i.hasNext(); ) {
+            ec.throwsException((Type)i.next());
         }
-	return this;
+    	return this;
+    }
+
+    public List throwTypes(TypeSystem ts) {
+       return Collections.EMPTY_LIST;
     }
 
     /** Pretty-print the AST using the given <code>CodeWriter</code>. */
