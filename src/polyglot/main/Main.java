@@ -42,6 +42,10 @@ public class Main
   private static Set source;
   private static boolean hasErrors = false;
 
+  static String ext = "";
+  static Class extClass = null;
+  static ExtensionInfo extInfo = null;
+
   public static final void main(String args[])
   {
     options = new HashMap();
@@ -54,32 +58,6 @@ public class Main
                                 (File)options.get( MAIN_OPT_OUTPUT_DIRECTORY),
                                 (String)options.get( MAIN_OPT_OUTPUT_EXT),
                                 (Boolean)options.get( MAIN_OPT_STDOUT));
-
-    String ext = (String) options.get(MAIN_OPT_EXT);
-    Class extClass = null;
-    ExtensionInfo extInfo = null;
-
-    if (ext != null && ! ext.equals("")) {
-      String extClassName = "jltools.ext." + ext + ".ExtensionInfo";
-
-      try {
-	extClass = Class.forName(extClassName);
-      }
-      catch (ClassNotFoundException e) {
-	System.err.println( "Extension " + ext +
-	  " not found: could not find class " + extClassName + ".");
-	System.exit( 1);
-      }
-
-      try {
-	extInfo = (ExtensionInfo) extClass.newInstance();
-      }
-      catch (Exception e) {
-	System.err.println( "Extension " + ext +
-	  " could not be loaded: could not instantiate " + extClassName + ".");
-	System.exit( 1);
-      }
-    }
 
     if (extInfo == null) {
 	extInfo = new StandardExtensionInfo();
@@ -379,6 +357,37 @@ public class Main
     }
   }
 
+  static final void loadExtension(String ext) {
+    if (ext != null && ! ext.equals("")) {
+      String extClassName = "jltools.ext." + ext + ".ExtensionInfo";
+
+      try {
+	extClass = Class.forName(extClassName);
+      }
+      catch (ClassNotFoundException e) {
+	System.err.println( "Extension " + ext +
+	  " not found: could not find class " + extClassName + "." +
+	  e.getMessage());
+	System.exit( 1);
+      }
+
+      try {
+	extInfo = (ExtensionInfo) extClass.newInstance();
+      }
+      catch (ClassCastException e) {
+	System.err.println( ext + " is not a valid jltools extension:" +
+	    " extension class " + extClassName +
+	    " exists but is not a subclass of ExtensionInfo");
+	System.exit( 1);
+      }
+      catch (Exception e) {
+	System.err.println( "Extension " + ext +
+	  " could not be loaded: could not instantiate " + extClassName + ".");
+	System.exit( 1);
+      }
+    }
+  }
+
   static final void parseCommandLine(String args[], Map options, Set source)
   {
     if(args.length < 1)
@@ -425,7 +434,7 @@ public class Main
         options.put( MAIN_OPT_OUTPUT_DIRECTORY, new File( args[i]));
         i++;
       }
-      else if( args[i].equals( "-S"))
+      else if( args[i].equals( "-sourcepath"))
       {
         i++;
         StringTokenizer st = new StringTokenizer( args[i], File.pathSeparator);
@@ -455,6 +464,7 @@ public class Main
       {
         i++;
         options.put( MAIN_OPT_EXT, args[i]);
+	loadExtension(args[i]);
         i++;
       }
       else if( args[i].equals( "-sx")) 
@@ -551,11 +561,15 @@ public class Main
 
   private static void usage()
   {
+    String fileext;
+    if (extInfo == null) fileext = "jl";
+    else fileext = extInfo.fileExtension();
+
     System.err.println( "usage: " + Main.class.getName() + " [options] " 
-                        + "File.jl ...\n");
+                        + "<source-file>."+ fileext + " ...\n");
     System.err.println( "where [options] includes:");
     System.err.println( " -d <directory>          output directory");
-    System.err.println( " -S <path list>          source path");
+    System.err.println( " -sourcepath <path list> source path");
     System.err.println( " -fqcn                   use fully-qualified class"
                         + " names");
     System.err.println( " -sx <ext>               set source extension");

@@ -17,6 +17,7 @@ JAVADOC_DOCLET		= iContract.doclet.Standard
 JAVADOC_OUTPUT		= $(SOURCE)/javadoc
 JAVADOC_FLAGS		= -mx40m -ms40m -classpath "$(JAVADOC_CLASSPATH)"
 
+SOURCEPATH		= $(SOURCE)
 BIN 			= $(SOURCE)
 
 %.class: %.java
@@ -44,7 +45,7 @@ define javadoc
 "$(JAVA)" "$(JAVADOC_FLAGS)" $(JAVADOC_MAIN) \
 	-d $(JAVADOC_OUTPUT) \
 	-doclet $(JAVADOC_DOCLET) \
-	-sourcepath $(SOURCE) \
+	-sourcepath $(SOURCEPATH) \
 	-classpath "$(CLASSPATH)" $(PACKAGES)
 endef
 

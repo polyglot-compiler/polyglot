@@ -12,6 +12,10 @@ public class StandardExtensionInfo implements ExtensionInfo {
     protected TypeSystem ts = null;
     protected ExtensionFactory ef = null;
 
+    public String fileExtension() {
+	return "jl";
+    }
+
     protected TypeSystem createTypeSystem() {
 	return new StandardTypeSystem();
     }

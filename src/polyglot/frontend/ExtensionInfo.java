@@ -7,6 +7,9 @@ import java.io.*;
 import java.util.*;
 
 public interface ExtensionInfo {
+    String fileExtension();
+	// The extension that source files are expected to have
+
     TypeSystem getTypeSystem();
     ExtensionFactory getExtensionFactory();
     List getNodeVisitors(SourceJob job, int stage);
