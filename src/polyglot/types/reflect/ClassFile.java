@@ -278,7 +278,12 @@ public class ClassFile implements LazyClassInitializer {
      * Create an array of <code>t</code>.
      */
     Type arrayOf(Type t, int dims) {
-      return t.typeSystem().arrayOf(t, dims);
+        if (dims == 0) {
+            return t;
+        }
+        else {
+            return t.typeSystem().arrayOf(t, dims);
+        }
     }
 
     /**
