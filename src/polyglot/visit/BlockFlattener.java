@@ -8,7 +8,7 @@ import java.util.*;
  * The <code>BlockFlattener</code> runs over the AST and, as the name
  * suggests, flattens blocks whenever possible.
  **/
-public class BlockFlattener extends SemanticVisitor {
+public class BlockFlattener extends BaseVisitor {
 
   NodeFactory nf;
 
