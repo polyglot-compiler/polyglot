@@ -138,9 +138,9 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 	TypeSystem ts = tb.typeSystem();
 	tb = tb.pushClass(position(), flags, name);
         
-        // Member classes of interfaces are implicitly static.
         ParsedClassType ct = tb.currentClass();
 
+        // Member classes of interfaces are implicitly static.
         if (ct.isMember() && ct.outer().flags().isInterface()) {
             ct.flags(ct.flags().Static());
         }
@@ -154,12 +154,12 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         if (ct.flags().isInterface()) {
             ct.flags(ct.flags().Abstract());
         }
-
+        
         return tb;
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-	ParsedClassType type = tb.currentClass();
+	ParsedClassType type = tb.currentClass();        
         return type(type).flags(type.flags());
     }
 
@@ -213,6 +213,13 @@ public class ClassDecl_c extends Node_c implements ClassDecl
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
+            // make sure that the inStaticContext flag of the class is 
+            // correct
+            Context ctxt = ar.context();
+            this.type().isInStaticContext(ctxt.isStaticContext());
+        }
+
         if (ar.kind() != AmbiguityRemover.SUPER) {
             return this;
         }
@@ -284,9 +291,8 @@ public class ClassDecl_c extends Node_c implements ClassDecl
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        // The class cannot have the same simple name as any enclosing class.
-
-        if (this.type.isMember()) {
+        if (this.type().isNested() && (this.type() instanceof Named)) {
+            // The class cannot have the same simple name as any enclosing class.
             ClassType container = this.type.outer();
 
             while (container instanceof Named) {
@@ -299,25 +305,41 @@ public class ClassDecl_c extends Node_c implements ClassDecl
                                                 "same name.", position());
                 }
 
-                if (container.isMember()) {
+                if (container.isNested()) {
                     container = container.outer();
                 }
                 else {
                     break;
                 }
             }
+                        
+            if (this.type().isLocal()) {
+                // a local class name cannot be redeclared within the same
+                // method, constructor or initializer, and within its scope
+                
+                // outerCtxt is the scope in which this local class was
+                // declared.
+                Context outerCtxt = tc.context().pop();
+
+                if (outerCtxt.isLocal(this.name)) {
+                    // something with the same name was declared locally.
+                    // (but not in an enclosing class)                                    
+                    Named nm = outerCtxt.find(this.name);
+                    if (nm instanceof Type) {
+                        Type another = (Type)nm;
+                        if (another.isClass() && another.toClass().isLocal()) {
+                            throw new SemanticException("Cannot declare local " +
+                                "class \"" + this.type + "\" within the same " +
+                                "method, constructor or initializer as another " +
+                                "local class of the same name.", position());
+                        }
+                    }
+                }                
+            }
         }
 
         // check that inner classes do not declare member interfaces
         if (type().isMember() && flags().isInterface() &&
-              type().outer().isInnerClass()) {
-            // it's a member interface in an inner class.
-            throw new SemanticException("Inner classes cannot declare " + 
-                    "member interfaces.", this.position());             
-        }
-
-        // check that inner classes do not declare static members
-        if (type().isMember() && type().flags().isInterface() &&
               type().outer().isInnerClass()) {
             // it's a member interface in an inner class.
             throw new SemanticException("Inner classes cannot declare " + 
@@ -330,7 +352,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
             throw new SemanticException("Inner classes cannot declare static " 
                                  + "member classes.", position());
         }
-
+        
         if (type.superType() != null) {
             if (! type.superType().isClass()) {
                 throw new SemanticException("Cannot extend non-class \"" +

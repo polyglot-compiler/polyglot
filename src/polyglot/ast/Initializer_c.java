@@ -157,9 +157,26 @@ public class Initializer_c extends Term_c implements Initializer
 	    Type t = (Type) i.next();
 
 	    if (! t.isUncheckedException()) {
-		throw new SemanticException(
-		    "An initializer block may not throw a " + t + ".",
-                    position());
+                // TODO: This should agree with Java Language Spec 2nd Ed. 8.6
+                // An instance initializer of a named class may not throw
+                // a checked exception unless that exception or one of its 
+                // superclasses is explicitly declared in the throws clause
+                // of each contructor or its class, and the class has at least
+                // one explicitly declared constructor.
+                if (initializerInstance().flags().isStatic()) {
+                    throw new SemanticException(
+                        "A static initializer block may not throw a " + t + ".",
+                        ec.exceptionPosition(t));
+                }
+                
+                if (!initializerInstance().container().toClass().isAnonymous()) {
+                        // XXX should only throw this if it is not common to all
+                        // declared constructors, and there is at least one
+                        // declared constructor.
+        		throw new SemanticException(
+        		    "An instance initializer block may not throw a " + t + ".",
+                            ec.exceptionPosition(t));
+                }
 	    }
 	}
 

@@ -82,37 +82,31 @@ public class Special_c extends Expr_c implements Special
         TypeSystem ts = tc.typeSystem();
         Context c = tc.context();
 
-	ClassType t;
+        if (c.isStaticContext()) {
+            throw new SemanticException("Cannot access a non-static " +
+                "field or method, or refer to \"this\" or \"super\" " + 
+                "from a static context.",  this.position());
+        }
 
-	if (qualifier == null) {
-	    // Unqualified this or super expression
-	    t = c.currentClass();
-        
-            if (c.isStaticContext()) {
-                throw new SemanticException("Cannot access a non-static " +
-                    "field or method, or refer to \"this\" or \"super\" " + 
-                    "from a static context.",  this.position());
-            }
-	}
-	else {
+        ClassType t;
+        if (qualifier == null) {
+            // an unqualified "this" or "super"
+            t = c.currentClass();
+        }
+        else {    
 	    if (! qualifier.type().isClass()) {
 		throw new SemanticException("Qualified " + kind +
 		    " expression must be of a class type",
 		    qualifier.position());
 	    }
 
-	    t = qualifier.type().toClass();
+            t = qualifier.type().toClass();
 
-            /** TODO: ensure that there is an appropriate enclosing instance
-             * at the given type.
-             * 
-             */
-            if (! ts.equals(c.currentClass(), t) &&
-                ! ts.isEnclosed(c.currentClass(), t)) {
-                throw new SemanticException("Qualifier type \"" + t +
-                                            "\" is not an enclosing class of " +
-                                            "\"" + c.currentClass() + "\".",
-                                            qualifier.position());
+            if (!c.currentClass().hasEnclosingInstance(t)) {
+                throw new SemanticException("The nested class \"" + 
+                            c.currentClass() + "\" does not have " +
+                            "an enclosing instance of type \"" +
+                            t + "\".", qualifier.position());
             }
 	}
 

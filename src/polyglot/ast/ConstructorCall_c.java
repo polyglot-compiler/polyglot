@@ -1,10 +1,33 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
-import polyglot.util.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import polyglot.ast.ConstructorCall;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.ast.Term;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.ProcedureInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.Position;
+import polyglot.util.TypedList;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>ConstructorCall_c</code> represents a direct call to a constructor.
@@ -151,38 +174,24 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
                                             position());
             }
 
+
+            Type superType = ct.superType();
+            
+            if (!superType.isClass() || !superType.toClass().isInnerClass() ||
+                superType.toClass().isInStaticContext()) {
+                throw new SemanticException("The class \"" + superType + "\"" +
+                    " is not an inner class, or was declared in a static " +
+                    "context; a qualified constructor invocation cannot " +
+                    "be used.", position());
+            }
+
             Type qt = qualifier.type();
 
-            if (! qt.isClass()) {
-                throw new SemanticException("The type of a constructor " +
-                                            "invocation qualifier must be a " +
-                                            "member class.", position());
-            }
-
-            ClassType qct = qt.toClass();
-
-            boolean found = false;
-
-            // Check if ct or a supertype of ct is an member of qct.
-            for (Type t = ct; t != null; t = t.toReference().superType()) {
-                try {
-                    if (t.isClass() && t.toClass().isMember()) {
-                        Type s = ts.findMemberClass(qct, t.toClass().name());
-
-                        if (s == t) {
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-                catch (SemanticException e) {
-                }
-            }
-
-            if (! found) {
-                throw new SemanticException("Class \"" + ct +
-                                            "\" is not a member of \"" + qt +
-                                            "\".", position());
+            if (! qt.isClass() || !qt.isSubtype(superType.toClass().outer())) {
+                throw new SemanticException("The type of the qualifier " +
+                    "\"" + qt + "\" does not match the immediately enclosing " +
+                    "class  of the super class \"" +
+                    superType.toClass().outer() + "\".", qualifier.position());
             }
         }
 
