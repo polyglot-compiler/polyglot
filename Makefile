@@ -52,28 +52,25 @@ PACKAGES = \
 	jltools.ext.op.runtime \
 	jltools.ext.polyj \
 	jltools.ext.polyj.ast \
-	jltools.ext.polyj.lex \
 	jltools.ext.polyj.extension \
-	jltools.ext.polyj.parse \
 	jltools.ext.polyj.types \
 	jltools.ext.polyj.visit \
 	jltools.ext.jif \
 	jltools.ext.jif.ast \
-	jltools.ext.jif.lex \
 	jltools.ext.jif.extension \
-	jltools.ext.jif.parse \
 	jltools.ext.jif.types \
 	jltools.ext.jif.visit \
+	jltools.ext.jmatch \
+	jltools.ext.jmatch.ast \
+	jltools.ext.jmatch.extension \
+	jltools.ext.jmatch.ir \
+	jltools.ext.jmatch.visit \
 	jltools.ext.split \
 	jltools.ext.split.ast \
 	jltools.ext.split.dataflow \
 	jltools.ext.split.extension \
-	jltools.ext.split.lex \
-	jltools.ext.split.parse \
-	jltools.ext.split.runtime \
 	jltools.ext.split.types \
-	jltools.ext.split.visit \
-	jif.lang
+	jltools.ext.split.visit
 
 javadoc: FORCE
 	$(javadoc)

@@ -39,15 +39,26 @@ define subdirs
 done
 endef
 
+# define javadoc
+# -rm -rf $(JAVADOC_OUTPUT)
+# -mkdir -p $(JAVADOC_OUTPUT)
+# "$(JAVA)" "$(JAVADOC_FLAGS)" $(JAVADOC_MAIN) \
+# 	-d $(JAVADOC_OUTPUT) \
+# 	-doclet $(JAVADOC_DOCLET) \
+# 	-sourcepath $(SOURCEPATH) \
+# 	-classpath "$(CLASSPATH)" $(PACKAGES)
+# endef
+
 define javadoc
 -rm -rf $(JAVADOC_OUTPUT)
 -mkdir -p $(JAVADOC_OUTPUT)
-"$(JAVA)" "$(JAVADOC_FLAGS)" $(JAVADOC_MAIN) \
-	-d $(JAVADOC_OUTPUT) \
-	-doclet $(JAVADOC_DOCLET) \
+"$(JAVADOC)" -d $(JAVADOC_OUTPUT) \
 	-sourcepath $(SOURCEPATH) \
-	-classpath "$(CLASSPATH)" $(PACKAGES)
+	-classpath "$(CLASSPATH)" \
+	$(PACKAGES)
 endef
+#	-doclet $(JAVADOC_DOCLET) \
+#	-docletpath "$(JAVADOC_CLASSPATH)" \
 
 define yacc
 awk 'BEGIN {FS = "\n"; s = 1} {print $$1, "\t // ", s++}' $< | \
