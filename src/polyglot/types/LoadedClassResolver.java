@@ -150,16 +150,10 @@ public class LoadedClassResolver extends ClassResolver
     ClassType dt;
     
     try {
-      dt = (ClassType) te.decode(clazz.encodedClassType(version.name()));
+        dt = (ClassType) te.decode(clazz.encodedClassType(version.name()));
     }
-	catch (InvalidClassException e) {
-		throw new BadSerializationException(clazz.name());
-	}
-    catch (Exception e) {
-      throw new SemanticException("Could not get type information for " +
-                                  "class \"" + clazz.name() + "\"; " +
-                                  e.getClass().getName() + ": " +
-                                  e.getMessage());
+    catch (InvalidClassException e) {
+        throw new BadSerializationException(clazz.name());
     }
 
     // Put the decoded type into the resolver to avoid circular resolving.

@@ -23,6 +23,7 @@ public class TypeEncoder
 {
   protected TypeSystem ts;
   protected final boolean zip = true;
+  protected final boolean base64 = true;
   protected final boolean test = false;
 
   public TypeEncoder( TypeSystem ts)
@@ -34,8 +35,6 @@ public class TypeEncoder
   {
     ByteArrayOutputStream baos;
     ObjectOutputStream oos;
-    byte[] b;
-    StringBuffer sb;
 
     if (Report.should_report(Report.serialize, 1)) {
       Report.report(1, "Encoding type " + t);
@@ -53,13 +52,20 @@ public class TypeEncoder
     oos.writeObject( t);
     oos.flush();
     oos.close();
-    b = baos.toByteArray();
-
-    sb = new StringBuffer();
-    for (int i = 0; i < b.length; i++)
-	sb.append((char) b[i]);
-    String s = sb.toString();
-
+    
+    String s;
+    if (base64) {
+        s = new String(Base64.encode(baos.toByteArray()));
+    }
+    else {
+        byte[] b = baos.toByteArray();
+    
+        StringBuffer sb = new StringBuffer(b.length);
+        for (int i = 0; i < b.length; i++)
+    	sb.append((char) b[i]);
+        s = sb.toString();
+    }
+    
     if (test) {
       // Test it.
       try {
@@ -75,25 +81,42 @@ public class TypeEncoder
     return s;
   }
 
-  public Type decode( String s) throws IOException, ClassNotFoundException
+  public Type decode(String s) throws InvalidClassException
   {
-    char[] source;
-    byte[] b;
     ObjectInputStream ois;
+    byte[] b;
 
-    source = s.toCharArray();
-    b = new byte[ source.length];
-    for (int i = 0; i < source.length; i++)
-	b[i] = (byte) source[i];
-
-    if (zip) {
-	ois = new TypeInputStream( new GZIPInputStream( 
-				     new ByteArrayInputStream( b)), ts);
+    if (base64) {
+        b = Base64.decode(s.toCharArray());    
     }
     else {
-	ois = new TypeInputStream( new ByteArrayInputStream( b), ts);
+        char[] source;        
+        source = s.toCharArray();
+        b = new byte[ source.length];
+        for (int i = 0; i < source.length; i++)
+    	b[i] = (byte) source[i];
     }
-
-    return (Type)ois.readObject();
+    
+    try {
+        if (zip) {
+            ois = new TypeInputStream( new GZIPInputStream( 
+    				     new ByteArrayInputStream( b)), ts);
+        }
+        else {
+            ois = new TypeInputStream( new ByteArrayInputStream( b), ts);
+        }
+        return (Type)ois.readObject();
+    }
+    catch (InvalidClassException e) {
+        throw e;
+    }
+    catch (IOException e) {
+        throw new InternalCompilerError("IOException thrown while " +
+            "decoding serialized type info: " + e.getMessage());
+    }
+    catch (ClassNotFoundException e) {
+        throw new InternalCompilerError("Unable to find one of the classes " +
+            "for the serialized type info: " + e.getMessage());
+    }
   }
 }
