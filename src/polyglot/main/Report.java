@@ -44,15 +44,4 @@ public class Report {
 	System.err.println(message);
     }
   }
-
-  /** This is the standard way to report debugging information in the
-   *  compiler.  It conditionally reports a message if it is related to
-   *  the specified topic. The obscurity of the message is indicated
-   *  by <code>level</code>.  The message is reported only if the user
-   *  has requested (via the -report command-line option) that messages
-   *  of that obscurity be reported for one of the specified topics.
-   */
-  public static void report(String topic, int level, String message) {
-    report(Collections.singleton(topic), level, message);
-  }
 }
