@@ -127,7 +127,6 @@ public class ClassNode extends ClassMember
                                        interfaces, members, isLocal, isAnonymous);
           n.type = type;
           n.copyAnnotationsFrom( this);
-          n.type = this.type;
           return n;
         }
       }
@@ -295,7 +294,6 @@ public class ClassNode extends ClassMember
     
     if ( accessFlags.isAbstract() || accessFlags.isInterface())
       return this;
-
 
     // if no constructor was declared in a Class, add the default constructor.
     boolean bHasConstructor = false;
