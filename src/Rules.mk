@@ -19,7 +19,7 @@ JAR_FLAGS		= cf
 JAVADOC_MAIN		= com.sun.tools.javadoc.Main
 JAVADOC_DOCLET		= iContract.doclet.Standard
 JAVADOC_OUTPUT		= $(SOURCE)/javadoc
-JAVADOC_FLAGS		= -mx40m -ms40m -classpath "$(JAVADOC_CLASSPATH)"
+JAVADOC_FLAGS		= -mx40m -ms40m -classpath "$(JAVADOC_CLASSPATH)" -sourcepath "$(JAVADOC_SOURCEPATH)"
 
 BIN 			= $(SOURCE)/bin
 JIF			= $(BIN)/jifc
@@ -32,8 +32,7 @@ RELPATH			= $(SOURCE)/release/jif
 REL_DOC			= $(RELPATH)/doc
 REL_IMG			= $(RELPATH)/images
 REL_LIB			= $(RELPATH)/lib
-
-REL_SOURCES		= $(SOURCES)
+REL_SRC			= $(RELPATH)/src
 
 # To avoid repeated slashes
 DIR_ = $(DIR)
@@ -94,16 +93,16 @@ endef
 # 	-d $(JAVADOC_OUTPUT) \
 # 	-doclet $(JAVADOC_DOCLET) \
 # 	-sourcepath $(SOURCEPATH) \
-# 	-classpath "$(CLASSPATH)" $(PACKAGES)
+# 	-classpath "$(CLASSPATH)" $(JAVADOC_PACKAGES)
 # endef
 
 define javadoc
 -rm -rf $(JAVADOC_OUTPUT)
 -mkdir -p $(JAVADOC_OUTPUT)
 $(JAVADOC) -d $(JAVADOC_OUTPUT) \
-	-sourcepath $(SOURCEPATH) \
+	-sourcepath $(JAVADOC_SOURCEPATH) \
 	-classpath "$(CLASSPATH)" \
-	$(PACKAGES)
+	$(JAVADOC_PACKAGES)
 endef
 #	-doclet $(JAVADOC_DOCLET) \
 #	-docletpath "$(JAVADOC_CLASSPATH)" \

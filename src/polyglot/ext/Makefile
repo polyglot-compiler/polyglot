@@ -1,8 +1,9 @@
 SOURCE = ../..
 PACKAGE = jltools/ext
-SUBDIRS = jl jif split polyj jmatch op
 
 include $(SOURCE)/Rules.mk
+
+SUBDIRS = jl ${EXT}
 
 all clean clobber:
 	$(subdirs)

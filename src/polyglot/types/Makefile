@@ -65,3 +65,4 @@ all: $(CLASSES)
 release: release_src
 
 clean clobber: cleanclasses
+	$(subdirs)
