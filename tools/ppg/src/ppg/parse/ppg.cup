@@ -1,13 +1,14 @@
-package jltools.util.jlgen.parse;
+package polyglot.util.ppg.parse;
 
 import java.io.*;
 import java.util.*;
 import java_cup.runtime.Symbol; 
-import jltools.util.jlgen.*;
-import jltools.util.jlgen.atoms.*;
-import jltools.util.jlgen.cmds.*;
-import jltools.util.jlgen.code.*;import jltools.util.jlgen.lex.*;
-import jltools.util.jlgen.spec.*;
+import polyglot.util.ppg.*;
+import polyglot.util.ppg.atoms.*;
+import polyglot.util.ppg.cmds.*;
+import polyglot.util.ppg.code.*;
+import polyglot.util.ppg.lex.*;
+import polyglot.util.ppg.spec.*;
 
 parser code {: 
     private Lexer lexer;           
@@ -49,14 +50,14 @@ scan with {:
 :}; 
 
 terminal 
-	/* JLgen syntax */
+	/* PPG syntax */
 	INCLUDE, TO,
 	
-	/* JLgen commands and syntax */
+	/* PPG commands and syntax */
 	DROP, TRANSFER,
 	LBRACE, RBRACE,
 	
-	/* JLgen & CUP common */
+	/* PPG & CUP common */
 	COMMA, SEMI, COLON, COLON_COLON_EQUALS, BAR,
 	TERMINAL, NONTERMINAL,
 	PERCENT_PREC, DOT,	
@@ -71,7 +72,7 @@ terminal
 terminal Token STRING_CONST, ID, CODE_STR, EXTEND, OVERRIDE;
 
 nonterminal
-  /* JLgen nonterminals */
+  /* PPG nonterminals */
   prod_modifier_opt, 
   
   /* Common */
@@ -85,12 +86,12 @@ nonterminal
   preced
   ;
 
-nonterminal Spec spec, jlgen_spec, cup_spec;
+nonterminal Spec spec, ppg_spec, cup_spec;
 
-/* JLgen */nonterminal String include_spec;
+/* PPG */nonterminal String include_spec;
 nonterminal Vector command_list_opt, prod_part_list, rhs_list, transfer_list,
-					jlgen_precedence_list,
-					jlgen_start_spec, jlgen_start_spec_elt, jlgen_start_spec_list,					nt_id_list;
+					ppg_precedence_list,
+					ppg_start_spec, ppg_start_spec_elt, ppg_start_spec_list,					nt_id_list;
 nonterminal Command command;
 /* Common */
 nonterminal Production production;nonterminal Vector production_list;
@@ -108,16 +109,16 @@ start with spec;
 /* add ability to override class imports, package declaration */
 
 spec ::=
-	jlgen_spec:s {:		Parser.setProgramNode(s);	:}
+	ppg_spec:s {:		Parser.setProgramNode(s);	:}
 |	cup_spec:s {:		Parser.setProgramNode(s);	:}
 ;
 /********************************************************************
  * JLGEN                                                            *
  ********************************************************************/
-jlgen_spec ::=
-	include_spec:inc package_spec:pkg import_list:imp 	code_parts:code symbol_list_opt:sym_list jlgen_precedence_list:prec_list	jlgen_start_spec:start command_list_opt:cmd_list
+ppg_spec ::=
+	include_spec:inc package_spec:pkg import_list:imp 	code_parts:code symbol_list_opt:sym_list ppg_precedence_list:prec_list	ppg_start_spec:start command_list_opt:cmd_list
 	{:
-		RESULT = new JLgenSpec(inc, pkg, imp, code, sym_list,								prec_list, start, cmd_list);
+		RESULT = new PPGSpec(inc, pkg, imp, code, sym_list,								prec_list, start, cmd_list);
 	:}
 	;
  
@@ -130,30 +131,30 @@ include_spec ::=
 symbol_list_opt ::=
 	symbol_list:sym_list {: RESULT = sym_list; :}|	{: RESULT = null; :};
 
-jlgen_precedence_list ::=
+ppg_precedence_list ::=
 	precedence_list:p_l {: RESULT = p_l; :}
 |	PRECEDENCE SEMI // remove all precedence instructions from grammar
 	{: RESULT = null; :}
 ;
 
-jlgen_start_spec ::=
+ppg_start_spec ::=
 	START WITH nt_id:start SEMI {: 
 		Vector v = new Vector();
 		v.addElement(start);
 		RESULT = v;
 	:}	
-|	jlgen_start_spec_list:m {: RESULT = m; :}
+|	ppg_start_spec_list:m {: RESULT = m; :}
 ;
 
-jlgen_start_spec_list ::=
-	jlgen_start_spec_list:list jlgen_start_spec_elt:elt {: 
+ppg_start_spec_list ::=
+	ppg_start_spec_list:list ppg_start_spec_elt:elt {: 
 		list.addAll(elt);
 		RESULT = list;
 	:}
-|	jlgen_start_spec_elt:elt {: RESULT = elt; :}
+|	ppg_start_spec_elt:elt {: RESULT = elt; :}
 ;
 
-jlgen_start_spec_elt ::=
+ppg_start_spec_elt ::=
 	START WITH ID:start ID:method SEMI {:
 		Vector m = new Vector();
 		m.addElement(start.getValue());
