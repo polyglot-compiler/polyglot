@@ -106,10 +106,12 @@ public class Try_c extends Stmt_c implements Try
 	TypeSystem ts = ec.typeSystem();
 
 	// Visit the try block.
+        ec = ec.push();
 	Block tryBlock = (Block) visitChild(this.tryBlock, ec);
 	// First, get exceptions from the try block.
 	SubtypeSet thrown = ec.throwsSet(); 
         SubtypeSet caught = new SubtypeSet(ts);
+        ec = ec.pop();
 
 	// Add the unchecked exceptions.
 	thrown.addAll(ts.uncheckedExceptions());
@@ -124,7 +126,6 @@ public class Try_c extends Stmt_c implements Try
 	    // exception thrown in the try block.
 
 	    boolean match = false;
-
 	    for (Iterator j = thrown.iterator(); j.hasNext(); ) {
 		Type ex = (Type) j.next();
 
@@ -205,6 +206,11 @@ public class Try_c extends Stmt_c implements Try
             
             ec = ec.pop();
 	}
+    
+        // "thrown" now contains any exceptions which were not caught,
+        // and any exceptions thrown by the catch blocks and finallyBlock 
+        // Add these exceptions to the exception checker's throw set.
+        ec.throwsSet().addAll(thrown);
 
 	return reconstruct(tryBlock, catchBlocks, finallyBlock);
     }
