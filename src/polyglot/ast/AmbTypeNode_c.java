@@ -62,7 +62,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode
 	return type(ts.unknownType(position()));
     }
 
-    public Node disambiguateTypesOverride_(TypeAmbiguityRemover sc)
+    public Node disambiguateTypes_(TypeAmbiguityRemover sc)
 	throws SemanticException {
 
 	Node n = new Disamb().disambiguate(sc, position(), qual, name);
@@ -70,7 +70,6 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode
 	if (n instanceof TypeNode) {
 	    return n;
 	}
-
 	throw new SemanticException("Could not find type \"" + name +
 	    "\".", position());
     }

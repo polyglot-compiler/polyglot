@@ -73,7 +73,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 	return qualifier(ts.unknownQualifier(position()));
     }
 
-    public Node disambiguateTypesOverride_(TypeAmbiguityRemover sc)
+    public Node disambiguateTypes_(TypeAmbiguityRemover sc)
 	throws SemanticException {
 
 	Node n = new Disamb().disambiguate(sc, position(), qual, name);

@@ -129,9 +129,11 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 	    type.superType(ts.Object());
 	}
 
+	//FIXME: add(tn.type()) will throw a NullPointerException.
 	for (Iterator i = interfaces.iterator(); i.hasNext(); ) {
 	    TypeNode tn = (TypeNode) i.next();
-	    type.addInterface(tn.type());
+	    //type.addInterface(tn.type());
+	    type.addInterface(ts.unknownType(tn.position()));
 	}
 
 	// Plonk in the type before recursing to add members.
