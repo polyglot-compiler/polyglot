@@ -22,7 +22,7 @@ exists() {
 }
 
 escape() {
-    sed -e 's%\\%\\\\%g' -e 's%;%\\;%g' | sed 's%%%g'
+    sed -e 's%\\%\\\\%g' -e 's%;%\\;%g' | sed 's% %%g'
 }
 
 JAVA=`find_in_path java`
@@ -85,6 +85,9 @@ echo java version is ${JAVA_VER}
 
 PATH_SEP=`"${JAVA}" -cp . PrintProperty path.separator | escape`
 echo path separator is ${PATH_SEP}
+
+NOT_ESC_PATH_SEP=`"${JAVA}" -cp . PrintProperty path.separator`
+echo unescaped path separator is ${NOT_ESC_PATH_SEP}
 
 FILE_SEP=`"${JAVA}" -cp . PrintProperty file.separator | escape`
 echo file separator is ${FILE_SEP}
@@ -181,13 +184,13 @@ JCERT_JAR = \$(ESC_SOURCE)${FILE_SEP}jcert.jar
 CRYPTIX_JAR = \$(ESC_SOURCE)${FILE_SEP}cryptix32.jar
 IDOCLET_JAR = \$(ESC_SOURCE)${FILE_SEP}iDoclet.jar
 
-CRYPT_PATH = \$(JSSE_JAR)${PATH_SEP}\$(JNET_JAR)${PATH_SEP}\$(JCERT_JAR)${PATH_SEP}\$(CRYPTIX_JAR)
+CRYPT_PATH = \$(JSSE_JAR)${NOT_ESC_PATH_SEP}\$(JNET_JAR)${NOT_ESC_PATH_SEP}\$(JCERT_JAR)${NOT_ESC_PATH_SEP}\$(CRYPTIX_JAR)
 
 OUTPUT = \$(ESC_SOURCE)${FILE_SEP}classes
 
 LEX_RUNTIME = \$(ESC_SOURCE)${FILE_SEP}jlex.jar
 CUP_RUNTIME = \$(ESC_SOURCE)${FILE_SEP}java_cup.jar
-CLASSPATH = "\$(OUTPUT)${PATH_SEP}\$(CUP_RUNTIME)${PATH_SEP}\$(LEX_RUNTIME)${PATH_SEP}\$(CRYPT_PATH)${PATH_SEP}\$(RT_JAR)${PATH_SEP}\$(TOOLS_JAR)"
+CLASSPATH = "\$(OUTPUT)${NOT_ESC_PATH_SEP}\$(CUP_RUNTIME)${NOT_ESC_PATH_SEP}\$(LEX_RUNTIME)${NOT_ESC_PATH_SEP}\$(CRYPT_PATH)${NOT_ESC_PATH_SEP}\$(RT_JAR)${NOT_ESC_PATH_SEP}\$(TOOLS_JAR)"
 JAVAC_PATHS = -classpath \$(CLASSPATH) -sourcepath \$(ESC_BUILDPATH)${PATH_SEP}\$(ESC_SOURCE)
 
 JAVADOC_CLASSPATH = \$(IDOCLET_JAR)${PATH_SEP}\$(CLASSPATH)
