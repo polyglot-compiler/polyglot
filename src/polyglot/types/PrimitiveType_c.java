@@ -145,12 +145,20 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
     public boolean numericConversionValidImpl(Object value) {
         if (value == null)
             return false;
-        if (! (value instanceof Number))
-            return false;
         if (value instanceof Float || value instanceof Double)
             return false;
 
-        long v = ((Number) value).longValue();
+        long v;
+
+        if (value instanceof Number) {
+            v = ((Number) value).longValue();
+        }
+        else if (value instanceof Character) {
+            v = ((Character) value).charValue();
+        }
+        else {
+            return false;
+        }
 
         if (isLong())
             return true;
