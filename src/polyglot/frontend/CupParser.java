@@ -40,7 +40,9 @@ public class CupParser implements Parser
 	}
 	catch (Exception e) {
 	    // Used by cup to indicate a non-recoverable error.
-	    eq.enqueue(ErrorInfo.SYNTAX_ERROR, e.getMessage());
+	    if (e.getMessage() != null) {
+	        eq.enqueue(ErrorInfo.SYNTAX_ERROR, e.getMessage());
+	    }
 	}
 
 	return null;

@@ -51,7 +51,7 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
   {
     report_error (message, info);
     eq.enqueue (ErrorInfo.SYNTAX_ERROR,
-		"Unable to recover from previous errors.");
+		"Unable to recover from previous errors");
     die ();
   }
 
@@ -76,7 +76,8 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
 	 */
   public void die () throws Exception
   {
-    throw new Exception ("Couldn't repair and continue parse");
+    done_parsing();
+    throw new Exception ();
   }
 
   protected Position posForObject(Object o) {
