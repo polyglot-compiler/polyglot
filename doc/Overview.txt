@@ -143,7 +143,8 @@ follows:
     following subpackages:
 
 	ext.<ext-name>.ast - AST nodes specific to the extension
-	ext.<ext-name>.extension - New delegates specific to the extension
+	ext.<ext-name>.extension - New extenson and delegate objects specific
+                                   to the extension
         ext.<ext-name>.types - type objects and typing judgments specific to
                                the extension
 	ext.<ext-name>.visit - visitors specific to the extension
@@ -434,15 +435,15 @@ factory and/or an extension factory to use. The classes
 AbstractDelFactory_c and AbstractExtFactory_c in the same package
 provide convenient base classes for language extensions to extend.
 
-For any AST node <node>, the node factory typically has one or more
+For any AST node type <node>, the node factory typically has one or more
 methods called <node>, to create instances of <node>. The
 implementation of these methods in NodeFactory_c have the following
 form:
 
     public <node> <node>(Position pos, ...) {
         <node> n = new <node>_c(pos, ...);
-        n = (<node>)n.ext(extFactory.ext<node>());
-        n = (<node>)n.del(delFactory.del<node>());
+        n = (<node>) n.ext(extFactory.ext<node>());
+        n = (<node>) n.del(delFactory.del<node>());
         return n;
     }
 

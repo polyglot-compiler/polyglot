@@ -44,6 +44,9 @@ downloadable from:
 
         http://www.jflex.de
 
+Install JFlex.jar in your classpath or drop it in the lib directory
+of the polyglot distribution.
+
 LEGAL NOTE: Polyglot is distributed under LGPL, but JFlex is distributed under
 GPL.  This means that we cannot include JFlex in the Polyglot distribution.
 The output of JFlex inherits the license of the specification (i.e., LGPL in
