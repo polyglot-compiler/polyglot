@@ -5,6 +5,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.types.Type;
 import polyglot.visit.*;
+import java.util.List;
 
 /**
  * A <code>Node</code> represents an AST node.  All AST nodes must implement
@@ -84,6 +85,19 @@ public interface Node extends JL, Copy
      * if <code>child</code> was <code>null</code>.
      */
     Node visitChild(Node child, NodeVisitor v);
+
+    /**
+     * Visit all the elements of a list.
+     * @param l The list to visit.
+     * @param v The visitor to use.
+     * @return A new list with each element from the old list
+     *         replaced by the result of visiting that element.
+     *         If <code>l</code> is a <code>TypedList</code>, the
+     *         new list will also be typed with the same type as 
+     *         <code>l</code>.  If <code>l</code> is <code>null</code>,
+     *         <code>null</code> is returned.
+     */
+    public List visitList(List l, NodeVisitor v);
 
     /**
      * Get the expected type of a child expression of <code>this</code>.
