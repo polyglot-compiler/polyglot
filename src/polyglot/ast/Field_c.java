@@ -177,6 +177,13 @@ public class Field_c extends Expr_c implements Field
                                                   target.type() + "\".", target.position());
   }
   
+  public Node checkConstants(ConstantChecker cc) throws SemanticException {
+      // Just check if the field is constant to force a dependency to be
+      // created.
+      isConstant();
+      return this;
+  }
+  
   public Type childExpectedType(Expr child, AscriptionVisitor av)
   {
       if (child == target) {
@@ -240,17 +247,22 @@ public class Field_c extends Expr_c implements Field
   }
 
   public boolean constantValueSet() {
-      return fi != null && fi.constantValueSet();
+      if (fi != null &&
+              (target instanceof TypeNode ||
+                      (target instanceof Special && targetImplicit))) {
+          return fi.constantValueSet();
+      }
+      return fi != null;
   }
   
   public boolean isConstant() {
-    if (fi != null &&
-        (target instanceof TypeNode ||
-         (target instanceof Special && targetImplicit))) {
-      return fi.isConstant();
-    }
+      if (fi != null &&
+              (target instanceof TypeNode ||
+                      (target instanceof Special && targetImplicit))) {
+          return fi.isConstant();
+      }
 
-    return false;
+      return false;
   }
 
   public Object constantValue() {

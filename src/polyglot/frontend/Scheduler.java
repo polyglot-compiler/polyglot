@@ -373,7 +373,7 @@ public abstract class Scheduler {
             }
             
             if (! reached(subgoal)) {
-                // put the subgoal on the worklist
+                // put the subgoal back on the worklist
                 addGoal(subgoal);
                 runPass = false;
             }

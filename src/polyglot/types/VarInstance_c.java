@@ -35,7 +35,11 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     
     public boolean isConstant() {
         if (! constantValueSet) {
-            Scheduler scheduler = typeSystem().extensionInfo().scheduler();
+            if (! flags.isFinal()) {
+                setNotConstant();
+                return isConstant;
+            }
+//            Scheduler scheduler = typeSystem().extensionInfo().scheduler();
 //            scheduler.addConcurrentDependency(scheduler.currentGoal(), new ConstantsChecked(this));
         }
         return isConstant;
