@@ -207,7 +207,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
                 ClassType superContainer = superType.toClass().outer();
                 // ct needs an enclosing instance of superContainer, 
                 // or a subclass of superContainer.
-                ClassType e = ct.outer();
+                ClassType e = ct;
                 
                 while (e != null) {
                     if (e.isSubtype(superContainer) && ct.hasEnclosingInstance(e)) {
@@ -218,8 +218,13 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
                 
                 if (e == null) {
                     throw new SemanticException(ct + " must have an enclosing instance" +
-                    " that contains " + superType, position());
-                }                
+                        " that is a subtype of " + superContainer, position());
+                }               
+                if (e == ct) {
+                    throw new SemanticException(ct + " is a subtype of " + superContainer + 
+                        "; an enclosing instance that is a subtype of " + superContainer +
+                        " must be specified in the super constructor call.", position());
+                }
             }
 
 	    ct = ct.superType().toClass();
