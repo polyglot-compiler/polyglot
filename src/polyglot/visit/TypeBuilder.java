@@ -62,7 +62,7 @@ public class TypeBuilder extends HaltingVisitor
 
         Stack s = new Stack();
 
-        for (ParsedClassType ct = context.currentClass(); ct != null; ) {
+        for (ParsedClassType ct = context.currentClassScope(); ct != null; ) {
             s.push(ct);
 
             if (ct.isInner()) {

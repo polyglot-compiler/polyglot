@@ -180,7 +180,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
       Context c = ar.context();
       TypeSystem ts = ar.typeSystem();
 
-      ParsedClassType ct = c.currentClass();
+      ParsedClassType ct = c.currentClassScope();
 
       FieldInstance fi = ts.fieldInstance(position(),
                                           ct, flags(), declType(), name());
@@ -205,24 +205,20 @@ public class FieldDecl_c extends Node_c implements FieldDecl
   }
 
   public NodeVisitor addMembersEnter(AddMemberVisitor am) {
-    ParsedClassType ct = am.context().currentClass();
+    ParsedClassType ct = am.context().currentClassScope();
     if (fi == null) {
         throw new InternalCompilerError("null field instance");
     }
+    Types.report(5, "adding " + fi + " to " + ct);
     ct.addField(fi);
     return am.bypassChildren(this);
   }
 
-  public void enterScope(Context c) {
+  public Context enterScope(Context c) {
       if (ii != null) {
-          c.pushCode(ii);
+          return c.pushCode(ii);
       }
-  }
-
-  public void leaveScope(Context c) {
-      if (ii != null) {
-          c.popCode();
-      }
+      return c;
   }
 
   /** Type check the declaration. */
@@ -248,10 +244,9 @@ public class FieldDecl_c extends Node_c implements FieldDecl
     return this;
   }
 
-  public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-      throws SemanticException
+  public Type childExpectedType(Expr child, AscriptionVisitor av)
   {
-      return decl.setExpectedType(child, tc);
+      return decl.childExpectedType(child, av);
   }
 
   public String toString() {

@@ -80,25 +80,25 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
     /** Set the local instance of the declaration. */
     public LocalDecl localInstance(LocalInstance li) {
         LocalDecl_c n = (LocalDecl_c) copy();
-		n.li = li;
-		return n;
+        n.li = li;
+        return n;
     }
 
-	/**
-	 * Get the declarator.
-	 */
-	protected Declarator decl() {
-		return decl;
-	}
+    /**
+     * Get the declarator.
+     */
+    protected Declarator decl() {
+        return decl;
+    }
 
-	/**
-	 * Set the declarator.
-	 */
-	protected LocalDecl decl(Declarator decl) {
-		LocalDecl_c n = (LocalDecl_c) copy();
-		n.decl = decl;
-		return n;
-	}
+    /**
+     * Set the declarator.
+     */
+    protected LocalDecl decl(Declarator decl) {
+        LocalDecl_c n = (LocalDecl_c) copy();
+        n.decl = decl;
+        return n;
+    }
 
     /** Reconstruct the declaration. */
     protected LocalDecl_c reconstruct(TypeNode type, Expr init) {
@@ -120,9 +120,9 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
 	return reconstruct(type, init);
     }
 
-    /** Add the variable to the scope after the declaration. */
-    public void leaveScope(Context c) {
+    public Context enterScope(Context c) {
         c.addVariable(li);
+        return c;
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
@@ -149,25 +149,6 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
 	return localInstance(li);
     }
 
-    /**
-     * Type check the declaration.  We must do this test before we leave scope.
-     */
-    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
-        Context c = tc.context();
-
-	try {
-	    c.findLocal(li.name());
-	}
-	catch (SemanticException e) {
-            // not found, so not multiply-defined
-            return tc;
-	}
-
-        throw new SemanticException(
-            "Local variable " + li + " multiply-defined in " +
-            c.currentCode() + ".");
-    }
-
     /** Type check the declaration. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
@@ -181,13 +162,26 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
 
 	decl.typeCheck(tc);
 
-	return this;
+        // Check if the variable is multiply defined.
+        // FIXME: This won't find variables defined in the same scope.
+        // LocalDecl should be a "let".
+        Context c = tc.context();
+
+	try {
+	    c.pop().findLocal(li.name());
+	}
+	catch (SemanticException e) {
+            // not found, so not multiply-defined
+            return this;
+	}
+
+        throw new SemanticException(
+            "Local variable " + li + " multiply-defined in " +
+            c.currentCode() + ".");
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-        throws SemanticException
-    {
-        return decl.setExpectedType(child, tc);
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        return decl.childExpectedType(child, av);
     }
 
     public String toString() {

@@ -15,17 +15,6 @@ public interface Expr extends Receiver {
      */
     Expr type(Type type);
 
-    /**
-     * Return the expected type of the expression.
-     */
-    Type expectedType();
-
-    /**
-     * Return an equivalent expression, but with the expected type
-     * <code>type</code>.
-     */
-    Expr expectedType(Type type);
-
     /** Get the precedence of the expression. */
     Precedence precedence();
 

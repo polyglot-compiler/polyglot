@@ -55,20 +55,22 @@ public class ClassBody_c extends Node_c implements ClassBody
         return reconstruct(members);
     }
 
-    public void enterScope(Context c) {
-        enterScope(c, true);
+    public Context enterScope(Context c) {
+        return enterScope(c, true);
     }
 
-    public void enterScope(Context c, boolean inherit) {
-        c.pushBlock();
+    public Context enterScope(Context c, boolean inherit) {
+        c = c.pushBlock();
 
-        ParsedClassType type = c.currentClass();
+        ClassType type = c.currentClass();
 
         addMembers(c, type, new HashSet(), inherit);
+
+        return c;
     }
 
-    protected void addMembers(Context c, ReferenceType type, Set visited,
-                              boolean inherit) {
+    protected void addMembers(Context c, ReferenceType type,
+                              Set visited, boolean inherit) {
         Types.report(2, "addMembers(" + type + ")");
 
         if (visited.contains(type)) {
@@ -123,10 +125,6 @@ public class ClassBody_c extends Node_c implements ClassBody
                 c.addType(mct);
             }
         }
-    }
-
-    public void leaveScope(Context c) {
-        c.popBlock();
     }
 
     public String toString() {
@@ -298,11 +296,5 @@ public class ClassBody_c extends Node_c implements ClassBody
             w.newline(0);
             w.write("}");
         }
-    }
-
-    public void translate(CodeWriter w, Translator tr) {
-        enterScope(tr.context());
-        super.translate(w, tr);
-	leaveScope(tr.context());
     }
 }

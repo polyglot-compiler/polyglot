@@ -63,8 +63,7 @@ public interface Declarator extends Copy {
     /** 
       * Type check a child of the declarator. 
       */
-    Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-          throws SemanticException;
+    Type childExpectedType(Expr child, AscriptionVisitor av);
 
     /** 
       * Write the declarator to an output file. 

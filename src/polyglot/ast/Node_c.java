@@ -147,10 +147,7 @@ public abstract class Node_c implements Node
     }
 
     /** Adjust the environment for entering a new scope. */
-    public void enterScope(Context c) { }
-
-    /** Adjust the environment for leaving the current scope. */
-    public void leaveScope(Context c) { }
+    public Context enterScope(Context c) { return c; }
 
     // These methods override the methods in Ext_c.
     // These are the default implementation of these passes.
@@ -219,8 +216,8 @@ public abstract class Node_c implements Node
 	return this;
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc) throws SemanticException {
-	return child;
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+	return child.type();
     }
 
     /** Check that exceptions are properly propagated throughout the AST. */
@@ -259,7 +256,7 @@ public abstract class Node_c implements Node
     /** Translate the AST using the given <code>CodeWriter</code>. */
     public void translate(CodeWriter w, Translator tr) {
             // By default, just rely on the pretty printer.
-            this.del().prettyPrint(w, tr);
+            this.del().prettyPrint(w, tr.context(enterScope(tr.context())));
     }
 
     public void dump(CodeWriter w) {

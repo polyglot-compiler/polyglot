@@ -7,7 +7,7 @@ import polyglot.types.TypeSystem;
 import polyglot.types.Context;
 
 /**
- * <code>Ext</code> is the super type of all node extension objects.
+ * <code>Del</code> is the super type of all node delegate objects.
  * It declares the methods which implement compiler passes.
  */
 public interface Del extends NodeOps, Copy
@@ -18,7 +18,7 @@ public interface Del extends NodeOps, Copy
     Node node();
 
     /**
-     * Initialize the Ext with a Node.
+     * Initialize the Del with a Node.
      */
     void init(Node node);
 }

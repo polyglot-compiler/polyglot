@@ -64,12 +64,8 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 	return reconstruct(statements);
     }
 
-    public void enterScope(Context c) {
-	c.pushBlock();
-    }
-
-    public void leaveScope(Context c) {
-	c.popBlock();
+    public Context enterScope(Context c) {
+	return c.pushBlock();
     }
 
     /** Write the block to an output file. */
@@ -89,8 +85,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
     }
 
     public void translate(CodeWriter w, Translator tr) {
-        enterScope(tr.context());
-        super.translate(w, tr);
-	leaveScope(tr.context());
+        Context c = enterScope(tr.context());
+        super.translate(w, tr.context(c));
     }
 }

@@ -131,29 +131,26 @@ public class Unary_c extends Expr_c implements Unary
 	return this;
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-      	throws SemanticException
-    {
-        TypeSystem ts = tc.typeSystem();
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        TypeSystem ts = av.typeSystem();
 
         if (child == expr) {
             if (op == POST_INC || op == POST_DEC ||
                 op == PRE_INC || op == PRE_DEC) {
-
-                return child.expectedType(ts.Double());
+                return ts.Double();
             }
             else if (op == NEG || op == POS) {
-                return child.expectedType(ts.Double());
+                return ts.Double();
             }
             else if (op == BIT_NOT) {
-                return child.expectedType(ts.Long());
+                return ts.Long();
             }
             else if (op == NOT) {
-                return child.expectedType(ts.Boolean());
+                return ts.Boolean();
             }
         }
 
-        return child;
+        return child.type();
     }
 
     /** Check exceptions thrown by the statement. */

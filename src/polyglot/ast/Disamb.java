@@ -15,7 +15,7 @@ public interface Disamb
      * @return An unambiguous AST node, or null if disambiguation
      * 		   fails.
 	 */
-    Node disambiguate(SemanticVisitor v, Position pos,
+    Node disambiguate(ContextVisitor v, Position pos,
 			Prefix prefix, String name) throws SemanticException;
 
 }

@@ -1507,7 +1507,6 @@ public class TypeSystem_c implements TypeSystem
 	    return t.name();
 	}
 
-        /*
 	// Use the short name if it is unique.
 	if (c != null) {
 	    try {
@@ -1520,7 +1519,6 @@ public class TypeSystem_c implements TypeSystem
 	    catch (SemanticException e) {
 	    }
 	}
-        */
 
 	return t.container().translate(c) + "." + t.name();
     }

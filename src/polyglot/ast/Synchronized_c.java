@@ -77,16 +77,14 @@ public class Synchronized_c extends Stmt_c implements Synchronized
 	return this;
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-      	throws SemanticException
-    {
-        TypeSystem ts = tc.typeSystem();
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        TypeSystem ts = av.typeSystem();
 
         if (child == expr) {
-            return child.expectedType(ts.Object());
+            return ts.Object();
         }
 
-        return child;
+        return child.type();
     }
 
     public String toString() {

@@ -92,13 +92,9 @@ public class Formal_c extends Node_c implements Formal
 	return reconstruct(type);
     }
 
-    public void enterScope(Context c) {
-    }
-
-    public void leaveScope(Context c) {
-        if (li != null) {
-            c.addVariable(li);
-        }
+    public Context enterScope(Context c) {
+        c.addVariable(li);
+        return c;
     }
 
     /** Write the formal to an output file. */

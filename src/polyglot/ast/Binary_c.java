@@ -296,9 +296,7 @@ public class Binary_c extends Expr_c implements Binary
 	return type(ts.promote(l, r));
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-        throws SemanticException
-    {
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
         Expr other;
 
         if (child == left) {
@@ -308,57 +306,57 @@ public class Binary_c extends Expr_c implements Binary
             other = left;
         }
         else {
-            return child;
+            return child.type();
         }
 
-	TypeSystem ts = tc.typeSystem();
+        TypeSystem ts = av.typeSystem();
 
 	if (op == EQ || op == NE) {
             // Coercion to compatible types.
             if (other.type().isReference() || other.type().isNull()) {
-                return child.expectedType(ts.Object());
+                return ts.Object();
             }
 
             if (other.type().isBoolean()) {
-                return child.expectedType(ts.Boolean());
+                return ts.Boolean();
             }
 
             if (other.type().isNumeric()) {
-                return child.expectedType(ts.Double());
+                return ts.Double();
             }
         }
 
         if (op == ADD && type.isSame(ts.String())) {
             // Implicit coercion to String.
-            return child.expectedType(ts.String());
+            return ts.String();
         }
 
         if (op == GT || op == LT || op == GE || op == LE) {
             if (other.type().isNumeric()) {
-                return child.expectedType(ts.Double());
+                return ts.Double();
             }
         }
 
         if (op == COND_OR || op == COND_AND) {
-            return child.expectedType(ts.Boolean());
+            return ts.Boolean();
         }
 
 	if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
             if (other.type().isBoolean()) {
-                return child.expectedType(ts.Boolean());
+                return ts.Boolean();
             }
-            return child.expectedType(ts.Long());
+            return ts.Long();
         }
 
         if (op == SUB || op == MUL || op == DIV || op == MOD) {
-            return child.expectedType(ts.Double());
+            return ts.Double();
         }
 
         if (op == SHL || op == SHR || op == USHR) {
-            return child.expectedType(ts.Long());
+            return ts.Long();
         }
 
-        return child;
+        return child.type();
     }
 
     /** Check exceptions thrown by the expression. */

@@ -185,7 +185,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
             Context c = ar.context();
             TypeSystem ts = ar.typeSystem();
 
-            ParsedClassType ct = c.currentClass();
+            ParsedClassType ct = c.currentClassScope();
 
             MethodInstance mi = makeMethodInstance(ct, ts);
 
@@ -196,19 +196,15 @@ public class MethodDecl_c extends Node_c implements MethodDecl
     }
 
     public NodeVisitor addMembersEnter(AddMemberVisitor am) {
-        ParsedClassType ct = am.context().currentClass();
+        ParsedClassType ct = am.context().currentClassScope();
         ct.addMethod(mi);
         return am.bypassChildren(this);
     }
 
-    public void enterScope(Context c) {
+    public Context enterScope(Context c) {
         Types.report(5, "enter scope of method " + name);
-        c.pushCode(mi);
-    }
-
-    public void leaveScope(Context c) {
-        Types.report(5, "leave scope of method " + name);
-        c.popCode();
+        c = c.pushCode(mi);
+        return c;
     }
 
     /** Type check the method. */
@@ -359,9 +355,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
         prettyPrintHeader(flags, w, tr);
 
 	if (body != null) {
-	    enterScope(c);
-	    printSubStmt(body, w, tr);
-	    leaveScope(c);
+	    printSubStmt(body, w, tr.context(enterScope(c)));
 	}
 	else {
 	    w.write(";");

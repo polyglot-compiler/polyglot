@@ -79,12 +79,8 @@ public class Initializer_c extends Node_c implements Initializer
 	return reconstruct(body);
     }
 
-    public void enterScope(Context c) {
-	c.pushCode(ii);
-    }
-
-    public void leaveScope(Context c) {
-	c.popCode();
+    public Context enterScope(Context c) {
+	return c.pushCode(ii);
     }
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
@@ -147,12 +143,6 @@ public class Initializer_c extends Node_c implements Initializer
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write(flags.translate());
 	printBlock(body, w, tr);
-    }
-
-    public void translate(CodeWriter w, Translator tr) {
-	enterScope(tr.context());
-        super.translate(w, tr);
-	leaveScope(tr.context());
     }
 
     public void dump(CodeWriter w) {

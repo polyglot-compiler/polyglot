@@ -144,12 +144,8 @@ public class SourceFile_c extends Node_c implements SourceFile
         return importTable(it);
     }
 
-    public void enterScope(Context c) {
-        c.pushSource(importTable);
-    }
-
-    public void leaveScope(Context c) {
-        c.popSource();
+    public Context enterScope(Context c) {
+        return c.pushSource(importTable);
     }
 
     /** Type check the source file. */

@@ -16,7 +16,7 @@ import java.util.*;
  * To use:
  *     new Translator(job, ts, nf, tf).translate(ast);
  */
-public class Translator extends PrettyPrinter
+public class Translator extends PrettyPrinter implements Copy
 {
     protected Job job;
     protected NodeFactory nf;
@@ -40,6 +40,24 @@ public class Translator extends PrettyPrinter
 
         if (this.context == null) {
             this.context = ts.createContext();
+        }
+    }
+
+    public Translator context(Context c) {
+        if (c == this.context) {
+            return this;
+        }
+        Translator tr = (Translator) copy();
+        tr.context = c;
+        return tr;
+    }
+
+    public Object copy() {
+        try {
+            return super.clone();
+        }
+        catch (CloneNotSupportedException e) {
+            throw new InternalCompilerError("Java clone() weirdness.");
         }
     }
 
@@ -116,7 +134,7 @@ public class Translator extends PrettyPrinter
                 pkg = p.toString();
             }
 
-            sfn.enterScope(context);
+            Context c = sfn.enterScope(context);
 
             TopLevelDecl first = null;
 
@@ -153,14 +171,12 @@ public class Translator extends PrettyPrinter
                     writeHeader(sfn, w);
                 }
 
-                decl.del().translate(w, this);
+                decl.del().translate(w, this.context(c));
 
                 if (i.hasNext()) {
                     w.newline(0);
                 }
             }
-
-            sfn.leaveScope(context);
 
             w.flush();
             ofw.close();

@@ -156,12 +156,12 @@ public class Assign_c extends Expr_c implements Assign
     return type(ts.promote(t, s));
   }
   
-  public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc) throws SemanticException {
+  public Type childExpectedType(Expr child, AscriptionVisitor av) {
       if (child == right) {
-          return child.expectedType(left.type());
+          return left.type();
       }
 
-      return child;
+      return child.type();
   }
 
   /** Check exceptions thrown by the expression. */

@@ -27,10 +27,6 @@ public class ConstantFolder extends NodeVisitor
 	return n.del().foldConstantsEnter(this);
     }
 
-    public Node override(Node n) {
-	return n.del().foldConstantsOverride(this);
-    }
-
     public Node leave(Node old, Node n, NodeVisitor v) {
 	return n.del().foldConstants(this);
     }

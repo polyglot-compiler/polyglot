@@ -9,7 +9,7 @@ import polyglot.frontend.Job;
  * A visitor which traverses the AST and remove ambiguities found in fields,
  * method signatures and the code itself.
  */
-public class AmbiguityRemover extends SemanticVisitor
+public class AmbiguityRemover extends ContextVisitor
 {
     public static class Kind extends Enum {
         private Kind(String name) {
@@ -39,13 +39,9 @@ public class AmbiguityRemover extends SemanticVisitor
         return v;
     }
 
-    protected Node overrideCall(Node n) throws SemanticException {
-        return n.del().disambiguateOverride(this);
-    }
-
-    protected Node leaveCall(Node n) throws SemanticException {
+    protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         Types.report(2, ">> " + kind + "::leave " + n);
-        Node m = n.del().disambiguate(this);
+        Node m = n.del().disambiguate((AmbiguityRemover) v);
         Types.report(2, "<< " + kind + "::leave " + n + " -> " + m);
         return m;
     }

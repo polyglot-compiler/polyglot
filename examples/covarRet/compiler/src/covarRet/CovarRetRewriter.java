@@ -11,29 +11,40 @@ import java.util.*;
  * This visitor rewrites the AST to translate from Java with covariant returns
  * to standard Java.
  */
-public class CovarRetRewriter extends SemanticVisitor
+public class CovarRetRewriter extends AscriptionVisitor
 {
     public CovarRetRewriter(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
 
-    public Node leaveCall(Node n) {
-        if (n instanceof Call) {
+    public Expr ascribe(Expr e, Type toType) {
+        if (e instanceof Call) {
             /* Add a cast to the appropriate subclass, if neccssary */
-            Call c = (Call) n;
+            Call c = (Call) e;
 
             Position p = c.position();
 
             // Insert a cast, (always at the moment)
-            Type overridenRetType = getOverridenReturnType(c.methodInstance());
-            if (overridenRetType != null && !overridenRetType.isImplicitCastValid(c.expectedType())) {
-              // The overriden return type cannot be implicitly cast to the
-              // expected type, so explicitly cast it.
-              NodeFactory nf = nodeFactory();
-              return nf.Cast(p, nf.CanonicalTypeNode(p, c.methodInstance().returnType()), c);
+            MethodInstance mi = c.methodInstance();
+            Type overridenRetType = getOverridenReturnType(mi);
+
+            if (overridenRetType != null &&
+                ! overridenRetType.isImplicitCastValid(toType)) {
+
+                // The overriden return type cannot be implicitly cast to the
+                // expected type, so explicitly cast it.
+                NodeFactory nf = nodeFactory();
+                return nf.Cast(p, nf.CanonicalTypeNode(p, mi.returnType()), c);
             }
         }
-        else if (n instanceof MethodDecl) {
+
+        return e;
+    }
+
+    public Node leaveCall(Node old, Node n, NodeVisitor v)
+        throws SemanticException {
+
+        if (n instanceof MethodDecl) {
             // Change the return type of the overridden method
             // to be the same as the superclass's
             MethodDecl md = (MethodDecl)n;
@@ -42,11 +53,12 @@ public class CovarRetRewriter extends SemanticVisitor
             MethodInstance mi = md.methodInstance();
             Type overridenRetType = getOverridenReturnType(mi);
             if (overridenRetType != null) {
-              return md.returnType(nodeFactory().CanonicalTypeNode(p, overridenRetType));
+                NodeFactory nf = nodeFactory();
+                return md.returnType(nf.CanonicalTypeNode(p, overridenRetType));
             }
         }
 
-        return n;
+        return super.leaveCall(old, n, v);
     }
 
     /**
@@ -72,7 +84,8 @@ public class CovarRetRewriter extends SemanticVisitor
                   continue;
               }
 
-              if (ts.isSubtype(mi.returnType(), mj.returnType()) && !ts.isSame(mi.returnType(), mj.returnType())) {
+              if (ts.isSubtype(mi.returnType(), mj.returnType()) &&
+                  !ts.isSame(mi.returnType(), mj.returnType())) {
                 // mj.returnType() is the type to use!
                 retType = mj.returnType();
               }

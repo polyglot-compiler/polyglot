@@ -12,35 +12,6 @@ import polyglot.visit.*;
  */
 public interface NodeOps
 {
-    /*
-     * FIXME: insert this comment before every Override method.
-     *
-     * @deprecated Don't use this method.  Try to use the methods
-     * called by <code>enter()</code> and <code>leave()</code>.
-     */
-
-    /**
-     * Collects classes, methods, and fields from the AST rooted at this node
-     * and constructs type objects for these.  These type objects may be
-     * ambiguous.  Inserts classes into the <code>TypeSystem</code>.
-     *
-     * This method is called by the <code>override()</code> method of
-     * the visitor.  This method should perform the work for the node
-     * and for its children, possibly be directly invoking
-     * <code>this.visitChildren()</code> to have the visitor visit the
-     * children.
-     *
-     * The method should either return <code>null</code>--in which case
-     * the visitor will call the <code>enter()</code> method,
-     * <code>visitChildren()</code>, and <code>leave()</code>--or the
-     * method should explicitly visit the children and return a new
-     * node.
-     *
-     * @param tb The visitor which adds new type objects to the
-     * <code>TypeSystem</code>.
-     */
-    Node buildTypesOverride(TypeBuilder tb) throws SemanticException;
-
     /**
      * Collects classes, methods, and fields from the AST rooted at this node
      * and constructs type objects for these.  These type objects may be
@@ -77,25 +48,6 @@ public interface NodeOps
     /**
      * Remove any remaining ambiguities from the AST.
      *
-     * This method is called by the <code>override()</code> method of
-     * the visitor.  This method should perform the work for the node
-     * and for its children, possibly be directly invoking
-     * <code>this.visitChildren()</code> to have the visitor visit the
-     * children.
-     *
-     * The method should either return <code>null</code>--in which case
-     * the visitor will call the <code>enter()</code> method,
-     * <code>visitChildren()</code>, and <code>leave()</code>--or the
-     * method should explicitly visit the children and return a new
-     * node.
-     *
-     * @param ar The visitor which disambiguates.
-     */
-    Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException;
-
-    /**
-     * Remove any remaining ambiguities from the AST.
-     *
      * This method is called by the <code>enter()</code> method of the
      * visitor.  The * method should perform work that should be done
      * before visiting the children of the node.  The method may return
@@ -119,25 +71,6 @@ public interface NodeOps
      * @param ar The visitor which disambiguates.
      */
     Node disambiguate(AmbiguityRemover ar) throws SemanticException;
-
-    /**
-     * Adds disambiguated methods and fields to the types.
-     *
-     * This method is called by the <code>override()</code> method of
-     * the visitor.  This method should perform the work for the node
-     * and for its children, possibly be directly invoking
-     * <code>this.visitChildren()</code> to have the visitor visit the
-     * children.
-     *
-     * The method should either return <code>null</code>--in which case
-     * the visitor will call the <code>enter()</code> method,
-     * <code>visitChildren()</code>, and <code>leave()</code>--or the
-     * method should explicitly visit the children and return a new
-     * node.
-     *
-     * @param am The visitor which builds types.
-     */
-    Node addMembersOverride(AddMemberVisitor am) throws SemanticException;
 
     /**
      * Adds disambiguated methods and fields to the types.
@@ -169,25 +102,6 @@ public interface NodeOps
     /**
      * Fold constants in the AST.
      *
-     * This method is called by the <code>override()</code> method of
-     * the visitor.  This method should perform the work for the node
-     * and for its children, possibly be directly invoking
-     * <code>this.visitChildren()</code> to have the visitor visit the
-     * children.
-     *
-     * The method should either return <code>null</code>--in which case
-     * the visitor will call the <code>enter()</code> method,
-     * <code>visitChildren()</code>, and <code>leave()</code>--or the
-     * method should explicitly visit the children and return a new
-     * node.
-     *
-     * @param cf The constant folding visitor.
-     */
-    Node foldConstantsOverride(ConstantFolder cf);
-
-    /**
-     * Fold constants in the AST.
-     *
      * This method is called by the <code>enter()</code> method of the
      * visitor.  The * method should perform work that should be done
      * before visiting the children of the node.  The method may return
@@ -215,25 +129,6 @@ public interface NodeOps
     /**
      * Type check the AST.
      *
-     * This method is called by the <code>override()</code> method of
-     * the visitor.  This method should perform the work for the node
-     * and for its children, possibly be directly invoking
-     * <code>this.visitChildren()</code> to have the visitor visit the
-     * children.
-     *
-     * The method should either return <code>null</code>--in which case
-     * the visitor will call the <code>enter()</code> method,
-     * <code>visitChildren()</code>, and <code>leave()</code>--or the
-     * method should explicitly visit the children and return a new
-     * node.
-     *
-     * @param tc The type checking visitor.
-     */
-    Node typeCheckOverride(TypeChecker tc) throws SemanticException;
-
-    /**
-     * Type check the AST.
-     *
      * This method is called by the <code>enter()</code> method of the
      * visitor.  The * method should perform work that should be done
      * before visiting the children of the node.  The method may return
@@ -257,36 +152,6 @@ public interface NodeOps
      * @param tc The type checking visitor.
      */
     Node typeCheck(TypeChecker tc) throws SemanticException;
-
-    /**
-     * Set the expected type of <code>child</code>.  This method is called
-     * by the visitor just before the child expression is visited.
-     *
-     * @param child An immediate subexpression of <code>node()</code>.
-     * @param tv The expected type visitor.
-     * @return A new version of child with the expectedType() field set.
-     */
-    Expr setExpectedType(Expr child, ExpectedTypeVisitor tv)
-        throws SemanticException;
-
-    /**
-     * Check that exceptions are properly propagated throughout the AST.
-     *
-     * This method is called by the <code>override()</code> method of
-     * the visitor.  This method should perform the work for the node
-     * and for its children, possibly be directly invoking
-     * <code>this.visitChildren()</code> to have the visitor visit the
-     * children.
-     *
-     * The method should either return <code>null</code>--in which case
-     * the visitor will call the <code>enter()</code> method,
-     * <code>visitChildren()</code>, and <code>leave()</code>--or the
-     * method should explicitly visit the children and return a new
-     * node.
-     *
-     * @param ec The visitor.
-     */
-    Node exceptionCheckOverride(ExceptionChecker ec) throws SemanticException;
 
     /**
      * Check that exceptions are properly propagated throughout the AST.

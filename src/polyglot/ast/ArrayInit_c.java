@@ -75,17 +75,15 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 	}
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-      	throws SemanticException
-    {
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
         if (elements.isEmpty()) {
-            return child;
+            return child.type();
         }
 
-        Type t = this.expectedType();
+        Type t = av.pop().toType();
 
         if (! t.isArray()) {
-            throw new SemanticException("Type of array initializer must be " +
+            throw new InternalCompilerError("Type of array initializer must be " +
                                         "an array.", position());
         }
 
@@ -95,11 +93,11 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 	    Expr e = (Expr) i.next();
 
             if (e == child) {
-                return child.expectedType(t);
+                return t;
             }
         }
 
-        return child;
+        return child.type();
     }
 
     public void typeCheckElements(Type lhsType) throws SemanticException {

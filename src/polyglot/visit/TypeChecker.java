@@ -7,7 +7,7 @@ import polyglot.frontend.Job;
 import polyglot.types.Package;
 
 /** Visitor which performs type checking on the AST. */
-public class TypeChecker extends SemanticVisitor
+public class TypeChecker extends ContextVisitor
 {
     public TypeChecker(Job job, TypeSystem ts, NodeFactory nf) {
 	super(job, ts, nf);
@@ -17,18 +17,8 @@ public class TypeChecker extends SemanticVisitor
 	return n.del().typeCheckEnter(this);
     }
 
-    protected Node overrideCall(Node n) throws SemanticException {
-	Node m = n.del().typeCheckOverride(this);
-
-	if (m instanceof Expr && ((Expr) m).type() == null) {
-	    throw new InternalCompilerError("Null type for " + m, m.position());
-	}
-
-	return m;
-    }
-
-    protected Node leaveCall(Node n) throws SemanticException {
-	Node m = n.del().typeCheck(this);
+    protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
+	Node m = n.del().typeCheck((TypeChecker) v);
 
 	if (m instanceof Expr && ((Expr) m).type() == null) {
 	    throw new InternalCompilerError("Null type for " + m, m.position());
