@@ -24,6 +24,7 @@ parser Grm extends polyglot.ext.jl.parse.Grm implements QQParser {:
 :};
 
 terminal QQNodeToken COMMA_EXPR;
+terminal QQNodeToken COMMA_FORM;
 terminal QQNodeToken COMMA_STMT;
 terminal QQNodeToken COMMA_TYPE;
 terminal QQNodeToken COMMA_DECL;

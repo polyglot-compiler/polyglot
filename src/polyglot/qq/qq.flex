@@ -38,6 +38,7 @@ import polyglot.ast.Stmt;
 import polyglot.ast.TypeNode;
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassMember;
+import polyglot.ast.Formal;
 import polyglot.ext.jl.qq.sym;
 import polyglot.util.Position;
 import polyglot.util.InternalCompilerError;
