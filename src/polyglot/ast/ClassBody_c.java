@@ -73,8 +73,7 @@ public class ClassBody_c extends Node_c implements ClassBody
         // We can't clean-super any member classes yet until we are finished
         // with this class and all at the same nesting level.
         // Delay until the clean-sigs pass.
-        if (ar.kind() == AmbiguityRemover.SUPER ||
-            ar.kind() == AmbiguityRemover.SIGNATURES) {
+        if (ar.kind() == AmbiguityRemover.SUPER) {
             return ar.bypassChildren(this);
         }
 
