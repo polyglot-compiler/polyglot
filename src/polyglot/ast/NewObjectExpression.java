@@ -250,16 +250,17 @@ public class NewObjectExpression extends Expression
     }
 
     tn.translate( c, w);
-    w.write( "(");
+    w.write( "("); w.begin(0);
 
     for( Iterator iter = arguments(); iter.hasNext(); ) {
       ((Expression)iter.next()).translate( c, w);
       if(iter.hasNext()) {
-        w.write(", ");
+        w.write(",");
+	w.allowBreak(0);
       }
     }
 
-    w.write( ")");
+    w.end(); w.write(")");
 
     if( cn != null) {
       cn.translate(c, w);

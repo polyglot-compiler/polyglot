@@ -226,14 +226,14 @@ public class MethodExpression extends Expression
       w.write( ".");
     }
 
-    w.write( name + "(");
+    w.write(name + "(");
     w.begin(0);
     
     for( Iterator iter = arguments(); iter.hasNext(); ) {
       ((Expression)iter.next()).translate( c, w);
       if (iter.hasNext()) {
-        w.write( ",");
-	w.allowBreak(2, " ");
+        w.write(",");
+	w.allowBreak(0);
       }
     }
     w.end();
@@ -253,5 +253,3 @@ public class MethodExpression extends Expression
     return PRECEDENCE_OTHER;
   }
 }
-    
-  

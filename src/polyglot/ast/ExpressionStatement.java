@@ -63,7 +63,7 @@ public class ExpressionStatement extends Statement
   public void translate( LocalContext c, CodeWriter w)
   {
     expr.translate( c, w);
-    w.write( "; ");
+    w.write( ";");
   }
 
   public void dump( CodeWriter w)

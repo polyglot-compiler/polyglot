@@ -154,12 +154,15 @@ public class ConstructorCallStatement extends Statement
       w.write( (kind == THIS ? "this(" : "super("));
     }
 
-    for( Iterator iter = arguments(); iter.hasNext(); ) {
+    w.begin(0);
+    for (Iterator iter = arguments(); iter.hasNext(); ) {
       ((Expression)iter.next()).translate( c, w);
-      if( iter.hasNext()) {
-        w.write( ", ");
+      if (iter.hasNext()) {
+        w.write(",");
+	w.allowBreak(0);
       }
     }
+    w.end();
     w.write( "); ");
   }
   

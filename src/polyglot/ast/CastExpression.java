@@ -91,11 +91,14 @@ public class CastExpression extends Expression
   
   public void translate( LocalContext c, CodeWriter w)
   {
-    w.write( "(");
-    tn.translate( c, w);
-    w.write( ")");
+    w.begin(0);
+    w.write("(");
+    tn.translate(c, w);
+    w.write(")");
+    w.allowBreak(2, "");
 
-    translateExpression( expr, c, w);
+    translateExpression(expr, c, w);
+    w.end();
   }
   
   public void dump( CodeWriter w)

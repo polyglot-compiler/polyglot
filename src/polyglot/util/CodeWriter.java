@@ -14,8 +14,6 @@ import java.util.Vector;
 
 public class CodeWriter
 {
-   public static final int INDENT = 4;
-   
     // A code-writer formats text onto an
     // output stream "o" while keeping the width of the output
     // within "width" characters if possible
@@ -66,8 +64,9 @@ public class CodeWriter
     }
     public void newline(int n) {
         // Force a newline. Indentation will be preserved.
+	// This method should be used sparingly; usually a call to
+	// "allowBreak" is preferable.
         current.add(new Newline(n));
-         
     }
     public void flush() throws IOException {
         // Send out the current batch of text
