@@ -127,7 +127,7 @@ public class TypeNode extends Node
     if( type instanceof AmbiguousType) {
       w.write( "AMB ");
     }
-    dumpNodeInfo( w);
+    //dumpNodeInfo( w);
   }
 
   public void setCheckedType( Type type)

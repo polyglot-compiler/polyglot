@@ -41,6 +41,10 @@ public abstract class Type extends AnnotatedObject implements Serializable
 
   public abstract String getTypeString();
 
+    public String translate() {
+	return getTypeString();
+    }
+
   /*
    * To be filled in by subtypes.
    */

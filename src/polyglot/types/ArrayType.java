@@ -49,6 +49,16 @@ public class ArrayType extends Type
     return sb.toString();
   }
 
+    public String translate() {
+	StringBuffer sb = new StringBuffer();
+	sb.append(base.translate());
+	for(int i = 0; i < dims; i++) {
+	    sb.append("[]");
+	}
+	return sb.toString();
+    }
+	
+
   public boolean isPrimitive() 
   {
     return false;
