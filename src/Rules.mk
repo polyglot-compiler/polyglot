@@ -56,9 +56,6 @@ all clean clobber javadoc release:
 $(PACKAGEPATH)/%.class: %.java
 	$(JC) $(JC_FLAGS) $<
 
-JLGEN_DEP: 
-	sh -c 'cd $(SOURCE)/jltools/util/jlgen/; make'
-
 cleanclasses:
 	-rm -f $(PACKAGEPATH)/*.class
 
@@ -67,6 +64,12 @@ clean_java_output:
 
 classpath:
 	@echo "setenv CLASSPATH $(CLASSPATH)"
+
+release_files:
+	@for i in $(REL_SOURCES); do echo $(REL_SRC)$$i; done
+	echo $(REL_SRC)Makefile
+	@if [ -f package.html ]; then echo $(REL_SRC)package.html; fi
+	$(subdirs)
 
 release_src:
 	mkdir -p $(REL_SRC)
