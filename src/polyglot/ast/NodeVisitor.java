@@ -1,55 +1,77 @@
-/*
- * NodeVisitor.java
- */
-
 package jltools.ast;
 
 /**
- * NodeVisitor
+ * The <code>NodeVisitor</code> represents an implementation of the "Visitor" 
+ * style of tree traversal. There is a convention among <b>jltools</b> visitors
+ * which states that traversals will <i>lazily reconstruct</i> the tree. That
+ * is, the AST is functionally "modified" by creating new nodes on each 
+ * traversal, but only when necessary-- only when nodes (or their children)
+ * are actually changed. Up to three seperate calls into the visitor may be
+ * invoked for each AST node. <code>override</code> allows the visitor to 
+ * redefine the entire traversal for a particular subtree. <code>enter</code>
+ * notifies the visitor that traversal of a particular subtree has begun.
+ * <code>leave</code> informs the visitor that traversal is finishing a 
+ * particular subtree.
  *
- * Overview: A NodeVisitor is a traversal class for the AST, which implements
- *   the 'Visitor' design pattern. The contract is that every AST Node will
- *   have an accept method, which will dispatch to NodeVisitor's visitFoo
- *   method.
- *
- * Notes: 
- *    If you want to add nodes to the AST outside of jtools.ast, don't add
- *    them to NodeVisitor.  Instead, make a new visitor interface which
- *    extends NodeVisitor, and have your code look a little like:
- *         Node accept(NodeVisitor v) {
- *             if (v instanceof SpecialVisitor)
- *                return v.visitSpecial(this);
- *             else {
- *                visitChildren(v);
- *                return this;
- *                // or maybe: return v.visitSupertypeOfThis(this);
- *                // or      : throw new Error("foo");
- *             }
- *         }
- **/
+ * @see jltools.ast.Node#visit
+ * @see jltools.ast.Node#visitChildren
+ */
 public abstract class NodeVisitor 
 {
-// XXX document me
-   public Node visitBefore(Node n)
-   {
-      return null;
-   }
-
-// XXX document me
-   public Node visitAfter(Node n)
-   {
-      return n;
-   }
-
-// XXX document me
-  public Node visitAfter(Node n, Object vinfo)
-  {
-    return visitAfter( n);
-  }
-
-// XXX document me
-  public Object mergeVisitorInfo( Object vinfo1, Object vinfo2)
+  /**
+   * Given a tree rooted at <code>n</code>, the visitor has the option of
+   * overriding all traversal of the children of <code>n</code>. If no changes
+   * were made to <code>n</code> and the visitor wishes to prevent further
+   * traversal of the tree, then it should return <code>n</code>. If changes
+   * were made to the subtree, then the visitor should return a <i>copy</i>
+   * of <code>n</code> with appropriate changes. Finally, if the visitor
+   * does not wish to override traversal of the subtree rooted at 
+   * <code>n</code>, then it should return <code>null</code>.
+   *
+   * @param n The root of the subtree to be traversed.
+   * @return A node if normal traversal is to stop, <code>null</code> if it is
+   *  to continue.
+   */
+  public Node override( Node n)
   {
     return null;
+  }
+  
+  /**
+   * Begin normal traversal of a subtree rooted at <code>n</code>. This gives
+   * the visitor the option of changing internal state or returning a new
+   * visitor which will be used to visit the children of <code>n</code>.
+   *
+   * @param n The root of the subtree to be traversed.
+   * @return The <code>NodeVisitor</code> which should be used to visit the 
+   *  children of <code>n</code>.
+   */
+  public NodeVisitor enter( Node n)
+  {
+    return this;
+  }
+
+  /**
+   * This method is called after all of the children of <code>n</code> have
+   * been visited. In this case, these children were visited by the visitor 
+   * <code>v</code>. This is the last chance for the visitor to modify the
+   * tree rooted at <code>n</code>. This method will be called exactly the
+   * same number of times as <code>entry</code> is called. That is, for each
+   * node that is not overriden, <code>enter</code> and <code>leave</code> are
+   * each called exactly once.
+   * <p>
+   * Note that if <code>old == n</code> then the vistior should make a copy of
+   * <code>n</code> before modifying it. It should then return the modified 
+   * copy.
+   *
+   * @param old The original state of root of the current subtree.
+   * @param n The current state of the root of the current subtree.
+   * @param v The <code>NodeVisitor</code> object used to visit the children.
+   * @return The final result of the traversal of the tree rooted at 
+   *  <code>n</code>.
+   */
+  public Node leave( Node old, Node n, NodeVisitor v)
+  {
+    return n;
   }
 }
