@@ -228,7 +228,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
 
     /**
-     * Over-ridden superclass method, to build the flow graph, perform dataflow
+     * Overridden superclass method, to build the flow graph, perform dataflow
      * analysis, and check the analysis for CodeDecl nodes.
      */
     public Node leaveCall(Node n) throws SemanticException {
