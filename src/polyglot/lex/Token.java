@@ -1,7 +1,19 @@
 package jltools.lex;
 
 abstract class Token extends InputElement {
-  abstract java_cup.runtime.Symbol token();
+  int line;
+
+  public Token(int lineNumber)
+  {
+    this.line = line;
+  }
+
+  public int getLine()
+  {
+	return line;
+  }
+
+  abstract java_cup.runtime.Symbol symbol();
 
   protected static String escape(String s) {
     StringBuffer sb = new StringBuffer();

@@ -5,9 +5,9 @@ import java_cup.runtime.Symbol;
 
 class Keyword extends Token {
   String keyword;
-  Keyword(String s) { keyword = s; }
+  Keyword(int line, String s) { super(line); keyword = s; }
 
-  Symbol token() {
+  Symbol symbol() {
     Integer i = (Integer) key_table.get(keyword);
     return new Symbol(i.intValue());
   }

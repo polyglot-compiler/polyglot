@@ -4,7 +4,7 @@ class WhiteSpace extends InputElement {
   char whitespace;
   WhiteSpace(char which) { this.whitespace=which; }
 
-  public String toString() { 
+  public String toString() {
     String s;
     switch(whitespace) {
     case ' ':  s = "SP"; break;

@@ -3,7 +3,7 @@ package jltools.lex;
 import java_cup.runtime.Symbol;
 
 class LongLiteral extends NumericLiteral {
-  LongLiteral(long l) { this.val = new Long(l); }
+  LongLiteral(int line, long l) { super(line); this.val = new Long(l); }
 
-  Symbol token() { return new Symbol(Sym.INTEGER_LITERAL, val); }
+  Symbol symbol() { return new Symbol(Sym.INTEGER_LITERAL, val); }
 }

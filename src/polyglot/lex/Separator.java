@@ -4,9 +4,9 @@ import java_cup.runtime.Symbol;
 
 class Separator extends Token {
   char which;
-  Separator(char which) { this.which = which; }
+  Separator(int line, char which) { super(line); this.which = which; }
 
-  Symbol token() {
+  Symbol symbol() {
     switch(which) {
     case '(': return new Symbol(Sym.LPAREN);
     case ')': return new Symbol(Sym.RPAREN);

@@ -9,14 +9,14 @@ import java.io.LineNumberReader;
  * COPYING for more details.  There is NO WARRANTY on this code.
  */
 
-public class Lexer implements Parse.Lexer {
+public class Lexer /* implements jltools.parse.Lexer */ {
   LineNumberReader reader;
   boolean isJava12;
   String line = null;
   int line_pos = 1;
   int line_num = 0;
   LineList lineL = new LineList(-line_pos, null); // sentinel for line #0
-  
+
   public Lexer(Reader reader) {
     this(reader, true); // by default, use a Java 1.2-compatible lexer.
   }
@@ -24,8 +24,9 @@ public class Lexer implements Parse.Lexer {
     this.reader = new LineNumberReader(new EscapedUnicodeReader(reader));
     this.isJava12 = isJava12;
   }
-  
-  public java_cup.runtime.Symbol nextToken() throws java.io.IOException {
+
+  /* public java_cup.runtime.Symbol nextToken() throws java.io.IOException { */
+  public Token nextToken() throws java.io.IOException {
     /* tokens are:
      *  Identifiers/Keywords/true/false/null (start with java letter)
      *  numeric literal (start with number)
@@ -47,11 +48,13 @@ public class Lexer implements Parse.Lexer {
     endpos = lineL.head + line_pos;
 
     //System.out.println(ie.toString()); // uncomment to debug lexer.
-    java_cup.runtime.Symbol sym = ((Token)ie).token();
+    java_cup.runtime.Symbol sym = ((Token)ie).symbol();
     // fix up left/right positions.
     sym.left = startpos; sym.right = endpos;
     // return token.
-    return sym;
+
+    /* return sym; */
+    return (Token)ie;
   }
   public boolean debug_lex() throws java.io.IOException {
     InputElement ie = getInputElement();
@@ -62,18 +65,18 @@ public class Lexer implements Parse.Lexer {
   String comment;
   public String lastComment() { return comment; }
   public void clearComment() { comment=""; }
-  
+
   InputElement getInputElement() throws java.io.IOException {
     if (line_num == 0)
       nextLine();
     if (line==null)
-      return new EOF();
+      return new EOF(line_num);
     if (line.length()<=line_pos) {      // end of line.
       nextLine();
       if (line==null)
-	return new EOF();
+	return new EOF(line_num);
     }
-    
+
     switch (line.charAt(line_pos)) {
 
       // White space:
@@ -86,7 +89,7 @@ public class Lexer implements Parse.Lexer {
       // EOF character:
     case '\020': // ASCII SUB
       consume();
-      return new EOF();
+      return new EOF(line_num);
 
       // Comment prefix:
     case '/':
@@ -127,7 +130,7 @@ public class Lexer implements Parse.Lexer {
 	  text.append(line.substring(line_pos));
 	  c.appendLine(text.toString()); text.setLength(0);
 	  nextLine();
-	  if (line==null) 
+	  if (line==null)
 	    throw new Error("Unterminated comment at end of file.");
 	} else {
 	  text.append(line.substring(line_pos, star_pos));
@@ -155,7 +158,7 @@ public class Lexer implements Parse.Lexer {
     case ']':
     case ';':
     case ',':
-      return new Separator(consume());
+      return new Separator(line_num, consume());
 
       // Operators:
     case '=':
@@ -183,9 +186,9 @@ public class Lexer implements Parse.Lexer {
     case '.':
       if (Character.digit(line.charAt(line_pos+1),10)!=-1)
 	return getNumericLiteral();
-      else return new Separator(consume());
+      else return new Separator(line_num, consume());
 
-    default: 
+    default:
       break;
     }
     if (Character.isJavaIdentifierStart(line.charAt(line_pos)))
@@ -197,10 +200,10 @@ public class Lexer implements Parse.Lexer {
 
   static final String[] keywords = new String[] {
     "abstract", "boolean", "break", "byte", "case", "catch", "char",
-    "class", "const", "continue", "default", "do", "double", "else", 
-    "extends", "final", "finally", "float", "for", "goto", "if", 
-    "implements", "import", "instanceof", "int", "interface", "long", 
-    "native", "new", "package", "private", "protected", "public", 
+    "class", "const", "continue", "default", "do", "double", "else",
+    "extends", "final", "finally", "float", "for", "goto", "if",
+    "implements", "import", "instanceof", "int", "interface", "long",
+    "native", "new", "package", "private", "protected", "public",
     "return", "short", "static", "strictfp", "super", "switch",
     "synchronized", "this", "throw", "throws", "transient", "try", "void",
     "volatile", "while" };
@@ -214,20 +217,20 @@ public class Lexer implements Parse.Lexer {
       sb.append(consume());
     String s = sb.toString();
     // Now check against boolean literals and null literal.
-    if (s.equals("null")) return new NullLiteral();
-    if (s.equals("true")) return new BooleanLiteral(true);
-    if (s.equals("false")) return new BooleanLiteral(false);
+    if (s.equals("null")) return new NullLiteral(line_num);
+    if (s.equals("true")) return new BooleanLiteral(line_num, true);
+    if (s.equals("false")) return new BooleanLiteral(line_num, false);
     // Check against keywords.
     //  pre-java 1.2 compatibility:
-    if (!isJava12 && s.equals("strictfp")) return new Identifier(s);
+    if (!isJava12 && s.equals("strictfp")) return new Identifier(line_num, s);
     // use binary search.
     for (int l=0, r=keywords.length; r > l; ) {
       int x = (l+r)/2, cmp = s.compareTo(keywords[x]);
       if (cmp < 0) r=x; else l=x+1;
-      if (cmp== 0) return new Keyword(s);
+      if (cmp== 0) return new Keyword(line_num, s);
     }
     // not a keyword.
-    return new Identifier(s);
+    return new Identifier(line_num, s);
   }
   NumericLiteral getNumericLiteral() {
     int i;
@@ -267,14 +270,14 @@ public class Lexer implements Parse.Lexer {
     if (line.charAt(line_pos) == 'l' ||
 	line.charAt(line_pos) == 'L') {
       consume();
-      return new LongLiteral(val);
-    } 
+      return new LongLiteral(line_num, val);
+    }
     // we compare MAX_VALUE against val/2 to allow constants like
     // 0xFFFF0000 to get past the test. (unsigned long->signed int)
     if ((val/2) > Integer.MAX_VALUE ||
 	 val    < Integer.MIN_VALUE)
       throw new Error("Constant does not fit in integer on line "+line_num);
-    return new IntegerLiteral((int)val);
+    return new IntegerLiteral(line_num, (int)val);
   }
   NumericLiteral getFloatingPointLiteral() {
     String rep = getDigits();
@@ -293,13 +296,13 @@ public class Lexer implements Parse.Lexer {
       case 'f':
       case 'F':
 	consume();
-	return new FloatLiteral(Float.valueOf(rep).floatValue());
+	return new FloatLiteral(line_num, Float.valueOf(rep).floatValue());
       case 'd':
       case 'D':
 	consume();
 	/* falls through */
       default:
-	return new DoubleLiteral(Double.valueOf(rep).doubleValue());
+	return new DoubleLiteral(line_num, Double.valueOf(rep).doubleValue());
       }
     } catch (NumberFormatException e) {
       throw new Error("Illegal floating-point on line "+line_num+": "+e);
@@ -321,20 +324,20 @@ public class Lexer implements Parse.Lexer {
     case '~':
     case '?':
     case ':':
-      return new Operator(new String(new char[] {first}));
+      return new Operator(line_num, new String(new char[] {first}));
       // doubled operators
     case '+':
     case '-':
     case '&':
     case '|':
-      if (first==second) 
-	return new Operator(new String(new char[] {first, consume()}));
+      if (first==second)
+	return new Operator(line_num, new String(new char[] {first, consume()}));
     default:
       break;
     }
     // Check for trailing '='
     if (second=='=')
-	return new Operator(new String(new char[] {first, consume()}));
+	return new Operator(line_num, new String(new char[] {first, consume()}));
 
     // Special-case '<<', '>>' and '>>>'
     if ((first=='<' && second=='<') || // <<
@@ -344,11 +347,11 @@ public class Lexer implements Parse.Lexer {
 	op += consume();
       if (line.charAt(line_pos)=='=') // <<=, >>=, >>>=
 	op += consume();
-      return new Operator(op);
+      return new Operator(line_num, op);
     }
 
     // Otherwise return single operator.
-    return new Operator(new String(new char[] {first}));
+    return new Operator(line_num, new String(new char[] {first}));
   }
 
   CharacterLiteral getCharLiteral() {
@@ -369,7 +372,7 @@ public class Lexer implements Parse.Lexer {
     char secondquote = consume();
     if (firstquote != '\'' || secondquote != '\'')
       throw new Error("Invalid character literal on line "+line_num);
-    return new CharacterLiteral(val);
+    return new CharacterLiteral(line_num, val);
   }
   StringLiteral getStringLiteral() {
     char openquote = consume();
@@ -389,8 +392,8 @@ public class Lexer implements Parse.Lexer {
     char closequote = consume();
     if (openquote != '\"' || closequote != '\"')
       throw new Error("Invalid string literal on line " + line_num);
-    
-    return new StringLiteral(val.toString().intern());
+
+    return new StringLiteral(line_num, val.toString().intern());
   }
 
   char getEscapeSequence() {
@@ -441,10 +444,10 @@ public class Lexer implements Parse.Lexer {
   char consume() { return line.charAt(line_pos++); }
   void nextLine() throws java.io.IOException {
     line=reader.readLine();
-    if (line!=null) line=line+'\n'; 
+    if (line!=null) line=line+'\n';
     lineL = new LineList(lineL.head+line_pos, lineL); // for error reporting
-    line_pos=0; 
-    line_num++; 
+    line_pos=0;
+    line_num++;
   }
 
   // Deal with error messages.
@@ -454,7 +457,7 @@ public class Lexer implements Parse.Lexer {
 	if (p.head<info.left) { c=info.left-p.head; break; }
     System.err.println(msg+" at line "+n);
   }
-  
+
   class LineList {
     int head;
     LineList tail;

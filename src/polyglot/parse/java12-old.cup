@@ -34,62 +34,62 @@ parser code  {:
   }
 :};
 
-scan with {: return lexer.nextToken(); :};
+scan with {: return lexer.nextToken().symbol(); :};
 
-terminal BOOLEAN; // primitive_type
-terminal BYTE, SHORT, INT, LONG, CHAR; // integral_type
-terminal FLOAT, DOUBLE; // floating_point_type
-terminal LBRACK, RBRACK; // array_type
-terminal IDENTIFIER; // name
-terminal DOT; // qualified_name
-terminal SEMICOLON, MULT, COMMA, LBRACE, RBRACE, EQ, LPAREN, RPAREN, COLON;
-terminal PACKAGE; // package_declaration
-terminal IMPORT; // import_declaration
-terminal PUBLIC, PROTECTED, PRIVATE; // modifier
-terminal STATIC; // modifier
-terminal ABSTRACT, FINAL, NATIVE, SYNCHRONIZED, TRANSIENT, VOLATILE;
-terminal CLASS; // class_declaration
-terminal EXTENDS; // super
-terminal IMPLEMENTS; // interfaces
-terminal VOID; // method_header
-terminal THROWS; // throws
-terminal THIS, SUPER; // explicit_constructor_invocation
-terminal INTERFACE; // interface_declaration
-terminal IF, ELSE; // if_then_statement, if_then_else_statement
-terminal SWITCH; // switch_statement
-terminal CASE, DEFAULT; // switch_label
-terminal DO, WHILE; // while_statement, do_statement
-terminal FOR; // for_statement
-terminal BREAK; // break_statement
-terminal CONTINUE; // continue_statement
-terminal RETURN; // return_statement
-terminal THROW; // throw_statement
-terminal TRY; // try_statement
-terminal CATCH; // catch_clause
-terminal FINALLY; // finally
-terminal NEW; // class_instance_creation_expression
-terminal PLUSPLUS; // postincrement_expression
-terminal MINUSMINUS; // postdecrement_expression
-terminal PLUS, MINUS, COMP, NOT, DIV, MOD;
-terminal LSHIFT, RSHIFT, URSHIFT; // shift_expression
-terminal LT, GT, LTEQ, GTEQ, INSTANCEOF; // relational_expression
-terminal EQEQ, NOTEQ; // equality_expression
-terminal AND; // and_expression
-terminal XOR; // exclusive_or_expression
-terminal OR;  // inclusive_or_expression
-terminal ANDAND; // conditional_and_expression
-terminal OROR; // conditional_or_expression
-terminal QUESTION; // conditional_expression
-terminal MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ; // assignment_operator
-terminal LSHIFTEQ, RSHIFTEQ, URSHIFTEQ; // assignment_operator
-terminal ANDEQ, XOREQ, OREQ; // assignment_operator
+terminal Token BOOLEAN; // primitive_type
+terminal Token BYTE, SHORT, INT, LONG, CHAR; // integral_type
+terminal Token FLOAT, DOUBLE; // floating_point_type
+terminal Token LBRACK, RBRACK; // array_type
+terminal Token IDENTIFIER; // name
+terminal Token DOT; // qualified_name
+terminal Token SEMICOLON, MULT, COMMA, LBRACE, RBRACE, EQ, LPAREN, RPAREN, COLON;
+terminal Token PACKAGE; // package_declaration
+terminal Token IMPORT; // import_declaration
+terminal Token PUBLIC, PROTECTED, PRIVATE; // modifier
+terminal Token STATIC; // modifier
+terminal Token ABSTRACT, FINAL, NATIVE, SYNCHRONIZED, TRANSIENT, VOLATILE;
+terminal Token CLASS; // class_declaration
+terminal Token EXTENDS; // super
+terminal Token IMPLEMENTS; // interfaces
+terminal Token VOID; // method_header
+terminal Token THROWS; // throws
+terminal Token THIS, SUPER; // explicit_constructor_invocation
+terminal Token INTERFACE; // interface_declaration
+terminal Token IF, ELSE; // if_then_statement, if_then_else_statement
+terminal Token SWITCH; // switch_statement
+terminal Token CASE, DEFAULT; // switch_label
+terminal Token DO, WHILE; // while_statement, do_statement
+terminal Token FOR; // for_statement
+terminal Token BREAK; // break_statement
+terminal Token CONTINUE; // continue_statement
+terminal Token RETURN; // return_statement
+terminal Token THROW; // throw_statement
+terminal Token TRY; // try_statement
+terminal Token CATCH; // catch_clause
+terminal Token FINALLY; // finally
+terminal Token NEW; // class_instance_creation_expression
+terminal Token PLUSPLUS; // postincrement_expression
+terminal Token MINUSMINUS; // postdecrement_expression
+terminal Token PLUS, MINUS, COMP, NOT, DIV, MOD;
+terminal Token LSHIFT, RSHIFT, URSHIFT; // shift_expression
+terminal Token LT, GT, LTEQ, GTEQ, INSTANCEOF; // relational_expression
+terminal Token EQEQ, NOTEQ; // equality_expression
+terminal Token AND; // and_expression
+terminal Token XOR; // exclusive_or_expression
+terminal Token OR;  // inclusive_or_expression
+terminal Token ANDAND; // conditional_and_expression
+terminal Token OROR; // conditional_or_expression
+terminal Token QUESTION; // conditional_expression
+terminal Token MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ; // assignment_operator
+terminal Token LSHIFTEQ, RSHIFTEQ, URSHIFTEQ; // assignment_operator
+terminal Token ANDEQ, XOREQ, OREQ; // assignment_operator
 
-terminal java.lang.Number INTEGER_LITERAL;
-terminal java.lang.Number FLOATING_POINT_LITERAL;
-terminal java.lang.Boolean BOOLEAN_LITERAL;
-terminal java.lang.Character CHARACTER_LITERAL;
-terminal java.lang.String STRING_LITERAL;
-terminal NULL_LITERAL;
+terminal Token INTEGER_LITERAL;
+terminal Token FLOATING_POINT_LITERAL;
+terminal Token BOOLEAN_LITERAL;
+terminal Token CHARACTER_LITERAL;
+terminal Token STRING_LITERAL;
+terminal Token NULL_LITERAL;
 
 // strictfp keyword, new in Java 1.2
 terminal STRICTFP;
@@ -205,46 +205,81 @@ non terminal constant_expression;
 start with goal;
 
 // 19.2) The Syntactic Grammar
-goal ::=	compilation_unit
+goal ::=	compilation_unit:a
+			{: RESULT = a; :}
 	;
 
 // 19.3) Lexical Structure.
-literal ::=	INTEGER_LITERAL
-	|	FLOATING_POINT_LITERAL
-	|	BOOLEAN_LITERAL
-	|	CHARACTER_LITERAL
-	|	STRING_LITERAL
+literal ::=	INTEGER_LITERAL:a	
+			{: RESULT = new IntLiteral(a.intValue()); :}
+	|	FLOATING_POINT_LITERAL:a
+			{: RESULT = new IntLiteral(a.floatValue()); :}
+	|	BOOLEAN_LITERAL:a
+			{: RESULT = new IntLiteral(a.booleanValue()); :}
+	|	CHARACTER_LITERAL:a
+			{: RESULT = new IntLiteral(a.charValue()); :}
+	|	STRING_LITERAL:a
+			{: RESULT = new StringLiteral(a); :}
 	|	NULL_LITERAL
+			{: RESULT = new NullLiteral(); :}
 	;
 
 // 19.4) Types, Values, and Variables
-type	::=	primitive_type
-	|	reference_type
+type	::=	primitive_type:a
+			{: RESULT = a; :}
+	|	reference_type:a
+			{: 
+			   RESULT = a; :}
 	;
 primitive_type ::=
-		numeric_type
+		numeric_type:a
+			{: RESULT = a; :}
 	|	BOOLEAN
+			{: RESULT = new PrimativeType(null,
+						PrimativeType.BOOLEAN); :}
 	;
-numeric_type::=	integral_type
-	|	floating_point_type
+numeric_type::=	integral_type:a
+			{: RESULT = a; :}
+	|	floating_point_type:a
+			{: RESULT = a; :}
 	;
 integral_type ::= 
 		BYTE 
+			{: RESULT = new PrimativeType(null,
+						PrimativeType.BYTE); :}
 	|	SHORT 
+			{: RESULT = new PrimativeType(null,
+						PrimativeType.SHORT); :}
 	|	INT 
+			{: RESULT = new PrimativeType(null, 
+						PrimativeType.INT); :}
 	|	LONG 
+			{: RESULT = new PrimativeType(null,
+						PrimativeType.LONG); :}
 	|	CHAR 
+			{: RESULT = new PrimativeType(null, 
+						PrimativeType.CHAR); :}
 	;
 floating_point_type ::= 
 		FLOAT 
+			{: RESULT = new PrimativeType(null, 
+						PrimativeType.FLOAT); :}
 	|	DOUBLE
+			{: RESULT = new PrimativeType(null,
+						PrimativeType.DOUBLE); :}
 	;
 
 reference_type ::=
-		class_or_interface_type
-	|	array_type
+		class_or_interface_type:a
+			{: RESULT = a; :}
+	|	array_type:a
+			{: RESULT = a; :}
 	;
-class_or_interface_type ::= name;
+
+class_or_interface_type ::= 
+		name:a
+			{: RESULT = a; :}
+	;
 
 class_type ::=	class_or_interface_type;
 interface_type ::= class_or_interface_type;		
@@ -601,7 +636,8 @@ switch_label ::=
 	;
 
 while_statement ::=
-		WHILE LPAREN expression RPAREN statement
+		WHILE LPAREN expression:a RPAREN statement:b
+			{: RESULT = new WhileExpression( a, b); :}
 	;
 while_statement_no_short_if ::=
 		WHILE LPAREN expression RPAREN statement_no_short_if
@@ -851,10 +887,14 @@ assignment_operator ::=
 	|	OREQ
 	;
 expression_opt ::=
-	|	expression
+	|	expression:a
+			{: RESULT = a; :}
 	;
-expression ::=	assignment_expression
+expression ::=	
+		assignment_expression:a
+			{: RESULT = a; :}
 	;
 constant_expression ::=
 		expression
+			{: RESULT = a; :}
 	;

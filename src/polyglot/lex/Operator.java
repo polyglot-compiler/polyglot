@@ -5,13 +5,13 @@ import java_cup.runtime.Symbol;
 
 class Operator extends Token {
   String which;
-  Operator(String which) { this.which = which; }
+  Operator(int line, String which) { super(line); this.which = which; }
 
   public String toString() { return "Operator <"+which+">"; }
 
-  Symbol token() { 
+  Symbol symbol() {
     Integer i = (Integer) op_table.get(which);
-    return new Symbol(i.intValue()); 
+    return new Symbol(i.intValue());
   }
 
   static private final Hashtable op_table = new Hashtable();
