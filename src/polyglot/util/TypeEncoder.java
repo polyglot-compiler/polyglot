@@ -5,7 +5,9 @@ import jltools.types.*;
 import java.io.*;
 import java.util.zip.*;
 
-
+/**
+ * FIXME docs
+ */
 public class TypeEncoder
 {
   protected TypeSystem ts;
@@ -23,8 +25,8 @@ public class TypeEncoder
     StringBuffer sb;
 
     baos = new ByteArrayOutputStream();
-    oos = new TypeOutputStream( new GZIPOutputStream( baos));
-    
+    oos = new TypeOutputStream( new GZIPOutputStream( baos), ts, t);
+
     oos.writeObject( t);
     oos.flush();
     oos.close();
@@ -103,32 +105,29 @@ public class TypeEncoder
   }
 
   protected static int decodeByte( byte[] dest, int doff, 
-                                       char[] source, int soff)
+                                   char[] source, int soff)
   {
     char c = source[ soff++];
 
     dest[ doff] = (byte)c;
 
-    //System.err.println( "  decodeByte = " + dest[ doff]);
-    //System.err.println( "  soff = " + soff);
     return soff;
   }
 
   protected static int decodeShort( short[] dest, int doff, 
-                                         char[] source, int soff)
+                                    char[] source, int soff)
   {
     byte[] b = new byte[ 2];
     soff = decodeByte( b, 0, source, soff);
     soff = decodeByte( b, 1, source, soff);
 
     dest[ doff] = (short)(((b[ 0] << 8) & 0xFF00) | (b[ 1] & 0x00FF));
-    //System.err.println( "  decodeShort = " + dest[ doff]);
-    //System.err.println( "  soff = " + soff);
+
     return soff;
   }
 
   protected static int decodeInt( int[] dest, int doff, 
-                                     char[] source, int soff)
+                                  char[] source, int soff)
   {
     short[] s = new short[ 2];
     soff = decodeShort( s, 0, source, soff);
@@ -141,11 +140,12 @@ public class TypeEncoder
   }
 
   protected static int decodeBytes( byte[] dest, int doff,
-                                       char[] source, int soff)
+                                    char[] source, int soff)
   {
     for( int i = doff, j = soff; i < dest.length; i++) {
       soff = decodeByte( dest, i, source, soff);
     }
     return soff;
   }
+
 }

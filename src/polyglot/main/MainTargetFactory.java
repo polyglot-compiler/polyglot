@@ -103,7 +103,7 @@ public class MainTargetFactory implements TargetFactory
 
   public Target createClassTarget( ClassType classType) throws IOException
   {
-    return new MainTarget( classType.getShortName(), null, null);
+    return new MainTarget( classType.getShortName() + ".class", null, null);
   }
 
   public class MainTarget extends Target
@@ -126,12 +126,14 @@ public class MainTargetFactory implements TargetFactory
       this.visitors = null;
       sourceFileReader = null;
       outputWriter = null;
+
+      if( sourceFile != null) {
+        lastModified = new Date( sourceFile.lastModified());
+      }
     }
 
     public Reader getSourceReader() throws IOException
     {
-      lastModified = new Date( sourceFile.lastModified());
-
       if (sourceFileReader != null) return sourceFileReader;
       return (sourceFileReader = new FileReader( sourceFile));
     }

@@ -423,6 +423,8 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public Type checkAndResolveType(Type type, Context context) throws SemanticException {
 
+    // System.out.println( "Checking: " + type + " " + type.getTypeString());
+
     if (type.isCanonical()) return type;
     if (type instanceof ArrayType) {
       ArrayType at = (ArrayType) type;
@@ -463,7 +465,7 @@ public class StandardTypeSystem extends TypeSystem {
 	// any inners by that name.  If they _both_ do, that's an error.
 	Type resultFromOuter = null;
 	Type resultFromParent = null;
-        //  System.out.println("in " + inClass.getTypeString() + " super: " + inClass.getSuperType());
+        // System.out.println("in " + inClass.getTypeString() + " super: " + inClass.getSuperType());
 	ClassType parentType = (ClassType)inClass.getSuperType();
 	ClassType outerType = inClass.getContainingClass();
 	if (outerType != null) {
@@ -490,7 +492,8 @@ public class StandardTypeSystem extends TypeSystem {
 	    (resultFromParent != null) &&
             (resultFromParent != resultFromOuter)) {
 	  // FIXME: Better error message needed.
-	  throw new SemanticException ("Found " + className + " in both outer and parent.");
+	  throw new SemanticException ("Found \"" + className 
+                                  + "\" in both containing class and parent.");
 	} else if (resultFromOuter != null) {
 	  return resultFromOuter;
 	} else if (resultFromParent != null) {
@@ -537,7 +540,7 @@ public class StandardTypeSystem extends TypeSystem {
       } catch (NoClassException e) {}
     }
     if (result == null)
-      throw new SemanticException( "No class found for " + className );
+      throw new NoClassException( "Class \"" + className + "\" not found.");
     
 
     // Type outer = result;
@@ -546,7 +549,9 @@ public class StandardTypeSystem extends TypeSystem {
       String innerName = TypeSystem.getFirstComponent(rest);
       result = result.getInnerNamed(innerName);
       if (result == null)
-	throw new SemanticException ("Class " + prefix + " has no inner class named " + innerName);
+	throw new SemanticException ("Class \"" + prefix 
+                                     + "\" has no inner class named \"" 
+                                     + innerName + "\"");
       prefix = prefix + "." + innerName;
       rest = TypeSystem.removeFirstComponent(rest);
     }

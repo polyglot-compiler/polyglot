@@ -34,7 +34,7 @@ public class ParsedClassType extends ClassTypeImpl
     methods = new TypedList( new LinkedList(), MethodTypeInstance.class,
                              false);
     fields = new TypedList( new LinkedList(), FieldInstance.class, false);
-    innerClasses = new TypedList( new LinkedList(), ClassType.class, false);
+    innerClasses = new TypedList( new LinkedList(), Type.class, false);
     this.containingClass = containingClass;
   }
 
@@ -101,24 +101,6 @@ public class ParsedClassType extends ClassTypeImpl
   public void addInnerClass( ClassType innerClass)
   {
     innerClasses.add( innerClass);
-  }
-
-  /**
-   * Used to serialize this class into the output file.
-   */
-  private void writeObject( ObjectOutputStream out)
-     throws IOException
-  {
-    if( out instanceof TypeOutputStream
-        && ((TypeOutputStream)out).atRootType()) {
-      /* We are the actual class being written out. */
-      out.defaultWriteObject();
-    }
-    else {
-      /* We are somewhere below the root class, so sever any links to other
-       * types. */
-      out.writeObject( new AmbiguousType( ts, getTypeString()));
-    }
   }
 }
 

@@ -7,7 +7,9 @@ import java.util.List;
  * classpath, parsed from a source file, or obtained from other source.
  */
 public abstract class ClassType extends Type 
-{
+{ 
+  static final long serialVersionUID = -176302096315403062L;
+
   protected ClassType()
   {
     super();

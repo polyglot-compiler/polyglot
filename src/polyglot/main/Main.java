@@ -152,6 +152,10 @@ public class Main
       while( iter.hasNext()) {
         t = (MainTargetFactory.MainTarget)iter.next(); 
 
+        if( t.outputFileName == null) {
+          continue;
+        }
+
         command =  (String)options.get( MAIN_OPT_POST_COMPILER) 
                       + " -classpath " 
                         + ( options.get(MAIN_OPT_OUTPUT_DIRECTORY) != null ?

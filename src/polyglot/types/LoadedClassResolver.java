@@ -69,6 +69,7 @@ public class LoadedClassResolver implements ClassResolver
     try
     {
       Field field = clazz.getDeclaredField( "jlc$CompilerVersion");
+      field.setAccessible( true);
       int i = checkCompilerVersion( (String)field.get( null));
       if( i != 0) {
         /* Incompatible or older version, so go with the source. */
@@ -77,8 +78,9 @@ public class LoadedClassResolver implements ClassResolver
       }
 
       field = clazz.getDeclaredField( "jlc$SourceLastModified");
+      field.setAccessible( true);
       if( !checkSourceModificationDate( (Long)field.get( null), 
-                                    t.getLastModifiedDate())) {
+                                        t.getLastModifiedDate())) {
         // System.err.println( "More recent source for " + name + ".");
         return getTypeFromTarget( t, name);
       }
@@ -88,6 +90,8 @@ public class LoadedClassResolver implements ClassResolver
     }
     catch( Exception e)
     {
+      // System.err.println( "Exception while checking fields.");
+      e.printStackTrace();
       return getTypeFromTarget( t, name);
     } 
   }
@@ -124,6 +128,7 @@ public class LoadedClassResolver implements ClassResolver
       /* Check to see if it has serialized info. If so then check the
        * version. */
       Field field = clazz.getDeclaredField( "jlc$CompilerVersion");
+      field.setAccessible( true);
       int i = checkCompilerVersion( (String)field.get( null));
       if( i < 0) {
         // System.err.println( "Throwing exception for " + clazz.getName() + " (Bad Version)...");
@@ -135,14 +140,19 @@ public class LoadedClassResolver implements ClassResolver
       
       /* Alright, go with it! */
       field = clazz.getDeclaredField( "jlc$ClassType");
-      
-      ClassType ct = (ClassType)te.decode( (String)field.get( null));
+      field.setAccessible( true);
+      Type t = te.decode( (String)field.get( null));
+      // System.err.println( "The type: " + t);
+      // System.err.println( "Get type: " + t.getTypeString() + " " + t.getClass().getName());
+      ClassType ct = (ClassType)t;
+      //ClassType ct = (ClassType)te.decode( (String)field.get( null));
       
       // System.err.println( "Returning serialized ClassType for " + clazz.getName() + "...");
-
+      // ((ClassTypeImpl)ct).dump();
+      
       /* Add the class to the target list so that it will be cleaned later. */
       tt.addTarget( ct);
-      // ((ClassTypeImpl)ct).dump();
+      
       return ct;
     }
     catch( SemanticException e)
@@ -157,8 +167,12 @@ public class LoadedClassResolver implements ClassResolver
     catch( Exception e)
     {
       e.printStackTrace();
-      // System.err.println( "Returning LoadedClassType for " + clazz.getName() + " (Error While Deserializing)...");
-      return new LoadedClassType( ts, clazz);
+      // System.err.println( "Throwing exception for " + clazz.getName() + " (Error While Deserializing)...");
+      throw new SemanticException( "There was an error while reading type "
+                                   + "information from the class file for \""
+                                   + clazz.getName() + "\". Delete the class "
+                                   + "file and recompile, or obtain a newer "
+                                   + "version of the file.");
     }
   }
 

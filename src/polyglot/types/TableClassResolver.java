@@ -76,7 +76,7 @@ public class TableClassResolver implements ClassResolver
     if( type != null) {
       try {
         superClazz = (ClassType)ts.checkAndResolveType( type, context);
-
+        
         /* Now we must clean all our super classes. But we need to check
          * first to see if the super class is defined in this file. If
          * so then clean here it, but if not, then ask then ask the
@@ -185,7 +185,6 @@ public class TableClassResolver implements ClassResolver
         return false;
       }
     }
-
 
 
     context = new TypeSystem.Context( it, clazz, null);

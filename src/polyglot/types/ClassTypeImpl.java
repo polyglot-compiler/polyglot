@@ -11,6 +11,8 @@ import java.util.Iterator;
  */
 public abstract class ClassTypeImpl extends ClassType 
 {
+  static final long serialVersionUID = 6483392342759261702L;
+
   protected ClassTypeImpl()
   {
     super();
@@ -58,6 +60,16 @@ public abstract class ClassTypeImpl extends ClassType
       ClassType innerType = (ClassType) i.next();
       System.out.println( "  " + innerType.getTypeString());
     }
+    System.out.println( "Fields: ");
+    for( Iterator iter = fields.iterator(); iter.hasNext(); ) {
+      FieldInstance fi = (FieldInstance)iter.next();
+      System.out.println( "  " + fi.getName());
+      System.out.println( "    " + fi.getAccessFlags().getStringRepresentation());
+      System.out.println( "    " + fi.getType().getTypeString() + " ("
+                        + fi.getType().getClass().getName() + ")");
+    }
+    System.out.println( "Methods: ");
+
     System.out.println( "---------------------");
   }
       

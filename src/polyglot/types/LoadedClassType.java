@@ -187,10 +187,5 @@ public class LoadedClassType extends ClassTypeImpl
     
     return new ConstructorTypeInstance(ts, this, argList, excpList, flags);
   }
-
-  protected Object writeReplace() throws ObjectStreamException
-  {
-    return new AmbiguousType( ts, getTypeString());
-  }
 }
 
