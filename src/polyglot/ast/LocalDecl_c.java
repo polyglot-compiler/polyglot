@@ -256,6 +256,11 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
             w.write("(instance " + li + ")");
             w.end();
         }
+
+	w.allowBreak(4, " ");
+	w.begin(0);
+	w.write("(name " + name + ")");
+	w.end();
     }
 
     public Term entry() {

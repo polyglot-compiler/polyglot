@@ -163,6 +163,11 @@ public class Formal_c extends Node_c implements Formal
 	    w.write("(instance " + li + ")");
 	    w.end();
 	}
+
+	w.allowBreak(4, " ");
+	w.begin(0);
+	w.write("(name " + name + ")");
+	w.end();
     }
 
     public String toString() {
