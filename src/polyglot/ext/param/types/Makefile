@@ -10,6 +10,7 @@ SOURCES = \
 	Param.java \
 	ParamTypeSystem_c.java \
 	ParamTypeSystem.java \
+	InstType.java \
 	Subst.java \
 	Subst_c.java \
 	SubstClassType_c.java \
