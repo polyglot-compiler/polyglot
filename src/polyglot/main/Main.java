@@ -93,7 +93,7 @@ public class Main
       for( int i = 0; i < totalThreads; i++) {
         WorkThread wt = new WorkThread( tl, compiler);
         Thread thread = new Thread( wt);
-        
+	Compiler.verbose( Main.class, "Starting a thread.");
         thread.start();
       }
     }
