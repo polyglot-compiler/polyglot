@@ -55,7 +55,6 @@ public class ParsedClassType extends ClassTypeImpl
 
   public void setSuperType( Type superType)
   {
-// new Exception("changed superclass of " + getTypeString() + " from " + (this.superType == null ? "null" : this.superType.getTypeString()) + " to " + (superType == null ? "null" : superType.getTypeString())).printStackTrace(System.out);
     this.superType = superType;
   }
 

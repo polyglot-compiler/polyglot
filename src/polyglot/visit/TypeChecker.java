@@ -75,7 +75,6 @@ public class TypeChecker extends NodeVisitor
     }
     catch( SemanticException e)
     {
-e.printStackTrace();
       int line = e.getLineNumber();
       if( line == SemanticException.INVALID_LINE) {
         line = Annotate.getLineNumber( n);

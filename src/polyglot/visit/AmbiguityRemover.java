@@ -35,18 +35,13 @@ public class AmbiguityRemover extends NodeVisitor
   {
     try
     {
-System.out.println("removing ambiguities from " + n.getClass().getName());
       Node m = n.removeAmbiguities( c);
-System.out.println("removed ambiguities from "
-	+ n.getClass().getName() + " now "
-	+ m.getClass().getName());
 
       m.leaveScope( c);
       return m;
     }
     catch( SemanticException e)
     {
-e.printStackTrace();
       int line = e.getLineNumber();
 
       if( line == SemanticException.INVALID_LINE) {
