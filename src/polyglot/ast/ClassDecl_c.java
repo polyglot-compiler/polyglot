@@ -121,6 +121,11 @@ public class ClassDecl_c extends Node_c implements ClassDecl
             ct.flags(ct.flags().setStatic());
         }
 
+        // Member interfaces are implicitly static. 
+        if (ct.isMember() && ct.toMember().flags().isInterface()) {
+            ct.flags(ct.flags().setStatic());
+        }
+
         return this;
     }
 
