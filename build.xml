@@ -113,7 +113,6 @@
       <classpath refid="standard.classpath"/>
       <arg line="${ppg.file}"/>
     </java>
-    <antcall target="cup-parser"/>
   </target>
 
   <!-- Set the property ppg.parser.up-to-date if the parser is in fact
@@ -253,6 +252,10 @@
       <param name="parser.dir" value="polyglot/ext/${ext}/qq"/>
       <param name="ppg.file" value="qq.ppg"/>
       <param name="cup.file" value="qq_ppg.cup"/>
+    </antcall>
+    <antcall target="cup-parser">
+      <param name="parser.dir" value="polyglot/ext/${ext}/qq"/>
+      <param name="cup.file" value="qq_ppg.cup"/>
       <param name="parser.class" value="Grm"/>
       <param name="symbol.class" value="sym"/>
     </antcall>
@@ -267,6 +270,10 @@
     <antcall target="ppg-parser">
       <param name="parser.dir" value="polyglot/ext/${ext}/parse"/>
       <param name="ppg.file" value="${ext}.ppg"/>
+      <param name="cup.file" value="${ext}_ppg.cup"/>
+    </antcall>
+    <antcall target="cup-parser">
+      <param name="parser.dir" value="polyglot/ext/${ext}/parse"/>
       <param name="cup.file" value="${ext}_ppg.cup"/>
       <param name="parser.class" value="Grm"/>
       <param name="symbol.class" value="sym"/>
@@ -325,7 +332,7 @@
   <target name="jif" depends="param">
     <antcall target="standard-ext">
       <param name="ext" value="jif"/>
-      <param name="parser.type" value="cup"/>
+      <param name="parser.type" value="ppg"/>
     </antcall>
   </target>
 
