@@ -137,8 +137,8 @@ public class BlockStatement extends Statement {
     BlockStatement bs = new BlockStatement();
     bs.copyAnnotationsFrom(this);
     for (Iterator i = statements.iterator(); i.hasNext(); ) {
-      s = (Statement) i.next();
-      bs.addStatement(s.deepCopy());
+      Statement s = (Statement) i.next();
+      bs.addStatement((Statement) s.deepCopy());
     }
     return bs;
   }

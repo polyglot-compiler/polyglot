@@ -92,6 +92,11 @@ public class VariableDeclarationStatement extends Statement {
     VariableDeclarationStatement vds = 
       new VariableDeclarationStatement(type);
     // FIXME
+    return null;
+  }
+
+  public Node deepCopy() {
+    return null; // FIXME
   }
 
   

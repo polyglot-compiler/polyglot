@@ -35,8 +35,9 @@ public interface NodeVisitor {
   public Node visitReturnStatement(ReturnStatement re);
   public Node visitThrowStatement(ThrowStatement ts);
   public Node visitIfStatement(IfStatement is);
-  public Node visitWhileStatement(WhileStatement ws);
+  //public Node visitWhileStatement(WhileStatement ws);
   public Node visitDoStatement(DoStatement ds);
+  public Node visitSynchronizedStatement(SynchronizedStatement ss);
 
   // Expressions
   public Node visitNullLiteral(NullLiteral nl);

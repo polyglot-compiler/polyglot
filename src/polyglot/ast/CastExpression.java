@@ -74,7 +74,8 @@ public class CastExpression extends Expression {
     }
 
     public Node deepCopy() {
-      CastExpression ce = new CastExpression(type, expr.deepCopy());
+      CastExpression ce = 
+	new CastExpression(type, (Expression) expr.deepCopy());
       ce.copyAnnotationsFrom(this);
       return ce;     
     }

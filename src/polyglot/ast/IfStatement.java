@@ -104,6 +104,20 @@ public class IfStatement extends Statement {
     }
   }
 
+  public Node copy() {
+    IfStatement is = new IfStatement(condExpr, thenStatement, elseStatement);
+    is.copyAnnotationsFrom(this);
+    return is;
+  }
+
+  public Node deepCopy() {
+    IfStatement is = new IfStatement((Expression) condExpr.deepCopy(), 
+				     (Statement) thenStatement.deepCopy(), 
+				     (Statement) elseStatement.deepCopy());
+    is.copyAnnotationsFrom(this);
+    return is;    
+  }
+
   private Expression condExpr;
   private Statement thenStatement;
   private Statement elseStatement;

@@ -58,8 +58,24 @@ public class FloatLiteral extends Literal {
   
   public void visitChildren(NodeVisitor v) {
   }
+
+  public Node copy() {
+    switch(type) {
+    case FLOAT:
+      return new FloatLiteral((float) value);
+    case DOUBLE:
+      return new FloatLiteral((double) value);
+    default:
+      throw new Error("Internal error: Float rep broken.");
+    }
+  }
+
+  public Node deepCopy() {
+    return copy();
+  }
   
   private int type;
   private double value;
   
 }
+

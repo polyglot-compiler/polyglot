@@ -69,6 +69,15 @@ public class NewArrayExpression extends Expression {
 	expr = (Expression) expr.accept(v);
     }
 
+  public Node copy() {
+    // FIXME
+    throw new Error();
+  }
+
+  public Node deepCopy() {
+    // FIXME
+    throw new Error();
+  }
 
     private Expression expr;
     private Type type;

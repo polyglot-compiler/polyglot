@@ -95,8 +95,9 @@ public class TernaryExpression extends Expression {
 
     public Node deepCopy() {
       TernaryExpression te = 
-	new TernaryExpression(conditional.deepCopy(), 
-			      trueResult.deepCopy(), falseResult.deepCopy());
+	new TernaryExpression((Expression) conditional.deepCopy(), 
+			      (Expression) trueResult.deepCopy(), 
+			      (Expression) falseResult.deepCopy());
       te.copyAnnotationsFrom(this);
       return te;
     }

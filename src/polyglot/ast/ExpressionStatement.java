@@ -54,7 +54,8 @@ public class ExpressionStatement extends Statement {
   }
 
   public Node deepCopy() {
-    ExpressionStatement es = new ExpressionStatement(expression.deepCopy());
+    ExpressionStatement es = 
+      new ExpressionStatement((Expression) expression.deepCopy());
     es.copyAnnotationsFrom(this);
     return es;
   }

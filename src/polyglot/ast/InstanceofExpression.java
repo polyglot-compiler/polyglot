@@ -75,7 +75,8 @@ public class InstanceofExpression extends Expression {
   }
 
   public Node deepCopy() {
-    InstanceofExpression ie = new InstanceofExpression(expr.deepCopy(), type);
+    InstanceofExpression ie = 
+      new InstanceofExpression((Expression) expr.deepCopy(), type);
     ie.copyAnnotationsFrom(this);
     return ie;
   }

@@ -45,13 +45,21 @@ public class NullVisitor implements NodeVisitor {
     return is;
   }
 
+  /*
   public Node visitWhileStatement(WhileStatement ws) {
     ws.visitChildren(this);
     return ws;
   }
+  */
 
   public Node visitDoStatement(DoStatement ds) {
     ds.visitChildren(this);
+    return ds;
+  }
+
+  public Node visitSynchronizedStatement(SynchronizedStatement ss) {
+    ss.visitChildren(this);
+    return ss;
   }
 
   // Expressions

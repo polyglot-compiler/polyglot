@@ -67,7 +67,7 @@ public class SynchronizedStatement extends Statement {
    *    wrapped in an ExpressionStatement.
    */
   public void visitChildren(NodeVisitor v) {
-    expr = (Expression) condExpr.accept(v);
+    expr = (Expression) expr.accept(v);
     Node newNode = (Node) statement.accept(v);
     if (newNode instanceof Expression) {
       statement = new ExpressionStatement((Expression) newNode);
@@ -75,6 +75,20 @@ public class SynchronizedStatement extends Statement {
     else {
       statement = (Statement) newNode;
     }
+  }
+
+  public Node copy() {
+    SynchronizedStatement ss = new SynchronizedStatement(expr, statement);
+    ss.copyAnnotationsFrom(this);
+    return ss;
+  }
+
+  public Node deepCopy() {
+    SynchronizedStatement ss = 
+      new SynchronizedStatement((Expression) expr.deepCopy(), 
+				(Statement) statement.deepCopy());      
+    ss.copyAnnotationsFrom(this);
+    return ss;
   }
 
   private Expression expr;

@@ -76,6 +76,20 @@ public class DoStatement extends Statement {
     condExpr = (Expression) condExpr.accept(v);
   }
 
+  public Node copy() {
+    DoStatement ds = new DoStatement(statement, condExpr);
+    ds.copyAnnotationsFrom(this);
+    return ds;
+  }
+
+  public Node deepCopy() {
+    DoStatement ds = new DoStatement((Statement) statement.deepCopy(), 
+				     (Expression) condExpr.deepCopy());
+    ds.copyAnnotationsFrom(this);
+    return ds;
+  }
+
+
   private Expression condExpr;
   private Statement statement;
 }

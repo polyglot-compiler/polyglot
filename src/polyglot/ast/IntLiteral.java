@@ -124,6 +124,18 @@ public class IntLiteral extends Literal {
   
   public void visitChildren(NodeVisitor v) {
   }
+
+  public Node copy() {
+    IntLiteral il = new IntLiteral(0);
+    il.type = type;
+    il.value = value;
+    il.copyAnnotationsFrom(this);
+    return il;
+  }
+
+  public Node deepCopy() {
+    return copy();
+  }
   
   private int  type;
   private long value;
