@@ -155,9 +155,8 @@ public class CFGBuilder implements Copy
                   edge(last_visitor, last, loop.continueTarget(), FlowGraph.EDGE_KEY_OTHER);
                 }
                 else {
-                  // Should be SemanticException
-                  throw new InternalCompilerError("Can only continue loops.",
-                                                  l.position());
+                  throw new CFGBuildError("Target of continue statement must " +
+                                          "be a loop.", l.position());
                 }
               }
 
@@ -184,7 +183,8 @@ public class CFGBuilder implements Copy
         }
       }
 
-      throw new InternalCompilerError("Branch target not found.", b.position());
+      throw new CFGBuildError("Target of branch statement not found.",
+                              b.position());
     }
 
     /**
