@@ -507,6 +507,11 @@ public class TypeSystem_c implements TypeSystem
 
         assert_(container);
 
+        if (container == null) {
+            throw new InternalCompilerError("Cannot access field \"" + name +
+                "\" within a null container type.");
+        }
+
         FieldInstance fi = findField(container, name);
 
         if (! isAccessible(fi, c)) {
@@ -519,6 +524,11 @@ public class TypeSystem_c implements TypeSystem
     public FieldInstance findField(ReferenceType container, String name)
                                    throws SemanticException {
         assert_(container);
+
+        if (container == null) {
+            throw new InternalCompilerError("Cannot access field \"" + name +
+                "\" within a null container type.");
+        }
 
         Stack s = new Stack();
         s.push(container);
