@@ -12,7 +12,7 @@ then
     extra_cp="${PATH_SEP}${extra_cp}"
 fi
 
-classpath="${TOP}${FILE_SEP}classes${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}polyglot.jar${FILE_SEP}pth.jar${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}java_cup.jar${ext_cp}${extra_cp}"
+classpath="${TOP}${FILE_SEP}classes${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}polyglot.jar${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}pth.jar${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}java_cup.jar${ext_cp}${extra_cp}"
 command="\"$JAVA\"  -classpath \"$classpath\" polyglot.pth.Main $args"
 
 eval "$command"
