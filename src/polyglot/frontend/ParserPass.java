@@ -4,6 +4,7 @@ import java.io.*;
 import polyglot.ast.*;
 import polyglot.util.*;
 import polyglot.frontend.Compiler;
+import polyglot.main.Report;
 
 /**
  * A pass which runs a parser.  After parsing it stores the AST in the Job.
@@ -29,8 +30,8 @@ public class ParserPass extends AbstractPass
 
 	    Parser p = compiler.sourceExtension().parser(reader, source, eq);
 
-	    if (Compiler.should_report(2))
-		Compiler.report("Using parser " + p, 2);
+	    if (Report.should_report("frontend", 2))
+		Report.report(2, "Using parser " + p);
 
 	    Node ast = p.parse();
 

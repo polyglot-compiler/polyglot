@@ -5,6 +5,7 @@ import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
 import polyglot.frontend.*;
+import polyglot.main.Report;
 import java.util.*;
 
 /**
@@ -133,8 +134,8 @@ public class ClassBody_c extends Node_c implements ClassBody
 
     protected void addMembers(Context c, ReferenceType type,
                               Set visited, boolean inherit) {
-        if (Types.should_report(2))
-	    Types.report(2, "addMembers(" + type + ")");
+        if (Report.should_report(new String[]{"ts","context"}, 2))
+	    Report.report(2, "addMembers(" + type + ")");
 
         if (visited.contains(type)) {
             return;

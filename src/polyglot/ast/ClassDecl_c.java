@@ -5,6 +5,7 @@ import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
 import polyglot.frontend.*;
+import polyglot.main.Report;
 import java.util.*;
 
 /**
@@ -159,8 +160,8 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 
         TypeSystem ts = ar.typeSystem();
 
-        if (Types.should_report(2))
-	    Types.report(2, "Cleaning " + type + ".");
+        if (Report.should_report("ts", 2))
+	    Report.report(2, "Cleaning " + type + ".");
 
         if (this.superClass != null) {
             Type t = this.superClass.type();
@@ -175,8 +176,8 @@ public class ClassDecl_c extends Node_c implements ClassDecl
                         type + " is not a class.", superClass.position());
             }
 
-            if (Types.should_report(3))
-		Types.report(3, "setting super type of " + this.type + " to " + t);
+            if (Report.should_report("ts", 3))
+		Report.report(3, "setting super type of " + this.type + " to " + t);
 
             this.type.superType(t);
 
@@ -200,8 +201,8 @@ public class ClassDecl_c extends Node_c implements ClassDecl
                         type + " is not an interface.", tn.position());
             }
 
-            if (Types.should_report(3))
-		Types.report(3, "adding interface of " + this.type + " to " + t);
+            if (Report.should_report("ts", 3))
+		Report.report(3, "adding interface of " + this.type + " to " + t);
 
             this.type.addInterface(t);
 

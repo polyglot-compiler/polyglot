@@ -133,30 +133,6 @@ public class Compiler
 	return eq;
     }
 
-    private static Collection topics = new ArrayList(1);
-    private static Collection timeTopics = new ArrayList(1);
-
-    static {
-	topics.add("frontend");
-	timeTopics.add("time");
-    }
-
-    /** Debug reporting for the frontend. */
-    public static boolean should_report(int level) {
-	return Report.should_report(topics, level);
-    }
-    public static void report(String msg, int level) {
-	Report.report(level, msg);
-    }
-
-    /** Reports the time taken by every pass. */
-    public static boolean should_reportTime(int level) {
-	return Report.should_report(timeTopics, level);
-    }
-    public static void reportTime(String msg, int level) {
-	Report.report(level, msg);
-    }
-
     static {
       // FIXME: if we get an io error (due to too many files open, for example)
       // it will throw an exception. but, we won't be able to do anything with

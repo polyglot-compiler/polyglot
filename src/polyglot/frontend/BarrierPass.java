@@ -1,6 +1,6 @@
 package polyglot.frontend;
 
-import polyglot.frontend.Compiler;
+import polyglot.main.Report;
 import polyglot.util.InternalCompilerError;
 import java.util.*;
 
@@ -19,10 +19,10 @@ public class BarrierPass extends AbstractPass
 
     /** Run all the other jobs with the same parent up to this pass. */
     public boolean run() {
-        if (Compiler.should_report(1))
-	    Compiler.report(job + " at barrier " + id, 1);
-        if (Compiler.should_report(2))
-	    Compiler.report("children of " + job + " = " + job.children(), 1);
+        if (Report.should_report("frontend", 1))
+	    Report.report(1, job + " at barrier " + id);
+        if (Report.should_report("frontend", 2))
+	    Report.report(2, "children of " + job + " = " + job.children());
 
         if (job.compiler().errorQueue().hasErrors()) {
             return false;
@@ -32,8 +32,8 @@ public class BarrierPass extends AbstractPass
         for (Iterator i = job.children().iterator(); i.hasNext(); ) {
             Job child = (Job) i.next();
 
-            if (Compiler.should_report(2))
-                Compiler.report(job + " bringing " + child + " to barrier " + id, 1);
+            if (Report.should_report("frontend", 2))
+                Report.report(2, job + " bringing " + child + " to barrier " + id);
 
             if (! job.extensionInfo().runToPass(child, id)) {
                 return false;

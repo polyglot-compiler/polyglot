@@ -5,7 +5,7 @@ import polyglot.frontend.Compiler;
 import polyglot.ast.Node;
 import polyglot.visit.ClassSerializer;
 import polyglot.util.*;
-import polyglot.main.Main;
+import polyglot.main.Report;
 import polyglot.main.Version;
 import polyglot.types.reflect.*;
 
@@ -52,20 +52,20 @@ public class LoadedClassResolver extends ClassResolver
       try {
         ClassFile clazz = loader.loadClass(name);
 
-        if (Types.should_report(4))
-	    Types.report(4, "Class " + name + " found in classpath " +
+        if (Report.should_report(new String[] {"ts","resolver","loader"}, 4))
+	    Report.report(4, "Class " + name + " found in classpath " +
                     loader.classpath());
 
         return clazz;
       }
       catch (ClassNotFoundException e) {
-        if (Types.should_report(4))
-	    Types.report(4, "Class " + name + " not found in classpath " +
+        if (Report.should_report(new String[] {"ts","resolver","loader"}, 4))
+	    Report.report(4, "Class " + name + " not found in classpath " +
                     loader.classpath());
       }
       catch (ClassFormatError e) {
-        if (Types.should_report(4))
-	    Types.report(4, "Class " + name + " format error");
+        if (Report.should_report(new String[] {"ts","resolver","loader"}, 4))
+	    Report.report(4, "Class " + name + " format error");
       }
     }
 
@@ -78,21 +78,21 @@ public class LoadedClassResolver extends ClassResolver
    * Find a type by name.
    */
   public Type findType(String name) throws SemanticException {
-    if (Types.should_report(3))
-	Types.report(3, "LoadedCR.findType(" + name + ")");
+    if (Report.should_report(new String[] {"ts","resolver","loader"}, 3))
+	Report.report(3, "LoadedCR.findType(" + name + ")");
 
     // First try the class file.
     ClassFile clazz = loadFile(name);
 
     // Check for encoded type information.
     if (clazz.encodedClassType(version.name()) != null) {
-      if (Types.should_report(4))
-	Types.report(4, "Using encoded class type for " + name);
+      if (Report.should_report(new String[] {"ts","resolver","loader"}, 4))
+	Report.report(4, "Using encoded class type for " + name);
       return getEncodedType(clazz, name);
     }
     else {
-      if (Types.should_report(4))
-	Types.report(4, "Using raw class file for " + name);
+      if (Report.should_report(new String[] {"ts","resolver","loader"}, 4))
+	Report.report(4, "Using raw class file for " + name);
       return clazz.type(ts);
     }
   }
@@ -126,8 +126,8 @@ public class LoadedClassResolver extends ClassResolver
 
       ((CachingResolver) ts.systemResolver()).medianResult(name, dt);
 
-      if (Types.should_report(2))
-	Types.report(2, "Returning serialized ClassType for " +
+      if (Report.should_report(new String[] {"ts","resolver","loader"}, 2))
+	Report.report(2, "Returning serialized ClassType for " +
 		  clazz.name() + ".");
 
       return (ClassType) dt.restore();

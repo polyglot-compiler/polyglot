@@ -17,6 +17,10 @@ public abstract class AbstractPass implements Pass
         return id;
     }
 
+    public String name() {
+        return id.toString();
+    }
+
     public abstract boolean run();
 
     public String toString() {

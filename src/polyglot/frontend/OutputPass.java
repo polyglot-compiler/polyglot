@@ -6,7 +6,6 @@ import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
 import polyglot.types.Package;
-import polyglot.frontend.Compiler;
 
 import java.io.*;
 import java.util.*;

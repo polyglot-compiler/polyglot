@@ -1,6 +1,7 @@
 package polyglot.frontend;
 
 import polyglot.main.Options;
+import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.*;
 
@@ -29,8 +30,8 @@ public class TargetFactory
 
     /** Open a writer to the output file. */
     public Writer outputWriter(File outputFile) throws IOException {
-	if (Compiler.should_report(1))
-	    Compiler.report("Opening " + outputFile + " for output.", 1);
+	if (Report.should_report("frontend", 2))
+	    Report.report(2, "Opening " + outputFile + " for output.");
 
 	if (outputStdout) {
 	    return new UnicodeWriter(new PrintWriter(System.out));

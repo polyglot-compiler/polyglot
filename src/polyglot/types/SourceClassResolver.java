@@ -5,7 +5,7 @@ import polyglot.frontend.Compiler;
 import polyglot.ast.Node;
 import polyglot.visit.ClassSerializer;
 import polyglot.util.*;
-import polyglot.main.Main;
+import polyglot.main.Report;
 import polyglot.main.Version;
 import polyglot.types.reflect.*;
 
@@ -103,8 +103,8 @@ public class SourceClassResolver extends LoadedClassResolver
    * Find a type by name.
    */
   public Type findType(String name) throws SemanticException {
-    if (Types.should_report(3))
-	Types.report(3, "SourceCR.findType(" + name + ")");
+    if (Report.should_report(new String[] {"ts","resolver"}, 3))
+	Report.report(3, "SourceCR.findType(" + name + ")");
 
     ClassFile clazz = null;
     ClassFile encodedClazz = null;
@@ -116,8 +116,8 @@ public class SourceClassResolver extends LoadedClassResolver
 
       // Check for encoded type information.
       if (clazz.encodedClassType(version.name()) != null) {
-        if (Types.should_report(4))
-	    Types.report(4, "Class " + name + " has encoded type info");
+        if (Report.should_report(new String[] {"ts","resolver"}, 4))
+	    Report.report(4, "Class " + name + " has encoded type info");
         encodedClazz = clazz;
       }
     }
@@ -128,19 +128,19 @@ public class SourceClassResolver extends LoadedClassResolver
     // Now, try and find the source file.
     try {
       source = ext.sourceLoader().classSource(name);
-      if (Types.should_report(4))
-	Types.report(4, "Class " + name + " found in source " + source);
+      if (Report.should_report(new String[] {"ts","resolver"}, 4))
+	Report.report(4, "Class " + name + " found in source " + source);
     }
     catch (IOException e) {
-      if (Types.should_report(4))
-	Types.report(4, "Class " + name + " not found in source file");
+      if (Report.should_report(new String[] {"ts","resolver"}, 4))
+	Report.report(4, "Class " + name + " not found in source file");
       source = null;
     }
 
     // Don't use the raw class if the source or encoded class is available.
     if (encodedClazz != null || source != null) {
-      if (Types.should_report(4))
-	Types.report(4, "Not using raw class file for " + name);
+      if (Report.should_report(new String[] {"ts","resolver"}, 4))
+	Report.report(4, "Not using raw class file for " + name);
       clazz = null;
     }
 
@@ -153,15 +153,15 @@ public class SourceClassResolver extends LoadedClassResolver
       int comp = checkCompilerVersion(encodedClazz.compilerVersion(version.name()));
 
       if (classModTime < sourceModTime) {
-        if (Types.should_report(3))
-	    Types.report(3, "Source file version is newer than compiled for " +
+        if (Report.should_report(new String[] {"ts","resolver"}, 3))
+	    Report.report(3, "Source file version is newer than compiled for " +
                       name + ".");
         encodedClazz = null;
       }
       else if (comp != COMPATIBLE) {
         // Incompatible or older version, so go with the source.
-        if (Types.should_report(3))
-	    Types.report(3, "Incompatible source file version for " + name + ".");
+        if (Report.should_report(new String[] {"ts","resolver"}, 3))
+	    Report.report(3, "Incompatible source file version for " + name + ".");
         encodedClazz = null;
       }
       else {
@@ -173,20 +173,20 @@ public class SourceClassResolver extends LoadedClassResolver
     // should be set.
 
     if (clazz != null) {
-      if (Types.should_report(4))
-	Types.report(4, "Using raw class file for " + name);
+      if (Report.should_report(new String[] {"ts","resolver"}, 4))
+	Report.report(4, "Using raw class file for " + name);
       return clazz.type(ts);
     }
 
     if (encodedClazz != null) {
-      if (Types.should_report(4))
-	Types.report(4, "Using encoded class type for " + name);
+      if (Report.should_report(new String[] {"ts","resolver"}, 4))
+	Report.report(4, "Using encoded class type for " + name);
       return getEncodedType(encodedClazz, name);
     }
 
     if (source != null) {
-      if (Types.should_report(4))
-	Types.report(4, "Using source file for " + name);
+      if (Report.should_report(new String[] {"ts","resolver"}, 4))
+	Report.report(4, "Using source file for " + name);
       return getTypeFromSource(source, name);
     }
 

@@ -6,6 +6,7 @@ import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
 import polyglot.frontend.*;
+import polyglot.main.Report;
 import java.util.*;
 
 /**
@@ -219,8 +220,8 @@ public class FieldDecl_c extends Node_c implements FieldDecl
         throw new InternalCompilerError("null field instance");
     }
 
-    if (Types.should_report(5))
-	Types.report(5, "adding " + fi + " to " + ct);
+    if (Report.should_report("ts", 5))
+	Report.report(5, "adding " + fi + " to " + ct);
 
     ct.addField(fi);
 

@@ -3,6 +3,7 @@ package polyglot.ext.jl.types;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
+import polyglot.main.Report;
 import java.util.*;
 
 /**
@@ -99,14 +100,14 @@ public class Context_c implements Context
      * "argTypes".
      */
     public MethodInstance findMethod(String name, List argTypes) throws SemanticException {
-        if (Types.should_report(3))
-          Types.report(3, "find-method " + name + argTypes + " in " + this);
+        if (Report.should_report(new String[] {"ts","context"}, 3))
+          Report.report(3, "find-method " + name + argTypes + " in " + this);
 
         ReferenceType rt = localFindMethodContainer(name);
 
         if (rt != null) {
-            if (Types.should_report(3))
-              Types.report(3, "find-method " + name + argTypes + " -> " + rt);
+            if (Report.should_report(new String[] {"ts","context"}, 3))
+              Report.report(3, "find-method " + name + argTypes + " -> " + rt);
 
             // Found a class which has a method of the right name.
             // Now need to check if the method is of the correct type.
@@ -137,14 +138,14 @@ public class Context_c implements Context
      * Finds the class which added a field to the scope.
      */
     public ClassType findFieldScope(String name) throws SemanticException {
-        if (Types.should_report(3))
-          Types.report(3, "find-field-scope " + name + " in " + this);
+        if (Report.should_report(new String[] {"ts","context"}, 3))
+          Report.report(3, "find-field-scope " + name + " in " + this);
 
 	VarInstance vi = localFindVariable(name);
 
         if (vi instanceof FieldInstance) {
-            if (Types.should_report(3))
-              Types.report(3, "find-field-scope " + name + " in " + vi);
+            if (Report.should_report(new String[] {"ts","context"}, 3))
+              Report.report(3, "find-field-scope " + name + " in " + vi);
             return type;
         }
 
@@ -158,14 +159,14 @@ public class Context_c implements Context
     /** Finds the class which added a method to the scope.
      */
     public ClassType findMethodScope(String name) throws SemanticException {
-        if (Types.should_report(3))
-          Types.report(3, "find-method-scope " + name + " in " + this);
+        if (Report.should_report(new String[] {"ts","context"}, 3))
+          Report.report(3, "find-method-scope " + name + " in " + this);
 
         ClassType container = localFindMethodContainer(name);
 
         if (container != null) {
-            if (Types.should_report(3))
-              Types.report(3, "find-method-scope " + name + " -> " + container);
+            if (Report.should_report(new String[] {"ts","context"}, 3))
+              Report.report(3, "find-method-scope " + name + " -> " + container);
             return type;
         }
 
@@ -189,8 +190,8 @@ public class Context_c implements Context
                 throw new SemanticException("Field " + name + " not accessible.");
 	    }
 
-            if (Types.should_report(3))
-              Types.report(3, "find-field " + name + " -> " + fi);
+            if (Report.should_report(new String[] {"ts","context"}, 3))
+              Report.report(3, "find-field " + name + " -> " + fi);
 	    return fi;
 	}
 
@@ -204,8 +205,8 @@ public class Context_c implements Context
 	VarInstance vi = findVariableSilent(name);
 
 	if (vi != null) {
-            if (Types.should_report(3))
-              Types.report(3, "find-var " + name + " -> " + vi);
+            if (Report.should_report(new String[] {"ts","context"}, 3))
+              Report.report(3, "find-var " + name + " -> " + vi);
             return vi;
 	}
 
@@ -216,14 +217,14 @@ public class Context_c implements Context
      * Gets a local or field of a particular name.
      */
     public VarInstance findVariableSilent(String name) {
-        if (Types.should_report(3))
-          Types.report(3, "find-var " + name + " in " + this);
+        if (Report.should_report(new String[] {"ts","context"}, 3))
+          Report.report(3, "find-var " + name + " in " + this);
 
         VarInstance vi = localFindVariable(name);
 
         if (vi != null) {
-            if (Types.should_report(3))
-              Types.report(3, "find-var " + name + " -> " + vi);
+            if (Report.should_report(new String[] {"ts","context"}, 3))
+              Report.report(3, "find-var " + name + " -> " + vi);
             return vi;
         }
 
@@ -253,8 +254,8 @@ public class Context_c implements Context
      * Finds the definition of a particular type.
      */
     public Type findType(String name) throws SemanticException {
-        if (Types.should_report(3))
-          Types.report(3, "find-type " + name + " in " + this);
+        if (Report.should_report(new String[] {"ts","context"}, 3))
+          Report.report(3, "find-type " + name + " in " + this);
 
         if (kind == OUTER) return outerResolver().findType(name);
         if (kind == SOURCE) return it.findType(name);
@@ -262,8 +263,8 @@ public class Context_c implements Context
         Type type = localFindType(name);
 
         if (type != null) {
-            if (Types.should_report(3))
-              Types.report(3, "find-type " + name + " -> " + type);
+            if (Report.should_report(new String[] {"ts","context"}, 3))
+              Report.report(3, "find-type " + name + " -> " + type);
             return type;
         }
 
@@ -293,8 +294,8 @@ public class Context_c implements Context
      * Pushes on a class scoping
      */
     public Context pushClass(ParsedClassType c, ClassType t) {
-        if (Types.should_report(4))
-          Types.report(4, "push class " + c + " " + c.position());
+        if (Report.should_report(new String[] {"ts","context"}, 4))
+          Report.report(4, "push class " + c + " " + c.position());
         Context_c v = (Context_c) this.copy();
         v.outer = this;
         v.kind = CLASS;
@@ -324,8 +325,8 @@ public class Context_c implements Context
      * enters a method
      */
     public Context pushCode(CodeInstance ci) {
-        if (Types.should_report(4))
-          Types.report(4, "push code " + ci + " " + ci.position());
+        if (Report.should_report(new String[] {"ts","context"}, 4))
+          Report.report(4, "push code " + ci + " " + ci.position());
         Context_c v = (Context_c) this.copy();
         v.outer = this;
         v.kind = CODE;
@@ -370,8 +371,8 @@ public class Context_c implements Context
      * Adds a symbol to the current scoping level.
      */
     public void addVariable(VarInstance vi) {
-        if (Types.should_report(3))
-          Types.report(3, "Adding " + vi + " to context.");
+        if (Report.should_report(new String[] {"ts","context"}, 3))
+          Report.report(3, "Adding " + vi + " to context.");
         localAddVariable(vi);
     }
 
@@ -379,8 +380,8 @@ public class Context_c implements Context
      * Adds a method to the current scoping level.
      */
     public void addMethod(MethodInstance mi) {
-        if (Types.should_report(3))
-          Types.report(3, "Adding " + mi + " to context.");
+        if (Report.should_report(new String[] {"ts","context"}, 3))
+          Report.report(3, "Adding " + mi + " to context.");
         localAddMethodContainer(mi);
     }
 
@@ -388,8 +389,8 @@ public class Context_c implements Context
      * Adds a type to the current scoping level.
      */
     public void addType(NamedType t) {
-        if (Types.should_report(3))
-          Types.report(3, "Adding type " + t + " to context.");
+        if (Report.should_report(new String[] {"ts","context"}, 3))
+          Report.report(3, "Adding type " + t + " to context.");
         localAddType(t);
     }
 

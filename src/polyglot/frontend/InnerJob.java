@@ -4,7 +4,6 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
-import polyglot.frontend.Compiler;
 
 import java.util.*;
 import java.io.IOException;

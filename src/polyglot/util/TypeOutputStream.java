@@ -1,6 +1,6 @@
 package polyglot.util;
 
-import polyglot.frontend.Serialize;
+import polyglot.main.Report;
 import polyglot.types.*;
 
 import java.io.*;
@@ -20,8 +20,8 @@ public class TypeOutputStream extends ObjectOutputStream
     this.ts = ts;
     this.roots = ts.getTypeEncoderRootSet(root);
 
-    if (Serialize.should_report(2)) {
-        Serialize.report(2, "Began TypeOutputStream with roots: " + roots);
+    if (Report.should_report("serialize", 2)) {
+        Report.report(2, "Began TypeOutputStream with roots: " + roots);
     }
     
     enableReplaceObject( true);
@@ -30,27 +30,27 @@ public class TypeOutputStream extends ObjectOutputStream
   protected Object replaceObject(Object o) throws IOException
   {
     if (roots.contains(o)) {
-      if (Serialize.should_report(2)) {
-	Serialize.report(2, "+ In roots: " + o + " : " + o.getClass());
+      if (Report.should_report("serialize", 2)) {
+	Report.report(2, "+ In roots: " + o + " : " + o.getClass());
       }
       return o;
     }
     else if (o instanceof TypeObject) {
       Object r = ts.placeHolder((TypeObject) o, roots);
-      if (Serialize.should_report(2)) {
+      if (Report.should_report("serialize", 2)) {
         if (r != o) {
-          Serialize.report(2, "+ Replacing: " + o + " : " + o.getClass()
+          Report.report(2, "+ Replacing: " + o + " : " + o.getClass()
 	    + " with " + r);
         } 
 	else {
-	  Serialize.report(2, "+ " + o + " : " + o.getClass());
+	  Report.report(2, "+ " + o + " : " + o.getClass());
         }
       }
       return r;
     }
     else {
-      if (Serialize.should_report(2)) {
-	Serialize.report(2, "+ " + o + " : " + o.getClass());
+      if (Report.should_report("serialize", 2)) {
+	Report.report(2, "+ " + o + " : " + o.getClass());
       }
       return o;
     }

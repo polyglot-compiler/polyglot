@@ -6,6 +6,7 @@ import polyglot.types.Package;
 import polyglot.types.reflect.ClassFile;
 import polyglot.frontend.Compiler;
 import polyglot.frontend.Source;
+import polyglot.main.Report;
 
 import java.util.*;
 
@@ -30,8 +31,8 @@ public class TypeSystem_c implements TypeSystem
     public void initialize(LoadedClassResolver loadedResolver)
                            throws SemanticException {
 
-        if (Types.should_report(1))
-	    Types.report(1, "Initializing " + getClass().getName());
+        if (Report.should_report("ts", 1))
+	    Report.report(1, "Initializing " + getClass().getName());
 
         // The parsed class resolver.  This resolver contains classes parsed
         // from source files.
@@ -701,9 +702,9 @@ public class TypeSystem_c implements TypeSystem
 
 	    visitedTypes.add(type);
 
-	    if (Types.should_report(1))
-		Types.report(1, "Searching type " + type + " for method " +
-		name + " with args " + listToString(argTypes));
+	    if (Report.should_report("ts", 2))
+		Report.report(2, "Searching type " + type + " for method " +
+                              name + " with args " + listToString(argTypes));
 
 	    if (! type.isReference()) {
 	        throw new SemanticException("Cannot call method in " +
@@ -715,14 +716,14 @@ public class TypeSystem_c implements TypeSystem
 
 		MethodInstance mi = (MethodInstance) i.next();
 
-		if (Types.should_report(1))
-		    Types.report(1, "Trying " + mi);
+		if (Report.should_report("ts", 3))
+		    Report.report(3, "Trying " + mi);
 
 		if (methodCallValid(mi, name, argTypes) &&
 		    isAccessible(mi, context)) {
 
-		    if (Types.should_report(1))
-			Types.report(1, "->acceptable: " + mi);
+		    if (Report.should_report("ts", 3))
+			Report.report(3, "->acceptable: " + mi);
 
 		    acceptable.add(mi);
 		}
@@ -749,19 +750,20 @@ public class TypeSystem_c implements TypeSystem
 
 	List acceptable = new ArrayList();
 
-	if (Types.should_report(1))
-	    Types.report(1, "Searching type " + container + " for constructor " +
-	    " with args " + listToString(argTypes));
+	if (Report.should_report("ts", 2))
+	    Report.report(2, "Searching type " + container +
+                          " for constructor " + " with args " +
+                          listToString(argTypes));
 
 	for (Iterator i = container.constructors().iterator(); i.hasNext(); ) {
 	    ConstructorInstance ci = (ConstructorInstance) i.next();
 
-	    if (Types.should_report(1))
-		Types.report(1, "Trying " + ci);
+	    if (Report.should_report("ts", 3))
+		Report.report(3, "Trying " + ci);
 
 	    if (callValid(ci, argTypes) && isAccessible(ci, context)) {
-		if (Types.should_report(1))
-		    Types.report(1, "->acceptable: " + ci);
+		if (Report.should_report("ts", 3))
+		    Report.report(3, "->acceptable: " + ci);
 		acceptable.add(ci);
 	    }
 	}

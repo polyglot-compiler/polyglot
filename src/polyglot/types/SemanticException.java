@@ -38,14 +38,8 @@ public class SemanticException extends Exception {
     }
 
     static void trace(Exception e, int level) {
-        if (Report.should_report(topics, level)) {
+        if (Report.should_report("errors", level)) {
             e.printStackTrace();
         }
-    }
-
-    static Collection topics = new HashSet();
-
-    static {
-        topics.add("errors");
     }
 }

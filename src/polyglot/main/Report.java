@@ -1,9 +1,11 @@
 package polyglot.main;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Stack;
 
 /** Class used for reporting debug messages. */
 public class Report {
@@ -11,31 +13,49 @@ public class Report {
       -report command-line switch */
   public static Collection topics = new HashSet();
 
+  /** A collection of string names of topics which we should always check
+      if we should report. */
+  public static Stack should_report = new Stack();
+
+  static {
+    should_report.push("verbose");
+  }
+
+  /**
+   * Return whether a message on <code>topic</code> of obscurity
+   * <code>level</code> should be reported, based on use of the
+   * -report command-line switches given by the user.
+   */
+  public static boolean should_report(String topic, int level) {
+    return should_report(Collections.singleton(topic), level); 
+  }
+
+  /**
+   * Return whether a message on <code>topics</code> of obscurity
+   * <code>level</code> should be reported, based on use of the
+   * -report command-line switches given by the user.
+   */
+  public static boolean should_report(String[] topics, int level) {
+    return should_report(Arrays.asList(topics), level);
+  }
+
   /**
    * Return whether a message on <code>topics</code> of obscurity
    * <code>level</code> should be reported, based on use of the
    * -report command-line switches given by the user.
    */
   public static boolean should_report(Collection topics, int level) {
-    if (Options.global.level("verbose") >= level) return true;
-    if (topics == null) {
-	// if (Options.global.level("verbose") >= level) return true;
-    } else {
+    for (Iterator i = should_report.iterator(); i.hasNext();) {
+        String topic = (String) i.next();
+        if (Options.global.level(topic) >= level) return true;
+    }
+    if (topics != null) {
 	for (Iterator i = topics.iterator(); i.hasNext();) {
 	    String topic = (String) i.next();
 	    if (Options.global.level(topic) >= level) return true;
 	}
     }
     return false;
-  }
-
-  /**
-   * Whether a message on the topic "topic" at level "level" should
-   * be reported.
-   */
-  public static boolean should_report(String topic, int level) {
-    if (Options.global.level("verbose") >= level) return true;
-    return (topics != null && Options.global.level(topic) >= level);
   }
 
   /** This is the standard way to report debugging information in the

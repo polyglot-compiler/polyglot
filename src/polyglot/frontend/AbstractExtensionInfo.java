@@ -64,8 +64,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         // inter-dependent jobs in the worklist are kept in sync.
         while (okay && ! worklist.isEmpty()) {
             SourceJob job = (SourceJob) worklist.removeFirst();
-            if (Compiler.should_report(1))
-		Compiler.report("Running job " + job, 1);
+            if (Report.should_report("frontend", 1))
+		Report.report(1, "Running job " + job);
             okay &= runNextPass(job);
 
             if (! job.completed()) {
@@ -73,9 +73,9 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             }
         }
 
-        if (Compiler.should_report(1))
-	    Compiler.report("Finished all passes -- " +
-                        (okay ? "okay" : "failed"), 1);
+        if (Report.should_report("frontend", 1))
+	    Report.report(1, "Finished all passes -- " +
+                        (okay ? "okay" : "failed"));
 
         return okay;
     }
@@ -106,8 +106,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     /** Run a job until the <code>goal</code> pass completes. */
     public boolean runToPass(Job job, Pass.ID goal) {
-        if (Compiler.should_report(1))
-	    Compiler.report("Running " + job + " to pass named " + goal, 1);
+        if (Report.should_report("frontend", 1))
+	    Report.report(1, "Running " + job + " to pass named " + goal);
 
         if (job.completed(goal)) {
             return true;
@@ -120,16 +120,16 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     /** Run a job up to the <code>goal</code> pass. */
     public boolean runToPass(Job job, Pass goal) {
-        if (Compiler.should_report(1))
-	    Compiler.report("Running " + job + " to pass " + goal, 1);
+        if (Report.should_report("frontend", 1))
+	    Report.report(1, "Running " + job + " to pass " + goal);
 
         boolean okay = job.status();
 
         while (! job.pendingPasses().isEmpty()) {
             Pass pass = (Pass) job.pendingPasses().get(0);
 
-            if (Compiler.should_report(2))
-		Compiler.report("Trying to run pass " + pass, 2);
+            if (Report.should_report("frontend", 1))
+		Report.report(1, "Trying to run pass " + pass);
 
             if (job.isRunning()) {
                 // We're currently running.  We can't reach the goal.
@@ -143,34 +143,38 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                 Job oldCurrentJob = currentJob;
                 currentJob = job;
 
+                Report.should_report.push(pass.name());
+
                 job.setIsRunning(true);
                 okay &= pass.run();
                 job.setIsRunning(false);
+
+                Report.should_report.pop();
 
                 currentJob = oldCurrentJob;
             }
 
             job.finishPass(pass, okay);
 
-            if (Compiler.should_report(2))
-		Compiler.report("Finished " + pass + " status=" + str(okay), 2);
-            if (Compiler.should_reportTime(1))
-		Compiler.reportTime("Finished " + pass + " status=" + str(okay)
-                                + " time=" + (System.currentTimeMillis() -
-                                              start_time), 1);
+            if (Report.should_report("frontend", 1))
+		Report.report(1, "Finished " + pass + " status=" + str(okay));
+            if (Report.should_report("time", 1))
+		Report.report(1, "Finished " + pass +
+                              " status=" + str(okay) + " time=" +
+                              (System.currentTimeMillis() - start_time));
 
             if (pass == goal) {
                 break;
             }
         }
 
-        if (Compiler.should_report(1))
-	    Compiler.report("Pass " + goal + " " + str(okay), 1);
+        if (Report.should_report("frontend", 1))
+	    Report.report(1, "Pass " + goal + " " + str(okay));
 
         // Ensure orphaned jobs don't get lost.
         if (job.completed()) {
-            if (Compiler.should_report(1))
-                Compiler.report("Job " + job + " completed", 1);
+            if (Report.should_report("frontend", 1))
+                Report.report(1, "Job " + job + " completed");
 
             for (Iterator i = job.children().iterator(); i.hasNext(); ) {
                 Job orphan = (Job) i.next();
@@ -187,14 +191,14 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
 
                 if (job.parent() != null) {
-                    if (Compiler.should_report(2))
-                        Compiler.report("Job " + job.parent() + " adopting " +
-                                        orphan, 2);
+                    if (Report.should_report("frontend", 2))
+                        Report.report(2, "Job " + job.parent() + " adopting " +
+                                      orphan);
                     orphan.reparent(job.parent());
                 }
                 else {
-                    if (Compiler.should_report(2))
-                        Compiler.report("Worklist adopting " + orphan, 2);
+                    if (Report.should_report("frontend", 2))
+                        Report.report(2, "Worklist adopting " + orphan);
                     SourceJob sj = (SourceJob) orphan;
                     jobs.put(sj.source(), sj);
                     worklist.add(sj);
@@ -434,10 +438,17 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     }
 
     static { Report.topics.add("verbose"); }
-    static { Report.topics.add("types"); }
+
+    static { Report.topics.add("context"); }
+    static { Report.topics.add("errors"); }
     static { Report.topics.add("frontend"); }
+    static { Report.topics.add("import"); }
     static { Report.topics.add("loader"); }
+    static { Report.topics.add("resolver"); }
     static { Report.topics.add("serialize"); }
+    static { Report.topics.add("time"); }
+    static { Report.topics.add("ts"); }
+    static { Report.topics.add("visit"); }
 
     public String toString() {
         return getClass().getName() + " worklist=" + worklist;

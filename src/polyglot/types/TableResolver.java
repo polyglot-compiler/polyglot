@@ -1,6 +1,7 @@
 package polyglot.types;
 
 import polyglot.util.*;
+import polyglot.main.Report;
 import java.util.*;
 
 /** A class resolver implemented as a map from names to types. */
@@ -28,8 +29,8 @@ public class TableResolver extends ClassResolver {
         if (name == null || type == null) {
             throw new InternalCompilerError("Bad insertion into TableResolver");
         }
-	if (Types.should_report(1))
-	    Types.report(1, "TableCR.addType(" + name + ", " + type + ")");
+	if (Report.should_report(new String[] {"ts","resolver"}, 3))
+	    Report.report(3, "TableCR.addType(" + name + ", " + type + ")");
 	table.put(name, type);
     }
 
@@ -37,8 +38,8 @@ public class TableResolver extends ClassResolver {
      * Find a type by name.
      */
     public Type findType(String name) throws SemanticException {
-	if (Types.should_report(1))
-	    Types.report(1, "TableCR.findType(" + name + ")");
+	if (Report.should_report(new String[] {"ts","resolver"}, 3))
+	    Report.report(3, "TableCR.findType(" + name + ")");
 
 	Type type = (Type) table.get(name);
 

@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.frontend.Job;
+import polyglot.main.Report;
 import java.util.*;
 
 /**
@@ -86,8 +87,8 @@ public class ContextVisitor extends ErrorHandlingVisitor
     }
 
     public NodeVisitor enter(Node parent, Node n) {
-        if (Types.should_report(5))
-	    Types.report(5, "enter(" + n + ")");
+        if (Report.should_report("visit", 5))
+	    Report.report(5, "enter(" + n + ")");
 
         ContextVisitor v = this;
 

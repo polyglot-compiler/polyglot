@@ -1,6 +1,7 @@
 package polyglot.types;
 
 import polyglot.util.*;
+import polyglot.main.Report;
 
 import java.util.*;
 
@@ -74,8 +75,8 @@ public class ImportTable extends ClassResolver
      * Add a class import.
      */
     public void addClassImport(String className) {
-	if (Types.should_report(1))
-	    Types.report(1, this + ": lazy import " + className);
+        if (Report.should_report(new String[] {"ts","resolver","import"}, 2))
+            Report.report(2, this + ": lazy import " + className);
 	lazyImports.add(className);
         classImports.add(className);
     }
@@ -113,8 +114,8 @@ public class ImportTable extends ClassResolver
      */
     public Type findType(String name) throws SemanticException {
 	// FIXME: need to keep on looking to find conflicts.
-	if (Types.should_report(1))
-	    Types.report(1, this + ".findType(" + name + ")");
+        if (Report.should_report(new String[] {"ts","resolver","import"}, 2))
+	    Report.report(2, this + ".findType(" + name + ")");
 
 	/* First add any lazy imports. */
 	lazyImport();
@@ -196,15 +197,15 @@ public class ImportTable extends ClassResolver
 	for (int i = 0; i < lazyImports.size(); i++) {
 	    String longName = (String) lazyImports.get(i);
 
-	    if (Types.should_report(1))
-		Types.report(1, this + ": import " + longName);
+            if (Report.should_report(new String[] {"ts","resolver","import"}, 2))
+		Report.report(2, this + ": import " + longName);
 
 	    try {
 		Type t = resolver.findType(longName);
 		String shortName = StringUtil.getShortNameComponent(longName);
 
-		if (Types.should_report(1))
-		    Types.report(1, this + ": import " + shortName + " as " + t);
+                if (Report.should_report(new String[] {"ts","resolver","import"}, 2))
+		    Report.report(2, this + ": import " + shortName + " as " + t);
 
 		if (map.containsKey(shortName)) {
 		    Type s = (Type) map.get(shortName);

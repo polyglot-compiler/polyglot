@@ -11,6 +11,7 @@ public interface Pass
     }
 
     public ID id();
+    public String name();
 
     public static final ID PARSE = new ID("parse");
     public static final ID BUILD_TYPES = new ID("build-types");

@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.frontend.Job;
+import polyglot.main.Report;
 import java.util.*;
 
 /**
@@ -83,8 +84,8 @@ public class ErrorHandlingVisitor extends HaltingVisitor
      */
     protected NodeVisitor enterCall(Node parent, Node n)
                 throws SemanticException {
-        if (Types.should_report(1))
-	    Types.report(1, "enter: " + parent + " -> " + n);
+        if (Report.should_report("visit", 1))
+	    Report.report(1, "enter: " + parent + " -> " + n);
         return enterCall(n);
     }
 
@@ -144,8 +145,8 @@ public class ErrorHandlingVisitor extends HaltingVisitor
      * children of <code>n</code>.
      */
     public NodeVisitor enter(Node parent, Node n) {
-        if (Types.should_report(5))
-	    Types.report(5, "enter(" + n + ")");
+        if (Report.should_report("visit", 5))
+	    Report.report(5, "enter(" + n + ")");
 
         ErrorHandlingVisitor v = this;
 
@@ -202,26 +203,26 @@ public class ErrorHandlingVisitor extends HaltingVisitor
         try {
             if (v instanceof ErrorHandlingVisitor &&
                 ((ErrorHandlingVisitor) v).error) {
-                if (Types.should_report(5))
-		    Types.report(5, "leave(" + n + "): error below");
+                if (Report.should_report("visit", 5))
+		    Report.report(5, "leave(" + n + "): error below");
 
                 // There was an error below us.
                 if (! catchErrors(n)) {
                     // Propagate error up one level
                     this.error = true;
-                    if (Types.should_report(5))
-			Types.report(5, "leave(" + n + "): error propagated");
+                    if (Report.should_report("visit", 5))
+			Report.report(5, "leave(" + n + "): error propagated");
                 }
                 else {
-                    if (Types.should_report(5))
-			Types.report(5, "leave(" + n + "): error not propagated");
+                    if (Report.should_report("visit", 5))
+			Report.report(5, "leave(" + n + "): error not propagated");
                 }
 
                 return n;
             }
 
-            if (Types.should_report(5))
-		Types.report(5, "leave(" + n + "): calling leaveCall");
+            if (Report.should_report("visit", 5))
+		Report.report(5, "leave(" + n + "): calling leaveCall");
             return leaveCall(old, n, v);
 	}
 	catch (SemanticException e) {

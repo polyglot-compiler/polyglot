@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import polyglot.main.Report;
 import polyglot.frontend.Compiler;
 
 import java.util.*;
@@ -230,8 +231,8 @@ public abstract class Job
     public Node spawn(Context c, Node ast, Pass.ID begin, Pass.ID end) {
         Job j = lang.createJob(ast, c, this, begin, end);
 
-	if (Compiler.should_report(1))
-	    Compiler.report(this + " spawning " + j, 1);
+	if (Report.should_report("frontend", 1))
+	    Report.report(1, this + " spawning " + j);
 
         if (! lang.runAllPasses(j)) {
             return null;

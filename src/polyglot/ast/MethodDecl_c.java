@@ -5,6 +5,7 @@ import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
 import polyglot.frontend.*;
+import polyglot.main.Report;
 import java.util.*;
 
 /**
@@ -202,8 +203,8 @@ public class MethodDecl_c extends Node_c implements MethodDecl
     }
 
     public Context enterScope(Context c) {
-        if (Types.should_report(5))
-	    Types.report(5, "enter scope of method " + name);
+        if (Report.should_report(new String[]{"ts","context"}, 5))
+	    Report.report(5, "enter scope of method " + name);
         c = c.pushCode(mi);
         return c;
     }

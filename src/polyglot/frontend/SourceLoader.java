@@ -2,7 +2,7 @@ package polyglot.frontend;
 
 import java.io.*;
 import java.util.*;
-import polyglot.frontend.Compiler;
+import polyglot.main.Report;
 
 /** A <code>SourceLoader</code> is responsible for loading source files. */
 public class SourceLoader
@@ -29,8 +29,8 @@ public class SourceLoader
                                   sourceExt.fileExtension() + "\".");
         }
 
-	if (Compiler.should_report(2))
-	    Compiler.report("Loading class from " + sourceFile, 2);
+	if (Report.should_report("frontend", 2))
+	    Report.report(2, "Loading class from " + sourceFile);
 
 	return new FileSource(fileName);
     }
@@ -56,9 +56,8 @@ public class SourceLoader
 	    }
 	    
 	    if (sourceFile.exists()) {
-		if (Compiler.should_report(2))
-		    Compiler.report(
-			"Loading " + className + " from " + sourceFile, 2);
+		if (Report.should_report("frontend", 2))
+		    Report.report(2, "Loading " + className + " from " + sourceFile);
 
 		return new FileSource(sourceFile.getPath());
 	    }

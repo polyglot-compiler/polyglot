@@ -1,6 +1,6 @@
 package polyglot.util;
 
-import polyglot.frontend.Serialize;
+import polyglot.main.Report;
 import polyglot.types.*;
 
 import java.io.*;
@@ -24,14 +24,14 @@ public class TypeInputStream extends ObjectInputStream
   }
 
   protected Object resolveObject(Object o) {
-    if (Serialize.should_report(2)) {
+    if (Report.should_report("serialize", 2)) {
       String s;
       try {
         s = o.toString();
       } catch (NullPointerException e) {
         s = "<NullPointerException thrown>";
       }
-      Serialize.report(2, "- " + s + " : " + o.getClass());
+      Report.report(2, "- " + s + " : " + o.getClass());
     }
     return o;
   }

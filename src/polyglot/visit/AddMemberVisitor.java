@@ -5,6 +5,7 @@ import polyglot.frontend.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.types.Package;
+import polyglot.main.Report;
 
 import java.io.IOException;
 import java.util.*;
@@ -17,14 +18,14 @@ public class AddMemberVisitor extends ContextVisitor
     }
 
     protected NodeVisitor enterCall(Node n) throws SemanticException {
-        if (Types.should_report(4))
-	    Types.report(4, ">> AddMemberVisitor::enter " + n);
+        if (Report.should_report("visit", 4))
+	    Report.report(4, ">> AddMemberVisitor::enter " + n);
         return n.del().addMembersEnter(this);
     }
 
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
-      if (Types.should_report(4))
-	Types.report(4, "<< AddMemberVisitor::leave " + n);
+      if (Report.should_report("visit", 4))
+	Report.report(4, "<< AddMemberVisitor::leave " + n);
         return n.del().addMembers((AddMemberVisitor) v);
     }
 }
