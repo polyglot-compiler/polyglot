@@ -20,7 +20,10 @@ JAVADOC_FLAGS		= -mx40m -ms40m -classpath "$(JAVADOC_CLASSPATH)"
 BIN 			= $(SOURCE)
 
 %.class: %.java
-	"$(JC)" $(JC_FLAGS) $<
+	@if /usr/bin/test ! -f $(SOURCE)/classes/$(subst .,/,$(PACKAGE))/$@ || /usr/bin/test $< -nt $(SOURCE)/classes/$(subst .,/,$(PACKAGE))/$@ ; then \
+		echo "$(JC)" $(JC_FLAGS) $< ; \
+		"$(JC)" $(JC_FLAGS) $< ; \
+	fi
 
 all clean clobber javadoc:
 
