@@ -12,14 +12,15 @@ JAR			= jar
 JAVADOC			= javadoc
 
 CUP_RUNTIME		= /home/nks/lib
-CLASSPATH		= -classpath $(SOURCE):/usr/local/jdk1.2.1/jre/lib/rt.jar:$(CUP_RUNTIME)
-JC_FLAGS 		= $(CLASSPATH)
+CLASSPATH		= $(SOURCE):/usr/local/jdk1.2.1/jre/lib/rt.jar:$(CUP_RUNTIME)
+CLASSPATHFLAG		= -classpath $(CLASSPATH)
+JC_FLAGS 		= $(CLASSPATHFLAG)
 
 JAR_FILE		= jltools.jar
 JAR_FLAGS		= cf 
 
 JAVADOC_OUTPUT		= ./javadoc
-JAVADOC_FLAGS		= $(CLASSPATH) 
+JAVADOC_FLAGS		= -classpath $(CLASSPATHFLAG) 
 
 SOURCE			= .
 PERSONAL_MAKEFILE	= Makefile.personal
