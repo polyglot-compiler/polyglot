@@ -57,7 +57,7 @@ dnl This macro applies its first argument to all the rest in order.
 dnl MapEach(F, A, B, C...) = F(A)F(B)F(C)...
 define(MapEach, `ifelse($#, 0, , $#, 1, , 
      $#, 2, 
-     `ifelse(len($2), 0, , `indir(`$1', $2)')',
+     `ifelse(len(`$2'), 0, , `indir(`$1', $2)')',
      `indir(`$1', $2) MapEach(`$1', ShiftN(2,$@))')')
 
 dnl This macro applies its first argument to all the rest in order, separating
@@ -185,10 +185,10 @@ ifelse(NodeMult(`$1'), `*',
 dnl Helper function: Takes a field f, and generates code for 
 dnl "deep ? f.copy(deep) : f"
 define(CopyVar, `dnl
-ifelse(NodeKind(`$1', `P', `NodeName(`$1'),
+ifelse(NodeKind(`$1', `P', `NodeName(`$1')',
    NodeKind(`$1'), `J', 
      `ifelse(NodeMult(`$1'), `*', ``TypedList.copy('NodeName(`$1')`)'',
-             `NodeName(`$1')')',
+                                   `NodeName(`$1')')',
    NodeMult(`$1'), `!', 
      ``deep ? ('NodeType(`$1')`) 'NodeName(`$1')`.copy() : 'NodeName(`$1')',
    NodeMult(`$1'), `?', 
