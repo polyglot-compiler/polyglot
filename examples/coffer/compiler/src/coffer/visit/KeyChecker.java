@@ -73,10 +73,11 @@ public class KeyChecker extends DataFlow
         
         public boolean equals(Object o) {
             if (o instanceof DataFlowItem) {
-                return this.must_held.equals(((DataFlowItem)o).must_held)
-                    && this.may_held.equals(((DataFlowItem)o).may_held)
-                    && this.must_stored.equals(((DataFlowItem)o).must_stored)
-                    && this.may_stored.equals(((DataFlowItem)o).may_stored);
+                DataFlowItem that = (DataFlowItem) o;
+                return this.must_held.equals(that.must_held)
+                    && this.may_held.equals(that.may_held)
+                    && this.must_stored.equals(that.must_stored)
+                    && this.may_stored.equals(that.may_stored);
             }
             return false;
         }
@@ -138,7 +139,8 @@ public class KeyChecker extends DataFlow
             DataFlowItem df = (DataFlowItem) i.next();
 
             if (outItem == null) {
-                outItem = df;
+                outItem = new DataFlowItem(df.must_held, df.may_held,
+                                           df.must_stored, df.may_stored);
                 continue;
             }
 
