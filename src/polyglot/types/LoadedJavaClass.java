@@ -30,10 +30,10 @@ public class LoadedJavaClass extends JavaClassImpl {
     
     // Set up names and classType.    
     String rawName = theClass.getName(); // pkg1.pkg2.class$inner1$inner2
-    this.packageName = packageComponent(rawName);
+    this.packageName = TypeSystem.getPackageComponent(rawName);
     this.classType = ts.typeForClass(theClass);
     this.fullName = classType.getName();
-    this.shortName = nameComponent(fullName);
+    this.shortName = TypeSystem.getShortNameComponent(fullName);
 
     // Set up the rest of the typing information
     this.flags = AccessFlags.flagsForInt(theClass.getModifiers());
@@ -52,6 +52,7 @@ public class LoadedJavaClass extends JavaClassImpl {
     Class outer = theClass.getDeclaringClass();
     this.isInner = outer != null;
     if (this.isInner) {
+      // FIXME: what about classes inside methods?
       this.isAnonymous = isInner && 
 	Character.isDigit(this.shortName.charAt(0));    
       this.containingClass = ts.typeForClass(outer);
@@ -119,32 +120,6 @@ public class LoadedJavaClass extends JavaClassImpl {
 
     return new ConstructorType(argList, excpList, flags);
   }
-  
-  protected static String packageComponent(String fullName) {
-    int lastDot = fullName.lastIndexOf('.');
-    return lastDot >= 0 ? fullName.substring(0,lastDot) : "";
-  }
 
-  protected static String nameComponent(String fullName) {
-    int lastDot = fullName.lastIndexOf('.');
-    return lastDot >= 0 ? fullName.substring(lastDot+1) : fullName;
-  }    
-
-  ////
-  // Names
-  ////
-
-
-  ////
-  // Members
-  ////
-  protected TypedList methods;
-  protected TypedList fields;
-
-  ////
-  // Inner info
-  ////
-  protected Type containingClass;
-  protected String innerName;
 }
 

@@ -46,6 +46,15 @@ public class ArrayType extends Type {
   public boolean isCanonical() {
     return base.isCanonical();
   }
+  public boolean equals(Object o) {
+    if (! (o instanceof ArrayType)) return false;
+
+    ArrayType t = (ArrayType) o;
+    return t.dims == dims && ts.isSameType(t.base, base);
+  }
+  public int hashCode() {
+    return base.hashCode() ^ (dims << 3);
+  }
 }
 
 

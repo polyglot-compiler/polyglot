@@ -35,6 +35,15 @@ public abstract class JavaClassImpl extends AnnotatedObject
   public String getInnerName()          { return innerName; }
   public List getInnerClasses()         { return innerClasses; }
 
+  public Type getInnerNamed(String name) {
+    for (Iterator i = innerClasses().iterator(); i.hasNext();) {
+      ClassType innerType = (ClassType) i.next();
+      if (innerType.getShortName().equals(name))
+	return innerType;
+    }
+  }
+  
+
   ////
   // All or most of the information below must be initialized before
   // we can use this class.

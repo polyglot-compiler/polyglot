@@ -23,12 +23,24 @@ public class ClassType extends Type {
   public String getName() {
     return name;
   }
+  public String getShortName() {
+    return TypeSystem.getShortNameComponent(name);
+  }
 
   private String name;
   private boolean canonical;
 
   public boolean isPrimitive() { return false; }
   public boolean isCanonical() { return canonical; }
+  public boolean equals(Object o) {
+    if (! (o instanceof ClassType)) return false;
+
+    ClassType t = (ClassType) o;
+    return t.name.equals(name) && t.canonical == canonical ;
+  }
+  public int hashCode() {
+    return name.hashCode();
+  }
 }
 
 

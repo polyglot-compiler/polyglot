@@ -45,6 +45,22 @@ public class PrimitiveType extends Type {
     return true;
   }
 
+  public boolean isNumeric() {
+    switch(kind) 
+      {
+      case CHAR:
+      case BYTE:
+      case SHORT:
+      case INT:
+      case LONG:
+      case FLOAT:
+      case DOUBLE:
+	return true;
+      default:
+	return false;
+      }
+  }
+
   public boolean equals(Object o) {
     if (! (o instanceof PrimitiveType)) return false;
     PrimitiveType pt = (PrimitiveType) o;

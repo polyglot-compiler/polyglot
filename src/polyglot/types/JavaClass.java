@@ -99,4 +99,12 @@ public interface JavaClass {
    * Return a list of the types of all the inner classes declared in this.
    **/
   public List getInnerClasses();
+
+  /**
+   * Returns the type of the inner in this whose short name is <name>.
+   * Returns null if no such inner exists.
+   **/
+  public Type getInnerNamed(String name);
+  
+  // FIXME:  InMethod?
 }
