@@ -51,6 +51,9 @@ public class Options {
     /** Dump the AST after the following passes? */
     public Set dump_ast = new HashSet();
   
+    /** Pretty-print the AST after the following passes? */
+    public Set print_ast = new HashSet();
+ 
     /** Disable the following passes? */
     public Set disable_passes = new HashSet();
   
@@ -269,6 +272,13 @@ public class Options {
             dump_ast.add(pass_name);
             i++;
         }
+        else if (args[i].equals("-print"))
+        {
+            i++;
+            String pass_name = args[i];
+            print_ast.add(pass_name);
+            i++;
+        }
         else if (args[i].equals("-disable"))
         {
             i++;
@@ -337,6 +347,8 @@ public class Options {
         usageForFlag(out, "-w <num>", 
                           "set the maximum width of the .java output files");
         usageForFlag(out, "-dump <pass>", "dump the ast after pass <pass>");
+        usageForFlag(out, "-print <pass>",
+	                  "pretty-print the ast after pass <pass>");
         usageForFlag(out, "-disable <pass>", "disable pass <pass>");
 //        usageForFlag(out, "-scramble [seed]", "scramble the ast (for testing)");
         usageForFlag(out, "-noserial", "disable class serialization");

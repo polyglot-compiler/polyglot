@@ -296,6 +296,20 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                 oldPass.toggleTimers(true);
             }
 
+            // pretty-print this pass if we need to.
+            if (getOptions().print_ast.contains(pass.name())) {
+                System.err.println("--------------------------------" +
+                                   "--------------------------------");
+                System.err.println("Pretty-printing AST for " + job +
+                                   " after " + pass.name());
+
+		NodeVisitor dumper =
+		  new DumpAst(new CodeWriter(System.err, 78));
+		dumper = dumper.begin();
+		job.ast().visit(dumper);
+		dumper.finish();
+            }
+
             // dump this pass if we need to.
             if (getOptions().dump_ast.contains(pass.name())) {
                 System.err.println("--------------------------------" +
