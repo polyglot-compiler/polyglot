@@ -19,7 +19,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
     this.name = name;
   }
   
-  public boolean isCanonical() {
+  public boolean isDisambiguated() {
       return false;
   }
 

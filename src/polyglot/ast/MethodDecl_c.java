@@ -35,8 +35,8 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 	this.body = body;
     }
 
-    public boolean isCanonical() {
-        return mi != null && mi.isCanonical() && super.isCanonical();
+    public boolean isDisambiguated() {
+        return mi != null && mi.isCanonical() && super.isDisambiguated();
     }
     
     public MemberInstance memberInstance() {

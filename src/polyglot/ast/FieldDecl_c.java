@@ -33,8 +33,8 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         this.init = init;
     }
     
-    public boolean isCanonical() {
-        return fi != null && fi.isCanonical() && (init == null || (ii != null && ii.isCanonical())) && super.isCanonical();
+    public boolean isDisambiguated() {
+        return fi != null && fi.isCanonical() && (init == null || (ii != null && ii.isCanonical())) && super.isDisambiguated();
     }
 
     public MemberInstance memberInstance() {

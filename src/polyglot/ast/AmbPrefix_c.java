@@ -20,7 +20,7 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
 	this.name = name;
     }
     
-    public boolean isCanonical() {
+    public boolean isDisambiguated() {
         return false;
     }
 

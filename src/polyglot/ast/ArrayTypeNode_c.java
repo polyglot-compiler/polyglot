@@ -20,7 +20,7 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
 	this.base = base;
     }
 
-    public boolean isCanonical() {
+    public boolean isDisambiguated() {
         return false;
     }
 

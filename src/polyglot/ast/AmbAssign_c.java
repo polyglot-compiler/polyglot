@@ -16,7 +16,7 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
     super(pos, left, op, right);
   }
   
-  public boolean isCanonical() {
+  public boolean isDisambiguated() {
       return false;
   }
 

@@ -22,7 +22,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 	this.name = name;
     }
     
-    public boolean isCanonical() {
+    public boolean isDisambiguated() {
         return false;
     }
 

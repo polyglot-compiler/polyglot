@@ -33,8 +33,8 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         this.init = init;
     }
     
-    public boolean isCanonical() {
-        return li != null && li.isCanonical() && super.isCanonical();
+    public boolean isDisambiguated() {
+        return li != null && li.isCanonical() && super.isDisambiguated();
     }
 
     /** Get the type of the declaration. */

@@ -33,8 +33,8 @@ public class New_c extends Expr_c implements New
 	this.body = body;
     }
     
-    public boolean isCanonical() {
-        return ci != null && ci.isCanonical() && (body == null || (anonType != null && anonType.isCanonical())) && super.isCanonical();
+    public boolean isTypeChecked() {
+        return ci != null && ci.isCanonical() && (body == null || (anonType != null && anonType.isCanonical())) && super.isTypeChecked();
     }
 
     /** Get the qualifier expression of the allocation. */

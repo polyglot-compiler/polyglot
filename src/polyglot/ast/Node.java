@@ -69,9 +69,15 @@ public interface Node extends JL, Copy
     
     /**
      * Return true if the all type information for the node (but not necessarily
+     * for the node's children) has been computed.
+     */
+    boolean isTypeChecked();
+
+    /**
+     * Return true if the all type information for the node (but not necessarily
      * for the node's children) is unambiguous.
      */
-    boolean isCanonical();
+    boolean isDisambiguated();
     
     /**
      * Visit the node.  This method is equivalent to

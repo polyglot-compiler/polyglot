@@ -30,8 +30,8 @@ public class Local_c extends Expr_c implements Local
     this.name = name;
   }
   
-  public boolean isCanonical() {
-      return li != null && li.isCanonical() && super.isCanonical();
+  public boolean isTypeChecked() {
+      return li != null && li.isCanonical() && super.isTypeChecked();
   }
 
   /** Get the precedence of the local. */

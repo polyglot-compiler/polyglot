@@ -41,8 +41,11 @@ public abstract class Scheduler {
      */
     protected Map jobs;
 
-    /** Map from goals to goals. */
+    /** Map from goals to goals used to intern goals. */
     protected Map goals;
+    
+    /** Map from goals to number of times a pass was run for the goal. */
+    protected Map runCount;
 
     protected static final Object COMPLETED_JOB = "COMPLETED JOB";
 
@@ -54,6 +57,7 @@ public abstract class Scheduler {
 
         this.jobs = new HashMap();
         this.goals = new HashMap();
+        this.runCount = new HashMap();
         this.inWorklist = new HashSet();
         this.worklist = new LinkedList();
         this.currentPass = null;
@@ -453,6 +457,26 @@ public abstract class Scheduler {
 
         if (reached(goal)) {
             throw new InternalCompilerError("Cannot run a pass for completed goal " + goal);
+        }
+        
+        final int MAX_RUN_COUNT = 10;
+        Integer countObj = (Integer) this.runCount.get(goal);
+        int count = countObj != null ? countObj.intValue() : 0;
+        count++;
+        this.runCount.put(goal, new Integer(count));
+        
+        if (count >= MAX_RUN_COUNT) {
+            String cardinal = "";
+            if (count % 10 == 1 && count != 11) {
+                cardinal = count + "st";
+            }
+            else if (count % 10 == 2 && count != 12) {
+                cardinal = count + "nd";
+            }
+            else {
+                cardinal = count + "th";
+            }
+            throw new InternalCompilerError("Possible infinite loop detected trying to run a pass for " + goal + " for the " + cardinal + " time.");
         }
         
         pass.resetTimers();

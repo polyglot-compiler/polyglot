@@ -29,8 +29,8 @@ public class Formal_c extends Term_c implements Formal
         this.name = name;
     }
     
-    public boolean isCanonical() {
-        return li != null && li.isCanonical() && super.isCanonical();
+    public boolean isDisambiguated() {
+        return li != null && li.isCanonical() && super.isDisambiguated();
     }
 
     /** Get the type of the formal. */

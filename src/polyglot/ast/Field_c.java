@@ -57,8 +57,8 @@ public class Field_c extends Expr_c implements Field
     }
   }
   
-  public boolean isCanonical() {
-      return fi != null && fi.isCanonical() && super.isCanonical();
+  public boolean isTypeChecked() {
+      return fi != null && fi.isCanonical() && super.isTypeChecked();
   }
 
   /** Get the precedence of the field. */

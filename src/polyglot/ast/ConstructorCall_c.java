@@ -24,8 +24,8 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
     }
     
-    public boolean isCanonical() {
-        return ci != null && ci.isCanonical() && super.isCanonical();
+    public boolean isTypeChecked() {
+        return ci != null && ci.isCanonical() && super.isTypeChecked();
     }
 
     /** Get the qualifier of the constructor call. */

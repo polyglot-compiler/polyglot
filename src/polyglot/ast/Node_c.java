@@ -157,8 +157,12 @@ public abstract class Node_c implements Node
         return n;
     }
     
-    public boolean isCanonical() {
-        return true;
+    public boolean isTypeChecked() {
+        return isDisambiguated();
+    }
+    
+    public boolean isDisambiguated() {
+        return !(this instanceof Ambiguous);
     }
     
     public boolean error() {

@@ -18,8 +18,8 @@ public abstract class TypeNode_c extends Node_c implements TypeNode
 	super(pos);
     }
     
-    public boolean isCanonical() {
-        return type != null && type.isCanonical() && super.isCanonical();
+    public boolean isDisambiguated() {
+        return super.isDisambiguated() && type != null && type.isCanonical();
     }
 
     /** Get the type as a qualifier. */

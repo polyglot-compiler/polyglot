@@ -33,8 +33,8 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	this.body = body;
     }
     
-    public boolean isCanonical() {
-        return ci != null && ci.isCanonical() && super.isCanonical();
+    public boolean isDisambiguated() {
+        return ci != null && ci.isCanonical() && super.isDisambiguated();
     }
     
     public MemberInstance memberInstance() {

@@ -17,8 +17,8 @@ public abstract class Expr_c extends Term_c implements Expr
 	super(pos);
     }
 
-    public boolean isCanonical() {
-        return type != null && type.isCanonical() && super.isCanonical();
+    public boolean isTypeChecked() {
+        return type != null && type.isCanonical() && super.isTypeChecked();
     }
     
     /**

@@ -65,7 +65,7 @@ public class ConstantsCheckedForFile extends SourceFileGoal {
                     return n;
                 }
                 
-                if (! n.isCanonical()) {
+                if (! n.isTypeChecked()) {
                     // We should depend on type checking, so there's no need
                     // to add any new dependencies.
                     allOk[0] = false;

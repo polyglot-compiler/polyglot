@@ -24,7 +24,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
     this.name = name;
   }
   
-  public boolean isCanonical() {
+  public boolean isDisambiguated() {
       return false;
   }
 

@@ -53,7 +53,7 @@ public class Disambiguated extends SourceFileGoal {
             return false;
         }
         
-        // Do a relatively quick test of the types contained in the AST.
+        // Do a relatively quick test of the types declared in the AST.
         for (Iterator i = job().ast().typesBelow().iterator(); i.hasNext(); ) {
             ParsedClassType ct = (ParsedClassType) i.next();
             if (! ct.signaturesResolved()) {
@@ -69,16 +69,20 @@ public class Disambiguated extends SourceFileGoal {
         final boolean[] allOk = new boolean[] { true };
         
         job().ast().visit(new NodeVisitor() {
-            public Node override(Node n) {
+            public Node override(Node parent, Node n) {
                 if (! allOk[0]) {
                     return n;
                 }
                 
-                if (n instanceof New) {
+                if (parent instanceof LocalClassDecl && n instanceof ClassDecl) {
                     return n;
                 }
                 
-                if (n instanceof Ambiguous) {
+                if (parent instanceof New && n instanceof ClassBody) {
+                    return n;
+                }
+
+                if (! n.isDisambiguated()) {
                     if (Report.should_report(TOPICS, 3))
                         Report.report(3, "  not ok at " + n);
                     allOk[0] = false;

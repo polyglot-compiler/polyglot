@@ -75,7 +75,7 @@ public class TypeChecked extends SourceFileGoal {
                     return n;
                 }
                 
-                if (! n.isCanonical()) {
+                if (! n.isTypeChecked()) {
                     if (Report.should_report(TOPICS, 3))
                         Report.report(3, "  not ok at " + n);
                     allOk[0] = false;

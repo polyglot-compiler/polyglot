@@ -66,9 +66,12 @@ public class TypeChecker extends DisambiguationDriver
         
         n.visitChildren(new NodeVisitor() {
             public Node override(Node n) {    
-                if (! n.isCanonical()) {
+//                System.out.println("checking isTypechecked for " + n);
+//                System.out.println(n + " isa " + n.getClass().getName());
+                if (! n.isTypeChecked()) {
                     amb[0] = true;
                 }
+//                System.out.println("done with " + n);
                 return n;
             }
         });
@@ -77,6 +80,7 @@ public class TypeChecker extends DisambiguationDriver
         
         try {
             if (! amb[0]) {
+//                System.out.println("running typeCheck for " + m);
                 m = m.del().typeCheck((TypeChecker) v);
                 
                 if (m instanceof Expr && ((Expr) m).type() == null) {
