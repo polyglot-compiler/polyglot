@@ -81,11 +81,12 @@ public class MethodType implements Cloneable {
   }
 
   private String name;
-  // RI: May be null.
-  private Type returnType;
   // RI: every element is a Type.
   private TypedList argumentTypes;
   // RI: every element is a Type.  May be null.
   private TypedList exceptionTypes;
+  // RI: May be null.
   private AccessFlags flags;
+  // RI: May be null.
+  private Type returnType;
 }

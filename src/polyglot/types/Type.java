@@ -26,17 +26,33 @@ public abstract class Type {
   ////
   // Methods which dispatch to typeSystem
   ////
-  public final boolean descendsFrom(Type t) 
-    { return ts.descendsFrom(this,t); }
   public final boolean isSameType(Type t)
     { return ts.isSameType(this,t); }
   public final boolean isCanonical()
     { return ts.isCanonical(this); }
-  public final Type getCanonicalType()
-    { return ts.getCanonicalType(this); }
-  public final boolean isTypeOk()
-    { return ts.isTypeOk(this); }
+  public final Type getCanonicalType(TypeSystem.Context context)
+    { return ts.getCanonicalType(this, context); }
+  public final String checkTypeOk(TypeSystem.Context context)
+    { return ts.checkTypeOk(this, context); }
+  public final boolean descendsFrom(Type ancestorType)
+    { return ts.descendsFrom(this,ancestorType); }
+  public final boolean isAssignableSubtype(Type ancestorType)
+    { return ts.isAssignableSubtype(this,ancestorType); }
+  public final boolean isCastValid(Type toType) 
+    { return ts.isCastValid(this, toType); }
+  public final boolean isImplicitCastValid(Type toType) 
+    { return ts.isImplicitCastValid(this, toType); }
+  public final boolean isThrowable()
+    { return ts.isThrowable(this); }
+  public final boolean isUncheckedException()
+    { return ts.isUncheckedException(this); }
 
+  public final TypeSystem getTypeSystem()
+    { return ts; }
+
+  public final boolean isComparable(Type t) {
+    return t.ts == this.ts;
+  }
   private TypeSystem ts;
 }
 
