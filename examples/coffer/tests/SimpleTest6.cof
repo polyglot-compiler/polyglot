@@ -16,7 +16,7 @@ public class SimpleTest6 {
         is.read();
         is.close();
         new tracked(I) File(); // ok
-        is.close(); // error: I not stored in is
+        is.close(); // expected error: I not stored in is
     }
 }
 

@@ -13,7 +13,7 @@ public class SimpleTest4 {
         tracked(I) File is = new tracked(I) File();
         is.read();
         is.close();
-        is.close(); // error: I already freed
+        is.close(); // expected error: I already freed
     }
 }
 

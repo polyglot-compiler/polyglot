@@ -3,7 +3,7 @@ tracked(F) class File {
 
     public int read() [F] -> [F] { return 0; }
 
-    public void close() [F] -> [] { // error: F not freed
+    public void close() [F] -> [] { // expected error: F not freed
     }
 }
 

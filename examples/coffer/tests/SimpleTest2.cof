@@ -9,7 +9,7 @@ tracked(F) class File {
 }
 
 public class SimpleTest2 {
-    public static void main(String[] args) { // error I: not freed
+    public static void main(String[] args) { // expected error I: not freed
         tracked(I) File is = new tracked(I) File();
         is.read();
     }
