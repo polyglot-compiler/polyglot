@@ -21,57 +21,40 @@ public class ImportTable extends ClassResolver
     protected Resolver resolver;
     /** A list of all package imports. */
     protected List packageImports;
-    /** A list of all class imports. */
-    protected List classImports;
     /** Map from names to classes found. */
     protected Map map;
-    /** Our package */
-    protected Package pkg;
+    /** List of imports which will be lazily added to the table. */
+    protected List lazyImports;
     /** Source name to use for debugging and error reporting */
     protected String sourceName;
+    /** Position to use for error reporting */
+    protected Position sourcePos;
+    /** Our package */
+    protected Package pkg;
 
     public ImportTable(TypeSystem ts, Resolver base, Package pkg) {
         this(ts, base, pkg, null);
     }
 
     public ImportTable(TypeSystem ts, Resolver base, Package pkg, String src) {
-	this.resolver = base;
-	this.ts = ts;
-        this.pkg = pkg;
+        this.resolver = base;
+        this.ts = ts;
         this.sourceName = src;
+        this.sourcePos = src != null ? new Position(src) : null;
+        this.pkg = pkg;
 
 	this.map = new HashMap();
 	this.packageImports = new ArrayList();
-        this.classImports = new ArrayList();
+	this.lazyImports = new ArrayList();
     }
 
     public Package package_() {
         return pkg;
     }
 
-    public void addClassImport(String className) throws SemanticException {
-	Types.report(1, this + ": class import " + className);
-
-        // Bring the class in now.
-        Type t = resolver.findType(className);
-        String shortName = StringUtil.getShortNameComponent(className);
-
-        Types.report(1, this + ": import " + shortName + " as " + t);
-
-        if (map.containsKey(shortName)) {
-            Type s = (Type) map.get(shortName);
-
-            if (! ts.isSame(s, t)) {
-                throw new SemanticException("Class " + shortName +
-                    " already defined as " + map.get(shortName),
-                    new Position(sourceName));
-            }
-        }
-
-        map.put(className, t);
-        map.put(shortName, t);
-
-        classImports.add(className);
+    public void addClassImport(String className) {
+	Types.report(1, this + ": lazy import " + className);
+	lazyImports.add(className);
     }
 
     public void addPackageImport(String pkgName) {
@@ -82,6 +65,8 @@ public class ImportTable extends ClassResolver
 	// FIXME: need to keep on looking to find conflicts.
 	Types.report(1, this + ".findType(" + name + ")");
 
+	/* First add any lazy imports. */
+	lazyImport();
 
 	if (StringUtil.isNameShort(name)) {
 	    // First see if we have a mapping already.
@@ -100,7 +85,7 @@ public class ImportTable extends ClassResolver
             imports.addAll(ts.defaultPackageImports());
             imports.addAll(packageImports);
 
-	    // It wasn't a class import.  Maybe it was a package import?
+            // It wasn't a ClassImport.  Maybe it was a PackageImport?
 	    for (Iterator iter = imports.iterator(); iter.hasNext(); ) {
 		String pkgName = (String) iter.next();
 		String fullName = pkgName + "." + name;
@@ -136,7 +121,7 @@ public class ImportTable extends ClassResolver
 		t.toClass().flags().isPackage() && this.pkg != null) {
 	      // Not visible.
 	      throw new NoClassException("Class \"" + name + "\" not found.",
-                                         new Position(sourceName));
+					 sourcePos);
 	    }
 
 	    // Memoize.
@@ -147,6 +132,47 @@ public class ImportTable extends ClassResolver
 
 	// The name was long.
 	return resolver.findType(name);
+    }
+
+    protected void lazyImport() throws SemanticException {
+	if (lazyImports.isEmpty()) {
+            return;
+	}
+
+	for (int i = 0; i < lazyImports.size(); i++) {
+	    String longName = (String) lazyImports.get(i);
+
+	    Types.report(1, this + ": import " + longName);
+
+	    try {
+		Type t = resolver.findType(longName);
+		String shortName = StringUtil.getShortNameComponent(longName);
+
+		Types.report(1, this + ": import " + shortName + " as " + t);
+
+		if (map.containsKey(shortName)) {
+		    Type s = (Type) map.get(shortName);
+
+		    if (! ts.isSame(s, t)) {
+			throw new SemanticException("Class " + shortName +
+			    " already defined as " + map.get(shortName),
+                            sourcePos);
+		    }
+		}
+
+		map.put(longName, t);
+		map.put(shortName, t);
+	    }
+	    catch (SemanticException e) {
+                if (e.position() == null) {
+                    throw new SemanticException(e.getMessage(), sourcePos);
+                }
+
+                throw e;
+	    }
+	}
+
+	lazyImports = new ArrayList();
     }
 
     public String toString() {
