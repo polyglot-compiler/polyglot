@@ -1,4 +1,4 @@
-class Outer6 {
+public class Outer6 {
     Outer5.Member foo() {
 	return new Outer5.Member();
     }

@@ -27,42 +27,42 @@ Except4.jl:2: Type "Except4" is not a subclass of "java.lang.Throwable".
                   ^
 
 1 error.
-/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoInit.java:9: variable i might not have been initialized
+/home/nystrom/jl/j.multiple-sources/jltools/jltools/ext/jl/tests/NoInit.java:7: variable i might not have been initialized
             this.foo(i);
                      ^
-/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoInit.java:20: variable i might not have been initialized
+/home/nystrom/jl/j.multiple-sources/jltools/jltools/ext/jl/tests/NoInit.java:18: variable i might not have been initialized
             this.foo(i);
                      ^
-/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoInit.java:29: unreachable statement
+/home/nystrom/jl/j.multiple-sources/jltools/jltools/ext/jl/tests/NoInit.java:27: unreachable statement
                     i = 3;
                     ^
-/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoInit.java:31: variable i might not have been initialized
+/home/nystrom/jl/j.multiple-sources/jltools/jltools/ext/jl/tests/NoInit.java:29: variable i might not have been initialized
             this.foo(i);
                      ^
-/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoInit.java:61: variable j might not have been initialized
+/home/nystrom/jl/j.multiple-sources/jltools/jltools/ext/jl/tests/NoInit.java:59: variable j might not have been initialized
             this.foo(j);
                      ^
-/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoInit.java:77: variable i might not have been initialized
+/home/nystrom/jl/j.multiple-sources/jltools/jltools/ext/jl/tests/NoInit.java:75: variable i might not have been initialized
             this.foo(i);
                      ^
 6 errors
-/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoReturns.java:4: missing return statement
+/home/nystrom/jl/j.multiple-sources/jltools/jltools/ext/jl/tests/NoReturns.java:2: missing return statement
     int m1() {  }
              ^
-/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoReturns.java:8: missing return statement
+/home/nystrom/jl/j.multiple-sources/jltools/jltools/ext/jl/tests/NoReturns.java:6: missing return statement
     int m3() { while (true) { if (true) { break; } } }
              ^
-/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoReturns.java:10: missing return statement
+/home/nystrom/jl/j.multiple-sources/jltools/jltools/ext/jl/tests/NoReturns.java:8: missing return statement
     int m4() { l1: while (true) { l2: while (true) { break l1; } } }
              ^
-/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoReturns.java:25: missing return statement
+/home/nystrom/jl/j.multiple-sources/jltools/jltools/ext/jl/tests/NoReturns.java:23: missing return statement
         {
         ^
-/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoReturns.java:36: missing return statement
+/home/nystrom/jl/j.multiple-sources/jltools/jltools/ext/jl/tests/NoReturns.java:34: missing return statement
         {
         ^
 5 errors
-Unreachable.jl:52: Syntax error.
+Unreachable.jl:50: Syntax error.
       System.out.println("ouch!"); // BAD (52)
       ^
 
@@ -91,10 +91,9 @@ BadCtor.jl:3: Cannot declare a constructor inside an anonymous class.
                            ^
 
 2 errors.
-BadExcept.jl:11: Cannot override method void method1() in
-    polyj.tests.bad.semant.Except1 with method void method1() throws
-    polyj.tests.bad.semant.e1 in polyj.tests.bad.semant.Except1sub; throws
-    more exceptions than overridden method.
+BadExcept.jl:9: Cannot override method void method1() in Except1 with method
+    void method1() throws e1 in Except1sub; throws more exceptions than
+    overridden method.
   void method1() throws e1 {}
        ^
 
@@ -176,7 +175,7 @@ class C0 implements I0
                     ^
 
 1 error.
-/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/BadOverride.java:91: method() in polyj.tests.bad.semant.Sub cannot implement method() in polyj.tests.bad.semant.Override; attempting to assign weaker access privileges; was public
+/home/nystrom/jl/j.multiple-sources/jltools/jltools/ext/jl/tests/BadOverride.java:85: method() in Sub cannot implement method() in Override; attempting to assign weaker access privileges; was public
 class Sub implements Override {
 ^
 1 error
@@ -209,7 +208,7 @@ Protection2.jl:6: Cannot override method final void f() in Protection2 with
        ^
 
 1 error.
-/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/BadStaticContext.java:10: cannot reference this before supertype constructor has been called
+/home/nystrom/jl/j.multiple-sources/jltools/jltools/ext/jl/tests/BadStaticContext.java:10: cannot reference this before supertype constructor has been called
             { super(this.m()); }
                     ^
 1 error

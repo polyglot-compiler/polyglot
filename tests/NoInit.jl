@@ -1,5 +1,3 @@
-package polyj.tests.bad.semant;
-
 // This tests whether we detect variables which are used before they get
 // initialized.
 

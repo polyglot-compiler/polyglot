@@ -1,5 +1,3 @@
-package polyj.tests.bad.semant;
-
 // This tests whether we detect reachable code properly.
 
 public class Reachable {

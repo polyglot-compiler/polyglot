@@ -1,5 +1,3 @@
-package polyj.tests.bad.semant;
-
 // This tests whether we detect methods without return statements properly.
 
 public class NoReturns {

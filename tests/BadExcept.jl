@@ -1,5 +1,3 @@
-package polyj.tests.bad.semant;
-
 class Except1 {
   void method1() {}
   void method2() throws e1 {}
