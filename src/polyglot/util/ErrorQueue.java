@@ -59,8 +59,8 @@ public class ErrorQueue
 	err.print(prefix + ":");
 	width += prefix.length() + 1;
 
-	int lmargin = width + 1;
-	int rmargin = 80;
+	int lmargin = 4;
+	int rmargin = 78;
 
 	StringTokenizer st = new StringTokenizer(message, " ");
 
