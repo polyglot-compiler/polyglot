@@ -11,7 +11,7 @@ SOURCES = \
 	LHS.java \
 	Loop.java \
 	CodeDecl.java \
-	Computation.java \
+	Term.java \
 	Assert.java \
 	AmbPrefix.java \
 	AmbQualifierNode.java \
@@ -37,7 +37,6 @@ SOURCES = \
 	Conditional.java \
 	ConstructorCall.java \
 	ConstructorDecl.java \
-	Declarator.java \
 	Disamb.java \
 	Del.java \
 	Do.java \

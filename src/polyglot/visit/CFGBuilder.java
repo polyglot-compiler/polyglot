@@ -30,10 +30,10 @@ public class CFGBuilder implements Copy
      * statements and for exception throws.  When such a jump is encountered we
      * traverse the stack, searching for the target of the jump.
      */
-    Stmt current_block;
+    Stmt innermostTarget;
 
     /**
-     * List of terms on the path to the current finally block.  If we are
+     * List of terms on the path to the innermost finally block.  If we are
      * constructing a CFG for a finally block, this is the sequence of terms
      * that caused entry into this and lexically enclosing finally blocks.
      * We construct a unique subgraph for each such path. The list
@@ -57,7 +57,7 @@ public class CFGBuilder implements Copy
         this.df = df;
         this.path_to_finally = Collections.EMPTY_LIST;
         this.outer = null;
-        this.current_block = null;
+        this.innermostTarget = null;
         this.skipInnermostCatches = false;
     }
 
@@ -91,14 +91,9 @@ public class CFGBuilder implements Copy
     public CFGBuilder push(Stmt n, boolean skipInnermostCatches) {
         CFGBuilder v = (CFGBuilder) copy();
         v.outer = this;
-        v.current_block = n;
+        v.innermostTarget = n;
         v.skipInnermostCatches = skipInnermostCatches;
         return v;
-    }
-
-    /** Get the CFGBuilder for the outer block. */
-    public CFGBuilder outer() {
-        return outer;
     }
 
     /**
@@ -109,8 +104,8 @@ public class CFGBuilder implements Copy
       Term last = b;
       CFGBuilder last_visitor = this;
 
-      for (CFGBuilder v = this; v != null; v = v.outer()) {
-        Term c = v.current_block;
+      for (CFGBuilder v = this; v != null; v = v.outer) {
+        Term c = v.innermostTarget;
 
         if (c instanceof Try) {
           Try tr = (Try) c;
@@ -174,8 +169,8 @@ public class CFGBuilder implements Copy
       Term last = r;
       CFGBuilder last_visitor = this;
 
-      for (CFGBuilder v = this; v != null; v = v.outer()) {
-        Term c = v.current_block;
+      for (CFGBuilder v = this; v != null; v = v.outer) {
+        Term c = v.innermostTarget;
 
         if (c instanceof Try) {
           Try tr = (Try) c;
@@ -277,8 +272,8 @@ public class CFGBuilder implements Copy
       Term last = t;
       CFGBuilder last_visitor = this;
 
-      for (CFGBuilder v = this; v != null; v = v.outer()) {
-        Term c = v.current_block;
+      for (CFGBuilder v = this; v != null; v = v.outer) {
+        Term c = v.innermostTarget;
 
         if (c instanceof Try) {
           Try tr = (Try) c;
@@ -314,7 +309,7 @@ public class CFGBuilder implements Copy
     /** Create edges for a try finally block. */
     public CFGBuilder tryFinally(CFGBuilder v, Term last,
                                  CFGBuilder last_visitor, Term f) {
-        CFGBuilder v_ = v.outer().enterFinally(last);
+        CFGBuilder v_ = v.outer.enterFinally(last);
         v_.edge(last_visitor, last, f.entry());
         v_.visitCFG(f, Collections.EMPTY_LIST);
         return v_;
