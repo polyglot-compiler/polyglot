@@ -4,6 +4,6 @@ package polyglot.ast;
  * A <code>Stmt</code> represents any Java statement.  All statements must
  * be subtypes of Statement.
  */
-public interface Stmt extends Node
+public interface Stmt extends Computation
 {
 }

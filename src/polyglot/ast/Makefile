@@ -8,6 +8,7 @@ SOURCES = \
 	NodeFactory.java \
 	AmbExpr.java \
 	Ambiguous.java \
+	Computation.java \
 	AmbPrefix.java \
 	AmbQualifierNode.java \
 	AmbReceiver.java \
