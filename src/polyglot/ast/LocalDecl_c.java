@@ -232,11 +232,14 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        boolean semi = tr.appendSemicolon(true);
+        boolean printSemi = tr.appendSemicolon(true);
+        boolean printType = tr.printType(true);
 
         w.write(flags.translate());
-        print(type, w, tr);
-        w.write(" ");
+        if (printType) {
+            print(type, w, tr);
+            w.write(" ");
+        }
         w.write(name);
 
         if (init != null) {
@@ -245,11 +248,12 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
             print(init, w, tr);
         }
 
-        if (semi) {
+        if (printSemi) {
             w.write(";");
         }
 
-        tr.appendSemicolon(semi);
+        tr.printType(printType);
+        tr.appendSemicolon(printSemi);
     }
 
     public void dump(CodeWriter w) {

@@ -7,6 +7,7 @@ GOOD =  \
 	Constants3.jl \
 	Constants4.jl \
 	Constants5.jl \
+	Constants6.jl \
 	Ctor.jl \
 	Dep1.jl \
 	Empty.jl \
@@ -27,9 +28,11 @@ GOOD =  \
 	FinalInit5.jl \
 	FinalInit6.jl \
 	FinalInit7.jl \
+	ForInit.jl \
 	ForwardRef.jl \
 	ForwardRef2.jl \
 	ForwardRef3.jl \
+	ForwardRef4.jl \
 	Infinite.jl \
 	Init1.jl \
 	Init2.jl \
@@ -52,6 +55,7 @@ GOOD =  \
 	LocalClass.jl \
 	LocalClass2.jl \
 	LocalClass3.jl \
+	LocalInit.jl \
 	Narrowing.jl \
 	Prim.jl \
 	Return1.jl \
@@ -61,6 +65,7 @@ GOOD =  \
 	Return5.jl \
 	Semicolon.jl \
 	SemicolonClass.jl \
+	Statements.jl \
 	StaticContext.jl \
 	StaticOps.jl \
 	Switch1.jl \

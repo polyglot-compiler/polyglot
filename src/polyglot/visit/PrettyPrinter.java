@@ -17,6 +17,7 @@ import java.util.*;
 public class PrettyPrinter
 {
     protected boolean appendSemicolon = true;
+    protected boolean printType = true;
 
     public PrettyPrinter() {
     }
@@ -32,6 +33,20 @@ public class PrettyPrinter
     public boolean appendSemicolon(boolean a) {
         boolean old = this.appendSemicolon;
         this.appendSemicolon = a;
+	return old;
+    }
+
+    /** Flag indicating whether to print the type in a local declaration.
+     * This is used when pretty-printing for loops. */
+    public boolean printType() {
+        return printType;
+    }
+
+    /** Set a flag indicating whether to print type type in a local declaration.
+     * This is used when pretty-printing for loops. */
+    public boolean printType(boolean a) {
+        boolean old = this.printType;
+        this.printType = a;
 	return old;
     }
 

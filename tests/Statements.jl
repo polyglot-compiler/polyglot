@@ -1,8 +1,3 @@
-
-package test;
-
-import polyglot.types.*;
-
 public class Statements
 {
    Object o;
@@ -25,7 +20,6 @@ public class Statements
       for( int x = 0, y = 0; x < y * y; x++, y++)
         System.out.println( "x: " + x + " y: " + y);
 
-      TypeSystem ts = new StandardTypeSystem();
       Statements s = new Statements();
       Constants c = new Constants();
 

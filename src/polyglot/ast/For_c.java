@@ -105,6 +105,29 @@ public class For_c extends Loop_c implements For
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
+        // Check that all initializers have the same type.
+        // This should be enforced by the parser, but check again here,
+        // just to be sure.
+        Type t = null;
+
+        for (Iterator i = inits.iterator(); i.hasNext(); ) {
+            ForInit s = (ForInit) i.next();
+
+            if (s instanceof LocalDecl) {
+                LocalDecl d = (LocalDecl) s;
+                Type dt = d.type().type();
+                if (t == null) {
+                    t = dt;
+                }
+                else if (! t.equals(dt)) {
+                    throw new InternalCompilerError("Local variable " +
+                        "declarations in a for loop initializer must all " +
+                        "be the same type, in this case " + t + ", not " +
+                        dt + ".", d.position());
+                }
+            }
+        }
+
 	if (cond != null &&
 	    ! ts.isImplicitCastValid(cond.type(), ts.Boolean())) {
 	    throw new SemanticException(
@@ -131,9 +154,11 @@ public class For_c extends Loop_c implements For
 	w.begin(0);
 
 	if (inits != null) {
+            boolean first = true;
 	    for (Iterator i = inits.iterator(); i.hasNext(); ) {
 		ForInit s = (ForInit) i.next();
-	        printForInit(s, w, tr);
+	        printForInit(s, w, tr, first);
+                first = false;
 
 		if (i.hasNext()) {
 		    w.write(",");
@@ -174,9 +199,11 @@ public class For_c extends Loop_c implements For
 	return "for (...) ...";
     }
 
-    private void printForInit(ForInit s, CodeWriter w, PrettyPrinter tr) {
+    private void printForInit(ForInit s, CodeWriter w, PrettyPrinter tr, boolean printType) {
         tr.appendSemicolon(false);
+        tr.printType(printType);
         printBlock(s, w, tr);
+        tr.printType(printType);
         tr.appendSemicolon(true);
     }
 

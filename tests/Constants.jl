@@ -1,5 +1,3 @@
-package test;
-
 /*
  * This class defines a number of useful constants...
  */
