@@ -54,7 +54,7 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
     protected void initTypeSystem() {
 	try {
             LoadedClassResolver lr;
-            lr = new SourceClassResolver(compiler, this, options.constructFullClasspath(),
+            lr = new SourceClassResolver(compiler, this, getOptions().constructFullClasspath(),
                                          compiler.loader(), true);
             ts.initialize(lr);
 	}
@@ -70,10 +70,6 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
 
     public String compilerName() {
 	return "jlc";
-    }
-
-    public String options() {
-	return "";
     }
 
     public polyglot.main.Version version() {

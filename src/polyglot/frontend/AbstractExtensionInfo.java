@@ -18,7 +18,7 @@ import java.util.*;
  */
 public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected Compiler compiler;
-    protected Options options;
+    private Options options;
     protected TypeSystem ts = null;
     protected NodeFactory nf = null;
     protected SourceLoader source_loader = null;
@@ -135,7 +135,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         while (! job.pendingPasses().isEmpty()) {
             Pass pass = (Pass) job.pendingPasses().get(0);
 
-            if (options.disable_passes.contains(pass.name())) {
+            if (getOptions().disable_passes.contains(pass.name())) {
                 if (Report.should_report(Report.frontend, 1))
                     Report.report(1, "Skipping pass " + pass);
             }
@@ -164,7 +164,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
                     Report.should_report.pop();
 
-                    if (options.dump_ast.contains(pass.name())) {
+                    if (getOptions().dump_ast.contains(pass.name())) {
                         System.err.println("--------------------------------" +
                                            "--------------------------------");
                         System.err.println("Dumping AST for " + job +
@@ -277,7 +277,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     }
 
     public String fileExtension() {
-	String sx = options == null ? null : options.source_ext;
+	String sx = getOptions() == null ? null : getOptions().source_ext;
 
 	if (sx == null) {
 	    sx = defaultFileExtension();
@@ -288,7 +288,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     public SourceLoader sourceLoader() {
         if (source_loader == null) {
-            source_loader = new SourceLoader(this, options.source_path);
+            source_loader = new SourceLoader(this, getOptions().source_path);
         }
 
         return source_loader;
@@ -296,9 +296,9 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     public TargetFactory targetFactory() {
         if (target_factory == null) {
-            target_factory = new TargetFactory(options.output_directory,
-                                               options.output_ext,
-                                               options.output_stdout);
+            target_factory = new TargetFactory(getOptions().output_directory,
+                                               getOptions().output_ext,
+                                               getOptions().output_stdout);
         }
         
         return target_factory;
