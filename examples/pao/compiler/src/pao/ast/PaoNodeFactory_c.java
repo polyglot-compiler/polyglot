@@ -1,25 +1,17 @@
 package polyglot.ext.pao.ast;
 
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.*;
-import polyglot.ext.pao.extension.*;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.ext.jl.ast.NodeFactory_c;
 
 /**
- * NodeFactory for pao extension.
+ * <code>NodeFactory</code> implementation for the pao extension.
+ * The node factory is responsible for creating AST nodes. 
  */
 public class PaoNodeFactory_c extends NodeFactory_c {
     public PaoNodeFactory_c() {
-        super(new PaoExtFactory_c());
-    }
-    protected PaoNodeFactory_c(ExtFactory extFact) {
-        super(extFact);
-    }
-
-    public Instanceof Instanceof(Position pos, Expr expr, TypeNode type) {
-        Instanceof n = new Instanceof_c(pos, expr, type);
-        n = (Instanceof)n.ext(extFactory().extInstanceof());
-        return (Instanceof)n.del(new PaoInstanceofDel_c());
+    	// Set the ExtFactory to be PaoExtFactory_c, 
+    	// and the DelFactory to be PaoDelFactory_c.
+    	// this will ensure that the correct Ext and Del
+    	// objects are created for the pao extension.
+        super(new PaoExtFactory_c(), new PaoDelFactory_c());
     }
 }
