@@ -11,11 +11,16 @@ CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 $(SOURCE)/classes:
 	mkdir $(SOURCE)/classes
 
-all: $(CLASSES) $(SOURCE)/classes
+all: parse $(CLASSES) $(SOURCE)/classes
 	$(subdirs)
+
+parse: FORCE
+	$(MAKE) -C parse all
 
 release: release_src
 	$(subdirs)
 
 clean clobber: cleanclasses
 	$(subdirs)
+
+FORCE:
