@@ -1,6 +1,7 @@
 package polyglot.types.reflect;
 
 import polyglot.main.Report;
+import polyglot.util.InternalCompilerError;
 
 import java.io.*;
 import java.util.*;
@@ -39,100 +40,115 @@ public class ClassFileLoader
         }
 
         try {
-            if (dir.isDirectory()) {
-                StringBuffer filename = new StringBuffer(name.length() + 8);
-                filename.append(name);
-                // our own replace, to save a suprising amount of memory
-                for (int i = 0; i < filename.length(); i++) {
-                    if (filename.charAt(i) == '.') 
-                        filename.setCharAt(i, File.separatorChar);
-                }
-                filename.append(".class");
-                
-                File file = new File(dir, filename.toString());
-
-                if (file.exists()) {
-                    if (Report.should_report(verbose, 3))
-			Report.report(3, "found " + file);
-                    FileInputStream in = new FileInputStream(file);
-                    ClassFile c = loadFromStream(in, name);
-                    in.close();
-                    return c;
-                }
+            if (dir.getName().endsWith(".jar")) {
+                return loadFromJar(name, dir);
             }
-            else if (dir.getName().endsWith(".jar")) {
-                Object o = jarCache.get(dir);
-                if (o != not_found) {
-                    JarFile jar = (JarFile)o;
-                    if (jar == null) { 
-                        // the jar is not in the cache.
-                        // try to get it.
-                        if (!dir.exists()) {
-                            // record that the file does not exist, 
-                            jarCache.put(dir, not_found);
-                        }
-                        else {
-                            // get the jar and put it in the cache.
-                            if (Report.should_report(verbose, 2))
-                                Report.report(2, "Opening jar " + dir);
-                            jar = new JarFile(dir);
-                            jarCache.put(dir, jar);                            
-                        }
-                    }
-                    if (jar != null) {
-                        String entryName = name.replace('.', '/') + ".class";
-                        JarEntry entry = jar.getJarEntry(entryName);
-                        if (entry != null) {
-                            if (Report.should_report(verbose, 3))
-        			Report.report(3, "found jar entry " + entry);
-                            InputStream in = jar.getInputStream(entry);
-                            ClassFile c = loadFromStream(in, name);
-                            in.close();
-                            return c;
-                        }
-                    }
-                }
-            }
+            else if (dir.isDirectory()) {
+                return loadFromFile(name, dir);
+            } 
             else if (dir.getName().endsWith(".zip")) {
-                Object o = jarCache.get(dir);
-                if (o != not_found) {
-                    ZipFile zip = (ZipFile)o;
-                    if (zip == null) { 
-                        // the zip is not in the cache.
-                        // try to get it.
-                        if (!dir.exists()) {
-                            // record that the file does not exist, 
-                            jarCache.put(dir, not_found);
-                        }
-                        else {
-                            // get the zip and put it in the cache.
-                            if (Report.should_report(verbose, 2))
-                                Report.report(2, "Opening zip " + dir);
-                            zip = new ZipFile(dir);
-                            jarCache.put(dir, zip);                            
-                        }
-                    }
-                    if (zip != null) {
-                        String entryName = name.replace('.', '/') + ".class";
-                        ZipEntry entry = zip.getEntry(entryName);
-                        if (entry != null) {
-                            if (Report.should_report(verbose, 3))
-                                Report.report(3, "found zip entry " + entry);
-                            InputStream in = zip.getInputStream(entry);
-                            ClassFile c = loadFromStream(in, name);
-                            in.close();
-                            return c;
-                        }
-                    }
-                }
+                return loadFromZip(name, dir);
             }
         }
+        catch (FileNotFoundException e) {
+            // ignore the exception.
+        }
         catch (IOException e) {
+            throw new InternalCompilerError(e);
         }
 
         return null;
     }
 
+    ClassFile loadFromJar(String name, File dir) throws IOException {
+        Object o = jarCache.get(dir);
+        if (o != not_found) {
+            JarFile jar = (JarFile)o;
+            if (jar == null) { 
+                // the jar is not in the cache.
+                // try to get it.
+                if (!dir.exists()) {
+                    // record that the file does not exist, 
+                    jarCache.put(dir, not_found);
+                }
+                else {
+                    // get the jar and put it in the cache.
+                    if (Report.should_report(verbose, 2))
+                        Report.report(2, "Opening jar " + dir);
+                    jar = new JarFile(dir);
+                    jarCache.put(dir, jar);                            
+                }
+            }
+            if (jar != null) {
+                String entryName = name.replace('.', '/') + ".class";
+                JarEntry entry = jar.getJarEntry(entryName);
+                if (entry != null) {
+                    if (Report.should_report(verbose, 3))
+            Report.report(3, "found jar entry " + entry);
+                    InputStream in = jar.getInputStream(entry);
+                    ClassFile c = loadFromStream(in, name);
+                    in.close();
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+    ClassFile loadFromZip(String name, File dir) throws IOException {
+        Object o = jarCache.get(dir);
+        if (o != not_found) {
+            ZipFile zip = (ZipFile)o;
+            if (zip == null) { 
+                // the zip is not in the cache.
+                // try to get it.
+                if (!dir.exists()) {
+                    // record that the file does not exist, 
+                    jarCache.put(dir, not_found);
+                }
+                else {
+                    // get the zip and put it in the cache.
+                    if (Report.should_report(verbose, 2))
+                        Report.report(2, "Opening zip " + dir);
+                    zip = new ZipFile(dir);
+                    jarCache.put(dir, zip);                            
+                }
+            }
+            if (zip != null) {
+                String entryName = name.replace('.', '/') + ".class";
+                ZipEntry entry = zip.getEntry(entryName);
+                if (entry != null) {
+                    if (Report.should_report(verbose, 3))
+                        Report.report(3, "found zip entry " + entry);
+                    InputStream in = zip.getInputStream(entry);
+                    ClassFile c = loadFromStream(in, name);
+                    in.close();
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+    
+    ClassFile loadFromFile(String name, File dir) throws IOException {
+        StringBuffer filename = new StringBuffer(name.length() + 8);
+        filename.append(name);
+        // our own replace, to save a suprising amount of memory
+        for (int i = 0; i < filename.length(); i++) {
+            if (filename.charAt(i) == '.') 
+                filename.setCharAt(i, File.separatorChar);
+        }
+        filename.append(".class");
+                
+        File file = new File(dir, filename.toString());
+                
+        FileInputStream in = new FileInputStream(file);
+        if (Report.should_report(verbose, 3))
+            Report.report(3, "found " + file);
+        ClassFile c = loadFromStream(in, name);
+        in.close();
+        return c;
+    }
+    
     /**
      * Load a class from an input stream.
      */
