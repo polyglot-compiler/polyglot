@@ -18,9 +18,9 @@ import polyglot.ast.Assert;
  * This program is released under the terms of the GPL; see the file
  * COPYING for more details.  There is NO WARRANTY on this code.
  *
- * As a special exception, C. Scott Ananian additionally permits the use of
- * this modified version of the parser, distributed with Polyglot, under
- * the terms of the LGPL.
+ * As a special exception, C. Scott Ananian additionally permits the
+ * distribution of this modified version of the parser and its derivatives
+ * under the terms of the LGPL.
  *
  * extended to support Java 1.4 (assert keyword).
  */
