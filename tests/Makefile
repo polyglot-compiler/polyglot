@@ -13,6 +13,7 @@ GOOD =  \
 	Except3.jl \
 	Except4.jl \
 	Except5.jl \
+	Except6.jl \
 	Field.jl \
 	FieldAccess.jl \
 	FinalInit1.jl \
