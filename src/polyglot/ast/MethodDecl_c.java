@@ -247,6 +247,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     /** Type check the method. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
+
 	try {
 	    ts.checkMethodFlags(flags());
 	}
@@ -299,7 +300,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     }
 
     protected void overrideMethodCheck(TypeChecker tc) throws SemanticException {
-    TypeSystem ts = tc.typeSystem();
+        TypeSystem ts = tc.typeSystem();
 
         for (Iterator j = mi.implemented().iterator(); j.hasNext(); ) {
             MethodInstance mj = (MethodInstance) j.next();

@@ -3,8 +3,6 @@ LOG=log
 GOOD =  \
 	ArrayInit.jl \
 	Conditional1.jl \
-	ConformanceCheck1.jl \
-	ConformanceCheck2.jl \
 	ConformanceCheck3.jl \
 	Constants.jl \
 	Constants2.jl \
@@ -89,6 +87,8 @@ GOOD =  \
 	xIterator.jl
 
 BAD = \
+	ConformanceCheck1.jl \
+	ConformanceCheck2.jl \
 	BadAbstract.jl \
 	BadAlloc.jl \
 	BadCtor.jl \
