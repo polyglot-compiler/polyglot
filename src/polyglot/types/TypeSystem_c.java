@@ -1627,10 +1627,6 @@ public class TypeSystem_c implements TypeSystem
 		f.clear(TOP_LEVEL_CLASS_FLAGS) + ".");
 	}
 
-        if (f.isStrictFP() && f.isInterface()) {
-            throw new SemanticException("Cannot declare a strictfp interface.");
-        }
-
         if (f.isFinal() && f.isInterface()) {
             throw new SemanticException("Cannot declare a final interface.");
         }
