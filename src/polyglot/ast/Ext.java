@@ -1,5 +1,6 @@
 package polyglot.ast;
 
+import polyglot.util.CodeWriter;
 import polyglot.util.Copy;
 
 /**
@@ -24,4 +25,9 @@ public interface Ext extends Copy
 
     /** Set the extension of this extension. */
     Ext ext(Ext ext);
+
+    /**
+     * Dump the AST node for debugging purposes.
+     */
+    void dump(CodeWriter w);
 }

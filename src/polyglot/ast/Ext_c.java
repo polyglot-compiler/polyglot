@@ -87,4 +87,11 @@ public abstract class Ext_c implements Ext {
     public String toString() {
         return StringUtil.getShortNameComponent(getClass().getName());
     }
+
+    /**
+     * Dump the AST node for debugging purposes.
+     */
+    public void dump(CodeWriter w) {
+      w.write(toString());
+    }
 }

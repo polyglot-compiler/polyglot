@@ -378,7 +378,9 @@ public abstract class Node_c implements Node
 
         w.allowBreak(4, " ");
         w.begin(0);
-        w.write("(ext " + ext() + ")");
+        w.write("(ext ");
+	ext().dump(w);
+	w.write(")");
         w.end();
 
         w.allowBreak(4, " ");
