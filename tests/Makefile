@@ -1,3 +1,5 @@
+LOG=log
+
 GOOD =  \
 	ArrayInit.jl \
 	Ctor.jl \
@@ -65,8 +67,6 @@ good: $(GOOD)
 	-rm -f $(GOOD_OUTPUT) good.log
 	cat /dev/null > good.log
 	$(MAKE) LOG=good.log $(GOOD_OUTPUT)
-	sed 's%.*/\([A-Za-z0-9_]\.java\)%\1%g' good.log > good.log.x
-	mv good.log.x good.log
 	@if cmp -s good.log.in good.log; then \
 	    echo "LOG UNCHANGED"; \
 	    diff good.log.in good.log; \
@@ -79,8 +79,6 @@ bad: $(BAD)
 	-rm -f $(BAD_OUTPUT) bad.log
 	cat /dev/null > bad.log
 	$(MAKE) LOG=bad.log $(BAD_OUTPUT)
-	sed 's%.*/\([A-Za-z0-9_]\.java\)%\1%g' bad.log > bad.log.x
-	mv bad.log.x bad.log
 	@if cmp -s bad.log.in bad.log; then \
 	    echo "LOG UNCHANGED"; \
 	    diff bad.log.in bad.log; \
@@ -97,4 +95,5 @@ clean:
 
 .jl.java:
 	@-rm -f *.class
-	-jlc $< 2>&1 | tee -a $(LOG)
+	@-echo jlc $<
+	@-jlc $< 2>&1 | sed 's%^.*/\([A-Za-z0-9_]*\.java:\)%\1%g' | tee -a $(LOG)
