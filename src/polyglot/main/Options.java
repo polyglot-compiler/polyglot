@@ -190,7 +190,9 @@ public class Options {
             StringTokenizer st = new StringTokenizer(args[i], File.pathSeparator);
             while(st.hasMoreTokens())
             {
-                source_path.add(new File(st.nextToken()));
+                File f = new File(st.nextToken());
+                if (!source_path.contains(f))
+                    source_path.add(f);
             }
             i++;
         }
@@ -302,7 +304,9 @@ public class Options {
         }        
         else if (!args[i].startsWith("-")) {
             source.add(args[i]);
-            source_path.add(new File(args[i]).getParentFile());
+            File f = new File(args[i]).getParentFile();
+            if (!source_path.contains(f))
+                source_path.add(f);
             i++;
         }
         
