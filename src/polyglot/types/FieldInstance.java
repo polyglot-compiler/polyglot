@@ -5,6 +5,7 @@
 package jltools.types;
 
 import jltools.util.AnnotatedObject;
+import jltools.util.InternalCompilerError;
 
 /**
  * FieldInstance
@@ -24,6 +25,7 @@ public class FieldInstance extends AnnotatedObject
     this.type = fieldType;
     this.enclosingType = enclosingType;
     this.flags = fieldFlags.copy();
+    LValue = null;
   }
 
   public AccessFlags getAccessFlags() { return flags.copy(); }
@@ -31,8 +33,18 @@ public class FieldInstance extends AnnotatedObject
   public void setType( Type type) { this.type = type; }
   public String getName()       { return name; }
   public Type getEnclosingType() { return enclosingType; }
+  public void setConstantValue(long i) { LValue = new Long ( i) ; }
+  public boolean isConstant() { return LValue != null; }
+  public int getConstantValue() 
+  { 
+    if ( LValue == null) throw new InternalCompilerError(
+         "Tried to obtain constant value on a non-constant field.");
+    return (int)LValue.longValue();
+  }
 
   private String name;
   private Type type, enclosingType;
   private AccessFlags flags;
+  // used for constant values of 
+  Long LValue;
 }

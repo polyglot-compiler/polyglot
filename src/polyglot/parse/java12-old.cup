@@ -1108,10 +1108,12 @@ switch_labels ::=
 	;
 switch_label ::=
 					// SwitchStatement.CaseStatement
-		CASE constant_expression:a COLON
-			{: RESULT = new SwitchStatement.CaseStatement(a); :}
-	|	DEFAULT COLON
-			{: RESULT = new SwitchStatement.CaseStatement(); :}
+		CASE:n constant_expression:a COLON
+			{: RESULT = (SwitchStatement.CaseStatement)Grm.ln( 
+ 				new SwitchStatement.CaseStatement(a), n); :}
+	|	DEFAULT:n COLON
+			{: RESULT = (SwitchStatement.CaseStatement)Grm.ln( 
+ 				new SwitchStatement.CaseStatement(), n); :}
 	;
 
 while_statement ::=

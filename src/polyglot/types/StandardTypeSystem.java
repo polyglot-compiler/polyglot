@@ -815,7 +815,9 @@ public class StandardTypeSystem extends TypeSystem {
     
     ClassType tSuper = (ClassType)type1;
     
-    while ( ! type2.descendsFrom ( tSuper ) && tSuper != null) {
+    while ( ! ( type2.descendsFrom ( tSuper ) ||
+                type2.equals( tSuper )) &&
+            tSuper != null) {
       tSuper = (ClassType)tSuper.getSuperType();
     }
 

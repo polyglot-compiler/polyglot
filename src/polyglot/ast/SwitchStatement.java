@@ -4,7 +4,7 @@
 
 package jltools.ast;
 
-import jltools.types.LocalContext;
+import jltools.types.*;
 import jltools.util.*;
 
 import java.util.*;
@@ -25,9 +25,9 @@ public class SwitchStatement extends Statement {
     * Overview: An element of a switch statement.  This can either be
     * a case label, or a BlockStatement.
     */
-   public static abstract class SwitchElement {
-      public abstract SwitchElement copy();
-      public abstract SwitchElement deepCopy();
+   public static abstract class SwitchElement extends Statement {
+      public abstract Node copy();
+      public abstract Node  deepCopy();
    }
   
    /**
@@ -79,6 +79,71 @@ public class SwitchStatement extends Statement {
          expr = newExpr;
       }
 
+     public Object visitChildren ( NodeVisitor v)
+     {
+       expr = (Expression)expr.visit ( v );
+       return Annotate.getVisitorInfo ( expr );
+     }
+
+     public Node typeCheck( LocalContext c ) throws TypeCheckException
+     {
+
+       if ( def)
+       {
+         return this;
+       }
+
+       if ( ! expr.getCheckedType().isImplicitCastValid ( 
+                  c.getTypeSystem().getInt()))
+         throw new TypeCheckException ( "The case label must be a byte, char,"
+                                        + " short or int.");
+
+       if ( expr instanceof FieldExpression)
+       {
+         FieldInstance fi = ((FieldExpression)expr).getFieldInstance();
+         if ( fi == null)
+           throw new InternalCompilerError("Field Instance not defined!");
+         if ( ! fi.isConstant())
+           throw new TypeCheckException(" Case must be a constant.");
+         iValue = fi.getConstantValue();
+       }
+       else if (expr instanceof LocalVariableExpression)
+       {
+         FieldInstance fi = ((LocalVariableExpression)expr).getFieldInstance();
+         if ( fi == null)
+           throw new InternalCompilerError("Field Instance not defined!");
+         if ( ! fi.isConstant())
+           throw new TypeCheckException(" Case must be a constant.");
+         iValue = fi.getConstantValue();
+       }
+       else if ( expr instanceof IntLiteral)
+       {
+         iValue = (int)((IntLiteral)expr).getLongValue();
+       }
+       else
+         throw new TypeCheckException (" Cast must be a constant");
+       
+       return this;
+     }
+
+     public void translate( LocalContext c , CodeWriter w)
+     {
+       if (isDefault())
+         w.write("default: ");
+       else
+       {
+         w.write("case ");
+         getExpression().translate(c, w);
+         w.write(": " );
+       }
+     }
+
+     public Node dump ( CodeWriter cw)
+     {
+       return this;
+     }
+
+
       /**
        * Effects: If <def> is true, sets this CaseStatement to
        * represent a defualt label, else sets it to represent a typical
@@ -88,7 +153,7 @@ public class SwitchStatement extends Statement {
          this.def = def;
       }
 
-      public SwitchElement copy() {
+      public Node  copy() {
          if (def) {
             return new CaseStatement();
          }
@@ -97,7 +162,7 @@ public class SwitchStatement extends Statement {
          }
       }
 
-      public SwitchElement deepCopy() {
+      public Node deepCopy() {
          if (def) {
             return new CaseStatement();
          }
@@ -108,6 +173,7 @@ public class SwitchStatement extends Statement {
   
       private boolean def;
       private Expression expr;
+     private int iValue;
    }
 
    public static class SwitchBlock extends SwitchElement {
@@ -130,17 +196,40 @@ public class SwitchStatement extends Statement {
       }
 
       /**
-       * Effects: Sets the block statement associated with this to be <newBlock>.
+       * Effects: Sets the block statement associated with this to 
+       * be <newBlock>.
        */
       public void setBlock(BlockStatement newBlock) {
          block = newBlock;
       }
 
-      public SwitchElement copy() {
+     public Object visitChildren ( NodeVisitor v)
+     {
+       block = (BlockStatement)block.visit( v );
+       return null;
+     }
+
+     public Node typeCheck( LocalContext lc )
+     {
+       return this;
+     }
+
+     public void translate( LocalContext c , CodeWriter w)
+     {
+       block.translate(c, w);
+     }
+
+     public Node dump ( CodeWriter cw)
+     {
+       return this;
+     }
+
+
+      public Node copy() {
          return new SwitchBlock(block);
       }
 
-      public SwitchElement deepCopy() {
+      public Node deepCopy() {
          return new SwitchBlock((BlockStatement) block.deepCopy());
       }
     
@@ -218,25 +307,40 @@ public class SwitchStatement extends Statement {
     
     for (ListIterator it = switchElems.listIterator(); it.hasNext(); ) {
       SwitchElement se = (SwitchElement) it.next();
-      if (se instanceof CaseStatement) {
-        CaseStatement cs = (CaseStatement) se;
-        cs.expr = (Expression) cs.expr.visit( v);
-        vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( cs.expr), vinfo);
-      }
-      else {
-        SwitchBlock sb = (SwitchBlock) se;
-        sb.block = (BlockStatement) sb.block.visit( v);
-        vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( sb.block), vinfo);
-      }
+      it.set ( se.visit ( v) );
+      vinfo = v.mergeVisitorInfo ( Annotate.getVisitorInfo ( se ), vinfo );
+      
     }
 
     return vinfo;
   }
 
-   public Node typeCheck(LocalContext c)
+   public Node typeCheck(LocalContext c) throws TypeCheckException
    {
-      // FIXME: implement
-      return this;
+     //FIXME: add exceptions, return path stuff
+
+     List lDefinedCaseLabels = new ArrayList();
+     
+    for (ListIterator it = switchElems.listIterator(); it.hasNext(); ) {
+      SwitchElement se = (SwitchElement) it.next();
+
+      if ( se instanceof CaseStatement)
+      {
+        Object key;
+        if ( ((CaseStatement)se).def)
+          key = "default";
+        else
+          key = new Long ( ((CaseStatement)se).iValue);
+        
+        if ( lDefinedCaseLabels.contains( key ) )
+          throw new TypeCheckException( " Duplicate case label.", 
+                                        Annotate.getLineNumber( se ) );
+        lDefinedCaseLabels.add ( key );                                        
+      }
+      
+    }
+     
+     return this;
    }
 
    public void translate(LocalContext c, CodeWriter w)
@@ -253,22 +357,7 @@ public class SwitchStatement extends Statement {
       for (ListIterator it = switchElems.listIterator(); it.hasNext(); )
       {
          se = (SwitchElement) it.next();
-         if (se instanceof CaseStatement)
-         {
-            cs = (CaseStatement)se;
-            if (cs.isDefault())
-               w.write("default: ");
-            else
-            {
-               w.write("case ");
-               cs.getExpression().translate(c, w);
-               w.write(": " );
-            }
-         }
-         else if (se instanceof SwitchBlock)
-         {
-           ((SwitchBlock)se).getBlock().translate(c, w);
-         }
+         se.translate(c, w);
 
          if (it.hasNext()) {
            w.newline(0);
@@ -308,7 +397,6 @@ public class SwitchStatement extends Statement {
       return ss;
    }
   
-   private Expression expr;
-   private List switchElems;
-
+  private Expression expr;
+  private List switchElems;
 }

@@ -73,7 +73,7 @@ public class ReturnStatement extends Statement {
   {
     MethodTypeInstance mti = c.getCurrentMethod() ;
     if( expr == null) {
-      if( mti.getReturnType() == c.getTypeSystem().getVoid()) {
+      if( ! mti.getReturnType().equals (c.getTypeSystem().getVoid())) {
         throw new TypeCheckException( 
                           "Method \"" + mti.getName() + "\" must return "
                           + "an expression of type \"" 
@@ -84,6 +84,8 @@ public class ReturnStatement extends Statement {
     else {
       if ( ! expr.getCheckedType().descendsFrom( mti.getReturnType() ) &&
            ! expr.getCheckedType().equals( mti.getReturnType() )) {
+        System.out.println("Expecting something of type: " + mti.getReturnType().getTypeString());
+        System.out.println("Got something of type: " + expr.getCheckedType().getTypeString());
         throw new TypeCheckException ( 
                           "Method \"" + mti.getName() + "\" must return "
                           + "an expression of type \"" 

@@ -59,11 +59,15 @@ public class LocalVariableExpression extends Expression {
 
   public Node typeCheck(LocalContext c) throws TypeCheckException
   {
-    FieldInstance fi = c.getField( null, name);
-    
+    fi = c.getField( null, name);
     setCheckedType( fi.getType());
 
     return this;
+  }
+
+  public FieldInstance getFieldInstance()
+  {
+    return fi;
   }
 
   Object visitChildren(NodeVisitor v) 
@@ -82,5 +86,6 @@ public class LocalVariableExpression extends Expression {
       return copy();
     }
 
-    private String name;
+  private String name;
+  private FieldInstance fi;
 }

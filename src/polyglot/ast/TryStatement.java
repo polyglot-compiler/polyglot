@@ -106,9 +106,11 @@ public class TryStatement extends Statement {
        CatchBlock cb = (CatchBlock)it.next();
        if ( (s == null) ||
             ! s.remove ( cb.getCatchBlockType() ))
-         throw new TypeCheckException ( "The catch block is unreachable since no exceptions of type \"" + 
-                                        cb.getCatchBlockType().getTypeString() + "\" can reach this point.", 
-                                        Annotate.getLineNumber ( cb ));
+         throw new TypeCheckException ( 
+            "The catch block is unreachable since no exceptions of type " 
+            + "\"" + cb.getCatchBlockType().getTypeString() 
+            + "\" can reach this point.", 
+            Annotate.getLineNumber ( cb ));
        bTerminates &= Annotate.terminatesOnAllPaths ( cb );
      }
      addThrows ( s );

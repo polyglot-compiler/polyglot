@@ -6,8 +6,8 @@ import jltools.util.InternalCompilerError;
 import jltools.types.MethodType;
 
 /**
- * A context to be used within the scope of a method body.  It provides a convenient wrapper
- * for the Type System.
+ * A context to be used within the scope of a method body.  
+ * It provides a convenient wrapper for the Type System.
  */
 public class LocalContext 
 {
@@ -25,9 +25,10 @@ public class LocalContext
   ImportTable itImports;
 
   /** 
-   * Creates a LocalContext without a parent context (i.e, for a method level
-   * block).  All unresolved queries are passed on to the TypeSystem.  To do this, 
-   * we'll also need the import table and what our enclosing class is.
+   * Creates a LocalContext without a parent context (i.e, for a method 
+   * level block).  All unresolved queries are passed on to the TypeSystem.
+   * To do this, we'll also need the import table and what our enclosing 
+   * class is.
    */
   public LocalContext ( ImportTable itImports, TypeSystem ts)
   {  
@@ -38,13 +39,15 @@ public class LocalContext
   }
   
   /**
-   * Returns whether the particular symbol is defined locally. If it isn't in this 
-   * scope, we ask the parent scope, but don't traverse to enclosing classes.
+   * Returns whether the particular symbol is defined locally. If it 
+   * isn't in this scope, we ask the parent scope, but don't traverse to 
+   * enclosing classes.
    */
   public boolean isDefinedLocally(String s)
   {
     Stack blockStack =  ((ClassTuple)stkContexts.peek()).getBlockStack();
-    for (ListIterator i =blockStack.listIterator(blockStack.size()) ; i.hasPrevious() ; )
+    for (ListIterator i =blockStack.listIterator(blockStack.size()) ; 
+         i.hasPrevious() ; )
     {
       Hashtable ht = (Hashtable) i.previous();
       if ( ht.get( s ) != null )
@@ -54,42 +57,51 @@ public class LocalContext
   }
 
   /**
-   * Gets the methodMatch with name with "name" and a list of argument types "argumentTypes"
-   * against Type "type". type may be null; 
+   * Gets the methodMatch with name with "name" and a list of argument 
+   * types "argumentTypes" against Type "type". type may be null; 
    */
-  public MethodTypeInstance getMethod( ClassType type, String methodName, List argumentTypes) throws TypeCheckException
+  public MethodTypeInstance getMethod( ClassType type, String methodName, 
+                                       List argumentTypes) 
+    throws TypeCheckException
   {
-    return ts.getMethod( type, new MethodType( ts, methodName, argumentTypes), ((ClassTuple)stkContexts.peek()).getContext() ); 
+    return ts.getMethod( type, 
+                         new MethodType( ts, methodName, argumentTypes), 
+                         ((ClassTuple)stkContexts.peek()).getContext() ); 
   }
 
   /**
-   * Gets the methodMatch with name with of a MethodNode m on object t type may be null; 
+   * Gets the methodMatch with name with of a MethodNode m on object t 
+   * type may be null; 
    */
-  public MethodTypeInstance getMethod( ClassType t, MethodType m) throws TypeCheckException
+  public MethodTypeInstance getMethod( ClassType t, MethodType m) 
+    throws TypeCheckException
   {
-    return ts.getMethod( t, m, ((ClassTuple)stkContexts.peek()).getContext() );
+    return ts.getMethod( t, m, 
+                         ((ClassTuple)stkContexts.peek()).getContext() );
   }
   
   /**
    * Gets a field matched against a particular type
    */  
-  public FieldInstance getField( ClassType type, String fieldName) throws TypeCheckException
+  public FieldInstance getField( ClassType type, String fieldName) 
+    throws TypeCheckException
   {
     Object result;
     Stack blockStack =  ((ClassTuple)stkContexts.peek()).getBlockStack();
     if ( type == null ) // could be a local, so check there first.
     {
-      for (ListIterator i = blockStack.listIterator(blockStack.size()) ; i.hasPrevious() ; )
+      for (ListIterator i = blockStack.listIterator(blockStack.size()) ; 
+           i.hasPrevious() ; )
       {
-        if ( (result = ((Hashtable) i.previous()).get( fieldName )) != null )
+        if ((result = ((Hashtable) i.previous()).get( fieldName )) != null)
         {
-          //          return new FieldInstance (fieldName, (Type)result, null, AccessFlags.flagsForInt(0));
           return (FieldInstance)result;
         }
       }      
     }
     // not a local variable, so pass on to the type system.
-    return ts.getField(type, fieldName, ((ClassTuple)stkContexts.peek()).getContext());
+    return ts.getField(type, fieldName, 
+                       ((ClassTuple)stkContexts.peek()).getContext());
   }
 
   /**
@@ -98,7 +110,8 @@ public class LocalContext
    **/
   public Type getType( Type type ) throws TypeCheckException
   {
-    return ts.checkAndResolveType(type, ((ClassTuple)stkContexts.peek()).getContext());
+    return ts.checkAndResolveType(type, 
+                     ((ClassTuple)stkContexts.peek()).getContext());
   }
 
   /**
@@ -106,7 +119,8 @@ public class LocalContext
    */
   public Type getType( String s) throws TypeCheckException
   {
-    return ts.checkAndResolveType( new AmbiguousType( ts, s), ((ClassTuple)stkContexts.peek()).getContext());
+    return ts.checkAndResolveType( new AmbiguousType( ts, s), 
+                         ((ClassTuple)stkContexts.peek()).getContext());
   }
   
   /**
@@ -122,7 +136,8 @@ public class LocalContext
    */
   public void pushClass( ClassType c)
   {
-    stkContexts.push ( new ClassTuple ( new TypeSystem.Context ( itImports, c, null) ));
+    stkContexts.push ( new ClassTuple ( 
+                      new TypeSystem.Context ( itImports, c, null) ));
     if ( c.getSuperType() instanceof AmbiguousType)
       throw new Error();
   }
@@ -149,7 +164,8 @@ public class LocalContext
   public void pushBlock()
   {
     if ( stkContexts.size() < 1)
-      throw new InternalCompilerError("Can't push block since not in a class.");
+      throw new InternalCompilerError("Can't push block since not " 
+                                      + "in a class.");
     ((ClassTuple)stkContexts.peek()).pushBlock();
   }
 
@@ -159,7 +175,8 @@ public class LocalContext
   public void popBlock()
   {
     if ( stkContexts.size() < 1)
-      throw new InternalCompilerError("Can't pop block since not in a class.");
+      throw new InternalCompilerError("Can't pop block since not " 
+                                      + "in a class.");
     ((ClassTuple)stkContexts.peek()).popBlock();
   }
 
@@ -169,7 +186,8 @@ public class LocalContext
   public void enterMethod(MethodTypeInstance mti)
   {
     if ( stkContexts.size() < 1)
-      throw new InternalCompilerError("Can't enter function since not currently in a class.");
+      throw new InternalCompilerError("Can't enter function since " 
+                                      + "not currently in a class.");
     ((ClassTuple)stkContexts.peek()).enterMethod(mti);
   }
 
@@ -179,7 +197,8 @@ public class LocalContext
   public void leaveMethod()
   {
     if ( stkContexts.size() < 1)
-      throw new InternalCompilerError("Can't leave function  since not currently in a class.");
+      throw new InternalCompilerError("Can't leave function "
+                                      + "since not currently in a class.");
     ((ClassTuple)stkContexts.peek()).leaveMethod();
   }
 
@@ -189,7 +208,8 @@ public class LocalContext
   public MethodTypeInstance getCurrentMethod() 
   {
     if ( stkContexts.size() < 1)
-      throw new InternalCompilerError("Can't pop block since not in a class.");
+      throw new InternalCompilerError("Can't pop block since not "
+                                      + " in a class.");
     return ((ClassTuple)stkContexts.peek()).getMethod();
   }
 
@@ -199,31 +219,37 @@ public class LocalContext
   public ClassType getCurrentClass()
   {
     if ( stkContexts.size() < 1)
-      throw new InternalCompilerError("Can't pop block since not in a class.");
+      throw new InternalCompilerError("Can't pop block since not " +
+                                      " in a class.");
     return ((ClassTuple)stkContexts.peek()).getCurrentClass();
   }
 
   /**
    * Adds a symbol to the current scoping level
    */
-  public void addSymbol( String sName, FieldInstance fi) throws TypeCheckException
+  public void addSymbol( String sName, FieldInstance fi) 
+    throws TypeCheckException
   {
     if ( stkContexts.size() < 1)
-      throw new InternalCompilerError("Can't pop block since not in a class.");
+      throw new InternalCompilerError("Can't pop block since not " 
+                                      + "in a class.");
     Stack blockStack =  ((ClassTuple)stkContexts.peek()).getBlockStack();
     if ( blockStack == null || blockStack.size() == 0)
-      throw new InternalCompilerError(" Can't add symbol since not inside a method");
-    if ( ! isDefinedLocally ( sName ) )
+      throw new InternalCompilerError(" Can't add symbol since " 
+                                      + "not inside a method");
+    if ( ! ((Hashtable)blockStack.peek()).contains( sName ))
       ((Hashtable)blockStack.peek()).put(sName, fi);
     else
-      throw new TypeCheckException ( "Symbol \"" + sName + "\" already defined");
+      throw new TypeCheckException ( "Symbol \"" + sName + 
+                                     "\" already defined in this block.");
 
   }
 
   class ClassTuple
   {
-    // contains a stack of hashtables ( e.g. for blocking structures) and a MethodTypeInstance
-    // giving the method that is currently being processed, and the TypeSystem.context
+    // contains a stack of hashtables ( e.g. for blocking structures) 
+    // and a MethodTypeInstance giving the method that is currently 
+    // being processed, and the TypeSystem.context
 
     Stack sBlocks;
     MethodTypeInstance mti;
@@ -240,7 +266,8 @@ public class LocalContext
     {
       if ( mti == null)
       {
-        throw new InternalCompilerError("Cannot push blocks since MethodTypeInstance == null!");
+        throw new InternalCompilerError("Cannot push blocks since "
+                                        + "MethodTypeInstance == null!");
       }
       sBlocks.push( new Hashtable () );
     }
@@ -263,7 +290,9 @@ public class LocalContext
     
     void leaveMethod()
     {
-      if ( mti == null) throw new InternalCompilerError(" Cannot leave method, since not in one.");
+      if ( mti == null) 
+        throw new InternalCompilerError(" Cannot leave method, " 
+                                        + "since not in one.");
       mti = null;
       popBlock();
     }

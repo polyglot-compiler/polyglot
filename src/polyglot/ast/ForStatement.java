@@ -86,16 +86,18 @@ public class ForStatement extends Statement {
     boolean writeSemicolon = true;
     
     w.write ( "for( " );
-    
-    for ( ListIterator iter = initializers.listIterator(); iter.hasNext(); )
-    {
-      Statement next = (Statement)iter.next();
-      if(next instanceof VariableDeclarationStatement) {
-        next.translate(c, w);
-        writeSemicolon = false;
-      } else {
-        ((ExpressionStatement)next).getExpression().translate(c, w);      
-      }
+
+    if (initializers != null)
+      for ( ListIterator iter = initializers.listIterator(); 
+            iter.hasNext(); )
+      {
+        Statement next = (Statement)iter.next();
+        if(next instanceof VariableDeclarationStatement) {
+          next.translate(c, w);
+          writeSemicolon = false;
+        } else {
+          ((ExpressionStatement)next).getExpression().translate(c, w);
+        }
           
       if (iter.hasNext())
         w.write (", " );
@@ -108,23 +110,28 @@ public class ForStatement extends Statement {
     if( writeSemicolon) {
       w.write ("; " ); 
     }
-
-    condition.translate(c, w);
+    
+    if ( condition != null)
+      condition.translate(c, w);
     w.write ("; " ); // condition is a expr, so write semicolon.
-    for ( ListIterator iter = incrementors.listIterator(); iter.hasNext(); )
-    {
-      Statement next = (Statement)iter.next();
-      if(next instanceof ExpressionStatement)
-        ((ExpressionStatement)next).getExpression().translate(c, w);      
-      else
-        next.translate(c, w);
+    if ( incrementors != null)
+      for ( ListIterator iter = incrementors.listIterator(); 
+            iter.hasNext(); )
+      {
+        Statement next = (Statement)iter.next();
+        if(next instanceof ExpressionStatement)
+          ((ExpressionStatement)next).getExpression().translate(c, w);      
+        else
+          next.translate(c, w);
         
-      if (iter.hasNext())
-        w.write (", " );
-    }
+        if (iter.hasNext())
+          w.write (", " );
+      }
     w.write ( ")" );
     
-    if(!(body instanceof BlockStatement))
+    if (body == null)
+      w.write ( " ; ");
+    else if(!(body instanceof BlockStatement))
     {
       w.beginBlock();
       body.translate(c, w);
@@ -142,9 +149,32 @@ public class ForStatement extends Statement {
     return null;
   }
 
-  public Node typeCheck( LocalContext c)
+  public Node typeCheck( LocalContext c) throws TypeCheckException
   {
-    // FIXME; implement
+    
+    if ( condition != null && 
+         ! condition.getCheckedType().isImplicitCastValid( 
+               c.getTypeSystem().getBoolean() ) )
+      throw new TypeCheckException(" The conditional must be a boolean.");
+
+    for(ListIterator iter = initializers.listIterator(); iter.hasNext(); ) 
+    {
+      Statement stat = (Statement) iter.next();
+      Annotate.addThrows ( this, Annotate.getThrows( stat ) );
+    }
+
+    if ( condition != null)
+      Annotate.addThrows ( this, Annotate.getThrows( condition ) );
+    if ( incrementors != null)
+      for(ListIterator iter = incrementors.listIterator(); 
+          iter.hasNext(); ) {
+        Statement stat = (Statement) iter.next();
+        Annotate.addThrows ( this, Annotate.getThrows ( stat ) );
+      }
+    if (body != null)
+    {
+      Annotate.addThrows ( this, Annotate.getThrows ( body ) );
+    }
     return this;
   }
 
@@ -152,23 +182,32 @@ public class ForStatement extends Statement {
   {
     Object vinfo = Annotate.getVisitorInfo( this);
 
-    for(ListIterator iter = initializers.listIterator(); iter.hasNext(); ) {
+    for(ListIterator iter = initializers.listIterator(); iter.hasNext(); ) 
+    {
       Statement stat = (Statement) iter.next();
       Statement newStat = (Statement) stat.visit(v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newStat), vinfo);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newStat), 
+                                  vinfo);
       if (stat != newStat)
         iter.set(newStat);
     }
-    condition = (Expression) condition.visit(v);
-    for(ListIterator iter = incrementors.listIterator(); iter.hasNext(); ) {
-      Statement stat = (Statement) iter.next();
-      Statement newStat = (Statement) stat.visit(v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newStat), vinfo);
-      if (stat != newStat)
-        iter.set(newStat);
+    if ( condition != null)
+      condition = (Expression) condition.visit(v);
+    if ( incrementors != null)
+      for(ListIterator iter = incrementors.listIterator(); 
+          iter.hasNext(); ) {
+        Statement stat = (Statement) iter.next();
+        Statement newStat = (Statement) stat.visit(v);
+        vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newStat), 
+                                    vinfo);
+        if (stat != newStat)
+          iter.set(newStat);
+      }
+    if (body != null)
+    {
+      body = (Statement) body.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( body), vinfo);
     }
-    body = (Statement) body.visit(v);
-    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( body), vinfo);
     
     return vinfo;
   }

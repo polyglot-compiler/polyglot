@@ -36,7 +36,7 @@ public class SubtypeSet implements java.util.Set
           {
             i.remove();
           }
-          if ( ((Type)o).descendsFrom( t))
+          if ( ((Type)o).descendsFrom( t) || ((Type)o).equals ( t) )
           {
             bHaveToAdd = false;
             break;

@@ -177,12 +177,19 @@ public class VariableDeclarationStatement extends Statement {
 
     Declarator d;
     Iterator iter = declarators();
-    
+
     // only add to context if inside a method, hence a local Variable declaration
     if ( c.getCurrentMethod() != null)
       while( iter.hasNext()) {
         d = (Declarator)iter.next();
-        c.addSymbol( d.name, new FieldInstance ( d.name, typeForDeclarator( d), null, modifiers));
+        // if it is a constant numeric expression (final + initializer is IntLiteral)
+        // mark it under FieldInstance
+        FieldInstance fi = new FieldInstance( d.name, typeForDeclarator(d), null, modifiers);
+        if (d.initializer instanceof IntLiteral && 
+            d.initializer != null &&
+            modifiers.isFinal())
+          fi.setConstantValue ( ((IntLiteral)d.initializer).getLongValue() );
+        c.addSymbol( d.name, fi);
       }
     
     return this;
@@ -193,23 +200,39 @@ public class VariableDeclarationStatement extends Statement {
      Declarator d;
      Iterator iter = declarators();
      
-     //only add to context if inside a method, hence a local variable declaration
+     // only add to context if inside a method, 
+     // hence a local variable declaration
      if ( c.getCurrentMethod() != null)
        while( iter.hasNext()) {
          d = (Declarator)iter.next();
-         c.addSymbol( d.name, new FieldInstance ( d.name, typeForDeclarator( d), null, modifiers));
+        FieldInstance fi = new FieldInstance( d.name, 
+                                              typeForDeclarator(d), 
+                                              null, modifiers);
+        // if it is a constant numeric expression (final + initializer 
+         //                                        is IntLiteral)
+        // mark it under FieldInstance
+        if (d.initializer instanceof IntLiteral && 
+            d.initializer != null &&
+            modifiers.isFinal())
+        {
+          fi.setConstantValue ( ((IntLiteral)d.initializer).getLongValue() );
+        }
+        c.addSymbol( d.name, fi);
        }
      
     for  (Iterator it = declarators(); it.hasNext() ;) {
       Declarator pair = (Declarator)it.next();
       if (pair.initializer != null)
       {
-        if ( ! c.getTypeSystem().isImplicitCastValid( pair.initializer.getCheckedType(), 
-                                                  type.getType() ) )
-          throw new TypeCheckException( "The type of the variable initializer (\"" 
+        if ( ! c.getTypeSystem().isImplicitCastValid( 
+               pair.initializer.getCheckedType(), 
+               type.getType() ) )
+          throw new TypeCheckException( "The type of the variable initializer "
+                                        + "(\"" 
                                         + pair.initializer.getCheckedType().getTypeString() + 
                                         "\") does not match " +
-                                        "that of the declaration (\"" + type.getType().getTypeString() + "\")");
+                                        "that of the declaration (\"" + 
+                                        type.getType().getTypeString() + "\")");
         addThrows ( pair.initializer.getThrows() );
       }
       
@@ -314,6 +337,9 @@ public class VariableDeclarationStatement extends Statement {
   // RI: every member is a Declarator
   private List variables; 
   private AccessFlags modifiers;
+
+  // describes our type
+  FieldInstance fi;
 }
 
     

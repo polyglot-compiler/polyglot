@@ -97,10 +97,14 @@ public class FieldExpression extends Expression {
     return PRECEDENCE_OTHER;
   }
 
+  public FieldInstance getFieldInstance()
+  {
+    return fi;
+  }
+
   public Node typeCheck( LocalContext c) throws TypeCheckException
   {
     Type ltype;
-    FieldInstance fi;
 
     if( target instanceof Expression) {
       ltype = ((Expression)target).getCheckedType();
@@ -120,11 +124,19 @@ public class FieldExpression extends Expression {
       setCheckedType( c.getTypeSystem().getInt());
     }
     else if( ltype instanceof ClassType) {
-      fi = c.getField( (ClassType)ltype, name);
-
-      // FIXME is this expected type correct?
-      Annotate.setExpectedType( target, fi.getEnclosingType());
-      setCheckedType( fi.getType());
+      if (name.equals("class"))
+      {
+        setCheckedType( c.getTypeSystem().typeForClass( java.lang.Class.class));
+        // FIXME what to do about expected type?
+      }      
+      else
+      {
+        fi = c.getField( (ClassType)ltype, name);
+        
+        // FIXME is this expected type correct?
+        Annotate.setExpectedType( target, fi.getEnclosingType());
+        setCheckedType( fi.getType());
+      }
     }
     else {
       throw new TypeCheckException( 
@@ -160,6 +172,8 @@ public class FieldExpression extends Expression {
     return fe;
   }
 
+  // the field instance which we are accessing;
+  private FieldInstance fi;
   private Node target;
   private String name;
 }

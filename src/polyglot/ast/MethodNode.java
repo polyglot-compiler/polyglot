@@ -373,15 +373,16 @@ public class MethodNode extends ClassMember {
             }
             if ( ! bThrowDeclared)
               throw new TypeCheckException ( 
-                               "Method \"" + name + "\" throws the undeclared "
-                               + "exception \"" + t.getTypeString() + "\".");
+                    "Method \"" + name + "\" throws the undeclared "
+                    + "exception \"" + t.getTypeString() + "\".");
           }
         }
       }
        
       // make sure that all paths return, if our return type is not void
       if ( !mtiThis.getReturnType().equals (c.getTypeSystem().getVoid() ) &&
-             !Annotate.terminatesOnAllPaths ( body ) )
+             !Annotate.terminatesOnAllPaths ( body ) &&
+           ! mtiThis.getAccessFlags().isAbstract() )
         throw new TypeCheckException ( 
                           "Not all execution paths in the method \""
                           + name + "\" lead to a return or throw statement.");
