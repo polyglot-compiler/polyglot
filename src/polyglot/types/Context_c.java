@@ -67,7 +67,7 @@ public class Context_c implements Context
      * Looks up a method with name "name" and arguments compatible with
      * "argTypes".
      */
-    public MethodInstance findMethod(String name, List argTypes) 
+    public MethodInstance findMethod(String name, List argTypes)
 	throws SemanticException {
 	ListIterator i = scopes.listIterator(scopes.size());
 
@@ -92,7 +92,7 @@ public class Context_c implements Context
 
     /**
      * Gets a local of a particular name.
-     */  
+     */
     public LocalInstance findLocal(String name) throws SemanticException {
 	VarInstance vi = findVariableSilent(name);
 
@@ -105,7 +105,7 @@ public class Context_c implements Context
 
     /**
      * Finds the class which added a field to the scope.
-     */  
+     */
     public ParsedClassType findFieldScope(String name)
 	throws SemanticException {
 
@@ -135,7 +135,7 @@ public class Context_c implements Context
     }
 
     /** Finds the class which added a method to the scope.
-     */  
+     */
     public ParsedClassType findMethodScope(String name) throws
 	SemanticException {
 
@@ -166,7 +166,7 @@ public class Context_c implements Context
 
     /**
      * Gets a field of a particular name.
-     */  
+     */
     public FieldInstance findField(String name) throws SemanticException {
 	VarInstance vi = findVariableSilent(name);
 
@@ -184,20 +184,20 @@ public class Context_c implements Context
 
     /**
      * Gets a local or field of a particular name.
-     */  
+     */
     public VarInstance findVariable(String name) throws SemanticException {
 	VarInstance vi = findVariableSilent(name);
 
 	if (vi != null) {
 	    return vi;
 	}
-        
+
 	throw new SemanticException("Field or local " + name + " not found.");
     }
 
     /**
      * Gets a local or field of a particular name, without raising exceptions.
-     */  
+     */
     private VarInstance findVariableSilent(String name) {
 	ListIterator i = scopes.listIterator(scopes.size());
 
@@ -221,6 +221,19 @@ public class Context_c implements Context
 	return null;
     }
 
+    public String toString() {
+        String s = "";
+
+	ListIterator i = scopes.listIterator(scopes.size());
+
+	while (i.hasPrevious()) {
+	    Mark m = (Mark) i.previous();
+            s += m.toString() + "; ";
+        }
+
+        return s;
+    }
+
     /**
      * Finds the definition of a particular type qualifier (also a type).
      */
@@ -237,7 +250,7 @@ public class Context_c implements Context
 	while (i.hasPrevious()) {
 	    Mark m = (Mark) i.previous();
 
-	    if (m instanceof Scope) { 
+	    if (m instanceof Scope) {
 	        Scope scope = (Scope) m;
 
 		Type type = scope.findType(name);
@@ -306,7 +319,7 @@ public class Context_c implements Context
 	    // Force a type check.
 	    ClassMark m = (ClassMark) scopes.pop();
 	}
-	catch (EmptyStackException ese ) { 
+	catch (EmptyStackException ese ) {
 	    throw new InternalCompilerError("No more scopes to pop");
 	}
     }
@@ -320,7 +333,7 @@ public class Context_c implements Context
     }
 
     /**
-     * Removes a scoping level 
+     * Removes a scoping level
      */
     public void popBlock() {
 	Types.report(4, "pop block");
@@ -428,7 +441,7 @@ public class Context_c implements Context
 	    Scope scope = (Scope) scopes.peek();
 	    scope.addVariable(vi);
 	}
-	catch (EmptyStackException e) { 
+	catch (EmptyStackException e) {
 	    throw new InternalCompilerError("Scope stack is empty!");
 	}
     }
@@ -443,7 +456,7 @@ public class Context_c implements Context
 	    Scope scope = (Scope) scopes.peek();
 	    scope.addMethodContainer(mi);
 	}
-	catch (EmptyStackException e) { 
+	catch (EmptyStackException e) {
 	    throw new InternalCompilerError("Scope stack is empty!");
 	}
     }
@@ -458,7 +471,7 @@ public class Context_c implements Context
 	    Scope scope = (Scope) scopes.peek();
 	    scope.addType(t);
 	}
-	catch (EmptyStackException e) { 
+	catch (EmptyStackException e) {
 	    throw new InternalCompilerError("Scope stack is empty!");
 	}
     }
