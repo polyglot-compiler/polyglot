@@ -14,6 +14,9 @@ public interface TypeSystem {
     /**
      * Initialize the type system with the compiler.  This method must be
      * called before any other type system method is called.
+     *
+     * @param resolver The resolver to use for loading types from class files
+     *                 or other source files.
      */
     void initialize(LoadedClassResolver resolver)
                     throws SemanticException;
@@ -36,10 +39,16 @@ public interface TypeSystem {
      */
     LoadedClassResolver loadedResolver();
 
-    /** Create an import table for the source file. */
+    /** Create an import table for the source file.
+     * @param sourceName Name of the source file to import into.  This is used
+     * mainly for error messages and for debugging. 
+     * @param pkg The package of the source file in which to import.
+     */
     ImportTable importTable(String sourceName, Package pkg);
 
-    /** Create an import table for the source file. */
+    /** Create an import table for the source file.
+     * @param pkg The package of the source file in which to import.
+     */
     ImportTable importTable(Package pkg);
 
     /**
@@ -48,39 +57,68 @@ public interface TypeSystem {
      */
     List defaultPackageImports();
 
-    /** Get the class type with the following name. */
+    /** Get the class type with the following name.
+     * @param name The name to create the type for.
+     * @exception SemanticException when class is not found.    
+     */
     ClassType typeForName(String name) throws SemanticException;
 
-    /** Create an initailizer instance. */
+    /** Create an initailizer instance.
+     * @param pos Position of the initializer.
+     * @param container Containing class of the initializer.
+     * @param flags The initializer's flags.
+     */
     InitializerInstance initializerInstance(Position pos, ClassType container,
                                             Flags flags);
 
-    /** Create a constructor instance. */
+    /** Create a constructor instance.
+     * @param pos Position of the constructor.
+     * @param container Containing class of the constructor.
+     * @param flags The constructor's flags.
+     * @param argTypes The constructor's formal parameter types.
+     * @param excTypes The constructor's exception throw types.
+     */
     ConstructorInstance constructorInstance(Position pos, ClassType container,
                                             Flags flags, List argTypes,
                                             List excTypes);
 
-    /** Create a method instance. */
+    /** Create a method instance.
+     * @param pos Position of the method.
+     * @param container Containing type of the method.
+     * @param flags The method's flags.
+     * @param returnType The method's return type.
+     * @param name The method's name.
+     * @param argTypes The method's formal parameter types.
+     * @param excTypes The method's exception throw types.
+     */
     MethodInstance methodInstance(Position pos, ReferenceType container,
                                   Flags flags, Type returnType, String name,
                                   List argTypes, List excTypes);
 
-    /** Create a field instance. */
+    /** Create a field instance.
+     * @param pos Position of the field.
+     * @param container Containing type of the field.
+     * @param flags The field's flags.
+     * @param type The field's type.
+     * @param name The field's name.
+     */
     FieldInstance fieldInstance(Position pos, ReferenceType container,
                                 Flags flags, Type type, String name);
 
-    /** Create a local variable instance. */
+    /** Create a local variable instance.
+     * @param pos Position of the local variable.
+     * @param flags The local variable's flags.
+     * @param type The local variable's type.
+     * @param name The local variable's name.
+     */
     LocalInstance localInstance(Position pos, Flags flags, Type type,
                                 String name);
 
-    /** Create a default constructor instance. */
+    /** Create a default constructor instance.
+     * @param pos Position of the constructor.
+     * @param container Containing class of the constructor. 
+     */
     ConstructorInstance defaultConstructor(Position pos, ClassType container);
-
-    /** Get a place-holder for serializing a type object. */
-    TypeObject placeHolder(TypeObject o, java.util.Set roots);
-
-    /** Get a place-holder for serializing a type object. */
-    TypeObject placeHolder(TypeObject o);
 
     /** Get an unknown type. */
     UnknownType unknownType(Position pos);
@@ -91,7 +129,9 @@ public interface TypeSystem {
     /**
      * Returns true iff child descends from ancestor or child == ancestor.
      * This is equivalent to:
+     * <pre>
      *    descendsFrom(child, ancestor) || isSame(child, ancestor)
+     * </pre>
      */
     boolean isSubtype(Type child, Type ancestor);
 
@@ -100,37 +140,31 @@ public interface TypeSystem {
     boolean descendsFrom(Type child, Type ancestor);
 
     /**
-     * Requires: all type arguments are canonical.
-     *
      * Returns true iff a cast from fromType to toType is valid; in other
      * words, some non-null members of fromType are also members of toType.
      */
     boolean isCastValid(Type fromType, Type toType);
 
     /**
-     * Requires: all type arguments are canonical.
-     *
      * Returns true iff an implicit cast from fromType to toType is valid;
      * in other words, every member of fromType is member of toType.
      */
     boolean isImplicitCastValid(Type fromType, Type toType);
 
     /**
-     * Requires: all type arguments are canonical.
-     *
      * Returns true iff type1 and type2 are the same type.
      */
     boolean isSame(Type type1, Type type2);
 
     /**
      * Returns true if <code>value</code> can be implicitly cast to
-     * Primitive type <code>t</code>.
+     * type <code>t</code>.
      */
     boolean numericConversionValid(Type t, long value);
 
     /**
-     * Requires: all type arguments are canonical.
-     * Returns the least common ancestor of Type1 and Type2
+     * Returns the least common ancestor of type1 and type2
+     * @exception SemanticException if the LCA does not exist
      */
     Type leastCommonAncestor(Type type1, Type type2) throws SemanticException;
 
@@ -140,7 +174,7 @@ public interface TypeSystem {
     boolean isCanonical(Type type);
 
     /**
-     * Checks whether a method or field within target with access flags 'flags'      * can be accessed from Context context.
+     * Checks whether a class member can be accessed from Context context.
      */
     boolean isAccessible(MemberInstance mi, Context context);
 
@@ -154,7 +188,6 @@ public interface TypeSystem {
     ////
 
     /**
-     * Requires: all type arguments are canonical.
      * Returns true iff an object of type <type> may be thrown.
      */
     boolean isThrowable(Type type);
@@ -171,10 +204,14 @@ public interface TypeSystem {
      */
     Collection uncheckedExceptions();
 
-    /** Unary promotion for numeric types. */
+    /** Unary promotion for numeric types.
+     * @exception SemanticException if the type cannot be promoted. 
+     */
     PrimitiveType promote(Type t) throws SemanticException;
 
-    /** Binary promotion for numeric types. */
+    /** Binary promotion for numeric types.
+     * @exception SemanticException if the types cannot be promoted. 
+     */
     PrimitiveType promote(Type t1, Type t2) throws SemanticException;
 
     ////
@@ -184,12 +221,16 @@ public interface TypeSystem {
     /**
      * Returns the field named 'name' defined on 'type'.
      * We check if the field is accessible from the context 'c'.
+     * @exception SemanticException if the field cannot be found or is
+     * inaccessible.
      */
     FieldInstance findField(ReferenceType container, String name, Context c)
 	throws SemanticException;
 
     /**
      * Returns the field named 'name' defined on 'type'.
+     * @exception SemanticException if the field cannot be found or is
+     * inaccessible.
      */
     FieldInstance findField(ReferenceType container, String name)
 	throws SemanticException;
@@ -198,6 +239,8 @@ public interface TypeSystem {
      * Find a method.  We need to pass the context because the method
      * we find depends on whether the method is accessible from the context.
      * We also check if the field is accessible from the context 'c'.
+     * @exception SemanticException if the method cannot be found or is
+     * inaccessible.
      */
     MethodInstance findMethod(ReferenceType container,
                               String name, List argTypes,
@@ -207,6 +250,8 @@ public interface TypeSystem {
      * Find a constructor.  We need to pass the context because the constructor
      * we find depends on whether the method is accessible from the context.
      * We also check if the field is accessible from the context 'c'.
+     * @exception SemanticException if the constructor cannot be found or is
+     * inaccessible.
      */
     ConstructorInstance findConstructor(ClassType container, List argTypes,
                                         Context c) throws SemanticException;
@@ -214,12 +259,16 @@ public interface TypeSystem {
     /**
      * Find a member class.
      * We check if the field is accessible from the context 'c'.
+     * @exception SemanticException if the class cannot be found or is
+     * inaccessible.
      */
     MemberClassType findMemberClass(ClassType container, String name, Context c)
 	throws SemanticException;
 
     /**
      * Find a member class.
+     * @exception SemanticException if the class cannot be found or is
+     * inaccessible.
      */
     MemberClassType findMemberClass(ClassType container, String name)
 	throws SemanticException;
@@ -486,6 +535,18 @@ public interface TypeSystem {
      * should be returned in the set in addition to clazz.
      */
     Set getTypeEncoderRootSet(Type clazz);
+
+    /** Get a place-holder for serializing a type object.
+     * @param o The object to get the place-holder for.
+     * @param roots The root objects for the serialization.  Place holders
+     * are not created for these.
+     */
+    TypeObject placeHolder(TypeObject o, java.util.Set roots);
+
+    /** Get a place-holder for serializing a type object.
+     * @param o The object to get the place-holder for.
+     */
+    TypeObject placeHolder(TypeObject o);
 
     /**
      * Translate a package.
