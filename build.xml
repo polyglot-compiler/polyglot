@@ -44,15 +44,15 @@
 <!--
     <available classname="java_cup.Main" property="cp_existence.java_cup"/>
     <available classname="JFlex.Main" property="cp_existence.jlex"/>
-    <fail unless="cp_existence.java_cup" 
+    <fail unless="cp_existence.java_cup"
           message="The java_cup classes must be on the classpath. Try adding java_cup.jar to the classpath."/>
-    <fail unless="cp_existence.jlex" 
+    <fail unless="cp_existence.jlex"
           message="The JFlex classes must be on the classpath. Try adding JFlex.jar to the classpath."/>
 -->
   </target>
 
   <!-- create appropriate executables in the bin directory -->
-  <target name="bin" 
+  <target name="bin"
           depends="configure,bin-deps"
           unless="bin.up-to-date">
     <antcall target="jlc"/>
@@ -67,13 +67,13 @@
     <condition property="bin.up-to-date">
       <available file="${bin}/jlc"/>
     </condition>
-  </target> 
+  </target>
 
   <target name="defs-deps">
     <condition property="defs.up-to-date">
       <available file="${bin}/defs"/>
     </condition>
-  </target> 
+  </target>
 
   <!-- creates a file containing common environment variable definitions -->
   <target name="executable-defs" depends="defs-deps" unless="defs.up-to-date">
@@ -89,7 +89,7 @@ TOP='${basedir}'
   </target>
 
   <!-- creates the executable script jlc -->
-  <target name="jlc" 
+  <target name="jlc"
           depends="executable-defs">
     <echo message="Creating ${bin}/jlc"/>
     <concat destfile="${bin}/jlc" append="no">
@@ -109,14 +109,14 @@ ext=""
   </target>
 
   <!-- Configure a single extension
-       @param ${ext}         the name of the extension 
+       @param ${ext}         the name of the extension
     -->
   <target name="configure-ext">
     <available file="configure-${ext}.xml" property="configure-ext.configure-available"/>
     <antcall target="configure-ext-conditional"/>
   </target>
 
-  <target name="configure-ext-conditional" 
+  <target name="configure-ext-conditional"
           if="configure-ext.configure-available"
           depends="executable-defs">
     <ant antfile="configure-${ext}.xml" target="configure" inheritRefs="true"/>
@@ -143,7 +143,7 @@ ext=""
     <mkdir dir="${dist}/lib"/>
   </target>
 
-  <target name="clean" 
+  <target name="clean"
   	      description="Cleans up the directory tree: deletes the distribution directory and the classes directories">
     <!-- Delete the ${classes} and ${dist} directory trees -->
     <delete dir="${classes}"/>
@@ -172,7 +172,7 @@ ext=""
   </target>
 
   <!-- compile the base compiler excluding the jl extension -->
-  <target name="compile-base" depends="init,ppg">
+  <target name="compile-base">
     <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/**"
       excludes="polyglot/ext/**,polyglot/tests/**,ppg/test/**">
@@ -180,7 +180,7 @@ ext=""
     </javac>
   </target>
 
-  <target name="cup" depends="init" 
+  <target name="cup" depends="init"
           description="Builds the extended CUP parser generator">
     <antcall target="cup-parser-using-jar">
       <param name="parser.dir" value="${src}/java_cup"/>
@@ -226,7 +226,7 @@ ext=""
        @param parser.class  The name to be passed to CUP with -parser.
        @param symbol.class  The name to be passed to CUP with -symbols.
    -->
-  <target name="ppg-parser" depends="ppg-parser-deps" 
+  <target name="ppg-parser" depends="ppg-parser-deps"
           unless="ppg.parser.up-to-date">
     <java classname="ppg.PPG"
           fork="true"
@@ -257,8 +257,8 @@ ext=""
       <and>
         <available file="${parser.dir}/${cup.file}"/>
         <available file="${parser.dir}/${parser.class}.java"/>
-        <available file="${parser.dir}/${symbol.class}.java"/>	   
-      </and>	       
+        <available file="${parser.dir}/${symbol.class}.java"/>
+      </and>
     </condition>
   </target>
 
@@ -269,7 +269,7 @@ ext=""
        @param symbol.class  The name to be passed to CUP with -symbols.
        @param cup.file      The name of the CUP file.
    -->
-  <target name="cup-parser" depends="cup,cup-parser-using-jar" 
+  <target name="cup-parser" depends="cup,cup-parser-using-jar"
           unless="cup.parser.up-to-date">
   </target>
 
@@ -277,7 +277,7 @@ ext=""
   <!-- The following target builds a cup parser using the version of
        cup already sitting in the java_cup.jar file. This is needed to
        allow the building of cup to be bootstrapped. -->
-  <target name="cup-parser-using-jar" depends="cup-parser-deps" 
+  <target name="cup-parser-using-jar" depends="cup-parser-deps"
           unless="cup.parser.up-to-date">
     <java classname="java_cup.Main"
           fork="true"
@@ -302,9 +302,9 @@ ext=""
     <condition property="cup.parser.up-to-date">
       <and>
         <available file="${parser.dir}/${parser.class}.java"/>
-        <available file="${parser.dir}/${symbol.class}.java"/>	   
-      </and>	       
-    </condition>	      
+        <available file="${parser.dir}/${symbol.class}.java"/>
+      </and>
+    </condition>
   </target>
 
   <!-- Build a JFlex lexer based on parameters supplied to the target.
@@ -320,7 +320,7 @@ ext=""
 	  fork="true"
 	  dir="${lexer.dir}"
 	  failonerror="true">
-      <classpath refid="standard.classpath"/>	  
+      <classpath refid="standard.classpath"/>
       <arg line="${jflex.file}"/>
     </java>
   </target>
@@ -333,11 +333,11 @@ ext=""
       <srcfileset dir="${lexer.dir}" includes="${jflex.file}"/>
       <targetfileset dir="${lexer.dir}" includes="${lexer.class}.java"/>
     </dependset>
-    <available property="jflex.lexer.up-to-date" 
+    <available property="jflex.lexer.up-to-date"
                file="${lexer.dir}/${lexer.class}.java"/>
   </target>
-  
-  <target name="base" depends="bin,cup,compile-base">
+
+  <target name="base" depends="bin,cup,init,ppg,compile-base">
   </target>
 
   <!-- Builds PPG -->
@@ -358,6 +358,12 @@ ext=""
       excludes="ppg/test/**">
       <classpath refid="standard.classpath"/>
     </javac>
+  </target>
+
+  <target name ="jl-compile" depends="compile-base">
+    <antcall target="compile-ext">
+      <param name="ext" value="jl"/>
+    </antcall>
   </target>
 
   <!-- Builds JL -->
@@ -465,7 +471,7 @@ ext=""
     <antcall target="compile-ext"/>
     <antcall target="compile-ext-qq-dep"/>
   </target>
-  
+
   <!-- SKEL: When using the newext script, copy and modify this target by
        replacing the name "ibex" with the new extension name. -->
   <target name="ibex" depends="jl">
@@ -510,7 +516,7 @@ ext=""
     <jar jarfile="${lib}/j0.jar" basedir="${classes}" includes="polyglot/ext/j0/**"/>
   </target>
 
-  <target name="param" 
+  <target name="param"
   	      depends="jl"
           description="Builds the param extension">
     <antcall target="compile-ext">
@@ -560,7 +566,7 @@ ext=""
     </javac>
   </target>
 
-  <target name="pao" 
+  <target name="pao"
   	      depends="jl"
   	      description="Builds the pao extension">
     <antcall target="standard-ext">
@@ -575,8 +581,8 @@ ext=""
     </javac>
   </target>
 
-  <target name="coffer" 
-    description="Builds the coffer extension" 
+  <target name="coffer"
+    description="Builds the coffer extension"
   	depends="param">
     <antcall target="standard-ext">
       <param name="ext" value="coffer"/>
@@ -730,8 +736,8 @@ ext=""
     <ant inheritAll="false" antfile="${dist}/build.xml" dir="${dist}" target="clobber"/>
   </target>
 
-  <target name="javadoc" 
-    description="Runs javadoc over the Polyglot source code" 
+  <target name="javadoc"
+    description="Runs javadoc over the Polyglot source code"
   	depends="jl">
     <javadoc sourcepath="${basedir}" destdir="doc/api" encoding="iso-8859-1">
       <packageset dir="${src}" defaultexcludes="yes">
@@ -753,7 +759,7 @@ ext=""
   <target name="polyj-dist" depends="jl-dist,polyj"/>
 
   <!-- Creates the Windows and UNIX distributions for j0. -->
-  <target name="j0-dist" depends="j0-jar,polyglot-jar,cup,jl-dist" 
+  <target name="j0-dist" depends="j0-jar,polyglot-jar,cup,jl-dist"
     description="Builds the j0 Windows and UNIX distribution files and puts them in the dist directory.">
 
     <!-- Creates the Windows distribution .zip. -->
@@ -762,7 +768,7 @@ ext=""
       <zipfileset dir="${src}/polyglot/ext/j0/j0-dist/" includes="*.bat" prefix="j0"/>
       <zipfileset dir="${lib}/" includes="polyglot.jar, j0.jar, java_cup.jar" prefix="j0"/>
       <zipfileset dir="${src}/polyglot/ext/j0/tests/demo" prefix="j0/demo"/>
-    </zip>   
+    </zip>
 
     <!-- Creates the UNIX distribution. -->
     <tar destfile="${dist}/j0.tar">
@@ -836,7 +842,7 @@ ext=""
     <!-- omit JFlex -->
     <delete file="${dist}/lib/JFlex.jar"/>
   </target>
-  
+
   <!-- compile pth (Polyglot Test Harness) -->
   <target name="pth-compile" depends="jl">
     <antcall target="jflex-lexer">
@@ -855,15 +861,15 @@ ext=""
       <classpath refid="standard.classpath"/>
     </javac>
   </target>
-  
+
   <!-- create jar pth (Polyglot Test Harness) -->
   <target name="pth-jar" depends="pth-compile"
           description="Builds pth.jar">
     <jar jarfile="${lib}/pth.jar" basedir="${classes}" includes="polyglot/pth/**"/>
-  </target>  
-  
+  </target>
+
   <!-- Create pth executable -->
-  <target name="pth-bin" 
+  <target name="pth-bin"
           depends="executable-defs">
     <echo message="Creating ${bin}/pth"/>
     <concat destfile="${bin}/pth" append="no">
