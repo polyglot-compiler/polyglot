@@ -12,8 +12,8 @@ import java.util.ArrayList;
  * MethodType
  *
  * Overview:
- *    A MethodType represents the mutable typing information associated with a 
- *    Java method. 
+ *    A MethodType represents the immutable typing information
+ *    associated with a Java method.
  *
  *    A MethodType object may be partial, and contain as little as a name and
  *    a list of arguments.  Such objects are used as keys for method lookup.
@@ -22,7 +22,7 @@ public class MethodType implements Cloneable {
   public MethodType(String methodName,
 		    List argumentTypes) {
     this.name = methodName;
-    this.argumentTypes = TypedList.copy(argumentTypes, Type.class, false);
+    this.argumentTypes = TypedList.copy(argumentTypes, Type.class, true);
   }  
 
   /**
@@ -36,10 +36,10 @@ public class MethodType implements Cloneable {
     this.name = methodName;
     this.returnType = returnType;
     this.argumentTypes = TypedList.copy(argumentTypes,
-					Type.class, false);
+					Type.class, true);
     if (exceptionTypes != null)
       this.exceptionTypes = TypedList.copy(exceptionTypes,
-					   Type.class, false);
+					   Type.class, true);
 
     if (flags != null)
       this.flags = flags.copy();    
@@ -55,29 +55,24 @@ public class MethodType implements Cloneable {
   public Object clone() { return copy(); }
 
   public AccessFlags getFlags() {
-    return flags;
+    return flags.copy();
   }
-  public void setFlags(AccessFlags flags) {
-    this.flags = flags;
-  }
-  public String getName() { return name; }
   public void setName(String name) { this.name = name; }
 
   public Type returnType()          { return returnType; }
-  public void setReturnType(Type t) { returnType = t; }
   public TypedList argumentTypes()  { return argumentTypes; }
   public TypedList exceptionTypes() { 
     if (exceptionTypes == null)
       exceptionTypes = new TypedList(new ArrayList(),
-				     Type.class, false);      
+				     Type.class, true);   
 
     return exceptionTypes; 
   }
 
   private String name;
-  // RI: every element is a Type.
+  // RI: every element is a Type.  Immutable.
   private TypedList argumentTypes;
-  // RI: every element is a Type.  May be null.
+  // RI: every element is a Type.  May be null.  Immutable.
   private TypedList exceptionTypes;
   // RI: May be null.
   private AccessFlags flags;

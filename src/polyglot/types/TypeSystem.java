@@ -23,8 +23,10 @@ public abstract class TypeSystem {
    * proceeding.
    **/
   public static class Context {   
-    public JavaClass inClass;
-    public MethodType inMethod;
+    public final JavaClass inClass;
+    public final MethodType inMethod;
+    
+    public Context(JavaClass c, MethodType m) { inClass = c; inMethod = m; }
   }
 
   /**
@@ -150,7 +152,7 @@ public abstract class TypeSystem {
    * Requires: all type arguments are canonical.
    *
    * Returns an immutable iterator of all the MethodMatches defined on
-   * type (if any).  The iterator is guaranteed to yeild methods
+   * type (if any).  The iterator is guaranteed to yield methods
    * defined on subclasses before those defined on superclasses.
    **/  
   public abstract Iterator getMethodsForType(Type type);
@@ -158,7 +160,7 @@ public abstract class TypeSystem {
    * Requires: all type arguments are canonical.
    *
    * Returns an immutable iterator of all the FieldMatches named 'name' defined
-   * on type (if any).  The iterator is guaranteed to yeild methods
+   * on type (if any).  The iterator is guaranteed to yield methods
    * defined on subclasses before those defined on superclasses.
    **/
   public abstract Iterator getFieldsNamed(Type type, String name);
@@ -166,7 +168,7 @@ public abstract class TypeSystem {
    * Requires: all type arguments are canonical.
    *
    * Returns an immutable of all the MethodMatches named 'name' defined on
-   * type (if any).  The iterator is guaranteed to yeild methods
+   * type (if any).  The iterator is guaranteed to yield methods
    * defined on subclasses before those defined on superclasses.
    **/  
   public abstract Iterator getMethodsNamed(Type type, String name);
@@ -200,26 +202,35 @@ public abstract class TypeSystem {
    * be successful, returns the actual MethodMatch for the method that
    * would be called.  Otherwise returns null.
    *
+   * If <context> is non-null, only those methods visible in context are
+   * considered.
+   *
    * This method uses the name, argument types, and access flags of <method>.
    * The access flags are used to select which protections may be accepted.
    *
    * (Guavac gets this wrong.)
    **/
-  public abstract MethodMatch getMethod(Type type, MethodType method);
+  public abstract MethodMatch getMethod(Type type, MethodType method, 
+					Context context);
   /**
    * If an attempt to call a method of type <method> on <type> would
    * be successful, and the method would match on the given <type>,
    * returns the actual MethodMatch for the method that would be
    * called.  Otherwise returns null.
    *
+   * If <context> is non-null, only those methods visible in context are
+   * considered.
+   *
    * This method uses the name, argument types, and access flags of <method>.
    * The access flags are used to select which protections may be accepted.
    *
    * (Guavac gets this wrong.)
    **/
-  public abstract MethodMatch getMethodInClass(Type type, MethodType method);
+  public abstract MethodMatch getMethodInClass(Type type, MethodType method, 
+					       Context context);
   /**
-   * As above, except only returns a match if the argument types are identical.
+   * As above, except only returns a match if the argument types are identical,
+   * and disregards context.
    **/
   public abstract MethodMatch getExactMethod(Type type, MethodType method);
   public abstract MethodMatch getExactMethodInClass(Type type, MethodType method); 
