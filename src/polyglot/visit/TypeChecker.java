@@ -19,14 +19,27 @@ public class TypeChecker extends NodeVisitor
     c = new LocalContext( im, ts);
   }
 
-  public Node visitBefore( Node n)
+  public Node override( Node n)
   {
-    return n.adjustScope( c);
+    if( n.hasError()) {
+      return n;
+    }
+    else {
+      return null;
+    }
   }
 
-  public Node visitAfter( Node n, Object vinfo)
+  public NodeVisitor enter( Node n)
   {
-    if( vinfo != null) {
+    n.enterScope( c);
+    depth++;
+    errors[depth] = false;
+    return this;
+  }
+
+  public Node leave( Node old, Node n, NodeVisitor v)
+  {
+    if( errors[ depth]) {
       /* We've seen some error, so propagate back to a statement. */
       if( n instanceof Expression || n instanceof TypeNode) {
         Annotate.setVisitorInfo( n, vinfo);
@@ -52,19 +65,8 @@ public class TypeChecker extends NodeVisitor
       eq.enqueue( ErrorInfo.SEMANTIC_ERROR, 
                   e.getMessage(),
                   iLine);
-      
-      Annotate.setVisitorInfo( n, this);
+      errors[depth] = true;
       return n;
-    }
-  }
-    
-  public Object mergeVisitorInfo( Object vinfo1, Object vinfo2)
-  {
-    if( vinfo1 == null && vinfo2 == null) {
-      return null;
-    }
-    else {
-      return this;
     }
   }
 }

@@ -1,140 +1,113 @@
-/*
- * CastExpression.java
- */
-
 package jltools.ast;
 
 import jltools.util.*;
 import jltools.types.*;
 
 /**
- * CastExpression
- * 
- * Overview: A CastExpression is a mutable representation of a casting
- *   operation.  It consists of an Expression being cast and a Type
- *   being cast to.
+ * A <code>CastExpression</code> is a immutable representation of a casting
+ * operation.  It consists of an <code>Expression</code> being cast and a
+ * <code>Type</code> being cast to.
  */ 
+public class CastExpression extends Expression
+{
+  protected final TypeNode tn;
+  protected final Expression expr;
 
-public class CastExpression extends Expression {
-    /** 
-     * Effects: Creates a new cast expression casting <expr> to type <type>.
-     */
-    public CastExpression (TypeNode type, Expression expr) {
-	this.type = type;
-	this.expr = expr;
-    }
-    /** 
-     * Effects: Creates a new cast expression casting <expr> to type <type>.
-     */
-    public CastExpression (Type type, Expression expr) {
-        this(new TypeNode(type), expr);
-    }
-
-    /**
-     * Effects: Returns the type that this CastExpression is casting to
-     */
-    public Node getCastType () {
-	return type;
-    }
-
-    /**
-     * Effects: Sets the type that this CastExpression is casting to
-     * <newType> 
-     */
-    public void setCastType(Type newType) {
-	type = new TypeNode(newType);
-    }
-
-    /**
-     * Effects: Sets the type that this CastExpression is casting to
-     * <newType> 
-     */
-    public void setCastType(TypeNode newType) {
-	type = newType;
-    }
-
-
-    /**
-     * Effects: Returns the expression that is being cast.
-     */
-    public Expression getExpression () {
-      return expr;
-    }
-
-    /**
-     * Effects: Sets the expression that is being cast to <newExpression>. 
-     */
-    public void setExpression(Expression newExpression) {
-	expr = newExpression;
-    }
-
-  public void translate ( LocalContext c, CodeWriter w)
+  /** 
+   * Creates a new cast expression casting <code>expr</code>> to type
+   * <code>type</code>.
+   */
+  public CastExpression( TypeNode tn, Expression expr) 
   {
-    w.write ("(" );
-    type.translate(c, w);
-    w.write ( ")" );
+    this.tn = tn;
+    this.expr = expr;
+  }
+  
+  /**
+   * Lazily reconstruct this node.
+   * <p>
+   * If the arguments are pointer identical the fields of the current node,
+   * then the current node is returned untouched. Otherwise a new node is
+   * constructed with the new fields and all annotations from this node are
+   * copied over.
+   *
+   * @param tn The new type of the cast.
+   * @param expr The expression that is being cast.
+   * @return An <code>CastExpression<code> with the given type and expression.
+   */
+  public CastExpression reconstruct( TypeNode tn, Expression expr)
+  {
+    if( this.tn == tn && this.expr == expr) {
+      return this;
+    }
+    else {
+      CastExpression n = new CastExpression( tn, expr);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+  }
+
+  /**
+   * Returns the type that this <code>CastExpression</code> is casting to.
+   */
+  public Type getCastType() 
+  {
+    return tn.getType();
+  }
+
+  /**
+   * Returns the expression that is being cast.
+   */
+  public Expression getExpression()
+  {
+    return expr;
+  }
+
+  /**
+   * Visit the children of this node.
+   *
+   * @pre Requires that <code>tn.visit</code> returns an object of type
+   *  <code>TypeNode</code> and that <code>expr.visit</code> returns an
+   *  object of type <code>Expression</code>.
+   */ 
+  Node visitChildren( NodeVisitor v) 
+  {
+    return reconstruct( (TypeNode)tn.visit( v),
+                        (Expression)expr.visit( v));
+  }
+
+  public Node typeCheck( LocalContext c) throws SemanticException
+  {
+    if ( !expr.getCheckedType().isCastValid( tn.getType()))
+      throw new SemanticException( "Cannot cast the expression of type \"" 
+                                   + expr.getCheckedType().getTypeString() 
+                                   + "\" to type \"" 
+                                   + tn.getType().getTypeString() 
+                                   + "\".");
+
+    setCheckedType( tn.getType());
+    return this;
+  }
+  
+  public void translate( LocalContext c, CodeWriter w)
+  {
+    w.write( "(");
+    tn.translate( c, w);
+    w.write( ")");
 
     translateExpression( expr, c, w);
   }
   
-  public Node dump( CodeWriter w)
+  public void dump( CodeWriter w)
   {
     w.write( "( CAST ");
     dumpNodeInfo( w);
     w.write( ")");
-    return null;
   }
 
   public int getPrecedence()
   {
     return PRECEDENCE_CAST;
   }
-
-  public Node typeCheck( LocalContext c) throws TypeCheckException
-  {
-    if ( ! expr.getCheckedType().isCastValid( type.getType() ) )
-      throw new TypeCheckException("Cannot cast the expression of type \"" +
-                                   expr.getCheckedType().getTypeString() + "\" to type \"" + 
-                                   type.getType().getTypeString() + "\"");
-    Annotate.addThrows ( this, Annotate.getThrows( expr ) );
-    setCheckedType( type.getType() );
-
-    return this;
-  }
-
-
-  /**
-   * Requires: v will not transform the Expression into anything
-   *    other than another Expression.
-   * Effects:
-   *    Visits the sub expression of this.
-   */ 
-  Object visitChildren(NodeVisitor v) 
-  {
-    Object vinfo = Annotate.getVisitorInfo( this);
-    
-    expr = (Expression) expr.visit(v);
-    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( expr), vinfo);
-    
-    type = (TypeNode) type.visit(v);
-    return v.mergeVisitorInfo( Annotate.getVisitorInfo( type), vinfo);
-  }
-  
-    public Node copy() {
-      CastExpression ce = new CastExpression(type, expr);
-      ce.copyAnnotationsFrom(this);
-      return ce;
-    }
-
-    public Node deepCopy() {
-      CastExpression ce = 
-	new CastExpression((TypeNode) type.deepCopy(), 
-			   (Expression) expr.deepCopy());
-      ce.copyAnnotationsFrom(this);
-      return ce;     
-    }
-
-    protected Expression expr;
-    protected TypeNode type;
 }
 

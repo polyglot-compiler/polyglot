@@ -26,7 +26,7 @@ public class LoadedClassType extends ClassTypeImpl  {
    * typeSystem.
    **/
   public LoadedClassType(Class theClass, TypeSystem typeSys) 
-       throws TypeCheckException 
+       throws SemanticException 
   {
     super( typeSys);    
     this.theClass = theClass;
@@ -80,7 +80,7 @@ public class LoadedClassType extends ClassTypeImpl  {
       try {
         initializeFields();
       }
-      catch( TypeCheckException e) {
+      catch( SemanticException e) {
         e.printStackTrace();
         return new LinkedList();
       }
@@ -94,7 +94,7 @@ public class LoadedClassType extends ClassTypeImpl  {
       try {
         initializeMethods();
       }
-      catch( TypeCheckException e) {
+      catch( SemanticException e) {
         e.printStackTrace();
         return new LinkedList();
       }
@@ -102,7 +102,7 @@ public class LoadedClassType extends ClassTypeImpl  {
     return super.getMethods();
   }
 
-  protected void initializeFields() throws TypeCheckException
+  protected void initializeFields() throws SemanticException
   {
     Field[]       fieldAry  = theClass.getDeclaredFields();
     List fieldLst  = new ArrayList(fieldAry.length + 1);
@@ -114,7 +114,7 @@ public class LoadedClassType extends ClassTypeImpl  {
     fields  = new TypedList(fieldLst,  FieldInstance.class, true);
   }
 
-  protected void initializeMethods() throws TypeCheckException
+  protected void initializeMethods() throws SemanticException
   {
     Method[]      methodAry = theClass.getDeclaredMethods();
     Constructor[] constrAry = theClass.getDeclaredConstructors();
@@ -130,7 +130,7 @@ public class LoadedClassType extends ClassTypeImpl  {
     methods = new TypedList(methodLst, MethodType.class, true);    
   }
 
-  protected FieldInstance fieldInstanceForField(Field f) throws TypeCheckException 
+  protected FieldInstance fieldInstanceForField(Field f) throws SemanticException 
   {
     String fieldName = f.getName();
     Type type = ts.typeForClass(f.getType());
@@ -146,7 +146,7 @@ public class LoadedClassType extends ClassTypeImpl  {
     return fi;
   }
 
-  protected MethodType methodTypeForMethod(Method m) throws TypeCheckException 
+  protected MethodType methodTypeForMethod(Method m) throws SemanticException 
   {
     String name = m.getName();
     AccessFlags flags = AccessFlags.flagsForInt(m.getModifiers());
@@ -166,7 +166,7 @@ public class LoadedClassType extends ClassTypeImpl  {
                                   argList, excpList, flags);
   }
 
-  protected MethodType methodTypeForConstructor(Constructor m) throws TypeCheckException
+  protected MethodType methodTypeForConstructor(Constructor m) throws SemanticException
   {
     AccessFlags flags = AccessFlags.flagsForInt(m.getModifiers());
     Class[] args = m.getParameterTypes();

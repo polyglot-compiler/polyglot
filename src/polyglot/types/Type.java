@@ -1,21 +1,14 @@
-/*
- * Type.java
- */
-
 package jltools.types;
 
 import jltools.util.AnnotatedObject;
 
 /**
- * Type
- *
- * Overview:
- *    A type represents a type in some java-based typesystem.  Each type
- *    is tied to a particular TypeSystem; types with different TypeSystems
- *    are incomparable.
- *
- *    ==> _All_ types are immutable.
- **/
+ * A type represents a type in some Java-based typesystem.  Each type
+ * is tied to a particular TypeSystem; types with different TypeSystems
+ * are incomparable.
+ * <p>
+ * <b>All types are immutable.</b>
+ */
 public abstract class Type extends AnnotatedObject {
   // Creates a new type in the given typeSystem.
   public Type(TypeSystem ts) { this.ts = ts; }
@@ -32,21 +25,21 @@ public abstract class Type extends AnnotatedObject {
   ////
   // Methods which dispatch to typeSystem
   ////
-  public final Type extendArrayDims(int dims) throws TypeCheckException
+  public final Type extendArrayDims(int dims) throws SemanticException
     { return ts.extendArrayDims(this,dims); }  
-  public final boolean isSameType(Type t) throws TypeCheckException
+  public final boolean isSameType(Type t) throws SemanticException
     { return ts.isSameType(this,t); }
-  public final boolean descendsFrom(Type ancestorType)throws TypeCheckException
+  public final boolean descendsFrom(Type ancestorType)throws SemanticException
     { return ts.descendsFrom(this,ancestorType); }
-  public final boolean isAssignableSubtype(Type ancestorType) throws TypeCheckException
+  public final boolean isAssignableSubtype(Type ancestorType) throws SemanticException
     { return ts.isAssignableSubtype(this,ancestorType); }
-  public final boolean isCastValid(Type toType) throws TypeCheckException
+  public final boolean isCastValid(Type toType) throws SemanticException
     { return ts.isCastValid(this, toType); }
-  public final boolean isImplicitCastValid(Type toType) throws TypeCheckException
+  public final boolean isImplicitCastValid(Type toType) throws SemanticException
     { return ts.isImplicitCastValid(this, toType); }
-  public final boolean isThrowable() throws TypeCheckException
+  public final boolean isThrowable() throws SemanticException
     { return ts.isThrowable(this); }
-  public final boolean isUncheckedException() throws TypeCheckException
+  public final boolean isUncheckedException() throws SemanticException
     { return ts.isUncheckedException(this); }
 
   public final TypeSystem getTypeSystem() 

@@ -1,209 +1,139 @@
-/*
- * IfStatement.java
- */
-
 package jltools.ast;
+
 import jltools.types.*;
 import jltools.util.*;
 
+
 /**
- * IfStatement
- *
- * Overview: A mutable representation of a Java language if statement.
- *    Contains an expression whose value is tested, a then statement, and
- *    optionally an else statement.
+ * An immutable representation of a Java language <code>if</code> statement.
+ * Contains an expression whose value is tested, a ``then'' statement 
+ * (consequent), and optionally an ``else'' statement (alternate).
  */
-public class IfStatement extends Statement {
-  /**
-   * Effects: Creates a new IfStatement with conditional expression
-   *    <condExpr>, a then statement <thenStatement> and else statement
-   *    <elseStatement>.  If there is no else statement <elseStatement>
-   *    should be null.
-   */
-  public IfStatement (Expression condExpr, Statement thenStatement,
-		      Statement elseStatement) {
-    this.condExpr = condExpr;
-    this.thenStatement = thenStatement;
-    this.elseStatement = elseStatement;
-  }
-
-  public IfStatement (Expression condExpr, Statement thenStatement) {
-    this(condExpr, thenStatement, null);
-  }
+public class IfStatement extends Statement 
+{
+  protected final Expression cond;
+  protected final Statement then;
+  protected final Statement else_;
 
   /**
-   * Effects: Returns the Expression that this IfStatement is
-   * conditioned on.
+   * Creates a new <code>IfStatement</code>.
+   * 
+   * @param cond The conditional expression to be tested.
+   * @param then The consequent.
+   * @param else_ The alternate. This parameter may be <code>null</code>.
    */
-  public Expression getConditionalExpression() {
-    return condExpr;
-  }
-
-  /**
-   * Effects: Sets the conditional expression of this to <newExpr>.
-   */
-  public void setConditionalExpression(Expression newExpr) {
-    condExpr = newExpr;
-  }
-
-  /**
-   * Effects: Returns the then statement associated with this
-   *    IfStatement.
-   */
-  public Statement getThenStatement() {
-    return thenStatement;
-  }
-
-  /**
-   * Effects: Sets the then statement of this IfExpression to be
-   *    <newStatement>.
-   */
-  public void setThenStatement(Statement newStatement) {
-    thenStatement = newStatement;
-  }
-
-  /**
-   * Effects: Returns the else statement associated with this
-   *    IfStatement.
-   */
-  public Statement getElseStatement() {
-    return elseStatement;
-  }
-
-  /**
-   * Effects: Sets the else statement of this IfExpression to be
-   *    <newStatement>.
-   */
-  public void setElseStatement(Statement newStatement) {
-    elseStatement = newStatement;
-  }
-
-
-  public void translate(LocalContext c, CodeWriter w)
+  public IfStatement( Expression cond, Statement then, Statement else_) 
   {
-    boolean bThenBlockStatement, bElseBlockStatement;
-    bThenBlockStatement = thenStatement instanceof BlockStatement;
-    bElseBlockStatement = elseStatement instanceof BlockStatement;
-    
-    w.write ( "if( " ) ;
-    condExpr.translate ( c, w);
-    w.write ( ")" );
-    if (! bThenBlockStatement)
-    {
-      w.beginBlock();
-      thenStatement.translate(c, w);
-      w.endBlock();
+    this.cond = cond;
+    this.then = then;
+    this.else_ = else_;
+  }
+
+  public IfStatement( Expression cond, Statement then) 
+  {
+    this( cond, then, null);
+  }
+
+  /**
+   * Lazily reconstruct this node.
+   */
+  public IfStatement reconstruct( Expression cond, Statement then, 
+                                  Statement else_) 
+  {
+    if( this.cond == cond && this.then == then && this.else_ == else_) {
+      return this;
     }
-    else
-      thenStatement.translate(c, w);
-    if ( elseStatement != null)
-    {
-      w.newline();
-      w.write ( "else " );
-      if (! bElseBlockStatement)
-      {
-        w.beginBlock();
-        elseStatement.translate(c, w);
-        w.endBlock();
-      }
-      else {
-        elseStatement.translate(c,w );
-      }
+    else {
+      IfStatement n = new IfStatement( cond, then, else_);
+      n.copyAnnotationsFrom( this);
+      return n;
     }
-
   }
 
-  public Node dump( CodeWriter w)
+  /**
+   * Returns the conditional expression for this statement.
+   */
+  public Expression getCondition() 
   {
-    w.write( "( IF ");
-    dumpNodeInfo( w);
-    w.write( ")");
-    return null;
+    return cond;
   }
 
-  public Node typeCheck(LocalContext c) throws TypeCheckException
+  /**
+   * Returns the then statement associated with this <code>IfStatement</code>.
+   */
+  public Statement getConsequent() 
   {
-    Type ctype = condExpr.getCheckedType();
+    return then;
+  }
+
+  /**
+   * Returns the else statement associated with this <code>IfStatement</code>.
+   */
+  public Statement getAlternate() 
+  {
+    return else_;
+  }
+
+  /**
+   * Visit the children of this node.
+   * 
+   * @pre Requires that <code>cond.visit</code> transforms the condition
+   *  into an object of type <code>Expression</code> and that the
+   *  <code>visit</code> method for the consequent and the alternate
+   *  should transform each into objects of type <code>Statement</code>.
+   */
+  Node visitChildren(NodeVisitor v) 
+  {
+    return reconstruct( (Expression)cond.visit( v),
+                        (Statement)then.visit( v),
+                        (else_ == null ? null : (Statement)else_.visit( v)));
+  }
+
+  public Node typeCheck(LocalContext c) throws SemanticException
+  {
+    Type ctype = cond.getCheckedType();
+
     if( !ctype.equals( c.getTypeSystem().getBoolean())) {
-      throw new TypeCheckException( "Conditional must have boolean type.");
+      throw new SemanticException( "Conditional must have boolean type.");
     }
-    
-    Annotate.addThrows ( this, Annotate.getThrows ( condExpr ));
-    Annotate.addThrows ( this, Annotate.getThrows ( thenStatement ));
-    if ( elseStatement != null)
-    {
-      Annotate.addThrows ( this, Annotate.getThrows ( elseStatement ));
-      
-      Annotate.setTerminatesOnAllPaths( this, Annotate.terminatesOnAllPaths ( thenStatement) &&
-                                        Annotate.terminatesOnAllPaths ( elseStatement));
-                                        
-    }
-    
 
     return this;
   }
 
-  /**
-   * Requires: v will not transform an expression into anything other
-   *    than another expression, and that v will not transform a
-   *    Statement into anything other than another Statement or
-   *    Expression.
-   * Effects: visits each of the children of this node with <v>.  If <v>
-   *    returns an expression in place of one of the sub-statements, it is
-   *    wrapped in an ExpressionStatement.
-   */
-  Object visitChildren(NodeVisitor v) 
-  {
-    Object vinfo = Annotate.getVisitorInfo( this);
-
-    condExpr = (Expression) condExpr.visit(v);
-    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( condExpr), vinfo);
-
-    Node newNode;
-
-    if( thenStatement != null) {
-      newNode = (Node) thenStatement.visit(v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newNode), vinfo);
-      if (newNode instanceof Expression) {
-        thenStatement = new ExpressionStatement((Expression) newNode);
-      }
-      else {
-        thenStatement = (Statement) newNode;
-      }
+  public void translate( LocalContext c, CodeWriter w)
+  {    
+    w.write( "if( ");
+    cond.translate( c, w);
+    w.write( ")");
+   
+    if( !(then instanceof BlockStatement)) {
+      w.beginBlock();
+      then.translate( c, w);
+      w.endBlock();
+    } 
+    else {
+      then.translate(c, w);
     }
 
-    if( elseStatement != null)
+    if ( else_ != null)
     {
-      newNode = (Node) elseStatement.visit(v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newNode), vinfo);
-      if (newNode instanceof Expression) {
-        elseStatement = new ExpressionStatement((Expression) newNode);
+      w.newline();
+      w.write ( "else " );
+      if( !(else_ instanceof BlockStatement)) {
+        w.beginBlock();
+        else_.translate( c, w);
+        w.endBlock();
       }
       else {
-        elseStatement = (Statement) newNode;
+        else_.translate( c, w);
       }
     }
-
-    return vinfo;
   }
 
-  public Node copy() {
-    IfStatement is = new IfStatement(condExpr, thenStatement, elseStatement);
-    is.copyAnnotationsFrom(this);
-    return is;
+  public void dump( CodeWriter w)
+  {
+    w.write( "( IF ");
+    dumpNodeInfo( w);
+    w.write( ")");
   }
-
-  public Node deepCopy() {
-    Statement newElseStatement = 
-      (elseStatement == null ? null : (Statement)elseStatement.deepCopy());
-    IfStatement is = new IfStatement((Expression) condExpr.deepCopy(),
-				     (Statement) thenStatement.deepCopy(),
-				     newElseStatement);
-    is.copyAnnotationsFrom(this);
-    return is;
-  }
-
-  private Expression condExpr;
-  private Statement thenStatement;
-  private Statement elseStatement;
 }

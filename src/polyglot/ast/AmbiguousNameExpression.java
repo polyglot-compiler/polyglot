@@ -1,7 +1,3 @@
-/*
- * AmbiguousNameExpression.java
- */
-
 package jltools.ast;
 
 import jltools.types.*;
@@ -11,116 +7,113 @@ import java.util.*;
 
 
 /**
- * AmbiguousNameExpression
- *
- * Overview: An AmbiguousNameExpression represents an ambiguous
- *    expression composed of a series of period-separated identifiers.
- *
- * Notes: In standard Java, an AmbiguousNameExpression will be one of:
- *     -- field-name{.nonstatic-field-name}*
- *     -- class-name.static-field-name{.nonstatic-field-name}*....
- *
- * Since we can identify locals at parse-time, we make it invariant
- * that the first component of an AmbiguousNameExpression is _not_ a local.
- *
+ * An <code>AmbiguousNameExpression</code> represents an ambiguous expression 
+ * composed of a series of period-separated identifiers.
+ * <p>
+ * Notes: In standard Java, an <code>AmbiguousNameExpression</code> will be
+ *  one of:
+ * <ul>
+ * <li> var-name{.nonstatic-field-name}*
+ * <li> class-name.static-field-name{.nonstatic-field-name}*
+ * <li> inner-class-name.static-field-name{.nonstatic-field-name}*
+ * <li> class-name.inner-class-name.static-field-name{.nonstatic-field-name}*
+ * </ul>
+ * Where <i>var-name</i> is either a local variable or field of the current
+ * a super class, or a containing class.
+ * <p>
  * In order to resolve the ambiguity, the spec requires that we inspect the
  * first identifier to determine whether it's a field.  If not, we look for
  * the longest possible prefix that's a class name.
  **/
 public class AmbiguousNameExpression extends AmbiguousExpression {
-  /**
-   * Checks: lst has at least one element, and every element of lst is a
-   *   String which contains no periods.
-   * Effects: creates a new AmbiguousNameExpression for the names in lst.
-   **/
-  public AmbiguousNameExpression(List lst) {
-    names = TypedList.copyAndCheck(lst, String.class, false);
-    if (lst.size() < 1) throw new Error();
-  }
+
+  protected final TypedList names;
 
   /**
-   * Requires: strng is not empty, and does not begin or end with a '.'
-   * Effects: creates a new AmbiguousNameExpression for the identifier in
-   *   <strng>
+   * Creates a new AmbiguousNameExpression for the identifier in
+   * <code>s</code>.
+   * @pre <code>s</code> is not empty, and does not begin or end with a '.'.
    */
-  public AmbiguousNameExpression(String strng) {
-    names = new TypedList(new ArrayList(4), String.class, false);
-    Enumeration enum = new java.util.StringTokenizer(strng, ".");
-    while (enum.hasMoreElements())
-      names.add(enum.nextElement());
-  }
+  public AmbiguousNameExpression( String s) {
 
-  public void addIdentifier(String strng) {
-    names.add(strng);
+    names = new TypedList(new ArrayList(4), String.class, true);
+
+    StringTokenizer st = new StringTokenizer( s, ".");
+
+    while( st.hasMoreTokens()) {
+      names.add( st.nextToken());
+    }
   }
 
   /**
-   * Returns a mutable TypedList of the identifiers in this
-   * AmbiguousExpression.
-   **/
+   * Lazily reconstruct this node. If any of the dotted components in 
+   * <code>s</code> differ from their respective components in 
+   * <code>this.getName()</code> then return a new expression. Otherwise
+   * return <code>this</code>.
+   */
+  public AmbiguousNameExpression reconstruct( String s) {
+    StringTokenizer st = new StringTokenizer( s, ".");
+    if( st.countTokens() != names.size()) {
+      return new AmbiguousNameExpression( s);
+    }
+    else {
+      for( Iterator iter = names.iterator(); iter.hasNext(); ) {
+        if( !iter.next().equals( st.nextToken())) {
+          AmbiguousNameExpression n = new AmbiguousNameExpression( s);
+          n.copyAnnotationsFrom( this);
+          return n;
+        }
+      }
+      return this;
+    }
+  }
+
+  /**
+   * Returns a new <code>AmbiguousNameExpression</code> whose expression
+   * is equivalent to the current expression with <code>s</code> appended.
+   *
+   * @post Will copy annotations from <code>this</code> to the new node.
+   */
+  public AmbiguousNameExpression append( String s)
+  {
+    AmbiguousNameExpression n = new AmbiguousNameExpression( getName() + "." 
+                                                             + s);
+    n.copyAnnotationsFrom( this);
+    return n;
+  }
+
+  /**
+   * Returns a immutable TypedList of the identifiers in this
+   * <code>AmbiguousNameExpression</code>.
+   */
   public TypedList getIdentifiers() {
     return names;
   }
 
+  /**
+   * Returns the entire expression as a dotted string.
+   */
   public String getName() {
     StringBuffer sb = new StringBuffer();
     Iterator iter = names.iterator();
-    while(iter.hasNext())
+
+    while( iter.hasNext())
     {
-      sb.append((String)iter.next());
-      if(iter.hasNext())
-        sb.append('.');
+      sb.append( (String)iter.next());
+      if( iter.hasNext()) {
+        sb.append( '.');
+      }
     }
+
     return sb.toString();
   }
 
-  public Node copy() {
-    AmbiguousNameExpression ane = new AmbiguousNameExpression(names);
-    ane.copyAnnotationsFrom(this);
-    return ane;
-  }
-
-  public Node deepCopy() {
-    return copy();
-  }
-  
-  Object visitChildren(NodeVisitor vis) 
+  Node visitChildren( NodeVisitor v) 
   { 
-    return Annotate.getVisitorInfo( this);
+    return this;
   }
 
-  public void translate( LocalContext c, CodeWriter w)
-  {
-    /*
-    for (Iterator i = names.listIterator(); i.hasNext(); )
-    {
-      w.write ((String)i.next());
-      if(i.hasNext())
-        w.write(".");
-    }
-    */
-    
-    throw new InternalCompilerError( 
-			    "Attempted to translate an ambiguous node.");
-  }
-
-  public Node dump( CodeWriter w)
-  {
-    w.write ("( AMBIGOUS NAME < ");
-    for (Iterator i = names.listIterator(); i.hasNext(); )
-    {
-      w.write( (String)i.next());
-      if( i.hasNext()) {
-        w.write( ".");
-      }
-    }
-    w.write( " > ");
-    dumpNodeInfo( w);
-    w.write( ")");
-    return null;
-  }
-
-  public Node removeAmbiguities( LocalContext c) throws TypeCheckException
+  public Node removeAmbiguities( LocalContext c) throws SemanticException
   {
     Node top = null;
     String name = "";
@@ -155,7 +148,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
         /* Clear the name. */
         name = "";
       }
-      catch( TypeCheckException tce) 
+      catch( SemanticException tce) 
       {
         if( top == null) {
           /* If it's not a local or field, then try and find a type. */
@@ -166,7 +159,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
             /* Clear the name. */
             name = "";
           }
-          catch( TypeCheckException tce2)
+          catch( SemanticException tce2)
           {
             /* Not a local, field or type. Must be imcomplete. */
             name += ".";
@@ -181,12 +174,38 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     }
 
     if( top == null) {
-      throw new TypeCheckException( "No field or variable with name \"" + 
+      throw new SemanticException( "No field or variable with name \"" + 
                                     name + "\".");
     }
 
     return top;
   }
 
-  TypedList names;
+  /*
+   * Possibly useful for debugging purposes, but usually not used.
+   *
+  public void translate( LocalContext c, CodeWriter w)
+  {
+    for( Iterator i = names.listIterator(); i.hasNext(); ) {
+      w.write( (String)i.next());
+      if( i.hasNext()) {
+        w.write( ".");
+      }
+    }
+  }
+  */
+
+  public void dump( CodeWriter w)
+  {
+    w.write ("( AMBIGOUS NAME < ");
+    for( Iterator i = names.listIterator(); i.hasNext(); ) {
+      w.write( (String)i.next());
+      if( i.hasNext()) {
+        w.write( ".");
+      }
+    }
+    w.write( " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
+  }
 }

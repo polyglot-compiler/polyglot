@@ -1,73 +1,84 @@
-/*
- * FloatLiteral.java
- */
-
 package jltools.ast;
-import jltools.types.LocalContext;
+
+import jltools.types.*;
 import jltools.util.*;
 
 /** 
- * Float Literal
- * 
- * Overview: A FloatLiteral represents a literal in java of type float
- *    or double.
+ * A <code>FloatLiteral</code> represents a literal in java of type
+ * <code>float</code> or <code>double</code>.
  */
-public class FloatLiteral extends Literal {
-  
+public class FloatLiteral extends Literal 
+{  
   public static final int FLOAT   = 0;
   public static final int DOUBLE  = 1;
 
+  protected final int kind;
+  protected final double value;  
+
   /**
-   * Creates a new FloatLiteral storing a float with the value <f>.
+   * Creates a new <code>FloatLiteral</code> storing a float with the value 
+   * <code>f</code>.
    */
-  public FloatLiteral (float f) {
-    type = FLOAT;
+  public FloatLiteral( float f) 
+  {
+    kind = FLOAT;
     value = f;
   }
 
   /**
-   * Creates a new FloatLiteral storing a double with the value <d>.
+   * Creates a new <code>FloatLiteral</code> storing a double with the value
+   * <code>d</code>.
    */
-  public FloatLiteral (double d) {
-    type = DOUBLE;
+  public FloatLiteral( double d) 
+  {
+    kind = DOUBLE;
     value = d;
   }
 
-  /**
-   * Effects: Returns the type of this FloatLiteral as specified by the
-   *   public static constants in this class.
-   */ 
-  public int getFloatType() {
-    return type;
+  /* Lazily reconstruct this node. */
+  public FloatLiteral reconstruct( int kind, double value)
+  {
+    if( this.kind == kind && (double)this.value == value) {
+      return this;
+    }
+    else {
+      FloatLiteral n = (kind == FLOAT ? new FloatLiteral( (float)value) :
+                                  new FloatLiteral( (double)value));
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
   }
 
   /**
-   * Effects: Returns the float value of this FloatLiteral.
+   * Returns the kind of this <code>FloatLiteral</code> as specified by the
+   * <code>public static</code> constants in this class.
+   */ 
+  public int getKind() 
+  {
+    return kind;
+  }
+
+  /**
+   * Returns the float value of this <code>FloatLiteral</code>.
    */
-  public float getFloatValue() {
-    return (float) value;
+  public float getFloatValue() 
+  {
+    return (float)value;
   }
   
   /**
-   * Effects: Returns the double value of this FloatLiteral.
+   * Returns the double value of this <code>FloatLiteral</code>.
    */
-  public double getDoubleValue() {
-    return (double) value;
+  public double getDoubleValue() 
+  {
+    return (double)value;
   }
 
-
-  public void translate(LocalContext c, CodeWriter w)
+  /**
+   * Visit this children of this node. */
+  Node visitChildren(NodeVisitor v) 
   {
-    w.write ( type == FLOAT ? Float.toString( (float)value) /* + 'F' */: Double.toString( value ));
-  }
-
-  public Node dump( CodeWriter w)
-  {
-    w.write( "( " + (type == FLOAT ? " FLOAT LITERAL < " + Float.toString((float)value) :
-                                       " DOUBLE LITERAL < " + Double.toString( value ) ) + " > ");
-    dumpNodeInfo( w);
-    w.write( ")");
-    return null;
+    return this;
   }
 
   public Node typeCheck( LocalContext c)
@@ -76,27 +87,20 @@ public class FloatLiteral extends Literal {
     return this;
   }  
 
-  Object visitChildren(NodeVisitor v) 
+  public void translate(LocalContext c, CodeWriter w)
   {
-    return Annotate.getVisitorInfo( this);
+    w.write( kind == FLOAT ? Float.toString( (float)value) /* + 'F' */ : 
+                          Double.toString( value));
   }
 
-  public Node copy() {
-    switch(type) {
-    case FLOAT:
-      return new FloatLiteral((float) value);
-    case DOUBLE:
-      return new FloatLiteral((double) value);
-    default:
-      throw new Error("Internal error: Float rep broken.");
-    }
+  public void dump( CodeWriter w)
+  {
+    w.write( "( " + (kind == FLOAT ? " FLOAT LITERAL < " 
+                                        + Float.toString((float)value) :
+                               " DOUBLE LITERAL < " 
+                                        + Double.toString( value ) ) + " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
   }
-
-  public Node deepCopy() {
-    return copy();
-  }
-  
-  private int type;
-  private double value;  
 }
 

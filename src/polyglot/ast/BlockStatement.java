@@ -1,81 +1,112 @@
-/*
- * BlockStatement.java
- */
-
 package jltools.ast;
 
 import jltools.util.*;
 import jltools.types.*;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
+
 
 /**
- * BlockStatement
- *
- * Overview: A BlockStatement represents a Java block statement -- a mutable
- *   sequence of statements.
- **/
+ * A <code>BlockStatement</code> represents a Java block statement -- a 
+ * immutable sequence of statements.
+ */
 public class BlockStatement extends Statement {
+ 
+  protected final List statements;
+
   /**
-   * Effects: Create a new, empty BlockStatement.
-   **/
-  public BlockStatement() {
+   * Create a new, empty BlockStatement.
+   */
+  public BlockStatement() 
+  {
     statements = new ArrayList();
   }
 
   /**
-   * Requires: every element of statementList is a Statement.
-   * Effects: Create a new BlockStatement with <statementList> as its
-   * statements.
-   **/
-  public BlockStatement(List statementList) {
-    TypedList.check(statementList, Statement.class);
-    statements = new ArrayList(statementList);
-  }
-
-  /**     
-   * Add a new child <s> to this BlockStatement.
-   **/
-  public void addStatement(Statement s) {
-    statements.add(s);
-  }
-  
-  /**
-   * Adds a new child <s> to this BlockStatement, such that the child
-   * is at position <pos>.  Throws an IndexOutOfBoundsException if <pos>
-   * is not a valid position.
-   **/
-  public void addStatement(Statement s, int pos) {
-    statements.add(pos, s);
-  }
- 
-  /**
-   * Removes a child at position <pos> from this BlockStatement.
-   * Throws an IndexOutOfBoundsException if <pos> is not a valid
-   * position.
-   **/
-  public void removeStatement(int pos) {
-    statements.remove(pos);
+   * Create a new <code>BlockStatement</code> with <code>statementList</code>
+   * as its statements.
+   *
+   * @pre Each element in <code>list</code> is a <code>Statement</code>.
+   */
+  public BlockStatement( List list) 
+  {
+    statements = TypedList.copyAndCheck( list, Statement.class, true);
   }
 
   /**
-   * Returns the child at position <pos>.  Throws an
-   * IndexOutOfBoundsException if <pos> is not a valid position.
-   **/
-  public Statement statementAt(int pos) {
-    return (Statement) statements.get(pos);
+   * Lazily reconstuct this node.
+   */
+  public BlockStatement reconstruct( List list)
+  {
+    if( statements.size() != list.size()) {
+      BlockStatement n = new BlockStatement( list);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+    else {
+      for( int i = 0; i < list.size(); i++) {
+        if( list.get( i) != statements.get( i)) {
+          BlockStatement n = new BlockStatement( list);
+          n.copyAnnotationsFrom( this);
+          return n;
+        }
+      }
+      return this;
+    }
   }
 
   /**
-   * Returns a TypedListIterator which will yield every statement in this
-   * in order, and only allow Statements to be inserted.
-   **/
-  public TypedListIterator iterator() {
+   * Returns the child at position <code>pos</code>.
+   */
+  public Statement statementAt( int pos) 
+  {
+    return (Statement)statements.get(pos);
+  }
+
+  /**
+   * Returns an <code>Iterator</code> which will yield every statement in this
+   * in order.
+   */
+  public Iterator statements() {
     return new TypedListIterator(statements.listIterator(), 
 				 Statement.class,
-				 false);
+				 true);
+  }
+
+  /**
+   * Visit the children (statements) of this node.
+   *
+   * @pre Requires that the <code>visit</code> method of each child returns
+   *  an object of type <code>Expression</code>.
+   * @post Returns this node if there are no changes to the children. Otherwise
+   *  return a reconstructed copy of this node with the appropriate changes.
+   */
+  Node visitChildren( NodeVisitor v) 
+  {
+    List list = new ArrayList( statements.size());
+
+    for( Iterator iter = statements(); iter.hasNext(); ) {
+      Statement stmt = (Statement)((Statement)iter.next()).visit( v);
+      if( stmt != null) {
+        list.add( stmt);
+      }
+    }
+    return reconstruct( list);
+  }
+
+  public void enterScope( LocalContext c)
+  {
+    c.pushBlock();
+  }
+
+  public void leaveScope( LocalContext c) 
+  {
+    c.popBlock();
+  }
+  
+  public Node typeCheck( LocalContext c) throws SemanticException
+  {
+    return this;
   }
 
   public void translate( LocalContext c, CodeWriter w)
@@ -92,121 +123,11 @@ public class BlockStatement extends Statement {
     w.write("}");
   }
 
-  public Node dump( CodeWriter w)
+  public void dump( CodeWriter w)
   {
     w.write( "( BLOCK ");
     dumpNodeInfo( w);
     w.write( ")");
-    return null;
   }
-
-  public Node adjustScope( LocalContext c)
-  {
-    c.pushBlock();
-    return null;
-  }
-  
-  public Node typeCheck( LocalContext c) throws TypeCheckException
-  {
-    for (Iterator i = statements.iterator(); i.hasNext(); )
-    {
-      Node n = (Node)i.next();
-      Annotate.addThrows( this, Annotate.getThrows (n) );
-      if ( Annotate.terminatesOnAllPaths(n) ) 
-      {
-        Annotate.setTerminatesOnAllPaths (this, true);
-        if ( i.hasNext())
-          throw new TypeCheckException( "This statement is unreachable.", 
-                                        Annotate.getLineNumber( (Node)i.next() ) );
-      }
-    }
-    c.popBlock();
-    return this;
-  }
-
-  /**
-   * Requires: v will not transform a Statement into anything other than
-   *    a Statement, an Expression, or Null.
-   * Effects:
-   *    Visits the children of this in order with <v>.  If <v> returns null,
-   *    the statement is elided.  If it returns an Expression, it is wrapped
-   *    as an ExpressionStatement.
-   **/
-  Object visitChildren(NodeVisitor v) {
-    return visitChildren(v, false);
-  }
-
-  /**
-   * Requires: v will not transform a Statement into anything other than
-   *    a Statement, an Expression, or Null.
-   *
-   * Effects:
-   *    Visits the children of this in order with <v>.  If <v> returns
-   *    null, the statement is elided.  If it returns an Expression, it is
-   *    wrapped as an ExpressionStatement.
-   *
-   *    If <flatten> is true, all BlockStatements have their contents
-   *    contents are interpolated into this statement.
-   **/
-  Object visitChildren(NodeVisitor v, boolean flatten) 
-  {
-    Object vinfo = Annotate.getVisitorInfo( this);
-    for (ListIterator it = statements.listIterator(); it.hasNext(); ) {
-      Node node = (Node) it.next();
-      if (node == null)
-      {
-        it.remove();
-        continue;
-      }
-      Node newNode = node.visit(v);
-      if (newNode == null) {
-	// Remove the node.
-	it.remove();
-	continue;
-      } else if (flatten && newNode instanceof BlockStatement) {
-	// Interpolate the subnodes.
-	it.remove();
-	BlockStatement bs = (BlockStatement) newNode;
-	for (Iterator bsIt = bs.statements.iterator(); bsIt.hasNext(); ) {
-	  it.add(bsIt.next());
-	}
-      } else if (node != newNode) {
-	// The node changed.
-        vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newNode), vinfo);
-	if (newNode instanceof Expression) {
-	  it.set(new ExpressionStatement((Expression) newNode));
-	} else {
-	  Assert.assert(newNode instanceof Statement);  
-	  it.set(newNode);
-	}
-      } else {
-        // The node hasn't changed. 
-        vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newNode), vinfo);
-      }
-    }    
-    return vinfo;
-  }
-
-  public Node copy() {
-    BlockStatement bs = new BlockStatement();
-    bs.copyAnnotationsFrom(this);
-    for (Iterator i = statements.iterator(); i.hasNext(); ) {
-      bs.addStatement((Statement) i.next());
-    }
-    return bs;
-  }
-
-  public Node deepCopy() {
-    BlockStatement bs = new BlockStatement();
-    bs.copyAnnotationsFrom(this);
-    for (Iterator i = statements.iterator(); i.hasNext(); ) {
-      Statement s = (Statement) i.next();
-      bs.addStatement((Statement) s.deepCopy());
-    }
-    return bs;
-  }
-
-  // RI: every member of statements is a Statement.
-  private ArrayList statements;
 }
 

@@ -8,7 +8,6 @@ utl_files 	= Annotate.java \
 			ConcatenatedIterator.java \
 			ErrorInfo.java \
 			ErrorQueue.java \
-			ErrorQueueFactory.java \
 			ErrorLimitError.java \
 			FilteringIterator.java \
 			InternalCompilerError.java \

@@ -148,7 +148,7 @@ public abstract class Node extends AnnotatedObject {
    *
    * @param w The output writer used to display information.
    */
-  public abstract Node dump( CodeWriter w) throws SemanticException;
+  public abstract void dump( CodeWriter w) throws SemanticException;
 
   /**
    * Dumps annotations to the writer, if any annotations have been set.

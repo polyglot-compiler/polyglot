@@ -1,7 +1,3 @@
-/*
- * VariableDeclarationStatement.java
- */ 
-
 package jltools.ast;
 
 import jltools.util.*;
@@ -11,340 +7,301 @@ import java.util.*;
 
 
 /** 
- * VariableDeclarationStatement
- *
- * Overview: A VariableDeclarationStatements is a mutable representation of
- *   a variable declaration, which consists of a type, one or more variable
- *   names, and possible initilization expressions.
+ * A <code>VariableDeclarationStatement</code> is a immutable representation of
+ * a variable declaration, which consists of a type, one or more variable
+ * names, and possible initilization expressions.
  */
-public class VariableDeclarationStatement extends Statement {
+public class VariableDeclarationStatement extends Statement 
+{
+
   /**
    * This class corresponds to the VariableDeclarator production in
    * the Java grammar. (Section 19.8.2)
-   **/
-  public static final class Declarator {
+   */
+  public static final class Declarator 
+  {
     public String name;
     public int additionalDimensions;    
     // will be null for uninitialized variable.
     public Expression initializer;
     /**
-     * Creates a new Declarator for a variable named <n>, with <dims>
-     *   dimensions beyond those of the declarations's base type.
-     **/
-    public Declarator(String n, int dims, Expression init) {
+     * Creates a new Declarator for a variable named <code>n</code>, with 
+     * <code>dims</code> dimensions beyond those of the declarations's base
+     * type.
+     */
+    public Declarator( String n, int dims, Expression init) 
+    {
       name = n;
       additionalDimensions = dims;
       initializer = init;
     }
   }
-  /**
-   * Requires: Every element of <declList> is a Declarator.
-   * Effects: Creates a new VariableDeclarationStatement of type <type>,
-   *    with optional modifiers <optModifiers>, and declarations <declList>.
-   **/
-  public VariableDeclarationStatement(AccessFlags optModifiers,
-				      TypeNode type, List declList) {
-    modifiers = optModifiers;
-    this.type = type;
-    TypedList.check(declList, Declarator.class);
-    variables = new ArrayList(declList);
-  }     
-
-  /**
-   * Requires: Every element of <declList> is a Declarator.
-   * Effects: Creates a new VariableDeclarationStatement of type <type>,
-   *    with optional modifiers <optModifiers>, and declarations <declList>.
-   **/
-  public VariableDeclarationStatement(AccessFlags optModifiers,
-				      Type type, List declList) {
-    this (optModifiers, new TypeNode(type), declList);
-  }     
 
 
+  protected final TypeNode tn; 
+  /** A list of <code>Declarators</code>. */
+  protected final List declarators; 
+  protected final AccessFlags accessFlags;
+
   /**
+   * Creates a new <code>VariableDeclarationStatement</code>.
+   *
+   * @pre Every element of <code>declarators</code> must be a 
+   *  <code>Declarator</code>.
+   */
+  public VariableDeclarationStatement( AccessFlags accessFlags,
+                                       TypeNode tn, List declarators) {
+    this.accessFlags = accessFlags;
+    this.tn = tn;
+    this.declarators = TypedList.copyAndCheck( declarators, Declarator.class,
+                                               true);
+  }
+
+  /**
+   * Lazily reconstruct this node.
+   */
+  public VariableDeclarationStatement reconstruct( AccessFlags accessFlags,
+                                                   TypeNode tn,
+                                                   List declarators) {
+    if( !this.accessFlags.equals( accessFlags) || this.tn != tn
+        || this.declarators.size() != declarators.size()) {
+      VariableDeclarationStatement n 
+        = new VariableDeclarationStatement( accessFlags, tn, declarators);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+    else {
+      for( int i = 0; i < declarators.size(); i++) {
+        if( this.declarators.get( i) != declarators.get( i)) {
+          VariableDeclarationStatement n 
+            = new VariableDeclarationStatement( accessFlags, tn, declarators);
+          n.copyAnnotationsFrom( this);
+          return n;
+        }
+      }
+      return this;
+    }
+  }
+
+  /*
+   * FIXME is this ever possible??
+   *
    * Effects: Creates a new VariableDeclarationStatement of type <type>
    *   with no variables being declared.
-   */
   public VariableDeclarationStatement (Type baseType) {
     this.type = type;
     variables = new ArrayList();
   }
+  */
 
   /**
-   * Adds a new variable named <var> with initializer <init> to
-   * this VariableDelarationStatement.
+   * Returns the accessFlags for this, or null for none.
    */
-  public void addVariable(Declarator decl) {
-    variables.add(decl);
+  public AccessFlags getAccessFlags() 
+  {
+    return accessFlags;
+  }
+
+  /**
+   * Yields all the declarators in this node, in order. 
+   */
+  public Iterator declarators() 
+  {
+    return declarators.iterator();
   }
 
   /** 
-   * Returns the variable name at position <pos>.  Throws an
-   * IndexOutOfboundsException if <pos> is not a valid position.
-   **/ 
-  public Declarator variableAt(int pos) {
-    return (Declarator) variables.get(pos);
-  }
-  
-  /**
-   * Removes the variable at position <pos> in the variable declaration.
-   * Throws an IndexOutOfBoundsException if <pos> is not a valid
-   * position.
-   **/ 
-  public void removeVariable(int pos) 
+   * Returns the declarator at position <code>pos</code>.
+   */ 
+  public Declarator declaratorAt( int pos) 
   {
-    variables.remove(pos);
+    return (Declarator)declarators.get( pos);
   }
 
   /**
+   * FIXME is this method necessary?
+   * 
    * Gets the type of this declaration statement.
-   **/
   public TypeNode getTypeNode() {
     return type;
   }
-
-
-  /**
-   * Sets the type of this declaration statement.
-   **/
-  public void setType(TypeNode type) {
-    this.type = type;
-  }
+  */
 
   /**
-   * Sets the type of this declaration statement.
-   **/
-  public void setType(Type type) {
-    this.type = new TypeNode(type);
-  }
-
-  /**
-   * Requires: decl is a declarator in this.
-   *
-   * Effects: returns the actual type of the variable declared by <decl>.
-   **/
-  public Type typeForDeclarator(Declarator decl) throws TypeCheckException {
-    if (decl.additionalDimensions > 0)
-      return type.getType().extendArrayDims(decl.additionalDimensions);
-    else
-      return type.getType();
-  }
-
-  /**
-   * Returns the modifiers for this, or null for none.
-   **/
-  public AccessFlags getModifiers() {
-    return modifiers;
-  }
-
-  /**
-   * Sets the modifiers for this to be <modifiers>
-   **/
-  public AccessFlags setModifiers() {
-    return modifiers;
+   * Returns the actual type (including any additional array dimensions) of 
+   * the variable declared by <code>decl</code>.
+   * 
+   * @pre Requires that <code>decl</code> be a member of 
+   *  <code>this.declarators</code>.
+   */
+  public Type typeForDeclarator(Declarator decl) throws SemanticException 
+  {
+    if (decl.additionalDimensions > 0) {
+      return tn.getType().extendArrayDims( decl.additionalDimensions);
+    }
+    else {
+      return tn.getType();
+    }
   }
   
   /**
+   * Visit the children of this node.
    *
+   * @pre Requires that <code>tn.visit</code> returns an object of type
+   *  <code>TypeNode</code> and that the <code>visit</code> method for each
+   *  of the initializer expressions returns an object of type 
+   *  <code>Expression</code>.
    */
-  Object visitChildren(NodeVisitor v)
+  Node visitChildren(NodeVisitor v)
   {
-    Object vinfo = Annotate.getVisitorInfo( this);
+    TypeNode newTn = (TypeNode)tn.visit( v);
 
-    type = (TypeNode) type.visit( v);
-    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( type), vinfo);
-    
-    ListIterator it = variables.listIterator();
-    while (it.hasNext()) {
-      Declarator pair = (Declarator)it.next();
-      if (pair.initializer != null)
-      {
-        Expression newExpr = (Expression) pair.initializer.visit(v);
-        vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newExpr),
-                                    vinfo);
-        if (newExpr != pair.initializer) {
-          it.set( new Declarator( pair.name, pair.additionalDimensions, 
-                                  newExpr));
+    List newDeclarators = new ArrayList( declarators.size());
+
+    for( Iterator iter = declarators(); iter.hasNext(); ) {
+      Declarator decl = (Declarator)iter.next();
+      if( decl != null) {
+        Expression newInitializer = (Expression)decl.initializer.visit( v);
+        if( newInitializer != decl.initializer) {
+          newDeclarators.add( new Declarator( decl.name,
+                                              decl.additionalDimensions,
+                                              newInitializer));
+        }
+        else {
+          newDeclarators.add( decl);
         }
       }
+      else {
+        newDeclarators.add( decl);
+      }   
     }
 
-    return vinfo;
+    return reconstruct( accessFlags, newTn, newDeclarators);
   }
 
-  public Node removeAmbiguities( LocalContext c) throws TypeCheckException
+  public Node removeAmbiguities( LocalContext c) throws SemanticException
   {
-
-    Declarator d;
-    Iterator iter = declarators();
-
-    // only add to context if inside a method, hence a local Variable declaration
-    if ( c.getCurrentMethod() != null)
-      while( iter.hasNext()) {
-        d = (Declarator)iter.next();
-        // if it is a constant numeric expression (final + initializer is IntLiteral)
-        // mark it under FieldInstance
-        FieldInstance fi = new FieldInstance( d.name, typeForDeclarator(d), null, modifiers);
-        if (d.initializer instanceof IntLiteral && 
-            d.initializer != null &&
-            modifiers.isFinal())
-          fi.setConstantValue ( new Long (
-              ((IntLiteral)d.initializer).getLongValue() ));
-        c.addSymbol( d.name, fi);
+    /* Only add to context if inside a method, hence a local variable 
+     * declaration. */
+    if( c.getCurrentMethod() != null) {
+      for( Iterator iter = declarators(); iter.hasNext(); ) {
+        Declarator decl = (Declarator)iter.next();
+        /* If it is a constant numeric expression (final + initializer is 
+         * IntLiteral) then mark it "constant" under FieldInstance. */
+        // FIXME other literal types?
+        FieldInstance fi = new FieldInstance( decl.name, 
+                                              typeForDeclarator(decl), 
+                                              null, accessFlags);
+        if( decl.initializer instanceof IntLiteral 
+            && decl.initializer != null && accessFlags.isFinal()) {
+          fi.setConstantValue( new Long(
+              ((IntLiteral)decl.initializer).getLongValue())); 
+        }
+        c.addSymbol( decl.name, fi);
       }
+    }
     
     return this;
   }
 
-   public Node typeCheck(LocalContext c) throws TypeCheckException
-   {
-     Declarator d;
-     Iterator iter = declarators();
-
-     // only add to context if inside a method, 
-     // hence a local variable declaration
-     if ( c.getCurrentMethod() != null)
-       while( iter.hasNext()) {
-         d = (Declarator)iter.next();
-        FieldInstance fi = new FieldInstance( d.name, 
-                                              typeForDeclarator(d), 
-                                              null, modifiers);
-        // if it is a constant numeric expression (final + initializer 
-         //                                        is IntLiteral)
-        // mark it under FieldInstance
-        if (d.initializer instanceof IntLiteral && 
-            d.initializer != null &&
-            modifiers.isFinal())
-        {
-          fi.setConstantValue ( new Long( 
-                 ((IntLiteral)d.initializer).getLongValue() ));
-        }
-        c.addSymbol( d.name, fi);
-       }
-     
-    for  (Iterator it = declarators(); it.hasNext() ;) {
-      Declarator pair = (Declarator)it.next();
-      if (pair.initializer != null)
-      {
-        Type t = pair.additionalDimensions == 0 ? type.getType() : 
-          new ArrayType(c.getTypeSystem(), type.getType(), pair.additionalDimensions);
-
-        if ( ! c.getTypeSystem().isImplicitCastValid( 
-               pair.initializer.getCheckedType(), 
-               t) )
-          throw new TypeCheckException( "The type of the variable initializer "
-                                        + "(\"" 
-                                        + pair.initializer.getCheckedType().getTypeString() + 
-                                        "\") does not match " +
-                                        "that of the declaration (\"" + 
-                                        type.getType().getTypeString() + "\")");
-        addThrows ( pair.initializer.getThrows() );
-      }
-      
-    }
-     return this;
-   }
-
-  public void translate(LocalContext c, CodeWriter w)
+  public Node typeCheck( LocalContext c) throws SemanticException
   {
-    w.write( modifiers.getStringRepresentation());
-    type.translate(c, w);
-    w.write(" ");
-    ListIterator it = variables.listIterator();
-    while (it.hasNext())
-    {
-      Declarator pair = (Declarator)it.next();
-      if (pair.initializer != null)
-      {
-            w.write(pair.name);
-            for (int i = 0; i < pair.additionalDimensions; i++) {
-              w.write("[]");
-            }
-            w.write(" = ");
-            pair.initializer.translate(c, w);
+    /* Only add to context if inside a method, hence a local variable 
+     * declaration. */
+    if( c.getCurrentMethod() != null) {
+      for( Iterator iter = declarators(); iter.hasNext(); ) {
+        Declarator decl = (Declarator)iter.next();
+        /* If it is a constant numeric expression (final + initializer is 
+         * IntLiteral) then mark it "constant" under FieldInstance. */
+        // FIXME other literal types?
+        FieldInstance fi = new FieldInstance( decl.name, 
+                                              typeForDeclarator(decl), 
+                                              null, accessFlags);
+        if( decl.initializer instanceof IntLiteral 
+            && decl.initializer != null && accessFlags.isFinal()) {
+          fi.setConstantValue( new Long(
+              ((IntLiteral)decl.initializer).getLongValue())); 
+        }
+        c.addSymbol( decl.name, fi);
+      }
+    }
+     
+    for( Iterator iter = declarators(); iter.hasNext() ;) {
+      Declarator decl = (Declarator)iter.next();
+      if (decl.initializer != null) {
+        Type type = typeForDeclarator( decl);
+
+        if( !c.getTypeSystem().isImplicitCastValid( 
+                                  decl.initializer.getCheckedType(), 
+                                  type)) {
+          throw new SemanticException( "The type of the variable initializer "
+                           + "\"" 
+                           + decl.initializer.getCheckedType().getTypeString()
+                           + "\" does not match " 
+                           + "that of the declaration \"" 
+                           + type.getTypeString() + "\".");
+        }
+      }
+    }
+
+    return this;
+  }
+
+  public void translate( LocalContext c, CodeWriter w)
+  {
+    w.write( accessFlags.getStringRepresentation());
+    tn.translate( c, w);
+    w.write( " ");
+    for( Iterator iter = declarators(); iter.hasNext(); ) {
+      Declarator decl = (Declarator)iter.next();
+      if( decl.initializer != null) {
+        w.write( decl.name);
+        for (int i = 0; i < decl.additionalDimensions; i++) {
+          w.write( "[]");
+        }
+        w.write( " = ");
+        decl.initializer.translate( c, w);
       }
       else {
-        w.write(pair.name);
-        for (int i = 0; i < pair.additionalDimensions; i++) {
-          w.write("[]");
+        w.write( decl.name);
+        for( int i = 0; i < decl.additionalDimensions; i++) {
+          w.write( "[]");
         }
       }
-      if (it.hasNext())
-        w.write(", ");
+      if( iter.hasNext()) {
+        w.write( ", ");
+      }
     }
-    w.write("; ");
-    
-   }
+    w.write( "; ");
+  }
   
-  public Node dump( CodeWriter w) throws TypeCheckException
+  public void dump( CodeWriter w) throws SemanticException
   {
     w.write( "( VAR DECL");
-    w.write( " < " + modifiers.getStringRepresentation() + "> ");
+    w.write( " < " + accessFlags.getStringRepresentation() + "> ");
     dumpNodeInfo( w);
     w.write(")");
     
     w.beginBlock();
     
-    ListIterator it = variables.listIterator();
-    while (it.hasNext())
-    {
-      Declarator pair = (Declarator)it.next();
-      if (pair.initializer != null) {
-        w.write( "( < " + pair.name + " > < " 
-                 + typeForDeclarator( pair).getTypeString() + " > ) ");
-        pair.initializer.dump( w);
+    for( Iterator iter = declarators(); iter.hasNext(); ) {
+      Declarator decl = (Declarator)iter.next();
+      if (decl.initializer != null) {
+        w.write( "( < " + decl.name + " > < " 
+                 + typeForDeclarator( decl).getTypeString() + " > ) ");
+        decl.initializer.dump( w);
       }
       else {
-        w.write( "( < " + pair.name + " > < " 
-                 + typeForDeclarator( pair).getTypeString() + " > ) ");
+        w.write( "( < " + decl.name + " > < " 
+                 + typeForDeclarator( decl).getTypeString() + " > ) ");
       }
-      if( it.hasNext()) {
+      if( iter.hasNext()) {
         w.newline();
       }
     }
     
     w.endBlock();
-    return this;
   }
-
-  /**
-   * Yields all the declarators in this, in order. 
-   **/
-  public Iterator declarators() {
-    return new TypedListIterator(variables.listIterator(), 
-				 Declarator.class, false);
-  }
-
-  public Node copy() {
-    return copy(false);
-  }
-  public Node deepCopy() {
-    return copy(true);
-  }
-  
-  private Node copy(boolean deep) {
-    AccessFlags mods = modifiers == null ? null : modifiers.copy();
-    ArrayList list = new ArrayList(variables.size());
-    for (Iterator i = variables.iterator(); i.hasNext(); ) {
-      Declarator d = (Declarator) i.next();
-      Expression expr = d.initializer == null ? null :
-	(deep ? (Expression) d.initializer.deepCopy() : d.initializer);
-      list.add(new Declarator(d.name, d.additionalDimensions, expr));
-    }
-    TypeNode tn = (TypeNode) type.copy();
-    VariableDeclarationStatement vds = 
-      new VariableDeclarationStatement(mods, type, list);
-    vds.copyAnnotationsFrom(this);
-    return vds;
-  }
-  
-  private TypeNode type; 
-  // RI: every member is a Declarator
-  private List variables; 
-  private AccessFlags modifiers;
-
-  // describes our type
-  FieldInstance fi;
 }
 
     

@@ -1,65 +1,110 @@
-/*
- * FieldNode.java
- */
-
 package jltools.ast;
 
 import jltools.types.*;
 import jltools.util.*;
-import jltools.visit.SymbolReader;
+import jltools.visit.*;
 
 import java.util.*;
 
+
 /**
- * FieldNode
- *
- * Overview: A FieldNode is a mutable representation of the
- * declaration of a field of a class.  It consists of a set of
- * AccessFlags and a VariableDeclarationStatement.
+ * A <code>FieldNode</code> is a immutable representation of the declaration 
+ * of a field of a class.  It consists of a set of <code>AccessFlags</code>
+ * and a <code>VariableDeclarationStatement</code>.
  */
 
-public class FieldNode extends ClassMember {
+public class FieldNode extends ClassMember 
+{
+  protected final AccessFlags accessFlags;
+  protected final VariableDeclarationStatement declare;
+
   /**
-   * Effects: Creates a new FieldNode declaring variables from
-   * <declare> with modified by the flags in <accessFlags>.
+   * Creates a new <code>FieldNode</code> declaring variables from
+   * <code>declare</code> with modified by the flags in 
+   * <code>accessFlags</code>.
    */
-  public FieldNode (AccessFlags accessFlags,
-		    VariableDeclarationStatement declare) {
+  public FieldNode( AccessFlags accessFlags,
+		    VariableDeclarationStatement declare) 
+  {
     this.accessFlags = accessFlags;
     this.declare = declare;
   }
 
   /**
-   * Effects: Returns the AccessFlags for these fields.
+   * Lazily reconstruct this node.
    */
-  public AccessFlags getAccessFlags() {
+  public FieldNode reconstruct( AccessFlags accessFlags, 
+                                VariableDeclarationStatement declare)
+  {
+    if( this.accessFlags.equals( accessFlags) && this.declare == declare) {
+      return this;
+    }
+    else {
+      FieldNode n = new FieldNode( accessFlags, declare);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+  }
+
+  /**
+   * Returns the access flags for these fields.
+   */
+  public AccessFlags getAccessFlags() 
+  {
     return accessFlags;
   }
 
   /**
-   * Effects: Sets the access flags for these fields to be <newFlags>.
-   */
-  public void setAccessFlags(AccessFlags newFlags) {
-    accessFlags = newFlags;
-  }
-
-  /**
-   * Effects: Returns the VariableDeclarationStatement which specifies
+   * Returns the <code>VariableDeclarationStatement</code> which specifies
    * the type, names, and initialization expressions for the fields
-   * declared as part of this FieldNode.
+   * declared as part of this <code>FieldNode</code>.
    */
-  public VariableDeclarationStatement getDeclare() {
+  public VariableDeclarationStatement getDeclaration() 
+  {
     return declare;
   }
 
   /**
-   * Effects: Sets the VariableDeclarationStatement for this FieldNode
-   * to be <newDeclare>.
+   * Visit the children of this node.
    */
-  public void setDeclare(VariableDeclarationStatement newDeclare) {
-    declare = newDeclare;
+  Node visitChildren( NodeVisitor v) 
+  {
+    return reconstruct( accessFlags, 
+                        (VariableDeclarationStatement)declare.visit( v));
   }
 
+  public Node readSymbols( SymbolReader sr) throws SemanticException
+  {
+    ParsedClassType clazz = sr.getCurrentClass();
+    VariableDeclarationStatement.Declarator decl;
+    Iterator iter = declare.declarators();
+
+    while( iter.hasNext()) {
+      decl = (VariableDeclarationStatement.Declarator)iter.next();
+      FieldInstance fi = new FieldInstance( decl.name, 
+                              declare.typeForDeclarator( decl), 
+                              clazz, declare.getAccessFlags());
+      /* If it is a constant numeric expression (final + initializer is 
+       * IntLiteral) then mark it "constant" under FieldInstance. */
+      // FIXME other literal types?
+      if( decl.initializer instanceof IntLiteral 
+          && decl.initializer != null && accessFlags.isFinal()) {
+        fi.setConstantValue( new Long(
+            ((IntLiteral)decl.initializer).getLongValue())); 
+      }
+
+      Annotate.setLineNumber( fi, Annotate.getLineNumber( this));
+      clazz.addField( fi);
+    }
+  
+    return this;
+  }
+
+  public Node typeCheck( LocalContext c) throws SemanticException
+  {
+    // FIXME; implement
+    return this;
+  }
 
   public void translate(LocalContext c, CodeWriter w)
   {
@@ -67,73 +112,13 @@ public class FieldNode extends ClassMember {
     declare.translate(c, w);
   }
 
-  public Node dump( CodeWriter w)
+  public void dump( CodeWriter w)
   {
     w.write ( "( FIELD DECLARATION ");
        /* + accessFlags.getStringRepresentation() */
     dumpNodeInfo( w);
     w.write( ")");
-    return null;
   } 
-
-  public Node readSymbols( SymbolReader sr) throws TypeCheckException
-  {
-    ParsedClassType clazz = sr.getCurrentClass();
-    VariableDeclarationStatement.Declarator declarator;
-    Iterator iter = declare.declarators();
-    FieldInstance fi;
-
-    while( iter.hasNext()) {
-      declarator = (VariableDeclarationStatement.Declarator)iter.next();
-      fi = new FieldInstance( declarator.name, 
-                              declare.typeForDeclarator( declarator), 
-                              clazz, declare.getModifiers());
-      // if it is a constant numeric expression (final + initializer is IntLiteral)
-      // mark it under FieldInstance
-      if (declarator.initializer instanceof IntLiteral && 
-          declarator.initializer != null &&
-          declare.getModifiers().isFinal())
-      {
-        fi.setConstantValue ( new Long ( 
-                ((IntLiteral)declarator.initializer).getLongValue()) );
-      }
-
-      Annotate.setLineNumber( fi, Annotate.getLineNumber( this));
-      clazz.addField( fi);
-
-    }
-    return this;
-  }
-
-  public Node typeCheck( LocalContext c) throws TypeCheckException
-  {
-    // FIXME; implement
-    return this;
-  }
-
-  Object visitChildren(NodeVisitor v) 
-  {
-    declare = (VariableDeclarationStatement) declare.visit(v);
-    return v.mergeVisitorInfo( Annotate.getVisitorInfo( this),
-                               Annotate.getVisitorInfo( declare));
-  }
-
-  public Node copy() {
-    FieldNode fn = new FieldNode(accessFlags.copy(), declare);
-    fn.copyAnnotationsFrom(this);
-    return fn;
-  }
-
-  public Node deepCopy() {
-    FieldNode fn =
-      new FieldNode(accessFlags.copy(),
-		    (VariableDeclarationStatement) declare.deepCopy());
-    fn.copyAnnotationsFrom(this);
-    return fn;
-  }
-
-  private AccessFlags accessFlags;
-  private VariableDeclarationStatement declare;
 }
 
 

@@ -1,12 +1,12 @@
 package jltools.visit;
 
-
 import jltools.ast.*;
 import jltools.frontend.*;
 import jltools.types.*;
 import jltools.util.*;
 
 import java.io.IOException;
+
 
 public class SymbolReader extends NodeVisitor
 {
@@ -40,13 +40,13 @@ public class SymbolReader extends NodeVisitor
     current = null;
   }
 
-  public Node visitBefore(Node n)
+  public Node override(Node n)
   {
     try
     {
       return n.readSymbols( this);
     }
-    catch( TypeCheckException e)
+    catch( SemanticException e)
     {
       eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
                   Annotate.getLineNumber( n));
@@ -90,7 +90,7 @@ public class SymbolReader extends NodeVisitor
     current = (ParsedClassType)c;
   }
 
-  public void setPackageName( String packageName) throws TypeCheckException
+  public void setPackageName( String packageName) throws SemanticException
   {
     this.packageName = packageName;
     this.it = new ImportTable( systemResolver, true);
@@ -109,7 +109,7 @@ public class SymbolReader extends NodeVisitor
     }
     catch( IOException e)
     {
-      throw new TypeCheckException( "Expected to find \"" + target.getName()
+      throw new SemanticException( "Expected to find \"" + target.getName()
                       + "\" in a directory matching the package name \"" 
                       + packageName + "\".");
     }

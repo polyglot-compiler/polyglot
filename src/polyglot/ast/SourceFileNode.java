@@ -91,6 +91,11 @@ public class SourceFileNode extends Node {
     imports.remove(pos);
   }
 
+  public void removeAllImportNodes() 
+  {
+    imports = new ArrayList();
+  }
+
   /**
    * Effects: Returns a TypedListIterator which will return the
    * ImportNodes of this SourceFileNode in order.
@@ -135,8 +140,6 @@ public class SourceFileNode extends Node {
 
   Object visitChildren(NodeVisitor v)
   {
-    Object vinfo = Annotate.getVisitorInfo( this);
-
     for(ListIterator it=imports.listIterator(); it.hasNext(); ) {
       ImportNode n = (ImportNode)it.next();
       n = (ImportNode)n.visit( v);

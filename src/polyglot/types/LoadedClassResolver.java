@@ -20,7 +20,7 @@ public class LoadedClassResolver implements ClassResolver
     this.ts = ts;
   }
 
-  public ClassType findClass( String name) throws TypeCheckException
+  public ClassType findClass( String name) throws SemanticException
   {
     Class clazz;
 

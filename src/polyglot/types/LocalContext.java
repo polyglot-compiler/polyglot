@@ -62,7 +62,7 @@ public class LocalContext
    */
   public MethodTypeInstance getMethod( ClassType type, String methodName, 
                                        List argumentTypes) 
-    throws TypeCheckException
+    throws SemanticException
   {
     return ts.getMethod( type, 
                          new MethodType( ts, methodName, argumentTypes), 
@@ -74,7 +74,7 @@ public class LocalContext
    * type may be null; 
    */
   public MethodTypeInstance getMethod( ClassType t, MethodType m) 
-    throws TypeCheckException
+    throws SemanticException
   {
     return ts.getMethod( t, m, 
                          ((ClassTuple)stkContexts.peek()).getContext() );
@@ -84,7 +84,7 @@ public class LocalContext
    * Gets a field matched against a particular type
    */  
   public FieldInstance getField( Type type, String fieldName) 
-    throws TypeCheckException
+    throws SemanticException
   {
     Object result;
     Stack blockStack =  ((ClassTuple)stkContexts.peek()).getBlockStack();
@@ -108,7 +108,7 @@ public class LocalContext
    * If <type> is a valid type in the given context, returns a
    * canonical form of that type.  
    **/
-  public Type getType( Type type ) throws TypeCheckException
+  public Type getType( Type type ) throws SemanticException
   {
     return ts.checkAndResolveType(type, 
                      ((ClassTuple)stkContexts.peek()).getContext());
@@ -117,7 +117,7 @@ public class LocalContext
   /**
    * Finds the definition of a particular type
    */
-  public Type getType( String s) throws TypeCheckException
+  public Type getType( String s) throws SemanticException
   {
     return ts.checkAndResolveType( new AmbiguousType( ts, s), 
                          ((ClassTuple)stkContexts.peek()).getContext());
@@ -228,7 +228,7 @@ public class LocalContext
    * Adds a symbol to the current scoping level
    */
   public void addSymbol( String sName, FieldInstance fi) 
-    throws TypeCheckException
+    throws SemanticException
   {
     if ( stkContexts.size() < 1)
       throw new InternalCompilerError("Can't pop block since not " 
@@ -240,7 +240,7 @@ public class LocalContext
     if ( ! ((Hashtable)blockStack.peek()).contains( sName ))
       ((Hashtable)blockStack.peek()).put(sName, fi);
     else
-      throw new TypeCheckException ( "Symbol \"" + sName + 
+      throw new SemanticException ( "Symbol \"" + sName + 
                                      "\" already defined in this block.");
 
   }

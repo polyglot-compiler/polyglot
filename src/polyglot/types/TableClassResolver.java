@@ -117,7 +117,7 @@ public class TableClassResolver implements ClassResolver
         clazz.setSuperType( superClazz);
           
       }
-      catch( TypeCheckException e)
+      catch( SemanticException e)
       {
         eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage());
         queue.remove( clazz);
@@ -178,7 +178,7 @@ public class TableClassResolver implements ClassResolver
 
         i.set( implementsClazz );          
       }
-      catch( TypeCheckException e)
+      catch( SemanticException e)
       {
         eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage());
         queue.remove( clazz);
@@ -198,7 +198,7 @@ public class TableClassResolver implements ClassResolver
       try {
         method.setReturnType( ts.checkAndResolveType( type, context));
       } 
-      catch( TypeCheckException e) {
+      catch( SemanticException e) {
         eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
                     Annotate.getLineNumber( method));
       }
@@ -210,7 +210,7 @@ public class TableClassResolver implements ClassResolver
         try {
           iter3.set( ts.checkAndResolveType( type, context));
         }
-        catch( TypeCheckException e) {
+        catch( SemanticException e) {
           eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
                       Annotate.getLineNumber( method));
         }
@@ -222,9 +222,12 @@ public class TableClassResolver implements ClassResolver
         typeNode = (TypeNode)iter3.next();
         type = typeNode.getType();
         try {
+          /* FIXME!!
           typeNode.setType( ts.checkAndResolveType( type, context));
+          */
+          ts.checkAndResolveType( type, context);
         } 
-        catch( TypeCheckException e) {
+        catch( SemanticException e) {
           eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
                       Annotate.getLineNumber( method));
         }
@@ -239,7 +242,7 @@ public class TableClassResolver implements ClassResolver
       try {
          field.setType( ts.checkAndResolveType( type, context));
       } 
-      catch( TypeCheckException e) {
+      catch( SemanticException e) {
         eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
                     Annotate.getLineNumber( field));
       }        

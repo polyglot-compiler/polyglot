@@ -1,84 +1,86 @@
-/*
- * ClassDeclarationStatement.java
- */
-
 package jltools.ast;
 
 import jltools.util.*;
-import jltools.types.LocalContext;
+import jltools.types.*;
+
 
 /**
- * ClassDeclarationStatement
- *
- * Overeview: A ClassDeclarationStatement is a mutable representation
- * of the declaration of a class.  It consists of a ClassNode
- * representing the delcared class.
+ * FIXME
  */
-
-public class ClassDeclarationStatement extends Statement {
+public class ClassDeclarationStatement extends Statement 
+{
+  protected final ClassNode classNode;
 
   /**
-   * Effects: Creates a new ClassDeclarationStatement for the class
-   * defined in ClassNode.
+   * Creates a new <code>ClassDeclarationStatement</code> for the class
+   * defined in <code>ClassNode</code>.
    */
-  public ClassDeclarationStatement(ClassNode classNode) {
+  public ClassDeclarationStatement(ClassNode classNode) 
+  {
     this.classNode = classNode;
   }
 
   /**
-   * Effects: Returns the ClassNode declared by this.
+   * Lazily reconstruct this node.
+   * <p>
+   * If the arguments are pointer identical the fields of the current node,
+   * then the current node is returned untouched. Otherwise a new node is
+   * constructed with the new fields and all annotations from this node are
+   * copied over.
+   *
+   * @param classNode The new class definition.
+   * @return An <code>ClassDeclarationStatement<code> defining the given class.
    */
-  public ClassNode getClassNode() {
+  public ClassDeclarationStatement reconstruct( ClassNode classNode) 
+  {
+    if( this.classNode == classNode) {
+      return this;
+    }
+    else {
+      ClassDeclarationStatement n = new ClassDeclarationStatement( classNode);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+  }
+
+  /**
+   * Returns the <code>ClassNode</code> declared by <code>this</code>.
+   */
+  public ClassNode getClassNode() 
+  {
     return classNode;
   }
 
   /**
-   * Effects: Setts the ClassNode being declared by this to
-   * <newClassNode>.
+   * Visit the child of this node.
+   *
+   * @pre Requires that <code>classNode.visit</code> returns an object of 
+   *  type <code>ClassNode</code>.
+   * @post Returns <code>this</code> if the result of 
+   *  <code>classNode.visit</code> is pointer identical to 
+   *  <code>classNode</code>. Otherwise returns a new 
+   *  <code>ClassDeclarationStatement</code> which defines the new class.
    */
-  public void setClassNode(ClassNode newClassNode) {
-    classNode = newClassNode;
-  }
-  public void translate ( LocalContext c, CodeWriter w)
+  Node visitChildren( NodeVisitor v) 
   {
-    classNode.translate(c, w);
-  }
-  
-  public Node dump( CodeWriter w)
-  {
-    w.write( "( CLASS DECLARATION");
-    dumpNodeInfo( w);
-    w.write( ")");
-    return null;
+    return reconstruct( (ClassNode)classNode.visit( v));
   }
 
-  public Node typeCheck(LocalContext c)
+  public Node typeCheck( LocalContext c)
   {
     // FIXME: implement;
     return this;
   }
 
-
-  /**
-   * Requires: v will not transform the ClassNode into anything other
-   * than another ClassNode.
-   *
-   * Effects: visits each of the children of this with <v>.  
-   */
-  Object visitChildren(NodeVisitor v) 
+  public void translate( LocalContext c, CodeWriter w)
   {
-    classNode = (ClassNode) classNode.visit(v);
-    return v.mergeVisitorInfo( Annotate.getVisitorInfo( this),
-                               Annotate.getVisitorInfo( classNode));
+    classNode.translate( c, w);
   }
-
-  public Node copy() {
-    return new ClassDeclarationStatement(classNode);
+  
+  public void dump( CodeWriter w)
+  {
+    w.write( "( CLASS DECLARATION");
+    dumpNodeInfo( w);
+    w.write( ")");
   }
-
-  public Node deepCopy() {
-    return new ClassDeclarationStatement((ClassNode)classNode.deepCopy());
-  }
-
-  private ClassNode classNode;
 }

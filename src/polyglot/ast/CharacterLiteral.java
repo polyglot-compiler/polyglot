@@ -1,86 +1,84 @@
-/*
- * CharacterLiteral.java
- */ 
-
 package jltools.ast;
 
 import jltools.types.*;
 import jltools.util.*;
 
+
 /** 
- * CharacterLiteral
- * 
- * Overview: An CharacterLiteral represents a literal in java of character
- * type.
+ * An <code>CharacterLiteral</code> represents a literal in java of
+ * <code>char</code> type.
  */
-public class CharacterLiteral extends Literal {
-
+public class CharacterLiteral extends Literal 
+{  
+  protected final char value;
+  protected final String escaped;
 
   /**
-   * Creates a new CharacterLiteral storing a character with the value <c>.
+   * Creates a new <code>CharacterLiteral</code> storing a character with the
+   * value <code>value</code>.
    */
-  public CharacterLiteral( char c) 
+  public CharacterLiteral( char value) 
   {
-    this( c, String.valueOf( c));
+    this( value, String.valueOf( value));
   }
 
   /**
-   * Creates a new CharacterLiteral storing a character with the value <c>
-   * and escaped value <escaped>.
+   * Creates a new <code>CharacterLiteral</code> storing a character with the
+   * value <code>c</code> and escaped value <code>escaped</code>.
    */ 
-  public CharacterLiteral( char c, String escaped) 
+  public CharacterLiteral( char value, String escaped) 
   {
-    value = c;
-    escapedValue = escaped;
+    this.value = value;
+    this.escaped = escaped;
+  }
+  
+  /**
+   * Lazily reconstruct this node.
+   */
+  public CharacterLiteral reconstruct( char value, String escaped)
+  {
+    if( this.value == value && this.escaped.equals( escaped)) {
+      return this;
+    }
+    else {
+      CharacterLiteral n = new CharacterLiteral( value, escaped);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
   }
 
-  public char getCharValue() {
+  public char getCharValue()
+  {
     return value;
   }
 
-  public String getEscapedCharValue() {
-    return escapedValue;
-  }
-
-  public void translate(LocalContext c, CodeWriter w)
+  public String getEscapedCharValue()
   {
-    w.write( "'" + escapedValue + "'");
+    return escaped;
   }
 
-  public Node dump( CodeWriter w)
+  Node visitChildren( NodeVisitor v) 
+  {
+    /* Nothing to do. */
+    return this;
+  }
+
+  public Node typeCheck( LocalContext c) throws SemanticException
+  {
+    setCheckedType( c.getTypeSystem().getChar());
+    return this;
+  }  
+
+  public void translate( LocalContext c, CodeWriter w)
+  {
+    w.write( "'" + escaped + "'");
+  }
+
+  public void dump( CodeWriter w)
   {
     w.write( "( CHAR LITERAL");
     w.write( " < " + value + " > ");
     dumpNodeInfo( w);
     w.write( ")");
-    return null;
   }
-
-  public Node typeCheck(  LocalContext c) throws TypeCheckException
-  {
-    setCheckedType( c.getTypeSystem().getChar());
-    return this;
-  }  
-  
-  Object visitChildren(NodeVisitor v) 
-  {
-    // nothing to do
-    return Annotate.getVisitorInfo( this);
-  }
-
-  public Node copy() {
-    CharacterLiteral cl = new CharacterLiteral(value, escapedValue);
-    cl.copyAnnotationsFrom(this);
-    return cl;
-  }
-
-  public Node deepCopy() {
-    CharacterLiteral cl = new CharacterLiteral(value, 
-                                               new String(escapedValue));
-    cl.copyAnnotationsFrom(this);
-    return cl;
-  }
-  
-  protected char value;
-  protected String escapedValue;
 }

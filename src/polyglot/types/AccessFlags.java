@@ -257,6 +257,16 @@ public class AccessFlags implements Cloneable {
   private static int VOLATILE_BIT     = Modifier.VOLATILE;
   private static int STRICTFP_BIT     = Modifier.STRICT;
 
+  public boolean equals( Object o)
+  {
+    if( o instanceof AccessFlags) {
+      return bits == ((AccessFlags)o).bits;
+    }
+    else {
+      return false;
+    }
+  }
+  
   // Currently, the above bits fit into a short.  We provide an int here
   // for subclasses.
   protected int bits;

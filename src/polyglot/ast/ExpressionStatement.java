@@ -1,87 +1,76 @@
-/*
- * ExpressionStatement.java
- */
-
 package jltools.ast;
 
 import jltools.util.*;
-import jltools.types.LocalContext;
+import jltools.types.*;
 
-import jltools.util.Assert;
-import jltools.util.Annotate;
 
 /**
- * ExpressionStatement
- *
- * Overview: An Statement represents a mutable expression statement.
- **/
-public class ExpressionStatement extends Statement {
+ * An <code>ExpressionStatement</code> is a wrapper for an expression (a
+ * sequence of Java code that yeilds a value) in the context of a statement.
+ */
+public class ExpressionStatement extends Statement 
+{
+  protected final Expression expr;
+
   /**
    * Effects: Create a new ExpressionStatement.
    **/
-  public ExpressionStatement(Expression exp) {
-    expression = exp;
+  public ExpressionStatement( Expression expr)
+  {
+    this.expr = expr;
   }
-
-  /** 
-   * Returns the underlying expression of this ExpressionStatement.
-   **/
-  public Expression getExpression() {
-    return expression;
-  }
-
-  /** 
-   * Sets the underlying expression of this ExpressionStatement.
-   **/
-  public void setExpression(Expression exp) {
-    Assert.assert(exp != null);
-    expression = exp;
-  }    
 
   /**
-   * Requires: v will not transform an Expression into anything other than an
-   *    Expression.
-   **/
-  Object visitChildren(NodeVisitor v) 
+   * Lazily reconstuct this node. 
+   */
+  public ExpressionStatement reconstruct( Expression expr) 
   {
-    expression = (Expression) expression.visit(v);
-    return v.mergeVisitorInfo( Annotate.getVisitorInfo( this),
-                               Annotate.getVisitorInfo( expression));
+    if( this.expr == expr) {
+      return this;
+    }
+    else {
+      ExpressionStatement n = new ExpressionStatement( expr);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
   }
 
-  public void translate(LocalContext c, CodeWriter w)
+  /** 
+   * Returns the underlying expression of this 
+   * <code>ExpressionStatement</code>.
+   */
+  public Expression getExpression() 
   {
-    expression.translate(c, w);
-    w.write(";");
+    return expr;
   }
 
-  public Node dump( CodeWriter w)
+  /**
+   * Visit the children of this node.
+   *
+   * @pre Requires that <code>expr.visit</code> returns an object of type
+   *  <code>Expression</code>.
+   */
+  Node visitChildren( NodeVisitor v) 
+  {
+    return reconstruct( (Expression)expr.visit( v));
+  }
+
+  public Node typeCheck( LocalContext c)
+  {
+    return this;
+  }
+
+  public void translate( LocalContext c, CodeWriter w)
+  {
+    expr.translate( c, w);
+    w.write( "; ");
+  }
+
+  public void dump( CodeWriter w)
   {
     w.write( "( EXPR STMT ");
     dumpNodeInfo( w);
     w.write( ")");
-    return null;
   }
-
-  public Node typeCheck(LocalContext c)
-  {
-    Annotate.addThrows ( this, Annotate.getThrows( expression ) );
-    return this;
-  }
-
-  public Node copy() {
-    ExpressionStatement es = new ExpressionStatement(expression);
-    es.copyAnnotationsFrom(this);
-    return es;
-  }
-
-  public Node deepCopy() {
-    ExpressionStatement es = 
-      new ExpressionStatement((Expression) expression.deepCopy());
-    es.copyAnnotationsFrom(this);
-    return es;
-  }
-
-  private Expression expression;
 }
 

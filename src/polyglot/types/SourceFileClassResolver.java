@@ -19,7 +19,7 @@ public class SourceFileClassResolver implements ClassResolver
     this.tt = tt;
   }
 
-  public ClassType findClass( String name) throws TypeCheckException
+  public ClassType findClass( String name) throws SemanticException
   {
     Target t;
     ClassResolver cr;

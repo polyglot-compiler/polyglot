@@ -3,44 +3,48 @@ package jltools.visit;
 import jltools.ast.Node;
 import jltools.ast.NodeVisitor;
 import jltools.util.CodeWriter;
-import jltools.types.TypeCheckException;
+import jltools.types.SemanticException;
+
 
 public class DumpAst extends NodeVisitor
 {
-  private CodeWriter cw;
+  private CodeWriter w;
 
-  public DumpAst( CodeWriter cw)
+  public DumpAst( CodeWriter w)
   {
-    this.cw = cw;
+    this.w = w;
   }
 
-  public Node visitBefore( Node n)
+  /** 
+   * Visit each node before traversal of children. Call <code>dump</code> for
+   * that node. Then we begin a new <code>CodeWriter</code> block and traverse
+   * the children.
+   */
+  public NodeVisitor enter( Node n)
   {
-    Node m = null;
-
     try
     {
-      m = n.dump( cw);
+      n.dump( w);
     }
-    catch( TypeCheckException e)
+    catch( SemanticException e)
     {
-      System.err.println( "Caught TypeCheckException during dump: " 
+      System.err.println( "Caught SemanticException during dump: " 
                           + e.getMessage());
       e.printStackTrace( System.err);
     }
-    
-    if( m == null) {
-      cw.beginBlock();
-      return null;
-    }
-    else {
-      return m;
-    }
+
+    w.beginBlock();
+    return this;
   }
 
-  public Node visitAfter( Node n)
+  /**
+   * This method is called only after normal traversal of the children. Thus
+   * we must end the <code>CodeWriter</code> block that was begun in 
+   * <code>enter</code>.
+   */
+  public Node leave( Node old, Node n, NodeVisitor v)
   {
-    cw.endBlock();
+    w.endBlock();
     return n;
   }
 }

@@ -44,7 +44,8 @@ public abstract class TypeSystem {
   /**
    * performs any initizlation necessary that requries resolvers.
    */
-  public abstract void initializeTypeSystem() throws TypeCheckException;
+  public abstract void initializeTypeSystem( ClassResolver resolver)
+    throws SemanticException;
 
   ////
   // Functions for two-type comparison.
@@ -55,7 +56,7 @@ public abstract class TypeSystem {
    **/
   public abstract boolean descendsFrom(Type childClass, 
 				       Type  ancestorClass) 
-    throws TypeCheckException ;
+    throws SemanticException ;
 
   /**
    * Returns true iff childType and ancestorType are non-primitive
@@ -64,7 +65,7 @@ public abstract class TypeSystem {
    **/
   public abstract boolean isAssignableSubtype(Type childType, 
 					      Type ancestorType)
-    throws TypeCheckException ;
+    throws SemanticException ;
   /**
    * Requires: all type arguments are canonical.
    *
@@ -72,7 +73,7 @@ public abstract class TypeSystem {
    * words, some non-null members of fromType are also members of toType.
    **/
   public abstract boolean isCastValid(Type fromType, Type toType)
-    throws TypeCheckException ;
+    throws SemanticException ;
 
   /**
    * Requires: all type arguments are canonical.
@@ -81,7 +82,7 @@ public abstract class TypeSystem {
    * in other wors, every member of fromType is member of toType.
    **/
   public abstract boolean isImplicitCastValid(Type fromType, Type toType)
-    throws TypeCheckException ;
+    throws SemanticException ;
 
   /**
    * Requires: all type arguments are canonical.
@@ -95,7 +96,7 @@ public abstract class TypeSystem {
    * Returns the least common ancestor of Type1 and Type2
    **/
   public abstract Type leastCommonAncestor( Type type1, Type type2)
-    throws TypeCheckException;
+    throws SemanticException;
 
   ////
   // Functions for one-type checking and resolution.
@@ -105,14 +106,14 @@ public abstract class TypeSystem {
    * Returns true iff <type> is a canonical (fully qualified) type.
    **/
   public abstract boolean isCanonical(Type type)
-    throws TypeCheckException ;
+    throws SemanticException ;
 
   /**
    * Checks whether a method or field within ctTarget with access flags 'flags' can
    * be accessed from Context context. 
    */
   public abstract boolean isAccessible(ClassType ctTarget, AccessFlags flags, Context context)
-    throws TypeCheckException ;
+    throws SemanticException ;
 
   /**
    * Returns whether inner is enclosed within outer
@@ -125,7 +126,7 @@ public abstract class TypeSystem {
    * describing the error.
    **/
   public abstract Type checkAndResolveType(Type type, Context context)
-    throws TypeCheckException;
+    throws SemanticException;
 
   ////
   // Various one-type predicates.
@@ -136,7 +137,7 @@ public abstract class TypeSystem {
    * Returns true iff an object of type <type> may be thrown.
    **/
   public abstract boolean isThrowable(Type type)
-    throws TypeCheckException;
+    throws SemanticException;
   /**
    * Requires: all type arguments are canonical.
    *
@@ -144,7 +145,7 @@ public abstract class TypeSystem {
    * without being declared in its 'throws' clause.
    **/
   public abstract boolean isUncheckedException(Type type)
-    throws TypeCheckException;
+    throws SemanticException;
 
   ////
   // Functions for type membership.
@@ -155,21 +156,21 @@ public abstract class TypeSystem {
    * with an error explaining why. Considers accessflags
    **/
   public abstract FieldInstance getField(Type type, String name, Context context)
-    throws TypeCheckException;
+    throws SemanticException;
  
 
   /**
    * Returns the supertype of type, or null if type has no supertype.
    **/
   public abstract ClassType getSuperType(ClassType type)
-    throws TypeCheckException;
+    throws SemanticException;
 
   /**
    * Returns an immutable list of all the interface types which type
    * implements.
    **/
   public abstract List getInterfaces(ClassType type)
-    throws TypeCheckException;
+    throws SemanticException;
 
   ////
   // Functions for method testing.
@@ -178,7 +179,7 @@ public abstract class TypeSystem {
    * Returns true iff <type1> is the same as <type2>.
    **/
   public abstract boolean isSameType(MethodType type1, MethodType type2)
-    throws TypeCheckException;
+    throws SemanticException;
 
   /**
    * Returns true iff <type1> has the same arguments as <type2>
@@ -204,7 +205,7 @@ public abstract class TypeSystem {
    **/
   public abstract MethodTypeInstance getMethod(ClassType type, MethodType method, 
 					Context context)
-    throws TypeCheckException;
+    throws SemanticException;
 
   ////
   // Functions which yield particular types.
@@ -229,14 +230,14 @@ public abstract class TypeSystem {
    * class.
    **/
   public abstract AmbiguousType getTypeWithName(String name)
-    throws TypeCheckException;
+    throws SemanticException;
 
   /**
    * Returns a type identical to <type>, but with <dims> more array
    * dimensions.  If dims is < 0, array dimensions are stripped.
    **/
   public abstract Type extendArrayDims(Type type, int dims)
-    throws TypeCheckException;
+    throws SemanticException;
 
   /**
    * Returns a canonical type corresponding to the Java Class object
@@ -247,7 +248,7 @@ public abstract class TypeSystem {
    * this TypeSystem.  For use only by ClassType implementations.
    **/
   public abstract Type typeForClass(Class clazz)
-    throws TypeCheckException;
+    throws SemanticException;
 
   /**
    * Given the name for a class, returns the portion which appears to

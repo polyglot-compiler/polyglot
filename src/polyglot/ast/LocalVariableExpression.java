@@ -48,7 +48,7 @@ public class LocalVariableExpression extends Expression {
     w.write(name);
   }
 
-  public Node dump( CodeWriter w)
+  public void dump( CodeWriter w)
   {
     w.write( "( LOCAL");
     w.write( " < " + name + " > ");

@@ -5,7 +5,10 @@ import jltools.types.*;
 import jltools.util.*;
 
 
-// XXX document me
+/**
+ * A visitor which traverses the AST and remove ambiguities found in fields,
+ * method signatures and the code itself. 
+ */
 public class AmbiguityRemover extends NodeVisitor
 {
   private TypeSystem ts;
@@ -23,24 +26,27 @@ public class AmbiguityRemover extends NodeVisitor
   }
 
 // XXX document me
-  public Node visitBefore(Node n)
+  public VisitorNode enter(Node n)
   {
-    return n.adjustScope( c);
+    n.enterScope( c);
+    return this;
   }
 
 // XXX document me
-  public Node visitAfter( Node n)
+  public Node leave( Node n)
   {
     try
     {
-      return n.removeAmbiguities( c);
+      n.removeAmbiguities( c);
     }
     catch( TypeCheckException e)
     {
       eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
                   Annotate.getLineNumber( n));
-      return n;
+      n.setHasError( true);
+     
     }
+    n.leaveScope();
   }
 
   public ImportTable getImportTable()

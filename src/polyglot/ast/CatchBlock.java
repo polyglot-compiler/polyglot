@@ -1,90 +1,104 @@
-/*
- * CatchBlock.java
- */
-
 package jltools.ast;
 
 import jltools.util.*;
 import jltools.types.*;
-import jltools.visit.SymbolReader;
+import jltools.visit.*;
+
 
 /**
- * Overview: Represents a mutable pair of BlockStatements and
- * FormalParameters which represent a catch block.
+ * A <code>CatchBlock</code> represents one half of a <code>try... catch</code>
+ * statement. Specifically, the second half. The example below demonstrates a
+ * catch block with parameter <code>ioe</code> of type <code>IOException</code>
+ * that prints out the stack trace of the exception.
+ * <pre><code>
+ * ...
+ * catch( IOException ioe) 
+ * {
+ *   ioe.printStackTrace();
+ * }
+ * </code></pre>
  */
-
-public class CatchBlock extends Node {
+public class CatchBlock extends Node 
+{
+  protected final FormalParameter fp;
+  protected final BlockStatement block;
   
   /**
-   * Effects: creates a new CatchBlock with FormalParameter
+   * Creates a new <code>CatchBlock</code> to 
    * <formalParameter> and BlockStatement <block>.
    */
-  public CatchBlock(FormalParameter formalParameter,
-		    BlockStatement block) {
-    this.formalParameter = formalParameter;
+  public CatchBlock( FormalParameter fp, BlockStatement block) 
+  {
+    this.fp = fp;
     this.block = block;
   }
 
   /**
-   * Effects: returns the FormalParameter associated with this
-   * CatchBlock.
+   * Lazily reconstruct this node.
+   * <p>
+   * If the arguments are pointer identical the fields of the current node,
+   * then the current node is returned untouched. Otherwise a new node is
+   * constructed with the new fields and all annotations from this node are
+   * copied over.
+   *
+   * @param fp The new type and name of the expression to be caught.
+   * @param block The set of statements to be executed if the given 
+   *  throwable is caught.
+   * @return An <code>CatchBlock<code> with the given parameter and block of
+   *  statements.
    */
-  public FormalParameter getFormalParameter() {
-    return formalParameter;
-  }
-
-  /**
-   * Effects: sets the FormalParameter associated with this CatchBlock
-   * to <newParam>.
-   */
-  public void setFormalParameter(FormalParameter newParam) {
-    formalParameter = newParam;
-  }
-
-  /**
-   * Returns the type of the FormalParameter which this CatchBlock catches
-   */
-  public Type getCatchBlockType ()
+  public CatchBlock reconstruct( FormalParameter fp, BlockStatement block)
   {
-    return formalParameter.getType();
+    if( this.fp == fp && this.block == block) {
+      return this;
+    }
+    else {
+      CatchBlock n = new CatchBlock( fp, block);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+  }
+  
+  /**
+   * Returns the <code>FormalParameter</code> associated with this 
+   * <code>CatchBlock</code>.
+   */
+  public FormalParameter getFormalParameter() 
+  {
+    return fp;
+  }
+ 
+  /**
+   * Returns the type of the <code>FormalParameter</code> which this
+   * <code>CatchBlock</code> catches.
+   */
+  public Type getCatchType()
+  {
+    return fp.getType();
   }
 
   /**
-   * Effects: returns the BlockStatement for this.
+   * Returns the <code>BlockStatement</code> for this <code>catch</code>
+   * statement.
    */
-  public BlockStatement getBlockStatement() {
+  public BlockStatement getBlockStatement() 
+  {
     return block;
   }
 
-  /**
-   * Effects: sets the block statement for this to be <newBlock>.
+  /* 
+   * Visit the children of this node.
+   *
+   * @pre Required that <code>fp.visit</code> returns an object of type
+   *  <code>FormalParameter</code> and that <code>block.visit</code> returns
+   *  an object of type <code>BlockStatement</code>.
+   * @post Returns <code>this</code> if no changes are made, otherwise a copy
+   *  is made and returned.
    */
-  public void setBlockStatement(BlockStatement newBlock) {
-    block = newBlock;
-  }
-
-  public void translate ( LocalContext c, CodeWriter w)
+  Node visitChildren( NodeVisitor v) 
   {
-    w.write ( " catch ( " );
-    formalParameter.translate( c, w);
-    w.write ( " )");
-    w.beginBlock();
-    block.translate (c, w);
-    w.endBlock();
-  }
-  
-  public Node dump( CodeWriter w)
-  {
-    w.write( "( CATCH BLOCK ");
-    dumpNodeInfo( w);
-    w.write( ")"); 
-    return null;
-  }
-
-  public Node adjustScope( LocalContext c)
-  {
-    c.pushBlock();
-    return null;
+    return reconstruct( (FormalParameter)fp.visit( v),
+                        (BlockStatement)block.visit( v));
   }
   
   public Node readSymbols( SymbolReader sr)
@@ -92,45 +106,45 @@ public class CatchBlock extends Node {
     return this;
   }
 
-  public Node typeCheck( LocalContext c) throws TypeCheckException
+  public void enterScope( LocalContext c)
   {
-    if ( ! formalParameter.getType().descendsFrom ( c.getTypeSystem().getThrowable()) &&
-         ! formalParameter.getType().equals (c.getTypeSystem().getThrowable() ) )
-      throw new TypeCheckException("Can only catch Objects which descend from Throwable");
-    Annotate.setTerminatesOnAllPaths ( this, Annotate.terminatesOnAllPaths(block));
-    addThrows ( block.getThrows () );
+    c.pushBlock();
+  }
 
+  public void leaveScope( LocalContext c)
+  {
     c.popBlock();
+  }
+
+  public Node typeCheck( LocalContext c) throws SemanticException
+  {
+    ClassType throwable = (ClassType)c.getTypeSystem().getThrowable();
+
+    if( !fp.getType().descendsFrom( throwable) &&
+          !fp.getType().equals( throwable)) {
+      throw new SemanticException(
+                "Can only catch objects whose type descends from Throwable.");
+    }
     return this;
   }
 
+  // FIXME implement flowCheck
 
-  Object visitChildren(NodeVisitor v) 
+  public void translate( LocalContext c, CodeWriter w)
   {
-    Object vinfo = Annotate.getVisitorInfo( this);
+    w.write ( "catch( ");
+    fp.translate( c, w);
+    w.write ( ")");
 
-    formalParameter = (FormalParameter)formalParameter.visit(v);
-    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( formalParameter), 
-                                vinfo);
-
-    block = (BlockStatement) block.visit(v);
-    return v.mergeVisitorInfo( Annotate.getVisitorInfo( block), vinfo);
+    w.beginBlock();
+    block.translate( c, w);
+    w.endBlock();
   }
-
-  public Node copy() {
-    CatchBlock cb = new CatchBlock(formalParameter, block);
-    cb.copyAnnotationsFrom(this);
-    return cb;
+  
+  public void dump( CodeWriter w)
+  {
+    w.write( "( CATCH BLOCK ");
+    dumpNodeInfo( w);
+    w.write( ")"); 
   }
-
-  public Node deepCopy() {
-    CatchBlock cb = 
-      new CatchBlock((FormalParameter)formalParameter.deepCopy(), 
-		     (BlockStatement) block.deepCopy());
-    cb.copyAnnotationsFrom(this);
-    return cb;
-  }
-
-  private FormalParameter formalParameter;
-  private BlockStatement block;
 }

@@ -1,84 +1,76 @@
-/*
- * DoStatement.java
- */
-
 package jltools.ast;
 
-import jltools.types.LocalContext;
+import jltools.types.*;
 import jltools.util.*;
 
+
 /**
- * DoStatement
- *
- * Overview: A mutable representation of a Java language do
- *   statment.  Contains a statement to be executed and an expression
- *   to be tested indicating whether to reexecute the statement.
+ * A immutable representation of a Java language <code>do</code> statement. 
+ * Contains a statement to be executed and an expression to be tested 
+ * indicating whether to reexecute the statement.
  */ 
-public class DoStatement extends Statement {
-  /**
-   * Effects: Creates a new DoStatement with a statement <statement>,
-   *    and a conditional expression <condExpr>.
-   */
-  public DoStatement (Statement statement, Expression condExpr) {
-    this.condExpr = condExpr;
-    this.statement = statement;
-  }
+public class DoStatement extends Statement 
+{
+  /** The statement which is iteratively executed. */
+  protected Statement stmt;
+  /** The conditional expression of this statement. */
+  protected Expression cond;
 
   /**
-   * Effects: Returns the Expression that this DoStatement is
-   * conditioned on.
+   * Creates a new <code>DoStatement</code> with a statement <code>statement>,
+   *    and a conditional expression <code>cond</code>.
    */
-  public Expression getConditionalExpression() {
-    return condExpr;
-  }
-
-  /**
-   * Effects: Sets the conditional expression of this to <newExpr>.
-   */
-  public void setConditionalExpression(Expression newExpr) {
-    condExpr = newExpr;
-  }
-
-  /**
-   * Effects: Returns the statement associated with this
-   *    DoStatement.
-   */
-  public Statement getBody() {
-    return statement;
-  }
-
-  /**
-   * Effects: Sets the statement of this DoStatement to be
-   *    <newStatement>.
-   */
-  public void setBody(Statement newStatement) {
-    statement = newStatement;
-  }
-
-
-  public void translate(LocalContext c, CodeWriter w)
+  public DoStatement( Statement stmt, Expression cond) 
   {
-    w.write (" do " );
-    if (! (statement instanceof BlockStatement))
-    {
-      w.beginBlock();
-      statement.translate(c, w);
-      w.endBlock();
+    this.stmt = stmt;
+    this.cond = cond;
+  }
+
+  /** 
+   * Lazily reconstuct this node.
+   */
+  public DoStatement reconstruct( Statement stmt, Expression cond)
+  {
+    if( this.stmt == stmt && this.cond == cond) {
+      return this;
     }
-    else
-      statement.translate(c, w);
-    w.write (" while ( " );
-    condExpr.translate ( c, w);
-    w.write ( " ); ");
-    
+    else {
+      DoStatement n = new DoStatement( stmt, cond);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
   }
 
-  public Node dump( CodeWriter w)
+  /**
+   * Returns the <code>Expression</code> that this <code>DoStatement</code>
+   * is conditioned on.
+   */
+  public Expression getCondition() 
   {
-    w.write( "( DO ");
-    dumpNodeInfo( w);
-    w.write( ")");
-    return null;
+    return cond;
+  }
+
+  /** 
+   * Returns the statement associated with this <code>DoStatement</code>.
+   */
+  public Statement getBody() 
+  {
+    return stmt;
+  }
+
+  /** 
+   * Visit the children of this node.
+   *
+   * @pre Requires that <code>stmt.visit</code> returns an object of type
+   *  <code>Statement</code> and that <code>cond.visit</code> returns an
+   *  object of type <code>Expression</code>.
+   * @post Returns <code>this</code> if no changes are made, otherwise a copy
+   *  is made and returned.
+   */  
+  Node visitChildren(NodeVisitor v) 
+  {
+    return reconstruct( (Statement)stmt.visit( v),
+                        (Expression)cond.visit( v));
   }
 
   public Node typeCheck( LocalContext c)
@@ -87,45 +79,26 @@ public class DoStatement extends Statement {
     return this;
   }
 
-  /** 
-   * Requires: v will not transform an expression into anything other
-   *    than another expression, and that v will not transform a
-   *    Statement into anything other than another Statement or
-   *    Expression.
-   * Effects: visits each of the children of this node with <v>.  If <v>
-   *    returns an expression in place of the sub-statement, it is
-   *    wrapped in an ExpressionStatement.
-   */
-  Object visitChildren(NodeVisitor v) 
+  public void translate(LocalContext c, CodeWriter w)
   {
-    Object vinfo = Annotate.getVisitorInfo( this);
-
-    Node newNode = (Node) statement.visit(v);
-    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newNode), vinfo);
-    if (newNode instanceof Expression) {
-      statement = new ExpressionStatement((Expression) newNode);
+    w.write( "do ");
+    if( !(stmt instanceof BlockStatement)) {
+      w.beginBlock();
+      stmt.translate( c, w);
+      w.endBlock();
     }
     else {
-      statement = (Statement) newNode;
+      stmt.translate( c, w);
     }
-    condExpr = (Expression) condExpr.visit(v);
-    return v.mergeVisitorInfo( Annotate.getVisitorInfo( condExpr), vinfo);
+    w.write( "while( ");
+    cond.translate( c, w);
+    w.write( "); ");
   }
 
-  public Node copy() {
-    DoStatement ds = new DoStatement(statement, condExpr);
-    ds.copyAnnotationsFrom(this);
-    return ds;
+  public void dump( CodeWriter w)
+  {
+    w.write( "( DO ");
+    dumpNodeInfo( w);
+    w.write( ")");
   }
-
-  public Node deepCopy() {
-    DoStatement ds = new DoStatement((Statement) statement.deepCopy(), 
-				     (Expression) condExpr.deepCopy());
-    ds.copyAnnotationsFrom(this);
-    return ds;
-  }
-
-  private Expression condExpr;
-  private Statement statement;
 }
-

@@ -20,25 +20,25 @@ import jltools.util.InternalCompilerError;
 public class StandardTypeSystem extends TypeSystem {
 
   // resolver should handle caching.
-  public StandardTypeSystem(ClassResolver resolver) 
+  public StandardTypeSystem() {}
+
+  /**
+   * Initializes the type system and its internal constants (which depend on
+   * the resolver).
+   */
+  public void initializeTypeSystem( ClassResolver resolver) 
+    throws SemanticException
   {
     this.resolver = resolver;
     this.emptyImportTable = new ImportTable( new CompoundClassResolver(), 
                                              false);
-  }
 
-  /**
-   * Initiazlies the type system to internal constants (which depend on the resolver 
-   * being properly initialized) are themselves initialized.
-   */
-  public void initializeTypeSystem( ) throws TypeCheckException
-  {
     OBJECT_  = resolver.findClass( "java.lang.Object");
     THROWABLE_ = resolver.findClass( "java.lang.Throwable");
     ERROR_ = resolver.findClass( "java.lang.Error");
-    RTEXCEPTION_ = resolver.findClass("java.lang.RuntimeException");
-    CLONEABLE_ = resolver.findClass("java.lang.Cloneable");
-    SERIALIZABLE_ = resolver.findClass("java.io.Serializable");
+    RTEXCEPTION_ = resolver.findClass( "java.lang.RuntimeException");
+    CLONEABLE_ = resolver.findClass( "java.lang.Cloneable");
+    SERIALIZABLE_ = resolver.findClass( "java.io.Serializable");
   }
 
   ////
@@ -51,7 +51,7 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public boolean descendsFrom(Type childType, 
                               Type ancestorType) 
-    throws TypeCheckException 
+    throws SemanticException 
   {
     if ( childType instanceof AmbiguousType ||
          ancestorType instanceof AmbiguousType)
@@ -105,7 +105,7 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public boolean isAssignableSubtype(Type childType, 
 				     Type ancestorType)
-    throws TypeCheckException{
+    throws SemanticException{
 
     if ( childType instanceof AmbiguousType ||
          ancestorType instanceof AmbiguousType) {
@@ -182,7 +182,7 @@ public class StandardTypeSystem extends TypeSystem {
    * words, some non-null members of fromType are also members of toType.
    **/
   public boolean isCastValid(Type fromType, Type toType)
-    throws TypeCheckException
+    throws SemanticException
   {
     // Are they distinct?
     if (fromType.equals(toType)) return true;
@@ -274,7 +274,7 @@ public class StandardTypeSystem extends TypeSystem {
    * in other words, every member of fromType is member of toType.
    **/
   public boolean isImplicitCastValid(Type fromType, Type toType)
-    throws TypeCheckException
+    throws SemanticException
   {
     // TODO: read JLS 5.1 to be sure this is valid.
 
@@ -336,7 +336,7 @@ public class StandardTypeSystem extends TypeSystem {
   /**
    * Returns true iff <type> is a canonical (fully qualified) type.
    **/
-  public boolean isCanonical(Type type) throws TypeCheckException {
+  public boolean isCanonical(Type type) throws SemanticException {
     return type.isCanonical();
   }
       
@@ -345,7 +345,7 @@ public class StandardTypeSystem extends TypeSystem {
    * be accessed from Context context, where context is a class type.
    */
   public boolean isAccessible(ClassType ctTarget, AccessFlags flags, Context context) 
-    throws TypeCheckException 
+    throws SemanticException 
   {
     // check if in same class or public 
     if ( isSameType( ctTarget, context.inClass) ||
@@ -397,7 +397,7 @@ public class StandardTypeSystem extends TypeSystem {
    * canonical form of that type.  Otherwise, returns a String
    * describing the error.
    **/
-  public Type checkAndResolveType(Type type, Context context) throws TypeCheckException {
+  public Type checkAndResolveType(Type type, Context context) throws SemanticException {
 
     if (type.isCanonical()) return type;
     if (type instanceof ArrayType) {
@@ -451,7 +451,7 @@ public class StandardTypeSystem extends TypeSystem {
           try {
             resultFromOuter = checkAndResolveType(type, outerContext);
           }
-          catch( TypeCheckException e) {}
+          catch( SemanticException e) {}
 	}
 	if (parentType != null) {
 	  Context parentContext = new Context(emptyImportTable,
@@ -461,14 +461,14 @@ public class StandardTypeSystem extends TypeSystem {
           {
             resultFromParent = checkAndResolveType(type, parentContext);
           }
-          catch( TypeCheckException e) {}
+          catch( SemanticException e) {}
           //  System.out.println( "back from parent!");
 	}
 	if ((resultFromOuter != null) &&
 	    (resultFromParent != null) &&
             (resultFromParent != resultFromOuter)) {
 	  // FIXME: Better error message needed.
-	  throw new TypeCheckException ("Found " + className + " in both outer and parent.");
+	  throw new SemanticException ("Found " + className + " in both outer and parent.");
 	} else if (resultFromOuter != null) {
 	  return resultFromOuter;
 	} else if (resultFromParent != null) {
@@ -506,7 +506,7 @@ public class StandardTypeSystem extends TypeSystem {
       result = (ClassType)checkAndResolveType(new AmbiguousType(this, prefix),
                                               context);
     }
-    catch( TypeCheckException e) {}
+    catch( SemanticException e) {}
     while (result == null && rest.length() > 0) {
       prefix = prefix + "." + TypeSystem.getFirstComponent(rest);
       rest = TypeSystem.removeFirstComponent(rest);
@@ -515,7 +515,7 @@ public class StandardTypeSystem extends TypeSystem {
       } catch (NoClassException e) {}
     }
     if (result == null)
-      throw new TypeCheckException( "No class found for " + className );
+      throw new SemanticException( "No class found for " + className );
     
 
     // Type outer = result;
@@ -524,7 +524,7 @@ public class StandardTypeSystem extends TypeSystem {
       String innerName = TypeSystem.getFirstComponent(rest);
       result = result.getInnerNamed(innerName);
       if (result == null)
-	throw new TypeCheckException ("Class " + prefix + " has no inner class named " + innerName);
+	throw new SemanticException ("Class " + prefix + " has no inner class named " + innerName);
       prefix = prefix + "." + innerName;
       rest = TypeSystem.removeFirstComponent(rest);
     }
@@ -537,14 +537,14 @@ public class StandardTypeSystem extends TypeSystem {
   /**
    * Returns true iff an object of type <type> may be thrown.
    **/
-  public boolean isThrowable(Type type) throws TypeCheckException {
+  public boolean isThrowable(Type type) throws SemanticException {
     return descendsFrom(type,THROWABLE_) || type.equals(THROWABLE_);
   }
   /**
    * Returns true iff an object of type <type> may be thrown by a method
    * without being declared in its 'throws' clause.
    **/
-  public boolean isUncheckedException(Type type) throws TypeCheckException {
+  public boolean isUncheckedException(Type type) throws SemanticException {
     return descendsFrom(type,ERROR_) || type.equals(ERROR_) || 
       descendsFrom(type,RTEXCEPTION_) || type.equals(RTEXCEPTION_);
   }
@@ -561,7 +561,7 @@ public class StandardTypeSystem extends TypeSystem {
    * they will not restrict the output.
    **/
   public FieldInstance getField(Type t, String name, Context context ) 
-    throws TypeCheckException
+    throws SemanticException
   {
     FieldInstance fi = null, fiEnclosing = null, fiTemp = null;
     ClassType type, tEnclosing = null;
@@ -580,7 +580,7 @@ public class StandardTypeSystem extends TypeSystem {
       }
       else if ( !( t instanceof ClassType))
       {
-        throw new TypeCheckException("Field access valid only on reference types.");
+        throw new SemanticException("Field access valid only on reference types.");
       }
       type = (ClassType)t;
       do 
@@ -594,14 +594,14 @@ public class StandardTypeSystem extends TypeSystem {
             {
               return fi;
             }
-            throw new TypeCheckException(" Field \"" + name + "\" found in \"" + 
+            throw new SemanticException(" Field \"" + name + "\" found in \"" + 
                                          type.getFullName() + 
                                          "\", but with wrong access permissions.");
           }
         }
       }
       while ( (type = (ClassType)type.getSuperType()) != null);
-      throw new TypeCheckException( "Field \"" + name + "\" not found in context"
+      throw new SemanticException( "Field \"" + name + "\" not found in context"
                                     + t.getTypeString() );
     }
     else // type == null, ==> no starting point. so check superclasses as well as enclosing classes.
@@ -618,7 +618,7 @@ public class StandardTypeSystem extends TypeSystem {
 
       // check the lineage of where we are
       try {  fi = getField( context.inClass, name, context); }
-      catch ( TypeCheckException tce) { /* must have been something we couldnt access */ }
+      catch ( SemanticException tce) { /* must have been something we couldnt access */ }
 
       boolean bFound = (fi != null);
       
@@ -627,11 +627,11 @@ public class StandardTypeSystem extends TypeSystem {
       while (tEnclosing != null)
       {
         try { fiTemp = getField(tEnclosing, name, context); }
-        catch (TypeCheckException tce ) { /* must have been something we couldn't access */ }
+        catch (SemanticException tce ) { /* must have been something we couldn't access */ }
 
         if (bFound && fiTemp != null)
         {
-          throw new TypeCheckException("Ambiguous referenct to field \"" + name + "\"");
+          throw new SemanticException("Ambiguous referenct to field \"" + name + "\"");
         }
         else if (fiTemp != null)
         {
@@ -641,7 +641,7 @@ public class StandardTypeSystem extends TypeSystem {
       }
       if ( fi != null && fiEnclosing != null)
       {
-        throw new TypeCheckException("Ambiguous referenct to field \"" + name + "\"");
+        throw new SemanticException("Ambiguous referenct to field \"" + name + "\"");
       }
     }
     if ( fi!= null) return fi;
@@ -658,7 +658,7 @@ public class StandardTypeSystem extends TypeSystem {
       result = (ClassType)checkAndResolveType(new AmbiguousType(this, prefix),
                                               context);
     }
-    catch( TypeCheckException e) {}
+    catch( SemanticException e) {}
 
     while (result == null && rest.length() > 0) {
       prefix = prefix + "." + TypeSystem.getFirstComponent(rest);
@@ -668,7 +668,7 @@ public class StandardTypeSystem extends TypeSystem {
       } catch (NoClassException e) {}
     }
     if (result == null)
-      throw new TypeCheckException( "Field \"" + name + "\" not found");
+      throw new SemanticException( "Field \"" + name + "\" not found");
     // ah ha! we have a type. to work against.
     return getField ( result, rest, context );
     
@@ -683,13 +683,13 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public MethodTypeInstance getMethod(ClassType type, MethodType method, 
                                       Context context)
-    throws TypeCheckException
+    throws SemanticException
   {
     List lAcceptable = new java.util.ArrayList();
     getMethodSet ( lAcceptable, type, method, context);
     
     if (lAcceptable.size() == 0)
-      throw new TypeCheckException ( "No valid method call found for \"" + 
+      throw new SemanticException ( "No valid method call found for \"" + 
                                      method.getName() + "\".");
 
     // At this point, the List lAcceptable contains all those which are 
@@ -729,7 +729,7 @@ public class StandardTypeSystem extends TypeSystem {
     for ( int i = 1 ; i < mtiArray.length; i++)
     {
       if (msc.compare ( mtiArray[0], mtiArray[i]) == 1)
-        throw new TypeCheckException("Ambiguous method \"" + method.getName() 
+        throw new SemanticException("Ambiguous method \"" + method.getName() 
                                      + "\". More than one invocations are valid"
                                      + " from this context.");
     }
@@ -761,7 +761,7 @@ public class StandardTypeSystem extends TypeSystem {
    */
   private void getMethodSet(List lAcceptable, ClassType type, MethodType method, 
                             Context context)
-    throws TypeCheckException
+    throws SemanticException
   {
     MethodTypeInstance mti = null, mtiEnclosing = null, mtiTemp = null;
     ClassType tEnclosing = null;
@@ -803,7 +803,7 @@ public class StandardTypeSystem extends TypeSystem {
 
       // check the parent lineage of where we are
       try {  getMethodSet( lAcceptable, context.inClass, method, context); }
-      catch ( TypeCheckException tce) 
+      catch ( SemanticException tce) 
       { /* must have been something we couldnt access */ }
 
       // now check all enclosing classes (this will also look for conflicts)
@@ -811,7 +811,7 @@ public class StandardTypeSystem extends TypeSystem {
       while (tEnclosing != null)
       {
         try { getMethodSet(lAcceptable, tEnclosing, method, context); }
-        catch (TypeCheckException tce ) 
+        catch (SemanticException tce ) 
         { /* must have been something we couldn't access */ }
       }
     }
@@ -837,7 +837,7 @@ public class StandardTypeSystem extends TypeSystem {
       // rule 2:
       return ( methodCallValid ( mti2, mti1) );
     }
-    catch (TypeCheckException tce)
+    catch (SemanticException tce)
     {
       return false;
     }
@@ -846,7 +846,7 @@ public class StandardTypeSystem extends TypeSystem {
   /**
    * Returns the supertype of type, or null if type has no supertype.
    **/
-  public ClassType getSuperType(ClassType type) throws TypeCheckException
+  public ClassType getSuperType(ClassType type) throws SemanticException
   {
     return (ClassType)type.getSuperType();
   }
@@ -855,7 +855,7 @@ public class StandardTypeSystem extends TypeSystem {
    * Returns an immutable list of all the interface types which type
    * implements.
    **/
-  public List getInterfaces(ClassType type) throws TypeCheckException
+  public List getInterfaces(ClassType type) throws SemanticException
   {
     return type.getInterfaces();
   }
@@ -872,7 +872,7 @@ public class StandardTypeSystem extends TypeSystem {
    * Requires: all type arguments are canonical.
    * Returns the least common ancestor of Type1 and Type2
    **/
-  public Type leastCommonAncestor( Type type1, Type type2) throws TypeCheckException
+  public Type leastCommonAncestor( Type type1, Type type2) throws SemanticException
   {
     if (( type1 instanceof PrimitiveType ) &&
         ( type2 instanceof PrimitiveType ))
@@ -882,7 +882,7 @@ public class StandardTypeSystem extends TypeSystem {
           return getBoolean();
         }
         else {
-          throw new TypeCheckException( 
+          throw new SemanticException( 
                        "No least common ancestor found. The type \"" 
                        + type1.getTypeString() + 
                        "\" is not compatible with the type \"" 
@@ -891,7 +891,7 @@ public class StandardTypeSystem extends TypeSystem {
 
       }
       if( ((PrimitiveType)type2).isBoolean()) {
-        throw new TypeCheckException( 
+        throw new SemanticException( 
                        "No least common ancestor found. The type \"" 
                        + type1.getTypeString() + 
                        "\" is not compatible with the type \"" 
@@ -902,7 +902,7 @@ public class StandardTypeSystem extends TypeSystem {
           return getVoid();
         }
         else {
-          throw new TypeCheckException( 
+          throw new SemanticException( 
                        "No least common ancestor found. The type \"" 
                        + type1.getTypeString() + 
                        "\" is not compatible with the type \"" 
@@ -910,7 +910,7 @@ public class StandardTypeSystem extends TypeSystem {
         }
       }
       if( ((PrimitiveType)type2).isVoid()) {
-        throw new TypeCheckException( 
+        throw new SemanticException( 
                        "No least common ancestor found. The type \"" 
                        + type1.getTypeString() + 
                        "\" is not compatible with the type \"" 
@@ -932,7 +932,7 @@ public class StandardTypeSystem extends TypeSystem {
     
     if (!( type1 instanceof ClassType) ||
         !( type2 instanceof ClassType)) {
-      throw new TypeCheckException( 
+      throw new SemanticException( 
                        "No least common ancestor found. The type \"" 
                        + type1.getTypeString() + 
                        "\" is not compatible with the type \"" 
@@ -948,7 +948,7 @@ public class StandardTypeSystem extends TypeSystem {
     }
 
     if ( tSuper == null) {
-      throw new TypeCheckException( 
+      throw new SemanticException( 
                        "No least common ancestor found. The type \"" 
                        + type1.getTypeString() + 
                        "\" is not compatible with the type \"" 
@@ -988,7 +988,7 @@ public class StandardTypeSystem extends TypeSystem {
    * MethodTypeInstance prototype
    */
   public boolean methodCallValid( MethodTypeInstance prototype, MethodType call) 
-    throws TypeCheckException
+    throws SemanticException
   {
     if ( ! prototype.getName().equals(call.getName()))
       return false;
@@ -1081,7 +1081,7 @@ public class StandardTypeSystem extends TypeSystem {
    * registered in this typeSystem.  Does not register the type in
    * this TypeSystem.  For use only by JavaClass implementations.
    **/
-  public Type typeForClass(Class clazz) throws TypeCheckException
+  public Type typeForClass(Class clazz) throws SemanticException
   {
     if( clazz == Void.TYPE) {
       return VOID_;

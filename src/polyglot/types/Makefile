@@ -20,15 +20,14 @@ tp_files 	= AccessFlags.java	\
 			MethodTypeInstance.java \
 			NoClassException.java \
 			NullType.java \
-			ObjectPrimitiveTypeSystem.java \
 			ParsedClassType.java \
 			PrimitiveType.java \
 			TableClassResolver.java \
 			TargetTable.java \
 			Type.java \
-			TypeCheckException.java \
 			TypeInstance.java \
 			TypeSystem.java \
+			SemanticException.java \
 			SourceFileClassResolver.java \
 			StandardTypeSystem.java 
 

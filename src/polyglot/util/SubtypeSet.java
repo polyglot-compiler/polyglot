@@ -51,7 +51,7 @@ public class SubtypeSet implements java.util.Set
         throw new ClassCastException("Can only add types to the set");
       }
     }
-    catch ( TypeCheckException tce) 
+    catch ( SemanticException tce) 
     {
       throw new IllegalArgumentException(" Cannont perform typesystem operations: " + tce.getMessage());
     }
@@ -86,7 +86,7 @@ public class SubtypeSet implements java.util.Set
             return true;
         }
       }
-      catch (TypeCheckException tce ) 
+      catch (SemanticException tce ) 
       {
         return false;
       }

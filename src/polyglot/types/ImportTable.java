@@ -40,7 +40,7 @@ public  class ImportTable implements ClassResolver {
     }
   }
 
-  public void addClassImport(String className) throws TypeCheckException {
+  public void addClassImport(String className) throws SemanticException {
     ClassType class_ = resolver.findClass(className);
     String shortName = TypeSystem.getShortNameComponent(className);
     map.put(className, class_);
@@ -56,7 +56,7 @@ public  class ImportTable implements ClassResolver {
     resolver.findPackage(name);
   }
 
-  public ClassType findClass(String name)  throws TypeCheckException {
+  public ClassType findClass(String name)  throws SemanticException {
     // FIXME: need to keep on looking to find conflicts.
     //System.out.println( "looking " + name + " " + TypeSystem.isNameShort(name));
     if (TypeSystem.isNameShort(name)) {

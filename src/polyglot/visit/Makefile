@@ -1,11 +1,12 @@
 
 vs_package	= jltools/visit
 vs_codebase	= ../..
-vs_files 	= AmbiguityRemover.java \
-		  DumpAst.java \
-		  ObjectPrimitiveCastRewriter.java \
+vs_files 	= SymbolReader.java \
+		  AmbiguityRemover.java \
 		  TypeChecker.java \
-		  SymbolReader.java
+		  ExceptionChecker.java \
+		  FlowChecker.java \
+		  DumpAst.java  
 
 VISIT_TARGET = $(patsubst %.java, $(vs_package)/%.class, $(vs_files))
 

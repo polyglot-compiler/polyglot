@@ -3,6 +3,7 @@ package jltools.ast;
 import jltools.util.*;
 import jltools.types.*;
 
+
 /**
  * An <code>ArrayIndexExpression</code> is a immutable representation of an
  * access of an array member.  For instance <code>foo[i]</code> accesses the 
@@ -11,8 +12,8 @@ import jltools.types.*;
  * evaulates to an array, and an index expression which evaluates to an integer
  * indicating the index of the array to be accessed.
  */
-public class ArrayIndexExpression extends Expression {
-
+public class ArrayIndexExpression extends Expression 
+{
   protected final Expression base;
   protected final Expression index;
 
@@ -41,7 +42,7 @@ public class ArrayIndexExpression extends Expression {
   public ArrayIndexExpression reconstruct( Expression base, Expression index) 
   {
     if( this.base == base && this.index == index) {
-      returnt this;
+      return this;
     }
     else {
       ArrayIndexExpression n = new ArrayIndexExpression( base, index);
@@ -74,7 +75,8 @@ public class ArrayIndexExpression extends Expression {
    * @post Returns <code>this</code> if no changes are made, otherwise a copy
    *  is made and returned.
    */  
-  Node visitChildren(NodeVisitor v) {
+  Node visitChildren(NodeVisitor v) 
+  {
     return reconstruct( (Expression)base.visit( v),
                         (Expression)index.visit( v));
   }
@@ -108,12 +110,11 @@ public class ArrayIndexExpression extends Expression {
     w.write ("]");
   }
   
-  public Node dump( CodeWriter w)
+  public void dump( CodeWriter w)
   {
     w.write( "( ARRAY INDEX EXPR ") ;
     dumpNodeInfo( w);
     w.write( ")");
-    return null;
   }
 
   public int getPrecedence()

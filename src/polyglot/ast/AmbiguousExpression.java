@@ -1,31 +1,29 @@
-/*
- * AmbiguousExpression.java
- */
-
 package jltools.ast;
 
 import jltools.types.*;
 import jltools.util.*;
 
 /**
- * AmbiguousExpression
- *
- * Overview: An AmbiguousExpression represents any ambiguous Java expression,
- *    such as "a.b.c".
- **/
-public abstract class AmbiguousExpression extends Expression {
-
-  public int getPrecedence()
-  {
-    return 3; // PRECEDENCE_OTHER;
-  }
-
-  public Node typeCheck( LocalContext c) throws TypeCheckException
+ * An <code>AmbiguousExpression</code> represents any ambiguous Java 
+ * expression.
+ */
+public abstract class AmbiguousExpression extends Expression 
+{
+  public Node typeCheck( LocalContext c) throws SemanticException
   {
     throw new InternalCompilerError( 
                      "Attempt to type check an ambiguous node.");
   }
 
-  public void translate( LocalContext c, CodeWriter w) {}
+  public void translate( LocalContext c, CodeWriter w) 
+  {
+    throw new InternalCompilerError( 
+                     "Attempt to translate an ambiguous node.");
+  }
+
+  public int getPrecedence()
+  {
+    return PRECEDENCE_OTHER;
+  }
 }
 

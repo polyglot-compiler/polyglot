@@ -1,7 +1,3 @@
-/*
- * ArrayInitializerExpression.java
- */
-
 package jltools.ast;
 
 import java.util.List;
@@ -14,129 +10,126 @@ import jltools.util.*;
 
 
 /**
- * ArrayInitializerExpression
- *
- * Overview: An ArrayInitializerExpression is a mutable representation of
- *   the an ArrayInitializer, such as { 3, 1, { 4, 1, 5 } }
+ * An <code>ArrayInitializerExpression</code> is a mutable representation of
+ * the an array initializer, such as { 3, 1, { 4, 1, 5 } }.
  */
 public class ArrayInitializerExpression extends Expression {
-  /**
-   * Checks: every element of <list> is an Expression.
-   *
-   * Creates a new ArrayInitializerExpression with <list> as its elements.
-   **/
-  public ArrayInitializerExpression(List list) {
-    TypedList.check(list, Expression.class);
-    children = new ArrayList(list);
-  }
+
+  protected final List children;
 
   /**
-   * Creates a new, empty ArrayInitializerExpression.
-   **/
+   * Creates a new, empty <code>ArrayInitializerExpression</code>.
+   */
   public ArrayInitializerExpression() {
     children = new ArrayList();
   }
 
   /**
-   * Returns a TypedListIterator which yields every child of this expression,
-   * in order, and only allows Expressions to be inserted.
-   **/
-  public ListIterator children() {
-    return new TypedListIterator(children.listIterator(),
-				 Expression.class,
-				 false);
+   * Creates a new <code>ArrayInitializerExpression</code> with 
+   * <code>list</code> as its elements.
+   *
+   * @pre Each element of <code>list</code> is an expression.
+   */
+  public ArrayInitializerExpression( List list) {
+    children = TypedList.copyAndCheck( list, Expression.class, true);
+  }
+
+  /** 
+   * Lazily reconstuct this node.
+   */
+  public ArrayInitializerExpression reconstruct( List list) {
+    if( list.size() != children.size()) {
+      ArrayInitializerExpression n = new ArrayInitializerExpression( list);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+    else {
+      for( int i = 0; i < list.size(); i++) {
+        if( list.get( i) != children.get( i)) {
+          ArrayInitializerExpression n = new ArrayInitializerExpression( list);
+          n.copyAnnotationsFrom( this);
+          return n;
+        }
+      }      
+      return this;
+    }
   }
 
   /**
-   * Adds a new element to the end of this expression.
-   **/
-  public void addExpression(Expression e) { children.add(e); }
+   * Returns a Iterator which yields every child of this expression,
+   * in order.
+   */
+  public Iterator children() {
+    return children.iterator();
+  }
 
   /**
-   * Adds a new element to this expression at position <pos>.
-   **/
-  public void addExpression(int pos, Expression e) { children.add(pos, e); }
-
-  /**
-   * Returns the <pos>'th element of this expression.
-   **/
-  public Expression getExpression(int pos) 
-    { return (Expression) children.get(pos); }
-
-  /**
-   * Replaces the <pos>'th element of this expression with <e>.
-   **/
-  public void setExpression(int pos, Expression e) { children.set(pos,e); }
-
-  /**
-   * Removes the <pos'th elemen of this expression.
-   **/
-  public void removeExpression(int pos) { children.remove(pos); }
-  
-  public int getPrecedence()
+   * Returns the <code>pos</code>'th child of this expression.
+   */
+  public Expression getChildAt( int pos) 
   {
-    // FIXME is this right?
-    return PRECEDENCE_OTHER;
+    return (Expression)children.get( pos); 
+  }
+
+  /**
+   * Visit the children of this node.
+   *
+   * @pre Requires that the <code>visit</code> method of each child returns
+   *  an object of type <code>Expression</code>.
+   */
+  Node visitChildren( NodeVisitor v) 
+  {
+    List list = new ArrayList( children.size());
+
+    for( Iterator iter = children(); iter.hasNext(); ) {
+      Expression expr = (Expression)((Expression)iter.next()).visit( v);
+      if( expr != null) {
+        list.add( expr);
+      }
+    }
+    return reconstruct( list);
+  }
+  
+  public Node typeCheck( LocalContext c) throws SemanticException
+  {
+    Type type = null;
+    Expression child;
+
+    for( Iterator iter = children(); iter.hasNext(); ) {
+      child = (Expression)iter.next();
+
+      type = (type == null ? child.getCheckedType() :
+              c.getTypeSystem().leastCommonAncestor( type,
+                                  child.getCheckedType()));
+    }
+    
+    setCheckedType( type);
+    
+    return this;
   }
 
   public void translate( LocalContext c, CodeWriter w)
   {
-    w.write ( " { " );
-    for (ListIterator iter = children(); iter.hasNext(); ) {
-      ((Expression) iter.next()).translate(c, w);
-      if ( iter.hasNext())
-      {
-        w.write (" , ");
+    w.write( "{ ");
+    for( Iterator iter = children(); iter.hasNext(); ) {
+      ((Expression)iter.next()).translate(c, w);
+      if( iter.hasNext()) {
+        w.write(", ");
       }
     }
-    w.write ( " } " );
+    w.write( " }");
   }
   
-  public Node dump( CodeWriter w)
+  public void dump( CodeWriter w)
   {
     w.write( "( ARRAY INITIALIZER ");
     dumpNodeInfo( w);
     w.write( ")");
-    return null;
   }
   
-  public Node typeCheck( LocalContext c)
+  public int getPrecedence()
   {
-    // FIXME: implement;
-    return this;
+    return PRECEDENCE_OTHER;
   }
-
-  Object visitChildren(NodeVisitor v) 
-  {
-    Object vinfo = Annotate.getVisitorInfo( this);
-    for (ListIterator iter = children(); iter.hasNext(); ) {
-      Expression expr = (Expression) iter.next();
-
-      Expression newExpr = (Expression) expr.visit(v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newExpr), vinfo);
-
-      if (expr != newExpr)
-	iter.set(newExpr);
-    }
-    return vinfo;
-  }
-
-  public Node copy() {
-    Node n = new ArrayInitializerExpression(children);
-    n.copyAnnotationsFrom(this);
-    return n;
-  }
-
-  public Node deepCopy() {
-    ArrayInitializerExpression aie = new ArrayInitializerExpression();
-    for (Iterator iter = children.iterator(); iter.hasNext(); ) {
-      Expression expr = (Expression) iter.next();
-      aie.addExpression( (Expression) expr.deepCopy() );
-    }
-    aie.copyAnnotationsFrom(this);
-    return aie;
-  }
-  
-  private List children;
 }
   

@@ -17,7 +17,7 @@ public class CompoundClassResolver implements ClassResolver
     resolvers.add( cr);
   }
 
-  public ClassType findClass( String name) throws TypeCheckException
+  public ClassType findClass( String name) throws SemanticException
   {
     ClassType clazz;
     ClassResolver cr;
