@@ -73,7 +73,7 @@ public abstract class Type extends AnnotatedObject implements Serializable
     }
 
 
-  public final Type extendArrayDims(int dims) throws SemanticException
+  public Type extendArrayDims(int dims) throws SemanticException
   { 
     return ts.extendArrayDims(this,dims); 
   }  
