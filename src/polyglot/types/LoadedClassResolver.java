@@ -1,16 +1,16 @@
 package polyglot.types;
 
-import polyglot.frontend.*;
-import polyglot.frontend.Compiler;
-import polyglot.ast.Node;
-import polyglot.visit.ClassSerializer;
-import polyglot.util.*;
+import java.io.InvalidClassException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import polyglot.main.Report;
 import polyglot.main.Version;
-import polyglot.types.reflect.*;
-
-import java.io.*;
-import java.util.*;
+import polyglot.types.reflect.ClassFile;
+import polyglot.types.reflect.ClassFileLoader;
+import polyglot.types.reflect.ClassPathLoader;
+import polyglot.util.TypeEncoder;
 
 /**
  * Loads class information from class files, or serialized class infomation
@@ -139,6 +139,9 @@ public class LoadedClassResolver extends ClassResolver
     try {
       dt = (ClassType) te.decode(clazz.encodedClassType(version.name()));
     }
+	catch (InvalidClassException e) {
+		throw new BadSerializationException(clazz.name());
+	}
     catch (Exception e) {
       throw new SemanticException("Could not get type information for " +
                                   "class \"" + clazz.name() + "\"; " +

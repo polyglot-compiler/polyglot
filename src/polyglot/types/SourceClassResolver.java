@@ -1,16 +1,13 @@
 package polyglot.types;
 
-import polyglot.frontend.*;
-import polyglot.frontend.Compiler;
-import polyglot.ast.Node;
-import polyglot.visit.ClassSerializer;
-import polyglot.util.*;
-import polyglot.main.Report;
-import polyglot.main.Version;
-import polyglot.types.reflect.*;
+import java.io.IOException;
 
-import java.io.*;
-import java.util.*;
+import polyglot.frontend.Compiler;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.FileSource;
+import polyglot.main.Report;
+import polyglot.types.reflect.ClassFile;
+import polyglot.types.reflect.ClassFileLoader;
 
 /**
  * Loads class information from source files, class files, or serialized
@@ -172,6 +169,9 @@ public class SourceClassResolver extends LoadedClassResolver
 	Report.report(4, "Using encoded class type for " + name);
       try {
         return getEncodedType(encodedClazz, name);
+      }
+      catch (BadSerializationException e) {
+      	throw e;
       }
       catch (SemanticException e) {
         if (Report.should_report(report_topics, 4))
