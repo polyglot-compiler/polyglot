@@ -48,6 +48,7 @@ public class SymbolReader extends NodeVisitor
     }
     catch( SemanticException e)
     {
+e.printStackTrace();
       eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
 		  Annotate.getLineNumber( n));
       return n;

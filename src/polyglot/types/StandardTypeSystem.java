@@ -198,7 +198,7 @@ public class StandardTypeSystem extends TypeSystem {
     if (! (ancestorType instanceof ReferenceType))
 	return false;
     
-    return (childType.equals(ancestorType) || 
+    return (isSameType(childType, ancestorType) || 
 	    descendsFrom(childType, ancestorType));    
   }
   /**

@@ -27,6 +27,9 @@ BIN 			= $(SOURCE)
 
 all clean clobber javadoc:
 
+cleanclasses:
+	-rm -f $(SOURCE)/classes/$(subst .,/,$(PACKAGE))/*.class
+
 define subdirs
 @for i in $(SUBDIRS) ""; do \
     if [ "x$$i" != "x" ]; then $(MAKE) -C $$i $@ || exit 1; fi; \

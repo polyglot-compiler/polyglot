@@ -11,6 +11,7 @@ include Rules.mk
 
 all: classes
 	$(subdirs)
+
 clean:
 	rm -rf classes
 	$(subdirs)
@@ -47,7 +48,8 @@ PACKAGES = \
 	jltools.ext.jif.extension \
 	jltools.ext.jif.parse \
 	jltools.ext.jif.types \
-	jltools.ext.jif.visit
+	jltools.ext.jif.visit \
+	jif.lang
 
 javadoc: FORCE
 	$(javadoc)

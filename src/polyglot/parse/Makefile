@@ -13,11 +13,9 @@ include $(SOURCE)/Rules.mk
 
 all: $(CLASSES)
 
-clean:
-	-rm -f *.class 
+clean: cleanclasses
 
-clobber:
-	-rm -f *.class 
+clobber: cleanclasses
 	-rm -f Grm.java sym.java
 
 Grm.java sym.java: java12.cup

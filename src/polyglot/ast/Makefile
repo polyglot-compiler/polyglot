@@ -67,5 +67,4 @@ include $(SOURCE)/Rules.mk
 
 all: $(CLASSES)
 
-clean clobber:
-	-rm -f *.class
+clean clobber: cleanclasses
