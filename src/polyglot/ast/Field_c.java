@@ -1,11 +1,31 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
+import java.util.Collections;
+import java.util.List;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.Node;
+import polyglot.ast.Precedence;
+import polyglot.ast.Receiver;
+import polyglot.ast.Special;
+import polyglot.ast.Term;
+import polyglot.ast.TypeNode;
+import polyglot.types.Context;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>Field</code> is an immutable representation of a Java field
@@ -112,28 +132,14 @@ public class Field_c extends Expr_c implements Field
     Context c = tc.context();
     TypeSystem ts = tc.typeSystem();
 
-    if (target instanceof TypeNode) {
-      Type type = ((TypeNode) target).type();
-      FieldInstance fi = ts.findField(type.toReference(), name, c);
-
-      // Check that we don't access a non-static field from a static
-      // context.
-      if (! fi.flags().isStatic()) {
-        throw new SemanticException("Cannot access non-static field " + name +
-                                    " of " + type + " in static context.");
-      }
-
-      return fieldInstance(fi).type(fi.type());
+    FieldInstance fi = ts.findField(target.type().toReference(), name, c);
+    
+    if (fi == null) {
+        throw new InternalCompilerError("Cannot access field on node of type " +
+            target.getClass().getName() + ".");
     }
-
-    if (target instanceof Expr) {
-      Type type = ((Expr) target).type();
-      FieldInstance fi = ts.findField(type.toReference(), name, c);
-      return fieldInstance(fi).type(fi.type());
-    }
-
-    throw new InternalCompilerError("Cannot access field on node of type " +
-                                    target.getClass().getName() + ".");
+    
+    return fieldInstance(fi).type(fi.type());
   }
 
   public Type childExpectedType(Expr child, AscriptionVisitor av)

@@ -1,10 +1,18 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.ast.Node;
+import polyglot.ast.Precedence;
+import polyglot.ast.Special;
+import polyglot.ast.TypeNode;
+import polyglot.types.ClassType;
+import polyglot.types.Context;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>Special</code> is an immutable representation of a
@@ -77,8 +85,14 @@ public class Special_c extends Expr_c implements Special
 	ClassType t;
 
 	if (qualifier == null) {
-	    // Unqualified this expression
+	    // Unqualified this or super expression
 	    t = c.currentClass();
+        
+            if (c.isStaticContext()) {
+                throw new SemanticException("Cannot access a non-static " +
+                    "field or method, or refer to \"this\" or \"super\" " + 
+                    "from a static context.",  this.position());
+            }
 	}
 	else {
 	    if (! qualifier.type().isClass()) {
@@ -89,6 +103,10 @@ public class Special_c extends Expr_c implements Special
 
 	    t = qualifier.type().toClass();
 
+            /** TODO: ensure that there is an appropriate enclosing instance
+             * at the given type.
+             * 
+             */
             if (! ts.equals(c.currentClass(), t) &&
                 ! ts.isEnclosed(c.currentClass(), t)) {
                 throw new SemanticException("Qualifier type \"" + t +
