@@ -43,5 +43,15 @@ public class LocalVariableExpression extends Expression {
     public void visitChildren(NodeVisitor v) {
     }
 
+    public Node copy() {
+      LocalVariableExpression lve = new LocalVariableExpression(name);
+      lve.copyAnnotationsFrom(this);
+      return lve;
+    }
+
+    public Node deepCopy() {
+      return copy();
+    }
+
     private String name;
 }

@@ -7,7 +7,7 @@ package jltools.ast;
 /**
  * SynchronizedStatement
  *
- * Overview: A mutable representation of a Java language synchronized block.  while statement.
+ * Overview: A mutable representation of a Java language synchronized block.
  *   Contains an expression being tested and a statement to be executed
  *   while the expression is true.
  */

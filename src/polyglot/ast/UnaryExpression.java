@@ -79,6 +79,20 @@ public class UnaryExpression extends Expression {
     public void visitChildren(NodeVisitor v) {
 	expr  = (Expression) expr.accept(v);
     }
+
+    public Node copy() {
+      UnaryExpression ue = new UnaryExpression(expr, operator);
+      ue.copyAnnotationsFrom(this);
+      return ue;
+    }
+
+    public Node deepCopy() {
+      UnaryExpression ue = new UnaryExpression( (Expression) expr.deepCopy(),
+						operator);
+      ue.copyAnnotationsFrom(this);
+      return ue;
+    }
+      
     
     private Expression expr;
     private int operator;

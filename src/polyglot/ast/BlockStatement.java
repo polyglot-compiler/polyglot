@@ -124,6 +124,25 @@ public class BlockStatement extends Statement {
     }    
   }
 
+  public Node copy() {
+    BlockStatement bs = new BlockStatement();
+    bs.copyAnnotationsFrom(this);
+    for (Iterator i = statements.iterator(); i.hasNext(); ) {
+      bs.addStatement((Statement) i.next());
+    }
+    return bs;
+  }
+
+  public Node deepCopy() {
+    BlockStatement bs = new BlockStatement();
+    bs.copyAnnotationsFrom(this);
+    for (Iterator i = statements.iterator(); i.hasNext(); ) {
+      s = (Statement) i.next();
+      bs.addStatement(s.deepCopy());
+    }
+    return bs;
+  }
+
   // RI: every member of statements is a Statement.
   private ArrayList statements;
 }

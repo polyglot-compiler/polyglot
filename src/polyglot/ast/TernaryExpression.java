@@ -1,5 +1,5 @@
 /* 
- * Ternary.java
+ * TernaryExpression.java
  */
 
 package jltools.ast;
@@ -84,6 +84,21 @@ public class TernaryExpression extends Expression {
 	conditional  = (Expression) conditional.accept(v);
 	trueResult   = (Expression) trueResult.accept(v);
 	falseResult  = (Expression) falseResult.accept(v);
+    }
+
+    public Node copy() {
+      TernaryExpression te = 
+	new TernaryExpression(conditional, trueResult, falseResult);
+      te.copyAnnotationsFrom(this);
+      return te;						   
+    }
+
+    public Node deepCopy() {
+      TernaryExpression te = 
+	new TernaryExpression(conditional.deepCopy(), 
+			      trueResult.deepCopy(), falseResult.deepCopy());
+      te.copyAnnotationsFrom(this);
+      return te;
     }
 
 

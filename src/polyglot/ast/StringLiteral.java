@@ -40,5 +40,15 @@ public class StringLiteral extends Literal {
   public void visitChildren(NodeVisitor v) {
   }
 
+  public Node copy() {
+    StringLiteral sl = new StringLiteral(string);
+    sl.copyAnnotationsFrom(this);
+    return sl;
+  }
+
+  public Node deepCopy() {
+    return copy();
+  }
+
   private String string;
 }

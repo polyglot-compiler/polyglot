@@ -15,6 +15,16 @@ public class NullLiteral extends Literal {
    **/
   public NullLiteral() {}
 
+  public Node copy() {
+    NullLiteral nl = new NullLiteral();
+    nl.copyAnnotationsFrom(this);
+    return nl;
+  }
+
+  public Node deepCopy() {
+    return copy();
+  }
+
   public Node accept(NodeVisitor v) {
     return v.visitNullLiteral(this);
   }

@@ -11,6 +11,26 @@ package jltools.ast;
  * be subclasses of Node. All nodes are mutable.
  **/
 public abstract class Node extends jltools.util.AnnotatedObject {
+
+  /**
+   * Node copy()
+   *
+   * Returns a new node with the same, contents, and annotations as
+   *  this.  This is a shallow copy; if some object is stored under
+   *  this node, an identical object will be stored under the copied
+   *  node.
+   **/
+  public abstract Node copy();
+
+  /**
+   * Node deepCopy()
+   *
+   * Returns a new node with the same type, contents, and annotations
+   * as this.  Any changes made to the new node, or any subnode of
+   * that node, are guaranteed not to affect this.  In other words,
+   * this method performs a deep copy.
+   **/
+  public abstract Node deepCopy();
   
   /**
    * Node accept(NodeVisitor vis)

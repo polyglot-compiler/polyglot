@@ -6,6 +6,9 @@ package jltools.ast;
 
 import jltools.types.Type;
 
+// FIXME: This doesn't handle multidimensional or initialized arrays.
+
+
 /**
  * NewArrayExpression
  *
@@ -65,6 +68,7 @@ public class NewArrayExpression extends Expression {
     public void visitChildren(NodeVisitor v) {
 	expr = (Expression) expr.accept(v);
     }
+
 
     private Expression expr;
     private Type type;

@@ -85,7 +85,15 @@ public class VariableDeclarationStatement extends Statement {
     }
   }
 
-  
+  // FIXME No set, get operations;
+  // FIXME No iterators.
+
+  public Node copy() {
+    VariableDeclarationStatement vds = 
+      new VariableDeclarationStatement(type);
+    // FIXME
+  }
+
   
   private Type type; 
   // RI: every member is a VariableDeclarationPair

@@ -68,6 +68,18 @@ public class InstanceofExpression extends Expression {
     expr = (Expression) expr.accept(v);
   }
 
+  public Node copy() {
+    InstanceofExpression ie = new InstanceofExpression(expr, type);
+    ie.copyAnnotationsFrom(this);
+    return ie;
+  }
+
+  public Node deepCopy() {
+    InstanceofExpression ie = new InstanceofExpression(expr.deepCopy(), type);
+    ie.copyAnnotationsFrom(this);
+    return ie;
+  }
+
   private Expression expr;
   private Type type;
 }

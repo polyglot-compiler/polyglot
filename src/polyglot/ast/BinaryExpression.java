@@ -43,6 +43,8 @@ public class BinaryExpression extends Expression {
     public static final int RSHIFTASSIGN   = 27; // >>= operator
     public static final int RUSHIFTASSIGN  = 28; // >>>= operator
 
+    // Largest operator used.
+    public static final int MAX_OPERATOR   = RUSHIFTASSIGN; 
 
     /** 
      * Requires: A valid value for <operator> as listed in public
@@ -73,7 +75,7 @@ public class BinaryExpression extends Expression {
      * Effects: Changes the operator of <this> to <newOperator>.
      */
     public void setOperator(int newOperator) {
-	if (newOperator < 0 || newOperator > 28) {
+	if (newOperator < 0 || newOperator > MAX_OPERATOR) {
 	    throw new IllegalArgumentException("Value for operator to " +
 					       "BinaryExpression not valid.");
 	}
@@ -131,6 +133,20 @@ public class BinaryExpression extends Expression {
 	right = (Expression) right.accept(v);
     }
     
+
+    public Node copy() {
+      BinaryExpression be = new BinaryExpression(left, operator, right);
+      be.copyAnnotationsFrom(this);
+      return be;
+    }
+
+    public Node deepCopy() {
+      BinaryExpression be = new BinaryExpression((Expression) left.deepCopy(),
+						operator, 
+						(Expression) right.deepCopy());
+      be.copyAnnotationsFrom(this);
+      return be;
+    }
 
     private Expression left, right;
     private int operator;

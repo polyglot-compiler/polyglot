@@ -45,5 +45,17 @@ public class ReturnStatement extends Statement {
     expr = (Expression) expr.accept(v);
   }
 
+  public Node copy() {
+    ReturnStatement rs = new ReturnStatement(expr);
+    rs.copyAnnotationsFrom(this);
+    return rs;
+  }
+
+  public Node deepCopy() {
+    ReturnStatement rs = new ReturnStatement((Expression) expr.deepCopy());
+    rs.copyAnnotationsFrom(this);
+    return rs;
+  }
+
   private Expression expr;
 }

@@ -47,6 +47,18 @@ public class ExpressionStatement extends Statement {
     expression = (Expression) expression.accept(v);
   }
 
+  public Node copy() {
+    ExpressionStatement es = new ExpressionStatement(expression);
+    es.copyAnnotationsFrom(this);
+    return es;
+  }
+
+  public Node deepCopy() {
+    ExpressionStatement es = new ExpressionStatement(expression.deepCopy());
+    es.copyAnnotationsFrom(this);
+    return es;
+  }
+
   private Expression expression;
 }
 

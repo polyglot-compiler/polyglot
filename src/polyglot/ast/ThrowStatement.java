@@ -50,6 +50,18 @@ public class ThrowStatement extends Statement {
     expr = (Expression) expr.accept(v);
   }
 
+  public void copy() {
+    ThrowStatement ts = new ThrowStatement(expr);
+    ts.copyAnnotationsFrom(this);
+    return ts;
+  }
+
+  public void deepCopy() {
+    ThrowStatement ts = new ThrowStatement((Expression) expr.deepCopy());
+    ts.copyAnnotationsFrom(this);
+    return ts;
+  }
+
   private Expression expr;
 
 }
