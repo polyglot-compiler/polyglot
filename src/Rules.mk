@@ -7,7 +7,7 @@
 # set up some reasonable defaults (for building in CUCS)
 include $(SOURCE)/Defs.mk
 
-JC_FLAGS 		= -g
+JC_FLAGS 		= -g -d $(SOURCE)/classes $(JAVAC_PATHS)
 
 JAR_FILE		= jltools.jar
 JAR_FLAGS		= cf 
@@ -20,7 +20,7 @@ JAVADOC_FLAGS		= -mx40m -ms40m -classpath "$(JAVADOC_CLASSPATH)"
 BIN 			= $(SOURCE)
 
 %.class: %.java
-	"$(JC)" "$(JC_FLAGS)" -classpath "$(CLASSPATH)" $<
+	"$(JC)" $(JC_FLAGS) $<
 
 all clean clobber javadoc:
 

@@ -73,17 +73,18 @@ exists -f PrintProperty.java
 "${JAVAC}" PrintProperty.java
 exists -f PrintProperty.class
 
-PATH_SEP=`"${JAVA}" PrintProperty path.separator | escape`
+PATH_SEP=`"${JAVA}" -cp . PrintProperty path.separator | escape`
 echo path separator is ${PATH_SEP}
 
-FILE_SEP=`"${JAVA}" PrintProperty file.separator | escape`
+FILE_SEP=`"${JAVA}" -cp . PrintProperty file.separator | escape`
 echo file separator is ${FILE_SEP}
 
-ESC_JAVA_HOME=`"${JAVA}" PrintProperty java.home | escape`
+ESC_JAVA_HOME=`"${JAVA}" -cp . PrintProperty java.home | escape`
 if [ -f "${ESC_JAVA_HOME}${FILE_SEP}lib${FILE_SEP}rt.jar" ]; then
     ESC_JAVA_HOME="${ESC_JAVA_HOME}${FILE_SEP}.." # %%${FILE_SEP}jre}
 fi
 echo escaped Java home directory is "${ESC_JAVA_HOME}"
+
 
 ESC_TOOLS_JAR="${ESC_JAVA_HOME}${FILE_SEP}lib${FILE_SEP}tools.jar"
 echo escaped tools.jar is "${ESC_TOOLS_JAR}"
@@ -106,7 +107,8 @@ echo creating Defs.mk
     echo RT_JAR = "${RT_JAR}"
     echo
     echo CUP_RUNTIME = '$(ESC_SOURCE)'${FILE_SEP}'java_cup.jar'
-    echo CLASSPATH = '$(ESC_SOURCE)'${PATH_SEP}'$(CUP_RUNTIME)'
+    echo CLASSPATH = '$(ESC_SOURCE)'${FILE_SEP}classes${PATH_SEP}'$(CUP_RUNTIME)'
+    echo JAVAC_PATHS = -classpath "$(CLASSPATH)" -sourcepath "$(ESC_SOURCE)"
     echo
     echo JAVADOC_CLASSPATH = '$(ESC_SOURCE)'${FILE_SEP}'iDoclet.jar'"${PATH_SEP}${ESC_TOOLS_JAR}${PATH_SEP}"'$(CLASSPATH)'
 ) > Defs.mk

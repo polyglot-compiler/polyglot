@@ -9,8 +9,14 @@ SUBDIRS = jltools
 
 include Rules.mk
 
-all clean:
+all: classes
 	$(subdirs)
+clean:
+	rm -rf classes
+	$(subdirs)
+
+classes:
+	mkdir classes
 
 clobber:
 	-rm -rf $(JAVADOC_OUTPUT)
