@@ -52,7 +52,6 @@ SOURCES = \
 	TopLevelClassType.java \
 	Type.java \
 	TypeObject.java \
-	TypeExt.java \
 	Types.java \
 	UnknownQualifier.java \
 	UnknownType.java \
