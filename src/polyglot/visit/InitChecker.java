@@ -667,6 +667,18 @@ public class InitChecker extends DataFlow
      */
     public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
         DataFlowItem dfIn = (DataFlowItem)inItem;        
+        if (dfIn == null) {
+            // There is no input data flow item. This can happen if we are 
+            // checking an unreachable term, and so no Items have flowed 
+            // through the term. For example, in the code fragment:
+            //     a: do { break a; } while (++i < 10);
+            // the expression "++i < 10" is unreachable, but the as there is
+            // no unreachable statement, the Java Language Spec permits it.
+            
+            // Set inItem to a default Item
+            dfIn = (DataFlowItem)createInitialItem(graph);             
+        }
+        
         DataFlowItem dfOut = null;
         if (outItems != null && !outItems.isEmpty()) {
             // due to the flow equations, all DataFlowItems in the outItems map
