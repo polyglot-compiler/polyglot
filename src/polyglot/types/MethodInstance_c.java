@@ -145,11 +145,35 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     /** Returns true iff <this> is the same method as <m> */
-    public boolean isSameMethod(MethodInstance m) {
-        return this.name().equals(m.name()) && ts.hasSameArguments(this, m);
+    public final boolean isSameMethod(MethodInstance m) {
+        return ts.isSameMethod(this, m);
+    }
+
+    /** Returns true iff <this> is the same method as <m> */
+    public boolean isSameMethodImpl(MethodInstance m) {
+        return this.name().equals(m.name()) && hasArguments(m.argumentTypes());
+    }
+
+    public boolean isCanonical() {
+	return container.isCanonical()
+	    && returnType.isCanonical()
+	    && listIsCanonical(argTypes)
+	    && listIsCanonical(excTypes);
+    }
+
+    public final boolean methodCallValid(String name, List argTypes) {
+        return ts.methodCallValid(this, name, argTypes);
+    }
+
+    public boolean methodCallValidImpl(String name, List argTypes) {
+        return name().equals(name) && ts.callValid(this, argTypes);
     }
 
     public List overrides() {
+        return ts.overrides(this);
+    }
+
+    public List overridesImpl() {
         List l = new LinkedList();
 
         Type t = container().superType();
@@ -167,22 +191,11 @@ public class MethodInstance_c extends ProcedureInstance_c
         return l;
     }
 
-    public boolean isCanonical() {
-	return container.isCanonical()
-	    && returnType.isCanonical()
-	    && listIsCanonical(argTypes)
-	    && listIsCanonical(excTypes);
+    public final boolean canOverride(MethodInstance mj) {
+        return ts.canOverride(this, mj);
     }
 
-    public boolean methodCallValid(MethodInstance call) {
-        return name().equals(call.name()) && ts.callValid(this, call);
-    }
-
-    public boolean methodCallValid(String name, List argTypes) {
-        return name().equals(name) && ts.callValid(this, argTypes);
-    }
-
-    public boolean canOverride(MethodInstance mj) {
+    public boolean canOverrideImpl(MethodInstance mj) {
         MethodInstance mi = this;
 
         if (! ts.isSame(mi.returnType(), mj.returnType())) {

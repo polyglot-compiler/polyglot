@@ -231,24 +231,29 @@ public interface TypeSystem {
     ////
 
     /**
-     * Returns true iff <m1> throws fewer exceptions than <m2>
+     * Returns true iff <m1> throws fewer exceptions than <m2>.
      */
     boolean throwsSubset(ProcedureInstance m1, ProcedureInstance m2);
 
     /**
-     * Returns true iff <m1> has the same arguments as <m2>
+     * Returns true iff <m1> has the same arguments as <m2>.
      */
     boolean hasMethod(ReferenceType t, MethodInstance mi);
 
     /**
-     * Returns true iff <m1> has the same arguments as <m2>
-     */
-    boolean hasSameArguments(ProcedureInstance m1, ProcedureInstance m2);
-
-    /**
-     * Returns true iff <m1> is the same method as <m2>
+     * Returns true iff <m1> is the same method as <m2>.
      */
     boolean isSameMethod(MethodInstance m1, MethodInstance m2);
+
+    /**
+     * Returns true iff <m1> is more specific than <m2>.
+     */
+    boolean moreSpecific(ProcedureInstance m1, ProcedureInstance m2);
+
+    /**
+     * Returns true iff <m1> is more specific than <m2>.
+     */
+    boolean hasArguments(ProcedureInstance p, List argumentTypes);
 
     ////
     // Functions which yield particular types.
@@ -330,9 +335,7 @@ public interface TypeSystem {
     String translateLocalClass(Resolver c, LocalClassType t);
     String wrapperTypeString(PrimitiveType t);
 
-    boolean methodCallValid(MethodInstance prototype, MethodInstance call);
     boolean methodCallValid(MethodInstance prototype, String name, List argTypes);
-    boolean callValid(ProcedureInstance prototype, ProcedureInstance call);
     boolean callValid(ProcedureInstance prototype, List argTypes);
 
     List overrides(MethodInstance mi);

@@ -225,7 +225,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean descendsFrom(Type child, Type ancestor) {
         assert_(child);
         assert_(ancestor);
-        return child.descendsFrom(ancestor);
+        return child.descendsFromImpl(ancestor);
     }
 
     /**
@@ -237,7 +237,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean isCastValid(Type fromType, Type toType) {
         assert_(fromType);
         assert_(toType);
-        return fromType.isCastValid(toType);
+        return fromType.isCastValidImpl(toType);
     }
 
     /**
@@ -254,7 +254,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean isImplicitCastValid(Type fromType, Type toType) {
         assert_(fromType);
         assert_(toType);
-        return fromType.isImplicitCastValid(toType);
+        return fromType.isImplicitCastValidImpl(toType);
     }
 
     /**
@@ -263,7 +263,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean isSame(Type type1, Type type2) {
         assert_(type1);
         assert_(type2);
-	return type1.isSame(type2);
+	return type1.isSameImpl(type2);
     }
 
     /**
@@ -272,7 +272,7 @@ public class TypeSystem_c implements TypeSystem
      */
     public boolean numericConversionValid(Type t, long value) {
         assert_(t);
-        return t.numericConversionValid(value);
+        return t.numericConversionValidImpl(value);
     }
 
     ////
@@ -342,25 +342,7 @@ public class TypeSystem_c implements TypeSystem
     }
 
     public boolean isEnclosed(ClassType inner, ClassType outer) {
-        assert_(inner);
-        assert_(outer);
-
-        if (inner.isInner()) {
-	    ClassType c = inner.toInner().outer();
-
-	    if (c == null) {
-	      	throw new InternalCompilerError(inner.position(),
-		    "Inner class " + inner + " has null outer class.");
-	    }
-
-	    if (isSame(c, outer)) {
-		return true;
-	    }
-
-	    return isEnclosed(c, outer);
-	}
-
-	return false;
+        return inner.isEnclosedImpl(outer);
     }
 
     public void checkCycles(ReferenceType goal) throws SemanticException {
@@ -437,7 +419,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean isSubtype(Type t1, Type t2) {
         assert_(t1);
         assert_(t2);
-        return t1.isSubtype(t2);
+        return t1.isSubtypeImpl(t2);
     }
 
     ////
@@ -664,7 +646,10 @@ public class TypeSystem_c implements TypeSystem
 	    if (msc.compare(maximal, p) > 0) {
 	        return null;
 	    }
-	} return maximal; }
+	}
+
+        return maximal;
+    }
 
     /**
      * Class to handle the comparisons; dispatches to moreSpecific method.
@@ -780,34 +765,9 @@ public class TypeSystem_c implements TypeSystem
     /**
      * Returns whether method 1 is <i>more specific</i> than method 2,
      * where <i>more specific</i> is defined as JLS 15.11.2.2
-     * <p>
-     * Note: There is a fair amount of guesswork since the JLS does not
-     * include any
-     * info regarding java 1.2, so all inner class rules are found empirically
-     * using jikes and javac.
      */
-    /**
-     * Note: java 1.2 rule is described in JLS2 in section 15.12.2.2
-     */
-    protected boolean moreSpecific(ProcedureInstance p1, ProcedureInstance p2) {
-	// rule 1:
-	ReferenceType t1 = p1.container();
-	ReferenceType t2 = p2.container();
-
-	if (t1.isClass() && t2.isClass()) {
-	    if (! isSubtype(t1, t2) &&
-		! isEnclosed(t1.toClass(), t2.toClass())) {
-		return false;
-	    }
-	}
-	else {
-	    if (! isSubtype(t1, t2)) {
-		return false;
-	    }
-	}
-
-	// rule 2:
-	return callValid(p2, p1) ;
+    public boolean moreSpecific(ProcedureInstance p1, ProcedureInstance p2) {
+        return p1.moreSpecificImpl(p2);
     }
 
     /**
@@ -905,33 +865,29 @@ public class TypeSystem_c implements TypeSystem
     public boolean throwsSubset(ProcedureInstance p1, ProcedureInstance p2) {
         assert_(p1);
         assert_(p2);
-        return p1.throwsSubset(p2);
+        return p1.throwsSubsetImpl(p2);
     }
 
-    /**
-     * Returns true iff <p1> has the same arguments as <p2>
-     **/
-    public boolean hasSameArguments(ProcedureInstance p1,
-				    ProcedureInstance p2) {
-
-        assert_(p1);
-        assert_(p2);
-        return p1.hasSameArguments(p2);
+    /** Return true if t overrides mi */
+    public boolean hasArguments(ProcedureInstance pi, List argumentTypes) {
+        assert_(pi);
+        assert_(argumentTypes);
+        return pi.hasArgumentsImpl(argumentTypes);
     }
 
     /** Return true if t overrides mi */
     public boolean hasMethod(ReferenceType t, MethodInstance mi) {
         assert_(t);
         assert_(mi);
-        return t.hasMethod(mi);
+        return t.hasMethodImpl(mi);
     }
 
     public List overrides(MethodInstance mi) {
-        return mi.overrides();
+        return mi.overridesImpl();
     }
 
     public boolean canOverride(MethodInstance mi, MethodInstance mj) {
-        return mi.canOverride(mj);
+        return mi.canOverrideImpl(mj);
     }
 
     /**
@@ -940,41 +896,26 @@ public class TypeSystem_c implements TypeSystem
     public boolean isSameMethod(MethodInstance m1, MethodInstance m2) {
         assert_(m1);
         assert_(m2);
-        return m1.isSameMethod(m2);
-    }
-
-    public boolean methodCallValid(MethodInstance prototype,
-	                           MethodInstance call) {
-        assert_(prototype);
-        assert_(call);
-	return prototype.methodCallValid(call);
-    }
-
-    public boolean callValid(ProcedureInstance prototype,
-			        ProcedureInstance call)
-    {
-        assert_(prototype);
-        assert_(call);
-	return prototype.callValid(call);
+        return m1.isSameMethodImpl(m2);
     }
 
     public boolean methodCallValid(MethodInstance prototype,
 				   String name, List argTypes) {
         assert_(prototype);
         assert_(argTypes);
-	return prototype.methodCallValid(name, argTypes);
+	return prototype.methodCallValidImpl(name, argTypes);
     }
 
     public boolean callValid(ProcedureInstance prototype, List argTypes) {
         assert_(prototype);
         assert_(argTypes);
-        return prototype.callValid(argTypes);
+        return prototype.callValidImpl(argTypes);
     }
 
     ////
     // Functions which yield particular types.
     ////
-    public NullType Null()    { return NULL_; }
+    public NullType Null()         { return NULL_; }
     public PrimitiveType Void()    { return VOID_; }
     public PrimitiveType Boolean() { return BOOLEAN_; }
     public PrimitiveType Char()    { return CHAR_; }

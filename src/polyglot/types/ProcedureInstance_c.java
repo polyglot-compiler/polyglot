@@ -55,7 +55,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 	    // FIXME: Check excTypes too?
 	    return flags.equals(i.flags())
 	        && ts.isSame(container, i.container())
-	        && ts.hasSameArguments(this, i);
+	        && ts.hasArguments(this, i.argumentTypes());
 	}
 
 	return false;
@@ -87,12 +87,50 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 	return true;
     }
 
-    /** Returns true iff <this> has the same arguments as <p> */
-    public boolean hasSameArguments(ProcedureInstance p) {
-        return hasArguments(p.argumentTypes());
+    public final boolean moreSpecific(ProcedureInstance p) {
+        return ts.moreSpecific(this, p);
     }
 
-    public boolean hasArguments(List argTypes) {
+
+    /**
+     * Returns whether this is <i>more specific</i> than p,
+     * where <i>more specific</i> is defined as JLS 15.12.2.2
+     * <p>
+     * Note: There is a fair amount of guesswork since the JLS does not
+     * include any info regarding java 1.2, so all inner class rules are
+     * found empirically using jikes and javac.
+     *
+     * Note: java 1.2 rule is described in JLS2 in section 15.12.2.2
+     */
+    public boolean moreSpecificImpl(ProcedureInstance p) {
+        ProcedureInstance p1 = this;
+        ProcedureInstance p2 = p;
+
+        // rule 1:
+        ReferenceType t1 = p1.container();
+        ReferenceType t2 = p2.container();
+
+        if (t1.isClass() && t2.isClass()) {
+            if (! t1.isSubtype(t2) &&
+                ! t1.toClass().isEnclosed(t2.toClass())) {
+                return false;
+            }
+        }
+        else {
+            if (! t1.isSubtype(t2)) {
+                return false;
+            }
+        }
+
+        // rule 2:
+        return p2.callValid(p1.argumentTypes());
+    }
+
+    public final boolean hasArguments(List argTypes) {
+        return ts.hasArguments(this, argTypes);
+    }
+
+    public boolean hasArgumentsImpl(List argTypes) {
         List l1 = this.argumentTypes();
         List l2 = argTypes;
 
@@ -112,7 +150,12 @@ public abstract class ProcedureInstance_c extends TypeObject_c
     }
 
     /** Returns true iff <this> throws fewer exceptions than <p>. */
-    public boolean throwsSubset(ProcedureInstance p) {
+    public final boolean throwsSubset(ProcedureInstance p) {
+        return ts.throwsSubset(this, p);
+    }
+
+    /** Returns true iff <this> throws fewer exceptions than <p>. */
+    public boolean throwsSubsetImpl(ProcedureInstance p) {
         SubtypeSet s1 = new SubtypeSet(ts);
         SubtypeSet s2 = new SubtypeSet(ts);
 
@@ -129,11 +172,11 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         return true;
     }
 
-    public boolean callValid(ProcedureInstance call) {
-        return ts.callValid(this, call.argumentTypes());
+    public final boolean callValid(List argTypes) {
+        return ts.callValid(this, argTypes);
     }
 
-    public boolean callValid(List argTypes) {
+    public boolean callValidImpl(List argTypes) {
         List l1 = this.argumentTypes();
         List l2 = argTypes;
 

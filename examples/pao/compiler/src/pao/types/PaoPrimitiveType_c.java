@@ -19,18 +19,18 @@ public class PaoPrimitiveType_c extends PrimitiveType_c
     /**
      * Return true if this type strictly descends from <code>ancestor</code>.
      */
-    public boolean descendsFrom(Type ancestor) {
+    public boolean descendsFromImpl(Type ancestor) {
         return ts.isSame(ancestor, ts.Object());
     }
 
     /** Return true if this type can be assigned to <code>toType</code>. */
-    public boolean isImplicitCastValid(Type toType) {
+    public boolean isImplicitCastValidImpl(Type toType) {
         return ts.isSame(toType, ts.Object()) ||
-               super.isImplicitCastValid(toType);
+               super.isImplicitCastValidImpl(toType);
     }
 
     /** Returns true iff a cast from this to <code>toType</code> is valid. */
-    public boolean isCastValid(Type toType) {
-        return ts.isSame(toType, ts.Object()) || super.isCastValid(toType);
+    public boolean isCastValidImpl(Type toType) {
+        return ts.isSame(toType, ts.Object()) || super.isCastValidImpl(toType);
     }
 }

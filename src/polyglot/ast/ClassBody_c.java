@@ -162,7 +162,7 @@ public class ClassBody_c extends Node_c implements ClassBody
             for (int j = i+1; j < l.size(); j++) {
                 ConstructorInstance cj = (ConstructorInstance) l.get(j);
 
-                if (ts.hasSameArguments(ci, cj)) {
+                if (ci.hasArguments(cj.argumentTypes())) {
                     throw new SemanticException("Duplicate constructor \"" + cj + "\".", cj.position());
                 }
             }
@@ -190,7 +190,7 @@ public class ClassBody_c extends Node_c implements ClassBody
 
     protected boolean isSameMethod(TypeSystem ts, MethodInstance mi,
                                    MethodInstance mj) {
-        return ts.isSameMethod(mi, mj);
+        return mi.isSameMethod(mj);
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {

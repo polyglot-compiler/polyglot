@@ -49,8 +49,13 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
      */
     public abstract List interfaces();
 
-    /** Return true if t overrides mi */
-    public boolean hasMethod(MethodInstance mi) {
+    /** Return true if t has a method mi */
+    public final boolean hasMethod(MethodInstance mi) {
+        return ts.hasMethod(this, mi);
+    }
+
+    /** Return true if t has a method mi */
+    public boolean hasMethodImpl(MethodInstance mi) {
         for (Iterator j = methods().iterator(); j.hasNext(); ) {
             MethodInstance mj = (MethodInstance) j.next();
 
@@ -62,7 +67,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
         return false;
     }
 
-    public boolean descendsFrom(Type ancestor) {
+    public boolean descendsFromImpl(Type ancestor) {
         if (! ancestor.isCanonical()) {
             return false;
         }
@@ -95,7 +100,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
         return false;
     }
 
-    public boolean isImplicitCastValid(Type toType) {
+    public boolean isImplicitCastValidImpl(Type toType) {
         return ts.isSubtype(this, toType);
     }
 
@@ -131,7 +136,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
      * Returns true iff a cast from this to toType is valid; in other
      * words, some non-null members of this are also members of toType.
      **/
-    public boolean isCastValid(Type toType) {
+    public boolean isCastValidImpl(Type toType) {
         if (! toType.isReference()) return false;
         return ts.isSubtype(this, toType) || ts.isSubtype(toType, this);
     }

@@ -35,4 +35,7 @@ public interface ClassType extends ReferenceType
      * flags.  It will return Flags.NONE if invoked on an anonymous class.
      */
     Flags flags();
+
+    boolean isEnclosed(ClassType outer);
+    boolean isEnclosedImpl(ClassType outer);
 }

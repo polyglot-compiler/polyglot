@@ -20,8 +20,8 @@ public class PaoParsedTopLevelClassType_c extends ParsedTopLevelClassType_c
     }
 
     /** Returns true iff a cast from this to <code>toType</code> is valid. */
-    public boolean isCastValid(Type t) {
+    public boolean isCastValidImpl(Type t) {
         return t.isPrimitive() && ts.isSame(this, ts.Object()) ||
-               super.isCastValid(t);
+               super.isCastValidImpl(t);
     }
 }

@@ -25,6 +25,13 @@ public interface Type extends Qualifier
     boolean isImplicitCastValid(Type t);
     boolean numericConversionValid(long value);
 
+    boolean isSameImpl(Type t);
+    boolean isSubtypeImpl(Type t);
+    boolean descendsFromImpl(Type t);
+    boolean isCastValidImpl(Type t);
+    boolean isImplicitCastValidImpl(Type t);
+    boolean numericConversionValidImpl(long value);
+
     boolean isPrimitive();
     boolean isVoid();
     boolean isBoolean();

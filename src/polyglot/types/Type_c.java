@@ -95,27 +95,51 @@ public abstract class Type_c extends TypeObject_c implements Type
 	return ts.arrayOf(this);
     }  
     
-    public boolean isSubtype(Type t) {
+    public final boolean isSubtype(Type t) {
+	return ts.isSubtype(this, t);
+    }
+
+    public boolean isSubtypeImpl(Type t) {
 	return ts.isSame(this, t) || ts.descendsFrom(this, t);
     }
     
-    public boolean descendsFrom(Type t) {
+    public final boolean descendsFrom(Type t) {
+        return ts.descendsFrom(this, t);
+    }
+
+    public boolean descendsFromImpl(Type t) {
         return false;
     }
 
-    public boolean isSame(Type t) {
+    public final boolean isSame(Type t) {
+        return ts.isSame(this, t);
+    }
+    
+    public boolean isSameImpl(Type t) {
         return equals(t);
     }
     
-    public boolean isCastValid(Type toType) {
+    public final boolean isCastValid(Type toType) {
+	return ts.isCastValid(this, toType);
+    }
+    
+    public boolean isCastValidImpl(Type toType) {
 	return false;
     }
     
-    public boolean isImplicitCastValid(Type toType) {
+    public final boolean isImplicitCastValid(Type toType) {
+        return ts.isImplicitCastValid(this, toType);
+    }
+
+    public boolean isImplicitCastValidImpl(Type toType) {
         return false;
     }
 
-    public boolean numericConversionValid(long value) {
+    public final boolean numericConversionValid(long value) {
+        return ts.numericConversionValid(this, value);
+    }
+    
+    public boolean numericConversionValidImpl(long value) {
         return false;
     }
     

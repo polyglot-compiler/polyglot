@@ -23,9 +23,13 @@ public interface ProcedureInstance extends CodeInstance
      */
     String designator();
 
-    boolean hasSameArguments(ProcedureInstance pi);
+    boolean moreSpecific(ProcedureInstance pi);
     boolean hasArguments(List arguments);
     boolean throwsSubset(ProcedureInstance pi);
-    boolean callValid(ProcedureInstance call);
     boolean callValid(List actualTypes);
+
+    boolean moreSpecificImpl(ProcedureInstance pi);
+    boolean hasArgumentsImpl(List arguments);
+    boolean throwsSubsetImpl(ProcedureInstance pi);
+    boolean callValidImpl(List actualTypes);
 }

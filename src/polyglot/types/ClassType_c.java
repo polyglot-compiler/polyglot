@@ -112,7 +112,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         return flags;
     }
 
-    public boolean descendsFrom(Type ancestor) {
+    public boolean descendsFromImpl(Type ancestor) {
         if (! ancestor.isCanonical()) {
             return false;
         }
@@ -180,7 +180,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         return false;
     }
 
-    public boolean isImplicitCastValid(Type toType) {
+    public boolean isImplicitCastValidImpl(Type toType) {
         if (! toType.isClass()) return false;
         return ts.isSubtype(this, toType);
     }
@@ -191,7 +191,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
      * Returns true iff a cast from this to toType is valid; in other
      * words, some non-null members of this are also members of toType.
      **/
-    public boolean isCastValid(Type toType) {
+    public boolean isCastValidImpl(Type toType) {
 	if (! toType.isCanonical()) return false;
 	if (! toType.isReference()) return false;
 
@@ -242,5 +242,13 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 	    // To and From are both interfaces.
 	    return true;
 	}
+    }
+
+    public final boolean isEnclosed(ClassType outer) {
+        return ts.isEnclosed(this, outer);
+    }
+
+    public boolean isEnclosedImpl(ClassType outer) {
+        return false;
     }
 }

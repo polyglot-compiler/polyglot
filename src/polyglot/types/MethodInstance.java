@@ -22,6 +22,10 @@ public interface MethodInstance extends ProcedureInstance
     List overrides();
     boolean canOverride(MethodInstance mi);
     boolean isSameMethod(MethodInstance mi);
-    boolean methodCallValid(MethodInstance call);
     boolean methodCallValid(String name, List actualTypes);
+
+    List overridesImpl();
+    boolean canOverrideImpl(MethodInstance mi);
+    boolean isSameMethodImpl(MethodInstance mi);
+    boolean methodCallValidImpl(String name, List actualTypes);
 }
