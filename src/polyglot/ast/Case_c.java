@@ -86,10 +86,7 @@ public class Case_c extends Stmt_c implements Case
 		position());
 	}
 
-	if (expr instanceof NumLit) {
-            return value(((NumLit) expr).longValue());
-	}
-	else if (expr instanceof Field) {
+	if (expr instanceof Field) {
 	    FieldInstance fi = ((Field) expr).fieldInstance();
 
 	    if (fi == null) {
@@ -131,6 +128,14 @@ public class Case_c extends Stmt_c implements Case
 	    return value(((Number) li.constantValue()).longValue());
 	}
 	else {
+            Object o = expr.constantValue();
+
+            if (o instanceof Number && ! (o instanceof Long) &&
+                ! (o instanceof Float) && ! (o instanceof Double)) {
+
+                return ((Number) o).longValue();
+            }
+
 	    throw new SemanticException("Case label must be a constant.",
 					position());
 	}

@@ -327,7 +327,7 @@ public class TypeSystem_c implements TypeSystem
      * Returns true if <code>value</code> can be implicitly cast to Primitive
      * type <code>t</code>.
      */
-    public boolean numericConversionValid(Type t, long value) {
+    public boolean numericConversionValid(Type t, Object value) {
         assert_(t);
         return t.numericConversionValidImpl(value);
     }

@@ -160,7 +160,7 @@ public interface TypeSystem {
      * Returns true if <code>value</code> can be implicitly cast to
      * type <code>t</code>.
      */
-    boolean numericConversionValid(Type t, long value);
+    boolean numericConversionValid(Type t, Object value);
 
     /**
      * Returns the least common ancestor of type1 and type2

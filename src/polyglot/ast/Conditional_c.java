@@ -136,7 +136,7 @@ public class Conditional_c extends Expr_c implements Conditional
             
             if (lit != null && lit.kind() == IntLit.INT) {
                 if ((t.isByte() || t.isShort() || t.isChar()) &&
-                    ts.numericConversionValid(t, lit.value())) {
+                    ts.numericConversionValid(t, lit.constantValue())) {
                     return type(t);
                 }
 	    }

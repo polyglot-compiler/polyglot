@@ -178,16 +178,10 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
                 ((ArrayInit) init).typeCheckElements(type.type());
             }
             else {
-                boolean intConversion = false;
-
-                if (init instanceof NumLit) {
-                    long value = ((NumLit) init).longValue();
-                    intConversion = ts.numericConversionValid(type.type(),
-                                                              value);
-                }
-
                 if (! ts.isImplicitCastValid(init.type(), type.type()) &&
-                    ! ts.equals(init.type(), type.type()) && ! intConversion) {
+                    ! ts.equals(init.type(), type.type()) &&
+                    ! ts.numericConversionValid(type.type(),
+                                                init.constantValue())) {
                     throw new SemanticException("The type of the variable " +
                                                 "initializer \"" + init.type() +
                                                 "\" does not match that of " +

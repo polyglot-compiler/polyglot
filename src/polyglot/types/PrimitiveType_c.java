@@ -129,17 +129,31 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
         return false;
     }
 
-    public boolean numericConversionValidImpl(long value) {
-        if (isByte())
-            return Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE;
-        if (isShort())
-            return Short.MIN_VALUE <= value && value <= Short.MAX_VALUE;
-        if (isChar())
-            return Character.MIN_VALUE <= value && value <= Character.MAX_VALUE;
-        if (isInt())
-            return Integer.MIN_VALUE <= value && value <= Integer.MAX_VALUE;
+    /**
+     * Returns true if literal value <code>value</code> can be converted to
+     * this primitive type.
+     */
+    public boolean numericConversionValidImpl(Object value) {
+        if (value == null)
+            return false;
+        if (! (value instanceof Number))
+            return false;
+        if (value instanceof Float || value instanceof Double)
+            return false;
+
+        long v = ((Number) value).longValue();
+
         if (isLong())
             return true;
+        if (isInt())
+            return Integer.MIN_VALUE <= v && v <= Integer.MAX_VALUE;
+        if (isChar())
+            return Character.MIN_VALUE <= v && v <= Character.MAX_VALUE;
+        if (isShort())
+            return Short.MIN_VALUE <= v && v <= Short.MAX_VALUE;
+        if (isByte())
+            return Byte.MIN_VALUE <= v && v <= Byte.MAX_VALUE;
+
         return false;
     }
 }

@@ -74,7 +74,7 @@ public interface Type extends Qualifier
     /**
      * Return true a literal <code>value</code> can be converted to this type.
      */
-    boolean numericConversionValid(long value);
+    boolean numericConversionValid(Object value);
 
     /**
      * Return true if this type is a subtype of <code>ancestor</code>.
@@ -100,7 +100,7 @@ public interface Type extends Qualifier
     /**
      * Return true a literal <code>value</code> can be converted to this type.
      */
-    boolean numericConversionValidImpl(long value);
+    boolean numericConversionValidImpl(Object value);
 
     /**
      * Return true if a primitive type.

@@ -127,11 +127,11 @@ public abstract class Type_c extends TypeObject_c implements Type
         return false;
     }
 
-    public final boolean numericConversionValid(long value) {
+    public final boolean numericConversionValid(Object value) {
         return ts.numericConversionValid(this, value);
     }
     
-    public boolean numericConversionValidImpl(long value) {
+    public boolean numericConversionValidImpl(Object value) {
         return false;
     }
     

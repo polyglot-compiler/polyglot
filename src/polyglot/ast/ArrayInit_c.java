@@ -120,16 +120,9 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
                 continue;
             }
 
-            boolean intConversion = false;
-
-            if (e instanceof NumLit) {
-                long value = ((NumLit) e).longValue();
-                intConversion = ts.numericConversionValid(t, value);
-            }
-
             if (! ts.isImplicitCastValid(s, t) &&
                 ! ts.equals(s, t) &&
-                ! intConversion) {
+                ! ts.numericConversionValid(t, e.constantValue())) {
                 throw new SemanticException("Cannot assign " + s +
                                             " to " + t + ".", e.position());
             }

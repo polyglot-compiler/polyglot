@@ -74,31 +74,28 @@ public class Return_c extends Stmt_c implements Return
 	if (ci instanceof MethodInstance) {
 	    MethodInstance mi = (MethodInstance) ci;
 
-	    if (expr == null) {
-	        if (! mi.returnType().isVoid()) {
-		    throw new SemanticException("Must return a value from " +
-			mi + ".", position());
-		}
-
-		return this;
-	    }
-
 	    if (mi.returnType().isVoid()) {
-		throw new SemanticException("Cannot return a value from " +
-		    mi + ".", position());
+                if (expr != null) {
+                    throw new SemanticException("Cannot return a value from " +
+                        mi + ".", position());
+                }
+                else {
+                    return this;
+                }
 	    }
+            else if (expr == null) {
+                throw new SemanticException("Must return a value from " +
+                    mi + ".", position());
+            }
 
 	    if (ts.isImplicitCastValid(expr.type(), mi.returnType())) {
 	        return this;
 	    }
 
-	    if (expr instanceof NumLit) {
-	        long value = ((NumLit) expr).longValue();
-
-		if (! ts.numericConversionValid(mi.returnType(), value)) {
-		    return this;
-		}
-	    }
+            if (ts.numericConversionValid(mi.returnType(),
+                                          expr.constantValue())) {
+                return this;
+            }
 
 	    throw new SemanticException("Cannot return expression of type " +
 		expr.type() + " from " + mi + ".", expr.position());

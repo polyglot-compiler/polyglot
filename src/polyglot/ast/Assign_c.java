@@ -90,17 +90,10 @@ public abstract class Assign_c extends Expr_c implements Assign
 
     TypeSystem ts = tc.typeSystem();
 
-    boolean intConversion = false;
-
-    if (right instanceof NumLit) {
-      long value = ((NumLit) right).longValue();
-      intConversion = ts.numericConversionValid(t, value);
-    }
-
     if (op == ASSIGN) {
       if (! ts.isImplicitCastValid(s, t) &&
           ! ts.equals(s, t) &&
-          ! intConversion) {
+          ! ts.numericConversionValid(t, right.constantValue())) {
 
         throw new SemanticException("Cannot assign " + s + " to " + t + ".",
                                     position());
