@@ -1,5 +1,3 @@
-
-
 package polyglot.util;
 
 import java.util.*;
@@ -12,7 +10,7 @@ import polyglot.types.*;
  * { <code>S</code> } union { <code>A</code>,<code>B</code> } = 
  * { <code>S</code> }.  Similarily, we remove elements from the set such 
  * that if <code>s</code> is an element of a set <code>S</code>, then a
- * call to remove <code>r</code> removes all <code>s</code> iff r is a 
+ * call to remove <code>r</code> removes all <code>s</code> s.t. r is a 
  * a supertype of s.
  */
 public class SubtypeSet implements java.util.Set
@@ -26,6 +24,14 @@ public class SubtypeSet implements java.util.Set
     public SubtypeSet(TypeSystem ts) {
 	v = new Vector();
         this.ts = ts;
+    }
+
+    /**
+     * Creates a copy of the given SubtypeSet
+     */
+    public SubtypeSet(SubtypeSet s) {
+      v = new Vector(s.v);
+      ts = s.ts;
     }
 
     /**
