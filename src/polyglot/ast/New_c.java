@@ -21,7 +21,7 @@ public class New_c extends Expr_c implements New
     protected List arguments;
     protected ClassBody body;
     protected ConstructorInstance ci;
-    protected ParsedAnonClassType anonType;
+    protected ParsedClassType anonType;
 
     public New_c(Del ext, Position pos, Expr qualifier, TypeNode tn, List arguments, ClassBody body) {
 	super(ext, pos);
@@ -55,11 +55,11 @@ public class New_c extends Expr_c implements New
 	return n;
     }
 
-    public ParsedAnonClassType anonType() {
+    public ParsedClassType anonType() {
 	return this.anonType;
     }
 
-    public New anonType(ParsedAnonClassType anonType) {
+    public New anonType(ParsedClassType anonType) {
 	New_c n = (New_c) copy();
 	n.anonType = anonType;
 	return n;
@@ -137,7 +137,7 @@ public class New_c extends Expr_c implements New
         New_c n = this;
 
         if (body != null) {
-            ParsedAnonClassType type = (ParsedAnonClassType) tb.currentClass();
+            ParsedClassType type = (ParsedClassType) tb.currentClass();
             n = (New_c) anonType(type);
         }
 
@@ -196,12 +196,12 @@ public class New_c extends Expr_c implements New
             // not just ct.outer(); it may be a subclass of ct.outer().
             Type outer = null;
 
-            String name = ct.toMember().name();
+            String name = ct.name();
             ClassType t = c.currentClass();
 
             // We're in one scope too many.
             if (t == anonType) {
-                t = t.toAnonymous().outer();
+                t = t.outer();
             }
 
             while (t != null) {
@@ -218,7 +218,7 @@ public class New_c extends Expr_c implements New
                 catch (SemanticException e) {
                 }
 
-                t = t.isInner() ? t.toInner().outer() : null;
+                t = t.outer();
             }
 
             if (outer == null) {
@@ -304,7 +304,7 @@ FIXME: check super types as well.
             ClassType ct = tn.type().toClass();
 
             if (ct.isMember()) {
-                for (ClassType t = ct; t.isMember(); t = t.toMember().outer()) {
+                for (ClassType t = ct; t.isMember(); t = t.outer()) {
                     if (! t.flags().isStatic()) {
                         throw new SemanticException(
                             "Cannot allocate non-static member class \"" +
@@ -413,7 +413,7 @@ FIXME: check super types as well.
         NodeFactory nf = tc.nodeFactory();
         Context c = tc.context();
 
-        MemberClassType ct = ts.findMemberClass(outer, name, c);
+        ClassType ct = ts.findMemberClass(outer, name, c);
         return nf.CanonicalTypeNode(tn.position(), ct);
     }
 
@@ -465,7 +465,7 @@ FIXME: check super types as well.
             ReferenceType t = ci.container();
                      
             if (t.isClass() && t.toClass().isMember()) {
-                t = t.toClass().toMember().container();
+                t = t.toClass().container();
                 return t;
             }
 
@@ -567,7 +567,7 @@ FIXME: check super types as well.
                                                 "class.", position());
             }
 
-            tr.setOuterClass(ct.toMember().outer());
+            tr.setOuterClass(ct.outer());
             print(tn, w, tr);
             tr.setOuterClass(null);
         }

@@ -497,12 +497,12 @@ public class TypeSystem_c implements TypeSystem
                                     container + "\".");
     }
 
-    public MemberClassType findMemberClass(ClassType container, String name,
-	                                   Context c) throws SemanticException {
+    public ClassType findMemberClass(ClassType container, String name,
+                                     Context c) throws SemanticException {
 
         assert_(container);
 
-        MemberClassType t = findMemberClass(container, name);
+        ClassType t = findMemberClass(container, name);
 
         if (! isAccessible(t, c)) {
             throw new SemanticException("Cannot access member \"" + t + "\".");
@@ -511,37 +511,47 @@ public class TypeSystem_c implements TypeSystem
         return t;
     }
 
-    public MemberClassType findMemberClass(ClassType container, String name)
-                                           throws SemanticException {
+    public ClassType findMemberClass(ClassType container, String name)
+        throws SemanticException {
 
         assert_(container);
 
-        Stack s = new Stack();
-        s.push(container);
+        ClassType mt = container.memberClassNamed(name);
 
-        while (! s.isEmpty()) {
-            Type t = (Type) s.pop();
-
-	    if (! t.isClass()) {
-	        throw new SemanticException("Cannot access a field in " +
-		    " non-class type " + t + ".");
-	    }
-
-            ClassType ct = t.toClass();
-
-            MemberClassType mt = ct.memberClassNamed(name);
-
-            if (mt != null) {
-                return mt;
+        if (mt != null) {
+            if (! mt.isMember()) {
+                throw new InternalCompilerError("Class " + mt +
+                                                " is not a member class, " +
+                                                "but is in " + container +
+                                                "\'s list of members.");
             }
 
-            for (Iterator i = ct.interfaces().iterator(); i.hasNext(); ) {
-                Type it = (Type) i.next();
-                s.push(it);
+            if (mt.outer() != container) {
+                throw new InternalCompilerError("Class " + mt +
+                                                " has outer class " +
+                                                mt.outer() +
+                                                "but is a member of " +
+                                                container);
             }
 
-            if (ct.superType() != null) {
-                s.push(ct.superType());
+            return mt;
+        }
+
+        if (container.superType() != null) {
+            try {
+                return findMemberClass(container.superType().toClass(), name);
+            }
+            catch (SemanticException e) {
+            }
+        }
+
+        for (Iterator i = container.interfaces().iterator(); i.hasNext(); ) {
+            Type it = (Type) i.next();
+
+            try {
+                return findMemberClass(it.toClass(), name);
+            }
+            catch (SemanticException e) {
             }
 	}
 
@@ -1009,16 +1019,17 @@ public class TypeSystem_c implements TypeSystem
     public Object placeHolder(TypeObject o, Set roots) {
         assert_(o);
 
-	// This should never happen: anonymous and local types cannot
-	// appear in signatures.
+        if (o instanceof ClassType) {
+            ClassType ct = (ClassType) o;
 
-	if (o instanceof AnonClassType || o instanceof LocalClassType) {
-	    throw new InternalCompilerError("Cannot serialize " + o + ".");
-	}
+            // This should never happen: anonymous and local types cannot
+            // appear in signatures.
+            if (ct.isLocal() || ct.isAnonymous()) {
+                throw new InternalCompilerError("Cannot serialize " + o + ".");
+            }
 
-	if (o instanceof TopLevelClassType || o instanceof MemberClassType) {
-	    return new PlaceHolder_c((Type) o);
-	}
+            return new PlaceHolder_c(ct);
+        }
 
 	return o;
     }
@@ -1142,15 +1153,7 @@ public class TypeSystem_c implements TypeSystem
         return t.translate(c);
     }
 
-    public String translateTopLevelClass(Resolver c, TopLevelClassType t) {
-        return t.translate(c);
-    }
-
-    public String translateMemberClass(Resolver c, MemberClassType t) {
-        return t.translate(c);
-    }
-
-    public String translateLocalClass(Resolver c, LocalClassType t) {
+    public String translateClass(Resolver c, ClassType t) {
         return t.translate(c);
     }
 
@@ -1185,36 +1188,12 @@ public class TypeSystem_c implements TypeSystem
         return defaultClassInit;
     }
 
-    public ParsedTopLevelClassType topLevelClassType() {
-	return topLevelClassType(defaultClassInitializer());
+    public ParsedClassType createClassType() {
+	return createClassType(defaultClassInitializer());
     }
 
-    public ParsedMemberClassType memberClassType() {
-	return memberClassType(defaultClassInitializer());
-    }
-
-    public ParsedLocalClassType localClassType() {
-	return localClassType(defaultClassInitializer());
-    }
-
-    public ParsedAnonClassType anonClassType() {
-	return anonClassType(defaultClassInitializer());
-    }
-
-    public ParsedTopLevelClassType topLevelClassType(LazyClassInitializer init) {
-	return new ParsedTopLevelClassType_c(this, init);
-    }
-
-    public ParsedMemberClassType memberClassType(LazyClassInitializer init) {
-	return new ParsedMemberClassType_c(this, init);
-    }
-
-    public ParsedLocalClassType localClassType(LazyClassInitializer init) {
-	return new ParsedLocalClassType_c(this, init);
-    }
-
-    public ParsedAnonClassType anonClassType(LazyClassInitializer init) {
-	return new ParsedAnonClassType_c(this, init);
+    public ParsedClassType createClassType(LazyClassInitializer init) {
+	return new ParsedClassType_c(this, init);
     }
 
     public List defaultPackageImports() {

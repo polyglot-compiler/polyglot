@@ -118,7 +118,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         // Member classes of interfaces are implicitly static.
         ParsedClassType ct = tb.currentClass();
 
-        if (ct.isMember() && ct.toMember().outer().flags().isInterface()) {
+        if (ct.isMember() && ct.outer().flags().isInterface()) {
             ct.flags(ct.flags().Static());
         }
 
@@ -253,7 +253,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         // The class cannot have the same simple name as any enclosing class.
 
         if (this.type.isMember()) {
-            ClassType container = this.type.toMember().outer();
+            ClassType container = this.type.outer();
 
             while (container instanceof NamedType) {
                 String name = ((NamedType) container).name();
@@ -266,7 +266,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
                 }
 
                 if (container.isMember()) {
-                    container = container.toMember().outer();
+                    container = container.outer();
                 }
                 else {
                     break;
@@ -279,7 +279,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         // really inner classes since they may not refer to their outer
         // instance).
         if (this.type.isMember() && this.type.flags().isStatic()) {
-            ClassType container = this.type.toMember().outer();
+            ClassType container = this.type.outer();
 
             if (container.isMember() && ! container.flags().isStatic() ||
                 container.isLocal() || container.isAnonymous()) {

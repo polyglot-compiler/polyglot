@@ -66,7 +66,7 @@ public class TypeBuilder extends HaltingVisitor
             s.push(ct);
 
             if (ct.isInner()) {
-                ct = (ParsedClassType) ct.toInner().outer();
+                ct = (ParsedClassType) ct.outer();
             }
             else {
                 ct = null;
@@ -158,7 +158,7 @@ public class TypeBuilder extends HaltingVisitor
 
 	// Make sure the import table finds this class.
         if (importTable() != null && type.isTopLevel()) {
-	    tb.importTable().addClassImport(type.toTopLevel().fullName());
+	    tb.importTable().addClassImport(type.fullName());
 	}
         
         return tb;
@@ -167,8 +167,10 @@ public class TypeBuilder extends HaltingVisitor
     private ParsedClassType newClass(Position pos, Flags flags, String name) {
 	TypeSystem ts = typeSystem();
 
+        ParsedClassType ct = ts.createClassType();
+
 	if (local) {
-	    ParsedLocalClassType ct = ts.localClassType();
+            ct.kind(ClassType.LOCAL);
 	    ct.outer(currentClass());
 	    ct.flags(flags);
 	    ct.name(name);
@@ -181,7 +183,7 @@ public class TypeBuilder extends HaltingVisitor
 	    return ct;
 	}
 	else if (currentClass() != null) {
-	    ParsedMemberClassType ct = ts.memberClassType();
+            ct.kind(ClassType.MEMBER);
 	    ct.outer(currentClass());
 	    ct.flags(flags);
 	    ct.name(name);
@@ -196,7 +198,7 @@ public class TypeBuilder extends HaltingVisitor
 	    return ct;
 	}
 	else {
-	    ParsedTopLevelClassType ct = ts.topLevelClassType();
+            ct.kind(ClassType.TOP_LEVEL);
 	    ct.flags(flags);
 	    ct.name(name);
 	    ct.position(pos);
@@ -211,9 +213,7 @@ public class TypeBuilder extends HaltingVisitor
 	}
     }
 
-    public TypeBuilder pushAnonClass(Position pos)
-        throws SemanticException {
-
+    public TypeBuilder pushAnonClass(Position pos) throws SemanticException {
         if (! local) {
             throw new InternalCompilerError(
                 "Cannot push anonymous class outside method scope.");
@@ -221,7 +221,8 @@ public class TypeBuilder extends HaltingVisitor
 
 	TypeSystem ts = typeSystem();
 
-        ParsedAnonClassType ct = ts.anonClassType();
+        ParsedClassType ct = ts.createClassType();
+        ct.kind(ClassType.ANONYMOUS);
         ct.outer(currentClass());
         ct.position(pos);
 

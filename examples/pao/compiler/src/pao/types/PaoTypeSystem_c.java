@@ -10,8 +10,8 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
         return new PaoPrimitiveType_c(this, kind);
     }
 
-    public ParsedTopLevelClassType topLevelClassType(LazyClassInitializer init) {
-        return new PaoParsedTopLevelClassType_c(this, init);
+    public ParsedClassType createClassType(LazyClassInitializer init) {
+        return new PaoParsedClassType_c(this, init);
     }
 
     private static final String WRAPPER_PACKAGE = "polyglot.ext.pao.runtime";

@@ -7,7 +7,7 @@ include $(SOURCE)/Rules.mk
 SOURCES = \
 	PaoTypeSystem_c.java \
 	PaoTypeSystem.java \
-	PaoParsedTopLevelClassType_c.java \
+	PaoParsedClassType_c.java \
 	PaoPrimitiveType_c.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))

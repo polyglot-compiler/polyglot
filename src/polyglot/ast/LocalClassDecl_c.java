@@ -52,7 +52,10 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
     public void addDecls(Context c) {
         // We should now be back in the scope of the enclosing block.
         // Add the type.
-        c.addType(decl.type().toClass().toLocal());
+        if (! decl.type().toClass().isLocal())
+            throw new InternalCompilerError("Non-local " + decl.type() +
+                                            " found in method body.");
+        c.addType(decl.type().toClass());
     }
 
     public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {

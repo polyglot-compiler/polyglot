@@ -156,8 +156,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
             for (Type t = ct; t != null; t = t.toReference().superType()) {
                 try {
                     if (t.isClass() && t.toClass().isMember()) {
-                        MemberClassType mt = t.toClass().toMember();
-                        Type s = ts.findMemberClass(qct, mt.name());
+                        Type s = ts.findMemberClass(qct, t.toClass().name());
 
                         if (s == t) {
                             found = true;

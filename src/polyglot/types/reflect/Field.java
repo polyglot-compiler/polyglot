@@ -30,42 +30,44 @@ class Field {
      * yet be set.
      */
     boolean isString(Type t) {
-      return t.isClass() && t.toClass().isTopLevel() && t.toClass().toTopLevel().fullName().equals("java.lang.String");
+      return t.isClass()
+          && t.toClass().isTopLevel()
+          && t.toClass().fullName().equals("java.lang.String");
     }
 
-  FieldInstance fieldInstance(TypeSystem ts, ClassType ct) {
-    String name = (String) clazz.constants[this.name].value();
-    String type = (String) clazz.constants[this.type].value();
+    FieldInstance fieldInstance(TypeSystem ts, ClassType ct) {
+      String name = (String) clazz.constants[this.name].value();
+      String type = (String) clazz.constants[this.type].value();
 
-    FieldInstance fi = ts.fieldInstance(ct.position(), ct,
-                                        ts.flagsForBits(modifiers),
-                                        clazz.typeForString(ts, type), name);
+      FieldInstance fi = ts.fieldInstance(ct.position(), ct,
+                                          ts.flagsForBits(modifiers),
+                                          clazz.typeForString(ts, type), name);
 
-    Constant c = constantValue();
+      Constant c = constantValue();
 
-    if (c != null) {
-      Object o = null;
+      if (c != null) {
+        Object o = null;
 
-      try {
-        switch (c.tag()) {
-          case Constant.STRING: o = getString(); break;
-          case Constant.INTEGER: o = new Integer(getInt()); break;
-          case Constant.LONG: o = new Long(getLong()); break;
-          case Constant.FLOAT: o = new Float(getFloat()); break;
-          case Constant.DOUBLE: o = new Double(getDouble()); break;
+        try {
+          switch (c.tag()) {
+            case Constant.STRING: o = getString(); break;
+            case Constant.INTEGER: o = new Integer(getInt()); break;
+            case Constant.LONG: o = new Long(getLong()); break;
+            case Constant.FLOAT: o = new Float(getFloat()); break;
+            case Constant.DOUBLE: o = new Double(getDouble()); break;
+          }
+        }
+        catch (SemanticException e) {
+          throw new ClassFormatError("Unexpected constant pool entry.");
+        }
+
+        if (o != null) {
+          return fi.constantValue(o);
         }
       }
-      catch (SemanticException e) {
-        throw new ClassFormatError("Unexpected constant pool entry.");
-      }
 
-      if (o != null) {
-        return fi.constantValue(o);
-      }
+      return fi;
     }
-
-    return fi;
-  }
 
     Constant constantValue() {
       if (this.constantValue != null) {
@@ -141,9 +143,9 @@ class Field {
                                   "pool entry with tag STRING or UTF8.");
     }
 
-  String name() {
-    return (String) clazz.constants[this.name].value();
-  }
+    String name() {
+      return (String) clazz.constants[this.name].value();
+    }
 
     /**
      * Constructor.  Read a field from a class file.

@@ -199,8 +199,8 @@ public class ClassFile implements LazyClassInitializer {
 
                 if (t.isMember()) {
 		    if (Report.should_report(verbose, 3))
-                      Report.report(3, "adding member " + t + " to " + ct);
-                    ct.addMemberClass(t.toMember());
+                        Report.report(3, "adding member " + t + " to " + ct);
+                    ct.addMemberClass(t);
                 }
                 else {
                     throw new InternalCompilerError(name + " should be a member class.");
@@ -399,15 +399,7 @@ public class ClassFile implements LazyClassInitializer {
             innerName = null;
         }
 
-        final int TOP = 0;
-        final int MEMBER = 1;
-        final int LOCAL = 2;
-        final int ANONYMOUS = 3;
-
-        final String[] kinds = new String[] {
-          "top-level", "member", "local", "anonymous" };
-                                                        
-        int kind = TOP;
+        ClassType.Kind kind = ClassType.TOP_LEVEL;
 
         if (dollar >= 0) {
             // An inner class.  Parse the class name to determine what kind. 
@@ -418,41 +410,31 @@ public class ClassFile implements LazyClassInitializer {
 
                 if (Character.isDigit(s.charAt(0))) {
                     // Example: C$1
-                    kind = ANONYMOUS;
+                    kind = ClassType.ANONYMOUS;
                 }
-                else if (kind == ANONYMOUS) {
+                else if (kind == ClassType.ANONYMOUS) {
                     // Example: C$1$D
-                    kind = LOCAL;
+                    kind = ClassType.LOCAL;
                 }
                 else {
                     // Example: C$D
-                    kind = MEMBER;
+                    kind = ClassType.MEMBER;
                 }
             }
         }
+
 	if (Report.should_report(verbose, 3))
-	    Report.report(3, name + " is " + kinds[kind]);
+	    Report.report(3, name + " is " + kind);
 
-        ParsedClassType ct;
+        ParsedClassType ct = ts.createClassType(this);
 
-        if (kind == ANONYMOUS) {
-            ParsedAnonClassType t = ts.anonClassType(this);
-            ct = t;
+        ct.kind(kind);
+
+        if (ct.isTopLevel()) {
+            ct.name(className);
         }
-        else if (kind == LOCAL) {
-            ParsedLocalClassType t = ts.localClassType(this);
-            t.name(innerName);
-            ct = t;
-        }
-        else if (kind == MEMBER) {
-            ParsedMemberClassType t = ts.memberClassType(this);
-            t.name(innerName);
-            ct = t;
-        }
-        else {
-            ParsedTopLevelClassType t = ts.topLevelClassType(this);
-            t.name(className);
-            ct = t;
+        else if (ct.isMember() || ct.isLocal()) {
+            ct.name(innerName);
         }
 
         if (! packageName.equals("")) {
@@ -462,8 +444,8 @@ public class ClassFile implements LazyClassInitializer {
         // Add unresolved class into the cache to avoid circular resolving.
         ((CachingResolver) ts.systemResolver()).install(name, ct);
 
-        if (kind != TOP) {
-            ((ParsedInnerClassType) ct).outer(typeForName(ts, outerName));
+        if (ct.isInner()) {
+            ct.outer(typeForName(ts, outerName));
         }
 
         ct.flags(ts.flagsForBits(modifiers));

@@ -6,7 +6,7 @@ import polyglot.util.Position;
  * A <code>ParsedClassType</code> represents a class loaded from a source file.
  * <code>ParsedClassType</code>s are mutable.
  */
-public interface ParsedClassType extends ClassType, ParsedType
+public interface ParsedClassType extends ClassType
 {
     /**
      * Position of the type's declaration.
@@ -46,31 +46,26 @@ public interface ParsedClassType extends ClassType, ParsedType
     /**
      * Add a member class to the class.
      */
-    void addMemberClass(MemberClassType t);
+    void addMemberClass(ClassType t);
 
     /**
-     * Replace a field in the class.
-     */
-    void replaceField(FieldInstance old, FieldInstance fi);
-
-    /**
-     * Replace a method in the class.
-     */
-    void replaceMethod(MethodInstance old, MethodInstance mi);
-
-    /**
-     * Replace a constructor in the class.
-     */
-    void replaceConstructor(ConstructorInstance old, ConstructorInstance ci);
-
-    /**
-     * Replace a member class in the class.
-     */
-    void replaceMemberClass(MemberClassType old, MemberClassType t);
-
-    /**
-     * Set the flags of the class.  Anonymous classes don't have flags.  This
-     * has no effect for anonymous classes.
+     * Set the flags of the class.
      */
     void flags(Flags flags);
+
+    /**
+     * Set the class's outer class.
+     */
+    void outer(ClassType t);
+
+    /**
+     * Set the name of the class.  Throws <code>InternalCompilerError</code>
+     * if called on an anonymous class.
+     */
+    void name(String name);
+
+    /**
+     * Set the class's kind.
+     */
+    void kind(Kind kind);
 }

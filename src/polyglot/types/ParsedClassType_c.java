@@ -2,11 +2,10 @@ package polyglot.ext.jl.types;
 
 import polyglot.types.*;
 import polyglot.types.Package;
-import polyglot.util.*;
 import polyglot.frontend.Job;
+import polyglot.util.*;
 import java.io.*;
 import java.util.*;
-
 
 /**
  * ParsedClassType
@@ -15,10 +14,20 @@ import java.util.*;
  * A ParsedClassType represents a information that has been parsed (but not
  * necessarily type checked) from a .java file.
  **/
-public abstract class ParsedClassType_c extends ClassType_c
-				     implements ParsedClassType
+public class ParsedClassType_c extends ClassType_c implements ParsedClassType
 {
     protected transient LazyClassInitializer init;
+    protected Type superType;
+    protected List interfaces;
+    protected List methods;
+    protected List fields;
+    protected List constructors;
+    protected List memberClasses;
+    protected Package package_;
+    protected Flags flags;
+    protected Kind kind;
+    protected String name;
+    protected ClassType outer;
 
     protected ParsedClassType_c() {
 	super();
@@ -31,6 +40,45 @@ public abstract class ParsedClassType_c extends ClassType_c
         if (init == null) {
           throw new InternalCompilerError("Null lazy class initializer");
         }
+    }
+
+    public Kind kind() {
+        return kind;
+    }
+
+    public ClassType outer() {
+        if (isTopLevel())
+            return null;
+        if (outer == null)
+            throw new InternalCompilerError("Inner classes must have outer classes.");
+            
+        return outer;
+    }
+
+    public String name() {
+        if (isAnonymous())
+            throw new InternalCompilerError("Anonymous classes cannot have names.");
+
+        if (name == null)
+            throw new InternalCompilerError("Non-anonymous classes must have names.");
+        return name;
+    }
+
+    /** Get the class's super type. */
+    public Type superType() {
+        return this.superType;
+    }
+
+    /** Get the class's package. */
+    public Package package_() {
+        return package_;
+    }
+
+    /** Get the class's flags. */
+    public Flags flags() {
+        if (isAnonymous())
+            return Flags.NONE;
+        return flags;
     }
 
     /** Return true if we no longer need the initializer object. */
@@ -53,7 +101,25 @@ public abstract class ParsedClassType_c extends ClassType_c
     }
 
     public void flags(Flags flags) {
+        if (isAnonymous())
+            throw new InternalCompilerError("Cannot set flags for anonymous class.");
 	this.flags = flags;
+    }
+
+    public void kind(Kind kind) {
+        this.kind = kind;
+    }
+
+    public void outer(ClassType outer) {
+        if (isTopLevel())
+            throw new InternalCompilerError("Top-level classes cannot have outer classes.");
+        this.outer = outer;
+    }
+
+    public void name(String name) {
+        if (isAnonymous())
+            throw new InternalCompilerError("Anonymous classes cannot have names.");
+        this.name = name;
     }
 
     public void position(Position pos) {
@@ -84,27 +150,7 @@ public abstract class ParsedClassType_c extends ClassType_c
 	fields().add(fi);
     }
 
-    public void addMemberClass(MemberClassType t) {
-	memberClasses().add(t);
-    }
-
-    public void replaceField(FieldInstance old, FieldInstance fi) {
-	fields().remove(old);
-	fields().add(fi);
-    }
-
-    public void replaceMethod(MethodInstance old, MethodInstance mi) {
-	methods().remove(old);
-	methods().add(mi);
-    }
-
-    public void replaceConstructor(ConstructorInstance old, ConstructorInstance ci) {
-	constructors().remove(old);
-	constructors().add(ci);
-    }
-
-    public void replaceMemberClass(MemberClassType old, MemberClassType t) {
-	memberClasses().remove(old);
+    public void addMemberClass(ClassType t) {
 	memberClasses().add(t);
     }
 
@@ -121,7 +167,7 @@ public abstract class ParsedClassType_c extends ClassType_c
     /** Return a mutable list of member classes */
     public List memberClasses() {
         if (memberClasses == null) {
-            memberClasses = new TypedList(new LinkedList(), MemberClassType.class, false);
+            memberClasses = new TypedList(new LinkedList(), Type.class, false);
             init.initMemberClasses(this);
             freeInit();
         }

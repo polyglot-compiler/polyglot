@@ -1,5 +1,6 @@
 package polyglot.types;
 
+import polyglot.util.Enum;
 import java.util.List;
 
 /**
@@ -7,8 +8,52 @@ import java.util.List;
  * classpath, parsed from a source file, or obtained from other source.
  * A <code>ClassType</code> is not necessarily named.
  */
-public interface ClassType extends ReferenceType 
+public interface ClassType extends ImportableType, ReferenceType, MemberInstance
 {
+    public static class Kind extends Enum {
+        public Kind(String name) {
+            super(name);
+        }
+    }
+
+    public static final Kind TOP_LEVEL = new Kind("top-level");
+    public static final Kind MEMBER = new Kind("member");
+    public static final Kind LOCAL = new Kind("local");
+    public static final Kind ANONYMOUS = new Kind("anonymous");
+
+    /** Get the class's kind. */
+    Kind kind();
+
+    /**
+     * Return true if the class is top-level (i.e., not inner).
+     * Equivalent to kind() == TOP_LEVEL.
+     */
+    boolean isTopLevel();
+
+    /**
+     * Return true if the class is an inner class.
+     * Equivalent to kind() == MEMBER || kind() == LOCAL || kind() == ANONYMOUS.
+     */
+    boolean isInner();
+
+    /**
+     * Return true if the class is a member class.
+     * Equivalent to kind() == MEMBER.
+     */
+    boolean isMember();
+
+    /**
+     * Return true if the class is a local class.
+     * Equivalent to kind() == LOCAL.
+     */
+    boolean isLocal();
+
+    /**
+     * Return true if the class is an anonymous class.
+     * Equivalent to kind() == ANONYMOUS.
+     */
+    boolean isAnonymous();
+
     /**
      * The class's constructors.
      * A list of <code>ConstructorInstance</code>.
@@ -18,93 +63,18 @@ public interface ClassType extends ReferenceType
 
     /**
      * The class's member classes.
-     * A list of <code>MemberClassType</code>.
-     * @see polyglot.types.MemberClassType
+     * A list of <code>ClassType</code>.
+     * @see polyglot.types.ClassType
      */
     List memberClasses();
 
     /** Returns the member class with the given name, or null. */
-    MemberClassType memberClassNamed(String name);
+    ClassType memberClassNamed(String name);
 
-    /**
-     * Get a field by name, or null.
-     */
+    /** Get a field by name, or null. */
     FieldInstance fieldNamed(String name);
 
-    /**
-     * Return true if the class is top-level (i.e., not inner).
-     * This method will probably get deprecated.
-     */
-    boolean isTopLevel();
-
-    /**
-     * Return true if the class is an inner class.
-     * This method will probably get deprecated.
-     */
-    boolean isInner();
-
-    /**
-     * Return true if the class is a member class.
-     * This method will probably get deprecated.
-     */
-    boolean isMember();
-
-    /**
-     * Return true if the class is a local class.
-     * This method will probably get deprecated.
-     */
-    boolean isLocal();
-
-    /**
-     * Return true if the class is an anonymous class.
-     * This method will probably get deprecated.
-     */
-    boolean isAnonymous();
-
-    /**
-     * Cast to a top-level class, returning null if not top-level.
-     * This method will probably get deprecated.
-     */
-    TopLevelClassType toTopLevel();
-
-    /**
-     * Cast to an inner class, returning null if not inner.
-     * This method will probably get deprecated.
-     */
-    InnerClassType toInner();
-
-    /**
-     * Cast to a member class, returning null if not a member.
-     * This method will probably get deprecated.
-     */
-    MemberClassType toMember();
-
-    /**
-     * Cast to a local class, returning null if not local.
-     * This method will probably get deprecated.
-     */
-    LocalClassType toLocal();
-
-    /**
-     * Cast to an anonymous class, returning null if not anonymous.
-     * This method will probably get deprecated.
-     */
-    AnonClassType toAnonymous();
-
-    /**
-     * The class's package.
-     */
-    Package package_();
-
-    /**
-     * This method is here for convenience.  Anonymous classes have no access
-     * flags.  It will return ts.NoFlags() if invoked on an anonymous class.
-     */
-    Flags flags();
-
-    /**
-     * Return true if the class is strictly contained in <code>outer</code>.
-     */
+    /** Return true if the class is strictly contained in <code>outer</code>. */
     boolean isEnclosed(ClassType outer);
 
     /**
@@ -113,4 +83,7 @@ public interface ClassType extends ReferenceType
      * or by a subclass.
      */
     boolean isEnclosedImpl(ClassType outer);
+
+    /** The class's outer class if this is an inner class, or null. */
+    ClassType outer();
 }

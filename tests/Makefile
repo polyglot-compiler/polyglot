@@ -13,6 +13,7 @@ GOOD =  \
 	ForwardRef2.jl \
 	ForwardRef3.jl \
 	ForwardRef.jl \
+	Infinite.jl \
 	Init1.jl \
 	Init2.jl \
 	Init3.jl \

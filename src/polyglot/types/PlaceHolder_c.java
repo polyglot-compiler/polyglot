@@ -18,13 +18,13 @@ public class PlaceHolder_c implements PlaceHolder
     
     /** Creates a place holder type for the type. */
     public PlaceHolder_c(Type t) {
-	if (t.isClass() && t.toClass().isTopLevel()) {
-	    name = t.toClass().toTopLevel().fullName();
-	}
-	else if (t.isClass() && t.toClass().isMember()) {
-	    name = t.toClass().toMember().name();
-	    outer = t.toClass().toMember().container();
-	}
+	if (t.isClass()) {
+	    name = t.toClass().fullName();
+
+            if (t.toClass().isMember()) {
+                outer = t.toClass().container();
+            }
+        }
 	else {
 	    throw new InternalCompilerError("Cannot serialize " + t + ".");
 	}

@@ -8,14 +8,13 @@ import java.util.*;
 /**
  * An <code>PrimitiveType_c</code> represents a primitive type.
  */
-public class PaoParsedTopLevelClassType_c extends ParsedTopLevelClassType_c
+public class PaoParsedClassType_c extends ParsedClassType_c
 {
-    protected PaoParsedTopLevelClassType_c() {
+    protected PaoParsedClassType_c() {
         super();
     }
 
-    public PaoParsedTopLevelClassType_c(TypeSystem ts,
-                                        LazyClassInitializer init) {
+    public PaoParsedClassType_c(TypeSystem ts, LazyClassInitializer init) {
         super(ts, init);
     }
 

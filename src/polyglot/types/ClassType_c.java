@@ -12,15 +12,6 @@ import java.util.*;
  */
 public abstract class ClassType_c extends ReferenceType_c implements ClassType
 {
-    protected Type superType;
-    protected List interfaces;
-    protected List methods;
-    protected List fields;
-    protected List constructors;
-    protected List memberClasses;
-    protected Package package_;
-    protected Flags flags;
-
     /** Used for deserializing types. */
     protected ClassType_c() { }
 
@@ -32,39 +23,75 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 	super(ts, pos);
     }
 
+    /** Get the class's kind. */
+    public abstract Kind kind();
+
+    /** Get the class's outer class, or null if a top-level class. */
+    public abstract ClassType outer();
+
+    /** Get the short name of the class, if possible. */ 
+    public abstract String name();
+
+    /** Get the container class if a member class. */
+    public ReferenceType container() {
+        if (! isMember())
+            throw new InternalCompilerError("Non-member classes cannot have container classes.");
+        if (outer() == null)
+            throw new InternalCompilerError("Inner classes must have outer classes.");
+        return outer();
+    }
+
+    /** Get the full name of the class, if possible. */
+    public String fullName() {
+        if (isTopLevel() && package_() != null) {
+            return package_().fullName() + "." + name();
+        }
+        else if (isMember() && container() instanceof NamedType) {
+            return ((NamedType) container()).fullName() + "." + name();
+        }
+        else {
+            return name();
+        }
+    }
+
+    public boolean isTopLevel() { return kind() == TOP_LEVEL; }
+    public boolean isMember() { return kind() == MEMBER; }
+    public boolean isLocal() { return kind() == LOCAL; }
+    public boolean isAnonymous() { return kind() == ANONYMOUS; }
+
+    public boolean isInner() {
+        // Implement this way rather than with ! isTopLevel() so that
+        // extensions can add more kinds.
+        return kind() == MEMBER || kind() == LOCAL || kind() == ANONYMOUS;
+    }
+
     public boolean isCanonical() { return true; }
     public boolean isClass() { return true; }
     public ClassType toClass() { return this; }
 
+    /** Get the class's package. */
+    public abstract Package package_();
+
+    /** Get the class's flags. */
+    public abstract Flags flags();
+
     /** Get the class's constructors. */
-    public List constructors() {
-        return Collections.unmodifiableList(constructors);
-    }
+    public abstract List constructors();
 
     /** Get the class's member classes. */
-    public List memberClasses() {
-        return Collections.unmodifiableList(memberClasses);
-    }
+    public abstract List memberClasses();
 
     /** Get the class's methods. */
-    public List methods() {
-        return Collections.unmodifiableList(methods);
-    }
+    public abstract List methods();
 
     /** Get the class's fields. */
-    public List fields() {
-        return Collections.unmodifiableList(fields);
-    }
+    public abstract List fields();
 
     /** Get the class's interfaces. */
-    public List interfaces() {
-        return Collections.unmodifiableList(interfaces);
-    }
+    public abstract List interfaces();
 
     /** Get the class's super type. */
-    public Type superType() {
-        return this.superType;
-    }
+    public abstract Type superType();
 
     /** Get a field of the class by name. */
     public FieldInstance fieldNamed(String name) {
@@ -79,37 +106,15 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     }
 
     /** Get a member class of the class by name. */
-    public MemberClassType memberClassNamed(String name) {
+    public ClassType memberClassNamed(String name) {
         for (Iterator i = memberClasses().iterator(); i.hasNext(); ) {
-	    MemberClassType t = (MemberClassType) i.next();
+	    ClassType t = (ClassType) i.next();
 	    if (t.name().equals(name)) {
 	        return t;
 	    }
 	}
 
 	return null;
-    }
-
-    public boolean isTopLevel() { return false; }
-    public boolean isInner() { return false; }
-    public boolean isMember() { return false; }
-    public boolean isLocal() { return false; }
-    public boolean isAnonymous() { return false; }
-
-    public TopLevelClassType toTopLevel() { return null; }
-    public InnerClassType toInner() { return null; }
-    public MemberClassType toMember() { return null; }
-    public LocalClassType toLocal() { return null; }
-    public AnonClassType toAnonymous() { return null; }
-
-    /** Get the class's package. */
-    public Package package_() {
-        return package_;
-    }
-
-    /** Get the class's flags. */
-    public Flags flags() {
-        return flags;
     }
 
     public boolean isSameImpl(Type t) {
@@ -252,7 +257,87 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         return ts.isEnclosed(this, maybe_outer);
     }
 
+    public String translate(Resolver c) {
+        if (isTopLevel()) {
+            if (package_() == null) {
+                return name();
+            }
+
+            // Use the short name if it is unique.
+            if (c != null) {
+                try {
+                    Type x = c.findType(name());
+
+                    if (ts.isSame(this, x)) {
+                        return name();
+                    }
+                }
+                catch (SemanticException e) {
+                }
+            }
+
+            return package_().translate(c) + "." + name();
+        }
+        else if (isMember()) {
+            // Use only the short name if the outer class is anonymous.
+            if (container().toClass().isAnonymous()) {
+                return name();
+            }
+
+            // Use the short name if it is unique.
+            if (c != null) {
+                try {
+                    Type x = c.findType(name());
+
+                    if (ts.isSame(this, x)) {
+                        return name();
+                    }
+                }
+                catch (SemanticException e) {
+                }
+            }
+
+            return container().translate(c) + "." + name();
+        }
+        else if (isLocal()) {
+            return name();
+        }
+        else {
+            throw new InternalCompilerError("Cannot translate an anonymous class.");
+        }
+    }
+
+    public String toString() {
+        if (isTopLevel()) {
+            if (package_() != null) {
+                return package_().toString() + "." + name();
+            }
+
+            return name();
+        }
+        else if (isMember()) {
+            return container().toString() + "." + name();
+        }
+        else if (isLocal()) {
+            return name();
+        }
+        else {
+            if (superType() != null) {
+                return "anonymous subtype of " + superType().toString();
+            }
+            else {
+                return "anonymous subtype of <unknown>";
+            }
+        }
+    }
+
     public boolean isEnclosedImpl(ClassType maybe_outer) {
-        return false;
+        if (isTopLevel())
+            return false;
+        else if (outer() != null)
+            return outer().isSame(maybe_outer) ||
+                  outer().isEnclosed(maybe_outer);
+        else
+            throw new InternalCompilerError("Inner classes must have outer classes.");
     }
 }

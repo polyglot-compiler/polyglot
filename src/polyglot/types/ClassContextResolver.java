@@ -42,7 +42,7 @@ public class ClassContextResolver extends ClassResolver {
         }
 
         // Check if the name is for a member class.
-        MemberClassType inner = ts.findMemberClass(type, name);
+        ClassType inner = ts.findMemberClass(type, name);
 
         if (inner != null) {
             if (Report.should_report(new String[] {Report.types, Report.resolver}, 2))

@@ -6,7 +6,6 @@ include $(SOURCE)/Rules.mk
 
 SOURCES = \
 	TypeSystem.java \
-	AnonClassType.java \
 	ArrayType.java \
 	LazyClassInitializer.java \
 	CachingResolver.java \
@@ -23,12 +22,9 @@ SOURCES = \
 	Flags.java \
 	ImportTable.java \
 	InitializerInstance.java \
-	InnerClassType.java \
 	LoadedClassResolver.java \
 	SourceClassResolver.java \
-	LocalClassType.java \
 	LocalInstance.java \
-	MemberClassType.java \
 	MemberInstance.java \
 	MethodInstance.java \
 	NamedQualifier.java \
@@ -37,13 +33,7 @@ SOURCES = \
 	NullType.java \
 	Package.java \
 	PackageContextResolver.java \
-	ParsedAnonClassType.java \
 	ParsedClassType.java \
-	ParsedInnerClassType.java \
-	ParsedLocalClassType.java \
-	ParsedMemberClassType.java \
-	ParsedTopLevelClassType.java \
-	ParsedType.java \
 	PrimitiveType.java \
 	ProcedureInstance.java \
 	Qualifier.java \
@@ -51,7 +41,6 @@ SOURCES = \
 	Resolver.java \
 	SemanticException.java \
 	TableResolver.java \
-	TopLevelClassType.java \
 	Type.java \
 	TypeObject.java \
 	UnknownQualifier.java \

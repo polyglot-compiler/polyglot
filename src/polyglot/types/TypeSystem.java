@@ -262,7 +262,7 @@ public interface TypeSystem {
      * @exception SemanticException if the class cannot be found or is
      * inaccessible.
      */
-    MemberClassType findMemberClass(ClassType container, String name, Context c)
+    ClassType findMemberClass(ClassType container, String name, Context c)
 	throws SemanticException;
 
     /**
@@ -270,7 +270,7 @@ public interface TypeSystem {
      * @exception SemanticException if the class cannot be found or is
      * inaccessible.
      */
-    MemberClassType findMemberClass(ClassType container, String name)
+    ClassType findMemberClass(ClassType container, String name)
 	throws SemanticException;
 
     /**
@@ -485,44 +485,14 @@ public interface TypeSystem {
     LazyClassInitializer defaultClassInitializer();
 
     /**
-     * Create a top-level class.
+     * Create a new empty class.
      */
-    ParsedTopLevelClassType topLevelClassType(LazyClassInitializer init);
+    ParsedClassType createClassType(LazyClassInitializer init);
 
     /**
-     * Create a member class.
+     * Create a new empty class.
      */
-    ParsedMemberClassType memberClassType(LazyClassInitializer init);
-
-    /**
-     * Create a local class.
-     */
-    ParsedLocalClassType localClassType(LazyClassInitializer init);
-
-    /**
-     * Create a anonymous class.
-     */
-    ParsedAnonClassType anonClassType(LazyClassInitializer init);
-
-    /**
-     * Create a top-level class.
-     */
-    ParsedTopLevelClassType topLevelClassType();
-
-    /**
-     * Create a member class.
-     */
-    ParsedMemberClassType memberClassType();
-
-    /**
-     * Create a local class.
-     */
-    ParsedLocalClassType localClassType();
-
-    /**
-     * Create a anonymous class.
-     */
-    ParsedAnonClassType anonClassType();
+    ParsedClassType createClassType();
 
     /**
      * Return the set of objects that should be serialized into the
@@ -566,17 +536,7 @@ public interface TypeSystem {
     /**
      * Translate a top-level class type.
      */
-    String translateTopLevelClass(Resolver c, TopLevelClassType t);
-
-    /**
-     * Translate a member class type.
-     */
-    String translateMemberClass(Resolver c, MemberClassType t);
-
-    /**
-     * Translate a local class type.
-     */
-    String translateLocalClass(Resolver c, LocalClassType t);
+    String translateClass(Resolver c, ClassType t);
 
     /**
      * Return the boxed version of <code>t</code>.

@@ -1,7 +1,7 @@
 package polyglot.ast;
 
 import polyglot.types.ConstructorInstance;
-import polyglot.types.ParsedAnonClassType;
+import polyglot.types.ParsedClassType;
 import java.util.List;
 
 /**
@@ -14,10 +14,10 @@ import java.util.List;
 public interface New extends Expr, Thrower
 {
     /** The type object for anonymous classes, or null. */
-    ParsedAnonClassType anonType();
+    ParsedClassType anonType();
 
     /** Set the type object for anonymous classes. */
-    New anonType(ParsedAnonClassType anonType);
+    New anonType(ParsedClassType anonType);
 
     /** The constructor invoked by this expression. */
     ConstructorInstance constructorInstance();
