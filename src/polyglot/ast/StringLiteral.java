@@ -30,7 +30,7 @@ public class StringLiteral extends Literal
 
   public Node typeCheck( LocalContext c) throws SemanticException
   {
-    setCheckedType( c.getType( "java.lang.String"));
+    setCheckedType( c.getTypeSystem().getString());
     return this;
   }
   

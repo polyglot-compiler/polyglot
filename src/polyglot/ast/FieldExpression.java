@@ -108,7 +108,7 @@ public class FieldExpression extends Expression
       if (name.equals("class"))
       {
         Annotate.setExpectedType( target, ltype);
-        setCheckedType( c.getType( "java.lang.Class"));
+        setCheckedType( c.getTypeSystem().getClass_());
       }      
       else
       {

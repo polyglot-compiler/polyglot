@@ -15,24 +15,16 @@ public class ClassSerializer extends NodeVisitor
   protected TypeEncoder te;
   protected ErrorQueue eq;
   protected Date date;
-  protected Type string_t, long_t;
+  protected TypeSystem ts;
 
-  public ClassSerializer( TypeSystem ts, Date date, ErrorQueue eq)
+  public ClassSerializer( TypeSystem ts_, Date date, ErrorQueue eq)
   {
+    this.ts = ts_;
     this.te = new TypeEncoder( ts);
     this.eq = eq;
     this.date = date;
       
-    long_t = ts.getLong();
-
-    try
-    {
-      string_t = ts.getTypeWithName( "java.lang.String");
-    }
-    catch( SemanticException e)
-    {
-      throw new InternalCompilerError( e.toString());
-    }
+    ts.getString();
   }
 
   public Node leave( Node old, Node n, NodeVisitor v)
@@ -68,7 +60,7 @@ public class ClassSerializer extends NodeVisitor
                          + "." + Compiler.VERSION_PATCHLEVEL));
         decls = new LinkedList();
         decls.add( decl);
-        vds = new VariableDeclarationStatement( af, new TypeNode( string_t), 
+        vds = new VariableDeclarationStatement( af, new TypeNode(ts.getString()), 
                                                 decls);
         fn = new FieldNode( af, vds);
         members.add( fn);
@@ -79,7 +71,7 @@ public class ClassSerializer extends NodeVisitor
                                                        (long)date.getTime()));
         decls = new LinkedList();
         decls.add( decl);
-        vds = new VariableDeclarationStatement( af, new TypeNode( long_t), 
+        vds = new VariableDeclarationStatement( af, new TypeNode(ts.getLong()), 
                                                 decls);
         fn = new FieldNode( af, vds);
         members.add( fn);
@@ -91,7 +83,7 @@ public class ClassSerializer extends NodeVisitor
 
         decls = new LinkedList();
         decls.add( decl);
-        vds = new VariableDeclarationStatement( af, new TypeNode( string_t),
+        vds = new VariableDeclarationStatement( af, new TypeNode( ts.getString()),
                                                 decls);
         fn = new FieldNode( af, vds);
         members.add( fn);

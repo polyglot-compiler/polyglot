@@ -320,7 +320,7 @@ public class BinaryExpression extends Expression
     case PLUS:
     case PLUSASSIGN:
       /* (15.17). */
-      Type string = c.getType( "java.lang.String");
+      Type string = c.getTypeSystem().getString();
       if( ltype.isSameType( string)) {
         setCheckedType( string);
         break;
@@ -432,9 +432,7 @@ public class BinaryExpression extends Expression
    {
      /* Extra checks are need here to see if we have a numeric binary
       * expression inside of a String concatenation. */
-     try
-     {
-       if( getCheckedType().equals( c.getType( "java.lang.String")) 
+       if( getCheckedType().equals( c.getTypeSystem().getString())
            && left.getCheckedType().isPrimitive()) {
          w.write( "(");
          left.translate_block( c, w);
@@ -448,7 +446,7 @@ public class BinaryExpression extends Expression
        w.write( getOperatorString( operator));
        w.allowBreak(2, " ");
        
-       if( getCheckedType().equals( c.getType( "java.lang.String")) 
+       if( getCheckedType().equals( c.getTypeSystem().getString())
            && right.getCheckedType().isPrimitive()) {
          w.write( "(");
 	 right.translate_block( c, w);
@@ -457,13 +455,6 @@ public class BinaryExpression extends Expression
        else {
          translateExpression( right, c, w);
        }
-     }
-     catch( SemanticException e) 
-     {
-       throw new InternalCompilerError( 
-                          "Caught SemanticException during translation: " 
-                          + e.getMessage());
-     }
    }
 
    public void dump( CodeWriter w)

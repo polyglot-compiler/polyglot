@@ -15,7 +15,7 @@ Extensions would modify the TypeSystem behavior for the following
 typical reasons:
 
    * The extension would like to Modify the typing rules for java.
-   * The extension would liek to include support for additional AST
+   * The extension would like to include support for additional AST
       nodes.  This may or may not necessitate modifying the
       TypeSystem.  In general, modifications to PrimitiveType, or the
       addition of a new class type family that descends from Type
@@ -32,7 +32,7 @@ method call is made.  There are no rules to govern how multiple
 TypeSystems interact, and because of this, we cannot have multiple
 TypeSystem implemenations during a particular compile.
 
-The easiest way to modity the TypeSystem behavior is to
+The easiest way to modify the TypeSystem behavior is to
 extend the StandardTypeSystem and override the necessary methods to
 obtain the desired behavior.  Then, you must instruct the TypeSystem
 to use the new implemention whenever the extension is used.
@@ -44,7 +44,7 @@ whenever using this Compiler modification.
 
 Currently the only way to do this is by editing Main.java.  However,
 there was an initiative to create a standard modification description
-file that is requried of any valid Compiler modification:
+file that is required of any valid Compiler modification:
 ExtensionInfo.java.  This file would have resided in the root of the
 extension's hierarchy and given instructions to jltools.main.Main and
 jltools.frontend.Compiler to properly "install" the

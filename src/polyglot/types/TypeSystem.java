@@ -228,6 +228,8 @@ public abstract class TypeSystem {
   public abstract Type getFloat();
   public abstract Type getDouble();
   public abstract Type getObject();
+  public abstract Type getString();
+  public abstract Type getClass_();
   public abstract Type getThrowable();
   public abstract Type getError();
   public abstract Type getException();

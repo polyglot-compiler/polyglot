@@ -152,26 +152,26 @@ Print out a summary of the usage options.
    (see the documentation in Compiler.java) then an error is reported.
    In either case, all remaining steps are skipped.
 
-8. If both a suitable source file and class are found then we have a
+8. If both a suitable source file and class are found, we have a
    choice. If the class definition does not contain jlc class type
    information then the source file is parsed as the definition found
    in this file is used as desired definiton and we stop here. If the
    class does contain jlc class type information, then continue.
 
-9. (source and class with jlc info) Next the last modification date of
+9. (source and class with jlc info) Next, the last modification date of
    the source file is compared to the last modification date of the
    source file used to generate the class file. If the source file is
    more recent, the it is parsed as used as the desired definition and
    all remaining steps are skipped.
 
-10. (source and class with jlc info) Next the jlc version of the class
+10. (source and class with jlc info) Next, the jlc version of the class
     and of the current translator are compared (as in 7.). If the
     verisions are incompatible, then we use the definition from the
     parsed source file. If the versions are compatible, then we use
     the definition given by the jlc class type information.
 
-Finally, if at any point an error occurs while reading jlc class type
-information (e.g. if this information exists but is corrupted), then
+Finally, if at any point an error occurs while reading the jlc class type
+information (e.g., if this information exists but is corrupted), then
 an error is reported. 
 
 

@@ -35,6 +35,8 @@ public class StandardTypeSystem extends TypeSystem {
     this.emptyResolver = new CompoundClassResolver();
 
     OBJECT_ = resolver.findClass( "java.lang.Object");
+    STRING_ = resolver.findClass( "java.lang.String");
+    CLASS_ = resolver.findClass( "java.lang.Class");
     THROWABLE_ = resolver.findClass( "java.lang.Throwable");
     EXCEPTION_ = resolver.findClass( "java.lang.Exception");
     ERROR_ = resolver.findClass( "java.lang.Error");
@@ -1048,7 +1050,9 @@ public class StandardTypeSystem extends TypeSystem {
   public Type getFloat()   { return FLOAT_; }
   public Type getDouble()  { return DOUBLE_; }
   public Type getObject()  { return OBJECT_; }
-  public Type getThrowable() {return THROWABLE_; }
+  public Type getClass_()   { return CLASS_; }
+  public Type getString()   { return STRING_; }
+  public Type getThrowable() { return THROWABLE_; }
   public Type getError() { return ERROR_; }
   public Type getException() { return EXCEPTION_; }
   public Type getRTException() { return RTEXCEPTION_; }
@@ -1064,6 +1068,8 @@ public class StandardTypeSystem extends TypeSystem {
   private final Type FLOAT_   = new PrimitiveType(this, PrimitiveType.FLOAT);
   private final Type DOUBLE_  = new PrimitiveType(this, PrimitiveType.DOUBLE);
   private Type OBJECT_      ;
+  private Type CLASS_       ;
+  private Type STRING_      ;
   private Type THROWABLE_   ;
   private Type ERROR_       ;
   private Type EXCEPTION_   ;

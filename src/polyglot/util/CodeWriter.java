@@ -82,6 +82,16 @@ public class CodeWriter
         input.free();
         current = input = new Block(null, 0);
     }
+    public void quickflush() throws IOException {
+        // Send out the current batch of text
+        // to be formatted, closing all
+        // outstanding "begin"'s and resetting
+        // the indentation level to 0.
+        input.sendOutput(output, 0, 0);
+        output.flush();
+        input.free();
+        current = input = new Block(null, 0);
+    }
     
     Block input;
     Block current;
