@@ -12,7 +12,10 @@ public interface Case extends SwitchElement
      */
     Expr expr();
 
-    /** Set the case label.  This must should a constant expression, or null. */
+    /**
+     * Set the case label.  This must should a constant expression,
+     * or null.
+     */
     Case expr(Expr expr);
 
     /** Returns true iff this is the default case. */
@@ -23,5 +26,9 @@ public interface Case extends SwitchElement
      * after type-checking.
      */
     long value();
+
+    /**
+     * Set the value of the case label.
+     */
     Case value(long value);
 }

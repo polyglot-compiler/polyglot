@@ -15,9 +15,9 @@ public interface Declarator extends Copy {
      */
     Flags flags();
 	
-	/**
-	 * Set the flags of the declarator.
-	 */
+    /**
+     * Set the flags of the declarator.
+     */
     Declarator flags(Flags flags);
 	
     /** 
@@ -27,7 +27,7 @@ public interface Declarator extends Copy {
 
     /**
      * Get the type node of the declarator.
-	 */
+     */
     TypeNode type();
 
     /** 
@@ -56,18 +56,18 @@ public interface Declarator extends Copy {
     Declarator init(Expr init);
 	
     /** 
-      * Type check the declarator. 
-      */
+     * Type check the declarator. 
+     */
     void typeCheck(TypeChecker tc) throws SemanticException;
 	
     /** 
-      * Type check a child of the declarator. 
-      */
+     * Type check a child of the declarator. 
+     */
     Type childExpectedType(Expr child, AscriptionVisitor av);
 
     /** 
-      * Write the declarator to an output file. 
-      */
+     * Write the declarator to an output file. 
+     */
     void prettyPrint(CodeWriter w, PrettyPrinter tr, boolean field);
 	
 }

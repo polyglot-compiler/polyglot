@@ -10,12 +10,26 @@ import polyglot.types.FieldInstance;
  */
 public interface Field extends Expr
 {
+    /**
+     * Get the type object for the field.  This field may not be valid until
+     * after type checking.
+     */
     FieldInstance fieldInstance();
+
+    /** Set the type object for the field. */
     Field fieldInstance(FieldInstance fi);
 
+    /**
+     * Get the field's container object or type.  May be null before
+     * disambiguation.
+     */
     Receiver target();
+
+    /** Set the field's container object or type. */
     Field target(Receiver target);
 
+    /** Get the field's name. */
     String name();
+    /** Set the field's name. */
     Field name(String name);
 }

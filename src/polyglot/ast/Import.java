@@ -19,9 +19,13 @@ public interface Import extends Node
     public static final Kind CLASS   = new Kind("class");
     public static final Kind PACKAGE = new Kind("package");
 
+    /** Get the name of the class or package to import. */
     String name();
+    /** Set the name of the class or package to import. */
     Import name(String name);
 
+    /** Get the kind of import. */
     Kind kind();
+    /** Set the kind of import. */
     Import kind(Kind kind);
 }

@@ -6,5 +6,8 @@ package polyglot.ast;
  */
 public interface AmbExpr extends Expr, Ambiguous
 {
+    /**
+     * Ambiguous name.
+     */
     String name();
 }

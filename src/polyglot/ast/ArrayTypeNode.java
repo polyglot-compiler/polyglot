@@ -8,6 +8,13 @@ import polyglot.types.Type;
  */
 public interface ArrayTypeNode extends TypeNode
 {
+    /**
+     * Base of the array.
+     */
     TypeNode base();
+
+    /**
+     * Set the base of the array.
+     */
     ArrayTypeNode base(TypeNode base);
 }

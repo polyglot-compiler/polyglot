@@ -19,15 +19,30 @@ public interface ConstructorCall extends Stmt
     public static final Kind SUPER = new Kind("super");
     public static final Kind THIS    = new Kind("this");
 
+    /** The qualifier of the call, possibly null. */
     Expr qualifier();
+
+    /** Set the qualifier of the call, possibly null. */
     ConstructorCall qualifier(Expr qualifier);
 
+    /** The kind of the call: THIS or SUPER. */
     Kind kind();
+
+    /** Set the kind of the call: THIS or SUPER. */
     ConstructorCall kind(Kind kind);
 
+    /** Actual arguments. */
     List arguments();
+
+    /** Set the actual arguments. */
     ConstructorCall arguments(List arguments);
 
+    /**
+     * The constructor that is called.  This field may not be valid until
+     * after type checking.
+     */
     ConstructorInstance constructorInstance();
+
+    /** Set the constructor to call. */
     ConstructorCall constructorInstance(ConstructorInstance ci);
 }

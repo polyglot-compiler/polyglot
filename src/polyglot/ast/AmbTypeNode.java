@@ -6,8 +6,23 @@ package polyglot.ast;
  */
 public interface AmbTypeNode extends TypeNode, Ambiguous
 {
+    /**
+     * Qualifier of the type.
+     */
     QualifierNode qual();
+
+    /**
+     * Set the qualifier of the type.
+     */
     AmbTypeNode qual(QualifierNode qual);
+
+    /**
+     * Ambiguous name.
+     */
     String name();
+
+    /**
+     * Set the ambiguous name.
+     */
     AmbTypeNode name(String name);
 }

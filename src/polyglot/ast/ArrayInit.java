@@ -11,7 +11,14 @@ import java.util.List;
  */
 public interface ArrayInit extends Expr
 {
+    /**
+     * Initializer elements.
+     */
     List elements();
+
+    /**
+     * Set the initializer elements.
+     */
     ArrayInit elements(List elements);
 
     /**

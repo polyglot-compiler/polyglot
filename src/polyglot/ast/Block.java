@@ -8,8 +8,23 @@ import java.util.List;
  */
 public interface Block extends Stmt
 {
+    /**
+     * Statements in the block.
+     */
     List statements();
+
+    /**
+     * Set the statements in the block.
+     */
     Block statements(List statements);
+
+    /**
+     * Append a statement to the block, returning a new block.
+     */
     Block append(Stmt stmt);
+
+    /**
+     * Prepend a statement to the block, returning a new block.
+     */
     Block prepend(Stmt stmt);
 }

@@ -7,12 +7,18 @@ package polyglot.ast;
  */
 public interface If extends Stmt 
 {
+    /** Get the if's condition. */
     Expr cond();
+    /** Set the if's condition. */
     If cond(Expr cond);
 
+    /** Get the if's then clause. */
     Stmt consequent();
+    /** Set the if's then clause. */
     If consequent(Stmt consequent);
 
+    /** Get the if's else clause, or null. */
     Stmt alternative();
+    /** Set the if's else clause. */
     If alternative(Stmt alternative);
 }

@@ -9,5 +9,6 @@ import polyglot.types.*;
  */
 public interface LocalClassDecl extends Stmt
 {
+    /** The class declaration. */
     ClassDecl decl();
 }
