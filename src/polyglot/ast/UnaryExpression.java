@@ -3,8 +3,8 @@
  */
 
 package jltools.ast;
-import jltools.util.CodeWriter;
-import jltools.types.LocalContext;
+import jltools.util.*;
+import jltools.types.*;
 /**
  * UnaryExpression
  * 
@@ -79,11 +79,58 @@ public class UnaryExpression extends Expression {
       expr = (Expression)expr.visit(vis);
    }
 
-   public Node typeCheck(LocalContext c)
-   {
-      // FIXME: implement
-      return this;
-   }
+  public Node typeCheck(LocalContext c) throws TypeCheckException
+  {
+    Type type = expr.getCheckedType();
+    switch( operator)
+    {
+    case POSTINCR:
+    case POSTDECR:
+    case PREINCR:
+    case PREDECR:
+      if( !type.isPrimitive()) {
+        throw new TypeCheckException( "Operand of " 
+                + getOperatorName() + " operator must be numeric.");
+      }
+      if( !((PrimitiveType)type).isNumeric()) {
+        throw new TypeCheckException( "Operand of " 
+                + getOperatorName() + " operator must be numeric.");
+      }
+      setCheckedType( type);
+      break;
+
+    case BITCOMP:
+    case NEGATIVE:
+    case POSITIVE:
+      if( !type.isPrimitive()) {
+        throw new TypeCheckException( "Operand of " 
+                + getOperatorName() + " operator must be numeric.");
+      }
+      if( !((PrimitiveType)type).isNumeric()) {
+        throw new TypeCheckException( "Operand of " 
+                + getOperatorName() + " operator must be numeric.");
+      }
+      setCheckedType( PrimitiveType.unaryPromotion( (PrimitiveType)type));
+      break;
+
+    case LOGICALNOT:
+      if( !type.isPrimitive()) {
+        throw new TypeCheckException( "Operand of " 
+                + getOperatorName() + " operator must be boolean.");
+      }
+      if( !((PrimitiveType)type).isBoolean()) {
+        throw new TypeCheckException( "Operand of " 
+                + getOperatorName() + " operator must be boolean.");
+      }
+      setCheckedType( type);
+      break;
+
+    default:
+      throw new InternalCompilerError( "Unknown unary operator: " + operator);
+    }
+     
+    return this;
+  }
 
    public void  translate(LocalContext c, CodeWriter w)
    {
@@ -140,6 +187,28 @@ public class UnaryExpression extends Expression {
       dumpNodeInfo( w);
       w.write( ")");
       return null;
+   }
+
+  protected String getOperatorName()
+  {
+    if (operator == NEGATIVE) 
+      return "numeric negation";
+    if (operator == BITCOMP)
+      return "bitwise complement";
+    if (operator == PREINCR)
+      return "prefix increment";
+    if (operator == PREDECR)
+      return "prefix decrement";
+    if (operator == POSTINCR)
+      return "postfix increment";
+    if (operator == POSTDECR)
+      return "postfix decrement";
+    if (operator == POSITIVE)
+      return "unary plus";
+    if (operator == LOGICALNOT)
+      return "logical negation";
+    else
+      return "unknown";
    }
 
     public Node copy() {
