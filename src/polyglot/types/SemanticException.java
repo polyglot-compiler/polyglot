@@ -1,5 +1,7 @@
 package jltools.types;
 
+import jltools.util.Annotate;
+import jltools.util.AnnotatedObject;
 import jltools.util.Position;
 
 /**
@@ -21,6 +23,10 @@ public class SemanticException extends Exception
     this.position = position;
   }
 
+  public SemanticException( AnnotatedObject a) {
+    this( Annotate.getPosition(a));
+  }
+
   public SemanticException( String m)
   {
     super(m);
@@ -31,6 +37,10 @@ public class SemanticException extends Exception
   {
     super(m);
     this.position = position;
+  }
+
+  public SemanticException( String m, AnnotatedObject a) {
+    this( m, Annotate.getPosition(a));
   }
 
   public Position getPosition()
