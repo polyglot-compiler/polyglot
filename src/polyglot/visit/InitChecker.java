@@ -973,12 +973,11 @@ public class InitChecker extends DataFlow
             LocalInstance li = (LocalInstance)iter.next();
             MinMaxInitCount initCount = (MinMaxInitCount)
                                             dfOut.initStatus.get(li);                                
-    
             if (!currCBI.localDeclarations.contains(li)) {
                 // the local wasn't defined in this scope.
                 currCBI.outerLocalsUsed.add(li);
             }
-            else if (InitCount.ZERO.equals(initCount.getMin())) {
+            else if (initCount == null || InitCount.ZERO.equals(initCount.getMin())) {
                 throw new SemanticException("Local variable \"" + li.name() +
                         "\" must be initialized before the class " + 
                         "declaration.",
