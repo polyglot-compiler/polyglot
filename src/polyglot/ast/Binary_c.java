@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.util.*;
 import polyglot.visit.*;
 import polyglot.types.*;
+
 import java.util.*;
 
 /**
@@ -380,8 +381,18 @@ public class Binary_c extends Expr_c implements Binary
 
 	if (op == ADD) {
 	    if (ts.equals(l, ts.String()) || ts.equals(r, ts.String())) {
-		return precedence(Precedence.STRING_ADD).type(ts.String());
-	    }
+                if (!canCoerceToString(r, ts, tc.context())) {
+                    throw new SemanticException("Cannot coerce an expression " + 
+                                "of type " + r + " to a String.", 
+                                right.position());
+                }
+                if (!canCoerceToString(l, ts, tc.context())) {
+                    throw new SemanticException("Cannot coerce an expression " + 
+                                "of type " + l + " to a String.", 
+                                left.position());
+                }
+                return precedence(Precedence.STRING_ADD).type(ts.String());
+            }
 	}
 
 	if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
@@ -450,6 +461,41 @@ public class Binary_c extends Expr_c implements Binary
 	return type(ts.promote(l, r));
     }
 
+    /**
+     * Can Type t be coerced to a String? In general, this will be true
+     * if t is a String, a primitive, or it has a toString() method. Language
+     * extensions may want to override this however.
+     * 
+     * @param t Type
+     * @param ts TypeSystem
+     * @return true if type t can be coerced to a String.
+     */
+    protected boolean canCoerceToString(Type t, TypeSystem ts, Context c) {
+        if (t.isPrimitive() || ts.equals(t, ts.String())) {
+            return true;
+        }
+        
+        // check that t has a toString method
+        if (t.isClass()) {
+            ClassType ct = t.toClass();
+            try {
+                ts.findMethod(ct, "toString", Collections.EMPTY_LIST, c);
+                // we were succesfully able to find an appropriate method
+                return true;                
+            }
+            catch (NoMemberException e) { 
+                // no toString method. 
+                // fall through and return false 
+            }
+            catch (SemanticException e) {
+                throw new InternalCompilerError(
+                        "Unexpected semantic exception: " + e.getMessage(),
+                         e.position());
+            }
+        }
+        return false;
+    }
+
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         Expr other;
 
@@ -481,7 +527,7 @@ public class Binary_c extends Expr_c implements Binary
         }
 
         if (op == ADD && ts.equals(type, ts.String())) {
-            // Implicit coercion to String.
+            // Implicit coercion to String. 
             return ts.String();
         }
 
