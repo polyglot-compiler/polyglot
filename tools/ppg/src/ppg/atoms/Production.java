@@ -12,7 +12,9 @@ public class Production
 		this.lhs = lhs;
 		this.rhs = rhs;
 	}
-	public String toString() {		String result = lhs.toString();		Vector rhs_part;
+
+	public Nonterminal getLHS() { return lhs; }	public Vector getRHS() { return rhs; }
+		public String toString() {		String result = lhs.toString();		Vector rhs_part;
 		result += " ::=";
 		for (int i=0; i < rhs.size(); i++) {
 			rhs_part = (Vector) rhs.elementAt(i);			for (int j=0; j < rhs_part.size(); j++) {

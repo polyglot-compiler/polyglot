@@ -13,13 +13,15 @@ public class DropCmd implements Command
 		nt = new Nonterminal(nonterminal);
 		prod = null;
 	}
-	
-	public DropCmd(Production productions)
+		public DropCmd(Production productions)
 	{
 		prod = productions;
 		nt = null;
 	}
 
+	public boolean isProdDrop() { return prod != null; }
+	public boolean isNTDrop() { return nt != null; }		public Production getProduction() { return prod; }
+	public Nonterminal getNonterminal() { return nt; }	
 	public void unparse(CodeWriter cw) {
 		cw.begin(3);		cw.write("DropCmd\n");
 		cw.end();

@@ -1,5 +1,5 @@
 package jltools.util.jlgen.lex;
-import java.io.*;
+import java.io.*;
 
 /**
  * The main interface for the return of Lexer output

@@ -11,12 +11,11 @@ import jltools.util.jlgen.util.*;
 public class CUPSpec extends Spec
 {
 	private static final String HEADER = "jlgen [cupspec]: ";
-	private String packageName, start;
-	private Vector imports, code, symbols, prec, productions;
+	private Vector productions;
 	
 	public CUPSpec (String pkg, Vector imp, Vector codeParts, Vector syms,
 					Vector precedence, String startSym, Vector prods)
-	{
+	{		super();
 		packageName = pkg;
 		imports = imp;
 		code = codeParts;
@@ -24,9 +23,22 @@ public class CUPSpec extends Spec
 		prec = precedence;
 		start = startSym;
 		productions = prods;
-	}
-
-	public void unparse(CodeWriter cw) throws ParserError {
+	}		public CUPSpec coalesce() {
+		// cannot have a parent by definition		return this;	}	
+		public void addSymbols(Vector syms) {		if (syms == null)
+			return;				for (int i=0; i < syms.size(); i++) {			symbols.addElement(syms.elementAt(i));		}
+	}	
+	public void dropSymbol(GrammarSymbol gs) {		for (int i=0; i < symbols.size(); i++ ) {			Vector list = (Vector) symbols.elementAt(i);
+			for (int j=0; j < list.size(); j++) {
+				if (gs.equals(list.elementAt(j)))
+					list.removeElementAt(j);
+			}
+		}	}
+	
+	public void dropProductions(Production p) {			}
+		public void dropAllProductions(Nonterminal nt) {			}
+	public void addProductions(Production p) {			}
+	public void unparse(CodeWriter cw) throws ParserError {
 		/*
 		cw.begin(0);
 		cw.write("CUP Spec\n");

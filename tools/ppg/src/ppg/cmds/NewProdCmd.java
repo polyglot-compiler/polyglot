@@ -10,7 +10,9 @@ public class NewProdCmd implements Command
 	{
 		prod = p;
 	}
-	public void unparse(CodeWriter cw) {
+
+	public Production getProduction() { return prod; }
+		public void unparse(CodeWriter cw) {
 		cw.begin(3);		cw.write("NewProdCmd");		cw.allowBreak(2);		cw.end();
 	}
 }

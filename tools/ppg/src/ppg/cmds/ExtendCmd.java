@@ -9,7 +9,8 @@ public class ExtendCmd implements Command
 	public ExtendCmd(Production p)
 	{
 		prod = p;
-	}
+	}	
+	public Production getProduction() { return prod; }
 	public void unparse(CodeWriter cw) {
 		cw.begin(3);		cw.write("ExtendCmd\n");		cw.end();
 	}	

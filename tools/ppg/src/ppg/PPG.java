@@ -46,8 +46,7 @@ public class JLgen
 			return;
 		}
 		Spec spec = (Spec)parser.getProgramNode();
-		
-		spec.parseChain();
+		spec.parseChain();				// now we have a linked list of inheritance, namely		// JLgen1, JLgen2, ..., JLgenN, CUP		// We combine two at a time, starting from the end with the CUP spec
 		
 	}
 }
