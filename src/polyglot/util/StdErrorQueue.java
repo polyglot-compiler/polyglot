@@ -6,38 +6,16 @@ import java.util.StringTokenizer;
 /**
  * A <code>StdErrorQueue</code> handles outputing error messages.
  */
-public class StdErrorQueue implements ErrorQueue
+public class StdErrorQueue extends AbstractErrorQueue
 {
     private PrintStream err;
 
-    private int errorCount;
-    private boolean flushed;
-    private int limit;
-    private String name;
-    
     public StdErrorQueue(PrintStream err, int limit, String name) {
+        super(limit, name);
 	this.err = err;
-	this.errorCount = 0;
-	this.flushed = true;
-	this.limit = limit;
-	this.name = name;
     }
 
-    public void enqueue(int type, String message) {
-	enqueue(type, message, null);
-    }
-
-    public void enqueue(int type, String message, Position position) {
-	enqueue(new ErrorInfo(type, message, position));
-    }
-
-    public void enqueue(ErrorInfo e) {
-	if (e.getErrorKind() != ErrorInfo.WARNING) {
-	    errorCount++;
-	}
-
-	flushed = false;
-
+    public void displayError(ErrorInfo e) {
 	String message = e.getErrorKind() != ErrorInfo.WARNING
 		       ? e.getMessage()
 		       : e.getErrorString() + " -- " + e.getMessage();
@@ -120,13 +98,12 @@ public class StdErrorQueue implements ErrorQueue
 	if (position != null) {
 	    showError(position);
 	}
-
-	if (errorCount >= limit) {
-	    prefix = position != null ? (position.file() + ": ") : "";
-	    err.println(prefix + "Too many errors.  Aborting compilation.");
-	    flush();
-	    throw new ErrorLimitError();
-	}
+    }
+    
+    protected void tooManyErrors(ErrorInfo lastError) {
+        Position position = lastError.getPosition();
+        String prefix = position != null ? (position.file() + ": ") : "";
+        err.println(prefix + "Too many errors.  Aborting compilation.");        
     }
 
     protected Reader reader(Position pos) throws IOException {
@@ -179,19 +156,11 @@ public class StdErrorQueue implements ErrorQueue
     
     public void flush() {
 	if (! flushed) {
-            if (errorCount > 0) {
-                err.println(errorCount + " error" +
-                            (errorCount > 1 ? "s." : "."));
+            if (errorCount() > 0) {
+                err.println(errorCount() + " error" +
+                            (errorCount() > 1 ? "s." : "."));
             }
-	    flushed = true;
 	}
-    }
-
-    public boolean hasErrors() {
-      return errorCount > 0;
-    }
-
-    public int errorCount() {
-        return errorCount;
+        super.flush();
     }
 }
