@@ -38,6 +38,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         ConformanceCheck7.jl (Semantic, "should be declared abstract");        
         packA/ConformanceCheck8.jl packB/ConformanceCheck8b.jl (Semantic, "should be declared abstract"); 
         packA/ProtectedAccess1.jl packB/ProtectedAccess2.jl (Semantic, "Cannot call inaccessible method");
+        package1/ProtectedTest.jl package2/ProtectedTestBase.jl (Semantic, "Cannot call inaccessible method");
         package1/InnerClassAccess.jl package1/InnerClassProblem.jl ;
         Constants.jl ;  Constants2.jl ; Constants3.jl ; Constants4.jl ;
         Constants5.jl ; Constants6.jl ; Constants7.jl ; Constants8.jl;
@@ -210,7 +211,6 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
 	NoReturn3.jl (Semantic, "Missing return statement");
 	NoReturn4.jl (Semantic, "Missing return statement");
 	NoReturn5.jl (Semantic, "Missing return statement");
-        packA/ProtMethA.jl packB/ProtMethB.jl (Semantic, "No valid method call"); 
 	Unreachable1.jl (Semantic, "Unreachable statement");
 	Unreachable10.jl (Semantic, "Unreachable statement");
 	Unreachable11.jl (Semantic, "Unreachable statement");
