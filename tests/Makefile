@@ -4,6 +4,7 @@ GOOD =  \
 	ArrayInit.jl \
 	Constants.jl \
 	Constants2.jl \
+	Constants3.jl \
 	Ctor.jl \
 	Dep1.jl \
 	Empty.jl \
