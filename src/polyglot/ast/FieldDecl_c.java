@@ -286,19 +286,18 @@ public class FieldDecl_c extends Node_c implements FieldDecl {
                 }
             }
         }
-        
-        
+
         // check that inner classes do not declare static fields, unless they
         // are compile-time constants
         if (flags().isStatic() &&
               fieldInstance().container().toClass().isInnerClass()) {
             // it's a static field in an inner class.
             if (!flags().isFinal() || init == null || !init.isConstant()) {
-                throw new SemanticException("Inner classes cannot declare " + 
+                throw new SemanticException("Inner classes cannot declare " +
                         "static fields, unless they are compile-time " +
-                        "constant fields.", this.position()); 
+                        "constant fields.", this.position());
             }
-            
+
         }
 
         return this;
@@ -315,7 +314,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl {
             if (! t.isUncheckedException()) {
                 ec.throwsSet().clear();
                 throw new SemanticException(
-                    "A field initializer may not throw a " 
+                    "A field initializer may not throw a "
                     + t + ".", position());
             }
         }

@@ -72,5 +72,5 @@ public interface ParsedClassType extends ClassType
     /**
      * Set whether the class was declared in a static context.
      */
-    void isInStaticContext(boolean inStaticContext);
+    void inStaticContext(boolean inStaticContext);
 }

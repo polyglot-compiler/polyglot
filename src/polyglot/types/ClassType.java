@@ -73,7 +73,7 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance
      * Return true if the class declaration occurs in a static context.
      * Is used to determine if a nested class is implicitly static.
      */
-    boolean isInStaticContext();
+    boolean inStaticContext();
     
     /**
      * The class's constructors.

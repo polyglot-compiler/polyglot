@@ -396,7 +396,7 @@ public class Context_c implements Context
      * variable initializer of a static variable, or an explicity constructor 
      * invocation statment. (Java Language Spec, 2nd Edition, 8.1.2)
      */
-    public boolean isStaticContext() {
+    public boolean inStaticContext() {
         return staticContext;
     }
 

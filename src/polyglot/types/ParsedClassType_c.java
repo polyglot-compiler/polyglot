@@ -29,7 +29,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     protected String name;
     protected ClassType outer;
     /** Was the class declared in a static context? */
-    protected boolean isInStaticContext = false;
+    protected boolean inStaticContext = false;
 
     protected ParsedClassType_c() {
 	super();
@@ -48,12 +48,12 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         return kind;
     }
 
-    public void isInStaticContext(boolean inStaticContext) {
-        this.isInStaticContext = inStaticContext;
+    public void inStaticContext(boolean inStaticContext) {
+        this.inStaticContext = inStaticContext;
     }
 
-    public boolean isInStaticContext() {
-        return isInStaticContext;
+    public boolean inStaticContext() {
+        return inStaticContext;
     }
     
         public ClassType outer() {

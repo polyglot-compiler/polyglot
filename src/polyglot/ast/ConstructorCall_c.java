@@ -178,7 +178,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
             Type superType = ct.superType();
             
             if (!superType.isClass() || !superType.toClass().isInnerClass() ||
-                superType.toClass().isInStaticContext()) {
+                superType.toClass().inStaticContext()) {
                 throw new SemanticException("The class \"" + superType + "\"" +
                     " is not an inner class, or was declared in a static " +
                     "context; a qualified constructor invocation cannot " +

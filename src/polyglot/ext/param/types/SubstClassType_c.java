@@ -98,8 +98,8 @@ public class SubstClassType_c extends ClassType_c implements SubstType
     }
 
     /** Get whether the class was declared in a static context */
-    public boolean isInStaticContext() {
-        return base.isInStaticContext();
+    public boolean inStaticContext() {
+        return base.inStaticContext();
     }
 
     /** Get the class's full name, if possible. */

@@ -377,7 +377,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             return true;
         }
         
-        if (!isInnerClass() || isInStaticContext()) {
+        if (!isInnerClass() || inStaticContext()) {
             // this class is not an inner class, or was declared in a static
             // context; it cannot have an enclosing
             // instance of anything. 

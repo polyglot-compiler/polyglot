@@ -235,7 +235,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
             // make sure that the inStaticContext flag of the class is 
             // correct
             Context ctxt = ar.context();
-            this.type().isInStaticContext(ctxt.isStaticContext());
+            this.type().inStaticContext(ctxt.inStaticContext());
         }
 
         if (ar.kind() != AmbiguityRemover.SUPER) {

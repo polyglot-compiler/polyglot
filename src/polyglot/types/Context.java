@@ -101,7 +101,7 @@ public interface Context extends Resolver, Copy
      * variable initializer of a static variable, or an explicity constructor 
      * invocation statment. (Java Language Spec, 2nd Edition, 8.1.2)
      */
-    boolean isStaticContext();
+    boolean inStaticContext();
 
     /** Return the innermost class in scope. */
     ClassType currentClass();

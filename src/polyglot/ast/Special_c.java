@@ -83,6 +83,7 @@ public class Special_c extends Expr_c implements Special
         Context c = tc.context();
 
         ClassType t;
+
         if (qualifier == null) {
             // an unqualified "this" or "super"
             t = c.currentClass();
@@ -104,7 +105,7 @@ public class Special_c extends Expr_c implements Special
             }
 	}
 
-        if (c.isStaticContext() && ts.equals(t, c.currentClass())) {
+        if (c.inStaticContext() && ts.equals(t, c.currentClass())) {
             // trying to access "this" or "super" from a static context.
             throw new SemanticException("Cannot access a non-static " +
                 "field or method, or refer to \"this\" or \"super\" " + 
