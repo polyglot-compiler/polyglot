@@ -1,4 +1,4 @@
-package Lex;
+package jltools.lex;
 
 import java_cup.runtime.Symbol;
 

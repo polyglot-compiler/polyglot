@@ -1,4 +1,4 @@
-package Lex;
+package jltools.lex;
 
 class WhiteSpace extends InputElement {
   char whitespace;

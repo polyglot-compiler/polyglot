@@ -1,4 +1,4 @@
-package Parse;
+package jltools.parse;
 
 /* Lexer.java.  Copyright (C) 1998 C. Scott Ananian.
  * This program is free software; see the file COPYING for more details.

@@ -1,4 +1,4 @@
-package Lex;
+package jltools.lex;
 
 import java.io.Reader;
 import java.io.FilterReader;

@@ -1,4 +1,4 @@
-package Lex;
+package jltools.lex;
 
 abstract class Token extends InputElement {
   abstract java_cup.runtime.Symbol token();

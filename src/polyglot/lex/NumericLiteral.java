@@ -1,4 +1,4 @@
-package Lex;
+package jltools.lex;
 
 abstract class NumericLiteral extends Literal {
   Number val;

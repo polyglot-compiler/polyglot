@@ -1,4 +1,4 @@
-package Lex;
+package jltools.lex;
 
 abstract class Comment extends InputElement {
   private StringBuffer comment = new StringBuffer();
