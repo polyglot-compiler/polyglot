@@ -321,16 +321,9 @@ public class Compiler
     SourceFileNode sfn = (SourceFileNode)ast;
     CodeWriter cw = new CodeWriter( t.getOutputWriter( sfn.getPackageName()), 
                                     outputWidth);
-
-    try
-    {
-      ast.translate( null, cw);
-    }
-    catch( TypeCheckException e)
-    {
-      throw new InternalCompilerError( "Caught TypeCheckError during "
-                                     + "translation phase: " + e.getMessage());
-    }
+    
+    ast.translate( null, cw);
+    
     cw.flush();
     System.out.flush();
   }
@@ -341,7 +334,9 @@ public class Compiler
                                        new PrintWriter( System.out)), 
                                     outputWidth);
     DumpAst d = new DumpAst( cw);
+    
     ast.visit( d);
+    
     cw.flush();
   }
 }

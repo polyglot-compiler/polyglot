@@ -189,7 +189,7 @@ public class VariableDeclarationStatement extends Statement {
       return this;
    }
 
-  public void translate(LocalContext c, CodeWriter w) throws TypeCheckException
+  public void translate(LocalContext c, CodeWriter w)
   {
     w.write( modifiers.getStringRepresentation());
     type.translate(c, w);

@@ -79,7 +79,7 @@ public class IfStatement extends Statement {
   }
 
 
-  public void translate(LocalContext c, CodeWriter w) throws TypeCheckException
+  public void translate(LocalContext c, CodeWriter w)
   {
     boolean bThenBlockStatement, bElseBlockStatement;
     bThenBlockStatement = thenStatement instanceof BlockStatement;

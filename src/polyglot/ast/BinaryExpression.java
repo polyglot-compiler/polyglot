@@ -334,7 +334,6 @@ public class BinaryExpression extends Expression {
   }
   
    public void translate(LocalContext c, CodeWriter w) 
-       throws TypeCheckException
    {
       if(operator != ASSIGN && !(operator >= PLUSASSIGN && 
                                 operator <= RUSHIFTASSIGN)) {
