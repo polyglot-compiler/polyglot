@@ -39,10 +39,10 @@ import java.math.BigInteger;
     public Lexer_c(String s, Position pos, List subst) {
         this(new EscapedUnicodeReader(new StringReader(s)));
         if (pos != null) {
-            this.file = pos + ": quasiquote(" + s + ")";
+            this.file = pos + ": quasiquote(" + s + "," + subst + ")";
         }
         else {
-            this.file = "quasiquote(" + s + ")";
+            this.file = "quasiquote(" + s + "," + subst + ")";
         }
 
         this.subst = new LinkedList(subst);
