@@ -1,41 +1,65 @@
 package polyglot.ext.pao.types;
 
-import polyglot.types.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import polyglot.ext.jl.types.TypeSystem_c;
 import polyglot.frontend.Source;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.types.*;
+import polyglot.util.InternalCompilerError;
 
 /**
- * PAO type system.
+ * Implementation of the PAO type system interface. Also overrides some
+ * methods of <code>TypeSystem_c</code>.
  */
 public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
+
+    /**
+     * Returns a new instance of <code>PaoPrimitiveType_c</code>
+     * @see PaoPrimitiveType_c
+     */
     public PrimitiveType createPrimitive(PrimitiveType.Kind kind) {
         return new PaoPrimitiveType_c(this, kind);
     }
 
+    /**
+     * Returns a new instance of <code>PaoParsedClassType_c</code>
+     * @see PaoParsedClassType_c
+     */
     public ParsedClassType createClassType(LazyClassInitializer init, 
                                            Source fromSource) {
         return new PaoParsedClassType_c(this, init, fromSource);
     }
 
-    private static final String WRAPPER_PACKAGE = "polyglot.ext.pao.runtime";
+    /**
+     * The package that contains the runtime classes for boxing primitive
+     * values as objects.
+     */
+    private static final String RUNTIME_PACKAGE = "polyglot.ext.pao.runtime";
 
+    /**
+     * @see polyglot.ext.pao.types.PaoTypeSystem#primitiveEquals()
+     */
     public MethodInstance primitiveEquals() {
-        String name = WRAPPER_PACKAGE + ".Primitive";
+        // The method instance could be cached for greater efficiency,
+        // but we are not too worried about this.
+        String name = RUNTIME_PACKAGE + ".Primitive";
 
         try {
+            // use the system resolver to find the type named by name.
             Type ct = (Type) systemResolver().find(name);
 
+            // create an argument list: two arguments of type Object.
             List args = new LinkedList();
             args.add(Object());
             args.add(Object());
 
-            for (Iterator i = ct.toClass().methods("equals", args).iterator();
-                 i.hasNext(); ) {
-
-                MethodInstance mi = (MethodInstance) i.next();
-                return mi;
+            // take the first method "equals(Object, Object)" in ct.
+            List l = ct.toClass().methods("equals", args);
+            if (!l.isEmpty()) {
+                return (MethodInstance)l.get(0);
             }
         }
         catch (SemanticException e) {
@@ -46,42 +70,54 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
     }
 
     public MethodInstance getter(PrimitiveType t) {
+        // The method instances could be cached for greater efficiency,
+        // but we are not too worried about this.
+        
         String methodName = t.toString() + "Value";
-        ConstructorInstance ci = wrapper(t);
+        
+        // get the type used to represent boxed values of type t
+        ReferenceType boxedType = boxedType(t);
 
-        for (Iterator i = ci.container().methods().iterator();
-              i.hasNext(); ) {
-            MethodInstance mi = (MethodInstance) i.next();
-            if (mi.name().equals(methodName) && mi.formalTypes().isEmpty()) {
-                return mi;
-            }
+        // take the first method with the appropriate name and an empty 
+        // argument list, in the type boxedType
+        List l = boxedType.methods(methodName, Collections.EMPTY_LIST);
+        if (!l.isEmpty()) {
+            return (MethodInstance)l.get(0);
         }
 
         throw new InternalCompilerError("Could not find getter for " + t);
     }
 
-    public Type boxedType(PrimitiveType t) {
-        return wrapper(t).container();
-    }
+    public ClassType boxedType(PrimitiveType t) {
+        // The class types could be cached for greater efficiency,
+        // but we are not too worried about this.
 
-    public ConstructorInstance wrapper(PrimitiveType t) {
-        String name = WRAPPER_PACKAGE + "." + wrapperTypeString(t).substring("java.lang.".length());
+        String name = RUNTIME_PACKAGE + "."
+                + wrapperTypeString(t).substring("java.lang.".length());
 
         try {
-            ClassType ct = ((Type) systemResolver().find(name)).toClass();
+            return ((Type)systemResolver().find(name)).toClass();
 
-            for (Iterator i = ct.constructors().iterator(); i.hasNext(); ) {
-                ConstructorInstance ci = (ConstructorInstance) i.next();
-                if (ci.formalTypes().size() == 1) {
-                    Type argType = (Type) ci.formalTypes().get(0);
-                    if (equals(argType, t)) {
-                        return ci;
-                    }
-                }
-            }
         }
         catch (SemanticException e) {
             throw new InternalCompilerError(e.getMessage());
+        }
+    }
+
+    public ConstructorInstance wrapper(PrimitiveType t) {
+        // The constructor instances could be cached for greater efficiency,
+        // but we are not too worried about this.
+
+        ClassType ct = boxedType(t);
+        for (Iterator i = ct.constructors().iterator(); i.hasNext(); ) {
+            ConstructorInstance ci = (ConstructorInstance) i.next();
+            if (ci.formalTypes().size() == 1) {
+                Type argType = (Type) ci.formalTypes().get(0);
+                if (equals(argType, t)) {
+                    // found the appropriate constructor
+                    return ci;
+                }
+            }
         }
 
         throw new InternalCompilerError("Could not find constructor for " + t);

@@ -1,24 +1,28 @@
 package polyglot.ext.pao;
 
-import polyglot.ext.pao.parse.Lexer_c;
+import java.io.Reader;
+import java.util.List;
+
+import polyglot.ast.NodeFactory;
+import polyglot.ext.pao.ast.PaoNodeFactory_c;
 import polyglot.ext.pao.parse.Grm;
-import polyglot.ext.pao.ast.*;
-import polyglot.ext.pao.types.*;
-import polyglot.ext.pao.visit.*;
-
-import polyglot.lex.Lexer;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.ext.pao.parse.Lexer_c;
+import polyglot.ext.pao.types.PaoTypeSystem_c;
+import polyglot.ext.pao.visit.PaoBoxer;
 import polyglot.frontend.*;
-import polyglot.main.*;
-
-import java.util.*;
-import java.io.*;
+import polyglot.lex.Lexer;
+import polyglot.types.TypeSystem;
+import polyglot.util.ErrorQueue;
 
 /**
- * Extension information for PAO extension.
+ * Extension information for the PAO extension. This class specifies the
+ * appropriate parser, <code>NodeFactory</code> and <code>TypeSystem</code>
+ * to use, as well as inserting a new pass: <code>PaoBoxer</code>.
+ * 
+ * @see polyglot.ext.pao.visit.PaoBoxer
+ * @see polyglot.ext.pao.ast.PaoNodeFactory_c 
+ * @see polyglot.ext.pao.types.PaoTypeSystem 
+ * @see polyglot.ext.pao.types.PaoTypeSystem_c 
  */
 public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
     public String defaultFileExtension() {
@@ -52,5 +56,8 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
         return passes;
     }
 
-    static { Topics t = new Topics(); }
+    static {
+        // Make sure the class Topics is loaded.
+        new Topics(); 
+    }
 }

@@ -4,7 +4,9 @@ package polyglot.ext.pao.parse;
 
 import polyglot.ext.pao.types.PaoTypeSystem;
 import polyglot.ext.jl.parse.Name;
-
+/**
+ * Parser for the PAO extension.
+ */
 parser Grm extends polyglot.ext.jl.parse.Grm {:
 	public final PaoTypeSystem ts;
 	public final NodeFactory nf;

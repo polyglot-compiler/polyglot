@@ -1,35 +1,47 @@
 package polyglot.ext.pao.types;
 
-import polyglot.ext.jl.types.*;
-import polyglot.types.*;
-import java.util.*;
+import polyglot.ext.jl.types.PrimitiveType_c;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 
 /**
- * A PAO primitive type.  A primitive is now considered a subtype of Object.
+ * A PAO primitive type.  In the PAO extension, primitives are considered a 
+ * subtype of <code>Object</code>.
  */
 public class PaoPrimitiveType_c extends PrimitiveType_c
 {
-    /** Used for deserializing types. */
-    protected PaoPrimitiveType_c() { }
+    protected PaoPrimitiveType_c() { 
+        super();
+    }
 
     public PaoPrimitiveType_c(TypeSystem ts, Kind kind) {
         super(ts, kind);
     }
 
     /**
-     * Return true if this type strictly descends from <code>ancestor</code>.
+     * Returns <code>true</code> if <code>ancestor</code> is the 
+     * <code>Object</code> type, as primitives are considered a
+     * subtype of <code>Object</code>.
      */
     public boolean descendsFromImpl(Type ancestor) {
         return ts.equals(ancestor, ts.Object());
     }
 
-    /** Return true if this type can be assigned to <code>toType</code>. */
+    /**
+     * Returns <code>true</code> if the normal rules for implicit casts
+     * hold, or if casting a primitive to <code>Object</code>, as primitives
+     * are considered a subtype of <code>Object</code>. 
+     */
     public boolean isImplicitCastValidImpl(Type toType) {
         return ts.equals(toType, ts.Object()) ||
                super.isImplicitCastValidImpl(toType);
     }
 
-    /** Returns true iff a cast from this to <code>toType</code> is valid. */
+    /**
+     * Returns <code>true</code> if the normal rules for casts
+     * hold, or if casting a primitive to <code>Object</code>, as primitives
+     * are considered a subtype of <code>Object</code>. 
+     */
     public boolean isCastValidImpl(Type toType) {
         return ts.equals(toType, ts.Object()) || super.isCastValidImpl(toType);
     }
