@@ -117,7 +117,7 @@ public class LoadedClassResolver extends ClassResolver
                    e.getMessage());
 
       throw new NoClassException("Class " + name +
-                                " could not be loaded because " +
+                                " could not be loaded; " +
                                 e.getMessage() + ".");
     }
     catch (Throwable e) {
@@ -157,7 +157,7 @@ public class LoadedClassResolver extends ClassResolver
 
       if (source == null) {
         throw new NoClassException("Class " + name +
-                                  " could not be loaded because " +
+                                  " could not be loaded; " +
                                   e.getMessage() + ".");
       }
     }
@@ -287,15 +287,14 @@ public class LoadedClassResolver extends ClassResolver
 				clazz.getName() + ".");
       return ts.forClass(clazz);
     }
-    catch( Exception e) {
-      throw new SemanticException(e.getMessage());
-      /*
-      				"There was an error while reading type "
-                                  + "information from the class file for \""
-                                  + clazz.getName() + "\". Delete the class "
-                                  + "file and recompile, or obtain a newer "
-                                  + "version of the file.");
-				  */
+    catch (RuntimeException e) {
+      throw e;
+    }
+    catch (Exception e) {
+      throw new SemanticException("Could not get type information for " +
+                                  "class \"" + clazz.getName() + "\"; " +
+                                  e.getClass().getName() + ": " +
+                                  e.getMessage());
     }
   }
 
