@@ -133,7 +133,7 @@ public class Case_c extends Stmt_c implements Case
             if (o instanceof Number && ! (o instanceof Long) &&
                 ! (o instanceof Float) && ! (o instanceof Double)) {
 
-                return ((Number) o).longValue();
+                return value(((Number) o).longValue());
             }
 
 	    throw new SemanticException("Case label must be a constant.",
