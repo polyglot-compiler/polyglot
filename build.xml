@@ -1,4 +1,4 @@
-<project name="polyglot" default="compile" basedir=".">
+<project name="polyglot" default="all" basedir=".">
   <description>
     Polyglot build file
   </description>
@@ -10,6 +10,7 @@
 
   <!-- directory for class file targets -->
   <property name="classes" location="${basedir}/classes"/>
+  <property name="cup-classes" location="cup-classes"/>
 
   <!-- directory for jar files -->
   <property name="lib" location="${basedir}/lib"/>
@@ -121,6 +122,9 @@ ext=""
   </target>
 
   <!-- compile the base compiler -->
+  <target name="all" depends="compile,bin" description="compile the source"/>
+
+  <!-- compile the base compiler -->
   <target name="compile" depends="base,jl" description="compile the source"/>
 
   <!-- generate the Polyglot distribution -->
@@ -146,12 +150,18 @@ ext=""
 	<include name="**/*_ppg.cup"/>
 	<include name="${src}/ppg/parse/Constant.java"/>
 	<include name="${src}/ppg/parse/Grm.java"/>
-      </fileset>      
+      </fileset>
+    </delete>
+    <delete>
+      <fileset dir="${bin}">
+        <include name="jlc"/>
+        <include name="defs"/>
+      </fileset>
     </delete>
   </target>
 
   <!-- compile the base compiler excluding the jl extension -->
-  <target name="compile-base" depends="init,bin,ppg" 
+  <target name="compile-base" depends="init,ppg" 
           description="compile the source">
     <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/**"
@@ -159,8 +169,6 @@ ext=""
       <classpath refid="standard.classpath"/>
     </javac>
   </target>
-
-  <property name="cup-classes" location="cup-classes"/>
 
   <target name="cup" depends="init" 
           description="compile the extended CUP parser generator">
@@ -605,7 +613,6 @@ ext=""
     <copy file="doc/ppg.html" todir="${dist}/doc"/>
     <copy file="${lib}/java_cup.jar" todir="${dist}/lib"/>
     <copy file="build.xml" todir="${dist}"/>
-    <copy file="configure.xml" todir="${dist}"/>
     <copy file="README" todir="${dist}"/>
     <copy file="LICENSE" todir="${dist}"/>
   </target>
