@@ -28,7 +28,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	// Add method public Object clone()
 	methods.add(ts.methodInstance(position(),
 				      this,
-	                              Flags.PUBLIC,
+	                              ts.Public(),
 				      ts.Object(),
 	                              "clone",
 				      Collections.EMPTY_LIST,
@@ -37,14 +37,14 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	// Add field public final int length
 	fields.add(ts.fieldInstance(position(),
 	                            this,
-				    Flags.PUBLIC.set(Flags.FINAL),
+				    ts.Public().Final(),
 				    ts.Int(),
 				    "length"));
 
 	// Add field public static final Class class
 	fields.add(ts.fieldInstance(position(),
 	                            this,
-				    Flags.PUBLIC.set(Flags.STATIC).set(Flags.FINAL),
+				    ts.Public().Static().Final(),
 				    ts.Class(),
 				    "class"));
 

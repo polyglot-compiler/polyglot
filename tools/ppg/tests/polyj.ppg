@@ -315,7 +315,7 @@ extend interface_declaration ::= 			// PolyJClassDecl
 	parameters:p where_opt:w
 	extends_interfaces_opt:c interface_body:d {:
 		RESULT = parser.nf.PolyJClassDecl(parser.util.pos(n),
-							a.setInterface(),
+							a.Interface(),
 							b.getIdentifier(), p, w, null, c, d);
 	:};
 			

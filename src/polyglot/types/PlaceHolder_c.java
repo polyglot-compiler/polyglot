@@ -10,7 +10,6 @@ import java.io.*;
  */
 public class PlaceHolder_c implements PlaceHolder
 {
-    boolean primitive;
     String name;
     Type outer;
 
@@ -19,16 +18,10 @@ public class PlaceHolder_c implements PlaceHolder
     
     /** Creates a place holder type for the type. */
     public PlaceHolder_c(Type t) {
-	if (t.isPrimitive()) {
-	    name = t.toPrimitive().kind().toString();
-	    primitive = true;
-	}
-	else if (t.isClass() && t.toClass().isTopLevel()) {
-	    primitive = false;
+	if (t.isClass() && t.toClass().isTopLevel()) {
 	    name = t.toClass().toTopLevel().fullName();
 	}
 	else if (t.isClass() && t.toClass().isMember()) {
-	    primitive = false;
 	    name = t.toClass().toMember().name();
 	    outer = t.toClass().toMember().container();
 	}
@@ -40,10 +33,7 @@ public class PlaceHolder_c implements PlaceHolder
     /** Restore the placeholder into a proper type. */ 
     public TypeObject resolve(TypeSystem ts) {
         try {
-            if (primitive) {
-                return ts.primitiveForName(name);
-            }
-            else if (outer == null) {
+            if (outer == null) {
                 return ts.systemResolver().findType(name);
             }
             else {

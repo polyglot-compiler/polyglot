@@ -119,17 +119,17 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         ParsedClassType ct = tb.currentClass();
 
         if (ct.isMember() && ct.toMember().outer().flags().isInterface()) {
-            ct.flags(ct.flags().setStatic());
+            ct.flags(ct.flags().Static());
         }
 
         // Member interfaces are implicitly static. 
         if (ct.isMember() && ct.flags().isInterface()) {
-            ct.flags(ct.flags().setStatic());
+            ct.flags(ct.flags().Static());
         }
 
         // Interfaces are implicitly abstract. 
         if (ct.flags().isInterface()) {
-            ct.flags(ct.flags().setAbstract());
+            ct.flags(ct.flags().Abstract());
         }
 
         return tb;

@@ -809,7 +809,7 @@ interface_declaration ::=
         modifiers_opt:a INTERFACE:n IDENTIFIER:b
                 extends_interfaces_opt:c interface_body:d
             {: RESULT = parser.nf.ClassDecl(
-                    parser.util.pos(n), a.setInterface(),
+                    parser.util.pos(n), a.Interface(),
                         b.getIdentifier(), null, c, d); :}
     ;
 extends_interfaces_opt ::=

@@ -1,136 +1,153 @@
 package polyglot.types;
 
 import polyglot.util.InternalCompilerError;
-import polyglot.util.Copy;
+import polyglot.util.Enum;
 
-import java.lang.reflect.Modifier;
 import java.io.Serializable;
+import java.util.*;
 
 /**
  * <code>Flags</code> is an immutable set of class, method, or field modifiers.
- * We represent package scope as the abscence of private, public and protected
+ * We represent package scope as the absence of private, public and protected
  * scope modifiers.
  */
-public class Flags implements Copy, Serializable
+public class Flags implements Serializable
 {
+    protected static ArrayList all_flags = new ArrayList();
+
+    protected static class Flag extends Enum {
+        protected Flag(String name) {
+            super(name);
+        }
+    }
+
     public static final Flags NONE         = new Flags();
+    public static final Flags PUBLIC       = createFlag("public");
+    public static final Flags PRIVATE      = createFlag("private");
+    public static final Flags PROTECTED    = createFlag("protected");
+    public static final Flags STATIC       = createFlag("static");
+    public static final Flags FINAL        = createFlag("final");
+    public static final Flags SYNCHRONIZED = createFlag("synchronized");
+    public static final Flags TRANSIENT    = createFlag("transient");
+    public static final Flags NATIVE       = createFlag("native");
+    public static final Flags INTERFACE    = createFlag("interface");
+    public static final Flags ABSTRACT     = createFlag("abstract");
+    public static final Flags VOLATILE     = createFlag("volatile");
+    public static final Flags STRICTFP     = createFlag("strictfp");
 
-    public static final Flags PUBLIC       = new Flags(Modifier.PUBLIC);
-    public static final Flags PROTECTED    = new Flags(Modifier.PROTECTED);
-    public static final Flags PRIVATE      = new Flags(Modifier.PRIVATE);
-    public static final Flags STATIC       = new Flags(Modifier.STATIC);
-    public static final Flags FINAL        = new Flags(Modifier.FINAL);
-    public static final Flags SYNCHRONIZED = new Flags(Modifier.SYNCHRONIZED);
-    public static final Flags TRANSIENT    = new Flags(Modifier.TRANSIENT);
-    public static final Flags NATIVE       = new Flags(Modifier.NATIVE);
-    public static final Flags INTERFACE    = new Flags(Modifier.INTERFACE);
-    public static final Flags ABSTRACT     = new Flags(Modifier.ABSTRACT);
-    public static final Flags VOLATILE     = new Flags(Modifier.VOLATILE);
-    public static final Flags STRICTFP     = new Flags(Modifier.STRICT);
+    /** All access flags. */
+    protected static final Flags ACCESS_FLAGS = PUBLIC.Private().Protected();
 
-    protected int bits;
+    protected Set flags;
+
+    /**
+     * Return a new Flags object with a new name.  Should only be called once
+     * per name.
+     */
+    public static Flags createFlag(String name) {
+        Flag f = new Flag(name);
+        all_flags.add(f);
+        return new Flags(f);
+    }
+
+    public static Flags createFlag(String name, Flags after) {
+        Flag f = new Flag(name);
+
+        // Insert in "all_flags" just after the last flag in "after".
+        for (int i = all_flags.size()-1; i >= 0; i--) {
+            Object o = all_flags.get(i);
+
+            if (after.flags.contains(o)) {
+                all_flags.add(i+1, f);
+                return new Flags(f);
+            }
+        }
+
+        all_flags.add(0, f);
+
+        return new Flags(f);
+    }
 
     /**
      * Effects: returns a new accessflags object with no accessflags set.
      */
     public Flags() {
-	this(0);
+        flags = new HashSet();
     }
 
     /**
-     * Given the JVM encoding of a set of flags, returns the Flags object
+     * Given the name  encoding of a set of flags, returns the Flags object
      * for that encoding.
      */
-    public Flags(int bits) {
-	this.bits = bits;
+    public Flags(Flag flag) {
+        flags = new HashSet();
+        flags.add(flag);
     }
 
     /**
-     * Returns a copy of this.
+     * Given the name  encoding of a set of flags, returns the Flags object
+     * for that encoding.
      */
-    public Object copy() {
-        return copyFlags();
-    }
-
-    /**
-     * Returns a copy of this.
-     */
-    private Flags copyFlags() {
-        try {
-	    return (Flags) clone();
-	}
-	catch (CloneNotSupportedException e) {
-	    throw new InternalCompilerError("clone() not supported");
-	}
+    private Flags(Set flags) {
+        flags = new HashSet(flags);
     }
 
     /**
      * Create new flags with the flags in <code>other</code> also set.
      */
     public Flags set(Flags other) {
-	return copyFlags().set_bits(other);
+        Flags f = new Flags();
+        f.flags.addAll(flags);
+        f.flags.addAll(other.flags);
+        return f;
     }
 
     /**
      * Create new flags with the flags in <code>other</code> cleared.
      */
     public Flags clear(Flags other) {
-	return copyFlags().clear_bits(other);
+        Flags f = new Flags();
+        f.flags.addAll(flags);
+        f.flags.removeAll(other.flags);
+        return f;
     }
 
     /**
      * Create new flags with only flags in <code>other</code> set.
      */
     public Flags retain(Flags other) {
-        Flags a = copyFlags();
-	a.bits &= other.bits;
-	return a;
-    }
-
-    /**
-     * Return an empty set of flags.
-     */
-    public Flags clear() {
-        return new Flags();
+        Flags f = new Flags();
+        f.flags.addAll(flags);
+        f.flags.retainAll(other.flags);
+        return f;
     }
 
     /**
      * Check if <i>any</i> flags in <code>other</code> are set.
      */
-    private boolean is_set(Flags other) {
-	return (bits & other.bits) != 0;
+    public boolean intersects(Flags other) {
+        for (Iterator i = other.flags.iterator(); i.hasNext(); ) {
+            Flag f = (Flag) i.next();
+            if (flags.contains(f))
+                return true;
+        }
+
+        return false;
     }
 
     /**
      * Check if <i>all</i> flags in <code>other</code> are set.
      */
     public boolean contains(Flags other) {
-	return (bits & other.bits) == other.bits
-	    && (bits | other.bits) == bits;
-    }
-
-    /**
-     * Destructively set the flags from <code>other</code>.
-     */
-    private Flags set_bits(Flags other) {
-	bits |= other.bits;
-	return this;
-    }
-
-    /**
-     * Destructively clear the flags in <code>other</code>.
-     */
-    private Flags clear_bits(Flags other) {
-	bits &= ~other.bits;
-	return this;
+        return flags.containsAll(other.flags);
     }
 
     /**
      * Return a copy of this <code>this</code> with the <code>public</code>
      * flag set.
      */
-    public Flags setPublic() {
-	return copyFlags().set_bits(PUBLIC);
+    public Flags Public() {
+	return set(PUBLIC);
     }
 
     /**
@@ -138,22 +155,22 @@ public class Flags implements Copy, Serializable
      * flag clear.
      */
     public Flags clearPublic() {
-	return copyFlags().clear_bits(PUBLIC);
+	return clear(PUBLIC);
     }
 
     /**
      * Return true if <code>this</code> has the <code>public</code> flag set.
      */
     public boolean isPublic() {
-	return is_set(PUBLIC);
+	return contains(PUBLIC);
     }
 
     /**
      * Return a copy of this <code>this</code> with the <code>private</code>
      * flag set.
      */
-    public Flags setPrivate() {
-	return copyFlags().set_bits(PRIVATE);
+    public Flags Private() {
+	return set(PRIVATE);
     }
 
     /**
@@ -161,22 +178,22 @@ public class Flags implements Copy, Serializable
      * flag clear.
      */
     public Flags clearPrivate() {
-	return copyFlags().clear_bits(PRIVATE);
+	return clear(PRIVATE);
     }
 
     /**
      * Return true if <code>this</code> has the <code>private</code> flag set.
      */
     public boolean isPrivate() {
-	return is_set(PRIVATE);
+	return contains(PRIVATE);
     }
 
     /**
      * Return a copy of this <code>this</code> with the <code>protected</code>
      * flag set.
      */
-    public Flags setProtected() {
-	return copyFlags().set_bits(PROTECTED);
+    public Flags Protected() {
+	return set(PROTECTED);
     }
 
     /**
@@ -184,22 +201,22 @@ public class Flags implements Copy, Serializable
      * flag clear.
      */
     public Flags clearProtected() {
-	return copyFlags().clear_bits(PROTECTED);
+	return clear(PROTECTED);
     }
 
     /**
      * Return true if <code>this</code> has the <code>protected</code> flag set.
      */
     public boolean isProtected() {
-	return is_set(PROTECTED);
+	return contains(PROTECTED);
     }
 
     /**
      * Return a copy of this <code>this</code> with no access flags
      * (<code>public</code>, <code>private</code>, <code>protected</code>) set.
      */
-    public Flags setPackage() {
-	return clear(PUBLIC).clear(PROTECTED).clear(PRIVATE);
+    public Flags Package() {
+        return clear(ACCESS_FLAGS);
     }
 
     /**
@@ -207,15 +224,15 @@ public class Flags implements Copy, Serializable
      * (<code>public</code>, <code>private</code>, <code>protected</code>) set.
      */
     public boolean isPackage() {
-	return ! is_set(PUBLIC) && ! is_set(PROTECTED) && ! is_set(PRIVATE);
+        return ! intersects(ACCESS_FLAGS);
     }
 
     /**
      * Return a copy of this <code>this</code> with the <code>static</code>
      * flag set.
      */
-    public Flags setStatic() {
-	return copyFlags().set_bits(STATIC);
+    public Flags Static() {
+	return set(STATIC);
     }
 
     /**
@@ -223,22 +240,22 @@ public class Flags implements Copy, Serializable
      * flag clear.
      */
     public Flags clearStatic() {
-	return copyFlags().clear_bits(STATIC);
+	return clear(STATIC);
     }
 
     /**
      * Return true if <code>this</code> has the <code>static</code> flag set.
      */
     public boolean isStatic() {
-	return is_set(STATIC);
+	return contains(STATIC);
     }
 
     /**
      * Return a copy of this <code>this</code> with the <code>final</code>
      * flag set.
      */
-    public Flags setFinal() {
-	return copyFlags().set_bits(FINAL);
+    public Flags Final() {
+	return set(FINAL);
     }
 
     /**
@@ -246,22 +263,22 @@ public class Flags implements Copy, Serializable
      * flag clear.
      */
     public Flags clearFinal() {
-	return copyFlags().clear_bits(FINAL);
+	return clear(FINAL);
     }
 
     /**
      * Return true if <code>this</code> has the <code>final</code> flag set.
      */
     public boolean isFinal() {
-	return is_set(FINAL);
+	return contains(FINAL);
     }
 
     /**
      * Return a copy of this <code>this</code> with the
      * <code>synchronized</code> flag set.
      */
-    public Flags setSynchronized() {
-	return copyFlags().set_bits(SYNCHRONIZED);
+    public Flags Synchronized() {
+	return set(SYNCHRONIZED);
     }
 
     /**
@@ -269,7 +286,7 @@ public class Flags implements Copy, Serializable
      * <code>synchronized</code> flag clear.
      */
     public Flags clearSynchronized() {
-	return copyFlags().clear_bits(SYNCHRONIZED);
+	return clear(SYNCHRONIZED);
     }
 
     /**
@@ -277,15 +294,15 @@ public class Flags implements Copy, Serializable
      * set.
      */
     public boolean isSynchronized() {
-	return is_set(SYNCHRONIZED);
+	return contains(SYNCHRONIZED);
     }
 
     /**
      * Return a copy of this <code>this</code> with the <code>transient</code>
      * flag set.
      */
-    public Flags setTransient() {
-	return copyFlags().set_bits(TRANSIENT);
+    public Flags Transient() {
+	return set(TRANSIENT);
     }
 
     /**
@@ -293,22 +310,22 @@ public class Flags implements Copy, Serializable
      * flag clear.
      */
     public Flags clearTransient() {
-	return copyFlags().clear_bits(TRANSIENT);
+	return clear(TRANSIENT);
     }
 
     /**
      * Return true if <code>this</code> has the <code>transient</code> flag set.
      */
     public boolean isTransient() {
-	return is_set(TRANSIENT);
+	return contains(TRANSIENT);
     }
 
     /**
      * Return a copy of this <code>this</code> with the <code>native</code>
      * flag set.
      */
-    public Flags setNative() {
-	return copyFlags().set_bits(NATIVE);
+    public Flags Native() {
+	return set(NATIVE);
     }
 
     /**
@@ -316,22 +333,22 @@ public class Flags implements Copy, Serializable
      * flag clear.
      */
     public Flags clearNative() {
-	return copyFlags().clear_bits(NATIVE);
+	return clear(NATIVE);
     }
 
     /**
      * Return true if <code>this</code> has the <code>native</code> flag set.
      */
     public boolean isNative() {
-	return is_set(NATIVE);
+	return contains(NATIVE);
     }
 
     /**
      * Return a copy of this <code>this</code> with the <code>interface</code>
      * flag set.
      */
-    public Flags setInterface() {
-	return copyFlags().set_bits(INTERFACE);
+    public Flags Interface() {
+	return set(INTERFACE);
     }
 
     /**
@@ -339,22 +356,22 @@ public class Flags implements Copy, Serializable
      * flag clear.
      */
     public Flags clearInterface() {
-	return copyFlags().clear_bits(INTERFACE);
+	return clear(INTERFACE);
     }
 
     /**
      * Return true if <code>this</code> has the <code>interface</code> flag set.
      */
     public boolean isInterface() {
-	return is_set(INTERFACE);
+	return contains(INTERFACE);
     }
 
     /**
      * Return a copy of this <code>this</code> with the <code>abstract</code>
      * flag set.
      */
-    public Flags setAbstract() {
-	return copyFlags().set_bits(ABSTRACT);
+    public Flags Abstract() {
+	return set(ABSTRACT);
     }
 
     /**
@@ -362,22 +379,22 @@ public class Flags implements Copy, Serializable
      * flag clear.
      */
     public Flags clearAbstract() {
-	return copyFlags().clear_bits(ABSTRACT);
+	return clear(ABSTRACT);
     }
 
     /**
      * Return true if <code>this</code> has the <code>abstract</code> flag set.
      */
     public boolean isAbstract() {
-	return is_set(ABSTRACT);
+	return contains(ABSTRACT);
     }
 
     /**
      * Return a copy of this <code>this</code> with the <code>volatile</code>
      * flag set.
      */
-    public Flags setVolatile() {
-	return copyFlags().set_bits(VOLATILE);
+    public Flags Volatile() {
+	return set(VOLATILE);
     }
 
     /**
@@ -385,22 +402,22 @@ public class Flags implements Copy, Serializable
      * flag clear.
      */
     public Flags clearVolatile() {
-	return copyFlags().clear_bits(VOLATILE);
+	return clear(VOLATILE);
     }
 
     /**
      * Return true if <code>this</code> has the <code>volatile</code> flag set.
      */
     public boolean isVolatile() {
-	return is_set(VOLATILE);
+	return contains(VOLATILE);
     }
 
     /**
      * Return a copy of this <code>this</code> with the <code>strictfp</code>
      * flag set.
      */
-    public Flags setStrictFP() {
-	return copyFlags().set_bits(STRICTFP);
+    public Flags StrictFP() {
+	return set(STRICTFP);
     }
 
     /**
@@ -408,14 +425,14 @@ public class Flags implements Copy, Serializable
      * flag clear.
      */
     public Flags clearStrictFP() {
-	return copyFlags().clear_bits(STRICTFP);
+	return clear(STRICTFP);
     }
 
     /**
      * Return true if <code>this</code> has the <code>strictfp</code> flag set.
      */
     public boolean isStrictFP() {
-	return is_set(STRICTFP);
+	return contains(STRICTFP);
     }
 
     /**
@@ -440,18 +457,17 @@ public class Flags implements Copy, Serializable
 
     public String toString() {
         String s = "";
-        if (isPublic())       s += (s.equals("") ? "" : " ") + "public";
-        if (isPrivate())      s += (s.equals("") ? "" : " ") + "private";
-        if (isProtected())    s += (s.equals("") ? "" : " ") + "protected";
-        if (isStatic())       s += (s.equals("") ? "" : " ") + "static";
-        if (isFinal())        s += (s.equals("") ? "" : " ") + "final";
-        if (isSynchronized()) s += (s.equals("") ? "" : " ") + "synchronized";
-        if (isTransient())    s += (s.equals("") ? "" : " ") + "transient";
-        if (isNative())       s += (s.equals("") ? "" : " ") + "native";
-        if (isInterface())    s += (s.equals("") ? "" : " ") + "interface";
-        if (isAbstract())     s += (s.equals("") ? "" : " ") + "abstract";
-        if (isVolatile())     s += (s.equals("") ? "" : " ") + "volatile";
-        if (isStrictFP())     s += (s.equals("") ? "" : " ") + "strictfp";
+
+        List l = new LinkedList(all_flags);
+        l.retainAll(flags);
+
+        for (Iterator i = l.iterator(); i.hasNext(); ) {
+            Flag f = (Flag) i.next();
+            s += f.toString();
+            if (i.hasNext())
+                s += " ";
+        }
+
         return s;
     }
 
@@ -469,10 +485,10 @@ public class Flags implements Copy, Serializable
     }
 
     public int hashCode() {
-	return bits * 37;
+        return flags.hashCode();
     }
 
     public boolean equals(Object o) {
-	return o instanceof Flags && bits == ((Flags) o).bits;
+	return o instanceof Flags && flags.equals(((Flags) o).flags);
     }
 }

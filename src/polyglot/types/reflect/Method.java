@@ -92,7 +92,7 @@ class Method
     }
 
     return ts.methodInstance(ct.position(), ct,
-                             new Flags(modifiers), returnType, name,
+                             ts.flagsForBits(modifiers), returnType, name,
                              argTypes, excTypes);
   }
 

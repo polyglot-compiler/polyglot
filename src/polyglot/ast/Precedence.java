@@ -38,7 +38,7 @@ public class Precedence extends Enum {
     /** The precedence of a <code>*</code>, <code>/</code>, or <code>%</code> expression. */
     public static final Precedence MUL         = new Precedence("*", 2);
     /** The precedence of a <code>+</code> when applied to Strings.  This is of higher precedence than <code>+</code> applied to numbers. */
-    public static final Precedence STRING_ADD  = new Precedence("+", 3);
+    public static final Precedence STRING_ADD  = new Precedence("string+", 3);
     /** The precedence of a <code>+</code> when applied to numbers, and the precedence of <code>-</code>. */
     public static final Precedence ADD         = new Precedence("+", 4);
     /** The precedence of the shift expressions <code>&lt;&lt;</code>, <code>&gt;&gt;</code>, and <code>&gt;&gt;&gt;</code>. */

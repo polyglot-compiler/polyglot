@@ -38,7 +38,7 @@ class Field {
     String type = (String) clazz.constants[this.type].value();
 
     FieldInstance fi = ts.fieldInstance(ct.position(), ct,
-                                        new Flags(modifiers),
+                                        ts.flagsForBits(modifiers),
                                         clazz.typeForString(ts, type), name);
 
     Constant c = constantValue();

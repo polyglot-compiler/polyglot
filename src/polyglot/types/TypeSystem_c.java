@@ -7,6 +7,7 @@ import polyglot.types.reflect.ClassFile;
 import polyglot.frontend.Compiler;
 import polyglot.frontend.Source;
 import polyglot.main.Report;
+import java.lang.reflect.Modifier;
 
 import java.util.*;
 
@@ -18,9 +19,10 @@ import java.util.*;
  **/
 public class TypeSystem_c implements TypeSystem
 {
-    Resolver systemResolver;
-    TableResolver parsedResolver;
-    LoadedClassResolver loadedResolver;
+    protected Resolver systemResolver;
+    protected TableResolver parsedResolver;
+    protected LoadedClassResolver loadedResolver;
+    protected Map flagsForName;
 
     public TypeSystem_c() {}
 
@@ -52,6 +54,8 @@ public class TypeSystem_c implements TypeSystem
         // import table and then in the system resolver.  The system resolver
         // first tries to find the class in parsed class resolver.
         this.systemResolver = new CachingResolver(compoundResolver);
+
+        initFlags();
 
         initTypes();
     }
@@ -185,7 +189,7 @@ public class TypeSystem_c implements TypeSystem
                                                   ClassType container) {
         assert_(container);
         return constructorInstance(pos, container,
-                                   Flags.PUBLIC, Collections.EMPTY_LIST,
+                                   Public(), Collections.EMPTY_LIST,
                                    Collections.EMPTY_LIST);
     }
 
@@ -1012,12 +1016,6 @@ public class TypeSystem_c implements TypeSystem
 	    throw new InternalCompilerError("Cannot serialize " + o + ".");
 	}
 
-	// Need place-holders for primitives since Enums don't serialize
-	// correctly.  Bother.
-	if (o instanceof PrimitiveType) {
-	    return new PlaceHolder_c((Type) o);
-	}
-
 	if (o instanceof TopLevelClassType || o instanceof MemberClassType) {
 	    return new PlaceHolder_c((Type) o);
 	}
@@ -1273,50 +1271,38 @@ public class TypeSystem_c implements TypeSystem
     }
 
     /** All possible <i>access</i> flags. */
-    protected static final Flags ACCESS_FLAGS = Flags.PUBLIC
-					   .set(Flags.PROTECTED)
-					   .set(Flags.PRIVATE);
+    protected final Flags ACCESS_FLAGS = Public().Protected().Private();
 
     /** All flags allowed for a local variable. */
-    protected static final Flags LOCAL_FLAGS = Flags.FINAL;
+    protected final Flags LOCAL_FLAGS = Final();
 
     /** All flags allowed for a field. */
-    protected static final Flags FIELD_FLAGS = ACCESS_FLAGS
-	                                  .set(Flags.STATIC)
-					  .set(Flags.FINAL)
-					  .set(Flags.TRANSIENT)
-					  .set(Flags.VOLATILE);
+    protected final Flags FIELD_FLAGS = ACCESS_FLAGS.Static().Final()
+                                        .Transient().Volatile();
 
     /** All flags allowed for a constructor. */
-    protected static final Flags CONSTRUCTOR_FLAGS = ACCESS_FLAGS
-    						.set(Flags.NATIVE); // FIXME ??
+    protected final Flags CONSTRUCTOR_FLAGS = ACCESS_FLAGS
+                                              .Synchronized().Native();
 
     /** All flags allowed for an initializer block. */
-    protected static final Flags INITIALIZER_FLAGS = Flags.STATIC;
+    protected final Flags INITIALIZER_FLAGS = Static();
 
     /** All flags allowed for a method. */
-    protected static final Flags METHOD_FLAGS = ACCESS_FLAGS
-				           .set(Flags.ABSTRACT)
-					   .set(Flags.STATIC)
-					   .set(Flags.FINAL)
-					   .set(Flags.SYNCHRONIZED)
-					   .set(Flags.NATIVE)
-					   .set(Flags.STRICTFP);
+    protected final Flags METHOD_FLAGS = ACCESS_FLAGS.Abstract().Static()
+                                         .Final().Native()
+                                         .Synchronized().StrictFP();
 
     /** All flags allowed for a top-level class. */
-    protected static final Flags TOP_LEVEL_CLASS_FLAGS = ACCESS_FLAGS
-						    .set(Flags.ABSTRACT)
-						    .set(Flags.FINAL)
-						    .set(Flags.STRICTFP)
-						    .set(Flags.INTERFACE);
+    protected final Flags TOP_LEVEL_CLASS_FLAGS = ACCESS_FLAGS
+                                                  .Abstract().Final()
+                                                  .StrictFP().Interface();
 
     /** All flags allowed for a member class. */
-    protected static final Flags MEMBER_CLASS_FLAGS = TOP_LEVEL_CLASS_FLAGS
-						 .set(Flags.STATIC);
+    protected final Flags MEMBER_CLASS_FLAGS = TOP_LEVEL_CLASS_FLAGS.Static();
 
     /** All flags allowed for a local class. */
-    protected static final Flags LOCAL_CLASS_FLAGS = TOP_LEVEL_CLASS_FLAGS
-					      .clear(ACCESS_FLAGS);
+    protected final Flags LOCAL_CLASS_FLAGS = TOP_LEVEL_CLASS_FLAGS
+                                              .clear(ACCESS_FLAGS);
 
     public void checkMethodFlags(Flags f) throws SemanticException {
       	if (! f.clear(METHOD_FLAGS).equals(Flags.NONE)) {
@@ -1438,6 +1424,69 @@ public class TypeSystem_c implements TypeSystem
     public Type staticTarget(Type t) {
         // Nothing needs done in standard Java.
         return t;
+    }
+
+    protected void initFlags() {
+        flagsForName = new HashMap();
+        flagsForName.put("public", Flags.PUBLIC);
+        flagsForName.put("private", Flags.PRIVATE);
+        flagsForName.put("protected", Flags.PROTECTED);
+        flagsForName.put("static", Flags.STATIC);
+        flagsForName.put("final", Flags.FINAL);
+        flagsForName.put("synchronized", Flags.SYNCHRONIZED);
+        flagsForName.put("transient", Flags.TRANSIENT);
+        flagsForName.put("native", Flags.NATIVE);
+        flagsForName.put("interface", Flags.INTERFACE);
+        flagsForName.put("abstract", Flags.ABSTRACT);
+        flagsForName.put("volatile", Flags.VOLATILE);
+        flagsForName.put("strictfp", Flags.STRICTFP);
+    }
+
+    public Flags createNewFlag(String name, Flags after) {
+        Flags f = Flags.createFlag(name, after);
+        flagsForName.put(name, f);
+        return f;
+    }
+
+    public Flags NoFlags()      { return Flags.NONE; }
+    public Flags Public()       { return Flags.PUBLIC; }
+    public Flags Private()      { return Flags.PRIVATE; }
+    public Flags Protected()    { return Flags.PROTECTED; }
+    public Flags Static()       { return Flags.STATIC; }
+    public Flags Final()        { return Flags.FINAL; }
+    public Flags Synchronized() { return Flags.SYNCHRONIZED; }
+    public Flags Transient()    { return Flags.TRANSIENT; }
+    public Flags Native()       { return Flags.NATIVE; }
+    public Flags Interface()    { return Flags.INTERFACE; }
+    public Flags Abstract()     { return Flags.ABSTRACT; }
+    public Flags Volatile()     { return Flags.VOLATILE; }
+    public Flags StrictFP()     { return Flags.STRICTFP; }
+        
+    public Flags flagsForBits(int bits) {
+        Flags f = Flags.NONE;
+
+        if ((bits & Modifier.PUBLIC) != 0)       f = f.Public();
+        if ((bits & Modifier.PRIVATE) != 0)      f = f.Private();
+        if ((bits & Modifier.PROTECTED) != 0)    f = f.Protected();
+        if ((bits & Modifier.STATIC) != 0)       f = f.Static();
+        if ((bits & Modifier.FINAL) != 0)        f = f.Final();
+        if ((bits & Modifier.SYNCHRONIZED) != 0) f = f.Synchronized();
+        if ((bits & Modifier.TRANSIENT) != 0)    f = f.Transient();
+        if ((bits & Modifier.NATIVE) != 0)       f = f.Native();
+        if ((bits & Modifier.INTERFACE) != 0)    f = f.Interface();
+        if ((bits & Modifier.ABSTRACT) != 0)     f = f.Abstract();
+        if ((bits & Modifier.VOLATILE) != 0)     f = f.Volatile();
+        if ((bits & Modifier.STRICT) != 0)       f = f.StrictFP();
+
+        return f;
+    }
+
+    public Flags flagsForName(String name) {
+        Flags f = (Flags) flagsForName.get(name);
+        if (f == null) {
+            throw new InternalCompilerError("No flag named \"" + name + "\".");
+        }
+        return f;
     }
 
     public String toString() {

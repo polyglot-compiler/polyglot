@@ -674,4 +674,31 @@ public interface TypeSystem {
      * static target.
      */
     public Type staticTarget(Type t);
+
+    /**
+     * Given the JVM encoding of a set of flags, returns the Flags object
+     * for that encoding.
+     */
+    public Flags flagsForBits(int bits); 
+
+    /**
+     * Create a new unique Flags object.
+     * @param name the name of the flag
+     * @param print_after print the new flag after these flags
+     */
+    public Flags createNewFlag(String name, Flags print_after);
+
+    public Flags NoFlags();
+    public Flags Public();
+    public Flags Protected();
+    public Flags Private();
+    public Flags Static();
+    public Flags Final();
+    public Flags Synchronized();
+    public Flags Transient();
+    public Flags Native();
+    public Flags Interface();
+    public Flags Abstract();
+    public Flags Volatile();
+    public Flags StrictFP();
 }

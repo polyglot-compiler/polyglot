@@ -466,7 +466,7 @@ public class ClassFile implements LazyClassInitializer {
             ((ParsedInnerClassType) ct).outer(typeForName(ts, outerName));
         }
 
-        ct.flags(new Flags(modifiers));
+        ct.flags(ts.flagsForBits(modifiers));
         ct.position(position());
 
         return ct;

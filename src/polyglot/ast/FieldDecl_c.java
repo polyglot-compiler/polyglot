@@ -190,9 +190,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
       Flags flags = flags();
 
       if (ct.flags().isInterface()) {
-        flags = flags.setPublic();
-        flags = flags.setStatic();
-        flags = flags.setFinal();
+        flags = flags.Public().Static().Final();
       }
 
       return flags(fi.flags()).fieldInstance(fi);

@@ -43,14 +43,18 @@ public class Enum implements Serializable
 	}
 
 	public boolean equals(Object o) {
-	    return o instanceof Enum
-	        && e.name.equals(((Enum) o).name)
-	        && e.getClass() == o.getClass();
+	    return o instanceof EnumKey
+	        && e.name.equals(((EnumKey) o).e.name)
+	        && e.getClass() == ((EnumKey) o).e.getClass();
 	}
 
 	public int hashCode() {
 	    return e.getClass().hashCode() ^ e.name.hashCode();
 	}
+
+        public String toString() {
+            return e.toString();
+        }
     }
 
     public Enum intern() {

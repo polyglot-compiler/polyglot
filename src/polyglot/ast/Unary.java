@@ -11,14 +11,19 @@ public interface Unary extends Expr
     /** Unary expression operator. */
     public static class Operator extends Enum {
 	boolean prefix;
+        String name;
 
         protected Operator(String name, boolean prefix) {
-	    super(name);
+	    super(name + (prefix ? "" : "post"));
+            this.name = name;
 	    this.prefix = prefix;
 	}
 
-	/** Returns true of the operator is a prefix operator, false if postfix. */
+        /** Returns true of the operator is a prefix operator, false if
+         * postfix. */
 	public boolean isPrefix() { return prefix; }
+
+        public String toString() { return name; }
     }
 
     public static final Operator BIT_NOT  = new Operator("~", true);

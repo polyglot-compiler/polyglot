@@ -98,7 +98,7 @@ public interface ClassType extends ReferenceType
 
     /**
      * This method is here for convenience.  Anonymous classes have no access
-     * flags.  It will return Flags.NONE if invoked on an anonymous class.
+     * flags.  It will return ts.NoFlags() if invoked on an anonymous class.
      */
     Flags flags();
 

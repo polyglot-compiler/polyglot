@@ -161,6 +161,12 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                     pp.printAst(job.ast(), new CodeWriter(System.err, 78));
                 }
 
+                // This seems to work around a VM bug on linux with JDK 1.4.0.
+                // The mark-sweep collector will sometimes crash.
+                // Running the GC explicitly here makes the bug go away.
+                // If this fails, maybe run with bigger heap.
+                System.gc();
+
                 currentJob = oldCurrentJob;
             }
 

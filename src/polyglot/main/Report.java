@@ -54,7 +54,7 @@ public class Report {
    * -report command-line switches given by the user.
    */
   public static boolean should_report(String topic, int level) {
-    return should_report(Collections.singleton(topic), level); 
+    return should_report(Collections.singletonList(topic), level); 
   }
 
   /**

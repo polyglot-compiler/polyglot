@@ -293,7 +293,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
         // Check for abstract methods.
         if (mi.flags().isAbstract()) {
             // Clear all flags for the error message.
-            MethodInstance x = mi.flags(mi.flags().clear());
+            MethodInstance x = mi.flags(Flags.NONE);
             throw new SemanticException("Class \"" + type +
                                         "\" should be declared abstract; " +
                                         "it does not implement " + x + ".",
@@ -446,8 +446,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	Flags flags = this.flags;
 
 	if (ct.flags().isInterface()) {
-	    flags = flags.setPublic();
-	    flags = flags.setAbstract();
+	    flags = flags.Public().Abstract();
 	}
 
 	return ts.methodInstance(position(),
