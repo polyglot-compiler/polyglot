@@ -73,11 +73,8 @@ public class ExitChecker extends DataFlow
         }
 
         public void check(FlowGraph graph, Computation n) throws SemanticException {
-            // Check for statements not on the path to exit; compound
-            // statements are allowed to be off the path.  (e.g., "{ return; }"
-            // or "while (true) S").  If a compound statement is truly
-            // unreachable, one of its sub-statements will be also and we will
-            // report an error there.
+            // Check that all backward paths to the entry node go through
+            // a return statement.
             if (n == graph.entryNode()) {
                 DataFlowItem item = (DataFlowItem) flow(n);
 

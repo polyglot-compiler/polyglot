@@ -145,7 +145,7 @@ public class CFGBuilder implements Copy
       }
 
       // Add an edge to the exit node.
-      edge(last, graph.exitNode());
+      edge(last_visitor, last, graph.exitNode());
     }
 
     static int counter = 0;
@@ -255,7 +255,7 @@ public class CFGBuilder implements Copy
       }
 
       // If not caught, do _not_ insert a node from the thrower to exit.
-      // edge(last, graph.exitNode());
+      // edge(last_visitor, last, graph.exitNode());
     }
 
     public CFGBuilder tryFinally(CFGBuilder v, Computation last,
