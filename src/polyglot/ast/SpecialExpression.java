@@ -65,7 +65,7 @@ public class SpecialExpression extends Expression
    */
   public Type getType() 
   {
-    return tn.getType();
+    return tn == null ? null : tn.getType();
   }
 
   /**
@@ -85,14 +85,29 @@ public class SpecialExpression extends Expression
       return reconstruct( Node.condVisit(this.ext, v), (TypeNode)Node.condVisit(tn, v), kind);
   }
 
-  public Node typeCheck( LocalContext c)
+  public Node typeCheck( LocalContext c) throws SemanticException
   {
-    if ( kind == THIS) {
-      setCheckedType( c.getCurrentClass());
+    ClassType t;
+
+    if (tn == null) {
+      // Unqualified this or super expression
+      t = c.getCurrentClass();
     }
     else {
-      setCheckedType( c.getCurrentClass().getSuperType());
+      if (! tn.getType().isClassType()) {
+	throw new SemanticException("this expression must be of a class type");
+      }
+
+      t = (ClassType) tn.getType();
     }
+
+    if ( kind == THIS) {
+      setCheckedType(t);
+    }
+    else {
+      setCheckedType(t.getSuperType());
+    }
+
     return this;
   }
 
