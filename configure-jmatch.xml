@@ -20,7 +20,7 @@ This build file is meant to be used only from the main buildfile build.xml.
   </target>
 
   <target name="executables" 
-          description="creates the executable script jmc">
+          description="creates the executable scripts jmc and jm">
     <echo message="Creating ${bin}/jmc"/>
     <concat destfile="${bin}/jmc" append="no">
       <filelist dir="${bin}" files="defs"/>
@@ -32,6 +32,15 @@ ext="jmatch"
       <filelist dir="${bin}" files="jlc.in"/>
     </concat>
     <chmod perm="+x" file="${bin}/jmc"/>
+
+    <echo message="Creating ${bin}/jm"/>
+    <concat destfile="${bin}/jm" append="no">
+      <filelist dir="${bin}" files="defs"/>
+    </concat>
+    <concat destfile="${bin}/jm" append="yes">
+      <filelist dir="${bin}" files="jm.in"/>
+    </concat>
+    <chmod perm="+x" file="${bin}/jm"/>
   </target>
 </project>
 

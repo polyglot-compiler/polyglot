@@ -723,6 +723,7 @@ ext=""
 
   <target name="jmatch-jar" depends="jmatch">
     <jar jarfile="${lib}/jmatch.jar" basedir="${classes}" includes="polyglot/ext/jmatch/**"/>
+    <jar jarfile="${lib}/jmatch-runtime.jar" basedir="${classes}" includes="polyglot/ext/jmatch/runtime/**"/>
   </target>
 
   <target name="jmatch-dist" depends="jl-dist,jmatch-jar">
