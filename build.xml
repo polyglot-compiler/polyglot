@@ -106,8 +106,7 @@
   <!-- Set the property ppg.parser.up-to-date if the parser is in fact
        up to date.  Called by the ppg-parser target.
    -->
-  <target name="ppg-parser-deps" depends="cup-parser-deps"
-          if="cup.parser.up-to-date">
+  <target name="ppg-parser-deps">
     <dependset>
       <srcfileset dir="${parser.dir}" includes="${ppg.file}"/>
       <targetfileset dir="${parser.dir}" includes="${cup.file}"/>
@@ -140,8 +139,10 @@
   <target name="cup-parser-deps">
     <dependset>
       <srcfileset dir="${parser.dir}" includes="${cup.file}"/>
-      <targetfileset dir="${parser.dir}" 
-                     includes="${parser.class}.java ${symbol.class}.java"/>
+      <targetfileset dir="${parser.dir}">
+        <include name="${parser.class}.java"/>
+	<include name="${symbol.class}.java"/>
+      </targetfileset>
     </dependset>
     <condition property="cup.parser.up-to-date">
       <and>
