@@ -58,7 +58,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
     }
 
     /** Set the base type of the array. */
-    public ArrayType base(Type type) {
+    public ArrayType base(Type base) {
 	ArrayType_c n = (ArrayType_c) copy();
 	n.base = base;
 	return n;

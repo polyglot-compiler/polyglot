@@ -28,7 +28,7 @@ public class TypeOutputStream extends ObjectOutputStream
       return o;
     }
     else if (o instanceof TypeObject) {
-      return ts.placeHolder((TypeObject) o);
+      return ts.placeHolder((TypeObject) o, roots);
     }
     else {
       return o;

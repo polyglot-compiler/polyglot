@@ -221,11 +221,15 @@ public class LoadedClassResolver extends ClassResolver
       field.setAccessible( true);
 
       ClassType t = (ClassType) te.decode((String) field.get(null));
-
+ 
       Types.report(1, "Returning serialized ClassType for " +
 		  clazz.getName() + ".");
 
-      return (ClassType) t.restore();
+      ClassType ret = (ClassType) t.restore();
+      if (ret instanceof ParsedClassType) {
+	  ((ParsedClassType)ret).setClean(true);
+      }
+      return ret;
     }
     catch (SemanticException e) {
       throw e;

@@ -61,6 +61,7 @@ public class TypeEncoder
 	decode(s);
       }
       catch (Exception e) {
+        e.printStackTrace();
 	throw new InternalCompilerError(
 	    "Could not decode back to " + t + ": " + e.getMessage());
       }

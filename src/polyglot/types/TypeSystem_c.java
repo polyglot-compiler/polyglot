@@ -1066,6 +1066,10 @@ public class TypeSystem_c implements TypeSystem
     protected ClassType ARITHMETIC_EXN_;
 
     public TypeObject placeHolder(TypeObject o) {
+    	return placeHolder(o, new HashSet());
+    }
+    
+    public TypeObject placeHolder(TypeObject o, Set roots) {
 	// This should never happen: anonymous and local types cannot
 	// appear in signatures.
 

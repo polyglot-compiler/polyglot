@@ -15,7 +15,22 @@ import jltools.frontend.Compiler;
 import java.io.*;
 import java.util.*;
 
-/** This is the default <code>ExtensionInfo</code> for the Java language. */
+/** 
+ * This is the default <code>ExtensionInfo</code> for the Java language. 
+ * 
+ * Compiling Passes:
+ * 1. parse
+ * 2. build types (TypeBuilder)
+ * 3. disambiguate types (TypeAmbiguityRemover)
+ * 4. disambiguate (AmbiguityRemover)
+ * 5. constant folding (ConstantFolder)
+ * ------------------barrier
+ * 6. type checking (TypeChecker)
+ * 7. exception checking (ExceptionChecker)
+ * ------------------barrier
+ * 8. serialization (ClassSerializer), optional
+ * 9. translation (Translator)
+ */
 public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
     protected jltools.frontend.Compiler compiler;
     protected Options options;

@@ -58,6 +58,7 @@ public interface TypeSystem {
     ClassType forClass(Class clazz) throws SemanticException;
 
     /** Get a place-holder for serializing a type object. */ 
+    TypeObject placeHolder(TypeObject o, java.util.Set roots);
     TypeObject placeHolder(TypeObject o);
 
     /** Get an unknown type. */
