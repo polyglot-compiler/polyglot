@@ -69,31 +69,49 @@ public class StdErrorQueue extends AbstractErrorQueue
 	int lmargin = 4;
 	int rmargin = 78;
 
-	StringTokenizer st = new StringTokenizer(message, " ");
+	StringTokenizer lines = new StringTokenizer(message, "\n", true);
+        boolean needNewline = false;
 
-	while (st.hasMoreTokens()) {
-	    String s = st.nextToken();
-	    
-	    if (s.charAt(0)=='\n') {
-		lmargin = 0; 
-		width = 0;
-	    }
-	    if (width + s.length() + 1 > rmargin) {
-		err.println();
-		for (int i = 0; i < lmargin; i++) err.print(" ");
-		width = lmargin;
-	    }
-	    else {
-		err.print(" ");
-		width++;
-	    }
+	while (lines.hasMoreTokens()) {
+	    String line = lines.nextToken();
 
-	    err.print(s);
+            if (line.indexOf("\n") < 0) {
+                StringTokenizer st = new StringTokenizer(line, " ");
 
-	    width += s.length();
+                while (st.hasMoreTokens()) {
+                    String s = st.nextToken();
+
+                    if (width + s.length() + 1 > rmargin) {
+                        err.println();
+                        for (int i = 0; i < lmargin; i++) err.print(" ");
+                        width = lmargin;
+                    }
+                    else {
+                        err.print(" ");
+                        width++;
+                    }
+
+                    err.print(s);
+
+                    width += s.length();
+                }
+
+                needNewline = true;
+            }
+            else {
+                err.println();
+                needNewline = false;
+            }
+
+            width = lmargin;
+
+            if (lines.hasMoreTokens()) {
+                for (int i = 0; i < lmargin; i++) err.print(" ");
+            }
+            else if (needNewline) {
+                err.println();
+            }
 	}
-
-	err.println();
 
 	if (position != null) {
 	    showError(position);
