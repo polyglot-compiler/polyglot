@@ -23,9 +23,10 @@ public class ImportTable extends ClassResolver
     protected List packageImports;
     /** Map from names to classes found, or to the NOT_FOUND object. */
     protected Map map;
-    /** List of imports which will be lazily added to the table. */
+    /** List of class imports which will be lazily added to the table next time
+     * <code>lazyImport</code> is called. */
     protected List lazyImports;
-    /** List of imports which will be lazily added to the table. */
+    /** List of explicitly imported classes. */
     protected List classImports;
     /** Source name to use for debugging and error reporting */
     protected String sourceName;
