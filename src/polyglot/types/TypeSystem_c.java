@@ -562,7 +562,7 @@ public class TypeSystem_c implements TypeSystem
                                     container + "\".");
     }
 
-    private String listToString(List l) {
+    protected String listToString(List l) {
 	String s = "";
 
 	for (Iterator i = l.iterator(); i.hasNext(); ) {
@@ -789,7 +789,7 @@ public class TypeSystem_c implements TypeSystem
     /**
      * Note: java 1.2 rule is described in JLS2 in section 15.12.2.2
      */
-    private boolean moreSpecific(ProcedureInstance p1, ProcedureInstance p2) {
+    protected boolean moreSpecific(ProcedureInstance p1, ProcedureInstance p2) {
 	// rule 1:
 	ReferenceType t1 = p1.container();
 	ReferenceType t2 = p2.container();
