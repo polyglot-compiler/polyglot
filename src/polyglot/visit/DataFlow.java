@@ -235,6 +235,19 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             throw new InternalCompilerError("This method only takes binary " +
                       "or unary operators of boolean type");
         }
+        
+        if (trueItem == null && falseItem == null) {
+            // there are no true or false items flowing
+            // into this node. This is probably because
+            // the sub-expressions for this node do not
+            // generate different dataflow items for
+            // the true and false branches.
+            // Use otherItem instead, so that something
+            // flows correctly along the true and false
+            // edge keys.
+            trueItem = falseItem = otherItem;
+        }
+        
         if (n instanceof Unary) {
             Unary u = (Unary)n;
             if (u.operator() == Unary.NOT) {
