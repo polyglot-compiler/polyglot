@@ -451,7 +451,6 @@ public class Context_c implements Context
 
     public void addMethodContainerToThisScope(MethodInstance mi) {
         if (methods == null) methods = new HashMap();
-        // methods.put(mi.name(), mi.container());
         methods.put(mi.name(), currentClass());
     }
 
