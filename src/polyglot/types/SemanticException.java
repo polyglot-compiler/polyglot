@@ -1,6 +1,8 @@
 package polyglot.types;
 
 import polyglot.util.Position;
+import polyglot.main.Report;
+import java.util.*;
 
 /**
  * Thrown during any number of phases of the compiler during which a semantic
@@ -11,23 +13,39 @@ public class SemanticException extends Exception {
     
     public SemanticException() {
 	super();
+        trace(this, 1);
     }
 
     public SemanticException(Position position) {
 	super();
 	this.position = position;
+        trace(this, 1);
     }
 
     public SemanticException(String m) {
 	super(m);
+        trace(this, 1);
     }
 
     public SemanticException(String m, Position position) {
 	super(m);
 	this.position = position;
+        trace(this, 1);
     }
 
     public Position position() {
 	return position;
+    }
+
+    static void trace(Exception e, int level) {
+        if (Report.should_report(topics, level)) {
+            e.printStackTrace();
+        }
+    }
+
+    static Collection topics = new HashSet();
+
+    static {
+        topics.add("errors");
     }
 }
