@@ -6,6 +6,7 @@ package jltools.ast;
 
 import java.util.*;
 
+import jltools.frontend.Compiler;
 import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.SymbolReader;
@@ -126,6 +127,11 @@ public class SourceFileNode extends Node {
     classes.remove(pos);
   }
 
+  public ImportTable getImportTable()
+  {
+    return it;
+  }
+
 
    void visitChildren(NodeVisitor vis)
    {
@@ -139,8 +145,23 @@ public class SourceFileNode extends Node {
    
    public Node readSymbols( SymbolReader sr)
    {
+     it = new ImportTable( Compiler.getSystemClassResolver());
+     try
+     {
+       it.addPackageImport("java.lang");
+     }
+     catch( Exception e)
+     {
+       throw new Error( e.getMessage());
+     }
+     sr.setImportTable( it);
      return this;
    }
+
+  public Node removeAmbiguities( LocalContext c)
+  {
+    return this;
+  }
 
    public Node typeCheck(LocalContext c)
    {
@@ -217,4 +238,6 @@ public class SourceFileNode extends Node {
   private String packageName;
   private List imports;
   private List classes;
+
+  private ImportTable it;
 }

@@ -163,17 +163,17 @@ public class ForStatement extends Statement {
 
   public void visitChildren(NodeVisitor v) {
     for(ListIterator iter = initializers.listIterator(); iter.hasNext(); ) {
-      Expression expr = (Expression) iter.next();
-      Expression newExpr = (Expression) expr.visit(v);
-      if (expr != newExpr)
-        iter.set(newExpr);
+      Statement stat = (Statement) iter.next();
+      Statement newStat = (Statement) stat.visit(v);
+      if (stat != newStat)
+        iter.set(newStat);
     }
     condition = (Expression) condition.visit(v);
     for(ListIterator iter = incrementors.listIterator(); iter.hasNext(); ) {
-      Expression expr = (Expression) iter.next();
-      Expression newExpr = (Expression) expr.visit(v);
-      if (expr != newExpr)
-	      iter.set(newExpr);
+      Statement stat = (Statement) iter.next();
+      Statement newStat = (Statement) stat.visit(v);
+      if (stat != newStat)
+        iter.set(newStat);
     }
     body = (Statement) body.visit(v);
   }

@@ -258,6 +258,8 @@ public class ClassNode extends ClassMember {
 
   public Node readSymbols( SymbolReader sr)
   {
+    String packageName = sr.getPackageName();
+    name = (packageName == null ? name : packageName + "." + name);
     return this;
   }
 
@@ -289,7 +291,7 @@ public class ClassNode extends ClassMember {
 	i.remove();
       }
       else {
-	i.set(v);
+	i.set(m);
       }
     }
   }

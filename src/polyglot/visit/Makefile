@@ -1,7 +1,9 @@
 
 vs_package	= jltools/visit
 vs_codebase	= ../..
-vs_files 	= TypeChecker.java SymbolReader.java
+vs_files 	= AmbiguityRemover.java \
+		  TypeChecker.java \
+		  SymbolReader.java
 
 VISIT_TARGET = $(patsubst %.java, $(vs_package)/%.class, $(vs_files))
 

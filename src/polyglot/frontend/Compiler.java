@@ -2,6 +2,7 @@ package jltools.frontend;
 
 import jltools.lex.Lexer;
 import jltools.ast.Node;
+import jltools.ast.SourceFileNode;
 import jltools.parse.Grm;
 import jltools.types.*;
 import jltools.util.*;
@@ -15,6 +16,7 @@ public class Compiler
   private static TypeSystem ts;
   private static CompoundClassResolver systemResolver;
   private static TableClassResolver parsedResolver;
+  private static LoadedClassResolver loadedResolver;
 
   private static Map options;
 
@@ -23,10 +25,15 @@ public class Compiler
     Compiler.systemResolver = new CompoundClassResolver();
     Compiler.parsedResolver = new TableClassResolver();
     systemResolver.addClassResolver( parsedResolver);
-    //systemResolver.addResolver( new FileClassResolver());
+
+    //systemResolver.addClassResolver( new FileClassResolver());
+
+    Compiler.loadedResolver = new LoadedClassResolver();
+    systemResolver.addClassResolver( loadedResolver);
 
     Compiler.ts = new StandardTypeSystem( systemResolver);
-
+    Compiler.loadedResolver.setTypeSystem( Compiler.ts);
+    
     Compiler.options = new HashMap();
   }
 
@@ -35,18 +42,23 @@ public class Compiler
     Compiler.options = options;
   }
 
+  public static ClassResolver getSystemClassResolver()
+  {
+    return Compiler.systemResolver;
+  }
+
   public Compiler()
   {
   }
 
-  public Node parse( Reader source) throws IOException
+  public Node parse( String filename, Reader source) throws IOException
   {
     Lexer lexer;
     Grm grm;
     java_cup.runtime.Symbol sym;
 
     lexer = new Lexer( source);
-    grm = new Grm(lexer, null);
+    grm = new Grm(lexer, ts);
                
     try
     {
@@ -57,13 +69,22 @@ public class Compiler
       throw new IOException( e.getMessage());
     }
 
-    return (Node)sym.value; 
+    SourceFileNode sfn = (SourceFileNode)sym.value;
+    sfn.setFilename( filename);
+
+    return sfn; 
   }
 
   public void readSymbols( Node ast)
   {
     SymbolReader sr = new SymbolReader( ts, parsedResolver);
     ast.visit( sr);
+  }
+
+  public void removeAmbiguities( Node ast)
+  {
+    AmbiguityRemover ar = new AmbiguityRemover( ts);
+    ast.visit( ar);
   }
 
   public Node typeCheck( Node ast)

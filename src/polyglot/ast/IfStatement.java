@@ -159,12 +159,15 @@ public class IfStatement extends Statement {
       thenStatement = (Statement) newNode;
     }
 
-    newNode = (Node) elseStatement.visit(v);
-    if (newNode instanceof Expression) {
-      elseStatement = new ExpressionStatement((Expression) newNode);
-    }
-    else {
-      elseStatement = (Statement) newNode;
+    if( elseStatement != null)
+    {
+      newNode = (Node) elseStatement.visit(v);
+      if (newNode instanceof Expression) {
+        elseStatement = new ExpressionStatement((Expression) newNode);
+      }
+      else {
+        elseStatement = (Statement) newNode;
+      }
     }
   }
 

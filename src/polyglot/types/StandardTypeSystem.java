@@ -904,6 +904,8 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public  ClassType typeForClass(Class theClass)
   {
+    return new ClassType( this, theClass.getName(), true);
+    /*
     try
     {
       JavaClass jc = resolver.findClass(theClass.getName());
@@ -913,6 +915,7 @@ public class StandardTypeSystem extends TypeSystem {
     {
       return null;
     }
+    */
   }
 
 

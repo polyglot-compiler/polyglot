@@ -297,7 +297,7 @@ public class MethodNode extends ClassMember {
   public void visitChildren(NodeVisitor v) {
     for (Iterator i = formals.iterator(); i.hasNext(); )
     {
-      ((Expression)i.next()).visit(v);
+      ((FormalParameter)i.next()).visit(v);
     }
     body = (BlockStatement) body.visit(v);
   }

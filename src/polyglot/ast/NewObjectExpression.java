@@ -146,7 +146,7 @@ public class NewObjectExpression extends Expression {
 	i.remove();
       }
       else {
-	i.set(v);
+	i.set(e);
       }
     }
     if (classNode != null) {

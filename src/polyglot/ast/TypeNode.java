@@ -38,26 +38,35 @@ public class TypeNode extends Node {
     return type;
   }
 
-   void visitChildren(NodeVisitor vis)
-   {
-      // nothing to do
-   }
-   
-   public Node readSymbols( SymbolReader sr)
-   {
-     return this;
-   } 
-
-   public Node typeCheck(LocalContext c)
-   {
-     Annotate.setType( this, c.checkAndResolveType( type));
-     return this;
-   }
-
-   public void  translate(LocalContext c, CodeWriter w)
+  void visitChildren(NodeVisitor vis)
   {
-     w.write(type.getTypeString());
-   }
+    // nothing to do
+  }
+   
+  public Node readSymbols( SymbolReader sr)
+  {
+    return this;
+  } 
+   
+  public Node removeAmbiguities( LocalContext c)
+  {
+    type = c.checkAndResolveType( type);
+    Annotate.setType( this, type);
+
+    //Annotate.setType( this, c.checkAndResolveType( type));
+    
+    return this;
+  }
+
+  public Node typeCheck(LocalContext c)
+  {
+    return this;
+  }
+
+  public void translate(LocalContext c, CodeWriter w)
+  {
+    w.write(type.getTypeString());
+  }
 
    public void dump(LocalContext c, CodeWriter w)
    {

@@ -74,6 +74,8 @@ public abstract class Node extends jltools.util.AnnotatedObject {
    }
 
   public abstract Node readSymbols( SymbolReader sr);
+  
+  public Node removeAmbiguities( LocalContext c) { return this; }
 
   public abstract Node typeCheck(LocalContext c);
   

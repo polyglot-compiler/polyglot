@@ -38,8 +38,9 @@ public class LoadedJavaClass extends JavaClassImpl {
     // Set up the rest of the typing information
     this.flags = AccessFlags.flagsForInt(theClass.getModifiers());
 
-    if (! this.fullName.equals("java.lang.Object"))
+    if (! this.fullName.equals("java.lang.Object")) {
       this.superType = ts.typeForClass(theClass.getSuperclass());
+    }
 
     Class[] interfaceAry = theClass.getInterfaces();
     List interfaceLst = new ArrayList(interfaceAry.length +1);      
@@ -72,7 +73,7 @@ public class LoadedJavaClass extends JavaClassImpl {
     for (int idx = 0; idx < methodAry.length; ++idx) {
       methodLst.add(methodTypeForMethod(methodAry[idx]));
     }
-    for (int idx = 0; idx < methodAry.length; ++idx) {
+    for (int idx = 0; idx < constrAry.length; ++idx) {
       methodLst.add(methodTypeForConstructor(constrAry[idx]));
     }
     this.fields  = new TypedList(fieldLst,  FieldInstance.class, true);

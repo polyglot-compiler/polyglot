@@ -1,11 +1,13 @@
 
+import jltools.types.*;
+
 public class Statements
 {
    public static final void main(String args[])
    {
       int i, n = 10, j = n;
       boolean b;
-      
+     
       System.out.println("Hello World!");
       for( i = 0, b = false; i < n; i++, j++)
       {
@@ -17,6 +19,9 @@ public class Statements
       
       for( int x = 0, y = 0; x < y * y; x++, y++)
         System.out.println( "x: " + x + " y: " + y);
+
+      TypeSystem ts = new StandardTypeSystem( null);
+
    }
    
    void foo()

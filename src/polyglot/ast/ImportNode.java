@@ -85,7 +85,25 @@ public class ImportNode extends Node {
 
   public Node readSymbols( SymbolReader sr)
   {
-    // FIXME 
+    // FIXME
+    ImportTable it = sr.getImportTable();
+
+    try
+    {
+      switch( type)
+      {
+      case CLASS:
+        it.addClassImport( imports);
+        break;
+      case PACKAGE:
+        it.addPackageImport( imports);
+        break;
+      }
+    }
+    catch( NoClassException e)
+    {
+      throw new Error( e.getMessage());
+    }
     return this;
   }
    

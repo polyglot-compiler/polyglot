@@ -12,6 +12,7 @@ tp_files 	= AccessFlags.java	\
 			ImportTable.java \
 			JavaClass.java \
 			JavaClassImpl.java \
+			LoadedClassResolver.java \
 			LoadedJavaClass.java \
 			LocalContext.java \
 			MethodType.java \

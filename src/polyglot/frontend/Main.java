@@ -32,7 +32,9 @@ public class Main
       Reader reader = new FileReader( source);
       Writer writer = new UnicodeWriter( new PrintWriter( System.out));
 
-      Node ast = compiler.parse( reader);
+      Node ast = compiler.parse( source, reader);
+      compiler.readSymbols( ast);
+      compiler.removeAmbiguities( ast);
       compiler.translate( ast, writer);
     }
     catch( IOException e)
