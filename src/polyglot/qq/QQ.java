@@ -140,7 +140,7 @@ public class QQ {
      * applying substitutions.
      */
     public SourceFile parseFile(String fmt) {
-        return parseFile(fmt, list());
+        return (SourceFile) parse(fmt, list(), FILE);
     }
 
     /**
@@ -148,7 +148,7 @@ public class QQ {
      * applying substitutions.
      */
     public SourceFile parseFile(String fmt, Object o1) {
-        return parseFile(fmt, list(o1));
+        return (SourceFile) parse(fmt, list(o1), FILE);
     }
 
     /**
@@ -156,7 +156,7 @@ public class QQ {
      * applying substitutions.
      */
     public SourceFile parseFile(String fmt, Object o1, Object o2) {
-        return parseFile(fmt, list(o1, o2));
+        return (SourceFile) parse(fmt, list(o1, o2), FILE);
     }
 
     /**
@@ -164,7 +164,7 @@ public class QQ {
      * applying substitutions.
      */
     public SourceFile parseFile(String fmt, Object o1, Object o2, Object o3) {
-        return parseFile(fmt, list(o1, o2, o3));
+        return (SourceFile) parse(fmt, list(o1, o2, o3), FILE);
     }
 
     /**
@@ -174,7 +174,7 @@ public class QQ {
     public SourceFile parseFile(String fmt, Object o1, Object o2, Object o3,
         Object o4)
     {
-        return parseFile(fmt, list(o1, o2, o3, o4));
+        return (SourceFile) parse(fmt, list(o1, o2, o3, o4), FILE);
     }
 
     /**
@@ -184,7 +184,7 @@ public class QQ {
     public SourceFile parseFile(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5)
     {
-        return parseFile(fmt, list(o1, o2, o3, o4, o5));
+        return (SourceFile) parse(fmt, list(o1, o2, o3, o4, o5), FILE);
     }
 
     /**
@@ -194,7 +194,7 @@ public class QQ {
     public SourceFile parseFile(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5, Object o6)
     {
-        return parseFile(fmt, list(o1, o2 , o3, o4, o5, o6));
+        return (SourceFile) parse(fmt, list(o1, o2 , o3, o4, o5, o6), FILE);
     }
 
     /**
@@ -204,7 +204,7 @@ public class QQ {
     public SourceFile parseFile(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5, Object o6, Object o7)
     {
-        return parseFile(fmt, list(o1, o2 , o3, o4, o5, o6, o7));
+        return (SourceFile) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7), FILE);
     }
 
     /**
@@ -214,7 +214,7 @@ public class QQ {
     public SourceFile parseFile(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5, Object o6, Object o7, Object o8)
     {
-        return parseFile(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8));
+        return (SourceFile) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8), FILE);
     }
 
     /**
@@ -224,7 +224,7 @@ public class QQ {
     public SourceFile parseFile(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5, Object o6, Object o7, Object o8, Object o9)
     {
-        return parseFile(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8, o9));
+        return (SourceFile) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8, o9), FILE);
     }
 
     /**
@@ -232,7 +232,7 @@ public class QQ {
      * applying substitutions.
      */
     public SourceFile parseFile(String fmt, Object[] os) {
-        return parseFile(fmt, list(os));
+        return (SourceFile) parse(fmt, list(os), FILE);
     }
 
     /**
@@ -246,25 +246,25 @@ public class QQ {
     /** Parse a string into a <code>ClassDecl</code> AST node,
      * applying substitutions. */
     public ClassDecl parseDecl(String fmt) {
-        return parseDecl(fmt, list());
+        return (ClassDecl) parse(fmt, list(), DECL);
     }
 
     /** Parse a string into a <code>ClassDecl</code> AST node,
      * applying substitutions. */
     public ClassDecl parseDecl(String fmt, Object o1) {
-        return parseDecl(fmt, list(o1));
+        return (ClassDecl) parse(fmt, list(o1), DECL);
     }
 
     /** Parse a string into a <code>ClassDecl</code> AST node,
      * applying substitutions. */
     public ClassDecl parseDecl(String fmt, Object o1, Object o2) {
-        return parseDecl(fmt, list(o1, o2));
+        return (ClassDecl) parse(fmt, list(o1, o2), DECL);
     }
 
     /** Parse a string into a <code>ClassDecl</code> AST node,
      * applying substitutions. */
     public ClassDecl parseDecl(String fmt, Object o1, Object o2, Object o3) {
-        return parseDecl(fmt, list(o1, o2, o3));
+        return (ClassDecl) parse(fmt, list(o1, o2, o3), DECL);
     }
 
     /** Parse a string into a <code>ClassDecl</code> AST node,
@@ -272,7 +272,7 @@ public class QQ {
     public ClassDecl parseDecl(String fmt, Object o1, Object o2, Object o3,
         Object o4)
     {
-        return parseDecl(fmt, list(o1, o2, o3, o4));
+        return (ClassDecl) parse(fmt, list(o1, o2, o3, o4), DECL);
     }
 
     /** Parse a string into a <code>ClassDecl</code> AST node,
@@ -280,7 +280,7 @@ public class QQ {
     public ClassDecl parseDecl(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5)
     {
-        return parseDecl(fmt, list(o1, o2, o3, o4, o5));
+        return (ClassDecl) parse(fmt, list(o1, o2, o3, o4, o5), DECL);
     }
 
     /** Parse a string into a <code>ClassDecl</code> AST node,
@@ -288,7 +288,7 @@ public class QQ {
     public ClassDecl parseDecl(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5, Object o6)
     {
-        return parseDecl(fmt, list(o1, o2 , o3, o4, o5, o6));
+        return (ClassDecl) parse(fmt, list(o1, o2 , o3, o4, o5, o6), DECL);
     }
 
     /** Parse a string into a <code>ClassDecl</code> AST node,
@@ -296,7 +296,7 @@ public class QQ {
     public ClassDecl parseDecl(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5, Object o6, Object o7)
     {
-        return parseDecl(fmt, list(o1, o2 , o3, o4, o5, o6, o7));
+        return (ClassDecl) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7), DECL);
     }
 
     /** Parse a string into a <code>ClassDecl</code> AST node,
@@ -305,7 +305,7 @@ public class QQ {
         Object o4, Object o5, Object o6, Object o7, Object o8)
        
     {
-        return parseDecl(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8));
+        return (ClassDecl) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8), DECL);
     }
 
     /** Parse a string into a <code>ClassDecl</code> AST node,
@@ -314,13 +314,13 @@ public class QQ {
         Object o4, Object o5, Object o6, Object o7, Object o8, Object o9)
        
     {
-        return parseDecl(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8, o9));
+        return (ClassDecl) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8, o9), DECL);
     }
 
     /** Parse a string into a <code>ClassDecl</code> AST node,
      * applying substitutions. */
     public ClassDecl parseDecl(String fmt, Object[] os) {
-        return parseDecl(fmt, list(os));
+        return (ClassDecl) parse(fmt, list(os), DECL);
     }
 
     /** Parse a string into a <code>ClassDecl</code> AST node,
@@ -332,25 +332,25 @@ public class QQ {
     /** Parse a string into a <code>ClassMember</code> AST node,
      * applying substitutions. */
     public ClassMember parseMember(String fmt) {
-        return parseMember(fmt, list());
+        return (ClassMember) parse(fmt, list(), MEMB);
     }
 
     /** Parse a string into a <code>ClassMember</code> AST node,
      * applying substitutions. */
     public ClassMember parseMember(String fmt, Object o1) {
-        return parseMember(fmt, list(o1));
+        return (ClassMember) parse(fmt, list(o1), MEMB);
     }
 
     /** Parse a string into a <code>ClassMember</code> AST node,
      * applying substitutions. */
     public ClassMember parseMember(String fmt, Object o1, Object o2) {
-        return parseMember(fmt, list(o1, o2));
+        return (ClassMember) parse(fmt, list(o1, o2), MEMB);
     }
 
     /** Parse a string into a <code>ClassMember</code> AST node,
      * applying substitutions. */
     public ClassMember parseMember(String fmt, Object o1, Object o2, Object o3) {
-        return parseMember(fmt, list(o1, o2, o3));
+        return (ClassMember) parse(fmt, list(o1, o2, o3), MEMB);
     }
 
     /** Parse a string into a <code>ClassMember</code> AST node,
@@ -358,7 +358,7 @@ public class QQ {
     public ClassMember parseMember(String fmt, Object o1, Object o2, Object o3,
         Object o4)
     {
-        return parseMember(fmt, list(o1, o2, o3, o4));
+        return (ClassMember) parse(fmt, list(o1, o2, o3, o4), MEMB);
     }
 
     /** Parse a string into a <code>ClassMember</code> AST node,
@@ -366,7 +366,7 @@ public class QQ {
     public ClassMember parseMember(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5)
     {
-        return parseMember(fmt, list(o1, o2, o3, o4, o5));
+        return (ClassMember) parse(fmt, list(o1, o2, o3, o4, o5), MEMB);
     }
 
     /** Parse a string into a <code>ClassMember</code> AST node,
@@ -374,7 +374,7 @@ public class QQ {
     public ClassMember parseMember(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5, Object o6)
     {
-        return parseMember(fmt, list(o1, o2 , o3, o4, o5, o6));
+        return (ClassMember) parse(fmt, list(o1, o2 , o3, o4, o5, o6), MEMB);
     }
 
     /** Parse a string into a <code>ClassMember</code> AST node,
@@ -382,7 +382,7 @@ public class QQ {
     public ClassMember parseMember(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5, Object o6, Object o7)
     {
-        return parseMember(fmt, list(o1, o2 , o3, o4, o5, o6, o7));
+        return (ClassMember) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7), MEMB);
     }
 
     /** Parse a string into a <code>ClassMember</code> AST node,
@@ -391,7 +391,7 @@ public class QQ {
         Object o4, Object o5, Object o6, Object o7, Object o8)
        
     {
-        return parseMember(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8));
+        return (ClassMember) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8), MEMB);
     }
 
     /** Parse a string into a <code>ClassMember</code> AST node,
@@ -400,13 +400,13 @@ public class QQ {
         Object o4, Object o5, Object o6, Object o7, Object o8, Object o9)
        
     {
-        return parseMember(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8, o9));
+        return (ClassMember) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8, o9), MEMB);
     }
 
     /** Parse a string into a <code>ClassMember</code> AST node,
      * applying substitutions. */
     public ClassMember parseMember(String fmt, Object[] os) {
-        return parseMember(fmt, list(os));
+        return (ClassMember) parse(fmt, list(os), MEMB);
     }
 
     /** Parse a string into a <code>ClassMember</code> AST node,
@@ -418,25 +418,25 @@ public class QQ {
     /** Parse a string into a <code>Expr</code> AST node,
      * applying substitutions. */
     public Expr parseExpr(String fmt) {
-        return parseExpr(fmt, list());
+        return (Expr) parse(fmt, list(), EXPR);
     }
 
     /** Parse a string into a <code>Expr</code> AST node,
      * applying substitutions. */
     public Expr parseExpr(String fmt, Object o1) {
-        return parseExpr(fmt, list(o1));
+        return (Expr) parse(fmt, list(o1), EXPR);
     }
 
     /** Parse a string into a <code>Expr</code> AST node,
      * applying substitutions. */
     public Expr parseExpr(String fmt, Object o1, Object o2) {
-        return parseExpr(fmt, list(o1, o2));
+        return (Expr) parse(fmt, list(o1, o2), EXPR);
     }
 
     /** Parse a string into a <code>Expr</code> AST node,
      * applying substitutions. */
     public Expr parseExpr(String fmt, Object o1, Object o2, Object o3) {
-        return parseExpr(fmt, list(o1, o2, o3));
+        return (Expr) parse(fmt, list(o1, o2, o3), EXPR);
     }
 
     /** Parse a string into a <code>Expr</code> AST node,
@@ -444,7 +444,7 @@ public class QQ {
     public Expr parseExpr(String fmt, Object o1, Object o2, Object o3,
         Object o4)
     {
-        return parseExpr(fmt, list(o1, o2, o3, o4));
+        return (Expr) parse(fmt, list(o1, o2, o3, o4), EXPR);
     }
 
     /** Parse a string into a <code>Expr</code> AST node,
@@ -452,7 +452,7 @@ public class QQ {
     public Expr parseExpr(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5)
     {
-        return parseExpr(fmt, list(o1, o2, o3, o4, o5));
+        return (Expr) parse(fmt, list(o1, o2, o3, o4, o5), EXPR);
     }
 
     /** Parse a string into a <code>Expr</code> AST node,
@@ -460,7 +460,7 @@ public class QQ {
     public Expr parseExpr(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5, Object o6)
     {
-        return parseExpr(fmt, list(o1, o2 , o3, o4, o5, o6));
+        return (Expr) parse(fmt, list(o1, o2 , o3, o4, o5, o6), EXPR);
     }
 
     /** Parse a string into a <code>Expr</code> AST node,
@@ -468,7 +468,7 @@ public class QQ {
     public Expr parseExpr(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5, Object o6, Object o7)
     {
-        return parseExpr(fmt, list(o1, o2 , o3, o4, o5, o6, o7));
+        return (Expr) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7), EXPR);
     }
 
     /** Parse a string into a <code>Expr</code> AST node,
@@ -477,7 +477,7 @@ public class QQ {
         Object o4, Object o5, Object o6, Object o7, Object o8)
        
     {
-        return parseExpr(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8));
+        return (Expr) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8), EXPR);
     }
 
     /** Parse a string into a <code>Expr</code> AST node,
@@ -486,13 +486,13 @@ public class QQ {
         Object o4, Object o5, Object o6, Object o7, Object o8, Object o9)
        
     {
-        return parseExpr(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8, o9));
+        return (Expr) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8, o9), EXPR);
     }
 
     /** Parse a string into a <code>Expr</code> AST node,
      * applying substitutions. */
     public Expr parseExpr(String fmt, Object[] os) {
-        return parseExpr(fmt, list(os));
+        return (Expr) parse(fmt, list(os), EXPR);
     }
 
     /** Parse a string into a <code>Expr</code> AST node,
@@ -504,25 +504,25 @@ public class QQ {
     /** Parse a string into a <code>Stmt</code> AST node,
      * applying substitutions. */
     public Stmt parseStmt(String fmt) {
-        return parseStmt(fmt, list());
+        return (Stmt) parse(fmt, list(), STMT);
     }
 
     /** Parse a string into a <code>Stmt</code> AST node,
      * applying substitutions. */
     public Stmt parseStmt(String fmt, Object o1) {
-        return parseStmt(fmt, list(o1));
+        return (Stmt) parse(fmt, list(o1), STMT);
     }
 
     /** Parse a string into a <code>Stmt</code> AST node,
      * applying substitutions. */
     public Stmt parseStmt(String fmt, Object o1, Object o2) {
-        return parseStmt(fmt, list(o1, o2));
+        return (Stmt) parse(fmt, list(o1, o2), STMT);
     }
 
     /** Parse a string into a <code>Stmt</code> AST node,
      * applying substitutions. */
     public Stmt parseStmt(String fmt, Object o1, Object o2, Object o3) {
-        return parseStmt(fmt, list(o1, o2, o3));
+        return (Stmt) parse(fmt, list(o1, o2, o3), STMT);
     }
 
     /** Parse a string into a <code>Stmt</code> AST node,
@@ -530,7 +530,7 @@ public class QQ {
     public Stmt parseStmt(String fmt, Object o1, Object o2, Object o3,
         Object o4)
     {
-        return parseStmt(fmt, list(o1, o2, o3, o4));
+        return (Stmt) parse(fmt, list(o1, o2, o3, o4), STMT);
     }
 
     /** Parse a string into a <code>Stmt</code> AST node,
@@ -538,7 +538,7 @@ public class QQ {
     public Stmt parseStmt(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5)
     {
-        return parseStmt(fmt, list(o1, o2, o3, o4, o5));
+        return (Stmt) parse(fmt, list(o1, o2, o3, o4, o5), STMT);
     }
 
     /** Parse a string into a <code>Stmt</code> AST node,
@@ -546,7 +546,7 @@ public class QQ {
     public Stmt parseStmt(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5, Object o6)
     {
-        return parseStmt(fmt, list(o1, o2 , o3, o4, o5, o6));
+        return (Stmt) parse(fmt, list(o1, o2 , o3, o4, o5, o6), STMT);
     }
 
     /** Parse a string into a <code>Stmt</code> AST node,
@@ -554,7 +554,7 @@ public class QQ {
     public Stmt parseStmt(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5, Object o6, Object o7)
     {
-        return parseStmt(fmt, list(o1, o2 , o3, o4, o5, o6, o7));
+        return (Stmt) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7), STMT);
     }
 
     /** Parse a string into a <code>Stmt</code> AST node,
@@ -563,7 +563,7 @@ public class QQ {
         Object o4, Object o5, Object o6, Object o7, Object o8)
        
     {
-        return parseStmt(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8));
+        return (Stmt) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8), STMT);
     }
 
     /** Parse a string into a <code>Stmt</code> AST node,
@@ -572,13 +572,13 @@ public class QQ {
         Object o4, Object o5, Object o6, Object o7, Object o8, Object o9)
        
     {
-        return parseStmt(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8, o9));
+        return (Stmt) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8, o9), STMT);
     }
 
     /** Parse a string into a <code>Stmt</code> AST node,
      * applying substitutions. */
     public Stmt parseStmt(String fmt, Object[] os) {
-        return parseStmt(fmt, list(os));
+        return (Stmt) parse(fmt, list(os), STMT);
     }
 
     /** Parse a string into a <code>Stmt</code> AST node,
@@ -590,25 +590,25 @@ public class QQ {
     /** Parse a string into a <code>TypeNode</code> AST node,
      * applying substitutions. */
     public TypeNode parseType(String fmt) {
-        return parseType(fmt, list());
+        return (TypeNode) parse(fmt, list(), TYPE);
     }
 
     /** Parse a string into a <code>TypeNode</code> AST node,
      * applying substitutions. */
     public TypeNode parseType(String fmt, Object o1) {
-        return parseType(fmt, list(o1));
+        return (TypeNode) parse(fmt, list(o1), TYPE);
     }
 
     /** Parse a string into a <code>TypeNode</code> AST node,
      * applying substitutions. */
     public TypeNode parseType(String fmt, Object o1, Object o2) {
-        return parseType(fmt, list(o1, o2));
+        return (TypeNode) parse(fmt, list(o1, o2), TYPE);
     }
 
     /** Parse a string into a <code>TypeNode</code> AST node,
      * applying substitutions. */
     public TypeNode parseType(String fmt, Object o1, Object o2, Object o3) {
-        return parseType(fmt, list(o1, o2, o3));
+        return (TypeNode) parse(fmt, list(o1, o2, o3), TYPE);
     }
 
     /** Parse a string into a <code>TypeNode</code> AST node,
@@ -616,7 +616,7 @@ public class QQ {
     public TypeNode parseType(String fmt, Object o1, Object o2, Object o3,
         Object o4)
     {
-        return parseType(fmt, list(o1, o2, o3, o4));
+        return (TypeNode) parse(fmt, list(o1, o2, o3, o4), TYPE);
     }
 
     /** Parse a string into a <code>TypeNode</code> AST node,
@@ -624,7 +624,7 @@ public class QQ {
     public TypeNode parseType(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5)
     {
-        return parseType(fmt, list(o1, o2, o3, o4, o5));
+        return (TypeNode) parse(fmt, list(o1, o2, o3, o4, o5), TYPE);
     }
 
     /** Parse a string into a <code>TypeNode</code> AST node,
@@ -632,7 +632,7 @@ public class QQ {
     public TypeNode parseType(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5, Object o6)
     {
-        return parseType(fmt, list(o1, o2 , o3, o4, o5, o6));
+        return (TypeNode) parse(fmt, list(o1, o2 , o3, o4, o5, o6), TYPE);
     }
 
     /** Parse a string into a <code>TypeNode</code> AST node,
@@ -640,7 +640,7 @@ public class QQ {
     public TypeNode parseType(String fmt, Object o1, Object o2, Object o3,
         Object o4, Object o5, Object o6, Object o7)
     {
-        return parseType(fmt, list(o1, o2 , o3, o4, o5, o6, o7));
+        return (TypeNode) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7), TYPE);
     }
 
     /** Parse a string into a <code>TypeNode</code> AST node,
@@ -649,7 +649,7 @@ public class QQ {
         Object o4, Object o5, Object o6, Object o7, Object o8)
        
     {
-        return parseType(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8));
+        return (TypeNode) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8), TYPE);
     }
 
     /** Parse a string into a <code>TypeNode</code> AST node,
@@ -658,13 +658,13 @@ public class QQ {
         Object o4, Object o5, Object o6, Object o7, Object o8, Object o9)
        
     {
-        return parseType(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8, o9));
+        return (TypeNode) parse(fmt, list(o1, o2 , o3, o4, o5, o6, o7, o8, o9), TYPE);
     }
 
     /** Parse a string into a <code>TypeNode</code> AST node,
      * applying substitutions. */
     public TypeNode parseType(String fmt, Object[] os) {
-        return parseType(fmt, list(os));
+        return (TypeNode) parse(fmt, list(os), TYPE);
     }
 
     /** Parse a string into a <code>TypeNode</code> AST node,
