@@ -56,6 +56,12 @@ polyglot.ext.jl.ExtensionInfo {
         Inner0.jl ; Inner1.jl ; Inner2.jl ; Inner3.jl ; Inner4.jl ;
         Inner5.jl ; Inner6.jl ; Inner7.jl ; Inner8.jl ; Inner9.jl ;
         Inner10.jl ; Inner11.jl ; Inner12.jl ;
+        InnerSuperConstructor1.jl;
+        InnerSuperConstructor2.jl (Semantic, ".*must have an enclosing instance that contains.*");
+        InnerSuperConstructor3.jl;
+        InnerSuperConstructor4.jl;
+        InnerSuperConstructor5.jl (Semantic, ".*must have an enclosing instance that contains.*");
+        InnerSuperConstructor6.jl;
         InterfaceOverride.jl ;
         LabeledBreak.jl ;
         Local.jl ;
