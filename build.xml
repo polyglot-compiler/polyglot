@@ -632,7 +632,7 @@ ext=""
     <copy todir="${dist}/src/polyglot/ext/jl/tests" file="${src}/polyglot/ext/jl/tests/Makefile"/>
 
     <copy todir="${dist}/tools">
-      <fileset dir="${src}/tools"/>
+      <fileset dir="$tools"/>
     </copy>
 
     <copy file="${bin}/jlc.in" todir="${dist}/bin"/>
