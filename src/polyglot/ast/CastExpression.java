@@ -5,6 +5,8 @@
 package jltools.ast;
 
 import jltools.types.Type;
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 
 /**
  * CastExpression
@@ -67,9 +69,29 @@ public class CastExpression extends Expression {
 	expr = newExpression;
     }
 
-    public Node accept(NodeVisitor v) {
-	return v.visitCastExpression(this);
-    }
+  public void translate ( Context c, CodeWriter w)
+  {
+    w.write (" (( " );
+    type.translate(c, w);
+    w.write ( " ) " );
+    expr.translate(c, w);
+    w.write ( " )");
+  }
+  
+  public void dump (Context c, CodeWriter w)
+  {
+    w.write (" ( CAST to " );
+    type.dump(c, w);
+    expr.dump(c, w);
+    w.write (" )");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME: implement;
+    return this;
+  }
+
 
     /**
      * Requires: v will not transform the Expression into anything
@@ -78,8 +100,8 @@ public class CastExpression extends Expression {
      *    Visits the sub expression of this.
      */ 
     public void visitChildren(NodeVisitor v) {
-	expr = (Expression) expr.accept(v);
-	type = (TypeNode) type.accept(v);
+	expr = (Expression) expr.visit(v);
+	type = (TypeNode) type.visit(v);
     }
   
     public Node copy() {

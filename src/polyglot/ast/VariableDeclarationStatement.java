@@ -6,6 +6,8 @@ package jltools.ast;
 
 import jltools.util.TypedListIterator;
 import jltools.util.TypedList;
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 import jltools.types.Type;
 import jltools.types.AccessFlags;
 import java.util.Iterator;
@@ -145,24 +147,72 @@ public class VariableDeclarationStatement extends Statement {
     return modifiers;
   }
   
-  public Node accept(NodeVisitor v) {
-    return v.visitVariableDeclarationStatement(this);
-  }
-
-  /**
-   * Requires: v will not transform an Expression into anything other than
-   *   another Expression or null.
-   */
-  public void visitChildren(NodeVisitor v) {
-    type = (TypeNode) type.accept(v);
+   /**
+    *
+    */
+   void visitChildren(NodeVisitor vis)
+   {
+    type = (TypeNode) type.visit(vis);
     ListIterator it = variables.listIterator();
     while (it.hasNext()) {
       Declarator pair = (Declarator)it.next();
-      Expression newExpr = (Expression) pair.initializer.accept(v);
-      if (newExpr != pair.initializer)
-	it.set(new Declarator(pair.name, pair.additionalDims, newExpr));
+      if (pair.initializer != null)
+      {
+         Expression newExpr = (Expression) pair.initializer.visit(vis);
+         if (newExpr != pair.initializer)
+            it.set(new Declarator(pair.name, pair.additionalDims, newExpr));
+      }
     }
-  }
+   }
+
+   public Node typeCheck(Context c)
+   {
+      // FIXME: implement
+      return this;
+   }
+
+   public void translate(Context c, CodeWriter w)
+   {
+      w.write( modifiers.getStringRepresentation());
+      type.translate(c, w);
+      ListIterator it = variables.listIterator();
+      while (it.hasNext())
+      {
+         Declarator pair = (Declarator)it.next();
+         if (pair.initializer != null)
+         {
+            w.write(pair.name + "= ");
+            pair.initializer.translate(c, w);
+         }
+         else
+            w.write(pair.name);
+         if (it.hasNext())
+            w.write(", ");
+      }
+      w.write(";");
+
+   }
+
+   public void dump(Context c, CodeWriter w)
+   {
+      w.write( "(" + modifiers.getStringRepresentation());
+      type.translate(c, w);
+      ListIterator it = variables.listIterator();
+      while (it.hasNext())
+      {
+         Declarator pair = (Declarator)it.next();
+         if (pair.initializer != null)
+         {
+            w.write("(" + pair.name + ", ");
+            pair.initializer.translate(c, w);
+         }
+         else
+            w.write(pair.name + ", Nil");
+         if (it.hasNext())
+            w.write("), ");
+      }
+      w.write(";");
+   }
 
   /**
    * Yields all the declarators in this, in order. 

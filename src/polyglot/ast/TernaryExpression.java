@@ -4,6 +4,8 @@
 
 package jltools.ast;
 
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 
 /**
  * TernaryExpression
@@ -70,21 +72,40 @@ public class TernaryExpression extends Expression {
 	falseResult = newFalseResult;
     }
 
-    public Node accept(NodeVisitor v) {
-	return v.visitTernaryExpression(this);
-    }
 
-    /**
-     * Requires: v will not transform an Expression into anything other
-     *    than another Expression.
-     * Effects:
-     *    Visits all three children of this in order from left to right.
-     */
-    public void visitChildren(NodeVisitor v) {
-	conditional  = (Expression) conditional.accept(v);
-	trueResult   = (Expression) trueResult.accept(v);
-	falseResult  = (Expression) falseResult.accept(v);
-    }
+   void visitChildren(NodeVisitor vis)
+   {
+	conditional  = (Expression) conditional.visit(vis);
+	trueResult   = (Expression) trueResult.visit(vis);
+	falseResult  = (Expression) falseResult.visit(vis);
+   }
+
+   public Node typeCheck(Context c)
+   {
+      // FIXME: implement
+      return this;
+   }
+
+   public void  translate(Context c, CodeWriter w)
+   {
+      w.write("( " );
+      conditional.translate(c, w);
+      w.write(" ? ");
+      trueResult.translate(c, w);
+      w.write(" : " );
+      falseResult.translate(c, w);
+      w.write(")");
+   }
+
+   public void dump(Context c, CodeWriter w)
+   {
+      w.write("( TERNARY " );
+      dumpNodeInfo(c, w);
+      conditional.dump(c, w);
+      trueResult.dump(c, w);
+      falseResult.dump(c, w);
+      w.write(" ) ");
+   }
 
     public Node copy() {
       TernaryExpression te = 

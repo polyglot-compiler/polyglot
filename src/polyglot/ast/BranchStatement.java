@@ -4,6 +4,9 @@
 
 package jltools.ast;
 
+import jltools.util.CodeWriter;
+import jltools.types.Context;
+
 /**
  * BranchStatement
  *
@@ -71,11 +74,28 @@ public class BranchStatement extends Statement {
     label = newLabel;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitBranchStatement(this);
+  public void translate ( Context c, CodeWriter w)
+  {
+    w.write ( ( type == BREAK ? " break " : " continue " ) + 
+              ( label == null ? "; " : label + "; " ));
+  }
+  
+  public void dump (Context c, CodeWriter w)
+  {
+    w.write ( " ( BRANCH STATMENT : " + 
+              ( type == BREAK ? " BREAK " : " CONTINUE " ) + 
+              ( label == null ? ")" : label + ") " ));
   }
 
+  public Node typeCheck(Context c)
+  {
+    // FIXME: implement;
+    return this;
+  }
+
+
   public void visitChildren(NodeVisitor v) {
+    // nothing to do
   }
 
   public Node copy() {

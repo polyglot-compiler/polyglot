@@ -4,6 +4,9 @@
 
 package jltools.ast;
 
+import jltools.util.CodeWriter;
+import jltools.types.Context;
+
 /**
  * Overview: An ArrayIndexExpression is a mutable representation of an
  * access of an array member.  For instance foo[i] accesses the i'th
@@ -50,9 +53,29 @@ public class ArrayIndexExpression extends Expression {
     index = newIndex;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitArrayIndexExpression(this);
+  public void translate ( Context c, CodeWriter w)
+  {
+    base.translate(c, w);
+    w.write ("[");
+    index.translate(c, w);
+    w.write ("]");
   }
+  
+  public void dump (Context c, CodeWriter w)
+  {
+    w.write ( " ( ARRAY INDEX EXPR ") ;
+    dumpNodeInfo(c, w);
+    base.dump(c, w);
+    index.dump(c, w);
+    w.write (" ) " );
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME: implement;
+    return this;
+  }
+
 
   /** 
    * Requires: v does not transform an Expression into anything other
@@ -61,8 +84,8 @@ public class ArrayIndexExpression extends Expression {
    * Effects: visits the children of this with v.
    */  
   public void visitChildren(NodeVisitor v) {
-    base = (Expression) base.accept(v);
-    index = (Expression) index.accept(v);
+    base = (Expression) base.visit(v);
+    index = (Expression) index.visit(v);
   }
 
   public Node copy() {

@@ -4,6 +4,9 @@
 
 package jltools.ast;
 
+import jltools.util.CodeWriter;
+import jltools.types.Context;
+
 import jltools.util.Assert;
 import jltools.util.Annotate;
 
@@ -35,16 +38,33 @@ public class ExpressionStatement extends Statement {
     expression = exp;
   }    
 
-  public Node accept(NodeVisitor v) {
-    return v.visitExpressionStatement(this);
-  }
-
   /**
    * Requires: v will not transform an Expression into anything other than an
    *    Expression.
    **/
   public void visitChildren(NodeVisitor v) {
-    expression = (Expression) expression.accept(v);
+    expression = (Expression) expression.visit(v);
+  }
+
+  public void translate(Context c, CodeWriter w)
+  {
+    expression.translate(c, w);
+    w.write(";");
+  }
+
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write("( EXPRESSION_STATEMENT" );
+    dumpNodeInfo(c, w);
+    w.write(" (");
+    expression.dump(c, w);
+    w.write(" ) )");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // Fixme: implement
+    return this;
   }
 
   public Node copy() {

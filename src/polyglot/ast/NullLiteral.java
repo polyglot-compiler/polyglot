@@ -4,6 +4,9 @@
 
 package jltools.ast;
 
+import jltools.util.CodeWriter;
+import jltools.types.Context;
+
 /**
  * NullLiteral
  *
@@ -25,9 +28,23 @@ public class NullLiteral extends Literal {
     return copy();
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitNullLiteral(this);
+  public void translate(Context c, CodeWriter w)
+  {
+    w.write("null");
   }
 
-  public void visitChildren(NodeVisitor v) {}
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write("( NULL )");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // Fixme: implement
+    return this;
+  }
+  public void visitChildren(NodeVisitor v) 
+  {
+    // nothing to do 
+  }
 }

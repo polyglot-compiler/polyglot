@@ -3,6 +3,8 @@
  */
 
 package jltools.ast;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 
 /**
  * Overview: An InitializerBlock is a mutable representation of an
@@ -52,12 +54,33 @@ public class InitializerBlock extends ClassMember {
     block = newBlock;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitInitializerBlock(this);
+
+  public void translate(Context c, CodeWriter w)
+  {
+    w.beginBlock();
+    w.write (" { ");
+    block.translate(c, w);
+    w.write (" } ");
+    w.endBlock();
+  }
+
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write(" ( INITIALIZER BLOCK " );
+    w.beginBlock();
+    block.dump(c, w);
+    w.endBlock();
+    w.write(" )");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME; implement
+    return this;
   }
 
   public void visitChildren(NodeVisitor v) {
-    block = (BlockStatement) block.accept(v);
+    block = (BlockStatement) block.visit(v);
   }
 
   public Node copy() {

@@ -6,6 +6,8 @@ package jltools.ast;
 
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 import java.util.ListIterator;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -73,18 +75,72 @@ public class TryStatement extends Statement {
 				 false);
   }
   
-  public Node accept(NodeVisitor v) {
-    return v.visitTryStatement(this);
-  }
+   /**
+    *
+    */
+   void visitChildren(NodeVisitor vis)
+   {
+      tryBlock = (BlockStatement) tryBlock.visit(vis);
+      for (ListIterator it = catchBlocks.listIterator(); it.hasNext(); ) {
+	 CatchBlock cb = (CatchBlock) it.next();
+	 it.set((CatchBlock) cb.visit(vis));
+      }
+      finallyBlock = (BlockStatement) finallyBlock.visit(vis);
+   }
 
-  public void visitChildren(NodeVisitor v) {
-    tryBlock = (BlockStatement) tryBlock.accept(v);
-    for (ListIterator it = catchBlocks.listIterator(); it.hasNext(); ) {
-      CatchBlock cb = (CatchBlock) it.next();
-      it.set((CatchBlock) cb.accept(v));
-    }
-    finallyBlock = (BlockStatement) finallyBlock.accept(v);
-  }
+   public Node typeCheck(Context c)
+   {
+      // FIXME: implement
+      return this;
+   }
+
+   public void  translate(Context c, CodeWriter w)
+   {
+      w.write("try ");
+      w.beginBlock();
+      tryBlock.translate(c, w);
+      w.endBlock();
+      
+      for (ListIterator it = catchBlocks.listIterator(); it.hasNext(); )
+      {
+         CatchBlock cb = (CatchBlock) it.next();
+         w.beginBlock();
+         cb.translate(c, w);
+         w.endBlock();
+      }
+      w.beginBlock();
+      if (finallyBlock != null)
+      {
+         w.write ("finally ");
+         w.beginBlock();
+         finallyBlock.translate(c, w);
+         w.endBlock();
+      }
+   }
+
+   public void dump(Context c, CodeWriter w)
+   {
+      w.write("( TRY ");
+      w.beginBlock();
+      tryBlock.dump(c, w);
+      w.endBlock();
+      for (ListIterator it = catchBlocks.listIterator(); it.hasNext(); )
+      {
+         CatchBlock cb = (CatchBlock) it.next();
+         w.beginBlock();
+         cb.dump(c, w);
+         w.endBlock();
+      }
+      if (finallyBlock != null)
+      {
+         w.write ("(FINALLY ");
+         w.beginBlock();
+         finallyBlock.translate(c, w);
+         w.write(")");
+         w.endBlock();
+      }
+      w.write(")");
+   }
 
   public Node copy() {
     TryStatement ts = new TryStatement(tryBlock,

@@ -5,6 +5,8 @@
 package jltools.ast;
 
 import jltools.types.Type;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 
 /**
  * InstanceofExpression
@@ -70,8 +72,26 @@ public class InstanceofExpression extends Expression {
     type = new TypeNode(newType);
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitInstanceofExpression(this);
+
+  public void translate(Context c, CodeWriter w)
+  {
+    expr.translate(c, w);
+    w.write( " instanceof " + type.getType().getTypeString());
+  }
+
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write( " ( INSTANCEOF  ");
+    dumpNodeInfo(c, w);
+    w.write( " (");
+    expr.dump(c, w);
+    w.write (" ) ( " + type.getType().getTypeString() + ") )");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME; implement
+    return this;
   }
 
   /**
@@ -81,8 +101,8 @@ public class InstanceofExpression extends Expression {
    *     Visits the subexpression of this.
    */
   public void visitChildren(NodeVisitor v) {
-    type = (TypeNode) type.accept(v);
-    expr = (Expression) expr.accept(v);
+    type = (TypeNode) type.visit(v);
+    expr = (Expression) expr.visit(v);
   }
 
   public Node copy() {

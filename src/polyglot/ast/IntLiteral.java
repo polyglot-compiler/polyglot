@@ -3,6 +3,8 @@
  */ 
 
 package jltools.ast;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 
 /** 
  * IntegerLiteral
@@ -117,11 +119,33 @@ public class IntLiteral extends Literal {
     return value;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitIntLiteral(this);
+
+  public void translate(Context c, CodeWriter w)
+  {
+    if (type == BOOLEAN)
+    {
+      w.write( (value != 0 ? "true" : "false")  );
+    }
+    else
+    {
+      w.write( Long.toString( value ) );
+    }
   }
-  
+
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write( " ( INTLITERAL " );
+    dumpNodeInfo(c, w);
+    w.write( " ( " + value + " ) )");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME; implement
+    return this;
+  }  
   public void visitChildren(NodeVisitor v) {
+    // nothing to do
   }
 
   public Node copy() {

@@ -4,6 +4,8 @@
 
 package jltools.ast;
 
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 /**
  * BinaryExpression
  *
@@ -133,7 +135,7 @@ public class BinaryExpression extends Expression {
       return this;
    }
 
-   public Node translate(Context c)
+   public void translate(Context c, CodeWriter w)
    {
       left.translate(c, w);
       w.write(" ");
@@ -141,10 +143,9 @@ public class BinaryExpression extends Expression {
       w.write(" ");
       right.translate(c, w);
 
-      return this;
    }
 
-   public Node dump(Context c, CodeWriter w)
+   public void  dump(Context c, CodeWriter w)
    {
       w.write(getOperatorString(operator));
       dumpNodeInfo(c, w);
@@ -153,7 +154,6 @@ public class BinaryExpression extends Expression {
       right.dump(c, w);
       w.endBlock();
 
-      return this;
    }
 
     public Node copy() {

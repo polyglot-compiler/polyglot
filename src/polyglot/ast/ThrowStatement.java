@@ -3,6 +3,8 @@
  */
 
 package jltools.ast;
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 
 /**
  * ThrowStatement
@@ -37,19 +39,34 @@ public class ThrowStatement extends Statement {
     expr = newExpr;
   }
 
-  public Node accept (NodeVisitor v) {
-    return v.visitThrowStatement(this);
-  }
-  
-  /**
-   * Requires: <v> will not transform the Expression into anything
-   *    other than another Expression.
-   * Effects: Visits the subexpression of this
-   */
-  public void visitChildren(NodeVisitor v) {
-    expr = (Expression) expr.accept(v);
-  }
+   /**
+    *
+    */
+   void visitChildren(NodeVisitor vis)
+   {
+      expr = (Expression)expr.visit(vis);
+   }
 
+   public Node typeCheck(Context c)
+   {
+      // FIXME: implement
+      return this;
+   }
+
+   public void  translate(Context c, CodeWriter w)
+   {
+      w.write("throw ");
+      expr.translate(c, w);
+      w.write(";");
+   }
+
+   public void dump(Context c, CodeWriter w)
+   {
+      w.write("( ");
+      expr.dump(c, w);
+      w.write(")");
+   }
+  
   public Node copy() {
     ThrowStatement ts = new ThrowStatement(expr);
     ts.copyAnnotationsFrom(this);

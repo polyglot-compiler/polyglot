@@ -7,6 +7,8 @@ package jltools.ast;
 import jltools.types.Type;
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -109,18 +111,58 @@ public class MethodExpression extends Expression {
     
     target = newTarget;
   }
-
-  public Node accept(NodeVisitor v) {
-    return v.visitMethodExpression(this);
+  
+  public void translate(Context c, CodeWriter w)
+  {
+    if (target != null)
+    {
+      target.translate(c, w);
+      w.write ("." + name + "(");
+    }
+    else 
+      w.write(name + "(");
+    for(ListIterator it=arguments.listIterator(); it.hasNext(); ) {
+      ((Expression)it.next()).translate(c, w);
+      if (it.hasNext())
+        w.write(", ");
+    }
+    w.write (")");
+    
+  }
+  
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write (" ( CALL " + name + ": ");
+    dumpNodeInfo(c, w);
+    
+    if (target != null)
+    {
+      w.write (" ( TARGET: "  );
+      target.dump(c, w);
+      w.write(" ) ");
+    }
+    for(ListIterator it=arguments.listIterator(); it.hasNext(); ) 
+    {
+      w.write("(");
+      ((Expression)it.next()).translate(c, w);
+      w.write(")");
+    }
+    w.write(")");
   }
 
+  public Node typeCheck(Context c)
+  {
+    // fixme: implement
+    return this;
+  }
+  
   public void visitChildren(NodeVisitor v) {
     if (target != null) {
-      target = target.accept(v);
+      target = target.visit(v);
     }
 
     for(ListIterator it=arguments.listIterator(); it.hasNext(); ) {
-      it.set(((Expression) it.next()).accept(v));
+      it.set(((Expression) it.next()).visit(v));
     }
 
   }

@@ -5,6 +5,8 @@
 package jltools.ast;
 
 import jltools.types.Type;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 import jltools.util.TypedListIterator;
 import jltools.util.TypedList;
 import java.util.Iterator;
@@ -33,12 +35,13 @@ public class NewArrayExpression extends Expression {
    * Effects: Creates a NewArrayExpression with element type <elemType>,
    *    <lengthExpressions> as supplied dimensions,
    *    <additionalDim> additional dimensions of unspecified length,
-   *    and (optionally) <optInitializer> as an initializer expression.
+   *    <optInitializer> initializer (may be null) used when 
+   *               = new byte[] {2, 32, 32}
    */ 
   public NewArrayExpression(TypeNode elemType, 
 			    List lengthExpressions, 
-			    int additionalDim,
-			    ArrayInitializerExpression optInitializer) {
+			    int additionalDim, 
+                            ArrayInitializerExpression optInitializer) {
     if (additionalDim < 0) {
       throw new IllegalArgumentException("additionalDim must be positive");
     }
@@ -51,18 +54,18 @@ public class NewArrayExpression extends Expression {
 
   /**
    * Requires: additionalDim >= 0, and every element of lengthExpressions is 
-   *    an Expression.  optInitializer may be null.
+   *    an Expression.  
    * Effects: Creates a NewArrayExpression with element type <elemType>,
    *    <lengthExpressions> as supplied dimensions,
    *    <additionalDim> additional dimensions of unspecified length,
-   *    and (optionally) <optInitializer> as an initializer expression.
+   *    <optInitializer> initializer (may be null) used when 
+   *               = new byte[] {2, 32, 32}
    */ 
   public NewArrayExpression(Type elemType, 
 			    List lengthExpressions, 
-			    int additionalDim,
-			    ArrayInitializerExpression optInitializer) {
-    this(new TypeNode(elemType), lengthExpressions, additionalDim, 
-		      optInitializer);
+			    int additionalDim, 
+                            ArrayInitializerExpression optInitializer) {
+    this(new TypeNode(elemType), lengthExpressions, additionalDim, optInitializer);
   }
   
   /**
@@ -101,6 +104,22 @@ public class NewArrayExpression extends Expression {
   public void setAdditionalDimensions(int newAdditionalDim) {
     additionalDimensions = newAdditionalDim;
   } 
+
+  /**
+   * Returns the initalizer for this expression, or null if none exists
+   */
+  public ArrayInitializerExpression getInitializer()
+  {
+    return initializer;
+  }
+
+  /**
+   * Sets the initializer for this expression equal to <init>
+   */
+  public void setInitializer( ArrayInitializerExpression init)
+  {
+    initializer = init;
+  }
   
   /**
    * Effects: Returns the total dimensionality of the array.  For
@@ -156,22 +175,52 @@ public class NewArrayExpression extends Expression {
 				 false);
   }
 
-  /**
-   * Returns the initializer for this expression, or null if none exists.
-   **/
-  public ArrayInitializerExpression getInitializer() {
-    return initializer;
+  public void translate(Context c, CodeWriter w)
+  {
+    w.write ("new ");
+    type.translate(c, w);
+    for (ListIterator i = dimensionExpressions.listIterator(); i.hasNext(); )
+    {
+      w.write("[");
+      ( (Expression)i.next()).translate( c, w);
+      w.write("]");
+    }
+    for (int i = 0; i < additionalDimensions; i++)
+    { 
+      w.write("[]");
+    }
+    if (initializer != null)
+    {
+      initializer.translate(c, w);
+    }
   }
 
-  /**
-   * Sets the initializer for this expression to equal <expr>
-   **/
-  public void setInitializer(ArrayInitializerExpression expr) {
-    initializer = expr;
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write (" ( NEW " );
+    dumpNodeInfo(c, w);
+    w.write(" ( ");
+    type.dump(c, w);
+    w.write(" ) ");
+    for (ListIterator i = dimensionExpressions.listIterator(); i.hasNext(); )
+    {
+      w.write("(");
+      ( (Expression)i.next()).translate( c, w);
+      w.write(")");
+    }
+    w.write("( AdditionalDIM: " + additionalDimensions + ")");
+    if (initializer != null)
+    {
+      w.write( " ( " );
+      initializer.dump(c, w);
+      w.write( " ) " );
+    }
+    w.write (" )");
   }
-
-  public Node accept(NodeVisitor v) {
-    return v.visitNewArrayExpression(this);
+  
+  public Node typeCheck (Context c)
+  {
+    return this;
   }
 
     /** 
@@ -181,10 +230,10 @@ public class NewArrayExpression extends Expression {
      * Effects: visits the subexpression of this.  
      */
     public void visitChildren(NodeVisitor v) {
-      type = (TypeNode) type.accept(v);
+      type = (TypeNode) type.visit(v);
       for (ListIterator i=dimensionExpressions.listIterator(); i.hasNext(); ) {
 	Expression e = (Expression) i.next();
-	e = (Expression) e.accept(v);
+	e = (Expression) e.visit(v);
 	if (e==null) {
 	  i.remove();
 	}
@@ -192,13 +241,14 @@ public class NewArrayExpression extends Expression {
 	  i.set(v);
 	}
       }
+      initializer = initializer == null ? null: (ArrayInitializerExpression) initializer.visit(v);
     }
 
   public Node copy() {
     NewArrayExpression na = new NewArrayExpression(type,
 						   new ArrayList(),
-						   additionalDimensions,
-						   initializer);
+						   additionalDimensions, 
+                                                   initializer);
     na.copyAnnotationsFrom(this);
     for (Iterator i = dimensionExpressions.iterator(); i.hasNext() ; ) {
       na.addDimensionExpression((Expression) i.next());
@@ -207,12 +257,12 @@ public class NewArrayExpression extends Expression {
   }
 
   public Node deepCopy() {
-    ArrayInitializerExpression init = initializer == null ? null
-      : (ArrayInitializerExpression) initializer.deepCopy();
+    ArrayInitializerExpression init = initializer == null ? null : 
+      ( ArrayInitializerExpression) initializer.deepCopy();
     NewArrayExpression na = new NewArrayExpression((TypeNode) type.deepCopy(),
 						   new ArrayList(),
-						   additionalDimensions,
-						   init);
+						   additionalDimensions, 
+                                                   init);
     na.copyAnnotationsFrom(this);
     for (Iterator i = dimensionExpressions.iterator(); i.hasNext() ; ) {
       Expression e = (Expression) i.next();

@@ -6,6 +6,8 @@ package jltools.ast;
 
 import jltools.util.TypedListIterator;
 import jltools.util.TypedList;
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 import jltools.types.Type;
 import jltools.types.AccessFlags;
 import java.util.Iterator;
@@ -192,9 +194,73 @@ public class ClassNode extends ClassMember {
 				 false);
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitClassNode(this);
+  public void translate ( Context c, CodeWriter w)
+  {
+    w.write (accessFlags.getStringRepresentation() + " class " + name);
+    if (superClass != null)
+    {
+      w.write (" extends ");
+      superClass.translate(c, w);
+    }
+    if ( !interfaceList.isEmpty())
+    {
+      w.write (" implements " );
+      for (Iterator i = interfaceList.listIterator(); i.hasNext() ; )
+      {
+        ((TypeNode)i.next()).translate(c, w);
+        if ( i.hasNext())
+             w.write (", ");
+      }
+    }
+    w.write (" {");
+    w.beginBlock();
+    for (Iterator i = classMembers.listIterator(); i.hasNext(); )
+    {
+      ((Node)i.next()).translate(c, w);
+      w.newline(0);
+    }
+    w.endBlock();
+    w.write( "}");
+      
+
   }
+  
+  public void dump (Context c, CodeWriter w)
+  {
+    w.write (" ( CLASS " + name + "( SUPERCLASS: ");
+    if ( superClass == null)
+      w.write (" java.lang.Object ");
+    else
+      superClass.dump(c, w);
+    w.write ( " ) ( ACCESSFLAGS: " + 
+              accessFlags.getStringRepresentation() + ")");
+    w.write (" ( IMPLEMENTS: ");
+    for (Iterator i = interfaceList.listIterator(); i.hasNext() ; )
+    {
+      w.write(" ( " );
+      ((TypeNode)i.next()).dump(c, w);
+      w.write (") ");
+    }
+    w.write ( " ) ");
+    
+    w.beginBlock();
+    w.write (" (");
+    w.beginBlock();
+    for (Iterator i = classMembers.listIterator(); i.hasNext(); )
+    {
+      ((Node)i.next()).translate(c, w);
+      w.newline(0);
+    }
+    w.endBlock();
+    w.write( ") )");  
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME: implement;
+    return this;
+  }
+
 
   /**
    * Requires: v will not transform any ClassMember of the body of
@@ -206,13 +272,13 @@ public class ClassNode extends ClassMember {
    */
   public void visitChildren(NodeVisitor v) {
     if (superClass != null) 
-      superClass = (TypeNode) superClass.accept(v);
+      superClass = (TypeNode) superClass.visit(v);
     for(ListIterator i = interfaceList.listIterator(); i.hasNext(); ) {
-      i.set( ((TypeNode) i.next()).accept(v));
+      i.set( ((TypeNode) i.next()).visit(v));
     }
     for(ListIterator i=classMembers.listIterator(); i.hasNext(); ) {
       ClassMember m = (ClassMember) i.next();
-      m = (ClassMember) m.accept(v);
+      m = (ClassMember) m.visit(v);
       if (m==null) {
 	i.remove();
       }

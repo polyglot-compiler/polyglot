@@ -7,6 +7,8 @@ package jltools.ast;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 
 /**
  * Node
@@ -65,16 +67,16 @@ public abstract class Node extends jltools.util.AnnotatedObject {
    /**
     * Dumps the attributes to the writer, if the attributes have been set
     */
-   public void dumpNodeInfo(Context c, Codewriter w)
+   public void dumpNodeInfo(Context c, CodeWriter w)
    {
       //FIXME: Do this
    }
 
    public abstract Node typeCheck(Context c);
 
-   public abstract Node translate(Context c, CodeWriter w);
+   public abstract void translate(Context c, CodeWriter w);
 
-   public abstract Node dump(Context c, CodeWrite w);
+   public abstract void dump(Context c, CodeWriter w);
 
   /**
    * Return a new array containing all the elements of lst, in the same order.

@@ -6,6 +6,8 @@ package jltools.ast;
 
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -71,14 +73,43 @@ public class ArrayInitializerExpression extends Expression {
    **/
   public void removeExpression(int pos) { children.remove(pos); }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitArrayInitializerExpression(this);
+  public void translate ( Context c, CodeWriter w)
+  {
+    w.write ( " { " );
+    for (ListIterator iter = children(); iter.hasNext(); ) {
+      ((Expression) iter.next()).translate(c, w);
+      if ( iter.hasNext())
+      {
+        w.write (" , ");
+      }
+    }
+    w.write ( " } " );
   }
+  
+  public void dump (Context c, CodeWriter w)
+  {
+    w.write (" ( ARRAY INITIALIZER " );
+    dumpNodeInfo(c, w);
+    for (ListIterator iter = children(); iter.hasNext(); ) {
+      w.write ( " ( " );
+      ((Expression) iter.next()).dump(c, w);
+      w.write (" ) ");
+    }
+    w.write ( " ) " );
+    
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME: implement;
+    return this;
+  }
+
 
   public void visitChildren(NodeVisitor v) {
     for (ListIterator iter = children(); iter.hasNext(); ) {
       Expression expr = (Expression) iter.next();
-      Expression newExpr = (Expression) expr.accept(v);
+      Expression newExpr = (Expression) expr.visit(v);
       if (expr != newExpr)
 	iter.set(newExpr);
     }

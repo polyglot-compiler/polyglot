@@ -5,7 +5,8 @@
 package jltools.ast;
 
 import jltools.types.Type;
-
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 /**
  * TypeNode
  *
@@ -31,11 +32,28 @@ public class TypeNode extends Node {
     return type;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitTypeNode(this);
-  }
+   void visitChildren(NodeVisitor vis)
+   {
+      // nothing to do
+   }
 
-  public void visitChildren(NodeVisitor v) {}
+   public Node typeCheck(Context c)
+   {
+      // FIXME: implement
+      return this;
+   }
+
+   public void  translate(Context c, CodeWriter w)
+  {
+     w.write(type.getTypeString());
+   }
+
+   public void dump(Context c, CodeWriter w)
+   {
+     w.write(" ( TYPE: " + type.getTypeString() + ")");
+   }
+ 
+
   public Node copy() {
     TypeNode tn = new TypeNode(type);
     tn.copyAnnotationsFrom(this);

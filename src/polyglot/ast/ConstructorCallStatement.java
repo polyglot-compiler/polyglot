@@ -6,6 +6,8 @@ package jltools.ast;
 
 import jltools.util.TypedListIterator;
 import jltools.util.TypedList;
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.ArrayList;
@@ -103,8 +105,49 @@ public class ConstructorCallStatement extends Statement {
 				 false);
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitConstructorCallStatement(this);
+  public void translate ( Context c, CodeWriter w)
+  {
+    if (primary != null)
+    {
+      primary.translate( c, w);
+      w.write ( "." + ( type == THIS ? "this( " : "super( "));
+    }
+    else
+    {
+      w.write (( type == THIS ? "this( " : "super( "));
+    }
+    for (ListIterator i = argumentList.listIterator(); i.hasNext();)
+    {
+      ((Expression)i.next()).translate(c, w);
+      if (i.hasNext())
+      {
+        w.write (", " );
+      }
+    }
+    w.write ( ");");
+  }
+  
+  public void dump (Context c, CodeWriter w)
+  {
+    w.write (" (  CONSTRUCTOR CALL STMT " );
+    if (primary != null)
+    {
+      primary.dump(c, w);
+    }
+    w.write (( type == THIS ? "THIS " : "SUPER "));
+    for (ListIterator i = argumentList.listIterator(); i.hasNext();)
+    {
+      w.write (" ( ");
+      ((Expression)i.next()).translate(c, w);
+      w.write ( " ) ");
+    }
+    w.write (" )");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME: implement;
+    return this;
   }
 
   /**
@@ -116,12 +159,12 @@ public class ConstructorCallStatement extends Statement {
    */
   public void visitChildren(NodeVisitor v) {
     if (primary != null) {
-      primary = (Expression) primary.accept(v);
+      primary = (Expression) primary.visit(v);
     }
 
     for(ListIterator i=argumentList.listIterator(); i.hasNext(); ) {
       Expression e = (Expression) i.next();
-      e = (Expression) e.accept(v);
+      e = (Expression) e.visit(v);
       if (e == null) {
 	i.remove();
       }

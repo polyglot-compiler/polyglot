@@ -5,6 +5,8 @@
 package jltools.ast;
 
 import jltools.types.AccessFlags;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 
 /**
  * FieldNode
@@ -56,12 +58,28 @@ public class FieldNode extends ClassMember {
     declare = newDeclare;
   }
 
-  public Node accept (NodeVisitor v) {
-    return v.visitFieldNode(this);
+
+  public void translate(Context c, CodeWriter w)
+  {
+    w.write(accessFlags.getStringRepresentation());
+    declare.translate(c, w);
+  }
+
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write ( "(  FIELD_NODE: ( " + accessFlags.getStringRepresentation());
+    declare.dump(c, w);
+    w.write ( " ) " );
+  } 
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME; implement
+    return this;
   }
 
   public void visitChildren(NodeVisitor v) {
-    declare = (VariableDeclarationStatement) declare.accept(v);
+    declare = (VariableDeclarationStatement) declare.visit(v);
   }
 
   public Node copy() {

@@ -3,6 +3,8 @@
  */
 
 package jltools.ast;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 
 /** 
  * Float Literal
@@ -53,10 +55,23 @@ public class FloatLiteral extends Literal {
     return (double) value;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitFloatLiteral(this);
+
+  public void translate(Context c, CodeWriter w)
+  {
+    w.write ( type == FLOAT ? Float.toString( (float)value) : Double.toString( value ));
   }
-  
+
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write ( " ( " + (type == FLOAT ? " FLOAT " + Float.toString((float)value) :
+                                       " DOUBLE " + Double.toString( value ) ) + ")");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME; implement
+    return this;
+  }  
   public void visitChildren(NodeVisitor v) {
   }
 

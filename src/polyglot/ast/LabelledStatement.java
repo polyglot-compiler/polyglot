@@ -3,6 +3,8 @@
  */
 
 package jltools.ast;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 
 /**
  * LabelledStatement
@@ -52,10 +54,25 @@ public class LabelledStatement extends Statement {
     statement = newStatement;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitLabelledStatement(this);
+
+  public void translate(Context c, CodeWriter w)
+  {
+    w.write(label + ": ");
+    statement.translate(c, w);
   }
 
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write ("( LABEL \"" + label + "\" (");
+    statement.translate(c, w);
+    w.write(") )");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME; implement
+    return this;
+  }
   /**
    * Requires: v will not transform the statement into anything other
    *    than another statement.
@@ -63,7 +80,7 @@ public class LabelledStatement extends Statement {
    * Effects: visits the substatement of this with <v>.
    */
   public void visitChildren(NodeVisitor v) {
-    statement = (Statement) statement.accept(v);
+    statement = (Statement) statement.visit(v);
   }
 
   public Node copy() {

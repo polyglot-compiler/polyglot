@@ -6,6 +6,8 @@ package jltools.ast;
 
 import jltools.types.Type;
 import jltools.types.AccessFlags;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
 import java.util.List;
@@ -213,12 +215,68 @@ public class MethodNode extends ClassMember {
     body = newBody;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitMethodNode(this);
+  public void translate(Context c, CodeWriter w)
+  {
+    w.write ( accessFlags.getStringRepresentation() );
+    if (! isConstructor())
+    {
+      returnType.translate(c, w);
+      w.write (name + "( ");
+    }
+    else
+    {
+      w.write("(");
+    }
+    for (Iterator i = formals.iterator(); i.hasNext(); )
+    {
+      ((Expression)i.next()).translate(c, w);
+      if (i.hasNext())
+        w.write (" , ");
+    }
+    w.write(")");
+    if (! exceptions.isEmpty())
+    {
+      w.write (" throws " );
+      for (Iterator i = exceptions.iterator(); i.hasNext(); )
+      {
+        w.write ( ((Type)i.next()).getTypeString() + (i.hasNext() ? ", " : "" ));
+      }
+    }
+    w.beginBlock();
+    body.translate(c, w);
+    w.endBlock();
   }
-  
+
+  public void dump (Context c, CodeWriter w)
+  {
+    w.write( "( METHOD " + name + " ( " + accessFlags.getStringRepresentation() + " ) ");
+    dumpNodeInfo(c, w);
+    w.write("(");
+    for (Iterator i = formals.iterator(); i.hasNext(); )
+    {
+      w.write("(");
+      ((Expression)i.next()).translate(c, w);
+      w.write(")");
+    }
+    w.write(")");
+    w.write ("( THROWS : ");
+    for (Iterator i = exceptions.iterator(); i.hasNext(); )
+    {
+      w.write(" ( " + ((Type)i.next()).getTypeString() + " )" );
+    }
+  }
+
+  public Node typeCheck( Context c)
+  {
+    return this;
+  }
+
   public void visitChildren(NodeVisitor v) {
-    body = (BlockStatement) body.accept(v);
+    for (Iterator i = formals.iterator(); i.hasNext(); )
+    {
+      ((Expression)i.next()).visit(v);
+    }
+    body = (BlockStatement) body.visit(v);
   }
 
   public Node copy() {

@@ -4,6 +4,9 @@
 
 package jltools.ast;
 
+import jltools.util.CodeWriter;
+import jltools.types.Context;
+
 /**
  * SynchronizedStatement
  *
@@ -53,22 +56,38 @@ public class SynchronizedStatement extends Statement {
     body = newBody;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitSynchronizedStatement(this);
-  }
+   void visitChildren(NodeVisitor vis)
+   {
+    expr = (Expression) expr.visit(vis);
+    body = (BlockStatement) body.visit(vis);
+   }
 
-  /** 
-   * Requires: v will not transform an expression into anything other
-   *    than another expression, and that v will not transform a
-   *    BlockStatement into anything other than another BlockStatement.
-   * Effects: visits each of the children of this node with <v>.  If <v>
-   *    returns an expression in place of the sub-statement, it is
-   *    wrapped in an ExpressionStatement.
-   */
-  public void visitChildren(NodeVisitor v) {
-    expr = (Expression) expr.accept(v);
-    body = (BlockStatement) body.accept(v);
-  }
+   public Node typeCheck(Context c)
+   {
+      // FIXME: implement
+      return this;
+   }
+
+   public void  translate(Context c, CodeWriter w)
+   {
+      w.write ("synchronized (") ;
+      expr.translate(c, w);
+      w.write(")");
+      w.beginBlock();
+      body.translate(c, w);
+      w.endBlock();
+   }
+
+   public void  dump(Context c, CodeWriter w)
+   {
+      w.write ("SYNCHRONIZED ");
+      dumpNodeInfo(c, w);
+      expr.dump(c, w);
+      w.beginBlock();
+      body.dump(c, w);
+      w.endBlock();
+      w.write(")");
+   }
 
   public Node copy() {
     SynchronizedStatement ss = new SynchronizedStatement(expr, body);

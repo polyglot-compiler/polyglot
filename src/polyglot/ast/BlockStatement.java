@@ -7,6 +7,8 @@ package jltools.ast;
 import jltools.util.Assert;
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.ArrayList;
@@ -79,9 +81,33 @@ public class BlockStatement extends Statement {
 				 false);
   }
 
+  public void translate(Context c, CodeWriter w)
+  {
+    w.write("{");
+    w.newline(0);
+    for (ListIterator it = statements.listIterator(); it.hasNext(); ) 
+    {
+      ((Node)it.next()).translate(c, w);
+      w.newline(0);
+    }
+    w.write("}");
+  }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitBlockStatement(this);
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write("( ");
+    for (ListIterator it = statements.listIterator(); it.hasNext(); ) 
+    {
+      ((Node)it.next()).dump(c, w);
+      w.newline(0);
+    }
+    w.write(")");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // Fixme: implement
+    return this;
   }
 
   /**
@@ -111,7 +137,7 @@ public class BlockStatement extends Statement {
   public void visitChildren(NodeVisitor v, boolean flatten) {
     for (ListIterator it = statements.listIterator(); it.hasNext(); ) {
       Node node = (Node) it.next();
-      Node newNode = node.accept(v);
+      Node newNode = node.visit(v);
       if (newNode == null) {
 	// Remove the node.
 	it.remove();

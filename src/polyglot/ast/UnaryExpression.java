@@ -3,7 +3,8 @@
  */
 
 package jltools.ast;
-
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 /**
  * UnaryExpression
  * 
@@ -68,19 +69,65 @@ public class UnaryExpression extends Expression {
 	expr = newExpr;
     }
 
-    public Node accept(NodeVisitor v) {
-	return v.visitUnaryExpression(this);
-    }
+   /**
+    *
+    */
+   void visitChildren(NodeVisitor vis)
+   {
+      expr = (Expression)expr.visit(vis);
+   }
 
-    /**
-     * Requires: v will not transform an Expression into anything other
-     *    then another Expression.
-     * Effects:
-     *    Visits the child of this.
-     */ 
-    public void visitChildren(NodeVisitor v) {
-	expr  = (Expression) expr.accept(v);
-    }
+   public Node typeCheck(Context c)
+   {
+      // FIXME: implement
+      return this;
+   }
+
+   public void  translate(Context c, CodeWriter w)
+   {
+      if (operator <= NEGATIVE ||
+          operator >= PREINCR)
+      {
+         // prefix op.
+         if (operator == NEGATIVE) 
+            w.write("-");
+         if (operator == BITCOMP)
+            w.write("~");
+         if (operator == PREINCR)
+            w.write("++");
+         if (operator == PREDECR)
+            w.write("--");
+         expr.translate(c, w);
+      }
+      else
+      {
+         expr.translate(c, w);
+         if (operator == POSTINCR)
+            w.write("++");
+         if (operator == POSTDECR)
+            w.write("--");
+      }
+   }
+
+   public void  dump(Context c, CodeWriter w)
+   {
+      if (operator == NEGATIVE) 
+         w.write("(NEGATIVE ");
+      if (operator == BITCOMP)
+         w.write("(BIT-COMPL");
+      if (operator == PREINCR)
+         w.write("(PRE-INCR ");
+      if (operator == PREDECR)
+         w.write("(PRE-DECR ");
+      if (operator == POSTINCR)
+         w.write("(POST-INCR ");
+      if (operator == POSTDECR)
+         w.write("(POST-DECR ");
+      dumpNodeInfo(c, w);
+      expr.dump(c, w);
+      w.write(")");
+      
+   }
 
     public Node copy() {
       UnaryExpression ue = new UnaryExpression(expr, operator);

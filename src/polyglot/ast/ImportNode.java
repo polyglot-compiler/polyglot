@@ -3,6 +3,8 @@
  */
 
 package jltools.ast;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 
 /**
  * Overview: An ImportNode is a mutable representation of a Java
@@ -66,8 +68,21 @@ public class ImportNode extends Node {
     imports = newImports;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitImportNode(this);
+
+  public void translate(Context c, CodeWriter w)
+  {
+    w.write(" import " + imports+ (type == PACKAGE ? ".*;" : ";" ));
+  }
+
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write(" ( IMPORT " + (type == PACKAGE ? " PACKAGE " : " CLASS " ) + imports);
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME; implement
+    return this;
   }
 
   public void visitChildren(NodeVisitor v) {

@@ -6,6 +6,8 @@ package jltools.ast;
 
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -86,20 +88,57 @@ public class ForStatement extends Statement {
     return new TypedList(incrementors, Expression.class, false);
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitForStatement(this);
+
+  public void translate(Context c, CodeWriter w)
+  {
+    w.write ( " for ( " );
+    initializer.translate(c, w);
+    // don't have to write a semicolon because initializer is a statemnt
+    condition.translate(c, w);
+    w.write (" ; " ); // condition is a expr, so write semicolon.
+    for ( ListIterator iter = incrementors.listIterator(); iter.hasNext(); )
+    {
+      ((Expression)iter.next()).translate(c, w);
+      if (iter.hasNext())
+        w.write (", " );
+    }
+    w.write ( " ) " );
+    w.beginBlock();
+    body.translate(c, w);
+    w.endBlock();
+  }
+
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write (" ( FOR " );
+    initializer.dump(c, w);
+    condition.dump(c, w);
+    for (ListIterator iter = incrementors.listIterator(); iter.hasNext(); )
+    {
+      ((Expression)iter.next()).dump(c, w);
+    }
+    w.beginBlock();
+    body.dump(c, w);
+    w.write (" ) ");
+    w.endBlock();
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME; implement
+    return this;
   }
 
   public void visitChildren(NodeVisitor v) {
-    initializer = (Statement) initializer.accept(v);
-    condition = (Expression) initializer.accept(v);
+    initializer = (Statement) initializer.visit(v);
+    condition = (Expression) initializer.visit(v);
     for(ListIterator iter = incrementors.listIterator(); iter.hasNext(); ) {
       Expression expr = (Expression) iter.next();
-      Expression newExpr = (Expression) expr.accept(v);
+      Expression newExpr = (Expression) expr.visit(v);
       if (expr != newExpr)
 	iter.set(newExpr);
     }
-    body = (Statement) body.accept(v);
+    body = (Statement) body.visit(v);
   }
 
   public Node copy() {    

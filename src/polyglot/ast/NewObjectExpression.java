@@ -5,6 +5,8 @@
 package jltools.ast;
 
 import jltools.types.Type;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 import jltools.util.TypedListIterator;
 import jltools.util.TypedList;
 import java.util.Iterator;
@@ -123,10 +125,6 @@ public class NewObjectExpression extends Expression {
     classNode = newClassNode;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitNewObjectExpression(this);
-  }
-
   /**
    * Requires: v will not transform the an Expression from the
    * argument list into anything other than another expression and
@@ -138,12 +136,12 @@ public class NewObjectExpression extends Expression {
    */
   public void visitChildren(NodeVisitor v) {
     if (primary != null) {
-      primary = (Expression) primary.accept(v);
+      primary = (Expression) primary.visit(v);
     }
-    type = (TypeNode) type.accept(v);
+    type = (TypeNode) type.visit(v);
     for(ListIterator i=argumentList.listIterator(); i.hasNext(); ) {
       Expression e = (Expression) i.next();
-      e = (Expression) e.accept(v);
+      e = (Expression) e.visit(v);
       if (e == null) {
 	i.remove();
       }
@@ -152,8 +150,57 @@ public class NewObjectExpression extends Expression {
       }
     }
     if (classNode != null) {
-      classNode = (ClassNode) classNode.accept(v);
+      classNode = (ClassNode) classNode.visit(v);
     }
+  }
+
+  public void translate(Context c, CodeWriter w)
+  {
+    if (primary != null)
+    {
+      primary.translate(c, w);
+      w.write(".new ");
+    }
+    else
+      w.write ("new "  );
+    type.translate(c, w);
+    w.write (" ( ");
+    for (ListIterator i = argumentList.listIterator(); i.hasNext(); )
+    {
+      ((Expression) i.next()).translate(c, w);
+      w.write(", ");
+    }
+    w.write (")");
+    if (classNode != null)
+    {
+      classNode.translate(c, w);
+    }
+  }
+
+  public void dump (Context c, CodeWriter w)
+  {
+    w.write (" ( NEW " );
+    type.dump ( c, w);
+    primary.dump(c, w);
+    w.write (" ( " );
+    for (ListIterator i = argumentList.listIterator(); i.hasNext(); )
+    {
+      w.write("( ");
+      ((Expression) i.next()).translate(c, w);
+      w.write("), ");
+    }
+    w.write(")");
+    if (classNode != null)
+    {
+      classNode.translate(c, w);
+    }
+    w.write (")");
+    
+  }
+  
+  public Node typeCheck(Context c)
+  {
+    return this;
   }
 
   public Node copy() {

@@ -5,6 +5,8 @@
 package jltools.ast;
 
 import jltools.types.Type;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 
 /**
  * Overview: A FormalParameter is mutable representation of a pair of
@@ -12,7 +14,7 @@ import jltools.types.Type;
  * parameters such as in method declarations and catch blocks.
  */
 
-public class FormalParameter {
+public class FormalParameter extends Node {
     
     /**
      * Effects: Creates a new FormalParameter of type <type> bound to
@@ -87,7 +89,35 @@ public class FormalParameter {
 	this.isFinal = isFinal;
     }
 
-    public FormalParameter deepCopy() {
+
+   public void translate(Context c, CodeWriter w)
+   {
+     w.write ( type.getType().getTypeString() + " " + name);
+   }
+
+   public void dump(Context c, CodeWriter w)
+   {
+
+   }
+
+   public Node typeCheck(Context c)
+   {
+     // FIXME; implement
+     return this;
+   }
+  
+  public void visitChildren(NodeVisitor v)
+  {
+    type.visit(v);
+  }
+  
+  public Node copy()
+  {
+    return new FormalParameter((TypeNode)type.copy(), 
+                               name, 
+                               isFinal);
+  }
+    public Node deepCopy() {
       return new FormalParameter((TypeNode) type.deepCopy(),
 				 name,
 				 isFinal);

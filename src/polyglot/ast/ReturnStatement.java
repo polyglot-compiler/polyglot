@@ -4,6 +4,8 @@
 
 package jltools.ast;
 
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 /**
  * ReturnStatement
  * 
@@ -33,16 +35,34 @@ public class ReturnStatement extends Statement {
     expr = newExpr;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitReturnStatement(this);
-  }
-
   /** 
    * Requires: v will not transform the expression into anything other than
    *   another expression.
    */
   public void visitChildren(NodeVisitor v) {
-    expr = (Expression) expr.accept(v);
+    expr = (Expression) expr.visit(v);
+  }
+  
+  public void translate(Context c, CodeWriter w)
+  {
+    w.write("return ") ;
+    expr.translate(c, w);
+    w.write(";");
+  }
+
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write("RETURN ");
+    dumpNodeInfo(c, w);
+    w.write( " ( ");
+    expr.dump(c, w);
+    w.write(" ) ");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME: implement
+    return this;
   }
 
   public Node copy() {

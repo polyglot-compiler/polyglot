@@ -4,6 +4,9 @@
 
 package jltools.ast;
 
+import jltools.util.CodeWriter;
+import jltools.types.Context;
+
 /** 
  * StringLiteral
  * 
@@ -32,14 +35,27 @@ public class StringLiteral extends Literal {
     string = newString;
   }
 
+   void visitChildren(NodeVisitor vis)
+   {
+      //nothing to do
+   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitStringLiteral(this);
-  }
+   public Node typeCheck(Context c)
+   {
+      // FIXME: implement
+      return this;
+   }
+
+   public void  translate(Context c, CodeWriter w)
+   {
+      w.write(string);
+   }
+
+   public void dump(Context c, CodeWriter w)
+   {
+      w.write("( " + string + " )");
+   }
   
-  public void visitChildren(NodeVisitor v) {
-  }
-
   public Node copy() {
     StringLiteral sl = new StringLiteral(string);
     sl.copyAnnotationsFrom(this);

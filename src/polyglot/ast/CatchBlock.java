@@ -4,6 +4,9 @@
 
 package jltools.ast;
 
+import jltools.util.CodeWriter;
+import jltools.types.Context;
+
 /**
  * Overview: Represents a mutable pair of BlockStatements and
  * FormalParameters which represent a catch block.
@@ -51,13 +54,35 @@ public class CatchBlock extends Node {
     block = newBlock;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitCatchBlock(this);
+  public void translate ( Context c, CodeWriter w)
+  {
+    w.write ( " catch ( " );
+    formalParameter.translate( c, w);
+    w.write ( " )");
+    w.beginBlock();
+    block.translate (c, w);
+    w.endBlock();
+  }
+  
+  public void dump (Context c, CodeWriter w)
+  {
+    w.write (" (  CATCH BLOCK " ) ;
+    formalParameter.dump( c, w);
+    w.beginBlock();
+    block.dump(c, w);
+    w.endBlock();
   }
 
+  public Node typeCheck(Context c)
+  {
+    // FIXME: implement;
+    return this;
+  }
+
+
   public void visitChildren(NodeVisitor v) {
-    formalParameter.setType((TypeNode) formalParameter.getType().accept(v));
-    block = (BlockStatement) block.accept(v);
+    formalParameter.setType((TypeNode) formalParameter.getType().visit(v));
+    block = (BlockStatement) block.visit(v);
   }
 
   public Node copy() {
@@ -68,7 +93,7 @@ public class CatchBlock extends Node {
 
   public Node deepCopy() {
     CatchBlock cb = 
-      new CatchBlock(formalParameter.deepCopy(), 
+      new CatchBlock((FormalParameter)formalParameter.deepCopy(), 
 		     (BlockStatement) block.deepCopy());
     cb.copyAnnotationsFrom(this);
     return cb;

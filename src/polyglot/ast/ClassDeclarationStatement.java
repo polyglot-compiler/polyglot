@@ -4,6 +4,9 @@
 
 package jltools.ast;
 
+import jltools.util.CodeWriter;
+import jltools.types.Context;
+
 /**
  * ClassDeclarationStatement
  *
@@ -36,10 +39,26 @@ public class ClassDeclarationStatement extends Statement {
   public void setClassNode(ClassNode newClassNode) {
     classNode = newClassNode;
   }
-
-  public Node accept(NodeVisitor v) {
-    return v.visitClassDeclarationStatement(this);
+  public void translate ( Context c, CodeWriter w)
+  {
+    classNode.translate(c, w);
   }
+  
+  public void dump (Context c, CodeWriter w)
+  {
+    w.write (" CLASS DECLARATION");
+    w.beginBlock();
+    classNode.dump(c, w);
+    w.endBlock();
+    w.write ( " )");;
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME: implement;
+    return this;
+  }
+
 
   /**
    * Requires: v will not transform the ClassNode into anything other
@@ -48,7 +67,7 @@ public class ClassDeclarationStatement extends Statement {
    * Effects: visits each of the children of this with <v>.  
    */
   public void visitChildren(NodeVisitor v) {
-    classNode = (ClassNode) classNode.accept(v);
+    classNode = (ClassNode) classNode.visit(v);
   }
 
   public Node copy() {

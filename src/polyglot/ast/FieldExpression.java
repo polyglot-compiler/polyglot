@@ -7,6 +7,8 @@ package jltools.ast;
 import jltools.types.Type;
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -65,13 +67,39 @@ public class FieldExpression extends Expression {
     this.target = target;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitFieldExpression(this);
+
+  public void translate(Context c, CodeWriter w)
+  {
+    if (target != null) 
+    {
+      target.translate(c, w);
+      w.write("." + name);
+    }
+    else
+    {
+      w.write(name);
+    }
+  }
+
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write ( " ( FIELD ACCESS: " );
+    if (target != null)
+    {
+      target.dump( c, w);
+    }
+    w.write (" ( " + name + " ) ) ");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME; implement
+    return this;
   }
 
   public void visitChildren(NodeVisitor v) {
     if (target != null)
-      target = target.accept(v);
+      target = target.visit(v);
   }
 
   public Node copy() {

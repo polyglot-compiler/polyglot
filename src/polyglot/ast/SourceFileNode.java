@@ -6,6 +6,8 @@ package jltools.ast;
 
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -127,18 +129,60 @@ public class SourceFileNode extends Node {
     classes.remove(pos);
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitSourceFileNode(this);
-  }
 
-  public void visitChildren(NodeVisitor v) {
-    for(ListIterator it=imports.listIterator(); it.hasNext(); ) {
-      it.set(((ImportNode) it.next()).accept(v));
-    }
-    for(ListIterator it=classes.listIterator(); it.hasNext(); ) {
-      it.set(((ClassNode) it.next()).accept(v));
-    }
-  }
+   void visitChildren(NodeVisitor vis)
+   {
+      for(ListIterator it=imports.listIterator(); it.hasNext(); ) {
+	 it.set(((ImportNode) it.next()).visit(vis));
+      }
+      for(ListIterator it=classes.listIterator(); it.hasNext(); ) {
+	 it.set(((ClassNode) it.next()).visit(vis));
+      }
+   }
+
+   public Node typeCheck(Context c)
+   {
+      // FIXME: implement
+      return this;
+   }
+
+   public void translate(Context c, CodeWriter w)
+   {
+     w.write("package " + packageName);
+     w.newline(0);
+     for(ListIterator it=imports.listIterator(); it.hasNext(); ) 
+     {
+       ((ImportNode)it.next()).translate(c, w);
+     }
+     for(ListIterator it=classes.listIterator(); it.hasNext(); ) 
+     {
+       ((ClassNode)it.next()).translate(c, w);
+     }
+   }
+
+   public void dump(Context c, CodeWriter w)
+   {
+     w.write("CLASS ");
+     dumpNodeInfo(c, w);
+     w.write(" ( PACKAGE: " + packageName + " )");
+     w.newline();
+     w.beginBlock();
+     w.write("(");
+     for(ListIterator it=imports.listIterator(); it.hasNext(); ) 
+     {
+       ((ImportNode)it.next()).dump(c, w);
+     }
+     w.write(")");
+     w.endBlock();
+
+     w.beginBlock();
+     for(ListIterator it=classes.listIterator(); it.hasNext(); ) 
+     {
+       ((ClassNode)it.next()).translate(c, w);
+     }
+     w.endBlock();
+     
+   }
 
   public Node copy() {
     SourceFileNode sf = new SourceFileNode(sourceFilename, packageName,

@@ -4,6 +4,9 @@
 
 package jltools.ast;
 
+import jltools.util.CodeWriter;
+import jltools.types.Context;
+
 /**
  * WhileStatement
  *
@@ -52,54 +55,65 @@ public class WhileStatement extends Statement {
     statement = newStatement;
   }
 
-   /**
-    *
-    */
-   void visitChildren(NodeVisitor vis)
-   {
-      condExpr = condExpr.visit(vis);
-      statement = statement.visit(vis);
-   }
 
-   public Node typeCheck(Context c)
-   {
-      // FIXME: implement
-      return this;
-   }
+  /** 
+   * Requires: v will not transform an expression into anything other
+   *    than another expression, and that v will not transform a
+   *    Statement into anything other than another Statement or
+   *    Expression.
+   * Effects: visits each of the children of this node with <v>.  If <v>
+   *    returns an expression in place of the sub-statement, it is
+   *    wrapped in an ExpressionStatement.
+   */
+  public void visitChildren(NodeVisitor v) {
+    Node newNode = (Node) statement.visit(v);
+    if (newNode instanceof Expression) {
+      statement = new ExpressionStatement((Expression) newNode);
+    }
+    else {
+      statement = (Statement) newNode;
+    }
+    condExpr = (Expression) condExpr.visit(v);
+  }
 
-   public Node translate(Context c)
-   {
-      w.write("while ");
-      w.write("(");
-      condExpr.translate(c, w);
-      w.write(")");
-      w.beginBlock();
-      statement.translate(c, w);
-      w.endBlock();
+  public void translate(Context c, CodeWriter w)
+  {
+    w.write("while (" );
+    condExpr.translate(c, w);
+    w.write(") ");
+    w.beginBlock();
+    statement.translate(c, w);
+    w.endBlock();
+  }
 
-      return this;
-   }
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write("( WHILE " );
+    dumpNodeInfo(c, w);
+    w.write (" ( " );
+    condExpr.dump(c, w);
+    w.write (" ) " );
+    w.beginBlock();
+    w.write(" (" );
+    statement.dump(c, w);
+    w.write(" )" );
+    w.endBlock();
+    w.write(")");
+  }
 
-   public Node dump(Context c, CodeWriter w)
-   {
-      w.write("( WHILE ");
-      dumpNodeInfo(c, w); 
-      condExpr.dump(c, w);
-      w.beginBlock();
-      statement.dump(c, w);
-      w.endBlock();
+  public Node typeCheck(Context c)
+  {
+    // FIXME: implement
+    return this;
+  }
 
-      return this;
-   }
-   
-  
-   public Node copy() {
-      WhileStatement ds = new WhileStatement(condExpr, statement);
-      ds.copyAnnotationsFrom(this);
-      return ds;
-   }
+  public Node copy() {
+    WhileStatement ds = new WhileStatement(condExpr, statement);
+    ds.copyAnnotationsFrom(this);
+    return ds;
+  }
 
-   public Node deepCopy() {
+  public Node deepCopy() {
     WhileStatement ds = new WhileStatement((Expression) condExpr.deepCopy(),
 					   (Statement) statement.deepCopy());
     ds.copyAnnotationsFrom(this);

@@ -8,6 +8,9 @@ import jltools.util.TypedList;
 import java.util.List;
 import java.util.Enumeration;
 import java.util.ArrayList;
+import java.util.Iterator;
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 
 /**
  * AmbiguousNameExpression
@@ -67,8 +70,29 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     return copy();
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitAmbiguousNameExpression(this);
+  public void translate ( Context c, CodeWriter w)
+  {
+    // FIXME: Shouldn't get in here.
+    w.write ("< AMBIGOUS NAME: ");
+    dump(c, w);
+    w.write ( "> ");
+  }
+  
+  public void dump (Context c, CodeWriter w)
+  {
+    w.write ("( AMBIGOUS NAME ");
+    dumpNodeInfo(c, w);
+    for (Iterator i = names.listIterator(); i.hasNext(); )
+    {
+      w.write ("(" + (String)i.next() + ")");
+    }
+    w.write ( " ) ");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME: implement;
+    return this;
   }
 
   public void visitChildren(NodeVisitor v) { }

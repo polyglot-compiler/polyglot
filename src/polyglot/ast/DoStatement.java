@@ -4,6 +4,9 @@
 
 package jltools.ast;
 
+import jltools.types.Context;
+import jltools.util.CodeWriter;
+
 /**
  * DoStatement
  *
@@ -52,8 +55,33 @@ public class DoStatement extends Statement {
     statement = newStatement;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitDoStatement(this);
+
+  public void translate(Context c, CodeWriter w)
+  {
+    w.write (" do " );
+    w.beginBlock();
+    statement.translate(c, w);
+    w.endBlock();
+    w.write (" while ( " );
+    condExpr.translate ( c, w);
+    w.write ( " ) ");
+    
+  }
+
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write ( " ( DO_WHILE: " );
+    condExpr.dump(c, w);
+    w.beginBlock();
+    statement.dump(c, w);
+    w.endBlock();
+    w.write (" ) ");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME; implement
+    return this;
   }
 
   /** 
@@ -66,14 +94,14 @@ public class DoStatement extends Statement {
    *    wrapped in an ExpressionStatement.
    */
   public void visitChildren(NodeVisitor v) {
-    Node newNode = (Node) statement.accept(v);
+    Node newNode = (Node) statement.visit(v);
     if (newNode instanceof Expression) {
       statement = new ExpressionStatement((Expression) newNode);
     }
     else {
       statement = (Statement) newNode;
     }
-    condExpr = (Expression) condExpr.accept(v);
+    condExpr = (Expression) condExpr.visit(v);
   }
 
   public Node copy() {

@@ -3,6 +3,8 @@
  */
 
 package jltools.ast;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 
 /** 
  * LocalVariableExpression
@@ -36,11 +38,26 @@ public class LocalVariableExpression extends Expression {
 	name = newName;
     }
 
-    public Node accept(NodeVisitor v) {
-	return v.visitLocalVariableExpression(this);
-    }
+  public void translate(Context c, CodeWriter w)
+  {
+    w.write(name);
+  }
+
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write(" ( " + name );
+    dumpNodeInfo(c, w);
+    w.write(" ) ");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME; implement
+    return this;
+  }
 
     public void visitChildren(NodeVisitor v) {
+      // nothing to do
     }
 
     public Node copy() {

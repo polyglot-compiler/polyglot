@@ -3,6 +3,8 @@
  */
 
 package jltools.ast;
+import jltools.types.Context;
+import jltools.util.CodeWriter;
 
 /**
  * IfStatement
@@ -72,8 +74,52 @@ public class IfStatement extends Statement {
     elseStatement = newStatement;
   }
 
-  public Node accept(NodeVisitor v) {
-    return v.visitIfStatement(this);
+
+  public void translate(Context c, CodeWriter w)
+  {
+    w.write ( "if ( " ) ;
+    condExpr.translate ( c, w);
+    w.write ( " ) " );
+    w.beginBlock();
+    thenStatement.translate(c, w);
+    w.endBlock();
+    if ( elseStatement != null)
+    {
+      w.write ( " else " );
+      w.beginBlock();
+      elseStatement.translate(c, w);
+      w.endBlock();
+    }
+    
+  }
+
+  public void dump(Context c, CodeWriter w)
+  {
+    w.write ( "( IF " ) ; 
+    dumpNodeInfo(c, w);
+    w.write (" ( " );
+    condExpr.dump ( c, w);
+    w.write ( " ) " );
+    w.beginBlock();
+    w.write ( " ( ");
+    thenStatement.translate(c, w);
+    w.write ( " ) ");
+    w.endBlock();
+    if ( elseStatement != null)
+    {
+      w.write ( " ( " );
+      w.beginBlock();
+      elseStatement.translate(c, w);
+      w.write ( " ) ");
+      w.endBlock();
+    }
+    w.write ( ") ");
+  }
+
+  public Node typeCheck(Context c)
+  {
+    // FIXME; implement
+    return this;
   }
 
   /** 
@@ -86,8 +132,8 @@ public class IfStatement extends Statement {
    *    wrapped in an ExpressionStatement.
    */
   public void visitChildren(NodeVisitor v) {
-    condExpr = (Expression) condExpr.accept(v);
-    Node newNode = (Node) thenStatement.accept(v);
+    condExpr = (Expression) condExpr.visit(v);
+    Node newNode = (Node) thenStatement.visit(v);
     if (newNode instanceof Expression) {
       thenStatement = new ExpressionStatement((Expression) newNode);
     }
@@ -95,7 +141,7 @@ public class IfStatement extends Statement {
       thenStatement = (Statement) newNode;
     }
 
-    newNode = (Node) elseStatement.accept(v);
+    newNode = (Node) elseStatement.visit(v);
     if (newNode instanceof Expression) {
       elseStatement = new ExpressionStatement((Expression) newNode);
     }

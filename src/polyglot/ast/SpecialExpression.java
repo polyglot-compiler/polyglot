@@ -4,6 +4,8 @@
 
 package jltools.ast;
 
+import jltools.util.CodeWriter;
+import jltools.types.Context;
 import jltools.types.Type;
 
 /**
@@ -74,15 +76,31 @@ public class SpecialExpression extends Expression {
     kind = newKind;
   }
   
-  public Node accept(NodeVisitor v) {
-    return v.visitSpecialExpression(this);
-  }
+   void visitChildren(NodeVisitor vis)
+   {
+      if (type != null) {
+	 type = (TypeNode) type.visit(vis);
+      }
+   }
 
-  public void visitChildren(NodeVisitor v) {
-    if (type != null) {
-      type = (TypeNode) type.accept(v);
-    }
-  }
+   public Node typeCheck(Context c)
+   {
+      // FIXME: implement
+      return this;
+   }
+
+   public void translate(Context c, CodeWriter w)
+   {
+     w.write(type.getType().getTypeString() + 
+             ( kind == SUPER ? ".super" : ".this") );
+   }
+
+   public void dump(Context c, CodeWriter w)
+   {
+     w.write( " ( (" + type.getType().getTypeString() + " ) ( " + 
+              (kind == SUPER ? "SUPER" : "THIS" ) + ") )");
+     
+   }
 
   public Node copy() {
     SpecialExpression se = new SpecialExpression (type, kind);
