@@ -631,6 +631,7 @@ ext=""
     <copy file="${lib}/JFlex.jar" todir="${dist}/lib"/>
     <copy file="build.xml" todir="${dist}"/>
     <copy file="README" todir="${dist}"/>
+    <copy file="CHANGES" todir="${dist}"/>
     <copy file="LICENSE" todir="${dist}"/>
   </target>
 
