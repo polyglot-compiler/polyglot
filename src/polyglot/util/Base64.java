@@ -41,9 +41,9 @@ package polyglot.util;
 *
 * @author Kevin Kelley (kelley@ruralnet.net)
 * @version 1.3
-* @date 06 August 1998
-* @modified 14 February 2000
-* @modified 22 September 2000
+* %date 06 August 1998
+* %modified 14 February 2000
+* %modified 22 September 2000
 */
 public class Base64 {
 

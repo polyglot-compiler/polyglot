@@ -156,8 +156,8 @@ public class Formal_c extends Node_c implements Formal
     }
 
     /**
-     * Is this term reachable? This attribute is not guaranteed correct until
-     * after the reachability pass
+     * Return true if this term is reachable. This attribute is not
+     * guaranteed correct until after the reachability pass
      *
      * @see polyglot.visit.ReachChecker
      */

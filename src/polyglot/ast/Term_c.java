@@ -34,8 +34,8 @@ public abstract class Term_c extends Node_c implements Term
     }
 
     /**
-     * Is this term reachable? This attribute is not guaranteed correct until
-     * after the reachability pass
+     * Return true if this term is eachable.  This attribute is not
+     * guaranteed correct until after the reachability pass
      *
      * @see polyglot.visit.ReachChecker
      */

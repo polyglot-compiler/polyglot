@@ -23,7 +23,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected TargetFactory target_factory = null;
 
     /** 
-     * A list of all active (i.e. uncompleted) <code>SourceJob</code>s.
+     * A list of all active (that is, uncompleted) <code>SourceJob</code>s.
      */
     protected LinkedList worklist;
 
