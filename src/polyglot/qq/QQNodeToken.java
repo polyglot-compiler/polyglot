@@ -17,4 +17,8 @@ public class QQNodeToken extends Token {
   public Node node() {
       return node;
   }
+
+  public String toString() {
+      return "qq" + symbol() + "(" + node + ")";
+  }
 }

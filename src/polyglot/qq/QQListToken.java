@@ -18,4 +18,8 @@ public class QQListToken extends Token {
   public List list() {
       return list;
   }
+
+  public String toString() {
+      return "qq(" + list + ")";
+  }
 }
