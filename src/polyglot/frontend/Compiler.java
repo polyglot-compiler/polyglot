@@ -291,6 +291,22 @@ public class Compiler implements TargetTable, ClassCleaner
    */
   protected boolean compile( Job job, int goal) throws IOException
   {
+    // FIXME: if we get an io error (due to too many files open, for example)
+    // it will throw an exception. but, we won't be able to do anything with it since
+    // the exception handlers will want to load jltools.util.CodeWriter and 
+    // jltools.util.ErrorInfo to print and enqueue the error; but the classes must 
+    // be in memory since the io can't open any files; thus, we force the classloader
+    // to load the class file.
+    try
+    {
+      this.getClass().getClassLoader().loadClass( "jltools.util.CodeWriter");
+      this.getClass().getClassLoader().loadClass( "jltools.util.ErrorInfo");
+    }
+    catch (ClassNotFoundException cnfe)
+    {
+      cnfe.printStackTrace();
+    }
+    
     if( hasErrors( job)) {
       return false;
     }
@@ -424,7 +440,7 @@ public class Compiler implements TargetTable, ClassCleaner
     catch( IOException e)
     {
       eq.enqueue( ErrorInfo.IO_ERROR, 
-                      "Encountered an I/O error while compiling.");
+                      "Encountered an I/O error while compiling:" + e.getMessage());
       eq.flush();
       throw e;
     }
@@ -547,7 +563,6 @@ public class Compiler implements TargetTable, ClassCleaner
     try
     {
       sym = grm.parse();
-      t.getSourceReader().close();
     }
     catch( IOException e)
     {
@@ -560,6 +575,8 @@ public class Compiler implements TargetTable, ClassCleaner
       eq.enqueue( ErrorInfo.INTERNAL_ERROR, e.getMessage());
       return null;
     }
+    // done with the input
+    t.getSourceReader().close();
 
     /* Try and figure out whether or not the parser was successful. */
     if( sym == null) {

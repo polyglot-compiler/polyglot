@@ -680,7 +680,7 @@ variable_declarator_id ::=
 				// VariableDeclarationStatement.Declarator
 		IDENTIFIER:a
 			{: RESULT = new VariableDeclarationStatement.
-				Declarator(a.getIdentifier(), 0, null); :}
+				Declarator(null, a.getIdentifier(), 0, null); :}
 	|	variable_declarator_id:a LBRACK RBRACK
 			{: RESULT = a; a.additionalDimensions++; :}
 	;

@@ -104,6 +104,8 @@ public class MainTargetFactory implements TargetFactory
   {
     File sourceFile;
     File outputFile;
+    FileReader sourceFileReader;
+    Writer outputWriter;
     Iterator visitors;
 
     public MainTarget( String name, File sourceFile, File outputFile)
@@ -112,17 +114,22 @@ public class MainTargetFactory implements TargetFactory
       this.sourceFile = sourceFile;
       this.outputFile = outputFile;
       this.visitors = null;
+      sourceFileReader = null;
+      outputWriter = null;
     }
 
     public Reader getSourceReader() throws IOException
     {
-      return new FileReader( sourceFile);
+      if (sourceFileReader != null) return sourceFileReader;
+      return (sourceFileReader = new FileReader( sourceFile));
     }
 
     public Writer getOutputWriter( String packageName) throws IOException
     {
+      if (outputWriter == null) return outputWriter;
+
       if( stdout) {
-        return new UnicodeWriter( new PrintWriter( System.out));
+        return (outputWriter = new UnicodeWriter( new PrintWriter( System.out)));
       }
       else {
         if( outputFile == null) {
@@ -147,7 +154,7 @@ public class MainTargetFactory implements TargetFactory
           File parent = outputFile.getParentFile();
           parent.mkdirs();
         }
-        return new UnicodeWriter( new FileWriter( outputFile));
+        return (outputWriter = new UnicodeWriter( new FileWriter( outputFile)));
       }
     }
 

@@ -2,9 +2,9 @@ package jltools.ast;
 
 import jltools.util.*;
 import jltools.types.*;
-
+import jltools.visit.AmbiguityRemover;
 import java.util.*;
-
+import java.lang.ref.WeakReference;
 
 /** 
  * A <code>VariableDeclarationStatement</code> is an immutable representation 
@@ -13,27 +13,145 @@ import java.util.*;
  */
 public class VariableDeclarationStatement extends Statement 
 {
-
   /**
    * This class corresponds to the VariableDeclarator production in
    * the Java grammar. (Section 19.8.2)
    */
-  public static final class Declarator 
+  public static final class Declarator extends Statement
   {
     public String name;
     public int additionalDimensions;    
     // will be null for uninitialized variable.
     public Expression initializer;
+    // declaration statement that we are a part of; hold it in a weak referenence to 
+    // avoid cycles in the ast, so that the gc can perform well
+    WeakReference wrVDS;
+
     /**
      * Creates a new Declarator for a variable named <code>n</code>, with 
      * <code>dims</code> dimensions beyond those of the declarations's base
      * type.
      */
-    public Declarator( String n, int dims, Expression init) 
+    public Declarator( VariableDeclarationStatement vds, 
+                       String n, int dims, Expression init) 
     {
       name = n;
       additionalDimensions = dims;
       initializer = init;
+      wrVDS = new WeakReference(vds);
+    }
+
+    /**
+     * Lazily reconstruct the Declarator
+     */
+    public Declarator reconstruct (VariableDeclarationStatement vds, 
+                                   String n, int dims, Expression init)
+    {
+      if ( ! n.equals ( name) ||
+           dims != additionalDimensions ||
+           init != initializer ||
+           vds != (VariableDeclarationStatement)wrVDS.get() )
+      {
+        Declarator d = new Declarator ( vds, n, dims, init);
+        d.copyAnnotationsFrom ( this );
+        return d;
+      }
+      return this;
+    }
+    
+    Node visitChildren( NodeVisitor v)
+    {
+      
+      if (initializer != null)
+        return reconstruct ( (VariableDeclarationStatement)wrVDS.get(), name, 
+                             additionalDimensions, 
+                             (Expression)initializer.visit( v ) );
+      return this;
+    }
+
+    public Node removeAmbiguities( LocalContext c) throws SemanticException
+    {
+      /* Only add to context if inside a method, hence a local variable 
+       * declaration. */
+      if( c.getCurrentMethod() != null) {
+        VariableDeclarationStatement vdsEnclosing = 
+          (VariableDeclarationStatement)wrVDS.get();
+        FieldInstance fi = new FieldInstance( name, 
+                                              vdsEnclosing.typeForDeclarator(this), 
+                                              null, vdsEnclosing.accessFlags);
+        /* If it is a constant numeric expression (final + initializer is 
+         * IntLiteral) then mark it "constant" under FieldInstance. */
+        // FIXME other literal types?
+        if( initializer instanceof IntLiteral 
+            && initializer != null && vdsEnclosing.accessFlags.isFinal()) {
+          fi.setConstantValue( new Long(
+              ((IntLiteral)initializer).getLongValue())); 
+        }
+        c.addSymbol( name, fi);
+      }
+      return this;
+    }
+      
+    public Node typeCheck( LocalContext c) throws SemanticException
+    {
+
+      VariableDeclarationStatement vdsEnclosing = 
+        (VariableDeclarationStatement)wrVDS.get();
+      /* Only add to context if inside a method, hence a local variable 
+       * declaration. */
+      if( c.getCurrentMethod() != null) {
+        if (c.isDefinedLocally( name) )
+          throw new SemanticException("Duplicate declaration of \"" + 
+                                      name + "\"");
+          
+        /* If it is a constant numeric expression (final + initializer is 
+         * IntLiteral) then mark it "constant" under FieldInstance. */
+        // FIXME other literal types?
+        FieldInstance fi = new FieldInstance( name, 
+                                              vdsEnclosing.typeForDeclarator(this), 
+                                              null, vdsEnclosing.accessFlags);
+        if( initializer instanceof IntLiteral 
+            && initializer != null && vdsEnclosing.accessFlags.isFinal()) {
+          fi.setConstantValue( new Long(
+                                 ((IntLiteral)initializer).getLongValue())); 
+        }
+        c.addSymbol( name, fi);
+      }
+      
+      if (initializer != null) {
+        Type type = vdsEnclosing.typeForDeclarator( this );
+          if( !c.getTypeSystem().isImplicitCastValid( 
+                            initializer.getCheckedType(), 
+                            type)) {
+            throw new SemanticException( "The type of the variable initializer "
+                           + "\"" 
+                           + initializer.getCheckedType().getTypeString()
+                           + "\" does not match that of the declaration \"" 
+                           + type.getTypeString() + "\".");
+          }
+      }
+      return this;
+    }
+
+    public void translate( LocalContext c, CodeWriter w)
+    {
+      w.write ( name);
+      for (int i = 0; i < additionalDimensions; i++)
+        w.write("[]");
+      if ( initializer != null)
+      {
+        w.write( " =");
+	w.allowBreak(2, " ");
+        initializer.translate(c, w);
+      }
+    }
+
+    public void dump( CodeWriter w) throws SemanticException
+    {
+      VariableDeclarationStatement vdsEnclosing = 
+        (VariableDeclarationStatement)wrVDS.get();
+      w.write( "( < " + name + " > < " 
+               + vdsEnclosing.typeForDeclarator( this).getTypeString() + " > ) ");
     }
   }
 
@@ -53,7 +171,13 @@ public class VariableDeclarationStatement extends Statement
                                        TypeNode tn, List declarators) {
     this.accessFlags = accessFlags;
     this.tn = tn;
-    this.declarators = TypedList.copyAndCheck( declarators, Declarator.class,
+    List l = new ArrayList( declarators.size());
+    for (ListIterator i = declarators.listIterator(); i.hasNext(); )
+    {
+      Declarator d = (Declarator)i.next();
+      l.add( d.reconstruct ( this, d.name, d.additionalDimensions, d.initializer));
+    }
+    this.declarators = TypedList.copyAndCheck( l, Declarator.class,
                                                true);
   }
 
@@ -155,100 +279,32 @@ public class VariableDeclarationStatement extends Statement
   Node visitChildren( NodeVisitor v)
   {
     TypeNode newTn = (TypeNode)tn.visit( v);
-
     List newDeclarators = new ArrayList( declarators.size());
 
     for( Iterator iter = declarators(); iter.hasNext(); ) {
-      Declarator decl = (Declarator)iter.next();
-      if( decl.initializer != null) {
-        Expression newInitializer = (Expression)decl.initializer.visit( v);
-        if( newInitializer != decl.initializer) {
-          newDeclarators.add( new Declarator( decl.name,
-                                              decl.additionalDimensions,
-                                              newInitializer));
-        }
-        else {
-          newDeclarators.add( decl);
-        }
-      }
-      else {
-        newDeclarators.add( decl);
-      }   
+      newDeclarators.add ( ((Declarator)iter.next()).visit ( v ) );
     }
 
     return reconstruct( accessFlags, newTn, newDeclarators);
   }
 
-  public Node removeAmbiguities( LocalContext c) throws SemanticException
+  public Node removeAmbiguities( LocalContext c, AmbiguityRemover ar) 
+    throws SemanticException
   {
-    /* Only add to context if inside a method, hence a local variable 
-     * declaration. */
-    if( c.getCurrentMethod() != null) {
-      for( Iterator iter = declarators(); iter.hasNext(); ) {
-        Declarator decl = (Declarator)iter.next();
-        /* If it is a constant numeric expression (final + initializer is 
-         * IntLiteral) then mark it "constant" under FieldInstance. */
-        // FIXME other literal types?
-        FieldInstance fi = new FieldInstance( decl.name, 
-                                              typeForDeclarator(decl), 
-                                              null, accessFlags);
-        if( decl.initializer instanceof IntLiteral 
-            && decl.initializer != null && accessFlags.isFinal()) {
-          fi.setConstantValue( new Long(
-              ((IntLiteral)decl.initializer).getLongValue())); 
-        }
-        c.addSymbol( decl.name, fi);
-      }
-    }
+    TypeNode newTn = (TypeNode)tn.visit(ar);
     
-    return this;
+    VariableDeclarationStatement vds = reconstruct ( accessFlags, 
+                                                     newTn, declarators);
+    List newDeclarators = new ArrayList ( declarators.size());
+    for (Iterator iter = vds.declarators(); iter.hasNext(); )
+    {
+      newDeclarators.add( ((Declarator)iter.next()).visit( ar ));
+    }
+    return vds.reconstruct ( accessFlags, newTn, newDeclarators);
   }
 
   public Node typeCheck( LocalContext c) throws SemanticException
   {
-    /* Only add to context if inside a method, hence a local variable 
-     * declaration. */
-    if( c.getCurrentMethod() != null) {
-      for( Iterator iter = declarators(); iter.hasNext(); ) {
-        Declarator decl = (Declarator)iter.next();
-
-        if (c.isDefinedLocally( decl.name) )
-          throw new SemanticException("Duplicate declaration of \"" + 
-                                      decl.name + "\"");
-
-        /* If it is a constant numeric expression (final + initializer is 
-         * IntLiteral) then mark it "constant" under FieldInstance. */
-        // FIXME other literal types?
-        FieldInstance fi = new FieldInstance( decl.name, 
-                                              typeForDeclarator(decl), 
-                                              null, accessFlags);
-        if( decl.initializer instanceof IntLiteral 
-            && decl.initializer != null && accessFlags.isFinal()) {
-          fi.setConstantValue( new Long(
-              ((IntLiteral)decl.initializer).getLongValue())); 
-        }
-        c.addSymbol( decl.name, fi);
-      }
-    }
-     
-    for( Iterator iter = declarators(); iter.hasNext() ;) {
-      Declarator decl = (Declarator)iter.next();
-      if (decl.initializer != null) {
-        Type type = typeForDeclarator( decl);
-
-        if( !c.getTypeSystem().isImplicitCastValid( 
-                                  decl.initializer.getCheckedType(), 
-                                  type)) {
-          throw new SemanticException( "The type of the variable initializer "
-                           + "\"" 
-                           + decl.initializer.getCheckedType().getTypeString()
-                           + "\" does not match " 
-                           + "that of the declaration \"" 
-                           + type.getTypeString() + "\".");
-        }
-      }
-    }
-
     return this;
   }
 
@@ -259,21 +315,8 @@ public class VariableDeclarationStatement extends Statement
     w.write(" ");
     for( Iterator iter = declarators(); iter.hasNext(); ) {
       Declarator decl = (Declarator)iter.next();
-      if( decl.initializer != null) {
-        w.write( decl.name);
-        for (int i = 0; i < decl.additionalDimensions; i++) {
-          w.write( "[]");
-        }
-        w.write( " =");
-	w.allowBreak(2, " ");
-        decl.initializer.translate( c, w);
-      }
-      else {
-        w.write( decl.name);
-        for( int i = 0; i < decl.additionalDimensions; i++) {
-          w.write( "[]");
-        }
-      }
+      decl.translate(c, w);
+
       if( iter.hasNext()) {
         w.write( ",");
 	w.allowBreak(2, " ");
@@ -289,24 +332,5 @@ public class VariableDeclarationStatement extends Statement
     dumpNodeInfo( w);
     w.write(")");
     
-    w.begin(0);
-    
-    for( Iterator iter = declarators(); iter.hasNext(); ) {
-      Declarator decl = (Declarator)iter.next();
-      if (decl.initializer != null) {
-        w.write( "( < " + decl.name + " > < " 
-                 + typeForDeclarator( decl).getTypeString() + " > ) ");
-        decl.initializer.dump( w);
-      }
-      else {
-        w.write( "( < " + decl.name + " > < " 
-                 + typeForDeclarator( decl).getTypeString() + " > ) ");
-      }
-      if( iter.hasNext()) {
-        w.allowBreak(0, " ");
-      }
-    }
-    
-    w.end();
   }
 }

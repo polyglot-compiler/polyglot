@@ -51,6 +51,26 @@ public class AmbiguityRemover extends NodeVisitor
     }
   }
 
+  public Node override( Node n)
+  {
+    if ( n instanceof VariableDeclarationStatement)
+    {
+      try
+      {
+        Node m = ((VariableDeclarationStatement)n).removeAmbiguities(c, this);
+        return m;
+      }
+      catch ( SemanticException e)
+      {
+        eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
+                    Annotate.getLineNumber(n ));
+        // FIXME: n.setHasError(true);
+        return n;
+      }
+    }
+    return null;
+  }
+
   public ImportTable getImportTable()
   {
     return it;
