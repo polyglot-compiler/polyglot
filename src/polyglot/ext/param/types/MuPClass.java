@@ -1,11 +1,8 @@
 package polyglot.ext.param.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
+import java.util.List;
 
-import polyglot.ext.jl.types.*;
-
-import java.util.*;
+import polyglot.types.ClassType;
 
 /*
  * Mutable parametric classes.  This interface is a wrapper around
@@ -28,7 +25,7 @@ public interface MuPClass extends PClass {
 
     /**
      * Destructively update the clazz.
-     * @param formals The new clazz
+     * @param clazz The new clazz
      */
     void clazz(ClassType clazz);
 }
