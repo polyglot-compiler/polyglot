@@ -224,8 +224,8 @@ public abstract class Type_c extends TypeObject_c implements Type
     private void writeObject(ObjectOutputStream out) throws IOException {
         // Write out the full name first so we can install correctly
         // when we read back.
-        if (this instanceof Importable) {
-            String name = ((Importable) this).fullName();
+        if (this instanceof Named) {
+            String name = ((Named) this).fullName();
             out.writeObject(name);
             String memberName = null;
             if (name != null && this.isClass() && this.toClass().isMember()) {
