@@ -23,10 +23,11 @@ public class ImportTable extends ClassResolver
     protected List packageImports;
     /** Map from names to classes found, or to the NOT_FOUND object. */
     protected Map map;
-    /** List of class imports which will be lazily added to the table next time
-     * <code>lazyImport</code> is called. */
+    /** List of class imports which will be lazily added to the table at the
+     * next lookup. */
     protected List lazyImports;
-    /** List of explicitly imported classes. */
+    /** List of explicitly imported classes added to the table or pending in
+     * the lazyImports list. */
     protected List classImports;
     /** Source name to use for debugging and error reporting */
     protected String sourceName;
@@ -310,15 +311,15 @@ public class ImportTable extends ClassResolver
                 // The class maybe a static member class of another, so we'll
                 // make several attempts.
                 StringTokenizer st = new StringTokenizer(longName, ".");
-                String name = "";
+                StringBuffer name = new StringBuffer();
                 Named t = null;
 
                 while (st.hasMoreTokens()) {
                     String s = st.nextToken();
-                    name += s;
+                    name.append(s);
 
                     try {
-                        t = cachedFind(name);
+                        t = cachedFind(name.toString());
 
                         if (! st.hasMoreTokens()) {
                             // found it
@@ -350,7 +351,7 @@ public class ImportTable extends ClassResolver
                         }
 
                         // try again with the next level of type qualification
-                        name += ".";
+                        name.append(".");
                     }
                 }
 

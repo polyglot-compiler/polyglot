@@ -23,6 +23,10 @@ public class SourceJob extends Job
      */
     protected Set dependencies;
 
+    /**
+     * Set of <code>Source</code>s that depend on this job.
+     */
+    protected Set dependents;
 
     /** 
      * Constructor 
@@ -35,6 +39,7 @@ public class SourceJob extends Job
 
         this.source = source;
         this.dependencies = new HashSet();
+        this.dependents = new HashSet();
 
     }
 
@@ -42,6 +47,16 @@ public class SourceJob extends Job
         return dependencies;
     }
     
+    public Set dependents() {
+        return dependents;
+    }
+
+    public void addDependent(Source s) {
+        if (s != this.source()) {
+            dependents.add(s);
+        }
+    }
+
     public void addDependency(Source s) {
         if (s != this.source()) {
             dependencies.add(s);

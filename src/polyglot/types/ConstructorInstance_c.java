@@ -61,20 +61,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c
     }
     
     public String signature() {
-        String s = container + "(";
-
-        for (Iterator i = formalTypes.iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
-            s += t.toString();
-
-            if (i.hasNext()) {
-                s += ",";
-            }
-        }
-
-        s += ")";
-
-        return s;
+        return container + "(" + TypeSystem_c.listToString(formalTypes) + ")";
     }
 
     public String designator() {

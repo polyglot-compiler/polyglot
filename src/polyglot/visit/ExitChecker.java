@@ -45,8 +45,8 @@ public class ExitChecker extends DataFlow
             this.exits = exits;
         }
         
-        public static DataFlowItem EXITS = new DataFlowItem(true);
-        public static DataFlowItem DOES_NOT_EXIT = new DataFlowItem(false);
+        public static final DataFlowItem EXITS = new DataFlowItem(true);
+        public static final DataFlowItem DOES_NOT_EXIT = new DataFlowItem(false);
 
         public String toString() {
             return "exits=" + exits;

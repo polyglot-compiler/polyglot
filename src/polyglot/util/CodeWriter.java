@@ -165,7 +165,7 @@ public class CodeWriter
     Writer output;
     int width;
     public static final boolean debug = false;
-    public static boolean precompute = false;
+    public static final boolean precompute = false;
 
     //@ invariant current != null
     //@ invariant input != null

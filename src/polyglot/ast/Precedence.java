@@ -14,6 +14,10 @@ public class Precedence extends Enum {
 	this.value = value;
     }
 
+    public int hashCode() {
+        return value;
+    }
+
     /** Returns true if this and p have the same precedence. */
     public boolean equals(Object o) {
         return o instanceof Precedence && equals((Precedence) o);

@@ -772,19 +772,19 @@ public class TypeSystem_c implements TypeSystem
 	return findMemberClass(container, name, (ClassType) null);
     }
     
-    protected String listToString(List l) {
-	String s = "";
+    protected static String listToString(List l) {
+	StringBuffer sb = new StringBuffer();
 
 	for (Iterator i = l.iterator(); i.hasNext(); ) {
 	    Object o = i.next();
-	    s += o.toString();
+            sb.append(o.toString());
 
 	    if (i.hasNext()) {
-		s += ", ";
+                sb.append(", ");
 	    }
 	}
 
-	return s;
+	return sb.toString();
     }
 
     /**

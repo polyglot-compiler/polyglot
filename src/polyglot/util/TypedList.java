@@ -93,10 +93,18 @@ public class TypedList implements List, java.io.Serializable
    * Copies this list.
    **/
   public TypedList copy() {
-    List newBackingList = new ArrayList(backing_list);
-    return new TypedList(newBackingList, allowed_type, immutable);
+      return (TypedList) clone();
   }
-  public Object clone() { return copy(); }
+  public Object clone() {
+      try {
+          TypedList l = (TypedList) super.clone();
+          l.backing_list = new ArrayList(backing_list);
+          return l;
+      }
+      catch (CloneNotSupportedException e) {
+          throw new InternalCompilerError("Java clone weirdness.");
+      }
+  }
 
   public void add(int idx, Object o) {
     tryIns(o);

@@ -27,6 +27,10 @@ public class Enum implements Serializable
     /** For serialization. */
     private Enum() { }
 
+    public int hashCode() {
+        return name.hashCode();
+    }
+
     public boolean equals(Object o) {
 	return this == o;
     }

@@ -30,14 +30,14 @@ public class ReachChecker extends DataFlow
         }
         
         // terms that are reachable through normal control flow
-        public static DataFlowItem REACHABLE = new DataFlowItem(true, true);
+        public static final DataFlowItem REACHABLE = new DataFlowItem(true, true);
         
         // terms that are reachable only through exception control flow, but
         // not by normal control flow. 
-        public static DataFlowItem REACHABLE_EX_ONLY = new DataFlowItem(true, false);
+        public static final DataFlowItem REACHABLE_EX_ONLY = new DataFlowItem(true, false);
 
         // terms that are not reachable 
-        public static DataFlowItem NOT_REACHABLE = new DataFlowItem(false, false);
+        public static final DataFlowItem NOT_REACHABLE = new DataFlowItem(false, false);
 
         public String toString() {
             return (reachable?"":"not ") + "reachable" +

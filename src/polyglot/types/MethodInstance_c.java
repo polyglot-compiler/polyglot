@@ -112,36 +112,14 @@ public class MethodInstance_c extends ProcedureInstance_c
                    signature();
 
 	if (! excTypes.isEmpty()) {
-	    s += " throws ";
-
-	    for (Iterator i = excTypes.iterator(); i.hasNext(); ) {
-		Type t = (Type) i.next();
-		s += t.toString();
-
-		if (i.hasNext()) {
-		    s += ", ";
-		}
-	    }
+	    s += " throws " + TypeSystem_c.listToString(excTypes);
 	}
 
 	return s;
     }
 
     public String signature() {
-        String s = name + "(";
-
-        for (Iterator i = formalTypes.iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
-            s += t.toString();
-
-            if (i.hasNext()) {
-                s += ",";
-            }
-        }
-
-        s += ")";
-
-        return s;
+        return name + "(" + TypeSystem_c.listToString(formalTypes) + ")";
     }
 
     public String designator() {

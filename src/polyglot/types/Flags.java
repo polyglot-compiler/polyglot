@@ -14,11 +14,11 @@ import java.util.*;
 public class Flags implements Serializable
 {
     /** List of all flag bits in order in which they should be printed. */
-    protected static int[] print_order = new int[64];
-    protected static int next_bit = 0;
+    static final int[] print_order = new int[64];
+    static int next_bit = 0;
 
     /** Names of 1-bit flags indexed by flag bit. */
-    protected static String[] flag_names = new String[64];
+    static final String[] flag_names = new String[64];
 
     public static final Flags NONE         = new Flags(0);
     public static final Flags PUBLIC       = createFlag("public", null);
@@ -442,17 +442,17 @@ public class Flags implements Serializable
      * Return "" if no flags set, or toString() + " " if some flags are set.
      */
     public String translate() {
-        String s = "";
+        StringBuffer sb = new StringBuffer();
 
         for (int i = 0; i < next_bit; i++) {
             int bit = print_order[i];
             if ((bits & (1L << bit)) != 0) {
-                s += flag_names[bit];
-                s += " ";
+                sb.append(flag_names[bit]);
+                sb.append(" ");
             }
         }
 
-        return s;
+        return sb.toString();
     }
 
     public int hashCode() {
