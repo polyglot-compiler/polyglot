@@ -192,8 +192,10 @@ public class CFGBuilder implements Copy
         String name = StringUtil.getShortNameComponent(df.getClass().getName());
         name += counter++;
 
-	if (Report.should_report(Report.cfg, 2))
-	    Report.report(2, "digraph " + name + " {");
+	if (Report.should_report(Report.cfg, 2)) {
+            Report.report(2, "digraph " + name + " {");
+            Report.report(2, "  center=true; ratio=auto; size = \"8.5,11\";");
+        }
 
         // create peers for the entry and exit nodes.
         graph.peer(graph.entryNode(), Collections.EMPTY_LIST, df);
@@ -395,7 +397,8 @@ public class CFGBuilder implements Copy
         FlowGraph.Peer pp = graph.peer(p, p_visitor.path_to_finally, df);
         FlowGraph.Peer pq = graph.peer(q, path_to_finally, df);
         
-        if (Report.should_report(Report.cfg, 2)) {
+        if (Report.should_report(Report.cfg, 3)) {
+            // at level 3, use Peer.toString() as the label for the nodes
             Report.report(2,
                           pp.hashCode() + " [ label = \"" +
                           StringUtil.escape(pp.toString()) + "\" ];");
@@ -403,17 +406,27 @@ public class CFGBuilder implements Copy
                           pq.hashCode() + " [ label = \"" +
                           StringUtil.escape(pq.toString()) + "\" ];");
         }
+        else if (Report.should_report(Report.cfg, 2)) {
+            // at level 2, use Node.toString() as the label for the nodes
+            // which is more readable than Peer.toString(), but not as unique.
+            Report.report(2,
+                          pp.hashCode() + " [ label = \"" +
+                          StringUtil.escape(pp.node.toString()) + "\" ];");
+            Report.report(2,
+                          pq.hashCode() + " [ label = \"" +
+                          StringUtil.escape(pq.node.toString()) + "\" ];");
+        }
         
         if (graph.forward()) {
             if (Report.should_report(Report.cfg, 2)) {
-                Report.report(2, pp.hashCode() + " -> " + pq.hashCode() + ";");
+                Report.report(2, pp.hashCode() + " -> " + pq.hashCode() + " [label=\"" + edgeKey + "\"];");
             }
             pp.succs.add(new FlowGraph.Edge(edgeKey, pq));
             pq.preds.add(new FlowGraph.Edge(edgeKey, pp));
         }
         else {
             if (Report.should_report(Report.cfg, 2)) {
-                Report.report(2, pq.hashCode() + " -> " + pp.hashCode() + ";");
+                Report.report(2, pq.hashCode() + " -> " + pp.hashCode() + " [label=\"" + edgeKey + "\"];");
             }
             pq.succs.add(new FlowGraph.Edge(edgeKey, pp));
             pp.preds.add(new FlowGraph.Edge(edgeKey, pq));
