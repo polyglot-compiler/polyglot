@@ -229,10 +229,11 @@ public class MethodInstance_c extends ProcedureInstance_c
     public List implementedImpl(ReferenceType rt) {
         List l = new LinkedList();
         l.addAll(rt.methods(name, argTypes));
-        List ints = container().interfaces();
-
+        
+	List ints = rt.interfaces();
 	for (Iterator i = ints.iterator(); i.hasNext(); ) {
-	    l.addAll(implementedImpl((ReferenceType) i.next()));
+	    ReferenceType rt2 = (ReferenceType) i.next();
+	    l.addAll(implementedImpl(rt2));
 	}
 	
         return l;

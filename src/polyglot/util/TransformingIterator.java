@@ -67,8 +67,9 @@ public final class TransformingIterator implements Iterator {
 	next_item = res;
 	return;
       }
+      index++;
       if (index < backing_iterators.length) {
-	current_iter = backing_iterators[++index];
+	current_iter = backing_iterators[index];
       } else {
 	current_iter = null;
       }
