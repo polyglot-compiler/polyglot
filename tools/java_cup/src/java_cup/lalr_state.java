@@ -4,6 +4,10 @@ package java_cup;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Stack;
+import java.util.LinkedList;
+import java.util.HashSet;
+import java.util.ListIterator;
+import java.util.Iterator;
 
 /** This class represents a state in the LALR viable prefix recognition machine.
  *  A state consists of an LALR item set and a set of transitions to other 
@@ -268,10 +272,12 @@ public class lalr_state {
    * @see   java_cup.lalr_state#propagate_all_lookaheads
    */
 
+  private static lalr_state start_state;
+
   public static lalr_state build_machine(production start_prod) 
     throws internal_error
     {
-      lalr_state    start_state;
+      /* lalr_state    start_state; // ACM -- made static */
       lalr_item_set start_items;
       lalr_item_set new_items;
       lalr_item_set linked_items;
@@ -779,6 +785,13 @@ public class lalr_state {
 	System.err.println("the first production.\n");
       else
 	System.err.println("the second production.\n");
+/* ACM extension */
+      if (Main.report_counterexamples) {
+	System.err.println("Example producing conflict: ");
+ 	report_shortest_path();
+	System.err.println(" (*)\n");
+      }
+/* end ACM extension */
 
       /* count the conflict */
       emit.num_conflicts++;
@@ -824,10 +837,64 @@ public class lalr_state {
 	}
       System.err.println("  under symbol "+ terminal.find(conflict_sym).name());
       System.err.println("  Resolved in favor of shifting.\n");
+/* ACM extension */
+      if (Main.report_counterexamples) {
+	System.err.println("Example producing conflict: ");
+ 	report_shortest_path();
+	System.err.print(" (*) ");
+	System.err.println(terminal.find(conflict_sym).name());
+	System.err.println("");
+      }
+/* end ACM extension */
 
       /* count the conflict */
       emit.num_conflicts++;
       lexer.warning_count++;
+    }
+
+    class Path {
+	Path(LinkedList t, lalr_state s) {
+	    transitions = t;
+	    last = s;
+	}
+	LinkedList transitions; /* of lalr_transition */
+	lalr_state last; /* last state reached */
+    }
+
+    protected void report_shortest_path() {
+	Path p = shortest_path();
+	boolean first = true;
+	for (Iterator i = p.transitions.listIterator(); i.hasNext();) {
+	    lalr_transition tr = (lalr_transition)i.next();
+	    if (!first) System.err.print(" ");
+	    first = false;
+	    System.err.print(tr.on_symbol().name());
+	}
+    }
+
+    protected Path shortest_path() {
+	HashSet visited = new HashSet(); /* of lalr_state */
+	LinkedList active = new LinkedList(); /* of paths */
+	Path p = new Path(new LinkedList(), start_state);
+	active.add(p);
+	while (!active.isEmpty()) {
+	    Path p1 = (Path)active.removeFirst();
+	    lalr_state s = p1.last;
+	    if (visited.contains(s)) continue; /* saw it already */
+	    visited.add(s);
+	    if (equals(s)) {
+		p = p1;
+		return p;
+	    }
+	    for (lalr_transition tr = s.transitions(); tr != null;
+		 tr = tr.next()) {
+		LinkedList newt = new LinkedList(p1.transitions);
+		newt.add(tr);
+		Path p2 = new Path(newt, tr.to_state());
+		active.add(p2);
+	    }
+	}
+	return null;
     }
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/

@@ -98,6 +98,10 @@ public class Main {
   protected static boolean no_summary = false;
   /** User option -- number of conflicts to expect */
   protected static int expect_conflicts = 0;
+  /** Whether to report counterexamples when conflicts are found.
+    * (ACM extension) */
+  public static boolean report_counterexamples = true;
+
 
   /* frankf added this 6/18/96 */
   /** User option -- should generator generate code for left/right values? */

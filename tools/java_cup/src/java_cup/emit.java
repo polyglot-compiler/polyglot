@@ -128,8 +128,8 @@ public class emit {
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-  /** Extends and implements declarations for the parser class */
-  /** ACM extension */
+  /** Extends and implements declarations for the parser class
+    * (ACM extension) */
   public static String extendsimpls = "";
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
