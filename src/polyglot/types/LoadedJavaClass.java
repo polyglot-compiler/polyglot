@@ -67,7 +67,7 @@ public class LoadedJavaClass extends JavaClassImpl {
     List methodLst = new ArrayList(methodAry.length + constrAry.length + 1);
 
     for (int idx = 0; idx < fieldAry.length; ++idx) {
-      fieldLst.add(fieldTypeForField(fieldAry[idx]));
+      fieldLst.add(fieldInstanceForField(fieldAry[idx]));
     }
     for (int idx = 0; idx < methodAry.length; ++idx) {
       methodLst.add(methodTypeForMethod(methodAry[idx]));
@@ -75,16 +75,16 @@ public class LoadedJavaClass extends JavaClassImpl {
     for (int idx = 0; idx < methodAry.length; ++idx) {
       methodLst.add(methodTypeForConstructor(constrAry[idx]));
     }
-    this.fields  = new TypedList(fieldLst,  FieldType.class, true);
+    this.fields  = new TypedList(fieldLst,  FieldInstance.class, true);
     this.methods = new TypedList(methodLst, MethodType.class, true);    
   }
 
-  protected FieldType fieldTypeForField(Field f) {
+  protected FieldInstance fieldInstanceForField(Field f) {
     String fieldName = f.getName();
     Type type = ts.typeForClass(f.getType());
     AccessFlags flags = AccessFlags.flagsForInt(f.getModifiers());    
     
-    return new FieldType(fieldName, type, flags);
+    return new FieldInstance(fieldName, type, flags);
   }
 
   protected MethodType methodTypeForMethod(Method m) {
@@ -102,7 +102,7 @@ public class LoadedJavaClass extends JavaClassImpl {
       excpList.add(ts.typeForClass(excpns[idx]));
     }
 
-    return new MethodType(name, returnType, argList, excpList, flags);
+    return new MethodTypeInstance(ts, name, returnType, argList, excpList, flags);
   }
 
   protected MethodType methodTypeForConstructor(Constructor m) {

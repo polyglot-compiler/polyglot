@@ -42,13 +42,13 @@ public interface JavaClass {
   public String getPackage();
 
   /**
-   * Returns a TypedList of MethodTypes for all the methods declared
+   * Returns a TypedList of MethodTypeInstances for all the methods declared
    * in this.  It does not return methods declared in supertypes.
    **/
   public List getMethods();
 
   /**
-   * Returns a TypedList of FieldTypes for all the fields declared
+   * Returns a TypedList of FieldInstances for all the fields declared
    * in this.  It does not return fields declared in supertypes.
    **/
   public List getFields();

@@ -1,26 +1,26 @@
 /*
- * FieldType.java
+ * FieldInstnace.java
  */
 
 package jltools.types;
 
 /**
- * FieldType
+ * FieldInstance
  *
  * Overview:
- *    A FieldType represents the immutable typing information
+ *    A FieldInstance represents the immutable typing information
  *    associated with a Java field: a set of access flags, a name, and
  *    a type.
  **/
-public class FieldType implements Cloneable {
+public class FieldInstance implements Cloneable, TypeInstance {
 
-  public FieldType(String fieldName, Type fieldType, AccessFlags fieldFlags) {
+  public FieldInstance(String fieldName, Type fieldType, AccessFlags fieldFlags) {
     this.name = fieldName;
     this.type = fieldType;
     this.flags = fieldFlags.copy();
   }
 
-  public AccessFlags getFlags() { return flags.copy(); }
+  public AccessFlags getAccessFlags() { return flags.copy(); }
   public Type getType()         { return type; }
   public String getName()       { return name; }
 

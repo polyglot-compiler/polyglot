@@ -15,67 +15,43 @@ import java.util.ArrayList;
  *    A MethodType represents the immutable typing information
  *    associated with a Java method.
  *
- *    A MethodType object may be partial, and contain as little as a name and
- *    a list of arguments.  Such objects are used as keys for method lookup.
+ *    A MethodType can be used as keys for method lookup; a particualr defn 
+ *    would be a MethodTypeInstance with the additional fields of returnType, 
+ *    accessFlags and exceptionTypes, in which case the TypeSystem would be null.
  **/
-public class MethodType implements Cloneable {
-  public MethodType(String methodName,
+public class MethodType extends Type implements Cloneable {
+  public MethodType(TypeSystem ts, 
+                    String methodName,
 		    List argumentTypes) {
+    super(ts);
     this.name = methodName;
     this.argumentTypes = TypedList.copy(argumentTypes, Type.class, true);
   }  
 
-  /**
-   *    ExceptionTypes, returnType, and AccessFlags may be null.
-   **/
-  public MethodType(String methodName, 
-		    Type returnType,
-		    List argumentTypes,
-		    List exceptionTypes,
-		    AccessFlags flags) {
-    this.name = methodName;
-    this.returnType = returnType;
-    this.argumentTypes = TypedList.copy(argumentTypes,
-					Type.class, true);
-    if (exceptionTypes != null)
-      this.exceptionTypes = TypedList.copy(exceptionTypes,
-					   Type.class, true);
-
-    if (flags != null)
-      this.flags = flags.copy();    
-  }
 
   public MethodType copy() {
-    return new MethodType(name,
-			  returnType,
-			  argumentTypes.copy(),
-			  exceptionTypes.copy(),
-			  flags);
+    return new MethodType(getTypeSystem(), name,
+			  argumentTypes.copy());
+  }
+
+  public String getTypeString() 
+  {
+    return "METHOD " + name;
   }
   public Object clone() { return copy(); }
 
-  public AccessFlags getFlags() {
-    return flags.copy();
-  }
   public void setName(String name) { this.name = name; }
+  public String getName() { return name; }
 
-  public Type returnType()          { return returnType; }
   public TypedList argumentTypes()  { return argumentTypes; }
-  public TypedList exceptionTypes() { 
-    if (exceptionTypes == null)
-      exceptionTypes = new TypedList(new ArrayList(),
-				     Type.class, true);   
 
-    return exceptionTypes; 
-  }
+  public boolean isPrimitive() { return false; }
+  // FIXME: is this correct?
+  public  boolean isCanonical() { return true; }
+
 
   private String name;
   // RI: every element is a Type.  Immutable.
   private TypedList argumentTypes;
-  // RI: every element is a Type.  May be null.  Immutable.
-  private TypedList exceptionTypes;
-  // RI: May be null.
-  private AccessFlags flags;
-  // RI: May be null.
-  private Type returnType;
+
 }

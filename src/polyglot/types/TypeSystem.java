@@ -56,10 +56,10 @@ public abstract class TypeSystem {
    **/
   public static class FieldMatch {
     public final Type onClass;
-    public final FieldType field;
+    public final FieldInstance field;
     public String error;
 
-    public FieldMatch(Type c, FieldType f) { onClass = c; field = f; }
+    public FieldMatch(Type c, FieldInstance f) { onClass = c; field = f; }
   }
 
   ////
