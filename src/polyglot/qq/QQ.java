@@ -86,7 +86,9 @@ public class QQ {
     private List list() { return Collections.EMPTY_LIST; }
 
     /** Create a singleton list. */
-    private List list(Object o1) { return Collections.singletonList(o1); }
+    private List list(Object o1) {
+	return list(new Object[] { o1 });
+    }
 
     /** Create a 2-element list. */
     private List list(Object o1, Object o2) {
