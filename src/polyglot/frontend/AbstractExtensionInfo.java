@@ -151,6 +151,16 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
                 Report.should_report.pop();
 
+                if (options.dump_ast.contains(pass.name())) {
+                    System.err.println("------------------------------------" +
+                                       "------------------------------------");
+                    System.err.println("Dumping AST for " + job +
+                                       " after " + pass.name());
+
+                    PrettyPrinter pp = new PrettyPrinter();
+                    pp.printAst(job.ast(), new CodeWriter(System.err, 78));
+                }
+
                 currentJob = oldCurrentJob;
             }
 

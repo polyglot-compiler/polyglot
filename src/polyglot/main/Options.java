@@ -2,6 +2,8 @@ package polyglot.main;
 import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.io.File;
 import polyglot.frontend.ExtensionInfo;
@@ -50,8 +52,8 @@ public final class Options {
   /** Inject type information in serialized form into output file? */
   public boolean serialize_type_info = true;
 
-  /** Dump the AST? */
-  public boolean dump_ast = false;
+  /** Dump the AST after the following passes? */
+  public Set dump_ast = new HashSet();
 
   /** keep output files */
   public boolean keep_output_files = true;
@@ -112,8 +114,10 @@ public final class Options {
                         + " names");
     System.err.println(" -sx <ext>               set source extension");
     System.err.println(" -ox <ext>               set output extension");
-    System.err.println(" -dump                   dump the ast");
-    System.err.println(" -scramble [seed]        scramble the ast");
+    System.err.println(" -dump <pass>            dump the ast after " +
+                       "pass <pass>");
+    System.err.println(" -scramble [seed]        scramble the ast " +
+                       "(for testing)");
     System.err.println(" -noserial               disable class"
                         + " serialization");
     System.err.println(" -nooutput               delete output files after" +

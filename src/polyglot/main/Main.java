@@ -248,9 +248,10 @@ public class Main
         else if (args[i].equals("-dump"))
         {
           i++;
-          options.dump_ast = true;
+          String pass_name = args[i];
+          options.dump_ast.add(pass_name);
+          i++;
         }
-
         else if (args[i].equals("-nooutput"))
         {
           i++;

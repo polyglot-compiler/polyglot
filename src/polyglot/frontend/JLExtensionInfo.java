@@ -44,7 +44,6 @@ import java.util.*;
  * <hr>
  * <center>BARRIER</center>
  * <hr>
- * <li> dump (DumpAst), optional </li>
  * <li> serialization (ClassSerializer), optional </li>
  * <li> translation (Translator) </li>
  * </ol>
@@ -132,16 +131,6 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
         l.add(new VisitorPass(Pass.EXIT_CHECK, job, new ExitChecker(job, ts, nf)));
         l.add(new VisitorPass(Pass.INIT_CHECK, job, new InitChecker(job, ts, nf)));
 	l.add(new BarrierPass(Pass.PRE_OUTPUT_ALL, job));
-
-	if (compiler.dumpAst()) {
-	    l.add(new PrettyPrintPass(Pass.DUMP, job,
-                                      new CodeWriter(System.err, 78),
-                                      new PrettyPrinter()));
-            /*
-	    l.add(new VisitorPass(Pass.DUMP, job,
-				  new DumpAst(new CodeWriter(System.err, 78))));
-                                  */
-	}
 
 	if (compiler.serializeClassInfo()) {
 	    l.add(new VisitorPass(Pass.SERIALIZE,

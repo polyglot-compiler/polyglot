@@ -23,7 +23,7 @@ public class TypeEncoder
 {
   protected TypeSystem ts;
   protected final boolean zip = true;
-  protected final boolean test = true;
+  protected final boolean test = false;
 
   public TypeEncoder( TypeSystem ts)
   {
