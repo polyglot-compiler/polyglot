@@ -20,10 +20,6 @@ public class ReachChecker extends DataFlow
               true /* perform dataflow on entry to CodeDecls */);
     }
 
-    public Item createInitialItem(FlowGraph graph, Term node) {
-        return DataFlowItem.NOT_REACHABLE;
-    }
-
     protected static class DataFlowItem extends Item {
         final boolean reachable;
         final boolean normalReachable;
@@ -60,32 +56,35 @@ public class ReachChecker extends DataFlow
         }
     }
 
-    public Map flow(Item in, FlowGraph graph, Term n, Set succEdgeKeys) {
-        if (n == graph.entryNode()) {
-            return itemToMap(DataFlowItem.REACHABLE, succEdgeKeys);
+    public Item createInitialItem(FlowGraph graph, Term node) {
+        if (node == graph.entryNode()) {
+            return DataFlowItem.REACHABLE;
         }
         else {
-            if (in == DataFlowItem.NOT_REACHABLE) {
-                return itemToMap(in, succEdgeKeys);
-            }
-            
-            // in is either REACHABLE or REACHABLE_EX_ONLY.
-            // return a map where all exception edges are REACHABLE_EX_ONLY,
-            // and all non-exception edges are REACHABLE.
-            Map m = itemToMap(DataFlowItem.REACHABLE_EX_ONLY, succEdgeKeys);
-
-            if (succEdgeKeys.contains(FlowGraph.EDGE_KEY_OTHER)) {
-                m.put(FlowGraph.EDGE_KEY_OTHER, DataFlowItem.REACHABLE);
-            }
-            if (succEdgeKeys.contains(FlowGraph.EDGE_KEY_TRUE)) {
-                m.put(FlowGraph.EDGE_KEY_TRUE, DataFlowItem.REACHABLE);
-            }
-            if (succEdgeKeys.contains(FlowGraph.EDGE_KEY_FALSE)) {
-                m.put(FlowGraph.EDGE_KEY_FALSE, DataFlowItem.REACHABLE);
-            }
-            
-            return m;
+            return DataFlowItem.NOT_REACHABLE;
         }
+    }
+    public Map flow(Item in, FlowGraph graph, Term n, Set succEdgeKeys) {
+        if (in == DataFlowItem.NOT_REACHABLE) {
+            return itemToMap(in, succEdgeKeys);
+        }
+        
+        // in is either REACHABLE or REACHABLE_EX_ONLY.
+        // return a map where all exception edges are REACHABLE_EX_ONLY,
+        // and all non-exception edges are REACHABLE.
+        Map m = itemToMap(DataFlowItem.REACHABLE_EX_ONLY, succEdgeKeys);
+
+        if (succEdgeKeys.contains(FlowGraph.EDGE_KEY_OTHER)) {
+            m.put(FlowGraph.EDGE_KEY_OTHER, DataFlowItem.REACHABLE);
+        }
+        if (succEdgeKeys.contains(FlowGraph.EDGE_KEY_TRUE)) {
+            m.put(FlowGraph.EDGE_KEY_TRUE, DataFlowItem.REACHABLE);
+        }
+        if (succEdgeKeys.contains(FlowGraph.EDGE_KEY_FALSE)) {
+            m.put(FlowGraph.EDGE_KEY_FALSE, DataFlowItem.REACHABLE);
+        }
+        
+        return m;
     }
 
     public Item confluence(List inItems, Term node, FlowGraph graph) {
