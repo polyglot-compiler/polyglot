@@ -751,8 +751,10 @@ public class Compiler implements TargetTable, ClassCleaner
 	  JifVarMap soln = lc.solver.solve(PH);
 	  CodeWriter cw = new CodeWriter(System.out, outputWidth);
 	  soln.dump(cw);
+	  cw.flush();
       } catch (SemanticException e) {
 	  eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), -1);
+      } catch (IOException e) {
       }
       return ast;
   }
