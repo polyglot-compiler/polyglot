@@ -346,7 +346,11 @@ public class CopyPropagator extends DataFlow {
 	    LocalInstance to = n.localInstance();
 	    result.kill(to);
 
-	    if (n.init() instanceof Local) {
+	    // It's a copy if we're initializing a non-final local declaration
+	    // with a value from a local variable.  We only care about
+	    // non-final local declarations because final locals have special
+	    // use in local classes.
+	    if (!n.flags().isFinal() && n.init() instanceof Local) {
 		LocalInstance from = ((Local)n.init()).localInstance();
 		result.add(from, to);
 	    }

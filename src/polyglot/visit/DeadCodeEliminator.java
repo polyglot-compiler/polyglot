@@ -301,8 +301,8 @@ public class DeadCodeEliminator extends DataFlow {
     }
 
     /**
-     * Returns a statement that is equivalent to evaluating the given
-     * expression for side-effects.
+     * Returns a statement that is side-effect-equivalent to the given
+     * expression.
      */
     protected Stmt getEffects(Expr expr) {
 	Stmt empty = nf.Empty(Position.COMPILER_GENERATED);
