@@ -3,7 +3,7 @@
  */
 
 package jltools.ast;
-import jltools.types.LocalContext;
+import jltools.types.*;
 import jltools.util.CodeWriter;
 
 /**
@@ -79,7 +79,7 @@ public class IfStatement extends Statement {
   }
 
 
-  public void translate(LocalContext c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w) throws TypeCheckException
   {
     boolean bThenBlockStatement, bElseBlockStatement;
     bThenBlockStatement = thenStatement instanceof BlockStatement;
@@ -119,9 +119,12 @@ public class IfStatement extends Statement {
     return null;
   }
 
-  public Node typeCheck(LocalContext c)
+  public Node typeCheck(LocalContext c) throws TypeCheckException
   {
-    // FIXME; implement
+    Type ctype = condExpr.getCheckedType();
+    if( !ctype.equals( c.getTypeSystem().getBoolean())) {
+      throw new TypeCheckException( "Conditional must have boolean type.");
+    }
     return this;
   }
 
@@ -136,12 +139,16 @@ public class IfStatement extends Statement {
    */
   public void visitChildren(NodeVisitor v) {
     condExpr = (Expression) condExpr.visit(v);
-    Node newNode = (Node) thenStatement.visit(v);
-    if (newNode instanceof Expression) {
-      thenStatement = new ExpressionStatement((Expression) newNode);
-    }
-    else {
-      thenStatement = (Statement) newNode;
+    Node newNode;
+
+    if( thenStatement != null) {
+      newNode = (Node) thenStatement.visit(v);
+      if (newNode instanceof Expression) {
+        thenStatement = new ExpressionStatement((Expression) newNode);
+      }
+      else {
+        thenStatement = (Statement) newNode;
+      }
     }
 
     if( elseStatement != null)

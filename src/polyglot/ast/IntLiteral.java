@@ -3,7 +3,8 @@
  */ 
 
 package jltools.ast;
-import jltools.types.LocalContext;
+
+import jltools.types.*;
 import jltools.util.CodeWriter;
 
 /** 
@@ -129,7 +130,7 @@ public class IntLiteral extends Literal {
     return null;
   }
 
-  public Node typeCheck(LocalContext c)
+  public Node typeCheck(LocalContext c) throws TypeCheckException
   {
     switch( type) {
     case BOOLEAN:

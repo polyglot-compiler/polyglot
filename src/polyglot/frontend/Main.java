@@ -15,6 +15,8 @@ public class Main
                                         = "Output Directory (File)";
   private static final String MAIN_OPT_SOURCE_EXT 
                                         = "Source Extension (String)";
+  private static final String MAIN_OPT_STDOUT
+                                        = "Output to stdout (Boolean)";
 
   public static final void main(String args[]) throws Exception
   {
@@ -25,7 +27,8 @@ public class Main
     parseCommandLine(args, options, source);
     tf = new MainTargetFactory( (String)options.get( MAIN_OPT_SOURCE_EXT),
                                 (Collection)options.get( MAIN_OPT_SOURCE_PATH),
-                                (File)options.get( MAIN_OPT_OUTPUT_DIRECTORY));
+                                (File)options.get( MAIN_OPT_OUTPUT_DIRECTORY),
+                                (Boolean)options.get( MAIN_OPT_STDOUT));
 
     /* Must initialize before instantiating any compilers. */
     Compiler.initialize( options, tf, new MainErrorQueueFactory());
@@ -108,6 +111,16 @@ public class Main
         i++;
         options.put( Compiler.OPT_FQCN, new Boolean( true));
       }
+      else if( args[i].equals( "-stdout")) 
+      {
+        i++;
+        options.put( MAIN_OPT_STDOUT, new Boolean( true));
+      }
+      else if( args[i].equals( "-dump"))
+      {
+        i++;
+        options.put( Compiler.OPT_DUMP, new Boolean( true));
+      }
       else if( args[i].equals( "-v") || args[i].equals( "-verbose"))
       {
         i++;
@@ -131,6 +144,8 @@ public class Main
     System.err.println( " -S <path list>          source path");
     System.err.println( " -fqcn                   print fully-qualified class"
                         + " names in comments");
+    System.err.println( " -stdout                 print all source to stdout");
+    System.err.println( " -dump                   dump the ast");
     System.err.println( " -v -verbose             print verbose " 
                         + "debugging info");
     System.err.println( " -version                print version info");

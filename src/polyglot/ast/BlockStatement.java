@@ -103,10 +103,17 @@ public class BlockStatement extends Statement {
     w.write( ")");
     return null;
   }
+
+  public Node adjustScope( LocalContext c)
+  {
+    c.pushBlock();
+    return null;
+  }
   
   public Node typeCheck( LocalContext c)
   {
     // Fixme: implement throws
+    c.popBlock();
     return this;
   }
 

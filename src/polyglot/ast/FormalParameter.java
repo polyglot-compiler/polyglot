@@ -112,8 +112,7 @@ public class FormalParameter extends Node {
   
   public Node typeCheck( LocalContext c) throws TypeCheckException
   {
-    // FIXME is this necessary?
-    Annotate.setType( this, c.checkAndResolveType( type.getType()));
+    Annotate.setType( this, type.getType());
     return this;
   }
   

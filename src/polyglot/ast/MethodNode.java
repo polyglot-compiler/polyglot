@@ -292,7 +292,7 @@ public class MethodNode extends ClassMember {
     while( iter.hasNext()) {
       argTypes.add( ((FormalParameter)iter.next()).getType());
     }
-
+    
     if( additionalDimensions == 0) {
       clazz.addMethod( new MethodTypeInstance( ts, name,
                           returnType.getType(), argTypes, 

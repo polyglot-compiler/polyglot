@@ -54,7 +54,7 @@ public class TypeNode extends Node {
    
   public Node removeAmbiguities( LocalContext c) throws TypeCheckException
   {
-    type = c.checkAndResolveType( type);
+    type = c.getType( type);
     Annotate.setType( this, type);
 
     //Annotate.setType( this, c.checkAndResolveType( type));
@@ -80,7 +80,7 @@ public class TypeNode extends Node {
   public Node dump( CodeWriter w)
   {
     w.write( "( TYPE");
-    w.write( " < " + type.getTypeString() + "> ");
+    w.write( " < " + type.getTypeString() + " > ");
     dumpNodeInfo( w);
     w.write( ")");
     return null;

@@ -40,7 +40,7 @@ public class SymbolReader extends NodeVisitor
     }
   }
 
-  public void pushClass( String name)
+  public ClassType pushClass( String name)
   {
     String fullName;
 
@@ -56,6 +56,8 @@ public class SymbolReader extends NodeVisitor
     current.setFullName( fullName);
 
     cr.addClass( fullName, current);
+
+    return current;
   }
 
   public void popClass()

@@ -18,7 +18,7 @@ public class AmbiguityRemover extends NodeVisitor
     this.it = it;
     this.eq = eq;
     
-    c = new LocalContext( it, null, null, ts);
+    c = new LocalContext( it, ts);
   }
 
   public Node visitBefore(Node n)

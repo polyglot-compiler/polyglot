@@ -10,10 +10,11 @@ public class TypeChecker extends NodeVisitor
   private LocalContext c;
   private ErrorQueue eq;
   
-  public TypeChecker( LocalContext c, ErrorQueue eq)
+  public TypeChecker( TypeSystem ts, ImportTable im, ErrorQueue eq)
   {
-    this.c = c;
     this.eq = eq;
+
+    c = new LocalContext( im, ts);
   }
 
   public Node visitBefore( Node n)

@@ -23,6 +23,7 @@ public class Compiler
   public static String OPT_OUTPUT_WIDTH     = "Output Width (Integer)";
   public static String OPT_VERBOSE          = "Verbose (Boolean)";
   public static String OPT_FQCN             = "FQCN (Boolean)";
+  public static String OPT_DUMP             = "Dump AST (Boolean)";
 
   public static int VERSION_MAJOR           = 1;
   public static int VERSION_MINOR           = 0;
@@ -30,6 +31,7 @@ public class Compiler
 
   private static int outputWidth;
   private static boolean useFqcn;
+  private static boolean dumpAst;
   private static Collection compilers;
   protected static TargetFactory tf;
   protected static ErrorQueueFactory eqf;
@@ -46,6 +48,7 @@ public class Compiler
     Compiler.eqf = eqf;
     Integer width;
     Boolean fqcn;
+    Boolean dump;
 
     /* Read the options. */
     width = (Integer)options.get( OPT_OUTPUT_WIDTH);
@@ -59,6 +62,12 @@ public class Compiler
       fqcn = new Boolean( false);
     }
     useFqcn = fqcn.booleanValue();
+
+    dump = (Boolean)options.get( OPT_DUMP);
+    if( dump == null) {
+      dump = new Boolean( false);
+    }
+    dumpAst = dump.booleanValue();
 
     /* Set up the resolvers. */
     systemResolver = new CompoundClassResolver();
@@ -196,7 +205,9 @@ public class Compiler
         }
       }
 
-      //dump( job.ast);
+      if( dumpAst) {
+        dump( job.ast);
+      }
 
       job.it = readSymbols( job.ast, job.eq);
 
@@ -209,7 +220,15 @@ public class Compiler
 
       job.ast = removeAmbiguities( job.ast, job.it, job.eq);
 
-      // typeCheck( job.ast, job.eq);    
+      if( dumpAst) {
+        dump( job.ast);
+      }
+
+      typeCheck( job.ast, job.it, job.eq);    
+      
+      if( dumpAst) {
+        dump( job.ast);
+      }
 
       if( !job.eq.hasErrors()) {
         translate( job.t, job.ast);
@@ -291,9 +310,9 @@ public class Compiler
     return ast.visit( ar);
   }
 
-  protected Node typeCheck( Node ast, ErrorQueue eq)
+  protected Node typeCheck( Node ast, ImportTable it, ErrorQueue eq)
   {
-    TypeChecker tc = new TypeChecker( null, eq);
+    TypeChecker tc = new TypeChecker( ts, it, eq);
     return ast.visit( tc);
   }
 
@@ -303,7 +322,15 @@ public class Compiler
     CodeWriter cw = new CodeWriter( t.getOutputWriter( sfn.getPackageName()), 
                                     outputWidth);
 
-    ast.translate( null, cw);
+    try
+    {
+      ast.translate( null, cw);
+    }
+    catch( TypeCheckException e)
+    {
+      throw new InternalCompilerError( "Caught TypeCheckError during "
+                                     + "translation phase: " + e.getMessage());
+    }
     cw.flush();
     System.out.flush();
   }
@@ -311,7 +338,7 @@ public class Compiler
   public void dump( Node ast) throws IOException
   {
     CodeWriter cw = new CodeWriter( new UnicodeWriter( 
-                                       new PrintWriter( System.err)), 
+                                       new PrintWriter( System.out)), 
                                     outputWidth);
     DumpAst d = new DumpAst( cw);
     ast.visit( d);

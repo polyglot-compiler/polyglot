@@ -162,13 +162,34 @@ public class VariableDeclarationStatement extends Statement {
     }
    }
 
-   public Node typeCheck(LocalContext c)
+  public Node removeAmbiguities( LocalContext c) throws TypeCheckException
+  {
+    Declarator d;
+     Iterator iter = declarators();
+
+     while( iter.hasNext()) {
+       d = (Declarator)iter.next();
+       c.addSymbol( d.name, typeForDeclarator( d));
+     }
+     
+     return this;
+  }
+
+   public Node typeCheck(LocalContext c) throws TypeCheckException
    {
-      // FIXME: implement
+     Declarator d;
+     Iterator iter = declarators();
+
+     while( iter.hasNext()) {
+       d = (Declarator)iter.next();
+       c.addSymbol( d.name, typeForDeclarator( d));
+     }
+
+      // FIXME: initializers
       return this;
    }
 
-  public void translate(LocalContext c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w) throws TypeCheckException
   {
     w.write( modifiers.getStringRepresentation());
     type.translate(c, w);
@@ -199,7 +220,7 @@ public class VariableDeclarationStatement extends Statement {
     
    }
   
-  public Node dump( CodeWriter w)
+  public Node dump( CodeWriter w) throws TypeCheckException
   {
     w.write( "( VAR DECL");
     w.write( " < " + modifiers.getStringRepresentation() + "> ");
@@ -213,11 +234,13 @@ public class VariableDeclarationStatement extends Statement {
     {
       Declarator pair = (Declarator)it.next();
       if (pair.initializer != null) {
-        w.write( "( < " + pair.name + " > ) ");
+        w.write( "( < " + pair.name + " > < " 
+                 + typeForDeclarator( pair).getTypeString() + " > ) ");
         pair.initializer.dump( w);
       }
       else {
-        w.write( "( < " + pair.name + " > )");
+        w.write( "( < " + pair.name + " > < " 
+                 + typeForDeclarator( pair).getTypeString() + " > ) ");
       }
       if( it.hasNext()) {
         w.newline();

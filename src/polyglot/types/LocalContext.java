@@ -98,7 +98,7 @@ public class LocalContext
   /**
    * Finds the definition of a particular type
    */
-  public Type getType( String s) throws Exception
+  public Type getType( String s) throws TypeCheckException
   {
     return ts.checkAndResolveType( new AmbiguousType( ts, s), (TypeSystem.Context)stkContexts.peek());
   }
@@ -124,7 +124,7 @@ public class LocalContext
    */
   public void popClass()
   {
-    if ( stkContexts.size() > 1)
+    if ( stkContexts.size() >= 1)
     {
       try { stkContexts.pop(); }
       catch (EmptyStackException ese ) { }
@@ -140,6 +140,7 @@ public class LocalContext
    */
   public void pushBlock()
   {
+    // FIXME: nks put block scoping within class scoping
     stkBlocks.push(new Hashtable());
   }
 

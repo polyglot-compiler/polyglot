@@ -96,13 +96,36 @@ public class StandardTypeSystem extends TypeSystem {
     throws TypeCheckException{
 
     if ( childType instanceof AmbiguousType ||
-         ancestorType instanceof AmbiguousType)
-      throw new InternalCompilerError("Expected fully qualified classes.");      
+         ancestorType instanceof AmbiguousType) {
+      throw new InternalCompilerError("Expected fully qualified classes.");
+    } 
 
     // childType is primitive.
-    if (childType instanceof PrimitiveType ||
-	ancestorType instanceof PrimitiveType) 
+    if (childType instanceof PrimitiveType &&
+	ancestorType instanceof PrimitiveType) {
+
+      PrimitiveType c = (PrimitiveType)childType,
+        a = (PrimitiveType)ancestorType;
+
+      if( c.isBoolean() && a.isBoolean()) {
+        return true;
+      }
+      if( c.isBoolean() || a.isBoolean()) {
+        return false;
+      }
+
+      if( c.getKind() <= a.getKind()) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+
+    if( childType instanceof PrimitiveType ||
+        ancestorType instanceof PrimitiveType) {
       return false;
+    }
 
     // childType is array.
     if (childType instanceof ArrayType) {
@@ -342,6 +365,7 @@ public class StandardTypeSystem extends TypeSystem {
    * describing the error.
    **/
   public Type checkAndResolveType(Type type, Context context) throws TypeCheckException {
+
     if (type.isCanonical()) return type;
     if (type instanceof ArrayType) {
       ArrayType at = (ArrayType) type;
@@ -426,7 +450,13 @@ public class StandardTypeSystem extends TypeSystem {
     ClassType result = null;
     String prefix = TypeSystem.getFirstComponent(className);
     String rest = TypeSystem.removeFirstComponent(className);
-    result = (ClassType)checkAndResolveType(new AmbiguousType(this, prefix), context);
+
+    try
+    {
+      result = (ClassType)checkAndResolveType(new AmbiguousType(this, prefix),
+                                              context);
+    }
+    catch( TypeCheckException e) {}
     while (result == null && rest.length() > 0) {
       prefix = prefix + "." + TypeSystem.getFirstComponent(rest);
       rest = TypeSystem.removeFirstComponent(rest);

@@ -3,7 +3,8 @@
  */ 
 
 package jltools.ast;
-import jltools.types.LocalContext;
+
+import jltools.types.*;
 import jltools.util.CodeWriter;
 
 /** 
@@ -47,7 +48,7 @@ public class CharacterLiteral extends Literal {
     return null;
   }
 
-  public Node typeCheck(  LocalContext c)
+  public Node typeCheck(  LocalContext c) throws TypeCheckException
   {
     setCheckedType( c.getTypeSystem().getChar());
     return this;

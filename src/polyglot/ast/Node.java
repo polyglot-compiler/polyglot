@@ -92,9 +92,10 @@ public abstract class Node extends jltools.util.AnnotatedObject {
 
   public abstract Node typeCheck( LocalContext c) throws TypeCheckException;
   
-  public abstract void translate( LocalContext c, CodeWriter w);
+  public abstract void translate( LocalContext c, CodeWriter w) 
+       throws TypeCheckException;
   
-  public abstract Node dump( CodeWriter w);
+  public abstract Node dump( CodeWriter w) throws TypeCheckException;
 
   /**
    * Return a new array containing all the elements of lst, in the same order.
@@ -123,6 +124,7 @@ public abstract class Node extends jltools.util.AnnotatedObject {
     return newList;
   }
 
+  
   public void setError(int errType, String errMsg)
   {
     ErrorInfo e = new ErrorInfo(errType, errMsg, 
@@ -132,5 +134,6 @@ public abstract class Node extends jltools.util.AnnotatedObject {
     // FIXME
     //Compiler.enqueueError( e);
   }
+  
 }
 

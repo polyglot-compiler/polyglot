@@ -235,7 +235,7 @@ public class ClassNode extends ClassMember {
 
   public Node readSymbols( SymbolReader sr)
   {
-    sr.pushClass( name);
+    type = sr.pushClass( name);
     visitChildren( sr);
     sr.popClass();
     
@@ -244,14 +244,13 @@ public class ClassNode extends ClassMember {
 
   public Node adjustScope( LocalContext c)
   {
-    // FIXME
+    c.pushClass( type);
     return null;
   }
 
   public Node removeAmbiguities( LocalContext c)
   {
-
-    c.popScope(); 
+    c.popClass(); 
     return this;
   }
 
@@ -259,7 +258,7 @@ public class ClassNode extends ClassMember {
   {
     // FIXME: implement;
 
-    c.popScope(); 
+    c.popClass(); 
     return this;
   }
 
@@ -323,6 +322,7 @@ public class ClassNode extends ClassMember {
   private AccessFlags accessFlags;
   private String name;
   private TypeNode superClass;
+  private ClassType type;
   private List interfaceList;
   private List classMembers;
 }

@@ -351,7 +351,7 @@ public abstract class TypeSystem {
 
   public static String getFirstComponent(String fullName) {
     int firstDot = fullName.indexOf('.');
-    return firstDot >= 0 ? fullName.substring(0,firstDot-1) : fullName;
+    return firstDot >= 0 ? fullName.substring(0,firstDot) : fullName;
   }
 
   public static String removeFirstComponent(String fullName) {

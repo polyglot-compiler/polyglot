@@ -4,13 +4,11 @@
 
 package jltools.ast;
 
-import jltools.util.TypedList;
-import java.util.List;
-import java.util.Enumeration;
-import java.util.ArrayList;
-import java.util.Iterator;
-import jltools.util.CodeWriter;
-import jltools.types.LocalContext;
+import jltools.types.*;
+import jltools.util.*;
+
+import java.util.*;
+
 
 /**
  * AmbiguousNameExpression
@@ -117,6 +115,29 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     dumpNodeInfo( w);
     w.write( ")");
     return null;
+  }
+
+  public Node removeAmbiguities( LocalContext c) throws TypeCheckException
+  {
+    Expression e;
+    TypeNode tn;
+    FieldInstance fi;
+    String name = getName();
+
+    fi = c.getField( null, name);
+
+    if( true /* c.isDefinedLocally( name) */) {
+      e = new LocalVariableExpression( name);
+    }
+    else {
+      tn = new TypeNode( fi.getEnclosingType());
+      e = new FieldExpression( tn, name);
+      Annotate.setLineNumber( tn, Annotate.getLineNumber( this));
+    }
+
+    Annotate.setLineNumber( e, Annotate.getLineNumber( this));
+    e.setCheckedType( fi.getType());
+    return e;
   }
 
   public Node typeCheck( LocalContext c)

@@ -142,9 +142,9 @@ public class BinaryExpression extends Expression {
     case ASSIGN:
       /* See (5.2). */
       if( !rtype.isAssignableSubtype(ltype)) {
-        setError( ErrorInfo.SEMANTIC_ERROR, 
-                  "Unable to assign " + rtype.getTypeString() + " to "
-                  + ltype.getTypeString());
+        throw new TypeCheckException( "Unable to assign \"" + 
+                                      rtype.getTypeString() + "\" to \""
+                                      + ltype.getTypeString() + "\".");
       }
       setCheckedType( ltype);
       break;
@@ -155,12 +155,12 @@ public class BinaryExpression extends Expression {
     case LE:
       /* See (15.19.1). */
       if( !ltype.isPrimitive() || !rtype.isPrimitive()) {
-        setError( ErrorInfo.SEMANTIC_ERROR,
+        throw new TypeCheckException( 
                   "Operands of numeric comparison operators must be numeric.");
       }
       if( !((PrimitiveType)ltype).isNumeric() ||
           !((PrimitiveType)rtype).isNumeric()) {
-        setError(ErrorInfo.SEMANTIC_ERROR,
+        throw new TypeCheckException(
                  "Operands of numeric comparison operators must be numeric.");
       }
       setCheckedType( c.getTypeSystem().getBoolean());
@@ -172,22 +172,22 @@ public class BinaryExpression extends Expression {
       if( ltype.isPrimitive()) {
         if( ((PrimitiveType)ltype).isNumeric()) {
           if( !rtype.isPrimitive()) {
-            setError( ErrorInfo.SEMANTIC_ERROR,
+            throw new TypeCheckException(
                       "Can only compare two expressions of similar type.");
           }
           else if( !((PrimitiveType)rtype).isNumeric()) {
-            setError( ErrorInfo.SEMANTIC_ERROR,
+            throw new TypeCheckException(
                       "Can only compare two expressions of similar type.");
           }
         }
         else {
           /* ltype is boolean. */
           if( !rtype.isPrimitive()) {
-            setError( ErrorInfo.SEMANTIC_ERROR,
+            throw new TypeCheckException(
                       "Can only compare two expressions of similar type.");
           }
           else if( ((PrimitiveType)rtype).isNumeric()) {
-            setError( ErrorInfo.SEMANTIC_ERROR,
+            throw new TypeCheckException(
                       "Can only compare two expressions of similar type.");
           }
         }
@@ -195,11 +195,11 @@ public class BinaryExpression extends Expression {
       else {
         /* ltype is a reference type. */
         if( rtype.isPrimitive()) {
-          setError( ErrorInfo.SEMANTIC_ERROR,
+          throw new TypeCheckException(
                     "Can only compare two expressions of similar type.");
         }
         else if( !(ltype.isCastValid( rtype) || rtype.isCastValid( ltype))) {
-          setError( ErrorInfo.SEMANTIC_ERROR,
+          throw new TypeCheckException(
                     "Can only compare two expressions of similar type.");
         }
       }
@@ -208,9 +208,9 @@ public class BinaryExpression extends Expression {
       
     case LOGIC_OR:
     case LOGIC_AND:
-      if( !(ltype.isSameType(/* FIXME boolean */ null) 
-            && rtype.isSameType(/* FIXME boolean */ null))) {
-        setError( ErrorInfo.SEMANTIC_ERROR,
+      if( !(ltype.isSameType( c.getTypeSystem().getBoolean()) 
+            && rtype.isSameType( c.getTypeSystem().getBoolean()))) {
+        throw new TypeCheckException(
                   "Operands of logical operator must be boolean.");
       }
       setCheckedType( c.getTypeSystem().getBoolean());
@@ -219,35 +219,36 @@ public class BinaryExpression extends Expression {
     case PLUS:
     case PLUSASSIGN:
       /* (15.17). */
-      if( ltype.isSameType(/* FIXME String */ null)) {
-        setCheckedType(/* FIXME String */ null);
+      Type string = c.getType( "java.lang.String");
+      if( ltype.isSameType( string)) {
+        setCheckedType( string);
         break;
       }
-      else if( rtype.isSameType(/* FIXME String */ null)) {
-        setCheckedType(/* FIXME String */ null);
+      else if( rtype.isSameType( string)) {
+        setCheckedType( string);
         break;
       }
     case SUB:
     case SUBASSIGN:
       if( !ltype.isPrimitive()) {
-        setError( ErrorInfo.SEMANTIC_ERROR,
+        throw new TypeCheckException( 
                   "Additive operators must have numeric operands.");
-        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+        //      setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
       }
       else if( !((PrimitiveType)ltype).isNumeric()) {
-        setError( ErrorInfo.SEMANTIC_ERROR,
+        throw new TypeCheckException( 
                   "Additive operators must have numeric operands.");
-        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+        //      setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
       }
       else if( !rtype.isPrimitive()) {
-        setError( ErrorInfo.SEMANTIC_ERROR,
+        throw new TypeCheckException(
                   "Additive operators must have numeric operands.");
-        setCheckedType( ltype);
+        //        setCheckedType( ltype);
       }
       else if( !((PrimitiveType)rtype).isNumeric()) {
-        setError( ErrorInfo.SEMANTIC_ERROR,
+        throw new TypeCheckException(
                   "Additive operators must have numeric operands.");
-        setCheckedType( ltype);
+        //        setCheckedType( ltype);
       }
       else {
         setCheckedType( PrimitiveType.binaryPromotion( (PrimitiveType)ltype,
@@ -262,15 +263,15 @@ public class BinaryExpression extends Expression {
     case MOD:
     case MODASSIGN:
       if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
-        setError( ErrorInfo.SEMANTIC_ERROR,
+        throw new TypeCheckException(
                   "Expected numeric operands to multiplicative operator.");
-        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+        //        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
       }
       else if( !(((PrimitiveType)ltype).isNumeric()
                  && ((PrimitiveType)rtype).isNumeric())) {
-        setError( ErrorInfo.SEMANTIC_ERROR,
+        throw new TypeCheckException(
                   "Expected numeric operands to multiplicative operator.");
-        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+        //        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
       }
       else {
         setCheckedType( PrimitiveType.binaryPromotion( (PrimitiveType)ltype,
@@ -286,9 +287,9 @@ public class BinaryExpression extends Expression {
     case XORASSIGN:
       /* Either both are either numeric or boolean (15.21). */
       if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
-        setError(ErrorInfo.SEMANTIC_ERROR, 
+        throw new TypeCheckException(
                  "Expected primitive operands to bitwise binary operator.");
-        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+        //        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
       }
       else if( ((PrimitiveType)ltype).isNumeric()
                && ((PrimitiveType)rtype).isNumeric()) {
@@ -308,15 +309,15 @@ public class BinaryExpression extends Expression {
     case RUSHIFT:
     case RUSHIFTASSIGN:
       if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
-        setError( ErrorInfo.SEMANTIC_ERROR,
+        throw new TypeCheckException(
                   "Expected numeric operands to shift operator.");
-        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+        //        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
       }
       else if( !(((PrimitiveType)ltype).isNumeric()
                  && ((PrimitiveType)rtype).isNumeric())) {
-        setError( ErrorInfo.SEMANTIC_ERROR,
+        throw new TypeCheckException(
                   "Expected numeric operands to shift operator.");
-        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+        //        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
       }
       else {
         setCheckedType( PrimitiveType.unaryPromotion( (PrimitiveType)ltype));
@@ -325,14 +326,15 @@ public class BinaryExpression extends Expression {
       
     default:
       /* FIXME */
-      setError( ErrorInfo.SEMANTIC_ERROR,
+      throw new TypeCheckException(
                 "Internal error: unknown binary operator.");
     }
     
     return this;
   }
   
-   public void translate(LocalContext c, CodeWriter w)
+   public void translate(LocalContext c, CodeWriter w) 
+       throws TypeCheckException
    {
       if(operator != ASSIGN && !(operator >= PLUSASSIGN && 
                                 operator <= RUSHIFTASSIGN)) {

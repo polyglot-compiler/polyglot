@@ -11,13 +11,15 @@ public class MainTargetFactory implements TargetFactory
   String sourceExtension;
   Collection sourcePath;
   File outputDirectory;
+  boolean stdout;
 
   public MainTargetFactory( String sourceExtension, Collection sourcePath,
-                            File outputDirectory)
+                            File outputDirectory, Boolean stdout)
   {
     this.sourceExtension = sourceExtension;
     this.sourcePath = sourcePath;
     this.outputDirectory = outputDirectory;
+    this.stdout = stdout.booleanValue();
   }
 
 
@@ -100,19 +102,24 @@ public class MainTargetFactory implements TargetFactory
 
     public Writer getOutputWriter( String packageName) throws IOException
     {
-      if( outputFile == null) {
-        outputFile = new File( outputDirectory, 
-                               packageName.replace( '.', File.separatorChar)
-                               + File.separatorChar
-                               + name.substring( 0, name.lastIndexOf( 
-                                   sourceExtension))
-                               + ".java");
+      if( stdout) {
+        return new UnicodeWriter( new PrintWriter( System.out));
       }
-      if( !outputFile.getParentFile().exists()) {
-        File parent = outputFile.getParentFile();
-        parent.mkdirs();
+      else {
+        if( outputFile == null) {
+          outputFile = new File( outputDirectory, 
+                                 packageName.replace( '.', File.separatorChar)
+                                 + File.separatorChar
+                                 + name.substring( 0, name.lastIndexOf( 
+                                     sourceExtension))
+                                 + ".java");
+        }
+        if( !outputFile.getParentFile().exists()) {
+          File parent = outputFile.getParentFile();
+          parent.mkdirs();
+        }
+        return new UnicodeWriter( new FileWriter( outputFile));
       }
-      return new UnicodeWriter( new FileWriter( outputFile));
     }
 
   }

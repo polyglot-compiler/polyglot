@@ -5,8 +5,8 @@
 package jltools.ast;
 
 import jltools.util.CodeWriter;
-import jltools.types.LocalContext;
-import jltools.types.ClassType;
+import jltools.types.*;
+
 
 /** 
  * StringLiteral
@@ -41,14 +41,10 @@ public class StringLiteral extends Literal {
       //nothing to do
    }
 
-   public Node typeCheck(LocalContext c)
+   public Node typeCheck(LocalContext c) throws TypeCheckException
    {
-     /* FIXME
-      setCheckedType( new ClassType( c.getTypeSystem(), 
-                                     "java.lang.String", 
-                                     true));
-                                     */
-      return this;
+     setCheckedType( c.getType( "java.lang.String"));
+     return this;
    }
 
    public void translate(LocalContext c, CodeWriter w)
