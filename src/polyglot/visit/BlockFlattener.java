@@ -58,6 +58,10 @@ public class BlockFlattener extends SemanticVisitor {
       }
     }
 
+    if ( b instanceof SwitchBlock ) {
+      return nf.SwitchBlock( b.position(), stmtList );
+    }
+
     return nf.Block( b.position(), stmtList );
   }
 }
