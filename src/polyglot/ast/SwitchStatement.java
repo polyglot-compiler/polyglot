@@ -26,13 +26,13 @@ public class SwitchStatement extends Statement
   {
     /**
      * Effects: Creates a new CaseStement with <expr> as the value
-     * for the case.
+     * for the case, or a default case if <expr> is null.
      */
     public CaseStatement( Node ext, Expression expr) 
     {
       this.ext = ext;
       this.expr = expr;
-      this.def = false;
+      this.def = (expr == null);
     }
 
       public CaseStatement( Expression expr) {
@@ -63,19 +63,6 @@ public class SwitchStatement extends Statement
 	  return reconstruct(this.ext, expr, def);
       }
 
-    /**
-     * Effects: Creates a new CaseStatement which represents a default Label.
-     */
-    public CaseStatement(Node ext) 
-    {
-      this.ext = ext;
-      this.def = true;
-    }
-      public CaseStatement() {
-	  this(null);
-      }
-
-    
     /**
      * Effects: Returns true iff this CaseStatement represents a
      * default label.

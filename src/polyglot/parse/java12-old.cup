@@ -1177,7 +1177,7 @@ switch_label ::=
  				new SwitchStatement.CaseStatement(a), n); :}
 	|	DEFAULT:n COLON
 			{: RESULT = (SwitchStatement.CaseStatement)Grm.ln( 
- 				new SwitchStatement.CaseStatement(), n); :}
+ 				new SwitchStatement.CaseStatement(null), n); :}
 	;
 
 while_statement ::=
