@@ -16,6 +16,11 @@ public class NullType extends Type {
   public NullType(TypeSystem ts) { 
     super(ts);
   }
+  
+  public String getTypeString() {
+    return "null";
+  }
+  
   public boolean equals(Object o) {
     return o instanceof NullType;
   }

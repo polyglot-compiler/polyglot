@@ -37,7 +37,33 @@ public class PrimitiveType extends Type {
   public int getKind() {
     return kind;
   }
-
+  
+  public String getTypeString() {
+    switch(kind)
+    {
+      case VOID:
+        return "void";
+      case BOOLEAN:
+        return "boolean";
+      case CHAR:
+        return "char";
+      case BYTE:
+        return "byte";
+      case SHORT:
+        return "short";
+      case INT:
+        return "int";
+      case LONG:
+        return "long";
+      case FLOAT:
+        return "float";
+      case DOUBLE:
+        return "double";
+      default:
+        return "???";
+    }
+  }
+        
   public final boolean isPrimitive() {
     return true;
   }

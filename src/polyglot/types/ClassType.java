@@ -19,6 +19,10 @@ public class ClassType extends Type {
     this.name = name;
     this.canonical = canonical;
   }
+  
+  public String getTypeString() {
+    return getName();
+  }
 
   public String getName() {
     return name;

@@ -36,6 +36,10 @@ public class ArrayType extends Type {
   public int getDimensions() {
     return dims;
   }
+  
+  public String getTypeString() {
+    return base.getTypeString() + "[]";
+  }
 
   ////
   // Methods to be filled in by subtypes.

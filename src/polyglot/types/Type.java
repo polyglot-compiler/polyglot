@@ -18,10 +18,8 @@ public abstract class Type {
   // Creates a new type in the given typeSystem.
   public Type(TypeSystem ts) { this.ts = ts; }
 
-  // FIXME: Temporary constructor until typing thing is figured out.
-  public Type(String type) { this.type = type; }
-  // FIXME: Temporary accessor method until typing figured out
-  public String getTypeString() { return type; }
+  // FIXME: Temporary method until typing figured out
+  public abstract String getTypeString();
 
   ////
   // Methods to be filled in by subtypes.
