@@ -75,7 +75,7 @@ public class ImportTable extends ClassResolver
      * Add a class import.
      */
     public void addClassImport(String className) {
-        if (Report.should_report(new String[] {Report.types, Report.resolver, Report.imports}, 2))
+        if (Report.should_report(TOPICS, 2))
             Report.report(2, this + ": lazy import " + className);
 
 	lazyImports.add(className);
@@ -138,7 +138,7 @@ public class ImportTable extends ClassResolver
      * Find a type by name, searching the import table.
      */
     public Named find(String name) throws SemanticException {
-        if (Report.should_report(new String[] {Report.types, Report.resolver, Report.imports}, 2))
+        if (Report.should_report(TOPICS, 2))
            Report.report(2, this + ".find(" + name + ")");
 
         /* First add any lazy imports. */
@@ -268,7 +268,7 @@ public class ImportTable extends ClassResolver
 	for (int i = 0; i < lazyImports.size(); i++) {
 	    String longName = (String) lazyImports.get(i);
 
-            if (Report.should_report(new String[] {Report.types, Report.resolver, Report.imports}, 2))
+            if (Report.should_report(TOPICS, 2))
 		Report.report(2, this + ": import " + longName);
 
 	    try {
@@ -322,7 +322,7 @@ public class ImportTable extends ClassResolver
 
                 String shortName = StringUtil.getShortNameComponent(longName);
 
-                if (Report.should_report(new String[] {Report.types, Report.resolver, Report.imports}, 2))
+                if (Report.should_report(TOPICS, 2))
 		    Report.report(2, this + ": import " + shortName + " as " + t);
 
 		if (map.containsKey(shortName)) {
@@ -358,4 +358,8 @@ public class ImportTable extends ClassResolver
             return "(import)";
         }
     }
+
+    private static final Collection TOPICS = 
+        CollectionUtil.list(Report.types, Report.resolver, Report.imports);
+
 }

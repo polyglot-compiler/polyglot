@@ -1,6 +1,5 @@
 package polyglot.types;
 
-import polyglot.ast.*;
 import polyglot.util.*;
 import polyglot.main.Report;
 import java.util.*;
@@ -37,21 +36,21 @@ public class CachingResolver implements Resolver {
      * @param name The name to search for.
      */
     public Named find(String name) throws SemanticException {
-        if (Report.should_report(new String[] {Report.types, Report.resolver}, 2))
+        if (Report.should_report(TOPICS, 2))
             Report.report(2, "CachingResolver: find: " + name);
 
         Named q = (Named) cache.get(name);
 
 	if (q == null) {
-            if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
+            if (Report.should_report(TOPICS, 3))
                 Report.report(3, "CachingResolver: not cached: " + name);
 	    q = inner.find(name);
 	    cache.put(name, q);
-            if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
+            if (Report.should_report(TOPICS, 3))
                 Report.report(3, "CachingResolver: loaded: " + name);
 	}
         else {
-            if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
+            if (Report.should_report(TOPICS, 3))
                 Report.report(3, "CachingResolver: cached: " + name);
         }
 
@@ -75,4 +74,8 @@ public class CachingResolver implements Resolver {
     public void install(String name, Qualifier q) {
 	cache.put(name, q);
     }
+
+    private static final Collection TOPICS = 
+                    CollectionUtil.list(Report.types, 
+                                        Report.resolver);
 }

@@ -1,6 +1,7 @@
 package polyglot.types;
 
 import java.io.InvalidClassException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -10,6 +11,7 @@ import polyglot.main.Version;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLoader;
 import polyglot.types.reflect.ClassPathLoader;
+import polyglot.util.CollectionUtil;
 import polyglot.util.TypeEncoder;
 
 /**
@@ -29,9 +31,8 @@ public class LoadedClassResolver extends ClassResolver
   Set nocache;
   boolean allowRawClasses;
 
-  final static String[] report_topics = new String[] {
-    Report.types, Report.resolver, Report.loader
-  };
+  final static Collection report_topics = CollectionUtil.list(
+    Report.types, Report.resolver, Report.loader);
 
   /**
    * Create a loaded class resolver.

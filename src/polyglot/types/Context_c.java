@@ -2,6 +2,7 @@ package polyglot.ext.jl.types;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 import polyglot.main.Report;
@@ -20,6 +21,7 @@ import polyglot.types.Resolver;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.types.VarInstance;
+import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 
 /**
@@ -130,19 +132,19 @@ public class Context_c implements Context
 
         return outer.isLocal(name);
     }
-
+     
     /**
      * Looks up a method with name "name" and arguments compatible with
      * "argTypes".
      */
     public MethodInstance findMethod(String name, List argTypes) throws SemanticException {
-        if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+        if (Report.should_report(TOPICS, 3))
           Report.report(3, "find-method " + name + argTypes + " in " + this);
 
         ReferenceType rt = findMethodContainerInThisScope(name);
 
         if (rt != null) {
-            if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+            if (Report.should_report(TOPICS, 3))
               Report.report(3, "find-method " + name + argTypes + " -> " + rt);
 
             // Found a class which has a method of the right name.
@@ -174,13 +176,13 @@ public class Context_c implements Context
      * Finds the class which added a field to the scope.
      */
     public ClassType findFieldScope(String name) throws SemanticException {
-        if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+        if (Report.should_report(TOPICS, 3))
           Report.report(3, "find-field-scope " + name + " in " + this);
 
 	VarInstance vi = findVariableInThisScope(name);
 
         if (vi instanceof FieldInstance) {
-            if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+            if (Report.should_report(TOPICS, 3))
               Report.report(3, "find-field-scope " + name + " in " + vi);
             return type;
         }
@@ -195,13 +197,13 @@ public class Context_c implements Context
     /** Finds the class which added a method to the scope.
      */
     public ClassType findMethodScope(String name) throws SemanticException {
-        if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+        if (Report.should_report(TOPICS, 3))
           Report.report(3, "find-method-scope " + name + " in " + this);
 
         ClassType container = findMethodContainerInThisScope(name);
 
         if (container != null) {
-            if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+            if (Report.should_report(TOPICS, 3))
               Report.report(3, "find-method-scope " + name + " -> " + container);
             return type;
         }
@@ -226,7 +228,7 @@ public class Context_c implements Context
                 throw new SemanticException("Field " + name + " not accessible.");
 	    }
 
-            if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+            if (Report.should_report(TOPICS, 3))
               Report.report(3, "find-field " + name + " -> " + fi);
 	    return fi;
 	}
@@ -241,7 +243,7 @@ public class Context_c implements Context
 	VarInstance vi = findVariableSilent(name);
 
 	if (vi != null) {
-            if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+            if (Report.should_report(TOPICS, 3))
               Report.report(3, "find-var " + name + " -> " + vi);
             return vi;
 	}
@@ -253,13 +255,13 @@ public class Context_c implements Context
      * Gets a local or field of a particular name.
      */
     public VarInstance findVariableSilent(String name) {
-        if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+        if (Report.should_report(TOPICS, 3))
           Report.report(3, "find-var " + name + " in " + this);
 
         VarInstance vi = findVariableInThisScope(name);
 
         if (vi != null) {
-            if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+            if (Report.should_report(TOPICS, 3))
               Report.report(3, "find-var " + name + " -> " + vi);
             return vi;
         }
@@ -287,7 +289,7 @@ public class Context_c implements Context
      * Finds the definition of a particular type.
      */
     public Named find(String name) throws SemanticException {
-        if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+        if (Report.should_report(TOPICS, 3))
           Report.report(3, "find-type " + name + " in " + this);
 
         if (kind == OUTER) return outerResolver().find(name);
@@ -296,7 +298,7 @@ public class Context_c implements Context
         Named type = findInThisScope(name);
 
         if (type != null) {
-            if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+            if (Report.should_report(TOPICS, 3))
               Report.report(3, "find " + name + " -> " + type);
             return type;
         }
@@ -324,7 +326,7 @@ public class Context_c implements Context
      * Pushes on a class scoping
      */
     public Context pushClass(ParsedClassType c, ClassType t) {
-        if (Report.should_report(new String[] {Report.types, Report.context}, 4))
+        if (Report.should_report(TOPICS, 4))
           Report.report(4, "push class " + c + " " + c.position());
         Context_c v = push();
         v.kind = CLASS;
@@ -339,7 +341,7 @@ public class Context_c implements Context
      * pushes an additional block-scoping level.
      */
     public Context pushBlock() {
-        if (Report.should_report(new String[] {Report.types, Report.context}, 4))
+        if (Report.should_report(TOPICS, 4))
           Report.report(4, "push block");
         Context_c v = push();
         v.kind = BLOCK;
@@ -350,7 +352,7 @@ public class Context_c implements Context
      * pushes an additional static scoping level.
      */
     public Context pushStatic() {
-        if (Report.should_report(new String[] {Report.types, Report.context}, 4))
+        if (Report.should_report(TOPICS, 4))
           Report.report(4, "push static");
         Context_c v = push();
         v.staticContext = true;
@@ -361,7 +363,7 @@ public class Context_c implements Context
      * enters a method
      */
     public Context pushCode(CodeInstance ci) {
-        if (Report.should_report(new String[] {Report.types, Report.context}, 4))
+        if (Report.should_report(TOPICS, 4))
           Report.report(4, "push code " + ci + " " + ci.position());
         Context_c v = push();
         v.kind = CODE;
@@ -418,7 +420,7 @@ public class Context_c implements Context
      * Adds a symbol to the current scoping level.
      */
     public void addVariable(VarInstance vi) {
-        if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+        if (Report.should_report(TOPICS, 3))
           Report.report(3, "Adding " + vi + " to context.");
         addVariableToThisScope(vi);
     }
@@ -427,7 +429,7 @@ public class Context_c implements Context
      * Adds a method to the current scoping level.
      */
     public void addMethod(MethodInstance mi) {
-        if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+        if (Report.should_report(TOPICS, 3))
           Report.report(3, "Adding " + mi + " to context.");
         addMethodContainerToThisScope(mi);
     }
@@ -436,7 +438,7 @@ public class Context_c implements Context
      * Adds a named type object to the current scoping level.
      */
     public void addNamed(Named t) {
-        if (Report.should_report(new String[] {Report.types, Report.context}, 3))
+        if (Report.should_report(TOPICS, 3))
           Report.report(3, "Adding type " + t + " to context.");
         addNamedToThisScope(t);
     }
@@ -470,4 +472,8 @@ public class Context_c implements Context
         if (vars == null) vars = new HashMap();
         vars.put(var.name(), var);
     }
+
+    private static final Collection TOPICS = 
+                CollectionUtil.list(Report.types, Report.context);
+
 }

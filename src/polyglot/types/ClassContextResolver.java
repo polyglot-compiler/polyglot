@@ -1,6 +1,5 @@
 package polyglot.types;
 
-import polyglot.ast.*;
 import polyglot.util.*;
 import polyglot.main.Report;
 import java.util.*;
@@ -33,7 +32,7 @@ public class ClassContextResolver extends ClassResolver {
      * @param name The name to search for.
      */
     public Named find(String name) throws SemanticException {
-        if (Report.should_report(new String[] {Report.types, Report.resolver}, 2))
+        if (Report.should_report(TOPICS, 2))
 	    Report.report(2, "Looking for " + name + " in " + this);
 
         if (! StringUtil.isNameShort(name)) {
@@ -45,7 +44,7 @@ public class ClassContextResolver extends ClassResolver {
         ClassType inner = ts.findMemberClass(type, name);
 
         if (inner != null) {
-            if (Report.should_report(new String[] {Report.types, Report.resolver}, 2))
+            if (Report.should_report(TOPICS, 2))
                 Report.report(2, "Found member class " + inner);
             return inner;
         }
@@ -59,4 +58,8 @@ public class ClassContextResolver extends ClassResolver {
     public ClassType classType() {
 	return type;
     }
+
+    private static final Collection TOPICS = 
+            CollectionUtil.list(Report.types, Report.resolver);
+
 }

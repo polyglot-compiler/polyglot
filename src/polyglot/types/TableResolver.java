@@ -29,7 +29,7 @@ public class TableResolver extends ClassResolver {
         if (name == null || type == null) {
             throw new InternalCompilerError("Bad insertion into TableResolver");
         }
-        if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
+        if (Report.should_report(TOPICS, 3))
 	    Report.report(3, "TableCR.addNamed(" + name + ", " + type + ")");
 	table.put(name, type);
     }
@@ -38,7 +38,7 @@ public class TableResolver extends ClassResolver {
      * Find a type by name.
      */
     public Named find(String name) throws SemanticException {
-        if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
+        if (Report.should_report(TOPICS, 3))
 	    Report.report(3, "TableCR.find(" + name + ")");
 
 	Named n = (Named) table.get(name);
@@ -53,4 +53,7 @@ public class TableResolver extends ClassResolver {
     public String toString() {
         return "(table " + table + ")";
     }
+    
+    private static final Collection TOPICS = 
+                CollectionUtil.list(Report.types, Report.resolver);
 }

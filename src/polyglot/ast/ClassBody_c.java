@@ -1,6 +1,7 @@
 package polyglot.ext.jl.ast;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -155,7 +156,7 @@ public class ClassBody_c extends Term_c implements ClassBody
 
     protected void addMembers(Context c, ReferenceType type,
                               Set visited, boolean inherit) {
-        if (Report.should_report(new String[]{Report.types, Report.context}, 2))
+        if (Report.should_report(TOPICS, 2))
 	    Report.report(2, "addMembers(" + type + ")");
 
         if (visited.contains(type)) {
@@ -304,4 +305,8 @@ public class ClassBody_c extends Term_c implements ClassBody
             w.newline(0);
         }
     }
+
+    private static final Collection TOPICS = 
+                CollectionUtil.list(Report.types, Report.context);
+     
 }
