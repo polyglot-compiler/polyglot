@@ -19,7 +19,7 @@ public class ClassFileLoader
 
     public ClassFileLoader(List classpath) {
         this.classpath = new ArrayList(classpath);
-        this.cache = new HashMap();
+        this.cache = new WeakHashMap();
     }
 
     public ClassFileLoader(String classpath) {
@@ -49,11 +49,11 @@ public class ClassFileLoader
         if (c == null) {
             c = findClass(name);
 
-            // Don't cache.  We'll never use the cache since the class resolver
-            // caches ClassTypes.  We're just preventing ClassFiles from
-            // getting garbage collected.
+            // We cache here since more than one type system may attempt
+            // to load the same class file.  But, we use a weak hash map
+            // to allow garbage collection of ClassFiles when we need it.
 
-            // cache.put(name, c);
+            cache.put(name, c);
         }
         else {
             Report.report(verbose, 2, "already loaded " + c.name());
