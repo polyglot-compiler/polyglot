@@ -227,7 +227,7 @@ public class TypeBuilder extends HaltingVisitor
             Named dup = null;
 
             try {
-                dup = typeSystem().parsedResolver().find(ct.fullName());
+                dup = typeSystem().systemResolver().find(ct.fullName());
             }
             catch (SemanticException e) {
             }
