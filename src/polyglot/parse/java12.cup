@@ -284,7 +284,7 @@ literal ::=
     ;
 
 // 19.4) Types, Values, and Variables
-type    ::=
+type ::=
                     // TypeNode
         primitive_type:a
             {: RESULT = a; :}
