@@ -8,7 +8,7 @@ import java.util.*;
 
 /**
  * A <code>Unary</code> represents a Java unary expression, an
- * immutable pair of an expression and an an operator.
+ * immutable pair of an expression and an operator.
  */
 public class Unary_c extends Expr_c implements Unary
 {
@@ -221,7 +221,13 @@ public class Unary_c extends Expr_c implements Unary
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(expr, this);
+        if (expr.type().isBoolean()) {
+            v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this,
+                             FlowGraph.EDGE_KEY_FALSE, this);
+        }
+        else {
+            v.visitCFG(expr, this);
+        }
         return succs;
     }
 

@@ -648,12 +648,21 @@ public class Binary_c extends Expr_c implements Binary
           v.visitCFG(left, FlowGraph.EDGE_KEY_FALSE, right.entry(), 
                            FlowGraph.EDGE_KEY_TRUE, this);            
         }
-        v.visitCFG(right, this);
+        v.visitCFG(right, FlowGraph.EDGE_KEY_TRUE, this,
+                          FlowGraph.EDGE_KEY_FALSE, this);
       }
     }
     else {
-      v.visitCFG(left, right.entry());
-      v.visitCFG(right, this);
+      if (left.type().isBoolean() && right.type().isBoolean()) {        
+          v.visitCFG(left, FlowGraph.EDGE_KEY_TRUE, right.entry(),
+                           FlowGraph.EDGE_KEY_FALSE, right.entry());
+          v.visitCFG(right, FlowGraph.EDGE_KEY_TRUE, this,
+                            FlowGraph.EDGE_KEY_FALSE, this);
+      }
+      else {
+          v.visitCFG(left, right.entry());
+          v.visitCFG(right, this);
+      }
     }
 
     return succs;

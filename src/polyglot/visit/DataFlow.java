@@ -870,6 +870,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * <code>cond</code> evaluated to true, and similarly, <code>s2</code>
      * can be analyzed using the knowledge that <code>cond</code> evaluated to
      * false.
+     * 
+     * @deprecated
      */
     protected abstract static class ConditionNavigator {
         /**
