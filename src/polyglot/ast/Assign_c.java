@@ -107,48 +107,56 @@ public abstract class Assign_c extends Expr_c implements Assign
       if (ts.equals(t, ts.String()) && ts.canCoerceToString(s, tc.context())) {
         return type(ts.String());
       }
+
+      if (t.isNumeric() && s.isNumeric()) {
+        return type(ts.promote(t, s));
+      }
+
+      throw new SemanticException("The " + op + " operator must have "
+                                  + "numeric or String operands.",
+                                  position());
     }
 
-    if (op == BIT_AND_ASSIGN || op == BIT_OR_ASSIGN ||
-        op == BIT_XOR_ASSIGN) {
+    if (op == SUB_ASSIGN || op == MUL_ASSIGN ||
+        op == DIV_ASSIGN || op == MOD_ASSIGN) {
+      if (t.isNumeric() && s.isNumeric()) {
+        return type(ts.promote(t, s));
+      }
+
+      throw new SemanticException("The " + op + " operator must have "
+                                  + "numeric operands.",
+                                  position());
+    }
+
+    if (op == BIT_AND_ASSIGN || op == BIT_OR_ASSIGN || op == BIT_XOR_ASSIGN) {
       if (t.isBoolean() && s.isBoolean()) {
         return type(ts.Boolean());
       }
-    }
 
-    if (! t.isNumeric() || ! s.isNumeric()) {
-      if (op == ADD_ASSIGN) {
-        throw new SemanticException("The " + op + " operator must have "
-                                    + "numeric or String operands.",
-                                    position());
+      if (ts.isImplicitCastValid(t, ts.Long()) &&
+          ts.isImplicitCastValid(s, ts.Long())) {
+        return type(ts.promote(t, s));
       }
 
-      if (op == BIT_AND_ASSIGN || op == BIT_OR_ASSIGN ||
-          op == BIT_XOR_ASSIGN) {
-        throw new SemanticException("The " + op + " operator must have "
-                                    + "numeric or boolean operands.",
-                                    position());
-      }
-
-      if (op == SUB_ASSIGN || op == MUL_ASSIGN ||
-          op == DIV_ASSIGN || op == MOD_ASSIGN ||
-          op == SHL_ASSIGN || op == SHR_ASSIGN ||
-          op == USHR_ASSIGN) {
-        throw new SemanticException("The " + op + " operator must have "
-                                    + "numeric operands.",
-                                    position());
-      }
-
-      throw new InternalCompilerError("Unrecognized assignment operator " +
-                                      op + ".");
+      throw new SemanticException("The " + op + " operator must have "
+                                  + "integral or boolean operands.",
+                                  position());
     }
 
     if (op == SHL_ASSIGN || op == SHR_ASSIGN || op == USHR_ASSIGN) {
-      // Only promote the left of a shift.
-      return type(ts.promote(t));
+      if (ts.isImplicitCastValid(t, ts.Long()) &&
+          ts.isImplicitCastValid(s, ts.Long())) {
+        // Only promote the left of a shift.
+        return type(ts.promote(t));
+      }
+
+      throw new SemanticException("The " + op + " operator must have "
+                                  + "integral operands.",
+                                  position());
     }
-      
-    return type(ts.promote(t, s));
+
+    throw new InternalCompilerError("Unrecognized assignment operator " +
+                                    op + ".");
   }
   
   public Type childExpectedType(Expr child, AscriptionVisitor av) {
