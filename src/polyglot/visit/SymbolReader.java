@@ -21,6 +21,11 @@ public class SymbolReader extends NodeVisitor
     current = new ParsedJavaClass( ts);
   }
 
+  public ClassResolver getClassResolver()
+  {
+    return cr;
+  }
+
   public Node visitBefore(Node n)
   {
     if( n instanceof SourceFileNode)
@@ -65,5 +70,12 @@ public class SymbolReader extends NodeVisitor
   public String getPackageName()
   {
     return packageName;
+  }
+
+  public void setClassName( String name)
+  {
+    current.setFullName( name);
+    current.setClassType( new ClassType( ts, name, true));
+    cr.addClass( name, current);
   }
 }

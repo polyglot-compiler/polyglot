@@ -1,4 +1,6 @@
 
+package test;
+
 public class Constants
 {
   String \u0062 = "Tab \t newline \n unicode \u0370 octal \100\76 \r";

@@ -16,30 +16,46 @@ public class Compiler
   private static TypeSystem ts;
   private static CompoundClassResolver systemResolver;
   private static TableClassResolver parsedResolver;
+  private static SourceFileClassResolver sourceResolver;
   private static LoadedClassResolver loadedResolver;
 
   private static Map options;
 
   static
   {
-    Compiler.systemResolver = new CompoundClassResolver();
-    Compiler.parsedResolver = new TableClassResolver();
+    systemResolver = new CompoundClassResolver();
+    
+    parsedResolver = new TableClassResolver();
     systemResolver.addClassResolver( parsedResolver);
 
-    //systemResolver.addClassResolver( new FileClassResolver());
+    sourceResolver = new SourceFileClassResolver( ".jl");
+    systemResolver.addClassResolver( sourceResolver);
 
-    Compiler.loadedResolver = new LoadedClassResolver();
+    loadedResolver = new LoadedClassResolver();
     systemResolver.addClassResolver( loadedResolver);
 
-    Compiler.ts = new StandardTypeSystem( systemResolver);
-    Compiler.loadedResolver.setTypeSystem( Compiler.ts);
+    ts = new StandardTypeSystem( systemResolver);
+    loadedResolver.setTypeSystem( Compiler.ts);
     
-    Compiler.options = new HashMap();
+    options = new HashMap();
   }
+
+  public static String OPT_SOURCE_PATH             = "Source Path";
 
   public static void setOptions( Map options)
   {
     Compiler.options = options;
+
+    File sourcePath = (File)options.get( OPT_SOURCE_PATH);
+    if( sourcePath != null) {
+      try
+      {
+        //System.err.println( "Adding source path: " + sourcePath.toString());
+        sourceResolver.addSourceDirectory( sourcePath);
+        sourceResolver.addSourceDirectory( ".");
+      }
+      catch( IOException e) { e.printStackTrace(); System.exit( 1); }
+    }
   }
 
   public static ClassResolver getSystemClassResolver()
@@ -75,16 +91,26 @@ public class Compiler
     return sfn; 
   }
 
-  public void readSymbols( Node ast)
+  public ClassResolver readSymbols( Node ast)
   {
     SymbolReader sr = new SymbolReader( ts, parsedResolver);
     ast.visit( sr);
+
+    return sr.getClassResolver();
   }
 
   public void removeAmbiguities( Node ast)
   {
     AmbiguityRemover ar = new AmbiguityRemover( ts);
-    ast.visit( ar);
+    try
+    {
+      ast.visit( ar);
+    }
+    catch( TypeCheckError e)
+    {
+      System.err.println( "Type check error: " + e.getMessage());
+      System.exit(1);
+    }
   }
 
   public Node typeCheck( Node ast)

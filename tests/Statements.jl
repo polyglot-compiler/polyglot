@@ -1,4 +1,6 @@
 
+package test;
+
 import jltools.types.*;
 
 public class Statements
@@ -21,6 +23,8 @@ public class Statements
         System.out.println( "x: " + x + " y: " + y);
 
       TypeSystem ts = new StandardTypeSystem( null);
+      Statements s = new Statements();
+      Constants c = new Constants();
 
    }
    

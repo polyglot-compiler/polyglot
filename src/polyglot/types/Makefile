@@ -26,6 +26,7 @@ tp_files 	= AccessFlags.java	\
 			TypeCheckError.java \
 			TypeInstance.java \
 			TypeSystem.java \
+			SourceFileClassResolver.java \
 			StandardTypeSystem.java 
 
 

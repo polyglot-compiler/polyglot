@@ -149,6 +149,9 @@ public class SourceFileNode extends Node {
      try
      {
        it.addPackageImport("java.lang");
+       if( packageName != null) {
+         it.addPackageImport( packageName);
+       }
      }
      catch( Exception e)
      {

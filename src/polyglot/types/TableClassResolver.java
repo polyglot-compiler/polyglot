@@ -24,5 +24,14 @@ public class TableClassResolver implements ClassResolver
     return clazz;
   }
 
+  public void dump()
+  {
+    Iterator iter = table.keySet().iterator();
+    while( iter.hasNext())
+    {
+      System.err.println( "Table: " + iter.next());
+    }
+  }
+
   public void findPackage( String name) throws NoClassException {}
 }

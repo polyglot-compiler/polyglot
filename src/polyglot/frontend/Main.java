@@ -15,7 +15,7 @@ public class Main
       Set source = new TreeSet();
 
       parseCommandLine(args, options, source);
-
+      
       Compiler.setOptions( options);
 
       Compiler compiler = new Compiler();
@@ -53,5 +53,6 @@ public class Main
     }
     
     source.add( args[0]);
+    options.put( Compiler.OPT_SOURCE_PATH, new File( args[0]).getParentFile());
   }
 }

@@ -260,6 +260,7 @@ public class ClassNode extends ClassMember {
   {
     String packageName = sr.getPackageName();
     name = (packageName == null ? name : packageName + "." + name);
+    sr.setClassName( name);
     return this;
   }
 
