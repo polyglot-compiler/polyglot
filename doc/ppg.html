@@ -45,9 +45,21 @@ A JLgen file differs from a CUP grammar in several key ways:
       nonterminal, the nonterminal remains, even if ALL of its
       productions are dropped in this way. To get rid of the symbol
       entirely, use the syntax above.
-    <li><tt><b>override</b></tt> - FIXME
-    <li><tt><b>extend</b></tt> - FIXME
-    <li><tt><b>transfer</b></tt> - FIXME
+    <li><tt><b>override</b></tt> <i>S</i> <tt><b>::=</b></tt> &lt;
+      <i>productions</i>&gt; <tt><b>;</b></tt><br>
+      Result: replaces productions of <i>S</i> with specified productions.
+    <li><tt><b>extend</b></tt> <i>S</i> <tt><b>::=</b></tt> &lt;
+      <i>productions</i>&gt; <tt><b>;</b></tt><br>
+      Result: adds specified productions to nonterminal <i>S</i>.
+    <li><tt><b>transfer</b></tt> <i>S</i> <tt><b>to</b></tt> <i>A</i>
+      { <i>rhs of productions</i> } <tt><b>to</b></tt> <i>B</i> {
+      ... } ...
+      Result: Extends each of nonterminals <i>A, B,</i>, etc. the
+      productions as specified, removes the union of transferred
+      productions from <i>S</i>, so a single production can be
+      transferred to multiple nonterminals. To retain a production in
+      S, manually transfer it to itself, e.g.:
+      <tt><b>transfer S to A {...} to S {...}</b></tt>
     <li>Adding productions: same syntax as in CUP.
   </ul>
 </ol>
@@ -61,11 +73,26 @@ inheritance file.<p>
 In the case of inherited grammars, file inclusion is treated as
 relative to where the base file is located.
 
+<a name="features"><h3>Features of JLgen</h3></a>
+
+Features of JLgen
+<ul>
+  <li>Allows inheritance of grammars
+  <li>Easy modification of grammars via drop, extend, transfer and
+  override commands
+  <li>Can drop and introduce new symbols
+</ul>
+
+Coming soon: multiple start symbols.
+
+
 <a name="semantics"><h3>Semantics of JLgen</h3></a>
 
-
-
-
+The order of specification of commands is not important. The resulting
+productions for any nonterminal N is as follows:
+<ul>N' = N - drop(N) - transferL(N) + override(N) + transferR(N) +
+extend(N) + newProductions(N)</ul>
+(need to check this again).
 </body>
 
 </html>
