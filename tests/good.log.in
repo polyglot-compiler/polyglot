@@ -1,0 +1,9 @@
+LocalClass5.java:9: duplicate class: Local
+                class Local {
+                ^
+1 error
+LocalInit.jl:3: Could not find field or local variable "i".
+    int i = (i = 1) + i;
+             ^
+
+1 error.

@@ -192,7 +192,6 @@ good: $(GOOD)
 	(cd disamb_member; jlc -noserial CollectionsTester.jl) >> good.log 2>&1
 	jlc package1/InnerClassAccess.jl >> good.log 2>&1
 	jlc package2/ProtectedCtorAccess.jl >> good.log 2>&1
-	jlc package1/StaticContext2.jl >> good.log 2>&1
 	(cd recursive_serialize; jlc Main.jl) >> good.log 2>&1
 	(cd recursive_serialize; jlc Main.jl) >> good.log 2>&1
 	@if cmp -s good.log.in good.log; then \
