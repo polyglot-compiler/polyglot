@@ -305,14 +305,12 @@ FIXME: check super types as well.
             }
             */
 
-            // ?: Is this really true?
-            // MRC: yes, according to JLS2 15.9.1, the class type being
-            //          instantiated must be inner, and static classes
-            //      are by definition (8.1.2) not inner.
-            if (ct.flags().isStatic()) {
+            // According to JLS2 15.9.1, the class type being
+            // instantiated must be inner.
+	    if (! ct.isInnerClass()) {
                 throw new SemanticException(
-                    "Cannot specify a containing instance for static classes.",
-                    qualifier.position());
+                    "Cannot provide a containing instance for non-inner class " +
+		    ct.fullName() + ".", qualifier.position());
             }
 
             n = (New_c) n.objectType(tn);
