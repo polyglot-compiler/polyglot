@@ -25,7 +25,7 @@ class ForwardRef6 {
 	}
 	int w = x= 3; // ok - x at left hand side of assignment
 	int p = x; // ok - instance initializers may access static fields
-    //	static int u = (new Object(){int bar(){return x;}}).bar();
+    	static int u = (new Object(){int bar(){return x;}}).bar();
 	// ok - occurs in a different class
 	static int x;
 	int m = j = 4; // ok - j at left hand side of assignment

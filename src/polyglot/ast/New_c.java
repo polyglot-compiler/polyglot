@@ -1,46 +1,12 @@
 package polyglot.ext.jl.ast;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
-import polyglot.ast.AmbTypeNode;
-import polyglot.ast.CanonicalTypeNode;
-import polyglot.ast.ClassBody;
-import polyglot.ast.Expr;
-import polyglot.ast.New;
-import polyglot.ast.Node;
-import polyglot.ast.NodeFactory;
-import polyglot.ast.Precedence;
-import polyglot.ast.Term;
-import polyglot.ast.TypeNode;
+import polyglot.ast.*;
 import polyglot.frontend.Pass;
-import polyglot.types.ClassType;
-import polyglot.types.ConstructorInstance;
-import polyglot.types.Context;
-import polyglot.types.Flags;
-import polyglot.types.ParsedClassType;
-import polyglot.types.ProcedureInstance;
-import polyglot.types.ReferenceType;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.types.TypeSystem;
-import polyglot.util.CodeWriter;
-import polyglot.util.CollectionUtil;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
-import polyglot.util.TypedList;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.AscriptionVisitor;
-import polyglot.visit.CFGBuilder;
-import polyglot.visit.ExceptionChecker;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
-import polyglot.visit.Translator;
-import polyglot.visit.TypeBuilder;
-import polyglot.visit.TypeChecker;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
 
 /**
  * A <code>New</code> is an immutable representation of the use of the
@@ -445,6 +411,9 @@ FIXME: check super types as well.
 	    anonType.addInterface(ct);
 	}
 
+        // The type of the new expression is actually the anon type.
+        n = (New_c)n.type(anonType);
+        
 	// Now, run the four passes on the body.
 	ClassBody body = n.typeCheckBody(tc, ct);
 
