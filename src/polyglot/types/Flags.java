@@ -35,7 +35,7 @@ public class Flags implements Serializable
     public static final Flags STRICTFP     = createFlag("strictfp", null);
 
     /** All access flags. */
-    protected static final Flags ACCESS_FLAGS = PUBLIC.Private().Protected();
+    protected static final Flags ACCESS_FLAGS = PUBLIC.set(PRIVATE).set(PROTECTED);
 
     /** Bit set use to implement a flag set. */
     protected long bits;
@@ -126,7 +126,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Public() {
-	return clear(ACCESS_FLAGS).set(PUBLIC);
+	return set(PUBLIC);
     }
 
     /**
@@ -149,7 +149,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Private() {
-	return clear(ACCESS_FLAGS).set(PRIVATE);
+	return set(PRIVATE);
     }
 
     /**
@@ -172,7 +172,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Protected() {
-	return clear(ACCESS_FLAGS).set(PROTECTED);
+	return set(PROTECTED);
     }
 
     /**
