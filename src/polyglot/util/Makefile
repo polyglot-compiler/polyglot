@@ -19,6 +19,8 @@ SOURCES = \
 	Predicate.java \
 	SubtypeSet.java \
 	Transformation.java \
+	TransformingList.java \
+	CachingTransformingList.java \
 	TransformingIterator.java \
 	TypeEncoder.java \
 	TypeInputStream.java \

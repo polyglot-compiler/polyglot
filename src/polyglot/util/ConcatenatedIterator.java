@@ -33,6 +33,15 @@ public final class ConcatenatedIterator implements Iterator {
     findNextItem();
   }
 
+  /**
+   * Constructs a new ConcatenatedIterator which yields every element, in
+   * order, of every element of the collection iters, in order.
+   **/
+  public ConcatenatedIterator(java.util.Collection iters) {
+    this.backing_iterators = (Iterator[])iters.toArray(new Iterator[0]);
+    findNextItem();
+  }
+
   public Object next() {
     Object res = next_item;
     if (res == null)

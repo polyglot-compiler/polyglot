@@ -21,6 +21,15 @@ public final class TransformingIterator implements Iterator {
     this(new Iterator[]{iter}, trans);
   }
 
+  public TransformingIterator(Collection iters, Transformation trans) {
+    index = 0;
+    backing_iterators = (Iterator[]) iters.toArray(new Iterator[0]);
+    transformation = trans;
+    if (backing_iterators.length > 0)
+      current_iter = backing_iterators[0];
+    findNextItem();
+  }
+
   public TransformingIterator(Iterator[] iters, Transformation trans) {
     index = 0;
     backing_iterators = (Iterator[]) iters.clone();
