@@ -49,6 +49,7 @@ polyglot.ext.jl.ExtensionInfo {
         Infinite.jl (Post, ".*finally clause cannot complete normally.*"); // javac warning
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
 #KNOWN BUG:         Init6.jl ;
+        Init7.jl ;
         InitializerType1.jl ;
         Inner0.jl ; Inner1.jl ; Inner2.jl ; Inner3.jl ; Inner4.jl ;
         Inner5.jl ; Inner6.jl ; Inner7.jl ; Inner8.jl ; Inner9.jl ;
