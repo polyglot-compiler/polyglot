@@ -6,7 +6,7 @@
 
 SOURCE = .
 SUBDIRS = polyglot
-TAG = POLYGLOT_0_90
+TAG = RELEASE_0_9_0
 
 include Rules.mk
 
@@ -31,7 +31,7 @@ clobber:
 	-rm -f $(JAR_FILE)
 	$(subdirs)
 
-javadoc: FORCE
+javadoc:
 	$(javadoc)
 
 norecurse: classes jif polyj split op jmatch
@@ -56,9 +56,9 @@ jar: all
 export: javadoc
 	rm -rf release
 	mkdir release
-	cvs rtag $(TAG) polyglot
-	cd release; cvs export -r $(TAG) -f polyglot
-	cvs rtag -d $(TAG) polyglot
+	cd release; cvs checkout -r $(TAG) polyglot
+	rm -rf `find release -name CVS`
+	rm -f `find release -name .cvsignore`
 	for i in $(EXT) jl skel; do \
 		mv release/polyglot/polyglot/ext/$$i release; \
 	done

@@ -86,15 +86,9 @@ if [ ! -d src ]
 then
 	exists -f ./java_cup.jar
 	echo java_cup.jar is ./java_cup.jar
-
-	# exists -f ./iDoclet.jar
-	# echo iDoclet.jar is ./iDoclet.jar
 else
 	exists -f ./src/java_cup.jar
 	echo java_cup.jar is ./src/java_cup.jar
-
-	# exists -f ./src/iDoclet.jar
-	# echo iDoclet.jar is ./src/iDoclet.jar
 fi
 
 echo determining some Java properties:
