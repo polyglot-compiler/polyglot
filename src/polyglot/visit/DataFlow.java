@@ -1,12 +1,27 @@
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.ext.jl.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.frontend.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import polyglot.ast.Binary;
+import polyglot.ast.CodeDecl;
+import polyglot.ast.Expr;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Term;
+import polyglot.ast.Unary;
+import polyglot.frontend.Job;
 import polyglot.main.Report;
-import java.util.*;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.StringUtil;
 
 /**
  * Abstract dataflow Visitor, to allow simple dataflow equations to be easily
@@ -109,7 +124,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 
                 dataflow(g);
 
-                return post(g, cd);
+                return (CodeDecl)post(g, cd);
             }
         }
 
@@ -228,7 +243,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * Check all of the Peers in the graph, after the dataflow analysis has
      * been performed.
      */
-    public CodeDecl post(FlowGraph graph, CodeDecl root) throws SemanticException {
+    public Term post(FlowGraph graph, Term root) throws SemanticException {
         if (Report.should_report(Report.cfg, 2)) {
             dumpFlowGraph(graph, root);
         }
@@ -505,7 +520,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * Dump a flow graph, labeling edges with their flows, to aid in the
      * debugging of data flow.
      */
-    private void dumpFlowGraph(FlowGraph graph, CodeDecl root) {
+    private void dumpFlowGraph(FlowGraph graph, Term root) {
         Report.report(2, "digraph Flow" + (flowCounter++) + " {");
         Report.report(2, "  center=true; ratio=auto; size = \"8.5,11\";");
         // Loop around the nodes...
