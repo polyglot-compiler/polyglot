@@ -39,11 +39,11 @@ public class JLgenSpec extends Spec
 	/**
 	 * Parse the chain of inheritance via include files
 	 */
-	public void parseChain() {
-		try {
-			FileInputStream fileInput = new FileInputStream(include);
-			File f = new File(include);
-			String simpleName = f.getName();
+	public void parseChain(String basePath) {		File file = null;
+		try {			String fullPath = basePath + System.getProperty("file.separator") + include;
+			FileInputStream fileInput = new FileInputStream(fullPath);
+			file = new File(fullPath);
+			String simpleName = file.getName();
 			Lexer lex = new Lexer(fileInput, simpleName);
 			Parser parser = new Parser(simpleName, lex);
 			JLgen.DEBUG("parsing "+simpleName);
@@ -52,67 +52,75 @@ public class JLgenSpec extends Spec
 			fileInput.close();
 		} catch (Exception e) {
 			System.out.println(HEADER+"Exception: "+e.getMessage());
-			return;
+			System.exit(1);
 		}
-		parent.setChild(this);		parent.parseChain();
-	}		public CUPSpec coalesce() {		// parent cannot be null by definition
+		parent.setChild(this);
+		String parentDir = file.getPath();
+		parent.parseChain(parentDir == null ? "" : parentDir);	}		public CUPSpec coalesce() {		// parent cannot be null by definition
 		CUPSpec combined = parent.coalesce();		
+		// work with a copy so we have the unmodified original to refer to		CUPSpec newSpec = (CUPSpec) combined.clone();		
 		// override package name
-		combined.setPkgName(packageName);
+		newSpec.setPkgName(packageName);
 		
-		// add imported classes		combined.addImports(imports);
-				// override action/parser/init/scan code		
+		// add imported classes		newSpec.addImports(imports);
+				// override action/parser/init/scan code		newSpec.replaceCode(code);
 				// add in (non)terminals
-		combined.addSymbols(symbols);
+		newSpec.addSymbols(symbols);
 				// override start symbol
-		combined.setStart(start);		
+		newSpec.setStart(start);		
 		// combine this spec with the rest 
-		// of the chain and return the result		// Order of processing:		// drop, transferL, override, extend, transferR, new
+		// of the chain and return the result		processTransferL(combined, newSpec);		processDrop(combined, newSpec);		processOverride(combined, newSpec);		processTransferR(combined, newSpec);		processExtend(combined, newSpec);		processNew(combined, newSpec);				return newSpec;
+	}
+	
+	private void processDrop(CUPSpec combined, CUPSpec newSpec) {
+		// DROP
 		Command cmd;
-				// DROP
 		DropCmd drop;		for (int i=0; i < commands.size(); i++) {
 			cmd = (Command) commands.elementAt(i);			if (cmd instanceof DropCmd) {				drop = (DropCmd) cmd;
 				if (drop.isProdDrop()) {
-					// remove all productions that have NT as lhs					combined.dropProductions(drop.getProduction());
+					// remove all productions that have NT as lhs					newSpec.dropProductions(drop.getProduction());
 				} else { /* NT Drop */
-					// remove nonterminal from list of symbols					combined.dropSymbol(drop.getNonterminal());
-					// remove all productions that have NT as lhs					combined.dropAllProductions(drop.getNonterminal());
+					// remove nonterminal from list of symbols					newSpec.dropSymbol(drop.getNonterminal());
+					// remove all productions that have NT as lhs					newSpec.dropAllProductions(drop.getNonterminal());
 				}			}
-		}		
+		}	}	private void processOverride(CUPSpec combined, CUPSpec newSpec) {
 		// OVERRIDE
+		Command cmd;
 		OverrideCmd override;		for (int i=0; i < commands.size(); i++) {
 			cmd = (Command) commands.elementAt(i);			if (cmd instanceof OverrideCmd) {				override = (OverrideCmd) cmd;
-				combined.dropAllProductions(override.getLHS());
-				combined.addProductions(override.getProduction());			}
+				newSpec.dropAllProductions(override.getLHS());
+				newSpec.addProductions(override.getProduction());			}
 		}
-		
+	}		private void processExtend(CUPSpec combined, CUPSpec newSpec) {
 		// EXTEND
+		Command cmd;
 		ExtendCmd extend;		for (int i=0; i < commands.size(); i++) {
 			cmd = (Command) commands.elementAt(i);			if (cmd instanceof ExtendCmd) {				extend = (ExtendCmd) cmd;
-				combined.addProductions(extend.getProduction());			}
+				newSpec.addProductions(extend.getProduction());			}
 		}
-		
+	}		private void processTransferL(CUPSpec combined, CUPSpec newSpec) {
 		// TRANSFER_L
+		Command cmd;
 		TransferCmd transfer;		for (int i=0; i < commands.size(); i++) {
 			cmd = (Command) commands.elementAt(i);			if (cmd instanceof TransferCmd) {				transfer = (TransferCmd) cmd;
 				// ???			}
 		}
-		
+	}		private void processTransferR(CUPSpec combined, CUPSpec newSpec) {
 		// TRANSFER_R
-		for (int i=0; i < commands.size(); i++) {
+		Command cmd;
+		TransferCmd transfer;		for (int i=0; i < commands.size(); i++) {
 			cmd = (Command) commands.elementAt(i);			if (cmd instanceof TransferCmd) {				transfer = (TransferCmd) cmd;
 				// ???			}
-		}		
-		// NEW PRODUCTIONS		NewProdCmd newProd;		for (int i=0; i < commands.size(); i++) {
+		}	}		private void processNew(CUPSpec combined, CUPSpec newSpec) {
+		// NEW PRODUCTIONS		NewProdCmd newProd;		Command cmd;
+		for (int i=0; i < commands.size(); i++) {
 			cmd = (Command) commands.elementAt(i);			if (cmd instanceof NewProdCmd) {				newProd = (NewProdCmd) cmd;
-				combined.addProductions(newProd.getProduction());			}
+				newSpec.addProductions(newProd.getProduction());			}
 		}
-				return combined;
-	}
-			/**
+	}			/**
 	 * Write out contents to a CodeWriter
 	 */
-	public void unparse(CodeWriter cw) throws ParserError {
+	public void unparse(CodeWriter cw) {
 		cw.begin(0);
 		if (include != null) {
 			cw.write(include+"\n");

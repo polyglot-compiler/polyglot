@@ -1,11 +1,9 @@
 package jltools.util.jlgen.atoms;
 
+import jltools.util.jlgen.parse.*;
 import jltools.util.jlgen.util.*;
-
 public class Terminal extends GrammarSymbol
 {
-	private String name, label;
-	
 	public Terminal(String name, String label)
 	{
 		this.name = name;
@@ -19,15 +17,9 @@ public class Terminal extends GrammarSymbol
 	}
 
 	public boolean equals(Object o) {
-		if (o instanceof Nonterminal) {
-			return name.equals( ((Nonterminal)o).getName() );	
+		if (o instanceof Terminal) {
+			return name.equals( ((Terminal)o).getName() );	
 		}
 		return false;
-	}
-		public String toString() {
-		String result = name;		if (label != null)			result += ":" + label;		return result;
-	}	
-	public String getName() {
-		return name;	
 	}
 }

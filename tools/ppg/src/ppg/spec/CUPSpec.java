@@ -18,13 +18,13 @@ public class CUPSpec extends Spec
 	{		super();
 		packageName = pkg;
 		imports = imp;
-		code = codeParts;
+		code = codeParts; replaceCode(code);
 		symbols = syms;
 		prec = precedence;
 		start = startSym;
 		productions = prods;
 	}		public CUPSpec coalesce() {
-		// cannot have a parent by definition		return this;	}	
+		// cannot have a parent by definition		return this;	}		public Object clone() {		return new CUPSpec(packageName, imports, code, symbols, prec, start, productions);		}
 		public void addSymbols(Vector syms) {		if (syms == null)
 			return;				for (int i=0; i < syms.size(); i++) {			symbols.addElement(syms.elementAt(i));		}
 	}	
@@ -38,19 +38,46 @@ public class CUPSpec extends Spec
 	public void dropProductions(Production p) {			}
 		public void dropAllProductions(Nonterminal nt) {			}
 	public void addProductions(Production p) {			}
-	public void unparse(CodeWriter cw) throws ParserError {
-		/*
-		cw.begin(0);
-		cw.write("CUP Spec\n");
+	public void unparse(CodeWriter cw) {
+		cw.begin(0);		cw.write("package " + packageName + ";");
+		cw.newline(); cw.newline();
+		
+		// import
+		for (int i=0; i < imports.size(); i++) {
+			cw.write("import " + (String) imports.elementAt(i) + ";");
+			cw.newline();		}
+		cw.newline();
+
+		// code
+		for (int i=0; i < code.size(); i++) {
+			cw.write( ((Code) code.elementAt(i)).toString() );			cw.newline();		}
+		cw.newline();
+		
+		// symbols
+		for (int i=0; i < symbols.size(); i++) {
+			cw.write( ((SymbolList) symbols.elementAt(i)).toString() );
+			cw.newline();		}
+		cw.newline();
+		
+		// precedence
+		
+		// start
+		cw.write("start with " + start + ";");
+		cw.newline(); cw.newline();
+		
+		// productions
+		for (int i=0; i < productions.size(); i++) {
+			((Production) productions.elementAt(i)).unparse(cw);
+		}		
+		cw.newline();
 		cw.end();
-		*/
-		try {
+				//Write out to stdout in a naive manner
+		/*		try {
 			export(System.out);
 		} catch (Exception e) {
 			System.out.println(HEADER+"Exception: "+e.getMessage());
 			return;
-		}
-	}
+		}		*/	}
 	
 	/**
 	 * Write out the CUP specification to the stream

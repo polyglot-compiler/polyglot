@@ -34,8 +34,8 @@ public class JLgen
 			return;
 		}
 
-		File f = new File(filename);
-		String simpleName = f.getName();
+		File file = new File(filename);
+		String simpleName = file.getName(); 
 		Lexer lex = new Lexer(fileInput, simpleName);
 		
 		Parser parser = new Parser(filename, lex);
@@ -45,8 +45,16 @@ public class JLgen
 			System.out.println(HEADER+"Exception: "+e.getMessage());
 			return;
 		}
-		Spec spec = (Spec)parser.getProgramNode();
-		spec.parseChain();				// now we have a linked list of inheritance, namely		// JLgen1, JLgen2, ..., JLgenN, CUP		// We combine two at a time, starting from the end with the CUP spec
-		
+		Spec spec = (Spec)parser.getProgramNode();		//String parentDir = file.getPath();
+		//spec.parseChain(parentDir == null ? "" : parentDir);
+		File parent = file.getParentFile();
+		spec.parseChain(parent == null ? "" : parent.getPath());				// now we have a linked list of inheritance, namely		// JLgen1, JLgen2, ..., JLgenN, CUP		// We combine two at a time, starting from the end with the CUP spec
+		CUPSpec combined = spec.coalesce();				CodeWriter cw = new CodeWriter(System.out, 72); 
+		try {
+			combined.unparse(cw);
+			cw.flush();		} catch (IOException e) {
+			System.out.println(HEADER+"exception: "+e.getMessage());
+			return;
+		}		
 	}
 }

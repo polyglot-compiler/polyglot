@@ -45,13 +45,9 @@ public class ParseTest
 		CodeWriter cw = new CodeWriter(System.out, 72); 
 		try {
 			spec.unparse(cw);
-			cw.flush();
-			fileInput.close();
+			cw.flush();			fileInput.close();
 		} catch (IOException e) {
 			System.out.println(HEADER+"exception: "+e.getMessage());
-			return;
-		} catch (ParserError e) {
-			System.out.println(HEADER+"parser error: "+e.getMessage());
 			return;
 		}
 	}
