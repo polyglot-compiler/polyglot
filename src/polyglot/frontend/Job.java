@@ -8,11 +8,11 @@ import polyglot.frontend.Compiler;
 import java.util.*;
 
 /**
- * A <code>Job</code> encapsulates work done by the compiler. <code>Job</code>s 
- * are typically associated either with a nested class (<code>InnerJob</code>s) or a source 
- * file (<code>SourceJob</code>s). A Job contains all information carried 
- * between phases of the compiler. A Job consists of a set of scheduled passes over
- * the associated code.
+ * A <code>Job</code> encapsulates work done by the compiler. <code>Job</code>s
+ * are typically associated either with a nested class (<code>InnerJob</code>s)
+ * or a source file (<code>SourceJob</code>s). A Job contains all information
+ * carried between phases of the compiler. A Job consists of a set of scheduled
+ * passes over the associated code.
  */
 public abstract class Job
 {
@@ -172,7 +172,7 @@ public abstract class Job
     }
 
     /**
-     * Have all of the passes been completed?
+     * Return true if all of the passes been completed.
      */
     public boolean completed() {
         return pendingPasses().isEmpty();
@@ -199,7 +199,7 @@ public abstract class Job
     }
 
     /**
-     * Has the pass <code>id</code> been completed yet?
+     * Return true if the pass <code>id</code> has been completed.
      */
     public boolean completed(Pass.ID id) {
         Integer i = (Integer) passMap().get(id);
@@ -207,7 +207,7 @@ public abstract class Job
     }
 
     /**
-     * Is the pass <code>id</code> still pending?
+     * Return true if the pass <code>id</code> is still pending.
      */
     public boolean pending(Pass.ID id) {
         Integer i = (Integer) passMap().get(id);
