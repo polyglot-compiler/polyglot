@@ -50,6 +50,7 @@ PACKAGES = \
 	jltools.types \
 	jltools.util \
 	jltools.visit \
+	jltools.ext.jl \
 	jltools.ext.jl.ast \
 	jltools.ext.jl.parse \
 	jltools.ext.jl.types \
@@ -58,7 +59,10 @@ PACKAGES = \
 	jltools.ext.jif.extension \
 	jltools.ext.jif.types \
 	jltools.ext.jif.visit \
-
+	jif.lang \
+	jif.runtime \
+	jif.policy \
+	
 #jltools.ext.op \
 	jltools.ext.op.runtime \
 	jltools.ext.polyj \
@@ -81,7 +85,9 @@ PACKAGES = \
 	jltools.ext.split.visit
 
 javadoc: FORCE
+	cp -r jltools/ext/jif/runtime/jif .
 	$(javadoc)
+	rm -r jif
 
 jar: all
 	cd classes ; \
@@ -104,12 +110,15 @@ release_clean: FORCE
 	mkdir -p $(RELPATH)
 
 release_doc: FORCE
-	cp LICENSE README README-JIF.txt $(RELPATH)
+	cp LICENSE Readme.html $(RELPATH)
 	mkdir -p $(REL_DOC)
 	mkdir -p $(REL_SRC)
+	mkdir -p $(REL_IMG)
+	cp -f images/*.gif $(REL_IMG)
 	$(MAKE) -C doc release
 
 release: jar release_clean release_doc release_src
+	$(MAKE) -C jltools/ext/jif/tests release
 	cp -f configure $(RELPATH)/configure
 	$(subdirs)
 	mkdir -p $(REL_LIB)

@@ -21,8 +21,11 @@ JAVADOC_DOCLET		= iContract.doclet.Standard
 JAVADOC_OUTPUT		= $(SOURCE)/javadoc
 JAVADOC_FLAGS		= -mx40m -ms40m -classpath "$(JAVADOC_CLASSPATH)"
 
-SOURCEPATH		= $(SOURCE)
 BIN 			= $(SOURCE)/bin
+JIF			= $(BIN)/jif
+JIF_FLAGS		= -d $(OUTPUT) -sourcepath $(BUILDPATH)
+
+SOURCEPATH		= $(SOURCE)
 PACKAGEPATH		= $(SOURCE)/classes/$(PACKAGE)
 VPATH			= $(PACKAGEPATH)
 RELPATH			= $(SOURCE)/release/jif-0.9
@@ -55,6 +58,9 @@ $(PACKAGEPATH)/%.class: %.java
 
 cleanclasses:
 	-rm -f $(PACKAGEPATH)/*.class
+
+clean_java_output:
+	-rm -f $(PACKAGEPATH)/*.java*
 
 classpath:
 	@echo "setenv CLASSPATH $(CLASSPATH)"

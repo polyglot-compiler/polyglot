@@ -145,6 +145,8 @@ else
     echo "Top of build tree is $TOP${FILE_SEP}src"
     DEFS_MK="src${FILE_SEP}Defs.mk"
     JLC_CP="-classpath \${TOP}${FILE_SEP}lib${FILE_SEP}jltools.jar${PATH_SEP}\${TOP}${FILE_SEP}lib${FILE_SEP}jif.jar${PATH_SEP}\${TOP}${FILE_SEP}lib${FILE_SEP}java_cup.jar${PATH_SEP}\${CLASSPATH}"
+    if [ $OS = linux ]; then rm -f lib/libfs.solaris.so; fi
+    if [ $OS = solaris ]; then mv lib/libfs.solaris.so lib/libfs.so; fi
 fi
 
 echo creating ${DEFS_MK}
