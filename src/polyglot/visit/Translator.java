@@ -17,6 +17,7 @@ public class Translator extends AbstractPass
     protected SourceJob job;
     protected Context context;
     protected boolean appendSemicolon = true;
+    protected ClassType outerClass = null;
 
     /**
      * Create a Translator.  The output of the visitor is a collection of files
@@ -37,6 +38,14 @@ public class Translator extends AbstractPass
         boolean old = this.appendSemicolon;
         this.appendSemicolon = a;
 	return old;
+    }
+
+    public ClassType outerClass() {
+        return outerClass;
+    }
+
+    public void setOuterClass(ClassType ct) {
+        this.outerClass = ct;
     }
 
     public Context context() {
