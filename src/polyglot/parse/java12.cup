@@ -1538,20 +1538,18 @@ class_instance_creation_expression ::=
             {: RESULT = parser.nf.New(parser.pos(n), a, b); :}
     |   NEW:n class_type:a LPAREN argument_list_opt:b RPAREN class_body:c
             {: RESULT = parser.nf.New(parser.pos(n), a, b, c); :}
-    |   primary:a DOT NEW IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
+    |   primary:a DOT NEW simple_name:b LPAREN argument_list_opt:c RPAREN
             {: RESULT = parser.nf.QualifiedNew(parser.pos(a), a,
-                                               b.getIdentifier(), c); :}
-    |   primary:a DOT NEW IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
-            class_body:d
+                                               b.toType(), c); :}
+    |   primary:a DOT NEW simple_name:b LPAREN argument_list_opt:c RPAREN class_body:d
             {: RESULT = parser.nf.QualifiedNew(parser.pos(a), a,
-                                               b.getIdentifier(), c, d); :}
-    |   name:a DOT NEW IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
+                                               b.toType(), c, d); :}
+    |   name:a DOT NEW simple_name:b LPAREN argument_list_opt:c RPAREN
             {: RESULT = parser.nf.QualifiedNew(parser.pos(a), a.toExpr(),
-                                               b.getIdentifier(), c); :}
-    |   name:a DOT NEW IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
-            class_body:d
+                                               b.toType(), c); :}
+    |   name:a DOT NEW simple_name:b LPAREN argument_list_opt:c RPAREN class_body:d
             {: RESULT = parser.nf.QualifiedNew(parser.pos(a), a.toExpr(),
-                                               b.getIdentifier(), c, d); :}
+                                               b.toType(), c, d); :}
     ;
 argument_list_opt ::=
                     // List of Expr

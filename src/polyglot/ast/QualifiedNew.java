@@ -17,8 +17,8 @@ public interface QualifiedNew extends Expr
     Expr qualifier();
     QualifiedNew qualifier(Expr qualifier);
 
-    String typeName();
-    QualifiedNew typeName(String typeName);
+    TypeNode objectType();
+    QualifiedNew objectType(TypeNode objectType);
 
     List arguments();
     QualifiedNew arguments(List arguments);

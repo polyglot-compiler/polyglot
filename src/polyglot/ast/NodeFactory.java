@@ -148,8 +148,8 @@ public interface NodeFactory
     New New(Position pos, TypeNode type, List args);
     New New(Position pos, TypeNode type, List args, ClassBody body);
 
-    QualifiedNew QualifiedNew(Position pos, Expr outer, String type, List args);
-    QualifiedNew QualifiedNew(Position pos, Expr outer, String type, List args, ClassBody body);
+    QualifiedNew QualifiedNew(Position pos, Expr outer, TypeNode objectType, List args);
+    QualifiedNew QualifiedNew(Position pos, Expr outer, TypeNode objectType, List args, ClassBody body);
 
     NewArray NewArray(Position pos, TypeNode base, List dims);
     NewArray NewArray(Position pos, TypeNode base, List dims, int addDims);
