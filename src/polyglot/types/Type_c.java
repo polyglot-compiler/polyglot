@@ -241,17 +241,23 @@ public abstract class Type_c extends TypeObject_c implements Type
         throws IOException, ClassNotFoundException
     {
         // Store the type in the system resolver to avoid infinite loop.
-        if (this instanceof Importable) {
+        if (this instanceof Named) {
             String name = (String) in.readObject();
             String memberName = (String) in.readObject();
             TypeSystem ts = ((TypeInputStream) in).getTypeSystem();
 
             if (name != null) {
-                ((CachingResolver) ts.systemResolver()).install(name, this);
+                try {
+                    ((CachingResolver) ts.systemResolver()).install(name, (Named) this);
+                }
+                catch (SemanticException e) { }
             }
             
             if (memberName != null) {
-                ((CachingResolver) ts.systemResolver()).install(memberName, this);
+                try {
+                    ((CachingResolver) ts.systemResolver()).install(memberName, (Named) this);
+                }
+                catch (SemanticException e) { }
             }
         }
 
