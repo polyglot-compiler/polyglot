@@ -99,7 +99,7 @@ public class CofferMethodInstance_c extends MethodInstance_c
 	return n;
     }
 
-    public boolean canOverrideImpl(MethodInstance mj) {
+    public boolean canOverrideImpl(MethodInstance mj, boolean quiet) throws SemanticException {
         CofferMethodInstance mi = this;
 
         KeySet e;
@@ -122,7 +122,12 @@ public class CofferMethodInstance_c extends MethodInstance_c
         KeySet newKeys = entryKeys.removeAll(e);
 
         if (! returnKeys.equals(r.addAll(newKeys))) {
-            return false;
+            if (quiet) return false;
+            throw new SemanticException(mi.signature() + " in " + mi.container() +
+                                        " cannot override " + 
+                                        mj.signature() + " in " + mj.container() + 
+                                        ";", 
+                                        mi.position());
         }
 
         CONSTRAINTS:
@@ -134,18 +139,28 @@ public class CofferMethodInstance_c extends MethodInstance_c
 
                 if (superC.throwType().equals(c.throwType())) {
                     if (! c.keys().equals(superC.keys().addAll(newKeys))) {
-                        return false;
+                        if (quiet) return false;
+                        throw new SemanticException(mi.signature() + " in " + mi.container() +
+                                " cannot override " + 
+                                mj.signature() + " in " + mj.container() + 
+                                ";", 
+                                mi.position());
                     }
                     continue CONSTRAINTS;
                 }
             }
 
             if (! c.keys().equals(newKeys)) {
-                return false;
+                if (quiet) return false;
+                throw new SemanticException(mi.signature() + " in " + mi.container() +
+                        " cannot override " + 
+                        mj.signature() + " in " + mj.container() + 
+                        ";", 
+                        mi.position());
             }
         }
 
-        return super.canOverrideImpl(mj);
+        return super.canOverrideImpl(mj, quiet);
     }
 
     public String toString() {

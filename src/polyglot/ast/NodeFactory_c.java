@@ -93,7 +93,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public final Assign Assign(Position pos, Expr left, Assign.Operator op, Expr right) {
+    public Assign Assign(Position pos, Expr left, Assign.Operator op, Expr right) {
         Assign n;
         if (left instanceof Local) {
             return LocalAssign(pos, (Local)left, op, right);

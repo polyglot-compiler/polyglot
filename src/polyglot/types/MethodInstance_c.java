@@ -187,6 +187,14 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     /**
+     * Leave this method in for historic reasons, to make sure that extensions
+     * modify their code correctly.
+     */
+    public final boolean canOverrideImpl(MethodInstance mj) throws SemanticException {
+        throw new RuntimeException("canOverrideImpl(MethodInstance mj) should not be called.");
+    }
+        
+    /**
      * @param quiet If true, then no Semantic Exceptions will be thrown, and the
      *              return value will be true or false. Otherwise, if the method
      *              cannot override, then a SemanticException will be thrown, else

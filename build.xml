@@ -391,6 +391,11 @@
       <param name="ext" value="pao"/>
       <param name="parser.type" value="ppg"/>
     </antcall>
+    <!-- compile the PAO runtime -->
+    <javac srcdir="${src}" destdir="${classes}" debug="on"
+      includes="polyglot/ext/pao/runtime/**">
+      <classpath refid="standard.classpath"/>
+    </javac>
   </target>
 
   <target name="coffer" depends="param">
