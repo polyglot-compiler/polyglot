@@ -81,7 +81,6 @@ parser code  {:
   }
 
   public void report_error(String message, Object info) {
-  System.out.println("message = " + message);
       if (info instanceof Position) {
 	  eq.enqueue(ErrorInfo.SYNTAX_ERROR, message, (Position) info);
       }
@@ -1634,11 +1633,18 @@ cast_expression ::=
 	|	LPAREN expression:a RPAREN 
 				unary_expression_not_plus_minus:b
 			{: /* XXX */
-			   CastExpression e = new CastExpression((TypeNode)
-				Grm.ln(new TypeNode( 
-				new AmbiguousNameType( parser.ts, 
-				((AmbiguousName) ((AmbiguousNameExpression)a).getPrefix()).toType(parser.ts),
-				((AmbiguousNameExpression)a).getName())), a),
+			if (! (a instanceof AmbiguousNameExpression)) {
+			    throw new SyntaxException(Annotate.getPosition(a));
+			}
+			AmbiguousNameExpression ae = (AmbiguousNameExpression) a;
+			Type t = ae.getPrefix() != null
+			  ? new AmbiguousNameType(parser.ts,
+			    ((AmbiguousName) ae.getPrefix()).toType(parser.ts),
+			    ae.getName())
+			  : new AmbiguousNameType(parser.ts, null,
+			    ae.getName());
+		        CastExpression e = new CastExpression((TypeNode)
+				Grm.ln(new TypeNode(t), a),
 				b);
 			   RESULT = (CastExpression)Grm.ln(e, a); :}
 	|	LPAREN name:a dims:b RPAREN unary_expression_not_plus_minus:c
