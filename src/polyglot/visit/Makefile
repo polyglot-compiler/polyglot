@@ -7,6 +7,7 @@ include $(SOURCE)/Rules.mk
 SOURCES = \
 	AmbiguityRemover.java \
 	BaseVisitor.java \
+	BlockFlattener.java \
 	ClassSerializer.java \
 	ConstantFolder.java \
 	DumpAst.java \
