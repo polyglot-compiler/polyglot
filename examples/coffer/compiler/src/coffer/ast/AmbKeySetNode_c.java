@@ -8,6 +8,9 @@ import polyglot.ext.jl.ast.*;
 import polyglot.ext.coffer.types.*;
 import java.util.*;
 
+/**
+ * Implementation of an ambiguous key set AST node.
+ */
 public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
 {
     protected List keys;

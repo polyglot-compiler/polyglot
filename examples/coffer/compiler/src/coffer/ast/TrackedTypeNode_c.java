@@ -8,7 +8,8 @@ import polyglot.visit.*;
 import polyglot.util.*;
 import java.util.*;
 
-/** An implementation of the <code>TrackedTypeNode</code> interface.
+/** An implementation of the <code>TrackedTypeNode</code> interface,
+ * a type node for a class instantiated with a key.
  */
 public class TrackedTypeNode_c extends TypeNode_c implements TrackedTypeNode
 {

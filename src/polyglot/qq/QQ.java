@@ -13,6 +13,7 @@ import polyglot.ext.jl.qq.Grm;
 import java.util.*;
 import java.io.*;
 
+/** JL quasiquoter.  Contains methods for parsing strings into ASTs. */
 public class QQ {
     protected ExtensionInfo ext;
     protected Position pos;
@@ -33,54 +34,74 @@ public class QQ {
         this.pos = pos;
     }
 
+    /** Parse a string into a <code>SourceFile</code> AST node. */
     public SourceFile parseFile(String text) throws SemanticException {
         return parseFile(new HashMap(), text);
     }
 
+    /** Parse a string into a <code>SourceFile</code> AST node,
+     * applying substitutions. */
     public SourceFile parseFile(Map subst, String text) throws SemanticException {
         return (SourceFile) parse(subst, text, FILE);
     }
 
+    /** Parse a string into a <code>ClassDecl</code> AST node. */
     public ClassDecl parseDecl(String text) throws SemanticException {
         return parseDecl(new HashMap(), text);
     }
 
+    /** Parse a string into a <code>ClassDecl</code> AST node,
+     * applying substitutions. */
     public ClassDecl parseDecl(Map subst, String text) throws SemanticException {
         return (ClassDecl) parse(subst, text, DECL);
     }
 
+    /** Parse a string into a <code>ClassMember</code> AST node. */
     public ClassMember parseMember(String text) throws SemanticException {
         return parseMember(new HashMap(), text);
     }
 
+    /** Parse a string into a <code>ClassMember</code> AST node,
+     * applying substitutions. */
     public ClassMember parseMember(Map subst, String text) throws SemanticException {
         return (ClassMember) parse(subst, text, MEMB);
     }
 
+    /** Parse a string into a <code>Expr</code> AST node. */
     public Expr parseExpr(String text) throws SemanticException {
         return parseExpr(new HashMap(), text);
     }
 
+    /** Parse a string into a <code>Expr</code> AST node,
+     * applying substitutions. */
     public Expr parseExpr(Map subst, String text) throws SemanticException {
         return (Expr) parse(subst, text, EXPR);
     }
 
+    /** Parse a string into a <code>Stmt</code> AST node. */
     public Stmt parseStmt(String text) throws SemanticException {
         return parseStmt(new HashMap(), text);
     }
 
+    /** Parse a string into a <code>Stmt</code> AST node,
+     * applying substitutions. */
     public Stmt parseStmt(Map subst, String text) throws SemanticException {
         return (Stmt) parse(subst, text, STMT);
     }
 
+    /** Parse a string into a <code>TypeNode</code> AST node. */
     public TypeNode parseType(String text) throws SemanticException {
         return parseType(new HashMap(), text);
     }
 
+    /** Parse a string into a <code>TypeNode</code> AST node,
+     * applying substitutions. */
     public TypeNode parseType(Map subst, String text) throws SemanticException {
         return (TypeNode) parse(subst, text, TYPE);
     }
 
+    /** Parse a string into an AST node of the given type,
+     * applying substitutions. */
     protected Node parse(Map subst, String text, int kind) throws SemanticException {
 
         TypeSystem ts = ext.typeSystem();

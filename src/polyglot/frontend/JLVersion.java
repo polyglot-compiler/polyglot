@@ -1,5 +1,8 @@
 package polyglot.ext.jl;
 
+/**
+ * Version information for the base compiler.
+ */
 public class Version extends polyglot.main.Version {
     public String name()
         { return "jl"; }

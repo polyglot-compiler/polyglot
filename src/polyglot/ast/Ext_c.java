@@ -7,8 +7,8 @@ import polyglot.util.*;
 
 /**
  * <code>Ext</code> is the super type of all node extension objects.
- * It defines default implementations of the methods which implement compiler
- * passes, dispatching to the node to perform the actual work of the pass.
+ * It contains a pointer back to the node it is extending and a possibly-null
+ * pointer to another extension node. 
  */
 public abstract class Ext_c implements Ext {
     protected Node node;
@@ -24,6 +24,10 @@ public abstract class Ext_c implements Ext {
         this.node = null;
     }
 
+    /** Initialize the extension object's pointer back to the node.
+     * This also initializes the back pointers for all extensions of
+     * the extension.
+     */
     public void init(Node node) {
         if (this.node != null) {
             throw new InternalCompilerError("Already initialized.");
@@ -37,12 +41,15 @@ public abstract class Ext_c implements Ext {
     }
 
     /**
-     * Return the node we ultimately extend, possibly this.
+     * Return the node we ultimately extend.
      */
     public Node node() {
 	return node;
     }
 
+    /**
+     * Return our extension object, or null.
+     */
     public Ext ext() {
         return ext;
     }

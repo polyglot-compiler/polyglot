@@ -7,6 +7,9 @@ import polyglot.ext.coffer.types.*;
 import polyglot.types.*;
 import polyglot.util.*;
 
+/**
+ * An AST node for an exception throw declaration annotated with a key set.
+ */
 public class ThrowConstraintNode_c extends Node_c implements ThrowConstraintNode
 {
     TypeNode tn;

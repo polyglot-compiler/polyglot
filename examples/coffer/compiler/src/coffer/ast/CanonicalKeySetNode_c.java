@@ -7,6 +7,10 @@ import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
 
+/**
+ * Implementation of a canonical key set AST node.  This is just an AST node
+ * veneer around a <code>KeySet</code> type object.
+ */
 public class CanonicalKeySetNode_c extends Node_c implements CanonicalKeySetNode
 {
     protected KeySet keys;

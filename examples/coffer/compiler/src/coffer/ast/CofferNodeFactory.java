@@ -11,7 +11,7 @@ import polyglot.util.*;
 import java.util.*;
 
 /**
- * NodeFactory for coffer extension.
+ * NodeFactory for Coffer extension.
  */
 public interface CofferNodeFactory extends NodeFactory {
     Free Free(Position pos, Expr expr);

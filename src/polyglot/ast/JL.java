@@ -7,13 +7,14 @@ import polyglot.types.Context;
 import polyglot.visit.*;
 
 /**
- * A <code>Node</code> represents an AST node.  All AST nodes must implement
- * this interface.  Nodes should be immutable: methods which set fields
- * of the node should copy the node, set the field in the copy, and then
- * return the copy.
+ * <code>JL</code> contains all methods implemented by an AST node.
+ * AST nodes and delegates for AST nodes must implement this interface.
  */
 public interface JL extends NodeOps, Copy
 {
-    public void init(Node node);
+    /** Pointer back to the node we are delegating for, possibly this. */
     public Node node();
+
+    /** Initialize the back pointer to the node. */
+    public void init(Node node);
 }

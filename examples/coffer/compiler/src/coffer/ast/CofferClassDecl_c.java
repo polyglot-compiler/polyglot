@@ -9,7 +9,9 @@ import polyglot.visit.*;
 import polyglot.util.*;
 import java.util.*;
 
-/** An implementation of the <code>CofferClassDecl</code> interface.
+/**
+ * An implementation of the <code>CofferClassDecl</code> interface.
+ * <code>ClassDecl</code> is extended with a possibly-null key name.
  */
 public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
 {

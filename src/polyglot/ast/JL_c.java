@@ -6,14 +6,20 @@ import polyglot.visit.*;
 import polyglot.util.*;
 
 /**
- * <code>JL</code> is the super type of all node extension objects.
+ * <code>JL_c</code> is the super class of JL node delegates objects.
  * It defines default implementations of the methods which implement compiler
  * passes, dispatching to the node to perform the actual work of the pass.
+ * Language extensions may subclass <code>JL_c</code> for individual node
+ * classes or may reimplement all compiler passes in a new class implementing
+ * the <code>JL</code> interface.
  */
 public class JL_c extends Ext_c implements JL {
     public JL_c() {
     }
 
+    /** The <code>JL</code> object we dispatch to, by default, the node
+     * itself, but possibly another delegate.
+     */
     public JL jl() {
         return node();
     }

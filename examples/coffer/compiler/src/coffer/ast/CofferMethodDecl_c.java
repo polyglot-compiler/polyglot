@@ -9,7 +9,8 @@ import polyglot.visit.*;
 import polyglot.util.*;
 import java.util.*;
 
-/** An implementation of the <code>CofferMethod</code> interface.
+/** An implementation of the <code>CofferMethodDecl</code> interface.
+ * <code>ConstructorDecl</code> is extended with pre- and post-conditions.
  */
 public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
 {

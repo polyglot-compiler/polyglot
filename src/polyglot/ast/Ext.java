@@ -4,19 +4,24 @@ import polyglot.util.Copy;
 
 /**
  * <code>Ext</code> is the super type of all node extension objects.
+ * It contains a pointer back to the node it is extending and a possibly-null
+ * pointer to another extension node.
  */
 public interface Ext extends Copy
 {
-    /**
-     * The node which we are extending, or this.
-     */
+    /** The node that we are extending. */
     Node node();
 
     /**
-     * Initialize the Ext with a Node.
+     * Initialize the extension object's pointer back to the node.
+     * This also initializes the back pointers for all extensions of
+     * the extension.
      */
     void init(Node node);
 
+    /** An extension of this extension, or null. */
     Ext ext();
+
+    /** Set the extension of this extension. */
     Ext ext(Ext ext);
 }
