@@ -60,11 +60,12 @@ public class ThrowStatement extends Statement {
       w.write(";");
    }
 
-   public void dump(LocalContext c, CodeWriter w)
+   public Node dump( CodeWriter w)
    {
-      w.write("( ");
-      expr.dump(c, w);
-      w.write(")");
+      w.write( "( THROW");
+      dumpNodeInfo( w);
+      w.write( ")");
+      return null;
    }
   
   public Node copy() {

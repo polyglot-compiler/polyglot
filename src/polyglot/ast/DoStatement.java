@@ -73,14 +73,12 @@ public class DoStatement extends Statement {
     
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write ( " ( DO_WHILE: " );
-    condExpr.dump(c, w);
-    w.beginBlock();
-    statement.dump(c, w);
-    w.endBlock();
-    w.write (" ) ");
+    w.write( "( DO ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck( LocalContext c)

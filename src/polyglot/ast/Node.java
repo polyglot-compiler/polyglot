@@ -6,6 +6,7 @@ package jltools.ast;
 
 import java.util.*;
 
+import jltools.frontend.Compiler;
 import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.SymbolReader;
@@ -68,9 +69,13 @@ public abstract class Node extends jltools.util.AnnotatedObject {
    /**
     * Dumps the attributes to the writer, if the attributes have been set
     */
-   public void dumpNodeInfo(LocalContext c, CodeWriter w)
+   public void dumpNodeInfo( CodeWriter w)
    {
       //FIXME: Do this
+     Type type = Annotate.getType( this);
+     if( type != null) {
+       w.write( "T: " + type.toString() + " ");
+     }
    }
 
   public abstract Node readSymbols( SymbolReader sr);
@@ -81,7 +86,7 @@ public abstract class Node extends jltools.util.AnnotatedObject {
   
   public abstract void translate(LocalContext c, CodeWriter w);
   
-  public abstract void dump(LocalContext c, CodeWriter w);
+  public abstract Node dump( CodeWriter w);
 
   /**
    * Return a new array containing all the elements of lst, in the same order.
@@ -112,10 +117,12 @@ public abstract class Node extends jltools.util.AnnotatedObject {
 
   public void setError(int errType, String errMsg)
   {
-    ErrorInfo err = new ErrorInfo(errType, errMsg);
-    Annotate.addError(this, err);
+    ErrorInfo e = new ErrorInfo(errType, errMsg, 
+                                  Annotate.getLineNumber( this));
+    Annotate.addError(this, e);
     
-    jltools.frontend.Compiler.enqueueError(Annotate.getLineNumber(this), err);
+    // FIXME
+    //Compiler.enqueueError( e);
   }
 }
 

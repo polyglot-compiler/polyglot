@@ -1,6 +1,6 @@
 package jltools.lex;
 
 class DocumentationComment extends Comment {
-  DocumentationComment() { }
+  DocumentationComment( int lineNumber) { super( lineNumber); }
 }
   

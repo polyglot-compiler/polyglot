@@ -65,12 +65,13 @@ public class FieldNode extends ClassMember {
     declare.translate(c, w);
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write ( "(  FIELD_NODE: ( "
-              /* + accessFlags.getStringRepresentation() */ );
-    declare.dump(c, w);
-    w.write ( " ) " );
+    w.write ( "( FIELD DECLARATION ");
+       /* + accessFlags.getStringRepresentation() */
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   } 
 
   public Node readSymbols( SymbolReader sr)

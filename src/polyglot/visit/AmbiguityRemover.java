@@ -2,17 +2,20 @@ package jltools.visit;
 
 import jltools.ast.*;
 import jltools.types.*;
+import jltools.util.*;
 
 
 public class AmbiguityRemover extends NodeVisitor
 {
   private TypeSystem ts;
+  private ErrorQueue eq;
   private LocalContext c;
   private ImportTable it;
 
-  public AmbiguityRemover( TypeSystem ts)
+  public AmbiguityRemover( TypeSystem ts, ErrorQueue eq)
   {
     this.ts = ts;
+    this.eq = eq;
   }
 
   public Node visitBefore(Node n)
@@ -28,7 +31,16 @@ public class AmbiguityRemover extends NodeVisitor
       c = new LocalContext( it, new ClassType( ts, cn.getName(), true), 
                             null, ts);
     }
-    n.removeAmbiguities( c);
+    try
+    {
+      n.removeAmbiguities( c);
+    }
+    catch( TypeCheckError e)
+    {
+      eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
+                  Annotate.getLineNumber( n));
+    }
+      
     return null;
   }
 }

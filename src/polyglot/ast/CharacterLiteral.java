@@ -38,11 +38,13 @@ public class CharacterLiteral extends Literal {
     w.write( "'" + value + "'");
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write( " ( CHARLITERAL " );
-    dumpNodeInfo(c, w);
-    w.write( " ( '" + value + "' ) )");
+    w.write( "( CHAR LITERAL");
+    w.write( " < " + value + " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck(  LocalContext c)

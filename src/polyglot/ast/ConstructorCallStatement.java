@@ -124,21 +124,13 @@ public class ConstructorCallStatement extends Statement {
     w.write ( ");");
   }
   
-  public void dump (LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write (" (  CONSTRUCTOR CALL STMT " );
-    if (primary != null)
-    {
-      primary.dump(c, w);
-    }
-    w.write (( type == THIS ? "THIS " : "SUPER "));
-    for (ListIterator i = argumentList.listIterator(); i.hasNext();)
-    {
-      w.write (" ( ");
-      ((Expression)i.next()).translate(c, w);
-      w.write ( " ) ");
-    }
+    w.write( "(  CONSTRUCTOR CALL STMT ");
+    dumpNodeInfo( w);
+    w.write(( type == THIS ? "< this >" : "< super >"));
     w.write (" )");
+    return null;
   }
 
   public Node typeCheck( LocalContext c)

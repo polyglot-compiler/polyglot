@@ -61,11 +61,13 @@ public class LabelledStatement extends Statement {
     statement.translate(c, w);
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write ("( LABEL \"" + label + "\" (");
-    statement.translate(c, w);
-    w.write(") )");
+    w.write( "( LABEL");
+    w.write( " < " + label + " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck(LocalContext c)

@@ -43,7 +43,9 @@ public class StringLiteral extends Literal {
 
    public Node typeCheck(LocalContext c)
    {
-      setCheckedType( new ClassType( c.getTypeSystem(), "java.lang.String", true));
+      setCheckedType( new ClassType( c.getTypeSystem(), 
+                                     "java.lang.String", 
+                                     true));
       return this;
    }
 
@@ -52,9 +54,13 @@ public class StringLiteral extends Literal {
       w.write("\"" + string + "\"");
    }
 
-   public void dump(LocalContext c, CodeWriter w)
+   public Node dump( CodeWriter w)
    {
-      w.write("( \"" + string + "\" )");
+      w.write( "( STRING LITERAL");
+      w.write( " < " + string + " > ");
+      dumpNodeInfo( w);
+      w.write( ")");
+      return null;
    }
   
   public Node copy() {

@@ -1,7 +1,13 @@
 
 fe_package	= jltools/frontend
 fe_codebase	= ../..
-fe_files 	= Main.java Compiler.java
+fe_files 	= Compiler.java \
+		  Target.java \
+		  TargetFactory.java \
+		  Main.java \
+		  MainErrorQueueFactory.java \
+		  MainTargetFactory.java
+
 
 FRONTEND_TARGET = $(patsubst %.java, $(fe_package)/%.class, $(fe_files))
 

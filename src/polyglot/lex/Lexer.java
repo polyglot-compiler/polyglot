@@ -1,5 +1,9 @@
 package jltools.lex;
 
+
+import jltools.util.ErrorQueue;
+import jltools.util.ErrorInfo;
+
 import java.io.Reader;
 import java.io.LineNumberReader;
 
@@ -9,20 +13,23 @@ import java.io.LineNumberReader;
  * COPYING for more details.  There is NO WARRANTY on this code.
  */
 
-public class Lexer /* implements jltools.parse.Lexer */ {
+public class Lexer {
   LineNumberReader reader;
   boolean isJava12;
   String line = null;
   int line_pos = 1;
   int line_num = 0;
   LineList lineL = new LineList(-line_pos, null); // sentinel for line #0
+  ErrorQueue eq;
 
-  public Lexer(Reader reader) {
-    this(reader, true); // by default, use a Java 1.2-compatible lexer.
+  public Lexer( Reader reader, ErrorQueue eq) {
+    // by default, use a Java 1.2-compatible lexer.
+    this( reader, true, eq);
   }
-  public Lexer(Reader reader, boolean isJava12) {
+  public Lexer( Reader reader, boolean isJava12, ErrorQueue eq) {
     this.reader = new LineNumberReader(new EscapedUnicodeReader(reader));
     this.isJava12 = isJava12;
+    this.eq = eq;
   }
 
   /* public java_cup.runtime.Symbol nextToken() throws java.io.IOException { */
@@ -44,7 +51,7 @@ public class Lexer /* implements jltools.parse.Lexer */ {
       ie = getInputElement();
       if (ie instanceof DocumentationComment)
 	comment = ((Comment)ie).getComment();
-    } while (!(ie instanceof Token));
+    } while (!(ie instanceof Token && ie != null));
     endpos = lineL.head + line_pos;
 
     //System.out.println(ie.toString()); // uncomment to debug lexer.
@@ -108,13 +115,13 @@ public class Lexer /* implements jltools.parse.Lexer */ {
     case '/': // EndOfLineComment
       comment = line.substring(line_pos+2);
       line_pos = line.length();
-      return new EndOfLineComment(comment);
+      return new EndOfLineComment( line_num, comment);
     case '*': // TraditionalComment or DocumentationComment
       line_pos += 2;
       if (line.charAt(line_pos)=='*') { // DocumentationComment
-	return snarfComment(new DocumentationComment());
+	return snarfComment(new DocumentationComment( line_num));
       } else { // TraditionalComment
-	return snarfComment(new TraditionalComment());
+	return snarfComment(new TraditionalComment( line_num));
       }
     default: // it's a token, not a comment.
       return getToken();
@@ -130,8 +137,12 @@ public class Lexer /* implements jltools.parse.Lexer */ {
 	  text.append(line.substring(line_pos));
 	  c.appendLine(text.toString()); text.setLength(0);
 	  nextLine();
-	  if (line==null)
-	    throw new Error("Unterminated comment at end of file.");
+	  if (line==null) {
+            eq.enqueue( ErrorInfo.LEXICAL_ERROR, 
+                                         "Unterminated comment.", 
+                                         c.getLineNumber());
+            return null;
+          }
 	} else {
 	  text.append(line.substring(line_pos, star_pos));
 	  line_pos=star_pos;
@@ -195,8 +206,10 @@ public class Lexer /* implements jltools.parse.Lexer */ {
       return getIdentifier();
     if (Character.isDigit(line.charAt(line_pos)))
       return getNumericLiteral();
-    System.out.println( "unknown char at pos " + line_pos + " of line: \n" + line);
-    throw new Error("Illegal character on line "+line_num);
+    eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                           "Illegal character.",
+                           line_num);
+    return new EOF( line_num);
   }
 
   static final String[] keywords = new String[] {
@@ -212,8 +225,12 @@ public class Lexer /* implements jltools.parse.Lexer */ {
     // Get id string.
     StringBuffer sb = new StringBuffer().append(consume());
 
-    if (!Character.isJavaIdentifierStart(sb.charAt(0)))
-      throw new Error("Invalid Java Identifier on line "+line_num);
+    if (!Character.isJavaIdentifierStart(sb.charAt(0))) {
+      eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                             "Invalid identifier.",
+                             line_num);
+      return null;
+    }
     while (Character.isJavaIdentifierPart(line.charAt(line_pos)))
       sb.append(consume());
     String s = sb.toString();
@@ -276,8 +293,12 @@ public class Lexer /* implements jltools.parse.Lexer */ {
     // we compare MAX_VALUE against val/2 to allow constants like
     // 0xFFFF0000 to get past the test. (unsigned long->signed int)
     if ((val/2) > Integer.MAX_VALUE ||
-	 val    < Integer.MIN_VALUE)
-      throw new Error("Constant does not fit in integer on line "+line_num);
+        val    < Integer.MIN_VALUE) {
+      eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                             "Integer literal greater than Integer.MAX_VALUE",
+                             line_num);
+      return null;
+    }
     return new IntegerLiteral(line_num, (int)val);
   }
   NumericLiteral getFloatingPointLiteral() {
@@ -306,7 +327,10 @@ public class Lexer /* implements jltools.parse.Lexer */ {
 	return new DoubleLiteral(line_num, Double.valueOf(rep).doubleValue());
       }
     } catch (NumberFormatException e) {
-      throw new Error("Illegal floating-point on line "+line_num+": "+e);
+      eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                             "Invalid floating-point literal.",
+                             line_num);
+      return null;
     }
   }
   String getDigits() {
@@ -364,17 +388,27 @@ public class Lexer /* implements jltools.parse.Lexer */ {
       val = getEscapeSequence();
       break;
     case '\'':
-      throw new Error("Invalid character literal on line "+line_num);
+      eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                             "Invalid character literal.",
+                             line_num);
+      return null;
     case '\n':
-      throw new Error("Invalid character literal on line "+line_num);
+      eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                             "Invalid character literal.",
+                             line_num);
+      return null;
     default:
       val = String.valueOf(consume());
       break;
     }
 
     char secondquote = consume();
-    if (firstquote != '\'' || secondquote != '\'')
-      throw new Error("Invalid character literal on line "+line_num);
+    if (firstquote != '\'' || secondquote != '\'') {
+      eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                             "Invalid character literal.",
+                             line_num);
+      return null;
+    }
     return new CharacterLiteral(line_num, val);
   }
 
@@ -388,21 +422,32 @@ public class Lexer /* implements jltools.parse.Lexer */ {
         val.append(getEscapeSequence());
         break;
       case '\n':
-        throw new Error("Invalid string literal on line " + line_num);
+        eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                               "String literals may not contain new lines.",
+                               line_num);
+        return null;
       default:
         val.append(consume());
         break;
       }
     }
     char closequote = consume();
-    if (openquote != '\"' || closequote != '\"')
-      throw new Error("Invalid string literal on line " + line_num);
+    if (openquote != '\"' || closequote != '\"') {
+      eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                             "Invalid string literal.",
+                             line_num);
+      return null;
+    }
     return new StringLiteral(line_num, val.toString().intern());
   }
 
   String getEscapeSequence() {
-    if (consume() != '\\')
-      throw new Error("Invalid escape sequence on line " + line_num);
+    if (consume() != '\\') {
+      eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                             "Invalid escape sequence.",
+                             line_num);
+      return null;
+    }
     switch(line.charAt(line_pos)) {
     case 'b':
       consume(); return "\\b";
@@ -431,7 +476,10 @@ public class Lexer /* implements jltools.parse.Lexer */ {
     case '7':
       return getOctalEscapeSequence(2);
     default:
-      throw new Error("Invalid escape sequence on line " + line_num);
+      eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                             "Invalid escape sequence.",
+                             line_num);
+      return null;
     }
   }
 
@@ -441,8 +489,12 @@ public class Lexer /* implements jltools.parse.Lexer */ {
     for (int i=0; i<maxlength; i++)
     {
       digit = consume();
-      if( !isOctalDigit(digit))
-        throw new Error("Invalid octal escape sequence in line " + line_num);
+      if( !isOctalDigit(digit)) {
+        eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                               "Invalid octal escape sequence.",
+                               line_num);
+        return null;
+      }
       result += digit;
     }
     return result;
@@ -464,12 +516,14 @@ public class Lexer /* implements jltools.parse.Lexer */ {
   }
 
   // Deal with error messages.
+  /*
   public void errorMsg(String msg, java_cup.runtime.Symbol info) {
     int n=line_num, c=info.left-lineL.head;
     for (LineList p = lineL; p!=null; p=p.tail, n--)
 	if (p.head<info.left) { c=info.left-p.head; break; }
     System.err.println(msg+" at line "+n);
   }
+  */
 
   class LineList {
     int head;

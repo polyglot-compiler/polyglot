@@ -2,6 +2,14 @@ package jltools.lex;
 
 abstract class Comment extends InputElement {
   private StringBuffer comment = new StringBuffer();
+  private int lineNumber;
+
+  public Comment( int lineNumber)
+  {
+    this.lineNumber = lineNumber;
+  }
+
+  public int getLineNumber() { return lineNumber; }
 
   String getComment() { return comment.toString(); }
 

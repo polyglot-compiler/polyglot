@@ -179,25 +179,12 @@ public class NewObjectExpression extends Expression {
     }
   }
 
-  public void dump (LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write (" ( NEW " );
-    type.dump ( c, w);
-    primary.dump(c, w);
-    w.write (" ( " );
-    for (ListIterator i = argumentList.listIterator(); i.hasNext(); )
-    {
-      w.write("( ");
-      ((Expression) i.next()).translate(c, w);
-      w.write("), ");
-    }
-    w.write(")");
-    if (classNode != null)
-    {
-      classNode.translate(c, w);
-    }
-    w.write (")");
-    
+    w.write ("( NEW " );
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
   
   public Node typeCheck(LocalContext c)

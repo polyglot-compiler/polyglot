@@ -2,6 +2,7 @@
 vs_package	= jltools/visit
 vs_codebase	= ../..
 vs_files 	= AmbiguityRemover.java \
+		  DumpAst.java \
 		  TypeChecker.java \
 		  SymbolReader.java
 

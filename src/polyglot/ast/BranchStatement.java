@@ -80,11 +80,14 @@ public class BranchStatement extends Statement {
               ( label == null ? "; " : " " + label + "; " ));
   }
   
-  public void dump (LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write ( " ( BRANCH STATMENT : " + 
-              ( type == BREAK ? " BREAK " : " CONTINUE " ) + 
-              ( label == null ? ")" : label + ") " ));
+    w.write( " ( BRANCH STATMENT < ");
+    w.write( type == BREAK ? "break > " : "continue > ");
+    w.write( label == null ? "< " : label + " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck(LocalContext c)

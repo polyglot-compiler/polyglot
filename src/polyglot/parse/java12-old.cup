@@ -6,6 +6,7 @@ import jltools.ast.*;
 import jltools.lex.*;
 import jltools.types.*;
 import jltools.util.*;
+
 import java.util.*;
 
 /* Java 1.2 parser for CUP.  
@@ -25,18 +26,20 @@ JDK 1.2 Features added:
         |       name DOT SUPER DOT IDENTIFIER LPAREN argument_list_opt RPAREN ;
 */
 parser code  {: 
+  ErrorQueue eq;
   Lexer lexer;
   TypeSystem ts;
 
-  public Grm(Lexer l, TypeSystem t) {
+  public Grm( Lexer l, TypeSystem t, ErrorQueue q) {
     this();
     lexer = l;
     ts = t;
+    eq = q;
   }
   
   public static Node ln(Node n, Token t) {
     if(n != null && t != null)
-    	Annotate.setLineNumber(n, t.getLine()); 
+    	Annotate.setLineNumber(n, t.getLineNumber()); 
     return n;
   }
   
@@ -45,23 +48,7 @@ parser code  {:
     	Annotate.setLineNumber(n, Annotate.getLineNumber(m)); 
     return n;
   }
-  
-  public static Node ln(Node n, String s) {
-      return n;
-  }
-  
-  public static Node ln(Node n, Number s) {
-        return n;
-  }
-  
-  public static Node ln(Node n, Boolean s) {
-          return n;
-  }
-  
-  public static Node ln(Node n, Character s) {
-          return n;
-  }
-  
+
   public static TypeNode dim(TypeNode n, int additionalDims) {
     if(additionalDims > 0)
     {
@@ -72,14 +59,30 @@ parser code  {:
   }
 
   public void syntax_error(java_cup.runtime.Symbol current) {
-    report_error("Syntax error (" + current.sym + ")", current);
+    if( current.sym == sym.EOF) {
+      eq.enqueue( ErrorInfo.SYNTAX_ERROR,
+		  "Unexpected end of file.");
+    }
+    else {
+      eq.enqueue( ErrorInfo.SYNTAX_ERROR, 
+		  "Syntax error.", 
+		  ((Token)current.value).getLineNumber());
+    }
   }
-  public void report_error(String message, java_cup.runtime.Symbol info) {
-    lexer.errorMsg(message, info);
+
+  public void report_fatal_error( String message, Object info)
+  {
+    eq.enqueue( ErrorInfo.SYNTAX_ERROR,
+		"Unable to recover from previous errors.");
   }
+
 :};
 
-scan with {: return lexer.nextToken().symbol(); :};
+scan with {: 
+
+  return lexer.nextToken().symbol(); 
+
+:};
 
 terminal Token BOOLEAN; // primitive_type
 terminal Token BYTE, SHORT, INT, LONG, CHAR; // integral_type
@@ -87,7 +90,8 @@ terminal Token FLOAT, DOUBLE; // floating_point_type
 terminal Token LBRACK, RBRACK; // array_type
 terminal Identifier IDENTIFIER; // name
 terminal Token DOT; // qualified_name
-terminal Token SEMICOLON, MULT, COMMA, LBRACE, RBRACE, EQ, LPAREN, RPAREN, COLON;
+terminal Token SEMICOLON, MULT, COMMA, LBRACE, RBRACE, EQ; // separators
+terminal Token LPAREN, RPAREN, COLON; // more separators
 terminal Token PACKAGE; // package_declaration
 terminal Token IMPORT; // import_declaration
 terminal Token PUBLIC, PROTECTED, PRIVATE; // modifier

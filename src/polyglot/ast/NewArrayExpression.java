@@ -196,27 +196,13 @@ public class NewArrayExpression extends Expression {
     w.write(")");
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write (" ( NEW " );
-    dumpNodeInfo(c, w);
-    w.write(" ( ");
-    type.dump(c, w);
-    w.write(" ) ");
-    for (ListIterator i = dimensionExpressions.listIterator(); i.hasNext(); )
-    {
-      w.write("(");
-      ( (Expression)i.next()).translate( c, w);
-      w.write(")");
-    }
-    w.write("( AdditionalDIM: " + additionalDimensions + ")");
-    if (initializer != null)
-    {
-      w.write( " ( " );
-      initializer.dump(c, w);
-      w.write( " ) " );
-    }
-    w.write (" )");
+    w.write( "( NEW");
+    w.write( " < " + additionalDimensions + " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
   
   public Node typeCheck (LocalContext c)

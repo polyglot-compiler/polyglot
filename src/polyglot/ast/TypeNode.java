@@ -68,9 +68,13 @@ public class TypeNode extends Node {
     w.write(type.getTypeString());
   }
 
-   public void dump(LocalContext c, CodeWriter w)
+   public Node dump( CodeWriter w)
    {
-     w.write(" ( TYPE: " + type.getTypeString() + ")");
+     w.write( "( TYPE");
+     w.write( " < " + type.getTypeString() + "> ");
+     dumpNodeInfo( w);
+     w.write( ")");
+     return null;
    }
  
 

@@ -171,57 +171,65 @@ public class VariableDeclarationStatement extends Statement {
       return this;
    }
 
-   public void translate(LocalContext c, CodeWriter w)
-   {
-      w.write( modifiers.getStringRepresentation());
-      type.translate(c, w);
-      w.write(" ");
-      ListIterator it = variables.listIterator();
-      while (it.hasNext())
+  public void translate(LocalContext c, CodeWriter w)
+  {
+    w.write( modifiers.getStringRepresentation());
+    type.translate(c, w);
+    w.write(" ");
+    ListIterator it = variables.listIterator();
+    while (it.hasNext())
+    {
+      Declarator pair = (Declarator)it.next();
+      if (pair.initializer != null)
       {
-         Declarator pair = (Declarator)it.next();
-         if (pair.initializer != null)
-         {
             w.write(pair.name);
             for (int i = 0; i < pair.additionalDims; i++) {
               w.write("[]");
             }
             w.write(" = ");
             pair.initializer.translate(c, w);
-         }
-         else {
-            w.write(pair.name);
-            for (int i = 0; i < pair.additionalDims; i++) {
-              w.write("[]");
-            }
-         }
-         if (it.hasNext())
-            w.write(", ");
       }
-      w.write("; ");
-
-   }
-
-   public void dump(LocalContext c, CodeWriter w)
-   {
-      w.write( "(" + modifiers.getStringRepresentation());
-      type.translate(c, w);
-      ListIterator it = variables.listIterator();
-      while (it.hasNext())
-      {
-         Declarator pair = (Declarator)it.next();
-         if (pair.initializer != null)
-         {
-            w.write("(" + pair.name + ", ");
-            pair.initializer.translate(c, w);
-         }
-         else
-            w.write(pair.name + ", Nil");
-         if (it.hasNext())
-            w.write("), ");
+      else {
+        w.write(pair.name);
+        for (int i = 0; i < pair.additionalDims; i++) {
+          w.write("[]");
+        }
       }
-      w.write(";");
+      if (it.hasNext())
+        w.write(", ");
+    }
+    w.write("; ");
+    
    }
+  
+  public Node dump( CodeWriter w)
+  {
+    w.write( "( VAR DECL");
+    w.write( " < " + modifiers.getStringRepresentation() + "> ");
+    dumpNodeInfo( w);
+    w.write(")");
+    
+    w.beginBlock();
+    
+    ListIterator it = variables.listIterator();
+    while (it.hasNext())
+    {
+      Declarator pair = (Declarator)it.next();
+      if (pair.initializer != null) {
+        w.write( "( < " + pair.name + " > ) ");
+        pair.initializer.dump( w);
+      }
+      else {
+        w.write( "( < " + pair.name + " > )");
+      }
+      if( it.hasNext()) {
+        w.newline();
+      }
+    }
+    
+    w.endBlock();
+    return this;
+  }
 
   /**
    * Yields all the declarators in this, in order. 

@@ -96,15 +96,12 @@ public class BlockStatement extends Statement {
     w.write("}");
   }
 
-  public void dump( LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write("( ");
-    for (ListIterator it = statements.listIterator(); it.hasNext(); ) 
-    {
-      ((Node)it.next()).dump(c, w);
-      w.newline(0);
-    }
-    w.write(")");
+    w.write( "( BLOCK ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
   
   public Node typeCheck( LocalContext c)

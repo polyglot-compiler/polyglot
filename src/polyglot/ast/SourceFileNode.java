@@ -191,28 +191,14 @@ public class SourceFileNode extends Node {
      }
    }
 
-   public void dump(LocalContext c, CodeWriter w)
+   public Node dump( CodeWriter w)
    {
-     w.write("CLASS ");
-     dumpNodeInfo(c, w);
-     w.write(" ( PACKAGE: " + packageName + " )");
-     w.newline();
-     w.beginBlock();
-     w.write("(");
-     for(ListIterator it=imports.listIterator(); it.hasNext(); ) 
-     {
-       ((ImportNode)it.next()).dump(c, w);
-     }
-     w.write(")");
-     w.endBlock();
-
-     w.beginBlock();
-     for(ListIterator it=classes.listIterator(); it.hasNext(); ) 
-     {
-       ((ClassNode)it.next()).translate(c, w);
-     }
-     w.endBlock();
-     
+     w.write( "( SOURCE FILE");
+     w.write( " < " + sourceFilename + " >");
+     w.write( " < " + packageName + " > ");
+     dumpNodeInfo( w);
+     w.write( ")");
+     return null;
    }
 
   public Node copy() {

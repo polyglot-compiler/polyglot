@@ -78,15 +78,12 @@ public class SynchronizedStatement extends Statement {
       w.endBlock();
    }
 
-   public void  dump(LocalContext c, CodeWriter w)
+   public Node dump( CodeWriter w)
    {
-      w.write ("SYNCHRONIZED ");
-      dumpNodeInfo(c, w);
-      expr.dump(c, w);
-      w.beginBlock();
-      body.dump(c, w);
-      w.endBlock();
-      w.write(")");
+      w.write( "( SYNCHRONIZED ");
+      dumpNodeInfo( w);
+      w.write( ")");
+      return null;
    }
 
   public Node copy() {

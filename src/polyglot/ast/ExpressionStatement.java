@@ -52,13 +52,12 @@ public class ExpressionStatement extends Statement {
     w.write(";");
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write("( EXPRESSION_STATEMENT" );
-    dumpNodeInfo(c, w);
-    w.write(" (");
-    expression.dump(c, w);
-    w.write(" ) )");
+    w.write( "( EXPR STMT ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck(LocalContext c)

@@ -81,13 +81,12 @@ public class InstanceofExpression extends Expression {
     w.write( ") ");
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write( " ( INSTANCEOF  ");
-    dumpNodeInfo(c, w);
-    w.write( " (");
-    expr.dump(c, w);
-    w.write (" ) ( " + type.getType().getTypeString() + ") )");
+    w.write( "( INSTANCEOF ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck(LocalContext c)

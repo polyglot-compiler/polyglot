@@ -66,13 +66,15 @@ public class InitializerBlock extends ClassMember {
     w.endBlock();
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write(" ( INITIALIZER BLOCK " );
-    w.beginBlock();
-    block.dump(c, w);
-    w.endBlock();
-    w.write(" )");
+    w.write( "( INITIALIZER BLOCK ");
+    if( isStatic) {
+      w.write( "< static > ");
+    }
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
   
   public Node readSymbols( SymbolReader sr)

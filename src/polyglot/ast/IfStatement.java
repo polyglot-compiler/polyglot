@@ -111,27 +111,12 @@ public class IfStatement extends Statement {
 
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write ( "( IF " ) ;
-    dumpNodeInfo(c, w);
-    w.write (" ( " );
-    condExpr.dump ( c, w);
-    w.write ( " ) " );
-    w.beginBlock();
-    w.write ( " ( ");
-    thenStatement.translate(c, w);
-    w.write ( " ) ");
-    w.endBlock();
-    if ( elseStatement != null)
-    {
-      w.write ( " ( " );
-      w.beginBlock();
-      elseStatement.translate(c, w);
-      w.write ( " ) ");
-      w.endBlock();
-    }
-    w.write ( ") ");
+    w.write( "( IF ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck(LocalContext c)

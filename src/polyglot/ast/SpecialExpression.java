@@ -98,12 +98,13 @@ public class SpecialExpression extends Expression {
     w.write((kind == SUPER ? "super" : "this"));
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    // FIXME
-    w.write( " ( (");
-    type.translate(c, w);
-    w.write( " ) ( " + (kind == SUPER ? "SUPER" : "THIS" ) + ") )");
+    w.write( "( SPECIAL");
+    w.write( " < " + (kind == SUPER ? "super" : "this") + " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node copy() {

@@ -118,28 +118,12 @@ public class TryStatement extends Statement {
       }
    }
 
-   public void dump(LocalContext c, CodeWriter w)
+   public Node dump( CodeWriter w)
    {
-      w.write("( TRY ");
-      w.beginBlock();
-      tryBlock.dump(c, w);
-      w.endBlock();
-      for (ListIterator it = catchBlocks.listIterator(); it.hasNext(); )
-      {
-         CatchBlock cb = (CatchBlock) it.next();
-         w.beginBlock();
-         cb.dump(c, w);
-         w.endBlock();
-      }
-      if (finallyBlock != null)
-      {
-         w.write ("(FINALLY ");
-         w.beginBlock();
-         finallyBlock.translate(c, w);
-         w.write(")");
-         w.endBlock();
-      }
-      w.write(")");
+      w.write( "( TRY ");
+      dumpNodeInfo( w);
+      w.write( ")");
+      return null;
    }
 
   public Node copy() {

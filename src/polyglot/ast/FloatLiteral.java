@@ -61,10 +61,13 @@ public class FloatLiteral extends Literal {
     w.write ( type == FLOAT ? Float.toString( (float)value) /* + 'F' */: Double.toString( value ));
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write ( " ( " + (type == FLOAT ? " FLOAT " + Float.toString((float)value) :
-                                       " DOUBLE " + Double.toString( value ) ) + ")");
+    w.write( "( " + (type == FLOAT ? " FLOAT LITERAL < " + Float.toString((float)value) :
+                                       " DOUBLE LITERAL < " + Double.toString( value ) ) + " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck( LocalContext c)

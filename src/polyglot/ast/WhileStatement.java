@@ -91,19 +91,12 @@ public class WhileStatement extends Statement {
       statement.translate(c, w);
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write("( WHILE " );
-    dumpNodeInfo(c, w);
-    w.write (" ( " );
-    condExpr.dump(c, w);
-    w.write (" ) " );
-    w.beginBlock();
-    w.write(" (" );
-    statement.dump(c, w);
-    w.write(" )" );
-    w.endBlock();
+    w.write( "( WHILE ");
+    dumpNodeInfo( w);
     w.write(")");
+    return null;
   }
 
   public Node typeCheck(LocalContext c)

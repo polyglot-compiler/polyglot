@@ -101,9 +101,15 @@ public class FormalParameter extends Node {
     w.write ( type.getType().getTypeString() + " " + name);
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-
+    w.write( "( FORMAL PARAM <" + name + "> ");
+    if( isFinal) {
+      w.write( "< final > ");
+    }
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
   
   public Node typeCheck( LocalContext c)

@@ -7,6 +7,8 @@ utl_files 	= Annotate.java \
 			CodeWriter.java \
 			ConcatenatedIterator.java \
 			ErrorInfo.java \
+			ErrorQueue.java \
+			ErrorQueueFactory.java \
 			FilteringIterator.java \
 			NestedMap.java \
 			NilMap.java \

@@ -86,17 +86,12 @@ public class ArrayInitializerExpression extends Expression {
     w.write ( " } " );
   }
   
-  public void dump( LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write (" ( ARRAY INITIALIZER " );
-    dumpNodeInfo(c, w);
-    for (ListIterator iter = children(); iter.hasNext(); ) {
-      w.write ( " ( " );
-      ((Expression) iter.next()).dump(c, w);
-      w.write (" ) ");
-    }
-    w.write ( " ) " );
-    
+    w.write( "( ARRAY INITIALIZER ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
   
   public Node typeCheck( LocalContext c)

@@ -103,15 +103,20 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     }
   }
 
-  public void dump (LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write ("( AMBIGOUS NAME ");
-    dumpNodeInfo(c, w);
+    w.write ("( AMBIGOUS NAME < ");
     for (Iterator i = names.listIterator(); i.hasNext(); )
     {
-      w.write ("(" + (String)i.next() + ")");
+      w.write( (String)i.next());
+      if( i.hasNext()) {
+        w.write( ".");
+      }
     }
-    w.write ( " ) ");
+    w.write( " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck( LocalContext c)

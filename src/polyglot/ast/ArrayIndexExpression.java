@@ -63,13 +63,12 @@ public class ArrayIndexExpression extends Expression {
     w.write ("]");
   }
   
-  public void dump( LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write ( " ( ARRAY INDEX EXPR ") ;
-    dumpNodeInfo(c, w);
-    base.dump (c, w);
-    index.dump (c, w);
-    w.write ( " ) " );
+    w.write( "( ARRAY INDEX EXPR ") ;
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck(LocalContext c)

@@ -120,11 +120,13 @@ public class IntLiteral extends Literal {
     }
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write( " ( INTLITERAL " );
-    dumpNodeInfo(c, w);
-    w.write( " ( " + value + " ) )");
+    w.write( "( INTEGER LITERAL");
+    w.write( " < " + value + " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck(LocalContext c)

@@ -137,22 +137,12 @@ public class ForStatement extends Statement {
       body.translate(c, w);
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write (" ( FOR " );
-    for (ListIterator iter = initializers.listIterator(); iter.hasNext(); )
-    {
-      ((Statement)iter.next()).dump(c, w);
-    }    
-    condition.dump(c, w);
-    for (ListIterator iter = incrementors.listIterator(); iter.hasNext(); )
-    {
-      ((Statement)iter.next()).dump(c, w);
-    }
-    w.beginBlock();
-    body.dump(c, w);
-    w.write (" ) ");
-    w.endBlock();
+    w.write( "( FOR ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck( LocalContext c)

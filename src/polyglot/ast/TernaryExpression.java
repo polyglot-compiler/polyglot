@@ -86,7 +86,7 @@ public class TernaryExpression extends Expression {
       return this;
    }
 
-   public void  translate(LocalContext c, CodeWriter w)
+   public void translate(LocalContext c, CodeWriter w)
    {
       w.write("( " );
       conditional.translate(c, w);
@@ -97,14 +97,12 @@ public class TernaryExpression extends Expression {
       w.write(" )");
    }
 
-   public void dump(LocalContext c, CodeWriter w)
+   public Node dump( CodeWriter w)
    {
-      w.write("( TERNARY " );
-      dumpNodeInfo(c, w);
-      conditional.dump(c, w);
-      trueResult.dump(c, w);
-      falseResult.dump(c, w);
-      w.write(" ) ");
+      w.write( "( TERNARY ");
+      dumpNodeInfo( w);
+      w.write( ")");
+      return null;
    }
 
     public Node copy() {

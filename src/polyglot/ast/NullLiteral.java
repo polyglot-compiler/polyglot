@@ -33,9 +33,10 @@ public class NullLiteral extends Literal {
     w.write("null");
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write("( NULL )");
+    w.write( "( NULL )");
+    return null;
   }
 
   public Node typeCheck(LocalContext c)

@@ -44,13 +44,12 @@ public class ClassDeclarationStatement extends Statement {
     classNode.translate(c, w);
   }
   
-  public void dump (LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write (" CLASS DECLARATION");
-    w.beginBlock();
-    classNode.dump(c, w);
-    w.endBlock();
-    w.write ( " )");;
+    w.write( "( CLASS DECLARATION");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck(LocalContext c)

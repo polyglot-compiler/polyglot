@@ -36,5 +36,7 @@ public abstract class Expression extends Node {
   public Type getCheckedType() {
     return Annotate.getType(this);
   }    
+  
+  public /* abstract */ int getPrecedence() { return Integer.MAX_VALUE; }
 }
 

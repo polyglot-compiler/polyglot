@@ -273,59 +273,12 @@ public class SwitchStatement extends Statement {
       w.write("}");
    }
 
-   public void dump(LocalContext c, CodeWriter w)
+   public Node dump( CodeWriter w)
    {
-      SwitchElement se;
-      CaseStatement cs;
-      SwitchBlock cb;
-
-      w.write(" SWITCH " );
-      dumpNodeInfo(c, w);
-      w.write("( ");
-      expr.dump(c, w);
-      w.write(")");
-      w.beginBlock();
-      
-      for (ListIterator it = switchElems.listIterator(); it.hasNext(); )
-      {
-         // assume that the case statment is followed by the switch block in the list
-         se = (SwitchElement) it.next();
-         if (se instanceof CaseStatement)
-         {
-            w.beginBlock();
-            cs = (CaseStatement)se;
-            if (cs.isDefault())
-               w.write("DEFAULT:  ");
-            else
-            {
-               w.write("CASE (");
-               cs.getExpression().dump(c, w);
-               cs.getExpression().dumpNodeInfo(c, w);
-               w.write("): " );
-            }
-            if (it.hasNext() && (  (se = (SwitchElement)it.next()) instanceof SwitchBlock))
-            {
-               w.beginBlock();
-               w.write("(");
-               ((SwitchBlock)se).getBlock().dump(c, w);
-               w.write(")");
-               w.endBlock();
-            }
-            else
-            {
-               // fixme:
-               //       throw an error; wrong format of list
-            }
-            w.endBlock();
-         }
-         else 
-         {
-            //fixme:
-            //       throw some error here: wrong list format
-         }
-      }
-
-      w.endBlock();
+      w.write( "( SWITCH ");
+      dumpNodeInfo( w);
+      w.write( ")");
+      return null;
    }
 
    public Node copy() {

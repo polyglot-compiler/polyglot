@@ -43,11 +43,13 @@ public class LocalVariableExpression extends Expression {
     w.write(name);
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write(" ( " + name );
-    dumpNodeInfo(c, w);
-    w.write(" ) ");
+    w.write( "( LOCAL");
+    w.write( " < " + name + " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck(LocalContext c)

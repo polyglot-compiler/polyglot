@@ -1,17 +1,19 @@
 package jltools.visit;
 
-import jltools.ast.Node;
-import jltools.ast.NodeVisitor;
-import jltools.types.LocalContext;
+import jltools.ast.*;
+import jltools.types.*;
+import jltools.util.*;
 
 
 public class TypeChecker extends NodeVisitor
 {
   private LocalContext c;
+  private ErrorQueue eq;
   
-  public TypeChecker( LocalContext c)
+  public TypeChecker( LocalContext c, ErrorQueue eq)
   {
     this.c = c;
+    this.eq = eq;
   }
 
   public Node visitAfter(Node n)

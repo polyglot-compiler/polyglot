@@ -222,38 +222,15 @@ public class ClassNode extends ClassMember {
     w.endBlock();
     w.write( "}");
     w.newline(0);
-      
-
   }
   
-  public void dump (LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write (" ( CLASS " + name + "( SUPERCLASS: ");
-    if ( superClass == null)
-      w.write (" java.lang.Object ");
-    else
-      superClass.dump(c, w);
-    w.write ( " ) ( ACCESSFLAGS: " + 
-              accessFlags.getStringRepresentation() + ")");
-    w.write (" ( IMPLEMENTS: ");
-    for (Iterator i = interfaceList.listIterator(); i.hasNext() ; )
-    {
-      w.write(" ( " );
-      ((TypeNode)i.next()).dump(c, w);
-      w.write (") ");
-    }
-    w.write ( " ) ");
-    
-    w.beginBlock();
-    w.write (" (");
-    w.beginBlock();
-    for (Iterator i = classMembers.listIterator(); i.hasNext(); )
-    {
-      ((Node)i.next()).translate(c, w);
-      w.newline(0);
-    }
-    w.endBlock();
-    w.write( ") )");  
+    w.write( " ( CLASS < " + name + " >");
+    w.write( " < " + accessFlags.getStringRepresentation() + "> ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node readSymbols( SymbolReader sr)
@@ -279,7 +256,8 @@ public class ClassNode extends ClassMember {
    * returns null for a member of the class body, that element is
    * removed. 
    */
-  public void visitChildren(NodeVisitor v) {
+  public void visitChildren(NodeVisitor v) 
+  {
     if (superClass != null) 
       superClass = (TypeNode) superClass.visit(v);
     for(ListIterator i = interfaceList.listIterator(); i.hasNext(); ) {

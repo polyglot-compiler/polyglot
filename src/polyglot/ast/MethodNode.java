@@ -16,7 +16,7 @@ import jltools.visit.SymbolReader;
  * definition as part of a class body.  It consists of a method name,
  * a list of formal parameters, a list of exceptions which may be
  * thrown, a return type, access flags, and a method body.  A Method
- * may be a constructor in which case it does not have a name (as it
+ * may be a isConstructor in which case it does not have a name (as it
  * must be the same as the class, nor does it have a return type.
  */
 public class MethodNode extends ClassMember {
@@ -24,7 +24,7 @@ public class MethodNode extends ClassMember {
    * Requires: all elements of <formals> are of type FormalParameter,
    * all elements of <exceptions> are of type Type.
    *
-   * Overview: Creates a new MethodNode to represent a constructor
+   * Overview: Creates a new MethodNode to represent a isConstructor
    * which takes <formals> as parameters, may throw exceptions in
    * <exceptions>, is modified by <accessFlags> and contains <body>
    * for a body.
@@ -42,8 +42,8 @@ public class MethodNode extends ClassMember {
     this.body = body;
     this.name = name;
     this.returnType = null;
-    this.constructor = true;
-    this.additionalDims = 0;
+    this.isConstructor = true;
+    this.additionalDimensions = 0;
   }
 
   /**
@@ -69,15 +69,15 @@ public class MethodNode extends ClassMember {
     this.body = body;
     this.name = name;
     this.returnType = returnType;
-    this.constructor = false;
-    this.additionalDims = 0;
+    this.isConstructor = false;
+    this.additionalDimensions = 0;
   }
 
   /**
-   * Effects: Returns true iff this MethodNode represents a constructor.
+   * Effects: Returns true iff this MethodNode represents a isConstructor.
    */
   public boolean isConstructor() {
-    return constructor;
+    return isConstructor;
   }
 
   /**
@@ -106,11 +106,11 @@ public class MethodNode extends ClassMember {
    * <newReturnType>.
    */
   public void setReturnType(TypeNode newReturnType) {
-    if(additionalDims > 0)
+    if(additionalDimensions > 0)
     {
       Type type = newReturnType.getType();
       newReturnType.setType(new ArrayType(type.getTypeSystem(),
-          type, additionalDims));
+          type, additionalDimensions));
     }
     returnType = newReturnType;
   }
@@ -120,15 +120,15 @@ public class MethodNode extends ClassMember {
    * <newReturnType>.
    */
   public void setReturnType(Type newReturnType) {
-    if(additionalDims > 0)
+    if(additionalDimensions > 0)
     {
-      newReturnType = new ArrayType(null, newReturnType, additionalDims);
+      newReturnType = new ArrayType(null, newReturnType, additionalDimensions);
     }
     returnType = new TypeNode(newReturnType);
   }
 
   public void addAdditionalDimension() {
-    additionalDims++;
+    additionalDimensions++;
   }
 
   /**
@@ -265,23 +265,20 @@ public class MethodNode extends ClassMember {
     body.translate(c, w);
   }
 
-  public void dump (LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write( "( METHOD " + name + " ( " + accessFlags.getStringRepresentation() + " ) ");
-    dumpNodeInfo(c, w);
-    w.write("(");
-    for (Iterator i = formals.iterator(); i.hasNext(); )
-    {
-      w.write("(");
-      ((FormalParameter)i.next()).translate(c, w);
-      w.write(")");
+    w.write( "( METHOD");
+    w.write( " < " + name + " >");
+    w.write( " < " + accessFlags.getStringRepresentation() + "> ");
+    if( isConstructor) {
+      w.write( "< isConstructor > ");
     }
-    w.write(")");
-    w.write ("( THROWS : ");
-    for (Iterator i = exceptions.iterator(); i.hasNext(); )
-    {
-      w.write(" ( " + ((Type)i.next()).getTypeString() + " )" );
+    if( additionalDimensions > 0) {
+      w.write( "< " + additionalDimensions + " > ");
     }
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
   
   public Node readSymbols( SymbolReader sr)
@@ -321,7 +318,7 @@ public class MethodNode extends ClassMember {
         name, newFormals, 
 			  deep ? Node.deepCopyList(exceptions) : exceptions,
 			  deep ? (BlockStatement) body.deepCopy() : body);
-      mn.additionalDims = additionalDims;
+      mn.additionalDimensions = additionalDimensions;
     } else {
       mn = new MethodNode(accessFlags.copy(),
 			  deep ? (TypeNode)returnType.deepCopy() :returnType,
@@ -329,17 +326,17 @@ public class MethodNode extends ClassMember {
 			  newFormals,
 			  deep ? Node.deepCopyList(exceptions) : exceptions,
 			  deep ? (BlockStatement) body.deepCopy() : body);
-      mn.additionalDims = additionalDims;
+      mn.additionalDimensions = additionalDimensions;
     }
     return mn;
   }
 
-  private boolean constructor;
+  private boolean isConstructor;
   private AccessFlags accessFlags;
   private TypeNode returnType;
   private String name;
   private List formals;
   private List exceptions;
   private BlockStatement body;
-  private int additionalDims;
+  private int additionalDimensions;
 }

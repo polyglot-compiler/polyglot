@@ -78,9 +78,13 @@ public class ImportNode extends Node {
     w.newline(0);
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write(" ( IMPORT " + (type == PACKAGE ? " PACKAGE " : " CLASS " ) + imports);
+    w.write( "( IMPORT < " + (type == PACKAGE ? "PACKAGE" : "CLASS"));
+    w.write( " > < " + imports + " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node readSymbols( SymbolReader sr)

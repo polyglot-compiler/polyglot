@@ -352,15 +352,14 @@ public class BinaryExpression extends Expression {
       w.write(")");
    }
 
-   public void dump(LocalContext c, CodeWriter w)
+   public Node dump( CodeWriter w)
    {
-      w.write(getOperatorString(operator));
-      dumpNodeInfo(c, w);
-      w.beginBlock();
-      left.dump(c, w);
-      right.dump(c, w);
-      w.endBlock();
-
+      w.write( "( BINARY EXPR < ");
+      w.write( getOperatorString(operator));
+      w.write( " > ");
+      dumpNodeInfo( w);
+      w.write( ")");
+      return null;
    }
 
     public Node copy() {

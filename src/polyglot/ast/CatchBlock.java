@@ -65,13 +65,12 @@ public class CatchBlock extends Node {
     w.endBlock();
   }
   
-  public void dump (LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write (" (  CATCH BLOCK " ) ;
-    formalParameter.dump( c, w);
-    w.beginBlock();
-    block.dump(c, w);
-    w.endBlock();
+    w.write( "( CATCH BLOCK ");
+    dumpNodeInfo( w);
+    w.write( ")"); 
+    return null;
   }
   
   public Node readSymbols( SymbolReader sr)

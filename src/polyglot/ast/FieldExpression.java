@@ -81,14 +81,13 @@ public class FieldExpression extends Expression {
     }
   }
 
-  public void dump(LocalContext c, CodeWriter w)
+  public Node dump( CodeWriter w)
   {
-    w.write ( " ( FIELD ACCESS: " );
-    if (target != null)
-    {
-      target.dump( c, w);
-    }
-    w.write (" ( " + name + " ) ) ");
+    w.write( "( FIELD ACCESS");
+    w.write( " < " + name + " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
   }
 
   public Node typeCheck( LocalContext c)
