@@ -210,10 +210,12 @@ public class MethodInstance_c extends ProcedureInstance_c
             return false;
         }
 
-        if (! mi.flags().isStatic() && mj.flags().isStatic()) {
+        if (mi.flags().isStatic() != mj.flags().isStatic()) {
             if (Report.should_report(Report.types, 3))
-                Report.report(3, mi.flags() + " not static but " +
-                              mj.flags() + " static");
+                Report.report(3, mi.signature() + " is " + 
+                              (mi.flags().isStatic() ? "" : "not") + 
+                              " static but " + mj.signature() + " is " +
+                              (mj.flags().isStatic() ? "" : "not") + " static");
             return false;
         }
 
@@ -246,11 +248,10 @@ public class MethodInstance_c extends ProcedureInstance_c
 	
 	List ints = rt.interfaces();
 	for (Iterator i = ints.iterator(); i.hasNext(); ) {
-	    ReferenceType rt2 = (ReferenceType) i.next();
+            ReferenceType rt2 = (ReferenceType) i.next();
 	    l.addAll(implementedImpl(rt2));
 	}
 	
         return l;
     }
-
 }
