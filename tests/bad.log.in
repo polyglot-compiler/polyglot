@@ -1,5 +1,5 @@
-BadAbstract.jl:1: Class "C0" should be declared abstract; it does not
-    implement method C0 m0().
+BadAbstract.jl:1: C0 should be declared abstract; it does not define m0(),
+    which is declared in C0
 class C0
 ^
 
@@ -24,13 +24,13 @@ BadExcept2.jl:10: Could not find type "MisspelledException".
              ^
 
 1 error.
-BadExcept.jl:9: Cannot override method void method1() in Except1 with method
-    void method1() throws e1 in Except1sub.
+BadExcept.jl:9: method1() in Except1sub cannot override method1() in Except1;
+    the throwset is not a subset of the overridden method's throwset
   void method1() throws e1 {}
        ^
 
-BadExcept.jl:11: Cannot override method void method3() throws e2 in Except1
-    with method void method3() throws e1 in Except1sub.
+BadExcept.jl:11: method3() in Except1sub cannot override method3() in Except1;
+    the throwset is not a subset of the overridden method's throwset
   void method3() throws e1 {}
        ^
 
@@ -68,12 +68,12 @@ BadFinalInit4.jl:4: variable "i" might already have been assigned to
 	    ^
 
 1 error.
-BadFinalInit5.jl:3: variable "i" might not have been initialized
+BadFinalInit5.jl:3: field "i" might not have been initialized
     BadFinalInit5() {
-                    ^
+    ^
 
 1 error.
-BadFinalInit6.jl:5: variable "i" might already have been assigned to
+BadFinalInit6.jl:5: field "i" might already have been assigned to
 	i = 4; // bad: more than one assignment to i.
 	^
 
@@ -83,7 +83,7 @@ BadFinalInit7.jl:8: cannot assign a value to final variable "i"
 	^
 
 1 error.
-BadFinalInit8.jl:4: variable "i" might already have been assigned to
+BadFinalInit8.jl:4: field "i" might already have been assigned to
 	i = 4; // bad: more than one assignment to i.
 	^
 
@@ -93,12 +93,12 @@ BadFinalInit9.jl:4: variable "i" might already have been assigned to
 	^
 
 1 error.
-BadFinalInit10.jl:4: variable "i" might already have been assigned to
+BadFinalInit10.jl:4: field "i" might already have been assigned to
 	i = 2; // Bad
 	^
 
 1 error.
-c:\data\compext\polyglot\polyglot\ext\jl\tests\BadFinalInit11.java:6: variable i might already have been assigned to
+BadFinalInit11.java:6: variable i might already have been assigned to
         this.i = 2;
         ^
 1 error
@@ -107,7 +107,7 @@ BadFinalInit12.jl:5: cannot assign a value to final variable "x"
 	^
 
 1 error.
-BadFinalInit13.jl:1: variable "x" might not have been initialized
+BadFinalInit13.jl:1: field "x" might not have been initialized
 class BadFinalInit13 {
 ^
 
@@ -116,11 +116,7 @@ BadInit.jl:4: Method no_such_fn not found.
     int a = no_such_fn();
             ^
 
-BadInit.jl:7: Method no_such_fn not found.
-    c = no_such_fn();
-        ^
-
-2 errors.
+1 error.
 BadInner2.jl:7: Cannot specify a containing instance for static classes.
   Object o = this.new Foo();
              ^
@@ -140,7 +136,7 @@ BadInner4.jl:7: Class "ChildOfInner" is not a member of "Super".
   	                             ^
 
 1 error.
-BadInner5.jl:3: Member class "C0" not found in type "C0".
+BadInner5.jl:3: Class "C0" not found in scope of C0
   public static C0.C0 m0 ()
                 ^
 
@@ -171,10 +167,12 @@ BadInterface.jl:17: Interface methods must be public.
                         ^
 
 1 error.
-BadOverride.java:80: method() in Sub cannot implement method() in Override; attempting to assign weaker access privileges; was public
-class Sub implements Override {
-^
-1 error
+BadOverride.jl:9: method() in Sub cannot override method() in Override;
+    attempting to assign weaker access privileges
+  void method() {} 
+       ^
+
+1 error.
 BadPrim.jl:6: No valid method call found for m(int) in BadPrim.
     m(1);
     ^
@@ -294,8 +292,8 @@ NoReturn5.jl:2: Missing return statement.
       ^
 
 1 error.
-Protection2.jl:6: Cannot override method final void f() in Protection2 with
-    method void f() in p2.
+Protection2.jl:6: f() in p2 cannot override f() in Protection2; overridden
+    method is final
   void f() {}
        ^
 
