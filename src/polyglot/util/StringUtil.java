@@ -46,7 +46,7 @@ public class StringUtil
     }
 
     public static String escape(char c) {
-        return escape("" + c, false);
+        return escape(String.valueOf(c), false);
     }
 
     public static String unicodeEscape(String s) {
@@ -54,7 +54,7 @@ public class StringUtil
     }
 
     public static String unicodeEscape(char c) {
-        return escape("" + c, true);
+        return escape(String.valueOf(c), true);
     }
 
     public static String escape(String s, boolean unicode) {

@@ -40,12 +40,12 @@ public class BooleanLit_c extends Lit_c implements BooleanLit
   }
 
   public String toString() {
-    return "" + value;
+    return String.valueOf(value);
   }
 
   /** Write the expression to an output file. */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-    w.write("" + value);
+    w.write(String.valueOf(value));
   }
 
   /** Dumps the AST. */
