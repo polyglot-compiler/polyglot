@@ -20,10 +20,17 @@ public class ClassFileLoader
      */
     Map jarCache;
     
+    /**
+     * Directory contents cache. Cache the first level of the directory
+     * so that we get less FileNotFoundExceptions
+     */
+    Map dirContentsCache;
+    
     final static Object not_found = new Object();
 
     public ClassFileLoader() {
         this.jarCache = new HashMap();
+        this.dirContentsCache = new HashMap(); 
     }
 
     /**
@@ -43,12 +50,12 @@ public class ClassFileLoader
             if (dir.getName().endsWith(".jar")) {
                 return loadFromJar(name, dir);
             }
-            else if (dir.isDirectory()) {
-                return loadFromFile(name, dir);
-            } 
             else if (dir.getName().endsWith(".zip")) {
                 return loadFromZip(name, dir);
             }
+            else {
+                return loadFromFile(name, dir);
+            } 
         }
         catch (FileNotFoundException e) {
             // ignore the exception.
@@ -130,16 +137,44 @@ public class ClassFileLoader
     }
     
     ClassFile loadFromFile(String name, File dir) throws IOException {
-        StringBuffer filename = new StringBuffer(name.length() + 8);
-        filename.append(name);
-        // our own replace, to save a suprising amount of memory
-        for (int i = 0; i < filename.length(); i++) {
-            if (filename.charAt(i) == '.') 
-                filename.setCharAt(i, File.separatorChar);
+        Set dirContents = (Set)dirContentsCache.get(dir);
+        if (dirContents == null) {
+            dirContents = new HashSet();
+            dirContentsCache.put(dir, dirContents);
+            if (dir.exists() && dir.isDirectory()) {
+                String[] contents = dir.list();
+                for (int j = 0; j < contents.length; j++) {
+                    dirContents.add(contents[j]);
+                }                
+            }
         }
-        filename.append(".class");
-                
-        File file = new File(dir, filename.toString());
+        
+        
+        StringBuffer filenameSB = new StringBuffer(name.length() + 8);
+        int firstSeparator = -1;
+        filenameSB.append(name);
+        // our own replace, to save a suprising amount of memory
+        for (int i = 0; i < filenameSB.length(); i++) {
+            if (filenameSB.charAt(i) == '.') { 
+                filenameSB.setCharAt(i, File.separatorChar);
+                if (firstSeparator == -1) 
+                    firstSeparator = i;
+            }
+        }
+        filenameSB.append(".class");
+        
+        String filename = filenameSB.toString(); 
+        String firstPart = (firstSeparator==-1) ? filename 
+                                                : filename.substring(0, firstSeparator);
+
+        // check to see if the directory has the first part of the filename,
+        // to avoid trying to open the file if it doesn't
+        if (!dirContents.contains(firstPart)) {
+            return null;
+        }              
+        
+        // otherwise, try and open the thing.           
+        File file = new File(dir, filename);
                 
         FileInputStream in = new FileInputStream(file);
         if (Report.should_report(verbose, 3))
