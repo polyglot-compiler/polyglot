@@ -221,18 +221,18 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
-	try {
-	    ts.checkMethodFlags(flags());
-	}
-	catch (SemanticException e) {
-	    throw new SemanticException(e.getMessage(), position());
-	}
-
         if (tc.context().currentClass().flags().isInterface()) {
             if (flags().isProtected() || flags().isPrivate()) {
                 throw new SemanticException("Interface methods must be public.",
                                             position());
             }
+        }
+
+        try {
+            ts.checkMethodFlags(flags());
+        }
+        catch (SemanticException e) {
+            throw new SemanticException(e.getMessage(), position());
         }
 
 	if (body == null && ! (flags().isAbstract() || flags().isNative())) {
