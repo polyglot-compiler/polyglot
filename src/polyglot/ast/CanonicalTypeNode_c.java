@@ -33,18 +33,20 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
     if (tr.outerClass() != null) {
       w.write(type.translate(ts.classContextResolver(tr.outerClass())));
     }
-    else if (type.isClass() && type.toClass().isMember()) {
-      // tr.context()?  eliminate this case?
-      // passing null forces the name to be fully qualified
+    else if (Options.global.fully_qualified_names) {
+      // if a field or local variable in this context shadows the package
+      // name of the type, then the output code may not compile, e.g.
+      //   ...
+      //   java.lang.Object foo;
+      //   foo.package.Bar = new foo.package.Bar();
+      //   ...
+      // 
+      // But, the user asked for fully qualified names, so that's what they
+      // get.
       w.write(type.translate(null));
     }
-    else if (! Options.global.fully_qualified_names) {
+    else { 
       w.write(type.translate(tr.context()));
-    }
-    else {
-      // FIXME: variable capture bug?
-      // What if a field in this context shadows the package name?
-      w.write(type.translate(null));
     }
   }
 
