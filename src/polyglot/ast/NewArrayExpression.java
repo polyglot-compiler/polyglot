@@ -169,10 +169,19 @@ public class NewArrayExpression extends Expression
     return reconstruct( Node.condVisit(this.ext, v),newBase, newDimExprs, addDims, newInit);
   }
   
-  public Node typeCheck( LocalContext c)
+  public Node typeCheck( LocalContext c) throws SemanticException
   {
-    setCheckedType( new ArrayType( c.getTypeSystem(), base.getType(),
-                                   getDimensions()));
+    Type type = new ArrayType( c.getTypeSystem(), base.getType(),
+                                   getDimensions());
+
+    // Check that the initializer has the correct type.
+    if (! c.getTypeSystem().isAssignableSubtype(init.getCheckedType(), type)) {
+      throw new SemanticException("An array initializer must be the same " +
+				  "type as the array declaration");
+    }
+
+    setCheckedType( type );
+
     return this;
   }
 
