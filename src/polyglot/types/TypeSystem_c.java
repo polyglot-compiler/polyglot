@@ -611,7 +611,7 @@ public class TypeSystem_c implements TypeSystem
             if (! mt.isMember()) {
                 throw new InternalCompilerError("Class " + mt +
                                                 " is not a member class, " +
-                                                "but is in " + container +
+                                                " but is in " + container +
                                                 "\'s list of members.");
             }
 
@@ -619,7 +619,7 @@ public class TypeSystem_c implements TypeSystem
                 throw new InternalCompilerError("Class " + mt +
                                                 " has outer class " +
                                                 mt.outer() +
-                                                "but is a member of " +
+                                                " but is a member of " +
                                                 container);
             }
 
