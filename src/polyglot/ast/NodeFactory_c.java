@@ -37,7 +37,11 @@ public class NodeFactory_c extends AbstractNodeFactory_c
     protected ExtFactory extFactory() {
         return this.extFactory;
     }
-    
+
+    protected DelFactory delFactory() {
+        return this.delFactory;
+    }
+
     /**
      * Utility method to find an instance of an Extension Factory
      */
