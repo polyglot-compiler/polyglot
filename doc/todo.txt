@@ -1,0 +1,6 @@
+jltools static checking doesn't do some things:
+    * check for uninitialized variables
+    * check for circularity in the type hierarchy
+
+Implementation should use interfaces in various places where it currently
+uses abstract classes.
