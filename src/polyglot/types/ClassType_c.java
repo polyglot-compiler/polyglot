@@ -99,7 +99,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     public boolean isInnerClass() {
         // it's an inner class if it is not an interface, it is a nested
         // class, and it is not explicitly or implicitly static. 
-        return !flags().isInterface() && isNested() && !flags().isStatic();
+        return !flags().isInterface() && isNested() && !flags().isStatic() && !inStaticContext();
     }
     
     public boolean isCanonical() { return true; }
