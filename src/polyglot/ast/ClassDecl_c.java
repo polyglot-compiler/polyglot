@@ -183,8 +183,11 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 
             ts.checkCycles(t.toReference());
         }
-        else {
+        else if (this.type != ts.Object()) {
             this.type.superType(ts.Object());
+        }
+        else {
+            this.type.superType(null);
         }
 
         for (Iterator i = this.interfaces.iterator(); i.hasNext(); ) {

@@ -93,9 +93,14 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        ConstructorCall_c n = (ConstructorCall_c) super.buildTypes(tb);
-
         TypeSystem ts = tb.typeSystem();
+
+        // Remove super() calls for java.lang.Object.
+        if (kind == SUPER && tb.currentClass() == ts.Object()) {
+            return tb.nodeFactory().Empty(position());
+        }
+
+        ConstructorCall_c n = (ConstructorCall_c) super.buildTypes(tb);
 
         List l = new ArrayList(arguments.size());
         for (int i = 0; i < arguments.size(); i++) {
@@ -144,7 +149,6 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
             }
 
             ClassType qct = qt.toClass();
-            ClassType superType = ct.superType().toClass();
 
             boolean found = false;
 

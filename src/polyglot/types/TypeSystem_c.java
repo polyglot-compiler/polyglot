@@ -708,7 +708,7 @@ public class TypeSystem_c implements TypeSystem
 
 	    if (Report.should_report(Report.types, 2))
 		Report.report(2, "Searching type " + type + " for method " +
-                              name + " with args " + listToString(argTypes));
+                              name + "(" + listToString(argTypes) + ")");
 
 	    if (! type.isReference()) {
 	        throw new SemanticException("Cannot call method in " +
@@ -756,8 +756,8 @@ public class TypeSystem_c implements TypeSystem
 
 	if (Report.should_report(Report.types, 2))
 	    Report.report(2, "Searching type " + container +
-                          " for constructor " + " with args " +
-                          listToString(argTypes));
+                          " for constructor " + container + "(" +
+                          listToString(argTypes) + ")");
 
 	for (Iterator i = container.constructors().iterator(); i.hasNext(); ) {
 	    ConstructorInstance ci = (ConstructorInstance) i.next();
