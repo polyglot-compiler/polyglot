@@ -126,7 +126,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Public() {
-	return set(PUBLIC);
+	return clear(ACCESS_FLAGS).set(PUBLIC);
     }
 
     /**
@@ -149,7 +149,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Private() {
-	return set(PRIVATE);
+	return clear(ACCESS_FLAGS).set(PRIVATE);
     }
 
     /**
@@ -172,7 +172,7 @@ public class Flags implements Serializable
      * flag set.
      */
     public Flags Protected() {
-	return set(PROTECTED);
+	return clear(ACCESS_FLAGS).set(PROTECTED);
     }
 
     /**
