@@ -37,7 +37,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         ConformanceCheck6.jl ;         
         ConformanceCheck7.jl (Semantic, "should be declared abstract");        
         packA/ConformanceCheck8.jl packB/ConformanceCheck8b.jl (Semantic, "should be declared abstract"); 
-        packA/Foo.jl packB/Bar.jl (Semantic, "Cannot call inaccessible method");
+        packA/ProtectedAccess1.jl packB/ProtectedAccess2.jl (Semantic, "Cannot call inaccessible method");
         package1/InnerClassAccess.jl package1/InnerClassProblem.jl ;
         Constants.jl ;  Constants2.jl ; Constants3.jl ; Constants4.jl ;
         Constants5.jl ; Constants6.jl ; Constants7.jl ; Constants8.jl;
