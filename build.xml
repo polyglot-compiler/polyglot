@@ -469,7 +469,7 @@ ext=""
   <target name="jmatch" depends="jl">
     <antcall target="standard-ext">
       <param name="ext" value="jmatch"/>
-      <param name="parser.type" value="cup"/>
+      <param name="parser.type" value="ppg"/>
     </antcall>
   </target>
 
