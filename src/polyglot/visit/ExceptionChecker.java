@@ -146,4 +146,8 @@ public class ExceptionChecker extends HaltingVisitor
     public Position exceptionPosition(Type t) {
         return (Position)exceptionPositions.get(t);
     }
+
+    public ErrorQueue errorQueue() {
+        return eq;
+    }
 }
