@@ -18,8 +18,6 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
     }
 
     private static final String WRAPPER_PACKAGE = "polyglot.ext.pao.runtime";
-    private static Map wrapper = null;
-    private static Map getter = null;
 
     public MethodInstance primitiveEquals() {
         String name = WRAPPER_PACKAGE + ".Primitive";
@@ -46,19 +44,7 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
     }
 
     public MethodInstance getter(PrimitiveType t) {
-        if (getter == null) {
-            getter = new HashMap();
-            getter.put(Boolean(), "booleanValue");
-            getter.put(Byte(), "byteValue");
-            getter.put(Char(), "charValue");
-            getter.put(Short(), "shortValue");
-            getter.put(Int(), "intValue");
-            getter.put(Long(), "longValue");
-            getter.put(Float(), "floatValue");
-            getter.put(Double(), "doubleValue");
-        }
-
-        String methodName = (String) getter.get(t);
+        String methodName = t.toString() + "Value";
         ConstructorInstance ci = wrapper(t);
 
         for (Iterator i = ci.container().methods().iterator();
@@ -77,25 +63,12 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
     }
 
     public ConstructorInstance wrapper(PrimitiveType t) {
-        if (wrapper == null) {
-            wrapper = new HashMap();
-            wrapper.put(Boolean(), "Boolean");
-            wrapper.put(Byte(), "Byte");
-            wrapper.put(Char(), "Character");
-            wrapper.put(Short(), "Short");
-            wrapper.put(Int(), "Integer");
-            wrapper.put(Long(), "Long");
-            wrapper.put(Float(), "Float");
-            wrapper.put(Double(), "Double");
-        }
-
-        String name = WRAPPER_PACKAGE + "." + (String) wrapper.get(t);
+        String name = WRAPPER_PACKAGE + "." + wrapperTypeString(t).substring("java.lang.".length());
 
         try {
-            Type ct = (Type) systemResolver().find(name);
+            ClassType ct = ((Type) systemResolver().find(name)).toClass();
 
-            for (Iterator i = ct.toClass().constructors().iterator();
-                 i.hasNext(); ) {
+            for (Iterator i = ct.constructors().iterator(); i.hasNext(); ) {
                 ConstructorInstance ci = (ConstructorInstance) i.next();
                 if (ci.formalTypes().size() == 1) {
                     Type argType = (Type) ci.formalTypes().get(0);
