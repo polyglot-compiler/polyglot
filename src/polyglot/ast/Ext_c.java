@@ -74,7 +74,7 @@ public abstract class Ext_c implements Ext {
         try {
             Ext_c copy = (Ext_c) super.clone();
             if (ext != null) {
-                copy.ext = (Ext) copy.copy();
+                copy.ext = (Ext) ext.copy();
             }
             copy.node = null; // uninitialize
             return copy;

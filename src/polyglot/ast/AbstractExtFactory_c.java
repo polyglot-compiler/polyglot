@@ -32,6 +32,9 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      */
     private ExtFactory nextExtFactory;
 
+    public ExtFactory nextExtFactory() {
+        return nextExtFactory;
+    }
     /**
      * Compose two extensions together. Order is important: e1 gets added
      * at the end of e2's chain of extensions.
@@ -46,7 +49,8 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     // ******************************************
     // Final methods that call the Impl methods to construct 
     // extensions, and then check with nextExtFactory to see if it
-    // also has an extension.
+    // also has an extension. Finally, call an appropriate post method,
+    // to allow subclasses to perform operations on the construction Exts
     // ******************************************
     public final Ext extAmbExpr() {
         Ext e = extAmbExprImpl();
@@ -55,7 +59,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extAmbExpr();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtAmbExpr(e);
     }
 
     public final Ext extAmbPrefix() {
@@ -65,7 +69,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extAmbPrefix();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtAmbPrefix(e);
     }
 
     public final Ext extAmbQualifierNode() {
@@ -75,7 +79,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extAmbQualifierNode();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtAmbQualifierNode(e);
     }
 
     public final Ext extAmbReceiver() {
@@ -85,7 +89,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extAmbReceiver();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtAmbReceiver(e);
     }
 
     public final Ext extAmbTypeNode() {
@@ -95,7 +99,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extAmbTypeNode();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtAmbTypeNode(e);
     }
 
     public final Ext extArrayAccess() {
@@ -105,7 +109,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extArrayAccess();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtArrayAccess(e);
     }
 
     public final Ext extArrayInit() {
@@ -115,7 +119,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extArrayInit();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtArrayInit(e);
     }
 
     public final Ext extArrayTypeNode() {
@@ -125,7 +129,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extArrayTypeNode();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtArrayTypeNode(e);
     }
 
     public final Ext extAssert() {
@@ -135,7 +139,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extAssert();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtAssert(e);
     }
 
     public final Ext extAssign() {
@@ -145,7 +149,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extAssign();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtAssign(e);
     }
 
     public final Ext extBinary() {
@@ -155,7 +159,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extBinary();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtBinary(e);
     }
 
     public final Ext extBlock() {
@@ -165,7 +169,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extBlock();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtBlock(e);
     }
 
     public final Ext extBooleanLit() {
@@ -175,7 +179,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extBooleanLit();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtBooleanLit(e);
     }
 
     public final Ext extBranch() {
@@ -185,7 +189,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extBranch();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtBranch(e);
     }
 
     public final Ext extCall() {
@@ -195,7 +199,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extCall();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtCall(e);
     }
 
     public final Ext extCanonicalTypeNode() {
@@ -205,7 +209,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extCanonicalTypeNode();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtCanonicalTypeNode(e);
     }
 
     public final Ext extCase() {
@@ -215,7 +219,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extCase();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtCase(e);
     }
 
     public final Ext extCast() {
@@ -225,7 +229,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extCast();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtCast(e);
     }
 
     public final Ext extCatch() {
@@ -235,7 +239,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extCatch();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtCatch(e);
     }
 
     public final Ext extCharLit() {
@@ -245,7 +249,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extCharLit();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtCharLit(e);
     }
 
     public final Ext extClassBody() {
@@ -255,7 +259,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extClassBody();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtClassBody(e);
     }
 
     public final Ext extClassDecl() {
@@ -265,7 +269,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extClassDecl();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtClassDecl(e);
     }
 
     public final Ext extConditional() {
@@ -275,7 +279,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extConditional();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtConditional(e);
     }
 
     public final Ext extConstructorCall() {
@@ -285,7 +289,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extConstructorCall();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtConstructorCall(e);
     }
 
     public final Ext extConstructorDecl() {
@@ -295,7 +299,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extConstructorDecl();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtConstructorDecl(e);
     }
 
     public final Ext extDo() {
@@ -305,7 +309,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extDo();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtDo(e);
     }
 
     public final Ext extEmpty() {
@@ -315,7 +319,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extEmpty();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtEmpty(e);
     }
 
     public final Ext extEval() {
@@ -325,7 +329,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extEval();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtEval(e);
     }
 
     public final Ext extExpr() {
@@ -335,7 +339,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extExpr();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtExpr(e);
     }
 
     public final Ext extField() {
@@ -345,7 +349,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extField();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtField(e);
     }
 
     public final Ext extFieldDecl() {
@@ -355,7 +359,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extFieldDecl();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtFieldDecl(e);
     }
 
     public final Ext extFloatLit() {
@@ -365,7 +369,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extFloatLit();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtFloatLit(e);
     }
 
     public final Ext extFor() {
@@ -375,7 +379,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extFor();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtFor(e);
     }
 
     public final Ext extFormal() {
@@ -385,7 +389,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extFormal();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtFormal(e);
     }
 
     public final Ext extIf() {
@@ -395,7 +399,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extIf();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtIf(e);
     }
 
     public final Ext extImport() {
@@ -405,7 +409,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extImport();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtImport(e);
     }
 
     public final Ext extInitializer() {
@@ -415,7 +419,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extInitializer();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtInitializer(e);
     }
 
     public final Ext extInstanceof() {
@@ -425,7 +429,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extInstanceof();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtInstanceof(e);
     }
 
     public final Ext extIntLit() {
@@ -435,7 +439,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extIntLit();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtIntLit(e);
     }
 
     public final Ext extLabeled() {
@@ -445,7 +449,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extLabeled();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtLabeled(e);
     }
 
     public final Ext extLit() {
@@ -455,7 +459,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extLit();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtLit(e);
     }
 
     public final Ext extLocal() {
@@ -465,7 +469,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extLocal();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtLocal(e);
     }
 
     public final Ext extLocalClassDecl() {
@@ -475,7 +479,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extLocalClassDecl();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtLocalClassDecl(e);
     }
 
     public final Ext extLocalDecl() {
@@ -485,7 +489,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extLocalDecl();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtLocalDecl(e);
     }
 
     public final Ext extLoop() {
@@ -495,7 +499,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extLoop();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtLoop(e);
     }
 
     public final Ext extMethodDecl() {
@@ -505,7 +509,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extMethodDecl();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtMethodDecl(e);
     }
 
     public final Ext extNewArray() {
@@ -515,7 +519,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extNewArray();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtNewArray(e);
     }
 
     public final Ext extNode() {
@@ -525,7 +529,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extNode();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtNode(e);
     }
 
     public final Ext extNew() {
@@ -535,7 +539,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extNew();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtNew(e);
     }
 
     public final Ext extNullLit() {
@@ -545,7 +549,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extNullLit();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtNullLit(e);
     }
 
     public final Ext extNumLit() {
@@ -555,7 +559,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extNumLit();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtNumLit(e);
     }
 
     public final Ext extPackageNode() {
@@ -565,7 +569,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extPackageNode();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtPackageNode(e);
     }
 
     public final Ext extReturn() {
@@ -575,7 +579,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extReturn();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtReturn(e);
     }
 
     public final Ext extSourceCollection() {
@@ -585,7 +589,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extSourceCollection();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtSourceCollection(e);
     }
 
     public final Ext extSourceFile() {
@@ -595,7 +599,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extSourceFile();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtSourceFile(e);
     }
 
     public final Ext extSpecial() {
@@ -605,7 +609,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extSpecial();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtSpecial(e);
     }
 
     public final Ext extStmt() {
@@ -615,7 +619,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extStmt();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtStmt(e);
     }
 
     public final Ext extStringLit() {
@@ -625,7 +629,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extStringLit();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtStringLit(e);
     }
 
     public final Ext extSwitchBlock() {
@@ -635,7 +639,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extSwitchBlock();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtSwitchBlock(e);
     }
 
     public final Ext extSwitchElement() {
@@ -645,7 +649,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extSwitchElement();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtSwitchElement(e);
     }
 
     public final Ext extSwitch() {
@@ -655,7 +659,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extSwitch();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtSwitch(e);
     }
 
     public final Ext extSynchronized() {
@@ -665,7 +669,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extSynchronized();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtSynchronized(e);
     }
 
     public final Ext extTerm() {
@@ -675,7 +679,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extTerm();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtTerm(e);
     }
 
     public final Ext extThrow() {
@@ -685,7 +689,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extThrow();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtThrow(e);
     }
 
     public final Ext extTry() {
@@ -695,7 +699,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extTry();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtTry(e);
     }
 
     public final Ext extTypeNode() {
@@ -705,7 +709,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extTypeNode();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtTypeNode(e);
     }
 
     public final Ext extUnary() {
@@ -715,7 +719,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extUnary();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtUnary(e);
     }
 
     public final Ext extWhile() {
@@ -725,7 +729,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             Ext e2 = nextExtFactory.extWhile();
             e = composeExts(e, e2);
         }
-        return e;
+        return postExtWhile(e);
     }
 
     // ********************************************
@@ -1003,4 +1007,282 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     protected Ext extWhileImpl() {
         return extLoopImpl();
     }
+
+
+    // ********************************************
+    // Post methods
+    // ********************************************
+
+    protected Ext postExtAmbExpr(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtAmbPrefix(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtAmbQualifierNode(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtAmbReceiver(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtAmbTypeNode(Ext ext) {
+        return postExtTypeNode(ext);
+    }
+
+    protected Ext postExtArrayAccess(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtArrayInit(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtArrayTypeNode(Ext ext) {
+        return postExtTypeNode(ext);
+    }
+
+    protected Ext postExtAssert(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtAssign(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtBinary(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtBlock(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtBooleanLit(Ext ext) {
+        return postExtLit(ext);
+    }
+
+    protected Ext postExtBranch(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtCall(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtCanonicalTypeNode(Ext ext) {
+        return postExtTypeNode(ext);
+    }
+
+    protected Ext postExtCase(Ext ext) {
+        return postExtSwitchElement(ext);
+    }
+
+    protected Ext postExtCast(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtCatch(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtCharLit(Ext ext) {
+        return postExtNumLit(ext);
+    }
+
+    protected Ext postExtClassBody(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtClassDecl(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtConditional(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtConstructorCall(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtConstructorDecl(Ext ext) {
+        return postExtTerm(ext);
+    }
+
+    protected Ext postExtDo(Ext ext) {
+        return postExtLoop(ext);
+    }
+
+    protected Ext postExtEmpty(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtEval(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtExpr(Ext ext) {
+        return postExtTerm(ext);
+    }
+
+    protected Ext postExtField(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtFieldDecl(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtFloatLit(Ext ext) {
+        return postExtLit(ext);
+    }
+
+    protected Ext postExtFor(Ext ext) {
+        return postExtLoop(ext);
+    }
+
+    protected Ext postExtFormal(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtIf(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtImport(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtInitializer(Ext ext) {
+        return postExtTerm(ext);
+    }
+
+    protected Ext postExtInstanceof(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtIntLit(Ext ext) {
+        return postExtNumLit(ext);
+    }
+
+    protected Ext postExtLabeled(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtLit(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtLocal(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtLocalClassDecl(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtLocalDecl(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtLoop(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtMethodDecl(Ext ext) {
+        return postExtTerm(ext);
+    }
+
+    protected Ext postExtNewArray(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtNode(Ext ext) {
+        return ext;
+    }
+
+    protected Ext postExtNew(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtNullLit(Ext ext) {
+        return postExtLit(ext);
+    }
+
+    protected Ext postExtNumLit(Ext ext) {
+        return postExtLit(ext);
+    }
+
+    protected Ext postExtPackageNode(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtReturn(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtSourceCollection(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtSourceFile(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtSpecial(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtStmt(Ext ext) {
+        return postExtTerm(ext);
+    }
+
+    protected Ext postExtStringLit(Ext ext) {
+        return postExtLit(ext);
+    }
+
+    protected Ext postExtSwitchBlock(Ext ext) {
+        return postExtSwitchElement(ext);
+    }
+
+    protected Ext postExtSwitchElement(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtSwitch(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtSynchronized(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtTerm(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtThrow(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtTry(Ext ext) {
+        return postExtStmt(ext);
+    }
+
+    protected Ext postExtTypeNode(Ext ext) {
+        return postExtNode(ext);
+    }
+
+    protected Ext postExtUnary(Ext ext) {
+        return postExtExpr(ext);
+    }
+
+    protected Ext postExtWhile(Ext ext) {
+        return postExtLoop(ext);
+    }
+
 }
