@@ -8,7 +8,7 @@ import java.util.*;
 
 /**
  * A <code>LocalAssign_c</code> represents a Java assignment expression
- * to an array element.  For instance, <code>x = e</code>.
+ * to a local variable.  For instance, <code>x = e</code>.
  * 
  * The class of the <code>Expr</code> returned by
  * <code>LocalAssign_c.left()</code>is guaranteed to be an <code>Local</code>.
