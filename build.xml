@@ -496,6 +496,13 @@ ext=""
     </antcall>
   </target>
 
+  <target name="jx" depends="jl">
+    <antcall target="standard-ext">
+      <param name="ext" value="jx"/>
+      <param name="parser.type" value="ppg"/>
+    </antcall>
+  </target>
+
   <target name="pao" depends="jl">
     <antcall target="standard-ext">
       <param name="ext" value="pao"/>
