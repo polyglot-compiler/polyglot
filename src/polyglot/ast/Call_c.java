@@ -177,7 +177,7 @@ public class Call_c extends Expr_c implements Call
 
         // we call typeCheck on the reciever too.
         r = (Receiver)r.typeCheck(tc);
-        return this.targetImplicit(true).target(r).typeCheck(tc);
+        return this.targetImplicit(true).target(r).del().typeCheck(tc);
     }
 
     /** Type check the call. */
