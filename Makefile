@@ -53,7 +53,8 @@ javadoc: FORCE
 	$(javadoc)
 
 jar: all
-	$(JAR) $(JAR_FLAGS) $(JAR_FILE) `find jltools -name \*.class`
+	cd classes ; \
+	$(JAR) $(JAR_FLAGS) ../$(JAR_FILE) `find jltools -name \*.class`
 
 FORCE:
 
