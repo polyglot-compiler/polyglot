@@ -1,10 +1,18 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.ast.Local;
+import polyglot.ast.Node;
+import polyglot.ast.Precedence;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.LocalInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /** 
  * A local variable expression.
@@ -62,6 +70,18 @@ public class Local_c extends Expr_c implements Local
   public Node typeCheck(TypeChecker tc) throws SemanticException {
     Context c = tc.context();
     LocalInstance li = c.findLocal(name);
+    
+    // if the local is defined in an outer class, then it must be final
+    if (!c.isLocal(li.name())) {
+        // this local is defined in an outer class
+        if (!li.flags().isFinal()) {
+            throw new SemanticException("Local variable \"" + li.name() + 
+                    "\" is accessed from an inner class, and must be declared " +
+                    "final.",
+                    this.position());                     
+        }
+    }
+    
     return localInstance(li).type(li.type());
   }
 
