@@ -96,10 +96,7 @@ public class PPG
 	    return;
 	}
 
-	File file = new File (filename);
-	String simpleName = file.getName ();
-
-	Lexer lex = new Lexer (fileInput, simpleName);
+	Lexer lex = new Lexer (fileInput, filename);
 
 	Parser parser = new Parser (filename, lex);
 	try
@@ -113,6 +110,7 @@ public class PPG
 	}
 	Spec spec = (Spec) parser.getProgramNode ();
 
+        File file = new File(filename);
 	String parent = file.getParent ();
 	spec.parseChain (parent == null ? "" : parent);
 

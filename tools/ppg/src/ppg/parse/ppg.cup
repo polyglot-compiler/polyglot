@@ -25,8 +25,9 @@ parser Parser {:
     public void syntax_error (Symbol cur_token)
     {
 	Token tok = (Token) cur_token.value;
-	report_error (tok.getFilename () + ": syntax error at line " +
-		    tok.getLineno () + ": \"" + tok.getValue () + "\" (" +
+	report_error (tok.getFilename () + ":" +
+		    tok.getLineno () + ": syntax error: \"" +
+                    tok.getValue () + "\" (" +
 		    tok.getID () + ")", null);
 	System.exit (1);
     }
