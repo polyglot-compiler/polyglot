@@ -468,14 +468,12 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 	Peer[] by_scc = new Peer[n];
 	int[] scc_head = new int[n];
 	Set visited = new HashSet();
-	int n2 = 0;
+	int head = 0;
 	for (int i=n-1; i>=0; i--) {
 	    if (!visited.contains(sorted[i])) {
+		// First, find all the nodes in the SCC
+		Set SCC = new HashSet();
 		visited.add(sorted[i]);
-		int head = n2;
-		by_scc[n2++] = sorted[i]; // XXX shouldn't be necessary
-		                          // XXX but makes some analyses work
-		//System.out.println("scc: found scc starting at " + head);
 		stack.add(new Frame(sorted[i], false));
 		while (stack.size() != 0) {
 		    Frame top = (Frame)stack.getFirst();
@@ -489,25 +487,51 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 			}
 		    } else {
 			stack.removeFirst();
-			if (stack.size() != 0) { // XXX else is the head
-			    scc_head[n2] = -2;
-			    by_scc[n2++] = top.peer;
-			}
+			SCC.add(top.peer);
 		    }
 		}
-		scc_head[n2-1] = head;
+		// Now, topologically sort the SCC (as much as possible)
+		// and place into by_scc[head..head+scc_size-1]
+		stack.add(new Frame(sorted[i], true));
+		Set revisited = new HashSet();
+		revisited.add(sorted[i]);
+		int scc_size = SCC.size();
+		int nsorted = 0;
+		while (stack.size() != 0) {
+		    Frame top = (Frame)stack.getFirst();
+		    if (top.edges.hasNext()) {
+			Edge e = (Edge)top.edges.next();
+			Peer q = e.getTarget();
+			if (SCC.contains(q) && !revisited.contains(q)) {
+			    revisited.add(q);
+			    Frame f = new Frame(q, true);
+			    stack.addFirst(f);
+			}
+		    } else {
+			stack.removeFirst();
+			int n3 = head + scc_size - nsorted - 1;
+			scc_head[n3] = -2;
+			by_scc[n3] = top.peer;
+			nsorted++;
+		    }
+		}
+		scc_head[head+scc_size-1] = head;
 		scc_head[head] = -1;
+		head = head + scc_size;
 	    }
 	}
-/*
-	for (int j = 0; j < n; j++) {
-	    switch(scc_head[j]) {
-		case -1: System.out.println(j + "[HEAD] : " + by_scc[j]); break;
-		case -2: System.out.println(j + "       : " + by_scc[j]); break;
-		default: System.out.println(j + " ->"+ scc_head[j] + " : " + by_scc[j]);
+	if (Report.should_report(Report.dataflow, 2)) {
+	    for (int j = 0; j < n; j++) {
+		switch(scc_head[j]) {
+		    case -1: Report.report(2, j + "[HEAD] : " + by_scc[j]); break;
+		    case -2: Report.report(2, j + "       : " + by_scc[j]); break;
+		    default: Report.report(2, j + " ->"+ scc_head[j] + " : " + by_scc[j]);
+		}
+		for (Iterator i = by_scc[j].succs().iterator(); i.hasNext(); ) {
+		    Report.report(3, "     successor: " + ((Edge)i.next()).getTarget());
+		}
 	    }
 	}
-*/
 	LinkedList ret = new LinkedList();
 	ret.addFirst(scc_head);
 	ret.addFirst(by_scc);
@@ -518,6 +542,9 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * Perform the dataflow on the flowgraph provided.
      */
     protected void dataflow(FlowGraph graph) {
+	if (Report.should_report("dataflow", 1)) {
+	    Report.report(1, "Finding strongly connected components");
+	}
 	LinkedList pair = findSCCs(graph);
 	Peer[] by_scc = (Peer[])pair.getFirst();
 	int[] scc_head = (int[])pair.getLast();
@@ -528,6 +555,9 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 	   begins with a -1 and ends with the index of
 	   the beginning of the SCC.
 	*/
+	if (Report.should_report("dataflow", 1)) {
+	    Report.report(1, "Iterating dataflow equations");
+	}
 
 	int current = 0;
 	boolean change = false;
@@ -587,6 +617,9 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 		current++;
 	    }
         }
+	if (Report.should_report("dataflow", 1)) {
+	    Report.report(1, "Done.");
+	}
     }
 
     /**
