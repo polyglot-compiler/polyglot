@@ -15,14 +15,14 @@ import java.io.IOException;
  * following form, to assist in this reconstuction.
  *
  * <pre><code>
- * public MyNode reconstruct( Node ext, Expression field1, TypeNode field2)
+ * public MyNode reconstruct(Node ext, Expression field1, TypeNode field2)
  * {
- *   if( this.field1 == field1 && this.field2 == field2 && this.ext == ext) {
+ *   if(this.field1 == field1 && this.field2 == field2 && this.ext == ext) {
  *     return this;
  *   }
  *   else {
- *     MyNode n = new MyNode( field1, field2, ext.reconstruct());
- *     n.copyAnnotationsFrom( this);
+ *     MyNode n = new MyNode(field1, field2, ext.reconstruct());
+ *     n.copyAnnotationsFrom(this);
  *     return n;
  *   }
  * }
@@ -70,17 +70,17 @@ public abstract class Node extends AnnotatedObject {
    * @return A new node which represents the AST if a change was made; 
    *  otherwise <code>this</code>.
    */
-  public final Node visit( NodeVisitor v)
+  public final Node visit(NodeVisitor v)
   {
-    Node n = v.override( this);
+    Node n = v.override(this);
     
-    if( n != null) {
+    if (n != null) {
       return n;
     }
     else {
-      NodeVisitor v_ = v.enter( this);
-      n = visitChildren( v_);
-      return v.leave( this, n, v_);
+      NodeVisitor v_ = v.enter(this);
+      n = visitChildren(v_);
+      return v.leave(this, n, v_);
     }
   }
   
@@ -101,7 +101,7 @@ public abstract class Node extends AnnotatedObject {
   
   protected static Node condVisit(Node n, NodeVisitor v) {
     if (n != null) {
-      return n.visit( v);
+      return n.visit(v);
     } else {
       return null;
     }
@@ -111,28 +111,29 @@ public abstract class Node extends AnnotatedObject {
    * Collects classes, methods, and fields from an AST. The types of fields
    * as well as the return, argument, and exception types of the methods
    * may be ambiguous.
+   * XXX what does this mean? Someone explain this.
    *
    * @param sr The visitor which allows nodes to add new symbols.
    * @return See notes for <code>visit</code> and <code>visitChildren</code>.
    */
-  public abstract Node readSymbols( SymbolReader sr) throws SemanticException;
+  public abstract Node readSymbols(SymbolReader sr) throws SemanticException;
 
   /**
    * Adjust the environment for entering a new scope.
    */
-  public void enterScope( LocalContext c) {}
+  public void enterScope(LocalContext c) {}
 
   /**
    * Adjust the environment for leaving the current scope.
    */
-  public void leaveScope( LocalContext c) {}
+  public void leaveScope(LocalContext c) {}
   
   /**
    * Remove any remaining ambiguities from the AST.
    *
    * @return See notes for <code>visit</code> and <code>visitChildren</code>.
    */
-  public Node removeAmbiguities( LocalContext c) throws SemanticException
+  public Node removeAmbiguities(LocalContext c) throws SemanticException
   { 
     return this; 
   }
@@ -164,14 +165,14 @@ public abstract class Node extends AnnotatedObject {
    * 
    * @return See notes for <code>visit</code> and <code>visitChildren</code>.
    */
-  public abstract Node typeCheck( LocalContext c) throws SemanticException;
+  public abstract Node typeCheck(LocalContext c) throws SemanticException;
 
   /**
    * Check that exceptions are properly propagated throughout the tree.
    *
    * @return See notes for <code>visit</code> and <code>visitChildren</code>.
    */
-  public Node exceptionCheck( ExceptionChecker ec) throws SemanticException 
+  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException 
   {
     return this; 
   }
@@ -183,7 +184,7 @@ public abstract class Node extends AnnotatedObject {
    *
    * @return See notes for <code>visit</code> and <code>visitChildren</code>.
    */
-  public Node flowCheck( FlowChecker fc) throws SemanticException 
+  public Node flowCheck(FlowChecker fc) throws SemanticException 
   {
     return this; 
   }
@@ -194,7 +195,7 @@ public abstract class Node extends AnnotatedObject {
    * Note that this method does <b>not</b> use the visitor model of traversal.
    * Rather, it uses a traditional recursive traversal.
    */
-  public void translate( LocalContext c, CodeWriter w) {
+  public void translate(LocalContext c, CodeWriter w) {
     if (ext instanceof TranslateOverride) {
       ((TranslateOverride) ext).translate(this, c, w);
     }
@@ -203,9 +204,9 @@ public abstract class Node extends AnnotatedObject {
     }
   }
 
-  public abstract void translate_no_override( LocalContext c, CodeWriter w);
+  public abstract void translate_no_override(LocalContext c, CodeWriter w);
 
-  public void translate_block( LocalContext c, CodeWriter w) {
+  public void translate_block(LocalContext c, CodeWriter w) {
     w.begin(0);
     translate(c, w);
     w.end();
@@ -231,19 +232,19 @@ public abstract class Node extends AnnotatedObject {
    *
    * @param w The output writer used to display information.
    */
-  public abstract void dump( CodeWriter w) throws SemanticException;
+  public abstract void dump(CodeWriter w) throws SemanticException;
 
   /**
    * Dumps annotations to the writer, if any annotations have been set.
    */
-  public void dumpNodeInfo( CodeWriter w)
+  public void dumpNodeInfo(CodeWriter w)
   {
-    Type type1 = Annotate.getCheckedType( this);
-    Type type2 = Annotate.getExpectedType( this);
+    Type type1 = Annotate.getCheckedType(this);
+    Type type2 = Annotate.getExpectedType(this);
 
-    //    w.write( "C: " + getClass().getName() + " ");
+    //    w.write("C: " + getClass().getName() + " ");
 
-    if( type1 != null && type2 != null ) {
+    if (type1 != null && type2 != null ) {
       w.begin(0);
       w.write("T: " + type1.getTypeString());
       w.allowBreak(0);
