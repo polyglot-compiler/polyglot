@@ -70,7 +70,7 @@ public abstract class Node extends AnnotatedObject {
    * from <code>visit</code>) then this method should return a copy of the
    * current node with the appropriate field set to the new child.
    * 
-   * @see jltools.ast.Node.visit
+   * @see jltools.ast.Node#visit
    *
    * @param v The visitor which is currently traversing the tree.
    * @return A new node if any changes where made to this node (or its 

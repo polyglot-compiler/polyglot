@@ -21,7 +21,7 @@ public class TypeNode extends Node
 
   /**
    * The string that originally represented the type in the source file.
-   * @see jltools.ast.TypeNode.translate
+   * @see jltools.ast.TypeNode#translate
    */
   protected final String original;
 

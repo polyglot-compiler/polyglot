@@ -22,7 +22,7 @@ JAR_FILE		= jltools.jar
 JAR_FLAGS		= cf 
 
 JAVADOC_OUTPUT		= ./javadoc
-JAVADOC_FLAGS		= -mx40m -ms40m -classpath /home/spoons/classes/iDoclet.jar:/usr/local/jdk1.2.1/lib/tools.jar:$(CLASSPATH) 
+JAVADOC_FLAGS		= -mx40m -ms40m -classpath /home/nks/lib/iDoclet.jar:/usr/local/jdk1.2.1/lib/tools.jar:$(CLASSPATH) 
 
 SOURCE			= .
 PERSONAL_MAKEFILE	= Makefile.personal
@@ -112,9 +112,18 @@ jar: all
 
 javadoc: FORCE
 	-mkdir -p $(JAVADOC_OUTPUT)
-	$(JAVA) $(JAVADOC_FLAGS) $(JAVADOC_MAIN) -d $(JAVADOC_OUTPUT) $(JAVADOC_DOCLET) jltools.runtime jltools.ast.Node jltools.ast.NodeVisitor jltools.ast.AmbiguousExpression jltools.ast.AmbiguousNameExpression jltools.ast.ArrayIndexExpression jltools.ast.Expression jltools.ast.ArrayInitializerExpression jltools.ast.BinaryExpression jltools.ast.BlockStatement jltools.ast.BranchStatement jltools.ast.CastExpression jltools.ast.CatchBlock jltools.ast.CharacterLiteral jltools.ast.ClassNode jltools.ast.ClassMember
-
-#jltools.ast jltools.frontend jltools.parse jltools.util jltools.types jltools.visit jltools.runtime
+	$(JAVA) $(JAVADOC_FLAGS) $(JAVADOC_MAIN) -d $(JAVADOC_OUTPUT) \
+		-classpath $(CLASSPATH) $(JAVADOC_DOCLET) -package\
+			jltools.ast      \
+			jltools.lex      \
+			jltools.frontend \
+			jltools.runtime  \
+			jltools.parse    \
+			jltools.types    \
+			jltools.util     \
+			jltools.visit    \
+			jltools.main     \
+			jltools.ext.op 
 
 FORCE:
 
