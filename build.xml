@@ -658,6 +658,18 @@ ext=""
   <target name="dist" depends="polyglot-dist-javadoc"/>
 
   <target name="polyj-dist" depends="jl-dist,polyj"/>
-  <target name="jmatch-dist" depends="jl-dist,jmatch"/>
+
+  <target name="jmatch-jar" depends="jmatch">
+    <jar jarfile="${lib}/jmatch.jar" basedir="${classes}" includes="polyglot/ext/jmatch/**"/>
+  </target>
+
+  <target name="jmatch-dist" depends="jl-dist,jmatch-jar">
+    <copy todir="${dist}/lib" file="${lib}/jmatch.jar"/>
+
+    <copy todir="${dist}/src/polyglot/ext/jmatch">
+      <fileset dir="${src}/polyglot/ext/jmatch"
+	excludes="**/Makefile,**/tests/**,**/doc/**"/>
+    </copy>
+  </target>
 </project>
 
