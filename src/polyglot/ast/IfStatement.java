@@ -4,7 +4,7 @@
 
 package jltools.ast;
 import jltools.types.*;
-import jltools.util.CodeWriter;
+import jltools.util.*;
 
 /**
  * IfStatement
@@ -125,6 +125,13 @@ public class IfStatement extends Statement {
     if( !ctype.equals( c.getTypeSystem().getBoolean())) {
       throw new TypeCheckException( "Conditional must have boolean type.");
     }
+    
+    Annotate.addThrows ( this, Annotate.getThrows ( condExpr ));
+    Annotate.addThrows ( this, Annotate.getThrows ( thenStatement ));
+    if ( elseStatement != null)
+      Annotate.addThrows ( this, Annotate.getThrows ( elseStatement ));
+    
+
     return this;
   }
 

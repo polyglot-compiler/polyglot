@@ -4,8 +4,9 @@
 
 package jltools.ast;
 
-import jltools.util.CodeWriter;
-import jltools.types.LocalContext;
+import jltools.util.*;
+import jltools.types.*;
+
 
 /**
  * WhileStatement
@@ -99,9 +100,16 @@ public class WhileStatement extends Statement {
     return null;
   }
 
-  public Node typeCheck(LocalContext c)
+  public Node typeCheck(LocalContext c) throws TypeCheckException
   {
-    // FIXME: implement
+    Type ctype = condExpr.getCheckedType();
+    if( !ctype.equals( c.getTypeSystem().getBoolean())) {
+      throw new TypeCheckException( "Conditional must have boolean type.");
+    }
+    
+    Annotate.addThrows ( this, Annotate.getThrows ( condExpr ));
+    Annotate.addThrows ( this, Annotate.getThrows ( statement ));
+
     return this;
   }
 

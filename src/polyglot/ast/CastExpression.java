@@ -4,9 +4,8 @@
 
 package jltools.ast;
 
-import jltools.types.Type;
-import jltools.util.CodeWriter;
-import jltools.types.LocalContext;
+import jltools.util.*;
+import jltools.types.*;
 
 /**
  * CastExpression
@@ -86,9 +85,14 @@ public class CastExpression extends Expression {
     return null;
   }
 
-  public Node typeCheck( LocalContext c)
+  public Node typeCheck( LocalContext c) throws TypeCheckException
   {
-    // FIXME: implement;
+    if ( ! expr.getCheckedType().isCastValid( type.getType() ) )
+      throw new TypeCheckException("Cannot cast the expression to type \"" + 
+                                   type.getType().getTypeString() + "\"");
+    Annotate.addThrows ( this, Annotate.getThrows( expr ) );
+    setCheckedType( type.getType() );
+
     return this;
   }
 

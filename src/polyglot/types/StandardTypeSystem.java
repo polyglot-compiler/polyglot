@@ -799,7 +799,7 @@ public class StandardTypeSystem extends TypeSystem {
     
     for ( ; iArgumentTypesProto.hasNext() ; )
     {
-      if ( !isCastValid (  (Type)iArgumentTypesCall.next(),  (Type)iArgumentTypesProto.next() ) )
+      if ( !isImplicitCastValid (  (Type)iArgumentTypesCall.next(),  (Type)iArgumentTypesProto.next() ) )
         return false;
     }
     
