@@ -24,7 +24,7 @@ Jul 30, 2004: Polyglot 1.3.0
     Language extensions can now compile files with different file
     extensions, e.g., ".jl" and ".java".
 
-    Rewrote the lexer in order to avoid licensing problems.
+    Rewrote the Java lexer to avoid licensing problems.
 
 
 Apr 9, 2004: Polyglot 1.2.0
