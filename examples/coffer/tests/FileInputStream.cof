@@ -1,0 +1,7 @@
+import java.io.IOException;
+
+public tracked class FileInputStream {
+    public FileInputStream(String name) [+F] throws IOException { }
+    public native int read() [F] throws IOException[F];
+    public native void close() [-F] throws IOException[F];
+}
