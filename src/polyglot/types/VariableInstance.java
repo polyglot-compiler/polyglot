@@ -43,6 +43,33 @@ public abstract class VariableInstance extends AnnotatedObject
     return oValue;
   }
 
+  public boolean equals(Object other)
+  {
+    if (other == null || !(other instanceof VariableInstance))
+      return false;
+    VariableInstance vi = (VariableInstance)other;
+    
+    if (vi.getName() == null && getName() != null)
+      return false;
+    else if (!vi.getName().equals(getName()))
+      return false;
+
+    if (vi.getType() == null && getType() != null)
+      return false;
+    else if (!vi.getType().equals(getType()))
+      return false;
+    
+    if (vi.isConstant() && isConstant())
+      return vi.getConstantValue().equals(getConstantValue());
+
+    return true;
+  }
+
+  public int hashCode() {
+    return getName().hashCode() ^ getType().hashCode();
+  }
+      
+
   private String name;
   private Type type;
   private AccessFlags flags;

@@ -31,5 +31,14 @@ public class FieldInstance extends VariableInstance
 
   public ReferenceType getEnclosingType() { return enclosingType; }
 
+  public boolean equals(Object o) {
+    return super.equals(o) &&
+      ((FieldInstance)o).getEnclosingType().equals(getEnclosingType());
+  }
+
+  public int hashCode() {
+    return super.hashCode() ^ getEnclosingType().hashCode();
+  }
+
   private ReferenceType enclosingType;
 }
