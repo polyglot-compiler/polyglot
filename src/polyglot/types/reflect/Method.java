@@ -87,7 +87,7 @@ class Method
     if (exceptions != null) {
         for (int i = 0; i < exceptions.exceptions.length; i++) {
             String s = clazz.classNameCP(exceptions.exceptions[i]);
-            excTypes.add(clazz.typeForName(ts, s));
+            excTypes.add(clazz.quietTypeForName(ts, s));
         }
     }
 
