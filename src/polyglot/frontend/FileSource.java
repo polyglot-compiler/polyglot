@@ -2,7 +2,8 @@ package polyglot.frontend;
 
 import java.io.*;
 import java.util.*;
-import polyglot.util.*;
+
+import polyglot.util.InternalCompilerError;
 
 /** A <code>Source</code> represents a source file. */
 public class FileSource extends Source
@@ -13,14 +14,28 @@ public class FileSource extends Source
     public FileSource(String name) throws IOException {
         super(name);
 
-	this.file = new File(name);
+        this.file = new File(name);
 
-	if (! file.exists()) {
-	    throw new FileNotFoundException(name);
-	}
+        if (! file.exists()) {
+            throw new FileNotFoundException(name);
+        }
 
         path = file.getPath();
-	lastModified = new Date(file.lastModified());
+        lastModified = new Date(file.lastModified());
+    }
+
+    public FileSource(File file) {
+        super(file.getPath());
+
+        this.file = file;
+    
+        if (! file.exists()) {
+            throw new InternalCompilerError("FileSource given a " + 
+                        "non-existent file");
+        }
+
+        path = file.getPath();
+        lastModified = new Date(file.lastModified());
     }
 
     public boolean equals(Object o) {

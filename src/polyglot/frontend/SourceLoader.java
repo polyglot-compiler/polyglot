@@ -35,13 +35,21 @@ public class SourceLoader
 	return new FileSource(fileName);
     }
 
+    /**
+     * The current user directory. We make it static so we don't need ot
+     * keep on making copies of it. 
+     */
+    static File current_dir = null;
+    
     /** Load the source file for the given class name using the source path. */
-    public FileSource classSource(String className) throws IOException {
+    public FileSource classSource(String className) {
 	/* Search the source path. */
         String fileName = className.replace('.', File.separatorChar) +
                                         "." + sourceExt.fileExtension();
 
-	File current_dir = new File(System.getProperty("user.dir"));
+	if (current_dir == null) {
+            current_dir = new File(System.getProperty("user.dir"));
+        }
 
 	for (Iterator i = sourcePath.iterator(); i.hasNext(); ) {
 	    File directory = (File) i.next();
@@ -59,10 +67,10 @@ public class SourceLoader
 		if (Report.should_report(Report.frontend, 2))
 		    Report.report(2, "Loading " + className + " from " + sourceFile);
 
-		return new FileSource(sourceFile.getPath());
+		return new FileSource(sourceFile);
 	    }
 	}
 
-	throw new FileNotFoundException(fileName);
+	return null;
     }
 }

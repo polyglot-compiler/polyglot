@@ -1,7 +1,5 @@
 package polyglot.types;
 
-import java.io.IOException;
-
 import polyglot.frontend.Compiler;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.FileSource;
@@ -124,15 +122,12 @@ public class SourceClassResolver extends LoadedClassResolver
     }
 
     // Now, try and find the source file.
-    try {
-      source = ext.sourceLoader().classSource(name);
-      if (Report.should_report(report_topics, 4))
-	Report.report(4, "Class " + name + " found in source " + source);
-    }
-    catch (IOException e) {
-      if (Report.should_report(report_topics, 4))
-	Report.report(4, "Class " + name + " not found in source file");
-      source = null;
+    source = ext.sourceLoader().classSource(name);
+    if (Report.should_report(report_topics, 4)) {
+        if (source == null) 
+            Report.report(4, "Class " + name + " not found in source file");
+        else
+            Report.report(4, "Class " + name + " found in source " + source);
     }
 
     // Don't use the raw class if the source or encoded class is available.
