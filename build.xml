@@ -452,7 +452,13 @@ ext=''
     </copy>
   </target>
 
-  <target name="param-dist" depends="jl-dist,param">
+  <target name="param-jar" depends="param">
+    <jar jarfile="${lib}/param.jar" basedir="${classes}" includes="polyglot/ext/param/**"/>
+  </target>
+
+  <target name="param-dist" depends="jl-dist,param-jar">
+    <copy todir="${dist}/lib" file="${lib}/param.jar"/>
+
     <copy todir="${dist}/src/polyglot/ext/param">
       <fileset dir="${src}/polyglot/ext/param"
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
