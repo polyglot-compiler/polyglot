@@ -213,7 +213,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
     }
 
     protected boolean defaultConstructorNeeded() {
-        if (flags().isAbstract() || flags().isInterface()) {
+        if (flags().isInterface()) {
             return false;
         }
         return type().constructors().isEmpty();
