@@ -89,8 +89,9 @@ public class Translator extends AbstractPass
 		first = (TopLevelDecl) exports.get(0);
 	    	of = tf.outputFile(pkg, first.name());
 	    }
-
-	    outputFiles.add(of.getPath());
+            
+            String opfPath = of.getPath();
+            if (!opfPath.endsWith("$")) outputFiles.add(of.getPath());
 	    ofw = tf.outputWriter(of);
 	    w = new CodeWriter(ofw, outputWidth);
 
