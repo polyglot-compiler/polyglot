@@ -8,9 +8,7 @@ import java.util.List;
  * <code>new</code> operator to create a new instance of a class.  In
  * addition to the type of the class being created, a <code>New</code> has a
  * list of arguments to be passed to the constructor of the object and an
- * optional <code>ClassBody</code> used to support anonymous classes. Such an
- * expression may also be proceeded by an qualifier expression which specifies
- * the context in which the object is being created.
+ * optional <code>ClassBody</code> used to support anonymous classes.
  */
 public interface New extends Expr 
 {

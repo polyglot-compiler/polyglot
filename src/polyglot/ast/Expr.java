@@ -19,5 +19,6 @@ public interface Expr extends Receiver {
      */
     Expr type(Type type);
 
+    /** Get the precedence of the expression. */
     Precedence precedence();
 }

@@ -1,7 +1,7 @@
 package jltools.ast;
 
 /**
- * An integer literal: chars or ints.
+ * An integer literal: longs, ints, shorts, bytes, and chars.
  */
 public interface NumLit extends Lit
 {

@@ -4,6 +4,10 @@ import java.util.List;
 import jltools.types.Flags;
 import jltools.types.ParsedClassType;
 
+/**
+ * A <code>ClassDecl</code> represents a top-level, member, or local class
+ * declaration.
+ */
 public interface ClassDecl extends Node, TopLevelDecl, ClassMember
 {
     ParsedClassType type();

@@ -5,7 +5,8 @@ import jltools.types.Flags;
 import java.util.List;
 
 /**
- * A method declaration.
+ * A procedure declaration.  A procedure is the supertype of methods and
+ * constructors.
  */
 public interface ProcedureDecl extends ClassMember 
 {

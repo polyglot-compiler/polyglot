@@ -5,5 +5,6 @@ package jltools.ast;
  */
 public interface Lit extends Expr
 {
+    /** Get the value of the literal, as an object. */
     Object objValue();
 }

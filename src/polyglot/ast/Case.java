@@ -1,18 +1,26 @@
 package jltools.ast;
 
 /**
- * A <code>Switch</code> is an immutable representation of a Java
- * <code>switch</code> statement.  Such a statement has an expression which
- * is evaluated to determine where to branch to, an a list of labels
- * and block statements which are conditionally evaluated.  One of the
- * labels, rather than having a constant expression, may be labeled
- * default.
+ * A <code>Case</code> is a representation of a Java <code>case</code>
+ * statement.  It can only be contained in a <code>Switch</code>.
  */
 public interface Case extends SwitchElement
 {
+    /**
+     * Get the case label.  This must should a constant expression.
+     * The case label is null for the <code>default</code> case.
+     */
     Expr expr();
+
+    /** Set the case label.  This must should a constant expression, or null. */
     Case expr(Expr expr);
 
+    /** Returns true iff this is the default case. */
     boolean isDefault();
+
+    /**
+     * Returns the value of the case label.  This value is only valid
+     * after type-checking.
+     */
     long value();
 }

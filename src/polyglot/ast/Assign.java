@@ -3,7 +3,7 @@ package jltools.ast;
 import jltools.util.Enum;
 
 /**
- * A <code>Assign</code> represents a Java assignment expression.
+ * An <code>Assign</code> represents a Java assignment expression.
  */
 public interface Assign extends Expr 
 {

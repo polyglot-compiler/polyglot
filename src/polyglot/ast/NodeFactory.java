@@ -7,6 +7,11 @@ import jltools.types.Package;
 import jltools.util.Position;
 import java.util.List;
 
+/**
+ * A <code>NodeFactory</code> constructs AST nodes.  All node construction
+ * should go through this factory or by done with the <code>copy()</code>
+ * method of <code>Node</code>.
+ */
 public interface NodeFactory
 {
     AmbExpr AmbExpr(Position pos, String name);

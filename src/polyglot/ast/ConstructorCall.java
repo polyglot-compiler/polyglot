@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * A <code>ConstructorCall</code> is an immutable representation of
  * a direct call to a constructor of a class in the form of
- * <code>super(...)</code>    or <code>this(...)</code>.
+ * <code>super(...)</code> or <code>this(...)</code>.
  */
 public interface ConstructorCall extends Stmt
 {

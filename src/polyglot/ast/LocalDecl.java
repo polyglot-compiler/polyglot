@@ -6,7 +6,7 @@ import jltools.types.LocalInstance;
 import jltools.types.SemanticException;
 
 /** 
- * A variable declaration statement: a type, a name and an optional
+ * A local variable declaration statement: a type, a name and an optional
  * initializer.
  */
 public interface LocalDecl extends ForInit

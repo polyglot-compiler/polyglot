@@ -1,8 +1,8 @@
 package jltools.ast;
 
 /**
- * A <code>Conditional</code> represents a Java ternary expression as
- * an immutable triple of expressions.
+ * A <code>Conditional</code> is a representation of a Java ternary
+ * expression <code>(cond ? consequent : alternative)</code>.
  */
 public interface Conditional extends Expr 
 {
