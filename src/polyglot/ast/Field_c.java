@@ -197,30 +197,49 @@ public class Field_c extends Expr_c implements Field
 
   public void visitAssignCFG(Assign assign, CFGBuilder v) {
       if (target instanceof Expr) {
-          Expr t = (Expr) target;
+          Expr o = (Expr) target;
 
           if (assign.operator() != Assign.ASSIGN) {
-              // o.f OP= e: visit o -> o.f -> e -> o.f -> (o.f OP= e)
-              v.visitCFG(t, this);
+              // o.f OP= e: visit o -> o.f -> e -> (o.f OP= e)
+              v.visitCFG(o, this);
               v.edge(this, assign.right().entry());
+              v.visitCFG(assign.right(), assign);
           }
           else {
-              // o.f = e: visit o -> e -> o.f -> (o.f OP= e)
-              v.visitCFG(t, assign.right().entry());
+              // ###@@@ ideally this needs to visit the nodes in the following order
+              //     o.f = e: visit o -> e -> (o.f = e)
+              // but there are problems with this. No node would then throw
+              // the NullPointerException.
+              // The correct fix is to subclass the assignment node. Meantime, 
+              // we'll visit the nodes like this:
+              //     o.f = e: visit o -> e -> o.f -> (o.f = e)
+
+              // o.f = e: visit o -> e -> o.f -> (o.f = e)
+              v.visitCFG(o, assign.right().entry());
+              v.visitCFG(assign.right(), this);
+              v.edge(this, assign);
           }
       }
       else {
           if (assign.operator() != Assign.ASSIGN) {
-              // T.f OP= e: visit T.f -> e -> T.f -> (T.f OP= e)
+              // T.f OP= e: visit T.f -> e -> (T.f OP= e)
               v.edge(this, assign.right().entry());
+              v.visitCFG(assign.right(), assign);
           }
           else {
-              // T.f = e: visit e -> T.f -> (T.f OP= e)
+              // ###@@@ ideally this needs to visit the nodes in the following order
+              //       T.f = e: visit e -> (T.f OP= e)
+              // but there are problems with this. No node would then throw
+              // the NullPointerException.
+              // The correct fix is to subclass the assignment node. Meantime, 
+              // we'll visit the nodes like this:
+              //       T.f = e: visit e -> T.f -> (T.f OP= e)
+
+              v.visitCFG(assign.right(), this);
+              v.edge(this, assign);
           }
       }
 
-      v.visitCFG(assign.right(), this);
-      v.visitCFG(this, assign);
   }
 
   public String toString() {
