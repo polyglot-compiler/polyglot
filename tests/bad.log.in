@@ -78,7 +78,7 @@ BadFinalInit6.jl:5: field "i" might already have been assigned to
 	^
 
 1 error.
-BadFinalInit7.jl:8: cannot assign a value to final variable "i"
+BadFinalInit7.jl:8: Cannot assign a value to final field "i"
 	i = 4; // bad: assignment to final field outside of constructor
 	^
 
@@ -98,20 +98,20 @@ BadFinalInit10.jl:4: field "i" might already have been assigned to
 	^
 
 1 error.
-BadFinalInit11.java:6: variable i might already have been assigned to
-        this.i = 2;
-        ^
-1 error
-BadFinalInit12.jl:5: cannot assign a value to final variable "x"
+BadFinalInit11.jl:5: field "i" might already have been assigned to
+	i = 2; // Bad
+	^
+
+1 error.
+BadFinalInit12.jl:5: Cannot assign a value to final field "x"
 	a.x = 0; // bad, even though a is a synonym for this, only acceptable target is this.
 	^
 
 1 error.
-BadFinalInit13.jl:1: field "x" might not have been initialized
-class BadFinalInit13 {
-^
-
-1 error.
+BadFinalInit13.java:4: cannot assign a value to final variable x
+    static { BadFinalInit13.x = 4; }
+                           ^
+1 error
 BadInit.jl:4: Method no_such_fn not found.
     int a = no_such_fn();
             ^
@@ -126,14 +126,16 @@ BadInner2.jl:8: Cannot specify a containing instance for static classes.
              ^
 
 2 errors.
-BadInner3.jl:6: Qualifier type "BadInner3" is not an enclosing class of "E.D".
+BadInner3.jl:6: The nested class "E.D" does not have an enclosing instance of
+    type "BadInner3".
     BadInner3 m() { return BadInner3.this; }
                            ^
 
 1 error.
-BadInner4.jl:7: Class "ChildOfInner" is not a member of "Super".
+BadInner4.jl:7: The type of the qualifier "Super" does not match the
+    immediately enclosing class of the super class "Outer".
   	ChildOfInner(){(new Super()).super();}
-  	                             ^
+  	                ^
 
 1 error.
 BadInner5.jl:3: Class "C0" not found in scope of C0
@@ -141,7 +143,8 @@ BadInner5.jl:3: Class "C0" not found in scope of C0
                 ^
 
 1 error.
-BadInner6.jl:12: Qualifier type "C2.I0" is not an enclosing class of "C2".
+BadInner6.jl:12: The nested class "C2" does not have an enclosing instance of
+    type "C2.I0".
     return I0.this;
            ^
 
@@ -167,6 +170,17 @@ BadInterface.jl:17: Interface methods must be public.
                         ^
 
 1 error.
+BadMultipleVarDef.jl:7: Local variable "s" multiply defined. Previous
+    definition at BadMultipleVarDef.jl:6,17.
+		String s = "Hi, Mom";
+		                   ^
+
+BadMultipleVarDef.jl:9: Local variable "s" multiply defined. Previous
+    definition at BadMultipleVarDef.jl:7,2.
+			String s = "Hi, Dad";
+			                   ^
+
+2 errors.
 BadOverride.jl:9: method() in Sub cannot override method() in Override;
     attempting to assign weaker access privileges
   void method() {} 
@@ -187,6 +201,11 @@ BadStaticContext.java:8: cannot reference this before supertype constructor has 
         Y() { super(this.m()); }
                     ^
 1 error
+StaticContext2.jl:10: Inner classes cannot declare static methods.
+    static Object f() {
+                  ^
+
+1 error.
 BadSwitch1.jl:8: Case label must be a constant.
       case x: System.out.println("x");
       ^
@@ -195,6 +214,11 @@ BadSwitch1.jl:8: Case label must be a constant.
 BadSwitch2.jl:8: Duplicate case label: BadSwitch2.x (0).
       case x: System.out.println("x"); // duplicate label
       ^
+
+1 error.
+CircularConstructor.jl:17: Recursive constructor invocation.
+	this("s");
+	^
 
 1 error.
 Errors2.jl:2: Could not find type "foo".
