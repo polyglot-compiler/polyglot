@@ -81,4 +81,15 @@ public class ContextVisitor extends ErrorHandlingVisitor
     public NodeVisitor superEnter(Node parent, Node n) {
         return super.enter(parent, n);
     }
+
+    public Node leave(Node old, Node n, NodeVisitor v) {
+        Node m = super.leave(old, n, v);
+
+        // FIXME: hack to allow locals added to the context by enterScope to
+        // propagate outward.  We need this until we have true "let"-style
+        // local decls.  This, of course, makes this visitor imperative.
+        this.context = this.updateScope(m);
+
+        return m;
+    }
 }
