@@ -84,7 +84,7 @@ public abstract class SemanticVisitor extends HaltingVisitor
 	n.enterScope(context);
     }
 
-    protected void leaveScope(Node n) {
+    protected void leaveScope(Node n, Node old) {
 	n.leaveScope(context);
     }
 
@@ -168,7 +168,7 @@ public abstract class SemanticVisitor extends HaltingVisitor
 	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
 		                 e.getMessage(), position);
 
-            leaveScope(n);
+            leaveScope(n, n);
 
             Types.report(5, "enter(" + n + "): error at " + depth);
 
@@ -209,7 +209,7 @@ public abstract class SemanticVisitor extends HaltingVisitor
 
             // don't visit the node
             Types.report(5, "leave(" + m + "): " + depth + "->" + (depth-1));
-            leaveScope(m);
+            leaveScope(m, n);
             depth--;
             return m;
 	}
@@ -233,7 +233,7 @@ public abstract class SemanticVisitor extends HaltingVisitor
 
             // don't visit the node
             Types.report(5, "leave(" + n + "): " + depth + "->" + (depth-1));
-            leaveScope(n);
+            leaveScope(n, n);
             depth--;
             return n;
         }
