@@ -266,6 +266,13 @@ public class Compiler implements TargetTable, ClassCleaner
     return okay;
   }
 
+  protected boolean bringAllToStage(int stage) throws IOException {
+      boolean okay = true; 
+      for (int i = 0; i < workList.size(); i++) {
+	  okay &= compile( (Job) workList.get(i), stage);
+      }
+      return okay;
+  }
 
   /* Protected methods. */
   protected boolean compile( Target t, int goal) throws IOException
@@ -322,6 +329,11 @@ public class Compiler implements TargetTable, ClassCleaner
 
       if( goal == Job.PARSED) { return true; }
 
+      if( extInfo.compileAllToStage(Job.PARSED) ) {
+	  boolean okay = bringAllToStage(Job.PARSED);
+	  if (! okay) return false;
+      }
+
       /* READ. */
       if (! job.isRead()) {
         acquireJob( job);
@@ -336,6 +348,12 @@ public class Compiler implements TargetTable, ClassCleaner
       }
 
       if( goal == Job.READ) { return true; }
+
+      if( extInfo.compileAllToStage(Job.READ) ) {
+	  boolean okay = bringAllToStage(Job.READ);
+	  if (! okay) return false;
+      }
+
 
       /* CLEAN. */
       if (! job.isCleaned()) {
@@ -352,6 +370,16 @@ public class Compiler implements TargetTable, ClassCleaner
 
       if( goal == Job.CLEANED) { return true; }
 
+      if( extInfo.compileAllToStage(Job.CLEANED) ) {
+	  boolean okay = bringAllToStage(Job.CLEANED);
+	  if (! okay) return false;
+      }
+
+      // Okay. Before we can type check, we need to make sure that everyone
+      // else in the worklist is at least CLEANED.  Note that the worklist
+      // can grow while compiling a member of the worklist, so we cannot use
+      // an iterator.
+
       /* DISAMBIGUATE. */
       if (! job.isDisambiguated()) {
         acquireJob( job);
@@ -367,18 +395,11 @@ public class Compiler implements TargetTable, ClassCleaner
 
       if( goal == Job.DISAMBIGUATED) { return true; } 
 
-      // Okay. Before we can type check, we need to make sure that everyone
-      // else in the worklist is at least CLEANED.  Note that the worklist
-      // can grow while compiling a member of the worklist, so we cannot use
-      // an iterator.
-      boolean okay = true; 
-      for (int i = 0; i < workList.size(); i++) {
-        okay &= compile( (Job) workList.get(i), Job.CLEANED);
+      if( extInfo.compileAllToStage(Job.DISAMBIGUATED) ) {
+	  boolean okay = bringAllToStage(Job.DISAMBIGUATED);
+	  if (! okay) return false;
       }
-      if( !okay) {
-        return false;
-      }
-     
+
       /* CHECK. */
       if (! job.isChecked()) {
         acquireJob( job);
@@ -393,6 +414,11 @@ public class Compiler implements TargetTable, ClassCleaner
       }
 
       if( goal == Job.CHECKED) { return true; }
+
+      if( extInfo.compileAllToStage(Job.CHECKED) ) {
+	  boolean okay = bringAllToStage(Job.CHECKED);
+	  if (! okay) return false;
+      }
 
       /* TRANSLATE. */
       if (! job.isTranslated()) {

@@ -237,8 +237,8 @@ public class Main
         }
       }
     }
-  }    public static File getOutputDirectory() {
-      return (File)options.get( MAIN_OPT_OUTPUT_DIRECTORY);  }
+  }    public static File getOutputDirectory() {
+      return (File)options.get( MAIN_OPT_OUTPUT_DIRECTORY);  }
 
 
   private static void setHasErrors( boolean b)

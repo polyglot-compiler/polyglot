@@ -10,5 +10,13 @@ public interface ExtensionInfo {
     TypeSystem getTypeSystem();
     ExtensionFactory getExtensionFactory();
     List getNodeVisitors(SourceJob job, int stage);
+
+    // This method returns true if all source files should be compiled to 
+    // stage before any further progress is made.
+    // The standard is to wait for all classes to be cleaned before 
+    // typechecking, but the Split extension needs to have all typechecked
+    // before translating.
+    boolean compileAllToStage(int stage);
+
     java_cup.runtime.lr_parser getParser(Reader reader, ErrorQueue eq);
 }

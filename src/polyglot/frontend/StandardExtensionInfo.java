@@ -84,6 +84,16 @@ public class StandardExtensionInfo implements ExtensionInfo {
 	return l;
     }
 
+    // Standard Typechecking requires all files to be in the CLEANED state
+    // so we force them to be cleaned before proceeding.
+    public boolean compileAllToStage(int stage) {
+	if( stage == Job.CLEANED ) {
+	    return true;
+	} else {
+	    return false;
+	}
+    }
+
     public java_cup.runtime.lr_parser getParser(Reader reader, ErrorQueue eq)
     {
 	jltools.lex.Lexer lexer = new jltools.lex.Lexer(reader, eq);
