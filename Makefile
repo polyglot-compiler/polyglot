@@ -60,6 +60,6 @@ clean:
 	rm -f jltools/lex/*.class
 
 # delete class files as well as the grammar files, so that we can regenerate them
-superclean: clean
+clobber superclean: clean
 	rm -f jltools/parse/Grm.java
 	rm -f jltools/parse/sym.java
