@@ -51,7 +51,6 @@ include jltools/visit/Makefile
 include jltools/ext/op/Makefile
 include jltools/frontend/Makefile
 include jltools/main/Makefile
-include jltools/runtime/Makefile
 
 #other targets:
 util: $(UTIL_TARGET) 
@@ -86,16 +85,6 @@ clean:
 	rm -f jltools/frontend/*.class
 	rm -f jltools/main/*.class
 	rm -f jltools/runtime/*.class
-	rm -f jltools/util/*.html
-	rm -f jltools/lex/*.html
-	rm -f jltools/parse/*.html
-	rm -f jltools/ast/*.html
-	rm -f jltools/types/*.html
-	rm -f jltools/visit/*.html
-	rm -f jltools/ext/op/*.html
-	rm -f jltools/frontend/*.html
-	rm -f jltools/main/*.html
-	rm -f jltools/runtime/*.html
 
 
 # Delete class files as well as the grammar files, so that we can regenerate 
