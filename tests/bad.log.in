@@ -1,0 +1,215 @@
+Errors.jl:5: No valid method call found for m(int) in Errors.
+    return m(4) + (((null - 1) - 1) - (null - 1));
+           ^
+
+Errors.jl:5: The - operator must have numeric operands.
+    return m(4) + (((null - 1) - 1) - (null - 1));
+                     ^
+
+Errors.jl:5: The - operator must have numeric operands.
+    return m(4) + (((null - 1) - 1) - (null - 1));
+                                       ^
+
+3 errors.
+Errors2.jl:2: Could not find type "foo".
+  void m(foo x) {
+         ^
+
+1 error.
+Except3.jl:3: Method "m" throws the undeclared exception
+    "java.lang.Exception".
+  Object m(Except3 a) {
+         ^
+
+1 error.
+Except4.jl:2: Type "Except4" is not a subclass of "java.lang.Throwable".
+  void m() throws Except4 { }
+                  ^
+
+1 error.
+/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoInit.java:9: variable i might not have been initialized
+            this.foo(i);
+                     ^
+/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoInit.java:20: variable i might not have been initialized
+            this.foo(i);
+                     ^
+/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoInit.java:29: unreachable statement
+                    i = 3;
+                    ^
+/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoInit.java:31: variable i might not have been initialized
+            this.foo(i);
+                     ^
+/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoInit.java:61: variable j might not have been initialized
+            this.foo(j);
+                     ^
+/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoInit.java:77: variable i might not have been initialized
+            this.foo(i);
+                     ^
+6 errors
+/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoReturns.java:4: missing return statement
+    int m1() {  }
+             ^
+/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoReturns.java:8: missing return statement
+    int m3() { while (true) { if (true) { break; } } }
+             ^
+/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoReturns.java:10: missing return statement
+    int m4() { l1: while (true) { l2: while (true) { break l1; } } }
+             ^
+/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoReturns.java:25: missing return statement
+        {
+        ^
+/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/NoReturns.java:36: missing return statement
+        {
+        ^
+5 errors
+Unreachable.jl:52: Syntax error.
+      System.out.println("ouch!"); // BAD (52)
+      ^
+
+jlc: Couldn't repair and continue parse
+jlc: Unable to recover from previous errors.
+jlc: Couldn't repair and continue parse
+4 errors.
+BadAbstract.jl:1: Class "C0" should be declared abstract; it does not
+    implement method C0 m0().
+class C0
+^
+
+1 error.
+BadAlloc.jl:5: Cannot instantiate an interface.
+    public static final I0 f0 = new I0 ();
+                                ^
+
+1 error.
+BadCtor.jl:2: Constructor name "B" does not match name of containing class
+    "C".
+  B() { }
+  ^
+
+BadCtor.jl:3: Cannot declare a constructor inside an anonymous class.
+  C m() { return new C() { C() { } }; }
+                           ^
+
+2 errors.
+BadExcept.jl:11: Cannot override method void method1() in
+    polyj.tests.bad.semant.Except1 with method void method1() throws
+    polyj.tests.bad.semant.e1 in polyj.tests.bad.semant.Except1sub; throws
+    more exceptions than overridden method.
+  void method1() throws e1 {}
+       ^
+
+1 error.
+BadExcept2.jl:10: Could not find type "MisspelledException".
+    } catch (MisspelledException e) {}
+             ^
+
+1 error.
+BadExpCC.jl:8: Syntax error.
+    super();
+         ^
+
+jlc: Couldn't repair and continue parse
+jlc: Unable to recover from previous errors.
+jlc: Couldn't repair and continue parse
+4 errors.
+BadExtends.jl:3: Cannot extend final class "C0".
+  public class C1 extends C0
+         ^
+
+1 error.
+BadInit.jl:4: Method no_such_fn not found.
+    int a = no_such_fn();
+            ^
+
+BadInit.jl:7: Method no_such_fn not found.
+    c = no_such_fn();
+        ^
+
+2 errors.
+BadInner.jl:8: Could not find non-static member class "Inner".
+	  Object o = new Outer.Inner();
+	             ^
+
+1 error.
+BadInner2.jl:7: Cannot specify a containing instance for static classes.
+  Object o = this.new Foo();
+             ^
+
+BadInner2.jl:8: Cannot specify a containing instance for static classes.
+  Object p = this.new Bar();
+             ^
+
+2 errors.
+BadInner3.jl:6: Qualifier type "BadInner3" is not an enclosing class.
+    BadInner3 m() { return BadInner3.this; }
+                           ^
+
+1 error.
+BadInner4.jl:7: Class "ChildOfInner" is not a member of "Super".
+  	ChildOfInner(){(new Super()).super();}
+  	                             ^
+
+1 error.
+BadInner5.jl:3: Member class "C0" not found in type "C0".
+  public static C0.C0 m0 ()
+                ^
+
+1 error.
+BadInner6.jl:12: Qualifier type "C2.I0" is not an enclosing class.
+    return I0.this;
+           ^
+
+1 error.
+BadInner7.jl:2: Cannot declare member class "BadInner7.BadInner7" inside class
+    with the same name.
+  class BadInner7 { }
+  ^
+
+1 error.
+BadInterface.jl:17: Interface methods must be public.
+    private abstract C1 m0 ();
+                        ^
+
+1 error.
+BadInterface2.jl:1: Could not find type "I0".
+class C0 implements I0
+                    ^
+
+1 error.
+/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/polyj/tests/bad/semant/BadOverride.java:91: method() in polyj.tests.bad.semant.Sub cannot implement method() in polyj.tests.bad.semant.Override; attempting to assign weaker access privileges; was public
+class Sub implements Override {
+^
+1 error
+BadPrim.jl:6: No valid method call found for m(int) in BadPrim.
+    m(1);
+    ^
+
+1 error.
+BadProt.jl:6: Interface methods must be public.
+  protected abstract I0 m0 ();
+                        ^
+
+1 error.
+Protection.jl:5: Cannot declare method which is both abstract and static.
+  static abstract void sa();
+                       ^
+
+Protection.jl:6: Cannot declare method which is both abstract and final.
+  final abstract void fa();
+                      ^
+
+Protection.jl:8: Cannot declare method which is both abstract and native.
+  native abstract void na();
+                       ^
+
+3 errors.
+Protection2.jl:6: Cannot override method final void f() in Protection2 with
+    method void f() in p2; overridden method is final.
+  void f() {}
+       ^
+
+1 error.
+/home/nystrom/jl/j.cvs/jltools/jltools/ext/jl/tests/BadStaticContext.java:10: cannot reference this before supertype constructor has been called
+            { super(this.m()); }
+                    ^
+1 error
