@@ -307,13 +307,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
      * 
      */
     protected void enforceInvariants(Job job, Pass pass) {
-        SourceJob srcJob = null;
-        if (job instanceof SourceJob) {
-            srcJob = (SourceJob)job;
-        }
-        else if (job instanceof InnerJob && ((InnerJob)job).outer instanceof SourceJob) {
-            srcJob = (SourceJob)((InnerJob)job).outer;
-        }
+        SourceJob srcJob = job.sourceJob();
         if (srcJob == null) {
             return;
         }
