@@ -7,7 +7,7 @@ Programming Languages (POPL), January 1999, pp. 228-241, by Andrew
 C. Myers.
 
 Please see the file README for information about the restrictions on
-redistributing this software. See jltools/ext/jif/AUTHORS for information
+redistributing this software. See src/jltools/ext/jif/AUTHORS for information
 on authorship for this software.
 
 To run Jif:
@@ -25,6 +25,7 @@ where [options] includes:
  -ox <ext>               set output extension
  -dump                   dump the ast
  -noserial               disable class serialization
+ -nooutput               delete output java files after compilation
  -ext <extension>        use language extension
  -c                      compile only to .java
  -post <compiler>        run javac-like compiler after translation

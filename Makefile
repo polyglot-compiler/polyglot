@@ -119,6 +119,7 @@ release: jar release_clean release_doc release_src
 	$(subdirs)
 	mkdir -p $(REL_LIB)
 	cp $(REL_LIBS) $(REL_LIB)
+	chmod a+x $(RELPATH)/configure
 	rm jltools.jar jif.jar
 	
 #cd $(RELPATH); zip -r jltools .

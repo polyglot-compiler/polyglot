@@ -32,13 +32,8 @@ REL_LIB			= $(RELPATH)/lib
 
 REL_SOURCES		= $(SOURCES)
 
-ifeq (x$(DIR),x)
-REL_SRC = $(RELPATH)/src/$(PACKAGE)
-REL_DEMO = $(RELPATH)/demo/$(PACKAGE)
-else
-REL_SRC = $(RELPATH)/src/$(DIR)
-REL_DEMO = $(RELPATH)/demo/$(DIR)
-endif
+REL_SRC = $(RELPATH)/src/$(DIR)/$(PACKAGE)
+REL_DEMO = $(RELPATH)/demo/$(DEMO_DIR)/$(PACKAGE)
 
 all clean clobber javadoc release:
 

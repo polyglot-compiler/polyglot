@@ -1,6 +1,6 @@
 #!/bin/sh
 
-trap 'rm -f PrintProperty.java PrintProperty.class' EXIT
+trap 'rm -f PrintProperty.java PrintProperty.class' 0
 
 find_in_path() {
     #type "$1" 2>&1 | grep -v 'not found' | sed 's/.* is //' | awk '{print $0}'
