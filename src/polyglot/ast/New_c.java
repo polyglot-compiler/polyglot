@@ -68,6 +68,7 @@ public class New_c extends AbstractNew_c implements New
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	ClassType ct = (ClassType) tn.type();
 
+        /*
         if (ct.isMember()) {
             ClassType currentClass = tc.context().currentClass();
 
@@ -78,6 +79,7 @@ public class New_c extends AbstractNew_c implements New
                 }
             }
         }
+        */
 
 	return typeCheckEpilogue(ct, tc);
     }
