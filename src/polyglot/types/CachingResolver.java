@@ -143,6 +143,14 @@ public class CachingResolver implements TopLevelResolver {
     }
 
     /**
+     * Check if a type object is in the cache, returning null if not.
+     * @param name The name to search for.
+     */
+    public Named check(String name) {
+        return (Named) cache.get(name);
+    }
+
+    /**
      * Install a qualifier in the cache.
      * @param name The name of the qualifier to insert.
      * @param q The qualifier to insert.
