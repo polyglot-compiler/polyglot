@@ -91,4 +91,7 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
                (flags != null ? flags.copy() : null));
   }
 
+  public String toString() {
+    return getEnclosingType()+"."+getTypeString()+argumentTypes()+" throws "+exceptionTypes();
+  }
 }

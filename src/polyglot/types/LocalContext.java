@@ -238,7 +238,15 @@ new SemanticException("Method " + methodName + " not found").printStackTrace(Sys
     ClassScope scope = getClassScope(c);
     scopes.push( scope );
 
-    do {
+    LinkedList typeQueue = new LinkedList();
+    Set visitedTypes = new HashSet();
+    typeQueue.addLast(c);
+
+    while (!typeQueue.isEmpty()) {
+      c = (ClassType)typeQueue.removeFirst();
+      if (visitedTypes.contains(c))
+	continue;
+
 	for (Iterator iter = c.getMethods().iterator(); iter.hasNext(); ) {
 	    MethodTypeInstance mti = (MethodTypeInstance) iter.next();
 	    if (scope.getMethodEnclosingType(mti.getName()) == null) {
@@ -259,11 +267,20 @@ new SemanticException("Method " + methodName + " not found").printStackTrace(Sys
 	      }
 	    }
 	}
+
 	if (scope.getType(c.getShortName()) == null) {
 	  scope.putType(c.getShortName(), c);
 	}
-	c = (ClassType) c.getSuperType();
-    } while (c != null);
+
+	visitedTypes.add(c);
+	if (c.getSuperType() != null)
+	  typeQueue.addLast(c.getSuperType());
+	for (Iterator i = c.getInterfaces().iterator(); i.hasNext(); ) {
+	  Object iface = i.next();
+	  if (iface != null)
+	    typeQueue.addLast(iface);
+	}
+    }
   }
 
   /**

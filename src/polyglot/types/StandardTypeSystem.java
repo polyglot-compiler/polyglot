@@ -7,6 +7,8 @@ package jltools.types;
 import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.HashSet;
 
 import jltools.ast.NodeVisitor;
 import jltools.util.InternalCompilerError;
@@ -626,10 +628,11 @@ public class StandardTypeSystem extends TypeSystem {
     // (if we did, it would be in the 0th index.
     for ( int i = 1 ; i < mtiArray.length; i++)
     {
-      if (msc.compare ( mtiArray[0], mtiArray[i]) == 1)
+      if (msc.compare ( mtiArray[0], mtiArray[i]) > 0)
         throw new SemanticException("Ambiguous method \"" + method.getName() 
                                      + "\". More than one invocations are valid"
-                                     + " from this context.");
+                                     + " from this context:"
+				     + java.util.Arrays.asList(mtiArray));
     }
     
     // ok. mtiArray[0] is maximal most specific, so return it.
@@ -648,8 +651,27 @@ public class StandardTypeSystem extends TypeSystem {
       if ( !( o1 instanceof MethodTypeInstance ) ||
            !( o2 instanceof MethodTypeInstance ))
         throw new ClassCastException();
-      return moreSpecific ( (MethodTypeInstance)o1, (MethodTypeInstance)o2) ?
-        -1 : 1;
+      MethodTypeInstance mti1 = (MethodTypeInstance)o1;
+      MethodTypeInstance mti2 = (MethodTypeInstance)o2;
+
+      if (moreSpecific (mti1, mti2))
+	return -1;
+
+      if (moreSpecific (mti2, mti1))
+	return 1;
+
+      // otherwise equally maximally specific
+
+      // JLS2 15.12.2.2 "two or more maximally specific methods"
+      // if both abstract or not abstract, equally applicable
+      // otherwise the non-abstract is more applicable
+      if (mti1.getAccessFlags().isAbstract() ==
+	  mti2.getAccessFlags().isAbstract())
+	return 0;
+      else if (mti1.getAccessFlags().isAbstract())
+	return 1;
+      else
+	return -1;
     }
   }
 
@@ -670,8 +692,15 @@ public class StandardTypeSystem extends TypeSystem {
 	"getMethodSet called with null reference type");
     }
 
-    do 
+    LinkedList typeQueue = new LinkedList();
+    Set visitedTypes = new HashSet();
+    typeQueue.addLast(type);
+
+    while (!typeQueue.isEmpty())
     {
+      type = (ReferenceType)typeQueue.removeFirst();
+      if (visitedTypes.contains(type))
+	continue;
       // System.out.println("collecting methods of " + type.getTypeString());
       for (Iterator i = type.getMethods().iterator(); i.hasNext() ; )
       {
@@ -684,8 +713,18 @@ public class StandardTypeSystem extends TypeSystem {
 	  }
 	}
       }
+
+      visitedTypes.add(type);
+      if (type.getSuperType() != null)
+	typeQueue.addLast(type.getSuperType());
+      for (Iterator i = type.getInterfaces().iterator(); i.hasNext() ; ) {
+	Object iface = i.next();
+	if (iface != null)
+	  typeQueue.addLast(iface);
+      }
+
     }
-    while ( (type = (ReferenceType)type.getSuperType()) != null);
+
     // System.out.println("done collecting methods");
   }
 
@@ -696,6 +735,9 @@ public class StandardTypeSystem extends TypeSystem {
    * Note: There is a fair amount of guesswork since the JLS does not include any 
    * info regarding java 1.2, so all inner class rules are found empirically
    * using jikes and javac.
+   */
+  /**
+   * Note: java 1.2 rule is described in JLS2 in section 15.12.2.2
    */
   private boolean moreSpecific(MethodTypeInstance mti1, MethodTypeInstance mti2)
   {
@@ -716,7 +758,8 @@ public class StandardTypeSystem extends TypeSystem {
       }
 
       // rule 2:
-      return ( methodCallValid ( mti2, mti1) );
+      return methodCallValid ( mti2, mti1) ;
+
     }
     catch (SemanticException tce)
     {
