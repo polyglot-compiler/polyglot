@@ -13,6 +13,10 @@ import java.util.jar.*;
  */
 public class ClassFileLoader
 {
+    /**
+     * Map from directories to maps from names to ClassFiles
+     * Map[File -> Map[String -> (ClassFile or not_found)]]
+     */
     Map cache;
     
     /**
@@ -29,18 +33,24 @@ public class ClassFileLoader
     }
 
     /**
-     * Load a class from the classpath.
+     * Try to find the class <code>name</code> in the directory or jar or zip 
+     * file <code>dir</code>.
+     * If the class does not exist in the specified file/directory, then 
+     * <code>null</code> is returned.
      */
     public ClassFile loadClass(File dir, String name)
-        throws ClassNotFoundException
     {
         if (Report.should_report(verbose, 2))
 	    Report.report(2, "attempting to load class " + name +
                       " from " + dir);
 
-        String key = dir.toString() + "/" + name;
-
-        Object o = cache.get(key);
+        Map dirMap = (Map)cache.get(dir);
+        if (dirMap == null) {
+            dirMap = new HashMap();
+            cache.put(dir, dirMap);
+        }
+        
+        Object o = dirMap.get(name);
 
         if (o != not_found) {
             ClassFile c = (ClassFile) o;
@@ -59,25 +69,31 @@ public class ClassFileLoader
             if (c != null) {
                 if (Report.should_report(verbose, 2))
 		    Report.report(2, "loaded class " + c.name());
-                cache.put(key, c);
+                dirMap.put(name, c);
                 return c;
             }
 
-            cache.put(key, not_found);
+            dirMap.put(name, not_found);
         }
 
-        throw new ClassNotFoundException(name);
+        return null;
     }
 
-    protected ClassFile findClass(File dir, String name) throws ClassNotFoundException {
-	String fileName = name.replace('.', File.separatorChar) + ".class";
-	String entryName = name.replace('.', '/') + ".class";
-
-        if (Report.should_report(verbose, 3))
-	    Report.report(3, "looking in " + dir + " for " + fileName);
+    /**
+     * Try to find the class <code>name</code> in the directory or jar or zip 
+     * file <code>dir</code>.
+     * If the class does not exist in the specified file/directory, then 
+     * <code>null</code> is returned.
+     */
+    protected ClassFile findClass(File dir, String name) {
+        if (Report.should_report(verbose, 3)) {
+	    Report.report(3, "looking in " + dir + " for " + 
+                             name.replace('.', File.separatorChar) + ".class");
+        }
 
         try {
             if (dir.isDirectory()) {
+                String fileName = name.replace('.', File.separatorChar) + ".class";
                 File file = new File(dir, fileName);
 
                 if (file.exists()) {
@@ -109,6 +125,7 @@ public class ClassFileLoader
                         }
                     }
                     if (jar != null) {
+                        String entryName = name.replace('.', '/') + ".class";
                         JarEntry entry = jar.getJarEntry(entryName);
                         if (entry != null) {
                             if (Report.should_report(verbose, 3))
@@ -141,6 +158,7 @@ public class ClassFileLoader
                         }
                     }
                     if (zip != null) {
+                        String entryName = name.replace('.', '/') + ".class";
                         ZipEntry entry = zip.getEntry(entryName);
                         if (entry != null) {
                             if (Report.should_report(verbose, 3))

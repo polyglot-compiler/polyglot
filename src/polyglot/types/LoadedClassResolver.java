@@ -61,16 +61,18 @@ public class LoadedClassResolver extends ClassResolver
       try {
         ClassFile clazz = loader.loadClass(name);
 
-        if (Report.should_report(report_topics, 4))
-          Report.report(4, "Class " + name + " found in classpath " +
-                        loader.classpath());
-
-        return clazz;
-      }
-      catch (ClassNotFoundException e) {
-        if (Report.should_report(report_topics, 4))
-          Report.report(4, "Class " + name + " not found in classpath " +
-                        loader.classpath());
+        if (clazz == null) {
+            if (Report.should_report(report_topics, 4))
+              Report.report(4, "Class " + name + " not found in classpath " +
+                            loader.classpath());
+        }
+        else {
+            if (Report.should_report(report_topics, 4))
+              Report.report(4, "Class " + name + " found in classpath " +
+                            loader.classpath());
+    
+            return clazz;
+        }
       }
       catch (ClassFormatError e) {
         if (Report.should_report(report_topics, 4))

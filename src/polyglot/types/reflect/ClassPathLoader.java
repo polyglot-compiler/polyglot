@@ -1,12 +1,9 @@
 package polyglot.types.reflect;
 
 import polyglot.main.Report;
-import polyglot.types.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.zip.*;
-import java.util.jar.*;
 
 /**
  * We implement our own class loader.  All this pain is so
@@ -40,9 +37,10 @@ public class ClassPathLoader
     }
 
     /**
-     * Load a class from the classpath.
+     * Load a class from the classpath. If the class is not found, then
+     * <code>null</code> is returned.
      */
-    public ClassFile loadClass(String name) throws ClassNotFoundException {
+    public ClassFile loadClass(String name) {
         if (Report.should_report(verbose, 2)) {
 	    Report.report(2, "attempting to load class " + name);
 	    Report.report(2, "classpath = " + classpath);
@@ -50,15 +48,13 @@ public class ClassPathLoader
 
 	for (Iterator i = classpath.iterator(); i.hasNext(); ) {
 	    File dir = (File) i.next();
-
-            try {
-                return loader.loadClass(dir, name);
-            }
-            catch (ClassNotFoundException e) {
+            ClassFile cf = loader.loadClass(dir, name); 
+            if (cf != null) {
+                return cf;
             }
         }
 
-        throw new ClassNotFoundException(name);
+        return null;
     }
 
     static Collection verbose;
