@@ -34,17 +34,10 @@ public class ClassFile implements LazyClassInitializer {
     static Collection verbose = ClassFileLoader.verbose;
   
     /**
-     * Constructor.  This constructor parses the class file from the input
-     * stream.
+     * Constructor.  This constructor parses the class file from the byte array
      *
-     * @param file
-     *        The file in which the class resides.
-     * @param loader
-     *        The class info loader which loaded the class.
-     * @param in
-     *        The data stream containing the class.
-     * @exception ClassFormatError
-     *        When the class could not be parsed.
+     * @param code
+     *        A byte array containing the class data
      */
     public ClassFile(byte[] code) {
         try {

@@ -1,15 +1,14 @@
 package polyglot.frontend;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.types.reflect.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import polyglot.main.Options;
-import polyglot.main.Report;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 
-import java.io.*;
-import java.util.*;
+import polyglot.main.Options;
+import polyglot.types.reflect.ClassFileLoader;
+import polyglot.util.*;
 
 /**
  * This is the main entry point for the compiler. It contains a work list that
@@ -39,7 +38,7 @@ public class Compiler
     /**
      * Initialize the compiler.
      *
-     * @param options Contains polyglot options
+     * @param extensionInfo the <code>ExtensionInfo</code> this compiler is for.
      */
     public Compiler(ExtensionInfo extensionInfo) {
 	this.extensionInfo = extensionInfo;

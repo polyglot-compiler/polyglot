@@ -553,8 +553,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
      * and <code>end</code> inclusive will be performed immediately on
      * the AST <code>ast</code>.
      * 
+     * @param c the context that the AST occurs in
      * @param ast the AST the new Job is for.
-     * @param context the context that the AST occurs in
      * @param outerJob the <code>Job</code> that spawned this job. 
      * @param begin the first pass to perform for this job.
      * @param end the last pass to perform for this job.
