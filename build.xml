@@ -26,12 +26,21 @@
     <pathelement location="${lib}/jlex.jar"/>
   </path>
 
-  <target name="configure" description="Configure Polyglot">
+  <target name="configure" description="Configure Polyglot"
+          depends="configure-deps" unless="configure.up-to-date">
     <ant antfile="configure.xml" target="configure"/>
   </target>
 
+  <target name="configure-deps">
+    <condition property="configure.up-to-date">
+      <and>
+        <available file="${bin}/jlc"/>
+      </and>
+    </condition>
+  </target> 
+
   <!-- initialize the build -->
-  <target name="init">
+  <target name="init" depends="configure">
     <!-- Create the time stamp -->
     <tstamp/>
     <!-- Create the build directory structure used by compile -->

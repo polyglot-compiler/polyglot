@@ -29,7 +29,6 @@ for further updates.  If you use Polyglot, we'd appreciate your letting us
 know.  Send your comments and bug reports to Nate Nystrom at
 nystrom@cs.cornell.edu.
 
-
 Requirements
 ------------
 
@@ -48,8 +47,9 @@ downloadable from:
 LEGAL NOTE: Polyglot is distributed under LGPL, but JFlex is distributed under
 GPL.  This means that we cannot include JFlex in the Polyglot distribution.
 The output of JFlex inherits the license of the specification (i.e., LGPL in
-Polyglot's case).  You may be able to substitute JLex
-(http://www.cs.princeton.edu/~appel/modern/java/JLex/), but this is untested.
+Polyglot's case), so using JFlex is not a problem.  You may be able to
+substitute JLex (http://www.cs.princeton.edu/~appel/modern/java/JLex/), but
+this is untested.
 
 Creating an extension
 ---------------------
@@ -69,13 +69,7 @@ README is in).  We'll call this directory $POLYGLOT from now on.
 
     $ cd $POLYGLOT
 
-3. Configure the compiler.
-
-    $ ant configure
-
-This generates the shell script bin/jlc.
-
-4. Run ant to build the base compiler.
+3. Run ant to build the base compiler.
 
     $ ant
 
@@ -91,7 +85,7 @@ You may optionally, do:
 
 to create jar files for Polyglot and for each extension.
 
-5. Update PATH and CLASSPATH.
+4. Update PATH and CLASSPATH.
 
 Add $POLYGLOT/bin to your PATH environment variable.
 
@@ -105,7 +99,7 @@ On Windows, do:
 
 If you created jar files, adjust the classpath accordingly.
 
-6. You are now ready to try out Polyglot.  See doc/Overview.txt for
+5. You are now ready to try out Polyglot.  See doc/Overview.txt for
 instructions on building an extension.  To compile using an existing
 extension do:
 
