@@ -1,7 +1,6 @@
 SOURCE = ../../../..
 PACKAGE = polyglot/ext/pao/runtime
 SUBDIRS =
-JAR_FILE = pao.jar paort.jar
 
 include $(SOURCE)/Rules.mk
 
@@ -17,7 +16,10 @@ SOURCES = \
 	Short.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES)
+JAR_FILE = pao.jar paort.jar
 
 all: $(CLASSES)
 
 clean clobber: cleanclasses
+

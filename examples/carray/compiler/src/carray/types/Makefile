@@ -1,7 +1,6 @@
 SOURCE = ../../../..
 PACKAGE = polyglot/ext/carray/types
 SUBDIRS =
-JAR_FILE = carray.jar
 
 include $(SOURCE)/Rules.mk
 
@@ -11,11 +10,11 @@ SOURCES = \
 	ConstArrayType_c.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES)
+JAR_FILE = carray.jar
 
 all: $(CLASSES)
 	$(subdirs)
 
 clean clobber: cleanclasses
 	$(subdirs)
-
-release: release_src

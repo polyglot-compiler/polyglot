@@ -1,16 +1,21 @@
 SOURCE = ../../../..
 PACKAGE = polyglot/ext/carray/parse
 SUBDIRS =
-JAR_FILE = carray.jar
 
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
 	Lexer.java \
 	Grm.java \
-	sym.java
+	sym.java \
+	$(SRC)
+
+SRC = \
+	CarrayParserWrapper.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SRC) carray.flex carray.ppg
+JAR_FILE = carray.jar
 
 all: $(CLASSES)
 
@@ -29,13 +34,4 @@ clean: cleanclasses
 clobber: cleanclasses
 	$(subdirs)
 	-rm -f Grm.java sym.java Lexer.java carray_ppg.cup
-
-REL_SOURCES = \
-	carray.ppg \
-	carray.flex \
-	sym.java \
-	JLParserWrapper.java \
-	JLUtil.java \
-	Name.java \
-
 

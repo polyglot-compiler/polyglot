@@ -24,14 +24,14 @@ BIN 			= $(SOURCE)/bin
 JIF			= $(BIN)/jifc
 JIF_FLAGS		= -d $(OUTPUT) -sourcepath $(BUILDPATH)
 
+RELEASE                 = $(SOURCE)/release
 SOURCEPATH		= $(SOURCE)
 PACKAGEPATH		= $(SOURCE)/classes/$(PACKAGE)
 VPATH			= $(PACKAGEPATH)
-RELPATH			= $(SOURCE)/release/jif
-REL_DOC			= $(RELPATH)/doc
-REL_IMG			= $(RELPATH)/images
-REL_LIB			= $(RELPATH)/lib
-REL_SOURCES		= $(SOURCES)
+
+DIR                     = $(CURDIR)
+MANIFEST                = Makefile $(SOURCES)
+JAR_FILE                = polyglot.jar
 
 # To avoid repeated slashes
 DIR_ = $(DIR)
@@ -63,21 +63,16 @@ clean_java_output:
 classpath:
 	@echo "setenv CLASSPATH $(CLASSPATH)"
 
-release_files:
-	@for i in $(REL_SOURCES); do echo $(REL_SRC)$$i; done
-	echo $(REL_SRC)Makefile
-	@if [ -f package.html ]; then echo $(REL_SRC)package.html; fi
+manifest_files:
+	@for i in $(MANIFEST) /dev/null; do \
+	    if [ -f $(DIR)/$$i -o -d $(DIR)/$$i ]; then \
+	        echo $(DIR)/$$i; \
+	        echo $(DIR)/$$i >> $(SOURCE)/manifest; \
+	    fi; \
+	done
+
+manifest: manifest_files
 	$(subdirs)
-
-release_src:
-	mkdir -p $(REL_SRC)
-	@cp -f $(REL_SOURCES) Makefile $(REL_SRC)
-	@if [ -f package.html ]; then cp package.html $(REL_SRC); fi
-
-release_demo:
-	mkdir -p $(REL_DEMO)
-	@if [ -n "$(DEMOS)" ]; then cp -f $(DEMOS) $(REL_DEMO); fi
-	@if [ -f package.html ]; then cp package.html $(REL_DEMO); fi
 
 define subdirs
 @for i in $(SUBDIRS) ""; do \
@@ -142,3 +137,7 @@ endef
 jar: all
 	$(jar)
 	$(subdirs)
+
+exports:
+	cp $(EXPORTS) $(SOURCE)/export
+

@@ -1,13 +1,16 @@
 SOURCE = ../../..
 PACKAGE = polyglot/util/ppg
 SUBDIRS = atoms cmds code lex parse spec util
-JAR_FILE = polyglot.jar
 
 include $(SOURCE)/Rules.mk
 
-SOURCES = PPG.java
+SOURCES = \
+	PPG.java \
+	PPGError.java 
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES) tests
+JAR_FILE = polyglot.jar
 
 $(SOURCE)/classes:
 	mkdir $(SOURCE)/classes
@@ -18,10 +21,8 @@ all: parse $(CLASSES) $(SOURCE)/classes
 parse: FORCE
 	$(MAKE) -C parse all
 
-release: release_src
-	$(subdirs)
-
 clean clobber: cleanclasses
 	$(subdirs)
 
 FORCE:
+

@@ -1,7 +1,6 @@
 SOURCE = ../../..
 PACKAGE = polyglot/ext/covarRet
 #SUBDIRS = runtime
-JAR_FILE = covarRet.jar
 
 include $(SOURCE)/Rules.mk
 
@@ -13,6 +12,8 @@ SOURCES = \
 	CovarRetMethodInstance_c.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES) tests
+JAR_FILE = covarRet.jar
 
 all: $(CLASSES)
 	$(subdirs)
@@ -22,5 +23,3 @@ clean: cleanclasses
 
 clobber: cleanclasses
 	$(subdirs)
-
-release: release_src

@@ -65,11 +65,11 @@ public abstract class Node_c implements Node
 	    return null;
 	}
 
-	return n.visitEdge(this, v);
+	return v.visitEdge(this, n);
     }
 
     public Node visit(NodeVisitor v) {
-	return visitEdge(null, v);
+	return v.visitEdge(null, this);
     }
 
     public Node visitEdge(Node parent, NodeVisitor v) {

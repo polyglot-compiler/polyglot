@@ -33,9 +33,8 @@ all: $(CLASSES)
 test:
 	$(JAVA) -classpath $(CLASSPATH) polyglot.util.ppg.test.multi.Tester expr.txt
 
-release: release_src
-	$(subdirs)
-
 clean clobber: cleanclasses
 	$(subdirs)
 	rm -f out.cup Parser.java Constant.java Lexer.java Lexer.java~
+
+MANIFEST = Makefile $(SOURCES)

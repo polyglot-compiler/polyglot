@@ -1,7 +1,6 @@
 SOURCE = ../..
 PACKAGE = polyglot/ast
 SUBDIRS =
-JAR_FILE = polyglot.jar
 
 include $(SOURCE)/Rules.mk
 
@@ -90,10 +89,10 @@ SOURCES = \
 	While.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
-JAR_CLASSES = $(patsubst %.java, $(PACKAGE)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES)
+JAR_FILE = polyglot.jar
 
 all: $(CLASSES)
 
 clean clobber: cleanclasses
 
-release: release_src

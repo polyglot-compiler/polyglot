@@ -1,7 +1,6 @@
 SOURCE = ../../..
 PACKAGE = polyglot/ext/pao
 SUBDIRS = parse ast extension visit types
-JAR_FILE = pao.jar
 
 include $(SOURCE)/Rules.mk
 
@@ -10,6 +9,8 @@ SOURCES = \
 	Version.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES) tests
+JAR_FILE = pao.jar
 
 all: parse $(CLASSES)
 	$(subdirs)
@@ -21,3 +22,4 @@ clean clobber: cleanclasses
 	$(subdirs)
 
 FORCE:
+

@@ -1,7 +1,6 @@
 SOURCE = ../../../..
 PACKAGE = polyglot/ext/pao/parse
 SUBDIRS =
-JAR_FILE = pao.jar
 
 include $(SOURCE)/Rules.mk
 
@@ -9,10 +8,15 @@ SOURCES = \
 	Lexer.java \
 	Grm.java \
 	sym.java \
+	$(SRC)
+
+SRC = \
 	PaoParserWrapper.java \
 	PaoUtil.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SRC) pao.ppg pao.flex
+JAR_FILE = pao.jar
 
 all: $(CLASSES)
 
@@ -31,7 +35,4 @@ clean: cleanclasses
 clobber: cleanclasses
 	$(subdirs)
 	-rm -f Grm.java sym.java Lexer.java pao_ppg.cup
-
-
-
 

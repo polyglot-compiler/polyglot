@@ -1,4 +1,4 @@
-Polyglot 0.9
+Polyglot 0.9.1
             Polyglot Extensible Compiler Toolkit
 
 Since you are reading this file, you have already downloaded and unpacked the
@@ -70,7 +70,7 @@ You may optionally:
 
     $ make jar
 
-to create jar files for polyglot and each extension
+to create jar files for polyglot and each extension.
 
 4. Update PATH and CLASSPATH.
 
@@ -78,11 +78,13 @@ Add $POLYGLOT/bin to your PATH environment variable.
 
 Update your CLASSPATH environment variable.  On Unix, do:
 
-    $ CLASSPATH=$CLASSPATH:$POLYGLOT/polyglot.jar:$POLYGLOT/java_cup.jar
+    $ CLASSPATH=$CLASSPATH:$POLYGLOT/classes:$POLYGLOT/java_cup.jar
 
 On Windows, do:
 
-    $ set CLASSPATH=%CLASSPATH%;$POLYGLOT\polyglot.jar;$POLYGLOT\java_cup.jar
+    $ set CLASSPATH=%CLASSPATH%;$POLYGLOT\classes;$POLYGLOT\java_cup.jar
+
+If you created jar files, adjust the classpath accordingly.
 
 4. You are now ready to try out Polyglot.  See doc/Overview.txt for
 instructions on building an extension.  To compile using an existing

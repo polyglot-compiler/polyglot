@@ -1,7 +1,6 @@
 SOURCE = ../../../..
 PACKAGE = polyglot/util/ppg/parse
 SUBDIRS = 
-JAR_FILE = polyglot.jar
 
 include $(SOURCE)/Rules.mk
 
@@ -12,14 +11,13 @@ SOURCES = \
 	Unparse.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES) ppg.cup
+JAR_FILE = polyglot.jar
 
 Parser.java Constant.java: ppg.cup
 	java -cp $(CUP_RUNTIME) java_cup.Main -parser Parser -symbols Constant < ppg.cup
 
 all: $(CLASSES)
-	$(subdirs)
-
-release: release_src
 	$(subdirs)
 
 clean: cleanclasses
@@ -28,4 +26,5 @@ clean: cleanclasses
 clobber: cleanclasses
 	-rm -f Constant.java Parser.java
 	$(subdirs)
+
 

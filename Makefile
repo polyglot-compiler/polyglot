@@ -5,7 +5,7 @@
 #
 
 SOURCE = .
-SUBDIRS = polyglot
+SUBDIRS = polyglot bin doc
 TAG = RELEASE_0_9_0
 
 include Rules.mk
@@ -34,70 +34,26 @@ clobber:
 javadoc:
 	$(javadoc)
 
-jar: all
-	$(subdirs)
+jar:
+	@rm -f polyglot.jar
+	@for i in $(EXT) ; do rm -f $${i}.jar $${i}rt.jar ; done
+	$(MAKE) -C polyglot jar
 
-export: javadoc
-	rm -rf release
-	mkdir release
-	cd release; cvs checkout -r $(TAG) polyglot
-	rm -rf `find release -name CVS`
-	rm -f `find release -name .cvsignore`
-	for i in $(EXT) jl skel; do \
-		mv release/polyglot/polyglot/ext/$$i release; \
-	done
-	rm -rf release/polyglot/polyglot/ext/*/
-	for i in $(EXT) jl skel; do \
-		mv release/$$i release/polyglot/polyglot/ext; \
-	done
-	mv javadoc release/polyglot
-	rm release/polyglot/jltools2polyglot.sh
-	rm release/polyglot/iDoclet.jar
-	rm release/polyglot/jsse.jar
-	rm release/polyglot/jnet.jar
-	rm release/polyglot/jcert.jar
-	rm release/polyglot/cryptix32.jar
-	rm -rf release/polyglot/bugs
-	rm -rf release/polyglot/example
-	rm -rf release/polyglot/splitter
-	rm -rf release/polyglot/test
-	rm release/polyglot/bin/polyjc
-	rm release/polyglot/README-JIF.txt
-	rm -rf release/polyglot/classes
-	-bin/jlc > release/polyglot/README-JLC.txt 2>&1
-	cd release; jar cf polyglot-src.jar polyglot
+export: new-manifest export-polyglot
 
-REL_SOURCES = \
-	Rules.mk \
-	java_cup.jar \
-	jlex.jar \
-	iDoclet.jar \
+new-manifest:
+	rm -f manifest
+	$(MAKE) manifest
 
-REL_LIBS = \
-	polyglot.jar \
-	java_cup.jar \
-	jif.jar \
+export-polyglot:
+	version=`head -1 README | awk '{print $$NF}' | sed 's%[^0-9\.]%%g'`; \
+	rm -rf polyglot-$${version}-src; \
+	mkdir polyglot-$${version}-src; \
+	tar cf - `cat manifest | sed "s%^$(CURDIR)/%%"` | (cd polyglot-$${version}-src; tar xf -); \
+	rm -f polyglot-$${version}-src.tar polyglot-$${version}-src.tar.gz; \
+	tar cf polyglot-$${version}-src.tar polyglot-$${version}-src; \
+	gzip polyglot-$${version}-src.tar
 
-release_clean: FORCE
-	rm -rf $(RELPATH)
-	mkdir -p $(RELPATH)
-
-release_doc: FORCE
-	cp LICENSE Readme.html $(RELPATH)
-	mkdir -p $(REL_DOC)
-	mkdir -p $(REL_SRC)
-	mkdir -p $(REL_IMG)
-	cp -f images/*.gif $(REL_IMG)
-	$(MAKE) -C doc release
-
-release: jar release_clean release_doc release_src
-	$(MAKE) -C polyglot/ext/jif/tests release
-	cp -f configure $(RELPATH)/configure
-	$(subdirs)
-	mkdir -p $(REL_LIB)
-	cp $(REL_LIBS) $(REL_LIB)
-	cp lib/*fs.* $(REL_LIB)
-	chmod a+x $(RELPATH)/configure
-	rm polyglot.jar jif.jar
-	
 FORCE:
+
+MANIFEST = Makefile LICENSE README Rules.mk configure java_cup.jar jlex.jar

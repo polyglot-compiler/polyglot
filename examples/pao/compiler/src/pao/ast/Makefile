@@ -1,7 +1,6 @@
 SOURCE = ../../../..
 PACKAGE = polyglot/ext/pao/ast
 SUBDIRS =
-JAR_FILE = pao.jar
 
 include $(SOURCE)/Rules.mk
 
@@ -11,7 +10,10 @@ SOURCES = \
 	PaoNodeFactory.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES)
+JAR_FILE = pao.jar
 
 all: $(CLASSES)
 
 clean clobber: cleanclasses
+

@@ -97,3 +97,5 @@ clean:
 	@-rm -f *.class
 	@-echo jlc $<
 	@-jlc $< 2>&1 | sed 's%^.*/\([A-Za-z0-9_]*\.java:\)%\1%g' | tee -a $(LOG)
+
+MANIFEST = Makefile $(SOURCES)

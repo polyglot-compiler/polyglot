@@ -1,18 +1,16 @@
 SOURCE = ../..
 PACKAGE = polyglot/ext
-JAR_FILE = polyglot.jar
 
 include $(SOURCE)/Rules.mk
 
-SUBDIRS = jl ${EXT}
+SUBDIRS = jl $(EXT)
+MANIFEST = Makefile $(SOURCES) newext skel
+JAR_FILE = polyglot.jar
 
 all: $(SUBDIRS)
 	@chmod +x newext
 
 clean clobber:
-	$(subdirs)
-
-release: release_src
 	$(subdirs)
 
 jl: FORCE
@@ -41,3 +39,4 @@ covpolyj: polyj covarRet FORCE
 	$(MAKE) -C $@ all
 
 FORCE:
+

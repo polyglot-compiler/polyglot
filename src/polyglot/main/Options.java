@@ -105,6 +105,7 @@ public final class Options {
     System.err.println("where [options] includes:");
     System.err.println(" -d <directory>          output directory");
     System.err.println(" -sourcepath <path list> source path");
+    System.err.println(" -ext <extension>        use language extension");
     System.err.println(" -fqcn                   use fully-qualified class"
                         + " names");
     System.err.println(" -sx <ext>               set source extension");
@@ -115,7 +116,6 @@ public final class Options {
                         + " serialization");
     System.err.println(" -nooutput               delete output files after" +
 		       " compilation");
-    System.err.println(" -ext <extension>        use language extension");
     System.err.println(" -c                      compile only to .java");
     System.err.println(" -post <compiler>        run javac-like compiler" 
                         + " after translation");

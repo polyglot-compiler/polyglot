@@ -1,7 +1,6 @@
 SOURCE = ../../../..
 PACKAGE = polyglot/ext/pao/types
 SUBDIRS =
-JAR_FILE = pao.jar
 
 include $(SOURCE)/Rules.mk
 
@@ -12,9 +11,12 @@ SOURCES = \
 	PaoPrimitiveType_c.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES)
+JAR_FILE = pao.jar
 
 all: $(CLASSES)
 	$(subdirs)
 
 clean clobber: cleanclasses
 	$(subdirs)
+

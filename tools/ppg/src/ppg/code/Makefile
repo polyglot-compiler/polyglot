@@ -1,7 +1,6 @@
 SOURCE = ../../../..
 PACKAGE = polyglot/util/ppg/code
 SUBDIRS = 
-JAR_FILE = polyglot.jar
 
 include $(SOURCE)/Rules.mk
 
@@ -13,12 +12,12 @@ SOURCES = \
 	ScanCode.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES)
+JAR_FILE = polyglot.jar
 
 all: $(CLASSES)
 	$(subdirs)
 
-release: release_src
-	$(subdirs)
-
 clean clobber: cleanclasses
 	$(subdirs)
+
