@@ -1,4 +1,4 @@
-SOURCE = ../../..
+SOURCE = ../../../..
 PACKAGE = jltools/util/jlgen/lex
 SUBDIRS = 
 
@@ -13,7 +13,7 @@ SOURCES = \
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
 lexer: jlgen.lex
-	java JLex.Main jlgen.lex
+	java -classpath $(LEX_RUNTIME) JFlex.Main jlgen.lex
 	mv jlgen.lex.java Lexer.java
 
 all: lexer $(CLASSES)
