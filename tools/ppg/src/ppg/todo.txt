@@ -1,20 +1,19 @@
 JLgen TODO
 ----------
-
-
 * use JLgen in building PolyJ
-* web page
-* man page
-* installation (.jar file)
+
 * multiple start symbols
-* find harmony with Unix-style path names
+* dropping a list of (non)terminals
 
-* dropping a list of (non)terminals?
+* installation (.jar file)
+* add usage message on errors
+* option for "base include dir"? (eq. to -I)
 
+* removing "includes"?
 
 In progress
 -----------
-* Makefiles (beta)
+* web/man page
 
 
 Complete
@@ -22,3 +21,5 @@ Complete
 * check multiple level of .jlg inheritance
 * dropping (non)terminals
 * bin/jlgen script
+* find harmony with Unix-style path names
+* Makefiles
