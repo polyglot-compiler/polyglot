@@ -28,7 +28,51 @@ import java.lang.UnsupportedOperationException;
  **/
 public class TypedList implements List {
   /**
-   * Requires: <list> not null
+   * Requires: <list> not null, and every element of <list> may be
+   *    cast to class <c>.
+   * Creates a new TypedList, containing all the elements of <list>,
+   * which restricts all members to belong to class <c>.  If <c> is
+   * null, no typing restriction is made.  If <immutable> is true, no
+   * modifications are allowed.
+   **/
+  public static TypedList copy(List list, Class c, boolean immutable) {
+    return new TypedList(new ArrayList(list), c, immutable);
+  }
+
+  /**
+   * Creates a new TypedList, containing all the elements of <list>,
+   * which restricts all members to belong to class <c>.  If <c> is
+   * null, no typing restriction is made.  If <immutable> is true, no
+   * modifications are allowed.
+   *
+   * Throws an UnsupportedOperationException if any member of <list>
+   * may not be cast to class <c>.
+   **/
+  public static TypedList copyAndCheck(List list, Class c, boolean immutable) {
+    if (c != null)
+      check(list,c);
+    return copy(list,c,immutable);
+  }
+
+  /**
+   * Throws an UnsupportedOperationException if any member of <list>
+   * may not be cast to class <c>. Otherwise does nothing.
+   **/
+  public static void check(List list, Class c) {
+    for (Iterator i = list.iterator(); i.hasNext(); ) {
+      Object o = i.next();
+      if (!c.isAssignableFrom(o.getClass())) {
+	throw new UnsupportedOperationException(
+		     "Tried to add a " + o.getClass().getName() +
+   	             " to a list of type " + c.getName());
+      }
+    }
+  }
+
+  /**
+   * Requires: <list> not null, and every element of <list> may be
+   *    cast to class <c>.
+   * Effects:
    * Creates a new TypedList around <list> which restricts all
    * members to belong to class <c>.  If <c> is null, no typing
    * restriction is made.  If <immutable> is true, no modifications
