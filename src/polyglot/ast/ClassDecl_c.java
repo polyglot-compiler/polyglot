@@ -261,6 +261,123 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 		return this;
 	}
 
+	protected void duplicateFieldCheck(TypeChecker tc) throws SemanticException {
+	    TypeSystem ts = tc.typeSystem();
+
+	    ArrayList l = new ArrayList(type.fields());
+
+	    for (int i = 0; i < l.size(); i++) {
+		FieldInstance fi = (FieldInstance) l.get(i);
+
+	      	for (int j = i+1; j < l.size(); j++) {
+		    FieldInstance fj = (FieldInstance) l.get(j);
+
+		    if (fi.name().equals(fj.name())) {
+			throw new SemanticException("Duplicate field \"" + fj + "\".", fj.position());
+		    }
+		}
+	    }
+	}
+
+	protected void duplicateConstructorCheck(TypeChecker tc) throws SemanticException {
+	    TypeSystem ts = tc.typeSystem();
+
+	    ArrayList l = new ArrayList(type.constructors());
+
+	    for (int i = 0; i < l.size(); i++) {
+		ConstructorInstance ci = (ConstructorInstance) l.get(i);
+
+	      	for (int j = i+1; j < l.size(); j++) {
+		    ConstructorInstance cj = (ConstructorInstance) l.get(j);
+
+		    if (ts.hasSameArguments(ci, cj)) {
+			throw new SemanticException("Duplicate constructor \"" + cj + "\".", cj.position());
+		    }
+		}
+	    }
+	}
+
+	protected void duplicateMethodCheck(TypeChecker tc) throws SemanticException {
+	    TypeSystem ts = tc.typeSystem();
+
+	    ArrayList l = new ArrayList(type.methods());
+
+	    for (int i = 0; i < l.size(); i++) {
+		MethodInstance mi = (MethodInstance) l.get(i);
+
+	      	for (int j = i+1; j < l.size(); j++) {
+		    MethodInstance mj = (MethodInstance) l.get(j);
+
+		    if (mi.name().equals(mj.name()) &&
+		        ts.hasSameArguments(mi, mj)) {
+
+			throw new SemanticException("Duplicate method \"" + mj + "\".", mj.position());
+		    }
+		}
+	    }
+	}
+
+	protected void overrideMethodCheck(TypeChecker tc) throws SemanticException {
+	    TypeSystem ts = tc.typeSystem();
+
+	    for (Iterator i = type.methods().iterator(); i.hasNext(); ) {
+		MethodInstance mi = (MethodInstance) i.next();
+
+		Type t = type.superType();
+		
+		while (t instanceof ReferenceType) {
+		    ReferenceType rt = (ReferenceType) t;
+		    t = rt.superType();
+
+		    for (Iterator j = rt.methods().iterator(); j.hasNext(); ) {
+			MethodInstance mj = (MethodInstance) j.next();
+
+			if (! mi.name().equals(mj.name()) ||
+			    ! ts.hasSameArguments(mi, mj) ||
+			    ! ts.isAccessible(mj, tc.context())) {
+
+			  continue;
+			}
+
+			if (! ts.isSame(mi.returnType(), mj.returnType())) {
+			    throw new SemanticException("Cannot override method \"" + mj + "\" with different return type.", mi.position());
+			}
+
+			int ai = 2;
+			if (mi.flags().isPrivate()) ai = 0;
+			if (mi.flags().isProtected()) ai = 1;
+			if (mi.flags().isPublic()) ai = 3;
+
+			int aj = 2;
+			if (mj.flags().isPrivate()) aj = 0;
+			if (mj.flags().isProtected()) aj = 1;
+			if (mj.flags().isPublic()) aj = 3;
+
+			if (ai < aj) {
+			    throw new SemanticException("Cannot override method \"" + mi + "\" with more restrictive access flags.", mi.position());
+			}
+
+			if (! mi.flags().isStatic() && mj.flags().isStatic()) {
+			    throw new SemanticException("Cannot override static method with instance method \"" + mi + "\".", mi.position());
+			}
+
+			if (mj.flags().isFinal()) {
+			    throw new SemanticException("Cannot override final method \"" + mi + "\".", mi.position());
+			}
+		    }
+		}
+	    }
+	}
+
+	public Node typeCheck_(TypeChecker tc) throws SemanticException {
+	    duplicateFieldCheck(tc);
+	    duplicateConstructorCheck(tc);
+	    duplicateMethodCheck(tc);
+	    overrideMethodCheck(tc);
+
+	    return this;
+	}
+
 	public String toString() {
 		return flags.clearInterface().translate() + 
 			   (flags.isInterface() ? "interface " : "class ") + name + " " + body;
