@@ -165,6 +165,9 @@ public abstract class Node extends AnnotatedObject {
   public void dumpNodeInfo( CodeWriter w)
   {
     Type type = Annotate.getCheckedType( this);
+
+    //    w.write( "C: " + getClass().getName() + " ");
+
     if( type != null) {
       w.write( "T: " + type.getTypeString() + " ");
     }

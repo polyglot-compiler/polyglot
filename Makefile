@@ -89,7 +89,7 @@ clean:
 	rm -f jltools/lex/*.class
 	rm -f jltools/parse/*.class
 	rm -f jltools/ast/*.class
-	rm -f jltools/types/*.class\
+	rm -f jltools/types/*.class
 	rm -f jltools/visit/*.class
 	rm -f jltools/ext/op/*.class
 	rm -f jltools/frontend/*.class
@@ -103,6 +103,8 @@ clean:
 clobber superclean: clean
 	rm -f jltools/parse/Grm.java
 	rm -f jltools/parse/sym.java
+	rm -f jltools/ext/op/Grm.java
+	rm -f jltools/ext/op/sym.java
 	rm -f $(JAR_FILE)
 	rm -rf $(JAVADOC_OUTPUT)
 	rm -f $(BIN)/jlc

@@ -519,14 +519,11 @@ public class Compiler implements TargetTable, ClassCleaner
 
   protected Node parse( Target t) throws IOException
   {
-    Lexer lexer;
-    Grm grm;
+    java_cup.runtime.lr_parser grm = t.getParser();
     java_cup.runtime.Symbol sym = null;
+
     ErrorQueue eq = t.getErrorQueue();
 
-    lexer = new Lexer( t.getSourceReader(), eq);
-    grm = new Grm( lexer, ts, eq);
-               
     try
     {
       sym = grm.parse();

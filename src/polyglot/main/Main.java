@@ -2,7 +2,7 @@ package jltools.main;
 
 import jltools.ast.Node;
 import jltools.frontend.Compiler;
-import jltools.types.StandardTypeSystem;
+import jltools.types.TypeSystem;
 import jltools.util.*;
 
 import java.io.*;
@@ -27,11 +27,14 @@ public class Main
                                         = "Dump AST (Boolean)";
   private static final String MAIN_OPT_SCRAMBLE         
                                         = "Scramble AST (Boolean)";
+  private static final String MAIN_OPT_EXT_OP
+                                        = "Use ObjectPrimitive Ext (Boolean)";
 
   private static final int MAX_THREADS = 1;
 
   private static Map options;
   private static Set source;
+  private static TypeSystem ts;
 
   public static final void main(String args[])
   {
@@ -40,6 +43,7 @@ public class Main
     MainTargetFactory tf; 
     
     parseCommandLine(args, options, source);
+
     tf = new MainTargetFactory( (String)options.get( MAIN_OPT_SOURCE_EXT),
                                (Collection)options.get( MAIN_OPT_SOURCE_PATH),
                                 (File)options.get( MAIN_OPT_OUTPUT_DIRECTORY),
@@ -47,7 +51,13 @@ public class Main
                                 (Boolean)options.get( MAIN_OPT_STDOUT));
 
     /* Must initialize before instantiating any compilers. */
-    Compiler.initialize( options, new StandardTypeSystem(), tf);
+    if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()) {
+      ts = new jltools.ext.op.ObjectPrimitiveTypeSystem();
+    }
+    else {
+      ts = new jltools.types.StandardTypeSystem();
+    }
+    Compiler.initialize( options, ts, tf);
     
     /* Now compile each file. */
     Iterator iter;
@@ -93,12 +103,14 @@ public class Main
     }
     catch( FileNotFoundException fnfe)
     {
-      System.err.println( "Cannot find source file: " + targetName);
+      System.err.println( Main.class.getName() 
+                          + ": cannot find source file -- " + targetName);
       System.exit( 1);
     }
     catch( IOException e)
     {
-      System.err.println( "Caught IOException while compiling " 
+      System.err.println( Main.class.getName() 
+                          + ": caught IOException while compiling -- " 
                           + targetName + ": " + e.getMessage());
       System.exit( 1);
     }
@@ -192,9 +204,34 @@ public class Main
     }
   }
 
+  static java_cup.runtime.lr_parser getParser( jltools.lex.Lexer lexer,
+                                               ErrorQueue eq)
+  {
+    if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()) {
+      return new jltools.ext.op.Grm( lexer, ts, eq);
+    }
+    else {
+      return new jltools.parse.Grm( lexer, ts, eq);
+    }
+  }
+
   static Iterator getNodeVisitors( int stage)
   {
     List l = new LinkedList();
+    if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()
+        && stage == Compiler.CHECKED) {
+      
+      if( ((Boolean)options.get( MAIN_OPT_DUMP)).booleanValue()) {
+        CodeWriter cw = new CodeWriter( new UnicodeWriter( 
+                                          new PrintWriter( System.out)), 
+               ((Integer)options.get( Compiler.OPT_OUTPUT_WIDTH)).intValue()); 
+
+        l.add( new jltools.visit.DumpAst( cw));
+      }
+
+      l.add( new jltools.ext.op.ObjectPrimitiveCastRewriter( ts));
+
+    }
     if( ((Boolean)options.get( MAIN_OPT_DUMP)).booleanValue()) {
       CodeWriter cw = new CodeWriter( new UnicodeWriter( 
                                         new PrintWriter( System.out)), 
@@ -213,11 +250,14 @@ public class Main
       System.exit( 1);
     }
 
+    boolean hasError = false;
+
     /* Set defaults. */
     Collection sourcePath = new LinkedList();
     sourcePath.add( new File( "."));
     options.put( MAIN_OPT_SOURCE_PATH, sourcePath);
     options.put( MAIN_OPT_DUMP, new Boolean( false));
+    options.put( MAIN_OPT_EXT_OP, new Boolean( false));
     
     options.put( Compiler.OPT_OUTPUT_WIDTH, new Integer( 72));
     options.put( Compiler.OPT_VERBOSE, new Boolean( false));
@@ -289,14 +329,32 @@ public class Main
         i++;
         options.put( MAIN_OPT_SCRAMBLE, new Boolean( true));
       }
+      else if( args[i].equals( "-op"))
+      {
+        i++;
+        options.put( MAIN_OPT_EXT_OP, new Boolean( true));
+      }
       else if( args[i].equals( "-v") || args[i].equals( "-verbose"))
       {
         i++;
         options.put( Compiler.OPT_VERBOSE, new Boolean( true));
       }
+      else if( args[i].startsWith( "-"))
+      {
+        System.err.println( Main.class.getName() + ": illegal option -- " 
+                            + args[ i]);
+        i++;
+        hasError = true;
+      }
       else
       {
-        if( options.get( MAIN_OPT_SOURCE_EXT) == null) {
+        if( hasError) {
+          usage();
+          System.exit( 1);
+        }
+
+        if( options.get( MAIN_OPT_SOURCE_EXT) == null
+            && args[i].indexOf( '.') != -1) {
           options.put( MAIN_OPT_SOURCE_EXT, args[i].substring( 
                            args[i].lastIndexOf( '.')));
         }
@@ -306,50 +364,49 @@ public class Main
       }
     }
 
-    if( options.get( MAIN_OPT_OUTPUT_EXT) == null) {
-      if( options.get( MAIN_OPT_SOURCE_EXT).equals( ".java")) {
-        if( !options.containsKey( MAIN_OPT_OUTPUT_DIRECTORY)) {
-          options.put( MAIN_OPT_OUTPUT_DIRECTORY, new File( "."));
-          options.put( MAIN_OPT_OUTPUT_EXT, ".jlava");
-        }
-        else {
-          options.put( MAIN_OPT_OUTPUT_EXT, ".java");
-        }
-      }
-      else {
-        options.put( MAIN_OPT_OUTPUT_EXT, ".java");
-      }
+    if( hasError) {
+      usage();
+      System.exit( 1);
     }
-    else
-    {
-      if( options.get( MAIN_OPT_SOURCE_EXT).equals( 
-                      options.get(MAIN_OPT_OUTPUT_EXT))) {
-        System.err.println( "jltools.frontent.Main: Source and output"
-                            + " extensions must differ.");
-        System.exit( 1);
-      } 
+
+    if( source.size() < 1) {
+      System.err.println( Main.class.getName() 
+                          + ": must specify at least one source file");
+      usage();
+      System.exit( 1);
+    }
+
+    /* Check first for a source extension. */
+    if( options.get( MAIN_OPT_SOURCE_EXT) == null) {
+      options.put( MAIN_OPT_SOURCE_EXT, ".java");
+    }
+
+    /* Now check for an output extension. */
+    if( options.get( MAIN_OPT_OUTPUT_EXT) == null) {
+      options.put( MAIN_OPT_OUTPUT_EXT, ".java");
     }
   }
 
   private static void usage()
   {
-    System.err.println( "usage: jltools.frontend.Main [options] " 
+    System.err.println( "usage: " + Main.class.getName() + " [options] " 
                         + "File.jl ...\n");
     System.err.println( "where [options] includes:");
     System.err.println( " -d <directory>          output directory");
     System.err.println( " -S <path list>          source path");
-    System.err.println( " -fqcn                   print fully-qualified class"
-                        + " names in comments");
-    System.err.println( " -stdout                 print all source to stdout");
+    System.err.println( " -fqcn                   use fully-qualified class"
+                        + " names");
     System.err.println( " -sx <ext>               set source extension");
     System.err.println( " -ox <ext>               set output extension");
     System.err.println( " -dump                   dump the ast");
     System.err.println( " -scramble               scramble the ast");
+    System.err.println( " -op                     use op extension");
     System.err.println( " -post <compiler>        run javac-like compiler" 
                         + " after translation");
     System.err.println( " -v -verbose             print verbose " 
                         + "debugging info");
     System.err.println( " -version                print version info");
     System.err.println( " -h                      print this message");
+    System.err.println();
   }
 }

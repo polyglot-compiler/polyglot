@@ -29,6 +29,8 @@ public abstract class Target
   {
     return source;
   }
+
+  public abstract java_cup.runtime.lr_parser getParser() throws IOException;
   
   public Writer getOutputWriter( String packageName) throws IOException
   {

@@ -6,7 +6,6 @@ import jltools.ast.*;
 import jltools.lex.*;
 import jltools.types.*;
 import jltools.util.*;
-import jltools.ext.op.*;
 
 import java.util.*;
 
@@ -1566,13 +1565,13 @@ cast_expression ::=
 			{: TypeNode tn = (TypeNode)Grm.ln( new TypeNode( 
 			        (b.intValue() == 0 ? a.getType() :
 			new ArrayType(parser.ts,a.getType(),b.intValue()))),a);
-				RESULT = (ObjectPrimitiveCastExpression)Grm.ln(
-				new ObjectPrimitiveCastExpression( tn, c), a);
+				RESULT = (CastExpression)Grm.ln(
+				new CastExpression( tn, c), a);
 				:}
 	|	LPAREN expression:a RPAREN 
 				unary_expression_not_plus_minus:b
-			{: RESULT = (ObjectPrimitiveCastExpression)Grm.ln(
-				new ObjectPrimitiveCastExpression( (TypeNode)
+			{: RESULT = (CastExpression)Grm.ln(
+				new CastExpression((TypeNode)
 				Grm.ln(new TypeNode( 
 				new AmbiguousType( parser.ts, 
 				((AmbiguousNameExpression)a).getName())), a),
@@ -1581,8 +1580,8 @@ cast_expression ::=
 			{: Type t2 = new ArrayType(parser.ts, 
 				new AmbiguousType(parser.ts, 
 				a.getName()), b.intValue());
-				RESULT = (ObjectPrimitiveCastExpression)Grm.ln(
-			       new ObjectPrimitiveCastExpression( new TypeNode(t2), c), a); :}
+				RESULT = (CastExpression)Grm.ln(
+			       new CastExpression( new TypeNode(t2), c), a); :}
 	;
 multiplicative_expression ::=
 					// Expression
@@ -1651,18 +1650,11 @@ relational_expression ::=
 			{: RESULT = (Expression)Grm.ln(
 				new BinaryExpression(a,
 				BinaryExpression.GE, b), a); :}
-	|	relational_expression:a INSTANCEOF type:b
-			{: RESULT = (Expression)Grm.ln(
-				new ObjectPrimitiveInstanceofExpression(a,
-				b), a); :}
-	;
-
-/*
 	|	relational_expression:a INSTANCEOF reference_type:b
 			{: RESULT = (Expression)Grm.ln(
 				new InstanceofExpression(a,
 				b), a); :}
-*/
+	;
 	
 equality_expression ::=
 					// Expression

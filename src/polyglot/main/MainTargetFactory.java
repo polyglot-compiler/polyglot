@@ -30,11 +30,16 @@ public class MainTargetFactory implements TargetFactory
 
   public Target createFileTarget( String fileName) throws IOException
   {
+    //System.out.println( "FILE " + fileName);
     File sourceFile = new File( fileName);
     File outputFile;
 
     if( !sourceFile.exists()) {
       throw new FileNotFoundException( fileName);
+    }
+
+    if( fileName.indexOf( sourceExtension) == -1) {
+      throw new IOException( "All source files must have the same extension.");
     }
 
     if( outputDirectory == null) {
@@ -45,6 +50,12 @@ public class MainTargetFactory implements TargetFactory
                              name.substring( 0, name.lastIndexOf(
                                                   sourceExtension)) 
                              + outputExtension);
+      if( sourceFile.equals( outputFile)) {
+        outputFile = new File( parentDirectory, 
+                               name.substring( 0, name.lastIndexOf(
+                                                    sourceExtension)) 
+                               + ".java$");
+      }
     }
     else {
       /* Otherwise, we can't tell until we have the package name. */
@@ -56,6 +67,7 @@ public class MainTargetFactory implements TargetFactory
 
   public Target createClassTarget( String className) throws IOException
   {
+    //System.out.println( "CLASS " + className);
     /* Search the source path. */
     File sourceFile = null, directory;
     File outputFile = new File( outputDirectory, 
@@ -66,18 +78,13 @@ public class MainTargetFactory implements TargetFactory
                                          + sourceExtension;
     Iterator iter = sourcePath.iterator();
 
-    // System.err.println( "Trying to find source for: " + fileName);
-
     while( iter.hasNext())
     {
       directory = (File)iter.next();
 
       sourceFile = new File( directory, fileName);
-
-      // System.err.println( "Trying: " + sourceFile.toString());
       
       if( sourceFile.exists()) {
-        // System.err.println( "Success!!");
         break;
       }
     }
@@ -85,6 +92,12 @@ public class MainTargetFactory implements TargetFactory
     if( !sourceFile.exists()) {
       throw new FileNotFoundException( fileName);
     }    
+
+    if( sourceFile.equals( outputFile)) {
+        outputFile = new File( outputDirectory, 
+                               className.replace( '.', File.separatorChar)
+                               + ".java$");
+    }
 
     return new MainTarget( sourceFile.getName(), sourceFile, outputFile);
   }
@@ -138,6 +151,13 @@ public class MainTargetFactory implements TargetFactory
         }
         return new UnicodeWriter( new FileWriter( outputFile));
       }
+    }
+
+    public java_cup.runtime.lr_parser getParser() throws IOException
+    {
+      jltools.lex.Lexer lexer = new jltools.lex.Lexer( getSourceReader(), 
+                                                       getErrorQueue());
+      return Main.getParser( lexer, getErrorQueue());
     }
 
     public NodeVisitor getNextNodeVisitor( int stage)
