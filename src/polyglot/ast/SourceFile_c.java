@@ -205,8 +205,8 @@ public class SourceFile_c extends Node_c implements SourceFile
 	}
 
 	for (Iterator i = decls.iterator(); i.hasNext(); ) {
-	    ClassDecl cd = (ClassDecl) i.next();
-	    print(cd, w, tr);
+	    TopLevelDecl d = (TopLevelDecl) i.next();
+	    print(d, w, tr);
 	}
     }
 }
