@@ -5,12 +5,7 @@
 package polyglot.util;
 
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.ListIterator;
-import java.util.Iterator;
-import java.util.Collection;
-import java.lang.UnsupportedOperationException;
+import java.util.*;
 
 /**
  * A TypedList is an List which will not allow members not belonging
@@ -139,7 +134,7 @@ public class TypedList implements List, java.io.Serializable
 			 immutable);
   }
   public void clear() 
-    { backing_list.clear(); }
+    { tryMod(); backing_list.clear(); }
   public boolean contains(Object o) 
     { return backing_list.contains(o); }
   public boolean containsAll(Collection coll) 
@@ -155,17 +150,17 @@ public class TypedList implements List, java.io.Serializable
   public boolean isEmpty()
     { return backing_list.isEmpty(); }
   public Iterator iterator()
-    { return backing_list.iterator(); }
+    { return listIterator(); }
   public int lastIndexOf(Object o)
     { return backing_list.lastIndexOf(o); }
   public Object remove(int idx)
-    { return backing_list.remove(idx); }
+    { tryMod(); return backing_list.remove(idx); }
   public boolean remove(Object o)
-    { return backing_list.remove(o); }
+    { tryMod(); return backing_list.remove(o); }
   public boolean removeAll(Collection coll)
-    { return backing_list.removeAll(coll); }
+    { tryMod(); return backing_list.removeAll(coll); }
   public boolean retainAll(Collection coll)
-    { return backing_list.retainAll(coll); }
+    { tryMod(); return backing_list.retainAll(coll); }
   public int size()
     { return backing_list.size(); }
   public Object[] toArray() 
