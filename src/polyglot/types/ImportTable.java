@@ -238,9 +238,22 @@ public class ImportTable extends ClassResolver
     
     protected Named findInPkg(String name, String pkgName) throws SemanticException {
         String fullName = pkgName + "." + name;
+
         try {
-            Named n = resolver.find(fullName); 
-        
+            Named n = resolver.find(pkgName);
+
+            if (n instanceof ClassType) {
+                n = ts.classContextResolver((ClassType) n).find(name); 
+                return n;
+            }
+        }
+        catch (NoClassException ex) {
+            // Do nothing.
+        }
+
+        try {
+            Named n = resolver.find(fullName);
+
             // Check if the type is visible in this package.
             if (isVisibleFrom(n, pkgName)) {
                 return n;
@@ -249,6 +262,7 @@ public class ImportTable extends ClassResolver
         catch (NoClassException ex) {
             // Do nothing.
         }
+
         return null;
     }
 

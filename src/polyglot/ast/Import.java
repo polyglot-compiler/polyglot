@@ -11,7 +11,11 @@ import polyglot.util.Enum;
 public interface Import extends Node 
 {
     /** Import kinds: class (e.g., import java.util.Set) or package (e.g.,
-     *  import java.util.*). */
+     *  import java.util.*).
+     *
+     * PACKAGE is a bit of a misnomer, since we can import p.C.*, where p.C
+     * is a class.  This puts the nested classes of p.C in scope.
+     */
     public static class Kind extends Enum {
         public Kind(String name) { super(name); }
     }

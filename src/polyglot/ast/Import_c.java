@@ -64,32 +64,31 @@ public class Import_c extends Node_c implements Import
 
     /** Check that imported classes and packages exist. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-	if (kind == CLASS) {
-            // The first component of the type name must be a package.
-            String pkgName = StringUtil.getFirstComponent(name);
-            if (! tc.typeSystem().packageExists(pkgName)) {
-                throw new SemanticException("Package \"" + pkgName +
-                    "\" not found.", position());
-            }
+        if (kind == PACKAGE && tc.typeSystem().packageExists(name)) {
+            return this;
+        }
 
-            // The type must exist.
-            Named nt = tc.typeSystem().forName(name);
+        // Must be importing a class, either as p.C, or as p.C.*
 
-            // And the type must be accessible.
-            if (nt instanceof Type) {
-                Type t = (Type) nt;
-                if (t.isClass()) {
-                    tc.typeSystem().classAccessibleFromPackage(t.toClass(),
-                        tc.context().package_());
-                }
+        // The first component of the type name must be a package.
+        String pkgName = StringUtil.getFirstComponent(name);
+
+        if (! tc.typeSystem().packageExists(pkgName)) {
+            throw new SemanticException("Package \"" + pkgName +
+                "\" not found.", position());
+        }
+
+        // The type must exist.
+        Named nt = tc.typeSystem().forName(name);
+
+        // And the type must be accessible.
+        if (nt instanceof Type) {
+            Type t = (Type) nt;
+            if (t.isClass()) {
+                tc.typeSystem().classAccessibleFromPackage(t.toClass(),
+                    tc.context().package_());
             }
-	}
-	else if (kind == PACKAGE) {
-            if (! tc.typeSystem().packageExists(name)) {
-                throw new SemanticException("Package \"" + name +
-                    "\" not found.", position());
-            }
-	}
+        }
 
 	return this;
     }
