@@ -1,11 +1,13 @@
 JLtools 0.9
-		    JLtools Extensible Compiler Toolkit
+            JLtools Extensible Compiler Toolkit
 
-When reading this file you have already downloaded and unpacked the JLtools Distribution. Your installation directory contains the following sub-folders:
+When reading this file you have already downloaded and unpacked the JLtools
+Distribution. Your installation directory contains the following sub-folders:
 
   - src: the complete source code of JLtools 0.9
-  - lib: the JLtools library files and the "CUP Parser Generator for Java" library (a Copyright notice for CUP can be found at the end of this document) 
-  - doc: the documentations about writing JLtools extensions 
+  - lib: the JLtools library files and the "CUP Parser Generator for Java"
+    library (a Copyright notice for CUP can be found at the end of this document)
+  - doc: the documentations about writing JLtools extensions
   - demo: Jif sample programs
   - images: Logos
 
@@ -13,23 +15,67 @@ Installation Instructions
 --------------------------
 
 First ensure javac is in your path and that you are using JDK 1.2
-or later.  
+or later.
+
+1. Create "bin" directory and running scripts.
 
 On Unix, do:
 
-	sh ./configure
-	PATH=$PATH:<your-install-directory>/bin
+    sh ./configure
 
-On NT, you will need the Cygwin environment. While running sh, do:
+On Windows NT, you will need the Cygwin environment. While running sh, do:
 
-	sh ./configure
-	set PATH=%PATH%;<your-install-directory>\bin
+    sh ./configure
 
+2. Update PATH and CLASSPATH.
+
+Suppose <jltools> is the absolute path of your JLtools installation directory.
+
+-- Add "<jltools>/bin" to your PATH environment variable or copy all the files
+in "<jltools>/bin" to a directory in PATH.
+
+-- Check your LD_LIBRARY_PATH environment variable on Unix systems, and your
+PATH environment variable on Windows systems. Make sure the value contains
+<jltools>/lib.
+
+-- Update your CLASSPATH environment variable.
+
+On Unix, do:
+
+    CLASSPATH=$CLASSPATH:<jltools>/lib/jltools.jar:<jltools>/lib/jif.jar:<jltools>/lib/java_cup.jar
+
+On Windows, do:
+
+    set CLASSPATH=%CLASSPATH%;<jltools>\lib\jltools.jar;<jltools>\lib\jif.jar;<jltools>\lib\java_cup.jar
+
+3. Test Jif compiler
+
+First, you need to create some principals. In Jif, principals are represented
+by classes in the jif.principal package. Suppose <foo> is the directory you
+like to put the jif.principal package in, run:
+
+    ./bin/sampleusers <foo>
+    ./bin/localusers <foo>
+
+"sampleusers" is a utility to create some sample principals like Alice and
+Bob. "localusers" will generate Jif principals for users on your local
+machine. Make sure that <foo> is in your CLASSPATH environment variable.
+
+Go to the demo directory, run:
+
+    jif Hello.jif
+    java Hello
+
+If you see "Hello, the world!" printed on the screen, you have successfully
+installed JLtools. Otherwise, make sure that you have followed every
+instruction in step 1 and 2. If you still cannot run the Hello demo, please
+contact the authors.
 
 For more information:
 ---------------------
 
-For information on how to run the JLtools translator (jlc) from the command line, see the file README-JLC.txt
+For information on how to run the JLtools translator (jlc) from the command
+line, see the file README-JLC.txt
 
 For information on specific Java language extensions included with
 this release (e.g. Jif, PolyJ, etc.), see the appropriate README-*
@@ -64,9 +110,19 @@ LICENSE, included in this distribution.
 
 CUP Parser Generator Copyright Notice, License, and Disclaimer
 ---------------------------------------------------------------
-Copyright 1996-1999 by Scott Hudson, Frank Flannery, C. Scott Ananian 
-Permission to use, copy, modify, and distribute this software and its documentation for any purpose and without fee is hereby granted, provided that the above copyright notice appear in all copies and that both the copyright notice and this permission notice and warranty disclaimer appear in supporting documentation, and that the names of the authors or their employers not be used in advertising or publicity pertaining to distribution of the software without specific, written prior permission. 
+Copyright 1996-1999 by Scott Hudson, Frank Flannery, C. Scott Ananian
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted, provided that
+the above copyright notice appear in all copies and that both the copyright
+notice and this permission notice and warranty disclaimer appear in supporting
+documentation, and that the names of the authors or their employers not be
+used in advertising or publicity pertaining to distribution of the software
+without specific, written prior permission.
 
-The authors and their employers disclaim all warranties with regard to this software, including all implied warranties of merchantability and fitness. In no event shall the authors or their employers be liable for any special, indirect or consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action of contract, negligence or other tortious action, arising out of or in connection with the use or performance of this software. 
-
-
+The authors and their employers disclaim all warranties with regard to this
+software, including all implied warranties of merchantability and fitness. In
+no event shall the authors or their employers be liable for any special,
+indirect or consequential damages or any damages whatsoever resulting from
+loss of use, data or profits, whether in an action of contract, negligence or
+other tortious action, arising out of or in connection with the use or
+performance of this software.
