@@ -110,6 +110,7 @@ string_lit_slash={string_lit}\\
 <YYINITIAL> ":"             { return t(Constant.COLON); }
 <YYINITIAL> "*"             { return t(Constant.STAR); }
 <YYINITIAL> {identifier}    { return t(Constant.ID, yytext().intern()); }
+<YYINITIAL> "%prec"         { return t(Constant.PERCENT_PREC); }
                         
 <YYINITIAL> \"      {yybegin(STRING);}
 

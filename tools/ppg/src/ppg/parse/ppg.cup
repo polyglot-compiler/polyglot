@@ -296,7 +296,8 @@ rhs_list ::=
 
 rhs ::= 
 	prod_part_list:p PERCENT_PREC term_id:term_name 
-	    {: RESULT = p; :} /* XXX */
+	    {: p.add(new PrecedenceModifier(term_name));
+	       RESULT = p; :}
 |	prod_part_list:p
 	    {: RESULT = p; :}
 ;
