@@ -52,11 +52,15 @@ public interface ClassDecl extends Node, TopLevelDecl, ClassMember
 
     /**
      * The class's interface list.
+     * A list of <code>TypeNode</code>.
+     * @see polyglot.ast.TypeNode
      */
     List interfaces();
 
     /**
      * Set the class's interface list.
+     * A list of <code>TypeNode</code>.
+     * @see polyglot.ast.TypeNode
      */
     ClassDecl interfaces(List interfaces);
 

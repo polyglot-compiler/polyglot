@@ -11,11 +11,15 @@ public interface ClassType extends ReferenceType
 {
     /**
      * The class's constructors.
+     * A list of <code>ConstructorInstance</code>.
+     * @see polyglot.types.ConstructorInstance
      */
     List constructors();
 
     /**
      * The class's member classes.
+     * A list of <code>MemberClassType</code>.
+     * @see polyglot.types.MemberClassType
      */
     List memberClasses();
 

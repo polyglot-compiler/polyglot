@@ -24,7 +24,10 @@ public interface Context extends Resolver, Copy
     /** Add a type to the current scope. */
     void addType(NamedType t);
 
-    /** Looks up a method in the current scope. */
+    /** Looks up a method in the current scope.
+     * @param argumentTypes A list of <code>Type</code>.
+     * @see polyglot.types.Type
+     */
     MethodInstance findMethod(String name, List argumentTypes) throws SemanticException;
 
     /** Looks up a local variable or field in the current scope. */

@@ -12,12 +12,16 @@ import java.util.List;
 public interface ArrayInit extends Expr
 {
     /**
-     * Initializer elements.  A list of <code>Expression</code>.
+     * Initializer elements.
+     * A list of <code>Expr</code>.
+     * @see polyglot.ast.Expr
      */
     List elements();
 
     /**
-     * Set the initializer elements.  A list of <code>Expression</code>.
+     * Set the initializer elements.
+     * A list of <code>Expr</code>.
+     * @see polyglot.ast.Expr
      */
     ArrayInit elements(List elements);
 

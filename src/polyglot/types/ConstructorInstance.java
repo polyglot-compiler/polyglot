@@ -15,11 +15,15 @@ public interface ConstructorInstance extends ProcedureInstance
 
     /**
      * Set the types of the formal parameters of the constructor.
+     * @param l A list of <code>Type</code>.
+     * @see polyglot.types.Type
      */
     ConstructorInstance argumentTypes(List l);
 
     /**
      * Set the types of the exceptions thrown by the constructor.
+     * @param l A list of <code>Type</code>.
+     * @see polyglot.types.Type
      */
     ConstructorInstance exceptionTypes(List l);
 

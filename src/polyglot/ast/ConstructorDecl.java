@@ -25,16 +25,28 @@ public interface ConstructorDecl extends ProcedureDecl
     /** Set the constructor's name. */
     ConstructorDecl name(String name);
 
-    /** The constructor's formal parameters. */
+    /** The constructor's formal parameters.
+     * A list of <code>Formal</code>.
+     * @see polyglot.ast.Formal
+     */
     List formals();
 
-    /** Set the constructor's formal parameters. */
+    /** Set the constructor's formal parameters.
+     * A list of <code>Formal</code>.
+     * @see polyglot.ast.Formal
+     */
     ConstructorDecl formals(List formals);
 
-    /** The constructor's exception throw types. */
+    /** The constructor's exception throw types.
+     * A list of <code>TypeNode</code>.
+     * @see polyglot.ast.TypeNode
+     */
     List exceptionTypes();
 
-    /** Set the constructor's exception throw types. */
+    /** Set the constructor's exception throw types.
+     * A list of <code>TypeNode</code>.
+     * @see polyglot.ast.TypeNode
+     */
     ConstructorDecl exceptionTypes(List exceptionTypes);
 
     /** The constructor's body. */
@@ -45,7 +57,7 @@ public interface ConstructorDecl extends ProcedureDecl
 
     /**
      * The constructor type object.  This field may not be valid until
-     * after type checking.
+     * after signature disambiguation.
      */
     ConstructorInstance constructorInstance();
 

@@ -31,10 +31,18 @@ public interface ConstructorCall extends Stmt
     /** Set the kind of the call: THIS or SUPER. */
     ConstructorCall kind(Kind kind);
 
-    /** Actual arguments. */
+    /**
+     * Actual arguments.
+     * A list of <code>Expr</code>.
+     * @see polyglot.ast.Expr
+     */
     List arguments();
 
-    /** Set the actual arguments. */
+    /**
+     * Set the actual arguments.
+     * A list of <code>Expr</code>.
+     * @see polyglot.ast.Expr
+     */
     ConstructorCall arguments(List arguments);
 
     /**

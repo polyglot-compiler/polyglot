@@ -16,10 +16,16 @@ public interface ProcedureDecl extends ClassMember
     /** The procedure's name. */
     String name();
 
-    /** The procedure's formal parameters. */
+    /** The procedure's formal parameters.
+     * A list of <code>Formal</code>.
+     * @see polyglot.ast.Formal
+     */
     List formals();
 
-    /** The procedure's exception throw types. */
+    /** The procedure's exception throw types.
+     * A list of <code>TypeNode</code>.
+     * @see polyglot.ast.TypeNode
+     */
     List exceptionTypes();
 
     /** The procedure's body. */

@@ -24,10 +24,16 @@ public interface NewArray extends Expr
      */
     int numDims();
 
-    /** List of dimension expressions. */
+    /** List of dimension expressions.
+     * A list of <code>Expr</code>.
+     * @see polyglot.ast.Expr
+     */
     List dims();
 
-    /** Set the list of dimension expressions. */
+    /** Set the list of dimension expressions.
+     * A list of <code>Expr</code>.
+     * @see polyglot.ast.Expr
+     */
     NewArray dims(List dims);
 
     /** The number of additional dimensions. */

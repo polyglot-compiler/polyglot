@@ -10,11 +10,15 @@ public interface Block extends Stmt
 {
     /**
      * Statements in the block.
+     * A list of <code>Stmt</code>.
+     * @see polyglot.ast.Stmt
      */
     List statements();
 
     /**
      * Set the statements in the block.
+     * A list of <code>Stmt</code>.
+     * @see polyglot.ast.Stmt
      */
     Block statements(List statements);
 

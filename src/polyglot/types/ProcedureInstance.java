@@ -10,11 +10,15 @@ public interface ProcedureInstance extends CodeInstance
 {
     /**
      * List of formal parameter types.
+     * @return A list of <code>Type</code>.
+     * @see polyglot.types.Type
      */
     List argumentTypes();
 
     /**
      * List of declared exception types thrown.
+     * @return A list of <code>Type</code>.
+     * @see polyglot.types.Type
      */
     List exceptionTypes();
 

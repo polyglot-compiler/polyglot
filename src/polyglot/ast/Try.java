@@ -14,10 +14,16 @@ public interface Try extends Stmt
     /** Set the block to "try". */
     Try tryBlock(Block tryBlock);
 
-    /** List of catch blocks. */
+    /** List of catch blocks.
+     * A list of <code>Catch</code>.
+     * @see polyglot.ast.Catch
+     */
     List catchBlocks();
 
-    /** Set the list of catch blocks. */
+    /** Set the list of catch blocks.
+     * A list of <code>Catch</code>.
+     * @see polyglot.ast.Catch
+     */
     Try catchBlocks(List catchBlocks);
 
     /** The block to "finally" execute. */

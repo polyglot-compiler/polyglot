@@ -35,11 +35,15 @@ public interface MethodInstance extends ProcedureInstance
 
     /**
      * Set the method's formal parameter types.
+     * @param l A list of <code>Type</code>.
+     * @see polyglot.types.Type
      */
     MethodInstance argumentTypes(List l);
 
     /**
      * Set the method's exception throw types.
+     * @param l A list of <code>Type</code>.
+     * @see polyglot.types.Type
      */
     MethodInstance exceptionTypes(List l);
 
@@ -51,6 +55,9 @@ public interface MethodInstance extends ProcedureInstance
     /**
      * Get the list of methods this method (potentially) overrides, in order
      * from this class (i.e., including <code>this</code>) to super classes.
+     * @return A list of <code>MethodInstance</code>, starting with
+     * <code>this</code>.
+     * @see polyglot.types.MethodInstance
      */
     List overrides();
 
@@ -67,6 +74,9 @@ public interface MethodInstance extends ProcedureInstance
     /**
      * Return true if this method can be called with name <code>name</code>
      * and actual parameters of types <code>actualTypes</code>.
+     * @param name The method to call.
+     * @param actualTypes A list of argument types of type <code>Type</code>.
+     * @see polyglot.types.Type
      */
     boolean methodCallValid(String name, List actualTypes);
 
@@ -75,6 +85,9 @@ public interface MethodInstance extends ProcedureInstance
      * from this class (i.e., including <code>this</code>) to super classes.
      * This method should not be called except by <code>TypeSystem</code>
      * and by subclasses.
+     * @return A list of <code>MethodInstance</code>, starting with
+     * <code>this</code>.
+     * @see polyglot.types.MethodInstance
      */
     List overridesImpl();
 

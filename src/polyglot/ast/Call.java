@@ -33,11 +33,15 @@ public interface Call extends Expr
 
     /**
      * The call's arguments.
+     * A list of <code>Expr</code>.
+     * @see polyglot.ast.Expr
      */
     List arguments();
 
     /**
      * Set the call's arguments.
+     * A list of <code>Expr</code>.
+     * @see polyglot.ast.Expr
      */
     Call arguments(List arguments);
 

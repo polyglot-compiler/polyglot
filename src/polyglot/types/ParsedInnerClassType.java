@@ -1,6 +1,5 @@
 package polyglot.types;
 
-import java.util.List;
 import polyglot.util.Position;
 
 /**
