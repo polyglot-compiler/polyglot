@@ -423,11 +423,11 @@ public class Flags implements Serializable
             return true;
         }
 
-        if (isProtected() && (f.isPackage() || f.isPublic())) {
+        if (isPackage() && (f.isProtected() || f.isPublic())) {
             return true;
         }
 
-        if (isPackage() && f.isPublic()) {
+        if (isProtected() && f.isPublic()) {
             return true;
         }
 
