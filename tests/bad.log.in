@@ -2,15 +2,7 @@ Errors.jl:5: No valid method call found for m(int) in Errors.
     return m(4) + (((null - 1) - 1) - (null - 1));
            ^
 
-Errors.jl:5: The - operator must have numeric operands.
-    return m(4) + (((null - 1) - 1) - (null - 1));
-                     ^
-
-Errors.jl:5: The - operator must have numeric operands.
-    return m(4) + (((null - 1) - 1) - (null - 1));
-                                       ^
-
-3 errors.
+1 error.
 Errors2.jl:2: Could not find type "foo".
   void m(foo x) {
          ^
@@ -27,24 +19,24 @@ Except4.jl:2: Type "Except4" is not a subclass of "java.lang.Throwable".
                   ^
 
 1 error.
-NoInit.java:7: variable i might not have been initialized
-            this.foo(i);
-                     ^
-NoInit.java:18: variable i might not have been initialized
-            this.foo(i);
-                     ^
-NoInit.java:27: unreachable statement
-                    i = 3;
-                    ^
-NoInit.java:29: variable i might not have been initialized
-            this.foo(i);
-                     ^
-NoInit.java:59: variable j might not have been initialized
-            this.foo(j);
-                     ^
-NoInit.java:75: variable i might not have been initialized
-            this.foo(i);
-                     ^
+NoInit.java:6: variable i might not have been initialized
+        this.foo(i);
+                 ^
+NoInit.java:15: variable i might not have been initialized
+        this.foo(i);
+                 ^
+NoInit.java:22: unreachable statement
+            i = 3;
+            ^
+NoInit.java:24: variable i might not have been initialized
+        this.foo(i);
+                 ^
+NoInit.java:52: variable j might not have been initialized
+        this.foo(j);
+                 ^
+NoInit.java:66: variable i might not have been initialized
+        this.foo(i);
+                 ^
 6 errors
 NoReturns.java:2: missing return statement
     int m1() {  }
@@ -55,12 +47,12 @@ NoReturns.java:6: missing return statement
 NoReturns.java:8: missing return statement
     int m4() { l1: while (true) { l2: while (true) { break l1; } } }
              ^
-NoReturns.java:23: missing return statement
-        {
-        ^
-NoReturns.java:34: missing return statement
-        {
-        ^
+NoReturns.java:21: missing return statement
+    int m6() {
+             ^
+NoReturns.java:26: missing return statement
+    int m7() {
+             ^
 5 errors
 Unreachable.jl:50: Syntax error.
       System.out.println("ouch!"); // BAD (52)
@@ -92,12 +84,16 @@ BadCtor.jl:3: Cannot declare a constructor inside an anonymous class.
 
 2 errors.
 BadExcept.jl:9: Cannot override method void method1() in Except1 with method
-    void method1() throws e1 in Except1sub; throws more exceptions than
-    overridden method.
+    void method1() throws e1 in Except1sub.
   void method1() throws e1 {}
        ^
 
-1 error.
+BadExcept.jl:11: Cannot override method void method3() throws e2 in Except1
+    with method void method3() throws e1 in Except1sub.
+  void method3() throws e1 {}
+       ^
+
+2 errors.
 BadExcept2.jl:10: Could not find type "MisspelledException".
     } catch (MisspelledException e) {}
              ^
@@ -120,11 +116,7 @@ BadInit.jl:4: Method no_such_fn not found.
     int a = no_such_fn();
             ^
 
-BadInit.jl:7: Method no_such_fn not found.
-    c = no_such_fn();
-        ^
-
-2 errors.
+1 error.
 BadInner.jl:8: Could not find non-static member class "Inner".
 	  Object o = new Outer.Inner();
 	             ^
@@ -139,7 +131,7 @@ BadInner2.jl:8: Cannot specify a containing instance for static classes.
              ^
 
 2 errors.
-BadInner3.jl:6: Qualifier type "BadInner3" is not an enclosing class.
+BadInner3.jl:6: Qualifier type "BadInner3" is not an enclosing class of "E.D".
     BadInner3 m() { return BadInner3.this; }
                            ^
 
@@ -154,7 +146,7 @@ BadInner5.jl:3: Member class "C0" not found in type "C0".
                 ^
 
 1 error.
-BadInner6.jl:12: Qualifier type "C2.I0" is not an enclosing class.
+BadInner6.jl:12: Qualifier type "C2.I0" is not an enclosing class of "C2".
     return I0.this;
            ^
 
@@ -175,7 +167,7 @@ class C0 implements I0
                     ^
 
 1 error.
-BadOverride.java:85: method() in Sub cannot implement method() in Override; attempting to assign weaker access privileges; was public
+BadOverride.java:76: method() in Sub cannot implement method() in Override; attempting to assign weaker access privileges; was public
 class Sub implements Override {
 ^
 1 error
@@ -189,26 +181,26 @@ BadProt.jl:6: Interface methods must be public.
                         ^
 
 1 error.
-Protection.jl:5: Cannot declare method which is both abstract and static.
+Protection.jl:5: Cannot declare method that is both abstract and static.
   static abstract void sa();
                        ^
 
-Protection.jl:6: Cannot declare method which is both abstract and final.
+Protection.jl:6: Cannot declare method that is both abstract and final.
   final abstract void fa();
                       ^
 
-Protection.jl:8: Cannot declare method which is both abstract and native.
+Protection.jl:8: Cannot declare method that is both abstract and native.
   native abstract void na();
                        ^
 
 3 errors.
 Protection2.jl:6: Cannot override method final void f() in Protection2 with
-    method void f() in p2; overridden method is final.
+    method void f() in p2.
   void f() {}
        ^
 
 1 error.
-BadStaticContext.java:10: cannot reference this before supertype constructor has been called
-            { super(this.m()); }
+BadStaticContext.java:8: cannot reference this before supertype constructor has been called
+        Y() { super(this.m()); }
                     ^
 1 error
