@@ -485,8 +485,6 @@ public class MethodNode extends ClassMember
     w.end();
 
     enterScope(c);
-    
-    enterScope(c);
 
     if( !mtiThis.getAccessFlags().isAbstract() ) {
       // FIXME should be abstract for interfaces.
