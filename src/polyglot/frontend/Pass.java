@@ -28,6 +28,7 @@ public interface Pass
     public static final ID FOLD = new ID("fold");
     public static final ID INIT_CHECK = new ID("init-check");
     public static final ID CONSTRUCTOR_CHECK = new ID("constructor-check");
+    public static final ID FWD_REF_CHECK = new ID("fwd-reference-check");
     public static final ID REACH_CHECK = new ID("reach-check");
     public static final ID EXIT_CHECK = new ID("exit-check");
     public static final ID DUMP = new ID("dump");
