@@ -6,7 +6,7 @@
   <target name="instructions" 
           description="Tell the user the instructions for using this build file">
     <echo>
-This build file is meant to only be used from the main buildfile build.xml.
+This build file is meant to be used only from the main buildfile build.xml.
 Use "ant -file build.xml configure"
     </echo>
     <fail/>
