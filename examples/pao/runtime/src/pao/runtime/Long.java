@@ -32,4 +32,8 @@ public class Long extends Primitive
     }
     return false;
   }
+
+  public String toString() {
+    return "" + value;
+  }
 }

@@ -31,4 +31,8 @@ public class Boolean extends Primitive
       return false;
     }
   }
+
+  public String toString() {
+    return "" + value;
+  }
 }

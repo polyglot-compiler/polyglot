@@ -32,4 +32,8 @@ public class Double extends Primitive
     }
     return false;
   }
+
+  public String toString() {
+    return "" + value;
+  }
 }

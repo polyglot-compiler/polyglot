@@ -14,4 +14,8 @@ public class Character extends Integer
   {
     return (char) value;
   }
+
+  public String toString() {
+    return "" + (char) value;
+  }
 }
