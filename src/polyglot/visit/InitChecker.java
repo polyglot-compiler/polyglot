@@ -864,7 +864,7 @@ public class InitChecker extends DataFlow
         else { 
             MinMaxInitCount initCount = (MinMaxInitCount) 
                       dfIn.initStatus.get(l.localInstance());           
-            if (initCount == null || InitCount.ZERO.equals(initCount.getMin())) {
+            if (initCount != null && InitCount.ZERO.equals(initCount.getMin())) {
                 // the local variable may not have been initialized. 
                 // However, we only want to complain if the local is reachable
                 if (l.reachable()) {
