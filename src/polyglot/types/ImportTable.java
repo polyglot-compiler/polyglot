@@ -130,72 +130,86 @@ public class ImportTable extends ClassResolver
      * Find a type by name, searching the import table.
      */
     public Named find(String name) throws SemanticException {
-	// FIXME: need to keep on looking to find conflicts.
         if (Report.should_report(new String[] {Report.types, Report.resolver, Report.imports}, 2))
-	    Report.report(2, this + ".find(" + name + ")");
+           Report.report(2, this + ".find(" + name + ")");
 
-	/* First add any lazy imports. */
-	lazyImport();
+        /* First add any lazy imports. */
+        lazyImport();
 
-	if (StringUtil.isNameShort(name)) {
-	    // First see if we have a mapping already.
-	    Object res = map.get(name);
+        if (!StringUtil.isNameShort(name)) {
+            // The name was long.
+            return resolver.find(name);
+        }
+        
+        // The class name is short.
+        // First see if we have a mapping already.
+        Object res = map.get(name);
 
-	    if (res != null) {
-		return (Named) res;
-	    }
+        if (res != null) {
+            return (Named) res;
+        }
 
-            List imports = new ArrayList(packageImports.size() + 5);
+        List imports = new ArrayList(packageImports.size() + 5);
 
-            if (pkg != null) {
-                imports.add(pkg.fullName());
-            }
+        if (pkg != null) {
+            imports.add(pkg.fullName());
+        }
 
-            imports.addAll(ts.defaultPackageImports());
-            imports.addAll(packageImports);
+        imports.addAll(ts.defaultPackageImports());
+        imports.addAll(packageImports);
 
-            // It wasn't a ClassImport.  Maybe it was a PackageImport?
-	    for (Iterator iter = imports.iterator(); iter.hasNext(); ) {
-		String pkgName = (String) iter.next();
-		String fullName = pkgName + "." + name;
+        // It wasn't a ClassImport.  Maybe it was a PackageImport?
+        Named resolved = null;
+        for (Iterator iter = imports.iterator(); iter.hasNext(); ) {
+            String pkgName = (String) iter.next();
+            String fullName = pkgName + "." + name;
 
-		try {
-                    Named n = resolver.find(fullName); 
-                    
-                    // Check if the type is visible in this package.
-                    if (isVisibleFrom(n, pkgName)) {
-                        // Memoize.
-                        map.put(name, n);
-
-                        return n;
+            try {
+                Named n = resolver.find(fullName); 
+        
+                // Check if the type is visible in this package.
+                if (isVisibleFrom(n, pkgName)) {
+                    if (resolved == null) {
+                        // this is the first occurance of name we've found
+                        // in a package import.
+                        // Record it, and keep going, to see if there
+                        // are any conflicts.
+                        resolved = n;
                     }
-		}
-		catch (NoClassException ex) {
-		    // Do nothing.
-		}
-	    }
+                    else {
+                        // this is the 2nd occurance of name we've found
+                        // in an imported package.
+                        // That's bad.
+                        throw new SemanticException("Reference to \"" + 
+                                name + "\" is ambiguous; both " + 
+                                resolved.fullName() + " and " + n.fullName() + 
+                                " match.");
+                    }
+                }
+            }
+            catch (NoClassException ex) {
+                // Do nothing.
+            }
+        }
 
-	    // The name was short, but not in any imported class or package.
-	    // Check the null package.
-	    Named n = resolver.find(name); // may throw exception
-
-            if (!isVisibleFrom(n, "")) {
-	      // Not visible.
-	      throw new NoClassException(name, sourcePos);
-	    }
-
-	    // Memoize.
-	    map.put(name, n);
-
-	    return n;
-	}
-
-	// The name was long.
-	return resolver.find(name);
+        if (resolved == null) {
+            // The name was short, but not in any imported class or package.
+            // Check the null package.
+            resolved = resolver.find(name); // may throw exception
+    
+            if (!isVisibleFrom(resolved, "")) {
+                // Not visible.
+                throw new NoClassException(name, sourcePos);
+            }
+        }
+        
+        // Memoize the result.
+        map.put(name, resolved);
+        return resolved;
     }
 
     /**
-     * Return whether <code>n</code> is visible from within
+     * Return whether <code>n</code> in package <code>pkgName</code> is visible from within
      * package <code>pkg</code>.  The empty string may
      * be passed in to represent the default package.
      */
