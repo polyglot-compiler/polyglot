@@ -86,6 +86,10 @@ public class CharacterLiteral extends NumericalLiteral
     w.write( "'" + escaped + "'");
   }
 
+  public String toString() {
+    return "'" + escaped + "'";
+  }
+
   public void dump( CodeWriter w)
   {
     w.write( "CHAR LITERAL");

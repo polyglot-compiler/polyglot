@@ -268,6 +268,36 @@ public class ForStatement extends Statement
     }
   }
 
+  public String toString() {
+    String s = "for (";
+
+    if( inits != null) {
+      for( Iterator iter = inits.iterator(); iter.hasNext(); ) {
+	s += iter.next();
+
+        if( iter.hasNext()) {
+          s += " ";
+        }
+      }
+    }
+
+    s += cond + ";";
+
+    if( iters != null) {
+      for( Iterator iter = iters.iterator(); iter.hasNext(); ) {
+	s += iter.next();
+
+        if( iter.hasNext()) {
+          s += " ";
+        }
+      }
+    }
+
+    s += ") " + body;
+
+    return s;
+  }
+
   public void dump( CodeWriter w)
   {
     w.write( "FOR ");

@@ -119,6 +119,10 @@ public class ReturnStatement extends Statement
     w.write( ";");
   }
 
+  public String toString() {
+    return "return" + (expr != null ? (" " + expr) : "") + ";";
+  }
+
   public void dump( CodeWriter w)
   {
     w.write( "RETURN ");

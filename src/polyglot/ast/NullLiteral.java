@@ -37,6 +37,10 @@ public class NullLiteral extends Literal
     w.write( "null");
   }
 
+  public String toString() {
+	return "null";
+  }
+
   public void dump( CodeWriter w)
   {
     w.write( "NULL ");

@@ -507,6 +507,12 @@ public class ClassNode extends ClassMember implements GlobalDeclaration
     translateBody(c, w);
   }
 
+  public String toString() {
+    return accessFlags.getStringRepresentation() + 
+             (accessFlags.isInterface() ? "" : "class ") 
+             + name + " { ... }";
+  }
+
   public void translateBody( LocalContext c, CodeWriter w)
   {
     if (ext instanceof TranslateBodyOverride) {

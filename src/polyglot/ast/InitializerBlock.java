@@ -117,6 +117,13 @@ public class InitializerBlock extends ClassMember
     leaveScope(c);
   }
 
+  public String toString() {
+    if (isStatic) {
+      return "static " + block.toString();
+    }
+    return block.toString();
+  }
+
   public void dump( CodeWriter w)
   {
     w.write( "INITIALIZER BLOCK ");

@@ -184,6 +184,27 @@ public class ConstructorCallStatement extends Statement
     return mti;
   }
 
+  public String toString() {
+    String s = "";
+    if( primary != null) {
+      s += primary.toString();
+      s += ".";
+    } 
+
+    s += (kind == THIS ? "this(" : "super(");
+
+    for (Iterator iter = arguments(); iter.hasNext(); ) {
+      s += iter.next();
+      if (iter.hasNext()) {
+        s += ", ";
+      }
+    }
+
+    s += ");";
+
+    return s;
+  }
+
   public void translate_no_override( LocalContext c, CodeWriter w)
   {
     if( primary != null) {

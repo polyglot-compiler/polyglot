@@ -182,6 +182,35 @@ public class UnaryExpression extends Expression
     return this;
   }
 
+  public String toString() {
+    if (operator == POSTINCR) {
+	return expr + "++";
+    }
+    else if (operator == POSTDECR) {
+	return expr + "--";
+    }
+    if( operator == NEGATIVE) {
+      return "-" + expr;
+    }
+    else if( operator == BITCOMP) {
+      return "~" + expr;
+    }
+    else if( operator == PREINCR) {
+      return "++" + expr;
+    }
+    else if( operator == PREDECR) {
+      return "--" + expr;
+    }
+    else if( operator == POSITIVE) {
+      return "+" + expr;
+    }
+    else if( operator == LOGICALNOT) {
+      return "!" + expr;
+    }
+
+    return "???";
+  }
+
   public void translate_no_override( LocalContext c, CodeWriter w)
   {
     if (operator <= NEGATIVE || operator >= PREINCR) {
@@ -214,7 +243,7 @@ public class UnaryExpression extends Expression
       if( operator == POSTINCR) {
         w.write( "++");
       }
-      if( operator == POSTDECR) {
+      else if( operator == POSTDECR) {
         w.write( "--");
       }
     }

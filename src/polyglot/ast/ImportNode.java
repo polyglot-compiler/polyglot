@@ -116,6 +116,10 @@ public class ImportNode extends Node
     }
   }
 
+  public String toString() {
+    return "import " + imports + (kind == PACKAGE ? ".*;" : ";");
+  }
+
   public void dump( CodeWriter w)
   {
     w.write( "IMPORT < " + (kind == PACKAGE ? "PACKAGE" : "CLASS"));

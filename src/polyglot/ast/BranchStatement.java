@@ -124,6 +124,11 @@ public class BranchStatement extends Statement {
     w.write( (kind == BREAK ? "break" : "continue") + 
                (label == null ? "; " : " " + label + "; "));
   }
+
+  public String toString() {
+    return (kind == BREAK ? "break" : "continue") + 
+	   (label == null ? ";" : " " + label + ";");
+  }
   
   public void dump( CodeWriter w)
   {

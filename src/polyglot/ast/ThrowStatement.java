@@ -83,6 +83,10 @@ public class ThrowStatement extends Statement
     expr.translate(c, w);
     w.write("; ");
   }
+
+  public String toString() {
+    return "throw " + expr + ";";
+  }
   
   public void dump( CodeWriter w)
   {

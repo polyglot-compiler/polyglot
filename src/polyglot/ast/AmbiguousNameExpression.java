@@ -240,6 +240,10 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
   }
   */
 
+  public String toString() {
+    return "AmbNameEx(" + getFullName() + ")";
+  }
+
   public void dump( CodeWriter w)
   {
     w.write ("AMBIGUOUS NAME < ");

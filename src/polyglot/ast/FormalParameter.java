@@ -162,6 +162,10 @@ public class FormalParameter extends Node
     w.write( " " + name);
   }
 
+  public String toString() {
+    return tn + " " + name;
+  }
+
   public void dump( CodeWriter w)
   {
     w.write( "FORMAL PARAM <" + name + "> ");

@@ -540,6 +540,22 @@ public class MethodNode extends ClassMember
     w.newline( 0);
   }
 
+  public String toString() {
+    String s = "";
+    if( !isConstructor()) {
+      s += returns;
+      s += " ";
+      s += name;
+    }
+    else {
+      s += returns;
+    }
+
+    s += "( ... ) { ... }" ;
+
+    return s;
+  }
+  
   public void dump( CodeWriter w) throws SemanticException
   {
     w.write( "METHOD");

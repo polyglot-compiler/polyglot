@@ -86,6 +86,10 @@ public class ClassDeclarationStatement extends Statement
     classNode.translate( c, w);
   }
   
+  public String toString() {
+    return classNode.toString() + ";";
+  }
+
   public void dump( CodeWriter w)
   {
     w.write( "CLASS DECLARATION");

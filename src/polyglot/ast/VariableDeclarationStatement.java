@@ -231,6 +231,10 @@ public class VariableDeclarationStatement extends Statement
       }
     }
 
+    public String toString() {
+      return name;
+    }
+    
     public void dump( CodeWriter w) throws SemanticException
     {
       VariableDeclarationStatement vdsEnclosing = 
@@ -440,6 +444,20 @@ public class VariableDeclarationStatement extends Statement
       }
     }
     w.write(";");
+  }
+
+  public String toString() {
+    String s = tn + " ";
+
+    for( Iterator iter = declarators(); iter.hasNext(); ) {
+      s += iter.next();
+      if( iter.hasNext())
+	s += ", ";
+    }
+
+    s += ";";
+
+    return s;
   }
   
   public void dump( CodeWriter w) throws SemanticException

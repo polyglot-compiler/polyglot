@@ -63,6 +63,10 @@ public class BooleanLiteral extends Literal
     w.write( "" + value);
   }
 
+  public String toString() {
+    return "" + value;
+  }
+
   public void dump( CodeWriter w) 
   {
     w.write( "BOOLEAN LITERAL");

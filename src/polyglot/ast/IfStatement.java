@@ -134,6 +134,10 @@ public class IfStatement extends Statement
     }
   }
 
+  public String toString() {
+    return "if (" + cond + ") " + then + (else_ != null ? (" else " + else_) : "");
+  }
+
   public void dump(CodeWriter w)
   {
     w.write( "IF ");

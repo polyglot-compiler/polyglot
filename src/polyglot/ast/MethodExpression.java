@@ -260,6 +260,26 @@ public class MethodExpression extends Expression
     w.end();
     w.write( ")");
   }
+
+  public String toString() {
+    String s = "";
+    if( target != null) {
+      s += target;
+      s += ".";
+    }
+
+    s += name + "(";
+    
+    for( Iterator iter = arguments(); iter.hasNext(); ) {
+      s += iter.next();
+      if (iter.hasNext()) {
+        s += ", ";
+      }
+    }
+
+    s += ")";
+    return s;
+  }
   
   public void dump( CodeWriter w)
   {

@@ -87,6 +87,10 @@ public class WhileStatement extends Statement
     return this;
   }
 
+  public String toString() {
+    return "while (" + cond + ") " + body;
+  }
+
   public void translate_no_override( LocalContext c, CodeWriter w)
   {
     w.write( "while (" );

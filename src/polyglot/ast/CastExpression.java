@@ -130,6 +130,10 @@ public class CastExpression extends Expression
     translateExpression(expr, c, w);
     w.end();
   }
+
+  public String toString() {
+    return "(" + tn + ")" + expr;
+  }
   
   public void dump( CodeWriter w)
   {

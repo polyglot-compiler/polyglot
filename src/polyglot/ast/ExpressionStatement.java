@@ -69,6 +69,10 @@ public class ExpressionStatement extends Statement
     return this;
   }
 
+  public String toString() {
+    return expr + ";";
+  }
+
   public void translate_no_override( LocalContext c, CodeWriter w)
   {
     expr.translate( c, w);

@@ -97,6 +97,10 @@ public class SynchronizedStatement extends Statement
     body.translate_substmt( c, w);
   }
 
+  public String toString() {
+    return "synchronized (" + expr + ") " + body;
+  }
+
   public void dump( CodeWriter w)
   {
     w.write( "SYNCHRONIZED ");

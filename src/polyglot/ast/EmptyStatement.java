@@ -41,6 +41,10 @@ public class EmptyStatement extends Statement
     w.write( ";");
   }
 
+  public String toString() {
+    return ";";
+  }
+
   public void dump( CodeWriter w) throws SemanticException
   {
     w.write( "EMPTY_STATEMENT");

@@ -283,6 +283,10 @@ public class AmbiguousName extends Node implements AmbiguousNode {
   }
   */
 
+  public String toString() {
+    return "AmbName(" + getFullName() + ")";
+  }
+
   public void dump( CodeWriter w)
   {
     w.write ("AMBIGUOUS NAME < ");

@@ -141,6 +141,10 @@ public class ArrayIndexExpression extends Expression
     dumpNodeInfo( w);
   }
 
+  public String toString() {
+    return base + "[" + index + "]";
+  }
+
   public int getPrecedence()
   {
     return PRECEDENCE_OTHER;

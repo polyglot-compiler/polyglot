@@ -208,6 +208,26 @@ public class NewArrayExpression extends Expression
     }
   }
 
+  public String toString() {
+    String s = "new " + base;
+
+    for( Iterator iter = dimensionExpressions(); iter.hasNext(); ) {
+      s += "[";
+      s += iter.next();
+      s += "]";
+    }
+
+    for( int i = 0; i < addDims; i++) { 
+      s += "[]";
+    }
+
+    if( init != null) {
+      s += init;
+    }
+
+    return s;
+  }
+  
   public void dump( CodeWriter w)
   {
     w.write( "NEW");

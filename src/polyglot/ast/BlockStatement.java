@@ -139,6 +139,17 @@ public class BlockStatement extends Statement {
       translate(c, w);
   }
 
+  public String toString() {
+    String s = "";
+    for (Iterator it = statements.iterator(); it.hasNext(); ) 
+    {
+      s += it.next();
+      if (it.hasNext())
+        s += " ";
+    }
+    return "{" + s + "}";
+  }
+
   public void translate_no_override( LocalContext c, CodeWriter w)
   {
     enterScope(c);

@@ -87,6 +87,10 @@ public class LabelledStatement extends Statement
     stmt.translate( c, w);
   }
 
+  public String toString() {
+    return label + ": " + stmt;
+  }
+
   public void dump( CodeWriter w)
   {
     w.write( "LABEL");

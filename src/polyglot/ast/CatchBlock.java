@@ -150,6 +150,10 @@ public class CatchBlock extends Node
     block.translate_substmt(c, w);
     leaveScope(c);
   }
+
+  public String toString() {
+    return "catch (" + fp + ")" + block;
+  }
   
   public void dump( CodeWriter w)
   {

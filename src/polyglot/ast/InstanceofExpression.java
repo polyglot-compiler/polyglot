@@ -110,6 +110,10 @@ public class InstanceofExpression extends Expression
     tn.translate( c, w);
   }
 
+  public String toString() {
+    return expr + " instanceof " + tn;
+  }
+
   public void dump( CodeWriter w)
   {
     w.write( "INSTANCEOF ");

@@ -353,6 +353,10 @@ public class SwitchStatement extends Statement
       w.write("}");
    }
 
+   public String toString() {
+      return "switch { ... }";
+   }
+
    public void dump( CodeWriter w)
    {
       w.write( "SWITCH ");

@@ -88,6 +88,10 @@ public class DoStatement extends Statement
     return this;
   }
 
+  public String toString() {
+    return "do " + stmt + " while (" + cond + ");";
+  }
+
   public void translate_no_override(LocalContext c, CodeWriter w)
   {
     w.write( "do ");

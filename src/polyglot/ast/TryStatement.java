@@ -264,6 +264,10 @@ public class TryStatement extends Statement {
       dumpNodeInfo( w);
    }
 
+  public String toString() {
+    return "try { ... }";
+  }
+
   private BlockStatement tryBlock;
   private List catchBlocks;
   private BlockStatement finallyBlock;

@@ -91,6 +91,10 @@ public class StringLiteral extends Literal
     w.write("\"");
   }
 
+  public String toString() {
+    return "\"" + value + "\"";
+  }
+
   public void dump( CodeWriter w)
   {
     w.write( "STRING LITERAL");

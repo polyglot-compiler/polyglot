@@ -127,6 +127,10 @@ public class FieldNode extends ClassMember
     return this;
   }
 
+  public String toString() {
+    return declare.toString();
+  }
+
   public void translate_no_override(LocalContext c, CodeWriter w)
   {
     //w.write(accessFlags.getStringRepresentation());

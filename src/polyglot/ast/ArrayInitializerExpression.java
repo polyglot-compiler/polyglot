@@ -145,6 +145,17 @@ public class ArrayInitializerExpression extends Expression
     dumpNodeInfo( w);
   }
   
+  public String toString() {
+    String s = "";
+    for( Iterator iter = children(); iter.hasNext(); ) {
+      s += iter.next();
+      if (iter.hasNext()) {
+	s += ", ";
+      }
+    }
+    return "{" + s + "}";
+  }
+
   public int getPrecedence()
   {
     return PRECEDENCE_OTHER;

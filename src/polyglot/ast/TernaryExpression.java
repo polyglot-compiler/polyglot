@@ -113,6 +113,10 @@ public class TernaryExpression extends Expression
     translateExpression( third, c, w);
   }
 
+  public String toString() {
+    return cond + " ? " + second + " : " + third;
+  }
+
   public void dump( CodeWriter w)
   {
     w.write( "TERNARY ");

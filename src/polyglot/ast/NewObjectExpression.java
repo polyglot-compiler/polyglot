@@ -343,6 +343,33 @@ public class NewObjectExpression extends Expression
     }
   }
 
+  public String toString() {
+    String s = "";
+    if( primary != null) {
+      s += primary;
+      s += ".";
+    }
+
+    s += "new ";
+    s += tn;
+    s += "(";
+
+    for( Iterator iter = arguments(); iter.hasNext(); ) {
+      s += iter.next();
+      if(iter.hasNext()) {
+        s += ", ";
+      }
+    }
+
+    s += ")";
+
+    if( cn != null) {
+	s += " { ... }";
+    }
+
+    return s;
+  } 
+
   public void dump( CodeWriter w)
   {
     w.write ("NEW " );

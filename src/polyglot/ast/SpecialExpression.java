@@ -123,6 +123,11 @@ public class SpecialExpression extends Expression
     w.write( (kind == SUPER ? "super" : "this"));
   }
 
+  public String toString() {
+    return (tn != null ? (tn + ".") : "") + 
+	   (kind == SUPER ? "super" : "this");
+  }
+
   public void dump( CodeWriter w)
   {
     w.write( "SPECIAL");

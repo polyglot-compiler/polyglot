@@ -142,6 +142,10 @@ public class TypeNode extends Node
     //dumpNodeInfo( w);
   }
 
+  public String toString() {
+    return type.getTypeString();
+  }
+
   public void setCheckedType( Type type)
   {
     Annotate.setCheckedType( this, type);

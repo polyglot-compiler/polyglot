@@ -201,6 +201,13 @@ public class FieldExpression extends Expression
     return this;
   }
 
+  public String toString() {
+    if (target != null) {
+      return target + "." + name;
+    }
+    return name;
+  }
+
   public void translate_no_override( LocalContext c, CodeWriter w)
   {
     if (target != null) 
@@ -230,10 +237,6 @@ public class FieldExpression extends Expression
   public int getPrecedence()
   {
     return PRECEDENCE_OTHER;
-  }
-  
-  public String toString() {
-	  return name; //TO FIX
   }
 }
     
