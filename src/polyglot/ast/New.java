@@ -48,7 +48,7 @@ public interface New extends Expr, ProcedureCall
     /** Set the actual arguments to pass to the constructor.
      * @param arguments A list of {@link polyglot.ast.Expr Expr}.
      */
-    New arguments(List arguments);
+    ProcedureCall arguments(List arguments);
 
     /** The class body for anonymous classes, or null. */
     ClassBody body();

@@ -9,6 +9,7 @@ import java.util.List;
 import polyglot.ast.ConstructorCall;
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
+import polyglot.ast.ProcedureCall;
 import polyglot.ast.Term;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
@@ -77,7 +78,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     }
 
     /** Set the actual arguments of the constructor call. */
-    public ConstructorCall arguments(List arguments) {
+    public ProcedureCall arguments(List arguments) {
 	ConstructorCall_c n = (ConstructorCall_c) copy();
 	n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
 	return n;

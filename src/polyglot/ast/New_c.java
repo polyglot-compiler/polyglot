@@ -85,7 +85,7 @@ public class New_c extends Expr_c implements New
 	return this.arguments;
     }
 
-    public New arguments(List arguments) {
+    public ProcedureCall arguments(List arguments) {
 	New_c n = (New_c) copy();
 	n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
 	return n;

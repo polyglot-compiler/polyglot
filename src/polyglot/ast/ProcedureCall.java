@@ -16,6 +16,12 @@ public interface ProcedureCall extends Term
     List arguments();
 
     /**
+     * Set the call's actual arguments.
+     * @param arguments A list of {@link polyglot.ast.Expr Expr}.
+     */
+    ProcedureCall arguments(List arguments);
+
+    /**
      * The type object of the method we are calling.  This is, generally, only
      * valid after the type-checking pass.
      */

@@ -94,7 +94,7 @@ public class Call_c extends Expr_c implements Call
   }
 
   /** Set the actual arguments of the call. */
-  public Call arguments(List arguments) {
+  public ProcedureCall arguments(List arguments) {
     Call_c n = (Call_c) copy();
     n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
     return n;
