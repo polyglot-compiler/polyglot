@@ -1,7 +1,7 @@
-package jltools.ext.jl.types;
+package polyglot.ext.jl.types;
 
-import jltools.types.*;
-import jltools.util.*;
+import polyglot.types.*;
+import polyglot.util.*;
 
 /**
  * A <code>InitializerInstance</code> contains the type information for a

@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * A <code>LocalInstance</code> contains type information for a local variable.

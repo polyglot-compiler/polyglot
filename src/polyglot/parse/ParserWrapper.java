@@ -1,10 +1,10 @@
-package jltools.parse;
+package polyglot.parse;
 
-import jltools.ast.*;
-import jltools.lex.*;
-import jltools.parse.*;
-import jltools.types.*;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.lex.*;
+import polyglot.parse.*;
+import polyglot.types.*;
+import polyglot.util.*;
 
 /**
  * A wrapper for a parser to provide access to certain data and methods

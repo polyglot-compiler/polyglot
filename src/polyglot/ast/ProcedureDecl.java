@@ -1,7 +1,7 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.ProcedureInstance;
-import jltools.types.Flags;
+import polyglot.types.ProcedureInstance;
+import polyglot.types.Flags;
 import java.util.List;
 
 /**

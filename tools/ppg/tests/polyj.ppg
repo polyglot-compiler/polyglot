@@ -1,10 +1,10 @@
 include "java12.cup"
 
-package jltools.ext.polyj.parse;
+package polyglot.ext.polyj.parse;
 
-import jltools.ext.polyj.ast.*;
-import jltools.ext.polyj.extension.*;
-import jltools.ext.polyj.types.*;
+import polyglot.ext.polyj.ast.*;
+import polyglot.ext.polyj.extension.*;
+import polyglot.ext.polyj.types.*;
 
 parser code  {:
 	ErrorQueue eq;

@@ -1,14 +1,14 @@
-package jltools.util.jlgen.parse;
+package polyglot.util.ppg.parse;
 
 import java.io.*;
-import jltools.util.jlgen.*;
-import jltools.util.jlgen.lex.*;
-import jltools.util.jlgen.spec.*;
-import jltools.util.jlgen.util.*;
+import polyglot.util.ppg.*;
+import polyglot.util.ppg.lex.*;
+import polyglot.util.ppg.spec.*;
+import polyglot.util.ppg.util.*;
 
 public class ParseTest
 {
-	private static final String HEADER = "jlgen [parsetest]: ";
+	private static final String HEADER = "ppg [parsetest]: ";
 	
 	private ParseTest() {}
 

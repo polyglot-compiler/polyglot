@@ -1,6 +1,6 @@
-package jltools.frontend;
+package polyglot.frontend;
 
-import jltools.util.Enum;
+import polyglot.util.Enum;
 import java.util.*;
 
 /** A <code>Pass</code> represents a compiler pass. */

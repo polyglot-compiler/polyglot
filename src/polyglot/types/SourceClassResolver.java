@@ -1,13 +1,13 @@
-package jltools.types;
+package polyglot.types;
 
-import jltools.frontend.*;
-import jltools.frontend.Compiler;
-import jltools.ast.Node;
-import jltools.visit.ClassSerializer;
-import jltools.util.*;
-import jltools.main.Main;
-import jltools.main.Version;
-import jltools.types.reflect.*;
+import polyglot.frontend.*;
+import polyglot.frontend.Compiler;
+import polyglot.ast.Node;
+import polyglot.visit.ClassSerializer;
+import polyglot.util.*;
+import polyglot.main.Main;
+import polyglot.main.Version;
+import polyglot.types.reflect.*;
 
 import java.io.*;
 import java.util.*;
@@ -18,7 +18,7 @@ import java.util.*;
  * given below.
  *
  * <ol>
- * <li> When the jltools translator looks for a class by the name
+ * <li> When the polyglot translator looks for a class by the name
  * "foo.bar.Quux" it first searches for that class in any file given
  * on the command line. If the class is found one of these files, then
  * this definition is used and the remainder of the steps are

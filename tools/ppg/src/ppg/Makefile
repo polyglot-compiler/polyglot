@@ -1,10 +1,10 @@
 SOURCE = ../../..
-PACKAGE = jltools/util/jlgen
+PACKAGE = polyglot/util/ppg
 SUBDIRS = atoms cmds code lex parse spec util
 
 include $(SOURCE)/Rules.mk
 
-SOURCES = JLgen.java
+SOURCES = PPG.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 

@@ -1,8 +1,8 @@
-package jltools.frontend;
+package polyglot.frontend;
 
 import java.io.*;
-import jltools.ast.*;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.util.*;
 
 /**
  * A pass which runs a parser.  After parsing it stores the AST in the Job.
@@ -28,7 +28,7 @@ public class ParserPass extends AbstractPass
 
 	    Parser p = compiler.sourceExtension().parser(reader, source, eq);
 
-	    jltools.frontend.Compiler.report(2, "Using parser " + p);
+	    polyglot.frontend.Compiler.report(2, "Using parser " + p);
 
 	    Node ast = p.parse();
 

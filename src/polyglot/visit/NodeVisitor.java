@@ -1,12 +1,12 @@
-package jltools.visit;
+package polyglot.visit;
 
-import jltools.ast.Node;
-import jltools.util.*;
+import polyglot.ast.Node;
+import polyglot.util.*;
 import java.util.*;
 
 /**
  * The <code>NodeVisitor</code> represents an implementation of the "Visitor"
- * style of tree traversal. There is a convention among <b>jltools</b> visitors
+ * style of tree traversal. There is a convention among <b>polyglot</b> visitors
  * which states that traversals will <i>lazily reconstruct</i> the tree. That
  * is, the AST is functionally "modified" by creating new nodes on each
  * traversal, but only when necessary-- only when nodes (or their children) are
@@ -17,8 +17,8 @@ import java.util.*;
  * <code>leave</code> informs the visitor that traversal is finishing a
  * particular subtree.
  *
- * @see jltools.ast.Node#visit
- * @see jltools.ast.Node
+ * @see polyglot.ast.Node#visit
+ * @see polyglot.ast.Node
  */
 public abstract class NodeVisitor
 {

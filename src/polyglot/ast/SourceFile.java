@@ -1,7 +1,7 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.ImportTable;
-import jltools.frontend.Source;
+import polyglot.types.ImportTable;
+import polyglot.frontend.Source;
 import java.util.List;
 
 /**

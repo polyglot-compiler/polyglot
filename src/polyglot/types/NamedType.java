@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * A <code>NamedType</code> is a type with a name, usually either a top-level

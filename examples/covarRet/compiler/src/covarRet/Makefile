@@ -1,5 +1,5 @@
 SOURCE = ../../..
-PACKAGE = jltools/ext/covarRet
+PACKAGE = polyglot/ext/covarRet
 #SUBDIRS = runtime
 
 include $(SOURCE)/Rules.mk

@@ -46,13 +46,13 @@ interface, the method would return the string ``\verb-I-''.)
 \section{Translation Infrastructure}
 
 Translation in PolyJ $1.2$ is handled by a translation visitor that
-extends the existing translation visitor in JLTools.  The PolyJ
+extends the existing translation visitor in Polyglot.  The PolyJ
 translation visitor first walks over the AST and produces a Java
 translation of the .pj file.  As it does this, the visitor saves
 information to three data structures so that it can generate the
 appropriate adapter interfaces and classes once the .pj file is
 translated.  The classes for these data structures are kept in the
-package \verb-jltools.ext.polyj.util-.
+package \verb-polyglot.ext.polyj.util-.
 
 The first of these data structures, \verb-WhereBindingTable-, holds
 information about the method constraints found in the where clauses of
@@ -116,7 +116,7 @@ to support inner classes should not be difficult.
 
 \paragraph{Files:}
 \begin{itemize}
-\item \verb-jltools.ext.polyj.ast.PolyJClassNode-
+\item \verb-polyglot.ext.polyj.ast.PolyJClassNode-
 \end{itemize}
 
 \subsection{Generation of adapter interfaces and adapter classes}
@@ -126,7 +126,7 @@ Adapter interfaces and adapter classes generated.
 
 \paragraph{Files:}
 \begin{itemize}
-\item \verb-jltools.ext.polyj.visit.PolyJTranslationVisitor-
+\item \verb-polyglot.ext.polyj.visit.PolyJTranslationVisitor-
 \end{itemize}
 
 \subsection{Generation of \texttt{\$FetchS} and \texttt{\$SetS}}
@@ -137,7 +137,7 @@ adapter interfaces, implemented in adapter classes.
 
 \paragraph{Files:}
 \begin{itemize}
-\item \verb+jltools.ext.polyj.visit.PolyJTranslationVisitor+
+\item \verb+polyglot.ext.polyj.visit.PolyJTranslationVisitor+
 \end{itemize}
 
 \subsection{Translation of cast and instanceof expressions.}
@@ -149,8 +149,8 @@ is polymorphic, does not handle types instantiated on
 
 \paragraph{Files:}
 \begin{itemize}
-\item \verb+jltools.ext.polyj.ast.PolyJCastExpression+
-\item \verb+jltools.ext.polyj.ast.PolyJInstanceOfExpression+
+\item \verb+polyglot.ext.polyj.ast.PolyJCastExpression+
+\item \verb+polyglot.ext.polyj.ast.PolyJInstanceOfExpression+
 \end{itemize}
 
 \subsection{Constructor Translation.}
@@ -160,7 +160,7 @@ does not add the ``\verb+this.$W = $W+'' statement to the body of
 the constructor.
 \paragraph{Files:}
 \begin{itemize}
-\item \verb+jltools.ext.polyj.ast.PolyJMethodExpression+
+\item \verb+polyglot.ext.polyj.ast.PolyJMethodExpression+
 \end{itemize}
 
 \subsection{Translation infrastructure}
@@ -174,7 +174,7 @@ is a call to a polymorphic class constructor.
 
 \paragraph{Files:}
 \begin{itemize}
-\item \verb+jltools.ext.polyj.ast.PolyJConstructorCallStatement+
+\item \verb+polyglot.ext.polyj.ast.PolyJConstructorCallStatement+
 \end{itemize}
 
 \subsection{Field Expression translation.}
@@ -184,7 +184,7 @@ Additionally, if the field is known, a cast is done.
 
 \paragraph{Files:}
 \begin{itemize}
-\item \verb+jltools.ext.polyj.ast.PolyJFieldExpression+
+\item \verb+polyglot.ext.polyj.ast.PolyJFieldExpression+
 \end{itemize}
 
 \subsection{Method expressions (including translation of where methods
@@ -195,7 +195,7 @@ If the method call is a where method, we translate to call the correct
 
 \paragraph{Files:}
 \begin{itemize}
-\item \verb+jltools.ext.polyj.ast.PolyJMethodExpression+
+\item \verb+polyglot.ext.polyj.ast.PolyJMethodExpression+
 \end{itemize}
 
 \subsection{Addition of \texttt{PolyJAmbiguousName} and \texttt{PolyJAmbiguousNameExpression}}

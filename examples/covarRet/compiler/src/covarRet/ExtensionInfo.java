@@ -1,15 +1,15 @@
-package jltools.ext.covarRet;
+package polyglot.ext.covarRet;
 
-import jltools.ast.*;
-import jltools.types.*;
-import jltools.util.*;
-import jltools.visit.*;
-import jltools.frontend.*;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
+import polyglot.frontend.*;
 
 import java.util.*;
 import java.io.*;
 
-public class ExtensionInfo extends jltools.ext.jl.ExtensionInfo {
+public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
     public String defaultFileExtension() {
 	return "jl";
     }

@@ -1,7 +1,7 @@
-package jltools.types;
+package polyglot.types;
 
 import java.util.List;
-import jltools.util.Position;
+import polyglot.util.Position;
 
 /**
  * A <code>ParsedClassType</code> represents a class loaded from a source file.

@@ -1,7 +1,7 @@
-package jltools.types;
+package polyglot.types;
 
-import jltools.util.InternalCompilerError;
-import jltools.util.Copy;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Copy;
 
 import java.lang.reflect.Modifier;
 import java.io.Serializable;

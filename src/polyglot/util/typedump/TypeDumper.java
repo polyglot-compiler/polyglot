@@ -1,8 +1,8 @@
 
-package jltools.util.typedump;
+package polyglot.util.typedump;
 
-import jltools.util.*;
-import jltools.types.*;
+import polyglot.util.*;
+import polyglot.types.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Date;
@@ -65,7 +65,7 @@ class TypeDumper {
 	w.write("Type "+rawName+ " {");
 	w.allowBreak(2);
 	w.begin(0);
-	w.write("Compiled with jltools version "+compilerVersion+".  ");
+	w.write("Compiled with polyglot version "+compilerVersion+".  ");
 	w.allowBreak(0);
 	w.write("Last modified: "+timestamp.toString()+".  ");
 	w.allowBreak(0);

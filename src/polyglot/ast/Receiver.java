@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /**
  * A <code>Receiver</code> represents any node that can be used as the

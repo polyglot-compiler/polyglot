@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /**
  * Am immutable representation of a Java statement with a label.  A labeled

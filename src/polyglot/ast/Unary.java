@@ -1,6 +1,6 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.util.Enum;
+import polyglot.util.Enum;
 
 /**
  * A <code>Unary</code> represents a Java unary expression, an

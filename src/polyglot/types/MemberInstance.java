@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * A <code>MemberInstance</code> is an entity that can be a member of

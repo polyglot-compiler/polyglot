@@ -1,12 +1,12 @@
-package jltools.util;
+package polyglot.util;
 
-import jltools.types.*;
+import polyglot.types.*;
 
 import java.io.*;
 import java.util.zip.*;
 
 /**
- * The <code>TypeEncoder</code> gives the ability to encode a jltools 
+ * The <code>TypeEncoder</code> gives the ability to encode a polyglot 
  * <code>Type</code> as a Java string.
  * <p>
  * It uses a form of serialization to encode the <code>Type</code> into

@@ -1,8 +1,8 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.ConstructorInstance;
+import polyglot.types.ConstructorInstance;
 import java.util.List;
-import jltools.types.Flags;
+import polyglot.types.Flags;
 
 /**
  * A <code>ConstructorDecl</code> is an immutable representation of a

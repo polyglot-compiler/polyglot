@@ -1,6 +1,6 @@
-package jltools.types;
+package polyglot.types;
 
-import jltools.util.Enum;
+import polyglot.util.Enum;
 
 /**
  * A <code>PrimitiveType</code> represents a type which may not be directly 

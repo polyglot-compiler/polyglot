@@ -1,8 +1,8 @@
-package jltools.frontend;
+package polyglot.frontend;
 
-import jltools.ast.Node;
-import jltools.visit.NodeVisitor;
-import jltools.util.*;
+import polyglot.ast.Node;
+import polyglot.visit.NodeVisitor;
+import polyglot.util.*;
 
 /** A pass which runs a visitor. */
 public class VisitorPass extends AbstractPass

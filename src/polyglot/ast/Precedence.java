@@ -1,6 +1,6 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.util.Enum;
+import polyglot.util.Enum;
 
 /**
  * Constants defining the precedence of an expression.  Higher

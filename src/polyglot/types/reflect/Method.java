@@ -1,6 +1,6 @@
-package jltools.types.reflect;
+package polyglot.types.reflect;
 
-import jltools.types.*;
+import polyglot.types.*;
 import java.util.*;
 import java.io.*;
 

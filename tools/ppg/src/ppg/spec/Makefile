@@ -1,12 +1,12 @@
 SOURCE = ../../../..
-PACKAGE = jltools/util/jlgen/spec
+PACKAGE = polyglot/util/ppg/spec
 SUBDIRS = 
 
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
 	CUPSpec.java \
-	JLgenSpec.java \
+	PPGSpec.java \
 	Spec.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))

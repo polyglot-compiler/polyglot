@@ -1,7 +1,7 @@
-This file describes running the jltools translator version 1.0 (jlc) from the
+This file describes running the polyglot translator version 1.0 (jlc) from the
 command line.
 
-The jltools translator uses the Java2 virtual machine. It has been
+The polyglot translator uses the Java2 virtual machine. It has been
 successfully compiled with "javac" from Sun's JDK 1.2.1 and with
 "jikes" version 1.04 (14 Sep 99) from IBM Research. jlc requires that
 java CUP version 0.10j or later be found in the classpath. 
@@ -14,11 +14,11 @@ http://www.cs.princeton.edu/~appel/modern/java/CUP/
 
 jlc may be run from the command line as follows:
 
-java jltools.main.Main
+java polyglot.main.Main
 
 This given the following options which are detailed below.
 
-usage: jltools.main.Main [options] File.jl ...
+usage: polyglot.main.Main [options] File.jl ...
 
 where [options] includes:
  -d <directory>          output directory
@@ -74,7 +74,7 @@ Defaults to OFF. If this option is given, then the abstract syntax
 tree is printed out (to stdout) after each stage of the translator.
 
 Scramble: -scramble
-Defaults to OFF. A debugging tool, see jltools.visit.NodeScrambler for
+Defaults to OFF. A debugging tool, see polyglot.visit.NodeScrambler for
 more info. Optionally takes an argument which is the long integer seed
 for the random number generator used to pick which part of the tree is
 scrambled. 
@@ -84,14 +84,14 @@ By default all translated class type information is serialized into
 the output files. This information will persist into the .class file
 and will continue to be available to jlc even if the source or
 translated Java file are lost. This allows the distribution of a set
-of .class files which still can be used with the jltools
+of .class files which still can be used with the polyglot
 translator. This option disables class type serialization.
 
 ObjectPrimitive Extension: -op
 Defaults to OFF. Enables the ObjectPrimitive extension. This is a
 modification to the standard java type system in which primtive types
 (int, float, byte, ...) are subtypes of java.lang.Object. See the
-documentation in the source code in the "jltools.ext.op" package.
+documentation in the source code in the "polyglot.ext.op" package.
 
 Post Process Compiler: -post
 Defaults to NONE. If the post process compiler is set then the
@@ -112,7 +112,7 @@ Print out a summary of the usage options.
 
 --- Where Class Definitions Are Found ---
 
-1. When the jltools translator looks for a class by the name
+1. When the polyglot translator looks for a class by the name
    "foo.bar.Quux" it first searches for that class in any file given
    on the command line. If the class is found one of these files, then
    this definition is used and the remainder of the steps are

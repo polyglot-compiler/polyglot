@@ -1,9 +1,9 @@
-package jltools.ext.jl.parse;
+package polyglot.ext.jl.parse;
 
-import jltools.ast.*;
-import jltools.parse.*;
-import jltools.types.*;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.parse.*;
+import polyglot.types.*;
+import polyglot.util.*;
 
 /**
  * Represents an ambiguous, possibly qualified, identifier encountered while parsing.

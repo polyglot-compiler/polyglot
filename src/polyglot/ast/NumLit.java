@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /**
  * An integer literal: longs, ints, shorts, bytes, and chars.

@@ -1,7 +1,7 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.util.*;
-import jltools.types.*;
+import polyglot.util.*;
+import polyglot.types.*;
 
 /**
  * A local class declaration statement.  The node is just a wrapper around

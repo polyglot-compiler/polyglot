@@ -1,8 +1,8 @@
-package jltools.ext.jl.ast;
+package polyglot.ext.jl.ast;
 
-import jltools.ast.*;
-import jltools.visit.*;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.visit.*;
+import polyglot.util.*;
 
 /**
  * A <code>Stmt</code> represents any Java statement.  All statements must

@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * A <code>NamedClassType</code> is a class type with a name: either a

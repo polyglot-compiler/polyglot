@@ -1,8 +1,8 @@
-package jltools.ext.jl.types;
+package polyglot.ext.jl.types;
 
-import jltools.types.*;
-import jltools.util.*;
-import jltools.types.Package;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.types.Package;
 import java.io.*;
 
 /**

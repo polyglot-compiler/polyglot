@@ -1,7 +1,7 @@
-package jltools.ext.jl.types;
+package polyglot.ext.jl.types;
 
-import jltools.types.*;
-import jltools.util.*;
+import polyglot.types.*;
+import polyglot.util.*;
 
 /**
  * A <code>LocalInstance</code> contains type information for a local variable.

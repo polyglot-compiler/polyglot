@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * A LazyClassInitializer is responsible for initializing members of

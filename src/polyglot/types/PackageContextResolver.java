@@ -1,10 +1,10 @@
-package jltools.types;
+package polyglot.types;
 
 import java.util.Iterator;
 import java.util.List;
-import jltools.ast.*;
-import jltools.util.*;
-import jltools.types.Package;
+import polyglot.ast.*;
+import polyglot.util.*;
+import polyglot.types.Package;
 
 /**
  * A PackageContextResolver is responsible for looking up types and packages

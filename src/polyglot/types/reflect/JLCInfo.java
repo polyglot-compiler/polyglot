@@ -1,4 +1,4 @@
-package jltools.types.reflect;
+package polyglot.types.reflect;
 
 class JLCInfo {
     long sourceLastModified = 0L;

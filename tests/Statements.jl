@@ -1,7 +1,7 @@
 
 package test;
 
-import jltools.types.*;
+import polyglot.types.*;
 
 public class Statements
 {

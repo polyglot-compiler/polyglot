@@ -4,7 +4,7 @@ Introduction
 Jltools is an extensible Java compiler toolkit designed for
 experimentation with new language extensions.
 
-The base jltools compiler, jlc, is a mostly-complete Java frontend; that
+The base polyglot compiler, jlc, is a mostly-complete Java frontend; that
 is, it parses and performs semantic checking on Java source code.  The
 compiler outputs Java source code.  Thus, the base compiler implements
 the identity translation.
@@ -24,25 +24,25 @@ Java AST.
 Architecture
 ------------
 
-The jltools compiler is structured as a set of passes over source files
+The polyglot compiler is structured as a set of passes over source files
 that ends with the output of Java source code.  The passes parse the
 original source language and create an AST, rewrite the AST to eliminate
 any ambiguities, type check the AST, possibly rewrite the AST to another
 AST, then output the AST as Java source code.
 
-When the compiler is invoked (through jltools.main.Main.main()), it
-parses the command line (setting options in jltools.main.Options), then
-creates a compiler object (an instance of jltools.frontend.Compiler) to
+When the compiler is invoked (through polyglot.main.Main.main()), it
+parses the command line (setting options in polyglot.main.Options), then
+creates a compiler object (an instance of polyglot.frontend.Compiler) to
 manage the compilation process.  An important job of the command line
 parser is to identify the language extension (specified on the command
 line with -ext L, where L is the name of the extension), and load the
-extension (from jltools.ext.L.ExtensionInfo).  The compiler uses the
+extension (from polyglot.ext.L.ExtensionInfo).  The compiler uses the
 extension to determine several important features of the language,
 including its source file extension, AST node factory, type system, and
 pass schedule.
 
-Parsing is done with the Java CUP parser generator and a jltools
-extension to CUP called JLgen.  JLgen allows CUP files to be selectively
+Parsing is done with the Java CUP parser generator and a polyglot
+extension to CUP called PPG.  PPG allows CUP files to be selectively
 extended to create parsers for extension languages by providing
 operations on a CUP grammar, including adding, dropping, and renaming of
 productions.  The JFlex lexer generator is used to create a lexer for
@@ -100,11 +100,11 @@ AST.
 Source code hierarchy
 ---------------------
 
-All jltools code is in the package jltools.  The subpackages are as
+All polyglot code is in the package polyglot.  The subpackages are as
 follows:
 
     ast - contains the AST node interface files.  All AST nodes
-    implement the jltools.ast.Node interface.
+    implement the polyglot.ast.Node interface.
 
     types - contains the type system interface.
 
@@ -116,18 +116,18 @@ follows:
     frontend - contains compiler pass scheduling code.
 
     main - contains the code for the main method of the compiler in the
-    class jltools.main.Main.  It includes code for parsing command line
+    class polyglot.main.Main.  It includes code for parsing command line
     options and for debug output.
 
     util - contains utility code.  This includes the parser generator in
-    util/jlgen.
+    util/ppg.
 
     lex - contains some lexer utility code.
 
     parse - contains some parser utility code.
 
     ext - contains the code for the language extensions.  Source code for
-    a language extension lives in the package jltools.ext.<ext-name>.  The
+    a language extension lives in the package polyglot.ext.<ext-name>.  The
     default language extension is the "jl" extension which implements Java
     parsing and type checking.  Extensions are usually implemented by
     inheriting from the "jl" extension code.  Extensions usually have the
@@ -182,41 +182,41 @@ First, you need to design L.  Your design process should include the
 following tasks.
 
     1. Define the syntactic differences between L and Java, based on the
-    Java grammar found in jltools/ext/jl/parse/java12.cup.
+    Java grammar found in polyglot/ext/jl/parse/java12.cup.
 
     2. Define any new AST nodes that L requires.  The existing
-    Java nodes can be found in jltools.ast (interfaces) and
-    jltools.ext.jl.ast (implementations).
+    Java nodes can be found in polyglot.ast (interfaces) and
+    polyglot.ext.jl.ast (implementations).
 
-    3. Define the semantic differences between L and Java. jltools
+    3. Define the semantic differences between L and Java. polyglot
     implements an ever-increasing subset of the static semantic of Java
     as defined in the Java Language Specification 2.
 
     4. Define a translation from L to Java.  The translation should
     produce a legal Java program that can be compiled by javac.
 
-Next, you can implement L by creating a jltools extension.  Implementing
+Next, you can implement L by creating a polyglot extension.  Implementing
 the extension will require the following tasks.
 
     0. (Optionally) Begin with the skeleton extension found in
-    jltools/ext/skel.  Run the customization script found at
-    jltools/ext/newext, which will copy the skeleton to jltools/ext/L,
+    polyglot/ext/skel.  Run the customization script found at
+    polyglot/ext/newext, which will copy the skeleton to polyglot/ext/L,
     and substitute your language's name at all the appropriate places
     in the skeleton.
 
-    1. Implement a new parser using JLgen.  To do this, modify
-    jltools/ext/L/parse/L.jlg using the syntactic changes you defined
+    1. Implement a new parser using PPG.  To do this, modify
+    polyglot/ext/L/parse/L.ppg using the syntactic changes you defined
     above.
 
     2. Implement any new AST nodes.  Modify the node factory
-    jltools/ext/L/ast/LNodeFactory_c.java to produce these nodes.
+    polyglot/ext/L/ast/LNodeFactory_c.java to produce these nodes.
 
     3. Implement semantic checking for L based on the rules you defined
     above.
 
 	a. If L involves changing the semantics of Java, you will
 	probably want to implement these as part of the TypeCheck
-	pass already defined by jltools.
+	pass already defined by polyglot.
 
         b. If L introduces new semantics that are orthogonal to Java,
         you may wish to implement an entirely new pass that runs
@@ -226,7 +226,7 @@ the extension will require the following tasks.
     be implemented by overriding that node's typeCheck_() method.
     Semantic changes that affect more fundamental properties of the
     Java type system will probably be implemented by overriding
-    appropriate methods in jltools/ext/L/types/LTypeSystem_c.java.
+    appropriate methods in polyglot/ext/L/types/LTypeSystem_c.java.
 
     4. Implement the translation from L to Java based on the translation
     you defined above.  This should be implemented as a visitor pass
@@ -260,7 +260,7 @@ The changes to Java needed to support this feature are quite minimal.
 
     2. We modify type checking so that primitive values may be used at
     type Object.  That means for all primitive types P where P != void,
-    P <: Object (jltools defines void as a primitive type, but void has
+    P <: Object (polyglot defines void as a primitive type, but void has
     no values).  We'll want to use this relationship in assignments and
     casting, as shown in the example above.  Also, we'll need to allow
     primitive types to appear inside an instanceof operator.
@@ -272,11 +272,11 @@ The changes to Java needed to support this feature are quite minimal.
 We create the extension as follows:
 
     1. The extension is sufficiently simple that we won't need the
-    skeleton.  So we start by creating the directory jltools/ext/op.
+    skeleton.  So we start by creating the directory polyglot/ext/op.
     // FIXME: perhaps we should have a small-scale and a large-scale
     extension skeleton.
 
-    2. We create the JLgen file, op.jlg.  The first 80 lines or so are
+    2. We create the PPG file, op.ppg.  The first 80 lines or so are
     just boiler plate code.  Then, we change the grammar for instanceof
     by dropping the existing production in relational_expression and
     adding a new production.  When creating a new parser, it is also
@@ -323,7 +323,7 @@ We create the extension as follows:
 
     7. We create the ExtensionInfo that defines our extension.  In it
     we override factory methods to create our OP type system and node
-    factory instead of the default jltools classes.  We also define the
+    factory instead of the default polyglot classes.  We also define the
     file extension for the OP language, ".jop".  Finally, we define our
     new pass and schedule it to run before translation.
 

@@ -1,9 +1,9 @@
-package jltools.ext.jl.ast;
+package polyglot.ext.jl.ast;
 
-import jltools.ast.*;
-import jltools.types.*;
-import jltools.visit.*;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.visit.*;
+import polyglot.util.*;
 
 /**
  * An <code>Eval</code> is a wrapper for an expression in the context of

@@ -1,8 +1,8 @@
-package jltools.frontend;
+package polyglot.frontend;
 
-import jltools.main.Options;
-import jltools.types.*;
-import jltools.util.*;
+import polyglot.main.Options;
+import polyglot.types.*;
+import polyglot.util.*;
 
 import java.io.*;
 import java.util.*;

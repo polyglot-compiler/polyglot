@@ -1,13 +1,13 @@
-package jltools.ext.jl.qq;
+package polyglot.ext.jl.qq;
 
-import jltools.ast.*;
-import jltools.types.*;
-import jltools.util.*;
-import jltools.visit.*;
-import jltools.frontend.*;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
+import polyglot.frontend.*;
 
-import jltools.ext.jl.qq.Lexer;
-import jltools.ext.jl.qq.Grm;
+import polyglot.ext.jl.qq.Lexer;
+import polyglot.ext.jl.qq.Grm;
 
 import java.util.*;
 import java.io.*;
@@ -23,7 +23,7 @@ public class QQ {
     }
 
     public static void report(int level, String msg) {
-        jltools.main.Report.report(topics, level, msg);
+        polyglot.main.Report.report(topics, level, msg);
     }
 
     protected static final int EXPR = 0;
@@ -91,14 +91,14 @@ public class QQ {
     }
 
     protected Node parse(Map subst, String text, int kind) throws SemanticException {
-        jltools.ext.jl.qq.Lexer lexer;
-        jltools.ext.jl.qq.Grm grm;
+        polyglot.ext.jl.qq.Lexer lexer;
+        polyglot.ext.jl.qq.Grm grm;
 
         TypeSystem ts = ext.typeSystem();
         NodeFactory nf = ext.nodeFactory();
 
-        lexer = new jltools.ext.jl.qq.Lexer(text, pos);
-        grm = new jltools.ext.jl.qq.Grm(lexer, ts, nf, subst);
+        lexer = new polyglot.ext.jl.qq.Lexer(text, pos);
+        grm = new polyglot.ext.jl.qq.Grm(lexer, ts, nf, subst);
 
         report(1, "qq: " + text);
         report(1, "subst: " + subst);

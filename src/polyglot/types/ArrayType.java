@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * An <code>ArrayType</code> represents an array of other types.

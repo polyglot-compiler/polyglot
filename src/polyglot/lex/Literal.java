@@ -1,6 +1,6 @@
-package jltools.lex;
+package polyglot.lex;
 
-import jltools.util.Position;
+import polyglot.util.Position;
 
 /** A token class for literals. */
 public abstract class Literal extends Token

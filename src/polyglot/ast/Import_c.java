@@ -1,11 +1,11 @@
-package jltools.ext.jl.ast;
+package polyglot.ext.jl.ast;
 
-import jltools.ast.*;
+import polyglot.ast.*;
 
-import jltools.types.*;
-import jltools.util.*;
-import jltools.visit.*;
-import jltools.main.Options;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
+import polyglot.main.Options;
 
 /**
  * An <code>Import</code> is an immutable representation of a Java

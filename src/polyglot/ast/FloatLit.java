@@ -1,6 +1,6 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.util.Enum;
+import polyglot.util.Enum;
 
 /** 
  * A <code>FloatLit</code> represents a literal in java of type

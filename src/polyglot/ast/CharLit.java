@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /** 
  * An <code>CharLit</code> represents a literal in java of

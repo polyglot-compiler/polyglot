@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * An <code>AnonClassType</code> represents an anonymous class.

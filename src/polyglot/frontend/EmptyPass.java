@@ -1,4 +1,4 @@
-package jltools.frontend;
+package polyglot.frontend;
 
 /**
  * An <code>EmptyPass</code> does nothing.

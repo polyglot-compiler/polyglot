@@ -1,5 +1,5 @@
 SOURCE = ../..
-PACKAGE = jltools/ext
+PACKAGE = polyglot/ext
 
 include $(SOURCE)/Rules.mk
 

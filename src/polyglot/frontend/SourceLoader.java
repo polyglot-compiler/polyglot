@@ -1,8 +1,8 @@
-package jltools.frontend;
+package polyglot.frontend;
 
 import java.io.*;
 import java.util.*;
-import jltools.frontend.Compiler;
+import polyglot.frontend.Compiler;
 
 /** A <code>SourceLoader</code> is responsible for loading source files. */
 public class SourceLoader

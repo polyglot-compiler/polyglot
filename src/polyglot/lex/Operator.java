@@ -1,7 +1,7 @@
-package jltools.lex;
+package polyglot.lex;
 
 import java.util.Hashtable;
-import jltools.util.Position;
+import polyglot.util.Position;
 import java_cup.runtime.Symbol;
 
 /** A token class for operators. */

@@ -1,9 +1,9 @@
-package jltools.parse;
+package polyglot.parse;
 
-import jltools.ast.*;
-import jltools.lex.*;
-import jltools.types.*;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.lex.*;
+import polyglot.types.*;
+import polyglot.util.*;
 
 import java.util.*;
 

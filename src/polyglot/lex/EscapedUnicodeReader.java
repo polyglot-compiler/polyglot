@@ -1,4 +1,4 @@
-package jltools.lex;
+package polyglot.lex;
 
 import java.io.Reader;
 import java.io.FilterReader;

@@ -1,6 +1,6 @@
-package jltools.types;
+package polyglot.types;
 
-import jltools.util.Position;
+import polyglot.util.Position;
 
 /**
  * A <code>Type</code> is the base type of all classes which represent

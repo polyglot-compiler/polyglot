@@ -1,6 +1,6 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.util.Enum;
+import polyglot.util.Enum;
 
 /**
  * A <code>Special</code> is an immutable representation of a

@@ -1,6 +1,6 @@
-package jltools.types;
+package polyglot.types;
 
-import jltools.util.*;
+import polyglot.util.*;
 import java.util.*;
 
 /** A class resolver implemented as a map from names to types. */

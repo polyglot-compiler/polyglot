@@ -29,14 +29,14 @@
    For a production quality application (e.g. a Java compiler) 
    this could be optimized */
 
-package jltools.ext.carray.parse;
+package polyglot.ext.carray.parse;
 
 import java_cup.runtime.Symbol;
-import jltools.lex.*;
-import jltools.ext.carray.parse.sym;
-import jltools.util.Position;
-import jltools.util.ErrorQueue;
-import jltools.util.ErrorInfo;
+import polyglot.lex.*;
+import polyglot.ext.carray.parse.sym;
+import polyglot.util.Position;
+import polyglot.util.ErrorQueue;
+import polyglot.util.ErrorInfo;
 
 %%
 

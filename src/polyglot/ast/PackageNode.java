@@ -1,6 +1,6 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.Package;
+import polyglot.types.Package;
 
 /**
  * A <code>PackageNode</code> is the syntactic representation of a 

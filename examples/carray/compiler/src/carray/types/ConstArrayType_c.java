@@ -1,8 +1,8 @@
-package jltools.ext.carray.types;
+package polyglot.ext.carray.types;
 
-import jltools.types.*;
-import jltools.util.*;
-import jltools.ext.jl.types.*;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.ext.jl.types.*;
 import java.util.*;
 
 /**

@@ -1,7 +1,7 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.ConstructorInstance;
-import jltools.util.Enum;
+import polyglot.types.ConstructorInstance;
+import polyglot.util.Enum;
 import java.util.List;
 
 /**

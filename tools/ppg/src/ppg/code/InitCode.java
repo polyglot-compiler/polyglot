@@ -1,4 +1,4 @@
-package jltools.util.jlgen.code;
+package polyglot.util.ppg.code;
 
 public class InitCode extends Code
 {

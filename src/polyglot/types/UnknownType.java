@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * An unknown type.  This is used as a place-holder until types are

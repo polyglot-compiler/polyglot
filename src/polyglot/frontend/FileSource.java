@@ -1,8 +1,8 @@
-package jltools.frontend;
+package polyglot.frontend;
 
 import java.io.*;
 import java.util.*;
-import jltools.util.*;
+import polyglot.util.*;
 
 /** A <code>Source</code> represents a source file. */
 public class FileSource extends Source

@@ -1,7 +1,7 @@
-package jltools.util.jlgen.atoms;
+package polyglot.util.ppg.atoms;
 
-import jltools.util.jlgen.parse.*;
-import jltools.util.jlgen.util.*;
+import polyglot.util.ppg.parse.*;
+import polyglot.util.ppg.util.*;
 public class Terminal extends GrammarSymbol
 {
 	public Terminal(String name, String label) {

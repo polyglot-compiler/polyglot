@@ -1,7 +1,7 @@
-package jltools.types;
+package polyglot.types;
 
-import jltools.frontend.Job;
-import jltools.util.Position;
+import polyglot.frontend.Job;
+import polyglot.util.Position;
 
 /** A type parsed from a source file. */
 public interface ParsedType extends Type

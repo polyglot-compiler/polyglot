@@ -2,7 +2,7 @@
  * FilteringIterator.java
  */
 
-package jltools.util;
+package polyglot.util;
 
 import java.util.Iterator;
 import java.util.Collection;

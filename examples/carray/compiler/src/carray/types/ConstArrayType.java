@@ -1,6 +1,6 @@
-package jltools.ext.carray.types;
+package polyglot.ext.carray.types;
 
-import jltools.types.*;
+import polyglot.types.*;
 /**
  * A <code>ConstArrayType</code> represents an array of base java types,
  * whose elements cannot change after initialization.

@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * A <code>InitializerInstance</code> contains the type information for a

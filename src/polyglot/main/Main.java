@@ -1,10 +1,10 @@
-package jltools.main;
+package polyglot.main;
 
-import jltools.ast.Node;
-import jltools.frontend.Compiler;
-import jltools.frontend.ExtensionInfo;
-import jltools.types.TypeSystem;
-import jltools.util.*;
+import polyglot.ast.Node;
+import polyglot.frontend.Compiler;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.types.TypeSystem;
+import polyglot.util.*;
 
 import java.io.*;
 import java.util.*;
@@ -98,7 +98,7 @@ public class Main
 
   static final void loadExtension(String ext) {
     if (ext != null && ! ext.equals("")) {
-      String extClassName = "jltools.ext." + ext + ".ExtensionInfo";
+      String extClassName = "polyglot.ext." + ext + ".ExtensionInfo";
 
       Class extClass;
       try {
@@ -116,7 +116,7 @@ public class Main
 	Options.global.extension = (ExtensionInfo) extClass.newInstance();
       }
       catch (ClassCastException e) {
-	System.err.println(ext + " is not a valid jltools extension:" +
+	System.err.println(ext + " is not a valid polyglot extension:" +
 	    " extension class " + extClassName +
 	    " exists but is not a subclass of ExtensionInfo");
 	System.exit(1);
@@ -147,8 +147,8 @@ public class Main
           if (options.extension != null)
               System.out.println(options.extension.compilerName() +
                   " version " + options.extension.version());
-          System.out.println("JLtools compiler toolkit version " +
-              new jltools.ext.jl.Version());
+          System.out.println("Polyglot compiler toolkit version " +
+              new polyglot.ext.jl.Version());
           System.exit(0);
         }
         else if (args[i].equals("-d"))

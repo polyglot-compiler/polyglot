@@ -1,7 +1,7 @@
-package jltools.types;
+package polyglot.types;
 
 import java.util.List;
-import jltools.util.Position;
+import polyglot.util.Position;
 
 /**
  * A <code>ParsedInnerClassType</code> represents a parsed inner class.

@@ -1,8 +1,8 @@
-package jltools.util.jlgen.lex;
+package polyglot.util.ppg.lex;
 
 import java.io.InputStream;
-import jltools.util.jlgen.parse.*;
-//import jltools.util.Position;
+import polyglot.util.ppg.parse.*;
+//import polyglot.util.Position;
 
 %%
 

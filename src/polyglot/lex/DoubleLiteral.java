@@ -1,7 +1,7 @@
-package jltools.lex;
+package polyglot.lex;
 
 import java_cup.runtime.Symbol;
-import jltools.util.Position;
+import polyglot.util.Position;
 
 /** Token class for double literals. */
 public class DoubleLiteral extends NumericLiteral {

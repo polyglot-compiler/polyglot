@@ -1,9 +1,9 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.Type;
-import jltools.types.Flags;
-import jltools.types.LocalInstance;
-import jltools.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.Flags;
+import polyglot.types.LocalInstance;
+import polyglot.types.SemanticException;
 
 /** 
  * A local variable declaration statement: a type, a name and an optional

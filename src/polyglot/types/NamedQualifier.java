@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * A <code>NamedQualifier</code> is a qualifier with a name, usually either a

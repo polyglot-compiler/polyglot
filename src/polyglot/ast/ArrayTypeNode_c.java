@@ -1,10 +1,10 @@
-package jltools.ext.jl.ast;
+package polyglot.ext.jl.ast;
 
-import jltools.ast.*;
-import jltools.types.*;
-import jltools.util.*;
-import jltools.visit.*;
-import jltools.main.Main;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
+import polyglot.main.Main;
 import java.io.IOException;
 
 /**

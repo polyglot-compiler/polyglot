@@ -2,7 +2,7 @@
 
 # List of extensions to build.
 ext=$*
-allext=`/bin/ls -1d jltools/ext/*/ExtensionInfo.java | cut -d/ -f3`
+allext=`/bin/ls -1d polyglot/ext/*/ExtensionInfo.java | cut -d/ -f3`
 allext=`echo $allext`
 
 if [ "$ext" = "" ]
@@ -12,9 +12,9 @@ fi
 
 for e in $ext
 do
-  if [ ! -f jltools/ext/$e/ExtensionInfo.java ]
+  if [ ! -f polyglot/ext/$e/ExtensionInfo.java ]
   then
-    echo "** Error: $e is not a jltools extension"
+    echo "** Error: $e is not a polyglot extension"
     echo "usage: `basename $0` <extensions>"
     echo "    where <extensions> is a zero or more of:" $allext
     echo "    by default, all extensions are built"
@@ -27,7 +27,7 @@ old=""
 while [ "$ext" != "$old" ]
 do
     old=`echo $ext`
-    ext=`for e in $ext; do grep "^$e:" jltools/ext/Makefile | sed -e 's/://g'; done`
+    ext=`for e in $ext; do grep "^$e:" polyglot/ext/Makefile | sed -e 's/://g'; done`
     ext=`for e in $ext; do echo $e | grep -v '^jl$' | grep -v '^FORCE$'; done | sort -u`
     ext=`echo $ext`
 done
@@ -188,11 +188,11 @@ fi
 echo "Setting up javadoc parameters"
 
 # Get a list of all the packages we're building to feed to javadoc.
-source_dirs=`find ${src}jltools -name ext -prune -o -name \*.java -exec dirname {} \; | sort -u`
+source_dirs=`find ${src}polyglot -name ext -prune -o -name \*.java -exec dirname {} \; | sort -u`
 
 for e in jl ${ext}
 do
-    s=`find ${src}jltools/ext/$e -name \*.java -exec dirname {} \; | sort -u`
+    s=`find ${src}polyglot/ext/$e -name \*.java -exec dirname {} \; | sort -u`
     source_dirs="$source_dirs $s"
 done
 
@@ -298,7 +298,7 @@ then
     if [ -d src ]; then BIN="src/bin"; else BIN="bin"; fi
     if [ -d src ]; then TOP="${CWD}${FILE_SEP}src"; else TOP="$CWD" ; fi
 else
-    JLC_CP="-classpath \${TOP}${FILE_SEP}lib${FILE_SEP}jltools.jar${PATH_SEP}\${TOP}${FILE_SEP}lib${FILE_SEP}jif.jar${PATH_SEP}\${TOP}${FILE_SEP}lib${FILE_SEP}java_cup.jar"
+    JLC_CP="-classpath \${TOP}${FILE_SEP}lib${FILE_SEP}polyglot.jar${PATH_SEP}\${TOP}${FILE_SEP}lib${FILE_SEP}jif.jar${PATH_SEP}\${TOP}${FILE_SEP}lib${FILE_SEP}java_cup.jar"
     BIN="bin"
     TOP=$CWD
 fi

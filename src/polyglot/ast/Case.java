@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /**
  * A <code>Case</code> is a representation of a Java <code>case</code>

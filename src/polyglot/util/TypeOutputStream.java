@@ -1,6 +1,6 @@
-package jltools.util;
+package polyglot.util;
 
-import jltools.types.*;
+import polyglot.types.*;
 
 import java.io.*;
 import java.util.Set;

@@ -1,8 +1,8 @@
-package jltools.util.jlgen.test.multi;
+package polyglot.util.ppg.test.multi;
 
 import java.io.*;
 import java_cup.runtime.Symbol;
-//import jltools.util.Position;
+//import polyglot.util.Position;
 
 public class Token /*extends Symbol */implements LexerResult {
 

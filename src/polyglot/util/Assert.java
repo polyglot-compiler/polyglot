@@ -2,7 +2,7 @@
  * Assert.java
  */
 
-package jltools.util;
+package polyglot.util;
 
 /**
  * Assert

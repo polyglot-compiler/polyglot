@@ -1,12 +1,12 @@
-package jltools.util.jlgen.atoms;
+package polyglot.util.ppg.atoms;
 
 import java.util.*;
-import jltools.util.jlgen.parse.*;
-import jltools.util.jlgen.util.*;
+import polyglot.util.ppg.parse.*;
+import polyglot.util.ppg.util.*;
 public class Production implements Unparse
 {	private Nonterminal lhs;
 	private Vector rhs;
-	private static String HEADER = "jlgen [nterm]: ";	
+	private static String HEADER = "ppg [nterm]: ";	
 	public Production (Nonterminal lhs, Vector rhs) {
 		this.lhs = lhs;
 		this.rhs = rhs;

@@ -1,11 +1,11 @@
 include "../../jl/parse/java12.cup"
 
-package jltools.ext.carray.parse;
+package polyglot.ext.carray.parse;
 
-import jltools.ext.carray.types.CarrayTypeSystem;
-import jltools.ext.carray.ast.CarrayNodeFactory;
-import jltools.ext.jl.parse.Name;
-import jltools.ext.jl.parse.JLUtil;
+import polyglot.ext.carray.types.CarrayTypeSystem;
+import polyglot.ext.carray.ast.CarrayNodeFactory;
+import polyglot.ext.jl.parse.Name;
+import polyglot.ext.jl.parse.JLUtil;
 
 parser code {:
 	ErrorQueue eq;

@@ -1,11 +1,11 @@
-package jltools.util.jlgen;
+package polyglot.util.ppg;
 
-public class JLgenError extends Throwable
+public class PPGError extends Throwable
 {
 	private String filename, error;
 	private int line;
 	
-	public JLgenError(String file, int lineNum, String errorMsg) {
+	public PPGError(String file, int lineNum, String errorMsg) {
 		filename = file;
 		line = lineNum;
 		error = errorMsg;

@@ -1,10 +1,10 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.Flags;
-import jltools.types.Type;
-import jltools.types.Type;
-import jltools.types.Package;
-import jltools.util.Position;
+import polyglot.types.Flags;
+import polyglot.types.Type;
+import polyglot.types.Type;
+import polyglot.types.Package;
+import polyglot.util.Position;
 import java.util.List;
 
 /**

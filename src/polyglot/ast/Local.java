@@ -1,6 +1,6 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.LocalInstance;
+import polyglot.types.LocalInstance;
 
 /** 
  * A local variable expression.

@@ -1,8 +1,8 @@
-package jltools.visit;
+package polyglot.visit;
 
-import jltools.ast.*;
-import jltools.types.TypeSystem;
-import jltools.frontend.Job;
+import polyglot.ast.*;
+import polyglot.types.TypeSystem;
+import polyglot.frontend.Job;
 
 /** Visitor which performs constant folding. */
 public class ConstantFolder extends NodeVisitor

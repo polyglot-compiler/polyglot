@@ -1,7 +1,7 @@
-package jltools.frontend;
+package polyglot.frontend;
 
-import jltools.frontend.Compiler;
-import jltools.util.InternalCompilerError;
+import polyglot.frontend.Compiler;
+import polyglot.util.InternalCompilerError;
 import java.util.*;
 
 /**

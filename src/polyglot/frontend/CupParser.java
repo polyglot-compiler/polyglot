@@ -1,8 +1,8 @@
-package jltools.frontend;
+package polyglot.frontend;
 
 import java.io.*;
-import jltools.ast.*;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.util.*;
 
 /**
  * A parser implemented with a Cup generated-parser.

@@ -1,5 +1,5 @@
 SOURCE = ../../../..
-PACKAGE = jltools/util/jlgen/lex
+PACKAGE = polyglot/util/ppg/lex
 SUBDIRS = 
 
 include $(SOURCE)/Rules.mk
@@ -12,7 +12,7 @@ SOURCES = \
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
-Lexer.java: jlgen.flex
+Lexer.java: ppg.flex
 	$(flex)
 
 all: $(CLASSES)

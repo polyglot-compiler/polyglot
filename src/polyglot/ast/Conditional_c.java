@@ -1,9 +1,9 @@
-package jltools.ext.jl.ast;
+package polyglot.ext.jl.ast;
 
-import jltools.ast.*;
-import jltools.visit.*;
-import jltools.types.*;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.visit.*;
+import polyglot.types.*;
+import polyglot.util.*;
 
 /**
  * A <code>Conditional</code> is a representation of a Java ternary

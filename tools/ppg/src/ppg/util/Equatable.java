@@ -1,4 +1,4 @@
-package jltools.util.jlgen.util;
+package polyglot.util.ppg.util;
 
 public interface Equatable
 {

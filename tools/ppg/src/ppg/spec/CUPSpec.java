@@ -1,12 +1,12 @@
-package jltools.util.jlgen.spec;
+package polyglot.util.ppg.spec;
 
 import java.io.*;
 import java.util.*;
-import jltools.util.jlgen.*;import jltools.util.jlgen.atoms.*;
-import jltools.util.jlgen.code.*;
-import jltools.util.jlgen.lex.*;
-import jltools.util.jlgen.parse.*;
-import jltools.util.jlgen.util.*;
+import polyglot.util.ppg.*;import polyglot.util.ppg.atoms.*;
+import polyglot.util.ppg.code.*;
+import polyglot.util.ppg.lex.*;
+import polyglot.util.ppg.parse.*;
+import polyglot.util.ppg.util.*;
 
 public class CUPSpec extends Spec
 {
@@ -97,11 +97,11 @@ public class CUPSpec extends Spec
 		public void addSymbols(Vector syms) {		if (syms == null)
 			return;				for (int i=0; i < syms.size(); i++) {			symbols.addElement(syms.elementAt(i));		}
 	}	
-	public void dropSymbol(String gs) throws JLgenError {
+	public void dropSymbol(String gs) throws PPGError {
 		boolean dropped = false;		for (int i=0; i < symbols.size(); i++ ) {			SymbolList list = (SymbolList) symbols.elementAt(i);			dropped = dropped || list.dropSymbol(gs);
 		}		//TODO: error if symbol being dropped was not found		/*
 		if (!dropped)
-			throw new JLgenError("file", -1, "symbol "+gs+" not found.");		*/
+			throw new PPGError("file", -1, "symbol "+gs+" not found.");		*/
 	}
 	
 	public void dropProductions(Production p) {
@@ -135,7 +135,7 @@ public class CUPSpec extends Spec
 	}	
 	private int errorNotFound(int i, Nonterminal nt) {
 		if (i == NT_NOT_FOUND) {			// index not found, hence we have no such terminal
-			System.err.println(JLgen.HEADER + "nonterminal " + nt + " not found.");
+			System.err.println(PPG.HEADER + "nonterminal " + nt + " not found.");
 			System.exit(1);
 		}
 		return i;	}

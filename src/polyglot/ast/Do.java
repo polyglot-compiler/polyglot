@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /**
  * A immutable representation of a Java language <code>do</code> statement. 

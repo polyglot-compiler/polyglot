@@ -1,7 +1,7 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.InitializerInstance;
-import jltools.types.Flags;
+import polyglot.types.InitializerInstance;
+import polyglot.types.Flags;
 
 /**
  * An <code>Initializer</code> is an immutable representation of an

@@ -1,4 +1,4 @@
-package jltools.util.jlgen.test.multi;
+package polyglot.util.ppg.test.multi;
 
 import java.io.*;
 

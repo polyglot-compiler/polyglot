@@ -1,13 +1,13 @@
-JLtools 0.9
-            JLtools Extensible Compiler Toolkit
+Polyglot 0.9
+            Polyglot Extensible Compiler Toolkit
 
-When reading this file you have already downloaded and unpacked the JLtools
+When reading this file you have already downloaded and unpacked the Polyglot
 Distribution. Your installation directory contains the following sub-folders:
 
-  - src: the complete source code of JLtools 0.9
-  - lib: the JLtools library files and the "CUP Parser Generator for Java"
+  - src: the complete source code of Polyglot 0.9
+  - lib: the Polyglot library files and the "CUP Parser Generator for Java"
     library (a Copyright notice for CUP can be found at the end of this document)
-  - doc: the documentations about writing JLtools extensions
+  - doc: the documentations about writing Polyglot extensions
   - demo: Jif sample programs
   - images: Logos
 
@@ -29,24 +29,24 @@ On Windows NT, you will need the Cygwin environment. While running sh, do:
 
 2. Update PATH and CLASSPATH.
 
-Suppose <jltools> is the absolute path of your JLtools installation directory.
+Suppose <polyglot> is the absolute path of your Polyglot installation directory.
 
--- Add "<jltools>/bin" to your PATH environment variable or copy all the files
-in "<jltools>/bin" to a directory in PATH.
+-- Add "<polyglot>/bin" to your PATH environment variable or copy all the files
+in "<polyglot>/bin" to a directory in PATH.
 
 -- [Jif only] Check your LD_LIBRARY_PATH environment variable on Unix systems,
 and your PATH environment variable on Windows systems. Make sure the value
-contains <jltools>/lib.
+contains <polyglot>/lib.
 
 -- Update your CLASSPATH environment variable.
 
 On Unix, do:
 
-    CLASSPATH=$CLASSPATH:<jltools>/lib/jltools.jar:<jltools>/lib/jif.jar:<jltools>/lib/java_cup.jar
+    CLASSPATH=$CLASSPATH:<polyglot>/lib/polyglot.jar:<polyglot>/lib/jif.jar:<polyglot>/lib/java_cup.jar
 
 On Windows, do:
 
-    set CLASSPATH=%CLASSPATH%;<jltools>\lib\jltools.jar;<jltools>\lib\jif.jar;<jltools>\lib\java_cup.jar
+    set CLASSPATH=%CLASSPATH%;<polyglot>\lib\polyglot.jar;<polyglot>\lib\jif.jar;<polyglot>\lib\java_cup.jar
 
 3. [Jif only] Test Jif compiler
 
@@ -67,31 +67,31 @@ Go to the demo directory, run:
     java Hello
 
 If you see "Hello, the world!" printed on the screen, you have successfully
-installed JLtools. Otherwise, make sure that you have followed every
+installed Polyglot. Otherwise, make sure that you have followed every
 instruction in step 1 and 2. If you still cannot run the Hello demo, please
 contact the authors.
 
 For more information:
 ---------------------
 
-For information on how to run the JLtools translator (jlc) from the command
+For information on how to run the Polyglot translator (jlc) from the command
 line, see the file README-JLC.txt
 
 For information on specific Java language extensions included with
 this release (e.g. Jif, PolyJ, etc.), see the appropriate README-*
 file in this directory.
 
-For information on rebuilding JLtools, see the file src/README.
+For information on rebuilding Polyglot, see the file src/README.
 
 
 Restrictions on distribution
 ----------------------------
 
-This release of the JLtools distribution is governed by the GPL
+This release of the Polyglot distribution is governed by the GPL
 license as described by the following copyright notice.
 
-JLtools extensible compiler toolkit
-Copyright (C) 2000-2001 JLtools project group, Cornell University
+Polyglot extensible compiler toolkit
+Copyright (C) 2000-2001 Polyglot project group, Cornell University
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -129,7 +129,7 @@ performance of this software.
 
 
 
-Some of the class file parsing code in jltools/types/reflect is derived
+Some of the class file parsing code in polyglot/types/reflect is derived
 from the BLOAT bytecode optimizer.
 -----------------------------------------------------------------------
 

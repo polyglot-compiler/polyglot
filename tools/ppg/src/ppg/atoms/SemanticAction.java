@@ -1,6 +1,6 @@
-package jltools.util.jlgen.atoms;
-import jltools.util.jlgen.parse.*;
-import jltools.util.jlgen.util.*;
+package polyglot.util.ppg.atoms;
+import polyglot.util.ppg.parse.*;
+import polyglot.util.ppg.util.*;
 public class SemanticAction extends GrammarPart
 {
 	private String action;

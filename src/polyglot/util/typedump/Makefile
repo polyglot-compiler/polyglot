@@ -1,5 +1,5 @@
 SOURCE = ../../..
-PACKAGE = jltools/util/typedump
+PACKAGE = polyglot/util/typedump
 SUBDIRS = 
 
 include $(SOURCE)/Rules.mk

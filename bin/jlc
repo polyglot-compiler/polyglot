@@ -19,7 +19,7 @@ then
 fi
 
 classpath="${TOP}${FILE_SEP}classes${PATH_SEP}${TOP}${FILE_SEP}java_cup.jar${PATH_SEP}.${extra_cp}"
-command="$JAVA $profile -classpath $classpath jltools.main.Main $args"
+command="$JAVA $profile -classpath $classpath polyglot.main.Main $args"
 
 if [ -n "$verbose" ]
 then

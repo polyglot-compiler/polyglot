@@ -2,7 +2,7 @@
  * Predicate.java
  */
 
-package jltools.util;
+package polyglot.util;
 
 /**
  * Predicate

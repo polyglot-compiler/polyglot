@@ -1,14 +1,14 @@
-package jltools.ext.jl.parse;
+package polyglot.ext.jl.parse;
 
 import java.util.*;
 
 import java_cup.runtime.*;
 
-import jltools.ast.*;
-import jltools.lex.*;
-import jltools.parse.*;
-import jltools.types.*;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.lex.*;
+import polyglot.parse.*;
+import polyglot.types.*;
+import polyglot.util.*;
 
 // This parser is based on:
 /* Java 1.2 parser for CUP.
@@ -145,14 +145,14 @@ terminal Token MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ; // assignment_operator
 terminal Token LSHIFTEQ, RSHIFTEQ, URSHIFTEQ; // assignment_operator
 terminal Token ANDEQ, XOREQ, OREQ; // assignment_operator
 
-terminal jltools.lex.IntegerLiteral INTEGER_LITERAL;
-terminal jltools.lex.LongLiteral LONG_LITERAL;
-terminal jltools.lex.DoubleLiteral DOUBLE_LITERAL;
-terminal jltools.lex.FloatLiteral FLOAT_LITERAL;
-terminal jltools.lex.BooleanLiteral BOOLEAN_LITERAL;
-terminal jltools.lex.CharacterLiteral CHARACTER_LITERAL;
-terminal jltools.lex.StringLiteral STRING_LITERAL;
-terminal jltools.lex.NullLiteral NULL_LITERAL;
+terminal polyglot.lex.IntegerLiteral INTEGER_LITERAL;
+terminal polyglot.lex.LongLiteral LONG_LITERAL;
+terminal polyglot.lex.DoubleLiteral DOUBLE_LITERAL;
+terminal polyglot.lex.FloatLiteral FLOAT_LITERAL;
+terminal polyglot.lex.BooleanLiteral BOOLEAN_LITERAL;
+terminal polyglot.lex.CharacterLiteral CHARACTER_LITERAL;
+terminal polyglot.lex.StringLiteral STRING_LITERAL;
+terminal polyglot.lex.NullLiteral NULL_LITERAL;
 
 // strictfp keyword, new in Java 1.2
 terminal Token STRICTFP;
@@ -163,7 +163,7 @@ terminal CONST, GOTO;
 // 19.2) The Syntactic Grammar
 non terminal SourceFile goal;
 // 19.3) Lexical Structure
-non terminal jltools.ast.Lit literal;
+non terminal polyglot.ast.Lit literal;
 // 19.4) Types, Values, and Variables
 non terminal TypeNode type, primitive_type, numeric_type;
 non terminal TypeNode integral_type, floating_point_type;

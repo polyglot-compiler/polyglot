@@ -1,7 +1,7 @@
-package jltools.frontend;
+package polyglot.frontend;
  
-import jltools.ast.*;
-import jltools.util.InternalCompilerError;
+import polyglot.ast.*;
+import polyglot.util.InternalCompilerError;
 
 /**
  * The <code>SpawnPass</code> spawns a new job and runs it on the current

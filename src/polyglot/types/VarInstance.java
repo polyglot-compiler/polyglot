@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * A <code>VarInstance</code> contains type information for a variable.  It may

@@ -1,7 +1,7 @@
-package jltools.util.jlgen.parse;
+package polyglot.util.ppg.parse;
 
 import java.io.*;
-import jltools.util.jlgen.lex.*;
+import polyglot.util.ppg.lex.*;
 
 /** 
  * This error is thrown when the parser has an internal error -- the user should not see these

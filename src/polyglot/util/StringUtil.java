@@ -1,4 +1,4 @@
-package jltools.util;
+package polyglot.util;
 
 /** String utilities. */
 public class StringUtil

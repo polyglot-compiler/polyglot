@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /**
  * An immutable representation of a Java language <code>synchronized</code>

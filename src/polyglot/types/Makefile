@@ -1,5 +1,5 @@
 SOURCE = ../..
-PACKAGE = jltools/types
+PACKAGE = polyglot/types
 SUBDIRS = reflect
 
 include $(SOURCE)/Rules.mk

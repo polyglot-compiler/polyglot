@@ -1,12 +1,12 @@
 
 
-package jltools.util;
+package polyglot.util;
 
 import java.util.*;
-import jltools.types.*;
+import polyglot.types.*;
 
 /**
- * Class to implement sets containing <code>jltools.types.Type </code>.  
+ * Class to implement sets containing <code>polyglot.types.Type </code>.  
  * Set membership is based on the subtype relationships.  Thus, if 
  * <code>S</code> is a supertype of <code>A</code> and <code>B</code>, then
  * { <code>S</code> } union { <code>A</code>,<code>B</code> } = 
@@ -27,7 +27,7 @@ public class SubtypeSet implements java.util.Set
     }
 
     /**
-     * Add an element of type <code>jltools.types.Type</code> to the set
+     * Add an element of type <code>polyglot.types.Type</code> to the set
      * only if it has no supertypes already in the set. If we do add it, 
      * remove any subtypes of <code>o</code>
      * 

@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /**
  * <code>Ambiguous</code> represents an ambiguous AST node.  This interface is

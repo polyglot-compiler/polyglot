@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * An <code>InnerClassType</code> represents any inner class.

@@ -1,4 +1,4 @@
-package jltools.util.jlgen.lex;
+package polyglot.util.ppg.lex;
 
 import java.io.*;
 

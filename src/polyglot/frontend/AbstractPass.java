@@ -1,7 +1,7 @@
-package jltools.frontend;
+package polyglot.frontend;
 
-import jltools.ast.*;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.util.*;
 import java.util.*;
 
 /** The base class for most passes. */

@@ -1,6 +1,6 @@
-package jltools.types;
+package polyglot.types;
 
-import jltools.util.Position;
+import polyglot.util.Position;
 
 /**
  * Signals an error in the class resolver system. This exception is thrown

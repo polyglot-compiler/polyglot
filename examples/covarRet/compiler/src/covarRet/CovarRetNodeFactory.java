@@ -1,12 +1,12 @@
-package jltools.ext.covarRet;
+package polyglot.ext.covarRet;
 
-import jltools.ast.*;
-import jltools.ext.jl.ast.*;
-import jltools.types.Flags;
-import jltools.types.Package;
-import jltools.types.Type;
-import jltools.types.Qualifier;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.ext.jl.ast.*;
+import polyglot.types.Flags;
+import polyglot.types.Package;
+import polyglot.types.Type;
+import polyglot.types.Qualifier;
+import polyglot.util.*;
 import java.util.*;
 
 public class CovarRetNodeFactory extends NodeFactory_c {

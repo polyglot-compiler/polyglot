@@ -1,11 +1,11 @@
 #
-# Makefile to build the jltools source to source compiler
+# Makefile to build the polyglot source to source compiler
 # includes a makefile in each package to handle building of respective 
 # packages
 #
 
 SOURCE = .
-SUBDIRS = jltools
+SUBDIRS = polyglot
 
 include Rules.mk
 
@@ -34,22 +34,22 @@ javadoc: FORCE
 	$(javadoc)
 
 norecurse: classes jif polyj split op jmatch
-	$(JC) $(JC_FLAGS) jltools/main/Main.java
+	$(JC) $(JC_FLAGS) polyglot/main/Main.java
 
 jif:
-	$(JC) $(JC_FLAGS) jltools/ext/jif/ExtensionInfo.java
+	$(JC) $(JC_FLAGS) polyglot/ext/jif/ExtensionInfo.java
 polyj:
-	$(JC) $(JC_FLAGS) jltools/ext/polyj/ExtensionInfo.java
+	$(JC) $(JC_FLAGS) polyglot/ext/polyj/ExtensionInfo.java
 op:
-	$(JC) $(JC_FLAGS) jltools/ext/op/ExtensionInfo.java
+	$(JC) $(JC_FLAGS) polyglot/ext/op/ExtensionInfo.java
 split:
-	$(JC) $(JC_FLAGS) jltools/ext/split/ExtensionInfo.java
+	$(JC) $(JC_FLAGS) polyglot/ext/split/ExtensionInfo.java
 jmatch:
-	$(JC) $(JC_FLAGS) jltools/ext/jmatch/ExtensionInfo.java
+	$(JC) $(JC_FLAGS) polyglot/ext/jmatch/ExtensionInfo.java
 
 jar: all
 	cd classes ; \
-	$(JAR) $(JAR_FLAGS) ../$(JAR_FILE) `find jltools -name \*.class`; \
+	$(JAR) $(JAR_FLAGS) ../$(JAR_FILE) `find polyglot -name \*.class`; \
 	$(JAR) $(JAR_FLAGS) ../jif.jar `find jif -name \*.class`
 
 REL_SOURCES = \
@@ -59,7 +59,7 @@ REL_SOURCES = \
 	iDoclet.jar \
 
 REL_LIBS = \
-	jltools.jar \
+	polyglot.jar \
 	java_cup.jar \
 	jif.jar \
 
@@ -76,13 +76,13 @@ release_doc: FORCE
 	$(MAKE) -C doc release
 
 release: jar release_clean release_doc release_src
-	$(MAKE) -C jltools/ext/jif/tests release
+	$(MAKE) -C polyglot/ext/jif/tests release
 	cp -f configure $(RELPATH)/configure
 	$(subdirs)
 	mkdir -p $(REL_LIB)
 	cp $(REL_LIBS) $(REL_LIB)
 	cp lib/*fs.* $(REL_LIB)
 	chmod a+x $(RELPATH)/configure
-	rm jltools.jar jif.jar
+	rm polyglot.jar jif.jar
 	
 FORCE:

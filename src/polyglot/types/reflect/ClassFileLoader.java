@@ -1,7 +1,7 @@
-package jltools.types.reflect;
+package polyglot.types.reflect;
 
-import jltools.main.Report;
-import jltools.types.*;
+import polyglot.main.Report;
+import polyglot.types.*;
 
 import java.io.*;
 import java.util.*;

@@ -1,6 +1,6 @@
-package jltools.util.jlgen.cmds;
+package polyglot.util.ppg.cmds;
 
-import jltools.util.jlgen.parse.*;
+import polyglot.util.ppg.parse.*;
 
 public interface Command extends Unparse
 {

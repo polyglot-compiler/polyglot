@@ -1,12 +1,12 @@
-package jltools.frontend;
+package polyglot.frontend;
 
-import jltools.ast.*;
-import jltools.types.*;
-import jltools.types.reflect.*;
-import jltools.util.*;
-import jltools.visit.*;
-import jltools.main.Options;
-import jltools.main.Report;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.types.reflect.*;
+import polyglot.util.*;
+import polyglot.visit.*;
+import polyglot.main.Options;
+import polyglot.main.Report;
 
 import java.io.*;
 import java.util.*;
@@ -39,7 +39,7 @@ public class Compiler
     /**
      * Initialize the compiler.
      *
-     * @param options Contains jltools options
+     * @param options Contains polyglot options
      */
     public Compiler(Options options_) {
 	options = options_;
@@ -155,15 +155,15 @@ public class Compiler
       // FIXME: if we get an io error (due to too many files open, for example)
       // it will throw an exception. but, we won't be able to do anything with
       // it since the exception handlers will want to load
-      // jltools.util.CodeWriter and jltools.util.ErrorInfo to print and
+      // polyglot.util.CodeWriter and polyglot.util.ErrorInfo to print and
       // enqueue the error; but the classes must be in memory since the io
       // can't open any files; thus, we force the classloader to load the class
       // file.
       try {
 	ClassLoader loader = Compiler.class.getClassLoader();
-	// loader.loadClass("jltools.util.CodeWriter");
-	// loader.loadClass("jltools.util.ErrorInfo");
-	loader.loadClass("jltools.util.StdErrorQueue");
+	// loader.loadClass("polyglot.util.CodeWriter");
+	// loader.loadClass("polyglot.util.ErrorInfo");
+	loader.loadClass("polyglot.util.StdErrorQueue");
       }
       catch (ClassNotFoundException e) {
 	throw new InternalCompilerError(e.getMessage());

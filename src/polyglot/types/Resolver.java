@@ -1,8 +1,8 @@
-package jltools.types;
+package polyglot.types;
 
 import java.util.Iterator;
 import java.util.List;
-import jltools.ast.*;
+import polyglot.ast.*;
 
 /**
  * A <code>Resolver</code> is responsible for looking up types and

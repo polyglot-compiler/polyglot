@@ -1,9 +1,9 @@
-package jltools.ext.jl.qq;
+package polyglot.ext.jl.qq;
 
-import jltools.ast.*;
-import jltools.parse.*;
-import jltools.types.*;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.parse.*;
+import polyglot.types.*;
+import polyglot.util.*;
 
 /**
  * Wrapper for a QQ parser.

@@ -1,8 +1,8 @@
-JLgen TODO
+PPG TODO
 ----------
 * fix documentation
 * error reporting
-  - filename/pos on jlgen error
+  - filename/pos on ppg error
   - add usage message on errors
   - dropping nonexistent symbol
 
@@ -18,15 +18,15 @@ In progress
 
 Complete
 --------
-* check multiple level of .jlg inheritance
+* check multiple level of .ppg inheritance
 * dropping (non)terminals
-* bin/jlgen script
+* bin/ppg script
 * find harmony with Unix-style path names
 * Makefiles
 * web/man page
 * dropping a list of (non)terminals
 * multiple start symbols (new start symbol always required)
-* use JLgen in building PolyJ
+* use PPG in building PolyJ
 * take care of precedence directives:
   - new precedence rules override all previous ones
   - "precedence;" deletes all precedence rules

@@ -1,6 +1,6 @@
-package jltools.util.jlgen.parse;
+package polyglot.util.ppg.parse;
 
-import jltools.util.jlgen.util.*;
+import polyglot.util.ppg.util.*;
 
 public interface Unparse { 
     /**     * Write a human-readable representation of the parse tree     */

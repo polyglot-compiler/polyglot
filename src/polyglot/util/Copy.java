@@ -1,4 +1,4 @@
-package jltools.util;
+package polyglot.util;
 
 /**
  * Interface used to copy objects.  Similar to Cloneable except that

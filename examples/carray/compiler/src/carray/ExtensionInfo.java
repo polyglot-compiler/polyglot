@@ -1,14 +1,14 @@
-package jltools.ext.carray;
+package polyglot.ext.carray;
 
-import jltools.ext.carray.parse.Lexer;
-import jltools.ext.carray.parse.Grm;
-import jltools.ext.carray.ast.*;
-import jltools.ext.carray.types.*;
-import jltools.ast.*;
-import jltools.types.*;
-import jltools.util.*;
-import jltools.visit.*;
-import jltools.frontend.*;
+import polyglot.ext.carray.parse.Lexer;
+import polyglot.ext.carray.parse.Grm;
+import polyglot.ext.carray.ast.*;
+import polyglot.ext.carray.types.*;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
+import polyglot.frontend.*;
 
 import java.util.*;
 import java.io.*;
@@ -16,7 +16,7 @@ import java.io.*;
 /**
  * Extension information for carray extension.
  */
-public class ExtensionInfo extends jltools.ext.jl.ExtensionInfo {
+public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
     public String defaultFileExtension() {
         return "jl";
     }

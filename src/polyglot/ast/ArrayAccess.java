@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /**
  * An <code>ArrayAccess</code> is an immutable representation of an

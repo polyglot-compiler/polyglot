@@ -1,11 +1,11 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.util.Copy;
-import jltools.util.CodeWriter;
-import jltools.util.Position;
-import jltools.types.Context;
-import jltools.types.SemanticException;
-import jltools.visit.*;
+import polyglot.util.Copy;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.types.Context;
+import polyglot.types.SemanticException;
+import polyglot.visit.*;
 
 /**
  * A <code>Node</code> represents an AST node.  All AST nodes must implement

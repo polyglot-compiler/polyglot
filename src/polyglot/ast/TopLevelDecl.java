@@ -1,6 +1,6 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.Flags;
+import polyglot.types.Flags;
 
 /**
  * A top-level declaration.  This is any declaration that can appear in the

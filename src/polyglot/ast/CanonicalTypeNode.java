@@ -1,6 +1,6 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.Type;
+import polyglot.types.Type;
 
 /**
  * A <code>CanonicalTypeNode</code> is a type node for a canonical type.

@@ -5,7 +5,7 @@ Extending the TypeSystem
 This document describes what is involved in writing an extension that
 modifies the behavior of the TypeSystem.
 
-The TypeSystem of the jltools compiler is structured so that all
+The TypeSystem of the polyglot compiler is structured so that all
 requests for type verification and name resolution are handled via the
 TypeSystem interface.  The StandardTypeSystem implementation
 corresponds to an implementation that is intended to model Sun's
@@ -37,8 +37,8 @@ extend the StandardTypeSystem and override the necessary methods to
 obtain the desired behavior.  Then, you must instruct the TypeSystem
 to use the new implemention whenever the extension is used.
 
-The TypeSystem is instantiated in jltools.main.Main and then passed to
-jltools.frontend.Compiler.  So, to instantiate a Compiler with the new
+The TypeSystem is instantiated in polyglot.main.Main and then passed to
+polyglot.frontend.Compiler.  So, to instantiate a Compiler with the new
 extension, Main.java must be instructed to create the new TypeSystem
 whenever using this Compiler modification.
 
@@ -46,11 +46,11 @@ Currently the only way to do this is by editing Main.java.  However,
 there was an initiative to create a standard modification description
 file that is required of any valid Compiler modification:
 ExtensionInfo.java.  This file would have resided in the root of the
-extension's hierarchy and given instructions to jltools.main.Main and
-jltools.frontend.Compiler to properly "install" the
+extension's hierarchy and given instructions to polyglot.main.Main and
+polyglot.frontend.Compiler to properly "install" the
 modifications. Then, the Compiler is notified of the new extension by
 passing the fully qualified package name of the new extension; the
 extension reads the ExtensionInfo file, and proceeds. Under this
-scenario, there is no need to modify jltools.main.Main to instruct it
+scenario, there is no need to modify polyglot.main.Main to instruct it
 of a new extension.  Unfortunately, this cleaner solution is not yet
 available.

@@ -1,6 +1,6 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.*;
+import polyglot.types.*;
 import java.util.List;
 
 /**

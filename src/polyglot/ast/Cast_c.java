@@ -1,10 +1,10 @@
-package jltools.ext.jl.ast;
+package polyglot.ext.jl.ast;
 
-import jltools.ast.*;
+import polyglot.ast.*;
 
-import jltools.util.*;
-import jltools.visit.*;
-import jltools.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
+import polyglot.types.*;
 
 /**
  * A <code>Cast</code> is an immutable representation of a casting

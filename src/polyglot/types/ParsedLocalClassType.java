@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * A <code>ParsedLocalClassType</code> is a parsed local class type.

@@ -1,7 +1,7 @@
-package jltools.parse;
+package polyglot.parse;
 
-import jltools.ast.*;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.util.*;
 
 /**
  * Encapsulates some of the data in a variable declaration.  Used only by the parser.

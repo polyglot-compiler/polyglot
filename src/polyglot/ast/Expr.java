@@ -1,8 +1,8 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.Type;
-import jltools.util.CodeWriter;
-import jltools.visit.PrettyPrinter;
+import polyglot.types.Type;
+import polyglot.util.CodeWriter;
+import polyglot.visit.PrettyPrinter;
 
 /**
  * An <code>Expr</code> represents any Java expression.  All expressions

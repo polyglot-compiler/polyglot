@@ -1,5 +1,5 @@
 SOURCE = ../../../../..
-PACKAGE = jltools/util/jlgen/test/multi
+PACKAGE = polyglot/util/ppg/test/multi
 SUBDIRS = 
 
 include $(SOURCE)/Rules.mk
@@ -10,8 +10,8 @@ Lexer.java: multi.flex
 Parser.java Constant.java: out.cup
 	java -cp $(SOURCE)/java_cup.jar java_cup.Main -parser Parser -symbols Constant < out.cup
 
-out.cup: multi.jlg multi.cup
-	$(SOURCE)/bin/jlgen -symbols Constant multi.jlg > out.cup
+out.cup: multi.ppg multi.cup
+	$(SOURCE)/bin/ppg -symbols Constant multi.ppg > out.cup
 
 
 SOURCES = \
@@ -31,7 +31,7 @@ all: $(CLASSES)
 	$(subdirs)
 
 test:
-	$(JAVA) -classpath $(CLASSPATH) jltools.util.jlgen.test.multi.Tester expr.txt
+	$(JAVA) -classpath $(CLASSPATH) polyglot.util.ppg.test.multi.Tester expr.txt
 
 release: release_src
 	$(subdirs)

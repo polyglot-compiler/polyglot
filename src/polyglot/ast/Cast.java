@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /**
  * A <code>Cast</code> is an immutable representation of a casting

@@ -1,10 +1,10 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.util.CodeWriter;
-import jltools.util.Copy;
-import jltools.types.SemanticException;
-import jltools.types.TypeSystem;
-import jltools.types.Context;
+import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.types.Context;
 
 /**
  * <code>Ext</code> is the super type of all node extension objects.

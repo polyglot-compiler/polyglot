@@ -2,7 +2,7 @@
  * NilMap.java
  */
 
-package jltools.util;
+package polyglot.util;
 
 import java.util.Map;
 import java.util.Collection;

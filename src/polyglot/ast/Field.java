@@ -1,6 +1,6 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.FieldInstance;
+import polyglot.types.FieldInstance;
 
 /**
  * A <code>Field</code> is an immutable representation of a Java field

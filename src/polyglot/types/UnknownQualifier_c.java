@@ -1,8 +1,8 @@
-package jltools.ext.jl.types;
+package polyglot.ext.jl.types;
 
-import jltools.types.*;
-import jltools.types.Package;
-import jltools.util.Position;
+import polyglot.types.*;
+import polyglot.types.Package;
+import polyglot.util.Position;
 
 /**
  * An unknown type qualifier.  This is used as a place-holder until types

@@ -1,11 +1,11 @@
-package jltools.ext.carray.parse;
+package polyglot.ext.carray.parse;
 
-import jltools.ext.carray.types.*;
-import jltools.ext.carray.ast.*;
-import jltools.ast.*;
-import jltools.parse.*;
-import jltools.types.*;
-import jltools.util.*;
+import polyglot.ext.carray.types.*;
+import polyglot.ext.carray.ast.*;
+import polyglot.ast.*;
+import polyglot.parse.*;
+import polyglot.types.*;
+import polyglot.util.*;
 
 /**
  * Wrapper for a carray parser. Adds a new utility method, as

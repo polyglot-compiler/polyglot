@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /**
  * A <code>Return</code> represents a <code>return</code> statement in Java.

@@ -1,6 +1,6 @@
-package jltools.lex;
+package polyglot.lex;
 
-import jltools.util.Position;
+import polyglot.util.Position;
  
 /** The base class of all tokens. */
 public abstract class Token {

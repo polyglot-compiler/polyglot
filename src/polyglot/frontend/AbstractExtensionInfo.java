@@ -1,14 +1,14 @@
-package jltools.frontend;
+package polyglot.frontend;
 
-import jltools.ast.*;
-import jltools.types.*;
-import jltools.util.*;
-import jltools.visit.*;
-import jltools.frontend.*;
-import jltools.main.UsageError;
-import jltools.main.Options;
-import jltools.main.Report;
-import jltools.frontend.Compiler;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
+import polyglot.frontend.*;
+import polyglot.main.UsageError;
+import polyglot.main.Options;
+import polyglot.main.Report;
+import polyglot.frontend.Compiler;
 
 import java.io.*;
 import java.util.*;

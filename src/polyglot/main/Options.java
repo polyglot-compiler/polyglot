@@ -1,13 +1,13 @@
-package jltools.main;
+package polyglot.main;
 import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.io.File;
-import jltools.frontend.ExtensionInfo;
+import polyglot.frontend.ExtensionInfo;
 
-/** This object encapsulates various jltools options. Extensions to
-    jltools must define their own objects for encapsulating options. */
+/** This object encapsulates various polyglot options. Extensions to
+    polyglot must define their own objects for encapsulating options. */
 public final class Options {
   /** The global object containing compiler options.  Access to compiler
       options via the Compiler object, rather than through this static
@@ -55,7 +55,7 @@ public final class Options {
   /** keep output files */
   public boolean keep_output_files = true;
 
-  public ExtensionInfo extension = new jltools.ext.jl.ExtensionInfo();
+  public ExtensionInfo extension = new polyglot.ext.jl.ExtensionInfo();
      // The extension information
 
   public static Map report = new HashMap(); // Map[String, Integer]

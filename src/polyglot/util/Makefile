@@ -1,6 +1,6 @@
 SOURCE = ../..
-PACKAGE = jltools/util
-SUBDIRS = typedump jlgen
+PACKAGE = polyglot/util
+SUBDIRS = typedump ppg
 
 include $(SOURCE)/Rules.mk
 

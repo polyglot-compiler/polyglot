@@ -1,5 +1,5 @@
-package jltools.util.jlgen.atoms;
-import jltools.util.jlgen.util.*;
+package polyglot.util.ppg.atoms;
+import polyglot.util.ppg.util.*;
 
 public abstract class GrammarSymbol extends GrammarPart implements Equatable
 {

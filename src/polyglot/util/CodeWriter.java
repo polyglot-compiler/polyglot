@@ -3,7 +3,7 @@
  *   For use in Cornell University Computer Science 412/413
  */
 
-package jltools.util;
+package polyglot.util;
 
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;

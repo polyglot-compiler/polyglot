@@ -1,5 +1,5 @@
 SOURCE = ../..
-PACKAGE = jltools/visit
+PACKAGE = polyglot/visit
 SUBDIRS =
 
 include $(SOURCE)/Rules.mk

@@ -1,8 +1,8 @@
-package jltools.ext.jl.types;
+package polyglot.ext.jl.types;
 
-import jltools.types.*;
-import jltools.types.Package;
-import jltools.util.*;
+import polyglot.types.*;
+import polyglot.types.Package;
+import polyglot.util.*;
 
 /**
  * An <code>PackageType</code> represents a package type. It may or may

@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /** 
  * A <code>StringLit</code> represents an immutable instance of a 

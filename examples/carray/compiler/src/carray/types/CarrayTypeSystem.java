@@ -1,9 +1,9 @@
-package jltools.ext.carray.types;
+package polyglot.ext.carray.types;
 
-import jltools.util.Position;
-import jltools.util.InternalCompilerError;
-import jltools.types.*;
-import jltools.ext.jl.types.TypeSystem_c;
+import polyglot.util.Position;
+import polyglot.util.InternalCompilerError;
+import polyglot.types.*;
+import polyglot.ext.jl.types.TypeSystem_c;
 
 public class CarrayTypeSystem extends TypeSystem_c
 {

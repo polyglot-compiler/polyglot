@@ -1,8 +1,8 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.util.CodeWriter;
-import jltools.types.SemanticException;
-import jltools.visit.*;
+import polyglot.util.CodeWriter;
+import polyglot.types.SemanticException;
+import polyglot.visit.*;
 
 /**
  * A <code>Node</code> represents an AST node.  All AST nodes must implement

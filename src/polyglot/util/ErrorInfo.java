@@ -1,4 +1,4 @@
-package jltools.util;
+package polyglot.util;
 
 /** Information about an error message. */
 public class ErrorInfo

@@ -1,5 +1,5 @@
-package jltools.util.jlgen.cmds;
-import jltools.util.jlgen.atoms.*;import jltools.util.jlgen.util.*;
+package polyglot.util.ppg.cmds;
+import polyglot.util.ppg.atoms.*;import polyglot.util.ppg.util.*;
 
 public class OverrideCmd implements Command
 {

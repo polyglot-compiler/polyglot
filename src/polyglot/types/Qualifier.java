@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * A <code>Qualifier</code> can be used to qualify a type: it can be either

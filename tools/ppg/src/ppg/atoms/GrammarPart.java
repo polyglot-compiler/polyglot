@@ -1,6 +1,6 @@
-package jltools.util.jlgen.atoms;
+package polyglot.util.ppg.atoms;
 
-import jltools.util.jlgen.parse.*;
+import polyglot.util.ppg.parse.*;
 
 public abstract class GrammarPart implements Unparse
 {

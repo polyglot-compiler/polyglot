@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * A <code>ParsedMemberClassType</code> is a parsed class type that is a member

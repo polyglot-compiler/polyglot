@@ -1,7 +1,7 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.MethodInstance;
-import jltools.types.Flags;
+import polyglot.types.MethodInstance;
+import polyglot.types.Flags;
 import java.util.List;
 
 /**

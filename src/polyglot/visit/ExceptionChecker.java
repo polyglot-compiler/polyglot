@@ -1,8 +1,8 @@
-package jltools.visit;
+package polyglot.visit;
 
-import jltools.ast.*;
-import jltools.util.*;
-import jltools.types.*;
+import polyglot.ast.*;
+import polyglot.util.*;
+import polyglot.types.*;
 import java.util.*;
 
 /** Visitor which checks if exceptions are caught or declared properly. */

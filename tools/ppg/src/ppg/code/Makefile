@@ -1,5 +1,5 @@
 SOURCE = ../../../..
-PACKAGE = jltools/util/jlgen/code
+PACKAGE = polyglot/util/ppg/code
 SUBDIRS = 
 
 include $(SOURCE)/Rules.mk

@@ -1,6 +1,6 @@
-package jltools.types;
+package polyglot.types;
 
-import jltools.util.Position;
+import polyglot.util.Position;
 
 /**
  * Thrown during any number of phases of the compiler during which a semantic

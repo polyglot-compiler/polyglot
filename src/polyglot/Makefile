@@ -1,6 +1,6 @@
 SOURCE = ..
-PACKAGE = jltools
-SUBDIRS = util/jlgen ext/jl lex parse main frontend ast types visit util ext
+PACKAGE = polyglot
+SUBDIRS = util/ppg ext/jl lex parse main frontend ast types visit util ext
 
 include $(SOURCE)/Rules.mk
 

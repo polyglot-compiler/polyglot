@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * A <code>ParsedAnonClassType</code> represents a parsed anonymous class.

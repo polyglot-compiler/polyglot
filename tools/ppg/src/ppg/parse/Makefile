@@ -1,5 +1,5 @@
 SOURCE = ../../../..
-PACKAGE = jltools/util/jlgen/parse
+PACKAGE = polyglot/util/ppg/parse
 SUBDIRS = 
 
 include $(SOURCE)/Rules.mk
@@ -12,8 +12,8 @@ SOURCES = \
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
-Parser.java Constant.java: jlgen.cup
-	java -cp $(CUP_RUNTIME) java_cup.Main -parser Parser -symbols Constant < jlgen.cup
+Parser.java Constant.java: ppg.cup
+	java -cp $(CUP_RUNTIME) java_cup.Main -parser Parser -symbols Constant < ppg.cup
 
 all: $(CLASSES)
 	$(subdirs)

@@ -1,5 +1,5 @@
 SOURCE = ../../../..
-PACKAGE = jltools/ext/carray/types
+PACKAGE = polyglot/ext/carray/types
 SUBDIRS =
 
 include $(SOURCE)/Rules.mk

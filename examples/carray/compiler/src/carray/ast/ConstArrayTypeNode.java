@@ -1,6 +1,6 @@
-package jltools.ext.carray.ast;
+package polyglot.ext.carray.ast;
 
-import jltools.ast.*;
+import polyglot.ast.*;
 
 /**
  * A <code>ConstArrayTypeNode</code> is a type node for a non-canonical

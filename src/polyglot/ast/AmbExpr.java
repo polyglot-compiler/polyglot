@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /**
  * An <code>AmbExpr</code> is an ambiguous AST node composed of a single

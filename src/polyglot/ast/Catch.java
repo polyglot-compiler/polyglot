@@ -1,7 +1,7 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.Type;
-import jltools.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.SemanticException;
 
 /**
  * A <code>Catch</code> represents one half of a <code>try... catch</code>

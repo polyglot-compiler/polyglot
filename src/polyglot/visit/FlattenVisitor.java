@@ -1,7 +1,7 @@
-package jltools.visit;
+package polyglot.visit;
 
-import jltools.ast.*;
-import jltools.types.*;
+import polyglot.ast.*;
+import polyglot.types.*;
 
 import java.util.*;
 

@@ -1,5 +1,5 @@
 SOURCE = ../../../..
-PACKAGE = jltools/ext/carray/parse
+PACKAGE = polyglot/ext/carray/parse
 SUBDIRS =
 
 include $(SOURCE)/Rules.mk
@@ -13,24 +13,24 @@ CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
 all: $(CLASSES)
 
-Grm.java sym.java: carray_jlgen.cup
+Grm.java sym.java: carray_ppg.cup
 	$(yacc)
 
 Lexer.java: carray.flex sym.java
 	$(flex)
 
-carray_jlgen.cup: carray.jlg $(SOURCE)/jltools/ext/jl/parse/java12.cup
-	$(jlgen) carray.jlg > carray_jlgen.cup
+carray_ppg.cup: carray.ppg $(SOURCE)/polyglot/ext/jl/parse/java12.cup
+	$(ppg) carray.ppg > carray_ppg.cup
 
 clean: cleanclasses
 	$(subdirs)
 
 clobber: cleanclasses
 	$(subdirs)
-	-rm -f Grm.java sym.java Lexer.java carray_jlgen.cup
+	-rm -f Grm.java sym.java Lexer.java carray_ppg.cup
 
 REL_SOURCES = \
-	carray.jlg \
+	carray.ppg \
 	carray.flex \
 	sym.java \
 	JLParserWrapper.java \

@@ -1,4 +1,4 @@
-jltools static checking doesn't do some things:
+polyglot static checking doesn't do some things:
     * check for uninitialized variables
     * check for circularity in the type hierarchy
 

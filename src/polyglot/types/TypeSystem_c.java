@@ -1,11 +1,11 @@
-package jltools.ext.jl.types;
+package polyglot.ext.jl.types;
 
-import jltools.util.*;
-import jltools.types.*;
-import jltools.types.Package;
-import jltools.types.reflect.ClassFile;
-import jltools.frontend.Compiler;
-import jltools.frontend.Source;
+import polyglot.util.*;
+import polyglot.types.*;
+import polyglot.types.Package;
+import polyglot.types.reflect.ClassFile;
+import polyglot.frontend.Compiler;
+import polyglot.frontend.Source;
 
 import java.util.*;
 

@@ -1,6 +1,6 @@
-package jltools.visit;
+package polyglot.visit;
 
-import jltools.ast.*;
+import polyglot.ast.*;
 
 /**
  * Visitor which checks if control flow properties are correct (e.g., that all

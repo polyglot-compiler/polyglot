@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /**
  * A <code>Throw</code> is an immutable representation of a <code>throw</code>

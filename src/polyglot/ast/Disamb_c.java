@@ -1,9 +1,9 @@
-package jltools.ext.jl.ast;
+package polyglot.ext.jl.ast;
 
-import jltools.ast.*;
-import jltools.types.*;
-import jltools.visit.*;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.visit.*;
+import polyglot.util.*;
 
 /**
  * Utility class which is used to disambiguate ambiguous

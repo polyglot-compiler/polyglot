@@ -2,7 +2,7 @@
  * Transformation.java
  */
 
-package jltools.util;
+package polyglot.util;
 
 /**
  * Transformation

@@ -1,4 +1,4 @@
-package jltools.ast;
+package polyglot.ast;
 
 /**
  * An <code>AmbQualifierNode</code> is an ambiguous AST node composed of

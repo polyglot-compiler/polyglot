@@ -1,10 +1,10 @@
-package jltools.visit;
+package polyglot.visit;
 
-import jltools.ast.*;
-import jltools.types.*;
-import jltools.util.*;
-import jltools.frontend.Job;
-import jltools.types.Package;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.frontend.Job;
+import polyglot.types.Package;
 
 /** Visitor which performs type checking on the AST. */
 public class TypeChecker extends SemanticVisitor

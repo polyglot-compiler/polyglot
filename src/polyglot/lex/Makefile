@@ -1,5 +1,5 @@
 SOURCE = ../..
-PACKAGE = jltools/lex
+PACKAGE = polyglot/lex
 SUBDIRS =
 
 include $(SOURCE)/Rules.mk

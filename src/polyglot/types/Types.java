@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 import java.util.*;
 
@@ -12,6 +12,6 @@ public class Types
     }
 
     public static void report(int level, String msg) {
-        jltools.main.Report.report(topics, level, msg);
+        polyglot.main.Report.report(topics, level, msg);
     }
 }

@@ -1,11 +1,11 @@
-package jltools.visit;
+package polyglot.visit;
 
-import jltools.ast.*;
-import jltools.frontend.*;
-import jltools.types.*;
-import jltools.util.*;
-import jltools.types.Package;
-import jltools.frontend.Compiler;
+import polyglot.ast.*;
+import polyglot.frontend.*;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.types.Package;
+import polyglot.frontend.Compiler;
 
 import java.io.*;
 import java.util.*;

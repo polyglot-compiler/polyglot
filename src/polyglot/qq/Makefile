@@ -1,5 +1,5 @@
 SOURCE = ../../../..
-PACKAGE = jltools/ext/jl/qq
+PACKAGE = polyglot/ext/jl/qq
 SUBDIRS = 
 
 include $(SOURCE)/Rules.mk
@@ -16,11 +16,11 @@ CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 all: $(CLASSES)
 	$(subdirs)
 
-Grm.java sym.java: qq_jlgen.cup
+Grm.java sym.java: qq_ppg.cup
 	$(yacc)
 	 
-qq_jlgen.cup: qq.jlg $(SOURCE)/jltools/ext/jl/parse/java12.cup
-	$(jlgen) qq.jlg > qq_jlgen.cup
+qq_ppg.cup: qq.ppg $(SOURCE)/polyglot/ext/jl/parse/java12.cup
+	$(ppg) qq.ppg > qq_ppg.cup
 
 Lexer.java: qq.flex sym.java
 	$(flex)
@@ -30,6 +30,6 @@ clean: cleanclasses
 
 clobber: cleanclasses
 	$(subdirs)
-	-rm -f Grm.java sym.java Lexer.java qq_jlgen.cup
+	-rm -f Grm.java sym.java Lexer.java qq_ppg.cup
 
 release: release_src

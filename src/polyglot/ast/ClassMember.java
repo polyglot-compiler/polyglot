@@ -1,6 +1,6 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.Context;
+import polyglot.types.Context;
 
 /**
  * A <code>ClassMember</code> is a method, a constructor, a field, an

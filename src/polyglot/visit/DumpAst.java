@@ -1,8 +1,8 @@
-package jltools.visit;
+package polyglot.visit;
 
-import jltools.ast.Node;
-import jltools.util.CodeWriter;
-import jltools.types.SemanticException;
+import polyglot.ast.Node;
+import polyglot.util.CodeWriter;
+import polyglot.types.SemanticException;
 
 import java.io.IOException;
 import java.io.FileWriter;

@@ -1,10 +1,10 @@
-package jltools.ext.jl.ast;
+package polyglot.ext.jl.ast;
 
-import jltools.ast.*;
+import polyglot.ast.*;
 
-import jltools.types.*;
-import jltools.util.*;
-import jltools.visit.*;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
 
 /**
  * A <code>Formal</code> represents a formal parameter to a method

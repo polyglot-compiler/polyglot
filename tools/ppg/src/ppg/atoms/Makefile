@@ -1,5 +1,5 @@
 SOURCE = ../../../..
-PACKAGE = jltools/util/jlgen/atoms
+PACKAGE = polyglot/util/ppg/atoms
 SUBDIRS = 
 
 include $(SOURCE)/Rules.mk

@@ -1,11 +1,11 @@
-package jltools.util.jlgen.lex;
+package polyglot.util.ppg.lex;
 
 import java.io.*;
-import jltools.util.jlgen.parse.*;
+import polyglot.util.ppg.parse.*;
 
 public class LexTest
 {
-	private static final String HEADER = "jlgen [lexertest]: ";
+	private static final String HEADER = "ppg [lexertest]: ";
 	
 	public LexTest() {}
 	

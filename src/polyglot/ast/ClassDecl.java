@@ -1,8 +1,8 @@
-package jltools.ast;
+package polyglot.ast;
 
 import java.util.List;
-import jltools.types.Flags;
-import jltools.types.ParsedClassType;
+import polyglot.types.Flags;
+import polyglot.types.ParsedClassType;
 
 /**
  * A <code>ClassDecl</code> represents a top-level, member, or local class

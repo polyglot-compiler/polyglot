@@ -1,9 +1,9 @@
-package jltools.visit;
+package polyglot.visit;
 
-import jltools.ast.*;
-import jltools.types.*;
-import jltools.util.*;
-import jltools.frontend.Job;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.frontend.Job;
 import java.util.*;
 
 /**

@@ -1,5 +1,5 @@
 SOURCE = ../..
-PACKAGE = jltools/ast
+PACKAGE = polyglot/ast
 SUBDIRS =
 
 include $(SOURCE)/Rules.mk

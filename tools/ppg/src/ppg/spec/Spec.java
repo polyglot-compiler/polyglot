@@ -1,13 +1,13 @@
-package jltools.util.jlgen.spec;
+package polyglot.util.ppg.spec;
 import java.util.*;
-import jltools.util.jlgen.*;
-import jltools.util.jlgen.code.*;import jltools.util.jlgen.parse.*;
+import polyglot.util.ppg.*;
+import polyglot.util.ppg.code.*;import polyglot.util.ppg.parse.*;
 
 public abstract class Spec implements Unparse
 {	protected String packageName;
 	protected Vector imports, symbols, prec;	protected InitCode initCode;
 	protected ActionCode actionCode;	protected ParserCode parserCode;	protected ScanCode scanCode;
-	protected JLgenSpec child;		public Spec () {		initCode = null;		actionCode = null;		parserCode = null;		scanCode = null;
+	protected PPGSpec child;		public Spec () {		initCode = null;		actionCode = null;		parserCode = null;		scanCode = null;
 		child = null;
 	}	
 	public void setPkgName (String pkgName) {		if (pkgName != null)
@@ -19,16 +19,16 @@ public abstract class Spec implements Unparse
 			try {				code = (Code) codeParts.elementAt(i);				if (code instanceof ActionCode && code != null) {					actionCode = (ActionCode) code.clone();				} else if (code instanceof InitCode && code != null) {					initCode = (InitCode) code.clone();				} else if (code instanceof ParserCode && code != null) {					parserCode = (ParserCode) code.clone();				} else { // must be ScanCode
 					if (code != null)						scanCode = (ScanCode) code.clone();				}
 			} catch (Exception e) {
-				System.err.println(JLgen.HEADER+" Spec::replaceCode(): not a code segment "+
+				System.err.println(PPG.HEADER+" Spec::replaceCode(): not a code segment "+
 								   "found in code Vector: "+								   ((code == null) ? "null" : code.toString()));
 				System.exit(1);			}		}	}	
 	public void addImports (Vector imp) {
 		if (imp == null)			return;
 				for (int i=0; i < imp.size(); i++) {			imports.addElement(imp.elementAt(i));		}	}
 	
-	public void setChild (JLgenSpec childSpec) {		child = childSpec;
+	public void setChild (PPGSpec childSpec) {		child = childSpec;
 	}		// default action is to do nothing: as CUP does
 	public void parseChain(String basePath) {}
 
-	/**	 * Combine the chain of inheritance into one CUP spec	 */	public abstract CUPSpec coalesce() throws JLgenError;	
+	/**	 * Combine the chain of inheritance into one CUP spec	 */	public abstract CUPSpec coalesce() throws PPGError;	
 }

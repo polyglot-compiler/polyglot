@@ -1,8 +1,8 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.*;
-import jltools.visit.*;
-import jltools.util.*;
+import polyglot.types.*;
+import polyglot.visit.*;
+import polyglot.util.*;
 
 /**
  * Utility class which is used to disambiguate ambiguous

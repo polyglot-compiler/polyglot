@@ -1,5 +1,5 @@
 #
-# Makefile to build the jltools source to source compiler
+# Makefile to build the polyglot source to source compiler
 # includes a makefile in each package to handle building of respective 
 # packages
 #
@@ -13,7 +13,7 @@ CC			= gcc
 JC_FLAGS 		= -g -d $(OUTPUT) $(JAVAC_PATHS) -deprecation
 RMIC_FLAGS		= -d $(OUTPUT) -classpath $(CLASSPATH)
 
-JAR_FILE		= jltools.jar
+JAR_FILE		= polyglot.jar
 JAR_FLAGS		= cf 
 
 JAVADOC_MAIN		= com.sun.tools.javadoc.Main
@@ -117,7 +117,7 @@ define flex
 endef
 
 
-define jlgen
-	$(JAVA) -classpath $(CLASSPATH) jltools.util.jlgen.JLgen
+define ppg
+	$(JAVA) -classpath $(CLASSPATH) polyglot.util.ppg.PPG
 endef
 

@@ -1,10 +1,10 @@
 
-package jltools.util.typedump;
+package polyglot.util.typedump;
 
-import jltools.util.*;
-import jltools.types.Type;
-import jltools.types.TypeSystem;
-import jltools.frontend.ExtensionInfo;
+import polyglot.util.*;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.frontend.ExtensionInfo;
 
 public class Main {
     public static void main(String args[]) {
@@ -15,7 +15,7 @@ public class Main {
 	if ((extension == null && args.length != 1) ||
 	    (extension != null && args.length != 3)) {
 	    System.err.println("Usage: " +
-			       "jltools.util.typedump.Main "+ 
+			       "polyglot.util.typedump.Main "+ 
 			       "[-ext <extension>] <classname>");
 	    System.exit(1);
 	}
@@ -29,7 +29,7 @@ public class Main {
 
 	if (extension != null) {
 	    String extClassName =
-		"jltools.ext." + extension + ".ExtensionInfo";
+		"polyglot.ext." + extension + ".ExtensionInfo";
 	    Class extClass = null;
 	    
 	    try {
@@ -53,7 +53,7 @@ public class Main {
 	    }
 	} else {
 	
-	    extInfo = new jltools.ext.jl.ExtensionInfo();
+	    extInfo = new polyglot.ext.jl.ExtensionInfo();
 	}
 	
 

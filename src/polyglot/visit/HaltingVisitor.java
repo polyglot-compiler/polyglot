@@ -1,7 +1,7 @@
-package jltools.visit;
+package polyglot.visit;
 
-import jltools.ast.Node;
-import jltools.util.*;
+import polyglot.ast.Node;
+import polyglot.util.*;
 import java.util.*;
 
 public abstract class HaltingVisitor extends NodeVisitor implements Copy

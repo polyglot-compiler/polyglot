@@ -1,16 +1,16 @@
-package jltools.ext.jl;
+package polyglot.ext.jl;
 
-import jltools.ast.*;
-import jltools.types.*;
-import jltools.ext.jl.ast.*;
-import jltools.ext.jl.types.*;
-import jltools.util.*;
-import jltools.visit.*;
-import jltools.frontend.*;
-import jltools.main.UsageError;
-import jltools.main.Options;
-import jltools.main.Report;
-import jltools.frontend.Compiler;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.ext.jl.ast.*;
+import polyglot.ext.jl.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
+import polyglot.frontend.*;
+import polyglot.main.UsageError;
+import polyglot.main.Options;
+import polyglot.main.Report;
+import polyglot.frontend.Compiler;
 
 import java.io.*;
 import java.util.*;
@@ -49,7 +49,7 @@ import java.util.*;
  * <li> translation (Translator) </li>
  * </ol>
  */
-public class ExtensionInfo extends jltools.frontend.AbstractExtensionInfo {
+public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
     protected void initTypeSystem() {
 	try {
             LoadedClassResolver lr;
@@ -75,7 +75,7 @@ public class ExtensionInfo extends jltools.frontend.AbstractExtensionInfo {
 	return "";
     }
 
-    public jltools.main.Version version() {
+    public polyglot.main.Version version() {
 	return new Version();
     }
 
@@ -100,11 +100,11 @@ public class ExtensionInfo extends jltools.frontend.AbstractExtensionInfo {
     }
 
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
-	jltools.ext.jl.parse.Lexer lexer;
+	polyglot.ext.jl.parse.Lexer lexer;
 	java_cup.runtime.lr_parser grm;
 
-	lexer = new jltools.ext.jl.parse.Lexer(reader, source.name(), eq);
-	grm = new jltools.ext.jl.parse.Grm(lexer, ts, nf, eq);
+	lexer = new polyglot.ext.jl.parse.Lexer(reader, source.name(), eq);
+	grm = new polyglot.ext.jl.parse.Grm(lexer, ts, nf, eq);
 
 	return new CupParser(grm, source, eq);
     }

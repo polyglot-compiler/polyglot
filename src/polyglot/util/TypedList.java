@@ -2,7 +2,7 @@
  * TypedList.java
  */
 
-package jltools.util;
+package polyglot.util;
 
 
 import java.util.List;

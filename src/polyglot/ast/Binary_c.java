@@ -1,9 +1,9 @@
-package jltools.ext.jl.ast;
+package polyglot.ext.jl.ast;
 
-import jltools.ast.*;
-import jltools.util.*;
-import jltools.visit.*;
-import jltools.types.*;
+import polyglot.ast.*;
+import polyglot.util.*;
+import polyglot.visit.*;
+import polyglot.types.*;
 
 /**
  * A <code>Binary</code> represents a Java binary expression, an

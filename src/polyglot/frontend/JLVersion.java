@@ -1,6 +1,6 @@
-package jltools.ext.jl;
+package polyglot.ext.jl;
 
-public class Version extends jltools.main.Version {
+public class Version extends polyglot.main.Version {
     public String name()
         { return "jl"; }
     public int major()

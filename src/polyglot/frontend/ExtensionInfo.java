@@ -1,12 +1,12 @@
-package jltools.frontend;
+package polyglot.frontend;
 
-import jltools.ast.*;
-import jltools.types.*;
-import jltools.util.*;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.util.*;
 import java.io.*;
 import java.util.*;
-import jltools.main.UsageError;
-import jltools.main.Options;
+import polyglot.main.UsageError;
+import polyglot.main.Options;
 
 /**
  * <code>ExtensionInfo</code> is the main interface for defining language
@@ -36,7 +36,7 @@ public interface ExtensionInfo {
     String compilerName();
 
     /** Report the version of the extension. */
-    jltools.main.Version version();
+    polyglot.main.Version version();
 
     /** Report the options accepted by the extension.
         Output is newline-terminated if non-empty. */
@@ -47,7 +47,7 @@ public interface ExtensionInfo {
      * be called after the compiler is initialized, but before the compiler
      * starts work.
      */
-    void initCompiler(jltools.frontend.Compiler compiler);
+    void initCompiler(polyglot.frontend.Compiler compiler);
 
     Compiler compiler();
 

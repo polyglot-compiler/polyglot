@@ -1,9 +1,9 @@
-package jltools.ext.carray;
+package polyglot.ext.carray;
 
 /**
  * Version information for carray extension
  */
-public class Version extends jltools.main.Version {
+public class Version extends polyglot.main.Version {
   public String name() { return "carray"; }
   public int major() { return 0; }
   public int minor() { return 1; }

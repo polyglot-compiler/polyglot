@@ -1,8 +1,8 @@
-package jltools.ext.jl.types;
+package polyglot.ext.jl.types;
 
-import jltools.util.InternalCompilerError;
-import jltools.frontend.Pass;
-import jltools.types.*;
+import polyglot.util.InternalCompilerError;
+import polyglot.frontend.Pass;
+import polyglot.types.*;
 import java.util.*;
 
 /**

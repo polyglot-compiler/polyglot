@@ -2,7 +2,7 @@
  * TypedIterator.java
  */
 
-package jltools.util;
+package polyglot.util;
 
 import java.util.ListIterator;
 import java.lang.UnsupportedOperationException;

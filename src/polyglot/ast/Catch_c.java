@@ -1,10 +1,10 @@
-package jltools.ext.jl.ast;
+package polyglot.ext.jl.ast;
 
-import jltools.ast.*;
+import polyglot.ast.*;
 
-import jltools.util.*;
-import jltools.types.*;
-import jltools.visit.*;
+import polyglot.util.*;
+import polyglot.types.*;
+import polyglot.visit.*;
 
 /**
  * A <code>Catch</code> represents one half of a <code>try... catch</code>

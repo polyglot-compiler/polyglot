@@ -1,7 +1,7 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.ConstructorInstance;
-import jltools.types.ParsedAnonClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.ParsedAnonClassType;
 import java.util.List;
 
 /**

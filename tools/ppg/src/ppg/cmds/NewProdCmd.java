@@ -1,6 +1,6 @@
-package jltools.util.jlgen.cmds;
+package polyglot.util.ppg.cmds;
 
-import jltools.util.jlgen.atoms.*;import jltools.util.jlgen.util.*;
+import polyglot.util.ppg.atoms.*;import polyglot.util.ppg.util.*;
 
 public class NewProdCmd implements Command
 {

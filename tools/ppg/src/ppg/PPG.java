@@ -1,16 +1,16 @@
-package jltools.util.jlgen;
+package polyglot.util.ppg;
 
 import java.io.*;
-import jltools.util.jlgen.cmds.*;
-import jltools.util.jlgen.lex.*;
-import jltools.util.jlgen.parse.*;
-import jltools.util.jlgen.spec.*;
-import jltools.util.jlgen.util.*;
+import polyglot.util.ppg.cmds.*;
+import polyglot.util.ppg.lex.*;
+import polyglot.util.ppg.parse.*;
+import polyglot.util.ppg.spec.*;
+import polyglot.util.ppg.util.*;
 
-public class JLgen
+public class PPG
 {
-	public static final String HEADER = "jlgen: ";
-	public static final String DEBUG_HEADER = "jlgen [debug]: ";
+	public static final String HEADER = "ppg: ";
+	public static final String DEBUG_HEADER = "ppg [debug]: ";
 	public static boolean debug = false;	public static String SYMBOL_CLASS_NAME = "sym";
 
 	public static void DEBUG (String s) {
@@ -69,12 +69,12 @@ public class JLgen
 		Spec spec = (Spec)parser.getProgramNode();		
 		String parent = file.getParent();		spec.parseChain(parent == null ? "" : parent);
 		
-		/* now we have a linked list of inheritance, namely		 * JLgen_1, JLgen_2, ..., JLgen_n, CUP		 * We combine two at a time, starting from the end with the CUP spec		 */
+		/* now we have a linked list of inheritance, namely		 * PPG_1, PPG_2, ..., PPG_n, CUP		 * We combine two at a time, starting from the end with the CUP spec		 */
 		try {
 			CUPSpec combined = spec.coalesce();			CodeWriter cw = new CodeWriter(System.out, 72); 
 			combined.unparse(cw);
 			cw.flush();
-		} catch (JLgenError e) {
+		} catch (PPGError e) {
 			System.out.println(e.getMessage());
 			System.exit(1);		} catch (IOException e) {
 			System.out.println(HEADER+"exception: "+e.getMessage());
@@ -82,7 +82,7 @@ public class JLgen
 		}	}	
 	
 	public static void usage() {
-		System.err.println("Usage: jlgen [-c ConstClass] <input file>\nwhere:\n"+
+		System.err.println("Usage: ppg [-c ConstClass] <input file>\nwhere:\n"+
 						   "\t-c <Class>\tclass prepended to token names to pass to <func>\n"+
-						   "\t<input>\ta JLgen or CUP source file\n");
+						   "\t<input>\ta PPG or CUP source file\n");
 		System.exit(1);	}}

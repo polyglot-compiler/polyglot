@@ -1,4 +1,4 @@
-package jltools.util;
+package polyglot.util;
 
 import java.io.*;
 import java.util.StringTokenizer;

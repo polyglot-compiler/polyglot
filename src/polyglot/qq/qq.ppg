@@ -1,9 +1,9 @@
 include "../parse/java12.cup"
 
-package jltools.ext.jl.qq;
+package polyglot.ext.jl.qq;
 
-import jltools.ext.jl.parse.Name;
-import jltools.ext.jl.parse.JLUtil;
+import polyglot.ext.jl.parse.Name;
+import polyglot.ext.jl.parse.JLUtil;
 
 parser code {:
 	Lexer lexer;

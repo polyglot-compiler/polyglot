@@ -1,8 +1,8 @@
-package jltools.util.jlgen.cmds;
+package polyglot.util.ppg.cmds;
 
 import java.util.*;
-import jltools.util.jlgen.atoms.*;
-import jltools.util.jlgen.util.*;
+import polyglot.util.ppg.atoms.*;
+import polyglot.util.ppg.util.*;
 public class DropCmd implements Command
 {
 	private Production prod; // productions to be dropped for some nonterminal

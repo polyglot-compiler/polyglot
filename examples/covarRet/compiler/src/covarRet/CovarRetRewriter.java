@@ -1,10 +1,10 @@
-package jltools.ext.covarRet;
+package polyglot.ext.covarRet;
 
-import jltools.ast.*;
-import jltools.types.*;
-import jltools.util.*;
-import jltools.frontend.*;
-import jltools.visit.*;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.frontend.*;
+import polyglot.visit.*;
 import java.util.*;
 
 /**

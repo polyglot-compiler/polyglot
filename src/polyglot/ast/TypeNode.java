@@ -1,7 +1,7 @@
-package jltools.ast;
+package polyglot.ast;
 
-import jltools.types.Type;
-import jltools.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.SemanticException;
 
 /**
  * A <code>TypeNode</code> is the syntactic representation of a 

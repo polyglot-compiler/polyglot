@@ -1,4 +1,4 @@
-package jltools.types;
+package polyglot.types;
 
 /**
  * A <code>ParsedTopLevelClassType</code> represents a parsed top-level class.

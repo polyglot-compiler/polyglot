@@ -1,10 +1,10 @@
-package jltools.types;
+package polyglot.types;
 
 import java.util.*;
-import jltools.util.Position;
-import jltools.frontend.Job;
-import jltools.frontend.Compiler;
-import jltools.types.reflect.ClassFile;
+import polyglot.util.Position;
+import polyglot.frontend.Job;
+import polyglot.frontend.Compiler;
+import polyglot.types.reflect.ClassFile;
 
 /**
  * The <code>TypeSystem</code> defines the types of the language and

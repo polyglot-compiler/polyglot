@@ -1,4 +1,4 @@
-package jltools.main;
+package polyglot.main;
 
 /** This class encapsulates the version of the compiler. */
 public abstract class Version {
