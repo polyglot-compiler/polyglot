@@ -16,9 +16,9 @@ public class ThrowConstraintNode_c extends Node_c implements ThrowConstraintNode
     KeySetNode keys;
     ThrowConstraint constraint;
 
-    public ThrowConstraintNode_c(JL del, Ext ext, Position pos,
+    public ThrowConstraintNode_c(Position pos,
                                  TypeNode tn, KeySetNode keys) {
-        super(del, ext, pos);
+        super(pos);
         this.tn = tn;
         this.keys = keys;
     }

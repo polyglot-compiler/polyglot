@@ -18,8 +18,8 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     protected List arguments;
     protected ConstructorInstance ci;
 
-    public ConstructorCall_c(JL del, Ext ext, Position pos, Kind kind, Expr qualifier, List arguments) {
-	super(del, ext, pos);
+    public ConstructorCall_c(Position pos, Kind kind, Expr qualifier, List arguments) {
+	super(pos);
 	this.kind = kind;
 	this.qualifier = qualifier;
 	this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);

@@ -21,8 +21,8 @@ public class NewArray_c extends Expr_c implements NewArray
     protected int addDims;
     protected ArrayInit init;
 
-    public NewArray_c(JL del, Ext ext, Position pos, TypeNode baseType, List dims, int addDims, ArrayInit init) {
-	super(del, ext, pos);
+    public NewArray_c(Position pos, TypeNode baseType, List dims, int addDims, ArrayInit init) {
+	super(pos);
 	this.baseType = baseType;
 	this.dims = TypedList.copyAndCheck(dims, Expr.class, true);
 	this.addDims = addDims;

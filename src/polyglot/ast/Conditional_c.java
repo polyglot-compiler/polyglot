@@ -16,8 +16,8 @@ public class Conditional_c extends Expr_c implements Conditional
     protected Expr consequent;
     protected Expr alternative;
 
-    public Conditional_c(JL del, Ext ext, Position pos, Expr cond, Expr consequent, Expr alternative) {
-	super(del, ext, pos);
+    public Conditional_c(Position pos, Expr cond, Expr consequent, Expr alternative) {
+	super(pos);
 	this.cond = cond;
 	this.consequent = consequent;
 	this.alternative = alternative;

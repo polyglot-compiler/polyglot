@@ -10,6 +10,9 @@ import polyglot.frontend.*;
 import polyglot.visit.*;
 import java.util.*;
 
+/**
+ * Visitor that inserts boxing and unboxing code into the AST.
+ */
 public class PaoBoxer extends AscriptionVisitor
 {
     public PaoBoxer(Job job, TypeSystem ts, NodeFactory nf) {

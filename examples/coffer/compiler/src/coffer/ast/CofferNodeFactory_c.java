@@ -64,7 +64,7 @@ public class CofferNodeFactory_c extends ExtNodeFactory_c implements CofferNodeF
     }
 
     public Free Free(Position pos, Expr expr) {
-        return extFree(new Free_c(null, null, pos, expr));
+        return extFree(new Free_c(pos, expr));
     }
 
     public TrackedTypeNode extTrackedTypeNode(TrackedTypeNode n) {
@@ -72,7 +72,7 @@ public class CofferNodeFactory_c extends ExtNodeFactory_c implements CofferNodeF
     }
 
     public TrackedTypeNode TrackedTypeNode(Position pos, KeyNode key, TypeNode base) {
-        return extTrackedTypeNode(new TrackedTypeNode_c(null, null, pos, key, base));
+        return extTrackedTypeNode(new TrackedTypeNode_c(pos, key, base));
     }
 
     public AmbKeySetNode extAmbKeySetNode(AmbKeySetNode n) {
@@ -80,7 +80,7 @@ public class CofferNodeFactory_c extends ExtNodeFactory_c implements CofferNodeF
     }
 
     public AmbKeySetNode AmbKeySetNode(Position pos, List keys) {
-        return extAmbKeySetNode(new AmbKeySetNode_c(null, null, pos, keys));
+        return extAmbKeySetNode(new AmbKeySetNode_c(pos, keys));
     }
 
     public CanonicalKeySetNode extCanonicalKeySetNode(CanonicalKeySetNode n) {
@@ -88,7 +88,7 @@ public class CofferNodeFactory_c extends ExtNodeFactory_c implements CofferNodeF
     }
 
     public CanonicalKeySetNode CanonicalKeySetNode(Position pos, KeySet keys) {
-        return extCanonicalKeySetNode(new CanonicalKeySetNode_c(null, null, pos, keys));
+        return extCanonicalKeySetNode(new CanonicalKeySetNode_c(pos, keys));
     }
 
     public KeyNode extKeyNode(KeyNode n) {
@@ -96,7 +96,7 @@ public class CofferNodeFactory_c extends ExtNodeFactory_c implements CofferNodeF
     }
 
     public KeyNode KeyNode(Position pos, Key key) {
-        return extKeyNode(new KeyNode_c(null, null, pos, key));
+        return extKeyNode(new KeyNode_c(pos, key));
     }
 
     public ClassDecl ClassDecl(Position pos, Flags flags, String name,
@@ -112,7 +112,7 @@ public class CofferNodeFactory_c extends ExtNodeFactory_c implements CofferNodeF
                                          TypeNode superClass, List interfaces,
                                          ClassBody body)
     {
-        return (CofferClassDecl) extClassDecl(new CofferClassDecl_c(null, null, pos, flags, name, key,
+        return (CofferClassDecl) extClassDecl(new CofferClassDecl_c(pos, flags, name, key,
                                     superClass, interfaces, body));
     }
 
@@ -121,7 +121,7 @@ public class CofferNodeFactory_c extends ExtNodeFactory_c implements CofferNodeF
     }
 
     public ThrowConstraintNode ThrowConstraintNode(Position pos, TypeNode tn, KeySetNode keys) {
-        return extThrowConstraintNode(new ThrowConstraintNode_c(null, null, pos, tn, keys));
+        return extThrowConstraintNode(new ThrowConstraintNode_c(pos, tn, keys));
     }
 
     public MethodDecl MethodDecl(Position pos, Flags flags,
@@ -167,7 +167,7 @@ public class CofferNodeFactory_c extends ExtNodeFactory_c implements CofferNodeF
                                               List throwConstraints,
                                               Block body)
     {
-        return (CofferMethodDecl) extMethodDecl(new CofferMethodDecl_c(null, null, pos, flags, returnType, name, argTypes,
+        return (CofferMethodDecl) extMethodDecl(new CofferMethodDecl_c(pos, flags, returnType, name, argTypes,
                                      entryKeys, returnKeys, throwConstraints, body));
     }
 
@@ -180,7 +180,7 @@ public class CofferNodeFactory_c extends ExtNodeFactory_c implements CofferNodeF
                                                         List throwConstraints,
                                                         Block body)
     {
-        return (CofferConstructorDecl) extConstructorDecl(new CofferConstructorDecl_c(null, null, pos, flags, name, argTypes,
+        return (CofferConstructorDecl) extConstructorDecl(new CofferConstructorDecl_c(pos, flags, name, argTypes,
                                           entryKeys, returnKeys, throwConstraints, body));
     }
 }

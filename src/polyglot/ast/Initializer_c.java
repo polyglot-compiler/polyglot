@@ -20,8 +20,8 @@ public class Initializer_c extends Term_c implements Initializer
     protected Block body;
     protected InitializerInstance ii;
 
-    public Initializer_c(JL del, Ext ext, Position pos, Flags flags, Block body) {
-	super(del, ext, pos);
+    public Initializer_c(Position pos, Flags flags, Block body) {
+	super(pos);
 	this.flags = flags;
 	this.body = body;
     }

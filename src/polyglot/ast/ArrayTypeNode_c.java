@@ -15,8 +15,8 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
 {
     protected TypeNode base;
 
-    public ArrayTypeNode_c(JL del, Ext ext, Position pos, TypeNode base) {
-	super(del, ext, pos);
+    public ArrayTypeNode_c(Position pos, TypeNode base) {
+	super(pos);
 	this.base = base;
     }
 

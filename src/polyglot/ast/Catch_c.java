@@ -16,8 +16,8 @@ public class Catch_c extends Stmt_c implements Catch
     protected Formal formal;
     protected Block body;
 
-    public Catch_c(JL del, Ext ext, Position pos, Formal formal, Block body) {
-	super(del, ext, pos);
+    public Catch_c(Position pos, Formal formal, Block body) {
+	super(pos);
 	this.formal = formal;
 	this.body = body;
     }

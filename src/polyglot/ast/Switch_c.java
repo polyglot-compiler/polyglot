@@ -19,8 +19,8 @@ public class Switch_c extends Stmt_c implements Switch
     protected Expr expr;
     protected List elements;
 
-    public Switch_c(JL del, Ext ext, Position pos, Expr expr, List elements) {
-	super(del, ext, pos);
+    public Switch_c(Position pos, Expr expr, List elements) {
+	super(pos);
 	this.expr = expr;
 	this.elements = TypedList.copyAndCheck(elements, SwitchElement.class, true);
     }

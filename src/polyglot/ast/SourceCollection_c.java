@@ -13,8 +13,8 @@ public class SourceCollection_c extends Node_c implements SourceCollection
 {
     protected List sources;
 
-    public SourceCollection_c(JL del, Ext ext, Position pos, List sources) {
-	super(del, ext, pos);
+    public SourceCollection_c(Position pos, List sources) {
+	super(pos);
 	this.sources = TypedList.copyAndCheck(sources, SourceFile.class, true);
     }
 

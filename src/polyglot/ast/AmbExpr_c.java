@@ -13,8 +13,8 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
 {
   protected String name;
 
-  public AmbExpr_c(JL del, Ext ext, Position pos, String name) {
-    super(del, ext, pos);
+  public AmbExpr_c(Position pos, String name) {
+    super(pos);
     this.name = name;
   }
 

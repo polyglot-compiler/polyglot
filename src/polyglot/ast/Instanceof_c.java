@@ -15,8 +15,8 @@ public class Instanceof_c extends Expr_c implements Instanceof
     protected Expr expr;
     protected TypeNode compareType;
 
-    public Instanceof_c(JL del, Ext ext, Position pos, Expr expr, TypeNode compareType) {
-	super(del, ext, pos);
+    public Instanceof_c(Position pos, Expr expr, TypeNode compareType) {
+	super(pos);
 	this.expr = expr;
 	this.compareType = compareType;
     }

@@ -23,8 +23,8 @@ public class New_c extends Expr_c implements New
     protected ConstructorInstance ci;
     protected ParsedClassType anonType;
 
-    public New_c(JL del, Ext ext, Position pos, Expr qualifier, TypeNode tn, List arguments, ClassBody body) {
-	super(del, ext, pos);
+    public New_c(Position pos, Expr qualifier, TypeNode tn, List arguments, ClassBody body) {
+	super(pos);
         this.qualifier = qualifier;
         this.tn = tn;
 	this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);

@@ -10,8 +10,8 @@ import polyglot.util.*;
  */
 public class Empty_c extends Stmt_c implements Empty
 {
-    public Empty_c(JL del, Ext ext, Position pos) {
-	super(del, ext, pos);
+    public Empty_c(Position pos) {
+	super(pos);
     }
 
     /** Write the statement to an output file. */

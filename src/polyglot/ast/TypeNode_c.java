@@ -14,8 +14,8 @@ public abstract class TypeNode_c extends Node_c implements TypeNode
 {
     protected Type type;
 
-    public TypeNode_c(JL del, Ext ext, Position pos) {
-	super(del, ext, pos);
+    public TypeNode_c(Position pos) {
+	super(pos);
     }
 
     /** Get the type as a qualifier. */

@@ -18,8 +18,8 @@ import java.util.*;
  */
 public class CovarRetClassBody_c extends ClassBody_c
 {
-    public CovarRetClassBody_c(Del ext, Position pos, List members) {
-        super(ext, pos, members);
+    public CovarRetClassBody_c(Position pos, List members) {
+        super(pos, members);
     }
 
     protected void overrideMethodCheck(TypeChecker tc) throws SemanticException {

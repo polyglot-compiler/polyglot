@@ -1,5 +1,8 @@
 package polyglot.ext.pao.runtime;
 
+/**
+ * Boxed longs.
+ */
 public class Long extends Primitive
 {
   protected long value;

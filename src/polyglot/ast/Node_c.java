@@ -20,7 +20,7 @@ public abstract class Node_c implements Node
     protected JL del;
     protected Ext ext;
 
-    public Node_c(JL del, Ext ext, Position pos) {
+    public Node_c(Position pos) {
         this.del = del;
 
         if (del != null) {

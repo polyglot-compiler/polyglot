@@ -21,8 +21,8 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     protected Block body;
     protected MethodInstance mi;
 
-    public MethodDecl_c(JL del, Ext ext, Position pos, Flags flags, TypeNode returnType, String name, List formals, List throwTypes, Block body) {
-	super(del, ext, pos);
+    public MethodDecl_c(Position pos, Flags flags, TypeNode returnType, String name, List formals, List throwTypes, Block body) {
+	super(pos);
 	this.flags = flags;
 	this.returnType = returnType;
 	this.name = name;

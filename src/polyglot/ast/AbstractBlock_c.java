@@ -14,8 +14,8 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 {
     protected List statements;
 
-    public AbstractBlock_c(JL del, Ext ext, Position pos, List statements) {
-	super(del, ext, pos);
+    public AbstractBlock_c(Position pos, List statements) {
+	super(pos);
 	this.statements = TypedList.copyAndCheck(statements, Stmt.class, true);
     }
 

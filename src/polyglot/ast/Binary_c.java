@@ -17,8 +17,8 @@ public class Binary_c extends Expr_c implements Binary
     protected Expr right;
     protected Precedence precedence;
 
-    public Binary_c(JL del, Ext ext, Position pos, Expr left, Operator op, Expr right) {
-	super(del, ext, pos);
+    public Binary_c(Position pos, Expr left, Operator op, Expr right) {
+	super(pos);
 	this.left = left;
 	this.op = op;
 	this.right = right;

@@ -15,8 +15,8 @@ public class Return_c extends Stmt_c implements Return
 {
     protected Expr expr;
 
-    public Return_c(JL del, Ext ext, Position pos, Expr expr) {
-	super(del, ext, pos);
+    public Return_c(Position pos, Expr expr) {
+	super(pos);
 	this.expr = expr;
     }
 

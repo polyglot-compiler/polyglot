@@ -13,8 +13,8 @@ public abstract class Expr_c extends Term_c implements Expr
 {
     protected Type type;
 
-    public Expr_c(JL del, Ext ext, Position pos) {
-	super(del, ext, pos);
+    public Expr_c(Position pos) {
+	super(pos);
     }
 
     /**

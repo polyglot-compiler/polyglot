@@ -1,5 +1,8 @@
 package polyglot.ext.pao.runtime;
 
+/**
+ * Boxed chars.
+ */
 public class Character extends Integer
 {
   public Character( char value)

@@ -1,5 +1,8 @@
 package polyglot.ext.pao.runtime;
 
+/**
+ * Boxed doubles.
+ */
 public class Double extends Primitive
 {
   protected double value;

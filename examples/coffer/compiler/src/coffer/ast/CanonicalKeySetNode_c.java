@@ -15,8 +15,8 @@ public class CanonicalKeySetNode_c extends Node_c implements CanonicalKeySetNode
 {
     protected KeySet keys;
 
-    public CanonicalKeySetNode_c(JL del, Ext ext, Position pos, KeySet keys) {
-        super(del, ext, pos);
+    public CanonicalKeySetNode_c(Position pos, KeySet keys) {
+        super(pos);
         this.keys = keys;
     }
 

@@ -15,8 +15,8 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
     protected QualifierNode qual;
     protected String name;
 
-    public AmbQualifierNode_c(JL del, Ext ext, Position pos, QualifierNode qual, String name) {
-	super(del, ext, pos);
+    public AmbQualifierNode_c(Position pos, QualifierNode qual, String name) {
+	super(pos);
 
 	this.qual = qual;
 	this.name = name;

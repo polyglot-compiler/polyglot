@@ -14,8 +14,8 @@ public class Local_c extends Expr_c implements Local
   protected String name;
   protected LocalInstance li;
 
-  public Local_c(JL del, Ext ext, Position pos, String name) {
-    super(del, ext, pos);
+  public Local_c(Position pos, String name) {
+    super(pos);
     this.name = name;
   }
 

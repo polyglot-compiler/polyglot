@@ -15,8 +15,8 @@ public class Unary_c extends Expr_c implements Unary
     protected Unary.Operator op;
     protected Expr expr;
 
-    public Unary_c(JL del, Ext ext, Position pos, Unary.Operator op, Expr expr) {
-	super(del, ext, pos);
+    public Unary_c(Position pos, Unary.Operator op, Expr expr) {
+	super(pos);
 	this.op = op;
 	this.expr = expr;
     }

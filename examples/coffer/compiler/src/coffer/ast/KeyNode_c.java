@@ -14,8 +14,8 @@ public class KeyNode_c extends Node_c implements KeyNode
 {
     protected Key key;
 
-    public KeyNode_c(JL del, Ext ext, Position pos, Key key) {
-        super(del, ext, pos);
+    public KeyNode_c(Position pos, Key key) {
+        super(pos);
         this.key = key;
     }
 

@@ -15,8 +15,8 @@ public class Assign_c extends Expr_c implements Assign
   protected Operator op;
   protected Expr right;
 
-  public Assign_c(JL del, Ext ext, Position pos, Expr left, Operator op, Expr right) {
-    super(del, ext, pos);
+  public Assign_c(Position pos, Expr left, Operator op, Expr right) {
+    super(pos);
     this.left = left;
     this.op = op;
     this.right = right;

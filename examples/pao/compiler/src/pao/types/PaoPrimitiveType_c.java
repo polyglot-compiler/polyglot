@@ -5,7 +5,7 @@ import polyglot.types.*;
 import java.util.*;
 
 /**
- * An <code>PrimitiveType_c</code> represents a primitive type.
+ * A PAO primitive type.  A primitive is now considered a subtype of Object.
  */
 public class PaoPrimitiveType_c extends PrimitiveType_c
 {

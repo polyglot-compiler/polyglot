@@ -16,8 +16,8 @@ public class Throw_c extends Stmt_c implements Throw
 {
     protected Expr expr;
 
-    public Throw_c(JL del, Ext ext, Position pos, Expr expr) {
-	super(del, ext, pos);
+    public Throw_c(Position pos, Expr expr) {
+	super(pos);
 	this.expr = expr;
     }
 

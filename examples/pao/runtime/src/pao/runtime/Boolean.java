@@ -1,5 +1,8 @@
 package polyglot.ext.pao.runtime;
 
+/**
+ * Boxed booleans.
+ */
 public class Boolean extends Primitive
 {
   private boolean value;

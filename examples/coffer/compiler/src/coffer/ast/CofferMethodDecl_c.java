@@ -18,10 +18,10 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
     protected KeySetNode returnKeys;
     protected List throwConstraints;
 
-    public CofferMethodDecl_c(JL del, Ext ext, Position pos, Flags flags, TypeNode returnType,
+    public CofferMethodDecl_c(Position pos, Flags flags, TypeNode returnType,
 	    String name, List formals, KeySetNode entryKeys, KeySetNode returnKeys,
 	    List throwConstraints, Block body) {
-	super(del, ext, pos, flags, returnType, name, formals, Collections.EMPTY_LIST, body);
+	super(pos, flags, returnType, name, formals, Collections.EMPTY_LIST, body);
 	this.entryKeys = entryKeys;
 	this.returnKeys = returnKeys;
 	this.throwConstraints = TypedList.copyAndCheck(throwConstraints, 

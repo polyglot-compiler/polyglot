@@ -13,8 +13,8 @@ import java.util.*;
  */ 
 public abstract class Loop_c extends Stmt_c implements Loop
 {
-    public Loop_c(JL del, Ext ext, Position pos) {
-	super(del, ext, pos);
+    public Loop_c(Position pos) {
+	super(pos);
     }
 
     public boolean condIsConstant() {

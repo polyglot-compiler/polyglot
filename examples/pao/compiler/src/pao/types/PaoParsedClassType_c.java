@@ -6,7 +6,8 @@ import polyglot.types.*;
 import java.util.*;
 
 /**
- * An <code>PrimitiveType_c</code> represents a primitive type.
+ * A PAO class type.  This class overrides type checking of casts to
+ * primitives.
  */
 public class PaoParsedClassType_c extends ParsedClassType_c
 {
@@ -19,8 +20,8 @@ public class PaoParsedClassType_c extends ParsedClassType_c
     }
 
     /** Returns true iff a cast from this to <code>toType</code> is valid. */
-    public boolean isCastValidImpl(Type t) {
-        return t.isPrimitive() && ts.equals(this, ts.Object()) ||
-               super.isCastValidImpl(t);
+    public boolean isCastValidImpl(Type toType) {
+        return toType.isPrimitive() && ts.equals(this, ts.Object()) ||
+               super.isCastValidImpl(toType);
     }
 }

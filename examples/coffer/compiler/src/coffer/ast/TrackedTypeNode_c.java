@@ -16,8 +16,8 @@ public class TrackedTypeNode_c extends TypeNode_c implements TrackedTypeNode
     protected TypeNode base;
     protected KeyNode key;
 
-    public TrackedTypeNode_c(JL del, Ext ext, Position pos, KeyNode key, TypeNode base) {
-	super(del, ext, pos);
+    public TrackedTypeNode_c(Position pos, KeyNode key, TypeNode base) {
+	super(pos);
         this.key = key;
 	this.base = base;
     }

@@ -16,8 +16,8 @@ public class Do_c extends Loop_c implements Do
     protected Stmt body;
     protected Expr cond;
 
-    public Do_c(JL del, Ext ext, Position pos, Stmt body, Expr cond) {
-	super(del, ext, pos);
+    public Do_c(Position pos, Stmt body, Expr cond) {
+	super(pos);
 	this.body = body;
 	this.cond = cond;
     }

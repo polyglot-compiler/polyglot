@@ -12,8 +12,8 @@ import java.util.*;
  */
 public class Block_c extends AbstractBlock_c implements Block
 {
-    public Block_c(JL del, Ext ext, Position pos, List statements) {
-	super(del, ext, pos, statements);
+    public Block_c(Position pos, List statements) {
+	super(pos, statements);
     }
 
     /** Write the block to an output file. */

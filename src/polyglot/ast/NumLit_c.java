@@ -12,8 +12,8 @@ public abstract class NumLit_c extends Lit_c implements NumLit
 {
     protected long value;
 
-    public NumLit_c(JL del, Ext ext, Position pos, long value) {
-	super(del, ext, pos);
+    public NumLit_c(Position pos, long value) {
+	super(pos);
 	this.value = value;
     }
 

@@ -16,8 +16,8 @@ public class ClassBody_c extends Node_c implements ClassBody
 {
     protected List members;
 
-    public ClassBody_c(JL del, Ext ext, Position pos, List members) {
-        super(del, ext, pos);
+    public ClassBody_c(Position pos, List members) {
+        super(pos);
         this.members = TypedList.copyAndCheck(members, ClassMember.class, true);
     }
 

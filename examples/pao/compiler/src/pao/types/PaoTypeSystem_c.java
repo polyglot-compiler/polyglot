@@ -5,6 +5,9 @@ import polyglot.ext.jl.types.TypeSystem_c;
 import polyglot.util.*;
 import java.util.*;
 
+/**
+ * PAO type system.
+ */
 public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
     public PrimitiveType createPrimitive(PrimitiveType.Kind kind) {
         return new PaoPrimitiveType_c(this, kind);

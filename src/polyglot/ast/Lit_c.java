@@ -10,8 +10,8 @@ import polyglot.util.*;
  */
 public abstract class Lit_c extends Expr_c implements Lit
 {
-    public Lit_c(JL del, Ext ext, Position pos) {
-	super(del, ext, pos);
+    public Lit_c(Position pos) {
+	super(pos);
     }
 
     public abstract Object objValue();
