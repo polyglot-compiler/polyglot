@@ -73,11 +73,8 @@ public abstract class Node_c implements Node
 
     public Ext ext(int n) {
         if (n < 1) throw new InternalCompilerError("n must be >= 1");
-        Ext ext = this.ext;
-        while (n > 1) {
-            ext = ext.ext();
-        }
-        return ext;
+        if (n == 1) return ext();
+        return ext(n-1);
     }
 
     public Node ext(int n, Ext ext) {
@@ -87,6 +84,8 @@ public abstract class Node_c implements Node
             return ext(ext);
 
         Ext prev = this.ext(n-1);
+        if (prev == null)
+            throw new InternalCompilerError("cannot set the nth extension if there is no (n-1)st extension");
         return this.ext(n-1, prev.ext(ext));
     }
 
