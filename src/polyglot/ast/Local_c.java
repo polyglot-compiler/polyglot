@@ -84,29 +84,6 @@ public class Local_c extends Expr_c implements Local
     w.end();
   }
 
-  public Term lhsEntry(Assign assign) {
-    if (assign.operator() != Assign.ASSIGN) {
-      return this;
-    }
-
-    return assign.right().entry();
-  }
-
-  public void visitAssignCFG(Assign assign, CFGBuilder v) {
-    if (assign.operator() != Assign.ASSIGN) {
-        // x OP= e: visit x -> e -> (x OP= e)
-        v.visitThrow(this);
-        v.edge(this, assign.right().entry());
-    }
-    else {
-        // x OP= e: visit e -> (x OP= e)
-        // ###@@@: we need this:
-        // v.visitThrow(this);
-    }
-
-    v.visitCFG(assign.right(), assign);
-  }
-
   public boolean isConstant() {
     return li.isConstant();
   }

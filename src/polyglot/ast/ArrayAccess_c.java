@@ -123,35 +123,6 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
         return succs;
     }
 
-    public Term lhsEntry(Assign assign) {
-        return array.entry();
-    }
-
-    public void visitAssignCFG(Assign assign, CFGBuilder v) {
-        if (Assign.ASSIGN != assign.operator()) {
-            // a[i] OP= e: visit a -> i -> a[i] -> e -> (a[i] OP= e)
-            v.visitCFG(array, index.entry());
-            v.visitCFG(index, this);
-            v.visitThrow(this);
-            v.edge(this, assign.right().entry());
-            v.visitCFG(assign.right(), assign);
-        }
-        else {
-            // ###@@@ ideally this needs to visit the nodes in the following order
-            //    a[i] = e: visit a -> i -> e -> (a[i] = e)
-            // but there are problems with this. No node would then throw
-            // the NullPointerException and ArrayIndexOutOfBoundsException.
-            // The correct fix is to subclass the assignment node. Meantime, 
-            // we'll visit the nodes like this:
-            //    a[i] = e: visit a -> i -> e -> a[i] -> (a[i] = e)
-            v.visitCFG(array, index.entry());
-            v.visitCFG(index, assign.right().entry());
-            v.visitCFG(assign.right(), this);
-            v.visitThrow(this);
-            v.edge(this, assign);
-        }
-    }
-
     public List throwTypes(TypeSystem ts) {
         return CollectionUtil.list(ts.OutOfBoundsException(),
                                    ts.NullPointerException());

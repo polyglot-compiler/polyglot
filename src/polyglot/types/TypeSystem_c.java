@@ -67,10 +67,10 @@ public class TypeSystem_c implements TypeSystem
         // later if these are loaded.
 
         // We cache the most commonly used ones in fields.
-        OBJECT_ = (ClassType) systemResolver.find("java.lang.Object");
-        CLASS_  = (ClassType) systemResolver.find("java.lang.Class");
-        STRING_ = (ClassType) systemResolver.find("java.lang.String");
-        THROWABLE_ = (ClassType) systemResolver.find("java.lang.Throwable");
+        Object();
+        Class();
+        String();
+        Throwable();
 
         systemResolver.find("java.lang.Error");
         systemResolver.find("java.lang.Exception");

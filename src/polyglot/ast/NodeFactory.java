@@ -53,6 +53,10 @@ public interface NodeFactory
     Assert Assert(Position pos, Expr cond, Expr errorMessage);
 
     Assign Assign(Position pos, Expr target, Assign.Operator op, Expr source);
+    LocalAssign LocalAssign(Position pos, Local target, Assign.Operator op, Expr source);
+    FieldAssign FieldAssign(Position pos, Field target, Assign.Operator op, Expr source);
+    ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess target, Assign.Operator op, Expr source);
+    AmbAssign AmbAssign(Position pos, Expr target, Assign.Operator op, Expr source);
 
     Binary Binary(Position pos, Expr left, Binary.Operator op, Expr right);
 

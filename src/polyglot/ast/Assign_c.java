@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * An <code>Assign</code> represents a Java assignment expression.
  */
-public class Assign_c extends Expr_c implements Assign
+public abstract class Assign_c extends Expr_c implements Assign
 {
   protected Expr left;
   protected Operator op;
@@ -165,13 +165,6 @@ public class Assign_c extends Expr_c implements Assign
       return child.type();
   }
 
-  /** Get the throwsArrayStoreException of the expression. */
-  public boolean throwsArrayStoreException() {
-    return op == ASSIGN &&
-      left.type().isReference() &&
-      left instanceof ArrayAccess;
-  }
-
   /** Get the throwsArithmeticException of the expression. */
   public boolean throwsArithmeticException() {
     // conservatively assume that any division or mod may throw
@@ -202,24 +195,33 @@ public class Assign_c extends Expr_c implements Assign
     w.end();
   }
 
-  public Term entry() {
-    return ((LHS) left).lhsEntry(this);
-  }
+  abstract public Term entry();
 
   public List acceptCFG(CFGBuilder v, List succs) {
-    ((LHS) left).visitAssignCFG(this, v);
+      if (operator() == ASSIGN) {
+          acceptCFGAssign(v);          
+      }
+      else {
+          acceptCFGOpAssign(v);                    
+      }
     return succs;
   }
 
+  /**
+   * ###@@@DOCO TODO
+   */
+  protected abstract void acceptCFGAssign(CFGBuilder v);
+
+  /**
+   * ###@@@DOCO TODO
+   */
+  protected abstract void acceptCFGOpAssign(CFGBuilder v);
+  
   public List throwTypes(TypeSystem ts) {
     List l = new LinkedList();
 
     if (throwsArithmeticException()) {
       l.add(ts.ArithmeticException());
-    }
-
-    if (throwsArrayStoreException()) {
-      l.add(ts.ArrayStoreException());
     }
 
     return l;

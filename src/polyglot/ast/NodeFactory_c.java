@@ -18,7 +18,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
 {
     private ExtFactory extFactory;
     public NodeFactory_c() {
-        // use an empty implementatin of AbstractExtFactory_c, so we
+        // use an empty implementation of AbstractExtFactory_c, so we
         // don't need to do null checks
         this(new AbstractExtFactory_c() {}); 
     }
@@ -93,11 +93,41 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public Assign Assign(Position pos, Expr left, Assign.Operator op, Expr right) {
-        Assign n = new Assign_c(pos, left, op, right);
-        n = (Assign)n.ext(extFactory.extAssign());
+    public final Assign Assign(Position pos, Expr left, Assign.Operator op, Expr right) {
+        Assign n;
+        if (left instanceof Local) {
+            return LocalAssign(pos, (Local)left, op, right);
+        }
+        else if (left instanceof Field) {
+            return FieldAssign(pos, (Field)left, op, right);
+        }
+        else if (left instanceof ArrayAccess) {
+            return ArrayAccessAssign(pos, (ArrayAccess)left, op, right);
+        }
+        return AmbAssign(pos, left, op, right);
+    }
+
+    public LocalAssign LocalAssign(Position pos, Local left, Assign.Operator op, Expr right) {
+        LocalAssign n = new LocalAssign_c(pos, left, op, right);
+        n = (LocalAssign)n.ext(extFactory.extLocalAssign());
         return n;
     }
+    public FieldAssign FieldAssign(Position pos, Field left, Assign.Operator op, Expr right) {
+        FieldAssign n = new FieldAssign_c(pos, left, op, right);
+        n = (FieldAssign)n.ext(extFactory.extFieldAssign());
+        return n;
+    }
+    public ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess left, Assign.Operator op, Expr right) {
+        ArrayAccessAssign n = new ArrayAccessAssign_c(pos, left, op, right);
+        n = (ArrayAccessAssign)n.ext(extFactory.extArrayAccessAssign());
+        return n;
+    }
+    public AmbAssign AmbAssign(Position pos, Expr left, Assign.Operator op, Expr right) {
+        AmbAssign n = new AmbAssign_c(pos, left, op, right);
+        n = (AmbAssign)n.ext(extFactory.extAmbAssign());
+        return n;
+    }
+
 
     public Binary Binary(Position pos, Expr left, Binary.Operator op, Expr right) {
         Binary n = new Binary_c(pos, left, op, right);

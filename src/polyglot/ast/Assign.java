@@ -54,10 +54,6 @@ public interface Assign extends Expr, Thrower
      * Set the right child (source) of the assignment.
      */
     Assign right(Expr right);
-
-    /**
-     * Returns true if the assignment might throw an arithmetic exception,
-     * such as division by zero.
-     */
+    
     boolean throwsArithmeticException();
 }

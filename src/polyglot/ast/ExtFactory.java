@@ -25,6 +25,8 @@ public interface ExtFactory
     // Factory Methods
     //////////////////////////////////////////////////////////////////
     
+    Ext extAmbAssign();
+
     Ext extAmbExpr();
     
     Ext extAmbPrefix();
@@ -44,6 +46,10 @@ public interface ExtFactory
     Ext extAssert();
     
     Ext extAssign();
+
+    Ext extLocalAssign();
+    Ext extFieldAssign();
+    Ext extArrayAccessAssign();
     
     Ext extBinary();
     

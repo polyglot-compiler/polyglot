@@ -52,6 +52,16 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     // also has an extension. Finally, call an appropriate post method,
     // to allow subclasses to perform operations on the construction Exts
     // ******************************************
+    public final Ext extAmbAssign() {
+        Ext e = extAmbAssignImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extAmbAssign();
+            e = composeExts(e, e2);
+        }
+        return postExtAmbAssign(e);
+    }
+
     public final Ext extAmbExpr() {
         Ext e = extAmbExprImpl();
 
@@ -150,6 +160,36 @@ public abstract class AbstractExtFactory_c implements ExtFactory
             e = composeExts(e, e2);
         }
         return postExtAssign(e);
+    }
+
+    public final Ext extLocalAssign() {
+        Ext e = extLocalAssignImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extLocalAssign();
+            e = composeExts(e, e2);
+        }
+        return postExtLocalAssign(e);
+    }
+
+    public final Ext extFieldAssign() {
+        Ext e = extFieldAssignImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extFieldAssign();
+            e = composeExts(e, e2);
+        }
+        return postExtFieldAssign(e);
+    }
+
+    public final Ext extArrayAccessAssign() {
+        Ext e = extArrayAccessAssignImpl();
+
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extArrayAccessAssign();
+            e = composeExts(e, e2);
+        }
+        return postExtArrayAccessAssign(e);
     }
 
     public final Ext extBinary() {
@@ -736,6 +776,10 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     // Impl methods
     // ********************************************
     
+    protected Ext extAmbAssignImpl() {
+        return extAssignImpl();
+    }
+
     protected Ext extAmbExprImpl() {
         return extExprImpl();
     }
@@ -776,6 +820,17 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return extExprImpl();
     }
 
+    protected Ext extLocalAssignImpl() {
+        return extAssignImpl();
+    }
+
+    protected Ext extFieldAssignImpl() {
+        return extAssignImpl();
+    }
+
+    protected Ext extArrayAccessAssignImpl() {
+        return extAssignImpl();
+    }
     protected Ext extBinaryImpl() {
         return extExprImpl();
     }
@@ -1013,6 +1068,10 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     // Post methods
     // ********************************************
 
+    protected Ext postExtAmbAssign(Ext ext) {
+        return postExtAssign(ext);
+    }
+
     protected Ext postExtAmbExpr(Ext ext) {
         return postExtExpr(ext);
     }
@@ -1051,6 +1110,18 @@ public abstract class AbstractExtFactory_c implements ExtFactory
 
     protected Ext postExtAssign(Ext ext) {
         return postExtExpr(ext);
+    }
+
+    protected Ext postExtLocalAssign(Ext ext) {
+        return postExtAssign(ext);
+    }
+
+    protected Ext postExtFieldAssign(Ext ext) {
+        return postExtAssign(ext);
+    }
+
+    protected Ext postExtArrayAccessAssign(Ext ext) {
+        return postExtAssign(ext);
     }
 
     protected Ext postExtBinary(Ext ext) {

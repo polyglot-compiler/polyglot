@@ -5,7 +5,7 @@ import polyglot.types.LocalInstance;
 /** 
  * A local variable expression.
  */
-public interface Local extends LHS
+public interface Local extends Expr
 {
     /** Get the name of the local variable. */
     String name();
