@@ -1,17 +1,8 @@
 package polyglot.visit;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import polyglot.ast.Block;
-import polyglot.ast.CompoundStmt;
-import polyglot.ast.Node;
-import polyglot.ast.NodeFactory;
-import polyglot.ast.Stmt;
-import polyglot.ast.Term;
+import polyglot.ast.*;
 import polyglot.frontend.Job;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
@@ -35,26 +26,37 @@ public class ReachChecker extends DataFlow
 
     protected static class DataFlowItem extends Item {
         final boolean reachable;
+        final boolean normalReachable;
 
-        protected DataFlowItem(boolean reachable) {
+        protected DataFlowItem(boolean reachable, boolean normalReachable) {
             this.reachable = reachable;
+            this.normalReachable = normalReachable;
         }
         
-        public static DataFlowItem REACHABLE = new DataFlowItem(true);
-        public static DataFlowItem NOT_REACHABLE = new DataFlowItem(false);
+        // terms that are reachable through normal control flow
+        public static DataFlowItem REACHABLE = new DataFlowItem(true, true);
+        
+        // terms that are reachable only through exception control flow, but
+        // not by normal control flow. 
+        public static DataFlowItem REACHABLE_EX_ONLY = new DataFlowItem(true, false);
+
+        // terms that are not reachable 
+        public static DataFlowItem NOT_REACHABLE = new DataFlowItem(false, false);
 
         public String toString() {
-            return "reachable=" + reachable;
+            return (reachable?"":"not ") + "reachable" +
+                   (normalReachable?"":" by exceptions only");
         }
         
         public boolean equals(Object o) {
             if (o instanceof DataFlowItem) {
-                return this.reachable == ((DataFlowItem)o).reachable;
+                return this.reachable == ((DataFlowItem)o).reachable &&
+                       this.normalReachable == ((DataFlowItem)o).normalReachable;
             }
             return false;
         }
         public int hashCode() {
-            return (reachable ? 5423 : 5753);
+            return (reachable ? 5423 : 5753) + (normalReachable ? 31 : -2);
         }
     }
 
@@ -63,17 +65,60 @@ public class ReachChecker extends DataFlow
             return itemToMap(DataFlowItem.REACHABLE, succEdgeKeys);
         }
         else {
-            return itemToMap(in, succEdgeKeys);
+            if (in == DataFlowItem.NOT_REACHABLE) {
+                return itemToMap(in, succEdgeKeys);
+            }
+            
+            // in is either REACHABLE or REACHABLE_EX_ONLY.
+            // return a map where all exception edges are REACHABLE_EX_ONLY,
+            // and all non-exception edges are REACHABLE.
+            Map m = itemToMap(DataFlowItem.REACHABLE_EX_ONLY, succEdgeKeys);
+
+            if (succEdgeKeys.contains(FlowGraph.EDGE_KEY_OTHER)) {
+                m.put(FlowGraph.EDGE_KEY_OTHER, DataFlowItem.REACHABLE);
+            }
+            if (succEdgeKeys.contains(FlowGraph.EDGE_KEY_TRUE)) {
+                m.put(FlowGraph.EDGE_KEY_TRUE, DataFlowItem.REACHABLE);
+            }
+            if (succEdgeKeys.contains(FlowGraph.EDGE_KEY_FALSE)) {
+                m.put(FlowGraph.EDGE_KEY_FALSE, DataFlowItem.REACHABLE);
+            }
+            
+            return m;
         }
     }
 
     public Item confluence(List inItems, Term node, FlowGraph graph) {
-        // if any predecessor is reachable, so is this one
-        for (Iterator i = inItems.iterator(); i.hasNext(); ) {
-            if (((DataFlowItem)i.next()).reachable) {
+        throw new InternalCompilerError("Should never be called.");
+    }
+
+    public Item confluence(List inItems, List itemKeys, Term node, FlowGraph graph) {
+        // if any predecessor is reachable, so is this one, and if any
+        // predecessor is normal reachable, and the edge key is not an 
+        // exception edge key, then so is this one.
+        
+        
+        List l = this.filterItemsNonException(inItems, itemKeys);
+        for (Iterator i = l.iterator(); i.hasNext(); ) {
+            if (i.next() == DataFlowItem.REACHABLE) {
+                // this term is reachable via a non-exception edge
                 return DataFlowItem.REACHABLE;
             }
         }
+
+        // If we fall through to here, then there were
+        // no non-exception edges that were normally reachable.        
+        // We now need to determine if this node is
+        // reachable via an exception edge key, or if 
+        // it is not reachable at all.
+        for (Iterator i = inItems.iterator(); i.hasNext(); ) {
+            if (((DataFlowItem)i.next()).reachable) {
+                // this term is reachable, but only through an
+                // exception edge.
+                return DataFlowItem.REACHABLE_EX_ONLY;
+            }
+        }
+
         return DataFlowItem.NOT_REACHABLE;
     }
 
@@ -91,16 +136,28 @@ public class ReachChecker extends DataFlow
         if (g != null) {   
             Collection peers = g.peers(n);
             if (peers != null && !peers.isEmpty()) {
+                boolean isInitializer = (n instanceof Initializer);
+                
                 for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
                     FlowGraph.Peer p = (FlowGraph.Peer) iter.next();
         
-                    // the peer is reachable if at least one of it's out items
+                    // the peer is reachable if at least one of its out items
                     // is reachable. This would cover all cases, except that some
                     // peers may have no successors (e.g. peers that throw an
                     // an exception that is not caught by the method). So we need 
                     // to also check the inItem.
-                    if (p.inItem() != null && ((DataFlowItem)p.inItem()).reachable) {
-                        return n.reachable(true);                
+                    if (p.inItem() != null) {
+                        DataFlowItem dfi = (DataFlowItem)p.inItem();
+                        // there will only be one peer for an initializer,
+                        // as it cannot occur in a finally block.
+                        if (isInitializer && !dfi.normalReachable) {
+                            throw new SemanticException("Initializers must be able to complete normally.",
+                                                        n.position());
+                        }
+
+                        if (dfi.reachable) {
+                            return n.reachable(true);
+                        }
                     }
                     
                     if (p.outItems != null) {
