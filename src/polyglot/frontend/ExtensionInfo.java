@@ -19,6 +19,15 @@ public interface ExtensionInfo {
 
     TypeSystem getTypeSystem();
     ExtensionFactory getExtensionFactory();
+
+    /** This method, when given a job and a compiler stage (e.g. Job.CHECKED)
+     * returns a list of NodeVisitors that will be run at the specified
+     * stage of compilation.  For example, the standard compiler runs a 
+     * ConstantFolder visitor after the AmbiguityRemover during the 
+     * Job.DISAMBIGUATE phase, so StandardExtensionInfo returns a list 
+     * containing those two visitors when given the stage Job.DISAMBIGUATE.
+     * The visitors will eventually be run in the order specified in the list
+     */
     List getNodeVisitors(SourceJob job, int stage);
 
     /** Parse the rest of the command line after the "-ext" option
