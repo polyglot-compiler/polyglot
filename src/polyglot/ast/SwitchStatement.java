@@ -302,6 +302,9 @@ public class SwitchStatement extends Statement
       return expr;
    }
 
+   public Iterator getSwitchElems() {
+	   return switchElems.iterator();
+   }
 
   public Node visitChildren(NodeVisitor v)
   {

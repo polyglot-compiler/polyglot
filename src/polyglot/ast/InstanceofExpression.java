@@ -61,6 +61,11 @@ public class InstanceofExpression extends Expression
   {
     return tn.getType();
   }
+  
+  public TypeNode getTypeNode()
+  {
+	  return tn;
+  }
 
   /**
    * Visit the children of this node.

@@ -94,6 +94,11 @@ public class NewArrayExpression extends Expression
     return base.getType();
   }
   
+  public TypeNode getBaseTypeNode()
+  {
+	return base;
+  }
+  
   /**
    * Returns the number of additional dimensions which do not have a defined
    * length.

@@ -73,6 +73,13 @@ public class CastExpression extends Expression
   }
 
   /**
+   * return the type node
+   */
+  public TypeNode getTypeNode() {
+	  return tn; 
+  }
+  
+  /**
    * Visit the children of this node.
    *
    * @pre Requires that <code>tn.visit</code> returns an object of type

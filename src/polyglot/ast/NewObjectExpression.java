@@ -101,6 +101,10 @@ public class NewObjectExpression extends Expression
   {
     return tn.getType();
   }
+  
+  public TypeNode getTypeNode() {
+	  return tn;
+  }
 
   /**
    * Returns the argument at position <code>pos</code>.
