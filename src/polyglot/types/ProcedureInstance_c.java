@@ -25,8 +25,8 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         super(ts, pos);
 	this.container = container;
 	this.flags = flags;
-	this.argTypes = new ArrayList(argTypes);
-	this.excTypes = new ArrayList(excTypes);
+	this.argTypes = TypedList.copyAndCheck(argTypes, Type.class, true);
+	this.excTypes = TypedList.copyAndCheck(excTypes, Type.class, true);
     }
 
     public ReferenceType container() {
