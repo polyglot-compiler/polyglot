@@ -57,12 +57,14 @@ public abstract class AbstractPass implements Pass
         exclusive_time = 0;
     }
 
-    /** Return the time in ms taken to run the pass, excluding the time in spawned passes */
+    /** Return the time in ms taken to run the pass, excluding the time in
+     * spawned passes */
     public long exclusiveTime() {
         return exclusive_time;
     }
 
-    /** Return the time in ms taken to run the pass, including the time in spawned passes */
+    /** Return the time in ms taken to run the pass, including the time in
+     * spawned passes */
     public long inclusiveTime() {
         return inclusive_time;
     }

@@ -20,6 +20,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected NodeFactory nf = null;
     protected SourceLoader source_loader = null;
     protected TargetFactory target_factory = null;
+    protected Stats stats;
 
     /**
      * A list of all active (that is, uncompleted) <code>SourceJob</code>s.
@@ -48,6 +49,14 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     protected Options createOptions() {
         return new Options(this);
+    }
+
+    /** Return a Stats object to accumulate and report statistics. */
+    public Stats getStats() {
+        if (this.stats == null) {
+            this.stats = new Stats();
+        }
+        return stats;
     }
 
     public Compiler compiler() {
@@ -251,6 +260,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                                             pass);
         }
 
+        pass.resetTimers();
+
         boolean result = false;
         if (job.status()) {
             Job oldCurrentJob = this.currentJob;
@@ -267,7 +278,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             }
 
             job.setRunningPass(pass);
-            pass.resetTimers();
             pass.toggleTimers(false);
 
             result = pass.run();
@@ -302,8 +312,12 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             // System.gc();
         }
 
-        if (Report.should_report(Report.time, 1)) {
-            Report.report(1, "Finished " + pass +
+        Stats stats = getStats();
+        stats.accumPassTimes(pass.id(), pass.inclusiveTime(),
+                             pass.exclusiveTime());
+
+        if (Report.should_report(Report.time, 2)) {
+            Report.report(2, "Finished " + pass +
                           " status=" + str(result) + " inclusive_time=" +
                           pass.inclusiveTime() + " exclusive_time=" +
                           pass.exclusiveTime());

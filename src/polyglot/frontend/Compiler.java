@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import polyglot.types.reflect.ClassFileLoader;
+import polyglot.main.Report;
 import polyglot.util.*;
 
 /**
@@ -107,6 +108,11 @@ public class Compiler
 	}
 
 	eq.flush();
+
+        if (Report.should_report(Report.time, 1)) {
+            extensionInfo.getStats().report();
+        }
+
 	return okay;
     }
 

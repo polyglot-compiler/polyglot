@@ -26,6 +26,11 @@ public interface ExtensionInfo {
     Options getOptions();
 
     /**
+     * Return a Stats object to accumulate and report statistics.
+     */ 
+    Stats getStats();
+
+    /**
      * Initialize the extension with a particular compiler.  This must
      * be called after the compiler is initialized, but before the compiler
      * starts work.
