@@ -10,7 +10,7 @@ import polyglot.ext.coffer.types.*;
 
 import java.util.*;
 
-public class LocalDeclDel_c extends CofferDel_c {
+public class LocalDeclExt_c extends CofferExt_c {
     public KeySet keyFlow(KeySet held_keys, Type throwType) {
         LocalDecl n = (LocalDecl) node();
         return super.keyFlow(held_keys, throwType);

@@ -9,7 +9,7 @@ import polyglot.ext.coffer.types.*;
 
 import java.util.*;
 
-public class SpecialDel_c extends CofferDel_c {
+public class SpecialExt_c extends CofferExt_c {
     public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
         Special e = (Special) node();
 

@@ -9,7 +9,7 @@ import polyglot.ext.coffer.types.*;
 
 import java.util.*;
 
-public class CofferDel_c extends Del_c implements CofferDel {
+public class CofferExt_c extends Ext_c implements CofferExt {
     public String KeysToString(KeySet set) {
         return "K" + eysToString(set);
     }

@@ -13,7 +13,7 @@ import java.util.*;
  * 
  *  @see polyglot.ast.ProcedureDecl
  */
-public class ProcedureDeclDel_c extends CofferDel_c {
+public class ProcedureDeclExt_c extends CofferExt_c {
     public void checkHeldKeys(KeySet held, KeySet stored) throws SemanticException {
         ProcedureDecl n = (ProcedureDecl) node();
 

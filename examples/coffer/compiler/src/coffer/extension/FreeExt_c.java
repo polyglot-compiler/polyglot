@@ -9,7 +9,7 @@ import polyglot.ext.coffer.types.*;
 
 import java.util.*;
 
-public class FreeDel_c extends CofferDel_c {
+public class FreeExt_c extends CofferExt_c {
     public KeySet keyFlow(KeySet held_keys, Type throwType) {
         Free f = (Free) node();
 
