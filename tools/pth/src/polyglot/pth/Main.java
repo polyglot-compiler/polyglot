@@ -52,8 +52,9 @@ public class Main {
                 return new SilentOutputController(System.out);
 
             case 8:
+                return new VerboseOutputController(System.out, false);
             case 9:
-                return new VerboseOutputController(System.out);
+                return new VerboseOutputController(System.out, true);
 
             default:
                 return new StdOutputController(System.out);                

@@ -62,7 +62,7 @@ public class ScriptTestSuite extends TestSuite {
         try {        
             ObjectInputStream ois = 
                  new ObjectInputStream(
-                          new FileInputStream(this.scriptFile.getAbsolutePath() + TestSuiteResult.RESULT_FILE_SUFFIX));
+                          new FileInputStream(TestSuiteResult.getResultsFileName(this.scriptFile)));
             TestResult tr = (TestResult)ois.readObject();
             this.setTestResult(tr);
         }
@@ -80,7 +80,7 @@ public class ScriptTestSuite extends TestSuite {
         try {        
             ObjectOutputStream oos = 
                  new ObjectOutputStream(
-                          new FileOutputStream(this.scriptFile.getAbsolutePath() + TestSuiteResult.RESULT_FILE_SUFFIX));
+                          new FileOutputStream(TestSuiteResult.getResultsFileName(this.scriptFile)));
             oos.writeObject(this.getTestSuiteResult());            
         }
         catch (IOException e) {

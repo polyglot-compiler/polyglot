@@ -20,8 +20,10 @@ import polyglot.util.StdErrorQueue;
  * 
  */
 public class VerboseOutputController extends OutputController{
-    public VerboseOutputController(PrintStream out) {
+    private boolean alwaysShowErrorQ;
+    public VerboseOutputController(PrintStream out, boolean alwaysShowErrorQ) {
         super(out);
+        this.alwaysShowErrorQ = alwaysShowErrorQ;
     }
      
     protected void startScriptTestSuite(ScriptTestSuite sts) {
@@ -69,6 +71,8 @@ public class VerboseOutputController extends OutputController{
             else {
                 out.println();
             }
+        }
+        if (alwaysShowErrorQ || !sft.success()) {
             StdErrorQueue stdeq = new StdErrorQueue(out, 
                          eq.errorCount() + 1, 
                          sft.getName());

@@ -4,6 +4,7 @@
  */
 package polyglot.pth;
 
+import java.io.File;
 import java.util.Date;
 import java.util.Map;
 
@@ -11,7 +12,18 @@ import java.util.Map;
  * 
  */
 public final class TestSuiteResult extends TestResult {
-    public static final String RESULT_FILE_SUFFIX = ".pthres";
+    private static final String RESULT_FILE_SUFFIX = ".results";
+    /**
+     * The results file is the script file, with a preceding period, and
+     * RESULT_FILE_SUFFIX appended. 
+     */
+    protected static String getResultsFileName(File script) {
+        String parent = "";
+        if (script.getParent() != null) {
+            parent = script.getParent() + File.separator;
+        }
+        return parent + '.' + script.getName() + RESULT_FILE_SUFFIX;
+    }
     public final Map testResults;
     public TestSuiteResult(Test t, Date dateTestRun, Map testResults, Date dateLastSuccess) {
         super(t, dateTestRun, dateLastSuccess);
