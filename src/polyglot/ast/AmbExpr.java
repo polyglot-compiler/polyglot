@@ -10,4 +10,5 @@ public interface AmbExpr extends Expr, Ambiguous
      * Ambiguous name.
      */
     String name();
+    AmbExpr name(String name);
 }
