@@ -1,6 +1,8 @@
 while true; do
     case "$1" in
         "") break;;
+	-profile)
+	  shift; hprof="-Xrunhprof:cpu=samples,file=$1,depth=10"; shift;;
         -classpath) shift; extra_cp=$1; shift;;
         *) args="$args '$1'"; shift;;
     esac
@@ -12,6 +14,6 @@ then
 fi
 
 classpath="${TOP}${FILE_SEP}classes${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}jmatch-runtime.jar${PATH_SEP}${extra_cp}"
-command="\"$JAVA\" -classpath \"$classpath\" $args"
+command="\"$JAVA\" $hprof -classpath \"$classpath\" $args"
 
 eval "$command"
