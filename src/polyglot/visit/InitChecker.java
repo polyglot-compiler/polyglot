@@ -113,6 +113,15 @@ public class InitChecker extends DataFlow
          * declaration of C. 
          */
         Map localsUsedInClassBodies = new HashMap();
+        
+        /**
+         * Set of LocalInstances that we have seen declarations for in this 
+         * class. This set allows us to determine which local instances
+         * are simply being used before they are declared (if they are used in
+         * their own initialization) or are locals declared in an enclosing 
+         * class.
+         */
+        Set localDeclarations = new HashSet();
     }
 
 
@@ -563,14 +572,22 @@ public class InitChecker extends DataFlow
                                 LocalDecl ld, 
                                 Set succEdgeKeys) {
         Map m = new HashMap(inItem.initStatus);
-        if (ld.init() == null) {
-            // declaration of local var with no initialization
-            m.put(ld.localInstance(), new MinMaxInitCount(InitCount.ZERO,InitCount.ZERO));
+        MinMaxInitCount initCount = (MinMaxInitCount)m.get(ld.localInstance());
+        if (initCount == null) {
+            initCount = new MinMaxInitCount(InitCount.ZERO,InitCount.ZERO);
         }
-        else {
+        
+        if (ld.init() != null) {
             // declaration of local var with initialization.
-            m.put(ld.localInstance(), new MinMaxInitCount(InitCount.ONE,InitCount.ONE));
+            initCount = new MinMaxInitCount(initCount.getMin().increment(),
+                                            initCount.getMax().increment());
         }
+
+        m.put(ld.localInstance(), initCount);
+        
+        // record the fact that we have seen a local declaration
+        currCBI.localDeclarations.add(ld.localInstance());
+        
         return itemToMap(new DataFlowItem(m), succEdgeKeys);
     }
     
@@ -587,14 +604,17 @@ public class InitChecker extends DataFlow
           MinMaxInitCount initCount = (MinMaxInitCount)m.get(l.localInstance());
 
           // initcount could be null if the local is defined in the outer
-          // class.
-          if (initCount != null ) {
-              initCount = new MinMaxInitCount(initCount.getMin().increment(),
-                                              initCount.getMax().increment());
-              m.put(l.localInstance(), initCount);
-              return itemToMap(new DataFlowItem(m), succEdgeKeys);  
+          // class, or if we have not yet seen its declaration (i.e. the
+          // local is used in its own initialization)
+          if (initCount == null) {
+              initCount = new MinMaxInitCount(InitCount.ZERO,InitCount.ZERO);
           }
-          return null;
+
+          initCount = new MinMaxInitCount(initCount.getMin().increment(),
+                                          initCount.getMax().increment());
+
+          m.put(l.localInstance(), initCount);
+          return itemToMap(new DataFlowItem(m), succEdgeKeys);  
     }
 
     /**
@@ -751,9 +771,7 @@ public class InitChecker extends DataFlow
                               DataFlowItem dfIn, 
                               DataFlowItem dfOut) 
         throws SemanticException {
-        MinMaxInitCount initCount = (MinMaxInitCount) 
-                  dfIn.initStatus.get(l.localInstance());
-        if (initCount == null) {
+        if (!currCBI.localDeclarations.contains(l.localInstance())) {
             // it's a local variable that has not been declared within
             // this scope. The only way this can arise is from an
             // inner class that is not a member of a class (typically
@@ -765,10 +783,16 @@ public class InitChecker extends DataFlow
             currCBI.outerLocalsUsed.add(l.localInstance());                
         }
         else { 
-            if (InitCount.ZERO.equals(initCount.getMin())) {
-                throw new SemanticException("Local variable \"" + l.name() +
-                        "\" may not have been initialized",
-                        l.position());
+            MinMaxInitCount initCount = (MinMaxInitCount) 
+                      dfIn.initStatus.get(l.localInstance());           
+            if (initCount == null || InitCount.ZERO.equals(initCount.getMin())) {
+                // the local variable may not have been initialized. 
+                // However, we only want to complain if the local is reachable
+                if (l.reachable()) {
+                    throw new SemanticException("Local variable \"" + l.name() +
+                            "\" may not have been initialized",
+                            l.position());
+                }
             }
         }
     }
@@ -782,13 +806,14 @@ public class InitChecker extends DataFlow
                                     DataFlowItem dfOut) 
         throws SemanticException {
         LocalInstance li = ((Local)a.left()).localInstance();
-        MinMaxInitCount initCount = (MinMaxInitCount) 
-                               dfOut.initStatus.get(li);                                
-        if (initCount == null) {
+        if (!currCBI.localDeclarations.contains(li)) {
             throw new SemanticException("Final local variable \"" + li.name() +
                     "\" cannot be assigned to in an inner class.",
                     a.position());                     
         }
+
+        MinMaxInitCount initCount = (MinMaxInitCount) 
+                               dfOut.initStatus.get(li);                                
 
         if (li.flags().isFinal() && InitCount.MANY.equals(initCount.getMax())) {
             throw new SemanticException("variable \"" + li.name() +
@@ -867,7 +892,7 @@ public class InitChecker extends DataFlow
             MinMaxInitCount initCount = (MinMaxInitCount)
                                             dfOut.initStatus.get(li);                                
     
-            if (initCount == null) {
+            if (!currCBI.localDeclarations.contains(li)) {
                 // the local wasn't defined in this scope.
                 currCBI.outerLocalsUsed.add(li);
             }
