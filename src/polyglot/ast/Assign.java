@@ -27,11 +27,15 @@ public interface Assign extends Expr
 
     /**
      * Left child (target) of the assignment.
+     * The target must be a Variable, but this is not enforced
+     * statically to keep Polyglot backward compatible.
      */
     Expr left();
 
     /**
      * Set the left child (target) of the assignment.
+     * The target must be a Variable, but this is not enforced
+     * statically to keep Polyglot backward compatible.
      */
     Assign left(Expr left);
 
