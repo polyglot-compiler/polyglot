@@ -79,7 +79,7 @@ public class ArrayInitializerExpression extends Expression
    * @pre Requires that the <code>visit</code> method of each child returns
    *  an object of type <code>Expression</code>.
    */
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     List list = new ArrayList( children.size());
 

@@ -59,7 +59,7 @@ public class VariableDeclarationStatement extends Statement
       return this;
     }
     
-    Node visitChildren( NodeVisitor v)
+    public Node visitChildren( NodeVisitor v)
     {
       
       if (initializer != null)
@@ -276,7 +276,7 @@ public class VariableDeclarationStatement extends Statement
    *  of the initializer expressions returns an object of type 
    *  <code>Expression</code>.
    */
-  Node visitChildren( NodeVisitor v)
+  public Node visitChildren( NodeVisitor v)
   {
     TypeNode newTn = (TypeNode)tn.visit( v);
     List newDeclarators = new ArrayList( declarators.size());

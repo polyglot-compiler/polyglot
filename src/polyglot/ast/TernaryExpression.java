@@ -64,7 +64,7 @@ public class TernaryExpression extends Expression
     return third;
   }
 
-  Node visitChildren( NodeVisitor v)
+  public Node visitChildren( NodeVisitor v)
   {
     return reconstruct( (Expression)cond.visit( v),
                         (Expression)second.visit( v),

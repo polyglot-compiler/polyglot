@@ -72,7 +72,7 @@ public class FormalParameter extends Node
    * @pre Requires that <code>tn.visit</code> returns an object of type
    *  <code>TypeNode</code>.
    */
-  Node visitChildren(NodeVisitor v)
+  public Node visitChildren(NodeVisitor v)
   {
     return reconstruct( (TypeNode)tn.visit( v), name, isFinal);
   }

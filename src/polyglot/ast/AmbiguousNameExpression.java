@@ -108,7 +108,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     return sb.toString();
   }
 
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   { 
     return this;
   }

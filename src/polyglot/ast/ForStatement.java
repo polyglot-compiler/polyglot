@@ -123,7 +123,7 @@ public class ForStatement extends Statement
    *  <code>cond.visit</code> must return an <code>Expression</code> and
    *  <code>body.visit</code> must return a <code>Statement</code>
    */
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     List newInits = new ArrayList( inits.size()),
       newIters = new ArrayList( iters.size());

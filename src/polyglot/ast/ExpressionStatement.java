@@ -50,7 +50,7 @@ public class ExpressionStatement extends Statement
    * @pre Requires that <code>expr.visit</code> returns an object of type
    *  <code>Expression</code>.
    */
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     return reconstruct( (Expression)expr.visit( v));
   }

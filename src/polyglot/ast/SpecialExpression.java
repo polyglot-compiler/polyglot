@@ -72,7 +72,7 @@ public class SpecialExpression extends Expression
   /**
    * Visit the children of this node.
    */
-  Node visitChildren( NodeVisitor v)
+  public Node visitChildren( NodeVisitor v)
   {
     return reconstruct( (tn == null ? null : (TypeNode)tn.visit( v)), kind);
   }

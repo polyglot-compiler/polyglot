@@ -82,7 +82,7 @@ public class IfStatement extends Statement
    *  <code>visit</code> method for the consequent and the alternate
    *  should transform each into objects of type <code>Statement</code>.
    */
-  Node visitChildren(NodeVisitor v) 
+  public Node visitChildren(NodeVisitor v) 
   {
     return reconstruct( (Expression)cond.visit( v),
                         (Statement)then.visit( v),

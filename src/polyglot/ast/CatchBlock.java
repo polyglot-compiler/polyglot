@@ -95,7 +95,7 @@ public class CatchBlock extends Node
    * @post Returns <code>this</code> if no changes are made, otherwise a copy
    *  is made and returned.
    */
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     return reconstruct( (FormalParameter)fp.visit( v),
                         (BlockStatement)block.visit( v));

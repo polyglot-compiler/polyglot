@@ -57,7 +57,7 @@ public class CharacterLiteral extends NumericalLiteral
     return escaped;
   }
 
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     /* Nothing to do. */
     return this;

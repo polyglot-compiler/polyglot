@@ -62,7 +62,7 @@ public class WhileStatement extends Statement
    *  <code>null</code>, <code>body.visit</code> returns an object
    *  of type <code>Statement</code>.
    */
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     return reconstruct( (Expression)cond.visit( v),
                         (body == null ? null : (Statement)body.visit( v)));

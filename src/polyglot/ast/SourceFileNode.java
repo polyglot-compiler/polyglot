@@ -115,7 +115,7 @@ public class SourceFileNode extends Node
     return it;
   }
 
-  Node visitChildren( NodeVisitor v)
+  public Node visitChildren( NodeVisitor v)
   {
     List newImports = new ArrayList( imports.size()),
       newClasses = new ArrayList( classes.size());

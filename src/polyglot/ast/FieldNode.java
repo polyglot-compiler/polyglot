@@ -67,7 +67,7 @@ public class FieldNode extends ClassMember
   /**
    * Visit the children of this node.
    */
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     return reconstruct( accessFlags, 
                         (VariableDeclarationStatement)declare.visit( v));

@@ -60,7 +60,7 @@ public class InitializerBlock extends ClassMember
     return block;
   }
     
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     return reconstruct( (BlockStatement)block.visit( v), isStatic);
   }

@@ -124,7 +124,7 @@ public class NewObjectExpression extends Expression
    * Effects: visits each child of this with <v>.  If <v> returns null
    * for a memeber of the class body, then that member is removed. 
    */
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     Expression newPrimary = null;
 

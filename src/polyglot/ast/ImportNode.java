@@ -68,7 +68,7 @@ public class ImportNode extends Node
   /**
    * Visit the children of this node. 
    */
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     return this;
   }

@@ -125,7 +125,7 @@ public class BinaryExpression extends Expression
    * @post Returns <code>this</code> if no changes are made, otherwise a copy
    *  is made and returned.
    */  
-  Node visitChildren( NodeVisitor v)
+  public Node visitChildren( NodeVisitor v)
   {
     return reconstruct( (Expression)left.visit( v),
                         operator,

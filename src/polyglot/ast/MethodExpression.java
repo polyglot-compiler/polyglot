@@ -105,7 +105,7 @@ public class MethodExpression extends Expression
   /**
    * Visit the children of this node.
    */
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     Node newTarget = null;
 

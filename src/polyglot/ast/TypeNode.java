@@ -65,7 +65,7 @@ public class TypeNode extends Node
     return type;
   }
 
-  Node visitChildren(NodeVisitor vis)
+  public Node visitChildren(NodeVisitor vis)
   {
     /* Nothing to do. */
     return this;

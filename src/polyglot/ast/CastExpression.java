@@ -70,7 +70,7 @@ public class CastExpression extends Expression
    *  <code>TypeNode</code> and that <code>expr.visit</code> returns an
    *  object of type <code>Expression</code>.
    */ 
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     return reconstruct( (TypeNode)tn.visit( v),
                         (Expression)expr.visit( v));

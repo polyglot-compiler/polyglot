@@ -61,7 +61,7 @@ public class ClassDeclarationStatement extends Statement
    *  <code>classNode</code>. Otherwise returns a new 
    *  <code>ClassDeclarationStatement</code> which defines the new class.
    */
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     return reconstruct( (ClassNode)classNode.visit( v));
   }

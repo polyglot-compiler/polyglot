@@ -92,7 +92,7 @@ public class BlockStatement extends Statement {
    * @post Returns this node if there are no changes to the children. Otherwise
    *  return a reconstructed copy of this node with the appropriate changes.
    */
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     List list = new ArrayList( statements.size());
 

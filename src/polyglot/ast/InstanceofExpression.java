@@ -60,7 +60,7 @@ public class InstanceofExpression extends Expression
    *  <code>Expression</code> and <code>tn.visit</code> returns an object of
    *  type <code>TypeNode</code>.
    */
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     return reconstruct( (Expression)expr.visit( v),
                         (TypeNode)tn.visit( v));

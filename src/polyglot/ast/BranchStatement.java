@@ -94,7 +94,7 @@ public class BranchStatement extends Statement {
     return label;
   }
 
-  Node visitChildren( NodeVisitor v)
+  public Node visitChildren( NodeVisitor v)
   {
     /* Nothing to do. */
     return this;

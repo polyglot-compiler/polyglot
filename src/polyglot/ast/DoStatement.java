@@ -67,7 +67,7 @@ public class DoStatement extends Statement
    * @post Returns <code>this</code> if no changes are made, otherwise a copy
    *  is made and returned.
    */  
-  Node visitChildren(NodeVisitor v) 
+  public Node visitChildren(NodeVisitor v) 
   {
     return reconstruct( (Statement)stmt.visit( v),
                         (Expression)cond.visit( v));

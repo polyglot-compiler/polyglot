@@ -59,7 +59,7 @@ public class LabelledStatement extends Statement
    * @pre Requires that <code>stmt.visit</code> transforms itself into an 
    *  object of type <code>Statement</code>.
    */
-  Node visitChildren(NodeVisitor v) 
+  public Node visitChildren(NodeVisitor v) 
   {
     return reconstruct( label, (Statement)stmt.visit( v));
   }

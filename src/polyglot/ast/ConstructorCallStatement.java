@@ -119,7 +119,7 @@ public class ConstructorCallStatement extends Statement
    *  each of the elements of <code>arguments</code> return object of type
    *  <code>Expression</code>.
    */
-  Node visitChildren(NodeVisitor v) 
+  public Node visitChildren(NodeVisitor v) 
   {
     Expression newPrimary = null;
 

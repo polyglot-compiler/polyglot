@@ -11,7 +11,7 @@ package jltools.ast;
  **/
 public abstract class Literal extends Expression {
    
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     /* Nothing to do. */
     return this;

@@ -129,7 +129,7 @@ public class NewArrayExpression extends Expression
   /** 
    * Visit the children of this node.
    */
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     TypeNode newBase = (TypeNode)base.visit( v);
 

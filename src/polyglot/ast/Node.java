@@ -76,7 +76,7 @@ public abstract class Node extends AnnotatedObject {
    * @return A new node if any changes where made to this node (or its 
    *  children; otherwise <code>this</code>.
    */
-  abstract Node visitChildren(NodeVisitor v);
+  public abstract Node visitChildren(NodeVisitor v);
 
   /**
    * Collects classes, methods, and fields from an AST. The types of fields

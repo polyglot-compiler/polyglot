@@ -59,7 +59,7 @@ public class SynchronizedStatement extends Statement
   /**
    * Visit the children of this node.
    */
-  Node visitChildren( NodeVisitor v)
+  public Node visitChildren( NodeVisitor v)
   {
     return reconstruct( (Expression)expr.visit( v),
                         (BlockStatement)body.visit( v));

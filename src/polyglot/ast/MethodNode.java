@@ -258,7 +258,7 @@ public class MethodNode extends ClassMember
     return body;
   }
   
-  Node visitChildren( NodeVisitor v) 
+  public Node visitChildren( NodeVisitor v) 
   {
     TypeNode newReturns = (TypeNode)returns.visit( v);
 
