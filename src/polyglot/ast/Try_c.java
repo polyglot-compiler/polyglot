@@ -88,6 +88,7 @@ public class Try_c extends Stmt_c implements Try
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
 	throws SemanticException
     {
+        ec = (ExceptionChecker) super.exceptionCheckEnter(ec);
         return ec.bypassChildren(this);
     }
 
@@ -212,7 +213,7 @@ public class Try_c extends Stmt_c implements Try
         // Add these exceptions to the exception checker's throw set.
         ec.throwsSet().addAll(thrown);
 
-	return reconstruct(tryBlock, catchBlocks, finallyBlock);
+	return reconstruct(tryBlock, catchBlocks, finallyBlock).exceptions(ec.throwsSet());
     }
 
     public String toString() {

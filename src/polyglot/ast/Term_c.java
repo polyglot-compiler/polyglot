@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+
 import java.util.*;
 
 /**
@@ -57,5 +58,23 @@ public abstract class Term_c extends Node_c implements Term
         Term c = (Term) CollectionUtil.firstOrElse(l, alt);
         if (c != alt) return c.entry();
         return alt;
+    }
+    
+    protected SubtypeSet exceptions;
+    
+    public SubtypeSet exceptions() {
+        return exceptions;
+    }
+    
+    public Term exceptions(SubtypeSet exceptions) {
+        Term_c n = (Term_c) copy();
+        n.exceptions = new SubtypeSet(exceptions);
+        return n;
+    }
+    
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
+        Term t = (Term) super.exceptionCheck(ec);
+        //System.out.println("exceptions for " + t + " = " + ec.throwsSet());
+        return t.exceptions(ec.throwsSet());
     }
 }

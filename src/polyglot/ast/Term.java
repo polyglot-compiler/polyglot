@@ -1,5 +1,6 @@
 package polyglot.ast;
 
+import polyglot.util.SubtypeSet;
 import polyglot.visit.*;
 import java.util.*;
 
@@ -33,4 +34,13 @@ public interface Term extends Node
      * Set the reachability of this term.
      */
     public Term reachable(boolean reachability);
+    
+    /**
+     * List of Types with all exceptions possibly thrown by this term.
+     * The list is not necessarily correct until after exception-checking.
+     * <code>polyglot.ast.NodeOps.throwTypes()</code> is similar, but exceptions
+     * are not propagated to the containing node.
+     */
+    public SubtypeSet exceptions();
+    public Term exceptions(SubtypeSet exceptions);
 }

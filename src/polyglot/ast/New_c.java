@@ -542,7 +542,7 @@ FIXME: check super types as well.
 	    ec.throwsException(t, position());
 	}
 
-	return this;
+	return super.exceptionCheck(ec);
     }
 
     /** Get the precedence of the expression. */

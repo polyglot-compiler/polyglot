@@ -29,7 +29,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
     }
 
     public ExceptionChecker push() {
-        ExceptionChecker ec = (ExceptionChecker) copy();
+        ExceptionChecker ec = (ExceptionChecker) this.visitChildren();
         ec.outer = this;
         ec.scope = new SubtypeSet(ts.Throwable());
         ec.exceptionPositions = new HashMap();
@@ -72,18 +72,21 @@ public class ExceptionChecker extends ErrorHandlingVisitor
      */
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
 	throws SemanticException {
-
-	// Merge results from the children and free the checker used for the
-	// children.
+        
         ExceptionChecker inner = (ExceptionChecker) v;
+        
+        if (inner.outer != this) throw new InternalCompilerError("oops!");
+        
+        // gather exceptions from this node.
+        n = n.del().exceptionCheck(inner);
+        
+        // Merge results from the children and free the checker used for the
+        // children.
         SubtypeSet t = inner.throwsSet();
         throwsSet().addAll(t);
         exceptionPositions.putAll(inner.exceptionPositions);
 
-        if (inner.outer != this) throw new InternalCompilerError("oops!");
-
-	// gather exceptions from this node.
-	return n.del().exceptionCheck(this);
+	return n;
     }
 
     /**

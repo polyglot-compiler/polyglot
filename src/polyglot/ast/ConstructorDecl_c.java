@@ -287,7 +287,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 
 	ec.throwsSet().clear();
 
-	return this;
+	return super.exceptionCheck(ec);
     }
 
     public String toString() {

@@ -320,7 +320,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 
 	ec.throwsSet().clear();
 
-	return this;
+	return super.exceptionCheck(ec);
     }
 
     public String toString() {

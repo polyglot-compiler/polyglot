@@ -184,7 +184,7 @@ public class Initializer_c extends Term_c implements Initializer
 	    }
 	}
 
-	return this;
+	return super.exceptionCheck(ec);
     }
 
     /** Write the initializer to an output file. */

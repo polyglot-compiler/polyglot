@@ -305,7 +305,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
         ec.throwsSet().clear();
 
-        return this;
+        return super.exceptionCheck(ec);
     }
 
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
