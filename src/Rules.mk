@@ -27,7 +27,7 @@ VPATH			= $(PACKAGEPATH)
 
 all clean clobber javadoc:
 
-.java.class:
+$(PACKAGEPATH)/%.class: %.java
 	$(JC) $(JC_FLAGS) $<
 
 cleanclasses:
