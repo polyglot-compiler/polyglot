@@ -58,20 +58,15 @@ public class Import_c extends Node_c implements Import
 	}
 	else if (kind == PACKAGE) {
 	    it.addPackageImport(name);
+            if (! tb.typeSystem().packageExists(name)) {
+                throw new SemanticException("Package \"" + name +
+                    "\" not found.", position());
+            }
 	}
 
 	return this;
     }
 
-    /*
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        if (kind == CLASS) {
-            tc.typeSystem().typeForName(name);
-        }
-        return this;
-    }
-    */
-   
     public String toString() {
 	return "import " + name + (kind == PACKAGE ? ".*" : "");
     }

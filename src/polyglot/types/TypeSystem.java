@@ -60,6 +60,11 @@ public interface TypeSystem {
      */
     List defaultPackageImports();
 
+    /**
+     * Returns true if the package named <code>name</code> exists.
+     */
+    boolean packageExists(String name);
+
     /** Get the class type with the following name.
      * @param name The name to create the type for.
      * @exception SemanticException when class is not found.    

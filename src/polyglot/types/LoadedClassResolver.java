@@ -53,6 +53,10 @@ public class LoadedClassResolver extends ClassResolver
     this.allowRawClasses = allowRawClasses;
   }
 
+  public boolean packageExists(String name) {
+    return loader.packageExists(name);
+  }
+
   /**
    * Load a class file for class <code>name</code>.
    */

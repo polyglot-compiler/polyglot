@@ -36,6 +36,17 @@ public class ClassPathLoader
         return classpath.toString();
     }
 
+    public boolean packageExists(String name) {
+	for (Iterator i = classpath.iterator(); i.hasNext(); ) {
+	    File dir = (File) i.next();
+            if (loader.packageExists(dir, name)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Load a class from the classpath. If the class is not found, then
      * <code>null</code> is returned.

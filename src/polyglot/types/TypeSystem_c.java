@@ -112,6 +112,13 @@ public class TypeSystem_c implements TypeSystem
         return new ImportTable(this, systemResolver, pkg);
     }
 
+    /**
+     * Returns true if the package named <code>name</code> exists.
+     */
+    public boolean packageExists(String name) {
+        return loadedResolver.packageExists(name);
+    }
+
     protected void assert_(Collection l) {
         for (Iterator i = l.iterator(); i.hasNext(); ) {
             TypeObject o = (TypeObject) i.next();
