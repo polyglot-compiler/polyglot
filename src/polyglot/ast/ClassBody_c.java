@@ -77,7 +77,6 @@ public class ClassBody_c extends Node_c implements ClassBody
             return ar.bypassChildren(this);
         }
 
-        /*
         // FIXME: we should skip member classes (otherwise we visit them twice
         // and in the wrong order), but doing so causes a bug with:
         // ext/jl/tests/disamb_member/CollectionsTestser.jl
@@ -96,7 +95,6 @@ public class ClassBody_c extends Node_c implements ClassBody
 
             return ar;
         }
-        */
 
         return ar;
     }
