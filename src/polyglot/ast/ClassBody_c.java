@@ -255,6 +255,25 @@ public class ClassBody_c extends Term_c implements ClassBody
         }
     }
 
+    protected void duplicateMemberClassCheck(TypeChecker tc) throws SemanticException {
+        ClassType type = tc.context().currentClass();
+        TypeSystem ts = tc.typeSystem();
+
+        ArrayList l = new ArrayList(type.memberClasses());
+
+        for (int i = 0; i < l.size(); i++) {
+            ClassType mi = (ClassType) l.get(i);
+
+            for (int j = i+1; j < l.size(); j++) {
+                ClassType mj = (ClassType) l.get(j);
+
+                if (mi.name().equals(mj.name())) {
+                    throw new SemanticException("Duplicate member type \"" + mj + "\".", mj.position());
+                }
+            }
+        }
+    }
+
     protected boolean isSameMethod(TypeSystem ts, MethodInstance mi,
                                    MethodInstance mj) {
         return mi.isSameMethod(mj);
@@ -264,6 +283,7 @@ public class ClassBody_c extends Term_c implements ClassBody
         duplicateFieldCheck(tc);
         duplicateConstructorCheck(tc);
         duplicateMethodCheck(tc);
+        duplicateMemberClassCheck(tc);
 
         return this;
     }
