@@ -11,6 +11,7 @@ include Rules.mk
 
 
 all: classes
+	mkdir -p lib
 	$(subdirs)
 
 clean:
@@ -19,9 +20,6 @@ clean:
 
 classes:
 	mkdir classes
-
-bin:
-	mkdir bin
 
 clobber:
 	-rm -rf $(JAVADOC_OUTPUT)
@@ -89,8 +87,6 @@ jar: all
 
 REL_SOURCES = \
 	Rules.mk \
-	configure \
-	README \
 	java_cup.jar \
 	jlex.jar \
 	iDoclet.jar \
@@ -112,11 +108,11 @@ release_doc: FORCE
 	$(MAKE) -C doc release
 
 release: jar release_clean release_doc release_src
-	cp -f configure.rel $(RELPATH)/configure
+	cp -f configure $(RELPATH)/configure
 	$(subdirs)
 	mkdir -p $(REL_LIB)
 	cp $(REL_LIBS) $(REL_LIB)
-	cp $(BIN)/*fs.* $(REL_LIB)
+	cp lib/fs.* $(REL_LIB)
 	chmod a+x $(RELPATH)/configure
 	rm jltools.jar jif.jar
 	
