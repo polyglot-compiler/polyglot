@@ -79,6 +79,10 @@ import java.util.*;
  */
 public class LoadedClassResolver implements ClassResolver
 {
+  protected final static int NOT_COMPATIBLE = -1;
+  protected final static int MINOR_NOT_COMPATIBLE = 1;
+  protected final static int COMPATIBLE = 0;
+
   TargetFactory tf;
   TargetTable tt;
   TypeSystem ts;
@@ -148,7 +152,7 @@ public class LoadedClassResolver implements ClassResolver
       field = clazz.getDeclaredField( "jlc$CompilerVersion");
       field.setAccessible( true);
       int i = checkCompilerVersion( (String)field.get( null));
-      if( i != 0) {
+      if( i != COMPATIBLE ) {
         /* Incompatible or older version, so go with the source. */
         // System.err.println( "Incompatible version for " + name + ".");
         return getTypeFromTarget( t, name);
@@ -198,7 +202,7 @@ public class LoadedClassResolver implements ClassResolver
       Field field = clazz.getDeclaredField( "jlc$CompilerVersion");
       field.setAccessible( true);
       int i = checkCompilerVersion( (String)field.get( null));
-      if( i < 0) {
+      if( i == NOT_COMPATIBLE ) {
         // System.err.println( "Throwing exception for " + clazz.getName() + " (Bad Version)...");
         throw new SemanticException( "Unable to find a suitable definition of "
                                      + clazz.getName() 
@@ -250,16 +254,16 @@ public class LoadedClassResolver implements ClassResolver
     int v = Integer.parseInt( st.nextToken());
     if( v != jltools.frontend.Compiler.VERSION_MAJOR) {
       /* Incompatible. */
-      return -1;
+      return NOT_COMPATIBLE;
     }
     v = Integer.parseInt( st.nextToken());
     if( v != jltools.frontend.Compiler.VERSION_MINOR) {
       /* Not the best option, but will work if its the only one. */
-      return 1;
+      return MINOR_NOT_COMPATIBLE;
     }
 
     /* Everything is way cool. */
-    return 0;
+    return COMPATIBLE;
   }
 
   protected boolean checkSourceModificationDate( Long time, Date target)
