@@ -111,7 +111,18 @@ public class Return_c extends Stmt_c implements Return
 
             if (ci instanceof MethodInstance) {
                 MethodInstance mi = (MethodInstance) ci;
-                return mi.returnType();
+
+                TypeSystem ts = av.typeSystem();
+
+                // If expr is an integral constant, we can relax the expected
+                // type to the type of the constant.
+                if (ts.numericConversionValid(mi.returnType(),
+                                              child.constantValue())) {
+                    return child.type();
+                }
+                else {
+                    return mi.returnType();
+                }
             }
         }
 

@@ -122,23 +122,14 @@ public class Conditional_c extends Expr_c implements Conditional
 	    // whose value is representable in type T, then the type of the
 	    // conditional expression is T.
 
-	    Type t = null;
-            IntLit lit = null;
+            if (t1.isIntOrLess() &&
+                ts.numericConversionValid(t1, e2.constantValue())) {
+                return type(t1);
+	    }
 
-	    if (e1 instanceof IntLit) {
-	      	t = t2;
-		lit = (IntLit) e1;
-	    }
-	    else if (e2 instanceof IntLit) {
-	      	t = t1;
-		lit = (IntLit) e2;
-	    }
-            
-            if (lit != null && lit.kind() == IntLit.INT) {
-                if ((t.isByte() || t.isShort() || t.isChar()) &&
-                    ts.numericConversionValid(t, lit.constantValue())) {
-                    return type(t);
-                }
+            if (t2.isIntOrLess() &&
+                ts.numericConversionValid(t2, e1.constantValue())) {
+                return type(t2);
 	    }
 
 	    // - Otherwise, binary numeric promotion (§5.6.2) is applied to the

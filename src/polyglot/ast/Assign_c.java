@@ -153,7 +153,16 @@ public abstract class Assign_c extends Expr_c implements Assign
   
   public Type childExpectedType(Expr child, AscriptionVisitor av) {
       if (child == right) {
-          return left.type();
+          TypeSystem ts = av.typeSystem();
+
+          // If the RHS is an integral constant, we can relax the expected
+          // type to the type of the constant.
+          if (ts.numericConversionValid(left.type(), child.constantValue())) {
+              return child.type();
+          }
+          else {
+              return left.type();
+          }
       }
 
       return child.type();

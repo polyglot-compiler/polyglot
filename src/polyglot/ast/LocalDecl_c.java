@@ -206,7 +206,16 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
 
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         if (child == init) {
-            return type.type();
+            TypeSystem ts = av.typeSystem();
+
+            // If the RHS is an integral constant, we can relax the expected
+            // type to the type of the constant.
+            if (ts.numericConversionValid(type.type(), child.constantValue())) {
+                return child.type();
+            }
+            else {
+                return type.type();
+            }
         }
 
         return child.type();
