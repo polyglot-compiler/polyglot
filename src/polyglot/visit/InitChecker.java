@@ -29,10 +29,24 @@ public class InitChecker extends DataFlow
      * */
     private Map currentClassFinalFieldInitCounts = null;
     /**
-     * List of the constructors that need to be checked once all of the
+     * List of all the constructors. These will be checked once all the
      * initializer blocks have been processed.
      */
-    private List constructorsToCheck = null;
+    private List allConstructors = null;
+    
+    /**
+     * Map from ConstructorInstances to ConstructorInstances detailing
+     * which constructors call which constructors.
+     * This is used in checking the initialization of final fields.
+     */
+    private Map constructorCalls = null;
+    
+    /**
+     * Map from ConstructorInstances to Sets of FieldInstances, detailing
+     * which final non-static fields each constructor initializes. 
+     * This is used in checking the initialization of final fields.
+     */
+    private Map fieldsConstructorInitializes = null;
 
     /**
      * Class representing the initialization counts of variables. The
@@ -182,12 +196,14 @@ public class InitChecker extends DataFlow
      * Set up the state that must be tracked during a Class Declaration.
      */
     protected NodeVisitor enterCall(Node n) throws SemanticException {
-        if (n instanceof ClassDecl) {
+      if (n instanceof ClassDecl) {
             // we are starting to process a class declaration, but have yet
             // to do any of the dataflow analysis.
             
-            constructorsToCheck = new ArrayList();
-            
+          allConstructors = new ArrayList();
+          constructorCalls = new HashMap();
+          fieldsConstructorInitializes = new HashMap();
+
             // set up currentClassFinalFieldInitCounts to contain mappings
             // for all the final fields of the class.
             currentClassFinalFieldInitCounts = new HashMap();            
@@ -223,44 +239,86 @@ public class InitChecker extends DataFlow
      * processed first.
      * 
      * Also, at the end of the class declaration, check that all static final
-     * fields have been initialized at least once.
+     * fields have been initialized at least once, and that for each constructor
+     * all non-static final fields must have been initialized at least once,
+     * taking into account the constructor calls.
+     * 
      */
     public Node leaveCall(Node n) throws SemanticException {
         if (n instanceof ConstructorDecl) {
             // postpone the checking of the constructors until all the 
             // initializer blocks have been processed.
-            constructorsToCheck.add(n);
+            allConstructors.add(n);
             return n;
         }
+        
         if (n instanceof ClassDecl) {
             // Now that we are at the end of the class declaration, and can
             // be sure that all of the initializer blocks have been processed,
             // we can now process the constructors.
-            while (!constructorsToCheck.isEmpty()) {
-                ConstructorDecl cd = (ConstructorDecl)constructorsToCheck.remove(0);
+            for (Iterator iter = allConstructors.iterator(); iter.hasNext(); ) {
+                ConstructorDecl cd = (ConstructorDecl)iter.next();
                 
                 // rely on the fact that our dataflow does not change the AST,
                 // so we can discard the result of this call.
                 dataflow(cd);                
             }
             
-            // check that all static fields have been initialized exactly once. 
-            Iterator iter = currentClassFinalFieldInitCounts.entrySet().iterator();
-            while (iter.hasNext()) {
+            // check that all static fields have been initialized exactly once.             
+            for (Iterator iter = currentClassFinalFieldInitCounts.entrySet().iterator(); iter.hasNext(); ) {
                 Map.Entry e = (Map.Entry)iter.next();
                 if (e.getKey() instanceof FieldInstance) {
                     FieldInstance fi = (FieldInstance)e.getKey();
                     if (fi.flags().isStatic() && fi.flags().isFinal()) {
                         MinMaxInitCount initCount = (MinMaxInitCount)e.getValue();
                         if (InitCount.ZERO.equals(initCount.getMin())) {
-                            throw new SemanticException("variable \"" + fi.name() +
+                            throw new SemanticException("field \"" + fi.name() +
                                                         "\" might not have been initialized",
                                                         n.position());                                
                         }
                     }
                 }
-            }            
+            }   
+
+            // for each non-static final field instance, check that all 
+            // constructors intialize it exactly once, taking into account constructor calls.
+            for (Iterator iter = currentClassFinalFieldInitCounts.keySet().iterator(); iter.hasNext(); ) {
+                FieldInstance fi = (FieldInstance)iter.next();
+                if (fi.flags().isFinal() && !fi.flags().isStatic()) {
+                    // the field is final and not static
+                    // it must be initialized exactly once.
+                    // navigate up through all of the the constructors
+                    // that this constructor calls.
+                    
+                    for (Iterator iter2 = allConstructors.iterator(); iter2.hasNext(); ) {
+                        ConstructorDecl cd = (ConstructorDecl)iter2.next();
+                        ConstructorInstance ci = cd.constructorInstance();
+                        
+                        boolean isInitialized = false;
+                            
+                        while (ci != null) {
+                            Set s = (Set)fieldsConstructorInitializes.get(ci);
+                            if (s != null && s.contains(fi)) {
+                                if (isInitialized) {
+                                    throw new SemanticException("field \"" + fi.name() +
+                                            "\" might have already been initialized",
+                                            cd.position());                                                                        
+                                }
+                                isInitialized = true;
+                            }                                
+                            ci = (ConstructorInstance)constructorCalls.get(ci);
+                        }
+                        if (!isInitialized) {
+                            throw new SemanticException("field \"" + fi.name() +
+                                    "\" might not have been initialized",
+                                    cd.position());                                
+                                
+                        }                            
+                    }
+                }
+            }
         }
+            
 
         return super.leaveCall(n);
     }
@@ -320,6 +378,7 @@ public class InitChecker extends DataFlow
             Map m = new HashMap(inDFItem.initStatus);
             // a formal argument is always defined.            
             m.put(f.localInstance(), new MinMaxInitCount(InitCount.ONE,InitCount.ONE));
+            
             return itemToMap(new DataFlowItem(m), succEdgeKeys);
         }
         
@@ -359,11 +418,23 @@ public class InitChecker extends DataFlow
                     Map m = new HashMap(inDFItem.initStatus);
                     MinMaxInitCount initCount = (MinMaxInitCount)m.get(fi);
                     initCount = new MinMaxInitCount(initCount.getMin().increment(),
-                                                    initCount.getMax().increment());
+                            initCount.getMax().increment());
                     m.put(fi, initCount);
                     return itemToMap(new DataFlowItem(m), succEdgeKeys);
                 }                
             }            
+        }
+        
+        if (n instanceof ConstructorCall) {
+            ConstructorCall cc = (ConstructorCall)n;
+            if (ConstructorCall.THIS.equals(cc.kind())) {
+                // currentCodeDecl must be a ConstructorDecl, as that
+                // is the only place constructor calls are allowed
+                // record the fact that the current constructor calls the other
+                // constructor
+                constructorCalls.put(((ConstructorDecl)currentCodeDecl).constructorInstance(), 
+                                     cc.constructorInstance());
+            }
         }
 
         return itemToMap(inItem, succEdgeKeys);
@@ -396,8 +467,6 @@ public class InitChecker extends DataFlow
      *               more than once 
      * - Final static fields whose target is the current class cannot be 
      *               assigned to more than once
-     * - At the end of a constructor, all non-static final fields must have 
-     *               been initialized at least once. 
      *               
      * 
      * This method is also responsible for maintaining state between the 
@@ -452,10 +521,24 @@ public class InitChecker extends DataFlow
                         MinMaxInitCount initCount = (MinMaxInitCount) 
                                                dfOut.initStatus.get(fi);                                
                         if (InitCount.MANY.equals(initCount.getMax())) {
-                            throw new SemanticException("variable \"" + fi.name() +
-                                                        "\" might already have been assigned to",
-                                                        a.position());
+                            throw new SemanticException("field \"" + fi.name() +
+                                    "\" might already have been assigned to",
+                                    a.position());
                         }
+                        
+                        // if the field is non-static and final, and we are in
+                        // a constructor, record the fact that this constructor 
+                        // initializes the field 
+                        if (!fi.flags().isStatic() && currentCodeDecl instanceof ConstructorDecl) {
+                            ConstructorInstance ci = ((ConstructorDecl)currentCodeDecl).constructorInstance();
+                            Set s = (Set)fieldsConstructorInitializes.get(ci);
+                            if (s == null) {
+                                s = new HashSet();
+                                fieldsConstructorInitializes.put(ci, s);
+                            }
+                            s.add(fi);
+                        }
+                    
                     }
                     else {
                         // not in a constructor or intializer, or the target is
@@ -469,28 +552,7 @@ public class InitChecker extends DataFlow
             }
         }
         
-        if (n == graph.finishNode()) {
-            if (currentCodeDecl instanceof ConstructorDecl) {
-                // we are finishing the checking of a constructor
-                // Any final static fields must be assigned to exactly once.
-                Iterator iter = dfOut.initStatus.entrySet().iterator();
-                while (iter.hasNext()) {
-                    Map.Entry e = (Map.Entry)iter.next();
-                    if (e.getKey() instanceof FieldInstance) {
-                        FieldInstance fi = (FieldInstance)e.getKey();
-                        if (fi.flags().isFinal() && !fi.flags().isStatic()) {
-                            // the field is final and not static
-                            // it must be initialized exactly once.
-                            if (InitCount.ZERO.equals(((MinMaxInitCount)e.getValue()).getMin())) {
-                                throw new SemanticException("variable \"" + fi.name() +
-                                                            "\" might not have been initialized",
-                                                            graph.entryNode().position());                                
-                            } 
-                        }
-                    }
-                }
-            }
-            
+        if (n == graph.finishNode()) {            
             if (currentCodeDecl instanceof Initializer) {
                 // We are finishing the checking of an intializer.
                 // We need to copy back the init counts of any fields back into
