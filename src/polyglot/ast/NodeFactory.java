@@ -170,6 +170,8 @@ public interface NodeFactory
     Return Return(Position pos);
     Return Return(Position pos, Expr expr);
 
+    SourceCollection SourceCollection(Position pos, List sources);
+
     SourceFile SourceFile(Position pos, List decls);
     SourceFile SourceFile(Position pos, List imports, List decls);
     SourceFile SourceFile(Position pos, PackageNode packageName, List imports, List decls);
