@@ -94,4 +94,21 @@ public class CollectionUtil
                 }
                 return x.iterator();
         }
+
+	/**
+	 * Apply <code>t</code> to each element of <code>l</code>.
+	 * <code>l</code> is not modified.  
+	 * @return A list containing the result of each transformation,
+	 * in the same order as the original elements.
+	 */
+	public static List map(List l, Transformation t) {
+		List m = new ArrayList(l.size());
+		for (Iterator i = new TransformingIterator(l, t); 
+			i.hasNext(); )
+		{
+			m.add(i.next());
+		}
+		return m;
+	}
+
 }

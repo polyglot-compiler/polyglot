@@ -608,6 +608,12 @@ public interface TypeSystem {
     boolean canOverride(MethodInstance mi, MethodInstance mj);
 
     /**
+     * Get the list of methods <code>mi</code> implements, in no
+     * specified order.
+     */
+    List implemented(MethodInstance mi);
+    
+    /**
      * Return the primitive with the given name.
      */
     PrimitiveType primitiveForName(String name) throws SemanticException;

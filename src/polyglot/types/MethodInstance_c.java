@@ -221,4 +221,21 @@ public class MethodInstance_c extends ProcedureInstance_c
 
         return true;
     }
+    
+    public List implemented() {
+	return ts.implemented(this);
+    }
+
+    public List implementedImpl(ReferenceType rt) {
+        List l = new LinkedList();
+        l.addAll(rt.methods(name, argTypes));
+        List ints = container().interfaces();
+
+	for (Iterator i = ints.iterator(); i.hasNext(); ) {
+	    l.addAll(implementedImpl((ReferenceType) i.next()));
+	}
+	
+        return l;
+    }
+
 }

@@ -886,6 +886,10 @@ public class TypeSystem_c implements TypeSystem
         return mi.overridesImpl();
     }
 
+    public List implemented(MethodInstance mi) {
+	return mi.implementedImpl(mi.container());
+    }
+    
     public boolean canOverride(MethodInstance mi, MethodInstance mj) {
         return mi.canOverrideImpl(mj);
     }

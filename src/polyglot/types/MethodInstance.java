@@ -67,6 +67,14 @@ public interface MethodInstance extends ProcedureInstance
     boolean canOverride(MethodInstance mi);
 
     /**
+     * Get the set of methods this method implements.  No ordering is
+     * specified since the superinterfaces need not form a linear list
+     * (i.e., they can form a tree).  
+     * @return List[MethodInstance]
+     */
+    List implemented(); 
+    
+    /**
      * Return true if this method has the same signature as <code>mi</code>.
      */
     boolean isSameMethod(MethodInstance mi);
@@ -98,6 +106,14 @@ public interface MethodInstance extends ProcedureInstance
      */
     boolean canOverrideImpl(MethodInstance mi);
 
+    /**
+     * Get the set of methods in rt and its superinterfaces that
+     * this method implements.  No ordering is specified.
+     * @return List[MethodInstance]
+     * @param rt The point in the type hierarchy to begin looking for methods.
+     */
+    List implementedImpl(ReferenceType rt);
+    
     /**
      * Return true if this method has the same signature as <code>mi</code>.
      * This method should not be called except by <code>TypeSystem</code>
