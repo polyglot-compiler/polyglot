@@ -483,10 +483,9 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 	/**
 	 * Construct a CFGBuilder.
 	 * 
-	 * @param ts
-	 * @param g
-	 * @param flow
-	 * @return
+	 * @param ts The type system
+	 * @param g The flow graph to that the CFGBuilder will construct.
+	 * @return a new CFGBuilder
 	 */
 	protected CFGBuilder createCFGBuilder(TypeSystem ts, FlowGraph g) {
 		return new CFGBuilder(ts, g, this);
