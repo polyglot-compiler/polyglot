@@ -148,4 +148,8 @@ public class ErrorQueue
     public boolean hasErrors() {
       return hasErrors;
     }
+
+    public int errorCount() {
+        return errorCount;
+    }
 }

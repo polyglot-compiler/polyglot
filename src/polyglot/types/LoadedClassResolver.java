@@ -205,14 +205,14 @@ public class LoadedClassResolver extends ClassResolver
     try {
       if (compiler.readSource(source)) {
 	return compiler.parsedResolver().findType(name);
+      } else {
+        throw new SemanticException("Error while compiling " + source.name() + ".");
       }
     }
     catch (IOException e) {
       throw new SemanticException("I/O error while compiling " +
 	  source.name() + ": " + e.getMessage());
     }
-
-    throw new SemanticException("Error while compiling " + source.name() + ".");
   }
 
   protected Type getTypeFromClass(Class clazz, String name)
@@ -245,7 +245,7 @@ public class LoadedClassResolver extends ClassResolver
 
       //HACK: storing median result to avoid circular resolving
       ((CachingResolver)ts.systemResolver()).medianResult(name, t);
-      
+
       Types.report(1, "Returning serialized ClassType for " +
 		  clazz.getName() + ".");
 
