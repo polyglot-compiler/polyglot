@@ -70,7 +70,7 @@ public class SourceLoader
                 if (exts.length == 2 && i == exts.length-1) {
                     extString += " or ";
                 }
-                else if (i == exts.length-1) {
+                else if (exts.length != 1 && i == exts.length-1) {
                     extString += ", or ";
                 }
                 else if (i != 0) {
