@@ -61,7 +61,7 @@ public class Local_c extends Expr_c implements Local
   public Node typeCheck(TypeChecker tc) throws SemanticException {
     Context c = tc.context();
     LocalInstance li = c.findLocal(name);
-    return type(li.type());
+    return localInstance(li).type(li.type());
   }
 
   public String toString() {
