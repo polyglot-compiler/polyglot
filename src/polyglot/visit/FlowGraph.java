@@ -124,4 +124,34 @@ public class FlowGraph {
       return false;
     }
   }
+  
+  public String toString() {
+    
+    StringBuffer sb = new StringBuffer();
+    Set todo = new HashSet(this.peers());
+    LinkedList queue = new LinkedList(this.peers(this.startNode()));
+    
+    while (!queue.isEmpty()) {
+        Peer p = (Peer)queue.removeFirst();
+        todo.remove(p);
+//        sb.append(StringUtil.getShortNameComponent(p.node.getClass().getName()) + " ["+p.node+"]" + "\n");
+        sb.append(p.node+" (" + p.node.position()+ ")\n");
+        for (Iterator i = p.succs.iterator(); i.hasNext(); ) {
+            Peer q = (Peer)i.next();
+            sb.append("    -> " + q.node+" (" + q.node.position()+ ")\n");
+            //sb.append("  " + StringUtil.getShortNameComponent(q.node.getClass().getName()) + " ["+q.node+"]" + "\n");
+            if (todo.contains(q) && !queue.contains(q)) {
+                queue.addLast(q);
+            }
+        }
+        
+        if (queue.isEmpty() && !todo.isEmpty()) {
+            sb.append("\n\n***UNREACHABLE***\n");
+            queue.addAll(todo);
+            todo = Collections.EMPTY_SET;
+        }
+    }
+    
+    return sb.toString();
+  }
 }

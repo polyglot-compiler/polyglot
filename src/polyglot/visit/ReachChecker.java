@@ -7,10 +7,7 @@ import polyglot.frontend.*;
 import java.util.*;
 
 /**
- * Visitor which checks data flow properties of each method.
- * 1) definite assignment: local variables must be defined before use
- * 2) reachability: all statements must be reachable
- * 3) termination: all (terminating) paths through a method must return.
+ * Visitor which checks that all statements must be reachable
  */
 public class ReachChecker extends DataFlow
 {

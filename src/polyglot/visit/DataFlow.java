@@ -47,6 +47,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     /**
      * Create an initial Item. This is generally the Item that will be given
      * to the entry point of a graph.
+     * 
+     * @return a non-null Item.
      */
     protected abstract Item createInitialItem();
     
@@ -55,12 +57,15 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * input Item in. Note that if the Computation n has many flows going into
      * it, the Item in may be the result of a call to confluence(List)
      * 
+     * @return a non-null Item.
      */
     protected abstract Item flow(Item in, FlowGraph graph, Computation n);
     
     /**
      * The confluence operator for many flows. This method produces a single
      * Item from a List of Items.
+     * 
+     * @return a non-null Item.
      */
     protected abstract Item confluence(List items);
     
@@ -69,6 +74,9 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * dataflow is checking for. This method is called for each computation
      * in a code declaration block after the dataflow for that block of code 
      * has been performed.
+     * 
+     * @throws SemanticException if the properties this dataflow analysis
+     *         is checking for is not satisfied.
      */
     protected abstract void check(FlowGraph graph, Computation n, Item inItem, Item outItem) throws SemanticException;
 
@@ -80,6 +88,9 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         LinkedList queue = new LinkedList();
       
         // Initially put all the Peers in the queue. 
+        // ###We could probably be smarter and just put the
+        // start peers in, 
+        //    i.e. queue = new LinkedList(graph.peers(graph.startNode()));
         for (Iterator i = graph.peers().iterator(); i.hasNext(); ) {
             queue.addLast(i.next());
         }
