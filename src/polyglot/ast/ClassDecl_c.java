@@ -260,7 +260,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
             if (Report.should_report(Report.types, 3))
 		Report.report(3, "adding interface of " + this.type + " to " + t);
 
-            this.type.addInterface(t);
+            if (!this.type.interfaces().contains(t)) this.type.addInterface(t);
 
             ts.checkCycles(t.toReference());
         }
