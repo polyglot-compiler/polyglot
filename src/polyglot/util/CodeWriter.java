@@ -79,6 +79,7 @@ public class CodeWriter
         }
         input.sendOutput(output, 0, 0);
         output.flush();
+        input.free();
         current = input = new Block(null, 0);
     }
     
@@ -118,6 +119,13 @@ abstract class Item {
       throws IOException;
         // Send the output associated with this item to "o", using the
         // current break settings.
+    void free() { 
+        // Free references to any other items.
+        if( next != null) { 
+            next.free(); 
+            next = null; 
+        }
+    }
     Item next;
 }
 
@@ -155,6 +163,15 @@ class Block extends Item {
             it = it.next;
         }
         return pos;
+    }
+    void free() {
+        super.free();
+  
+        parent = null;
+        if( first != null) {
+            first.free();
+        }
+        last = null;
     }
 }
 

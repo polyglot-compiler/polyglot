@@ -35,6 +35,7 @@ public class DumpAst extends NodeVisitor
       e.printStackTrace( System.err);
     }
 
+    w.allowBreak(4," ");
     w.begin(0);
     return this;
   }
@@ -47,6 +48,7 @@ public class DumpAst extends NodeVisitor
   public Node leave( Node old, Node n, NodeVisitor v)
   {
     w.end();
+    w.allowBreak(0, " ");
     return n;
   }
 
