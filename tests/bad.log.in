@@ -52,7 +52,11 @@ BadInit.jl:4: Method no_such_fn not found.
     int a = no_such_fn();
             ^
 
-1 error.
+BadInit.jl:7: Method no_such_fn not found.
+    c = no_such_fn();
+        ^
+
+2 errors.
 BadInner2.jl:7: Cannot specify a containing instance for static classes.
   Object o = this.new Foo();
              ^
@@ -103,7 +107,7 @@ BadInterface.jl:17: Interface methods must be public.
                         ^
 
 1 error.
-BadOverride.java:84: method() in Sub cannot implement method() in Override; attempting to assign weaker access privileges; was public
+BadOverride.java:80: method() in Sub cannot implement method() in Override; attempting to assign weaker access privileges; was public
 class Sub implements Override {
 ^
 1 error
