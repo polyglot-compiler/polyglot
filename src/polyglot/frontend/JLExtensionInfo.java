@@ -80,12 +80,6 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
 	return new Version();
     }
 
-    /** By default, don't parse anything */
-    public int parseCommandLine(String args[], int index, Options options)
-	throws UsageError {
-	return index;
-    }
-
     /** Create the type system for this extension. */
     protected TypeSystem createTypeSystem() {
 	return new TypeSystem_c();

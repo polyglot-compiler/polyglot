@@ -18,8 +18,8 @@ import java.util.*;
  */
 public class Compiler
 {
-    /** Command-line options */
-    private Options options;
+    /** The extension info */
+    private ExtensionInfo extensionInfo;
 
     /** The error queue handles outputting error messages. */
     private ErrorQueue eq;
@@ -41,16 +41,18 @@ public class Compiler
      *
      * @param options Contains polyglot options
      */
-    public Compiler(Options options_) {
-	options = options_;
+    public Compiler(ExtensionInfo extensionInfo) {
+	this.extensionInfo = extensionInfo;
 
+        Options options = extensionInfo.getOptions();
+        
 	eq = new StdErrorQueue(System.err, options.error_count,
-                               options.extension.compilerName());
+                               extensionInfo.compilerName());
 
         loader = new ClassFileLoader();
 
 	// This must be done last.
-	options.extension.initCompiler(this);
+	extensionInfo.initCompiler(this);
     }
 
     /** Return a set of output filenames resulting from a compilation. */
@@ -105,22 +107,22 @@ public class Compiler
 
     /** Should fully qualified class names be used in the output? */
     public boolean useFullyQualifiedNames() {
-        return options.fully_qualified_names;
+        return extensionInfo.getOptions().fully_qualified_names;
     }
 
     /** Get information about the language extension being compiled. */
     public ExtensionInfo sourceExtension() {
-	return options.extension;
+	return extensionInfo;
     }
 
     /** Maximum number of characters on each line of output */
     public int outputWidth() {
-        return options.output_width;
+        return extensionInfo.getOptions().output_width;
     }
 
     /** Should class info be serialized into the output? */
     public boolean serializeClassInfo() {
-	return options.serialize_type_info;
+	return extensionInfo.getOptions().serialize_type_info;
     }
 
     /** Get the compiler's error queue. */

@@ -33,10 +33,17 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     /** The currently running job, or null. */
     Job currentJob;
 
-    public void setOptions(Options options) throws UsageError {
-	this.options = options;
+    public Options getOptions() {
+        if (this.options == null) {
+            this.options = createOptions();
+        }
+        return options;
     }
 
+    protected Options createOptions() {
+        return new Options(this);
+    }
+        
     public Compiler compiler() {
         return compiler;
     }
@@ -277,12 +284,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         }
 
         return sx;
-    }
-
-    /** By default, don't parse anything */
-    public int parseCommandLine(String args[], int index, Options options)
-	throws UsageError {
-	return index;
     }
 
     public SourceLoader sourceLoader() {

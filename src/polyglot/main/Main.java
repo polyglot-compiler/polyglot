@@ -16,93 +16,153 @@ public class Main
 {
 
   /** Source files specified on the command line */
-  private static Set source;
+  private Set source;
 
-  /** Whether any errors seen yet */
-  private boolean hasErrors = false;
   final static String verbose = "verbose";
 
+  private List args;
+  protected ExtensionInfo getExtensionInfo() {
+      ExtensionInfo ext = null;
+      
+      for (Iterator i = args.iterator(); i.hasNext(); ) {
+          String s = (String)i.next();
+          if (s.equals("-ext") || s.equals("-extension")) 
+          {
+              if (ext != null) {
+                  System.err.println("only one extension can be specified");
+                  System.exit(1);                  
+              }
+              
+              i.remove();
+              if (!i.hasNext()) {
+                  System.err.println("missing argument");
+                  System.exit(1);
+              }
+              String extName = (String)i.next();
+              i.remove();
+              ext = loadExtension("polyglot.ext." + extName + ".ExtensionInfo");
+          }
+          else if (s.equals("-extclass"))
+          {
+              if (ext != null) {
+                  System.err.println("only one extension can be specified");
+                  System.exit(1);                  
+              }
+
+              i.remove();
+              if (!i.hasNext()) {
+                  System.err.println("missing argument");
+                  System.exit(1);
+              }
+              String extClass = (String)i.next();
+              i.remove();
+              ext = loadExtension(extClass);
+          }      
+      }
+      if (ext != null) {
+          return ext;
+      }
+      return loadExtension("polyglot.ext.jl.ExtensionInfo");
+  }
+  
+  protected void start(String[] argv) {
+      source = new HashSet();  
+      this.args = new ArrayList(Arrays.asList(argv));
+      ExtensionInfo ext = getExtensionInfo();
+      Options options = ext.getOptions();
+      
+      // Allow all objects to get access to the Options object. This hack should
+      // be fixed somehow. XXX###@@@
+      Options.global = options;
+      try {
+          options.parseCommandLine((String[])args.toArray(new String[0]), source);
+      }
+      catch (UsageError ue) {
+          PrintStream out = (ue.exitCode==0 ? System.out : System.err);
+          if (ue.getMessage() != null && ue.getMessage().length() > 0) {
+              out.println(ext.compilerName() +": " + ue.getMessage());
+          }
+          options.usage(out);
+          System.exit(ue.exitCode);
+      }
+      
+      Compiler compiler = new Compiler(ext);
+  
+      long time0 = System.currentTimeMillis();
+  
+      String targetName = null;
+      if (!compiler.compile(source)) System.exit(1);
+  
+      if (Report.should_report(verbose, 1))
+          Report.report(1, "Output files: " + compiler.outputFiles());
+  
+      long start_time = System.currentTimeMillis();
+  
+      /* Now call javac or jikes, if necessary. */
+      if (options.post_compiler != null && !options.output_stdout) {
+        Runtime runtime = Runtime.getRuntime();
+  
+        Iterator iter = compiler.outputFiles().iterator();
+        String outputFiles = "";
+        while(iter.hasNext()) {
+          outputFiles += (String)iter.next() + " ";
+        }
+  
+          String command = options.post_compiler + " -classpath " 
+            + options.output_directory + File.pathSeparator
+            + "." + File.pathSeparator
+            + System.getProperty("java.class.path") + " "
+            + outputFiles;
+  
+          if (Report.should_report(verbose, 1))
+              Report.report(1, "Executing post-compiler " + command);
+  
+          try 
+          {
+            Process proc = runtime.exec(command);
+  
+            InputStreamReader err = 
+              new InputStreamReader(proc.getErrorStream());
+            char[] c = new char[72];
+            int len;
+            while((len = err.read(c)) > 0) {
+              System.err.print(String.valueOf(c, 0, len));
+            }
+  
+            proc.waitFor();
+  
+            if (!options.keep_output_files) {
+              String command2 = "rm " + outputFiles;
+              runtime.exec(command2);
+            }
+  
+            if (proc.exitValue() > 0) {
+              System.exit(proc.exitValue());
+            }
+          }
+          catch(Exception e) 
+          { 
+            System.err.println("Caught Exception while running compiler: "
+                                + e.getMessage());
+            System.exit(1);
+          }
+  
+      }
+  
+      if (Report.should_report(verbose, 1)) {
+          reportTime("Finished compiling Java output files. time=" + 
+                  (System.currentTimeMillis() - start_time), 1);
+  
+          reportTime("Total time=" + (System.currentTimeMillis() - time0), 1);
+      }
+  }
+  
   public static final void main(String args[])
   {      
-    source = new HashSet();
-    Options options = Options.global;
-    loadExtension("polyglot.ext.jl.ExtensionInfo");
-    
-    parseCommandLine(args, options, source);
-
-    Compiler compiler = new Compiler(options);
-
-    long time0 = System.currentTimeMillis();
-    
-    String targetName = null;
-    if (!compiler.compile(source)) System.exit(1);
-
-    if (Report.should_report(verbose, 1))
-	Report.report(1, "Output files: " + compiler.outputFiles());
-
-    long start_time = System.currentTimeMillis();
-    
-    /* Now call javac or jikes, if necessary. */
-    if (options.post_compiler != null && !options.output_stdout) {
-      Runtime runtime = Runtime.getRuntime();
-      
-      Iterator iter = compiler.outputFiles().iterator();
-      String outputFiles = "";
-      while(iter.hasNext()) {
-	outputFiles += (String)iter.next() + " ";
-      }
-	
-	String command = options.post_compiler + " -classpath " 
-	  + options.output_directory + File.pathSeparator
-	  + "." + File.pathSeparator
-	  + System.getProperty("java.class.path") + " "
-	  + outputFiles;
-
-	if (Report.should_report(verbose, 1))
-	    Report.report(1, "Executing post-compiler " + command);
-	
-	try 
-	{
-	  Process proc = runtime.exec(command);
-	  
-	  InputStreamReader err = 
-	    new InputStreamReader(proc.getErrorStream());
-	  char[] c = new char[72];
-	  int len;
-	  while((len = err.read(c)) > 0) {
-	    System.err.print(String.valueOf(c, 0, len));
-	  }
-	  
-	  proc.waitFor();
-	  
-	  if (!options.keep_output_files) {
-	    String command2 = "rm " + outputFiles;
-	    runtime.exec(command2);
-	  }
-	  
-	  if (proc.exitValue() > 0) {
-	    System.exit(proc.exitValue());
-	  }
-	}
-	catch(Exception e) 
-	{ 
-	  System.err.println("Caught Exception while running compiler: "
-			      + e.getMessage());
-	  System.exit(1);
-	}
-      
-    }
-
-    if (Report.should_report(verbose, 1)) {
-	reportTime("Finished compiling Java output files. time=" + 
-		(System.currentTimeMillis() - start_time), 1);
-    
-	reportTime("Total time=" + (System.currentTimeMillis() - time0), 1);
-    }
-    
+      new Main().start(args);
   }
 
-  static final void loadExtension(String ext) {
+  static final ExtensionInfo loadExtension(String ext) {
     if (ext != null && ! ext.equals("")) {
       Class extClass = null;
 
@@ -114,247 +174,25 @@ public class Main
           " not found: could not find class " + ext + "." +
           e.getMessage());
         System.exit(1);
-        return;
+        return null;
       }
 
       try {
-	Options.global.extension = (ExtensionInfo) extClass.newInstance();
+        return (ExtensionInfo) extClass.newInstance();
       }
       catch (ClassCastException e) {
 	System.err.println(ext + " is not a valid polyglot extension:" +
 	    " extension class " + ext +
 	    " exists but is not a subclass of ExtensionInfo");
 	System.exit(1);
-        return;
       }
       catch (Exception e) {
 	System.err.println("Extension " + ext +
 	  " could not be loaded: could not instantiate " + ext + ".");
 	System.exit(1);
-        return;
       }
     }
-  }
-
-  static final void parseCommandLine(String args[], Options options, Set source)
-  {
-    if(args.length < 1) {
-      options.usage();
-      System.exit(1);
-    }
-
-    try {
-      for(int i = 0; i < args.length; )
-      {
-        if (args[i].equals("-h")) {
-          options.usage();
-          System.exit(0);
-        }
-        else if (args[i].equals("-version")) {
-          if (options.extension != null)
-              System.out.println(options.extension.compilerName() +
-                  " version " + options.extension.version());
-          System.out.println("Polyglot compiler toolkit version " +
-              new polyglot.ext.jl.Version());
-          System.exit(0);
-        }
-        else if (args[i].equals("-d"))
-        {
-          i++;
-          options.output_directory = new File(args[i]);
-          i++;
-        }
-        else if (args[i].equals("-classpath") ||
-                args[i].equals("-cp")) {
-          i++;
-          options.classpath = args[i] + System.getProperty("path.separator") +
-                          options.default_classpath;
-          i++;
-        }
-        else if (args[i].equals("-bootclasspath")) {
-          i++;
-          options.bootclasspath = args[i];
-          i++;
-        }
-        else if (args[i].equals("-sourcepath"))
-        {
-          i++;
-          StringTokenizer st = new StringTokenizer(args[i], File.pathSeparator);
-          while(st.hasMoreTokens())
-          {
-            options.source_path.add(new File(st.nextToken()));
-          }
-          i++;
-        }
-        else if (args[i].equals("-assert")) 
-        {
-          i++;
-          options.assertions = true;
-        }
-        else if (args[i].equals("-fqcn")) 
-        {
-          i++;
-          options.fully_qualified_names = true;
-        }
-        else if (args[i].equals("-c"))
-        {
-          options.post_compiler = null;
-          i++;
-        }
-        else if (args[i].equals("-errors"))
-        {
-          i++;
-          try {
-            options.error_count = Integer.parseInt(args[i]);
-          } catch (NumberFormatException e) {}
-          i++;
-        }
-        else if (args[i].equals("-w"))
-        {
-          i++;
-          try {
-            options.output_width = Integer.parseInt(args[i]);
-          } catch (NumberFormatException e) {}
-          i++;
-        }
-        else if (args[i].equals("-post"))
-        {
-          i++;
-          options.post_compiler = args[i];
-          i++;
-        }
-        else if (args[i].equals("-stdout")) 
-        {
-          i++;
-          options.output_stdout = true;
-        }
-        else if (args[i].equals("-ext") || args[i].equals("-extension")) 
-        {
-          i++;
-          loadExtension("polyglot.ext." + args[i] + ".ExtensionInfo");
-          i++;
-        }
-        else if (args[i].equals("-extclass"))
-        {
-          i++;
-          loadExtension(args[i]);
-          i++;
-        }
-        else if (args[i].equals("-sx")) 
-        {
-          i++;
-          options.source_ext = args[i];
-          i++;
-        }
-        else if (args[i].equals("-ox"))
-        {
-          i++;
-          options.output_ext = args[i];
-          i++;
-        }
-        else if (args[i].equals("-noserial"))
-        {
-          i++;
-          options.serialize_type_info = false;
-        }
-        else if (args[i].equals("-dump"))
-        {
-          i++;
-          String pass_name = args[i];
-          options.dump_ast.add(pass_name);
-          i++;
-        }
-        else if (args[i].equals("-disable"))
-        {
-          i++;
-          String pass_name = args[i];
-          options.disable_passes.add(pass_name);
-          i++;
-        }
-        else if (args[i].equals("-nooutput"))
-        {
-          i++;
-          options.keep_output_files = false;
-        }
-        else if (args[i].equals("-nosourcecheck")) 
-        {
-          i++;
-          options.no_source_check = true;
-        }
-        else if (args[i].equals("-v") || args[i].equals("-verbose"))
-        {
-          i++;
-          Integer level = (Integer) options.report.get("verbose");
-          if (level == null) options.report.put("verbose", new Integer(1));
-        }
-        else if (args[i].equals("-report")) {
-          i++;
-          String report_option = args[i];
-          StringTokenizer st = new StringTokenizer(args[i], "=");
-          String topic = ""; int level = 0;
-          if (st.hasMoreTokens()) topic = st.nextToken();
-          if (st.hasMoreTokens())
-            try {
-              level = Integer.parseInt(st.nextToken());
-            } catch (NumberFormatException e) {}
-          options.report.put(topic, new Integer(level));
-          i++;
-        }
-        else if (args[i].startsWith("-")) {
-          int i2 = i;
-          if (options.extension != null) {
-              try  {
-                  i2 = options.extension.parseCommandLine(args, i, options);
-              }
-              catch (UsageError u) {
-                  System.err.println(u.getMessage());
-                  options.usage();
-                  System.exit(1);
-              }
-          } 
-          if (i2 == i) {
-              System.err.println(compilerName() + ": illegal option -- " 
-                                  + args[i]);
-              i++;
-	      options.usage();
-              System.exit(1);
-          }
-          //System.err.println("Extension: " + i + " to " + i2);
-          i = i2;
-        } else {
-          source.add(args[i]);
-          options.source_path.add(new File(args[i]).getParentFile());
-          i++;
-        }
-      }
-    }
-    catch (ArrayIndexOutOfBoundsException e) {
-      System.err.println(compilerName() + ": missing argument");
-      options.usage();
-      System.exit(1);
-    }
-
-    if (source.size() < 1) {
-      System.err.println(compilerName()
-                          + ": must specify at least one source file");
-      options.usage();
-      System.exit(1);
-    }
-
-    if (options.extension != null) {
-	try {
-	    options.extension.setOptions(options);
-	}
-	catch (UsageError u) {
-	    System.err.println(u.getMessage());
-	    options.usage();
-	    System.exit(1);
-	}
-    }
-  }
-
-  static String compilerName() {
-    return Options.global.extension.compilerName();
+    return null;
   }
 
   static private Collection timeTopics = new ArrayList(1);

@@ -15,32 +15,16 @@ import polyglot.main.Options;
  * factory, parser, and other parameters of a language extension.
  */
 public interface ExtensionInfo {
-    /** Parse as much of the command line as this extension understands,
-     *  up to the first source file. Return the index of the first
-     *  switch not understood by the extension, or of the first
-     *  source file, or args.length if neither. */
-    int parseCommandLine(String args[], int index, Options options)
-	throws UsageError;
-
-    /**
-     * Initialize the extension with the command-line options.
-     * This must be called before any other method of the extension except
-     * the command-line parsing methods:
-     *     compilerName()
-     *     options()
-     *     parseCommandLine()
-     */
-    void setOptions(Options options) throws UsageError;
-
     /** The name of the compiler for usage messages */
     String compilerName();
 
     /** Report the version of the extension. */
     polyglot.main.Version version();
 
-    /** Report the options accepted by the extension.
-        Output is newline-terminated if non-empty. */
-    String options();
+    /** 
+     * Return an Options object, which will be given the command line to parse.
+     */    
+    Options getOptions();
 
     /**
      * Initialize the extension with a particular compiler.  This must
