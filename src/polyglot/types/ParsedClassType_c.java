@@ -111,8 +111,6 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     }
 
     public void flags(Flags flags) {
-        if (isAnonymous())
-            throw new InternalCompilerError("Cannot set flags for anonymous class.");
 	this.flags = flags;
     }
 
