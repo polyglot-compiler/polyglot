@@ -163,9 +163,6 @@ public class TypeSystem_c implements TypeSystem
 	if (t.kind() == PrimitiveType.VOID) {
 	    return "java.lang.Void";
 	}
-	if (t.kind() == PrimitiveType.CHAR) {
-	    return "java.lang.Character";
-	}
 
 	throw new InternalCompilerError("Unrecognized primitive type.");
     }
