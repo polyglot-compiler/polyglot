@@ -141,7 +141,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 
         List m = new ArrayList(exceptionTypes.size());
         for (int i = 0; i < exceptionTypes.size(); i++) {
-            l.add(ts.unknownType(position()));
+            m.add(ts.unknownType(position()));
         }
 
         ConstructorInstance ci = ts.constructorInstance(position(), ts.Object(),
