@@ -3,12 +3,14 @@ package polyglot.util;
 import polyglot.main.Report;
 import polyglot.types.*;
 
+import java.util.*;
 import java.io.*;
 
 /** Input stream for reading type objects. */
 public class TypeInputStream extends ObjectInputStream
 {
   protected TypeSystem ts;
+  protected Map cache;
 
   public TypeInputStream( InputStream in, TypeSystem ts) 
     throws IOException
@@ -16,6 +18,7 @@ public class TypeInputStream extends ObjectInputStream
     super( in);
     enableResolveObject(true);
     this.ts = ts;
+    this.cache = new HashMap();
   }
 
   public TypeSystem getTypeSystem()
@@ -33,14 +36,19 @@ public class TypeInputStream extends ObjectInputStream
       }
     }	  
     if (o instanceof PlaceHolder) {
-      TypeObject t = ((PlaceHolder) o).resolve();
-      if (Report.should_report("serialize", 2)) {
+      Object k = new IdentityKey(o);
+      TypeObject t = (TypeObject) cache.get(k);
+      if (t == null) {
+        t = ((PlaceHolder) o).resolve(ts);
+        cache.put(k, t);
+      }
+      if (Report.should_report(Report.serialize, 2)) {
         Report.report(2, "- Resolving " + s + " : " + o.getClass()
           + " to " + t + " : " + t.getClass());      	
       }
       return t;
     } else {
-      if (Report.should_report("serialize", 2)) {    
+      if (Report.should_report(Report.serialize, 2)) {    
         Report.report(2, "- " + s + " : " + o.getClass());
       }
       return o;

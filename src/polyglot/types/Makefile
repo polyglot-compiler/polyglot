@@ -10,11 +10,13 @@ SOURCES = \
 	ArrayType.java \
 	LazyClassInitializer.java \
 	CachingResolver.java \
+	ImportableType.java \
 	ClassContextResolver.java \
 	ClassResolver.java \
 	ClassType.java \
 	CodeInstance.java \
 	CompoundResolver.java \
+	PlaceHolder.java \
 	ConstructorInstance.java \
 	Context.java \
 	FieldInstance.java \

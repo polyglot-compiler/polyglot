@@ -2,6 +2,7 @@ package polyglot.types;
 
 import polyglot.ast.*;
 import polyglot.util.*;
+import polyglot.main.Report;
 import java.util.*;
 
 /**
@@ -10,7 +11,6 @@ import java.util.*;
 public class CachingResolver implements Resolver {
     Resolver inner;
     Map cache;
-    Map workingCache; //storing the unrestored class types
 
     /**
      * Create a caching resolver.
@@ -19,7 +19,6 @@ public class CachingResolver implements Resolver {
     public CachingResolver(Resolver inner) {
 	this.inner = inner;
 	this.cache = new HashMap();
-	this.workingCache = new HashMap();
     }
 
     /**
@@ -38,14 +37,24 @@ public class CachingResolver implements Resolver {
      * @param name The name to search for.
      */
     public Qualifier findQualifier(String name) throws SemanticException {
+        if (Report.should_report(new String[] {Report.types, Report.resolver}, 2))
+            Report.report(2, "CachingResolver: find: " + name);
+
         Qualifier q = (Qualifier) cache.get(name);
 
 	if (q == null) {
-	    Qualifier qq = (Qualifier) workingCache.get(name);
-	    if (qq!=null) return qq;
+            if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
+                Report.report(3, "CachingResolver: not cached: " + name);
 	    q = inner.findQualifier(name);
 	    cache.put(name, q);
+            if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
+                Report.report(3, "CachingResolver: loaded: " + name);
 	}
+        else {
+            if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
+                Report.report(3, "CachingResolver: cached: " + name);
+        }
+
 
 	return q;
     }
@@ -55,11 +64,7 @@ public class CachingResolver implements Resolver {
      * @param name The name to search for.
      */
     public Type checkType(String name) {
-        Type t = (Type) cache.get(name);
-        if (t == null) {
-            return (Type) workingCache.get(name);
-        }
-        return t;
+        return (Type) cache.get(name);
     }
 
     /**
@@ -81,7 +86,7 @@ public class CachingResolver implements Resolver {
      * @param name The name of the qualifier to insert.
      * @param q The qualifier to insert.
      */
-    public void medianResult(String name, Qualifier q) {
-	workingCache.put(name, q);
+    public void install(String name, Qualifier q) {
+	cache.put(name, q);
     }
 }

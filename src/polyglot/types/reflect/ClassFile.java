@@ -460,8 +460,7 @@ public class ClassFile implements LazyClassInitializer {
         }
 
         // Add unresolved class into the cache to avoid circular resolving.
-
-        ((CachingResolver) ts.systemResolver()).medianResult(name, ct);
+        ((CachingResolver) ts.systemResolver()).install(name, ct);
 
         if (kind != TOP) {
             ((ParsedInnerClassType) ct).outer(typeForName(ts, outerName));

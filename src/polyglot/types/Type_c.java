@@ -152,4 +152,28 @@ public abstract class Type_c extends TypeObject_c implements Type
     }
 
     public abstract String toString();
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        // Write out the full name first so we can install correctly
+        // when we read back.
+        if (this instanceof ImportableType) {
+            String name = ((ImportableType) this).fullName();
+            out.writeObject(name);
+        }
+
+        out.defaultWriteObject();
+    }
+
+    private void readObject(ObjectInputStream in)
+        throws IOException, ClassNotFoundException
+    {
+        // Store the type in the system resolver to avoid infinite loop.
+        if (this instanceof ImportableType) {
+            String name = (String) in.readObject();
+            TypeSystem ts = ((TypeInputStream) in).getTypeSystem();
+            ((CachingResolver) ts.systemResolver()).install(name, this);
+        }
+
+        in.defaultReadObject();
+    }
 }

@@ -137,9 +137,8 @@ public class LoadedClassResolver extends ClassResolver
                                   e.getMessage());
     }
 
-    // HACK: storing median result to avoid circular resolving
-
-    ((CachingResolver) ts.systemResolver()).medianResult(name, dt);
+    // Put the decoded type into the resolver to avoid circular resolving.
+    ((CachingResolver) ts.systemResolver()).install(name, dt);
 
     if (Report.should_report(report_topics, 2))
       Report.report(2, "Returning serialized ClassType for " +

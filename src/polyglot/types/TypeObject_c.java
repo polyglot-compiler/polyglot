@@ -45,7 +45,7 @@ public abstract class TypeObject_c implements TypeObject
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-	out.writeObject(position);
+        out.defaultWriteObject();
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
@@ -54,6 +54,6 @@ public abstract class TypeObject_c implements TypeObject
 	    ts = ((TypeInputStream) in).getTypeSystem();
 	}
 
-	position = (Position) in.readObject();
+        in.defaultReadObject();
     }
 }

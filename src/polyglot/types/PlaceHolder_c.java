@@ -8,7 +8,7 @@ import java.io.*;
 /**
  * A place holder type used to serialize types that cannot be serialized.  
  */
-public class PlaceHolder_c extends Type_c implements PlaceHolder
+public class PlaceHolder_c implements PlaceHolder
 {
     boolean primitive;
     String name;
@@ -19,8 +19,6 @@ public class PlaceHolder_c extends Type_c implements PlaceHolder
     
     /** Creates a place holder type for the type. */
     public PlaceHolder_c(Type t) {
-        super(t.typeSystem(), t.position());
-
 	if (t.isPrimitive()) {
 	    name = t.toPrimitive().kind().toString();
 	    primitive = true;
@@ -40,7 +38,7 @@ public class PlaceHolder_c extends Type_c implements PlaceHolder
     }
 
     /** Restore the placeholder into a proper type. */ 
-    public TypeObject resolve() {
+    public TypeObject resolve(TypeSystem ts) {
         try {
             if (primitive) {
                 return ts.primitiveForName(name);
