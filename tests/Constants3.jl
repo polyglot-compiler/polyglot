@@ -1,5 +1,5 @@
 
-class T1528e1 {
+class Constants3 {
     void foo(int i) {
         switch (i) {
             case 0:
