@@ -1,9 +1,10 @@
 package jltools.util.jlgen.spec;
 import java.util.*;
+import jltools.util.jlgen.*;
 import jltools.util.jlgen.code.*;import jltools.util.jlgen.parse.*;
 
 public abstract class Spec implements Unparse
-{	protected static String HEADER = "jlgen [spec]: ";	protected String packageName, start;
+{	protected String packageName, start;
 	protected Vector imports, symbols, prec;	protected InitCode initCode;
 	protected ActionCode actionCode;	protected ParserCode parserCode;	protected ScanCode scanCode;
 	protected JLgenSpec child;		public Spec () {		initCode = null;		actionCode = null;		parserCode = null;		scanCode = null;
@@ -20,7 +21,7 @@ public abstract class Spec implements Unparse
 			try {				code = (Code) codeParts.elementAt(i);				if (code instanceof ActionCode && code != null) {					actionCode = (ActionCode) code.clone();				} else if (code instanceof InitCode && code != null) {					initCode = (InitCode) code.clone();				} else if (code instanceof ParserCode && code != null) {					parserCode = (ParserCode) code.clone();				} else { // must be ScanCode
 					if (code != null)						scanCode = (ScanCode) code.clone();				}
 			} catch (Exception e) {
-				System.err.println(HEADER+" Spec::replaceCode(): not a code segment "+
+				System.err.println(JLgen.HEADER+" Spec::replaceCode(): not a code segment "+
 								   "found in code Vector: "+								   ((code == null) ? "null" : code.toString()));
 				System.exit(1);			}		}	}	
 	public void addImports (Vector imp) {

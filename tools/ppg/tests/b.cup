@@ -4,7 +4,7 @@ parser code {:
 	original parser code
 :}
 
-nonterminal B;
+nonterminal B, C;
 terminal a, c, d;
 
 start with B;

@@ -19,8 +19,8 @@ public class Nonterminal extends GrammarSymbol
 	}	
 	public boolean equals(Object o) {
 		if (o instanceof Nonterminal) {
-			return name.equals( ((Nonterminal)o).getName() );	
-		}
+			return name.equals( ((Nonterminal)o).getName() );		} else if (o instanceof String) {
+			// do we even need the nonterminal/terminal distinction?			return name.equals(o);		}
 		return false;
 	}
 }

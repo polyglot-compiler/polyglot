@@ -13,9 +13,7 @@ public class JLgenSpec extends Spec
 {
 	private String include;
 	private Vector commands, code;
-	private Spec parent;
-	private final String HEADER = "jlgen [spec]: ";
-	
+	private Spec parent;	
 	/**
 	 * JLgen spec
 	 */	public JLgenSpec (String incFile, String pkg, Vector imp,
@@ -34,8 +32,8 @@ public class JLgenSpec extends Spec
 	/**
 	 * Parse the chain of inheritance via include files
 	 */
-	public void parseChain (String basePath) {		File file = null;
-		try {			String fullPath = basePath + System.getProperty("file.separator") + include;
+	public void parseChain (String basePath) {		File file = null;		String fullPath = "";
+		try {			fullPath = basePath + System.getProperty("file.separator") + include;
 			FileInputStream fileInput = new FileInputStream(fullPath);
 			file = new File(fullPath);
 			String simpleName = file.getName();
@@ -44,14 +42,17 @@ public class JLgenSpec extends Spec
 			JLgen.DEBUG("parsing "+simpleName);
 			parser.parse();
 			parent = (Spec)parser.getProgramNode();
-			fileInput.close();
+			fileInput.close();		} catch (FileNotFoundException e) {			System.out.println(JLgen.HEADER+fullPath+" not found.");			System.exit(1);
 		} catch (Exception e) {
-			System.out.println(HEADER+"Exception: "+e.getMessage());
+			System.out.println(JLgen.HEADER+"Exception: "+e.getMessage());
 			System.exit(1);
 		}
-		parent.setChild(this);
+		parent.setChild(this);		/*
 		String parentDir = file.getPath();
-		parent.parseChain(parentDir == null ? "" : parentDir);	}		public CUPSpec coalesce() {		// parent cannot be null by definition
+		parent.parseChain(parentDir == null ? "" : parentDir);
+		*/
+		String parentDir = file.getParent();		parent.parseChain(parentDir == null ? "" : parentDir);
+	}		public CUPSpec coalesce() {		// parent cannot be null by definition
 		CUPSpec combined = parent.coalesce();		
 		// work with a copy so we have the unmodified original to refer to		CUPSpec newSpec = (CUPSpec) combined.clone();		
 		// override package name
@@ -79,9 +80,9 @@ public class JLgenSpec extends Spec
 			cmd = (Command) commands.elementAt(i);			if (cmd instanceof DropCmd) {				drop = (DropCmd) cmd;
 				if (drop.isProdDrop()) {
 					// remove all productions that have NT as lhs					newSpec.dropProductions(drop.getProduction());
-				} else { /* NT Drop */
-					// remove nonterminal from list of symbols					newSpec.dropSymbol(drop.getNonterminal());
-					// remove all productions that have NT as lhs					newSpec.dropAllProductions(drop.getNonterminal());
+				} else { /* symbol Drop */
+					// remove nonterminal from list of symbols					newSpec.dropSymbol(drop.getSymbol());
+					// remove all productions that have NT as lhs, if possible					newSpec.dropAllProductions(drop.getSymbol());
 				}			}
 		}	}	private void processOverride (CUPSpec combined, CUPSpec newSpec) {
 		// OVERRIDE

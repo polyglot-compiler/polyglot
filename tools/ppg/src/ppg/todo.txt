@@ -2,13 +2,23 @@ JLgen TODO
 ----------
 
 
-* bin/jlgen script
-* Makefiles 
 * use JLgen in building PolyJ
 * web page
 * man page
 * installation (.jar file)
-* check multiple level of .jlg inheritance
 * multiple start symbols
-* dropping (non)terminals
 * find harmony with Unix-style path names
+
+* dropping a list of (non)terminals?
+
+
+In progress
+-----------
+* Makefiles (beta)
+
+
+Complete
+--------
+* check multiple level of .jlg inheritance
+* dropping (non)terminals
+* bin/jlgen script

@@ -9,8 +9,8 @@ import jltools.util.jlgen.util.*;
 
 public class JLgen
 {
-	private static final String HEADER = "jlgen: ";
-	private static final String DEBUG_HEADER = "jlgen [debug]: ";
+	public static final String HEADER = "jlgen: ";
+	public static final String DEBUG_HEADER = "jlgen [debug]: ";
 	public static boolean debug = false;
 
 	public static void DEBUG (String s) {

@@ -2,5 +2,5 @@ package jltools.util.jlgen.util;
 
 public interface Equatable
 {
-	public boolean equals(Object o);
+	public abstract boolean equals(Object o);
 }

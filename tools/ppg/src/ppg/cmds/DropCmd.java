@@ -6,24 +6,24 @@ import jltools.util.jlgen.util.*;
 public class DropCmd implements Command
 {
 	private Production prod; // productions to be dropped for some nonterminal
-	private Nonterminal nt; // or, the single nonterminal to be dropped
+	private String sym; // or, the single nonterminal to be dropped
 	
-	public DropCmd(String nonterminal)
-	{
-		nt = new Nonterminal(nonterminal);
+	public DropCmd(String symbol)
+	{		// here it does not matter whether it's a nonterminal or terminal
+		sym = symbol;
 		prod = null;
 	}
 		public DropCmd(Production productions)
 	{
 		prod = productions;
-		nt = null;
+		sym = null;
 	}
 
 	public boolean isProdDrop() { return prod != null; }
-	public boolean isNTDrop() { return nt != null; }		public Production getProduction() { return prod; }
-	public Nonterminal getNonterminal() { return nt; }	
+	public boolean isSymbolDrop() { return sym != null; }		public Production getProduction() { return prod; }
+	public String getSymbol() { return sym; }	
 	public void unparse(CodeWriter cw) {
-		//cw.begin(0);		cw.write("DropCmd");		cw.allowBreak(0);		if (prod != null)			prod.unparse(cw);		else			cw.write(nt.getName());
+		//cw.begin(0);		cw.write("DropCmd");		cw.allowBreak(0);		if (prod != null)			prod.unparse(cw);		else			cw.write(sym);
 		//cw.end();
 	}	
 }

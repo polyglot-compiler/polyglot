@@ -2,7 +2,7 @@ package jltools.util.jlgen.spec;
 
 import java.io.*;
 import java.util.*;
-import jltools.util.jlgen.atoms.*;
+import jltools.util.jlgen.*;import jltools.util.jlgen.atoms.*;
 import jltools.util.jlgen.code.*;
 import jltools.util.jlgen.lex.*;
 import jltools.util.jlgen.parse.*;
@@ -10,9 +10,8 @@ import jltools.util.jlgen.util.*;
 
 public class CUPSpec extends Spec
 {
-	private static final String HEADER = "jlgen [cupspec]: ";
 	private Vector productions;
-	// maps nonterminal to its index in the vector of productions	private Hashtable ntProds;
+	// maps nonterminal to its index in the vector of productions	private Hashtable ntProds;	private final int NT_NOT_FOUND = -1;
 	
 	public CUPSpec (String pkg, Vector imp, Vector codeParts, Vector syms,
 					Vector precedence, String startSym, Vector prods)
@@ -95,11 +94,7 @@ public class CUPSpec extends Spec
 		public void addSymbols(Vector syms) {		if (syms == null)
 			return;				for (int i=0; i < syms.size(); i++) {			symbols.addElement(syms.elementAt(i));		}
 	}	
-	public void dropSymbol(GrammarSymbol gs) {		for (int i=0; i < symbols.size(); i++ ) {			Vector list = (Vector) symbols.elementAt(i);
-			for (int j=0; j < list.size(); j++) {
-				if (gs.equals(list.elementAt(j)))
-					list.removeElementAt(j);
-			}
+	public void dropSymbol(String gs) {		for (int i=0; i < symbols.size(); i++ ) {			SymbolList list = (SymbolList) symbols.elementAt(i);			list.dropSymbol(gs);
 		}	}
 	
 	public void dropProductions(Production p) {
@@ -111,11 +106,14 @@ public class CUPSpec extends Spec
 		int pos = errorNotFound(findNonterminal(nt), nt);		// should be a valid index from which we can drop productions
 		Production prod = (Production) productions.elementAt(pos);		prod.drop((Production) prod.clone());
 	}
-		public void dropAllProductions(Nonterminal nt) {		int pos = errorNotFound(findNonterminal(nt), nt);		// remove the whole lhs ::= rhs entry from the list of productions		productions.removeElementAt(pos);		// now we need to rehash since positions changed		hashNonterminals();
+		public void dropAllProductions(String nt) {		int pos = findNonterminal(nt);
+		// a terminal will not be in the hash		if (pos == NT_NOT_FOUND) 
+			return;		// remove the whole lhs ::= rhs entry from the list of productions
+		productions.removeElementAt(pos);		// now we need to rehash since positions changed		hashNonterminals();
 	}
 	public void addProductions(Production p) {		Nonterminal nt = p.getLHS();
 		int pos = findNonterminal(nt);
-		if (pos == -1) {			// add a hash mapping for this entry
+		if (pos == NT_NOT_FOUND) {			// add a hash mapping for this entry
 			ntProds.put(nt.getName(), new Integer(productions.size()));			// just append to our list			productions.addElement(p);		} else {
 			// attach to specific nonterminal in our list of productions			Production prod = (Production) productions.elementAt(pos);			prod.add(p);
 			//productions.setElementAt(prod, pos);		}
@@ -124,15 +122,16 @@ public class CUPSpec extends Spec
 	 * Returns int which is the position of the nonterminal in the production
 	 * list, or exits if it is not found
 	 */
-	private int findNonterminal(Nonterminal nt) {		Integer pos = (Integer) ntProds.get(nt.getName());
+	private int findNonterminal(Nonterminal nt) {
+		return findNonterminal(nt.getName());	}
+		private int findNonterminal(String nt) {		Integer pos = (Integer) ntProds.get(nt);
 		if (pos == null)
-			return -1;
+			return NT_NOT_FOUND;
 		else			return pos.intValue();
-	}
-	
+	}	
 	private int errorNotFound(int i, Nonterminal nt) {
-		if (i == -1) {			// index not found, hence we have no such terminal
-			System.err.println(HEADER + "nonterminal " + nt + " not found.");
+		if (i == NT_NOT_FOUND) {			// index not found, hence we have no such terminal
+			System.err.println(JLgen.HEADER + "nonterminal " + nt + " not found.");
 			System.exit(1);
 		}
 		return i;	}
