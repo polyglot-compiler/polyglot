@@ -27,21 +27,89 @@
   </path>
 
   <target name="configure" description="Configure Polyglot"
-          depends="configure-deps" unless="configure.up-to-date">
-    <ant antfile="configure.xml" target="configure"/>
+          depends="check-classpath">
+    <echo message="java version is ${java.version}"/>
+    <echo message="current directory is ${user.dir}"/>
+    <echo message="Java home directory is ${java.home}"/>
   </target>
 
-  <target name="configure-deps">
+  <target name="check-classpath" description="Check that the classpath contains the appropriate directories/jars">
+<!--
+    <available classname="java_cup.Main" property="cp_existence.java_cup"/>
+    <available classname="JFlex.Main" property="cp_existence.jlex"/>
+    <fail unless="cp_existence.java_cup" 
+          message="The java_cup classes must be on the classpath. Try adding java_cup.jar to the classpath."/>
+    <fail unless="cp_existence.jlex" 
+          message="The JFlex classes must be on the classpath. Try adding JFlex.jar to the classpath."/>
+-->
+  </target>
+
+  <target name="bin" 
+          description="Configure Polyglot" 
+          depends="configure,bin-deps"
+          unless="bin.up-to-date">
+    <antcall target="jlc"/>
+  </target>
+
+  <target name="bin-deps">
     <dependset>
       <srcfileset dir="${bin}" includes="jlc.in"/>
       <targetfileset dir="${bin}" includes="jlc"/>
     </dependset>
-    <condition property="configure.up-to-date">
+    <condition property="bin.up-to-date">
       <and>
         <available file="${bin}/jlc"/>
       </and>
     </condition>
   </target> 
+
+  <target name="executable-defs" description="creates a file containing common environment variable definitions">
+    <echo message="Creating ${bin}/defs"/>
+    <echo file="${bin}/defs" append="no">#!/bin/sh
+# DO NOT EDIT - This file was automatically generated.
+
+JAVA='${java.home}/bin/java'
+FILE_SEP='${file.separator}'
+PATH_SEP='${path.separator}'
+TOP='${basedir}'
+    </echo>
+  </target>
+
+  <target name="jlc" 
+          depends="executable-defs" 
+          description="creates the executable script jlc">
+    <!-- Create jlc -->
+    <echo message="Creating ${bin}/jlc"/>
+    <concat destfile="${bin}/jlc" append="no">
+      <filelist dir="${bin}" files="defs"/>
+    </concat>
+    <echo file="${bin}/jlc" append="yes">
+ext=""
+
+</echo>
+    <concat destfile="${bin}/jlc" append="yes">
+      <filelist dir="${bin}" files="jlc.in"/>
+    </concat>
+
+    <chmod perm="+x" file="${bin}/jlc"/>
+
+    <delete file="${bin}/defs"/>
+  </target>
+
+  <!-- Configure a single extension
+       @param ${ext}         the name of the extension 
+    -->
+  <target name="configure-ext">
+    <available file="configure-${ext}.xml" property="configure-ext.configure-available"/>
+    <antcall target="configure-ext-conditional"/>
+  </target>
+
+  <target name="configure-ext-conditional" 
+          if="configure-ext.configure-available"
+          depends="executable-defs">
+    <ant antfile="configure-${ext}.xml" target="configure" inheritRefs="true"/>
+    <delete file="${bin}/defs"/>
+  </target>
 
   <!-- initialize the build -->
   <target name="init" depends="configure">
@@ -83,7 +151,7 @@
   </target>
 
   <!-- compile the base compiler excluding the jl extension -->
-  <target name="compile-base" depends="init,ppg" 
+  <target name="compile-base" depends="init,bin,ppg" 
           description="compile the source">
     <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/**"
@@ -354,9 +422,7 @@
        @param has-qq       Pass in iff the extension has a qq package.
    -->
   <target name="standard-ext">
-    <ant antfile="configure.xml" 
-	 target="configure-ext"
-	 inheritRefs="true"/>
+    <antcall target="configure-ext"/>
     <antcall target="standard-ext-lexer"/>
     <antcall target="standard-ext-${parser.type}-parser"/>
     <antcall target="standard-ext-qq-dep"/>
