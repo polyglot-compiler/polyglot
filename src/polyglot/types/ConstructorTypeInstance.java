@@ -21,9 +21,11 @@ public class ConstructorTypeInstance extends MethodTypeInstance {
    *    ExceptionTypes and AccessFlags may be null.
    **/
   public ConstructorTypeInstance(TypeSystem ts, 
-                         List argumentTypes,
-			 List exceptionTypes,
-			 AccessFlags flags) {
-    super(ts, "[Constructor]", ts.getVoid(), argumentTypes, exceptionTypes, flags);
+                                 ClassType enclosingType, 
+                                 List argumentTypes,
+                                 List exceptionTypes,
+                                 AccessFlags flags) {
+    super(ts, enclosingType, "[Constructor]", ts.getVoid(), 
+          argumentTypes, exceptionTypes, flags);
   }
 }

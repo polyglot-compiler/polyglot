@@ -134,7 +134,7 @@ terminal Token LSHIFTEQ, RSHIFTEQ, URSHIFTEQ; // assignment_operator
 terminal Token ANDEQ, XOREQ, OREQ; // assignment_operator
 
 terminal IntegerLiteral INTEGER_LITERAL;
-terminal jltools.lex.FloatLiteral FLOATING_POINT_LITERAL;
+terminal jltools.lex.DoubleLiteral FLOATING_POINT_LITERAL;
 terminal BooleanLiteral BOOLEAN_LITERAL;
 terminal jltools.lex.CharacterLiteral CHARACTER_LITERAL;
 terminal jltools.lex.StringLiteral STRING_LITERAL;
@@ -284,7 +284,7 @@ literal ::=
 	|	FLOATING_POINT_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(new 
 					jltools.ast.FloatLiteral(
-					a.getValue().floatValue()), a); :}
+					a.getValue().doubleValue()), a); :}
 	|	BOOLEAN_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(new IntLiteral(
 					a.getValue().booleanValue()), a); :}

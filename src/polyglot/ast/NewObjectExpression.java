@@ -237,7 +237,6 @@ public class NewObjectExpression extends Expression {
       for (Iterator i = argTypes.iterator(); i.hasNext() ; )
       {
         Type t = (Type)i.next();
-        System.out.println( t + t.getTypeString());
       }
       throw new TypeCheckException ( 
               " No acceptable constructor found for the creation of \"" 

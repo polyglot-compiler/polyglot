@@ -157,7 +157,6 @@ public class MethodExpression extends Expression {
 
   public Node typeCheck(LocalContext c) throws TypeCheckException
   {
-    // fixme: exceptions
     ClassType ct; 
     if (target == null) {
       ct = c.getCurrentClass();
@@ -171,7 +170,6 @@ public class MethodExpression extends Expression {
         ct = (ClassType)((Expression)target).getCheckedType();
       }
       else if( ((Expression)target).getCheckedType() instanceof ArrayType) {
-        // FIXME protected methods
         ct = (ClassType)c.getTypeSystem().getObject();
       }
       else {
@@ -181,10 +179,6 @@ public class MethodExpression extends Expression {
     }
     else
     {
-      System.out.println("it is of type: " + target);
-      if( target instanceof FieldExpression) {
-        System.out.println(((FieldExpression)target).getName());
-      }
       throw new TypeCheckException( 
                          "Target of method invocation must be a ClassType");
     }
@@ -196,7 +190,12 @@ public class MethodExpression extends Expression {
     }
     MethodTypeInstance mti = c.getMethod ( ct, name, argTypes );
     setCheckedType ( mti.getType() );
-    jltools.util.Annotate.addThrows( this, mti.exceptionTypes () );
+    // SPECIAL CASE EXCEPTION ArrayType.clone should not throw the CloneNotSupported
+    //                        Exception, as per JLS 10.7
+    if ( !( target instanceof Expression &&
+            ((Expression)target).getCheckedType() instanceof ArrayType &&
+            name.equals("clone")))
+      jltools.util.Annotate.addThrows( this, mti.exceptionTypes () );
 
     List formalTypes = mti.argumentTypes();
     for ( ListIterator i = arguments.listIterator(),

@@ -247,7 +247,6 @@ public class ClassNode extends ClassMember {
     {
       Type t = ((TypeNode)i.next()).getType();
       type.addInterface ( t ) ;
-      System.out.println( "adding ambig iface: " + t.getTypeString() + " to pct");
     }
 
     type.setAccessFlags( accessFlags);

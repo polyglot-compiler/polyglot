@@ -83,7 +83,7 @@ public class LocalContext
   /**
    * Gets a field matched against a particular type
    */  
-  public FieldInstance getField( ClassType type, String fieldName) 
+  public FieldInstance getField( Type type, String fieldName) 
     throws TypeCheckException
   {
     Object result;

@@ -317,15 +317,16 @@ public class MethodNode extends ClassMember {
     
     if ( isConstructor)
     {
-      mtiThis = new ConstructorTypeInstance( ts, argTypes, exceptions, accessFlags) ;
+      mtiThis = new ConstructorTypeInstance( ts, clazz, argTypes, 
+                                             exceptions, accessFlags) ;
     }
     else if( additionalDimensions == 0 ) {
-      mtiThis = new MethodTypeInstance( ts, name,
+      mtiThis = new MethodTypeInstance( ts, clazz, name,
                           returnType.getType(), argTypes, 
                           exceptions, accessFlags);
     }
     else {
-      mtiThis = new MethodTypeInstance( ts, name,
+      mtiThis = new MethodTypeInstance( ts, clazz, name,
                           new ArrayType( ts, returnType.getType(), 
                                          additionalDimensions),
                           argTypes, exceptions, accessFlags);     

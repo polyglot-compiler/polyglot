@@ -93,7 +93,8 @@ public class CastExpression extends Expression {
   public Node typeCheck( LocalContext c) throws TypeCheckException
   {
     if ( ! expr.getCheckedType().isCastValid( type.getType() ) )
-      throw new TypeCheckException("Cannot cast the expression to type \"" + 
+      throw new TypeCheckException("Cannot cast the expression of type \"" +
+                                   expr.getCheckedType().getTypeString() + "\" to type \"" + 
                                    type.getType().getTypeString() + "\"");
     Annotate.addThrows ( this, Annotate.getThrows( expr ) );
     setCheckedType( type.getType() );

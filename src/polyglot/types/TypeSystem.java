@@ -154,7 +154,7 @@ public abstract class TypeSystem {
    * context.  If no such field may be found, returns a fieldmatch
    * with an error explaining why. Considers accessflags
    **/
-  public abstract FieldInstance getField(ClassType type, String name, Context context)
+  public abstract FieldInstance getField(Type type, String name, Context context)
     throws TypeCheckException;
  
 

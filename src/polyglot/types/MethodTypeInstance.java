@@ -24,11 +24,14 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
   private AccessFlags flags;
   // RI: May be null.
   private Type returnType;
+  // The encompassing class
+  private ClassType enclosingType;
   
   /**
    *    ExceptionTypes, returnType, and AccessFlags may be null.
    **/
   public MethodTypeInstance(TypeSystem ts, 
+                            ClassType enclosingType, 
                             String methodName, 
                             Type returnType,
                             List argumentTypes,
@@ -36,6 +39,7 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
                             AccessFlags flags) {
     super( ts, methodName, argumentTypes);
 
+    this.enclosingType = enclosingType;
     this.returnType = returnType;
     if (exceptionTypes != null)
       this.exceptionTypes = TypedList.copy(exceptionTypes,
@@ -48,6 +52,11 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
   public Type getReturnType()
   {
     return returnType; 
+  }
+
+  public ClassType getEnclosingType()
+  {
+    return enclosingType;
   }
   
   public void setReturnType( Type returnType)  
@@ -72,6 +81,7 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
   public MethodTypeInstance copyInstance()
   {
     return new MethodTypeInstance( getTypeSystem(), 
+               enclosingType, 
                getName(), 
                returnType, 
                argumentTypes(),                    

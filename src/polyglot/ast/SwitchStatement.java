@@ -100,7 +100,6 @@ public class SwitchStatement extends Statement {
        if ( ! expr.getCheckedType().isImplicitCastValid ( 
                   c.getTypeSystem().getInt()))
        {
-         System.out.println("TYPE  " + expr.getCheckedType().getTypeString());
          throw new TypeCheckException ( "The case label must be a byte, char,"
                                         + " short or int.");
        }

@@ -38,6 +38,7 @@ public class StandardTypeSystem extends TypeSystem {
     ERROR_ = resolver.findClass( "java.lang.Error");
     RTEXCEPTION_ = resolver.findClass("java.lang.RuntimeException");
     CLONEABLE_ = resolver.findClass("java.lang.Cloneable");
+    SERIALIZABLE_ = resolver.findClass("java.io.Serializable");
   }
 
   ////
@@ -214,10 +215,17 @@ public class StandardTypeSystem extends TypeSystem {
       // Both bases are reference types.
       return isCastValid(fromBase, toBase);
     }
-    else if (fromType instanceof ArrayType ||
-          toType instanceof ArrayType) {
-      // From an array to a non-array.
-      return toType.equals(CLONEABLE_) || toType.equals(OBJECT_);
+    else if (fromType instanceof ArrayType)
+    {
+      return toType.equals(CLONEABLE_) || 
+        toType.equals(SERIALIZABLE_) || 
+        toType.equals(OBJECT_);
+    }
+    else if (toType instanceof ArrayType)
+    {
+      return fromType.equals(CLONEABLE_) ||
+        fromType.equals(SERIALIZABLE_) ||
+        fromType.equals(OBJECT_);
     }
 
     if( fromType instanceof NullType) {
@@ -548,13 +556,29 @@ public class StandardTypeSystem extends TypeSystem {
    * with an error explaining why. name and context may be null, in which case
    * they will not restrict the output.
    **/
-  public FieldInstance getField(ClassType type, String name, Context context ) throws TypeCheckException
+  public FieldInstance getField(Type t, String name, Context context ) 
+    throws TypeCheckException
   {
     FieldInstance fi = null, fiEnclosing = null, fiTemp = null;
-    ClassType tEnclosing = null;
+    ClassType type, tEnclosing = null;
 
-    if (type != null) // then we have a starting point. don't have to perform a 2d search
+    if (t != null) // then we have a starting point. don't have to perform a 2d search
     {
+      if ( t instanceof ArrayType)
+      {
+        // only valid field is .length
+        if ( name.equals("length"))
+          {
+            AccessFlags flags = new AccessFlags();
+            flags.setFinal(true);
+            return new FieldInstance ( "length", INT_, t, flags);
+          }
+      }
+      else if ( !( t instanceof ClassType))
+      {
+        throw new TypeCheckException("Field access valid only on reference types.");
+      }
+      type = (ClassType)t;
       do 
       {
         for (Iterator i = type.getFields().iterator(); i.hasNext() ; )
@@ -651,14 +675,94 @@ public class StandardTypeSystem extends TypeSystem {
    * context.  If no such field may be found, returns a fieldmatch
    * with an error explaining why. Considers accessflags.
    **/
-  public MethodTypeInstance getMethod(ClassType type, MethodType method, Context context)
+  public MethodTypeInstance getMethod(ClassType type, MethodType method, 
+                                      Context context)
+    throws TypeCheckException
+  {
+    List lAcceptable = new java.util.ArrayList();
+    getMethodSet ( lAcceptable, type, method, context);
+    
+    if (lAcceptable.size() == 0)
+      throw new TypeCheckException ( "No valid method call found for \"" + 
+                                     method.getName() + "\".");
+
+    // At this point, the List lAcceptable contains all those which are 
+    // Acceptable and Accessible as defined by JLS 15.11.2.1
+    //    for (Iterator i = lAcceptable.listIterator(); i.hasNext(); )
+    //    {
+    //      MethodTypeInstance mti = (MethodTypeInstance)i.next();
+    //      System.out.print( mti.getEnclosingType().getTypeString() + "::" + 
+    //                        method.getName() + "(" );
+    //      for (Iterator i2 = mti.argumentTypes().listIterator(); i2.hasNext(); )
+    //      {
+    //        System.out.print( ((Type)i2.next()).getTypeString() + ", ");
+    //      }
+    //      System.out.println(");");
+    //    }
+    //    System.out.println("=====");
+
+    // now, use JLS 15.11.2.2
+    Object [] mtiArray = lAcceptable.toArray(  );
+    MostSpecificComparator msc = new MostSpecificComparator();
+    java.util.Arrays.sort( mtiArray, msc);
+
+    //    for (int i = 0; i < mtiArray.length; i++)
+    //    {
+    //      MethodTypeInstance mti = (MethodTypeInstance)mtiArray[i];
+    //      System.out.print( mti.getEnclosingType().getTypeString() + "::" + 
+    //                        method.getName() + "(" );
+    //      for (Iterator i2 = mti.argumentTypes().listIterator(); i2.hasNext(); )
+    //      {
+    //        System.out.print( ((Type)i2.next()).getTypeString() + ", ");
+    //      }
+    //      System.out.println(");");
+    //    }
+
+    // now check to make sure that we have a maximal most specific method.
+    // (if we did, it would be in the 0th index.
+    for ( int i = 1 ; i < mtiArray.length; i++)
+    {
+      if (msc.compare ( mtiArray[0], mtiArray[i]) == 1)
+        throw new TypeCheckException("Ambiguous method \"" + method.getName() 
+                                     + "\". More than one invocations are valid"
+                                     + " from this context.");
+    }
+    
+    // ok. mtiArray[0] is maximal most specific, so return it.
+    return (MethodTypeInstance)mtiArray[0];
+  }
+  /** 
+   * Class to handle the comparisons; dispactes to moreSpecific method. 
+   * <p> Should really be an anonymous class, but isn't because the jltools
+   * compiler doesn't yet handle anonymous classes.
+   */
+  class MostSpecificComparator implements java.util.Comparator
+  {
+    public int compare ( Object o1, Object o2)
+    {
+      if ( !( o1 instanceof MethodTypeInstance ) ||
+           !( o2 instanceof MethodTypeInstance ))
+        throw new ClassCastException();
+      return moreSpecific ( (MethodTypeInstance)o1, (MethodTypeInstance)o2) ?
+        -1 : 1;
+    }
+  }
+
+
+  /**
+   * populates the list lAcceptible with those MethodTypeInstances which are 
+   * Applicable and Accesable as defined by JLS 15.11.2.1
+   */
+  private void getMethodSet(List lAcceptable, ClassType type, MethodType method, 
+                            Context context)
     throws TypeCheckException
   {
     MethodTypeInstance mti = null, mtiEnclosing = null, mtiTemp = null;
     ClassType tEnclosing = null;
 
-    if (type != null) // then we have a starting point. don't have to perform a 2d search
+    if (type != null) 
     {
+      // then we have a starting point. don't have to perform a 2d search
       do 
       {
         for (Iterator i = type.getMethods().iterator(); i.hasNext() ; )
@@ -668,61 +772,69 @@ public class StandardTypeSystem extends TypeSystem {
           {
             if ( isAccessible( type, mti.getAccessFlags(), context))
             {
-              return mti;
+              lAcceptable.add (mti);
             }
-            throw new TypeCheckException(" Method \"" + method.getName() + "\" found in \"" + type.getFullName() + 
-                                         "\", but with wrong access permissions.");
           }
         }
       }
       while ( (type = (ClassType)type.getSuperType()) != null);
       mti = null;
     }
-    else // type == null, ==> no starting point. so check superclasses as well as enclosing classes.
+    else
     {
-      // check ourselves, first. this is because if a field is in this class, it cannot be ambiguous
+      // type == null, ==> no starting point. so check superclasses as 
+      //   well as enclosing classes. check ourselves, first. this is because 
+      //   if a field is in this class, it cannot be ambiguous
       for (Iterator i = context.inClass.getMethods().iterator(); i.hasNext(); )
       {
         mti = (MethodTypeInstance)i.next();
         if (methodCallValid(mti, method))
-          // found it. can stop looking since guaranteed that it is not ambiguous
-          return mti;
-        mti = null;
+        {
+          // found it. Add it.
+          lAcceptable.add ( mti );
+        }
       }
 
-      // check the parent  lineage of where we are
-      try {  mti = getMethod( context.inClass, method, context); }
-      catch ( TypeCheckException tce) { /* must have been something we couldnt access */ }
+      // check the parent lineage of where we are
+      try {  getMethodSet( lAcceptable, context.inClass, method, context); }
+      catch ( TypeCheckException tce) 
+      { /* must have been something we couldnt access */ }
 
-      boolean bFound = (mti != null);
-      
       // now check all enclosing classes (this will also look for conflicts)
       tEnclosing = context.inClass.getContainingClass();
       while (tEnclosing != null)
       {
-        try { mtiTemp = getMethod(tEnclosing, method, context); }
-        catch (TypeCheckException tce ) { /* must have been something we couldn't access */ }
-
-        if (bFound && mtiTemp != null)
-        {
-          throw new TypeCheckException("Ambiguous referenct to method \"" + method.getName() + "\"");
-        }
-        else if (mtiTemp != null)
-        {
-          mti = mtiTemp;
-          bFound = true;
-        }
-      }
-      if ( mti != null && mtiEnclosing != null)
-      {
-        throw new TypeCheckException("Ambiguous referenct to method \"" + method.getName() + "\"");
+        try { getMethodSet(lAcceptable, tEnclosing, method, context); }
+        catch (TypeCheckException tce ) 
+        { /* must have been something we couldn't access */ }
       }
     }
+  }
 
-    if ( mti != null) return mti;
-    if ( mtiEnclosing != null) return mtiEnclosing;
-    throw new TypeCheckException("No method \"" + method.getName() + "\" found with proper signature.");
-
+  /**
+   * Returns whether MethodType 1 is <i>more specific</i> than MethodTypeInstance 2, 
+   * where <i>more specific</i> is defined as JLS 15.11.2.2
+   * <p>
+   * Note: There is a fair amount of guesswork since the JLS does not include any 
+   * info regarding java 1.2, so all inner class rules are found empirically
+   * using jikes and javac.
+   */
+  private boolean moreSpecific(MethodTypeInstance mti1, MethodTypeInstance mti2)
+  {
+    try
+    {
+      // rule 1:
+      if ( ! (mti1.getEnclosingType().descendsFrom ( mti2.getEnclosingType()) ||
+              mti1.getEnclosingType().equals ( mti2.getEnclosingType()) ||
+              isEnclosed ( mti1.getEnclosingType(), mti2.getEnclosingType())))
+        return false;
+      // rule 2:
+      return ( methodCallValid ( mti2, mti1) );
+    }
+    catch (TypeCheckException tce)
+    {
+      return false;
+    }
   }
 
   /**
@@ -803,7 +915,15 @@ public class StandardTypeSystem extends TypeSystem {
                                         ((PrimitiveType) type1).getKind(), 
                                         ((PrimitiveType) type2).getKind() ));
     }
-      
+    
+    if ( ( type1 instanceof ClassType ) || (type1 instanceof ArrayType) &&
+         ( type2 instanceof NullType))
+      return type1;
+    if ( ( type2 instanceof ClassType ) || (type2 instanceof ArrayType) &&
+         ( type1 instanceof NullType))
+      return type2;
+
+    
     if (!( type1 instanceof ClassType) ||
         !( type2 instanceof ClassType)) {
       throw new TypeCheckException( 
@@ -858,7 +978,8 @@ public class StandardTypeSystem extends TypeSystem {
   }
 
   /**
-   * Returns whether the arguments for MethodType call can call MethodTypeInstance prototype
+   * Returns whether the arguments for MethodType call can call
+   * MethodTypeInstance prototype
    */
   public boolean methodCallValid( MethodTypeInstance prototype, MethodType call) 
     throws TypeCheckException
@@ -915,6 +1036,7 @@ public class StandardTypeSystem extends TypeSystem {
   private Type ERROR_       ;
   private Type RTEXCEPTION_ ;
   private Type CLONEABLE_   ;
+  private Type SERIALIZABLE_;
   
   protected ClassResolver resolver; //Should do its own caching.
   protected ImportTable emptyImportTable;

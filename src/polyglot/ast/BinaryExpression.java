@@ -131,7 +131,14 @@ public class BinaryExpression extends Expression {
   {
     Object vinfo = Annotate.getVisitorInfo( this);
 
+    try
+    {
     left = (Expression)left.visit( v);
+    }
+    catch (ClassCastException cce)
+    {
+      throw cce;
+    }
     vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( left), vinfo);
 
     right = (Expression)right.visit( v);

@@ -119,10 +119,8 @@ public class FieldExpression extends Expression {
                               + target.getClass().getName());
     }
 
-    if( ltype instanceof ArrayType && name.equals( "length")) {
-      setCheckedType( c.getTypeSystem().getInt());
-    }
-    else if( ltype instanceof ClassType) {
+    if( ltype instanceof ClassType ||
+        ltype instanceof ArrayType) {
       if (name.equals("class"))
       {
         Annotate.setExpectedType( target, ltype);
@@ -130,7 +128,7 @@ public class FieldExpression extends Expression {
       }      
       else
       {
-        fi = c.getField( (ClassType)ltype, name);
+        fi = c.getField( ltype, name);
         
         Annotate.setExpectedType( target, fi.getEnclosingType());
         setCheckedType( fi.getType());
@@ -138,7 +136,7 @@ public class FieldExpression extends Expression {
     }
     else {
       throw new TypeCheckException( 
-                    "Cannot access a field of an expression of type"
+                    "Cannot access a field of an expression of type "
                     + ltype.getTypeString());
     }
 

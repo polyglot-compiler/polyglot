@@ -84,8 +84,6 @@ public class ReturnStatement extends Statement {
     else {
       if ( ! expr.getCheckedType().descendsFrom( mti.getReturnType() ) &&
            ! expr.getCheckedType().equals( mti.getReturnType() )) {
-        System.out.println("Expecting something of type: " + mti.getReturnType().getTypeString());
-        System.out.println("Got something of type: " + expr.getCheckedType().getTypeString());
         throw new TypeCheckException ( 
                           "Method \"" + mti.getName() + "\" must return "
                           + "an expression of type \"" 

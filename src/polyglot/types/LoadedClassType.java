@@ -162,7 +162,8 @@ public class LoadedClassType extends ClassTypeImpl  {
       excpList.add(ts.typeForClass(excpns[idx]));
     }
 
-    return new MethodTypeInstance(ts, name, returnType, argList, excpList, flags);
+    return new MethodTypeInstance(ts, this, name, returnType, 
+                                  argList, excpList, flags);
   }
 
   protected MethodType methodTypeForConstructor(Constructor m) throws TypeCheckException
@@ -179,7 +180,7 @@ public class LoadedClassType extends ClassTypeImpl  {
       excpList.add(ts.typeForClass(excpns[idx]));
     }
 
-    return new ConstructorTypeInstance(ts, argList, excpList, flags);
+    return new ConstructorTypeInstance(ts, this, argList, excpList, flags);
   }
 
   Class theClass;

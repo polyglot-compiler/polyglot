@@ -124,7 +124,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
   {
     Node top = null;
     String name = "";
-    ClassType last = null;
+    Type last = null;
 
     for (Iterator i = names.listIterator(); i.hasNext(); )
     {
@@ -134,15 +134,8 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
         /* First try local variables and fields. */
         FieldInstance fi;
 
-        if( last == null) {
-          /* This is the first component. */
-          fi = c.getField( null, name);
-        }
-        else {
-          /* This is not the first component, so use the last component
-           * as the context for this component. */
-          fi = c.getField( last, name);
-        }
+        fi = c.getField( last, name );
+
 
         if( last == null && c.isDefinedLocally( name) ) {
           top = new LocalVariableExpression( name);
@@ -156,14 +149,8 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
             top = new FieldExpression( top, fi.getName());
           }
         }
-
-        if( fi.getType() instanceof ClassType) {
-          last = (ClassType)fi.getType();
-        }
-        else {
-          last = null;
-        }
-
+        
+        last = fi.getType();
         
         /* Clear the name. */
         name = "";
@@ -185,6 +172,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
             name += ".";
           }
         }
+        else throw tce;
       }
       
       if( top != null) {
