@@ -38,7 +38,7 @@ public class StringLit_c extends Lit_c implements StringLit
 
     public String toString() {
         if (StringUtil.unicodeEscape(value).length() > 11) {
-            return "\"" + StringUtil.unicodeEscape(value.substring(0,8)) + "...\"";
+            return "\"" + StringUtil.unicodeEscape(value).subString(0,8) + "...\"";
         }
                 
 	return "\"" + StringUtil.unicodeEscape(value) + "\"";
