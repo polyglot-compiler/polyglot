@@ -550,6 +550,10 @@ public class InitChecker extends DataFlow
                                      falseItem, FlowGraph.EDGE_KEY_FALSE,
                                      otherItem, FlowGraph.EDGE_KEY_OTHER,
                                      n, graph);
+        if (inItem == BOTTOM) {
+            return itemToMap(BOTTOM, succEdgeKeys);           
+        }                                     
+        
         DataFlowItem inDFItem = ((DataFlowItem)inItem);
         Map ret = null;        
         if (n instanceof Formal) {            
