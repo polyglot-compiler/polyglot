@@ -101,8 +101,17 @@ public class Unary_c extends Expr_c implements Unary
 	    return type(expr.type());
 	}
 
-	if (op == BIT_NOT || op == NEG || op == POS) {
+	if (op == BIT_NOT) {
 	    if (! expr.type().isImplicitCastValid(ts.Long())) {
+		throw new SemanticException("Operand of " + op +
+		    " operator must be numeric.", expr.position());
+	    }
+
+	    return type(ts.promote(expr.type()));
+	}
+
+	if (op == NEG || op == POS) {
+	    if (! expr.type().isNumeric()) {
 		throw new SemanticException("Operand of " + op +
 		    " operator must be numeric.", expr.position());
 	    }
@@ -133,7 +142,10 @@ public class Unary_c extends Expr_c implements Unary
 
                 return child.expectedType(ts.Double());
             }
-            else if (op == BIT_NOT || op == NEG || op == POS) {
+            else if (op == NEG || op == POS) {
+                return child.expectedType(ts.Double());
+            }
+            else if (op == BIT_NOT) {
                 return child.expectedType(ts.Long());
             }
             else if (op == NOT) {
