@@ -5,3 +5,5 @@ polyglot.jar
 classes
 cup-classes
 dist
+.classpath
+.project
