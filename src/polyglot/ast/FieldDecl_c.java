@@ -135,7 +135,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
 
 	ct.addField(fi);
 
-	return flags(fi.flags()).fieldInstance(fi);
+        return flags(fi.flags()).fieldInstance(fi);
     }
 
     /** Type check the declaration. */
@@ -195,8 +195,9 @@ public class FieldDecl_c extends Node_c implements FieldDecl
 	if (! flags.equals(fi.flags())) {
 	    fi = fi.flags(flags);
 	}
-
-	if (! type.equals(fi.type())) {
+	//FIXME: 
+	//if (! type.equals(fi.type())) {
+	if (type != fi.type()) {
 	    fi = fi.type(type);
 	}
 
