@@ -121,6 +121,7 @@ non terminal List type_list;
 non terminal List formal_parameter_type_list_opt, formal_parameter_type_list;
 non terminal TypeNode formal_parameter_or_type;
 
+start with goal;
 
 override class_or_interface_type ::=
 	ambiguous:a {: RESULT = a.toType(); :}

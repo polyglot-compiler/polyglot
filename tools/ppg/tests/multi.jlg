@@ -1,5 +1,0 @@
-include "b.cup"
-
-start with nt1 parse_NT1 token1;
-
-start with nt2 parse_NT2 token2;

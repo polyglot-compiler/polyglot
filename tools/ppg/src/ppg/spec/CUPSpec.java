@@ -97,8 +97,12 @@ public class CUPSpec extends Spec
 		public void addSymbols(Vector syms) {		if (syms == null)
 			return;				for (int i=0; i < syms.size(); i++) {			symbols.addElement(syms.elementAt(i));		}
 	}	
-	public void dropSymbol(String gs) {		for (int i=0; i < symbols.size(); i++ ) {			SymbolList list = (SymbolList) symbols.elementAt(i);			list.dropSymbol(gs);
-		}	}
+	public void dropSymbol(String gs) throws JLgenError {
+		boolean dropped = false;		for (int i=0; i < symbols.size(); i++ ) {			SymbolList list = (SymbolList) symbols.elementAt(i);			dropped = dropped || list.dropSymbol(gs);
+		}		//TODO: error if symbol being dropped was not found		/*
+		if (!dropped)
+			throw new JLgenError("file", -1, "symbol "+gs+" not found.");		*/
+	}
 	
 	public void dropProductions(Production p) {
 		Nonterminal nt = p.getLHS();		int pos = errorNotFound(findNonterminal(nt), nt);		// should be a valid index from which we can drop productions
@@ -163,6 +167,9 @@ public class CUPSpec extends Spec
 			cw.newline();		}		cw.newline();
 		
 		// precedence
+		for (int i=0; i < prec.size(); i++) {
+			cw.write( ((Precedence) prec.elementAt(i)).toString() );			cw.newline();		}
+		cw.newline();
 		
 		// start		if (start != null) {
 			cw.write("start with " + start + ";");
@@ -212,7 +219,9 @@ public class CUPSpec extends Spec
 			out.println( ((SymbolList) symbols.elementAt(i)).toString() );
 		out.println();
 		
-		//TODO: precedence
+		// precedence		for (int i=0; i < prec.size(); i++)
+			out.println( ((Precedence) prec.elementAt(i)).toString() );
+		out.println();
 		
 		// start
 		out.println("start with " + start + ";");

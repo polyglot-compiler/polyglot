@@ -25,9 +25,8 @@ parser code {:
 
     public void syntax_error (Symbol cur_token) { 
         Token tok = (Token) cur_token.value; 
-        report_error ("Syntax error at line " + tok.getLineno() + 
-                      ": \"" + tok.getValue() + "\" (" + tok.getID() + ")", 
-                      null); 
+        report_error (tok.getFilename()+": syntax error at line " + 
+						tok.getLineno() + ": \"" + tok.getValue() + "\" (" + 						tok.getID() + ")", null); 
         System.exit(1);
     } 
 
@@ -90,7 +89,7 @@ nonterminal Spec spec, jlgen_spec, cup_spec;
 
 /* JLgen */nonterminal String include_spec;
 nonterminal Vector command_list_opt, prod_part_list, rhs_list, transfer_list,
-					jlgen_start_spec, jlgen_start_spec_elt, jlgen_start_spec_list;
+					jlgen_start_spec, jlgen_start_spec_elt, jlgen_start_spec_list,					nt_id_list;
 nonterminal Command command;
 /* Common */
 nonterminal Production production;nonterminal Vector production_list;
@@ -176,11 +175,18 @@ command ::=
 			RESULT = new OverrideCmd(p);
 		} 
 	:}
-|	DROP nt_id:nt {: RESULT = new DropCmd(nt); :}
-|	DROP LBRACE production:p RBRACE {: RESULT = new DropCmd(p); :}
+/*|	DROP nt_id:nt {: RESULT = new DropCmd(nt); :}*/
+|	DROP LBRACE production:p RBRACE {: RESULT = new DropCmd(p); :}|	DROP LBRACE nt_id_list:nt_list RBRACE {: 		RESULT = new DropCmd(nt_list);	:}
 |	TRANSFER nt_id:nt transfer_list:tlist {:		RESULT = new TransferCmd(nt, tlist);	:}
 ;
-
+nt_id_list ::=
+	nt_id_list:list COMMA nt_id:id {:
+		list.addElement(id);
+		RESULT = list;
+	:}
+|	nt_id:id {:		Vector list = new Vector();
+		list.addElement(id);
+		RESULT = list;	:};
 prod_modifier_opt ::=
 	EXTEND:a	{: RESULT = (String)a.getValue(); :}
 |	OVERRIDE:a	{: RESULT = (String)a.getValue(); :}
@@ -193,7 +199,7 @@ prod_modifier_opt ::=
 		Vector v = new Vector();
 		Production p = new Production(new Nonterminal(nt), rhs);		v.addElement(p);		RESULT = v;
 	:}
-	;
+;
 /********************************************************************
  * COMMON                                                           *
  ********************************************************************/

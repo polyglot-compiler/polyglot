@@ -1,10 +1,6 @@
 JLgen TODO
 ----------
-* dropping a list of (non)terminals
-
 * error reporting
-  - line numbers on errors (use pos?)
-  - filename in chain on parse error
   - filename/pos on jlgen error
   - add usage message on errors
   - dropping nonexistent symbol
@@ -30,3 +26,4 @@ Complete
 * find harmony with Unix-style path names
 * Makefiles
 * web/man page
+* dropping a list of (non)terminals

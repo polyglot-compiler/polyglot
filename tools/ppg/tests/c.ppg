@@ -2,14 +2,4 @@ include "a.jlg"
 
 start with E;
 
-drop D 
-
-drop B
-
-drop a
-
-drop d
-
-drop c
-
-drop z
+drop { D, B, a, d, c, z }

@@ -20,9 +20,33 @@ public class JLgen
 	
 	public static void main (String args[]) {
 		FileInputStream fileInput;
-		String filename = null;
+		String filename = null;				for (int i=0; i < args.length; i++) {
+			// assume all switches begin with a dash '-'
+			if (args[i].charAt(0) == '-') {
+				if (args[i].equals("-t")) {
+					// token function
+				} else if (args[i].equals("-c")) {
+					// constant class
+				}
+				else { // invalid switch
+					System.err.println("Error: invalid switch: "+args[i]);
+					usage();
+				}
+			} else {
+				// not a switch: this must be a filename
+				// but only do the 1st filename on the command line
+				if (filename == null) {
+					filename = args[i];
+				} else {
+					System.err.println("Error: multiple source files specified.");
+					usage();
+				}
+			}
+		}		if (filename == null) {
+			System.err.println("Error: no filename specified.");
+			usage();
+		}		
 		try {
-			filename = args[0];
 			fileInput = new FileInputStream(filename);
 		}
 		catch (FileNotFoundException e) {
@@ -46,22 +70,23 @@ public class JLgen
 			return;
 		}
 		Spec spec = (Spec)parser.getProgramNode();		
-		/* try #1		String parentDir = file.getPath();
-		spec.parseChain(parentDir == null ? "" : parentDir);		*/
-				/* try #2: uses java1.2 function
-		File parent = file.getParentFile();
-		spec.parseChain(parent == null ? "" : parent.getPath());		*/
+		String parent = file.getParent();		spec.parseChain(parent == null ? "" : parent);
 		
-		// try #3		String parent = file.getParent();		spec.parseChain(parent == null ? "" : parent);
-		
-		// now we have a linked list of inheritance, namely		// JLgen1, JLgen2, ..., JLgenN, CUP		// We combine two at a time, starting from the end with the CUP spec
-		CUPSpec combined = spec.coalesce();				CodeWriter cw = new CodeWriter(System.out, 72); 
+		/* now we have a linked list of inheritance, namely		 * JLgen_1, JLgen_2, ..., JLgen_n, CUP		 * We combine two at a time, starting from the end with the CUP spec		 */
 		try {
+			CUPSpec combined = spec.coalesce();			CodeWriter cw = new CodeWriter(System.out, 72); 
 			combined.unparse(cw);
-			cw.flush();		} catch (IOException e) {
+			cw.flush();
+		} catch (JLgenError e) {
+			System.out.println(e.getMessage());
+			System.exit(1);		} catch (IOException e) {
 			System.out.println(HEADER+"exception: "+e.getMessage());
-			return;
-		}	}		private static void pause() {		if (debug) {
-			try{System.in.read();}catch(Exception e){}
-		}	}
-}
+			System.exit(1);
+		}	}	
+	
+	public static void usage() {
+		System.err.println("Usage: jlgen [-t token_func] [-c ConstClass] <input file>\nwhere:\n"+
+						   "\t-t <func>\tfunction will accept an int and return a token\n"+
+						   "\t-c <Class>\tclass prepended to token names to pass to <func>\n"+
+						   "\t<input>\ta JLgen or CUP source file\n");
+		System.exit(1);	}}

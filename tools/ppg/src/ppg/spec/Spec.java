@@ -30,5 +30,5 @@ public abstract class Spec implements Unparse
 	}		// default action is to do nothing: as CUP does
 	public void parseChain(String basePath) {}
 
-	/**	 * Combine the chain of inheritance into one CUP spec	 */	public abstract CUPSpec coalesce();	
+	/**	 * Combine the chain of inheritance into one CUP spec	 */	public abstract CUPSpec coalesce() throws JLgenError;	
 }
