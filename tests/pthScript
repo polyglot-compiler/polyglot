@@ -28,6 +28,7 @@
 polyglot.ext.jl.ExtensionInfo "-cp ." {
         ArrayInit.jl ;
         BoolTest.jl ;
+        BoolTest2.jl (Semantic, "may not have been initialized");
         ClassLit.jl ;
         Conditional1.jl ;
 	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
