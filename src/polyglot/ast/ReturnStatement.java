@@ -4,8 +4,8 @@
 
 package jltools.ast;
 
-import jltools.util.CodeWriter;
-import jltools.types.LocalContext;
+import jltools.util.*;
+import jltools.types.*;
 /**
  * ReturnStatement
  * 
@@ -58,9 +58,20 @@ public class ReturnStatement extends Statement {
     return null;
   }
 
-  public Node typeCheck(LocalContext c)
+  public Node typeCheck(LocalContext c) throws TypeCheckException
   {
-    // FIXME: implement
+    MethodTypeInstance mti = c.getCurrentMethod() ;
+    if ( ! expr.getCheckedType().descendsFrom( mti.getReturnType() ) &&
+         ! expr.getCheckedType().equals( mti.getReturnType() ))
+      throw new TypeCheckException ( "The mehtod body says the return type is \"" + 
+                                     mti.getReturnType().getTypeString() + "\", however, the return statement " +
+                                     "returns an instnace of type \"" + 
+                                     expr.getCheckedType().getTypeString() + "\"");
+
+      
+
+    Annotate.setTerminatesOnAllPaths (this, true);
+    addThrows ( expr.getThrows() );
     return this;
   }
 

@@ -21,6 +21,8 @@ public class Annotate {
   static final int TYPE                   = 2;
   static final int ERROR                  = 3;
   static final int THROWS_SET             = 4;
+  // true if the node has all paths ending in function termination (either throws or return).
+  static final int TERMINATE_ALL_PATHS    = 5;
 
   /**
    * Notes that o appeared at line i of the source.
@@ -97,6 +99,19 @@ public class Annotate {
   {
     return (SubtypeSet) o.getAnnotation(THROWS_SET);
   }
+  
+  public static boolean terminatesOnAllPaths(AnnotatedObject o)
+  {
+    Boolean b = (Boolean) o.getAnnotation (TERMINATE_ALL_PATHS);
+    if (b == null ) return false;
+    return b.booleanValue();
+  }
+
+  public static void setTerminatesOnAllPaths ( AnnotatedObject o, boolean b)
+  {
+    o.setAnnotation ( TERMINATE_ALL_PATHS, new Boolean ( b ) );
+  }
+  
 
   // Never instantiate this class.
   private Annotate() {}

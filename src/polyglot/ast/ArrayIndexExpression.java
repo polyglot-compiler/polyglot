@@ -88,6 +88,10 @@ public class ArrayIndexExpression extends Expression {
       setError(ErrorInfo.SEMANTIC_ERROR,
                     "Array subscript must be an integer.");
     } 
+
+    addThrows ( base.getThrows() ) ;
+    addThrows ( index.getThrows() );
+    
     return this;
   }
 

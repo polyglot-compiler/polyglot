@@ -138,6 +138,16 @@ public abstract class Node extends jltools.util.AnnotatedObject {
     // FIXME
     //Compiler.enqueueError( e);
   }
+
+  public void addThrows( SubtypeSet s ) 
+  {
+    Annotate.addThrows ( this, s) ;
+  }
+
+  public SubtypeSet getThrows ( )
+  {
+    return Annotate.getThrows ( this ) ;
+  }
   
 }
 

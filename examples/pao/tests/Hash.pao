@@ -5,10 +5,26 @@ import java.util.*;
 
 public class Hash
 {
-  public static void main(String [] args)
+  public static void  main(String [] args) throws Exception
   {
     Hashtable ht = new Hashtable();
     ht.put ( (Object)32, "Hello");
     System.out.println ( ht.get( (Object)32) );
+    
+    if ( true) 
+    {
+      throw new java.io.IOException();
+    }
+
+  }
+  
+  int method () throws Exception
+  {
+    if (true) 
+      return 32;
+    else
+    
+    
+        throw new java.io.IOException();
   }
 }

@@ -353,7 +353,12 @@ public class MethodNode extends ClassMember {
       }
     }
 
-
+    // make sure that all paths return, if our return type is not void
+    if ( !mtiThis.getReturnType().equals (c.getTypeSystem().getVoid() ) &&
+         !Annotate.terminatesOnAllPaths ( body ) )
+      throw new TypeCheckException ( "Not all paths in the method \"" + name + 
+                                     "\" have a return or throw statement");
+      
     c.leaveMethod(  ) ;
     return this;
   }

@@ -143,58 +143,12 @@ public abstract class TypeSystem {
   // Functions for type membership.
   ////
   /**
-   * Requires: all type arguments are canonical.
-   *
-   * Returns an immutable iterator of all the FieldMatches defined on
-   * type (if any).  The iterator is guaranteed to yeild fields
-   * defined on subclasses before those defined on superclasses.
-   **/
-  // public abstract FieldInstance getFieldsForType(AmbiguousType type) throws TypeCheckException;
-
-  /**
-   * Requires: all type arguments are canonical.
-   *
-   * Returns an immutable iterator of all the MethodMatches defined on
-   * type (if any).  The iterator is guaranteed to yield methods
-   * defined on subclasses before those defined on superclasses.
-   **/  
-  // public abstract Iterator getMethodsForType(Type type);
-
-  /**
-   * Requires: all type arguments are canonical.
-   *
-   * Returns an immutable iterator of all the FieldMatches named 'name' defined
-   * on type (if any).  If 'name' is null, matches all.  The iterator is guaranteed 
-   * to yield fields defined on subclasses before those defined on superclasses.
-   **/
-  //  public abstract Iterator getFieldsNamed(Type type, String name);
-
-  /**
-   * Requries all type are canonical.
-   * 
-   * Returns an immutable iterator of all the MethodMatches named 'name' defined
-   * on type (if any).  If 'name' is null, mathces all. The iterator is guaranteed
-   * to yield methods defined on subclasses before those defined on superclasses.
-   **/
-  // public abstract Iterator getMethodsNamed(Type type, String name);
-
-  /**
    * Returns the fieldMatch named 'name' defined on 'type' visible in
    * context.  If no such field may be found, returns a fieldmatch
    * with an error explaining why. Considers accessflags
    **/
   public abstract FieldInstance getField(ClassType type, String name, Context context)
     throws TypeCheckException;
-
-  /**
-   * Requires: all type arguments are canonical.
-   * 
-   * Returns the MethodMatch named 'name' defined on 'type' visibile in
-   * context.  If no such field may be found, returns a fieldmatch
-   * with an error explaining why. Considers accessflags.
-   **/
-  //  public abstract MethodInstance  getMethod(ClassType type, String name, Context context);
-  //    throws TypeCheckException;
  
 
   /**
@@ -244,41 +198,6 @@ public abstract class TypeSystem {
   public abstract MethodTypeInstance getMethod(ClassType type, MethodType method, 
 					Context context)
     throws TypeCheckException;
-  /**
-   * If an attempt to call a method of type <method> on <type> would
-   * be successful, and the method would match on the given <type>,
-   * returns the actual MethodMatch for the method that would be
-   * called.  Otherwise returns a MethodMatch with an error string
-   * explaining why no method could be found.
-   *
-   * If <context> is non-null, only those methods visible in context are
-   * considered.
-   *
-   * Iff <isThis> is true, methods are considered which would only be valid
-   * if the target object were equal to the "this" object.
-   *
-   * This method uses the name, argument types, and access flags of <method>.
-   * The access flags are used to select which protections may be accepted.
-   *
-   * (Guavac gets this wrong.)
-   **/
-  //  public abstract MethodMatch getMethodInClass(Type type, MethodType method, 
-  //					      Context context, boolean isThis);
-  /**
-   * As above, except only returns a match if the argument types are identical,
-   * and disregards context.
-   **/
-  //  public abstract MethodMatch getExactMethod(Type type, MethodType method);
-  //  public abstract MethodMatch getExactMethodInClass(Type type, MethodType method); 
-
-  ////
-  // Functions for type->class mapping.
-  ////
-  /**
-   * Returns the ClassType object corresponding to a given type, or null
-   * if there is none.
-   **/
-  //  public abstract JavaClass getClassForType(Type type);
 
   ////
   // Functions which yield particular types.

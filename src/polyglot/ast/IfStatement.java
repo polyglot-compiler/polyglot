@@ -129,7 +129,13 @@ public class IfStatement extends Statement {
     Annotate.addThrows ( this, Annotate.getThrows ( condExpr ));
     Annotate.addThrows ( this, Annotate.getThrows ( thenStatement ));
     if ( elseStatement != null)
+    {
       Annotate.addThrows ( this, Annotate.getThrows ( elseStatement ));
+      
+      Annotate.setTerminatesOnAllPaths( this, Annotate.terminatesOnAllPaths ( thenStatement) &&
+                                        Annotate.terminatesOnAllPaths ( elseStatement));
+                                        
+    }
     
 
     return this;

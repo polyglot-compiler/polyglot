@@ -330,6 +330,8 @@ public class BinaryExpression extends Expression {
                 "Internal error: unknown binary operator.");
     }
     
+    addThrows (left.getThrows() );
+    addThrows (right.getThrows() );
     return this;
   }
   

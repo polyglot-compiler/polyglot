@@ -54,6 +54,7 @@ public class ThrowStatement extends Statement {
        throw new TypeCheckException("Can only throw objects that extend from \"java.lang.Throwable\"");
      Annotate.addThrows ( this, expr.getCheckedType()  );
      Annotate.addThrows ( this, Annotate.getThrows( expr ) );
+     Annotate.setTerminatesOnAllPaths (this, true);
      return this;
    }
 

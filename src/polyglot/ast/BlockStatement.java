@@ -4,11 +4,7 @@
 
 package jltools.ast;
 
-import jltools.util.Assert;
-import jltools.util.TypedList;
-import jltools.util.TypedListIterator;
-import jltools.util.CodeWriter;
-import jltools.util.Annotate;
+import jltools.util.*;
 import jltools.types.*;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -112,11 +108,18 @@ public class BlockStatement extends Statement {
     return null;
   }
   
-  public Node typeCheck( LocalContext c)
+  public Node typeCheck( LocalContext c) throws TypeCheckException
   {
     for (Iterator i = statements.iterator(); i.hasNext(); )
     {
-      Annotate.addThrows( this, Annotate.getThrows ( ((Node)i.next())) );
+      Node n = (Node)i.next();
+      Annotate.addThrows( this, Annotate.getThrows (n) );
+      if ( Annotate.terminatesOnAllPaths(n) ) 
+      {
+        Annotate.setTerminatesOnAllPaths (this, true);
+        if ( i.hasNext())
+          throw new TypeCheckException( "The block has unreachable statements" );
+      }
     }
     c.popBlock();
     return this;

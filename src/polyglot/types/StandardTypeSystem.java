@@ -514,58 +514,6 @@ public class StandardTypeSystem extends TypeSystem {
   ////
   // Functions for type membership.
   ////
-
-  /**
-   * Requires: all type arguments are canonical.
-   *
-   * Returns an immutable iterator of all the FieldMatches defined on
-   * type (if any).  The iterator is guaranteed to yeild fields
-   * defined on subclasses before those defined on superclasses.
-   **/
-  //  public Iterator getFieldsForType(Type type) 
-  //  {
-  //    return getField(type, null, null);
-  //  }
-
-  /**
-   * Requires: all type arguments are canonical.
-   *
-   * Returns an immutable iterator of all the MethodMatches defined on
-   * type (if any).  The iterator is guaranteed to yield methods
-   * defined on subclasses before those defined on superclasses.
-   **/  
-
-//  public Iterator getMethodsForType(Type type)
-//  {
-//    return getMethod(type, null, null);
-//  }
-  
-
-  /**
-   * Requires: all type arguments are canonical.
-   *
-   * Returns an immutable iterator of all the FieldMatches named 'name' defined
-   * on type (if any).  If 'name' is null, matches all.  The iterator is guaranteed 
-   * to yield fields defined on subclasses before those defined on superclasses.
-   **/
-//  public Iterator getFieldsNamed(Type type, String name)
-//  {
-//    return getField( type, name, null);
-//  }
-  
-  
-  /**
-   * Requries all type are canonical.
-   * 
-   * Returns an immutable iterator of all the MethodMatches named 'name' defined
-   * on type (if any).  If 'name' is null, mathces all. The iterator is guaranteed
-   * to yield methods defined on subclasses before those defined on superclasses.
-   */
-//  public  Iterator getMethodsNamed(Type type, String name)
-//  {
-//    return getMethod(type, name, null);
-//  }
-
   /**
    * Requires: all type arguments are canonical.
    *
@@ -578,11 +526,6 @@ public class StandardTypeSystem extends TypeSystem {
   {
     FieldInstance fi = null, fiEnclosing = null, fiTemp = null;
     ClassType tEnclosing = null;
-
-    /*
-    if ( context.inClass  != null)
-      System.err.println(context.inClass.getTypeString() + " supertype: " + context.inClass.getSuperType());
-    */
 
     if (type != null) // then we have a starting point. don't have to perform a 2d search
     {
@@ -830,88 +773,6 @@ public class StandardTypeSystem extends TypeSystem {
     return true;
   }
 
-  /**
-   * If an attempt to call a method of type <method> on <type> would
-   * be successful, returns the actual MethodMatch for the method that
-   * would be called.  Otherwise returns a MethodMatch with an error string
-   * explaining why no method could be found.
-   *
-   * If <context> is non-null, only those methods visible in context are
-   * considered.
-   *
-   * Iff <isThis> is true, methods are considered which would only be valid
-   * if the target object were equal to the "this" object.
-   *
-   * This method uses the name, argument types, and access flags of <method>.
-   * The access flags are used to select which protections may be accepted.
-   *
-   * (Guavac gets this wrong.)
-   **/
-  public MethodTypeInstance getMethod(ClassType type, MethodType method, 
-                                      Context context, boolean isThis)
-    throws TypeCheckException 
-  {
-    throw new TypeCheckException("Deprecated method");
-  }
-
-  /**
-   * If an attempt to call a method of type <method> on <type> would
-   * be successful, and the method would match on the given <type>,
-   * returns the actual MethodMatch for the method that would be
-   * called.  Otherwise returns a MethodMatch with an error string
-   * explaining why no method could be found.
-   *
-   * If <context> is non-null, only those methods visible in context are
-   * considered.
-   *
-   * Iff <isThis> is true, methods are considered which would only be valid
-   * if the target object were equal to the "this" object.
-   *
-   * This method uses the name, argument types, and access flags of <method>.
-   * The access flags are used to select which protections may be accepted.
-   *
-   * (Guavac gets this wrong.)
-   **/
-//public MethodMatch getMethodInClass(Type type, MethodType method, 
-//                                      Context context, boolean isThis)
-//  {
-    //FIXME: implement
-//    return null;
-//  }
-
-  /**
-   * As above, except only returns a match if the argument types are identical,
-   * and disregards context.
-   **/
-//  public MethodMatch getExactMethod(Type type, MethodType method)
-//  {
-    //FIXME: implement
-//    return null;
-//  }
-
-//  public MethodMatch getExactMethodInClass(Type type, MethodType method)
-//  {
-//    //FIXME: implement
-//    return null;
-//  }
-
-  ////
-  // Functions for type->class mapping.
-  ////
-  /**
-   * Requires: all arguments are canonical.
-   *
-   * Returns the JavaClass object corresponding to a given type, or null
-   * if there is none.
-   **/
-//  public JavaClass getClassForType(Type type) {
-//    if (! (type instanceof ClassType)) return null;
-//    String fullName = ((ClassType) type).getName();
-//    try { return resolver.findClass(fullName); }
-//    catch (NoClassException nce) 
-//    { return null; }
-//  }
-
   ////
   // Functions which yield particular types.
   ////
@@ -972,16 +833,6 @@ public class StandardTypeSystem extends TypeSystem {
     else
       return new ArrayType(this, base, newDims); // May throw error.
   }
-  /**
-   * Returns a canonical type corresponding to the Java Class object
-   * theClass.  Does not require that <theClass> have a JavaClass
-   * registered in this typeSystem.  Does not register the type in
-   * this TypeSystem.  For use only by JavaClass implementations.
-   **/
-//  public ClassType typeForClass(JavaClass theClass)
-//  {
-//    return (ClassType)theClass.getType();
-//  }
 
   /**
    * Returns a canonical type corresponding to the Java Class object
