@@ -9,6 +9,7 @@ SOURCES = \
 	BaseVisitor.java \
 	BlockFlattener.java \
 	ClassSerializer.java \
+	CodeCleaner.java \
 	ConstantFolder.java \
 	DumpAst.java \
 	ExceptionChecker.java \

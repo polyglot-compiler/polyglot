@@ -2,7 +2,6 @@ package jltools.visit;
 
 import jltools.ast.*;
 import jltools.frontend.*;
-import jltools.visit.*;
 import java.util.*;
 
 /**
