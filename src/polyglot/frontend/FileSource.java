@@ -8,8 +8,8 @@ import polyglot.util.InternalCompilerError;
 /** A <code>Source</code> represents a source file. */
 public class FileSource extends Source
 {
-    File file;
-    FileReader reader;
+    protected final File file;
+    protected FileReader reader;
 
     public FileSource(String name) throws IOException {
         super(name);

@@ -7,15 +7,15 @@ import polyglot.main.Report;
 /** A <code>SourceLoader</code> is responsible for loading source files. */
 public class SourceLoader
 {
-    ExtensionInfo sourceExt;
-    Collection sourcePath;
+    protected ExtensionInfo sourceExt;
+    protected Collection sourcePath;
     
     /**
      * This is a map from Files (of directories) to Set[String]s, which
      * records the first level of contents of the directory. This cache
      * is used to avoid a number of File.exists() calls.
      */
-    Map directoryContentsCache;
+    protected Map directoryContentsCache;
 
     public SourceLoader(ExtensionInfo sourceExt, Collection sourcePath) {
 	this.sourcePath = sourcePath;
@@ -44,10 +44,10 @@ public class SourceLoader
     }
 
     /**
-     * The current user directory. We make it static so we don't need ot
+     * The current user directory. We make it static so we don't need to
      * keep on making copies of it. 
      */
-    static File current_dir = null;
+    protected static File current_dir = null;
     
     /** Load the source file for the given class name using the source path. */
     public FileSource classSource(String className) {
