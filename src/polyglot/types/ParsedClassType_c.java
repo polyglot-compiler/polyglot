@@ -157,41 +157,4 @@ public abstract class ParsedClassType_c extends ClassType_c
         }
         return interfaces;
     }
-
-    public TypeObject restore_() throws SemanticException {
-	if (package_ != null) {
-	    package_ = (Package) package_.restore();
-	}
-
-	if (superType != null) {
-	    superType = (Type) superType.restore();
-	}
-
-	for (ListIterator i = interfaces.listIterator(); i.hasNext(); ) {
-	    Type t = (Type) i.next();
-	    i.set(t.restore());
-	}
-
-	for (ListIterator i = fields.listIterator(); i.hasNext(); ) {
-	    FieldInstance t = (FieldInstance) i.next();
-	    i.set(t.restore());
-	}
-
-	for (ListIterator i = methods.listIterator(); i.hasNext(); ) {
-	    MethodInstance t = (MethodInstance) i.next();
-	    i.set(t.restore());
-	}
-
-	for (ListIterator i = constructors.listIterator(); i.hasNext(); ) {
-	    ConstructorInstance t = (ConstructorInstance) i.next();
-	    i.set(t.restore());
-	}
-
-	for (ListIterator i = memberClasses.listIterator(); i.hasNext(); ) {
-	    Type t = (Type) i.next();
-	    i.set(t.restore());
-	}
-
-	return this;
-    }
 }

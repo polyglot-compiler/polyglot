@@ -142,17 +142,6 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	return false;
     }
 
-    /** Restore the type after deserialization. */
-    public TypeObject restore_() throws SemanticException {
-	Type base = (Type) this.base.restore();
-
-	if (base != this.base) {
-	    return base(base);
-	}
-
-	return this;
-    }
-
     public boolean isImplicitCastValidImpl(Type toType) {
         if (toType.isArray()) {
             return ts.isImplicitCastValid(base(), toType.toArray().base());

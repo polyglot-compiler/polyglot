@@ -44,24 +44,6 @@ public abstract class TypeObject_c implements TypeObject
         return position;
     }
 
-    transient boolean restoring = false;
-
-    public TypeObject restore_() throws SemanticException {
-	return this;
-    }
-
-    public TypeObject restore() throws SemanticException {
-	if (restoring) return this;
-
-	restoring = true;
-
-	TypeObject o = restore_();
-
-	restoring = false;
-
-	return o;
-    }
-
     private void writeObject(ObjectOutputStream out) throws IOException {
 	out.writeObject(position);
     }

@@ -64,18 +64,6 @@ public class LocalInstance_c extends VarInstance_c implements LocalInstance
 	    (constantValue != null ? (" = " + constantValue) : "");
     }
 
-    public TypeObject restore_() throws SemanticException {
-	Type t = (Type) type.restore();
-
-	LocalInstance li = this;
-
-	if (t != li.type()) {
-	    li = type(t);
-	}
-
-	return li;
-    }
-
     public boolean isCanonical() {
 	return type.isCanonical();
     }

@@ -60,10 +60,6 @@ public class InitializerInstance_c extends TypeObject_c
         return flags.translate() + "initializer";
     }
 
-    public TypeObject restore_() throws SemanticException {
-	return this;
-    }
-
     public boolean isCanonical() {
 	return true;
     }

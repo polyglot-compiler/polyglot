@@ -74,20 +74,6 @@ public class ConstructorInstance_c extends ProcedureInstance_c
         return super.equals(o);
     }
 
-    public TypeObject restore_() throws SemanticException {
-	ClassType c = (ClassType) container.restore();
-	List a = restoreList(argTypes);
-	List e = restoreList(excTypes);
-
-	ConstructorInstance ci = this;
-
-	if (c != container) ci = ci.container(c);
-	if (a != argTypes) ci = ci.argumentTypes(a);
-	if (e != excTypes) ci = ci.exceptionTypes(e);
-
-	return ci;
-    }
-
     public boolean isCanonical() {
 	return container.isCanonical()
 	    && listIsCanonical(argTypes)

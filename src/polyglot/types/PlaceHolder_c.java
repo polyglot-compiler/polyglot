@@ -39,32 +39,28 @@ public class PlaceHolder_c extends Type_c implements PlaceHolder
 	}
     }
 
+    /** Restore the placeholder into a proper type. */ 
     public TypeObject resolve() {
-	try {
-	    return restore_();
+        try {
+            if (primitive) {
+                return ts.primitiveForName(name);
+            }
+            else if (outer == null) {
+                return ts.systemResolver().findType(name);
+            }
+            else {
+                ClassType o = (ClassType) outer.toClass();
+                ClassType m = o.memberClassNamed(name);
+
+                if (m == null) {
+                    throw new SemanticException("Member class \"" + name +
+                        "\" not found in class " + o + ".");
+                }
+
+                return m;
+            }
 	} catch (SemanticException se) {
 	    throw new InternalCompilerError(se.getMessage());
-	}
-    }
-    
-    /** Restore the placeholder into a proper type. */ 
-    public TypeObject restore_() throws SemanticException {
-	if (primitive) {
-	    return ts.primitiveForName(name);
-	}
-	else if (outer == null) {
-	    return ts.systemResolver().findType(name);
-	}
-	else {
-	    ClassType o = (ClassType) outer.toClass();//.restore();
-	    ClassType m = o.memberClassNamed(name);
-
-	    if (m == null) {
-		throw new SemanticException("Member class \"" + name +
-		    "\" not found in class " + o + ".");
-	    }
-
-	    return m;
 	}
     }
 

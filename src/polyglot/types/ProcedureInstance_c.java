@@ -61,21 +61,6 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 	return false;
     }
 
-    protected List restoreList(List l) throws SemanticException {
-	List n = new ArrayList(l.size());
-	boolean changed = false;
-
-	for (Iterator i = l.iterator(); i.hasNext(); ) {
-	    TypeObject o = (TypeObject) i.next();
-	    TypeObject r = o.restore();
-	    changed |= (o != r);
-	    n.add(r);
-	}
-
-	if (changed) return n;
-	return l;
-    }
-
     protected boolean listIsCanonical(List l) {
 	for (Iterator i = l.iterator(); i.hasNext(); ) {
 	    TypeObject o = (TypeObject) i.next();

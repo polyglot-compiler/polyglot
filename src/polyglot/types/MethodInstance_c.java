@@ -128,23 +128,6 @@ public class MethodInstance_c extends ProcedureInstance_c
         return "method";
     }
 
-
-    public TypeObject restore_() throws SemanticException {
-	ReferenceType c = (ReferenceType) container.restore();
-	Type t = (Type) returnType.restore();
-	List a = restoreList(argTypes);
-	List e = restoreList(excTypes);
-
-	MethodInstance mi = this;
-
-	if (c != container) mi = mi.container(c);
-	if (t != returnType) mi = mi.returnType(t);
-	if (a != argTypes) mi = mi.argumentTypes(a);
-	if (e != excTypes) mi = mi.exceptionTypes(e);
-
-	return mi;
-    }
-
     /** Returns true iff <this> is the same method as <m> */
     public final boolean isSameMethod(MethodInstance m) {
         return ts.isSameMethod(this, m);

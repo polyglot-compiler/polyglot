@@ -100,23 +100,6 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
 	    (v != null ? (" = " + v) : "");
     }
 
-    public TypeObject restore_() throws SemanticException {
-	ReferenceType c = (ReferenceType) container.restore();
-	Type t = (Type) type.restore();
-
-	FieldInstance fi = this;
-
-	if (c != fi.container()) {
-	    fi = container(c);
-	}
-
-	if (t != fi.type()) {
-	    fi = type(t);
-	}
-
-	return fi;
-    }
-
     public boolean isCanonical() {
 	return container.isCanonical() && type.isCanonical();
     }

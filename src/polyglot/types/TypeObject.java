@@ -22,9 +22,4 @@ public interface TypeObject extends Copy, Serializable
      * The object's position, or null.
      */
     Position position();
-
-    /**
-     * Restore the type object after de-serialization.
-     */
-    TypeObject restore() throws SemanticException;
 }
