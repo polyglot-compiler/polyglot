@@ -70,6 +70,8 @@ public class Main
 
     try
     {
+      Compiler.verbose( Main.class, "read all files from the command-line.");
+
       iter = source.iterator();
       while( iter.hasNext()) {
         targetName = (String)iter.next();
@@ -77,6 +79,8 @@ public class Main
           hasErrors = true;
         }
       }
+
+      Compiler.verbose( Main.class, "done reading, now translating...");
 
       iter = source.iterator();
       while( iter.hasNext()) {

@@ -197,7 +197,12 @@ public class MethodExpression extends Expression
   public void translate( LocalContext c, CodeWriter w)
   {
     if( target != null) {
-      target.translate( c, w);
+      if( target instanceof Expression) {
+        translateExpression( (Expression)target, c, w);
+      }
+      else {
+        target.translate( c, w);
+      }
       w.write( ".");
     }
 

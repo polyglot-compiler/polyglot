@@ -36,7 +36,7 @@ public class TableClassResolver implements ClassResolver
   {
     ClassType clazz = (ClassType)table.get( name);
     if( clazz == null)
-      throw new NoClassException( "Class " + name + " not found.");
+      throw new NoClassException( "Class \"" + name + "\" not found.");
     return clazz;
   }
 
@@ -87,7 +87,7 @@ public class TableClassResolver implements ClassResolver
             if( !cleanupClassSignatures( (ParsedClassType)superClazz, 
                                          ts, it, eq)) { 
               eq.enqueue( ErrorInfo.SEMANTIC_ERROR,
-                          "Errors while compiling dependencies of "
+                          "Errors while compiling dependencies of \""
                           + clazz.getShortName() + "\".");
               queue.remove( clazz);
               return false;
@@ -97,7 +97,7 @@ public class TableClassResolver implements ClassResolver
             try {
               if( !cc.cleanClass( superClazz)) {
                 eq.enqueue( ErrorInfo.SEMANTIC_ERROR,
-                            "Errors while compiling dependencies of "
+                            "Errors while compiling dependencies of \""
                             + clazz.getShortName() + "\".");
                 queue.remove( clazz);
                 return false;
@@ -105,6 +105,7 @@ public class TableClassResolver implements ClassResolver
             }
             catch( IOException e) 
             {
+              e.printStackTrace();
               eq.enqueue( ErrorInfo.IO_ERROR, 
                         "Encountered an I/O error while compiling "
                         + "dependencies of \"" + clazz.getShortName() + "\".");
@@ -159,7 +160,7 @@ public class TableClassResolver implements ClassResolver
             try {
               if( !cc.cleanClass( implementsClazz)) {
                 eq.enqueue( ErrorInfo.SEMANTIC_ERROR,
-                            "Errors while compiling dependencies of "
+                            "Errors while compiling dependencies of \""
                             + clazz.getShortName() + "\".");
                 queue.remove( clazz);
                 return false;

@@ -803,7 +803,8 @@ constructor_declaration ::=
 			constructor_body:d
 			{: List f = new LinkedList(); Grm.addAll(f, 
 				b.formalParameters());
-				RESULT = b.reconstruct( true, a, null, null,
+				RESULT = b.reconstruct( true, a, 
+				b.getReturnTypeNode(), null,
 				f, c, d, 0); :}
 	;
 constructor_declarator ::=
@@ -811,7 +812,10 @@ constructor_declarator ::=
 		simple_name:a LPAREN formal_parameter_list_opt:b RPAREN
 			{: RESULT = (MethodNode)Grm.ln(new MethodNode(
 				new AccessFlags(),
-				b, new LinkedList(), null), a); :}
+				(TypeNode)Grm.ln( new TypeNode( 
+				new AmbiguousType( parser.ts, a.getName()),
+				a.getName()), a), b,
+				new LinkedList(), null), a); :}
 	;
 constructor_body ::=
 					// BlockStatement

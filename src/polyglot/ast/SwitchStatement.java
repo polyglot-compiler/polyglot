@@ -198,6 +198,7 @@ public class SwitchStatement extends Statement
        {
          SwitchBlock sb =  new SwitchBlock ( block );
          sb.copyAnnotationsFrom ( this );
+         return sb;
        }
        return this;
      }
@@ -331,7 +332,7 @@ public class SwitchStatement extends Statement
            key = "default";
          else
            key = new Long ( ((CaseStatement)se).iValue);
-         
+
          if ( lDefinedCaseLabels.contains( key ) )
            throw new SemanticException( "Duplicate case label: " + key, 
                                          Annotate.getLineNumber( se ) );

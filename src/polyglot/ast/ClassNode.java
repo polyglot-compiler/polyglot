@@ -70,7 +70,8 @@ public class ClassNode extends ClassMember
           || this.members.size() != members.size()) {
       ClassNode n = new ClassNode( accessFlags, name, superClass, 
                                    interfaces, members);
-      n.type = this.type;
+
+      n.type = type;
       n.copyAnnotationsFrom( this);
       return n;
     }
@@ -79,6 +80,7 @@ public class ClassNode extends ClassMember
         if( this.interfaces.get( i) != interfaces.get( i)) {
           ClassNode n = new ClassNode( accessFlags, name, superClass, 
                                        interfaces, members);
+          n.type = type;
           n.copyAnnotationsFrom( this);
           n.type = this.type;
           return n;
@@ -213,6 +215,7 @@ public class ClassNode extends ClassMember
     type.setAccessFlags( accessFlags);
 
     visitChildren( sr);
+
     sr.popClass();
     return this;
   }

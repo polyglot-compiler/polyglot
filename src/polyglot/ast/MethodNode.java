@@ -37,12 +37,12 @@ public class MethodNode extends ClassMember
    *  <code>FormalParameter</code> and that each element of 
    *  <code>exceptions</code> is of type <code>TypeNode</code>.
    */
-  public MethodNode( AccessFlags accessFlags, List formals, List exceptions, 
-                     BlockStatement body) 
+  public MethodNode( AccessFlags accessFlags, TypeNode tn, List formals, 
+                     List exceptions, BlockStatement body) 
   {
     this.isConstructor = true;
     this.accessFlags = accessFlags;
-    this.returns = null;
+    this.returns = tn;
     this.name = null;
     this.formals = TypedList.copyAndCheck( formals, FormalParameter.class, 
                                            true);
@@ -118,8 +118,8 @@ public class MethodNode extends ClassMember
         || this.body != body 
         || this.addDims != addDims) {
       MethodNode n = (isConstructor ? 
-                      new MethodNode( accessFlags, formals, exceptions,
-                                      body) :
+                      new MethodNode( accessFlags, returns, formals, 
+                                      exceptions, body) :
                       new MethodNode( accessFlags, returns, name, 
                                       formals, exceptions, body, 
                                       addDims));
@@ -131,8 +131,8 @@ public class MethodNode extends ClassMember
       for( int i = 0; i < formals.size(); i++) {
         if( this.formals.get( i) != formals.get( i)) {
           MethodNode n = (isConstructor ? 
-                          new MethodNode( accessFlags, formals, exceptions,
-                                          body) :
+                          new MethodNode( accessFlags, returns, formals, 
+                                          exceptions, body) :
                           new MethodNode( accessFlags, returns, name, 
                                           formals, exceptions, body, 
                                           addDims));
@@ -145,8 +145,8 @@ public class MethodNode extends ClassMember
       for( int i = 0; i < exceptions.size(); i++) {
         if( this.exceptions.get( i) != exceptions.get( i)) {
           MethodNode n = (isConstructor ? 
-                          new MethodNode( accessFlags, formals, exceptions,
-                                          body) :
+                          new MethodNode( accessFlags, returns, formals, 
+                                          exceptions, body) :
                           new MethodNode( accessFlags, returns, name, 
                                           formals, exceptions, body, 
                                           addDims));
@@ -195,6 +195,11 @@ public class MethodNode extends ClassMember
     else {
       return returns.getType();
     }
+  }
+
+  public TypeNode getReturnTypeNode()
+  {
+    return returns;
   }
 
   /**
@@ -255,11 +260,7 @@ public class MethodNode extends ClassMember
   
   Node visitChildren( NodeVisitor v) 
   {
-    TypeNode newreturns = null;
-    
-    if( returns != null) {
-      newreturns = (TypeNode)returns.visit( v);
-    }
+    TypeNode newReturns = (TypeNode)returns.visit( v);
 
     List newFormals = new ArrayList( formals.size()),
       newExceptions = new ArrayList( exceptions.size());
@@ -285,7 +286,7 @@ public class MethodNode extends ClassMember
       newBody = (BlockStatement)body.visit( v); 
     }
 
-    return reconstruct( isConstructor, accessFlags, newreturns, name,
+    return reconstruct( isConstructor, accessFlags, newReturns, name,
                         newFormals, newExceptions, newBody,
                         addDims);
   }
@@ -294,14 +295,6 @@ public class MethodNode extends ClassMember
   {
     ParsedClassType clazz = sr.getCurrentClass();
     TypeSystem ts = sr.getTypeSystem();
-
-    /*
-     * FIXME
-    if( isConstructor) {
-      returns = new TypeNode (ts.getVoid());
-      Annotate.setLineNumber( returns, Annotate.getLineNumber( this ) );
-    }
-    */
 
     /* Build a list of argument types. */
     List argTypes = new LinkedList();
@@ -385,7 +378,8 @@ public class MethodNode extends ClassMember
       w.write( " " + name + "( ");
     }
     else {
-      w.write( name + "( ");
+      returns.translate( c, w);
+      w.write( "( ");
     }
 
     for( Iterator iter = formals.iterator(); iter.hasNext(); )

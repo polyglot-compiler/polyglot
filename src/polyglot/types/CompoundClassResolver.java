@@ -34,7 +34,7 @@ public class CompoundClassResolver implements ClassResolver
       catch( NoClassException e) {}
     }
 
-    throw new NoClassException( "Class " + name + " not found.");
+    throw new NoClassException( "Class \"" + name + "\" not found.");
   }
 
   public void findPackage( String name) throws NoClassException
@@ -53,6 +53,6 @@ public class CompoundClassResolver implements ClassResolver
       catch( NoClassException e) {}
     }
     
-    throw new NoClassException( "Package " + name + " not found.");
+    throw new NoClassException( "Package \"" + name + "\" not found.");
   }
 }

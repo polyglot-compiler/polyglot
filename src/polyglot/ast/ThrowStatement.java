@@ -32,7 +32,7 @@ public class ThrowStatement extends Statement
     else {
       ThrowStatement n = new ThrowStatement( expr);
       n.copyAnnotationsFrom( this);
-      return this;
+      return n;
     }
   }
 
@@ -76,7 +76,7 @@ public class ThrowStatement extends Statement
   
   public void dump( CodeWriter w)
   {
-    w.write( "( THROW");
+    w.write( "( THROW ");
     dumpNodeInfo( w);
     w.write( ")");
   }

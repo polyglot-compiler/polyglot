@@ -235,9 +235,15 @@ public class Compiler implements TargetTable, ClassCleaner
 
   public boolean cleanClass( ClassType clazz) throws IOException
   {
-    Job job = lookupJob( tf.createClassTarget( clazz.getFullName()));
-
-    return compile( job, CLEANED);
+    try
+    {
+      Job job = lookupJob( tf.createClassTarget( clazz.getFullName()));
+      return compile( job, CLEANED);
+    }
+    catch( FileNotFoundException e)
+    {
+      return false;
+    }
   } 
 
   public boolean compile( Target t) throws IOException
@@ -457,13 +463,16 @@ public class Compiler implements TargetTable, ClassCleaner
   /* Protected Methods. */
   protected Job lookupJob( Target t) throws IOException
   {
+    /* Now check the worklist. */
     Job job = new Job( t);
     
     synchronized( workList) {
       if( workList.contains( job)) {
+        /* Found it. */
         job = (Job)workList.get( workList.indexOf( job));
       }
       else {
+        /* No sign of it, Add the new job. */
         workList.add( job);
       }
     }

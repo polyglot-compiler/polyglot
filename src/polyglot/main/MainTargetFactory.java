@@ -124,7 +124,8 @@ public class MainTargetFactory implements TargetFactory
           }
           else {
             outputFile = new File( outputDirectory, 
-                                   packageName.replace( '.', File.separatorChar)
+                                   packageName.replace( '.', 
+                                                        File.separatorChar)
                                    + File.separatorChar
                                    + name.substring( 0, name.lastIndexOf( 
                                        sourceExtension))
