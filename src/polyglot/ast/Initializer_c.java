@@ -3,29 +3,12 @@ package polyglot.ext.jl.ast;
 import java.util.Iterator;
 import java.util.List;
 
-import polyglot.ast.Block;
-import polyglot.ast.CodeDecl;
-import polyglot.ast.Initializer;
-import polyglot.ast.Node;
-import polyglot.ast.Term;
-import polyglot.types.ClassType;
-import polyglot.types.CodeInstance;
-import polyglot.types.Context;
-import polyglot.types.Flags;
-import polyglot.types.InitializerInstance;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.types.TypeSystem;
+import polyglot.ast.*;
+import polyglot.types.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SubtypeSet;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.CFGBuilder;
-import polyglot.visit.ExceptionChecker;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeBuilder;
-import polyglot.visit.TypeChecker;
+import polyglot.visit.*;
 
 /**
  * An <code>Initializer</code> is an immutable representation of an
@@ -130,6 +113,11 @@ public class Initializer_c extends Term_c implements Initializer
         ClassType ct = tb.currentClass();
         InitializerInstance ii = ts.initializerInstance(position(), ct, flags);
         return initializerInstance(ii);
+    }
+
+    public NodeVisitor addMembersEnter(AddMemberVisitor am) {
+        // do not add members for the children of this node.
+        return am.bypassChildren(this);
     }
 
     public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
