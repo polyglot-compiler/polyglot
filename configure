@@ -48,8 +48,10 @@ find_in_path() {
 
 exists() {
     if [ ! "$1" "$2" ]; then
-	echo "** Error: $2 not found"
+	echo "** Error: $3 not found"
 	exit 1
+   else
+        if test "$3" != "$2"; then echo "$3 is $2"; fi
     fi
 }
 
@@ -64,31 +66,23 @@ JAVADOC=`find_in_path javadoc`
 JAR=`find_in_path jar`
 RMIC=`find_in_path rmic`
 
-exists -x "${JAVA}"
-echo java is "${JAVA}"
+exists -x "${JAVA}" java
 
-exists -x "${JAVAC}"
-echo javac is "${JAVAC}"
+exists -x "${JAVAC}" javac
 
-exists -x "${JAVAH}"
-echo javah is "${JAVAH}"
+exists -x "${JAVAH}" javah
 
-exists -x "${JAVADOC}"
-echo javadoc is "${JAVADOC}"
+exists -x "${JAVADOC}" javadoc
 
-exists -x "${JAR}"
-echo jar is "${JAR}"
+exists -x "${JAR}" jar
 
-exists -x "${RMIC}"
-echo rmic is "${RMIC}"
+exists -x "${RMIC}" rmic
 
 if [ ! -d src ] 
 then
-	exists -f ./java_cup.jar
-	echo java_cup.jar is ./java_cup.jar
+	exists -f ./java_cup.jar java_cup.jar
 else
-	exists -f ./src/java_cup.jar
-	echo java_cup.jar is ./src/java_cup.jar
+	exists -f ./src/java_cup.jar java_cup.jar
 fi
 
 echo determining some Java properties:
@@ -101,10 +95,10 @@ public class PrintProperty {
 }
 EOF
 
-exists -f PrintProperty.java
+exists -f PrintProperty.java PrintProperty.java
 
 "${JAVAC}" PrintProperty.java
-exists -f PrintProperty.class
+exists -f PrintProperty.class PrintProperty.class
 
 JAVA_VER=`"${JAVA}" -cp . PrintProperty java.version | escape`
 echo java version is ${JAVA_VER}
@@ -134,12 +128,10 @@ ESC_JAVA_HOME=`echo ${JAVA_HOME} | escape`
 echo escaped Java home directory is "${ESC_JAVA_HOME}"
 
 TOOLS_JAR="${JAVA_HOME}/lib/tools.jar"
-exists -f "${TOOLS_JAR}"
-echo tools.jar is "${TOOLS_JAR}"
+exists -f "${TOOLS_JAR}" tools.jar
 
 RT_JAR="${JAVA_HOME}/jre/lib/rt.jar"
-exists -f "${RT_JAR}"
-echo rt.jar is "${RT_JAR}"
+exists -f "${RT_JAR}" rt.jar
 
 if [ -d "${JAVA_HOME}/include/win32" ]
 then
@@ -279,7 +271,7 @@ JAVADOC_PACKAGES = ${JAVADOC_PACKAGES}
 JAVADOC_SOURCEPATH = ${JAVADOC_SOURCEPATH}
 EOF
 
-exists -f ${DEFS_MK}
+exists -f ${DEFS_MK} Defs.mk
 
 # Create the bin directory and scripts
 
