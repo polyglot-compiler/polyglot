@@ -33,19 +33,23 @@ public class VisitorPass extends AbstractPass
 	    throw new InternalCompilerError("Null AST: did the parser run?");
 	}
 
-        ErrorQueue q = job.compiler().errorQueue();
-        int nErrsBefore = q.errorCount();
+        if (v.begin()) {
+            ErrorQueue q = job.compiler().errorQueue();
+            int nErrsBefore = q.errorCount();
 
-	ast = ast.visit(v);
-        v.finish();
+            ast = ast.visit(v);
+            v.finish();
 
-        int nErrsAfter = q.errorCount();
+            int nErrsAfter = q.errorCount();
 
-	job.ast(ast);
+            job.ast(ast);
 
-        return (nErrsBefore == nErrsAfter);
-        // because, if they're equal, no new errors occured,
-        // so the run was successful.
+            return (nErrsBefore == nErrsAfter);
+            // because, if they're equal, no new errors occured,
+            // so the run was successful.
+        }
+
+        return false;
     }
 
     public String toString() {
