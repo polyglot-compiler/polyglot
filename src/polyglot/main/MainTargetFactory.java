@@ -130,8 +130,8 @@ public class MainTargetFactory implements TargetFactory
     }
 
     public Collection outputFiles() {
-	LinkedList ret = new LinkedList();
-	ret.add(outputFile);
+	Collection ret = new HashSet();
+	ret.add(outputFileName);
 	return ret;
     }
 

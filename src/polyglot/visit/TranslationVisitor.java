@@ -4,6 +4,7 @@ import jltools.ast.*;
 import jltools.frontend.*;
 import jltools.types.*;
 import jltools.util.*;
+import jltools.main.Main;
 
 import java.io.*;
 import java.util.Collection;
@@ -54,6 +55,8 @@ public class TranslationVisitor extends NodeVisitor
 	    w.flush();
 	    System.out.flush();
 	    target.closeDestination();
+	    Main.report(null, 3, "Target output files: " +
+		target.outputFiles());
 	    outputFiles.addAll(target.outputFiles());
 	}
 	catch (IOException e) {
