@@ -228,7 +228,7 @@ public abstract class Type_c extends TypeObject_c implements Type
             String name = ((Importable) this).fullName();
             out.writeObject(name);
             String memberName = null;
-            if (this.isClass() && this.toClass().isMember()) {
+            if (name != null && this.isClass() && this.toClass().isMember()) {
                 memberName = this.typeSystem().getTransformedClassName(this.toClass());
             }
             out.writeObject(memberName);
@@ -245,8 +245,10 @@ public abstract class Type_c extends TypeObject_c implements Type
             String name = (String) in.readObject();
             String memberName = (String) in.readObject();
             TypeSystem ts = ((TypeInputStream) in).getTypeSystem();
-            
-            ((CachingResolver) ts.systemResolver()).install(name, this);
+
+            if (name != null) {
+                ((CachingResolver) ts.systemResolver()).install(name, this);
+            }
             
             if (memberName != null) {
                 ((CachingResolver) ts.systemResolver()).install(memberName, this);
