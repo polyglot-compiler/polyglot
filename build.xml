@@ -562,6 +562,8 @@ ext=''
     </javadoc>
   </target>
 
+  <target name="jar" depends="polyglot-jar,ppg-jar"/>
+
   <target name="polyglot-dist" depends="jl-dist,skel-dist,pao-dist,coffer-dist"/>
   <target name="polyglot-dist-javadoc" depends="polyglot-dist,dist-javadoc"/>
   <target name="polyj-dist" depends="jl-dist,polyj"/>
