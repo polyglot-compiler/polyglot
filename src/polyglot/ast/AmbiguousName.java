@@ -16,8 +16,8 @@ import java.util.*;
  **/
 public class AmbiguousName extends Node implements AmbiguousNode {
 
-  Node prefix;
-  String name;
+  protected Node prefix;
+  protected String name;
 
   public AmbiguousName( Node ext, Node prefix, String s) {
       this.ext = ext;
