@@ -3,6 +3,8 @@ LOG=log
 GOOD =  \
 	ArrayInit.jl \
 	Conditional1.jl \
+	ConformanceCheck1.jl \
+	ConformanceCheck2.jl \
 	ConformanceCheck3.jl \
 	Constants.jl \
 	Constants2.jl \
@@ -55,6 +57,7 @@ GOOD =  \
 	Inner7.jl \
 	Inner8.jl \
 	Inner9.jl \
+	InterfaceOverride.jl \
 	LabeledBreak.jl \
 	Local.jl \
 	LocalClass.jl \
@@ -129,8 +132,6 @@ BAD = \
 	BadSwitch1.jl \
 	BadSwitch2.jl \
 	CircularConstructor.jl \
-	ConformanceCheck1.jl \
-	ConformanceCheck2.jl \
 	DoubleFlags.jl \
 	Errors.jl \
 	Errors2.jl \
