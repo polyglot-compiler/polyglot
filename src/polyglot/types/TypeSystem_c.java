@@ -945,15 +945,29 @@ public class TypeSystem_c implements TypeSystem
 	if (type1.isReference() && type2.isReference()) {
 	    // Don't consider interfaces.
 	    if (type1.isClass() && type1.toClass().flags().isInterface()) {
-		type1 = Object();
+	        return Object();
 	    }
 
 	    if (type2.isClass() && type2.toClass().flags().isInterface()) {
-		type2 = Object();
+	        return Object();
 	    }
+
+	    // Check against Object to ensure superType() is not null.
+	    if (isSame(type1, Object())) return type1;
+	    if (isSame(type2, Object())) return type2;
 
 	    if (type1.isSubtype(type2)) return type2;
 	    if (type2.isSubtype(type1)) return type1;
+
+	    // Walk up the hierarchy
+	    Type t1 = leastCommonAncestor(type1.toReference().superType(),
+		                          type2);
+	    Type t2 = leastCommonAncestor(type2.toReference().superType(),
+					  type1);
+
+	    if (isSame(t1, t2)) return t1;
+	    
+	    return Object();
 	}
 
 	throw new SemanticException(
