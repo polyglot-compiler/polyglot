@@ -227,9 +227,18 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     public List implementedImpl(ReferenceType rt) {
+	if (rt == null) {
+	    return Collections.EMPTY_LIST;
+	}
+
         List l = new LinkedList();
         l.addAll(rt.methods(name, argTypes));
-        
+
+	Type superType = rt.superType();
+	if (superType != null) {
+	    l.addAll(implementedImpl(superType.toReference())); 
+	}
+	
 	List ints = rt.interfaces();
 	for (Iterator i = ints.iterator(); i.hasNext(); ) {
 	    ReferenceType rt2 = (ReferenceType) i.next();
