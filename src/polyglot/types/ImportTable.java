@@ -157,11 +157,21 @@ public class ImportTable extends ClassResolver
             return (Named) res;
         }
 
-        List imports = new ArrayList(packageImports.size() + 5);
-
         if (pkg != null) {
-            imports.add(pkg.fullName());
+            // check if the current package defines it.
+            // If so, this takes priority over the package imports (or 
+            // "type-import-on-demand" declarations as they are called in
+            // the JLS), so even if another package defines the same name,
+            // there is no conflict. See Section 6.5.2 of JLS, 2nd Ed.
+            Named n = findInPkg(name, pkg.fullName());
+            if (n != null) {
+                // Memoize the result.
+                map.put(name, n);
+                return n;
+            }
         }
+
+        List imports = new ArrayList(packageImports.size() + 5);
 
         imports.addAll(ts.defaultPackageImports());
         imports.addAll(packageImports);
@@ -170,33 +180,24 @@ public class ImportTable extends ClassResolver
         Named resolved = null;
         for (Iterator iter = imports.iterator(); iter.hasNext(); ) {
             String pkgName = (String) iter.next();
-            String fullName = pkgName + "." + name;
-
-            try {
-                Named n = resolver.find(fullName); 
-        
-                // Check if the type is visible in this package.
-                if (isVisibleFrom(n, pkgName)) {
-                    if (resolved == null) {
-                        // this is the first occurance of name we've found
-                        // in a package import.
-                        // Record it, and keep going, to see if there
-                        // are any conflicts.
-                        resolved = n;
-                    }
-                    else {
-                        // this is the 2nd occurance of name we've found
-                        // in an imported package.
-                        // That's bad.
-                        throw new SemanticException("Reference to \"" + 
-                                name + "\" is ambiguous; both " + 
-                                resolved.fullName() + " and " + n.fullName() + 
-                                " match.");
-                    }
+            Named n = findInPkg(name, pkgName);
+            if (n != null) {
+                if (resolved == null) {
+                    // this is the first occurance of name we've found
+                    // in a package import.
+                    // Record it, and keep going, to see if there
+                    // are any conflicts.
+                    resolved = n;
                 }
-            }
-            catch (NoClassException ex) {
-                // Do nothing.
+                else {
+                    // this is the 2nd occurance of name we've found
+                    // in an imported package.
+                    // That's bad.
+                    throw new SemanticException("Reference to \"" + 
+                            name + "\" is ambiguous; both " + 
+                            resolved.fullName() + " and " + n.fullName() + 
+                            " match.");
+                }
             }
         }
 
@@ -214,6 +215,22 @@ public class ImportTable extends ClassResolver
         // Memoize the result.
         map.put(name, resolved);
         return resolved;
+    }
+    
+    protected Named findInPkg(String name, String pkgName) throws SemanticException {
+        String fullName = pkgName + "." + name;
+        try {
+            Named n = resolver.find(fullName); 
+        
+            // Check if the type is visible in this package.
+            if (isVisibleFrom(n, pkgName)) {
+                return n;
+            }
+        }
+        catch (NoClassException ex) {
+            // Do nothing.
+        }
+        return null;
     }
 
     /**
