@@ -13,7 +13,7 @@ then
     extra_cp="${PATH_SEP}${extra_cp}"
 fi
 
-classpath="${TOP}${FILE_SEP}classes${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}java_cup.jar${PATH_SEP}.${extra_cp}"
+classpath="${TOP}${FILE_SEP}classes${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}polyglot.jar${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}java_cup.jar${extra_cp}"
 command="\"$JAVA\" $profile -classpath \"$classpath\" polyglot.main.Main $ext $args"
 
 if [ -n "$verbose" ]
