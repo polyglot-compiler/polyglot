@@ -15,19 +15,11 @@ contains the following sub-directories:
 Disclaimer
 ----------
 
-<<<<<<< README
 Polglot is research software.  Over time, some of the interfaces in the
 framework may change.  This may require some extensions to be changed to
 conform to the new interfaces.  Also, Polyglot is not well-documented; in
 particular, some of the javadoc is missing or out-of-date.  We are working on
 writing better documentation.  Watch the web page:
-=======
-Polyglot is ALPHA software.  Some of the interfaces in the framework
-may change.  This may require some extensions to be changed to conform
-to the new interfaces.  Also, Polyglot is not well-documented; in
-particular, some of the javadoc is missing or out-of-date.  We are
-working on writing better documentation.  Watch the web page:
->>>>>>> 1.28
 
     http://www.cs.cornell.edu/Projects/polyglot
 
