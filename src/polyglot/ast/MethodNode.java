@@ -474,6 +474,8 @@ public class MethodNode extends ClassMember
       }
     }
     w.end();
+
+    enterScope(c);
     
     if( !mtiThis.getAccessFlags().isAbstract() ) {
       // FIXME should be abstract for interfaces.
@@ -486,6 +488,8 @@ public class MethodNode extends ClassMember
     else {
       w.write(";");
     }
+
+    leaveScope(c);
 
     w.newline( 0);
   }

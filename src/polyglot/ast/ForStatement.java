@@ -197,6 +197,7 @@ public class ForStatement extends Statement
     if( inits != null) {
       for( Iterator iter = inits.iterator(); iter.hasNext(); ) {
         Statement stmt = (Statement)iter.next();
+	enterScope(c);
         if( stmt instanceof VariableDeclarationStatement) {
           stmt.translate_block (c, w);
           writeSemicolon = false;
@@ -253,7 +254,17 @@ public class ForStatement extends Statement
     if (body == null) {
       w.write(";");
     }
+
+    enterScope(c);
     body.translate_substmt(c, w);
+    leaveScope(c);
+
+    if( inits != null) {
+      for( Iterator iter = inits.iterator(); iter.hasNext(); ) {
+        Statement stmt = (Statement)iter.next();
+	leaveScope(c);
+      }
+    }
   }
 
   public void dump( CodeWriter w)

@@ -141,6 +141,7 @@ public class BlockStatement extends Statement {
 
   public void translate( LocalContext c, CodeWriter w)
   {
+    enterScope(c);
     w.write("{");
     w.allowBreak(4," ");
     w.begin(0);
@@ -153,6 +154,7 @@ public class BlockStatement extends Statement {
     w.end();
     w.allowBreak(0, " ");
     w.write("}");
+    leaveScope(c);
   }
 
   public void dump( CodeWriter w)

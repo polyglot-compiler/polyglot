@@ -145,7 +145,9 @@ public class CatchBlock extends Node
     fp.translate_block(c, w);
     w.write(")");
 
+    enterScope(c);
     block.translate_substmt(c, w);
+    leaveScope(c);
   }
   
   public void dump( CodeWriter w)
