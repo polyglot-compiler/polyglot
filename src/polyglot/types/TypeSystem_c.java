@@ -1511,6 +1511,10 @@ public class TypeSystem_c implements TypeSystem
 		f.clear(TOP_LEVEL_CLASS_FLAGS) + ".");
 	}
 
+        if (f.isStrictFP() && f.isInterface()) {
+            throw new SemanticException("Cannot declare a strictfp interface.");
+        }
+
         if (f.isFinal() && f.isInterface()) {
             throw new SemanticException("Cannot declare a final interface.");
         }
@@ -1525,6 +1529,10 @@ public class TypeSystem_c implements TypeSystem
 		f.clear(MEMBER_CLASS_FLAGS) + ".");
 	}
 
+        if (f.isStrictFP() && f.isInterface()) {
+            throw new SemanticException("Cannot declare a strictfp interface.");
+        }
+
         if (f.isFinal() && f.isInterface()) {
             throw new SemanticException("Cannot declare a final interface.");
         }
@@ -1533,15 +1541,15 @@ public class TypeSystem_c implements TypeSystem
     }
 
     public void checkLocalClassFlags(Flags f) throws SemanticException {
+        if (f.isInterface()) {
+            throw new SemanticException("Cannot declare a local interface.");
+        }
+
       	if (! f.clear(LOCAL_CLASS_FLAGS).equals(Flags.NONE)) {
 	    throw new SemanticException(
 		"Cannot declare a local class with flag(s) " +
 		f.clear(LOCAL_CLASS_FLAGS) + ".");
 	}
-
-        if (f.isFinal() && f.isInterface()) {
-            throw new SemanticException("Cannot declare a final interface.");
-        }
 
 	checkAccessFlags(f);
     }
