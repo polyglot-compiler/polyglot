@@ -64,6 +64,7 @@ PACKAGES = \
 	jltools.ext.jmatch.ast \
 	jltools.ext.jmatch.extension \
 	jltools.ext.jmatch.ir \
+	jltools.ext.jmatch.types \
 	jltools.ext.jmatch.visit \
 	jltools.ext.split \
 	jltools.ext.split.ast \
