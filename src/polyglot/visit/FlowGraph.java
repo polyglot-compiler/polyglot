@@ -28,6 +28,10 @@ public class FlowGraph {
   public boolean replicateFinally() { return replicateFinally; }
   public Collection peers() { return peerMap.values(); }
 
+  public Peer peer(Computation n, DataFlow df) {
+    return peer(n, Collections.EMPTY_LIST, df);
+  }
+
   public Peer peer(Computation n, List path_to_finally, DataFlow df) {
     NodeKey k = new NodeKey(n, path_to_finally);
     Peer p = (Peer) peerMap.get(k);
