@@ -76,7 +76,8 @@ public class ReturnStatement extends Statement
 				  Annotate.getLineNumber(this));
                                   
     if( expr == null) {
-      if( !mti.getReturnType().equals( c.getTypeSystem().getVoid())) {
+      if( !mti.isConstructor() &&
+          !mti.getReturnType().equals( c.getTypeSystem().getVoid())) {
         throw new SemanticException( 
                           "Method \"" + mti.getName() + "\" must return "
                           + "an expression of type \"" 
