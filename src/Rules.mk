@@ -10,6 +10,7 @@ include $(SOURCE)/Defs.mk
 .SUFFIXES: .class .java
 
 JC_FLAGS 		= -g -d $(SOURCE)/classes $(JAVAC_PATHS)
+RMIC_FLAGS		= -g -d $(SOURCE)/classes -classpath $(CLASSPATH)
 
 JAR_FILE		= jltools.jar
 JAR_FLAGS		= cf 
