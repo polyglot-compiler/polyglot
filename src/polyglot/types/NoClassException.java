@@ -15,7 +15,9 @@ public class NoClassException extends SemanticException {
     }
     
     public NoClassException(String className, Named scope) {
-        super("Class \"" + className + "\" not found in scope of " + scope.toString()); 
+        super("Class \"" + className + "\" not found"
+                + (scope != null ? ("in scope of " + scope.toString())
+                                 : "."));
         this.className = className;
     }
   
