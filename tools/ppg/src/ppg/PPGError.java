@@ -12,6 +12,6 @@ public class PPGError extends Throwable
 	}
 	
 	public String getMessage() {
-		return filename+": error on line "+String.valueOf(line)+": "+error;
+		return filename + ":" + line + ": syntax error: " + error;
 	}
 }
