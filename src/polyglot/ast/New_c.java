@@ -336,7 +336,6 @@ FIXME: check super types as well.
                     qualifier.position());
             }
 
-
             n = (New_c) n.objectType(tn);
         }
         else {
@@ -394,8 +393,19 @@ FIXME: check super types as well.
 	    }
 	}
 
+
         if (! ct.flags().isInterface()) {
-            ci = ts.findConstructor(ct, argTypes, tc.context());
+            Context c = tc.context();
+            if (body != null) {
+                // Enter the body of this class so we can access protected
+                // super-constructors.
+
+                // temporarily set the super type; we'll set it correctly below
+                anonType.superType(ct);
+
+                c = c.pushClass(anonType, anonType);
+            }
+            ci = ts.findConstructor(ct, argTypes, c);
         }
         else {
             ci = ts.defaultConstructor(position(), ct);
