@@ -111,9 +111,6 @@ release_doc: FORCE
 	cp -f BUILD.txt $(REL_SRC)/README
 	$(MAKE) -C doc release
 
-release_demo: FORCE
-	mkdir -p $(REL_DEMO)
-
 release: jar release_clean release_doc release_src
 	cp -f configure.rel $(RELPATH)/configure
 	$(subdirs)
