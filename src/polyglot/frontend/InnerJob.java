@@ -55,8 +55,8 @@ public class InnerJob extends Job
     }
 
     public String toString() {
-      String name = "inner-job[" + begin + ".." + end + "](" +
-          context.currentCode() + " in " + context.currentClass() + ")";
+      String name = "inner-job[" + begin + ".." + end + "](code=" +
+          context.currentCode() + " class=" + context.currentClass() + ") [" + status() + "]";
           
        return name + " (" +
             (isRunning() ? "running " : "before ") + 
