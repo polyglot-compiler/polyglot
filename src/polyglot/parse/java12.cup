@@ -1340,8 +1340,8 @@ dim_exprs ::=
     ;
 dim_expr ::=
                     // Expr
-        LBRACK expression:a RBRACK
-            {: RESULT = a; :}
+        LBRACK:x expression:a RBRACK:y
+            {: RESULT = (Expr)a.position(parser.pos(x,y,a)); :}
     ;
 dims_opt ::=
                     // Integer
