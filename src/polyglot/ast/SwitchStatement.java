@@ -20,17 +20,9 @@ public class SwitchStatement extends Statement
   private List switchElems;
   
   /**
-   * An element of a switch statement.  This can either be
-   * a case label, or a set of statements.
-   */
-  public static abstract class SwitchElement extends Statement 
-  {
-  }
-  
-  /**
    * A case statement or a default label in a switch block.  
    */
-  public static class CaseStatement extends SwitchElement 
+  public static class CaseStatement extends Statement
   {
     /**
      * Effects: Creates a new CaseStement with <expr> as the value
@@ -177,7 +169,7 @@ public class SwitchStatement extends Statement
     private int iValue;
    }
 
-   public static class SwitchBlock extends SwitchElement {
+   public static class SwitchBlock extends Statement{
     
       private BlockStatement block;
 
@@ -231,8 +223,7 @@ public class SwitchStatement extends Statement
    }
 
    /**
-    * Requires: <code>switchElems</code> contains only elements of type 
-    * SwitchElement.
+    * Requires: List contains only SwitchBlocks or CaseStatements
     *
     * Effects: Creates a new SwitchStatement which is conditioned on
     * <code>expr</code> and contains the elements of <code>switchElems</code> 
@@ -240,7 +231,7 @@ public class SwitchStatement extends Statement
     */
    public SwitchStatement(Expression expr, List switchElems) {
       this.expr = expr;
-      TypedList.check(switchElems, SwitchElement.class);
+      TypedList.check(switchElems, Statement.class);
       this.switchElems = new ArrayList(switchElems);
    }
 
@@ -278,31 +269,6 @@ public class SwitchStatement extends Statement
       return expr;
    }
 
-   /**
-    * Effects: Adds <sw> to the list of SwitchElements of this.
-    */
-  //   public void addSwitchElement(SwitchElement sw) {
-  //      switchElems.add(sw);
-  //   }
-
-   /**
-    * Effects: Returns the SwitchElement at position <pos>.  Throws an
-    * IndexOutOfBoundsException when <pos> is not valid.
-    */
-   public SwitchElement getSwitchElementAt(int pos) {
-      return (SwitchElement) switchElems.get(pos);
-   }
-
-   /**
-    * Effects: Returns TypedListIterator which will return the
-    * SwitchElements of this in order.
-    */
-   public TypedListIterator switchElements() {
-      return new TypedListIterator (switchElems.listIterator(),
-                                    SwitchElement.class,
-                                    false);
-   }
-
 
   public Node visitChildren(NodeVisitor v)
   {
@@ -311,8 +277,8 @@ public class SwitchStatement extends Statement
     List newSwitchElems = new ArrayList ( switchElems.size() );
 
     for (ListIterator it = switchElems.listIterator(); it.hasNext(); ) {
-      SwitchElement se = (SwitchElement)((SwitchElement) it.next()).visit( v );
-      newSwitchElems.add ( se ) ;      
+      Statement switchElement = (Statement)((Statement) it.next()).visit( v );
+      newSwitchElems.add ( switchElement ) ;      
     }
 
     return reconstruct ( e, newSwitchElems);
@@ -324,7 +290,7 @@ public class SwitchStatement extends Statement
 
 
      for (ListIterator it = switchElems.listIterator(); it.hasNext(); ) {
-       SwitchElement se = (SwitchElement) it.next();
+       Statement se = (Statement) it.next();
        if ( se instanceof CaseStatement)
        {
          Object key;
@@ -344,10 +310,6 @@ public class SwitchStatement extends Statement
 
    public void translate(LocalContext c, CodeWriter w)
    {
-      SwitchElement se;
-      CaseStatement cs;
-      SwitchBlock cb;
-
       w.write("switch (");
       expr.translate_block(c, w);
       w.write(") {");
@@ -356,8 +318,8 @@ public class SwitchStatement extends Statement
 
       for (ListIterator it = switchElems.listIterator(); it.hasNext(); )
       {
-         se = (SwitchElement) it.next();
-         se.translate(c, w);
+         Statement switchEl = (Statement) it.next();
+         switchEl.translate(c, w);
 	 if (it.hasNext()) w.newline(0);
       }
       w.end();

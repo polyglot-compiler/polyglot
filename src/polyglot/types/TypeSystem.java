@@ -80,7 +80,7 @@ public abstract class TypeSystem {
    * Requires: all type arguments are canonical.
    *
    * Returns true iff an implicit cast from fromType to toType is valid;
-   * in other wors, every member of fromType is member of toType.
+   * in other words, every member of fromType is member of toType.
    **/
   public abstract boolean isImplicitCastValid(Type fromType, Type toType)
     throws SemanticException ;
@@ -91,6 +91,12 @@ public abstract class TypeSystem {
    * Returns true iff type1 and type2 are the same type.
    **/
   public abstract boolean isSameType(Type type1, Type type2);
+
+  /**
+   * Returns true if <code>value</code> can be implicitly cast to Primitive type
+   * <code>t</code>.
+   */
+  public abstract boolean numbericConversionValid ( Type t, long value);
 
   /**
    * Requires: all type arguments are canonical.

@@ -576,7 +576,7 @@ public class Compiler implements TargetTable, ClassCleaner
       return null;
     }
     // done with the input
-    t.getSourceReader().close();
+    t.closeSource();
 
     /* Try and figure out whether or not the parser was successful. */
     if( sym == null) {
@@ -627,13 +627,15 @@ public class Compiler implements TargetTable, ClassCleaner
   {
     SourceFileNode sfn = (SourceFileNode)ast;
     Writer ofw = t.getOutputWriter( sfn.getPackageName());
-    CodeWriter w = new CodeWriter( ofw, outputWidth);
+    CodeWriter w = new CodeWriter( t.getOutputWriter(sfn.getPackageName()), 
+                                   outputWidth);
     
     ast.translate( new LocalContext(it, ts, null), w);
-    
     w.flush();
-    ofw.close();
     System.out.flush();
+    t.closeDestination();
+
+
   }
 
   protected Node runVisitors( Target t, Node ast, int stage)

@@ -121,13 +121,14 @@ javadoc: FORCE
 			jltools.ast      \
 			jltools.lex      \
 			jltools.frontend \
-			jltools.runtime  \
 			jltools.parse    \
 			jltools.types    \
 			jltools.util     \
 			jltools.visit    \
 			jltools.main     \
-			jltools.ext.op 
+			jltools.ext.op   \
+			jltools.ext.op.runtime  \
+
 
 FORCE:
 

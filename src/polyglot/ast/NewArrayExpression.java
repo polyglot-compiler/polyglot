@@ -148,7 +148,7 @@ public class NewArrayExpression extends Expression
       newInit = (ArrayInitializerExpression)init.visit(v);
     }
     
-    return reconstruct( newBase, newDimExprs, addDims, init);
+    return reconstruct( newBase, newDimExprs, addDims, newInit);
   }
   
   public Node typeCheck( LocalContext c)

@@ -31,7 +31,11 @@ public class IntLiteral extends Literal
    */ 
   public IntLiteral( short s) 
   {
-    this( SHORT, s);
+    value = s;
+    if ( Math.abs(s) < Byte.MAX_VALUE)
+      kind = BYTE;
+    else 
+      kind = SHORT;
   }
     
   /**
@@ -39,7 +43,13 @@ public class IntLiteral extends Literal
    */ 
   public IntLiteral( int i) 
   {
-    this( INT, i);
+    value = i;
+    if (Math.abs(i) < Byte.MAX_VALUE)
+      kind = BYTE;
+    else if (Math.abs(i) < Short.MAX_VALUE)
+      kind = SHORT;
+    else
+      kind = INT;
   }
 
   /**
@@ -47,7 +57,15 @@ public class IntLiteral extends Literal
    */ 
   public IntLiteral( long l) 
   {
-    this( LONG, l);
+    value = l;
+    if (Math.abs( l) < Byte.MAX_VALUE)
+      kind = BYTE;
+    else if (Math.abs(l) < Short.MAX_VALUE)
+      kind = SHORT;
+    else if (Math.abs(l) < Integer.MAX_VALUE)
+      kind = INT;
+    else
+      kind = LONG;
   }
 
   public IntLiteral( int kind, long value)

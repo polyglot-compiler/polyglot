@@ -502,7 +502,7 @@ public class Lexer {
     case 'r':
       consume(); return '\r';
     case '\"':
-      consume(); return '\\';
+      consume(); return '\"';
     case '\'':
       consume(); return '\'';
     case '\\':

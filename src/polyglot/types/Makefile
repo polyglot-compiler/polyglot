@@ -18,6 +18,7 @@ tp_files 	= AccessFlags.java	\
 			LocalContext.java \
 			MethodType.java \
 			MethodTypeInstance.java \
+			MethodTypeInstanceInitializer.java \
 			NoClassException.java \
 			NullType.java \
 			ParsedClassType.java \

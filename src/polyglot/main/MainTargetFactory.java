@@ -126,8 +126,7 @@ public class MainTargetFactory implements TargetFactory
 
     public Writer getOutputWriter( String packageName) throws IOException
     {
-      if (outputWriter == null) return outputWriter;
-
+      if (outputWriter != null) return outputWriter;
       if( stdout) {
         return (outputWriter = new UnicodeWriter( new PrintWriter( System.out)));
       }
@@ -165,6 +164,20 @@ public class MainTargetFactory implements TargetFactory
       return Main.getParser( lexer, getErrorQueue());
     }
 
+    public void closeSource() throws IOException
+    {
+      if ( sourceFileReader != null) sourceFileReader.close();
+      sourceFileReader =null;
+      sourceFile = null;
+      
+    }
+    public void closeDestination() throws IOException
+    {
+      if ( outputWriter != null) outputWriter.close();
+      outputWriter = null;
+      outputFile = null;
+
+    }
     public NodeVisitor getNextNodeVisitor( int stage)
     {
       if( visitors == null) {
@@ -182,8 +195,7 @@ public class MainTargetFactory implements TargetFactory
 
     protected ErrorQueue createErrorQueue() throws IOException
     {
-      return new MainErrorQueue( name, new FileReader( sourceFile), 
-                                 System.err);
+      return new MainErrorQueue( name, System.err);
     }
   }
    
@@ -198,10 +210,9 @@ public class MainTargetFactory implements TargetFactory
     private int errorCount;
     private boolean flushed;
     
-    public MainErrorQueue( String filename, Reader source, PrintStream err) 
+    public MainErrorQueue( String filename,  PrintStream err) 
     {
       this.filename = filename;
-      this.source = source;
       this.err = err;
 
       this.errorCount = 0;

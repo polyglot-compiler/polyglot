@@ -61,6 +61,10 @@ public class ReturnStatement extends Statement
   public Node typeCheck( LocalContext c) throws SemanticException
   {
     MethodTypeInstance mti = c.getCurrentMethod();
+    if (mti instanceof MethodTypeInstanceInitializer)
+      throw new SemanticException( "Return statements are not valid inside an " +
+                                   "initializer block.");
+                                  
     if( expr == null) {
       if( !mti.getReturnType().equals( c.getTypeSystem().getVoid())) {
         throw new SemanticException( 

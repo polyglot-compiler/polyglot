@@ -17,6 +17,8 @@ public class InitializerBlock extends ClassMember
   protected final BlockStatement block;
   protected final boolean isStatic;
 
+  MethodTypeInstance mtiThis;
+
   /**
    * Creates a new <code>InitializerBlock</code>.
    */
@@ -63,6 +65,18 @@ public class InitializerBlock extends ClassMember
     return reconstruct( (BlockStatement)block.visit( v), isStatic);
   }
 
+  public void enterScope( LocalContext c)
+  {
+    c.enterMethod( new MethodTypeInstanceInitializer( c.getTypeSystem(), 
+                                                      c.getCurrentClass(), 
+                                                      isStatic) );
+  }
+
+  public void leaveScope( LocalContext c)
+  {
+    c.leaveMethod();
+  }
+
   public Node readSymbols( SymbolReader sr)
   {
     return this;
@@ -71,6 +85,15 @@ public class InitializerBlock extends ClassMember
   public Node typeCheck( LocalContext c)
   {
     // FIXME; implement
+    return this;
+  }
+
+  public Node exceptionCheck (ExceptionChecker ec ) 
+  {
+    SubtypeSet s = (SubtypeSet)ec.getThrowsSet();
+    if (s.size() != 0 )
+      ec.reportError("An initializer block may not throw"+ 
+                     " any exceptions.", Annotate.getLineNumber(this));
     return this;
   }
 

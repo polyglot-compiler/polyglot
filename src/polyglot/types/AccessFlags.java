@@ -243,19 +243,19 @@ public class AccessFlags implements Cloneable {
      return s;
   }
 
-  private static int PUBLIC_BIT       = Modifier.PUBLIC;
-  private static int PROTECTED_BIT    = Modifier.PROTECTED;
-  private static int PRIVATE_BIT      = Modifier.PRIVATE;
-  
-  private static int STATIC_BIT       = Modifier.STATIC;
-  private static int FINAL_BIT        = Modifier.FINAL;
-  private static int SYNCHRONIZED_BIT = Modifier.SYNCHRONIZED;
-  private static int TRANSIENT_BIT    = Modifier.TRANSIENT;
-  private static int NATIVE_BIT       = Modifier.NATIVE;
-  private static int INTERFACE_BIT    = Modifier.INTERFACE;
-  private static int ABSTRACT_BIT     = Modifier.ABSTRACT;
-  private static int VOLATILE_BIT     = Modifier.VOLATILE;
-  private static int STRICTFP_BIT     = Modifier.STRICT;
+  public static final int PUBLIC_BIT       = Modifier.PUBLIC;
+  public static final int PROTECTED_BIT    = Modifier.PROTECTED;
+  public static final int PRIVATE_BIT      = Modifier.PRIVATE;
+ 
+  public static final int STATIC_BIT       = Modifier.STATIC;
+  public static final int FINAL_BIT        = Modifier.FINAL;
+  public static final int SYNCHRONIZED_BIT = Modifier.SYNCHRONIZED;
+  public static final int TRANSIENT_BIT    = Modifier.TRANSIENT;
+  public static final int NATIVE_BIT       = Modifier.NATIVE;
+  public static final int INTERFACE_BIT    = Modifier.INTERFACE;
+  public static final int ABSTRACT_BIT     = Modifier.ABSTRACT;
+  public static final int VOLATILE_BIT     = Modifier.VOLATILE;
+  public static final int STRICTFP_BIT     = Modifier.STRICT;
 
   public boolean equals( Object o)
   {

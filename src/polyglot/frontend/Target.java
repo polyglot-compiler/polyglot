@@ -45,6 +45,10 @@ public abstract class Target
     return eq;
   }
 
+  abstract public void closeSource() throws IOException;
+  abstract public void closeDestination() throws IOException;
+  
+
   protected abstract ErrorQueue createErrorQueue() throws IOException;
 
   public NodeVisitor getNextNodeVisitor( int stage)
