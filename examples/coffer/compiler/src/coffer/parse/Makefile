@@ -10,9 +10,7 @@ SOURCES = \
 	sym.java \
 	$(SRC) \
 
-SRC = \
-	CofferParserWrapper.java \
-	CofferUtil.java
+SRC =
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 MANIFEST = Makefile $(SRC) coffer.ppg coffer.flex

@@ -5,8 +5,7 @@ SUBDIRS =
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
-	ParserWrapper.java \
-	Util.java \
+	BaseParser.java \
 	VarDeclarator.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))

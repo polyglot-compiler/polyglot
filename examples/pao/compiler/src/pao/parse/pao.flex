@@ -55,12 +55,12 @@ import polyglot.util.ErrorInfo;
     String file;
     ErrorQueue eq;
 
-    public Lexer(java.io.InputStream in, String file, ErrorQueue eq) {
+    public Lexer_c(java.io.InputStream in, String file, ErrorQueue eq) {
         this(new java.io.BufferedReader(new java.io.InputStreamReader(in)),
              file, eq);
     }
     
-    public Lexer(java.io.Reader reader, String file, ErrorQueue eq) {
+    public Lexer_c(java.io.Reader reader, String file, ErrorQueue eq) {
         this(new EscapedUnicodeReader(reader));
         this.file = file;
         this.eq = eq;

@@ -8,8 +8,7 @@ SOURCES = \
 	Lexer_c.java \
 	Grm.java \
 	sym.java \
-	QQ.java \
-	QQParserWrapper.java
+	QQ.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 MANIFEST = Makefile $(SOURCES) qq.ppg qq.flex
