@@ -55,19 +55,29 @@ public class TypeEncoder
     oos.flush();
     oos.close();
     
+    byte[] b = baos.toByteArray();
+
+    if (Report.should_report(Report.serialize, 2)) {
+      Report.report(2, "Size of serialization (with" 
+            + (zip?"":"out") + " zipping) is " + b.length + " bytes");
+    }
+
     String s;
     if (base64) {
-        s = new String(Base64.encode(baos.toByteArray()));
+        s = new String(Base64.encode(b));
     }
-    else {
-        byte[] b = baos.toByteArray();
-    
+    else {    
         StringBuffer sb = new StringBuffer(b.length);
         for (int i = 0; i < b.length; i++)
     	sb.append((char) b[i]);
         s = sb.toString();
     }
     
+    if (Report.should_report(Report.serialize, 2)) {
+      Report.report(2, "Size of serialization after conversion to string is " 
+            + s.length() + " characters");
+    }
+
     if (test) {
       // Test it.
       try {
