@@ -3,6 +3,7 @@ PACKAGE = jltools.parse
 SUBDIRS =
 
 SOURCES = \
+	SyntaxException.java \
 	Grm.java \
 	sym.java
 
