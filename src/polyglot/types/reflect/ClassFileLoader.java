@@ -1,7 +1,6 @@
 package polyglot.types.reflect;
 
 import polyglot.main.Report;
-import polyglot.types.*;
 
 import java.io.*;
 import java.util.*;
@@ -15,10 +14,18 @@ import java.util.jar.*;
 public class ClassFileLoader
 {
     Map cache;
+    
+    /**
+     * Keep a cache of the zips and jars so we don't have to keep 
+     * opening them from the file system. 
+     */
+    Map jarCache;
+    
     final static Object not_found = new Object();
 
     public ClassFileLoader() {
         this.cache = new HashMap();
+        this.jarCache = new HashMap();
     }
 
     /**
@@ -83,30 +90,68 @@ public class ClassFileLoader
                 }
             }
             else if (dir.getName().endsWith(".jar")) {
-                JarFile jar = new JarFile(dir);
-                JarEntry entry = jar.getJarEntry(entryName);
-                if (entry != null) {
-                    if (Report.should_report(verbose, 3))
-			Report.report(3, "found jar entry " + entry);
-                    InputStream in = jar.getInputStream(entry);
-                    ClassFile c = loadFromStream(in, name);
-                    in.close();
-                    return c;
+                Object o = jarCache.get(dir);
+                if (o != not_found) {
+                    JarFile jar = (JarFile)o;
+                    if (jar == null) { 
+                        // the jar is not in the cache.
+                        // try to get it.
+                        if (!dir.exists()) {
+                            // record that the file does not exist, 
+                            jarCache.put(dir, not_found);
+                        }
+                        else {
+                            // get the jar and put it in the cache.
+                            if (Report.should_report(verbose, 2))
+                                Report.report(2, "Opening jar " + dir);
+                            jar = new JarFile(dir);
+                            jarCache.put(dir, jar);                            
+                        }
+                    }
+                    if (jar != null) {
+                        JarEntry entry = jar.getJarEntry(entryName);
+                        if (entry != null) {
+                            if (Report.should_report(verbose, 3))
+        			Report.report(3, "found jar entry " + entry);
+                            InputStream in = jar.getInputStream(entry);
+                            ClassFile c = loadFromStream(in, name);
+                            in.close();
+                            return c;
+                        }
+                    }
                 }
-                jar.close();
             }
             else if (dir.getName().endsWith(".zip")) {
-                ZipFile zip = new ZipFile(dir);
-                ZipEntry entry = zip.getEntry(entryName);
-                if (entry != null) {
-                    if (Report.should_report(verbose, 3))
-			Report.report(3, "found zip entry " + entry);
-                    InputStream in = zip.getInputStream(entry);
-                    ClassFile c = loadFromStream(in, name);
-                    in.close();
-                    return c;
+                Object o = jarCache.get(dir);
+                if (o != not_found) {
+                    ZipFile zip = (ZipFile)o;
+                    if (zip == null) { 
+                        // the zip is not in the cache.
+                        // try to get it.
+                        if (!dir.exists()) {
+                            // record that the file does not exist, 
+                            jarCache.put(dir, not_found);
+                        }
+                        else {
+                            // get the zip and put it in the cache.
+                            if (Report.should_report(verbose, 2))
+                                Report.report(2, "Opening zip " + dir);
+                            zip = new ZipFile(dir);
+                            jarCache.put(dir, zip);                            
+                        }
+                    }
+                    if (zip != null) {
+                        ZipEntry entry = zip.getEntry(entryName);
+                        if (entry != null) {
+                            if (Report.should_report(verbose, 3))
+                                Report.report(3, "found zip entry " + entry);
+                            InputStream in = zip.getInputStream(entry);
+                            ClassFile c = loadFromStream(in, name);
+                            in.close();
+                            return c;
+                        }
+                    }
                 }
-                zip.close();
             }
         }
         catch (IOException e) {
