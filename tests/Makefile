@@ -2,24 +2,19 @@ LOG=log
 
 GOOD =  \
 	ArrayInit.jl \
-	Narrowing.jl \
-	LabeledBreak.jl \
-	Constants2.jl \
 	Constants.jl \
-	InitializerType1.jl \
-	Semicolon.jl \
-	SemicolonClass.jl \
-	TypeShadowing.jl \
+	Constants2.jl \
 	Ctor.jl \
 	Dep1.jl \
 	Empty.jl \
 	Equality.jl \
+	Except.jl \
 	Except2.jl \
 	Except3.jl \
 	Except4.jl \
-	Except.jl \
-	FieldAccess.jl \
+	Except5.jl \
 	Field.jl \
+	FieldAccess.jl \
 	FinalInit1.jl \
 	FinalInit2.jl \
 	FinalInit3.jl \
@@ -27,16 +22,16 @@ GOOD =  \
 	FinalInit5.jl \
 	FinalInit6.jl \
 	FinalInit7.jl \
-	Except5.jl \
+	ForwardRef.jl \
 	ForwardRef2.jl \
 	ForwardRef3.jl \
-	ForwardRef.jl \
 	Infinite.jl \
 	Init1.jl \
 	Init2.jl \
 	Init3.jl \
 	Init4.jl \
 	Init5.jl \
+	InitializerType1.jl \
 	Inner0.jl \
 	Inner1.jl \
 	Inner2.jl \
@@ -47,20 +42,26 @@ GOOD =  \
 	Inner7.jl \
 	Inner8.jl \
 	Inner9.jl \
+	LabeledBreak.jl \
 	Local.jl \
 	LocalClass.jl \
 	LocalClass2.jl \
+	LocalClass3.jl \
+	Narrowing.jl \
 	Prim.jl \
 	Return1.jl \
 	Return2.jl \
 	Return3.jl \
 	Return4.jl \
 	Return5.jl \
+	Semicolon.jl \
+	SemicolonClass.jl \
 	StaticContext.jl \
 	StaticOps.jl \
 	Switch1.jl \
 	Switch2.jl \
 	Switch3.jl \
+	TypeShadowing.jl \
 	xIterator.jl
 
 BAD = \
