@@ -184,6 +184,9 @@ public class StdErrorQueue extends AbstractErrorQueue
         if (pos.endLine() == lineNum) {
             stopIndAt = pos.endColumn() - 1;
         }
+        if (stopIndAt < startIndAt) {
+            stopIndAt = startIndAt;
+        }
         if (pos.endColumn() == Position.UNKNOWN ||
             pos.endColumn() == Position.END_UNUSED) {
             stopIndAt = startIndAt;
