@@ -67,6 +67,18 @@ public class New_c extends AbstractNew_c implements New
 
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	ClassType ct = (ClassType) tn.type();
+
+        if (ct.isMember()) {
+            ClassType currentClass = tc.context().currentClass();
+
+            for (ClassType t = ct; t.isMember(); t = t.toMember().outer()) {
+                if (! t.flags().isStatic()) {
+                    throw new SemanticException("Cannot allocate non-static " +
+                                                "member class \"" + t + "\".");
+                }
+            }
+        }
+
 	return typeCheckEpilogue(ct, tc);
     }
 
