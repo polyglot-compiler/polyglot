@@ -88,6 +88,7 @@ BAD = \
 	BadPrim.jl \
 	BadProt.jl \
 	BadStaticContext.jl \
+	StaticContext2.jl \
 	BadSwitch1.jl \
 	BadSwitch2.jl \
 	CircularConstructor.jl \
