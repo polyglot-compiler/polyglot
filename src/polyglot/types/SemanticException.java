@@ -13,24 +13,24 @@ public class SemanticException extends Exception {
     
     public SemanticException() {
 	super();
-        trace(this, 1);
+        trace(this, 5);
     }
 
     public SemanticException(Position position) {
 	super();
 	this.position = position;
-        trace(this, 1);
+        trace(this, 5);
     }
 
     public SemanticException(String m) {
 	super(m);
-        trace(this, 1);
+        trace(this, 5);
     }
 
     public SemanticException(String m, Position position) {
 	super(m);
 	this.position = position;
-        trace(this, 1);
+        trace(this, 5);
     }
 
     public Position position() {

@@ -133,15 +133,15 @@ public class LoadedClassResolver extends ClassResolver
       return (ClassType) dt.restore();
     }
     catch (SemanticException e) {
-      e.printStackTrace();
+      // e.printStackTrace();
       throw e;
     }
     catch (RuntimeException e) {
-      e.printStackTrace();
+      // e.printStackTrace();
       throw e;
     }
     catch (Exception e) {
-      e.printStackTrace();
+      // e.printStackTrace();
       throw new SemanticException("Could not get type information for " +
                                   "class \"" + clazz.name() + "\"; " +
                                   e.getClass().getName() + ": " +
