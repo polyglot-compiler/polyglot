@@ -8,7 +8,7 @@ import jltools.util.*;
 /**
  * An integer literal: longs, ints, shorts, bytes, and chars.
  */
-public class NumLit_c extends Lit_c implements NumLit
+public abstract class NumLit_c extends Lit_c implements NumLit
 {
     protected long value;
 

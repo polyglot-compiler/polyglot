@@ -32,7 +32,7 @@ public class IntLit_c extends NumLit_c implements IntLit
 
     /** Get the value of the expression. */
     public long value() {
-        return (int) longValue();
+        return longValue();
     }
 
     /** Set the value of the expression. */
