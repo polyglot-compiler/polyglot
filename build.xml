@@ -518,6 +518,10 @@ ext=""
       <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
       <param name="parser.type" value="ppg"/>
     </antcall>
+    <javac srcdir="${src}/polyglot/ext/jx/runtime/src" destdir="${classes}" debug="on"
+      includes="jx/runtime/**">
+      <classpath refid="standard.classpath"/>
+    </javac>
   </target>
 
   <target name="pao" 
