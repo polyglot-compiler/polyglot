@@ -203,7 +203,7 @@ public class SourceFileNode extends Node
     return this;
   }
 
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     if( package_ != null && !package_.equals("")) {
       w.write( "package " + package_ + ";");

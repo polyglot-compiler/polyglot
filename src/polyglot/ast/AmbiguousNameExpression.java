@@ -229,7 +229,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
   /*
    * Possibly useful for debugging purposes, but usually not used.
    *
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     for( Iterator i = names.listIterator(); i.hasNext(); ) {
       w.write( (String)i.next());

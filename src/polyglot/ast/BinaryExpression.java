@@ -463,7 +463,7 @@ public class BinaryExpression extends Expression
     return this;
   }
   
-   public void translate(LocalContext c, CodeWriter w) 
+   public void translate_no_override(LocalContext c, CodeWriter w) 
    {
      /* Extra checks are needed here to see if we have a numeric binary
       * expression inside of a String concatenation. If so they must

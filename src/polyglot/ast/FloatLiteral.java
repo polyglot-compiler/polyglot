@@ -121,7 +121,7 @@ public class FloatLiteral extends Literal
     return this;
   }  
 
-  public void translate(LocalContext c, CodeWriter w)
+  public void translate_no_override(LocalContext c, CodeWriter w)
   {
     w.write( kind == FLOAT ? Float.toString( (float)value) /* + 'F' */ : 
                           Double.toString( value));

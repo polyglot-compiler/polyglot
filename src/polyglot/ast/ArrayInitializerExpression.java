@@ -127,7 +127,7 @@ public class ArrayInitializerExpression extends Expression
     return this;
   }
 
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     w.write( "{ ");
     for( Iterator iter = children(); iter.hasNext(); ) {

@@ -194,7 +194,17 @@ public abstract class Node extends AnnotatedObject {
    * Note that this method does <b>not</b> use the visitor model of traversal.
    * Rather, it uses a traditional recursive traversal.
    */
-  public abstract void translate( LocalContext c, CodeWriter w);
+  public void translate( LocalContext c, CodeWriter w) {
+    if (ext instanceof TranslateOverride) {
+        ((TranslateOverride) ext).translate(this, c, w);
+    }
+    else {
+	translate_no_override(c, w);
+    }
+  }
+
+  public abstract void translate_no_override( LocalContext c, CodeWriter w);
+
   public void translate_block( LocalContext c, CodeWriter w) {
     w.begin(0);
     translate(c, w);

@@ -308,7 +308,7 @@ public class NewObjectExpression extends Expression
   }
 
   
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     if( primary != null)
     {

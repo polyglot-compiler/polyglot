@@ -146,7 +146,7 @@ public class SwitchStatement extends Statement
       return this;
     }
     
-    public void translate( LocalContext c, CodeWriter w)
+    public void translate_no_override( LocalContext c, CodeWriter w)
     {
       if (isDefault())
         w.write("default: ");
@@ -225,7 +225,7 @@ public class SwitchStatement extends Statement
        return this;
      }
 
-     public void translate( LocalContext c, CodeWriter w)
+     public void translate_no_override( LocalContext c, CodeWriter w)
      {
        block.translate(c, w);
      }
@@ -334,7 +334,7 @@ public class SwitchStatement extends Statement
      return this;
    }
 
-   public void translate(LocalContext c, CodeWriter w)
+   public void translate_no_override(LocalContext c, CodeWriter w)
    {
       w.write("switch (");
       expr.translate_block(c, w);

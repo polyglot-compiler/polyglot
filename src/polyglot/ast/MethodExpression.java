@@ -221,7 +221,7 @@ public class MethodExpression extends Expression
     return this;
   }
   
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     if( target != null) {
       if( target instanceof Expression) {

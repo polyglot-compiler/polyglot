@@ -187,7 +187,7 @@ public class IntLiteral extends NumericalLiteral
     return this;
   }  
 
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     if( kind == LONG) {
       w.write( Long.toString( value ) + 'L');

@@ -191,7 +191,7 @@ public class VariableDeclarationStatement extends Statement
       return this;
     }
 
-    public void translate( LocalContext c, CodeWriter w)
+    public void translate_no_override( LocalContext c, CodeWriter w)
     {
       w.write ( name);
       for (int i = 0; i < additionalDimensions; i++)
@@ -398,7 +398,7 @@ public class VariableDeclarationStatement extends Statement
     return this;
   }
 
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     w.write( accessFlags.getStringRepresentation());
     tn.translate( c, w);

@@ -116,7 +116,7 @@ public class IfStatement extends Statement
     return this;
   }
 
-  public void translate(LocalContext c, CodeWriter w)
+  public void translate_no_override(LocalContext c, CodeWriter w)
   {    
     w.write( "if (");
     cond.translate_block(c, w);

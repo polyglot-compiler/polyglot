@@ -140,7 +140,7 @@ public class AmbiguousName extends Node implements AmbiguousNode {
                      "Attempt to type check an ambiguous node.");
   } 
 
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     throw new InternalCompilerError(
                      "Attempt to translate an ambiguous node.");
@@ -272,7 +272,7 @@ public class AmbiguousName extends Node implements AmbiguousNode {
   /*
    * Possibly useful for debugging purposes, but usually not used.
    *
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     for( Iterator i = names.listIterator(); i.hasNext(); ) {
       w.write( (String)i.next());

@@ -58,7 +58,7 @@ public class BooleanLiteral extends Literal
     return this;
   }
 
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     w.write( "" + value);
   }

@@ -139,7 +139,7 @@ public class BlockStatement extends Statement {
       translate(c, w);
   }
 
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     enterScope(c);
     w.write("{");

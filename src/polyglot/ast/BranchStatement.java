@@ -119,7 +119,7 @@ public class BranchStatement extends Statement {
 
   // FIXME write flowCheck
 
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     w.write( (kind == BREAK ? "break" : "continue") + 
                (label == null ? "; " : " " + label + "; "));

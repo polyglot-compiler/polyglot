@@ -122,7 +122,7 @@ public class TypeNode extends Node
    * the string that originally represented the type in the source file is 
    * used.
    */
-  public void translate(LocalContext c, CodeWriter w)
+  public void translate_no_override(LocalContext c, CodeWriter w)
   {
     if (! Compiler.useFullyQualifiedNames()) {
       w.write( type.translate(c) );

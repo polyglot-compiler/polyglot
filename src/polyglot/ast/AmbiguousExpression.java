@@ -16,7 +16,7 @@ public abstract class AmbiguousExpression extends Expression
                      "Attempt to type check an ambiguous node.");
   }
 
-  public void translate( LocalContext c, CodeWriter w) 
+  public void translate_no_override( LocalContext c, CodeWriter w) 
   {
     throw new InternalCompilerError( 
                      "Attempt to translate an ambiguous node.");

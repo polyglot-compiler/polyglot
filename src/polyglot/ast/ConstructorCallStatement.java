@@ -184,7 +184,7 @@ public class ConstructorCallStatement extends Statement
     return mti;
   }
 
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     if( primary != null) {
       primary.translate( c, w);

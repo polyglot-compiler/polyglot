@@ -113,7 +113,7 @@ public class ArrayIndexExpression extends Expression
     return this;
   }
 
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     translateExpression( base, c, w);
 

@@ -188,7 +188,7 @@ public class ForStatement extends Statement
     return this;
   }
 
-  public void translate(LocalContext c, CodeWriter w)
+  public void translate_no_override(LocalContext c, CodeWriter w)
   {
     boolean writeSemicolon = true;
     

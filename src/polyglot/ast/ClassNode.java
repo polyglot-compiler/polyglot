@@ -482,7 +482,7 @@ public class ClassNode extends ClassMember implements GlobalDeclaration
     return this;
   }
 
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate_no_override( LocalContext c, CodeWriter w)
   {
     w.write( accessFlags.getStringRepresentation() + 
              (accessFlags.isInterface() ? "" : "class ") 
@@ -508,6 +508,11 @@ public class ClassNode extends ClassMember implements GlobalDeclaration
 
   public void translateBody( LocalContext c, CodeWriter w)
   {
+    if (ext instanceof TranslateBodyOverride) {
+      ((TranslateBodyOverride) ext).translateBody(this, c, w);
+      return;
+    }
+
     enterScope(c);
     w.newline( 0);
     w.write( "{");
