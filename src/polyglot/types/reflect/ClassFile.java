@@ -188,7 +188,7 @@ public class ClassFile implements LazyClassInitializer {
                 }
 
                 // A member class of this class
-                ClassType t = typeForName(ts, name);
+                ClassType t = quietTypeForName(ts, name);
 
                 if (t.isMember()) {
 		    if (Report.should_report(verbose, 3))
@@ -218,7 +218,7 @@ public class ClassFile implements LazyClassInitializer {
 
         for (int i = 0; i < interfaces.length; i++) {
             String name = classNameCP(interfaces[i]);
-            ct.addInterface(typeForName(ts, name));
+            ct.addInterface(quietTypeForName(ts, name));
         }
     }
 
@@ -326,7 +326,7 @@ public class ClassFile implements LazyClassInitializer {
                         if (str.charAt(i) == ';') {
                             String s = str.substring(start, i);
                             s = s.replace('/', '.');
-                            types.add(arrayOf(typeForName(ts, s), dims));
+                            types.add(arrayOf(quietTypeForName(ts, s), dims));
                             break;
                         }
 
@@ -358,7 +358,7 @@ public class ClassFile implements LazyClassInitializer {
     /**
      * Convert a String into a type.
      */
-    ClassType typeForName(TypeSystem ts, String name) {
+    ClassType quietTypeForName(TypeSystem ts, String name) {
 	if (Report.should_report(verbose,2))
 	    Report.report(2, "resolving " + name);
 
@@ -371,6 +371,15 @@ public class ClassFile implements LazyClassInitializer {
     }
 
     /**
+     * Convert a String into a type.
+     */
+    ClassType typeForName(TypeSystem ts, String name) throws SemanticException {
+	if (Report.should_report(verbose,2))
+	    Report.report(2, "resolving " + name);
+        return (ClassType) ts.systemResolver().find(name);
+    }
+
+    /**
      * Create the type for this class file.
      */
     ParsedClassType createType(TypeSystem ts) {
@@ -380,29 +389,63 @@ public class ClassFile implements LazyClassInitializer {
 	if (Report.should_report(verbose, 2))
 	    Report.report(2, "creating ClassType for " + name);
 
+        // Create the ClassType.
+        ParsedClassType ct = ts.createClassType(this);
+
+        ct.flags(ts.flagsForBits(modifiers));
+        ct.position(position());
+
+        // Add unresolved class into the cache to avoid circular resolving.
+        ((CachingResolver) ts.systemResolver()).install(name, ct);
+
         // This is the "p.q" part.
         String packageName = StringUtil.getPackageComponent(name);
 
+        // Set the ClassType's package.
+        if (! packageName.equals("")) {
+            ct.package_(ts.packageForName(packageName));
+        }
+
         // This is the "C$I$J" part.
         String className = StringUtil.getShortNameComponent(name);
-                        
-        int dollar = name.lastIndexOf('$');
 
         String outerName; // This will be "p.q.C$I"
         String innerName; // This will be "J"
 
-        if (dollar >= 0) {
-            outerName = name.substring(0, dollar);
-            innerName = name.substring(dollar+1);
-        }
-        else {
-            outerName = name;
-            innerName = null;
+        outerName = name;
+        innerName = null;
+
+        while (true) {
+            int dollar = outerName.lastIndexOf('$');
+
+            if (dollar >= 0) {
+                outerName = name.substring(0, dollar);
+                innerName = name.substring(dollar+1);
+            }
+            else {
+                outerName = name;
+                innerName = null;
+                break;
+            }
+
+            // Try loading the outer class.
+            // This will recursively load its outer class, if any.
+            try {
+                if (Report.should_report(verbose,2))
+                    Report.report(2, "resolving " + outerName + " for " + name);
+                ct.outer(typeForName(ts, outerName));
+                break;
+            }
+            catch (SemanticException e) {
+                // Failed.  The class probably has a '$' in its name.
+                if (Report.should_report(verbose,3))
+                    Report.report(2, "error resolving " + outerName);
+            }
         }
 
         ClassType.Kind kind = ClassType.TOP_LEVEL;
 
-        if (dollar >= 0) {
+        if (innerName != null) {
             // A nested class.  Parse the class name to determine what kind. 
             StringTokenizer st = new StringTokenizer(className, "$");
 
@@ -427,8 +470,6 @@ public class ClassFile implements LazyClassInitializer {
 	if (Report.should_report(verbose, 3))
 	    Report.report(3, name + " is " + kind);
 
-        ParsedClassType ct = ts.createClassType(this);
-
         ct.kind(kind);
 
         if (ct.isTopLevel()) {
@@ -438,19 +479,6 @@ public class ClassFile implements LazyClassInitializer {
             ct.name(innerName);
         }
 
-        if (! packageName.equals("")) {
-            ct.package_(ts.packageForName(packageName));
-        }
-
-        // Add unresolved class into the cache to avoid circular resolving.
-        ((CachingResolver) ts.systemResolver()).install(name, ct);
-
-        if (ct.isNested()) {
-            ct.outer(typeForName(ts, outerName));
-        }
-
-        ct.flags(ts.flagsForBits(modifiers));
-        ct.position(position());
 
         return ct;
     }
