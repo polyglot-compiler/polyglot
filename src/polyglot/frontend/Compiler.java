@@ -102,8 +102,19 @@ public class Compiler
 		eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage());
 	    }
 	    catch (InternalCompilerError e) {
-		e.printStackTrace();
-		eq.enqueue(ErrorInfo.INTERNAL_ERROR, e.message(), e.position());
+		// Report it like other errors, but rethrow to get the stack trace.
+		try {
+		    eq.enqueue(ErrorInfo.INTERNAL_ERROR, e.message(), e.position());
+		}
+		catch (ErrorLimitError e2) {
+		}
+		eq.flush();
+		throw e;
+	    }
+	    catch (RuntimeException e) {
+		// Flush the error queue, then rethrow to get the stack trace.
+		eq.flush();
+		throw e;
 	    }
 	}
 	catch (ErrorLimitError e) {

@@ -35,8 +35,8 @@ public class CupParser implements Parser
 	    eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage());
 	}
 	catch (RuntimeException e) {
-	    e.printStackTrace();
-	    eq.enqueue(ErrorInfo.INTERNAL_ERROR, e.getMessage());
+	    // Let the Compiler catch and report it.
+	    throw e;
 	}
 	catch (Exception e) {
 	    // Used by cup to indicate a non-recoverable error.
