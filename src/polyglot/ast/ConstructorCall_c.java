@@ -1,34 +1,10 @@
 package polyglot.ext.jl.ast;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import polyglot.ast.ConstructorCall;
-import polyglot.ast.Expr;
-import polyglot.ast.Node;
-import polyglot.ast.ProcedureCall;
-import polyglot.ast.Term;
-import polyglot.types.ClassType;
-import polyglot.types.ConstructorInstance;
-import polyglot.types.Context;
-import polyglot.types.Flags;
-import polyglot.types.ProcedureInstance;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.types.TypeSystem;
-import polyglot.util.CodeWriter;
-import polyglot.util.CollectionUtil;
-import polyglot.util.Position;
-import polyglot.util.TypedList;
-import polyglot.visit.AscriptionVisitor;
-import polyglot.visit.CFGBuilder;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeBuilder;
-import polyglot.visit.TypeChecker;
+import java.util.*;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
 
 /**
  * A <code>ConstructorCall_c</code> represents a direct call to a constructor.
@@ -195,7 +171,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
         }
 
 	if (kind == SUPER) {
-	    if (! ct.superType().isClass()) {
+	    if (! superType.isClass()) {
 	        throw new SemanticException("Super type of " + ct +
 		    " is not a class.", position());
 	    }

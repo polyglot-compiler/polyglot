@@ -148,37 +148,31 @@ public class Field_c extends Expr_c implements Field
 
   /** Type check the field. */
   public Node typeCheck(TypeChecker tc) throws SemanticException {
-    Context c = tc.context();
-    TypeSystem ts = tc.typeSystem();
-
-    if (target instanceof Expr) {
-        if (! target.type().isReference()) {
-            throw new SemanticException("Cannot access field \"" + name +
-                "\" on an expression of non-reference type \"" +
-                target.type() + "\".", target.position());
-        }
-    }
-    else {
-        if (! target.type().isReference()) {
-            throw new SemanticException("Cannot access field \"" + name +
-                "\" on non-reference type \"" + target.type() + "\".",
-                target.position());
-        }
-    }
-
-    FieldInstance fi = ts.findField(target.type().toReference(), name, c.currentClass());
-    
-    if (fi == null) {
-        throw new InternalCompilerError("Cannot access field on node of type " +
-            target.getClass().getName() + ".");
-    }
-    
-    Field_c f = (Field_c)fieldInstance(fi).type(fi.type());
-    f.checkConsistency(c);
-    
-    return f;
+      Context c = tc.context();
+      TypeSystem ts = tc.typeSystem();
+      
+      if (! target.type().isReference()) {
+	  throw new SemanticException("Cannot access field \"" + name +
+				      "\" " + (target instanceof Expr
+					       ? "on an expression "
+					       : "") +
+				      "of non-reference type \"" +
+				      target.type() + "\".", target.position());
+      }
+      
+      FieldInstance fi = ts.findField(target.type().toReference(), name, c.currentClass());
+      
+      if (fi == null) {
+	  throw new InternalCompilerError("Cannot access field on node of type " +
+					  target.getClass().getName() + ".");
+      }
+      
+      Field_c f = (Field_c)fieldInstance(fi).type(fi.type());
+      f.checkConsistency(c);
+      
+      return f;
   }
-
+  
   public Type childExpectedType(Expr child, AscriptionVisitor av)
   {
       if (child == target) {
