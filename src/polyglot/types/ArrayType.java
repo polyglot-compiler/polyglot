@@ -54,6 +54,10 @@ public class ArrayType extends Type
     return false;
   }
 
+  public boolean isClassType() { return false; }
+  public boolean isArrayType() { return true; }
+
+
   public boolean isCanonical() 
   {
     return base.isCanonical();

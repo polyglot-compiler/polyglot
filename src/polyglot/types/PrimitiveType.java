@@ -72,6 +72,8 @@ public class PrimitiveType extends Type
   public final boolean isCanonical() {
     return true;
   }
+  public boolean isClassType() { return false; }
+  public boolean isArrayType() { return false; }
 
   public boolean isNumeric() {
     switch(kind) 

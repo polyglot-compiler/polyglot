@@ -111,8 +111,8 @@ public class FieldExpression extends Expression
     }
 
     if( ltype == null ||
-        ltype instanceof ClassType ||
-        ltype instanceof ArrayType) {
+        ltype.isClassType() ||
+        ltype.isArrayType()) {
       if (name.equals("class"))
       {
         Annotate.setExpectedType( target, ltype);

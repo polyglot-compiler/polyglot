@@ -241,10 +241,10 @@ public class NewObjectExpression extends Expression
 
     for (Iterator i = mti.exceptionTypes().iterator(); i.hasNext(); )
     {
-      Object o = i.next();
+      Type o = (Type)i.next();
       ClassType ct = null;
 
-      if ( o instanceof ClassType) ct = (ClassType)o;
+      if ( o.isClassType()) ct = o.toClassType();
       else throw new InternalCompilerError("The constructor throws " +
                                            " exceptions that are not of "
                                            + "ClassType");

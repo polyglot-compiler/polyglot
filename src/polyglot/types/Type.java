@@ -50,6 +50,14 @@ public abstract class Type extends AnnotatedObject implements Serializable
    */
   public abstract boolean isCanonical();
 
+  public abstract boolean isClassType();
+  public abstract boolean isArrayType();
+
+    /* Returns a non-null classtype iff isClassType() returns true */
+    public ClassType toClassType() {
+	return null;
+    }
+
   public final Type extendArrayDims(int dims) throws SemanticException
   { 
     return ts.extendArrayDims(this,dims); 

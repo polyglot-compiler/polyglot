@@ -15,19 +15,19 @@ public class LocalContext
   /**
    * Resolve anything that we dont' know about to the type system
    */
-  TypeSystem ts;
+  protected TypeSystem ts;
   /**
    * Contains the stack of inner class tuples.
    */
-  Stack /* of ClassTuple */ stkContexts;
+  protected Stack /* of ClassTuple */ stkContexts;
   /**
    * the import table for the file
    */
-  ImportTable itImports;
+  protected ImportTable itImports;
   /**
    * The current node visitor.
    */
-  NodeVisitor visitor;
+  protected NodeVisitor visitor;
 
   /** 
    * Creates a LocalContext without a parent context (i.e, for a method 

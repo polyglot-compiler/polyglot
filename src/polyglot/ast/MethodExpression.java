@@ -157,15 +157,15 @@ public class MethodExpression extends Expression
       ct = null;
     }
     else if( target instanceof TypeNode 
-                && ((TypeNode)target).getType() instanceof ClassType) {
-      ct = (ClassType)((TypeNode)target).getType();
+                && ((TypeNode)target).getType().isClassType()) {
+      ct = ((TypeNode)target).getType().toClassType();
     }
     else if( target instanceof Expression) {
-      if( ((Expression)target).getCheckedType() instanceof ClassType) {
-        ct = (ClassType)((Expression)target).getCheckedType();
+      if( ((Expression)target).getCheckedType().isClassType()) {
+        ct = ((Expression)target).getCheckedType().toClassType();
       }
-      else if( ((Expression)target).getCheckedType() instanceof ArrayType) {
-        ct = (ClassType)c.getTypeSystem().getObject();
+      else if( ((Expression)target).getCheckedType().isArrayType()) {
+        ct = c.getTypeSystem().getObject().toClassType();
       }
       else {
         throw new SemanticException( "Cannot invoke method \""

@@ -312,7 +312,7 @@ public class BinaryExpression extends Expression
           throw new SemanticException(
                     "Can only compare two expressions of similar type.");
         }
-        else if( !(rtype instanceof ClassType || rtype instanceof NullType)) {
+        else if( !(rtype.isClassType() || rtype instanceof NullType)) {
           throw new SemanticException(
                     "Can only compare two expressions of similar type.");
         }

@@ -25,6 +25,12 @@ public abstract class ClassType extends Type
    */
   public boolean isPrimitive() { return false; }
   public boolean isCanonical() { return true; }
+  public boolean isClassType() { return true; }
+  public boolean isArrayType() { return false; }
+
+    public ClassType toClassType() {
+	return this;
+    }
 
   public boolean equals(Object o) 
   {

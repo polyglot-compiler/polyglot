@@ -718,15 +718,20 @@ public class Compiler implements TargetTable, ClassCleaner
   protected void translate( Target t, Node ast, ImportTable it) 
     throws IOException
   {
-    SourceFileNode sfn = (SourceFileNode)ast;
-    Writer ofw = t.getOutputWriter( sfn.getPackageName());
-    CodeWriter w = new CodeWriter( t.getOutputWriter(sfn.getPackageName()), 
-                                   outputWidth);
+    if (jif) {
+	verbose(this, "Skipping translation");
+	return;
+    } else {
+	SourceFileNode sfn = (SourceFileNode)ast;
+	Writer ofw = t.getOutputWriter( sfn.getPackageName());
+	CodeWriter w = new CodeWriter( t.getOutputWriter(sfn.getPackageName()), 
+				       outputWidth);
     
-    ast.translate( new LocalContext(it, ts, null), w);
-    w.flush();
-    System.out.flush();
-    t.closeDestination();
+	ast.translate( new LocalContext(it, ts, null), w);
+	w.flush();
+	System.out.flush();
+	t.closeDestination();
+    }
   }
 
   protected Node serializeClassInfo( Target t, Node ast, ErrorQueue eq)

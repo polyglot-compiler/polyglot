@@ -50,6 +50,8 @@ public class MethodType extends Type implements Cloneable
   public TypedList argumentTypes()  { return argumentTypes; }
 
   public boolean isPrimitive() { return false; }
+  public boolean isClassType() { return false; }
+  public boolean isArrayType() { return false; }
   // FIXME: is this correct?
   public  boolean isCanonical() { return true; }
   
