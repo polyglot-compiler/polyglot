@@ -27,8 +27,10 @@ public class Constants12 {
     switch (x) {
       case (int) (0L-Long.MAX_VALUE):
         System.out.println("0"); break;
-      case (int) -9223372036854775807:
+      case (int) -9223372036854775807L:
         System.out.println("1"); break; // error: duplicate label
     }
+
+    return 0;
   }
 }
