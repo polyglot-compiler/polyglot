@@ -162,6 +162,7 @@ public class Main
 	String current_path = System.getProperty("java.class.path");
 	current_path = args[i] + System.getProperty("path.separator") +
 			current_path;
+        i++;
 	System.setProperty("java.class.path", current_path);
 	System.err.println("Warning: -classpath not implemented\n");
 	// Does the system class loader really keep looking at this?
