@@ -23,7 +23,7 @@ public class DropCmd implements Command
 	public boolean isNTDrop() { return nt != null; }		public Production getProduction() { return prod; }
 	public Nonterminal getNonterminal() { return nt; }	
 	public void unparse(CodeWriter cw) {
-		cw.begin(3);		cw.write("DropCmd\n");
-		cw.end();
+		//cw.begin(0);		cw.write("DropCmd");		cw.allowBreak(0);		if (prod != null)			prod.unparse(cw);		else			cw.write(nt.getName());
+		//cw.end();
 	}	
 }

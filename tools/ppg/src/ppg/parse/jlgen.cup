@@ -128,7 +128,7 @@ include_spec ::=
 	;
 
 command_list_opt ::=
-	command:a command_list_opt:b
+	command_list_opt:b command:a
 	{:
 		/* b = Vector, a = command; */
 		b.addElement(a);
@@ -158,8 +158,13 @@ prod_modifier_opt ::=
 |	empty		{: RESULT = null; :}
 ; 
 transfer_list ::=
-	transfer_list:tl TO nt_id:nt LBRACE production:p RBRACE
-|	TO nt_id:nt LBRACE production:p RBRACE;
+	transfer_list:tl TO nt_id:nt LBRACE rhs_list:rhs RBRACE {:		Production p = new Production(new Nonterminal(nt), rhs);		tl.addElement(p);		RESULT = tl;
+	:}
+|	TO nt_id:nt LBRACE rhs_list:rhs RBRACE {:
+		Vector v = new Vector();
+		Production p = new Production(new Nonterminal(nt), rhs);		v.addElement(p);		RESULT = v;
+	:}
+	;
 /********************************************************************
  * COMMON                                                           *
  ********************************************************************/
@@ -172,11 +177,11 @@ production ::=
 	nt_id:lhs_id COLON_COLON_EQUALS rhs_list:rhs SEMI
 	{: 
 		RESULT = new Production(new Nonterminal(lhs_id), rhs);
-	:}
+	:}/*	
 |	error SEMI
 	{:
-		/* throw exeption? */
-	:}
+		
+	:}*/
 ;
 nt_id ::=
 	ID:the_id {: RESULT = (String)the_id.getValue(); :}/*

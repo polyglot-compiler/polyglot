@@ -2,6 +2,7 @@ package jltools.util.jlgen.atoms;
 
 import jltools.util.jlgen.parse.*;
 import jltools.util.jlgen.util.*;
+
 public class Terminal extends GrammarSymbol
 {
 	public Terminal(String name, String label)

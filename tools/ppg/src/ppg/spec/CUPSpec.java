@@ -12,6 +12,7 @@ public class CUPSpec extends Spec
 {
 	private static final String HEADER = "jlgen [cupspec]: ";
 	private Vector productions;
+	// maps nonterminal to its index in the vector of productions	private Hashtable ntProds;
 	
 	public CUPSpec (String pkg, Vector imp, Vector codeParts, Vector syms,
 					Vector precedence, String startSym, Vector prods)
@@ -23,8 +24,27 @@ public class CUPSpec extends Spec
 		prec = precedence;
 		start = startSym;
 		productions = prods;
-	}		public CUPSpec coalesce() {
-		// cannot have a parent by definition		return this;	}		public Object clone() {		return new CUPSpec(packageName, imports, code, symbols, prec, start, productions);		}
+		hashNonterminals();
+	}
+	
+	private void hashNonterminals() {		ntProds = new Hashtable();		if (productions == null)			return;				Production prod;
+		for (int i=0; i < productions.size(); i++) {			prod = (Production) productions.elementAt(i);
+			ntProds.put(prod.getLHS().getName(), new Integer(i));
+		}	}
+		public CUPSpec coalesce() {		// cannot have a parent by definition		return this;	}	
+	public void removeEmptyProductions () {
+		Production prod;		for (int i=0; i < productions.size(); i++) {
+			prod = (Production) productions.elementAt(i);			if (prod.getRHS().size() == 0) {				productions.removeElementAt(i);				i--;			}
+		}	}
+		public Object clone() {
+		String newPkgName = (packageName == null) ? null : new String(packageName);
+		String newStart = (start == null) ? null : new String(start);		return new CUPSpec(newPkgName,
+						   (Vector) imports.clone(),
+						   (Vector) code.clone(),
+						   (Vector) symbols.clone(),
+						   (Vector) prec.clone(),
+						   newStart,
+						   (Vector) productions.clone());	}
 		public void addSymbols(Vector syms) {		if (syms == null)
 			return;				for (int i=0; i < syms.size(); i++) {			symbols.addElement(syms.elementAt(i));		}
 	}	
@@ -35,13 +55,45 @@ public class CUPSpec extends Spec
 			}
 		}	}
 	
-	public void dropProductions(Production p) {			}
-		public void dropAllProductions(Nonterminal nt) {			}
-	public void addProductions(Production p) {			}
-	public void unparse(CodeWriter cw) {
-		cw.begin(0);		cw.write("package " + packageName + ";");
-		cw.newline(); cw.newline();
-		
+	public void dropProductions(Production p) {
+		Nonterminal nt = p.getLHS();		int pos = errorNotFound(findNonterminal(nt), nt);		// should be a valid index from which we can drop productions
+		Production prod = (Production) productions.elementAt(pos);		prod.drop(p);
+	}
+	
+	public void dropProductions(Nonterminal nt) {
+		int pos = errorNotFound(findNonterminal(nt), nt);		// should be a valid index from which we can drop productions
+		Production prod = (Production) productions.elementAt(pos);		prod.drop((Production) prod.clone());
+	}
+		public void dropAllProductions(Nonterminal nt) {		int pos = errorNotFound(findNonterminal(nt), nt);		// remove the whole lhs ::= rhs entry from the list of productions		productions.removeElementAt(pos);		// now we need to rehash since positions changed		hashNonterminals();
+	}
+	public void addProductions(Production p) {		Nonterminal nt = p.getLHS();
+		int pos = findNonterminal(nt);
+		if (pos == -1) {			// add a hash mapping for this entry
+			ntProds.put(nt.getName(), new Integer(productions.size()));			// just append to our list			productions.addElement(p);		} else {
+			// attach to specific nonterminal in our list of productions			Production prod = (Production) productions.elementAt(pos);			prod.add(p);
+			//productions.setElementAt(prod, pos);		}
+	}
+	/**
+	 * Returns int which is the position of the nonterminal in the production
+	 * list, or exits if it is not found
+	 */
+	private int findNonterminal(Nonterminal nt) {		Integer pos = (Integer) ntProds.get(nt.getName());
+		if (pos == null)
+			return -1;
+		else			return pos.intValue();
+	}
+	
+	private int errorNotFound(int i, Nonterminal nt) {
+		if (i == -1) {			// index not found, hence we have no such terminal
+			System.err.println(HEADER + "nonterminal " + nt + " not found.");
+			System.exit(1);
+		}
+		return i;	}
+		public void unparse(CodeWriter cw) {
+		cw.begin(0);
+		if (packageName != null) {			cw.write("package " + packageName + ";");
+			cw.newline(); cw.newline();
+		}	
 		// import
 		for (int i=0; i < imports.size(); i++) {
 			cw.write("import " + (String) imports.elementAt(i) + ";");
@@ -61,10 +113,10 @@ public class CUPSpec extends Spec
 		
 		// precedence
 		
-		// start
-		cw.write("start with " + start + ";");
-		cw.newline(); cw.newline();
-		
+		// start		if (start != null) {
+			cw.write("start with " + start + ";");
+			cw.newline(); cw.newline();
+		}		
 		// productions
 		for (int i=0; i < productions.size(); i++) {
 			((Production) productions.elementAt(i)).unparse(cw);

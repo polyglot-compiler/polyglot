@@ -11,7 +11,7 @@ public class JLgen
 {
 	private static final String HEADER = "jlgen: ";
 	private static final String DEBUG_HEADER = "jlgen [debug]: ";
-	public static boolean debug = true;
+	public static boolean debug = false;
 
 	public static void DEBUG (String s) {
 		if (debug)
@@ -45,10 +45,15 @@ public class JLgen
 			System.out.println(HEADER+"Exception: "+e.getMessage());
 			return;
 		}
-		Spec spec = (Spec)parser.getProgramNode();		//String parentDir = file.getPath();
-		//spec.parseChain(parentDir == null ? "" : parentDir);
+		Spec spec = (Spec)parser.getProgramNode();		
+		/* try #1		String parentDir = file.getPath();
+		spec.parseChain(parentDir == null ? "" : parentDir);		*/
+				/* try #2: uses java1.2 function
 		File parent = file.getParentFile();
-		spec.parseChain(parent == null ? "" : parent.getPath());				// now we have a linked list of inheritance, namely		// JLgen1, JLgen2, ..., JLgenN, CUP		// We combine two at a time, starting from the end with the CUP spec
+		spec.parseChain(parent == null ? "" : parent.getPath());		*/
+		
+		// try #3		String parent = file.getParent();		spec.parseChain(parent == null ? "" : parent);
+				// now we have a linked list of inheritance, namely		// JLgen1, JLgen2, ..., JLgenN, CUP		// We combine two at a time, starting from the end with the CUP spec
 		CUPSpec combined = spec.coalesce();				CodeWriter cw = new CodeWriter(System.out, 72); 
 		try {
 			combined.unparse(cw);
@@ -56,5 +61,7 @@ public class JLgen
 			System.out.println(HEADER+"exception: "+e.getMessage());
 			return;
 		}		
-	}
+	}		private static void pause() {		if (debug) {
+			try{System.in.read();}catch(Exception e){}
+		}	}
 }
