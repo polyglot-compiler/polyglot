@@ -334,6 +334,11 @@ public class Context_c implements Context
         v.type = t;
         v.inCode = false;
         v.staticContext = false;
+
+        if (! t.isAnonymous()) {
+            v.addNamed(t);
+        }
+
         return v;
     }
 
