@@ -2,6 +2,7 @@ LOG=log
 
 GOOD =  \
 	ArrayInit.jl \
+	Narrowing.jl \
 	LabeledBreak.jl \
 	LabeledBreak2.jl \
 	InitializerType1.jl \
