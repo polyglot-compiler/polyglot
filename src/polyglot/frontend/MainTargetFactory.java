@@ -19,7 +19,7 @@ public class MainTargetFactory implements TargetFactory
     this.sourceExtension = sourceExtension;
     this.sourcePath = sourcePath;
     this.outputDirectory = outputDirectory;
-    this.stdout = stdout.booleanValue();
+    this.stdout = (stdout != null) && (stdout.booleanValue());
   }
 
 

@@ -15,13 +15,9 @@ public class LocalContext
    */
   TypeSystem ts;
   /**
-   * Contains the hashtable mapping for name => symbol. top of stack is context for current scope.
+   * Contains the stack of inner class tuples.
    */
-  Stack /* of Hashtable */ stkBlocks; 
-  /**
-   * Contains the stack of inner class contexts.
-   */
-  Stack /* of TypeSystem.Context */ stkContexts;
+  Stack /* of ClassTuple */ stkContexts;
   /**
    * the import table for the file
    */
@@ -37,9 +33,6 @@ public class LocalContext
     this.itImports = itImports;
     this.ts = ts;
     
-    stkBlocks = new Stack();
-    stkBlocks.push( new Hashtable () );
-
     stkContexts = new Stack();
   }
   
@@ -49,10 +42,11 @@ public class LocalContext
    */
   public boolean isDefinedLocally(String s)
   {
-    for (ListIterator i = stkBlocks.listIterator(stkBlocks.size()) ; i.hasPrevious() ; )
+    Stack blockStack =  ((ClassTuple)stkContexts.peek()).getBlockStack();
+    for (ListIterator i =blockStack.listIterator(blockStack.size()) ; i.hasPrevious() ; )
     {
       if ( ((Hashtable) i.previous()).contains( s ) )
-        return true;
+        return true; 
     }
     return false;
   }
@@ -63,7 +57,7 @@ public class LocalContext
    */
   public MethodTypeInstance getMethod( ClassType type, String methodName, List argumentTypes) throws TypeCheckException
   {
-    return ts.getMethod( type, new MethodType( ts, methodName, argumentTypes), (TypeSystem.Context)stkContexts.peek());
+    return ts.getMethod( type, new MethodType( ts, methodName, argumentTypes), ((ClassTuple)stkContexts.peek()).getContext() ); 
   }
 
   /**
@@ -72,9 +66,10 @@ public class LocalContext
   public FieldInstance getField( ClassType type, String fieldName) throws TypeCheckException
   {
     Object result;
+    Stack blockStack =  ((ClassTuple)stkContexts.peek()).getBlockStack();
     if ( type == null ) // could be a local, so check there first.
     {
-      for (ListIterator i = stkBlocks.listIterator(stkBlocks.size()) ; i.hasPrevious() ; )
+      for (ListIterator i = blockStack.listIterator(blockStack.size()) ; i.hasPrevious() ; )
       {
         if ( (result = ((Hashtable) i.previous()).get( fieldName )) != null )
         {
@@ -83,7 +78,7 @@ public class LocalContext
       }      
     }
     // not a local variable, so pass on to the type system.
-    return ts.getField(type, fieldName, (TypeSystem.Context)stkContexts.peek());
+    return ts.getField(type, fieldName, ((ClassTuple)stkContexts.peek()).getContext());
   }
 
   /**
@@ -92,7 +87,7 @@ public class LocalContext
    **/
   public Type getType( Type type ) throws TypeCheckException
   {
-    return ts.checkAndResolveType(type, (TypeSystem.Context)stkContexts.peek());
+    return ts.checkAndResolveType(type, ((ClassTuple)stkContexts.peek()).getContext());
   }
 
   /**
@@ -100,7 +95,7 @@ public class LocalContext
    */
   public Type getType( String s) throws TypeCheckException
   {
-    return ts.checkAndResolveType( new AmbiguousType( ts, s), (TypeSystem.Context)stkContexts.peek());
+    return ts.checkAndResolveType( new AmbiguousType( ts, s), ((ClassTuple)stkContexts.peek()).getContext());
   }
   
   /**
@@ -116,7 +111,7 @@ public class LocalContext
    */
   public void pushClass( ClassType c)
   {
-    stkContexts.push ( new TypeSystem.Context ( itImports, c, null) );
+    stkContexts.push ( new ClassTuple ( new TypeSystem.Context ( itImports, c, null) ));
   }
 
   /**
@@ -140,8 +135,9 @@ public class LocalContext
    */
   public void pushBlock()
   {
-    // FIXME: nks put block scoping within class scoping
-    stkBlocks.push(new Hashtable());
+    if ( stkContexts.size() < 1)
+      throw new InternalCompilerError("Can't push block since not in a class.");
+    ((ClassTuple)stkContexts.peek()).pushBlock();
   }
 
   /**
@@ -149,15 +145,49 @@ public class LocalContext
    */
   public void popBlock()
   {
-    if ( stkBlocks.size() > 1)
-    {
-      try { stkBlocks.pop(); }
-      catch (EmptyStackException ese ) { }
-    }
-    else
-    {
-      throw new InternalCompilerError("No more block-scopes to pop!");
-    }
+    if ( stkContexts.size() < 1)
+      throw new InternalCompilerError("Can't pop block since not in a class.");
+    ((ClassTuple)stkContexts.peek()).popBlock();
+  }
+
+  /**
+   * enters a method
+   */
+  public void enterMethod(MethodTypeInstance mti)
+  {
+    if ( stkContexts.size() < 1)
+      throw new InternalCompilerError("Can't enter function since not currently in a class.");
+    ((ClassTuple)stkContexts.peek()).enterMethod(mti);
+  }
+
+  /**
+   * leaves a method
+   */
+  public void leaveMethod()
+  {
+    if ( stkContexts.size() < 1)
+      throw new InternalCompilerError("Can't leave function  since not currently in a class.");
+    ((ClassTuple)stkContexts.peek()).leaveMethod();
+  }
+
+  /**
+   * Gets the current method
+   */
+  public MethodTypeInstance getCurrentMethod() 
+  {
+    if ( stkContexts.size() < 1)
+      throw new InternalCompilerError("Can't pop block since not in a class.");
+    return ((ClassTuple)stkContexts.peek()).getMethod();
+  }
+
+  /**
+   * Gets current class
+   */
+  public ClassType getCurrentClass()
+  {
+    if ( stkContexts.size() < 1)
+      throw new InternalCompilerError("Can't pop block since not in a class.");
+    return ((ClassTuple)stkContexts.peek()).getCurrentClass();
   }
 
   /**
@@ -165,7 +195,69 @@ public class LocalContext
    */
   public void addSymbol( String sName, Type t)
   {
-    ((Hashtable)stkBlocks.peek()).put(sName, t);
+    if ( stkContexts.size() < 1)
+      throw new InternalCompilerError("Can't pop block since not in a class.");
+    Stack blockStack =  ((ClassTuple)stkContexts.peek()).getBlockStack();
+    if ( blockStack == null || blockStack.size() == 0)
+      throw new InternalCompilerError(" Can't add symbol since not inside a method");
+    ((Hashtable)blockStack.peek()).put(sName, t);
+  }
+
+  class ClassTuple
+  {
+    // contains a stack of hashtables ( e.g. for blocking structures) and a MethodTypeInstance
+    // giving the method that is currently being processed, and the TypeSystem.context
+
+    Stack sBlocks;
+    MethodTypeInstance mti;
+    TypeSystem.Context context;
+    
+    ClassTuple (TypeSystem.Context c)
+    {
+      context = c;
+      sBlocks = new Stack();
+      mti = null;
+    }
+    
+    void pushBlock() 
+    {
+      if ( mti == null)
+      {
+        throw new InternalCompilerError("Cannot push blocks since MethodTypeInstance == null!");
+      }
+      sBlocks.push( new Hashtable () );
+    }
+
+    void popBlock()
+    {
+      try { sBlocks.pop(); }
+      catch (EmptyStackException ese ) 
+      { 
+        throw new InternalCompilerError("Not enough blocks to pop.");
+      }
+    }
+    
+    void enterMethod(MethodTypeInstance mti)
+    {
+      this.mti = mti;
+      sBlocks = new Stack();
+      pushBlock();
+    }
+    
+    void leaveMethod()
+    {
+      if ( mti == null) throw new InternalCompilerError(" Cannot leave method, since not in one.");
+      mti = null;
+      popBlock();
+    }
+    
+    Stack getBlockStack()  { return sBlocks; }
+
+    ClassType getCurrentClass() { return context.inClass; }
+
+    MethodTypeInstance getMethod()  { return mti; }
+    
+    TypeSystem.Context getContext() { return context;  }
   }
 
 }

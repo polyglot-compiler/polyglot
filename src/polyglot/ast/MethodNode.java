@@ -44,6 +44,7 @@ public class MethodNode extends ClassMember {
     this.returnType = null;
     this.isConstructor = true;
     this.additionalDimensions = 0;
+    mtiThis = null;
   }
 
   /**
@@ -71,6 +72,7 @@ public class MethodNode extends ClassMember {
     this.returnType = returnType;
     this.isConstructor = false;
     this.additionalDimensions = 0;
+    mtiThis = null;
   }
 
   /**
@@ -294,22 +296,30 @@ public class MethodNode extends ClassMember {
     }
     
     if( additionalDimensions == 0) {
-      clazz.addMethod( new MethodTypeInstance( ts, name,
+      mtiThis = new MethodTypeInstance( ts, name,
                           returnType.getType(), argTypes, 
-                          exceptions, accessFlags));
+                          exceptions, accessFlags);
     }
     else {
-      clazz.addMethod( new MethodTypeInstance( ts, name,
+      mtiThis = new MethodTypeInstance( ts, name,
                           new ArrayType( ts, returnType.getType(), 
                                          additionalDimensions),
-                          argTypes, exceptions, accessFlags));     
+                          argTypes, exceptions, accessFlags);     
     }
+    clazz.addMethod( mtiThis);
 
     return this;
   }
 
+  public Node adjustScope(LocalContext c)
+  {
+    c.enterMethod ( mtiThis ) ;
+    return null;
+  }
+
   public Node typeCheck( LocalContext c)
   {
+    c.leaveMethod(  ) ;
     return this;
   }
 
@@ -361,4 +371,5 @@ public class MethodNode extends ClassMember {
   private List exceptions;
   private BlockStatement body;
   private int additionalDimensions;
+  private MethodTypeInstance mtiThis; 
 }

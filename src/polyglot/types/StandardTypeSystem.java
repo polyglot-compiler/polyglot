@@ -577,7 +577,9 @@ public class StandardTypeSystem extends TypeSystem {
           if ( fi.getName().equals(name))
           {
             if ( isAccessible( type, fi.getAccessFlags(), context))
+            {
               return fi;
+            }
             throw new TypeCheckException(" Field \"" + name + "\" found in \"" + type.getFullName() + 
                                          "\", but with wrong access permissions.");
           }
@@ -600,7 +602,7 @@ public class StandardTypeSystem extends TypeSystem {
       try {  fi = getField( context.inClass, name, context); }
       catch ( TypeCheckException tce) { /* must have been something we couldnt access */ }
 
-      boolean bFound = (fi == null);
+      boolean bFound = (fi != null);
       
       // now check all enclosing classes (this will also look for conflicts)
       tEnclosing = context.inClass.getContainingClass();
@@ -653,13 +655,16 @@ public class StandardTypeSystem extends TypeSystem {
           if ( methodCallValid( mti, method))
           {
             if ( isAccessible( type, mti.getAccessFlags(), context))
+            {
               return mti;
+            }
             throw new TypeCheckException(" Method \"" + method.getName() + "\" found in \"" + type.getFullName() + 
                                          "\", but with wrong access permissions.");
           }
         }
       }
       while ( (type = type.getSupertype()) != null);
+      mti = null;
     }
     else // type == null, ==> no starting point. so check superclasses as well as enclosing classes.
     {
@@ -670,13 +675,14 @@ public class StandardTypeSystem extends TypeSystem {
         if (methodCallValid(mti, method))
           // found it. can stop looking since guaranteed that it is not ambiguous
           return mti;
+        mti = null;
       }
 
-      // check the lineage of where we are
+      // check the parent  lineage of where we are
       try {  mti = getMethod( context.inClass, method, context); }
       catch ( TypeCheckException tce) { /* must have been something we couldnt access */ }
 
-      boolean bFound = (mti == null);
+      boolean bFound = (mti != null);
       
       // now check all enclosing classes (this will also look for conflicts)
       tEnclosing = context.inClass.getContainingClass();
@@ -774,8 +780,11 @@ public class StandardTypeSystem extends TypeSystem {
     Iterator iArgumentTypesCall  = lArgumentTypesCall.iterator();
     
     for ( ; iArgumentTypesProto.hasNext() ; )
-      if ( ! descendsFrom ( (Type)iArgumentTypesCall.next(), (Type)iArgumentTypesProto.next() ) )
+    {
+      if ( !isCastValid (  (Type)iArgumentTypesCall.next(),  (Type)iArgumentTypesProto.next() ) )
         return false;
+    }
+    
     return true;
   }
 

@@ -165,28 +165,32 @@ public class VariableDeclarationStatement extends Statement {
   public Node removeAmbiguities( LocalContext c) throws TypeCheckException
   {
     Declarator d;
-     Iterator iter = declarators();
-
-     while( iter.hasNext()) {
-       d = (Declarator)iter.next();
-       c.addSymbol( d.name, typeForDeclarator( d));
-     }
-     
-     return this;
+    Iterator iter = declarators();
+    
+    // only add to context if inside a method
+    if ( c.getCurrentMethod() != null)
+      while( iter.hasNext()) {
+        d = (Declarator)iter.next();
+        c.addSymbol( d.name, typeForDeclarator( d));
+      }
+    
+    return this;
   }
 
    public Node typeCheck(LocalContext c) throws TypeCheckException
    {
      Declarator d;
      Iterator iter = declarators();
-
-     while( iter.hasNext()) {
-       d = (Declarator)iter.next();
-       c.addSymbol( d.name, typeForDeclarator( d));
-     }
-
-      // FIXME: initializers
-      return this;
+     
+     //only add to context if inside a method
+     if ( c.getCurrentMethod() != null)
+       while( iter.hasNext()) {
+         d = (Declarator)iter.next();
+         c.addSymbol( d.name, typeForDeclarator( d));
+       }
+     
+     // FIXME: initializers
+     return this;
    }
 
   public void translate(LocalContext c, CodeWriter w)

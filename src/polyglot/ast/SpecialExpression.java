@@ -85,7 +85,10 @@ public class SpecialExpression extends Expression {
 
   public Node typeCheck(LocalContext c)
   {
-    // FIXME: implement
+    if ( kind == THIS)
+      setCheckedType( c.getCurrentClass() );
+    else
+      setCheckedType ( c.getCurrentClass().getSupertype() );
     return this;
   }
 

@@ -248,7 +248,7 @@ public class ClassNode extends ClassMember {
     return null;
   }
 
-  public Node removeAmbiguities( LocalContext c)
+  public Node removeAmbiguities( LocalContext c) throws TypeCheckException
   {
     c.popClass(); 
     return this;

@@ -4,10 +4,9 @@
 
 package jltools.ast;
 
-import jltools.types.Type;
+import jltools.types.*;
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
-import jltools.types.LocalContext;
 import jltools.util.CodeWriter;
 import java.util.List;
 import java.util.Iterator;
@@ -139,9 +138,27 @@ public class MethodExpression extends Expression {
     return null;
   }
 
-  public Node typeCheck(LocalContext c)
+  public Node typeCheck(LocalContext c) throws TypeCheckException
   {
-    // fixme: implement
+    // fixme: exceptions
+    ClassType ct; 
+    if (target == null) 
+      ct = null;
+    else if ( target instanceof TypeNode && ((TypeNode)target).getType() instanceof ClassType)
+      ct = (ClassType) ((TypeNode)target).getType() ;
+    else if ( target instanceof Expression && ((Expression)target).getCheckedType() instanceof ClassType)
+      ct = (ClassType)   ((Expression)target).getCheckedType();
+    else
+      throw new TypeCheckException (" Target of method invocation must be a ClassType");
+
+    List argTypes = new ArrayList();
+    for ( ListIterator i = arguments.listIterator() ; i.hasNext(); )
+    {
+      argTypes.add (  ((Expression)i.next()).getCheckedType() );
+    }
+    MethodTypeInstance mti = c.getMethod ( ct, name, argTypes );
+    setCheckedType ( mti.getType() );
+
     return this;
   }
   

@@ -41,8 +41,8 @@ public class FormalParameter extends Node {
     /**
      * Effects: Returns the type of this parameter.
      */
-    public TypeNode getType() {
-	return type;
+    public Type getType() {
+	return type.getType();
     }
 
     /**
