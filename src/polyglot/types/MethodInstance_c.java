@@ -28,9 +28,12 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     public MethodInstance flags(Flags flags) {
-        MethodInstance_c n = (MethodInstance_c) copy();
-	n.flags = flags;
-	return n;
+        if (!flags.equals(this.flags)) {
+            MethodInstance_c n = (MethodInstance_c) copy();
+            n.flags = flags;
+            return n;
+        }
+        return this;
     }
 
     public String name() {
@@ -38,9 +41,13 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     public MethodInstance name(String name) {
-        MethodInstance_c n = (MethodInstance_c) copy();
-	n.name = name;
-	return n;
+        if ((name != null && !name.equals(this.name)) ||
+            (name == null && name != this.name)) {
+            MethodInstance_c n = (MethodInstance_c) copy();
+            n.name = name;
+            return n;
+        }
+        return this;
     }
 
     public Type returnType() {
@@ -48,27 +55,39 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     public MethodInstance returnType(Type returnType) {
-        MethodInstance_c n = (MethodInstance_c) copy();
-	n.returnType = returnType;
-	return n;
+        if (this.returnType != returnType) {
+            MethodInstance_c n = (MethodInstance_c) copy();
+            n.returnType = returnType;
+            return n;
+        }
+        return this;
     }
 
     public MethodInstance formalTypes(List l) {
-        MethodInstance_c n = (MethodInstance_c) copy();
-	n.formalTypes = new ArrayList(l);
-	return n;
+        if (!CollectionUtil.equals(this.formalTypes, l)) {
+            MethodInstance_c n = (MethodInstance_c) copy();
+            n.formalTypes = new ArrayList(l);
+            return n;
+        }
+        return this;
     }
 
     public MethodInstance throwTypes(List l) {
-        MethodInstance_c n = (MethodInstance_c) copy();
-	n.excTypes = new ArrayList(l);
-	return n;
+        if (!CollectionUtil.equals(this.excTypes, l)) {
+            MethodInstance_c n = (MethodInstance_c) copy();
+            n.excTypes = new ArrayList(l);
+            return n;
+        }
+        return this;
     }
 
     public MethodInstance container(ReferenceType container) {
-        MethodInstance_c n = (MethodInstance_c) copy();
-	n.container = container;
-	return n;
+        if (this.container != container) {
+            MethodInstance_c n = (MethodInstance_c) copy();
+            n.container = container;
+            return n;
+        }
+        return this;
     }
 
     public int hashCode() {

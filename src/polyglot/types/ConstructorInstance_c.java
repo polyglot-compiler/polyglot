@@ -21,27 +21,39 @@ public class ConstructorInstance_c extends ProcedureInstance_c
     }
 
     public ConstructorInstance flags(Flags flags) {
-        ConstructorInstance_c n = (ConstructorInstance_c) copy();
-	n.flags = flags;
-	return n;
+        if (!flags.equals(this.flags)) {
+            ConstructorInstance_c n = (ConstructorInstance_c) copy();
+            n.flags = flags;
+            return n;
+        }
+        return this;
     }
 
     public ConstructorInstance formalTypes(List l) {
-        ConstructorInstance_c n = (ConstructorInstance_c) copy();
-	n.formalTypes = new ArrayList(l);
-	return n;
+        if (!CollectionUtil.equals(this.formalTypes, l)) {
+            ConstructorInstance_c n = (ConstructorInstance_c) copy();
+            n.formalTypes = new ArrayList(l);
+            return n;
+        }
+        return this;
     }
 
     public ConstructorInstance throwTypes(List l) {
-        ConstructorInstance_c n = (ConstructorInstance_c) copy();
-	n.excTypes = new ArrayList(l);
-	return n;
+        if (!CollectionUtil.equals(this.excTypes, l)) {
+            ConstructorInstance_c n = (ConstructorInstance_c) copy();
+            n.excTypes = new ArrayList(l);
+            return n;
+        }
+        return this;
     }
 
     public ConstructorInstance container(ClassType container) {
-        ConstructorInstance_c n = (ConstructorInstance_c) copy();
-	n.container = container;
-	return n;
+        if (this.container != container) {
+            ConstructorInstance_c n = (ConstructorInstance_c) copy();
+            n.container = container;
+            return n;
+        }
+        return this;
     }
 
     public String toString() {
