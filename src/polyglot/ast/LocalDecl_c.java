@@ -116,17 +116,23 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return reconstruct(type, init);
     }
 
-    /*
-    public Context enterScope(Context c) {
-        // Add the local to the _current_ scope.  This ensures li is in scope
-        // when evaluating the initializer.
-        c.addVariable(li);
-        return c;
+    /**
+     * Add the declaration of the variable as we enter the scope of the
+     * intializer
+     */
+    public Context enterScope(Node child, Context c) {
+        if (child == init) {
+            c.addVariable(li);
+        }
+        return super.enterScope(child, c);
     }
-    */
 
     public void addDecls(Context c) {
-        c.addVariable(li);
+        // Add the declaration of the variable if we haven't already done
+        // so in enterScope, when visiting the initializer.
+        if (init == null) {
+            c.addVariable(li);
+        }
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
@@ -148,6 +154,37 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         return localInstance(li);
     }
 
+    /**
+     * Override superclass behaviour to check if the variable is multiply
+     * defined.
+     */
+    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+        // Check if the variable is multiply defined.
+        // we do it in type check enter, instead of type check since
+        // we add the declaration before we enter the scope of the
+        // initializer.
+        Context c = tc.context();
+
+        LocalInstance outerLocal = null;
+
+        try {
+            outerLocal = c.findLocal(li.name());
+        }
+        catch (SemanticException e) {
+            // not found, so not multiply defined
+        }
+
+        if (outerLocal != null && c.isLocal(li.name())) {
+            throw new SemanticException(
+                "Local variable \"" + name + "\" multiply defined.  "
+                    + "Previous definition at " + outerLocal.position() + ".",
+                position());
+        }
+        
+        return super.typeCheckEnter(tc);
+
+    }
+    
     /** Type check the declaration. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
@@ -165,26 +202,6 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         catch (SemanticException e) {
             throw new SemanticException(e.getMessage(), position());
         }
-
-        // Check if the variable is multiply defined.
-        Context c = tc.context();
-
-	LocalInstance outerLocal = null;
-
-        try {
-            outerLocal = c.findLocal(li.name());
-	}
-        catch (SemanticException e) {
-            // not found, so not multiply defined
-        }
-
-	if (outerLocal != null && c.isLocal(li.name())) {
-	    throw new SemanticException("Local variable \"" + name +
-					"\" multiply defined.  " +
-					"Previous definition at " +
-					outerLocal.position() + ".",
-					position());
-	}
 
         if (init != null) {
             if (init instanceof ArrayInit) {
