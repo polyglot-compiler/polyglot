@@ -7,6 +7,7 @@ include $(SOURCE)/Rules.mk
 SOURCES = \
 	Compiler.java \
 	ExtensionInfo.java \
+	AbstractExtensionInfo.java \
 	AbstractPass.java \
 	BarrierPass.java \
 	CupParser.java \

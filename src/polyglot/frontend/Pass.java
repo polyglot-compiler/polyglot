@@ -31,6 +31,8 @@ public interface Pass
     public static final ID SERIALIZE = new ID("serialize");
     public static final ID OUTPUT = new ID("output");
 
+    public static final ID FIRST_BARRIER = BUILD_TYPES_ALL;
+
     /** Run the pass. */
     public boolean run();
 }

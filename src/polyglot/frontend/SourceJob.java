@@ -20,13 +20,14 @@ public class SourceJob extends Job
     protected Context context;
 
     /** Construct a new job for a given source and compiler. */
-    public SourceJob(ExtensionInfo lang, JobExt ext, Job parent, Source source) {
+    public SourceJob(ExtensionInfo lang, JobExt ext, Job parent, Source source, Node ast) {
         super(lang, ext, parent, null);
         this.source = source;
+        this.ast = ast;
     }
 
     public List getPasses() {
-      	return lang.passes(this);
+        return lang.passes(this);
     }
 
     public Context context() {

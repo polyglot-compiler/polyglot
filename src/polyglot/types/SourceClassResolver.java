@@ -178,17 +178,11 @@ public class SourceClassResolver extends LoadedClassResolver
     throws SemanticException
   {
     // Compile the source file just enough to get the type information out.
-    try {
-      if (compiler.readSource(ext, source)) {
-	return ts.parsedResolver().findType(name);
-      }
-      else {
-        throw new SemanticException("Error while compiling " + source.name() + ".");
-      }
+    if (ext.readSource(source)) {
+      return ts.parsedResolver().findType(name);
     }
-    catch (IOException e) {
-      throw new SemanticException("I/O error while compiling " +
-	  source.name() + ": " + e.getMessage());
+    else {
+      throw new SemanticException("Error while compiling " + source.name() + ".");
     }
   }
 }

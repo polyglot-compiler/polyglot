@@ -213,7 +213,7 @@ public abstract class Job
 
         Compiler.report(1, this + " spawning " + j);
 
-        if (! compiler().runAllPasses(j)) {
+        if (! lang.runAllPasses(j)) {
             return null;
         }
 

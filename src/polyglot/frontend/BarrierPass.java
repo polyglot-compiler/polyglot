@@ -25,7 +25,7 @@ public class BarrierPass extends AbstractPass
         for (Iterator i = job.children().iterator(); i.hasNext(); ) {
             Job child = (Job) i.next();
 
-            if (! job.compiler().runToPass(child, id)) {
+            if (! job.extensionInfo().runToPass(child, id)) {
                 return false;
 	    }
         }

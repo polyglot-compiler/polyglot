@@ -67,10 +67,28 @@ public interface ExtensionInfo {
     SourceLoader sourceLoader();
 
     /** Produce a job for the given source. */
-    SourceJob createJob(Job parent, Source source);
+    SourceJob addJob(Source source);
+
+    /** Produce a job for a given source using the given AST. */
+    SourceJob addJob(Source source, Node ast);
+
+    /** Produce a job for the given AST (possibly null). */
+    SourceJob createJob(Job parent, Source source, Node ast);
 
     /** Produce a job for the given context. */
     Job createJob(Node ast, Context context, Job outer, Pass.ID begin, Pass.ID end);
+
+    /** Run all jobs to completion. */
+    boolean runToCompletion();
+
+    /** Run the given job up to a given pass. */
+    boolean runToPass(Job job, Pass.ID goal);
+
+    /** Run the given job to completion. */
+    boolean runAllPasses(Job job);
+
+    /** Read a source file and compile up to the current job's barrier. */
+    boolean readSource(Source source);
 
     /**
      * Produce a target factory for this language extension.  The target

@@ -40,7 +40,7 @@ public class VisitorPass extends AbstractPass
 	    int nErrsBefore = q.errorCount();
 
             ast = ast.visit(v);
-            v.finish();
+            v.finish(ast);
 
             int nErrsAfter = q.errorCount();
 

@@ -49,56 +49,18 @@ import java.util.*;
  * <li> translation (Translator) </li>
  * </ol>
  */
-public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
-    protected Compiler compiler;
-    protected Options options;
-    protected TypeSystem ts = null;
-    protected NodeFactory nf = null;
-    protected SourceLoader source_loader = null;
-    protected TargetFactory target_factory = null;
-
-    public void setOptions(Options options) throws UsageError {
-	this.options = options;
-    }
-
-    public Compiler compiler() {
-        return compiler;
-    }
-
-    public void initCompiler(Compiler compiler) {
-	this.compiler = compiler;
-
+public class ExtensionInfo extends jltools.frontend.AbstractExtensionInfo {
+    protected void initTypeSystem() {
 	try {
-            // Create the type system and node factory.
-            typeSystem();
-            nodeFactory();
-
             LoadedClassResolver lr;
-
             lr = new SourceClassResolver(compiler, this, options.classpath,
-                                          compiler.loader());
-
-            /*
-            lr = new LoadedClassResolver(typeSystem(), options.classpath,
-                                          compiler.loader(), version());
-            */
-
+                                         compiler.loader());
             ts.initialize(lr);
 	}
 	catch (SemanticException e) {
 	    throw new InternalCompilerError(
 		"Unable to initialize type system: " + e.getMessage());
 	}
-    }
-
-    public String fileExtension() {
-	String sx = options == null ? null : options.source_ext;
-
-	if (sx == null) {
-	    sx = defaultFileExtension();
-        }
-
-        return sx;
     }
 
     public String defaultFileExtension() {
@@ -112,6 +74,7 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
     public String options() {
 	return "";
     }
+
     public jltools.main.Version version() {
 	return new Version();
     }
@@ -127,53 +90,13 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	return new TypeSystem_c();
     }
 
-    public TypeSystem typeSystem() {
-	if (ts == null) {
-	    ts = createTypeSystem();
-	}
-	return ts;
-    }
-
-    public SourceLoader sourceLoader() {
-        if (source_loader == null) {
-            source_loader = new SourceLoader(this, options.source_path);
-        }
-
-        return source_loader;
-    }
-
-    public JobExt jobExt() {
-      return null;
-    }
-
-    public SourceJob createJob(Job parent, Source source) {
-	return new SourceJob(this, jobExt(), parent, source);
-    }
-
-    public Job createJob(Node ast, Context context, Job outer, Pass.ID begin, Pass.ID end) {
-	return new InnerJob(this, jobExt(), ast, context, outer, begin, end);
-    }
-
-    public TargetFactory targetFactory() {
-        if (target_factory == null) {
-            target_factory = new TargetFactory(options.output_directory,
-                                               options.output_ext,
-                                               options.output_stdout);
-        }
-        
-        return target_factory;
-    }
-
     /** Create the node factory for this extension. */
     protected NodeFactory createNodeFactory() {
 	return new NodeFactory_c();
     }
 
-    public NodeFactory nodeFactory() {
-	if (nf == null) {
-	    nf = createNodeFactory();
-	}
-	return nf;
+    public JobExt jobExt() {
+      return null;
     }
 
     public Parser parser(Reader reader, Source source, ErrorQueue eq) {
@@ -185,98 +108,6 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 
 	return new CupParser(grm, source, eq);
     }
-
-    public void replacePass(List passes, Pass.ID id, List newPasses) {
-        for (ListIterator i = passes.listIterator(); i.hasNext(); ) {
-          Pass p = (Pass) i.next();
-
-          if (p.id() == id) {
-            if (p instanceof BarrierPass) {
-              throw new InternalCompilerError("Cannot replace a barrier pass.");
-            }
-
-            i.remove();
-
-            for (Iterator j = newPasses.iterator(); j.hasNext(); ) {
-              i.add(j.next());
-            }
-
-            return;
-          }
-        }
-
-        throw new InternalCompilerError("Pass " + id + " not found.");
-    }
-
-    public void removePass(List passes, Pass.ID id) {
-        for (ListIterator i = passes.listIterator(); i.hasNext(); ) {
-          Pass p = (Pass) i.next();
-
-          if (p.id() == id) {
-            if (p instanceof BarrierPass) {
-              throw new InternalCompilerError("Cannot remove a barrier pass.");
-            }
-
-            i.remove();
-            return;
-          }
-        }
-
-        throw new InternalCompilerError("Pass " + id + " not found.");
-    }
-
-    public void beforePass(List passes, Pass.ID id, List newPasses) {
-        for (ListIterator i = passes.listIterator(); i.hasNext(); ) {
-          Pass p = (Pass) i.next();
-
-          if (p.id() == id) {
-            // Backup one position.
-            i.previous();
-
-            for (Iterator j = newPasses.iterator(); j.hasNext(); ) {
-              i.add(j.next());
-            }
-
-            return;
-          }
-        }
-
-        throw new InternalCompilerError("Pass " + id + " not found.");
-    }
-
-    public void afterPass(List passes, Pass.ID id, List newPasses) {
-        for (ListIterator i = passes.listIterator(); i.hasNext(); ) {
-          Pass p = (Pass) i.next();
-
-          if (p.id() == id) {
-            for (Iterator j = newPasses.iterator(); j.hasNext(); ) {
-              i.add(j.next());
-            }
-
-            return;
-          }
-        }
-
-        throw new InternalCompilerError("Pass " + id + " not found.");
-    }
-
-    public void replacePass(List passes, Pass.ID id, Pass pass) {
-        replacePass(passes, id, Collections.singletonList(pass));
-    }
-
-    public void beforePass(List passes, Pass.ID id, Pass pass) {
-        beforePass(passes, id, Collections.singletonList(pass));
-    }
-
-    public void afterPass(List passes, Pass.ID id, Pass pass) {
-        afterPass(passes, id, Collections.singletonList(pass));
-    }
-
-    /*
-    public void removePass(List passes, Pass.ID id) {
-        replacePass(passes, id, new EmptyPass(id));
-    }
-    */
 
     public List passes(Job job) {
         ArrayList l = new ArrayList(15);
@@ -325,22 +156,6 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
         return l;
     }
 
-    public List passes(Job job, Pass.ID begin, Pass.ID end) {
-        List l = passes(job);
-        boolean in = false;
-
-        for (Iterator i = l.iterator(); i.hasNext(); ) {
-            Pass p = (Pass) i.next();
-            in = in || begin == p.id();
-            if (! (p instanceof BarrierPass) && ! in) i.remove();
-            in = in && end != p.id();
-        }
-
-        return l;
-    }
-
     static { Report.topics.add("jl"); }
-    static { Report.topics.add("verbose"); }
-    static { Report.topics.add("types"); }
-    static { Report.topics.add("frontend"); }
+    static { Report.topics.add("qq"); }
 }

@@ -103,6 +103,7 @@ public abstract class NodeVisitor
      * including flushing buffers and I/O connections.
      */
     public void finish() { }
+    public void finish(Node ast) { this.finish(); }
 
     public String toString() {
         return getClass().getName();
