@@ -98,17 +98,20 @@ public class LoadedClassResolver extends ClassResolver
 	Report.report(4, "Using encoded class type for " + name);
       return getEncodedType(clazz, name);
     }
-    else if (allowRawClasses) {
+    
+    if (allowRawClasses) {
       if (Report.should_report(report_topics, 4))
 	Report.report(4, "Using raw class file for " + name);
       return clazz.type(ts);
     }
-    else {
-      throw new SemanticException("Unable to find a suitable definition of "
-                                  + name
-                                  + ". Try recompiling or obtaining "
-                                  + " a newer version of the class file.");
-    }
+
+    // We have a raw class, but are not allowed to use it, and
+    // cannot find appropriate encoded info. 
+    throw new SemanticException("Found a class file for " + name
+        + " but it did not contain appropriate information for this" 
+        + " language extension. If the source for this file is written"
+        + " in the language extension, try recompiling the source code.");
+    
   }
 
   /**

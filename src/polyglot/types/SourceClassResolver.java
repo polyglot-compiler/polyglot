@@ -136,7 +136,7 @@ public class SourceClassResolver extends LoadedClassResolver
     }
 
     // Don't use the raw class if the source or encoded class is available.
-    if (encodedClazz != null || source != null || ! this.allowRawClasses) {
+    if (encodedClazz != null || source != null) {
       if (Report.should_report(report_topics, 4))
 	Report.report(4, "Not using raw class file for " + name);
       clazz = null;
@@ -182,7 +182,7 @@ public class SourceClassResolver extends LoadedClassResolver
 
     // At this point, at most one of clazz and source should be set.
 
-    if (clazz != null) {
+    if (clazz != null && this.allowRawClasses) {
       if (Report.should_report(report_topics, 4))
 	Report.report(4, "Using raw class file for " + name);
       return clazz.type(ts);
@@ -194,6 +194,14 @@ public class SourceClassResolver extends LoadedClassResolver
       return getTypeFromSource(source, name);
     }
 
+    if (clazz != null && !this.allowRawClasses) {
+        // We have a raw class only. We do not have the source code,
+        // or encoded class information. 
+        throw new SemanticException("Found a class file for " + name
+            + " but it did not contain appropriate information for the" 
+            + " Polyglot-based compiler " + ext.compilerName() + ". Try using "
+            + ext.compilerName() + " to recompile the source code.");
+    }
     throw new NoClassException(name);
   }
 
