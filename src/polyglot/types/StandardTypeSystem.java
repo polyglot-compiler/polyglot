@@ -562,7 +562,12 @@ public class StandardTypeSystem extends TypeSystem {
     else {
       ClassType s = (ClassType) ct.getSuperType();
 
-      if (s != null && s.getAccessFlags().isInterface()) {
+      if (s == null) {
+	s = (ClassType) getObject();
+	ct.setSuperType(s);
+      }
+
+      if (s.getAccessFlags().isInterface()) {
 	  throw new SemanticException("Class " + ct +
 				      " cannot extend interface " + s + ".",
 				      Annotate.getPosition(ct));
