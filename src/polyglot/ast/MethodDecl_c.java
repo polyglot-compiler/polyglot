@@ -172,8 +172,8 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 
     /** Visit the children of the method. */
     public Node visitChildren(NodeVisitor v) {
+        List formals = visitList(this.formals, v);
 	TypeNode returnType = (TypeNode) visitChild(this.returnType, v);
-	List formals = visitList(this.formals, v);
 	List throwTypes = visitList(this.throwTypes, v);
 	Block body = (Block) visitChild(this.body, v);
 	return reconstruct(returnType, formals, throwTypes, body);
