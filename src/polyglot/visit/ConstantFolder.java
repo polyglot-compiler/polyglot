@@ -1,19 +1,21 @@
-
 package jltools.visit;
 
 import jltools.ast.*;
 import jltools.types.TypeSystem;
+import jltools.frontend.Pass;
+import jltools.frontend.Job;
 
-public class ConstantFolder extends NodeVisitor
+public class ConstantFolder extends BaseVisitor
 {
-    private ExtensionFactory ef;
-    public ConstantFolder(ExtensionFactory ef) {
-	this.ef = ef;
+    public ConstantFolder(Job job) {
+        super(job);
     }
 
-  public Node leave( Node old, Node n, NodeVisitor v)
-  {
-    return n.foldConstants(ef);
-  }
-  
+    public Node override(Node n) {
+	return n.ext().foldConstantsOverride(this);
+    }
+
+    public Node leave(Node old, Node n, NodeVisitor v) {
+	return n.ext().foldConstants(this);
+    }
 }

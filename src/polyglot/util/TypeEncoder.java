@@ -21,6 +21,8 @@ import java.util.zip.*;
 public class TypeEncoder
 {
   protected TypeSystem ts;
+  protected final boolean zip = true;
+  protected final boolean test = true;
 
   public TypeEncoder( TypeSystem ts)
   {
@@ -35,7 +37,13 @@ public class TypeEncoder
     StringBuffer sb;
 
     baos = new ByteArrayOutputStream();
-    oos = new TypeOutputStream( new GZIPOutputStream( baos), ts, t);
+
+    if (zip) {
+	oos = new TypeOutputStream( new GZIPOutputStream( baos), ts, t);
+    }
+    else {
+	oos = new TypeOutputStream( baos, ts, t);
+    }
 
     oos.writeObject( t);
     oos.flush();
@@ -45,7 +53,20 @@ public class TypeEncoder
     sb = new StringBuffer();
     for (int i = 0; i < b.length; i++)
 	sb.append((char) b[i]);
-    return sb.toString();
+    String s = sb.toString();
+
+    if (test) {
+      // Test it.
+      try {
+	decode(s);
+      }
+      catch (Exception e) {
+	throw new InternalCompilerError(
+	    "Could not decode back to " + t + ": " + e.getMessage());
+      }
+    }
+
+    return s;
   }
 
   public Type decode( String s) throws IOException, ClassNotFoundException
@@ -59,8 +80,13 @@ public class TypeEncoder
     for (int i = 0; i < source.length; i++)
 	b[i] = (byte) source[i];
 
-    ois = new TypeInputStream( new GZIPInputStream( 
-                                 new ByteArrayInputStream( b)), ts);
+    if (zip) {
+	ois = new TypeInputStream( new GZIPInputStream( 
+				     new ByteArrayInputStream( b)), ts);
+    }
+    else {
+	ois = new TypeInputStream( new ByteArrayInputStream( b), ts);
+    }
 
     return (Type)ois.readObject();
   }

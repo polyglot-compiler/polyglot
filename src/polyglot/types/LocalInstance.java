@@ -1,26 +1,12 @@
-/*
- * LocalInstnace.java
- */
-
 package jltools.types;
 
-import jltools.util.AnnotatedObject;
-import jltools.util.InternalCompilerError;
-
 /**
- * LocalInstance
- *
- * Overview:
- *    A LocalInstance represents the immutable typing information
- *    associated with a Java local: a name and a type.
- **/
-public class LocalInstance extends VariableInstance 
-  implements Cloneable, java.io.Serializable 
+ * A <code>LocalInstance</code> contains type information for a local variable.
+ */
+public interface LocalInstance extends VarInstance
 {
-  public LocalInstance(String name, Type type, AccessFlags flags) {
-    super(name, type, flags);
-  }
-
-  public boolean isLocal() { return true; }
-  public boolean isField() { return false; }
+    LocalInstance flags(Flags flags);
+    LocalInstance name(String name);
+    LocalInstance type(Type type);
+    LocalInstance constantValue(Object value);
 }

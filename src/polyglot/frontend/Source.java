@@ -22,7 +22,7 @@ public class Source
 
 	if (! name.endsWith("." + sourceExtension)) {
 	    throw new IOException(
-		"All source files must have the extension \"." +
+		"Source \"" + name + "\" does not have the extension \"." +
 		sourceExtension + "\".");
 	}
 

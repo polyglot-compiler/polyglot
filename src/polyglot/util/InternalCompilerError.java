@@ -1,18 +1,33 @@
 
 package jltools.util;
 
-public class InternalCompilerError extends Error
+public class InternalCompilerError extends RuntimeException
 {
-  public InternalCompilerError( String msg) 
-  {
-    super ( msg ); 
-  }
-  public InternalCompilerError(Position position, String msg) 
-  {
-    super ( position == null ? msg : position + ": " + msg );
-  }
-  public InternalCompilerError(jltools.util.AnnotatedObject n, String msg) 
-  {
-    this( n == null ? null : Annotate.getPosition(n), msg );
-  }
+    Position pos;
+
+    public InternalCompilerError(String msg) {
+        this(msg, null);
+    }
+
+    public InternalCompilerError(Position position, String msg) {
+	super(msg); 
+	pos = position;
+    }
+
+    public InternalCompilerError(String msg, Position position) {
+	super(msg); 
+	pos = position;
+    }
+
+    public Position position() {
+	return pos;
+    }
+
+    public String message() {
+	return super.getMessage();
+    }
+
+    public String getMessage() {
+	return pos == null ? message() : pos + ": " + message();
+    }
 }

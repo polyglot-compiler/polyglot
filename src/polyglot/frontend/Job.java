@@ -4,6 +4,7 @@ import jltools.ast.*;
 import jltools.types.*;
 import jltools.visit.*;
 import jltools.util.*;
+import jltools.frontend.Compiler;
 
 import java.util.*;
 import java.io.IOException;
@@ -13,36 +14,30 @@ import java.io.IOException;
  * one source file.  It includes all information carried between phases
  * of the compiler.
  */
-public class Job
+public abstract class Job
 {
     protected Source source;
-    protected jltools.frontend.Compiler compiler;
+    protected Compiler compiler;
 
     protected ImportTable it;
-    protected Set completed;
-
     protected Node ast;
 
-    public Job(Source s, jltools.frontend.Compiler c, ExtensionInfo extInfo) {
+    public Job(Source s, Compiler c) {
 	this.source = s;
 	this.compiler = c;
-	this.it = new ImportTable(c.systemResolver(), true, s, c.errorQueue());
-	this.completed = new HashSet();
+	this.it = new ImportTable(c.typeSystem(),
+	                          c.systemResolver(), s, c.errorQueue());
     }
 
     public Node ast() { return ast; }
     public void ast(Node ast) { this.ast = ast; }
 
-    public void complete(PassID pass) {
-	completed.add(pass);
-    }
-
-    public boolean hasCompleted(PassID pass) {
-	return completed.contains(pass);
-    }
+    public abstract Pass buildPass();
+    public abstract Pass disambTypesPass();
+    public abstract Pass translatePass();
 
     public String toString() {
-	return source.toString() + " (completed=" + completed + ")";
+	return source.toString();
     }
 
     public int hashCode() {
@@ -58,7 +53,7 @@ public class Job
 	return false;
     }
 
-    public jltools.frontend.Compiler compiler() {
+    public Compiler compiler() {
 	return compiler;
     }
 
@@ -71,12 +66,8 @@ public class Job
     }
 
     public void dump(CodeWriter cw) {
-	try {
-	    if (ast != null) {
-		ast.dump(cw);
-	    }
-	}
-	catch (SemanticException e) {
+	if (ast != null) {
+	    ast.dump(cw);
 	}
     }
 }

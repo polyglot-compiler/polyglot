@@ -4,7 +4,7 @@ import jltools.ast.*;
 import jltools.util.*;
 
 /** A pass which runs a visitor. */
-public class VisitorPass implements Pass
+public class VisitorPass extends AbstractPass
 {
     Job job;
     NodeVisitor v;
@@ -38,14 +38,10 @@ public class VisitorPass implements Pass
 
 	job.ast(ast);
 
-	if (job.compiler().errorQueue().hasErrors()) {
-	    return false;
-	}
-
-	return true;
+	return ! job.compiler().errorQueue().hasErrors();
     }
 
     public String toString() {
-	return v.getClass().getName();
+	return v.getClass().getName() + "(" + job + ")";
     }
 }

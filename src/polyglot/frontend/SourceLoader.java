@@ -2,6 +2,7 @@ package jltools.frontend;
 
 import java.io.*;
 import java.util.*;
+import jltools.frontend.Compiler;
 
 /** A <code>SourceLoader</code> is responsible for loading source files. */
 public class SourceLoader
@@ -21,7 +22,7 @@ public class SourceLoader
 	    throw new FileNotFoundException(fileName);
 	}
 
-	jltools.frontend.Compiler.report(1, "Loading class from " + sourceFile);
+	Compiler.report(2, "Loading class from " + sourceFile);
 
 	return new Source(fileName, sourceExtension);
     }
@@ -31,13 +32,22 @@ public class SourceLoader
 	String fileName = className.replace('.', File.separatorChar) 
 			   + "." + sourceExtension;
 
+	File current_dir = new File(System.getProperty("user.dir"));
+
 	for (Iterator i = sourcePath.iterator(); i.hasNext(); ) {
 	    File directory = (File) i.next();
 
-	    File sourceFile = new File(directory, fileName);
+	    File sourceFile;
+
+	    if (directory != null && directory.equals(current_dir)) {
+		sourceFile = new File(fileName);
+	    }
+	    else {
+	        sourceFile = new File(directory, fileName);
+	    }
 	    
 	    if (sourceFile.exists()) {
-		jltools.frontend.Compiler.report(1,
+		Compiler.report(2,
 		    "Loading " + className + " from " + sourceFile);
 
 		return new Source(sourceFile.getPath(), sourceExtension);

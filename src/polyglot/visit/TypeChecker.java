@@ -3,96 +3,50 @@ package jltools.visit;
 import jltools.ast.*;
 import jltools.types.*;
 import jltools.util.*;
-import jltools.frontend.Pass;
+import jltools.frontend.Job;
+import jltools.types.Package;
 
-public class TypeChecker extends NodeVisitor
+public class TypeChecker extends SemanticVisitor
 {
-  protected LocalContext c;
-  protected ErrorQueue eq;
-  protected BitVector errors;
-  protected int depth;
-  
-  public TypeChecker(Pass pass, ExtensionFactory ef,
-    TypeSystem ts, ImportTable im, ErrorQueue eq)
-  {
-    this.eq = eq;
-
-    this.c = ts.getLocalContext(im, ef, pass);
-    this.errors = new BitVector();
-    this.depth = 0;
-  }
-
-  public Node override( Node n)
-  {
-    if (n.ext instanceof TypeCheckOverride) {
-      LocalContext.Mark mark = c.getMark();
-
-      try {
-        return ((TypeCheckOverride) n.ext).typeCheck(n, this, c);
-      }
-      catch ( SemanticException e) {
-        eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
-                    Annotate.getPosition(n ));
-        c.popToMark(mark);
-        return n;
-      }
+    public TypeChecker(Job job) {
+	super(job);
     }
 
-    return null;
-  }
-
-  public NodeVisitor enter( Node n)
-  {
-    n.enterScope( c);
-
-    errors.setBit( ++depth, false);
-
-    return this;
-  }
-
-  public Node leave( Node old, Node n, NodeVisitor v)
-  {
-    Node m = null;
-    depth--;
-
-    if( errors.getBit( depth + 1)) {
-      /* We've seen some error in one of the children, so propagate back to a
-       * statement. */
-      if( n instanceof Expression || n instanceof TypeNode) {
-        // FIXME should this include SwitchStatement.*?
-        errors.setBit( depth, true);
-        
-        n.leaveScope( c);
-        return n;
-      }
-      else
-      {
-        /* We've hit a statement, so just continue. */
-        n.leaveScope( c);
-        return n;
-      }
+    public TypeBuilder typeBuilder(Package p) {
+        TypeBuilder tb = new TypeBuilder(job);
+	tb.currentPackage = p;
+	return tb;
     }
 
-    /* No errors seen so far. */
-    try
-    {
-      m = n.typeCheck( c);
-
-      m.leaveScope( c);      
-      return m;
+    public TypeAmbiguityRemover typeAmbiguityRemover() {
+        TypeAmbiguityRemover sc = new TypeAmbiguityRemover(job);
+	sc.context = context;
+	return sc;
     }
-    catch( SemanticException e)
-    {
-      Position position = e.getPosition();
-      if( position == null) {
-        position = Annotate.getPosition( n);
-      }
 
-      eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), position);
-      errors.setBit( depth, true);
-
-      n.leaveScope( c);
-      return n;
+    public AmbiguityRemover ambiguityRemover() {
+        AmbiguityRemover ar = new AmbiguityRemover(job);
+	ar.context = context;
+	return ar;
     }
-  }
+
+    protected Node overrideCall(Node n) throws SemanticException {
+	Node m = n.ext().typeCheckOverride(this);
+
+	if (m instanceof Expr && ((Expr) m).type() == null) {
+	    throw new InternalCompilerError("Null type for " + m, m.position());
+	}
+
+	return m;
+    }
+
+    protected Node leaveCall(Node n) throws SemanticException {
+	Node m = n.ext().typeCheck(this);
+
+	if (m instanceof Expr && ((Expr) m).type() == null) {
+	    throw new InternalCompilerError("Null type for " + m, m.position());
+	}
+
+	return m;
+    }
 }

@@ -474,8 +474,8 @@ int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
 	}
     }
     String selfToString() {
-	if (indent == 0) return "[" + first.toString() + "]";
-	else return "[" + indent + first.toString() + "]";
+	if (indent == 0) return "[" + first + "]";
+	else return "[" + indent + first + "]";
     }
 }
 

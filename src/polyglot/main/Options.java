@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.io.File;
 import jltools.frontend.ExtensionInfo;
-import jltools.frontend.StandardExtensionInfo;
 
 /** This object encapsulates various jltools options. Extensions to
     jltools must define their own objects for encapsulating options. */
@@ -15,11 +14,15 @@ public final class Options {
       variable, is encouraged for future extensibility. */
   public static Options global = new Options();
 
+  public int error_count = 100;
   public Collection source_path; // List[String]
   public File output_directory;
   public String source_ext = null; // e.g., java, jl, pj
   public String output_ext = "java"; // java, by default
   public boolean output_stdout = false; // whether to output to stdout
+  public boolean no_source_check = false;
+    // If a class file is available for a type, use it, even if a newer
+    // source is available.  This is not safe with some extensions
   public String post_compiler;
     // compiler to run on java output file
 
@@ -29,7 +32,7 @@ public final class Options {
   /** Inject type information in serialized form into output file? */
   public boolean serialize_type_info = true;
 
-  public ExtensionInfo extension = new StandardExtensionInfo();
+  public ExtensionInfo extension = new jltools.ext.jl.ExtensionInfo();
      // The extension information
 
   public static Map report = new HashMap(); // Map[String, Integer]

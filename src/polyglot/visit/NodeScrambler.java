@@ -140,38 +140,38 @@ public class NodeScrambler extends NodeVisitor
   {
     Class required = Node.class;
 
-    if( n instanceof SourceFileNode) {
+    if( n instanceof SourceFile) {
       return null;
     }
-    if( n instanceof ImportNode) {
-      required = ImportNode.class;
+    if( n instanceof Import) {
+      required = Import.class;
     }
     else if( n instanceof TypeNode) {
       required = TypeNode.class;
     }
-    else if( n instanceof ClassNode) {
-      required = ClassNode.class;
+    else if( n instanceof ClassDecl) {
+      required = ClassDecl.class;
     }
     else if( n instanceof ClassMember) {
       required = ClassMember.class;
     }
-    else if( n instanceof FormalParameter) {
-      required = FormalParameter.class;
+    else if( n instanceof Formal) {
+      required = Formal.class;
     }
-    else if( n instanceof Expression) {
-      required = Expression.class;
+    else if( n instanceof Expr) {
+      required = Expr.class;
     }
-    else if( n instanceof BlockStatement) {
-      required = BlockStatement.class;
+    else if( n instanceof Block) {
+      required = Block.class;
     }
-    else if( n instanceof CatchBlock) {
-      required = CatchBlock.class;
+    else if( n instanceof Catch) {
+      required = Catch.class;
     }
-    else if( n instanceof VariableDeclarationStatement) {
-      required = VariableDeclarationStatement.class;
+    else if( n instanceof LocalDecl) {
+      required = LocalDecl.class;
     }
-    else if( n instanceof Statement) {
-      required = Statement.class;
+    else if( n instanceof Stmt) {
+      required = Stmt.class;
     }
 
     LinkedList parents = (LinkedList)pairs.get( n);

@@ -1,7 +1,3 @@
-/*
- * ClassResolver.java
- */
-
 package jltools.types;
 
 /**
@@ -15,8 +11,11 @@ package jltools.types;
  *    slightly different contracts in terms of which names they
  *    accept; it is the responsibility of the user to make sure they
  *    have one whose behavior is reasonable.
- **/
-public interface ClassResolver {
-  // DOCME
-  public ClassType findClass(String name) throws SemanticException;
+ */
+public abstract class ClassResolver implements Resolver {
+    public abstract Type findType(String name) throws SemanticException;
+
+    public Qualifier findQualifier(String name) throws SemanticException {
+        return findType(name);
+    }
 }

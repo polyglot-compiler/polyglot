@@ -9,135 +9,144 @@ import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 
-
 public class ClassSerializer extends NodeVisitor
 {
-  protected TypeEncoder te;
-  protected ErrorQueue eq;
-  protected Date date;
-  protected TypeSystem ts;
+    protected TypeEncoder te;
+    protected ErrorQueue eq;
+    protected Date date;
+    protected TypeSystem ts;
+    protected NodeFactory nf;
 
-  public ClassSerializer( TypeSystem ts_, Date date, ErrorQueue eq)
-  {
-    this.ts = ts_;
-    this.te = new TypeEncoder( ts);
-    this.eq = eq;
-    this.date = date;
-      
-    ts.getString();
-  }
-
-  public Node leave( Node old, Node n, NodeVisitor v)
-  {
-    if( n instanceof ClassNode)
-    {
-      try
-      {
-        ClassNode cn = (ClassNode)n;
-        ParsedClassType clazz;
-        ByteArrayOutputStream baos;
-        ObjectOutputStream oos;
-        byte[] b;
-        
-        AccessFlags af = new AccessFlags();
-        
-        af.setPublic( true);
-        af.setStatic( true);
-        af.setFinal( true);
-
-        List interfaces = copyIteratorToList( cn.interfaces());
-        List members = copyIteratorToList( cn.members());
-        List decls;
-                
-        VariableDeclarationStatement vds;
-        VariableDeclarationStatement.Declarator decl;
-        FieldNode fn;
-        
-        /* Add the compiler version number. */
-        decl = new VariableDeclarationStatement.Declarator( null,
-                      "jlc$CompilerVersion", 0, new StringLiteral( 
-                         Compiler.VERSION_MAJOR + "." + Compiler.VERSION_MINOR
-                         + "." + Compiler.VERSION_PATCHLEVEL));
-        decls = new LinkedList();
-        decls.add( decl);
-        vds = new VariableDeclarationStatement( af, new TypeNode(ts.getString()), 
-                                                decls);
-        fn = new FieldNode( vds);
-        members.add( fn);
-               
-        /* Add the date of the last source file modification. */
-        decl = new VariableDeclarationStatement.Declarator( null,
-                      "jlc$SourceLastModified", 0, new IntLiteral( 
-                                                       (long)date.getTime()));
-        decls = new LinkedList();
-        decls.add( decl);
-        vds = new VariableDeclarationStatement( af, new TypeNode(ts.getLong()), 
-                                                decls);
-        fn = new FieldNode( vds);
-        members.add( fn);
-
-        /* Add the class type info. */
-        clazz = cn.type;        
-        decl = new VariableDeclarationStatement.Declarator( null,
-           "jlc$ClassType", 0, largeStringLiteral( te.encode( clazz)));
-
-        decls = new LinkedList();
-        decls.add( decl);
-        vds = new VariableDeclarationStatement( af, new TypeNode( ts.getString()),
-                                                decls);
-        fn = new FieldNode( vds);
-        members.add( fn);
-        
-        return cn.reconstruct( cn.getAccessFlags(), cn.getName(),
-                              cn.getSuperClass(), interfaces, members);
-      }
-      catch( IOException e)
-      {
-        e.printStackTrace();
-        eq.enqueue( ErrorInfo.IO_ERROR, 
-                    "Unable to serialize class information.");
-        return n;
-      }
+    public ClassSerializer(TypeSystem ts, NodeFactory nf, Date date, ErrorQueue eq) {
+	this.ts = ts;
+	this.nf = nf;
+	this.te = new TypeEncoder( ts);
+	this.eq = eq;
+	this.date = date;
     }
-    else {
-      return n;
-    }
-  }
 
-  private final List copyIteratorToList( Iterator iter)
-  {
-    List l = new LinkedList();
-    for( ; iter.hasNext(); )
-    {
-      l.add( iter.next());
-    }
-    return l;
-  }
-
-/* Break a long string literal into a sum of small string literals.
- * This avoids messing up the pretty printer and editors. However, it
- * does not entirely solve the formatting problem if the pretty-printer
- * output is post-processed by a unicode transformation (which it is),
- * since the pretty-printer doesn't realize that the unicode characters
- * expand to multiple characters.
- */
-  private final Expression largeStringLiteral(String x) {
-    Expression result = null;
-    int n = x.length();
-    int i = 0;
-    for (;;) {
-	int j = i + 16; // 16 is fairly arbitrary.
-	if (j >= n) j = n; 
-	StringLiteral s = new StringLiteral(x.substring(i, j));
-	s.setCheckedType(ts.getString());
-	if (result == null) {
-	    result = s;
-	} else {
-	    result = new BinaryExpression(result, BinaryExpression.PLUS, s);
-	    result.setCheckedType(ts.getString());
+    public Node override(Node n) {
+        // Stop at class members.  We only want to encode top-level classes.
+	if (n instanceof ClassMember && ! (n instanceof ClassDecl)) {
+	    return n;
 	}
-	if (j == n) return result;
-	i = j;
+
+	return null;
     }
-  }
+
+    public Node leave(Node old, Node n, NodeVisitor v) {
+	if (! (n instanceof ClassDecl)) {
+	    return n;
+	}
+
+	try {
+	    ClassDecl cn = (ClassDecl) n;
+	    ClassBody body = cn.body();
+	    ParsedClassType ct = cn.type();
+	    byte[] b;
+
+	    if (! ct.isTopLevel()) {
+	        return n;
+	    }
+
+	    // Check if we've already serialized.
+	    if (ct.fieldNamed("jlc$CompilerVersion") != null ||
+		ct.fieldNamed("jlc$SourceLastModified") != null ||
+		ct.fieldNamed("jlc$ClassType") != null) {
+
+		eq.enqueue(ErrorInfo.SEMANTIC_ERROR, 
+			   "Cannot serialize class information " +
+			   "more than once.");
+
+		return n;
+	    }
+
+	    Flags flags = Flags.PUBLIC.set(Flags.STATIC).set(Flags.FINAL);
+
+	    FieldDecl f;
+	    
+	    /* Add the compiler version number. */
+	    String version = Compiler.VERSION_MAJOR + "." +
+			     Compiler.VERSION_MINOR + "." +
+			     Compiler.VERSION_PATCHLEVEL;
+
+	    f = nf.FieldDecl(null, flags,
+		             nf.CanonicalTypeNode(null, ts.String()),
+			     "jlc$CompilerVersion",
+			     nf.StringLit(null, version).type(ts.String()));
+
+	    f = f.fieldInstance(ts.fieldInstance(null, ct,
+						 flags, ts.String(),
+						 "jlc$CompilerVersion"));
+	    body = body.addMember(f);
+
+	    /* Add the date of the last source file modification. */
+	    long time = date.getTime();
+
+	    f = nf.FieldDecl(null, flags,
+		             nf.CanonicalTypeNode(null, ts.Long()),
+			     "jlc$SourceLastModified",
+			     nf.IntLit(null, time).type(ts.Long()));
+	    f = f.fieldInstance(ts.fieldInstance(null, ct,
+						 flags, ts.Long(),
+						 "jlc$SourceLastModified"));
+	    body = body.addMember(f);
+
+	    /* Add the class type info. */
+	    f = nf.FieldDecl(null, flags,
+		             nf.CanonicalTypeNode(null, ts.String()),
+			     "jlc$ClassType",
+			     largeStringLiteral(te.encode(ct)));
+	    f = f.fieldInstance(ts.fieldInstance(null, ct,
+						 flags, ts.String(),
+						 "jlc$ClassType"));
+	    body = body.addMember(f);
+	    
+	    return cn.body(body);
+	}
+	catch (IOException e) {
+	    eq.enqueue(ErrorInfo.IO_ERROR, 
+		       "Unable to serialize class information.");
+	    return n;
+	}
+    }
+
+    /**
+     * Break a long string literal into a sum of small string literals.
+     * This avoids messing up the pretty printer and editors. However, it
+     * does not entirely solve the formatting problem if the pretty-printer
+     * output is post-processed by a unicode transformation (which it is),
+     * since the pretty-printer doesn't realize that the unicode characters
+     * expand to multiple characters.
+     */
+    private final Expr largeStringLiteral(String x) {
+	Expr result = null;
+	int n = x.length();
+	int i = 0;
+
+	for (;;) {
+	    int j;
+	    // Compensate for the unicode transformation by computing
+	    // the length of the encoded string (or something close to it).
+	    int len = 0;
+	    for (j = i; len < 60 && j < n; j++) {
+		if (x.charAt(j) > 0xff) len += 6;
+		len += StringUtil.escape(x.charAt(j)).length();
+	    }
+
+	    Expr s = nf.StringLit(null, x.substring(i, j)).type(ts.String());
+
+	    if (result == null) {
+		result = s;
+	    }
+	    else {
+		result = nf.Binary(null, result, Binary.ADD, s).type(ts.String());
+	    }
+
+	    if (j == n)
+		return result;
+
+	    i = j;
+	}
+    }
 }

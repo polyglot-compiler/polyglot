@@ -1,25 +1,28 @@
 package jltools.util;
 
 import java.io.*;
+import java.util.StringTokenizer;
 
 /**
  * A <code>ErrorQueue</code> handles outputing error messages.
  */
 public class ErrorQueue
 {
-    private static final int ERROR_COUNT_LIMIT = 100;
-    
     private PrintStream err;
 
     private boolean hasErrors;
     private int errorCount;
     private boolean flushed;
+    private int limit;
+    private String name;
     
-    public ErrorQueue(PrintStream err) {
+    public ErrorQueue(PrintStream err, int limit, String name) {
 	this.err = err;
 	this.errorCount = 0;
 	this.hasErrors = false;
 	this.flushed = true;
+	this.limit = limit;
+	this.name = name;
     }
 
     public void enqueue( int type, String message) {
@@ -44,16 +47,91 @@ public class ErrorQueue
 
 	Position position = e.getPosition();
 
-	String prefix = position != null ? (position.toString() + ": ") : "";
+	String prefix = position != null
+	  		? position.nameAndLineString()
+			: name;
 
-	err.println(prefix + message);
+	// I (Nate) tried without success to get CodeWriter to do this.
+	// It would be nice if we could specify where breaks are allowed 
+	// when generating the error.  We don't want to break Jif labels,
+	// for instance.
+	int width = 0;
+	err.print(prefix + ":");
+	width += prefix.length() + 1;
 
-	if (errorCount >= ERROR_COUNT_LIMIT) {
+	int lmargin = width + 1;
+	int rmargin = 80;
+
+	StringTokenizer st = new StringTokenizer(message);
+
+	while (st.hasMoreTokens()) {
+	    String s = st.nextToken();
+
+	    if (width + s.length() + 1 > rmargin) {
+		err.println();
+		for (int i = 0; i < lmargin; i++) err.print(" ");
+		width = lmargin;
+	    }
+	    else {
+		err.print(" ");
+		width++;
+	    }
+
+	    err.print(s);
+
+	    width += s.length();
+	}
+
+	err.println();
+
+	if (position != null) {
+	    showError(position);
+	}
+
+	if (errorCount >= limit) {
 	    prefix = position != null ? (position.file() + ": ") : "";
 	    err.println(prefix + "Too many errors.  Aborting compilation.");
 	    flush();
 	    throw new ErrorLimitError();
 	}
+    }
+
+    private void showError(Position pos) {
+      if (pos.file() != null && pos.line() != Position.UNKNOWN) {
+	try {
+	  LineNumberReader reader = new LineNumberReader(
+	      new FileReader(pos.file()));
+
+	  String s = null;
+
+	  for (int i = 0; i < pos.line(); i++) {
+	    s = reader.readLine();
+	  }
+
+	  reader.close();
+
+	  if (s != null) {
+	    err.println(s);
+
+	    if (pos.column() != Position.UNKNOWN) {
+	      for (int i = 0; i < pos.column(); i++) {
+		if (s.charAt(i) == '\t') {
+		  err.print("\t");
+		}
+		else {
+		  err.print(" ");
+		}
+	      }
+
+	      err.println("^");
+	    }
+
+	    err.println();
+	  }
+	}
+	catch (IOException e) {
+	}
+      }
     }
     
     public void flush() {

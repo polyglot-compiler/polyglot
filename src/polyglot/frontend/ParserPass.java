@@ -8,7 +8,7 @@ import jltools.util.*;
  * A pass which runs a parser.  After parsing it stores the AST in the Job.
  * so it can be accessed by later passes.
  */
-public class ParserPass implements Pass
+public class ParserPass extends AbstractPass
 {
     Job job;
     ExtensionInfo extInfo;
@@ -33,21 +33,20 @@ public class ParserPass implements Pass
 
 	    source.close();
 
-	    if (ast == null) {
-		return false;
+	    if (ast != null) {
+		job.ast(ast);
+		return true;
 	    }
 
-	    job.ast(ast);
+	    return false;
 	}
 	catch (IOException e) {
 	    eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage());
 	    return false;
 	}
-
-	return true;
     }
 
     public String toString() {
-	return "Parser";
+	return "Parse(" + job + ")";
     }
 }

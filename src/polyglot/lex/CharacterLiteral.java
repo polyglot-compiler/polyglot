@@ -4,17 +4,17 @@ import java_cup.runtime.Symbol;
 import jltools.util.Position;
 
 public class CharacterLiteral extends Literal {
-  char val;
+  Character val;
 
   public CharacterLiteral(Position position, char c, int sym)
   {
     super(position, sym); 
-    this.val = c; 
+    this.val = new Character(c); 
   }
   
-  public char getValue() 
+  public Character getValue() 
   {
-    return val; 
+    return val;
   }
 
   public String getEscapedValue()

@@ -52,8 +52,7 @@ public interface ExtensionInfo {
     TypeSystem typeSystem();
     
     /** Produce a node factory for this language extension. */
-    // NodeFactory nodeFactory();
-    ExtensionFactory extensionFactory();
+    NodeFactory nodeFactory();
 
     /** Produce a source factory for this language extension. */
     SourceLoader sourceLoader();
@@ -63,12 +62,6 @@ public interface ExtensionInfo {
 
     /** Produce a target factory for this language extension. */
     TargetFactory targetFactory();
-
-    /** Get a list of compiler passes for a given job. */
-    Scheduler scheduler();
-
-    /** Create a pass for a particular job. */
-    Pass getPass(Job job, PassID key);
 
     /** Get a parser for this language extension. */
     Parser parser(Reader reader, Job job);

@@ -13,111 +13,171 @@ import java.util.*;
  * It has a set of package and class imports, which caches the results of
  * lookups for future reference.
  */
-public  class ImportTable implements ClassResolver 
+public class ImportTable extends ClassResolver
 {
-  /** The underlying resolver. */
-  protected ClassResolver resolver;
-  /** Determines whether this table caches classes. */
-  protected boolean caching;
-  /** A list of all package imports. */
-  protected Set packageImports;
-  /** Map from names to classes found. */
-  protected Map map;
-  /** List of imports which will be lazily added to the table. */
-  protected List lazyImports;
-  /** Used to report errors for lazily added imports. */
-  protected ErrorQueue eq;
-  /** The source file associated with the import table. */
-  protected Source source;
+    protected TypeSystem ts;
 
-  // DOCME
-  public ImportTable( ClassResolver base, boolean caching, Source source,
-	  ErrorQueue eq)
-  {
-    resolver = base;
-    this.caching = caching;
-    this.source = source;
-    this.eq = eq;
+    /** The underlying resolver. */
+    protected Resolver resolver;
+    /** A list of all package imports. */
+    protected List packageImports;
+    /** Map from names to classes found. */
+    protected Map map;
+    /** List of imports which will be lazily added to the table. */
+    protected List lazyImports;
+    /** Used to report errors for lazily added imports. */
+    protected ErrorQueue eq;
+    /** The source file associated with the import table. */
+    protected Source source;
+    /** Our package */
+    protected String pkgName;
 
-    map = new HashMap();
-    packageImports = new HashSet();
-    lazyImports = new ArrayList();
-  }
+    public ImportTable(TypeSystem ts, Resolver base,
+	               Source source, ErrorQueue eq) {
+	this.resolver = base;
+	this.ts = ts;
+	this.source = source;
+	this.eq = eq;
 
-  public void addClassImport( String className) throws SemanticException 
-  {
-    lazyImports.add( className);
-  }
-  
-  public void addPackageImport( String pkgName) throws NoClassException {
-    packageImports.add(pkgName);
-  }
-    
-  public ClassType findClass( String name)  throws SemanticException {
-    // FIXME: need to keep on looking to find conflicts.
-
-    /* First add any lazy imports. */
-    if( lazyImports.size() > 0) {
-      for( Iterator iter = lazyImports.iterator(); iter.hasNext(); ) {
-        String longName = (String)iter.next();
-        try 
-        {
-          ClassType clazz = resolver.findClass( longName);
-          String shortName = TypeSystem.getShortNameComponent( longName);
-
-          map.put( longName, clazz);
-          map.put( shortName, clazz);    
-        }
-        catch( NoClassException e)
-        {
-          eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
-		  	new Position(source.name()));
-        }
-      }
-
-      lazyImports = new ArrayList();
+	this.map = new HashMap();
+	this.packageImports = new ArrayList();
+	this.lazyImports = new ArrayList();
     }
 
-    if (TypeSystem.isNameShort(name)) {
-      Object res = map.get(name);
-      // First see if we have a mapping already.
-      if (res != null) {
-	return (ClassType) res;
-      } 
-      // It wasn't a ClassImport.  Maybe it was a PackageImport?
-      for (Iterator iter = packageImports.iterator(); iter.hasNext(); ) {
-	String pkgName = (String) iter.next();
-	String fullName = pkgName + "." + name;
-	try {
-	  ClassType class_ = resolver.findClass(fullName);
-          if( caching) {
-            map.put(name, class_);
-          }
-	  return class_;
-	} catch (NoClassException ex) { /* Do nothing. */ }
-      }
-      // The name was short, but not in any imported class or package.
-      // Check the null package.
-      ClassType class_ = resolver.findClass(name); // may throw exception
-      if( caching) {
-        map.put(name,class_);
-      }
-      return class_;
-    } 
-    // The name was long.
-    return resolver.findClass(name);
-  }
+    public void addDefaultImports() throws SemanticException {
+	List imports = ts.defaultPackageImports();
 
-  public void dump()
-  {
-    Iterator iter = map.keySet().iterator();
-    while( iter.hasNext()) {
-      System.out.println( "import " + (String)iter.next());
+	for (Iterator i = imports.iterator(); i.hasNext(); ) {
+	    String s = (String) i.next();
+	    addPackageImport(s);
+	}
     }
 
-    iter = packageImports.iterator();
-    while( iter.hasNext()) {
-      System.out.println( "import " + (String)iter.next() + ".*");
+    public void setPackage(String pkgName) {
+	this.pkgName = pkgName;
+
+	if (packageImports.size() != 0) {
+	  throw new InternalCompilerError(
+	      "ImportTable.setPackage() must be called before any " +
+	      "package imports are added.");
+	}
+
+	if (pkgName != null) {
+	    addPackageImport(pkgName);
+	}
     }
-  }
+
+    public void addClassImport(String className) {
+	Types.report(1, this + ": lazy import " + className);
+	lazyImports.add(className);
+    }
+
+    public void addPackageImport(String pkgName) {
+	packageImports.add(pkgName);
+    }
+
+    public Type findType(String name) throws SemanticException {
+	// FIXME: need to keep on looking to find conflicts.
+	Types.report(1, this + ".findType(" + name + ")");
+
+	/* First add any lazy imports. */
+	lazyImport();
+
+	if (StringUtil.isNameShort(name)) {
+	    // First see if we have a mapping already.
+	    Object res = map.get(name);
+
+	    if (res != null) {
+		return (Type) res;
+	    }
+
+	    // It wasn't a ClassImport.  Maybe it was a PackageImport?
+	    for (Iterator iter = packageImports.iterator(); iter.hasNext(); ) {
+		String pkgName = (String) iter.next();
+		String fullName = pkgName + "." + name;
+
+		boolean inSamePackage = this.pkgName != null &&
+					this.pkgName.equals(pkgName);
+
+		try {
+		    Type t = resolver.findType(fullName);
+
+		    // Check if the type is visible in this package.
+		    // FIXME: Assume non-class types are always visible.
+		    if (! t.isClass() ||
+			t.toClass().flags().isPublic() ||
+		        inSamePackage) {
+
+			// Memoize.
+			map.put(name, t);
+
+			return t;
+		    }
+		}
+		catch (NoClassException ex) {
+		    // Do nothing.
+		}
+	    }
+	    // The name was short, but not in any imported class or package.
+	    // Check the null package.
+	    Type t = resolver.findType(name); // may throw exception
+
+	    if (t.isClass() &&
+		t.toClass().flags().isPackage() && this.pkgName != null) {
+	      // Not visible.
+	      throw new NoClassException("Class \"" + name + "\" not found.",
+					 new Position(source.name()));
+	    }
+
+	    // Memoize.
+	    map.put(name, t);
+
+	    return t;
+	}
+
+	// The name was long.
+	return resolver.findType(name);
+    }
+
+    public String toString() {
+      return "(import " + source.name() + ")";
+    }
+
+    protected void lazyImport() {
+	if (lazyImports.isEmpty()) {
+	  return;
+	}
+
+	for (int i = 0; i < lazyImports.size(); i++) {
+	    String longName = (String) lazyImports.get(i);
+
+	    Types.report(1, this + ": import " + longName);
+
+	    try {
+		Type t = resolver.findType(longName);
+		String shortName = StringUtil.getShortNameComponent(longName);
+
+		Types.report(1, this + ": import " + shortName + " as " + t);
+
+		if (map.containsKey(shortName)) {
+		    Type s = (Type) map.get(shortName);
+
+		    if (! ts.isSame(s, t)) {
+			throw new SemanticException("Class " + shortName +
+			    " already defined as " + map.get(shortName),
+			    new Position(source.name()));
+		    }
+		}
+
+		map.put(longName, t);
+		map.put(shortName, t);
+	    }
+	    catch (SemanticException e) {
+		eq.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
+			      new Position(source.name()));
+	    }
+	}
+
+	lazyImports = new ArrayList();
+    }
 }

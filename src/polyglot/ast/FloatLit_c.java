@@ -1,0 +1,76 @@
+package jltools.ext.jl.ast;
+
+import jltools.ast.*;
+import jltools.types.*;
+import jltools.visit.*;
+import jltools.util.*;
+
+/** 
+ * A <code>FloatLit</code> represents a literal in java of type
+ * <code>float</code> or <code>double</code>.
+ */
+public class FloatLit_c extends Lit_c implements FloatLit
+{
+    protected FloatLit.Kind kind;
+    protected double value;
+
+    public FloatLit_c(Ext ext, Position pos, FloatLit.Kind kind, double value) {
+	super(ext, pos);
+	this.kind = kind;
+	this.value = value;
+    }
+
+    public FloatLit.Kind kind() {
+	return this.kind;
+    }
+
+    public FloatLit kind(FloatLit.Kind kind) {
+	FloatLit_c n = (FloatLit_c) copy();
+	n.kind = kind;
+	return n;
+    }
+
+    public double value() {
+	return this.value;
+    }
+
+    public Object objValue() {
+	return new Double(this.value);
+    }
+
+    public FloatLit value(double value) {
+	FloatLit_c n = (FloatLit_c) copy();
+	n.value = value;
+	return n;
+    }
+
+    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+	if (kind == FLOAT) {
+	    return type(tc.typeSystem().Float());
+	}
+	else if (kind == DOUBLE) {
+	    return type(tc.typeSystem().Double());
+	}
+	else {
+	    throw new InternalCompilerError("Unrecognized FloatLit kind " +
+		kind);
+	}
+    }  
+
+    public String toString() {
+	return Double.toString(value);
+    }
+
+    public void translate_(CodeWriter w, Translator tr) {
+        if (kind == FLOAT) {
+	    w.write(Float.toString((float) value) + "F");
+	}
+	else if (kind == DOUBLE) {
+	    w.write(Double.toString(value));
+	}
+	else {
+	    throw new InternalCompilerError("Unrecognized FloatLit kind " +
+		kind);
+	}
+    }
+}

@@ -5,42 +5,57 @@ SUBDIRS =
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
-	AccessFlags.java \
-	AmbiguousNameType.java \
-	AmbiguousType.java \
+	AnonClassType.java \
 	ArrayType.java \
-	CachingClassResolver.java \
-	ClassContext.java \
+	CachingResolver.java \
+	ClassContextResolver.java \
 	ClassResolver.java \
 	ClassType.java \
-	ClassTypeImpl.java \
-	CompoundClassResolver.java \
-	ConstructorType.java \
-	EmptyContext.java \
+	CodeInstance.java \
+	CompoundResolver.java \
+	ConstructorInstance.java \
+	Context.java \
+	EmptyContextResolver.java \
 	FieldInstance.java \
+	Flags.java \
 	ImportTable.java \
+	InitializerInstance.java \
+	InnerClassType.java \
 	LoadedClassResolver.java \
 	LoadedClassType.java \
-	LocalContext.java \
+	LocalClassType.java \
 	LocalInstance.java \
-	MethodType.java \
-	MethodTypeInstance.java \
-	MethodTypeInstanceInitializer.java \
+	MemberClassType.java \
+	MemberInstance.java \
+	MethodInstance.java \
+	NamedQualifier.java \
+	NamedType.java \
 	NoClassException.java \
 	NullType.java \
-	PackageContext.java \
-	PackageType.java \
+	Package.java \
+	PackageContextResolver.java \
+	ParsedAnonClassType.java \
 	ParsedClassType.java \
+	ParsedInnerClassType.java \
+	ParsedLocalClassType.java \
+	ParsedMemberClassType.java \
+	ParsedTopLevelClassType.java \
+	ParsedType.java \
 	PrimitiveType.java \
+	ProcedureInstance.java \
+	Qualifier.java \
 	ReferenceType.java \
+	Resolver.java \
 	SemanticException.java \
-	StandardTypeSystem.java \
-	TableClassResolver.java \
+	TableResolver.java \
+	TopLevelClassType.java \
 	Type.java \
-	TypeContext.java \
-	TypeInstance.java \
+	TypeObject.java \
+	Types.java \
 	TypeSystem.java \
-	VariableInstance.java
+	UnknownQualifier.java \
+	UnknownType.java \
+	VarInstance.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 

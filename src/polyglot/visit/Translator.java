@@ -4,16 +4,18 @@ import jltools.ast.*;
 import jltools.frontend.*;
 import jltools.types.*;
 import jltools.util.*;
-import jltools.main.Report;
+import jltools.types.Package;
 
 import java.io.*;
 import java.util.*;
 
-/** A TranslationVisitor generates output code from the processed AST.
+/** A Translator generates output code from the processed AST.
  */
-public class Translator implements Pass
+public class Translator extends AbstractPass
 {
     protected Job job;
+    protected Context context;
+    protected boolean appendSemicolon = true;
 
     /**
      * Create a Translator.  The output of the visitor is a collection of files
@@ -23,20 +25,40 @@ public class Translator implements Pass
 	this.job = job;
     }
 
+    public boolean appendSemicolon() {
+        return appendSemicolon;
+    }
+
+    public boolean appendSemicolon(boolean a) {
+        boolean old = this.appendSemicolon;
+        this.appendSemicolon = a;
+	return old;
+    }
+
+    public Context context() {
+        return context;
+    }
+
+    public TypeSystem typeSystem() {
+        return job.compiler().typeSystem();
+    }
+
+    public NodeFactory nodeFactory() {
+        return job.compiler().nodeFactory();
+    }
+
     public boolean run() {
 	jltools.frontend.Compiler compiler = job.compiler();
 
 	TypeSystem ts = compiler.typeSystem();
-	ExtensionFactory ef = compiler.extensionFactory();
+	NodeFactory nf = compiler.nodeFactory();
 	TargetFactory tf = compiler.targetFactory();
 	int outputWidth = compiler.outputWidth();
 	Collection outputFiles = compiler.outputFiles();
 
-	// FIXME: need to make LocalContext take a Pass rather
-	// than a Visitor.
-	LocalContext c = ts.getLocalContext(job.importTable(), ef, this);
+	this.context = ts.createContext(job.importTable());
 
-	SourceFileNode sfn = (SourceFileNode) job.ast();
+	SourceFile sfn = (SourceFile) job.ast();
 
 	// Find the public declarations in the file.  We'll use these to
 	// derive the names of the target files.  There will be one
@@ -50,69 +72,80 @@ public class Translator implements Pass
 	    Writer ofw;
 	    CodeWriter w;
 
-	    String pkg = sfn.getPackageName();
+	    String pkg = "";
 
-	    GlobalDeclaration first = null;
+	    if (sfn.package_() != null) {
+		Package p = sfn.package_().package_();
+		pkg = p.toString();
+	    }
+
+	    TopLevelDecl first = null;
 
 	    if (exports.size() == 0) {
 		// Use the source name to derive a default output file name.
 	    	of = tf.outputFile(pkg, job.source());
 	    }
 	    else {
-		first = (GlobalDeclaration) exports.get(0);
-	    	of = tf.outputFile(pkg, first.getName());
+		first = (TopLevelDecl) exports.get(0);
+	    	of = tf.outputFile(pkg, first.name());
 	    }
 
 	    outputFiles.add(of.getPath());
 	    ofw = tf.outputWriter(of);
 	    w = new CodeWriter(ofw, outputWidth);
 
-	    writeHeader(sfn, c, w);
+	    writeHeader(sfn, w);
 
-	    for (Iterator i = sfn.declarations(); i.hasNext(); ) {
-		GlobalDeclaration decl = (GlobalDeclaration) i.next();
+	    for (Iterator i = sfn.decls().iterator(); i.hasNext(); ) {
+		TopLevelDecl decl = (TopLevelDecl) i.next();
 
-		if (decl.getAccessFlags().isPublic() && decl != first) {
+		if (decl.flags().isPublic() && decl != first) {
 		    // We hit a new exported declaration, open a new file.
 		    // But, first close the old file.
 		    w.flush();
 		    ofw.close();
 
-		    of = tf.outputFile(pkg, decl.getName());
+		    of = tf.outputFile(pkg, decl.name());
 		    outputFiles.add(of.getPath());
 		    ofw = tf.outputWriter(of);
 		    w = new CodeWriter(ofw, outputWidth);
 
-		    writeHeader(sfn, c, w);
+		    writeHeader(sfn, w);
 		}
 
-		writeDecl(decl, c, w);
+		decl.ext().translate(w, this);
+		w.newline(0);
+
+		if (i.hasNext()) {
+		    w.newline(0);
+		}
 	    }
 
 	    w.flush();
 	    ofw.close();
+	    return true;
 	}
 	catch (IOException e) {
 	    job.compiler().errorQueue().enqueue(ErrorInfo.IO_ERROR,
 		       "I/O error while translating: " + e.getMessage());
 	    return false;
 	}
-
-	return true;
     }
 
-    void writeHeader(SourceFileNode sfn, LocalContext c, CodeWriter w) {
-	if (sfn.getPackageName() != null && ! sfn.getPackageName().equals("")) {
-	    w.write("package " + sfn.getPackageName() + ";");
+    protected void writeHeader(SourceFile sfn, CodeWriter w) {
+	if (sfn.package_() != null) {
+	    w.write("package ");
+	    sfn.package_().ext().translate(w, this);
+	    w.write(";");
 	    w.newline(0);
 	    w.newline(0);
 	}
 
 	boolean newline = false;
 
-	for (Iterator i = sfn.importNodes(); i.hasNext(); ) {
-	    ImportNode imp = (ImportNode) i.next();
-	    imp.translate(c, w);
+	for (Iterator i = sfn.imports().iterator(); i.hasNext(); ) {
+	    Import imp = (Import) i.next();
+	    imp.ext().translate(w, this);
 	    newline = true;
 	}
 		   
@@ -121,21 +154,21 @@ public class Translator implements Pass
 	}
     }
 
-    void writeDecl(GlobalDeclaration decl, LocalContext c, CodeWriter w) {
-	((Node) decl).translate(c, w);
-    }
-
-    List exports(SourceFileNode sfn) {
+    protected List exports(SourceFile sfn) {
 	List exports = new LinkedList();
 
-	for (Iterator i = sfn.declarations(); i.hasNext(); ) {
-	    GlobalDeclaration decl = (GlobalDeclaration) i.next();
+	for (Iterator i = sfn.decls().iterator(); i.hasNext(); ) {
+	    TopLevelDecl decl = (TopLevelDecl) i.next();
 
-	    if (decl.getAccessFlags().isPublic()) {
+	    if (decl.flags().isPublic()) {
 		exports.add(decl);
 	    }
 	}
 
 	return exports;
+    }
+
+    public String toString() {
+	return "Translator(" + job + ")";
     }
 }

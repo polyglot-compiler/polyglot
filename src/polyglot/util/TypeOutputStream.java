@@ -22,13 +22,13 @@ public class TypeOutputStream extends ObjectOutputStream
     enableReplaceObject( true);
   }
 
-  protected Object replaceObject( Object o) throws IOException
+  protected Object replaceObject(Object o) throws IOException
   {
-    if( roots.contains(o)) {
+    if (roots.contains(o)) {
       return o;
     }
-    else if( o instanceof ClassType) {
-      return new AmbiguousNameType( ts, ((ClassType)o).getTypeString());
+    else if (o instanceof TypeObject) {
+      return ts.placeHolder((TypeObject) o);
     }
     else {
       return o;

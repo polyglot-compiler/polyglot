@@ -5,7 +5,6 @@ import jltools.util.*;
 import jltools.types.Type;
 import jltools.types.TypeSystem;
 import jltools.frontend.ExtensionInfo;
-import jltools.frontend.StandardExtensionInfo;
 
 public class Main {
     public static void main(String args[]) {
@@ -54,7 +53,7 @@ public class Main {
 	    }
 	} else {
 	
-	    extInfo = new StandardExtensionInfo();
+	    extInfo = new jltools.ext.jl.ExtensionInfo();
 	}
 	
 

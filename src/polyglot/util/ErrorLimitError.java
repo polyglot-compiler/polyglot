@@ -1,7 +1,7 @@
 
 package jltools.util;
 
-public class ErrorLimitError extends Error
+public class ErrorLimitError extends RuntimeException
 {
   public ErrorLimitError( String msg)
   {

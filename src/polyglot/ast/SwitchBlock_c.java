@@ -1,0 +1,18 @@
+package jltools.ext.jl.ast;
+
+import jltools.ast.*;
+import jltools.types.*;
+import jltools.visit.*;
+import jltools.util.*;
+import java.util.*;
+
+public class SwitchBlock_c extends AbstractBlock_c implements SwitchBlock
+{
+    public SwitchBlock_c(Ext ext, Position pos, List statements) {
+	super(ext, pos, statements);
+    }
+
+    public String toString() {
+	return "...";
+    }
+}

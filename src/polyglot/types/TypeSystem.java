@@ -1,347 +1,302 @@
-/*
- * TypeSystem.java
- */
-
 package jltools.types;
 
-import jltools.frontend.Pass;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Collection;
-import java.util.ArrayList;
-import jltools.ast.*;
+import java.util.*;
+import jltools.util.Position;
+import jltools.frontend.Job;
 
 /**
- * TypeSystem
- *
- * Overview:
- *    A TypeSystem represents a universe of types.  It is responsible for
- *    finding classes to correspond to types, determining relations between
- *    types, and so forth.
- *
- **/
-public abstract class TypeSystem {
+ * The <code>TypeSystem</code> defines the types of the language and
+ * how they are related.
+ */
+public interface TypeSystem {
+    /**
+     * Initialize the type system with the system resolver.  The resolver
+     * should be capable of loading top-level classes with fully qualified
+     * names from the class path and the source path.  This method must be
+     * called before any other type system method is called.
+     */
+    void initialize(Resolver systemResolver) throws SemanticException;
 
-  /**
-   * performs any initialization necessary that requires resolvers.
-   */
-  public abstract void initializeTypeSystem( ClassResolver resolver)
-    throws SemanticException;
+    /**
+     * Returns the system resolver.  This resolver can load top-level classes
+     * with fully qualified names from the class path and the source path.
+     */
+    Resolver systemResolver();
 
-  public abstract String getWrapperTypeString(PrimitiveType t);
+    /**
+     * Return a list of the packages names that will be imported by
+     * default.  A list of Strings is returned, not a list of Packages.
+     */
+    List defaultPackageImports();
 
-  public abstract LocalContext getLocalContext( ImportTable it,
-	ExtensionFactory ef, Pass pass );
+    /** Create an initailizer instance. */
+    InitializerInstance initializerInstance(Position pos, ClassType container,
+					    Flags flags);
 
-  public abstract FieldInstance newFieldInstance( String name, Type type,
-	ReferenceType enclosingType, AccessFlags af);
-  public abstract LocalInstance newLocalInstance( String name, Type type,
-	AccessFlags af);
+    /** Create a constructor instance. */
+    ConstructorInstance constructorInstance(Position pos, ClassType container,
+					    Flags flags, List argTypes,
+					    List excTypes);
 
-  ////
-  // Functions for two-type comparison.
-  ////
-  /**
-   * Returns true iff childClass is not ancestorClass, but childClass descends
-   * from ancestorClass.
-   **/
-  public abstract boolean descendsFrom(Type childClass, 
-				       Type  ancestorClass) 
-    throws SemanticException ;
+    /** Create a method instance. */
+    MethodInstance methodInstance(Position pos, ReferenceType container,
+				  Flags flags, Type returnType, String name,
+				  List argTypes, List excTypes);
 
-  /**
-   * Returns true iff childType and ancestorType are non-primitive
-   * types, and a variable of type childType may be legally assigned
-   * to a variable of type ancestorType.
-   **/
-  public abstract boolean isAssignableSubtype(Type childType, 
-					      Type ancestorType)
-    throws SemanticException ;
-  /**
-   * Requires: all type arguments are canonical.
-   *
-   * Returns true iff a cast from fromType to toType is valid; in other
-   * words, some non-null members of fromType are also members of toType.
-   **/
-  public abstract boolean isCastValid(Type fromType, Type toType)
-    throws SemanticException ;
+    /** Create a field instance. */
+    FieldInstance fieldInstance(Position pos, ReferenceType container,
+				Flags flags, Type type, String name);
 
-  /**
-   * Requires: all type arguments are canonical.
-   *
-   * Returns true iff an implicit cast from fromType to toType is valid;
-   * in other words, every member of fromType is member of toType.
-   **/
-  public abstract boolean isImplicitCastValid(Type fromType, Type toType)
-    throws SemanticException ;
+    /** Create a local variable instance. */
+    LocalInstance localInstance(Position pos, Flags flags, Type type,
+	                        String name);
 
-  /**
-   * Requires: all type arguments are canonical.
-   *
-   * Returns true iff type1 and type2 are the same type.
-   **/
-  public abstract boolean isSameType(Type type1, Type type2);
+    /**
+     * Return a class type for the Class object.  Only a
+     * Resolver should call this method.
+     */
+    ClassType forClass(Class clazz) throws SemanticException;
 
-  /**
-   * Returns true if <code>value</code> can be implicitly cast to Primitive type
-   * <code>t</code>.
-   */
-  public abstract boolean numericConversionValid ( Type t, long value);
+    TypeObject placeHolder(TypeObject o);
 
-  /**
-   * Requires: all type arguments are canonical.
-   * Returns the least common ancestor of Type1 and Type2
-   **/
-  public abstract Type leastCommonAncestor( Type type1, Type type2)
-    throws SemanticException;
+    UnknownType unknownType(Position pos);
+    UnknownQualifier unknownQualifier(Position pos);
 
-  ////
-  // Functions for one-type checking and resolution.
-  ////
-  
-  /**
-   * Returns true iff <type> is a canonical (fully qualified) type.
-   **/
-  public abstract boolean isCanonical(Type type)
-    throws SemanticException ;
+    /**
+     * Returns true iff child descends from ancestor or child == ancestor.
+     * This is equivalent to:
+     *    descendsFrom(child, ancestor) || isSame(child, ancestor)
+     */
+    boolean isSubtype(Type child, Type ancestor);
 
-  /**
-   * Checks whether a method or field within ctTarget with access flags 'flags' can
-   * be accessed from TypeContext context. 
-   */
-  public abstract boolean isAccessible(ReferenceType ctTarget, AccessFlags flags, LocalContext context)
-    throws SemanticException ;
+    /**
+     * Returns true iff child is not ancestor, but child descends from ancestor.
+     */
+    boolean descendsFrom(Type child, Type ancestor);
 
-  /**
-   * Returns whether inner is enclosed within outer
-   */
-  public abstract boolean isEnclosed( ClassType tInner, ClassType tOuter);
+    /**
+     * Returns true iff child and ancestor are non-primitive types, and a
+     * variable of type child may be legally assigned to a variable of type
+     * ancestor.
+     */
+    boolean isAssignableSubtype(Type child, Type ancestor);
 
-  /**
-   * If <type> is a valid type in the given context, returns a
-   * canonical form of that type.  Otherwise, returns a String
-   * describing the error.
-   **/
-  public abstract void cleanClass(ClassType type)
-    throws SemanticException;
-  public abstract void cleanSuperTypes(ClassType type, TypeContext context)
-    throws SemanticException;
-  public abstract void cleanClass(ClassType type, TypeContext context)
-    throws SemanticException;
-  public abstract Type checkAndResolveType(Type type, TypeContext context)
-    throws SemanticException;
-  public abstract Type checkAndResolveType(Type type, Type contextType)
-    throws SemanticException;
+    /**
+     * Requires: all type arguments are canonical.
+     *
+     * Returns true iff a cast from fromType to toType is valid; in other
+     * words, some non-null members of fromType are also members of toType.
+     */
+    boolean isCastValid(Type fromType, Type toType);
 
-  ////
-  // Various one-type predicates.
-  ////
-  /**
-   * Requires: all type arguments are canonical.
-   *
-   * Returns true iff an object of type <type> may be thrown.
-   **/
-  public abstract boolean isThrowable(Type type)
-    throws SemanticException;
-  /**
-   * Requires: all type arguments are canonical.
-   *
-   * Returns true iff an object of type <type> may be thrown by a method
-   * without being declared in its 'throws' clause.
-   **/
-  public abstract boolean isUncheckedException(Type type)
-    throws SemanticException;
+    /**
+     * Requires: all type arguments are canonical.
+     *
+     * Returns true iff an implicit cast from fromType to toType is valid;
+     * in other words, every member of fromType is member of toType.
+     */
+    boolean isImplicitCastValid(Type fromType, Type toType);
 
-  ////
-  // Functions for type membership.
-  ////
-  /**
-   * Returns the fieldMatch named 'name' defined on 'type' visible in
-   * context.  If no such field may be found, returns a fieldmatch
-   * with an error explaining why. Considers accessflags
-   **/
-  public abstract FieldInstance getField(Type type, String name, LocalContext context)
-    throws SemanticException;
- 
+    /**
+     * Requires: all type arguments are canonical.
+     *
+     * Returns true iff type1 and type2 are the same type.
+     **/
+    boolean isSame(Type type1, Type type2);
 
-  /**
-   * Returns the supertype of type, or null if type has no supertype.
-   **/
-  public abstract ReferenceType getSuperType(ReferenceType type)
-    throws SemanticException;
+    /**
+     * Returns true if <code>value</code> can be implicitly cast to
+     * Primitive type <code>t</code>.
+     */
+    boolean numericConversionValid(Type t, long value);
 
-  /**
-   * Returns an immutable list of all the interface types which type
-   * implements.
-   **/
-  public abstract List getInterfaces(ReferenceType type)
-    throws SemanticException;
+    /**
+     * Requires: all type arguments are canonical.
+     * Returns the least common ancestor of Type1 and Type2
+     */
+    Type leastCommonAncestor(Type type1, Type type2) throws SemanticException;
 
-  ////
-  // Functions for method testing.
-  ////
-  /**
-   * Returns true iff <type1> is the same as <type2>.
-   **/
-  public abstract boolean isSameType(MethodType type1, MethodType type2)
-    throws SemanticException;
+    /**
+     * Returns true iff <type> is a canonical (fully qualified) type.
+     */
+    boolean isCanonical(Type type);
 
-  /**
-   * Returns true iff <type1> has the same arguments as <type2>
-   **/
-  public abstract boolean hasSameArguments(MethodType type1, MethodType type2);
+    /**
+     * Checks whether a method or field within target with access flags 'flags'
+     * can be accessed from Context context. 
+     */
+    boolean isAccessible(MemberInstance mi, Context context);
 
-  /**
-   * If an attempt to call a method of type <method> on <type> would
-   * be successful, returns the actual MethodMatch for the method that
-   * would be called.  Otherwise returns a MethodMatch with an error string
-   * explaining why no method could be found.
-   *
-   * If <context> is non-null, only those methods visible in context are
-   * considered.
-   *
-   * Iff <isThis> is true, methods are considered which would only be valid
-   * if the target object were equal to the "this" object.
-   *
-   * This method uses the name, argument types, and access flags of <method>.
-   * The access flags are used to select which protections may be accepted.
-   *
-   * (Guavac gets this wrong.)
-   **/
-  public abstract MethodTypeInstance getMethod(Type type, MethodType method, 
-					LocalContext context)
-    throws SemanticException;
+    /**
+     * Returns whether inner is enclosed within outer
+     */
+    boolean isEnclosed(ClassType inner, ClassType outer);
 
-  /**
-   * If a constructor call on <clazz> with arguments <args> would
-   *  succeed in <context> returns the actual ConstructorTypeInstance
-   *  for the constructor call, otherwise throws a SemanticException.
-   */
-  public abstract MethodTypeInstance getConstructor(ClassType clazz,
-						    List args,
-						    LocalContext context)
-    throws SemanticException;
+    ////
+    // Various one-type predicates.
+    ////
+    /**
+     * Requires: all type arguments are canonical.
+     *
+     * Returns true iff an object of type <type> may be thrown.
+     **/
+    boolean isThrowable(Type type);
 
-  ////
-  // Functions which yield particular types.
-  ////
-  public abstract Type getNull();
-  public abstract Type getVoid();
-  public abstract Type getBoolean();
-  public abstract Type getChar();
-  public abstract Type getByte();
-  public abstract Type getShort();
-  public abstract Type getInt();
-  public abstract Type getLong();
-  public abstract Type getFloat();
-  public abstract Type getDouble();
-  public abstract Type getObject();
-  public abstract Type getString();
-  public abstract Type getClass_();
-  public abstract Type getThrowable();
-  public abstract Type getError();
-  public abstract Type getException();
-  public abstract Type getRTException();
-  public abstract Type getCloneable();
-  public abstract Type getSerializable();
-  public abstract Type getNullPointerException();
-  public abstract Type getClassCastException();
-  public abstract Type getOutOfBoundsException();
-  public abstract Type getArrayStoreException();
-  public abstract Type getArithmeticException();
+    /**
+     * Returns a true iff the type or a supertype is in the list 
+     * returned by uncheckedExceptions().
+     */
+    boolean isUncheckedException(Type type);
 
-  /**
-   * Returns a non-canonical type object for a class type whose name
-   * is the provided string.  This type may not correspond to a valid
-   * class.
-   **/
-  public abstract Type getTypeWithName(String name)
-    throws SemanticException;
+    /**
+     * Returns a collection of the Throwable types that need not be declared
+     * in method and constructor signatures.
+     */
+    Collection uncheckedExceptions();
 
-  /**
-   * Returns a type identical to <type>, but with <dims> more array
-   * dimensions.  If dims is < 0, array dimensions are stripped.
-   **/
-  public abstract Type extendArrayDims(Type type, int dims)
-    throws SemanticException;
+    /** Unary promotion for numeric types. */
+    PrimitiveType promote(Type t) throws SemanticException;
 
-  /**
-   * Returns a canonical type corresponding to the Java Class object
-   * class.  Does not require that <theClass> have a JavaClass
-   * theClass.  Does not require that <theClass> have a ClassType
-   * registered in this typeSystem.  Does not register the type in
-   * this TypeSystem.  
-   * this TypeSystem.  For use only by ClassType implementations.
-   **/
-  public abstract Type typeForClass(Class clazz)
-    throws SemanticException;
+    /** Binary promotion for numeric types. */
+    PrimitiveType promote(Type t1, Type t2) throws SemanticException;
 
-  /**
-   * Given the name for a class, returns the portion which appears to
-   * constitute the package -- i.e., all characters up to but not including
-   * the last dot, or no characters if the name has no dot.
-   **/
-  public static String getPackageComponent(String fullName) {
-    int lastDot = fullName.lastIndexOf('.');
-    return lastDot >= 0 ? fullName.substring(0,lastDot) : "";
-  }
- 
-  /**
-   * Given the name for a class, returns the portion which appears to
-   * constitute the package -- i.e., all characters after the last
-   * dot, or all the characters if the name has no dot.
-   **/
-  public static String getShortNameComponent(String fullName) {
-    int lastDot = fullName.lastIndexOf('.');
-    return lastDot >= 0 ? fullName.substring(lastDot+1) : fullName;
-  }
+    ////
+    // Functions for type membership.
+    ////
 
-  /**
-   * Returns true iff the provided class name does not appear to be
-   * qualified (i.e., it has no dot.)
-   **/
-  public static boolean isNameShort(String name) {
-    return name.indexOf('.') < 0;
-  }
+    /**
+     * Returns the field named 'name' defined on 'type'.
+     */
+    FieldInstance findField(ReferenceType container, String name, Context c)
+	throws SemanticException;
 
-  public static String getFirstComponent(String fullName) {
-    int firstDot = fullName.indexOf('.');
-    return firstDot >= 0 ? fullName.substring(0,firstDot) : fullName;
-  }
+    /**
+     * Find a method.  We need to pass the context because the method
+     * we find depends on whether the method is accessible from the context.
+     */
+    MethodInstance findMethod(ReferenceType container,
+	String name, List argTypes, Context c) throws SemanticException;
 
-  public static String removeFirstComponent(String fullName) {
-    int firstDot = fullName.indexOf('.');
-    return firstDot >= 0 ? fullName.substring(firstDot+1) : "";
-  }
+    ConstructorInstance findConstructor(ClassType container,
+	List argTypes, Context c) throws SemanticException;
 
-  public abstract TypeContext getEmptyContext(ClassResolver resolver);
-  public abstract TypeContext getClassContext(ClassType clazz) throws SemanticException;
-  public abstract TypeContext getPackageContext(ClassResolver resolver, PackageType type) throws SemanticException;
-  public abstract TypeContext getPackageContext(ClassResolver resolver, String name) throws SemanticException;
+    MemberClassType findMemberClass(ClassType container, String name, Context c)
+	throws SemanticException;
 
-  public abstract ParsedClassType newParsedClassType(ImportTable it, ClassType container);
-  public abstract List defaultPackageImports();
+    /**
+     * Returns the immediate supertype of type, or null if type has no supertype.
+     **/
+    Type superType(ReferenceType type);
 
-  /**
-   * return the set of objects that should be serialized into the
-   * type information for the given ClassType. 
-   * Usually only the clazz itself should get encoded, and references
-   * to other classes should just have their name written out.
-   * If it makes sense for additional types to be fully encoded,
-   * (ie, they're necessary to correctly reconstruct the given clazz,
-   * and the usual class resolvers can't otherwise find them) they
-   * should be returned in the set in addition to clazz.
-   */
-  public abstract java.util.Set getTypeEncoderRootSet(Type clazz);
+    /**
+     * Returns an immutable list of all the interface types which type
+     * implements.
+     **/
+    List interfaces(ReferenceType type);
 
-  public abstract String translateArrayType(LocalContext c, ArrayType array);
-  public abstract String translateClassType(LocalContext c, ClassType clazz);
-  public abstract String translatePrimitiveType(LocalContext c, PrimitiveType prim);
+    ////
+    // Functions for method testing.
+    ////
 
-  public static void report(int level, String msg) {
-    Collection c = new ArrayList(1);
-    c.add("types");
-    jltools.main.Report.report(c, level, msg);
-  }
+    /**
+     * Returns true iff <type1> has the same arguments as <type2>
+     */
+    boolean hasSameArguments(ProcedureInstance m1, ProcedureInstance m2);
+
+    ////
+    // Functions which yield particular types.
+    ////
+    NullType Null();
+    PrimitiveType Void();
+    PrimitiveType Boolean();
+    PrimitiveType Char();
+    PrimitiveType Byte();
+    PrimitiveType Short();
+    PrimitiveType Int();
+    PrimitiveType Long();
+    PrimitiveType Float();
+    PrimitiveType Double();
+    ClassType Object();
+    ClassType String();
+    ClassType Class();
+    ClassType Throwable();
+    ClassType Error();
+    ClassType Exception();
+    ClassType RuntimeException();
+    ClassType Cloneable();
+    ClassType Serializable();
+    ClassType NullPointerException();
+    ClassType ClassCastException();
+    ClassType OutOfBoundsException();
+    ClassType ArrayStoreException();
+    ClassType ArithmeticException();
+
+    /**
+     * Returns a type identical to <type>, but with <dims> more array
+     * dimensions.  <dims> must be >= 0.
+     **/
+    ArrayType arrayOf(Type type);
+    ArrayType arrayOf(Position pos, Type type);
+    ArrayType arrayOf(Type type, int dims);
+    ArrayType arrayOf(Position pos, Type type, int dims);
+
+    /**
+     * Returns a canonical type corresponding to the Java Class object
+     * class.  Does not require that <theClass> have a JavaClass
+     * theClass.  Does not require that <theClass> have a ClassType
+     * registered in this typeSystem.  Does not register the type in
+     * this TypeSystem.  
+     * this TypeSystem.  For use only by ClassType implementations.
+     **/
+    Type typeForClass(Class clazz) throws SemanticException;
+
+    Package packageForName(String name);
+    Package packageForName(Package prefix, String name);
+
+    Context createContext(ImportTable it);
+
+    ParsedAnonClassType anonClassType(Job job);
+    ParsedTopLevelClassType topLevelClassType(Job job);
+    ParsedMemberClassType memberClassType(Job job);
+    ParsedLocalClassType localClassType(Job job);
+
+    Resolver emptyContextResolver(Resolver resolver);
+    Resolver packageContextResolver(Resolver resolver, Package type);
+    Resolver classContextResolver(ClassType ct);
+    Resolver bodyContextResolver(ClassType ct, Resolver outer);
+    Resolver qualifierContextResolver(Qualifier q) throws SemanticException;
+
+    /**
+     * return the set of objects that should be serialized into the
+     * type information for the given ClassType. 
+     * Usually only the clazz itself should get encoded, and references
+     * to other classes should just have their name written out.
+     * If it makes sense for additional types to be fully encoded,
+     * (ie, they're necessary to correctly reconstruct the given clazz,
+     * and the usual class resolvers can't otherwise find them) they
+     * should be returned in the set in addition to clazz.
+     */
+    Set getTypeEncoderRootSet(Type clazz);
+
+    String translatePackage(Context c, Package p);
+    String translatePrimitive(Context c, PrimitiveType t);
+    String translateArray(Context c, ArrayType t);
+    String translateTopLevelClass(Context c, TopLevelClassType t);
+    String translateMemberClass(Context c, MemberClassType t);
+    String translateLocalClass(Context c, LocalClassType t);
+    String wrapperTypeString(PrimitiveType t);
+
+    PrimitiveType primitiveForName(String name) throws SemanticException;
+
+    void checkMethodFlags(Flags f) throws SemanticException;
+    void checkLocalFlags(Flags f) throws SemanticException;
+    void checkFieldFlags(Flags f) throws SemanticException;
+    void checkConstructorFlags(Flags f) throws SemanticException;
+    void checkInitializerFlags(Flags f) throws SemanticException;
+    void checkTopLevelClassFlags(Flags f) throws SemanticException;
+    void checkMemberClassFlags(Flags f) throws SemanticException;
+    void checkLocalClassFlags(Flags f) throws SemanticException;
+    void checkAccessFlags(Flags f) throws SemanticException;
+
+    void checkCycles(ReferenceType t) throws SemanticException;
 }

@@ -17,195 +17,175 @@ import jltools.types.*;
  */
 public class SubtypeSet implements java.util.Set
 {
-  Vector v; 
-  /**
-   * Creates an empty SubtypeSet
-   */
-  public  SubtypeSet()
-  {
-    v = new Vector();
-  }
+    Vector v; 
 
-  /**
-   * Add an element of type <code>jltools.types.Type</code> to the set
-   * only if it has no supertypes already in the set. If we do add it, 
-   * remove any subtypes of <code>o</code>
-   * 
-   * @param o The element to add.
-   */
-  public boolean add( Object o)
-  {
-    boolean bHaveToAdd = true;
+    /**
+     * Creates an empty SubtypeSet
+     */
+    public SubtypeSet() {
+	v = new Vector();
+    }
 
-    if ( o == null) return false;
+    /**
+     * Add an element of type <code>jltools.types.Type</code> to the set
+     * only if it has no supertypes already in the set. If we do add it, 
+     * remove any subtypes of <code>o</code>
+     * 
+     * @param o The element to add.
+     */
+    public boolean add(Object o) {
+        if (o == null) {
+	    return false;
+	}
+
+	if (o instanceof Type) {
+	    Type type = (Type) o;
+
+	    if (type.isThrowable()) {
+		boolean haveToAdd = true;
+
+		for (Iterator i = v.iterator(); i.hasNext(); ) {
+		    Type t = (Type) i.next();
+
+		    if (t.descendsFrom(type)) {
+			i.remove();
+		    }
+
+		    if (type.isSubtype(t)) {
+			haveToAdd = false;
+			break;
+		    }
+		}
+
+		if (haveToAdd) {
+		    v.add(type);
+		}
+
+		return haveToAdd;
+	    }
+	}
+
+	throw new InternalCompilerError(
+	      "Can only add Throwables to the set. Got a " + o);
+    }
+
+    /**
+     * Adds all elements from c into this set.
+     */
+    public boolean addAll(Collection c) {
+	if (c == null) {
+	    return false;
+	}
+
+	boolean changed = false;
+
+	for (Iterator i = c.iterator(); i.hasNext(); ) {
+	    changed |= add(i.next()); 
+	}
+
+	return changed;
+    }
+
+    /**
+     * Removes all elements from the set
+     */
+    public void clear() {
+	v.clear();
+    }
+
+    /**
+     * Check whether object <code>o</code> is in the set. Because of the 
+     * semantics of the subtype set, <code>o</code> is in the set iff
+     * it descends from (or is equal to) one of the elements in the set.
+     */
+    public boolean contains(Object o) {
+	if (o instanceof Type) {
+	    Type type = (Type) o;
+
+	    for (Iterator i = v.iterator(); i.hasNext(); ) {
+		Type t = (Type) i.next();
+
+		if (type.isSubtype(t)) {
+		    return true;
+		}
+	    }
+	}
+
+	return false;
+    }
+
+    /**
+     * Checks whether all elements of the collection are in the set
+     */
+    public boolean containsAll(Collection c) {
+	for (Iterator i = c.iterator(); i.hasNext(); ) {
+	    if (! contains (i.next())) {
+		return false;
+	    }
+	}
+
+	return true;
+    }
+
+    public boolean isEmpty() {
+	return v.isEmpty();
+    }
     
-    if (o instanceof jltools.ast.TypeNode)
-      o = ((jltools.ast.TypeNode)o).getType();
+    public Iterator iterator() {
+	return v.iterator();
+    }
 
-    try
-    {
-      if ( o instanceof Type)
-      {
-	if ( (( Type )o).isThrowable() )
-	{
-	  for (Iterator i = v.iterator(); i.hasNext() ; )
-	  {
-	    Type t = (Type)i.next();
-	    if ( t.descendsFrom( (Type)o) )
-	    {
-	      i.remove();
+    /**
+     * Removes all elements <code>s</code> in the set such that 
+     * <code>s</code> decends from <code>o</code>
+     *
+     * @return whether or not an element was removed.
+     */
+    public boolean remove(Object o) {
+	Type type = (Type) o;
+
+	boolean removed = false;
+
+	for (Iterator i = v.iterator(); i.hasNext(); ) {
+	    Type t = (Type) i.next();
+
+	    if (t.isSubtype(type)) {
+		removed = true;
+		i.remove(); 
 	    }
-	    if ( ((Type)o).descendsFrom( t) || ((Type)o).equals ( t) )
-	    {
-	      bHaveToAdd = false;
-	      break;
-	    }
-	  }
-	if (bHaveToAdd)
-	  v.add( o);
-	return bHaveToAdd;
 	}
-	else 
-	{
-	  throw new InternalCompilerError(
-		"Can only add Throwables to the set. Got a " + 
-				       ((Type) o).getTypeString());
+
+	return removed;
+    }
+    
+    public boolean removeAll(Collection c) {
+        boolean changed = false;
+
+	for (Iterator i = c.iterator(); i.hasNext(); ) {
+	    Object o = i.next();
+	    changed |= remove(o);
 	}
-      }
-      else 
-      {
-        throw new ClassCastException("Can only add Types to the set. Got a " + 
-                                     o.getClass().getName());
-      }
-    }
-    catch ( SemanticException tce) 
-    {
-      throw new IllegalArgumentException(" Cannont perform typesystem operations: " + tce.getMessage());
+
+	return changed;
     }
 
-  }
-
-  /**
-   * Adds all elements from c into this set.
-   */
-  public boolean addAll( Collection c )
-  {
-    if ( c == null) return false;
-    boolean bChanged = false;
-    for (Iterator i = c.iterator() ; i.hasNext() ; )
-      bChanged |= add ( i.next()) ;
-    return bChanged;
-  }
-
-  /**
-   * Removes all elements from the set
-   */
-  public void  clear()
-  {
-    v.clear();
-  }
-
-  /**
-   * Check whether object <code>o</code> is in the set. Because of the 
-   * semantics of the subtype set, <code>o</code> is in the set iff
-   * it descends from (or is equal to) one of the elements in the set.
-   */
-  public boolean contains(Object o)
-  {
-    if ( o instanceof Type)
-    {
-      try
-      {
-        for (Iterator i = v.iterator(); i.hasNext() ; )
-        {
-          Type t = (Type)i.next();
-          if (((Type)o).descendsFrom ( t ) ||
-              ((Type)o).equals(t))
-            return true;
-        }
-      }
-      catch (SemanticException tce ) 
-      {
-        return false;
-      }
+    public boolean retainAll(Collection c) {
+	throw new UnsupportedOperationException("Not supported");
     }
-    return false;
-  }
 
-  /**
-   * Checks whether all elements of the collection are in the set
-   */
-  public boolean containsAll(Collection c)
-  {
-    for (Iterator i = c.iterator() ; i.hasNext() ; )
-      if (! contains (i.next()))
-        return false;
-    return true;
-  }
-
-  public boolean isEmpty()
-  {
-    return v.isEmpty();
-  }
-  
-  public Iterator iterator()
-  {
-    return v.iterator();
-  }
-
-  /**
-   * Removes all elements <code>s</code> in the set such that 
-   * <code>s</code> decends from <code>o</code>
-   *
-   * @return whether or not an element was removed.
-   */
-  public boolean remove(Object o )
-  {
-    if ( ! (o instanceof Type ))
-      throw new ClassCastException("Can only add types to the set");
-
-    boolean bRemoved = false;
-    for (Iterator i = v.iterator(); i.hasNext() ; ) 
-    {
-      Type t = (Type)i.next();
-      try
-      {
-        if ( t.equals(o) || t.descendsFrom ( (Type)o ) )
-        {
-          bRemoved = true;
-          i.remove() ; 
-        }      
-      }
-      catch ( SemanticException tce) 
-      {
-        throw new IllegalArgumentException(" Cannont perform typesystem operations: " + 
-                                           tce.getMessage());
-      }
+    public int size() {
+	return v.size();
     }
-    return bRemoved;
-  }
-  
-  public boolean removeAll(Collection c) 
-  {
-    throw new UnsupportedOperationException( " Not supported" );
-  }
 
-  public boolean retainAll(Collection c) 
-  {
-    throw new UnsupportedOperationException( " Not supported" );
-  }
-  public int size()
-  {
-    return v.size();
-  }
+    public Object[] toArray() {
+	return v.toArray();
+    }
 
-  public Object[] toArray()
-  {
-    return v.toArray();
-  }
+    public Object[] toArray(Object[] a) {
+	return v.toArray(a);
+    }
 
-  public Object[] toArray(Object[] a)
-  {
-    return v.toArray(a);
-  }
+    public String toString() {
+	return v.toString();
+    }
 }

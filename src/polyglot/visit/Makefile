@@ -6,6 +6,7 @@ include $(SOURCE)/Rules.mk
 
 SOURCES = \
 	AmbiguityRemover.java \
+	BaseVisitor.java \
 	ClassSerializer.java \
 	ConstantFolder.java \
 	DumpAst.java \
@@ -13,8 +14,9 @@ SOURCES = \
 	FlattenVisitor.java \
 	FlowChecker.java \
 	NodeScrambler.java \
-	SignatureCleaner.java \
-	SymbolReader.java \
+	SemanticVisitor.java \
+	TypeAmbiguityRemover.java \
+	TypeBuilder.java \
 	Translator.java \
 	TypeChecker.java
 

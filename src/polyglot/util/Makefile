@@ -5,13 +5,14 @@ SUBDIRS = typedump
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
-	AnnotatedObject.java \
-	Annotate.java \
 	Assert.java \
 	BitVector.java \
 	CachingTransformingList.java \
 	CodeWriter.java \
+	Copy.java \
+	CollectionUtil.java \
 	ConcatenatedIterator.java \
+	Enum.java \
 	ErrorInfo.java \
 	ErrorLimitError.java \
 	ErrorQueue.java \
@@ -21,6 +22,7 @@ SOURCES = \
 	NilMap.java \
 	Position.java \
 	Predicate.java \
+	StringUtil.java \
 	SubtypeSet.java \
 	Transformation.java \
 	TransformingIterator.java \

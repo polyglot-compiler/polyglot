@@ -1,14 +1,22 @@
 package jltools.util;
 
+import java.io.Serializable;
+
 /**
  * This class represents a posiiton within a file.
  **/
-public class Position {
+public class Position implements Serializable
+{
+    static final long serialVersionUID = -4588386982624074261L;
+
     String file;
     int line;
     int column;
 
     public static final int UNKNOWN = -1;
+
+    /** For deserialization. */
+    protected Position() { }
 
     public Position(String file) {
 	this(file, UNKNOWN, UNKNOWN);
@@ -34,6 +42,16 @@ public class Position {
 
     public String file() {
 	return file;
+    }
+
+    public String nameAndLineString() {
+	String s = file;
+
+	if (line != UNKNOWN) {
+	    s += ":" + line;
+	}
+
+	return s;
     }
 
     public String toString() {

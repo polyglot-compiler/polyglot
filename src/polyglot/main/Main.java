@@ -3,7 +3,6 @@ package jltools.main;
 import jltools.ast.Node;
 import jltools.frontend.Compiler;
 import jltools.frontend.ExtensionInfo;
-import jltools.frontend.StandardExtensionInfo;
 import jltools.types.TypeSystem;
 import jltools.util.*;
 
@@ -169,6 +168,14 @@ public class Main
         options.post_compiler = null;
         i++;
       }
+      else if (args[i].equals("-errors"))
+      {
+        i++;
+	try {
+	  options.error_count = Integer.parseInt(args[i]);
+	} catch (NumberFormatException e) {}
+        i++;
+      }
       else if (args[i].equals("-w"))
       {
         i++;
@@ -210,6 +217,11 @@ public class Main
       {
         i++;
 	options.serialize_type_info = false;
+      }
+      else if (args[i].equals("-nosourcecheck")) 
+      {
+        i++;
+	options.no_source_check = true;
       }
       else if (args[i].equals("-v") || args[i].equals("-verbose"))
       {
@@ -279,5 +291,4 @@ public class Main
   static String compilerName() {
     return Options.global.extension.compilerName();
   }
-
 }

@@ -1,149 +1,44 @@
 package jltools.types;
 
-import jltools.util.*;
+import jltools.util.Position;
 
-import java.io.*;
-
-
-/**
- * A type represents a type in some Java-based typesystem.  Each type
- * is tied to a particular TypeSystem; types with different TypeSystems
- * are incomparable.
- * <p>
- * <b>All types are immutable.</b>
- */
-public abstract class Type extends AnnotatedObject implements Serializable
+public interface Type extends Qualifier
 {
-  static final long serialVersionUID = -7347257353426805117L;
+    String translate(Context c);
+    ArrayType arrayOf();
+    ArrayType arrayOf(int dims);
 
-  /**
-   * The system to be used for comparison of types. This must be set in one
-   * of two ways: either through the constructor taking one argument, or
-   * through deserialization.
-   * <p>
-   * Note that this field itself is not serialized. Instead a 
-   * <code>TypeInputStream</code> should be used to deserialize the this
-   * object (or any subclass) so that the <code>TypeSystem</code> is properly
-   * set.
-   */
-  protected transient TypeSystem ts;
+    ClassType toClass();
+    NullType toNull();
+    ReferenceType toReference();
+    PrimitiveType toPrimitive();
+    ArrayType toArray();
 
-  /**
-   * Used for deserializing types.
-   */
-  protected Type()
-  {
-    this( null);
-  }
-  
-  /** Creates a new type in the given a TypeSystem. */
-  public Type(TypeSystem ts) { this.ts = ts; }
+    boolean isSame(Type t);
+    boolean isSubtype(Type t);
+    boolean descendsFrom(Type t);
+    boolean isAssignableSubtype(Type t);
+    boolean isCastValid(Type t);
+    boolean isImplicitCastValid(Type t);
 
-  public abstract String getTypeString();
+    boolean isPrimitive();
+    boolean isVoid();
+    boolean isBoolean();
+    boolean isChar();
+    boolean isByte();
+    boolean isShort();
+    boolean isInt();
+    boolean isLong();
+    boolean isFloat();
+    boolean isDouble();
+    boolean isIntOrLess();
+    boolean isLongOrLess();
+    boolean isNumeric();
 
-  public String translate(LocalContext c) {
-    throw new InternalCompilerError(this, "translate called on " +
-	getClass().getName() + ": " + getTypeString());
-  }
-
-  /*
-   * To be filled in by subtypes.
-   */
-  public abstract boolean isPrimitive();
-  /*
-   * To be filled in by subtypes.
-   */
-  public abstract boolean isCanonical();
-
-  public abstract boolean isReferenceType();
-  public abstract boolean isClassType();
-  public abstract boolean isArrayType();
-  public abstract boolean isPackageType();
-
-    /* Returns a non-null classtype iff isClassType() returns true  null otherwise */
-    public ClassType toClassType() {
-	return null;
-    }
-
-    /* Returns a non-null reference type iff isReferenceType() returns true  null otherwise */
-    public ReferenceType toReferenceType() {
-	return null;
-    }
-
-    /* Returns a non-null classtype iff isPrimitiveType() returns true  null otherwise */
-    public PrimitiveType toPrimitiveType() {
-	return null;
-    }
-
-    /* Returns a non-null classtype iff isArrayType() returns true  null otherwise */
-    public ArrayType toArrayType() {
-	return null;
-    }
-
-
-  public Type extendArrayDims(int dims) throws SemanticException
-  { 
-    return ts.extendArrayDims(this,dims); 
-  }  
-  
-  public final boolean isSameType(Type t) throws SemanticException
-  { 
-    return ts.isSameType(this,t); 
-  }
-  
-  public final boolean descendsFrom(Type ancestorType)throws SemanticException
-  { 
-    return ts.descendsFrom(this,ancestorType); 
-  }
-  
-  public final boolean isAssignableSubtype(Type ancestorType) 
-    throws SemanticException
-  { 
-    return ts.isAssignableSubtype(this,ancestorType); 
-  }
-  
-  public final boolean isCastValid(Type toType) throws SemanticException
-  {
-    return ts.isCastValid(this, toType); 
-  }
-  
-  public final boolean isImplicitCastValid(Type toType) 
-    throws SemanticException
-  { 
-    return ts.isImplicitCastValid(this, toType); 
-  }
-  
-  public final boolean isThrowable() throws SemanticException
-  {
-    return ts.isThrowable(this); 
-  }
-  
-  public final boolean isUncheckedException() throws SemanticException
-  {
-    return ts.isUncheckedException(this); 
-  }
-
-  public final TypeSystem getTypeSystem() 
-  {
-    return ts; 
-  }
-
-  public final boolean isComparable(Type t) 
-  {
-    return t.ts == this.ts;
-  }
-
-  private void readObject( ObjectInputStream in)
-     throws IOException, ClassNotFoundException
-  {
-    if( in instanceof TypeInputStream) {
-      ts = ((TypeInputStream)in).getTypeSystem();
-    }
-  }
-
-  public String toString() {
-    return getTypeString() + (this instanceof AmbiguousType ? "{amb}" : "");
-  }
+    boolean isReference();
+    boolean isNull();
+    boolean isArray();
+    boolean isClass();
+    boolean isThrowable();
+    boolean isUncheckedException();
 }
-
-
