@@ -476,9 +476,6 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 			w.begin(0);
 			w.write("(type " + type + ")");
 			w.end();
-			w.begin(0);
-			w.write("(members " + type.fields() + ")");
-			w.end();
 		}
 	}
 }
