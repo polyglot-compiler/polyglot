@@ -13,6 +13,7 @@ public class PPG
     public static final String DEBUG_HEADER = "ppg [debug]: ";
     public static boolean debug = false;
     public static String SYMBOL_CLASS_NAME = "sym";
+    public static String OUTPUT_FILE = null;
 
     public static void DEBUG (String s)
     {
@@ -39,8 +40,17 @@ public class PPG
 			      else
 				  throw new
 				      Exception
-				      ("No filename specified after -c");
+				      ("No filename specified after -symbols");
 			  }
+                        else if (args[i].equals ("-o"))
+                          {
+                              if (args.length > i) 
+                                  OUTPUT_FILE = args[++i];
+                              else
+				  throw new
+				      Exception
+				      ("No filename specified after -o");
+                          }
 			else	// invalid switch
 			    throw new Exception ("Invalid switch: " +
 						 args[i]);
@@ -106,14 +116,21 @@ public class PPG
 	String parent = file.getParent ();
 	spec.parseChain (parent == null ? "" : parent);
 
+        PrintStream out = System.out;
+
+
 	/* now we have a linked list of inheritance, namely
 	 * PPG_1, PPG_2, ..., PPG_n, CUP
 	 * We combine two at a time, starting from the end with the CUP spec
 	 */
 	try
 	{
+            if (OUTPUT_FILE != null) {
+                out = new PrintStream(new FileOutputStream(OUTPUT_FILE));
+            }
+
 	    CUPSpec combined = spec.coalesce ();
-	    CodeWriter cw = new CodeWriter (System.out, 72);
+	    CodeWriter cw = new CodeWriter (out, 72);
 	    combined.unparse (cw);
 	    cw.flush ();
 	}
