@@ -16,7 +16,7 @@ public class SourceLoader
     }
 
     /** Load a source from a specific file. */
-    public Source fileSource(String fileName) throws IOException {
+    public FileSource fileSource(String fileName) throws IOException {
 	File sourceFile = new File(fileName);
 
 	if (! sourceFile.exists()) {
@@ -31,11 +31,11 @@ public class SourceLoader
 
 	Compiler.report(2, "Loading class from " + sourceFile);
 
-	return new Source(fileName);
+	return new FileSource(fileName);
     }
 
     /** Load the source file for the given class name using the source path. */
-    public Source classSource(String className) throws IOException {
+    public FileSource classSource(String className) throws IOException {
 	/* Search the source path. */
         String fileName = className.replace('.', File.separatorChar) +
                                         "." + sourceExt.fileExtension();
@@ -58,7 +58,7 @@ public class SourceLoader
 		Compiler.report(2,
 		    "Loading " + className + " from " + sourceFile);
 
-		return new Source(sourceFile.getPath());
+		return new FileSource(sourceFile.getPath());
 	    }
 	}
 

@@ -82,7 +82,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
      * Read a source file and compile it up to the the current job's last
      * barrier.
      */
-    public boolean readSource(Source source) {
+    public boolean readSource(FileSource source) {
         Job job = addJob(source);
 
         // Run the new job up to its owner's (the current job's) barrier.
@@ -273,7 +273,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 	return new InnerJob(this, jobExt(), ast, context, outer, begin, end);
     }
 
-    public abstract Parser parser(Reader reader, Source source, ErrorQueue eq);
+    public abstract Parser parser(Reader reader, FileSource source, ErrorQueue eq);
 
     public void replacePass(List passes, Pass.ID id, List newPasses) {
         for (ListIterator i = passes.listIterator(); i.hasNext(); ) {

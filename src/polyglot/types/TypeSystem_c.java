@@ -1227,6 +1227,19 @@ public class TypeSystem_c implements TypeSystem
 	return ! (i1.hasNext() || i2.hasNext());
     }
 
+    /** Return true if t overrides mi */
+    public boolean hasMethod(ReferenceType t, MethodInstance mi) {
+        for (Iterator j = t.methods().iterator(); j.hasNext(); ) {
+            MethodInstance mj = (MethodInstance) j.next();
+
+            if (isSameMethod(mi, mj)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Returns true iff <m1> is the same method as <m2>
      */

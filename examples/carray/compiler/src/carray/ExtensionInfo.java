@@ -21,7 +21,7 @@ public class ExtensionInfo extends jltools.ext.jl.ExtensionInfo {
         return "jl";
     }
 
-    public Parser parser(Reader reader, Source source, ErrorQueue eq) {
+    public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
         Lexer lexer = new Lexer(reader, source.name(), eq);
         Grm grm = new Grm(lexer, ts, nf, eq);
         return new CupParser(grm, source, eq);

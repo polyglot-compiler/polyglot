@@ -1,7 +1,6 @@
 package jltools.types;
 
 import jltools.util.*;
-import jltools.frontend.Source;
 
 import java.util.*;
 

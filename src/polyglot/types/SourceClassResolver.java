@@ -98,7 +98,7 @@ public class SourceClassResolver extends LoadedClassResolver
 
     ClassFile clazz = null;
     ClassFile encodedClazz = null;
-    Source source = null;
+    FileSource source = null;
 
     // First try the class file.
     try {
@@ -174,7 +174,7 @@ public class SourceClassResolver extends LoadedClassResolver
     throw new NoClassException("Class " + name + " not found.");
   }
 
-  protected Type getTypeFromSource(Source source, String name)
+  protected Type getTypeFromSource(FileSource source, String name)
     throws SemanticException
   {
     // Compile the source file just enough to get the type information out.

@@ -3,7 +3,6 @@ package jltools.types;
 import java.util.*;
 import jltools.util.Position;
 import jltools.frontend.Job;
-import jltools.frontend.Source;
 import jltools.frontend.Compiler;
 import jltools.types.reflect.ClassFile;
 
@@ -242,6 +241,11 @@ public interface TypeSystem {
      * Returns true iff <m1> throws fewer exceptions than <m2>
      */
     boolean throwsSubset(ProcedureInstance m1, ProcedureInstance m2);
+
+    /**
+     * Returns true iff <m1> has the same arguments as <m2>
+     */
+    boolean hasMethod(ReferenceType t, MethodInstance mi);
 
     /**
      * Returns true iff <m1> has the same arguments as <m2>

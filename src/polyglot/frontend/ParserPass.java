@@ -21,7 +21,7 @@ public class ParserPass extends AbstractPass
 
     public boolean run() {
 	ErrorQueue eq = compiler.errorQueue();
-	Source source = job.source();
+	FileSource source = (FileSource) job.source();
 
 	try {
 	    Reader reader = source.open();

@@ -8,32 +8,30 @@ import jltools.util.*;
 public class Source
 {
     String name;
-    File file;
-    FileReader reader;
+    String path;
     Date lastModified;
 
-    public Source(String name) throws IOException {
+    protected Source(String name) {
 	this.name = name;
-	this.file = new File(name);
+    }
 
-	if (! file.exists()) {
-	    throw new FileNotFoundException(name);
-	}
-
-	lastModified = new Date(file.lastModified());
+    public Source(String name, String path, Date lastModified) {
+	this.name = name;
+        this.path = path;
+	this.lastModified = lastModified;
     }
 
     public boolean equals(Object o) {
 	if (o instanceof Source) {
 	    Source s = (Source) o;
-	    return file.equals(s.file);
+	    return name.equals(s.name) && path.equals(s.path);
 	}
 
 	return false;
     }
 
     public int hashCode() {
-	return file.getAbsolutePath().hashCode();
+	return path.hashCode() + name.hashCode();
     }
 
     /** The name of the source file. */
@@ -41,26 +39,9 @@ public class Source
 	return name;
     }
 
-    /** Gets the path of the source file. */
+    /** The name of the source file. */
     public String path() {
-	return file.getPath();
-    }
-
-    /** Open the source file. */
-    public Reader open() throws IOException {
-	if (reader == null) {
-	    reader = new FileReader(file);
-	}
-
-	return reader;
-    }
-
-    /** Close the source file. */
-    public void close() throws IOException {
-	if (reader != null) {
-	    reader.close();
-	    reader = null;
-	}
+	return path;
     }
 
     /** Return the date the source file was last modified. */
@@ -69,6 +50,6 @@ public class Source
     }
 
     public String toString() {
-	return file.getName();
+	return name;
     }
 }

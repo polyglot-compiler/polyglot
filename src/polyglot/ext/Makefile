@@ -32,5 +32,7 @@ covarRet: jl FORCE
 	$(MAKE) -C $@ all
 carcov: carray covarRet FORCE
 	$(MAKE) -C $@ all
+mixj: polyj
+	$(MAKE) -C $@ all
 
 FORCE:

@@ -73,7 +73,7 @@ public class Compiler
 
 		for (Iterator i = sources.iterator(); i.hasNext(); ) {
 		    String sourceName = (String) i.next();
-		    Source source = source_loader.fileSource(sourceName);
+		    FileSource source = source_loader.fileSource(sourceName);
 		    sourceExtension().addJob(source);
 		}
 

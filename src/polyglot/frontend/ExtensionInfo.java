@@ -88,7 +88,7 @@ public interface ExtensionInfo {
     boolean runAllPasses(Job job);
 
     /** Read a source file and compile up to the current job's barrier. */
-    boolean readSource(Source source);
+    boolean readSource(FileSource source);
 
     /**
      * Produce a target factory for this language extension.  The target
@@ -98,7 +98,7 @@ public interface ExtensionInfo {
     TargetFactory targetFactory();
 
     /** Get a parser for this language extension. */
-    Parser parser(Reader reader, Source source, ErrorQueue eq);
+    Parser parser(Reader reader, FileSource source, ErrorQueue eq);
 
     /** Get the list of passes for a given source job. */
     List passes(Job job);

@@ -99,7 +99,7 @@ public class ExtensionInfo extends jltools.frontend.AbstractExtensionInfo {
       return null;
     }
 
-    public Parser parser(Reader reader, Source source, ErrorQueue eq) {
+    public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
 	jltools.ext.jl.parse.Lexer lexer;
 	java_cup.runtime.lr_parser grm;
 
