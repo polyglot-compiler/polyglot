@@ -599,7 +599,7 @@ public class TypeSystem_c implements TypeSystem
      **/
     public FieldInstance findField(ReferenceType container, String name,
 	                           ClassType currClass) throws SemanticException {
-	List fields = findFields(container, name);
+	Collection fields = findFields(container, name);
 	
 	if (fields.size() == 0) {
 	    throw new NoMemberException(NoMemberException.FIELD,
@@ -608,21 +608,16 @@ public class TypeSystem_c implements TypeSystem
 					container + "\".");
 	}
 	
-	FieldInstance fi;
-
-	if (fields.size() > 1) {
-	    Iterator i = fields.iterator();
-	    FieldInstance fi1 = (FieldInstance) i.next();
+	Iterator i = fields.iterator();
+	FieldInstance fi = (FieldInstance) i.next();
+	
+	if (i.hasNext()) {
 	    FieldInstance fi2 = (FieldInstance) i.next();
 	    
 	    throw new SemanticException("Field \"" + name +
 					"\" is ambiguous; it is defined in both " +
-					fi1.container() + " and " +
+					fi.container() + " and " +
 					fi2.container() + "."); 
-	}
-	else {
-	    Iterator i = fields.iterator();
-	    fi = (FieldInstance) i.next();
 	}
 	
 	if (currClass != null && ! isAccessible(fi, currClass)) {
@@ -645,11 +640,11 @@ public class TypeSystem_c implements TypeSystem
 	    
     
     /**
-     * Returns a list of fields named <code>name</code> defined
+     * Returns a set of fields named <code>name</code> defined
      * in type <code>container</code> or a supertype.  The list
      * returned may be empty.
      */
-    protected List findFields(ReferenceType container, String name) {
+    protected Set findFields(ReferenceType container, String name) {
         assert_(container);
 
         if (container == null) {
@@ -660,14 +655,14 @@ public class TypeSystem_c implements TypeSystem
 	FieldInstance fi = container.fieldNamed(name);
 	
 	if (fi != null) {
-	    return Collections.singletonList(fi);
+	    return Collections.singleton(fi);
 	}
 
-	List l = new ArrayList();
+	Set fields = new HashSet();
 
 	if (container.superType() != null && container.superType().isReference()) {
-	    List l2 = findFields(container.superType().toReference(), name);
-	    l.addAll(l2);
+	    Set superFields = findFields(container.superType().toReference(), name);
+	    fields.addAll(superFields);
 	}
 
 	if (container.isClass()) {
@@ -676,12 +671,12 @@ public class TypeSystem_c implements TypeSystem
 	
 	    for (Iterator i = ct.interfaces().iterator(); i.hasNext(); ) {
 		Type it = (Type) i.next();
-		List l2 = findFields(it.toReference(), name);
-		l.addAll(l2);
+		Set superFields = findFields(it.toReference(), name);
+		fields.addAll(superFields);
 	    }
-	 }
+	}
 	
-	return l;
+	return fields;
     }
 
     /**
@@ -691,68 +686,83 @@ public class TypeSystem_c implements TypeSystem
                                      Context c) throws SemanticException {
         return findMemberClass(container, name, c.currentClass());
     }
-
+    
     public ClassType findMemberClass(ClassType container, String name,
-                                     ClassType currClass) throws SemanticException {
-
-        assert_(container);
-
-        ClassType t = findMemberClass(container, name);
-
-        if (! isAccessible(t, currClass)) {
-            throw new SemanticException("Cannot access member \"" + t + "\".");
-        }
-
-        return t;
+                                     ClassType currClass) throws SemanticException
+    {
+	assert_(container);
+	
+	Set s = findMemberClasses(container, name);
+	
+	if (s.size() == 0) {
+	    throw new NoClassException(name, container);
+	}
+	
+	Iterator i = s.iterator();
+	ClassType t = (ClassType) i.next();
+	
+	if (i.hasNext()) {
+	    ClassType t2 = (ClassType) i.next();
+	    throw new SemanticException("Member type \"" + name +
+					"\" is ambiguous; it is defined in both " +
+					t.container() + " and " +
+					t2.container() + ".");
+	}
+	
+	if (currClass != null && ! isAccessible(t, currClass)) {
+	    throw new SemanticException("Cannot access member type \"" + t + "\".");
+	}
+	
+	return t;
     }
-
+    
+    public Set findMemberClasses(ClassType container, String name) throws SemanticException {
+	assert_(container);
+	
+	ClassType mt = container.memberClassNamed(name);
+	
+	if (mt != null) {
+	    if (! mt.isMember()) {
+		throw new InternalCompilerError("Class " + mt +
+						" is not a member class, " +
+						" but is in " + container +
+						"\'s list of members.");
+	    }
+	    
+	    if (mt.outer() != container) {
+		throw new InternalCompilerError("Class " + mt +
+						" has outer class " +
+						mt.outer() +
+						" but is a member of " +
+						container);
+	    }
+	    
+	    return Collections.singleton(mt);
+	}
+	
+	Set memberClasses = new HashSet();
+	
+	if (container.superType() != null) {
+	    Set s = findMemberClasses(container.superType().toClass(), name);
+	    memberClasses.addAll(s);
+	}
+	
+	for (Iterator i = container.interfaces().iterator(); i.hasNext(); ) {
+	    Type it = (Type) i.next();
+	    
+	    Set s =  findMemberClasses(it.toClass(), name);
+	    memberClasses.addAll(s);
+	}
+	
+	return memberClasses;
+    }
+    
     public ClassType findMemberClass(ClassType container, String name)
         throws SemanticException {
 
-        assert_(container);
-
-        ClassType mt = container.memberClassNamed(name);
-
-        if (mt != null) {
-            if (! mt.isMember()) {
-                throw new InternalCompilerError("Class " + mt +
-                                                " is not a member class, " +
-                                                " but is in " + container +
-                                                "\'s list of members.");
-            }
-
-            if (mt.outer() != container) {
-                throw new InternalCompilerError("Class " + mt +
-                                                " has outer class " +
-                                                mt.outer() +
-                                                " but is a member of " +
-                                                container);
-            }
-
-            return mt;
-        }
-
-        if (container.superType() != null) {
-            try {
-                return findMemberClass(container.superType().toClass(), name);
-            }
-            catch (SemanticException e) {
-            }
-        }
-
-        for (Iterator i = container.interfaces().iterator(); i.hasNext(); ) {
-            Type it = (Type) i.next();
-
-            try {
-                return findMemberClass(it.toClass(), name);
-            }
-            catch (SemanticException e) {
-            }
-	}
-
-	throw new NoClassException(name, container);
+	return findMemberClass(container, name, (ClassType) null);
     }
-
+    
     protected String listToString(List l) {
 	String s = "";
 
