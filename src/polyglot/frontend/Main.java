@@ -142,7 +142,7 @@ public class Main
     Collection sourcePath = new LinkedList();
     sourcePath.add( new File( "."));
     options.put( MAIN_OPT_SOURCE_PATH, sourcePath);
-    options.put( MAIN_OPT_OUTPUT_DIRECTORY, new File( "."));
+    
     
     for( int i = 0; i < args.length; )
     {
@@ -229,7 +229,13 @@ public class Main
 
     if( options.get( MAIN_OPT_OUTPUT_EXT) == null) {
       if( options.get( MAIN_OPT_SOURCE_EXT).equals( ".java")) {
-        options.put( MAIN_OPT_OUTPUT_EXT, ".jlava");
+        if( !options.containsKey( MAIN_OPT_OUTPUT_DIRECTORY)) {
+          options.put( MAIN_OPT_OUTPUT_DIRECTORY, new File( "."));
+          options.put( MAIN_OPT_OUTPUT_EXT, ".jlava");
+        }
+        else {
+          options.put( MAIN_OPT_OUTPUT_EXT, ".java");
+        }
       }
       else {
         options.put( MAIN_OPT_OUTPUT_EXT, ".java");

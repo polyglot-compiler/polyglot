@@ -34,7 +34,7 @@ public  class ImportTable implements ClassResolver {
 
     iter = packageImports.iterator();
     while( iter.hasNext()) {
-      System.out.println( "import " + (String)iter.next());
+      System.out.println( "import " + (String)iter.next() + ".*");
     }
   }
 
@@ -56,6 +56,7 @@ public  class ImportTable implements ClassResolver {
 
   public ClassType findClass(String name)  throws TypeCheckException {
     // FIXME: need to keep on looking to find conflicts.
+    //System.out.println( "looking " + name + " " + TypeSystem.isNameShort(name));
     if (TypeSystem.isNameShort(name)) {
       Object res = map.get(name);
       // First see if we have a mapping already.

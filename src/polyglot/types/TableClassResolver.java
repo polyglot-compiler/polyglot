@@ -9,20 +9,23 @@ import java.util.*;
 public class TableClassResolver implements ClassResolver
 {
   protected Map table;
+  protected List queue;
 
   public TableClassResolver()
   {
     table = new HashMap();
+    queue = new LinkedList();
   }
   
   public void addClass( String fullName, ClassType clazz)
   {
     table.put( fullName, clazz);
+    queue.add( clazz);
   }
 
   public Iterator classes() 
   {
-    return table.entrySet().iterator();
+    return queue.iterator();
   }
 
   public ClassType findClass( String name) throws NoClassException
@@ -51,15 +54,17 @@ public class TableClassResolver implements ClassResolver
     iter1 = classes();
 
     while( iter1.hasNext()) {
-      clazz = (ParsedClassType)((Map.Entry)iter1.next()).getValue();
-      
+      clazz = (ParsedClassType)iter1.next();
+      //      System.out.println( "clean: working on " + clazz.getTypeString());
       context = new TypeSystem.Context( it, (ClassType)ts.getObject(), null);
 
       type = clazz.getSuperType();
       if( type != null) {
         try {
+          //       System.out.println( "cleaning super: "+ type.getTypeString());
           clazz.setSuperType( (ClassType)ts.checkAndResolveType( type, 
                                                                  context));
+          //System.out.println( "cleaned: " + clazz.getSuperType() );
         }
         catch( TypeCheckException e)
         {
@@ -71,6 +76,9 @@ public class TableClassResolver implements ClassResolver
           clazz.setSuperType( (ClassType)ts.getObject());
         }
       }
+
+      //      ((ClassTypeImpl)clazz).dump();
+      //      it.dump();
       
       context = new TypeSystem.Context( it, clazz, null);
 
@@ -121,6 +129,9 @@ public class TableClassResolver implements ClassResolver
         type = field.getType();
 
         try {
+          //          System.out.println( "field: " + type.getTypeString() + " ("
+          //                  + type.getClass().getName() + ")");
+ 
           field.setType( ts.checkAndResolveType( type, context));
         } 
         catch( TypeCheckException e) {

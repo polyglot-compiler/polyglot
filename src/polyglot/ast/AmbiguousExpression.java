@@ -14,7 +14,7 @@ public abstract class AmbiguousExpression extends Expression {
 
   public int getPrecedence()
   {
-    return PRECEDENCE_OTHER;
+    return 3; // PRECEDENCE_OTHER;
   }
 }
 

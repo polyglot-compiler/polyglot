@@ -378,8 +378,10 @@ public class MethodNode extends ClassMember {
   {
     Object vinfo = Annotate.getVisitorInfo( this);
     
-    returnType = (TypeNode)returnType.visit( v);
-    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( returnType), vinfo);
+    if( returnType != null) {
+      returnType = (TypeNode)returnType.visit( v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( returnType), vinfo);
+    }
     
     for (ListIterator i = formals.listIterator(); i.hasNext(); )
     {

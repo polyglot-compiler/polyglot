@@ -123,6 +123,8 @@ public class LocalContext
   public void pushClass( ClassType c)
   {
     stkContexts.push ( new ClassTuple ( new TypeSystem.Context ( itImports, c, null) ));
+    if ( c.getSuperType() instanceof AmbiguousType)
+      throw new Error();
   }
 
   /**

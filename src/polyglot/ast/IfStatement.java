@@ -98,7 +98,8 @@ public class IfStatement extends Statement {
       thenStatement.translate(c, w);
     if ( elseStatement != null)
     {
-      w.write ( "else" );
+      w.newline();
+      w.write ( "else " );
       if (! bElseBlockStatement)
       {
         w.beginBlock();

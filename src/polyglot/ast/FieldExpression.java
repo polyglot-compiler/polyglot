@@ -68,13 +68,19 @@ public class FieldExpression extends Expression {
   {
     if (target != null) 
     {
-      target.translate(c, w);
-      w.write("." + name);
+      if( target instanceof Expression) {
+        translateExpression( (Expression)target, c, w);
+        w.write( ".");
+      }
+      else if( target instanceof TypeNode) {
+        if( ((TypeNode)target).getCheckedType() != c.getCurrentClass()) {
+          target.translate(c, w);
+          w.write( ".");
+        }
+      }
     }
-    else
-    {
-      w.write(name);
-    }
+   
+    w.write( name);
   }
 
   public Node dump( CodeWriter w)
@@ -91,9 +97,39 @@ public class FieldExpression extends Expression {
     return PRECEDENCE_OTHER;
   }
 
-  public Node typeCheck( LocalContext c)
+  public Node typeCheck( LocalContext c) throws TypeCheckException
   {
-    // FIXME; implement
+    Type ltype;
+    FieldInstance fi;
+
+    if( target instanceof Expression) {
+      ltype = ((Expression)target).getCheckedType();
+    }
+    else if( target instanceof TypeNode) {
+      ltype = ((TypeNode)target).getCheckedType();
+    }
+    else {
+      throw new InternalCompilerError(
+                              "Attempting field access on node of type " 
+                              + target.getClass().getName());
+    }
+
+    if( ltype instanceof ArrayType && name.equals( "length")) {
+      setCheckedType( c.getTypeSystem().getInt());
+    }
+    else if( ltype instanceof ClassType) {
+      fi = c.getField( (ClassType)ltype, name);
+
+      // FIXME is this expected type correct?
+      Annotate.setExpectedType( target, fi.getEnclosingType());
+      setCheckedType( fi.getType());
+    }
+    else {
+      throw new TypeCheckException( 
+                    "Cannot access a field of an expression of type"
+                    + ltype.getTypeString());
+    }
+
     return this;
   }
 

@@ -48,7 +48,21 @@ public abstract class ClassTypeImpl extends ClassType {
       }
     return null;
   }
-  
+
+  public void dump()
+  {
+    System.out.println( "---------------------");
+    System.out.println( "Class: " + fullName);
+    System.out.println( "Super: " + superType.getTypeString() + " ("
+                        + superType.getClass().getName() + ")");
+    System.out.println( "Inner Classes: ");
+    for (Iterator i = innerClasses.iterator(); i.hasNext();) {
+      ClassType innerType = (ClassType) i.next();
+      System.out.println( "  " + innerType.getTypeString());
+    }
+    System.out.println( "---------------------");
+  }
+      
 
   ////
   // All or most of the information below must be initialized before

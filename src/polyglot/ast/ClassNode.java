@@ -191,7 +191,7 @@ public class ClassNode extends ClassMember {
 
   public void translate ( LocalContext c, CodeWriter w)
   {
-    if ( c == null) System.out.println( " cn c is null");
+    c.pushClass( type);
     w.write (accessFlags.getStringRepresentation() + "class " + name);
     if (superClass != null)
     {
@@ -223,6 +223,7 @@ public class ClassNode extends ClassMember {
     w.endBlock();
     w.write( "}");
     w.newline(0);
+    c.popClass();
   }
   
   public Node dump( CodeWriter w)
@@ -237,6 +238,7 @@ public class ClassNode extends ClassMember {
   public Node readSymbols( SymbolReader sr)
   {
     type = sr.pushClass( name);
+    //    System.out.println( "reading: " + name);
     if( superClass != null) {
       type.setSuperType( superClass.getType());
     }

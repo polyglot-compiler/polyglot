@@ -386,7 +386,8 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public Type checkAndResolveType(Type type, Context context) throws TypeCheckException {
 
-    //    System.out.println( "resolving: " + type.getTypeString());
+    //System.out.println( "resolving: " + type.getTypeString() + " (" 
+    //                    + type.getClass().getName() + ") ");
 
     if (type.isCanonical()) return type;
     if (type instanceof ArrayType) {
@@ -409,7 +410,7 @@ public class StandardTypeSystem extends TypeSystem {
     //    System.out.println( "short? " + (TypeSystem.isNameShort(className)));
 
 
-    // Is the name short?
+    // Is the name short.?
     if (TypeSystem.isNameShort(className)) {
       // Sun's Java compiler seems to follow these steps.  The spec is
       // a bit hazy here, so we'll use the compiler as a reference.
@@ -425,12 +426,18 @@ public class StandardTypeSystem extends TypeSystem {
 	// any inners by that name.  If they _both_ do, that's an error.
 	Type resultFromOuter = null;
 	Type resultFromParent = null;
+        //        System.out.println("in " + inClass.getTypeString() + " super: " + 
+        //                 inClass.getSuperType());
 	ClassType parentType = (ClassType)inClass.getSuperType();
 	ClassType outerType = inClass.getContainingClass();
 	if (outerType != null) {
 	  Context outerContext = new Context(emptyImportTable,
 					     outerType, null);
-	  resultFromOuter = checkAndResolveType(type, outerContext);
+
+          try {
+            resultFromOuter = checkAndResolveType(type, outerContext);
+          }
+          catch( TypeCheckException e) {}
 	}
 	if (parentType != null) {
 	  Context parentContext = new Context(emptyImportTable,
@@ -443,13 +450,13 @@ public class StandardTypeSystem extends TypeSystem {
           catch( TypeCheckException e) {}
           //  System.out.println( "back from parent!");
 	}
-	if ((resultFromOuter instanceof ClassType) &&
-	    (resultFromParent instanceof ClassType)) {
+	if ((resultFromOuter != null) &&
+	    (resultFromParent != null)) {
 	  // FIXME: Better error message needed.
 	  throw new TypeCheckException ("Found " + className + " in both outer and parent.");
-	} else if (resultFromOuter instanceof ClassType) {
+	} else if (resultFromOuter != null) {
 	  return resultFromOuter;
-	} else if (resultFromParent instanceof ClassType) {
+	} else if (resultFromParent != null) {
 	  return resultFromParent;
 	}
       }

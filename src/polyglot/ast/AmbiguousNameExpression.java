@@ -126,6 +126,23 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     TypeNode tn;
     FieldInstance fi = null;
     String name = getName();
+    String s = "";
+    /*
+    for (Iterator i = names.listIterator(); i.hasNext(); )
+    {
+      try {
+        s += (String)i.next();
+        fi = c.getField( null, s);
+        break;
+      }
+      catch( TypeCheckException tce) {}
+    }
+
+    if( fi == null) {
+      throw new TypeCheckException( "No field or variable with name \"" + 
+                                    name + "\".");
+    }
+    */
     fi = c.getField( null, name);
 
     if( c.isDefinedLocally( name) ) {
@@ -133,6 +150,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     }
     else {
       // look for a field
+      //      System.out.println( fi.getEnclosingType().getTypeString());
       tn = new TypeNode( fi.getEnclosingType());
       e = new FieldExpression( tn, fi.getName() );
       Annotate.setLineNumber( tn, Annotate.getLineNumber( this));

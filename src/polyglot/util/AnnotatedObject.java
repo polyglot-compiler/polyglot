@@ -21,6 +21,7 @@ import java.util.Iterator;
  **/
 public abstract class AnnotatedObject {
 
+
   private static final class AnnotationTuple {
     int tag;
     Object val;

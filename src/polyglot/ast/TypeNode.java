@@ -19,7 +19,7 @@ import jltools.visit.SymbolReader;
  **/
 public class TypeNode extends Node {
 
-  public TypeNode( Type type) {
+  public TypeNode( Type type) { 
     this( type, type.getTypeString());
   }
 
@@ -65,7 +65,9 @@ public class TypeNode extends Node {
    
   public Node removeAmbiguities( LocalContext c) throws TypeCheckException
   {
+    //    System.out.println( "typenode: " + type.getTypeString());
     type = c.getType( type);
+
     setCheckedType( type);
     
     return this;
@@ -73,6 +75,7 @@ public class TypeNode extends Node {
 
   public Node typeCheck(LocalContext c)
   {
+    setCheckedType( type);
     return this;
   }
 

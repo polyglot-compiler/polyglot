@@ -47,6 +47,9 @@ public class SymbolReader extends NodeVisitor
   public ParsedClassType pushClass( String name)
   {
     String fullName;
+    ParsedClassType newClass;
+
+    newClass = new ParsedClassType( ts, current);
 
     if( current == null) {
       fullName = (packageName == null ? "" : 
@@ -54,13 +57,15 @@ public class SymbolReader extends NodeVisitor
     }
     else {
       fullName = current.getFullName() + "." + name;
+      current.addInnerClass( newClass);
     }
 
-    current = new ParsedClassType( ts, current);
-    current.setFullName( fullName);
+    newClass.setFullName( fullName);
+    newClass.setShortName( name);
 
-    currentResolver.addClass( fullName, current);
+    currentResolver.addClass( fullName, newClass);
 
+    current = newClass;
     return current;
   }
 
