@@ -27,6 +27,10 @@ public class SubstClassType_c extends ClassType_c implements SubstType
         this.subst = subst;
     }
 
+    /**
+     * Entries of the underlying substitution object.
+     * @return an <code>Iterator</code> of <code>Map.Entry</code>.
+     */
     public Iterator entries() {
         return subst.entries();
     }
@@ -36,6 +40,7 @@ public class SubstClassType_c extends ClassType_c implements SubstType
         return base;
     }
 
+    /** The substitution object. */
     public Subst subst() {
         return subst;
     }

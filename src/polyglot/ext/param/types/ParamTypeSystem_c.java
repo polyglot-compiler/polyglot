@@ -7,7 +7,7 @@ import polyglot.util.*;
 import java.util.*;
 
 /**
- * Type system for parameterized types.
+ * Implementation of type system for parameterized types.
  */
 public abstract class ParamTypeSystem_c extends TypeSystem_c
     implements ParamTypeSystem

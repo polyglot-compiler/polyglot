@@ -12,6 +12,9 @@ import java.io.*;
  */
 public interface Subst extends Serializable
 {
+    /** Entries of the underlying substitution map.
+     * @return An <code>Iterator</code> of <code>Map.Entry</code>.
+     */
     public Iterator entries();
 
     /** Type system */

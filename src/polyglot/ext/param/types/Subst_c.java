@@ -10,7 +10,7 @@ import polyglot.ext.param.Topics;
 import polyglot.main.Report;
 
 /**
- * Implementation of a ClassType that performs substitutions using a
+ * Utility class that performs substitutions on type objects using a
  * map.  Subclasses must define how the substititions are performed and
  * how to cache substituted types.
  */
@@ -36,10 +36,17 @@ public class Subst_c implements Subst
         return ts;
     }
 
+    /**
+     * Entries of the underlying substitution map.
+     * @return an <code>Iterator</code> of <code>Map.Entry</code>.
+     */
     public Iterator entries() {
         return substitutions().entrySet().iterator();
     }
 
+    /**
+     * The underlying substitution map.
+     */
     public Map substitutions() {
         return Collections.unmodifiableMap(subst);
     }
@@ -93,7 +100,8 @@ public class Subst_c implements Subst
         return t;
     }
 
-    /** Perform substitutions on a class type. */
+    /** Perform substitutions on a class type. Substitutions are performed
+     * lazily. */
     public ClassType substClassType(ClassType t) {
         return new SubstClassType_c(ts, t.position(), t, this);
     }
@@ -161,18 +169,22 @@ public class Subst_c implements Subst
         return (ConstructorInstance) ci.formalTypes(formalTypes).throwTypes(throwTypes).container(ct);
     }
 
+    /** Perform substititions on a list of <code>Type</code>. */
     public List substTypeList(List list) {
         return new CachingTransformingList(list, new TypeXform());
     }
 
+    /** Perform substititions on a list of <code>MethodInstance</code>. */
     public List substMethodList(List list) {
         return new CachingTransformingList(list, new MethodXform());
     }
 
+    /** Perform substititions on a list of <code>ConstructorInstance</code>. */
     public List substConstructorList(List list) {
         return new CachingTransformingList(list, new ConstructorXform());
     }
 
+    /** Perform substititions on a list of <code>FieldInstance</code>. */
     public List substFieldList(List list) {
         return new CachingTransformingList(list, new FieldXform());
     }

@@ -7,6 +7,11 @@ import polyglot.ext.jl.types.*;
 
 import java.util.*;
 
+/*
+ * Mutable parametric classes.  This interface is a wrapper around
+ * a ClassType that associates formal parameters with the class.
+ * formals can be any type object.
+ */
 public interface MuPClass extends PClass {
 
     /**

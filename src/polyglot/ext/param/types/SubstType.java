@@ -8,7 +8,14 @@ import java.util.Iterator;
  */
 public interface SubstType extends Type
 {
+    /** The type on which substitutions are performed. */ 
     Type base();
+
+    /** The substitution function. */ 
     Subst subst();
+
+    /** Entries of underlying substitution map.
+     * @return An <code>Iterator</code> of <code>Map.Entry</code>.
+     */ 
     Iterator entries();
 }
