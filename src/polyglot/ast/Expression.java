@@ -61,11 +61,11 @@ public abstract class Expression extends Node
                                          LocalContext c, 
                                          CodeWriter w)
   {
-    if( expr.getPrecedence() >= getPrecedence()) {
+    if( expr.getPrecedence() > getPrecedence()) {
       w.write("(");
     }
     expr.translate_block(c, w);
-    if( expr.getPrecedence() >= getPrecedence()) {
+    if( expr.getPrecedence() > getPrecedence()) {
       w.write( ")");
     }
   }

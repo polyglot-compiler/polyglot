@@ -162,10 +162,12 @@ public class MainTargetFactory implements TargetFactory
                                      File.separatorChar + fixExt(name));
           }
         }
-        if( !outputFile.getParentFile().exists()) {
-          File parent = outputFile.getParentFile();
-          parent.mkdirs();
-        }
+        if( outputFile.getParentFile() != null) {
+	  if( !outputFile.getParentFile().exists()) {
+	    File parent = outputFile.getParentFile();
+	    parent.mkdirs();
+	  }
+	}
 
         outputFileName = outputFile.getPath();
 
