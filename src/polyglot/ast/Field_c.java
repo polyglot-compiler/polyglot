@@ -150,10 +150,19 @@ public class Field_c extends Expr_c implements Field
     Context c = tc.context();
     TypeSystem ts = tc.typeSystem();
 
-    if (!target.type().isReference()) {
+    if (target instanceof Expr) {
+        if (! target.type().isReference()) {
             throw new SemanticException("Cannot access field \"" + name +
-                       "\" on an expression of non-reference type " + 
-                       target.type() + ".", position());
+                "\" on an expression of non-reference type \"" +
+                target.type() + "\".", target.position());
+        }
+    }
+    else {
+        if (! target.type().isReference()) {
+            throw new SemanticException("Cannot access field \"" + name +
+                "\" on non-reference type \"" + target.type() + "\".",
+                target.position());
+        }
     }
 
     FieldInstance fi = ts.findField(target.type().toReference(), name, c);
