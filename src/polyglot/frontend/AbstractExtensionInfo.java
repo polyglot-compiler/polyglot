@@ -175,7 +175,11 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             barrier = Pass.FIRST_BARRIER;
         }
 
-        return runToPass(job, barrier);
+        // Make sure we reach at least the first barrier defined
+        // in the base compiler.  This forces types to be constructed.
+        // If FIRST_BARRIER is before "barrier",
+        // then the second runToPass will just return true.
+        return runToPass(job, barrier) && runToPass(job, Pass.FIRST_BARRIER);
     }
 
     /**
