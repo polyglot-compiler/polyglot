@@ -20,6 +20,7 @@ SOURCES = \
 	InternalCompilerError.java \
 	NestedMap.java \
 	NilMap.java \
+	Pair.java \
 	Position.java \
 	Predicate.java \
 	StringUtil.java \

@@ -62,11 +62,15 @@ public class ErrorQueue
 	int lmargin = width + 1;
 	int rmargin = 80;
 
-	StringTokenizer st = new StringTokenizer(message);
+	StringTokenizer st = new StringTokenizer(message, " ");
 
 	while (st.hasMoreTokens()) {
 	    String s = st.nextToken();
-
+	    
+	    if (s.charAt(0)=='\n') {
+		lmargin = 0; 
+		width = 0;
+	    }
 	    if (width + s.length() + 1 > rmargin) {
 		err.println();
 		for (int i = 0; i < lmargin; i++) err.print(" ");
