@@ -132,8 +132,8 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         BadInit.jl (Semantic, "Method .* not found"),
                    (Semantic, "Method .* not found");
         BadInner.jl (Semantic, "Could not find non-static member class");
-        BadInner2.jl (Semantic, "Cannot specify a containing instance for static classes"),
-                     (Semantic, "Cannot specify a containing instance for static classes");
+        BadInner2.jl (Semantic, "Cannot provide a containing instance for non-inner class"),
+                     (Semantic, "Cannot provide a containing instance for non-inner class");
         BadInner3.jl (Semantic, "The nested class .* does not have an enclosing instance of type .*");
         BadInner4.jl (Semantic, "The type of the qualifier .* does not match the immediately enclosing class  of the super class .*");
 	BadInner5.jl (Semantic, "Class .* not found in scope of ");
