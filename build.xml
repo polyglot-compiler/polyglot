@@ -545,14 +545,17 @@
   </target>
 
   <target name="dist-javadoc" depends="jl-dist">
+    <copy file="${lib}/JFlex.jar" todir="${dist}/lib"/>
     <ant inheritAll="false" antfile="${dist}/build.xml" dir="${dist}" target="javadoc"/>
     <ant inheritAll="false" antfile="${dist}/build.xml" dir="${dist}" target="clobber"/>
+    <delete file="${dist}/lib/JFlex.jar"/>
   </target>
 
   <target name="javadoc" depends="jl">
     <javadoc sourcepath="${basedir}" destdir="doc/api">
-      <packageset dir="${basedir}" defaultexcludes="yes">
+      <packageset dir="${src}" defaultexcludes="yes">
         <include name="polyglot/**"/>
+        <include name="ppg/**"/>
         <exclude name="**/tests"/>
         <exclude name="**/test"/>
       </packageset>
@@ -560,11 +563,11 @@
   </target>
 
   <target name="jar" depends="polyglot-jar"/>
-
   <target name="polyglot-dist" depends="jl-dist,skel-dist,param-dist,pao-dist,coffer-dist"/>
   <target name="polyglot-dist-javadoc" depends="polyglot-dist,dist-javadoc"/>
+  <target name="dist" depends="polyglot-dist-javadoc"/>
+
   <target name="polyj-dist" depends="jl-dist,polyj"/>
   <target name="jmatch-dist" depends="jl-dist,jmatch"/>
-  <target name="dist" depends="polyglot-dist"/>
 </project>
 
