@@ -109,7 +109,11 @@ public class Translator extends PrettyPrinter implements Copy
         return nf;
     }
 
-    /** Print an ast node using the given code writer. */
+    /** Print an ast node using the given code writer.  This method should not
+     * be called directly to translate a source file AST; use
+     * <code>translate(Node)</code> instead.  This method should only be called
+     * by nodes to print their children.
+     */
     public void print(Node ast, CodeWriter w) {
         ast.del().translate(w, this);
     }
