@@ -492,6 +492,10 @@ public class Binary_c extends Expr_c implements Binary
                     return ts.promote(child.type(), other.type());
                 }
 
+                if (child.type().isImplicitCastValid(other.type())) {
+                    return other.type();
+                }
+
                 return child.type();
             }
 
