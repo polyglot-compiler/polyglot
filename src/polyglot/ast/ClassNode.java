@@ -334,52 +334,67 @@ public class ClassNode extends ClassMember
   public Node cleanupSignatures( LocalContext c, SignatureCleaner sc)
     throws SemanticException, IOException
   {
-    Type superType = type.getSuperType();
+    if (isAnonymous) {
+      if (type.getSuperType() != null || type.getInterfaces().size() != 1) {
+	throw new InternalCompilerError("Anonymous classes should be " +
+	  "constructed with a null superclass and one super-interface");
+      }
 
-    if (superType != null) {
+      Type superType = (Type) type.getInterfaces().get(0);
       ClassType superClazz = (ClassType) c.getType(superType);
 
-      if (superClazz instanceof ParsedClassType) {
-	if (! sc.containsClass(superClazz.getFullName())) {
-	  if (! sc.cleanClass(superClazz)) {
-	    throw new SemanticException("Errors while compiling " +
-		"superclass " + superClazz.getTypeString() +
-		" of " + type.getTypeString() + ".",
-		Annotate.getLineNumber(this) );
-	  }
-	}
+      if (! superClazz.getAccessFlags().isInterface()) {
+	type.setSuperType(superClazz);
+	type.getInterfaces().clear();
       }
-
-      type.setSuperType(superClazz);
+      else {
+	type.setSuperType((ClassType) c.getTypeSystem().getObject());
+      }
     }
     else {
-      // FIXME: Aren't array suptypes of Object, too?
-/*
-      if (! type.getAccessFlags().isInterface()) {
-*/
-	type.setSuperType((ClassType) c.getTypeSystem().getObject());
-/*
+      Type superType = type.getSuperType();
+
+      if (superType != null) {
+	ClassType superClazz = (ClassType) c.getType(superType);
+
+	if (superClazz.getAccessFlags().isInterface()) {
+	  throw new SemanticException("Superclass " +
+	    superClazz.getTypeString() + " of " + type.getTypeString() +
+	    " is an interface",
+	    Annotate.getLineNumber(this));
+	}
+
+	type.setSuperType(superClazz);
       }
-*/
-    }
-    
-    for (ListIterator i = type.getInterfaces().listIterator(); i.hasNext(); ) {
-      Type interfaceType = (Type) i.next();
+      else {
+	type.setSuperType((ClassType) c.getTypeSystem().getObject());
+      }
 
-      ClassType interfaceClazz = (ClassType) c.getType(interfaceType);
+      for (ListIterator i = type.getInterfaces().listIterator(); i.hasNext();) {
+	Type interfaceType = (Type) i.next();
 
-      if (interfaceClazz instanceof ParsedClassType) {
-	if (! sc.containsClass(interfaceClazz.getFullName())) {
-	  if (! sc.cleanClass(interfaceClazz)) {
-	    throw new SemanticException("Errors while compiling " +
-		"super-interface " + interfaceClazz.getTypeString() +
-		" of " + type.getTypeString() + ".",
-		Annotate.getLineNumber(this) );
+	ClassType interfaceClazz = (ClassType) c.getType(interfaceType);
+
+	if (! interfaceClazz.getAccessFlags().isInterface()) {
+	  throw new SemanticException("Super-interface " +
+	    interfaceClazz.getTypeString() + " of " + type.getTypeString() +
+	    " is not an interface",
+	    Annotate.getLineNumber(this));
+	}
+
+	if (interfaceClazz instanceof ParsedClassType) {
+	  if (! sc.containsClass(interfaceClazz.getFullName())) {
+	    if (! sc.cleanClass(interfaceClazz)) {
+	      throw new SemanticException("Errors while compiling " +
+		  "super-interface " + interfaceClazz.getTypeString() +
+		  " of " + type.getTypeString() + ".",
+		  Annotate.getLineNumber(this) );
+	    }
 	  }
 	}
-      }
 
-      i.set(interfaceClazz);
+	i.set(interfaceClazz);
+      }
     }
 
     enterScope(c);

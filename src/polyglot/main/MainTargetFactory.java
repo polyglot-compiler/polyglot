@@ -21,6 +21,9 @@ public class MainTargetFactory implements TargetFactory
                             File outputDirectory, String outputExtension,
                             Boolean stdout)
   {
+    if (outputDirectory == null)
+	outputDirectory = new File(".");
+
     this.sourceExtension = sourceExtension;
     this.sourcePath = sourcePath;
     this.outputDirectory = outputDirectory;
