@@ -17,14 +17,12 @@ public interface ProcedureDecl extends ClassMember
     String name();
 
     /** The procedure's formal parameters.
-     * A list of <code>Formal</code>.
-     * @see polyglot.ast.Formal
+     * @return A list of {@link polyglot.ast.Formal Formal}.
      */
     List formals();
 
     /** The procedure's exception throw types.
-     * A list of <code>TypeNode</code>.
-     * @see polyglot.ast.TypeNode
+     * @return A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
     List exceptionTypes();
 

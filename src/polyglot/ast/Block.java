@@ -9,16 +9,14 @@ import java.util.List;
 public interface Block extends Stmt
 {
     /**
-     * Statements in the block.
-     * A list of <code>Stmt</code>.
-     * @see polyglot.ast.Stmt
+     * Get the statements in the block.
+     * @return A list of {@link polyglot.ast.Stmt Stmt}.
      */
     List statements();
 
     /**
      * Set the statements in the block.
-     * A list of <code>Stmt</code>.
-     * @see polyglot.ast.Stmt
+     * @param statements A list of {@link polyglot.ast.Stmt Stmt}.
      */
     Block statements(List statements);
 

@@ -10,14 +10,12 @@ import java.util.*;
 public interface For extends Stmt 
 {    
     /** List of initialization statements.
-     * A list of <code>ForInit</code>.
-     * @see polyglot.ast.ForInit
+     * @return A list of {@link polyglot.ast.ForInit ForInit}.
      */
     List inits();
 
     /** Set the list of initialization statements.
-     * A list of <code>ForInit</code>.
-     * @see polyglot.ast.ForInit
+     * @param inits A list of {@link polyglot.ast.ForInit ForInit}.
      */
     For inits(List inits);
 
@@ -28,14 +26,12 @@ public interface For extends Stmt
     For cond(Expr cond);
 
     /** List of iterator expressions.
-     * A list of <code>ForUpdate</code>.
-     * @see polyglot.ast.ForUpdate
+     * @return A list of {@link polyglot.ast.ForUpdate ForUpdate}.
      */
     List iters();
 
     /** Set the list of iterator expressions.
-     * A list of <code>ForUpdate</code>.
-     * @see polyglot.ast.ForUpdate
+     * @param iters A list of {@link polyglot.ast.ForUpdate ForUpdate}.
      */
     For iters(List iters);
 

@@ -10,15 +10,13 @@ public interface ClassBody extends Node
 {
     /**
      * List of the class's members.
-     * A list of <code>ClassMember</code>.
-     * @see polyglot.ast.ClassMember
+     * @return A list of {@link polyglot.ast.ClassMember ClassMember}.
      */
     List members();
 
     /**
      * Set the class's members.
-     * A list of <code>ClassMember</code>.
-     * @see polyglot.ast.ClassMember
+     * @param members A list of {@link polyglot.ast.ClassMember ClassMember}.
      */
     ClassBody members(List members);
 

@@ -26,26 +26,22 @@ public interface ConstructorDecl extends ProcedureDecl
     ConstructorDecl name(String name);
 
     /** The constructor's formal parameters.
-     * A list of <code>Formal</code>.
-     * @see polyglot.ast.Formal
+     * @return A list of {@link polyglot.ast.Formal Formal}.
      */
     List formals();
 
     /** Set the constructor's formal parameters.
-     * A list of <code>Formal</code>.
-     * @see polyglot.ast.Formal
+     * @param formals A list of {@link polyglot.ast.Formal Formal}.
      */
     ConstructorDecl formals(List formals);
 
     /** The constructor's exception throw types.
-     * A list of <code>TypeNode</code>.
-     * @see polyglot.ast.TypeNode
+     * @return A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
     List exceptionTypes();
 
     /** Set the constructor's exception throw types.
-     * A list of <code>TypeNode</code>.
-     * @see polyglot.ast.TypeNode
+     * @param exceptionTypes A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
     ConstructorDecl exceptionTypes(List exceptionTypes);
 

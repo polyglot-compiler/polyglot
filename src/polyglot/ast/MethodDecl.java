@@ -28,26 +28,22 @@ public interface MethodDecl extends ProcedureDecl
     MethodDecl name(String name);
 
     /** The method's formal parameters.
-     * A list of <code>Formal</code>.
-     * @see polyglot.ast.Formal
+     * @return A list of {@link polyglot.ast.Formal Formal}.
      */
     List formals();
 
     /** Set the method's formal parameters.
-     * A list of <code>ForUpdate</code>.
-     * @see polyglot.ast.ForUpdate
+     * @param formals A list of {@link polyglot.ast.Formal Formal}.
      */
     MethodDecl formals(List formals);
 
     /** The method's exception throw types.
-     * A list of <code>TypeNode</code>.
-     * @see polyglot.ast.TypeNode
+     * @return A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
     List exceptionTypes();
 
     /** Set the method's exception throw types.
-     * A list of <code>TypeNode</code>.
-     * @see polyglot.ast.TypeNode
+     * @param exceptionTypes A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
     MethodDecl exceptionTypes(List exceptionTypes);
 

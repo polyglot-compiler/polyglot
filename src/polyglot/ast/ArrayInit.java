@@ -12,22 +12,23 @@ import java.util.List;
 public interface ArrayInit extends Expr
 {
     /**
-     * Initializer elements.
-     * A list of <code>Expr</code>.
-     * @see polyglot.ast.Expr
+     * Get the initializer elements.
+     * @return A list of {@link polyglot.ast.Expr Expr}.
      */
     List elements();
 
     /**
      * Set the initializer elements.
-     * A list of <code>Expr</code>.
-     * @see polyglot.ast.Expr
+     * @param elements A list of {@link polyglot.ast.Expr Expr}.
      */
     ArrayInit elements(List elements);
 
     /**
-     * Type check the individual elements of the array initializer against
-     * the left-hand-side type.
+     * Type check the individual elements of the array initializer against the
+     * left-hand-side type.  Each element is checked to see if it can be
+     * assigned to a variable of type lhsType.
+     * @param lhsType Type to compare against.
+     * @exception SemanticException if there is a type error.
      */
     void typeCheckElements(Type lhsType) throws SemanticException;
 }

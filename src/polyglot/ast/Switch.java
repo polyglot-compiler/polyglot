@@ -19,14 +19,12 @@ public interface Switch extends Stmt
     Switch expr(Expr expr);
 
     /** List of switch elements: case statements or blocks.
-     * A list of <code>SwitchElement</code>.
-     * @see polyglot.ast.SwitchElement
+     * @return A list of {@link polyglot.ast.SwitchElement SwitchElement}.
      */
     List elements();
 
     /** Set the list of switch elements: case statements or blocks.
-     * A list of <code>SwitchElement</code>.
-     * @see polyglot.ast.SwitchElement
+     * @param elements A list of {@link polyglot.ast.SwitchElement SwitchElement}.
      */
     Switch elements(List elements);
 }

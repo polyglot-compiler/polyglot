@@ -11,14 +11,12 @@ import java.util.List;
 public interface SourceCollection extends Node
 {
     /** List of source files in the collection.
-     * A list of <code>SourceFile</code>.
-     * @see polyglot.ast.SourceFile
+     * @return A list of {@link polyglot.ast.SourceFile SourceFile}.
      */
     List sources();
 
     /** Set the list of source files in the collection.
-     * A list of <code>SourceFile</code>.
-     * @see polyglot.ast.SourceFile
+     * @param sources A list of {@link polyglot.ast.SourceFile SourceFile}.
      */
     SourceCollection sources(List sources);
 }

@@ -18,26 +18,22 @@ public interface SourceFile extends Node
     SourceFile package_(PackageNode package_);
 
     /** Get the source's declared imports.
-     * A list of <code>Import</code>.
-     * @see polyglot.ast.Import
+     * @return A list of {@link polyglot.ast.Import Import}.
      */
     List imports();
 
     /** Set the source's declared imports.
-     * A list of <code>Import</code>.
-     * @see polyglot.ast.Import
+     * @param imports A list of {@link polyglot.ast.Import Import}.
      */
     SourceFile imports(List imports);
 
     /** Get the source's top-level declarations.
-     * A list of <code>TopLevelDecl</code>.
-     * @see polyglot.ast.TopLevelDecl
+     * @return A list of {@link polyglot.ast.TopLevelDecl TopLevelDecl}.
      */
     List decls();
 
     /** Set the source's top-level declarations.
-     * A list of <code>TopLevelDecl</code>.
-     * @see polyglot.ast.TopLevelDecl
+     * @param decls A list of {@link polyglot.ast.TopLevelDecl TopLevelDecl}.
      */
     SourceFile decls(List decls);
 

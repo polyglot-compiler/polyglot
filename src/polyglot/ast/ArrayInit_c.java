@@ -105,7 +105,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 
         if (! lhsType.isArray()) {
           throw new SemanticException("Cannot initialize " + lhsType +
-                                      " with " + type, position());
+                                      " with " + type + ".", position());
         }
 
         // Check if we can assign each individual element.
@@ -114,6 +114,11 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
         for (Iterator i = elements.iterator(); i.hasNext(); ) {
             Expr e = (Expr) i.next();
             Type s = e.type();
+
+            if (e instanceof ArrayInit) {
+                ((ArrayInit) e).typeCheckElements(t);
+                continue;
+            }
 
             boolean intConversion = false;
 

@@ -41,16 +41,14 @@ public interface New extends Expr
     New objectType(TypeNode t);
 
     /** Actual arguments to pass to the constructor.
-     * A list of <code>Expr</code>.
-     * @see polyglot.ast.Expr
+     * @return A list of {@link polyglot.ast.Expr Expr}.
      */
     List arguments();
 
     /** Set the actual arguments to pass to the constructor.
-     * A list of <code>Expr</code>.
-     * @see polyglot.ast.Expr
+     * @param arguments A list of {@link polyglot.ast.Expr Expr}.
      */
-    New arguments(List a);
+    New arguments(List arguments);
 
     /** The class body for anonymous classes, or null. */
     ClassBody body();
