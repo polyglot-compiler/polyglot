@@ -409,6 +409,10 @@ public class NodeFactory_c implements NodeFactory
 	return new Return_c(new Ext_c(), pos, expr);
     }
 
+    public SourceCollection SourceCollectionile(Position pos, List sources) {
+        return new SourceCollection_c(new Ext_c(), pos,  sources);
+    }
+
     public SourceFile SourceFile(Position pos, List decls) {
         return SourceFile(pos, null, Collections.EMPTY_LIST, decls);
     }
