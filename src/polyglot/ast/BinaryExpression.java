@@ -42,7 +42,7 @@ public class BinaryExpression extends Expression
   public static final int RUSHIFTASSIGN  = 30; // >>>= operator
   
   // Largest operator used.
-  public static final int MAX_OPERATOR   = RUSHIFTASSIGN;
+  protected static final int MAX_OPERATOR   = RUSHIFTASSIGN;
 
   protected final Expression left, right;
   protected final int operator;

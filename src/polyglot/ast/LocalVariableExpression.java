@@ -1,51 +1,73 @@
-/*
- * LocalVariableExpression
- */
-
 package jltools.ast;
+
 import jltools.types.*;
 import jltools.util.*;
 
+
 /** 
- * LocalVariableExpression
- * 
- * Overview: A LocalVariableExpression corresponds to a mutalbe reference to
- *   a local variable (not a field of a class) in an expression.
+ * A <code>LocalVariableExpression</code> corresponds to an immutable reference
+ * to a local variable (not a field of a class) in an expression.
  */
-
-public class LocalVariableExpression extends Expression {
+public class LocalVariableExpression extends Expression 
+{
+  protected final String name;
+  // FIXME is this necessary?
+  //  private FieldInstance fi;
     
-    /** 
-     * Effects: Creates a new local variable reference to a
-     * variable named <name>.
-     */
-    public LocalVariableExpression(String name) {
-	this.name = name;
-    }
-
-    /** 
-     * Effects: Returns the name of the variable referenced by this
-     */
-    public String getName() {
-	return name;
-    }
-
-    /** 
-     * Effects: Change the name of the variable referenced by this
-     *    to <newName>.
-     */
-    public void setName(String newName) {
-	name = newName;
-    }
-
-  public int getPrecedence()
+  /** 
+   * Creates a new local variable reference.
+   */
+  public LocalVariableExpression( String name) 
   {
-    return PRECEDENCE_OTHER;
+    this.name = name;
   }
 
-  public void translate(LocalContext c, CodeWriter w)
+  public LocalVariableExpression reconstruct( String name)
   {
-    w.write(name);
+    if( this.name.equals( name)) {
+      return this;
+    }
+    else {
+      LocalVariableExpression n = new LocalVariableExpression( name);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+  }
+
+  /** 
+   * Returns the name of the variable referenced by this node.
+   */
+  public String getName() 
+  {
+    return name;
+  }
+
+  /*
+   * FIXME is this necessary?
+   *
+  public FieldInstance getFieldInstance()
+  {
+    return fi;
+  }
+  */
+
+  Node visitChildren( NodeVisitor v) 
+  {
+    /* Nothing to do. */
+    return this;
+  }
+
+  public Node typeCheck( LocalContext c) throws SemanticException
+  {
+    FieldInstance fi = c.getField( null, name);
+    setCheckedType( fi.getType());
+
+    return this;
+  }
+
+  public void translate( LocalContext c, CodeWriter w)
+  {
+    w.write( name);
   }
 
   public void dump( CodeWriter w)
@@ -54,38 +76,10 @@ public class LocalVariableExpression extends Expression {
     w.write( " < " + name + " > ");
     dumpNodeInfo( w);
     w.write( ")");
-    return null;
   }
 
-  public Node typeCheck(LocalContext c) throws TypeCheckException
+  public int getPrecedence()
   {
-    fi = c.getField( null, name);
-    setCheckedType( fi.getType());
-
-    return this;
+    return PRECEDENCE_OTHER;
   }
-
-  public FieldInstance getFieldInstance()
-  {
-    return fi;
-  }
-
-  Object visitChildren(NodeVisitor v) 
-  {
-    // nothing to do
-    return Annotate.getVisitorInfo( this);
-  }
-
-    public Node copy() {
-      LocalVariableExpression lve = new LocalVariableExpression(name);
-      lve.copyAnnotationsFrom(this);
-      return lve;
-    }
-
-    public Node deepCopy() {
-      return copy();
-    }
-
-  private String name;
-  private FieldInstance fi;
 }

@@ -74,7 +74,7 @@ public class CatchBlock extends Node
    */
   public Type getCatchType()
   {
-    return fp.getType();
+    return fp.getParameterType();
   }
 
   /**
@@ -120,8 +120,8 @@ public class CatchBlock extends Node
   {
     ClassType throwable = (ClassType)c.getTypeSystem().getThrowable();
 
-    if( !fp.getType().descendsFrom( throwable) &&
-          !fp.getType().equals( throwable)) {
+    if( !fp.getParameterType().descendsFrom( throwable) &&
+          !fp.getParameterType().equals( throwable)) {
       throw new SemanticException(
                 "Can only catch objects whose type descends from Throwable.");
     }

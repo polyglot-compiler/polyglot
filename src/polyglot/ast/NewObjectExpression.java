@@ -1,7 +1,3 @@
-/*
- * NewObjectExpression.java
- */ 
-
 package jltools.ast;
 
 import jltools.types.*;
@@ -11,114 +7,106 @@ import java.util.*;
 
 
 /**
- * NewObjectExpression
- *
- * Overview: A NewObjectExpression is a mutable representation of the
- * use of the new operator to create a new instance of a class.  In
- * addition to the type of the class being created, a
- * NewObjectExpression has a list of arguments to be passed to the
- * constructor of the object and an optional ClassNode used to support
- * anonymous classes.  A new object expression may also be proceeded
- * by an primary expression which specifies the LocalContext in which the
+ * A NewObjectExpression is an immutable representation of the
+ * use of the <code>new</code> operator to create a new instance of a class.  
+ * In addition to the type of the class being created, a
+ * <code>NewObjectExpression</code> has a list of arguments to be passed to the
+ * constructor of the object and an optional <code>ClassNode</code> used to
+ * support anonymous classes. Such an expression may also be proceeded
+ * by an primary expression which specifies the context in which the
  * object is being created.
  */
 
-public class NewObjectExpression extends Expression {
-    
+public class NewObjectExpression extends Expression 
+{
+  protected final Expression primary;
+  protected final TypeNode tn;
+  protected final List args;
+  protected final ClassNode cn;
+
   /**
-   * Requires: arguments contains only elements of type <Expression>.
+   * Creates a new <code>NewObjectExpression</code>.
    *
-   * Effects: Creates a new NewObjectExpression representing the
-   * creation of an object of type <type> calling the constructor with
-   * arguments in <arguments> and optionally using <classNode> to
-   * extend the class.  If an anonymous class is not being created
-   * classNode should be null.
+   * @pre Requires that each element of <code>args</code> is an object of type
+   *  <code>Expression</code>.
    */
-  public NewObjectExpression(Expression primary, TypeNode type,
-			     List arguments, ClassNode classNode) {
+  public NewObjectExpression( Expression primary, TypeNode tn,
+                              List args, ClassNode cn)
+  {
     this.primary = primary;
-    this.type = type;
-    TypedList.check(arguments, Expression.class);
-    argumentList = new ArrayList(arguments);
-    this.classNode = classNode;
-  }
-
-  public NewObjectExpression(Expression primary, Type type,
-			     List arguments, ClassNode classNode) {
-    this(primary, new TypeNode(type), arguments, classNode);
+    this.tn = tn;
+    this.args = TypedList.copyAndCheck( args, Expression.class, true);
+    this.cn = cn;
   }
 
   /**
-   * Effects: Returns the primary expression of this node or null if
-   * there is none.
+   * Lazily reconstruct this node. 
    */
-  public Expression getPrimary() {
+  public NewObjectExpression reconstruct( Expression primary, TypeNode tn,
+                                          List args, ClassNode cn)
+  {
+    if( this.primary != primary || this.tn != tn
+        || this.args.size() != args.size() || this.cn != cn) {
+      NewObjectExpression n = new NewObjectExpression( primary, tn,
+                                                       args, cn);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+    else {
+      for( int i = 0; i < args.size(); i++) {
+        if( this.args.get( i) != args.get( i)) {
+          NewObjectExpression n = new NewObjectExpression( primary, tn,
+                                                           args, cn);
+          n.copyAnnotationsFrom( this);
+          return n;
+        }
+      }
+      return this;
+    }    
+  }
+
+  /**
+   * Returns the primary expression of this node or <code>null</code> if there
+   * is none.
+   */
+  public Expression getPrimary() 
+  {
     return primary;
   }
 
   /**
-   * Effects: Sets the primary expression which specifies the LocalContext
-   * of the creation of the new object to <newPrimary>.
+   * Returns the type of the object being created by this 
+   * <code>NewObjectExpression</code>.
    */
-  public void setPrimary(Expression newPrimary) {
-    primary = newPrimary;
+  public Type getType() 
+  {
+    return tn.getType();
   }
 
   /**
-   * Effects: Returns the type of the object being created by this
-   * NewObjectExpression.  */
-  public TypeNode getType() {
-    return getType();
-  }
-    
-  /**
-   * Effects: Sets the type of the object being created by this to
-   * be <newType>.
+   * Returns the argument at position <code>pos</code>.
    */
-  public void setType(TypeNode newType) {
-    type = newType;
-  }
-
-  public void setType(Type newType) {
-    type = new TypeNode(newType);
-  }
-
-
-  /**
-   * Effects: Returns the argument at position <pos>.  Throws
-   * IndexOutOfBoundsException if <pos> is not valid.
-   */
-  public Expression argumentAt(int pos) {
-    return (Expression) argumentList.get(pos);
+  public Expression getArgumentAt( int pos) 
+  {
+    return (Expression)args.get( pos);
   }
 
   /**
-   * Effects: Returns a TypedListIterator which will yield each
-   * argument exprssion of this in order.
+   * Returns an iterator which will yield each argument exprssion of this 
+   * in order.
    */
-  public TypedListIterator arguments() {
-    return new TypedListIterator(argumentList.listIterator(),
-				 Expression.class,
-				 false);
+  public Iterator arguments() 
+  {
+    return args.iterator();
   }
 
   /**
-   * Effects: Returns the ClassNode containing the ClassMembers used
-   * to extend the class being created.  If no such extentions exist,
-   * returns null.
+   * Returns the <code>ClassNode</code> defining the anonymous class being
+   * created. If no such class exits, returns <code>null</code>.
    */
-  public ClassNode getClassNode() {
-    return classNode;
-  }
-
-  /**
-   * Effects: Sets the ClassNode containing the ClassMembers used to
-   * extend the class being instatiated to <newClassNode>.  If
-   * <newClassNode> is null, then the class is instantiated with out
-   * being extended.
-   */
-  public void setClasNode(ClassNode newClassNode) {
-    classNode = newClassNode;
+  public ClassNode getClassNode() 
+  {
+    return cn;
   }
 
   /**
@@ -130,157 +118,133 @@ public class NewObjectExpression extends Expression {
    * Effects: visits each child of this with <v>.  If <v> returns null
    * for a memeber of the class body, then that member is removed. 
    */
-  Object visitChildren(NodeVisitor v) 
+  Node visitChildren( NodeVisitor v) 
   {
-    Object vinfo = Annotate.getVisitorInfo( this);
+    Expression newPrimary = null;
 
-    if (primary != null) {
-      primary = (Expression) primary.visit(v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( primary), vinfo);
+    if( primary != null) {
+      newPrimary = (Expression)primary.visit( v);
     }
 
-    type = (TypeNode) type.visit(v);
-    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( type), vinfo);
+    TypeNode newTn = (TypeNode)tn.visit( v);
 
-    for(ListIterator i=argumentList.listIterator(); i.hasNext(); ) {
-      Expression e = (Expression) i.next();
-      e = (Expression) e.visit(v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( e), vinfo);
+    List newArgs = new ArrayList( args.size());
 
-      if (e == null) {
-	i.remove();
-      }
-      else {
-	i.set(e);
+    for( Iterator iter = arguments(); iter.hasNext(); ) {
+      Expression expr = (Expression)((Expression)iter.next()).visit( v);
+
+      if( expr != null) {
+        newArgs.add( expr);
       }
     }
 
-    if (classNode != null) {
-      classNode = (ClassNode) classNode.visit(v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( classNode), vinfo);
+    ClassNode newCn = null;
+
+    if( cn != null) {
+      newCn = (ClassNode)cn.visit( v);
     }
 
-    return vinfo;
+    return reconstruct( newPrimary, newTn, newArgs, newCn);
+  }
+  
+  public Node typeCheck( LocalContext c) throws SemanticException
+  {
+    // make sure that primary is the "containing" class for the inner class, 
+    // if appropriate
+    if( primary != null && 
+        !primary.getCheckedType().equals((ClassType)tn.getType())) {
+      throw new SemanticException (
+              "The containing instance must be the containing class of \"" +
+              tn.getType().getTypeString() + "\".");
+    }
+
+    if( primary != null && 
+         ((ClassType)tn.getType()).getAccessFlags().isStatic()) {
+      // FIXME is this really true?
+      throw new SemanticException(
+             "Cannot specify a containing instance for static classes.");
+    }
+
+    if( ((ClassType)tn.getType()).getAccessFlags().isAbstract()) {
+      throw new SemanticException( "Cannot instantiate an abstract class.");
+    }
+
+    ClassType ct; 
+    ct = (ClassType)tn.getType();
+
+    List argTypes = new ArrayList( args.size());
+    for( Iterator iter = arguments(); iter.hasNext(); ) {
+      argTypes.add( ((Expression)iter.next()).getCheckedType());
+    }
+
+    MethodTypeInstance mti = null;
+    try
+    {
+      mti = c.getMethod( ct, new ConstructorType( c.getTypeSystem(), 
+                                                  argTypes));
+    }
+    catch (SemanticException e)
+    {
+      /*
+       * FIXME what does this do?
+      for( Iterator iter = argTypes.iterator(); iter.hasNext() ; ) {
+        Type t = (Type)i.next();
+      }
+      */
+      throw new SemanticException ( 
+              "No acceptable constructor found for the creation of \"" 
+              + ct.getTypeString() + "\".");
+    }
+    setCheckedType( ct);
+
+    List formalTypes = mti.argumentTypes();
+    for( Iterator iter1 = arguments(),
+            iter2 = formalTypes.iterator(); iter1.hasNext(); )
+    {
+       ((Expression)iter1.next()).setExpectedType( (Type)iter2.next());
+    }
+
+    return this;
+  }
+  
+  public void translate( LocalContext c, CodeWriter w)
+  {
+    if( primary != null)
+    {
+      primary.translate( c, w);
+      w.write( ".new ");
+    }
+    else {
+      w.write( "new ");
+    }
+
+    tn.translate( c, w);
+    w.write( "( ");
+
+    for( Iterator iter = arguments(); iter.hasNext(); ) {
+      ((Expression)iter.next()).translate( c, w);
+      if(iter.hasNext()) {
+        w.write(", ");
+      }
+    }
+
+    w.write( ")");
+
+    if( cn != null) {
+      cn.translate(c, w);
+    }
+  }
+
+  public void dump( CodeWriter w)
+  {
+    w.write ("( NEW " );
+    dumpNodeInfo( w);
+    w.write( ")");
   }
   
   public int getPrecedence()
   {
     return PRECEDENCE_OTHER;
   }
-
-  public void translate(LocalContext c, CodeWriter w)
-  {
-    if (primary != null)
-    {
-      primary.translate(c, w);
-      w.write(".new ");
-    }
-    else
-      w.write ("new "  );
-    type.translate(c, w);
-    w.write ("( ");
-    for (ListIterator i = argumentList.listIterator(); i.hasNext(); )
-    {
-      ((Expression) i.next()).translate(c, w);
-      if(i.hasNext()) {
-        w.write(", ");
-      }
-    }
-    w.write (")");
-    if (classNode != null)
-    {
-      classNode.translate(c, w);
-    }
-  }
-
-  public Node dump( CodeWriter w)
-  {
-    w.write ("( NEW " );
-    dumpNodeInfo( w);
-    w.write( ")");
-    return null;
-  }
-  
-  public Node typeCheck(LocalContext c) throws TypeCheckException
-  {
-    // make sure that primary is the "containing" class for the inner class, 
-    // if appropriate
-    if (primary != null && 
-        !primary.getCheckedType().equals((ClassType)type.getType()))
-      throw new TypeCheckException (
-              " The containing instance must be the containing class of \"" +
-              type.getType().getTypeString() + "\"");
-
-    if ( primary != null && 
-         ((ClassType)type.getType()).getAccessFlags().isStatic())
-      throw new TypeCheckException (
-             "Cannot specify a containing instance for static classes.");
-
-    if ( ((ClassType)type.getType()).getAccessFlags().isAbstract())
-      throw new TypeCheckException ( " Cannot instantiate an abstract class.");
-
-    ClassType ct; 
-    ct = (ClassType)type.getType();
-
-    List argTypes = new ArrayList();
-    for ( ListIterator i = argumentList.listIterator() ; i.hasNext(); )
-    {
-      argTypes.add (  ((Expression)i.next()).getCheckedType() );
-    }
-    MethodTypeInstance mti = null;
-    try
-    {
-      mti = c.getMethod ( ct, new ConstructorType ( c.getTypeSystem(), argTypes) );
-    }
-    catch (TypeCheckException tce)
-    {
-      for (Iterator i = argTypes.iterator(); i.hasNext() ; )
-      {
-        Type t = (Type)i.next();
-      }
-      throw new TypeCheckException ( 
-              " No acceptable constructor found for the creation of \"" 
-              + type.getType().getTypeString() + "\"");
-    }
-    setCheckedType ( type.getType() );
-    jltools.util.Annotate.addThrows( this, mti.exceptionTypes () );
-
-    List formalTypes = mti.argumentTypes();
-    for ( ListIterator i = argumentList.listIterator(),
-            j = formalTypes.listIterator(); i.hasNext(); )
-    {
-       ((Expression)i.next()).setExpectedType( (Type)j.next());
-    }
-    return this;
-  }
-
-  public Node copy() {
-    NewObjectExpression no = new NewObjectExpression(primary,
-						     type,
-						     argumentList,
-						     classNode);
-    no.copyAnnotationsFrom(this);
-    return no;
-  }
-
-  public Node deepCopy() {
-    List newArgumentList = Node.deepCopyList(argumentList);
-    Expression newPrimary =
-      (Expression) (primary==null?null:primary.deepCopy());
-    ClassNode newClassNode = 
-      (ClassNode) (classNode==null?null:classNode.deepCopy());
-    NewObjectExpression no =
-      new NewObjectExpression(newPrimary,
-			      (TypeNode) type.deepCopy(), 
-			      newArgumentList, 
-			      newClassNode);
-    no.copyAnnotationsFrom(this);
-    return no;
-  }
-
-  private Expression primary;
-  private TypeNode type;
-  private List argumentList;
-  private ClassNode classNode;
 }
   

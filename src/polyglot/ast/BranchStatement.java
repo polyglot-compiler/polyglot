@@ -4,8 +4,8 @@ import jltools.util.*;
 import jltools.types.LocalContext;
 
 /**
- * A <code>BranchStatement</code> is a immutable representation of a branch
- * statment in Java (a break or continue).  It consists of a type corresponding
+ * A <code>BranchStatement</code> is an immutable representation of a branch
+ * statment in Java (a break or continue).  It consists of a kind corresponding
  *  to either break or continue and an optional label specifing where to 
  * branch to.
  */
@@ -14,40 +14,40 @@ public class BranchStatement extends Statement {
   public static final int BREAK     = 0; // break statement
   public static final int CONTINUE  = 1; // continue statement
 
-  public static final int MAX_TYPE = CONTINUE; // largest type used.
+  protected static final int MAX_KIND = CONTINUE; // largest kind used.
 
-  protected final int type;
+  protected final int kind;
   protected final String label;
 
   /** 
    * Create a new <code>BranchStatement</code> without a label.
    *
-   * @pre Requires that <code>type</code> is a valid type.
-   * @param type Indicates if this is a <code>break</code> or a
+   * @pre Requires that <code>kind</code> is a valid kind.
+   * @param kind Indicates if this is a <code>break</code> or a
    *  <code>continue</code> statement.
    */
-  public BranchStatement( int type) 
+  public BranchStatement( int kind) 
   {
-    this( type, null);
+    this( kind, null);
   }
 
   /**
-   * Creates a new <code>BranchStatement</code> of type <code>type</code>
+   * Creates a new <code>BranchStatement</code> of kind <code>kind</code>
    * which branches to the statement labelled by <code>label</code>.
    *
-   * @pre Requires that <code>type</code> is a valid type.
-   * @param type Indicates if this is a <code>break</code> or a 
+   * @pre Requires that <code>kind</code> is a valid kind.
+   * @param kind Indicates if this is a <code>break</code> or a 
    *  <code>continue</codee> statement.
    * @param label Specifies the label that this statement will branch to.
    */
-  public BranchStatement( int type, String label) 
+  public BranchStatement( int kind, String label) 
   {
-    if (type < 0 || type > MAX_TYPE) {
-      throw new IllegalArgumentException("Value for type of " +
+    if (kind < 0 || kind > MAX_KIND) {
+      throw new IllegalArgumentException("Value for kind of " +
 					 "BranchStatement not valid.");
     }
 
-    this.type = type;
+    this.kind = kind;
     this.label = label;
   }
 
@@ -60,29 +60,29 @@ public class BranchStatement extends Statement {
    * <code>BranchStatement</code>. If the desired statement has no label
    * then pass <code>null</code> for the second argument.
    *
-   * @param type Indicates if this is a <code>break</code> or a 
+   * @param kind Indicates if this is a <code>break</code> or a 
    *  <code>continue</codee> statement.
    * @param label Specifies the label that this statement will branch to.
-   * @return A <code>BranchStatement</code> with the given type and label.
+   * @return A <code>BranchStatement</code> with the given kind and label.
    */
-  public BranchStatement reconstruct( int type, String label) {
-    if( this.type == type && ((this.label == null && label == null) 
+  public BranchStatement reconstruct( int kind, String label) {
+    if( this.kind == kind && ((this.label == null && label == null) 
                               || this.label.equals( label))) {
       return this;
     } 
     else {
-      BranchStatement n = new BranchStatement( type, label);
+      BranchStatement n = new BranchStatement( kind, label);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
 
   /**
-   * Returns the type of this branch statement.
+   * Returns the kind of this branch statement.
    */ 
-  public int getType() 
+  public int getKind() 
   {
-    return type;
+    return kind;
   }
 
   /**
@@ -109,14 +109,14 @@ public class BranchStatement extends Statement {
 
   public void translate( LocalContext c, CodeWriter w)
   {
-    w.write( (type == BREAK ? "break" : "continue") + 
+    w.write( (kind == BREAK ? "break" : "continue") + 
                (label == null ? "; " : " " + label + "; "));
   }
   
   public void dump( CodeWriter w)
   {
     w.write( " ( BRANCH STATMENT < ");
-    w.write( type == BREAK ? "break > " : "continue > ");
+    w.write( kind == BREAK ? "break > " : "continue > ");
     w.write( label == null ? "< " : label + " > ");
     dumpNodeInfo( w);
     w.write( ")");

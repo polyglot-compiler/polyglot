@@ -1,121 +1,96 @@
-/*
- * SynchronizedStatement.java
- */
-
 package jltools.ast;
 
 import jltools.util.*;
 import jltools.types.*;
 
+
 /**
- * SynchronizedStatement
- *
- * Overview: A mutable representation of a Java language synchronized block.
- *   Contains an expression being tested and a statement to be executed
- *   while the expression is true.
+ * An immutable representation of a Java language <code>synchronized</code>
+ * block. Contains an expression being tested and a statement to be executed
+ * while the expression is <code>true</code>.
  */
-public class SynchronizedStatement extends Statement {
+public class SynchronizedStatement extends Statement 
+{
+  protected final Expression expr;
+  protected final BlockStatement body;
+  
   /**
-   * Effects: Creates a new SynchronizedStatment with expression
-   *    <expr>, and a statement <body>.
+   * Creates a new <code>SynchronizedStatement</code>.
    */
-  public SynchronizedStatement (Expression expr, BlockStatement body) {
+  public SynchronizedStatement( Expression expr, BlockStatement body) 
+  {
     this.expr = expr;
     this.body = body;
   }
+  
+  /**
+   * Lazily reconstruct this node.
+   */
+  public reconstruct( Expression expr, BlockStatement body)
+  {
+    if( this.expr == expr && this.body == body) {
+      return this;
+    }
+    else {
+      SynchronizedStatement n = new SynchronizedStatement( expr, body);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+  }
 
   /**
-   * Effects: Returns the Expression that this SynchronizedStatement is
-   * conditioned on.
+   * Returns the <code>Expression</code> that this 
+   * <code>SynchronizedStatement</code> is synchronized on.
    */
-  public Expression getExpression() {
+  public Expression getExpression() 
+  {
     return expr;
   }
 
   /**
-   * Effects: Sets the expression that this Synchronized statement
-   * synchronizes on to <newExpr>.  
+   * Returns the block associated with this statement.
    */
-  public void setExpression(Expression newExpr) {
-    expr = newExpr;
-  }
-
-  /**
-   * Effects: Returns the statement associated with this
-   *    SynchronizedStatement.
-   */
-  public BlockStatement getBody() {
+  public BlockStatement getBody() 
+  {
     return body;
   }
 
   /**
-   * Effects: Sets the statement of this SynchronizedStatement to be
-   *    <newStatement>.
+   * Visit the children of this node.
    */
-  public void setStatement(BlockStatement newBody) {
-    body = newBody;
-  }
-
-  Object visitChildren(NodeVisitor v)
+  Node visitChildren( NodeVisitor v)
   {
-    Object vinfo = Annotate.getVisitorInfo( this);
-
-    expr = (Expression) expr.visit( v);
-    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( expr), vinfo);
-
-    body = (BlockStatement) body.visit( v);;
-    return v.mergeVisitorInfo( Annotate.getVisitorInfo( body), vinfo);
+    return reconstruct( (Expression)expr.visit( v),
+                        (Statement)body.visit( v));
   }
 
-   public Node typeCheck(LocalContext c) throws TypeCheckException
-   {
-     if ( !( expr.getCheckedType().descendsFrom ( c.getTypeSystem().getObject() )) &&
-          !( expr.getCheckedType().equals ( c.getTypeSystem().getObject())))
-       throw new TypeCheckException ("The type of the expression \"" + 
+  public Node typeCheck( LocalContext c) throws SemanticException
+  {
+    if( !( expr.getCheckedType().descendsFrom( c.getTypeSystem().getObject()))
+        && !(expr.getCheckedType().equals( c.getTypeSystem().getObject()))) {
+       throw new SemanticException( "The type of the expression \"" + 
                                      expr.getCheckedType().getTypeString() + 
                                      "\" is not valid to synchronize on.");
-
-     expr.setExpectedType( c.getTypeSystem().getObject()) ;
-     addThrows ( expr.getThrows() );
-     addThrows ( body.getThrows() );
-     Annotate.setTerminatesOnAllPaths (this, Annotate.terminatesOnAllPaths ( body ) );
-
-      return this;
-   }
-
-   public void  translate(LocalContext c, CodeWriter w)
-   {
-      w.write ("synchronized (") ;
-      expr.translate(c, w);
-      w.write(")");
-      w.beginBlock();
-      body.translate(c, w);
-      w.endBlock();
-   }
-
-   public Node dump( CodeWriter w)
-   {
-      w.write( "( SYNCHRONIZED ");
-      dumpNodeInfo( w);
-      w.write( ")");
-      return null;
-   }
-
-  public Node copy() {
-    SynchronizedStatement ss = new SynchronizedStatement(expr, body);
-    ss.copyAnnotationsFrom(this);
-    return ss;
+    }
+    expr.setExpectedType( c.getTypeSystem().getObject()) ;
+    return this;
   }
 
-  public Node deepCopy() {
-    SynchronizedStatement ss = 
-      new SynchronizedStatement((Expression) expr.deepCopy(), 
-				(BlockStatement) body.deepCopy());      
-    ss.copyAnnotationsFrom(this);
-    return ss;
+  public void translate( LocalContext c, CodeWriter w)
+  {
+    w.write( "synchronized (");
+    expr.translate( c, w);
+    w.write( ")");
+    w.beginBlock();
+    body.translate( c, w);
+    w.endBlock();
   }
 
-  private Expression expr;
-  private BlockStatement body;
+  public void dump( CodeWriter w)
+  {
+    w.write( "( SYNCHRONIZED ");
+    dumpNodeInfo( w);
+    w.write( ")");
+  }
 }
 

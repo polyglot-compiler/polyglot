@@ -1,7 +1,3 @@
-/*
- * NewArrayExpression.java
- */
-
 package jltools.ast;
 
 import jltools.types.*;
@@ -11,270 +7,188 @@ import java.util.*;
 
 
 /**
- * NewArrayExpression
- *
- * Overview: A NewArrayExpression is a mutable representation of the
- *   creation of a new array such as "new File[8][]".  It consists of
- *   an element type, in the above example File, a list of dimension
- *   expressions (expressions which evaluate to a length for a
- *   dimension in this case { 8 }), and a number representing the
- *   number optional dimensions (in the example 1).
+ * A <code>NewArrayExpression</code> is an immutable representation of the
+ * creation of a new array such as <code>new File[8][]</code>.  It consists of
+ * an element type, in the above example <code>File</code>, a list of dimension
+ * expressions (expressions which evaluate to a length for a
+ * dimension in this case <code>8</code>), and a number representing the
+ * number optional dimensions (in the example 1).
  */
+public class NewArrayExpression extends Expression 
+{
+  protected final TypeNode base;
+  /** A list of <code>Expression</code>s. */
+  protected final List dimExprs;
+  protected final int addDims;
+  protected final ArrayInitializerExpression init;
 
-public class NewArrayExpression extends Expression {
   /**
-   * Requires: additionalDim >= 0, and every element of lengthExpressions is 
-   *    an Expression.  optInitializer may be null.
-   * Effects: Creates a NewArrayExpression with element type <elemType>,
-   *    <lengthExpressions> as supplied dimensions,
-   *    <additionalDim> additional dimensions of unspecified length,
-   *    <optInitializer> initializer (may be null) used when 
-   *               = new byte[] {2, 32, 32}
+   * Creates a new <code>NewArrayExpression</code>.
+   *
+   * @param init The initializer expression. This argument may be 
+   *  <code>null</code> if there is not such expression.
+   * @pre <code>addDims</code> >= 0 and each element of <code>dimExprs</code>
+   *  is of type <code>Expression</code>.
    */ 
-  public NewArrayExpression(TypeNode elemType, 
-			    List lengthExpressions, 
-			    int additionalDim, 
-          ArrayInitializerExpression optInitializer) {
-    if (additionalDim < 0) {
-      throw new IllegalArgumentException("additionalDim must be positive");
+  public NewArrayExpression( TypeNode base, List dimExprs, int addDims, 
+                             ArrayInitializerExpression init)
+  {
+    if (addDims < 0) {
+      throw new IllegalArgumentException( "The number of additional dimensions"
+                                         + " must be positive.");
     }
-    TypedList.check(lengthExpressions, Expression.class);
-    type = elemType;    
-    additionalDimensions = additionalDim;
-    dimensionExpressions = new ArrayList(lengthExpressions);
-    initializer = optInitializer;
+    
+    this.base = base;
+    this.dimExprs = TypedList.copyAndCheck( dimExprs, Expression.class, true);
+    this.addDims = addDims;
+    this.init = init;
   }
 
   /**
-   * Requires: additionalDim >= 0, and every element of lengthExpressions is 
-   *    an Expression.  
-   * Effects: Creates a NewArrayExpression with element type <elemType>,
-   *    <lengthExpressions> as supplied dimensions,
-   *    <additionalDim> additional dimensions of unspecified length,
-   *    <optInitializer> initializer (may be null) used when 
-   *               = new byte[] {2, 32, 32}
-   */ 
-  public NewArrayExpression(Type elemType, 
-			    List lengthExpressions, 
-			    int additionalDim, 
-                            ArrayInitializerExpression optInitializer) {
-    this(new TypeNode(elemType), lengthExpressions, additionalDim, optInitializer);
+   * Lazily reconstruct this node. 
+   */
+  public NewArrayExpression reconstruct( TypeNode base, List dimExprs,
+                                         int addDims,
+                                         ArrayInitializerExpression init)
+  {
+    if( this.base != base || this.dimExprs.size() != dimExprs.size()
+        || this.addDims != addDims || this.init != init) {
+      NewArrayExpression n = new NewArrayExpression( base, dimExprs, addDims,
+                                                     init);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+    else {
+      for( int i = 0; i < dimExprs.size(); i++) {
+        if( this.dimExprs.get( i) != dimExprs.get( i)) {
+          NewArrayExpression n = new NewArrayExpression( base, dimExprs,
+                                                         addDims, init);
+          n.copyAnnotationsFrom( this);
+          return n;
+        }
+      }
+      return this;
+    }
   }
   
   /**
-   * Effects: Returns the type of the array being created. 
+   * Returns the type of the array being created. That is, the type without
+   * any array dimensions. For the expression <code>new File[8][]</code>
+   * the method returns the type <code>File</code>.
    */
-  public TypeNode getArrayType() {
-    return type;
+  public Type getBaseType() 
+  {
+    return base.getType();
   }
   
-  /** 
-   * Effects: Sets the type of the array being create to <newType>.
-   */
-  public void setArrayType(TypeNode newType) {
-    type = newType;
-  }
-
-  /** 
-   * Effects: Sets the type of the array being create to <newType>.
-   */
-  public void setArrayType(Type newType) {
-    type = new TypeNode(newType);
-  }
-
   /**
-   * Effects: Returns the number of additional dimensions which do not
-   * have a defined length.
-   */
-  public int getAdditionalDimensions() {
-    return additionalDimensions;
-  }
-
-  /**
-   * Effects: Sets the number of additional dimensions of unspecified
+   * Returns the number of additional dimensions which do not have a defined
    * length.
-   */ 
-  public void setAdditionalDimensions(int newAdditionalDim) {
-    additionalDimensions = newAdditionalDim;
-  } 
+   */
+  public int getAdditionalDimensions() 
+  {
+    return addDims;
+  }
 
   /**
-   * Returns the initalizer for this expression, or null if none exists
+   * Returns the initalizer for this expression, or <code>null</code> if none
+   * exists.
    */
   public ArrayInitializerExpression getInitializer()
   {
-    return initializer;
+    return init;
   }
-
+  
   /**
-   * Sets the initializer for this expression equal to <init>
+   * Returns the total dimensionality of the array.  For example 
+   * <code>File[8][][]</code> is three dimensional.  
    */
-  public void setInitializer( ArrayInitializerExpression init)
+  public int getDimensions() 
   {
-    initializer = init;
-  }
-  
-  /**
-   * Effects: Returns the total dimensionality of the array.  For
-   * example File[8][][] is three dimensional.  
-   */
-  
-  public int getDimensions() {
-    return dimensionExpressions.size() + additionalDimensions;
-  }
-  
-  /**
-   * Effects: adds a new dimension length expression to the end of the
-   * list of specified dimensions.  (This occurs before any of the
-   * dimensions of unspecified length.
-   */
-  public void addDimensionExpression(Expression e) {
-    dimensionExpressions.add(e);
+    return dimExprs.size() + addDims;
   }
 
   /**
-   * Effects: adds a new dimension expression, <e>, at posistion
-   * <pos>.  Throws IndexOutOfBoundsException if <pos> is not a valid
-   * position.
-   */
-  public void addDimensionExpression(Expression e, int pos) {
-    dimensionExpressions.add(pos, e);
-  }
-
-  /**
-   * Effects: removes the dimension expression at position <pos>.
-   * Throws an IndexOutOfBoundsException if <pos> is not a valid
-   * position.
-   */
-  public void removeDimension(int pos) {
-    dimensionExpressions.remove(pos);
-  }
-
-  /**
-   * Effects: Returns the expression specifing the length of <pos>
+   * Returns the expression specifing the length of the <code>pos</code>'th
    * dimension.
    */
-  public Expression dimensionExpressionAt(int pos) {
-    return (Expression) dimensionExpressions.get(pos);
+  public Expression dimensionExpressionAt( int pos) 
+  {
+    return (Expression)dimExprs.get( pos);
   }  
 
   /**
-   * Returns a TypedListIterator which will yield each expression
-   * which specifies a dimension of this.
+   * Returns a iterator which will yield each expression
+   * which specifies the length of a dimension of this node.
    */
-  public TypedListIterator lengths() {
-    return new TypedListIterator(dimensionExpressions.listIterator(),
-				 Expression.class,
-				 false);
+  public Iterator dimensionExpressions() 
+  {
+    return dimExprs.iterator();
+  }
+
+  /** 
+   * Visit the children of this node.
+   */
+  Node visitChildren( NodeVisitor v) 
+  {
+    TypeNode newBase = (TypeNode)base.visit( v);
+
+    List newDimExprs = new ArrayList( dimExprs.size());
+
+    for( Iterator iter = dimensionExpressions(); iter.hasNext(); ) {
+      Expression expr = (Expression)((Expression)iter.next()).visit( v);
+      if( expr != null) {
+        newDimExprs.add( expr);
+      }
+    }
+    
+    ArrayInitializerExpression newInit = null;
+
+    if( init != null) {
+      newInit = (ArrayInitializerExpression)init.visit(v);
+    }
+    
+    return reconstruct( newBase, newDimExprs, addDims, init);
+  }
+  
+  public Node typeCheck( LocalContext c)
+  {
+    setCheckedType( new ArrayType( c.getTypeSystem(), base.getType(),
+                                   getDimensions()));
+    return this;
+  }
+
+  public void translate( LocalContext c, CodeWriter w)
+  {
+    w.write( "new ");
+    base.translate( c, w);
+    for( Iterator iter = dimensionExpressions(); iter.hasNext(); ) {
+      w.write( "[");
+      ((Expression)iter.next()).translate( c, w);
+      w.write( "]");
+    }
+
+    for( int i = 0; i < addDims; i++) { 
+      w.write( "[]");
+    }
+
+    if( init != null) {
+      init.translate( c, w);
+    }
+  }
+
+  public void dump( CodeWriter w)
+  {
+    w.write( "( NEW");
+    w.write( " < " + addDims + " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
   }
 
   public int getPrecedence()
   {
     return PRECEDENCE_OTHER;
   }
-
-  public void translate(LocalContext c, CodeWriter w)
-  {
-    w.write ("new ");
-    type.translate(c, w);
-    for (ListIterator i = dimensionExpressions.listIterator(); i.hasNext(); )
-    {
-      w.write("[");
-      ( (Expression)i.next()).translate( c, w);
-      w.write("]");
-    }
-    for (int i = 0; i < additionalDimensions; i++)
-    { 
-      w.write("[]");
-    }
-    if (initializer != null)
-    {
-      initializer.translate(c, w);
-    }
-   }
-
-  public Node dump( CodeWriter w)
-  {
-    w.write( "( NEW");
-    w.write( " < " + additionalDimensions + " > ");
-    dumpNodeInfo( w);
-    w.write( ")");
-    return null;
-  }
-  
-  public Node typeCheck (LocalContext c)
-  {
-    setCheckedType( new ArrayType( c.getTypeSystem(), type.getType(),
-                                   dimensionExpressions.size() + 
-                                   additionalDimensions));
-    return this;
-  }
-
-  /** 
-   * Requires: v will not transform an Expression into anything
-   *   other than another Expression.  If an Expression is
-   *   transforemed into null, that dimension will be removed.
-   * Effects: visits the subexpression of this.  
-   */
-  Object visitChildren(NodeVisitor v) 
-  {
-    Object vinfo = Annotate.getVisitorInfo( this);
-    
-    type = (TypeNode) type.visit(v);
-    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( type), vinfo);
-    
-    for (ListIterator i=dimensionExpressions.listIterator(); i.hasNext(); ) {
-      Expression e = (Expression) i.next();
-      e = (Expression) e.visit(v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( e), vinfo);
-      if (e==null) {
-        i.remove();
-      }
-      else {
-        i.set(e);
-      }
-    }
-    if( initializer != null) {
-      initializer = (ArrayInitializerExpression) initializer.visit(v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( initializer), 
-                                  vinfo);
-    }
-    
-    return vinfo;
-  }
-
-  public Node copy() {
-    NewArrayExpression na = new NewArrayExpression(type,
-						   new ArrayList(),
-						   additionalDimensions, 
-                                                   initializer);
-    na.copyAnnotationsFrom(this);
-    for (Iterator i = dimensionExpressions.iterator(); i.hasNext() ; ) {
-      na.addDimensionExpression((Expression) i.next());
-    }
-    return na;
-  }
-
-  public Node deepCopy() {
-    ArrayInitializerExpression init = initializer == null ? null : 
-      ( ArrayInitializerExpression) initializer.deepCopy();
-    NewArrayExpression na = new NewArrayExpression((TypeNode) type.deepCopy(),
-						   new ArrayList(),
-						   additionalDimensions, 
-                                                   init);
-    na.copyAnnotationsFrom(this);
-    for (Iterator i = dimensionExpressions.iterator(); i.hasNext() ; ) {
-      Expression e = (Expression) i.next();
-      na.addDimensionExpression((Expression) e.deepCopy());
-    }
-    return na;
-  }
-
-  private TypeNode type;
-  // RI: contains only elements of type Expression 
-  private ArrayList dimensionExpressions;
-  private int additionalDimensions;
-  private ArrayInitializerExpression initializer;
 }
 
     

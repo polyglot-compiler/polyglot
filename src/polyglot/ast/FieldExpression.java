@@ -7,7 +7,7 @@ import java.util.*;
 
 
 /**
- * A <code>Field</code> is a immutable representation of a Java field
+ * A <code>Field</code> is an immutable representation of a Java field
  * access.  It consists of field name and may also have either a 
  * <code>Type</code> or an <code>Expression</code> containing the field being 
  * accessed.

@@ -1,80 +1,69 @@
-/*
- * ReturnStatement.java
- */
-
 package jltools.ast;
 
 import jltools.util.*;
 import jltools.types.*;
+
+
 /**
- * ReturnStatement
- * 
- * Overview: A ReturnStatment is a mutable representation of a return
- *   statement in Java.
+ * A ReturnStatment is an immutable representation of a <code>return</code>
+ * statement in Java.
  */
-public class ReturnStatement extends Statement {
+public class ReturnStatement extends Statement 
+{
+  protected final Expression expr;
+
   /**
-   * Effects: Creates a new ReturnStatement which returns <expr>.
+   * Creates a new <code>ReturnStatement</code> which returns 
+   * <code>expr</code>.
+   *
+   * @param expr The expression to be returned. May optionally be 
+   *  <code>null</code> if no expression is returned.
    */
-  public ReturnStatement (Expression expr) {
+  public ReturnStatement( Expression expr) 
+  {
     this.expr = expr;
+  }
+  
+  /**
+   * Lazily reconstruct this node.
+   */
+  public ReturnStatement reconstruct( Expression expr)
+  {
+    if( this.expr == expr) {
+      return this;
+    }
+    else {
+      ReturnStatement n = new ReturnStatement( expr);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
   }
 
   /**
-   * Effects: Returns the expression which would be returned by
-   * this ReturnStatement.
+   * Returns the expression which would be returned by this statement.
    */ 
-  public Expression getExpression() {
+  public Expression getExpression() 
+  {
     return expr;
   }
 
-  /**
-   * Effects: Sets the Expression to be returned by this to be <newExpr>.
-   */
-  public void setExpression(Expression newExpr) {
-    expr = newExpr;
-  }
-
   /** 
-   * Requires: v will not transform the expression into anything other than
-   *   another expression.
+   * Visit the children of this node.
+   *
+   * @pre Requires that <code>expr.visit</code> returns an object of type
+   *  <code>Expression</code>.
    */
-  Object visitChildren(NodeVisitor v) 
+  Node visitChildren( NodeVisitor v) 
   {
-    Object vinfo = Annotate.getVisitorInfo( this);
-    
-    if( expr != null) {
-      expr = (Expression) expr.visit(v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( expr), vinfo);
-    }
-
-    return vinfo;
+    return reconstruct( (expr == null ? null : (Expression)expr.visit( v)));
   }
   
-  public void translate(LocalContext c, CodeWriter w)
+  public Node typeCheck( LocalContext c) throws SemanticException
   {
-    w.write("return") ;
-    if( expr != null) {
-      w.write( " ");
-      expr.translate(c, w);
-    }
-    w.write(";");
-  }
-
-  public Node dump( CodeWriter w)
-  {
-    w.write( "( RETURN ");
-    dumpNodeInfo( w);
-    w.write( ")");
-    return null;
-  }
-
-  public Node typeCheck(LocalContext c) throws TypeCheckException
-  {
-    MethodTypeInstance mti = c.getCurrentMethod() ;
+    MethodTypeInstance mti = c.getCurrentMethod();
     if( expr == null) {
-      if( ! mti.getReturnType().equals (c.getTypeSystem().getVoid())) {
-        throw new TypeCheckException( 
+      if( !mti.getReturnType().equals( c.getTypeSystem().getVoid())) {
+        throw new SemanticException( 
                           "Method \"" + mti.getName() + "\" must return "
                           + "an expression of type \"" 
                           + mti.getReturnType().getTypeString() + "\".");
@@ -82,31 +71,37 @@ public class ReturnStatement extends Statement {
       }
     }
     else {
-      if ( ! expr.getCheckedType().descendsFrom( mti.getReturnType() ) &&
-           ! expr.getCheckedType().equals( mti.getReturnType() )) {
-        throw new TypeCheckException ( 
+      if( mti.getReturnType().equals( c.getTypeSystem().getNull())) {
+        throw new SemanticException(
+                       "A return statement which returns a value can only"
+                       + " occur in a method which does not have type void.");
+      }
+      else if( !expr.getCheckedType().descendsFrom( mti.getReturnType()) &&
+               !expr.getCheckedType().equals( mti.getReturnType())) {
+        throw new SemanticException( 
                           "Method \"" + mti.getName() + "\" must return "
                           + "an expression of type \"" 
                           + mti.getReturnType().getTypeString() + "\".");
       } 
-      addThrows ( expr.getThrows() );    
     }
-      
-    Annotate.setTerminatesOnAllPaths (this, true);
+    
     return this;
   }
-
-  public Node copy() {
-    ReturnStatement rs = new ReturnStatement(expr);
-    rs.copyAnnotationsFrom(this);
-    return rs;
+  
+  public void translate( LocalContext c, CodeWriter w)
+  {
+    w.write( "return") ;
+    if( expr != null) {
+      w.write( " ");
+      expr.translate( c, w);
+    }
+    w.write( ";");
   }
 
-  public Node deepCopy() {
-    ReturnStatement rs = new ReturnStatement((Expression) expr.deepCopy());
-    rs.copyAnnotationsFrom(this);
-    return rs;
+  public void dump( CodeWriter w)
+  {
+    w.write( "( RETURN ");
+    dumpNodeInfo( w);
+    w.write( ")");
   }
-
-  private Expression expr;
 }

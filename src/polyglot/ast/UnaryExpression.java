@@ -1,92 +1,87 @@
-/*
- * UnaryExpression.java
- */
-
 package jltools.ast;
+
 import jltools.util.*;
 import jltools.types.*;
+
+
 /**
- * UnaryExpression
- * 
- * Overview: A BinaryExpression represents a Java unary expression, a
- * mutable pair of an expression and an an operator.
+ * A <code>UnaryExpression</code> represents a Java unary expression, an
+ * immutable pair of an expression and an an operator.
  */
+public class UnaryExpression extends Expression 
+{
+  public static final int BITCOMP        = 29; // ~ operator
+  public static final int NEGATIVE       = 30; // - operator
+  public static final int POSTINCR       = 31; // <?>++ operator
+  public static final int POSTDECR       = 32; // <?>-- operator
+  public static final int PREINCR        = 33; // ++<?> operator
+  public static final int PREDECR        = 34; // --<?> operator
+  public static final int POSITIVE       = 35; // + operator
+  public static final int LOGICALNOT     = 36; // ! operator
+  
+  protected static final int MIN_OPERATOR = BITCOMP;
+  protected static final int MAX_OPERATOR = LOGICALNOT;
+      
+  protected final Expression expr;
+  protected final int operator;
 
-public class UnaryExpression extends Expression {
-
-    public static final int BITCOMP        = 29; // ~ operator
-    public static final int NEGATIVE       = 30; // - operator
-    public static final int POSTINCR       = 31; // <?>++ operator
-    public static final int POSTDECR       = 32; // <?>-- operator
-    public static final int PREINCR        = 33; // ++<?> operator
-    public static final int PREDECR        = 34; // --<?> operator
-    public static final int POSITIVE       = 35; // + operator
-    public static final int LOGICALNOT     = 36; // ! operator
-
-    public static final int MIN_OPERATOR = BITCOMP;
-    public static final int MAX_OPERATOR = LOGICALNOT;
-
-    /** 
-     * Requires: A valid value for <operator> as listed in public
-     *    static ints in this class. 
-     * Effects: Creates a new UnaryExpression of <operator> applied
-     *    to <expr>.
-     */ 
-    public UnaryExpression(Expression expr, int operator) {
-	this.expr = expr;
-	setOperator(operator);
+  /** 
+   * Requires: A valid value for <operator> as listed in public
+   *    static ints in this class. 
+   * Effects: Creates a new UnaryExpression of <operator> applied
+   *    to <expr>.
+   */ 
+  public UnaryExpression(Expression expr, int operator) 
+  {
+    if( operator < MIN_OPERATOR || operator > MAX_OPERATOR) {
+      throw new IllegalArgumentException( "Value for operator to " +
+                                          "UnaryExpression not valid.");
     }
 
-    /**
-     * Effects: Returns the operator corresponding to <this>.
-     */ 
-    public int getOperator() {
-	return operator;
+    this.expr = expr;
+    this.operator = operator;
+  }
+  
+  /**
+   * Lazily reconstruct this node. 
+   */
+  public UnaryExpression reconstruct( Expression expr, int operator)
+  {
+    if( this.expr == expr && this.operator == operator) {
+      return this;
     }
-
-    /**
-     * Requires: <newOperator> to be one of the valid operators
-     *    defined in UnaryExpression.
-     * Effects: Changes the operator of <this> to <newOperator>.
-     */
-    public void setOperator(int newOperator) {
-	if (newOperator < MIN_OPERATOR || newOperator > MAX_OPERATOR) {
-	    throw new IllegalArgumentException("Value for operator to " +
-					       "UnaryExpression not valid.");
-	}
-	operator = newOperator;
+    else {
+      UnaryExpression n = new UnaryExpression( expr, operator);
+      n.copyAnnotationsFrom( this);
+      return n;
     }
-
-    /**
-     * Effects: Returns the subexpression.
-     */ 
-    public Expression getExpression() {
-	return expr;
-    }
-
-    /** 
-     * Effects: Sets the subexpression to <newExp>
-     */
-    public void setExpression(Expression newExpr) {
-	expr = newExpr;
-    }
+  }
 
   /**
-   *
+   * Returns the operator corresponding for this expression.
+   */ 
+  public int getOperator() 
+  {
+    return operator;
+  }
+
+  /**
+   * Returns the subexpression.
+   */ 
+  public Expression getExpression() 
+  {
+    return expr;
+  }
+
+  /**
+   * Visit the children of this node.
    */
-  Object visitChildren(NodeVisitor vis)
+  Node visitChildren( NodeVisitor vis)
   {
-    expr = (Expression)expr.visit(vis);
-    return vis.mergeVisitorInfo( Annotate.getVisitorInfo( this),
-                                 Annotate.getVisitorInfo( expr));
+    return reconstruct( (Expression)expr.visit( v), operator);
   }
 
-  public int getPrecedence()
-  {
-    return PRECEDENCE_UNARY;
-  }
-
-  public Node typeCheck(LocalContext c) throws TypeCheckException
+  public Node typeCheck( LocalContext c) throws SemanticException
   {
     Type type = expr.getCheckedType();
     switch( operator)
@@ -96,11 +91,11 @@ public class UnaryExpression extends Expression {
     case PREINCR:
     case PREDECR:
       if( !type.isPrimitive()) {
-        throw new TypeCheckException( "Operand of " 
+        throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be numeric.");
       }
       if( !((PrimitiveType)type).isNumeric()) {
-        throw new TypeCheckException( "Operand of " 
+        throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be numeric.");
       }
       setCheckedType( type);
@@ -110,11 +105,11 @@ public class UnaryExpression extends Expression {
     case NEGATIVE:
     case POSITIVE:
       if( !type.isPrimitive()) {
-        throw new TypeCheckException( "Operand of " 
+        throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be numeric.");
       }
       if( !((PrimitiveType)type).isNumeric()) {
-        throw new TypeCheckException( "Operand of " 
+        throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be numeric.");
       }
       setCheckedType( PrimitiveType.unaryPromotion( (PrimitiveType)type));
@@ -122,11 +117,11 @@ public class UnaryExpression extends Expression {
 
     case LOGICALNOT:
       if( !type.isPrimitive()) {
-        throw new TypeCheckException( "Operand of " 
+        throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be boolean.");
       }
       if( !((PrimitiveType)type).isBoolean()) {
-        throw new TypeCheckException( "Operand of " 
+        throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be boolean.");
       }
       setCheckedType( type);
@@ -139,98 +134,107 @@ public class UnaryExpression extends Expression {
     return this;
   }
 
-  public void  translate(LocalContext c, CodeWriter w)
+  public void translate( LocalContext c, CodeWriter w)
   {
-    if (operator <= NEGATIVE ||
-        operator >= PREINCR)
-    {
-      // prefix op.
-      if (operator == NEGATIVE) 
-        w.write("-");
-      if (operator == BITCOMP)
-        w.write("~");
-      if (operator == PREINCR)
-        w.write("++");
-      if (operator == PREDECR)
-        w.write("--");
-      if (operator == POSITIVE)
-        w.write("+");
-      if (operator == LOGICALNOT)
-        w.write("!");
+    if (operator <= NEGATIVE || operator >= PREINCR) {
+      /* Prefix operator. */
+      if( operator == NEGATIVE) {
+        w.write( "-");
+      }
+      else if( operator == BITCOMP) {
+        w.write( "~");
+      }
+      else if( operator == PREINCR) {
+        w.write( "++");
+      }
+      else if( operator == PREDECR) {
+        w.write( "--");
+      }
+      else if( operator == POSITIVE) {
+        w.write( "+");
+      }
+      else if( operator == LOGICALNOT) {
+        w.write( "!");
+      }
       
       translateExpression( expr, c, w);
     }
     else {
-      
-      // postfix op.
+      /* Postfix operator. */
       translateExpression( expr, c, w);
       
-      if (operator == POSTINCR)
-        w.write("++");
-      if (operator == POSTDECR)
-        w.write("--");
+      if( operator == POSTINCR) {
+        w.write( "++");
+      }
+      if( operator == POSTDECR) {
+        w.write( "--");
+      }
     }
   }
 
-   public Node dump( CodeWriter w)
-   {
-      if (operator == NEGATIVE) 
-         w.write("( NEGATIVE ");
-      if (operator == BITCOMP)
-         w.write("( BIT-COMPL");
-      if (operator == PREINCR)
-         w.write("( PRE-INCR ");
-      if (operator == PREDECR)
-         w.write("( PRE-DECR ");
-      if (operator == POSTINCR)
-         w.write("( POST-INCR ");
-      if (operator == POSTDECR)
-         w.write("( POST-DECR ");
-      if (operator == POSITIVE)
-         w.write("( POSITIVE ");
-      if (operator == LOGICALNOT)
-         w.write("( LOGICAL-NOT ");
-      dumpNodeInfo( w);
-      w.write( ")");
-      return null;
-   }
+  public void dump( CodeWriter w)
+  {
+    if( operator == NEGATIVE) {
+      w.write( "( NEGATIVE ");
+    }
+    if( operator == BITCOMP) {
+      w.write( "( BIT-COMPL");
+    }
+    if( operator == PREINCR) {
+      w.write( "( PRE-INCR ");
+    }
+    if( operator == PREDECR) {
+      w.write( "( PRE-DECR ");
+    }
+    if( operator == POSTINCR) {
+      w.write( "( POST-INCR ");
+    }
+    if( operator == POSTDECR) {
+      w.write( "( POST-DECR ");
+    }
+    if( operator == POSITIVE) {
+      w.write( "( POSITIVE ");
+    }
+    if( operator == LOGICALNOT) {
+      w.write( "( LOGICAL-NOT ");
+    }
+    dumpNodeInfo( w);
+    w.write( ")");
+  }
+
+  public int getPrecedence()
+  {
+    return PRECEDENCE_UNARY;
+  }
 
   protected String getOperatorName()
   {
-    if (operator == NEGATIVE) 
+    if( operator == NEGATIVE) {
       return "numeric negation";
-    if (operator == BITCOMP)
+    }
+    if( operator == BITCOMP) {
       return "bitwise complement";
-    if (operator == PREINCR)
+    }
+    if( operator == PREINCR) {
       return "prefix increment";
-    if (operator == PREDECR)
+    }
+    if( operator == PREDECR) {
       return "prefix decrement";
-    if (operator == POSTINCR)
+    }
+    if( operator == POSTINCR) {
       return "postfix increment";
-    if (operator == POSTDECR)
+    }
+    if( operator == POSTDECR) {
       return "postfix decrement";
-    if (operator == POSITIVE)
+    }
+    if( operator == POSITIVE) {
       return "unary plus";
-    if (operator == LOGICALNOT)
+    }
+    if( operator == LOGICALNOT) {
       return "logical negation";
-    else
+    }
+    else {
       return "unknown";
-   }
-
-    public Node copy() {
-      UnaryExpression ue = new UnaryExpression(expr, operator);
-      ue.copyAnnotationsFrom(this);
-      return ue;
     }
-
-    public Node deepCopy() {
-      UnaryExpression ue = new UnaryExpression( (Expression) expr.deepCopy(),
-						operator);
-      ue.copyAnnotationsFrom(this);
-      return ue;
-    }
-      
-    
-    private Expression expr;
-    private int operator;
+  }
 }

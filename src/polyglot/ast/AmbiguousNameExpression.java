@@ -83,7 +83,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
   }
 
   /**
-   * Returns a immutable TypedList of the identifiers in this
+   * Returns an immutable TypedList of the identifiers in this
    * <code>AmbiguousNameExpression</code>.
    */
   public TypedList getIdentifiers() {

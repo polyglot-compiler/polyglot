@@ -7,8 +7,8 @@ import java.util.*;
 
 
 /** 
- * A <code>VariableDeclarationStatement</code> is a immutable representation of
- * a variable declaration, which consists of a type, one or more variable
+ * A <code>VariableDeclarationStatement</code> is an immutable representation 
+ * of a variable declaration, which consists of a type, one or more variable
  * names, and possible initilization expressions.
  */
 public class VariableDeclarationStatement extends Statement 

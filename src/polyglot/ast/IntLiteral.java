@@ -1,152 +1,131 @@
-/*
- * IntegerLiteral.java
- */ 
-
 package jltools.ast;
 
 import jltools.types.*;
 import jltools.util.*;
 
+
 /** 
- * IntegerLiteral
- * 
- * Overview: An IntLiteral represents a literal in java of an integer
- * type, or boolean type.
+ * An <code>IntLiteral</code> represents a literal in Java of an integer
+ * type.
  */
-public class IntLiteral extends Literal {
-
-  public static final int BOOLEAN = 0;
-  public static final int BYTE    = 2;
-  public static final int SHORT   = 3;
-  public static final int INT     = 4;
-  public static final int LONG    = 5;
-      
+public class IntLiteral extends Literal 
+{
+  public static final int BYTE    = 0;
+  public static final int SHORT   = 1;
+  public static final int INT     = 2;
+  public static final int LONG    = 3;
+  
+  protected final int kind;
+  protected final long value;
+ 
   /**
-   * Creates a new IntLiteral storing a boolean with the value <b>
+   * Creates a new IntLiteral storing a byte with the value <code>b</code>.
    */ 
-  public IntLiteral (boolean b) {
-    type = BOOLEAN;
-    value = b ? 1 : 0;
+  public IntLiteral( byte b) 
+  {
+    this( BYTE, b);
   }
 
   /**
-   * Creates a new IntLiteral storing a byte with the value <b>
+   * Creates a new IntLiteral storing a short with the value <code>s</code>.
    */ 
-  public IntLiteral (byte b) {
-    type = BYTE;
-    value = b;
-  }
-
-  /**
-   * Creates a new IntLiteral storing a short with the value <s>
-   */ 
-  public IntLiteral (short s) {
-    type = SHORT;
-    value = s;
+  public IntLiteral( short s) 
+  {
+    this( SHORT, s);
   }
     
   /**
-   * Creates a new IntLiteral storing a integer with the value <i>
+   * Creates a new IntLiteral storing an integer with the value <code>i</code>.
    */ 
-  public IntLiteral (int i) {
-    type = INT;
-    value = i;
+  public IntLiteral( int i) 
+  {
+    this( INT, i);
   }
 
   /**
-   * Creates a new IntLiteral storing a long with the value <l>
+   * Creates a new IntLiteral storing a long with the value <code>l</code>.
    */ 
-  public IntLiteral (long l) {
-    type = LONG;
-    value = l;
+  public IntLiteral( long l) 
+  {
+    this( LONG, l);
+  }
+
+  public IntLiteral( int kind, long value)
+  {
+    this.kind = kind;
+    this.value = value;
+  }
+
+  public IntLiteral reconstruct( int kind, long value) 
+  {
+    if( this.kind == kind && this.value == value) {
+      return this;
+    }
+    else {
+      IntLiteral n = new IntLiteral( kind, value);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }      
   }
 
   /** 
-   * Effects: returns the type of this IntLiteral as specified by the
-   *   public static constants in this class.  
+   * Returns the kind of this <code>IntLiteral</code> as specified by the
+   * <code>public static</code> constants in this class.  
    */ 
-  public int getIntType() {
-    return type;
+  public int getKind() 
+  {
+    return kind;
   }
 
   /**
-   * Effects: returns the boolean value of this IntLiteral.  
+   * Returns the <code>byte</code> value of this literal.
    */
-  public boolean getBooleanValue() {
-    return value == 0 ? false : true;
-  }
-
-  /**
-   * Effects: returns the byte value of this IntLiteral.
-   */
-  public byte getByteValue() {
-    return (byte) value;
+  public byte getByteValue() 
+  {
+    return (byte)value;
   }
   
   /**
-   * Effects: returns the short value of this IntLiteral.
+   * Returns the <code>short</code> value of this literal.
    */
-  public short getShortValue() {
-    return (short) value;
+  public short getShortValue() 
+  {
+    return (short)value;
   }
 
-  /**
-   * Effects: returns the int value of this IntLiteral.
+  /** 
+   * Returns the <code>int</code> value of this literal.
    */
-  public int getIntValue() {
-    return (int) value;
+  public int getIntValue() 
+  {
+    return (int)value;
   }
   
   /**
-   * Effects: returns the long value of this IntLiteral.
+   * Returns the <code>long</code> value of this literal.
    */
-  public long getLongValue() {
-    return value;
-  }
-
-
-  public void translate(LocalContext c, CodeWriter w)
+  public long getLongValue() 
   {
-    if (type == BOOLEAN)
-    {
-      w.write( (value != 0 ? "true" : "false")  );
-    }
-    else if(type == LONG)
-    {
-      w.write( Long.toString( value ) /* + 'L' */);
-    }
-    else 
-    {
-      w.write( Long.toString( value ));
-    }
-  }
+    return value;   
+  } 
 
-  public Node dump( CodeWriter w)
-  {
-    w.write( "( INTEGER LITERAL");
-    w.write( " < " + value + " > ");
-    dumpNodeInfo( w);
-    w.write( ")");
-    return null;
-  }
-
-  public Node typeCheck(LocalContext c) throws TypeCheckException
+  public Node typeCheck( LocalContext c) throws SemanticException
   {
     Type t = null;
 
-    switch( type) {
-    case BOOLEAN:
-      t = c.getTypeSystem().getBoolean();
-      break;
+    switch( kind) {
     case BYTE:
       t = c.getTypeSystem().getByte();
       break;
+
     case SHORT:
       t = c.getTypeSystem().getShort();
       break;
+
     case INT:
       t = c.getTypeSystem().getInt();
       break;
+
     case LONG:
       t = c.getTypeSystem().getLong();
       break;
@@ -156,24 +135,21 @@ public class IntLiteral extends Literal {
     return this;
   }  
 
-  Object visitChildren(NodeVisitor v) 
+  public void translate( LocalContext c, CodeWriter w)
   {
-    // nothing to do
-    return Annotate.getVisitorInfo( this);
+    if( kind == LONG) {
+      w.write( Long.toString( value ) /* + 'L' */);
+    }
+    else {
+      w.write( Long.toString( value ));
+    }
   }
 
-  public Node copy() {
-    IntLiteral il = new IntLiteral(0);
-    il.type = type;
-    il.value = value;
-    il.copyAnnotationsFrom(this);
-    return il;
+  public void dump( CodeWriter w)
+  {
+    w.write( "( INTEGER LITERAL");
+    w.write( " < " + value + " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
   }
-
-  public Node deepCopy() {
-    return copy();
-  }
-  
-  private int  type;
-  private long value;
 }

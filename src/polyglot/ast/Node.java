@@ -28,6 +28,15 @@ import java.util.*;
  * }
  * </code></pre>
  *
+ * By convention, <code>reconstruct</code> methods determine equality by:
+ * <ul>
+ * <li><code>equals</code> for fields of type <code>String</code>
+ * <li>pointer equality (<code>==</code>) of elements of fields of type 
+ *  <code>List</code>, <code>Set</code>, or <code>Collection</code>
+ * <li>pointer equality (<code>==</code>) of all other reference fields
+ * <li>equality for all primitive fields.
+ * </ul>
+ *
  * @see jltools.ast.NodeVisitor
  */
 public abstract class Node extends AnnotatedObject {

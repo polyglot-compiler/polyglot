@@ -1,9 +1,10 @@
-
 package jltools.types;
 
-import java.util.*;
 import jltools.util.InternalCompilerError;
-import jltools.types.MethodType;
+import jltools.ast.NodeVisitor;
+
+import java.util.*;
+
 
 /**
  * A context to be used within the scope of a method body.  
@@ -23,6 +24,10 @@ public class LocalContext
    * the import table for the file
    */
   ImportTable itImports;
+  /**
+   * The current node visitor.
+   */
+  NodeVisitor visitor;
 
   /** 
    * Creates a LocalContext without a parent context (i.e, for a method 
@@ -30,10 +35,12 @@ public class LocalContext
    * To do this, we'll also need the import table and what our enclosing 
    * class is.
    */
-  public LocalContext ( ImportTable itImports, TypeSystem ts)
+  public LocalContext( ImportTable itImports, TypeSystem ts,
+                       NodeVisitor visitor)
   {  
     this.itImports = itImports;
     this.ts = ts;
+    this.visitor = visitor;
     
     stkContexts = new Stack();
   }
@@ -243,6 +250,11 @@ public class LocalContext
       throw new SemanticException ( "Symbol \"" + sName + 
                                      "\" already defined in this block.");
 
+  }
+
+  public NodeVisitor getVisitor()
+  {
+    return visitor;
   }
 
   class ClassTuple

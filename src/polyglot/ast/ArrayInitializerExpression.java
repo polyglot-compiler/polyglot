@@ -10,11 +10,13 @@ import jltools.util.*;
 
 
 /**
- * An <code>ArrayInitializerExpression</code> is a mutable representation of
- * the an array initializer, such as { 3, 1, { 4, 1, 5 } }.
+ * An <code>ArrayInitializerExpression</code> is an immutable representation of
+ * the an array initializer, such as { 3, 1, { 4, 1, 5 } }. Note that the 
+ * elements of these array may be expressions of any type (e.g. 
+ * <code>MethedExpression</code>).
  */
-public class ArrayInitializerExpression extends Expression {
-
+public class ArrayInitializerExpression extends Expression 
+{
   protected final List children;
 
   /**

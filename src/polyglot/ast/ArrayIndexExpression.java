@@ -5,7 +5,7 @@ import jltools.types.*;
 
 
 /**
- * An <code>ArrayIndexExpression</code> is a immutable representation of an
+ * An <code>ArrayIndexExpression</code> is an immutable representation of an
  * access of an array member.  For instance <code>foo[i]</code> accesses the 
  * <code>i</code>'th member of <code>foo</code>.  An 
  * <code>ArrayIndexExpression</code> consists of a base expression which 

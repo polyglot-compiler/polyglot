@@ -21,8 +21,7 @@ public class FloatLiteral extends Literal
    */
   public FloatLiteral( float f) 
   {
-    kind = FLOAT;
-    value = f;
+    this( FLOAT, f);
   }
 
   /**
@@ -31,8 +30,16 @@ public class FloatLiteral extends Literal
    */
   public FloatLiteral( double d) 
   {
-    kind = DOUBLE;
-    value = d;
+    this( DOUBLE, d);
+  }
+
+  /**
+   * Creates a new <code>FloatLiteral</code>.
+   */
+  public FloatLiteral( int kind, double value)
+  {
+    this.kind = kind;
+    this.value = value;
   }
 
   /* Lazily reconstruct this node. */
@@ -42,8 +49,7 @@ public class FloatLiteral extends Literal
       return this;
     }
     else {
-      FloatLiteral n = (kind == FLOAT ? new FloatLiteral( (float)value) :
-                                  new FloatLiteral( (double)value));
+      FloatLiteral n = new FloatLiteral( kind, value);
       n.copyAnnotationsFrom( this);
       return n;
     }
@@ -74,16 +80,21 @@ public class FloatLiteral extends Literal
     return (double)value;
   }
 
-  /**
-   * Visit this children of this node. */
-  Node visitChildren(NodeVisitor v) 
-  {
-    return this;
-  }
-
   public Node typeCheck( LocalContext c)
   {
-    setCheckedType( c.getTypeSystem().getFloat());
+    Type t = null;
+    
+    switch( kind) {
+    case FLOAT:
+      t = c.getTypeSystem().getFloat();
+      break;
+      
+    case DOUBLE:
+      t = c.getTypeSystem().getDouble();
+      break;
+    }
+    setCheckedType( t);
+
     return this;
   }  
 
@@ -103,4 +114,3 @@ public class FloatLiteral extends Literal
     w.write( ")");
   }
 }
-

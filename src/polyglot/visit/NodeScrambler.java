@@ -27,22 +27,22 @@ public class NodeScrambler extends NodeVisitor
 
   public class FirstPass extends NodeVisitor 
   {
-    public Node visitBefore( Node n)
+    public NodeVisitor enter( Node n)
     {
       pairs.put( n, currentParents.clone());
       
       currentParents.add( n);
-      return null;
+      return this;
     }
     
-    public Node visitAfter( Node n)
+    public Node leave( Node old, Node n, NodeVisitor v)
     {
       currentParents.remove( n);
       return n;
     }
   }
 
-  public Node visitBefore( Node n)
+  public Node override( Node n)
   {
     if( coinFlip()) {
       Node m = potentialScramble( n);
@@ -68,7 +68,7 @@ public class NodeScrambler extends NodeVisitor
           e.printStackTrace();
           return null;
         }
-        return m.deepCopy();
+        return m;
       }
     }
     else {

@@ -1,248 +1,199 @@
-/*
- * SourceFileNode.java
- */
-
 package jltools.ast;
-
-import java.util.*;
 
 import jltools.frontend.Compiler;
 import jltools.types.*;
 import jltools.util.*;
-import jltools.visit.SymbolReader;
+import jltools.visit.*;
+
+import java.util.*;
+
 
 /**
- * Overview: A SourceFileNode is a mutable representations of a Java
- * langauge source file.  It consists of a filename, a package name, a
- * list of ImportNodes, and a list of ClassNodes.
+ * A <code>SourceFileNode</code> is an immutable representations of a Java
+ * langauge source file.  It consists of a package name, a list of 
+ * <code>ImportNode</code>s, and a list of <code>ClassNode</code>s.
  */
+public class SourceFileNode extends Node 
+{
+  protected final String package_;
+  protected final List imports;
+  protected final List classes;
 
-public class SourceFileNode extends Node {
+  // FIXME
+  private ImportTable it;
+
   /**
    * Requires: <imports> contains elements only of type ImportNode,
    * <classes> contains elemetns only of type ClassNode.
    *
    * Effects: Creates a new SourceFileNode with filename <filename> in
-   * package <packageName>, containing imports in <imports> and
+   * package <package_>, containing imports in <imports> and
    * classes in <classes>.
    */
-  public SourceFileNode(String filename, String packageName,
-			List imports, List classes) {
-    this.sourceFilename = filename;
-    this.packageName = packageName;
-    TypedList.check(imports, ImportNode.class);
-    this.imports = new ArrayList(imports);
-    TypedList.check(classes, ClassNode.class);
-    this.classes = new ArrayList(classes);
-  }
-
-  /**
-   * Effects: Returns the filename represented by this SourceFileNode.
-   */
-  public String getFilename() {
-    return sourceFilename;
-  }
-  
-  /**
-   * Effects: Sets the filename represented by this SourceFileNode to
-   * <newFilename>.
-   */
-  public void setFilename(String newFilename) {
-    sourceFilename = newFilename;
-  }
-
-  /**
-   * Effects: Returns the package name of this.
-   */
-  public String getPackageName() {
-    return packageName;
-  }
-
-  /**
-   * Effects: Sets the package name of this SourceFileNode to be
-   * <newPackageName>.
-   */
-  public void setPackageName(String newPackageName) {
-    packageName = newPackageName;
-  }
-
-  /**
-   * Effects: Adds ImportNode <in> to the imports of this SourceFileNode.
-   */
-  public void addImportNode(ImportNode in) {
-    imports.add(in);
-  }
-
-  /**
-   * Effects: Returns the ImportNode at position <pos> in this
-   * SourceFileNode.  Throws an IndexOutOfBoundsException if <pos> is
-   * not valid.  
-   */
-  public ImportNode getImportNode(int pos) {
-    return (ImportNode) imports.get(pos);
-  }
-
-  /**
-   * Effects: Removes the ImportNode at position <pos> in this
-   * SouceFileNode.  Throws an IndexOutOfBoundsExeption if <pos> is
-   * not valid.
-   */
-  public void removeImportNode(int pos) {
-    imports.remove(pos);
-  }
-
-  public void removeAllImportNodes() 
+  public SourceFileNode( String package_, List imports, List classes) 
   {
-    imports = new ArrayList();
+    this.package_ = package_;
+    this.imports = TypedList.copyAndCheck( imports, ImportNode.class, true);
+    this.classes = TypedList.copyAndCheck( classes, ClassNode.class, true);
+  }
+
+  public SourceFileNode reconstruct( String package_, List imports, 
+                                     List classes) 
+  {
+    if( !this.package_.equals( package_) 
+        || this.imports.size() != imports.size()
+        || this.classes.size() != classes.size()) {
+      SourceFileNode n = new SourceFileNode( package_, imports, classes);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+    else {
+      for( int i = 0; i < imports.size(); i++) {
+        if( this.imports.get( i) != imports.get( i)) {
+          SourceFileNode n = new SourceFileNode( package_, imports, classes);
+          n.copyAnnotationsFrom( this);
+          return n;
+        }
+      }
+
+      for( int i = 0; i < classes.size(); i++) {
+        if( this.classes.get( i) != classes.get( i)) {
+          SourceFileNode n = new SourceFileNode( package_, imports, classes);
+          n.copyAnnotationsFrom( this);
+          return n;
+        }
+      }
+      return this;
+    }
   }
 
   /**
-   * Effects: Returns a TypedListIterator which will return the
-   * ImportNodes of this SourceFileNode in order.
+   * Returns the package name of this source file.
    */
-  public TypedListIterator importNodes() {
-    return new TypedListIterator(imports.listIterator(),
-				 ImportNode.class,
-				 false);
+  public String getPackageName() 
+  {
+    return package_;
   }
 
   /**
-   * Effects: Adds a ClassNode to the list of classes contained in
-   * this SourcEfileNode.
+   * Returns the <code>ImportNode</code> at position <code>pos</code> in this
+   * node.
    */
-  public void addClassNode(ClassNode cn) {
-    classes.add(cn);
+  public ImportNode getImportNodeAt( int pos) 
+  {
+    return (ImportNode)imports.get( pos);
+  }
+
+  /**
+   * Returns an iterator which will return the <code>ImportNode<code>s of
+   * this source file (in order).
+   */
+  public Iterator importNodes() 
+  {
+    return imports.iterator();
   }
   
   /**
-   * Effects: Returns the ClassNode at position <pos> in this
-   * SourceFileNode.  Throws an IndexOutOfBoundsException if <pos> is
-   * not valid.
+   * Returns the <code>ClassNode</code> at position <code>pos</code> in this
+   * node.
    */
-  public ClassNode getClassNode(int pos) {
-    return (ClassNode) classes.get(pos);
+  public ClassNode getClassNodeAt( int pos) 
+  {
+    return (ClassNode)classes.get( pos);
   }
 
-  /**
-   * Effects: Removes the ClassNode at position <pos> in this
-   * SourceFileNode. Throws an IndexOutOfBoundsException if <pos> is
-   * not valid.
-   */
-  public void removeClassNode(int pos) {
-    classes.remove(pos);
+  public Iterator classNodes()
+  {
+    return classes.iterator();
   }
 
+  // FIXME necessary?
   public ImportTable getImportTable()
   {
     return it;
   }
 
-
-  Object visitChildren(NodeVisitor v)
+  Node visitChildren( NodeVisitor v)
   {
-    for(ListIterator it=imports.listIterator(); it.hasNext(); ) {
-      ImportNode n = (ImportNode)it.next();
-      n = (ImportNode)n.visit( v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( n), vinfo);
-      it.set( n);
-    }
-    for(ListIterator it=classes.listIterator(); it.hasNext(); ) {
-      ClassNode n = (ClassNode)it.next();
-      n = (ClassNode)n.visit( v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( n), vinfo);
-      it.set( n);
+    List newImports = new ArrayList( imports.size()),
+      newClasses = new ArrayList( classes.size());
+
+    for( Iterator iter = importNodes(); iter.hasNext(); ) {
+      ImportNode in = (ImportNode)((ImportNode)iter.next()).visit( v);
+      if( in != null) {
+        newImports.add( in);
+      }
     }
 
-    return vinfo;
+    for( Iterator iter = classNodes(); iter.hasNext(); ) {
+      ClassNode cn = (ClassNode)((ClassNode)iter.next()).visit( v);
+      if( cn != null) {
+        newClasses.add( cn);
+      }
+    }
+
+    return reconstruct( package_, newImports, newClasses);
   }
-   
-   public Node readSymbols( SymbolReader sr) throws TypeCheckException
-   {
-     sr.setPackageName( packageName);
-     return null;
-   }
+  
+  public Node readSymbols( SymbolReader sr) throws SemanticException
+  {
+    sr.setPackageName( package_);
+    return null;
+  }
 
   public Node removeAmbiguities( LocalContext c)
   {
     return this;
   }
 
-   public Node typeCheck(LocalContext c) throws TypeCheckException
-   {
-     Vector vNames = new Vector();
-     String sSourceName = TypeSystem.getFirstComponent ( sourceFilename );
+  public Node typeCheck( LocalContext c) throws SemanticException
+  {
+    /* FIXME
+    Vector vNames = new Vector();
+    String sSourceName = TypeSystem.getFirstComponent ( sourceFilename );
      
      for(ListIterator it=classes.listIterator(); it.hasNext(); ) {
        ClassNode cn = (ClassNode)it.next();
        String s = TypeSystem.getShortNameComponent (cn.getName() );
        if ( vNames.contains (s ) )
-         throw new TypeCheckException ( "The source file contains two classes named \"" + s + "\".", 
+         throw new SemanticException ( "The source file contains two classes named \"" + s + "\".", 
                                         Annotate.getLineNumber ( cn ));
        vNames.add ( s );
        if ( cn.getAccessFlags().isPublic() && !s.equals ( sSourceName ) )
-         throw new TypeCheckException ( "The name of the public class \"" + s + 
+         throw new SemanticException ( "The name of the public class \"" + s + 
                                         "\" must match the source file name", 
                                         Annotate.getLineNumber( cn ));
      }
+    */
      return this;
    }
 
-   public void translate(LocalContext c, CodeWriter w)
-   {
-     if (packageName != null && !packageName.equals(""))
-     {
-       w.write("package " + packageName + ";");
-       w.newline(0);
-       w.newline(0);
-     }
-     for(ListIterator it=imports.listIterator(); it.hasNext(); ) 
-     {
-       ((ImportNode)it.next()).translate(c, w);
-     }
-     if (!imports.isEmpty())
-       w.newline(0);
-     for(ListIterator it=classes.listIterator(); it.hasNext(); ) 
-     {
-       ((ClassNode)it.next()).translate(c, w);
-     }
-   }
-
-   public Node dump( CodeWriter w)
-   {
-     w.write( "( SOURCE FILE");
-     w.write( " < " + sourceFilename + " >");
-     w.write( " < " + packageName + " > ");
-     dumpNodeInfo( w);
-     w.write( ")");
-     return null;
-   }
-
-  public Node copy() {
-    SourceFileNode sf = new SourceFileNode(sourceFilename, packageName,
-					   imports, classes);
-    sf.copyAnnotationsFrom(this);
-    return sf;
-  }
-			
-  public Node deepCopy() {
-    List newImports = new ArrayList(imports.size());
-    for(ListIterator it=imports.listIterator(); it.hasNext(); ) {
-      newImports.add(((ImportNode) it.next()).deepCopy());
+  public void translate( LocalContext c, CodeWriter w)
+  {
+    if( package_ != null && !package_.equals("")) {
+      w.write( "package " + package_ + ";");
+      w.newline(0);
+      w.newline(0);
     }
-    List newClasses = new ArrayList(classes.size());
-    for(ListIterator it=classes.listIterator(); it.hasNext(); ) {
-      newClasses.add(((ClassNode) it.next()).deepCopy());
+    for( Iterator iter = importNodes(); iter.hasNext(); ) {
+      ((ImportNode)iter.next()).translate( c, w);
     }
-    SourceFileNode sf = new SourceFileNode(sourceFilename, packageName,
-					   newImports, newClasses);
-    sf.copyAnnotationsFrom(this);
-    return sf;
+     
+    if( !imports.isEmpty()) {
+      w.newline(0);
+    }
+
+    for( Iterator iter = classNodes(); iter.hasNext(); ) {
+      ((ClassNode)iter.next()).translate( c, w);
+    }
   }
 
-  private String sourceFilename;
-  private String packageName;
-  private List imports;
-  private List classes;
-
-  private ImportTable it;
+  public void dump( CodeWriter w)
+  {
+    w.write( "( SOURCE FILE");
+    //    w.write( " < " + sourceFilename + " >");
+    w.write( " < " + package_ + " > ");
+    dumpNodeInfo( w);
+    w.write( ")");
+  }
 }

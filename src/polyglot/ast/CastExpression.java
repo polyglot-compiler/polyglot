@@ -4,7 +4,7 @@ import jltools.util.*;
 import jltools.types.*;
 
 /**
- * A <code>CastExpression</code> is a immutable representation of a casting
+ * A <code>CastExpression</code> is an immutable representation of a casting
  * operation.  It consists of an <code>Expression</code> being cast and a
  * <code>Type</code> being cast to.
  */ 

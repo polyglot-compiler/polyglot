@@ -8,7 +8,7 @@ import java.util.*;
 
 
 /**
- * A <code>FieldNode</code> is a immutable representation of the declaration 
+ * A <code>FieldNode</code> is an immutable representation of the declaration 
  * of a field of a class.  It consists of a set of <code>AccessFlags</code>
  * and a <code>VariableDeclarationStatement</code>.
  */

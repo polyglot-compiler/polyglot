@@ -44,7 +44,8 @@ public abstract class Expression extends Node
   }
 
   /**
-   * Return the precedence of the current expression.
+   * Return the precedence of the current expression. Lower values represent
+   * tighter binding precendence.
    */
   public abstract int getPrecedence();
 

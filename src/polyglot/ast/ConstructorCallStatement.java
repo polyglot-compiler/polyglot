@@ -21,7 +21,7 @@ public class ConstructorCallStatement extends Statement
   public static final int THIS    = 1;
 
   // the highest kind used by this class
-  public static final int MAX_TYPE = THIS; 
+  protected static final int MAX_KIND = THIS; 
 
   protected final Expression primary;
   protected final int kind;
@@ -37,7 +37,7 @@ public class ConstructorCallStatement extends Statement
   public ConstructorCallStatement( Expression primary,
 				  int kind, List arguments) 
   {
-    if (kind < 0 || kind > MAX_TYPE) {
+    if (kind < 0 || kind > MAX_KIND) {
       throw new IllegalArgumentException( "Value for kind of " +
                                           "ConstructorCallStatement " +
                                           "is not valid.");

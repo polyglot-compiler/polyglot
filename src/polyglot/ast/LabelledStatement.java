@@ -1,107 +1,89 @@
-/*
- * LabelledStatement.java
- */
-
 package jltools.ast;
-import jltools.types.LocalContext;
+
+import jltools.types.*;
 import jltools.util.*;
 
 /**
- * LabelledStatement
- * 
- * Overview: A mutable representation of a Java statement with a
- * label.  A labeld statement contains the statement being labelled
+ * Am immutable representation of a Java statement with a
+ * label.  A labeled statement contains the statement being labelled
  * and a string label.
  */
+public class LabelledStatement extends Statement 
+{
+  protected final String label;
+  protected final Statement stmt;
 
-public class LabelledStatement extends Statement {
   /**
-   * Effects: Creates a new LabelledStatement with label <label> and
-   * statement <statement>.
+   * Creates a new <code>LabelledStatement</code>.
    */
-  public LabelledStatement (String label, Statement statement) {
+  public LabelledStatement( String label, Statement stmt) 
+  {
     this.label = label;
-    this.statement = statement;
+    this.stmt = stmt;
   }
 
   /**
-   * Effects: Returns the label associated with this statement.
+   * Lazily reconstruct this node.
    */
-  public String getLabel() {
+  public LabelledStatement reconstruct( String label, Statement stmt)
+  {
+    if( this.label.equals( label) && this.stmt == stmt) {
+      return this;
+    }
+    else {
+      LabelledStatement n = new LabelledStatement( label, stmt);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+  }
+
+  /**
+   * Returns the label associated with this statement.
+   */
+  public String getLabel() 
+  {
     return label;
   }
 
   /**
-   * Effects: Sets the label for this statement to be <newLabel>.
+   * Returns the statement being labelled in this statement. 
    */
-  public void setLabel(String newLabel) {
-    label = newLabel;
-  }
-
-  /**
-   * Effects: Returns the statement being labelled in this
-   * LabelledStatement. 
-   */
-  public Statement getStatement() {
-    return statement;
-  }
-
-  /**
-   * Effects: Sets the statement being labelled in this
-   * LabelledStatement to be <newStatement>.
-   */
-  public void setStatement(Statement newStatement) {
-    statement = newStatement;
-  }
-
-
-  public void translate(LocalContext c, CodeWriter w)
+  public Statement getStatement() 
   {
-    w.write(label + ": ");
-    statement.translate(c, w);
+    return stmt;
   }
 
-  public Node dump( CodeWriter w)
+  /**
+   * Visit the children of this node.
+   *
+   * @pre Requires that <code>stmt.visit</code> transforms itself into an 
+   *  object of type <code>Statement</code>.
+   */
+  Node visitChildren(NodeVisitor v) 
+  {
+    return reconstruct( label, (Statement)stmt.visit( v));
+  }
+
+  public Node typeCheck(LocalContext c)
+  {
+    /* Nothing to do. */
+    return this;
+  }
+
+  // FIXME implement flowCheck
+
+  public void translate( LocalContext c, CodeWriter w)
+  {
+    w.write( label + ": ");
+    stmt.translate( c, w);
+  }
+
+  public void dump( CodeWriter w)
   {
     w.write( "( LABEL");
     w.write( " < " + label + " > ");
     dumpNodeInfo( w);
     w.write( ")");
-    return null;
   }
-
-  public Node typeCheck(LocalContext c)
-  {
-    // FIXME; implement
-    return this;
-  }
-  /**
-   * Requires: v will not transform the statement into anything other
-   *    than another statement.
-   *
-   * Effects: visits the substatement of this with <v>.
-   */
-  Object visitChildren(NodeVisitor v) 
-  {
-    statement = (Statement) statement.visit(v);
-    return v.mergeVisitorInfo( Annotate.getVisitorInfo( this),
-                               Annotate.getVisitorInfo( statement));
-  }
-
-  public Node copy() {
-    LabelledStatement ls = new LabelledStatement(label, statement);
-    ls.copyAnnotationsFrom(this);
-    return ls;
-  }
-
-  public Node deepCopy() {
-    LabelledStatement ls =
-      new LabelledStatement(label, (Statement) statement.deepCopy());
-    ls.copyAnnotationsFrom(this);
-    return ls;
-  }
-
-  private String label;
-  private Statement statement;
 }
     

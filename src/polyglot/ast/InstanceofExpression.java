@@ -1,7 +1,3 @@
-/*
- * InstanceofExpression.java
- */
-
 package jltools.ast;
 
 import jltools.types.*;
@@ -9,104 +5,79 @@ import jltools.util.*;
 
 
 /**
- * InstanceofExpression
- *
- * Overview: An InstanceofExpression is a mutable representation of
- *   the use of the instanceof operator in Java such as "<expression>
- *   instanceof <type>".
+ * An <code>InstanceofExpression</code> is an immutable representation of
+ * the use of the <code>instanceof</code> operator.
  */
+public class InstanceofExpression extends Expression 
+{
+  protected final Expression expr;
+  protected final TypeNode tn;
 
-public class InstanceofExpression extends Expression {
   /**
-   * Effects: Creates a new InstanceofExpreession which is testing if
-   *    <expr> is an instance of <type>.
+   * Creates a new <code>InstanceofExpreession</code>.
    */
-  public InstanceofExpression (Expression expr, TypeNode type) {
+  public InstanceofExpression( Expression expr, TypeNode tn)
+  {
     this.expr = expr;
-    this.type = type;
-  }
-  /**
-   * Effects: Creates a new InstanceofExpreession which is testing if
-   *    <expr> is an instance of <type>.
-   */
-  public InstanceofExpression (Expression expr, Type type) {
-    this.expr = expr;
-    this.type = new TypeNode(type);
+    this.tn = tn;
   }
 
   /**
-   * Effects: Retursn the expression whose type is being checked
+   * Lazily reconstruct this node.
    */
-  public Expression getExpression() {
+  public InstanceofExpression reconstruct( Expression expr, TypeNode tn)
+  {
+    if( this.expr == expr && this.tn == tn) {
+      return this;
+    }
+    else {
+      InstanceofExpression n = new InstanceofExpression( expr, tn);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+  }
+
+  /**
+   * Returns the expression whose type is being checked.
+   */
+  public Expression getExpression() 
+  {
     return expr;
   }
 
   /**
-   * Effects:  Sets the expression being tested to <newExpr>.
+   * Returns the type to which the type of the expression is being compared. 
    */
-  public void setExpression(Expression newExpr) {
-    expr = newExpr;
+  public Type getType() 
+  {
+    return tn.getType();
   }
 
   /**
-   * Effects: Returns the type to which the type of the expression
-   *    is being compared. 
+   * Visit the children of this node.
+   *
+   * @pre Requires that <code>expr.visit</code> returns an object of type
+   *  <code>Expression</code> and <code>tn.visit</code> returns an object of
+   *  type <code>TypeNode</code>.
    */
-  public TypeNode getType() {
-    return type;
-  }
-
-  /**
-   * Effects: Changes the type of being checked in this expression
-   *    to <newType>.
-   */
-  public void setType(TypeNode newType) {
-    type = newType;
-  }
-
-  /**
-   * Effects: Changes the type of being checked in this expression
-   *    to <newType>.
-   */
-  public void setType(Type newType) {
-    type = new TypeNode(newType);
-  }
-
-
-  public void translate(LocalContext c, CodeWriter w)
+  Node visitChildren( NodeVisitor v) 
   {
-    translateExpression( expr, c, w);
-
-    w.write( " instanceof ");
-
-    type.translate( c, w);
+    return reconstruct( (Expression)expr.visit( v),
+                        (TypeNode)tn.visit( v));
   }
 
-  public Node dump( CodeWriter w)
+  public Node typeCheck( LocalContext c) throws SemanticException
   {
-    w.write( "( INSTANCEOF ");
-    dumpNodeInfo( w);
-    w.write( ")");
-    return null;
-  }
-
-  public int getPrecedence()
-  {
-    return PRECEDENCE_INSTANCE;
-  }
-
-  public Node typeCheck( LocalContext c) throws TypeCheckException
-  {
-    Type rtype = type.getType();
+    Type rtype = tn.getType();
 
     if( rtype instanceof PrimitiveType) {
-      throw new TypeCheckException( 
+      throw new SemanticException( 
                  "Right operand of \"instanceof\" must be a reference type.");
     }
 
     Type ltype = expr.getCheckedType();
     if( !ltype.isCastValid( rtype)) {
-      throw new TypeCheckException(
+      throw new SemanticException(
                  "Left operand of \"instanceof\" must be castable to "
                  + "the right operand.");
     }
@@ -115,38 +86,25 @@ public class InstanceofExpression extends Expression {
     return this;
   }
 
-  /**
-   * Requires: v will not transform the Expression into anything other
-   *    than another Expression.
-   * Effects:
-   *     Visits the subexpression of this.
-   */
-  Object visitChildren(NodeVisitor v) 
+  public void translate( LocalContext c, CodeWriter w)
   {
-    Object vinfo = Annotate.getVisitorInfo( this);
+    translateExpression( expr, c, w);
 
-    type = (TypeNode) type.visit(v);
-    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( type), vinfo);
+    w.write( " instanceof ");
 
-    expr = (Expression) expr.visit(v);
-    return v.mergeVisitorInfo( Annotate.getVisitorInfo( expr), vinfo);
+    tn.translate( c, w);
   }
 
-  public Node copy() {
-    InstanceofExpression ie = new InstanceofExpression(expr, type);
-    ie.copyAnnotationsFrom(this);
-    return ie;
+  public void dump( CodeWriter w)
+  {
+    w.write( "( INSTANCEOF ");
+    dumpNodeInfo( w);
+    w.write( ")");
   }
 
-  public Node deepCopy() {
-    InstanceofExpression ie = 
-      new InstanceofExpression((Expression) expr.deepCopy(), 
-			       (TypeNode) type.deepCopy());
-    ie.copyAnnotationsFrom(this);
-    return ie;
+  public int getPrecedence()
+  {
+    return PRECEDENCE_INSTANCE;
   }
-
-  protected Expression expr;
-  protected TypeNode type;
 }
   
