@@ -161,7 +161,7 @@ public class LoadedClassResolver extends ClassResolver implements TopLevelResolv
     }
 
     // Put the decoded type into the resolver to avoid circular resolving.
-    ((CachingResolver) ts.systemResolver()).install(name, dt);
+    ((CachingResolver) ts.systemResolver()).addNamed(name, dt);
 
     if (Report.should_report(report_topics, 2))
       Report.report(2, "Returning serialized ClassType for " +

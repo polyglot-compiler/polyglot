@@ -108,7 +108,7 @@ public class CachingResolver implements TopLevelResolver {
                 throw e;
             }
 
-            install(name, q);
+            addNamed(name, q);
 
             if (q instanceof ClassType) {
                 Package p = ((ClassType) q).package_();
@@ -153,8 +153,17 @@ public class CachingResolver implements TopLevelResolver {
      * @param name The name of the qualifier to insert.
      * @param q The qualifier to insert.
      */
-    public void install(String name, Named q) throws SemanticException {
+    public void install(String name, Named q) {
 	cache.put(name, q);
+    }
+
+    /**
+     * Install a qualifier in the cache.
+     * @param name The name of the qualifier to insert.
+     * @param q The qualifier to insert.
+     */
+    public void addNamed(String name, Named q) throws SemanticException {
+	install(name, q);
 
 	if (q instanceof Type && packageExists(name)) {
 	    throw new SemanticException("Type \"" + name +

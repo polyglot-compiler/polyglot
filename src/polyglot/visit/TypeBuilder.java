@@ -232,7 +232,7 @@ public class TypeBuilder extends HaltingVisitor
             }
 
             typeSystem().parsedResolver().addNamed(ct.fullName(), ct);
-            ((CachingResolver) typeSystem().systemResolver()).install(ct.fullName(), ct);
+            ((CachingResolver) typeSystem().systemResolver()).addNamed(ct.fullName(), ct);
 
 	    return ct;
 	}

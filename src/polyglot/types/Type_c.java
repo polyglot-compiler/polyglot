@@ -247,17 +247,11 @@ public abstract class Type_c extends TypeObject_c implements Type
             TypeSystem ts = ((TypeInputStream) in).getTypeSystem();
 
             if (name != null) {
-                try {
-                    ((CachingResolver) ts.systemResolver()).install(name, (Named) this);
-                }
-                catch (SemanticException e) { }
+                ((CachingResolver) ts.systemResolver()).install(name, (Named) this);
             }
             
             if (memberName != null) {
-                try {
-                    ((CachingResolver) ts.systemResolver()).install(memberName, (Named) this);
-                }
-                catch (SemanticException e) { }
+                ((CachingResolver) ts.systemResolver()).install(memberName, (Named) this);
             }
         }
 
