@@ -17,7 +17,7 @@ import java.util.*;
 import java.io.*;
 
 /**
- * Extension information for pao extension.
+ * Extension information for PAO extension.
  */
 public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
     static {

@@ -1,6 +1,6 @@
 SOURCE = ../../..
 PACKAGE = polyglot/ext/pao
-SUBDIRS = parse ast extension visit types runtime
+SUBDIRS = parse ast visit types runtime
 
 include $(SOURCE)/Rules.mk
 
