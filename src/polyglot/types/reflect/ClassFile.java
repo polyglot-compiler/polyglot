@@ -402,7 +402,7 @@ public class ClassFile implements LazyClassInitializer {
         ClassType.Kind kind = ClassType.TOP_LEVEL;
 
         if (dollar >= 0) {
-            // An inner class.  Parse the class name to determine what kind. 
+            // A nested class.  Parse the class name to determine what kind. 
             StringTokenizer st = new StringTokenizer(className, "$");
 
             while (st.hasMoreTokens()) {
@@ -444,7 +444,7 @@ public class ClassFile implements LazyClassInitializer {
         // Add unresolved class into the cache to avoid circular resolving.
         ((CachingResolver) ts.systemResolver()).install(name, ct);
 
-        if (ct.isInner()) {
+        if (ct.isNested()) {
             ct.outer(typeForName(ts, outerName));
         }
 

@@ -1,10 +1,16 @@
 package polyglot.ext.param.types;
 
-import polyglot.ext.jl.types.*;
-import polyglot.types.*;
+import java.util.Iterator;
+import java.util.List;
+
+import polyglot.ext.jl.types.ClassType_c;
+import polyglot.types.ClassType;
+import polyglot.types.Flags;
 import polyglot.types.Package;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.types.Resolver;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
+import polyglot.util.Position;
 
 /**
  * Implementation of a ClassType that performs substitutions using a
@@ -78,7 +84,7 @@ public class SubstClassType_c extends ClassType_c implements SubstType
         return subst.substTypeList(base.memberClasses());
     }
 
-    /** Get the class's outer class, if an inner class. */
+    /** Get the class's outer class, if a nested class. */
     public ClassType outer() {
         return (ClassType) subst.substType(base.outer());
     }

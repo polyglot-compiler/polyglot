@@ -1,14 +1,29 @@
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.frontend.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.types.Package;
-import polyglot.frontend.Compiler;
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import java.io.*;
-import java.util.*;
+import polyglot.ast.Import;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.SourceCollection;
+import polyglot.ast.SourceFile;
+import polyglot.ast.TopLevelDecl;
+import polyglot.frontend.Job;
+import polyglot.frontend.TargetFactory;
+import polyglot.types.ClassType;
+import polyglot.types.Context;
+import polyglot.types.Package;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.Copy;
+import polyglot.util.ErrorInfo;
+import polyglot.util.InternalCompilerError;
 
 /**
  * A Translator generates output code from the processed AST.
@@ -87,7 +102,7 @@ public class Translator extends PrettyPrinter implements Copy
     }
 
     /** Set the outer class context of the translator.  This class is used when
-     * translating "new" expressions for inner classes.  For the expression
+     * translating "new" expressions for nested classes.  For the expression
      * "e.new C()", the name "C" needs to be looked up in the context of the
      * static type of expression "e" (i.e., <code>outerClass</code>), rather
      * than in the current context returned by <code>context()</code>.

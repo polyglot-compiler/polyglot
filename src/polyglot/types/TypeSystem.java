@@ -649,7 +649,7 @@ public interface TypeSystem {
     void checkAccessFlags(Flags f) throws SemanticException;
 
     /**
-     * Assert that <code>t</code> has no cycles in the super type+inner class
+     * Assert that <code>t</code> has no cycles in the super type+nested class
      * graph starting at <code>t</code>.
      */
     void checkCycles(ReferenceType t) throws SemanticException;

@@ -355,7 +355,7 @@ public class TypeSystem_c implements TypeSystem
     }
 
     /**
-     * Checks whether a method, field or inner class within "outer" with access
+     * Checks whether a method, field or nested class within "outer" with access
      * flags "flags" can be accessed from Context "context".
      */
     public boolean isAccessible(MemberInstance mi, Context context) {

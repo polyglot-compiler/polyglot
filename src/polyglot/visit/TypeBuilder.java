@@ -1,14 +1,23 @@
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.frontend.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.types.Package;
-import polyglot.main.Report;
+import java.util.Stack;
 
-import java.io.IOException;
-import java.util.*;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.frontend.Job;
+import polyglot.main.Report;
+import polyglot.types.ClassType;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.ImportTable;
+import polyglot.types.Package;
+import polyglot.types.ParsedClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
 
 /** Visitor which traverses the AST constructing type objects. */
 public class TypeBuilder extends HaltingVisitor
@@ -65,7 +74,7 @@ public class TypeBuilder extends HaltingVisitor
         for (ParsedClassType ct = context.currentClassScope(); ct != null; ) {
             s.push(ct);
 
-            if (ct.isInner()) {
+            if (ct.isNested()) {
                 ct = (ParsedClassType) ct.outer();
             }
             else {
