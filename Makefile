@@ -8,9 +8,18 @@
 # set up some reasonable defaults (for building in CUCS)
 JC 			= javac
 JAVA			= java
+JAR			= jar
+JAVADOC			= javadoc
+
 CUP_RUNTIME		= /home/nks/lib
 CLASSPATH		= -classpath $(SOURCE):/usr/local/jdk1.2.1/jre/lib/rt.jar:$(CUP_RUNTIME)
 JC_FLAGS 		= $(CLASSPATH)
+
+JAR_FILE		= jltools.jar
+JAR_FLAGS		= cf 
+
+JAVADOC_OUTPUT		= ./javadoc
+JAVADOC_FLAGS		= $(CLASSPATH) 
 
 SOURCE			= .
 PERSONAL_MAKEFILE	= Makefile.personal
@@ -60,6 +69,20 @@ clean:
 	rm -f jltools/lex/*.class
 
 # delete class files as well as the grammar files, so that we can regenerate them
+# also delete the javadoc & jar file, if they exist
 clobber superclean: clean
 	rm -f jltools/parse/Grm.java
 	rm -f jltools/parse/sym.java
+	rm -f $(JAR_FILE)
+	rm -rf $(JAVADOC_OUTPUT)
+
+# create a jar file
+jar: all
+	$(JAR) $(JAR_FLAGS) $(JAR_FILE) jltools/*/*.class
+
+docs:
+	-mkdir -p $(JAVADOC_OUTPUT)
+	$(JAVADOC) $(JAVADOC_FLAGS) -d $(JAVADOC_OUTPUT) jltools.ast jltools.frontend jltools.parse jltools.util jltools.types
+
+
+

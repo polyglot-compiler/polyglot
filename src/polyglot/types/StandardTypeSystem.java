@@ -469,7 +469,12 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * type (if any).  The iterator is guaranteed to yield methods
    * defined on subclasses before those defined on superclasses.
    **/  
-  public Iterator getMethodsForType(Type type);
+  public Iterator getMethodsForType(Type type)
+  {
+    //FIXME: implement
+    return null;
+  }
+
   /**
    * Requires: all type arguments are canonical.
    *
@@ -477,7 +482,11 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * on type (if any).  The iterator is guaranteed to yield methods
    * defined on subclasses before those defined on superclasses.
    **/
-  public Iterator getFieldsNamed(Type type, String name);
+  public Iterator getFieldsNamed(Type type, String name)
+  {
+    //FIXME: implement
+    return null;
+  }
 
   /**
    * Requires: all type arguments are canonical.
@@ -486,7 +495,11 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * context.  If no such field may be found, returns a fieldmatch
    * with an error explaining why.
    **/
-  public Iterator getField(Type type, String name, Context context);
+  public Iterator getField(Type type, String name, Context context)
+  {
+    //FIXME: implement
+    return null;
+  }
 
   /**
    * Requires: all type arguments are canonical.
@@ -506,6 +519,7 @@ public abstract class StandardTypeSystem extends TypeSystem {
   // FIXME
   //public Type getSuperType(Type type);
   public abstract Type getSuperType(Type type);
+
   /**
    * Requires: all type arguments are canonical.
    *
@@ -516,17 +530,28 @@ public abstract class StandardTypeSystem extends TypeSystem {
   //public List getInterfaces(Type type);
   public abstract List getInterfaces(Type type);
 
+
   ////
   // Functions for method testing.
   ////
   /**
    * Returns true iff <type1> is the same as <type2>.
    **/
-  public boolean isSameType(MethodType type1, MethodType type2);
+  public boolean isSameType(MethodType type1, MethodType type2)
+  {
+    //FIXME: implement
+    return null;
+  }
+
   /**
    * Returns true iff <type1> has the same arguments as <type2>
    **/
-  public boolean hasSameArguments(MethodType type1, MethodType type2);
+  public boolean hasSameArguments(MethodType type1, MethodType type2)
+  {
+    //FIXME: implement
+    return null;
+  }
+
   /**
    * If an attempt to call a method of type <method> on <type> would
    * be successful, returns the actual MethodMatch for the method that
@@ -548,6 +573,7 @@ public abstract class StandardTypeSystem extends TypeSystem {
   //public MethodMatch getMethod(Type type, MethodType method, 
   public abstract MethodMatch getMethod(Type type, MethodType method, 
 					Context context, boolean isThis);
+
   /**
    * If an attempt to call a method of type <method> on <type> would
    * be successful, and the method would match on the given <type>,
@@ -567,13 +593,27 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * (Guavac gets this wrong.)
    **/
   public MethodMatch getMethodInClass(Type type, MethodType method, 
-					      Context context, boolean isThis);
+					      Context context, boolean isThis)
+  {
+    //FIXME: implement
+    return null;
+  }
+
   /**
    * As above, except only returns a match if the argument types are identical,
    * and disregards context.
    **/
-  public MethodMatch getExactMethod(Type type, MethodType method);
-  public MethodMatch getExactMethodInClass(Type type, MethodType method); 
+  public MethodMatch getExactMethod(Type type, MethodType method)
+  {
+    //FIXME: implement
+    return null;
+  }
+
+  public MethodMatch getExactMethodInClass(Type type, MethodType method)
+  {
+    //FIXME: implement
+    return null;
+  }
 
   ////
   // Functions for type->class mapping.
@@ -659,8 +699,11 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * registered in this typeSystem.  Does not register the type in
    * this TypeSystem.  For use only by JavaClass implementations.
    **/
-  public ClassType typeForClass(Class theClass); 
-  // TODO
+  public ClassType typeForClass(Class theClass)
+  {
+    //FIXME: implement
+    return null;
+  }
 
 }
 

@@ -3,6 +3,7 @@ tp_package	= jltools/types
 tp_codebase	= ../..
 tp_files 	= AccessFlags.java	\
 			ArrayType.java  \
+			ClassContext \
 			ClassResolver.java \
 			ClassType.java \
 			ConstructorType.java \
@@ -12,6 +13,7 @@ tp_files 	= AccessFlags.java	\
 			JavaClass.java \
 			JavaClassImpl.java \
 			LoadedJavaClass.java \
+			LocalContext.java \
 			MethodType.java \
 			NoClassException.java \
 			NullType.java \
