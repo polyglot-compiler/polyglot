@@ -64,7 +64,14 @@
     </condition>
   </target> 
 
-  <target name="executable-defs" description="creates a file containing common environment variable definitions">
+  <target name="defs-deps">
+    <condition property="defs.up-to-date">
+      <available file="${bin}/defs"/>
+    </condition>
+  </target> 
+
+  <target name="executable-defs" depends="defs-deps" unless="defs.up-to-date"
+          description="creates a file containing common environment variable definitions">
     <echo message="Creating ${bin}/defs"/>
     <echo file="${bin}/defs" append="no">#!/bin/sh
 # DO NOT EDIT - This file was automatically generated.
