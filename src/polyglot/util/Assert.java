@@ -14,22 +14,22 @@ package polyglot.util;
 public final class Assert {
 
   /**
-   * static void assert(boolean ok)
+   * static void check(boolean ok)
    *
    * Throws an error if not <ok>.
    **/
-  public static void assert(boolean ok) {
+  public static void check(boolean ok) {
     if (!ok)
       throw new AssertionFailedError("Assertion failed");
   }
 
   /**
-   * static void assert(String condition, boolean ok)
+   * static void check(String condition, boolean ok)
    *
    * Asserts that <condition> holds -- in other words, that <ok> is true.
    * Throws an error otherwise.
    **/
-  public static void assert(String condition, boolean ok) {
+  public static void check(String condition, boolean ok) {
     if (!ok)
       throw new AssertionFailedError("Assertion \"" + 
 				     condition + "\" failed.");
