@@ -56,6 +56,11 @@ include jltools/ext/op/runtime/Makefile
 include jltools/frontend/Makefile
 include jltools/main/Makefile
 
+# JIF
+#include jltools/ext/jif/Makefile
+include jltools/ext/jif/parse/Makefile
+include jltools/ext/jif/ast/Makefile
+
 #other targets:
 util: $(UTIL_TARGET) 
 
@@ -75,7 +80,15 @@ ext/op/runtime: $(EXT_OP_RUNTIME_TARGET)
 
 frontend: util types lex parse ast visit $(FRONTEND_TARGET)
 
+#jif
+#ext/jif: util types ast ext/op/jif/parse $(EXTJIF_TARGET)
+
+ext/jif/parse: util $(EXTJIFPARSE_TARGET)
+
+ext/jif/ast: util types ast $(EXTJIFAST_TARGET)
+
 main: $(BIN)/jlc $(BIN)/jlcd frontend ext/op/runtime $(MAIN_TARGET)
+#main: frontend ext/op/runtime $(MAIN_TARGET)
 
 $(BIN)/jlc: jltools/main/jlc.c
 	$(CC) -o $(BIN)/jlc jltools/main/jlc.c
