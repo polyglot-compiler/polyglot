@@ -171,7 +171,7 @@ public class Compiler implements TargetTable, ClassCleaner
 
     if (jif) {
 	/* setup the splitter configuration */
-	jifSplitConfig = Config.init("filename");
+	jifSplitConfig = new Config("filename");
     }
 
     /* Set up the resolvers. */
