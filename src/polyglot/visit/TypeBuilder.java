@@ -121,7 +121,8 @@ public class TypeBuilder extends HaltingVisitor
 
 	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
 		                 e.getMessage(), position);
-
+                         
+                        
             return this;
 	}
     }
@@ -144,7 +145,7 @@ public class TypeBuilder extends HaltingVisitor
 	}
     }
 
-    boolean local; // true if the last scope pushed as not a class.
+    boolean inCode; // true if the last scope pushed as not a class.
     boolean global; // true if all scopes pushed have been classes.
     ParsedClassType type; // last class pushed.
 
@@ -152,18 +153,18 @@ public class TypeBuilder extends HaltingVisitor
         if (Report.should_report(Report.visit, 4))
 	    Report.report(4, "TB pushing code");
         TypeBuilder tb = push();
-        tb.local = true;
+        tb.inCode = true;
         tb.global = false;
         return tb;
     }
 
-    public TypeBuilder pushClass(ParsedClassType type) throws SemanticException {
+    protected TypeBuilder pushClass(ParsedClassType type) throws SemanticException {
         if (Report.should_report(Report.visit, 4))
 	    Report.report(4, "TB pushing class " + type);
 
         TypeBuilder tb = push();
         tb.type = type;
-        tb.local = false;
+        tb.inCode = false;
 
 	// Make sure the import table finds this class.
         if (importTable() != null && type.isTopLevel()) {
@@ -178,7 +179,7 @@ public class TypeBuilder extends HaltingVisitor
 
         ParsedClassType ct = ts.createClassType();
 
-	if (local) {
+	if (inCode) {
             ct.kind(ClassType.LOCAL);
 	    ct.outer(currentClass());
 	    ct.flags(flags);
@@ -223,9 +224,9 @@ public class TypeBuilder extends HaltingVisitor
     }
 
     public TypeBuilder pushAnonClass(Position pos) throws SemanticException {
-        if (! local) {
+        if (! inCode) {
             throw new InternalCompilerError(
-                "Cannot push anonymous class outside method scope.");
+                "Can only push an anonymous class within code.");
         }
 
 	TypeSystem ts = typeSystem();
@@ -268,7 +269,7 @@ public class TypeBuilder extends HaltingVisitor
 
     public String toString() {
         return "(TB " + type +
-                (local ? " local" : "") +
+                (inCode ? " inCode" : "") +
                 (global ? " global" : "") +
                 (outer == null ? ")" : " " + outer.toString());
     }
