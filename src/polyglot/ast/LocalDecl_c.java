@@ -179,7 +179,7 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
 					"\" multiply defined.  " +
 					"Previous definition at " +
 					outerLocal.position() + ".",
-					init.position());
+					position());
 	}
 
         if (init != null) {
