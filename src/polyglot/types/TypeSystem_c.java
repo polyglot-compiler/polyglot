@@ -812,7 +812,7 @@ public class TypeSystem_c implements TypeSystem
         assert_(container);
         assert_(argTypes);
 
-	List acceptable = findAcceptableMethods(container, name, argTypes, currClass);
+	List acceptable = findAcceptableMethods(container, name, argTypes);
 
 	if (acceptable.size() == 0) {
 	    throw new NoMemberException(NoMemberException.METHOD,
@@ -826,9 +826,14 @@ public class TypeSystem_c implements TypeSystem
 	    findProcedure(acceptable, container, argTypes, currClass);
 
 	if (mi == null) {
-	    throw new SemanticException(
-		"Reference to " + name + " is ambiguous, multiple methods match: "
-		+ acceptable);
+	    throw new SemanticException("Reference to " + name +
+					" is ambiguous, multiple methods match: "
+					+ acceptable);
+	}
+		
+	if (! isAccessible(mi, currClass)) {
+	    throw new NoMemberException(NoMemberException.METHOD,
+					"Cannot call inaccessible " + mi + ".");
 	}
 
 	return mi;
@@ -850,7 +855,7 @@ public class TypeSystem_c implements TypeSystem
         assert_(container);
         assert_(argTypes);
 
-	List acceptable = findAcceptableConstructors(container, argTypes, currClass);
+	List acceptable = findAcceptableConstructors(container, argTypes);
 
 	if (acceptable.size() == 0) {
 	    throw new NoMemberException(NoMemberException.CONSTRUCTOR,
@@ -867,6 +872,11 @@ public class TypeSystem_c implements TypeSystem
 		"constructors match: " + acceptable);
 	}
 
+	if (! isAccessible(ci, currClass)) {
+	    throw new NoMemberException(NoMemberException.CONSTRUCTOR,
+					"Cannot invoke inaccessible " + ci + ".");
+	}
+	
 	return ci;
     }
 
@@ -927,7 +937,7 @@ public class TypeSystem_c implements TypeSystem
      * Applicable and Accessible as defined by JLS 15.11.2.1
      */
     protected List findAcceptableMethods(ReferenceType container, String name,
-                                     List argTypes, ClassType currClass)
+                                     List argTypes)
 	throws SemanticException {
 
         assert_(container);
@@ -957,6 +967,8 @@ public class TypeSystem_c implements TypeSystem
 	        throw new SemanticException("Cannot call method in " +
 		    " non-reference type " + type + ".");
 	    }
+	    
+	    boolean stop = false;
 
 	    for (Iterator i = type.toReference().methods().iterator();
 		 i.hasNext(); ) {
@@ -966,22 +978,18 @@ public class TypeSystem_c implements TypeSystem
 		if (Report.should_report(Report.types, 3))
 		    Report.report(3, "Trying " + mi);
 
-		if (methodCallValid(mi, name, argTypes) &&
-		    isAccessible(mi, currClass)) {
-
-		    if (Report.should_report(Report.types, 3))
-	                    Report.report(3, "->acceptable: " + mi +
-	                                      " in " + mi.container());
-
-			acceptable.add(mi);
-		    }
-                        }
-
-	    if (type.toReference().superType() != null) {
-		typeQueue.addLast(type.toReference().superType());
+		if (methodCallValid(mi, name, argTypes)) {
+		    acceptable.add(mi);
+		}
 	    }
-
-	    typeQueue.addAll(type.toReference().interfaces());
+	    
+	    if (! stop) {
+		if (type.toReference().superType() != null) {
+		    typeQueue.addLast(type.toReference().superType());
+		}
+		
+		typeQueue.addAll(type.toReference().interfaces());
+	    }
 	}
     
 	return acceptable;
@@ -992,8 +1000,7 @@ public class TypeSystem_c implements TypeSystem
      * Applicable and Accessible as defined by JLS 15.11.2.1
      */
     protected List findAcceptableConstructors(ClassType container,
-                                              List argTypes,
-                                              ClassType currClass) {
+                                              List argTypes) {
         assert_(container);
         assert_(argTypes);
 
@@ -1010,7 +1017,7 @@ public class TypeSystem_c implements TypeSystem
 	    if (Report.should_report(Report.types, 3))
 		Report.report(3, "Trying " + ci);
 
-	    if (callValid(ci, argTypes) && isAccessible(ci, currClass)) {
+	    if (callValid(ci, argTypes)) {
 		if (Report.should_report(Report.types, 3))
 		    Report.report(3, "->acceptable: " + ci);
 		acceptable.add(ci);
@@ -1217,25 +1224,26 @@ public class TypeSystem_c implements TypeSystem
     }
 
     public ClassType typeForName(String name) throws SemanticException {
-	if (! StringUtil.isNameShort(name)) {
-	    String containerName = StringUtil.getPackageComponent(name);
-	    String shortName = StringUtil.getShortNameComponent(name);
-	    
-	    ClassType container = null;
-	    
-	    try {
-		container = typeForName(containerName);
-	    }
-	    catch (SemanticException e) {
-		// ignore: the container could be a package
-	    }
-	    
-	    if (container != null) {
-		return (ClassType) classContextResolver(container).find(shortName);
-	    }
-	}
-	
-	return (ClassType) systemResolver.find(name);
+        try {
+            return (ClassType) systemResolver.find(name);
+        }
+        catch (SemanticException e) {
+            if (! StringUtil.isNameShort(name)) {
+                String containerName = StringUtil.getPackageComponent(name);
+                String shortName = StringUtil.getShortNameComponent(name);
+                
+                try {
+                    ClassType container = typeForName(containerName);
+                    return (ClassType)
+                        classContextResolver(container).find(shortName);
+                }
+                catch (SemanticException e2) {
+                }
+            }
+
+            // throw the original exception
+            throw e;
+        }
     }
 
     protected ClassType OBJECT_;

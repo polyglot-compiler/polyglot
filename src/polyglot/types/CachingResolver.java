@@ -3,6 +3,7 @@ package polyglot.types;
 import polyglot.util.*;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.main.Report;
+import polyglot.types.Package;
 import java.util.*;
 
 /**
@@ -13,6 +14,8 @@ public class CachingResolver implements TopLevelResolver {
     Map cache;
     Map packageCache;
     ExtensionInfo extInfo;
+
+    static Object NOT_FOUND = new Object();
 
     /**
      * Create a caching resolver.
@@ -35,7 +38,7 @@ public class CachingResolver implements TopLevelResolver {
     public String toString() {
         return "(cache " + inner.toString() + ")";
     }
-    
+
     /**
      * Check if a package exists.
      */
@@ -45,10 +48,36 @@ public class CachingResolver implements TopLevelResolver {
 	    return b.booleanValue();
 	}
 	else {
-	    boolean exists = inner.packageExists(name);
-	    packageCache.put(name, exists ? Boolean.TRUE : Boolean.FALSE);
-	    return exists;
+            String prefix = StringUtil.getPackageComponent(name);
+
+            if (packageCache.get(prefix) == Boolean.FALSE) {
+                packageCache.put(name, Boolean.FALSE);
+                return false;
+            }
+
+            boolean exists = inner.packageExists(name);
+
+            if (exists) {
+                packageCache.put(name, Boolean.TRUE);
+
+                do {
+                    packageCache.put(prefix, Boolean.TRUE);
+                    prefix = StringUtil.getPackageComponent(prefix);
+                } while (! prefix.equals(""));
+            }
+            else {
+                packageCache.put(name, Boolean.FALSE);
+            }
+
+            return exists;
 	}
+    }
+
+    protected void cachePackage(Package p) {
+        if (p != null) {
+            packageCache.put(p.fullName(), Boolean.TRUE);
+            cachePackage(p.prefix());
+        }
     }
     
     /**
@@ -59,13 +88,27 @@ public class CachingResolver implements TopLevelResolver {
         if (Report.should_report(TOPICS, 2))
             Report.report(2, "CachingResolver: find: " + name);
 
-        Named q = (Named) cache.get(name);
+        Object o = cache.get(name);
+
+        if (o == NOT_FOUND) {
+            throw new NoClassException(name);
+        }
+
+        Named q = (Named) o;
 
 	if (q == null) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "CachingResolver: not cached: " + name);
-	    q = inner.find(name);
-	    cache.put(name, q);
+
+            try {
+                q = inner.find(name);
+                cache.put(name, q);
+            }
+            catch (NoClassException e) {
+                cache.put(name, NOT_FOUND);
+                throw e;
+            }
+
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "CachingResolver: loaded: " + name);
 	}
@@ -76,6 +119,11 @@ public class CachingResolver implements TopLevelResolver {
         
         if (q instanceof ParsedClassType) {
             extInfo.addDependencyToCurrentJob(((ParsedClassType)q).fromSource());
+        }
+
+        if (q instanceof ClassType) {
+            Package p = ((ClassType) q).package_();
+            cachePackage(p);
         }
 
 	if (q instanceof Type && packageExists(name)) {
