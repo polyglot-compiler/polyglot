@@ -16,7 +16,7 @@ import jltools.util.InternalCompilerError;
  *    a type.
  **/
 public class FieldInstance extends VariableInstance
-  implements Cloneable, TypeInstance, java.io.Serializable 
+  implements Cloneable, java.io.Serializable 
 {
   static final long serialVersionUID = -3339170626027684669L;
 

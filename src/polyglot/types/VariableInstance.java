@@ -15,7 +15,10 @@ import jltools.util.InternalCompilerError;
  *    associated with a Java variable: a name and a type.
  **/
 public abstract class VariableInstance extends AnnotatedObject 
+  implements Cloneable, TypeInstance, java.io.Serializable
 {
+  static final long serialVersionUID = 7947688323544252267L;
+
   public VariableInstance(String name, Type type, AccessFlags flags) {
     this.name = name;
     this.type = type;
