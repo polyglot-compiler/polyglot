@@ -31,7 +31,7 @@ your path.
 Creating an extension
 ---------------------
 
-To create your own extensions, see the file doc/overview.txt.
+To create your own extensions, see the file doc/Overview.txt.
 
 Building Polyglot
 -----------------
@@ -84,7 +84,7 @@ On Windows, do:
 
     $ set CLASSPATH=%CLASSPATH%;$POLYGLOT\polyglot.jar;$POLYGLOT\java_cup.jar
 
-4. You are now ready to try out Polyglot.  See doc/overview.txt for
+4. You are now ready to try out Polyglot.  See doc/Overview.txt for
 instructions on building an extension.  To compile using an existing
 extension do:
 
