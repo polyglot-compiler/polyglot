@@ -188,11 +188,16 @@ public class Try_c extends Stmt_c implements Try
             // by the finally block. Examining the finally-block's reachability
             // will tell us if the finally-block can complete normally.
             if (!this.finallyBlock.reachable()) {
+
                 // warn the user, and remove all the exceptions that have
                 // been added by the try and catch blocks.
-                ec.errorQueue().enqueue(ErrorInfo.WARNING,
-                       "The finally block cannot complete normally", 
-                       finallyBlock.position());
+
+                if (false) {
+                      // don't warn the user; javac doesn't
+                      ec.errorQueue().enqueue(ErrorInfo.WARNING,
+                            "The finally block cannot complete normally", 
+                            finallyBlock.position());
+                }
                 
                 thrown.clear();
             }
