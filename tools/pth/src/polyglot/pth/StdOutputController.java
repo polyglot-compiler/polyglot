@@ -56,13 +56,32 @@ public class StdOutputController extends OutputController{
         out.print("Test script \"" + tsr.testName + "\"");
         out.println("    Last run: " + getDateDisplay(tsr.dateTestRun));
         out.println("  Contains tests:");
+        
+        int total = 0;
+        int lastSuccess = 0;
+        int neverRun = 0;
+        int neverSuccess = 0;
         for (Iterator iter = tsr.testResults.keySet().iterator(); iter.hasNext(); ) {
             String testName = (String)iter.next();
             TestResult tr = (TestResult)tsr.testResults.get(testName);
             if (TestSuite.executeTest(testName, tr)) {
                 displayTestResults(tr);
             }
+            total++;
+            if (tr.dateLastSuccess != null && tr.dateLastSuccess.equals(tr.dateTestRun)) {
+                lastSuccess++;
+            }
+            if (tr.dateTestRun == null) {
+                neverRun++;
+            }
+            if (tr.dateLastSuccess == null) {
+                neverSuccess++;
+            }
         }
+        out.println("Total tests: " + total);
+        out.println("   Succeeded last run: " + lastSuccess);
+        out.println("   Never run         : " + neverRun);
+        out.println("   Never succeeded   : " + neverSuccess);
     }
 
     public void displayTestResults(TestResult tr) {

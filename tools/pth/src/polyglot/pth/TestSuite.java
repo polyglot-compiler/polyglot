@@ -49,19 +49,22 @@ public class TestSuite extends AbstractTest {
             this.setTestResult(this.createTestResult(null));
         }        
         
+        Map oldTestResults = new HashMap(this.getTestSuiteResult().testResults);
+        this.getTestSuiteResult().testResults.clear();
+        
         for (Iterator i = tests.iterator(); i.hasNext(); ) {
             Test t = (Test)i.next();
             
-            if (executeTest(t)) {
+            TestResult tr = (TestResult)oldTestResults.get(t.getName());
+            if (executeTest(t.getName(), tr)) {
                 totalTests++;
-                TestResult tr = (TestResult)this.getTestSuiteResult().testResults.get(t.getName());
                 if (tr != null) {
                     t.setTestResult(tr);
                 }
                 boolean result = t.run();            
                 okay = okay && result;
                 
-                this.getTestSuiteResult().testResults.put(t.getName(), t.getTestResult());
+                tr = t.getTestResult();
                 
                 if (!result && haltOnFirstFailure) {
                     break;
@@ -70,6 +73,7 @@ public class TestSuite extends AbstractTest {
                     successfulTests++;
                 }
             }
+            this.getTestSuiteResult().testResults.put(t.getName(), tr);
         }        
         return okay;
     }
@@ -82,11 +86,6 @@ public class TestSuite extends AbstractTest {
     }
     public int getFailedTestCount() {
         return totalTests - successfulTests;
-    }
-
-    protected boolean executeTest(Test t) {
-        return executeTest(t.getName(), 
-                          (TestResult)getTestSuiteResult().testResults.get(t.getName()));
     }
     
     protected static boolean executeTest(String testName, TestResult tr) {

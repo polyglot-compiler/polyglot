@@ -70,7 +70,7 @@ public class ScriptTestSuite extends TestSuite {
             // ignore, and fail silently
         }
         catch (ClassNotFoundException e) { 
-            // ignore, and fail silently
+            System.err.println("Unable to load results for test suite " + this.getName() + ": " + e.getMessage());
         }
         catch (IOException e) {
             System.err.println("Unable to load results for test suite " + this.getName() + ": " + e.getMessage());
