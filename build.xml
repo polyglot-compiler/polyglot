@@ -344,11 +344,19 @@
     </antcall>
   </target>
 
+  <target name="coffer" depends="param">
+    <antcall target="standard-ext">
+      <param name="ext" value="coffer"/>
+      <param name="parser.type" value="ppg"/>
+    </antcall>
+  </target>
+
   <target name="polyglot-dist" depends="jl,pao"/>
   <target name="jif-dist" depends="jif"/>
   <target name="split-dist" depends="split"/>
   <target name="polyj-dist" depends="polyj"/>
   <target name="jmatch-dist" depends="jmatch"/>
+  <target name="coffer-dist" depends="coffer"/>
 
 </project>
 
