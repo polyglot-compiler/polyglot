@@ -2,9 +2,9 @@ LOG=log
 
 GOOD =  \
 	ArrayInit.jl \
-	Assignment.jl \
-	Assignment2.jl \
-	Assignment3.jl \
+	Init1.jl \
+	Init2.jl \
+	Init3.jl \
 	Ctor.jl \
 	Dep1.jl \
 	Equality.jl \
@@ -39,6 +39,12 @@ BAD = \
 	NoInit4.jl \
 	NoInit5.jl \
 	NoInit6.jl \
+	NoInit7.jl \
+	NoInit8.jl \
+	NoInit9.jl \
+	NoInit10.jl \
+	NoInit11.jl \
+	NoInit12.jl \
 	NoReturns.jl \
 	Unreachable1.jl \
 	Unreachable2.jl \

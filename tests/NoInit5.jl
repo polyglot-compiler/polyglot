@@ -14,6 +14,13 @@ public class NoInit5 {
     foo(i); // OK
   }
 
+  void m5b() {
+    int i;
+    if (true)
+      i = 1;
+    i = 0;
+  }
+
   void m5() {
     int i;
     boolean b = true;
