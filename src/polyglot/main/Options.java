@@ -37,9 +37,6 @@ public class Options {
     public String source_ext = null; // e.g., java, jl, pj
     public String output_ext = "java"; // java, by default
     public boolean output_stdout = false; // whether to output to stdout
-    public boolean no_source_check = false;
-      // If a class file is available for a type, use it, even if a newer
-      // source is available.  This is not safe with some extensions
     public String post_compiler;
       // compiler to run on java output file
   
@@ -277,11 +274,6 @@ public class Options {
                                  // set the output_width to a large number
                                  // to reduce the time spent pretty-printing 
         }
-        else if (args[i].equals("-nosourcecheck")) 
-        {
-            i++;
-            no_source_check = true;
-        }
         else if (args[i].equals("-v") || args[i].equals("-verbose"))
         {
             i++;
@@ -331,11 +323,13 @@ public class Options {
                            + " names");
         out.println(" -sx <ext>               set source extension");
         out.println(" -ox <ext>               set output extension");
+        out.println(" -errors <num>           set the maximum number of errors");
+        out.println(" -w <num>                set the maximum width of the .java output files");
         out.println(" -dump <pass>            dump the ast after " +
                            "pass <pass>");
         out.println(" -disable <pass>         disable pass <pass>");
-        out.println(" -scramble [seed]        scramble the ast " +
-                       "(for testing)");
+//        out.println(" -scramble [seed]        scramble the ast " +
+//                       "(for testing)");
         out.println(" -noserial               disable class"
                            + " serialization");
         out.println(" -nooutput               delete output files after" +
