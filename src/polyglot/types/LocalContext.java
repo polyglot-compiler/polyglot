@@ -336,7 +336,7 @@ public class LocalContext implements TypeContext
 	}
       }
       else {
-	  throw new InternalCompilerError("Top scope is not a class scope");
+	  throw new InternalCompilerError("Innermost scope is not a class scope");
       }
     }
     catch (EmptyStackException ese ) { 
@@ -362,7 +362,7 @@ public class LocalContext implements TypeContext
 	  scopes.pop();
       }
       else {
-	  throw new InternalCompilerError("Top scope is not a block scope!");
+	  throw new InternalCompilerError("Innermost scope is not a block scope!");
       }
     }
     catch (EmptyStackException ese ) { 
@@ -388,7 +388,7 @@ public class LocalContext implements TypeContext
 	  scopes.pop();
       }
       else {
-	  throw new InternalCompilerError("Top scope is not a method scope!");
+	  throw new InternalCompilerError("Innermost scope is not a method scope!");
       }
     }
     catch (EmptyStackException ese ) { 
