@@ -116,7 +116,6 @@ public class TypeBuilder extends HaltingVisitor
 	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
 		                 e.getMessage(), position);
                          
-                        
             return this;
 	}
     }
@@ -164,7 +163,9 @@ public class TypeBuilder extends HaltingVisitor
         return tb;
     }
 
-    protected ParsedClassType newClass(Position pos, Flags flags, String name) {
+    protected ParsedClassType newClass(Position pos, Flags flags, String name)
+        throws SemanticException
+    {
 	TypeSystem ts = typeSystem();
 
         ParsedClassType ct = ts.createClassType(this.job.source());
@@ -205,9 +206,10 @@ public class TypeBuilder extends HaltingVisitor
                 allMembers = allMembers && 
                         (container.isMember() || container.isTopLevel());
             }
+
             if (allMembers) {
                 typeSystem().parsedResolver().addNamed(
-                        typeSystem().getTransformedClassName(ct), ct);
+                    typeSystem().getTransformedClassName(ct), ct);
             }
 
 	    return ct;
@@ -222,7 +224,20 @@ public class TypeBuilder extends HaltingVisitor
 	      	ct.package_(currentPackage());
 	    }
 
-	    typeSystem().parsedResolver().addNamed(ct.fullName(), ct);
+            Named dup = null;
+
+            try {
+                dup = typeSystem().parsedResolver().find(ct.fullName());
+            }
+            catch (SemanticException e) {
+            }
+
+            if (dup != null) {
+                throw new SemanticException("Duplicate class \"" +
+                                            ct.fullName() + "\".", pos);
+            }
+
+            typeSystem().parsedResolver().addNamed(ct.fullName(), ct);
 
 	    return ct;
 	}

@@ -158,7 +158,10 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
 	ParsedClassType type = tb.currentClass();        
-        return type(type).flags(type.flags());
+        if (type != null) {
+            return type(type).flags(type.flags());
+        }
+        return this;
     }
 
     public Context enterScope(Node child, Context c) {
