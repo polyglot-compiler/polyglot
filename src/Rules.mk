@@ -22,7 +22,7 @@ JAVADOC_OUTPUT		= $(SOURCE)/javadoc
 JAVADOC_FLAGS		= -mx40m -ms40m -classpath "$(JAVADOC_CLASSPATH)"
 
 SOURCEPATH		= $(SOURCE)
-BIN 			= $(SOURCE)
+BIN 			= $(SOURCE)/bin
 PACKAGEPATH		= $(SOURCE)/classes/$(PACKAGE)
 VPATH			= $(PACKAGEPATH)
 
