@@ -4,9 +4,9 @@
 
 package jltools.ast;
 
-
+import jltools.frontend.Compiler;
 import jltools.types.*;
-import jltools.util.CodeWriter;
+import jltools.util.*;
 import jltools.visit.SymbolReader;
 
 /**
@@ -74,8 +74,10 @@ public class ImportNode extends Node {
 
   public void translate(LocalContext c, CodeWriter w)
   {
-    w.write("import " + imports+ (type == PACKAGE ? ".*;" : ";" ));
-    w.newline(0);
+    if( !Compiler.useFullyQualifiedNames()) {
+      w.write("import " + imports+ (type == PACKAGE ? ".*;" : ";" ));
+      w.newline(0);
+    }
   }
 
   public Node dump( CodeWriter w)
@@ -109,7 +111,8 @@ public class ImportNode extends Node {
     return this;
   }
 
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) {
+    return Annotate.getVisitorInfo( this);
   }
 
   public Node copy() {

@@ -113,6 +113,10 @@ public class StandardTypeSystem extends TypeSystem {
     // childType is primitive.
     if (childType instanceof PrimitiveType &&
 	ancestorType instanceof PrimitiveType) {
+      
+      if( ((PrimitiveType)childType).isVoid()) {
+        return false;
+      }
 
       PrimitiveType c = (PrimitiveType)childType,
         a = (PrimitiveType)ancestorType;
@@ -281,7 +285,8 @@ public class StandardTypeSystem extends TypeSystem {
       // ...and numeric.
       switch (ptFromType.getKind()) 
 	{
-	  
+	case PrimitiveType.VOID:
+          return false;
 	case PrimitiveType.BYTE:
 	case PrimitiveType.SHORT:
 	case PrimitiveType.CHAR:
@@ -741,22 +746,73 @@ public class StandardTypeSystem extends TypeSystem {
     if (( type1 instanceof PrimitiveType ) &&
         ( type2 instanceof PrimitiveType ))
     {
-      return new PrimitiveType( this, Math.max ( ((PrimitiveType) type1).getKind(), 
-                                                 ((PrimitiveType) type2).getKind() ));
-    }
-    if (!( type1 instanceof ClassType) ||
-        !( type2 instanceof ClassType))
-      throw new TypeCheckException ( " No least common ancestor found; the type \"" + type1.getTypeString() + 
-                                     "\" is not compatible with the type \"" +  type2.getTypeString() + "\"");
+      if( ((PrimitiveType)type1).isBoolean()) {
+        if( ((PrimitiveType)type2).isBoolean()) {
+          return getBoolean();
+        }
+        else {
+          throw new TypeCheckException( 
+                       "No least common ancestor found. The type \"" 
+                       + type1.getTypeString() + 
+                       "\" is not compatible with the type \"" 
+                       + type2.getTypeString() + "\"."); 
+        }
 
+      }
+      if( ((PrimitiveType)type2).isBoolean()) {
+        throw new TypeCheckException( 
+                       "No least common ancestor found. The type \"" 
+                       + type1.getTypeString() + 
+                       "\" is not compatible with the type \"" 
+                       + type2.getTypeString() + "\"."); 
+      }
+      if( ((PrimitiveType)type1).isVoid()) {
+        if( ((PrimitiveType)type2).isVoid()) {
+          return getVoid();
+        }
+        else {
+          throw new TypeCheckException( 
+                       "No least common ancestor found. The type \"" 
+                       + type1.getTypeString() + 
+                       "\" is not compatible with the type \"" 
+                       + type2.getTypeString() + "\"."); 
+        }
+      }
+      if( ((PrimitiveType)type2).isVoid()) {
+        throw new TypeCheckException( 
+                       "No least common ancestor found. The type \"" 
+                       + type1.getTypeString() + 
+                       "\" is not compatible with the type \"" 
+                       + type2.getTypeString() + "\"."); 
+      } 
+      
+      return new PrimitiveType( this, Math.max ( 
+                                        ((PrimitiveType) type1).getKind(), 
+                                        ((PrimitiveType) type2).getKind() ));
+    }
+      
+    if (!( type1 instanceof ClassType) ||
+        !( type2 instanceof ClassType)) {
+      throw new TypeCheckException( 
+                       "No least common ancestor found. The type \"" 
+                       + type1.getTypeString() + 
+                       "\" is not compatible with the type \"" 
+                       + type2.getTypeString() + "\"."); 
+    }
     
     ClassType tSuper = (ClassType)type1;
     
-    while ( ! type2.descendsFrom ( tSuper ) && tSuper != null)
+    while ( ! type2.descendsFrom ( tSuper ) && tSuper != null) {
       tSuper = (ClassType)tSuper.getSuperType();
-    if ( tSuper == null)
-      throw new TypeCheckException ( " No least common ancestor found; the type \"" + type1.getTypeString() + 
-                                     "\" is not compatible with the type \"" +  type2.getTypeString() + "\"");
+    }
+
+    if ( tSuper == null) {
+      throw new TypeCheckException( 
+                       "No least common ancestor found. The type \"" 
+                       + type1.getTypeString() + 
+                       "\" is not compatible with the type \"" 
+                       + type2.getTypeString() + "\"."); 
+    }
     return tSuper;
                                            
   }

@@ -53,11 +53,15 @@ public class ArrayIndexExpression extends Expression {
     index = newIndex;
   }
 
+  public int getPrecedence()
+  {
+    return PRECEDENCE_OTHER;
+  }
+
   public void translate( LocalContext c, CodeWriter w)
   {
-    w.write ("(");
-    base.translate(c, w);
-    w.write (")");
+    translateExpression( base, c, w);
+
     w.write ("[");
     index.translate(c, w);
     w.write ("]");
@@ -75,9 +79,9 @@ public class ArrayIndexExpression extends Expression {
   {
     Type btype = base.getCheckedType();
     if ( !(btype instanceof ArrayType)) {
-      setError(ErrorInfo.SEMANTIC_ERROR, 
+      throw new TypeCheckException(  
                     "Subscript can only follow an array type.");
-      setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+      //   setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
     }
     else {
       setCheckedType( ((ArrayType)btype).getBaseType());
@@ -85,7 +89,7 @@ public class ArrayIndexExpression extends Expression {
 
     Type itype = index.getCheckedType();
     if ( !itype.isImplicitCastValid( c.getTypeSystem().getInt())) {
-      setError(ErrorInfo.SEMANTIC_ERROR,
+      throw new TypeCheckException(
                     "Array subscript must be an integer.");
     } 
 
@@ -102,9 +106,14 @@ public class ArrayIndexExpression extends Expression {
    *
    * Effects: visits the children of this with v.
    */  
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
     base = (Expression) base.visit(v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( base), vinfo);
+
     index = (Expression) index.visit(v);
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( index), vinfo);
   }
 
   public Node copy() {

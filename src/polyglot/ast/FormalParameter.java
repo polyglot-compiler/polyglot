@@ -132,9 +132,11 @@ public class FormalParameter extends Node {
     return this;
   }
   
-  public void visitChildren(NodeVisitor v)
+  Object visitChildren(NodeVisitor v)
   {
     type.visit(v);
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( this),
+                               Annotate.getVisitorInfo( type));
   }
   
   public Node copy()

@@ -363,17 +363,30 @@ public class MethodNode extends ClassMember {
     return this;
   }
 
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+    
     returnType = (TypeNode)returnType.visit( v);
-    for (Iterator i = formals.iterator(); i.hasNext(); )
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( returnType), vinfo);
+    
+    for (ListIterator i = formals.listIterator(); i.hasNext(); )
     {
-      ((FormalParameter)i.next()).visit(v);
+      FormalParameter f = (FormalParameter)i.next();
+      f = (FormalParameter)f.visit( v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( f), vinfo);
+      i.set( f);
     }
-    for (Iterator i = exceptions.iterator(); i.hasNext(); )
+    for (ListIterator i = exceptions.listIterator(); i.hasNext(); )
     {
-      ((TypeNode)i.next()).visit(v);
+      TypeNode t = (TypeNode)i.next();
+      t = (TypeNode)t.visit( v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( t), vinfo);
+      i.set( t);
     }
+
     body = (BlockStatement) body.visit(v); 
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( body), vinfo);
   }
 
   public Node copy() {

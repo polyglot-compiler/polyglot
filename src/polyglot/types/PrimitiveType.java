@@ -91,6 +91,10 @@ public class PrimitiveType extends Type {
     return (kind == BOOLEAN);
   }
 
+  public boolean isVoid() {
+    return (kind == VOID);
+  }
+
   public boolean equals(Object o) {
     if (! (o instanceof PrimitiveType)) return false;
     PrimitiveType pt = (PrimitiveType) o;

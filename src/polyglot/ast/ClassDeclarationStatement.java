@@ -4,7 +4,7 @@
 
 package jltools.ast;
 
-import jltools.util.CodeWriter;
+import jltools.util.*;
 import jltools.types.LocalContext;
 
 /**
@@ -65,8 +65,11 @@ public class ClassDeclarationStatement extends Statement {
    *
    * Effects: visits each of the children of this with <v>.  
    */
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
     classNode = (ClassNode) classNode.visit(v);
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( this),
+                               Annotate.getVisitorInfo( classNode));
   }
 
   public Node copy() {

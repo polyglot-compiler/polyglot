@@ -84,7 +84,10 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     return copy();
   }
   
-  public void visitChildren(NodeVisitor vis) { }
+  Object visitChildren(NodeVisitor vis) 
+  { 
+    return Annotate.getVisitorInfo( this);
+  }
 
   public void translate( LocalContext c, CodeWriter w)
   {

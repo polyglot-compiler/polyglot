@@ -85,9 +85,9 @@ public class IfStatement extends Statement {
     bThenBlockStatement = thenStatement instanceof BlockStatement;
     bElseBlockStatement = elseStatement instanceof BlockStatement;
     
-    w.write ( "if ( " ) ;
+    w.write ( "if( " ) ;
     condExpr.translate ( c, w);
-    w.write ( " ) " );
+    w.write ( ")" );
     if (! bThenBlockStatement)
     {
       w.beginBlock();
@@ -98,15 +98,16 @@ public class IfStatement extends Statement {
       thenStatement.translate(c, w);
     if ( elseStatement != null)
     {
-      w.write ( " else " );
+      w.write ( "else" );
       if (! bElseBlockStatement)
       {
         w.beginBlock();
         elseStatement.translate(c, w);
         w.endBlock();
       }
-      else
+      else {
         elseStatement.translate(c,w );
+      }
     }
 
   }
@@ -150,12 +151,18 @@ public class IfStatement extends Statement {
    *    returns an expression in place of one of the sub-statements, it is
    *    wrapped in an ExpressionStatement.
    */
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
     condExpr = (Expression) condExpr.visit(v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( condExpr), vinfo);
+
     Node newNode;
 
     if( thenStatement != null) {
       newNode = (Node) thenStatement.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newNode), vinfo);
       if (newNode instanceof Expression) {
         thenStatement = new ExpressionStatement((Expression) newNode);
       }
@@ -167,6 +174,7 @@ public class IfStatement extends Statement {
     if( elseStatement != null)
     {
       newNode = (Node) elseStatement.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newNode), vinfo);
       if (newNode instanceof Expression) {
         elseStatement = new ExpressionStatement((Expression) newNode);
       }
@@ -174,6 +182,8 @@ public class IfStatement extends Statement {
         elseStatement = (Statement) newNode;
       }
     }
+
+    return vinfo;
   }
 
   public Node copy() {
@@ -183,9 +193,11 @@ public class IfStatement extends Statement {
   }
 
   public Node deepCopy() {
+    Statement newElseStatement = 
+      (elseStatement == null ? null : (Statement)elseStatement.deepCopy());
     IfStatement is = new IfStatement((Expression) condExpr.deepCopy(),
 				     (Statement) thenStatement.deepCopy(),
-				     (Statement) elseStatement.deepCopy());
+				     newElseStatement);
     is.copyAnnotationsFrom(this);
     return is;
   }

@@ -24,17 +24,17 @@ public class TypeChecker extends NodeVisitor
     return n.adjustScope( c);
   }
 
-  public Node visitAfter( Node n)
+  public Node visitAfter( Node n, Object vinfo)
   {
-    if( errorFlag) {
+    if( vinfo != null) {
       /* We've seen some error, so propagate back to a statement. */
-      if( n instanceof Expression) {
+      if( n instanceof Expression || n instanceof TypeNode) {
+        Annotate.setVisitorInfo( n, vinfo);
         return n;
       }
       else
       {
         /* We've hit a statement, so unset the flag and continue. */
-        errorFlag = false;
         return n;
       }
     }
@@ -48,13 +48,23 @@ public class TypeChecker extends NodeVisitor
     {
       int iLine = e.getLineNumber();
       iLine = (iLine == e.INVALID_LINE ? Annotate.getLineNumber( n ) : iLine );
-
+    
       eq.enqueue( ErrorInfo.SEMANTIC_ERROR, 
                   e.getMessage(),
                   iLine);
-
-      errorFlag = true;
+      
+      Annotate.setVisitorInfo( n, this);
       return n;
+    }
+  }
+    
+  public Object mergeVisitorInfo( Object vinfo1, Object vinfo2)
+  {
+    if( vinfo1 == null && vinfo2 == null) {
+      return null;
+    }
+    else {
+      return this;
     }
   }
 }

@@ -4,7 +4,7 @@
 
 package jltools.ast;
 
-import jltools.util.CodeWriter;
+import jltools.util.*;
 import jltools.types.LocalContext;
 
 import jltools.util.Assert;
@@ -42,8 +42,11 @@ public class ExpressionStatement extends Statement {
    * Requires: v will not transform an Expression into anything other than an
    *    Expression.
    **/
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
     expression = (Expression) expression.visit(v);
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( this),
+                               Annotate.getVisitorInfo( expression));
   }
 
   public void translate(LocalContext c, CodeWriter w)

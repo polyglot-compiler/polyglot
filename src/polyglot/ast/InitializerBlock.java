@@ -6,7 +6,7 @@ package jltools.ast;
 
 import jltools.types.LocalContext;
 import jltools.visit.SymbolReader;
-import jltools.util.CodeWriter;
+import jltools.util.*;
 
 /**
  * Overview: An InitializerBlock is a mutable representation of an
@@ -88,8 +88,11 @@ public class InitializerBlock extends ClassMember {
     return this;
   }
 
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
     block = (BlockStatement) block.visit(v);
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( this),
+                               Annotate.getVisitorInfo( block));
   }
 
   public Node copy() {

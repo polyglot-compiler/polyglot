@@ -38,4 +38,14 @@ public abstract class NodeVisitor
    {
       return n;
    }
+
+  public Node visitAfter(Node n, Object vinfo)
+  {
+    return visitAfter( n);
+  }
+
+  public Object mergeVisitorInfo( Object vinfo1, Object vinfo2)
+  {
+    return null;
+  }
 }

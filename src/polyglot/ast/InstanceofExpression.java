@@ -5,7 +5,7 @@
 package jltools.ast;
 
 import jltools.types.*;
-import jltools.util.CodeWriter;
+import jltools.util.*;
 
 
 /**
@@ -75,10 +75,9 @@ public class InstanceofExpression extends Expression {
 
   public void translate(LocalContext c, CodeWriter w)
   {
-    w.write( "(");
-    expr.translate(c, w);
+    translateExpression( expr, c, w);
+
     w.write( " instanceof " + type.getType().getTypeString());
-    w.write( ") ");
   }
 
   public Node dump( CodeWriter w)
@@ -87,6 +86,11 @@ public class InstanceofExpression extends Expression {
     dumpNodeInfo( w);
     w.write( ")");
     return null;
+  }
+
+  public int getPrecedence()
+  {
+    return PRECEDENCE_INSTANCE;
   }
 
   public Node typeCheck( LocalContext c) throws TypeCheckException
@@ -115,9 +119,15 @@ public class InstanceofExpression extends Expression {
    * Effects:
    *     Visits the subexpression of this.
    */
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
     type = (TypeNode) type.visit(v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( type), vinfo);
+
     expr = (Expression) expr.visit(v);
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( expr), vinfo);
   }
 
   public Node copy() {
@@ -134,7 +144,7 @@ public class InstanceofExpression extends Expression {
     return ie;
   }
 
-  private Expression expr;
-  private TypeNode type;
+  protected Expression expr;
+  protected TypeNode type;
 }
   

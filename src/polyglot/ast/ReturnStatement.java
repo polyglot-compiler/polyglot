@@ -39,14 +39,25 @@ public class ReturnStatement extends Statement {
    * Requires: v will not transform the expression into anything other than
    *   another expression.
    */
-  public void visitChildren(NodeVisitor v) {
-    expr = (Expression) expr.visit(v);
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+    
+    if( expr != null) {
+      expr = (Expression) expr.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( expr), vinfo);
+    }
+
+    return vinfo;
   }
   
   public void translate(LocalContext c, CodeWriter w)
   {
-    w.write("return ") ;
-    expr.translate(c, w);
+    w.write("return") ;
+    if( expr != null) {
+      w.write( " ");
+      expr.translate(c, w);
+    }
     w.write(";");
   }
 

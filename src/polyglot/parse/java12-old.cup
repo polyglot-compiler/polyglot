@@ -1608,11 +1608,19 @@ relational_expression ::=
 			{: RESULT = (Expression)Grm.ln(
 				new BinaryExpression(a,
 				BinaryExpression.GE, b), a); :}
+	|	relational_expression:a INSTANCEOF type:b
+			{: RESULT = (Expression)Grm.ln(
+				new ObjectPrimitiveInstanceofExpression(a,
+				b), a); :}
+	;
+
+/*
 	|	relational_expression:a INSTANCEOF reference_type:b
 			{: RESULT = (Expression)Grm.ln(
 				new InstanceofExpression(a,
 				b), a); :}
-	;
+*/
+	
 equality_expression ::=
 					// Expression
 		relational_expression:a

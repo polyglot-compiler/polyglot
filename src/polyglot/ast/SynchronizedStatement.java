@@ -56,11 +56,16 @@ public class SynchronizedStatement extends Statement {
     body = newBody;
   }
 
-   void visitChildren(NodeVisitor vis)
-   {
-    expr = (Expression) expr.visit(vis);
-    body = (BlockStatement) body.visit(vis);
-   }
+  Object visitChildren(NodeVisitor v)
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
+    expr = (Expression) expr.visit( v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( expr), vinfo);
+
+    body = (BlockStatement) body.visit( v);;
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( body), vinfo);
+  }
 
    public Node typeCheck(LocalContext c) throws TypeCheckException
    {

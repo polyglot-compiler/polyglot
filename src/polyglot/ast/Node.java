@@ -41,23 +41,27 @@ public abstract class Node extends jltools.util.AnnotatedObject {
   public abstract Node deepCopy();
   
   /**
-   * void visitChildren(NodeVisitor vis)
+   * Object visitChildren(NodeVisitor vis)
    *
    * Used by the subclasses of NodeVisitor.  Applies accept(vis) to
    * every child of this node, replacing that child with the return value.
    **/
-  abstract void visitChildren(NodeVisitor vis);
+  abstract Object visitChildren(NodeVisitor vis);
 
   public Node visit(NodeVisitor vis)
   {
     Node n;
-    
+
+    Annotate.removeVisitorInfo( this);
+
     n = vis.visitBefore(this);
-    if(n != null)
+
+    if(n != null) {
       return n;
+    }
     else {
-      visitChildren(vis);
-      return vis.visitAfter(this);
+      Object vinfo = visitChildren(vis);
+      return vis.visitAfter( this, vinfo);
     }
   }
   
@@ -71,7 +75,6 @@ public abstract class Node extends jltools.util.AnnotatedObject {
     */
    public void dumpNodeInfo( CodeWriter w)
    {
-      //FIXME: Do this
      Type type = Annotate.getCheckedType( this);
      if( type != null) {
        w.write( "T: " + type.getTypeString() + " ");
@@ -79,6 +82,10 @@ public abstract class Node extends jltools.util.AnnotatedObject {
      type = Annotate.getExpectedType( this);
      if( type != null) {
        w.write( "E: " + type.getTypeString() + " ");
+     }
+     Object o = Annotate.getVisitorInfo( this);
+     if( o != null) {
+       w.write( "ERROR ");
      }
    }
 
@@ -130,17 +137,6 @@ public abstract class Node extends jltools.util.AnnotatedObject {
       newList.add( ((Node) it.next()).deepCopy() );
     }
     return newList;
-  }
-
-  
-  public void setError(int errType, String errMsg)
-  {
-    ErrorInfo e = new ErrorInfo(errType, errMsg, 
-                                  Annotate.getLineNumber( this));
-    Annotate.addError(this, e);
-    
-    // FIXME
-    //Compiler.enqueueError( e);
   }
 
   public void addThrows( SubtypeSet s ) 

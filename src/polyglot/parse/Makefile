@@ -18,4 +18,4 @@ $(prs_package)/sym.class: $(prs_package)/sym.java
 $(prs_package)/Grm.java $(prs_package)/sym.java:  $(prs_package)/java12.cup
 	cd $(prs_package) && awk 'BEGIN {FS = "\n"; s = 1} \
 		{print $$1, "\t // ", s++}' java12.cup | \
-		$(JAVA) $(CLASSPATH) java_cup.Main -parser Grm 
+		$(JAVA) $(CLASSPATHFLAG) java_cup.Main -parser Grm 

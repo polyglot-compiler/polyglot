@@ -4,14 +4,11 @@
 
 package jltools.ast;
 
-import jltools.util.TypedList;
-import jltools.util.TypedListIterator;
-import jltools.types.LocalContext;
-import jltools.util.CodeWriter;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.ListIterator;
+import jltools.types.*;
+import jltools.util.*;
+
+import java.util.*;
+
 
 /**
  * ForStatement
@@ -88,7 +85,7 @@ public class ForStatement extends Statement {
   {
     boolean writeSemicolon = true;
     
-    w.write ( "for ( " );
+    w.write ( "for( " );
     
     for ( ListIterator iter = initializers.listIterator(); iter.hasNext(); )
     {
@@ -125,7 +122,7 @@ public class ForStatement extends Statement {
       if (iter.hasNext())
         w.write (", " );
     }
-    w.write ( " ) " );
+    w.write ( ")" );
     
     if(!(body instanceof BlockStatement))
     {
@@ -151,10 +148,14 @@ public class ForStatement extends Statement {
     return this;
   }
 
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
     for(ListIterator iter = initializers.listIterator(); iter.hasNext(); ) {
       Statement stat = (Statement) iter.next();
       Statement newStat = (Statement) stat.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newStat), vinfo);
       if (stat != newStat)
         iter.set(newStat);
     }
@@ -162,10 +163,14 @@ public class ForStatement extends Statement {
     for(ListIterator iter = incrementors.listIterator(); iter.hasNext(); ) {
       Statement stat = (Statement) iter.next();
       Statement newStat = (Statement) stat.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newStat), vinfo);
       if (stat != newStat)
         iter.set(newStat);
     }
     body = (Statement) body.visit(v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( body), vinfo);
+    
+    return vinfo;
   }
 
   public Node copy() {

@@ -6,15 +6,9 @@ package jltools.ast;
 
 import jltools.types.Type;
 import jltools.types.LocalContext;
-import jltools.util.CodeWriter;
-import jltools.util.TypedListIterator;
-import jltools.util.TypedList;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.ArrayList;
-import java.util.List;
+import jltools.util.*;
 
-
+import java.util.*;
 
 
 /**
@@ -175,9 +169,14 @@ public class NewArrayExpression extends Expression {
 				 false);
   }
 
+  public int getPrecedence()
+  {
+    return PRECEDENCE_OTHER;
+  }
+
   public void translate(LocalContext c, CodeWriter w)
   {
-    w.write ("(new ");
+    w.write ("new ");
     type.translate(c, w);
     for (ListIterator i = dimensionExpressions.listIterator(); i.hasNext(); )
     {
@@ -193,8 +192,7 @@ public class NewArrayExpression extends Expression {
     {
       initializer.translate(c, w);
     }
-    w.write(")");
-  }
+   }
 
   public Node dump( CodeWriter w)
   {
@@ -210,26 +208,38 @@ public class NewArrayExpression extends Expression {
     return this;
   }
 
-    /** 
-     * Requires: v will not transform an Expression into anything
-     *   other than another Expression.  If an Expression is
-     *   transforemed into null, that dimension will be removed.
-     * Effects: visits the subexpression of this.  
-     */
-    public void visitChildren(NodeVisitor v) {
-      type = (TypeNode) type.visit(v);
-      for (ListIterator i=dimensionExpressions.listIterator(); i.hasNext(); ) {
-	Expression e = (Expression) i.next();
-	e = (Expression) e.visit(v);
-	if (e==null) {
-	  i.remove();
-	}
-	else {
-	  i.set(v);
-	}
+  /** 
+   * Requires: v will not transform an Expression into anything
+   *   other than another Expression.  If an Expression is
+   *   transforemed into null, that dimension will be removed.
+   * Effects: visits the subexpression of this.  
+   */
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+    
+    type = (TypeNode) type.visit(v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( type), vinfo);
+    
+    for (ListIterator i=dimensionExpressions.listIterator(); i.hasNext(); ) {
+      Expression e = (Expression) i.next();
+      e = (Expression) e.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( e), vinfo);
+      if (e==null) {
+        i.remove();
       }
-      initializer = initializer == null ? null: (ArrayInitializerExpression) initializer.visit(v);
+      else {
+        i.set(v);
+      }
     }
+    if( initializer != null) {
+      initializer = (ArrayInitializerExpression) initializer.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( initializer), 
+                                  vinfo);
+    }
+    
+    return vinfo;
+  }
 
   public Node copy() {
     NewArrayExpression na = new NewArrayExpression(type,

@@ -71,13 +71,20 @@ public class UnaryExpression extends Expression {
 	expr = newExpr;
     }
 
-   /**
-    *
-    */
-   void visitChildren(NodeVisitor vis)
-   {
-      expr = (Expression)expr.visit(vis);
-   }
+  /**
+   *
+   */
+  Object visitChildren(NodeVisitor vis)
+  {
+    expr = (Expression)expr.visit(vis);
+    return vis.mergeVisitorInfo( Annotate.getVisitorInfo( this),
+                                 Annotate.getVisitorInfo( expr));
+  }
+
+  public int getPrecedence()
+  {
+    return PRECEDENCE_UNARY;
+  }
 
   public Node typeCheck(LocalContext c) throws TypeCheckException
   {
@@ -132,39 +139,38 @@ public class UnaryExpression extends Expression {
     return this;
   }
 
-   public void  translate(LocalContext c, CodeWriter w)
-   {
-      if (operator <= NEGATIVE ||
-          operator >= PREINCR)
-      {
-         // prefix op.
-         if (operator == NEGATIVE) 
-            w.write("-");
-         if (operator == BITCOMP)
-            w.write("~");
-         if (operator == PREINCR)
-            w.write("++");
-         if (operator == PREDECR)
-            w.write("--");
-         if (operator == POSITIVE)
-            w.write("+");
-         if (operator == LOGICALNOT)
-            w.write("!");
-         //w.write("(");
-         expr.translate(c, w);
-         //w.write(")");
-      }
-      else
-      {
-         //w.write("(");
-         expr.translate(c, w);
-         //w.write(")");
-         if (operator == POSTINCR)
-            w.write("++");
-         if (operator == POSTDECR)
-            w.write("--");
-      }
-   }
+  public void  translate(LocalContext c, CodeWriter w)
+  {
+    if (operator <= NEGATIVE ||
+        operator >= PREINCR)
+    {
+      // prefix op.
+      if (operator == NEGATIVE) 
+        w.write("-");
+      if (operator == BITCOMP)
+        w.write("~");
+      if (operator == PREINCR)
+        w.write("++");
+      if (operator == PREDECR)
+        w.write("--");
+      if (operator == POSITIVE)
+        w.write("+");
+      if (operator == LOGICALNOT)
+        w.write("!");
+      
+      translateExpression( expr, c, w);
+    }
+    else {
+      
+      // postfix op.
+      translateExpression( expr, c, w);
+      
+      if (operator == POSTINCR)
+        w.write("++");
+      if (operator == POSTDECR)
+        w.write("--");
+    }
+  }
 
    public Node dump( CodeWriter w)
    {

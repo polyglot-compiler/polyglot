@@ -12,7 +12,11 @@ public class Hash
     System.out.println ( ht.get( 32));    
 
     ht.put( "World", 39);
-    System.out.println( (int)ht.get( "World") + 3);
+
+    Object o = ht.get( "World");
+    if( o instanceof int) {
+      System.out.println( (int)o + 3);
+    }
 
     ht.put( "!!!", true);
     if( (boolean)ht.get( "!!!")) {

@@ -4,15 +4,11 @@
 
 package jltools.ast;
 
-import jltools.types.Type;
-import jltools.util.TypedList;
-import jltools.util.TypedListIterator;
-import jltools.types.LocalContext;
-import jltools.util.CodeWriter;
-import java.util.List;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.ArrayList;
+import jltools.types.*;
+import jltools.util.*;
+
+import java.util.*;
+
 
 /**
  * Overview: A Field is a mutable representation of a Java field
@@ -90,15 +86,27 @@ public class FieldExpression extends Expression {
     return null;
   }
 
+  public int getPrecedence()
+  {
+    return PRECEDENCE_OTHER;
+  }
+
   public Node typeCheck( LocalContext c)
   {
     // FIXME; implement
     return this;
   }
 
-  public void visitChildren(NodeVisitor v) {
-    if (target != null)
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
+    if (target != null) {
       target = target.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( target), vinfo);
+    }
+
+    return vinfo;
   }
 
   public Node copy() {

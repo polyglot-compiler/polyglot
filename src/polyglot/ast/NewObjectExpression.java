@@ -6,13 +6,10 @@ package jltools.ast;
 
 import jltools.types.Type;
 import jltools.types.LocalContext;
-import jltools.util.CodeWriter;
-import jltools.util.TypedListIterator;
-import jltools.util.TypedList;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.ArrayList;
-import java.util.List;
+import jltools.util.*;
+
+import java.util.*;
+
 
 /**
  * NewObjectExpression
@@ -134,14 +131,23 @@ public class NewObjectExpression extends Expression {
    * Effects: visits each child of this with <v>.  If <v> returns null
    * for a memeber of the class body, then that member is removed. 
    */
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
     if (primary != null) {
       primary = (Expression) primary.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( primary), vinfo);
     }
+
     type = (TypeNode) type.visit(v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( type), vinfo);
+
     for(ListIterator i=argumentList.listIterator(); i.hasNext(); ) {
       Expression e = (Expression) i.next();
       e = (Expression) e.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( e), vinfo);
+
       if (e == null) {
 	i.remove();
       }
@@ -149,9 +155,18 @@ public class NewObjectExpression extends Expression {
 	i.set(e);
       }
     }
+
     if (classNode != null) {
       classNode = (ClassNode) classNode.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( classNode), vinfo);
     }
+
+    return vinfo;
+  }
+  
+  public int getPrecedence()
+  {
+    return PRECEDENCE_OTHER;
   }
 
   public void translate(LocalContext c, CodeWriter w)
@@ -164,7 +179,7 @@ public class NewObjectExpression extends Expression {
     else
       w.write ("new "  );
     type.translate(c, w);
-    w.write (" ( ");
+    w.write ("( ");
     for (ListIterator i = argumentList.listIterator(); i.hasNext(); )
     {
       ((Expression) i.next()).translate(c, w);
@@ -172,7 +187,7 @@ public class NewObjectExpression extends Expression {
         w.write(", ");
       }
     }
-    w.write (" )");
+    w.write (")");
     if (classNode != null)
     {
       classNode.translate(c, w);
@@ -209,11 +224,13 @@ public class NewObjectExpression extends Expression {
     List newArgumentList = Node.deepCopyList(argumentList);
     Expression newPrimary =
       (Expression) (primary==null?null:primary.deepCopy());
+    ClassNode newClassNode = 
+      (ClassNode) (classNode==null?null:classNode.deepCopy());
     NewObjectExpression no =
       new NewObjectExpression(newPrimary,
 			      (TypeNode) type.deepCopy(), 
 			      newArgumentList, 
-			      (ClassNode) classNode.deepCopy());
+			      newClassNode);
     no.copyAnnotationsFrom(this);
     return no;
   }

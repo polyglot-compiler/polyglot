@@ -73,19 +73,28 @@ public class TryStatement extends Statement {
 				 false);
   }
   
-   /**
-    *
-    */
-   void visitChildren(NodeVisitor vis)
-   {
-      tryBlock = (BlockStatement) tryBlock.visit(vis);
-      for (ListIterator it = catchBlocks.listIterator(); it.hasNext(); ) {
-	 CatchBlock cb = (CatchBlock) it.next();
-	 it.set((CatchBlock) cb.visit(vis));
-      }
-      if ( finallyBlock != null)
-        finallyBlock = (BlockStatement) finallyBlock.visit(vis);
-   }
+  /**
+   *
+   */
+  Object visitChildren(NodeVisitor v)
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
+    tryBlock = (BlockStatement) tryBlock.visit( v);
+    for (ListIterator it = catchBlocks.listIterator(); it.hasNext(); ) {
+      CatchBlock cb = (CatchBlock) it.next();
+      cb = (CatchBlock)cb.visit( v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( cb), vinfo);
+      it.set( cb);
+    }
+    if ( finallyBlock != null) {
+      finallyBlock = (BlockStatement) finallyBlock.visit( v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( finallyBlock),
+                                  vinfo);
+    }
+    
+    return vinfo;
+  }
 
    public Node typeCheck(LocalContext c) throws TypeCheckException
    {

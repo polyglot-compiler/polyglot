@@ -47,7 +47,7 @@ public class BinaryExpression extends Expression {
     public static final int RUSHIFTASSIGN  = 28; // >>>= operator
 
     public static final int PLUS           = 29; // + operator
-    public static final int SUB          = 30; // - operator
+    public static final int SUB            = 30; // - operator
 
     // Largest operator used.
     public static final int MAX_OPERATOR   = SUB;
@@ -127,10 +127,77 @@ public class BinaryExpression extends Expression {
   /**
    *
    */
-  void visitChildren(NodeVisitor vis)
+  Object visitChildren(NodeVisitor v)
   {
-    left = (Expression)left.visit(vis);
-    right = (Expression)right.visit(vis);
+    Object vinfo = Annotate.getVisitorInfo( this);
+
+    left = (Expression)left.visit( v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( left), vinfo);
+
+    right = (Expression)right.visit( v);
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( right), vinfo);
+  }
+
+  public int getPrecedence()
+  {
+    switch( operator)
+    {
+       case MULT:
+    case DIV:
+    case MOD:
+      return PRECEDENCE_MULT;
+
+    case PLUS:
+    case SUB:
+      return PRECEDENCE_ADD;
+
+    case LSHIFT:
+    case RSHIFT:
+    case RUSHIFT:
+      return PRECEDENCE_SHIFT;
+
+    case GT:
+    case LT:
+    case LE:
+    case GE:
+      return PRECEDENCE_INEQUAL;
+
+    case EQUAL:
+    case NE:
+      return PRECEDENCE_EQUAL;
+
+    case BIT_AND:
+      return PRECEDENCE_BAND;
+
+    case BIT_XOR:
+      return PRECEDENCE_BXOR;
+
+    case BIT_OR:
+      return PRECEDENCE_BOR;
+
+    case LOGIC_AND:
+      return PRECEDENCE_CAND;
+
+    case LOGIC_OR:
+      return PRECEDENCE_COR;
+
+    case ASSIGN:
+    case PLUSASSIGN:
+    case SUBASSIGN:
+    case MULTASSIGN:
+    case DIVASSIGN:
+    case ANDASSIGN:
+    case ORASSIGN:
+    case XORASSIGN:
+    case MODASSIGN:
+    case LSHIFTASSIGN: 
+    case RSHIFTASSIGN: 
+    case RUSHIFTASSIGN:
+      return PRECEDENCE_ASSIGN;
+     
+    default:
+      return 0;
+    }
   }
 
   public Node typeCheck( LocalContext c) throws TypeCheckException
@@ -301,6 +368,10 @@ public class BinaryExpression extends Expression {
                && ((PrimitiveType)rtype).isBoolean()) {
         setCheckedType( c.getTypeSystem().getBoolean());
       }
+      else {
+        throw new TypeCheckException(
+            "Bitwise operators require two boolean or two numeric operands.");
+      }
       break;
       
     case LSHIFT:
@@ -338,22 +409,13 @@ public class BinaryExpression extends Expression {
   
    public void translate(LocalContext c, CodeWriter w) 
    {
-      if(operator != ASSIGN && !(operator >= PLUSASSIGN && 
-                                operator <= RUSHIFTASSIGN)) {
-        w.write("(");
-      }
-      left.translate(c, w);
-      if(operator != ASSIGN && !(operator >= PLUSASSIGN && 
-                                operator <= RUSHIFTASSIGN)) {
-        w.write(") ");
-      }
-      else {
-        w.write(" ");
-      }
-      w.write(getOperatorString(operator));
-      w.write(" (");
-      right.translate(c, w);
-      w.write(")");
+     translateExpression( left, c, w);
+
+     w.write( " ");
+     w.write( getOperatorString( operator));
+     w.write( " ");
+
+     translateExpression( right, c, w);
    }
 
    public Node dump( CodeWriter w)

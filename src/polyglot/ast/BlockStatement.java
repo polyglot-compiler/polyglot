@@ -132,8 +132,8 @@ public class BlockStatement extends Statement {
    *    the statement is elided.  If it returns an Expression, it is wrapped
    *    as an ExpressionStatement.
    **/
-  public void visitChildren(NodeVisitor v) {
-    visitChildren(v, false);
+  Object visitChildren(NodeVisitor v) {
+    return visitChildren(v, false);
   }
 
   /**
@@ -148,7 +148,10 @@ public class BlockStatement extends Statement {
    *    If <flatten> is true, all BlockStatements have their contents
    *    contents are interpolated into this statement.
    **/
-  public void visitChildren(NodeVisitor v, boolean flatten) {
+  Object visitChildren(NodeVisitor v, boolean flatten) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
     for (ListIterator it = statements.listIterator(); it.hasNext(); ) {
       Node node = (Node) it.next();
       Node newNode = node.visit(v);
@@ -165,14 +168,19 @@ public class BlockStatement extends Statement {
 	}
       } else if (node != newNode) {
 	// The node changed.
+        vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newNode), vinfo);
 	if (newNode instanceof Expression) {
 	  it.set(new ExpressionStatement((Expression) newNode));
 	} else {
 	  Assert.assert(newNode instanceof Statement);  
 	  it.set(newNode);
 	}
+      } else {
+        // The node hasn't changed. 
+        vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newNode), vinfo);
       }
     }    
+    return vinfo;
   }
 
   public Node copy() {

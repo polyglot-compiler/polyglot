@@ -5,7 +5,7 @@
 package jltools.ast;
 
 import jltools.types.*;
-import jltools.util.CodeWriter;
+import jltools.util.*;
 
 /** 
  * IntegerLiteral
@@ -156,8 +156,10 @@ public class IntLiteral extends Literal {
     return this;
   }  
 
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
     // nothing to do
+    return Annotate.getVisitorInfo( this);
   }
 
   public Node copy() {

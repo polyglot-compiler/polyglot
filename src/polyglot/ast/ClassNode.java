@@ -277,12 +277,18 @@ public class ClassNode extends ClassMember {
    * returns null for a member of the class body, that element is
    * removed. 
    */
-  public void visitChildren(NodeVisitor v) 
+  Object visitChildren(NodeVisitor v) 
   {
-    if (superClass != null) 
+    Object vinfo = Annotate.getVisitorInfo( this);
+
+    if (superClass != null) {
       superClass = (TypeNode) superClass.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( superClass), vinfo);
+    }
     for(ListIterator i = interfaceList.listIterator(); i.hasNext(); ) {
-      i.set( ((TypeNode) i.next()).visit(v));
+      TypeNode t = (TypeNode)i.next();
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( t), vinfo);
+      i.set( t);
     }
     for(ListIterator i=classMembers.listIterator(); i.hasNext(); ) {
       ClassMember m = (ClassMember) i.next();
@@ -291,9 +297,11 @@ public class ClassNode extends ClassMember {
 	i.remove();
       }
       else {
+        vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( m), vinfo);
 	i.set(m);
       }
-    }
+    }  
+    return vinfo;
   }
 
   public Node copy() {
@@ -317,10 +325,9 @@ public class ClassNode extends ClassMember {
       newInterfaceList.add( ((TypeNode) i.next()).deepCopy() );
     }
     ClassNode cn = new ClassNode(accessFlags.copy(),
-				  name,
-				  new TypeNode(superClass),
-				  newInterfaceList,
-				  newClassMembers);
+                        name,
+		        (superClass == null ? null : new TypeNode(superClass)),
+                        newInterfaceList,  newClassMembers);
     cn.copyAnnotationsFrom(this);
     return cn;
   }

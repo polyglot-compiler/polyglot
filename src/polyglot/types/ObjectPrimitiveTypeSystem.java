@@ -11,9 +11,11 @@ public class ObjectPrimitiveTypeSystem extends StandardTypeSystem
   public boolean isCastValid(Type fromType, Type toType)
     throws TypeCheckException
   {
-    if ( (fromType.equals( getObject() ) && toType.isPrimitive() ||
-          (toType.equals( getObject() ) && fromType.isPrimitive()))) {
-      return true;
+    if (fromType.equals( getObject() ) && toType.isPrimitive()) {
+      return !((PrimitiveType)toType).isVoid();
+    }
+    if (toType.equals( getObject() ) && fromType.isPrimitive()) {
+      return !((PrimitiveType)fromType).isVoid();
     }
     return super.isCastValid(fromType, toType);
   }
@@ -22,7 +24,7 @@ public class ObjectPrimitiveTypeSystem extends StandardTypeSystem
     throws TypeCheckException
   {
     if( childType.isPrimitive() && ancestorType.equals( getObject())) {
-      return true;
+      return !((PrimitiveType)childType).isVoid();
     }
 
     return super.isAssignableSubtype( childType, ancestorType);
@@ -32,7 +34,7 @@ public class ObjectPrimitiveTypeSystem extends StandardTypeSystem
     throws TypeCheckException
   {
     if( fromType.isPrimitive() && toType.equals( getObject())) {
-      return true;
+      return !((PrimitiveType)fromType).isVoid();
     }
 
     return super.isAssignableSubtype( fromType, toType);

@@ -4,7 +4,7 @@
 
 package jltools.ast;
 
-import jltools.util.CodeWriter;
+import jltools.util.*;
 import jltools.types.*;
 
 
@@ -36,10 +36,11 @@ public class StringLiteral extends Literal {
     string = newString;
   }
 
-   void visitChildren(NodeVisitor vis)
-   {
-      //nothing to do
-   }
+  Object visitChildren(NodeVisitor vis)
+  {
+    //nothing to do
+    return Annotate.getVisitorInfo( this);
+  }
 
    public Node typeCheck(LocalContext c) throws TypeCheckException
    {

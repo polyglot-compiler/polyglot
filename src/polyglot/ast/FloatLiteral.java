@@ -4,7 +4,7 @@
 
 package jltools.ast;
 import jltools.types.LocalContext;
-import jltools.util.CodeWriter;
+import jltools.util.*;
 
 /** 
  * Float Literal
@@ -76,7 +76,9 @@ public class FloatLiteral extends Literal {
     return this;
   }  
 
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
+    return Annotate.getVisitorInfo( this);
   }
 
   public Node copy() {

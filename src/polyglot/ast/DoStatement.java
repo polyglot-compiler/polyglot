@@ -5,7 +5,7 @@
 package jltools.ast;
 
 import jltools.types.LocalContext;
-import jltools.util.CodeWriter;
+import jltools.util.*;
 
 /**
  * DoStatement
@@ -96,8 +96,12 @@ public class DoStatement extends Statement {
    *    returns an expression in place of the sub-statement, it is
    *    wrapped in an ExpressionStatement.
    */
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
     Node newNode = (Node) statement.visit(v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newNode), vinfo);
     if (newNode instanceof Expression) {
       statement = new ExpressionStatement((Expression) newNode);
     }
@@ -105,6 +109,7 @@ public class DoStatement extends Statement {
       statement = (Statement) newNode;
     }
     condExpr = (Expression) condExpr.visit(v);
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( condExpr), vinfo);
   }
 
   public Node copy() {

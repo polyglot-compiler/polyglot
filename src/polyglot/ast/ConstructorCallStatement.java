@@ -4,14 +4,11 @@
 
 package jltools.ast;
 
-import jltools.util.TypedListIterator;
-import jltools.util.TypedList;
-import jltools.util.CodeWriter;
+import jltools.util.*;
 import jltools.types.LocalContext;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
+
 
 /**
  * ConstructorCallStatement
@@ -146,9 +143,13 @@ public class ConstructorCallStatement extends Statement {
    *    returns null for an argument expression, that argument is
    *    removed.
    */
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
     if (primary != null) {
       primary = (Expression) primary.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( primary), vinfo);
     }
 
     for(ListIterator i=argumentList.listIterator(); i.hasNext(); ) {
@@ -158,9 +159,11 @@ public class ConstructorCallStatement extends Statement {
 	i.remove();
       }
       else {
-	i.set(v);
+        vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( e), vinfo);
+	i.set(e);
       }
     }
+    return vinfo;
   }
 
   public Node copy() {

@@ -73,37 +73,55 @@ public class TernaryExpression extends Expression {
     }
 
 
-   void visitChildren(NodeVisitor vis)
+   Object visitChildren(NodeVisitor v)
    {
-	conditional  = (Expression) conditional.visit(vis);
-	trueResult   = (Expression) trueResult.visit(vis);
-	falseResult  = (Expression) falseResult.visit(vis);
+     Object vinfo = Annotate.getVisitorInfo( this);
+
+     conditional  = (Expression) conditional.visit( v);
+     vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( conditional), vinfo);
+
+     trueResult   = (Expression) trueResult.visit( v);
+     vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( trueResult), vinfo); 
+
+     falseResult  = (Expression) falseResult.visit( v);
+     return v.mergeVisitorInfo( Annotate.getVisitorInfo( falseResult), vinfo); 
    }
 
-   public Node typeCheck(LocalContext c) throws TypeCheckException
-   {
-     if (! conditional.getCheckedType().equals ( c.getTypeSystem().getBoolean() ) ) 
-       throw new TypeCheckException( "The conditional must be of type boolean.");
+  public int getPrecedence()
+  {
+    return PRECEDENCE_TERN;
+  }
 
-     setCheckedType ( c.getTypeSystem().leastCommonAncestor( trueResult.getCheckedType(), 
-                                                             falseResult.getCheckedType()));
-     addThrows ( conditional.getThrows() );
-     addThrows ( trueResult.getThrows() );
-     addThrows ( falseResult.getThrows() );
+  public Node typeCheck(LocalContext c) throws TypeCheckException
+  {
+    if( !conditional.getCheckedType().equals( c.getTypeSystem()
+                                                .getBoolean())) {
+       throw new TypeCheckException( 
+                              "Ternary conditional must be of type boolean.");
+    }
+     
+    setCheckedType (c.getTypeSystem().leastCommonAncestor( 
+                                               trueResult.getCheckedType(), 
+                                               falseResult.getCheckedType()));
+    addThrows( conditional.getThrows());
+    addThrows( trueResult.getThrows());
+    addThrows( falseResult.getThrows());
 
-     return this;
-   }
+    return this;
+  }
 
-   public void translate(LocalContext c, CodeWriter w)
-   {
-      w.write("( " );
-      conditional.translate(c, w);
-      w.write(" ) ? ( ");
-      trueResult.translate(c, w);
-      w.write(" ) : ( " );
-      falseResult.translate(c, w);
-      w.write(" )");
-   }
+  public void translate(LocalContext c, CodeWriter w)
+  {
+    translateExpression( conditional, c, w);
+
+    w.write( " ? ");
+
+    translateExpression( trueResult, c, w);
+
+    w.write( " : ");
+
+    translateExpression( falseResult, c, w);
+  }
 
    public Node dump( CodeWriter w)
    {

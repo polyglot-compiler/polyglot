@@ -72,6 +72,12 @@ public class ArrayInitializerExpression extends Expression {
    * Removes the <pos'th elemen of this expression.
    **/
   public void removeExpression(int pos) { children.remove(pos); }
+  
+  public int getPrecedence()
+  {
+    // FIXME is this right?
+    return PRECEDENCE_OTHER;
+  }
 
   public void translate( LocalContext c, CodeWriter w)
   {
@@ -100,13 +106,19 @@ public class ArrayInitializerExpression extends Expression {
     return this;
   }
 
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
     for (ListIterator iter = children(); iter.hasNext(); ) {
       Expression expr = (Expression) iter.next();
+
       Expression newExpr = (Expression) expr.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newExpr), vinfo);
+
       if (expr != newExpr)
 	iter.set(newExpr);
     }
+    return vinfo;
   }
 
   public Node copy() {

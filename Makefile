@@ -37,7 +37,7 @@ CALLED_FROM_PARENT 	= true
 	$(JC) $(JC_FLAGS) $<
 
 #everything:
-all: util types lex parse ast frontend
+all: util types lex parse ast frontend visit runtime 
 
 #include all of our package makefiles. they give us what class files are in each.
 include jltools/ast/Makefile 
@@ -47,21 +47,24 @@ include jltools/util/Makefile
 include jltools/types/Makefile
 include jltools/parse/Makefile
 include jltools/visit/Makefile
+include jltools/runtime/Makefile
 
 #other targets:
 util: $(UTIL_TARGET) 
 
-types: util $(TYPES_TARGET)
+types: util runtime $(TYPES_TARGET)
 
 lex: util types $(LEX_TARGET)
 
 parse: util types lex $(PARSE_TARGET)
 
-ast: util types lex $(AST_TARGET)
+ast: util types lex runtime $(AST_TARGET)
 
-visit: util types ast $(VISIT_TARGET)
+visit: util types ast runtime $(VISIT_TARGET)
 
-frontend: util types lex parse ast visit $(FRONTEND_TARGET)
+frontend: util types lex parse ast visit runtime $(FRONTEND_TARGET)
+
+runtime: $(RUNTIME_TARGET)
 
 #clean: (just delete the class files)
 clean: 
@@ -72,6 +75,7 @@ clean:
 	rm -f jltools/util/*.class
 	rm -f jltools/lex/*.class
 	rm -f jltools/visit/*.class
+	rm -f jltools/runtime/*.class
 
 # delete class files as well as the grammar files, so that we can regenerate them
 # also delete the javadoc & jar file, if they exist
@@ -87,7 +91,7 @@ jar: all
 
 docs:
 	-mkdir -p $(JAVADOC_OUTPUT)
-	$(JAVADOC) $(JAVADOC_FLAGS) -d $(JAVADOC_OUTPUT) jltools.ast jltools.frontend jltools.parse jltools.util jltools.types
+	$(JAVADOC) $(JAVADOC_FLAGS) -d $(JAVADOC_OUTPUT) jltools.ast jltools.frontend jltools.parse jltools.util jltools.types jltools.visit jltools.runtime
 
 
 

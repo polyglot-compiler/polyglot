@@ -144,23 +144,33 @@ public class VariableDeclarationStatement extends Statement {
     return modifiers;
   }
   
-   /**
-    *
-    */
-   void visitChildren(NodeVisitor vis)
-   {
-    type = (TypeNode) type.visit(vis);
+  /**
+   *
+   */
+  Object visitChildren(NodeVisitor v)
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
+    type = (TypeNode) type.visit( v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( type), vinfo);
+    
     ListIterator it = variables.listIterator();
     while (it.hasNext()) {
       Declarator pair = (Declarator)it.next();
       if (pair.initializer != null)
       {
-         Expression newExpr = (Expression) pair.initializer.visit(vis);
-         if (newExpr != pair.initializer)
-            it.set(new Declarator(pair.name, pair.additionalDimensions, newExpr));
+        Expression newExpr = (Expression) pair.initializer.visit(v);
+        vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newExpr),
+                                    vinfo);
+        if (newExpr != pair.initializer) {
+          it.set( new Declarator( pair.name, pair.additionalDimensions, 
+                                  newExpr));
+        }
       }
     }
-   }
+
+    return vinfo;
+  }
 
   public Node removeAmbiguities( LocalContext c) throws TypeCheckException
   {

@@ -3,9 +3,8 @@
  */
 
 package jltools.ast;
-import jltools.util.CodeWriter;
+import jltools.util.*;
 import jltools.types.*;
-import jltools.util.Annotate;
 
 /**
  * ThrowStatement
@@ -43,10 +42,12 @@ public class ThrowStatement extends Statement {
    /**
     *
     */
-   void visitChildren(NodeVisitor vis)
-   {
-      expr = (Expression)expr.visit(vis);
-   }
+  Object visitChildren(NodeVisitor v)
+  {
+    expr = (Expression)expr.visit( v);
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( this),
+                               Annotate.getVisitorInfo( expr));
+  }
 
    public Node typeCheck(LocalContext c) throws TypeCheckException
    {

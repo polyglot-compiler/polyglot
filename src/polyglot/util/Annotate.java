@@ -19,7 +19,7 @@ public class Annotate {
 
   static final int LINE_NUMBER            = 1;
   static final int CHECKED_TYPE           = 2;
-  static final int ERROR                  = 3;
+  static final int VISITOR                = 3;
   static final int THROWS_SET             = 4;
   // true if the node has all paths ending in function termination (either throws or return).
   static final int TERMINATE_ALL_PATHS    = 5;
@@ -69,24 +69,21 @@ public class Annotate {
   public static Type getExpectedType(AnnotatedObject o) {
     return (Type) o.getAnnotation(EXPECTED_TYPE);
   }
-
-  public static void addError(AnnotatedObject o, ErrorInfo e)
+ 
+  public static void setVisitorInfo( AnnotatedObject o, Object vinfo)
   {
-    List a = getErrors(o);
-    if (a == null) {
-      a = new LinkedList();
-      a.add(e);
-      o.setAnnotation(ERROR, o);
-    }
-    else {
-      a.add(e);
-    }
+    o.setAnnotation( VISITOR, vinfo);
   }
 
-  public static List getErrors(AnnotatedObject o)
+  public static Object getVisitorInfo( AnnotatedObject o)
   {
-    return (List) o.getAnnotation(ERROR);
-  }                           
+    return o.getAnnotation( VISITOR);
+  }                                        
+
+  public static void removeVisitorInfo( AnnotatedObject o)
+  {
+    o.removeAnnotation( VISITOR);
+  }
 
   public static void addThrows( AnnotatedObject o, Type t)
   {

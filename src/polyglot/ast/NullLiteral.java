@@ -4,7 +4,7 @@
 
 package jltools.ast;
 
-import jltools.util.CodeWriter;
+import jltools.util.*;
 import jltools.types.LocalContext;
 
 /**
@@ -44,8 +44,10 @@ public class NullLiteral extends Literal {
     setCheckedType( c.getTypeSystem().getNull());
     return this;
   }
-  public void visitChildren(NodeVisitor v) 
+  
+  Object visitChildren(NodeVisitor v) 
   {
     // nothing to do 
+    return Annotate.getVisitorInfo( this);
   }
 }

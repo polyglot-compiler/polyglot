@@ -17,6 +17,7 @@ public class Compiler implements TargetTable
   public static String OPT_VERBOSE          = "Verbose (Boolean)";
   public static String OPT_FQCN             = "FQCN (Boolean)";
   public static String OPT_DUMP             = "Dump AST (Boolean)";
+  public static String OPT_SCRAMBLE         = "Scramble AST (Boolean)";
 
   public static int VERSION_MAJOR           = 1;
   public static int VERSION_MINOR           = 0;
@@ -27,6 +28,7 @@ public class Compiler implements TargetTable
   private static int outputWidth;
   private static boolean useFqcn;
   private static boolean dumpAst;
+  private static boolean scrambleAst;
   private static boolean verbose;
 
   private static boolean initialized = false;
@@ -56,6 +58,7 @@ public class Compiler implements TargetTable
     Integer width;
     Boolean fqcn;
     Boolean dump;
+    Boolean scramble;
     Boolean v;
 
     /* Read the options. */
@@ -76,6 +79,12 @@ public class Compiler implements TargetTable
       dump = new Boolean( false);
     }
     dumpAst = dump.booleanValue();
+
+    scramble = (Boolean)options.get( OPT_SCRAMBLE);
+    if( scramble == null) {
+      scramble = new Boolean( false);
+    }
+    scrambleAst = scramble.booleanValue();
 
     v = (Boolean)options.get( OPT_VERBOSE);
     if( v == null) {
@@ -281,7 +290,16 @@ public class Compiler implements TargetTable
                     + "because of errors in dependencies.");
         return false;
       }
+      
+      if( (job.status & CHECKED) == 0 && scrambleAst) {
+        dump( job.ast);
 
+        NodeScrambler ns = new NodeScrambler();
+        job.ast = job.ast.visit( ns.fp);
+        job.ast = job.ast.visit( ns);
+      
+        dump( job.ast);
+      }
 
       /* CHECK. */
       if( (job.status & CHECKED) == 0) {
@@ -314,6 +332,17 @@ public class Compiler implements TargetTable
                       "Encountered an I/O error while compiling.");
       job.eq.flush();
       throw e;
+    }
+    catch( RuntimeException rte)
+    {
+      CodeWriter cw = new CodeWriter( new UnicodeWriter( 
+                                        new FileWriter( "ast.dump")), 
+                                      outputWidth);
+      DumpAst d = new DumpAst( cw);
+      job.ast.visit( d);
+      cw.flush();
+
+      throw rte;
     }
 
     job.eq.flush();

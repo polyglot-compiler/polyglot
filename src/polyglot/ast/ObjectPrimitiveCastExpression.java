@@ -5,6 +5,8 @@ import jltools.util.*;
 
 public class ObjectPrimitiveCastExpression extends CastExpression
 {  
+  public static String WRAPPER_PACKAGE = "jltools.runtime";
+
   public ObjectPrimitiveCastExpression( TypeNode type, Expression expr) {
     super( type, expr);
   }
@@ -22,49 +24,49 @@ public class ObjectPrimitiveCastExpression extends CastExpression
       if( rtype.equals(c.getTypeSystem().getObject())) {
       
         if( ltype.equals( c.getTypeSystem().getBoolean())) {
-          w.write( "((java.lang.Boolean)(");
+          w.write( "((" + WRAPPER_PACKAGE + ".Boolean)");
         }
         else if( ltype.equals( c.getTypeSystem().getChar())) {
-          w.write( "((java.lang.Character)(");
+          w.write( "((" + WRAPPER_PACKAGE + ".Character)");
         }
         else if( ltype.equals( c.getTypeSystem().getShort())) {
-          w.write( "((java.lang.Short)(");
+          w.write( "((" + WRAPPER_PACKAGE + ".Short)");
         }
         else if( ltype.equals( c.getTypeSystem().getInt())) {
-          w.write( "((java.lang.Integer)(");
+          w.write( "((" + WRAPPER_PACKAGE + ".Integer)");
         }
         else if( ltype.equals( c.getTypeSystem().getLong())) {
-          w.write( "((java.lang.Long)(");
+          w.write( "((" + WRAPPER_PACKAGE + ".Long)");
         }
         else if( ltype.equals( c.getTypeSystem().getFloat())) {
-          w.write( "((java.lang.Float)(");
+          w.write( "((" + WRAPPER_PACKAGE + ".Float)");
         }
         else if( ltype.equals( c.getTypeSystem().getDouble())) {
-          w.write( "((java.lang.Double)(");
+          w.write( "((" + WRAPPER_PACKAGE + ".Double)");
         }
         
-        expr.translate( c, w);
+        translateExpression( expr, c, w);
         
         if( ltype.equals( c.getTypeSystem().getBoolean())) {
-          w.write( ")).booleanValue()");
+          w.write( ").booleanValue()");
         }
         else if( ltype.equals( c.getTypeSystem().getChar())) {
-          w.write( ")).charValue()");
+          w.write( ").charValue()");
         }
         else if( ltype.equals( c.getTypeSystem().getShort())) {
-          w.write( ")).shortValue()");
+          w.write( ").shortValue()");
         }
         else if( ltype.equals( c.getTypeSystem().getInt())) {
-          w.write( ")).intValue()");
+          w.write( ").intValue()");
         }
         else if( ltype.equals( c.getTypeSystem().getLong())) {
-          w.write( ")).longValue()");
+          w.write( ").longValue()");
         }
         else if( ltype.equals( c.getTypeSystem().getFloat())) {
-          w.write( ")).floatValue()");
+          w.write( ").floatValue()");
         }
         else if( ltype.equals( c.getTypeSystem().getDouble())) {
-          w.write( ")).floatValue()");
+          w.write( ").floatValue()");
         }
       }
       else
@@ -76,25 +78,25 @@ public class ObjectPrimitiveCastExpression extends CastExpression
       if( rtype.isPrimitive()) {
         
         if( rtype.equals( c.getTypeSystem().getBoolean())) {
-          w.write( "(java.lang.Object)new Boolean( ");
+          w.write( "(java.lang.Object)new " + WRAPPER_PACKAGE + ".Boolean( ");
         }
         else if( rtype.equals( c.getTypeSystem().getChar())) {
-          w.write( "(java.lang.Object)new Character( ");
+          w.write( "(java.lang.Object)new " + WRAPPER_PACKAGE + ".Character( ");
         }
         else if( rtype.equals( c.getTypeSystem().getShort())) {
-          w.write( "(java.lang.Object)new Short( ");
+          w.write( "(java.lang.Object)new " + WRAPPER_PACKAGE + ".Short( ");
         }
         else if( rtype.equals( c.getTypeSystem().getInt())) {
-          w.write( "(java.lang.Object)new Integer( ");
+          w.write( "(java.lang.Object)new " + WRAPPER_PACKAGE + ".Integer( ");
         }
         else if( rtype.equals( c.getTypeSystem().getLong())) {
-          w.write( "(java.lang.Object)new Long( ");
+          w.write( "(java.lang.Object)new " + WRAPPER_PACKAGE + ".Long( ");
         }
         else if( rtype.equals( c.getTypeSystem().getFloat())) {
-          w.write( "(java.lang.Object)new Float( ");
+          w.write( "(java.lang.Object)new " + WRAPPER_PACKAGE + ".Float( ");
         }
         else if( rtype.equals( c.getTypeSystem().getDouble())) {
-          w.write( "(java.lang.Object)new Double( ");
+          w.write( "(java.lang.Object)new " + WRAPPER_PACKAGE + ".Double( ");
         }
         
         expr.translate( c, w);

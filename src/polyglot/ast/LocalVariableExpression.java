@@ -4,7 +4,7 @@
 
 package jltools.ast;
 import jltools.types.LocalContext;
-import jltools.util.CodeWriter;
+import jltools.util.*;
 
 /** 
  * LocalVariableExpression
@@ -38,6 +38,11 @@ public class LocalVariableExpression extends Expression {
 	name = newName;
     }
 
+  public int getPrecedence()
+  {
+    return PRECEDENCE_OTHER;
+  }
+
   public void translate(LocalContext c, CodeWriter w)
   {
     w.write(name);
@@ -58,9 +63,11 @@ public class LocalVariableExpression extends Expression {
     return this;
   }
 
-    public void visitChildren(NodeVisitor v) {
-      // nothing to do
-    }
+  Object visitChildren(NodeVisitor v) 
+  {
+    // nothing to do
+    return Annotate.getVisitorInfo( this);
+  }
 
     public Node copy() {
       LocalVariableExpression lve = new LocalVariableExpression(name);

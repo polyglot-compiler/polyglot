@@ -101,8 +101,11 @@ public class FieldNode extends ClassMember {
     return this;
   }
 
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
     declare = (VariableDeclarationStatement) declare.visit(v);
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( this),
+                               Annotate.getVisitorInfo( declare));
   }
 
   public Node copy() {

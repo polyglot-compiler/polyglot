@@ -133,15 +133,25 @@ public class SourceFileNode extends Node {
   }
 
 
-   void visitChildren(NodeVisitor vis)
-   {
-      for(ListIterator it=imports.listIterator(); it.hasNext(); ) {
-	 it.set(((ImportNode) it.next()).visit(vis));
-      }
-      for(ListIterator it=classes.listIterator(); it.hasNext(); ) {
-	 it.set(((ClassNode) it.next()).visit(vis));
-      }
-   }
+  Object visitChildren(NodeVisitor v)
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
+    for(ListIterator it=imports.listIterator(); it.hasNext(); ) {
+      ImportNode n = (ImportNode)it.next();
+      n = (ImportNode)n.visit( v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( n), vinfo);
+      it.set( n);
+    }
+    for(ListIterator it=classes.listIterator(); it.hasNext(); ) {
+      ClassNode n = (ClassNode)it.next();
+      n = (ClassNode)n.visit( v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( n), vinfo);
+      it.set( n);
+    }
+
+    return vinfo;
+  }
    
    public Node readSymbols( SymbolReader sr) throws TypeCheckException
    {

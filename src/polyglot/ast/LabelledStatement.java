@@ -4,7 +4,7 @@
 
 package jltools.ast;
 import jltools.types.LocalContext;
-import jltools.util.CodeWriter;
+import jltools.util.*;
 
 /**
  * LabelledStatement
@@ -81,8 +81,11 @@ public class LabelledStatement extends Statement {
    *
    * Effects: visits the substatement of this with <v>.
    */
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
     statement = (Statement) statement.visit(v);
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( this),
+                               Annotate.getVisitorInfo( statement));
   }
 
   public Node copy() {

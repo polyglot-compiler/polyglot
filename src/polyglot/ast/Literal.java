@@ -11,4 +11,8 @@ package jltools.ast;
  **/
 public abstract class Literal extends Expression {
   
+  public int getPrecedence()
+  {
+    return PRECEDENCE_OTHER;
+  }
 }

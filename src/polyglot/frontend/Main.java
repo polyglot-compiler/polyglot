@@ -205,6 +205,11 @@ public class Main
         i++;
         options.put( Compiler.OPT_DUMP, new Boolean( true));
       }
+      else if( args[i].equals( "-scramble"))
+      {
+        i++;
+        options.put( Compiler.OPT_SCRAMBLE, new Boolean( true));
+      }
       else if( args[i].equals( "-v") || args[i].equals( "-verbose"))
       {
         i++;
@@ -254,6 +259,7 @@ public class Main
     System.err.println( " -sx <ext>               set source extension");
     System.err.println( " -ox <ext>               set output extension");
     System.err.println( " -dump                   dump the ast");
+    System.err.println( " -scramble               scramble the ast");
     System.err.println( " -post <compiler>        run javac-like compiler" 
                         + " after translation");
     System.err.println( " -v -verbose             print verbose " 

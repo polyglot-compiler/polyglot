@@ -70,11 +70,11 @@ public class CastExpression extends Expression {
 
   public void translate ( LocalContext c, CodeWriter w)
   {
-    w.write (" (( " );
+    w.write ("(" );
     type.translate(c, w);
-    w.write ( " ) " );
-    expr.translate(c, w);
-    w.write ( " )");
+    w.write ( ")" );
+
+    translateExpression( expr, c, w);
   }
   
   public Node dump( CodeWriter w)
@@ -83,6 +83,11 @@ public class CastExpression extends Expression {
     dumpNodeInfo( w);
     w.write( ")");
     return null;
+  }
+
+  public int getPrecedence()
+  {
+    return PRECEDENCE_CAST;
   }
 
   public Node typeCheck( LocalContext c) throws TypeCheckException
@@ -97,16 +102,22 @@ public class CastExpression extends Expression {
   }
 
 
-    /**
-     * Requires: v will not transform the Expression into anything
-     *    other than another Expression.
-     * Effects:
-     *    Visits the sub expression of this.
-     */ 
-    public void visitChildren(NodeVisitor v) {
-	expr = (Expression) expr.visit(v);
-	type = (TypeNode) type.visit(v);
-    }
+  /**
+   * Requires: v will not transform the Expression into anything
+   *    other than another Expression.
+   * Effects:
+   *    Visits the sub expression of this.
+   */ 
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+    
+    expr = (Expression) expr.visit(v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( expr), vinfo);
+    
+    type = (TypeNode) type.visit(v);
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( type), vinfo);
+  }
   
     public Node copy() {
       CastExpression ce = new CastExpression(type, expr);

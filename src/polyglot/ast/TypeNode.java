@@ -52,9 +52,10 @@ public class TypeNode extends Node {
     return Annotate.getCheckedType( this);
   }
 
-  void visitChildren(NodeVisitor vis)
+  Object visitChildren(NodeVisitor vis)
   {
     // nothing to do
+    return Annotate.getVisitorInfo( this);
   }
    
   public Node readSymbols( SymbolReader sr)

@@ -102,9 +102,16 @@ public class CatchBlock extends Node {
   }
 
 
-  public void visitChildren(NodeVisitor v) {
-    formalParameter.visit(v );
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
+    formalParameter = (FormalParameter)formalParameter.visit(v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( formalParameter), 
+                                vinfo);
+
     block = (BlockStatement) block.visit(v);
+    return v.mergeVisitorInfo( Annotate.getVisitorInfo( block), vinfo);
   }
 
   public Node copy() {

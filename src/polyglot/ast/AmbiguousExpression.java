@@ -12,5 +12,9 @@ package jltools.ast;
  **/
 public abstract class AmbiguousExpression extends Expression {
 
+  public int getPrecedence()
+  {
+    return PRECEDENCE_OTHER;
+  }
 }
 

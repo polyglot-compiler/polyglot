@@ -4,14 +4,11 @@
 
 package jltools.ast;
 
-import jltools.util.TypedList;
-import jltools.util.TypedListIterator;
-import jltools.util.CodeWriter;
 import jltools.types.LocalContext;
-import java.util.List;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.ArrayList;
+import jltools.util.*;
+
+import java.util.*;
+
 
 /**
  * Overview: A SwitchStatement is a mutable representation of a Java
@@ -212,21 +209,29 @@ public class SwitchStatement extends Statement {
    }
 
 
-   void visitChildren(NodeVisitor vis)
-   {
-      expr = (Expression) expr.visit(vis);
-      for (ListIterator it = switchElems.listIterator(); it.hasNext(); ) {
-	 SwitchElement se = (SwitchElement) it.next();
-	 if (se instanceof CaseStatement) {
-	    CaseStatement cs = (CaseStatement) se;
-	    cs.expr = (Expression) cs.expr.visit(vis);
-	 }
-	 else {
-	    SwitchBlock sb = (SwitchBlock) se;
-	    sb.block = (BlockStatement) sb.block.visit(vis);
-	 }
+  Object visitChildren(NodeVisitor v)
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
+    expr = (Expression) expr.visit( v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( expr), vinfo);
+    
+    for (ListIterator it = switchElems.listIterator(); it.hasNext(); ) {
+      SwitchElement se = (SwitchElement) it.next();
+      if (se instanceof CaseStatement) {
+        CaseStatement cs = (CaseStatement) se;
+        cs.expr = (Expression) cs.expr.visit( v);
+        vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( cs.expr), vinfo);
       }
-   }
+      else {
+        SwitchBlock sb = (SwitchBlock) se;
+        sb.block = (BlockStatement) sb.block.visit( v);
+        vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( sb.block), vinfo);
+      }
+    }
+
+    return vinfo;
+  }
 
    public Node typeCheck(LocalContext c)
    {

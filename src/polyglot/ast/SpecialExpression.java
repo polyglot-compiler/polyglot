@@ -4,7 +4,7 @@
 
 package jltools.ast;
 
-import jltools.util.CodeWriter;
+import jltools.util.*;
 import jltools.types.LocalContext;
 import jltools.types.Type;
 
@@ -76,11 +76,21 @@ public class SpecialExpression extends Expression {
     kind = newKind;
   }
   
-  void visitChildren(NodeVisitor vis)
+  Object visitChildren(NodeVisitor v)
   {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
     if (type != null) {
-      type = (TypeNode) type.visit(vis);
+      type = (TypeNode) type.visit( v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( type), vinfo);
     }
+    
+    return vinfo;
+  }
+
+  public int getPrecedence()
+  {
+    return PRECEDENCE_OTHER;
   }
 
   public Node typeCheck(LocalContext c)

@@ -66,30 +66,39 @@ public class WhileStatement extends Statement {
    *    returns an expression in place of the sub-statement, it is
    *    wrapped in an ExpressionStatement.
    */
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
+    condExpr = (Expression) condExpr.visit(v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( condExpr), vinfo);   
+
     Node newNode = (Node) statement.visit(v);
+    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newNode), vinfo);
     if (newNode instanceof Expression) {
       statement = new ExpressionStatement((Expression) newNode);
     }
     else {
       statement = (Statement) newNode;
     }
-    condExpr = (Expression) condExpr.visit(v);
+    
+    return vinfo;
   }
 
   public void translate(LocalContext c, CodeWriter w)
   {
-    w.write("while ( " );
+    w.write("while( " );
     condExpr.translate(c, w);
-    w.write(" ) ");
+    w.write(")");
     if ( ! (statement instanceof BlockStatement))
     {
       w.beginBlock();
       statement.translate(c, w);
       w.endBlock();
     }
-    else
+    else {
       statement.translate(c, w);
+    }
   }
 
   public Node dump( CodeWriter w)

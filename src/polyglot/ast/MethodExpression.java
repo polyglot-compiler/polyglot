@@ -109,16 +109,21 @@ public class MethodExpression extends Expression {
     
     target = newTarget;
   }
+
+  public int getPrecedence()
+  {
+    return PRECEDENCE_OTHER;
+  }
   
   public void translate(LocalContext c, CodeWriter w)
   {
-    if (target != null)
-    {
+    if (target != null) {
       target.translate(c, w);
-      w.write ("." + name + "(");
+      w.write (".");
     }
-    else 
-      w.write(name + "(");
+
+    w.write(name + "( ");
+    
     for(ListIterator it=arguments.listIterator(); it.hasNext(); ) {
       ((Expression)it.next()).translate(c, w);
       if (it.hasNext())
@@ -186,15 +191,23 @@ public class MethodExpression extends Expression {
     return this;
   }
   
-  public void visitChildren(NodeVisitor v) {
+  Object visitChildren(NodeVisitor v) 
+  {
+    Object vinfo = Annotate.getVisitorInfo( this);
+
     if (target != null) {
       target = target.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( target), vinfo);
     }
 
     for(ListIterator it=arguments.listIterator(); it.hasNext(); ) {
-      it.set(((Expression) it.next()).visit(v));
+      Expression expr = (Expression)it.next();
+      expr = (Expression)expr.visit( v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( expr), vinfo);
+      it.set( expr);
     }
 
+    return vinfo;
   }
 
   public Node copy() {
