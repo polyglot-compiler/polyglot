@@ -262,25 +262,28 @@ public interface TypeSystem {
 	throws SemanticException;
 
     /**
-     * Find a method.  We need to pass the context because the method
-     * we find depends on whether the method is accessible from the context.
+     * Find a method.  We need to pass the class from which the method
+     * is being found because the method
+     * we find depends on whether the method is accessible from that
+     * class.
      * We also check if the field is accessible from the context 'c'.
      * @exception SemanticException if the method cannot be found or is
      * inaccessible.
      */
     MethodInstance findMethod(ReferenceType container,
                               String name, List argTypes,
-                              Context c) throws SemanticException;
+                              ClassType currClass) throws SemanticException;
 
     /**
-     * Find a constructor.  We need to pass the context because the constructor
-     * we find depends on whether the method is accessible from the context.
-     * We also check if the field is accessible from the context 'c'.
+     * Find a constructor.  We need to pass the class from which the constructor
+     * is being found because the constructor
+     * we find depends on whether the constructor is accessible from that
+     * class.
      * @exception SemanticException if the constructor cannot be found or is
      * inaccessible.
      */
     ConstructorInstance findConstructor(ClassType container, List argTypes,
-                                        Context c) throws SemanticException;
+                                        ClassType currClass) throws SemanticException;
 
     /**
      * Find a member class.

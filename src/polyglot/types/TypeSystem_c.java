@@ -654,13 +654,13 @@ public class TypeSystem_c implements TypeSystem
      * with an error explaining why.  Access flags are considered.
      **/
     public MethodInstance findMethod(ReferenceType container,
-	                             String name, List argTypes, Context c)
+	                             String name, List argTypes, ClassType currClass)
 	throws SemanticException {
 
         assert_(container);
         assert_(argTypes);
 
-	List acceptable = findAcceptableMethods(container, name, argTypes, c);
+	List acceptable = findAcceptableMethods(container, name, argTypes, currClass);
 
 	if (acceptable.size() == 0) {
 	    throw new NoMemberException(NoMemberException.METHOD,
@@ -671,7 +671,7 @@ public class TypeSystem_c implements TypeSystem
 	}
 
 	MethodInstance mi = (MethodInstance)
-	    findProcedure(acceptable, container, argTypes, c);
+	    findProcedure(acceptable, container, argTypes, currClass);
 
 	if (mi == null) {
 	    throw new SemanticException(
@@ -683,13 +683,13 @@ public class TypeSystem_c implements TypeSystem
     }
 
     public ConstructorInstance findConstructor(ClassType container,
-					       List argTypes, Context c)
+                           List argTypes, ClassType currClass)
 	throws SemanticException {
 
         assert_(container);
         assert_(argTypes);
 
-	List acceptable = findAcceptableConstructors(container, argTypes, c);
+	List acceptable = findAcceptableConstructors(container, argTypes, currClass);
 
 	if (acceptable.size() == 0) {
 	    throw new NoMemberException(NoMemberException.CONSTRUCTOR,
@@ -698,7 +698,7 @@ public class TypeSystem_c implements TypeSystem
 	}
 
 	ConstructorInstance ci = (ConstructorInstance)
-	    findProcedure(acceptable, container, argTypes, c);
+	    findProcedure(acceptable, container, argTypes, currClass);
 
 	if (ci == null) {
 	    throw new NoMemberException(NoMemberException.CONSTRUCTOR,
@@ -712,7 +712,7 @@ public class TypeSystem_c implements TypeSystem
     protected ProcedureInstance findProcedure(List acceptable,
 	                                      ReferenceType container,
 					      List argTypes,
-					      Context c)
+					      ClassType currClass)
 	throws SemanticException {
 
         assert_(container);
@@ -766,7 +766,7 @@ public class TypeSystem_c implements TypeSystem
      * Applicable and Accessible as defined by JLS 15.11.2.1
      */
     protected List findAcceptableMethods(ReferenceType container, String name,
-	                                 List argTypes, Context context)
+                                     List argTypes, ClassType currClass)
 	throws SemanticException {
 
         assert_(container);
@@ -806,7 +806,7 @@ public class TypeSystem_c implements TypeSystem
 		    Report.report(3, "Trying " + mi);
 
 		if (methodCallValid(mi, name, argTypes) &&
-		    isAccessible(mi, context)) {
+		    isAccessible(mi, currClass)) {
 
 		    if (Report.should_report(Report.types, 3))
 			Report.report(3, "->acceptable: " + mi);
@@ -830,7 +830,8 @@ public class TypeSystem_c implements TypeSystem
      * Applicable and Accessible as defined by JLS 15.11.2.1
      */
     protected List findAcceptableConstructors(ClassType container,
-					      List argTypes, Context context) {
+                                              List argTypes, 
+                                              ClassType currClass) {
         assert_(container);
         assert_(argTypes);
 
@@ -847,7 +848,7 @@ public class TypeSystem_c implements TypeSystem
 	    if (Report.should_report(Report.types, 3))
 		Report.report(3, "Trying " + ci);
 
-	    if (callValid(ci, argTypes) && isAccessible(ci, context)) {
+	    if (callValid(ci, argTypes) && isAccessible(ci, currClass)) {
 		if (Report.should_report(Report.types, 3))
 		    Report.report(3, "->acceptable: " + ci);
 		acceptable.add(ci);

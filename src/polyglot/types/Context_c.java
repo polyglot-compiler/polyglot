@@ -149,7 +149,7 @@ public class Context_c implements Context
 
             // Found a class which has a method of the right name.
             // Now need to check if the method is of the correct type.
-            return ts.findMethod(rt, name, argTypes, this);
+            return ts.findMethod(rt, name, argTypes, this.currentClass());
         }
 
         if (outer != null) {

@@ -422,7 +422,7 @@ FIXME: check super types as well.
 
                 c = c.pushClass(anonType, anonType);
             }
-            ci = ts.findConstructor(ct, argTypes, c);
+            ci = ts.findConstructor(ct, argTypes, c.currentClass());
         }
         else {
             ci = ts.defaultConstructor(position(), ct);

@@ -179,7 +179,7 @@ public class Call_c extends Expr_c implements Call
     MethodInstance mi;
 
     if (targetType != null) {
-      mi = ts.findMethod(targetType, name, argTypes, c);
+      mi = ts.findMethod(targetType, name, argTypes, c.currentClass());
     }
     else {
       mi = c.findMethod(name, argTypes);
