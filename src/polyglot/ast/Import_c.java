@@ -54,11 +54,21 @@ public class Import_c extends Node_c implements Import
 
 	if (kind == CLASS) {
 	    it.addClassImport(name);
-            tb.typeSystem().typeForName(name);
 	}
 	else if (kind == PACKAGE) {
 	    it.addPackageImport(name);
-            if (! tb.typeSystem().packageExists(name)) {
+	}
+
+	return this;
+    }
+
+    /** Check that imported classes and packages exist. */
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+	if (kind == CLASS) {
+            tc.typeSystem().typeForName(name);
+	}
+	else if (kind == PACKAGE) {
+            if (! tc.typeSystem().packageExists(name)) {
                 throw new SemanticException("Package \"" + name +
                     "\" not found.", position());
             }
