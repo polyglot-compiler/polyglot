@@ -309,6 +309,10 @@ public class CFGBuilder implements Copy
         }
         FlowGraph.EdgeKey edgeKey;
         Term term;        
+
+	public String toString() {
+	    return "{edgeKey=" + edgeKey + ",term=" + term + "}";
+	}
     }
     /**
      * Create edges for a node <code>a</code> with successors
