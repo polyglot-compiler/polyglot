@@ -152,7 +152,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
     /**
      * Type check the declaration.  We must do this test before we leave scope.
      */
-    public Node typeCheckEnter(TypeChecker tc) throws SemanticException {
+    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
         Context c = tc.context();
 
 	try {
@@ -160,7 +160,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
 	}
 	catch (SemanticException e) {
             // not found, so not multiply-defined
-            return this;
+            return tc;
 	}
 
         throw new SemanticException(

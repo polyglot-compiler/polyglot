@@ -19,6 +19,10 @@ public abstract class AbstractNodeFactory_c implements NodeFactory
         return new Disamb_c();
     }
 
+    public Del defaultExt() {
+        return new Del_c();
+    }
+
     public final AmbPrefix AmbPrefix(Position pos, String name) {
 	return AmbPrefix(pos, null, name);
     }

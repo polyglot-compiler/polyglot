@@ -56,7 +56,7 @@ public interface NodeOps
      * @param tb The visitor which adds new type objects to the
      * <code>TypeSystem</code>.
      */
-    Node buildTypesEnter(TypeBuilder tb) throws SemanticException;
+    NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException;
 
     /**
      * Collects classes, methods, and fields from the AST rooted at this node
@@ -105,7 +105,7 @@ public interface NodeOps
      *
      * @param ar The visitor which disambiguates.
      */
-    Node disambiguateEnter(AmbiguityRemover ar) throws SemanticException;
+    NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException;
 
     /**
      * Remove any remaining ambiguities from the AST.
@@ -151,7 +151,7 @@ public interface NodeOps
      *
      * @param am The visitor which builds types.
      */
-    Node addMembersEnter(AddMemberVisitor am) throws SemanticException;
+    NodeVisitor addMembersEnter(AddMemberVisitor am) throws SemanticException;
 
     /**
      * Adds disambiguated methods and fields to the types.
@@ -197,7 +197,7 @@ public interface NodeOps
      *
      * @param cf The constant folding visitor.
      */
-    Node foldConstantsEnter(ConstantFolder cf);
+    NodeVisitor foldConstantsEnter(ConstantFolder cf);
 
     /**
      * Fold constants in the AST.
@@ -243,7 +243,7 @@ public interface NodeOps
      *
      * @param tc The type checking visitor.
      */
-    Node typeCheckEnter(TypeChecker tc) throws SemanticException;
+    NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException;
 
     /**
      * Type check the AST.
@@ -300,7 +300,7 @@ public interface NodeOps
      *
      * @param ec The visitor.
      */
-    Node exceptionCheckEnter(ExceptionChecker ec) throws SemanticException;
+    NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException;
 
     /**
      * Check that exceptions are properly propagated throughout the AST.

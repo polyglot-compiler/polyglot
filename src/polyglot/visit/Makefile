@@ -15,6 +15,7 @@ SOURCES = \
 	ExceptionChecker.java \
 	ExpectedTypeVisitor.java \
 	FlattenVisitor.java \
+	HaltingVisitor.java \
 	FlowChecker.java \
 	NodeScrambler.java \
 	NodeVisitor.java \

@@ -127,14 +127,11 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	return reconstruct(formals, exceptionTypes, body);
     }
 
-    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException {
-        tb.pushScope();
-        return this;
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
+        return tb.pushCode();
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        tb.popScope();
-
         TypeSystem ts = tb.typeSystem();
 
         List l = new ArrayList(formals.size());
@@ -152,17 +149,17 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
         return constructorInstance(ci);
     }
 
-    public Node disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
         if (ar.kind() == AmbiguityRemover.SUPER) {
-            return bypassChildren();
+            return ar.bypassChildren(this);
         }
         else if (ar.kind() == AmbiguityRemover.SIGNATURES) {
             if (body != null) {
-                return body((Block) body.bypass(true));
+                return ar.bypass(body);
             }
         }
 
-        return this;
+        return ar;
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
@@ -180,10 +177,10 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
         return this;
     }
 
-    public Node addMembersEnter(AddMemberVisitor am) {
+    public NodeVisitor addMembersEnter(AddMemberVisitor am) {
 	ParsedClassType ct = am.context().currentClass();
         ct.addConstructor(ci);
-        return bypassChildren();
+        return am.bypassChildren(this);
     }
 
     public void enterScope(Context c) {

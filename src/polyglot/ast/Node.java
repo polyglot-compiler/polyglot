@@ -26,22 +26,6 @@ public interface Node extends NodeOps, Copy
     Del del();
 
     /**
-     * Return true if the node should be bypassed on the next visit.
-     */
-    boolean bypass();
-
-    /**
-     * Create a new node with the bypass flag set to <code>bypass</code>.
-     */
-    Node bypass(boolean bypass);
-
-    /**
-     * Create a new node with the bypass flag set to true for all children
-     * of the node.
-     */
-    Node bypassChildren();
-
-    /**
      * Get the position of the node in the source file.  Returns null if
      * the position is not set.
      */
@@ -113,31 +97,31 @@ public interface Node extends NodeOps, Copy
     /** @deprectated */
     public Node buildTypesOverride(TypeBuilder tb) throws SemanticException;
     /** @deprectated */
-    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException;
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException;
     /** @deprectated */
     public Node buildTypes(TypeBuilder tb) throws SemanticException;
     /** @deprectated */
     public Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException;
     /** @deprectated */
-    public Node disambiguateEnter(AmbiguityRemover ar) throws SemanticException;
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException;
     /** @deprectated */
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException;
     /** @deprectated */
     public Node addMembersOverride(AddMemberVisitor am) throws SemanticException;
     /** @deprectated */
-    public Node addMembersEnter(AddMemberVisitor am) throws SemanticException;
+    public NodeVisitor addMembersEnter(AddMemberVisitor am) throws SemanticException;
     /** @deprectated */
     public Node addMembers(AddMemberVisitor am) throws SemanticException;
     /** @deprectated */
     public Node foldConstantsOverride(ConstantFolder cf);
     /** @deprectated */
-    public Node foldConstantsEnter(ConstantFolder cf);
+    public NodeVisitor foldConstantsEnter(ConstantFolder cf);
     /** @deprectated */
     public Node foldConstants(ConstantFolder cf);
     /** @deprectated */
     public Node typeCheckOverride(TypeChecker tc) throws SemanticException;
     /** @deprectated */
-    public Node typeCheckEnter(TypeChecker tc) throws SemanticException;
+    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException;
     /** @deprectated */
     public Node typeCheck(TypeChecker tc) throws SemanticException;
     /** @deprectated */
@@ -146,7 +130,7 @@ public interface Node extends NodeOps, Copy
     /** @deprectated */
     public Node exceptionCheckOverride(ExceptionChecker ec) throws SemanticException;
     /** @deprectated */
-    public Node exceptionCheckEnter(ExceptionChecker ec) throws SemanticException;
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException;
     /** @deprectated */
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException;
     /** @deprectated */

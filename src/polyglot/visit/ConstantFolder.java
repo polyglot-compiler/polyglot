@@ -23,7 +23,7 @@ public class ConstantFolder extends NodeVisitor
       return nf;
     }
 
-    public Node enter(Node n) {
+    public NodeVisitor enter(Node n) {
 	return n.del().foldConstantsEnter(this);
     }
 

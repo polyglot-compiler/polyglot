@@ -110,9 +110,9 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 	    return reconstruct(superClass, interfaces, body);
     }
 
-    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException {
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
 	TypeSystem ts = tb.typeSystem();
-	tb.pushClass(position(), flags, name);
+	tb = tb.pushClass(position(), flags, name);
         
         // Member classes of interfaces are implicitly static.
         ParsedClassType ct = tb.currentClass();
@@ -131,12 +131,11 @@ public class ClassDecl_c extends Node_c implements ClassDecl
             ct.flags(ct.flags().setAbstract());
         }
 
-        return this;
+        return tb;
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
 	ParsedClassType type = tb.currentClass();
-	tb.popClass();
         return type(type).flags(type.flags());
     }
 

@@ -6,63 +6,41 @@ import jltools.types.*;
 import java.util.*;
 
 /** Visitor which checks if exceptions are caught or declared properly. */
-public class ExceptionChecker extends NodeVisitor
+public class ExceptionChecker extends HaltingVisitor
 {
     protected TypeSystem ts;
     protected ErrorQueue eq;
-
-    /**
-     * This is a stack of sets of exceptions thrown for each lexical nesting
-     * level.
-     */
-    protected Stack stack;
+    protected ExceptionChecker outer;
+    protected SubtypeSet scope;
 
     public ExceptionChecker(TypeSystem ts, ErrorQueue eq) {
         this.ts = ts;
         this.eq = eq;
-        this.stack = new Stack();
+        this.scope = new SubtypeSet();
     }
 
-    public boolean begin() {
-        pushScope();
-        return true;
+    public ExceptionChecker push() {
+        ExceptionChecker ec = (ExceptionChecker) copy();
+        ec.outer = this;
+        ec.scope = new SubtypeSet();
+        return ec;
+    }
+
+    public ExceptionChecker pop() {
+        return outer;
+    }
+
+    public NodeVisitor begin() {
+        return this;
     }
 
     public void finish() {
-        popScope();
-        if (! stack.isEmpty()) {
-            throw new InternalCompilerError("Throws stack not empty.");
-        }
     }
 
     public TypeSystem typeSystem() {
 	return ts;
     }
 
-    public Node override(Node n) {
-        pushScope();
-
-	try {
-	    Node m = n.del().exceptionCheckOverride(this);
-            SubtypeSet t = popScope();
-	    throwsSet().addAll(t);
-	    return m;
-	}
-	catch (SemanticException e) {
-	    Position position = e.position();
-
-	    if (position == null) {
-		position = n.position();
-	    }
-
-	    eq.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), position);
-
-            popScope();
-
-	    return n;
-	}
-    }
-    
     /**
      * This method is called when we are to perform a "normal" traversal of 
      * a subtree rooted at <code>n</code>.   At every node, we will push a 
@@ -75,9 +53,21 @@ public class ExceptionChecker extends NodeVisitor
      *  children of <code>n</code>.
      *
      */
-    public Node enter(Node n) {
-        pushScope();
-        return n;
+    public NodeVisitor enter(Node n) {
+        try {
+            return n.exceptionCheckEnter(push());
+        }
+	catch (SemanticException e) {
+	    Position position = e.position();
+
+	    if (position == null) {
+		position = n.position();
+	    }
+
+	    eq.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), position);
+
+	    return push();
+	}
     }
 
     /**
@@ -93,8 +83,11 @@ public class ExceptionChecker extends NodeVisitor
     public Node leave(Node old, Node n, NodeVisitor v) {
 	// Merge results from the children and free the checker used for the
 	// children.
-        SubtypeSet t = popScope();
+        ExceptionChecker inner = (ExceptionChecker) v;
+        SubtypeSet t = inner.throwsSet();
         throwsSet().addAll(t);
+
+        if (inner.outer != this) throw new InternalCompilerError("oops!");
 
 	// gather exceptions from this node.
 	try {
@@ -130,20 +123,6 @@ public class ExceptionChecker extends NodeVisitor
      * modify the throwsSet.
      */
     public SubtypeSet throwsSet() {
-        return (SubtypeSet) stack.peek();
-    }
-
-    /**
-     * Push a new, empty, throws set.
-     */
-    public void pushScope() {
-        stack.push(new SubtypeSet());
-    }
-
-    /**
-     * Push the current throws set.
-     */
-    public SubtypeSet popScope() {
-        return (SubtypeSet) stack.pop();
+        return (SubtypeSet) scope;
     }
 }

@@ -113,7 +113,7 @@ public class SourceFile_c extends Node_c implements SourceFile
      * Build type objects for the source file.  Set the visitor's import table
      * field before we recurse into the declarations.
      */
-    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException {
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         TypeSystem ts = tb.typeSystem();
 
         ImportTable it;
@@ -127,7 +127,7 @@ public class SourceFile_c extends Node_c implements SourceFile
 
         tb.setImportTable(it);
 
-        return this;
+        return tb;
     }
 
     /**

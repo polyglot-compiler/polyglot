@@ -32,11 +32,11 @@ public class AmbiguityRemover extends SemanticVisitor
         return kind;
     }
 
-    protected Node enterCall(Node n) throws SemanticException {
+    protected NodeVisitor enterCall(Node n) throws SemanticException {
         Types.report(2, ">> " + kind + "::enter " + n);
-        Node m = n.del().disambiguateEnter(this);
-        Types.report(2, "<< " + kind + "::enter " + n + " -> " + m);
-        return m;
+        NodeVisitor v = n.del().disambiguateEnter(this);
+        Types.report(2, "<< " + kind + "::enter " + n + " -> " + v);
+        return v;
     }
 
     protected Node overrideCall(Node n) throws SemanticException {

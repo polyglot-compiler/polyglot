@@ -130,12 +130,12 @@ public class New_c extends Expr_c implements New
         }
     }
 
-    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException {
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         if (body != null) {
-            tb.pushAnonClass(position());
+            tb = tb.pushAnonClass(position());
         }
 
-        return this;
+        return tb;
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
@@ -144,7 +144,6 @@ public class New_c extends Expr_c implements New
         if (body != null) {
             ParsedAnonClassType type = (ParsedAnonClassType) tb.currentClass();
             n = (New_c) anonType(type);
-            tb.popClass();
         }
 
         TypeSystem ts = tb.typeSystem();
@@ -162,25 +161,22 @@ public class New_c extends Expr_c implements New
         return n.type(ts.unknownType(position()));
     }
 
-    public Node disambiguateEnter(AmbiguityRemover ar)
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar)
         throws SemanticException
     {
-        New n = this;
-
         // We can't disambiguate the type node if we have a qualifier.  The
         // type node represents an inner class of the qualifier, and we don't
         // know which outer class to look in until the qualifier is type
         // checked.
-        if (n.qualifier() != null) {
-            n = n.objectType((TypeNode) n.objectType().bypass(true));
+        if (qualifier != null) {
+            ar = (AmbiguityRemover) ar.bypass(tn);
         }
 
-        if (n.body() != null) {
-            n = n.body((ClassBody) n.body().bypass(true));
+        if (body != null) {
+            ar = (AmbiguityRemover) ar.bypass(body);
         }
 
-
-        return n;
+        return ar;
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
@@ -252,18 +248,16 @@ public class New_c extends Expr_c implements New
         return this;
     }
 
-    public Node typeCheckEnter(TypeChecker tc) throws SemanticException {
-        New n = this;
-
-        if (n.qualifier() != null) {
-            n = n.objectType((TypeNode) n.objectType().bypass(true));
+    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+        if (qualifier != null) {
+            tc = (TypeChecker) tc.bypass(tn);
         }
 
-        if (n.body() != null) {
-            n = n.body((ClassBody) n.body().bypass(true));
+        if (body != null) {
+            tc = (TypeChecker) tc.bypass(body);
         }
 
-        return n;
+        return tc;
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {

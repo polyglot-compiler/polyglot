@@ -28,12 +28,12 @@ public class DumpAst extends NodeVisitor
      * that node. Then we begin a new <code>CodeWriter</code> block and traverse
      * the children.
      */
-    public Node enter(Node n) {
+    public NodeVisitor enter(Node n) {
 	w.write("(");
 	n.dump(w);
 	w.allowBreak(4," ");
 	w.begin(0);
-	return n;
+	return this;
     }
 
     /**

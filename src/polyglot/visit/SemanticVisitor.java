@@ -10,7 +10,7 @@ import java.util.*;
  * A visitor which maintains a context.  This is the base class of the
  * disambiguation and type checking visitors.
  */
-public abstract class SemanticVisitor extends NodeVisitor
+public abstract class SemanticVisitor extends HaltingVisitor
 {
     protected Context context;
     protected Context.Mark top;
@@ -42,7 +42,7 @@ public abstract class SemanticVisitor extends NodeVisitor
         return ts;
     }
 
-    public boolean begin() {
+    public NodeVisitor begin() {
 	context = job.context();
         if (context == null) {
             context = ts.createContext();
@@ -50,20 +50,20 @@ public abstract class SemanticVisitor extends NodeVisitor
         top = context.mark();
         depth = 0;
         errors = new BitSet();
-        return true;
+        return this;
     }
 
     public Context context() {
 	return context;
     }
 
-    protected Node enterCall(Node parent, Node n) throws SemanticException {
+    protected NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
         Types.report(1, "enter: " + parent + " -> " + n);
         return enterCall(n);
     }
 
-    protected Node enterCall(Node n) throws SemanticException {
-        return n;
+    protected NodeVisitor enterCall(Node n) throws SemanticException {
+        return this;
     }
 
     protected Node overrideCall(Node n) throws SemanticException {
@@ -148,7 +148,7 @@ public abstract class SemanticVisitor extends NodeVisitor
 	}
     }
 
-    public Node enter(Node parent, Node n) {
+    public NodeVisitor enter(Node parent, Node n) {
         Types.report(5, "enter(" + n + "): " + depth + "->" + (depth+1));
         depth++;
         errors.clear(depth);
@@ -156,7 +156,7 @@ public abstract class SemanticVisitor extends NodeVisitor
         enterScope(n);
 
         try {
-            n = enterCall(parent, n);
+            return enterCall(parent, n);
         }
 	catch (SemanticException e) {
 	    Position position = e.position();
@@ -178,7 +178,7 @@ public abstract class SemanticVisitor extends NodeVisitor
             depth--;
 	}
 
-        return n;
+        return this;
     }
 
     public Node leave(Node old, Node n, NodeVisitor v) {

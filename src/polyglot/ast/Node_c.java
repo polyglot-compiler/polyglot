@@ -17,14 +17,12 @@ import java.util.*;
 public abstract class Node_c implements Node
 {
     protected Position position;
-    protected boolean bypass;
     protected Del del;
 
     public Node_c(Del del, Position pos) {
         this.del = del;
         this.del.init(this);
 	this.position = pos;
-	this.bypass = false;
     }
 
     public Del del() {
@@ -52,32 +50,6 @@ public abstract class Node_c implements Node
         return del((Del) this.del.copy());
     }
 
-    public boolean bypass() {
-	return bypass;
-    }
-
-    public Node bypass(boolean bypass) {
-	if (this.bypass != bypass) {
-	    Node_c n = (Node_c) copy();
-	    n.bypass = bypass;
-	    return n;
-	}
-
-	return this;
-    }
-
-    static class BypassChildrenVisitor extends NodeVisitor {
-	public Node override(Node n) {
-	return n.bypass(true);
-	}
-    }
-
-    static BypassChildrenVisitor bcv = new BypassChildrenVisitor();
-
-    public Node bypassChildren() {
-	return bypass(false).visitChildren(bcv);
-    }
-
     public Position position() {
 	return this.position;
     }
@@ -101,29 +73,24 @@ public abstract class Node_c implements Node
     }
 
     public Node visitEdge(Node parent, NodeVisitor v) {
-	if (bypass) {
-	    Types.report(5, "skipping " + this);
-	    return bypass(false);
-	}
-
 	Node n = v.override(parent, this);
 
 	if (n == null) {
-	    n = v.enter(parent, this);
+	    NodeVisitor v_ = v.enter(parent, this);
 
-	    if (n == null) {
+	    if (v_ == null) {
 		throw new InternalCompilerError(
 		    "NodeVisitor.enter() returned null.");
 	    }
 
-	    n = n.visitChildren(v);
+	    n = this.visitChildren(v_);
 
 	    if (n == null) {
 		throw new InternalCompilerError(
 		    "Node_c.visitChildren() returned null.");
 	    }
 
-	    n = v.leave(parent, this, n, v);
+	    n = v.leave(parent, this, n, v_);
 
 	    if (n == null) {
 		throw new InternalCompilerError(
@@ -192,8 +159,8 @@ public abstract class Node_c implements Node
 	return null;
     }
 
-    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException {
-	return this;
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
+	return tb;
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
@@ -205,8 +172,8 @@ public abstract class Node_c implements Node
 	return null;
     }
 
-    public Node disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
-	return this;
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
+	return ar;
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
@@ -218,8 +185,8 @@ public abstract class Node_c implements Node
 	return null;
     }
 
-    public Node addMembersEnter(AddMemberVisitor am) throws SemanticException {
-	return this;
+    public NodeVisitor addMembersEnter(AddMemberVisitor am) throws SemanticException {
+	return am;
     }
 
     public Node addMembers(AddMemberVisitor am) throws SemanticException {
@@ -231,8 +198,8 @@ public abstract class Node_c implements Node
 	return null;
     }
 
-    public Node foldConstantsEnter(ConstantFolder cf) {
-	return this;
+    public NodeVisitor foldConstantsEnter(ConstantFolder cf) {
+	return cf;
     }
 
     public Node foldConstants(ConstantFolder cf) {
@@ -244,8 +211,8 @@ public abstract class Node_c implements Node
 	return null;
     }
 
-    public Node typeCheckEnter(TypeChecker tc) throws SemanticException {
-	return this;
+    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+	return tc;
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
@@ -261,8 +228,8 @@ public abstract class Node_c implements Node
 	return null;
     }
 
-    public Node exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
-	return this;
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
+	return ec;
     }
 
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
@@ -307,11 +274,6 @@ public abstract class Node_c implements Node
             w.begin(0);
             w.write("(position " + (position != null ? position.toString()
                                                      : "UNKNOWN") + ")");
-            w.end();
-
-            w.allowBreak(4, " ");
-            w.begin(0);
-            w.write("(bypass " + bypass() + ")");
             w.end();
     }
 

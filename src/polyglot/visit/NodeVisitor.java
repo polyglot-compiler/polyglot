@@ -1,6 +1,7 @@
 package jltools.visit;
 
 import jltools.ast.Node;
+import jltools.util.*;
 import java.util.*;
 
 /**
@@ -52,12 +53,12 @@ public abstract class NodeVisitor
      * @return The <code>NodeVisitor</code> which should be used to visit the
      * children of <code>n</code>.
      */
-    public Node enter(Node parent, Node n) {
+    public NodeVisitor enter(Node parent, Node n) {
         return enter(n);
     }
 
-    public Node enter(Node n) {
-        return n;
+    public NodeVisitor enter(Node n) {
+        return this;
     }
 
     /**
@@ -91,10 +92,10 @@ public abstract class NodeVisitor
      * The begin method is called before the entire tree is visited.
      * This method allows the visitor to perform any initialization
      * that cannot be done when the visitor is created.
-     * If <code>false</code> is returned, the ast is not traversed.
+     * If <code>null</code> is returned, the ast is not traversed.
      */
-    public boolean begin() {
-        return true;
+    public NodeVisitor begin() {
+        return this;
     }
 
     /**

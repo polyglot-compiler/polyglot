@@ -35,12 +35,14 @@ public class VisitorPass extends AbstractPass
 	    throw new InternalCompilerError("Null AST: did the parser run?");
 	}
 
-        if (v.begin()) {
+        NodeVisitor v_ = v.begin();
+
+        if (v_ != null) {
 	    ErrorQueue q = job.compiler().errorQueue();
 	    int nErrsBefore = q.errorCount();
 
-            ast = ast.visit(v);
-            v.finish(ast);
+            ast = ast.visit(v_);
+            v_.finish(ast);
 
             int nErrsAfter = q.errorCount();
 

@@ -85,10 +85,10 @@ public class Try_c extends Stmt_c implements Try
      * exceptionCheck(), called from ExceptionChecker.leave(),
      * will handle visiting children.
      */
-    public Node exceptionCheckEnter(ExceptionChecker ec)
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
 	throws SemanticException
     {
-      return bypassChildren();
+        return ec.bypassChildren(this);
     }
 
     /**
@@ -162,24 +162,24 @@ public class Try_c extends Stmt_c implements Try
 	for (Iterator i = this.catchBlocks.iterator(); i.hasNext(); ) {
 	    Catch cb = (Catch) i.next();
 
-            ec.pushScope();
+            ec = ec.push();
 
 	    cb = (Catch) visitChild(cb, ec);
 	    catchBlocks.add(cb);
 
 	    thrown.addAll(ec.throwsSet());
-            ec.popScope();
+            ec = ec.pop();
 	}
 
 	Block finallyBlock = null;
 
 	if (this.finallyBlock != null) {
-            ec.pushScope();
+            ec = ec.push();
 
 	    finallyBlock = (Block) visitChild(this.finallyBlock, ec);
 
 	    thrown.addAll(ec.throwsSet());
-            ec.popScope();
+            ec = ec.pop();
 	}
 
 	return reconstruct(tryBlock, catchBlocks, finallyBlock);

@@ -13,7 +13,7 @@ public class ExpectedTypeVisitor extends SemanticVisitor
 	super(job, ts, nf);
     }
 
-    protected Node enterCall(Node parent, Node n) throws SemanticException {
+    protected NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
         if (parent != null && n instanceof Expr) {
             n = parent.del().setExpectedType((Expr) n, this);
         }

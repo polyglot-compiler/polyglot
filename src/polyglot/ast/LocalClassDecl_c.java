@@ -58,14 +58,12 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
         c.addType(decl.type().toClass().toLocal());
     }
 
-    public Node disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
-        if (ar.kind() == AmbiguityRemover.SUPER) {
-            return bypassChildren();
-        }
-        else if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-            return bypassChildren();
-        }
-        else {
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
+        return ar.bypassChildren(this);
+    }
+
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        if (ar.kind() == AmbiguityRemover.ALL) {
             ClassDecl d = (ClassDecl) ar.job().spawn(ar.context(), decl,
                                                      Pass.CLEAN_SUPER,
                                                      Pass.ADD_MEMBERS_ALL);
@@ -76,8 +74,11 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
                     position());
             }
 
-            return decl(d);
+            LocalClassDecl n = decl(d);
+            return n.visitChild(d, ar);
         }
+
+        return this;
     }
 
     public String toString() {

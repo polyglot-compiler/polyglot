@@ -11,19 +11,29 @@ import java.io.IOException;
 import java.util.*;
 
 /** Visitor which traverses the AST constructing type objects. */
-public class TypeBuilder extends NodeVisitor
+public class TypeBuilder extends HaltingVisitor
 {
-    protected Stack stack;
     protected ImportTable importTable;
     protected Job job;
     protected TypeSystem ts;
     protected NodeFactory nf;
+    protected TypeBuilder outer;
 
     public TypeBuilder(Job job, TypeSystem ts, NodeFactory nf) {
         this.job = job;
         this.ts = ts;
         this.nf = nf;
-	stack = new Stack();
+        this.outer = null;
+    }
+
+    public TypeBuilder push() {
+        TypeBuilder tb = (TypeBuilder) this.copy();
+        tb.outer = this;
+        return tb;
+    }
+
+    public TypeBuilder pop() {
+        return outer;
     }
 
     public Job job() {
@@ -42,12 +52,12 @@ public class TypeBuilder extends NodeVisitor
         return ts;
     }
 
-    public boolean begin() {
+    public NodeVisitor begin() {
         // Initialize the stack from the context.
         Context context = job.context();
 
         if (context == null) {
-            return true;
+            return this;
         }
 
         Stack s = new Stack();
@@ -67,27 +77,29 @@ public class TypeBuilder extends NodeVisitor
             setImportTable(context.importTable());
         }
 
+        TypeBuilder tb = this;
+
         while (! s.isEmpty()) {
             ParsedClassType ct = (ParsedClassType) s.pop();
 
             try {
-                pushClass(ct);
+                tb = tb.pushClass(ct);
             }
             catch (SemanticException e) {
                 errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
                                      e.getMessage(), ct.position());
-                return false;
+                return null;
             }
 
             if (ct.isLocal() || ct.isAnonymous()) {
-                pushScope();
+                tb = tb.pushCode();
             }
         }
 
-        return true;
+        return tb;
     }
 
-    public Node enter(Node n) {
+    public NodeVisitor enter(Node n) {
         try {
 	    return n.del().buildTypesEnter(this);
 	}
@@ -101,31 +113,13 @@ public class TypeBuilder extends NodeVisitor
 	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
 		                 e.getMessage(), position);
 
-            return n;
-	}
-    }
-
-    public Node override(Node n) {
-        try {
-	    return n.del().buildTypesOverride(this);
-	}
-	catch (SemanticException e) {
-	    Position position = e.position();
-
-	    if (position == null) {
-		position = n.position();
-	    }
-
-	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-		                 e.getMessage(), position);
-
-	    return n;
+            return this;
 	}
     }
 
     public Node leave(Node old, Node n, NodeVisitor v) {
 	try {
-	    return n.del().buildTypes(this);
+	    return n.del().buildTypes((TypeBuilder) v);
 	}
 	catch (SemanticException e) {
 	    Position position = e.position();
@@ -141,56 +135,37 @@ public class TypeBuilder extends NodeVisitor
 	}
     }
 
-    Object inCode = new Object();
+    boolean local; // true if the last scope pushed as not a class.
+    boolean global; // true if all scopes pushed have been classes.
+    ParsedClassType type; // last class pushed.
 
-    public void pushScope() {
+    public TypeBuilder pushCode() {
         Types.report(4, "TB pushing code");
-        stack.push(inCode);
+        TypeBuilder tb = push();
+        tb.local = true;
+        tb.global = false;
+        return tb;
     }
 
-    public void popScope() {
-        if (stack.isEmpty()) {
-	    throw new InternalCompilerError("Empty class stack.");
-	}
-
-	if (! isLocal()) {
-	    throw new InternalCompilerError("No method to pop.");
-	}
-
-        Types.report(4, "TB popping code");
-
-        stack.pop();
-    }
-
-    public void pushClass(ParsedClassType type) throws SemanticException {
+    public TypeBuilder pushClass(ParsedClassType type) throws SemanticException {
         Types.report(4, "TB pushing class " + type);
 
-        stack.push(type);
+        TypeBuilder tb = push();
+        tb.type = type;
+        tb.local = false;
 
 	// Make sure the import table finds this class.
         if (importTable() != null && type.isTopLevel()) {
-	    importTable().addClassImport(type.toTopLevel().fullName());
+	    tb.importTable().addClassImport(type.toTopLevel().fullName());
 	}
-    }
-
-    public void popClass() {
-        if (stack.isEmpty()) {
-	    throw new InternalCompilerError("Empty class stack.");
-	}
-
-	if (isLocal()) {
-	    throw new InternalCompilerError("No class to pop.");
-	}
-
-        Types.report(4, "TB popping " + stack.peek());
-
-        stack.pop();
+        
+        return tb;
     }
 
     private ParsedClassType newClass(Position pos, Flags flags, String name) {
 	TypeSystem ts = typeSystem();
 
-	if (isLocal()) {
+	if (local) {
 	    ParsedLocalClassType ct = ts.localClassType();
 	    ct.outer(currentClass());
 	    ct.flags(flags);
@@ -234,10 +209,10 @@ public class TypeBuilder extends NodeVisitor
 	}
     }
 
-    public ParsedAnonClassType pushAnonClass(Position pos)
+    public TypeBuilder pushAnonClass(Position pos)
         throws SemanticException {
 
-        if (! isLocal()) {
+        if (! local) {
             throw new InternalCompilerError(
                 "Cannot push anonymous class outside method scope.");
         }
@@ -252,40 +227,18 @@ public class TypeBuilder extends NodeVisitor
             ct.package_(currentPackage());
         }
 
-        pushClass(ct);
-
-        return ct;
+        return pushClass(ct);
     }
 
-    public ParsedClassType pushClass(Position pos, Flags flags, String name)
+    public TypeBuilder pushClass(Position pos, Flags flags, String name)
     	throws SemanticException {
 
         ParsedClassType t = newClass(pos, flags, name);
-        pushClass(t);
-	return t;
-    }
-
-    public boolean isLocal() {
-        return ! stack.isEmpty() && stack.peek() == inCode;
-    }
-
-    /** Is this a top-level class or one of its members? */
-    public boolean isGlobal() {
-        return ! stack.contains(inCode);
+        return pushClass(t);
     }
 
     public ParsedClassType currentClass() {
-	ListIterator iter = stack.listIterator(stack.size());
-
-	while (iter.hasPrevious()) {
-	    Object o = iter.previous();
-
-	    if (o != inCode) {
-	        return (ParsedClassType) o;
-	    }
-	}
-
-	return null;
+        return this.type;
     }
 
     public Package currentPackage() {
@@ -299,5 +252,12 @@ public class TypeBuilder extends NodeVisitor
 
     public void setImportTable(ImportTable it) {
         this.importTable = it;
+    }
+
+    public String toString() {
+        return "(TB " + type +
+                (local ? " local" : "") +
+                (global ? " global" : "") +
+                (outer == null ? ")" : " " + outer.toString());
     }
 }

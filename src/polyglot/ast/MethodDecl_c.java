@@ -142,14 +142,11 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	return reconstruct(returnType, formals, exceptionTypes, body);
     }
 
-    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException {
-        tb.pushScope();
-        return this;
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
+        return tb.pushCode();
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        tb.popScope();
-
         TypeSystem ts = tb.typeSystem();
 
         List l = new ArrayList(formals.size());
@@ -170,17 +167,17 @@ public class MethodDecl_c extends Node_c implements MethodDecl
     }
 
     /** Build type objects for the method. */
-    public Node disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
         if (ar.kind() == AmbiguityRemover.SUPER) {
-            return bypassChildren();
+            return ar.bypassChildren(this);
         }
         else if (ar.kind() == AmbiguityRemover.SIGNATURES) {
             if (body != null) {
-                return body((Block) body.bypass(true));
+                return ar.bypass(body);
             }
         }
 
-        return this;
+        return ar;
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
@@ -198,10 +195,10 @@ public class MethodDecl_c extends Node_c implements MethodDecl
         return this;
     }
 
-    public Node addMembersEnter(AddMemberVisitor am) {
+    public NodeVisitor addMembersEnter(AddMemberVisitor am) {
         ParsedClassType ct = am.context().currentClass();
         ct.addMethod(mi);
-        return bypassChildren();
+        return am.bypassChildren(this);
     }
 
     public void enterScope(Context c) {

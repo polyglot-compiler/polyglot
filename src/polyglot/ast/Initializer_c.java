@@ -87,29 +87,27 @@ public class Initializer_c extends Node_c implements Initializer
 	c.popCode();
     }
 
-    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException {
-        tb.pushScope();
-        return this;
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
+        return tb.pushCode();
     }
 
     /** Build type objects for the method. */
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        tb.popScope();
         TypeSystem ts = tb.typeSystem();
         ClassType ct = tb.currentClass();
         InitializerInstance ii = ts.initializerInstance(position(), ct, flags);
         return initializerInstance(ii);
     }
 
-    public Node disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
         // Do not visit body on the clean-super and clean-signatures passes.
         if (ar.kind() == AmbiguityRemover.SUPER) {
-            return bypassChildren();
+            return ar.bypassChildren(this);
         }
         else if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-            return bypassChildren();
+            return ar.bypassChildren(this);
         }
-        return this;
+        return ar;
     }
 
     /** Type check the initializer. */

@@ -16,7 +16,7 @@ public class AddMemberVisitor extends SemanticVisitor
         super(job, ts, nf);
     }
 
-    protected Node enterCall(Node n) throws SemanticException {
+    protected NodeVisitor enterCall(Node n) throws SemanticException {
         return n.del().addMembersEnter(this);
     }
 
