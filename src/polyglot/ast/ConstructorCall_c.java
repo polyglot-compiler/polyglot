@@ -110,16 +110,67 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
     /** Type check the call. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
-        // FIXME: What about the qualifier?
-        if (qualifier != null) {
-            throw new InternalCompilerError("Qualifier constructor calls not " +
-                                            "implemented.", position());
-        }
-
 	TypeSystem ts = tc.typeSystem();
 	Context c = tc.context();
 
 	ClassType ct = c.currentClass();
+
+        // The qualifier specifies the enclosing instance of this inner class.
+        // The type of the qualifier must be the outer class of this
+        // inner class or one of its super types.
+        //
+        // Example:
+        //
+        // class Outer {
+        //     class Inner { }
+        // }
+        //
+        // class ChildOfInner extends Outer.Inner {
+        //     ChildOfInner() { (new Outer()).super(); }
+        // }
+        if (qualifier != null) {
+            if (kind != SUPER) {
+                throw new SemanticException("Can only qualify a \"super\"" +
+                                            "constructor invocation.",
+                                            position());
+            }
+
+            Type qt = qualifier.type();
+
+            if (! qt.isClass()) {
+                throw new SemanticException("The type of a constructor " +
+                                            "invocation qualifier must be a " +
+                                            "member class.", position());
+            }
+
+            ClassType qct = qt.toClass();
+            ClassType superType = ct.superType().toClass();
+
+            boolean found = false;
+
+            // Check if ct or a supertype of ct is an member of qct.
+            for (Type t = ct; t != null; t = t.toReference().superType()) {
+                try {
+                    if (t.isClass() && t.toClass().isMember()) {
+                        MemberClassType mt = t.toClass().toMember();
+                        Type s = ts.findMemberClass(qct, mt.name());
+
+                        if (s == t) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                catch (SemanticException e) {
+                }
+            }
+
+            if (! found) {
+                throw new SemanticException("Class \"" + ct +
+                                            "\" is not a member of \"" + qt +
+                                            "\".", position());
+            }
+        }
 
 	if (kind == SUPER) {
 	    if (! ct.superType().isClass()) {
@@ -145,10 +196,10 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
-        // FIXME: What about the qualifier?
         if (child == qualifier) {
-            throw new InternalCompilerError("Qualifier constructor calls not " +
-                                            "implemented.", position());
+            // FIXME: Can be more specific
+            TypeSystem ts = tc.typeSystem();
+            return child.expectedType(ts.Object());
         }
 
         Iterator i = this.arguments.iterator();
