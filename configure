@@ -112,15 +112,15 @@ RT_JAR="${JAVA_HOME}/jre/lib/rt.jar"
 exists -f "${RT_JAR}"
 echo rt.jar is "${RT_JAR}"
 
-if [ -d ${JAVA_HOME}/include/win32 ]
+if [ -d "${JAVA_HOME}/include/win32" ]
 then
     OS=win32
     LIBPATH="PATH"
-elif [ -d ${JAVA_HOME}/include/linux ]
+elif [ -d "${JAVA_HOME}/include/linux" ]
 then
     OS=linux
     LIBPATH="LD_LIBRARY_PATH"
-elif [ -d ${JAVA_HOME}/include/solaris ]
+elif [ -d "${JAVA_HOME}/include/solaris" ]
 then
     OS=solaris
     LIBPATH="LD_LIBRARY_PATH"
@@ -161,14 +161,14 @@ cat > ${DEFS_MK} << EOF
 ESC_SOURCE = \$(subst /,${FILE_SEP},\$(SOURCE))
 ESC_BUILDPATH = \$(subst /,${FILE_SEP},\$(BUILDPATH))
 
-JAVA_HOME = ${JAVA_HOME}
+JAVA_HOME = "${JAVA_HOME}"
 
-JC = ${JAVAC}
-JAVA = ${JAVA}
-JAVAH = ${JAVAH}
-RMIC = ${RMIC}
-JAVADOC = ${JAVADOC}
-JAR = ${JAR}
+JC = "${JAVAC}"
+JAVA = "${JAVA}"
+JAVAH = "${JAVAH}"
+RMIC = "${RMIC}"
+JAVADOC = "${JAVADOC}"
+JAR = "${JAR}"
 
 OS = ${OS}
 
@@ -187,7 +187,7 @@ OUTPUT = \$(ESC_SOURCE)${FILE_SEP}classes
 
 LEX_RUNTIME = \$(ESC_SOURCE)${FILE_SEP}jlex.jar
 CUP_RUNTIME = \$(ESC_SOURCE)${FILE_SEP}java_cup.jar
-CLASSPATH = \$(OUTPUT)${PATH_SEP}\$(CUP_RUNTIME)${PATH_SEP}\$(LEX_RUNTIME)${PATH_SEP}\$(CRYPT_PATH)${PATH_SEP}\$(RT_JAR)${PATH_SEP}\$(TOOLS_JAR)
+CLASSPATH = "\$(OUTPUT)${PATH_SEP}\$(CUP_RUNTIME)${PATH_SEP}\$(LEX_RUNTIME)${PATH_SEP}\$(CRYPT_PATH)${PATH_SEP}\$(RT_JAR)${PATH_SEP}\$(TOOLS_JAR)"
 JAVAC_PATHS = -classpath \$(CLASSPATH) -sourcepath \$(ESC_BUILDPATH)${PATH_SEP}\$(ESC_SOURCE)
 
 JAVADOC_CLASSPATH = \$(IDOCLET_JAR)${PATH_SEP}\$(CLASSPATH)
@@ -223,7 +223,7 @@ mkdir -p $BIN
 
 echo creating ${BIN}/jlc
 
-R="\${JAVA} ${JLC_CP} jltools.main.Main \$@"
+R="\"\${JAVA}\" ${JLC_CP} jltools.main.Main \$@"
 
 cat > ${BIN}/jlc <<EOF
 #!/bin/sh
@@ -257,6 +257,8 @@ EOF
 exists -f ${BIN}/jifc
 chmod a+x ${BIN}/jifc
 
+#creating bin/localusers
+
 echo creating ${BIN}/localusers
 
 cat > ${BIN}/localusers <<EOF
@@ -281,7 +283,7 @@ fi
 ${LIBPATH}=\$TOP${FILE_SEP}lib${PATH_SEP}\$${LIBPATH}
 export ${LIBPATH}
 
-\$JAVA ${JLC_CP} -Dprincipal.path=\$1 jif.policy.Passwd 
+"\$JAVA" ${JLC_CP} -Dprincipal.path=\$1 jif.policy.Passwd 
 EOF
 exists -f ${BIN}/localusers
 chmod a+x ${BIN}/localusers
@@ -301,7 +303,7 @@ cat > ${BIN}/sampleusers <<EOF
 JAVAC='${JAVAC}'
 TOP="${TOP}"
 
-\$JAVAC ${JLC_CP} -d \$1 \${TOP}${FILE_SEP}demo${FILE_SEP}jif${FILE_SEP}principal${FILE_SEP}*.java
+"\$JAVAC" ${JLC_CP} -d \$1 \${TOP}${FILE_SEP}demo${FILE_SEP}jif${FILE_SEP}principal${FILE_SEP}*.java
 EOF
 exists -f ${BIN}/sampleusers
 chmod a+x ${BIN}/sampleusers
@@ -339,7 +341,7 @@ fi
 ${LIBPATH}=\$TOP${FILE_SEP}lib${PATH_SEP}\$${LIBPATH}
 export ${LIBPATH}
 
-\${JAVA} \${JIFCP} \${args}
+"\${JAVA}" \${JIFCP} \${args}
 
 EOF
 exists -f ${BIN}/jif

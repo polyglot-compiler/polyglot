@@ -94,7 +94,7 @@ endef
 define javadoc
 -rm -rf $(JAVADOC_OUTPUT)
 -mkdir -p $(JAVADOC_OUTPUT)
-"$(JAVADOC)" -d $(JAVADOC_OUTPUT) \
+$(JAVADOC) -d $(JAVADOC_OUTPUT) \
 	-sourcepath $(SOURCEPATH) \
 	-classpath "$(CLASSPATH)" \
 	$(PACKAGES)
@@ -104,11 +104,11 @@ endef
 
 define yacc
 awk 'BEGIN {FS = "\n"; s = 1} {print $$1, "\t // ", s++}' $< | \
-	"$(JAVA)" -classpath "$(CLASSPATH)" java_cup.Main -parser Grm
+	$(JAVA) -classpath $(CLASSPATH) java_cup.Main -parser Grm
 endef
 
 define flex
-	"$(JAVA)" -classpath "$(CLASSPATH)" JFlex.Main $<
+	$(JAVA) -classpath $(CLASSPATH) JFlex.Main $<
 endef
 
 
