@@ -268,14 +268,33 @@ public class FlowGraph {
       this.succEdgeKeys = null;
     }
 
+    /** The successor Edges. */
     public List succs() { return succs; }
+
+    /** The predecessor Edges. */
     public List preds() { return preds; }
+
+    /** The node for which this is a peer. */
     public Term node()  { return node; }
+
+    /**
+     * The input data flow item.  Should only be called
+     * after data flow analysis is performed.
+     */
+    public DataFlow.Item inItem() { return inItem; }
+
+    /**
+     * The output item for a particular EdgeKey.  Should only be called
+     * after data flow analysis is performed.
+     */
+    public DataFlow.Item outItem(EdgeKey key) {
+      return (DataFlow.Item) outItems.get(key);
+    }
 
     public String toString() {
       return node + "[" + hashCode() + ": " + path_to_finally + "]";
     }
-    
+
     public Set succEdgeKeys() {
         if (this.succEdgeKeys == null) {
             // the successor edge keys have not yet been calculated. do it
