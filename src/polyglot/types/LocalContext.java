@@ -292,6 +292,10 @@ public class LocalContext implements TypeContext
     Set visitedTypes = new HashSet();
     typeQueue.addLast(c);
 
+    if (scope.getType(c.getShortName()) == null) {
+      scope.putType(c.getShortName(), c);
+    }
+
     while (!typeQueue.isEmpty()) {
       c = (ClassType)typeQueue.removeFirst();
       if (visitedTypes.contains(c))
@@ -318,13 +322,10 @@ public class LocalContext implements TypeContext
 	    }
 	}
 
-	if (scope.getType(c.getShortName()) == null) {
-	  scope.putType(c.getShortName(), c);
-	}
-
 	visitedTypes.add(c);
 	if (c.getSuperType() != null)
 	  typeQueue.addLast(c.getSuperType());
+
 	for (Iterator i = c.getInterfaces().iterator(); i.hasNext(); ) {
 	  Object iface = i.next();
 	  if (iface != null)
