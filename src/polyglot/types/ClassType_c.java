@@ -54,14 +54,26 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 
     /** Get the full name of the class, if possible. */
     public String fullName() {
-        if (isTopLevel() && package_() != null) {
-            return package_().fullName() + "." + name();
-        }
-        else if (isMember() && container() instanceof Named) {
-            return ((Named) container()).fullName() + "." + name();
+        String name;
+        if (isAnonymous()) {
+            if (superType() != null) {
+                name = "<anon subtype of " + superType().toString() + ">";
+            }
+            else {
+                name = "<anon subtype of unknown>";
+            }
         }
         else {
-            return name();
+            name = name();
+        } 
+        if (isTopLevel() && package_() != null) {
+            return package_().fullName() + "." + name;
+        }
+        else if (isMember() && container() instanceof Named) {
+            return ((Named) container()).fullName() + "." + name;
+        }
+        else {
+            return name;
         }
     }
 
@@ -348,10 +360,10 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         }
         else {
             if (superType() != null) {
-                return "anonymous subtype of " + superType().toString();
+                return "<anon subtype of " + superType().toString() + ">";
             }
             else {
-                return "anonymous subtype of <unknown>";
+                return "<anon subtype of unknown>";
             }
         }
     }
