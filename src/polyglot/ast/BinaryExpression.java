@@ -525,7 +525,8 @@ public class BinaryExpression extends Expression
     public boolean throwsArithmeticException() {
 	// conservatively assume that any division or mod may throw ArithmeticException
 	// this is NOT true-- floats and doubles don't throw any exceptions ever...
-	if (operator == DIV || operator == MOD) return true;
+	if (operator == DIV || operator == MOD ||
+	    operator == DIVASSIGN || operator == MODASSIGN) return true;
 	else return false;
     }
 

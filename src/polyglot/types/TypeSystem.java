@@ -29,6 +29,11 @@ public abstract class TypeSystem {
   public abstract LocalContext getLocalContext( ImportTable it,
 	NodeVisitor visitor );
 
+  public abstract FieldInstance newFieldInstance( String name, Type type,
+	ReferenceType enclosingType, AccessFlags af);
+  public abstract LocalInstance newLocalInstance( String name, Type type,
+	AccessFlags af);
+
   ////
   // Functions for two-type comparison.
   ////
@@ -246,6 +251,9 @@ public abstract class TypeSystem {
     throws SemanticException;
 
 
+    public Node getNewSpecialExpressionExtension() {
+	return null;
+    }
     public Node getNewTypeNodeExtension() {
 	return null;
     }
@@ -310,7 +318,7 @@ public abstract class TypeSystem {
   }
 
   public abstract TypeContext getEmptyContext(ClassResolver resolver);
-  public abstract TypeContext getClassContext(ClassResolver resolver, ClassType clazz) throws SemanticException;
+  public abstract TypeContext getClassContext(ClassType clazz) throws SemanticException;
   public abstract TypeContext getPackageContext(ClassResolver resolver, PackageType type) throws SemanticException;
   public abstract TypeContext getPackageContext(ClassResolver resolver, String name) throws SemanticException;
 }

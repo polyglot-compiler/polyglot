@@ -5,7 +5,6 @@ import jltools.ast.NodeVisitor;
 
 import java.util.*;
 
-
 /**
  * A context to be used within the scope of a method body.  
  * It provides a convenient wrapper for the Type System.
@@ -84,7 +83,6 @@ public class LocalContext implements TypeContext
       }
 
       if (type == null) {
-new SemanticException("Method " + methodName + " not found").printStackTrace(System.out);
 	throw new SemanticException("Method " + methodName + " not found");
       }
     }
@@ -213,7 +211,6 @@ new SemanticException("Method " + methodName + " not found").printStackTrace(Sys
       Scope scope = (Scope) iter.previous();
       Type type = scope.getType(name);
       if (type != null) {
-// System.out.println(scope.toString() + ": " + name + " -> " + type + " " + type.getTypeString());
 	return type;
       }
     }
@@ -384,7 +381,8 @@ new SemanticException("Method " + methodName + " not found").printStackTrace(Sys
   /**
    * leaves a method
    */
-  public void leaveMethod() {
+  public void leaveMethod()
+  {
     try {
       if (scopes.peek() instanceof MethodScope) {
 	  scopes.pop();
@@ -480,8 +478,11 @@ new SemanticException("Method " + methodName + " not found").printStackTrace(Sys
     }
   }
 
-  public NodeVisitor getVisitor()
-  {
+  public ImportTable getImportTable() {
+    return itImports;
+  }
+
+  public NodeVisitor getVisitor() {
     return visitor;
   }
 

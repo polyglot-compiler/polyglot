@@ -48,10 +48,21 @@ public class StandardTypeSystem extends TypeSystem {
     SERIALIZABLE_ = resolver.findClass( "java.io.Serializable");
   }
 
-  public LocalContext getLocalContext( ImportTable it,
-        NodeVisitor visitor ) {
-
+  public LocalContext getLocalContext( ImportTable it, NodeVisitor visitor )
+  {
     return new LocalContext( it, this, visitor );
+  }
+
+  public FieldInstance newFieldInstance( String name, Type type,
+	ReferenceType enclosingType, AccessFlags af)
+  {
+      return new FieldInstance(name, type, enclosingType, af);
+  }
+	
+  public LocalInstance newLocalInstance( String name, Type type,
+	AccessFlags af)
+  {
+      return new LocalInstance(name, type, af);
   }
 
   ////
@@ -477,7 +488,7 @@ public class StandardTypeSystem extends TypeSystem {
 
   public Type checkAndResolveType(Type type, Type contextType) throws SemanticException {
     if (contextType.isClassType()) {
-	TypeContext classContext = getClassContext(resolver, (ClassType) contextType);
+	TypeContext classContext = getClassContext((ClassType) contextType);
 	return checkAndResolveType(type, classContext);
     }
     else if (contextType.isPackageType()) {
@@ -516,8 +527,7 @@ public class StandardTypeSystem extends TypeSystem {
 
     // Lookup the unqualified name in the context of the prefix.
     if (prefixType.isClassType()) {
-	TypeContext classContext = getClassContext(resolver,
-						  (ClassType) prefixType);
+	TypeContext classContext = getClassContext((ClassType) prefixType);
 	return classContext.getType(ambType.getName());
     }
     else if (prefixType.isPackageType()) {
@@ -1088,8 +1098,8 @@ public class StandardTypeSystem extends TypeSystem {
     return new EmptyContext(this, resolver);
   }
 
-  public TypeContext getClassContext(ClassResolver resolver, ClassType type) throws SemanticException {
-    return new ClassContext(resolver, type);
+  public TypeContext getClassContext(ClassType type) throws SemanticException {
+    return new ClassContext(type);
   }
 
   public TypeContext getPackageContext(ClassResolver resolver, PackageType type) throws SemanticException {

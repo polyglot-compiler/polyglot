@@ -28,6 +28,8 @@ public class VariableDeclarationStatement extends Statement
     // avoid cycles in the ast, so that the gc can perform well
     public WeakReference wrVDS;
 
+    public LocalInstance li;
+
     /**
      * Creates a new Declarator for a variable named <code>n</code>, with 
      * <code>dims</code> dimensions beyond those of the declarations's base
@@ -41,6 +43,7 @@ public class VariableDeclarationStatement extends Statement
       additionalDimensions = dims;
       initializer = init;
       wrVDS = new WeakReference(vds);
+      this.li = null;
     }
 
     public Declarator( VariableDeclarationStatement vds, 
@@ -62,6 +65,7 @@ public class VariableDeclarationStatement extends Statement
       {
         Declarator d = new Declarator ( ext, vds, n, dims, init);
         d.copyAnnotationsFrom ( this );
+	d.li = li;
         return d;
       }
       return this;
@@ -72,6 +76,9 @@ public class VariableDeclarationStatement extends Statement
 	return reconstruct(this.ext, vds, n, dims, init);
     }
 
+    public LocalInstance getLocalInstance() {
+      return li;
+    }
     
     public Node visitChildren( NodeVisitor v)
     {
@@ -87,7 +94,7 @@ public class VariableDeclarationStatement extends Statement
       if( c.inMethodScope() ) {
         VariableDeclarationStatement vdsEnclosing = 
           (VariableDeclarationStatement)wrVDS.get();
-        LocalInstance li = new LocalInstance( name, 
+        LocalInstance li = c.getTypeSystem().newLocalInstance( name, 
                                               vdsEnclosing.typeForDeclarator(this),
                                               vdsEnclosing.accessFlags );
         /* If it is a constant numeric expression (final + initializer is 
@@ -119,7 +126,7 @@ public class VariableDeclarationStatement extends Statement
         /* If it is a constant numeric expression (final + initializer is 
          * IntLiteral) then mark it "constant" under FieldInstance. */
         // FIXME other literal types?
-        LocalInstance li = new LocalInstance( name, 
+        li = c.getTypeSystem().newLocalInstance( name, 
                                               vdsEnclosing.typeForDeclarator(this),
                                               vdsEnclosing.accessFlags );
         if( initializer instanceof NumericalLiteral 

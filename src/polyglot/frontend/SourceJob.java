@@ -125,6 +125,10 @@ public class SourceJob extends Job
 
       result = result.visit( v);
       v.finish();
+
+      if (eq.hasErrors()) {
+	break;
+      }
     }
 
     ast = result;

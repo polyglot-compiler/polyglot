@@ -5,7 +5,7 @@
 #
 
 SOURCE = .
-SUBDIRS = jltools splitter
+SUBDIRS = jltools
 
 include Rules.mk
 

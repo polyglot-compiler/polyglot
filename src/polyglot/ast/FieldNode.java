@@ -100,7 +100,7 @@ public class FieldNode extends ClassMember
 
     while( iter.hasNext()) {
       decl = (VariableDeclarationStatement.Declarator)iter.next();
-      FieldInstance fi = new FieldInstance( decl.name, 
+      FieldInstance fi = sr.getTypeSystem().newFieldInstance( decl.name, 
                               declare.typeForDeclarator( decl), 
                               clazz, af);
       /* If it is a constant numeric expression (final + initializer is 

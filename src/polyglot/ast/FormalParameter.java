@@ -4,6 +4,7 @@ import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
 
+import java.io.IOException;
 
 /**
  * A <code>FormalParameter</code> is immutable representation of a ordered 
@@ -15,6 +16,7 @@ public class FormalParameter extends Node
   protected final TypeNode tn;
   protected final String name;
   protected final boolean isFinal;
+  protected LocalInstance li;
     
   /**
    * Creates a new <code>FormalParameter</code>.
@@ -25,6 +27,7 @@ public class FormalParameter extends Node
     this.tn = tn;
     this.name = name;
     this.isFinal = isFinal;
+    this.li = null;
   }
 
     public FormalParameter( TypeNode tn, String name, boolean isFinal) {
@@ -42,6 +45,7 @@ public class FormalParameter extends Node
     }
     else {
       FormalParameter n = new FormalParameter( ext, tn, name, isFinal);
+      n.li = li;
       n.copyAnnotationsFrom( this);
       return n;
     }
@@ -69,6 +73,10 @@ public class FormalParameter extends Node
     return name;
   }
 
+  public LocalInstance getLocalInstance() {
+    return li;
+  }
+
   /**
    * Returns true if this parameter is final.
    */
@@ -93,11 +101,22 @@ public class FormalParameter extends Node
     return null;
   }
 
+  public Node cleanupSignatures( LocalContext c, SignatureCleaner sc) throws SemanticException, IOException
+  {
+    TypeNode newTN = (TypeNode) tn.visit(sc);
+
+    AccessFlags modifiers = new AccessFlags();
+    modifiers.setFinal( isFinal);
+    c.addSymbol( name, c.getTypeSystem().newLocalInstance( name,
+	newTN.getType(), modifiers ));
+    return reconstruct( Node.condVisit(this.ext, sc), newTN, name, isFinal);
+  }
+
   public Node removeAmbiguities( LocalContext c) throws SemanticException
   {
     AccessFlags modifiers = new AccessFlags();
     modifiers.setFinal( isFinal);
-    c.addSymbol( name, new LocalInstance( name, tn.getType(),
+    c.addSymbol( name, c.getTypeSystem().newLocalInstance( name, tn.getType(),
                                           modifiers ));
     return this;
   }
@@ -110,8 +129,8 @@ public class FormalParameter extends Node
     
     AccessFlags modifiers = new AccessFlags();
     modifiers.setFinal( isFinal);
-    c.addSymbol( name, new LocalInstance( name, tn.getType(),
-                                          modifiers ));
+    li = c.getTypeSystem().newLocalInstance( name, tn.getType(), modifiers );
+    c.addSymbol( name, li );
 
     Annotate.setCheckedType( this, tn.getType());
     return this;

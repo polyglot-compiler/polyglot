@@ -7,10 +7,10 @@ import jltools.util.*;
 
 public class TypeChecker extends NodeVisitor
 {
-  private LocalContext c;
-  private ErrorQueue eq;
-  private BitVector errors;
-  private int depth;
+  protected LocalContext c;
+  protected ErrorQueue eq;
+  protected BitVector errors;
+  protected int depth;
   
   public TypeChecker( TypeSystem ts, ImportTable im, ErrorQueue eq)
   {

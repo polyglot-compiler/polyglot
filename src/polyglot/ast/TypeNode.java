@@ -6,6 +6,7 @@ import jltools.util.*;
 import jltools.types.*;
 import jltools.visit.*;
 
+import java.io.IOException;
 
 /**
  * A <code>TypeNode</code> represents the syntactic representation of a 
@@ -96,6 +97,12 @@ public class TypeNode extends Node
   public Node removeAmbiguities( LocalContext c) throws SemanticException
   {
     return reconstruct( ext, c.getType( type), original);
+  }
+
+  public Node cleanupSignatures( LocalContext c, SignatureCleaner sc)
+    throws SemanticException, IOException
+  {
+    return null;
   }
 
   public Node typeCheck(LocalContext c) throws SemanticException

@@ -42,9 +42,13 @@ public class AmbiguityRemover extends NodeVisitor
     }
     catch( SemanticException e)
     {
-      eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
-                  Annotate.getLineNumber( n));
-      // FIXME n.setHasError( true);
+      int line = e.getLineNumber();
+
+      if( line == SemanticException.INVALID_LINE) {
+	  line = Annotate.getLineNumber( n);
+      }
+
+      eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), line);
 
       n.leaveScope( c);
       return n;

@@ -43,7 +43,7 @@ public class ArrayType extends ReferenceType
     lengthFlags.setPublic(true);
 
     fields = new ArrayList(1);
-    fields.add(new FieldInstance("length", ts.getInt(), this, lengthFlags));
+    fields.add(ts.newFieldInstance("length", ts.getInt(), this, lengthFlags));
 
     interfaces = new ArrayList(2);
     interfaces.add(ts.getCloneable());
@@ -111,6 +111,10 @@ public class ArrayType extends ReferenceType
   // Arrays have a public final int field named "length".
   public List getFields() {
     return fields;
+  }
+
+  public FieldInstance getLengthField() {
+    return (FieldInstance) fields.get(0);
   }
 
   public Type getSuperType() {

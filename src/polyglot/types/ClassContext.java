@@ -16,24 +16,12 @@ import jltools.util.*;
  *    A ClassContext is responsible for looking up types in a packge by name.
  **/
 public class ClassContext implements TypeContext {
-  ClassResolver resolver;
   ClassType type;
   TypeSystem ts;
 
-  ClassContext(ClassResolver resolver, ClassType type)
-	throws SemanticException {
-
-    this.resolver = resolver;
+  ClassContext(ClassType type) throws SemanticException {
     this.type = type;
     this.ts = type.getTypeSystem();
-
-    try {
-	resolver.findClass(type.getTypeString());
-    }
-    catch (SemanticException e) {
-      throw new SemanticException("Class " + type.getTypeString() +
-				  " not found");
-    }
   }
 
   public Type getType(String name) throws SemanticException {
@@ -56,8 +44,8 @@ public class ClassContext implements TypeContext {
 
     if (type.getSuperType() != null && type.getSuperType().isClassType()) {
 	try {
-	    t1 = ts.getClassContext(resolver,
-		    type.getSuperType().toClassType()).getType(name);
+	    t1 = ts.getClassContext(
+		type.getSuperType().toClassType()).getType(name);
 	}
 	catch (SemanticException e) {
 	}
@@ -65,8 +53,7 @@ public class ClassContext implements TypeContext {
 
     if (type.getContainingClass() != null) {
 	try {
-	    t2 = ts.getClassContext(resolver,
-		    type.getContainingClass()).getType(name);
+	    t2 = ts.getClassContext(type.getContainingClass()).getType(name);
 	}
 	catch (SemanticException e) {
 	}

@@ -181,7 +181,7 @@ public class LoadedClassType extends ClassTypeImpl
     Type type = ts.typeForClass(f.getType());
     AccessFlags flags = AccessFlags.flagsForInt(f.getModifiers());    
     
-    FieldInstance fi = new FieldInstance(fieldName, type, this,  flags);
+    FieldInstance fi = ts.newFieldInstance(fieldName, type, this,  flags);
     // gets the constant field and sets it.
     try
     {    

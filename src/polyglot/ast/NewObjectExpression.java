@@ -189,24 +189,23 @@ public class NewObjectExpression extends Expression
   
   public Node typeCheck( LocalContext c) throws SemanticException
   {
-
     /* if there is a primary expression, do a late-lookup of
      * the identifier to find the class that we are instantiating
      * here.
      */
-    Type tnType;
+    ClassType ct;
     if (primary != null) {
-      tnType =
+      ct = (ClassType)
 	c.getTypeSystem().checkAndResolveType(tn.getType(),
 					      primary.getCheckedType());
     } else
-      tnType = tn.getCheckedType();
+      ct = (ClassType) tn.getCheckedType();
 
     // make sure that primary is the "containing" class for the inner class, 
     // if appropriate
     if( primary != null && 
         !primary.getCheckedType().equals(
-	((ClassType)tnType).getContainingClass())) {
+	ct.getContainingClass())) {
       throw new SemanticException (
               "The containing instance must be the containing class of \"" +
               tn.getType().getTypeString() + "\".",
@@ -214,20 +213,17 @@ public class NewObjectExpression extends Expression
     }
 
     if( primary != null && 
-         ((ClassType)tnType).getAccessFlags().isStatic()) {
+         ct.getAccessFlags().isStatic()) {
       // FIXME is this really true?
       throw new SemanticException(
              "Cannot specify a containing instance for static classes.",
 	      Annotate.getLineNumber(primary));
     }
 
-    if( ((ClassType)tnType).getAccessFlags().isAbstract()) {
+    if( ct.getAccessFlags().isAbstract()) {
       throw new SemanticException( "Cannot instantiate an abstract class.",
 	      Annotate.getLineNumber(this));
     }
-
-    ClassType ct; 
-    ct = (ClassType)tnType;
 
     List argTypes = new ArrayList( args.size());
     for( Iterator iter = arguments(); iter.hasNext(); ) {
@@ -274,8 +270,8 @@ public class NewObjectExpression extends Expression
        ((Expression)iter1.next()).setExpectedType( (Type)iter2.next());
     }
 
-    TypeNode newTn = tn.reconstruct(tnType, tn.getOriginal());
-    newTn.setCheckedType(tnType);
+    TypeNode newTn = tn.reconstruct(ct, tn.getOriginal());
+    newTn.setCheckedType(ct);
     return reconstruct(primary, newTn, args, cn);
   }
 

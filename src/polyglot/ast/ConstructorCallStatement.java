@@ -156,10 +156,32 @@ public class ConstructorCallStatement extends Statement
     return reconstruct( Node.condVisit(this.ext, v), newPrimary, kind, newArguments);
   }
 
-  public Node typeCheck( LocalContext c)
+  MethodTypeInstance mti;
+
+  public Node typeCheck( LocalContext c) throws SemanticException
   {
-    // FIXME: implement;
+    TypeSystem ts = c.getTypeSystem();
+
+    ClassType ct = c.getCurrentClass();
+
+    if (kind == SUPER) {
+	ct = (ClassType) ct.getSuperType();
+    }
+
+    List args = new LinkedList();
+
+    for (Iterator iter = arguments(); iter.hasNext(); ) {
+	Expression e = (Expression) iter.next();
+	args.add(e.getCheckedType());
+    }
+
+    mti = ts.getConstructor(ct, args, c);
+
     return this;
+  }
+
+  public MethodTypeInstance getMTI() {
+    return mti;
   }
 
   public void translate( LocalContext c, CodeWriter w)
