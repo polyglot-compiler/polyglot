@@ -57,11 +57,16 @@ public class LocalContext implements TypeContext
 
     while (iter.hasPrevious()) {
 	Scope scope = (Scope) iter.previous();
-	if (scope instanceof BlockScope) {
+	if (scope instanceof BlockScope
+            || scope instanceof MethodScope) {
 	  if (scope.getVariable(s) != null || scope.getType(s) != null) {
 	    return true;
 	  }
-	}
+
+          if (scope instanceof MethodScope) {
+            break;
+          }
+        }
 	else {
 	  break;
 	}
