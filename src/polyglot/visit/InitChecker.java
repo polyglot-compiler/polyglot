@@ -560,9 +560,12 @@ public class InitChecker extends DataFlow
         // a formal argument is always defined.            
         m.put(f.localInstance(), new MinMaxInitCount(InitCount.ONE,InitCount.ONE));
             
+        // record the fact that we have seen the formal declaration
+        currCBI.localDeclarations.add(f.localInstance());
+
         return itemToMap(new DataFlowItem(m), succEdgeKeys);
     }
-
+    
     /**
      * Perform the appropriate flow operations for declaration of a local 
      * variable
