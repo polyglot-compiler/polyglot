@@ -1,5 +1,5 @@
 class Outer {
-      class Inner { static class Inner2 { } }
+      class Inner { class Inner2 { } }
 }
  
 class BadInner {

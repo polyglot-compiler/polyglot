@@ -1,4 +1,4 @@
-// Test that a field inherited through a diamond is unambiguous
+// Test that a class inherited through a diamond is unambiguous
 // Contrast with BadReferences.jl
 class DiamondInh {
     public void main(String[] args) {

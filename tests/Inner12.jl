@@ -1,4 +1,4 @@
-public class Inner11 {
+public class Inner12 {
     public void bar() {
         class BBB {
             class DDD {

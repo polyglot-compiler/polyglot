@@ -39,8 +39,8 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         ConformanceCheck6.jl ;         
         ConformanceCheck7.jl (Semantic, "should be declared abstract");        
         packA/ConformanceCheck8.jl packB/ConformanceCheck8b.jl (Semantic, "should be declared abstract"); 
-        packA/ProtectedAccess1.jl packB/ProtectedAccess2.jl (Semantic, "Cannot call inaccessible method");
-        package1/ProtectedTest.jl package2/ProtectedTestBase.jl (Semantic, "Cannot call inaccessible method");
+        packA/ProtectedAccess1.jl packB/ProtectedAccess2.jl (Semantic, "No valid method call");
+        package1/ProtectedTest.jl package2/ProtectedTestBase.jl (Semantic, "No valid method call");
         package1/InnerClassAccess.jl package1/InnerClassProblem.jl ;
         Constants.jl ;  Constants2.jl ; Constants3.jl ; Constants4.jl ;
         Constants5.jl ; Constants6.jl ; Constants7.jl ; Constants8.jl;
@@ -54,8 +54,8 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         Equality.jl ;
         Equality2.jl ;
         Except.jl ; Except2.jl ; Except3.jl ; Except4.jl ;
-        Except5.jl (Post, ".*finally clause cannot complete normally.*"); // javac warning
-        Except6.jl (Post, ".*finally clause cannot complete normally.*"); // javac warning
+        Except5.jl ;
+        Except6.jl ;
         Field.jl ;
         FieldAccess.jl ;
         FieldAccess2.jl (Semantic, "Cannot access field");
@@ -68,8 +68,9 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         ForwardRef.jl ; ForwardRef2.jl ; ForwardRef3.jl ;
         Import.jl ;
         Increment.jl ;
-        Infinite.jl (Post, ".*finally clause cannot complete normally.*"); // javac warning
+        Infinite.jl ;
         Inherit.jl (Semantic, "No valid method call found");
+        InheritClass.jl ;
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
         LiteralsCf.jl   (Lexical, "Illegal float literal"),
                         (Lexical, "Illegal float literal"),
@@ -123,7 +124,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         Narrowing.jl ;
         Prim.jl ;
         Return1.jl ; Return2.jl ; Return3.jl ;
-        Return4.jl (Post, ".*finally clause cannot complete normally.*"); // javac warning
+        Return4.jl ;
         Return5.jl ;
         Semicolon.jl ;
         SemicolonClass.jl ;
@@ -132,6 +133,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         StaticContext.jl ;
         StaticOps.jl ;
         Switch1.jl ; Switch2.jl ; Switch3.jl ; Switch4.jl ; Switch5.jl ;
+        Switch6.jl ; Switch7.jl ;
         TernaryPrimitiveOps.jl ;
         TypeShadowing.jl ;
         xIterator.jl ;
@@ -172,6 +174,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
 	BadInner6.jl (Semantic, "The nested class .* does not have an enclosing instance of type");
 	BadInner7.jl (Semantic, "Cannot declare member class .* inside class with the same name");
 	BadInner8.jl (Semantic, "The nested class .* does not have an enclosing instance of type");
+	BadInner9.jl (Semantic, "Inner classes cannot declare static member classes");
 	BadInterface.jl (Semantic, "Interface methods must be public");
 	BadInterface2.jl (Semantic, "Could not find type");
 	BadInterface3.jl (Semantic, "Cannot instantiate an interface");

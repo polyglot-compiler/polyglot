@@ -1,3 +1,3 @@
-class E extends Conformance4.D {
-    public void m() { }
+class E extends ConformanceCheck4.D {
+    // public void m() { }
 }
