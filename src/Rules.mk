@@ -32,7 +32,7 @@ RELPATH			= $(SOURCE)/release/jif
 REL_DOC			= $(RELPATH)/doc
 REL_IMG			= $(RELPATH)/images
 REL_LIB			= $(RELPATH)/lib
-REL_SRC			= $(RELPATH)/src
+REL_SOURCES		= $(SOURCES)
 
 # To avoid repeated slashes
 DIR_ = $(DIR)
