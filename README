@@ -15,11 +15,19 @@ contains the following sub-directories:
 Disclaimer
 ----------
 
+<<<<<<< README
+Polglot is research software.  Over time, some of the interfaces in the
+framework may change.  This may require some extensions to be changed to
+conform to the new interfaces.  Also, Polyglot is not well-documented; in
+particular, some of the javadoc is missing or out-of-date.  We are working on
+writing better documentation.  Watch the web page:
+=======
 Polyglot is ALPHA software.  Some of the interfaces in the framework
 may change.  This may require some extensions to be changed to conform
 to the new interfaces.  Also, Polyglot is not well-documented; in
 particular, some of the javadoc is missing or out-of-date.  We are
 working on writing better documentation.  Watch the web page:
+>>>>>>> 1.28
 
     http://www.cs.cornell.edu/Projects/polyglot
 
@@ -46,12 +54,12 @@ Install JFlex.jar in your classpath or drop it in the lib directory of
 the polyglot distribution.
 
 LEGAL NOTE: Polyglot is distributed under LGPL, but JFlex is
-distributed under GPL.  This means that we cannot include JFlex
-in the Polyglot distribution.  The output of JFlex inherits the
-license of the specification (i.e., LGPL in Polyglot's case), so
-using JFlex is not a problem.  You may be able to substitute JLex
-(http://www.cs.princeton.edu/~appel/modern/java/JLex/), but this is
-untested.
+distributed under GPL.  This means that we cannot include JFlex in the
+Polyglot distribution.  The output of JFlex inherits the copyright
+of the specification--licensed under LGPL in Polyglot's case--so
+using JFlex with Polyglot is not a problem.  You may be able to
+substitute JLex (http://www.cs.princeton.edu/~appel/modern/java/JLex/),
+but this is untested.
 
 Creating an extension
 ---------------------
