@@ -90,7 +90,12 @@ public class Disamb_c implements Disamb
             try {
                 FieldInstance fi = ts.findField(t.toReference(), name, c);
                 return nf.Field(pos, tn, name).fieldInstance(fi);
-            } catch (SemanticException e) {
+            } catch (NoMemberException e) {
+                if (e.getKind() != e.FIELD) {
+                    // something went wrong...
+                    throw e;
+                }
+                
                 // ignore so we can check if we're a member class.
             }
         }
@@ -115,10 +120,9 @@ public class Disamb_c implements Disamb
 
     protected Node disambiguateNoPrefix() throws SemanticException {
 
-        try {
-            // First try local variables and fields.
-            VarInstance vi = c.findVariable(name);
-
+        // First try local variables and fields.
+        VarInstance vi = c.findVariableSilent(name);
+        if (vi != null) {
             if (vi instanceof FieldInstance) {
                 FieldInstance fi = (FieldInstance) vi;
                 Receiver r = makeMissingFieldTarget(fi);
@@ -127,19 +131,28 @@ public class Disamb_c implements Disamb
                 LocalInstance li = (LocalInstance) vi;
                 return nf.Local(pos, name).localInstance(li);
             }
-        } catch (SemanticException e) {
-            // Then try types.
+        }
+        else {
+            // no variable found. try types.
             try {
                 Named n = c.find(name);
                 if (n instanceof Type) {
                     Type type = (Type) n;
                     return nf.CanonicalTypeNode(pos, type);
                 }
-            } catch (SemanticException e2) {
-                // must be a package--ignore the error
+            } catch (NoClassException e) {
+                if (!name.equals(e.getClassName())) {
+                    // hmm, something else must have gone wrong
+                    // rethrow the exception
+                    throw e;
+                }
+
+                // couldn't find a type named name. 
+                // It must be a package--ignore the exception.
             }
         }
 
+        // Must be a package then...
         return nf.PackageNode(pos, ts.packageForName(name));
     }
 

@@ -204,7 +204,7 @@ public class Context_c implements Context
 	    return fi;
 	}
 
-        throw new SemanticException("Field " + name + " not found.");
+        throw new NoMemberException(NoMemberException.FIELD, "Field " + name + " not found.");
     }
 
     /**

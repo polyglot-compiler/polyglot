@@ -497,7 +497,8 @@ public class TypeSystem_c implements TypeSystem
             }
 	}
 
-	throw new SemanticException("Field \"" + name +
+	throw new NoMemberException(NoMemberException.FIELD, 
+                                    "Field \"" + name +
 				    "\" not found in type \"" +
                                     container + "\".");
     }
@@ -560,9 +561,7 @@ public class TypeSystem_c implements TypeSystem
             }
 	}
 
-	throw new SemanticException("Member class \"" + name +
-				    "\" not found in type \"" +
-                                    container + "\".");
+	throw new NoClassException(name, container);
     }
 
     protected String listToString(List l) {
@@ -597,7 +596,7 @@ public class TypeSystem_c implements TypeSystem
 	List acceptable = findAcceptableMethods(container, name, argTypes, c);
 
 	if (acceptable.size() == 0) {
-	    throw new SemanticException(
+	    throw new NoMemberException(NoMemberException.METHOD,
 		"No valid method call found for " + name +
 		"(" + listToString(argTypes) + ")" +
 		" in " +
@@ -626,15 +625,16 @@ public class TypeSystem_c implements TypeSystem
 	List acceptable = findAcceptableConstructors(container, argTypes, c);
 
 	if (acceptable.size() == 0) {
-	    throw new SemanticException("No valid constructor found for " +
-			container + "(" + listToString(argTypes) + ").");
+	    throw new NoMemberException(NoMemberException.CONSTRUCTOR,
+                                        "No valid constructor found for " +
+                                        container + "(" + listToString(argTypes) + ").");
 	}
 
 	ConstructorInstance ci = (ConstructorInstance)
 	    findProcedure(acceptable, container, argTypes, c);
 
 	if (ci == null) {
-	    throw new SemanticException(
+	    throw new NoMemberException(NoMemberException.CONSTRUCTOR,
 		"Reference to " + container + " is ambiguous, multiple " +
 		"constructors match: " + acceptable);
 	}

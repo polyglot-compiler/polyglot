@@ -76,7 +76,7 @@ public class LoadedClassResolver extends ClassResolver
 
     nocache.add(name);
 
-    throw new NoClassException("Class " + name + " not found.");
+    throw new NoClassException(name);
   }
 
   /**

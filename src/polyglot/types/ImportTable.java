@@ -77,6 +77,7 @@ public class ImportTable extends ClassResolver
     public void addClassImport(String className) {
         if (Report.should_report(new String[] {Report.types, Report.resolver, Report.imports}, 2))
             Report.report(2, this + ": lazy import " + className);
+
 	lazyImports.add(className);
         classImports.add(className);
     }
@@ -164,8 +165,7 @@ public class ImportTable extends ClassResolver
 
             if (!isVisibleFrom(n, "")) {
 	      // Not visible.
-	      throw new NoClassException("Class \"" + name + "\" not found.",
-					 sourcePos);
+	      throw new NoClassException(name, sourcePos);
 	    }
 
 	    // Memoize.
@@ -237,8 +237,8 @@ public class ImportTable extends ClassResolver
 		map.put(shortName, t);
 	    }
 	    catch (SemanticException e) {
-                if (e.position() == null) {
-                    throw new SemanticException(e.getMessage(), sourcePos);
+                if (e.position == null) {
+                    e.position = sourcePos;
                 }
 
                 throw e;

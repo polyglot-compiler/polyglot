@@ -50,8 +50,7 @@ public class ClassContextResolver extends ClassResolver {
             return inner;
         }
 
-        throw new NoClassException("Could not find type " + name +
-            " in scope of " + type + ".");
+        throw new NoClassException(name, type);
     }
 
     /**

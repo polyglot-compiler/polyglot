@@ -193,7 +193,7 @@ public class SourceClassResolver extends LoadedClassResolver
       return getTypeFromSource(source, name);
     }
 
-    throw new NoClassException("Class " + name + " not found.");
+    throw new NoClassException(name);
   }
 
   /**

@@ -7,18 +7,24 @@ import polyglot.util.Position;
  * when a <code>ClassResolver</code> is unable to resolve a given class name.
  */
 public class NoClassException extends SemanticException {
-  public NoClassException() {
-  }
-
-  public NoClassException(String s) {
-    super(s); 
-  }
-
-  public NoClassException(Position position) {
-    super(position);
-  }
-
-  public NoClassException(String s, Position position) {
-    super(s, position);
-  }
+    private String className;
+    
+    public NoClassException(String className) {
+        super("Class \"" + className + "\" not found."); 
+        this.className = className;
+    }
+    
+    public NoClassException(String className, ClassType scope) {
+        super("Class \"" + className + "\" not found in scope of " + scope.toString()); 
+        this.className = className;
+    }
+  
+    public NoClassException(String className, Position position) {
+        super("Class \"" + className + "\" not found.", position);
+        this.className = className;
+    }
+    
+    public String getClassName() {
+        return className;
+    }
 }

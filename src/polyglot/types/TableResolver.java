@@ -47,8 +47,7 @@ public class TableResolver extends ClassResolver {
 	    return n;
 	}
 
-	throw new NoClassException("Could not find type " + name +
-	    " in context.");
+	throw new NoClassException(name);
     }
 
     public String toString() {
