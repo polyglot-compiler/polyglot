@@ -238,7 +238,13 @@ public abstract class Node_c implements Node
 	return ec;
     }
 
-    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException { 
+        if (this instanceof Thrower) {
+            List l = ((Thrower)this).throwTypes(ec.typeSystem());
+            for (Iterator i = l.iterator(); i.hasNext(); ) {
+                ec.throwsException((Type)i.next());
+            }
+        }
 	return this;
     }
 

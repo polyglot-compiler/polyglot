@@ -71,13 +71,6 @@ public class Throw_c extends Stmt_c implements Throw
         return child.type();
     }
 
-    /** Check exceptions thrown by the statement. */
-    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException
-    {
-	ec.throwsException(expr.type());
-	return this;
-    }
-
     public String toString() {
 	return "throw " + expr + ";";
     }
@@ -101,6 +94,8 @@ public class Throw_c extends Stmt_c implements Throw
     }
 
     public List throwTypes(TypeSystem ts) {
-      return Collections.singletonList(expr.type());
+        // if the exception that a throw statement is given to throw is null,
+        // then a NullPointerException will be thrown.
+        return CollectionUtil.list(expr.type(), ts.NullPointerException());
     }
 }

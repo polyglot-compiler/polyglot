@@ -62,23 +62,23 @@ public class ExitChecker extends DataFlow
         
     }
     
-    public Item flow(Item in, FlowGraph graph, Term n) {
+    public Map flow(Item in, FlowGraph graph, Term n, Set succEdgeKeys) {
         // If every path from the exit node to the entry goes through a return,
         // we're okay.  So make the exit bit false at exit and true at every return;
         // the confluence operation is &&. 
         if (n instanceof Return) {
-            return DataFlowItem.EXITS;
+            return itemToMap(DataFlowItem.EXITS, succEdgeKeys);
         }
 
         if (n == graph.exitNode()) {
-            return DataFlowItem.DOES_NOT_EXIT;
+            return itemToMap(DataFlowItem.DOES_NOT_EXIT, succEdgeKeys);
         }
 
-        return in;
+        return itemToMap(in, succEdgeKeys);
     }
 
 
-    public Item confluence(List inItems) {
+    public Item confluence(List inItems, Term node) {
         // all paths must have an exit
         for (Iterator i = inItems.iterator(); i.hasNext(); ) {
             if (!((DataFlowItem)i.next()).exits) {
@@ -88,18 +88,22 @@ public class ExitChecker extends DataFlow
         return DataFlowItem.EXITS; 
     }
 
-    public void check(FlowGraph graph, Term n, Item in, Item out) throws SemanticException {
+    public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
         // Check for statements not on the path to exit; compound
         // statements are allowed to be off the path.  (e.g., "{ return; }"
         // or "while (true) S").  If a compound statement is truly
         // unreachable, one of its sub-statements will be also and we will
         // report an error there.
         if (n == graph.entryNode()) {
-            if (out != null && !((DataFlowItem)out).exits) { 
-                throw new SemanticException("Missing return statement.",
-                                            code.position());
+            if (outItems != null && !outItems.isEmpty()) {
+                // due to the flow equations, all DataFlowItems in the outItems map
+                // are the same, so just take the first one.
+                DataFlowItem outItem = (DataFlowItem)outItems.values().iterator().next(); 
+                if (outItem != null && !outItem.exits) { 
+                    throw new SemanticException("Missing return statement.",
+                            code.position());
                 }
             }
         }
-    
+    }
 }

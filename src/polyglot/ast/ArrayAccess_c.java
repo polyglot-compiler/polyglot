@@ -101,16 +101,6 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
         return child.type();
     }
 
-    /** Check exceptions thrown by the expression. */
-    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-	TypeSystem ts = ec.typeSystem();
-
-	ec.throwsException(ts.NullPointerException());
-	ec.throwsException(ts.OutOfBoundsException());
-
-	return this;
-    }
-
     public String toString() {
 	return array + "[" + index + "]";
     }
@@ -141,19 +131,20 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
         v.visitCFG(array, index.entry());
 
         if (assign.operator() != Assign.ASSIGN) {
-            // a[i] OP= e: visit a -> i -> a[i] -> e -> (a[i] OP= e)
+            // a[i] OP= e: visit a -> i -> a[i] -> e -> a[i] -> (a[i] OP= e)
             v.visitCFG(index, this);
             v.edge(this, assign.right().entry());
         }
         else {
-            // a[i] = e: visit a -> i -> e -> (a[i] OP= e)
-            v.visitCFG(index, assign.right().entry());
+            //a[i] = e: visit a -> i -> e -> a[i] -> (a[i] OP= e)
+            v.visitCFG(index, assign.right().entry()); 
         }
 
-        v.visitCFG(assign.right(), assign);
+        v.visitCFG(assign.right(), this);
+        v.visitCFG(this, assign);
     }
 
     public List throwTypes(TypeSystem ts) {
-      return Collections.singletonList(ts.OutOfBoundsException());
+        return CollectionUtil.list(ts.OutOfBoundsException(), ts.NullPointerException());
     }
 }

@@ -513,17 +513,6 @@ public class Binary_c extends Expr_c implements Binary
         return child.type();
     }
 
-    /** Check exceptions thrown by the expression. */
-    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-	TypeSystem ts = ec.typeSystem();
-
-	if (throwsArithmeticException()) {
-	    ec.throwsException(ts.ArithmeticException());
-	}
-
-	return this;
-    }
-
     /** Get the throwsArithmeticException of the expression. */
     public boolean throwsArithmeticException() {
 	// conservatively assume that any division or mod may throw
@@ -579,7 +568,18 @@ public class Binary_c extends Expr_c implements Binary
         }
       }
       else {
-        v.visitCFG(left, CollectionUtil.list(right.entry(), this));
+        if (op == COND_AND) {
+          // AND operator
+          // short circuit means that left is false
+          v.visitCFG(left, FlowGraph.EDGE_KEY_TRUE, right.entry(), 
+                           FlowGraph.EDGE_KEY_FALSE, this);
+        }
+        else {
+          // OR operator
+          // short circuit means that left is true
+          v.visitCFG(left, FlowGraph.EDGE_KEY_FALSE, right.entry(), 
+                           FlowGraph.EDGE_KEY_TRUE, this);            
+        }
         v.visitCFG(right, this);
       }
     }

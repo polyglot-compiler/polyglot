@@ -184,7 +184,7 @@ public class Switch_c extends Stmt_c implements Switch
             cases.add(this);
         }
 
-        v.visitCFG(expr, cases);
+        v.visitCFG(expr, FlowGraph.EDGE_KEY_OTHER, cases);
         v.push(this).visitCFGList(elements, this);
 
         return succs;

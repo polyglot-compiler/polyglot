@@ -120,13 +120,13 @@ public class CFGBuilder implements Copy
             Labeled l = (Labeled) c;
             if (l.label().equals(b.label())) {
               if (b.kind() == Branch.BREAK) {
-                edge(last_visitor, last, l);
+                edge(last_visitor, last, l, FlowGraph.EDGE_KEY_OTHER);
               }
               else {
                 Stmt s = l.statement();
                 if (s instanceof Loop) {
                   Loop loop = (Loop) s;
-                  edge(last_visitor, last, loop.continueTarget());
+                  edge(last_visitor, last, loop.continueTarget(), FlowGraph.EDGE_KEY_OTHER);
                 }
                 else {
                   // Should be SemanticException
@@ -143,16 +143,16 @@ public class CFGBuilder implements Copy
           if (c instanceof Loop) {
             Loop l = (Loop) c;
             if (b.kind() == Branch.CONTINUE) {
-              edge(last_visitor, last, l.continueTarget());
+              edge(last_visitor, last, l.continueTarget(), FlowGraph.EDGE_KEY_OTHER);
             }
             else {
-              edge(last_visitor, last, l);
+              edge(last_visitor, last, l, FlowGraph.EDGE_KEY_OTHER);
             }
 
             return;
           }
           else if (c instanceof Switch && b.kind() == Branch.BREAK) {
-            edge(last_visitor, last, c);
+            edge(last_visitor, last, c, FlowGraph.EDGE_KEY_OTHER);
             return;
           }
         }
@@ -182,7 +182,7 @@ public class CFGBuilder implements Copy
       }
 
       // Add an edge to the exit node.
-      edge(last_visitor, last, graph.exitNode());
+      edge(last_visitor, last, graph.exitNode(), FlowGraph.EDGE_KEY_OTHER);
     }
 
     static int counter = 0;
@@ -225,46 +225,91 @@ public class CFGBuilder implements Copy
     }
 
     /**
-     * Create edges for a node <code>a</code> with a single successor
+     * Create an edge for a node <code>a</code> with a single successor
      * <code>succ</code>.
+     * 
+     * The EdgeKey used for the edge from <code>a</code> to <code>succ</code>
+     * will be FlowGraph.EDGE_KEY_OTHER
      */
     public void visitCFG(Term a, Term succ) {
-        visitCFG(a, Collections.singletonList(succ));
+        visitCFG(a, FlowGraph.EDGE_KEY_OTHER, succ);
     }
 
     /**
-     * Create edges for a node <code>a</code> with successors
-     * <code>succs</code>.
+     * Create an edge for a node <code>a</code> with a single successor
+     * <code>succ</code>, and EdgeKey <code>edgeKey</code>
      */
-    public void visitCFG(Term a, List succs) {
-      if (Report.should_report(Report.cfg, 2))
-	Report.report(2, "// node " + a + " -> " + succs);
-
-      succs = a.acceptCFG(this, succs);
-
-      for (Iterator i = succs.iterator(); i.hasNext(); ) {
-          Term out = (Term) i.next();
-          edge(a, out);
-      }
-
-      if (a instanceof Thrower) {
-        Thrower t = (Thrower) a;
-
-        for (Iterator i = t.throwTypes(ts).iterator(); i.hasNext(); ) {
-          Type type = (Type) i.next();
-          visitThrow(t, type);
-        }
-      }
-
-      // Every statement can throw an error.
-      // This is probably too inefficient.
-      if ((a instanceof Stmt && ! (a instanceof CompoundStmt)) ||
-          (a instanceof Block && ((Block) a).statements().isEmpty())) {
-
-          visitThrow(a, ts.Error());
-      }
+    public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, Term succ) {
+        visitCFG(a, CollectionUtil.list(new EdgeKeyTermPair(edgeKey, succ)));
     }
 
+    /**
+     * Create edges from node <code>a</code> to successors <code>succ1</code> 
+     * and <code>succ2</code> with EdgeKeys <code>edgeKey1</code> and
+     * <code>edgeKey2</code> respecitvely.
+     */
+    public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey1, Term succ1, 
+                                 FlowGraph.EdgeKey edgeKey2, Term succ2) {
+        visitCFG(a, CollectionUtil.list(new EdgeKeyTermPair(edgeKey1, succ1), 
+                                        new EdgeKeyTermPair(edgeKey2, succ2)));
+    }
+
+    /**
+     * Create edges from node <code>a</code> to all successors <code>succ</code> 
+     * with the EdgeKey <code>edgeKey</code> for all edges created.
+     */
+    public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, List succ) {
+        List l = new ArrayList(2*succ.size());
+        for (Iterator iter = succ.iterator(); iter.hasNext(); ) {
+            l.add(new EdgeKeyTermPair(edgeKey, (Term)iter.next()));
+        }
+        visitCFG(a, l);
+    }
+
+    private static class EdgeKeyTermPair {
+        public EdgeKeyTermPair(FlowGraph.EdgeKey edgeKey, Term term) {
+            this.edgeKey = edgeKey;
+            this.term = term;
+        }
+        FlowGraph.EdgeKey edgeKey;
+        Term term;        
+    }
+    /**
+     * Create edges for a node <code>a</code> with successors
+     * <code>succs</code>.
+     * 
+     * @param a the source node for the edges.
+     * @param succs a list of <code>EdgeKeyTermPair</code>s
+     */
+    private void visitCFG(Term a, List succs) { 
+        if (Report.should_report(Report.cfg, 2))
+            Report.report(2, "// node " + a + " -> " + succs);
+
+        succs = a.acceptCFG(this, succs);
+
+        for (Iterator i = succs.iterator(); i.hasNext(); ) {
+            EdgeKeyTermPair pair = (EdgeKeyTermPair)i.next();
+            edge(a, pair.term, pair.edgeKey);
+        }
+        
+        if (a instanceof Thrower) {
+            Thrower t = (Thrower) a;
+            
+            for (Iterator i = t.throwTypes(ts).iterator(); i.hasNext(); ) {
+                Type type = (Type) i.next();
+                visitThrow(t, type);
+            }
+        }
+        
+        // Every statement can throw an error.
+        // This is probably too inefficient.
+        if ((a instanceof Stmt && ! (a instanceof CompoundStmt)) ||
+            (a instanceof Block && ((Block) a).statements().isEmpty())) {
+            
+            visitThrow(a, ts.Error());
+        }
+    }
+    
     /**
      * Create edges for an exception thrown from term <code>t</code>.
      */
@@ -284,13 +329,13 @@ public class CFGBuilder implements Copy
 
               // definite catch
               if (type.isImplicitCastValid(cb.catchType())) {
-                edge(last_visitor, last, cb.entry());
+                edge(last_visitor, last, cb.entry(), new FlowGraph.ExceptionEdgeKey(type));
                 return;
               }
 
               // possible catch
-              if (type.isCastValid(type)) {
-                edge(last_visitor, last, cb.entry());
+              if (cb.catchType().isImplicitCastValid(type)) { 
+                edge(last_visitor, last, cb.entry(), new FlowGraph.ExceptionEdgeKey(cb.catchType()));
               }
             }
           }
@@ -310,7 +355,7 @@ public class CFGBuilder implements Copy
     public CFGBuilder tryFinally(CFGBuilder v, Term last,
                                  CFGBuilder last_visitor, Term f) {
         CFGBuilder v_ = v.outer.enterFinally(last);
-        v_.edge(last_visitor, last, f.entry());
+        v_.edge(last_visitor, last, f.entry(), FlowGraph.EDGE_KEY_OTHER); 
         v_.visitCFG(f, Collections.EMPTY_LIST);
         return v_;
     }
@@ -327,44 +372,51 @@ public class CFGBuilder implements Copy
      * Add an edge to the CFG from <code>p</code> to <code>q</code>.
      */
     public void edge(Term p, Term q) {
-      edge(this, p, q);
+      edge(this, p, q, FlowGraph.EDGE_KEY_OTHER);
     }
 
     /**
      * Add an edge to the CFG from <code>p</code> to <code>q</code>.
-     *
+     */
+    public void edge(Term p, Term q, FlowGraph.EdgeKey edgeKey) {
+      edge(this, p, q, edgeKey);
+    }
+    
+    /**
      * @param p_visitor The visitor used to create p ("this" is the visitor
      *                  that created q) 
      * @param p The predecessor node in the forward graph
      * @param q The successor node in the forward graph
      */
-    public void edge(CFGBuilder p_visitor, Term p, Term q) {
-      if (Report.should_report(Report.cfg, 2))
-	Report.report(2, "//     edge " + p + " -> " + q);
-
-      FlowGraph.Peer pp = graph.peer(p, p_visitor.path_to_finally, df);
-      FlowGraph.Peer pq = graph.peer(q, path_to_finally, df);
-
-      if (Report.should_report(Report.cfg, 2)) {
-	Report.report(2,
-			pp.hashCode() + " [ label = \"" +
-			StringUtil.escape(pp.toString()) + "\" ];");
-	Report.report(2,
-			pq.hashCode() + " [ label = \"" +
-			StringUtil.escape(pq.toString()) + "\" ];");
-      }
-
-      if (graph.forward()) {
-	if (Report.should_report(Report.cfg, 2))
-	    Report.report(2, pp.hashCode() + " -> " + pq.hashCode() + ";");
-        pp.succs.add(pq);
-        pq.preds.add(pp);
-      }
-      else {
-	if (Report.should_report(Report.cfg, 2))
-        Report.report(2, pq.hashCode() + " -> " + pp.hashCode() + ";");
-        pq.succs.add(pp);
-        pp.preds.add(pq);
-      }
+    public void edge(CFGBuilder p_visitor, Term p, Term q, FlowGraph.EdgeKey edgeKey) {
+        if (Report.should_report(Report.cfg, 2))
+            Report.report(2, "//     edge " + p + " -> " + q);
+        
+        FlowGraph.Peer pp = graph.peer(p, p_visitor.path_to_finally, df);
+        FlowGraph.Peer pq = graph.peer(q, path_to_finally, df);
+        
+        if (Report.should_report(Report.cfg, 2)) {
+            Report.report(2,
+                          pp.hashCode() + " [ label = \"" +
+                          StringUtil.escape(pp.toString()) + "\" ];");
+            Report.report(2,
+                          pq.hashCode() + " [ label = \"" +
+                          StringUtil.escape(pq.toString()) + "\" ];");
+        }
+        
+        if (graph.forward()) {
+            if (Report.should_report(Report.cfg, 2)) {
+                Report.report(2, pp.hashCode() + " -> " + pq.hashCode() + ";");
+            }
+            pp.succs.add(new FlowGraph.Edge(edgeKey, pq));
+            pq.preds.add(new FlowGraph.Edge(edgeKey, pp));
+        }
+        else {
+            if (Report.should_report(Report.cfg, 2)) {
+                Report.report(2, pq.hashCode() + " -> " + pp.hashCode() + ";");
+            }
+            pq.succs.add(new FlowGraph.Edge(edgeKey, pp));
+            pp.preds.add(new FlowGraph.Edge(edgeKey, pq));
+        }
     }
 }

@@ -145,21 +145,6 @@ public class Field_c extends Expr_c implements Field
       return child.type();
   }
 
-  /** Check exceptions thrown by the field. */
-  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-    TypeSystem ts = ec.typeSystem();
-
-    if (target instanceof Expr && ! (target instanceof Special)) {
-      ec.throwsException(ts.NullPointerException());
-    }
-
-    return this;
-  }
-
-  public String toString() {
-    return (target != null ? target + "." : "") + name;
-  }
-
   /** Write the field to an output file. */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
     if (target instanceof Expr) {
@@ -215,27 +200,33 @@ public class Field_c extends Expr_c implements Field
           Expr t = (Expr) target;
 
           if (assign.operator() != Assign.ASSIGN) {
-              // o.f OP= e: visit o -> o.f -> e -> (o.f OP= e)
+              // o.f OP= e: visit o -> o.f -> e -> o.f -> (o.f OP= e)
               v.visitCFG(t, this);
               v.edge(this, assign.right().entry());
           }
           else {
-              // o.f = e: visit o -> e -> (o.f OP= e)
+              // o.f = e: visit o -> e -> o.f -> (o.f OP= e)
               v.visitCFG(t, assign.right().entry());
           }
       }
       else {
           if (assign.operator() != Assign.ASSIGN) {
-              // T.f OP= e: visit T.f -> e -> (T.f OP= e)
+              // T.f OP= e: visit T.f -> e -> T.f -> (T.f OP= e)
               v.edge(this, assign.right().entry());
           }
           else {
-              // T.f = e: visit e -> (T.f OP= e)
+              // T.f = e: visit e -> T.f -> (T.f OP= e)
           }
       }
 
-      v.visitCFG(assign.right(), assign);
+      v.visitCFG(assign.right(), this);
+      v.visitCFG(this, assign);
   }
+
+  public String toString() {
+    return (target != null ? target + "." : "") + name;
+  }
+
 
   public List throwTypes(TypeSystem ts) {
       if (target instanceof Expr && ! (target instanceof Special)) {

@@ -44,16 +44,16 @@ public class ReachChecker extends DataFlow
         }
     }
 
-    public Item flow(Item in, FlowGraph graph, Term n) {
+    public Map flow(Item in, FlowGraph graph, Term n, Set succEdgeKeys) {
         if (n == graph.entryNode()) {
-            return DataFlowItem.REACHABLE;
+            return itemToMap(DataFlowItem.REACHABLE, succEdgeKeys);
         }
         else {
-            return in;
+            return itemToMap(in, succEdgeKeys);
         }
     }
 
-    public Item confluence(List inItems) {
+    public Item confluence(List inItems, Term node) {
         // if any predecessor is reachable, so is this one
         for (Iterator i = inItems.iterator(); i.hasNext(); ) {
             if (((DataFlowItem)i.next()).reachable) {
@@ -63,7 +63,7 @@ public class ReachChecker extends DataFlow
         return DataFlowItem.NOT_REACHABLE;
     }
 
-    public void check(FlowGraph graph, Term n, Item inItem, Item outItem) throws SemanticException {
+    public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
     }
     
     public CodeDecl post(FlowGraph graph, CodeDecl root) throws SemanticException {
@@ -82,10 +82,14 @@ public class ReachChecker extends DataFlow
                 FlowGraph.Peer p = (FlowGraph.Peer) j.next();
                 n = p.node;
 
-                DataFlowItem item = (DataFlowItem) p.outItem;
+                if (p.outItems != null) {
+                    for (Iterator k = p.outItems.values().iterator(); k.hasNext(); ) {
+                        DataFlowItem item = (DataFlowItem) k.next();
 
-                if (item != null && item.reachable) {
-                    continue MAPS;
+                        if (item != null && item.reachable) {
+                            continue MAPS;
+                        }                    
+                    }
                 }
             }
 

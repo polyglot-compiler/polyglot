@@ -254,30 +254,6 @@ public class Call_c extends Expr_c implements Call
       return child.type();
   }
 
-  /** Check exceptions thrown by the call. */
-  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-    if (mi == null) {
-      throw new InternalCompilerError(position(),
-                                      "Null method instance after type "
-                                      + "check.");
-    }
-
-    for (Iterator i = mi.exceptionTypes().iterator(); i.hasNext();) {
-      Type t = (Type) i.next();
-      ec.throwsException(t);
-    }
-
-    // We may throw a null pointer exception except when the target
-    // is "this" or "super".
-    TypeSystem ts = ec.typeSystem();
-
-    if (target instanceof Expr && ! (target instanceof Special)) {
-      ec.throwsException(ts.NullPointerException());
-    }
-
-    return this;
-  }
-
   public String toString() {
     String s = (target != null ? target.toString() + "." : "") + name + "(";
 
@@ -368,6 +344,18 @@ public class Call_c extends Expr_c implements Call
 
       return succs;
   }
+
+  /** Check exceptions thrown by the call. */
+  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
+    if (mi == null) {
+      throw new InternalCompilerError(position(),
+                                      "Null method instance after type "
+                                      + "check.");
+    }
+
+    return super.exceptionCheck(ec);
+  }
+
 
   public List throwTypes(TypeSystem ts) {
     List l = new LinkedList();

@@ -137,12 +137,13 @@ public class If_c extends Stmt_c implements If
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (alternative == null) {
-            v.visitCFG(cond, CollectionUtil.list(consequent.entry(), this));
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent.entry(), 
+                             FlowGraph.EDGE_KEY_FALSE, this);
             v.visitCFG(consequent, this);
         }
         else {
-            v.visitCFG(cond, CollectionUtil.list(consequent.entry(),
-                                                 alternative.entry()));
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent.entry(),
+                             FlowGraph.EDGE_KEY_FALSE, alternative.entry());
             v.visitCFG(consequent, this);
             v.visitCFG(alternative, this);
         }

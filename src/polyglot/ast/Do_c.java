@@ -115,7 +115,8 @@ public class Do_c extends Loop_c implements Do
             v.visitCFG(cond, body.entry());
         }
         else {
-            v.visitCFG(cond, CollectionUtil.list(body.entry(), this));
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body.entry(), 
+                             FlowGraph.EDGE_KEY_FALSE, this);
         }
 
         return succs;

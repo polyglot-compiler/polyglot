@@ -217,8 +217,8 @@ public class Conditional_c extends Expr_c implements Conditional
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(cond, CollectionUtil.list(consequent.entry(),
-                                             alternative.entry()));
+        v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent.entry(),
+                         FlowGraph.EDGE_KEY_FALSE, alternative.entry());
         v.visitCFG(consequent, this);
         v.visitCFG(alternative, this);
 

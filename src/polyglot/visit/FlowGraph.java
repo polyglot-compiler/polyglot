@@ -70,25 +70,157 @@ public class FlowGraph {
     return p;
   }
 
+  /**
+   * This class provides an identifying label for edges in the flow graph.
+   * Thus, the condition of an if statement will have at least two edges
+   * leaving it (in a forward flow graph): one will have the EdgeKey
+   * FlowGraph.EDGE_KEY_TRUE, and is the flow that is taken when the condition
+   * evaluates to true, and one will have the EdgeKey FlowGraph.EDGE_KEY_FALSE,
+   * and is the flow that is taken when the condition evaluates to false. 
+   * 
+   * The differentiation of the flow graph edges allows for a finer grain
+   * data flow analysis, as the dataflow equations can incorporate the 
+   * knowledge that a condition is true or false on certain flow paths.
+   */
+  static class EdgeKey {
+      protected Object o;
+      protected EdgeKey(Object o) {
+          this.o = o;
+      }
+      public int hashCode() {
+          return o.hashCode();
+      }
+      public boolean equals(Object other) {
+          return (other instanceof EdgeKey) && 
+                  (((EdgeKey)other).o.equals(this.o));
+      }
+      public String toString() {
+          return "EdgeKey["+o+"]";
+      }
+  }
+  
+  /**
+   * This class extends EdgeKey and is the key for edges that are
+   * taken when an exception of type t is thrown. Thus, the flow from
+   * line 2 in the example below to the catch block (line 4) would have an
+   * ExceptionEdgeKey constructed with the Type representing 
+   * NullPointerExceptions.
+   * 
+   * <pre>
+   * ...
+   * try {                                      // line 1
+   *   o.foo();                                 // line 2
+   * }                                          // line 3
+   * catch (NullPointerException e) {           // line 4
+   *   ...
+   * }
+   * ...
+   * </pre>
+   */
+  public static class ExceptionEdgeKey extends EdgeKey {
+      public ExceptionEdgeKey(Type t) {
+          super(t);
+      }
+      public String toString() {
+          return "ExceptionEdgeKey["+o+"]";
+      }
+  }
+  
+  /**
+   * This EdgeKey is the EdgeKey for edges where the expression evaluates
+   * to true.
+   */
+  public static final EdgeKey EDGE_KEY_TRUE = new EdgeKey("true");
+  
+  /**
+   * This EdgeKey is the EdgeKey for edges where the expression evaluates
+   * to false.
+   */
+  public static final EdgeKey EDGE_KEY_FALSE = new EdgeKey("false");
+
+  /**
+   * This EdgeKey is the EdgeKey for edges where the flow is not suitable 
+   * for EDGE_KEY_TRUE, EDGE_KEY_FALSE or an 
+   * ExceptionEdgeKey, such as the edges from a switch
+   * statement to its cases and
+   * the flow from a sink node in the control flow graph.
+   */
+  public static final EdgeKey EDGE_KEY_OTHER = new EdgeKey("other");
+
+  /**
+   * This class represents an edge in the flow graph. The target of the edge
+   * is either the head or the tail of the edge, depending on how the Edge is 
+   * used. Thus, the target field in Edges in the collection Peer.preds is the
+   * source Peer, while the target field in Edges in the collection Peer.succs 
+   * is the destination Peer of edges.
+   * 
+   * Each Edge has an EdgeKey, which identifies when flow uses that edge in 
+   * the flow graph. See EdgeKey for more information.
+   */
+  static class Edge {
+      Edge(EdgeKey key, Peer target) {
+          this.key = key;
+          this.target = target;
+      }
+      EdgeKey getKey() {
+          return key;
+      }
+      Peer getTarget() {
+          return target;
+      }
+      private EdgeKey key;
+      private Peer target;
+      public String toString() {
+          return "(" + key + ")" + target;
+      }
+      
+  }
+  
   static class Peer {
     DataFlow.Item inItem;  // Input Item for dataflow analysis
-    DataFlow.Item outItem; // Output Item for dataflow analysis
+    Map outItems; // Output Items for dataflow analysis, a map from EdgeKeys to DataFlowlItems
     Term node;
-    List succs; // List of successor Peers
-    List preds; // List of predecessor Peers
+    List succs; // List of successor Edges 
+    List preds; // List of predecessor Edges 
     List path_to_finally;
+    /**
+     * Set of all the different EdgeKeys that occur in the Edges in the 
+     * succs. This Set is lazily constructed, as needed, by the 
+     * method succEdgeKeys()
+     */     
+    private Set succEdgeKeys;
 
     public Peer(Term node, List path_to_finally) {
       this.node = node;
       this.path_to_finally = path_to_finally;
       this.inItem = null;
-      this.outItem = null;
+      this.outItems = null;
       this.succs = new ArrayList();
       this.preds = new ArrayList();
+      this.succEdgeKeys = null;
     }
 
     public String toString() {
       return node + "[" + hashCode() + ": " + path_to_finally + "]";
+    }
+    
+    public Set succEdgeKeys() {
+        if (this.succEdgeKeys == null) {
+            // the successor edge keys have not yet been calculated. do it
+            // now.
+            this.succEdgeKeys = new HashSet();
+            for (Iterator iter = this.succs.iterator(); iter.hasNext(); ) {
+                Edge e = (Edge)iter.next();
+                this.succEdgeKeys.add(e.getKey());
+            }
+            if (this.succEdgeKeys.isEmpty()) {
+                // There are no successors for this node. Add in the OTHER
+                // edge key, so that there is something to map the output
+                // item from...
+                this.succEdgeKeys.add(FlowGraph.EDGE_KEY_OTHER);
+            }
+        }
+        return this.succEdgeKeys;
     }
   }
 
@@ -134,7 +266,8 @@ public class FlowGraph {
 //        sb.append(StringUtil.getShortNameComponent(p.node.getClass().getName()) + " ["+p.node+"]" + "\n");
         sb.append(p.node+" (" + p.node.position()+ ")\n");
         for (Iterator i = p.succs.iterator(); i.hasNext(); ) {
-            Peer q = (Peer)i.next();
+            Edge e = (Edge)i.next();
+            Peer q = e.getTarget();
             sb.append("    -> " + q.node+" (" + q.node.position()+ ")\n");
             //sb.append("  " + StringUtil.getShortNameComponent(q.node.getClass().getName()) + " ["+q.node+"]" + "\n");
             if (todo.contains(q) && !queue.contains(q)) {

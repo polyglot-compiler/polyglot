@@ -279,7 +279,7 @@ public class InitChecker extends DataFlow
      * VarInstance, the conflict must be resolved, by using the
      * minimum of all mins and the maximum of all maxs. 
      */
-    public Item confluence(List inItems) {        
+    public Item confluence(List inItems, Term node) {        
         // Resolve any conflicts pairwise.
         Iterator iter = inItems.iterator();
         Map m = new HashMap(((DataFlowItem)iter.next()).initStatus);
@@ -311,7 +311,7 @@ public class InitChecker extends DataFlow
      *              are interested in, then increment the min and max counts
      *              for that local var or field.   
      */
-    public Item flow(Item inItem, FlowGraph graph, Term n) {
+    public Map flow(Item inItem, FlowGraph graph, Term n, Set succEdgeKeys) {
         DataFlowItem inDFItem = ((DataFlowItem)inItem);
         
         if (n instanceof Formal) {
@@ -320,7 +320,7 @@ public class InitChecker extends DataFlow
             Map m = new HashMap(inDFItem.initStatus);
             // a formal argument is always defined.            
             m.put(f.localInstance(), new MinMaxInitCount(InitCount.ONE,InitCount.ONE));
-            return new DataFlowItem(m);
+            return itemToMap(new DataFlowItem(m), succEdgeKeys);
         }
         
         if (n instanceof LocalDecl) {
@@ -335,7 +335,7 @@ public class InitChecker extends DataFlow
                 // declaration of local var with initialization.
                 m.put(l.localInstance(), new MinMaxInitCount(InitCount.ONE,InitCount.ONE));
             }
-            return new DataFlowItem(m);
+            return itemToMap(new DataFlowItem(m), succEdgeKeys);
         }
 
         if (n instanceof Assign) {
@@ -348,7 +348,7 @@ public class InitChecker extends DataFlow
                 initCount = new MinMaxInitCount(initCount.getMin().increment(),
                                                 initCount.getMax().increment());
                 m.put(l.localInstance(), initCount);
-                return new DataFlowItem(m);                
+                return itemToMap(new DataFlowItem(m), succEdgeKeys);  
             }            
             if (a.left() instanceof Field) {
                 Field f = (Field)a.left();
@@ -361,12 +361,12 @@ public class InitChecker extends DataFlow
                     initCount = new MinMaxInitCount(initCount.getMin().increment(),
                                                     initCount.getMax().increment());
                     m.put(fi, initCount);
-                    return new DataFlowItem(m);
+                    return itemToMap(new DataFlowItem(m), succEdgeKeys);
                 }                
             }            
         }
 
-        return inItem;
+        return itemToMap(inItem, succEdgeKeys);
     }
 
     /**
@@ -404,9 +404,14 @@ public class InitChecker extends DataFlow
      * dataflows over Initializers, by copying back the appropriate 
      * MinMaxInitCounts to the map currentClassFinalFieldInitCounts.
      */
-    public void check(FlowGraph graph, Term n, Item in, Item out) throws SemanticException {
-        DataFlowItem dfIn = (DataFlowItem)in;
-        DataFlowItem dfOut = (DataFlowItem)out;
+    public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
+        DataFlowItem dfIn = (DataFlowItem)inItem;        
+        DataFlowItem dfOut = null;
+        if (outItems != null && !outItems.isEmpty()) {
+            // due to the flow equations, all DataFlowItems in the outItems map
+            // are the same, so just take the first one.
+            dfOut = (DataFlowItem)outItems.values().iterator().next(); 
+        }
         if (n instanceof Local) {
             Local l = (Local) n;
             MinMaxInitCount initCount = (MinMaxInitCount) 
@@ -456,7 +461,6 @@ public class InitChecker extends DataFlow
                         // not in a constructor or intializer, or the target is
                         // not appropriate. So we cannot assign 
                         // to a final field at all.
-                        System.out.println("Here I am ");
                         throw new SemanticException("cannot assign a value " +
                                    "to final variable \"" + fi.name() + "\"",
                                    a.position());
@@ -478,7 +482,6 @@ public class InitChecker extends DataFlow
                             // the field is final and not static
                             // it must be initialized exactly once.
                             if (InitCount.ZERO.equals(((MinMaxInitCount)e.getValue()).getMin())) {
-                                System.out.println("Here i is again");
                                 throw new SemanticException("variable \"" + fi.name() +
                                                             "\" might not have been initialized",
                                                             graph.entryNode().position());                                

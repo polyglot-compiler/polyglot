@@ -104,16 +104,6 @@ public class Cast_c extends Expr_c implements Cast
         return child.type();
     }
   
-    /** Check exceptions thrown by the expression. */
-    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-      if (expr.type().isReference()) {
-	  TypeSystem ts = ec.typeSystem();
-	  ec.throwsException(ts.ClassCastException());
-      }
-
-      return this;
-    }
-
     public String toString() {
 	return "(" + castType + ") " + expr;
     }

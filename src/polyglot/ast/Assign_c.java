@@ -165,21 +165,6 @@ public class Assign_c extends Expr_c implements Assign
       return child.type();
   }
 
-  /** Check exceptions thrown by the expression. */
-  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-    TypeSystem ts = ec.typeSystem();
-
-    if (throwsArithmeticException()) {
-      ec.throwsException(ts.ArithmeticException());
-    }
-
-    if (throwsArrayStoreException()) {
-      ec.throwsException(ts.ArrayStoreException());
-    }
-
-    return this;
-  }
-
   /** Get the throwsArrayStoreException of the expression. */
   public boolean throwsArrayStoreException() {
     return op == ASSIGN &&
