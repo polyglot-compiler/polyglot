@@ -1,19 +1,25 @@
 JLgen TODO
 ----------
-* use JLgen in building PolyJ
-
-* multiple start symbols
 * dropping a list of (non)terminals
 
+* error reporting
+  - line numbers on errors (use pos?)
+  - filename in chain on parse error
+  - filename/pos on jlgen error
+  - add usage message on errors
+  - dropping nonexistent symbol
+
+* use JLgen in building PolyJ
+
 * installation (.jar file)
-* add usage message on errors
 * option for "base include dir"? (eq. to -I)
 
 * removing "includes"?
 
+
 In progress
 -----------
-* web/man page
+* multiple start symbols (new start symbol always required)
 
 
 Complete
@@ -23,3 +29,4 @@ Complete
 * bin/jlgen script
 * find harmony with Unix-style path names
 * Makefiles
+* web/man page

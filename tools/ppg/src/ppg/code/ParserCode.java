@@ -2,16 +2,14 @@ package jltools.util.jlgen.code;
 
 public class ParserCode extends Code
 {
-	private String parser;
-	
 	public ParserCode (String parserCode) {
-		parser = parserCode;
+		value = parserCode;
 	}
 	public Object clone () {
-		return new ParserCode(parser.toString());	
+		return new ParserCode(value.toString());	
 	}
 	public String toString () {
-		return "parser code {:\n" + parser + "\n:}\n";
+		return "parser code {:\n" + value + "\n:}\n";
 	}
 
 }

@@ -7,6 +7,8 @@ parser code {:
 	parser code replaced
 :}
 
+start with D;
+
 drop {
 	B ::= d r o p ;
 }

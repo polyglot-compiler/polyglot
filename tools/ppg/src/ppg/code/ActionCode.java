@@ -2,15 +2,13 @@ package jltools.util.jlgen.code;
 
 public class ActionCode extends Code
 {
-	private String action;
-	
 	public ActionCode (String actionCode) {
-		action = actionCode;
+		value = actionCode;
 	}
 	public Object clone () {
-		return new ActionCode(action.toString());	
+		return new ActionCode(value.toString());	
 	}	
 	public String toString () {
-		return "action code {:\n" + action + "\n:}\n";
+		return "action code {:\n" + value + "\n:}\n";
 	}
 }

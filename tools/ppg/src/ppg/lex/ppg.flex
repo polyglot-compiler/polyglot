@@ -2,6 +2,7 @@ package jltools.util.jlgen.lex;
 
 import java.io.InputStream;
 import jltools.util.jlgen.parse.*;
+import jltools.util.Position;
 
 %%
 
@@ -14,6 +15,10 @@ import jltools.util.jlgen.parse.*;
 	private int lastId = -1;
 	private String filename = "";
 	private String lineSeparator;
+
+    private Position pos() {
+        return new Position(filename, yyline+1, yycolumn);
+    }
 
 	public Lexer(InputStream in, String filename) {
 		this(in);

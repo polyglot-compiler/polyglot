@@ -53,15 +53,15 @@ public class JLgen
 		spec.parseChain(parent == null ? "" : parent.getPath());		*/
 		
 		// try #3		String parent = file.getParent();		spec.parseChain(parent == null ? "" : parent);
-				// now we have a linked list of inheritance, namely		// JLgen1, JLgen2, ..., JLgenN, CUP		// We combine two at a time, starting from the end with the CUP spec
+		
+		// now we have a linked list of inheritance, namely		// JLgen1, JLgen2, ..., JLgenN, CUP		// We combine two at a time, starting from the end with the CUP spec
 		CUPSpec combined = spec.coalesce();				CodeWriter cw = new CodeWriter(System.out, 72); 
 		try {
 			combined.unparse(cw);
 			cw.flush();		} catch (IOException e) {
 			System.out.println(HEADER+"exception: "+e.getMessage());
 			return;
-		}		
-	}		private static void pause() {		if (debug) {
+		}	}		private static void pause() {		if (debug) {
 			try{System.in.read();}catch(Exception e){}
 		}	}
 }

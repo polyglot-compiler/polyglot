@@ -11,7 +11,8 @@ import jltools.util.jlgen.util.*;
 public class CUPSpec extends Spec
 {
 	private Vector productions;
-	// maps nonterminal to its index in the vector of productions	private Hashtable ntProds;	private final int NT_NOT_FOUND = -1;
+	// maps nonterminal to its index in the vector of productions	private Hashtable ntProds;
+	private String start;	private final int NT_NOT_FOUND = -1;
 	
 	public CUPSpec (String pkg, Vector imp, Vector codeParts, Vector syms,
 					Vector precedence, String startSym, Vector prods)
@@ -25,7 +26,9 @@ public class CUPSpec extends Spec
 		productions = prods;
 		ntProds = new Hashtable();		hashNonterminals();
 	}
-
+	public void setStart (String startSym) {		if (startSym != null)
+			start = startSym;
+	}
 	private void hashNonterminals() {
 		ntProds.clear();		if (productions == null)			return;				Production prod;
 		for (int i=0; i < productions.size(); i++) {			prod = (Production) productions.elementAt(i);
@@ -118,10 +121,7 @@ public class CUPSpec extends Spec
 			// attach to specific nonterminal in our list of productions			Production prod = (Production) productions.elementAt(pos);			prod.add(p);
 			//productions.setElementAt(prod, pos);		}
 	}
-	/**
-	 * Returns int which is the position of the nonterminal in the production
-	 * list, or exits if it is not found
-	 */
+	/**	 * Returns int which is the position of the nonterminal in the production	 * list, or exits if it is not found	 */
 	private int findNonterminal(Nonterminal nt) {
 		return findNonterminal(nt.getName());	}
 		private int findNonterminal(String nt) {		Integer pos = (Integer) ntProds.get(nt);
@@ -212,7 +212,7 @@ public class CUPSpec extends Spec
 			out.println( ((SymbolList) symbols.elementAt(i)).toString() );
 		out.println();
 		
-		// precedence
+		//TODO: precedence
 		
 		// start
 		out.println("start with " + start + ";");

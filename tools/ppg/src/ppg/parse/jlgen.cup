@@ -11,8 +11,10 @@ import jltools.util.jlgen.spec.*;
 
 parser code {: 
     private Lexer lexer;           
-
     private static String filename; 
+    
+
+    
     public static String getFilename() { return filename; } 
 
     public Parser (String fname, Lexer lex) { 
@@ -87,7 +89,8 @@ nonterminal
 nonterminal Spec spec, jlgen_spec, cup_spec;
 
 /* JLgen */nonterminal String include_spec;
-nonterminal Vector command_list_opt, prod_part_list, rhs_list, transfer_list;
+nonterminal Vector command_list_opt, prod_part_list, rhs_list, transfer_list,
+					jlgen_start_spec, jlgen_start_spec_elt, jlgen_start_spec_list;
 nonterminal Command command;
 /* Common */
 nonterminal Production production;nonterminal Vector production_list;
@@ -112,7 +115,7 @@ spec ::=
  * JLGEN                                                            *
  ********************************************************************/
 jlgen_spec ::=
-	include_spec:inc package_spec:pkg import_list:imp 	code_parts:code symbol_list_opt:sym_list precedence_list:prec_list	start_spec:start command_list_opt:cmd_list
+	include_spec:inc package_spec:pkg import_list:imp 	code_parts:code symbol_list_opt:sym_list precedence_list:prec_list	jlgen_start_spec:start command_list_opt:cmd_list
 	{:
 		RESULT = new JLgenSpec(inc, pkg, imp, code, sym_list,								prec_list, start, cmd_list);
 	:}
@@ -126,6 +129,33 @@ include_spec ::=
 	;
 symbol_list_opt ::=
 	symbol_list:sym_list {: RESULT = sym_list; :}|	{: RESULT = null; :};
+jlgen_start_spec ::=
+	START WITH nt_id:start SEMI {: 
+		Vector v = new Vector();
+		v.addElement(start);
+		RESULT = v;
+	:}	
+|	jlgen_start_spec_list:m {: RESULT = m; :}
+;
+
+jlgen_start_spec_list ::=
+	jlgen_start_spec_list:list jlgen_start_spec_elt:elt {: 
+		list.addAll(elt);
+		RESULT = list;
+	:}
+|	jlgen_start_spec_elt:elt {: RESULT = elt; :}
+;
+
+jlgen_start_spec_elt ::=
+	START WITH ID:start ID:method ID:token SEMI {:
+		Vector m = new Vector();
+		m.addElement(start.getValue());
+		m.addElement(method.getValue());
+		m.addElement(token.getValue());
+		RESULT = m;
+	:}
+;
+
 command_list_opt ::=
 	command_list_opt:b command:a
 	{:
@@ -176,28 +206,13 @@ production ::=
 	nt_id:lhs_id COLON_COLON_EQUALS rhs_list:rhs SEMI
 	{: 
 		RESULT = new Production(new Nonterminal(lhs_id), rhs);
-	:}/*	
-|	error SEMI
-	{:
-		
-	:}*/
-;
+	:};
 nt_id ::=
-	ID:the_id {: RESULT = (String)the_id.getValue(); :}/*
-|	error
-	{:
-		//lexer.emit_error("Illegal use of reserved word");		RESULT = "ILLEGAL";
-	:}*/
-;
+	ID:the_id {: RESULT = (String)the_id.getValue(); :};
 
 symbol_id ::=
 	ID:the_id
-	{: RESULT = (String)the_id.getValue(); :}/*
-|	error
-	{:
-		//lexer.emit_error("Illegal use of reserved word");		RESULT="ILLEGAL";
-	:}*/
-;
+	{: RESULT = (String)the_id.getValue(); :};
 
 rhs_list ::=	rhs_list:r_list BAR rhs:r {:
 		r_list.addElement(r);		RESULT = r_list;
@@ -261,11 +276,7 @@ robust_id ::= /* all ids that aren't reserved words in Java */
 	| RIGHT		{: RESULT = "right"; :}
 	| NONASSOC	{: RESULT = "nonassoc"; :}
 	*/
-	| error	{:
-		//lexer.emit_error("Illegal use of reserved word");
-		RESULT="ILLEGAL";
-	:}
-	;
+;
 
 non_terminal ::= NON TERMINAL | NONTERMINAL;
 
@@ -363,11 +374,6 @@ symbol ::=
 |	non_terminal declares_non_term:non_term {:
 		RESULT = new SymbolList(SymbolList.NONTERMINAL, null, non_term);
 	:}
-/*	
-	// error recovery productions -- sync on semicolon
-|	TERMINAL error SEMI
-|	non_terminal error SEMI
-*/
 ;
 
 declares_term ::=

@@ -3,6 +3,7 @@ package jltools.util.jlgen.lex;
 import java.io.*;
 import java_cup.runtime.Symbol;
 import jltools.util.jlgen.parse.*;
+//import jltools.util.Position;
 
 public class Token /* extends Symbol */ implements LexerResult {
 
@@ -10,16 +11,16 @@ public class Token /* extends Symbol */ implements LexerResult {
     private String filename;
     private int lineno;
     private Object value;	// String, Boolean, Integer, Vector, null
-		
-	static int lastID;
-
+	//private Position position;
 	
-    public Token (String filename, int lineno, Object value) {
-		this (-1, filename, lineno, -1, -1, value);
+	static int lastID;
+	
+    public Token (String filename, int lineno, Object value/*, Position pos*/) {
+		this (-1, filename, lineno, -1, -1, value/*, pos*/);
     }
 
     public Token (int id, String filename, int lineno, int left, int right,
-		  Object value) {
+		  Object value/*, Position pos*/) {
 		// super(id, left, right, value);
 		
 		symbol = new Symbol (id, left, right, this);
@@ -27,6 +28,7 @@ public class Token /* extends Symbol */ implements LexerResult {
 		this.filename = filename;
 		this.lineno = lineno;
 		this.value = value;
+		//position = pos;
     }
 
     public int getCode () {

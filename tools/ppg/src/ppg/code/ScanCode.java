@@ -2,17 +2,15 @@ package jltools.util.jlgen.code;
 
 public class ScanCode extends Code
 {
-	private String scan;
-	
 	public ScanCode (String scanCode) {
-		scan = scanCode;
+		value = scanCode;
 	}
 
 	public Object clone () {
-		return new ScanCode(scan.toString());	
+		return new ScanCode(value.toString());	
 	}	
 	public String toString () {
-		return "scan with {:" + scan + ":};";
+		return "scan with {:" + value + ":};";
 	}
 
 }

@@ -2,17 +2,15 @@ package jltools.util.jlgen.code;
 
 public class InitCode extends Code
 {
-	private String init;
-	
 	public InitCode (String initCode) {
-		init = initCode;
+		value = initCode;
 	}
 
 	public Object clone () {
-		return new InitCode(init.toString());	
+		return new InitCode(value.toString());	
 	}	
 	public String toString () {
-		return "init code {:\n" + init + "\n:}\n";
+		return "init code {:\n" + value + "\n:}\n";
 	}
 }
 

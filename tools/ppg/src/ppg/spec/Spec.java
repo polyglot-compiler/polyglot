@@ -4,15 +4,13 @@ import jltools.util.jlgen.*;
 import jltools.util.jlgen.code.*;import jltools.util.jlgen.parse.*;
 
 public abstract class Spec implements Unparse
-{	protected String packageName, start;
+{	protected String packageName;
 	protected Vector imports, symbols, prec;	protected InitCode initCode;
 	protected ActionCode actionCode;	protected ParserCode parserCode;	protected ScanCode scanCode;
 	protected JLgenSpec child;		public Spec () {		initCode = null;		actionCode = null;		parserCode = null;		scanCode = null;
 		child = null;
 	}	
-	public void setStart (String startSym) {		if (startSym != null)
-			start = startSym;
-	}		public void setPkgName (String pkgName) {		if (pkgName != null)
+	public void setPkgName (String pkgName) {		if (pkgName != null)
 			packageName = pkgName;
 	}
 	
@@ -28,12 +26,9 @@ public abstract class Spec implements Unparse
 		if (imp == null)			return;
 				for (int i=0; i < imp.size(); i++) {			imports.addElement(imp.elementAt(i));		}	}
 	
-		
-		public void setChild (JLgenSpec childSpec) {		child = childSpec;
+	public void setChild (JLgenSpec childSpec) {		child = childSpec;
 	}		// default action is to do nothing: as CUP does
 	public void parseChain(String basePath) {}
 
-	/**
-	 * Combine the chain of inheritance into one CUP spec
-	 */	public abstract CUPSpec coalesce();	
+	/**	 * Combine the chain of inheritance into one CUP spec	 */	public abstract CUPSpec coalesce();	
 }
