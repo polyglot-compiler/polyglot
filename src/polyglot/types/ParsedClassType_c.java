@@ -56,7 +56,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         return inStaticContext;
     }
     
-        public ClassType outer() {
+    public ClassType outer() {
         if (isTopLevel())
             return null;
         if (outer == null)
