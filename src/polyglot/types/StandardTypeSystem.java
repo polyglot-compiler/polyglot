@@ -465,7 +465,6 @@ public class StandardTypeSystem extends TypeSystem {
 
     try
     {
-      //      System.out.println( "recursing to first prefix...");
       result = (ClassType)checkAndResolveType(new AmbiguousType(this, prefix),
                                               context);
     }
@@ -604,6 +603,7 @@ public class StandardTypeSystem extends TypeSystem {
         }
       }
       while ( (type = (ClassType)type.getSuperType()) != null);
+      throw new TypeCheckException( "Field \"" + name + "\" not found");
     }
     else // type == null, ==> no starting point. so check superclasses as well as enclosing classes.
     {
@@ -644,10 +644,34 @@ public class StandardTypeSystem extends TypeSystem {
         throw new TypeCheckException("Ambiguous referenct to field \"" + name + "\"");
       }
     }
-
     if ( fi!= null) return fi;
     if ( fiEnclosing != null) return fiEnclosing;
-    throw new TypeCheckException("Field \"" + name + "\" not found");
+
+
+    // still no dice. check for a name like: {class}.{static_member}+.*
+    ClassType result = null;
+    String prefix = TypeSystem.getFirstComponent(name);
+    String rest = TypeSystem.removeFirstComponent(name);
+    
+    try
+    {
+      result = (ClassType)checkAndResolveType(new AmbiguousType(this, prefix),
+                                              context);
+    }
+    catch( TypeCheckException e) {}
+
+    while (result == null && rest.length() > 0) {
+      prefix = prefix + "." + TypeSystem.getFirstComponent(rest);
+      rest = TypeSystem.removeFirstComponent(rest);
+      try {
+	result = resolver.findClass(prefix);
+      } catch (NoClassException e) {}
+    }
+    if (result == null)
+      throw new TypeCheckException( "Field \"" + name + "\" not found");
+    // ah ha! we have a type. to work against.
+    return getField ( result, rest, context );
+    
   }
 
  /**

@@ -119,19 +119,20 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 
   public Node removeAmbiguities( LocalContext c) throws TypeCheckException
   {
+    System.out.println ( "Resolving ambiguities for name = " + getName());
     Expression e;
     TypeNode tn;
-    FieldInstance fi;
+    FieldInstance fi = null;
     String name = getName();
-
     fi = c.getField( null, name);
 
-    if( true /* c.isDefinedLocally( name) */) {
+    if( c.isDefinedLocally( name) ) {
       e = new LocalVariableExpression( name);
     }
     else {
+      // look for a field
       tn = new TypeNode( fi.getEnclosingType());
-      e = new FieldExpression( tn, name);
+      e = new FieldExpression( tn, fi.getName() );
       Annotate.setLineNumber( tn, Annotate.getLineNumber( this));
     }
 

@@ -191,6 +191,7 @@ public class ClassNode extends ClassMember {
 
   public void translate ( LocalContext c, CodeWriter w)
   {
+    if ( c == null) System.out.println( " cn c is null");
     w.write (accessFlags.getStringRepresentation() + "class " + name);
     if (superClass != null)
     {

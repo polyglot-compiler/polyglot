@@ -84,7 +84,8 @@ public class BlockStatement extends Statement {
 
   public void translate( LocalContext c, CodeWriter w)
   {
-    
+    if ( c == null)
+      System.out.println( " block c is null");
     w.write("{");
     w.beginBlock();
     for (ListIterator it = statements.listIterator(); it.hasNext(); ) 

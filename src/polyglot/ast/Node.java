@@ -61,7 +61,7 @@ public abstract class Node extends jltools.util.AnnotatedObject {
     }
   }
   
-  public Node resolveAmbiguities(LocalContext c)
+  public Node resolveAmbiguities(LocalContext c) throws TypeCheckException
   {
     return this;
   }

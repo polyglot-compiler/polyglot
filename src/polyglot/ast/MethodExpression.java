@@ -5,9 +5,8 @@
 package jltools.ast;
 
 import jltools.types.*;
-import jltools.util.TypedList;
-import jltools.util.TypedListIterator;
-import jltools.util.CodeWriter;
+import jltools.util.*;
+
 import java.util.List;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -138,9 +137,23 @@ public class MethodExpression extends Expression {
     return null;
   }
 
+  public Node adjustScope( LocalContext c )
+  {
+    //FIXME:  this should be rectified in the grammar and not here, 
+    // i.e, name should always come in as a short name
+    if ( !c.getTypeSystem().getPackageComponent(name).equals(""))
+    {
+      target = new AmbiguousNameExpression ( c.getTypeSystem().getPackageComponent( name ) );
+      name = c.getTypeSystem().getShortNameComponent ( name ) ;
+      Annotate.setLineNumber ( target, Annotate.getLineNumber ( this ) ) ;
+    }
+    return null;
+  }
+
   public Node typeCheck(LocalContext c) throws TypeCheckException
   {
     // fixme: exceptions
+    System.out.println ("target is " + target);
     ClassType ct; 
     if (target == null) 
       ct = null;

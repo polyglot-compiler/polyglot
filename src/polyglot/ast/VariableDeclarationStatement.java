@@ -164,6 +164,7 @@ public class VariableDeclarationStatement extends Statement {
 
   public Node removeAmbiguities( LocalContext c) throws TypeCheckException
   {
+
     Declarator d;
     Iterator iter = declarators();
     

@@ -1,0 +1,14 @@
+
+package test;
+
+import java.util.*;
+
+public class Hash
+{
+  public static void main(String [] args)
+  {
+    Hashtable ht = new Hashtable();
+    ht.put ( (Object)32, "Hello");
+    System.out.println ( ht.get( (Object)32) );
+  }
+}

@@ -121,7 +121,7 @@ public class Compiler implements TargetTable
     loadedResolver = new LoadedClassResolver();
     systemResolver.addClassResolver( loadedResolver);
     
-    ts = new StandardTypeSystem( systemResolver);
+    ts = new IntCastableTypeSystem( systemResolver);
     
     loadedResolver.setTypeSystem( ts);
     
@@ -288,7 +288,7 @@ public class Compiler implements TargetTable
       /* TRANSLATE. */
       if( (job.status & job.TRANSLATED) == 0) {
         verbose( "translating " + job.t.getName() + "...");
-        translate( job.t, job.ast);
+        translate( job.t, job.it, job.ast);
 
         job.status |= Job.TRANSLATED;
       }
@@ -407,13 +407,13 @@ public class Compiler implements TargetTable
     return ast.visit( tc);
   }
 
-  protected void translate( Target t, Node ast) throws IOException
+  protected void translate( Target t, ImportTable it, Node ast) throws IOException
   {
     SourceFileNode sfn = (SourceFileNode)ast;
     CodeWriter cw = new CodeWriter( t.getOutputWriter( sfn.getPackageName()), 
                                     outputWidth);
     
-    ast.translate( null, cw);
+    ast.translate( new LocalContext(it, ts),  cw);
     
     cw.flush();
     System.out.flush();

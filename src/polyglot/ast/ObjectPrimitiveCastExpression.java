@@ -19,7 +19,8 @@ public class ObjectPrimitiveCastExpression extends CastExpression
     {
       if( type.getType().equals( c.getTypeSystem().getInt())) {
         if( expr.getCheckedType().descendsFrom( 
-                                         c.getTypeSystem().getObject())) {
+                                         c.getTypeSystem().getObject()) || 
+            expr.getCheckedType().equals(c.getTypeSystem().getObject() )) {
           w.write( " ((java.lang.Integer)(");
           expr.translate( c, w);
           w.write( " )).intValue() ");

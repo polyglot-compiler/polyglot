@@ -1522,14 +1522,14 @@ cast_expression ::=
 		LPAREN primitive_type:a dims_opt:b RPAREN unary_expression:c
 			{: Type t = (b.intValue() == 0 ? a.getType() :
 			    new ArrayType(parser.ts,a.getType(),b.intValue()));
-				RESULT = (CastExpression)Grm.ln(
-				new CastExpression( t, c), a);
+				RESULT = (ObjectPrimitiveCastExpression)Grm.ln(
+				new ObjectPrimitiveCastExpression( t, c), a);
 				Type t1 = a.getType(); a.setType(
 				t1.extendArrayDims(b.intValue())); :}
 	|	LPAREN expression:a RPAREN 
 				unary_expression_not_plus_minus:b
-			{: RESULT = (CastExpression)Grm.ln(
-				new CastExpression( (TypeNode)
+			{: RESULT = (ObjectPrimitiveCastExpression)Grm.ln(
+				new ObjectPrimitiveCastExpression( (TypeNode)
 				Grm.ln(new TypeNode( 
 				new AmbiguousType( parser.ts, 
 				((AmbiguousNameExpression)a).getName())), a),
@@ -1538,8 +1538,8 @@ cast_expression ::=
 			{: Type t2 = new ArrayType(parser.ts, 
 				new AmbiguousType(parser.ts, 
 				a.getName()), b.intValue());
-				RESULT = (CastExpression)Grm.ln(
-			       new CastExpression( new TypeNode(t2), c), a); :}
+				RESULT = (ObjectPrimitiveCastExpression)Grm.ln(
+			       new ObjectPrimitiveCastExpression( new TypeNode(t2), c), a); :}
 	;
 multiplicative_expression ::=
 					// Expression

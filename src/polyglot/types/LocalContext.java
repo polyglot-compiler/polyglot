@@ -45,7 +45,8 @@ public class LocalContext
     Stack blockStack =  ((ClassTuple)stkContexts.peek()).getBlockStack();
     for (ListIterator i =blockStack.listIterator(blockStack.size()) ; i.hasPrevious() ; )
     {
-      if ( ((Hashtable) i.previous()).contains( s ) )
+      Hashtable ht = (Hashtable) i.previous();
+      if ( ht.get( s ) != null )
         return true; 
     }
     return false;
@@ -195,12 +196,14 @@ public class LocalContext
    */
   public void addSymbol( String sName, Type t)
   {
+
     if ( stkContexts.size() < 1)
       throw new InternalCompilerError("Can't pop block since not in a class.");
     Stack blockStack =  ((ClassTuple)stkContexts.peek()).getBlockStack();
     if ( blockStack == null || blockStack.size() == 0)
       throw new InternalCompilerError(" Can't add symbol since not inside a method");
     ((Hashtable)blockStack.peek()).put(sName, t);
+
   }
 
   class ClassTuple
