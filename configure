@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -x
 
 trap 'rm -f PrintProperty.java PrintProperty.class' EXIT
