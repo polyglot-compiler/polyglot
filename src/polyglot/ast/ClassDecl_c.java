@@ -122,8 +122,13 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         }
 
         // Member interfaces are implicitly static. 
-        if (ct.isMember() && ct.toMember().flags().isInterface()) {
+        if (ct.isMember() && ct.flags().isInterface()) {
             ct.flags(ct.flags().setStatic());
+        }
+
+        // Interfaces are implicitly abstract. 
+        if (ct.flags().isInterface()) {
+            ct.flags(ct.flags().setAbstract());
         }
 
         return this;
@@ -251,6 +256,31 @@ public class ClassDecl_c extends Node_c implements ClassDecl
             }
         }
 
+        if (type.superType() != null && type.superType().isClass()) {
+            if (type.superType().toClass().flags().isFinal()) {
+                throw new SemanticException("Cannot extend final class \"" +
+                                            type.superType() + "\".",
+                                            position());
+            }
+        }
+
+        TypeSystem ts = tc.typeSystem();
+
+        try {
+            if (type.isTopLevel()) {
+                ts.checkTopLevelClassFlags(type.flags());
+            }
+            if (type.isMember()) {
+                ts.checkMemberClassFlags(type.flags());
+            }
+            if (type.isLocal()) {
+                ts.checkLocalClassFlags(type.flags());
+            }
+        }
+        catch (SemanticException e) {
+            throw new SemanticException(e.getMessage(), position());
+        }
+
         return this;
     }
 
@@ -262,7 +292,12 @@ public class ClassDecl_c extends Node_c implements ClassDecl
     public void translate_(CodeWriter w, Translator tr) {
 	    enterScope(tr.context());
 
-	    w.write(flags.clearInterface().translate());
+            if (flags.isInterface()) {
+                w.write(flags.clearInterface().clearAbstract().translate());
+            }
+            else {
+                w.write(flags.translate());
+            }
 
 	    if (flags.isInterface()) {
 		    w.write("interface ");
