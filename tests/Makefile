@@ -27,6 +27,7 @@ GOOD =  \
 	FinalInit4.jl \
 	FinalInit5.jl \
 	FinalInit6.jl \
+	FinalInit7.jl \
 	ForwardRef2.jl \
 	ForwardRef3.jl \
 	ForwardRef.jl \
