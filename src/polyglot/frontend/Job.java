@@ -16,8 +16,13 @@ import java.io.IOException;
  */
 public abstract class Job
 {
-    Job parent;
+    /** Field used for storing extension-specific information. */
     JobExt ext;
+
+    /** The job that caused this job to load.  Barrier passes executed
+     * by the parent job cause this job to run.
+     */
+    Job parent;
 
     /** List of jobs this Job depends on.  These are the jobs for the sources
      * loaded when this Job references a class not already loaded.  We try to
@@ -25,6 +30,7 @@ public abstract class Job
      * executed by its parent. */
     List children;
 
+    /** The language extension used for this job. */
     protected ExtensionInfo lang;
 
     /** The AST constructed from the source file. */
@@ -32,9 +38,17 @@ public abstract class Job
 
     /** List of passes remaining to be run on the work unit. */
     protected ArrayList passes;
+
+    /** Index of the next pass to run. */
     protected int nextPass;
+
+    /** True if currently running a pass. */
     protected boolean isRunning;
+
+    /** True if all passes run so far have been successful. */
     protected boolean status;
+
+    /** Map from pass id to pass. */
     protected Map passMap;
 
     public Job(ExtensionInfo lang, JobExt ext, Job parent, Node ast) {
@@ -56,10 +70,6 @@ public abstract class Job
     }
 
     public void reparent(Job parent) {
-        if (this.parent != null) {
-            this.parent.children().remove(this);
-        }
-
         if (parent != null) {
             parent.children().add(this);
         }

@@ -199,6 +199,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                     jobs.put(sj.source(), sj);
                     worklist.add(sj);
                 }
+
+                i.remove();
             }
         }
 
