@@ -515,7 +515,7 @@ ext=''
     </javadoc>
   </target>
 
-  <target name="polyglot-dist" depends="base-dist,pao-dist,coffer-dist,dist-javadoc"/>
+  <target name="polyglot-dist" depends="base-dist,pao-dist,coffer-dist"/>
   <target name="polyglot-dist-javadoc" depends="polyglot-dist,dist-javadoc"/>
   <target name="jif-dist" depends="base-dist,jif"/>
   <target name="split-dist" depends="base-dist,split"/>
