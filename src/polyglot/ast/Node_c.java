@@ -14,38 +14,30 @@ import java.util.*;
  * of the node should copy the node, set the field in the copy, and then
  * return the copy.
  */
-public abstract class Node_c implements Node
+public abstract class Node_c extends Ext_c implements Node
 {
-	protected Ext ext;
 	protected Position position;
         protected boolean bypass;
 
+	public Node_c(Position pos) {
+                this(null, pos);
+	}
+
 	public Node_c(Ext ext, Position pos) {
-		this.ext = ext;
-		ext.init(this);
+                super(ext);
+                this.basis = this;
+
 		this.position = pos;
                 this.bypass = false;
 	}
 
-	public Object copy() {
-		return ext((Ext) ext.copy());
-	}
+        public Node node() {
+                return this;
+        }
 
-	public Ext ext() {
-		return this.ext;
-	}
-
-	public Node ext(Ext ext) {
-		try {
-			Node_c n = (Node_c) super.clone();
-			n.ext = ext;
-			ext.init(n);
-			return n;
-		}
-		catch (CloneNotSupportedException e) {
-			throw new InternalCompilerError("Java clone() wierdness.");
-		}
-	}
+        public Node ext(Ext ext) {
+                return (Node) super.setExt(ext);
+        }
 
         public boolean bypass() {
                 return bypass;
@@ -180,6 +172,9 @@ public abstract class Node_c implements Node
 	/** Adjust the environment for leaving the current scope. */
 	public void leaveScope(Context c) { }
 
+        // These methods override the methods in Ext_c.
+        // These are the default implementation of these passes.
+
 	public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
 		return null;
 	}
@@ -264,9 +259,10 @@ public abstract class Node_c implements Node
 	/** Translate the AST using the given <code>CodeWriter</code>. */
 	public void translate_(CodeWriter w, Translator tr) { }
 
+        // Some helpful methods for translation.
 	public void translateBlock(Node n, CodeWriter w, Translator tr) {
 		w.begin(0);
-		n.ext().translate(w, tr);
+		n.translate(w, tr);
 		w.end();
 	}
 
@@ -275,6 +271,7 @@ public abstract class Node_c implements Node
 		translateBlock(stmt, w, tr);
 	}
 
+        /** Dump the ast for debugging purposes. */
 	public void dump(CodeWriter w) {
 		w.write(StringUtil.getShortNameComponent(getClass().getName()));
 
@@ -296,7 +293,7 @@ public abstract class Node_c implements Node
 		w.end();
 	}
 
-	public class StringCodeWriter extends CodeWriter {
+	public static class StringCodeWriter extends CodeWriter {
 		CharArrayWriter w;
 
 		public StringCodeWriter(CharArrayWriter w) {

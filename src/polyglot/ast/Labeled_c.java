@@ -68,6 +68,6 @@ public class Labeled_c extends Stmt_c implements Labeled
     /** Write the statement to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	w.write(label + ": ");
-	statement.ext().translate(w, tr);
+	statement.translate(w, tr);
     }
 }

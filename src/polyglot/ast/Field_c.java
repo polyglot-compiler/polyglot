@@ -169,7 +169,7 @@ public class Field_c extends Expr_c implements Field
       translateSubexpr((Expr) target, w, tr);
     }
     else if (target instanceof TypeNode) {
-      target.ext().translate(w, tr);
+      target.translate(w, tr);
     }
 
     w.write(".");

@@ -87,7 +87,7 @@ public class Throw_c extends Stmt_c implements Throw
     public void translate_(CodeWriter w, Translator tr)
     {
 	w.write("throw ");
-	expr.ext().translate(w, tr);
+	expr.translate(w, tr);
 	w.write(";");
     }
 }

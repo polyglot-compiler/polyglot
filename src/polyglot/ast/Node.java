@@ -24,8 +24,13 @@ import java.io.Serializable;
  * of the node should copy the node, set the field in the copy, and then
  * return the copy.
  */
-public interface Node extends Copy, Serializable
+public interface Node extends Ext, Serializable
 {
+    /**
+     * Set the node's extension.
+     */
+    Node ext(Ext ext);
+
     /**
      * Return true if the node should be bypassed on the next visit.
      */
@@ -42,31 +47,12 @@ public interface Node extends Copy, Serializable
      */
     Node bypassChildren();
 
-    /**
-     * Return the delegate for this node.  Some operations on the node should
-     * be invoked only through the delegate, for instance as:
-     * <pre>
-     *    n.ext().typeCheck(c)
-     * </pre>
-     * rather than:
-     * <pre>
-     *    n.typeCheck_(c)
-     * </pre>
-     */
-    Ext ext();
-
-    /** Create a copy of the node with a new delegate. */
-    Node ext(Ext ext);
-
     /** Get the position of the node in the source file.  Returns null if
      * the position is not set. */
     Position position();
 
     /** Create a copy of the node with a new position. */
     Node position(Position position);
-
-    /** Clone the node. */
-    Object copy();
 
     /**
      * Visit the node.  This method is equivalent to <code>visitEdge(null,
@@ -116,85 +102,6 @@ public interface Node extends Copy, Serializable
      * Adjust the environment on leaving the scope of the method.
      */
     void leaveScope(Context c);
-
-    // Implementations of the default passes.  These methods should only
-    // be called through the delegate.
-
-    /**
-     * Collects classes, methods, and fields from the AST rooted at this node
-     * and constructs type objects for these.  These type objects may be
-     * ambiguous.
-     *
-     * @param cb The visitor which adds new type objects to the
-     * <code>TypeSystem</code>.
-     */
-    Node buildTypesOverride_(TypeBuilder tb) throws SemanticException;
-    Node buildTypesEnter_(TypeBuilder tb) throws SemanticException;
-    Node buildTypes_(TypeBuilder tb) throws SemanticException;
-
-    /**
-     * Adds disambiguated methods and fields to the types.
-     *
-     * @param tc The visitor which builds types.
-     */
-    Node addMembersOverride_(AddMemberVisitor tc) throws SemanticException;
-    Node addMembersEnter_(AddMemberVisitor tc) throws SemanticException;
-    Node addMembers_(AddMemberVisitor tc) throws SemanticException;
-
-    /**
-     * Remove any remaining ambiguities from the AST.
-     *
-     * @param ar The visitor which disambiguates.
-     */
-    Node disambiguateOverride_(AmbiguityRemover ar) throws SemanticException;
-    Node disambiguateEnter_(AmbiguityRemover ar) throws SemanticException;
-    Node disambiguate_(AmbiguityRemover ar) throws SemanticException;
-
-    /**
-     * Fold constants in the AST.
-     *
-     * @param cf The constant folding visitor.
-     */
-    Node foldConstantsOverride_(ConstantFolder cf);
-    Node foldConstantsEnter_(ConstantFolder cf);
-    Node foldConstants_(ConstantFolder cf);
-
-    /**
-     * Type check the AST.
-     *
-     * @param tc The type checking visitor.
-     */
-    Node typeCheckOverride_(TypeChecker tc) throws SemanticException;
-    Node typeCheckEnter_(TypeChecker tc) throws SemanticException;
-    Node typeCheck_(TypeChecker tc) throws SemanticException;
-
-    /**
-     * Set the expected type of <code>child</code>.  This method is called
-     * by the visitor just before the child expression is visited.
-     *
-     * @param child An immediate subexpression of <code>this</code>.
-     * @param tc The expected type visitor.
-     * @return A new version of child with the expected type field set.
-     */
-    Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
-        throws SemanticException;
-
-    /**
-     * Check that exceptions are properly propagated throughout the AST.
-     *
-     * @param ec The visitor.
-     */
-    Node exceptionCheckOverride_(ExceptionChecker ec) throws SemanticException;
-    Node exceptionCheckEnter_(ExceptionChecker ec) throws SemanticException;
-    Node exceptionCheck_(ExceptionChecker ec) throws SemanticException;
-
-    /**
-     * Translate the AST using the given code writer.
-     *
-     * @param w The code writer to which to write.
-     * @param tr The translation pass.  This is <i>not</i> a visitor.
-     */
-    void translate_(CodeWriter w, Translator tr);
 
     /**
      * Dump the AST node for debugging purposes.

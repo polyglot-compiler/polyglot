@@ -124,7 +124,7 @@ public class Cast_c extends Expr_c implements Cast
     {
 	w.begin(0);
 	w.write("(");
-	castType.ext().translate(w, tr);
+	castType.translate(w, tr);
 	w.write(")");
 	w.allowBreak(2, " ");
 	translateSubexpr(expr, w, tr);

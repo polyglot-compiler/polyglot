@@ -224,7 +224,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     /** Write the call to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	if (qualifier != null) {
-	    qualifier.ext().translate(w, tr);
+	    qualifier.translate(w, tr);
 	    w.write(".");
 	} 
 
@@ -234,7 +234,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
 	for (Iterator i = arguments.iterator(); i.hasNext(); ) {
 	    Expr e = (Expr) i.next();
-	    e.ext().translate(w, tr);
+	    e.translate(w, tr);
 
 	    if (i.hasNext()) {
 		w.write(",");

@@ -67,7 +67,7 @@ public class Eval_c extends Stmt_c implements Eval
     public void translate_(CodeWriter w, Translator tr) {
 	boolean semi = tr.appendSemicolon(true);
 
-	expr.ext().translate(w, tr);
+	expr.translate(w, tr);
 
 	if (semi) {
 	    w.write(";");

@@ -144,7 +144,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 	for (Iterator i = elements.iterator(); i.hasNext(); ) {
 	    Expr e = (Expr) i.next();
 
-	    e.ext().translate(w, tr);
+	    e.translate(w, tr);
 
 	    if (i.hasNext()) {
 		w.write(", ");

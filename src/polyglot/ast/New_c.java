@@ -525,7 +525,7 @@ FIXME: check super types as well.
     /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
         if (qualifier != null) {
-            qualifier.ext().translate(w, tr);
+            qualifier.translate(w, tr);
             w.write(".");
         }
 
@@ -540,11 +540,11 @@ FIXME: check super types as well.
             }
 
             tr.setOuterClass(ct.toMember().outer());
-            tn.ext().translate(w, tr);
+            tn.translate(w, tr);
             tr.setOuterClass(null);
         }
         else {
-            tn.ext().translate(w, tr);
+            tn.translate(w, tr);
         }
 
 	w.write("(");
@@ -553,7 +553,7 @@ FIXME: check super types as well.
 	for (Iterator i = arguments.iterator(); i.hasNext();) {
 	    Expr e = (Expr) i.next();
 
-	    e.ext().translate(w, tr);
+	    e.translate(w, tr);
 
 	    if (i.hasNext()) {
 		w.write(",");
@@ -566,7 +566,7 @@ FIXME: check super types as well.
 
 	if (body != null) {
 	    w.write(" ");
-	    body.ext().translate(w, tr);
+	    body.translate(w, tr);
 	}
     }
 }

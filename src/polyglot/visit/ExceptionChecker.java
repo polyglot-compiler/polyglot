@@ -43,7 +43,7 @@ public class ExceptionChecker extends NodeVisitor
         pushScope();
 
 	try {
-	    Node m = n.ext().exceptionCheckOverride(this);
+	    Node m = n.exceptionCheckOverride(this);
             SubtypeSet t = popScope();
 	    throwsSet().addAll(t);
 	    return m;
@@ -98,7 +98,7 @@ public class ExceptionChecker extends NodeVisitor
 
 	// gather exceptions from this node.
 	try {
-	    return n.ext().exceptionCheck(this);
+	    return n.exceptionCheck(this);
 	}
 	catch (SemanticException e) {
 	    Position position = e.position();

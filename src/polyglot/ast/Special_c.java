@@ -110,7 +110,7 @@ public class Special_c extends Expr_c implements Special
     /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	if (qualifier != null) {
-	    qualifier.ext().translate(w, tr);
+	    qualifier.translate(w, tr);
 	    w.write(".");
 	}
 

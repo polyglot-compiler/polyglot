@@ -85,7 +85,7 @@ public class TypeBuilder extends NodeVisitor
 
     public Node enter(Node n) {
         try {
-	    return n.ext().buildTypesEnter(this);
+	    return n.buildTypesEnter(this);
 	}
 	catch (SemanticException e) {
 	    Position position = e.position();
@@ -103,7 +103,7 @@ public class TypeBuilder extends NodeVisitor
 
     public Node override(Node n) {
         try {
-	    return n.ext().buildTypesOverride(this);
+	    return n.buildTypesOverride(this);
 	}
 	catch (SemanticException e) {
 	    Position position = e.position();
@@ -121,7 +121,7 @@ public class TypeBuilder extends NodeVisitor
 
     public Node leave(Node old, Node n, NodeVisitor v) {
 	try {
-	    return n.ext().buildTypes(this);
+	    return n.buildTypes(this);
 	}
 	catch (SemanticException e) {
 	    Position position = e.position();
@@ -164,7 +164,7 @@ public class TypeBuilder extends NodeVisitor
         stack.push(type);
 
 	// Make sure the import table finds this class.
-        if (type.isTopLevel()) {
+        if (importTable() != null && type.isTopLevel()) {
 	    importTable().addClassImport(type.toTopLevel().fullName());
 	}
     }

@@ -132,7 +132,7 @@ public class Return_c extends Stmt_c implements Return
 	w.write("return") ;
 	if (expr != null) {
 	    w.write(" ");
-	    expr.ext().translate(w, tr);
+	    expr.translate(w, tr);
 	}
 	w.write(";");
     }

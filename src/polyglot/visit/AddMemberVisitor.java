@@ -17,14 +17,14 @@ public class AddMemberVisitor extends SemanticVisitor
     }
 
     protected Node enterCall(Node n) throws SemanticException {
-        return n.ext().addMembersEnter(this);
+        return n.addMembersEnter(this);
     }
 
     protected Node overrideCall(Node n) throws SemanticException {
-        return n.ext().addMembersOverride(this);
+        return n.addMembersOverride(this);
     }
 
     protected Node leaveCall(Node n) throws SemanticException {
-        return n.ext().addMembers(this);
+        return n.addMembers(this);
     }
 }

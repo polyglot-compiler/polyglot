@@ -312,14 +312,14 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 
 	w.begin(0);
 	w.write(flags.translate());
-	returnType.ext().translate(w, tr);
+	returnType.translate(w, tr);
 	w.write(" " + name + "(");
 
 	w.begin(0);
 
 	for (Iterator i = formals.iterator(); i.hasNext(); ) {
 	    Formal f = (Formal) i.next();
-	    f.ext().translate(w, tr);
+	    f.translate(w, tr);
 
 	    if (i.hasNext()) {
 		w.write(",");
@@ -336,7 +336,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 
 	    for (Iterator i = exceptionTypes.iterator(); i.hasNext(); ) {
 	        TypeNode tn = (TypeNode) i.next();
-		tn.ext().translate(w, tr);
+		tn.translate(w, tr);
 
 		if (i.hasNext()) {
 		    w.write(",");

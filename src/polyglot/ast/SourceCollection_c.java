@@ -55,7 +55,7 @@ public class SourceCollection_c extends Node_c implements SourceCollection
     public void translate_(CodeWriter w, Translator tr) {
         for (Iterator i = sources.iterator(); i.hasNext(); ) {
             SourceFile s = (SourceFile) i.next();
-            s.ext().translate(w, tr);
+            s.translate(w, tr);
         }
     }
 }

@@ -334,7 +334,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 
 	    if (superClass() != null) {
 		    w.write(" extends ");
-		    superClass().ext().translate(w, tr);
+		    superClass().translate(w, tr);
 	    }
 
 	    if (! interfaces.isEmpty()) {
@@ -347,7 +347,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 
 		    for (Iterator i = interfaces().iterator(); i.hasNext(); ) {
 			    TypeNode tn = (TypeNode) i.next();
-			    tn.ext().translate(w, tr);
+			    tn.translate(w, tr);
 
 			    if (i.hasNext()) {
 				    w.write (", ");
@@ -356,7 +356,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 	    }
 
 	    w.write(" ");
-	    body().ext().translate(w, tr);
+	    body().translate(w, tr);
 
 	    leaveScope(tr.context());
     }

@@ -24,14 +24,14 @@ public class ConstantFolder extends NodeVisitor
     }
 
     public Node enter(Node n) {
-	return n.ext().foldConstantsEnter(this);
+	return n.foldConstantsEnter(this);
     }
 
     public Node override(Node n) {
-	return n.ext().foldConstantsOverride(this);
+	return n.foldConstantsOverride(this);
     }
 
     public Node leave(Node old, Node n, NodeVisitor v) {
-	return n.ext().foldConstants(this);
+	return n.foldConstants(this);
     }
 }

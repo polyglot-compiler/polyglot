@@ -107,6 +107,6 @@ public class Instanceof_c extends Expr_c implements Instanceof
     public void translate_(CodeWriter w, Translator tr) {
 	translateSubexpr(expr, w, tr);
 	w.write(" instanceof ");
-	compareType.ext().translate(w, tr);
+	compareType.translate(w, tr);
     }
 }

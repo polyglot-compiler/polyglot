@@ -133,7 +133,7 @@ public class NewArray_c extends Expr_c implements NewArray
     /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	w.write("new ");
-	baseType.ext().translate(w, tr);
+	baseType.translate(w, tr);
 
 	for (Iterator i = dims.iterator(); i.hasNext();) {
 	  Expr e = (Expr) i.next();
@@ -148,7 +148,7 @@ public class NewArray_c extends Expr_c implements NewArray
 
 	if (init != null) {
 	    w.write(" ");
-	    init.ext().translate(w, tr);
+	    init.translate(w, tr);
 	}
     }
 }

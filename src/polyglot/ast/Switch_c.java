@@ -134,7 +134,7 @@ public class Switch_c extends Stmt_c implements Switch
 
 	for (Iterator i = elements.iterator(); i.hasNext();) {
 	   SwitchElement s = (SwitchElement) i.next();
-	   s.ext().translate(w, tr);
+	   s.translate(w, tr);
 	   if (i.hasNext()) {
 	       w.newline(0);
 	   }
