@@ -153,7 +153,8 @@ fi
 
 echo creating ${DEFS_MK}
 
-if [ -z $(echo ${JAVA_VER} | grep "1.4") ]
+# use jsse.jar only when jdk version number is not 1.4
+if [ -z `echo ${JAVA_VER} | grep "1.4"` ]
 then
     JSSE_JAR="\${ESC_SOURCE}${FILE_SEP}jsse.jar"
 fi
