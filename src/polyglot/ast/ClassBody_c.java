@@ -73,15 +73,12 @@ public class ClassBody_c extends Node_c implements ClassBody
         // We can't clean-super any member classes yet until we are finished
         // with this class and all at the same nesting level.
         // Delay until the clean-sigs pass.
-        if (ar.kind() == AmbiguityRemover.SUPER) {
+        if (ar.kind() == AmbiguityRemover.SUPER ||
+            ar.kind() == AmbiguityRemover.SIGNATURES) {
             return ar.bypassChildren(this);
         }
 
-        // FIXME: we should skip member classes (otherwise we visit them twice
-        // and in the wrong order), but doing so causes a bug with:
-        // ext/jl/tests/disamb_member/CollectionsTestser.jl
-          
-
+        /*
         // Skip clean-sigs for member classes; this will be done when we leave
         // the node, but only after clean-super is performed.
         if (ar.kind() == AmbiguityRemover.SIGNATURES) {
@@ -95,6 +92,7 @@ public class ClassBody_c extends Node_c implements ClassBody
 
             return ar;
         }
+        */
 
         return ar;
     }
