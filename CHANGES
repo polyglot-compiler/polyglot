@@ -1,0 +1,122 @@
+Polyglot Change Log
+===================
+
+This file documents changes between releases of Polyglot.
+
+Nov 2003: Polyglot 1.1.0
+========================
+  What's new since Polyglot 1.0.1:
+  --------------------------------
+    Numerous changes have been made to improve the performance of
+    Polyglot. It is now more efficient, especially when compiling
+    large code bases.
+
+    The scheduling of passes of jobs has been modified to take
+    dependencies between jobs into account. This allows for more
+    efficient scheduling. See polyglot.frontend.AbstractExtensionInfo
+    for more details.
+
+    A global barrier pass has been added, to facilitate whole program
+    analyses. See polyglot.frontend.GlobalBarrierPass for more
+    information.
+
+    The dataflow framework (polyglot.visit.DataFlow) has been modified
+    to allow dataflow upon either entering or leaving a code
+    declaration. This allows the results of dataflow analyses to be
+    available when visiting the AST nodes inside a code
+    declaration. The default (and legacy) behavior is to perform
+    dataflow upon leaving a code declaration.
+
+    The serialized type information that Polyglot produces in output
+    files is now encoded in base 64, which reduces the size of the
+    output files.
+
+    Serialized type information for member classes is now stored as a
+    field in the member class itself, instead of as part of the
+    serialized type information of the top level class that contains
+    the nested class.
+
+    Terms record whether or not they are reachable, as this
+    information is useful in later passes. The ReachChecker visitor
+    sets this information.
+
+    The reachability pass is now performed before the exception
+    checking pass.
+
+    A utility class PolyglotAntTask (in $POLYGLOT/tools) facilitates
+    the compilation of language extensions in the ANT framework.
+
+    Numerous bug fixes, including:
+      - changes for ancestors and conversions of short, int, etc.
+      - constant folding
+      - nested classes
+      - import table lookups
+
+
+  Converting existing extensions:
+  -------------------------------
+    Terms must now have methods to access and record reachability
+    information. If you have defined AST nodes that do not extend
+    polyglot.ext.jl.ast.Term_c, you may need to modify them. See
+    polyglot.ast.Term and polyglot.ext.jl.ast.Term_c for
+    information/examples.
+ 
+    ParsedClassTypes now record from which source they were parsed
+    from, if they were parsed during the current compilation. If you
+    have defined ParsedClassTypes that do not extend
+    polyglot.ext.jl.types.ParsedClassType_c, you may need to modify
+    them.
+
+    The signature for the class polyglot.types.TypeSystem has changed.
+      * void initialize(LoadedClassResolver loadedResolver)
+        has changed to
+        void initialize(LoadedClassResolver loadedResolver, ExtensionInfo extInfo)
+
+      * ParsedClassType createClassType(LazyClassInitializer init)
+        has changed to
+        ParsedClassType createClassType(LazyClassInitializer init, Source fromSource)
+
+      If you have overridden these methods in a subclass of
+      polyglot.ext.jl.types.TypeSystem_c, you should change your
+      method signatures.
+
+
+
+Aug 2003: Polyglot 1.0.1
+========================
+  What's new since Polyglot 1.0.0:
+  --------------------------------
+    Bug fixes:
+      - "import" declarations now import member classes.
+      - Detect uses of "this" in a static context.
+      - Detect multiply-defined local variables.
+      - Detect circular constructor invocations.
+      - Fixed bugs with Node.childExpectedType for arithmetic expressions.
+      - Fixed bugs with data-flow analysis through local and anonymous
+        classes.
+      - Renamed some protected methods in Context_c to avoid some
+        confusion.
+
+
+
+Jul 2003: Polyglot 1.0.0
+========================
+  What's new since Polyglot 0.9.5:
+  --------------------------------
+    We have changed the license from GPL to LGPL.  This should allow
+    more flexibility in licensing extensions to Java.
+
+    Many bugs in the base compiler have been fixed.
+
+    Node factories have been redesigned to be more extensible.
+    Existing subclasses of the base compiler node and extension
+    factories may need to be modified.
+
+    The quasiquoting interface has been changed to be easier to use.
+
+    New AST node types for local, field, and array assignment were
+    added.  Distinguishing the type of the left-hand-side permits
+    easier implementation of data-flow analyses.
+
+    The data-flow analysis framework was reworked to permit more
+    precise analyses.
