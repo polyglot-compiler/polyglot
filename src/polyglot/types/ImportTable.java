@@ -60,7 +60,6 @@ public  class ImportTable implements ClassResolver
     if( lazyImports.size() > 0) {
       for( Iterator iter = lazyImports.iterator(); iter.hasNext(); ) {
         String longName = (String)iter.next();
-        //        System.out.println( "lazily adding: " + longName);
         try 
         {
           ClassType clazz = resolver.findClass( longName);

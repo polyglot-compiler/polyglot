@@ -390,8 +390,11 @@ public class Compiler implements TargetTable, ClassCleaner
         acquireJob( job);
         if( (job.status & CHECKED) == 0) {
           verbose( this, "checking " + job.t.getName() + "...");
-          typeCheck( job.ast, job.it, eq);    
-          
+
+          job.ast = typeCheck( job.ast, job.it, eq);    
+          verbose( this, "exception checking " + job.t.getName() + "...");
+          job.ast = exceptionCheck ( job.ast, eq);
+
           if( hasErrors( job)) { releaseJob( job); return false; }
         
           job.status |= CHECKED;
@@ -593,6 +596,12 @@ public class Compiler implements TargetTable, ClassCleaner
   {
     TypeChecker tc = new TypeChecker( ts, it, eq);
     return ast.visit( tc);
+  }
+
+  protected Node exceptionCheck( Node ast, ErrorQueue eq)
+  {
+    ExceptionChecker ec = new ExceptionChecker( eq );
+    return ast.visit ( ec);
   }
 
   protected void translate( Target t, Node ast, ImportTable it) 

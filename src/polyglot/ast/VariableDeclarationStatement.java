@@ -211,6 +211,11 @@ public class VariableDeclarationStatement extends Statement
     if( c.getCurrentMethod() != null) {
       for( Iterator iter = declarators(); iter.hasNext(); ) {
         Declarator decl = (Declarator)iter.next();
+
+        if (c.isDefinedLocally( decl.name) )
+          throw new SemanticException("Duplicate declaration of \"" + 
+                                      decl.name + "\"");
+
         /* If it is a constant numeric expression (final + initializer is 
          * IntLiteral) then mark it "constant" under FieldInstance. */
         // FIXME other literal types?

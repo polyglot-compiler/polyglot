@@ -93,6 +93,10 @@ public class FormalParameter extends Node
 
   public Node typeCheck( LocalContext c) throws SemanticException
   {
+    if (c.isDefinedLocally( name) )
+      throw new SemanticException("Duplicate declaration of \"" + name +
+                                  "\"");
+    
     AccessFlags modifiers = new AccessFlags();
     modifiers.setFinal( isFinal);
     c.addSymbol( name, new FieldInstance( name, tn.getType(), null,

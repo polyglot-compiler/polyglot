@@ -34,6 +34,7 @@ public class StandardTypeSystem extends TypeSystem {
 
     OBJECT_ = resolver.findClass( "java.lang.Object");
     THROWABLE_ = resolver.findClass( "java.lang.Throwable");
+    EXCEPTION_ = resolver.findClass( "java.lang.Exception");
     ERROR_ = resolver.findClass( "java.lang.Error");
     RTEXCEPTION_ = resolver.findClass( "java.lang.RuntimeException");
     CLONEABLE_ = resolver.findClass( "java.lang.Cloneable");
@@ -413,12 +414,8 @@ public class StandardTypeSystem extends TypeSystem {
     // We have a class type on our hands.
     String className = ((AmbiguousType) type).getTypeString();
 
-    //    System.out.println( "looking for " + className);
-
     // Find the context.
     ClassType inClass = context.inClass;
-
-    //    System.out.println( "short? " + (TypeSystem.isNameShort(className)));
 
 
     // Is the name short.?
@@ -1001,6 +998,7 @@ public class StandardTypeSystem extends TypeSystem {
   public Type getObject()  { return OBJECT_; }
   public Type getThrowable() {return THROWABLE_; }
   public Type getError() { return ERROR_; }
+  public Type getException() { return EXCEPTION_; }
   public Type getRTException() { return RTEXCEPTION_; }
 
   private final Type NULL_    = new NullType(this);
@@ -1016,6 +1014,7 @@ public class StandardTypeSystem extends TypeSystem {
   private Type OBJECT_      ;
   private Type THROWABLE_   ;
   private Type ERROR_       ;
+  private Type EXCEPTION_   ;
   private Type RTEXCEPTION_ ;
   private Type CLONEABLE_   ;
   private Type SERIALIZABLE_;

@@ -65,7 +65,8 @@ public class SubtypeSet implements java.util.Set
       }
       else 
       {
-        throw new ClassCastException("Can only add types to the set");
+        throw new ClassCastException("Can only add types to the set. Got a " + 
+                                     o.getClass().getName());
       }
     }
     catch ( SemanticException tce) 

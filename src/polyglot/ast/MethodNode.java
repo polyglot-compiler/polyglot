@@ -298,26 +298,33 @@ public class MethodNode extends ClassMember
 
     /* Build a list of argument types. */
     List argTypes = new LinkedList();
+    List excTypes = new LinkedList(); 
+
     Iterator iter = formals.iterator();
     while( iter.hasNext()) {
       argTypes.add( ((FormalParameter)iter.next()).getParameterType());
+    }
+
+    for ( iter = exceptions.iterator(); iter.hasNext() ; )
+    {
+      excTypes.add ( (((TypeNode)iter.next()).getType()));
     }
     
     if ( isConstructor)
     {
       mtiThis = new ConstructorTypeInstance( ts, clazz, argTypes, 
-                                             exceptions, accessFlags) ;
+                                             excTypes, accessFlags) ;
     }
     else if( addDims == 0 ) {
       mtiThis = new MethodTypeInstance( ts, clazz, name,
                           returns.getType(), argTypes, 
-                          exceptions, accessFlags);
+                          excTypes, accessFlags);
     }
     else {
       mtiThis = new MethodTypeInstance( ts, clazz, name,
                           new ArrayType( ts, returns.getType(), 
                                          addDims),
-                          argTypes, exceptions, accessFlags);     
+                          argTypes, excTypes, accessFlags);     
     }
 
     Annotate.setLineNumber( mtiThis, Annotate.getLineNumber( this));
@@ -367,6 +374,7 @@ public class MethodNode extends ClassMember
                          Annotate.getLineNumber( this ) );
       }
     }
+    ec.getThrowsSet().clear();
     return this;
   }    
 

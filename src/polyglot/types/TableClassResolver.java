@@ -219,13 +219,9 @@ public class TableClassResolver implements ClassResolver
       list2 = method.exceptionTypes();
       iter3 = list2.listIterator();
       while( iter3.hasNext()) {
-        typeNode = (TypeNode)iter3.next();
-        type = typeNode.getType();
+        type = (Type)iter3.next();
         try {
-          /* FIXME!!
-          typeNode.setType( ts.checkAndResolveType( type, context));
-          */
-          ts.checkAndResolveType( type, context);
+          iter3.set( ts.checkAndResolveType( type, context));
         } 
         catch( SemanticException e) {
           eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),

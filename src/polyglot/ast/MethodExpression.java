@@ -2,7 +2,7 @@ package jltools.ast;
 
 import jltools.types.*;
 import jltools.util.*;
-
+import jltools.visit.*;
 import java.util.*;
 
 
@@ -17,6 +17,11 @@ public class MethodExpression extends Expression
   protected final Node target;
   protected final String name;
   protected final List args;
+
+  /**
+   * FIXME: Another occasion where we have a muttable field
+   */
+  MethodTypeInstance mti;
 
   /**
    * Create a new <code>MethodExpression</code>.
@@ -168,7 +173,7 @@ public class MethodExpression extends Expression
       argTypes.add( ((Expression)iter.next()).getCheckedType());
     }
 
-    MethodTypeInstance mti = c.getMethod( ct, name, argTypes);
+    mti = c.getMethod( ct, name, argTypes);
     setCheckedType( mti.getType());
 
     /* 
@@ -191,6 +196,19 @@ public class MethodExpression extends Expression
        ((Expression)iter1.next()).setExpectedType( (Type)iter2.next());
     }
 
+    return this;
+  }
+
+  public Node exceptionCheck( ExceptionChecker ec) 
+    throws SemanticException 
+  {
+    if (mti == null) 
+      throw new InternalCompilerError("MTI null in exception Checker!");
+
+    for (Iterator i = mti.exceptionTypes().iterator(); i.hasNext(); )
+    {
+      ec.throwsException( (ClassType)i.next() );
+    }
     return this;
   }
   

@@ -223,6 +223,7 @@ public abstract class TypeSystem {
   public abstract Type getObject();
   public abstract Type getThrowable();
   public abstract Type getError();
+  public abstract Type getException();
   public abstract Type getRTException();
   /**
    * Returns a non-canonical type object for a class type whose name

@@ -2,7 +2,7 @@ package jltools.ast;
 
 import jltools.types.*;
 import jltools.util.*;
-
+import jltools.visit.*;
 import java.util.*;
 
 
@@ -23,6 +23,12 @@ public class NewObjectExpression extends Expression
   protected final TypeNode tn;
   protected final List args;
   protected final ClassNode cn;
+
+  /**
+   * FIXME: Another occasion where we have a muttable field
+   */
+  MethodTypeInstance mti;
+
 
   /**
    * Creates a new <code>NewObjectExpression</code>.
@@ -177,7 +183,7 @@ public class NewObjectExpression extends Expression
       argTypes.add( ((Expression)iter.next()).getCheckedType());
     }
 
-    MethodTypeInstance mti = null;
+    mti = null;
     try
     {
       mti = c.getMethod( ct, new ConstructorType( c.getTypeSystem(), 
@@ -206,6 +212,29 @@ public class NewObjectExpression extends Expression
 
     return this;
   }
+
+  public Node exceptionCheck( ExceptionChecker ec) 
+    throws SemanticException 
+  {
+    
+    if (mti == null) 
+      throw new InternalCompilerError("MTI null in exception Checker!");
+
+    for (Iterator i = mti.exceptionTypes().iterator(); i.hasNext(); )
+    {
+      Object o = i.next();
+      ClassType ct = null;
+
+      if ( o instanceof ClassType) ct = (ClassType)o;
+      else throw new InternalCompilerError("The constructor throws " +
+                                           " exceptions that are not of "
+                                           + "ClassType");
+
+      ec.throwsException( ct );
+    }
+    return this;
+  }
+
   
   public void translate( LocalContext c, CodeWriter w)
   {

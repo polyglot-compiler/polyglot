@@ -37,7 +37,7 @@ public class ExceptionChecker extends NodeVisitor
 
       TryStatement ts = (TryStatement)n;
       ExceptionChecker ec = new ExceptionChecker( eq ) ;
-      
+
       ts.getTryBlock().visit( ec );
       try
       {
@@ -45,18 +45,31 @@ public class ExceptionChecker extends NodeVisitor
       }
       catch ( SemanticException se)
       {
-        throw new InternalCompilerError("Unexpected Semantic Exception.  It appears that type " +
-                                        "comparisons are not working in the TypeSystem.");
+        throw new InternalCompilerError("Unexpected Semantic Exception.  "
+                                       +"It appears that type comparisons"
+                                       + "are not working in the " +
+                                        "TypeSystem.");
       }
-      // ec now contains any exceptions that the catch blocks didn't get to.
-      
+      // ec now contains any exceptions that the catch 
+      // blocks didn't get to.
+      s.addAll ( ec.s );
+      releaseExceptionChecker(ec );
+
       for ( Iterator i = ts.catchBlocks(); i.hasNext() ; )
       {
-        ((Node)i.next()).visit( ec ) ;
+        ExceptionChecker ecBlock = getExceptionChecker();
+        ((Node)i.next()).visit( ecBlock ) ;
+        s.addAll( ecBlock.s);
+        releaseExceptionChecker(ecBlock);
       }
 
       if ( ts.getFinallyBlock() != null) 
+      {
+        ExceptionChecker ecBlock = getExceptionChecker();
         ts.getFinallyBlock().visit ( ec );
+        s.addAll( ecBlock.s);
+        releaseExceptionChecker(ecBlock);
+      }
 
       // now, try statement is done. 
       return n;
@@ -95,14 +108,10 @@ public class ExceptionChecker extends NodeVisitor
   {
     ExceptionChecker oldEC = (ExceptionChecker)v ;
     // merge results from the children.
-    s.add ( oldEC.s );
-    
-    // reuse the ExceptionCheckers. saves an allocation.  
-    oldEC.s.clear();
-    synchronized ( oldExceptionCheckers ) 
-    {
-      oldExceptionCheckers.add ( v );
-    }
+    s.addAll ( oldEC.s );
+
+    releaseExceptionChecker( oldEC );
+
 
     // gather exceptions from this node.
     try
@@ -111,9 +120,10 @@ public class ExceptionChecker extends NodeVisitor
     }
     catch ( SemanticException se)
     {
-      throw new InternalCompilerError("Unexpected Semantic Exception.  It appears "
-                                      + " that type comparisons are not working "
-                                      + "in the TypeSystem.");
+        throw new InternalCompilerError("Unexpected Semantic Exception.  "
+                                       +"It appears that type comparisons"
+                                       + "are not working in the " +
+                                        "TypeSystem.");
     }
   }
 
@@ -151,6 +161,16 @@ public class ExceptionChecker extends NodeVisitor
     }
     if ( e != null) return e;
     return new ExceptionChecker(eq); 
+  }
+  
+  private void releaseExceptionChecker(ExceptionChecker oldEC)
+  {
+    // reuse the ExceptionCheckers. saves an allocation.  
+    oldEC.s.clear();
+    synchronized ( oldExceptionCheckers ) 
+    {
+      oldExceptionCheckers.add ( oldEC );
+    }    
   }
 
   public void reportError( String description, int iLine)

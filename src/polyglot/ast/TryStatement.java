@@ -22,10 +22,10 @@ public class TryStatement extends Statement {
    * Requires: <code>catchBlocks</code> contains only elements of
    * type CatchStatement
    *
-   * Effects: Creates a new TryStatement with <code>tryBlock</code> as the try
-   * block, the catch blocks in <code>catchBlocks</code> and a finally block of
-   * <code>finallyBlock</code>.  If there is no finally block, then
-   * <code>finallyBlock</code> should be null.
+   * Effects: Creates a new TryStatement with <code>tryBlock</code> as 
+   * the try block, the catch blocks in <code>catchBlocks</code> and a 
+   * finally block of <code>finallyBlock</code>.  If there is no finally
+   *  block, then <code>finallyBlock</code> should be null.
    */
   public TryStatement(BlockStatement tryBlock,
 		      List catchBlocks,
@@ -39,11 +39,13 @@ public class TryStatement extends Statement {
   /**
    * Lazily reconstruct this node.
    * <p> 
-   * If any of the children change (upon visitition) construct a new node and return it. OW, 
-   * return <code>this</code>.
+   * If any of the children change (upon visitition) construct a new 
+   * node and return it. OW, return <code>this</code>.
    *
    * @param tryBlock The Block enclosed under the try
-   * @param catchBlocks List of catchblocks (which is a tuple of a formalparamater and block).
+   * @param catchBlocks List of catchblocks (which is a tuple of a
+   *  formalparamater
+   * and block).
    * @param finallyBlock An optional block for the finally clause
    */
   public TryStatement reconstruct( BlockStatement tryBlock, 
@@ -54,7 +56,8 @@ public class TryStatement extends Statement {
          finallyBlock != this.finallyBlock ||
          catchBlocks.size() != this.catchBlocks.size())
     {
-      TryStatement ts = new TryStatement ( tryBlock, catchBlocks, finallyBlock) ;
+      TryStatement ts = new TryStatement ( tryBlock, catchBlocks, 
+                                           finallyBlock) ;
       ts.copyAnnotationsFrom ( this ) ;
       return ts;
     }
@@ -63,7 +66,8 @@ public class TryStatement extends Statement {
     {
       if ( catchBlocks.get( i ) != this.catchBlocks.get( i ) )
       {
-        TryStatement ts = new TryStatement ( tryBlock, catchBlocks, finallyBlock) ;
+        TryStatement ts = new TryStatement ( tryBlock, catchBlocks, 
+                                             finallyBlock) ;
         ts.copyAnnotationsFrom ( this ) ;
         return ts;
       }
@@ -138,65 +142,86 @@ public class TryStatement extends Statement {
      return this;
    }
 
-  // ecTryStatement: the final set of exceptions that we throw should be ADDED to this.
-  // ecTryBlock: 
-
   /**
-   * Performs exceptionChecking. This is a special method that is called via the 
-   * exceptionChecker's override method (i.e, doesn't follow the standard model for 
-   * visitation.  
+   * Performs exceptionChecking. This is a special method that is called
+   * via the exceptionChecker's override method (i.e, doesn't follow the
+   * standard model for visitation.  
    *
-   * @param ecTryStatement The ExceptionChecker that this node will "deposit" it's exceptions
-   *  into
-   * @param ecTryBlock The ExceptionCheckerthat was run against the child node. It contains
+   * @param ecTryBlock The ExceptionCheckerthat was run against the 
+   * child node. It contains
    * the exceptions that can be thrown by the tryBlock
    */
-  public Node exceptionCheck(ExceptionChecker ecTryStatement, 
-                             ExceptionChecker ecTryBlock) throws SemanticException
+  public Node exceptionCheck(ExceptionChecker ecTryBlock) 
+    throws SemanticException
   {
-    
     // first, get exceptions from the try block
-    SubtypeSet sThrown = ecTryBlock.getThrowsSet(), sCaught = new SubtypeSet();
-    
-    // walk through our catch blocks, making sure that they each can "catch" something.
+    SubtypeSet sThrown = ecTryBlock.getThrowsSet(), 
+               sCaught = new SubtypeSet();
+
+
+    // walk through our catch blocks, making sure that they each can 
+    // "catch" something.
     for (Iterator it = catchBlocks.listIterator(); it.hasNext() ; )
     {
       CatchBlock cb = (CatchBlock)it.next();
       TypeSystem typeSystem = cb.getCatchType().getTypeSystem();
 
-      if ( sThrown.remove ( cb.getCatchType() ))
+      if ( sThrown.remove ( cb.getCatchType() ) ||
+           sThrown.contains( cb.getCatchType() ))
       {
         if ( ! sCaught.add ( cb.getCatchType()))
         {
-          ecTryBlock.reportError( " The exception \"" +
-                                  cb.getCatchType().getTypeString() + 
-                                  "\" has already been caught in this try block.", 
-                                  Annotate.getLineNumber ( cb ));
-        }
-        else if ( cb.getCatchType().isUncheckedException() ||
-                  typeSystem.getRTException().descendsFrom(cb.getCatchType() ))
-        {
-          // exceptions that don't need to be explicitly declared ( eg runtime, 
-          // or java.lang.exception. (Object gets screened out because of the way that 
-          // typeCheck works on CatchBlocks
-          if ( ! sCaught.add ( cb.getCatchType() ) )
-            ecTryBlock.reportError( " The exception \"" +
-                                    cb.getCatchType().getTypeString() + 
-                                    "\" has already been caught in this try block.", 
+          if ( cb.getCatchType().isUncheckedException() ||
+               typeSystem.getException().equals( cb.getCatchType() ) ||
+               typeSystem.getThrowable().equals( cb.getCatchType() ))
+          {
+            // exceptions that don't need to be explicitly declared 
+            // ( eg runtime, or java.lang.exception.
+            if ( ! sCaught.add ( cb.getCatchType() ) )
+              ecTryBlock.reportError( " The exception \"" +
+                        cb.getCatchType().getTypeString()+ 
+                        "\" has already been caught in this try block.", 
+                        Annotate.getLineNumber ( cb )); 
+          }
+          else
+          {
+            // this catch block is useless, since no one can throw to it
+            ecTryBlock.reportError( "The catch block is unreachable " +
+                                    " since no exceptions of type \"" + 
+                                    cb.getCatchType().getTypeString() 
+                                    + "\" can reach this point.", 
                                     Annotate.getLineNumber ( cb ));
-          
+          }
         }
-        else
-        {
-          // this catch block is useless, since no one can throw to it
-          ecTryBlock.reportError( "The catch block is unreachable since no exceptions of type " 
-                                  + "\"" + cb.getCatchType().getTypeString() 
-                                  + "\" can reach this point.", 
-                                  Annotate.getLineNumber ( cb ));
+      }
+      else
+      {
+          if ( cb.getCatchType().isUncheckedException() ||
+               typeSystem.getException().equals( cb.getCatchType() ) ||
+               typeSystem.getThrowable().equals( cb.getCatchType() ))
+          {
+            // exceptions that don't need to be explicitly declared 
+            // ( eg runtime,  or java.lang.exception.
+            if ( ! sCaught.add ( cb.getCatchType() ) )
+              ecTryBlock.reportError( " The exception \"" +
+                    cb.getCatchType().getTypeString() + 
+                    "\" has already been caught in this try block.", 
+                    Annotate.getLineNumber ( cb )); 
+          }
+          else
+          {
+            // this catch block is useless, since no one can throw to it
+            ecTryBlock.reportError( "The catch block is unreachable " + 
+                                    "since no exceptions of type \"" +
+                                    cb.getCatchType().getTypeString() 
+                                    + "\" can reach this point.", 
+                                    Annotate.getLineNumber ( cb ));
+          }
         }
-      }    
-    }
-    // ecTryBlock now contains any exceptions which the try block doesn't catch. 
+      }
+    
+    // ecTryBlock now contains any exceptions which 
+    // the try block doesn't catch. 
     return this;
   }
 
