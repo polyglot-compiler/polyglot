@@ -75,8 +75,10 @@ public class InstanceofExpression extends Expression {
 
   public void translate(Context c, CodeWriter w)
   {
+    w.write( "(");
     expr.translate(c, w);
     w.write( " instanceof " + type.getType().getTypeString());
+    w.write( ") ");
   }
 
   public void dump(Context c, CodeWriter w)

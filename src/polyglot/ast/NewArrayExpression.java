@@ -177,7 +177,7 @@ public class NewArrayExpression extends Expression {
 
   public void translate(Context c, CodeWriter w)
   {
-    w.write ("new ");
+    w.write ("(new ");
     type.translate(c, w);
     for (ListIterator i = dimensionExpressions.listIterator(); i.hasNext(); )
     {
@@ -193,6 +193,7 @@ public class NewArrayExpression extends Expression {
     {
       initializer.translate(c, w);
     }
+    w.write(")");
   }
 
   public void dump(Context c, CodeWriter w)

@@ -38,7 +38,12 @@ public class ArrayType extends Type {
   }
   
   public String getTypeString() {
-    return base.getTypeString() + "[]";
+    StringBuffer sb = new StringBuffer();
+    sb.append(base.getTypeString());
+    for(int i = 0; i < dims; i++) {
+      sb.append("[]");
+    }
+    return sb.toString();
   }
 
   ////

@@ -10,12 +10,11 @@ import jltools.util.CodeWriter;
  * IntegerLiteral
  * 
  * Overview: An IntLiteral represents a literal in java of an integer
- * type, character type or boolean type.
+ * type, or boolean type.
  */
 public class IntLiteral extends Literal {
 
   public static final int BOOLEAN = 0;
-  public static final int CHAR    = 1;
   public static final int BYTE    = 2;
   public static final int SHORT   = 3;
   public static final int INT     = 4;
@@ -27,14 +26,6 @@ public class IntLiteral extends Literal {
   public IntLiteral (boolean b) {
     type = BOOLEAN;
     value = b ? 1 : 0;
-  }
-
-  /**
-   * Creates a new IntLiteral storing a character with the value <c>
-   */ 
-  public IntLiteral (char c) {
-    type = CHAR;
-    value = c;
   }
 
   /**
@@ -82,13 +73,6 @@ public class IntLiteral extends Literal {
    */
   public boolean getBooleanValue() {
     return value == 0 ? false : true;
-  }
-
-  /**
-   * Effects: returns the character value of this IntLiteral.
-   */
-  public char getCharValue() {
-    return (char) value;
   }
 
   /**

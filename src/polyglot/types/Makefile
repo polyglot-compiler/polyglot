@@ -6,7 +6,7 @@ tp_files 	= AccessFlags.java	\
 			ClassContext.java \
 			ClassResolver.java \
 			ClassType.java \
-			ConstructorType.java \
+#			ConstructorType.java \
 			Context.java \
 			FieldInstance.java \
 			ImportTable.java \

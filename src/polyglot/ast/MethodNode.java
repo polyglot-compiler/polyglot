@@ -247,7 +247,7 @@ public class MethodNode extends ClassMember {
     }
     else
     {
-      w.write("(");
+      w.write(name + " (");
     }
     for (Iterator i = formals.iterator(); i.hasNext(); )
     {
@@ -261,7 +261,9 @@ public class MethodNode extends ClassMember {
       w.write (" throws " );
       for (Iterator i = exceptions.iterator(); i.hasNext(); )
       {
-        w.write ( ((Type)i.next()).getTypeString() + (i.hasNext() ? ", " : "" ));
+        w.write ( ((TypeNode)i.next()).getType().getTypeString() );
+
+        w.write ( (i.hasNext() ? ", " : "" ));
       }
     }
     w.newline(0);

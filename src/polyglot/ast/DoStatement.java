@@ -69,7 +69,7 @@ public class DoStatement extends Statement {
       statement.translate(c, w);
     w.write (" while ( " );
     condExpr.translate ( c, w);
-    w.write ( " ) ");
+    w.write ( " ); ");
     
   }
 

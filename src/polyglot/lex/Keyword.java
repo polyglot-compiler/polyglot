@@ -9,7 +9,7 @@ class Keyword extends Token {
 
   public Symbol symbol() {
     Integer i = (Integer) key_table.get(keyword);
-    return new Symbol(i.intValue());
+    return new Symbol(i.intValue(), this);
   }
   public String toString() { return "Keyword <"+keyword+">"; }
 

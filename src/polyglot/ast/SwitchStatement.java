@@ -242,16 +242,14 @@ public class SwitchStatement extends Statement {
 
       w.write("switch (");
       expr.translate(c, w);
-      w.write(")");
+      w.write(") {");
       w.beginBlock();
-      w.write("{");
+
       for (ListIterator it = switchElems.listIterator(); it.hasNext(); )
       {
-         // assume that the case statment is followed by the switch block in the list
          se = (SwitchElement) it.next();
          if (se instanceof CaseStatement)
          {
-            w.beginBlock();
             cs = (CaseStatement)se;
             if (cs.isDefault())
                w.write("default: ");
@@ -261,27 +259,18 @@ public class SwitchStatement extends Statement {
                cs.getExpression().translate(c, w);
                w.write(": " );
             }
-            if (it.hasNext() && (  (se = (SwitchElement)it.next()) instanceof SwitchBlock))
-            {
-               w.beginBlock();
-               ((SwitchBlock)se).getBlock().translate(c, w);
-               w.endBlock();
-            }
-            else
-            {
-               // fixme:
-               //       throw an error; wrong format of list
-            }
-            w.endBlock();
          }
-         else 
+         else if (se instanceof SwitchBlock)
          {
-            //fixme:
-            //       throw some error here: wrong list format
+           ((SwitchBlock)se).getBlock().translate(c, w);
+         }
+
+         if (it.hasNext()) {
+           w.newline(0);
          }
       }
-      w.write("}");
       w.endBlock();      
+      w.write("}");
    }
 
    public void dump(Context c, CodeWriter w)

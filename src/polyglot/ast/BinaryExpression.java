@@ -140,12 +140,22 @@ public class BinaryExpression extends Expression {
 
    public void translate(Context c, CodeWriter w)
    {
+      if(operator != ASSIGN && !(operator >= PLUSASSIGN && 
+                                operator <= RUSHIFTASSIGN)) {
+        w.write("(");
+      }
       left.translate(c, w);
-      w.write(" ");
+      if(operator != ASSIGN && !(operator >= PLUSASSIGN && 
+                                operator <= RUSHIFTASSIGN)) {
+        w.write(") ");
+      }
+      else {
+        w.write(" ");
+      }
       w.write(getOperatorString(operator));
-      w.write(" ");
+      w.write(" (");
       right.translate(c, w);
-
+      w.write(")");
    }
 
    public void  dump(Context c, CodeWriter w)

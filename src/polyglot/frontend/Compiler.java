@@ -3,11 +3,12 @@ package jltools.frontend;
 import jltools.lex.Lexer;
 import jltools.ast.Node;
 import jltools.parse.Grm;
-import jltools.types.Context;
+import jltools.util.UnicodeWriter;
 import jltools.util.CodeWriter;
 
 import java.io.Reader;
 import java.io.FileReader;
+import java.io.PrintWriter;
 import java.util.Map;
 
 public class Compiler
@@ -30,12 +31,13 @@ public class Compiler
          {
             reader = new FileReader(targets[i]);
             lexer = new Lexer(reader);
-            grm = new Grm(lexer);
+            grm = new Grm(lexer, null);
                
             java_cup.runtime.Symbol sym = grm.parse();
-            cw = new CodeWriter(System.out, 72);
+            cw = new CodeWriter(new UnicodeWriter( 
+                                  new PrintWriter(System.out)), 72);
             
-            ((Node)sym.value).translate(new Context(), cw);
+            ((Node)sym.value).translate(null, cw);
             cw.flush();
          }
          catch(Exception e)

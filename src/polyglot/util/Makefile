@@ -14,6 +14,7 @@ utl_files 	= Annotate.java \
 			TransformingIterator.java \
 			TypedList.java \
 			TypedListIterator.java \
+			UnicodeWriter.java \
 			WorkList.java \
 
 

@@ -182,11 +182,19 @@ public class VariableDeclarationStatement extends Statement {
          Declarator pair = (Declarator)it.next();
          if (pair.initializer != null)
          {
-            w.write(pair.name + " = ");
+            w.write(pair.name);
+            for (int i = 0; i < pair.additionalDims; i++) {
+              w.write("[]");
+            }
+            w.write(" = ");
             pair.initializer.translate(c, w);
          }
-         else
+         else {
             w.write(pair.name);
+            for (int i = 0; i < pair.additionalDims; i++) {
+              w.write("[]");
+            }
+         }
          if (it.hasNext())
             w.write(", ");
       }

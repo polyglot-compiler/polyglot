@@ -195,6 +195,7 @@ public class Lexer /* implements jltools.parse.Lexer */ {
       return getIdentifier();
     if (Character.isDigit(line.charAt(line_pos)))
       return getNumericLiteral();
+    System.out.println( "unknown char at pos " + line_pos + " of line: \n" + line);
     throw new Error("Illegal character on line "+line_num);
   }
 
@@ -356,7 +357,8 @@ public class Lexer /* implements jltools.parse.Lexer */ {
 
   CharacterLiteral getCharLiteral() {
     char firstquote = consume();
-    char val;
+    String val;
+                                  
     switch (line.charAt(line_pos)) {
     case '\\':
       val = getEscapeSequence();
@@ -366,79 +368,90 @@ public class Lexer /* implements jltools.parse.Lexer */ {
     case '\n':
       throw new Error("Invalid character literal on line "+line_num);
     default:
-      val = consume();
+      val = String.valueOf(consume());
       break;
     }
+
     char secondquote = consume();
     if (firstquote != '\'' || secondquote != '\'')
       throw new Error("Invalid character literal on line "+line_num);
     return new CharacterLiteral(line_num, val);
   }
+
   StringLiteral getStringLiteral() {
     char openquote = consume();
     StringBuffer val = new StringBuffer();
+
     while (line.charAt(line_pos)!='\"') {
       switch(line.charAt(line_pos)) {
       case '\\':
-	val.append(getEscapeSequence());
-	break;
+        val.append(getEscapeSequence());
+        break;
       case '\n':
-	throw new Error("Invalid string literal on line " + line_num);
+        throw new Error("Invalid string literal on line " + line_num);
       default:
-	val.append(consume());
-	break;
+        val.append(consume());
+        break;
       }
     }
     char closequote = consume();
     if (openquote != '\"' || closequote != '\"')
       throw new Error("Invalid string literal on line " + line_num);
-
     return new StringLiteral(line_num, val.toString().intern());
   }
 
-  char getEscapeSequence() {
+  String getEscapeSequence() {
     if (consume() != '\\')
       throw new Error("Invalid escape sequence on line " + line_num);
     switch(line.charAt(line_pos)) {
     case 'b':
-      consume(); return '\b';
+      consume(); return "\\b";
     case 't':
-      consume(); return '\t';
+      consume(); return "\\t";
     case 'n':
-      consume(); return '\n';
+      consume(); return "\\n";
     case 'f':
-      consume(); return '\f';
+      consume(); return "\\f";
     case 'r':
-      consume(); return '\r';
+      consume(); return "\\r";
     case '\"':
-      consume(); return '\"';
+      consume(); return "\\\"";
     case '\'':
-      consume(); return '\'';
+      consume(); return "\\'";
     case '\\':
-      consume(); return '\\';
+      consume(); return "\\\\";
     case '0':
     case '1':
     case '2':
     case '3':
-      return (char) getOctal(3);
+      return getOctalEscapeSequence(3);
     case '4':
     case '5':
     case '6':
     case '7':
-      return (char) getOctal(2);
+      return getOctalEscapeSequence(2);
     default:
       throw new Error("Invalid escape sequence on line " + line_num);
     }
   }
-  int getOctal(int maxlength) {
-    int i, val=0;
-    for (i=0; i<maxlength; i++)
-      if (Character.digit(line.charAt(line_pos), 8)!=-1) {
-	val = (8*val) + Character.digit(consume(), 8);
-      } else break;
-    if ((i==0) || (val>0xFF)) // impossible.
-      throw new Error("Invalid octal escape sequence in line " + line_num);
-    return val;
+
+  String getOctalEscapeSequence(int maxlength) {
+    String result = "\\";
+    char digit;
+    for (int i=0; i<maxlength; i++)
+    {
+      digit = consume();
+      if( !isOctalDigit(digit))
+        throw new Error("Invalid octal escape sequence in line " + line_num);
+      result += digit;
+    }
+    return result;
+  }
+
+  boolean isOctalDigit(char c)
+  {
+    return (Character.isDigit(c) &&
+            Character.digit(c, 10) < 8);
   }
 
   char consume() { return line.charAt(line_pos++); }

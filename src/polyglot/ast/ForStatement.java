@@ -24,55 +24,26 @@ public class ForStatement extends Statement {
   /**
    * Checks: Every element of incrementors is an Expression.
    * Effects: Creates a new ForStatement with a body <statement>,
-   *    initializer <initializer>, condition <condition>, and incrementors
+   *    initializers <initializers>, condition <condition>, and incrementors
    *    <incrementors>.
    */
   public ForStatement(List initializers,
 		      Expression condition,
 		      List incrementors,
 		      Statement body) {
-    
-    Iterator i = initializers.iterator();
-    if(initializers.size() == 1)
-    {
-      Object o = i.next();
-      if(o instanceof VariableDeclarationStatement)
-      {
-        this.initializer = (VariableDeclarationStatement)o;
-        this.hasSingleInitializer = true;
-      }
-      else
-      {
-        TypedList.check(initializers, Statement.class);
-        this.initializers = new ArrayList(initializers);
-        this.hasSingleInitializer = false;
-      }
-    }
-    else
-    {
-      TypedList.check(initializers, Statement.class);
-      this.initializers = new ArrayList(initializers);
-      this.hasSingleInitializer = false;
-    }
 
-    TypedList.check(incrementors, Statement.class);    
+    TypedList.check(initializers, Statement.class);
+    this.initializers = new ArrayList(initializers);
+   
     this.condition = condition;
-    this.body = body;
+    
+    TypedList.check(incrementors, Statement.class);    
     this.incrementors = new ArrayList(incrementors);
+    
+    this.body = body;    
   }
   
-  public ForStatement(Statement initializer,
-            Expression condition,
-            List incrementors,
-            Statement body) {
-      TypedList.check(incrementors, Statement.class);
-      this.initializer = initializer;
-      this.hasSingleInitializer = true;
-      this.condition = condition;
-      this.body = body;
-      this.incrementors = new ArrayList(incrementors);
-  }
-
+ 
   /**
    * Returns the condition of this for statement.
    **/
@@ -98,17 +69,11 @@ public class ForStatement extends Statement {
    * Sets the body of this for statement to equal <body>
    **/
   public void setBody(Statement body) {
-   this.body = body;
+    this.body = body;
   }
 
   public TypedList getInitializers() {
-    if(hasSingleInitializer) {
-      TypedList l = new TypedList(null, Statement.class, false);
-      l.add(initializer);
-      return l;
-    }
-    else
-      return new TypedList(initializers, Statement.class, false);
+    return new TypedList(initializers, Statement.class, false);
   }
 
   /**
@@ -119,32 +84,34 @@ public class ForStatement extends Statement {
     return new TypedList(incrementors, Statement.class, false);
   }
 
-
   public void translate(Context c, CodeWriter w)
   {
-    w.write ( " for ( " );
-    if(hasSingleInitializer)
+    boolean writeSemicolon = true;
+    
+    w.write ( "for ( " );
+    
+    for ( ListIterator iter = initializers.listIterator(); iter.hasNext(); )
     {
-      initializer.translate(c, w);  
-    }
-    else
-    {
-      for ( ListIterator iter = initializers.listIterator(); iter.hasNext(); )
-      {
-        Statement next = (Statement)iter.next();
-        if(next instanceof ExpressionStatement)
-          ((ExpressionStatement)next).getExpression().translate(c, w);      
-        else
-          next.translate(c, w);
-          
-        if (iter.hasNext())
-          w.write (", " );
+      Statement next = (Statement)iter.next();
+      if(next instanceof VariableDeclarationStatement) {
+        next.translate(c, w);
+        writeSemicolon = false;
+      } else {
+        ((ExpressionStatement)next).getExpression().translate(c, w);      
       }
+          
+      if (iter.hasNext())
+        w.write (", " );
+    }
+
+    
+    // If the initilizer is a single variable declaration statement, then
+    // we don't want to write out the semicolon, since the subnode has 
+    // already done this.
+    if( writeSemicolon) {
       w.write ("; " ); 
     }
-    // don't have to write a semicolon because initializer is a statemnt
-    // except it is, so we do have to.
-    
+
     condition.translate(c, w);
     w.write ("; " ); // condition is a expr, so write semicolon.
     for ( ListIterator iter = incrementors.listIterator(); iter.hasNext(); )
@@ -240,9 +207,6 @@ public class ForStatement extends Statement {
   
   // RI: every member is a Statement.
   private List initializers;
-  private Statement initializer;
-  private boolean hasSingleInitializer;
-  
   private Expression condition;
   // RI: every member is a Statement.
   private List incrementors;

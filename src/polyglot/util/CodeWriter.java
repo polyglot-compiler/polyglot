@@ -7,7 +7,8 @@
 package jltools.util;
 
 import java.io.OutputStream;
-import java.io.DataOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -19,11 +20,17 @@ public class CodeWriter
     // output stream "o" while keeping the width of the output
     // within "width" characters if possible
     public CodeWriter(OutputStream o, int width_) {
-        output = new DataOutputStream(o);
+        output = new OutputStreamWriter(o);
         width = width_;
         current = input = new Block(null, 0);
     }
 
+    public CodeWriter(Writer w, int width_) {
+        output = w;
+        width = width_;
+        current = input = new Block(null, 0);
+    }
+        
     public void write(String s) {
         // Print the string "s" on the output stream
         if(s != null)
@@ -84,7 +91,7 @@ public class CodeWriter
     Block input;
     Block current;
 
-    DataOutputStream output;
+    Writer output;
     int width;
 }
 
@@ -113,7 +120,7 @@ abstract class Item {
         // may be broken, "canBreak" is set. Return the new cursor
         // position and set any contained breaks appropriately if formatting
         // was successful. Requires rmargin > lmargin, pos <= rmargin.
-    abstract int sendOutput(DataOutputStream o, int lmargin, int pos)
+    abstract int sendOutput(Writer o, int lmargin, int pos)
       throws IOException;
         // Send the output associated with this item to "o", using the
         // current break settings.
@@ -145,7 +152,7 @@ class Block extends Item {
             return first.format(pos + indent, pos, rmargin, true);
         }
     }
-    int sendOutput(DataOutputStream o, int lmargin, int pos)
+    int sendOutput(Writer o, int lmargin, int pos)
             throws IOException {
         Item it = first;
         lmargin = pos+indent;
@@ -166,8 +173,8 @@ class StringItem extends Item {
         if (pos > rmargin) throw new Overrun(rmargin - pos);
         return pos;
     }
-    int sendOutput(DataOutputStream o, int lm, int pos) throws IOException {
-        o.writeBytes(s);
+    int sendOutput(Writer o, int lm, int pos) throws IOException {
+        o.write(s);
         return pos + s.length();
     }
 }
@@ -186,11 +193,11 @@ class AllowBreak extends Item {
             return pos;
         }
     }
-    int sendOutput(DataOutputStream o, int lmargin, int pos)
+    int sendOutput(Writer o, int lmargin, int pos)
         throws IOException {
         if (broken) {
-            o.writeBytes("\r\n");
-            for (int i = 0; i < lmargin + indent; i++) o.writeBytes(" ");
+            o.write("\r\n");
+            for (int i = 0; i < lmargin + indent; i++) o.write(" ");
             return lmargin + indent;
         } else {
             return pos;
@@ -206,10 +213,10 @@ class Newline extends AllowBreak {
         broken = true;
         return lmargin + indent;
     }
-    int sendOutput(DataOutputStream o, int lmargin, int pos)
+    int sendOutput(Writer o, int lmargin, int pos)
             throws IOException {
-        o.writeBytes("\r\n");
-        for (int i = 0; i < lmargin + indent; i++) o.writeBytes(" ");
+        o.write("\r\n");
+        for (int i = 0; i < lmargin + indent; i++) o.write(" ");
         return lmargin + indent;
     }
 }

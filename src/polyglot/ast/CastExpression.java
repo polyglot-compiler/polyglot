@@ -20,7 +20,7 @@ public class CastExpression extends Expression {
     /** 
      * Effects: Creates a new cast expression casting <expr> to type <type>.
      */
-    public CastExpression (TypeNode type, Expression expr) {
+    public CastExpression (Node type, Expression expr) {
 	this.type = type;
 	this.expr = expr;
     }
@@ -34,7 +34,7 @@ public class CastExpression extends Expression {
     /**
      * Effects: Returns the type that this CastExpression is casting to
      */
-    public TypeNode getCastType () {
+    public Node getCastType () {
 	return type;
     }
 
@@ -50,7 +50,7 @@ public class CastExpression extends Expression {
      * Effects: Sets the type that this CastExpression is casting to
      * <newType> 
      */
-    public void setCastType(TypeNode newType) {
+    public void setCastType(Node newType) {
 	type = newType;
     }
 
@@ -112,13 +112,13 @@ public class CastExpression extends Expression {
 
     public Node deepCopy() {
       CastExpression ce = 
-	new CastExpression((TypeNode) type.deepCopy(), 
+	new CastExpression((Node) type.deepCopy(), 
 			   (Expression) expr.deepCopy());
       ce.copyAnnotationsFrom(this);
       return ce;     
     }
 
     private Expression expr;
-    private TypeNode type;
+    private Node type;
 }
 

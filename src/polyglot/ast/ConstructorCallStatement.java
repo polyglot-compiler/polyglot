@@ -107,20 +107,17 @@ public class ConstructorCallStatement extends Statement {
 
   public void translate ( Context c, CodeWriter w)
   {
-    if (primary != null)
-    {
+    if (primary != null) {
       primary.translate( c, w);
       w.write ( "." + ( type == THIS ? "this( " : "super( "));
-    }
-    else
-    {
+    } else {
       w.write (( type == THIS ? "this( " : "super( "));
     }
-    for (ListIterator i = argumentList.listIterator(); i.hasNext();)
-    {
+
+    for (ListIterator i = argumentList.listIterator(); i.hasNext();) {
+
       ((Expression)i.next()).translate(c, w);
-      if (i.hasNext())
-      {
+      if (i.hasNext()) {
         w.write (", " );
       }
     }

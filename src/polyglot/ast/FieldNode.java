@@ -61,13 +61,14 @@ public class FieldNode extends ClassMember {
 
   public void translate(Context c, CodeWriter w)
   {
-    w.write(accessFlags.getStringRepresentation());
+    //w.write(accessFlags.getStringRepresentation());
     declare.translate(c, w);
   }
 
   public void dump(Context c, CodeWriter w)
   {
-    w.write ( "(  FIELD_NODE: ( " + accessFlags.getStringRepresentation());
+    w.write ( "(  FIELD_NODE: ( "
+              /* + accessFlags.getStringRepresentation() */ );
     declare.dump(c, w);
     w.write ( " ) " );
   } 

@@ -168,9 +168,11 @@ public class NewObjectExpression extends Expression {
     for (ListIterator i = argumentList.listIterator(); i.hasNext(); )
     {
       ((Expression) i.next()).translate(c, w);
-      w.write(", ");
+      if(i.hasNext()) {
+        w.write(", ");
+      }
     }
-    w.write (")");
+    w.write (" )");
     if (classNode != null)
     {
       classNode.translate(c, w);

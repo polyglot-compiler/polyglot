@@ -55,7 +55,9 @@ public class ArrayIndexExpression extends Expression {
 
   public void translate ( Context c, CodeWriter w)
   {
+    w.write("(");
     base.translate(c, w);
+    w.write(")");
     w.write ("[");
     index.translate(c, w);
     w.write ("]");

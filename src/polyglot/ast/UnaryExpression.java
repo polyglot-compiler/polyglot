@@ -99,11 +99,19 @@ public class UnaryExpression extends Expression {
             w.write("++");
          if (operator == PREDECR)
             w.write("--");
+         if (operator == POSITIVE)
+            w.write("+");
+         if (operator == LOGICALNOT)
+            w.write("!");
+         //w.write("(");
          expr.translate(c, w);
+         //w.write(")");
       }
       else
       {
+         //w.write("(");
          expr.translate(c, w);
+         //w.write(")");
          if (operator == POSTINCR)
             w.write("++");
          if (operator == POSTDECR)
@@ -125,6 +133,10 @@ public class UnaryExpression extends Expression {
          w.write("(POST-INCR ");
       if (operator == POSTDECR)
          w.write("(POST-DECR ");
+      if (operator == POSITIVE)
+         w.write("(POSITIVE ");
+      if (operator == LOGICALNOT)
+         w.write("(LOGICAL_NOT ");
       dumpNodeInfo(c, w);
       expr.dump(c, w);
       w.write(")");

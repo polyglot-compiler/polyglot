@@ -90,11 +90,11 @@ public class TernaryExpression extends Expression {
    {
       w.write("( " );
       conditional.translate(c, w);
-      w.write(" ? ");
+      w.write(" ) ? ( ");
       trueResult.translate(c, w);
-      w.write(" : " );
+      w.write(" ) : ( " );
       falseResult.translate(c, w);
-      w.write(")");
+      w.write(" )");
    }
 
    public void dump(Context c, CodeWriter w)

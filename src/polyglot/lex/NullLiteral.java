@@ -5,7 +5,7 @@ import java_cup.runtime.Symbol;
 public class NullLiteral extends Literal {
   NullLiteral(int line) { super(line); }
 
-  public Symbol symbol() { return new Symbol(Sym.NULL_LITERAL); }
+  public Symbol symbol() { return new Symbol(Sym.NULL_LITERAL, this); }
 
   public String toString() { return "NullLiteral <null>"; }
 }

@@ -8,6 +8,7 @@ ast_files   =  AmbiguousExpression.java \
 			BinaryExpression.java \
 			BlockStatement.java \
 			BranchStatement.java \
+			CharacterLiteral.java \
 			CastExpression.java \
 			CatchBlock.java\
 			ClassDeclarationStatement.java \

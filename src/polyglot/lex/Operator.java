@@ -11,7 +11,7 @@ class Operator extends Token {
 
   public Symbol symbol() {
     Integer i = (Integer) op_table.get(which);
-    return new Symbol(i.intValue());
+    return new Symbol(i.intValue(), this);
   }
 
   static private final Hashtable op_table = new Hashtable();

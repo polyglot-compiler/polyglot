@@ -8,15 +8,15 @@ class Separator extends Token {
 
   public Symbol symbol() {
     switch(which) {
-    case '(': return new Symbol(Sym.LPAREN);
-    case ')': return new Symbol(Sym.RPAREN);
-    case '{': return new Symbol(Sym.LBRACE);
-    case '}': return new Symbol(Sym.RBRACE);
-    case '[': return new Symbol(Sym.LBRACK);
-    case ']': return new Symbol(Sym.RBRACK);
-    case ';': return new Symbol(Sym.SEMICOLON);
-    case ',': return new Symbol(Sym.COMMA);
-    case '.': return new Symbol(Sym.DOT);
+    case '(': return new Symbol(Sym.LPAREN, this);
+    case ')': return new Symbol(Sym.RPAREN, this);
+    case '{': return new Symbol(Sym.LBRACE, this);
+    case '}': return new Symbol(Sym.RBRACE, this);
+    case '[': return new Symbol(Sym.LBRACK, this);
+    case ']': return new Symbol(Sym.RBRACK, this);
+    case ';': return new Symbol(Sym.SEMICOLON, this);
+    case ',': return new Symbol(Sym.COMMA, this);
+    case '.': return new Symbol(Sym.DOT, this);
     default:
       throw new Error("Invalid separator.");
     }

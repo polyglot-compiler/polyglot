@@ -26,10 +26,12 @@ JDK 1.2 Features added:
 */
 parser code  {: 
   Lexer lexer;
+  TypeSystem ts;
 
-  public Grm(Lexer l) {
+  public Grm(Lexer l, TypeSystem t) {
     this();
-    lexer=l;
+    lexer = l;
+    ts = t;
   }
   
   public static Node ln(Node n, Token t) {
@@ -83,8 +85,7 @@ terminal Token BOOLEAN; // primitive_type
 terminal Token BYTE, SHORT, INT, LONG, CHAR; // integral_type
 terminal Token FLOAT, DOUBLE; // floating_point_type
 terminal Token LBRACK, RBRACK; // array_type
-//terminal Identifier IDENTIFIER; // name
-terminal String IDENTIFIER; // name
+terminal Identifier IDENTIFIER; // name
 terminal Token DOT; // qualified_name
 terminal Token SEMICOLON, MULT, COMMA, LBRACE, RBRACE, EQ, LPAREN, RPAREN, COLON;
 terminal Token PACKAGE; // package_declaration
@@ -128,16 +129,11 @@ terminal Token MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ; // assignment_operator
 terminal Token LSHIFTEQ, RSHIFTEQ, URSHIFTEQ; // assignment_operator
 terminal Token ANDEQ, XOREQ, OREQ; // assignment_operator
 
-//terminal IntegerLiteral INTEGER_LITERAL;
-terminal Number INTEGER_LITERAL;
-//terminal jltools.lex.FloatLiteral FLOATING_POINT_LITERAL;
-terminal Number FLOATING_POINT_LITERAL;
-//terminal BooleanLiteral BOOLEAN_LITERAL;
-terminal Boolean BOOLEAN_LITERAL;
-//terminal CharacterLiteral CHARACTER_LITERAL;
-terminal Character CHARACTER_LITERAL;
-//terminal jltools.lex.StringLiteral STRING_LITERAL;
-terminal String STRING_LITERAL;
+terminal IntegerLiteral INTEGER_LITERAL;
+terminal jltools.lex.FloatLiteral FLOATING_POINT_LITERAL;
+terminal BooleanLiteral BOOLEAN_LITERAL;
+terminal jltools.lex.CharacterLiteral CHARACTER_LITERAL;
+terminal jltools.lex.StringLiteral STRING_LITERAL;
 terminal jltools.lex.NullLiteral NULL_LITERAL;
 
 // strictfp keyword, new in Java 1.2
@@ -280,20 +276,21 @@ literal ::=
 					// jltools.ast.Literal
 		INTEGER_LITERAL:a	
 			{: RESULT = (jltools.ast.Literal)Grm.ln(new IntLiteral(
-					a./* getValue(). */intValue()), a); :} 
+					a.getValue().intValue()), a); :} 
 	|	FLOATING_POINT_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(new 
 					jltools.ast.FloatLiteral(
-					a./* getValue(). */floatValue()), a); :}
+					a.getValue().floatValue()), a); :}
 	|	BOOLEAN_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(new IntLiteral(
-					a./* getValue(). */booleanValue()), a); :}
+					a.getValue().booleanValue()), a); :}
 	|	CHARACTER_LITERAL:a
-			{: RESULT = (jltools.ast.Literal)Grm.ln(new IntLiteral(
-					a./* getValue(). */charValue()), a); :}
+			{: RESULT = (jltools.ast.Literal)Grm.ln(
+					new jltools.ast.CharacterLiteral( 
+					a.getValue()), a); :}
 	|	STRING_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(
-				new jltools.ast.StringLiteral(a/* .getValue() */), a); :}
+				new jltools.ast.StringLiteral(a.getValue()), a); :}
 	|	NULL_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(
 				new jltools.ast.NullLiteral(), a); :}
@@ -314,7 +311,7 @@ primitive_type ::=
 	|	BOOLEAN:a
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(
 				new PrimitiveType(
-				null, PrimitiveType.BOOLEAN)), a); :}
+				parser.ts, PrimitiveType.BOOLEAN)), a); :}
 	;
 numeric_type::=
 					// TypeNode
@@ -327,28 +324,28 @@ integral_type ::=
 					// TypeNode
 		BYTE:a 
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new PrimitiveType(
-					null, PrimitiveType.BYTE)), a); :}
+					parser.ts, PrimitiveType.BYTE)), a); :}
 	|	SHORT:a 
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new PrimitiveType(
-					null, PrimitiveType.SHORT)), a); :}
+					parser.ts, PrimitiveType.SHORT)), a); :}
 	|	INT:a 
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new PrimitiveType(
-					null, PrimitiveType.INT)), a); :}
+					parser.ts, PrimitiveType.INT)), a); :}
 	|	LONG:a 
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new PrimitiveType(
-					null, PrimitiveType.LONG)), a); :}
+					parser.ts, PrimitiveType.LONG)), a); :}
 	|	CHAR:a 
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new PrimitiveType(
-					null, PrimitiveType.CHAR)), a); :}
+					parser.ts, PrimitiveType.CHAR)), a); :}
 	;
 floating_point_type ::=
 					// TypeNode
 		FLOAT:a 
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new PrimitiveType(
-					null, PrimitiveType.FLOAT)), a); :}
+					parser.ts, PrimitiveType.FLOAT)), a); :}
 	|	DOUBLE:a
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new PrimitiveType(
-					null, PrimitiveType.DOUBLE)), a); :}
+					parser.ts, PrimitiveType.DOUBLE)), a); :}
 	;
 reference_type ::=
 					// TypeNode
@@ -361,7 +358,7 @@ class_or_interface_type ::=
 					// TypeNode
 		name:a
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new ClassType(
-				null,a.getName(),false)),a); :}
+				parser.ts, a.getName(),false)),a); :}
 	;
 class_type ::=
 					// TypeNode
@@ -377,10 +374,10 @@ array_type ::=
 					// TypeNode
 		primitive_type:a dims:b
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new ArrayType(
-				null, a.getType(), b.intValue())), a); :}
+				parser.ts, a.getType(), b.intValue())), a); :}
 	|	name:a dims:b
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(new ArrayType(
-				null, new ClassType(null, a.getName(), false),
+				parser.ts, new ClassType(parser.ts, a.getName(), false),
 				b.intValue())), a); :}
 	;
 // 19.5) Names
@@ -396,12 +393,12 @@ simple_name ::=
 		IDENTIFIER:a
 			{: RESULT = (AmbiguousNameExpression)Grm.ln
 				(new AmbiguousNameExpression(
-				a/* .getIdentifier() */), a); :}
+				a.getIdentifier()), a); :}
 	;
 qualified_name ::=
 					// AmbiguousNameExpression
 		name:a DOT IDENTIFIER:b
-			{: a.getIdentifiers().add(b/* .getIdentifier() */); 
+			{: a.getIdentifiers().add(b.getIdentifier()); 
 				RESULT = a; :}
 	;
 // 19.6) Packages
@@ -426,8 +423,10 @@ import_declarations_opt ::=
 	;
 type_declarations_opt   ::=
 					// List of ClassNode
-		type_declarations:a {: RESULT = a; :} 
-	|	{: RESULT = new LinkedList(); :}
+		type_declarations:a 
+			{: RESULT = a; :} 
+	|	
+			{: RESULT = new LinkedList(); :}
 	;
 import_declarations ::=
 					// List of ImportNode
@@ -548,7 +547,7 @@ class_declaration ::=
 		modifiers_opt:a CLASS:n IDENTIFIER:b super_opt:c 
 						interfaces_opt:d class_body:e
 			{: RESULT = (ClassNode)Grm.ln(new ClassNode(a,
-				b/* .getIdentifier() */, c, d, e), n); :}
+				b.getIdentifier(), c, d, e), n); :}
 	;
 super ::=
 					// TypeNode
@@ -619,7 +618,7 @@ class_member_declaration ::=
 	|	modifiers_opt:a CLASS:n IDENTIFIER:b super_opt:c 
 						interfaces_opt:d class_body:e
 			{: RESULT = (ClassMember)Grm.ln(new ClassNode(
-				a, b/* .getIdentifier() */, c, d, e), n); :}
+				a, b.getIdentifier(), c, d, e), n); :}
 	|	interface_declaration:a
 			{: RESULT = a; :}
 	;
@@ -651,7 +650,7 @@ variable_declarator_id ::=
 				// VariableDeclarationStatement.Declarator
 		IDENTIFIER:a
 			{: RESULT = new VariableDeclarationStatement.
-				Declarator(a/* .getIdentifier() */,0,null); :}
+				Declarator(a.getIdentifier(), 0, null); :}
 	|	variable_declarator_id:a LBRACK RBRACK
 			{: RESULT = a; a.additionalDims++; :}
 	;
@@ -679,14 +678,14 @@ method_header ::=
 	|	modifiers_opt:a VOID:n method_declarator:c throws_opt:d
 			{: RESULT = (MethodNode)Grm.ln(c, n);
 				c.setAccessFlags(a); 
-				c.setReturnType(new PrimitiveType(null,
+				c.setReturnType(new PrimitiveType(parser.ts,
 				PrimitiveType.VOID)); c.setExceptions(d); :}
 	;
 method_declarator ::=
 					// MethodNode
 		IDENTIFIER:a LPAREN formal_parameter_list_opt:b RPAREN
 			{: RESULT = (MethodNode)Grm.ln(new MethodNode(null, 
-				null, a/* .getIdentifier() */, b, new LinkedList(), 
+				null, a.getIdentifier(), b, new LinkedList(), 
 				null), a); :}
 	|	method_declarator:a LBRACK RBRACK // deprecated
 			{: RESULT = a; a.addAdditionalDimension(); :}
@@ -802,7 +801,7 @@ interface_declaration ::=
 		modifiers_opt:a INTERFACE:n IDENTIFIER:b extends_interfaces_opt:c
 				interface_body:d
 			{: RESULT = (ClassNode)Grm.ln(new ClassNode(a,	
-				b/* .getIdentifier() */, (TypeNode)null, c, d), n); 
+				b.getIdentifier(), (TypeNode)null, c, d), n); 
 				a.setInterface(true); :}
 	;
 extends_interfaces_opt ::=
@@ -995,14 +994,14 @@ labeled_statement ::=
 		IDENTIFIER:a COLON statement:b
 			{: RESULT = (LabelledStatement)Grm.ln(
 				new LabelledStatement(
-				a/* .getIdentifier() */, b), a); :}
+				a.getIdentifier(), b), a); :}
 	;
 labeled_statement_no_short_if ::=
 					// LabelledStatement
 		IDENTIFIER:a COLON statement_no_short_if:b
 			{: RESULT = (LabelledStatement)Grm.ln(
 				new LabelledStatement(
-				a/* .getIdentifier() */, b), a); :}
+				a.getIdentifier(), b), a); :}
 	;
 expression_statement ::=
 					// Statement
@@ -1065,11 +1064,11 @@ switch_block ::=
 			{: RESULT = new LinkedList(); :}
 	;
 switch_block_statement_groups ::=
-					// List of SwitchBlock
+					// List of SwitchElement
 		switch_block_statement_group:a
-			{: List l = new LinkedList(); l.add(a); RESULT = l; :}		
+			{: RESULT = a; :}		
 	|	switch_block_statement_groups:a switch_block_statement_group:b
-			{: RESULT = a; a.add(b); :}
+			{: RESULT = a; a.addAll(b); :}
 	;
 switch_block_statement_group ::=
 					// List of SwitchElement
@@ -1126,6 +1125,7 @@ for_statement_no_short_if ::=
 	;
 for_init_opt ::=
 					// List of Statement
+			{: RESULT = new LinkedList(); :}
 	|	for_init:a
 			{: RESULT = a; :}
 	;
@@ -1139,6 +1139,7 @@ for_init ::=
 	;
 for_update_opt ::=
 					// List of Statement
+			{: RESULT = new LinkedList(); :}
 	|	for_update:a
 			{: RESULT = a; :}
 	;
@@ -1162,7 +1163,7 @@ identifier_opt ::=
 	|	IDENTIFIER:a
 			{: RESULT = (AmbiguousNameExpression)Grm.ln(
 				new AmbiguousNameExpression(
-				a/* .getIdentifier() */), a); :}
+				a.getIdentifier()), a); :}
 	;
 
 break_statement ::=
@@ -1214,6 +1215,7 @@ try_statement ::=
 	;
 catches_opt ::=
 					// List of CatchBlock
+			{: RESULT = new LinkedList(); :}
 	|	catches:a
 			{: RESULT = a; :}
 	;
@@ -1266,7 +1268,7 @@ primary_no_new_array ::=
 				new TypeNode(a), a), "class"), a); :}
 	|	VOID:a DOT CLASS
 			{: RESULT = (Expression)Grm.ln(new FieldExpression( 
-				Grm.ln(new TypeNode(new PrimitiveType(null, 
+				Grm.ln(new TypeNode(new PrimitiveType(parser.ts, 
 				PrimitiveType.VOID)), a), "class"), a); :}				
 	|	array_type:a DOT CLASS
 			{: RESULT = (Expression)Grm.ln(
@@ -1295,13 +1297,13 @@ class_instance_creation_expression ::=
 			LPAREN argument_list_opt:c RPAREN
 			{: RESULT = (NewObjectExpression)Grm.ln(
 				new NewObjectExpression(a, (TypeNode)
-				Grm.ln(new TypeNode(new ClassType(null, 
-				b/* .getIdentifier() */, false)), b), 
+				Grm.ln(new TypeNode(new ClassType(parser.ts, 
+				b.getIdentifier(), false)), b), 
 				c, null), a); :}
 	|	primary:a DOT NEW IDENTIFIER:b
 			LPAREN argument_list_opt:c RPAREN class_body:d
 			{: TypeNode t = (TypeNode)Grm.ln(new TypeNode(
-				new ClassType(null,b/* .getIdentifier() */,
+				new ClassType(parser.ts,b.getIdentifier(),
 				false)), b); List l = new LinkedList(); 
 				l.add(t); 
 				RESULT = (NewObjectExpression)Grm.ln(
@@ -1312,6 +1314,7 @@ class_instance_creation_expression ::=
 	;
 argument_list_opt ::=
 					// List of Expression
+			{: RESULT = new LinkedList(); :}
 	|	argument_list:a
 			{: RESULT = a; :}
 	;
@@ -1355,7 +1358,9 @@ dim_expr ::=
 	;
 dims_opt ::=
 					// Integer
-	|	dims
+			{: RESULT = new Integer(0); :}
+	|	dims:a
+			{: RESULT = a; :}
 	;
 dims ::=
 					// Integer
@@ -1369,18 +1374,18 @@ field_access ::=
 		primary:a DOT IDENTIFIER:b
 			{: RESULT = (FieldExpression)Grm.ln(
 				new FieldExpression(a, 
-				b/* .getIdentifier() */), a); :}
+				b.getIdentifier()), a); :}
 	|	SUPER:n DOT IDENTIFIER:a
 			{: RESULT = (FieldExpression)Grm.ln(
 				new FieldExpression(
 				(SpecialExpression)Grm.ln(
 				new SpecialExpression((TypeNode)null,
 				SpecialExpression.SUPER), n), 
-				a/* .getIdentifier() */), a); :}
+				a.getIdentifier()), a); :}
 	|	name:a DOT SUPER DOT IDENTIFIER:b
 			{: RESULT = (FieldExpression)Grm.ln(
 				new FieldExpression(a,
-				b/* .getIdentifier() */), a); 
+				b.getIdentifier()), a); 
 				a.addIdentifier("super"); :}
 	;
 method_invocation ::=
@@ -1391,17 +1396,17 @@ method_invocation ::=
 				a); :}
 	|	primary:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
 			{: RESULT = (MethodExpression)Grm.ln(
-				new MethodExpression(a, b/* .getIdentifier() */, c),
+				new MethodExpression(a, b.getIdentifier(), c),
 				a); :}
 	|	SUPER:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
 			{: RESULT = (MethodExpression)Grm.ln(
 				new MethodExpression((Expression)Grm.ln(
 				new SpecialExpression((TypeNode)null, 
 				SpecialExpression.SUPER), a),
-				b/* .getIdentifier() */, c), a); :}	
+				b.getIdentifier(), c), a); :}	
 	|	name:a DOT SUPER DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
 			{: RESULT = (MethodExpression)Grm.ln(
-				new MethodExpression(a, b/* .getIdentifier() */, c),
+				new MethodExpression(a, b.getIdentifier(), c),
 				a); :}	
 	;
 array_access ::=
@@ -1487,16 +1492,18 @@ unary_expression_not_plus_minus ::=
 cast_expression ::=
 					// CastExpression
 		LPAREN primitive_type:a dims_opt:b RPAREN unary_expression:c
+			{: /* FIXME */ Type t = (b.intValue() == 0 ? a.getType() :
+				new ArrayType(parser.ts,a.getType(),b.intValue()));
+				RESULT = (CastExpression)Grm.ln(
+				new CastExpression( t, c), a);
+				/* FIXME Type t = a.getType(); a.setType(
+				t.extendArrayDims(b.intValue())); */ :}
+	|	LPAREN expression:a RPAREN 
+				unary_expression_not_plus_minus:b
 			{: RESULT = (CastExpression)Grm.ln(
-				new CastExpression( a, c), a);
-				Type t = a.getType(); a.setType(
-				t.extendArrayDims(b.intValue())); :}
-//	|	LPAREN expression:a RPAREN 
-//				unary_expression_not_plus_minus:b
-//			{: RESULT = (CastExpression)Grm.ln(
-//				new CastExpression( a, b), a); :}
+				new CastExpression( a, b), a); :}
 	|	LPAREN name:a dims:b RPAREN unary_expression_not_plus_minus:c
-			{: Type t = new ArrayType(null, new ClassType(null, 
+			{: Type t = new ArrayType(parser.ts, new ClassType(parser.ts, 
 				a.getName(), false), b.intValue());
 				RESULT = (CastExpression)Grm.ln(
 				new CastExpression( new TypeNode(t), c), a); :}
