@@ -230,4 +230,18 @@ public class Subst_c implements Subst
     public int hashCode() {
         return subst.hashCode();
     }
+
+    ////////////////////////////////////////////////////////////////
+    // Utility functions
+
+    public String toString() {
+        String str = "[";
+        for (Iterator iter = subst.keySet().iterator(); iter.hasNext(); ) {
+            Object key = iter.next();
+            str += "<" + key + ": " + subst.get(key) + ">";
+            if (iter.hasNext())
+                str += ", ";
+        }
+        return str + "]";
+    }
 }

@@ -127,4 +127,8 @@ public class SubstClassType_c extends ClassType_c implements SubstType
     public int hashCode() {
         return base.hashCode() ^ subst.hashCode();
     }
+
+    public String toString() {
+        return base.toString() + subst.toString();
+    }
 }
