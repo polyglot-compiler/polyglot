@@ -15,6 +15,13 @@ public abstract class HaltingVisitor extends NodeVisitor implements Copy
         return v;
     }
 
+    public HaltingVisitor visitChildren() {
+        HaltingVisitor v = (HaltingVisitor) copy();
+        v.bypassParent = null;
+        v.bypass = null;
+        return v;
+    }
+
     public HaltingVisitor bypass(Node n) {
         if (n == null) return this;
 

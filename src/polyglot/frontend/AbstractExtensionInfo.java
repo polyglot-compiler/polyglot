@@ -188,6 +188,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             Pass pass = (Pass) passes.get(passes.size()-1);
             return runToPass(job, pass);
         }
+
         return true;
     }
 
@@ -365,13 +366,23 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     public List passes(Job job, Pass.ID begin, Pass.ID end) {
         List l = passes(job);
-        boolean in = false;
 
-        for (Iterator i = l.iterator(); i.hasNext(); ) {
+        Iterator i = l.iterator();
+
+        while (i.hasNext()) {
             Pass p = (Pass) i.next();
-            in = in || begin == p.id();
-            if (! (p instanceof BarrierPass) && ! in) i.remove();
-            in = in && end != p.id();
+            if (begin == p.id()) break;
+            if (! (p instanceof BarrierPass)) i.remove();
+        }
+
+        while (i.hasNext()) {
+            Pass p = (Pass) i.next();
+            if (end == p.id()) break;
+        }
+
+        while (i.hasNext()) {
+            Pass p = (Pass) i.next();
+            i.remove();
         }
 
         return l;

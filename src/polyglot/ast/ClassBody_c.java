@@ -73,7 +73,8 @@ public class ClassBody_c extends Node_c implements ClassBody
         // We can't clean-super any member classes yet until we are finished
         // with this class and all at the same nesting level.
         // Delay until the clean-sigs pass.
-        if (ar.kind() == AmbiguityRemover.SUPER) {
+        if (ar.kind() == AmbiguityRemover.SUPER ||
+            ar.kind() == AmbiguityRemover.SIGNATURES) {
             return ar.bypassChildren(this);
         }
 
@@ -84,8 +85,6 @@ public class ClassBody_c extends Node_c implements ClassBody
         // Now we can clean-super on the member classes.
         if (ar.kind() == AmbiguityRemover.SIGNATURES) {
             List l = new ArrayList(members.size());
-
-            boolean hasInner = false;
 
             Job j = ar.job();
 
@@ -99,21 +98,18 @@ public class ClassBody_c extends Node_c implements ClassBody
 
                     if (m == null) {
                         throw new SemanticException("Could not disambiguate " +
-                                                    "class member.", n.position());
+                                                    "class member.",
+                                                    n.position());
                     }
 
-                    l.add(m);
-
-                    hasInner = true;
+                    l.add(m.visit(ar.visitChildren()));
                 }
                 else {
-                    l.add(n);
+                    l.add(n.visit(ar.visitChildren()));
                 }
             }
 
-            if (hasInner) {
-                return members(l).visitChildren(ar);
-            }
+            return members(l);
         }
 
         return this;

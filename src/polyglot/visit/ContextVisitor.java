@@ -56,6 +56,10 @@ public class ContextVisitor extends HaltingVisitor
         return super.begin();
     }
 
+    public ContextVisitor pop() {
+        return outer;
+    }
+
     protected NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
         Types.report(1, "enter: " + parent + " -> " + n);
         return enterCall(n);

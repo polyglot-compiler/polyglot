@@ -44,7 +44,7 @@ public class InnerJob extends Job
 
     public String toString() {
         return name + " (" +
-            (isRunning() ? "running " : "before ") + nextPass() + ")";
+            (isRunning() ? "running " : "before ") + nextPass() + ")" + " <<< passes = " + passes + " >>>";
     }
 
     public List getPasses() {
@@ -55,6 +55,12 @@ public class InnerJob extends Job
             if (pass.id() == begin) {
                 nextPass = i;
             }
+            /*
+            if (i == 0 && pass.id() != begin)
+                throw new InternalCompilerError("ExtensionInfo.passes returned incorrect list: " + l);
+                */
+            if (i == l.size()-1 && pass.id() != end)
+                throw new InternalCompilerError("ExtensionInfo.passes returned incorrect list: " + l);
         }
 
         return l;
