@@ -364,7 +364,7 @@ SingleCharacter = [^\r\n\'\\]
   /* escape sequences */
   "\\b"\'                        { yybegin(YYINITIAL); return char_token('\b');}
   "\\t"\'                        { yybegin(YYINITIAL); return char_token('\t');}
-  "\\n"\'                        { yybegin(YYINITIAL); return char_token('\t');}
+  "\\n"\'                        { yybegin(YYINITIAL); return char_token('\n');}
   "\\f"\'                        { yybegin(YYINITIAL); return char_token('\f');}
   "\\r"\'                        { yybegin(YYINITIAL); return char_token('\r');}
   "\\\""\'                       { yybegin(YYINITIAL); return char_token('\"');}
