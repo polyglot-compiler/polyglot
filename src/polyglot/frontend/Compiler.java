@@ -244,8 +244,10 @@ public class Compiler implements TargetTable, ClassCleaner
     boolean success;
     Job job;
     
-    for( Iterator iter = workList.iterator(); iter.hasNext(); ) {
-      job = (Job)iter.next();
+    //cannot use an iterator here, compiling may introduce additional
+    //jobs, leading to ConcurrentModificationExceptions
+    for( int i = 0; i < workList.size(); i++) {
+      job = (Job)workList.get(i);
       success = compile( job, Job.TRANSLATED);
       if( success) {
         completed.add( job.getTarget() );
@@ -527,6 +529,10 @@ public class Compiler implements TargetTable, ClassCleaner
     ErrorQueue eq = job.getTarget().getErrorQueue();
     if( eq.hasErrors()) {
       eq.flush();
+      try {
+	CodeWriter cw = new CodeWriter(new UnicodeWriter(new FileWriter("onError.dump")), 76);
+	job.dump(cw);
+      } catch (IOException exn) {}
       return true;
     }
     else {
