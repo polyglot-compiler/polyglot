@@ -1,0 +1,94 @@
+This document will attempt to describe the class hierarchy of the JLTools
+package.
+
+KEY
+===
+Packages are written, abbreviated, in [brackets.]
+
+Interfaces are written in (parenthesis).
+
+<<*>> = Not yet implemented.
+
+<V>   = Has an entry in NodeVisitor
+
+(A)   = Abstract
+(I)   = Interface
+(S)   = Contains static members only.
+
+CLASSES
+=======
+Type							[jltools.types]
+  PrimitiveType					 <<*>>  [jltools.types]
+  ClassType					 <<*>>  [jltools.types]
+MethodType (A)					 <<*>>  [jltools.types]
+  JavaMethodType				 <<*>>  [jltools.types]
+AccessFlags					 <<*>>  [jltools.types]
+
+TypeSystem (I)					 <<*>>  [jltools.types]
+JavaTypeSystem (TypeSystem)			 <<*>>  [jltools.types]
+
+JavaClass (A)					 <<*>>  [jltools.types]
+  ClassFileClass				 <<*>>  [jltools.types]
+  ParsedSourceClass                              <<*>>  [jltools.types]
+ImportTable					 <<*>>  [jltools.types]
+
+NodeVisitor (I)					 	[jltools.ast]
+NullVisitor (NodeVisitor)				[jltools.ast]
+
+AnnotatedObject	(A)					[jltools.util]
+  Node (A)						[jltools.ast]
+    Expression (A)					[jltools.ast]      
+      Literal (A)					[jltools.ast]
+        NullLiteral				 <V>    [jltools.ast]
+	StringLiteral 				 <<*>>	[jltools.ast]
+	IntLiteral                               <<*>>	[jltools.ast]
+	FloatLiteral 				 <<*>>	[jltools.ast]
+      CastExpression				 <<*>>  [jltools.ast]
+      BinaryExpression				 <<*>>  [jltools.ast]
+      TrinaryExpression				 <<*>>  [jltools.ast]
+      UnaryExpression				 <<*>>  [jltools.ast]
+      LocalVariableExpression			 <<*>>  [jltools.ast]
+      NewArrayExpression			 <<*>>  [jltools.ast]
+      NewObjectExpression			 <<*>>  [jltools.ast]      
+      FieldExpression				 <<*>>  [jltools.ast]
+      MethodExpression				 <<*>>  [jltools.ast]
+      ArrayIndexExpression			 <<*>>  [jltools.ast]
+      ArrayInitializerExpression		 <<*>>  [jltools.ast]
+      SpecialExpression				 <<*>>  [jltools.ast]
+      InstanceofExpression			 <<*>>  [jltools.ast]     
+      AmbiguousExpression (A)                    <<*>>  [jltools.ast]
+        IdentifierAmbExpression			 <<*>>  [jltools.ast]      
+    Statement (A)					[jltools.ast]
+      ExpressionStatement 			 <V>	[jltools.ast]
+      BlockStatement 				 <V>	[jltools.ast]     
+      VariableDeclarationStatement		 <<*>>  [jltools.ast]
+      ClassDeclarationStatement			 <<*>>	[jltools.ast]
+      ReturnStatement				 <<*>>  [jltools.ast]
+      ThrowStatement				 <<*>>  [jltools.ast]
+      BranchStatement				 <<*>>  [jltools.ast]
+      ConstructorCallStatement                   <<*>>  [jltools.ast]
+      IfStatement				 <<*>>  [jltools.ast]     
+      WhileStatement				 <<*>>  [jltools.ast]
+      DoStatement				 <<*>>  [jltools.ast]
+      ForStatement				 <<*>>  [jltools.ast]
+      SynchronizedStatement			 <<*>>  [jltools.ast]
+      TryStatement				 <<*>>  [jltools.ast] 
+      SwitchStatement				 <<*>>  [jltools.ast] 
+      LabelledStatement				 <<*>>	[jltools.ast]
+    VariableDeclaration				 <<*>>  [jltools.ast]
+    ClassMember	(A)				 <<*>>  [jltools.ast]
+      ClassNode					 <<*>>  [jltools.ast]
+      FieldNode					 <<*>>  [jltools.ast]
+      MethodNode				 <<*>>  [jltools.ast]
+    SourceFileNode				 <<*>>  [jltools.ast]
+
+Annotate (S)						[jltools.util]
+Assert (S)						[jltools.util]
+ErrMsgs						 <<*>>  [jltools.util]
+ClassPath					 <<*>>	[jltools.util]
+
+TypedCollection					 <<*>>  [jltools.util]
+  TypedList					 <<*>>	[jltools.util]
+TypedListIterator				 	[jltools.util]
+TypedMap					 <<*>>	[jltools.util]
+
