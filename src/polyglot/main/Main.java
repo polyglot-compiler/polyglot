@@ -26,7 +26,7 @@ public class Main
   {      
     source = new HashSet();
     Options options = Options.global;
-    loadExtension("jl");
+    loadExtension("polyglot.ext.jl.ExtensionInfo");
     
     parseCommandLine(args, options, source);
 
