@@ -8,7 +8,7 @@ import jltools.ast.Expression;
 import jltools.types.Type;
 
 /**
- * Annotated
+ * Annotate
  *
  * Overview:
  *     This class contains the constants and methods used to wrap accesses

@@ -36,6 +36,13 @@ public class TypedListIterator implements ListIterator {
     this.backing_iterator = iter;
   }
 
+  /**
+   * Gets the allowed type for this ListIterator.
+   **/
+  public Class getAllowedType(){
+    return allowed_type;
+  }
+
   public void add(Object o) {
     tryIns(o);
     backing_iterator.add(o);
