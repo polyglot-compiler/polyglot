@@ -1,5 +1,6 @@
 /**
- * CodeWriter -- Andrew C. Myers, March 2001
+ * CodeWriter -- Andrew C. Myers, April 2001
+ *   For use in Cornell University Computer Science 412/413
  */
 
 package jltools.util;
