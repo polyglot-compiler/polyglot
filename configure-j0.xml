@@ -32,6 +32,16 @@ ext="j0"
       <filelist dir="${bin}" files="jlc.in"/>
     </concat>
     <chmod perm="+x" file="${bin}/j0c"/>
+
+    <echo message="Creating ${bin}/j0"/>
+    <concat destfile="${bin}/j0" append="no">
+      <filelist dir="${bin}" files="defs"/>
+    </concat>
+    <concat destfile="${bin}/j0" append="yes">
+      <filelist dir="${bin}" files="j0.in"/>
+    </concat>
+    <chmod perm="+x" file="${bin}/j0"/>
+
   </target>
 </project>
 
