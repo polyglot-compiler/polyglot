@@ -81,6 +81,37 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 	}
     }
 
+    public void typeCheckElements(Type lhsType) throws SemanticException {
+        TypeSystem ts = lhsType.typeSystem();
+
+        if (! lhsType.isArray()) {
+          throw new SemanticException("Cannot initialize " + lhsType +
+                                      " with " + type, position());
+        }
+
+        // Check if we can assign each individual element.
+        Type t = lhsType.toArray().base();
+
+        for (Iterator i = elements.iterator(); i.hasNext(); ) {
+            Expr e = (Expr) i.next();
+            Type s = e.type();
+
+            boolean intConversion = false;
+
+            if (e instanceof NumLit) {
+                long value = ((NumLit) e).longValue();
+                intConversion = ts.numericConversionValid(t, value);
+            }
+
+            if (! s.isAssignableSubtype(t) &&
+                ! s.isSame(t) &&
+                ! intConversion) {
+                throw new SemanticException("Cannot assign " + s +
+                                            " to " + t + ".", e.position());
+            }
+        }
+    }
+
     public String toString() {
 	return "{ ... }";
     }

@@ -119,14 +119,10 @@ public class NewArray_c extends Expr_c implements NewArray
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-	Type type = ts.arrayOf(baseType.type(), dims.size() + addDims);
+	ArrayType type = ts.arrayOf(baseType.type(), dims.size() + addDims);
 
 	if (init != null) {
-	    if (! ts.isAssignableSubtype(init.type(), type)) {
-		throw new SemanticException("An array initializer must be " +
-					    "the same type as the array " +
-					    "declaration.", init.position());
-	    }
+            init.typeCheckElements(type);
 	}
 
 	return type(type);
@@ -148,7 +144,7 @@ public class NewArray_c extends Expr_c implements NewArray
 	  w.write("]");
 	}
 
-	for (int i = 0; i < addDims; i++) { 
+	for (int i = 0; i < addDims; i++) {
 	    w.write("[]");
 	}
 
