@@ -276,7 +276,8 @@ start with goal;
 goal ::=    
                     // SourceFile
         compilation_unit:a
-            {: RESULT = a; :}
+            {: if (parser.eq.hasErrors()) RESULT = null;
+               else RESULT = a; :}
     ;
 
 // 19.3) Lexical Structure.
