@@ -106,10 +106,17 @@ public class TypeSystem_c implements TypeSystem
 				       Type type, String name) {
 	return new FieldInstance_c(this, pos, container, flags, type, name);
     }
-	  
+
     public LocalInstance localInstance(Position pos,
 	                               Flags flags, Type type, String name) {
 	return new LocalInstance_c(this, pos, flags, type, name);
+    }
+
+    public ConstructorInstance defaultConstructor(Position pos,
+                                                  ClassType container) {
+        return constructorInstance(pos, container,
+                                   Flags.PUBLIC, Collections.EMPTY_LIST,
+                                   Collections.EMPTY_LIST);
     }
 
     public ConstructorInstance constructorInstance(Position pos,
@@ -438,14 +445,14 @@ public class TypeSystem_c implements TypeSystem
     ////
     // Functions for one-type checking and resolution.
     ////
-    
+
     /**
      * Returns true iff <type> is a canonical (fully qualified) type.
      */
     public boolean isCanonical(Type type) {
 	return type.isCanonical();
     }
-	
+
     /**
      * Checks whether a method, field or inner class within "outer" with access
      * flags "flags" can be accessed from Context "context".
@@ -489,11 +496,11 @@ public class TypeSystem_c implements TypeSystem
 	    (flags.isPackage() || flags.isProtected())) {
 	    return true;
 	}
-	
+
 	// protected
 	if (ctc.descendsFrom(ctt) && flags.isProtected()) return true;
-	
-	// else, 
+
+	// else,
 	return false;
     }
 
@@ -564,7 +571,7 @@ public class TypeSystem_c implements TypeSystem
     }
 
     /**
-     * Returns a true iff the type or a supertype is in the list 
+     * Returns a true iff the type or a supertype is in the list
      * returned by uncheckedExceptions().
      */
     public boolean isUncheckedException(Type type) {
@@ -572,7 +579,7 @@ public class TypeSystem_c implements TypeSystem
 	// rather than just checking RuntimeException and Error.
         if (isThrowable(type)) {
 	    Collection c = uncheckedExceptions();
-	    
+
 	    for (Iterator i = c.iterator(); i.hasNext(); ) {
 	        Type t = (Type) i.next();
 
@@ -676,7 +683,7 @@ public class TypeSystem_c implements TypeSystem
 
     /**
      * Requires: all type arguments are canonical.
-     * 
+     *
      * Returns the MethodInstance named 'name' defined on 'type' visible in
      * context.  If no such field may be found, returns a fieldmatch
      * with an error explaining why.  Access flags are considered.
@@ -754,7 +761,7 @@ public class TypeSystem_c implements TypeSystem
 	    }
 	} return maximal; }
 
-    /** 
+    /**
      * Class to handle the comparisons; dispatches to moreSpecific method.
      */
     protected class MostSpecificComparator implements Comparator {
@@ -777,7 +784,7 @@ public class TypeSystem_c implements TypeSystem
     }
 
     /**
-     * Populates the list acceptable with those MethodInstances which are 
+     * Populates the list acceptable with those MethodInstances which are
      * Applicable and Accessible as defined by JLS 15.11.2.1
      */
     protected List findAcceptableMethods(ReferenceType container, String name,
@@ -835,7 +842,7 @@ public class TypeSystem_c implements TypeSystem
     }
 
     /**
-     * Populates the list acceptable with those MethodInstances which are 
+     * Populates the list acceptable with those MethodInstances which are
      * Applicable and Accessible as defined by JLS 15.11.2.1
      */
     protected List findAcceptableConstructors(ClassType container,
@@ -860,11 +867,11 @@ public class TypeSystem_c implements TypeSystem
     }
 
     /**
-     * Returns whether method 1 is <i>more specific</i> than method 2, 
+     * Returns whether method 1 is <i>more specific</i> than method 2,
      * where <i>more specific</i> is defined as JLS 15.11.2.2
      * <p>
      * Note: There is a fair amount of guesswork since the JLS does not
-     * include any 
+     * include any
      * info regarding java 1.2, so all inner class rules are found empirically
      * using jikes and javac.
      */
@@ -940,7 +947,7 @@ public class TypeSystem_c implements TypeSystem
 
 	if (type1.isReference() && type2.isNull()) return type1;
 	if (type2.isReference() && type1.isNull()) return type2;
-	
+
 	if (type1.isReference() && type2.isReference()) {
 	    // Don't consider interfaces.
 	    if (type1.isClass() && type1.toClass().flags().isInterface()) {
@@ -965,13 +972,13 @@ public class TypeSystem_c implements TypeSystem
 					  type1);
 
 	    if (isSame(t1, t2)) return t1;
-	    
+
 	    return Object();
 	}
 
 	throw new SemanticException(
 	   "No least common ancestor found for types \"" + type1 +
-	   "\" and \"" + type2 + "\"."); 
+	   "\" and \"" + type2 + "\".");
     }
 
     ////
@@ -979,17 +986,17 @@ public class TypeSystem_c implements TypeSystem
     ////
 
     /**
-     * Returns true iff <type1> has the same arguments as <type2>
+     * Returns true iff <p1> has the same arguments as <p2>
      **/
     public boolean hasSameArguments(ProcedureInstance p1,
 				    ProcedureInstance p2) {
 
 	List l1 = p1.argumentTypes();
 	List l2 = p2.argumentTypes();
-	
+
 	Iterator i1 = l1.iterator();
 	Iterator i2 = l2.iterator();
-	
+
 	while (i1.hasNext() && i2.hasNext()) {
 	    Type t1 = (Type) i1.next();
 	    Type t2 = (Type) i2.next();
@@ -1000,6 +1007,13 @@ public class TypeSystem_c implements TypeSystem
 	}
 
 	return ! (i1.hasNext() || i2.hasNext());
+    }
+
+    /**
+     * Returns true iff <m1> is the same method as <m2>
+     */
+    public boolean isSameMethod(MethodInstance m1, MethodInstance m2) {
+        return m1.name().equals(m2.name()) && hasSameArguments(m1, m2);
     }
 
     public boolean methodCallValid(MethodInstance prototype,
@@ -1021,10 +1035,10 @@ public class TypeSystem_c implements TypeSystem
     protected boolean callValid(ProcedureInstance prototype, List argTypes) {
 	List l1 = argTypes;
 	List l2 = prototype.argumentTypes();
-	
+
 	Iterator i1 = l1.iterator();
 	Iterator i2 = l2.iterator();
-	
+
 	while (i1.hasNext() && i2.hasNext()) {
 	    Type t1 = (Type) i1.next();
 	    Type t2 = (Type) i2.next();
@@ -1093,7 +1107,7 @@ public class TypeSystem_c implements TypeSystem
     public TypeObject placeHolder(TypeObject o) {
     	return placeHolder(o, new HashSet());
     }
-    
+
     public TypeObject placeHolder(TypeObject o, Set roots) {
 	// This should never happen: anonymous and local types cannot
 	// appear in signatures.

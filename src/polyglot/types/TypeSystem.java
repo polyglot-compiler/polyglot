@@ -55,13 +55,16 @@ public interface TypeSystem {
     LocalInstance localInstance(Position pos, Flags flags, Type type,
 	                        String name);
 
+    /** Create a default constructor instance. */
+    ConstructorInstance defaultConstructor(Position pos, ClassType container);
+
     /**
      * Return a class type for the Class object.  Only a
      * Resolver should call this method.
      */
     ClassType forClass(Class clazz) throws SemanticException;
 
-    /** Get a place-holder for serializing a type object. */ 
+    /** Get a place-holder for serializing a type object. */
     TypeObject placeHolder(TypeObject o, java.util.Set roots);
     TypeObject placeHolder(TypeObject o);
 
@@ -132,7 +135,7 @@ public interface TypeSystem {
 
     /**
      * Checks whether a method or field within target with access flags 'flags'
-     * can be accessed from Context context. 
+     * can be accessed from Context context.
      */
     boolean isAccessible(MemberInstance mi, Context context);
 
@@ -153,7 +156,7 @@ public interface TypeSystem {
     boolean isThrowable(Type type);
 
     /**
-     * Returns a true iff the type or a supertype is in the list 
+     * Returns a true iff the type or a supertype is in the list
      * returned by uncheckedExceptions().
      */
     boolean isUncheckedException(Type type);
@@ -218,9 +221,14 @@ public interface TypeSystem {
     ////
 
     /**
-     * Returns true iff <type1> has the same arguments as <type2>
+     * Returns true iff <m1> has the same arguments as <m2>
      */
     boolean hasSameArguments(ProcedureInstance m1, ProcedureInstance m2);
+
+    /**
+     * Returns true iff <m1> is the same method as <m2>
+     */
+    boolean isSameMethod(MethodInstance m1, MethodInstance m2);
 
     ////
     // Functions which yield particular types.
@@ -264,7 +272,7 @@ public interface TypeSystem {
      * class.  Does not require that <theClass> have a JavaClass
      * theClass.  Does not require that <theClass> have a ClassType
      * registered in this typeSystem.  Does not register the type in
-     * this TypeSystem.  
+     * this TypeSystem.
      * this TypeSystem.  For use only by ClassType implementations.
      **/
     Type typeForClass(Class clazz) throws SemanticException;
@@ -287,7 +295,7 @@ public interface TypeSystem {
 
     /**
      * return the set of objects that should be serialized into the
-     * type information for the given ClassType. 
+     * type information for the given ClassType.
      * Usually only the clazz itself should get encoded, and references
      * to other classes should just have their name written out.
      * If it makes sense for additional types to be fully encoded,
