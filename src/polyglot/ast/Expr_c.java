@@ -29,6 +29,7 @@ public abstract class Expr_c extends Node_c implements Expr
 
     /** Set the type of the expression. */
     public Expr type(Type type) {
+        if (type == this.type) return this;
 	Expr_c n = (Expr_c) copy();
 	n.type = type;
 	return n;
@@ -47,6 +48,7 @@ public abstract class Expr_c extends Node_c implements Expr
 
     /** Set the type of the expression. */
     public Expr expectedType(Type expectedType) {
+        if (expectedType == this.expectedType) return this;
 	Expr_c n = (Expr_c) copy();
 	n.expectedType = expectedType;
 	return n;
