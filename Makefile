@@ -1,78 +1,65 @@
-
-# Environment variables you must set:
-#	OSTYPE
-#	MAKE_MODE (with cygwin)
-
-# If CODEBASE is not defined then assume that this makefile was 
-# invoked directly and define "RECURSIVE" behavior.
-ifndef CODEBASE
-CODEBASE	= .
-RECURSIVE	= jltools
-endif
-
-# First include personal Makefile
--include $(CODEBASE)/Make.personal
+#
+# Makefile to build the jltools source to source compiler
+# includes a makefile in each package to handle building of respective 
+# packages
+#
 
 
-# Default settings.
-ifndef CLASSBASE
-CLASSBASE	= $(CODEBASE)/bin
-endif
+# set up some reasonable defaults (for building in CUCS)
+JC 			= javac
+JAVA			= java
+CUP_RUNTIME		= /home/nks/lib
+CLASSPATH		= -classpath $(SOURCE):/usr/local/jdk1.2.1/jre/lib/rt.jar:$(CUP_RUNTIME)
+JC_FLAGS 		= $(CLASSPATH)
 
-# Platform dependent defaults.
-ifeq ($(OSTYPE),'winnt')
-ifndef JC
-JC		= javac
-endif
-ifndef CUPBASE
-JAVA_CUPBASE	= d:\classes
-endif
-ifndef ADDCLASSPATH
-ADDCLASSPATH	= $(CLASSBASE);$(CODEBASE);$(JAVA_CUPBASE);$(CLASSPATH)
-endif
+SOURCE			= .
+PERSONAL_MAKEFILE	= Makefile.personal
 
-else # OSTYPE != winnt
-ifndef JC
-JC	 	= javac
-endif
-ifndef CUPBASE
-JAVA_CUPBASE	= /home/spoons/classes
-endif
-ifndef ADDCLASSPATH
-ADDCLASSPATH	= $(CLASSBASE):$(CODEBASE):$(JAVA_CUPBASE):$(CLASSPATH)
-endif
+# allow users to overload the above by overriding the above settings.
+-include $(PERSONAL_MAKEFILE)
 
-endif 
+# let the included makefiles know that we called them. otherwise, they'll try to 
+# call here.
+CALLED_FROM_PARENT 	= true
 
-# Platform indepentent defaults.
-ifndef JCFLAGS
-JCFLAGS		= -d $(CLASSBASE) -classpath $(ADDCLASSPATH)
-endif
+#implicit rule to build class files
+%.class: %.java
+	$(JC) $(JC_FLAGS) $<
 
-# End default settings.
+#everything:
+all: util types lex parse ast frontend
 
+#include all of our package makefiles. they give us what class files are in each.
+include jltools/ast/Makefile 
+include jltools/frontend/Makefile
+include jltools/lex/Makefile
+include jltools/util/Makefile
+include jltools/types/Makefile
+include jltools/parse/Makefile
 
+#other targets:
+util: $(UTIL_TARGET) 
 
-# Targets, depending on where we are.
-ifdef RECURSIVE
-all: recursive
+types: util $(TYPES_TARGET)
 
-recursive:
-	for DIR in $(RECURSIVE); do $(MAKE) -C $$DIR; done
+lex: util types $(LEX_TARGET)
 
-else # !RECURSIVE
-ifdef LEAF
-all: leaf
+parse: util types lex $(PARSE_TARGET)
 
-leaf: *.java
-	$(JC) $(JCFLAGS) *.java
+ast : util types lex  $(AST_TARGET)
 
+frontend: util types lex parse ast $(FRONTEND_TARGET)
 
-clean:
-	rm $(CLASSBASE)/$(PACKAGE)/*.class
+#clean: (just delete the class files)
+clean: 
+	rm -f jltools/ast/*.class
+	rm -f jltools/frontend/*.class
+	rm -f jltools/parse/*.class
+	rm -f jltools/types/*.class
+	rm -f jltools/util/*.class
+	rm -f jltools/lex/*.class
 
-
-endif # End LEAF.
-endif # End RECURSIVE.
-
-# End targets.
+# delete class files as well as the grammar files, so that we can regenerate them
+superclean: clean
+	rm -f jltools/parse/Grm.java
+	rm -f jltools/parse/sym.java

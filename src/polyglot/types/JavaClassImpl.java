@@ -7,6 +7,7 @@ package jltools.types;
 import java.util.List;
 import jltools.util.TypedList;
 import jltools.util.AnnotatedObject;
+import java.util.Iterator;
 
 /**
  * JavaClassImpl
@@ -36,11 +37,12 @@ public abstract class JavaClassImpl extends AnnotatedObject
   public List getInnerClasses()         { return innerClasses; }
 
   public Type getInnerNamed(String name) {
-    for (Iterator i = innerClasses().iterator(); i.hasNext();) {
+    for (Iterator i = innerClasses.iterator(); i.hasNext();) {
       ClassType innerType = (ClassType) i.next();
       if (innerType.getShortName().equals(name))
 	return innerType;
     }
+    return null;
   }
   
 

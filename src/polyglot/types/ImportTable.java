@@ -5,8 +5,10 @@
 package jltools.types;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Iterator;
 
 /**
  * ImportTable
@@ -31,7 +33,7 @@ public abstract class ImportTable implements ClassResolver {
   }
   
   public void addPackageImport(String pkgName) throws NoClassException {
-    resolver.findPackage(pkgName)
+    resolver.findPackage(pkgName);
     packageImports.add(pkgName);
   }
     
@@ -40,7 +42,7 @@ public abstract class ImportTable implements ClassResolver {
   }
 
   public JavaClass findClass(String name) throws NoClassException {
-    if (TypeSystem.isShortName(name)) {
+    if (TypeSystem.isNameShort(name)) {
       Object res = map.get(name);
       // First see if we have a mapping already.
       if (res != null) {

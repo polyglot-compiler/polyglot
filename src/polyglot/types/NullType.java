@@ -22,6 +22,17 @@ public class NullType extends Type {
   public int hashCode() {
     return 6060842;
   }
+  
+  public boolean isPrimitive()
+  {
+    return false;
+  }
+
+  public boolean isCanonical()
+  {
+    // FIXME: Correct?
+    return true;
+  }
 }
 
 
