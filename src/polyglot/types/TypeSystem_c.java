@@ -331,9 +331,9 @@ public class TypeSystem_c implements TypeSystem
 
     /**
      * Checks whether the member mi can be accessed from code that is
-     * declared in the class ctc.
+     * declared in the class contextClass.
      */
-    protected boolean isAccessible(MemberInstance mi, ClassType ctc) {
+    protected boolean isAccessible(MemberInstance mi, ClassType contextClass) {
         assert_(mi);
 
         ReferenceType target = mi.container();
@@ -345,26 +345,26 @@ public class TypeSystem_c implements TypeSystem
             return flags.isPublic();
         }
 
-        ClassType ctt = target.toClass();
+        ClassType targetClass = target.toClass();
 
-        if (! classAccessible(ctt, ctc)) {
+        if (! classAccessible(targetClass, contextClass)) {
             return false;
         }
 
-        if (equals(ctt, ctc))
+        if (equals(targetClass, contextClass))
             return true;
 
         // If the current class and the target class are both in the
         // same class body, then protection doesn't matter, i.e.
         // protected and private members may be accessed. Do this by
-        // working up through ctc's containers.
-        if (isEnclosed(ctc, ctt) || isEnclosed(ctt, ctc))
+        // working up through contextClass's containers.
+        if (isEnclosed(contextClass, targetClass) || isEnclosed(targetClass, contextClass))
             return true;
 
-        ClassType ctcContainer = ctc;
-        while (!ctcContainer.isTopLevel()) {
-            ctcContainer = ctcContainer.outer();
-            if (isEnclosed(ctt, ctcContainer))
+        ClassType ct = contextClass;
+        while (!ct.isTopLevel()) {
+            ct = ct.outer();
+            if (isEnclosed(targetClass, ct))
                 return true;
         }
 
@@ -373,83 +373,83 @@ public class TypeSystem_c implements TypeSystem
             // If the current class is in a
             // class body that extends/implements the target class, then
             // protected members can be accessed. Do this by
-            // working up through ctc's containers.
-            if (descendsFrom(ctc, ctt)) {
+            // working up through contextClass's containers.
+            if (descendsFrom(contextClass, targetClass)) {
                 return true;
             }
 
-            ctcContainer = ctc;
-            while (!ctcContainer.isTopLevel()) {
-                ctcContainer = ctcContainer.outer();
-                if (descendsFrom(ctcContainer, ctt)) {
+            ct = contextClass;
+            while (!ct.isTopLevel()) {
+                ct = ct.outer();
+                if (descendsFrom(ct, targetClass)) {
                     return true;
                 }
             }
         }
 
-        return accessibleFromPackage(flags, ctt.package_(), ctc.package_());
+        return accessibleFromPackage(flags, targetClass.package_(), contextClass.package_());
     }
 
-    /** True if the class ctt accessible from the context. */
-    public boolean classAccessible(ClassType ctt, Context context) {
+    /** True if the class targetClass accessible from the context. */
+    public boolean classAccessible(ClassType targetClass, Context context) {
         if (context.currentClass() == null) {
-            return classAccessibleFromPackage(ctt, context.importTable().package_());
+            return classAccessibleFromPackage(targetClass, context.importTable().package_());
         }
         else {
-            return classAccessible(ctt, context.currentClass());
+            return classAccessible(targetClass, context.currentClass());
         }
     }
 
-    /** True if the class ctt accessible from the body of class ctc. */
-    protected boolean classAccessible(ClassType ctt, ClassType ctc) {
-        assert_(ctt);
+    /** True if the class targetClass accessible from the body of class contextClass. */
+    protected boolean classAccessible(ClassType targetClass, ClassType contextClass) {
+        assert_(targetClass);
 
-        if (ctt.isMember()) {
-            return isAccessible(ctt, ctc);
+        if (targetClass.isMember()) {
+            return isAccessible(targetClass, contextClass);
         }
 
         // Local and anonymous classes are accessible if they can be named.
         // This method wouldn't be called if they weren't named.
-        if (! ctt.isTopLevel()) {
+        if (! targetClass.isTopLevel()) {
             return true;
         }
 
-        // ctt must be a top-level class
+        // targetClass must be a top-level class
         
         // same class
-	if (equals(ctt, ctc))
+	if (equals(targetClass, contextClass))
             return true;
 
-        if (isEnclosed(ctc, ctt))
+        if (isEnclosed(contextClass, targetClass))
             return true;
 
-        return accessibleFromPackage(ctt.flags(),
-                                     ctt.package_(), ctc.package_());
+        return accessibleFromPackage(targetClass.flags(),
+                                     targetClass.package_(), contextClass.package_());
     }
 
-    /** True if the class ctt accessible from the package pkg. */
-    public boolean classAccessibleFromPackage(ClassType ctt, Package pkg) {
-        assert_(ctt);
+    /** True if the class targetClass accessible from the package pkg. */
+    public boolean classAccessibleFromPackage(ClassType targetClass, Package pkg) {
+        assert_(targetClass);
 
         // Local and anonymous classes are not accessible from the outermost
         // scope of a compilation unit.
-        if (! ctt.isTopLevel() && ! ctt.isMember())
+        if (! targetClass.isTopLevel() && ! targetClass.isMember())
             return false;
 
-	Flags flags = ctt.flags();
+	Flags flags = targetClass.flags();
 
-        if (ctt.isMember()) {
-            if (! ctt.container().isClass()) {
+        if (targetClass.isMember()) {
+            if (! targetClass.container().isClass()) {
                 // public members of non-classes are accessible
                 return flags.isPublic();
             }
 
-            if (! classAccessibleFromPackage(ctt.container().toClass(), pkg)) {
+            if (! classAccessibleFromPackage(targetClass.container().toClass(), pkg)) {
                 return false;
             }
         }
 
-        return accessibleFromPackage(flags, ctt.package_(), pkg);
+        return accessibleFromPackage(flags, targetClass.package_(), pkg);
     }
 
     /**
