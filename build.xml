@@ -63,7 +63,7 @@
   <!-- compile the base compiler excluding the jl extension -->
   <target name="compile-base" depends="init,ppg" 
           description="compile the source">
-    <javac srcdir="${src}" destdir="${classes}"
+    <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/**"
       excludes="polyglot/ext/**,polyglot/tests/**,polyglot/util/ppg/test/**">
       <classpath refid="standard.classpath"/>
@@ -73,7 +73,7 @@
   <!-- compile a single extension, named ${ext} -->
   <target name="compile-ext"
     description="compile an extension">
-    <javac srcdir="${src}" destdir="${classes}"
+    <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/ext/${ext}/**"
       excludes="**/test/**,**/tests/**,**/runtime/**">
       <classpath refid="standard.classpath"/>
@@ -198,7 +198,7 @@
       <param name="symbol.class" value="Constant"/>
       <param name="cup.file" value="ppg.cup"/>
     </antcall>
-    <javac srcdir="${src}" destdir="${classes}"
+    <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/util/ppg/**"
       excludes="polyglot/util/ppg/test/**">
       <classpath refid="standard.classpath"/>
