@@ -13,9 +13,7 @@ import java.util.*;
 public class ExitChecker extends DataFlow
 {
     public ExitChecker(Job job, TypeSystem ts, NodeFactory nf) {
-	super(job, ts, nf,
-              false /* backward analysis */,
-              true /* replicate finally */);
+	super(job, ts, nf, false /* backward analysis */);
     }
 
     CodeDecl code;

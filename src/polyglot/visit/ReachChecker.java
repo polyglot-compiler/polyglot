@@ -12,9 +12,7 @@ import java.util.*;
 public class ReachChecker extends DataFlow
 {
     public ReachChecker(Job job, TypeSystem ts, NodeFactory nf) {
-	super(job, ts, nf,
-              true /* forward analysis */,
-              true /* replicate finally */);
+	super(job, ts, nf, true /* forward analysis */);
     }
 
     public Item createInitialItem() {

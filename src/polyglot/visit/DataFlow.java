@@ -17,16 +17,13 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * Is this dataflow a forward analysis?
      */
     boolean forward;
-    
-    boolean replicateFinally;
 
     /**
      * Constructor
      */
-    public DataFlow(Job job, TypeSystem ts, NodeFactory nf, boolean forward, boolean replicateFinally) {
+    public DataFlow(Job job, TypeSystem ts, NodeFactory nf, boolean forward) {
 	super(job, ts, nf);
         this.forward = forward;
-        this.replicateFinally = replicateFinally;
     }
 
     /**
@@ -178,7 +175,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *         FlowGraph.
      */
     protected FlowGraph initGraph(CodeDecl code, Term root) {
-        return new FlowGraph(root, forward, replicateFinally);
+        return new FlowGraph(root, forward);
     }
 
     /**

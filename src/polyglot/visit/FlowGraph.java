@@ -10,12 +10,10 @@ public class FlowGraph {
   Map peerMap;
   Term root;
   boolean forward;
-  boolean replicateFinally;
 
-  FlowGraph(Term root, boolean forward, boolean replicateFinally) {
+  FlowGraph(Term root, boolean forward) {
     this.root = root;
     this.forward = forward;
-    this.replicateFinally = replicateFinally;
     this.peerMap = new HashMap();
   }
 
@@ -25,7 +23,6 @@ public class FlowGraph {
   public Term exitNode() { return root; }
   public Term root() { return root; }
   public boolean forward() { return forward; }
-  public boolean replicateFinally() { return replicateFinally; }
 
   public Collection pathMaps() {
     return peerMap.values();

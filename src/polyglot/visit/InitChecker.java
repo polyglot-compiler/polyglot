@@ -17,9 +17,7 @@ import java.util.*;
 public class InitChecker extends DataFlow
 {
     public InitChecker(Job job, TypeSystem ts, NodeFactory nf) {
-	super(job, ts, nf,
-              true /* forward analysis */,
-              true /* replicate finally */);
+	super(job, ts, nf, true /* forward analysis */);
     }
     
     /** The current CodeDecl being processed by the dataflow equations */
@@ -175,7 +173,7 @@ public class InitChecker extends DataFlow
      */
     protected FlowGraph initGraph(CodeDecl code, Term root) {
         currentCodeDecl = code;
-        return new FlowGraph(root, forward, replicateFinally);
+        return new FlowGraph(root, forward);
     }
 
     /**
