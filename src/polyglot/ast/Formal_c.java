@@ -121,7 +121,7 @@ public class Formal_c extends Term_c implements Formal
 
         TypeSystem ts = tb.typeSystem();
 
-        LocalInstance li = ts.localInstance(position(), Flags.NONE,
+        LocalInstance li = ts.localInstance(position(), flags(),
                                             ts.unknownType(position()), name());
 
         return n.localInstance(li);
@@ -129,11 +129,9 @@ public class Formal_c extends Term_c implements Formal
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (declType().isCanonical() && ! li.type().isCanonical()) {
-            TypeSystem ts = ar.typeSystem();
-            LocalInstance li = ts.localInstance(position(), flags(),
-                                                declType(), name());
+            li.setFlags(flags());
+            li.setType(declType());
             li.setNotConstant();
-            return localInstance(li);
         }
 
         return this;

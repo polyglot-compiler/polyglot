@@ -150,6 +150,10 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
         ParsedClassType ct = tb.currentClass();
 
+        if (ct == null) {
+            return this;
+        }
+
         Flags f = flags;
 
         if (ct.flags().isInterface()) {

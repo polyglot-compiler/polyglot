@@ -168,6 +168,10 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 
         ParsedClassType ct = tb.currentClass();
 
+        if (ct == null) {
+            return this;
+        }
+
         List formalTypes = new ArrayList(formals.size());
         for (int i = 0; i < formals.size(); i++) {
             formalTypes.add(ts.unknownType(position()));

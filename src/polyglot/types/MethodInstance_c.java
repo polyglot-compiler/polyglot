@@ -216,7 +216,12 @@ public class MethodInstance_c extends ProcedureInstance_c
 
         if (!(mi.name().equals(mj.name()) && mi.hasFormals(mj.formalTypes()))) {
             if (quiet) return false;
-            throw new SemanticException("Arguments are different", mi.position());
+            throw new SemanticException(mi.signature() + " in " + mi.container() +
+                                        " cannot override " + 
+                                        mj.signature() + " in " + mj.container() + 
+                                        "; incompatible " +
+                                        "parameter types",
+                                        mi.position());
         }
 
         if (! ts.equals(mi.returnType(), mj.returnType())) {

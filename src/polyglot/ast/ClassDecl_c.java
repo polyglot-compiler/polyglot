@@ -174,7 +174,8 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 	    return type(type).flags(type.flags());
         }
 	else {
-	    throw new InternalCompilerError("Missing type.", position());
+	    // throw new InternalCompilerError("Missing type.", position());
+            return this;
 	}
     }
 
