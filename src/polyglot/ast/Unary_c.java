@@ -145,20 +145,40 @@ public class Unary_c extends Expr_c implements Unary
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         TypeSystem ts = av.typeSystem();
 
-        if (child == expr) {
-            if (op == POST_INC || op == POST_DEC ||
-                op == PRE_INC || op == PRE_DEC) {
-                return ts.Double();
+        try {
+            if (child == expr) {
+                if (op == POST_INC || op == POST_DEC ||
+                    op == PRE_INC || op == PRE_DEC) {
+
+                    if (ts.isImplicitCastValid(child.type(), av.toType())) {
+                        return ts.promote(child.type());
+                    }
+                    else {
+                        return av.toType();
+                    }
+                }
+                else if (op == NEG || op == POS) {
+                    if (ts.isImplicitCastValid(child.type(), av.toType())) {
+                        return ts.promote(child.type());
+                    }
+                    else {
+                        return av.toType();
+                    }
+                }
+                else if (op == BIT_NOT) {
+                    if (ts.isImplicitCastValid(child.type(), av.toType())) {
+                        return ts.promote(child.type());
+                    }
+                    else {
+                        return av.toType();
+                    }
+                }
+                else if (op == NOT) {
+                    return ts.Boolean();
+                }
             }
-            else if (op == NEG || op == POS) {
-                return ts.Double();
-            }
-            else if (op == BIT_NOT) {
-                return ts.Long();
-            }
-            else if (op == NOT) {
-                return ts.Boolean();
-            }
+        }
+        catch (SemanticException e) {
         }
 
         return child.type();

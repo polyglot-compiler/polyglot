@@ -476,49 +476,92 @@ public class Binary_c extends Expr_c implements Binary
 
         TypeSystem ts = av.typeSystem();
 
-	if (op == EQ || op == NE) {
-            // Coercion to compatible types.
-            if (other.type().isReference() || other.type().isNull()) {
-                return ts.Object();
+        try {
+            if (op == EQ || op == NE) {
+                // Coercion to compatible types.
+                if ((child.type().isReference() || child.type().isNull()) &&
+                    (other.type().isReference() || other.type().isNull())) {
+                    return ts.leastCommonAncestor(child.type(), other.type());
+                }
+
+                if (child.type().isBoolean() && other.type().isBoolean()) {
+                    return ts.Boolean();
+                }
+
+                if (child.type().isNumeric() && other.type().isNumeric()) {
+                    return ts.promote(child.type(), other.type());
+                }
+
+                return child.type();
             }
 
-            if (other.type().isBoolean()) {
+            if (op == ADD && ts.equals(type, ts.String())) {
+                // Implicit coercion to String. 
+                return ts.String();
+            }
+
+            if (op == GT || op == LT || op == GE || op == LE) {
+                if (child.type().isNumeric() && other.type().isNumeric()) {
+                    return ts.promote(child.type(), other.type());
+                }
+
+                return child.type();
+            }
+
+            if (op == COND_OR || op == COND_AND) {
                 return ts.Boolean();
             }
 
-            if (other.type().isNumeric()) {
-                return ts.Double();
+            if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
+                if (other.type().isBoolean()) {
+                    return ts.Boolean();
+                }
+
+                if (child.type().isNumeric() && other.type().isNumeric()) {
+                    return ts.promote(child.type(), other.type());
+                }
+
+                return child.type();
             }
-        }
 
-        if (op == ADD && ts.equals(type, ts.String())) {
-            // Implicit coercion to String. 
-            return ts.String();
-        }
+            if (op == ADD || op == SUB || op == MUL || op == DIV || op == MOD) {
+                if (child.type().isNumeric() && other.type().isNumeric()) {
+                    Type t = ts.promote(child.type(), other.type());
 
-        if (op == GT || op == LT || op == GE || op == LE) {
-            if (other.type().isNumeric()) {
-                return ts.Double();
+                    if (ts.isImplicitCastValid(t, av.toType())) {
+                        return t;
+                    }
+                    else {
+                        return av.toType();
+                    }
+                }
+
+                return child.type();
             }
-        }
 
-        if (op == COND_OR || op == COND_AND) {
-            return ts.Boolean();
-        }
+            if (op == SHL || op == SHR || op == USHR) {
+                if (child.type().isNumeric() && other.type().isNumeric()) {
+                    if (child == left) {
+                        Type t = ts.promote(child.type());
 
-	if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
-            if (other.type().isBoolean()) {
-                return ts.Boolean();
+                        if (ts.isImplicitCastValid(t, av.toType())) {
+                            return t;
+                        }
+                        else {
+                            return av.toType();
+                        }
+                    }
+                    else {
+                        return ts.promote(child.type());
+                    }
+                }
+
+                return child.type();
             }
-            return ts.Long();
-        }
 
-        if (op == ADD || op == SUB || op == MUL || op == DIV || op == MOD) {
-            return ts.Double();
+            return child.type();
         }
-
-        if (op == SHL || op == SHR || op == USHR) {
-            return ts.Long();
+        catch (SemanticException e) {
         }
 
         return child.type();

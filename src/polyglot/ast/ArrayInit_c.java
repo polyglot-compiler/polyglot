@@ -80,11 +80,11 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
             return child.type();
         }
 
-        Type t = av.pop().toType();
+        Type t = av.toType();
 
         if (! t.isArray()) {
-            throw new InternalCompilerError("Type of array initializer must be " +
-                                        "an array.", position());
+            throw new InternalCompilerError("Type of array initializer must " +
+                                            "be an array.", position());
         }
 
         t = t.toArray().base();
