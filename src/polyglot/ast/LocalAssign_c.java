@@ -7,11 +7,11 @@ import polyglot.util.*;
 import java.util.*;
 
 /**
- * A <code>LocalAssign</code> represents a Java assignment expression to
- * a local variable, e.g. x = foo, where x is a local variable
+ * A <code>LocalAssign_c</code> represents a Java assignment expression
+ * to an array element.  For instance, <code>x = e</code>.
  * 
- * The class of the Expr returned by LocalAssign.left() is guaranteed
- * to be a Local (although only after disambiguation...)
+ * The class of the <code>Expr</code> returned by
+ * <code>LocalAssign_c.left()</code>is guaranteed to be an <code>Local</code>.
  */
 public class LocalAssign_c extends Assign_c implements LocalAssign
 {

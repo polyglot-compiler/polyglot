@@ -47,7 +47,7 @@ public class Precedence extends Enum {
     public static final Precedence RELATIONAL  = new Precedence("<", 6);
     /** The precedence of <code>instanceof</code> expressions. */
     public static final Precedence INSTANCEOF  = new Precedence("isa", 7);
-    /** The precedence of <code>==</code> and <code>!=</code> expressions. */
+    /** The precedence of equality operators.  That is, precedence of <code>==</code> and <code>!=</code> expressions. */
     public static final Precedence EQUAL       = new Precedence("==", 8);
     /** The precedence of bitwise AND (<code>&amp;<code>) expressions. */
     public static final Precedence BIT_AND     = new Precedence("&", 9);

@@ -2,10 +2,10 @@ package polyglot.ast;
 
 /**
  * A <code>FieldAssign</code> represents a Java assignment expression to
- * a field, e.g. this.x = foo, where x is a field
+ * a field.  For instance, <code>this.x = e</code>.
  * 
- * The class of the Expr returned by FieldAssign.left() is guaranteed
- * to be a Field
+ * The class of the <code>Expr</code> returned by
+ * <code>FieldAssign.left()</code>is guaranteed to be a <code>Field</code>.
  */
 public interface FieldAssign extends Assign
 {

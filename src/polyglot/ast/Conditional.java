@@ -2,10 +2,9 @@ package polyglot.ast;
 
 /**
  * A <code>Conditional</code> is a representation of a Java ternary
- * expression <code>(cond ? consequent : alternative)</code>.
+ * expression.  That is, <code>(cond ? consequent : alternative)</code>.
  */
-public interface Conditional extends Expr 
-{
+public interface Conditional extends Expr {
     /** Get the condition to test. */
     Expr cond();
     /** Set the condition to test. */

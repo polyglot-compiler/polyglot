@@ -5,7 +5,7 @@ import polyglot.util.*;
 import java.util.*;
 
 /**
- * A <code>ProcedureInstance</code> contains the type information for a Java
+ * A <code>ProcedureInstance_c</code> contains the type information for a Java
  * procedure (either a method or a constructor).
  */
 public abstract class ProcedureInstance_c extends TypeObject_c
@@ -13,7 +13,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 {
     protected ReferenceType container;
     protected Flags flags;
-    protected List argTypes;
+    protected List formalTypes;
     protected List excTypes;
 
     /** Used for deserializing types. */
@@ -21,11 +21,11 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 
     public ProcedureInstance_c(TypeSystem ts, Position pos,
 			       ReferenceType container,
-			       Flags flags, List argTypes, List excTypes) {
+			       Flags flags, List formalTypes, List excTypes) {
         super(ts, pos);
 	this.container = container;
 	this.flags = flags;
-	this.argTypes = TypedList.copyAndCheck(argTypes, Type.class, true);
+	this.formalTypes = TypedList.copyAndCheck(formalTypes, Type.class, true);
 	this.excTypes = TypedList.copyAndCheck(excTypes, Type.class, true);
     }
 
@@ -38,7 +38,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
     }
 
     public List formalTypes() {
-        return Collections.unmodifiableList(argTypes);
+        return Collections.unmodifiableList(formalTypes);
     }
 
     public List throwTypes() {
@@ -110,13 +110,15 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         return p2.callValid(p1.formalTypes());
     }
 
-    public final boolean hasFormals(List argTypes) {
-        return ts.hasFormals(this, argTypes);
+    /** Returns true if the procedure has the given formal parameter types. */
+    public final boolean hasFormals(List formalTypes) {
+        return ts.hasFormals(this, formalTypes);
     }
 
-    public boolean hasFormalsImpl(List argTypes) {
+    /** Returns true if the procedure has the given formal parameter types. */
+    public boolean hasFormalsImpl(List formalTypes) {
         List l1 = this.formalTypes();
-        List l2 = argTypes;
+        List l2 = formalTypes;
 
         Iterator i1 = l1.iterator();
         Iterator i2 = l2.iterator();
@@ -133,12 +135,14 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         return ! (i1.hasNext() || i2.hasNext());
     }
 
-    /** Returns true iff <this> throws fewer exceptions than <p>. */
+    /** Returns true iff <code>this</code> throws fewer exceptions than
+     * <code>p</code>. */
     public final boolean throwsSubset(ProcedureInstance p) {
         return ts.throwsSubset(this, p);
     }
 
-    /** Returns true iff <this> throws fewer exceptions than <p>. */
+    /** Returns true iff <code>this</code> throws fewer exceptions than
+     * <code>p</code>. */
     public boolean throwsSubsetImpl(ProcedureInstance p) {
         SubtypeSet s1 = new SubtypeSet(ts);
         SubtypeSet s2 = new SubtypeSet(ts);
@@ -156,10 +160,12 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         return true;
     }
 
+    /** Returns true if a call can be made with the given argument types. */
     public final boolean callValid(List argTypes) {
         return ts.callValid(this, argTypes);
     }
 
+    /** Returns true if a call can be made with the given argument types. */
     public boolean callValidImpl(List argTypes) {
         List l1 = this.formalTypes();
         List l2 = argTypes;

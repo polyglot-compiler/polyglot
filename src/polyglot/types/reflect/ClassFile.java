@@ -12,10 +12,10 @@ import java.util.*;
  * Specification.  Methods are provided to edit the classfile at a very
  * low level.
  *
- * @see Attribute
- * @see Constant
- * @see Field
- * @see Method
+ * @see polyglot.types.reflect Attribute
+ * @see polyglot.types.reflect Constant
+ * @see polyglot.types.reflect Field
+ * @see polyglot.types.reflect Method
  *
  * @author Nate Nystrom
  *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)

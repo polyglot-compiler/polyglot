@@ -21,8 +21,8 @@ public class MethodInstance_c extends ProcedureInstance_c
     public MethodInstance_c(TypeSystem ts, Position pos,
 	 		    ReferenceType container,
 	                    Flags flags, Type returnType, String name,
-			    List argTypes, List excTypes) {
-        super(ts, pos, container, flags, argTypes, excTypes);
+			    List formalTypes, List excTypes) {
+        super(ts, pos, container, flags, formalTypes, excTypes);
 	this.returnType = returnType;
 	this.name = name;
     }
@@ -55,7 +55,7 @@ public class MethodInstance_c extends ProcedureInstance_c
 
     public MethodInstance formalTypes(List l) {
         MethodInstance_c n = (MethodInstance_c) copy();
-	n.argTypes = new ArrayList(l);
+	n.formalTypes = new ArrayList(l);
 	return n;
     }
 
@@ -111,7 +111,7 @@ public class MethodInstance_c extends ProcedureInstance_c
     public String signature() {
         String s = name + "(";
 
-        for (Iterator i = argTypes.iterator(); i.hasNext(); ) {
+        for (Iterator i = formalTypes.iterator(); i.hasNext(); ) {
             Type t = (Type) i.next();
             s += t.toString();
 
@@ -142,7 +142,7 @@ public class MethodInstance_c extends ProcedureInstance_c
     public boolean isCanonical() {
 	return container.isCanonical()
 	    && returnType.isCanonical()
-	    && listIsCanonical(argTypes)
+	    && listIsCanonical(formalTypes)
 	    && listIsCanonical(excTypes);
     }
 
@@ -163,9 +163,9 @@ public class MethodInstance_c extends ProcedureInstance_c
         ReferenceType rt = container();
 
         while (rt != null) {
-            // add any method with the same name and argTypes from 
+            // add any method with the same name and formalTypes from 
             // rt
-            l.addAll(rt.methods(name, argTypes));
+            l.addAll(rt.methods(name, formalTypes));
 
             ReferenceType sup = null;
             if (rt.superType() != null && rt.superType().isReference()) {
@@ -290,7 +290,7 @@ public class MethodInstance_c extends ProcedureInstance_c
 	}
 
         List l = new LinkedList();
-        l.addAll(rt.methods(name, argTypes));
+        l.addAll(rt.methods(name, formalTypes));
 
 	Type superType = rt.superType();
 	if (superType != null) {

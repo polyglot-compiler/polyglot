@@ -12,8 +12,8 @@ import java.io.*;
  * Methods have a number of attributes such as their Code and any
  * Exceptions they may throw.
  *
- * @see Code
- * @see Exceptions
+ * @see polyglot.types.reflect Code
+ * @see polyglot.types.reflect Exceptions
  *
  * @author Nate Nystrom
  *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)

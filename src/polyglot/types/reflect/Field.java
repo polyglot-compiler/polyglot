@@ -11,7 +11,7 @@ import java.io.*;
  * and any attributes of the field.  Static fields have a ConstantValue
  * attribute.
  *
- * @see ConstantValue
+ * @see polyglot.types.reflect ConstantValue
  *
  * @author Nate Nystrom
  *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)

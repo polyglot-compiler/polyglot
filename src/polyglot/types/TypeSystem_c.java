@@ -1503,8 +1503,8 @@ public class TypeSystem_c implements TypeSystem
     }
     
     /**
-     * Assert that <code>ct</code> implements all abstract methods that it 
-     * has to, i.e. if it is a concrete class, then it must implement all
+     * Assert that <code>ct</code> implements all abstract methods required;
+     * that is, if it is a concrete class, then it must implement all
      * interfaces and abstract methods that it or it's superclasses declare.
      */
     public void checkClassConformance(ClassType ct) throws SemanticException {

@@ -9,8 +9,8 @@ import java.io.*;
  * index into the constant pool) and its length.  Attribute is extended
  * to represent a constant value, code, exceptions, etc.
  *
- * @see ConstantValue
- * @see Exceptions
+ * @see polyglot.types.reflect ConstantValue
+ * @see polyglot.types.reflect Exceptions
  *
  * @author Nate Nystrom
  *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)

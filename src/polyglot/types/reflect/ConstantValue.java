@@ -8,7 +8,7 @@ import java.io.*;
  * that represents constant value.  A class's static fields have 
  * constant value attributes.
  *
- * @see Field
+ * @see polyglot.types.reflect Field
  *
  * @author Nate Nystrom
  *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)

@@ -4,7 +4,7 @@ import polyglot.types.Type;
 import polyglot.types.SemanticException;
 
 /**
- * A <code>Catch</code> represents one half of a <code>try... catch</code>
+ * A <code>Catch</code> represents one half of a <code>try-catch</code>
  * statement.  Specifically, the second half.
  */
 public interface Catch extends CompoundStmt

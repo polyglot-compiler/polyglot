@@ -5,9 +5,8 @@ import polyglot.util.Enum;
 import java.util.List;
 
 /**
- * A <code>ConstructorCall</code> is an immutable representation of
- * a direct call to a constructor of a class in the form of
- * <code>super(...)</code> or <code>this(...)</code>.
+ * A <code>ConstructorCall</code> represents a direct call to a constructor.
+ * For instance, <code>super(...)</code> or <code>this(...)</code>.
  */
 public interface ConstructorCall extends Stmt, ProcedureCall
 {

@@ -16,8 +16,8 @@ public class ConstructorInstance_c extends ProcedureInstance_c
 
     public ConstructorInstance_c(TypeSystem ts, Position pos,
 	                         ClassType container,
-				 Flags flags, List argTypes, List excTypes) {
-        super(ts, pos, container, flags, argTypes, excTypes);
+				 Flags flags, List formalTypes, List excTypes) {
+        super(ts, pos, container, flags, formalTypes, excTypes);
     }
 
     public ConstructorInstance flags(Flags flags) {
@@ -28,7 +28,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c
 
     public ConstructorInstance formalTypes(List l) {
         ConstructorInstance_c n = (ConstructorInstance_c) copy();
-	n.argTypes = new ArrayList(l);
+	n.formalTypes = new ArrayList(l);
 	return n;
     }
 
@@ -51,7 +51,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c
     public String signature() {
         String s = container + "(";
 
-        for (Iterator i = argTypes.iterator(); i.hasNext(); ) {
+        for (Iterator i = formalTypes.iterator(); i.hasNext(); ) {
             Type t = (Type) i.next();
             s += t.toString();
 
@@ -76,7 +76,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c
 
     public boolean isCanonical() {
 	return container.isCanonical()
-	    && listIsCanonical(argTypes)
+	    && listIsCanonical(formalTypes)
 	    && listIsCanonical(excTypes);
     }
 }

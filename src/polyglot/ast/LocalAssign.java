@@ -1,11 +1,11 @@
 package polyglot.ast;
 
 /**
- * A <code>LocalAssign</code> represents a Java assignment expression to
- * a local variable, e.g. x = foo, where x is a local variable
+ * A <code>LocalAssign</code> represents a Java assignment expression
+ * to an array element.  For instance, <code>x = e</code>.
  * 
- * The class of the Expr returned by LocalAssign.left() is guaranteed
- * to be a Local
+ * The class of the <code>Expr</code> returned by
+ * <code>LocalAssign.left()</code>is guaranteed to be an <code>Local</code>.
  */
 public interface LocalAssign extends Assign
 {

@@ -20,7 +20,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     boolean forward;
 
     /**
-     * Constructor
+     * Constructor.
      */
     public DataFlow(Job job, TypeSystem ts, NodeFactory nf, boolean forward) {
 	super(job, ts, nf);
@@ -28,14 +28,16 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
 
     /**
-     * An Item contains the data which flows during the dataflow analysis. Each
-     * node in the flow graph will have two Items associated with it: the input
-     * Item, and the output Item, which results from calling flow with the
-     * input Item. The input item may itself be the result of a call to the 
+     * An <code>Item</code> contains the data which flows during the dataflow
+     * analysis. Each
+     * node in the flow graph will have two items associated with it: the input
+     * item, and the output item, which results from calling flow with the
+     * input item. The input item may itself be the result of a call to the 
      * confluence method, if many paths flow into the same node.
      * 
-     * NOTE: the equals(Item) method and hashCode method must be implemented
-     * to ensure that the dataflow algorithm works correctly.
+     * NOTE: the <code>equals(Item)</code> method and <code>hashCode()</code>
+     * method must be implemented to ensure that the dataflow algorithm works
+     * correctly.
      */
     public static abstract class Item {
         public abstract boolean equals(Object i);
@@ -51,8 +53,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     protected abstract Item createInitialItem(FlowGraph graph);
     
     /**
-     * Produce a new Item as appropriate for the Term n and the 
-     * input Item in. 
+     * Produce a new <code>Item</code> as appropriate for the
+     * <code>Term n</code> and the input <code>Item in</code>. 
      * 
      * @param in the Item flowing into the node. Note that if the Term n 
      *           has many flows going into it, the Item in may be the result 
@@ -82,16 +84,17 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * in a code declaration block after the dataflow for that block of code 
      * has been performed.
      * 
-     * @throws SemanticException if the properties this dataflow analysis
-     *         is checking for is not satisfied.
+     * @throws <code>SemanticException</code> if the properties this dataflow
+     *         analysis is checking for is not satisfied.
      */
     protected abstract void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException;
 
     /**
-     * Construct a flow graph for the CodeDecl provided, and call 
-     * dataflow(FlowGraph). Is also responsible for calling 
-     * post(FlowGraph, Block) after dataflow(FlowGraph) has been called. 
-     * Returns the (possibly new) AST. 
+     * Construct a flow graph for the <code>CodeDecl</code> provided, and call 
+     * <code>dataflow(FlowGraph)</code>. Is also responsible for calling 
+     * <code>post(FlowGraph, Block)</code> after
+     * <code>dataflow(FlowGraph)</code> has been called. 
+     * @return the (possibly new) AST. 
      */
     protected CodeDecl dataflow(CodeDecl cd) throws SemanticException {
         // only bother to do the flow analysis if the body is not null...
@@ -198,10 +201,12 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
 
     /**
-     * Initialise the FlowGraph to be used in the dataflow analysis.
+     * Initialise the <code>FlowGraph</code> to be used in the dataflow
+     * analysis.
+     *
      * @return null if no dataflow analysis should be performed for this
      *         code declaration; otherwise, an apropriately initialized
-     *         FlowGraph.
+     *         <code>FlowGraph.</code>
      */
     protected FlowGraph initGraph(CodeDecl code, Term root) {
         return new FlowGraph(root, forward);
@@ -259,16 +264,19 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     
     /**
      * This utility methods is for subclasses to convert a single Item into
-     * a Map, to return from the flow(Item, FlowGraph, Term, Set) method. This
-     * method should be used when the same output Item from the flow is to be
-     * used for all edges leaving the node.
+     * a <code>Map</code>, to return from the
+     * <code>flow(Item, FlowGraph, Term, Set)</code> method. This
+     * method should be used when the same output <code>Item</code> from the
+     * flow is to be used for all edges leaving the node.
      * 
-     * @param i the Item to be placed in the returned Map as the value for
-     *          every EdgeKey in edgeKeys.
-     * @param edgeKeys the Set of EdgeKeys to be used as keys in the returned 
-     *          Map.
-     * @return a Map containing a mapping from every EdgeKey in edgeKeys to
-     *          the Item i.
+     * @param i the <code>Item</code> to be placed in the returned
+     *          <code>Map</code> as the value for every <code>EdgeKey</code> in
+     *          <code>edgeKeys.</code>
+     * @param edgeKeys the <code>Set</code> of <code>EdgeKey</code>s to be used
+     *           as keys in the returned <code>Map</code>.
+     * @return a <code>Map</code> containing a mapping from every
+     *           <code>EdgeKey</code> in <code>edgeKeys</code> to the
+     *           <code>Item i</code>.
      */
     protected static final Map itemToMap(Item i, Set edgeKeys) {
         Map m = new HashMap();
@@ -281,14 +289,16 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     
     /**
      * This utility method is for subclasses to determine if the node currently
-     * under consideration has both true and false edges leaving it, i.e. that
-     * the flow graph at this node has successor edges with the EdgeKeys 
-     * FlowGraph.EDGE_KEY_TRUE and FlowGraph.EDGE_KEY_FALSE.
+     * under consideration has both true and false edges leaving it.  That is,
+     * the flow graph at this node has successor edges with the
+     * <code>EdgeKey</code>s <code>FlowGraph.EDGE_KEY_TRUE</code> and
+     * <code>FlowGraph.EDGE_KEY_FALSE</code>.
      * 
-     * @param edgeKeys the Set of EdgeKeys of the successor edges of a given 
-     *            node.
-     * @return true if the edgeKeys contains both FlowGraph.EDGE_KEY_TRUE and 
-     *            FlowGraph.EDGE_KEY_FALSE
+     * @param edgeKeys the <code>Set</code> of <code>EdgeKey</code>s of the
+     * successor edges of a given node.
+     * @return true if the <code>edgeKeys</code> contains both
+     * <code>FlowGraph.EDGE_KEY_TRUE</code> and
+     * <code>FlowGraph.EDGE_KEY_FALSE</code>
      */
     protected static final boolean hasTrueFalseBranches(Set edgeKeys) {
         return edgeKeys.contains(FlowGraph.EDGE_KEY_FALSE) &&
@@ -296,23 +306,30 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
         
     /**
-     * This utility method is meant to be used by subclasses to help them 
-     * produce appropriate <code>Item</code>s for the FlowGraph.EDGE_KEY_TRUE
-     * and FlowGraph.EDGE_KEY_FALSE edges from a boolean condition.
+     * This utility method is meant to be used by subclasses to help them
+     * produce appropriate <code>Item</code>s for the
+     * <code>FlowGraph.EDGE_KEY_TRUE</code> and
+     * <code>FlowGraph.EDGE_KEY_FALSE</code> edges from a boolean condition.
      * 
      * @param booleanCond the boolean condition that is used to branch on. The
      *              type of the expression must be boolean.
      * @param startingItem the <code>Item</code> at the start of the flow for
      *              the expression <code>booleanCond</code>. 
-     * @param succEdgeKeys the set of EdgeKeys of the successor nodes of the 
-     *              current node. Must contain both FlowGraph.EDGE_KEY_TRUE
-     *              and FlowGraph.EDGE_KEY_FALSE
-     * @param navigator an instance of ConditionNavigator to be used to generate
-     *              appropriate Items from the boolean condition.
-     * @return a Map containing mappings for all entries in succEdgeKeys.
-     *              FlowGraph.EDGE_KEY_TRUE and FlowGraph.EDGE_KEY_FALSE 
-     *              map to Items calculated for them using navigator, and all
-     *              other objects in succEdgeKeys are mapped to startingItem.
+     * @param succEdgeKeys the set of <code>EdgeKeys</code> of the successor
+     *              nodes of the current node. Must contain both
+     *              <code>FlowGraph.EDGE_KEY_TRUE</code>
+     *              and <code>FlowGraph.EDGE_KEY_FALSE</code>.
+     * @param navigator an instance of <code>ConditionNavigator</code> to be
+     *              used to generate appropriate <code>Item</code>s from the
+     *              boolean condition.
+     * @return a <code>Map</code> containing mappings for all entries in
+     *              <code>succEdgeKeys</code>.
+     *              <code>FlowGraph.EDGE_KEY_TRUE</code> and
+     *              <code>FlowGraph.EDGE_KEY_FALSE</code> 
+     *              map to <code>Item</code>s calculated for them using
+     *              navigator, and all other objects in
+     *              <code>succEdgeKeys</code> are mapped to
+     *              <code>startingItem</code>.
      */
     protected static Map constructItemsFromCondition(Expr booleanCond, 
                                                      Item startingItem,
@@ -366,12 +383,14 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
 
     /**
-     * A ConditionNavigator is used to traverse boolean expressions that are
+     * A <code>ConditionNavigator</code> is used to traverse boolean
+     * expressions that are
      * used as conditions, such as in if statements, while statements, 
-     * left branches of && and ||. The ConditionNavigator is used to generate
+     * left branches of && and ||. The <code>ConditionNavigator</code> is used
+     * to generate
      * a finer-grained analysis, so that the branching flows from a 
      * condition can take into account the fact that the condition is true or
-     * false. For example, in the statement <code>if cond then s1 else s2</code>,
+     * false. For example, in the statement <code>if (cond) s1 else s2</code>,
      * dataflow for <code>s1</code> can continue in the knowledge that 
      * <code>cond</code> evaluated to true, and similarly, <code>s2</code>
      * can be analyzed using the knowledge that <code>cond</code> evaluated to
@@ -437,7 +456,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         
         /**
          * Combine the results of analyzing the left and right arms of
-         * an AND boolean operator (either && or &).
+         * an AND boolean operator (either &amp;&amp; or &amp;).
          */
         public BoolItem andResults(BoolItem left, 
                                    BoolItem right, 
@@ -483,7 +502,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     
     private static int flowCounter = 0;
     /**
-     * Dump a flow graph, labelling edges with their flows, to aid in the
+     * Dump a flow graph, labeling edges with their flows, to aid in the
      * debugging of data flow.
      */
     private void dumpFlowGraph(FlowGraph graph, CodeDecl root) {

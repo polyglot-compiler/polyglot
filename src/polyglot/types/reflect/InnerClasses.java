@@ -8,7 +8,7 @@ import java.io.*;
  * The Exceptions attribute stores a list of indices into the constant
  * pool of the typs of exceptions thrown by the method.
  *
- * @see Method
+ * @see polyglot.types.reflect Method
  *
  * @author Nate Nystrom
  *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)

@@ -103,9 +103,9 @@ public class Subst_c implements Subst
     }
 
     /**
-     * When adding a new substitution A->B to the map, we need to check if 
-     * there are already any existing substitutions, say C->A, and if so,
-     * replace them appropriately, i.e. with C->B.
+     * When adding a new substitution A-&gt;B to the map, we need to check if 
+     * there are already any existing substitutions, say C-&gt;A, and if so,
+     * replace them appropriately, in this case with C-&gt;B.
      * 
      * This method allows subclasses to check if a value (B in the 
      * example above) is present as a key. Subclasses may need to override this

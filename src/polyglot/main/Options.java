@@ -150,7 +150,7 @@ public class Options {
     
     /**
      * Parse a command
-     * @returns the next index to process. i.e., if calling this method
+     * @return the next index to process. i.e., if calling this method
      *         processes two commands, then the return value should be index+2
      */
     protected int parseCommand(String args[], int index, Set source) throws UsageError {

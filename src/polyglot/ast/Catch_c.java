@@ -8,7 +8,7 @@ import polyglot.visit.*;
 import java.util.*;
 
 /**
- * A <code>Catch</code> represents one half of a <code>try... catch</code>
+ * A <code>Catch</code> represents one half of a <code>try-catch</code>
  * statement.  Specifically, the second half.
  */
 public class Catch_c extends Stmt_c implements Catch

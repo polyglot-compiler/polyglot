@@ -169,7 +169,8 @@ public interface TypeSystem {
     Type leastCommonAncestor(Type type1, Type type2) throws SemanticException;
 
     /**
-     * Returns true iff <type> is a canonical (fully qualified) type.
+     * Returns true iff <code>type</code> is a canonical
+     * (fully qualified) type.
      */
     boolean isCanonical(Type type);
 
@@ -197,7 +198,7 @@ public interface TypeSystem {
     boolean canCoerceToString(Type t, Context c);
     
     /**
-     * Returns true iff an object of type <type> may be thrown.
+     * Returns true iff an object of type <code>type</code> may be thrown.
      */
     boolean isThrowable(Type type);
 
@@ -299,27 +300,29 @@ public interface TypeSystem {
     ////
 
     /**
-     * Returns true iff <m1> throws fewer exceptions than <m2>.
+     * Returns true iff <code>m1</code> throws fewer exceptions than
+     * <code>m2</code>.
      */
     boolean throwsSubset(ProcedureInstance m1, ProcedureInstance m2);
 
     /**
-     * Returns true iff <t> has the method <mi>.
+     * Returns true iff <code>t</code> has the method <code>mi</code>.
      */
     boolean hasMethod(ReferenceType t, MethodInstance mi);
 
     /**
-     * Returns true iff <m1> is the same method as <m2>.
+     * Returns true iff <code>m1</code> is the same method as <code>m2</code>.
      */
     boolean isSameMethod(MethodInstance m1, MethodInstance m2);
 
     /**
-     * Returns true iff <m1> is more specific than <m2>.
+     * Returns true iff <code>m1</code> is more specific than <code>m2</code>.
      */
     boolean moreSpecific(ProcedureInstance m1, ProcedureInstance m2);
 
     /**
-     * Returns true iff <p> has exactly the formal arguments <formalTypes>.
+     * Returns true iff <code>p</code> has exactly the formal arguments
+     * <code>formalTypes</code>.
      */
     boolean hasFormals(ProcedureInstance p, List formalTypes);
 

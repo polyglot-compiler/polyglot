@@ -7,11 +7,11 @@ import polyglot.util.*;
 import java.util.*;
 
 /**
- * A <code>FieldAssign</code> represents a Java assignment expression to
- * a field, e.g. this.x = foo, where x is a field
+ * A <code>FieldAssign_c</code> represents a Java assignment expression to
+ * a field.  For instance, <code>this.x = e</code>.
  * 
- * The class of the Expr returned by FieldAssign.left() is guaranteed
- * to be a Field
+ * The class of the <code>Expr</code> returned by
+ * <code>FieldAssign_c.left()</code>is guaranteed to be a <code>Field</code>.
  */
 public class FieldAssign_c extends Assign_c implements FieldAssign
 {

@@ -8,7 +8,7 @@ import java.util.*;
 
 /**
  * A <code>Conditional</code> is a representation of a Java ternary
- * expression <code>(cond ? consequent : alternative)</code>.
+ * expression.  That is, <code>(cond ? consequent : alternative)</code>.
  */
 public class Conditional_c extends Expr_c implements Conditional
 {

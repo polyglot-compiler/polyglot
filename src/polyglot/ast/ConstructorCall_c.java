@@ -7,9 +7,8 @@ import polyglot.visit.*;
 import java.util.*;
 
 /**
- * A <code>ConstructorCall</code> is an immutable representation of
- * a direct call to a constructor of a class in the form of
- * <code>super(...)</code> or <code>this(...)</code>.
+ * A <code>ConstructorCall_c</code> represents a direct call to a constructor.
+ * For instance, <code>super(...)</code> or <code>this(...)</code>.
  */
 public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 {
