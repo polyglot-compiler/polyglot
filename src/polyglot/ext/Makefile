@@ -1,6 +1,6 @@
 SOURCE = ../..
 PACKAGE = jltools/ext
-SUBDIRS = jif op polyj split
+SUBDIRS = jif op split
 
 include $(SOURCE)/Rules.mk
 
