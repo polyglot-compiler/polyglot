@@ -113,9 +113,11 @@ public class TypeBuilder extends HaltingVisitor
 		position = n.position();
 	    }
 
-	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-		                 e.getMessage(), position);
-                         
+            if (e.getMessage() != null) {
+                errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
+                                    e.getMessage(), position);
+            }
+                            
             return this;
 	}
     }
@@ -131,8 +133,10 @@ public class TypeBuilder extends HaltingVisitor
 		position = n.position();
 	    }
 
-	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-		                 e.getMessage(), position);
+            if (e.getMessage() != null) {
+                errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
+                                    e.getMessage(), position);
+            }
 
 	    return n;
 	}
