@@ -7,25 +7,37 @@ import polyglot.util.*;
 import polyglot.types.Package;
 
 /**
- * A PackageContextResolver is responsible for looking up types and packages
- * in a packge by name.
- **/
+ * A <code>PackageContextResolver</code> is responsible for looking up types
+ * and packages in a packge by name.
+ */
 public class PackageContextResolver implements Resolver
 {
     Package p;
     TypeSystem ts;
     Resolver cr;
 
+    /**
+     * Create a package context resolver.
+     * @param ts The type system.
+     * @param p The package in whose context to search.
+     * @param cr The resolver to use for looking up types.
+     */
     public PackageContextResolver(TypeSystem ts, Package p, Resolver cr) {
 	this.ts = ts;
 	this.p = p;
 	this.cr = cr;
     }
 
+    /**
+     * The package in whose context to search.
+     */
     public Package package_() {
         return p;
     }
 
+    /**
+     * Find a type by name.
+     */
     public Type findType(String name) throws SemanticException {
         Qualifier q = findQualifier(name);
 
@@ -37,6 +49,9 @@ public class PackageContextResolver implements Resolver
 				   " in package " + p + ".");
     }
 
+    /**
+     * Find a qualifier by name.
+     */
     public Qualifier findQualifier(String name) throws SemanticException {
 	if (! StringUtil.isNameShort(name)) {
 	    throw new InternalCompilerError(

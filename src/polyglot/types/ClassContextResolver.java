@@ -13,6 +13,11 @@ public class ClassContextResolver extends ClassResolver {
     TypeSystem ts;
     ClassType type;
 
+    /**
+     * Construct a resolver.
+     * @param ts The type system.
+     * @param type The type in whose context we search for member types.
+     */
     public ClassContextResolver(TypeSystem ts, ClassType type) {
 	this.ts = ts;
 	this.type = type;
@@ -22,6 +27,10 @@ public class ClassContextResolver extends ClassResolver {
         return "(class-context " + type + ")";
     }
 
+    /**
+     * Find a type in the context of the class.
+     * @param name The name to search for.
+     */
     public Type findType(String name) throws SemanticException {
         Types.report(1, "Looking for " + name + " in " + this);
 
@@ -41,6 +50,9 @@ public class ClassContextResolver extends ClassResolver {
             " in scope of " + type + ".");
     }
 
+    /**
+     * The class in whose context we look.
+     */
     public ClassType classType() {
 	return type;
     }

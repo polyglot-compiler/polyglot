@@ -26,7 +26,13 @@ public interface PrimitiveType extends NamedType
     public static final Kind FLOAT   = new Kind("float");
     public static final Kind DOUBLE  = new Kind("double");
 
+    /**
+     * The kind of primitive.
+     */
     Kind kind();
 
+    /**
+     * A string representing the type used to box this primitive.
+     */
     String wrapperTypeString(TypeSystem ts);
 }

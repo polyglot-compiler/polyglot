@@ -8,8 +8,23 @@ import java.util.List;
  */
 public interface ConstructorInstance extends ProcedureInstance
 {
+    /**
+     * Set the flags of the constructor.
+     */
     ConstructorInstance flags(Flags flags);
+
+    /**
+     * Set the types of the formal parameters of the constructor.
+     */
     ConstructorInstance argumentTypes(List l);
+
+    /**
+     * Set the types of the exceptions thrown by the constructor.
+     */
     ConstructorInstance exceptionTypes(List l);
+
+    /**
+     * Set the containing class of the constructor.
+     */
     ConstructorInstance container(ClassType container);
 }

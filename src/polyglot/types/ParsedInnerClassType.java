@@ -8,5 +8,8 @@ import polyglot.util.Position;
  */
 public interface ParsedInnerClassType extends ParsedClassType, InnerClassType
 {
+    /**
+     * Set the class's outer class.
+     */
     void outer(ClassType t);
 }

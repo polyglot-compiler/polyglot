@@ -9,6 +9,14 @@ import polyglot.ast.*;
  * packages by name.
  */
 public interface Resolver {
+
+    /**
+     * Find a qualifier by name.
+     */
     public Qualifier findQualifier(String name) throws SemanticException;
+
+    /**
+     * Find a type by name.
+     */
     public Type findType(String name) throws SemanticException;
 }

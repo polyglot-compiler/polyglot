@@ -27,8 +27,7 @@ import java.util.*;
  * <li>If none of these files contain the desired class, then the source
  * path is searched  next. For example, if the source extension is
  * ".jl" and the source path is "mydir:." then the translator looks
- * for files "mydir/foo/bar/Quux.jl" and "./foo/bar/Quux.jl". (The
- * source path may be set using the -S options, see above.)
+ * for files "mydir/foo/bar/Quux.jl" and "./foo/bar/Quux.jl".
  *
  * <li> Regardless of whether or not a source file is found, the translator
  * searches the classpath (defined as normal through the environment
@@ -85,6 +84,13 @@ public class SourceClassResolver extends LoadedClassResolver
   Compiler compiler;
   ExtensionInfo ext;
 
+  /**
+   * Create a loaded class resolver.
+   * @param ts The type system
+   * @param ext The extension to load sources for.
+   * @param classpath The class path
+   * @param loader The class file loader to use.
+   */
   public SourceClassResolver(Compiler compiler, ExtensionInfo ext,
                              String classpath, ClassFileLoader loader)
   {
@@ -93,6 +99,9 @@ public class SourceClassResolver extends LoadedClassResolver
     this.ext = ext;
   }
 
+  /**
+   * Find a type by name.
+   */
   public Type findType(String name) throws SemanticException {
     Types.report(3, "SourceCR.findType(" + name + ")");
 
@@ -174,6 +183,9 @@ public class SourceClassResolver extends LoadedClassResolver
     throw new NoClassException("Class " + name + " not found.");
   }
 
+  /**
+   * Get a type from a source file.
+   */
   protected Type getTypeFromSource(FileSource source, String name)
     throws SemanticException
   {

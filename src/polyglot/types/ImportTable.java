@@ -33,10 +33,23 @@ public class ImportTable extends ClassResolver
     /** Our package */
     protected Package pkg;
 
+    /**
+     * Create an import table.
+     * @param ts The type system
+     * @param base The outermost resolver to use for looking up types.
+     * @param pkg The package of the source we are importing types into.
+     */
     public ImportTable(TypeSystem ts, Resolver base, Package pkg) {
         this(ts, base, pkg, null);
     }
 
+    /**
+     * Create an import table.
+     * @param ts The type system
+     * @param base The outermost resolver to use for looking up types.
+     * @param pkg The package of the source we are importing types into.
+     * @param src The name of the source file we are importing into.
+     */
     public ImportTable(TypeSystem ts, Resolver base, Package pkg, String src) {
         this.resolver = base;
         this.ts = ts;
@@ -50,32 +63,53 @@ public class ImportTable extends ClassResolver
 	this.classImports = new ArrayList();
     }
 
+    /**
+     * The package of the source we are importing types into.
+     */
     public Package package_() {
         return pkg;
     }
 
+    /**
+     * Add a class import.
+     */
     public void addClassImport(String className) {
 	Types.report(1, this + ": lazy import " + className);
 	lazyImports.add(className);
         classImports.add(className);
     }
 
+    /**
+     * Add a package import.
+     */
     public void addPackageImport(String pkgName) {
 	packageImports.add(pkgName);
     }
 
+    /**
+     * List the packages we import from.
+     */
     public List packageImports() {
         return packageImports;
     }
 
+    /**
+     * List the classes explicitly imported.
+     */
     public List classImports() {
         return classImports;
     }
 
+    /**
+     * The name of the source file we are importing into.
+     */
     public String sourceName() {
         return sourceName;
     }
 
+    /**
+     * Find a type by name.
+     */
     public Type findType(String name) throws SemanticException {
 	// FIXME: need to keep on looking to find conflicts.
 	Types.report(1, this + ".findType(" + name + ")");
@@ -149,6 +183,9 @@ public class ImportTable extends ClassResolver
 	return resolver.findType(name);
     }
 
+    /**
+     * Load the class imports, lazily.
+     */
     protected void lazyImport() throws SemanticException {
 	if (lazyImports.isEmpty()) {
             return;

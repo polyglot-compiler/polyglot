@@ -5,5 +5,8 @@ package polyglot.types;
  */
 public interface ParsedAnonClassType extends ParsedInnerClassType, AnonClassType
 {
+    /**
+     * A unique identifier for this type.
+     */
     int uid();
 }

@@ -23,7 +23,17 @@ public interface TypeSystem {
      * with fully qualified names from the class path and the source path.
      */
     Resolver systemResolver();
+
+    /**
+     * Return the type system's table resolver.
+     * This resolver contains types parsed from source files.
+     */
     TableResolver parsedResolver();
+
+    /**
+     * Return the type system's loaded resolver.
+     * This resolver contains types loaded from class files.
+     */
     LoadedClassResolver loadedResolver();
 
     /** Create an import table for the source file. */
@@ -43,31 +53,33 @@ public interface TypeSystem {
 
     /** Create an initailizer instance. */
     InitializerInstance initializerInstance(Position pos, ClassType container,
-					    Flags flags);
+                                            Flags flags);
 
     /** Create a constructor instance. */
     ConstructorInstance constructorInstance(Position pos, ClassType container,
-					    Flags flags, List argTypes,
-					    List excTypes);
+                                            Flags flags, List argTypes,
+                                            List excTypes);
 
     /** Create a method instance. */
     MethodInstance methodInstance(Position pos, ReferenceType container,
-				  Flags flags, Type returnType, String name,
-				  List argTypes, List excTypes);
+                                  Flags flags, Type returnType, String name,
+                                  List argTypes, List excTypes);
 
     /** Create a field instance. */
     FieldInstance fieldInstance(Position pos, ReferenceType container,
-				Flags flags, Type type, String name);
+                                Flags flags, Type type, String name);
 
     /** Create a local variable instance. */
     LocalInstance localInstance(Position pos, Flags flags, Type type,
-	                        String name);
+                                String name);
 
     /** Create a default constructor instance. */
     ConstructorInstance defaultConstructor(Position pos, ClassType container);
 
     /** Get a place-holder for serializing a type object. */
     TypeObject placeHolder(TypeObject o, java.util.Set roots);
+
+    /** Get a place-holder for serializing a type object. */
     TypeObject placeHolder(TypeObject o);
 
     /** Get an unknown type. */
@@ -84,8 +96,7 @@ public interface TypeSystem {
     boolean isSubtype(Type child, Type ancestor);
 
     /**
-     * Returns true iff child is not ancestor, but child descends from ancestor.
-     */
+     * Returns true iff child is not ancestor, but child descends from ancestor.     */
     boolean descendsFrom(Type child, Type ancestor);
 
     /**
@@ -108,7 +119,7 @@ public interface TypeSystem {
      * Requires: all type arguments are canonical.
      *
      * Returns true iff type1 and type2 are the same type.
-     **/
+     */
     boolean isSame(Type type1, Type type2);
 
     /**
@@ -129,8 +140,7 @@ public interface TypeSystem {
     boolean isCanonical(Type type);
 
     /**
-     * Checks whether a method or field within target with access flags 'flags'
-     * can be accessed from Context context.
+     * Checks whether a method or field within target with access flags 'flags'      * can be accessed from Context context.
      */
     boolean isAccessible(MemberInstance mi, Context context);
 
@@ -145,9 +155,8 @@ public interface TypeSystem {
 
     /**
      * Requires: all type arguments are canonical.
-     *
      * Returns true iff an object of type <type> may be thrown.
-     **/
+     */
     boolean isThrowable(Type type);
 
     /**
@@ -191,15 +200,16 @@ public interface TypeSystem {
      * We also check if the field is accessible from the context 'c'.
      */
     MethodInstance findMethod(ReferenceType container,
-	String name, List argTypes, Context c) throws SemanticException;
+                              String name, List argTypes,
+                              Context c) throws SemanticException;
 
     /**
      * Find a constructor.  We need to pass the context because the constructor
      * we find depends on whether the method is accessible from the context.
      * We also check if the field is accessible from the context 'c'.
      */
-    ConstructorInstance findConstructor(ClassType container,
-	List argTypes, Context c) throws SemanticException;
+    ConstructorInstance findConstructor(ClassType container, List argTypes,
+                                        Context c) throws SemanticException;
 
     /**
      * Find a member class.
@@ -258,43 +268,160 @@ public interface TypeSystem {
     ////
     // Functions which yield particular types.
     ////
+
+    /**
+     * The type of <code>null</code>.
+     */
     NullType Null();
+
+    /**
+     * <code>void</code>
+     */
     PrimitiveType Void();
+
+    /**
+     * <code>boolean</code>
+     */
     PrimitiveType Boolean();
+
+    /**
+     * <code>char</code>
+     */
     PrimitiveType Char();
+
+    /**
+     * <code>byte</code>
+     */
     PrimitiveType Byte();
+
+    /**
+     * <code>short</code>
+     */
     PrimitiveType Short();
+
+    /**
+     * <code>int</code>
+     */
     PrimitiveType Int();
+
+    /**
+     * <code>long</code>
+     */
     PrimitiveType Long();
+
+    /**
+     * <code>float</code>
+     */
     PrimitiveType Float();
+
+    /**
+     * <code>double</code>
+     */
     PrimitiveType Double();
+
+    /**
+     * <code>java.lang.Object</code>
+     */
     ClassType Object();
+
+    /**
+     * <code>java.lang.String</code>
+     */
     ClassType String();
+
+    /**
+     * <code>java.lang.Class</code>
+     */
     ClassType Class();
+
+    /**
+     * <code>java.lang.Throwable</code>
+     */
     ClassType Throwable();
+
+    /**
+     * <code>java.lang.Error</code>
+     */
     ClassType Error();
+
+    /**
+     * <code>java.lang.Exception</code>
+     */
     ClassType Exception();
+
+    /**
+     * <code>java.lang.RuntimeException</code>
+     */
     ClassType RuntimeException();
+
+    /**
+     * <code>java.lang.Cloneable</code>
+     */
     ClassType Cloneable();
+
+    /**
+     * <code>java.io.Serializable</code>
+     */
     ClassType Serializable();
+
+    /**
+     * <code>java.lang.NullPointerException</code>
+     */
     ClassType NullPointerException();
+
+    /**
+     * <code>java.lang.ClassCastException</code>
+     */
     ClassType ClassCastException();
+
+    /**
+     * <code>java.lang.ArrayIndexOutOfBoundsException</code>
+     */
     ClassType OutOfBoundsException();
+
+    /**
+     * <code>java.lang.ArrayStoreException</code>
+     */
     ClassType ArrayStoreException();
+
+    /**
+     * <code>java.lang.ArithmeticException</code>
+     */
     ClassType ArithmeticException();
 
     /**
-     * Returns a type identical to <type>, but with <dims> more array
-     * dimensions.  <dims> must be >= 0.
-     **/
+     * Return an array of <code>type</code>
+     */
     ArrayType arrayOf(Type type);
+
+    /**
+     * Return an array of <code>type</code>
+     */
     ArrayType arrayOf(Position pos, Type type);
+
+    /**
+     * Return a <code>dims</code>-array of <code>type</code>
+     */
     ArrayType arrayOf(Type type, int dims);
+
+    /**
+     * Return a <code>dims</code>-array of <code>type</code>
+     */
     ArrayType arrayOf(Position pos, Type type, int dims);
 
+    /**
+     * Return a package by name.
+     */
     Package packageForName(String name);
+
+    /**
+     * Return a package by name with the given outer package.
+     */
     Package packageForName(Package prefix, String name);
 
+    /**
+     * Create a new context object for looking up variables, types, etc.
+     */
     Context createContext();
 
     /** Get a resolver for looking up a type in a package. */
@@ -303,16 +430,49 @@ public interface TypeSystem {
     /** Get a resolver for looking up a type in a class context. */
     Resolver classContextResolver(ClassType ct);
 
+    /**
+     * The default lazy class initializer.
+     */
     LazyClassInitializer defaultClassInitializer();
 
+    /**
+     * Create a top-level class.
+     */
     ParsedTopLevelClassType topLevelClassType(LazyClassInitializer init);
+
+    /**
+     * Create a member class.
+     */
     ParsedMemberClassType memberClassType(LazyClassInitializer init);
+
+    /**
+     * Create a local class.
+     */
     ParsedLocalClassType localClassType(LazyClassInitializer init);
+
+    /**
+     * Create a anonymous class.
+     */
     ParsedAnonClassType anonClassType(LazyClassInitializer init);
 
+    /**
+     * Create a top-level class.
+     */
     ParsedTopLevelClassType topLevelClassType();
+
+    /**
+     * Create a member class.
+     */
     ParsedMemberClassType memberClassType();
+
+    /**
+     * Create a local class.
+     */
     ParsedLocalClassType localClassType();
+
+    /**
+     * Create a anonymous class.
+     */
     ParsedAnonClassType anonClassType();
 
     /**
@@ -327,36 +487,123 @@ public interface TypeSystem {
      */
     Set getTypeEncoderRootSet(Type clazz);
 
+    /**
+     * Translate a package.
+     */
     String translatePackage(Resolver c, Package p);
+
+    /**
+     * Translate a primitive type.
+     */
     String translatePrimitive(Resolver c, PrimitiveType t);
+
+    /**
+     * Translate an array type.
+     */
     String translateArray(Resolver c, ArrayType t);
+
+    /**
+     * Translate a top-level class type.
+     */
     String translateTopLevelClass(Resolver c, TopLevelClassType t);
+
+    /**
+     * Translate a member class type.
+     */
     String translateMemberClass(Resolver c, MemberClassType t);
+
+    /**
+     * Translate a local class type.
+     */
     String translateLocalClass(Resolver c, LocalClassType t);
+
+    /**
+     * Return the boxed version of <code>t</code>.
+     */
     String wrapperTypeString(PrimitiveType t);
 
-    boolean methodCallValid(MethodInstance prototype, String name, List argTypes);
-    boolean callValid(ProcedureInstance prototype, List argTypes);
+    /**
+     * Return true if <code>mi</code> can be called with name <code>name</code>
+     * and actual parameters of types <code>actualTypes</code>.
+     */
+    boolean methodCallValid(MethodInstance mi, String name, List argTypes);
 
+    /**
+     * Return true if <code>pi</code> can be called with 
+     * actual parameters of types <code>actualTypes</code>.
+     */
+    boolean callValid(ProcedureInstance mi, List argTypes);
+
+    /**
+     * Get the list of methods <code>mi</code> (potentially) overrides, in
+     * order from this class (i.e., including <code>this</code>) to super
+     * classes.
+     */
     List overrides(MethodInstance mi);
+
+    /**
+     * Return true if <code>mi</code> can override <code>mj</code>.
+     */
     boolean canOverride(MethodInstance mi, MethodInstance mj);
 
+    /**
+     * Return the primitive with the given name.
+     */
     PrimitiveType primitiveForName(String name) throws SemanticException;
 
+    /**
+     * Assert if the flags <code>f</code> are legal method flags.
+     */
     void checkMethodFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal local variable flags.
+     */
     void checkLocalFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal field flags.
+     */
     void checkFieldFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal constructor flags.
+     */
     void checkConstructorFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal initializer flags.
+     */
     void checkInitializerFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal top-level class flags.
+     */
     void checkTopLevelClassFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal member class flags.
+     */
     void checkMemberClassFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal local class flags.
+     */
     void checkLocalClassFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal access flags.
+     */
     void checkAccessFlags(Flags f) throws SemanticException;
 
+    /**
+     * Assert that <code>t</code> has no cycles in the super type+inner class
+     * graph starting at <code>t</code>.
+     */
     void checkCycles(ReferenceType t) throws SemanticException;
 
     /**
-     * Returns t, modified as necessary to make it a legal
+     * Returns <code>t</code>, modified as necessary to make it a legal
      * static target.
      */
     public Type staticTarget(Type t);
