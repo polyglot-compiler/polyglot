@@ -9,6 +9,7 @@ public class ErrorInfo
   public static final int LEXICAL_ERROR      = 3;
   public static final int SYNTAX_ERROR       = 4;
   public static final int SEMANTIC_ERROR     = 5;
+  public static final int POST_COMPILER_ERROR= 6;
 
   protected int kind;
   protected String message;
@@ -56,6 +57,8 @@ public class ErrorInfo
       return "Syntax Error";
     case SEMANTIC_ERROR:
       return "Semantic Error";
+    case POST_COMPILER_ERROR:
+      return "Post-compiler Error";
     default:
       return "(Unknown)";
     }
