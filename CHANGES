@@ -3,66 +3,69 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
-Nov 2003: Polyglot 1.1.0
-========================
+Nov 19, 2003: Polyglot 1.1.0
+============================
   What's new since Polyglot 1.0.1:
   --------------------------------
     Numerous changes have been made to improve the performance of
-    Polyglot. It is now more efficient, especially when compiling
+    Polyglot.  It is now more efficient, especially when compiling
     large code bases.
 
-    The scheduling of passes of jobs has been modified to take
-    dependencies between jobs into account. This allows for more
-    efficient scheduling. See polyglot.frontend.AbstractExtensionInfo
-    for more details.
+    The scheduling of passes run on source files has been modified to
+    take advantage of more precise dependencies between source files.
+    This allows for more efficient scheduling.  See
+    polyglot.frontend.AbstractExtensionInfo for more details.
 
-    A global barrier pass has been added, to facilitate whole program
-    analyses. See polyglot.frontend.GlobalBarrierPass for more
+    A global barrier pass has been added to facilitate whole program
+    analyses.  See polyglot.frontend.GlobalBarrierPass for more
     information.
 
     The dataflow framework (polyglot.visit.DataFlow) has been modified
     to allow dataflow upon either entering or leaving a code
-    declaration. This allows the results of dataflow analyses to be
+    declaration.  This allows the results of dataflow analyses to be
     available when visiting the AST nodes inside a code
-    declaration. The default (and legacy) behavior is to perform
+    declaration.  The default (and legacy) behavior is to perform
     dataflow upon leaving a code declaration.
 
     The serialized type information that Polyglot produces in output
-    files is now encoded in base 64, which reduces the size of the
-    output files.
+    files is now encoded in base 64, which reduces the size and improves
+    the readability of the Java output files.  Class files compiled with
+    previous versions of Polyglot are not readable with Polyglot 1.1.
 
     Serialized type information for member classes is now stored as a
     field in the member class itself, instead of as part of the
     serialized type information of the top level class that contains
-    the nested class.
+    the nested class.  This resolves a circular dependency bug in
+    class loading.
 
     Terms record whether or not they are reachable, as this
-    information is useful in later passes. The ReachChecker visitor
+    information is useful in later passes.  The ReachChecker visitor
     sets this information.
 
     The reachability pass is now performed before the exception
-    checking pass.
+    checking pass, making exception checking more precise.
 
     A utility class PolyglotAntTask (in $POLYGLOT/tools) facilitates
     the compilation of language extensions in the ANT framework.
 
     Numerous bug fixes, including:
-      - changes for ancestors and conversions of short, int, etc.
+      - numeric conversions of short, int, etc.
       - constant folding
       - nested classes
-      - import table lookups
+      - imported class lookup
+      - code generation
 
 
   Converting existing extensions:
   -------------------------------
     Terms must now have methods to access and record reachability
-    information. If you have defined AST nodes that do not extend
-    polyglot.ext.jl.ast.Term_c, you may need to modify them. See
+    information.  If you have defined AST nodes that do not extend
+    polyglot.ext.jl.ast.Term_c, you may need to modify them.  See
     polyglot.ast.Term and polyglot.ext.jl.ast.Term_c for
     information/examples.
  
     ParsedClassTypes now record from which source they were parsed
-    from, if they were parsed during the current compilation. If you
+    from, if they were parsed during the current compilation.  If you
     have defined ParsedClassTypes that do not extend
     polyglot.ext.jl.types.ParsedClassType_c, you may need to modify
     them.
@@ -70,11 +73,13 @@ Nov 2003: Polyglot 1.1.0
     The signature for the class polyglot.types.TypeSystem has changed.
       * void initialize(LoadedClassResolver loadedResolver)
         has changed to
-        void initialize(LoadedClassResolver loadedResolver, ExtensionInfo extInfo)
+        void initialize(LoadedClassResolver loadedResolver,
+                        ExtensionInfo extInfo)
 
       * ParsedClassType createClassType(LazyClassInitializer init)
         has changed to
-        ParsedClassType createClassType(LazyClassInitializer init, Source fromSource)
+        ParsedClassType createClassType(LazyClassInitializer init,
+                        Source fromSource)
 
       If you have overridden these methods in a subclass of
       polyglot.ext.jl.types.TypeSystem_c, you should change your
@@ -82,8 +87,8 @@ Nov 2003: Polyglot 1.1.0
 
 
 
-Aug 2003: Polyglot 1.0.1
-========================
+Aug 18, 2003: Polyglot 1.0.1
+============================
   What's new since Polyglot 1.0.0:
   --------------------------------
     Bug fixes:
@@ -99,8 +104,8 @@ Aug 2003: Polyglot 1.0.1
 
 
 
-Jul 2003: Polyglot 1.0.0
-========================
+Jul 8, 2003: Polyglot 1.0.0
+===========================
   What's new since Polyglot 0.9.5:
   --------------------------------
     We have changed the license from GPL to LGPL.  This should allow
