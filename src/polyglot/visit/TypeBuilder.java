@@ -150,7 +150,7 @@ public class TypeBuilder extends HaltingVisitor
 
     public TypeBuilder pushCode() {
         if (Report.should_report(Report.visit, 4))
-	    Report.report(4, "TB pushing code");
+	    Report.report(4, "TB pushing code: " + this);
         TypeBuilder tb = push();
         tb.inCode = true;
         tb.global = false;
@@ -159,7 +159,7 @@ public class TypeBuilder extends HaltingVisitor
 
     protected TypeBuilder pushClass(ParsedClassType type) throws SemanticException {
         if (Report.should_report(Report.visit, 4))
-	    Report.report(4, "TB pushing class " + type);
+	    Report.report(4, "TB pushing class " + type + ": " + this);
 
         TypeBuilder tb = push();
         tb.type = type;
@@ -223,6 +223,9 @@ public class TypeBuilder extends HaltingVisitor
     }
 
     public TypeBuilder pushAnonClass(Position pos) throws SemanticException {
+        if (Report.should_report(Report.visit, 4))
+	    Report.report(4, "TB pushing anon class: " + this);
+
         if (! inCode) {
             throw new InternalCompilerError(
                 "Can only push an anonymous class within code.");
@@ -270,6 +273,6 @@ public class TypeBuilder extends HaltingVisitor
         return "(TB " + type +
                 (inCode ? " inCode" : "") +
                 (global ? " global" : "") +
-                (outer == null ? ")" : " " + outer.toString());
+                (outer == null ? ")" : " " + outer.toString() + ")");
     }
 }
