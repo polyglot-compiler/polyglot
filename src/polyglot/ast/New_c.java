@@ -620,7 +620,11 @@ FIXME: check super types as well.
 
     public Term entry() {
         if (qualifier != null) return qualifier.entry();
-        return listEntry(arguments, this);
+        Term afterArgs = this;
+        if (body() != null) {
+            afterArgs = body();
+        }
+        return listEntry(arguments, afterArgs);
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
