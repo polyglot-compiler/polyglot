@@ -3,6 +3,24 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
+Dec 18, 2003: Polyglot 1.1.1
+============================
+  What's new since Polyglot 1.1.0:
+  --------------------------------
+    Bug fixes in initialization checking.
+    
+    Refactored data flow slightly to allow subclasses to have more control of
+    the confluence operation.  Legacy behavior is maintained, so no
+    subclass will be invalidated by this change.
+
+    Made Term_c.acceptCFG() abstract to force new Terms to implement
+    it rather than using the default implementation.
+
+    Added some accessors for private/protected fields.  Made some
+    package-scoped fields protected.
+
+
+
 Nov 19, 2003: Polyglot 1.1.0
 ============================
   What's new since Polyglot 1.0.1:
