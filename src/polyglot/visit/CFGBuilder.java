@@ -342,41 +342,47 @@ public class CFGBuilder implements Copy
      * Create edges for an exception thrown from term <code>t</code>.
      */
     public void visitThrow(Term t, Type type) {
-      Term last = t;
-      CFGBuilder last_visitor = this;
+        Term last = t;
+        CFGBuilder last_visitor = this;
 
-      for (CFGBuilder v = this; v != null; v = v.outer) {
-        Term c = v.innermostTarget;
+        for (CFGBuilder v = this; v != null; v = v.outer) {
+            Term c = v.innermostTarget;
 
-        if (c instanceof Try) {
-          Try tr = (Try) c;
+            if (c instanceof Try) {
+                Try tr = (Try) c;
 
-          if (! v.skipInnermostCatches) {
-            for (Iterator i = tr.catchBlocks().iterator(); i.hasNext(); ) {
-              Catch cb = (Catch) i.next();
+                if (! v.skipInnermostCatches) {                    
+                    boolean definiteCatch = false;
+                    
+                    for (Iterator i = tr.catchBlocks().iterator(); i.hasNext(); ) {
+                        Catch cb = (Catch) i.next();
 
-              // definite catch
-              if (type.isImplicitCastValid(cb.catchType())) {
-                edge(last_visitor, last, cb.entry(), new FlowGraph.ExceptionEdgeKey(type));
-                return;
-              }
+                        // definite catch
+                        if (type.isImplicitCastValid(cb.catchType())) {
+                            edge(last_visitor, last, cb.entry(), new FlowGraph.ExceptionEdgeKey(type));
+                            definiteCatch = true;
+                        }
+                        // possible catch
+                        else if (cb.catchType().isImplicitCastValid(type)) { 
+                            edge(last_visitor, last, cb.entry(), new FlowGraph.ExceptionEdgeKey(cb.catchType()));
+                        }
+                    }
+                    if (definiteCatch) {
+                        // the exception has definitely been caught.
+                        // we can stop recursing to outer try-catch blocks
+                        return; 
+                    }
+                }
 
-              // possible catch
-              if (cb.catchType().isImplicitCastValid(type)) { 
-                edge(last_visitor, last, cb.entry(), new FlowGraph.ExceptionEdgeKey(cb.catchType()));
-              }
+                if (tr.finallyBlock() != null) {
+                    last_visitor = tryFinally(v, last, last_visitor, tr.finallyBlock());
+                    last = tr.finallyBlock();
+                }
             }
-          }
-
-          if (tr.finallyBlock() != null) {
-            last_visitor = tryFinally(v, last, last_visitor, tr.finallyBlock());
-            last = tr.finallyBlock();
-          }
         }
-      }
 
-      // If not caught, do _not_ insert a node from the thrower to exit.
-      // edge(last_visitor, last, graph.exitNode());
+        // If not caught, do _not_ insert a node from the thrower to exit.
+        // edge(last_visitor, last, graph.exitNode());
     }
 
     /** Create edges for a try finally block. */
