@@ -90,6 +90,13 @@ public abstract class TypeSystem {
    **/
   public abstract boolean isSameType(Type type1, Type type2);
 
+  /**
+   * Requires: all type arguments are canonical.
+   * Returns the least common ancestor of Type1 and Type2
+   **/
+  public abstract Type leastCommonAncestor( Type type1, Type type2)
+    throws TypeCheckException;
+
   ////
   // Functions for one-type checking and resolution.
   ////

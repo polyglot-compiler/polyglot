@@ -4,10 +4,8 @@
 
 package jltools.ast;
 
-import jltools.util.TypedList;
-import jltools.util.TypedListIterator;
-import jltools.util.CodeWriter;
-import jltools.types.LocalContext;
+import jltools.util.*;
+import jltools.types.*;
 import java.util.ListIterator;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -85,13 +83,33 @@ public class TryStatement extends Statement {
 	 CatchBlock cb = (CatchBlock) it.next();
 	 it.set((CatchBlock) cb.visit(vis));
       }
-      finallyBlock = (BlockStatement) finallyBlock.visit(vis);
+      if ( finallyBlock != null)
+        finallyBlock = (BlockStatement) finallyBlock.visit(vis);
    }
 
-   public Node typeCheck(LocalContext c)
+   public Node typeCheck(LocalContext c) throws TypeCheckException
    {
-      // FIXME: implement
-      return this;
+     SubtypeSet s = tryBlock.getThrows() ;
+     boolean bTerminates = true;
+
+     for (Iterator it = catchBlocks.listIterator() ; it.hasNext() ; )
+     {
+       CatchBlock cb = (CatchBlock)it.next();
+       if ( (s == null) ||
+            ! s.remove ( cb.getCatchBlockType() ))
+         throw new TypeCheckException ( "The catch block is unreachable since no exceptions of type \"" + 
+                                        cb.getCatchBlockType().getTypeString() + "\" can reach this point.", 
+                                        Annotate.getLineNumber ( cb ));
+       bTerminates &= Annotate.terminatesOnAllPaths ( cb );
+     }
+     addThrows ( s );
+     if (finallyBlock != null)
+     {
+       addThrows ( finallyBlock.getThrows() );
+       bTerminates |= Annotate.terminatesOnAllPaths( finallyBlock );
+     }
+     Annotate.setTerminatesOnAllPaths ( this, bTerminates );
+     return this;
    }
 
    public void  translate(LocalContext c, CodeWriter w)

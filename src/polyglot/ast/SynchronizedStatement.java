@@ -4,8 +4,8 @@
 
 package jltools.ast;
 
-import jltools.util.CodeWriter;
-import jltools.types.LocalContext;
+import jltools.util.*;
+import jltools.types.*;
 
 /**
  * SynchronizedStatement
@@ -62,9 +62,15 @@ public class SynchronizedStatement extends Statement {
     body = (BlockStatement) body.visit(vis);
    }
 
-   public Node typeCheck(LocalContext c)
+   public Node typeCheck(LocalContext c) throws TypeCheckException
    {
-      // FIXME: implement
+     if ( !( expr.getCheckedType() instanceof ClassType))
+       throw new TypeCheckException ("The type of the expression \"" + expr.getCheckedType() + 
+                                     "\" is not valid to synchronize on.");
+     addThrows ( expr.getThrows() );
+     addThrows ( body.getThrows() );
+     Annotate.setTerminatesOnAllPaths (this, Annotate.terminatesOnAllPaths ( body ) );
+
       return this;
    }
 

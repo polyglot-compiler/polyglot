@@ -168,11 +168,11 @@ public class VariableDeclarationStatement extends Statement {
     Declarator d;
     Iterator iter = declarators();
     
-    // only add to context if inside a method
+    // only add to context if inside a method, hence a local Variable declaration
     if ( c.getCurrentMethod() != null)
       while( iter.hasNext()) {
         d = (Declarator)iter.next();
-        c.addSymbol( d.name, typeForDeclarator( d));
+        c.addSymbol( d.name, new FieldInstance ( d.name, typeForDeclarator( d), null, modifiers));
       }
     
     return this;
@@ -183,14 +183,27 @@ public class VariableDeclarationStatement extends Statement {
      Declarator d;
      Iterator iter = declarators();
      
-     //only add to context if inside a method
+     //only add to context if inside a method, hence a local variable declaration
      if ( c.getCurrentMethod() != null)
        while( iter.hasNext()) {
          d = (Declarator)iter.next();
-         c.addSymbol( d.name, typeForDeclarator( d));
+         c.addSymbol( d.name, new FieldInstance ( d.name, typeForDeclarator( d), null, modifiers));
        }
      
-     // FIXME: initializers
+    for  (Iterator it = declarators(); it.hasNext() ;) {
+      Declarator pair = (Declarator)it.next();
+      if (pair.initializer != null)
+      {
+        if ( ! c.getTypeSystem().isImplicitCastValid( pair.initializer.getCheckedType(), 
+                                                  type.getType() ) )
+          throw new TypeCheckException( "The type of the variable initializer (\"" 
+                                        + pair.initializer.getCheckedType().getTypeString() + 
+                                        "\") does not match " +
+                                        "that of the declaration (\"" + type.getType().getTypeString() + "\")");
+        addThrows ( pair.initializer.getThrows() );
+      }
+      
+    }
      return this;
    }
 

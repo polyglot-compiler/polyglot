@@ -558,6 +558,7 @@ public class StandardTypeSystem extends TypeSystem {
           // found it. can stop looking since guaranteed that it is not ambiguous
           return fi;
       }
+      fi = null;
 
       // check the lineage of where we are
       try {  fi = getField( context.inClass, name, context); }
@@ -715,9 +716,6 @@ public class StandardTypeSystem extends TypeSystem {
     return type.getInterfaces();
   }
 
-  ////
-  // Functions for method testing.
-  ////
   /**
    * Returns true iff <type1> is the same as <type2>.
    **/
@@ -725,6 +723,40 @@ public class StandardTypeSystem extends TypeSystem {
   {
     return ( type1.equals(type2));
   }
+
+  /**
+   * Requires: all type arguments are canonical.
+   * Returns the least common ancestor of Type1 and Type2
+   **/
+  public Type leastCommonAncestor( Type type1, Type type2) throws TypeCheckException
+  {
+    if (( type1 instanceof PrimitiveType ) &&
+        ( type2 instanceof PrimitiveType ))
+    {
+      return new PrimitiveType( this, Math.max ( ((PrimitiveType) type1).getKind(), 
+                                                 ((PrimitiveType) type2).getKind() ));
+    }
+    if (!( type1 instanceof ClassType) ||
+        !( type2 instanceof ClassType))
+      throw new TypeCheckException ( " No least common ancestor found; the type \"" + type1.getTypeString() + 
+                                     "\" is not compatible with the type \"" +  type2.getTypeString() + "\"");
+
+    
+    ClassType tSuper = (ClassType)type1;
+    
+    while ( ! type2.descendsFrom ( tSuper ) && tSuper != null)
+      tSuper = (ClassType)tSuper.getSuperType();
+    if ( tSuper == null)
+      throw new TypeCheckException ( " No least common ancestor found; the type \"" + type1.getTypeString() + 
+                                     "\" is not compatible with the type \"" +  type2.getTypeString() + "\"");
+    return tSuper;
+                                           
+  }
+
+
+  ////
+  // Functions for method testing.
+  ////
 
   /**
    * Returns true iff <type1> has the same arguments as <type2>

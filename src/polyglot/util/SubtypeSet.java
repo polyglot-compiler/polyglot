@@ -72,9 +72,26 @@ public class SubtypeSet implements java.util.Set
     v.clear();
   }
 
-  public boolean contains(Object o )
+  public boolean contains(Object o)
   {
-    return v.contains(o);
+    if ( o instanceof Type)
+    {
+      try
+      {
+        for (Iterator i = v.iterator(); i.hasNext() ; )
+        {
+          Type t = (Type)i.next();
+          if (((Type)o).descendsFrom ( t ) ||
+              ((Type)o).equals(t))
+            return true;
+        }
+      }
+      catch (TypeCheckException tce ) 
+      {
+        return false;
+      }
+    }
+    return false;
   }
 
   public boolean containsAll(Collection c)
@@ -95,9 +112,11 @@ public class SubtypeSet implements java.util.Set
     return v.iterator();
   }
 
-  public boolean  remove(Object o )
+  public boolean remove(Object o )
   {
-    return v.remove (o );
+    boolean bContains = contains ( o );
+    v.remove (o );
+    return bContains;
   }
   
   public boolean removeAll(Collection c) 

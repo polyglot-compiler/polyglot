@@ -80,8 +80,6 @@ public class BlockStatement extends Statement {
 
   public void translate( LocalContext c, CodeWriter w)
   {
-    if ( c == null)
-      System.out.println( " block c is null");
     w.write("{");
     w.beginBlock();
     for (ListIterator it = statements.listIterator(); it.hasNext(); ) 
@@ -118,7 +116,8 @@ public class BlockStatement extends Statement {
       {
         Annotate.setTerminatesOnAllPaths (this, true);
         if ( i.hasNext())
-          throw new TypeCheckException( "The block has unreachable statements" );
+          throw new TypeCheckException( "This statement is unreachable.", 
+                                        Annotate.getLineNumber( (Node)i.next() ) );
       }
     }
     c.popBlock();

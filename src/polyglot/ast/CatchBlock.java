@@ -4,8 +4,8 @@
 
 package jltools.ast;
 
-import jltools.util.CodeWriter;
-import jltools.types.LocalContext;
+import jltools.util.*;
+import jltools.types.*;
 import jltools.visit.SymbolReader;
 
 /**
@@ -42,6 +42,14 @@ public class CatchBlock extends Node {
   }
 
   /**
+   * Returns the type of the FormalParameter which this CatchBlock catches
+   */
+  public Type getCatchBlockType ()
+  {
+    return formalParameter.getType();
+  }
+
+  /**
    * Effects: returns the BlockStatement for this.
    */
   public BlockStatement getBlockStatement() {
@@ -72,6 +80,12 @@ public class CatchBlock extends Node {
     w.write( ")"); 
     return null;
   }
+
+  public Node adjustScope( LocalContext c)
+  {
+    c.pushBlock();
+    return null;
+  }
   
   public Node readSymbols( SymbolReader sr)
   {
@@ -80,13 +94,16 @@ public class CatchBlock extends Node {
 
   public Node typeCheck( LocalContext c)
   {
-    // FIXME: implement;
+    Annotate.setTerminatesOnAllPaths ( this, Annotate.terminatesOnAllPaths(block));
+    addThrows ( block.getThrows () );
+
+    c.popBlock();
     return this;
   }
 
 
   public void visitChildren(NodeVisitor v) {
-    formalParameter.setType((TypeNode) formalParameter.getTypeNode().visit(v));
+    formalParameter.visit(v );
     block = (BlockStatement) block.visit(v);
   }
 

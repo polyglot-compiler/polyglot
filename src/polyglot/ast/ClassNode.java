@@ -75,7 +75,7 @@ public class ClassNode extends ClassMember {
   /**
    * Effects: returns the AccessFlags for this class declaration. 
    */
-  public AccessFlags getAcccessFlags() {
+  public AccessFlags getAccessFlags() {
     return accessFlags;
   }
 

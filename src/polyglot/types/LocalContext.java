@@ -74,7 +74,8 @@ public class LocalContext
       {
         if ( (result = ((Hashtable) i.previous()).get( fieldName )) != null )
         {
-          return new FieldInstance (fieldName, (Type)result, null, AccessFlags.flagsForInt(0));
+          //          return new FieldInstance (fieldName, (Type)result, null, AccessFlags.flagsForInt(0));
+          return (FieldInstance)result;
         }
       }      
     }
@@ -194,15 +195,17 @@ public class LocalContext
   /**
    * Adds a symbol to the current scoping level
    */
-  public void addSymbol( String sName, Type t)
+  public void addSymbol( String sName, FieldInstance fi) throws TypeCheckException
   {
-
     if ( stkContexts.size() < 1)
       throw new InternalCompilerError("Can't pop block since not in a class.");
     Stack blockStack =  ((ClassTuple)stkContexts.peek()).getBlockStack();
     if ( blockStack == null || blockStack.size() == 0)
       throw new InternalCompilerError(" Can't add symbol since not inside a method");
-    ((Hashtable)blockStack.peek()).put(sName, t);
+    if ( ! isDefinedLocally ( sName ) )
+      ((Hashtable)blockStack.peek()).put(sName, fi);
+    else
+      throw new TypeCheckException ( "Symbol \"" + sName + "\" already defined");
 
   }
 

@@ -4,8 +4,8 @@
 
 package jltools.ast;
 
-import jltools.util.CodeWriter;
-import jltools.types.LocalContext;
+import jltools.util.*;
+import jltools.types.*;
 
 /**
  * TernaryExpression
@@ -80,10 +80,18 @@ public class TernaryExpression extends Expression {
 	falseResult  = (Expression) falseResult.visit(vis);
    }
 
-   public Node typeCheck(LocalContext c)
+   public Node typeCheck(LocalContext c) throws TypeCheckException
    {
-      // FIXME: implement
-      return this;
+     if (! conditional.getCheckedType().equals ( c.getTypeSystem().getBoolean() ) ) 
+       throw new TypeCheckException( "The conditional must be of type boolean.");
+
+     setCheckedType ( c.getTypeSystem().leastCommonAncestor( trueResult.getCheckedType(), 
+                                                             falseResult.getCheckedType()));
+     addThrows ( conditional.getThrows() );
+     addThrows ( trueResult.getThrows() );
+     addThrows ( falseResult.getThrows() );
+
+     return this;
    }
 
    public void translate(LocalContext c, CodeWriter w)

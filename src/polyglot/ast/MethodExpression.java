@@ -153,7 +153,6 @@ public class MethodExpression extends Expression {
   public Node typeCheck(LocalContext c) throws TypeCheckException
   {
     // fixme: exceptions
-    System.out.println ("target is " + target);
     ClassType ct; 
     if (target == null) 
       ct = null;
@@ -162,7 +161,11 @@ public class MethodExpression extends Expression {
     else if ( target instanceof Expression && ((Expression)target).getCheckedType() instanceof ClassType)
       ct = (ClassType)   ((Expression)target).getCheckedType();
     else
+    {
+      System.out.println("it is of type: " + target);
+      System.out.println(((FieldExpression)target).getName());
       throw new TypeCheckException (" Target of method invocation must be a ClassType");
+    }
 
     List argTypes = new ArrayList();
     for ( ListIterator i = arguments.listIterator() ; i.hasNext(); )

@@ -154,9 +154,24 @@ public class SourceFileNode extends Node {
     return this;
   }
 
-   public Node typeCheck(LocalContext c)
+   public Node typeCheck(LocalContext c) throws TypeCheckException
    {
-      return this;
+     Vector vNames = new Vector();
+     String sSourceName = TypeSystem.getFirstComponent ( sourceFilename );
+     
+     for(ListIterator it=classes.listIterator(); it.hasNext(); ) {
+       ClassNode cn = (ClassNode)it.next();
+       String s = TypeSystem.getShortNameComponent (cn.getName() );
+       if ( vNames.contains (s ) )
+         throw new TypeCheckException ( "The source file contains two classes named \"" + s + "\".", 
+                                        Annotate.getLineNumber ( cn ));
+       vNames.add ( s );
+       if ( cn.getAccessFlags().isPublic() && !s.equals ( sSourceName ) )
+         throw new TypeCheckException ( "The name of the public class \"" + s + 
+                                        "\" must match the source file name", 
+                                        Annotate.getLineNumber( cn ));
+     }
+     return this;
    }
 
    public void translate(LocalContext c, CodeWriter w)

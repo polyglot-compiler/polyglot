@@ -116,14 +116,19 @@ public class FormalParameter extends Node {
 
   public Node removeAmbiguities( LocalContext c ) throws TypeCheckException
   {
-    c.addSymbol( name, type.getType());
+    AccessFlags modifiers = new AccessFlags ( );
+    modifiers.setFinal ( isFinal );
+    c.addSymbol( name, new FieldInstance ( name, type.getType(), null, modifiers ));
     return this;
   }
 
   public Node typeCheck( LocalContext c) throws TypeCheckException
   {
+    AccessFlags modifiers = new AccessFlags ( );
+    modifiers.setFinal ( isFinal );
+    c.addSymbol( name, new FieldInstance( name, type.getType(), null, modifiers ));
+
     Annotate.setType( this, type.getType());
-    c.addSymbol( name, type.getType());
     return this;
   }
   

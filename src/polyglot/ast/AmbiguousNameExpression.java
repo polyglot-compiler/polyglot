@@ -119,7 +119,6 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 
   public Node removeAmbiguities( LocalContext c) throws TypeCheckException
   {
-    System.out.println ( "Resolving ambiguities for name = " + getName());
     Expression e;
     TypeNode tn;
     FieldInstance fi = null;

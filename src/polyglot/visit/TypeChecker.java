@@ -30,9 +30,11 @@ public class TypeChecker extends NodeVisitor
     }
     catch( TypeCheckException e)
     {
+      int iLine = e.getLineNumber();
+      iLine = (iLine == e.INVALID_LINE ? Annotate.getLineNumber( n ) : iLine );
       eq.enqueue( ErrorInfo.SEMANTIC_ERROR, 
                   e.getMessage(),
-                  Annotate.getLineNumber( n));
+                  iLine);
       return n;
     }
   }
