@@ -6,7 +6,6 @@ import polyglot.util.*;
 import polyglot.visit.*;
 import polyglot.main.Options;
 import polyglot.main.Report;
-import polyglot.frontend.Compiler;
 
 import java.io.*;
 import java.util.*;
@@ -233,9 +232,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         // make sure that all scheduling invariants are satisfied before running
         // the next pass. We may thus execute some other passes on other 
         // jobs running the given pass.
-        if (job instanceof SourceJob) {
-            enforceInvariants((SourceJob)job, pass);
-        }
+        enforceInvariants(job, pass);
         
         
         if (getOptions().disable_passes.contains(pass.name())) {
@@ -309,8 +306,19 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
      * on will have already been done.
      * 
      */
-    protected void enforceInvariants(SourceJob job, Pass pass) {
-        BarrierPass lastBarrier = job.lastBarrier();
+    protected void enforceInvariants(Job job, Pass pass) {
+        SourceJob srcJob = null;
+        if (job instanceof SourceJob) {
+            srcJob = (SourceJob)job;
+        }
+        else if (job instanceof InnerJob && ((InnerJob)job).outer instanceof SourceJob) {
+            srcJob = (SourceJob)((InnerJob)job).outer;
+        }
+        if (srcJob == null) {
+            return;
+        }
+        
+        BarrierPass lastBarrier = srcJob.lastBarrier();
         if (lastBarrier != null) {
             // make sure that _all_ dependent jobs have completed at least up to 
             // the last barrier (not just children).
@@ -318,7 +326,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             // Ideally the invariant should be that only the source jobs that
             // job _depends on_ should be brought up to the last barrier.
             // This is work to be done in the future...
-            List allDependentSrcs = new ArrayList(job.dependencies());
+            List allDependentSrcs = new ArrayList(srcJob.dependencies());
             Iterator i = allDependentSrcs.iterator();
             while (i.hasNext()) {
                 Source s = (Source)i.next();
@@ -335,7 +343,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                     // how far we get...
                     if (Report.should_report(Report.frontend, 3)) {
                         Report.report(3, "Running " + sj +
-                                  " to " + lastBarrier.id() + " for " + job);
+                                  " to " + lastBarrier.id() + " for " + srcJob);
                     } 
                     runToPass(sj, lastBarrier.id());
                 }
@@ -366,7 +374,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                 Pass beforeGlobal = sj.getPreviousTo(pass.id());
                 if (Report.should_report(Report.frontend, 3)) {
                     Report.report(3, "Running " + sj +
-                              " to " + beforeGlobal.id() + " for " + job);
+                              " to " + beforeGlobal.id() + " for " + srcJob);
                 } 
                 runToPass(sj, beforeGlobal);
             }
