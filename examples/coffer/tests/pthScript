@@ -31,13 +31,12 @@ polyglot.ext.coffer.ExtensionInfo {
     Hello.cof ;
     InputStream.cof ;
     SimpleTest.cof ;
-    SimpleTest2.cof (Semantic, ".*\{I\}.*not.*held.*") ;
-    SimpleTest3.cof (Semantic, ".*\"F\".*not.*freed.*"),
-                    (Semantic, ".*\{I\}.*not.*held.*") ;
-    SimpleTest4.cof (Semantic, ".*\{I\}.*not.*held.*") ;
+    SimpleTest2.cof (Semantic, "Key.*I.*not.*freed") ;
+    SimpleTest3.cof (Semantic, "Key.*F.*not.*freed");
+    SimpleTest4.cof (Semantic, "Can evaluate expression.*only if key.*I.*is held") ;
     SimpleTest5.cof ;
-    SimpleTest6.cof (Semantic, ".*\{I\}.*not.*held.*") ;
-    SimpleTest7.cof (Semantic, ".*\{I\}.*not.*held.*") ;
+    SimpleTest6.cof (Semantic, "Can evaluate expression.*only if key.*I.*is held") ;
+    SimpleTest7.cof (Semantic, "Can evaluate expression.*only if key.*I.*is held") ;
     SimpleTest8.cof ;
     Subclassing.cof ;
     TestIS.cof

@@ -1,16 +1,28 @@
 package polyglot.ext.coffer.visit;
 
-import polyglot.ext.coffer.types.*;
-import polyglot.ext.coffer.ast.*;
-import polyglot.ext.coffer.extension.*;
-import polyglot.ext.coffer.Topics;
-import polyglot.main.Report;
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.frontend.*;
-import polyglot.visit.*;
 import java.util.*;
+import java.util.Map.Entry;
+
+import polyglot.ast.NodeFactory;
+import polyglot.ast.ProcedureDecl;
+import polyglot.ast.Term;
+import polyglot.ext.coffer.Topics;
+import polyglot.ext.coffer.extension.CofferExt;
+import polyglot.ext.coffer.types.CofferClassType;
+import polyglot.ext.coffer.types.CofferProcedureInstance;
+import polyglot.ext.coffer.types.CofferTypeSystem;
+import polyglot.ext.coffer.types.KeySet;
+import polyglot.frontend.Job;
+import polyglot.main.Report;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.DataFlow;
+import polyglot.visit.FlowGraph;
+import polyglot.visit.FlowGraph.EdgeKey;
+import polyglot.visit.FlowGraph.ExceptionEdgeKey;
 
 /**
  * Data flow analysis to compute and check held key sets.
@@ -42,6 +54,28 @@ public class KeyChecker extends DataFlow
     }
 
     KeySet EMPTY;
+
+	class ExitTermItem extends Item {
+		DataFlowItem nonExItem;
+		Map excEdgesToItems; // map from ExceptionEdgeKeys to DataFlowItems
+		public ExitTermItem(DataFlowItem nonExItem, Map excItems) {
+			this.nonExItem = nonExItem;
+			this.excEdgesToItems = excItems;
+		}
+
+        public boolean equals(Object i) {
+            if (i instanceof ExitTermItem) {
+				ExitTermItem that = (ExitTermItem)i;
+            	return this.excEdgesToItems.equals(that.excEdgesToItems) &&
+            	       this.nonExItem.equals(that.nonExItem);
+            }
+            return false;
+        }
+
+        public int hashCode() {
+            return nonExItem.hashCode() + excEdgesToItems.hashCode();
+        }
+	}
 
     class DataFlowItem extends Item {
         // keys that must/may be held at this point
@@ -89,6 +123,10 @@ public class KeyChecker extends DataFlow
     }
 
     public Map flow(Item in, FlowGraph graph, Term n, Set succEdgeKeys) {
+    	if (in instanceof ExitTermItem) {
+			return itemToMap(in, succEdgeKeys);    		
+    	}
+    	
         DataFlowItem df = (DataFlowItem) in;
 
         if (n.ext() instanceof CofferExt) {
@@ -130,9 +168,54 @@ public class KeyChecker extends DataFlow
         return itemToMap(in, succEdgeKeys);
     }
 
-    public Item confluence(List inItems, Term node) {
-        CofferTypeSystem vts = (CofferTypeSystem) KeyChecker.this.ts;
+	protected Item safeConfluence(List items, List itemKeys, Term node, FlowGraph graph) {
+		if (node == graph.exitNode()) {
+			return confluenceExitTerm(items, itemKeys, graph);
+		}
+		return super.safeConfluence(items, itemKeys, node, graph); 
+	}
 
+	protected Item confluence(List items, List itemKeys, Term node, FlowGraph graph) {
+		if (node == graph.exitNode()) {
+			return confluenceExitTerm(items, itemKeys, graph);
+		}
+		return confluence(items, node, graph); 
+	}
+
+    protected Item confluenceExitTerm(List items, List itemKeys, FlowGraph graph) {
+		List nonExcItems = filterItemsNonException(items, itemKeys);    	
+		DataFlowItem nonExc;
+    	if (nonExcItems.isEmpty()) {
+			nonExc = new DataFlowItem();
+    	}
+    	else {
+			nonExc = (DataFlowItem)confluence(nonExcItems, graph.exitNode(), graph);    		
+    	}
+
+    	Map excItemLists = new HashMap();
+    	for (Iterator i = items.iterator(), j = itemKeys.iterator();
+    	     i.hasNext() && j.hasNext();  ) {
+    	    FlowGraph.EdgeKey key = (EdgeKey)j.next();
+    	    DataFlowItem item = (DataFlowItem)i.next();
+    	    if (key instanceof FlowGraph.ExceptionEdgeKey) {
+    	    	List l = (List)excItemLists.get(key);
+    	    	if (l == null) {
+    	    		l = new ArrayList();
+    	    		excItemLists.put(key, l);
+    	    	}
+    	    	l.add(item);
+    	    }
+    	}
+    	
+    	Map excItems = new HashMap(excItemLists.size());
+    	for (Iterator i = excItemLists.entrySet().iterator(); i.hasNext(); ) {
+    		Map.Entry e = (Entry)i.next();
+    		excItems.put(e.getKey(), confluence((List)e.getValue(), graph.exitNode(), graph));
+    	}
+        return new ExitTermItem(nonExc, excItems);
+    }
+
+    protected Item confluence(List inItems, Term node, FlowGraph graph) {
         DataFlowItem outItem = null;
 
         for (Iterator i = inItems.iterator(); i.hasNext(); ) {
@@ -174,31 +257,75 @@ public class KeyChecker extends DataFlow
     public void check(FlowGraph graph, Term n, Item inItem, Map outItems)
         throws SemanticException
     {
-        DataFlowItem df = (DataFlowItem) inItem;
+    	if (n == graph.exitNode()) {
+    		checkExitTerm(graph, (ExitTermItem)inItem);
+    	}
+		else {
+	        DataFlowItem df = (DataFlowItem) inItem;
+			check(n, df);
+		}
+    }
+    
+    private void check(Term n, DataFlowItem df) throws SemanticException {
+		if (df == null)
+			return;
 
-        if (df == null)
-            return;
+		if (Report.should_report(Topics.keycheck, 2)) {
+			Report.report(2, "check(" + n + "):");
+			Report.report(2, "   " + df);
+		}
 
-        if (Report.should_report(Topics.keycheck, 2)) {
-            Report.report(2, "check(" + n + "):");
-            Report.report(2, "   " + df);
-        }
+		if (! df.must_held.containsAll(df.may_held)) {
+			KeySet s = df.may_held.removeAll(df.must_held);
+			throw new SemanticException("Keys " + s + " may not be held.",
+										n.position());
+		}
 
-        if (! df.must_held.containsAll(df.may_held)) {
-            KeySet s = df.may_held.removeAll(df.must_held);
-            throw new SemanticException("Keys " + s + " may not be held.",
-                                        n.position());
-        }
+		if (! df.must_stored.containsAll(df.may_stored)) {
+			KeySet s = df.may_stored.removeAll(df.must_stored);
+			throw new SemanticException("Keys " + s + " may not be saved" +
+										" in a local variable.", n.position());
+		}
 
-        if (! df.must_stored.containsAll(df.may_stored)) {
-            KeySet s = df.may_stored.removeAll(df.must_stored);
-            throw new SemanticException("Keys " + s + " may not be saved" +
-                                        " in a local variable.", n.position());
-        }
+		if (n.ext() instanceof CofferExt) {
+			CofferExt ext = (CofferExt) n.ext();
+			ext.checkHeldKeys(df.must_held, df.must_stored);
+		}
+    	
+    }
 
-        if (n.ext() instanceof CofferExt) {
-            CofferExt ext = (CofferExt) n.ext();
-            ext.checkHeldKeys(df.must_held, df.must_stored);
-        }
+    private void checkExitTerm(FlowGraph graph, ExitTermItem item) throws SemanticException {
+    	check(graph.exitNode(), item.nonExItem);
+    	
+    	List excepts;
+		if (graph.exitNode() instanceof ProcedureDecl) {
+			ProcedureDecl pd = (ProcedureDecl)graph.exitNode();
+			TypeSystem ts = pd.procedureInstance().typeSystem();
+			excepts = pd.throwTypes(ts);
+		}
+		else {
+			excepts = new ArrayList();			
+			for (Iterator i = item.excEdgesToItems.keySet().iterator(); i.hasNext(); ) {
+				FlowGraph.ExceptionEdgeKey key = (ExceptionEdgeKey)i.next();
+				excepts.add(key.type());
+			}
+		}
+
+		List excKeys = new ArrayList();		
+		List excItems = new ArrayList();		
+		for (Iterator i = item.excEdgesToItems.entrySet().iterator(); i.hasNext(); ) {
+			Entry e = (Entry)i.next();
+			excKeys.add(e.getKey());
+			excItems.add(e.getValue());
+		}
+		
+		for (Iterator i = excepts.iterator(); i.hasNext(); ) {
+			Type excType = (Type)i.next();
+			List matchingExc = filterItemsExceptionSubclass(excItems, excKeys, excType);
+			if (!matchingExc.isEmpty()) {
+				check(graph.exitNode(), (DataFlowItem)confluence(matchingExc, graph.exitNode(), graph));
+			}			
+		}
+
     }
 }
