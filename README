@@ -7,10 +7,12 @@ Since you are reading this file, you have already downloaded and unpacked the
 Polyglot distribution.  Your installation directory contains the following
 sub-directories:
 
-  - polyglot: the complete source code of Polyglot
+  - src: the complete source code of Polyglot
+  - src/polyglot: the Polyglot base compiler and some simple extensions 
+  - src/ppg: the Polyglot parser generator, an extension of Java CUP
+  - src/java_cup: tweaked version of the Java CUP parser generator 0.10k.
   - doc: documentation about writing Polyglot extensions
   - doc/api: Javadoc descriptions of Polyglot classes
-  - java_cup: tweaked version of the Java CUP parser generator 0.10k.
 
 Disclaimer
 ----------
@@ -36,7 +38,7 @@ recommend that you use JDK 1.3 or later.  We have experienced problems with
 versions of the JDK older than 1.3.  You must ensure that java and javac are in
 your path.  Polyglot is compiled with the Ant build tool
 (http://jakarta.apache.org/ant).  GNU make is used for compiling
-and running test cases.
+and running test cases.  We are phasing out the use of make in favor of Ant.
 
 Creating an extension
 ---------------------
@@ -51,21 +53,26 @@ Follow these steps to build the base compiler and the installed extensions:
 
 1. First ensure javac is in your path and that you are using JDK 1.3 or later.
 
-2. Suppose the root directory of the Polyglot installation (the directory this
+2. Assume the root directory of the Polyglot installation (the directory this
 README is in) is $POLYGLOT.
 
     $ cd $POLYGLOT
 
-3. Run ant to build the base compiler (the "jl" target) and some extensions.
+3. Run ant to build the base compiler (the "jl" target).
 
-    $ ant jl coffer pao
+    $ ant jl
+
+Optionally, create some extensions:
+
+    $ ant coffer pao
   
-Class files will be dumped in the $POLYGLOT/classes directory.
-You may optionally:
+Class files will be placed in the $POLYGLOT/classes directory.
+You may optionally, do:
 
     $ ant jar
+    $ ant coffer-jar pao-jar
 
-to create jar files for polyglot and each extension.
+to create jar files for Polyglot and for each extension.
 
 4. Update PATH and CLASSPATH.
 
@@ -98,6 +105,7 @@ The current Polyglot developers are:
 
         Nathaniel Nystrom
         Michael Clarkson
+        Stephen Chong
         Andrew C. Myers
 
 Other Polyglot contributers:
@@ -111,32 +119,31 @@ Other Polyglot contributers:
 
 Michael Brukman and Andrew Myers wrote the PPG parser generator.
 
-Some of the class file parsing code is derived from the BLOAT bytecode
-optimizer written by Nathaniel Nystrom, David Whitlock, and Antony Hosking
-at Purdue.
+The Polyglot class file parsing code (src/polyglot/types/reflect) is derived
+from the BLOAT bytecode optimizer written by Nathaniel Nystrom, David Whitlock,
+and Antony Hosking at Purdue.  See http://www.cs.purdue.edu/s3/projects/bloat/.
 
 Restrictions on distribution
 ----------------------------
 
-This release of the Polyglot distribution is governed by the GPL
+This release of the Polyglot distribution is governed by the LGPL
 license as described by the following copyright notice.
 
-Polyglot extensible compiler toolkit
-Copyright (C) 2000-2001 Polyglot project group, Cornell University
+Polyglot extensible compiler framework
+Copyright (C) 2000-2003 Polyglot project group, Cornell University
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
+This library is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
 
-A copy of the GNU General Public License can be found in the file
+A copy of the GNU Lesser General Public License can be found in the file
 LICENSE, included in this distribution.
-
 
 
 CUP Parser Generator Copyright Notice, License, and Disclaimer
@@ -161,24 +168,12 @@ performance of this software.
 
 BLOAT Copyright Notice, License, and Disclaimer
 -----------------------------------------------
-
 All files in the distribution of BLOAT (Bytecode Level Optimization
 and Analysis tool for Java(tm)) are Copyright 1997-2001 by the Purdue
-Research Foundation of Purdue University.  All rights reserved.
+Research Foundation of Purdue University.
 
-Redistribution and use in source and binary forms are permitted
-provided that this entire copyright notice is duplicated in all such
-copies, and that any documentation, announcements, and other materials
-related to such distribution and use acknowledge that the software was
-developed at Purdue University, West Lafayette, IN by Antony Hosking,
-David Whitlock, and Nathaniel Nystrom.  No charge may be made for
-copies, derivations, or distributions of this material without the
-express written consent of the copyright holder.  Neither the name of
-the University nor the name of the author may be used to endorse or
-promote products derived from this material without specific prior
-written permission.  THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR ANY PARTICULAR
-PURPOSE.
+BLOAT was written by Nathaniel Nystrom, David Whitlock, and Antony Hosking
+at Purdue University.  BLOAT is licensed under the LGPL and has the same
+restrictions on distributed as Polyglot.  See the file LICENSE for a copy.
 
 Java is a trademark of Sun Microsystems, Inc.

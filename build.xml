@@ -43,7 +43,7 @@
   <target name="compile" depends="base,jl" description="compile the source"/>
 
   <!-- generate the Polyglot distribution -->
-  <target name="dist" depends="compile"
+  <target name="dist-dir" depends="compile"
     description="generate the distribution">
     <!-- Create the distribution directory -->
     <mkdir dir="${dist}/lib"/>
@@ -362,7 +362,7 @@
   <!-- SKEL: When using the newext script, copy and modify this target by
        replacing the name "skel" with the new extension name. -->
   <target name="skel-jar" depends="skel">
-    <jar jarfile="skel.jar" basedir="${classes}" includes="polyglot/ext/skel/**"/>
+    <jar jarfile="${lib}/skel.jar" basedir="${classes}" includes="polyglot/ext/skel/**"/>
   </target>
 
   <target name="param" depends="jl">
@@ -427,108 +427,112 @@ ext=''
   </target>
 
   <target name="jar" depends="jl">
-    <jar jarfile="jl.jar" basedir="${classes}"
+    <jar jarfile="${lib}/polyglot.jar" basedir="${classes}"
       includes="polyglot/ast/**,polyglot/ext/jl/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**"/>
   </target>
 
   <target name="pao-jar" depends="pao">
-    <jar jarfile="pao.jar" basedir="${classes}" includes="polyglot/ext/pao/**"/>
+    <jar jarfile="${lib}/pao.jar" basedir="${classes}" includes="polyglot/ext/pao/**"/>
   </target>
 
   <target name="coffer-jar" depends="coffer">
-    <jar jarfile="coffer.jar" basedir="${classes}" includes="polyglot/ext/coffer/**,polyglot/ext/param/**"/>
+    <jar jarfile="${lib}/coffer.jar" basedir="${classes}" includes="polyglot/ext/coffer/**,polyglot/ext/param/**"/>
   </target>
 
-  <target name="pao-dist" depends="base-dist,pao-jar">
-    <copy todir="${dist}/lib" file="pao.jar"/>
+  <target name="pao-dist" depends="jl-dist,pao-jar">
+    <copy todir="${dist}/lib" file="${lib}/pao.jar"/>
 
-    <copy todir="${dist}/polyglot/ext/pao">
+    <copy todir="${dist}/src/polyglot/ext/pao">
       <fileset dir="${src}/polyglot/ext/pao"
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
     </copy>
   </target>
 
-  <target name="param-dist" depends="base-dist,param">
-    <copy todir="${dist}/polyglot/ext/param">
+  <target name="param-dist" depends="jl-dist,param">
+    <copy todir="${dist}/src/polyglot/ext/param">
       <fileset dir="${src}/polyglot/ext/param"
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
     </copy>
   </target>
 
-  <target name="skel-dist" depends="base-dist">
-    <copy todir="${dist}/polyglot/ext/skel">
+  <target name="skel-dist" depends="jl-dist">
+    <copy todir="${dist}/src/polyglot/ext/skel">
       <fileset dir="${src}/polyglot/ext/skel"
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
     </copy>
 
-    <copy file="${src}/polyglot/ext/newext" todir="${dist}/polyglot/ext"/>
-    <chmod perm="+x" file="${dist}/polyglot/ext/newext"/>
+    <copy file="${src}/polyglot/ext/newext" todir="${dist}/src/polyglot/ext"/>
+    <chmod perm="+x" file="${dist}/src/polyglot/ext/newext"/>
   </target>
 
   <target name="coffer-dist" depends="param-dist,coffer-jar">
-    <copy todir="${dist}/lib" file="coffer.jar"/>
+    <copy todir="${dist}/lib" file="${lib}/coffer.jar"/>
 
-    <copy todir="${dist}/polyglot/ext/coffer">
+    <copy todir="${dist}/src/polyglot/ext/coffer">
       <fileset dir="${src}/polyglot/ext/coffer"
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
     </copy>
   </target>
 
-  <target name="base-dist" depends="jar,dist,bin">
-    <copy todir="${dist}/lib" file="jl.jar"/>
+  <target name="jl-dist" depends="jar,dist-dir,bin">
+    <copy todir="${dist}/lib" file="${lib}/polyglot.jar"/>
 
-    <copy todir="${dist}/polyglot/ast">
+    <copy todir="${dist}/src/polyglot/ast">
       <fileset dir="${src}/polyglot/ast" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/polyglot/ext/jl">
+    <copy todir="${dist}/src/polyglot/ext/jl">
       <fileset dir="${src}/polyglot/ext/jl"
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
     </copy>
 
-    <copy todir="${dist}/polyglot/frontend">
+    <copy todir="${dist}/src/polyglot/frontend">
       <fileset dir="${src}/polyglot/frontend" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/polyglot/lex">
+    <copy todir="${dist}/src/polyglot/lex">
       <fileset dir="${src}/polyglot/lex" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/polyglot/main">
+    <copy todir="${dist}/src/polyglot/main">
       <fileset dir="${src}/polyglot/main" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/polyglot/parse">
+    <copy todir="${dist}/src/polyglot/parse">
       <fileset dir="${src}/polyglot/parse" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/polyglot/types">
+    <copy todir="${dist}/src/polyglot/types">
       <fileset dir="${src}/polyglot/types" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/polyglot/util">
+    <copy todir="${dist}/src/polyglot/util">
       <fileset dir="${src}/polyglot/util" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/polyglot/visit">
+    <copy todir="${dist}/src/polyglot/visit">
       <fileset dir="${src}/polyglot/visit" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/java_cup">
-      <fileset dir="java_cup"/>
+    <copy todir="${dist}/src/java_cup">
+      <fileset dir="${src}/java_cup"/>
     </copy>
 
-    <copy todir="${dist}/polyglot/ext/jl/tests" file="${src}/polyglot/ext/jl/tests/Makefile"/>
+    <copy todir="${dist}/src/ppg">
+      <fileset dir="${src}/ppg"/>
+    </copy>
+
+    <copy todir="${dist}/src/polyglot/ext/jl/tests" file="${src}/polyglot/ext/jl/tests/Makefile"/>
 
     <copy file="${bin}/jlc.in" todir="${dist}/bin"/>
     <copy file="doc/Overview.txt" todir="${dist}/doc"/>
-    <copy file="jlex.jar" todir="${dist}"/>
+    <copy file="${lib}/jlex.jar" todir="${dist}/lib"/>
     <copy file="build.xml" todir="${dist}"/>
     <copy file="README" todir="${dist}"/>
     <copy file="LICENSE" todir="${dist}"/>
   </target>
 
-  <target name="dist-javadoc" depends="base-dist">
+  <target name="dist-javadoc" depends="jl-dist">
     <ant inheritAll="false" antfile="${dist}/build.xml" dir="${dist}" target="javadoc"/>
     <ant inheritAll="false" antfile="${dist}/build.xml" dir="${dist}" target="clobber"/>
   </target>
@@ -543,9 +547,10 @@ ext=''
     </javadoc>
   </target>
 
-  <target name="polyglot-dist" depends="base-dist,skel-dist,pao-dist,coffer-dist"/>
+  <target name="polyglot-dist" depends="jl-dist,skel-dist,pao-dist,coffer-dist"/>
   <target name="polyglot-dist-javadoc" depends="polyglot-dist,dist-javadoc"/>
-  <target name="polyj-dist" depends="base-dist,polyj"/>
-  <target name="jmatch-dist" depends="base-dist,jmatch"/>
+  <target name="polyj-dist" depends="jl-dist,polyj"/>
+  <target name="jmatch-dist" depends="jl-dist,jmatch"/>
+  <target name="dist" depends="polyglot-dist"/>
 </project>
 
