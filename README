@@ -1,13 +1,15 @@
 Polyglot 0.9
             Polyglot Extensible Compiler Toolkit
 
-When reading this file you have already downloaded and unpacked the Polyglot
-Distribution. Your installation directory contains the following sub-folders:
+Since you are reading this file, you have already downloaded and unpacked the
+Polyglot Distribution. Your installation directory contains the following
+sub-directories:
 
   - polyglot: the complete source code of Polyglot 0.9
   - doc: old documentation about writing Polyglot extensions
   - javadoc: Javadoc descriptions of Polyglot classes
   - images: Logos
+
 
 Disclaimer
 ----------
@@ -18,39 +20,79 @@ interfaces.  Also, Polyglot is not well-documented; in particular, some of the
 javadoc is missing or out-of-date.  We are working on writing better
 documentation.  Watch the web page for further updates.
 
-Installation Instructions
---------------------------
+Requirements
+------------
 
-First ensure javac is in your path and that you are using JDK 1.2
-or later.
+Polyglot builds on Unix and on Windows using the Cygwin environment.  We
+recommend that you use JDK 1.3 or later.  We have experienced problems with
+versions of the JDK older than 1.3.  You must ensure that java and javac are in
+your path.
 
-1. Create "bin" directory and running scripts.
+Creating an extension
+---------------------
+
+To create your own extensions, see the file doc/overview.txt.
+
+Building Polyglot
+-----------------
+
+Follow the following steps to build the base compiler and the installed
+extensions.
+
+1. First ensure javac is in your path and that you are using JDK 1.3 or later.
+Suppose the root directory of the Polyglot installation (the directory this
+README is in) is $POLYGLOT.
+
+2. Configure the build environment.
 
 On Unix, do:
 
-    sh ./configure
+    $ sh ./configure
 
-On Windows NT, you will need the Cygwin environment. While running sh, do:
+On Windows NT, you will need the Cygwin environment.  While running sh, do:
 
-    sh ./configure
+    $ sh ./configure
 
-2. Update PATH and CLASSPATH.
+This script will locate java and javac and determine the values of some
+Java properties.  The script will create Defs.mk and bin/defs.
 
-Suppose <polyglot> is the absolute path of your Polyglot installation directory.
+Running configure with no options will create a Defs.mk file for building all
+installed language extensions.  You may optionally specify on the command line,
+the names of the extensions to build.  The installed extensions can be found in
+the directory polyglot/ext
 
--- Add "<polyglot>/bin" to your PATH environment variable or copy all the files
-in "<polyglot>/bin" to a directory in PATH.
+3. Run make:
 
--- Update your CLASSPATH environment variable.
+    $ make
 
-On Unix, do:
+Class files will be dumped in the $POLYGLOT/classes directory.
+You may optionally:
 
-    CLASSPATH=$CLASSPATH:<polyglot>/polyglot.jar:<polyglot>/ib/java_cup.jar
+    $ make jar
+
+to create jar files for polyglot and each extension
+
+4. Update PATH and CLASSPATH.
+
+Add $POLYGLOT/bin to your PATH environment variable.
+
+Update your CLASSPATH environment variable.  On Unix, do:
+
+    $ CLASSPATH=$CLASSPATH:$POLYGLOT/polyglot.jar:$POLYGLOT/java_cup.jar
 
 On Windows, do:
 
-    set CLASSPATH=%CLASSPATH%;<polyglot>\polyglot.jar;<polyglot>\java_cup.jar
+    $ set CLASSPATH=%CLASSPATH%;$POLYGLOT\polyglot.jar;$POLYGLOT\java_cup.jar
 
+4. You are now ready to try out Polyglot.  See doc/overview.txt for
+instructions on building an extension.  To compile using an existing
+extension do:
+
+    $ jlc -ext <extname> File.jl
+
+To compile using the base compiler:
+
+    $ jlc File.jl
 
 Restrictions on distribution
 ----------------------------
