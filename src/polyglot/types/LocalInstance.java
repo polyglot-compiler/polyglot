@@ -24,9 +24,4 @@ public interface LocalInstance extends VarInstance
      * Set the local's constant value.
      */
     LocalInstance constantValue(Object value);
-
-    /**
-     * Destructively set the local's constant value.
-     */
-    void setConstantValue(Object value);
 }

@@ -39,9 +39,9 @@ public class ConstructorInstance_c extends ProcedureInstance_c
     }
 
     public ConstructorInstance throwTypes(List l) {
-        if (!CollectionUtil.equals(this.excTypes, l)) {
+        if (!CollectionUtil.equals(this.throwTypes, l)) {
             ConstructorInstance_c n = (ConstructorInstance_c) copy();
-            n.excTypes = new ArrayList(l);
+            n.throwTypes = new ArrayList(l);
             return n;
         }
         return this;
@@ -76,6 +76,6 @@ public class ConstructorInstance_c extends ProcedureInstance_c
     public boolean isCanonical() {
 	return container.isCanonical()
 	    && listIsCanonical(formalTypes)
-	    && listIsCanonical(excTypes);
+	    && listIsCanonical(throwTypes);
     }
 }

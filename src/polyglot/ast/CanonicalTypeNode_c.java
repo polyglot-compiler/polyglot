@@ -15,7 +15,7 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
     super(pos);
     this.type = type;
   }
-
+  
   /**
    * If the "use-fully-qualified-class-names" options is used, then the
    * fully qualified names is written out (<code>java.lang.Object</code>).

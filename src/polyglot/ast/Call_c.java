@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
+
 import java.util.*;
 
 /**
@@ -27,6 +28,10 @@ public class Call_c extends Expr_c implements Call
     this.name = name;
     this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
     this.targetImplicit = (target == null);
+  }
+
+  public boolean isCanonical() {
+      return mi != null && mi.isCanonical() && super.isCanonical();
   }
 
   /** Get the precedence of the call. */
@@ -175,9 +180,9 @@ public class Call_c extends Expr_c implements Call
             }
         }
 
-        // we call typeCheck on the reciever too.
-        r = (Receiver)r.typeCheck(tc);
-        return this.targetImplicit(true).target(r).del().typeCheck(tc);
+        // we call computeTypes on the reciever too.
+        Call_c call = (Call_c) this.targetImplicit(true).target(r);
+        return call.visit(tc);
     }
 
     /** Type check the call. */
@@ -189,29 +194,34 @@ public class Call_c extends Expr_c implements Call
 
         for (Iterator i = this.arguments.iterator(); i.hasNext(); ) {
             Expr e = (Expr) i.next();
+            if (! e.type().isCanonical()) {
+                return this;
+            }
             argTypes.add(e.type());
         }
 
         if (this.target == null) {
             return this.typeCheckNullTarget(tc, argTypes);
         }
-
+        
+        if (! this.target.type().isCanonical()) {
+            return this;
+        }
+        
         ReferenceType targetType = this.findTargetType();
         MethodInstance mi = ts.findMethod(targetType, 
                                           this.name, 
                                           argTypes, 
                                           c.currentClass());
         
-        
         /* This call is in a static context if and only if
          * the target (possibly implicit) is a type node.
          */
         boolean staticContext = (this.target instanceof TypeNode);
 
-
         if (staticContext && !mi.flags().isStatic()) {
             throw new SemanticException("Cannot call non-static method " + this.name
-                                  + " of " + targetType + " in static "
+                                  + " of " + target.type() + " in static "
                                   + "context.", this.position());
         }
 
@@ -222,14 +232,16 @@ public class Call_c extends Expr_c implements Call
                 throw new SemanticException("Cannot call an abstract method " +
                                "of the super class", this.position());            
         }
+
+        Call_c call = (Call_c)this.methodInstance(mi).type(mi.returnType());
+
         // If we found a method, the call must type check, so no need to check
         // the arguments here.
-        
-        Call_c call = (Call_c)this.methodInstance(mi).type(mi.returnType());
         call.checkConsistency(c);
+
         return call;
     }
-    
+
     protected ReferenceType findTargetType() throws SemanticException { 
         Type t = target.type();
         if (t.isReference()) {

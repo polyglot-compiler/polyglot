@@ -1,5 +1,6 @@
 package polyglot.types;
 
+import polyglot.frontend.Job;
 import polyglot.util.Enum;
 import java.util.List;
 
@@ -21,6 +22,9 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance
     public static final Kind LOCAL = new Kind("local");
     public static final Kind ANONYMOUS = new Kind("anonymous");
 
+    /** Get the job (i.e., compilation unit) associated with this class; or null. */
+    Job job();
+    
     /** Get the class's kind. */
     Kind kind();
 

@@ -3,6 +3,9 @@ package polyglot.ext.jl.ast;
 import java.util.*;
 
 import polyglot.ast.*;
+import polyglot.frontend.*;
+import polyglot.frontend.goals.FieldConstantsChecked;
+import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.*;
@@ -28,6 +31,18 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         this.type = type;
         this.name = name;
         this.init = init;
+    }
+    
+    public boolean isCanonical() {
+        return fi != null && fi.isCanonical() && (init == null || (ii != null && ii.isCanonical())) && super.isCanonical();
+    }
+
+    public MemberInstance memberInstance() {
+        return fi;
+    }
+
+    public VarInstance varInstance() {
+        return fi;
     }
 
     /** Get the initializer instance of the initializer. */
@@ -133,93 +148,50 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         TypeSystem ts = tb.typeSystem();
 
+        ParsedClassType ct = tb.currentClass();
+
+        Flags f = flags;
+
+        if (ct.flags().isInterface()) {
+            f = f.Public().Static().Final();
+        }
+        
         FieldDecl n;
 
         if (init != null) {
-            ClassType ct = tb.currentClass();
-            Flags f = (flags.isStatic()) ? Flags.STATIC : Flags.NONE;
+            Flags iflags = f.isStatic() ? Flags.STATIC : Flags.NONE;
             InitializerInstance ii = ts.initializerInstance(init.position(),
-                                                            ct, f);
+                                                            ct, iflags);
             n = initializerInstance(ii);
         }
         else {
             n = this;
         }
 
-        FieldInstance fi = ts.fieldInstance(n.position(), ts.Object(),
-                                            Flags.NONE,
-                                            ts.unknownType(position()),
-                                            n.name());
+        // XXX: MutableFieldInstance
+        FieldInstance fi = ts.fieldInstance(position(), ct, f,
+                                            ts.unknownType(position()), name);
+        ct.addField(fi);
 
-        return n.fieldInstance(fi);
-    }
-
-    /** Build type objects for the declaration. */
-    public NodeVisitor disambiguateEnter(AmbiguityRemover ar)
-        throws SemanticException
-    {
-        if (ar.kind() == AmbiguityRemover.SUPER) {
-            return ar.bypassChildren(this);
-        }
-        else if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-            if (init != null) {
-                return ar.bypass(init);
-            }
-        }
-
-        return ar;
+        return n.flags(f).fieldInstance(fi);
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-            Context c = ar.context();
-            TypeSystem ts = ar.typeSystem();
+        Context c = ar.context();
+        TypeSystem ts = ar.typeSystem();
 
-            ParsedClassType ct = c.currentClassScope();
-
-            Flags f = flags;
-
-            if (ct.flags().isInterface()) {
-                f = f.Public().Static().Final();
-            }
-
-            FieldInstance fi = ts.fieldInstance(position(), ct, f,
-                                                declType(), name);
-
-            return flags(f).fieldInstance(fi);
+        // merge isCanonical with type states
+        // should type states just be booleans?
+        // this.fi.state(AMBIGUOUS)
+        if (this.fi.isCanonical()) {
+            return this;
         }
 
-        if (ar.kind() == AmbiguityRemover.ALL) {
-            checkFieldInstanceConstant();
+        if (declType().isCanonical()) {
+            this.fi.setType(declType());
         }
-
+        
         return this;
-    }
-
-    protected void checkFieldInstanceConstant() {
-        FieldInstance fi = this.fi;
-
-        if (init != null && fi.flags().isFinal() && init.isConstant()) {
-            Object value = init.constantValue();
-            fi.setConstantValue(value);
-        }
-    }
-
-    public NodeVisitor addMembersEnter(AddMemberVisitor am) {
-        ParsedClassType ct = am.context().currentClassScope();
-
-        FieldInstance fi = this.fi;
-
-        if (fi == null) {
-            throw new InternalCompilerError("null field instance");
-        }
-
-        if (Report.should_report(Report.types, 5))
-            Report.report(5, "adding " + fi + " to " + ct);
-
-        ct.addField(fi);
-
-        return am.bypassChildren(this);
     }
 
     public Context enterScope(Context c) {
@@ -228,13 +200,52 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         }
         return c;
     }
+   
+    public Node checkConstants(ConstantChecker cc) throws SemanticException {
+        if (init != null && ! init.constantValueSet()) {
+            // HACK to add dependencies for computing the constant value.
+            final Scheduler scheduler = cc.typeSystem().extensionInfo().scheduler();
+            final Goal ccgoal = cc.goal();
+            
+            init.visit(new NodeVisitor() {
+               public Node leave(Node old, Node n, NodeVisitor v) {
+                   if (n instanceof Field) {
+                       Field f = (Field) n;
+                       if (! f.fieldInstance().constantValueSet()) {
+                           Goal g = new FieldConstantsChecked(f.fieldInstance());
+                           try {
+                               scheduler.addPrerequisiteDependency(ccgoal, g);
+                           }
+                           catch (CyclicDependencyException e) {
+                               FieldDecl_c.this.fi.setNotConstant();
+                           }
+                       }
+                   }
+                   return n;
+               }
+            });
+            
+            return this;
+        }
+        
+        if (init == null || ! init.isConstant() || ! fi.flags().isFinal()) {
+            fi.setNotConstant();
+        }
+        else {
+            fi.setConstantValue(init.constantValue());
+        }
+
+        return this;
+    }
+    
+    public boolean constantValueSet() {
+        return fi != null && fi.constantValueSet();
+    }
 
     /** Type check the declaration. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-        checkFieldInstanceConstant();
-        
         try {
             ts.checkFieldFlags(flags);
         }

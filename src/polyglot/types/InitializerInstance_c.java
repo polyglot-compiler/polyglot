@@ -35,6 +35,10 @@ public class InitializerInstance_c extends TypeObject_c
         }
         return this;
     }
+    
+    public void setContainer(ReferenceType container) {
+        this.container = (ClassType) container;
+    }
 
     public Flags flags() {
         return flags;
@@ -49,6 +53,20 @@ public class InitializerInstance_c extends TypeObject_c
         return this;
     }
 
+    /**
+     * @param container The container to set.
+     */
+    public void setContainer(ClassType container) {
+        this.container = container;
+    }
+    
+    /**
+     * @param flags The flags to set.
+     */
+    public void setFlags(Flags flags) {
+        this.flags = flags;
+    }
+    
     public int hashCode() {
         return container.hashCode() + flags.hashCode();
     }

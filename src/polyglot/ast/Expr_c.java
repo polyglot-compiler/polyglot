@@ -17,6 +17,10 @@ public abstract class Expr_c extends Term_c implements Expr
 	super(pos);
     }
 
+    public boolean isCanonical() {
+        return type != null && type.isCanonical() && super.isCanonical();
+    }
+    
     /**
      * Get the type of the expression.  This may return an
      * <code>UnknownType</code> before type-checking, but should return the
@@ -48,6 +52,10 @@ public abstract class Expr_c extends Term_c implements Expr
     /** Get the precedence of the expression. */
     public Precedence precedence() {
 	return Precedence.UNKNOWN;
+    }
+
+    public boolean constantValueSet() {
+        return true;
     }
 
     public boolean isConstant() {

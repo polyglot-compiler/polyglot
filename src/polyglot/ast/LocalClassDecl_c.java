@@ -74,32 +74,6 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
         c.addNamed(decl.type().toClass());
     }
 
-    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
-        return ar.bypassChildren(this);
-    }
-
-    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (ar.kind() == AmbiguityRemover.ALL) {
-            Job sj = ar.job().spawn(ar.context(), decl,
-                                    Pass.CLEAN_SUPER, Pass.ADD_MEMBERS_ALL);
-
-            if (! sj.status()) {
-                if (! sj.reportedErrors()) {
-                    throw new SemanticException("Could not disambiguate local " +
-                                                "class \"" + decl.name() + "\".",
-                                                position());
-                }
-                throw new SemanticException();
-            }
-
-            ClassDecl d = (ClassDecl) sj.ast();
-            LocalClassDecl n = decl(d);
-            return n.visitChildren(ar);
-        }
-
-        return this;
-    }
-
     public String toString() {
 	return decl.toString();
     }

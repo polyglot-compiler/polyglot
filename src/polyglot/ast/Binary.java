@@ -35,7 +35,7 @@ public interface Binary extends Expr
     public static final Operator DIV      = new Operator("/", Precedence.MUL);
     public static final Operator MOD      = new Operator("%", Precedence.MUL);
     public static final Operator BIT_OR   = new Operator("|", Precedence.BIT_OR);
-    public static final Operator BIT_AND  = new Operator("&", Precedence.BIT_AND);
+    public static final Operator BIT_AND  = new Operator("&", Precedence.BIT_OR);
     public static final Operator BIT_XOR  = new Operator("^", Precedence.BIT_XOR);
     public static final Operator SHL      = new Operator("<<", Precedence.SHIFT);
     public static final Operator SHR      = new Operator(">>", Precedence.SHIFT);

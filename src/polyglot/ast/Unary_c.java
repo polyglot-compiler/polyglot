@@ -205,6 +205,10 @@ public class Unary_c extends Expr_c implements Unary
         return succs;
     }
     
+    public boolean constantValueSet() {
+        return expr.constantValueSet();
+    }
+    
     public boolean isConstant() {
 	return expr.isConstant();
     }

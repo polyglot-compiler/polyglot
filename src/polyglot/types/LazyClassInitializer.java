@@ -13,6 +13,11 @@ public interface LazyClassInitializer
     public boolean fromClassFile();
 
     /**
+     * Initialize <code>ct</code>'s superclass.
+     */
+    public void initSuperclass(ParsedClassType ct);
+   
+    /**
      * Initialize <code>ct</code>'s constructors.
      */
     public void initConstructors(ParsedClassType ct);
@@ -36,4 +41,18 @@ public interface LazyClassInitializer
      * Initialize <code>ct</code>'s interfaces.
      */
     public void initInterfaces(ParsedClassType ct);
+
+    public boolean constructorsInitialized();
+
+    public boolean fieldsInitialized();
+
+    public boolean interfacesInitialized();
+
+    public boolean memberClassesInitialized();
+
+    public boolean methodsInitialized();
+
+    public boolean superclassInitialized();
+
+    public boolean initialized();
 }

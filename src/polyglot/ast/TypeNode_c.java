@@ -17,6 +17,10 @@ public abstract class TypeNode_c extends Node_c implements TypeNode
     public TypeNode_c(Position pos) {
 	super(pos);
     }
+    
+    public boolean isCanonical() {
+        return type != null && type.isCanonical() && super.isCanonical();
+    }
 
     /** Get the type as a qualifier. */
     public Qualifier qualifier() {

@@ -1,7 +1,11 @@
 package polyglot.visit;
 
+import java.util.LinkedList;
+
 import polyglot.ast.Node;
+import polyglot.frontend.VisitorPass;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.StringUtil;
 
 /**
  * The <code>NodeVisitor</code> represents an implementation of the "Visitor"
@@ -183,9 +187,9 @@ public abstract class NodeVisitor
      */
     public void finish() { }
     public void finish(Node ast) { this.finish(); }
-
+    
     public String toString() {
-        return getClass().getName();
+        return StringUtil.getShortNameComponent(getClass().getName());
     }
 
     /**
@@ -206,28 +210,45 @@ public abstract class NodeVisitor
 	Node n = override(parent, child);
 
 	if (n == null) {
-	    NodeVisitor v_ = this.enter(parent, child);
-
-	    if (v_ == null) {
-		throw new InternalCompilerError(
-		    "NodeVisitor.enter() returned null.");
-	    }
-
-	    n = child.visitChildren(v_);
-
-	    if (n == null) {
-		throw new InternalCompilerError(
-		    "Node_c.visitChildren() returned null.");
-	    }
-
-	    n = this.leave(parent, child, n, v_);
-
-	    if (n == null) {
-		throw new InternalCompilerError(
-		    "NodeVisitor.leave() returned null.");
-	    }
+	    return visitEdgeNoOverride(parent, child);
 	}
 
 	return n;
+    }
+
+    /**
+     * Visit the edge between the parent node <code>parent</code>, and child
+     * node <code>child</code>, without invoking <code>override</code> for
+     * the child.  This method recursively visits the subtree rooted at
+     * <code>child</code>.
+     * 
+     * @param parent
+     * @param child
+     * @return
+     */
+    public Node visitEdgeNoOverride(Node parent, Node child) {
+        if (child == null) {
+            return null;
+        }
+
+        NodeVisitor v_ = enter(parent, child);
+        
+        if (v_ == null) {
+            throw new InternalCompilerError("NodeVisitor.enter() returned null.");
+        }
+
+        Node n = child.visitChildren(v_);
+	    
+        if (n == null) {
+            throw new InternalCompilerError("Node.visitChildren() returned null.");
+        }
+        
+        n = this.leave(parent, child, n, v_);
+        
+        if (n == null) {
+            throw new InternalCompilerError("NodeVisitor.leave() returned null.");
+        }
+        
+        return n;
     }
 }

@@ -2,6 +2,9 @@ package polyglot.visit;
 
 import polyglot.main.*;
 import polyglot.ast.*;
+import polyglot.frontend.*;
+import polyglot.frontend.Job;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
 import polyglot.util.*;
 
@@ -14,6 +17,7 @@ import java.util.*;
  */
 public class ClassSerializer extends NodeVisitor
 {
+    protected Goal goal;
     protected TypeEncoder te;
     protected ErrorQueue eq;
     protected Date date;
@@ -21,15 +25,16 @@ public class ClassSerializer extends NodeVisitor
     protected NodeFactory nf;
     protected Version ver;
 
-    public ClassSerializer(TypeSystem ts, NodeFactory nf, Date date, ErrorQueue eq, Version ver) {
-	this.ts = ts;
-	this.nf = nf;
-	this.te = new TypeEncoder( ts);
-	this.eq = eq;
-	this.date = date;
+    public ClassSerializer(Goal goal, TypeSystem ts, NodeFactory nf, Date date, ErrorQueue eq, Version ver) {
+        this.goal = goal;
+        this.ts = ts;
+        this.nf = nf;
+        this.te = new TypeEncoder( ts);
+        this.eq = eq;
+        this.date = date;
         this.ver = ver;
     }
-
+    
     public Node override(Node n) {
         // Stop at class members.  We only want to encode top-level classes.
 	if (n instanceof ClassMember && ! (n instanceof ClassDecl)) {
@@ -54,9 +59,10 @@ public class ClassSerializer extends NodeVisitor
             // initializer.
             ct.memberClasses();
             ct.constructors();
-            ct.interfaces();
             ct.methods();
             ct.fields();
+            ct.interfaces();
+            ct.superType();
 
 	    if (! (ct.isTopLevel() || ct.isMember())) {
 	        return n;

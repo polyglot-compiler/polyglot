@@ -3,8 +3,11 @@ package polyglot.ast;
 import polyglot.util.Copy;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.types.ParsedClassType;
 import polyglot.types.Type;
 import polyglot.visit.*;
+
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -53,7 +56,23 @@ public interface Node extends JL, Copy
 
     /** Create a copy of the node with a new position. */
     Node position(Position position);
-
+    
+    /** 
+     * Collection of all ParsedClassTypes whose ClassDecl is at this node or below.
+     */
+    Collection typesBelow();
+    Node typesBelow(Collection typesBelow);
+    
+    /** Return true if there an error in this node or its children. */
+    boolean error();
+    Node error(boolean flag);
+    
+    /**
+     * Return true if the all type information for the node (but not necessarily
+     * for the node's children) is unambiguous.
+     */
+    boolean isCanonical();
+    
     /**
      * Visit the node.  This method is equivalent to
      * <code>visitEdge(null, v)</code>.

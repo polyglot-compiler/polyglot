@@ -80,7 +80,11 @@ public class Switch_c extends Stmt_c implements Switch
             throw new SemanticException("Switch index must be an integer.",
                                         position());
         }
+        
+        return this;
+    }
 
+    public Node checkConstants(ConstantChecker cc) throws SemanticException {
         Collection labels = new HashSet();
 
 	for (Iterator i = elements.iterator(); i.hasNext();) {
@@ -94,6 +98,10 @@ public class Switch_c extends Stmt_c implements Switch
 	       if (c.isDefault()) {
 		   key = "default";
 		   str = "default";
+	       }
+	       else if (! c.expr().constantValueSet()) {
+	           // Constant not known yet; we'll try again later.
+	           return this;
 	       }
                else if (c.expr().isConstant()) {
 		   key = new Long(c.value());

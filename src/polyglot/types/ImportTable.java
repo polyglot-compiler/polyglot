@@ -216,7 +216,7 @@ public class ImportTable extends ClassResolver
                 // The name was short, but not in any imported class or package.
                 // Check the null package.
                 resolved = resolver.find(name); // may throw exception
-            
+
                 if (!isVisibleFrom(resolved, "")) {
                     // Not visible.
                     throw new NoClassException(name, sourcePos);

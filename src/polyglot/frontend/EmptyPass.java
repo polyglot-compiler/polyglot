@@ -1,15 +1,17 @@
 package polyglot.frontend;
 
+import polyglot.frontend.goals.Goal;
+
 /**
  * An <code>EmptyPass</code> does nothing.
  */
 public class EmptyPass extends AbstractPass
 {
-    public EmptyPass(Pass.ID id) {
-      	super(id);
+    public EmptyPass(Goal goal) {
+      	super(goal);
     }
 
     public boolean run() {
-	return true;
+        return true;
     }
 }

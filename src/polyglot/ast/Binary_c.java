@@ -92,8 +92,12 @@ public class Binary_c extends Expr_c implements Binary
 	return reconstruct(left, right);
     }
     
+    public boolean constantValueSet() {
+        return left.constantValueSet() && right.constantValueSet();
+    }
+    
     public boolean isConstant() {
-	return left.isConstant() && right.isConstant();
+        return left.isConstant() && right.isConstant();
     }
     
     public Object constantValue() {

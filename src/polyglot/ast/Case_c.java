@@ -85,15 +85,27 @@ public class Case_c extends Stmt_c implements Case
 		"Case label must be an byte, char, short, or int.",
 		position());
 	}
+    
+	return this;
+    }
+    
+    public Node checkConstants(ConstantChecker cc) throws SemanticException {
+        if (expr == null) {
+            return this;
+        }
 
         Object o = null;
-
+        
 	if (expr instanceof Field) {
 	    FieldInstance fi = ((Field) expr).fieldInstance();
 
 	    if (fi == null) {
 	        throw new InternalCompilerError(
 		    "Undefined FieldInstance after type-checking.");
+	    }
+        
+	    if (! fi.constantValueSet()) {
+	        return this;
 	    }
 
 	    if (! fi.isConstant()) {
@@ -110,20 +122,21 @@ public class Case_c extends Stmt_c implements Case
 	        throw new InternalCompilerError(
 		    "Undefined LocalInstance after type-checking.");
 	    }
-
-	    if (! li.isConstant()) {
-                /* FIXME: isConstant() is incorrect 
-	        throw new SemanticException("Case label must be an integral constant.",
-					    position());
-                */
-                return this;
+        
+	    if (! li.constantValueSet()) {
+	        return this;
 	    }
 
-            o = li.constantValue();
+	    if (! li.isConstant()) {
+                throw new SemanticException("Case label must be an integral constant.",
+					    position());
+	    }
+
+	    o = li.constantValue();
 	}
 	else {
-            o = expr.constantValue();
-        }
+	    o = expr.constantValue();
+	}
 
         if (o instanceof Number && ! (o instanceof Long) &&
             ! (o instanceof Float) && ! (o instanceof Double)) {

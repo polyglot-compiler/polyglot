@@ -21,6 +21,10 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 	this.qual = qual;
 	this.name = name;
     }
+    
+    public boolean isCanonical() {
+        return false;
+    }
 
     public Qualifier qualifier() {
 	return this.qualifier;
@@ -72,6 +76,14 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
     }
 
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
+        if (qual instanceof Ambiguous) {
+            return this;
+        }
+        
+        if (qual != null && ! qual.qualifier().isCanonical()) {
+            return this;
+        }
+        
 	Node n = sc.nodeFactory().disamb().disambiguate(this, sc, position(), qual, name);
 
 	if (n instanceof QualifierNode) {
@@ -84,10 +96,10 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-	throw new InternalCompilerError(position(),
-	    "Cannot type check ambiguous node " + this + ".");
-    } 
-
+        // Didn't finish disambiguation; just return.
+        return this;
+    }
+    
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
 	throw new InternalCompilerError(position(),
 	    "Cannot exception check ambiguous node " + this + ".");

@@ -15,6 +15,7 @@ public interface VarInstance extends TypeObject
      * The name of the variable.
      */
     String name();
+    void setName(String name);
 
     /**
      * The type of the variable.
@@ -22,10 +23,21 @@ public interface VarInstance extends TypeObject
     Type type();
 
     /**
+     * Whether the variable's constant value has been set yet.
+     */
+    boolean constantValueSet();
+    
+    /**
      * The variable's constant value, or null.
      */
     Object constantValue();
 
+    /**
+     * Destructively set the local's constant value.
+     */
+    void setConstantValue(Object value);
+    void setNotConstant();
+    
     /**
      * Whether the variable has a constant value.
      */

@@ -4,6 +4,7 @@ import java.util.List;
 
 import polyglot.ast.*;
 import polyglot.types.*;
+import polyglot.util.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.*;
@@ -76,19 +77,13 @@ public class Special_c extends Expr_c implements Special
         TypeSystem ts = tc.typeSystem();
         Context c = tc.context();
 
-        ClassType t;
-
+        ClassType t = null;
+        
         if (qualifier == null) {
             // an unqualified "this" or "super"
             t = c.currentClass();
         }
-        else {    
-	    if (! qualifier.type().isClass()) {
-		throw new SemanticException("Qualified " + kind +
-		    " expression must be of a class type",
-		    qualifier.position());
-	    }
-
+        else if (qualifier.type().isClass()) {
             t = qualifier.type().toClass();
 
             if (!c.currentClass().hasEnclosingInstance(t)) {
@@ -97,21 +92,27 @@ public class Special_c extends Expr_c implements Special
                             "an enclosing instance of type \"" +
                             t + "\".", qualifier.position());
             }
-	}
-
+        }
+        
+        if (t == null) {
+            // Cannot determine the type yet.
+            return this;
+        }
+        
         if (c.inStaticContext() && ts.equals(t, c.currentClass())) {
             // trying to access "this" or "super" from a static context.
             throw new SemanticException("Cannot access a non-static " +
                 "field or method, or refer to \"this\" or \"super\" " + 
-                "from a static context.",  this.position());
+                "from a static context.", this.position());
         }
-
-	if (kind == THIS) {
-	    return type(t);
-	}
-	else if (kind == SUPER) {
-	    return type(t.superType());
-	}
+        
+        if (kind == THIS) {
+            return type(t);
+        }
+        else if (kind == SUPER) {
+            return type(t.superType());
+        }
+        
         return this;
     }
 

@@ -15,6 +15,10 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
   public AmbAssign_c(Position pos, Expr left, Operator op, Expr right) {
     super(pos, left, op, right);
   }
+  
+  public boolean isCanonical() {
+      return false;
+  }
 
   public Term entry() {
     if (operator() != Assign.ASSIGN) {
@@ -49,4 +53,9 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
       throw new SemanticException("Could not disambiguate left side of assignment!", n.position());
   }
   
+
+  public Node typeCheck(TypeChecker tc) throws SemanticException {
+      // Didn't finish disambiguation; just return.
+      return this;
+  }
 }

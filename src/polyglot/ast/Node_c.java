@@ -18,9 +18,13 @@ public abstract class Node_c implements Node
     protected Position position;
     protected JL del;
     protected Ext ext;
+    protected Collection typesBelow;
+    protected boolean error;
 
     public Node_c(Position pos) {
         this.position = pos;
+        this.typesBelow = Collections.EMPTY_SET;
+        this.error = false;
     }
 
     public void init(Node node) {
@@ -132,6 +136,41 @@ public abstract class Node_c implements Node
 	return n;
     }
 
+    public Collection typesBelow() {
+        return typesBelow;
+    }
+    
+    public Node typesBelow(Collection types) {
+        if (types.isEmpty() && this.typesBelow.isEmpty()) {
+            return this;
+        }
+        
+        Node_c n = (Node_c) copy();
+        
+        if (types.isEmpty()) {
+            n.typesBelow = Collections.EMPTY_SET;
+        }
+        else {
+            n.typesBelow = new HashSet(types);
+        }
+        
+        return n;
+    }
+    
+    public boolean isCanonical() {
+        return true;
+    }
+    
+    public boolean error() {
+        return error;
+    }
+
+    public Node error(boolean flag) {
+        Node_c n = (Node_c) copy();
+        n.error = flag;
+        return n;
+    }
+    
     public Node visitChild(Node n, NodeVisitor v) {
 	if (n == null) {
 	    return null;
@@ -169,7 +208,24 @@ public abstract class Node_c implements Node
 		    "NodeVisitor.leave() returned null.");
 	    }
 	}
-
+    
+    /*
+	if (! n.error() && n != this) {
+	    final boolean[] error = new boolean[1];
+	    n.del().visitChildren(new NodeVisitor() {
+	        public Node override(Node m) {
+	            if (m.error()) {
+	                error[0] = true;
+	            }
+	            return m;
+	        }
+	    });
+	    
+	    if (error[0])
+	        return n.error(true);
+	}
+    */
+    
 	return n;
     }
 
@@ -241,10 +297,6 @@ public abstract class Node_c implements Node
     // These methods override the methods in Ext_c.
     // These are the default implementation of these passes.
 
-    public Node buildTypesOverride(TypeBuilder tb) throws SemanticException {
-	return null;
-    }
-
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
 	return tb;
     }
@@ -253,11 +305,10 @@ public abstract class Node_c implements Node
 	return this;
     }
 
-    /** Remove any remaining ambiguities from the AST. */
     public Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException {
-	return null;
+	return this;
     }
-
+    
     public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
 	return ar;
     }
@@ -266,24 +317,11 @@ public abstract class Node_c implements Node
 	return this;
     }
 
-    /** Add members to a class. */
-    public Node addMembersOverride(AddMemberVisitor am) throws SemanticException {
-	return null;
-    }
-
-    public NodeVisitor addMembersEnter(AddMemberVisitor am) throws SemanticException {
-	return am;
-    }
-
-    public Node addMembers(AddMemberVisitor am) throws SemanticException {
-	return this;
-    }
-
     /** Type check the AST. */
-    public Node typeCheckOverride(TypeChecker tc) throws SemanticException {
-	return null;
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+        return null;
     }
-
+    
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
 	return tc;
     }
@@ -291,14 +329,13 @@ public abstract class Node_c implements Node
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	return this;
     }
+    
+    public Node checkConstants(ConstantChecker cc) throws SemanticException {
+        return this;
+    }
 
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
 	return child.type();
-    }
-
-    /** Check that exceptions are properly propagated throughout the AST. */
-    public Node exceptionCheckOverride(ExceptionChecker ec) throws SemanticException {
-	return null;
     }
 
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {

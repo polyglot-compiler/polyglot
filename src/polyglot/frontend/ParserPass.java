@@ -1,10 +1,14 @@
 package polyglot.frontend;
 
-import java.io.*;
-import polyglot.ast.*;
-import polyglot.util.*;
-import polyglot.frontend.Compiler;
+import java.io.IOException;
+import java.io.Reader;
+
+import polyglot.ast.Node;
+import polyglot.frontend.goals.Goal;
+import polyglot.frontend.goals.SourceFileGoal;
 import polyglot.main.Report;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
 
 /**
  * A pass which runs a parser.  After parsing it stores the AST in the Job.
@@ -12,18 +16,16 @@ import polyglot.main.Report;
  */
 public class ParserPass extends AbstractPass
 {
-    Job job;
     Compiler compiler;
 
-    public ParserPass(Pass.ID id, Compiler compiler, Job job) {
-        super(id);
+    public ParserPass(Compiler compiler, Goal goal) {
+        super(goal);
 	this.compiler = compiler;
-	this.job = job;
     }
 
     public boolean run() {
 	ErrorQueue eq = compiler.errorQueue();
-	FileSource source = (FileSource) job.source();
+	FileSource source = (FileSource) goal.job().source();
 
 	try {
 	    Reader reader = source.open();
@@ -38,7 +40,10 @@ public class ParserPass extends AbstractPass
 	    source.close();
 
 	    if (ast != null) {
-		job.ast(ast);
+		goal.job().ast(ast);
+		if (goal instanceof SourceFileGoal) {
+		    ((SourceFileGoal) goal).markReached();
+		}
 		return true;
 	    }
 
@@ -51,6 +56,6 @@ public class ParserPass extends AbstractPass
     }
 
     public String toString() {
-	return id + "(" + job.source() + ")";
+	return super.toString() + "(" + goal.job().source() + ")";
     }
 }

@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.frontend.Job;
+import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
 import java.util.*;
 
@@ -31,21 +32,15 @@ public class ContextVisitor extends ErrorHandlingVisitor
     /** The current context of this visitor. */
     protected Context context;
 
-    public ContextVisitor(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, ts, nf);
+    public ContextVisitor(Goal goal, TypeSystem ts, NodeFactory nf) {
+        super(goal, ts, nf);
         this.outer = null;
         this.context = null;
     }
 
     public NodeVisitor begin() {
-        context = job.context();
-
-        if (context == null) {
-            context = ts.createContext();
-        }
-
+        context = ts.createContext();
         outer = null;
-
         return super.begin();
     }
 

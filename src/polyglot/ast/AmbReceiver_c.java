@@ -44,4 +44,10 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver
             (prefix == null ? name : prefix.toString() + "." + name) +
             "\".", position());
     }
+    
+
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        // Didn't finish disambiguation; just return.
+        return this;
+    }
 }

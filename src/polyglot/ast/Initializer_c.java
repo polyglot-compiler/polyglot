@@ -28,6 +28,14 @@ public class Initializer_c extends Term_c implements Initializer
 	this.flags = flags;
 	this.body = body;
     }
+    
+    public boolean isCanonical() {
+        return ii != null && ii.isCanonical() && super.isCanonical();
+    }
+
+    public MemberInstance memberInstance() {
+        return ii;
+    }
 
     /** Get the flags of the initializer. */
     public Flags flags() {
@@ -113,20 +121,6 @@ public class Initializer_c extends Term_c implements Initializer
         ClassType ct = tb.currentClass();
         InitializerInstance ii = ts.initializerInstance(position(), ct, flags);
         return initializerInstance(ii);
-    }
-
-    public NodeVisitor addMembersEnter(AddMemberVisitor am) {
-        // do not add members for the children of this node.
-        return am.bypassChildren(this);
-    }
-
-    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
-        // Do not visit body on the clean-super and clean-signatures passes.
-        if (ar.kind() == AmbiguityRemover.SUPER ||
-            ar.kind() == AmbiguityRemover.SIGNATURES) {
-            return ar.bypassChildren(this);
-        }
-        return ar;
     }
 
     /** Type check the initializer. */

@@ -1,6 +1,5 @@
 package polyglot.frontend;
 
-import java.util.*;
 
 /**
  * Thrown during when the compiler tries to run a pass that is

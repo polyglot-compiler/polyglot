@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.frontend.Job;
+import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
 import java.util.*;
 
@@ -12,14 +13,18 @@ import java.util.*;
 public class ErrorHandlingVisitor extends HaltingVisitor
 {
     protected boolean error;
-    protected Job job;
+    protected Goal goal;
     protected TypeSystem ts;
     protected NodeFactory nf;
 
-    public ErrorHandlingVisitor(Job job, TypeSystem ts, NodeFactory nf) {
-        this.job = job;
+    public ErrorHandlingVisitor(Goal goal, TypeSystem ts, NodeFactory nf) {
+        this.goal = goal;
         this.ts = ts;
         this.nf = nf;
+    }
+    
+    public Goal goal() {
+        return goal;
     }
 
     /** Returns the <code>Job</code> that this Visitor is part of.
@@ -27,7 +32,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
      * @see polyglot.frontend.Job
      */
     public Job job() {
-        return job;
+        return goal.job();
     }
 
     /**
@@ -44,7 +49,14 @@ public class ErrorHandlingVisitor extends HaltingVisitor
      * @see polyglot.util.ErrorQueue
      */
     public ErrorQueue errorQueue() {
-        return job.compiler().errorQueue();
+        return job().compiler().errorQueue();
+    }
+    
+    /**
+     * Returns true if some errors have been reported, even if cleared.
+     */
+    public boolean hasErrors() {
+        return errorQueue().hasErrors();
     }
 
     /** Returns the <code>NodeFactory</code> that this Visitor is using.
@@ -121,6 +133,12 @@ public class ErrorHandlingVisitor extends HaltingVisitor
       * @return The final result of the traversal of the tree rooted at
       * <code>n</code>.
       */
+    protected Node leaveCall(Node parent, Node old, Node n, NodeVisitor v)
+        throws SemanticException {
+
+	return leaveCall(old, n, v);
+    }
+    
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
         throws SemanticException {
 
@@ -248,7 +266,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
             if (Report.should_report(Report.visit, 5))
 		Report.report(5, "leave(" + n + "): calling leaveCall");
 
-            return leaveCall(old, n, v);
+            return leaveCall(parent, old, n, v);
 	}
 	catch (SemanticException e) {
             if (e.getMessage() != null) {

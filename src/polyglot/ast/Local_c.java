@@ -29,6 +29,10 @@ public class Local_c extends Expr_c implements Local
     super(pos);
     this.name = name;
   }
+  
+  public boolean isCanonical() {
+      return li != null && li.isCanonical() && super.isCanonical();
+  }
 
   /** Get the precedence of the local. */
   public Precedence precedence() { 
@@ -133,12 +137,17 @@ public class Local_c extends Expr_c implements Local
     w.write("(name " + name + ")");
     w.end();
   }
+  
+  public boolean constantValueSet() {
+      return li != null && li.constantValueSet();
+  }
 
   public boolean isConstant() {
-    return li.isConstant();
+    return li != null && li.isConstant();
   }
 
   public Object constantValue() {
+    if (! isConstant()) return null;
     return li.constantValue();
   }
 

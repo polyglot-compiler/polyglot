@@ -14,14 +14,16 @@ public interface ProcedureInstance extends CodeInstance
      * @see polyglot.types.Type
      */
     List formalTypes();
-
+    void setFormalTypes(List l);
+    
     /**
      * List of declared exception types thrown.
      * @return A list of <code>Type</code>.
      * @see polyglot.types.Type
      */
     List throwTypes();
-
+    void setThrowTypes(List l);
+    
     /**
      * Returns a String representing the signature of the procedure.
      * This includes just the name of the method (or name of the class, if

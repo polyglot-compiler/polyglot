@@ -1,24 +1,25 @@
 package polyglot.frontend;
 
 import polyglot.ast.Node;
-import polyglot.visit.NodeVisitor;
+import polyglot.frontend.goals.Goal;
+import polyglot.frontend.goals.SourceFileGoal;
 import polyglot.main.Report;
-import polyglot.util.*;
+import polyglot.util.ErrorQueue;
+import polyglot.util.InternalCompilerError;
+import polyglot.visit.NodeVisitor;
 
 /** A pass which runs a visitor. */
 public class VisitorPass extends AbstractPass
 {
-    Job job;
     NodeVisitor v;
 
-    public VisitorPass(Pass.ID id, Job job) {
-	this(id, job, null);
+    public VisitorPass(Goal goal) {
+	this(goal, null);
     }
 
-    public VisitorPass(Pass.ID id, Job job, NodeVisitor v) {
-        super(id);
-	this.job = job;
-	this.v = v;
+    public VisitorPass(Goal goal, NodeVisitor v) {
+        super(goal);
+        this.v = v;
     }
 
     public void visitor(NodeVisitor v) {
@@ -28,18 +29,18 @@ public class VisitorPass extends AbstractPass
     public NodeVisitor visitor() {
 	return v;
     }
-
+  
     public boolean run() {
-	Node ast = job.ast();
+	Node ast = goal.job().ast();
 
 	if (ast == null) {
 	    throw new InternalCompilerError("Null AST: did the parser run?");
 	}
 
         NodeVisitor v_ = v.begin();
-
+        
         if (v_ != null) {
-	    ErrorQueue q = job.compiler().errorQueue();
+	    ErrorQueue q = goal.job().compiler().errorQueue();
 	    int nErrsBefore = q.errorCount();
 
             if (Report.should_report(Report.frontend, 3))
@@ -48,27 +49,34 @@ public class VisitorPass extends AbstractPass
             ast = ast.visit(v_);
             v_.finish(ast);
 
-            /*
-            // if the ast did not change, there no need to stop even if there
-            // are errors
-            if (ast == job.ast()) {
-                return true;
-            }
-            */
-
             int nErrsAfter = q.errorCount();
 
-            job.ast(ast);
+            goal.job().ast(ast);
 
-            return (nErrsBefore == nErrsAfter);
-            // because, if they're equal, no new errors occurred,
-            // so the run was successful.
+            if (nErrsBefore != nErrsAfter) {
+                // because, if they're equal, no new errors occurred,
+                // so the run was successful.
+                return false;
+            }
+           
+            markGoalReached();
+        
+            return true;
         }
 
         return false;
     }
+    
+    public void markGoalReached() {
+        if (goal instanceof SourceFileGoal) {
+            ((SourceFileGoal) goal).markReached();
+        }
+    }
 
-    public String toString() {
-	return id.toString();
+    public String name() {
+        if (v != null)
+            return v.toString();
+        else 
+            return super.name();
     }
 }

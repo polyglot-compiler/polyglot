@@ -9,7 +9,7 @@ import polyglot.types.SemanticException;
  * A local variable declaration statement: a type, a name and an optional
  * initializer.
  */
-public interface LocalDecl extends ForInit, VarDecl
+public interface LocalDecl extends ForInit, VarDecl, VarInit
 {
     /** Set the declaration's flags. */
     LocalDecl flags(Flags flags);
@@ -29,4 +29,6 @@ public interface LocalDecl extends ForInit, VarDecl
      * Set the type object for the local we are declaring.
      */
     LocalDecl localInstance(LocalInstance li);
+    
+    boolean constantValueSet();
 }

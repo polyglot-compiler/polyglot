@@ -19,6 +19,10 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
 	this.prefix = prefix;
 	this.name = name;
     }
+    
+    public boolean isCanonical() {
+        return false;
+    }
 
     /** Get the name of the prefix. */
     public String name() {
@@ -63,14 +67,16 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
 
     /** Disambiguate the prefix. */
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        if (prefix instanceof Ambiguous) {
+            return this;
+        }
 	return ar.nodeFactory().disamb().disambiguate(this, ar, position(), prefix, name);
     }
 
-    /** Type check the prefix. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-	throw new InternalCompilerError(position(),
-	    "Cannot type check ambiguous node " + this + ".");
-    } 
+        // Didn't finish disambiguation; just return.
+        return this;
+    }
 
     /** Check exceptions thrown by the prefix. */
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {

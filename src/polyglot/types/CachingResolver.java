@@ -122,11 +122,11 @@ public class CachingResolver implements TopLevelResolver {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "CachingResolver: cached: " + name);
         }
-
+/*
         if (q instanceof ParsedClassType) {
             extInfo.addDependencyToCurrentJob(((ParsedClassType)q).fromSource());
         }
-
+*/
 	return q;
     }
 
@@ -154,6 +154,9 @@ public class CachingResolver implements TopLevelResolver {
      * @param q The qualifier to insert.
      */
     public void install(String name, Named q) {
+        if (Report.should_report(TOPICS, 1)) {
+            Report.report(3, "Installing " + name + " in resolver cache");
+        }
 	cache.put(name, q);
     }
 

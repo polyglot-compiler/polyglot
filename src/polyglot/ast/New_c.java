@@ -32,6 +32,10 @@ public class New_c extends Expr_c implements New
 	this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
 	this.body = body;
     }
+    
+    public boolean isCanonical() {
+        return ci != null && ci.isCanonical() && (body == null || (anonType != null && anonType.isCanonical())) && super.isCanonical();
+    }
 
     /** Get the qualifier expression of the allocation. */
     public Expr qualifier() {
@@ -133,35 +137,24 @@ public class New_c extends Expr_c implements New
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         if (body != null) {
-            // bybass the visiting of the body of the anonymous class. We'll
+            /*
+            // bypass the visiting of the body of the anonymous class. We'll
             // get around to visiting it in the buildTypes method.
             // We do this because we need to visit the body of the anonymous
             // class after we've pushed an anon class onto the type builder, 
             // but we need to check the arguments, and qualifier, etc. outside 
             // of the scope of the anon class.            
             return tb.bypass(body);
+            */
+            return tb.pushAnonClass(position());
         }
         
-
         return tb;
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         New_c n = this;
         
-        if (n.body() != null) {
-            // let's get a type builder that is prepared to visit the
-            // body; tb wants to bypass it, due to the builtTypesEnter method.
-            TypeBuilder bodyTB = (TypeBuilder)tb.visitChildren();
-            
-            // push an anonymous class on the stack.
-            bodyTB = bodyTB.pushAnonClass(position());
-
-            n = (New_c) n.body((ClassBody)n.body().visit(bodyTB));
-            ParsedClassType type = (ParsedClassType) bodyTB.currentClass();
-            n = (New_c) n.anonType(type);
-        }
-
         TypeSystem ts = tb.typeSystem();
 
         List l = new ArrayList(n.arguments.size());
@@ -173,113 +166,235 @@ public class New_c extends Expr_c implements New
                                                         Flags.NONE, l,
                                                         Collections.EMPTY_LIST);
         n = (New_c) n.constructorInstance(ci);
+        
+        if (n.body() != null) {
+            /*
+            // let's get a type builder that is prepared to visit the
+            // body; tb wants to bypass it, due to the buildTypesEnter method.
+            TypeBuilder bodyTB = (TypeBuilder)tb.visitChildren();
+            
+            // push an anonymous class on the stack.
+            bodyTB = bodyTB.pushAnonClass(position());
 
+            n = (New_c) n.body((ClassBody)n.body().visit(bodyTB));
+            ParsedClassType type = (ParsedClassType) bodyTB.currentClass();
+            */
+            ParsedClassType type = (ParsedClassType) tb.currentClass();
+            n = (New_c) n.anonType(type);
+            
+            type.setMembersAdded(true);
+
+//            n = n.addTypeBelow(type);
+        }
+        
         return n.type(ts.unknownType(position()));
     }
 
-    public NodeVisitor disambiguateEnter(AmbiguityRemover ar)
-        throws SemanticException
-    {
-        // We can't disambiguate the type node if we have a qualifier.  The
-        // type node represents an inner class of the qualifier, and we don't
-        // know which outer class to look in until the qualifier is type
-        // checked.
-        if (qualifier != null) {
-            ar = (AmbiguityRemover) ar.bypass(tn);
-        }
-
-        if (body != null) {
-            ar = (AmbiguityRemover) ar.bypass(body);
-        }
-
-        return ar;
-    }
-
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (ar.kind() != AmbiguityRemover.ALL) {
+        New_c n = this;
+        
+        if (! tn.type().isClass()) {
             return this;
         }
-
+        
         if (qualifier == null) {
             ClassType ct = tn.type().toClass();
 
-            if (! ct.isMember() || ct.flags().isStatic()) {
-                return this;
+            if (ct.isMember() && ! ct.flags().isStatic()) {
+                n = findQualifier(ar, ct);
             }
-
-            // If we're instantiating a non-static member class, add a "this"
-            // qualifier.
-            NodeFactory nf = ar.nodeFactory();
-            TypeSystem ts = ar.typeSystem();
-            Context c = ar.context();
-
-            // Search for the outer class of the member.  The outer class is
-            // not just ct.outer(); it may be a subclass of ct.outer().
-            Type outer = null;
-
-            String name = ct.name();
-            ClassType t = c.currentClass();
-
-            // We're in one scope too many.
-            if (t == anonType) {
-                t = t.outer();
-            }
-
-            while (t != null) {
-                try {
-                    // HACK: PolyJ outer() doesn't work
-                    t = ts.staticTarget(t).toClass();
-                    ClassType mt = ts.findMemberClass(t, name, c.currentClass());
-
-                    if (ts.equals(mt, ct)) {
-                        outer = t;
-                        break;
-                    }
-                }
-                catch (SemanticException e) {
-                }
-
-                t = t.outer();
-            }
-
-            if (outer == null) {
-                throw new SemanticException("Could not find non-static member class \"" +
-                                            name + "\".", position());
-            }
-
-            // Create the qualifier.
-            Expr q;
-
-            if (outer.equals(c.currentClass())) {
-                q = nf.This(position());
+        }
+        
+        if (n.qualifier() != null && ! n.qualifier().type().isCanonical()) {
+            return n;
+        }
+        
+        if (anonType != null && ! anonType.supertypesResolved()) {
+            ClassType ct = tn.type().toClass();
+            
+            if (! ct.flags().isInterface()) {
+                anonType.superType(ct);
             }
             else {
-                q = nf.This(position(),
-                            nf.CanonicalTypeNode(position(),
-                                                 outer));
+                anonType.superType(ar.typeSystem().Object());
+                anonType.addInterface(ct);
             }
-
-            return qualifier(q);
+            
+            anonType.setSupertypesResolved(true);
         }
-
-        return this;
+        
+        return n;
     }
 
-    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+    /**
+     * @param ar
+     * @param ct
+     * @return
+     * @throws SemanticException
+     */
+    private New_c findQualifier(AmbiguityRemover ar, ClassType ct) throws SemanticException {
+        // If we're instantiating a non-static member class, add a "this"
+        // qualifier.
+        NodeFactory nf = ar.nodeFactory();
+        TypeSystem ts = ar.typeSystem();
+        Context c = ar.context();
+        
+        // Search for the outer class of the member.  The outer class is
+        // not just ct.outer(); it may be a subclass of ct.outer().
+        Type outer = null;
+        
+        String name = ct.name();
+        ClassType t = c.currentClass();
+        
+        // We're in one scope too many.
+        if (t == anonType) {
+            t = t.outer();
+        }
+        
+        while (t != null) {
+            try {
+                // HACK: PolyJ outer() doesn't work
+                t = ts.staticTarget(t).toClass();
+                ClassType mt = ts.findMemberClass(t, name, c.currentClass());
+                
+                if (ts.equals(mt, ct)) {
+                    outer = t;
+                    break;
+                }
+            }
+            catch (SemanticException e) {
+            }
+            
+            t = t.outer();
+        }
+        
+        if (outer == null) {
+            throw new SemanticException("Could not find non-static member class \"" +
+                                        name + "\".", position());
+        }
+        
+        // Create the qualifier.
+        Expr q;
+
+        if (outer.equals(c.currentClass())) {
+            q = nf.This(position());
+        }
+        else {
+            q = nf.This(position(),
+                        nf.CanonicalTypeNode(position(),
+                                             outer));
+        }
+        
+        q = q.type(outer);
+        return (New_c) qualifier(q);
+    }
+
+    public New disambiguateObjectType(TypeChecker tc) throws SemanticException {
+        New n = this;
+        
+        // The type for qualifier should already have been computed.
         if (qualifier != null) {
-            tc = (TypeChecker) tc.bypass(tn);
+            // Get the qualifier type first.
+            Type qt = qualifier.type();
+
+            if (! qt.isCanonical()) {
+                return this;
+            }
+            
+            if (! qt.isClass()) {
+                return this;
+            }
+            
+            // Disambiguate the type node as a member of the qualifier type.
+            TypeNode tn = disambiguateTypeNode(this.tn, tc, qt.toClass());
+
+            n = objectType(tn);
         }
 
-        if (body != null) {
-            tc = (TypeChecker) tc.bypass(body);
+        return n;
+    }
+    
+    protected TypeNode disambiguateTypeNode(TypeNode tn, TypeChecker tc, ClassType outer) throws SemanticException
+    {
+        // We have to disambiguate the type node as if it were a member of the
+        // static type, outer, of the qualifier.  For Java this is simple: type
+        // nested type is just a name and we
+        // use that name to lookup a member of the outer class.  For some
+        // extensions (e.g., PolyJ), the type node may be more complex than
+        // just a name.  We'll just punt here and let the extensions handle
+        // this complexity.
+
+        if (tn instanceof CanonicalTypeNode) {
+            return tn;
         }
 
-        return tc;
+        String name = null;
+
+        if (tn instanceof AmbTypeNode && ((AmbTypeNode) tn).qual() == null) {
+            name = ((AmbTypeNode) tn).name();
+        }
+        else {
+            throw new SemanticException(
+                "Cannot instantiate an member class.",
+                tn.position());
+        }
+
+        TypeSystem ts = tc.typeSystem();
+        NodeFactory nf = tc.nodeFactory();
+        Context c = tc.context();
+
+        ClassType ct = ts.findMemberClass(outer, name, c.currentClass());
+        return nf.CanonicalTypeNode(tn.position(), ct);
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        New_c n = this;
+        TypeSystem ts = tc.typeSystem();
+        
+        List argTypes = new ArrayList(arguments.size());
+        
+        for (Iterator i = this.arguments.iterator(); i.hasNext(); ) {
+            Expr e = (Expr) i.next();
+            if (! e.type().isCanonical()) {
+                return this;
+            }
+            argTypes.add(e.type());
+        }
+        
+        if (! tn.type().isCanonical() || ! tn.type().isClass()) {
+            return this;
+        }
+        
+        typeCheckFlags(tc);
+        typeCheckNested(tc);
+        
+        if (this.body != null) {
+            ts.checkClassConformance(anonType);
+        }
+        
+        ClassType ct = tn.type().toClass();
+        
+        if (! ct.flags().isInterface()) {
+            Context c = tc.context();
+            if (anonType != null) {
+                c = c.pushClass(anonType, anonType);
+            }
+            ci = ts.findConstructor(ct, argTypes, c.currentClass());
+        }
+        else {
+            ci = ts.defaultConstructor(this.position(), ct);
+        }
+        
+        New n = this.constructorInstance(ci);
+        
+        if (anonType != null) {
+            // The type of the new expression is the anonymous type, not the base type.
+            ct = anonType;
+        }
 
+        return n.type(ct);
+    }
+
+    protected void typeCheckNested(TypeChecker tc) throws SemanticException {
         if (qualifier != null) {
             // We have not disambiguated the type node yet.
 
@@ -291,19 +406,9 @@ public class New_c extends Expr_c implements New
                     "Cannot instantiate member class of a non-class type.",
                     qualifier.position());
             }
-
+            
             // Disambiguate the type node as a member of the qualifier type.
-            TypeNode tn = disambiguateTypeNode(tc, qt.toClass());
             ClassType ct = tn.type().toClass();
-
-            /*
-FIXME: check super types as well.
-            if (! ct.isMember() || ! ts.isEnclosed(ct, qt.toClass())) {
-                throw new SemanticException("Class \"" + qt +
-                    "\" does not enclose \"" + ct + "\".",
-                    qualifier.position());
-            }
-            */
 
             // According to JLS2 15.9.1, the class type being
             // instantiated must be inner.
@@ -312,8 +417,6 @@ FIXME: check super types as well.
                     "Cannot provide a containing instance for non-inner class " +
 		    ct.fullName() + ".", qualifier.position());
             }
-
-            n = (New_c) n.objectType(tn);
         }
         else {
             ClassType ct = tn.type().toClass();
@@ -328,19 +431,10 @@ FIXME: check super types as well.
                 }
             }
         }
-
-        return n.typeCheckEpilogue(tc);
     }
 
-    protected Node typeCheckEpilogue(TypeChecker tc) throws SemanticException {
+    protected void typeCheckFlags(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
-
-	List argTypes = new ArrayList(arguments.size());
-
-	for (Iterator i = this.arguments.iterator(); i.hasNext(); ) {
-	    Expr e = (Expr) i.next();
-	    argTypes.add(e.type());
-	}
 
         ClassType ct = tn.type().toClass();
 
@@ -374,133 +468,9 @@ FIXME: check super types as well.
         if (! ct.flags().isInterface()) {
             Context c = tc.context();
             if (body != null) {
-                // Enter the body of this class so we can access protected
-                // super-constructors.
-
-                // temporarily set the super type; we'll set it correctly below
-                anonType.superType(ct);
-
                 c = c.pushClass(anonType, anonType);
             }
-            ci = ts.findConstructor(ct, argTypes, c.currentClass());
         }
-        else {
-            ci = ts.defaultConstructor(position(), ct);
-        }
-
-	New_c n = (New_c) this.constructorInstance(ci).type(ct);
-
-	if (n.body == null) {
-	    return n;
-	}
-
-	// Now, need to read symbols, clean, disambiguate, and type check
-	// the body.
-
-	if (! ct.flags().isInterface()) {
-	    anonType.superType(ct);
-	}
-	else {
-	    anonType.superType(ts.Object());
-	    anonType.addInterface(ct);
-	}
-
-        // The type of the new expression is actually the anon type.
-        n = (New_c)n.type(anonType);
-        
-	// Now, run the four passes on the body.
-	ClassBody body = n.typeCheckBody(tc, ct);
-
-	return n.body(body);
-    }
-
-    protected TypeNode partialDisambTypeNode(TypeNode tn, TypeChecker tc, ClassType outer) throws SemanticException
-    {
-        // We have to disambiguate the type node as if it were a member of the
-        // outer class.  For Java this is simple: outer is just a name and we
-        // use that name to lookup a member of the outer class.  For some
-        // extensions (e.g., PolyJ), the type node may be more complex than
-        // just a name.  We'll just punt here and let the extensions handle
-        // this complexity.
-
-        if (tn instanceof CanonicalTypeNode) {
-            return tn;
-        }
-
-        String name = null;
-
-        if (tn instanceof AmbTypeNode && ((AmbTypeNode) tn).qual() == null) {
-            name = ((AmbTypeNode) tn).name();
-        }
-        else {
-            throw new SemanticException(
-                "Cannot instantiate an member class.",
-                tn.position());
-        }
-
-        TypeSystem ts = tc.typeSystem();
-        NodeFactory nf = tc.nodeFactory();
-        Context c = tc.context();
-
-        ClassType ct = ts.findMemberClass(outer, name, c.currentClass());
-        return nf.CanonicalTypeNode(tn.position(), ct);
-    }
-
-    protected TypeNode disambiguateTypeNode(TypeChecker tc, ClassType ct)
-        throws SemanticException
-    {
-        TypeNode tn = this.partialDisambTypeNode(this.tn, tc, ct);
-
-        if (tn instanceof CanonicalTypeNode) {
-            return tn;
-        }
-
-        // Run the disambiguation passes on the node.
-        Job sj = tc.job().spawn(tc.context(), tn,
-                                Pass.CLEAN_SUPER, Pass.DISAM_ALL);
-
-        if (! sj.status()) {
-            if (! sj.reportedErrors()) {
-                throw new SemanticException("Could not disambiguate type.",
-                                            this.tn.position());
-            }
-            throw new SemanticException();
-        }
-
-        tn = (TypeNode) sj.ast();
-
-        // Now, type-check the type node.
-        return (TypeNode) visitChild(tn, tc);
-    }
-
-    protected ClassBody typeCheckBody(TypeChecker tc, ClassType superType)
-        throws SemanticException
-    {
-        Context bodyCtxt = tc.context().pushClass(anonType, anonType);
-        Job sj = tc.job().spawn(bodyCtxt, body,
-                                Pass.CLEAN_SUPER, Pass.DISAM_ALL);
-
-        if (! sj.status()) {
-            if (! sj.reportedErrors()) {
-                throw new SemanticException("Could not disambiguate body of " +
-                                            "anonymous " +
-                                            (superType.flags().isInterface() ?
-                                             "implementor" : "subclass") +
-                                            " of \"" + superType + "\".");
-            }
-            throw new SemanticException();
-        }
-
-        ClassBody b = (ClassBody) sj.ast();
-
-        // Now, type-check the body.
-        TypeChecker bodyTC = (TypeChecker)tc.context(bodyCtxt);
-        b = (ClassBody) visitChild(b, bodyTC.visitChildren());
-
-        // check the class implements all abstract methods that it needs to.
-        bodyTC.typeSystem().checkClassConformance(anonType());
-
-        return b;
     }
 
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
@@ -655,5 +625,93 @@ FIXME: check super types as well.
       l.addAll(ci.throwTypes());
       l.addAll(ts.uncheckedExceptions());
       return l;
+    }
+
+    /**
+     * @param parent
+     * @param tc
+     * @return
+     */
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+        New nn = this;
+        New old = nn;
+        
+        TypeChecker childtc = (TypeChecker) tc.enter(parent, this);
+        BodyDisambiguator bd = new BodyDisambiguator(tc);
+        BodyDisambiguator childbd = (BodyDisambiguator) bd.enter(parent, this);
+        
+        // Override to ensure that when the qualifier type is known before
+        // the TypeNode is disambiguated.
+        nn = nn.qualifier((Expr) nn.visitChild(nn.qualifier(), childbd));
+        if (childbd.hasErrors()) throw new SemanticException();
+        
+        nn = nn.qualifier((Expr) nn.visitChild(nn.qualifier(), childtc));
+        if (childtc.hasErrors()) throw new SemanticException();
+        
+        // Hack to ensure nn.disambiguate is invoked to set the qualifier.
+        nn = (New_c) bd.leave(parent, old, nn, childbd);
+        if (bd.hasErrors()) throw new SemanticException();
+        
+        // Now disambiguate nn.objectType().
+        if (nn.qualifier() != null) {
+            nn = ((New_c) nn).disambiguateObjectType(childtc);
+            if (childtc.hasErrors()) throw new SemanticException();
+        }
+        else {
+            nn = nn.objectType((TypeNode) nn.visitChild(nn.objectType(), childbd));
+            if (childbd.hasErrors()) throw new SemanticException();
+            
+            nn = nn.objectType((TypeNode) nn.visitChild(nn.objectType(), childtc));
+            if (childtc.hasErrors()) throw new SemanticException();
+        }
+
+        // Hack to ensure nn.disambiguate is invoked to set the supertypes.
+        nn = (New_c) bd.leave(parent, old, nn, childbd);
+        if (bd.hasErrors()) throw new SemanticException();
+
+        nn = (New) nn.arguments(nn.visitList(nn.arguments(), childbd));
+        if (childbd.hasErrors()) throw new SemanticException();
+        
+        nn = (New) nn.arguments(nn.visitList(nn.arguments(), childtc));
+        if (childtc.hasErrors()) throw new SemanticException();
+        
+        // Now visit the body.
+        // Check typesBelow to see if we need to disambiguate supertypes
+        // and signatures.
+        if (nn.body() != null) {
+            for (Iterator i = nn.body().typesBelow().iterator(); i.hasNext(); ) {
+                ParsedClassType ct = (ParsedClassType) i.next();
+                if (! ct.supertypesResolved()) {
+                    SupertypeDisambiguator sd = new SupertypeDisambiguator(childtc);
+                    nn = nn.body((ClassBody) nn.visitChild(nn.body(), sd));
+                    if (sd.hasErrors()) throw new SemanticException();
+                    break;
+                }
+            }
+            for (Iterator i = nn.body().typesBelow().iterator(); i.hasNext(); ) {
+                ParsedClassType ct = (ParsedClassType) i.next();
+                if (! ct.signaturesResolved()) {
+                    SignatureDisambiguator sd = new SignatureDisambiguator(childtc);
+                    nn = nn.body((ClassBody) nn.visitChild(nn.body(), sd));
+                    if (sd.hasErrors()) throw new SemanticException();
+                    break;
+                }
+            }
+        }
+    
+        // Now visit the body.
+        nn = nn.body((ClassBody) nn.visitChild(nn.body(), childbd));
+        if (childbd.hasErrors()) throw new SemanticException();
+        
+        nn = nn.body((ClassBody) nn.visitChild(nn.body(), childtc));
+        if (childtc.hasErrors()) throw new SemanticException();
+    
+        // Hack to ensure nn.disambiguate is invoked.  What isn't a hack here?
+        nn = (New_c) bd.leave(parent, old, nn, childbd);
+        if (bd.hasErrors()) throw new SemanticException();
+    
+        nn = (New_c) tc.leave(parent, old, nn, childtc);
+        
+        return nn;
     }
 }

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.*;
 
 import polyglot.types.reflect.ClassFileLoader;
-import polyglot.main.Report;
 import polyglot.util.*;
 
 /**
@@ -76,23 +75,31 @@ public class Compiler
      */
     public boolean compile(Collection sources) {
 	boolean okay = false;
-
+    
 	try {
 	    try {
                 SourceLoader source_loader = sourceExtension().sourceLoader();
+                Scheduler scheduler = sourceExtension().scheduler();
 
-		for (Iterator i = sources.iterator(); i.hasNext(); ) {
-		    String sourceName = (String) i.next();
-		    FileSource source = source_loader.fileSource(sourceName);
-
+                // First, create a goal to compile every source file.
+                for (Iterator i = sources.iterator(); i.hasNext(); ) {
+                    String sourceName = (String) i.next();
+                    FileSource source = source_loader.fileSource(sourceName);
+                    
                     // mark this source as being explicitly specified
                     // by the user.
                     source.setUserSpecified(true);
+                    
+                    // Add a new SourceJob for the given source. If a Job for the source
+                    // already exists, then we will be given the existing job.
+                    Job job = scheduler.addJob(source);
 
-		    sourceExtension().addJob(source);
-		}
-
-		okay = sourceExtension().runToCompletion();
+                    // Now, add a goal for completing the job.
+                    scheduler.addGoal(sourceExtension().getCompileGoal(job));
+                }
+		    
+                // Then, compile the files to completion.
+                okay = scheduler.runToCompletion();
 	    }
 	    catch (FileNotFoundException e) {
 		eq.enqueue(ErrorInfo.IO_ERROR,

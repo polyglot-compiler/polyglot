@@ -10,9 +10,11 @@ public interface MemberInstance extends TypeObject
      * Return the member's flags.
      */
     Flags flags();
+    void setFlags(Flags flags);
 
     /**
      * Return the member's containing type.
      */
     ReferenceType container();
+    void setContainer(ReferenceType container);
 }

@@ -22,6 +22,7 @@ import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.visit.*;
 import polyglot.visit.AscriptionVisitor;
 import polyglot.visit.CFGBuilder;
 import polyglot.visit.NodeVisitor;
@@ -54,6 +55,10 @@ public class Field_c extends Expr_c implements Field
                                       + "with the appropriate type node or "
                                       + "this.");
     }
+  }
+  
+  public boolean isCanonical() {
+      return fi != null && fi.isCanonical() && super.isCanonical();
   }
 
   /** Get the precedence of the field. */
@@ -151,26 +156,25 @@ public class Field_c extends Expr_c implements Field
       Context c = tc.context();
       TypeSystem ts = tc.typeSystem();
       
-      if (! target.type().isReference()) {
-	  throw new SemanticException("Cannot access field \"" + name +
-				      "\" " + (target instanceof Expr
-					       ? "on an expression "
-					       : "") +
-				      "of non-reference type \"" +
-				      target.type() + "\".", target.position());
+      if (target.type().isReference()) {
+	  FieldInstance fi = ts.findField(target.type().toReference(), name, c.currentClass());
+	  
+	  if (fi == null) {
+	      throw new InternalCompilerError("Cannot access field on node of type " +
+	                                      target.getClass().getName() + ".");
+	  }
+	  
+	  checkConsistency(c);
+	  
+	  return fieldInstance(fi).type(fi.type());
       }
-      
-      FieldInstance fi = ts.findField(target.type().toReference(), name, c.currentClass());
-      
-      if (fi == null) {
-	  throw new InternalCompilerError("Cannot access field on node of type " +
-					  target.getClass().getName() + ".");
-      }
-      
-      Field_c f = (Field_c)fieldInstance(fi).type(fi.type());
-      f.checkConsistency(c);
-      
-      return f;
+
+      throw new SemanticException("Cannot access field \"" + name +
+                                  "\" " + (target instanceof Expr
+                                          ? "on an expression "
+                                                  : "") +
+                                                  "of non-reference type \"" +
+                                                  target.type() + "\".", target.position());
   }
   
   public Type childExpectedType(Expr child, AscriptionVisitor av)
@@ -235,6 +239,10 @@ public class Field_c extends Expr_c implements Field
       return Collections.EMPTY_LIST;
   }
 
+  public boolean constantValueSet() {
+      return fi != null && fi.constantValueSet();
+  }
+  
   public boolean isConstant() {
     if (fi != null &&
         (target instanceof TypeNode ||

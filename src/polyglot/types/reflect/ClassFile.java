@@ -1,10 +1,11 @@
 package polyglot.types.reflect;
 
+import java.io.*;
+import java.util.*;
+
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.*;
-import java.io.*;
-import java.util.*;
 
 /**
  * ClassFile basically represents a Java classfile as it is found on 
@@ -18,7 +19,6 @@ import java.util.*;
  * @see polyglot.types.reflect Method
  *
  * @author Nate Nystrom
- *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)
  */
 public class ClassFile implements LazyClassInitializer {
     Constant[] constants;       // The constant pool
@@ -30,6 +30,12 @@ public class ClassFile implements LazyClassInitializer {
     Method[] methods;
     Attribute[] attrs;
     InnerClasses innerClasses;
+    boolean constructorsInitialized;
+    boolean fieldsInitialized;
+    boolean interfacesInitialized;
+    boolean memberClassesInitialized;
+    boolean methodsInitialized;
+    boolean superclassInitialized;
 
     static Collection verbose = ClassFileLoader.verbose;
   
@@ -146,7 +152,12 @@ public class ClassFile implements LazyClassInitializer {
      */
     public ParsedClassType type(TypeSystem ts) throws SemanticException {
         ParsedClassType ct = createType(ts);
-
+        return ct;
+    }
+   
+    public void initSuperclass(ParsedClassType ct) {
+        TypeSystem ts = ct.typeSystem();
+        
         if (ts.equals(ct, ts.Object())) {
             ct.superType(null);
         }
@@ -154,61 +165,63 @@ public class ClassFile implements LazyClassInitializer {
             String superName = classNameCP(superClass);
 
             if (superName != null) {
-                ct.superType(typeForName(ts, superName));
+                ct.superType(quietTypeForName(ts, superName));
             }
             else {
                 ct.superType(ts.Object());
             }
         }
-
-        return ct;
+        
+        superclassInitialized = true;
     }
 
     /**
      * Initialize <code>ct</code>'s member classes.
      */
     public void initMemberClasses(ParsedClassType ct) {
-        if (innerClasses == null) {
-            return;
-        }
-
         TypeSystem ts = ct.typeSystem();
 
-        for (int i = 0; i < innerClasses.classes.length; i++) {
-            InnerClasses.Info c = innerClasses.classes[i];
-
-            if (c.outerClassIndex == thisClass && c.classIndex != 0) {
-                String name = classNameCP(c.classIndex);
-
-                int index = name.lastIndexOf('$');
-
-                // Skip local and anonymous classes.
-                if (index >= 0 && Character.isDigit(name.charAt(index+1))) {
-                    continue;
-                }
-
-                // A member class of this class
-                ClassType t = quietTypeForName(ts, name);
-
-                if (t.isMember()) {
-		    if (Report.should_report(verbose, 3))
-                        Report.report(3, "adding member " + t + " to " + ct);
-
-                    ct.addMemberClass(t);
+        if (innerClasses != null) {
+            for (int i = 0; i < innerClasses.classes.length; i++) {
+                InnerClasses.Info c = innerClasses.classes[i];
+                
+                if (c.outerClassIndex == thisClass && c.classIndex != 0) {
+                    String name = classNameCP(c.classIndex);
                     
-                    // HACK: set the access flags of the member class
-                    // using the modifier bits of the InnerClass attribute.
-                    if (t instanceof ParsedClassType) {
-                        ParsedClassType pt = (ParsedClassType) t;
-                        pt.flags(ts.flagsForBits(c.modifiers));
+                    int index = name.lastIndexOf('$');
+                    
+                    // Skip local and anonymous classes.
+                    if (index >= 0 && Character.isDigit(name.charAt(index+1))) {
+                        continue;
                     }
-                }
-                else {
-                    throw new InternalCompilerError(name + " should be a member class.");
+                    
+                    // A member class of this class
+                    ClassType t = quietTypeForName(ts, name);
+                    
+                    if (t.isMember()) {
+                        if (Report.should_report(verbose, 3))
+                            Report.report(3, "adding member " + t + " to " + ct);
+                        
+                        ct.addMemberClass(t);
+                        
+                        // Set the access flags of the member class
+                        // using the modifier bits of the InnerClass attribute.
+                        // The flags in the class file for the member class are
+                        // not correct!  Stupid Java.
+                        if (t instanceof ParsedClassType) {
+                            ParsedClassType pt = (ParsedClassType) t;
+                            pt.flags(ts.flagsForBits(c.modifiers));
+                        }
+                    }
+                    else {
+                        throw new InternalCompilerError(name + " should be a member class.");
+                    }
                 }
             }
         }
-    }
+        
+        memberClassesInitialized = true;
+     }
 
     /**
      * Initialize <code>ct</code>'s interfaces.
@@ -220,6 +233,8 @@ public class ClassFile implements LazyClassInitializer {
             String name = classNameCP(interfaces[i]);
             ct.addInterface(quietTypeForName(ts, name));
         }
+        
+        interfacesInitialized = true;
     }
 
     /**
@@ -228,10 +243,6 @@ public class ClassFile implements LazyClassInitializer {
     public void initFields(ParsedClassType ct) {
         TypeSystem ts = ct.typeSystem();
 
-        // Add the "class" field.
-        LazyClassInitializer init = ts.defaultClassInitializer();
-        init.initFields(ct);
-  
         for (int i = 0; i < fields.length; i++) {
             if (! fields[i].name().startsWith("jlc$") &&
                 ! fields[i].isSynthetic()) {
@@ -241,6 +252,8 @@ public class ClassFile implements LazyClassInitializer {
                 ct.addField(fi);
             }
         }
+
+        fieldsInitialized = true;
     }
 
     /**
@@ -259,6 +272,8 @@ public class ClassFile implements LazyClassInitializer {
                 ct.addMethod(mi);
             }
         }
+
+        methodsInitialized = true;
     }
 
     /**
@@ -277,8 +292,40 @@ public class ClassFile implements LazyClassInitializer {
                 ct.addConstructor(ci);
             }
         }
+
+        constructorsInitialized = true;
+    }
+    
+    public boolean constructorsInitialized() {
+        return constructorsInitialized;
     }
 
+    public boolean fieldsInitialized() {
+        return fieldsInitialized;
+    }
+
+    public boolean interfacesInitialized() {
+        return interfacesInitialized;
+    }
+
+    public boolean memberClassesInitialized() {
+        return memberClassesInitialized;
+    }
+
+    public boolean methodsInitialized() {
+        return methodsInitialized;
+    }
+
+    public boolean superclassInitialized() {
+        return superclassInitialized;
+    }
+
+    public boolean initialized() {
+        return superclassInitialized && interfacesInitialized
+                && memberClassesInitialized && methodsInitialized
+                && fieldsInitialized && constructorsInitialized;
+    }
+    
     /**
      * Create an array of <code>t</code>.
      */
@@ -401,9 +448,6 @@ public class ClassFile implements LazyClassInitializer {
         ct.flags(ts.flagsForBits(modifiers));
         ct.position(position());
 
-        // Add unresolved class into the cache to avoid circular resolving.
-        ((CachingResolver) ts.systemResolver()).install(name, ct);
-
         // This is the "p.q" part.
         String packageName = StringUtil.getPackageComponent(name);
 
@@ -485,6 +529,8 @@ public class ClassFile implements LazyClassInitializer {
             ct.name(innerName);
         }
 
+        // Add unresolved class into the cache to avoid circular resolving.
+        ((CachingResolver) ts.systemResolver()).install(name, ct);
 
         return ct;
     }

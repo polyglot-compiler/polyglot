@@ -1,5 +1,7 @@
 package polyglot.types;
 
+import polyglot.frontend.*;
+import polyglot.frontend.Job;
 import polyglot.frontend.Source;
 import polyglot.util.Position;
 
@@ -9,6 +11,8 @@ import polyglot.util.Position;
  */
 public interface ParsedClassType extends ClassType
 {
+    void setJob(Job job);
+    
     /**
      * Position of the type's declaration.
      */
@@ -81,4 +85,13 @@ public interface ParsedClassType extends ClassType
      * Set whether the class was declared in a static context.
      */
     void inStaticContext(boolean inStaticContext);
+    
+    boolean membersAdded();
+    boolean supertypesResolved();
+    boolean allMembersAdded();
+    boolean signaturesResolved();
+    void setMembersAdded(boolean flag);
+    void setSupertypesResolved(boolean flag);
+    void setAllMembersAdded(boolean flag);
+    void setSignaturesResolved(boolean flag);
 }

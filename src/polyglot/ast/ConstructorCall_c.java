@@ -23,6 +23,10 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	this.qualifier = qualifier;
 	this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
     }
+    
+    public boolean isCanonical() {
+        return ci != null && ci.isCanonical() && super.isCanonical();
+    }
 
     /** Get the qualifier of the constructor call. */
     public Expr qualifier() {
@@ -130,7 +134,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	Context c = tc.context();
 
 	ClassType ct = c.currentClass();
-        Type superType = ct.superType();
+	Type superType = ct.superType();
 
         // The qualifier specifies the enclosing instance of this inner class.
         // The type of the qualifier must be the outer class of this
@@ -203,17 +207,22 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
                         " must be specified in the super constructor call.", position());
                 }
             }
-
-	    ct = ct.superType().toClass();
 	}
 
 	List argTypes = new LinkedList();
-
+	
 	for (Iterator iter = this.arguments.iterator(); iter.hasNext();) {
 	    Expr e = (Expr) iter.next();
+            if (! e.type().isCanonical()) {
+                return this;
+            }
 	    argTypes.add(e.type());
 	}
-
+	
+	if (kind == SUPER) {
+	    ct = ct.superType().toClass();
+	}
+	
 	ConstructorInstance ci = ts.findConstructor(ct, argTypes, c.currentClass());
 
 	return constructorInstance(ci);

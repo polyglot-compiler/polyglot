@@ -73,9 +73,9 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     public MethodInstance throwTypes(List l) {
-        if (!CollectionUtil.equals(this.excTypes, l)) {
+        if (!CollectionUtil.equals(this.throwTypes, l)) {
             MethodInstance_c n = (MethodInstance_c) copy();
-            n.excTypes = new ArrayList(l);
+            n.throwTypes = new ArrayList(l);
             return n;
         }
         return this;
@@ -90,6 +90,20 @@ public class MethodInstance_c extends ProcedureInstance_c
         return this;
     }
 
+    /**
+     * @param name The name to set.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    /**
+     * @param returnType The returnType to set.
+     */
+    public void setReturnType(Type returnType) {
+        this.returnType = returnType;
+    }
+    
     public int hashCode() {
         //return container.hashCode() + flags.hashCode() +
 	//       returnType.hashCode() + name.hashCode();
@@ -111,8 +125,8 @@ public class MethodInstance_c extends ProcedureInstance_c
 	String s = designator() + " " + flags.translate() + returnType + " " +
                    signature();
 
-	if (! excTypes.isEmpty()) {
-	    s += " throws " + TypeSystem_c.listToString(excTypes);
+	if (! throwTypes.isEmpty()) {
+	    s += " throws " + TypeSystem_c.listToString(throwTypes);
 	}
 
 	return s;
@@ -140,7 +154,7 @@ public class MethodInstance_c extends ProcedureInstance_c
 	return container.isCanonical()
 	    && returnType.isCanonical()
 	    && listIsCanonical(formalTypes)
-	    && listIsCanonical(excTypes);
+	    && listIsCanonical(throwTypes);
     }
 
     public final boolean methodCallValid(String name, List argTypes) {

@@ -209,4 +209,34 @@ public class SourceFile_c extends Node_c implements SourceFile
 	    print(d, w, tr);
 	}
     }
+
+    /**
+     * @param parent
+     * @param tc
+     * @return
+     */
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+        SourceFile n = this;
+        
+        // Disambiguate imports and package declarations.
+        OuterScopeDisambiguator osd = new OuterScopeDisambiguator(tc);
+        n = (SourceFile) osd.visitEdgeNoOverride(parent, n);
+        if (osd.hasErrors()) throw new SemanticException();
+
+        // Ensure supertypes and signatures are disambiguated for all
+        // classes visible from the outer scope. 
+        SupertypeDisambiguator sud = new SupertypeDisambiguator(tc);
+        n = (SourceFile) sud.visitEdgeNoOverride(parent, n);
+        if (sud.hasErrors()) throw new SemanticException();
+
+        SignatureDisambiguator sid = new SignatureDisambiguator(tc);
+        n = (SourceFile) sid.visitEdgeNoOverride(parent, n);
+        if (sid.hasErrors()) throw new SemanticException();
+        
+        // Now type check the children.
+        n = (SourceFile) tc.visitEdgeNoOverride(parent, n);
+        if (tc.hasErrors()) throw new SemanticException();
+        
+        return n.typeCheck(tc);
+    }
 }

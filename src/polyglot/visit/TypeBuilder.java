@@ -1,10 +1,16 @@
 package polyglot.visit;
 
+import java.util.*;
+import java.util.HashSet;
 import java.util.Stack;
 
+import polyglot.ast.*;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
+import polyglot.frontend.*;
 import polyglot.frontend.Job;
+import polyglot.frontend.goals.Goal;
+import polyglot.frontend.goals.TypeExists;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.types.Package;
@@ -14,7 +20,7 @@ import polyglot.util.*;
 public class TypeBuilder extends HaltingVisitor
 {
     protected ImportTable importTable;
-    protected Job job;
+    protected Goal goal;
     protected TypeSystem ts;
     protected NodeFactory nf;
     protected TypeBuilder outer;
@@ -22,13 +28,13 @@ public class TypeBuilder extends HaltingVisitor
     protected boolean global; // true if all scopes pushed have been classes.
     protected ParsedClassType type; // last class pushed.
 
-    public TypeBuilder(Job job, TypeSystem ts, NodeFactory nf) {
-        this.job = job;
+    public TypeBuilder(Goal goal, TypeSystem ts, NodeFactory nf) {
+        this.goal = goal;
         this.ts = ts;
         this.nf = nf;
         this.outer = null;
     }
-
+    
     public TypeBuilder push() {
         TypeBuilder tb = (TypeBuilder) this.copy();
         tb.outer = this;
@@ -38,13 +44,17 @@ public class TypeBuilder extends HaltingVisitor
     public TypeBuilder pop() {
         return outer;
     }
+    
+    public Goal goal() {
+        return goal;
+    }
 
     public Job job() {
-        return job;
+        return goal.job();
     }
 
     public ErrorQueue errorQueue() {
-        return job.compiler().errorQueue();
+        return job().compiler().errorQueue();
     }
 
     public NodeFactory nodeFactory() {
@@ -56,50 +66,7 @@ public class TypeBuilder extends HaltingVisitor
     }
 
     public NodeVisitor begin() {
-        // Initialize the stack from the context.
-        Context context = job.context();
-
-        if (context == null) {
-            return this;
-        }
-
-        Stack s = new Stack();
-
-        for (ParsedClassType ct = context.currentClassScope(); ct != null; ) {
-            s.push(ct);
-
-            if (ct.isNested()) {
-                ct = (ParsedClassType) ct.outer();
-            }
-            else {
-                ct = null;
-            }
-        }
-
-        if (context.importTable() != null) {
-            setImportTable(context.importTable());
-        }
-
-        TypeBuilder tb = this;
-
-        while (! s.isEmpty()) {
-            ParsedClassType ct = (ParsedClassType) s.pop();
-
-            try {
-                tb = tb.pushClass(ct);
-            }
-            catch (SemanticException e) {
-                errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-                                     e.getMessage(), ct.position());
-                return null;
-            }
-
-            if (ct.isLocal() || ct.isAnonymous()) {
-                tb = tb.pushCode();
-            }
-        }
-
-        return tb;
+        return this;
     }
 
     public NodeVisitor enter(Node n) {
@@ -124,7 +91,30 @@ public class TypeBuilder extends HaltingVisitor
 
     public Node leave(Node old, Node n, NodeVisitor v) {
 	try {
-	    return n.del().buildTypes((TypeBuilder) v);
+	    Node m = n.del().buildTypes((TypeBuilder) v);
+        
+	    final Collection typesBelow = new HashSet();
+	    m.visitChildren(new NodeVisitor() {
+	        public Node override(Node parent, Node n) {
+	            typesBelow.addAll(n.typesBelow());
+	            return n;
+	        }
+	    });
+	
+	    // TODO: change interface to allow easier aggregation of results computed
+	    // by children.
+	    if (m instanceof ClassDecl) {
+	        ClassDecl cd = (ClassDecl) m;
+	        typesBelow.add(cd.type());
+	    }
+	    else if (m instanceof New) {
+	        New nw = (New) m;
+	        if (nw.anonType() != null) {
+	            typesBelow.add(nw.anonType());
+	        }
+	    }
+	    
+	    return m.typesBelow(typesBelow);
 	}
 	catch (SemanticException e) {
 	    Position position = e.position();
@@ -144,7 +134,7 @@ public class TypeBuilder extends HaltingVisitor
 
     public TypeBuilder pushCode() {
         if (Report.should_report(Report.visit, 4))
-	    Report.report(4, "TB pushing code: " + this);
+	    Report.report(4, "TB pushing code: " + context());
         TypeBuilder tb = push();
         tb.inCode = true;
         tb.global = false;
@@ -153,7 +143,7 @@ public class TypeBuilder extends HaltingVisitor
 
     protected TypeBuilder pushClass(ParsedClassType type) throws SemanticException {
         if (Report.should_report(Report.visit, 4))
-	    Report.report(4, "TB pushing class " + type + ": " + this);
+	    Report.report(4, "TB pushing class " + type + ": " + context());
 
         TypeBuilder tb = push();
         tb.type = type;
@@ -172,14 +162,17 @@ public class TypeBuilder extends HaltingVisitor
     {
 	TypeSystem ts = typeSystem();
 
-        ParsedClassType ct = ts.createClassType(this.job.source());
+        ParsedClassType ct = ts.createClassType(job().source());
+        
+        ct.setJob(job());
+        ct.position(pos);
+        ct.flags(flags);
+        ct.name(name);
+//        ct.superType(ts.unknownType(pos));
 
 	if (inCode) {
             ct.kind(ClassType.LOCAL);
 	    ct.outer(currentClass());
-	    ct.flags(flags);
-	    ct.name(name);
-	    ct.position(pos);
 
 	    if (currentPackage() != null) {
 	      	ct.package_(currentPackage());
@@ -190,9 +183,6 @@ public class TypeBuilder extends HaltingVisitor
 	else if (currentClass() != null) {
             ct.kind(ClassType.MEMBER);
 	    ct.outer(currentClass());
-	    ct.flags(flags);
-	    ct.name(name);
-	    ct.position(pos);
 
 	    currentClass().addMemberClass(ct);
 
@@ -214,15 +204,13 @@ public class TypeBuilder extends HaltingVisitor
             if (allMembers) {
                 typeSystem().parsedResolver().addNamed(
                     typeSystem().getTransformedClassName(ct), ct);
+                satisfyTypeExistsGoal(ct);
             }
 
 	    return ct;
 	}
 	else {
             ct.kind(ClassType.TOP_LEVEL);
-	    ct.flags(flags);
-	    ct.name(name);
-	    ct.position(pos);
 
 	    if (currentPackage() != null) {
 	      	ct.package_(currentPackage());
@@ -237,9 +225,20 @@ public class TypeBuilder extends HaltingVisitor
 
             typeSystem().parsedResolver().addNamed(ct.fullName(), ct);
             ((CachingResolver) typeSystem().systemResolver()).addNamed(ct.fullName(), ct);
+            satisfyTypeExistsGoal(ct);
 
 	    return ct;
 	}
+    }
+
+    /**
+     * @param ct
+     */
+    private void satisfyTypeExistsGoal(ParsedClassType ct) {
+        Scheduler scheduler = job().extensionInfo().scheduler();
+        TypeExists goal = new TypeExists(ct.fullName());
+        goal = (TypeExists) scheduler.internGoal(goal);
+        goal.setSatisfied();
     }
 
     public TypeBuilder pushAnonClass(Position pos) throws SemanticException {
@@ -254,6 +253,7 @@ public class TypeBuilder extends HaltingVisitor
 	TypeSystem ts = typeSystem();
 
         ParsedClassType ct = ts.createClassType(this.job().source());
+        ct.setJob(job());
         ct.kind(ClassType.ANONYMOUS);
         ct.outer(currentClass());
         ct.position(pos);
@@ -261,6 +261,8 @@ public class TypeBuilder extends HaltingVisitor
         if (currentPackage() != null) {
             ct.package_(currentPackage());
         }
+        
+//        ct.superType(ts.unknownType(pos));
 
         return pushClass(ct);
     }
@@ -289,10 +291,10 @@ public class TypeBuilder extends HaltingVisitor
         this.importTable = it;
     }
 
-    public String toString() {
+    public String context() {
         return "(TB " + type +
                 (inCode ? " inCode" : "") +
                 (global ? " global" : "") +
-                (outer == null ? ")" : " " + outer.toString() + ")");
+                (outer == null ? ")" : " " + outer.context() + ")");
     }
 }

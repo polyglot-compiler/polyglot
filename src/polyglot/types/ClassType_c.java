@@ -1,9 +1,11 @@
 package polyglot.ext.jl.types;
 
+import java.util.*;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import polyglot.frontend.Job;
 import polyglot.types.ClassType;
 import polyglot.types.FieldInstance;
 import polyglot.types.Flags;
@@ -34,6 +36,8 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 	super(ts, pos);
     }
 
+    public abstract Job job();
+    
     /** Get the class's kind. */
     public abstract Kind kind();
 
@@ -129,6 +133,16 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 
     /** Get the class's super type. */
     public abstract Type superType();
+    
+    /** Get a list of all the class's MemberInstances. */
+    public List members() {
+        List l = new ArrayList();
+        l.addAll(methods());
+        l.addAll(fields());
+        l.addAll(constructors());
+        l.addAll(memberClasses());
+        return l;
+    }
 
     /** Get a field of the class by name. */
     public FieldInstance fieldNamed(String name) {
@@ -347,9 +361,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     public String toString() {
         if (isTopLevel()) {
             if (package_() != null) {
-                return package_().toString() + "." + name();
             }
-
             return name();
         }
         else if (isMember()) {
@@ -358,13 +370,16 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         else if (isLocal()) {
             return name();
         }
-        else {
+        else if (isAnonymous()) {
             if (superType() != null) {
                 return "<anon subtype of " + superType().toString() + ">";
             }
             else {
                 return "<anon subtype of unknown>";
             }
+        }
+        else {
+            return "<unknown class>";
         }
     }
 

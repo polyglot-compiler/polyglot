@@ -44,9 +44,9 @@ class Field {
                                           ts.flagsForBits(modifiers),
                                           clazz.typeForString(ts, type), name);
 
-      Constant c = constantValue();
+      if (isConstant()) {
+        Constant c = constantValue();
 
-      if (c != null) {
         Object o = null;
 
         try {
@@ -62,9 +62,11 @@ class Field {
           throw new ClassFormatError("Unexpected constant pool entry.");
         }
 
-        if (o != null) {
-          return fi.constantValue(o);
-        }
+        fi.setConstantValue(o);
+        return fi;
+      }
+      else {
+        fi.setNotConstant();
       }
 
       return fi;
@@ -74,6 +76,10 @@ class Field {
       return synthetic;
     }
 
+    boolean isConstant() {
+      return this.constantValue != null;
+    }
+    
     Constant constantValue() {
       if (this.constantValue != null) {
         int index = this.constantValue.index;

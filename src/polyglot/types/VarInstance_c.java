@@ -1,5 +1,7 @@
 package polyglot.ext.jl.types;
 
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.FieldConstantsChecked;
 import polyglot.types.*;
 import polyglot.util.*;
 
@@ -14,6 +16,7 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     protected String name;
     protected Object constantValue;
     protected boolean isConstant;
+    protected boolean constantValueSet;
 
     /** Used for deserializing types. */
     protected VarInstance_c() { }
@@ -26,12 +29,23 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
 	this.name = name;
     }
 
+    public boolean constantValueSet() {
+        return constantValueSet;
+    }
+    
     public boolean isConstant() {
+        if (! constantValueSet) {
+            Scheduler scheduler = typeSystem().extensionInfo().scheduler();
+//            scheduler.addConcurrentDependency(scheduler.currentGoal(), new ConstantsChecked(this));
+        }
         return isConstant;
     }
 
     public Object constantValue() {
-        return constantValue;
+        if (isConstant()) {
+            return constantValue;
+        }
+        return null;
     }
 
     public Flags flags() {
@@ -71,5 +85,35 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
 
     public void setFlags(Flags flags) {
         this.flags = flags;
+    }
+    
+    /** Destructive update of constant value. */
+    public void setConstantValue(Object constantValue) {
+        if (! (constantValue == null) &&
+                ! (constantValue instanceof Boolean) &&
+                ! (constantValue instanceof Number) &&
+                ! (constantValue instanceof Character) &&
+                ! (constantValue instanceof String)) {
+            
+            throw new InternalCompilerError(
+            "Can only set constant value to a primitive or String.");
+        }
+
+        this.constantValue = constantValue;
+        this.isConstant = true;
+        this.constantValueSet = true;
+    }
+    
+    public void setNotConstant() {
+        this.constantValue = null;
+        this.isConstant = false;
+        this.constantValueSet = true;
+    }
+    
+    /**
+     * @param name The name to set.
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 }

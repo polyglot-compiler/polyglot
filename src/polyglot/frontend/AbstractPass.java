@@ -1,11 +1,13 @@
 package polyglot.frontend;
 
+import polyglot.frontend.goals.Goal;
+import polyglot.util.StringUtil;
+
 /** The base class for most passes. */
 public abstract class AbstractPass implements Pass
 {
-    /** The id of the pass. */
-    protected Pass.ID id;
-
+    protected Goal goal;
+    
     /**
      * If the pass is running, the time that the pass started.
      * If the pass has completed, the time in ms the pass took to run,
@@ -20,18 +22,17 @@ public abstract class AbstractPass implements Pass
      */
     protected long inclusive_time = 0;
 
-    public AbstractPass(Pass.ID id) {
-        this.id = id;
+    public AbstractPass(Goal goal) {
+        this.goal = goal;
     }
-
-    /** The id of the pass. */
-    public Pass.ID id() {
-        return id;
+ 
+    public Goal goal() {
+        return goal;
     }
 
     /** The human-readable name of the pass. */
     public String name() {
-        return id.toString();
+        return this.getClass().getName();
     }
 
     /** Run the pass, returning true on success. */
@@ -70,6 +71,6 @@ public abstract class AbstractPass implements Pass
     }
 
     public String toString() {
-	return getClass().getName() + ":" + id;
+	return StringUtil.getShortNameComponent(name());
     }
 }

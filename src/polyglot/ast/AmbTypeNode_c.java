@@ -1,6 +1,9 @@
 package polyglot.ext.jl.ast;
 
 import polyglot.ast.*;
+import polyglot.frontend.*;
+import polyglot.frontend.CyclicDependencyException;
+import polyglot.frontend.Scheduler;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
@@ -19,6 +22,10 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 
     this.qual = qual;
     this.name = name;
+  }
+  
+  public boolean isCanonical() {
+      return false;
   }
 
   public String name() {
@@ -61,23 +68,30 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
   }
 
   public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-    Node n = sc.nodeFactory().disamb().disambiguate(this, sc, position(), qual,
-                                                    name);
-
-    if (n instanceof TypeNode) {
-      return n;
-    }
-   
-    throw new SemanticException("Could not find type \"" +
-            (qual == null ? name : qual.toString() + "." + name) +
-                                "\".", position());
+      if (qual instanceof Ambiguous) {
+          return this;
+      }
+      
+      if (qual != null && ! qual.qualifier().isCanonical()) {
+          return this;
+      }
+      
+      Node n = sc.nodeFactory().disamb().disambiguate(this, sc, position(), qual,
+                                                      name);
+      
+      if (n instanceof TypeNode) {
+          return n;
+      }
+      
+      throw new SemanticException("Could not find type \"" +
+                                  (qual == null ? name : qual.toString() + "." + name) +
+                                  "\".", position());
   }
 
   public Node typeCheck(TypeChecker tc) throws SemanticException {
-    throw new InternalCompilerError(position(),
-                                    "Cannot type check ambiguous node "
-                                    + this + ".");
-  } 
+      // Didn't finish disambiguation; just return.
+      return this;
+  }
 
   public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
     throw new InternalCompilerError(position(),

@@ -18,6 +18,10 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
     super(pos);
     this.name = name;
   }
+  
+  public boolean isCanonical() {
+      return false;
+  }
 
   /** Get the precedence of the field. */
   public Precedence precedence() {
@@ -49,12 +53,10 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
                                 "variable \"" + name + "\".", position());
   }
 
-  /** Type check the expression. */
   public Node typeCheck(TypeChecker tc) throws SemanticException {
-    throw new InternalCompilerError(position(),
-                                    "Cannot type check ambiguous node "
-                                    + this + ".");
-  } 
+      // Didn't finish disambiguation; just return.
+      return this;
+  }
 
   /** Check exceptions thrown by the expression. */
   public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {

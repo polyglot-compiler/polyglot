@@ -26,6 +26,14 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
     public boolean isReference() { return true; }
     public ReferenceType toReference() { return this; }
 
+    /** Get a list of all the type's MemberInstances. */
+    public List members() {
+        List l = new ArrayList();
+        l.addAll(methods());
+        l.addAll(fields());
+        return l;
+    }
+
     /**
      * Returns a list of MethodInstances for all the methods declared in this.
      * It does not return methods declared in supertypes.

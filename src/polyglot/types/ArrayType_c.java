@@ -44,11 +44,13 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
             fields = new ArrayList(2);
 
             // Add field public final int length
-            fields.add(ts.fieldInstance(position(),
+            FieldInstance fi = ts.fieldInstance(position(),
                                         this,
                                         ts.Public().Final(),
                                         ts.Int(),
-                                        "length"));
+                                        "length");
+            fi.setNotConstant();
+            fields.add(fi);
         }
 
         if (interfaces == null) {

@@ -6,7 +6,7 @@ import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
 
 /**
- * A <code>VarDecl</code> represents a variable declaration, of either a formal
+ * A <code>VarDecl</code> represents a local variable declaration, of either a formal
  * or a local variable.
  */
 public interface VarDecl extends Term

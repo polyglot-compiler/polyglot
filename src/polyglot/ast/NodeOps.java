@@ -102,6 +102,7 @@ public interface NodeOps
      *
      * @param ar The visitor which disambiguates.
      */
+    Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException;
     NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException;
 
     /**
@@ -116,33 +117,6 @@ public interface NodeOps
      * @param ar The visitor which disambiguates.
      */
     Node disambiguate(AmbiguityRemover ar) throws SemanticException;
-
-    /**
-     * Adds disambiguated methods and fields to the types.
-     *
-     * This method is called by the <code>enter()</code> method of the
-     * visitor.  The * method should perform work that should be done
-     * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
-     * invoked.
-     *
-     * @param am The visitor which builds types.
-     */
-    NodeVisitor addMembersEnter(AddMemberVisitor am) throws SemanticException;
-
-    /**
-     * Adds disambiguated methods and fields to the types.
-     *
-     * This method is called by the <code>leave()</code> method of the
-     * visitor.  The method should perform work that should be done
-     * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
-     * installed as a child of the node's parent.
-     *
-     * @param am The visitor which builds types.
-     */
-    Node addMembers(AddMemberVisitor am) throws SemanticException;
 
     /**
      * Type check the AST.
@@ -169,8 +143,11 @@ public interface NodeOps
      *
      * @param tc The type checking visitor.
      */
+    Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException;
     Node typeCheck(TypeChecker tc) throws SemanticException;
 
+    Node checkConstants(ConstantChecker cc) throws SemanticException;
+    
     /**
      * Check that exceptions are properly propagated throughout the AST.
      *

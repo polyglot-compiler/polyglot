@@ -125,6 +125,9 @@ public class JL_c extends Ext_c implements JL {
      *
      * @param ar The visitor which disambiguates.
      */
+    public Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException {
+	return jl().disambiguateOverride(ar);
+    }
     public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
 	return jl().disambiguateEnter(ar);
     }
@@ -145,37 +148,6 @@ public class JL_c extends Ext_c implements JL {
     }
 
     /**
-     * Adds disambiguated methods and fields to the types.
-     *
-     * This method is called by the <code>enter()</code> method of the
-     * visitor.  The * method should perform work that should be done
-     * before visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node on which
-     * <code>visitChildren()</code> and <code>leave()</code> will be
-     * invoked.
-     *
-     * @param am The visitor which builds types.
-     */
-    public NodeVisitor addMembersEnter(AddMemberVisitor am) throws SemanticException {
-	return jl().addMembersEnter(am);
-    }
-
-    /**
-     * Adds disambiguated methods and fields to the types.
-     *
-     * This method is called by the <code>leave()</code> method of the
-     * visitor.  The method should perform work that should be done
-     * after visiting the children of the node.  The method may return
-     * <code>this</code> or a new copy of the node which will be
-     * installed as a child of the node's parent.
-     *
-     * @param am The visitor which builds types.
-     */
-    public Node addMembers(AddMemberVisitor am) throws SemanticException {
-	return jl().addMembers(am);
-    }
-
-    /**
      * Type check the AST.
      *
      * This method is called by the <code>enter()</code> method of the
@@ -187,6 +159,10 @@ public class JL_c extends Ext_c implements JL {
      *
      * @param tc The type checking visitor.
      */
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+	return jl().typeCheckOverride(parent, tc);
+    }
+    
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
 	return jl().typeCheckEnter(tc);
     }
@@ -206,6 +182,10 @@ public class JL_c extends Ext_c implements JL {
 	return jl().typeCheck(tc);
     }
 
+    public Node checkConstants(ConstantChecker cc) throws SemanticException {
+        return jl().checkConstants(cc);
+    }
+    
     /**
      * Check that exceptions are properly propagated throughout the AST.
      *

@@ -1,12 +1,18 @@
 package polyglot.ext.jl.ast;
 
+import java.util.*;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import polyglot.ast.*;
+import polyglot.frontend.*;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.Goal;
+import polyglot.frontend.goals.SupertypesResolved;
 import polyglot.main.Report;
 import polyglot.types.*;
+import polyglot.util.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.CollectionUtil;
 import polyglot.util.Position;
@@ -36,6 +42,10 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 	    this.superClass = superClass;
 	    this.interfaces = TypedList.copyAndCheck(interfaces, TypeNode.class, true);
 	    this.body = body;
+    }
+
+    public MemberInstance memberInstance() {
+        return type;
     }
 
     public ParsedClassType type() {
@@ -136,21 +146,21 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
 	tb = tb.pushClass(position(), flags, name);
         
-        ParsedClassType ct = tb.currentClass();
+        ParsedClassType type = tb.currentClass();
 
         // Member classes of interfaces are implicitly public and static.
-        if (ct.isMember() && ct.outer().flags().isInterface()) {
-            ct.flags(ct.flags().Public().Static());
+        if (type.isMember() && type.outer().flags().isInterface()) {
+            type.flags(type.flags().Public().Static());
         }
 
         // Member interfaces are implicitly static. 
-        if (ct.isMember() && ct.flags().isInterface()) {
-            ct.flags(ct.flags().Static());
+        if (type.isMember() && type.flags().isInterface()) {
+            type.flags(type.flags().Static());
         }
 
         // Interfaces are implicitly abstract. 
-        if (ct.flags().isInterface()) {
-            ct.flags(ct.flags().Abstract());
+        if (type.flags().isInterface()) {
+            type.flags(type.flags().Abstract());
         }
 
         return tb;
@@ -158,9 +168,27 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
 	ParsedClassType type = tb.currentClass();        
-        if (type != null) {
-            return type(type).flags(type.flags());
+
+	if (type != null) {
+	    type.setMembersAdded(true);
+	   
+        /*
+         
+             Scheduler scheduler = tb.job().extensionInfo().scheduler();
+        
+	    scheduler.addDependency(new DisamSupertypesInFile(tb.job()),
+	                            new SuperTypesResolved(type));
+	    scheduler.addDependency(new DisamSignaturesInFile(tb.job()),
+	                            new AllMembersAdded(type));
+	    scheduler.addDependency(new DisamSignaturesInFile(tb.job()),
+	                            new SignaturesDisambiguated(type));
+                                
+                                */
+        
+	    ClassDecl_c n = (ClassDecl_c) type(type).flags(type.flags());
+	    return n.addDefaultConstructorIfNeeded(tb.typeSystem(), tb.nodeFactory());
         }
+
         return this;
     }
 
@@ -171,107 +199,96 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         }
         return super.enterScope(child, c);
     }
-
-    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
-        if (ar.kind() == AmbiguityRemover.SUPER) {
-            return ar.bypass(body);
-        }
-
-        return ar;
-    }
-
-    protected void disambiguateSuperType(AmbiguityRemover ar) throws SemanticException {
-        TypeSystem ts = ar.typeSystem();
-
-        if (this.superClass != null) {
-            Type t = this.superClass.type();
-
-            if (! t.isCanonical()) {
-                throw new SemanticException("Could not disambiguate super" +
-                        " class of " + type + ".", superClass.position());
-            }
-
-            if (! t.isClass() || t.toClass().flags().isInterface()) {
-                throw new SemanticException("Super class " + t + " of " +
-                        type + " is not a class.", superClass.position());
-            }
-
-            if (Report.should_report(Report.types, 3))
-                Report.report(3, "setting super type of " + this.type + " to " + t);
-
-            this.type.superType(t);
-
-            ts.checkCycles(t.toReference());
-        }
-        else if (ts.Object() != this.type && 
-                 !ts.Object().fullName().equals(this.type.fullName())) {
-            // the supertype was not specified, and the type is not the same
-            // as ts.Object() (which is typically java.lang.Object)
-            // As such, the default supertype is ts.Object().
-            this.type.superType(ts.Object());
-        }
-        else {
-            // the type is the same as ts.Object(), so it has no supertype.
-            this.type.superType(null);
-        }    
-    }
-
+    
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-            // make sure that the inStaticContext flag of the class is 
-            // correct
-            Context ctxt = ar.context();
-            this.type().inStaticContext(ctxt.inStaticContext());
+        ClassDecl_c n = disambiguateSupertypes(ar);
+        ParsedClassType type = n.type();
 
-
-        }
-
-        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-            // make sure that this class has the correct dependencies
-            // recorded for its super classes and interfaces.
-            ar.addSuperDependencies(this.type());
-        }
-
-        if (ar.kind() != AmbiguityRemover.SUPER) {
-            return this;
-        }
-
-        TypeSystem ts = ar.typeSystem();
-
-        if (Report.should_report(Report.types, 2))
-	    Report.report(2, "Cleaning " + type + ".");
-
-        disambiguateSuperType(ar);
+        // Make sure that the inStaticContext flag of the class is correct.
+        Context ctxt = ar.context();
+        type.inStaticContext(ctxt.inStaticContext());
         
-        for (Iterator i = this.interfaces.iterator(); i.hasNext(); ) {
-            TypeNode tn = (TypeNode) i.next();
-            Type t = tn.type();
-
-            if (! t.isCanonical()) {
-                throw new SemanticException("Could not disambiguate super" +
-                        " class of " + type + ".", tn.position());
-            }
-
-            if (! t.isClass() || ! t.toClass().flags().isInterface()) {
-                throw new SemanticException("Interface " + t + " of " +
-                        type + " is not an interface.", tn.position());
-            }
-
-            if (Report.should_report(Report.types, 3))
-		Report.report(3, "adding interface of " + this.type + " to " + t);
-
-            if (!this.type.interfaces().contains(t)) this.type.addInterface(t);
-
-            ts.checkCycles(t.toReference());
-        }
-
         return this;
     }
 
-    public Node addMembers(AddMemberVisitor tc) throws SemanticException {
-	TypeSystem ts = tc.typeSystem();
-	NodeFactory nf = tc.nodeFactory();
-        return addDefaultConstructorIfNeeded(ts, nf);
+    protected ClassDecl_c disambiguateSupertypes(AmbiguityRemover ar) throws SemanticException {
+        TypeNode newSuperClass;
+        List newInterfaces;
+ 
+        boolean supertypesResolved = true;
+        
+//        System.out.println("  " + ar + ".disamsuper: " + this);
+        
+        if (! type.supertypesResolved()) {
+            if (superClass != null && ! superClass.type().isCanonical()) {
+                supertypesResolved = false;
+            }
+            
+            for (Iterator i = interfaces.iterator(); supertypesResolved && i.hasNext(); ) {
+                TypeNode tn = (TypeNode) i.next();
+                if (! tn.type().isCanonical()) {
+                    supertypesResolved = false;
+                }
+            }
+            
+            if (! supertypesResolved) {
+                Scheduler scheduler = ar.job().extensionInfo().scheduler();
+                scheduler.addConcurrentDependency(ar.goal(), new SupertypesResolved(type));
+//                System.out.println("    not resolved");
+            }
+            else {            
+//                System.out.println("    resolved");
+                setSuperClass(ar, superClass);
+                setInterfaces(ar, interfaces);
+                type.setSupertypesResolved(true);
+            }
+        }
+        
+        return this;
+    }
+
+    protected void setSuperClass(AmbiguityRemover ar, TypeNode superClass) throws SemanticException {
+        TypeSystem ts = ar.typeSystem();
+
+        if (superClass != null) {
+            Type t = superClass.type();
+            if (Report.should_report(Report.types, 3))
+                Report.report(3, "setting superclass of " + this.type + " to " + t);
+            this.type.superType(t);
+            ts.checkCycles(t.toReference());
+        }
+        else if (this.type.equals(ts.Object()) || this.type.fullName().equals(ts.Object().fullName())) {
+            // the type is the same as ts.Object(), so it has no superclass.
+            if (Report.should_report(Report.types, 3))
+                Report.report(3, "setting superclass of " + this.type + " to " + null);
+            this.type.superType(null);
+        }
+        else {
+            // the superclass was not specified, and the type is not the same
+            // as ts.Object() (which is typically java.lang.Object)
+            // As such, the default superclass is ts.Object().
+            if (Report.should_report(Report.types, 3))
+                Report.report(3, "setting superclass of " + this.type + " to " + ts.Object());
+            this.type.superType(ts.Object());
+        }    
+    }
+
+    protected void setInterfaces(AmbiguityRemover ar, List newInterfaces) throws SemanticException {
+        TypeSystem ts = ar.typeSystem();
+     
+        for (Iterator i = newInterfaces.iterator(); i.hasNext(); ) {
+            TypeNode tn = (TypeNode) i.next();
+            Type t = tn.type();
+    
+            if (Report.should_report(Report.types, 3))
+		Report.report(3, "adding interface of " + this.type + " to " + t);
+
+            if (!this.type.interfaces().contains(t)) {
+                this.type.addInterface(t);
+            }
+
+            ts.checkCycles(t.toReference());
+        }
     }
 
     protected Node addDefaultConstructorIfNeeded(TypeSystem ts,
@@ -374,7 +391,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         }
         
         if (type.superType() != null) {
-            if (! type.superType().isClass()) {
+            if (! type.superType().isClass() || type.superType().toClass().flags().isInterface()) {
                 throw new SemanticException("Cannot extend non-class \"" +
                                             type.superType() + "\".",
                                             position());
@@ -384,6 +401,26 @@ public class ClassDecl_c extends Term_c implements ClassDecl
                 throw new SemanticException("Cannot extend final class \"" +
                                             type.superType() + "\".",
                                             position());
+            }
+            
+            if (this.type.equals(tc.typeSystem().Object()) || this.type.fullName().equals(tc.typeSystem().Object().fullName())) {
+                throw new SemanticException("Class \"" + this.type + "\" cannot have a superclass.",
+                                            superClass.position());
+            }
+        }
+        
+        for (Iterator i = interfaces.iterator(); i.hasNext(); ) {
+            TypeNode tn = (TypeNode) i.next();
+            Type t = tn.type();
+    
+            if (! t.isClass() || ! t.toClass().flags().isInterface()) {
+                throw new SemanticException("Superinterface " + t + " of " +
+                        type + " is not an interface.", tn.position());
+            }
+            
+            if (this.type.equals(tc.typeSystem().Object()) || this.type.fullName().equals(tc.typeSystem().Object().fullName())) {
+                throw new SemanticException("Class " + this.type + " cannot have a superinterface.",
+                                            tn.position());
             }
         }
 
@@ -483,5 +520,62 @@ public class ClassDecl_c extends Term_c implements ClassDecl
                     w.write("(type " + type + ")");
                     w.end();
             }
+    }
+
+    /**
+     * @param parent
+     * @param tc
+     * @return
+     */
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+        // Don't do anything special for member classes; the disambiguation passes
+        // for the container have already been run and visited this class.
+        if (type.isMember()) {
+            return null;
+        }
+
+        ClassDecl n = this;
+        Node old = n;
+        
+        // Ensure supertypes and signatures are disambiguated for all
+        // classes visible from this class's scope.
+    
+        // Check typesBelow to see if we need to disambiguate supertypes
+        // and signatures.
+        for (Iterator i = n.typesBelow().iterator(); i.hasNext(); ) {
+            ParsedClassType ct = (ParsedClassType) i.next();
+            if (! ct.supertypesResolved()) {
+                SupertypeDisambiguator sd = new SupertypeDisambiguator(tc);
+                n = (ClassDecl) sd.visitEdgeNoOverride(parent, n);
+                if (sd.hasErrors()) throw new SemanticException();
+                break;
+            }
+        }
+    
+        // Hack to force n.disambiguate() to be called and supertypes set.
+        // n = (ClassDecl) new SupertypeDisambiguator(tc).leave(parent, old, n, new SupertypeDisambiguator(tc));
+    
+        for (Iterator i = n.typesBelow().iterator(); i.hasNext(); ) {
+            ParsedClassType ct = (ParsedClassType) i.next();
+            if (! ct.signaturesResolved()) {
+                SignatureDisambiguator sd = new SignatureDisambiguator(tc);
+                n = (ClassDecl) sd.visitEdgeNoOverride(parent, n);
+                if (sd.hasErrors()) throw new SemanticException();
+                break;
+            }
+        }
+    
+        BodyDisambiguator bd = new BodyDisambiguator(tc);
+        n = (ClassDecl) bd.visitEdgeNoOverride(parent, n);
+        if (bd.hasErrors()) throw new SemanticException();
+        
+        // Call enter and leave to manage the context.
+        TypeChecker childtc = (TypeChecker) tc.enter(parent, n);
+        if (tc.hasErrors()) throw new SemanticException();
+    
+        n = (ClassDecl) n.visitChildren(childtc);
+        if (childtc.hasErrors()) throw new SemanticException();
+    
+        return tc.leave(parent, old, n, childtc);
     }
 }

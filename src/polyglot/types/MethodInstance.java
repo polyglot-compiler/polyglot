@@ -12,6 +12,7 @@ public interface MethodInstance extends ProcedureInstance
      * The method's return type.
      */
     Type returnType();
+    void setReturnType(Type type);
 
     /**
      * Set the method's return type.
@@ -22,6 +23,7 @@ public interface MethodInstance extends ProcedureInstance
      * The method's name.
      */
     String name();
+    void setName(String name);
 
     /**
      * Set the method's name.

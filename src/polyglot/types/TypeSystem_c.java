@@ -24,9 +24,10 @@ public class TypeSystem_c implements TypeSystem
     protected TableResolver parsedResolver;
     protected LoadedClassResolver loadedResolver;
     protected Map flagsForName;
+    protected ExtensionInfo extInfo;
 
     public TypeSystem_c() {}
-
+    
     /**
      * Initializes the type system and its internal constants (which depend on
      * the resolver).
@@ -37,6 +38,8 @@ public class TypeSystem_c implements TypeSystem
         if (Report.should_report(Report.types, 1))
 	    Report.report(1, "Initializing " + getClass().getName());
 
+        this.extInfo = extInfo;
+        
         // The parsed class resolver.  This resolver contains classes parsed
         // from source files.
         this.parsedResolver = new TableResolver();
@@ -88,6 +91,11 @@ public class TypeSystem_c implements TypeSystem
         systemResolver.find("java.lang.ArrayStoreException");
         systemResolver.find("java.lang.ArithmeticException");
         */
+    }
+
+    /** Return the language extension this type system is for. */
+    public ExtensionInfo extensionInfo() {
+        return extInfo;
     }
 
     public TopLevelResolver systemResolver() {
@@ -701,8 +709,23 @@ public class TypeSystem_c implements TypeSystem
     {
 	assert_(container);
 	
-	Set s = findMemberClasses(container, name);
+        /*
+        System.out.println("findMemberClasses");
+
+        if (container instanceof ParsedClassType_c) {
+                ParsedClassType_c pt = (ParsedClassType_c ) container;
+                System.out.println("pt = " + pt);
+                System.out.println("pt.super = " + pt.superType);
+                System.out.println("pt.interfaces = " + pt.interfaces);
+                System.out.println("membersAdded = " + pt.membersAdded);
+                System.out.println("signaturesResolved = " + pt.signaturesResolved);
+                System.out.println("supertypesResolved = " + pt.supertypesResolved);
+                System.out.println("allMembersAdded = " + pt.allMembersAdded);
+        }
+        */
 	
+	Set s = findMemberClasses(container, name);
+
 	if (s.size() == 0) {
 	    throw new NoClassException(name, container);
 	}
@@ -758,7 +781,6 @@ public class TypeSystem_c implements TypeSystem
 	
 	for (Iterator i = container.interfaces().iterator(); i.hasNext(); ) {
 	    Type it = (Type) i.next();
-	    
 	    Set s =  findMemberClasses(it.toClass(), name);
 	    memberClasses.addAll(s);
 	}
@@ -846,7 +868,7 @@ public class TypeSystem_c implements TypeSystem
 
         assert_(container);
         assert_(argTypes);
-
+        
 	List acceptable = findAcceptableMethods(container, name, argTypes, currClass);
 
 	if (acceptable.size() == 0) {

@@ -32,6 +32,14 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	this.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
 	this.body = body;
     }
+    
+    public boolean isCanonical() {
+        return ci != null && ci.isCanonical() && super.isCanonical();
+    }
+    
+    public MemberInstance memberInstance() {
+        return ci;
+    }
 
     /** Get the flags of the constructor. */
     public Flags flags() {
@@ -143,53 +151,59 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         TypeSystem ts = tb.typeSystem();
 
-        List l = new ArrayList(formals.size());
+        ParsedClassType ct = tb.currentClass();
+
+        List formalTypes = new ArrayList(formals.size());
         for (int i = 0; i < formals.size(); i++) {
-            l.add(ts.unknownType(position()));
+            formalTypes.add(ts.unknownType(position()));
         }
 
-        List m = new ArrayList(throwTypes().size());
+        List throwTypes = new ArrayList(throwTypes().size());
         for (int i = 0; i < throwTypes().size(); i++) {
-            m.add(ts.unknownType(position()));
+            throwTypes.add(ts.unknownType(position()));
         }
 
-        ConstructorInstance ci = ts.constructorInstance(position(), ts.Object(),
-                                                        Flags.NONE, l, m);
+        ConstructorInstance ci = ts.constructorInstance(position(), ct,
+                                                        flags, formalTypes, throwTypes);
+        ct.addConstructor(ci);
+
         return constructorInstance(ci);
     }
 
-    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
-        if (ar.kind() == AmbiguityRemover.SUPER) {
-            return ar.bypassChildren(this);
-        }
-        else if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-            if (body != null) {
-                return ar.bypass(body);
-            }
-        }
-
-        return ar;
-    }
-
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-            Context c = ar.context();
-            TypeSystem ts = ar.typeSystem();
-
-            ParsedClassType ct = c.currentClassScope();
-
-            ConstructorInstance ci = makeConstructorInstance(ct, ts);
-
-            return constructorInstance(ci);
+        if (this.ci.isCanonical()) {
+            return this;
         }
+
+        Context c = ar.context();
+        TypeSystem ts = ar.typeSystem();
+            
+        ParsedClassType ct = c.currentClassScope();
+        
+        List formalTypes = new LinkedList();
+        List throwTypes = new LinkedList();
+            
+        for (Iterator i = formals.iterator(); i.hasNext(); ) {
+            Formal f = (Formal) i.next();
+            if (! f.declType().isCanonical()) {
+                return this;
+            }
+            formalTypes.add(f.declType());
+        }
+
+        ci.setFormalTypes(formalTypes);
+
+        for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
+            TypeNode tn = (TypeNode) i.next();
+            if (! tn.type().isCanonical()) {
+                return this;
+            }
+            throwTypes.add(tn.type());
+        }
+
+        ci.setThrowTypes(throwTypes);
 
         return this;
-    }
-
-    public NodeVisitor addMembersEnter(AddMemberVisitor am) {
-	ParsedClassType ct = am.context().currentClassScope();
-        ct.addConstructor(ci);
-        return am.bypassChildren(this);
     }
 
     public Context enterScope(Context c) {
@@ -357,26 +371,6 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	}
     }
 
-    protected ConstructorInstance makeConstructorInstance(ClassType ct,
-	TypeSystem ts) throws SemanticException {
-
-	List argTypes = new LinkedList();
-	List excTypes = new LinkedList();
-
-	for (Iterator i = formals.iterator(); i.hasNext(); ) {
-	    Formal f = (Formal) i.next();
-	    argTypes.add(f.declType());
-	}
-
-	for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
-	    TypeNode tn = (TypeNode) i.next();
-	    excTypes.add(tn.type());
-	}
-
-	return ts.constructorInstance(position(), ct, flags,
-		                      argTypes, excTypes);
-    }
-    
     /**
      * Return the first (sub)term performed when evaluating this
      * term.

@@ -10,7 +10,7 @@ import polyglot.types.SemanticException;
  * A <code>FieldDecl</code> is an immutable representation of the declaration
  * of a field of a class.
  */
-public interface FieldDecl extends ClassMember
+public interface FieldDecl extends ClassMember, VarInit
 {
     /** Get the type object for the declaration's type. */
     Type declType();
@@ -54,4 +54,6 @@ public interface FieldDecl extends ClassMember
 
     /** Set the type object for the initializer expression. */
     FieldDecl initializerInstance(InitializerInstance fi);
+    
+    boolean constantValueSet();
 }

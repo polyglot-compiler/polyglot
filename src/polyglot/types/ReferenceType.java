@@ -21,6 +21,13 @@ public interface ReferenceType extends Type
     List interfaces();
 
     /**
+     * Return a list of a all the type's members.
+     * @return A list of <code>MemberInstance</code>.
+     * @see polyglot.types.MemberInstance
+     */
+    List members();
+    
+    /**
      * Return the type's fields.
      * @return A list of <code>FieldInstance</code>.
      * @see polyglot.types.FieldInstance

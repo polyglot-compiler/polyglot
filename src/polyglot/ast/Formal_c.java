@@ -5,6 +5,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
+
 import java.util.*;
 
 /**
@@ -26,6 +27,10 @@ public class Formal_c extends Term_c implements Formal
         this.flags = flags;
         this.type = type;
         this.name = name;
+    }
+    
+    public boolean isCanonical() {
+        return li != null && li.isCanonical() && super.isCanonical();
     }
 
     /** Get the type of the formal. */
@@ -127,6 +132,7 @@ public class Formal_c extends Term_c implements Formal
             TypeSystem ts = ar.typeSystem();
             LocalInstance li = ts.localInstance(position(), flags(),
                                                 declType(), name());
+            li.setNotConstant();
             return localInstance(li);
         }
 

@@ -65,7 +65,7 @@ public abstract class HaltingVisitor extends NodeVisitor implements Copy
         return v;
     }
 
-    public final Node override(Node parent, Node n) {
+    public Node override(Node parent, Node n) {
         if (bypassParent != null && bypassParent == parent) {
             // System.out.println("bypassing " + n +
             //                    " (child of " + parent + ")");

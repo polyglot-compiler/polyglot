@@ -18,6 +18,10 @@ public class PackageNode_c extends Node_c implements PackageNode
 	super(pos);
 	this.package_ = package_;
     }
+    
+    public boolean isCanonical() {
+        return package_ != null && package_.isCanonical() && super.isCanonical();
+    }
 
     /** Get the package as a qualifier. */
     public Qualifier qualifier() {

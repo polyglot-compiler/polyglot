@@ -1,8 +1,11 @@
 package polyglot.frontend;
 
-import java.io.*;
-import polyglot.ast.*;
-import polyglot.util.*;
+import java.io.IOException;
+
+import polyglot.ast.Node;
+import polyglot.ast.SourceFile;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
 
 /**
  * A parser implemented with a Cup generated-parser.

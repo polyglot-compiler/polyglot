@@ -1,5 +1,8 @@
 package polyglot.ext.jl.types;
 
+import polyglot.frontend.*;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.goals.FieldConstantsChecked;
 import polyglot.types.*;
 import polyglot.util.*;
 
@@ -23,22 +26,21 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
     public ReferenceType container() {
         return container;
     }
-
-    /** Destructive update of constant value. */
-    public void setConstantValue(Object constantValue) {
-	if (! (constantValue == null) &&
-	    ! (constantValue instanceof Boolean) &&
-	    ! (constantValue instanceof Number) &&
-	    ! (constantValue instanceof Character) &&
-	    ! (constantValue instanceof String)) {
-
-	    throw new InternalCompilerError(
-		"Can only set constant value to a primitive or String.");
-	}
-
-        this.constantValue = constantValue;
-        this.isConstant = true;
+    
+    public boolean isConstant() {
+        if (! constantValueSet) {
+            Scheduler scheduler = typeSystem().extensionInfo().scheduler();
+            try {
+                scheduler.addPrerequisiteDependency(scheduler.currentGoal(), new FieldConstantsChecked(this));
+            }
+            catch (CyclicDependencyException e) {
+                setNotConstant();
+            }
+        }
+            
+        return isConstant;
     }
+
 
     /** Non-destructive update of constant value. */
     public FieldInstance constantValue(Object constantValue) {
@@ -59,6 +61,13 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
         return this;
     }
 
+    /**
+     * @param container The container to set.
+     */
+    public void setContainer(ReferenceType container) {
+        this.container = container;
+    }
+     
     public FieldInstance flags(Flags flags) {
         if (!flags.equals(this.flags)) {
             FieldInstance_c n = (FieldInstance_c) copy();

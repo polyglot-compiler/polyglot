@@ -1,11 +1,16 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
+import java.util.List;
 
+import polyglot.ast.*;
+import polyglot.frontend.*;
+import polyglot.frontend.goals.FieldConstantsChecked;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
-import polyglot.visit.*;
 import polyglot.util.*;
-import java.util.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.*;
 
 /**
  * A <code>LocalDecl</code> is an immutable representation of the declaration
@@ -26,6 +31,10 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         this.type = type;
         this.name = name;
         this.init = init;
+    }
+    
+    public boolean isCanonical() {
+        return li != null && li.isCanonical() && super.isCanonical();
     }
 
     /** Get the type of the declaration. */
@@ -94,6 +103,10 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
     /** Get the local instance of the declaration. */
     public LocalInstance localInstance() {
+        return li;
+    }
+    
+    public VarInstance varInstance() {
         return li;
     }
 
@@ -221,6 +234,54 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         }
 
         return localInstance(li);
+    }
+    
+    public Node checkConstants(ConstantChecker cc) throws SemanticException {
+        if (init != null && ! init.constantValueSet()) {
+            // HACK to add dependencies for computing the constant value.
+            final Scheduler scheduler = cc.typeSystem().extensionInfo().scheduler();
+            final Goal ccgoal = cc.goal();
+            
+            init.visit(new NodeVisitor() {
+               public Node leave(Node old, Node n, NodeVisitor v) {
+                   if (n instanceof Field) {
+                       Field f = (Field) n;
+                       if (! f.fieldInstance().constantValueSet()) {
+                           Goal g = new FieldConstantsChecked(f.fieldInstance());
+                           try {
+                               scheduler.addPrerequisiteDependency(ccgoal, g);
+                           }
+                           catch (CyclicDependencyException e) {
+                               LocalDecl_c.this.li.setNotConstant();
+                           }
+                       }
+                   }
+                   if (n instanceof Local) {
+                       Local l = (Local) n;
+                       if (! l.localInstance().constantValueSet()) {
+                           // Undefined variable or forward reference.
+                           LocalDecl_c.this.li.setNotConstant();
+                       }
+                   }
+                   return n;
+               }
+            });
+            
+            return this;
+        }
+        
+        if (init == null || ! init.isConstant() || ! li.flags().isFinal()) {
+            li.setNotConstant();
+        }
+        else {
+            li.setConstantValue(init.constantValue());
+        }
+
+        return this;
+    }
+    
+    public boolean constantValueSet() {
+        return li != null && li.constantValueSet();
     }
 
     public Type childExpectedType(Expr child, AscriptionVisitor av) {

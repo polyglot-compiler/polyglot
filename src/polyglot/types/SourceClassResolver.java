@@ -1,8 +1,11 @@
 package polyglot.types;
 
+import polyglot.frontend.*;
 import polyglot.frontend.Compiler;
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.FileSource;
+import polyglot.frontend.goals.TypesInitialized;
+import polyglot.frontend.goals.TypeExists;
 import polyglot.main.Report;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLoader;
@@ -218,8 +221,25 @@ public class SourceClassResolver extends LoadedClassResolver
   protected Named getTypeFromSource(FileSource source, String name)
     throws SemanticException
   {
-    // Compile the source file just enough to get the type information out.
-    ext.readSource(source);
+    Job job = ext.scheduler().loadSource(source);
+    
+    // job is null if the source has already been compiled
+    if (job != null) {
+        boolean result = false;
+        try {
+            // Compile the source file just enough to get the type information out.
+            result = ext.scheduler().attemptGoal(new TypesInitialized(job));
+        }
+        catch (CyclicDependencyException e) {
+            ext.scheduler().addConcurrentDependency(ext.scheduler().currentGoal(),
+                                                    new TypeExists(name));
+            throw new UnavailableTypeException(job, name);
+        }
+        
+        if (!result) {
+            throw new NoClassException(name);
+        }
+    }
     
     // Even if there was an error when compiling the source file, we may
     // as well keep trying to compile the current class, as the error may

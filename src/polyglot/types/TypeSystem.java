@@ -24,6 +24,9 @@ public interface TypeSystem {
     void initialize(LoadedClassResolver resolver, ExtensionInfo extInfo)
                     throws SemanticException;
 
+    /** Return the language extension this type system is for. */
+    ExtensionInfo extensionInfo();
+    
     /**
      * Returns the system resolver.  This resolver can load top-level classes
      * with fully qualified names from the class path and the source path.

@@ -62,36 +62,9 @@ public class ClassBody_c extends Term_c implements ClassBody
         return reconstruct(members);
     }
 
-    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
-        // We can't clean-super any member classes yet until we are finished
-        // with this class and all at the same nesting level.
-        // Delay until the clean-sigs pass.
-        if (ar.kind() == AmbiguityRemover.SUPER ||
-            ar.kind() == AmbiguityRemover.SIGNATURES) {
-            return ar.bypassChildren(this);
-        }
-
-        /*
-        // Skip clean-sigs for member classes; this will be done when we leave
-        // the node, but only after clean-super is performed.
-        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-            for (Iterator i = members.iterator(); i.hasNext(); ) {
-                ClassMember n = (ClassMember) i.next();
-
-                if (n instanceof ClassDecl) {
-                    ar = (AmbiguityRemover) ar.bypass(n);
-                }
-            }
-
-            return ar;
-        }
-        */
-
-        return ar;
-    }
-
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         // Now we can clean-super on the member classes.
+        /*
         if (ar.kind() == AmbiguityRemover.SIGNATURES) {
             List l = new ArrayList(members.size());
 
@@ -123,6 +96,7 @@ public class ClassBody_c extends Term_c implements ClassBody
 
             return members(l);
         }
+        */
 
         return this;
     }
