@@ -6,6 +6,7 @@ import jltools.ast.Node;
 import jltools.visit.ClassSerializer;
 import jltools.util.*;
 import jltools.main.Main;
+import jltools.main.Version;
 
 import java.io.*;
 import java.util.*;
@@ -252,15 +253,16 @@ public class LoadedClassResolver extends ClassResolver
     try {
       int v;
       v = Integer.parseInt(st.nextToken());
+      Version version = compiler.extensionInfo().version();
 
-      if (v != compiler.options().extension.version().major()) {
+      if (v != version.major()) {
 	// Incompatible.
 	return NOT_COMPATIBLE;
       }
 
       v = Integer.parseInt(st.nextToken());
 
-      if (v != compiler.options().extension.version().minor()) {
+      if (v != version.minor()) {
 	// Not the best option, but will work if its the only one.
 	return MINOR_NOT_COMPATIBLE;
       }
