@@ -33,6 +33,7 @@ GOOD =  \
 	Return2.jl \
 	Return3.jl \
 	Return4.jl \
+	Return5.jl \
 	StaticContext.jl \
 	StaticOps.jl \
 	Switch1.jl \
@@ -91,6 +92,8 @@ BAD = \
 	Unreachable12.jl \
 	Unreachable13.jl \
 	Unreachable14.jl \
+	Unreachable15.jl \
+	Unreachable16.jl \
 	Unreachable1.jl \
 	Unreachable2.jl \
 	Unreachable3.jl \
