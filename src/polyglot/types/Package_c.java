@@ -2,7 +2,6 @@ package polyglot.ext.jl.types;
 
 import polyglot.types.*;
 import polyglot.types.Package;
-import polyglot.util.*;
 
 /**
  * An <code>PackageType</code> represents a package type. It may or may
@@ -13,6 +12,10 @@ public class Package_c extends TypeObject_c implements Package
 {
     protected Package prefix;
     protected String name;
+    /**
+     * The full name is computed lazily from the prefix and name.
+     */
+    protected String fullname = null;
 
     /** Used for deserializing types. */
     protected Package_c() { }
@@ -49,7 +52,10 @@ public class Package_c extends TypeObject_c implements Package
     }
 
     public String fullName() {
-	return prefix() == null ? name : prefix().fullName() + "." + name;
+        if (fullname == null) {
+            fullname = prefix() == null ? name : prefix().fullName() + "." + name;
+        }
+        return fullname;
     }
 
     public String toString() {
