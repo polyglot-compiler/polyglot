@@ -18,6 +18,6 @@ package jltools.types;
  **/
 public interface ClassResolver {
   // DOCME
-  public JavaClass findClass(String name) throws NoClassException;
+  public ClassType findClass(String name) throws NoClassException;
   public void findPackage(String name) throws NoClassException;
 }

@@ -2,24 +2,24 @@
 tp_package	= jltools/types
 tp_codebase	= ../..
 tp_files 	= AccessFlags.java	\
+			AmbiguousType.java \
 			ArrayType.java  \
 			ClassResolver.java \
 			ClassType.java \
+			ClassTypeImpl.java \
 			CompoundClassResolver.java \
 			ConstructorType.java \
 			ConstructorTypeInstance.java \
 			FieldInstance.java \
 			ImportTable.java \
-			JavaClass.java \
-			JavaClassImpl.java \
 			LoadedClassResolver.java \
-			LoadedJavaClass.java \
+			LoadedClassType.java \
 			LocalContext.java \
 			MethodType.java \
 			MethodTypeInstance.java \
 			NoClassException.java \
 			NullType.java \
-			ParsedJavaClass.java \
+			ParsedClassType.java \
 			PrimitiveType.java \
 			TableClassResolver.java \
 			Type.java \

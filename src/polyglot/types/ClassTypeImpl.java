@@ -16,13 +16,17 @@ import java.util.Iterator;
  *    A JavaClassImpl is used to implement non-lazy Java classes: ones where
  *    information is computed once, rather than on demand. 
  **/
-public abstract class JavaClassImpl extends AnnotatedObject 
-  implements JavaClass {
+public abstract class ClassTypeImpl extends AnnotatedObject 
+  extends ClassType {
+
+  public ClassTypeImpl( TypeSystem ts)
+  {
+    super( ts);
+  }
   
   public String getFullName()         { return fullName; }
   public String getShortName()        { return shortName; }
   public String getPackage()          { return packageName; }
-  public Type getType()               { return classType; }
 
   public List getMethods()              { return methods; }
   public List getFields()               { return fields; }
@@ -55,7 +59,8 @@ public abstract class JavaClassImpl extends AnnotatedObject
   // Metadata
   ////
   // The associated TypeSystem.
-  protected TypeSystem ts;
+  /* Now found in Type. */
+  // protected TypeSystem ts;
   
   ////
   // Names
@@ -70,8 +75,6 @@ public abstract class JavaClassImpl extends AnnotatedObject
   ////
   // Typing info
   ////
-  // The type for this class.
-  protected ClassType classType;
   // The supertype.  (null for JLO)
   protected ClassType superType;
   // The TypedList of interface types.

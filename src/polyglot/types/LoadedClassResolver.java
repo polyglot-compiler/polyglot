@@ -20,7 +20,7 @@ public class LoadedClassResolver implements ClassResolver
     this.ts = ts;
   }
 
-  public JavaClass findClass( String name) throws NoClassException
+  public ClassType findClass( String name) throws NoClassException
   {
     Class clazz;
 
@@ -37,7 +37,7 @@ public class LoadedClassResolver implements ClassResolver
       throw new NoClassException( "Class " + name + " not found.");
     }
 
-    return new LoadedJavaClass( clazz, ts);
+    return new LoadedClassType( clazz, ts);
   }
 
   public void findPackage( String name) throws NoClassException {}

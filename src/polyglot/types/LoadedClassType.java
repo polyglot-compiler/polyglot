@@ -18,20 +18,18 @@ import jltools.util.TypedList;
  *    A LoadedJavaClass is a JavaClass which derives from a file
  *    loaded at run time.
  **/
-public class LoadedJavaClass extends JavaClassImpl {
+public class LoadedClassType extends ClassTypeImpl  {
 
   /**
    * Constructs a new LoadedJavaClass from a given class, within a given
    * typeSystem.
    **/
   public LoadedJavaClass(Class theClass, TypeSystem typeSys) {
-    // TypeSys
-    this.ts = typeSys;
+    super( typeSys);    
     
     // Set up names and classType.    
     String rawName = theClass.getName(); // pkg1.pkg2.class$inner1$inner2
     this.packageName = TypeSystem.getPackageComponent(rawName);
-    this.classType = ts.typeForClass(theClass);
     this.fullName = classType.getName();
     this.shortName = TypeSystem.getShortNameComponent(fullName);
 

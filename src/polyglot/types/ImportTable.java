@@ -26,7 +26,7 @@ public  class ImportTable implements ClassResolver {
   }
 
   public void addClassImport(String className) throws NoClassException {
-    JavaClass class_ = resolver.findClass(className);
+    ClassType class_ = resolver.findClass(className);
     String shortName = TypeSystem.getShortNameComponent(className);
     map.put(className, class_);
     map.put(shortName, class_);    
@@ -41,27 +41,27 @@ public  class ImportTable implements ClassResolver {
     resolver.findPackage(name);
   }
 
-  public JavaClass findClass(String name) throws NoClassException {
+  public ClassType findClass(String name) throws NoClassException {
     // FIXME: need to keep on looking to find conflicts.
     if (TypeSystem.isNameShort(name)) {
       Object res = map.get(name);
       // First see if we have a mapping already.
       if (res != null) {
-	return (JavaClass) res;
+	return (ClassType) res;
       } 
       // It wasn't a ClassImport.  Maybe it was a PackageImport?
       for (Iterator iter = packageImports.iterator(); iter.hasNext(); ) {
 	String pkgName = (String) iter.next();
 	String fullName = pkgName + "." + name;
 	try {
-	  JavaClass class_ = resolver.findClass(fullName);
+	  ClassType class_ = resolver.findClass(fullName);
 	  map.put(name, class_);
 	  return class_;
 	} catch (NoClassException ex) { /* Do nothing. */ }
       }
       // The name was short, but not in any imported class or package.
       // Check the null package.
-      JavaClass class_ = resolver.findClass(name); // may throw exception
+      ClassType class_ = resolver.findClass(name); // may throw exception
       map.put(name,class_);
       return class_;
     } 

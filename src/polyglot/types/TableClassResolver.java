@@ -11,14 +11,14 @@ public class TableClassResolver implements ClassResolver
     table = new HashMap();
   }
   
-  public void addClass( String fullName, JavaClass clazz)
+  public void addClass( String fullName, ClassType clazz)
   {
     table.put( fullName, clazz);
   }
 
-  public JavaClass findClass( String name) throws NoClassException
+  public ClassType findClass( String name) throws NoClassException
   {
-    JavaClass clazz = (JavaClass)table.get( name);
+    ClassType clazz = (ClassType)table.get( name);
     if( clazz == null)
       throw new NoClassException( "Class " + name + " not found.");
     return clazz;

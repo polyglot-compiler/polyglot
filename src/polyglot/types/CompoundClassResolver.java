@@ -17,9 +17,9 @@ public class CompoundClassResolver implements ClassResolver
     resolvers.add( cr);
   }
 
-  public JavaClass findClass( String name) throws NoClassException
+  public ClassType findClass( String name) throws NoClassException
   {
-    JavaClass clazz;
+    ClassType clazz;
     ClassResolver cr;
 
     for( int i = 0; i < resolvers.size(); i++)

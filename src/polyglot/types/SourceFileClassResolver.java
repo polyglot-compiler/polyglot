@@ -18,7 +18,7 @@ public class SourceFileClassResolver implements ClassResolver
     this.tf = tf;
   }
 
-  public JavaClass findClass( String name) throws NoClassException
+  public ClassType findClass( String name) throws NoClassException
   {
     Target t;
     

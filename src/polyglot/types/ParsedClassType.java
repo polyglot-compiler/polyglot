@@ -17,12 +17,12 @@ import jltools.util.AnnotatedObject;
  * A ParsedJavaClass represents a information that has been parsed (but not
  * necessarily type checked) from a .java file.
  **/
-public class ParsedJavaClass extends JavaClassImpl 
+public class ParsedClassType extends ClassTypeImpl 
 {
 
   public ParsedJavaClass( TypeSystem ts)
   {
-    this.ts = ts;
+    super( ts);
     interfaces = new TypedList( new LinkedList(), ClassType.class, false);
     methods = new TypedList( new LinkedList(), MethodTypeInstance.class,
                              false);
@@ -43,11 +43,6 @@ public class ParsedJavaClass extends JavaClassImpl
   public void setShortName( String shortName)
   {
     this.shortName = shortName;
-  }
-
-  public void setClassType( ClassType classType)
-  {
-    this.classType = classType;
   }
 
   public void setSuperType( ClassType superType)
