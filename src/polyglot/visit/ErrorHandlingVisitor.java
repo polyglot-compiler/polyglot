@@ -136,6 +136,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
 	return n instanceof Stmt
 	    || n instanceof ClassMember
 	    || n instanceof ClassDecl
+	    || n instanceof Import
 	    || n instanceof SourceFile;
     }
 
