@@ -771,7 +771,8 @@ ext=""
         <include name="README.txt"/>
       </tarfileset>
       <tarfileset dir="${src}/polyglot/ext/j0/j0-dist/" mode="755" prefix="j0">
-        <include name="*.sh"/>
+        <include name="j0"/>
+        <include name="j0c"/>
       </tarfileset>
       <tarfileset dir="${lib}/" mode="755" prefix="j0">
         <include name="polyglot.jar"/>
