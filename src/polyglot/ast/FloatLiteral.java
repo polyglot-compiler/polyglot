@@ -3,7 +3,7 @@
  */
 
 package jltools.ast;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 import jltools.util.CodeWriter;
 
 /** 
@@ -56,22 +56,23 @@ public class FloatLiteral extends Literal {
   }
 
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     w.write ( type == FLOAT ? Float.toString( (float)value) /* + 'F' */: Double.toString( value ));
   }
 
-  public void dump(Context c, CodeWriter w)
+  public void dump(LocalContext c, CodeWriter w)
   {
     w.write ( " ( " + (type == FLOAT ? " FLOAT " + Float.toString((float)value) :
                                        " DOUBLE " + Double.toString( value ) ) + ")");
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck( LocalContext c)
   {
-    // FIXME; implement
+    setCheckedType( c.getTypeSystem().getFloat());
     return this;
   }  
+
   public void visitChildren(NodeVisitor v) {
   }
 

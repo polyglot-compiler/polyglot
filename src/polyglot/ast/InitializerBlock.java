@@ -3,7 +3,9 @@
  */
 
 package jltools.ast;
-import jltools.types.Context;
+
+import jltools.types.LocalContext;
+import jltools.visit.SymbolReader;
 import jltools.util.CodeWriter;
 
 /**
@@ -55,7 +57,7 @@ public class InitializerBlock extends ClassMember {
   }
 
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     w.beginBlock();
     w.write (" { ");
@@ -64,7 +66,7 @@ public class InitializerBlock extends ClassMember {
     w.endBlock();
   }
 
-  public void dump(Context c, CodeWriter w)
+  public void dump(LocalContext c, CodeWriter w)
   {
     w.write(" ( INITIALIZER BLOCK " );
     w.beginBlock();
@@ -72,8 +74,13 @@ public class InitializerBlock extends ClassMember {
     w.endBlock();
     w.write(" )");
   }
+  
+  public Node readSymbols( SymbolReader sr)
+  {
+    return this;
+  }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck(LocalContext c)
   {
     // FIXME; implement
     return this;

@@ -5,7 +5,7 @@
 package jltools.ast;
 
 import jltools.types.Type;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 import jltools.util.CodeWriter;
 import jltools.util.TypedListIterator;
 import jltools.util.TypedList;
@@ -175,7 +175,7 @@ public class NewArrayExpression extends Expression {
 				 false);
   }
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     w.write ("(new ");
     type.translate(c, w);
@@ -196,7 +196,7 @@ public class NewArrayExpression extends Expression {
     w.write(")");
   }
 
-  public void dump(Context c, CodeWriter w)
+  public void dump(LocalContext c, CodeWriter w)
   {
     w.write (" ( NEW " );
     dumpNodeInfo(c, w);
@@ -219,7 +219,7 @@ public class NewArrayExpression extends Expression {
     w.write (" )");
   }
   
-  public Node typeCheck (Context c)
+  public Node typeCheck (LocalContext c)
   {
     return this;
   }

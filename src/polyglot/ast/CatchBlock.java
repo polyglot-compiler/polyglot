@@ -5,7 +5,8 @@
 package jltools.ast;
 
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.types.LocalContext;
+import jltools.visit.SymbolReader;
 
 /**
  * Overview: Represents a mutable pair of BlockStatements and
@@ -54,7 +55,7 @@ public class CatchBlock extends Node {
     block = newBlock;
   }
 
-  public void translate ( Context c, CodeWriter w)
+  public void translate ( LocalContext c, CodeWriter w)
   {
     w.write ( " catch ( " );
     formalParameter.translate( c, w);
@@ -64,7 +65,7 @@ public class CatchBlock extends Node {
     w.endBlock();
   }
   
-  public void dump (Context c, CodeWriter w)
+  public void dump (LocalContext c, CodeWriter w)
   {
     w.write (" (  CATCH BLOCK " ) ;
     formalParameter.dump( c, w);
@@ -72,8 +73,13 @@ public class CatchBlock extends Node {
     block.dump(c, w);
     w.endBlock();
   }
+  
+  public Node readSymbols( SymbolReader sr)
+  {
+    return this;
+  }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck( LocalContext c)
   {
     // FIXME: implement;
     return this;

@@ -4,8 +4,9 @@
 
 package jltools.ast;
 
-import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.util.*;
+import jltools.types.*;
+
 /**
  * BinaryExpression
  *
@@ -46,10 +47,10 @@ public class BinaryExpression extends Expression {
     public static final int RUSHIFTASSIGN  = 28; // >>>= operator
 
     public static final int PLUS           = 29; // + operator
-    public static final int MINUS          = 30; // - operator
+    public static final int SUB          = 30; // - operator
 
     // Largest operator used.
-    public static final int MAX_OPERATOR   = MINUS;
+    public static final int MAX_OPERATOR   = SUB;
 
     /**
      * Requires: A valid value for <operator> as listed in public
@@ -123,22 +124,215 @@ public class BinaryExpression extends Expression {
 	right = newExp;
     }
 
-   /**
-    *
-    */
-   void visitChildren(NodeVisitor vis)
-   {
-      left = (Expression)left.visit(vis);
-      right = (Expression)right.visit(vis);
-   }
+  /**
+   *
+   */
+  void visitChildren(NodeVisitor vis)
+  {
+    left = (Expression)left.visit(vis);
+    right = (Expression)right.visit(vis);
+  }
 
-   public Node typeCheck(Context c)
-   {
-      // FIXME: implement
-      return this;
-   }
-
-   public void translate(Context c, CodeWriter w)
+  public Node typeCheck(LocalContext c)
+  {
+    Type ltype = left.getCheckedType(), rtype = right.getCheckedType();
+    
+    switch(operator)
+    {
+    case ASSIGN:
+      /* See (5.2). */
+      if( !rtype.isAssignableSubtype(ltype)) {
+        setError( ErrorInfo.SEMANTIC_ERROR, 
+                  "Unable to assign " + rtype.getTypeString() + " to "
+                  + ltype.getTypeString());
+      }
+      setCheckedType( ltype);
+      break;
+      
+    case GT:
+    case LT:
+    case GE:
+    case LE:
+      /* See (15.19.1). */
+      if( !ltype.isPrimitive() || !rtype.isPrimitive()) {
+        setError( ErrorInfo.SEMANTIC_ERROR,
+                  "Operands of numeric comparison operators must be numeric.");
+      }
+      if( !((PrimitiveType)ltype).isNumeric() ||
+          !((PrimitiveType)rtype).isNumeric()) {
+        setError(ErrorInfo.SEMANTIC_ERROR,
+                 "Operands of numeric comparison operators must be numeric.");
+      }
+      setCheckedType( c.getTypeSystem().getBoolean());
+      break;
+      
+    case EQUAL:
+    case NE:
+      /* See (15.19). */
+      if( ltype.isPrimitive()) {
+        if( ((PrimitiveType)ltype).isNumeric()) {
+          if( !rtype.isPrimitive()) {
+            setError( ErrorInfo.SEMANTIC_ERROR,
+                      "Can only compare two expressions of similar type.");
+          }
+          else if( !((PrimitiveType)rtype).isNumeric()) {
+            setError( ErrorInfo.SEMANTIC_ERROR,
+                      "Can only compare two expressions of similar type.");
+          }
+        }
+        else {
+          /* ltype is boolean. */
+          if( !rtype.isPrimitive()) {
+            setError( ErrorInfo.SEMANTIC_ERROR,
+                      "Can only compare two expressions of similar type.");
+          }
+          else if( ((PrimitiveType)rtype).isNumeric()) {
+            setError( ErrorInfo.SEMANTIC_ERROR,
+                      "Can only compare two expressions of similar type.");
+          }
+        }
+      }
+      else {
+        /* ltype is a reference type. */
+        if( rtype.isPrimitive()) {
+          setError( ErrorInfo.SEMANTIC_ERROR,
+                    "Can only compare two expressions of similar type.");
+        }
+        else if( !(ltype.isCastValid( rtype) || rtype.isCastValid( ltype))) {
+          setError( ErrorInfo.SEMANTIC_ERROR,
+                    "Can only compare two expressions of similar type.");
+        }
+      }
+      setCheckedType( c.getTypeSystem().getBoolean());
+      break;
+      
+    case LOGIC_OR:
+    case LOGIC_AND:
+      if( !(ltype.isSameType(/* FIXME boolean */ null) 
+            && rtype.isSameType(/* FIXME boolean */ null))) {
+        setError( ErrorInfo.SEMANTIC_ERROR,
+                  "Operands of logical operator must be boolean.");
+      }
+      setCheckedType( c.getTypeSystem().getBoolean());
+      break;
+      
+    case PLUS:
+    case PLUSASSIGN:
+      /* (15.17). */
+      if( ltype.isSameType(/* FIXME String */ null)) {
+        setCheckedType(/* FIXME String */ null);
+        break;
+      }
+      else if( rtype.isSameType(/* FIXME String */ null)) {
+        setCheckedType(/* FIXME String */ null);
+        break;
+      }
+    case SUB:
+    case SUBASSIGN:
+      if( !ltype.isPrimitive()) {
+        setError( ErrorInfo.SEMANTIC_ERROR,
+                  "Additive operators must have numeric operands.");
+        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+      }
+      else if( !((PrimitiveType)ltype).isNumeric()) {
+        setError( ErrorInfo.SEMANTIC_ERROR,
+                  "Additive operators must have numeric operands.");
+        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+      }
+      else if( !rtype.isPrimitive()) {
+        setError( ErrorInfo.SEMANTIC_ERROR,
+                  "Additive operators must have numeric operands.");
+        setCheckedType( ltype);
+      }
+      else if( !((PrimitiveType)rtype).isNumeric()) {
+        setError( ErrorInfo.SEMANTIC_ERROR,
+                  "Additive operators must have numeric operands.");
+        setCheckedType( ltype);
+      }
+      else {
+        setCheckedType( PrimitiveType.binaryPromotion( (PrimitiveType)ltype,
+                                                (PrimitiveType)rtype));
+      }
+      break;
+      
+    case MULT:
+    case MULTASSIGN:
+    case DIV:
+    case DIVASSIGN:
+    case MOD:
+    case MODASSIGN:
+      if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
+        setError( ErrorInfo.SEMANTIC_ERROR,
+                  "Expected numeric operands to multiplicative operator.");
+        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+      }
+      else if( !(((PrimitiveType)ltype).isNumeric()
+                 && ((PrimitiveType)rtype).isNumeric())) {
+        setError( ErrorInfo.SEMANTIC_ERROR,
+                  "Expected numeric operands to multiplicative operator.");
+        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+      }
+      else {
+        setCheckedType( PrimitiveType.binaryPromotion( (PrimitiveType)ltype,
+                                                (PrimitiveType)rtype));
+      }
+      break;
+      
+    case BIT_OR:
+    case ORASSIGN:
+    case BIT_AND:
+    case ANDASSIGN:
+    case BIT_XOR:
+    case XORASSIGN:
+      /* Either both are either numeric or boolean (15.21). */
+      if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
+        setError(ErrorInfo.SEMANTIC_ERROR, 
+                 "Expected primitive operands to bitwise binary operator.");
+        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+      }
+      else if( ((PrimitiveType)ltype).isNumeric()
+               && ((PrimitiveType)rtype).isNumeric()) {
+        setCheckedType( PrimitiveType.binaryPromotion( (PrimitiveType)ltype,
+                                                (PrimitiveType)rtype));
+      }
+      else if( ((PrimitiveType)ltype).isBoolean() 
+               && ((PrimitiveType)rtype).isBoolean()) {
+        setCheckedType( c.getTypeSystem().getBoolean());
+      }
+      break;
+      
+    case LSHIFT:
+    case LSHIFTASSIGN:
+    case RSHIFT:
+    case RSHIFTASSIGN:
+    case RUSHIFT:
+    case RUSHIFTASSIGN:
+      if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
+        setError( ErrorInfo.SEMANTIC_ERROR,
+                  "Expected numeric operands to shift operator.");
+        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+      }
+      else if( !(((PrimitiveType)ltype).isNumeric()
+                 && ((PrimitiveType)rtype).isNumeric())) {
+        setError( ErrorInfo.SEMANTIC_ERROR,
+                  "Expected numeric operands to shift operator.");
+        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+      }
+      else {
+        setCheckedType( PrimitiveType.unaryPromotion( (PrimitiveType)ltype));
+      }
+      break;
+      
+    default:
+      /* FIXME */
+      setError( ErrorInfo.SEMANTIC_ERROR,
+                "Internal error: unknown binary operator.");
+    }
+    
+    return this;
+  }
+  
+   public void translate(LocalContext c, CodeWriter w)
    {
       if(operator != ASSIGN && !(operator >= PLUSASSIGN && 
                                 operator <= RUSHIFTASSIGN)) {
@@ -158,7 +352,7 @@ public class BinaryExpression extends Expression {
       w.write(")");
    }
 
-   public void  dump(Context c, CodeWriter w)
+   public void dump(LocalContext c, CodeWriter w)
    {
       w.write(getOperatorString(operator));
       dumpNodeInfo(c, w);
@@ -250,7 +444,7 @@ public class BinaryExpression extends Expression {
          return ">>>=";
       case PLUS:
          return "+";
-      case MINUS:
+      case SUB:
          return "-";      
       default:
          return "???";

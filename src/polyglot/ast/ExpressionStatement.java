@@ -5,7 +5,7 @@
 package jltools.ast;
 
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 
 import jltools.util.Assert;
 import jltools.util.Annotate;
@@ -46,13 +46,13 @@ public class ExpressionStatement extends Statement {
     expression = (Expression) expression.visit(v);
   }
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     expression.translate(c, w);
     w.write(";");
   }
 
-  public void dump(Context c, CodeWriter w)
+  public void dump(LocalContext c, CodeWriter w)
   {
     w.write("( EXPRESSION_STATEMENT" );
     dumpNodeInfo(c, w);
@@ -61,7 +61,7 @@ public class ExpressionStatement extends Statement {
     w.write(" ) )");
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck(LocalContext c)
   {
     // Fixme: implement
     return this;

@@ -6,6 +6,7 @@ utl_files 	= Annotate.java \
 			Assert.java \
 			CodeWriter.java \
 			ConcatenatedIterator.java \
+			ErrorInfo.java \
 			FilteringIterator.java \
 			NestedMap.java \
 			NilMap.java \

@@ -4,14 +4,11 @@
 
 package jltools.ast;
 
-import jltools.util.TypedList;
-import jltools.util.TypedListIterator;
-import jltools.util.CodeWriter;
-import jltools.types.Context;
-import java.util.List;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.ArrayList;
+import java.util.*;
+
+import jltools.types.*;
+import jltools.util.*;
+import jltools.visit.SymbolReader;
 
 /**
  * Overview: A SourceFileNode is a mutable representations of a Java
@@ -139,14 +136,18 @@ public class SourceFileNode extends Node {
 	 it.set(((ClassNode) it.next()).visit(vis));
       }
    }
-
-   public Node typeCheck(Context c)
+   
+   public Node readSymbols( SymbolReader sr)
    {
-      // FIXME: implement
+     return this;
+   }
+
+   public Node typeCheck(LocalContext c)
+   {
       return this;
    }
 
-   public void translate(Context c, CodeWriter w)
+   public void translate(LocalContext c, CodeWriter w)
    {
      if (packageName != null && !packageName.equals(""))
      {
@@ -166,7 +167,7 @@ public class SourceFileNode extends Node {
      }
    }
 
-   public void dump(Context c, CodeWriter w)
+   public void dump(LocalContext c, CodeWriter w)
    {
      w.write("CLASS ");
      dumpNodeInfo(c, w);

@@ -7,7 +7,7 @@ package jltools.ast;
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -228,13 +228,13 @@ public class SwitchStatement extends Statement {
       }
    }
 
-   public Node typeCheck(Context c)
+   public Node typeCheck(LocalContext c)
    {
       // FIXME: implement
       return this;
    }
 
-   public void translate(Context c, CodeWriter w)
+   public void translate(LocalContext c, CodeWriter w)
    {
       SwitchElement se;
       CaseStatement cs;
@@ -273,7 +273,7 @@ public class SwitchStatement extends Statement {
       w.write("}");
    }
 
-   public void dump(Context c, CodeWriter w)
+   public void dump(LocalContext c, CodeWriter w)
    {
       SwitchElement se;
       CaseStatement cs;

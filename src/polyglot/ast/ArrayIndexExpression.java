@@ -4,8 +4,8 @@
 
 package jltools.ast;
 
-import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.util.*;
+import jltools.types.*;
 
 /**
  * Overview: An ArrayIndexExpression is a mutable representation of an
@@ -53,28 +53,42 @@ public class ArrayIndexExpression extends Expression {
     index = newIndex;
   }
 
-  public void translate ( Context c, CodeWriter w)
+  public void translate( LocalContext c, CodeWriter w)
   {
-    w.write("(");
+    w.write ("(");
     base.translate(c, w);
-    w.write(")");
+    w.write (")");
     w.write ("[");
     index.translate(c, w);
     w.write ("]");
   }
   
-  public void dump (Context c, CodeWriter w)
+  public void dump( LocalContext c, CodeWriter w)
   {
     w.write ( " ( ARRAY INDEX EXPR ") ;
     dumpNodeInfo(c, w);
-    base.dump(c, w);
-    index.dump(c, w);
-    w.write (" ) " );
+    base.dump (c, w);
+    index.dump (c, w);
+    w.write ( " ) " );
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck(LocalContext c)
   {
-    // FIXME: implement;
+    Type btype = base.getCheckedType();
+    if ( !(btype instanceof ArrayType)) {
+      setError(ErrorInfo.SEMANTIC_ERROR, 
+                    "Subscript can only follow an array type.");
+      setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
+    }
+    else {
+      setCheckedType( ((ArrayType)btype).getBaseType());
+    }
+
+    Type itype = index.getCheckedType();
+    if ( !itype.isImplicitCastValid( c.getTypeSystem().getInt())) {
+      setError(ErrorInfo.SEMANTIC_ERROR,
+                    "Array subscript must be an integer.");
+    } 
     return this;
   }
 

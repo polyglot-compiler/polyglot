@@ -4,7 +4,7 @@
 
 package jltools.ast;
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 
 /**
  * ThrowStatement
@@ -47,20 +47,20 @@ public class ThrowStatement extends Statement {
       expr = (Expression)expr.visit(vis);
    }
 
-   public Node typeCheck(Context c)
+   public Node typeCheck(LocalContext c)
    {
       // FIXME: implement
       return this;
    }
 
-   public void  translate(Context c, CodeWriter w)
+   public void  translate(LocalContext c, CodeWriter w)
    {
       w.write("throw ");
       expr.translate(c, w);
       w.write(";");
    }
 
-   public void dump(Context c, CodeWriter w)
+   public void dump(LocalContext c, CodeWriter w)
    {
       w.write("( ");
       expr.dump(c, w);

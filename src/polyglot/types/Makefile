@@ -5,6 +5,7 @@ tp_files 	= AccessFlags.java	\
 			ArrayType.java  \
 			ClassResolver.java \
 			ClassType.java \
+			CompoundClassResolver.java \
 			ConstructorType.java \
 			ConstructorTypeInstance.java \
 			FieldInstance.java \
@@ -17,8 +18,12 @@ tp_files 	= AccessFlags.java	\
 			MethodTypeInstance.java \
 			NoClassException.java \
 			NullType.java \
+			ParsedJavaClass.java \
 			PrimitiveType.java \
+			SymbolReader.java \
+			TableClassResolver.java \
 			Type.java \
+			TypeChecker.java \
 			TypeCheckError.java \
 			TypeInstance.java \
 			TypeSystem.java \

@@ -7,7 +7,7 @@ package jltools.ast;
 import jltools.util.TypedListIterator;
 import jltools.util.TypedList;
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import java.util.List;
  *    super(...)  or this(...).  It consists of a type of the call
  *    (either super or this) and a list of expressions to be
  *    parameters of the call.  A constructor call statement may also
- *    contain an expression providing the context in which it is
+ *    contain an expression providing the LocalContext in which it is
  *    executed.
  */
 
@@ -40,7 +40,7 @@ public class ConstructorCallStatement extends Statement {
    *
    * Effects: Creates a new ConstructorCallStatement of type <type>
    *    which contains the elements of <arguments> as arguments to the
-   *    call, and optionally in the context of <primary>.
+   *    call, and optionally in the LocalContext of <primary>.
    */
   public ConstructorCallStatement(Expression primary,
 				  int type, List arguments) {
@@ -51,7 +51,7 @@ public class ConstructorCallStatement extends Statement {
   }
 
   /**
-   * Effects: Returns the expression providing the context in which
+   * Effects: Returns the expression providing the LocalContext in which
    * this constructor is executed or null if none. 
    */
   public Expression getPrimary() {
@@ -105,7 +105,7 @@ public class ConstructorCallStatement extends Statement {
 				 false);
   }
 
-  public void translate ( Context c, CodeWriter w)
+  public void translate ( LocalContext c, CodeWriter w)
   {
     if (primary != null) {
       primary.translate( c, w);
@@ -124,7 +124,7 @@ public class ConstructorCallStatement extends Statement {
     w.write ( ");");
   }
   
-  public void dump (Context c, CodeWriter w)
+  public void dump (LocalContext c, CodeWriter w)
   {
     w.write (" (  CONSTRUCTOR CALL STMT " );
     if (primary != null)
@@ -141,7 +141,7 @@ public class ConstructorCallStatement extends Statement {
     w.write (" )");
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck( LocalContext c)
   {
     // FIXME: implement;
     return this;

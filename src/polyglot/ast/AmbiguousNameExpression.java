@@ -10,7 +10,7 @@ import java.util.Enumeration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 
 /**
  * AmbiguousNameExpression
@@ -88,7 +88,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
   
   public void visitChildren(NodeVisitor vis) { }
 
-  public void translate ( Context c, CodeWriter w)
+  public void translate( LocalContext c, CodeWriter w)
   {
     // FIXME: Shouldn't get in here.
     //w.write ("< AMBIGOUS NAME: ");
@@ -103,7 +103,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     }
   }
 
-  public void dump (Context c, CodeWriter w)
+  public void dump (LocalContext c, CodeWriter w)
   {
     w.write ("( AMBIGOUS NAME ");
     dumpNodeInfo(c, w);
@@ -114,7 +114,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     w.write ( " ) ");
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck( LocalContext c)
   {
     // FIXME: implement;
     return this;

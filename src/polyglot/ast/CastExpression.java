@@ -6,7 +6,7 @@ package jltools.ast;
 
 import jltools.types.Type;
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 
 /**
  * CastExpression
@@ -69,7 +69,7 @@ public class CastExpression extends Expression {
 	expr = newExpression;
     }
 
-  public void translate ( Context c, CodeWriter w)
+  public void translate ( LocalContext c, CodeWriter w)
   {
     w.write (" (( " );
     type.translate(c, w);
@@ -78,7 +78,7 @@ public class CastExpression extends Expression {
     w.write ( " )");
   }
   
-  public void dump (Context c, CodeWriter w)
+  public void dump (LocalContext c, CodeWriter w)
   {
     w.write (" ( CAST to " );
     type.dump(c, w);
@@ -86,7 +86,7 @@ public class CastExpression extends Expression {
     w.write (" )");
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck( LocalContext c)
   {
     // FIXME: implement;
     return this;

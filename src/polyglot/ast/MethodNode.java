@@ -4,17 +4,12 @@
 
 package jltools.ast;
 
-import jltools.types.Type;
-import jltools.types.AccessFlags;
-import jltools.types.Context;
-import jltools.types.ArrayType;
-import jltools.util.CodeWriter;
-import jltools.util.TypedList;
-import jltools.util.TypedListIterator;
-import java.util.List;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.ArrayList;
+import java.util.*;
+
+import jltools.types.*;
+import jltools.util.*;
+import jltools.visit.SymbolReader;
+
 
 /**
  * Overview: A MethodNode is a mutable representation of a methods
@@ -237,7 +232,7 @@ public class MethodNode extends ClassMember {
     body = newBody;
   }
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     w.write ( accessFlags.getStringRepresentation() );
     if (! isConstructor())
@@ -270,7 +265,7 @@ public class MethodNode extends ClassMember {
     body.translate(c, w);
   }
 
-  public void dump (Context c, CodeWriter w)
+  public void dump (LocalContext c, CodeWriter w)
   {
     w.write( "( METHOD " + name + " ( " + accessFlags.getStringRepresentation() + " ) ");
     dumpNodeInfo(c, w);
@@ -288,8 +283,13 @@ public class MethodNode extends ClassMember {
       w.write(" ( " + ((Type)i.next()).getTypeString() + " )" );
     }
   }
+  
+  public Node readSymbols( SymbolReader sr)
+  {
+      return this;
+  }
 
-  public Node typeCheck( Context c)
+  public Node typeCheck( LocalContext c)
   {
     return this;
   }

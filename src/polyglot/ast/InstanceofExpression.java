@@ -5,7 +5,7 @@
 package jltools.ast;
 
 import jltools.types.Type;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 import jltools.util.CodeWriter;
 
 /**
@@ -73,7 +73,7 @@ public class InstanceofExpression extends Expression {
   }
 
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     w.write( "(");
     expr.translate(c, w);
@@ -81,7 +81,7 @@ public class InstanceofExpression extends Expression {
     w.write( ") ");
   }
 
-  public void dump(Context c, CodeWriter w)
+  public void dump(LocalContext c, CodeWriter w)
   {
     w.write( " ( INSTANCEOF  ");
     dumpNodeInfo(c, w);
@@ -90,7 +90,7 @@ public class InstanceofExpression extends Expression {
     w.write (" ) ( " + type.getType().getTypeString() + ") )");
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck(LocalContext c)
   {
     // FIXME; implement
     return this;

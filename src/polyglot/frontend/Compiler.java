@@ -3,47 +3,85 @@ package jltools.frontend;
 import jltools.lex.Lexer;
 import jltools.ast.Node;
 import jltools.parse.Grm;
-import jltools.util.UnicodeWriter;
-import jltools.util.CodeWriter;
+import jltools.types.*;
+import jltools.util.*;
+import jltools.visit.*;
 
-import java.io.Reader;
-import java.io.FileReader;
-import java.io.PrintWriter;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 public class Compiler
 {
-   public static final String TARGETS = "Target Files";
+  private static TypeSystem ts;
+  private static CompoundClassResolver systemResolver;
+  private static TableClassResolver parserResolver;
 
-   public Compiler(Map options)
-   {
-      String[] targets;
-      Reader reader;
-      Lexer lexer;
-      Grm grm;
-      CodeWriter cw;
-      
-      targets = (String[])options.get(TARGETS);
+  private static Map options;
 
-      for(int i = 0; i < targets.length; i++)
-      {
-         try
-         {
-            reader = new FileReader(targets[i]);
-            lexer = new Lexer(reader);
-            grm = new Grm(lexer, null);
+  static
+  {
+    Compiler.systemResolver = new CompoundClassResolver();
+    Compiler.parsedResolver = new TableClassResolver();
+    systemResolver.addResolver( parsedResolver);
+    //systemResolver.addResolver( new FileClassResolver());
+
+    Compiler.ts = new StandardTypeSystem( systemResolver);
+
+    Compiler.options = new HashMap();
+  }
+
+  public static void setOptions( Map options)
+  {
+    Compiler.options = options;
+  }
+
+  public Compiler()
+  {
+  }
+
+  public Node parse( Reader source) throws IOException
+  {
+    Lexer lexer;
+    Grm grm;
+    java_cup.runtime.Symbol sym;
+
+    lexer = new Lexer( source);
+    grm = new Grm(lexer, null);
                
-            java_cup.runtime.Symbol sym = grm.parse();
-            cw = new CodeWriter(new UnicodeWriter( 
-                                  new PrintWriter(System.out)), 72);
-            
-            ((Node)sym.value).translate(null, cw);
-            cw.flush();
-         }
-         catch(Exception e)
-         {
-            e.printStackTrace();
-         }
-      }
-   }
+    try
+    {
+      sym = grm.parse();
+    }
+    catch( Exception e)
+    {
+      throw new IOException( e.getMessage());
+    }
+
+    return (Node)sym.value; 
+  }
+
+  public void readSymbols( Node ast)
+  {
+    SymbolReader sr = new SymbolReader( ts, parsedResolver);
+    ast.visit( sr);
+  }
+
+  public Node typeCheck( Node ast)
+  {
+    TypeChecker tc = new TypeChecker( null);
+    return ast.visit( tc);
+  }
+
+  public void translate( Node ast, Writer output) throws IOException
+  {
+    CodeWriter cw = new CodeWriter( output, 72);
+    ast.translate( null, cw);
+    cw.flush();
+  }
+
+  // A hack, but only here to get type checking working...
+  public static void enqueueError(int line, ErrorInfo e)
+  {
+    System.err.println( "Error on line " + line + ": " + e.getMessage());
+  }
 }

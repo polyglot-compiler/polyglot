@@ -5,7 +5,7 @@
 package jltools.ast;
 
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 
 /**
  * BranchStatement
@@ -74,20 +74,20 @@ public class BranchStatement extends Statement {
     label = newLabel;
   }
 
-  public void translate ( Context c, CodeWriter w)
+  public void translate ( LocalContext c, CodeWriter w)
   {
     w.write ( ( type == BREAK ? "break" : "continue" ) + 
               ( label == null ? "; " : " " + label + "; " ));
   }
   
-  public void dump (Context c, CodeWriter w)
+  public void dump (LocalContext c, CodeWriter w)
   {
     w.write ( " ( BRANCH STATMENT : " + 
               ( type == BREAK ? " BREAK " : " CONTINUE " ) + 
               ( label == null ? ")" : label + ") " ));
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck(LocalContext c)
   {
     // FIXME: implement;
     return this;

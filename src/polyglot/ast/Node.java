@@ -4,11 +4,12 @@
 
 package jltools.ast;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
-import jltools.util.CodeWriter;
-import jltools.types.Context;
+import java.util.*;
+
+import jltools.types.*;
+import jltools.util.*;
+import jltools.visit.SymbolReader;
+
 
 /**
  * Node
@@ -46,37 +47,39 @@ public abstract class Node extends jltools.util.AnnotatedObject {
    **/
   abstract void visitChildren(NodeVisitor vis);
 
-   public Node visit(NodeVisitor vis)
-   {
-      Node n;
-
-      n = vis.visitBefore(this);
-      if(n != null)
-	 return n;
-      else {
-	 visitChildren(vis);
-	 return vis.visitAfter(this);
-      }
-   }
-
-   public Node resolveAmbiguities(Context c)
-   {
-      return this;
-   }
+  public Node visit(NodeVisitor vis)
+  {
+    Node n;
+    
+    n = vis.visitBefore(this);
+    if(n != null)
+      return n;
+    else {
+      visitChildren(vis);
+      return vis.visitAfter(this);
+    }
+  }
+  
+  public Node resolveAmbiguities(LocalContext c)
+  {
+    return this;
+  }
 
    /**
     * Dumps the attributes to the writer, if the attributes have been set
     */
-   public void dumpNodeInfo(Context c, CodeWriter w)
+   public void dumpNodeInfo(LocalContext c, CodeWriter w)
    {
       //FIXME: Do this
    }
 
-   public abstract Node typeCheck(Context c);
+  public abstract Node readSymbols( SymbolReader sr);
 
-   public abstract void translate(Context c, CodeWriter w);
-
-   public abstract void dump(Context c, CodeWriter w);
+  public abstract Node typeCheck(LocalContext c);
+  
+  public abstract void translate(LocalContext c, CodeWriter w);
+  
+  public abstract void dump(LocalContext c, CodeWriter w);
 
   /**
    * Return a new array containing all the elements of lst, in the same order.
@@ -105,5 +108,12 @@ public abstract class Node extends jltools.util.AnnotatedObject {
     return newList;
   }
 
+  public void setError(int errType, String errMsg)
+  {
+    ErrorInfo err = new ErrorInfo(errType, errMsg);
+    Annotate.addError(this, err);
+    
+    jltools.frontend.Compiler.enqueueError(Annotate.getLineNumber(this), err);
+  }
 }
 

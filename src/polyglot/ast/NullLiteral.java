@@ -5,7 +5,7 @@
 package jltools.ast;
 
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 
 /**
  * NullLiteral
@@ -28,19 +28,19 @@ public class NullLiteral extends Literal {
     return copy();
   }
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     w.write("null");
   }
 
-  public void dump(Context c, CodeWriter w)
+  public void dump(LocalContext c, CodeWriter w)
   {
     w.write("( NULL )");
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck(LocalContext c)
   {
-    // Fixme: implement
+    setCheckedType( c.getTypeSystem().getNull());
     return this;
   }
   public void visitChildren(NodeVisitor v) 

@@ -5,7 +5,9 @@
 package jltools.ast;
 
 import jltools.types.Type;
-import jltools.types.Context;
+import jltools.types.LocalContext;
+import jltools.visit.SymbolReader;
+import jltools.util.Annotate;
 import jltools.util.CodeWriter;
 
 /**
@@ -89,22 +91,26 @@ public class FormalParameter extends Node {
 	this.isFinal = isFinal;
     }
 
+  public Node readSymbols( SymbolReader sr)
+  {
+    return this;
+  }
 
-   public void translate(Context c, CodeWriter w)
-   {
-     w.write ( type.getType().getTypeString() + " " + name);
-   }
+  public void translate(LocalContext c, CodeWriter w)
+  {
+    w.write ( type.getType().getTypeString() + " " + name);
+  }
 
-   public void dump(Context c, CodeWriter w)
-   {
+  public void dump(LocalContext c, CodeWriter w)
+  {
 
-   }
-
-   public Node typeCheck(Context c)
-   {
-     // FIXME; implement
-     return this;
-   }
+  }
+  
+  public Node typeCheck( LocalContext c)
+  {
+    Annotate.setType( this, c.checkAndResolveType( type.getType()));
+    return this;
+  }
   
   public void visitChildren(NodeVisitor v)
   {
@@ -117,13 +123,13 @@ public class FormalParameter extends Node {
                                name, 
                                isFinal);
   }
-    public Node deepCopy() {
-      return new FormalParameter((TypeNode) type.deepCopy(),
-				 name,
-				 isFinal);
-    }
+  public Node deepCopy() {
+    return new FormalParameter((TypeNode) type.deepCopy(),
+	                          	 name,
+	                      			 isFinal);
+  }
 
-    private TypeNode type;
-    private String name;
-    private boolean isFinal;
+  private TypeNode type;
+  private String name;
+  private boolean isFinal;
 }

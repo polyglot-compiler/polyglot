@@ -5,8 +5,14 @@
 package jltools.ast;
 
 import jltools.types.Type;
+import jltools.types.LocalContext;
+import jltools.visit.SymbolReader;
+
+import jltools.util.Annotate;
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+
+
+
 /**
  * TypeNode
  *
@@ -36,19 +42,24 @@ public class TypeNode extends Node {
    {
       // nothing to do
    }
-
-   public Node typeCheck(Context c)
+   
+   public Node readSymbols( SymbolReader sr)
    {
-      // FIXME: implement
-      return this;
+     return this;
+   } 
+
+   public Node typeCheck(LocalContext c)
+   {
+     Annotate.setType( this, c.checkAndResolveType( type));
+     return this;
    }
 
-   public void  translate(Context c, CodeWriter w)
+   public void  translate(LocalContext c, CodeWriter w)
   {
      w.write(type.getTypeString());
    }
 
-   public void dump(Context c, CodeWriter w)
+   public void dump(LocalContext c, CodeWriter w)
    {
      w.write(" ( TYPE: " + type.getTypeString() + ")");
    }

@@ -4,7 +4,7 @@
 
 package jltools.ast;
 
-import jltools.types.Context;
+import jltools.types.LocalContext;
 import jltools.util.CodeWriter;
 
 /**
@@ -56,7 +56,7 @@ public class DoStatement extends Statement {
   }
 
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     w.write (" do " );
     if (! (statement instanceof BlockStatement))
@@ -73,7 +73,7 @@ public class DoStatement extends Statement {
     
   }
 
-  public void dump(Context c, CodeWriter w)
+  public void dump(LocalContext c, CodeWriter w)
   {
     w.write ( " ( DO_WHILE: " );
     condExpr.dump(c, w);
@@ -83,7 +83,7 @@ public class DoStatement extends Statement {
     w.write (" ) ");
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck( LocalContext c)
   {
     // FIXME; implement
     return this;

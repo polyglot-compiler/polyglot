@@ -3,7 +3,7 @@
  */ 
 
 package jltools.ast;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 import jltools.util.CodeWriter;
 
 /** 
@@ -104,7 +104,7 @@ public class IntLiteral extends Literal {
   }
 
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     if (type == BOOLEAN)
     {
@@ -120,18 +120,35 @@ public class IntLiteral extends Literal {
     }
   }
 
-  public void dump(Context c, CodeWriter w)
+  public void dump(LocalContext c, CodeWriter w)
   {
     w.write( " ( INTLITERAL " );
     dumpNodeInfo(c, w);
     w.write( " ( " + value + " ) )");
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck(LocalContext c)
   {
-    // FIXME; implement
+    switch( type) {
+    case BOOLEAN:
+      setCheckedType( c.getTypeSystem().getBoolean());
+      break;
+    case BYTE:
+      setCheckedType( c.getTypeSystem().getByte());
+      break;
+    case SHORT:
+      setCheckedType( c.getTypeSystem().getShort());
+      break;
+    case INT:
+      setCheckedType( c.getTypeSystem().getInt());
+      break;
+    case LONG:
+      setCheckedType( c.getTypeSystem().getLong());
+      break;
+    } 
     return this;
   }  
+
   public void visitChildren(NodeVisitor v) {
     // nothing to do
   }

@@ -6,7 +6,7 @@ package jltools.ast;
 
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 import jltools.util.CodeWriter;
 import java.util.List;
 import java.util.ArrayList;
@@ -84,7 +84,7 @@ public class ForStatement extends Statement {
     return new TypedList(incrementors, Statement.class, false);
   }
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     boolean writeSemicolon = true;
     
@@ -137,7 +137,7 @@ public class ForStatement extends Statement {
       body.translate(c, w);
   }
 
-  public void dump(Context c, CodeWriter w)
+  public void dump(LocalContext c, CodeWriter w)
   {
     w.write (" ( FOR " );
     for (ListIterator iter = initializers.listIterator(); iter.hasNext(); )
@@ -155,7 +155,7 @@ public class ForStatement extends Statement {
     w.endBlock();
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck( LocalContext c)
   {
     // FIXME; implement
     return this;

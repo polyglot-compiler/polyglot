@@ -4,14 +4,14 @@
 
 package jltools.ast;
 
-import jltools.util.TypedList;
-import jltools.util.TypedListIterator;
-import jltools.util.CodeWriter;
-import jltools.types.Context;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.ArrayList;
+
+import jltools.types.*;
+import jltools.util.*;
+
 
 /**
  * ArrayInitializerExpression
@@ -73,7 +73,7 @@ public class ArrayInitializerExpression extends Expression {
    **/
   public void removeExpression(int pos) { children.remove(pos); }
 
-  public void translate ( Context c, CodeWriter w)
+  public void translate( LocalContext c, CodeWriter w)
   {
     w.write ( " { " );
     for (ListIterator iter = children(); iter.hasNext(); ) {
@@ -86,7 +86,7 @@ public class ArrayInitializerExpression extends Expression {
     w.write ( " } " );
   }
   
-  public void dump (Context c, CodeWriter w)
+  public void dump( LocalContext c, CodeWriter w)
   {
     w.write (" ( ARRAY INITIALIZER " );
     dumpNodeInfo(c, w);
@@ -98,13 +98,12 @@ public class ArrayInitializerExpression extends Expression {
     w.write ( " ) " );
     
   }
-
-  public Node typeCheck(Context c)
+  
+  public Node typeCheck( LocalContext c)
   {
     // FIXME: implement;
     return this;
   }
-
 
   public void visitChildren(NodeVisitor v) {
     for (ListIterator iter = children(); iter.hasNext(); ) {

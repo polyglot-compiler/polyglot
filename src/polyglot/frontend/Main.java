@@ -1,30 +1,55 @@
 package jltools.frontend;
 
-
 import java.io.*;
 import java.util.*;
+
+import jltools.ast.Node;
+import jltools.frontend.Compiler;
+import jltools.util.UnicodeWriter;
 
 public class Main
 {
    public static final void main(String args[])
    {
       Map options = new HashMap();
+      Set source = new TreeSet();
 
-      parseCommandLine(args, options);
+      parseCommandLine(args, options, source);
 
-      new Compiler(options);
-   }
+      Compiler.setOptions( options);
 
-   static final void parseCommandLine(String args[], Map options)
-   {
-      if(args.length < 1)
-      {
-         System.err.println("usage: Main File.java\n");
-         System.exit(1);
+      Compiler compiler = new Compiler();
+      Iterator i = source.iterator();
+      while( i.hasNext()) {
+        compile( compiler, (String)i.next());
       }
-
-      String[] target_files = new String[1];
-      target_files[0] = args[0];
-      options.put(Compiler.TARGETS, target_files);
    }
+
+  public static void compile( Compiler compiler, String source)
+  {
+    try
+    {
+      Reader reader = new FileReader( source);
+      Writer writer = new UnicodeWriter( new PrintWriter( System.out));
+
+      Node ast = compiler.parse( reader);
+      compiler.translate( ast, writer);
+    }
+    catch( IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+
+  static final void parseCommandLine(String args[], Map options,
+                                      Set source)
+  {
+    if(args.length < 1)
+    {
+      System.err.println("usage: Main File.java\n");
+      System.exit(1);
+    }
+    
+    source.add( args[0]);
+  }
 }

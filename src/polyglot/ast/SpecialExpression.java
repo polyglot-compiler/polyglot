@@ -5,7 +5,7 @@
 package jltools.ast;
 
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 import jltools.types.Type;
 
 /**
@@ -76,34 +76,35 @@ public class SpecialExpression extends Expression {
     kind = newKind;
   }
   
-   void visitChildren(NodeVisitor vis)
-   {
-      if (type != null) {
-	 type = (TypeNode) type.visit(vis);
-      }
-   }
+  void visitChildren(NodeVisitor vis)
+  {
+    if (type != null) {
+      type = (TypeNode) type.visit(vis);
+    }
+  }
 
-   public Node typeCheck(Context c)
-   {
-      // FIXME: implement
-      return this;
-   }
+  public Node typeCheck(LocalContext c)
+  {
+    // FIXME: implement
+    return this;
+  }
 
-   public void translate(Context c, CodeWriter w)
-   {
-     if(type != null) {
-       w.write(type.getType().getTypeString() + ".");
-     }
-     w.write((kind == SUPER ? "super" : "this"));
-   }
+  public void translate(LocalContext c, CodeWriter w)
+  {
+    if( type != null) {
+      type.translate(c, w);
+      w.write( ".");
+    }
+    w.write((kind == SUPER ? "super" : "this"));
+  }
 
-   public void dump(Context c, CodeWriter w)
-   {
-     // FIXME
-     w.write( " ( (" + type.getType().getTypeString() + " ) ( " + 
-              (kind == SUPER ? "SUPER" : "THIS" ) + ") )");
-     
-   }
+  public void dump(LocalContext c, CodeWriter w)
+  {
+    // FIXME
+    w.write( " ( (");
+    type.translate(c, w);
+    w.write( " ) ( " + (kind == SUPER ? "SUPER" : "THIS" ) + ") )");
+  }
 
   public Node copy() {
     SpecialExpression se = new SpecialExpression (type, kind);

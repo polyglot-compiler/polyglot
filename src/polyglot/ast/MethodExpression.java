@@ -7,7 +7,7 @@ package jltools.ast;
 import jltools.types.Type;
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 import jltools.util.CodeWriter;
 import java.util.List;
 import java.util.Iterator;
@@ -112,7 +112,7 @@ public class MethodExpression extends Expression {
     target = newTarget;
   }
   
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     if (target != null)
     {
@@ -130,7 +130,7 @@ public class MethodExpression extends Expression {
     
   }
   
-  public void dump(Context c, CodeWriter w)
+  public void dump(LocalContext c, CodeWriter w)
   {
     w.write (" ( CALL " + name + ": ");
     dumpNodeInfo(c, w);
@@ -150,7 +150,7 @@ public class MethodExpression extends Expression {
     w.write(")");
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck(LocalContext c)
   {
     // fixme: implement
     return this;

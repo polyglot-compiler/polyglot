@@ -45,6 +45,7 @@ include jltools/lex/Makefile
 include jltools/util/Makefile
 include jltools/types/Makefile
 include jltools/parse/Makefile
+include jltools/visit/Makefile
 
 #other targets:
 util: $(UTIL_TARGET) 
@@ -55,9 +56,11 @@ lex: util types $(LEX_TARGET)
 
 parse: util types lex $(PARSE_TARGET)
 
-ast : util types lex  $(AST_TARGET)
+ast: util types lex $(AST_TARGET)
 
-frontend: util types lex parse ast $(FRONTEND_TARGET)
+visit: util types ast $(VISIT_TARGET)
+
+frontend: util types lex parse ast visit $(FRONTEND_TARGET)
 
 #clean: (just delete the class files)
 clean: 
@@ -67,6 +70,7 @@ clean:
 	rm -f jltools/types/*.class
 	rm -f jltools/util/*.class
 	rm -f jltools/lex/*.class
+	rm -f jltools/visit/*.class
 
 # delete class files as well as the grammar files, so that we can regenerate them
 # also delete the javadoc & jar file, if they exist

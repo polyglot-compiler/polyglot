@@ -4,8 +4,9 @@
 
 package jltools.util;
 
-import jltools.ast.Expression;
 import jltools.types.Type;
+
+import java.util.*;
 
 /**
  * Annotate
@@ -18,6 +19,7 @@ public class Annotate {
 
   static final int LINE_NUMBER            = 1;
   static final int TYPE                   = 2;
+  static final int ERROR                  = 3;
 
   /**
    * Notes that o appeared at line i of the source.
@@ -37,19 +39,36 @@ public class Annotate {
   }
 
   /**
-   * Sets the type of an Expression.
+   * Sets the type of an object.
    **/
-  public static void setType(Expression exp, Type t) {
-    exp.setAnnotation(TYPE, t);
+  public static void setType(AnnotatedObject o, Type t) {
+    o.setAnnotation(TYPE, t);
   }
 
   /**
-   * Returns the type of an Expression -- null if not set.
+   * Returns the type of an object -- null if not set.
    **/
-  public static Type getType(Expression exp) {
-    return (Type) exp.getAnnotation(TYPE);
+  public static Type getType(AnnotatedObject o) {
+    return (Type) o.getAnnotation(TYPE);
   }
-  
+
+  public static void addError(AnnotatedObject o, ErrorInfo e)
+  {
+    List a = getErrors(o);
+    if (a == null) {
+      a = new LinkedList();
+      a.add(e);
+      o.setAnnotation(ERROR, o);
+    }
+    else {
+      a.add(e);
+    }
+  }
+
+  public static List getErrors(AnnotatedObject o)
+  {
+    return (List) o.getAnnotation(ERROR);
+  }                           
 
   // Never instantiate this class.
   private Annotate() {}

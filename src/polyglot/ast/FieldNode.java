@@ -4,9 +4,9 @@
 
 package jltools.ast;
 
-import jltools.types.AccessFlags;
-import jltools.types.Context;
+import jltools.types.*;
 import jltools.util.CodeWriter;
+import jltools.visit.SymbolReader;
 
 /**
  * FieldNode
@@ -59,13 +59,13 @@ public class FieldNode extends ClassMember {
   }
 
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     //w.write(accessFlags.getStringRepresentation());
     declare.translate(c, w);
   }
 
-  public void dump(Context c, CodeWriter w)
+  public void dump(LocalContext c, CodeWriter w)
   {
     w.write ( "(  FIELD_NODE: ( "
               /* + accessFlags.getStringRepresentation() */ );
@@ -73,7 +73,12 @@ public class FieldNode extends ClassMember {
     w.write ( " ) " );
   } 
 
-  public Node typeCheck(Context c)
+  public Node readSymbols( SymbolReader sr)
+  {
+    return this;
+  }
+
+  public Node typeCheck( LocalContext c)
   {
     // FIXME; implement
     return this;

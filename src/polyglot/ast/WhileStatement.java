@@ -5,7 +5,7 @@
 package jltools.ast;
 
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 
 /**
  * WhileStatement
@@ -76,7 +76,7 @@ public class WhileStatement extends Statement {
     condExpr = (Expression) condExpr.visit(v);
   }
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     w.write("while ( " );
     condExpr.translate(c, w);
@@ -91,7 +91,7 @@ public class WhileStatement extends Statement {
       statement.translate(c, w);
   }
 
-  public void dump(Context c, CodeWriter w)
+  public void dump(LocalContext c, CodeWriter w)
   {
     w.write("( WHILE " );
     dumpNodeInfo(c, w);
@@ -106,7 +106,7 @@ public class WhileStatement extends Statement {
     w.write(")");
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck(LocalContext c)
   {
     // FIXME: implement
     return this;

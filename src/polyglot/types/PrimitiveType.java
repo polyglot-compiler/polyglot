@@ -87,6 +87,10 @@ public class PrimitiveType extends Type {
       }
   }
 
+  public boolean isBoolean() {
+    return (kind == BOOLEAN);
+  }
+
   public boolean equals(Object o) {
     if (! (o instanceof PrimitiveType)) return false;
     PrimitiveType pt = (PrimitiveType) o;
@@ -96,6 +100,22 @@ public class PrimitiveType extends Type {
 
   public int hashCode() {
     return kind;
+  }
+
+  public static PrimitiveType binaryPromotion( PrimitiveType t1, 
+                                            PrimitiveType t2)
+  {
+    return new PrimitiveType( t1.ts, Math.max( t1.kind, t2.kind));
+  }
+
+  public static PrimitiveType unaryPromotion( PrimitiveType t)
+  {
+    if( t.kind >= INT) {
+      return t;
+    }
+    else {
+      return (PrimitiveType)t.ts.getInt();
+    }
   }
       
   private int kind;

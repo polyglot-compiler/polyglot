@@ -4,16 +4,11 @@
 
 package jltools.ast;
 
-import jltools.util.TypedListIterator;
-import jltools.util.TypedList;
-import jltools.util.CodeWriter;
-import jltools.types.Context;
-import jltools.types.Type;
-import jltools.types.AccessFlags;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+import jltools.types.*;
+import jltools.visit.SymbolReader;
+import jltools.util.*;
 
 /**
  * ClassNode
@@ -194,7 +189,7 @@ public class ClassNode extends ClassMember {
 				 false);
   }
 
-  public void translate ( Context c, CodeWriter w)
+  public void translate ( LocalContext c, CodeWriter w)
   {
     w.write (accessFlags.getStringRepresentation() + "class " + name);
     if (superClass != null)
@@ -231,7 +226,7 @@ public class ClassNode extends ClassMember {
 
   }
   
-  public void dump (Context c, CodeWriter w)
+  public void dump (LocalContext c, CodeWriter w)
   {
     w.write (" ( CLASS " + name + "( SUPERCLASS: ");
     if ( superClass == null)
@@ -261,7 +256,12 @@ public class ClassNode extends ClassMember {
     w.write( ") )");  
   }
 
-  public Node typeCheck(Context c)
+  public Node readSymbols( SymbolReader sr)
+  {
+    return this;
+  }
+
+  public Node typeCheck( LocalContext c)
   {
     // FIXME: implement;
     return this;

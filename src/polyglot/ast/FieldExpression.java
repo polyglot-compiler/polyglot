@@ -7,7 +7,7 @@ package jltools.ast;
 import jltools.types.Type;
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 import jltools.util.CodeWriter;
 import java.util.List;
 import java.util.Iterator;
@@ -68,7 +68,7 @@ public class FieldExpression extends Expression {
   }
 
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     if (target != null) 
     {
@@ -81,7 +81,7 @@ public class FieldExpression extends Expression {
     }
   }
 
-  public void dump(Context c, CodeWriter w)
+  public void dump(LocalContext c, CodeWriter w)
   {
     w.write ( " ( FIELD ACCESS: " );
     if (target != null)
@@ -91,7 +91,7 @@ public class FieldExpression extends Expression {
     w.write (" ( " + name + " ) ) ");
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck( LocalContext c)
   {
     // FIXME; implement
     return this;

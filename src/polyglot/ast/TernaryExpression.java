@@ -5,7 +5,7 @@
 package jltools.ast;
 
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 
 /**
  * TernaryExpression
@@ -80,13 +80,13 @@ public class TernaryExpression extends Expression {
 	falseResult  = (Expression) falseResult.visit(vis);
    }
 
-   public Node typeCheck(Context c)
+   public Node typeCheck(LocalContext c)
    {
       // FIXME: implement
       return this;
    }
 
-   public void  translate(Context c, CodeWriter w)
+   public void  translate(LocalContext c, CodeWriter w)
    {
       w.write("( " );
       conditional.translate(c, w);
@@ -97,7 +97,7 @@ public class TernaryExpression extends Expression {
       w.write(" )");
    }
 
-   public void dump(Context c, CodeWriter w)
+   public void dump(LocalContext c, CodeWriter w)
    {
       w.write("( TERNARY " );
       dumpNodeInfo(c, w);

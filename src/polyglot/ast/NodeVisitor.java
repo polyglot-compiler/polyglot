@@ -31,7 +31,7 @@ public abstract class NodeVisitor
 {
    public Node visitBefore(Node n)
    {
-      return n;
+      return null;
    }
 
    public Node visitAfter(Node n)

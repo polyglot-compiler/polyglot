@@ -1268,8 +1268,9 @@ primary_no_new_array ::=
 				new TypeNode(a), a), "class"), a); :}
 	|	VOID:a DOT CLASS
 			{: RESULT = (Expression)Grm.ln(new FieldExpression( 
-				Grm.ln(new TypeNode(new PrimitiveType(parser.ts, 
-				PrimitiveType.VOID)), a), "class"), a); :}				
+			       Grm.ln(new TypeNode(new PrimitiveType(parser.ts,
+			       PrimitiveType.VOID)), a), "class"), a); :}
+
 	|	array_type:a DOT CLASS
 			{: RESULT = (Expression)Grm.ln(
 				new FieldExpression(a, "class"), a); :}
@@ -1278,7 +1279,10 @@ primary_no_new_array ::=
 				new FieldExpression(a, "class"), a); :}
 	|	name:a DOT THIS
 			{: RESULT = (Expression)Grm.ln(
-			new FieldExpression(a, "this"), a); :}
+				new SpecialExpression((TypeNode)Grm.ln(
+				new TypeNode(new ClassType(parser.ts, 
+				a.getName(), false)), a), 
+				SpecialExpression.THIS), a); :}
 	;
 class_instance_creation_expression ::=
 					// NewObjectExpression
@@ -1536,7 +1540,7 @@ additive_expression ::=
 	|	additive_expression:a MINUS multiplicative_expression:b
 			{: RESULT = (Expression)Grm.ln(
 				new BinaryExpression(a,
-				BinaryExpression.MINUS, b), a); :}
+				BinaryExpression.SUB, b), a); :}
 	;
 shift_expression ::=
 					// Expression

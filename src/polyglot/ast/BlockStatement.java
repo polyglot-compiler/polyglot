@@ -8,7 +8,7 @@ import jltools.util.Assert;
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.ArrayList;
@@ -81,7 +81,7 @@ public class BlockStatement extends Statement {
 				 false);
   }
 
-  public void translate(Context c, CodeWriter w)
+  public void translate( LocalContext c, CodeWriter w)
   {
     
     w.write("{");
@@ -96,7 +96,7 @@ public class BlockStatement extends Statement {
     w.write("}");
   }
 
-  public void dump(Context c, CodeWriter w)
+  public void dump( LocalContext c, CodeWriter w)
   {
     w.write("( ");
     for (ListIterator it = statements.listIterator(); it.hasNext(); ) 
@@ -106,10 +106,10 @@ public class BlockStatement extends Statement {
     }
     w.write(")");
   }
-
-  public Node typeCheck(Context c)
+  
+  public Node typeCheck( LocalContext c)
   {
-    // Fixme: implement
+    // Fixme: implement throws
     return this;
   }
 

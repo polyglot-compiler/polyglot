@@ -5,7 +5,7 @@
 package jltools.ast;
 
 import jltools.util.CodeWriter;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 
 /**
  * ClassDeclarationStatement
@@ -39,12 +39,12 @@ public class ClassDeclarationStatement extends Statement {
   public void setClassNode(ClassNode newClassNode) {
     classNode = newClassNode;
   }
-  public void translate ( Context c, CodeWriter w)
+  public void translate ( LocalContext c, CodeWriter w)
   {
     classNode.translate(c, w);
   }
   
-  public void dump (Context c, CodeWriter w)
+  public void dump (LocalContext c, CodeWriter w)
   {
     w.write (" CLASS DECLARATION");
     w.beginBlock();
@@ -53,7 +53,7 @@ public class ClassDeclarationStatement extends Statement {
     w.write ( " )");;
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck(LocalContext c)
   {
     // FIXME: implement;
     return this;

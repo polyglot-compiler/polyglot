@@ -5,7 +5,7 @@
 package jltools.ast;
 
 import jltools.types.Type;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 import jltools.util.CodeWriter;
 import jltools.util.TypedListIterator;
 import jltools.util.TypedList;
@@ -23,7 +23,7 @@ import java.util.List;
  * NewObjectExpression has a list of arguments to be passed to the
  * constructor of the object and an optional ClassNode used to support
  * anonymous classes.  A new object expression may also be proceeded
- * by an primary expression which specifies the context in which the
+ * by an primary expression which specifies the LocalContext in which the
  * object is being created.
  */
 
@@ -61,7 +61,7 @@ public class NewObjectExpression extends Expression {
   }
 
   /**
-   * Effects: Sets the primary expression which specifies the context
+   * Effects: Sets the primary expression which specifies the LocalContext
    * of the creation of the new object to <newPrimary>.
    */
   public void setPrimary(Expression newPrimary) {
@@ -154,7 +154,7 @@ public class NewObjectExpression extends Expression {
     }
   }
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     if (primary != null)
     {
@@ -179,7 +179,7 @@ public class NewObjectExpression extends Expression {
     }
   }
 
-  public void dump (Context c, CodeWriter w)
+  public void dump (LocalContext c, CodeWriter w)
   {
     w.write (" ( NEW " );
     type.dump ( c, w);
@@ -200,7 +200,7 @@ public class NewObjectExpression extends Expression {
     
   }
   
-  public Node typeCheck(Context c)
+  public Node typeCheck(LocalContext c)
   {
     return this;
   }

@@ -57,9 +57,9 @@ public abstract class Type {
   public final boolean isComparable(Type t) {
     return t.ts == this.ts;
   }
-  private TypeSystem ts;
+  protected TypeSystem ts;
   // Fixme: Temporary until types are figured out.
-  private String type;
+  protected String type;
 }
 
 

@@ -3,7 +3,7 @@
  */
 
 package jltools.ast;
-import jltools.types.Context;
+import jltools.types.LocalContext;
 import jltools.util.CodeWriter;
 
 /**
@@ -55,20 +55,20 @@ public class LabelledStatement extends Statement {
   }
 
 
-  public void translate(Context c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {
     w.write(label + ": ");
     statement.translate(c, w);
   }
 
-  public void dump(Context c, CodeWriter w)
+  public void dump(LocalContext c, CodeWriter w)
   {
     w.write ("( LABEL \"" + label + "\" (");
     statement.translate(c, w);
     w.write(") )");
   }
 
-  public Node typeCheck(Context c)
+  public Node typeCheck(LocalContext c)
   {
     // FIXME; implement
     return this;
