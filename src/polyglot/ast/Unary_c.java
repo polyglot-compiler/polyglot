@@ -95,7 +95,7 @@ public class Unary_c extends Expr_c implements Unary
 
 	    if (! expr.type().isNumeric()) {
 		throw new SemanticException("Operand of " + op +
-		    " operator must be numeric.", position());
+		    " operator must be numeric.", expr.position());
 	    }
 
 	    return type(expr.type());
@@ -104,7 +104,7 @@ public class Unary_c extends Expr_c implements Unary
 	if (op == BIT_NOT || op == NEG || op == POS) {
 	    if (! expr.type().isNumeric()) {
 		throw new SemanticException("Operand of " + op +
-		    " operator must be numeric.", position());
+		    " operator must be numeric.", expr.position());
 	    }
 
 	    return type(ts.promote(expr.type()));
@@ -113,7 +113,7 @@ public class Unary_c extends Expr_c implements Unary
 	if (op == NOT) {
 	    if (! expr.type().isBoolean()) {
 		throw new SemanticException("Operand of " + op +
-		    " operator must be boolean.", position());
+		    " operator must be boolean.", expr.position());
 	    }
 
 	    return type(expr.type());

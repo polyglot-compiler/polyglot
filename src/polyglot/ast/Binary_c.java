@@ -187,9 +187,14 @@ public class Binary_c extends Expr_c implements Binary
 	TypeSystem ts = tc.typeSystem();
 
 	if (op == GT || op == LT || op == GE || op == LE) {
-	    if (! l.isNumeric() || ! r.isNumeric()) {
+	    if (! l.isNumeric()) {
 		throw new SemanticException("The " + op +
-		    " operator must have numeric operands.", position());
+		    " operator must have numeric operands.", l.position());
+	    }
+
+            if (! r.isNumeric()) {
+		throw new SemanticException("The " + op +
+		    " operator must have numeric operands.", r.position());
 	    }
 
 	    return type(ts.Boolean());
@@ -218,10 +223,14 @@ public class Binary_c extends Expr_c implements Binary
 	}
 
 	if (op == COND_OR || op == COND_AND) {
-	    if (! l.isBoolean() || ! r.isBoolean()) {
+	    if (! l.isBoolean()) {
 		throw new SemanticException("The " + op +
-		    " operator must have boolean operands.",
-		    position());
+		    " operator must have boolean operands.", l.position());
+	    }
+
+	    if (! r.isBoolean()) {
+		throw new SemanticException("The " + op +
+		    " operator must have boolean operands.", r.position());
 	    }
 
 	    return type(ts.Boolean());
@@ -239,26 +248,48 @@ public class Binary_c extends Expr_c implements Binary
 	    }
 	}
 
-	if (! l.isNumeric() || ! r.isNumeric()) {
-	    if (op == ADD) {
-		throw new SemanticException("The " + op +
-		    " operator must have numeric or String operands.",
-		    position());
-	    }
+        if (op == ADD) {
+            if (! l.isNumeric()) {
+                throw new SemanticException("The " + op +
+                    " operator must have numeric or String operands.",
+                    l.position());
+            }
+            if (! r.isNumeric()) {
+                throw new SemanticException("The " + op +
+                    " operator must have numeric or String operands.",
+                    r.position());
+            }
+        }
 
-	    if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
-		throw new SemanticException("The " + op +
-		    " operator must have numeric or boolean operands.",
-		    position());
-	    }
+        if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
+            if (! l.isNumeric()) {
+                throw new SemanticException("The " + op +
+                    " operator must have numeric or boolean operands.",
+                    l.position());
+            }
 
-	    if (op == SUB || op == MUL || op == DIV || op == MOD ||
-		op == SHL || op == SHR || op == USHR) {
-		throw new SemanticException("The " + op +
-		    " operator must have numeric operands.",
-		    position());
-	    }
-	}
+            if (! r.isNumeric()) {
+                throw new SemanticException("The " + op +
+                    " operator must have numeric or boolean operands.",
+                    r.position());
+            }
+        }
+
+        if (op == SUB || op == MUL || op == DIV || op == MOD ||
+            op == SHL || op == SHR || op == USHR) {
+
+            if (! l.isNumeric()) {
+                throw new SemanticException("The " + op +
+                    " operator must have numeric operands.",
+                    l.position());
+            }
+
+            if (! r.isNumeric()) {
+                throw new SemanticException("The " + op +
+                    " operator must have numeric operands.",
+                    r.position());
+            }
+        }
 
 	if (op == SHL || op == SHR || op == USHR) {
 	    // For shift, only promote the left operand.
