@@ -64,15 +64,15 @@ public class CFGBuilder implements Copy
     protected DataFlow df;
 
     /**
-     * Should we skip the catch blocks for the innermost try when building
-     * edges for an exception throw?
+     * True if we should skip the catch blocks for the innermost try when
+     * building edges for an exception throw.
      */
     protected boolean skipInnermostCatches;
     
     /**
-     * Should we add edges for uncaught Errors to the exit node of the graph?
-     * By default, we do not, but subclasses can change this behavior if 
-     * needed.
+     * True if we should add edges for uncaught Errors to the exit node of the
+     * graph.  By default, we do not, but subclasses can change this behavior
+     * if needed.
      */
     protected boolean errorEdgesToExitNode;
 
