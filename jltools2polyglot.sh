@@ -19,13 +19,11 @@ if [ `basename $source` != jltools ]; then
   exit 1
 fi
 
-set -x
-
-target=$PWD/jltools
+target=$PWD/polyglot
 
 if [ ! -d $target ]
 then
-    cvs checkout jltools
+    cvs checkout polyglot
 fi
 
 (
@@ -35,6 +33,8 @@ find . -type f -print | grep -v CVS | grep -v \.class$ | while read f
 do
   g=`echo $f | sed -e 's/\.jlg/.ppg/g' -e 's/JLgen/PPG/g' -e 's/jlgen/ppg/g' \
                    -e 's/jltools/polyglot/g'`
+
+  echo $f '->' $g
 
   mkdir -p `dirname $target/$g` 2>/dev/null
   sed -e 's/\<jlgen\>/ppg/g' \
