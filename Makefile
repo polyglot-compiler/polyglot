@@ -85,15 +85,15 @@ frontend: util types lex parse ast visit $(FRONTEND_TARGET)
 #jif
 jif: util types ast ext/jif/lex ext/jif/parse ext/jif/ast ext/jif/types ext/jif/visit
 
-ext/jif/lex: util $(EXTJIFLEX_TARGET)
+ext/jif/lex: util ext/jif/parse ext/jif/types $(EXTJIFLEX_TARGET)
 
 ext/jif/parse: util $(EXTJIFPARSE_TARGET)
 
-ext/jif/ast: util types ast  $(EXTJIFAST_TARGET)
+ext/jif/ast: util ext/jif/ast ext/jif/types  $(EXTJIFAST_TARGET)
 
-ext/jif/types: util $(JIFTYPES_TARGET)
+ext/jif/types: util types $(JIFTYPES_TARGET)
 
-ext/jif/visit: util $(JIFVISIT_TARGET)
+ext/jif/visit: util visit $(JIFVISIT_TARGET)
 
 main: $(BIN)/jlc $(BIN)/jlcd frontend jif ext/op ext/op/runtime $(MAIN_TARGET)
 
