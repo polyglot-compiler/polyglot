@@ -32,10 +32,17 @@ public interface VarInstance extends TypeObject
      */
     Object constantValue();
 
+
     /**
-     * Destructively set the local's constant value.
+     * Destructively set the constant value of the field.
+     * @param value the constant value.  Should be an instance of String,
+     * Boolean, Byte, Short, Character, Integer, Long, Float, Double, or null.
      */
     void setConstantValue(Object value);
+    
+    /**
+     * Mark the variable as not a compile time constant.
+     */
     void setNotConstant();
     
     /**

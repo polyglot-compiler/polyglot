@@ -153,7 +153,10 @@ public class Subst_c implements Subst
     public FieldInstance substField(FieldInstance fi) {
         ReferenceType ct = (ReferenceType) substType(fi.container());
         Type t = substType(fi.type());
-        return fi.type(t).container(ct);
+        FieldInstance newFI = (FieldInstance) fi.copy();
+        newFI.setType(t);
+        newFI.setContainer(ct);
+        return newFI;
     }
 
     /** Perform substititions on a method. */

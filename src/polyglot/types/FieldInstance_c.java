@@ -41,26 +41,6 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
         return isConstant;
     }
 
-
-    /** Non-destructive update of constant value. */
-    public FieldInstance constantValue(Object constantValue) {
-        if (this.constantValue != constantValue) {
-            FieldInstance_c n = (FieldInstance_c) copy();
-            n.setConstantValue(constantValue);
-            return n;
-        }
-        return this;
-    }
-
-    public FieldInstance container(ReferenceType container) {
-        if (this.container != container) {
-            FieldInstance_c n = (FieldInstance_c) copy();
-            n.container = container;
-            return n;
-        }
-        return this;
-    }
-
     /**
      * @param container The container to set.
      */
@@ -68,34 +48,6 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
         this.container = container;
     }
      
-    public FieldInstance flags(Flags flags) {
-        if (!flags.equals(this.flags)) {
-            FieldInstance_c n = (FieldInstance_c) copy();
-            n.flags = flags;
-            return n;
-        }
-        return this;
-    }
-
-    public FieldInstance name(String name) {
-        if ((name != null && !name.equals(this.name)) ||
-            (name == null && name != this.name)) {
-            FieldInstance_c n = (FieldInstance_c) copy();
-            n.name = name;
-            return n;
-        }
-        return this;
-    }
-
-    public FieldInstance type(Type type) {
-        if (this.type != type) {
-            FieldInstance_c n = (FieldInstance_c) copy();
-            n.type = type;
-            return n;
-        }
-        return this;
-    }
-    
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof FieldInstance) {
 	    FieldInstance i = (FieldInstance) o;

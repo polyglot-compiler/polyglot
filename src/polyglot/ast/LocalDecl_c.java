@@ -202,11 +202,6 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
         LocalInstance li = this.li;
 
-        if (li.flags().isFinal() && init() != null && init().isConstant()) {
-            Object value = init().constantValue();
-            li = (LocalInstance) li.constantValue(value);
-        }
-
         try {
             ts.checkLocalFlags(flags);
         }

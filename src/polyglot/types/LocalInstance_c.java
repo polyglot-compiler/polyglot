@@ -16,43 +16,6 @@ public class LocalInstance_c extends VarInstance_c implements LocalInstance
         super(ts, pos, flags, type, name);
     }
 
-    public LocalInstance constantValue(Object constantValue) {
-        if (this.constantValue != constantValue) {
-            LocalInstance_c n = (LocalInstance_c) copy();
-            n.setConstantValue(constantValue);
-            return n;
-        }
-        return this;
-    }
-
-    public LocalInstance flags(Flags flags) {
-        if (!flags.equals(this.flags)) {
-            LocalInstance_c n = (LocalInstance_c) copy();
-            n.flags = flags;
-            return n;
-        }
-        return this;
-    }
-
-    public LocalInstance name(String name) {
-        if ((name != null && !name.equals(this.name)) ||
-            (name == null && name != this.name)) {
-            LocalInstance_c n = (LocalInstance_c) copy();
-            n.name = name;
-            return n;
-        }
-        return this;
-    }
-
-    public LocalInstance type(Type type) {
-        if (this.type != type) {
-            LocalInstance_c n = (LocalInstance_c) copy();
-            n.type = type;
-            return n;
-        }
-        return this;
-    }
- 
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof LocalInstance) {
             LocalInstance i = (LocalInstance) o;
