@@ -31,6 +31,8 @@ public class CovarRetMethodInstance_c extends MethodInstance_c
 
         // Force the return types to be the same and then let the super
         // class perform the remainder of the tests.
-        return super.canOverrideImpl(mj.returnType(mi.returnType()));
+        MethodInstance tmpMj = (MethodInstance) mj.copy();
+        tmpMj.setReturnType(mi.returnType());
+        return super.canOverrideImpl(tmpMj);
     }
 }

@@ -12,47 +12,24 @@ public interface MethodInstance extends ProcedureInstance
      * The method's return type.
      */
     Type returnType();
-    void setReturnType(Type type);
-
+    
     /**
-     * Set the method's return type.
+     * Destructively set the method's return type.
+     * @param type
      */
-    MethodInstance returnType(Type returnType);
-
+    void setReturnType(Type type);
+   
     /**
      * The method's name.
      */
     String name();
+    
+    /**
+     * Destructively set the method's name.
+     * @param name
+     */
     void setName(String name);
 
-    /**
-     * Set the method's name.
-     */
-    MethodInstance name(String name);
-
-    /**
-     * Set the method's flags.
-     */
-    MethodInstance flags(Flags flags);
-
-    /**
-     * Set the method's formal parameter types.
-     * @param l A list of <code>Type</code>.
-     * @see polyglot.types.Type
-     */
-    MethodInstance formalTypes(List l);
-
-    /**
-     * Set the method's exception throw types.
-     * @param l A list of <code>Type</code>.
-     * @see polyglot.types.Type
-     */
-    MethodInstance throwTypes(List l);
-
-    /**
-     * Set the method's containing type.
-     */
-    MethodInstance container(ReferenceType container);
 
     /**
      * Get the list of methods this method (potentially) overrides, in order

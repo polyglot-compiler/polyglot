@@ -151,8 +151,9 @@ public class InnerTranslator extends NodeVisitor {
 		List ftypes = new ArrayList(ci.formalTypes().size() + 1);
 		ftypes.add(ct.container());
 		ftypes.addAll(ci.formalTypes());
-		ci = ci.formalTypes(ftypes);
-		return ci;
+		ConstructorInstance ci2 = (ConstructorInstance) ci.copy();
+		ci2.setFormalTypes(ftypes);
+		return ci2;
 	}
 	
 	// Add a new argument to all the constructors

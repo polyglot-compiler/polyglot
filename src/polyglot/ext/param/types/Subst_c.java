@@ -171,7 +171,13 @@ public class Subst_c implements Subst
         List throwTypes = mi.throwTypes();
         throwTypes = substTypeList(throwTypes);
 
-        return (MethodInstance) mi.returnType(rt).formalTypes(formalTypes).throwTypes(throwTypes).container(ct);
+        MethodInstance tmpMi = (MethodInstance) mi.copy();
+        tmpMi.setReturnType(rt);
+        tmpMi.setFormalTypes(formalTypes);
+        tmpMi.setThrowTypes(throwTypes);
+        tmpMi.setContainer(ct);
+        
+        return tmpMi;
     }
 
     /** Perform substititions on a constructor. */
@@ -183,8 +189,14 @@ public class Subst_c implements Subst
 
         List throwTypes = ci.throwTypes();
         throwTypes = substTypeList(throwTypes);
+        
 
-        return (ConstructorInstance) ci.formalTypes(formalTypes).throwTypes(throwTypes).container(ct);
+        ConstructorInstance tmpCi = (ConstructorInstance) ci.copy();
+        tmpCi.setFormalTypes(formalTypes);
+        tmpCi.setThrowTypes(throwTypes);
+        tmpCi.setContainer(ct);
+        
+        return tmpCi;
     }
 
     /** Perform substititions on a list of <code>Type</code>. */
