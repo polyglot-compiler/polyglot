@@ -269,13 +269,21 @@ public class DeadCodeEliminator extends DataFlow {
 	return new DefUseFinder(def, use);
     }
 
-    protected static class DefUseFinder extends NodeVisitor {
+    protected static class DefUseFinder extends HaltingVisitor {
 	protected Set def;
 	protected Set use;
 
 	public DefUseFinder(Set def, Set use) {
 	    this.def = def;
 	    this.use = use;
+	}
+
+	public NodeVisitor enter(Node n) {
+	    if (n instanceof Assign) {
+		return bypass(((Assign)n).left());
+	    }
+
+	    return super.enter(n);
 	}
 
 	public Node leave(Node old, Node n, NodeVisitor v) {
