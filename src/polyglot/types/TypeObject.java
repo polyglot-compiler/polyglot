@@ -12,4 +12,8 @@ public interface TypeObject extends Copy, Serializable
     TypeSystem typeSystem();
     Position position();
     TypeObject restore() throws SemanticException;
+
+    TypeExt ext();
+    TypeObject ext(TypeExt ext); // non-destructive update
+    void setExt(TypeExt ext);    // destructive update
 }
