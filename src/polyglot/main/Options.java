@@ -1,11 +1,13 @@
 package polyglot.main;
-import java.util.Collection;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.StringTokenizer;
 import java.io.File;
 import java.io.PrintStream;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import polyglot.frontend.ExtensionInfo;
 
 /** 
@@ -310,44 +312,169 @@ public class Options {
      */
     public void usage(PrintStream out) {
         out.println("usage: " + extension.compilerName() + " [options] " +
-                           "<source-file>." + extension.fileExtension() + " ...\n");
+                           "<source-file>." + extension.fileExtension() + " ...");
         out.println("where [options] includes:");
-        out.println(" @<file>                 read options from <file>");
-        out.println(" -d <directory>          output directory");
-        out.println(" -assert                 recognize the assert keyword");
-        out.println(" -sourcepath <path>      source path");
-        out.println(" -bootclasspath <path>   path for bootstrap class files");
-        out.println(" -ext <extension>        use language extension");
-        out.println(" -extclass <ext-class>   use language extension");
-        out.println(" -fqcn                   use fully-qualified class"
-                           + " names");
-        out.println(" -sx <ext>               set source extension");
-        out.println(" -ox <ext>               set output extension");
-        out.println(" -errors <num>           set the maximum number of errors");
-        out.println(" -w <num>                set the maximum width of the .java output files");
-        out.println(" -dump <pass>            dump the ast after " +
-                           "pass <pass>");
-        out.println(" -disable <pass>         disable pass <pass>");
-//        out.println(" -scramble [seed]        scramble the ast " +
-//                       "(for testing)");
-        out.println(" -noserial               disable class"
-                           + " serialization");
-        out.println(" -nooutput               delete output files after" +
-                           " compilation");
-        out.println(" -c                      compile only to .java");
-        out.println(" -post <compiler>        run javac-like compiler" 
-                           + " after translation");
-        out.println(" -v -verbose             print verbose " 
-                           + "debugging information");
-        out.println(" -report <topic>=<level> print verbose debugging" +
-                           " information about topic\n" +
-                           "                         at specified verbosity");
-        out.println("   (Allowed topics: " + Report.topics + ")");
-        out.println(" -version                print version info");
-        out.println(" -h                      print this message");
+        usageForFlag(out, "@<file>", "read options from <file>");
+        usageForFlag(out, "-d <directory>", "output directory");
+        usageForFlag(out, "-assert", "recognize the assert keyword");
+        usageForFlag(out, "-sourcepath <path>", "source path");
+        usageForFlag(out, "-bootclasspath <path>", 
+                          "path for bootstrap class files");
+        usageForFlag(out, "-ext <extension>", "use language extension");
+        usageForFlag(out, "-extclass <ext-class>", "use language extension");
+        usageForFlag(out, "-fqcn", "use fully-qualified class names");
+        usageForFlag(out, "-sx <ext>", "set source extension");
+        usageForFlag(out, "-ox <ext>", "set output extension");
+        usageForFlag(out, "-errors <num>", "set the maximum number of errors");
+        usageForFlag(out, "-w <num>", 
+                          "set the maximum width of the .java output files");
+        usageForFlag(out, "-dump <pass>", "dump the ast after pass <pass>");
+        usageForFlag(out, "-disable <pass>", "disable pass <pass>");
+//        usageForFlag(out, "-scramble [seed]", "scramble the ast (for testing)");
+        usageForFlag(out, "-noserial", "disable class serialization");
+        usageForFlag(out, "-nooutput", "delete output files after compilation");
+        usageForFlag(out, "-c", "compile only to .java");
+        usageForFlag(out, "-post <compiler>", 
+                          "run javac-like compiler after translation");
+        usageForFlag(out, "-v -verbose", "print verbose debugging information");
+        usageForFlag(out, "-report <topic>=<level>", 
+                          "print verbose debugging information about " +
+                          "topic at specified verbosity");
+
+        StringBuffer allowedTopics = new StringBuffer("Allowed topics: ");
+        for (Iterator iter = Report.topics.iterator(); iter.hasNext(); ) {
+            allowedTopics.append(iter.next().toString());
+            if (iter.hasNext()) {
+                allowedTopics.append(", ");
+            }
+        }
+        usageSubsection(out, allowedTopics.toString());
+        
+        usageForFlag(out, "-version", "print version info");
+        usageForFlag(out, "-h", "print this message");
+    }
+    
+    /**
+     * The maximum width of a line when printing usage information. Used
+     * by <code>usageForFlag</code> and <code>usageSubsection</code>.
+     */
+    protected int USAGE_SCREEN_WIDTH = 76;
+    /**
+     * The number of spaces from the left that the descriptions for flags will
+     * be displayed. Used
+     * by <code>usageForFlag</code>.
+     */
+    protected int USAGE_FLAG_WIDTH = 27;
+    /**
+     * The number of spaces to indent a subsection of usage information.
+     * Used by <code>usageSubsection</code>.
+     */
+    protected int USAGE_SUBSECTION_INDENT = 8;
+
+    /**
+     * Output a flag and a description of its usage in a nice format. This 
+     * makes it easier for extensions to output their usage in a consistent
+     * format.
+     * 
+     * @param out output PrintStream
+     * @param flag 
+     * @param description description of the flag.
+     */
+    protected void usageForFlag(PrintStream out, String flag, String description) {        
+        out.print("  ");
+        out.print(flag);
+        // cur is where the cursor is on the screen.
+        int cur = flag.length() + 2;
+        
+        // print space to get up to indentation level
+        if (cur < USAGE_FLAG_WIDTH) {
+            printSpaces(out, USAGE_FLAG_WIDTH - cur);
+        }
+        else {
+            // the flag is long. Get a new line before printing the
+            // description.
+            out.println();
+            printSpaces(out, USAGE_FLAG_WIDTH);
+        }
+        cur = USAGE_FLAG_WIDTH;
+        
+        // break up the description.
+        StringTokenizer st = new StringTokenizer(description);
+        while (st.hasMoreTokens()) {
+            String s = st.nextToken();
+            if (cur + s.length() > USAGE_SCREEN_WIDTH) {
+                out.println();
+                printSpaces(out, USAGE_FLAG_WIDTH);
+                cur = USAGE_FLAG_WIDTH;
+            }
+            out.print(s);
+            cur += s.length();
+            if (st.hasMoreTokens()) {
+                if (cur + 1 > USAGE_SCREEN_WIDTH) {
+                    out.println();
+                    printSpaces(out, USAGE_FLAG_WIDTH);
+                    cur = USAGE_FLAG_WIDTH;
+                }
+                else {
+                    out.print(" ");
+                    cur++;
+                }
+            }
+        }
         out.println();
     }
+    
+    /**
+     * Output a section of text for usage information. This text will be
+     * displayed indented a certain amount from the left, controlled by
+     * the field <code>USAGE_SUBSECTION_INDENT</code>
+     * 
+     * @param out the output PrintStream
+     * @param text the text to output.
+     */
+    protected void usageSubsection(PrintStream out, String text) {        
+        // print space to get up to indentation level
+        printSpaces(out, USAGE_SUBSECTION_INDENT);
 
+        // cur is where the cursor is on the screen.
+        int cur = USAGE_SUBSECTION_INDENT;
+        
+        // break up the description.
+        StringTokenizer st = new StringTokenizer(text);
+        while (st.hasMoreTokens()) {
+            String s = st.nextToken();
+            if (cur + s.length() > USAGE_SCREEN_WIDTH) {
+                out.println();
+                printSpaces(out, USAGE_SUBSECTION_INDENT);
+                cur = USAGE_SUBSECTION_INDENT;
+            }
+            out.print(s);
+            cur += s.length();
+            if (st.hasMoreTokens()) {
+                if (cur + 1 > USAGE_SCREEN_WIDTH) {
+                    out.println();
+                    printSpaces(out, USAGE_SUBSECTION_INDENT);
+                    cur = USAGE_SUBSECTION_INDENT;
+                }
+                else {
+                    out.print(' ');
+                    cur++;
+                }
+            }
+        }
+        out.println();
+    }
+    
+    /**
+     * Utility method to print a number of spaces to a PrintStream.
+     * @param out output PrintStream
+     * @param n number of spaces to print.
+     */
+    protected static void printSpaces(PrintStream out, int n) {
+        while (n-- > 0) {
+            out.print(' ');
+        }
+    } 
 
   public String constructFullClasspath() {
       StringBuffer fullcp = new StringBuffer();
