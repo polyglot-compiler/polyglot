@@ -1,10 +1,20 @@
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.frontend.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import polyglot.ast.Block;
+import polyglot.ast.CompoundStmt;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Stmt;
+import polyglot.ast.Term;
+import polyglot.frontend.Job;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 
 /**
  * Visitor which checks that all statements must be reachable
@@ -64,9 +74,11 @@ public class ReachChecker extends DataFlow
     }
 
     public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
+        throw new InternalCompilerError("ReachChecker.check should " +
+                "never be called.");
     }
     
-    public CodeDecl post(FlowGraph graph, CodeDecl root) throws SemanticException {
+    public Term post(FlowGraph graph, Term root) throws SemanticException {
         MAPS:
         for (Iterator i = graph.pathMaps().iterator(); i.hasNext(); ) {
             Map m = (Map) i.next();
