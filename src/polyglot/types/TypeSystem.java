@@ -161,7 +161,7 @@ public abstract class TypeSystem {
    * on type (if any).  The iterator is guaranteed to yeild methods
    * defined on subclasses before those defined on superclasses.
    **/
-  public abstract Iterator getFielsdNamed(Type type, String name);
+  public abstract Iterator getFieldsNamed(Type type, String name);
   /**
    * Requires: all type arguments are canonical.
    *
@@ -249,6 +249,11 @@ public abstract class TypeSystem {
    * This type may not correspond to a valid class.
    **/
   public abstract Type getTypeWithName(String name);
+  /**
+   * Returns a type identical to <type>, but with <dims> more array
+   * dimensions.
+   **/
+  public abstract Type extendArrayDims(Type type, int dims);
 
 }
 

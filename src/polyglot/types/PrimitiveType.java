@@ -41,6 +41,9 @@ public class PrimitiveType extends Type {
   public final boolean isPrimitive() {
     return true;
   }
+  public final boolean isCanonical() {
+    return true;
+  }
 
   public boolean equals(Object o) {
     if (! (o instanceof PrimitiveType)) return false;

@@ -19,19 +19,13 @@ import java.util.ArrayList;
  *    a list of arguments.  Such objects are used as keys for method lookup.
  **/
 public class MethodType implements Cloneable {
-  /**
-   * Requires: All references to argumentTypes will be discarded after
-   *    this constructor is called.
-   **/
   public MethodType(String methodName,
 		    List argumentTypes) {
     this.name = methodName;
-    this.argumentTypes = new TypedList(argumentTypes, Type.class, false);      
+    this.argumentTypes = TypedList.copy(argumentTypes, Type.class, false);
   }  
 
   /**
-   * Requires: All references to argumentTypes and exceptionTypes
-   *    will be discarded after this constructor is called.
    *    ExceptionTypes, returnType, and AccessFlags may be null.
    **/
   public MethodType(String methodName, 
@@ -41,11 +35,11 @@ public class MethodType implements Cloneable {
 		    AccessFlags flags) {
     this.name = methodName;
     this.returnType = returnType;
-    this.argumentTypes = new TypedList(argumentTypes,
-				       Type.class, false);
+    this.argumentTypes = TypedList.copy(argumentTypes,
+					Type.class, false);
     if (exceptionTypes != null)
-      this.exceptionTypes = new TypedList(exceptionTypes,
-					  Type.class, false);
+      this.exceptionTypes = TypedList.copy(exceptionTypes,
+					   Type.class, false);
 
     if (flags != null)
       this.flags = flags.copy();    

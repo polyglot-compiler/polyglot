@@ -22,14 +22,15 @@ public abstract class Type {
   // Methods to be filled in by subtypes.
   ////
   public abstract boolean isPrimitive();
+  public abstract boolean isCanonical();
 
   ////
   // Methods which dispatch to typeSystem
   ////
+  public final Type extendArrayDims(int dims)
+    { return ts.extendArrayDims(this,dims); }
   public final boolean isSameType(Type t)
     { return ts.isSameType(this,t); }
-  public final boolean isCanonical()
-    { return ts.isCanonical(this); }
   public final Type getCanonicalType(TypeSystem.Context context)
     { return ts.getCanonicalType(this, context); }
   public final String checkTypeOk(TypeSystem.Context context)

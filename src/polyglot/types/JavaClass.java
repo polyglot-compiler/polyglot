@@ -10,11 +10,13 @@ import java.util.List;
  * JavaClass
  *
  * Overview: 
- *    A JavaClass represents a class -- either loaded from a ClassPath, or
- *    parsed from a source file.
+ *    A JavaClass represents a class -- either loaded from a ClassPath, 
+ *    parsed from a source file, or obtained from other source.
  *
  *    The Type, Name, and Package of a class are immutable.  All other data
  *    may or may not be mutable, depending on the implementation.
+ *
+ *    This class is used to implement TypeSystem.
  **/
 public abstract class JavaClass {
   
@@ -43,8 +45,8 @@ public abstract class JavaClass {
   public abstract List getMethods();
 
   /**
-   * Returns a TypedList of MethodTypes for all the fields declared
-   * in this.  It does not return methods declared in supertypes.
+   * Returns a TypedList of FieldTypes for all the fields declared
+   * in this.  It does not return fields declared in supertypes.
    **/
   public abstract List getFields();
 
@@ -88,7 +90,7 @@ public abstract class JavaClass {
    * If this class is an inner class, return its short name, encoded
    * with the name of its containing class.
    **/
-  public abstract String getInnerName();
+  public abstract String getInnerName();  
 
   // We can't implement this with JDK 1.1, so we won't depend on it.
   //  public abstract List getInnerClasses();
