@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * An <code>AmbExpr</code> is an ambiguous AST node composed of a single
@@ -70,6 +71,13 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
 
   public String toString() {
     return name + "{amb}";
+  }
+
+  /**
+   * Visit this term in evaluation order.
+   */
+  public List acceptCFG(CFGBuilder v, List succs) {
+      return succs;
   }
 
   public void dump(CodeWriter w) {

@@ -13,6 +13,8 @@ import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
+import polyglot.visit.CFGBuilder;
+import java.util.List;
 
 /**
  * A <code>Special</code> is an immutable representation of a
@@ -118,6 +120,13 @@ public class Special_c extends Expr_c implements Special
 	else {
 	    return type(t.superType());
 	}
+    }
+
+    /**
+     * Visit this term in evaluation order.
+     */
+    public List acceptCFG(CFGBuilder v, List succs) {
+        return succs;
     }
 
     public String toString() {

@@ -32,6 +32,7 @@ import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
+import polyglot.visit.CFGBuilder;
 
 /**
  * A <code>ClassBody</code> represents the body of a class or interface
@@ -304,6 +305,13 @@ public class ClassBody_c extends Term_c implements ClassBody
             w.end();
             w.newline(0);
         }
+    }
+
+    /**
+     * Visit this term in evaluation order.
+     */
+    public List acceptCFG(CFGBuilder v, List succs) {
+        return succs;
     }
 
     private static final Collection TOPICS = 

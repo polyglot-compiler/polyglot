@@ -13,6 +13,8 @@ import polyglot.util.Position;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
+import polyglot.visit.CFGBuilder;
+import java.util.List;
 
 /** 
  * A local variable expression.
@@ -90,6 +92,13 @@ public class Local_c extends Expr_c implements Local
     return localInstance(li).type(li.type());
   }
 
+  /**
+    * Visit this term in evaluation order.
+    */
+  public List acceptCFG(CFGBuilder v, List succs) {
+      return succs;
+  }
+
   public String toString() {
     return name;
   }
@@ -116,4 +125,5 @@ public class Local_c extends Expr_c implements Local
   public Object constantValue() {
     return li.constantValue();
   }
+
 }

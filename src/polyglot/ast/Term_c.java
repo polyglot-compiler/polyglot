@@ -29,9 +29,7 @@ public abstract class Term_c extends Node_c implements Term
     /**
      * Visit this term in evaluation order.
      */
-    public List acceptCFG(CFGBuilder v, List succs) {
-        return succs;
-    }
+    public abstract List acceptCFG(CFGBuilder v, List succs);
 
     /**
      * Return true if this term is eachable.  This attribute is not
