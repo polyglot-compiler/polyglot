@@ -234,8 +234,9 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 		}
 
 		if (! throwDeclared) {
-		    throw new SemanticException("Method \"" + name +
-			"\" throws the undeclared exception \"" + t + "\".", 
+			ec.throwsSet().clear();
+			throw new SemanticException("Method \"" + name +
+			"\" throws the undeclared exception \"" + t + "\".",
 		        position());
 		}
 	    }

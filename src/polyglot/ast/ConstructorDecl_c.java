@@ -223,8 +223,9 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 		}
 
 		if (! throwDeclared) {
+			ec.throwsSet().clear();
 		    throw new SemanticException("Constructor \"" + name +
-			"\" throws the undeclared exception \"" + t + "\".", 
+			"\" throws the undeclared exception \"" + t + "\".",
 		        position());
 		}
 	    }
