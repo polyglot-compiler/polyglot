@@ -1,14 +1,16 @@
 package polyglot.visit;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Stack;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.util.Enum;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
 import polyglot.main.Report;
+import polyglot.types.*;
+import polyglot.util.Enum;
 
 /**
  * A visitor which traverses the AST and remove ambiguities found in fields,
@@ -60,13 +62,25 @@ public class AmbiguityRemover extends ContextVisitor
      * Add dependencies for the job to the super classes and interface classes
      * of <code>ct</code>.
      */
-    public void addSuperDependencies(ClassType ct) {        
+    public void addSuperDependencies(ClassType ct) {
+        // track which classtypes we've seen, since it may be the
+        // case that the class types are (incorrectly) circular. 
+        Set seen = new HashSet();    
+            
         Stack s = new Stack();
         s.push(ct);
         while (! s.isEmpty()) {
             Type t = (Type) s.pop();
             if (t.isClass()) {
                 ClassType classt = t.toClass();
+                
+                if (seen.contains(classt)) {
+                    continue;
+                }
+                else {
+                    seen.add(classt);
+                }
+                
                 // add a dependency if its a parsed class type.
                 if (classt instanceof ParsedClassType) {
                     this.job().extensionInfo().addDependencyToCurrentJob(
