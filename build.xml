@@ -668,8 +668,12 @@ ext=""
 
     <copy todir="${dist}/src/polyglot/ext/jmatch">
       <fileset dir="${src}/polyglot/ext/jmatch"
-	excludes="**/Makefile,**/tests/**,**/doc/**"/>
+	excludes="**/Makefile,**/tests/attic/**,**/doc/**"/>
     </copy>
+
+    <copy file="${basedir}/configure-jmatch.xml" tofile="${dist}/configure-jmatch.xml"/>
+    <move file="${dist}/README" tofile="${dist}/README-POLYGLOT"/>
+    <copy file="${src}/polyglot/ext/jmatch/doc/README" tofile="${dist}/README"/>
   </target>
 </project>
 
