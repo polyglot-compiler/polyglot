@@ -99,6 +99,27 @@ public class LoadedClassResolver extends ClassResolver
     this.checkSource = ! no_source_check;
   }
 
+  /** Load a type from a class file. */
+  public Type loadType(String name) throws SemanticException
+  {
+    Types.report(1, "LoadedCR.loadType(" + name + ")");
+
+    Class clazz = null;
+
+    // Now, try the class file.
+    try {
+      clazz = Class.forName(name);
+    }
+    catch (Throwable e) {
+    }
+
+    if (clazz != null) {
+      return getTypeFromClass(clazz, name);
+    }
+
+    throw new NoClassException("Class " + name + " not found.");
+  }
+
   public Type findType(String name) throws SemanticException
   {
     Types.report(1, "LoadedCR.findType(" + name + ")");

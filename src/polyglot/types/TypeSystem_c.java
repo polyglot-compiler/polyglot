@@ -4,6 +4,7 @@ import jltools.util.*;
 import jltools.types.*;
 import jltools.types.Package;
 import jltools.frontend.Job;
+import jltools.frontend.Compiler;
 
 import java.util.*;
 
@@ -15,11 +16,8 @@ import java.util.*;
  **/
 public class TypeSystem_c implements TypeSystem
 {
+    Compiler compiler;
     Resolver systemResolver;
-
-    public Resolver systemResolver() {
-      return systemResolver;
-    }
 
     public TypeSystem_c() {}
 
@@ -27,8 +25,9 @@ public class TypeSystem_c implements TypeSystem
      * Initializes the type system and its internal constants (which depend on
      * the resolver).
      */
-    public void initialize(Resolver systemResolver) throws SemanticException {
-	this.systemResolver = systemResolver;
+    public void initialize(Compiler compiler) throws SemanticException {
+	this.compiler = compiler;
+	this.systemResolver = compiler.systemResolver();
 
 	// java.lang.Object must be first.
 	OBJECT_ = (ClassType) systemResolver.findType("java.lang.Object");
@@ -45,6 +44,14 @@ public class TypeSystem_c implements TypeSystem
 	OUTOFBOUNDS_EXN_ = (ClassType) systemResolver.findType("java.lang.ArrayIndexOutOfBoundsException");
 	ARRAYSTORE_EXN_ = (ClassType) systemResolver.findType("java.lang.ArrayStoreException");
 	ARITHMETIC_EXN_ = (ClassType) systemResolver.findType("java.lang.ArithmeticException");
+    }
+
+    public Compiler compiler() {
+      return compiler;
+    }
+
+    public Resolver systemResolver() {
+      return systemResolver;
     }
 
     public String wrapperTypeString(PrimitiveType t) {

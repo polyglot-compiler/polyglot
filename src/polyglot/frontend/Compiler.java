@@ -341,6 +341,11 @@ OUTER:
     }
 
     /** Get the compiler's parsed-file resolver */
+    public LoadedClassResolver loadedResolver() {
+	return loadedResolver;
+    }
+
+    /** Get the compiler's parsed-file resolver */
     public TableResolver parsedResolver() {
 	return parsedResolver;
     }

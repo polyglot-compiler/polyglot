@@ -38,7 +38,7 @@ import java.util.*;
  * </ol>
  */
 public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
-    protected jltools.frontend.Compiler compiler;
+    protected Compiler compiler;
     protected Options options;
     protected TypeSystem ts = null;
     protected NodeFactory nf = null;
@@ -51,7 +51,7 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	this.compiler = compiler;
 
 	try {
-	    ts.initialize(compiler.systemResolver());
+	    ts.initialize(compiler);
 	}
 	catch (SemanticException e) {
 	    throw new InternalCompilerError(

@@ -3,6 +3,7 @@ package jltools.types;
 import java.util.*;
 import jltools.util.Position;
 import jltools.frontend.Job;
+import jltools.frontend.Compiler;
 
 /**
  * The <code>TypeSystem</code> defines the types of the language and
@@ -10,12 +11,15 @@ import jltools.frontend.Job;
  */
 public interface TypeSystem {
     /**
-     * Initialize the type system with the system resolver.  The resolver
-     * should be capable of loading top-level classes with fully qualified
-     * names from the class path and the source path.  This method must be
+     * Initialize the type system with the compiler.  This method must be
      * called before any other type system method is called.
      */
-    void initialize(Resolver systemResolver) throws SemanticException;
+    void initialize(Compiler compiler) throws SemanticException;
+
+    /**
+     * Return the compiler associated with this type system.
+     */
+    Compiler compiler();
 
     /**
      * Returns the system resolver.  This resolver can load top-level classes
