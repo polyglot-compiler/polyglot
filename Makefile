@@ -76,6 +76,15 @@ clean:
 	rm -f jltools/lex/*.class
 	rm -f jltools/visit/*.class
 	rm -f jltools/runtime/*.class
+	rm -f jltools/ast/*.html
+	rm -f jltools/frontend/*.html
+	rm -f jltools/parse/*.html
+	rm -f jltools/types/*.html
+	rm -f jltools/util/*.html
+	rm -f jltools/lex/*.html
+	rm -f jltools/visit/*.html
+	rm -f jltools/runtime/*.html
+
 
 # delete class files as well as the grammar files, so that we can regenerate them
 # also delete the javadoc & jar file, if they exist
