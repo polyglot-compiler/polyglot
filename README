@@ -34,9 +34,9 @@ Suppose <jltools> is the absolute path of your JLtools installation directory.
 -- Add "<jltools>/bin" to your PATH environment variable or copy all the files
 in "<jltools>/bin" to a directory in PATH.
 
--- Check your LD_LIBRARY_PATH environment variable on Unix systems, and your
-PATH environment variable on Windows systems. Make sure the value contains
-<jltools>/lib.
+-- [Jif only] Check your LD_LIBRARY_PATH environment variable on Unix systems,
+and your PATH environment variable on Windows systems. Make sure the value
+contains <jltools>/lib.
 
 -- Update your CLASSPATH environment variable.
 
@@ -48,7 +48,7 @@ On Windows, do:
 
     set CLASSPATH=%CLASSPATH%;<jltools>\lib\jltools.jar;<jltools>\lib\jif.jar;<jltools>\lib\java_cup.jar
 
-3. Test Jif compiler
+3. [Jif only] Test Jif compiler
 
 First, you need to create some principals. In Jif, principals are represented
 by classes in the jif.principal package. Suppose <foo> is the directory you
@@ -126,3 +126,30 @@ indirect or consequential damages or any damages whatsoever resulting from
 loss of use, data or profits, whether in an action of contract, negligence or
 other tortious action, arising out of or in connection with the use or
 performance of this software.
+
+
+
+Some of the class file parsing code in jltools/types/reflect is derived
+from the BLOAT bytecode optimizer.
+-----------------------------------------------------------------------
+
+All files in the distribution of BLOAT (Bytecode Level Optimization
+and Analysis tool for Java(tm)) are Copyright 1997-2001 by the Purdue
+Research Foundation of Purdue University.  All rights reserved.
+
+Redistribution and use in source and binary forms are permitted
+provided that this entire copyright notice is duplicated in all such
+copies, and that any documentation, announcements, and other materials
+related to such distribution and use acknowledge that the software was
+developed at Purdue University, West Lafayette, IN by Antony Hosking,
+David Whitlock, and Nathaniel Nystrom.  No charge may be made for
+copies, derivations, or distributions of this material without the
+express written consent of the copyright holder.  Neither the name of
+the University nor the name of the author may be used to endorse or
+promote products derived from this material without specific prior
+written permission.  THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR ANY PARTICULAR
+PURPOSE.
+
+Java is a trademark of Sun Microsystems, Inc.
