@@ -79,6 +79,9 @@ public class ReachChecker extends DataFlow
     }
     
     public Term post(FlowGraph graph, Term root) throws SemanticException {
+        // A node is reachable if any peer is reachable; not all
+        // peers need be.  Go through every path map to check that at
+        // least one peer is reachable.
         MAPS:
         for (Iterator i = graph.pathMaps().iterator(); i.hasNext(); ) {
             Map m = (Map) i.next();
@@ -92,16 +95,21 @@ public class ReachChecker extends DataFlow
             // Check that some path to a node makes the node reachable.
             for (Iterator j = m.values().iterator(); j.hasNext(); ) {
                 FlowGraph.Peer p = (FlowGraph.Peer) j.next();
+
+                if (n != null && n != p.node) {
+                    throw new InternalCompilerError("");
+                }
+
                 n = p.node;
 
                 if (p.outItems != null) {
-                    for (Iterator k = p.outItems.values().iterator(); k.hasNext(); ) {
-                        DataFlowItem item = (DataFlowItem) k.next();
+                  for (Iterator k = p.outItems.values().iterator(); k.hasNext(); ) {
+                      DataFlowItem item = (DataFlowItem) k.next();
 
-                        if (item != null && item.reachable) {
-                            continue MAPS;
-                        }                    
-                    }
+                      if (item != null && item.reachable) {
+                          continue MAPS;
+                      }                    
+                  }
                 }
             }
 

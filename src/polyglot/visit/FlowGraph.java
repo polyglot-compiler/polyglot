@@ -7,17 +7,24 @@ import java.util.*;
 
 public class FlowGraph {
   /**
-   * Maps from AST nodes to <code>Peer</code>s that represent occurances of the
-   * AST node in the flow graph. In particular, <code>peerMap</code> maps
-   * <code>IdentityKey(Node)</code>s to path maps. A path map is a map from
-   * paths (<code>ListKey(List of Terms)</code>) to <code>Peer</code>s. 
-   * In particular, if <code>n</code> is an AST node, and <code>n</code> occurs
-   * in a finally block, then there will be a <code>Peer</code> of 
-   * <code>n</code> for each possible path to the finally block, and the 
-   * path map records which <code>Peer</code> corresponds to which path. If 
-   * <code>n</code> does not occur in a finally block, then the path map should
-   * have only a single entry, from an empty list to the unique 
-   * <code>Peer</code> for <code>n</code>.
+   * Maps from AST nodes to path maps and hence to <code>Peer</code>s
+   * that represent occurrences of the
+   * AST node in the flow graph.  In particular, <code>peerMap</code>
+   * maps <code>IdentityKey(Node)</code>s to path maps.  A path map is a
+   * map from paths (<code>ListKey(List of Terms)</code>) to
+   * <code>Peer</code>s.  In particular, if <code>n</code> is an AST
+   * node in a finally block, then there will be a <code>Peer</code> of
+   * <code>n</code> for each possible path to the finally block, and the
+   * path map records which <code>Peer</code> corresponds to which path.
+   * If <code>n</code> does not occur in a finally block, then the path
+   * map should have only a single entry, from an empty list to the
+   * unique <code>Peer</code> for <code>n</code>.
+   *
+   * <p>
+   * <b>WARNING</b>: the AST must be a tree, not a DAG.  Otherwise the
+   * same peer may be used for a node that appears at multiple points in
+   * the AST.  These points may have different data flows.
+   * </p>
    */  
   protected Map peerMap;
   
