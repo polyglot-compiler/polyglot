@@ -82,12 +82,6 @@ public class Special_c extends Expr_c implements Special
         TypeSystem ts = tc.typeSystem();
         Context c = tc.context();
 
-        if (c.isStaticContext()) {
-            throw new SemanticException("Cannot access a non-static " +
-                "field or method, or refer to \"this\" or \"super\" " + 
-                "from a static context.",  this.position());
-        }
-
         ClassType t;
         if (qualifier == null) {
             // an unqualified "this" or "super"
@@ -109,6 +103,13 @@ public class Special_c extends Expr_c implements Special
                             t + "\".", qualifier.position());
             }
 	}
+
+        if (c.isStaticContext() && ts.equals(t, c.currentClass())) {
+            // trying to access "this" or "super" from a static context.
+            throw new SemanticException("Cannot access a non-static " +
+                "field or method, or refer to \"this\" or \"super\" " + 
+                "from a static context.",  this.position());
+        }
 
 	if (kind == THIS) {
 	    return type(t);
