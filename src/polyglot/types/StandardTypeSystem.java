@@ -389,8 +389,8 @@ public class StandardTypeSystem extends TypeSystem {
 
   public boolean isEnclosed(ClassType tInner, ClassType tOuter)
   {
-    ClassType ct; 
-    while ( (ct = tInner.getContainingClass()) != null &&
+    ClassType ct = tInner; 
+    while ( (ct = ct.getContainingClass()) != null &&
             ! ct.equals(tOuter));
     return ct != null;
   }
