@@ -24,7 +24,9 @@ import polyglot.util.InternalCompilerError;
 public class ReachChecker extends DataFlow
 {
     public ReachChecker(Job job, TypeSystem ts, NodeFactory nf) {
-	super(job, ts, nf, true /* forward analysis */);
+	super(job, ts, nf, 
+              true /* forward analysis */, 
+              true /* perform dataflow on entry to CodeDecls */);
     }
 
     public Item createInitialItem(FlowGraph graph) {
@@ -86,48 +88,48 @@ public class ReachChecker extends DataFlow
 
     protected Node checkReachability(Term n) throws SemanticException {
         FlowGraph g = currentFlowGraph();
-            
-        Collection peers = g.peers(n);
-        if (!peers.isEmpty()) {
-            for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
-                FlowGraph.Peer p = (FlowGraph.Peer) iter.next();
-    
-                // the peer is reachable if at least one of it's out items
-                // is reachable. This would cover all cases, except that some
-                // peers may have no successors (e.g. peers that throw an
-                // an exception that is not caught by the method). So we need 
-                // to also check the inItem.
-                if (p.inItem != null && ((DataFlowItem)p.inItem).reachable) {
-                    return n.reachable(true);                
-                }
-                
-                if (p.outItems != null) {
-                    for (Iterator k = p.outItems.values().iterator(); k.hasNext(); ) {
-                        DataFlowItem item = (DataFlowItem) k.next();
+        if (g != null) {   
+            Collection peers = g.peers(n);
+            if (peers != null && !peers.isEmpty()) {
+                for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
+                    FlowGraph.Peer p = (FlowGraph.Peer) iter.next();
+        
+                    // the peer is reachable if at least one of it's out items
+                    // is reachable. This would cover all cases, except that some
+                    // peers may have no successors (e.g. peers that throw an
+                    // an exception that is not caught by the method). So we need 
+                    // to also check the inItem.
+                    if (p.inItem != null && ((DataFlowItem)p.inItem).reachable) {
+                        return n.reachable(true);                
+                    }
                     
-                        if (item != null && item.reachable) {
-                            // n is reachable.
-                            return n.reachable(true);
-                        }                    
+                    if (p.outItems != null) {
+                        for (Iterator k = p.outItems.values().iterator(); k.hasNext(); ) {
+                            DataFlowItem item = (DataFlowItem) k.next();
+                        
+                            if (item != null && item.reachable) {
+                                // n is reachable.
+                                return n.reachable(true);
+                            }                    
+                        }
                     }
                 }
+                
+                // if we fall through to here, then no peer for n was reachable.
+                n = n.reachable(false);
+                
+                // Compound statements are allowed to be unreachable
+                // (e.g., "{ // return; }" or "while (true) S").  If a compound
+                // statement is truly unreachable, one of its sub-statements will
+                // be also and we will report an error there.
+    
+                if ((n instanceof Block && ((Block) n).statements().isEmpty()) ||
+                    (n instanceof Stmt && ! (n instanceof CompoundStmt))) {
+                    throw new SemanticException("Unreachable statement.",
+                                                n.position());
+                }
             }
-            
-            // if we fall through to here, then no peer for n was reachable.
-            n = n.reachable(false);
-            
-            // Compound statements are allowed to be unreachable
-            // (e.g., "{ // return; }" or "while (true) S").  If a compound
-            // statement is truly unreachable, one of its sub-statements will
-            // be also and we will report an error there.
-
-            if ((n instanceof Block && ((Block) n).statements().isEmpty()) ||
-                (n instanceof Stmt && ! (n instanceof CompoundStmt))) {
-                throw new SemanticException("Unreachable statement.",
-                                            n.position());
-            }
-        }
-        
+        }        
         return n;
     }
     

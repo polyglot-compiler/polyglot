@@ -32,14 +32,26 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     /**
      * Is this dataflow a forward analysis?
      */
-    protected boolean forward;
-
+    protected final boolean forward;
+    
+    /**
+     * Should the dataflow be performed on entering a <code>CodeDecl</code>, 
+     * or on leaving a <code>CodeDecl</code>? If dataflow is performed on 
+     * entry, then the control flow graph will be available when visiting 
+     * children of the <code>CodeDecl</code>, via the 
+     * <code>currentFlowGraph</code> method. If dataflow is performed on 
+     * leaving, then the control flow graph will not be available, but 
+     * nested <code>CodeDecl</code>s will have already been processed.
+     */
+    protected final boolean dataflowOnEntry;
+    
     /**
      * A stack of <code>FlowGraphSource</code>. The flow graph is constructed 
      * upon entering a CodeDecl AST node, and dataflow performed on that flow 
      * graph immediately. The flow graph is available during the visiting of 
      * children of the CodeDecl, if subclasses want to use this information
-     * to update AST nodes.
+     * to update AST nodes. The stack is only maintained if 
+     * <code>dataflowOnEntry</code> is true.
      */
     protected LinkedList flowgraphStack;
     
@@ -56,9 +68,24 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * Constructor.
      */
     public DataFlow(Job job, TypeSystem ts, NodeFactory nf, boolean forward) {
-	super(job, ts, nf);
+        this(job, ts, nf, forward, false);
+    }
+
+    /**
+     * Constructor.
+     */
+    public DataFlow(Job job, 
+                    TypeSystem ts, 
+                    NodeFactory nf, 
+                    boolean forward, 
+                    boolean dataflowOnEntry) {
+        super(job, ts, nf);
         this.forward = forward;
-        this.flowgraphStack = new LinkedList();
+        this.dataflowOnEntry = dataflowOnEntry;
+        if (dataflowOnEntry)
+            this.flowgraphStack = new LinkedList();
+        else 
+            this.flowgraphStack = null;
     }
 
     /**
@@ -128,7 +155,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * <code>dataflow(FlowGraph)</code>. Is also responsible for calling 
      * <code>post(FlowGraph, Block)</code> after
      * <code>dataflow(FlowGraph)</code> has been called, and for pushing
-     * the <code>FlowGraph</code> onto the stack of <code>FlowGraph</code>s.
+     * the <code>FlowGraph</code> onto the stack of <code>FlowGraph</code>s if
+     * dataflow analysis is performed on entry to <code>CodeDecl</code> nodes.
      */
     protected void dataflow(CodeDecl cd) throws SemanticException {
         // only bother to do the flow analysis if the body is not null...
@@ -145,8 +173,9 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 
                 post(g, cd);
 
-                // push the CFG onto the stack
-                flowgraphStack.addFirst(new FlowGraphSource(g, cd));
+                // push the CFG onto the stack if we are dataflowing on entry
+                if (dataflowOnEntry)
+                    flowgraphStack.addFirst(new FlowGraphSource(g, cd));
             }
         }
     } 
@@ -252,7 +281,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * analysis, and check the analysis for CodeDecl nodes.
      */
     protected NodeVisitor enterCall(Node n) throws SemanticException {
-        if (n instanceof CodeDecl) {
+        if (dataflowOnEntry && n instanceof CodeDecl) {
             dataflow((CodeDecl)n);
         }
         
@@ -264,15 +293,19 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * <code>FlowGraph</code>s if necessary.
      */
     protected Node leaveCall(Node n) throws SemanticException {
-        if (n instanceof CodeDecl && !flowgraphStack.isEmpty()) {
-            FlowGraphSource fgs = (FlowGraphSource)flowgraphStack.getFirst();
-            if (fgs.source.equals(n)) {
-                // we are leaving the code decl that pushed this flowgraph 
-                // on the stack. pop tbe stack.
-                flowgraphStack.removeFirst();
+        if (n instanceof CodeDecl) {
+            if (!dataflowOnEntry) {
+                dataflow((CodeDecl)n);
             }
-        }
-
+            else if (dataflowOnEntry && !flowgraphStack.isEmpty()) {
+                FlowGraphSource fgs = (FlowGraphSource)flowgraphStack.getFirst();
+                if (fgs.source.equals(n)) {
+                    // we are leaving the code decl that pushed this flowgraph 
+                    // on the stack. pop tbe stack.
+                    flowgraphStack.removeFirst();
+                }
+            }
+        }        
         return n;
     }
 
@@ -313,7 +346,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
     
     /**
-     * Return the <code>FlowGraph</code> at the top of the stack. If this 
+     * Return the <code>FlowGraph</code> at the top of the stack. This method
+     * should not be called if dataflow is not being performed on entry to
+     * the <code>CodeDecl</code>s, as the stack is not maintained in that case.
+     * If this 
      * method is called by a subclass from the <code>enterCall</code> 
      * or <code>leaveCall</code> methods, for an AST node that is a child
      * of a <code>CodeDecl</code>, then the <code>FlowGraph</code> returned 
@@ -321,6 +357,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * <code>CodeDecl</code>.
      */
     protected FlowGraph currentFlowGraph() {
+        if (!dataflowOnEntry) {
+            throw new InternalCompilerError("currentFlowGraph() cannot be" +
+                " called when dataflow is not performed on entry");
+        }
         if (flowgraphStack.isEmpty()) {
             return null;
         }
