@@ -44,9 +44,7 @@ public class NullType_c extends Type_c implements NullType
     }
 
     public boolean isImplicitCastValidImpl(Type toType) {
-        if (toType.isNull()) return false;
-        if (toType.isReference()) return true;
-        return false;
+        return toType.isNull() || toType.isReference();
     }
 
     /**
@@ -56,8 +54,6 @@ public class NullType_c extends Type_c implements NullType
      * words, some non-null members of this are also members of toType.
      **/
     public boolean isCastValidImpl(Type toType) {
-	if (toType.isNull()) return false;
-	if (toType.isReference()) return true;
-        return false;
+        return toType.isNull() || toType.isReference();
     }
 }
