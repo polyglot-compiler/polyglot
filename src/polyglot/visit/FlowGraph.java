@@ -219,10 +219,10 @@ public class FlowGraph {
           this.key = key;
           this.target = target;
       }
-      protected EdgeKey getKey() {
+      public EdgeKey getKey() {
           return key;
       }
-      protected Peer getTarget() {
+      public Peer getTarget() {
           return target;
       }
       protected EdgeKey key;
