@@ -6,6 +6,7 @@ import java.util.Stack;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
+import polyglot.util.Enum;
 import polyglot.frontend.Job;
 import polyglot.main.Report;
 
