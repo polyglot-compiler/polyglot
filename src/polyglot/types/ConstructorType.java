@@ -18,16 +18,7 @@ import java.util.List;
  *    lookup.
  **/
 public class ConstructorType extends MethodType {
-  public ConstructorType(List argumentTypes) {
-    super("[Constructor]", argumentTypes);
-  }
-
-  /**
-   *    ExceptionTypes and AccessFlags may be null.
-   **/
-  public ConstructorType(List argumentTypes,
-			 List exceptionTypes,
-			 AccessFlags flags) {
-    super("[Constructor]", null, argumentTypes, exceptionTypes, flags);
+  public ConstructorType(TypeSystem ts, List argumentTypes) {
+    super(ts, "[Constructor]", argumentTypes);
   }
 }

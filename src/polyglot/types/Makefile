@@ -3,11 +3,9 @@ tp_package	= jltools/types
 tp_codebase	= ../..
 tp_files 	= AccessFlags.java	\
 			ArrayType.java  \
-			ClassContext.java \
 			ClassResolver.java \
 			ClassType.java \
-#			ConstructorType.java \
-			Context.java \
+			ConstructorType.java \
 			FieldInstance.java \
 			ImportTable.java \
 			JavaClass.java \

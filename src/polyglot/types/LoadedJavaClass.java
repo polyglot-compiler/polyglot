@@ -118,7 +118,7 @@ public class LoadedJavaClass extends JavaClassImpl {
       excpList.add(ts.typeForClass(excpns[idx]));
     }
 
-    return new ConstructorType(argList, excpList, flags);
+    return new ConstructorTypeInstance(ts, argList, excpList, flags);
   }
 
 }

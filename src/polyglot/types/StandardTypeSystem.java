@@ -458,8 +458,14 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * defined on subclasses before those defined on superclasses.
    **/
   public Iterator getFieldsForType(Type type) {
-    JavaClass class_ = classForType(type);
-    // TODO
+    if (! type.isCanonical() )
+      throw new TypeCheckError("Type: \"" + type + "\" not a canoncial type.");
+    
+    JavaClass class_ = getClassForType(type);
+    
+    
+    // FIXME: TODO
+    return null;
   }
 
   /**
@@ -509,16 +515,21 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * defined on subclasses before those defined on superclasses.
    **/  
   // FIXME
-  //public Iterator getMethodsNamed(Type type, String name);
-  public abstract Iterator getMethodsNamed(Type type, String name);
+  public Iterator getMethodsNamed(Type type, String name)
+  {
+    return null;
+  }
+
   /**
    * Requires: all type arguments are canonical.
    *
    * Returns the supertype of type, or null if type has no supertype.
    **/
   // FIXME
-  //public Type getSuperType(Type type);
-  public abstract Type getSuperType(Type type);
+  public Type getSuperType(Type type)
+  {
+    return null;
+  }
 
   /**
    * Requires: all type arguments are canonical.
@@ -527,9 +538,12 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * implements.
    **/
   // FIXME
-  //public List getInterfaces(Type type);
-  public abstract List getInterfaces(Type type);
+  public List getInterfaces(Type type)
+  {
+    return null;
+  }
 
+  
 
   ////
   // Functions for method testing.
@@ -570,9 +584,11 @@ public abstract class StandardTypeSystem extends TypeSystem {
    * (Guavac gets this wrong.)
    **/
   // FIXME
-  //public MethodMatch getMethod(Type type, MethodType method, 
-  public abstract MethodMatch getMethod(Type type, MethodType method, 
-					Context context, boolean isThis);
+  public MethodMatch getMethod(Type type, MethodType method, 
+					Context context, boolean isThis)
+  {
+    return null;
+  }
 
   /**
    * If an attempt to call a method of type <method> on <type> would

@@ -1,22 +1,43 @@
 
 package jltools.types;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * A context to be used within the scope of a method body.  
  */
-public class LocalContext implements Context
+public class LocalContext 
 {
-  Context cParent;
+  LocalContext lcParent;
+  TypeSystem ts;
+  ImportTable itImports;
+  Type tEnclosingClass;
   Hashtable htLocalVariables;
 
   /**
    * Creates a LocalContext with a parent context. We refer to the parent
    * whenever the symbol is not found locally.
    */
-  public LocalContext( Context cParent)
+  public LocalContext( LocalContext lcParent)
   {
-    this.cParent = cParent;
+    this.lcParent = lcParent;
+    this.itImports = null;
+    this.ts = null;
+    this.tEnclosingClass = null;
+    htLocalVariables = new Hashtable();
+  }
+
+  /** 
+   * Creates a LocalContext without a parent context (i.e, for a method level
+   * block).  All unresolved queries are passed on to the TypeSystem.  To do this, 
+   * we'll also need the import table and what our enclosing class is.
+   */
+  public LocalContext ( ImportTable itImports, Type tEnclosingClass, TypeSystem ts)
+  {  
+    this.lcParent = null;
+    this.itImports = itImports;
+    this.tEnclosingClass = tEnclosingClass;
+    this.ts = ts;
     htLocalVariables = new Hashtable();
   }
 
@@ -24,11 +45,26 @@ public class LocalContext implements Context
    * Finds the type of a particular string within a context. If it is not found
    * in this context, checks the parent context.
    */
-  public TypeInstance lookup(String s) throws TypeCheckError
+  public Type lookup(String s) throws TypeCheckError
   {
-    TypeInstance t = (TypeInstance)htLocalVariables.get(s);
+    Type t = (Type)htLocalVariables.get(s);
     
-    return (t != (TypeInstance)null ? t : cParent.lookup(s));
+    if ( t != null ) 
+      return t;
+    
+    if (lcParent != null)
+      return lcParent.lookup(s);
+    
+    if (ts != null)
+    {
+      // FIXME: properly figure out if it's canonical or not 
+      Object o =  ts.checkAndResolveType( new ClassType ( ts, s, true) , 
+                                 new TypeSystem.Context ( itImports, tEnclosingClass , null));
+      if (o instanceof Type)
+        return (Type)o;
+      throw new TypeCheckError((String)o);
+    }
+    return null;
   }
   
   /**
@@ -39,12 +75,30 @@ public class LocalContext implements Context
   {
     boolean b = htLocalVariables.contains(s);
     
-    return (  ( b || cParent instanceof ClassContext) ? 
-              b : cParent.isDefinedLocally(s));
+    return (  ( b || lcParent != null) ? 
+              b : lcParent.isDefinedLocally(s));
   }
 
   /**
-   * Adds a scoping "level" by createing a new LocalContext.
+   * Gets the methodMatch with  name with "name" and a list of argument types "argumentTypes"
+   * against Type "type".
+   */
+  public TypeSystem.MethodMatch getMethod( Type type, String methodName, List argumentTypes)
+  {
+    //FIXME: implement
+    return null;
+  }
+
+  /**
+   * Gets the MethodMatch with a possibly ambiguous name "name" and list of "argumentTypes"
+   */
+  public TypeSystem.MethodMatch getMethod( String methodName, List argumentTypes)
+  {
+    return null;
+  }
+  
+  /**
+   * Returns a new LocalContext with an additional scoping level.
    */
   public LocalContext pushScope()
   {
@@ -56,15 +110,15 @@ public class LocalContext implements Context
    */
   public LocalContext popScope()
   {
-    if (cParent instanceof LocalContext)
-      return (LocalContext) cParent;
+    if (lcParent != null)
+      return  lcParent;
     return this;
   }
 
   /**
    * Adds a symbol to the current scoping level
    */
-  public void addSymbol( String sName, TypeInstance t)
+  public void addSymbol( String sName, Type t)
   {
     htLocalVariables.put(sName, t);
   }
