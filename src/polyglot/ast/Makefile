@@ -31,6 +31,7 @@ SOURCES = \
 	Conditional.java \
 	ConstructorCall.java \
 	ConstructorDecl.java \
+	Declarator.java \
 	Do.java \
 	Empty.java \
 	Eval.java \
