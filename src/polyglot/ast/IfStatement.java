@@ -109,8 +109,11 @@ public class IfStatement extends Statement
     then.translate_substmt(c, w);
 
     if ( else_ != null) {
-      w.allowBreak(0, " ");
-      w.write ( "else ");
+      if (then instanceof BlockStatement) // allow the "} else {" formatting
+	w.write(" ");
+      else
+	w.allowBreak(0, " ");
+      w.write ( "else");
       else_.translate_substmt(c, w);
     }
   }
