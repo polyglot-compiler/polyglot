@@ -7,7 +7,7 @@ import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
 import jltools.main.Options;
-import jltools.main.Main;
+import jltools.main.Report;
 
 import java.io.*;
 import java.util.*;
@@ -423,7 +423,7 @@ public class Compiler
     }
 
     public static void report(int level, String msg) {
-	Main.report(topics, level, msg);
+	Report.report(topics, level, msg);
     }
 
     static {

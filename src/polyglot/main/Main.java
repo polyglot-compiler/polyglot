@@ -15,14 +15,6 @@ import java.util.*;
  */
 public class Main
 {
-  /** A collection of string names of topics which can be used with the
-      -report command-line switch */
-  public static Collection report_topics = new HashSet();
-
-  /** Compiler options. Access to compiler options via the Compiler object,
-      rather than through this static variable, is encouraged for future
-      extensibility. */
-  public static Options options = new Options();
 
   /** Source files specified on the command line */
   private static Set source;
@@ -33,6 +25,7 @@ public class Main
   public static final void main(String args[])
   {
     source = new HashSet();
+    Options options = Options.global;
     
     parseCommandLine(args, options, source);
 
@@ -41,7 +34,7 @@ public class Main
     String targetName = null;
     if (!compiler.compile(source)) System.exit(1);
 
-    Main.report(null, 1, "Output files: " + compiler.outputFiles());
+    Report.report(null, 1, "Output files: " + compiler.outputFiles());
 
     /* Now call javac or jikes, if necessary. */
     if (options.post_compiler != null && !options.output_stdout) {
@@ -57,7 +50,7 @@ public class Main
 	  + System.getProperty("java.class.path") + " "
 	  + outfile;
 	
-	report(null, 1, "Executing post-compiler " + command);
+	Report.report(null, 1, "Executing post-compiler " + command);
 	
 	try 
 	{
@@ -86,45 +79,6 @@ public class Main
     }
   }
 
-  /**
-   * Return whether a message on <code>topics</code> of obscurity
-   * <code>level</code> should be reported, based on the command-line
-   * switches given by the user. This method is occasionally useful
-   * when the computation of the message to be reported is expensive.
-   */
-  public static boolean should_report(Collection topics, int level) {
-    if (topics == null) {
-      Object lvo = options.report.get("verbose");
-      if (lvo != null && ((Integer) lvo).intValue() >= level) {
-	return true;
-      }
-    } else {
-	for (Iterator i = topics.iterator(); i.hasNext();) {
-	    String topic = (String) i.next();
-	    Object lvo = options.report.get(topic);
-	    if (lvo != null && ((Integer) lvo).intValue() >= level) {
-		return true;
-	    }
-	}
-    }
-    return false;
-  }
-
-  /** This is the standard way to report debugging information in the
-   *  compiler.  It conditionally reports a message if it is related to
-   *  one of the specified topics. The variable <code>topics</code> is a
-   *  collection of strings.  The obscurity of the message is indicated
-   *  by <code>level</code>.  The message is reported only if the user
-   *  has requested (via the -report command-line option) that messages
-   *  of that obscurity be reported for one of the specified topics.
-   */
-  public static void report(Collection topics, int level, String message) {
-    if (should_report(topics,level)) {
-	for (int j = 1; j < level; j++) System.err.print("  ");
-	System.err.println(message);
-    }
-  }
-
   static final void loadExtension(String ext) {
     if (ext != null && ! ext.equals("")) {
       String extClassName = "jltools.ext." + ext + ".ExtensionInfo";
@@ -142,7 +96,7 @@ public class Main
       }
 
       try {
-	options.extension = (ExtensionInfo) extClass.newInstance();
+	Options.global.extension = (ExtensionInfo) extClass.newInstance();
       }
       catch (ClassCastException e) {
 	System.err.println(ext + " is not a valid jltools extension:" +
@@ -161,14 +115,14 @@ public class Main
   static final void parseCommandLine(String args[], Options options, Set source)
   {
     if(args.length < 1) {
-      usage();
+      options.usage();
       System.exit(1);
     }
 
     for(int i = 0; i < args.length; )
     {
       if (args[i].equals("-h")) {
-        usage();
+        options.usage();
         System.exit(0);
       }
       else if (args[i].equals("-version")) {
@@ -284,7 +238,7 @@ public class Main
 	    }
 	    catch (UsageError u) {
 		System.err.println(u.getMessage());
-		usage();
+		options.usage();
 		System.exit(1);
 	    }
 	} 
@@ -306,7 +260,7 @@ public class Main
     if (source.size() < 1) {
       System.err.println(compilerName()
                           + ": must specify at least one source file");
-      usage();
+      options.usage();
       System.exit(1);
     }
 
@@ -316,48 +270,14 @@ public class Main
 	}
 	catch (UsageError u) {
 	    System.err.println(u.getMessage());
-	    usage();
+	    options.usage();
 	    System.exit(1);
 	}
     }
   }
 
-  private static String compilerName() {
-    if (options.extension == null) return "jlc";
-      else return options.extension.compilerName();
+  static String compilerName() {
+    return Options.global.extension.compilerName();
   }
 
-  private static void usage()
-  {
-    String fileext, compilerName;
-    fileext = options.extension.fileExtension();
-
-    System.err.println("usage: " + compilerName() + " [options] " +
-                        "<source-file>." + fileext + " ...\n");
-    System.err.println("where [options] includes:");
-    System.err.println(" -d <directory>          output directory");
-    System.err.println(" -sourcepath <path list> source path");
-    System.err.println(" -fqcn                   use fully-qualified class"
-                        + " names");
-    System.err.println(" -sx <ext>               set source extension");
-    System.err.println(" -ox <ext>               set output extension");
-    System.err.println(" -dump                   dump the ast");
-    System.err.println(" -scramble [seed]        scramble the ast");
-    System.err.println(" -noserial               disable class"
-                        + " serialization");
-    System.err.println(" -ext <extension>        use language extension");
-    System.err.println(" -c                      compile only to .java");
-    System.err.println(" -post <compiler>        run javac-like compiler" 
-                        + " after translation");
-    System.err.println(" -v -verbose             print verbose " 
-                        + "debugging information");
-    System.err.println(" -report <topic>=<level> print verbose debugging" +
-                        " information about topic\n" +
-			"                         at specified verbosity");
-    System.err.println("   (Allowed topics: "+report_topics+")");
-    System.err.println(" -version                print version info");
-    System.err.println(" -h                      print this message");
-    System.err.println();
-    System.err.println(options.extension.options());
-  }
 }

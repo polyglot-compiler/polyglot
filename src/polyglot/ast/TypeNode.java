@@ -6,6 +6,7 @@ import jltools.util.*;
 import jltools.types.*;
 import jltools.visit.*;
 import jltools.main.Main;
+import jltools.main.Report;
 
 import java.io.IOException;
 

@@ -4,7 +4,7 @@ import jltools.frontend.*;
 import jltools.ast.Node;
 import jltools.visit.ClassSerializer;
 import jltools.util.*;
-import jltools.main.Main;
+import jltools.main.Report;
 
 import java.io.*;
 import java.util.*;

@@ -9,6 +9,7 @@ include $(SOURCE)/Defs.mk
 
 .SUFFIXES: .class .java
 
+CC			= gcc
 JC_FLAGS 		= -g -d $(OUTPUT) $(JAVAC_PATHS)
 RMIC_FLAGS		= -d $(OUTPUT) -classpath $(CLASSPATH)
 
@@ -32,6 +33,9 @@ $(PACKAGEPATH)/%.class: %.java
 
 cleanclasses:
 	-rm -f $(PACKAGEPATH)/*.class
+
+classpath:
+	@echo "setenv CLASSPATH $(CLASSPATH)"
 
 define subdirs
 @for i in $(SUBDIRS) ""; do \

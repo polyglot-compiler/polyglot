@@ -10,6 +10,11 @@ import jltools.frontend.StandardExtensionInfo;
 /** This object encapsulates various jltools options. Extensions to
     jltools must define their own objects for encapsulating options. */
 public final class Options {
+  /** The global object containing compiler options.  Access to compiler
+      options via the Compiler object, rather than through this static
+      variable, is encouraged for future extensibility. */
+  public static Options global = new Options();
+
   public Collection source_path; // List[String]
   public File output_directory;
   public String source_ext = null; // e.g., java, jl, pj
@@ -28,6 +33,12 @@ public final class Options {
      // The extension information
 
   public static Map report = new HashMap(); // Map[String, Integer]
+
+  public int level(String name) {
+    Object i = report.get(name);
+    if (i == null) return 0;
+    else return ((Integer)i).intValue();
+  }
 
 /** Initialization of defaults */
   {
@@ -58,5 +69,37 @@ public final class Options {
 	post_compiler = "javac";
       }
     }
+  }
+
+  public void usage() {
+    String fileext = extension.fileExtension();
+
+    System.err.println("usage: " + extension.compilerName() + " [options] " +
+                        "<source-file>." + fileext + " ...\n");
+    System.err.println("where [options] includes:");
+    System.err.println(" -d <directory>          output directory");
+    System.err.println(" -sourcepath <path list> source path");
+    System.err.println(" -fqcn                   use fully-qualified class"
+                        + " names");
+    System.err.println(" -sx <ext>               set source extension");
+    System.err.println(" -ox <ext>               set output extension");
+    System.err.println(" -dump                   dump the ast");
+    System.err.println(" -scramble [seed]        scramble the ast");
+    System.err.println(" -noserial               disable class"
+                        + " serialization");
+    System.err.println(" -ext <extension>        use language extension");
+    System.err.println(" -c                      compile only to .java");
+    System.err.println(" -post <compiler>        run javac-like compiler" 
+                        + " after translation");
+    System.err.println(" -v -verbose             print verbose " 
+                        + "debugging information");
+    System.err.println(" -report <topic>=<level> print verbose debugging" +
+                        " information about topic\n" +
+			"                         at specified verbosity");
+    System.err.println("   (Allowed topics: " + Report.topics + ")");
+    System.err.println(" -version                print version info");
+    System.err.println(" -h                      print this message");
+    System.err.println();
+    System.err.println(extension.options());
   }
 }

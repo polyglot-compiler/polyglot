@@ -4,7 +4,7 @@ import jltools.ast.*;
 import jltools.frontend.*;
 import jltools.types.*;
 import jltools.util.*;
-import jltools.main.Main;
+import jltools.main.Report;
 
 import java.io.*;
 import java.util.*;

@@ -342,6 +342,6 @@ public abstract class TypeSystem {
   public static void report(int level, String msg) {
     Collection c = new ArrayList(1);
     c.add("types");
-    jltools.main.Main.report(c, level, msg);
+    jltools.main.Report.report(c, level, msg);
   }
 }

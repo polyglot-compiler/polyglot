@@ -4,9 +4,7 @@ import jltools.ast.*;
 import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
-import jltools.main.UsageError;
-import jltools.main.Options;
-import jltools.main.Main;
+import jltools.main.*;
 
 import java.io.*;
 import java.util.*;
@@ -221,7 +219,7 @@ public class StandardExtensionInfo implements ExtensionInfo {
 	throw new InternalCompilerError("No pass with ID " + key);
     }
 
-    static { Main.report_topics.add("verbose"); }
-    static { Main.report_topics.add("types"); }
-    static { Main.report_topics.add("frontend"); }
+    static { Report.topics.add("verbose"); }
+    static { Report.topics.add("types"); }
+    static { Report.topics.add("frontend"); }
 }
