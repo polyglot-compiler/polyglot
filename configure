@@ -182,16 +182,18 @@ fi
 echo "Setting up javadoc parameters"
 
 # Get a list of all the packages we're building to feed to javadoc.
-source_dirs=`find ${src}polyglot -name ext -prune -o -name \*.java -exec dirname {} \; | sort -u`
+source_dirs=""
+
+find ${src}polyglot/ext -name \*.java | sed -e 's%/[^/]*$%%g' | \
+    egrep -v '\<tests?\>' | sort -u > /tmp/pkg.$$
 
 for e in jl ${ext}
 do
-    s=`find ${src}polyglot/ext/$e -name \*.java -exec dirname {} \; | sort -u`
-    source_dirs="$source_dirs $s"
+  s=`grep "^${src}polyglot/ext/$e" /tmp/pkg.$$`
+  source_dirs="$source_dirs $s"
 done
 
-# Eliminate test directories
-source_dirs=`for d in $source_dirs; do echo $d; done | egrep -v '\<tests?\>'`
+rm -f /tmp/pkg.$$
 
 packages=""
 package_dirs="$srcdir"
