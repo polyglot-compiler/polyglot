@@ -1,6 +1,8 @@
 
 package jltools.types;
+
 import java.util.*;
+import jltools.util.InternalCompilerError;
 
 /**
  * A context to be used within the scope of a method body.  It provides a convenient wrapper
@@ -31,7 +33,7 @@ public class LocalContext
    * block).  All unresolved queries are passed on to the TypeSystem.  To do this, 
    * we'll also need the import table and what our enclosing class is.
    */
-  public LocalContext ( ImportTable itImports, Type tThisClass, LocalContext lcEnclosingClass, TypeSystem ts)
+  public LocalContext ( ImportTable itImports, ClassType tThisClass, LocalContext lcEnclosingClass, TypeSystem ts)
   {  
     this.lcEnclosingClass = lcEnclosingClass;
     this.ts = ts;
@@ -60,7 +62,7 @@ public class LocalContext
    * Gets the methodMatch with name with "name" and a list of argument types "argumentTypes"
    * against Type "type".
    */
-  public TypeSystem.MethodMatch getMethod( Type type, String methodName, List argumentTypes)
+  public MethodTypeInstance getMethod( Type type, String methodName, List argumentTypes)
   {
     //FIXME: implement
     return null;
@@ -69,7 +71,7 @@ public class LocalContext
   /**
    * Gets the MethodMatch with a possibly ambiguous name "name" and list of "argumentTypes"
    */
-  public TypeSystem.MethodMatch getMethod( String methodName, List argumentTypes)
+  public MethodTypeInstance getMethod( String methodName, List argumentTypes)
   {
     // FIXME: implement
     return null;
@@ -78,7 +80,7 @@ public class LocalContext
   /**
    * Finds a particular field within the current type system.
    */
-  public TypeSystem.FieldMatch getField (String fieldName)
+  public FieldInstance getField (String fieldName) throws TypeCheckException
   {
     return getField(null, fieldName);
   }
@@ -86,7 +88,7 @@ public class LocalContext
   /**
    * Gets a field matched against a particular type
    */  
-  public TypeSystem.FieldMatch getField( Type type, String fieldName)
+  public FieldInstance getField( Type type, String fieldName) throws TypeCheckException
   {
     Object result;
     if ( type == null ) // could be a local, so check there first.
@@ -95,10 +97,7 @@ public class LocalContext
       {
         if ( (result = ((Hashtable) i.previous()).get( fieldName )) != null )
         {
-          return new TypeSystem.FieldMatch (null, new FieldInstance (fieldName, 
-                                                                     (Type)result, 
-                                                                     null, 
-                                                                     AccessFlags.flagsForInt(0)));
+          return new FieldInstance (fieldName, (Type)result, null, AccessFlags.flagsForInt(0));
         }
       }      
       // not in this class. check enclosing class.
@@ -107,16 +106,16 @@ public class LocalContext
     }
 
     // pass on to type system:
-    Iterator i = ts.getField(type, fieldName, context);
-    if ( i == null ) return null;
-    return (TypeSystem.FieldMatch)i.next();
+    // FIXME: nks: 
+    //return ts.getField(type, fieldName, context);
+    return null;
   }
 
   /**
    * If <type> is a valid type in the given context, returns a
    * canonical form of that type.  
    **/
-  public Type checkAndResolveType( Type type ) throws TypeCheckError
+  public Type checkAndResolveType( Type type ) throws TypeCheckException
   {
     return ts.checkAndResolveType(type, context);
   }
@@ -124,9 +123,9 @@ public class LocalContext
   /**
    * Finds the definition of a particular type
    */
-  public Type getType( String s)
+  public Type getType( String s) throws Exception
   {
-    return ts.checkAndResolveType( new ClassType( ts, s, false), context);
+    return ts.checkAndResolveType( new AmbiguousType( ts, s), context);
   }
   
   /**
@@ -157,7 +156,7 @@ public class LocalContext
     }
     else
     {
-      throw new TypeCheckError("No more scopes to pop!");
+      throw new InternalCompilerError("No more scopes to pop!");
     }
 
   }

@@ -80,7 +80,7 @@ public class ParsedClassType extends ClassTypeImpl
     this.isAnonymous = isAnonymous;
   }
 
-  public void setContainingClass( Type containingClass)
+  public void setContainingClass( ClassType containingClass)
   {
     this.containingClass = containingClass;
   }

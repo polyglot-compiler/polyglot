@@ -25,7 +25,7 @@ public  class ImportTable implements ClassResolver {
     packageImports = new HashSet();
   }
 
-  public void addClassImport(String className) throws NoClassException {
+  public void addClassImport(String className) throws TypeCheckException {
     ClassType class_ = resolver.findClass(className);
     String shortName = TypeSystem.getShortNameComponent(className);
     map.put(className, class_);
@@ -41,7 +41,7 @@ public  class ImportTable implements ClassResolver {
     resolver.findPackage(name);
   }
 
-  public ClassType findClass(String name) throws NoClassException {
+  public ClassType findClass(String name)  throws TypeCheckException {
     // FIXME: need to keep on looking to find conflicts.
     if (TypeSystem.isNameShort(name)) {
       Object res = map.get(name);

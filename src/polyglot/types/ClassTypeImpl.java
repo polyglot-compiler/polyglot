@@ -32,14 +32,14 @@ public abstract class ClassTypeImpl extends ClassType {
   public List getInterfaces()           { return interfaces; }
 
   public AccessFlags getAccessFlags()   { return flags; }
-  public Type getSupertype()            { return superType; } 
+  public ClassType getSupertype()       { return superType; } 
   public boolean isInner()              { return isInner; } 
   public boolean isAnonymous()          { return isAnonymous; }
-  public Type getContainingClass()      { return containingClass; }
+  public ClassType getContainingClass() { return containingClass; }
   public String getInnerName()          { return innerName; }
   public List getInnerClasses()         { return innerClasses; }
 
-  public Type getInnerNamed(String name) {
+  public ClassType getInnerNamed(String name) {
     for (Iterator i = innerClasses.iterator(); i.hasNext();) {
       ClassType innerType = (ClassType) i.next();
       if (innerType.getShortName().equals(name))
@@ -92,7 +92,7 @@ public abstract class ClassTypeImpl extends ClassType {
   ////
   protected boolean isInner;
   protected boolean isAnonymous;
-  protected Type containingClass;
+  protected ClassType containingClass;
   protected String innerName;
   protected TypedList innerClasses;
 }

@@ -57,7 +57,7 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
 
   public Type getType()
   {
-    return (MethodType)this;
+    return returnType;
   }
 
   public MethodTypeInstance copyInstance()

@@ -8,6 +8,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
 
+import jltools.util.InternalCompilerError;
+
+
 /**
  * StandardTypeSystem
  *
@@ -16,53 +19,48 @@ import java.util.LinkedList;
  **/
 public class StandardTypeSystem extends TypeSystem {
 
-  // FIXME: Documentation.
   // resolver should handle caching.
-  public StandardTypeSystem(ClassResolver resolver) {
+  public StandardTypeSystem(ClassResolver resolver) throws TypeCheckException
+  {
     this.resolver = resolver;
     this.emptyImportTable = new ImportTable(resolver);
+    
+    // set up final objects:
+    OBJECT_  = resolver.findClass( "java.lang.Object");
+    THROWABLE_ = resolver.findClass( "java.lang.Throwable");
+    ERROR_ = resolver.findClass( "java.lang.Error");
+    RTEXCEPTION_ = resolver.findClass("java.lang.RuntimeException");
+    CLONEABLE_ = resolver.findClass("java.lang.Cloneable");
   }
 
   ////
   // Functions for two-type comparison.
   ////
-  /**
-   * Requires: all type arguments are canonical.
-   *
-   * Returns true iff childClass is not ancestorClass, but childClass descends
-   * from ancestorClass.
-   **/
-  public boolean descendsFrom(JavaClass childClass, 
-			      JavaClass ancestorClass) {
-    return descendsFrom(typeForClass(childClass),
-			typeForClass(ancestorClass));
-  }
 
   /**
-   * Requires: all type arguments are canonical.
-   *
    * Returns true iff childType and ancestorType are distinct
    * classTypes, and childType descends from ancestorType.
    **/
   public boolean descendsFrom(Type childType, 
-			      Type ancestorType) {
-    if (ancestorType.equals(childType) || 
-	! (childType instanceof ClassType) || 
-	! (ancestorType instanceof ClassType))
+                              Type ancestorType) 
+    throws TypeCheckException 
+  {
+    if ( childType instanceof AmbiguousType ||
+         ancestorType instanceof AmbiguousType)
+      throw new InternalCompilerError("Expected fully qualified classes.");
+    if (ancestorType.equals(childType) ||
+        ! (childType instanceof ClassType) ||
+        ! (ancestorType instanceof ClassType) )
+    {
       return false;
+    }
 
-    JavaClass childClass;
-    try
-    {  childClass = resolver.findClass(((ClassType)childType).getName()); }
-    catch (NoClassException nce)
-    { return false;   }
-
-    if (! childClass.getAccessFlags().isInterface()) {
+    if (! ((ClassType)childType).getAccessFlags().isInterface()) {
       // If the child isn't an interface, check whether its supertype is or
       // descends from the ancestorType
-      JavaClass parentType = getClassForType ( getSuperType( childClass.getType()) );
+      ClassType parentType = ((ClassType)childType).getSupertype();
       if (parentType.equals(ancestorType) ||
-	  descendsFrom(parentType.getType(), ancestorType))
+	  descendsFrom(parentType, ancestorType))
 	return true;
     } else {
       // if it _is_ an interface, check whether the ancestor is Object.
@@ -71,7 +69,7 @@ public class StandardTypeSystem extends TypeSystem {
     } 
 
     // Next check interfaces.
-    for(Iterator it = getInterfaces(childType).iterator(); it.hasNext(); ) {
+    for(Iterator it = getInterfaces((ClassType)childType).iterator(); it.hasNext(); ) {
       Type parentType = (Type) it.next();
       if (parentType.equals(ancestorType) ||
 	  descendsFrom(parentType, ancestorType))
@@ -88,17 +86,19 @@ public class StandardTypeSystem extends TypeSystem {
    * to a variable of type ancestorType.
    **/
   public boolean isAssignableSubtype(Type childType, 
-				     Type ancestorType) {
-    ////
+				     Type ancestorType)
+    throws TypeCheckException{
+
+    if ( childType instanceof AmbiguousType ||
+         ancestorType instanceof AmbiguousType)
+      throw new InternalCompilerError("Expected fully qualified classes.");      
+
     // childType is primitive.
-    ////
     if (childType instanceof PrimitiveType ||
 	ancestorType instanceof PrimitiveType) 
       return false;
 
-    ////
     // childType is array.
-    ////
     if (childType instanceof ArrayType) {
       ArrayType  child = (ArrayType) childType;
       if (ancestorType instanceof ArrayType) {
@@ -119,15 +119,11 @@ public class StandardTypeSystem extends TypeSystem {
       }
     } 
     
-    ////
     // childType is null.
-    ////
     if (childType instanceof NullType) 
       return true;
 
-    ////
     // So childType is definitely a ClassType.
-    ////
     if (! (ancestorType instanceof ClassType))
       return false;
     
@@ -140,15 +136,13 @@ public class StandardTypeSystem extends TypeSystem {
    * Returns true iff a cast from fromType to toType is valid; in other
    * words, some non-null members of fromType are also members of toType.
    **/
-  public boolean isCastValid(Type fromType, Type toType) {
-    ////
+  public boolean isCastValid(Type fromType, Type toType)
+    throws TypeCheckException
+  {
     // Are they distinct?
-    ////
     if (fromType.equals(toType)) return true;
     
-    ////
     // Are they primitive?
-    ////
     if (fromType instanceof PrimitiveType) {
       if (! (toType instanceof PrimitiveType)) 
 	return false;
@@ -156,21 +150,18 @@ public class StandardTypeSystem extends TypeSystem {
       // Distinct primitive types are only convertable if type are numeric.
       if (((PrimitiveType)fromType).isNumeric() && ((PrimitiveType)toType).isNumeric()) 
         return true;
-      
       return false;
     }
     if (toType instanceof PrimitiveType) return false;
   
     if (fromType instanceof NullType) return true;
 
-    ////
     // Array cases.
-    ////
     if (fromType instanceof ArrayType) {
       if (toType instanceof ArrayType) {
 	// FIXME: Make this iterative.
-	Type fromBase = extendArrayDims(fromType,-1);
-	Type toBase   = extendArrayDims(toType,-1);
+	Type fromBase = extendArrayDims((ArrayType)fromType,-1);
+	Type toBase   = extendArrayDims((ArrayType)toType,-1);
 	if (fromBase instanceof PrimitiveType) {
 	  return toBase.equals(fromBase);
 	} else if (toBase instanceof PrimitiveType) {
@@ -183,19 +174,13 @@ public class StandardTypeSystem extends TypeSystem {
       return toType.equals(CLONEABLE_) || toType.equals(OBJECT_);
     }
 
-    ////
     // From and to are neither primitive nor an array. They are distinct.
-    ////    
-    JavaClass fromClass = getClassForType(fromType);
-    JavaClass toClass = getClassForType(fromType);    
-    boolean fromInterface = fromClass.getAccessFlags().isInterface();
-    boolean toInterface   =   toClass.getAccessFlags().isInterface();
-    boolean fromFinal     = fromClass.getAccessFlags().isFinal();
-    boolean toFinal       =   toClass.getAccessFlags().isFinal();
+    boolean fromInterface = ((ClassType)fromType).getAccessFlags().isInterface();
+    boolean toInterface   =   ((ClassType)toType).getAccessFlags().isInterface();
+    boolean fromFinal     = ((ClassType)fromType).getAccessFlags().isFinal();
+    boolean toFinal       =   ((ClassType)toType).getAccessFlags().isFinal();
 
-    ////
     // This is taken from Section 5.5 of the JLS.
-    ////
     if (!fromInterface) {
       // From is not an interface.
       if (!toInterface) {
@@ -220,8 +205,6 @@ public class StandardTypeSystem extends TypeSystem {
       } else {
 	// To and From are both interfaces.
 	return true;
-	// FIXME: This should check whether they have any conflicting
-	// methods.
       }
     }
   }
@@ -232,7 +215,9 @@ public class StandardTypeSystem extends TypeSystem {
    * Returns true iff an implicit cast from fromType to toType is valid;
    * in other words, every member of fromType is member of toType.
    **/
-  public boolean isImplicitCastValid(Type fromType, Type toType) {
+  public boolean isImplicitCastValid(Type fromType, Type toType)
+    throws TypeCheckException
+  {
     // TODO: read JLS 5.1 to be sure this is valid.
 
     if (fromType.equals(toType)) return true;
@@ -278,11 +263,10 @@ public class StandardTypeSystem extends TypeSystem {
   }
 
   /**
-   * Requires: all type arguments are canonical.
-   *
    * Returns true iff type1 and type2 are the same type.
    **/
-  public boolean isSameType(Type type1, Type type2) {
+  public boolean isSameType(Type type1, Type type2)
+  {
     return type1.equals(type2);
   }
 
@@ -293,7 +277,7 @@ public class StandardTypeSystem extends TypeSystem {
   /**
    * Returns true iff <type> is a canonical (fully qualified) type.
    **/
-  public boolean isCanonical(Type type) {
+  public boolean isCanonical(Type type) throws TypeCheckException {
     return type.isCanonical();
   }
       
@@ -301,7 +285,8 @@ public class StandardTypeSystem extends TypeSystem {
    * Checks whether a method, field or inner class  within tEnclosingClass with access flags 'flags' can
    * be accessed from Context context, where context is a class type.
    */
-  public boolean isAccessible(ClassType ctEnclosingClass, AccessFlags flags, Context context)
+  public boolean isAccessible(ClassType ctEnclosingClass, AccessFlags flags, Context context) 
+    throws TypeCheckException 
   {
     // check if in same class or public 
     if ( isSameType( ctEnclosingClass, context.inClass) ||
@@ -310,14 +295,14 @@ public class StandardTypeSystem extends TypeSystem {
 
     if ( ! (context.inClass instanceof ClassType))
     {
-      throw new TypeCheckError("Internal error: Context is not a Classtype");
+      throw new InternalCompilerError("Internal error: Context is not a Classtype");
     }
 
     ClassType ctContext = (ClassType)context.inClass;
     
     // check for package level scope. ( same package and flags has package level scope.
-    if (getPackageComponent(ctEnclosingClass.getName() ).equals
-        (getPackageComponent(ctContext.getName())) &&
+    if (ctEnclosingClass.getPackage().equals
+        (ctContext.getPackage()) &&
         flags.isPackage())
       return true;
     
@@ -331,19 +316,11 @@ public class StandardTypeSystem extends TypeSystem {
   }
 
   /**
-   * Checks whether <type> is a valid type in the given context,
-   * which may be null.  Returns a description of the error, if any.
-   **/
-  public String checkTypeOk(Type type, Context context) {
-    Object res = checkAndResolveType(type, context);
-    return (res instanceof String) ? (String) res : null;
-  }
-  /**
    * If <type> is a valid type in the given context, returns a
    * canonical form of that type.  Otherwise, returns a String
    * describing the error.
    **/
-  public Type checkAndResolveType(Type type, Context context) throws TypeCheckError {
+  public Type checkAndResolveType(Type type, Context context) throws TypeCheckException {
     if (type.isCanonical()) return type;
     if (type instanceof ArrayType) {
       ArrayType at = (ArrayType) type;
@@ -353,15 +330,14 @@ public class StandardTypeSystem extends TypeSystem {
       return new ArrayType(this, (Type)result, dims);
     }
     
-    if (! (type instanceof ClassType)) 
-      throw new TypeCheckError("Found a non-canonical, non-array, non-class type.");
+    if (! (type instanceof AmbiguousType)) 
+      throw new InternalCompilerError("Found a non-canonical, non-array, non-ambiguous type.");
 
     // We have a class type on our hands.
-    String className = ((ClassType) type).getName();
+    String className = ((AmbiguousType) type).getTypeString();
 
     // Find the context.
-    JavaClass inClass =( context.inClass == null ? null : 
-			 getClassForType(context.inClass) );
+    ClassType inClass = context.inClass;
 
     // Is the name short?
     if (TypeSystem.isNameShort(className)) {
@@ -379,8 +355,8 @@ public class StandardTypeSystem extends TypeSystem {
 	// any inners by that name.  If they _both_ do, that's an error.
 	Type resultFromOuter = null;
 	Type resultFromParent = null;
-	Type parentType = inClass.getSupertype();
-	Type outerType = inClass.getContainingClass();
+	ClassType parentType = inClass.getSupertype();
+	ClassType outerType = inClass.getContainingClass();
 	if (outerType != null) {
 	  Context outerContext = new Context(emptyImportTable,
 					     outerType, null);
@@ -394,7 +370,7 @@ public class StandardTypeSystem extends TypeSystem {
 	if ((resultFromOuter instanceof ClassType) &&
 	    (resultFromParent instanceof ClassType)) {
 	  // FIXME: Better error message needed.
-	  throw new TypeCheckError ("Found " + className + " in both outer and parent.");
+	  throw new TypeCheckException ("Found " + className + " in both outer and parent.");
 	} else if (resultFromOuter instanceof ClassType) {
 	  return resultFromOuter;
 	} else if (resultFromParent instanceof ClassType) {
@@ -405,9 +381,9 @@ public class StandardTypeSystem extends TypeSystem {
       // STEP 3
       // Check the import table.  Default to the null package.
       try 
-      {  return context.table.findClass(className).getType(); }
+      {  return context.table.findClass(className); }
       catch (NoClassException nce) 
-      { throw new TypeCheckError(" No \"" + className + "\" found in context or import table."); }
+      { throw new TypeCheckException(" No \"" + className + "\" found in context or import table."); }
 
     }
 
@@ -426,28 +402,28 @@ public class StandardTypeSystem extends TypeSystem {
     // We'll try to set <result> equal to the type of the outermost
     // class, <prefix> equal to that class's name, and <rest> equal to
     // the leftover parts.
-    Type result = null;
+    ClassType result = null;
     String prefix = TypeSystem.getFirstComponent(className);
     String rest = TypeSystem.removeFirstComponent(className);
-    result = getCanonicalType(new ClassType(this, prefix, false), context);
+    result = (ClassType)checkAndResolveType(new AmbiguousType(this, prefix), context);
     while (result == null && rest.length() > 0) {
       prefix = prefix + "." + TypeSystem.getFirstComponent(rest);
       rest = TypeSystem.removeFirstComponent(rest);
       try {
-	result = resolver.findClass(prefix).getType();
+	result = resolver.findClass(prefix);
       } catch (NoClassException e) {}
     }
     if (result == null)
-      throw new TypeCheckError( "No class found for " + className );
+      throw new TypeCheckException( "No class found for " + className );
     
-    Type outer = result;
-    JavaClass resultClass = getClassForType(outer);
+
+    // Type outer = result;
+    // JavaClass resultClass = getClassForType(outer);
     while (rest.length() > 0) {
       String innerName = TypeSystem.getFirstComponent(rest);
-      result = resultClass.getInnerNamed(innerName);
+      result = result.getInnerNamed(innerName);
       if (result == null)
-	throw new TypeCheckError ("Class " + prefix + " has no inner class named " + innerName);
-      resultClass = getClassForType(result);
+	throw new TypeCheckException ("Class " + prefix + " has no inner class named " + innerName);
       prefix = prefix + "." + innerName;
       rest = TypeSystem.removeFirstComponent(rest);
     }
@@ -458,20 +434,16 @@ public class StandardTypeSystem extends TypeSystem {
   // Various one-type predicates.
   ////
   /**
-   * Requires: all type arguments are canonical.
-   *
    * Returns true iff an object of type <type> may be thrown.
    **/
-  public boolean isThrowable(Type type) {
+  public boolean isThrowable(Type type) throws TypeCheckException {
     return descendsFrom(type,THROWABLE_) || type.equals(THROWABLE_);
   }
   /**
-   * Requires: all type arguments are canonical.
-   *
    * Returns true iff an object of type <type> may be thrown by a method
    * without being declared in its 'throws' clause.
    **/
-  public boolean isUncheckedException(Type type) {
+  public boolean isUncheckedException(Type type) throws TypeCheckException {
     return descendsFrom(type,ERROR_) || type.equals(ERROR_) || 
       descendsFrom(type,RTEXCEPTION_) || type.equals(RTEXCEPTION_);
   }
@@ -487,10 +459,10 @@ public class StandardTypeSystem extends TypeSystem {
    * type (if any).  The iterator is guaranteed to yeild fields
    * defined on subclasses before those defined on superclasses.
    **/
-  public Iterator getFieldsForType(Type type) 
-  {
-    return getField(type, null, null);
-  }
+  //  public Iterator getFieldsForType(Type type) 
+  //  {
+  //    return getField(type, null, null);
+  //  }
 
   /**
    * Requires: all type arguments are canonical.
@@ -500,10 +472,10 @@ public class StandardTypeSystem extends TypeSystem {
    * defined on subclasses before those defined on superclasses.
    **/  
 
-  public Iterator getMethodsForType(Type type)
-  {
-    return getMethod(type, null, null);
-  }
+//  public Iterator getMethodsForType(Type type)
+//  {
+//    return getMethod(type, null, null);
+//  }
   
 
   /**
@@ -513,10 +485,10 @@ public class StandardTypeSystem extends TypeSystem {
    * on type (if any).  If 'name' is null, matches all.  The iterator is guaranteed 
    * to yield fields defined on subclasses before those defined on superclasses.
    **/
-  public Iterator getFieldsNamed(Type type, String name)
-  {
-    return getField( type, name, null);
-  }
+//  public Iterator getFieldsNamed(Type type, String name)
+//  {
+//    return getField( type, name, null);
+//  }
   
   
   /**
@@ -526,10 +498,10 @@ public class StandardTypeSystem extends TypeSystem {
    * on type (if any).  If 'name' is null, mathces all. The iterator is guaranteed
    * to yield methods defined on subclasses before those defined on superclasses.
    */
-  public  Iterator getMethodsNamed(Type type, String name)
-  {
-    return getMethod(type, name, null);
-  }
+//  public  Iterator getMethodsNamed(Type type, String name)
+//  {
+//    return getMethod(type, name, null);
+//  }
 
   /**
    * Requires: all type arguments are canonical.
@@ -539,39 +511,50 @@ public class StandardTypeSystem extends TypeSystem {
    * with an error explaining why. name and context may be null, in which case
    * they will not restrict the output.
    **/
-  public Iterator getField(Type type, String name, Context context  )
+  public FieldInstance getField(ClassType type, String name, Context context, boolean bIsThis ) throws TypeCheckException
   {
-    if (! type.isCanonical() )
-      throw new TypeCheckError("Type: \"" + type + "\" not a canoncial type.");
+    /*    if (! type.isCanonical() )
+      throw new TypeCheckException("Type: \"" + type + "\" not a canoncial type.");
     
-    JavaClass class_ = getClassForType(type);
     LinkedList worklistEnclosingTypes = new LinkedList();
-    List lResults = new LinkedList();
+    Type tResult;
     List lTempResult; // Typed list containing FieldInstances
     Type tEnclosing;
 
-    // first add all that we descend from
-    while (class_ != null)
+    // check ourselves:
+    lTempResults = type.getFields();
+    for (Iterator i = lTempResult.listIterator(); i.hasNext(); )
     {
-      lTempResult = class_.getFields();
-      // wrap all the fieldinstances in fieldmatches, and add them to our list.
+      FieldInstance fi = (FieldInstance)i.next();
+      if (fi.getName().equals(name))
+        // found it. can stop looking since guaranteed that it is not looking.
+        return fi;
+    }
+
+    // now look through those classes that type descended from
+    while (type != null)
+    {
+      lTempResult = type.getFields();
       for (Iterator i = lTempResult.listIterator(); i.hasNext(); )
       {
         FieldInstance fi = (FieldInstance)i.next();
-        // only add those fields which match our input criteria, namely, 
-        //   - make sure that the names match (if specified) and 
-        //   - make sure that we have proper access from  this context.
-        if ( (fi.getName().equals (name) || name == null) &&
-             (context == null || 
-                isAccessible( (ClassType)class_.getType(), fi.getAccessFlags(),  context)) )
-          
-          lResults.add( new FieldMatch ( class_.getType(), fi ));
+        // only "find"those fields which match our input criteria, namely, 
+        //   - make sure that the names match
+        //   - make sure that we have proper access from this context.
+        if ( (fi.getName().equals (name)))
+          if ( isAccessible( type, fi.getAccessFlags(),  context))
+          {
+            tResult = fi;
+          }
+          else 
+            throw new TypeCheckError( "Cannot access 
+
       }
       // if we have an enclosing class, throw it in the worklist.
-      tEnclosing = class_.getContainingClass();
+      tEnclosing = type.getContainingClass();
       if (tEnclosing != null && ! worklistEnclosingTypes.contains(tEnclosing))
         worklistEnclosingTypes.add( tEnclosing );
-      class_ = getClassForType( class_.getSupertype());
+      type = getClassForType( class_.getSupertype());
     }
 
     // now go through our worklist.
@@ -585,6 +568,8 @@ public class StandardTypeSystem extends TypeSystem {
       }
     }
     return lResults.iterator();
+    */
+    return null;
   }
 
  /**
@@ -594,21 +579,23 @@ public class StandardTypeSystem extends TypeSystem {
    * context.  If no such field may be found, returns a fieldmatch
    * with an error explaining why. Considers accessflags.
    **/
-  public Iterator getMethod(Type type, String name, Context context)
+  public Iterator getMethod(ClassType type, String name, Context context)
+    throws TypeCheckException
   {
+    /*    // FIXME: nks: deprecated
+
     if (! type.isCanonical() )
-      throw new TypeCheckError("Type: \"" + type + "\" not a canoncial type.");
+      throw new TypeCheckException("Type: \"" + type + "\" not a canoncial type.");
     
-    JavaClass class_ = getClassForType(type);
     LinkedList worklistEnclosingTypes = new LinkedList();
     List lResults = new LinkedList();
     List lTempResult; // Typed list containing MethodTypeIstances
     Type tEnclosing;
 
     // first add all that we descend from
-    while (class_ != null)
+    while (type != null)
     {
-      lTempResult = class_.getMethods();
+      lTempResult = type.getMethods();
       // wrap all the MethodTypeInstances in MethodMatches, and add them to our list.
       for (Iterator i = lTempResult.listIterator(); i.hasNext(); )
       {
@@ -617,15 +604,15 @@ public class StandardTypeSystem extends TypeSystem {
         //   - make sure that the names match (if specified) and 
         //   - make sure that we have proper access from this context (if specified)
         if ( (mti.getName().equals( name) || name == null) &&
-             (context == null || isAccessible( (ClassType) class_.getType(), 
+             (context == null || isAccessible( type, 
                                                mti.getAccessFlags(), context)))
           lResults.add( new MethodMatch ( class_.getType(), mti));
       }
       // if we have an enclosing class, throw it in the worklist.
-      tEnclosing = class_.getContainingClass();
+      tEnclosing = type.getContainingClass();
       if (tEnclosing != null && ! worklistEnclosingTypes.contains(tEnclosing))
         worklistEnclosingTypes.add( tEnclosing );
-      class_ = getClassForType( class_.getSupertype());
+      type = getClassForType( type.getSupertype());
     }
 
     // now go through our worklist.
@@ -639,29 +626,25 @@ public class StandardTypeSystem extends TypeSystem {
       }
     }
     return lResults.iterator();
+    */
+    return null;
   }
 
   /**
-   * Requires: all type arguments are canonical.
-   *
    * Returns the supertype of type, or null if type has no supertype.
    **/
-  public Type getSuperType(Type type)
+  public ClassType getSuperType(ClassType type) throws TypeCheckException
   {
-    JavaClass class_ = getClassForType( type);
-    return class_.getSupertype();
+    return (ClassType)type.getSupertype();
   }
 
   /**
-   * Requires: all type arguments are canonical.
-   *
    * Returns an immutable list of all the interface types which type
    * implements.
    **/
-  public List getInterfaces(Type type)
+  public List getInterfaces(ClassType type) throws TypeCheckException
   {
-    JavaClass class_ = getClassForType( type );
-    return class_.getInterfaces();
+    return type.getInterfaces();
   }
 
   ////
@@ -670,7 +653,7 @@ public class StandardTypeSystem extends TypeSystem {
   /**
    * Returns true iff <type1> is the same as <type2>.
    **/
-  public boolean isSameType(MethodType type1, MethodType type2)
+  public boolean isSameType(MethodType type1, MethodType type2) 
   {
     return ( type1.equals(type2));
   }
@@ -698,7 +681,8 @@ public class StandardTypeSystem extends TypeSystem {
   /**
    * Returns whether the arguments for MethodType call can call MethodTypeInstance prototype
    */
-  public boolean methodCallValid( MethodTypeInstance prototype, MethodType call)
+  public boolean methodCallValid( MethodTypeInstance prototype, MethodType call) 
+    throws TypeCheckException
   {
     if ( ! prototype.getName().equals(call.getName()))
       return false;
@@ -735,10 +719,11 @@ public class StandardTypeSystem extends TypeSystem {
    *
    * (Guavac gets this wrong.)
    **/
-  public MethodMatch getMethod(Type type, MethodType method, 
-                               Context context, boolean isThis)
+  public MethodTypeInstance getMethod(ClassType type, MethodType method, 
+                                      Context context, boolean isThis)
+    throws TypeCheckException 
   {
-    // we first get the list of methods which match our type, method name and 
+    /*    // we first get the list of methods which match our type, method name and 
     // are accessible from our context.  We make use of the fact that 
     // the methods come back such taht those in the subclass come before those in a 
     // super class.
@@ -758,9 +743,11 @@ public class StandardTypeSystem extends TypeSystem {
           // we have a match already. if our temp refines the signature of our current match
           // (from the subclass), then we have an ambiguous situation.
           if ( methodCallValid( temp.method, match.method) )
-            return new MethodMatch(" The call is ambiguous; more than 1 prototype will match");
+            throw new TypeCheckException(" The call is ambiguous; more than 1 prototype will match");
     }
     return match;
+    */
+    return null;
   }
 
   /**
@@ -781,28 +768,28 @@ public class StandardTypeSystem extends TypeSystem {
    *
    * (Guavac gets this wrong.)
    **/
-  public MethodMatch getMethodInClass(Type type, MethodType method, 
-                                      Context context, boolean isThis)
-  {
+//public MethodMatch getMethodInClass(Type type, MethodType method, 
+//                                      Context context, boolean isThis)
+//  {
     //FIXME: implement
-    return null;
-  }
+//    return null;
+//  }
 
   /**
    * As above, except only returns a match if the argument types are identical,
    * and disregards context.
    **/
-  public MethodMatch getExactMethod(Type type, MethodType method)
-  {
+//  public MethodMatch getExactMethod(Type type, MethodType method)
+//  {
     //FIXME: implement
-    return null;
-  }
+//    return null;
+//  }
 
-  public MethodMatch getExactMethodInClass(Type type, MethodType method)
-  {
-    //FIXME: implement
-    return null;
-  }
+//  public MethodMatch getExactMethodInClass(Type type, MethodType method)
+//  {
+//    //FIXME: implement
+//    return null;
+//  }
 
   ////
   // Functions for type->class mapping.
@@ -813,13 +800,13 @@ public class StandardTypeSystem extends TypeSystem {
    * Returns the JavaClass object corresponding to a given type, or null
    * if there is none.
    **/
-  public JavaClass getClassForType(Type type) {
-    if (! (type instanceof ClassType)) return null;
-    String fullName = ((ClassType) type).getName();
-    try { return resolver.findClass(fullName); }
-    catch (NoClassException nce) 
-    { return null; }
-  }
+//  public JavaClass getClassForType(Type type) {
+//    if (! (type instanceof ClassType)) return null;
+//    String fullName = ((ClassType) type).getName();
+//    try { return resolver.findClass(fullName); }
+//    catch (NoClassException nce) 
+//    { return null; }
+//  }
 
   ////
   // Functions which yield particular types.
@@ -847,15 +834,11 @@ public class StandardTypeSystem extends TypeSystem {
   private final Type LONG_    = new PrimitiveType(this, PrimitiveType.LONG);
   private final Type FLOAT_   = new PrimitiveType(this, PrimitiveType.FLOAT);
   private final Type DOUBLE_  = new PrimitiveType(this, PrimitiveType.DOUBLE);
-  private final Type OBJECT_  = new ClassType(this, "java.lang.Object", true);
-  private final Type THROWABLE_ = 
-    new ClassType(this, "java.lang.Throwable", true);
-  private final Type ERROR_ = 
-    new ClassType(this, "java.lang.Error", true);
-  private final Type RTEXCEPTION_ = 
-    new ClassType(this, "java.lang.RuntimeException", true);
-  private final Type CLONEABLE_ = 
-    new ClassType(this, "java.lang.Cloneable", true);
+  private final Type OBJECT_      ;
+  private final Type THROWABLE_   ;
+  private final Type ERROR_       ;
+  private final Type RTEXCEPTION_ ;
+  private final Type CLONEABLE_   ;
   
   protected ClassResolver resolver; //Should do its own caching.
   protected ImportTable emptyImportTable;
@@ -865,8 +848,8 @@ public class StandardTypeSystem extends TypeSystem {
    * is the provided string.  This type may not correspond to a valid
    * class.
    **/
-  public ClassType getTypeWithName(String name) {
-    return new ClassType(this, name, false);
+  public AmbiguousType getTypeWithName(String name) {
+    return new AmbiguousType(this, name);
   }
   /**
    * Returns a type identical to <type>, but with <dims> more array
@@ -891,10 +874,10 @@ public class StandardTypeSystem extends TypeSystem {
    * registered in this typeSystem.  Does not register the type in
    * this TypeSystem.  For use only by JavaClass implementations.
    **/
-  public ClassType typeForClass(JavaClass theClass)
-  {
-    return (ClassType)theClass.getType();
-  }
+//  public ClassType typeForClass(JavaClass theClass)
+//  {
+//    return (ClassType)theClass.getType();
+//  }
 
   /**
    * Returns a canonical type corresponding to the Java Class object
@@ -902,22 +885,9 @@ public class StandardTypeSystem extends TypeSystem {
    * registered in this typeSystem.  Does not register the type in
    * this TypeSystem.  For use only by JavaClass implementations.
    **/
-  public  ClassType typeForClass(Class theClass)
+  public  ClassType typeForClass(Class clazz) throws TypeCheckException
   {
-    return new ClassType( this, theClass.getName(), true);
-    /*
-    try
-    {
-      JavaClass jc = resolver.findClass(theClass.getName());
-      return ( jc != null ? (ClassType)jc.getType() : null);
-    }
-    catch ( NoClassException nce)
-    {
-      return null;
-    }
-    */
+    return resolver.findClass(clazz.getName());
   }
-
-
 }
 

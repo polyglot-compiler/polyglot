@@ -23,7 +23,7 @@ tp_files 	= AccessFlags.java	\
 			PrimitiveType.java \
 			TableClassResolver.java \
 			Type.java \
-			TypeCheckError.java \
+			TypeCheckException.java \
 			TypeInstance.java \
 			TypeSystem.java \
 			SourceFileClassResolver.java \

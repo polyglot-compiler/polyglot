@@ -24,7 +24,7 @@ public class LoadedClassType extends ClassTypeImpl  {
    * Constructs a new LoadedClassType from a given class, within a given
    * typeSystem.
    **/
-  public LoadedClassType(Class theClass, TypeSystem typeSys) {
+  public LoadedClassType(Class theClass, TypeSystem typeSys) throws TypeCheckException {
     super( typeSys);    
     
     // Set up names and classType.    
@@ -78,7 +78,8 @@ public class LoadedClassType extends ClassTypeImpl  {
     this.methods = new TypedList(methodLst, MethodType.class, true);    
   }
 
-  protected FieldInstance fieldInstanceForField(Field f) {
+  protected FieldInstance fieldInstanceForField(Field f) throws TypeCheckException 
+  {
     String fieldName = f.getName();
     Type type = ts.typeForClass(f.getType());
     AccessFlags flags = AccessFlags.flagsForInt(f.getModifiers());    
@@ -86,7 +87,8 @@ public class LoadedClassType extends ClassTypeImpl  {
     return new FieldInstance(fieldName, type, this,  flags);
   }
 
-  protected MethodType methodTypeForMethod(Method m) {
+  protected MethodType methodTypeForMethod(Method m) throws TypeCheckException 
+  {
     String name = m.getName();
     AccessFlags flags = AccessFlags.flagsForInt(m.getModifiers());
     Type returnType = ts.typeForClass(m.getReturnType());
@@ -104,7 +106,8 @@ public class LoadedClassType extends ClassTypeImpl  {
     return new MethodTypeInstance(ts, name, returnType, argList, excpList, flags);
   }
 
-  protected MethodType methodTypeForConstructor(Constructor m) {
+  protected MethodType methodTypeForConstructor(Constructor m) throws TypeCheckException
+  {
     AccessFlags flags = AccessFlags.flagsForInt(m.getModifiers());
     Class[] args = m.getParameterTypes();
     List argList = new ArrayList(args.length+1);

@@ -96,7 +96,7 @@ public abstract class ClassType extends Type {
    * Returns the supertype of this class.  For every class except Object, this
    * is non-null.
    **/
-  public abstract Type getSupertype();
+  public abstract ClassType getSupertype();
   /**
    * Returns a TypedList of the types of this class's interfaces.
    **/
@@ -116,7 +116,7 @@ public abstract class ClassType extends Type {
    * If this class is inner, returns the containing class.  Otherwise returns
    * null.
    **/
-  public abstract Type getContainingClass();
+  public abstract ClassType getContainingClass();
   /**
    * If this class is an inner class, return its short name, encoded
    * with the name of its containing class.
@@ -132,7 +132,7 @@ public abstract class ClassType extends Type {
    * Returns the type of the inner in this whose short name is <name>.
    * Returns null if no such inner exists.
    **/
-  public abstract Type getInnerNamed(String name);
+  public abstract ClassType getInnerNamed(String name);
   
   // FIXME:  InMethod?
 }

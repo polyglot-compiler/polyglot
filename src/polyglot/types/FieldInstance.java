@@ -14,7 +14,8 @@ package jltools.types;
  **/
 public class FieldInstance implements Cloneable, TypeInstance {
 
-  public FieldInstance(String fieldName, Type fieldType, Type enclosingType, AccessFlags fieldFlags) {
+  public FieldInstance(String fieldName, Type fieldType, 
+                       Type enclosingType, AccessFlags fieldFlags) {
     this.name = fieldName;
     this.type = fieldType;
     this.enclosingType = enclosingType;

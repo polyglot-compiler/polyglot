@@ -7,6 +7,7 @@ package jltools.types;
 import java.util.Iterator;
 import java.util.List;
 
+
 /**
  * TypeSystem
  *
@@ -31,74 +32,42 @@ public abstract class TypeSystem {
    **/
   public static class Context {
     public final ImportTable table;
-    public final Type inClass;
+    public final ClassType inClass;
     public final MethodType inMethod;
     
-    public Context(ImportTable t, Type type, MethodType m) 
+    public Context(ImportTable t, ClassType type, MethodType m) 
       { table = t; inClass = type; inMethod = m; }
-    public Context(Type type, MethodType m) 
+    public Context(ClassType type, MethodType m) 
       { table = null; inClass = type; inMethod = m; }
-  }
-
-  /**
-   * This class represents the <Type, methodType> pair of a method lookup.
-   **/
-  public static class MethodMatch {
-    public final Type onClass;
-    public final MethodTypeInstance method;
-    public String error;
-
-    public MethodMatch(Type c, MethodTypeInstance m) { onClass = c; method = m; }    
-    public MethodMatch(String error) { this(null, null); this.error = error; }
-  }
-
-  /**
-   * This class represents the <Type, fieldType> pair of a field lookup.
-   **/
-  public static class FieldMatch {
-    public final Type onClass;
-    public final FieldInstance field;
-    public String error;
-
-    public FieldMatch(Type c, FieldInstance f) { onClass = c; field = f; }
   }
 
   ////
   // Functions for two-type comparison.
   ////
   /**
-   * Requires: all type arguments are canonical.
-   *
    * Returns true iff childClass is not ancestorClass, but childClass descends
    * from ancestorClass.
    **/
-  public abstract boolean descendsFrom(ClassType childClass, 
-				       ClassType ancestorClass);
+  public abstract boolean descendsFrom(Type childClass, 
+				       Type  ancestorClass) 
+    throws TypeCheckException ;
+
   /**
-   * Requires: all type arguments are canonical.
-   *
-   * Returns true iff childType and ancestorType are distinct
-   * ClassTypes, and childType descends from * ancestorType.
-   **/
-  public abstract boolean descendsFrom(Type childType, 
-				       Type ancestorType);
-  /**
-   * Requires: all type arguments are canonical.
-   *
    * Returns true iff childType and ancestorType are non-primitive
    * types, and a variable of type childType may be legally assigned
    * to a variable of type ancestorType.
    **/
   public abstract boolean isAssignableSubtype(Type childType, 
-					      Type ancestorType);
+					      Type ancestorType)
+    throws TypeCheckException ;
   /**
    * Requires: all type arguments are canonical.
    *
    * Returns true iff a cast from fromType to toType is valid; in other
    * words, some non-null members of fromType are also members of toType.
    **/
-  public abstract boolean isCastValid(Type fromType, Type toType);
-
+  public abstract boolean isCastValid(Type fromType, Type toType)
+    throws TypeCheckException ;
 
   /**
    * Requires: all type arguments are canonical.
@@ -106,7 +75,8 @@ public abstract class TypeSystem {
    * Returns true iff an implicit cast from fromType to toType is valid;
    * in other wors, every member of fromType is member of toType.
    **/
-  public abstract boolean isImplicitCastValid(Type fromType, Type toType);
+  public abstract boolean isImplicitCastValid(Type fromType, Type toType)
+    throws TypeCheckException ;
 
   /**
    * Requires: all type arguments are canonical.
@@ -122,38 +92,23 @@ public abstract class TypeSystem {
   /**
    * Returns true iff <type> is a canonical (fully qualified) type.
    **/
-  public abstract boolean isCanonical(Type type);
-  /**
-   * Tries to return the canonical (fully qualified) form of <type> in
-   * the provided context, which may be null.  Returns null if no such
-   * type exists.
-   **/
-  public Type getCanonicalType(Type type, Context context) {
-    try { return checkAndResolveType(type, context); }
-    catch (TypeCheckError tce )
-    { return null; }
-  }
+  public abstract boolean isCanonical(Type type)
+    throws TypeCheckException ;
 
   /**
    * Checks whether a method or field within tEnclosingClass with access flags 'flags' can
    * be accessed from Context context. 
    */
-  public abstract boolean isAccessible(ClassType tEnclosingClass, AccessFlags flags, Context context);
+  public abstract boolean isAccessible(ClassType tEnclosingClass, AccessFlags flags, Context context)
+    throws TypeCheckException ;
 
-  /**
-   * Checks whether <type> is a valid type in the given context,
-   * which may be null.  Returns a description of the error, if any.
-   **/
-  public String checkTypeOk(Type type, Context context) {
-    Object res = checkAndResolveType(type, context);
-    return (res instanceof String) ? (String) res : null;
-  }
   /**
    * If <type> is a valid type in the given context, returns a
    * canonical form of that type.  Otherwise, returns a String
    * describing the error.
    **/
-  public abstract Type checkAndResolveType(Type type, Context context);
+  public abstract Type checkAndResolveType(Type type, Context context)
+    throws TypeCheckException;
 
   ////
   // Various one-type predicates.
@@ -163,14 +118,16 @@ public abstract class TypeSystem {
    *
    * Returns true iff an object of type <type> may be thrown.
    **/
-  public abstract boolean isThrowable(Type type);
+  public abstract boolean isThrowable(Type type)
+    throws TypeCheckException;
   /**
    * Requires: all type arguments are canonical.
    *
    * Returns true iff an object of type <type> may be thrown by a method
    * without being declared in its 'throws' clause.
    **/
-  public abstract boolean isUncheckedException(Type type);  
+  public abstract boolean isUncheckedException(Type type)
+    throws TypeCheckException;
 
   ////
   // Functions for type membership.
@@ -182,7 +139,7 @@ public abstract class TypeSystem {
    * type (if any).  The iterator is guaranteed to yeild fields
    * defined on subclasses before those defined on superclasses.
    **/
-  public abstract Iterator getFieldsForType(Type type);
+  // public abstract FieldInstance getFieldsForType(AmbiguousType type) throws TypeCheckException;
 
   /**
    * Requires: all type arguments are canonical.
@@ -191,7 +148,7 @@ public abstract class TypeSystem {
    * type (if any).  The iterator is guaranteed to yield methods
    * defined on subclasses before those defined on superclasses.
    **/  
-  public abstract Iterator getMethodsForType(Type type);
+  // public abstract Iterator getMethodsForType(Type type);
 
   /**
    * Requires: all type arguments are canonical.
@@ -200,7 +157,7 @@ public abstract class TypeSystem {
    * on type (if any).  If 'name' is null, matches all.  The iterator is guaranteed 
    * to yield fields defined on subclasses before those defined on superclasses.
    **/
-  public abstract Iterator getFieldsNamed(Type type, String name);
+  //  public abstract Iterator getFieldsNamed(Type type, String name);
 
   /**
    * Requries all type are canonical.
@@ -209,16 +166,15 @@ public abstract class TypeSystem {
    * on type (if any).  If 'name' is null, mathces all. The iterator is guaranteed
    * to yield methods defined on subclasses before those defined on superclasses.
    **/
-  public abstract Iterator getMethodsNamed(Type type, String name);
+  // public abstract Iterator getMethodsNamed(Type type, String name);
 
   /**
-   * Requires: all type arguments are canonical.
-   *
    * Returns the fieldMatch named 'name' defined on 'type' visible in
    * context.  If no such field may be found, returns a fieldmatch
    * with an error explaining why. Considers accessflags
    **/
-  public abstract Iterator getField(Type type, String name, Context context);
+  public abstract FieldInstance getField(ClassType type, String name, Context context, boolean bIsThis)
+    throws TypeCheckException;
 
   /**
    * Requires: all type arguments are canonical.
@@ -227,22 +183,22 @@ public abstract class TypeSystem {
    * context.  If no such field may be found, returns a fieldmatch
    * with an error explaining why. Considers accessflags.
    **/
-  public abstract Iterator getMethod(Type type, String name, Context context);
+  //  public abstract MethodInstance  getMethod(ClassType type, String name, Context context);
+  //    throws TypeCheckException;
  
 
   /**
-   * Requires: all type arguments are canonical.
-   *
    * Returns the supertype of type, or null if type has no supertype.
    **/
-  public abstract Type getSuperType(Type type);
+  public abstract ClassType getSuperType(ClassType type)
+    throws TypeCheckException;
+
   /**
-   * Requires: all type arguments are canonical.
-   *
    * Returns an immutable list of all the interface types which type
    * implements.
    **/
-  public abstract List getInterfaces(Type type);
+  public abstract List getInterfaces(ClassType type)
+    throws TypeCheckException;
 
   ////
   // Functions for method testing.
@@ -250,11 +206,14 @@ public abstract class TypeSystem {
   /**
    * Returns true iff <type1> is the same as <type2>.
    **/
-  public abstract boolean isSameType(MethodType type1, MethodType type2);
+  public abstract boolean isSameType(MethodType type1, MethodType type2)
+    throws TypeCheckException;
+
   /**
    * Returns true iff <type1> has the same arguments as <type2>
    **/
   public abstract boolean hasSameArguments(MethodType type1, MethodType type2);
+
   /**
    * If an attempt to call a method of type <method> on <type> would
    * be successful, returns the actual MethodMatch for the method that
@@ -272,8 +231,9 @@ public abstract class TypeSystem {
    *
    * (Guavac gets this wrong.)
    **/
-  public abstract MethodMatch getMethod(Type type, MethodType method, 
-					Context context, boolean isThis);
+  public abstract MethodTypeInstance getMethod(ClassType type, MethodType method, 
+					Context context, boolean isThis)
+    throws TypeCheckException;
   /**
    * If an attempt to call a method of type <method> on <type> would
    * be successful, and the method would match on the given <type>,
@@ -292,14 +252,14 @@ public abstract class TypeSystem {
    *
    * (Guavac gets this wrong.)
    **/
-  public abstract MethodMatch getMethodInClass(Type type, MethodType method, 
-					      Context context, boolean isThis);
+  //  public abstract MethodMatch getMethodInClass(Type type, MethodType method, 
+  //					      Context context, boolean isThis);
   /**
    * As above, except only returns a match if the argument types are identical,
    * and disregards context.
    **/
-  public abstract MethodMatch getExactMethod(Type type, MethodType method);
-  public abstract MethodMatch getExactMethodInClass(Type type, MethodType method); 
+  //  public abstract MethodMatch getExactMethod(Type type, MethodType method);
+  //  public abstract MethodMatch getExactMethodInClass(Type type, MethodType method); 
 
   ////
   // Functions for type->class mapping.
@@ -308,7 +268,7 @@ public abstract class TypeSystem {
    * Returns the ClassType object corresponding to a given type, or null
    * if there is none.
    **/
-  public abstract ClassType getClassForType(Type type);
+  //  public abstract JavaClass getClassForType(Type type);
 
   ////
   // Functions which yield particular types.
@@ -330,19 +290,26 @@ public abstract class TypeSystem {
    * is the provided string.  This type may not correspond to a valid
    * class.
    **/
-  public abstract ClassType getTypeWithName(String name);
+  public abstract AmbiguousType getTypeWithName(String name)
+    throws TypeCheckException;
+
   /**
    * Returns a type identical to <type>, but with <dims> more array
    * dimensions.  If dims is < 0, array dimensions are stripped.
    **/
-  public abstract Type extendArrayDims(Type type, int dims);
+  public abstract Type extendArrayDims(Type type, int dims)
+    throws TypeCheckException;
+
   /**
    * Returns a canonical type corresponding to the Java Class object
+   * class.  Does not require that <theClass> have a JavaClass
    * theClass.  Does not require that <theClass> have a ClassType
    * registered in this typeSystem.  Does not register the type in
+   * this TypeSystem.  
    * this TypeSystem.  For use only by ClassType implementations.
    **/
-  public abstract ClassType typeForClass(Class theClass);
+  public abstract ClassType typeForClass(Class clazz)
+    throws TypeCheckException;
 
   /**
    * Given the name for a class, returns the portion which appears to
