@@ -153,6 +153,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	Context c = tc.context();
 
 	ClassType ct = c.currentClass();
+        Type superType = ct.superType();
 
         // The qualifier specifies the enclosing instance of this inner class.
         // The type of the qualifier must be the outer class of this
@@ -173,9 +174,6 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
                                             "constructor invocation.",
                                             position());
             }
-
-
-            Type superType = ct.superType();
             
             if (!superType.isClass() || !superType.toClass().isInnerClass() ||
                 superType.toClass().inStaticContext()) {
@@ -200,6 +198,29 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	        throw new SemanticException("Super type of " + ct +
 		    " is not a class.", position());
 	    }
+
+            // If the super class is an inner class (i.e., has an enclosing
+            // instance of its container class), then either a qualifier 
+            // must be provided, or ct must have an enclosing instance of the
+            // super class's container class, or a subclass thereof.
+            if (qualifier == null && superType.isClass() && superType.toClass().isInnerClass()) {
+                ClassType superContainer = superType.toClass().outer();
+                // ct needs an enclosing instance of superContainer, 
+                // or a subclass of superContainer.
+                ClassType e = ct.outer();
+                
+                while (e != null) {
+                    if (e.isSubtype(superContainer) && ct.hasEnclosingInstance(e)) {
+                        break; 
+                    }
+                    e = e.outer();
+                }
+                
+                if (e == null) {
+                    throw new SemanticException(ct + " must have an enclosing instance" +
+                    " that contains " + superType, position());
+                }                
+            }
 
 	    ct = ct.superType().toClass();
 	}
