@@ -1033,13 +1033,13 @@ public class TypeSystem_c implements TypeSystem
     protected ClassType THROWABLE_;
 
     public ClassType Object()  { if (OBJECT_ != null) return OBJECT_;
-                                 return load("java.lang.Object"); }
+                                 return OBJECT_ = load("java.lang.Object"); }
     public ClassType Class()   { if (CLASS_ != null) return CLASS_;
-                                 return load("java.lang.Class"); }
+                                 return CLASS_ = load("java.lang.Class"); }
     public ClassType String()  { if (STRING_ != null) return STRING_;
-                                 return load("java.lang.String"); }
+                                 return STRING_ = load("java.lang.String"); }
     public ClassType Throwable() { if (THROWABLE_ != null) return THROWABLE_;
-                                   return load("java.lang.Throwable"); }
+                                   return THROWABLE_ = load("java.lang.Throwable"); }
     public ClassType Error() { return load("java.lang.Error"); }
     public ClassType Exception() { return load("java.lang.Exception"); }
     public ClassType RuntimeException() { return load("java.lang.RuntimeException"); }
