@@ -252,6 +252,7 @@ public class BinaryExpression extends Expression
     case ASSIGN:
       /* See (5.2). */
       if( !rtype.isAssignableSubtype(ltype) &&
+	  !rtype.isSameType(ltype) &&
           ! ( right instanceof NumericalLiteral && 
               c.getTypeSystem().numericConversionValid(ltype, 
                                    ((NumericalLiteral)right).getValue()))   ) {
