@@ -9,6 +9,8 @@ import polyglot.frontend.*;
 import polyglot.visit.*;
 import polyglot.util.*;
 
-public interface PaoDel extends Del {
-    public Node rewrite(PaoTypeSystem ts, PaoNodeFactory nf);
+public class PaoExt_c extends Ext_c implements PaoExt {
+    public Node rewrite(PaoTypeSystem ts, PaoNodeFactory nf) {
+        return node();
+    }
 }
