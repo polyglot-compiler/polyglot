@@ -21,18 +21,30 @@ import java.util.*;
  * Compilation passes and visitors:
  * <ol>
  * <li> parse </li>
- * <li> build types (TypeBuilder) </li>
- * <li> disambiguate1 (AmbiguityRemover) </li>
- * <li> disambiguate2 (AmbiguityRemover) </li>
+ * <li> build-types (TypeBuilder) </li>
+ * <hr>
+ * <center>BARRIER</center>
+ * <hr>
+ * <li> clean-super (AmbiguityRemover) </li>
+ * <hr>
+ * <center>BARRIER</center>
+ * <hr>
+ * <li> clean-sigs (AmbiguityRemover) </li>
+ * <li> add-members (AddMemberVisitor) </li>
+ * <hr>
+ * <center>BARRIER</center>
+ * <hr>
+ * <li> disambiguate (AmbiguityRemover) </li>
+ * <li> constant folding (ConstantFolder)
  * <hr>
  * <center>BARRIER</center>
  * <hr>
  * <li> type checking (TypeChecker) </li>
  * <li> exception checking (ExceptionChecker)
- * <li> constant folding (ConstantFolder)
  * <hr>
  * <center>BARRIER</center>
  * <hr>
+ * <li> dump (DumpAst), optional </li>
  * <li> serialization (ClassSerializer), optional </li>
  * <li> translation (Translator) </li>
  * </ol>
