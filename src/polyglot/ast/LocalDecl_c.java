@@ -114,11 +114,13 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
         return reconstruct(type, init);
     }
 
+    /*
     public Context enterScope(Context c) {
         c = c.pushBlock();
         c.addVariable(li);
         return c;
     }
+    */
 
     public void addDecls(Context c) {
         c.addVariable(li);

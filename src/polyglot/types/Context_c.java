@@ -244,8 +244,12 @@ public class Context_c implements Context
         return null;
     }
 
+    protected String mapsToString() {
+        return "types=" + types + " vars=" + vars + " methods=" + methods;
+    }
+
     public String toString() {
-        return "(" + kindStr() + " " + types + " " + vars + " " + methods + " " + outer + ")";
+        return "(" + kindStr() + " " + mapsToString() + " " + outer + ")";
     }
 
     /**
@@ -313,6 +317,8 @@ public class Context_c implements Context
      * pushes an additional block-scoping level.
      */
     public Context pushBlock() {
+        if (Report.should_report(new String[] {Report.types, Report.context}, 4))
+          Report.report(4, "push block");
         Context_c v = push();
         v.kind = BLOCK;
         return v;
