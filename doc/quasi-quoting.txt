@@ -23,12 +23,14 @@ The fmt string may contain the following patterns:
         %S - corresponding object is Stmt
         %C - corresponding object is ClassDecl
         %M - corresponding object is ClassMember
+        %F - corresponding object is Formal
 
         %LT - corresponding object is List of Type or TypeNode
         %LE - corresponding object is List of Expr
         %LS - corresponding object is List of Stmt
         %LC - corresponding object is List of ClassDecl
         %LM - corresponding object is List of ClassMember
+        %LF - corresponding object is List of Formal
 
 These patterns are recognized as tokens by the lexer--surrounding the token
 with whitespace or parens may be needed to parse the string.

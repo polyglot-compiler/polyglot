@@ -87,6 +87,7 @@ import java.io.*;
             case 'T': return "TypeNode";
             case 'D': return "ClassDecl";
             case 'M': return "ClassMember";
+            case 'F': return "Formal";
             default:
                 error("Bad quasiquoting substitution type: \"" + kind + "\".",
                       pos());
@@ -123,6 +124,9 @@ import java.io.*;
                         break;
                     case 'M':
                         if (p instanceof ClassMember) continue;
+                        break;
+                    case 'F':
+                        if (p instanceof Formal) continue;
                         break;
                     default:
                         break;
@@ -187,6 +191,13 @@ import java.io.*;
                 if (o instanceof ClassMember) {
                     ClassMember m = (ClassMember) o;
                     return new QQNodeToken(pos(), m, sym.COMMA_MEMB);
+                }
+                break;
+            }
+            case 'F': {
+                if (o instanceof Formal) {
+                    Formal f = (Formal) o;
+                    return new QQNodeToken(pos(), f, sym.COMMA_FORM);
                 }
                 break;
             }
@@ -336,11 +347,13 @@ SingleCharacter = [^\r\n\'\\]
   "%T"                           { return subst('T'); }
   "%D"                           { return subst('D'); }
   "%M"                           { return subst('M'); }
+  "%F"                           { return subst('F'); }
   "%LE"                          { return substList('E'); }
   "%LS"                          { return substList('S'); }
   "%LT"                          { return substList('T'); }
   "%LD"                          { return substList('D'); }
   "%LM"                          { return substList('M'); }
+  "%LF"                          { return substList('F'); }
 
   /* keywords */
   "abstract"                     { return key(sym.ABSTRACT); }
