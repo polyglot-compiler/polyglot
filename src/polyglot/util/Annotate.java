@@ -26,6 +26,8 @@ public class Annotate {
   static final int COMPLETES_NORMALLY     = 6;
   static final int IS_REACHABLE           = 7;
   
+  // True for (PolyJ) expressions that are children of an ExpressionStatement
+  static final int IS_EXPR_STATEMENT      = 8; 
 
     
 
@@ -127,6 +129,24 @@ public class Annotate {
     o.setAnnotation( IS_REACHABLE, new Boolean (b ) );
   }
   */
+
+
+  /**
+   * Label an Expression as being part of an ExpressionStatement,
+   * meaning the result of the expression is not used
+   * (Only used by PolyJ)
+   **/
+  public static void setStatementExpr(AnnotatedObject o, boolean b) {
+    o.setAnnotation(IS_EXPR_STATEMENT, new Boolean(b));
+  }
+
+  public static boolean isStatementExpr(AnnotatedObject o) {
+    Boolean b = (Boolean) o.getAnnotation(IS_EXPR_STATEMENT);
+    if (b == null) 
+      return false;    
+    return b.booleanValue();
+  }
+
   // Never instantiate this class.
   private Annotate() {}
 }
