@@ -162,6 +162,10 @@ public class ErrorHandlingVisitor extends HaltingVisitor
         if (Report.should_report(Report.visit, 5))
 	    Report.report(5, "enter(" + n + ")");
 
+        if (catchErrors(n)) {
+            this.error = false;
+        }
+
         try {
             // should copy the visitor
             return (ErrorHandlingVisitor) enterCall(parent, n);
@@ -182,7 +186,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
                 // when the error has already been reported 
             }
 
-            if (! catchErrors(parent)) {
+            if (! catchErrors(n)) {
                 this.error = true;
             }
 
