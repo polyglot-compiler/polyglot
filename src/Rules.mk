@@ -112,3 +112,6 @@ define flex
 endef
 
 
+define jlgen
+	$(JAVA) -classpath $(CLASSPATH) jltools.util.jlgen.JLgen $<
+endef
