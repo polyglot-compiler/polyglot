@@ -83,13 +83,13 @@ ext/op/runtime: $(EXT_OP_RUNTIME_TARGET)
 frontend: util types lex parse ast visit $(FRONTEND_TARGET)
 
 #jif
-jif: util types ast ext/jif/lex ext/jif/parse ext/jif/ast ext/jif/types ext/jif/visit
-
-ext/jif/lex: util ext/jif/parse ext/jif/types $(EXTJIFLEX_TARGET)
+jif: ext/jif/parse ext/jif/lex ext/jif/ast ext/jif/types ext/jif/visit
 
 ext/jif/parse: util $(EXTJIFPARSE_TARGET)
 
-ext/jif/ast: util ext/jif/ast ext/jif/types  $(EXTJIFAST_TARGET)
+ext/jif/lex: util ext/jif/parse ext/jif/types $(EXTJIFLEX_TARGET)
+
+ext/jif/ast: util ext/jif/types  $(EXTJIFAST_TARGET)
 
 ext/jif/types: util types $(JIFTYPES_TARGET)
 
@@ -129,14 +129,15 @@ clobber superclean: clean
 	rm -f jltools/parse/sym.java
 	rm -f jltools/ext/op/Grm.java
 	rm -f jltools/ext/op/sym.java
+	rm -f jltools/ext/jif/parse/Grm.java
+	rm -f jltools/ext/jif/parse/sym.java
 	rm -f $(JAR_FILE)
 	rm -rf $(JAVADOC_OUTPUT)
 	rm -f $(BIN)/jlc
 	rm -f $(BIN)/jlcd
 	rm -f $(BIN)/jlc.exe
 	rm -f $(BIN)/jlcd.exe
-	rm -f jltools/ext/jif/parse/Grm.java
-	rm -f jltools/ext/jif/parse/sym.java
+
 
 # create a jar file
 jar: all

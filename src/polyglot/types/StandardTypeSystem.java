@@ -171,10 +171,10 @@ public class StandardTypeSystem extends TypeSystem {
     // childType is null.
     if (childType instanceof NullType) 
       return true;
-
+ 
     // So childType is definitely a ClassType.
     if (! (ancestorType instanceof ClassType))
-      return false;
+	return false;
     
     return (childType.equals(ancestorType) || 
 	    descendsFrom(childType, ancestorType));    
