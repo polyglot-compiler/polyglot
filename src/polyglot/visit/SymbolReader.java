@@ -115,6 +115,8 @@ public class SymbolReader extends NodeVisitor
 
     newClass.setFullName( fullName);
     newClass.setShortName( name);
+    if (packageName != null)
+      newClass.setPackageName( packageName);
 
     newClass.setIsLocal(isLocal);
     newClass.setIsAnonymous(isAnonymous);

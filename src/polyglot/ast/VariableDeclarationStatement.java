@@ -248,7 +248,7 @@ public class VariableDeclarationStatement extends Statement
    */
   public AccessFlags getAccessFlags() 
   {
-    return accessFlags;
+    return accessFlags; //don't return a copy! (FieldNode depends on this)
   }
 
     public int numDeclarators() {

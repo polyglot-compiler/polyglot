@@ -16,7 +16,7 @@ public class StandardExtensionInfo implements ExtensionInfo {
 
     public TypeSystem getTypeSystem() {
 	if (ts == null) {
-	    ts = new StandardTypeSystem();
+	  ts = createTypeSystem();
 	}
 	return ts;
     }

@@ -660,7 +660,7 @@ class_member_declaration ::=
 field_declaration ::=
 					// FieldNode
 		modifiers_opt:a type:b variable_declarators:c SEMICOLON
-			{: RESULT = (FieldNode)Grm.ln(new FieldNode(a, 
+			{: RESULT = (FieldNode)Grm.ln(new FieldNode( 
 				(VariableDeclarationStatement)
 				Grm.ln(new VariableDeclarationStatement(a, 
 				b, c), b)), b); :}

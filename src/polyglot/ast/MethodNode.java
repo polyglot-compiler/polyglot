@@ -363,6 +363,13 @@ public class MethodNode extends ClassMember
     {
       excTypes.add ( (((TypeNode)iter.next()).getType()));
     }
+
+    //if contained in an interface,
+    //  implicitly declared "public abstract"
+    if (clazz.getAccessFlags().isInterface()) {
+      accessFlags.setPublic(true);
+      accessFlags.setAbstract(true);
+    }
     
     if ( isConstructor)
     {
