@@ -79,10 +79,51 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
     throw new Exception ("Couldn't repair and continue parse");
   }
 
-	/**
+  protected Position posForObject(Object o) {
+      if (o instanceof Node) {
+          return pos ((Node) o);
+      }
+      else if (o instanceof Token) {
+          return pos ((Token) o);
+      }
+      else if (o instanceof Type) {
+          return pos ((Type) o);
+      }
+      else if (o instanceof List) {
+          return pos ((List) o);
+      }
+      else if (o instanceof VarDeclarator) {
+          return pos ((VarDeclarator) o);
+      }
+      else {
+          return null;
+      }
+  }      
+  public Position pos(Object first, Object last){
+      return pos(first, last, first);
+  }
+  public Position pos(Object first, Object last, Object noEndDefault){
+      //System.out.println("first: "+first+" class: "+first.getClass()+" last: "+last+" class: "+last.getClass());
+      Position fpos = posForObject(first);
+      Position epos = posForObject(last);
+
+      if (fpos != null && epos != null) {
+          if (epos.endColumn() != Position.END_UNUSED) {
+              return new Position(fpos, epos);
+          }        
+          
+          // the end line and column are not being used in this extension.
+          // so return the default for that case.
+          return posForObject(noEndDefault);
+      }
+      return null;
+
+  }
+      
+  	/**
 	 * Return the position of the Token.
 	 */
-  public static Position pos (Token t)
+  public Position pos (Token t)
   {
     if (t == null) return null;
     return t.getPosition ();
@@ -91,36 +132,30 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
 	/**
 	 * Return the source position of the Type.
 	 */
-  public static Position pos (Type n)
+  public Position pos (Type n)
   {
     if (n == null) return null;
     return n.position ();
   }
 
 	/**
-	 * Return the source position of the first element in the list.
+	 * Return the source position of the first element in the list to the
+         * last element in the list.
 	 */
-  public static Position pos (List l)
+  public Position pos (List l)
   {
     if (l == null || l.isEmpty ())
       {
 	return null;
       }
 
-    Object n = l.get (0);
-
-    if (n instanceof Node) return pos ((Node) n);
-    if (n instanceof Token) return pos ((Token) n);
-    if (n instanceof Type) return pos ((Type) n);
-    if (n instanceof List) return pos ((List) n);
-
-    return null;
+    return pos(l.get(0), l.get(l.size()-1));
   }
 
   /**
    * Return the source position of the declaration.
    */
-  public static Position pos (VarDeclarator n)
+  public Position pos (VarDeclarator n)
   {
     if (n == null) return null;
     return n.pos;
@@ -129,7 +164,7 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
 	/**
 	 * Return the source position of the Node.
 	 */
-  public static Position pos (Node n)
+  public Position pos (Node n)
   {
     if (n == null)
       {

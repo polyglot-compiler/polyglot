@@ -124,11 +124,10 @@ public class StdErrorQueue extends AbstractErrorQueue
         LineNumberReader reader = new LineNumberReader(r);
 
         String s = null;
-
+        
         for (int i = 0; i < pos.line(); i++) {
           s = reader.readLine();
         }
-
         reader.close();
 
         if (s != null) {
@@ -144,6 +143,23 @@ public class StdErrorQueue extends AbstractErrorQueue
               }
             }
 
+            if (pos.endLine() == pos.line() && 
+                pos.endColumn() != Position.UNKNOWN &&
+                pos.endColumn() != Position.END_UNUSED &&
+                pos.endColumn() != pos.column() &&
+                pos.endColumn() - pos.column() > 1) {
+                err.print("^");
+                int length = pos.endColumn()-pos.column();
+                for (int i = 0; i < length-2; i++) {
+                  if (s.charAt(i) == '\t') {
+                    err.print("\t");
+                  }
+                  else {
+                    err.print("-");
+                  }
+                }                
+            }
+            
             err.println("^");
           }
 

@@ -9,11 +9,15 @@ public class Position implements Serializable
 {
     static final long serialVersionUID = -4588386982624074261L;
 
-    String file;
-    int line;
-    int column;
+    private String file;
+    private int line;
+    private int column;
+    
+    private int endLine;
+    private int endColumn;
 
     public static final int UNKNOWN = -1;
+    public static final int END_UNUSED = -2;
 	public static final Position COMPILER_GENERATED = new Position("Compiler Generated");
 
     /** For deserialization. */
@@ -28,17 +32,41 @@ public class Position implements Serializable
     }
 
     public Position(String file, int line, int column) {
-	this.file = file;
-	this.line = line;
-	this.column = column;
+        this(file, line, column, END_UNUSED, END_UNUSED);
+    }
+    
+    public Position(String file, int line, int column, int endLine, int endColumn) {
+        this.file = file;
+        this.line = line;
+        this.column = column;
+        this.endLine = endLine;
+        this.endColumn = endColumn;
     }
 
+    public Position(Position start, Position end) {
+        this(start.file(), start.line, start.column, end.endLine, end.endColumn);
+    }
+    
     public int line() {
 	return line;
     }
 
     public int column() {
 	return column;
+    }
+
+    public int endLine() {
+        if (endLine == UNKNOWN || (line != UNKNOWN && endLine < line)) {
+            return line;
+        }
+        return endLine;
+    }
+
+    public int endColumn() {
+        if (endColumn == UNKNOWN || (column != UNKNOWN && endColumn < column)) {
+            return column;
+        }
+        return endColumn;
     }
 
     public String file() {
@@ -50,6 +78,10 @@ public class Position implements Serializable
 
 	if (line != UNKNOWN) {
 	    s += ":" + line;
+            if (endLine != line &&
+                      endLine != UNKNOWN && endLine != END_UNUSED) {
+                s += "-" + endLine;
+            }
 	}
 
 	return s;
@@ -63,6 +95,10 @@ public class Position implements Serializable
 
 	    if (column != UNKNOWN) {
 		s += "," + column;
+                if (line == endLine && 
+                          endColumn != UNKNOWN && endColumn != END_UNUSED) {
+                    s += "-" + endColumn;
+                }
 	    }
 	}
 

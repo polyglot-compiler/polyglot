@@ -73,9 +73,12 @@ import polyglot.util.ErrorInfo;
     }
 
     private Position pos() {
-        return new Position(file, yyline+1, yycolumn);
+        return new Position(file, yyline+1, yycolumn, yyline+1, yycolumn+yytext().length());
     }
-
+    private Position pos(int len) {
+        return new Position(file, yyline+1, yycolumn-len-1, yyline+1, yycolumn+1);
+    }
+    
     private Token key(int symbol) {
         return new Keyword(pos(), yytext(), symbol);
     }
@@ -121,7 +124,7 @@ import polyglot.util.ErrorInfo;
     }
 
     private Token string_token() {
-        return new StringLiteral(pos(), sb.toString(), sym.STRING_LITERAL);
+        return new StringLiteral(pos(sb.length()), sb.toString(), sym.STRING_LITERAL);
     }
 
   /* assumes correct representation of a long value for 
