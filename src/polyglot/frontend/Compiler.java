@@ -109,9 +109,7 @@ public class Compiler
 
 	eq.flush();
 
-        if (Report.should_report(Report.time, 1)) {
-            extensionInfo.getStats().report();
-        }
+        extensionInfo.getStats().report();
 
 	return okay;
     }
