@@ -71,6 +71,7 @@ GOOD =  \
 	Return5.jl \
 	Semicolon.jl \
 	SemicolonClass.jl \
+	Shadowing.jl \
 	Statements.jl \
 	StaticContext.jl \
 	StaticOps.jl \
