@@ -57,6 +57,10 @@ public class PackageType extends Type
     return name;
   }
   
+  public String translate(LocalContext c) {
+    return getTypeString();
+  }
+
   public String getTypeString() 
   {
     return prefix == null ? name : prefix.getTypeString() + "." + name;

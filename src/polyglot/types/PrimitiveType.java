@@ -38,6 +38,10 @@ public class PrimitiveType extends Type
   {
     return kind;
   }
+
+  public String translate(LocalContext c) {
+    return getTypeString();
+  }
   
   public String getTypeString() 
   {

@@ -41,9 +41,10 @@ public abstract class Type extends AnnotatedObject implements Serializable
 
   public abstract String getTypeString();
 
-    public String translate() {
-	return getTypeString();
-    }
+  public String translate(LocalContext c) {
+    throw new InternalCompilerError("translate called on " +
+	getClass().getName() + ": " + getTypeString());
+  }
 
   /*
    * To be filled in by subtypes.

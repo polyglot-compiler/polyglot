@@ -67,9 +67,9 @@ public class ArrayType extends ReferenceType
     return sb.toString();
   }
 
-  public String translate() {
+  public String translate(LocalContext c) {
       StringBuffer sb = new StringBuffer();
-      sb.append(base.translate());
+      sb.append(base.translate(c));
       sb.append("[]");
       return sb.toString();
   }

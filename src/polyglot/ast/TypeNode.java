@@ -117,11 +117,11 @@ public class TypeNode extends Node
    */
   public void translate(LocalContext c, CodeWriter w)
   {
-    if( Compiler.useFullyQualifiedNames()) {
-      w.write( type.getTypeString());
+    if (! Compiler.useFullyQualifiedNames()) {
+      w.write( type.translate(c) );
     }
     else {
-      w.write( original);
+      w.write( type.translate(null) );
     }
   }
 
