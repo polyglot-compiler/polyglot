@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.ListIterator;
 import java.util.Iterator;
 
+import java.io.PrintStream;
+import java.io.ByteArrayOutputStream;
+
 /** This class represents a state in the LALR viable prefix recognition machine.
  *  A state consists of an LALR item set and a set of transitions to other 
  *  states under terminal and non-terminal symbols.  Each state represents
@@ -770,19 +773,34 @@ public class lalr_state {
       System.err.print  ("  between ");
       System.err.println(itm1.to_simple_string());
 /* ACM extension */
+      ByteArrayOutputStream es = new ByteArrayOutputStream();
+      ByteArrayOutputStream ds = new ByteArrayOutputStream();
       if (Main.report_counterexamples) {
-  	  System.err.print("    Example:\n    ");
- 	  report_shortest_path(itm1);
+	try {
+ 	  report_shortest_path(itm1, new PrintStream(es), new PrintStream(ds));
+  	  System.err.print("    Example:    ");
+	  es.writeTo(System.err);
+	  System.err.println(" (*)");
+  	  System.err.print("    Derivation: ");
+	  ds.writeTo(System.err);
 	  System.err.println("] (*)\n");
+	} catch (java.io.IOException e) { throw new internal_error("impossible"); }
       }
 /* End ACM extension */
       System.err.print  ("  and     ");
       System.err.println(itm2.to_simple_string());
 /* ACM extension */
+      es.reset(); ds.reset();
       if (Main.report_counterexamples) {
-  	  System.err.print("    Example:\n    ");
- 	  report_shortest_path(itm2);
+	try {
+ 	  report_shortest_path(itm2, new PrintStream(es), new PrintStream(ds));
+  	  System.err.print("    Example:    ");
+	  es.writeTo(System.err);
+	  System.err.println(" (*)");
+  	  System.err.print("    Derivation: ");
+	  ds.writeTo(System.err);
 	  System.err.println("] (*)\n");
+	} catch (java.io.IOException e) { throw new internal_error("impossible"); }
       }
 /* End ACM extension */
       System.err.print("  under symbols: {" );
@@ -823,15 +841,24 @@ public class lalr_state {
 
       /* emit top part of message including the reduce item */
       System.err.println("*** Shift/Reduce conflict found in state #"+index());
-      System.err.print  ("  between ");
+      System.err.print  ("  between reduction on ");
       System.err.println(red_itm.to_simple_string());
 /* ACM extension */
+      ByteArrayOutputStream es = new ByteArrayOutputStream();
+      ByteArrayOutputStream ds = new ByteArrayOutputStream();
       if (Main.report_counterexamples) {
-	System.err.print("    Example:\n    ");
- 	report_shortest_path(red_itm);
-	System.err.print("] (*) ");
-	System.err.println(terminal.find(conflict_sym).name());
-	System.err.println("");
+	try {
+	    System.err.print("    Example:    ");
+	    report_shortest_path(red_itm, new PrintStream(es), new PrintStream(ds));
+	    es.writeTo(System.err);
+	    System.err.print(" (*) ");
+	    System.err.println(terminal.find(conflict_sym).name());
+	    System.err.print("    Derivation: ");
+	    ds.writeTo(System.err);
+	    System.err.print("] (*) ");
+	    System.err.println(terminal.find(conflict_sym).name());
+	    System.err.println("");
+	} catch (java.io.IOException e) { throw new internal_error("impossible"); }
       }
 /* end ACM extension */
 
@@ -848,14 +875,25 @@ public class lalr_state {
 	      if (!shift_sym.is_non_term() && shift_sym.index() == conflict_sym)
 	        {
 		  /* yes, report on it */
-                  System.err.println("  and     " + itm.to_simple_string());
+                  System.err.println("  and shift on " + itm.to_simple_string());
 /* ACM extension */
 		  if (Main.report_counterexamples) {
-		      System.err.print("    Example:\n    ");
-		      report_shortest_path(itm);
+		    try {
+		      es.reset();
+		      ds.reset();
+		      report_shortest_path(itm, new PrintStream(es),
+						new PrintStream(ds));
+		      System.err.print("    Example:    ");
+		      es.writeTo(System.err);
 		      System.err.print(" (*) ");
 		      System.err.println(right_of_dot(itm));
-		      System.err.println("\n    ");
+		      System.err.print("    Derivation: ");
+		      ds.writeTo(System.err);
+		      System.err.print(" (*) ");
+		      System.err.println(right_of_dot(itm));
+		      System.err.println("");
+	            } catch (java.io.IOException e)
+			{ throw new internal_error("impossible"); }
 		  }
 /* end ACM extension */
 		}
@@ -901,24 +939,33 @@ public class lalr_state {
     }
 
     /**
-     * Report on standard error a textual version of the shortest
+     * Report on example_s a textual version of the shortest
      * path from the start state and start item to the current state
-     * and item itm. This is useful for diagnosing errors.
+     * and item itm. Report on derivation_str a more detailed
+     * textual description including derivation information.
+     * This output is useful for diagnosing conflicts in the grammar.
      */
-    protected void report_shortest_path(lalr_item itm) throws internal_error {
+    protected void report_shortest_path(lalr_item itm,
+	    PrintStream example_s, PrintStream derivation_s)
+	    throws internal_error {
 	Path p = shortest_path(itm);
 	production current = null;
 	boolean first = true;
 	for (Iterator i = p.steps.listIterator(); i.hasNext();) {
-	    if (!first) System.err.print(" ");
+	    if (!first) {
+		derivation_s.print(" ");
+	    }
 	    first = false;
 	    Object o = i.next();
 	    if (o instanceof lalr_transition) {
 		lalr_transition tr = (lalr_transition)o;
-		System.err.print(tr.on_symbol().name());
+		String name = tr.on_symbol().name();
+		example_s.print(name);
+		derivation_s.print(name);
 	    } else if (o instanceof production) {
 		production pr = (production)o;
-		System.err.print("[" + pr.lhs().the_symbol().name() + "::=");
+		/* production: don't add anything to the example */
+		derivation_s.print("[" + pr.lhs().the_symbol().name() + "::=");
 	    }
 	}
     }
