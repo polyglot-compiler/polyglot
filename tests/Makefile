@@ -36,7 +36,6 @@ GOOD =  \
 	ForwardRef.jl \
 	ForwardRef2.jl \
 	ForwardRef3.jl \
-	ForwardRef4.jl \
 	Increment.jl \
 	Infinite.jl \
 	Init1.jl \
@@ -136,6 +135,7 @@ BAD = \
 	DoubleFlags.jl \
 	Errors.jl \
 	Errors2.jl \
+	ForwardRef4.jl \
 	LabeledBreak2.jl \
 	NoInit1.jl \
 	NoInit10.jl \
