@@ -13,6 +13,7 @@ import polyglot.ast.NodeFactory;
 import polyglot.ast.Stmt;
 import polyglot.ast.Term;
 import polyglot.frontend.Job;
+import polyglot.main.Report;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
@@ -91,6 +92,16 @@ public class ReachChecker extends DataFlow
             for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
                 FlowGraph.Peer p = (FlowGraph.Peer) iter.next();
     
+                // the peer is reachable if at least one of it's out items
+                // is reachable. This would cover all cases, except that some
+                // peers may have no successors (e.g. peers that throw an
+                // an exception that is not caught by the method). So we need 
+                // to also check the inItem.
+                if (p.inItem != null && ((DataFlowItem)p.inItem).reachable) {
+                    System.out.println("Setting term " + n + " to reachable");
+                    return n.reachable(true);                
+                }
+                
                 if (p.outItems != null) {
                     for (Iterator k = p.outItems.values().iterator(); k.hasNext(); ) {
                         DataFlowItem item = (DataFlowItem) k.next();
@@ -124,6 +135,9 @@ public class ReachChecker extends DataFlow
     public void post(FlowGraph graph, Term root) throws SemanticException {
         // There is no need to do any checking in this method, as this will
         // be handled by leaveCall and checkReachability.
+        if (Report.should_report(Report.cfg, 2)) {
+            dumpFlowGraph(graph, root);
+        }
     } 
 
     public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
