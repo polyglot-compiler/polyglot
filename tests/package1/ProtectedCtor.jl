@@ -1,5 +1,5 @@
 package package1;
 
-public class InnerClassProblem2 {
-    protected InnerClassProblem2() { }
+public class ProtectedCtor {
+    protected ProtectedCtor() { }
 }
