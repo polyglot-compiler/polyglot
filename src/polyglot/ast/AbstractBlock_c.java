@@ -39,6 +39,14 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 	return statements(l);
     }
 
+    /** Prepend a statement to the block. */
+    public Block prepend(Stmt stmt) {
+        List l = new ArrayList(statements.size()+1);
+        l.add(stmt);
+        l.addAll(statements);
+        return statements(l);
+    }
+
     /** Reconstruct the block. */
     protected AbstractBlock_c reconstruct(List statements) {
 	if (! CollectionUtil.equals(statements, this.statements)) {

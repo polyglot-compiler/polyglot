@@ -11,4 +11,5 @@ public interface Block extends Stmt
     List statements();
     Block statements(List statements);
     Block append(Stmt stmt);
+    Block prepend(Stmt stmt);
 }
