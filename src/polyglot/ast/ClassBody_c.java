@@ -69,6 +69,56 @@ public class ClassBody_c extends Node_c implements ClassBody
         return c;
     }
 
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
+        // We can't clean-super any member classes yet until we are finished
+        // with this class and all at the same nesting level.
+        // Delay until the clean-sigs pass.
+        if (ar.kind() == AmbiguityRemover.SUPER) {
+            return ar.bypassChildren(this);
+        }
+
+        return ar;
+    }
+
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        // Now we can clean-super on the member classes.
+        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
+            List l = new ArrayList(members.size());
+
+            boolean hasInner = false;
+
+            Job j = ar.job();
+
+            for (Iterator i = members.iterator(); i.hasNext(); ) {
+                ClassMember n = (ClassMember) i.next();
+
+                if (n instanceof ClassDecl) {
+                    ClassDecl m = (ClassDecl) j.spawn(ar.context(), n,
+                                                      Pass.CLEAN_SUPER,
+                                                      Pass.CLEAN_SUPER_ALL);
+
+                    if (m == null) {
+                        throw new SemanticException("Could not disambiguate " +
+                                                    "class member.", n.position());
+                    }
+
+                    l.add(m);
+
+                    hasInner = true;
+                }
+                else {
+                    l.add(n);
+                }
+            }
+
+            if (hasInner) {
+                return members(l).visitChildren(ar);
+            }
+        }
+
+        return this;
+    }
+
     protected void addMembers(Context c, ReferenceType type,
                               Set visited, boolean inherit) {
         Types.report(2, "addMembers(" + type + ")");

@@ -144,6 +144,14 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         return c.pushClass(type, ts.staticTarget(type).toClass());
     }
 
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
+        if (ar.kind() == AmbiguityRemover.SUPER) {
+            return ar.bypass(body);
+        }
+
+        return ar;
+    }
+
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (ar.kind() != AmbiguityRemover.SUPER) {
             return this;
