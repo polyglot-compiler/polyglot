@@ -701,6 +701,17 @@ ext=""
   <!-- compile pth (Polyglot Test Harness) -->
   <target name="pth-compile" 
           description="compile the pth source">
+    <antcall target="jflex-lexer">
+      <param name="lexer.dir" value="${pthdir}/src/polyglot/pth"/>
+      <param name="lexer.class" value="Lexer_c"/>
+      <param name="jflex.file" value="script.flex"/>
+    </antcall>
+    <antcall target="cup-parser">
+      <param name="parser.dir" value="${pthdir}/src/polyglot/pth"/>
+      <param name="parser.class" value="Grm"/>
+      <param name="symbol.class" value="sym"/>
+      <param name="cup.file" value="script.cup"/>
+    </antcall>
     <javac srcdir="${pthdir}/src" destdir="${classes}" debug="on"
       includes="polyglot/**">
       <classpath refid="standard.classpath"/>
