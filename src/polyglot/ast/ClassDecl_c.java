@@ -138,9 +138,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         
         ParsedClassType ct = tb.currentClass();
 
-        // Member classes of interfaces are implicitly static.
+        // Member classes of interfaces are implicitly public and static.
         if (ct.isMember() && ct.outer().flags().isInterface()) {
-            ct.flags(ct.flags().Static());
+            ct.flags(ct.flags().Public().Static());
         }
 
         // Member interfaces are implicitly static. 
@@ -152,7 +152,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         if (ct.flags().isInterface()) {
             ct.flags(ct.flags().Abstract());
         }
-        
+
         return tb;
     }
 

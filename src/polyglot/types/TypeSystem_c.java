@@ -1414,12 +1414,15 @@ public class TypeSystem_c implements TypeSystem
                                          .Synchronized().StrictFP();
 
     /** All flags allowed for a top-level class. */
-    protected final Flags TOP_LEVEL_CLASS_FLAGS = ACCESS_FLAGS
+    protected final Flags TOP_LEVEL_CLASS_FLAGS = ACCESS_FLAGS.clear(Private())
                                                   .Abstract().Final()
                                                   .StrictFP().Interface();
 
     /** All flags allowed for a member class. */
-    protected final Flags MEMBER_CLASS_FLAGS = TOP_LEVEL_CLASS_FLAGS.Static();
+    protected final Flags MEMBER_CLASS_FLAGS = ACCESS_FLAGS.Static()
+                                                  .Abstract().Final()
+                                                  .StrictFP().Interface();
+
 
     /** All flags allowed for a local class. */
     protected final Flags LOCAL_CLASS_FLAGS = TOP_LEVEL_CLASS_FLAGS
@@ -1451,6 +1454,18 @@ public class TypeSystem_c implements TypeSystem
 	    throw new SemanticException(
 		"Cannot declare method that is both abstract and native.");
         }
+
+        if (f.isAbstract() && f.isSynchronized()) {
+	    throw new SemanticException(
+		"Cannot declare method that is both abstract and synchronized.");
+        }
+
+        if (f.isAbstract() && f.isStrictFP()) {
+	    throw new SemanticException(
+		"Cannot declare method that is both abstract and strictfp.");
+        }
+
+	checkAccessFlags(f);
     }
 
     public void checkLocalFlags(Flags f) throws SemanticException {
