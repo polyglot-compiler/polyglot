@@ -466,16 +466,15 @@ public class Main
         options.put( MAIN_OPT_EXT, args[i]);
 	loadExtension(args[i]);
 	i++;
-	if (i < args.length)
-	    try  {
-		i = extInfo.parseCommandLine(args, i+1, options);
-	    }
-	    catch (UsageError u) {
-		System.err.println(u.getMessage());
-		usage();
-		System.exit(1);
-	    }
+	try  {
+	    i = extInfo.parseCommandLine(args, i, options);
 	}
+	catch (UsageError u) {
+	    System.err.println(u.getMessage());
+	    usage();
+	    System.exit(1);
+	}
+      }
       else if( args[i].equals( "-sx")) 
       {
         i++;
