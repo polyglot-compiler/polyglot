@@ -43,7 +43,7 @@ public abstract class Term_c extends Node_c implements Term
      * Set the reachability of this term.
      */
     public Term reachable(boolean reachability) {
-        if (this.reachable = reachability) {
+        if (this.reachable == reachability) {
             return this;
         }
         

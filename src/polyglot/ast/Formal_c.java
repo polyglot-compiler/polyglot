@@ -169,7 +169,7 @@ public class Formal_c extends Node_c implements Formal
      * Set the reachability of this term.
      */
     public Term reachable(boolean reachability) {
-        if (this.reachable = reachability) {
+        if (this.reachable == reachability) {
             return this;
         }
         
