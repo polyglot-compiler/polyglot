@@ -100,7 +100,8 @@ public class FormalParameter extends Node {
 
   public void translate(LocalContext c, CodeWriter w)
   {
-    w.write ( type.getType().getTypeString() + " " + name);
+    type.translate( c, w);
+    w.write ( " " + name);
   }
 
   public Node dump( CodeWriter w)

@@ -266,7 +266,7 @@ public class BinaryExpression extends Expression {
           throw new TypeCheckException(
                     "Can only compare two expressions of similar type.");
         }
-        else if( !(ltype.isCastValid( rtype) || rtype.isCastValid( ltype))) {
+        else if( !(rtype instanceof ClassType || rtype instanceof NullType)) {
           throw new TypeCheckException(
                     "Can only compare two expressions of similar type.");
         }

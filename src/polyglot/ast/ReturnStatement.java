@@ -72,17 +72,27 @@ public class ReturnStatement extends Statement {
   public Node typeCheck(LocalContext c) throws TypeCheckException
   {
     MethodTypeInstance mti = c.getCurrentMethod() ;
-    if ( ! expr.getCheckedType().descendsFrom( mti.getReturnType() ) &&
-         ! expr.getCheckedType().equals( mti.getReturnType() ))
-      throw new TypeCheckException ( "The mehtod body says the return type is \"" + 
-                                     mti.getReturnType().getTypeString() + "\", however, the return statement " +
-                                     "returns an instnace of type \"" + 
-                                     expr.getCheckedType().getTypeString() + "\"");
+    if( expr == null) {
+      if( mti.getReturnType() == c.getTypeSystem().getVoid()) {
+        throw new TypeCheckException( 
+                          "Method \"" + mti.getName() + "\" must return "
+                          + "an expression of type \"" 
+                          + mti.getReturnType().getTypeString() + "\".");
 
+      }
+    }
+    else {
+      if ( ! expr.getCheckedType().descendsFrom( mti.getReturnType() ) &&
+           ! expr.getCheckedType().equals( mti.getReturnType() )) {
+        throw new TypeCheckException ( 
+                          "Method \"" + mti.getName() + "\" must return "
+                          + "an expression of type \"" 
+                          + mti.getReturnType().getTypeString() + "\".");
+      } 
+      addThrows ( expr.getThrows() );    
+    }
       
-
     Annotate.setTerminatesOnAllPaths (this, true);
-    addThrows ( expr.getThrows() );
     return this;
   }
 

@@ -96,12 +96,16 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     //dump(c, w);
     //w.write ( "> ");
     
+    /*
     for (Iterator i = names.listIterator(); i.hasNext(); )
     {
       w.write ((String)i.next());
       if(i.hasNext())
         w.write(".");
     }
+    */
+      throw new InternalCompilerError( 
+			    "Attempted to translate an ambiguous node.");
   }
 
   public Node dump( CodeWriter w)
@@ -122,49 +126,82 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 
   public Node removeAmbiguities( LocalContext c) throws TypeCheckException
   {
-    Expression e;
-    TypeNode tn;
-    FieldInstance fi = null;
-    String name = getName();
-    String s = "";
-    /*
+    Node top = null;
+    String name = "";
+    ClassType last = null;
+
     for (Iterator i = names.listIterator(); i.hasNext(); )
     {
       try {
-        s += (String)i.next();
-        fi = c.getField( null, s);
-        break;
+        name += (String)i.next();
+
+        /* First try local variables and fields. */
+        FieldInstance fi;
+
+        if( last == null) {
+          /* This is the first component. */
+          fi = c.getField( null, name);
+        }
+        else {
+          /* This is not the first component, so use the last component
+           * as the context for this component. */
+          fi = c.getField( last, name);
+        }
+
+        if( last == null && c.isDefinedLocally( name) ) {
+          top = new LocalVariableExpression( name);
+        }
+        else {
+          if( top == null) {
+ 	    top = new FieldExpression( new TypeNode( c.getCurrentClass()), 
+                                       fi.getName());
+          }
+          else {
+            top = new FieldExpression( top, fi.getName());
+          }
+        }
+
+        if( fi.getType() instanceof ClassType) {
+          last = (ClassType)fi.getType();
+        }
+        else {
+          last = null;
+        }
+
+        
+        /* Clear the name. */
+        name = "";
       }
-      catch( TypeCheckException tce) {}
+      catch( TypeCheckException tce) 
+      {
+        if( top == null) {
+          /* If it's not a local or field, then try and find a type. */
+          try {
+            last = (ClassType)c.getType( name);
+            top = new TypeNode( last, name);
+            
+            /* Clear the name. */
+            name = "";
+          }
+          catch( TypeCheckException tce2)
+          {
+            /* Not a local, field or type. Must be imcomplete. */
+            name += ".";
+          }
+        }
+      }
+      
+      if( top != null) {
+        Annotate.setLineNumber( top, Annotate.getLineNumber( this));
+      }
     }
 
-    if( fi == null) {
+    if( top == null) {
       throw new TypeCheckException( "No field or variable with name \"" + 
                                     name + "\".");
     }
-    */
-    fi = c.getField( null, name);
 
-    if( c.isDefinedLocally( name) ) {
-      e = new LocalVariableExpression( name);
-    }
-    else {
-      // look for a field
-      //      System.out.println( fi.getEnclosingType().getTypeString());
-      tn = new TypeNode( fi.getEnclosingType());
-      e = new FieldExpression( tn, fi.getName() );
-      Annotate.setLineNumber( tn, Annotate.getLineNumber( this));
-    }
-
-    Annotate.setLineNumber( e, Annotate.getLineNumber( this));
-    e.setCheckedType( fi.getType());
-    return e;
-  }
-
-  public Node typeCheck( LocalContext c)
-  {
-    // FIXME: implement;
-    return this;
+    return top;
   }
 
   TypedList names;

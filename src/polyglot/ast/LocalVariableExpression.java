@@ -3,7 +3,7 @@
  */
 
 package jltools.ast;
-import jltools.types.LocalContext;
+import jltools.types.*;
 import jltools.util.*;
 
 /** 
@@ -57,9 +57,12 @@ public class LocalVariableExpression extends Expression {
     return null;
   }
 
-  public Node typeCheck(LocalContext c)
+  public Node typeCheck(LocalContext c) throws TypeCheckException
   {
-    // FIXME; implement
+    FieldInstance fi = c.getField( null, name);
+    
+    setCheckedType( fi.getType());
+
     return this;
   }
 

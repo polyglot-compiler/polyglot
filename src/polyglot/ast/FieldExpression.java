@@ -109,6 +109,8 @@ public class FieldExpression extends Expression {
       ltype = ((TypeNode)target).getCheckedType();
     }
     else {
+	System.out.println( "!!!" + target);
+	System.out.println( "!!!" + target.getClass().getName());
       throw new InternalCompilerError(
                               "Attempting field access on node of type " 
                               + target.getClass().getName());

@@ -4,6 +4,9 @@
 
 package jltools.ast;
 
+import jltools.types.*;
+import jltools.util.*;
+
 /**
  * AmbiguousExpression
  *
@@ -16,5 +19,13 @@ public abstract class AmbiguousExpression extends Expression {
   {
     return 3; // PRECEDENCE_OTHER;
   }
+
+  public Node typeCheck( LocalContext c) throws TypeCheckException
+  {
+    throw new InternalCompilerError( 
+                     "Attempt to type check an ambiguous node.");
+  }
+
+  public void translate( LocalContext c, CodeWriter w) {}
 }
 

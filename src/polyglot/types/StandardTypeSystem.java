@@ -219,6 +219,10 @@ public class StandardTypeSystem extends TypeSystem {
       return toType.equals(CLONEABLE_) || toType.equals(OBJECT_);
     }
 
+    if( fromType instanceof NullType) {
+      return (toType instanceof ClassType);
+    }
+
     // From and to are neither primitive nor an array. They are distinct.
     boolean fromInterface = ((ClassType)fromType).getAccessFlags().isInterface();
     boolean toInterface   =   ((ClassType)toType).getAccessFlags().isInterface();

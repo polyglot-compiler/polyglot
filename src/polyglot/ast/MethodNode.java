@@ -245,13 +245,13 @@ public class MethodNode extends ClassMember {
     }
     else
     {
-      w.write(name + " (");
+      w.write(name + "( ");
     }
     for (Iterator i = formals.iterator(); i.hasNext(); )
     {
       ((FormalParameter)i.next()).translate(c, w);
       if (i.hasNext())
-        w.write (" , ");
+        w.write (", ");
     }
     w.write(")");
     if (! exceptions.isEmpty())
@@ -264,8 +264,15 @@ public class MethodNode extends ClassMember {
         w.write ( (i.hasNext() ? ", " : "" ));
       }
     }
-    w.newline(0);
-    body.translate(c, w);
+    
+
+    if( !mtiThis.getAccessFlags().isAbstract()) {
+      w.newline( 0);
+      body.translate(c, w);
+    }
+    else {
+      w.write( ";");
+    }
   }
 
   public Node dump( CodeWriter w)
@@ -358,8 +365,9 @@ public class MethodNode extends ClassMember {
             }
           }
           if ( ! bThrowDeclared)
-            throw new TypeCheckException ( "The method \"" + name + "\" can throw the exception \"" + 
-                                           t.getTypeString() + "\", but it is not declared in the throws clause");
+            throw new TypeCheckException ( 
+                        "Method \"" + name + "\" throws the undeclared "
+                        + "exception \"" + t.getTypeString() + "\".");
         }
       }
     }
@@ -367,8 +375,8 @@ public class MethodNode extends ClassMember {
     // make sure that all paths return, if our return type is not void
     if ( !mtiThis.getReturnType().equals (c.getTypeSystem().getVoid() ) &&
          !Annotate.terminatesOnAllPaths ( body ) )
-      throw new TypeCheckException ( "Not all paths in the method \"" + name + 
-                                     "\" have a return or throw statement");
+      throw new TypeCheckException ( "Not all execution paths in the method \""
+                        + name + "\" lead to a return or throw statement.");
       
     c.leaveMethod(  ) ;
     return this;
