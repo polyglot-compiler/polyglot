@@ -5,6 +5,8 @@ GOOD =  \
 	Init1.jl \
 	Init2.jl \
 	Init3.jl \
+	Init4.jl \
+	Init5.jl \
 	Ctor.jl \
 	Dep1.jl \
 	Equality.jl \
