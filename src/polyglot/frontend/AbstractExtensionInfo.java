@@ -165,7 +165,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                 // The mark-sweep collector will sometimes crash.
                 // Running the GC explicitly here makes the bug go away.
                 // If this fails, maybe run with bigger heap.
-                System.gc();
+
+                // System.gc();
 
                 currentJob = oldCurrentJob;
             }
