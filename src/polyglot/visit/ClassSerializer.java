@@ -52,6 +52,14 @@ public class ClassSerializer extends NodeVisitor
 	    ParsedClassType ct = cn.type();
 	    byte[] b;
 
+            // HACK: force class members to get created from lazy class
+            // initializer.
+            ct.memberClasses();
+            ct.constructors();
+            ct.interfaces();
+            ct.methods();
+            ct.fields();
+
 	    if (! ct.isTopLevel()) {
 	        return n;
 	    }

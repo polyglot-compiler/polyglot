@@ -87,7 +87,7 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     public String toString() {
-	String s = designator() + flags.translate() + returnType + " " +
+	String s = designator() + " " + flags.translate() + returnType + " " +
                    signature();
 
 	if (! excTypes.isEmpty()) {

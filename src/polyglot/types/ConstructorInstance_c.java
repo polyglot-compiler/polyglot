@@ -45,7 +45,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c
     }
 
     public String toString() {
-	return designator() + flags.translate() + signature();
+	return designator() + " " + flags.translate() + signature();
     }
     
     public String signature() {
