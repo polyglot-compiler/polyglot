@@ -12,7 +12,12 @@ public class SemanticException extends Exception {
     protected Position position;
     
     public SemanticException() {
-	super();
+        super();
+        trace(this, 5);
+    }
+
+    public SemanticException(Throwable cause) {
+        super(cause);
         trace(this, 5);
     }
 
@@ -23,7 +28,12 @@ public class SemanticException extends Exception {
     }
 
     public SemanticException(String m) {
-	super(m);
+        super(m);
+       trace(this, 5);
+    }
+
+    public SemanticException(String m, Throwable cause) {
+        super(m, cause);
         trace(this, 5);
     }
 

@@ -6,17 +6,28 @@ public class InternalCompilerError extends RuntimeException
     Position pos;
 
     public InternalCompilerError(String msg) {
-        this(msg, null);
+        this(msg, (Position)null);
+    }
+
+    public InternalCompilerError(Throwable cause) {
+        this(cause.getMessage(), cause);
+    }
+
+    public InternalCompilerError(String msg, Throwable cause) {
+        this(msg, null, cause);
     }
 
     public InternalCompilerError(Position position, String msg) {
-	super(msg); 
-	pos = position;
+	this(msg, position); 
     }
 
     public InternalCompilerError(String msg, Position position) {
-	super(msg); 
-	pos = position;
+        super(msg); 
+        pos = position;
+    }
+    public InternalCompilerError(String msg, Position position, Throwable cause) {
+        super(msg, cause); 
+        pos = position;
     }
 
     public Position position() {
