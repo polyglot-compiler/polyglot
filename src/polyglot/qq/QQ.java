@@ -7,7 +7,7 @@ import polyglot.visit.*;
 import polyglot.frontend.*;
 import polyglot.main.Report;
 
-import polyglot.ext.jl.qq.Lexer;
+import polyglot.ext.jl.qq.Lexer_c;
 import polyglot.ext.jl.qq.Grm;
 
 import java.util.*;
@@ -82,14 +82,14 @@ public class QQ {
     }
 
     protected Node parse(Map subst, String text, int kind) throws SemanticException {
-        polyglot.ext.jl.qq.Lexer lexer;
-        polyglot.ext.jl.qq.Grm grm;
 
         TypeSystem ts = ext.typeSystem();
         NodeFactory nf = ext.nodeFactory();
 
-        lexer = new polyglot.ext.jl.qq.Lexer(text, pos);
-        grm = new polyglot.ext.jl.qq.Grm(lexer, ts, nf, subst);
+        polyglot.lex.Lexer lexer =
+	    new polyglot.ext.jl.qq.Lexer_c(text, pos);
+        polyglot.ext.jl.qq.Grm grm =
+	    new polyglot.ext.jl.qq.Grm(lexer, ts, nf, subst);
 
         if (Report.should_report(polyglot.ext.jl.Topics.qq, 1)) {
 	    Report.report(1, "qq: " + text);

@@ -40,7 +40,7 @@ import polyglot.util.ErrorInfo;
 %%
 
 %public
-%class Lexer
+%class Lexer_c
 %type Token
 %function nextToken
 

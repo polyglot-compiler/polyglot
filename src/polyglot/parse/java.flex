@@ -32,6 +32,7 @@
 package polyglot.ext.jl.parse;
 
 import java_cup.runtime.Symbol;
+import polyglot.lex.Lexer;
 import polyglot.lex.*;
 import polyglot.util.Position;
 import polyglot.util.ErrorQueue;
@@ -40,7 +41,8 @@ import polyglot.util.ErrorInfo;
 %%
 
 %public
-%class Lexer
+%class Lexer_c
+%implements Lexer
 %type Token
 %function nextToken
 
@@ -55,12 +57,12 @@ import polyglot.util.ErrorInfo;
     String file;
     ErrorQueue eq;
 
-    public Lexer(java.io.InputStream in, String file, ErrorQueue eq) {
+    public Lexer_c(java.io.InputStream in, String file, ErrorQueue eq) {
         this(new java.io.BufferedReader(new java.io.InputStreamReader(in)),
              file, eq);
     }
     
-    public Lexer(java.io.Reader reader, String file, ErrorQueue eq) {
+    public Lexer_c(java.io.Reader reader, String file, ErrorQueue eq) {
         this(new EscapedUnicodeReader(reader));
         this.file = file;
         this.eq = eq;

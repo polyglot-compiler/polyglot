@@ -11,17 +11,17 @@ import polyglot.util.*;
 public class Name {
 	public final Name prefix;
 	public final String name;
-	Position pos;
+	public final Position pos;
 	NodeFactory nf;
 	TypeSystem ts;
 
-	public Name(ParserWrapper parser, Position pos, String name) {
+	public Name(BaseParser parser, Position pos, String name) {
 		this(parser, pos, null, name);
 	}
 
-	public Name(ParserWrapper parser, Position pos, Name prefix, String name) {
-		this.nf = parser.nodeFactory();
-		this.ts = parser.typeSystem();
+	public Name(BaseParser parser, Position pos, Name prefix, String name) {
+		this.nf = parser.nf;
+		this.ts = parser.ts;
 		this.pos = pos;
 		this.prefix = prefix;
 		this.name = name;

@@ -48,7 +48,7 @@ import java.io.InputStream;
 	LexicalError
 %yylexthrow}
 
-%class Lexer
+%class Lexer_c
 %type Token
 %function getToken
 %public

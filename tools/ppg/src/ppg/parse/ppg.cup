@@ -10,11 +10,9 @@ import polyglot.util.ppg.code.*;
 import polyglot.util.ppg.lex.*;
 import polyglot.util.ppg.spec.*;
 
-parser code {: 
+parser Parser {: 
     private Lexer lexer;           
     private static String filename; 
-    
-
     
     public static String getFilename() { return filename; } 
 
@@ -24,13 +22,14 @@ parser code {:
         lexer = lex;
     } 
 
-    public void syntax_error (Symbol cur_token) { 
-        Token tok = (Token) cur_token.value; 
-        report_error (tok.getFilename()+": syntax error at line " + 
-						tok.getLineno() + ": \"" + tok.getValue() + "\" (" + 
-						tok.getID() + ")", null); 
-        System.exit(1);
-    } 
+    public void syntax_error (Symbol cur_token)
+    {
+	Token tok = (Token) cur_token.value;
+	report_error (tok.getFilename () + ": syntax error at line " +
+		    tok.getLineno () + ": \"" + tok.getValue () + "\" (" +
+		    tok.getID () + ")", null);
+	System.exit (1);
+    }
 
     public void report_fatal_error (String message, Object info) { 
         // stop parsing 
@@ -58,6 +57,9 @@ terminal
 	DROP, TRANSFER,
 	LBRACE, RBRACE,
 	
+	/* CUP extensions */
+	EXTENDS, IMPLEMENTS,
+
 	/* PPG & CUP common */
 	COMMA, SEMI, COLON, COLON_COLON_EQUALS, BAR,
 	TERMINAL, NONTERMINAL,
@@ -77,7 +79,7 @@ nonterminal
   prod_modifier_opt, 
   
   /* Common */
-  prod_part, rhs, empty, opt_semi,
+  prod_part, rhs, opt_semi,
   
   /* CUP nonterminals */
   action_code_part, 
@@ -90,7 +92,8 @@ nonterminal
 nonterminal Spec spec, ppg_spec, cup_spec;
 
 /* PPG */
-nonterminal String include_spec;
+nonterminal String id, include_spec, extendsimpls,
+	    code_str;
 nonterminal Vector command_list_opt, prod_part_list, rhs_list, transfer_list,
 					ppg_precedence_list,
 					ppg_start_spec, ppg_start_spec_elt, ppg_start_spec_list,
@@ -178,10 +181,10 @@ ppg_start_spec_list ::=
 ;
 
 ppg_start_spec_elt ::=
-	START WITH ID:start ID:method SEMI {:
+	START WITH id:start id:method SEMI {:
 		Vector m = new Vector();
-		m.addElement(start.getValue());
-		m.addElement(method.getValue());
+		m.addElement(start);
+		m.addElement(method);
 		RESULT = m;
 	:}
 ;
@@ -232,7 +235,7 @@ nt_id_list ::=
 prod_modifier_opt ::=
 	EXTEND:a	{: RESULT = (String)a.getValue(); :}
 |	OVERRIDE:a	{: RESULT = (String)a.getValue(); :}
-|	empty		{: RESULT = null; :}
+|	/* empty */	{: RESULT = null; :}
 ; 
 
 transfer_list ::=
@@ -272,12 +275,11 @@ production ::=
 ;
 
 nt_id ::=
-	ID:the_id {: RESULT = (String)the_id.getValue(); :}
+	id:id {: RESULT = id; :}
 ;
 
 symbol_id ::=
-	ID:the_id
-	{: RESULT = (String)the_id.getValue(); :}
+	id:id {: RESULT = id; :}
 ;
 
 rhs_list ::=
@@ -294,10 +296,9 @@ rhs_list ::=
 
 rhs ::= 
 	prod_part_list:p PERCENT_PREC term_id:term_name 
-	{:
-		/* ???? */
-	:}
-|	prod_part_list:p	{: RESULT = p; :}
+	    {: RESULT = p; :} /* XXX */
+|	prod_part_list:p
+	    {: RESULT = p; :}
 ;
 
 prod_part_list ::= 
@@ -306,21 +307,21 @@ prod_part_list ::=
 		/* Vector a, (non)terminal/code b */
 		a.addElement(b); RESULT = a;
 	:}
-|	empty {: RESULT = new Vector(); :};
+|	/* empty */ {: RESULT = new Vector(); :};
 
 prod_part ::=
 	symbol_id:symid opt_label:labid
 	{:
 		RESULT = new Nonterminal(symid, labid);
 	:}
-|	CODE_STR:code_str {:
-		RESULT = new SemanticAction((String)code_str.getValue());
+|	code_str:code_str {:
+		RESULT = new SemanticAction(code_str);
 	:}
 ;
 
 opt_label ::=
 	COLON label_id:labid {: RESULT = labid; :}
-|	empty {: RESULT = null; :}
+|	/* empty */ {: RESULT = null; :}
 ;
 
 label_id ::= 
@@ -329,16 +330,12 @@ label_id ::=
 	;
 
 robust_id ::= /* all ids that aren't reserved words in Java */
-	ID:the_id	{: RESULT = (String)the_id.getValue(); :}
+	id:id {: RESULT = id; :}
 ;
 
 non_terminal ::= NON TERMINAL | NONTERMINAL;
 
-opt_semi ::= SEMI | empty;
-
-empty ::= /* nothing */;
-
-
+opt_semi ::= SEMI | /* empty */;
 
 /********************************************************************
  * CUP                                                              *
@@ -354,7 +351,7 @@ cup_spec ::=
 
 package_spec ::= 
 	PACKAGE multipart_id:m_id SEMI {: RESULT = m_id; :}
-|	empty {: RESULT = null; :}
+|	/* empty */ {: RESULT = null; :}
 ;
 
 import_list ::=
@@ -362,7 +359,7 @@ import_list ::=
 		i_list.addElement(i);
 		RESULT = i_list;
 	:}
-|	empty {: RESULT = new Vector(); :}
+|	/* empty */ {: RESULT = new Vector(); :}
 ;
 
 import_spec ::=
@@ -376,7 +373,7 @@ code_parts ::=
 		c_parts.addElement(c);
 		RESULT = c_parts;
 	:}
-|	empty {: RESULT = new Vector(); :}
+|	/* empty */ {: RESULT = new Vector(); :}
 ;
 
 code_part ::=
@@ -387,23 +384,38 @@ code_part ::=
 ;
 
 action_code_part ::= 
-	ACTION CODE CODE_STR:user_code opt_semi
-	{: RESULT = new ActionCode((String) user_code.getValue()); :}
+	ACTION CODE code_str:user_code opt_semi
+	{: RESULT = new ActionCode(user_code); :}
 	;
 
 parser_code_part ::= 
-	PARSER CODE CODE_STR:user_code opt_semi
-	{: RESULT = new ParserCode((String) user_code.getValue()); :}
-	;
+	PARSER CODE code_str:user_code opt_semi
+	{:
+	  RESULT = new ParserCode(null, "", user_code);
+	:}
+    |   PARSER id:classname extendsimpls:ei code_str:user_code opt_semi
+	{:
+	  RESULT = new ParserCode(classname, ei, user_code);
+	:}
+    ;
+
+extendsimpls ::=
+	/* nothing */
+	{: RESULT = ""; :}
+    |	extendsimpls:e EXTENDS multipart_id:qid
+        {: RESULT = e + " extends " + qid; :}
+    |	extendsimpls:e IMPLEMENTS multipart_id:qid
+        {: RESULT = e + " implements " + qid; :}
+    ;
 
 init_code ::= 
-	INIT WITH CODE_STR:user_code opt_semi
-	{: RESULT = new InitCode((String) user_code.getValue()); :}
+	INIT WITH code_str:user_code opt_semi
+	{: RESULT = new InitCode(user_code); :}
 	;
 
 scan_code ::=
-	SCAN WITH CODE_STR:user_code opt_semi
-	{: RESULT = new ScanCode((String) user_code.getValue()); :}
+	SCAN WITH code_str:user_code opt_semi
+	{: RESULT = new ScanCode(user_code); :}
 	;
 
 symbol_list ::=
@@ -465,7 +477,7 @@ non_term_name_list ::=
 
 precedence_list ::=
 	precedence_l:p_l {: RESULT = p_l; :}
-|	empty {: RESULT = new Vector(); :}
+|	/* empty */ {: RESULT = new Vector(); :}
 ;
 
 precedence_l ::= 
@@ -510,7 +522,7 @@ term_id ::= symbol_id:sym {: RESULT = sym; :};
 
 start_spec ::= 
 	START WITH nt_id:start_name SEMI {: RESULT = start_name; :}
-|	empty {: RESULT = null; :}
+|	/* empty */ {: RESULT = null; :}
 ;
 
 multipart_id ::=
@@ -531,10 +543,18 @@ type_id ::=
 ;
 
 new_term_id ::= 
-	ID:id {: RESULT = (String) id.getValue(); :}
+	id:id {: RESULT = id; :}
 ;
 
 new_non_term_id ::=
-	ID:id {: RESULT = (String) id.getValue(); :}
+	id:id {: RESULT = id; :}
 ;
 
+/* some productions to extract info from tokens */
+id ::=
+	ID:id {: RESULT = (String)id.getValue(); :}
+;
+
+code_str ::=
+	CODE_STR:c {: RESULT = (String) c.getValue(); :}
+;

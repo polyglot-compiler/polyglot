@@ -11,6 +11,8 @@ import polyglot.main.UsageError;
 import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.frontend.Compiler;
+import polyglot.ext.jl.parse.Grm;
+import polyglot.ext.jl.parse.Lexer_c;
 
 import java.io.*;
 import java.util.*;
@@ -99,13 +101,10 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
     }
 
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
-	polyglot.ext.jl.parse.Lexer lexer;
-	java_cup.runtime.lr_parser grm;
+	polyglot.lex.Lexer lexer = new Lexer_c(reader, source.name(), eq);
+	polyglot.parse.BaseParser parser = new Grm(lexer, ts, nf, eq);
 
-	lexer = new polyglot.ext.jl.parse.Lexer(reader, source.name(), eq);
-	grm = new polyglot.ext.jl.parse.Grm(lexer, ts, nf, eq);
-
-	return new CupParser(grm, source, eq);
+	return new CupParser(parser, source, eq);
     }
 
     public List passes(Job job) {

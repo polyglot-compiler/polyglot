@@ -5,79 +5,15 @@ package polyglot.ext.coffer.parse;
 import polyglot.ext.coffer.types.*;
 import polyglot.ext.coffer.ast.*;
 import polyglot.ext.jl.parse.Name;
-import polyglot.ext.jl.parse.JLUtil;
 
-parser code {:
-	ErrorQueue eq;
-	Lexer lexer;
-	CofferTypeSystem ts;
-	CofferNodeFactory nf;
-	CofferUtil util;
+parser Grm extends polyglot.ext.jl.parse.Grm {:
+    public final CofferTypeSystem ts;
+    public final CofferNodeFactory nf;
 
-	public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
-		this();
-		eq = q;
-		lexer = l;
-		ts = (CofferTypeSystem) t;
-		nf = (CofferNodeFactory) n;
-		util = new CofferUtil(new CofferParserWrapper(this));
-	}
-
-    /**
-	 * Override the default CUP routine.
-	 */
-    public void syntax_error(java_cup.runtime.Symbol current) {
-        Position p = ((Token) current.value).getPosition();
-
-        if (current.sym == sym.EOF) {
-            report_error("Unexpected end of file.", p);
-        } else {
-            report_error("Syntax error.", p);
-        }
-    }
-
-	/**
-	 * Override the default CUP routine.
-	 */
-    public void report_error(String message, Object info) {
-        if (info instanceof Position) {
-            eq.enqueue(ErrorInfo.SYNTAX_ERROR, message, (Position) info);
-        } else {
-            eq.enqueue(ErrorInfo.SYNTAX_ERROR, message);
-        }
-    }
-
-	/**
-	 * Override the default CUP routine.
-	 */
-	public void report_fatal_error(String message, Object info)
-        throws Exception
-    {
-        report_error(message, info);
-		eq.enqueue(ErrorInfo.SYNTAX_ERROR,
-            "Unable to recover from previous errors.");
-        die();
-	}
-
-	/**
-	 * Report a fatal error then abort parsing.
-	 */
-    public void die(String msg, Position pos) throws Exception {
-		report_fatal_error(msg, pos);
-    }
-
-	/**
-	 * Report a fatal error then abort parsing.
-	 */
-    public void die(Position pos) throws Exception {
-		report_fatal_error("Syntax error.", pos);
-    }
-
-	/**
-	 * Report a fatal error then abort parsing.
-	 */
-    public void die() throws Exception {
-		throw new Exception("Couldn't repair and continue parse");
+    public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
+	super(l,t,n,q);
+	ts = (CofferTypeSystem) t;
+	nf = (CofferNodeFactory) n;
     }
 
     static class KeySpec {
@@ -113,7 +49,7 @@ start with goal;
 
 key ::=
         IDENTIFIER:a
-            {: RESULT = parser.nf.KeyNode(parser.util.pos(a), parser.ts.unknownKey(parser.util.pos(a), a.getIdentifier())); :}
+            {: RESULT = parser.nf.KeyNode(parser.pos(a), parser.ts.unknownKey(parser.pos(a), a.getIdentifier())); :}
     ;
 
 key_set_opt ::=
@@ -124,7 +60,7 @@ key_set_opt ::=
 
 key_set ::=
         LBRACK:x key_set_elements_opt:a RBRACK
-            {: RESULT = parser.nf.AmbKeySetNode(parser.util.pos(x), a); :}
+            {: RESULT = parser.nf.AmbKeySetNode(parser.pos(x), a); :}
     ;
 
 key_set_elements_opt ::=
@@ -145,20 +81,20 @@ extend
 class_instance_creation_expression ::=
                     // Expr
         NEW:n TRACKED LPAREN key:k RPAREN class_type:a LPAREN argument_list_opt:b RPAREN
-            {: RESULT = parser.nf.TrackedNew(parser.util.pos(n), a, b); :}
+            {: RESULT = parser.nf.TrackedNew(parser.pos(n), a, b); :}
     |   NEW:n TRACKED LPAREN key:k RPAREN class_type:a LPAREN argument_list_opt:b RPAREN class_body:c
-            {: RESULT = parser.nf.TrackedNew(parser.util.pos(n), a, b, c); :}
+            {: RESULT = parser.nf.TrackedNew(parser.pos(n), a, b, c); :}
     |   primary:a DOT NEW TRACKED LPAREN key:k RPAREN simple_name:b LPAREN argument_list_opt:c RPAREN
-            {: RESULT = parser.nf.TrackedNew(parser.util.pos(a), a,
+            {: RESULT = parser.nf.TrackedNew(parser.pos(a), a,
                                       b.toType(), c); :}
     |   primary:a DOT NEW TRACKED LPAREN key:k RPAREN simple_name:b LPAREN argument_list_opt:c RPAREN class_body:d
-            {: RESULT = parser.nf.TrackedNew(parser.util.pos(a), a,
+            {: RESULT = parser.nf.TrackedNew(parser.pos(a), a,
                                       b.toType(), c, d); :}
     |   name:a DOT NEW TRACKED LPAREN key:k RPAREN simple_name:b LPAREN argument_list_opt:c RPAREN
-            {: RESULT = parser.nf.TrackedNew(parser.util.pos(a), a.toExpr(),
+            {: RESULT = parser.nf.TrackedNew(parser.pos(a), a.toExpr(),
                                       b.toType(), c); :}
     |   name:a DOT NEW TRACKED LPAREN key:k RPAREN simple_name:b LPAREN argument_list_opt:c RPAREN class_body:d
-            {: RESULT = parser.nf.TrackedNew(parser.util.pos(a), a.toExpr(),
+            {: RESULT = parser.nf.TrackedNew(parser.pos(a), a.toExpr(),
                                       b.toType(), c, d); :}
     ;
 */
@@ -172,7 +108,7 @@ extend constructor_declaration ::=
         {: if (e == null) {
             e = new Grm.KeySpec(null, null);
           }
-           RESULT = parser.nf.CofferConstructorDecl(parser.util.pos(a),
+           RESULT = parser.nf.CofferConstructorDecl(parser.pos(a),
                                               m, a.toString(), b,
                                               e.entryKeys, e.returnKeys,
                                               c, d); :}
@@ -199,7 +135,7 @@ extend method_header ::=
             {: if (e == null) {
                 e = new Grm.KeySpec(null, null);
               }
-               RESULT = parser.nf.CofferMethodDecl(parser.util.pos(c), a, b,
+               RESULT = parser.nf.CofferMethodDecl(parser.pos(c), a, b,
                                             c.getIdentifier(), d,
                                             e.entryKeys, e.returnKeys,
                                             f, null); :}
@@ -210,8 +146,8 @@ extend method_header ::=
             {: if (e == null) {
                 e = new Grm.KeySpec(null, null);
               }
-               RESULT = parser.nf.CofferMethodDecl(parser.util.pos(c), a,
-                                            parser.nf.CanonicalTypeNode(parser.util.pos(b), parser.ts.Void()),
+               RESULT = parser.nf.CofferMethodDecl(parser.pos(c), a,
+                                            parser.nf.CanonicalTypeNode(parser.pos(b), parser.ts.Void()),
                                             c.getIdentifier(), d,
                                             e.entryKeys, e.returnKeys,
                                             f, null); :}
@@ -237,7 +173,7 @@ keyed_class_type_list ::=
 
 keyed_class_type ::=
         class_type:a key_set_opt:b
-            {: RESULT = parser.nf.ThrowConstraintNode(parser.util.pos(a), a, b); :}
+            {: RESULT = parser.nf.ThrowConstraintNode(parser.pos(a), a, b); :}
     ;
 
 extend
@@ -250,7 +186,7 @@ tracked_type ::=
         TRACKED:x LPAREN key:k RPAREN name:b
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.unknownKey(k.position(), k.name()));
-           RESULT = parser.nf.TrackedTypeNode(parser.util.pos(x), k, b.toType()); :}
+           RESULT = parser.nf.TrackedTypeNode(parser.pos(x), k, b.toType()); :}
     ;
 
 drop {
@@ -267,7 +203,7 @@ class_declaration ::=
           super_opt:c interfaces_opt:d class_body:e
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
-           RESULT = parser.nf.CofferClassDecl(parser.util.pos(n), a,
+           RESULT = parser.nf.CofferClassDecl(parser.pos(n), a,
                                         b.getIdentifier(), k, c, d, e);
         :}
     ;
@@ -278,7 +214,7 @@ interface_declaration ::=
           extends_interfaces_opt:c interface_body:d
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
-           RESULT = parser.nf.CofferClassDecl(parser.util.pos(n),
+           RESULT = parser.nf.CofferClassDecl(parser.pos(n),
                                         a.Interface(), b.getIdentifier(), k,
                                         null, c, d); 
         :}
@@ -291,8 +227,8 @@ block_statement ::=
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
            List l = new LinkedList();
-           l.add(   parser.nf.LocalClassDecl(parser.util.pos(n),
-                        parser.nf.CofferClassDecl(parser.util.pos(n), Flags.NONE,
+           l.add(   parser.nf.LocalClassDecl(parser.pos(n),
+                        parser.nf.CofferClassDecl(parser.pos(n), Flags.NONE,
                                         b.getIdentifier(), k, c, d, e)) );
            RESULT = l;
         :}
@@ -302,8 +238,8 @@ block_statement ::=
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
            List l = new LinkedList();
-           l.add(   parser.nf.LocalClassDecl(parser.util.pos(n),
-                        parser.nf.CofferClassDecl(parser.util.pos(n), Flags.ABSTRACT,
+           l.add(   parser.nf.LocalClassDecl(parser.pos(n),
+                        parser.nf.CofferClassDecl(parser.pos(n), Flags.ABSTRACT,
                                         b.getIdentifier(), k, c, d, e)) );
            RESULT = l;
         :}
@@ -313,8 +249,8 @@ block_statement ::=
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
            List l = new LinkedList();
-           l.add(   parser.nf.LocalClassDecl(parser.util.pos(n),
-                        parser.nf.CofferClassDecl(parser.util.pos(n), Flags.FINAL.Abstract(),
+           l.add(   parser.nf.LocalClassDecl(parser.pos(n),
+                        parser.nf.CofferClassDecl(parser.pos(n), Flags.FINAL.Abstract(),
                                         b.getIdentifier(), k, c, d, e)) );
            RESULT = l;
         :}
@@ -324,8 +260,8 @@ block_statement ::=
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
            List l = new LinkedList();
-           l.add(   parser.nf.LocalClassDecl(parser.util.pos(n),
-                        parser.nf.CofferClassDecl(parser.util.pos(n), Flags.FINAL,
+           l.add(   parser.nf.LocalClassDecl(parser.pos(n),
+                        parser.nf.CofferClassDecl(parser.pos(n), Flags.FINAL,
                                         b.getIdentifier(), k, c, d, e)) );
            RESULT = l;
         :}
@@ -335,8 +271,8 @@ block_statement ::=
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
            List l = new LinkedList();
-           l.add(   parser.nf.LocalClassDecl(parser.util.pos(n),
-                        parser.nf.CofferClassDecl(parser.util.pos(n), Flags.FINAL.Abstract(),
+           l.add(   parser.nf.LocalClassDecl(parser.pos(n),
+                        parser.nf.CofferClassDecl(parser.pos(n), Flags.FINAL.Abstract(),
                                         b.getIdentifier(), k, c, d, e)) );
            RESULT = l;
         :}
@@ -349,8 +285,8 @@ block_statement ::=
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
            List l = new LinkedList();
-           l.add(   parser.nf.LocalClassDecl(parser.util.pos(n),
-                        parser.nf.CofferClassDecl(parser.util.pos(n),
+           l.add(   parser.nf.LocalClassDecl(parser.pos(n),
+                        parser.nf.CofferClassDecl(parser.pos(n),
                                         Flags.INTERFACE, b.getIdentifier(), k,
                                         null, c, d)) ); 
            RESULT = l;
@@ -361,8 +297,8 @@ block_statement ::=
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
            List l = new LinkedList();
-           l.add( parser.nf.LocalClassDecl(parser.util.pos(n),
-                        parser.nf.CofferClassDecl(parser.util.pos(n),
+           l.add( parser.nf.LocalClassDecl(parser.pos(n),
+                        parser.nf.CofferClassDecl(parser.pos(n),
                                         Flags.ABSTRACT.Interface(), b.getIdentifier(), k,
                                         null, c, d)) ); 
            RESULT = l;
@@ -373,8 +309,8 @@ block_statement ::=
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
            List l = new LinkedList();
-           l.add( parser.nf.LocalClassDecl(parser.util.pos(n),
-                        parser.nf.CofferClassDecl(parser.util.pos(n),
+           l.add( parser.nf.LocalClassDecl(parser.pos(n),
+                        parser.nf.CofferClassDecl(parser.pos(n),
                                         Flags.FINAL.Abstract().Interface(), b.getIdentifier(), k,
                                         null, c, d)) ); 
            RESULT = l;
@@ -385,8 +321,8 @@ block_statement ::=
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
            List l = new LinkedList();
-           l.add( parser.nf.LocalClassDecl(parser.util.pos(n),
-                        parser.nf.CofferClassDecl(parser.util.pos(n),
+           l.add( parser.nf.LocalClassDecl(parser.pos(n),
+                        parser.nf.CofferClassDecl(parser.pos(n),
                                         Flags.FINAL.Interface(), b.getIdentifier(), k,
                                         null, c, d)) ); 
            RESULT = l;
@@ -397,8 +333,8 @@ block_statement ::=
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
            List l = new LinkedList();
-           l.add( parser.nf.LocalClassDecl(parser.util.pos(n),
-                        parser.nf.CofferClassDecl(parser.util.pos(n),
+           l.add( parser.nf.LocalClassDecl(parser.pos(n),
+                        parser.nf.CofferClassDecl(parser.pos(n),
                                         Flags.FINAL.Abstract().Interface(), b.getIdentifier(), k,
                                         null, c, d)) ); 
            RESULT = l;
@@ -412,7 +348,7 @@ class_member_declaration ::=
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
            List l = new LinkedList();
-           l.add( parser.nf.CofferClassDecl(parser.util.pos(n), a,
+           l.add( parser.nf.CofferClassDecl(parser.pos(n), a,
                                         b.getIdentifier(), k, c, d, e) );
            RESULT = l;
         :}
@@ -431,8 +367,8 @@ drop { class_type_list }
 
 free_stmt ::=
         FREE:x THIS:a SEMICOLON
-            {: RESULT = parser.nf.Free(parser.util.pos(x), 
-                                       parser.nf.Special(parser.util.pos(a),
+            {: RESULT = parser.nf.Free(parser.pos(x), 
+                                       parser.nf.Special(parser.pos(a),
                                                          Special.THIS)); :}
     ;
 

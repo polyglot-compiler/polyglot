@@ -3,7 +3,7 @@ package polyglot.util.ppg.code;
 public abstract class Code
 {
 	protected String value;
-		public abstract Object clone();
+	public abstract Object clone();
 	
 	public void append(String s) {
 		value += "\n" + s;								  

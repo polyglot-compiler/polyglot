@@ -26,6 +26,7 @@
     <tstamp/>
     <!-- Create the build directory structure used by compile -->
     <mkdir dir="${classes}"/>
+    <mkdir dir="${cup-classes}"/>
   </target>
 
   <!-- compile the base compiler -->
@@ -44,6 +45,7 @@
   <target name="clean" description="clean up">
     <!-- Delete the ${classes} and ${dist} directory trees -->
     <delete dir="${classes}"/>
+    <delete dir="${cup-classes}"/>
     <delete dir="${dist}"/>
   </target>
 
@@ -52,10 +54,10 @@
       <fileset dir="${src}">
         <include name="**/Grm.java"/>
 	<include name="**/sym.java"/>
-	<include name="**/Lexer.java"/>
+	<include name="**/Lexer_c.java"/>
 	<include name="**/*_ppg.cup"/>
 	<include name="polyglot/util/ppg/parse/Constant.java"/>
-	<include name="polyglot/util/ppg/parse/Parser.java"/>
+	<include name="polyglot/util/ppg/parse/Grm.java"/>
       </fileset>      
     </delete>
   </target>
@@ -68,6 +70,17 @@
       excludes="polyglot/ext/**,polyglot/tests/**,polyglot/util/ppg/test/**">
       <classpath refid="standard.classpath"/>
     </javac>
+  </target>
+
+  <property name="cup-classes" location="cup-classes"/>
+
+  <target name="cup" depends="init" 
+          description="compile the extended CUP parser generator">
+    <javac srcdir="${src}" destdir="${cup-classes}" debug="on"
+      includes="java_cup/**">
+      <classpath refid="standard.classpath"/>
+    </javac>
+    <jar jarfile="${basedir}/java_cup.jar" basedir="${cup-classes}"/>
   </target>
 
   <!-- compile a single extension, named ${ext} -->
@@ -122,7 +135,7 @@
        @param symbol.class  The name to be passed to CUP with -symbols.
        @param cup.file      The name of the CUP file.
    -->
-  <target name="cup-parser" depends="cup-parser-deps" 
+  <target name="cup-parser" depends="cup,cup-parser-deps" 
           unless="cup.parser.up-to-date">
     <java classname="java_cup.Main"
           fork="true"
@@ -209,7 +222,7 @@
   <target name="jl" depends="base">
     <antcall target="jflex-lexer">
       <param name="lexer.dir" value="polyglot/ext/jl/parse"/>
-      <param name="lexer.class" value="Lexer"/>
+      <param name="lexer.class" value="Lexer_c"/>
       <param name="jflex.file" value="java.flex"/>
     </antcall>
     <antcall target="cup-parser">
@@ -233,7 +246,7 @@
   <target name="standard-ext-qq">
     <antcall target="jflex-lexer">
       <param name="lexer.dir" value="polyglot/ext/${ext}/qq"/>
-      <param name="lexer.class" value="Lexer"/>
+      <param name="lexer.class" value="Lexer_c"/>
       <param name="jflex.file" value="qq.flex"/>
     </antcall>
     <antcall target="ppg-parser">
@@ -282,7 +295,7 @@
   <target name="standard-ext-lexer">
     <antcall target="jflex-lexer">
       <param name="lexer.dir" value="polyglot/ext/${ext}/parse"/>
-      <param name="lexer.class" value="Lexer"/>
+      <param name="lexer.class" value="Lexer_c"/>
       <param name="jflex.file" value="${ext}.flex"/>
     </antcall>
   </target>

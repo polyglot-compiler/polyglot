@@ -3,82 +3,15 @@ include "../parse/java12.cup"
 package polyglot.ext.jl.qq;
 
 import polyglot.ext.jl.parse.Name;
-import polyglot.ext.jl.parse.JLUtil;
+import polyglot.lex.Lexer;
 
-parser code {:
-	Lexer lexer;
-	TypeSystem ts;
-	NodeFactory nf;
-	JLUtil util;
-	Map subst;
+parser Grm extends polyglot.ext.jl.parse.Grm {:
+    public final Map subst;
 
-	public Grm(Lexer l, TypeSystem t, NodeFactory n, Map subst) {
-		this();
-		lexer = l;
-		ts = t;
-		nf = n;
-		util = new JLUtil(new QQParserWrapper(this));
-		this.subst = subst;
-	}
-
-    /**
-	 * Override the default CUP routine.
-	 */
-    public void syntax_error(java_cup.runtime.Symbol current) {
-        Position p = ((Token) current.value).getPosition();
-
-        if (current.sym == sym.EOF) {
-            report_error("Unexpected end of file.", p);
-        } else {
-            report_error("Syntax error.", p);
-        }
+    public Grm(Lexer l, TypeSystem t, NodeFactory n, Map subst) {
+	super(l, t, n, (ErrorQueue)null);
+	this.subst = subst;
     }
-
-	/**
-	 * Override the default CUP routine.
-	 */
-    public void report_error(String message, Object info) {
-    }
-
-	/**
-	 * Override the default CUP routine.
-	 */
-	public void report_fatal_error(String message, Object info)
-        throws Exception
-    {
-    	if (info instanceof Position) {
-	    throw new InternalCompilerError(message, (Position) info);
-	}
-	else if (info instanceof Token) {
-	    throw new InternalCompilerError(message, ((Token) info).getPosition());
-	}
-	else {
-	    throw new InternalCompilerError(message);
-	}
-    }
-
-	/**
-	 * Report a fatal error then abort parsing.
-	 */
-    public void die(String msg, Position pos) throws Exception {
-		report_fatal_error(msg, pos);
-    }
-
-	/**
-	 * Report a fatal error then abort parsing.
-	 */
-    public void die(Position pos) throws Exception {
-		report_fatal_error("Syntax error.", pos);
-    }
-
-	/**
-	 * Report a fatal error then abort parsing.
-	 */
-    public void die() throws Exception {
-		new Exception("Couldn't repair and continue parse").printStackTrace();
-		throw new Exception("Couldn't repair and continue parse");
-    }
-
 :};
 
 terminal Token COMMA_EXPR;
@@ -135,8 +68,8 @@ qq_member ::=
      	    {: RESULT = a; :}
      /* Simplified version of field_declaration with only one declarator. */
     |	modifiers_opt:a type:b variable_declarator:d SEMICOLON
-	    {: RESULT = parser.nf.FieldDecl(parser.util.pos(b),
-					    a, parser.util.array(b, d.dims),
+	    {: RESULT = parser.nf.FieldDecl(parser.pos(b),
+					    a, parser.array(b, d.dims),
 					    d.name, d.init); :}
     ;
 
@@ -163,7 +96,7 @@ extend class_or_interface_type ::=
 extend array_type ::=
 	COMMA_TYPE IDENTIFIER:a dims:b
 	    {: TypeNode tn = (TypeNode) parser.subst.get(a.getIdentifier());
-	       RESULT = parser.util.array(tn, b.intValue()); :}
+	       RESULT = parser.array(tn, b.intValue()); :}
     ;
 
 extend type_declaration ::=

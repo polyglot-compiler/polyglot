@@ -1,6 +1,6 @@
 package polyglot.ext.coffer;
 
-import polyglot.ext.coffer.parse.Lexer;
+import polyglot.ext.coffer.parse.Lexer_c;
 import polyglot.ext.coffer.parse.Grm;
 import polyglot.ext.coffer.ast.*;
 import polyglot.ext.coffer.types.*;
@@ -12,6 +12,7 @@ import polyglot.util.*;
 import polyglot.visit.*;
 import polyglot.frontend.*;
 import polyglot.main.*;
+import polyglot.lex.Lexer;
 
 import java.util.*;
 import java.io.*;
@@ -34,7 +35,7 @@ public class ExtensionInfo extends polyglot.ext.param.ExtensionInfo {
     }
 
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
-        Lexer lexer = new Lexer(reader, source.name(), eq);
+        Lexer lexer = new Lexer_c(reader, source.name(), eq);
         Grm grm = new Grm(lexer, ts, nf, eq);
         return new CupParser(grm, source, eq);
     }

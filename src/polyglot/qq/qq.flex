@@ -41,7 +41,8 @@ import java.io.*;
 %%
 
 %public
-%class Lexer
+%class Lexer_c
+%implements polyglot.lex.Lexer
 %type Token
 %function nextToken
 
@@ -55,7 +56,7 @@ import java.io.*;
     StringBuffer sb = new StringBuffer();
     String file;
 
-    public Lexer(String s, Position pos) {
+    public Lexer_c(String s, Position pos) {
 	this(new EscapedUnicodeReader(new StringReader(s)));
 	if (pos != null) {
 	    this.file = pos + ": quasi-quote(" + s + ")";
