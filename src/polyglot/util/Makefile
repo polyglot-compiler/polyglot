@@ -1,6 +1,6 @@
 SOURCE = ../..
 PACKAGE = jltools.util
-SUBDIRS =
+SUBDIRS = typedump
 
 SOURCES = \
 	Annotate.java \
@@ -36,5 +36,7 @@ CLASSES = $(patsubst %.java, %.class, $(SOURCES))
 include $(SOURCE)/Rules.mk
 
 all: $(CLASSES)
+	$(subdirs)
 
 clean clobber: cleanclasses
+	$(subdirs)
