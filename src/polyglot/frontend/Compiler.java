@@ -22,7 +22,7 @@ public class Compiler
   {
     Compiler.systemResolver = new CompoundClassResolver();
     Compiler.parsedResolver = new TableClassResolver();
-    systemResolver.addResolver( parsedResolver);
+    systemResolver.addClassResolver( parsedResolver);
     //systemResolver.addResolver( new FileClassResolver());
 
     Compiler.ts = new StandardTypeSystem( systemResolver);
