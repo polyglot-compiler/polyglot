@@ -23,7 +23,7 @@ import polyglot.visit.*;
  * <li> parse </li>
  * <li> build-types (TypeBuilder) </li>
  * <hr>
- * <center>BARRIER</center>
+ * <center>GLOBAL BARRIER</center>
  * <hr>
  * <li> clean-super (AmbiguityRemover) </li>
  * <hr>
@@ -35,14 +35,17 @@ import polyglot.visit.*;
  * <center>BARRIER</center>
  * <hr>
  * <li> disambiguate (AmbiguityRemover) </li>
- * <li> constant folding (ConstantFolder)
  * <hr>
  * <center>BARRIER</center>
  * <hr>
  * <li> type checking (TypeChecker) </li>
+ * <li> reachable checking (ReachChecker) </li>
  * <li> exception checking (ExceptionChecker)
+ * <li> exit checking (ExitChecker)
+ * <li> initialization checking (InitChecker)
+ * <li> circular constructor call checking (ConstructorCallChecker)
  * <hr>
- * <center>BARRIER</center>
+ * <center>PRE_OUTPUT MARKER</center>
  * <hr>
  * <li> serialization (ClassSerializer), optional </li>
  * <li> translation (Translator) </li>
