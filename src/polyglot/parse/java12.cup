@@ -838,6 +838,8 @@ interface_member_declaration ::=
             {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
                l.add(a);
                RESULT = l; :}
+    |   SEMICOLON
+            {: RESULT = Collections.EMPTY_LIST; :}
     ;
 constant_declaration ::=
                     // List of ClassMember
