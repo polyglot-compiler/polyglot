@@ -46,6 +46,10 @@ public class TypeBuilder extends NodeVisitor
         // Initialize the stack from the context.
         Context context = job.context();
 
+        if (context == null) {
+            return true;
+        }
+
         Stack s = new Stack();
 
         for (ParsedClassType ct = context.currentClass(); ct != null; ) {
@@ -285,6 +289,7 @@ public class TypeBuilder extends NodeVisitor
     }
 
     public Package currentPackage() {
+        if (importTable() == null) return null;
 	return importTable.package_();
     }
 
