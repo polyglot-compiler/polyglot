@@ -1,5 +1,0 @@
-#!/bin/sh
-
-echo creating ${BIN}/jmc
-(cat ${BIN}/defs; echo 'ext="-ext jmatch"'; cat ${BIN}/jlc.in) > ${BIN}/jmc
-chmod +x ${BIN}/jmc
