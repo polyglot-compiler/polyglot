@@ -5,6 +5,7 @@ SUBDIRS = reflect
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
+	TypeSystem.java \
 	AnonClassType.java \
 	ArrayType.java \
 	LazyClassInitializer.java \
@@ -52,7 +53,6 @@ SOURCES = \
 	Type.java \
 	TypeObject.java \
 	Types.java \
-	TypeSystem.java \
 	UnknownQualifier.java \
 	UnknownType.java \
 	VarInstance.java

@@ -6,11 +6,11 @@ include $(SOURCE)/Rules.mk
 
 SOURCES = \
 	Compiler.java \
+	ExtensionInfo.java \
 	AbstractPass.java \
 	BarrierPass.java \
 	CupParser.java \
 	EmptyPass.java \
-	ExtensionInfo.java \
 	InnerJob.java \
 	JobExt.java \
 	Job.java \

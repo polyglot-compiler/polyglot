@@ -5,6 +5,7 @@ SUBDIRS =
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
+	NodeFactory.java \
 	AmbExpr.java \
 	Ambiguous.java \
 	AmbPrefix.java \
@@ -59,7 +60,6 @@ SOURCES = \
 	MethodDecl.java \
 	NewArray.java \
 	New.java \
-	NodeFactory.java \
 	Node.java \
 	NullLit.java \
 	NumLit.java \

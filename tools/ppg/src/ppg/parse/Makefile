@@ -5,9 +5,9 @@ SUBDIRS =
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
+	Parser.java \
 	Constant.java \
 	ParserError.java \
-	Parser.java \
 	Unparse.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
@@ -21,6 +21,10 @@ all: $(CLASSES)
 release: release_src
 	$(subdirs)
 
-clean clobber: cleanclasses
+clean: cleanclasses
+	$(subdirs)
+
+clobber: cleanclasses
+	-rm -f Constant.java Parser.java
 	$(subdirs)
 
