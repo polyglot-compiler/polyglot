@@ -1,6 +1,6 @@
 SOURCE = ../..
 PACKAGE = jltools/ext
-SUBDIRS = jmatch
+SUBDIRS = jif op split polyj jmatch
 
 include $(SOURCE)/Rules.mk
 
