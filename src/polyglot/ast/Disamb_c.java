@@ -2,8 +2,8 @@ package polyglot.ext.jl.ast;
 
 import polyglot.ast.*;
 import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
+import polyglot.util.Position;
+import polyglot.visit.ContextVisitor;
 
 /**
  * Utility class which is used to disambiguate ambiguous
@@ -128,16 +128,10 @@ public class Disamb_c implements Disamb
 
         // First try local variables and fields.
         VarInstance vi = c.findVariableSilent(name);
-
+        
         if (vi != null && exprOK()) {
-            if (vi instanceof FieldInstance) {
-                FieldInstance fi = (FieldInstance) vi;
-                Receiver r = makeMissingFieldTarget(fi);
-                return nf.Field(pos, r, name).fieldInstance(fi).targetImplicit(true);
-            } else if (vi instanceof LocalInstance) {
-                LocalInstance li = (LocalInstance) vi;
-                return nf.Local(pos, name).localInstance(li);
-            }
+            Node n = disambiguateVarInstance(vi);
+            if (n != null) return n;
         }
 
         // no variable found. try types.
@@ -165,6 +159,18 @@ public class Disamb_c implements Disamb
             return nf.PackageNode(pos, ts.packageForName(name));
         }
 
+        return null;
+    }
+
+    protected Node disambiguateVarInstance(VarInstance vi) throws SemanticException {
+        if (vi instanceof FieldInstance) {
+            FieldInstance fi = (FieldInstance) vi;
+            Receiver r = makeMissingFieldTarget(fi);
+            return nf.Field(pos, r, name).fieldInstance(fi).targetImplicit(true);
+        } else if (vi instanceof LocalInstance) {
+            LocalInstance li = (LocalInstance) vi;
+            return nf.Local(pos, name).localInstance(li);
+        }
         return null;
     }
 
