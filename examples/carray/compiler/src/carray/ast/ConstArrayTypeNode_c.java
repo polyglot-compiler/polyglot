@@ -20,12 +20,12 @@ public class ConstArrayTypeNode_c extends ArrayTypeNode_c implements ConstArrayT
         super(ext, pos, base);
     }
 
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
         CarrayTypeSystem ts = (CarrayTypeSystem)tb.typeSystem();
         return type(ts.constArrayOf(position(), base.type()));
     }
 
-    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         CarrayTypeSystem ts = (CarrayTypeSystem)ar.typeSystem();
         NodeFactory nf = ar.nodeFactory();
 

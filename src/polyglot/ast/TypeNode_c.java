@@ -35,6 +35,17 @@ public abstract class TypeNode_c extends Node_c implements TypeNode
 	return n;
     }
 
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+        if (type == null) {
+            TypeSystem ts = tb.typeSystem();
+            return type(ts.unknownType(position()));
+        }
+        else {
+            return this;
+        }
+    }
+
+    /*
     public String toString() {
 	if (type != null) {
 	    return type.toString();
@@ -43,6 +54,7 @@ public abstract class TypeNode_c extends Node_c implements TypeNode
 	    return "<unknown type>";
 	}
     }
+    */
 
-    public abstract void translate(CodeWriter w, Translator tr);
+    public abstract void prettyPrint(CodeWriter w, PrettyPrinter tr);
 }

@@ -287,14 +287,14 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	return this;
     }
 
+    /*
     public String toString() {
 	return flags.translate() + name + "(...)";
     }
+    */
 
     /** Write the constructor to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
-        Context c = tr.context();
-
+    public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
 	w.begin(0);
 	w.write(flags().translate());
 
@@ -305,7 +305,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 
 	for (Iterator i = formals.iterator(); i.hasNext(); ) {
 	    Formal f = (Formal) i.next();
-	    f.del().translate(w, tr);
+	    tr.print(f, w);
 
 	    if (i.hasNext()) {
 		w.write(",");
@@ -322,7 +322,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 
 	    for (Iterator i = exceptionTypes.iterator(); i.hasNext(); ) {
 	        TypeNode tn = (TypeNode) i.next();
-		tn.del().translate(w, tr);
+		tr.print(tn, w);
 
 		if (i.hasNext()) {
 		    w.write(",");
@@ -332,17 +332,30 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	}
 
 	w.end();
+    }
+
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        prettyPrintHeader(w, tr);
 
 	if (body != null) {
-	    enterScope(c);
-	    translateSubstmt(body, w, tr);
-	    leaveScope(c);
+	    printSubStmt(body, w, tr);
 	}
 	else {
 	    w.write(";");
 	}
+    }
 
-	w.newline(0);
+    public void translate(CodeWriter w, Translator tr) {
+        prettyPrintHeader(w, tr);
+
+	if (body != null) {
+	    enterScope(tr.context());
+	    printSubStmt(body, w, tr);
+	    leaveScope(tr.context());
+	}
+	else {
+	    w.write(";");
+	}
     }
 
     public void dump(CodeWriter w) {

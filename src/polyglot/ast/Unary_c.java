@@ -157,6 +157,7 @@ public class Unary_c extends Expr_c implements Unary
     }
 
     /** Check exceptions thrown by the statement. */
+    /*
     public String toString() {
         if (op.isPrefix()) {
 	    return op.toString() + expr.toString();
@@ -165,14 +166,15 @@ public class Unary_c extends Expr_c implements Unary
 	    return expr.toString() + op.toString();
 	}
     }
+    */
 
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (op.isPrefix()) {
 	    w.write(op.toString());
-	    translateSubexpr(expr, w, tr);
+	    printSubExpr(expr, w, tr);
 	}
 	else {
-	    translateSubexpr(expr, w, tr);
+	    printSubExpr(expr, w, tr);
 	    w.write(op.toString());
 	}
     }

@@ -38,6 +38,14 @@ public class CachingResolver implements Resolver {
 	return q;
     }
 
+    public Type checkType(String name) {
+        Type t = (Type) cache.get(name);
+        if (t == null) {
+            return (Type) workingCache.get(name);
+        }
+        return t;
+    }
+
     public Type findType(String name) throws SemanticException {
         Qualifier q = (Qualifier) findQualifier(name);
 

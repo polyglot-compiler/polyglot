@@ -103,14 +103,16 @@ public class Special_c extends Expr_c implements Special
 	}
     }
 
+    /*
     public String toString() {
 	return (qualifier != null ? qualifier + "." : "") + kind;
     }
+    */
 
     /** Write the expression to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	if (qualifier != null) {
-	    qualifier.del().translate(w, tr);
+	    tr.print(qualifier, w);
 	    w.write(".");
 	}
 

@@ -80,15 +80,21 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
         }
     }
 
+    /*
     public String toString() {
 	return decl.toString();
     }
+    */
 
     /** Write the statement to an output file. */
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        printBlock(decl, w, tr);
+	w.write(";");
+    }
+
     public void translate(CodeWriter w, Translator tr) {
         enterScope(tr.context());
-        translateBlock(decl, w, tr);
-	w.write(";");
-        leaveScope(tr.context());
+        super.translate(w, tr);
+	leaveScope(tr.context());
     }
 }

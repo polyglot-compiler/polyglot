@@ -92,16 +92,28 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 	    "Cannot exception check ambiguous node " + this + ".");
     } 
 
-    public void translate(CodeWriter w, Translator tr) {
-	throw new InternalCompilerError(position(),
-	    "Cannot translate ambiguous node " + this + ".");
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+	if (qual != null) {
+            tr.print(qual, w);
+            w.write(".");
+        }
+                
+        w.write(name);
     }
 
+    public void translate(CodeWriter w, Translator tr) {
+      throw new InternalCompilerError(position(),
+                                      "Cannot translate ambiguous node "
+                                      + this + ".");
+    }
+
+    /*
     public String toString() {
 	return (qual == null
 		? name
 		: qual.toString() + "." + name) + "{amb}";
     }
+    */
 
   public void dump(CodeWriter w) {
     super.dump(w);

@@ -69,6 +69,6 @@ public interface Declarator extends Copy {
     /** 
       * Write the declarator to an output file. 
       */
-    void translate(CodeWriter w, Translator tr, boolean field);
+    void prettyPrint(CodeWriter w, PrettyPrinter tr, boolean field);
 	
 }

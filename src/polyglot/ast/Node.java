@@ -151,4 +151,6 @@ public interface Node extends NodeOps, Copy
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException;
     /** @deprectated */
     public void translate(CodeWriter w, Translator tr);
+    /** @deprectated */
+    public void prettyPrint(CodeWriter w, PrettyPrinter pp);
 }

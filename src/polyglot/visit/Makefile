@@ -18,7 +18,9 @@ SOURCES = \
 	FlowChecker.java \
 	NodeScrambler.java \
 	NodeVisitor.java \
+	PrettyPrinter.java \
 	SemanticVisitor.java \
+	StringPrettyPrinter.java \
 	Translator.java \
 	TypeBuilder.java \
 	TypeChecker.java

@@ -10,39 +10,37 @@ import jltools.frontend.Compiler;
 import java.io.*;
 import java.util.*;
 
-/** A Translator generates output code from the processed AST. */
-public class Translator extends AbstractPass
+/**
+ * A Translator generates output code from the processed AST.
+ *
+ * To use:
+ *     new Translator(job, ts, nf, tf).translate(ast);
+ */
+public class Translator extends PrettyPrinter
 {
     protected Job job;
-    protected TypeSystem ts;
     protected NodeFactory nf;
     protected TargetFactory tf;
-
+    protected TypeSystem ts;
     protected Context context;
-    protected boolean appendSemicolon = true;
     protected ClassType outerClass = null;
 
     /**
      * Create a Translator.  The output of the visitor is a collection of files
      * whose names are added to the collection <code>outputFiles</code>.
      */
-    public Translator(Pass.ID id, Job job, TypeSystem ts, NodeFactory nf, TargetFactory tf) {
-	super(id);
-	this.job = job;
-        this.ts = ts;
+    public Translator(Job job, TypeSystem ts, NodeFactory nf, TargetFactory tf) {
+        super();
+
+        this.job = job;
         this.nf = nf;
         this.tf = tf;
-	this.context = job.context();
-    }
+        this.ts = ts;
+        this.context = job.context();
 
-    public boolean appendSemicolon() {
-        return appendSemicolon;
-    }
-
-    public boolean appendSemicolon(boolean a) {
-        boolean old = this.appendSemicolon;
-        this.appendSemicolon = a;
-	return old;
+        if (this.context == null) {
+            this.context = ts.createContext();
+        }
     }
 
     public ClassType outerClass() {
@@ -53,25 +51,23 @@ public class Translator extends AbstractPass
         this.outerClass = ct;
     }
 
-    public Context context() {
-        return context;
-    }
-
     public TypeSystem typeSystem() {
         return ts;
+    }
+
+    public Context context() {
+        return context;
     }
 
     public NodeFactory nodeFactory() {
         return nf;
     }
 
-    public boolean run() {
-        Node ast = job.ast();
+    public void print(Node ast, CodeWriter w) {
+        ast.del().translate(w, this);
+    }
 
-        if (ast == null) {
-            throw new InternalCompilerError("AST is null");
-        }
-
+    public boolean translate(Node ast) {
         if (ast instanceof SourceFile) {
             SourceFile sfn = (SourceFile) ast;
             return translateSource(sfn);
@@ -79,14 +75,19 @@ public class Translator extends AbstractPass
         else if (ast instanceof SourceCollection) {
             SourceCollection sc = (SourceCollection) ast;
 
+            boolean okay = true;
+
             for (Iterator i = sc.sources().iterator(); i.hasNext(); ) {
                 SourceFile sfn = (SourceFile) i.next();
-                return translateSource(sfn);
+                okay &= translateSource(sfn);
             }
-        }
 
-        throw new InternalCompilerError("AST root must be a SourceFile; " +
-                                        "found a " + ast.getClass().getName());
+            return okay;
+        }
+        else {
+            throw new InternalCompilerError("AST root must be a SourceFile; " +
+                                            "found a " + ast.getClass().getName());
+        }
     }
 
     protected boolean translateSource(SourceFile sfn) {
@@ -153,8 +154,6 @@ public class Translator extends AbstractPass
                 }
 
                 decl.del().translate(w, this);
-
-                w.newline(0);
 
                 if (i.hasNext()) {
                     w.newline(0);

@@ -120,28 +120,42 @@ public class Switch_c extends Stmt_c implements Switch
         return child;
     }
 
+    /*
     public String toString() {
 	return "switch (" + expr + ") { ... }";
     }
+    */
 
     /** Write the statement to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("switch (");
-	translateBlock(expr, w, tr);
+	printBlock(expr, w, tr);
 	w.write(") {");
-	w.allowBreak(4, " ");
+        w.allowBreak(4, " ");
 	w.begin(0);
 
+        boolean lastWasCase = false;
+        boolean first = true;
+
 	for (Iterator i = elements.iterator(); i.hasNext();) {
-	   SwitchElement s = (SwitchElement) i.next();
-	   s.del().translate(w, tr);
-	   if (i.hasNext()) {
-	       w.newline(0);
-	   }
+            SwitchElement s = (SwitchElement) i.next();
+            if (s instanceof Case) {
+                if (lastWasCase) w.newline(0);
+                else if (! first) w.allowBreak(0, " ");
+                printBlock(s, w, tr);
+                lastWasCase = true;
+            }
+            else {
+                w.allowBreak(4," ");
+                tr.print(s, w);
+                lastWasCase = false;
+            }
+
+            first = false;
 	}
 
 	w.end();
-	w.newline(0);
+        w.allowBreak(0, " ");
 	w.write("}");
     }
 }

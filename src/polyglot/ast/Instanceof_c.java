@@ -99,14 +99,16 @@ public class Instanceof_c extends Expr_c implements Instanceof
         return child;
     }
 
+    /*
     public String toString() {
 	return expr + " instanceof " + compareType;
     }
+    */
 
     /** Write the expression to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
-	translateSubexpr(expr, w, tr);
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+	printSubExpr(expr, w, tr);
 	w.write(" instanceof ");
-	compareType.del().translate(w, tr);
+	tr.print(compareType, w);
     }
 }

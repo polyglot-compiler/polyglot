@@ -217,14 +217,16 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
         return child;
     }
 
+    /*
     public String toString() {
 	return (qualifier != null ? qualifier + "." : "") + kind + "(...)";
     }
+    */
 
     /** Write the call to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	if (qualifier != null) {
-	    qualifier.del().translate(w, tr);
+	    tr.print(qualifier, w);
 	    w.write(".");
 	} 
 
@@ -234,7 +236,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
 	for (Iterator i = arguments.iterator(); i.hasNext(); ) {
 	    Expr e = (Expr) i.next();
-	    e.del().translate(w, tr);
+	    tr.print(e, w);
 
 	    if (i.hasNext()) {
 		w.write(",");

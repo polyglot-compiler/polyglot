@@ -295,31 +295,24 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	return this;
     }
 
+    /*
     public String toString() {
 	return flags.translate() + returnType + " " + name + "(...)";
     }
+    */
 
     /** Write the method to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
-        Context c = tr.context();
-
-	Flags flags = flags();
-
-	if (c.currentClass().flags().isInterface()) {
-	    flags = flags.clearPublic();
-	    flags = flags.clearAbstract();
-	}
-
+    public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
 	w.begin(0);
 	w.write(flags.translate());
-	returnType.del().translate(w, tr);
+	tr.print(returnType, w);
 	w.write(" " + name + "(");
 
 	w.begin(0);
 
 	for (Iterator i = formals.iterator(); i.hasNext(); ) {
 	    Formal f = (Formal) i.next();
-	    f.del().translate(w, tr);
+	    tr.print(f, w);
 
 	    if (i.hasNext()) {
 		w.write(",");
@@ -336,7 +329,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 
 	    for (Iterator i = exceptionTypes.iterator(); i.hasNext(); ) {
 	        TypeNode tn = (TypeNode) i.next();
-		tn.del().translate(w, tr);
+		tr.print(tn, w);
 
 		if (i.hasNext()) {
 		    w.write(",");
@@ -346,11 +339,33 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	}
 
 	w.end();
+    }
 
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        prettyPrintHeader(flags(), w, tr);
+
+	if (body != null) {
+	    printSubStmt(body, w, tr);
+	}
+	else {
+	    w.write(";");
+	}
+    }
+
+    public void translate(CodeWriter w, Translator tr) {
+        Context c = tr.context();
+	Flags flags = flags();
+
+	if (c.currentClass().flags().isInterface()) {
+	    flags = flags.clearPublic();
+	    flags = flags.clearAbstract();
+	}
+
+        prettyPrintHeader(flags, w, tr);
 
 	if (body != null) {
 	    enterScope(c);
-	    translateSubstmt(body, w, tr);
+	    printSubStmt(body, w, tr);
 	    leaveScope(c);
 	}
 	else {

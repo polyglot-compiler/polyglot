@@ -83,17 +83,28 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
                                     + this + ".");
   } 
 
+  public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+    if (qual != null) {
+        tr.print(qual, w);
+        w.write(".");
+    }
+            
+    w.write(name);
+  }
+
   public void translate(CodeWriter w, Translator tr) {
     throw new InternalCompilerError(position(),
                                     "Cannot translate ambiguous node "
                                     + this + ".");
   }
 
+  /*
   public String toString() {
     return (qual == null
             ? name
             : qual.toString() + "." + name) + "{amb}";
   }
+  */
 
   public void dump(CodeWriter w) {
     super.dump(w);

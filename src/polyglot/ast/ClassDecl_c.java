@@ -280,7 +280,13 @@ public class ClassDecl_c extends Node_c implements ClassDecl
             }
         }
 
-        if (type.superType() != null && type.superType().isClass()) {
+        if (type.superType() != null) {
+            if (! type.superType().isClass()) {
+                throw new SemanticException("Cannot extend non-class \"" +
+                                            type.superType() + "\".",
+                                            position());
+            }
+
             if (type.superType().toClass().flags().isFinal()) {
                 throw new SemanticException("Cannot extend final class \"" +
                                             type.superType() + "\".",
@@ -308,72 +314,83 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         return this;
     }
 
+    /*
     public String toString() {
 	    return flags.clearInterface().translate() +
 		       (flags.isInterface() ? "interface " : "class ") + name + " " + body;
     }
+    */
 
-    public void translate(CodeWriter w, Translator tr) {
-	    enterScope(tr.context());
+    public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
+        if (flags.isInterface()) {
+            w.write(flags.clearInterface().clearAbstract().translate());
+        }
+        else {
+            w.write(flags.translate());
+        }
 
+        if (flags.isInterface()) {
+            w.write("interface ");
+        }
+        else {
+            w.write("class ");
+        }
+
+        w.write(name);
+
+        if (superClass() != null) {
+            w.write(" extends ");
+            tr.print(superClass(), w);
+        }
+
+        if (! interfaces.isEmpty()) {
             if (flags.isInterface()) {
-                w.write(flags.clearInterface().clearAbstract().translate());
+                w.write(" extends ");
             }
             else {
-                w.write(flags.translate());
+                w.write(" implements ");
             }
 
-	    if (flags.isInterface()) {
-		    w.write("interface ");
-	    }
-	    else {
-		    w.write("class ");
-	    }
+            for (Iterator i = interfaces().iterator(); i.hasNext(); ) {
+                TypeNode tn = (TypeNode) i.next();
+                tr.print(tn, w);
 
-	    w.write(name);
+                if (i.hasNext()) {
+                    w.write (", ");
+                }
+            }
+        }
 
-	    if (superClass() != null) {
-		    w.write(" extends ");
-		    superClass().del().translate(w, tr);
-	    }
-
-	    if (! interfaces.isEmpty()) {
-		    if (flags.isInterface()) {
-			    w.write(" extends ");
-		    }
-		    else {
-			    w.write(" implements ");
-		    }
-
-		    for (Iterator i = interfaces().iterator(); i.hasNext(); ) {
-			    TypeNode tn = (TypeNode) i.next();
-			    tn.del().translate(w, tr);
-
-			    if (i.hasNext()) {
-				    w.write (", ");
-			    }
-		    }
-	    }
-
-	    w.write(" ");
-	    body().del().translate(w, tr);
-
-	    leaveScope(tr.context());
+        w.write(" ");
     }
 
-	public void dump(CodeWriter w) {
-		super.dump(w);
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        prettyPrintHeader(w, tr);
+        tr.print(body(), w);
+        w.newline(0);
+    }
 
-		w.allowBreak(4, " ");
-		w.begin(0);
-		w.write("(name " + name + ")");
-		w.end();
+    public void translate(CodeWriter w, Translator tr) {
+        prettyPrintHeader(w, tr);
+        enterScope(tr.context());
+        tr.print(body(), w);
+	leaveScope(tr.context());
+        w.newline(0);
+    }
 
-		if (type != null) {
-			w.allowBreak(4, " ");
-			w.begin(0);
-			w.write("(type " + type + ")");
-			w.end();
-		}
-	}
+    public void dump(CodeWriter w) {
+            super.dump(w);
+
+            w.allowBreak(4, " ");
+            w.begin(0);
+            w.write("(name " + name + ")");
+            w.end();
+
+            if (type != null) {
+                    w.allowBreak(4, " ");
+                    w.begin(0);
+                    w.write("(type " + type + ")");
+                    w.end();
+            }
+    }
 }

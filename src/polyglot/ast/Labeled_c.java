@@ -61,13 +61,15 @@ public class Labeled_c extends Stmt_c implements Labeled
 	return reconstruct(statement);
     }
 
+    /*
     public String toString() {
 	return label + ": " + statement;
     }
+    */
 
     /** Write the statement to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write(label + ": ");
-	statement.del().translate(w, tr);
+	tr.print(statement, w);
     }
 }

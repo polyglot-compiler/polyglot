@@ -86,9 +86,9 @@ public class SourceClassResolver extends LoadedClassResolver
   ExtensionInfo ext;
 
   public SourceClassResolver(Compiler compiler, ExtensionInfo ext,
-                             String classpath)
+                             String classpath, ClassFileLoader loader)
   {
-    super(ext.typeSystem(), classpath, ext.version());
+    super(ext.typeSystem(), classpath, loader, ext.version());
     this.compiler = compiler;
     this.ext = ext;
   }

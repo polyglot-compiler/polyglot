@@ -8,6 +8,7 @@ SOURCES = \
 	Attribute.java \
 	ClassFile.java \
 	ClassFileLoader.java \
+	ClassPathLoader.java \
 	Constant.java \
 	ConstantValue.java \
 	Exceptions.java \

@@ -207,18 +207,19 @@ public class Conditional_c extends Expr_c implements Conditional
         return child;
     }
 
-
+    /*
     public String toString() {
 	return cond + " ? " + consequent + " : " + alternative;
     }
+    */
 
     /** Write the expression to an output file. */
-    public void translate(CodeWriter w, Translator tr)
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr)
     {
-	translateSubexpr(cond, false, w, tr);
+	printSubExpr(cond, false, w, tr);
 	w.write(" ? ");
-	translateSubexpr(consequent, false, w, tr);
+	printSubExpr(consequent, false, w, tr);
 	w.write(" : ");
-	translateSubexpr(alternative, false, w, tr);
+	printSubExpr(alternative, false, w, tr);
     }
 }

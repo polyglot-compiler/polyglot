@@ -102,8 +102,8 @@ public class Formal_c extends Node_c implements Formal
     }
 
     /** Write the formal to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
-        decl.translate(w, tr, false);
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        decl.prettyPrint(w, tr, false);
     }
 
     /** Build type objects for the formal. */
@@ -156,7 +156,9 @@ public class Formal_c extends Node_c implements Formal
 	}
     }
 
+    /*
     public String toString() {
 	return decl.toString();
     }
+    */
 }

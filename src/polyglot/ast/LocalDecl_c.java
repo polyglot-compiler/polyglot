@@ -190,15 +190,17 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
         return decl.setExpectedType(child, tc);
     }
 
+    /*
     public String toString() {
 	return decl.toString();
     }
+    */
 
     /** Write the declaration to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         boolean semi = tr.appendSemicolon(true);
 
-	decl.translate(w, tr, false);
+	decl.prettyPrint(w, tr, false);
 
 	if (semi) {
 	    w.write(";");

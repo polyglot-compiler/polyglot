@@ -65,7 +65,7 @@ public class Binary_c extends Expr_c implements Binary
 	return this.precedence;
     }
 
-    protected Binary precedence(Precedence precedence) {
+    public Binary precedence(Precedence precedence) {
 	Binary_c n = (Binary_c) copy();
 	n.precedence = precedence;
 	return n;
@@ -380,19 +380,19 @@ public class Binary_c extends Expr_c implements Binary
 	return op == DIV || op == MOD;
     }
 
+    /*
     public String toString() {
 	return left + " " + op + " " + right;
     }
+    */
 
     /** Write the expression to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
-	TypeSystem ts = tr.typeSystem();
-
-	translateSubexpr(left, true, w, tr);
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+	printSubExpr(left, true, w, tr);
 	w.write(" ");
 	w.write(op.toString());
-	w.allowBreak(type().isSame(ts.String()) ? 0 : 2, " ");
-	translateSubexpr(right, false, w, tr);
+	w.allowBreak(type() == null || type().isPrimitive() ? 2 : 0, " ");
+	printSubExpr(right, false, w, tr);
     }
 
   public void dump(CodeWriter w) {

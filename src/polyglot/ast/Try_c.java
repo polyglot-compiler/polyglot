@@ -185,25 +185,27 @@ public class Try_c extends Stmt_c implements Try
 	return reconstruct(tryBlock, catchBlocks, finallyBlock);
     }
 
+    /*
     public String toString() {
 	return "try { ... } " + (catchBlocks.isEmpty() ? "" : "catch ...") +
 	                        (finallyBlock != null ? "finally { ... }" : "");
     }
+    */
 
-    public void translate(CodeWriter w, Translator tr) {
-	w.write("try ");
-	translateSubstmt(tryBlock, w, tr);
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+	w.write("try");
+	printSubStmt(tryBlock, w, tr);
 
 	for (Iterator it = catchBlocks.iterator(); it.hasNext(); ) {
 	    Catch cb = (Catch) it.next();
-	    w.newline(4);
-	    translateBlock(cb, w, tr);
+	    w.newline(0);
+	    printBlock(cb, w, tr);
 	}
 
 	if (finallyBlock != null) {
-	    w.newline(4);
-	    w.write ("finally ");
-	    translateSubstmt(finallyBlock, w, tr);
+	    w.newline(0);
+	    w.write ("finally");
+	    printSubStmt(finallyBlock, w, tr);
 	}
     }
 }

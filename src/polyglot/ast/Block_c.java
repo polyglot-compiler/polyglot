@@ -16,17 +16,17 @@ public class Block_c extends AbstractBlock_c implements Block
 	super(ext, pos, statements);
     }
 
+    /*
     public String toString() {
 	return "{ ... }";
     }
+    */
 
     /** Write the block to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("{");
 	w.allowBreak(4," ");
-
-	super.translate(w, tr);
-
+	super.prettyPrint(w, tr);
 	w.allowBreak(0, " ");
 	w.write("}");
     }

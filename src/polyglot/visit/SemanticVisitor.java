@@ -44,6 +44,9 @@ public abstract class SemanticVisitor extends NodeVisitor
 
     public boolean begin() {
 	context = job.context();
+        if (context == null) {
+            context = ts.createContext();
+        }
         top = context.mark();
         depth = 0;
         errors = new BitSet();
@@ -55,6 +58,7 @@ public abstract class SemanticVisitor extends NodeVisitor
     }
 
     protected Node enterCall(Node parent, Node n) throws SemanticException {
+        Types.report(1, "enter: " + parent + " -> " + n);
         return enterCall(n);
     }
 

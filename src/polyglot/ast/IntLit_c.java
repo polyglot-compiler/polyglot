@@ -71,11 +71,13 @@ public class IntLit_c extends NumLit_c implements IntLit
 	}
     }
 
+    /*
     public String toString() {
 	return Long.toString(value);
     }
+    */
 
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	if (kind() == LONG) {
 	    w.write(Long.toString(value) + "L");
 	}

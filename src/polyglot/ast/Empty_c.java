@@ -15,11 +15,13 @@ public class Empty_c extends Stmt_c implements Empty
     }
 
     /** Write the statement to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write(";");
     }
 
+    /*
     public String toString() {
-	return "/* empty */";
+	return "/* empty *\/";
     }
+    */
 }

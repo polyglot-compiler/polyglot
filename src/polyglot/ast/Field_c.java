@@ -159,17 +159,19 @@ public class Field_c extends Expr_c implements Field
     return this;
   }
 
+  /*
   public String toString() {
     return (target != null ? target + "." : "") + name;
   }
+  */
 
   /** Write the field to an output file. */
-  public void translate(CodeWriter w, Translator tr) {
+  public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
     if (target instanceof Expr) {
-      translateSubexpr((Expr) target, w, tr);
+      printSubExpr((Expr) target, w, tr);
     }
     else if (target instanceof TypeNode) {
-      target.del().translate(w, tr);
+      tr.print(target, w);
     }
 
     w.write(".");

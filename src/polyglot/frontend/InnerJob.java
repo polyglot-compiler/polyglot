@@ -23,9 +23,9 @@ public class InnerJob extends Job
     protected String name;
 
     /** Construct a new job for a given source and compiler. */
-    public InnerJob(Compiler c, JobExt ext, Node ast, Context context,
+    public InnerJob(ExtensionInfo lang, JobExt ext, Node ast, Context context,
                     Job outer, Pass.ID begin, Pass.ID end) {
-        super(c, ext, null, ast);
+        super(lang, ext, null, ast);
 
         name = "inner-job[" + begin + ".." + end + "](" +
             context.currentCode() + " in " + context.currentClass() + ")";
@@ -48,7 +48,7 @@ public class InnerJob extends Job
     }
 
     public List getPasses() {
-      	List l = compiler.sourceExtension().passes(this, begin, end);
+      	List l = lang.passes(this, begin, end);
 
         for (int i = 0; i < l.size(); i++) {
             Pass pass = (Pass) l.get(i);

@@ -91,20 +91,29 @@ public class Catch_c extends Stmt_c implements Catch
 	return this;
     }
 
+    /*
     public String toString() {
 	return "catch (" + formal + ") " + body;
     }
+    */
 
     /** Write the catch block to an output file. */
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+	w.write("catch (");
+	printBlock(formal, w, tr);
+	w.write(")");
+	printSubStmt(body, w, tr);
+    }
+
     public void translate(CodeWriter w, Translator tr) {
         Context c = tr.context();
 
-	w.write("catch(");
-	translateBlock(formal, w, tr);
+	w.write("catch (");
+	printBlock(formal, w, tr);
 	w.write(")");
 
 	enterScope(c);
-	translateSubstmt(body, w, tr);
+	printSubStmt(body, w, tr);
 	leaveScope(c);
     }
 }

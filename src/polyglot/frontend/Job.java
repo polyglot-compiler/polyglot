@@ -25,7 +25,7 @@ public abstract class Job
      * executed by its parent. */
     List children;
 
-    Compiler compiler;
+    protected ExtensionInfo lang;
 
     /** The AST constructed from the source file. */
     protected Node ast;
@@ -37,8 +37,8 @@ public abstract class Job
     protected boolean status;
     protected Map passMap;
 
-    public Job(Compiler compiler, JobExt ext, Job parent, Node ast) {
-        this.compiler = compiler;
+    public Job(ExtensionInfo lang, JobExt ext, Job parent, Node ast) {
+        this.lang = lang;
         this.ext = ext;
 	this.parent = parent;
 	this.ast = ast;
@@ -164,8 +164,17 @@ public abstract class Job
     }
 
     public Pass nextPass() {
-        Pass pass = (Pass) passes().get(nextPass);
-        return pass;
+        if (nextPass < passes().size()) {
+            Pass pass = (Pass) passes().get(nextPass);
+            return pass;
+        }
+        else {
+            return null;
+        }
+    }
+
+    public boolean done() {
+        return nextPass >= passes().size();
     }
 
     public boolean status() {
@@ -191,16 +200,20 @@ public abstract class Job
         return children;
     }
 
+    public ExtensionInfo extensionInfo() {
+	return lang;
+    }
+
     public Compiler compiler() {
-	return compiler;
+	return lang.compiler();
     }
 
     public Node spawn(Context c, Node ast, Pass.ID begin, Pass.ID end) {
-        Job j = compiler.sourceExtension().createJob(ast, c, this, begin, end);
+        Job j = lang.createJob(ast, c, this, begin, end);
 
         Compiler.report(1, this + " spawning " + j);
 
-        if (! compiler.runAllPasses(j)) {
+        if (! compiler().runAllPasses(j)) {
             return null;
         }
 

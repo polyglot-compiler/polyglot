@@ -14,46 +14,33 @@ import java.util.jar.*;
  */
 public class ClassFileLoader
 {
-    List classpath;
     Map cache;
 
-    public ClassFileLoader(List classpath) {
-        this.classpath = new ArrayList(classpath);
+    public ClassFileLoader() {
         this.cache = new WeakHashMap();
-    }
-
-    public ClassFileLoader(String classpath) {
-        this.classpath = new ArrayList();
-        this.cache = new HashMap();
-
-        StringTokenizer st = new StringTokenizer(classpath, File.pathSeparator);
-
-        while (st.hasMoreTokens()) {
-            String s = st.nextToken();
-            this.classpath.add(new File(s));
-        }
-    }
-
-    public String classpath() {
-        return classpath.toString();
     }
 
     /**
      * Load a class from the classpath.
      */
-    public ClassFile loadClass(String name) throws ClassNotFoundException {
-        Report.report(verbose, 1, "attempting to load class " + name);
+    public ClassFile loadClass(File dir, String name)
+        throws ClassNotFoundException
+    {
+        Report.report(verbose, 1, "attempting to load class " + name +
+                      " from " + dir);
 
-        ClassFile c = (ClassFile) cache.get(name);
+        String key = dir.toString() + "/" + name;
+
+        ClassFile c = (ClassFile) cache.get(key);
 
         if (c == null) {
-            c = findClass(name);
+            c = findClass(dir, name);
 
             // We cache here since more than one type system may attempt
             // to load the same class file.  But, we use a weak hash map
             // to allow garbage collection of ClassFiles when we need it.
 
-            cache.put(name, c);
+            cache.put(key, c);
         }
         else {
             Report.report(verbose, 2, "already loaded " + c.name());
@@ -64,57 +51,51 @@ public class ClassFileLoader
         return c;
     }
 
-    protected ClassFile findClass(String name) throws ClassNotFoundException {
+    protected ClassFile findClass(File dir, String name) throws ClassNotFoundException {
 	String fileName = name.replace('.', File.separatorChar) + ".class";
 	String entryName = name.replace('.', '/') + ".class";
 
-        Report.report(verbose, 2, "classpath = " + classpath);
+        Report.report(verbose, 2, "looking in " + dir + " for " + fileName);
 
-	for (Iterator i = classpath.iterator(); i.hasNext(); ) {
-	    File dir = (File) i.next();
+        try {
+            if (dir.isDirectory()) {
+                File file = new File(dir, fileName);
 
-            Report.report(verbose, 2, "looking in " + dir + " for " + fileName);
-
-            try {
-                if (dir.isDirectory()) {
-                    File file = new File(dir, fileName);
-
-                    if (file.exists()) {
-                        Report.report(verbose, 2, "found " + file);
-                        FileInputStream in = new FileInputStream(file);
-                        ClassFile c = loadFromStream(in, name);
-                        in.close();
-                        return c;
-                    }
-                }
-                else if (dir.getName().endsWith(".jar")) {
-                    JarFile jar = new JarFile(dir);
-                    JarEntry entry = jar.getJarEntry(entryName);
-                    if (entry != null) {
-                        Report.report(verbose, 2, "found jar entry " + entry);
-                        InputStream in = jar.getInputStream(entry);
-                        ClassFile c = loadFromStream(in, name);
-                        in.close();
-                        return c;
-                    }
-                    jar.close();
-                }
-                else if (dir.getName().endsWith(".zip")) {
-                    ZipFile zip = new ZipFile(dir);
-                    ZipEntry entry = zip.getEntry(entryName);
-                    if (entry != null) {
-                        Report.report(verbose, 2, "found zip entry " + entry);
-                        InputStream in = zip.getInputStream(entry);
-                        ClassFile c = loadFromStream(in, name);
-                        in.close();
-                        return c;
-                    }
-                    zip.close();
+                if (file.exists()) {
+                    Report.report(verbose, 2, "found " + file);
+                    FileInputStream in = new FileInputStream(file);
+                    ClassFile c = loadFromStream(in, name);
+                    in.close();
+                    return c;
                 }
             }
-            catch (IOException e) {
+            else if (dir.getName().endsWith(".jar")) {
+                JarFile jar = new JarFile(dir);
+                JarEntry entry = jar.getJarEntry(entryName);
+                if (entry != null) {
+                    Report.report(verbose, 2, "found jar entry " + entry);
+                    InputStream in = jar.getInputStream(entry);
+                    ClassFile c = loadFromStream(in, name);
+                    in.close();
+                    return c;
+                }
+                jar.close();
             }
-	}
+            else if (dir.getName().endsWith(".zip")) {
+                ZipFile zip = new ZipFile(dir);
+                ZipEntry entry = zip.getEntry(entryName);
+                if (entry != null) {
+                    Report.report(verbose, 2, "found zip entry " + entry);
+                    InputStream in = zip.getInputStream(entry);
+                    ClassFile c = loadFromStream(in, name);
+                    in.close();
+                    return c;
+                }
+                zip.close();
+            }
+        }
+        catch (IOException e) {
+        }
 
         throw new ClassNotFoundException(name);
     }

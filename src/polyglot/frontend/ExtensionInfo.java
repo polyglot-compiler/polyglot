@@ -49,6 +49,8 @@ public interface ExtensionInfo {
      */
     void initCompiler(jltools.frontend.Compiler compiler);
 
+    Compiler compiler();
+
     /** The extension that source files are expected to have. */
     String fileExtension();
 

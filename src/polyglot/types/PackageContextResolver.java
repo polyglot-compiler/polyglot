@@ -43,6 +43,10 @@ public class PackageContextResolver implements Resolver
 		"Cannot lookup qualified name " + name);
 	}
 
+        if (cr == null) {
+	    return ts.packageForName(p, name);
+        }
+
 	try {
 	    return cr.findType(p.fullName() + "." + name);
 	}

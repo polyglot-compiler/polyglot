@@ -257,14 +257,17 @@ public class FieldDecl_c extends Node_c implements FieldDecl
       return decl.setExpectedType(child, tc);
   }
 
+  /*
   public String toString() {
     return decl.toString();
   }
+  */
 
-  public void translate(CodeWriter w, Translator tr) {
-    decl.translate(w, tr, true);
+  public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+    boolean isInterface = fi != null && fi.container() != null &&
+                          fi.container().toClass().flags().isInterface();
+    decl.prettyPrint(w, tr, isInterface);
     w.write(";");
-    w.newline(0);
   }
 
   public void dump(CodeWriter w) {

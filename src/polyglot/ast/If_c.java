@@ -105,18 +105,20 @@ public class If_c extends Stmt_c implements If
         return child;
     }
 
+    /*
     public String toString() {
 	return "if (" + cond + ") " + consequent +
 	    (alternative != null ? " else " + alternative : "");
     }
+    */
 
     /** Write the statement to an output file. */
-    public void translate(CodeWriter w, Translator tr) {    
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {    
 	w.write("if (");
-	translateBlock(cond, w, tr);
+	printBlock(cond, w, tr);
 	w.write(")");
        
-	translateSubstmt(consequent, w, tr);
+	printSubStmt(consequent, w, tr);
 
 	if (alternative != null) {
 	    if (consequent instanceof Block) {
@@ -128,7 +130,7 @@ public class If_c extends Stmt_c implements If
 	    }
 
 	    w.write ("else");
-	    translateSubstmt(alternative, w, tr);
+	    printSubStmt(alternative, w, tr);
 	}
     }
 }

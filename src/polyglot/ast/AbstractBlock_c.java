@@ -73,14 +73,12 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
     }
 
     /** Write the block to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
-        enterScope(tr.context());
-
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.begin(0);
 
 	for (Iterator i = statements.iterator(); i.hasNext(); ) {
 	    Stmt n = (Stmt) i.next();
-	    translateBlock(n, w, tr);
+	    printBlock(n, w, tr);
 
 	    if (i.hasNext()) {
 		w.newline(0);
@@ -88,7 +86,11 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 	}
 
 	w.end();
+    }
 
+    public void translate(CodeWriter w, Translator tr) {
+        enterScope(tr.context());
+        super.translate(w, tr);
 	leaveScope(tr.context());
     }
 }

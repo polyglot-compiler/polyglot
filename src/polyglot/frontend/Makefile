@@ -14,9 +14,12 @@ SOURCES = \
 	InnerJob.java \
 	JobExt.java \
 	Job.java \
+	OutputPass.java \
 	Parser.java \
 	ParserPass.java \
 	Pass.java \
+	PrettyPrintPass.java \
+	PrettyPrintPass.java \
 	Source.java \
 	SourceJob.java \
 	SourceLoader.java \

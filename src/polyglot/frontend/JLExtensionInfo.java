@@ -61,6 +61,10 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	this.options = options;
     }
 
+    public Compiler compiler() {
+        return compiler;
+    }
+
     public void initCompiler(Compiler compiler) {
 	this.compiler = compiler;
 
@@ -69,8 +73,16 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
             typeSystem();
             nodeFactory();
 
-            LoadedClassResolver lr = new SourceClassResolver(compiler, this,
-                                                             options.classpath);
+            LoadedClassResolver lr;
+
+            lr = new SourceClassResolver(compiler, this, options.classpath,
+                                          compiler.loader());
+
+            /*
+            lr = new LoadedClassResolver(typeSystem(), options.classpath,
+                                          compiler.loader(), version());
+            */
+
             ts.initialize(lr);
 	}
 	catch (SemanticException e) {
@@ -135,11 +147,11 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
     }
 
     public SourceJob createJob(Job parent, Source source) {
-	return new SourceJob(compiler, jobExt(), parent, source);
+	return new SourceJob(this, jobExt(), parent, source);
     }
 
     public Job createJob(Node ast, Context context, Job outer, Pass.ID begin, Pass.ID end) {
-	return new InnerJob(compiler, jobExt(), ast, context, outer, begin, end);
+	return new InnerJob(this, jobExt(), ast, context, outer, begin, end);
     }
 
     public TargetFactory targetFactory() {
@@ -196,6 +208,23 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
         throw new InternalCompilerError("Pass " + id + " not found.");
     }
 
+    public void removePass(List passes, Pass.ID id) {
+        for (ListIterator i = passes.listIterator(); i.hasNext(); ) {
+          Pass p = (Pass) i.next();
+
+          if (p.id() == id) {
+            if (p instanceof BarrierPass) {
+              throw new InternalCompilerError("Cannot remove a barrier pass.");
+            }
+
+            i.remove();
+            return;
+          }
+        }
+
+        throw new InternalCompilerError("Pass " + id + " not found.");
+    }
+
     public void beforePass(List passes, Pass.ID id, List newPasses) {
         for (ListIterator i = passes.listIterator(); i.hasNext(); ) {
           Pass p = (Pass) i.next();
@@ -243,9 +272,11 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
         afterPass(passes, id, Collections.singletonList(pass));
     }
 
+    /*
     public void removePass(List passes, Pass.ID id) {
         replacePass(passes, id, new EmptyPass(id));
     }
+    */
 
     public List passes(Job job) {
         ArrayList l = new ArrayList(15);
@@ -271,8 +302,13 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	l.add(new BarrierPass(Pass.PRE_OUTPUT_ALL, job));
 
 	if (compiler.dumpAst()) {
+	    l.add(new PrettyPrintPass(Pass.DUMP, job,
+                                      new CodeWriter(System.err, 78),
+                                      new PrettyPrinter()));
+            /*
 	    l.add(new VisitorPass(Pass.DUMP, job,
 				  new DumpAst(new CodeWriter(System.err, 78))));
+                                  */
 	}
 
 	if (compiler.serializeClassInfo()) {
@@ -283,7 +319,8 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
                                                            version())));
 	}
 
-	l.add(new Translator(Pass.OUTPUT, job, ts, nf, targetFactory()));
+	l.add(new OutputPass(Pass.OUTPUT, job,
+                             new Translator(job, ts, nf, targetFactory())));
 
         return l;
     }

@@ -129,9 +129,11 @@ public class ClassBody_c extends Node_c implements ClassBody
         c.popBlock();
     }
 
+    /*
     public String toString() {
         return "{ ... }";
     }
+    */
 
     protected void duplicateFieldCheck(TypeChecker tc) throws SemanticException {
         ClassType type = tc.context().currentClass();
@@ -277,9 +279,7 @@ public class ClassBody_c extends Node_c implements ClassBody
         return this;
     }
 
-    public void translate(CodeWriter w, Translator tr) {
-        enterScope(tr.context());
-
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (members.isEmpty()) {
             w.write("{ }");
         } else {
@@ -289,7 +289,7 @@ public class ClassBody_c extends Node_c implements ClassBody
 
             for (Iterator i = members.iterator(); i.hasNext(); ) {
                 ClassMember member = (ClassMember) i.next();
-                translateBlock(member, w, tr);
+                printBlock(member, w, tr);
                 if (i.hasNext()) {
                     w.newline(0);
                     w.newline(0);
@@ -300,7 +300,11 @@ public class ClassBody_c extends Node_c implements ClassBody
             w.newline(0);
             w.write("}");
         }
+    }
 
-        leaveScope(tr.context());
+    public void translate(CodeWriter w, Translator tr) {
+        enterScope(tr.context());
+        super.translate(w, tr);
+	leaveScope(tr.context());
     }
 }

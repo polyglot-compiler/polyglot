@@ -79,14 +79,25 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
     } 
 
     /** Write the prefix to an output file. */
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+	if (prefix != null) {
+            tr.print(prefix, w);
+            w.write(".");
+        }
+                
+        w.write(name);
+    }
+
     public void translate(CodeWriter w, Translator tr) {
 	throw new InternalCompilerError(position(),
 	    "Cannot translate ambiguous node " + this + ".");
     }
 
+    /*
     public String toString() {
 	return (prefix == null
 		? name
 		: prefix.toString() + "." + name) + "{amb}";
     }
+    */
 }

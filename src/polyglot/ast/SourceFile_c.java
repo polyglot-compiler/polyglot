@@ -182,15 +182,20 @@ public class SourceFile_c extends Node_c implements SourceFile
 	return this;
     }
 
+    /*
     public String toString() {
-	return "/* source file */";
+	return "/* source file *\/";
     }
+    */
 
     /** Write the source file to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        w.write("<<<< " + source + " >>>>");
+        w.newline(0);
+
 	if (package_ != null) {
 	    w.write("package ");
-	    package_.del().translate(w, tr);
+	    tr.print(package_, w);
 	    w.write(";");
 	    w.newline(0);
 	    w.newline(0);
@@ -198,7 +203,7 @@ public class SourceFile_c extends Node_c implements SourceFile
 
 	for (Iterator i = imports.iterator(); i.hasNext(); ) {
 	    Import im = (Import) i.next();
-	    im.del().translate(w, tr);
+	    tr.print(im, w);
 	}
 	 
 	if (! imports.isEmpty()) {
@@ -207,8 +212,7 @@ public class SourceFile_c extends Node_c implements SourceFile
 
 	for (Iterator i = decls.iterator(); i.hasNext(); ) {
 	    ClassDecl cd = (ClassDecl) i.next();
-	    cd.del().translate(w, tr);
-	    w.newline(0);
+	    tr.print(cd, w);
 	}
     }
 }

@@ -2,7 +2,7 @@ package jltools.ast;
 
 import jltools.types.Type;
 import jltools.util.CodeWriter;
-import jltools.visit.Translator;
+import jltools.visit.PrettyPrinter;
 
 /**
  * An <code>Expr</code> represents any Java expression.  All expressions
@@ -38,14 +38,14 @@ public interface Expr extends Receiver {
      * we parenthesis the right sub-expression of a left-associative
      * operator.
      */
-    void translateSubexpr(Expr expr, boolean associative,
-                          CodeWriter w, Translator tr);
+    void printSubExpr(Expr expr, boolean associative,
+                      CodeWriter w, PrettyPrinter pp);
 
     /**
      * Correctly parenthesize the subexpression <code>expr<code> given
      * based on its precedence and the precedence of this expression.
      *
-     * This is equivalent to <code>translateSubexpr(expr, true, w, tr)</code>
+     * This is equivalent to <code>printSubexpr(expr, true, w, pp)</code>
      */
-    void translateSubexpr(Expr expr, CodeWriter w, Translator tr);
+    void printSubExpr(Expr expr, CodeWriter w, PrettyPrinter pp);
 }

@@ -146,15 +146,15 @@ public class Initializer_c extends Node_c implements Initializer
     }
 
     /** Write the initializer to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
-        Context c = tr.context();
-
-	enterScope(c);
-
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write(flags.translate());
-	translateBlock(body, w, tr);
+	printBlock(body, w, tr);
+    }
 
-	leaveScope(c);
+    public void translate(CodeWriter w, Translator tr) {
+	enterScope(tr.context());
+        super.translate(w, tr);
+	leaveScope(tr.context());
     }
 
     public void dump(CodeWriter w) {
@@ -168,7 +168,9 @@ public class Initializer_c extends Node_c implements Initializer
 	}
     }
 
+    /*
     public String toString() {
 	return flags.translate() + "{ ... }";
     }
+    */
 }

@@ -16,6 +16,8 @@ SOURCES = \
 	ErrorInfo.java \
 	ErrorLimitError.java \
 	ErrorQueue.java \
+	StdErrorQueue.java \
+	QQErrorQueue.java \
 	FilteringIterator.java \
 	InternalCompilerError.java \
 	NestedMap.java \

@@ -48,7 +48,7 @@ public class Case_c extends Stmt_c implements Case
     }
 
     /** Set the value of the case label. */
-    protected Case value(long value) {
+    public Case value(long value) {
 	Case_c n = (Case_c) copy();
 	n.value = value;
 	return n;
@@ -140,6 +140,7 @@ public class Case_c extends Stmt_c implements Case
         return child;
     }
 
+    /*
     public String toString() {
         if (expr == null) {
 	    return "default:";
@@ -148,15 +149,16 @@ public class Case_c extends Stmt_c implements Case
 	    return "case " + expr + ":";
 	}
     }
+    */
 
     /** Write the statement to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (expr == null) {
 	    w.write("default:");
 	}
 	else {
 	    w.write("case ");
-	    expr.del().translate(w, tr);
+	    tr.print(expr, w);
 	    w.write(":");
 	}
     }

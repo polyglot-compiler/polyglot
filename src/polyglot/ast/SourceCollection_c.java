@@ -18,9 +18,11 @@ public class SourceCollection_c extends Node_c implements SourceCollection
 	this.sources = TypedList.copyAndCheck(sources, SourceFile.class, true);
     }
 
+    /*
     public String toString() {
 	return sources.toString();
     }
+    */
 
     /** Get the source files. */
     public List sources() {
@@ -38,7 +40,7 @@ public class SourceCollection_c extends Node_c implements SourceCollection
     protected SourceCollection_c reconstruct(List sources) {
 	if (! CollectionUtil.equals(sources, this.sources)) {
 	    SourceCollection_c n = (SourceCollection_c) copy();
-	    n.sources = TypedList.copyAndCheck(sources, Stmt.class, true);
+	    n.sources = TypedList.copyAndCheck(sources, SourceFile.class, true);
 	    return n;
 	}
 
@@ -52,10 +54,11 @@ public class SourceCollection_c extends Node_c implements SourceCollection
     }
 
     /** Write the source files to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         for (Iterator i = sources.iterator(); i.hasNext(); ) {
             SourceFile s = (SourceFile) i.next();
-            s.del().translate(w, tr);
+            tr.print(s, w);
+            w.newline(0);
         }
     }
 }

@@ -63,12 +63,14 @@ public class FloatLit_c extends Lit_c implements FloatLit
 	}
     }  
 
+    /*
     public String toString() {
 	return Double.toString(value);
     }
+    */
 
     /** Write the expression to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (kind == FLOAT) {
 	    w.write(Float.toString((float) value) + "F");
 	}

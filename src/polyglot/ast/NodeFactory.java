@@ -164,6 +164,7 @@ public interface NodeFactory
     NewArray NewArray(Position pos, TypeNode base, List dims);
     NewArray NewArray(Position pos, TypeNode base, List dims, int addDims);
     NewArray NewArray(Position pos, TypeNode base, int addDims, ArrayInit init);
+    NewArray NewArray(Position pos, TypeNode base, List dims, int addDims, ArrayInit init);
 
     NullLit NullLit(Position pos);
 

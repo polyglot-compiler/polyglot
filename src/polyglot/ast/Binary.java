@@ -51,4 +51,5 @@ public interface Binary extends Expr
     Binary right(Expr right);
 
     boolean throwsArithmeticException();
+    Binary precedence(Precedence precedence);
 }

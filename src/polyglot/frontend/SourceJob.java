@@ -20,21 +20,17 @@ public class SourceJob extends Job
     protected Context context;
 
     /** Construct a new job for a given source and compiler. */
-    public SourceJob(Compiler c, JobExt ext, Job parent, Source source) {
-        super(c, ext, parent, null);
+    public SourceJob(ExtensionInfo lang, JobExt ext, Job parent, Source source) {
+        super(lang, ext, parent, null);
         this.source = source;
     }
 
     public List getPasses() {
-      	return compiler.sourceExtension().passes(this);
+      	return lang.passes(this);
     }
 
     public Context context() {
-	if (context == null) {
-	    context = compiler.sourceExtension().typeSystem().createContext();
-	}
-
-	return context;
+        return null;
     }
 
     public Source source() {
@@ -43,6 +39,8 @@ public class SourceJob extends Job
 
     public String toString() {
         return source.toString() + " (" +
-            (isRunning() ? "running " : "before ") + nextPass() + ")";
+            (done() ? "done"
+                    : ((isRunning() ? "running "
+                                    : "before ") + nextPass()) + ")");
     }
 }

@@ -280,18 +280,20 @@ public class Call_c extends Expr_c implements Call
     return this;
   }
 
+  /*
   public String toString() {
     return (target != null ? target.toString() + "." : "") + name + "(...)";
   }
-	
+  */
+
   /** Write the expression to an output file. */
-  public void translate(CodeWriter w, Translator tr) {
+  public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
     if (target instanceof Expr) {
-      translateSubexpr((Expr) target, w, tr);
+      printSubExpr((Expr) target, w, tr);
       w.write(".");
     }
     else if (target != null) {
-      target.del().translate(w, tr);
+      tr.print(target, w);
       w.write(".");
     }
 
@@ -300,7 +302,7 @@ public class Call_c extends Expr_c implements Call
 		
     for(Iterator i = arguments.iterator(); i.hasNext();) {
       Expr e = (Expr) i.next();
-      e.del().translate(w, tr);
+      tr.print(e, w);
 
       if (i.hasNext()) {
         w.write(",");

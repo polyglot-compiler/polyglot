@@ -60,6 +60,7 @@ public abstract class Expr_c extends Node_c implements Expr
 	    w.begin(0);
 	    w.write("(type " + type + ")");
 	    w.end();
+	    w.allowBreak(4, " ");
 	    w.begin(0);
 	    w.write("(expectedType " + expectedType + ")");
 	    w.end();
@@ -78,31 +79,44 @@ public abstract class Expr_c extends Node_c implements Expr
     /**
      * Correctly parenthesize the subexpression <code>expr<code> given
      * the its precendence and the precedence of the current expression.
+     *
+     * If the sub-expression has the same precedence as this expression
+     * we do not parenthesize.
+     *
+     * @param expr The subexpression.
+     * (right-) associative operator.
+     * @param w The output writer.
+     * @param pp The pretty printer.
      */
-    public void translateSubexpr(Expr expr, CodeWriter w, Translator tr) {
-        translateSubexpr(expr, true, w, tr);
+    public void printSubExpr(Expr expr, CodeWriter w, PrettyPrinter pp) {
+        printSubExpr(expr, true, w, pp);
     }
 
     /**
      * Correctly parenthesize the subexpression <code>expr<code> given
      * the its precendence and the precedence of the current expression.
      *
+     * If the sub-expression has the same precedence as this expression
+     * we parenthesize if the sub-expression does not associate; e.g.,
+     * we parenthesis the right sub-expression of a left-associative
+     * operator.
+     *
      * @param expr The subexpression.
      * @param associative Whether expr is the left (right) child of a left-
      * (right-) associative operator.
-     * @param c The context of translation.
      * @param w The output writer.
+     * @param pp The pretty printer.
      */
-    public void translateSubexpr(Expr expr, boolean associative,
-                                 CodeWriter w, Translator tr) {
+    public void printSubExpr(Expr expr, boolean associative,
+                             CodeWriter w, PrettyPrinter pp) {
         if (! associative && precedence().isSame(expr.precedence()) ||
 	    precedence().isTighter(expr.precedence())) {
 	    w.write("(");
-            translateBlock(expr, w, tr);
+            printBlock(expr, w, pp);
 	    w.write( ")");
 	}
         else {
-            translateBlock(expr, w, tr);
+            printBlock(expr, w, pp);
         }
     }
 }

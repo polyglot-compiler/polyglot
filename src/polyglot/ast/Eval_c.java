@@ -59,15 +59,17 @@ public class Eval_c extends Stmt_c implements Eval
 	return reconstruct(expr);
     }
 
+    /*
     public String toString() {
 	return expr.toString();
     }
+    */
 
     /** Write the statement to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	boolean semi = tr.appendSemicolon(true);
 
-	expr.del().translate(w, tr);
+	tr.print(expr, w);
 
 	if (semi) {
 	    w.write(";");

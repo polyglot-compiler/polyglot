@@ -62,12 +62,14 @@ public class Import_c extends Node_c implements Import
 	return this;
     }
    
+    /*
     public String toString() {
 	return "import " + name + (kind == PACKAGE ? ".*" : "");
     }
+    */
 
     /** Write the import to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	if (! Options.global.fully_qualified_names) {
 	    w.write("import ");
 	    w.write(name);

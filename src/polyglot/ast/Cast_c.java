@@ -115,19 +115,21 @@ public class Cast_c extends Expr_c implements Cast
       return this;
     }
 
+    /*
     public String toString() {
 	return "(" + castType + ") " + expr;
     }
+    */
 
     /** Write the expression to an output file. */
-    public void translate(CodeWriter w, Translator tr)
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr)
     {
 	w.begin(0);
 	w.write("(");
-	castType.del().translate(w, tr);
+	tr.print(castType, w);
 	w.write(")");
 	w.allowBreak(2, " ");
-	translateSubexpr(expr, w, tr);
+	printSubExpr(expr, w, tr);
 	w.end();
     }
 }

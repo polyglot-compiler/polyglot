@@ -58,15 +58,21 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
   } 
 
   /** Write the expression to an output file. */
+  public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+    w.write(name);
+  }
+
   public void translate(CodeWriter w, Translator tr) {
     throw new InternalCompilerError(position(),
                                     "Cannot translate ambiguous node "
                                     + this + ".");
   }
 
+  /*
   public String toString() {
     return name + "{amb}";
   }
+  */
 
   public void dump(CodeWriter w) {
     super.dump(w);

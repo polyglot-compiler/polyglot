@@ -76,12 +76,20 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
 	    "Cannot exception check ambiguous node " + this + ".");
     }
 
-    public void translate(CodeWriter w, Translator tr) {
-	throw new InternalCompilerError(position(),
-	    "Cannot translate ambiguous node " + this + ".");
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        tr.print(base, w);
+        w.write("[]");
     }
 
+    public void translate(CodeWriter w, Translator tr) {
+      throw new InternalCompilerError(position(),
+                                      "Cannot translate ambiguous node "
+                                      + this + ".");
+    }
+
+    /*
     public String toString() {
         return base.toString() + "[]";
     }
+    */
 }

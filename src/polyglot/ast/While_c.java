@@ -89,18 +89,17 @@ public class While_c extends Stmt_c implements While
         return child;
     }
 
+    /*
     public String toString() {
 	return "while (" + cond + ") ...";
     }
+    */
 
     /** Write the statement to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("while (");
-	translateBlock(cond, w, tr);
+	printBlock(cond, w, tr);
 	w.write(")");
-	translateSubstmt(body, w, tr);
-
-	// FIXME: we used to construct with null body for while (c) ;
-	// check the creators of While nodes.
+	printSubStmt(body, w, tr);
     }
 }

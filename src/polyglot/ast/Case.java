@@ -23,4 +23,5 @@ public interface Case extends SwitchElement
      * after type-checking.
      */
     long value();
+    Case value(long value);
 }

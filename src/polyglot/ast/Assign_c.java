@@ -194,17 +194,19 @@ public class Assign_c extends Expr_c implements Assign
     return op == DIV_ASSIGN || op == MOD_ASSIGN;
   }
 
+  /*
   public String toString() {
     return left + " " + op + " " + right;
   }
+  */
 
   /** Write the expression to an output file. */
-  public void translate(CodeWriter w, Translator tr) {
-    translateSubexpr(left, true, w, tr);
+  public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+    printSubExpr(left, true, w, tr);
     w.write(" ");
     w.write(op.toString());
     w.allowBreak(2, " ");
-    translateSubexpr(right, false, w, tr);
+    printSubExpr(right, false, w, tr);
   }
 
   /** Dumps the AST. */

@@ -22,6 +22,11 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
    * Otherwise, the string that originally represented the type in the
    * source file is used.
    */
+  public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+    if (type == null) w.write("<unknown-type>");
+    else w.write(type.toString());
+  }
+
   public void translate(CodeWriter w, Translator tr) {
     TypeSystem ts = tr.typeSystem();
 
@@ -36,9 +41,11 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
     }
   }
 
+  /*
   public String toString() {
     return type.toString();
   }
+  */
 
   public void dump(CodeWriter w) {
     super.dump(w);

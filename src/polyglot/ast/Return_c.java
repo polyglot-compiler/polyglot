@@ -123,16 +123,18 @@ public class Return_c extends Stmt_c implements Return
         return child;
     }
 
+    /*
     public String toString() {
 	return "return" + (expr != null ? " " + expr : "");
     }
+    */
 
     /** Write the statement to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("return") ;
 	if (expr != null) {
 	    w.write(" ");
-	    expr.del().translate(w, tr);
+	    tr.print(expr, w);
 	}
 	w.write(";");
     }

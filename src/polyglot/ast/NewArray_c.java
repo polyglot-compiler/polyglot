@@ -126,19 +126,21 @@ public class NewArray_c extends Expr_c implements NewArray
         return child;
     }
 
+    /*
     public String toString() {
 	return "new " + baseType + "[...]";
     }
+    */
 
     /** Write the expression to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("new ");
-	baseType.del().translate(w, tr);
+	tr.print(baseType, w);
 
 	for (Iterator i = dims.iterator(); i.hasNext();) {
 	  Expr e = (Expr) i.next();
 	  w.write("[");
-	  translateBlock(e, w, tr);
+	  printBlock(e, w, tr);
 	  w.write("]");
 	}
 
@@ -148,7 +150,7 @@ public class NewArray_c extends Expr_c implements NewArray
 
 	if (init != null) {
 	    w.write(" ");
-	    init.del().translate(w, tr);
+	    tr.print(init, w);
 	}
     }
 }

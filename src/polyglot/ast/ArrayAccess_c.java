@@ -81,7 +81,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	if (! index.type().isImplicitCastValid(ts.Int())) {
 	    throw new SemanticException(
 		"Array subscript must be an integer.", position());
-	} 
+	}
 
 	return type(array.type().toArray().base());
     }
@@ -112,15 +112,17 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	return this;
     }
 
+    /*
     public String toString() {
 	return array + "[" + index + "]";
     }
+    */
 
     /** Write the expression to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
-	translateSubexpr(array, w, tr);
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+	printSubExpr(array, w, tr);
 	w.write ("[");
-	translateBlock(index, w, tr);
+	printBlock(index, w, tr);
 	w.write ("]");
     }
 }

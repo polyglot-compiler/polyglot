@@ -201,7 +201,8 @@ public class New_c extends Expr_c implements New
             TypeSystem ts = ar.typeSystem();
             Context c = ar.context();
 
-            // Search for the outer class of the member.
+            // Search for the outer class of the member.  The outer class is
+            // not just ct.outer(); it may be a subclass of ct.outer().
             Type outer = null;
 
             String name = ct.toMember().name();
@@ -211,6 +212,7 @@ public class New_c extends Expr_c implements New
             if (t == anonType) {
                 t = t.toAnonymous().outer();
             }
+
 
             while (t != null) {
                 try {
@@ -224,7 +226,7 @@ public class New_c extends Expr_c implements New
                 catch (SemanticException e) {
                 }
 
-                t = t.isMember() ? t.toMember().outer() : null;
+                t = t.isInner() ? t.toInner().outer() : null;
             }
 
             if (outer == null) {
@@ -517,15 +519,50 @@ FIXME: check super types as well.
         return Precedence.LITERAL;
     }
 
+    /*
     public String toString() {
 	return (qualifier != null ? (qualifier.toString() + ".") : "") +
             "new " + tn + "(...)" + (body != null ? " " + body : "");
     }
+    */
 
     /** Write the expression to an output file. */
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        if (qualifier != null) {
+            tr.print(qualifier, w);
+            w.write(".");
+        }
+
+	w.write("new ");
+
+        tr.print(tn, w);
+
+	w.write("(");
+	w.begin(0);
+
+	for (Iterator i = arguments.iterator(); i.hasNext();) {
+	    Expr e = (Expr) i.next();
+
+	    tr.print(e, w);
+
+	    if (i.hasNext()) {
+		w.write(",");
+		w.allowBreak(0);
+	    }
+	}
+
+	w.end();
+	w.write(")");
+
+	if (body != null) {
+	    w.write(" ");
+	    tr.print(body, w);
+	}
+    }
+
     public void translate(CodeWriter w, Translator tr) {
         if (qualifier != null) {
-            qualifier.del().translate(w, tr);
+            tr.print(qualifier, w);
             w.write(".");
         }
 
@@ -540,11 +577,11 @@ FIXME: check super types as well.
             }
 
             tr.setOuterClass(ct.toMember().outer());
-            tn.del().translate(w, tr);
+            tr.print(tn, w);
             tr.setOuterClass(null);
         }
         else {
-            tn.del().translate(w, tr);
+            tr.print(tn, w);
         }
 
 	w.write("(");
@@ -553,7 +590,7 @@ FIXME: check super types as well.
 	for (Iterator i = arguments.iterator(); i.hasNext();) {
 	    Expr e = (Expr) i.next();
 
-	    e.del().translate(w, tr);
+	    tr.print(e, w);
 
 	    if (i.hasNext()) {
 		w.write(",");
@@ -566,7 +603,7 @@ FIXME: check super types as well.
 
 	if (body != null) {
 	    w.write(" ");
-	    body.del().translate(w, tr);
+	    tr.print(body, w);
 	}
     }
 }

@@ -132,18 +132,14 @@ public class For_c extends Stmt_c implements For
     }
 
     /** Write the statement to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
-        Context c = tr.context();
-
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("for (");
 	w.begin(0);
-
-	enterScope(c);
 
 	if (inits != null) {
 	    for (Iterator i = inits.iterator(); i.hasNext(); ) {
 		ForInit s = (ForInit) i.next();
-	        translateForInit(s, w, tr);
+	        printForInit(s, w, tr);
 
 		if (i.hasNext()) {
 		    w.write(",");
@@ -156,7 +152,7 @@ public class For_c extends Stmt_c implements For
 	w.allowBreak(0);
 
 	if (cond != null) {
-	    translateBlock(cond, w, tr);
+	    printBlock(cond, w, tr);
 	}
 
 	w.write (";");
@@ -165,7 +161,7 @@ public class For_c extends Stmt_c implements For
 	if (iters != null) {
 	    for (Iterator i = iters.iterator(); i.hasNext();) {
 		ForUpdate s = (ForUpdate) i.next();
-		translateForUpdate(s, w, tr);
+		printForUpdate(s, w, tr);
 		
 		if (i.hasNext()) {
 		    w.write(",");
@@ -177,24 +173,30 @@ public class For_c extends Stmt_c implements For
 	w.end();
 	w.write(")");
 
-	translateSubstmt(body, w, tr);
-
-	leaveScope(c);
+	printSubStmt(body, w, tr);
     }
 
+    public void translate(CodeWriter w, Translator tr) {
+	enterScope(tr.context());
+        super.translate(w, tr);
+	leaveScope(tr.context());
+    }
+
+    /*
     public String toString() {
 	return "for (...) ...";
     }
+    */
 
-    private void translateForInit(ForInit s, CodeWriter w, Translator tr) {
+    private void printForInit(ForInit s, CodeWriter w, PrettyPrinter tr) {
         tr.appendSemicolon(false);
-        translateBlock(s, w, tr);
+        printBlock(s, w, tr);
         tr.appendSemicolon(true);
     }
 
-    private void translateForUpdate(ForUpdate s, CodeWriter w, Translator tr) {
+    private void printForUpdate(ForUpdate s, CodeWriter w, PrettyPrinter tr) {
         tr.appendSemicolon(false);
-        translateBlock(s, w, tr);
+        printBlock(s, w, tr);
         tr.appendSemicolon(true);
     }
 }

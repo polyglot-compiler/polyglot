@@ -32,12 +32,14 @@ public class CharLit_c extends NumLit_c implements CharLit
 	return type(tc.typeSystem().Char());
     }  
 
+    /*
     public String toString() {
         return "'" + StringUtil.escape((char) value) + "'";
     }
+    */
 
     /** Write the expression to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         w.write("'");
 	w.write(StringUtil.escape((char) value));
         w.write("'");

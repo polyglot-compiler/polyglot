@@ -59,8 +59,8 @@ public class Disamb_c implements Disamb
     }
 
     protected Node disambiguatePackagePrefix(PackageNode pn) throws SemanticException {
-
-        Resolver pc = ts.packageContextResolver(c.importTable(), pn.package_());
+        Resolver pc = ts.packageContextResolver(c.outerResolver(),
+                                                pn.package_());
         Qualifier q = pc.findQualifier(name);
 
         if (q.isPackage()) {

@@ -316,6 +316,14 @@ public interface NodeOps
     Node exceptionCheck(ExceptionChecker ec) throws SemanticException;
 
     /**
+     * Pretty-print the AST using the given code writer.
+     *
+     * @param w The code writer to which to write.
+     * @param pp The pretty printer.  This is <i>not</i> a visitor.
+     */
+    void prettyPrint(CodeWriter w, PrettyPrinter pp);
+
+    /**
      * Translate the AST using the given code writer.
      *
      * @param w The code writer to which to write.

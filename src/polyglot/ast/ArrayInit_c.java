@@ -133,18 +133,19 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
         }
     }
 
+    /*
     public String toString() {
 	return "{ ... }";
     }
+    */
 
     /** Write the initializer to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("{ ");
 
 	for (Iterator i = elements.iterator(); i.hasNext(); ) {
 	    Expr e = (Expr) i.next();
-
-	    e.del().translate(w, tr);
+	    tr.print(e, w);
 
 	    if (i.hasNext()) {
 		w.write(", ");

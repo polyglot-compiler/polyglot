@@ -88,33 +88,39 @@ public class LoadedClassResolver extends ClassResolver
 
   TypeSystem ts;
   TypeEncoder te;
-  ClassFileLoader loader;
+  ClassPathLoader loader;
   Version version;
+  Set nocache;
 
-  public LoadedClassResolver(TypeSystem ts, String classpath, Version version)
+  public LoadedClassResolver(TypeSystem ts, String classpath, ClassFileLoader loader, Version version)
   {
     this.ts = ts;
     this.te = new TypeEncoder(ts);
-    this.loader = new ClassFileLoader(classpath);
+    this.loader = new ClassPathLoader(classpath, loader);
     this.version = version;
+    this.nocache = new HashSet();
   }
 
   protected ClassFile loadFile(String name) throws SemanticException {
-    try {
-      ClassFile clazz = loader.loadClass(name);
+    if (! nocache.contains(name)) {
+      try {
+        ClassFile clazz = loader.loadClass(name);
 
-      Types.report(4, "Class " + name + " found in classpath " +
-                   loader.classpath());
+        Types.report(4, "Class " + name + " found in classpath " +
+                    loader.classpath());
 
-      return clazz;
+        return clazz;
+      }
+      catch (ClassNotFoundException e) {
+        Types.report(4, "Class " + name + " not found in classpath " +
+                    loader.classpath());
+      }
+      catch (ClassFormatError e) {
+        Types.report(4, "Class " + name + " format error");
+      }
     }
-    catch (ClassNotFoundException e) {
-      Types.report(4, "Class " + name + " not found in classpath " +
-                   loader.classpath());
-    }
-    catch (ClassFormatError e) {
-      Types.report(4, "Class " + name + " format error");
-    }
+
+    nocache.add(name);
 
     throw new NoClassException("Class " + name + " not found.");
   }

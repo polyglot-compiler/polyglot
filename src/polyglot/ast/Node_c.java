@@ -32,8 +32,12 @@ public abstract class Node_c implements Node
     }
 
     public Node del(Del del) {
-        // use clone here, not copy to avoid copying the del as well
+        if (this.del == del) {
+            return this;
+        }
+
         try {
+            // use clone here, not copy to avoid copying the del as well
             Node_c n = (Node_c) super.clone();
             n.del = del;
             n.del.init(n);
@@ -265,67 +269,53 @@ public abstract class Node_c implements Node
 	return this;
     }
 
+    /** Pretty-print the AST using the given <code>CodeWriter</code>. */
+    public void prettyPrint(CodeWriter w, PrettyPrinter pp) { }
+
+    public void printBlock(Node n, CodeWriter w, PrettyPrinter pp) {
+            w.begin(0);
+            pp.print(n, w);
+            w.end();
+    }
+
+    public void printSubStmt(Stmt stmt, CodeWriter w, PrettyPrinter pp) {
+            if (stmt instanceof Block) {
+                w.write(" ");
+                pp.print(stmt, w);
+            }
+            else {
+                w.allowBreak(4, " ");
+                printBlock(stmt, w, pp);
+            }
+    }
+
     /** Translate the AST using the given <code>CodeWriter</code>. */
-    public void translate(CodeWriter w, Translator tr) { }
-
-    // Some helpful methods for translation.
-    public void translateBlock(Node n, CodeWriter w, Translator tr) {
-	w.begin(0);
-	n.del().translate(w, tr);
-	w.end();
+    public void translate(CodeWriter w, Translator tr) {
+            // By default, just rely on the pretty printer.
+            this.del().prettyPrint(w, tr);
     }
 
-    public void translateSubstmt(Stmt stmt, CodeWriter w, Translator tr) {
-	w.allowBreak(4, " ");
-	translateBlock(stmt, w, tr);
-    }
-
-    /** Dump the ast for debugging purposes. */
     public void dump(CodeWriter w) {
-	w.write(StringUtil.getShortNameComponent(getClass().getName()));
+            w.write(StringUtil.getShortNameComponent(getClass().getName()));
 
-	w.allowBreak(4, " ");
-	w.begin(0);
-	w.write("(del " + del() + ")");
-	w.end();
+            w.allowBreak(4, " ");
+            w.begin(0);
+            w.write("(del " + del() + ")");
+            w.end();
 
-	w.allowBreak(4, " ");
-	w.begin(0);
-	w.write("(position " + (position != null
-				? position.toString()
-				  : "UNKNOWN") + ")");
-	w.end();
+            w.allowBreak(4, " ");
+            w.begin(0);
+            w.write("(position " + (position != null ? position.toString()
+                                                     : "UNKNOWN") + ")");
+            w.end();
 
-	w.allowBreak(4, " ");
-	w.begin(0);
-	w.write("(bypass " + bypass() + ")");
-	w.end();
-    }
-
-    public static class StringCodeWriter extends CodeWriter {
-	CharArrayWriter w;
-
-	public StringCodeWriter(CharArrayWriter w) {
-	    super(w, 1000);
-	    this.w = w;
-	}
-
-	public void newline(int n) { }
-	public void allowBreak(int n) { super.write(" "); }
-	public void allowBreak(int n, String alt) { super.write(alt); }
-
-	public String toString() {
-	    return w.toString();
-	}
+            w.allowBreak(4, " ");
+            w.begin(0);
+            w.write("(bypass " + bypass() + ")");
+            w.end();
     }
 
     public String toString() {
-	StringCodeWriter w = new StringCodeWriter(new CharArrayWriter());
-
-	DumpAst v = new DumpAst(w);
-	bypass(false).visit(v);
-	v.finish();
-
-	return w.toString();
+            return new StringPrettyPrinter(7).toString(this);
     }
 }
