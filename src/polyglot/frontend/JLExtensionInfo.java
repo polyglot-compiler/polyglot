@@ -63,6 +63,10 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
 		"Unable to initialize type system: " + e.getMessage());
 	}
     }
+    
+    public polyglot.frontend.Scheduler scheduler() {
+        return polyglot.ext.jl.Scheduler(this);
+    }
 
     public String defaultFileExtension() {
         return "jl";

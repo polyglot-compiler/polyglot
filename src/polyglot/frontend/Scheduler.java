@@ -23,7 +23,7 @@ import polyglot.visit.*;
  *
  * @author nystrom
  */
-public class Scheduler {
+public abstract class Scheduler {
     protected ExtensionInfo extInfo;
     
     /**
@@ -528,82 +528,26 @@ public class Scheduler {
         }
     }
     
-    public Goal TypeExists(String name) {
-        return internGoal(new TypeExists(name));
-    }
-    public Goal MembersAdded(ParsedClassType ct) {
-        return internGoal(new MembersAdded(ct));
-    }
-    public Goal AllMembersAdded(ParsedClassType ct) {
-        return internGoal(new AllMembersAdded(ct));
-    }
-    public Goal SupertypesResolved(ParsedClassType ct) {
-        return internGoal(new SupertypesResolved(ct));
-    }
-    public Goal SignaturesResolved(ParsedClassType ct) {
-        return internGoal(new SignaturesResolved(ct));
-    }
-
-    public Goal FieldConstantsChecked(FieldInstance fi) {
-        return internGoal(new FieldConstantsChecked(fi));
-    }
+    public abstract Goal TypeExists(String name);
+    public abstract Goal MembersAdded(ParsedClassType ct);
+    public abstract Goal AllMembersAdded(ParsedClassType ct);
+    public abstract Goal SupertypesResolved(ParsedClassType ct);
+    public abstract Goal SignaturesResolved(ParsedClassType ct);
+    public abstract Goal FieldConstantsChecked(FieldInstance fi);
+    public abstract Goal Parsed(Job job);
+    public abstract Goal TypesInitialized(Job job);
+    public abstract Goal TypesInitializedForCommandLine();
+    public abstract Goal TypeChecked(Job job);
+    public abstract Goal ConstantsChecked(Job job);
+    public abstract Goal ReachabilityChecked(Job job);
+    public abstract Goal ExceptionsChecked(Job job);
+    public abstract Goal ExitPathsChecked(Job job);
+    public abstract Goal InitializationsChecked(Job job);
+    public abstract Goal ConstructorCallsChecked(Job job);
+    public abstract Goal ForwardReferencesChecked(Job job);
+    public abstract Goal Serialized(Job job);
+    public abstract Goal CodeGenerated(Job job);
     
-    public Goal Parsed(Job job) {
-        return internGoal(new Parsed(job));
-    }
-    
-    public Goal TypesInitialized(Job job) {
-        return internGoal(new TypesInitialized(job));
-    }
-
-    public Goal TypesInitializedForCommandLine() {
-        return internGoal(new Barrier(this) {
-            public Goal goalForJob(Job j) {
-                return Scheduler.this.TypesInitialized(j);
-            }
-        });
-    }
-
-    public Goal TypeChecked(Job job) {
-        return internGoal(new TypeChecked(job));
-    }
-
-    public Goal ConstantsChecked(Job job) {
-        return internGoal(new ConstantsCheckedForFile(job));
-    }
-
-    public Goal ReachabilityChecked(Job job) {
-        return internGoal(new ReachabilityChecked(job));
-    }
-
-    public Goal ExceptionsChecked(Job job) {
-        return internGoal(new ExceptionsChecked(job));
-    }
-
-    public Goal ExitPathsChecked(Job job) {
-        return internGoal(new ExitPathsChecked(job));
-    }
-
-    public Goal InitializationsChecked(Job job) {
-        return internGoal(new InitializationsChecked(job));
-    }
-
-    public Goal ConstructorCallsChecked(Job job) {
-        return internGoal(new ConstructorCallsChecked(job));
-    }
-
-    public Goal ForwardReferencesChecked(Job job) {
-        return internGoal(new ForwardReferencesChecked(job));
-    }
-
-    public Goal Serialized(Job job) {
-        return internGoal(new Serialized(job));
-    }
-
-    public Goal CodeGenerated(Job job) {
-        return internGoal(new CodeGenerated(job));
-    }
-
     /** Return all compilation units currently being compiled. */
     public Collection jobs() {
         ArrayList l = new ArrayList(jobs.size());

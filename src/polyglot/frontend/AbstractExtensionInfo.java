@@ -22,10 +22,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected Stats stats;
     protected Scheduler scheduler;
 
-    public Scheduler scheduler() {
-        return scheduler;
-    }
-    
     public abstract Goal getCompileGoal(Job job);
     public abstract String compilerName();
     public abstract String defaultFileExtension();
@@ -113,6 +109,15 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         }
 
         return target_factory;
+    }
+    
+    protected abstract Scheduler createScheduler();
+    
+    public Scheduler scheduler() {
+        if (scheduler == null) {
+            scheduler = createScheduler();
+        }
+        return scheduler;
     }
 
     /** Create the type system for this extension. */
