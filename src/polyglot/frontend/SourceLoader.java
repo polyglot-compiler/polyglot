@@ -37,7 +37,7 @@ public class SourceLoader
     public FileSource fileSource(String fileName) throws IOException {
         // If we haven't done so already,
         // determine if the file system is case insensitive
-        fileName = canonicalize(fileName);
+        setCaseInsensitive(fileName);
 
 	File sourceFile = new File(fileName);
 
@@ -45,17 +45,17 @@ public class SourceLoader
 	    throw new FileNotFoundException(fileName);
 	}
 
-        if (loadedSources.contains(sourceFile)) {
+        if (loadedSources.contains(fileKey(sourceFile))) {
 	    throw new FileNotFoundException(fileName);
         }
 
-        loadedSources.add(sourceFile);
+        loadedSources.add(fileKey(sourceFile));
 
         String[] exts = sourceExt.fileExtensions();
         boolean ok = false;
 
         for (int i = 0; i < exts.length; i++) {
-            String ext = canonicalize(exts[i]);
+            String ext = exts[i];
 
             if (fileName.endsWith("." + ext)) {
                 ok = true;
@@ -134,8 +134,6 @@ public class SourceLoader
             String fileName = className.replace('.', File.separatorChar) +
                                       "." + exts[k];
 
-            fileName = canonicalize(fileName);
-
             for (Iterator i = sourcePath.iterator(); i.hasNext(); ) {
                 File directory = (File) i.next();
                 Set dirContents = (Set)directoryContentsCache.get(directory);
@@ -145,7 +143,7 @@ public class SourceLoader
                     if (directory.exists()) {
                         String[] contents = directory.list();
                         for (int j = 0; j < contents.length; j++) {
-                            dirContents.add(canonicalize(contents[j]));
+                            dirContents.add(contents[j]);
                         }
                     }                
                 }
@@ -168,11 +166,11 @@ public class SourceLoader
                     }
                     
                     // Skip it if already loaded
-                    if (loadedSources.contains(sourceFile)) {
+                    if (loadedSources.contains(fileKey(sourceFile))) {
                         continue;
                     }
 
-                    loadedSources.add(sourceFile);
+                    loadedSources.add(fileKey(sourceFile));
 
                     if (sourceFile.exists()) {
                         if (Report.should_report(Report.frontend, 2))
@@ -185,6 +183,14 @@ public class SourceLoader
         }
 
         return null;
+    }
+
+    public Object fileKey(File file) {
+        setCaseInsensitive(file.getAbsolutePath());
+        if (caseInsensitive()) {
+            return file.getAbsolutePath().toLowerCase();
+        }
+        return file.getAbsolutePath();
     }
 
     /** Is the file system case insensitive. */
@@ -249,21 +255,7 @@ public class SourceLoader
         }
     }
 
-    // Map canonicalFileNames = new HashMap();
-
     protected String canonicalize(String fileName) {
-        setCaseInsensitive(fileName);
-        if (caseInsensitive()) {
-            return fileName.toLowerCase();
-        }
-        /*
-            String s = (String) canonicalFileNames.get(fileName.toLowerCase());
-            if (s == null) {
-                s = fileName;
-                canonicalFileNames.put(fileName.toLowerCase(), s);
-            }
-            return s;
-        */
         return fileName;
     }
 }
