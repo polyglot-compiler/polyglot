@@ -50,8 +50,6 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
     throws Exception
   {
     report_error (message, info);
-    eq.enqueue (ErrorInfo.SYNTAX_ERROR,
-		"Unable to recover from previous errors");
     die ();
   }
 
@@ -71,9 +69,9 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
     report_fatal_error ("Syntax error.", pos);
   }
 
-	/**
-	 * Report a fatal error then abort parsing.
-	 */
+  /**
+   * Report a fatal error then abort parsing.
+   */
   public void die () throws Exception
   {
     done_parsing();
@@ -120,29 +118,29 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
       return null;
 
   }
-      
-  	/**
-	 * Return the position of the Token.
-	 */
+  
+  /**
+   * Return the position of the Token.
+   */
   public Position pos (Token t)
   {
     if (t == null) return null;
     return t.getPosition ();
   }
-
-	/**
-	 * Return the source position of the Type.
-	 */
+  
+  /**
+   * Return the source position of the Type.
+   */
   public Position pos (Type n)
   {
     if (n == null) return null;
     return n.position ();
   }
 
-	/**
-	 * Return the source position of the first element in the list to the
-         * last element in the list.
-	 */
+  /**
+   * Return the source position of the first element in the list to the
+   * last element in the list.
+   */
   public Position pos (List l)
   {
     if (l == null || l.isEmpty ())
@@ -161,10 +159,10 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
     if (n == null) return null;
     return n.pos;
   }
-
-	/**
-	 * Return the source position of the Node.
-	 */
+  
+  /**
+   * Return the source position of the Node.
+   */
   public Position pos (Node n)
   {
     if (n == null)
@@ -174,10 +172,10 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
     return n.position ();
   }
 
-	/**
-	 * Return a TypeNode representing a <code>dims</code>-dimensional
-	 * array of <code>n</code>.
-	 */
+  /**
+   * Return a TypeNode representing a <code>dims</code>-dimensional
+   * array of <code>n</code>.
+   */
   public TypeNode array (TypeNode n, int dims) throws Exception
   {
     if (dims > 0)
@@ -195,9 +193,9 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
       }
   }
 
-	/**
-	 * Helper for exprToType.
-	 */
+  /**
+   * Helper for exprToType.
+   */
   protected QualifierNode prefixToQualifier (Prefix p) throws Exception
   {
     if (p instanceof TypeNode)
@@ -246,9 +244,9 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
     return null;
   }
 
-	/**
-	 * Helper for exprToType.
-	 */
+  /**
+   * Helper for exprToType.
+   */
   protected QualifierNode typeToQualifier (TypeNode t) throws Exception
   {
     if (t instanceof AmbTypeNode)
@@ -268,10 +266,10 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
     die (pos (t));
     return null;
   }
-
-	/**
-	 * Helper for exprToType.
-	 */
+  
+  /**
+   * Helper for exprToType.
+   */
   protected QualifierNode exprToQualifier (Expr e) throws Exception
   {
     if (e instanceof AmbExpr)
@@ -292,10 +290,10 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
     return null;
   }
 
-	/**
-	 * Convert <code>e</code> into a type, yielding a <code>TypeNode</code>.
-	 * This is used by the cast_expression production.
-	 */
+  /**
+   * Convert <code>e</code> into a type, yielding a <code>TypeNode</code>.
+   * This is used by the cast_expression production.
+   */
   public TypeNode exprToType (Expr e) throws Exception
   {
     if (e instanceof AmbExpr)
