@@ -55,7 +55,9 @@ parser Grm extends BaseParser {:
     else return n.pos;
   }
 
-  List variableDeclarators(TypeNode a, List b, Flags flags) throws Exception {
+  public List variableDeclarators(TypeNode a, List b, Flags flags)
+    throws Exception
+  {
     List l = new TypedList(new LinkedList(), LocalDecl.class, false);
     for (Iterator i = b.iterator(); i.hasNext(); ) {
 	VarDeclarator d = (VarDeclarator) i.next();
