@@ -32,7 +32,7 @@ public abstract class AbstractPass implements Pass
 
     /** The human-readable name of the pass. */
     public String name() {
-        return this.getClass().getName();
+        return StringUtil.getShortNameComponent(this.getClass().getName());
     }
 
     /** Run the pass, returning true on success. */
@@ -71,6 +71,6 @@ public abstract class AbstractPass implements Pass
     }
 
     public String toString() {
-	return StringUtil.getShortNameComponent(name());
+        return name();
     }
 }
