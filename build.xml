@@ -1,0 +1,120 @@
+<project name="polyglot" default="compile" basedir=".">
+  <description>
+    Polyglot build file
+  </description>
+
+  <!-- set global properties for this build -->
+
+  <!-- source directory -->
+  <property name="src" location="${basedir}"/>
+
+  <!-- directory for temporary build targets -->
+  <property name="build" location="build"/>
+
+  <!-- directory for class file targets -->
+  <property name="classes" location="classes"/>
+
+  <!-- distribution directory -->
+  <property name="dist"  location="dist"/>
+
+  <!-- initialize the build -->
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+    <mkdir dir="${classes}"/>
+  </target>
+
+  <!-- compile the base compiler -->
+  <target name="compile" depends="base,jl" description="compile the source"/>
+
+  <!-- generate the Polyglot distribution -->
+  <target name="dist" depends="compile"
+    description="generate the distribution">
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}/lib"/>
+
+    <!-- Put everything in ${classes} into the polyglot-${DSTAMP}.jar file -->
+    <jar jarfile="${dist}/lib/polyglot-${DSTAMP}.jar" basedir="${classes}"/>
+  </target>
+
+  <target name="clean" description="clean up">
+    <!-- Delete the ${classes} and ${dist} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${classes}"/>
+    <delete dir="${dist}"/>
+  </target>
+
+  <!-- compile the base compiler excluding the jl extension -->
+  <target name="compile-base" depends="init" description="compile the source">
+    <javac srcdir="${src}" destdir="${classes}"
+      includes="polyglot/**"
+      excludes="polyglot/ext/**,polyglot/tests/**,polyglot/util/ppg/test/**">
+      <classpath>
+        <pathelement location="${basedir}/java_cup.jar"/>
+        <pathelement location="${basedir}/jlex.jar"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <!-- compile a single extension, named ${ext} -->
+  <target name="compile-ext"
+    description="compile an extension">
+    <javac srcdir="${src}" destdir="${classes}"
+      includes="polyglot/ext/${ext}/**"
+      excludes="polyglot/ext/${ext}/test/**,polyglot/ext/${ext}/tests/**">
+      <classpath>
+        <pathelement location="${basedir}/java_cup.jar"/>
+        <pathelement location="${basedir}/jlex.jar"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="base">
+    <antcall target="compile-base"/>
+  </target>
+
+  <target name="jl" depends="base">
+    <antcall target="compile-ext">
+      <param name="ext" value="jl"/>
+    </antcall>
+  </target>
+
+  <target name="jif" depends="jl">
+    <antcall target="compile-ext">
+      <param name="ext" value="jif"/>
+    </antcall>
+  </target>
+
+  <target name="split" depends="jif">
+    <antcall target="compile-ext">
+      <param name="ext" value="split"/>
+    </antcall>
+  </target>
+
+  <target name="polyj" depends="jl">
+    <antcall target="compile-ext">
+      <param name="ext" value="polyj"/>
+    </antcall>
+  </target>
+
+  <target name="jmatch" depends="jl">
+    <antcall target="compile-ext">
+      <param name="ext" value="jmatch"/>
+    </antcall>
+  </target>
+
+  <target name="pao" depends="jl">
+    <antcall target="compile-ext">
+      <param name="ext" value="pao"/>
+    </antcall>
+  </target>
+
+  <target name="polyglot-dist" depends="jl,pao"/>
+  <target name="jif-dist" depends="jif"/>
+  <target name="split-dist" depends="split"/>
+  <target name="polyj-dist" depends="polyj"/>
+  <target name="jmatch-dist" depends="jmatch"/>
+</project>
+
