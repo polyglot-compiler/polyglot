@@ -117,6 +117,28 @@ public class MethodInstance_c extends ProcedureInstance_c
 	return s;
     }
 
+    public String signature() {
+		String s = name + "(";
+
+		for (Iterator i = argTypes.iterator(); i.hasNext(); ) {
+		    Type t = (Type) i.next();
+		    s += t.toString();
+
+		    if (i.hasNext()) {
+		        s += ",";
+		    }
+		}
+
+		s += ")";
+
+		return s;
+    }
+
+    public String designator() {
+        return "method";
+    }
+
+
     public TypeObject restore_() throws SemanticException {
 	ReferenceType c = (ReferenceType) container.restore();
 	Type t = (Type) returnType.restore();

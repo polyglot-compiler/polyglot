@@ -61,6 +61,27 @@ public class ConstructorInstance_c extends ProcedureInstance_c
 	return s;
     }
     
+    public String signature() {
+		String s = container + "(";
+
+		for (Iterator i = argTypes.iterator(); i.hasNext(); ) {
+		    Type t = (Type) i.next();
+		    s += t.toString();
+
+		    if (i.hasNext()) {
+		        s += ",";
+		    }
+		}
+
+		s += ")";
+
+		return s;
+    }
+
+    public String designator() {
+        return "constructor";
+    }
+
     public boolean equals(Object o) {
         if (! (o instanceof ConstructorInstance) ) return false;
         return super.equals(o);
