@@ -3,12 +3,32 @@ package polyglot.visit;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
-import polyglot.frontend.*;
 import java.util.*;
 
 public class FlowGraph {
+  /**
+   * Maps from AST nodes to <code>Peer</code>s that represent occurances of the
+   * AST node in the flow graph. In particular, <code>peerMap</code> maps
+   * <code>IdentityKey(Node)</code>s to path maps. A path map is a map from
+   * paths (<code>ListKey(List of Terms)</code>) to <code>Peer</code>s. 
+   * In particular, if <code>n</code> is an AST node, and <code>n</code> occurs
+   * in a finally block, then there will be a <code>Peer</code> of 
+   * <code>n</code> for each possible path to the finally block, and the 
+   * path map records which <code>Peer</code> corresponds to which path. If 
+   * <code>n</code> does not occur in a finally block, then the path map should
+   * have only a single entry, from an empty list to the unique 
+   * <code>Peer</code> for <code>n</code>.
+   */  
   protected Map peerMap;
+  
+  /**
+   * The root of the AST that this is a flow graph for.
+   */
   protected Term root;
+  
+  /**
+   * Is the flow in this flow graph forward or backward?
+   */
   protected boolean forward;
 
   FlowGraph(Term root, boolean forward) {
@@ -32,6 +52,9 @@ public class FlowGraph {
     return (Map) peerMap.get(new IdentityKey(n));
   }
 
+  /**
+   * Return a collection of all <code>Peer</code>s in this flow graph.
+   */
   public Collection peers() {
     Collection c = new ArrayList();
     for (Iterator i = peerMap.values().iterator(); i.hasNext(); ) {
@@ -43,16 +66,35 @@ public class FlowGraph {
     return c;
   }
 
+  /**
+   * Retrieve the <code>Peer</code> for the <code>Term n</code>, where 
+   * <code>n</code> does not appear in a finally block. If no such Peer 
+   * exists, then one will be created.
+   * 
+   * @param df unused; for legacy purposes only?
+   */
   public Peer peer(Term n, DataFlow df) {
     return peer(n, Collections.EMPTY_LIST, df);
   }
 
+  /**
+   * Return a collection of all of the <code>Peer</code>s for the given 
+   * <code>Term n</code>. 
+   */
   public Collection peers(Term n) {
     IdentityKey k = new IdentityKey(n);
     Map pathMap = (Map) peerMap.get(k);
     return pathMap.values();
   }
 
+  /**
+   * Retrieve the <code>Peer</code> for the <code>Term n</code> that is 
+   * associated with the given path to the finally block. (A term that occurs
+   * in a finally block has one Peer for each possible path to that finally
+   * block.) If no such Peer exists, then one will be created.
+   * 
+   * @param df unused; for legacy purposes only?
+   */
   public Peer peer(Term n, List path_to_finally, DataFlow df) {
     IdentityKey k = new IdentityKey(n);
     Map pathMap = (Map) peerMap.get(k);
@@ -95,7 +137,7 @@ public class FlowGraph {
                   (((EdgeKey)other).o.equals(this.o));
       }
       public String toString() {
-          return "EdgeKey["+o+"]";
+          return o.toString();
       }
   }
   
@@ -127,7 +169,7 @@ public class FlowGraph {
       }
 
       public String toString() {
-          return "ExceptionEdgeKey["+o+"]";
+          return (type().isClass() ? type().toClass().name() : type().toString() );
       }
   }
   
@@ -150,7 +192,7 @@ public class FlowGraph {
    * statement to its cases and
    * the flow from a sink node in the control flow graph.
    */
-  public static final EdgeKey EDGE_KEY_OTHER = new EdgeKey("other");
+  public static final EdgeKey EDGE_KEY_OTHER = new EdgeKey("");
 
   /**
    * This class represents an edge in the flow graph. The target of the edge
@@ -181,13 +223,24 @@ public class FlowGraph {
       
   }
   
+  /**
+   * A <code>Peer</code> is an occurance of an AST node in a flow graph. 
+   * For most AST nodes, there will be only one Peer for each AST node. 
+   * However, if the AST node occurs in a finally block, then there will be
+   * multiple <code>Peer</code>s for that AST node, one for each possible
+   * path to the finally block. This is becuase flow graphs for finally blocks 
+   * are copied, one copy for each possible path to the finally block.
+   */
   public static class Peer {
     protected DataFlow.Item inItem;  // Input Item for dataflow analysis
     protected Map outItems; // Output Items for dataflow analysis, a map from EdgeKeys to DataFlowlItems
-    protected Term node;
+    protected Term node; // The AST node that this peer is an occurance of.
     protected List succs; // List of successor Edges 
     protected List preds; // List of predecessor Edges 
-    protected List path_to_finally;
+    protected List path_to_finally; // the path to the finally block that 
+                                    // uniquely distinguishes this Peer
+                                    // from the other Peers for the AST node.
+
     /**
      * Set of all the different EdgeKeys that occur in the Edges in the 
      * succs. This Set is lazily constructed, as needed, by the 
@@ -233,6 +286,10 @@ public class FlowGraph {
     }
   }
 
+  /**
+   * Class to be used for inserting Lists in hashtables using collection
+   * equality (as defined in {@link polyglot.util.CollectionUtil CollectionUtil}).
+   */
   protected static class ListKey {
     protected List list;
 
