@@ -82,7 +82,7 @@ public class FlowGraph {
    * data flow analysis, as the dataflow equations can incorporate the 
    * knowledge that a condition is true or false on certain flow paths.
    */
-  protected static class EdgeKey {
+  public static class EdgeKey {
       protected Object o;
       protected EdgeKey(Object o) {
           this.o = o;
@@ -121,6 +121,11 @@ public class FlowGraph {
       public ExceptionEdgeKey(Type t) {
           super(t);
       }
+
+      public Type type() {
+          return (Type) o;
+      }
+
       public String toString() {
           return "ExceptionEdgeKey["+o+"]";
       }
@@ -157,7 +162,7 @@ public class FlowGraph {
    * Each Edge has an EdgeKey, which identifies when flow uses that edge in 
    * the flow graph. See EdgeKey for more information.
    */
-  protected static class Edge {
+  public static class Edge {
       protected Edge(EdgeKey key, Peer target) {
           this.key = key;
           this.target = target;
