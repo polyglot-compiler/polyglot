@@ -15,6 +15,7 @@ import java.util.jar.*;
 public class ClassFileLoader
 {
     Map cache;
+    final static Object not_found = new Object();
 
     public ClassFileLoader() {
         this.cache = new HashMap();
@@ -31,24 +32,31 @@ public class ClassFileLoader
 
         String key = dir.toString() + "/" + name;
 
-        ClassFile c = (ClassFile) cache.get(key);
+        Object o = cache.get(key);
 
-        if (c == null) {
+        if (o != not_found) {
+            ClassFile c = (ClassFile) o;
+
+            if (c != null) {
+                Report.report(verbose, 3, "already loaded " + c.name());
+                return c;
+            }
+
             c = findClass(dir, name);
 
             // We cache here since more than one type system may attempt
             // to load the same class file.  But, we use a weak hash map
             // to allow garbage collection of ClassFiles when we need it.
+            if (c != null) {
+                Report.report(verbose, 1, "loaded class " + c.name());
+                cache.put(key, c);
+                return c;
+            }
 
-            cache.put(key, c);
+            cache.put(key, not_found);
         }
-        else {
-            Report.report(verbose, 3, "already loaded " + c.name());
-        }
 
-        Report.report(verbose, 1, "loaded class " + c.name());
-
-        return c;
+        throw new ClassNotFoundException(name);
     }
 
     protected ClassFile findClass(File dir, String name) throws ClassNotFoundException {
@@ -97,7 +105,7 @@ public class ClassFileLoader
         catch (IOException e) {
         }
 
-        throw new ClassNotFoundException(name);
+        return null;
     }
 
     /**
