@@ -16,6 +16,7 @@ JAR_FILE = polyglot.jar
 
 Lexer.java: ppg.flex
 	$(flex)
+	$(MAKE) -C ../parse Parser.java
 
 all: $(CLASSES)
 	$(subdirs)

@@ -16,6 +16,7 @@ JAR_FILE = polyglot.jar
 
 Parser.java Constant.java: ppg.cup
 	java -cp $(CUP_RUNTIME) java_cup.Main -parser Parser -symbols Constant < ppg.cup
+	$(MAKE) -C ../lex Lexer.java
 
 all: $(CLASSES)
 	$(subdirs)
