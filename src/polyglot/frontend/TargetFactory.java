@@ -29,9 +29,10 @@ public class TargetFactory
     }
 
     /** Open a writer to the output file for the class in the given package. */
-    public Writer outputWriter(String packageName, String className)
-	throws IOException {
-	return outputWriter(outputFile(packageName, className));
+    public Writer outputWriter(String packageName, String className,
+	    Source source) throws IOException 
+    {
+	return outputWriter(outputFile(packageName, className, source));
     }
 
     /** Open a writer to the output file. */
@@ -55,11 +56,13 @@ public class TargetFactory
 	String name;
 	name = new File(source.name()).getName();
 	name = name.substring(0, name.lastIndexOf('.'));
-	return outputFile(packageName, name);
+	return outputFile(packageName, name, source);
     }
 
     /** Return a file object for the output of the class in the given package. */
-    public File outputFile(String packageName, String className) {
+    public File outputFile(String packageName, String className, 
+	    		   Source source)
+    {
 	if (outputDirectory == null) {
 	      throw new InternalCompilerError("Output directory not set.");
 	}
@@ -74,10 +77,10 @@ public class TargetFactory
 				   + className
 				   + "." + outputExtension);
 
-	while (outputFile.exists()) {
-	    outputFile = new File(outputFile.getPath() + "$");
+	if (outputFile.getPath().equals(source.path())) {
+	    throw new InternalCompilerError("The output file is the same as the source file");
 	}
-
+	
 	return outputFile;
     }
 }

@@ -258,6 +258,8 @@ OUTER:
 
 	    pass.status(Pass.RUNNING);
 
+	    long start_time = System.currentTimeMillis();
+
 	    if (pass.run()) {
 		if (pass.repeat()) {
 		    report(3, "Re-running " + pass);
@@ -273,6 +275,9 @@ OUTER:
 	    }
 
 	    report(2, "Finished " + pass + " status=" + pass.status());
+	    reportTime(1, "Finished " + pass + " status=" + pass.status() + 
+		    " time=" + (System.currentTimeMillis() - start_time));
+		    
 	}
 
 	report(1, "Pass " + goal + " " + goal.status());
@@ -356,14 +361,21 @@ OUTER:
     }
 
     private static Collection topics = new ArrayList(1);
-
+    private static Collection timeTopics = new ArrayList(1);
+    
     static {
 	topics.add("frontend");
+	timeTopics.add("time");
     }
 
     /** Debug reporting for the frontend. */
     public static void report(int level, String msg) {
 	Report.report(topics, level, msg);
+    }
+
+    /** Reports the time taken by every pass. */
+    public static void reportTime(int level, String msg) {
+	Report.report(timeTopics, level, msg);
     }
 
     static {

@@ -47,6 +47,11 @@ public class Source
 	return name;
     }
 
+    /** Gets the path of the source file. */
+    public String path() {
+	return file.getPath();
+    }
+
     /** Open the source file. */
     public Reader open() throws IOException {
 	if (reader == null) {

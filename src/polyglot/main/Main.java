@@ -22,7 +22,7 @@ public class Main
   private boolean hasErrors = false;
 
   public static final void main(String args[])
-  {
+  {      
     source = new HashSet();
     Options options = Options.global;
     
@@ -30,24 +30,30 @@ public class Main
 
     Compiler compiler = new Compiler(options);
 
+    long time0 = System.currentTimeMillis();
+    
     String targetName = null;
     if (!compiler.compile(source)) System.exit(1);
 
     Report.report(null, 1, "Output files: " + compiler.outputFiles());
 
+    long start_time = System.currentTimeMillis();
+    
     /* Now call javac or jikes, if necessary. */
     if (options.post_compiler != null && !options.output_stdout) {
       Runtime runtime = Runtime.getRuntime();
       
       Iterator iter = compiler.outputFiles().iterator();
+      String outputFiles = "";
       while(iter.hasNext()) {
-	String outfile = (String)iter.next(); 
+	outputFiles += (String)iter.next() + " ";
+      }
 	
 	String command = options.post_compiler + " -classpath " 
 	  + options.output_directory + File.pathSeparator
 	  + "." + File.pathSeparator
 	  + System.getProperty("java.class.path") + " "
-	  + outfile;
+	  + outputFiles;
 	
 	Report.report(null, 1, "Executing post-compiler " + command);
 	
@@ -66,7 +72,7 @@ public class Main
 	  proc.waitFor();
 	  
 	  if (!options.keep_output_files) {
-	    String command2 = "rm " + outfile;
+	    String command2 = "rm " + outputFiles;
 	    runtime.exec(command2);
 	  }
 	  
@@ -80,8 +86,14 @@ public class Main
 			      + e.getMessage());
 	  System.exit(1);
 	}
-      }
+      
     }
+
+    reportTime(1, "Finished compiling Java output files. time=" + 
+	    (System.currentTimeMillis() - start_time));
+    
+    reportTime(1, "Total time=" + (System.currentTimeMillis() - time0));
+    
   }
 
   static final void loadExtension(String ext) {
@@ -302,5 +314,14 @@ public class Main
 
   static String compilerName() {
     return Options.global.extension.compilerName();
+  }
+
+  static private Collection timeTopics = new ArrayList(1);
+  static {
+      timeTopics.add("time");
+  }
+
+  static private void reportTime(int level, String msg) {
+      Report.report(timeTopics, level, msg);
   }
 }

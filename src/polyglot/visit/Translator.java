@@ -86,7 +86,7 @@ public class Translator extends AbstractPass
 	    }
 	    else {
 		first = (TopLevelDecl) exports.get(0);
-	    	of = tf.outputFile(pkg, first.name());
+	    	of = tf.outputFile(pkg, first.name(), job.source());
 	    }
             
             String opfPath = of.getPath();
@@ -105,7 +105,7 @@ public class Translator extends AbstractPass
 		    w.flush();
 		    ofw.close();
 
-		    of = tf.outputFile(pkg, decl.name());
+		    of = tf.outputFile(pkg, decl.name(), job.source());
 		    outputFiles.add(of.getPath());
 		    ofw = tf.outputWriter(of);
 		    w = new CodeWriter(ofw, outputWidth);
