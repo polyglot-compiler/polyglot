@@ -485,10 +485,12 @@ public class InitChecker extends DataFlow
             Local l = (Local) n;
             MinMaxInitCount initCount = (MinMaxInitCount) 
                       dfIn.initStatus.get(l.localInstance());
-            if (InitCount.ZERO.equals(initCount.getMin())) {
-                throw new SemanticException("Local variable \"" + l.name() +
-                                            "\" may not have been initialized",
-                                            l.position());
+            if (initCount != null) { // ###@@@ I don't like this line; it's symptomatic of other problems.
+                if (InitCount.ZERO.equals(initCount.getMin())) {
+                    throw new SemanticException("Local variable \"" + l.name() +
+                            "\" may not have been initialized",
+                            l.position());
+                }
             }
         }
         

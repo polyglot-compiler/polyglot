@@ -506,9 +506,15 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                               q.getTarget().hashCode() + " [ label = \"" +
                               StringUtil.escape(q.getTarget().node.toString()) + " (" + 
                               StringUtil.escape(StringUtil.getShortNameComponent(q.getTarget().node.getClass().getName()))+ ")\" ];");
+                String label = q.getKey().toString();
+                if (q.getTarget().outItems != null) {
+                    label += ": " + q.getTarget().outItems.get(q.getKey());
+                }
+                else {
+                    label += " [no dataflow available]";
+                }
                 Report.report(2, p.hashCode() + " -> " + q.getTarget().hashCode() + 
-                              " [label=\"" + q.getKey() + ": " + 
-                              q.getTarget().outItems.get(q.getKey()) + "\"];");
+                              " [label=\"" + label + "\"];");
             }
             
         }
