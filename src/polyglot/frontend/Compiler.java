@@ -711,7 +711,6 @@ public class Compiler implements TargetTable, ClassCleaner
                                    outputWidth);
     
     ast.translate( new LocalContext(it, ts, null), w);
-    verbose(this, "pretty-printing the translated code...");
     w.flush();
     System.out.flush();
     t.closeDestination();

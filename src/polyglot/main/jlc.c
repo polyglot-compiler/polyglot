@@ -21,8 +21,8 @@
 char * prepend[] = { "-Djava.compiler=none", 
                      "jltools.main.Main" };
 #else
-#define prependArgs 1 
-char * prepend[]  = { "jltools.main.Main" } ;
+#define prependArgs 2 
+char * prepend[]  = { "-mx100m", "jltools.main.Main" } ;
 #endif
 
 #define postpendArgs 0

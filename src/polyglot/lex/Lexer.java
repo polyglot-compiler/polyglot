@@ -419,7 +419,7 @@ public class Lexer {
     while (line.charAt(line_pos)!='\"') {
       switch(line.charAt(line_pos)) {
       case '\\':
-        val.append(getEscapeSequence());
+        val.append(getEscapeCharacter());
         break;
       case '\n':
         eq.enqueue( ErrorInfo.LEXICAL_ERROR,

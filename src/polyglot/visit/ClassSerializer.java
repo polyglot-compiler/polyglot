@@ -79,7 +79,7 @@ public class ClassSerializer extends NodeVisitor
         /* Add the class type info. */
         clazz = cn.type;        
         decl = new VariableDeclarationStatement.Declarator( null,
-           "jlc$ClassType", 0, new StringLiteral( te.encode( clazz)));
+           "jlc$ClassType", 0, largeStringLiteral( te.encode( clazz)));
 
         decls = new LinkedList();
         decls.add( decl);
@@ -112,5 +112,32 @@ public class ClassSerializer extends NodeVisitor
       l.add( iter.next());
     }
     return l;
+  }
+
+/* Break a long string literal into a sum of small string literals.
+ * This avoids messing up the pretty printer and editors. However, it
+ * does not entirely solve the formatting problem if the pretty-printer
+ * output is post-processed by a unicode transformation (which it is),
+ * since the pretty-printer doesn't realize that the unicode characters
+ * expand to multiple characters.
+ */
+  private final Expression largeStringLiteral(String x) {
+    Expression result = null;
+    int n = x.length();
+    int i = 0;
+    for (;;) {
+	int j = i + 16; // 16 is fairly arbitrary.
+	if (j >= n) j = n; 
+	StringLiteral s = new StringLiteral(x.substring(i, j));
+	s.setCheckedType(ts.getString());
+	if (result == null) {
+	    result = s;
+	} else {
+	    result = new BinaryExpression(result, BinaryExpression.PLUS, s);
+	    result.setCheckedType(ts.getString());
+	}
+	if (j == n) return result;
+	i = j;
+    }
   }
 }

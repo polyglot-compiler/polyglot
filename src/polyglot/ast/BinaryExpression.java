@@ -430,31 +430,27 @@ public class BinaryExpression extends Expression
   
    public void translate(LocalContext c, CodeWriter w) 
    {
-     /* Extra checks are need here to see if we have a numeric binary
-      * expression inside of a String concatenation. */
-       if( getCheckedType().equals( c.getTypeSystem().getString())
-           && left.getCheckedType().isPrimitive()) {
-         w.write( "(");
-         left.translate_block( c, w);
-         w.write( ")");
-       }
-       else {
-         translateExpression( left, c, w);
-       }
-       
-       w.write( " ");
-       w.write( getOperatorString( operator));
-       w.allowBreak(2, " ");
-       
-       if( getCheckedType().equals( c.getTypeSystem().getString())
-           && right.getCheckedType().isPrimitive()) {
-         w.write( "(");
-	 right.translate_block( c, w);
-         w.write( ")");
-       }
-       else {
-         translateExpression( right, c, w);
-       }
+     /* Extra checks are needed here to see if we have a numeric binary
+      * expression inside of a String concatenation. If so they must
+      * be parenthesized. */
+        boolean str = getCheckedType().equals(c.getTypeSystem().getString());
+	if (str && left.getCheckedType().isPrimitive()) {
+	    w.write("(");
+	    left.translate_block( c, w);
+	    w.write(")");
+	} else {
+	    translateExpression( left, c, w);
+	}
+	w.write(" ");
+	w.write( getOperatorString( operator));
+	w.allowBreak(str ? 0 : 2, " ");
+	if (str && right.getCheckedType().isPrimitive()) {
+	    w.write("(");
+	    right.translate_block(c, w);
+	    w.write(")");
+	} else {
+	    translateExpression(right, c, w);
+	}
    }
 
    public void dump( CodeWriter w)

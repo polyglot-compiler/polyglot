@@ -36,7 +36,34 @@ public class StringLiteral extends Literal
   
   public void translate( LocalContext c, CodeWriter w)
   {
-    w.write( "\"" + value + "\"");
+    w.write( "\"");
+    for (int i = 0; i < value.length(); i++) {
+	int ch = value.charAt(i);
+	if (ch > 0xFF) {
+	    w.write(""+(char)ch);
+	} else {
+	    switch (ch) {
+		case '\b': w.write("\\b"); break;
+		case '\t': w.write("\\t"); break;
+		case '\n': w.write("\\n"); break;
+		case '\f': w.write("\\f"); break;
+		case '\r': w.write("\\r"); break;
+		case '\"': w.write("\\\""); break;
+		case '\'': w.write("'"); break;
+		case '\\': w.write("\\\\"); break;
+		default:
+		    if (ch >= 0x20 && ch < 0x7F) {
+			w.write("" + (char)ch);
+		    } else {
+			w.write("\\");
+			w.write("" + (char)('0' + ch/64));
+			w.write("" + (char)('0' + (ch&63)/8));
+			w.write("" + (char)('0' + (ch&7)));
+		    }
+	    }
+	}
+    }
+    w.write("\"");
   }
 
   public void dump( CodeWriter w)
