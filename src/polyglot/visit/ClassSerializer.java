@@ -2,13 +2,11 @@ package polyglot.visit;
 
 import polyglot.main.*;
 import polyglot.ast.*;
-import polyglot.frontend.Compiler;
 import polyglot.types.*;
 import polyglot.util.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.zip.*;
 
 /**
  * Visitor which serializes class objects and adds a field to the class
@@ -60,7 +58,7 @@ public class ClassSerializer extends NodeVisitor
             ct.methods();
             ct.fields();
 
-	    if (! ct.isTopLevel()) {
+	    if (! (ct.isTopLevel() || ct.isMember())) {
 	        return n;
 	    }
 

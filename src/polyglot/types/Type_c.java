@@ -227,6 +227,11 @@ public abstract class Type_c extends TypeObject_c implements Type
         if (this instanceof Importable) {
             String name = ((Importable) this).fullName();
             out.writeObject(name);
+            String memberName = null;
+            if (this.isClass() && this.toClass().isMember()) {
+                memberName = getTransformedClassName(this.toClass());
+            }
+            out.writeObject(memberName);
         }
 
         out.defaultWriteObject();
@@ -238,10 +243,33 @@ public abstract class Type_c extends TypeObject_c implements Type
         // Store the type in the system resolver to avoid infinite loop.
         if (this instanceof Importable) {
             String name = (String) in.readObject();
+            String memberName = (String) in.readObject();
             TypeSystem ts = ((TypeInputStream) in).getTypeSystem();
+            
             ((CachingResolver) ts.systemResolver()).install(name, this);
+            
+            if (memberName != null) {
+                ((CachingResolver) ts.systemResolver()).install(memberName, this);
+            }
         }
 
         in.defaultReadObject();
+    }
+    
+    /**
+     * This utility method returns the "mangled" name of the given class,
+     * whereby all periods ('.') following the toplevel class name
+     * are replaced with dollar signs ('$').
+     */
+    public static String getTransformedClassName(ClassType ct) {
+        StringBuffer sb = new StringBuffer(ct.fullName().length());
+        while (ct.isMember()) {
+            sb.insert(0, ct.name());
+            sb.insert(0, '$');
+            ct = ct.outer();
+        }
+            
+        sb.insert(0, ct.fullName());
+        return sb.toString();
     }
 }

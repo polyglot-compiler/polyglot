@@ -16,8 +16,10 @@ import java.util.zip.*;
  * The difference between the encoder and a normal serialization process is
  * that in order to encode this type, we need to sever any links to other types
  * in the current environment. So any <code>ClassType</code> other than the 
- * the type being encoded is replaced in the stream with an 
- * <code>AmbiguousType</code> that contains the fully qualified name.
+ * the type being encoded is replaced in the stream with a 
+ * <code>PlaceHolder</code> that contains the name of the class. To aid
+ * in the decoding process, placeholders for member classes user their 
+ * "mangled" name; non-member classes use their fully qualified name.
  */
 public class TypeEncoder
 {
@@ -74,7 +76,7 @@ public class TypeEncoder
       catch (Exception e) {
         e.printStackTrace();
 	throw new InternalCompilerError(
-	    "Could not decode back to " + t + ": " + e.getMessage());
+	    "Could not decode back to " + t + ": " + e.getMessage(), e);
       }
     }
 
@@ -112,11 +114,11 @@ public class TypeEncoder
     }
     catch (IOException e) {
         throw new InternalCompilerError("IOException thrown while " +
-            "decoding serialized type info: " + e.getMessage());
+            "decoding serialized type info: " + e.getMessage(), e);
     }
     catch (ClassNotFoundException e) {
         throw new InternalCompilerError("Unable to find one of the classes " +
-            "for the serialized type info: " + e.getMessage());
+            "for the serialized type info: " + e.getMessage(), e);
     }
   }
 }

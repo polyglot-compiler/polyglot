@@ -1008,7 +1008,7 @@ public class TypeSystem_c implements TypeSystem
             // this is the exception thrown by the canOverrideImpl check.
             // It should never be thrown if the quiet argument of 
             // canOverrideImpl is true.
-            throw new InternalCompilerError(e.position(), e.getMessage());
+            throw new InternalCompilerError(e);
         }
     }
 
@@ -1059,7 +1059,7 @@ public class TypeSystem_c implements TypeSystem
       catch (SemanticException e) {
           throw new InternalCompilerError("Cannot find class \"" +
                                           name + "\"; " + e.getMessage(),
-                                          e.position());
+                                          e);
       }
     }
 
@@ -1224,24 +1224,9 @@ public class TypeSystem_c implements TypeSystem
     }
 
     public Set getTypeEncoderRootSet(Type t) {
-	/* Need to encode the type and all its members at once. */
-	Set s = new HashSet();
-
-	if (t.isClass()) {
-	    LinkedList stack = new LinkedList();
-	    stack.add(t);
-
-	    while (! stack.isEmpty()) {
-		ClassType ct = (ClassType) stack.removeLast();
-		s.add(ct);
-		stack.addAll(ct.memberClasses());
-	    }
-	}
-	else {
-	    s.add(t);
-	}
-
-	return s;
+        // The root set is now just the type itself. Previously it contained
+        // the member classes tool
+	return Collections.singleton(t);
     }
 
     public String translatePackage(Resolver c, Package p) {

@@ -2,16 +2,19 @@ package polyglot.ext.jl.types;
 
 import polyglot.types.*;
 import polyglot.util.*;
-import polyglot.types.Package;
-import java.io.*;
 
 /**
- * A place holder type used to serialize types that cannot be serialized.  
+ * A place holder type when serializing the Polylgot type information. 
+ * When serializing the type information for some class <code>C</code>, 
+ * Placeholders are used to prevent serializing the class type information
+ * for classes that <code>C</code> depends on.  
  */
 public class PlaceHolder_c implements PlaceHolder
 {
+    /**
+     * The name of the place holder.
+     */
     String name;
-    Type outer;
 
     /** Used for deserializing types. */
     protected PlaceHolder_c() { }
@@ -19,11 +22,7 @@ public class PlaceHolder_c implements PlaceHolder
     /** Creates a place holder type for the type. */
     public PlaceHolder_c(Type t) {
 	if (t.isClass()) {
-	    name = t.toClass().fullName();
-
-            if (t.toClass().isMember()) {
-                outer = t.toClass().container();
-            }
+            name = Type_c.getTransformedClassName(t.toClass());
         }
 	else {
 	    throw new InternalCompilerError("Cannot serialize " + t + ".");
@@ -33,22 +32,9 @@ public class PlaceHolder_c implements PlaceHolder
     /** Restore the placeholder into a proper type. */ 
     public TypeObject resolve(TypeSystem ts) {
         try {
-            if (outer == null) {
-                return ts.systemResolver().find(name);
-            }
-            else {
-                ClassType o = (ClassType) outer.toClass();
-                ClassType m = o.memberClassNamed(name);
-
-                if (m == null) {
-                    throw new SemanticException("Member class \"" + name +
-                        "\" not found in class " + o + ".");
-                }
-
-                return m;
-            }
+            return ts.systemResolver().find(name);
 	} catch (SemanticException se) {
-	    throw new InternalCompilerError(se.getMessage());
+	    throw new InternalCompilerError(se);
 	}
     }
 
@@ -57,7 +43,6 @@ public class PlaceHolder_c implements PlaceHolder
     }
 
     public String toString() {
-	return "PlaceHolder(" + (outer == null ? "" : outer.toString() + ", ") 
-	    + name + ")";
+	return "PlaceHolder(" + name + ")";
     }
 }
