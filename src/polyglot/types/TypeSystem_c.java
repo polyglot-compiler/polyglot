@@ -1048,7 +1048,9 @@ public class TypeSystem_c implements TypeSystem
      */
     protected List findAcceptableConstructors(ClassType container,
                                               List argTypes,
-                                              ClassType currClass) {
+                                              ClassType currClass)
+        throws SemanticException
+    {
         assert_(container);
         assert_(argTypes);
 
