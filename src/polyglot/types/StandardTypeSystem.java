@@ -414,9 +414,17 @@ public class StandardTypeSystem extends TypeSystem {
     if ( ctTarget.getPackage() == null && ctContext.getPackage() == null && flags.isPackage())
       return true;
 
+    // kliger: this used to only allow access if the context and the
+    //   target are in the same package and the flags have package-level
+    //   access set.
+    // However, JLS2 6.6.1 says that if the protected flag is set, then
+    //   if the package is the same for target and context, then access
+    //   is allowed, as well.  (in addition to the normal "subclasses get
+    //   access" rule for protected members).
+    // This is confusing for C++ programmers like me.
     if (ctTarget.getPackage() != null &&
         ctTarget.getPackage().equals (ctContext.getPackage()) &&
-        flags.isPackage())
+        (flags.isPackage() || flags.isProtected()))
       return true;
     
     // protected
