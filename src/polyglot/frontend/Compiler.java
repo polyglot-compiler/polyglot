@@ -39,19 +39,30 @@ public class Compiler
      *
      * @param extensionInfo the <code>ExtensionInfo</code> this compiler is for.
      */
+    public Compiler(ExtensionInfo extensionInfo) {    
+        this(extensionInfo, new StdErrorQueue(System.err, 
+                                              extensionInfo.getOptions().error_count,
+                                              extensionInfo.compilerName()));
+    }
+        
+    /**
+     * Initialize the compiler.
+     *
+     * @param extensionInfo the <code>ExtensionInfo</code> this compiler is for.
+     */
     public Compiler(ExtensionInfo extensionInfo, ErrorQueue eq) {
-    this.extensionInfo = extensionInfo;
-    this.eq = eq;
+        this.extensionInfo = extensionInfo;
+        this.eq = eq;
 
         loader = new ClassFileLoader();
 
-    // This must be done last.
-    extensionInfo.initCompiler(this);
+        // This must be done last.
+        extensionInfo.initCompiler(this);
     }
 
     /** Return a set of output filenames resulting from a compilation. */
     public Collection outputFiles() {
-    return outputFiles;
+        return outputFiles;
     }
 
     /**
