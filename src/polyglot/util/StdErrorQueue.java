@@ -193,36 +193,21 @@ public class StdErrorQueue extends AbstractErrorQueue
         }
                 
         for (;i <= stopIndAt; i++) {
+            char c = '-';            
             if (i < startIndAt) {
-                if (s.charAt(i) == '\t') {
-                  err.print("\t");
-                }
-                else {
-                  err.print(" ");
-                }
+              c = ' ';
             }
-            else if (i == startIndAt) {
-                if (pos.line() == lineNum) {
-                  err.print("^");
-                }
-                else {
-                  err.print("-");
-                }
+            if (s.charAt(i) == '\t') {
+              c = '\t';
+            }            
+            if (i == startIndAt && pos.line() == lineNum) {
+                c = '^';
             }
-            else if (i == stopIndAt) {
-                if (pos.endLine() == lineNum) {
-                  err.print("^");
-                }
-                else {
-                  err.print("-");
-                }
+            if (i == stopIndAt && pos.endLine() == lineNum) {
+                c = '^';
             }
-            else if (s.charAt(i) == '\t') {
-              err.print("\t");
-            }
-            else {
-              err.print("-");
-            }
+            
+            err.print(c);
         }
 
         err.println();

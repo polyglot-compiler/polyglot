@@ -63,7 +63,7 @@ public class Position implements Serializable
     }
 
     public int endColumn() {
-        if (endColumn == UNKNOWN || (column != UNKNOWN && endColumn < column)) {
+        if (endColumn == UNKNOWN || (column != UNKNOWN && endLine()==line() && endColumn < column)) {
             return column;
         }
         return endColumn;
@@ -88,20 +88,24 @@ public class Position implements Serializable
     }
 
     public String toString() {
-	String s = file;
+        String s = file;
 
-	if (line != UNKNOWN) {
-	    s += ":" + line;
-
-	    if (column != UNKNOWN) {
-		s += "," + column;
+        if (line != UNKNOWN) {
+            s += ":" + line;
+        
+            if (column != UNKNOWN) {
+                s += "," + column;
                 if (line == endLine && 
-                          endColumn != UNKNOWN && endColumn != END_UNUSED) {
+                  endColumn != UNKNOWN && endColumn != END_UNUSED) {
                     s += "-" + endColumn;
                 }
-	    }
-	}
-
-	return s;
+                if (line != endLine && 
+                      endColumn != UNKNOWN && endColumn != END_UNUSED) {
+                    s += "-" + endLine + ":" + endColumn;
+                }
+            }
+        }
+        
+        return s;
     }
 }
