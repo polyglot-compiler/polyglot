@@ -1,6 +1,6 @@
 class Except {
   int x;
-  Object m(A a) {
+  Object m(Except a) {
     try {
       a.x = 0;
     }

@@ -3,7 +3,7 @@ class Prim {
   }
 
   void p() {
-    m(1);
+    m((byte) 1);
     m((byte) -1);
   }
 }
