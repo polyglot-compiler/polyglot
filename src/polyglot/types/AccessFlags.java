@@ -172,17 +172,17 @@ public class AccessFlags implements Cloneable {
   public String getStringRepresentation()
   {
      String s = "";
-     s += bits & PUBLIC_BIT != 0    ? "public " : "";
-     s += bits & PRIVATE_BIT != 0   ? "private " : "";
-     s += bits & PROTECTED_BIT != 0 ? "protected " : "";
-     s += bits & STATIC_BIT    != 0 ? "static " : "";
-     s += bits & FINAL_BIT     != 0 ? "final " : "";
-     s += bits & SYNCHRONIZED_BIT  != 0 ? "synchronized " : "";
-     s += bits & TRANSIENT_BIT     != 0 ? "transient " : "";
-     s += bits & NATIVE_BIT        != 0 ? "native " : "";
-     s += bits & INTERFACE_BIT     != 0 ? "interface " : "";
-     s += bits & ABSTRACT_BIT      != 0 ? "abstract " : "";
-     s += bits & VOLATILE_BIT      != 0 ? "volatile " : "";
+     s += ((bits & PUBLIC_BIT) != 0    ? "public " : "");
+     s += ((bits & PRIVATE_BIT) != 0   ? "private " : "");
+     s += ((bits & PROTECTED_BIT) != 0 ? "protected " : "");
+     s += ((bits & STATIC_BIT)    != 0 ? "static " : "");
+     s += ((bits & FINAL_BIT)     != 0 ? "final " : "");
+     s += ((bits & SYNCHRONIZED_BIT)  != 0 ? "synchronized " : "");
+     s += ((bits & TRANSIENT_BIT)     != 0 ? "transient " : "");
+     s += ((bits & NATIVE_BIT)        != 0 ? "native " : "");
+     s += ((bits & INTERFACE_BIT)     != 0 ? "interface " : "");
+     s += ((bits & ABSTRACT_BIT)      != 0 ? "abstract " : "");
+     s += ((bits & VOLATILE_BIT)      != 0 ? "volatile " : "");
      return s;
   }
 
