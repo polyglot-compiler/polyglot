@@ -83,6 +83,11 @@ qq_member ::=
 					    d.name, d.init); :}
     ;
 
+extend left_hand_side ::=
+	COMMA_EXPR:a
+		{: RESULT = (Expr) a.node(); :}
+	;
+	
 extend primary_no_new_array ::=
 	COMMA_EXPR:a
 	    {: RESULT = (Expr) a.node(); :}
