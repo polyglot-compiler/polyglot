@@ -21,13 +21,15 @@ public class ClassSerializer extends NodeVisitor
     protected Date date;
     protected TypeSystem ts;
     protected NodeFactory nf;
+    protected Version ver;
 
-    public ClassSerializer(TypeSystem ts, NodeFactory nf, Date date, ErrorQueue eq) {
+    public ClassSerializer(TypeSystem ts, NodeFactory nf, Date date, ErrorQueue eq, Version ver) {
 	this.ts = ts;
 	this.nf = nf;
 	this.te = new TypeEncoder( ts);
 	this.eq = eq;
 	this.date = date;
+        this.ver = ver;
     }
 
     public Node override(Node n) {
@@ -55,7 +57,6 @@ public class ClassSerializer extends NodeVisitor
 	    }
 
 	    /* Add the compiler version number. */
-            Version ver = Options.global.extension.version();
             String suffix = ver.name();
 
 	    // Check if we've already serialized.

@@ -279,7 +279,8 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	    l.add(new VisitorPass(Pass.SERIALIZE,
 				  job, new ClassSerializer(ts, nf,
 							   job.source().lastModified(),
-							   compiler.errorQueue())));
+							   compiler.errorQueue(),
+                                                           version())));
 	}
 
 	l.add(new Translator(Pass.OUTPUT, job, ts, nf, targetFactory()));
