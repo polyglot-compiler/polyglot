@@ -124,6 +124,7 @@ public final class Options {
     System.err.println(" -sourcepath <path>      source path");
     System.err.println(" -bootclasspath <path>   path for bootstrap class files");
     System.err.println(" -ext <extension>        use language extension");
+    System.err.println(" -extclass <ext-class>   use language extension");
     System.err.println(" -fqcn                   use fully-qualified class"
                         + " names");
     System.err.println(" -sx <ext>               set source extension");
