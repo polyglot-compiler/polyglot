@@ -15,13 +15,15 @@ clean clobber:
 
 jl: FORCE
 	$(MAKE) -C $@ all
-jif: jl FORCE
+jif: param FORCE
 	$(MAKE) -C $@ all
 pragma: jl FORCE
 	$(MAKE) -C $@ all
 split: jif FORCE
 	$(MAKE) -C $@ all
-polyj: jl FORCE
+param: jl FORCE
+	$(MAKE) -C $@ all
+polyj: param FORCE
 	$(MAKE) -C $@ all
 jmatch: jl FORCE
 	$(MAKE) -C $@ all
@@ -40,6 +42,8 @@ covop: pao covarRet FORCE
 covpolyj: polyj covarRet FORCE
 	$(MAKE) -C $@ all
 pure: jl FORCE
+	$(MAKE) -C $@ all
+coffer: param FORCE
 	$(MAKE) -C $@ all
 
 FORCE:
