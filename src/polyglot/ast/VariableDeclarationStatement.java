@@ -3,6 +3,7 @@ package jltools.ast;
 import jltools.util.*;
 import jltools.types.*;
 import jltools.visit.AmbiguityRemover;
+import jltools.visit.SignatureCleaner;
 import java.util.*;
 import java.lang.ref.WeakReference;
 
@@ -25,7 +26,7 @@ public class VariableDeclarationStatement extends Statement
     public Expression initializer;
     // declaration statement that we are a part of; hold it in a weak referenence to 
     // avoid cycles in the ast, so that the gc can perform well
-    WeakReference wrVDS;
+    public WeakReference wrVDS;
 
     /**
      * Creates a new Declarator for a variable named <code>n</code>, with 
@@ -83,21 +84,21 @@ public class VariableDeclarationStatement extends Statement
     {
       /* Only add to context if inside a method, hence a local variable 
        * declaration. */
-      if( c.getCurrentMethod() != null) {
+      if( c.inMethodScope() ) {
         VariableDeclarationStatement vdsEnclosing = 
           (VariableDeclarationStatement)wrVDS.get();
-        FieldInstance fi = new FieldInstance( name, 
-                                              vdsEnclosing.typeForDeclarator(this), 
-                                              null, vdsEnclosing.accessFlags);
+        LocalInstance li = new LocalInstance( name, 
+                                              vdsEnclosing.typeForDeclarator(this),
+                                              vdsEnclosing.accessFlags );
         /* If it is a constant numeric expression (final + initializer is 
          * IntLiteral) then mark it "constant" under FieldInstance. */
         // FIXME other literal types?
         if( initializer instanceof NumericalLiteral 
             && initializer != null && vdsEnclosing.accessFlags.isFinal()) {
-          fi.setConstantValue( new Long(
+          li.setConstantValue( new Long(
               ((NumericalLiteral)initializer).getValue())); 
         }
-        c.addSymbol( name, fi);
+        c.addSymbol( name, li);
       }
       return this;
     }
@@ -109,23 +110,24 @@ public class VariableDeclarationStatement extends Statement
         (VariableDeclarationStatement)wrVDS.get();
       /* Only add to context if inside a method, hence a local variable 
        * declaration. */
-      if( c.getCurrentMethod() != null) {
+      if( c.inMethodScope() ) {
         if (c.isDefinedLocally( name) )
           throw new SemanticException("Duplicate declaration of \"" + 
-                                      name + "\"");
+                                      name + "\"",
+				      Annotate.getLineNumber(this));
           
         /* If it is a constant numeric expression (final + initializer is 
          * IntLiteral) then mark it "constant" under FieldInstance. */
         // FIXME other literal types?
-        FieldInstance fi = new FieldInstance( name, 
-                                              vdsEnclosing.typeForDeclarator(this), 
-                                              null, vdsEnclosing.accessFlags);
+        LocalInstance li = new LocalInstance( name, 
+                                              vdsEnclosing.typeForDeclarator(this),
+                                              vdsEnclosing.accessFlags );
         if( initializer instanceof NumericalLiteral 
             && initializer != null && vdsEnclosing.accessFlags.isFinal()) {
-          fi.setConstantValue( new Long(
+          li.setConstantValue( new Long(
                                  ((NumericalLiteral)initializer).getValue())); 
         }
-        c.addSymbol( name, fi);
+        c.addSymbol( name, li);
       }
       
       if (initializer != null) {
@@ -137,7 +139,8 @@ public class VariableDeclarationStatement extends Statement
                            + "\"" 
                            + initializer.getCheckedType().getTypeString()
                            + "\" does not match that of the declaration \"" 
-                           + type.getTypeString() + "\".");
+                           + type.getTypeString() + "\".",
+			   Annotate.getLineNumber(this));
           }
       }
       return this;
@@ -245,7 +248,7 @@ public class VariableDeclarationStatement extends Statement
    */
   public AccessFlags getAccessFlags() 
   {
-    return accessFlags;
+    return accessFlags; //don't return a copy! (FieldNode depends on this)
   }
 
     public int numDeclarators() {
@@ -312,6 +315,21 @@ public class VariableDeclarationStatement extends Statement
     }
 
     return reconstruct( Node.condVisit(this.ext, v), accessFlags, newTn, newDeclarators);
+  }
+
+  public Node cleanupSignatures( LocalContext c, SignatureCleaner sc) 
+    throws SemanticException
+  {
+    TypeNode newTn = (TypeNode)tn.visit(sc);
+    
+    VariableDeclarationStatement vds = reconstruct ( ext, accessFlags, 
+                                                     newTn, declarators);
+    List newDeclarators = new ArrayList ( declarators.size());
+    for (Iterator iter = vds.declarators(); iter.hasNext(); )
+    {
+      newDeclarators.add( ((Declarator)iter.next()).visit( sc ));
+    }
+    return vds.reconstruct ( accessFlags, newTn, newDeclarators);
   }
 
   public Node removeAmbiguities( LocalContext c, AmbiguityRemover ar) 

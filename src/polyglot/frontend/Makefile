@@ -1,16 +1,22 @@
+SOURCE = ../..
+PACKAGE = jltools.frontend
+SUBDIRS =
 
-fe_package	= jltools/frontend
-fe_codebase	= ../..
-fe_files 	= Compiler.java \
-		  Target.java \
-		  TargetFactory.java
+SOURCES = \
+	ClassTypeJob.java \
+	Compiler.java \
+	ExtensionInfo.java \
+	Job.java \
+	SourceJob.java \
+	StandardExtensionInfo.java \
+	Target.java \
+	TargetFactory.java
 
+CLASSES = $(patsubst %.java, %.class, $(SOURCES))
 
-FRONTEND_TARGET = $(patsubst %.java, $(fe_package)/%.class, $(fe_files))
+include $(SOURCE)/Rules.mk
 
-ifndef CALLED_FROM_PARENT
-all:	
-	cd ../.. && $(MAKE) frontend
-%:
-	cd ../.. && $(MAKE) $@
-endif
+all: $(CLASSES)
+
+clean clobber:
+	-rm -f *.class

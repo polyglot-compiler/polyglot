@@ -96,6 +96,9 @@ public class ImportNode extends Node
       it.addPackageImport( imports);
       break;
     }
+
+    visitChildren(sr);
+
     return this;
   }
    

@@ -90,12 +90,15 @@ public class SpecialExpression extends Expression
     ClassType t;
 
     if (tn == null) {
-      // Unqualified this or super expression
+      // Unqualified this expression
       t = c.getCurrentClass();
     }
     else {
       if (! tn.getType().isClassType()) {
-	throw new SemanticException("this expression must be of a class type");
+	throw new SemanticException("Qualified " +
+				    (kind == THIS ? "this" : "super") +
+				    " expression must be of a class type",
+				    Annotate.getLineNumber(tn));
       }
 
       t = (ClassType) tn.getType();

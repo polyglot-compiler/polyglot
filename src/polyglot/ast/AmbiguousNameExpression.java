@@ -27,27 +27,43 @@ import java.util.*;
  **/
 public class AmbiguousNameExpression extends AmbiguousExpression {
 
-  protected final TypedList names;
+  protected Node prefix;
+  protected String name;
 
   /**
    * Creates a new AmbiguousNameExpression for the identifier in
    * <code>s</code>.
    * @pre <code>s</code> is not empty, and does not begin or end with a '.'.
    */
-  public AmbiguousNameExpression( Node ext, String s) {
+  public AmbiguousNameExpression( Node ext, Node prefix, String s) {
       this.ext = ext;
-      names = new TypedList(new ArrayList(4), String.class, false);
+      this.prefix = prefix;
 
-      StringTokenizer st = new StringTokenizer( s, ".");
+      StringTokenizer st = new StringTokenizer(s, ".");
 
-      while( st.hasMoreTokens()) {
-	  names.add( st.nextToken());
+      while (st.hasMoreTokens()) {
+	  String p = st.nextToken();
+
+	  if (st.hasMoreTokens()) {
+	    this.prefix = new AmbiguousName(ext, this.prefix, p);
+	  }
+	  else {
+	    this.name = p;
+	  }
+      }
+
+      if (this.name == null) {
+	throw new InternalCompilerError("null ambiguous name");
       }
   }
 
-    public AmbiguousNameExpression( String s) {
-	this(null, s);
-    }
+  public AmbiguousNameExpression( Node prefix, String s) {
+      this(null, prefix, s);
+  }
+
+  public AmbiguousNameExpression( String s) {
+      this(null, null, s);
+  }
 
   /**
    * Lazily reconstruct this node. If any of the dotted components in 
@@ -55,31 +71,25 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
    * <code>this.getName()</code> then return a new expression. Otherwise
    * return <code>this</code>.
    */
-  public AmbiguousNameExpression reconstruct( Node ext, String s) {
-    if (this.ext != ext) {
-	AmbiguousNameExpression n =  new AmbiguousNameExpression( ext, s);
+  public AmbiguousNameExpression reconstruct( Node ext,
+    Node prefix, String name) {
+
+    if (this.ext != ext || ! this.name.equals(name) || this.prefix != prefix) {
+	AmbiguousNameExpression n =
+	  new AmbiguousNameExpression( ext, prefix, name);
 	n.copyAnnotationsFrom( this);
 	return n;
     }
 
-    StringTokenizer st = new StringTokenizer( s, ".");
-    if( st.countTokens() != names.size()) {
-      return new AmbiguousNameExpression( s);
-    }
-    else {
-      for( Iterator iter = names.iterator(); iter.hasNext(); ) {
-        if( !iter.next().equals( st.nextToken())) {
-          AmbiguousNameExpression n = new AmbiguousNameExpression( ext, s);
-          n.copyAnnotationsFrom( this);
-          return n;
-        }
-      }
-      return this;
-    }
+    return this;
   }
 
   public AmbiguousNameExpression reconstruct( String s) {
-      return reconstruct(this.ext, s);
+      return reconstruct(this.ext, null, s);
+  }
+
+  public AmbiguousNameExpression reconstruct( Node prefix, String s) {
+      return reconstruct(this.ext, prefix, s);
   }
 
   /**
@@ -90,107 +100,119 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
    */
   public AmbiguousNameExpression append( String s)
   {
-    AmbiguousNameExpression n = new AmbiguousNameExpression( this.ext, getName() + "." 
-                                                             + s);
+    AmbiguousName newPrefix = new AmbiguousName( this.ext, prefix, name );
+    AmbiguousNameExpression n =  new AmbiguousNameExpression( this.ext,
+	newPrefix, s );
     n.copyAnnotationsFrom( this);
     return n;
   }
 
   /**
-   * Returns an immutable TypedList of the identifiers in this
+   * Returns the prefix of this
    * <code>AmbiguousNameExpression</code>.
    */
-  public TypedList getIdentifiers() {
-    return names;
+  public Node getPrefix() {
+    return prefix;
   }
 
   /**
    * Returns the entire expression as a dotted string.
    */
-  public String getName() {
-    StringBuffer sb = new StringBuffer();
-    Iterator iter = names.iterator();
-
-    while( iter.hasNext())
-    {
-      sb.append( (String)iter.next());
-      if( iter.hasNext()) {
-        sb.append( '.');
-      }
+  public String getFullName() {
+    if (prefix instanceof AmbiguousName) {
+      return ((AmbiguousName) prefix).getFullName() + "." + name;
     }
+    else if (prefix != null) {
+      throw new InternalCompilerError("Cannot get full name of partially unambiguous AmbiguousNameExpression prefix isa " + prefix.getClass().getName() );
+    }
+    else {
+      return name;
+    }
+  }
 
-    return sb.toString();
+  public String getName() {
+    return name;
   }
 
   public Node visitChildren( NodeVisitor v) 
   { 
-      return reconstruct(Node.condVisit(ext, v), getName());
+      Node newPrefix = null;
+      if (prefix != null) {
+	newPrefix = prefix.visit(v);
+      }
+      return reconstruct(Node.condVisit(ext, v), newPrefix, getName());
   }
 
   public Node removeAmbiguities( LocalContext c) throws SemanticException
   {
     Node top = null;
-    String name = "";
-    Type last = null;
 
-    for (Iterator i = names.listIterator(); i.hasNext(); )
-    {
-      try {
-        name += (String)i.next();
+    if (prefix != null) {
+	if (prefix instanceof TypeNode) {
+	    /* Try static fields. */
+	    Type type = ((TypeNode) prefix).getType();
 
-        /* First try local variables and fields. */
-        FieldInstance fi;
+	    if (type.isReferenceType()) {
+		ReferenceType refType = type.toReferenceType();
+		FieldInstance fi =
+		    c.getTypeSystem().getField(refType, name, c);
+		top = new FieldExpression(
+		    c.getTypeSystem().getNewFieldExpressionExtension(),
+		    (TypeNode) prefix, fi );
+	    }
+	}
+	else if (prefix instanceof Expression) {
+	    /* Try non-static fields. */
+	    top = new FieldExpression(
+		c.getTypeSystem().getNewFieldExpressionExtension(),
+		(Expression) prefix, name );
+	}
+    }
+    else {
+	/* First try local variables and fields. */
+	VariableInstance vi = c.getVariable(name);
 
-        fi = c.getField( last, name );
+	if (vi instanceof FieldInstance) {
+	    FieldInstance fi = (FieldInstance) vi;
 
+	    if (fi.getAccessFlags().isStatic() ) {
+		top = new FieldExpression(
+		    c.getTypeSystem().getNewFieldExpressionExtension(),
+		    new TypeNode(fi.getEnclosingType()), fi );
+	    }
+	    else {
+		ClassType container = c.getFieldContainingClass(name);
 
-        if( last == null && c.isDefinedLocally( name) ) {
-          top = new LocalVariableExpression( c.getTypeSystem().getNewLocalVariableExpressionExtension(), name);
-        }
-        else {
-          if( top == null) {
-	      System.out.println("top == null");
- 	    top = new FieldExpression( c.getTypeSystem().getNewFieldExpressionExtension(), null, //new TypeNode( c.getCurrentClass()), 
-                                       fi.getName());
-          }
-          else {
-            top = new FieldExpression(  c.getTypeSystem().getNewFieldExpressionExtension(), top, fi.getName());
-          }
-        }
-        
-        last = fi.getType();
-        
-        /* Clear the name. */
-        name = "";
-      }
-      catch( SemanticException se) 
-      {
-        if( top == null) {
-          /* If it's not a local or field, then try and find a type. */
-          try {
-            last = (ClassType)c.getType( name);
-            top = new TypeNode( c.getTypeSystem().getNewTypeNodeExtension(), last, name);
-            
-            /* Clear the name. */
-            name = "";
-          }
-          catch( SemanticException se2)
-          {
-            /* Not a local, field or type. Must be imcomplete. */
-            name += ".";
-          }
-        }
-        else throw se;
-      }
-      
-      if( top != null) {
-        Annotate.setLineNumber( top, Annotate.getLineNumber( this));
-      }
+		TypeNode base = null;
+
+		if (container != c.getCurrentClass()) {
+		    base = new TypeNode(container);
+		}
+
+		top = new FieldExpression(
+		    c.getTypeSystem().getNewFieldExpressionExtension(),
+		    new SpecialExpression(base, SpecialExpression.THIS),
+		    fi);
+	    }
+	}
+	else if (vi instanceof LocalInstance) {
+	  top = new LocalVariableExpression(
+	    c.getTypeSystem().getNewLocalVariableExpressionExtension(),
+	    name);
+	}
+	else {
+	  throw new SemanticException("No field or variable with name \"" + 
+	    getFullName() + "\".", Annotate.getLineNumber(this));
+	}
     }
 
-    if( top == null) {
-      throw new SemanticException( "No field or variable with name \"" + 
-                                    name + "\".");
+    if( top != null) {
+      Annotate.setLineNumber( top, Annotate.getLineNumber( this));
+    }
+    else {
+      throw new SemanticException( "No field or variable " +
+				    "with name \"" + getFullName() + "\".",
+				    Annotate.getLineNumber(this) );
     }
 
     return top;
@@ -213,12 +235,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
   public void dump( CodeWriter w)
   {
     w.write ("AMBIGUOUS NAME < ");
-    for( Iterator i = names.listIterator(); i.hasNext(); ) {
-      w.write( (String)i.next());
-      if( i.hasNext()) {
-        w.write( ".");
-      }
-    }
+    w.write(getFullName());
     w.write( " > ");
     dumpNodeInfo( w);
   }

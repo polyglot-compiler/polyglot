@@ -20,33 +20,14 @@ import jltools.ast.*;
 public abstract class TypeSystem {
 
   /**
-   * This class represents the context in which a type lookup is
-   * proceeding.
-   *
-   * The 'ImportTable' field is required for type lookups (like checkType and
-   * getCanonicalType).  
-   *
-   * The Type field is required for all method and field lookups.
-   *
-   * The MethodType field may be null.
-   **/
-  public static class Context {
-    public final ClassResolver table;
-    public final ClassType inClass;
-    public final MethodType inMethod;
-    
-    public Context(ClassResolver t, ClassType type, MethodType m) 
-      { table = t; inClass = type; inMethod = m; }
-    public Context(ClassType type, MethodType m) 
-      { table = null; inClass = type; inMethod = m; }
-  }
-
-  /**
    * performs any initizlation necessary that requries resolvers.
    */
   public abstract void initializeTypeSystem( ClassResolver resolver,
                                              ClassCleaner cleaner)
     throws SemanticException;
+
+  public abstract LocalContext getLocalContext( ImportTable it,
+	NodeVisitor visitor );
 
   ////
   // Functions for two-type comparison.
@@ -117,9 +98,9 @@ public abstract class TypeSystem {
 
   /**
    * Checks whether a method or field within ctTarget with access flags 'flags' can
-   * be accessed from Context context. 
+   * be accessed from TypeContext context. 
    */
-  public abstract boolean isAccessible(ClassType ctTarget, AccessFlags flags, Context context)
+  public abstract boolean isAccessible(ReferenceType ctTarget, AccessFlags flags, LocalContext context)
     throws SemanticException ;
 
   /**
@@ -132,7 +113,9 @@ public abstract class TypeSystem {
    * canonical form of that type.  Otherwise, returns a String
    * describing the error.
    **/
-  public abstract Type checkAndResolveType(Type type, Context context)
+  public abstract Type checkAndResolveType(Type type, TypeContext context)
+    throws SemanticException;
+  public abstract Type checkAndResolveType(Type type, Type contextType)
     throws SemanticException;
 
   ////
@@ -162,21 +145,21 @@ public abstract class TypeSystem {
    * context.  If no such field may be found, returns a fieldmatch
    * with an error explaining why. Considers accessflags
    **/
-  public abstract FieldInstance getField(Type type, String name, Context context)
+  public abstract FieldInstance getField(Type type, String name, LocalContext context)
     throws SemanticException;
  
 
   /**
    * Returns the supertype of type, or null if type has no supertype.
    **/
-  public abstract ClassType getSuperType(ClassType type)
+  public abstract ReferenceType getSuperType(ReferenceType type)
     throws SemanticException;
 
   /**
    * Returns an immutable list of all the interface types which type
    * implements.
    **/
-  public abstract List getInterfaces(ClassType type)
+  public abstract List getInterfaces(ReferenceType type)
     throws SemanticException;
 
   ////
@@ -210,8 +193,18 @@ public abstract class TypeSystem {
    *
    * (Guavac gets this wrong.)
    **/
-  public abstract MethodTypeInstance getMethod(ClassType type, MethodType method, 
-					Context context)
+  public abstract MethodTypeInstance getMethod(Type type, MethodType method, 
+					LocalContext context)
+    throws SemanticException;
+
+  /**
+   * If a constructor call on <clazz> with arguments <args> would
+   *  succeed in <context> returns the actual ConstructorTypeInstance
+   *  for the constructor call, otherwise throws a SemanticException.
+   */
+  public abstract MethodTypeInstance getConstructor(ClassType clazz,
+						    List args,
+						    LocalContext context)
     throws SemanticException;
 
   ////
@@ -234,12 +227,15 @@ public abstract class TypeSystem {
   public abstract Type getError();
   public abstract Type getException();
   public abstract Type getRTException();
+  public abstract Type getCloneable();
+  public abstract Type getSerializable();
+
   /**
    * Returns a non-canonical type object for a class type whose name
    * is the provided string.  This type may not correspond to a valid
    * class.
    **/
-  public abstract AmbiguousType getTypeWithName(String name)
+  public abstract Type getTypeWithName(String name)
     throws SemanticException;
 
   /**
@@ -312,5 +308,9 @@ public abstract class TypeSystem {
     int firstDot = fullName.indexOf('.');
     return firstDot >= 0 ? fullName.substring(firstDot+1) : "";
   }
-}
 
+  public abstract TypeContext getEmptyContext(ClassResolver resolver);
+  public abstract TypeContext getClassContext(ClassResolver resolver, ClassType clazz) throws SemanticException;
+  public abstract TypeContext getPackageContext(ClassResolver resolver, PackageType type) throws SemanticException;
+  public abstract TypeContext getPackageContext(ClassResolver resolver, String name) throws SemanticException;
+}

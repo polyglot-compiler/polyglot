@@ -38,6 +38,10 @@ public class PrimitiveType extends Type
   {
     return kind;
   }
+
+  public String translate(LocalContext c) {
+    return getTypeString();
+  }
   
   public String getTypeString() 
   {
@@ -96,8 +100,10 @@ public class PrimitiveType extends Type
   public final boolean isCanonical() {
     return true;
   }
+  public boolean isReferenceType() { return false; }
   public boolean isClassType() { return false; }
   public boolean isArrayType() { return false; }
+  public boolean isPackageType() { return false; }
     public PrimitiveType toPrimitiveType() {
 	return this;
     }

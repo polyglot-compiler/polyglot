@@ -363,6 +363,13 @@ public class MethodNode extends ClassMember
     {
       excTypes.add ( (((TypeNode)iter.next()).getType()));
     }
+
+    //if contained in an interface,
+    //  implicitly declared "public abstract"
+    if (clazz.getAccessFlags().isInterface()) {
+      accessFlags.setPublic(true);
+      accessFlags.setAbstract(true);
+    }
     
     if ( isConstructor)
     {
@@ -383,6 +390,8 @@ public class MethodNode extends ClassMember
 
     Annotate.setLineNumber( mtiThis, Annotate.getLineNumber( this));
     clazz.addMethod( mtiThis);
+
+    visitChildren(sr);
 
     return this;
   }
@@ -477,6 +486,8 @@ public class MethodNode extends ClassMember
 
     enterScope(c);
     
+    enterScope(c);
+
     if( !mtiThis.getAccessFlags().isAbstract() ) {
       // FIXME should be abstract for interfaces.
       if( body != null) {
@@ -494,7 +505,7 @@ public class MethodNode extends ClassMember
     w.newline( 0);
   }
 
-  public void dump( CodeWriter w)
+  public void dump( CodeWriter w) throws SemanticException
   {
     w.write( "METHOD");
     w.write( " < " + name + " >");

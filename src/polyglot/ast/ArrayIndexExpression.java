@@ -96,7 +96,8 @@ public class ArrayIndexExpression extends Expression
     Type btype = base.getCheckedType();
     if ( !(btype.isArrayType())) {
       throw new SemanticException(  
-                    "Subscript can only follow an array type.");
+                    "Subscript can only follow an array type.",
+		    Annotate.getLineNumber(base) );
     }
     else {
       setCheckedType( (btype.toArrayType()).getBaseType());
@@ -105,7 +106,8 @@ public class ArrayIndexExpression extends Expression
     Type itype = index.getCheckedType();
     if ( !itype.isImplicitCastValid( c.getTypeSystem().getInt())) {
       throw new SemanticException(
-                    "Array subscript must be an integer.");
+                    "Array subscript must be an integer.",
+		    Annotate.getLineNumber(index) );
     } 
 
     return this;

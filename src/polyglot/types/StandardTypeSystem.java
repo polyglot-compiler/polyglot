@@ -7,7 +7,10 @@ package jltools.types;
 import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.HashSet;
 
+import jltools.ast.NodeVisitor;
 import jltools.util.InternalCompilerError;
 
 
@@ -45,13 +48,19 @@ public class StandardTypeSystem extends TypeSystem {
     SERIALIZABLE_ = resolver.findClass( "java.io.Serializable");
   }
 
+  public LocalContext getLocalContext( ImportTable it,
+        NodeVisitor visitor ) {
+
+    return new LocalContext( it, this, visitor );
+  }
+
   ////
   // Functions for two-type comparison.
   ////
 
   /**
    * Returns true iff childType and ancestorType are distinct
-   * classTypes, and childType descends from ancestorType.
+   * reference types, and childType descends from ancestorType.
    **/
   public boolean descendsFrom(Type childType, 
                               Type ancestorType) 
@@ -61,37 +70,44 @@ public class StandardTypeSystem extends TypeSystem {
          ancestorType instanceof AmbiguousType)
       throw new InternalCompilerError("Expected fully qualified classes.");
 
-    if(ancestorType instanceof ClassType &&
+    if(ancestorType instanceof ReferenceType &&
        childType.equals( NULL_)) {
       return true;
     }
 
     if (ancestorType.equals(childType) ||
-        ! (childType instanceof ClassType) ||
-        ! (ancestorType instanceof ClassType) )
+        ! (childType instanceof ReferenceType) ||
+        ! (ancestorType instanceof ReferenceType) )
     {
       return false;
     }
 
-    if (! ((ClassType)childType).getAccessFlags().isInterface()) {
-      // If the child isn't an interface, check whether its supertype is or
-      // descends from the ancestorType
+    boolean isClass = (childType instanceof ClassType) &&
+	! ((ClassType)childType).getAccessFlags().isInterface();
 
-      if ( ((ClassType)childType).equals ( OBJECT_))
+    // If the child isn't an interface or array, check whether its
+    // supertype is or descends from the ancestorType
+    if (isClass) {
+      if ( childType.equals ( OBJECT_)) {
         return false;
+      }
 
-      ClassType parentType = (ClassType)((ClassType)childType).getSuperType();
+      ReferenceType parentType = (ReferenceType)
+				((ReferenceType)childType).getSuperType();
       if (parentType.equals(ancestorType) ||
-	  descendsFrom(parentType, ancestorType))
+	  descendsFrom(parentType, ancestorType)) {
 	return true;
-    } else {
-      // if it _is_ an interface, check whether the ancestor is Object.
-      if (ancestorType.equals(OBJECT_))
+      }
+    }
+    else {
+      // if it _is_ an interface or array, check whether the ancestor is Object.
+      if (ancestorType.equals(OBJECT_)) {
 	return true;
-    } 
+      }
+    }
 
     // Next check interfaces.
-    for(Iterator it = getInterfaces((ClassType)childType).iterator(); it.hasNext(); ) {
+    for(Iterator it = getInterfaces((ReferenceType)childType).iterator(); it.hasNext(); ) {
       Type parentType = (Type) it.next();
       if (parentType.equals(ancestorType) ||
 	  descendsFrom(parentType, ancestorType))
@@ -152,19 +168,13 @@ public class StandardTypeSystem extends TypeSystem {
       ArrayType  child = (ArrayType) childType;
       if (ancestorType instanceof ArrayType) {
 	ArrayType ancestor = (ArrayType) ancestorType;
-	if (child.getDimensions() == ancestor.getDimensions()) {
-	  // Both types are arrays, of the same dimensionality.	
-	  Type childbase = child.getBaseType();
-	  Type ancestorbase = ancestor.getBaseType();
-	  return isAssignableSubtype(childbase, ancestorbase);
-	} else {
-	  // Both type are arrays, of different dimensionality.
-	  return (ancestor.getBaseType().equals(OBJECT_) &&
-		  ancestor.getDimensions() < child.getDimensions());
-	}
+	// Both types are arrays, of the same dimensionality.	
+	Type childbase = child.getBaseType();
+	Type ancestorbase = ancestor.getBaseType();
+	return isAssignableSubtype(childbase, ancestorbase);
       } else {
 	// childType is an array, but ancestorType not an array.
-	return ancestorType.equals(OBJECT_);
+	return descendsFrom(childType, ancestorType);    
       }
     } 
     
@@ -172,8 +182,9 @@ public class StandardTypeSystem extends TypeSystem {
     if (childType instanceof NullType) 
       return true;
  
+    // kliger - can we say ReferenceType here?
     // So childType is definitely a ClassType.
-    if (! (ancestorType instanceof ClassType))
+    if (! (ancestorType instanceof ReferenceType))
 	return false;
     
     return (childType.equals(ancestorType) || 
@@ -209,8 +220,8 @@ public class StandardTypeSystem extends TypeSystem {
     if (fromType instanceof ArrayType &&
           toType instanceof ArrayType) {
       // FIXME: Make this iterative.
-      Type fromBase = extendArrayDims((ArrayType)fromType,-1);
-      Type toBase   = extendArrayDims((ArrayType)toType,-1);
+      Type fromBase = ((ArrayType)fromType).getBaseType();
+      Type toBase   = ((ArrayType)toType).getBaseType();
       if (fromBase instanceof PrimitiveType) {
         return toBase.equals(fromBase);
       } else if (toBase instanceof PrimitiveType) {
@@ -221,20 +232,21 @@ public class StandardTypeSystem extends TypeSystem {
     }
     else if (fromType instanceof ArrayType)
     {
-      return toType.equals(CLONEABLE_) || 
-        toType.equals(SERIALIZABLE_) || 
-        toType.equals(OBJECT_);
+      return descendsFrom(fromType, toType);    
     }
     else if (toType instanceof ArrayType)
     {
-      return fromType.equals(CLONEABLE_) ||
-        fromType.equals(SERIALIZABLE_) ||
-        fromType.equals(OBJECT_);
+      return descendsFrom(toType, fromType);    
     }
 
     if( fromType instanceof NullType) {
       return (toType instanceof ClassType);
     }
+
+    if (! (fromType instanceof ClassType))
+      return false;
+    if (! (toType instanceof ClassType))
+      return false;
 
     // From and to are neither primitive nor an array. They are distinct.
     boolean fromInterface = ((ClassType)fromType).getAccessFlags().isInterface();
@@ -369,36 +381,50 @@ public class StandardTypeSystem extends TypeSystem {
    * Checks whether a method, field or inner class within ctTarget with access flags 'flags' can
    * be accessed from Context context, where context is a class type.
    */
-  public boolean isAccessible(ClassType ctTarget, AccessFlags flags, Context context) 
+  public boolean isAccessible(ReferenceType rtTarget, AccessFlags flags, LocalContext context) 
     throws SemanticException 
   {
 
     // check if in same class or public 
-    if ( isSameType( ctTarget, context.inClass) ||
+    if ( isSameType( rtTarget, context.getCurrentClass() ) ||
          flags.isPublic())
       return true;
 
+    if (! rtTarget.isClassType()) {
+      return false;
+    }
+
+    ClassType ctTarget = (ClassType) rtTarget;
+
     // check if context is an inner class of ctEnclosingClass, in which case protection doesnt matter
-    if ( isEnclosed ( context.inClass, ctTarget))
+    if ( isEnclosed ( context.getCurrentClass(), ctTarget))
       return true;
     // check if ctTarget is an inner of context, in which case protection doesnt matter either
-    if ( isEnclosed ( ctTarget, context.inClass))
+    if ( isEnclosed ( ctTarget, context.getCurrentClass()))
       return true;
 
-    if ( ! (context.inClass instanceof ClassType))
+    if ( ! (context.getCurrentClass() instanceof ClassType))
     {
       throw new InternalCompilerError("Internal error: Context is not a Classtype");
     }
 
-    ClassType ctContext = (ClassType)context.inClass;
+    ClassType ctContext = (ClassType)context.getCurrentClass();
     
     // check for package level scope. ( same package and flags has package level scope.
     if ( ctTarget.getPackage() == null && ctContext.getPackage() == null && flags.isPackage())
       return true;
 
+    // kliger: this used to only allow access if the context and the
+    //   target are in the same package and the flags have package-level
+    //   access set.
+    // However, JLS2 6.6.1 says that if the protected flag is set, then
+    //   if the package is the same for target and context, then access
+    //   is allowed, as well.  (in addition to the normal "subclasses get
+    //   access" rule for protected members).
+    // This is confusing for C++ programmers like me.
     if (ctTarget.getPackage() != null &&
         ctTarget.getPackage().equals (ctContext.getPackage()) &&
-        flags.isPackage())
+        (flags.isPackage() || flags.isProtected()))
       return true;
     
     // protected
@@ -423,146 +449,85 @@ public class StandardTypeSystem extends TypeSystem {
    * canonical form of that type.  Otherwise, returns a String
    * describing the error.
    **/
-  public Type checkAndResolveType(Type type, Context context) throws SemanticException {
-
-      // System.out.println( "Checking: " + type + " " + type.getTypeString());
+  public Type checkAndResolveType(Type type, TypeContext context)
+    throws SemanticException {
+    // System.out.println( "Checking: " + type + " " + type.getTypeString());
 
     if (type.isCanonical()) return type;
+
     if (type instanceof ArrayType) {
       ArrayType at = (ArrayType) type;
       Type base = at.getBaseType();
-      int dims = at.getDimensions();
       Type result = checkAndResolveType(base, context);
-      return new ArrayType(this, (Type)result, dims);
+
+      if (result.isPackageType()) {
+	throw new SemanticException("Type " + result.getTypeString() +
+		" is undefined");
+      }
+
+      return new ArrayType(this, (Type)result);
     }
     
     if (! (type instanceof AmbiguousType)) 
-      throw new InternalCompilerError("Found a non-canonical, non-array, non-ambiguous type.");
+      throw new InternalCompilerError(
+	"Found a non-canonical, non-array, non-ambiguous type: " + type.getTypeString() + ".");
 
-    // We have a class type on our hands.
-    String className = ((AmbiguousType) type).getTypeString();
+    return checkAndResolveAmbiguousType((AmbiguousType) type, context);
+  }
 
-    // Find the context.
-    ClassType inClass = context.inClass;
+  public Type checkAndResolveType(Type type, Type contextType) throws SemanticException {
+    if (contextType.isClassType()) {
+	TypeContext classContext = getClassContext(resolver, (ClassType) contextType);
+	return checkAndResolveType(type, classContext);
+    }
+    else if (contextType.isPackageType()) {
+	TypeContext packageContext = getPackageContext(resolver,
+	    (PackageType) contextType);
+	return checkAndResolveType(type, packageContext);
+    }
+    else {
+	throw new SemanticException("Type " + type + " not found in context");
+    }
+  }
 
+  protected Type checkAndResolveAmbiguousType(AmbiguousType type,
+    TypeContext context) throws SemanticException {
 
-    // Is the name short.?
-    if (TypeSystem.isNameShort(className)) {
-      // Sun's Java compiler seems to follow these steps.  The spec is
-      // a bit hazy here, so we'll use the compiler as a reference.
-
-      if (inClass != null) {
-        // STEP 0
-        // Check whether type is the class we're in.
-        if ( inClass.getShortName().equals( className ) )
-          return inClass;
-        
-	// STEP 1
-	// First, we see if the current class has any inners by that name.
-	Type innerType = inClass.getInnerNamed(className);
-	if (innerType != null) return innerType;
-
-	// STEP 2
-	// Now we see whether the outer class or the parent class have
-	// any inners by that name.  If they _both_ do, that's an error.
-	Type resultFromOuter = null;
-	Type resultFromParent = null;
-        //        System.out.println("in " + inClass.getTypeString() + " super: " + inClass.getSuperType() + " " + inClass.getTypeString());
-	ClassType parentType = (ClassType)inClass.getSuperType();
-	ClassType outerType = inClass.getContainingClass();
-	if (outerType != null) {
-	  Context outerContext = new Context(emptyResolver,
-					     outerType, null);
-
-          try {
-            resultFromOuter = checkAndResolveType(type, outerContext);
-          }
-          catch( SemanticException e) {}
-	}
-	if (parentType != null) {
-	  Context parentContext = new Context(emptyResolver,
-					      parentType, null);
-          // System.out.println( "recursing to parent..."); 
-          try
-          {
-            resultFromParent = checkAndResolveType(type, parentContext);
-          }
-          catch( SemanticException e) {}
-          //  System.out.println( "back from parent!");
-	}
-	if ((resultFromOuter != null) &&
-	    (resultFromParent != null) &&
-            (resultFromParent != resultFromOuter)) {
-	  // FIXME: Better error message needed.
-	  throw new SemanticException ("Found \"" + className 
-                                  + "\" in both containing class and parent.");
-	} else if (resultFromOuter != null) {
-	  return resultFromOuter;
-	} else if (resultFromParent != null) {
-	  return resultFromParent;
-	}
-      }
-
-      // STEP 3
-      // Check the import table.  Default to the null package.
-      //      context.table.dump();
-      return context.table.findClass(className);
+    if (! (type instanceof AmbiguousNameType)) {
+      throw new InternalCompilerError(
+	"Found a non-canonical, non-array, non-ambiguous-name type.");
     }
 
-    // It looks like we've got a long name.  It can be of only one of
-    // the following forms:
-    //          class{.inner}+
-    //          {package.}+class
-    //          {package.}+class{.inner}+
-    //
-    // Our strategy is to first check to see if the first component is
-    // a class.  If it is, then we look for the appropriate inner.
-    // Otherwise, we try to find the shortest possible prefix of the
-    // name that is not an inner class, and then look for inners there.
-    
-    // 
-    // We'll try to set <result> equal to the type of the outermost
-    // class, <prefix> equal to that class's name, and <rest> equal to
-    // the leftover parts.
-    ClassType result = null;
-    String prefix = TypeSystem.getFirstComponent(className);
-    String rest = TypeSystem.removeFirstComponent(className);
+    AmbiguousNameType ambType = (AmbiguousNameType) type;
 
-    try
-    {
-      result = (ClassType)checkAndResolveType(new AmbiguousType(this, prefix),
-                                              context);
+    // If the ambiguous name is just an identifier, look it up in the context.
+    if (ambType.isShort()) {
+      return context.getType(ambType.getName());
     }
-    catch( SemanticException e) {}
-    while (result == null && rest.length() > 0) {
-      prefix = prefix + "." + TypeSystem.getFirstComponent(rest);
-      rest = TypeSystem.removeFirstComponent(rest);
-      try {
-	result = resolver.findClass(prefix);
-      } catch (NoClassException e) {}
+
+    // If the ambiguous name is qualified: classify the prefix to create
+    // a new context in which to lookup the unqualified name.
+    Type prefixType = ambType.getPrefix();
+
+    if (prefixType instanceof AmbiguousType) {
+	prefixType = checkAndResolveAmbiguousType((AmbiguousType) prefixType,
+						context);
     }
-    if (result == null)
-      throw new NoClassException( "Class \"" + className + "\" not found.");
-    
 
-    // Type outer = result;
-    // JavaClass resultClass = getClassForType(outer);
-    while (rest.length() > 0) {
-      String innerName = TypeSystem.getFirstComponent(rest);
-      Type inner = result.getInnerNamed( innerName);
-
-      if (inner == null) {
-	throw new SemanticException ("Class \"" + prefix 
-                                     + "\" has no inner class named \"" 
-                                     + innerName + "\".");
-      }
-
-      result = (ClassType)checkAndResolveType( inner, context);
-
-      prefix = prefix + "." + innerName;
-      rest = TypeSystem.removeFirstComponent(rest);
+    // Lookup the unqualified name in the context of the prefix.
+    if (prefixType.isClassType()) {
+	TypeContext classContext = getClassContext(resolver,
+						  (ClassType) prefixType);
+	return classContext.getType(ambType.getName());
     }
-    return result;
+    else if (prefixType.isPackageType()) {
+	TypeContext packageContext = getPackageContext(resolver,
+						      (PackageType) prefixType);
+	return packageContext.getType(ambType.getName());
+    }
+    else {
+	throw new SemanticException("Type " + type + " not found in context");
+    }
   }
 
   ////
@@ -594,134 +559,42 @@ public class StandardTypeSystem extends TypeSystem {
    * with an error explaining why. name and context may be null, in which case
    * they will not restrict the output.
    **/
-  public FieldInstance getField(Type t, String name, Context context ) 
+  public FieldInstance getField(Type t, String name, LocalContext context ) 
     throws SemanticException
   {
     FieldInstance fi = null, fiEnclosing = null, fiTemp = null;
-    ClassType type, tEnclosing = null;
+    ReferenceType type = null;
 
-    if (t != null) // then we have a starting point. don't have to perform a 2d search
+    if (t == null)
     {
-      if ( t instanceof ArrayType)
-      {
-        // only valid field is .length
-        if ( name.equals("length"))
-          {
-            AccessFlags flags = new AccessFlags();
-            flags.setFinal(true);
-            return new FieldInstance ( "length", INT_, t, flags);
-          }
-      }
-      else if ( !( t instanceof ClassType))
-      {
-        throw new SemanticException("Field access valid only on reference types.");
-      }
-      type = (ClassType)t;
-      do 
-      {
-        for (Iterator i = type.getFields().iterator(); i.hasNext() ; )
-        {
-          fi = (FieldInstance)i.next();
-          if ( fi.getName().equals(name))
-          {
-            if ( isAccessible( type, fi.getAccessFlags(), context))
-            {
-              return fi;
-            }
-            throw new SemanticException(" Field \"" + name + "\" found in \"" + 
-                                         type.getFullName() + 
-                                         "\", but with wrong access permissions.");
-          }
-        }
-      }
-      while ( (type = (ClassType)type.getSuperType()) != null);
-      throw new SemanticException( "Field \"" + name + "\" not found in context"
-                                    + t.getTypeString() );
+      throw new InternalCompilerError("getField called with null type");
     }
-    else // type == null, ==> no starting point. so check superclasses as well as enclosing classes.
+
+    if ( !( t instanceof ReferenceType))
     {
-      // check ourselves, first. this is because if a field is in this class, it cannot be ambiguous
-      for (Iterator i = context.inClass.getFields().iterator(); i.hasNext(); )
-      {
-        fi = (FieldInstance)i.next();
-        if (fi.getName().equals(name))
-          // found it. can stop looking since guaranteed that it is not ambiguous
-          return fi;
-      }
-      fi = null;
-
-      // check the lineage of where we are
-      try {  fi = getField( context.inClass, name, context); }
-      catch ( SemanticException tce) { /* must have been something we couldnt access */ }
-
-      boolean bFound = (fi != null);
-      
-      // now check all enclosing classes (this will also look for conflicts)
-      tEnclosing = context.inClass.getContainingClass();
-      while (tEnclosing != null)
-      {
-        try { fiTemp = getField(tEnclosing, name, context); }
-        catch (SemanticException tce ) { /* must have been something we couldn't access */ }
-
-        if (bFound && fiTemp != null)
-        {
-          throw new SemanticException("Ambiguous reference to field \"" + name + "\"");
-        }
-        else if (fiTemp != null)
-        {
-          fi = fiTemp;
-          bFound = true;
-        }
-        tEnclosing = tEnclosing.getContainingClass();
-      }
-      if ( fi != null && fiEnclosing != null)
-      {
-        throw new SemanticException("Ambiguous reference to field \"" + name + "\"");
-      }
+      throw new SemanticException("Field access valid only on reference types.");
     }
-    if ( fi!= null) return fi;
-    if ( fiEnclosing != null) return fiEnclosing;
-
-
-    // still no dice. check for a name like: {class}.{static_member}+.*
-    ClassType result = null;
-    String prefix = TypeSystem.getFirstComponent(name);
-    String rest = TypeSystem.removeFirstComponent(name);
-    
-    try
+    type = (ReferenceType)t;
+    do 
     {
-      result = (ClassType)checkAndResolveType(new AmbiguousType(this, prefix),
-                                              context);
-    }
-    catch( SemanticException e) {}
-
-    while (result == null && rest.length() > 0) {
-      prefix = prefix + "." + TypeSystem.getFirstComponent(rest);
-      rest = TypeSystem.removeFirstComponent(rest);
-      try {
-	result = resolver.findClass(prefix);
-      } catch (NoClassException e) {}
-    }
-    if (result == null)
-      throw new SemanticException( "Field \"" + name + "\" not found");
-    // ah ha! we have a type. to work against.
-    if (rest.length() == 0)
-      throw new SemanticException( "Field \"" + name + "\" not found");
-
-    // We must make sure this class is clean before we start looking for 
-    // fields in it and its supertypes.
-    try {
-      if( !cleaner.cleanClass( result)) {
-        throw new SemanticException( "Field \"" + name + "\" not found.");
+      for (Iterator i = type.getFields().iterator(); i.hasNext() ; )
+      {
+	fi = (FieldInstance)i.next();
+	if ( fi.getName().equals(name))
+	{
+	  if ( isAccessible( type, fi.getAccessFlags(), context))
+	  {
+	    return fi;
+	  }
+	  throw new SemanticException(" Field \"" + name + "\" found in \"" + 
+				       type.getTypeString() + 
+				       "\", but with wrong access permissions.");
+	}
       }
     }
-    catch( java.io.IOException e)
-    {
-      throw new SemanticException( "Field \"" + name + "\" not found.");
-    }
-
-    return getField ( result, rest, context );
-    
+    while ( (type = (ReferenceType)type.getSuperType()) != null);
+    throw new SemanticException( "Field \"" + name + "\" not found in context "
+				  + t.getTypeString() );
   }
 
  /**
@@ -731,16 +604,28 @@ public class StandardTypeSystem extends TypeSystem {
    * context.  If no such field may be found, returns a fieldmatch
    * with an error explaining why. Considers accessflags.
    **/
-  public MethodTypeInstance getMethod(ClassType type, MethodType method, 
-                                      Context context)
+  public MethodTypeInstance getMethod(Type t, MethodType method, 
+                                      LocalContext context)
     throws SemanticException
   {
+    if (t == null)
+    {
+      throw new InternalCompilerError("getMethod called with null type");
+    }
+
+    if ( !( t instanceof ReferenceType))
+    {
+      throw new SemanticException("Method access valid only on reference types.");
+    }
+
+    ReferenceType type = (ReferenceType) t;
+
     List lAcceptable = new java.util.ArrayList();
     getMethodSet ( lAcceptable, type, method, context);
     
     if (lAcceptable.size() == 0)
       throw new SemanticException ( "No valid method call found for \"" + 
-                                     method.getName() + "\".");
+                                     method.getName() + "\" in "+ t + ".");
 
     // now, use JLS 15.11.2.2
     Object [] mtiArray = lAcceptable.toArray(  );
@@ -751,15 +636,17 @@ public class StandardTypeSystem extends TypeSystem {
     // (if we did, it would be in the 0th index.
     for ( int i = 1 ; i < mtiArray.length; i++)
     {
-      if (msc.compare ( mtiArray[0], mtiArray[i]) == 1)
+      if (msc.compare ( mtiArray[0], mtiArray[i]) > 0)
         throw new SemanticException("Ambiguous method \"" + method.getName() 
                                      + "\". More than one invocations are valid"
-                                     + " from this context.");
+                                     + " from this context:"
+				     + java.util.Arrays.asList(mtiArray));
     }
     
     // ok. mtiArray[0] is maximal most specific, so return it.
     return (MethodTypeInstance)mtiArray[0];
   }
+
   /** 
    * Class to handle the comparisons; dispactes to moreSpecific method. 
    * <p> Should really be an anonymous class, but isn't because the jltools
@@ -772,74 +659,81 @@ public class StandardTypeSystem extends TypeSystem {
       if ( !( o1 instanceof MethodTypeInstance ) ||
            !( o2 instanceof MethodTypeInstance ))
         throw new ClassCastException();
-      return moreSpecific ( (MethodTypeInstance)o1, (MethodTypeInstance)o2) ?
-        -1 : 1;
+      MethodTypeInstance mti1 = (MethodTypeInstance)o1;
+      MethodTypeInstance mti2 = (MethodTypeInstance)o2;
+
+      if (moreSpecific (mti1, mti2))
+	return -1;
+
+      if (moreSpecific (mti2, mti1))
+	return 1;
+
+      // otherwise equally maximally specific
+
+      // JLS2 15.12.2.2 "two or more maximally specific methods"
+      // if both abstract or not abstract, equally applicable
+      // otherwise the non-abstract is more applicable
+      if (mti1.getAccessFlags().isAbstract() ==
+	  mti2.getAccessFlags().isAbstract())
+	return 0;
+      else if (mti1.getAccessFlags().isAbstract())
+	return 1;
+      else
+	return -1;
     }
   }
 
 
   /**
    * populates the list lAcceptible with those MethodTypeInstances which are 
-   * Applicable and Accesable as defined by JLS 15.11.2.1
+   * Applicable and Accessible as defined by JLS 15.11.2.1
    */
-  private void getMethodSet(List lAcceptable, ClassType type, MethodType method, 
-                            Context context)
+  private void getMethodSet(List lAcceptable, ReferenceType type, MethodType method, 
+                            LocalContext context)
     throws SemanticException
   {
-    MethodTypeInstance mti = null, mtiEnclosing = null, mtiTemp = null;
-    ClassType tEnclosing = null;
+    MethodTypeInstance mti = null;
 
-    if (type != null) 
+    if (type == null)
     {
-      // then we have a starting point. don't have to perform a 2d search
-      do 
-      {
-        for (Iterator i = type.getMethods().iterator(); i.hasNext() ; )
-        {
-          mti = (MethodTypeInstance)i.next();
-          if ( methodCallValid( mti, method))
-          {
-            if ( isAccessible( type, mti.getAccessFlags(), context))
-            {
-              lAcceptable.add (mti);
-            }
-          }
-        }
-      }
-      while ( (type = (ClassType)type.getSuperType()) != null);
-      mti = null;
+      throw new InternalCompilerError(
+	"getMethodSet called with null reference type");
     }
-    else
+
+    LinkedList typeQueue = new LinkedList();
+    Set visitedTypes = new HashSet();
+    typeQueue.addLast(type);
+
+    while (!typeQueue.isEmpty())
     {
-      // type == null, ==> no starting point. so check superclasses as 
-      //   well as enclosing classes. check ourselves, first. this is because 
-      //   if a field is in this class, it cannot be ambiguous
-      for (Iterator i = context.inClass.getMethods().iterator(); i.hasNext(); )
+      type = (ReferenceType)typeQueue.removeFirst();
+      if (visitedTypes.contains(type))
+	continue;
+      // System.out.println("collecting methods of " + type.getTypeString());
+      for (Iterator i = type.getMethods().iterator(); i.hasNext() ; )
       {
-        mti = (MethodTypeInstance)i.next();
-        if (methodCallValid(mti, method))
-        {
-          // found it. Add it.
-          lAcceptable.add ( mti );
-        }
+	mti = (MethodTypeInstance)i.next();
+	if ( methodCallValid( mti, method))
+	{
+	  if ( isAccessible( type, mti.getAccessFlags(), context))
+	  {
+	    lAcceptable.add (mti);
+	  }
+	}
       }
 
-      // check the parent lineage of where we are
-      try {  getMethodSet( lAcceptable, context.inClass, method, context); }
-      catch ( SemanticException tce) 
-      { /* must have been something we couldnt access */ }
-
-      // now check all enclosing classes (this will also look for conflicts)
-      tEnclosing = context.inClass.getContainingClass();
-      while (tEnclosing != null)
-      {
-        try { getMethodSet(lAcceptable, tEnclosing, method, context); }
-        catch (SemanticException tce ) 
-        { /* must have been something we couldn't access */ }
-        tEnclosing = tEnclosing.getContainingClass();
+      visitedTypes.add(type);
+      if (type.getSuperType() != null)
+	typeQueue.addLast(type.getSuperType());
+      for (Iterator i = type.getInterfaces().iterator(); i.hasNext() ; ) {
+	Object iface = i.next();
+	if (iface != null)
+	  typeQueue.addLast(iface);
       }
 
     }
+
+    // System.out.println("done collecting methods");
   }
 
   /**
@@ -850,17 +744,30 @@ public class StandardTypeSystem extends TypeSystem {
    * info regarding java 1.2, so all inner class rules are found empirically
    * using jikes and javac.
    */
+  /**
+   * Note: java 1.2 rule is described in JLS2 in section 15.12.2.2
+   */
   private boolean moreSpecific(MethodTypeInstance mti1, MethodTypeInstance mti2)
   {
     try
     {
       // rule 1:
-      if ( ! (mti1.getEnclosingType().descendsFrom ( mti2.getEnclosingType()) ||
-              mti1.getEnclosingType().equals ( mti2.getEnclosingType()) ||
-              isEnclosed ( mti1.getEnclosingType(), mti2.getEnclosingType())))
-        return false;
+      ReferenceType t1 = mti1.getEnclosingType();
+      ReferenceType t2 = mti2.getEnclosingType();
+
+      if (t1 instanceof ClassType && t2 instanceof ClassType) {
+	if ( ! (t1.descendsFrom(t2) || t1.equals(t2) ||
+		isEnclosed((ClassType) t1, (ClassType) t2)))
+	  return false;
+      }
+      else {
+	if ( ! (t1.descendsFrom(t2) || t1.equals(t2)))
+	  return false;
+      }
+
       // rule 2:
-      return ( methodCallValid ( mti2, mti1) );
+      return methodCallValid ( mti2, mti1) ;
+
     }
     catch (SemanticException tce)
     {
@@ -869,18 +776,33 @@ public class StandardTypeSystem extends TypeSystem {
   }
 
   /**
+   * Returns the ConstructorTypeInstance correpsonding to the
+   *   constructor call for the given class on the given args
+   */
+  public MethodTypeInstance getConstructor(ClassType clazz, List args,
+					   LocalContext context)
+    throws SemanticException
+  {
+    return context.getMethod(clazz,
+			     new ConstructorType(context.getTypeSystem(),
+						 clazz, args));
+  }
+					   
+
+
+  /**
    * Returns the supertype of type, or null if type has no supertype.
    **/
-  public ClassType getSuperType(ClassType type) throws SemanticException
+  public ReferenceType getSuperType(ReferenceType type) throws SemanticException
   {
-    return (ClassType)type.getSuperType();
+    return (ReferenceType)type.getSuperType();
   }
 
   /**
    * Returns an immutable list of all the interface types which type
    * implements.
    **/
-  public List getInterfaces(ClassType type) throws SemanticException
+  public List getInterfaces(ReferenceType type) throws SemanticException
   {
     return type.getInterfaces();
   }
@@ -946,17 +868,23 @@ public class StandardTypeSystem extends TypeSystem {
                                         ((PrimitiveType) type1).getKind(), 
                                         ((PrimitiveType) type2).getKind() ));
     }
-    
-    if ( ( type1 instanceof ClassType ) || (type1 instanceof ArrayType) &&
-         ( type2 instanceof NullType))
-      return type1;
-    if ( ( type2 instanceof ClassType ) || (type2 instanceof ArrayType) &&
-         ( type1 instanceof NullType))
-      return type2;
 
+    if ( ( type1 instanceof ArrayType ) && ( type2 instanceof ArrayType ) ) {
+	ArrayType t1 = (ArrayType) type1;
+	ArrayType t2 = (ArrayType) type2;
+
+	Type base = leastCommonAncestor(t1.getBaseType(), t2.getBaseType());
+
+	return new ArrayType(this, base);
+    }
     
-    if (!( type1 instanceof ClassType) ||
-        !( type2 instanceof ClassType)) {
+    if ( ( type1 instanceof ReferenceType ) && ( type2 instanceof NullType))
+      return type1;
+    if ( ( type2 instanceof ReferenceType ) && ( type1 instanceof NullType))
+      return type2;
+    
+    if (!( type1 instanceof ReferenceType) ||
+        !( type2 instanceof ReferenceType)) {
       throw new SemanticException( 
                        "No least common ancestor found. The type \"" 
                        + type1.getTypeString() + 
@@ -964,12 +892,12 @@ public class StandardTypeSystem extends TypeSystem {
                        + type2.getTypeString() + "\"."); 
     }
     
-    ClassType tSuper = (ClassType)type1;
+    ReferenceType tSuper = (ReferenceType)type1;
     
     while ( ! ( type2.descendsFrom ( tSuper ) ||
                 type2.equals( tSuper )) &&
             tSuper != null) {
-      tSuper = (ClassType)tSuper.getSuperType();
+      tSuper = (ReferenceType)tSuper.getSuperType();
     }
 
     if ( tSuper == null) {
@@ -1056,6 +984,8 @@ public class StandardTypeSystem extends TypeSystem {
   public Type getError() { return ERROR_; }
   public Type getException() { return EXCEPTION_; }
   public Type getRTException() { return RTEXCEPTION_; }
+  public Type getCloneable() { return CLONEABLE_; }
+  public Type getSerializable() { return SERIALIZABLE_; }
 
   protected final Type NULL_    = new NullType(this);
   protected final Type VOID_    = new PrimitiveType(this, PrimitiveType.VOID);
@@ -1086,25 +1016,29 @@ public class StandardTypeSystem extends TypeSystem {
    * is the provided string.  This type may not correspond to a valid
    * class.
    **/
-  public AmbiguousType getTypeWithName(String name) {
-    return new AmbiguousType(this, name);
+  public Type getTypeWithName(String name) {
+    return new AmbiguousNameType(this, name);
   }
+
   /**
    * Returns a type identical to <type>, but with <dims> more array
    * dimensions.  If dims is < 0, array dimensions are stripped.
    **/
   public Type extendArrayDims(Type type, int dims) {
-    Type base = type;
-    int newDims = dims;
-    if (type instanceof ArrayType) {
-      ArrayType t = (ArrayType) type;
-      base = t.getBaseType();
-      newDims += t.getDimensions();
+    if (dims == 0) {
+	return type;
     }
-    if (newDims == 0) 
-      return base;
-    else
-      return new ArrayType(this, base, newDims); // May throw error.
+    else if (dims < 0) {
+	if (type instanceof ArrayType) {
+	  return extendArrayDims(((ArrayType) type).getBaseType(), dims+1);
+	}
+	else {
+	  throw new InternalCompilerError("Cannot strip dimensions of non-array type " + type.getTypeString());
+	}
+    }
+    else {
+	return new ArrayType(this, type, dims);
+    }
   }
 
   /**
@@ -1143,11 +1077,26 @@ public class StandardTypeSystem extends TypeSystem {
       return DOUBLE_;
     }
     else if( clazz.isArray()) {
-      return new ArrayType( this, typeForClass( clazz.getComponentType()), 1);
+      return new ArrayType( this, typeForClass( clazz.getComponentType()));
     }
     else {
       return resolver.findClass(clazz.getName());
     }
   }
-}
 
+  public TypeContext getEmptyContext(ClassResolver resolver) {
+    return new EmptyContext(this, resolver);
+  }
+
+  public TypeContext getClassContext(ClassResolver resolver, ClassType type) throws SemanticException {
+    return new ClassContext(resolver, type);
+  }
+
+  public TypeContext getPackageContext(ClassResolver resolver, PackageType type) throws SemanticException {
+    return new PackageContext(resolver, type);
+  }
+
+  public TypeContext getPackageContext(ClassResolver resolver, String name) throws SemanticException {
+    return new PackageContext(resolver, new PackageType(this, name));
+  }
+}

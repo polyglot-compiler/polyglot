@@ -10,7 +10,6 @@ import java.io.IOException;
 
 public class SymbolReader extends NodeVisitor
 {
-  protected ClassResolver systemResolver;
   protected TableClassResolver currentResolver;
 
   protected Target target;
@@ -24,12 +23,12 @@ public class SymbolReader extends NodeVisitor
   protected String packageName;
   protected ImportTable it;
 
-  public SymbolReader( ClassResolver systemResolver, 
+  public SymbolReader( ImportTable it,
                        TableClassResolver currentResolver, 
                        Target target, TargetFactory tf,
                        TypeSystem ts, ErrorQueue eq)
   {
-    this.systemResolver = systemResolver;
+    this.it = it;
     this.currentResolver = currentResolver;
 
     this.target = target;
@@ -44,34 +43,85 @@ public class SymbolReader extends NodeVisitor
   {
     try
     {
+      // System.out.println(indent() + "override " + n);
       return n.readSymbols( this);
     }
     catch( SemanticException e)
     {
       eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
-                  Annotate.getLineNumber( n));
+		  Annotate.getLineNumber( n));
       return n;
     }
   }
 
-  public ParsedClassType pushClass( String name)
+/*
+  public NodeVisitor enter(Node n)
+  {
+    System.out.println(indent() + "enter " + n); indent++;
+    return this;
+  }
+
+  public Node leave(Node old, Node n, NodeVisitor v)
+  {
+    indent--; System.out.println(indent() + "leave " + n);
+    return n;
+  }
+
+  int indent = 0;
+
+  String indent() {
+    String s = "";
+    for (int i = 0; i < indent; i++) s += " ";
+    return s;
+  }
+*/
+
+  protected ParsedClassType newParsedClassType() {
+    return new ParsedClassType( ts, current);
+  }
+
+  public ParsedClassType pushClass( String name,
+				    boolean isLocal, boolean isAnonymous)
   {
     String fullName;
     ParsedClassType newClass;
 
-    newClass = new ParsedClassType( ts, current);
+    newClass = newParsedClassType();
 
     if( current == null) {
+      if (isLocal || isAnonymous) {
+	throw new InternalCompilerError(	
+	    "Top-level class cannot be local or anonymous");
+      }
       fullName = (packageName == null ? "" : 
                                 packageName + ".") + name;
     }
     else {
-      fullName = current.getFullName() + "." + name;
+      if (isLocal || isAnonymous) {
+	String prefix = isLocal ? "$Local$" : "$Anonymous$";
+	int i = 1;
+	String suffix;
+	do {
+	  suffix = prefix + i + "." + name;
+	  i++;
+	} while (current.getInnerNamed(suffix) != null);
+	fullName = current.getFullName() + "." + suffix;
+      }
+      else {
+	fullName = current.getFullName() + "." + name;
+      }
       current.addInnerClass( newClass);
     }
 
     newClass.setFullName( fullName);
     newClass.setShortName( name);
+    if (packageName != null)
+      newClass.setPackageName( packageName);
+
+    newClass.setInner(current != null);
+    newClass.setIsLocal(isLocal);
+    newClass.setIsAnonymous(isAnonymous);
+
     currentResolver.addClass( fullName, newClass);
 
     current = newClass;
@@ -92,7 +142,6 @@ public class SymbolReader extends NodeVisitor
   public void setPackageName( String packageName) throws SemanticException
   {
     this.packageName = packageName;
-    this.it = new ImportTable( systemResolver, true, eq);
 
     it.addPackageImport("java.lang");
     if( packageName != null) {

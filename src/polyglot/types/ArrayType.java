@@ -1,14 +1,18 @@
 package jltools.types;
 
+import java.util.*;
+
 /**
  * An <code>ArrayType</code> represents an array of base java types.
  */
-public class ArrayType extends Type 
+public class ArrayType extends ReferenceType 
 {
   static final long serialVersionUID = -2145638221364361658L;
 
   protected Type base;
-  protected int dims;
+  protected List fields;
+  protected List methods;
+  protected List interfaces;
 
   protected ArrayType()
   {
@@ -16,18 +20,39 @@ public class ArrayType extends Type
   }
 
   public ArrayType(TypeSystem ts, Type baseType, int dims) 
-  { 
+  {
     super( ts);
     if (dims <= 0) 
       throw new Error("Tried to create ArrayType with <=0 dimensions");
-    if (baseType instanceof ArrayType) {
-      ArrayType baseArray = (ArrayType) baseType;
-      base = baseArray.base;
-      this.dims = dims + baseArray.dims;
-    } else {
-      base = baseType;
-      this.dims = dims;
+    if (dims > 1) {
+      base = new ArrayType(ts, baseType, dims - 1);
     }
+    else {
+      base = baseType;
+    }
+
+    AccessFlags cloneFlags = new AccessFlags();
+    cloneFlags.setPublic(true);
+
+    methods = new ArrayList(1);
+    methods.add(new MethodTypeInstance(ts, this, "clone",
+	ts.getObject(), new LinkedList(), new LinkedList(), cloneFlags));
+
+    AccessFlags lengthFlags = new AccessFlags();
+    lengthFlags.setFinal(true);
+    lengthFlags.setPublic(true);
+
+    fields = new ArrayList(1);
+    fields.add(new FieldInstance("length", ts.getInt(), this, lengthFlags));
+
+    interfaces = new ArrayList(2);
+    interfaces.add(ts.getCloneable());
+    interfaces.add(ts.getSerializable());
+  }
+
+  public ArrayType(TypeSystem ts, Type baseType)
+  {
+    this( ts, baseType, 1);
   }
 
   public Type getBaseType() 
@@ -35,29 +60,19 @@ public class ArrayType extends Type
     return base;
   }
   
-  public int getDimensions() 
-  {
-    return dims;
-  }
-  
   public String getTypeString() {
     StringBuffer sb = new StringBuffer();
     sb.append(base.getTypeString());
-    for(int i = 0; i < dims; i++) {
-      sb.append("[]");
-    }
+    sb.append("[]");
     return sb.toString();
   }
 
-    public String translate() {
-	StringBuffer sb = new StringBuffer();
-	sb.append(base.translate());
-	for(int i = 0; i < dims; i++) {
-	    sb.append("[]");
-	}
-	return sb.toString();
-    }
-	
+  public String translate(LocalContext c) {
+      StringBuffer sb = new StringBuffer();
+      sb.append(base.translate(c));
+      sb.append("[]");
+      return sb.toString();
+  }
 
   public boolean isPrimitive() 
   {
@@ -70,7 +85,6 @@ public class ArrayType extends Type
   public boolean isClassType() { return false; }
   public boolean isArrayType() { return true; }
 
-
   public boolean isCanonical() 
   {
     return base.isCanonical();
@@ -81,12 +95,31 @@ public class ArrayType extends Type
     if (! (o instanceof ArrayType)) return false;
 
     ArrayType t = (ArrayType) o;
-    return t.dims == dims && getTypeSystem().isSameType(t.base, base);
+    return getTypeSystem().isSameType(t.base, base);
   }
   
   public int hashCode() 
   {
-    return base.hashCode() ^ (dims << 3);
+    return base.hashCode() << 1;
+  }
+
+  // Arrays override Object's "clone" method.
+  public List getMethods() {
+    return methods;
+  }
+
+  // Arrays have a public final int field named "length".
+  public List getFields() {
+    return fields;
+  }
+
+  public Type getSuperType() {
+    return ts.getObject();
+  }
+
+  // Arrays implement the Cloneable and Serializable interfaces.
+  public List getInterfaces() {
+    return interfaces;
   }
 }
 

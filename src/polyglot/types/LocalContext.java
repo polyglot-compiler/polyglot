@@ -10,16 +10,16 @@ import java.util.*;
  * A context to be used within the scope of a method body.  
  * It provides a convenient wrapper for the Type System.
  */
-public class LocalContext 
+public class LocalContext implements TypeContext
 {
   /**
-   * Resolve anything that we dont' know about to the type system
+   * Resolve anything that we don't know about to the type system
    */
   protected TypeSystem ts;
   /**
-   * Contains the stack of inner class tuples.
+   * Contains the stack of inner scopes.
    */
-  protected Stack /* of ClassTuple */ stkContexts;
+  protected Stack /* of Scopes */ scopes;
   /**
    * the import table for the file
    */
@@ -29,12 +29,6 @@ public class LocalContext
    */
   protected NodeVisitor visitor;
 
-  /** 
-   * Creates a LocalContext without a parent context (i.e, for a method 
-   * level block).  All unresolved queries are passed on to the TypeSystem.
-   * To do this, we'll also need the import table and what our enclosing 
-   * class is.
-   */
   public LocalContext( ImportTable itImports, TypeSystem ts,
                        NodeVisitor visitor) 
   {  
@@ -42,7 +36,9 @@ public class LocalContext
     this.ts = ts;
     this.visitor = visitor;
     
-    stkContexts = new Stack();
+    scopes = new Stack();
+
+    scopes.push(getTopScope());
   }
 
   /**
@@ -52,14 +48,20 @@ public class LocalContext
    */
   public boolean isDefinedLocally(String s)
   {
-    Stack blockStack =  ((ClassTuple)stkContexts.peek()).getBlockStack();
-    for (ListIterator i =blockStack.listIterator(blockStack.size()) ; 
-         i.hasPrevious() ; )
-    {
-      Hashtable ht = (Hashtable) i.previous();
-      if ( ht.get( s ) != null )
-        return true; 
+    ListIterator iter = scopes.listIterator(scopes.size());
+
+    while (iter.hasPrevious()) {
+	Scope scope = (Scope) iter.previous();
+	if (scope instanceof BlockScope) {
+	  if (scope.getVariable(s) != null || scope.getType(s) != null) {
+	    return true;
+	  }
+	}
+	else {
+	  break;
+	}
     }
+
     return false;
   }
 
@@ -67,75 +69,184 @@ public class LocalContext
    * Gets the methodMatch with name with "name" and a list of argument 
    * types "argumentTypes" against Type "type". type may be null; 
    */
-  public MethodTypeInstance getMethod( ClassType type, String methodName, 
-                                       List argumentTypes) 
+  public MethodTypeInstance getMethod(ReferenceType type, String methodName, List argumentTypes) 
     throws SemanticException
   {
+    if (type == null) {
+      ListIterator iter = scopes.listIterator(scopes.size());
+
+      while (iter.hasPrevious()) {
+	  Scope scope = (Scope) iter.previous();
+	  type = (ReferenceType) scope.getMethodEnclosingType(methodName);
+	  if (type != null) {
+	    break;
+	  }
+      }
+
+      if (type == null) {
+new SemanticException("Method " + methodName + " not found").printStackTrace(System.out);
+	throw new SemanticException("Method " + methodName + " not found");
+      }
+    }
+
     return ts.getMethod( type, 
                          new MethodType( ts, methodName, argumentTypes), 
-                         ((ClassTuple)stkContexts.peek()).getContext() ); 
+			 this );
   }
 
   /**
    * Gets the methodMatch with name with of a MethodNode m on object t 
    * type may be null; 
    */
-  public MethodTypeInstance getMethod( ClassType t, MethodType m) 
+  public MethodTypeInstance getMethod( ReferenceType t, MethodType m) 
     throws SemanticException
   {
-    return ts.getMethod( t, m, 
-                         ((ClassTuple)stkContexts.peek()).getContext() );
+    return ts.getMethod( t, m, this );
   }
   
   /**
-   * Gets a field matched against a particular type
+   * Gets a local of a particular name.
    */  
-  public FieldInstance getField( Type type, String fieldName) 
+  public LocalInstance getLocal(String fieldName) throws SemanticException
+  {
+    ListIterator iter = scopes.listIterator(scopes.size());
+
+    while (iter.hasPrevious()) {
+      Scope scope = (Scope) iter.previous();
+      VariableInstance var = scope.getVariable(fieldName);
+      if (var != null) {
+        if (var instanceof LocalInstance) {
+	  return (LocalInstance) var;
+	}
+	else {
+	  break;
+	}
+      }
+    }
+
+    throw new SemanticException("Local " + fieldName + " not found");
+  }
+
+  /**
+   * Gets a local or field of a particular name.
+   */  
+  public VariableInstance getVariable(String fieldName) throws SemanticException
+  {
+    ListIterator iter = scopes.listIterator(scopes.size());
+
+    while (iter.hasPrevious()) {
+      Scope scope = (Scope) iter.previous();
+      VariableInstance var = scope.getVariable(fieldName);
+      if (var != null) {
+	return var;
+      }
+    }
+
+    throw new SemanticException("Field or local " + fieldName + " not found");
+  }
+
+  public ClassType getFieldContainingClass(String fieldName)
     throws SemanticException
   {
-    Object result;
-    Stack blockStack =  ((ClassTuple)stkContexts.peek()).getBlockStack();
-    if ( type == null ) // could be a local, so check there first.
-    {
-      for (ListIterator i = blockStack.listIterator(blockStack.size()) ; 
-           i.hasPrevious() ; )
-      {
-        if ((result = ((Hashtable) i.previous()).get( fieldName )) != null)
-        {
-          return (FieldInstance)result;
-        }
-      }      
+    boolean found = false;
+
+    ListIterator iter = scopes.listIterator(scopes.size());
+
+    while (iter.hasPrevious()) {
+      Scope scope = (Scope) iter.previous();
+
+      if (! found) {
+	VariableInstance var = scope.getVariable(fieldName);
+	if (var != null) {
+	  found = true;
+	}
+      }
+
+      if (found) {
+	if (scope instanceof ClassScope) {
+	  return ((ClassScope) scope).getClassType();
+	}
+      }
     }
-    // not a local variable, so pass on to the type system.
-    return ts.getField(type, fieldName, 
-                       ((ClassTuple)stkContexts.peek()).getContext());
+
+    throw new SemanticException("Field or local " + fieldName + " not found");
+  }
+
+  /**
+   * Gets a field of a particular name.
+   */  
+  public FieldInstance getField(String fieldName) throws SemanticException
+  {
+    ListIterator iter = scopes.listIterator(scopes.size());
+
+    while (iter.hasPrevious()) {
+      Scope scope = (Scope) iter.previous();
+      VariableInstance var = scope.getVariable(fieldName);
+      if (var != null) {
+        if (var instanceof FieldInstance) {
+	  return (FieldInstance) var;
+	}
+	else {
+	  break;
+	}
+      }
+    }
+
+    throw new SemanticException("Field " + fieldName + " not found");
   }
 
   /**
    * If <type> is a valid type in the given context, returns a
    * canonical form of that type.  
    **/
-  public Type getType( Type type ) throws SemanticException
-  {
-    return ts.checkAndResolveType(type, 
-                     ((ClassTuple)stkContexts.peek()).getContext());
+  public Type getType( Type type ) throws SemanticException {
+    return ts.checkAndResolveType( type, this );
   }
 
   /**
    * Finds the definition of a particular type
    */
-  public Type getType( String s) throws SemanticException
-  {
-    return ts.checkAndResolveType( new AmbiguousType( ts, s), 
-                         ((ClassTuple)stkContexts.peek()).getContext());
+  public Type getType(String name) throws SemanticException {
+    ListIterator iter = scopes.listIterator(scopes.size());
+
+    while (iter.hasPrevious()) {
+      Scope scope = (Scope) iter.previous();
+      Type type = scope.getType(name);
+      if (type != null) {
+// System.out.println(scope.toString() + ": " + name + " -> " + type + " " + type.getTypeString());
+	return type;
+      }
+    }
+
+    throw new SemanticException("Type " + name + " not found");
   }
-  
+
   /**
    * Returns the current type system
    */
   public TypeSystem getTypeSystem()
   {
     return ts;
+  }
+
+  protected TopScope getTopScope()
+  {
+    return new JavaTopScope();
+  }
+
+  protected ClassScope getClassScope(ClassType c)
+  {
+    return new JavaClassScope(c);
+  }
+
+  protected BlockScope getBlockScope()
+  {
+    return new JavaBlockScope();
+  }
+
+  protected MethodScope getMethodScope(MethodTypeInstance m)
+  {
+    return new JavaMethodScope(m);
   }
 
   /**
@@ -145,11 +256,57 @@ public class LocalContext
   {
     if ( c == null)
       throw new InternalCompilerError("Tried to push a null class.");
-    stkContexts.push ( new ClassTuple ( 
-                      new TypeSystem.Context ( itImports, c, null) ));
     if ( c.getSuperType() instanceof AmbiguousType)
-      throw new InternalCompilerError("Tried to push a class with an ambiguous " +
-                                      "supertype.");
+      throw new InternalCompilerError("Tried to push a class with an " +
+				      "ambiguous supertype: \"" +
+				      c.getSuperType().getTypeString() + "\".");
+
+    ClassScope scope = getClassScope(c);
+    scopes.push( scope );
+
+    LinkedList typeQueue = new LinkedList();
+    Set visitedTypes = new HashSet();
+    typeQueue.addLast(c);
+
+    while (!typeQueue.isEmpty()) {
+      c = (ClassType)typeQueue.removeFirst();
+      if (visitedTypes.contains(c))
+	continue;
+
+	for (Iterator iter = c.getMethods().iterator(); iter.hasNext(); ) {
+	    MethodTypeInstance mti = (MethodTypeInstance) iter.next();
+	    if (scope.getMethodEnclosingType(mti.getName()) == null) {
+	      scope.putMethodEnclosingType(mti.getName(), c);
+	    }
+	}
+	for (Iterator iter = c.getFields().iterator(); iter.hasNext(); ) {
+	    FieldInstance fi = (FieldInstance) iter.next();
+	    if (scope.getVariable(fi.getName()) == null) {
+	      scope.putVariable(fi.getName(), fi);
+	    }
+	}
+	for (Iterator iter = c.getInnerClasses().iterator(); iter.hasNext(); ) {
+	    ClassType t = (ClassType) iter.next();
+	    if (! t.isLocal() && ! t.isAnonymous()) {
+	      if (scope.getType(t.getShortName()) == null) {
+		scope.putType(t.getShortName(), t);
+	      }
+	    }
+	}
+
+	if (scope.getType(c.getShortName()) == null) {
+	  scope.putType(c.getShortName(), c);
+	}
+
+	visitedTypes.add(c);
+	if (c.getSuperType() != null)
+	  typeQueue.addLast(c.getSuperType());
+	for (Iterator i = c.getInterfaces().iterator(); i.hasNext(); ) {
+	  Object iface = i.next();
+	  if (iface != null)
+	    typeQueue.addLast(iface);
+	}
+    }
   }
 
   /**
@@ -157,14 +314,36 @@ public class LocalContext
    */
   public void popClass()
   {
-    if ( stkContexts.size() >= 1)
-    {
-      try { stkContexts.pop(); }
-      catch (EmptyStackException ese ) { }
+    try {
+      if (scopes.peek() instanceof ClassScope) {
+	ClassScope classScope = (ClassScope) scopes.pop();
+
+	// Handle local classes -- insert in new innermost scope after
+	// we've processed the class body.
+	if (classScope.getClassType().isLocal() &&
+	    ! classScope.getClassType().isAnonymous()) {
+	  try {
+	    Scope top = (Scope) scopes.peek();
+	    if (! (top instanceof BlockScope)) {
+	      throw new InternalCompilerError("Local class not in block scope: " + top);
+	    }
+	    else {
+	      ((BlockScope) top).putType(
+			classScope.getClassType().getShortName(),
+			classScope.getClassType());
+	    }
+	  }
+	  catch (EmptyStackException ese ) { 
+	    throw new InternalCompilerError("Local class found in top scope");
+	  }
+	}
+      }
+      else {
+	  throw new InternalCompilerError("Top scope is not a class scope");
+      }
     }
-    else
-    {
-      throw new InternalCompilerError("No more class-scopes to pop!");
+    catch (EmptyStackException ese ) { 
+      throw new InternalCompilerError("No more class scopes to pop");
     }
   }
 
@@ -173,10 +352,7 @@ public class LocalContext
    */
   public void pushBlock()
   {
-    if ( stkContexts.size() < 1)
-      throw new InternalCompilerError("Can't push block since not " 
-                                      + "in a class.");
-    ((ClassTuple)stkContexts.peek()).pushBlock();
+    scopes.push( getBlockScope() );
   }
 
   /**
@@ -184,10 +360,17 @@ public class LocalContext
    */
   public void popBlock()
   {
-    if ( stkContexts.size() < 1)
-      throw new InternalCompilerError("Can't pop block since not " 
-                                      + "in a class.");
-    ((ClassTuple)stkContexts.peek()).popBlock();
+    try {
+      if (scopes.peek() instanceof BlockScope) {
+	  scopes.pop();
+      }
+      else {
+	  throw new InternalCompilerError("Top scope is not a block scope!");
+      }
+    }
+    catch (EmptyStackException ese ) { 
+      throw new InternalCompilerError("No more block scopes to pop!");
+    }
   }
 
   /**
@@ -195,21 +378,24 @@ public class LocalContext
    */
   public void enterMethod(MethodTypeInstance mti)
   {
-    if ( stkContexts.size() < 1)
-      throw new InternalCompilerError("Can't enter function since " 
-                                      + "not currently in a class.");
-    ((ClassTuple)stkContexts.peek()).enterMethod(mti);
+    scopes.push( getMethodScope(mti) );
   }
 
   /**
    * leaves a method
    */
-  public void leaveMethod()
-  {
-    if ( stkContexts.size() < 1)
-      throw new InternalCompilerError("Can't leave function "
-                                      + "since not currently in a class.");
-    ((ClassTuple)stkContexts.peek()).leaveMethod();
+  public void leaveMethod() {
+    try {
+      if (scopes.peek() instanceof MethodScope) {
+	  scopes.pop();
+      }
+      else {
+	  throw new InternalCompilerError("Top scope is not a method scope!");
+      }
+    }
+    catch (EmptyStackException ese ) { 
+      throw new InternalCompilerError("No more method scopes to pop!");
+    }
   }
 
   /**
@@ -217,42 +403,81 @@ public class LocalContext
    */
   public MethodTypeInstance getCurrentMethod() 
   {
-    if ( stkContexts.size() < 1)
-      throw new InternalCompilerError("Can't pop block since not "
-                                      + " in a class.");
-    return ((ClassTuple)stkContexts.peek()).getMethod();
+    ListIterator iter = scopes.listIterator(scopes.size());
+
+    while (iter.hasPrevious()) {
+      Scope scope = (Scope) iter.previous();
+
+      if (scope instanceof MethodScope) {
+	MethodScope s = (MethodScope) scope;
+	return s.getMethod();
+      }
+    }
+
+    return null;
+    // throw new InternalCompilerError("Not in method scope");
+  }
+
+  /**
+   * Return true if in a method's scope and not in a local class within the
+   * innermost method.
+   */
+  public boolean inMethodScope() 
+  {
+    ListIterator iter = scopes.listIterator(scopes.size());
+
+    while (iter.hasPrevious()) {
+      Scope scope = (Scope) iter.previous();
+
+      if (scope instanceof MethodScope) {
+	return true;
+      }
+      if (scope instanceof ClassScope) {
+	return false;
+      }
+    }
+
+    return false;
   }
 
   /**
    * Gets current class
    */
-  public ClassType getCurrentClass()
-  {
-    if ( stkContexts.size() < 1)
-      throw new InternalCompilerError("Can't pop block since not " +
-                                      " in a class.");
-    return ((ClassTuple)stkContexts.peek()).getCurrentClass();
+  public ClassType getCurrentClass() {
+    ListIterator iter = scopes.listIterator(scopes.size());
+
+    while (iter.hasPrevious()) {
+      Scope scope = (Scope) iter.previous();
+
+      if (scope instanceof ClassScope) {
+	ClassScope s = (ClassScope) scope;
+	return s.getClassType();
+      }
+    }
+
+    return null;
+    // throw new InternalCompilerError("Not in class scope");
   }
 
   /**
    * Adds a symbol to the current scoping level
    */
-  public void addSymbol( String sName, FieldInstance fi) 
+  public void addSymbol( String name, VariableInstance vi) 
     throws SemanticException
   {
-    if ( stkContexts.size() < 1)
-      throw new InternalCompilerError("Can't pop block since not " 
-                                      + "in a class.");
-    Stack blockStack =  ((ClassTuple)stkContexts.peek()).getBlockStack();
-    if ( blockStack == null || blockStack.size() == 0)
-      throw new InternalCompilerError(" Can't add symbol since " 
-                                      + "not inside a method");
-    if ( ! ((Hashtable)blockStack.peek()).contains( sName ))
-      ((Hashtable)blockStack.peek()).put(sName, fi);
-    else
-      throw new SemanticException ( "Symbol \"" + sName + 
-                                     "\" already defined in this block.");
-
+    try {
+      Scope scope = (Scope) scopes.peek();
+      if (scope.getVariable(name) == null) {
+	scope.putVariable(name, vi);
+      }
+      else {
+	throw new SemanticException ( "Symbol \"" + name + 
+				       "\" already defined in this block.");
+      }
+    }
+    catch (EmptyStackException ese ) { 
+      throw new InternalCompilerError("Scope stack is empty!");
+    }
   }
 
   public NodeVisitor getVisitor()
@@ -260,65 +485,148 @@ public class LocalContext
     return visitor;
   }
 
-  class ClassTuple
-  {
-    // contains a stack of hashtables ( e.g. for blocking structures) 
-    // and a MethodTypeInstance giving the method that is currently 
-    // being processed, and the TypeSystem.context
+  protected interface Scope {
+    Type getType(String name);
+    void putType(String name, Type type);
 
-    Stack sBlocks;
-    MethodTypeInstance mti;
-    TypeSystem.Context context;
-    
-    ClassTuple (TypeSystem.Context c)
-    {
-      context = c;
-      sBlocks = new Stack();
-      mti = null;
-    }
-    
-    void pushBlock() 
-    {
-      if ( mti == null)
-      {
-        throw new InternalCompilerError("Cannot push blocks since "
-                                        + "MethodTypeInstance == null!");
-      }
-      sBlocks.push( new Hashtable () );
-    }
+    ReferenceType getMethodEnclosingType(String name);
+    void putMethodEnclosingType(String name, ReferenceType method);
 
-    void popBlock()
-    {
-      try { sBlocks.pop(); }
-      catch (EmptyStackException ese ) 
-      { 
-        throw new InternalCompilerError("Not enough blocks to pop.");
-      }
-    }
-    
-    void enterMethod(MethodTypeInstance mti)
-    {
-      this.mti = mti;
-      sBlocks = new Stack();
-      pushBlock();
-    }
-    
-    void leaveMethod()
-    {
-      if ( mti == null) 
-        throw new InternalCompilerError(" Cannot leave method, " 
-                                        + "since not in one.");
-      mti = null;
-      popBlock();
-    }
-    
-    Stack getBlockStack()  { return sBlocks; }
-
-    ClassType getCurrentClass() { return context.inClass; }
-
-    MethodTypeInstance getMethod()  { return mti; }
-    
-    TypeSystem.Context getContext() { return context;  }
+    VariableInstance getVariable(String name);
+    void putVariable(String name, VariableInstance var);
   }
 
+  protected interface TopScope extends Scope {
+  }
+
+  protected interface BlockScope extends Scope {
+  }
+
+  protected interface ClassScope extends Scope {
+    ClassType getClassType();
+  }
+
+  protected interface MethodScope extends Scope {
+    MethodTypeInstance getMethod();
+  }
+
+  protected abstract class HashScope implements Scope {
+    Map types;		// Map from name to type
+    Map methods;	// Map from name to class type enclosing the method
+			// (This isn't a map to the method type, since it
+			// could be overloaded)
+    Map variables;	// Map from name to variable instance
+
+    public HashScope() {
+	types = new HashMap();
+	methods = new HashMap();
+	variables = new HashMap();
+    }
+
+    public Type getType(String name) {
+	return (Type) types.get(name);
+    }
+
+    public void putType(String name, Type type) {
+	types.put(name, type);
+    }
+
+    public ReferenceType getMethodEnclosingType(String name) {
+	return (ReferenceType) methods.get(name);
+    }
+
+    public void putMethodEnclosingType(String name, ReferenceType method) {
+	methods.put(name, method);
+    }
+
+    public VariableInstance getVariable(String name) {
+	return (VariableInstance) variables.get(name);
+    }
+
+    public void putVariable(String name, VariableInstance var) {
+	variables.put(name, var);
+    }
+  }
+
+  protected class JavaBlockScope extends HashScope implements BlockScope {
+    public String toString() {
+	return "BlockScope";
+    }
+  }
+
+  protected class JavaMethodScope extends HashScope implements MethodScope {
+    private MethodTypeInstance mti;
+
+    public JavaMethodScope(MethodTypeInstance mti) {
+	this.mti = mti;
+    }
+
+    public MethodTypeInstance getMethod() {
+	return mti;
+    }
+
+    public String toString() {
+	return "MethodScope " + mti.getTypeString();
+    }
+  }
+
+  protected class JavaClassScope extends HashScope implements ClassScope {
+    private ClassType clazz;
+
+    public JavaClassScope(ClassType clazz) {
+	this.clazz = clazz;
+    }
+
+    public ClassType getClassType()
+    {
+	return clazz;
+    }
+
+    public String toString() {
+	return "ClassScope " + clazz.getTypeString();
+    }
+  }
+
+  protected class JavaTopScope implements TopScope {
+    public Type getType(String name) {
+	try {
+	  Type t = itImports.findClass(name);
+	  return t;
+	}
+	catch (SemanticException e2) {
+	  try {
+	    itImports.findPackage(name);
+	    Type t = new PackageType(ts, name);
+	    return t;
+	  }
+	  catch (NoClassException e) {
+	    return null;
+	  }
+	}
+    }
+
+    public void putType(String name, Type type) {
+	throw new InternalCompilerError("Cannot insert type in top scope");
+    }
+
+    public ReferenceType getMethodEnclosingType(String name) {
+	return null;
+    }
+
+    public void putMethodEnclosingType(String name, ReferenceType method) {
+	throw new InternalCompilerError("Cannot insert method in top scope");
+    }
+
+    public VariableInstance getVariable(String name) {
+	return null;
+    }
+
+    public void putVariable(String name, VariableInstance var) {
+	throw new InternalCompilerError("Cannot insert variable in top scope");
+    }
+
+    public String toString() {
+	return "TopScope";
+    }
+  }
 }

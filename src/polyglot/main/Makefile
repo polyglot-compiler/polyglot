@@ -1,14 +1,16 @@
+SOURCE = ../..
+PACKAGE = jltools.main
+SUBDIRS =
 
-ma_package	= jltools/main
-ma_codebase	= ../..
-ma_files 	= MainTargetFactory.java \
-		  Main.java
+SOURCES = \
+	Main.java \
+	MainTargetFactory.java
 
-MAIN_TARGET = $(patsubst %.java, $(ma_package)/%.class, $(ma_files))
+CLASSES = $(patsubst %.java, %.class, $(SOURCES))
 
-ifndef CALLED_FROM_PARENT
-all:	
-	cd ../.. && $(MAKE) main
-%:
-	cd ../.. && $(MAKE) $@
-endif
+include $(SOURCE)/Rules.mk
+
+all: $(CLASSES)
+
+clean clobber:
+	-rm -f *.class

@@ -99,7 +99,8 @@ public class CastExpression extends Expression
                                    + expr.getCheckedType().getTypeString() 
                                    + "\" to type \"" 
                                    + tn.getType().getTypeString() 
-                                   + "\".");
+                                   + "\".",
+				   Annotate.getLineNumber(this) );
 
     setCheckedType( tn.getType());
     return this;

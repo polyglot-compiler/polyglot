@@ -41,9 +41,10 @@ public abstract class Type extends AnnotatedObject implements Serializable
 
   public abstract String getTypeString();
 
-    public String translate() {
-	return getTypeString();
-    }
+  public String translate(LocalContext c) {
+    throw new InternalCompilerError("translate called on " +
+	getClass().getName() + ": " + getTypeString());
+  }
 
   /*
    * To be filled in by subtypes.
@@ -54,11 +55,18 @@ public abstract class Type extends AnnotatedObject implements Serializable
    */
   public abstract boolean isCanonical();
 
+  public abstract boolean isReferenceType();
   public abstract boolean isClassType();
   public abstract boolean isArrayType();
+  public abstract boolean isPackageType();
 
     /* Returns a non-null classtype iff isClassType() returns true  null otherwise */
     public ClassType toClassType() {
+	return null;
+    }
+
+    /* Returns a non-null reference type iff isReferenceType() returns true  null otherwise */
+    public ReferenceType toReferenceType() {
 	return null;
     }
 
@@ -131,6 +139,10 @@ public abstract class Type extends AnnotatedObject implements Serializable
     if( in instanceof TypeInputStream) {
       ts = ((TypeInputStream)in).getTypeSystem();
     }
+  }
+
+  public String toString() {
+    return getTypeString()+(this instanceof AmbiguousType ? "{amb}" : "");
   }
 }
 

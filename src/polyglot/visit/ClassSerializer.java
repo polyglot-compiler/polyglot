@@ -62,7 +62,7 @@ public class ClassSerializer extends NodeVisitor
         decls.add( decl);
         vds = new VariableDeclarationStatement( af, new TypeNode(ts.getString()), 
                                                 decls);
-        fn = new FieldNode( af, vds);
+        fn = new FieldNode( vds);
         members.add( fn);
                
         /* Add the date of the last source file modification. */
@@ -73,7 +73,7 @@ public class ClassSerializer extends NodeVisitor
         decls.add( decl);
         vds = new VariableDeclarationStatement( af, new TypeNode(ts.getLong()), 
                                                 decls);
-        fn = new FieldNode( af, vds);
+        fn = new FieldNode( vds);
         members.add( fn);
 
         /* Add the class type info. */
@@ -85,7 +85,7 @@ public class ClassSerializer extends NodeVisitor
         decls.add( decl);
         vds = new VariableDeclarationStatement( af, new TypeNode( ts.getString()),
                                                 decls);
-        fn = new FieldNode( af, vds);
+        fn = new FieldNode( vds);
         members.add( fn);
         
         return cn.reconstruct( cn.getAccessFlags(), cn.getName(),

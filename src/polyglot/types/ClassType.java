@@ -1,12 +1,13 @@
 package jltools.types;
 
+import jltools.util.InternalCompilerError;
 import java.util.List;
 
 /**
  * A <code>ClassType</code> represents a class -- either loaded from a
  * classpath, parsed from a source file, or obtained from other source.
  */
-public abstract class ClassType extends Type 
+public abstract class ClassType extends ReferenceType 
 { 
   static final long serialVersionUID = -176302096315403062L;
 
@@ -23,20 +24,20 @@ public abstract class ClassType extends Type
   /*
    * First the plain old type stuff...
    */
-  public boolean isPrimitive() { return false; }
   public boolean isCanonical() { return true; }
   public boolean isClassType() { return true; }
   public boolean isArrayType() { return false; }
 
-    public ClassType toClassType() {
-	return this;
-    }
+  public ClassType toClassType() {
+      return this;
+  }
 
   public boolean equals(Object o) 
   {
     if (! (o instanceof ClassType)) {
       return false;
     }
+
 
     ClassType t = (ClassType)o;
     return t.getFullName().equals( getFullName());
@@ -45,6 +46,44 @@ public abstract class ClassType extends Type
   public int hashCode() 
   {
     return getFullName().hashCode();
+  }
+
+  public String translate(LocalContext c) 
+  {
+      if (isAnonymous()) {
+	  throw new InternalCompilerError(
+	      "translate() called on anonymous class type " + getTypeString());
+      }
+      else if (isLocal()) {
+	  return getShortName();
+      }
+      else {
+	  ClassType container = getContainingClass();
+
+	  if (isInner() && container.isAnonymous()) {
+	      return getShortName();
+	  }
+
+	  // Return the short name if it is unique.
+	  if (c != null) {
+	      try {
+		  Type t = c.getType(getShortName());
+
+		  if (this.equals(t)) {
+		      return getShortName();
+		  }
+	      }
+	      catch (SemanticException e) {
+	      }
+	  }
+
+	  if (isInner()) {
+	      return container.translate(c) + "." + getShortName();
+	  }
+	  else {
+	      return getFullName();
+	  }
+      }
   }
 
   public String getTypeString() 
@@ -71,38 +110,19 @@ public abstract class ClassType extends Type
   public abstract String getPackage();
 
   /**
-   * Returns a TypedList of MethodTypeInstances for all the methods declared
-   * in this.  It does not return methods declared in supertypes.
-   */
-  public abstract List getMethods();
-
-  /**
-   * Returns a TypedList of FieldInstances for all the fields declared
-   * in this.  It does not return fields declared in supertypes.
-   */
-  public abstract List getFields();
-
-  /**
    * Returns this class's access flags.
    */
   public abstract AccessFlags getAccessFlags();
-
-  // Inheritance stuff
-  /** 
-   * Returns the supertype of this class.  For every class except Object, this
-   * is non-null.
-   */
-  public abstract Type getSuperType();
-  /**
-   * Returns a TypedList of the types of this class's interfaces.
-   */
-  public abstract List getInterfaces();
 
   // Inner class stuff.
   /**
    * Returns true iff this is an inner class.
    */
   public abstract boolean isInner();
+  /**
+   * Returns true iff this class is local or anonymous.
+   */
+  public abstract boolean isLocal(); 
   /**
    * Returns true iff this class is anonymous.
    */
@@ -128,6 +148,4 @@ public abstract class ClassType extends Type
    * Returns null if no such inner exists.
    */
   public abstract Type getInnerNamed(String name);
-  
-  // FIXME:  InMethod?
 }

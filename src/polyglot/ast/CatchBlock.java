@@ -112,7 +112,7 @@ public class CatchBlock extends Node
   
   public Node readSymbols( SymbolReader sr)
   {
-    return this;
+    return null;
   }
 
   public void enterScope( LocalContext c)
@@ -132,7 +132,8 @@ public class CatchBlock extends Node
     if( !fp.getParameterType().descendsFrom( throwable) &&
           !fp.getParameterType().equals( throwable)) {
       throw new SemanticException(
-                "Can only catch objects whose type descends from Throwable.");
+                "Can only catch objects whose type descends from Throwable.",
+				   Annotate.getLineNumber(fp) );
     }
     return this;
   }

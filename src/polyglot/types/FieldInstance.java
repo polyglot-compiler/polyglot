@@ -15,37 +15,30 @@ import jltools.util.InternalCompilerError;
  *    associated with a Java field: a set of access flags, a name, and
  *    a type.
  **/
-public class FieldInstance extends AnnotatedObject 
-  implements Cloneable, TypeInstance, java.io.Serializable 
+public class FieldInstance extends VariableInstance
+  implements Cloneable, java.io.Serializable 
 {
   static final long serialVersionUID = -3339170626027684669L;
 
   public FieldInstance(String fieldName, Type fieldType, 
-                       Type enclosingType, AccessFlags fieldFlags) {
-    this.name = fieldName;
-    this.type = fieldType;
+                       ReferenceType enclosingType, AccessFlags fieldFlags) {
+    super(fieldName, fieldType, fieldFlags);
     this.enclosingType = enclosingType;
-    this.flags = fieldFlags.copy();
-    oValue = null;
   }
 
-  public AccessFlags getAccessFlags() { return flags.copy(); }
-  public Type getType()         { return type; }
-  public void setType( Type type) { this.type = type; }
-  public String getName()       { return name; }
-  public Type getEnclosingType() { return enclosingType; }
-  public void setConstantValue(Object o) { oValue = o ; }
-  public boolean isConstant() { return oValue != null; }
-  public Object getConstantValue() 
-  { 
-    if ( oValue == null) throw new InternalCompilerError(
-         "Tried to obtain constant value on a non-constant field.");
-    return oValue;
+  public boolean isLocal() { return false; }
+  public boolean isField() { return true; }
+
+  public ReferenceType getEnclosingType() { return enclosingType; }
+
+  public boolean equals(Object o) {
+    return super.equals(o) &&
+      ((FieldInstance)o).getEnclosingType().equals(getEnclosingType());
   }
 
-  private String name;
-  private Type type, enclosingType;
-  private AccessFlags flags;
-  // used for constant values of 
-  Object oValue;
+  public int hashCode() {
+    return super.hashCode() ^ getEnclosingType().hashCode();
+  }
+
+  private ReferenceType enclosingType;
 }

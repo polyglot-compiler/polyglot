@@ -90,14 +90,14 @@ public class FormalParameter extends Node
 
   public Node readSymbols( SymbolReader sr)
   {
-    return this;
+    return null;
   }
 
   public Node removeAmbiguities( LocalContext c) throws SemanticException
   {
     AccessFlags modifiers = new AccessFlags();
     modifiers.setFinal( isFinal);
-    c.addSymbol( name, new FieldInstance( name, tn.getType(), null,
+    c.addSymbol( name, new LocalInstance( name, tn.getType(),
                                           modifiers ));
     return this;
   }
@@ -105,12 +105,12 @@ public class FormalParameter extends Node
   public Node typeCheck( LocalContext c) throws SemanticException
   {
     if (c.isDefinedLocally( name) )
-      throw new SemanticException("Duplicate declaration of \"" + name +
-                                  "\"");
+      throw new SemanticException("Duplicate declaration of \"" + name + "\"",
+				  Annotate.getLineNumber(this));
     
     AccessFlags modifiers = new AccessFlags();
     modifiers.setFinal( isFinal);
-    c.addSymbol( name, new FieldInstance( name, tn.getType(), null,
+    c.addSymbol( name, new LocalInstance( name, tn.getType(),
                                           modifiers ));
 
     Annotate.setCheckedType( this, tn.getType());

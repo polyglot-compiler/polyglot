@@ -90,7 +90,7 @@ public class TypeNode extends Node
    
   public Node readSymbols( SymbolReader sr)
   {
-    return this;
+    return null;
   } 
    
   public Node removeAmbiguities( LocalContext c) throws SemanticException
@@ -98,9 +98,14 @@ public class TypeNode extends Node
     return reconstruct( ext, c.getType( type), original);
   }
 
-  public Node typeCheck(LocalContext c)
+  public Node typeCheck(LocalContext c) throws SemanticException
   {
     setCheckedType( type);
+    if (type.isPackageType()) {
+	throw new SemanticException("Type " + type.getTypeString() +
+				    " not defined",
+				    Annotate.getLineNumber(this));
+    }
     return this;
   }
 
@@ -112,11 +117,11 @@ public class TypeNode extends Node
    */
   public void translate(LocalContext c, CodeWriter w)
   {
-    if( Compiler.useFullyQualifiedNames()) {
-      w.write( type.getTypeString());
+    if (! Compiler.useFullyQualifiedNames()) {
+      w.write( type.translate(c) );
     }
     else {
-      w.write( original);
+      w.write( type.translate(null) );
     }
   }
 

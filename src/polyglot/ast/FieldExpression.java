@@ -5,8 +5,10 @@ import jltools.util.*;
 
 import java.util.*;
 
-//*** EVIL, TEMPORARY HASK
+//*** EVIL, TEMPORARY HACK
+/*
 import jltools.ext.jif.extension.*;
+*/
 
 
 /**
@@ -17,11 +19,9 @@ import jltools.ext.jif.extension.*;
  */
 public class FieldExpression extends Expression 
 {
-  // FIXME
-  private FieldInstance fi;
-
-  protected final Node target;
+  protected FieldInstance fi;
   protected final String name;
+  protected final Node target;
 
   /**
    * Creates a new <code>EFieldExpression</code>.
@@ -29,7 +29,8 @@ public class FieldExpression extends Expression
    * @pre <code>target</code> is either a <code>TypeNode</code> or an 
    * <code>Expression</code>.
    */
-  public FieldExpression( Node ext, Node target, String name) 
+
+  protected FieldExpression( Node ext, Node target, String name, FieldInstance fi)
   {
     if (target != null && ! (target instanceof TypeNode ||
 			     target instanceof Expression))
@@ -38,29 +39,65 @@ public class FieldExpression extends Expression
     this.ext = ext;
     this.target = target;
     this.name = name;
+    this.fi = fi;
+
+    if (name == null) {
+      throw new InternalCompilerError("Field name cannot be null");
+    }
   }
 
-    public FieldExpression( Node target, String name) {
-	this(null, target, name);
-    }
+  public FieldExpression( Node ext, Node target, FieldInstance fi)
+  {
+    this(ext, target, fi.getName(), fi);
+  }
+
+  public FieldExpression( Node ext, Node target, String name)
+  {
+    this(ext, target, name, null);
+  }
+
+  public FieldExpression( Node target, FieldInstance fi) {
+    this(null, target, fi.getName(), fi);
+  }
+
+  public FieldExpression( Node target, String name) {
+    this(null, target, name, null);
+  }
 
   /**
    * Lazily reconstruct this node. 
    */
-  public FieldExpression reconstruct( Node ext, Node target, String name) 
+  public FieldExpression reconstruct( Node ext, Node target, String name, FieldInstance fi) 
   {
-    if( this.target == target && this.ext == ext && this.name.equals( name)) {
-      return this;
+    if( this.target == target && this.ext == ext && this.name.equals( name) ) {
+      if (this.fi == null) {
+	if (fi == null) {
+	  return this;
+	}
+      }
+      else {
+	if (this.fi.equals(fi)) {
+	  return this;
+	}
+      }
     }
-    else {
-      FieldExpression n = new FieldExpression( ext, target, name);
-      n.copyAnnotationsFrom( this);
-      return n;
-    }
+
+    FieldExpression n = new FieldExpression( ext, target, name, fi);
+    n.copyAnnotationsFrom( this);
+    return n;
   }
 
+    public FieldExpression reconstruct( Node ext, Node target, String name) 
+    {
+      return reconstruct(ext, target, name, fi);
+    }
+
     public FieldExpression reconstruct( Node target, String name) {
-	return reconstruct(this.ext, target, name);
+	return reconstruct(this.ext, target, name, null);
+    }
+
+    public FieldExpression reconstruct( Node target, FieldInstance fi) {
+	return reconstruct(this.ext, target, fi.getName(), fi);
     }
 
   /**
@@ -79,7 +116,6 @@ public class FieldExpression extends Expression
     return name;
   }
 
-  // FIXME
   public FieldInstance getFieldInstance()
   {
     return fi;
@@ -90,18 +126,22 @@ public class FieldExpression extends Expression
    */
   public Node visitChildren( NodeVisitor v) 
   {
-    return reconstruct( Node.condVisit(this.ext, v),Node.condVisit(target, v), name);
+    return reconstruct( Node.condVisit(this.ext, v),Node.condVisit(target, v), name, fi);
   }
 
     public Node addThis() {
 	Node newTarget;
+/*
 	if (target == null) {
 	    newTarget = new SpecialExpression(new JifSpecialExpressionExtension(), null,
 					      SpecialExpression.THIS);
 	} else {
+*/
 	    newTarget = target;
+/*
 	}
-	return reconstruct(this.ext, newTarget, name);
+*/
+	return reconstruct(this.ext, newTarget, name, fi);
     }
 
   public Node typeCheck( LocalContext c) throws SemanticException
@@ -123,8 +163,7 @@ public class FieldExpression extends Expression
     }
 
     if( ltype == null ||
-        ltype.isClassType() ||
-        ltype.isArrayType()) {
+        ltype.isReferenceType()) {
       if (name.equals("class"))
       {
         Annotate.setExpectedType( target, ltype);
@@ -132,7 +171,17 @@ public class FieldExpression extends Expression
       }      
       else
       {
-        fi = c.getField( ltype, name);
+        if (fi == null) {
+	  fi = c.getTypeSystem().getField(ltype, name, c);
+	}
+	else {
+	  FieldInstance fi2 = c.getTypeSystem().getField(ltype, name, c);
+	  if (! fi.equals(fi2)) {
+	    throw new InternalCompilerError(
+	      "Type checked field inconsistency: was " +
+	      fi.getEnclosingType() + " now " + fi2.getEnclosingType());
+	  }
+	}
         
         if (target != null)
           Annotate.setExpectedType( target, fi.getEnclosingType());
@@ -142,7 +191,8 @@ public class FieldExpression extends Expression
     else {
       throw new SemanticException( 
                     "Cannot access a field of an expression of type "
-                    + ltype.getTypeString());
+                    + ltype.getTypeString(),
+		    Annotate.getLineNumber(this));
     }
 
     return this;

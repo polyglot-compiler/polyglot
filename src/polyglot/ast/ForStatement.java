@@ -176,7 +176,8 @@ public class ForStatement extends Statement
          !cond.getCheckedType().isImplicitCastValid( 
                       c.getTypeSystem().getBoolean())) {
       throw new SemanticException("The condition of a for statement must "
-                                  + "evaluate to a boolean expression.");
+                                  + "evaluate to a boolean expression.",
+				  Annotate.getLineNumber(cond));
     }
 
     /*

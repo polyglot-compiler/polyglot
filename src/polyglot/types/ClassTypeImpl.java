@@ -34,6 +34,7 @@ public abstract class ClassTypeImpl extends ClassType
   public AccessFlags getAccessFlags()   { return flags; }
   public Type getSuperType()       { return superType; } 
   public boolean isInner()              { return isInner; } 
+  public boolean isLocal()          	{ return isLocal; }
   public boolean isAnonymous()          { return isAnonymous; }
   public ClassType getContainingClass() { return containingClass; }
   public String getInnerName()          { return innerName; }
@@ -106,6 +107,7 @@ public abstract class ClassTypeImpl extends ClassType
   // Inner info
   ////
   protected boolean isInner;
+  protected boolean isLocal;
   protected boolean isAnonymous;
   protected ClassType containingClass;
   protected String innerName;

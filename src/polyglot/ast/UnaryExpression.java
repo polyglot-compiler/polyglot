@@ -134,11 +134,13 @@ public class UnaryExpression extends Expression
     case PREDECR:
       if( !type.isPrimitive()) {
         throw new SemanticException( "Operand of " 
-                + getOperatorName() + " operator must be numeric.");
+                + getOperatorName() + " operator must be numeric.",
+		Annotate.getLineNumber(this));
       }
       if( !(type.toPrimitiveType()).isNumeric()) {
         throw new SemanticException( "Operand of " 
-                + getOperatorName() + " operator must be numeric.");
+                + getOperatorName() + " operator must be numeric.",
+		Annotate.getLineNumber(this));
       }
       setCheckedType( type);
       break;
@@ -148,11 +150,13 @@ public class UnaryExpression extends Expression
     case POSITIVE:
       if( !type.isPrimitive()) {
         throw new SemanticException( "Operand of " 
-                + getOperatorName() + " operator must be numeric.");
+                + getOperatorName() + " operator must be numeric.",
+		Annotate.getLineNumber(this));
       }
       if( !(type.toPrimitiveType()).isNumeric()) {
         throw new SemanticException( "Operand of " 
-                + getOperatorName() + " operator must be numeric.");
+                + getOperatorName() + " operator must be numeric.",
+		Annotate.getLineNumber(this));
       }
       setCheckedType( PrimitiveType.unaryPromotion( type.toPrimitiveType()));
       break;
@@ -160,11 +164,13 @@ public class UnaryExpression extends Expression
     case LOGICALNOT:
       if( !type.isPrimitive()) {
         throw new SemanticException( "Operand of " 
-                + getOperatorName() + " operator must be boolean.");
+                + getOperatorName() + " operator must be boolean.",
+		Annotate.getLineNumber(this));
       }
       if( !(type.toPrimitiveType()).isBoolean()) {
         throw new SemanticException( "Operand of " 
-                + getOperatorName() + " operator must be boolean.");
+                + getOperatorName() + " operator must be boolean.",
+		Annotate.getLineNumber(this));
       }
       setCheckedType( type);
       break;

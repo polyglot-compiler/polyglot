@@ -40,7 +40,7 @@ public abstract class Expression extends Node
    */
   public Node readSymbols( SymbolReader sr)
   {
-    return this;
+    return null;
   }
 
   /**

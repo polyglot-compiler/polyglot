@@ -2,6 +2,8 @@ package jltools.main;
 
 import jltools.ast.Node;
 import jltools.frontend.Compiler;
+import jltools.frontend.ExtensionInfo;
+import jltools.frontend.StandardExtensionInfo;
 import jltools.types.TypeSystem;
 import jltools.util.*;
 
@@ -29,25 +31,21 @@ public class Main
                                         = "Scramble AST (Boolean)";
   private static final String MAIN_OPT_SCRAMBLE_SEED  
                                         = "Scramble Random Seed (Long)";
-  private static final String MAIN_OPT_EXT_OP
-                                        = "Use ObjectPrimitive Ext (Boolean)";
-  public static final String MAIN_OPT_EXT_JIF
-                                        = "Use Jif Ext (Boolean)";
   private static final String MAIN_OPT_THREADS
                                         = "Use multiple threads (Boolean)";
+  private static final String MAIN_OPT_EXT
+                                        = "Use language extension (String)";
 
   private static final int MAX_THREADS = 2;
 
   private static Map options;
   private static Set source;
-  private static TypeSystem ts;
   private static boolean hasErrors = false;
 
   public static final void main(String args[])
   {
     options = new HashMap();
     source = new TreeSet();
-    //MainTargetFactory tf; 
     
     parseCommandLine(args, options, source);
 
@@ -57,15 +55,39 @@ public class Main
                                 (String)options.get( MAIN_OPT_OUTPUT_EXT),
                                 (Boolean)options.get( MAIN_OPT_STDOUT));
 
-    /* Must initialize before instantiating any compilers. */
-    if( ((Boolean)options.get( MAIN_OPT_EXT_JIF)).booleanValue()) {
-	ts = new jltools.ext.jif.types.JifTypeSystem(); // Fix for Jif
-    } else if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()) {
-      ts = new jltools.ext.op.ObjectPrimitiveTypeSystem();
-    } else {
-      ts = new jltools.types.StandardTypeSystem();
+    String ext = (String) options.get(MAIN_OPT_EXT);
+    Class extClass = null;
+    ExtensionInfo extInfo = null;
+
+    if (ext != null && ! ext.equals("")) {
+      String extClassName = "jltools.ext." + ext + ".ExtensionInfo";
+
+      try {
+	extClass = Class.forName(extClassName);
+      }
+      catch (ClassNotFoundException e) {
+	System.err.println( "Extension " + ext +
+	  " not found: could not find class " + extClassName + ".");
+	System.exit( 1);
+      }
+
+      try {
+	extInfo = (ExtensionInfo) extClass.newInstance();
+      }
+      catch (Exception e) {
+	System.err.println( "Extension " + ext +
+	  " could not be loaded: could not instantiate " + extClassName + ".");
+	System.exit( 1);
+      }
     }
-    Compiler.initialize( options, ts, tf);
+
+    if (extInfo == null) {
+	extInfo = new StandardExtensionInfo();
+    }
+
+    /* Must initialize before instantiating any compilers. */
+
+    Compiler.initialize( options, tf, extInfo);
     
     /* Now compile each file. */
     int totalThreads;
@@ -215,7 +237,8 @@ public class Main
         }
       }
     }
-  }
+  }    public static File getOutputDirectory() {
+      return (File)options.get( MAIN_OPT_OUTPUT_DIRECTORY);  }
 
 
   private static void setHasErrors( boolean b)
@@ -356,84 +379,6 @@ public class Main
     }
   }
 
-  /**
-   * Returns an instance of the parser that should be used during this
-   * compilation session.
-   */
-    static java_cup.runtime.lr_parser getParser(Reader reader, ErrorQueue eq)
-    {
-	if( ((Boolean)options.get( MAIN_OPT_EXT_JIF)).booleanValue()) {
-	    jltools.ext.jif.lex.Lexer lexer = new jltools.ext.jif.lex.Lexer(reader, eq);
-	    return new jltools.ext.jif.parse.Grm( lexer, ts, eq);
-	} else {
-	    jltools.lex.Lexer lexer = new jltools.lex.Lexer(reader, eq);
-      
-	    if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()) {
-		return new jltools.ext.op.Grm( lexer, ts, eq);
-	    }
-	    else {
-		return new jltools.parse.Grm( lexer, ts, eq);
-	    }
-	}
-    }
-
-  /**
-   * Returns a iterator which contains the visitors that should be run in the
-   * current stage of the compiler.
-   */
-  static Iterator getNodeVisitors( int stage)
-  {
-    List l = new LinkedList();
-
-    if( ((Boolean)options.get( MAIN_OPT_SCRAMBLE)).booleanValue()
-        && stage == Compiler.DISAMBIGUATED) {
-      
-      if( ((Boolean)options.get( MAIN_OPT_DUMP)).booleanValue()) {
-        CodeWriter cw = new CodeWriter( new UnicodeWriter( 
-                                          new PrintWriter( System.out)), 
-               ((Integer)options.get( Compiler.OPT_OUTPUT_WIDTH)).intValue()); 
-
-        l.add( new jltools.visit.DumpAst( cw));
-      }
-
-      jltools.visit.NodeScrambler ns;
-      Long seed = (Long)options.get( MAIN_OPT_SCRAMBLE_SEED);
-      if( seed == null) {
-        ns = new jltools.visit.NodeScrambler();
-      }
-      else {
-        ns = new jltools.visit.NodeScrambler( seed.longValue());
-      }
-
-      l.add( ns.fp);
-      l.add( ns);
-    }
-
-    if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()
-        && stage == Compiler.CHECKED) {
-      
-      if( ((Boolean)options.get( MAIN_OPT_DUMP)).booleanValue()) {
-        CodeWriter cw = new CodeWriter( new UnicodeWriter( 
-                                          new PrintWriter( System.out)), 
-               ((Integer)options.get( Compiler.OPT_OUTPUT_WIDTH)).intValue()); 
-
-        l.add( new jltools.visit.DumpAst( cw));
-      }
-
-      l.add( new jltools.ext.op.ObjectPrimitiveCastRewriter( ts));
-
-    }
-
-    if( ((Boolean)options.get( MAIN_OPT_DUMP)).booleanValue()) {
-      CodeWriter cw = new CodeWriter( new UnicodeWriter( 
-                                        new PrintWriter( System.out)), 
-            ((Integer)options.get( Compiler.OPT_OUTPUT_WIDTH)).intValue()); 
-
-      l.add( new jltools.visit.DumpAst( cw));
-    }
-    return l.iterator();
-  }   
-
   static final void parseCommandLine(String args[], Map options, Set source)
   {
     if(args.length < 1)
@@ -451,8 +396,9 @@ public class Main
     options.put( MAIN_OPT_DUMP, new Boolean( false));
     options.put( MAIN_OPT_STDOUT, new Boolean( false));
     options.put( MAIN_OPT_SCRAMBLE, new Boolean( false));
-    options.put( MAIN_OPT_EXT_OP, new Boolean( false));
-    options.put( MAIN_OPT_EXT_JIF, new Boolean( false));
+
+    options.put( MAIN_OPT_EXT, new String(""));
+
     options.put( MAIN_OPT_THREADS, new Boolean( false));
     
     options.put( Compiler.OPT_OUTPUT_WIDTH, new Integer(120));
@@ -505,6 +451,12 @@ public class Main
         i++;
         options.put( MAIN_OPT_STDOUT, new Boolean( true));
       }
+      else if( args[i].equals( "-ext")) 
+      {
+        i++;
+        options.put( MAIN_OPT_EXT, args[i]);
+        i++;
+      }
       else if( args[i].equals( "-sx")) 
       {
         i++;
@@ -543,16 +495,6 @@ public class Main
       {
         i++;
         options.put( MAIN_OPT_THREADS, new Boolean( true));
-      }
-      else if( args[i].equals( "-op"))
-      {
-        i++;
-        options.put( MAIN_OPT_EXT_OP, new Boolean( true));
-      }
-      else if( args[i].equals( "-jif"))
-      {
-        i++;
-        options.put( MAIN_OPT_EXT_JIF, new Boolean( true));
       }
       else if( args[i].equals( "-v") || args[i].equals( "-verbose"))
       {
@@ -622,8 +564,7 @@ public class Main
     System.err.println( " -scramble [seed]        scramble the ast");
     System.err.println( " -noserial               disable class"
                         + " serialization");
-    System.err.println( " -op                     use op extension");
-    System.err.println( " -jif                    use jif extension, overrides -op");
+    System.err.println( " -ext <extension>        use language extension");
     System.err.println( " -post <compiler>        run javac-like compiler" 
                         + " after translation");
     System.err.println( " -v -verbose             print verbose " 

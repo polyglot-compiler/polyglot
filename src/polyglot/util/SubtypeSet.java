@@ -44,28 +44,37 @@ public class SubtypeSet implements java.util.Set
 
     try
     {
-      if (( o instanceof Type) && (( Type )o).isThrowable() )
+      if ( o instanceof Type)
       {
-        for (Iterator i = v.iterator(); i.hasNext() ; )
-        {
-          Type t = (Type)i.next();
-          if ( t.descendsFrom( (Type)o) )
-          {
-            i.remove();
-          }
-          if ( ((Type)o).descendsFrom( t) || ((Type)o).equals ( t) )
-          {
-            bHaveToAdd = false;
-            break;
-          }
-        }
-      if (bHaveToAdd)
-        v.add( o);
-      return bHaveToAdd;
+	if ( (( Type )o).isThrowable() )
+	{
+	  for (Iterator i = v.iterator(); i.hasNext() ; )
+	  {
+	    Type t = (Type)i.next();
+	    if ( t.descendsFrom( (Type)o) )
+	    {
+	      i.remove();
+	    }
+	    if ( ((Type)o).descendsFrom( t) || ((Type)o).equals ( t) )
+	    {
+	      bHaveToAdd = false;
+	      break;
+	    }
+	  }
+	if (bHaveToAdd)
+	  v.add( o);
+	return bHaveToAdd;
+	}
+	else 
+	{
+	  throw new InternalCompilerError(
+		"Can only add Throwables to the set. Got a " + 
+				       ((Type) o).getTypeString());
+	}
       }
       else 
       {
-        throw new ClassCastException("Can only add types to the set. Got a " + 
+        throw new ClassCastException("Can only add Types to the set. Got a " + 
                                      o.getClass().getName());
       }
     }

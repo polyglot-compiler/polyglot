@@ -15,7 +15,6 @@ import java.util.*;
 
 public class FieldNode extends ClassMember 
 {
-  protected final AccessFlags accessFlags;
   protected final VariableDeclarationStatement declare;
 
   /**
@@ -23,40 +22,37 @@ public class FieldNode extends ClassMember
    * <code>declare</code> with modified by the flags in 
    * <code>accessFlags</code>.
    */
-  public FieldNode( Node ext, AccessFlags accessFlags,
+  public FieldNode( Node ext,
 		    VariableDeclarationStatement declare) 
   {
     this.ext = ext;
-    this.accessFlags = accessFlags;
     this.declare = declare;
   }
 
-  public FieldNode( AccessFlags accessFlags,
-		    VariableDeclarationStatement declare) {
-      this(null, accessFlags, declare);
+  public FieldNode( VariableDeclarationStatement declare) {
+      this(null, declare);
   }
 
 
   /**
    * Lazily reconstruct this node.
    */
-  public FieldNode reconstruct( Node ext, AccessFlags accessFlags, 
+  public FieldNode reconstruct( Node ext,
                                 VariableDeclarationStatement declare)
   {
-    if( this.accessFlags.equals( accessFlags) && this.declare == declare && this.ext == ext) {
+    if( this.declare == declare && this.ext == ext) {
       return this;
     }
     else {
-      FieldNode n = new FieldNode( ext, accessFlags, declare);
+      FieldNode n = new FieldNode( ext, declare);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
 
-  public FieldNode reconstruct( AccessFlags accessFlags, 
-                                VariableDeclarationStatement declare) 
+  public FieldNode reconstruct( VariableDeclarationStatement declare) 
     {
-	return reconstruct(this.ext, accessFlags, declare);
+	return reconstruct(this.ext, declare);
     }
 
 
@@ -65,7 +61,7 @@ public class FieldNode extends ClassMember
    */
   public AccessFlags getAccessFlags() 
   {
-    return accessFlags;
+    return declare.getAccessFlags();
   }
 
   /**
@@ -83,7 +79,7 @@ public class FieldNode extends ClassMember
    */
   public Node visitChildren( NodeVisitor v) 
   {
-    return reconstruct( Node.condVisit(this.ext, v),accessFlags, 
+    return reconstruct( Node.condVisit(this.ext, v),
                         (VariableDeclarationStatement)declare.visit( v));
   }
 
@@ -93,16 +89,25 @@ public class FieldNode extends ClassMember
     VariableDeclarationStatement.Declarator decl;
     Iterator iter = declare.declarators();
 
+    AccessFlags af = getAccessFlags();
+    if (clazz.getAccessFlags().isInterface()) {
+      //field members of interfaces are implicitly
+      //  public static final
+      af.setPublic(true);
+      af.setStatic(true);
+      af.setFinal(true);
+    }
+
     while( iter.hasNext()) {
       decl = (VariableDeclarationStatement.Declarator)iter.next();
       FieldInstance fi = new FieldInstance( decl.name, 
                               declare.typeForDeclarator( decl), 
-                              clazz, declare.getAccessFlags());
+                              clazz, af);
       /* If it is a constant numeric expression (final + initializer is 
        * IntLiteral) then mark it "constant" under FieldInstance. */
       // FIXME other literal types?
       if( decl.initializer instanceof IntLiteral 
-          && decl.initializer != null && accessFlags.isFinal()) {
+          && decl.initializer != null && getAccessFlags().isFinal()) {
         fi.setConstantValue( new Long(
             ((IntLiteral)decl.initializer).getValue())); 
       }
@@ -111,6 +116,8 @@ public class FieldNode extends ClassMember
       clazz.addField( fi);
     }
   
+    visitChildren(sr);
+
     return this;
   }
 

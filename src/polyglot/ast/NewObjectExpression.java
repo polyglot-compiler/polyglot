@@ -152,12 +152,21 @@ public class NewObjectExpression extends Expression
   public Node visitChildren( NodeVisitor v) 
   {
     Expression newPrimary = null;
+    TypeNode newTn = tn;
 
     if( primary != null) {
       newPrimary = (Expression)primary.visit( v);
+    } else {
+      /**
+       * avoid visiting tn if the primary is non-null.  In that case,
+       * tn does not contain any meaningful (besides an identifier)
+       * information since it refers to a class which is an inner of
+       * the compile-time type of the primary.
+       * So it only becomes meaningful after typechecking, when we
+       * learn the actual class that it refers to.
+       */
+      newTn = (TypeNode)tn.visit( v);
     }
-
-    TypeNode newTn = (TypeNode)tn.visit( v);
 
     List newArgs = new ArrayList( args.size());
 
@@ -180,29 +189,45 @@ public class NewObjectExpression extends Expression
   
   public Node typeCheck( LocalContext c) throws SemanticException
   {
+
+    /* if there is a primary expression, do a late-lookup of
+     * the identifier to find the class that we are instantiating
+     * here.
+     */
+    Type tnType;
+    if (primary != null) {
+      tnType =
+	c.getTypeSystem().checkAndResolveType(tn.getType(),
+					      primary.getCheckedType());
+    } else
+      tnType = tn.getCheckedType();
+
     // make sure that primary is the "containing" class for the inner class, 
     // if appropriate
     if( primary != null && 
         !primary.getCheckedType().equals(
-	((ClassType)tn.getType()).getContainingClass())) {
+	((ClassType)tnType).getContainingClass())) {
       throw new SemanticException (
               "The containing instance must be the containing class of \"" +
-              tn.getType().getTypeString() + "\".");
+              tn.getType().getTypeString() + "\".",
+	      Annotate.getLineNumber(primary));
     }
 
     if( primary != null && 
-         ((ClassType)tn.getType()).getAccessFlags().isStatic()) {
+         ((ClassType)tnType).getAccessFlags().isStatic()) {
       // FIXME is this really true?
       throw new SemanticException(
-             "Cannot specify a containing instance for static classes.");
+             "Cannot specify a containing instance for static classes.",
+	      Annotate.getLineNumber(primary));
     }
 
-    if( ((ClassType)tn.getType()).getAccessFlags().isAbstract()) {
-      throw new SemanticException( "Cannot instantiate an abstract class.");
+    if( ((ClassType)tnType).getAccessFlags().isAbstract()) {
+      throw new SemanticException( "Cannot instantiate an abstract class.",
+	      Annotate.getLineNumber(this));
     }
 
     ClassType ct; 
-    ct = (ClassType)tn.getType();
+    ct = (ClassType)tnType;
 
     List argTypes = new ArrayList( args.size());
     for( Iterator iter = arguments(); iter.hasNext(); ) {
@@ -222,9 +247,10 @@ public class NewObjectExpression extends Expression
     mti = null;
     try
     {
-      mti = c.getMethod( ct, new ConstructorType( c.getTypeSystem(), 
-                                                  ct, 
-                                                  argTypes));
+//        mti = c.getMethod( ct, new ConstructorType( c.getTypeSystem(), 
+//                                                    ct, 
+//                                                    argTypes));
+      mti = c.getTypeSystem().getConstructor(ct, argTypes, c);
     }
     catch (SemanticException e)
     {
@@ -232,12 +258,12 @@ public class NewObjectExpression extends Expression
        * FIXME what does this do?
       for( Iterator iter = argTypes.iterator(); iter.hasNext() ; ) {
         Type t = (Type)i.next();
-      }
-      */
+      } */
       System.out.println( ct.getTypeString() );
       throw new SemanticException ( 
               "No acceptable constructor found for the creation of \"" 
-              + ct.getTypeString() + "\".");
+              + ct.getTypeString() + "\".",
+	      Annotate.getLineNumber(this));
     }
     setCheckedType( ct);
 
@@ -248,7 +274,9 @@ public class NewObjectExpression extends Expression
        ((Expression)iter1.next()).setExpectedType( (Type)iter2.next());
     }
 
-    return this;
+    TypeNode newTn = tn.reconstruct(tnType, tn.getOriginal());
+    newTn.setCheckedType(tnType);
+    return reconstruct(primary, newTn, args, cn);
   }
 
   public Node exceptionCheck( ExceptionChecker ec) 
@@ -285,7 +313,11 @@ public class NewObjectExpression extends Expression
       w.write( "new ");
     }
 
-    tn.translate( c, w);
+    if (primary != null) {
+      w.write( ((ClassType)tn.getCheckedType()).getShortName() );
+    } else {
+      tn.translate( c, w);
+    }
     w.write( "("); w.begin(0);
 
     for( Iterator iter = arguments(); iter.hasNext(); ) {

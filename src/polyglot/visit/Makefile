@@ -1,21 +1,25 @@
+SOURCE = ../..
+PACKAGE = jltools.visit
+SUBDIRS =k
 
-vs_package	= jltools/visit
-vs_codebase	= ../..
-vs_files 	= SymbolReader.java \
-		  AmbiguityRemover.java \
-		  ConstantFolder.java \
-		  TypeChecker.java \
-		  ExceptionChecker.java \
-		  FlowChecker.java \
-		  ClassSerializer.java \
-		  DumpAst.java \
-		  NodeScrambler.java
+SOURCES = \
+	AmbiguityRemover.java \
+	ClassSerializer.java \
+	ConstantFolder.java \
+	DumpAst.java \
+	ExceptionChecker.java \
+	FlowChecker.java \
+	NodeScrambler.java \
+	SignatureCleaner.java \
+	SymbolReader.java \
+	TranslationVisitor.java \
+	TypeChecker.java
 
-VISIT_TARGET = $(patsubst %.java, $(vs_package)/%.class, $(vs_files))
+CLASSES = $(patsubst %.java, %.class, $(SOURCES))
 
-ifndef CALLED_FROM_PARENT
-all:	
-	cd ../.. && $(MAKE) visit
-%:
-	cd ../.. && $(MAKE) $@
-endif
+include $(SOURCE)/Rules.mk
+
+all: $(CLASSES)
+
+clean clobber:
+	-rm -f *.class

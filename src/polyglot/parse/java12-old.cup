@@ -170,10 +170,10 @@ non terminal TypeNode class_or_interface_type;
 non terminal TypeNode class_type, interface_type;
 non terminal TypeNode array_type;
 // 19.5) Names
-non terminal AmbiguousNameExpression name, simple_name, qualified_name;
+non terminal AmbiguousName name, simple_name, qualified_name;
 // 19.6) Packages
 non terminal SourceFileNode compilation_unit;
-non terminal AmbiguousNameExpression package_declaration_opt, package_declaration;
+non terminal AmbiguousName package_declaration_opt, package_declaration;
 non terminal List import_declarations_opt, import_declarations;
 non terminal List type_declarations_opt, type_declarations;
 non terminal ImportNode import_declaration;
@@ -242,7 +242,7 @@ non terminal ForStatement for_statement, for_statement_no_short_if;
 non terminal List for_init_opt, for_init;
 non terminal List for_update_opt, for_update;
 non terminal List statement_expression_list;
-non terminal AmbiguousNameExpression identifier_opt;
+non terminal AmbiguousName identifier_opt;
 non terminal BranchStatement break_statement, continue_statement;
 non terminal ReturnStatement return_statement;
 non terminal ThrowStatement throw_statement;
@@ -387,8 +387,7 @@ class_or_interface_type ::=
 					// TypeNode
 		name:a
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(
-				new AmbiguousType(parser.ts, 
-				a.getName())),a); :}
+				a.toType(parser.ts)),a); :}
 	;
 class_type ::=
 					// TypeNode
@@ -408,30 +407,30 @@ array_type ::=
 				b.intValue())), a); :}
 	|	name:a dims:b
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(
-				new ArrayType(parser.ts, 
-				new AmbiguousType(parser.ts, a.getName()),
+				new ArrayType(parser.ts, a.toType(parser.ts),
 				b.intValue())), a); :}
 	;
 // 19.5) Names
 name	::=
-					// AmbiguousNameExpression
+					// AmbiguousName
 		simple_name:a
 			{: RESULT = a; :}
 	|	qualified_name:a
 			{: RESULT = a; :}
 	;
 simple_name ::=
-					// AmbiguousNameExpression
+					// AmbiguousName
 		IDENTIFIER:a
-			{: RESULT = (AmbiguousNameExpression)Grm.ln
-				(new AmbiguousNameExpression(
+			{: RESULT = (AmbiguousName)Grm.ln
+				(new AmbiguousName(
 				a.getIdentifier()), a); :}
 	;
 qualified_name ::=
-					// AmbiguousNameExpression
+					// AmbiguousName
 		name:a DOT IDENTIFIER:b
-			{: a.getIdentifiers().add(b.getIdentifier()); 
-				RESULT = a; :}
+			{: RESULT = (AmbiguousName)Grm.ln
+                                (new AmbiguousName(a,
+                                b.getIdentifier()), b); :}
 	;
 // 19.6) Packages
 compilation_unit ::=
@@ -441,11 +440,11 @@ compilation_unit ::=
 		type_declarations_opt:c
 			{: RESULT = (SourceFileNode)Grm.ln
 				(new SourceFileNode( 
-				(a == null ? null : a.getName()),
+				(a == null ? null : a.getFullName()),
 				b, c), a); :}
 		;
 package_declaration_opt ::=
-					// AmbiguousNameExpression
+					// AmbiguousName
 		package_declaration:a {: RESULT = a; :} | ;
 import_declarations_opt ::=
 					// List of ImportNode
@@ -476,7 +475,7 @@ type_declarations ::=
 			{: RESULT = a; if( b != null) { a.add(b); } :}
 	;
 package_declaration ::=
-					// AmbiguousNameExpression
+					// AmbiguousName
 		PACKAGE name:a SEMICOLON
 			{: RESULT = a; :}
 	;
@@ -492,14 +491,14 @@ single_type_import_declaration ::=
 		IMPORT name:a SEMICOLON
 			{: RESULT = (ImportNode)Grm.ln
 				(new ImportNode(ImportNode.CLASS, 
-				a.getName()), a); :}
+				a.getFullName()), a); :}
 	;
 type_import_on_demand_declaration ::=
 					// ImportNode
 		IMPORT name:a DOT MULT SEMICOLON
 			{: RESULT = (ImportNode)Grm.ln(
 				new ImportNode(ImportNode.PACKAGE, 
-				a.getName()), a); :}
+				a.getFullName()), a); :}
 	;
 type_declaration ::=
 					// ClassNode
@@ -581,7 +580,7 @@ class_declaration ::=
 		modifiers_opt:a CLASS:n IDENTIFIER:b super_opt:c 
 						interfaces_opt:d class_body:e
 			{: RESULT = (ClassNode)Grm.ln(new ClassNode(a,
-				b.getIdentifier(), c, d, e), n); :}
+				b.getIdentifier(), c, d, e, false, false), n); :}
 	;
 super ::=
 					// TypeNode
@@ -652,7 +651,7 @@ class_member_declaration ::=
 	|	modifiers_opt:a CLASS:n IDENTIFIER:b super_opt:c 
 						interfaces_opt:d class_body:e
 			{: RESULT = (ClassMember)Grm.ln(new ClassNode(
-				a, b.getIdentifier(), c, d, e), n); :}
+				a, b.getIdentifier(), c, d, e, false, false), n); :}
 	|	interface_declaration:a
 			{: RESULT = a; :}
 	;
@@ -661,7 +660,7 @@ class_member_declaration ::=
 field_declaration ::=
 					// FieldNode
 		modifiers_opt:a type:b variable_declarators:c SEMICOLON
-			{: RESULT = (FieldNode)Grm.ln(new FieldNode(a, 
+			{: RESULT = (FieldNode)Grm.ln(new FieldNode( 
 				(VariableDeclarationStatement)
 				Grm.ln(new VariableDeclarationStatement(a, 
 				b, c), b)), b); :}
@@ -683,8 +682,10 @@ variable_declarator ::=
 variable_declarator_id ::=
 				// VariableDeclarationStatement.Declarator
 		IDENTIFIER:a
-			{: RESULT = new VariableDeclarationStatement.
-				Declarator(null, a.getIdentifier(), 0, null); :}
+			{: RESULT = (VariableDeclarationStatement.Declarator)
+				Grm.ln(new VariableDeclarationStatement.
+				Declarator(null, a.getIdentifier(), 0, null),
+				a); :}
 	|	variable_declarator_id:a LBRACK RBRACK
 			{: RESULT = a; a.additionalDimensions++; :}
 	;
@@ -816,8 +817,7 @@ constructor_declarator ::=
 			{: RESULT = (MethodNode)Grm.ln(new MethodNode(
 				new AccessFlags(),
 				(TypeNode)Grm.ln( new TypeNode( 
-				new AmbiguousType( parser.ts, a.getName()),
-				a.getName()), a), b,
+				a.toType(parser.ts)), a), b,
 				new LinkedList(), null), a); :}
 	;
 constructor_body ::=
@@ -864,9 +864,11 @@ interface_declaration ::=
 					// ClassNode
 		modifiers_opt:a INTERFACE:n IDENTIFIER:b 
 				extends_interfaces_opt:c interface_body:d
-			{: RESULT = (ClassNode)Grm.ln(new ClassNode(a,	
-				b.getIdentifier(), (TypeNode)null, c, d), n); 
-				a.setInterface(true); :}
+			{: AccessFlags af = a.copy();
+			   af.setInterface(true);
+			   RESULT = (ClassNode)Grm.ln(new ClassNode(af,	
+				b.getIdentifier(), (TypeNode)null, c, d,
+				false, false), n); :}
 	;
 extends_interfaces_opt ::=
 					// List of TypeNode
@@ -888,6 +890,7 @@ interface_body ::=
 	;
 interface_member_declarations_opt ::=
 					// List of ClassMember
+			{: RESULT = new LinkedList(); :}
 	|	interface_member_declarations:a
 			{: RESULT = a; :}
 	;
@@ -975,11 +978,27 @@ block_statement ::=
 	|	statement:a
 			{: RESULT = a; :}
 	|	class_declaration:a
-			{: RESULT = (Statement)Grm.ln(
-				new ClassDeclarationStatement(a), a); :}
+			{: List interfaces = new LinkedList();
+			        List members = new LinkedList();
+				Grm.addAll(interfaces, a.interfaces() );
+				Grm.addAll(members, a.members() );
+				ClassNode c = a.reconstruct(
+				a.getAccessFlags(),
+				a.getName(), a.getSuperClass(),
+				interfaces, members, true, false);
+				RESULT = (Statement)Grm.ln(
+				new ClassDeclarationStatement(c), a); :}
 	|	interface_declaration:a
-			{: RESULT = (Statement)Grm.ln(
-				new ClassDeclarationStatement(a), a); :}
+			{: List interfaces = new LinkedList();
+			        List members = new LinkedList();
+				Grm.addAll(interfaces, a.interfaces() );
+				Grm.addAll(members, a.members() );
+				ClassNode c = a.reconstruct(
+				a.getAccessFlags(),
+				a.getName(), a.getSuperClass(),
+				interfaces, members, true, false);
+				RESULT = (Statement)Grm.ln(
+				new ClassDeclarationStatement(c), a); :}
 	;
 local_variable_declaration_statement ::=
 					// VariableDeclarationStatement
@@ -1158,7 +1177,7 @@ switch_label ::=
  				new SwitchStatement.CaseStatement(a), n); :}
 	|	DEFAULT:n COLON
 			{: RESULT = (SwitchStatement.CaseStatement)Grm.ln( 
- 				new SwitchStatement.CaseStatement(), n); :}
+ 				new SwitchStatement.CaseStatement(null), n); :}
 	;
 
 while_statement ::=
@@ -1229,11 +1248,10 @@ statement_expression_list ::=
 	;
 
 identifier_opt ::=
-					// AmbiguousNameExpression
+					// AmbiguousName
 	|	IDENTIFIER:a
-			{: RESULT = (AmbiguousNameExpression)Grm.ln(
-				new AmbiguousNameExpression(
-				a.getIdentifier()), a); :}
+			{: RESULT = (AmbiguousName)Grm.ln(
+				new AmbiguousName(a.getIdentifier()), a); :}
 	;
 
 break_statement ::=
@@ -1242,7 +1260,7 @@ break_statement ::=
 			{: RESULT = (BranchStatement)Grm.ln(
 				new BranchStatement(
 				BranchStatement.BREAK, 
-				(a == null ? null : a.getName())), a); :}
+				(a == null ? null : a.getFullName())), a); :}
 				// FIXME
 	;
 
@@ -1252,7 +1270,7 @@ continue_statement ::=
 			{: RESULT = (BranchStatement)Grm.ln(
 				new BranchStatement(
 				BranchStatement.CONTINUE,
-				(a == null ? null : a.getName())), a); :}
+				(a == null ? null : a.getFullName())), a); :}
 				// FIXME
 
 	;
@@ -1347,12 +1365,13 @@ primary_no_new_array ::=
 				new FieldExpression(a, "class"), a); :}
 	|	name:a DOT CLASS
 			{: RESULT = (Expression)Grm.ln(
-				new FieldExpression(a, "class"), a); :}
+				new FieldExpression((TypeNode)Grm.ln(
+				new TypeNode(a.toType(parser.ts)), a),
+				"class"), a); :}
 	|	name:a DOT THIS
 			{: RESULT = (Expression)Grm.ln(
 				new SpecialExpression((TypeNode)Grm.ln(
-				new TypeNode(new AmbiguousType(parser.ts, 
-				a.getName())), a), 
+				new TypeNode(a.toType(parser.ts)), a), 
 				SpecialExpression.THIS), a); :}
 	;
 class_instance_creation_expression ::=
@@ -1366,44 +1385,47 @@ class_instance_creation_expression ::=
 				RESULT = (NewObjectExpression)Grm.ln(
 				new NewObjectExpression(null, a, b, 
 				(ClassNode)Grm.ln(new ClassNode(
-				new AccessFlags(), "$Anonymous$", 
-				(TypeNode)null, l, c), a)), a); :}
+				new AccessFlags(), "$Anonymous$",
+				(TypeNode)null, l, c, false, true), a)), a); :}
 	|	primary:a DOT NEW IDENTIFIER:b
 			LPAREN argument_list_opt:c RPAREN
 			{: RESULT = (NewObjectExpression)Grm.ln(
 				new NewObjectExpression(a, (TypeNode)
-				Grm.ln(new TypeNode(new AmbiguousType(
-				parser.ts, b.getIdentifier())), b), 
+				Grm.ln(new TypeNode(
+				new AmbiguousNameType(parser.ts,
+				b.getIdentifier())), b), 
 				c, null), a); :}
 	|	primary:a DOT NEW IDENTIFIER:b
 			LPAREN argument_list_opt:c RPAREN class_body:d
 			{: TypeNode t = (TypeNode)Grm.ln(new TypeNode(
-				new AmbiguousType(parser.ts,
+				new AmbiguousNameType(parser.ts,
 				b.getIdentifier())), b); 
 				List l = new LinkedList(); l.add(t); 
 				RESULT = (NewObjectExpression)Grm.ln(
 				new NewObjectExpression(a, t, c,
 				(ClassNode)Grm.ln(new ClassNode( 
 				new AccessFlags(), "$Anonymous$", 
-				(TypeNode)null, l, null), a)), a); :}
+				(TypeNode)null, l, null, false, true), a)), a); :}
 	|	name:a DOT NEW IDENTIFIER:b
 			LPAREN argument_list_opt:c RPAREN
 			{: RESULT = (NewObjectExpression)Grm.ln(
-				new NewObjectExpression(a, (TypeNode)
-				Grm.ln(new TypeNode(new AmbiguousType(
-				parser.ts, b.getIdentifier())), b), 
+				new NewObjectExpression(a.toExpression(),
+				(TypeNode)
+				Grm.ln(new TypeNode(
+				new AmbiguousNameType(parser.ts,
+                                b.getIdentifier())), b), 
 				c, null), a); :}
 	|	name:a DOT NEW IDENTIFIER:b
 			LPAREN argument_list_opt:c RPAREN class_body:d
 			{: TypeNode t = (TypeNode)Grm.ln(new TypeNode(
-				new AmbiguousType(parser.ts,
+				new AmbiguousNameType(parser.ts,
 				b.getIdentifier())), b); 
 				List l = new LinkedList(); l.add(t); 
 				RESULT = (NewObjectExpression)Grm.ln(
-				new NewObjectExpression(a, t, c,
+				new NewObjectExpression(a.toExpression(), t, c,
 				(ClassNode)Grm.ln(new ClassNode( 
 				new AccessFlags(), "$Anonymous$", 
-				(TypeNode)null, l, null), a)), a); :}
+				(TypeNode)null, l, null, false, true), a)), a); :}
 	;
 argument_list_opt ::=
 					// List of Expression
@@ -1480,9 +1502,7 @@ field_access ::=
 				new FieldExpression(
 				(SpecialExpression)Grm.ln(
 				new SpecialExpression((TypeNode)
-				Grm.ln(new TypeNode(
-				new AmbiguousType(parser.ts,
-				a.getName())), a),
+				Grm.ln(new TypeNode(a.toType(parser.ts)), a),
 				SpecialExpression.SUPER), a),
 				b.getIdentifier()), a); :}
 	;
@@ -1490,8 +1510,9 @@ method_invocation ::=
 					// MethodExpression
 		name:a LPAREN argument_list_opt:b RPAREN
 			{: RESULT = (MethodExpression)Grm.ln(
-				new MethodExpression(null, a.getName(), b), 
-				a); :}
+				new MethodExpression(
+				(AmbiguousName) a.getPrefix(),
+				a.getName(), b), a); :}
 	|	primary:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN
 			{: RESULT = (MethodExpression)Grm.ln(
 				new MethodExpression(a, b.getIdentifier(), c),
@@ -1508,17 +1529,16 @@ method_invocation ::=
 				new MethodExpression(
 				(SpecialExpression)Grm.ln(
 				new SpecialExpression((TypeNode)
-				Grm.ln(new TypeNode(
-				new AmbiguousType(parser.ts, a.getName())), a),
+				Grm.ln(new TypeNode(a.toType(parser.ts)), a),
 				SpecialExpression.SUPER), a),
-				b.getIdentifier(), c),
-				a); :}	
+				b.getIdentifier(), c), a); :}
 	;
 array_access ::=
 					// ArrayIndexExpression
 		name:a LBRACK expression:b RBRACK
 			{: RESULT = (ArrayIndexExpression)Grm.ln(
-				new ArrayIndexExpression(a, b), a); :}
+				new ArrayIndexExpression(
+				a.toExpression(), b), a); :}
 	|	primary_no_new_array:a LBRACK expression:b RBRACK
 			{: RESULT = (ArrayIndexExpression)Grm.ln(
 				new ArrayIndexExpression(a, b), a); :}
@@ -1528,7 +1548,7 @@ postfix_expression ::=
 		primary:a
 			{: RESULT = a; :}
 	|	name:a
-			{: RESULT = a; :}
+			{: RESULT = a.toExpression(); :}
 	|	postincrement_expression:a
 			{: RESULT = a; :}
 	|	postdecrement_expression:a
@@ -1608,15 +1628,16 @@ cast_expression ::=
 			{: RESULT = (CastExpression)Grm.ln(
 				new CastExpression((TypeNode)
 				Grm.ln(new TypeNode( 
-				new AmbiguousType( parser.ts, 
+				new AmbiguousNameType( parser.ts, 
+				((AmbiguousName) ((AmbiguousNameExpression)a).getPrefix()).toType(parser.ts),
 				((AmbiguousNameExpression)a).getName())), a),
 				b), a); :}
 	|	LPAREN name:a dims:b RPAREN unary_expression_not_plus_minus:c
 			{: Type t2 = new ArrayType(parser.ts, 
-				new AmbiguousType(parser.ts, 
-				a.getName()), b.intValue());
+				a.toType(parser.ts), b.intValue());
 				RESULT = (CastExpression)Grm.ln(
-			       new CastExpression( new TypeNode(t2), c), a); :}
+			        new CastExpression( (TypeNode) Grm.ln(
+				new TypeNode(t2), a), c), a); :}
 	;
 multiplicative_expression ::=
 					// Expression
@@ -1775,7 +1796,7 @@ assignment ::=
 left_hand_side ::=
 					// Expression
 		name:a
-			{: RESULT = a; :}
+			{: RESULT = a.toExpression(); :}
 	|	field_access:a
 			{: RESULT = a; :}
 	|	array_access:a

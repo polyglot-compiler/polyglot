@@ -21,6 +21,9 @@ public class MainTargetFactory implements TargetFactory
                             File outputDirectory, String outputExtension,
                             Boolean stdout)
   {
+    if (outputDirectory == null)
+	outputDirectory = new File(".");
+
     this.sourceExtension = sourceExtension;
     this.sourcePath = sourcePath;
     this.outputDirectory = outputDirectory;
@@ -69,7 +72,8 @@ public class MainTargetFactory implements TargetFactory
   public Target createClassTarget( String className) throws IOException
   {
     /* Search the source path. */
-    File sourceFile = null, directory;
+    File sourceFile = null;
+    File directory;
     File outputFile = new File( outputDirectory, 
                                 className.replace( '.', File.separatorChar)
                                 + outputExtension);
@@ -183,14 +187,6 @@ public class MainTargetFactory implements TargetFactory
       }
     }
 
-    public java_cup.runtime.lr_parser getParser() throws IOException
-    {
-	// The lexer also depends on which flags are passed to main.
-	//      jltools.lex.Lexer lexer = new jltools.lex.Lexer( getSourceReader(), 
-        //                                               getErrorQueue());
-      return Main.getParser( getSourceReader(), getErrorQueue());
-    }
-
     public void closeSource() throws IOException
     {
       if ( sourceFileReader != null) sourceFileReader.close();
@@ -205,21 +201,6 @@ public class MainTargetFactory implements TargetFactory
       outputFile = null;
 
     }
-    public NodeVisitor getNextNodeVisitor( int stage)
-    {
-      if( visitors == null) {
-        visitors = Main.getNodeVisitors( stage);
-      }
-      
-      if( visitors.hasNext()) {
-        return (NodeVisitor)visitors.next();
-      }
-      else {
-        visitors = null;
-        return null;
-      }
-    }
-
     protected ErrorQueue createErrorQueue() throws IOException
     {
       return new MainErrorQueue( name, System.err);

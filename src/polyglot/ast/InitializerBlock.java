@@ -88,7 +88,7 @@ public class InitializerBlock extends ClassMember
 
   public Node readSymbols( SymbolReader sr)
   {
-    return this;
+    return null;
   }
 
   public Node typeCheck( LocalContext c)

@@ -7,7 +7,8 @@ import jltools.util.*;
  * An <code>AmbiguousExpression</code> represents any ambiguous Java 
  * expression.
  */
-public abstract class AmbiguousExpression extends Expression 
+public abstract class AmbiguousExpression extends Expression
+  implements AmbiguousNode
 {
   public Node typeCheck( LocalContext c) throws SemanticException
   {

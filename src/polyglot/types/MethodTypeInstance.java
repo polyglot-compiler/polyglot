@@ -27,13 +27,13 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
   // RI: May be null.
   protected Type returnType;
   // The encompassing class
-  protected ClassType enclosingType;
+  protected ReferenceType enclosingType;
   
   /**
    *    ExceptionTypes, returnType, and AccessFlags may be null.
    **/
   public MethodTypeInstance(TypeSystem ts, 
-                            ClassType enclosingType, 
+                            ReferenceType enclosingType, 
                             String methodName, 
                             Type returnType,
                             List argumentTypes,
@@ -56,7 +56,7 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
     return returnType; 
   }
 
-  public ClassType getEnclosingType()
+  public ReferenceType getEnclosingType()
   {
     return enclosingType;
   }
@@ -91,4 +91,7 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
                (flags != null ? flags.copy() : null));
   }
 
+  public String toString() {
+    return getEnclosingType()+"."+getTypeString()+argumentTypes()+" throws "+exceptionTypes();
+  }
 }

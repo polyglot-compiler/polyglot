@@ -84,16 +84,17 @@ public class InstanceofExpression extends Expression
   {
     Type rtype = tn.getType();
 
-    if( rtype instanceof PrimitiveType) {
+    if( !rtype.isReferenceType()) {
       throw new SemanticException( 
-                 "Right operand of \"instanceof\" must be a reference type.");
+                 "Right operand of \"instanceof\" must be a reference type.",
+				  Annotate.getLineNumber(tn));
     }
 
     Type ltype = expr.getCheckedType();
     if( !ltype.isCastValid( rtype)) {
       throw new SemanticException(
                  "Left operand of \"instanceof\" must be castable to "
-                 + "the right operand.");
+                 + "the right operand.", Annotate.getLineNumber(expr));
     }
 
     setCheckedType( c.getTypeSystem().getBoolean());
