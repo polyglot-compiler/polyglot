@@ -29,7 +29,7 @@ public class ReachChecker extends DataFlow
               true /* perform dataflow on entry to CodeDecls */);
     }
 
-    public Item createInitialItem(FlowGraph graph) {
+    public Item createInitialItem(FlowGraph graph, Term node) {
         return DataFlowItem.NOT_REACHABLE;
     }
 

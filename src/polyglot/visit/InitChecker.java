@@ -448,8 +448,11 @@ public class InitChecker extends DataFlow
      * The initial item to be given to the entry point of the dataflow contains
      * the init counts for the final fields.
      */
-    public Item createInitialItem(FlowGraph graph) {
-        return new DataFlowItem(new HashMap(currCBI.currClassFinalFieldInitCounts));
+    public Item createInitialItem(FlowGraph graph, Term node) {
+        if (node == graph.startNode()) {
+            return new DataFlowItem(new HashMap(currCBI.currClassFinalFieldInitCounts));
+        }
+        return null;
     }
     
     /**
@@ -733,7 +736,7 @@ public class InitChecker extends DataFlow
             // no unreachable statement, the Java Language Spec permits it.
             
             // Set inItem to a default Item
-            dfIn = (DataFlowItem)createInitialItem(graph);
+            dfIn = (DataFlowItem)createInitialItem(graph, n);
         }
         DataFlowItem dfOut = null;
         if (outItems != null && !outItems.isEmpty()) {

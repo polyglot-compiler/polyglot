@@ -37,7 +37,7 @@ public class KeyChecker extends DataFlow
         EMPTY = vts.emptyKeySet(Position.COMPILER_GENERATED);
     }
 
-    public Item createInitialItem(FlowGraph graph) {
+    public Item createInitialItem(FlowGraph graph, Term node) {
         ProcedureDecl decl = (ProcedureDecl) graph.root();
         CofferProcedureInstance pi = (CofferProcedureInstance)
             decl.procedureInstance();

@@ -102,12 +102,13 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
 
     /**
-     * Create an initial Item. This is generally the Item that will be given
-     * to the entry point of a graph.
+     * Create an initial Item for the term node. This is generally how the Item that will be given
+     * to the start node of a graph is created, although this method may also be called for other
+     * (non-start) nodes.
      * 
-     * @return a non-null Item.
+     * @return a (possibly null) Item.
      */
-    protected abstract Item createInitialItem(FlowGraph graph);
+    protected abstract Item createInitialItem(FlowGraph graph, Term node);
     
     /**
      * Produce new <code>Item</code>s as appropriate for the
@@ -332,7 +333,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      */
     protected Item safeConfluence(List items, List itemKeys, Term node, FlowGraph graph) {
         if (items.isEmpty()) {
-            return this.createInitialItem(graph);
+            return this.createInitialItem(graph, node);
         }
         if (items.size() == 1) {
             return (Item)items.get(0);
@@ -432,17 +433,18 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             for (Iterator i = p.preds.iterator(); i.hasNext(); ) {
                 Edge e = (Edge)i.next();
                 Peer o = e.getTarget();
-                Item it = null;
                 if (o.outItems != null) {
-                    it = (Item)o.outItems.get(e.getKey());
-                    if (it == null) {
+                    if (!o.outItems.keySet().contains(e.getKey())) {
                         throw new InternalCompilerError("There should have " +
                                 "an out Item with edge key " + e.getKey() +
                                 "; instead there were only " + 
                                 o.outItems.keySet());
                     }
-                    inItems.add(it);
-                    inItemKeys.add(e.getKey());
+                    Item it = (Item)o.outItems.get(e.getKey());
+                    if (it != null) {
+                        inItems.add(it);
+                        inItemKeys.add(e.getKey());
+                    }
                 }
             }
     
@@ -670,7 +672,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             if (FlowGraph.EDGE_KEY_TRUE.equals(k)) {
                 m.put(k, trueItem);
             }
-            else if (FlowGraph.EDGE_KEY_TRUE.equals(k)) {
+            else if (FlowGraph.EDGE_KEY_FALSE.equals(k)) {
                 m.put(k, falseItem);
             }
             else { 

@@ -34,7 +34,7 @@ public class ExitChecker extends DataFlow
         return null;
     }
 
-    public Item createInitialItem(FlowGraph graph) {
+    public Item createInitialItem(FlowGraph graph, Term node) {
         return DataFlowItem.EXITS;
     }
 
