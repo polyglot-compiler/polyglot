@@ -160,10 +160,15 @@ public class CodeWriter
 class Overrun extends Exception 
 {
     int amount;
-    Overrun(int amount_) {
-	amount = amount_;
+
+    private Overrun() { }
+    private static Overrun overrun = new Overrun();
+
+    static Overrun overrun(int amount) {
 	if (CodeWriter.debug) System.err.println("-- Overrun: " + amount);
-    }  
+        overrun.amount = amount;
+        return overrun;
+    }
 }
 
 /**
@@ -239,13 +244,13 @@ abstract class Item
 		if (amount1 > amount) amount = amount1;
 		int amount2 = lmargin + getMinIndent(it) - fin;
 		if (amount2 > amount) amount = amount2;
-		throw new Overrun(amount);
+		throw Overrun.overrun(amount);
 	    } else {
-		throw new Overrun(pos - rmargin);
+		throw Overrun.overrun(pos - rmargin);
 	    }
 	}
 	if (it == null) { // no items to format. Check against final position.
-	    if (!nofail && pos > fin) throw new Overrun(pos - fin);
+	    if (!nofail && pos > fin) throw Overrun.overrun(pos - fin);
 	    return pos;
 	}
 	return it.formatN(lmargin, pos, rmargin, fin, can_break, nofail);
@@ -551,7 +556,7 @@ class Newline extends AllowBreak
     int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
 		boolean nofail) throws Overrun {
         broken = true;
-	if (!can_break) throw new Overrun(1);
+	if (!can_break) throw Overrun.overrun(1);
 	return format(next, lmargin, lmargin + indent, rmargin, fin,
 			can_break, nofail);
     }
