@@ -50,6 +50,9 @@ public class PackageContextResolver implements Resolver
 	    return cr.find(p.fullName() + "." + name);
 	}
 	catch (NoClassException e) {
+            if (!e.getClassName().equals(p.fullName() + "." + name)) {
+                throw e;
+            }
 	    return ts.packageForName(p, name);
 	}
     }
