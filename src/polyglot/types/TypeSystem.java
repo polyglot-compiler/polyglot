@@ -299,6 +299,7 @@ public abstract class TypeSystem {
     return firstDot >= 0 ? fullName.substring(firstDot+1) : "";
   }
 
+  public abstract TypeContext getEmptyContext(ClassResolver resolver);
   public abstract TypeContext getClassContext(ClassResolver resolver, ClassType clazz) throws SemanticException;
   public abstract TypeContext getPackageContext(ClassResolver resolver, PackageType type) throws SemanticException;
   public abstract TypeContext getPackageContext(ClassResolver resolver, String name) throws SemanticException;

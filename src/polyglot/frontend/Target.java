@@ -31,8 +31,6 @@ public abstract class Target
     return source;
   }
 
-  public abstract java_cup.runtime.lr_parser getParser() throws IOException;
-  
   public Writer getOutputWriter( String packageName) throws IOException
   {
     return output;
@@ -52,11 +50,6 @@ public abstract class Target
 
   protected abstract ErrorQueue createErrorQueue() throws IOException;
 
-  public NodeVisitor getNextNodeVisitor( int stage)
-  {
-    return null;
-  }
-
   public abstract Date getLastModifiedDate();
  
   public boolean equals( Object o)
@@ -68,5 +61,12 @@ public abstract class Target
       return false;
     }
   }
+
+  public int hashCode() {
+    return name.hashCode();
+  }
+
+  public String toString() {
+    return "Target " + name;
+  }
 }
-    

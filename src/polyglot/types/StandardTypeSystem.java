@@ -46,13 +46,11 @@ public class StandardTypeSystem extends TypeSystem {
     SERIALIZABLE_ = resolver.findClass( "java.io.Serializable");
   }
 
-
   public LocalContext getLocalContext( ImportTable it,
         NodeVisitor visitor ) {
 
     return new LocalContext( it, this, visitor );
   }
-
 
   ////
   // Functions for two-type comparison.
@@ -442,7 +440,6 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public Type checkAndResolveType(Type type, TypeContext context)
     throws SemanticException {
-
     // System.out.println( "Checking: " + type + " " + type.getTypeString());
 
     if (type.isCanonical()) return type;
@@ -499,21 +496,22 @@ public class StandardTypeSystem extends TypeSystem {
 
     // If the ambiguous name is qualified: classify the prefix to create
     // a new context in which to lookup the unqualified name.
-    Type leftType = ambType.getPrefix();
+    Type prefixType = ambType.getPrefix();
 
-    if (leftType instanceof AmbiguousType) {
-	leftType = checkAndResolveAmbiguousType((AmbiguousType) leftType,
+    if (prefixType instanceof AmbiguousType) {
+	prefixType = checkAndResolveAmbiguousType((AmbiguousType) prefixType,
 						context);
     }
 
-    if (leftType.isClassType()) {
+    // Lookup the unqualified name in the context of the prefix.
+    if (prefixType.isClassType()) {
 	TypeContext classContext = getClassContext(resolver,
-						  (ClassType) leftType);
+						  (ClassType) prefixType);
 	return classContext.getType(ambType.getName());
     }
-    else if (leftType.isPackageType()) {
+    else if (prefixType.isPackageType()) {
 	TypeContext packageContext = getPackageContext(resolver,
-						      (PackageType) leftType);
+						      (PackageType) prefixType);
 	return packageContext.getType(ambType.getName());
     }
     else {
@@ -1017,6 +1015,10 @@ public class StandardTypeSystem extends TypeSystem {
     else {
       return resolver.findClass(clazz.getName());
     }
+  }
+
+  public TypeContext getEmptyContext(ClassResolver resolver) {
+    return new EmptyContext(this, resolver);
   }
 
   public TypeContext getClassContext(ClassResolver resolver, ClassType type) throws SemanticException {

@@ -84,6 +84,7 @@ public class LocalContext implements TypeContext
       }
 
       if (type == null) {
+new SemanticException("Method " + methodName + " not found").printStackTrace(System.out);
 	throw new SemanticException("Method " + methodName + " not found");
       }
     }

@@ -3,6 +3,9 @@ fe_package	= jltools/frontend
 fe_codebase	= ../..
 fe_files 	= Compiler.java \
 		  Target.java \
+		  Job.java \
+		  SourceJob.java \
+		  ClassTypeJob.java \
 		  TargetFactory.java
 
 

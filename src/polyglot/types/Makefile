@@ -14,6 +14,7 @@ tp_files 	= AccessFlags.java	\
 			CompoundClassResolver.java \
 			ConstructorType.java \
 			ConstructorTypeInstance.java \
+			EmptyContext.java \
 			FieldInstance.java \
 			ImportTable.java \
 			LoadedClassResolver.java \

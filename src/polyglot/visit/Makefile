@@ -10,6 +10,7 @@ vs_files 	= SymbolReader.java \
 		  ClassSerializer.java \
 		  SignatureCleaner.java \
 		  DumpAst.java \
+		  TranslationVisitor.java \
 		  NodeScrambler.java
 
 VISIT_TARGET = $(patsubst %.java, $(vs_package)/%.class, $(vs_files))
