@@ -63,41 +63,6 @@ public class ClassBody_c extends Term_c implements ClassBody
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        // Now we can clean-super on the member classes.
-        /*
-        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-            List l = new ArrayList(members.size());
-
-            Job j = ar.job();
-
-            for (Iterator i = members.iterator(); i.hasNext(); ) {
-                ClassMember n = (ClassMember) i.next();
-
-                if (n instanceof ClassDecl) {
-                    Job sj = j.spawn(ar.context(), n,
-                                     Pass.CLEAN_SUPER, Pass.CLEAN_SUPER_ALL);
-
-                    if (! sj.status()) {                       
-                        if (! sj.reportedErrors()) {
-                            throw new SemanticException("Could not disambiguate " +
-                                                        "class member.",
-                                                        n.position());
-                        }
-                        throw new SemanticException();
-                    }
-
-                    ClassDecl m = (ClassDecl) sj.ast();
-                    l.add(m.visit(ar.visitChildren()));
-                }
-                else {
-                    l.add(n.visit(ar.visitChildren()));
-                }
-            }
-
-            return members(l);
-        }
-        */
-
         return this;
     }
 
