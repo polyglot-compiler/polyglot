@@ -11,6 +11,8 @@ import jltools.main.Main;
 import jltools.ext.jif.visit.*;
 import jltools.ext.jif.types.*;
 
+import splitter.config.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -56,6 +58,7 @@ public class Compiler implements TargetTable, ClassCleaner
   private static boolean serialize;
   private static boolean verbose;
   private static boolean jif;
+  private static Config jifSplitConfig;
 
   private static boolean initialized = false;
 
@@ -165,6 +168,11 @@ public class Compiler implements TargetTable, ClassCleaner
     serialize = ((Boolean)options.get( OPT_SERIALIZE)).booleanValue();
 
     jif = ((Boolean)options.get( Main.MAIN_OPT_EXT_JIF)).booleanValue();
+
+    if (jif) {
+	/* setup the splitter configuration */
+	jifSplitConfig = Config.init("filename");
+    }
 
     /* Set up the resolvers. */
     Compiler compiler = new Compiler( null);
@@ -702,8 +710,8 @@ public class Compiler implements TargetTable, ClassCleaner
   {
     AmbiguityRemover ar;
     if (jif) {
-	verbose(this, "Using Jif Ambiguity Remover");
-	ar = new JifAmbiguityRemover( ts, it, eq);
+	verbose(this, "Not Using Jif Ambiguity Remover");
+	ar = new AmbiguityRemover( ts, it, eq);
     } else {
 	ar = new AmbiguityRemover( ts, it, eq);
     }
@@ -745,8 +753,8 @@ public class Compiler implements TargetTable, ClassCleaner
     throws IOException
   {
     if (jif) {
-	verbose(this, "Skipping translation");
-	return;
+	verbose(this, "Splitting the file...");
+	
     } else {
 	SourceFileNode sfn = (SourceFileNode)ast;
 	Writer ofw = t.getOutputWriter( sfn.getPackageName());
