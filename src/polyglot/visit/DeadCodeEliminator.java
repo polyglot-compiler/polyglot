@@ -43,30 +43,30 @@ public class DeadCodeEliminator extends DataFlow {
 	    liveDecls = new HashSet(dfi.liveDecls);
 	}
 
-	protected void add(LocalInstance li) {
+	public void add(LocalInstance li) {
 	    liveVars.add(li);
 	    liveDecls.add(li);
 	}
 
-	protected void addAll(Set lis) {
+	public void addAll(Set lis) {
 	    liveVars.addAll(lis);
 	    liveDecls.addAll(lis);
 	}
 
-	protected void remove(LocalInstance li) {
+	public void remove(LocalInstance li) {
 	    liveVars.remove(li);
 	}
 
-	protected void removeAll(Set lis) {
+	public void removeAll(Set lis) {
 	    liveVars.removeAll(lis);
 	}
 
-	protected void removeDecl(LocalInstance li) {
+	public void removeDecl(LocalInstance li) {
 	    liveVars.remove(li);
 	    liveDecls.remove(li);
 	}
 
-	protected void union(DataFlowItem dfi) {
+	public void union(DataFlowItem dfi) {
 	    liveVars.addAll(dfi.liveVars);
 	    liveDecls.addAll(dfi.liveDecls);
 	}
@@ -124,7 +124,13 @@ public class DeadCodeEliminator extends DataFlow {
     }
 
     public Map flow(Item in, FlowGraph graph, Term t, Set succEdgeKeys) {
+	return itemToMap(flow(in, graph, t), succEdgeKeys);
+    }
+
+    protected DataFlowItem flow(Item in, FlowGraph graph, Term t) {
 	DataFlowItem result = new DataFlowItem((DataFlowItem)in);
+
+	Set[] du = null;
 
 	if (t instanceof LocalDecl) {
 	    LocalDecl n = (LocalDecl)t;
@@ -132,16 +138,29 @@ public class DeadCodeEliminator extends DataFlow {
 	    LocalInstance to = n.localInstance();
 	    result.removeDecl(to);
 
-	    Set[] du = getDefUse(n.init());
-	    result.removeAll(du[0]);
-	    result.addAll(du[1]);
+	    du = getDefUse(n.init());
 	} else if (t instanceof Stmt && !(t instanceof CompoundStmt)) {
-	    Set[] du = getDefUse((Stmt)t);
+	    du = getDefUse((Stmt)t);
+	} else if (t instanceof CompoundStmt) {
+	    if (t instanceof If) {
+		du = getDefUse(((If)t).cond());
+	    } else if (t instanceof Switch) {
+		du = getDefUse(((Switch)t).expr());
+	    } else if (t instanceof Do) {
+		du = getDefUse(((Do)t).cond());
+	    } else if (t instanceof For) {
+		du = getDefUse(((For)t).cond());
+	    } else if (t instanceof While) {
+		du = getDefUse(((While)t).cond());
+	    }
+	}
+
+	if (du != null) {
 	    result.removeAll(du[0]);
 	    result.addAll(du[1]);
 	}
 
-	return itemToMap(result, succEdgeKeys);
+	return result;
     }
 
     public void post(FlowGraph graph, Term root) throws SemanticException {
@@ -230,37 +249,54 @@ public class DeadCodeEliminator extends DataFlow {
 	return n;
     }
 
-    private Set[] getDefUse(Node n) {
+    /**
+     * Returns array of sets of local instances.
+     * Element 0 is the set of local instances DEFined by the node.
+     * Element 1 is the set of local instances USEd by the node.
+     */
+    protected Set[] getDefUse(Node n) {
 	final Set def = new HashSet();
 	final Set use = new HashSet();
 
 	if (n != null) {
-	    NodeVisitor v = new NodeVisitor() {
-		public Node leave(Node old, Node n, NodeVisitor v) {
-		    if (n instanceof Local) {
-			use.add(((Local)n).localInstance());
-		    } else if (n instanceof Assign) {
-			Expr left = ((Assign)n).left();
-			if (left instanceof Local) {
-			    def.add(((Local)left).localInstance());
-			}
-		    }
-
-		    return n;
-		}
-	    };
-
-	    n.visit(v);
+	    n.visit(createDefUseFinder(def, use));
 	}
 
 	return new Set[] {def, use};
+    }
+
+    protected NodeVisitor createDefUseFinder(Set def, Set use) {
+	return new DefUseFinder(def, use);
+    }
+
+    protected static class DefUseFinder extends NodeVisitor {
+	protected Set def;
+	protected Set use;
+
+	public DefUseFinder(Set def, Set use) {
+	    this.def = def;
+	    this.use = use;
+	}
+
+	public Node leave(Node old, Node n, NodeVisitor v) {
+	    if (n instanceof Local) {
+		use.add(((Local)n).localInstance());
+	    } else if (n instanceof Assign) {
+		Expr left = ((Assign)n).left();
+		if (left instanceof Local) {
+		    def.add(((Local)left).localInstance());
+		}
+	    }
+
+	    return n;
+	}
     }
 
     /**
      * Returns a statement that is equivalent to evaluating the given
      * expression for side-effects.
      */
-    private Stmt getEffects(Expr expr) {
+    protected Stmt getEffects(Expr expr) {
 	Stmt empty = nf.Empty(Position.COMPILER_GENERATED);
 	if (expr == null) return empty;
 
