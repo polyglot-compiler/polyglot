@@ -93,5 +93,5 @@ docs:
 	-mkdir -p $(JAVADOC_OUTPUT)
 	$(JAVADOC) $(JAVADOC_FLAGS) -d $(JAVADOC_OUTPUT) jltools.ast jltools.frontend jltools.parse jltools.util jltools.types jltools.visit jltools.runtime
 
-
-
+classpath: # type "eval `make classpath`" to set classpath
+	@echo setenv CLASSPATH "$(CLASSPATH)"
