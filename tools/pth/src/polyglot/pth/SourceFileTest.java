@@ -18,6 +18,7 @@ public class SourceFileTest extends AbstractTest {
     protected String extensionClassname = null;
     protected String[] extraArgs;
     protected final SilentErrorQueue eq;
+    protected String destDir;
     
     protected List expectedFailures;
         
@@ -127,9 +128,44 @@ public class SourceFileTest extends AbstractTest {
     protected void invokePolyglot(String[] files) 
         throws polyglot.main.Main.TerminationException 
     {
+        File tmpdir = new File("pthOutput");
+
+        int i = 1;
+        while (tmpdir.exists()) {
+            tmpdir = new File("pthOutput." + i);
+            i++;
+        }
+
+        tmpdir.mkdir();
+
+        setDestDir(tmpdir.getPath());
+                
         String[] cmdLine = buildCmdLine(files);
         polyglot.main.Main polyglotMain = new polyglot.main.Main();
-        polyglotMain.start(cmdLine, eq);
+
+        try {
+            polyglotMain.start(cmdLine, eq);
+        }
+        finally {
+            if (Main.options.deleteOutputFiles) {
+                deleteDir(tmpdir);
+            }
+
+            setDestDir(null);
+        }
+    }
+
+    protected void deleteDir(File dir) {
+        File[] list = dir.listFiles();
+        for (int i = 0; i < list.length; i++) {
+            if (list[i].isDirectory()) {
+                deleteDir(list[i]);
+            }
+            else {
+                list[i].delete();
+            }
+        }
+        dir.delete();
     }
 
     protected String[] buildCmdLine(String[] files) {
@@ -205,8 +241,11 @@ public class SourceFileTest extends AbstractTest {
     protected String getAdditionalClasspath() {
         return Main.options.classpath;
     }
+    protected void setDestDir(String dir) {
+        this.destDir = dir;
+    }
     protected String getDestDir() {
-        return null;
+        return destDir;
     }
     protected String getSourceDir() {
         return null;

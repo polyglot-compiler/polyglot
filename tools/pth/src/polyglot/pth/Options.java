@@ -31,6 +31,9 @@ public class Options {
     
     // test only the ones that failed last time
     protected boolean testPreviouslyFailedOnly = false;
+
+    // test only the ones that failed last time
+    protected boolean deleteOutputFiles = true;
     
     // array of the possible command line options.
     // the order in the array is the order that they will be applied in.
@@ -39,6 +42,13 @@ public class Options {
                            "only execute the tests for which the regular expression regexp occurs somewhere in the test's name.") { 
                protected int invoke(int index, String[] args) {
                    testFilter = ".*" + getStringArg(++index, args) + ".*";
+                   return index + 1;
+               }
+         },
+        new CommandLineOption(new String[] {"p", "preserve"}, 
+                           "preserve output files between tests; default is to delete") { 
+               protected int invoke(int index, String[] args) {
+                   deleteOutputFiles = false;
                    return index + 1;
                }
          },
