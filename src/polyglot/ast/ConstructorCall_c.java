@@ -110,11 +110,11 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
     // The arguments are evaluated in static scope.
     public void enterScope(Context c) {
-        c.pushStatic(true);
+        // c.pushStatic(true);
     }
    
     public void leaveScope(Context c) {
-        c.popStatic();
+        // c.popStatic();
     }
 
     /** Type check the call. */
