@@ -23,6 +23,10 @@ public class MethodExpression extends Expression
    */
   MethodTypeInstance mti;
 
+    public MethodTypeInstance getMTI() {
+	return mti;
+    }
+
   /**
    * Create a new <code>MethodExpression</code>.
    * 
@@ -109,6 +113,10 @@ public class MethodExpression extends Expression
   {
     return args.iterator();
   }
+
+    public List getArgs() {
+	return args;
+    }
   
   /**
    * Visit the children of this node.

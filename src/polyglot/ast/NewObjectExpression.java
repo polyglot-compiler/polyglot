@@ -29,6 +29,9 @@ public class NewObjectExpression extends Expression
    */
   MethodTypeInstance mti;
 
+    public MethodTypeInstance getMTI() {
+	return mti;
+    }
 
   /**
    * Creates a new <code>NewObjectExpression</code>.
@@ -122,6 +125,11 @@ public class NewObjectExpression extends Expression
   {
     return args.iterator();
   }
+
+    public List getArgs()
+    {
+	return args;
+    }
 
   /**
    * Returns the <code>ClassNode</code> defining the anonymous class being
