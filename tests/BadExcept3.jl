@@ -1,6 +1,6 @@
-class Except3 {
+class BadExcept3 {
   int x;
-  Object m(Except3 a) throws Exception {
+  Object m(BadExcept3 a) {
     try {
       a.x = 0;
       throw new Exception();

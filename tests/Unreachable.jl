@@ -1,6 +1,6 @@
 // This tests whether we detect reachable code properly.
 
-public class Reachable {
+public class Unreachable {
   // The following methods all have some
   // unreachable code.
   void m1() {
@@ -47,7 +47,7 @@ public class Reachable {
   void m6() {
     int i = 4;
     switch (i) {
-      System.out.println("ouch!"); // BAD (52)
+      // System.out.println("ouch!"); // BAD (52)
     case 3:
       break;
       System.out.println("no good"); // BAD (55)
