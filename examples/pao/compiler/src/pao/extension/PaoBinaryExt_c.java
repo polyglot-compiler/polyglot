@@ -22,7 +22,7 @@ public class PaoBinaryExt_c extends PaoExt_c {
             if (ts.isSubtype(l.type(), mi.container()) ||
                 ts.equals(l.type(), ts.Object())) {
 
-                // left is a boxed primitive
+                // left is possibly a boxed primitive
                 if (r.type().isReference()) {
                     TypeNode x = nf.CanonicalTypeNode(b.position(),
                                                       mi.container());
