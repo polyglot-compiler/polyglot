@@ -146,6 +146,11 @@ extend class_body_declarations ::=
 	    {: RESULT = a.list(); :}
     ;
 
+extend method_invocation ::=
+        COMMA_TYPE:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN:d
+        {: RESULT = parser.nf.Call(parser.pos(a,d), (TypeNode)a.node(), b.getIdentifier(), c); :}
+    ;
+    
 extend formal_parameter_list ::=
 	COMMA_LIST:a
 	    {: RESULT = a.list(); :}
