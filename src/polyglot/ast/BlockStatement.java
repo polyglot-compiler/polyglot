@@ -5,6 +5,7 @@
 package jltools.ast;
 
 import jltools.util.Assert;
+import jltools.util.TypedListIterator;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.ArrayList;
@@ -56,6 +57,17 @@ public class BlockStatement extends Statement {
   public Statement statementAt(int pos) {
     return (Statement) statements.get(pos);
   }
+
+  /**
+   * Returns a TypedListIterator which will yield every statement in this
+   * in order, and only allow Statements to be inserted.
+   **/
+  public TypedListIterator iterator() {
+    return new TypedListIterator(statements.listIterator(), 
+				 Statement.class,
+				 false);
+  }
+
 
   public Node accept(NodeVisitor v) {
     return v.visitBlockStatement(this);
