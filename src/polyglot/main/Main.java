@@ -465,8 +465,16 @@ public class Main
         i++;
         options.put( MAIN_OPT_EXT, args[i]);
 	loadExtension(args[i]);
-        i++;
-      }
+	if (i+1 < args.length)
+	    try  {
+		i = extInfo.parseCommandLine(args, i+1, options);
+	    }
+	    catch (UsageError u) {
+		System.err.println(u.getMessage());
+		usage();
+		System.exit(1);
+	    }
+	}
       else if( args[i].equals( "-sx")) 
       {
         i++;
@@ -561,12 +569,14 @@ public class Main
 
   private static void usage()
   {
-    String fileext;
+    String fileext, compilerName;
     if (extInfo == null) fileext = "jl";
-    else fileext = extInfo.fileExtension();
+      else fileext = extInfo.fileExtension();
+    if (extInfo == null) compilerName = "jltools";
+      else compilerName = extInfo.compilerName();
 
-    System.err.println( "usage: " + Main.class.getName() + " [options] " 
-                        + "<source-file>."+ fileext + " ...\n");
+    System.err.println("usage: " + compilerName + " [options] " +
+                        "<source-file>." + fileext + " ...\n");
     System.err.println( "where [options] includes:");
     System.err.println( " -d <directory>          output directory");
     System.err.println( " -sourcepath <path list> source path");
@@ -586,5 +596,6 @@ public class Main
     System.err.println( " -version                print version info");
     System.err.println( " -h                      print this message");
     System.err.println();
+    if (extInfo != null) System.err.println(extInfo.options());
   }
 }

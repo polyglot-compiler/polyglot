@@ -4,6 +4,7 @@ import jltools.ast.*;
 import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
+import jltools.main.UsageError;
 
 import java.io.*;
 import java.util.*;
@@ -14,6 +15,18 @@ public class StandardExtensionInfo implements ExtensionInfo {
 
     public String fileExtension() {
 	return "jl";
+    }
+    public String compilerName() {
+	return "jltools";
+    }
+    public String options() {
+	return "";
+    }
+
+    public int parseCommandLine(String args[], int index, Map options)
+	throws UsageError
+    {
+	return index;
     }
 
     protected TypeSystem createTypeSystem() {
@@ -26,6 +39,7 @@ public class StandardExtensionInfo implements ExtensionInfo {
 	}
 	return ts;
     }
+
 
     protected ExtensionFactory createExtensionFactory() {
 	return new StandardExtensionFactory();
