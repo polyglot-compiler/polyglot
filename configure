@@ -133,8 +133,9 @@ echo creating Defs.mk
     echo TOOLS_JAR = "${TOOLS_JAR}"
     echo RT_JAR = "${RT_JAR}"
     echo
+    echo LEX_RUNTIME = '$(ESC_SOURCE)'${FILE_SEP}'jlex.jar'
     echo CUP_RUNTIME = '$(ESC_SOURCE)'${FILE_SEP}'java_cup.jar'
-    echo CLASSPATH = '$(ESC_SOURCE)'${FILE_SEP}classes${PATH_SEP}'$(CUP_RUNTIME)'
+    echo CLASSPATH = '$(ESC_SOURCE)'${FILE_SEP}classes${PATH_SEP}'$(CUP_RUNTIME)'${PATH_SEP}'$(LEX_RUNTIME)'
     echo JAVAC_PATHS = -classpath '$(CLASSPATH)' -sourcepath '$(ESC_BUILDPATH)'${PATH_SEP}'$(ESC_SOURCE)'
     echo
     echo JAVADOC_CLASSPATH = '$(ESC_SOURCE)'${FILE_SEP}'iDoclet.jar'"${PATH_SEP}${ESC_TOOLS_JAR}${PATH_SEP}"'$(CLASSPATH)'
