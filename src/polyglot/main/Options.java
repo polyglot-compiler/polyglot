@@ -17,6 +17,8 @@ public final class Options {
   public int error_count = 100;
   public Collection source_path; // List[String]
   public File output_directory;
+  public String classpath = System.getProperty("java.class.path") +
+      File.pathSeparator + System.getProperty("sun.boot.class.path");
   public String source_ext = null; // e.g., java, jl, pj
   public String output_ext = "java"; // java, by default
   public boolean output_stdout = false; // whether to output to stdout

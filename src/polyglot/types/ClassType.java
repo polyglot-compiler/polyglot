@@ -14,6 +14,7 @@ public interface ClassType extends ReferenceType
 
     /** Returns the member class with the given name, or null. */
     MemberClassType memberClassNamed(String name);
+    FieldInstance fieldNamed(String name);
 
     boolean isTopLevel();
     boolean isInner();

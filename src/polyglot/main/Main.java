@@ -159,14 +159,12 @@ public class Main
       else if (args[i].equals("-classpath") ||
                args[i].equals("-cp")) {
 	i++;
-	String current_path = System.getProperty("java.class.path");
+	String current_path = System.getProperty("java.class.path") +
+              File.pathSeparator + System.getProperty("sun.boot.class.path");
 	current_path = args[i] + System.getProperty("path.separator") +
 			current_path;
         i++;
-	System.setProperty("java.class.path", current_path);
-	System.err.println("Warning: -classpath not implemented\n");
-	// Does the system class loader really keep looking at this?
-	// No -- this doesn't work
+        options.classpath = current_path;
       }
       else if (args[i].equals("-sourcepath"))
       {

@@ -1,12 +1,13 @@
 SOURCE = ../..
 PACKAGE = jltools/types
-SUBDIRS =
+SUBDIRS = reflect
 
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
 	AnonClassType.java \
 	ArrayType.java \
+	LazyClassInitializer.java \
 	CachingResolver.java \
 	ClassContextResolver.java \
 	ClassResolver.java \
@@ -22,7 +23,6 @@ SOURCES = \
 	InitializerInstance.java \
 	InnerClassType.java \
 	LoadedClassResolver.java \
-	LoadedClassType.java \
 	LocalClassType.java \
 	LocalInstance.java \
 	MemberClassType.java \
@@ -60,6 +60,7 @@ SOURCES = \
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
 all: $(CLASSES)
+	$(subdirs)
 
 release: release_src
 

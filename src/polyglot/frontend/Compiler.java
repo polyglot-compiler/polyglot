@@ -97,6 +97,7 @@ public class Compiler
 	// Create the compiler and set up the resolvers.
 	parsedResolver = new TableResolver();
 	loadedResolver = new LoadedClassResolver(this, type_system,
+                                                 options.classpath,
 						 options.no_source_check);
 
 	CompoundResolver compoundResolver =

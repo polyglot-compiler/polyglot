@@ -4,6 +4,7 @@ import java.util.*;
 import jltools.util.Position;
 import jltools.frontend.Job;
 import jltools.frontend.Compiler;
+import jltools.types.reflect.ClassFile;
 
 /**
  * The <code>TypeSystem</code> defines the types of the language and
@@ -57,12 +58,6 @@ public interface TypeSystem {
 
     /** Create a default constructor instance. */
     ConstructorInstance defaultConstructor(Position pos, ClassType container);
-
-    /**
-     * Return a class type for the Class object.  Only a
-     * Resolver should call this method.
-     */
-    ClassType forClass(Class clazz) throws SemanticException;
 
     /** Get a place-holder for serializing a type object. */
     TypeObject placeHolder(TypeObject o, java.util.Set roots);
@@ -272,16 +267,6 @@ public interface TypeSystem {
     ArrayType arrayOf(Type type, int dims);
     ArrayType arrayOf(Position pos, Type type, int dims);
 
-    /**
-     * Returns a canonical type corresponding to the Java Class object
-     * class.  Does not require that <theClass> have a JavaClass
-     * theClass.  Does not require that <theClass> have a ClassType
-     * registered in this typeSystem.  Does not register the type in
-     * this TypeSystem.
-     * this TypeSystem.  For use only by ClassType implementations.
-     **/
-    Type typeForClass(Class clazz) throws SemanticException;
-
     Package packageForName(String name);
     Package packageForName(Package prefix, String name);
 
@@ -293,13 +278,20 @@ public interface TypeSystem {
     /** Get a resolver for looking up a type in a class context. */
     Resolver classContextResolver(ClassType ct);
 
-    ParsedAnonClassType anonClassType(Job job);
-    ParsedTopLevelClassType topLevelClassType(Job job);
-    ParsedMemberClassType memberClassType(Job job);
-    ParsedLocalClassType localClassType(Job job);
+    LazyClassInitializer defaultClassInitializer();
+
+    ParsedTopLevelClassType topLevelClassType(LazyClassInitializer init);
+    ParsedMemberClassType memberClassType(LazyClassInitializer init);
+    ParsedLocalClassType localClassType(LazyClassInitializer init);
+    ParsedAnonClassType anonClassType(LazyClassInitializer init);
+
+    ParsedTopLevelClassType topLevelClassType();
+    ParsedMemberClassType memberClassType();
+    ParsedLocalClassType localClassType();
+    ParsedAnonClassType anonClassType();
 
     /**
-     * return the set of objects that should be serialized into the
+     * Return the set of objects that should be serialized into the
      * type information for the given ClassType.
      * Usually only the clazz itself should get encoded, and references
      * to other classes should just have their name written out.

@@ -63,7 +63,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 
     /** Get the class's super type. */
     public Type superType() {
-        return superType;
+        return this.superType;
     }
 
     /** Get a field of the class by name. */
@@ -103,8 +103,12 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     public AnonClassType toAnonymous() { return null; }
 
     /** Get the class's package. */
-    public Package package_() { return package_; }
+    public Package package_() {
+        return package_;
+    }
 
     /** Get the class's flags. */
-    public Flags flags() { return flags; }
+    public Flags flags() {
+        return flags;
+    }
 }

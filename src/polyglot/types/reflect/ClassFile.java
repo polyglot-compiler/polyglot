@@ -1,0 +1,692 @@
+package jltools.types.reflect;
+
+import jltools.main.Report;
+import jltools.types.*;
+import jltools.util.*;
+import java.io.*;
+import java.util.*;
+
+/**
+ * ClassFile basically represents a Java classfile as it is found on 
+ * disk.  The classfile is modeled according to the Java Virtual Machine
+ * Specification.  Methods are provided to edit the classfile at a very
+ * low level.
+ *
+ * @see Attribute
+ * @see Constant
+ * @see Field
+ * @see Method
+ *
+ * @author Nate Nystrom
+ *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)
+ */
+public class ClassFile implements LazyClassInitializer {
+    Constant[] constants;       // The constant pool
+    int modifiers;      // This class's modifer bit field
+    int thisClass;              
+    int superClass;             
+    int[] interfaces;           
+    Field[] fields;
+    Method[] methods;
+    Attribute[] attrs;
+    InnerClasses innerClasses;
+
+    static Collection verbose = ClassFileLoader.verbose;
+  
+    /**
+    * Constructor.  This constructor parses the class file from the input
+    * stream.
+    *
+    * @param file
+    *        The file in which the class resides.
+    * @param loader
+    *        The class info loader which loaded the class.
+    * @param in
+    *        The data stream containing the class.
+    * @exception ClassFormatError
+    *        When the class could not be parsed.
+    */
+    public ClassFile(byte[] code) {
+        try {
+            ByteArrayInputStream bin = new ByteArrayInputStream(code);
+            DataInputStream in = new DataInputStream(bin);
+            read(in);
+            in.close();
+            bin.close();
+        }
+        catch (IOException e) {
+            throw new InternalCompilerError("I/O exception on ByteArrayInputStream");
+        }
+    }
+
+    public boolean fromClassFile() { 
+      return true;
+    }
+
+    void setJLCInfo() {
+      // Check if already set.
+      if (initJLCInfo) {
+        return;
+      }
+
+      initJLCInfo = true;
+
+      try {
+        int count = 0;
+
+        for (int i = 0; i < fields.length; i++) {
+          if (fields[i].name().equals("jlc$SourceLastModified")) {
+            sourceLastModified = fields[i].getLong();
+            count++;
+          }
+          else if (fields[i].name().equals("jlc$CompilerVersion")) {
+            compilerVersion = fields[i].getString();
+            count++;
+          }
+          else if (fields[i].name().equals("jlc$ClassType")) {
+            encodedClassType = fields[i].getString();
+            count++;
+          }
+        }
+
+        if (count == 3) {
+          hasJLCInfo = true;
+        }
+      }
+      catch (SemanticException e) {
+      }
+    }
+
+    public long sourceLastModified() {
+      setJLCInfo();
+
+      if (! hasJLCInfo) {
+        return 0;
+      }
+
+      return sourceLastModified;
+    }
+
+    public String compilerVersion() {
+      setJLCInfo();
+
+      if (! hasJLCInfo) {
+        return null;
+      }
+
+      return compilerVersion;
+    }
+
+    public String encodedClassType() {
+      setJLCInfo();
+
+      if (! hasJLCInfo) {
+        return null;
+      }
+
+      return encodedClassType;
+    }
+
+    long sourceLastModified = 0L;
+    String compilerVersion = null;
+    String encodedClassType = null;
+    boolean hasJLCInfo = false;
+    boolean initJLCInfo = false;
+
+    void read(DataInputStream in) throws IOException {
+        // Read in file contents from stream
+        readHeader(in);
+        readConstantPool(in);
+        readAccessFlags(in);
+        readClassInfo(in);
+        readFields(in);
+        readMethods(in);
+        readAttributes(in);
+    }
+
+    public ParsedClassType type(TypeSystem ts) throws SemanticException {
+        ParsedClassType ct = createType(ts);
+
+        if (ct.isSame(ts.Object())) {
+            ct.superType(null);
+        }
+        else {
+            String superName = classNameCP(superClass);
+
+            if (superName != null) {
+                ct.superType(typeForName(ts, superName));
+            }
+            else {
+                ct.superType(ts.Object());
+            }
+        }
+
+        return ct;
+    }
+
+    public void initMemberClasses(ParsedClassType ct) {
+        if (innerClasses == null) {
+            return;
+        }
+
+        TypeSystem ts = ct.typeSystem();
+
+        for (int i = 0; i < innerClasses.classes.length; i++) {
+            InnerClasses.Info c = innerClasses.classes[i];
+
+            if (c.outerClassIndex == thisClass && c.classIndex != 0) {
+                String name = classNameCP(c.classIndex);
+
+                int index = name.lastIndexOf('$');
+
+                // Skip local and anonymous classes.
+                if (index >= 0 && Character.isDigit(name.charAt(index+1))) {
+                    continue;
+                }
+
+                // A member class of this class
+                ClassType t = typeForName(ts, name);
+
+                if (t.isMember()) {
+                    Report.report(verbose, 3, "adding member " + t + " to " + ct);
+                    ct.addMemberClass(t.toMember());
+                }
+                else {
+                    throw new InternalCompilerError(name + " should be a member class.");
+                }
+            }
+        }
+    }
+
+    public void initInterfaces(ParsedClassType ct) {
+        TypeSystem ts = ct.typeSystem();
+
+        for (int i = 0; i < interfaces.length; i++) {
+            String name = classNameCP(interfaces[i]);
+            ct.addInterface(typeForName(ts, name));
+        }
+    }
+
+    public void initFields(ParsedClassType ct) {
+        TypeSystem ts = ct.typeSystem();
+
+        // Add the "class" field.
+        LazyClassInitializer init = ts.defaultClassInitializer();
+        init.initFields(ct);
+  
+        for (int i = 0; i < fields.length; i++) {
+            if (! fields[i].name().startsWith("jlc$")) {
+                FieldInstance fi = fields[i].fieldInstance(ts, ct);
+                Report.report(verbose, 3, "adding " + fi + " to " + ct);
+                ct.addField(fi);
+            }
+        }
+    }
+
+    public void initMethods(ParsedClassType ct) {
+        TypeSystem ts = ct.typeSystem();
+
+        for (int i = 0; i < methods.length; i++) {
+            if (! methods[i].name().equals("<init>") &&
+                ! methods[i].name().equals("<clinit>")) {
+                MethodInstance mi = methods[i].methodInstance(ts, ct);
+                Report.report(verbose, 3, "adding " + mi + " to " + ct);
+                ct.addMethod(mi);
+            }
+        }
+    }
+
+    public void initConstructors(ParsedClassType ct) {
+        TypeSystem ts = ct.typeSystem();
+
+        for (int i = 0; i < methods.length; i++) {
+            if (methods[i].name().equals("<init>")) {
+                ConstructorInstance ci = methods[i].constructorInstance(ts, ct);
+                Report.report(verbose, 3, "adding " + ci + " to " + ct);
+                ct.addConstructor(ci);
+            }
+        }
+    }
+
+    Type arrayOf(Type t, int dims) {
+      if (dims == 0) {
+        return t;
+      }
+      else {
+        return t.typeSystem().arrayOf(t);
+      }
+    }
+
+    List typeListForString(TypeSystem ts, String str) {
+        List types = new ArrayList();
+
+        for (int i = 0; i < str.length(); i++) {
+            int dims = 0;
+
+            while (str.charAt(i) == '[') {
+                dims++;
+                i++;
+            }
+
+            switch (str.charAt(i)) {
+                case 'Z': types.add(arrayOf(ts.Boolean(), dims));
+                          break;
+                case 'B': types.add(arrayOf(ts.Byte(), dims));
+                          break;
+                case 'S': types.add(arrayOf(ts.Short(), dims));
+                          break;
+                case 'C': types.add(arrayOf(ts.Char(), dims));
+                          break;
+                case 'I': types.add(arrayOf(ts.Int(), dims));
+                          break;
+                case 'J': types.add(arrayOf(ts.Long(), dims));
+                          break;
+                case 'F': types.add(arrayOf(ts.Float(), dims));
+                          break;
+                case 'D': types.add(arrayOf(ts.Double(), dims));
+                          break;
+                case 'V': types.add(arrayOf(ts.Void(), dims));
+                          break;
+                case 'L': {
+                    int start = ++i;
+                    while (i < str.length()) {
+                        if (str.charAt(i) == ';') {
+                            String s = str.substring(start, i);
+                            s = s.replace('/', '.');
+                            types.add(arrayOf(typeForName(ts, s), dims));
+                            break;
+                        }
+
+                        i++;
+                    }
+                }
+            }
+        }
+
+        Report.report(verbose, 4, "parsed \"" + str + "\" -> " + types);
+
+        return types;
+    }
+
+    Type typeForString(TypeSystem ts, String str) {
+        List l = typeListForString(ts, str);
+
+        if (l.size() == 1) {
+            return (Type) l.get(0);
+        }
+
+        throw new InternalCompilerError("Bad type string: \"" + str + "\"");
+    }
+
+    ClassType typeForName(TypeSystem ts, String name) {
+        Report.report(verbose, 2, "resolving " + name);
+
+        try {
+            return (ClassType) ts.systemResolver().findType(name);
+        }
+        catch (SemanticException e) {
+            throw new InternalCompilerError("could not load " + name);
+        }
+    }
+
+    ParsedClassType createType(TypeSystem ts) {
+        // The name is of the form "p.q.C$I$J".
+        String name = classNameCP(thisClass);
+
+        Report.report(verbose, 2, "creating ClassType for " + name);
+
+        // This is the "p.q" part.
+        String packageName = StringUtil.getPackageComponent(name);
+
+        // This is the "C$I$J" part.
+        String className = StringUtil.getShortNameComponent(name);
+                        
+        int dollar = name.lastIndexOf('$');
+
+        String outerName; // This will be "p.q.C$I"
+        String innerName; // This will be "J"
+
+        if (dollar >= 0) {
+            outerName = name.substring(0, dollar);
+            innerName = name.substring(dollar+1);
+        }
+        else {
+            outerName = name;
+            innerName = null;
+        }
+
+        final int TOP = 0;
+        final int MEMBER = 1;
+        final int LOCAL = 2;
+        final int ANONYMOUS = 3;
+
+        final String[] kinds = new String[] {
+          "top-level", "member", "local", "anonymous" };
+                                                        
+        int kind = TOP;
+
+        if (dollar >= 0) {
+            // An inner class.  Parse the class name to determine what kind. 
+            StringTokenizer st = new StringTokenizer(className, "$");
+
+            while (st.hasMoreTokens()) {
+                String s = st.nextToken();
+
+                if (Character.isDigit(s.charAt(0))) {
+                    // Example: C$1
+                    kind = ANONYMOUS;
+                }
+                else if (kind == ANONYMOUS) {
+                    // Example: C$1$D
+                    kind = LOCAL;
+                }
+                else {
+                    // Example: C$D
+                    kind = MEMBER;
+                }
+            }
+        }
+
+        Report.report(verbose, 3, name + " is " + kinds[kind]);
+
+        ParsedClassType ct;
+
+        if (kind == ANONYMOUS) {
+            ParsedAnonClassType t = ts.anonClassType(this);
+            ct = t;
+        }
+        else if (kind == LOCAL) {
+            ParsedLocalClassType t = ts.localClassType(this);
+            t.name(innerName);
+            ct = t;
+        }
+        else if (kind == MEMBER) {
+            ParsedMemberClassType t = ts.memberClassType(this);
+            t.name(innerName);
+            ct = t;
+        }
+        else {
+            ParsedTopLevelClassType t = ts.topLevelClassType(this);
+            t.name(className);
+            ct = t;
+        }
+
+        if (! packageName.equals("")) {
+            ct.package_(ts.packageForName(packageName));
+        }
+
+        // Add unresolved class into the cache to avoid circular resolving.
+        ((CachingResolver) ts.systemResolver()).medianResult(name, ct);
+
+        if (kind != TOP) {
+            ((ParsedInnerClassType) ct).outer(typeForName(ts, outerName));
+        }
+
+        ct.flags(new Flags(modifiers));
+        ct.position(position());
+
+        return ct;
+    }
+
+    public Position position() {
+        return new Position(name() + ".class");
+    }
+
+  String classNameCP(int index) {
+    Constant c = constants[index];
+
+    if (c != null && c.tag() == Constant.CLASS) {
+      Integer nameIndex = (Integer) c.value();
+      if (nameIndex != null) {
+	c = constants[nameIndex.intValue()];
+	if (c.tag() == Constant.UTF8) {
+	  String s = (String) c.value();
+          return s.replace('/', '.');
+	}
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Get the name of the class, including the package name.
+   *
+   * @return
+   *        The name of the class.
+   */
+  public String name() {
+    Constant c = constants[thisClass];
+    if (c.tag() == Constant.CLASS) {
+      Integer nameIndex = (Integer) c.value();
+      if (nameIndex != null) {
+	c = constants[nameIndex.intValue()];
+	if (c.tag() == Constant.UTF8) {
+	  return (String) c.value();
+	}
+      }
+    }
+    
+    throw new ClassFormatError("Couldn't find class name in file"); 
+  }
+  
+  /**
+   * Read a constant from the constant pool.
+   *
+   * @param in
+   *        The stream from which to read.
+   * @return
+   *        The constant.
+   * @exception IOException
+   *        If an error occurs while reading.
+   */
+  Constant readConstant(DataInputStream in)
+       throws IOException
+  {
+    int tag = in.readUnsignedByte();
+    Object value;
+    
+    switch (tag) 
+      {
+      case Constant.CLASS:
+      case Constant.STRING:
+	value = new Integer(in.readUnsignedShort());
+	break;
+      case Constant.FIELD_REF:
+      case Constant.METHOD_REF:
+      case Constant.INTERFACE_METHOD_REF:
+      case Constant.NAME_AND_TYPE:
+	value = new int[2];
+	((int[]) value)[0] = in.readUnsignedShort();
+	((int[]) value)[1] = in.readUnsignedShort();
+	break;
+      case Constant.INTEGER:
+	value = new Integer(in.readInt());
+	break;
+      case Constant.FLOAT:
+	value = new Float(in.readFloat());
+	break;
+      case Constant.LONG:
+	// Longs take up 2 constant pool entries.
+	value = new Long(in.readLong());
+	break;
+      case Constant.DOUBLE:
+	// Doubles take up 2 constant pool entries.
+	value = new Double(in.readDouble());
+	break;
+      case Constant.UTF8:
+	value = in.readUTF();
+	break;
+      default:
+	throw new ClassFormatError("Invalid constant tag: " + tag);
+      }
+    
+    return new Constant(tag, value);
+  }
+  
+  /**
+   * Read the class file header.
+   *
+   * @param in
+   *        The stream from which to read.
+   * @exception IOException
+   *        If an error occurs while reading.
+   */
+  void readHeader(DataInputStream in)
+       throws IOException
+  {
+    int magic = in.readInt();
+    
+    if (magic != 0xCAFEBABE) {
+      throw new ClassFormatError("Bad magic number.");
+    }
+    
+    int major = in.readUnsignedShort();
+    int minor = in.readUnsignedShort();
+  }
+  
+  /**
+   * Read the class's constant pool.  Constants in the constant pool
+   * are modeled by an array of <tt>reflect.Constant</tt>/
+   *
+   * @param in
+   *        The stream from which to read.
+   * @exception IOException
+   *        If an error occurs while reading.
+   *
+   * @see Constant
+   * @see #constants
+   */
+  void readConstantPool(DataInputStream in)
+       throws IOException
+  {
+    int count = in.readUnsignedShort();
+    
+    constants = new Constant[count];
+    
+    // The first constant is reserved for internal use by the JVM.
+    constants[0] = null;
+    
+    // Read the constants.
+    for (int i = 1; i < count; i++) {
+      constants[i] = readConstant(in);
+      
+      switch (constants[i].tag()) {
+	case Constant.LONG:
+	case Constant.DOUBLE:
+	  // Longs and doubles take up 2 constant pool entries.
+          constants[++i] = null;
+	  break;
+      }
+    }
+  }
+  
+  /**
+   * Read the class's access flags.
+   *
+   * @param in
+   *        The stream from which to read.
+   * @exception IOException
+   *        If an error occurs while reading.
+   */
+  void readAccessFlags(DataInputStream in)
+       throws IOException
+  {
+    modifiers = in.readUnsignedShort();
+  }
+  
+  /**
+   * Read the class's name, superclass, and interfaces.
+   *
+   * @param in
+   *        The stream from which to read.
+   * @exception IOException
+   *        If an error occurs while reading.
+   */
+  void readClassInfo(DataInputStream in)
+       throws IOException
+  {
+    int index;
+    
+    thisClass = in.readUnsignedShort();
+    superClass = in.readUnsignedShort();
+    
+    int numInterfaces = in.readUnsignedShort();
+    
+    interfaces = new int[numInterfaces];
+    
+    for (int i = 0; i < numInterfaces; i++) {
+      interfaces[i] = in.readUnsignedShort();
+    }
+  }
+  
+  /**
+   * Read the class's fields.
+   *
+   * @param in
+   *        The stream from which to read.
+   * @exception IOException
+   *        If an error occurs while reading.
+   */
+  void readFields(DataInputStream in)
+       throws IOException
+  {
+    int numFields = in.readUnsignedShort();
+    
+    fields = new Field[numFields];
+    
+    for (int i = 0; i < numFields; i++) {
+      fields[i] = new Field(in, this);
+    }
+  }
+  
+  /**
+   * Read the class's methods.
+   *
+   * @param in
+   *        The stream from which to read.
+   * @exception IOException
+   *        If an error occurs while reading.
+   */
+  void readMethods(DataInputStream in)
+       throws IOException
+  {
+    int numMethods = in.readUnsignedShort();
+    
+    methods = new Method[numMethods];
+    
+    for (int i = 0; i < numMethods; i++) {
+      methods[i] = new Method(in, this);
+    }
+  }
+  
+  /**
+   * Read the class's attributes.  Since none of the attributes
+   * are required, just read the length of each attribute and
+   * skip that many bytes.
+   *
+   * @param in
+   *        The stream from which to read.
+   * @exception IOException
+   *        If an error occurs while reading.
+   */
+  void readAttributes(DataInputStream in)
+       throws IOException
+  {
+    int numAttributes = in.readUnsignedShort();
+    
+    attrs = new Attribute[numAttributes];
+    
+    for (int i = 0; i < numAttributes; i++) {
+      int nameIndex = in.readUnsignedShort();
+      int length = in.readInt();
+      if ("InnerClasses".equals(constants[nameIndex].value())) {
+          innerClasses = new InnerClasses(in, nameIndex, length);
+          attrs[i] = innerClasses;
+      }
+      else {
+          attrs[i] = new GenericAttribute(in, nameIndex, length);
+      }
+    }
+  }
+}

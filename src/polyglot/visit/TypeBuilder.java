@@ -162,7 +162,7 @@ public class TypeBuilder extends BaseVisitor
 	TypeSystem ts = typeSystem();
 
 	if (isLocal()) {
-	    ParsedLocalClassType ct = ts.localClassType(job);
+	    ParsedLocalClassType ct = ts.localClassType();
 	    ct.outer(currentClass());
 	    ct.flags(flags);
 	    ct.name(name);
@@ -175,7 +175,7 @@ public class TypeBuilder extends BaseVisitor
 	    return ct;
 	}
 	else if (currentClass() != null) {
-	    ParsedMemberClassType ct = ts.memberClassType(job);
+	    ParsedMemberClassType ct = ts.memberClassType();
 	    ct.outer(currentClass());
 	    ct.flags(flags);
 	    ct.name(name);
@@ -190,7 +190,7 @@ public class TypeBuilder extends BaseVisitor
 	    return ct;
 	}
 	else {
-	    ParsedTopLevelClassType ct = ts.topLevelClassType(job);
+	    ParsedTopLevelClassType ct = ts.topLevelClassType();
 	    ct.flags(flags);
 	    ct.name(name);
 	    ct.position(pos);
@@ -215,7 +215,7 @@ public class TypeBuilder extends BaseVisitor
 
 	TypeSystem ts = typeSystem();
 
-        ParsedAnonClassType ct = ts.anonClassType(job);
+        ParsedAnonClassType ct = ts.anonClassType();
         ct.outer(currentClass());
         ct.position(pos);
 

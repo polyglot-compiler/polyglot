@@ -77,8 +77,19 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
     }
 
     public String toString() {
+        Object v = constantValue;
+        if (v instanceof String) {
+          String s = (String) v;
+
+          if (s.length() > 8) {
+            s = s.substring(0, 8) + "...";
+          }
+
+          v = "\"" + s + "\"";
+        }
+
         return "field " + flags.translate() + type + " " + name +
-	    (constantValue != null ? (" = " + constantValue) : "");
+	    (v != null ? (" = " + v) : "");
     }
 
     public TypeObject restore_() throws SemanticException {

@@ -18,30 +18,38 @@ import java.util.*;
 public abstract class ParsedClassType_c extends ClassType_c
 				     implements ParsedClassType
 {
-    protected transient Job job;
-    
+    protected transient LazyClassInitializer init;
+
     protected ParsedClassType_c() {
 	super();
     }
 
-    public ParsedClassType_c(TypeSystem ts, Job job) {
+    public ParsedClassType_c(TypeSystem ts, LazyClassInitializer init) {
 	super(ts);
-	this.job = job;
+        this.init = init;
 
-	this.interfaces = new TypedList(new LinkedList(), Type.class, false);
-	this.fields = new TypedList(new LinkedList(), FieldInstance.class, false);
-	this.methods = new TypedList(new LinkedList(), MethodInstance.class, false);
-	this.constructors = new TypedList(new LinkedList(), ConstructorInstance.class, false);
-	this.memberClasses = new TypedList(new LinkedList(), MemberClassType.class, false);
-
-	// Special field in every class.
-	this.fields.add(ts.fieldInstance(position(), this,
-	    Flags.PUBLIC.set(Flags.STATIC).set(Flags.FINAL),
-	    ts.Class(), "class"));
+        if (init == null) {
+          throw new InternalCompilerError("Null lazy class initializer");
+        }
     }
 
-    public Job job() {
-	return job;
+    /** Return true if we no longer need the initializer object. */
+    protected boolean initialized() {
+        return this.methods != null &&
+               this.constructors != null &&
+               this.fields != null &&
+               this.memberClasses != null &&
+               this.interfaces != null;
+    }
+
+    /** Free the initializer object if we no longer need it. */
+    protected void freeInit() {
+        if (initialized()) {
+            init = null;
+        }
+        else if (init == null) {
+          throw new InternalCompilerError("Null lazy class initializer");
+        }
     }
 
     public void flags(Flags flags) {
@@ -61,77 +69,93 @@ public abstract class ParsedClassType_c extends ClassType_c
     }
 
     public void addInterface(Type t) {
-	interfaces.add(t);
+	interfaces().add(t);
     }
 
     public void addMethod(MethodInstance mi) {
-	methods.add(mi);
+	methods().add(mi);
     }
 
     public void addConstructor(ConstructorInstance ci) {
-	constructors.add(ci);
+	constructors().add(ci);
     }
 
     public void addField(FieldInstance fi) {
-	fields.add(fi);
+	fields().add(fi);
     }
 
     public void addMemberClass(MemberClassType t) {
-	memberClasses.add(t);
+	memberClasses().add(t);
     }
 
     public void replaceField(FieldInstance old, FieldInstance fi) {
-	fields.remove(old);
-	fields.add(fi);
+	fields().remove(old);
+	fields().add(fi);
     }
 
     public void replaceMethod(MethodInstance old, MethodInstance mi) {
-	methods.remove(old);
-	methods.add(mi);
+	methods().remove(old);
+	methods().add(mi);
     }
 
     public void replaceConstructor(ConstructorInstance old, ConstructorInstance ci) {
-	constructors.remove(old);
-	constructors.add(ci);
+	constructors().remove(old);
+	constructors().add(ci);
     }
 
     public void replaceMemberClass(MemberClassType old, MemberClassType t) {
-	memberClasses.remove(old);
-	memberClasses.add(t);
+	memberClasses().remove(old);
+	memberClasses().add(t);
     }
 
     /** Return a mutable list of constructors */
     public List constructors() {
+        if (constructors == null) {
+            constructors = new TypedList(new LinkedList(), ConstructorInstance.class, false);
+            init.initConstructors(this);
+            freeInit();
+        }
         return constructors;
     }
 
     /** Return a mutable list of member classes */
     public List memberClasses() {
+        if (memberClasses == null) {
+            memberClasses = new TypedList(new LinkedList(), MemberClassType.class, false);
+            init.initMemberClasses(this);
+            freeInit();
+        }
         return memberClasses;
     }
 
     /** Return a mutable list of methods */
     public List methods() {
+        if (methods == null) {
+            methods = new TypedList(new LinkedList(), MethodInstance.class, false);
+            init.initMethods(this);
+            freeInit();
+        }
         return methods;
     }
 
     /** Return a mutable list of fields */
     public List fields() {
+        if (fields == null) {
+            fields = new TypedList(new LinkedList(), FieldInstance.class, false);
+            init.initFields(this);
+            freeInit();
+        }
         return fields;
     }
 
     /** Return a mutable list of interfaces */
     public List interfaces() {
+        if (interfaces == null) {
+            interfaces = new TypedList(new LinkedList(), Type.class, false);
+            init.initInterfaces(this);
+            freeInit();
+        }
         return interfaces;
-    }
-
-    private void readObject(ObjectInputStream in)
-	throws IOException, ClassNotFoundException {
-
-	if (in instanceof TypeInputStream) {
-	    TypeSystem ts = ((TypeInputStream) in).getTypeSystem();
-	    job = null;
-	}
     }
 
     public TypeObject restore_() throws SemanticException {

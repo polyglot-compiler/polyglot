@@ -7,6 +7,7 @@ import jltools.visit.ClassSerializer;
 import jltools.util.*;
 import jltools.main.Main;
 import jltools.main.Version;
+import jltools.types.reflect.*;
 
 import java.io.*;
 import java.util.*;
@@ -89,133 +90,111 @@ public class LoadedClassResolver extends ClassResolver
   TypeSystem ts;
   TypeEncoder te;
   boolean checkSource;
+  ClassFileLoader loader;
 
   public LoadedClassResolver(Compiler compiler, TypeSystem ts,
-	                     boolean no_source_check)
+                             String classpath, boolean no_source_check)
   {
     this.compiler = compiler;
     this.ts = ts;
     this.te = new TypeEncoder(ts);
     this.checkSource = ! no_source_check;
+    this.loader = new ClassFileLoader(classpath);
   }
 
-  /** Load a type from a class file. */
-  public Type loadType(String name) throws SemanticException
-  {
-    Types.report(3, "LoadedCR.loadType(" + name + ")");
-
-    try {
-      Class clazz = Class.forName(name);
-
-      Types.report(4, "Class " + name + " found in classpath " +
-                   System.getProperty("java.class.path"));
-
-      return getTypeFromClass(clazz, name);
-    }
-    catch (UnsatisfiedLinkError e) {
-      Types.report(4, "Class " + name + " could not be loaded due to " +
-                   e.getMessage());
-
-      throw new NoClassException("Class " + name +
-                                " could not be loaded; " +
-                                e.getMessage() + ".");
-    }
-    catch (Throwable e) {
-      Types.report(4, "Class " + name + " not found in classpath " +
-                   System.getProperty("java.class.path"));
-
-      throw new NoClassException("Class " + name + " not found.");
-    }
+  public Type loadType(String name) throws SemanticException {
+    return findType(name, false);
   }
 
-  public Type findType(String name) throws SemanticException
-  {
+  public Type findType(String name) throws SemanticException {
+    return findType(name, this.checkSource);
+  }
+
+  Type findType(String name, boolean checkSource) throws SemanticException {
     Types.report(3, "LoadedCR.findType(" + name + ")");
 
-    Class clazz = null;
+    ClassFile clazz = null;
+    ClassFile encodedClazz = null;
     Source source = null;
 
-    // First, try and find the source file.
+    // First try the class file.
     try {
-      source = compiler.sourceLoader().classSource(name);
-      Types.report(4, "Class " + name + " found in source " + source);
-    }
-    catch (IOException e) {
-      Types.report(4, "Class " + name + " not found in source file");
-      source = null;
-    }
+      clazz = loader.loadClass(name);
 
-    // Now, try the class file.
-    try {
-      clazz = Class.forName(name);
       Types.report(4, "Class " + name + " found in classpath " +
-                   System.getProperty("java.class.path"));
-    }
-    catch (UnsatisfiedLinkError e) {
-      Types.report(4, "Class " + name + " could not be loaded due to " +
-                   e.getMessage());
+                   loader.classpath());
 
-      if (source == null) {
-        throw new NoClassException("Class " + name +
-                                  " could not be loaded; " +
-                                  e.getMessage() + ".");
-      }
     }
-    catch (Throwable e) {
+    catch (ClassNotFoundException e) {
       Types.report(4, "Class " + name + " not found in classpath " +
-                   System.getProperty("java.class.path"));
+                   loader.classpath());
+    }
+    catch (ClassFormatError e) {
+      Types.report(4, "Class " + name + " format error");
     }
 
-    boolean useClassFile = clazz != null;
-
-    if (useClassFile && ! checkSource) {
-	source = null;
+    // Check for encoded type information.
+    if (clazz != null && clazz.encodedClassType() != null) {
+      Types.report(4, "Class " + name + " has encoded type info");
+      encodedClazz = clazz;
     }
 
-    if (useClassFile && source != null) {
-      // Now we have both source and class files. We need to figure out
-      // whether or not the class file is up to date and if it contains any
-      // jlc information.  If we can use the class file, drop the source.
-      // Otherwise drop the class file and use the source.
+    // Now, try and find the source file.
+    if (clazz == null || checkSource) {
       try {
-	java.lang.reflect.Field field;
-
-	field = clazz.getDeclaredField("jlc$SourceLastModified");
-	field.setAccessible(true);
-
-	long classModTime = ((Long) field.get(null)).longValue();
-	long sourceModTime = source.lastModified().getTime();
-
-	if (classModTime < sourceModTime) {
-	  Types.report(3, "Source file version is newer than compiled for " +
-		       name + ".");
-	  useClassFile = false;
-	}
-	else {
-	  field = clazz.getDeclaredField("jlc$CompilerVersion");
-	  field.setAccessible(true);
-
-	  int comp = checkCompilerVersion((String) field.get(null));
-
-	  if (comp != COMPATIBLE) {
-	    // Incompatible or older version, so go with the source.
-	    Types.report(3, "Incompatible source file version for " +
-			 name + ".");
-	    useClassFile = false;
-	  }
-	}
+        source = compiler.sourceLoader().classSource(name);
+        Types.report(4, "Class " + name + " found in source " + source);
       }
-      catch (Exception e) {
-	// System.err.println( "Exception while checking fields: " + e);
-	useClassFile = false;
+      catch (IOException e) {
+        Types.report(4, "Class " + name + " not found in source file");
+        source = null;
       }
     }
 
-    if (useClassFile) {
-      return getTypeFromClass(clazz, name);
+    // Don't use the raw class if the source or encoded class is available.
+    if (encodedClazz != null || source != null) {
+      Types.report(4, "Not using raw class file for " + name);
+      clazz = null;
+    }
+
+    // If both the source and encoded class are available, we decide which to
+    // use based on compiler compatibility and modification times.
+    if (encodedClazz != null && source != null) {
+      long classModTime = encodedClazz.sourceLastModified();
+      long sourceModTime = source.lastModified().getTime();
+
+      int comp = checkCompilerVersion(encodedClazz.compilerVersion());
+
+      if (classModTime < sourceModTime) {
+        Types.report(3, "Source file version is newer than compiled for " +
+                      name + ".");
+        encodedClazz = null;
+      }
+      else if (comp != COMPATIBLE) {
+        // Incompatible or older version, so go with the source.
+        Types.report(3, "Incompatible source file version for " + name + ".");
+        encodedClazz = null;
+      }
+      else {
+        source = null;
+      }
+    }
+
+    // At this point, at most one of clazz, encodedClazz, and source
+    // should be set.
+
+    if (clazz != null) {
+      Types.report(4, "Using raw class file for " + name);
+      return clazz.type(ts);
+    }
+
+    if (encodedClazz != null) {
+      Types.report(4, "Using encoded class type for " + name);
+      return getEncodedType(encodedClazz, name);
     }
 
     if (source != null) {
+      Types.report(4, "Using source file for " + name);
       return getTypeFromSource(source, name);
     }
 
@@ -239,62 +218,58 @@ public class LoadedClassResolver extends ClassResolver
     }
   }
 
-  protected Type getTypeFromClass(Class clazz, String name)
+  protected Type getEncodedType(ClassFile clazz, String name)
     throws SemanticException
   {
     // At this point we've decided to go with the Class. So if something
-    // goes wrong here, we have only one choice, to throw an exception. */
+    // goes wrong here, we have only one choice, to throw an exception.
     try {
       // Check to see if it has serialized info. If so then check the
       // version.
-      java.lang.reflect.Field field;
-
-      field = clazz.getDeclaredField("jlc$CompilerVersion");
-      field.setAccessible( true);
-
-      int comp = checkCompilerVersion((String) field.get(null));
+      FieldInstance field;
+      
+      int comp = checkCompilerVersion(clazz.compilerVersion());
 
       if (comp == NOT_COMPATIBLE) {
         throw new SemanticException("Unable to find a suitable definition of "
-                                    + clazz.getName()
+                                    + clazz.name()
                                     + ". Try recompiling or obtaining "
                                     + " a newer version of the class file.");
       }
 
       // Alright, go with it!
-      field = clazz.getDeclaredField("jlc$ClassType");
-      field.setAccessible( true);
-
-      ClassType t = (ClassType) te.decode((String) field.get(null));
+      ClassType dt = (ClassType) te.decode(clazz.encodedClassType());
 
       //HACK: storing median result to avoid circular resolving
-      ((CachingResolver)ts.systemResolver()).medianResult(name, t);
+      ((CachingResolver) ts.systemResolver()).medianResult(name, dt);
 
       Types.report(2, "Returning serialized ClassType for " +
-		  clazz.getName() + ".");
+		  clazz.name() + ".");
 
-      return (ClassType) t.restore();
+      return (ClassType) dt.restore();
     }
     catch (SemanticException e) {
+      e.printStackTrace();
       throw e;
     }
-    catch (NoSuchFieldException e) {
-      Types.report(2, "Returning LoadedClassType for " +
-				clazz.getName() + ".");
-      return ts.forClass(clazz);
-    }
     catch (RuntimeException e) {
+      e.printStackTrace();
       throw e;
     }
     catch (Exception e) {
+      e.printStackTrace();
       throw new SemanticException("Could not get type information for " +
-                                  "class \"" + clazz.getName() + "\"; " +
+                                  "class \"" + clazz.name() + "\"; " +
                                   e.getClass().getName() + ": " +
                                   e.getMessage());
     }
   }
 
   protected int checkCompilerVersion(String clazzVersion) {
+    if (clazzVersion == null) {
+      return NOT_COMPATIBLE;
+    }
+
     StringTokenizer st = new StringTokenizer(clazzVersion, ".");
 
     try {

@@ -3,7 +3,7 @@ package jltools.ext.jl.types;
 import jltools.util.*;
 import jltools.types.*;
 import jltools.types.Package;
-import jltools.frontend.Job;
+import jltools.types.reflect.ClassFile;
 import jltools.frontend.Compiler;
 
 import java.util.*;
@@ -29,21 +29,25 @@ public class TypeSystem_c implements TypeSystem
 	this.compiler = compiler;
 	this.systemResolver = compiler.systemResolver();
 
-	// java.lang.Object must be first.
-	OBJECT_ = (ClassType) systemResolver.findType("java.lang.Object");
-	STRING_ = (ClassType) systemResolver.findType("java.lang.String");
-	CLASS_ = (ClassType) systemResolver.findType("java.lang.Class");
-	THROWABLE_ = (ClassType) systemResolver.findType("java.lang.Throwable");
-	EXCEPTION_ = (ClassType) systemResolver.findType("java.lang.Exception");
-	ERROR_ = (ClassType) systemResolver.findType("java.lang.Error");
-	RTEXCEPTION_ = (ClassType) systemResolver.findType("java.lang.RuntimeException");
-	CLONEABLE_ = (ClassType) systemResolver.findType("java.lang.Cloneable");
-	SERIALIZABLE_ = (ClassType) systemResolver.findType("java.io.Serializable");
-	NULLPOINTER_EXN_ = (ClassType) systemResolver.findType("java.lang.NullPointerException");
-	CLASSCAST_EXN_ = (ClassType) systemResolver.findType("java.lang.ClassCastException");
-	OUTOFBOUNDS_EXN_ = (ClassType) systemResolver.findType("java.lang.ArrayIndexOutOfBoundsException");
-	ARRAYSTORE_EXN_ = (ClassType) systemResolver.findType("java.lang.ArrayStoreException");
-	ARITHMETIC_EXN_ = (ClassType) systemResolver.findType("java.lang.ArithmeticException");
+        // Prime the resolver cache so that we don't need to check
+        // later if these are loaded.
+
+        // We cache the most commonly used ones in fields.
+        OBJECT_ = (ClassType) systemResolver.findType("java.lang.Object");
+        CLASS_  = (ClassType) systemResolver.findType("java.lang.Class");
+        STRING_ = (ClassType) systemResolver.findType("java.lang.String");
+        THROWABLE_ = (ClassType) systemResolver.findType("java.lang.Throwable");
+
+        systemResolver.findType("java.lang.Error");
+        systemResolver.findType("java.lang.Exception");
+        systemResolver.findType("java.lang.RuntimeException");
+        systemResolver.findType("java.lang.Cloneable");
+        systemResolver.findType("java.io.Serializable");
+        systemResolver.findType("java.lang.NullPointerException");
+        systemResolver.findType("java.lang.ClassCastException");
+        systemResolver.findType("java.lang.ArrayIndexOutOfBoundsException");
+        systemResolver.findType("java.lang.ArrayStoreException");
+        systemResolver.findType("java.lang.ArithmeticException");
     }
 
     public Compiler compiler() {
@@ -166,7 +170,7 @@ public class TypeSystem_c implements TypeSystem
 	// If the child isn't an interface or array, check whether its
 	// supertype is or descends from the ancestor
 	if (isClass) {
-	    if (child.isSame(OBJECT_)) {
+	    if (child.isSame(Object())) {
 		return false;
 	    }
 
@@ -183,7 +187,7 @@ public class TypeSystem_c implements TypeSystem
 	else {
 	    // if it _is_ an interface or array, check whether the ancestor is
 	    // Object.
-	    if (ancestor.isSame(OBJECT_)) {
+	    if (ancestor.isSame(Object())) {
 		return true;
 	    }
 	}
@@ -567,7 +571,7 @@ public class TypeSystem_c implements TypeSystem
      * Returns true iff an object of type <type> may be thrown.
      **/
     public boolean isThrowable(Type type) {
-	return isSubtype(type, THROWABLE_);
+	return isSubtype(type, Throwable());
     }
 
     /**
@@ -598,8 +602,8 @@ public class TypeSystem_c implements TypeSystem
      */
     public Collection uncheckedExceptions() {
         List l = new ArrayList(2);
-	l.add(ERROR_);
-	l.add(RTEXCEPTION_);
+	l.add(Error());
+	l.add(RuntimeException());
 	return l;
     }
 
@@ -1084,20 +1088,41 @@ public class TypeSystem_c implements TypeSystem
     public PrimitiveType Long()    { return LONG_; }
     public PrimitiveType Float()   { return FLOAT_; }
     public PrimitiveType Double()  { return DOUBLE_; }
-    public ClassType Object()  { return OBJECT_; }
-    public ClassType Class()   { return CLASS_; }
-    public ClassType String()   { return STRING_; }
-    public ClassType Throwable() { return THROWABLE_; }
-    public ClassType Error() { return ERROR_; }
-    public ClassType Exception() { return EXCEPTION_; }
-    public ClassType RuntimeException() { return RTEXCEPTION_; }
-    public ClassType Cloneable() { return CLONEABLE_; }
-    public ClassType Serializable() { return SERIALIZABLE_; }
-    public ClassType NullPointerException() { return NULLPOINTER_EXN_; }
-    public ClassType ClassCastException()   { return CLASSCAST_EXN_; }
-    public ClassType OutOfBoundsException() { return OUTOFBOUNDS_EXN_; }
-    public ClassType ArrayStoreException()  { return ARRAYSTORE_EXN_; }
-    public ClassType ArithmeticException()  { return ARITHMETIC_EXN_; }
+
+    protected ClassType load(String name) {
+      try {
+          return (ClassType) systemResolver.findType(name);
+      }
+      catch (SemanticException e) {
+          throw new InternalCompilerError("Cannot find class \"" +
+                                          name + "\"; " + e.getMessage(),
+                                          e.position());
+      }
+    }
+
+    protected ClassType OBJECT_;
+    protected ClassType CLASS_;
+    protected ClassType STRING_;
+    protected ClassType THROWABLE_;
+
+    public ClassType Object()  { if (OBJECT_ != null) return OBJECT_;
+                                 return load("java.lang.Object"); }
+    public ClassType Class()   { if (CLASS_ != null) return CLASS_;
+                                 return load("java.lang.Class"); }
+    public ClassType String()  { if (STRING_ != null) return STRING_;
+                                 return load("java.lang.String"); }
+    public ClassType Throwable() { if (THROWABLE_ != null) return THROWABLE_;
+                                   return load("java.lang.Throwable"); }
+    public ClassType Error() { return load("java.lang.Error"); }
+    public ClassType Exception() { return load("java.lang.Exception"); }
+    public ClassType RuntimeException() { return load("java.lang.RuntimeException"); }
+    public ClassType Cloneable() { return load("java.lang.Cloneable"); }
+    public ClassType Serializable() { return load("java.io.Serializable"); }
+    public ClassType NullPointerException() { return load("java.lang.NullPointerException"); }
+    public ClassType ClassCastException()   { return load("java.lang.ClassCastException"); }
+    public ClassType OutOfBoundsException() { return load("java.lang.ArrayIndexOutOfBoundsException"); }
+    public ClassType ArrayStoreException()  { return load("java.lang.ArrayStoreException"); }
+    public ClassType ArithmeticException()  { return load("java.lang.ArithmeticException"); }
 
     protected final NullType NULL_         = new NullType_c(this);
     protected final PrimitiveType VOID_    = new PrimitiveType_c(this, PrimitiveType.VOID);
@@ -1109,20 +1134,6 @@ public class TypeSystem_c implements TypeSystem
     protected final PrimitiveType LONG_    = new PrimitiveType_c(this, PrimitiveType.LONG);
     protected final PrimitiveType FLOAT_   = new PrimitiveType_c(this, PrimitiveType.FLOAT);
     protected final PrimitiveType DOUBLE_  = new PrimitiveType_c(this, PrimitiveType.DOUBLE);
-    protected ClassType OBJECT_;
-    protected ClassType CLASS_;
-    protected ClassType STRING_;
-    protected ClassType THROWABLE_;
-    protected ClassType ERROR_;
-    protected ClassType EXCEPTION_;
-    protected ClassType RTEXCEPTION_;
-    protected ClassType CLONEABLE_;
-    protected ClassType SERIALIZABLE_;
-    protected ClassType NULLPOINTER_EXN_;
-    protected ClassType CLASSCAST_EXN_;
-    protected ClassType OUTOFBOUNDS_EXN_;
-    protected ClassType ARRAYSTORE_EXN_;
-    protected ClassType ARITHMETIC_EXN_;
 
     public TypeObject placeHolder(TypeObject o) {
     	return placeHolder(o, new HashSet());
@@ -1155,83 +1166,6 @@ public class TypeSystem_c implements TypeSystem
 
     public UnknownQualifier unknownQualifier(Position pos) {
 	return new UnknownQualifier_c(this, pos);
-    }
-
-    public ClassType forClass(Class theClass) throws SemanticException {
-	// We need to determine what kind of class "theClass" is.  We can
-	// easily check if the class is an inner class, but the only way to
-	// determine the kind of inner class is to pick apart the class name.
-	// The names look like this:
-	//
-	//    class A { // a
-	//        class B { // A$B
-	//            A m() {
-	//                class C { } // A$1$C
-	//                return new A() { }; // A$1
-	//            }
-	//        }
-	//
-	//        A m() {
-	//            class D { } // A$1$D
-	//            return new A() { }; // A$2
-	//        }
-	//    }
-        //
-	if (theClass.getDeclaringClass() != null) {
-	    // An inner class.
-
-	    // The name is of the form "p.q.C$I$J".
-	    String name = theClass.getName();
-
-	    // This is the "p.q" part.
-	    String packageName = StringUtil.getPackageComponent(name);
-
-	    // This is the "C$I$J" part.
-	    String className = StringUtil.getShortNameComponent(name);
-
-	    final int TOP = 0;
-	    final int MEMBER = 1;
-	    final int LOCAL = 2;
-	    final int ANONYMOUS = 3;
-
-	    int kind = TOP;
-
-	    for (StringTokenizer st = new StringTokenizer(className, "$");
-		 st.hasMoreTokens(); ) {
-
-		String s = st.nextToken();
-
-		if (Character.isDigit(s.charAt(0))) {
-		    // Example: C$1
-		    kind = ANONYMOUS;
-		}
-		else if (kind == ANONYMOUS) {
-		    // Example: C$1$D
-		    kind = LOCAL;
-		}
-		else {
-		    // Example: C$D
-		    kind = MEMBER;
-		}
-	    }
-
-	    if (kind == ANONYMOUS) {
-		return new LoadedAnonClassType_c(this, theClass);
-	    }
-	    else if (kind == LOCAL) {
-		return new LoadedLocalClassType_c(this, theClass);
-	    }
-	    else if (kind == MEMBER) {
-		return new LoadedMemberClassType_c(this, theClass);
-	    }
-	    else {
-		throw new InternalCompilerError("Class name \"" + name +
-		    "\" parsed as a top-level class, but is an inner class.");
-	    }
-	}
-	else {
-	    return new LoadedTopLevelClassType_c(this, theClass);
-	}
     }
 
     public Package packageForName(Package prefix, String name) {
@@ -1405,20 +1339,46 @@ public class TypeSystem_c implements TypeSystem
 	    name + "\".");
     }
 
-    public ParsedTopLevelClassType topLevelClassType(Job job) {
-	return new ParsedTopLevelClassType_c(this, job);
+    protected LazyClassInitializer defaultClassInit;
+
+    public LazyClassInitializer defaultClassInitializer() {
+        if (defaultClassInit == null) {
+            defaultClassInit = new LazyClassInitializer_c(this);
+        }
+
+        return defaultClassInit;
     }
 
-    public ParsedMemberClassType memberClassType(Job job) {
-	return new ParsedMemberClassType_c(this, job);
+    public ParsedTopLevelClassType topLevelClassType() {
+	return topLevelClassType(defaultClassInitializer());
     }
 
-    public ParsedLocalClassType localClassType(Job job) {
-	return new ParsedLocalClassType_c(this, job);
+    public ParsedMemberClassType memberClassType() {
+	return memberClassType(defaultClassInitializer());
     }
 
-    public ParsedAnonClassType anonClassType(Job job) {
-	return new ParsedAnonClassType_c(this, job);
+    public ParsedLocalClassType localClassType() {
+	return localClassType(defaultClassInitializer());
+    }
+
+    public ParsedAnonClassType anonClassType() {
+	return anonClassType(defaultClassInitializer());
+    }
+
+    public ParsedTopLevelClassType topLevelClassType(LazyClassInitializer init) {
+	return new ParsedTopLevelClassType_c(this, init);
+    }
+
+    public ParsedMemberClassType memberClassType(LazyClassInitializer init) {
+	return new ParsedMemberClassType_c(this, init);
+    }
+
+    public ParsedLocalClassType localClassType(LazyClassInitializer init) {
+	return new ParsedLocalClassType_c(this, init);
+    }
+
+    public ParsedAnonClassType anonClassType(LazyClassInitializer init) {
+	return new ParsedAnonClassType_c(this, init);
     }
 
     public List defaultPackageImports() {
