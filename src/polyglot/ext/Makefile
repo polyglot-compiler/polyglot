@@ -39,6 +39,8 @@ covop: pao covarRet FORCE
 	$(MAKE) -C $@ all
 covpolyj: polyj covarRet FORCE
 	$(MAKE) -C $@ all
+pure: jl FORCE
+	$(MAKE) -C $@ all
 
 FORCE:
 
