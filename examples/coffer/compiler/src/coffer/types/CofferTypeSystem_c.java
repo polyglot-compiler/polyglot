@@ -129,6 +129,6 @@ public class CofferTypeSystem_c extends ParamTypeSystem_c
     }
 
     public Collection uncheckedExceptions() {
-        return Collections.singletonList(Error());
+        return CollectionUtil.list(Error(), NullPointerException());
     }
 }

@@ -43,7 +43,7 @@ tracked(F) class InputStream {
 }
 
 public class TestIS {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         tracked(I) InputStream is;
 
         is = new tracked(I) InputStream();
