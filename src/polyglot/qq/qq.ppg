@@ -146,6 +146,10 @@ extend class_body_declarations ::=
 	    {: RESULT = a.list(); :}
     ;
 
+extend field_access ::=
+        COMMA_TYPE:a DOT IDENTIFIER:b
+            {: RESULT = parser.nf.Field(parser.pos(a, b, b), (TypeNode)a.node(), b.getIdentifier()); :}
+    ;
 extend method_invocation ::=
         COMMA_TYPE:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN:d
         {: RESULT = parser.nf.Call(parser.pos(a,d), (TypeNode)a.node(), b.getIdentifier(), c); :}
