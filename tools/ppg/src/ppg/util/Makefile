@@ -1,22 +1,16 @@
 SOURCE = ../../..
-PACKAGE = jltools/util/jlgen/lex
+PACKAGE = jltools/util/jlgen/util
 SUBDIRS = 
 
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
-	Lexer.java \
-	LexerResult.java \
-	LexicalError.java \
-	Token.java
+	CodeWriter.java \
+	Equatable.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
-lexer: jlgen.lex
-	java JLex.Main jlgen.lex
-	mv jlgen.lex.java Lexer.java
-
-all: lexer $(CLASSES)
+all: $(CLASSES)
 	$(subdirs)
 
 release: release_src
