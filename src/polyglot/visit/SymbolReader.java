@@ -139,11 +139,20 @@ public class SymbolReader extends NodeVisitor
     current = (ParsedClassType)c;
   }
 
+  public String getPackageName() {
+    return packageName;
+  }
+
+  protected void addDefaultPackageImports() throws SemanticException {
+    it.addPackageImport("java.lang");
+  }
+
   public void setPackageName( String packageName) throws SemanticException
   {
     this.packageName = packageName;
 
-    it.addPackageImport("java.lang");
+    addDefaultPackageImports();
+
     if( packageName != null) {
       it.addPackageImport( packageName);
     }
