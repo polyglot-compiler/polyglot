@@ -22,7 +22,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         // don't need to do null checks
         this(new AbstractExtFactory_c() {}); 
     }
-    protected NodeFactory_c(ExtFactory extFactory ) {
+    public NodeFactory_c(ExtFactory extFactory ) {
         this.extFactory = extFactory; 
     }
     
