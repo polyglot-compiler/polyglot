@@ -11,6 +11,7 @@ include Rules.mk
 
 
 all: classes
+	chmod +x bin/*
 	mkdir -p lib
 	$(subdirs)
 
