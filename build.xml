@@ -540,6 +540,14 @@ ext=""
     </javac>
   </target>
 
+  <target name="jx-compile">
+    <antcall target="compile-ext">
+      <param name="ext" value="jx"/>
+      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
+      <param name="parser.type" value="ppg"/>
+    </antcall>
+  </target>
+
   <target name="jx" depends="jl">
     <antcall target="standard-ext">
       <param name="ext" value="jx"/>
