@@ -425,7 +425,7 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public Type checkAndResolveType(Type type, Context context) throws SemanticException {
 
-    //    System.out.println( "Checking: " + type + " " + type.getTypeString());
+    System.out.println( "Checking: " + type + " " + type.getTypeString());
 
     if (type.isCanonical()) return type;
     if (type instanceof ArrayType) {

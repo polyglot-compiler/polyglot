@@ -34,16 +34,19 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
    * <code>s</code>.
    * @pre <code>s</code> is not empty, and does not begin or end with a '.'.
    */
-  public AmbiguousNameExpression( String s) {
+  public AmbiguousNameExpression( Extension ext, String s) {
+      names = new TypedList(new ArrayList(4), String.class, false);
 
-    names = new TypedList(new ArrayList(4), String.class, false);
+      StringTokenizer st = new StringTokenizer( s, ".");
 
-    StringTokenizer st = new StringTokenizer( s, ".");
-
-    while( st.hasMoreTokens()) {
-      names.add( st.nextToken());
-    }
+      while( st.hasMoreTokens()) {
+	  names.add( st.nextToken());
+      }
   }
+
+    public AmbiguousNameExpression( String s) {
+	this(null, s);
+    }
 
   /**
    * Lazily reconstruct this node. If any of the dotted components in 

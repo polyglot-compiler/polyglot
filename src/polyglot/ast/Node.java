@@ -15,13 +15,13 @@ import java.util.*;
  * following form, to assist in this reconstuction.
  *
  * <pre><code>
- * public MyNode reconstruct( Expression field1, TypeNode field2)
+ * public MyNode reconstruct( Extension ext, Expression field1, TypeNode field2)
  * {
- *   if( this.field1 == field1 && this.field2 == field2) {
+ *   if( this.field1 == field1 && this.field2 == field2 && this.ext == ext) {
  *     return this;
  *   }
  *   else {
- *     MyNode n = new MyNode( field1, field2);
+ *     MyNode n = new MyNode( field1, field2, ext.reconstruct());
  *     n.copyAnnotationsFrom( this);
  *     return n;
  *   }
@@ -40,6 +40,30 @@ import java.util.*;
  * @see jltools.ast.NodeVisitor
  */
 public abstract class Node extends AnnotatedObject {
+
+    /**
+     * The extension object for this node.
+     */
+    public Extension ext;
+
+    /**
+     * Determines whether this node has an extension object.
+     */
+    public boolean isExtended() {
+	return ext == null;
+    }
+
+    public Node() {
+	this(null);
+    }
+
+    public Node(Extension ext) {
+	this.ext = ext;
+	if (ext != null) {
+	    ext.init(this);
+	}
+    }
+
 
   /**
    * The main entry point to the AST when using <code>NodeVisitor</code>s to
@@ -62,18 +86,6 @@ public abstract class Node extends AnnotatedObject {
       return v.leave( this, n, v_);
     }
   }
-
-    /**
-     * The extension object for this node.
-     */
-    public Object ext;
-
-    /**
-     * Determines whether this node has an extension object.
-     */
-    public boolean isExtended() {
-	return ext == null;
-    }
 
   /**
    * Defines the fashion in which the AST traversed. That is, each node 

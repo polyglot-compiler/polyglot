@@ -59,7 +59,7 @@ public class Main
 
     /* Must initialize before instantiating any compilers. */
     if( ((Boolean)options.get( MAIN_OPT_EXT_JIF)).booleanValue()) {
-	ts = new jltools.types.StandardTypeSystem(); // Fix for Jif
+	ts = new jltools.ext.jif.types.JifTypeSystem(); // Fix for Jif
     } else if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()) {
       ts = new jltools.ext.op.ObjectPrimitiveTypeSystem();
     } else {
