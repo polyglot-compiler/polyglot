@@ -1,0 +1,216 @@
+include "../parse/java12.cup"
+
+package jltools.ext.jl.qq;
+
+import jltools.ext.jl.parse.Name;
+import jltools.ext.jl.parse.JLUtil;
+
+parser code {:
+	Lexer lexer;
+	TypeSystem ts;
+	NodeFactory nf;
+	JLUtil util;
+	Map subst;
+
+	public Grm(Lexer l, TypeSystem t, NodeFactory n, Map subst) {
+		this();
+		lexer = l;
+		ts = t;
+		nf = n;
+		util = new JLUtil(new QQParserWrapper(this));
+		this.subst = subst;
+	}
+
+    /**
+	 * Override the default CUP routine.
+	 */
+    public void syntax_error(java_cup.runtime.Symbol current) {
+        Position p = ((Token) current.value).getPosition();
+
+        if (current.sym == sym.EOF) {
+            report_error("Unexpected end of file.", p);
+        } else {
+            report_error("Syntax error.", p);
+        }
+    }
+
+	/**
+	 * Override the default CUP routine.
+	 */
+    public void report_error(String message, Object info) {
+    }
+
+	/**
+	 * Override the default CUP routine.
+	 */
+	public void report_fatal_error(String message, Object info)
+        throws Exception
+    {
+    	if (info instanceof Position) {
+	    throw new InternalCompilerError(message, (Position) info);
+	}
+	else if (info instanceof Token) {
+	    throw new InternalCompilerError(message, ((Token) info).getPosition());
+	}
+	else {
+	    throw new InternalCompilerError(message);
+	}
+    }
+
+	/**
+	 * Report a fatal error then abort parsing.
+	 */
+    public void die(String msg, Position pos) throws Exception {
+		report_fatal_error(msg, pos);
+    }
+
+	/**
+	 * Report a fatal error then abort parsing.
+	 */
+    public void die(Position pos) throws Exception {
+		report_fatal_error("Syntax error.", pos);
+    }
+
+	/**
+	 * Report a fatal error then abort parsing.
+	 */
+    public void die() throws Exception {
+		new Exception("Couldn't repair and continue parse").printStackTrace();
+		throw new Exception("Couldn't repair and continue parse");
+    }
+
+:};
+
+terminal Token COMMA_EXPR;
+terminal Token COMMA_STMT;
+terminal Token COMMA_TYPE;
+terminal Token COMMA_DECL;
+terminal Token COMMA_MEMB;
+terminal Token COMMA_LIST;
+
+non terminal Node qq_expr;
+non terminal Node qq_stmt;
+non terminal Node qq_type;
+non terminal Node qq_decl;
+non terminal Node qq_file;
+non terminal Node qq_member;
+
+/* The 1st name is the non terminal; the 2nd is the name of the parse method. */
+start with qq_expr qq_expr;
+start with qq_stmt qq_stmt;
+start with qq_type qq_type;
+start with qq_decl qq_decl;
+start with qq_file qq_file;
+start with qq_member qq_member;
+
+drop { goal }
+
+qq_expr ::=
+	expression:a
+	    {: RESULT = a; :}
+    ;
+
+qq_stmt ::=
+    	statement:a
+     	    {: RESULT = a; :}
+    ;
+
+qq_type ::=
+    	type:a
+     	    {: RESULT = a; :}
+    ;
+
+qq_decl ::=
+    	type_declaration:a
+     	    {: RESULT = a; :}
+    ;
+
+qq_file ::=
+    	compilation_unit:a
+	    {: RESULT = a; :}
+    ;
+
+qq_member ::=
+     	method_declaration:a
+     	    {: RESULT = a; :}
+     /* Simplified version of field_declaration with only one declarator. */
+    |	modifiers_opt:a type:b variable_declarator:d SEMICOLON
+	    {: RESULT = parser.nf.FieldDecl(parser.util.pos(b),
+					    a, parser.util.array(b, d.dims),
+					    d.name, d.init); :}
+    ;
+
+extend primary_no_new_array ::=
+	COMMA_EXPR IDENTIFIER:a
+	    {: RESULT = (Expr) parser.subst.get(a.getIdentifier()); :}
+    ;
+
+extend statement_expression ::=
+	COMMA_EXPR IDENTIFIER:a
+	    {: RESULT = (Expr) parser.subst.get(a.getIdentifier()); :}
+    ;
+
+extend statement ::=
+	COMMA_STMT IDENTIFIER:a
+	    {: RESULT = (Stmt) parser.subst.get(a.getIdentifier()); :}
+    ;
+
+extend class_or_interface_type ::=
+	COMMA_TYPE IDENTIFIER:a
+	    {: RESULT = (TypeNode) parser.subst.get(a.getIdentifier()); :}
+    ;
+
+extend array_type ::=
+	COMMA_TYPE IDENTIFIER:a dims:b
+	    {: TypeNode tn = (TypeNode) parser.subst.get(a.getIdentifier());
+	       RESULT = parser.util.array(tn, b.intValue()); :}
+    ;
+
+extend type_declaration ::=
+	COMMA_DECL IDENTIFIER:a
+	    {: RESULT = (ClassDecl) parser.subst.get(a.getIdentifier()); :}
+    ;
+
+extend class_member_declaration ::=
+	COMMA_MEMB IDENTIFIER:a
+	    {: ClassMember m = (ClassMember) parser.subst.get(a.getIdentifier());
+	       List l = new ArrayList(1);
+	       l.add(m);
+	       RESULT = l; :}
+    ;
+
+extend interface_member_declarations ::=
+        COMMA_LIST IDENTIFIER:a
+	    {: List l = (List) parser.subst.get(a.getIdentifier());
+	       RESULT = l; :}
+    ;
+
+extend class_body_declarations ::=
+        COMMA_LIST IDENTIFIER:a
+	    {: List l = (List) parser.subst.get(a.getIdentifier());
+	       RESULT = l; :}
+    ;
+
+extend formal_parameter_list ::=
+	COMMA_LIST IDENTIFIER:a
+	    {: List l = (List) parser.subst.get(a.getIdentifier());
+	       RESULT = l; :}
+    ;
+
+extend throws ::=
+	COMMA_LIST IDENTIFIER:a
+	    {: List l = (List) parser.subst.get(a.getIdentifier());
+	       RESULT = l; :}
+    ;
+
+extend class_type_list ::=
+	COMMA_LIST IDENTIFIER:a
+	    {: List l = (List) parser.subst.get(a.getIdentifier());
+	       RESULT = l; :}
+    ;
+
+extend argument_list ::=
+	COMMA_LIST IDENTIFIER:a
+	    {: List l = (List) parser.subst.get(a.getIdentifier());
+	       RESULT = l; :}
+    ;
