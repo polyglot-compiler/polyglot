@@ -802,24 +802,24 @@ public class emit {
     out.print("    \"");
     int nchar=0, nbytes=0;
     nbytes+=do_escaped(out, (char)(sa.length>>16));
-    nbytes%=65500;
     nchar  =do_newline(out, nchar, nbytes);
+    nbytes%=65500;
     nbytes+=do_escaped(out, (char)(sa.length&0xFFFF));
-    nbytes%=65500;
     nchar  =do_newline(out, nchar, nbytes);
+    nbytes%=65500;
     for (int i=0; i<sa.length; i++) {
 	nbytes+=do_escaped(out, (char)(sa[i].length>>16));
-        nbytes%=65500;
 	nchar  =do_newline(out, nchar, nbytes);
+        nbytes%=65500;
 	nbytes+=do_escaped(out, (char)(sa[i].length&0xFFFF));
-        nbytes%=65500;
 	nchar  =do_newline(out, nchar, nbytes);
+        nbytes%=65500;
 	for (int j=0; j<sa[i].length; j++) {
 	  // contents of string are (value+2) to allow for common -1, 0 cases
 	  // (UTF-8 encoding is most efficient for 0<c<0x80)
 	  nbytes+=do_escaped(out, (char)(2+sa[i][j]));
-          nbytes%=65500;
 	  nchar  =do_newline(out, nchar, nbytes);
+          nbytes%=65500;
 	}
     }
     out.print("\" }");
