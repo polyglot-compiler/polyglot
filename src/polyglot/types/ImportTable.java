@@ -171,6 +171,9 @@ public class ImportTable extends ClassResolver
                 // there is no conflict. See Section 6.5.2 of JLS, 2nd Ed.
                 Named n = findInPkg(name, pkg.fullName());
                 if (n != null) {
+                    if (Report.should_report(TOPICS, 3))
+                       Report.report(3, this + ".find(" + name + "): found in current package");
+
                     // Memoize the result.
                     map.put(name, n);
                     return n;
@@ -219,11 +222,15 @@ public class ImportTable extends ClassResolver
             }
             
             // Memoize the result.
+            if (Report.should_report(TOPICS, 3))
+               Report.report(3, this + ".find(" + name + "): found as " + resolved.fullName());
             map.put(name, resolved);
             return resolved;
         }
         catch (NoClassException e) {
             // memoize the no class exception
+            if (Report.should_report(TOPICS, 3))
+               Report.report(3, this + ".find(" + name + "): didn't find it");
             map.put(name, NOT_FOUND);
             throw e;
         }
