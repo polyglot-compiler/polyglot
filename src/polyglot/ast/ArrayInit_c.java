@@ -89,11 +89,18 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 
         t = t.toArray().base();
 
+        TypeSystem ts = av.typeSystem();
+
 	for (Iterator i = elements.iterator(); i.hasNext(); ) {
 	    Expr e = (Expr) i.next();
 
             if (e == child) {
-                return t;
+                if (ts.numericConversionValid(t, e.constantValue())) {
+                    return child.type();
+                }
+                else {
+                    return t;
+                }
             }
         }
 
