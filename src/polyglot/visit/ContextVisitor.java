@@ -95,14 +95,6 @@ public class ContextVisitor extends ErrorHandlingVisitor
         n.addDecls(context);
     }
 
-    /** Return true if we should catch errors thrown when visiting the node. */
-    protected boolean catchErrors(Node n) {
-	return n instanceof Stmt
-	    || n instanceof ClassMember
-	    || n instanceof ClassDecl
-	    || n instanceof SourceFile;
-    }
-
     public NodeVisitor enter(Node parent, Node n) {
         if (Report.should_report(Report.visit, 5))
 	    Report.report(5, "enter(" + n + ")");
