@@ -39,6 +39,7 @@ public class CupParser implements Parser
 	    eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage());
 	}
 	catch (Exception e) {
+	    e.printStackTrace();
 	    eq.enqueue(ErrorInfo.INTERNAL_ERROR, e.getMessage());
 	}
 

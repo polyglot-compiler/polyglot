@@ -18,7 +18,7 @@ public class NullType extends Type
   }
   
   public String getTypeString() {
-    return "null";
+    return "type(null)";
   }
   
   public boolean equals(Object o) {

@@ -31,9 +31,13 @@ public class ParserPass implements Pass
 
 	    Node ast = p.parse();
 
-	    job.ast(ast);
-
 	    source.close();
+
+	    if (ast == null) {
+		return false;
+	    }
+
+	    job.ast(ast);
 	}
 	catch (IOException e) {
 	    eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage());

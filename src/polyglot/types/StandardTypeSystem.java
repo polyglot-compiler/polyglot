@@ -655,7 +655,6 @@ public class StandardTypeSystem extends TypeSystem {
     Type t = checkAndResolve(type, context);
 
     if (t.isPackageType()) {
-	new Exception().printStackTrace();
 	throw new SemanticException("Type " + type.getTypeString() +
 	    " not found.");
     }

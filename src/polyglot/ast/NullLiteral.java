@@ -34,11 +34,11 @@ public class NullLiteral extends Literal
 
   public void translate_no_override( LocalContext c, CodeWriter w)
   {
-    w.write( "null");
+    w.write("null");
   }
 
   public String toString() {
-	return "null";
+	return "literal(null)";
   }
 
   public void dump( CodeWriter w)

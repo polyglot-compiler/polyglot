@@ -70,21 +70,24 @@ parser code  {:
   }
 
   public void syntax_error(java_cup.runtime.Symbol current) {
-    if( current.sym == sym.EOF) {
-      eq.enqueue( ErrorInfo.SYNTAX_ERROR,
-		  "Unexpected end of file.", new Position(lexer.file()));
-    }
-    else {
-      eq.enqueue( ErrorInfo.SYNTAX_ERROR, 
-		  "Syntax error.", 
-		  ((Token)current.value).getPosition());
-    }
+      Position p = ((Token) current.value).getPosition();
+
+      if (current.sym == sym.EOF) {
+	  report_error("Unexpected end of file.", p);
+      }
+      else {
+	  report_error("Syntax error.", p);
+      }
   }
 
-  public void report_fatal_error( String message, Object info)
-  {
-    eq.enqueue( ErrorInfo.SYNTAX_ERROR,
-		"Unable to recover from previous errors.");
+  public void report_error(String message, Object info) {
+  System.out.println("message = " + message);
+      if (info instanceof Position) {
+	  eq.enqueue(ErrorInfo.SYNTAX_ERROR, message, (Position) info);
+      }
+      else {
+	  eq.enqueue(ErrorInfo.SYNTAX_ERROR, message);
+      }
   }
 
 :};

@@ -357,7 +357,6 @@ public class Compiler
 		report(2, job.source().toString() + ": running pass " + pass);
 
 		Pass p = scheduler.getPass(job, pass);
-		// Pass p = options.extension.getPass(job, pass);
 
 		okay &= p.run();
 
@@ -438,7 +437,7 @@ public class Compiler
 	loader.loadClass("jltools.util.ErrorInfo");
       }
       catch (ClassNotFoundException e) {
-	e.printStackTrace();
+	throw new InternalCompilerError(e.getMessage());
       }
     }
 }
