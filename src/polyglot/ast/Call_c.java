@@ -391,16 +391,18 @@ public class Call_c extends Expr_c implements Call
           // the target is implicit. Check that the
           // method found in the target type is the
           // same as the method found in the context.
-
+          
+          // as exception will be thrown if no appropriate method
+          // exists. 
           MethodInstance ctxtMI = c.findMethod(name, mi.formalTypes());
           
-          if (c.typeSystem().equals(ctxtMI, mi)) {
-              // all is OK.
-              return;
-          }
-          throw new InternalCompilerError("Method call " + this + " has an " +
-               "implicit target, but the name " + name + " resolves to " +
-               ctxtMI + " instead of " + mi, position());
+          // cannot perform this check due to the context's findMethod returning a 
+          // different method instance than the typeSystem in some situations
+//          if (!c.typeSystem().equals(ctxtMI, mi)) {
+//              throw new InternalCompilerError("Method call " + this + " has an " +
+//                   "implicit target, but the name " + name + " resolves to " +
+//                   ctxtMI + " in " + ctxtMI.container() + " instead of " + mi+ " in " + mi.container(), position());
+//          }
       }      
   }
   
