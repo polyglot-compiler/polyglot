@@ -8,9 +8,9 @@
 
 JLgen is a parser generator for extensible grammars, based on the
 <a href="http://www.cs.princeton.edu/~appel/modern/java/CUP/">CUP</a>
-parser generator. It provides the 
-ability to extend an existing base language grammar written in CUP or
-JLgen with localized, easily maintained changes.
+parser generator. It provides the ability to extend an existing base
+language grammar written in CUP or JLgen with localized, easily
+maintained changes.
 
 <h2>Distribution of JLgen</h2>
 JLgen was designed and written by Michael Brukman and Andrew C. Myers
@@ -22,7 +22,7 @@ It can be also be obtained
 <a href="http://www.cs.cornell.edu/Projects/jltools/jlgen">
 separately</a>.
 Questions about JLgen should be directed to Andrew Myers
-(<a href="mailto:myers@cs.cornell.edu">myers@cs.cornell.edu)</a>).
+(<a href="mailto:myers@cs.cornell.edu">myers@cs.cornell.edu</a>).
 
 <a name="usage"><h2>JLgen syntax</h2></a>
 The JLgen grammar syntax extends that of CUP with several new declarations:
@@ -71,7 +71,7 @@ The JLgen grammar syntax extends that of CUP with several new declarations:
       
     <li><tt><b>extend</b></tt> <i>S</i> <tt><b>::=</b></tt> &lt;
       <i>productions</i>&gt; <tt><b>;</b></tt><br>
-      Specified productions are added to the nonterminal <i>S</i>.
+      The specified productions are added to the nonterminal <i>S</i>.
       
     <li><tt><b>transfer</b></tt> <i>S</i> <tt><b>to</b></tt>
       <i>A<sub>1</sub></i> { <i>rhs</i><sub>1</sub> } <tt><b>to</b></tt>
@@ -89,16 +89,50 @@ The JLgen grammar syntax extends that of CUP with several new declarations:
     as in CUP and extend the base grammar.
 
   </ul>
+
+  <li> JLgen supports multiple start symbols in grammars. To specify
+       which symbols may be used as start symbols, JLgen provides the
+       following syntax:<br>
+
+       <tt><b>start with</b></tt> <i>S<sub>1</sub></i>
+              <i>func<sub>1</sub></i><br>
+           ...<br>
+       <tt><b>start with</b></tt> <i>S<sub>n</sub></i> 
+              <i>func<sub>n</sub></i><br>
+
+       where each <i>S<sub>i</sub></i> is a non-terminal symbol that
+       you would like to start the parser with, every time you call
+       the function <i>func<sub>n</sub></i>. JLgen will automatically
+       generate a new nonterminal symbol for each of these productions
+       to differentiate between the different nonterminals that the 
+       parsing may start with now, and patch the grammar accordingly.
+       After the parser class is instantiated, any of the
+       <i>func<sub>i</sub></i> can be called on it to parse the appropriate
+       part of the grammar.
+       <br>
+       <b>Note:</b> if you are using multiple inheritance, make sure to specify the
+       symbols class you are planning to use with the <b><tt>-symbols</tt></b>
+       switch. See <a href="#running">running JLgen</a> section.
 </ol>
 
+<a name="running"><h2>Running JLgen</h2></a>
 
-The syntax for invocation of JLgen is simply<br>
-<ul><tt>jlgen</tt> &lt;<i>grammar file</i>&gt;</ul>
-for either a standard CUP file or for a JLgen-based grammar
-inheritance file.<p>
-
-The inherited base grammar file is searched for relative to the location
-of the JLgen source file.
+The syntax for invocation of JLgen is<br>
+<ul><tt>jlgen</tt> [<tt>-symbols</tt> &lt;<i>class name</i>&gt;]
+	&lt;<i>grammar file</i>&gt;</ul>
+where
+<ul>
+	<li><tt>-symbols</tt> &lt;<i>class name</i>&gt;<br>
+		is an optional switch which specifies the name of the constant class,
+		as in CUP, and is only applicable if you are using multiple inheritance.
+		You should specify the <b>same</b> class name to JLgen as you will to CUP
+		when you invoke it on the resulting output, because JLgen will use that
+		class name. The default class name is "sym", as it is in CUP.
+	<li>&lt;<i>grammar file</i>&gt;<br>
+		is either a standard CUP file or a JLgen-based grammar inheritance file.
+		The inherited base grammar file is searched for relative to the location
+		of the JLgen source file.
+</ul>
 
 <a name="semantics"><h2>Semantics of JLgen</h2></a>
 
