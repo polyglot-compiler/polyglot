@@ -17,12 +17,14 @@ public class AddMemberVisitor extends ContextVisitor
     }
 
     protected NodeVisitor enterCall(Node n) throws SemanticException {
-        Types.report(4, ">> AddMemberVisitor::enter " + n);
+        if (Types.should_report(4))
+	    Types.report(4, ">> AddMemberVisitor::enter " + n);
         return n.del().addMembersEnter(this);
     }
 
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
-      Types.report(4, "<< AddMemberVisitor::leave " + n);
+      if (Types.should_report(4))
+	Types.report(4, "<< AddMemberVisitor::leave " + n);
         return n.del().addMembers((AddMemberVisitor) v);
     }
 }

@@ -140,7 +140,8 @@ public class TypeBuilder extends HaltingVisitor
     ParsedClassType type; // last class pushed.
 
     public TypeBuilder pushCode() {
-        Types.report(4, "TB pushing code");
+        if (Types.should_report(4))
+	    Types.report(4, "TB pushing code");
         TypeBuilder tb = push();
         tb.local = true;
         tb.global = false;
@@ -148,7 +149,8 @@ public class TypeBuilder extends HaltingVisitor
     }
 
     public TypeBuilder pushClass(ParsedClassType type) throws SemanticException {
-        Types.report(4, "TB pushing class " + type);
+        if (Types.should_report(4))
+	    Types.report(4, "TB pushing class " + type);
 
         TypeBuilder tb = push();
         tb.type = type;

@@ -219,7 +219,8 @@ public class FieldDecl_c extends Node_c implements FieldDecl
         throw new InternalCompilerError("null field instance");
     }
 
-    Types.report(5, "adding " + fi + " to " + ct);
+    if (Types.should_report(5))
+	Types.report(5, "adding " + fi + " to " + ct);
 
     ct.addField(fi);
 

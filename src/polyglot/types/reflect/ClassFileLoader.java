@@ -27,7 +27,8 @@ public class ClassFileLoader
     public ClassFile loadClass(File dir, String name)
         throws ClassNotFoundException
     {
-        Report.report(verbose, 2, "attempting to load class " + name +
+        if (Report.should_report(verbose, 2))
+	    Report.report(2, "attempting to load class " + name +
                       " from " + dir);
 
         String key = dir.toString() + "/" + name;
@@ -38,7 +39,8 @@ public class ClassFileLoader
             ClassFile c = (ClassFile) o;
 
             if (c != null) {
-                Report.report(verbose, 3, "already loaded " + c.name());
+                if (Report.should_report(verbose, 3))
+		    Report.report(3, "already loaded " + c.name());
                 return c;
             }
 
@@ -48,7 +50,8 @@ public class ClassFileLoader
             // to load the same class file.  But, we use a weak hash map
             // to allow garbage collection of ClassFiles when we need it.
             if (c != null) {
-                Report.report(verbose, 1, "loaded class " + c.name());
+                if (Report.should_report(verbose, 1))
+		    Report.report(1, "loaded class " + c.name());
                 cache.put(key, c);
                 return c;
             }
@@ -63,14 +66,16 @@ public class ClassFileLoader
 	String fileName = name.replace('.', File.separatorChar) + ".class";
 	String entryName = name.replace('.', '/') + ".class";
 
-        Report.report(verbose, 3, "looking in " + dir + " for " + fileName);
+        if (Report.should_report(verbose, 3))
+	    Report.report(3, "looking in " + dir + " for " + fileName);
 
         try {
             if (dir.isDirectory()) {
                 File file = new File(dir, fileName);
 
                 if (file.exists()) {
-                    Report.report(verbose, 3, "found " + file);
+                    if (Report.should_report(verbose, 3))
+			Report.report(3, "found " + file);
                     FileInputStream in = new FileInputStream(file);
                     ClassFile c = loadFromStream(in, name);
                     in.close();
@@ -81,7 +86,8 @@ public class ClassFileLoader
                 JarFile jar = new JarFile(dir);
                 JarEntry entry = jar.getJarEntry(entryName);
                 if (entry != null) {
-                    Report.report(verbose, 3, "found jar entry " + entry);
+                    if (Report.should_report(verbose, 3))
+			Report.report(3, "found jar entry " + entry);
                     InputStream in = jar.getInputStream(entry);
                     ClassFile c = loadFromStream(in, name);
                     in.close();
@@ -93,7 +99,8 @@ public class ClassFileLoader
                 ZipFile zip = new ZipFile(dir);
                 ZipEntry entry = zip.getEntry(entryName);
                 if (entry != null) {
-                    Report.report(verbose, 3, "found zip entry " + entry);
+                    if (Report.should_report(verbose, 3))
+			Report.report(3, "found zip entry " + entry);
                     InputStream in = zip.getInputStream(entry);
                     ClassFile c = loadFromStream(in, name);
                     in.close();
@@ -125,7 +132,8 @@ public class ClassFileLoader
         byte[] bytecode = out.toByteArray();
 
         try {
-            Report.report(verbose, 3, "defining class " + name);
+            if (Report.should_report(verbose, 3))
+		Report.report(3, "defining class " + name);
             return new ClassFile(bytecode);
         }
         catch (ClassFormatError e) {

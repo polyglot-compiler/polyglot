@@ -28,7 +28,8 @@ public class TableResolver extends ClassResolver {
         if (name == null || type == null) {
             throw new InternalCompilerError("Bad insertion into TableResolver");
         }
-	Types.report(1, "TableCR.addType(" + name + ", " + type + ")");
+	if (Types.should_report(1))
+	    Types.report(1, "TableCR.addType(" + name + ", " + type + ")");
 	table.put(name, type);
     }
 
@@ -36,7 +37,8 @@ public class TableResolver extends ClassResolver {
      * Find a type by name.
      */
     public Type findType(String name) throws SemanticException {
-	Types.report(1, "TableCR.findType(" + name + ")");
+	if (Types.should_report(1))
+	    Types.report(1, "TableCR.findType(" + name + ")");
 
 	Type type = (Type) table.get(name);
 

@@ -20,6 +20,7 @@ public class Main
 
   /** Whether any errors seen yet */
   private boolean hasErrors = false;
+  final static String verbose = "verbose";
 
   public static final void main(String args[])
   {      
@@ -35,7 +36,8 @@ public class Main
     String targetName = null;
     if (!compiler.compile(source)) System.exit(1);
 
-    Report.report(null, 1, "Output files: " + compiler.outputFiles());
+    if (Report.should_report(verbose, 1))
+	Report.report(1, "Output files: " + compiler.outputFiles());
 
     long start_time = System.currentTimeMillis();
     
@@ -55,7 +57,8 @@ public class Main
 	  + System.getProperty("java.class.path") + " "
 	  + outputFiles;
 
-	Report.report(null, 1, "Executing post-compiler " + command);
+	if (Report.should_report(verbose, 1))
+	    Report.report(1, "Executing post-compiler " + command);
 	
 	try 
 	{
@@ -89,10 +92,12 @@ public class Main
       
     }
 
-    reportTime(1, "Finished compiling Java output files. time=" + 
-	    (System.currentTimeMillis() - start_time));
+    if (Report.should_report(verbose, 1)) {
+	reportTime("Finished compiling Java output files. time=" + 
+		(System.currentTimeMillis() - start_time), 1);
     
-    reportTime(1, "Total time=" + (System.currentTimeMillis() - time0));
+	reportTime("Total time=" + (System.currentTimeMillis() - time0), 1);
+    }
     
   }
 
@@ -335,7 +340,7 @@ public class Main
       timeTopics.add("time");
   }
 
-  static private void reportTime(int level, String msg) {
-      Report.report(timeTopics, level, msg);
+  static private void reportTime(String msg, int level) {
+      Report.report(level, msg);
   }
 }

@@ -74,7 +74,8 @@ public class ImportTable extends ClassResolver
      * Add a class import.
      */
     public void addClassImport(String className) {
-	Types.report(1, this + ": lazy import " + className);
+	if (Types.should_report(1))
+	    Types.report(1, this + ": lazy import " + className);
 	lazyImports.add(className);
         classImports.add(className);
     }
@@ -112,7 +113,8 @@ public class ImportTable extends ClassResolver
      */
     public Type findType(String name) throws SemanticException {
 	// FIXME: need to keep on looking to find conflicts.
-	Types.report(1, this + ".findType(" + name + ")");
+	if (Types.should_report(1))
+	    Types.report(1, this + ".findType(" + name + ")");
 
 	/* First add any lazy imports. */
 	lazyImport();
@@ -194,13 +196,15 @@ public class ImportTable extends ClassResolver
 	for (int i = 0; i < lazyImports.size(); i++) {
 	    String longName = (String) lazyImports.get(i);
 
-	    Types.report(1, this + ": import " + longName);
+	    if (Types.should_report(1))
+		Types.report(1, this + ": import " + longName);
 
 	    try {
 		Type t = resolver.findType(longName);
 		String shortName = StringUtil.getShortNameComponent(longName);
 
-		Types.report(1, this + ": import " + shortName + " as " + t);
+		if (Types.should_report(1))
+		    Types.report(1, this + ": import " + shortName + " as " + t);
 
 		if (map.containsKey(shortName)) {
 		    Type s = (Type) map.get(shortName);

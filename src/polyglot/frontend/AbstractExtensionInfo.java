@@ -64,7 +64,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         // inter-dependent jobs in the worklist are kept in sync.
         while (okay && ! worklist.isEmpty()) {
             SourceJob job = (SourceJob) worklist.removeFirst();
-            Compiler.report(1, "Running job " + job);
+            if (Compiler.should_report(1))
+		Compiler.report("Running job " + job, 1);
             okay &= runNextPass(job);
 
             if (! job.completed()) {
@@ -72,8 +73,9 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             }
         }
 
-        Compiler.report(1, "Finished all passes -- " +
-                        (okay ? "okay" : "failed"));
+        if (Compiler.should_report(1))
+	    Compiler.report("Finished all passes -- " +
+                        (okay ? "okay" : "failed"), 1);
 
         return okay;
     }
@@ -104,7 +106,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     /** Run a job until the <code>goal</code> pass completes. */
     public boolean runToPass(Job job, Pass.ID goal) {
-        Compiler.report(1, "Running " + job + " to pass named " + goal);
+        if (Compiler.should_report(1))
+	    Compiler.report("Running " + job + " to pass named " + goal, 1);
 
         if (job.completed(goal)) {
             return true;
@@ -117,14 +120,16 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     /** Run a job up to the <code>goal</code> pass. */
     public boolean runToPass(Job job, Pass goal) {
-        Compiler.report(1, "Running " + job + " to pass " + goal);
+        if (Compiler.should_report(1))
+	    Compiler.report("Running " + job + " to pass " + goal, 1);
 
         boolean okay = job.status();
 
         while (! job.pendingPasses().isEmpty()) {
             Pass pass = (Pass) job.pendingPasses().get(0);
 
-            Compiler.report(2, "Trying to run pass " + pass);
+            if (Compiler.should_report(2))
+		Compiler.report("Trying to run pass " + pass, 2);
 
             if (job.isRunning()) {
                 // We're currently running.  We can't reach the goal.
@@ -147,17 +152,20 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
             job.finishPass(pass, okay);
 
-            Compiler.report(2, "Finished " + pass + " status=" + str(okay));
-            Compiler.reportTime(1, "Finished " + pass + " status=" + str(okay)
+            if (Compiler.should_report(2))
+		Compiler.report("Finished " + pass + " status=" + str(okay), 2);
+            if (Compiler.should_reportTime(1))
+		Compiler.reportTime("Finished " + pass + " status=" + str(okay)
                                 + " time=" + (System.currentTimeMillis() -
-                                              start_time));
+                                              start_time), 1);
 
             if (pass == goal) {
                 break;
             }
         }
 
-        Compiler.report(1, "Pass " + goal + " " + str(okay));
+        if (Compiler.should_report(1))
+	    Compiler.report("Pass " + goal + " " + str(okay), 1);
 
         return okay;
     }

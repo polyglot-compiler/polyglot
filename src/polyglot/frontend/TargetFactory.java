@@ -29,7 +29,8 @@ public class TargetFactory
 
     /** Open a writer to the output file. */
     public Writer outputWriter(File outputFile) throws IOException {
-	Compiler.report(1, "Opening " + outputFile + " for output.");
+	if (Compiler.should_report(1))
+	    Compiler.report("Opening " + outputFile + " for output.", 1);
 
 	if (outputStdout) {
 	    return new UnicodeWriter(new PrintWriter(System.out));

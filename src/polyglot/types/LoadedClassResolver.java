@@ -52,17 +52,20 @@ public class LoadedClassResolver extends ClassResolver
       try {
         ClassFile clazz = loader.loadClass(name);
 
-        Types.report(4, "Class " + name + " found in classpath " +
+        if (Types.should_report(4))
+	    Types.report(4, "Class " + name + " found in classpath " +
                     loader.classpath());
 
         return clazz;
       }
       catch (ClassNotFoundException e) {
-        Types.report(4, "Class " + name + " not found in classpath " +
+        if (Types.should_report(4))
+	    Types.report(4, "Class " + name + " not found in classpath " +
                     loader.classpath());
       }
       catch (ClassFormatError e) {
-        Types.report(4, "Class " + name + " format error");
+        if (Types.should_report(4))
+	    Types.report(4, "Class " + name + " format error");
       }
     }
 
@@ -75,18 +78,21 @@ public class LoadedClassResolver extends ClassResolver
    * Find a type by name.
    */
   public Type findType(String name) throws SemanticException {
-    Types.report(3, "LoadedCR.findType(" + name + ")");
+    if (Types.should_report(3))
+	Types.report(3, "LoadedCR.findType(" + name + ")");
 
     // First try the class file.
     ClassFile clazz = loadFile(name);
 
     // Check for encoded type information.
     if (clazz.encodedClassType(version.name()) != null) {
-      Types.report(4, "Using encoded class type for " + name);
+      if (Types.should_report(4))
+	Types.report(4, "Using encoded class type for " + name);
       return getEncodedType(clazz, name);
     }
     else {
-      Types.report(4, "Using raw class file for " + name);
+      if (Types.should_report(4))
+	Types.report(4, "Using raw class file for " + name);
       return clazz.type(ts);
     }
   }
@@ -120,7 +126,8 @@ public class LoadedClassResolver extends ClassResolver
 
       ((CachingResolver) ts.systemResolver()).medianResult(name, dt);
 
-      Types.report(2, "Returning serialized ClassType for " +
+      if (Types.should_report(2))
+	Types.report(2, "Returning serialized ClassType for " +
 		  clazz.name() + ".");
 
       return (ClassType) dt.restore();

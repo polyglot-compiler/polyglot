@@ -211,7 +211,8 @@ public abstract class Job
     public Node spawn(Context c, Node ast, Pass.ID begin, Pass.ID end) {
         Job j = lang.createJob(ast, c, this, begin, end);
 
-        Compiler.report(1, this + " spawning " + j);
+	if (Compiler.should_report(1))
+	    Compiler.report(this + " spawning " + j, 1);
 
         if (! lang.runAllPasses(j)) {
             return null;

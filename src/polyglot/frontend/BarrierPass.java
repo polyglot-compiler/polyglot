@@ -19,7 +19,8 @@ public class BarrierPass extends AbstractPass
 
     /** Run all the other jobs with the same parent up to this pass. */
     public boolean run() {
-        Compiler.report(1, job + " at barrier " + id);
+        if (Compiler.should_report(1))
+	    Compiler.report(job + " at barrier " + id, 1);
 
         if (job.compiler().errorQueue().hasErrors()) {
             return false;

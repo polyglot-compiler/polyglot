@@ -30,7 +30,8 @@ public class TypeSystem_c implements TypeSystem
     public void initialize(LoadedClassResolver loadedResolver)
                            throws SemanticException {
 
-        Types.report(1, "Initializing " + getClass().getName());
+        if (Types.should_report(1))
+	    Types.report(1, "Initializing " + getClass().getName());
 
         // The parsed class resolver.  This resolver contains classes parsed
         // from source files.
@@ -700,7 +701,8 @@ public class TypeSystem_c implements TypeSystem
 
 	    visitedTypes.add(type);
 
-	    Types.report(1, "Searching type " + type + " for method " +
+	    if (Types.should_report(1))
+		Types.report(1, "Searching type " + type + " for method " +
 		name + " with args " + listToString(argTypes));
 
 	    if (! type.isReference()) {
@@ -713,12 +715,14 @@ public class TypeSystem_c implements TypeSystem
 
 		MethodInstance mi = (MethodInstance) i.next();
 
-		Types.report(1, "Trying " + mi);
+		if (Types.should_report(1))
+		    Types.report(1, "Trying " + mi);
 
 		if (methodCallValid(mi, name, argTypes) &&
 		    isAccessible(mi, context)) {
 
-		    Types.report(1, "->acceptable: " + mi);
+		    if (Types.should_report(1))
+			Types.report(1, "->acceptable: " + mi);
 
 		    acceptable.add(mi);
 		}
@@ -745,16 +749,19 @@ public class TypeSystem_c implements TypeSystem
 
 	List acceptable = new ArrayList();
 
-	Types.report(1, "Searching type " + container + " for constructor " +
+	if (Types.should_report(1))
+	    Types.report(1, "Searching type " + container + " for constructor " +
 	    " with args " + listToString(argTypes));
 
 	for (Iterator i = container.constructors().iterator(); i.hasNext(); ) {
 	    ConstructorInstance ci = (ConstructorInstance) i.next();
 
-	    Types.report(1, "Trying " + ci);
+	    if (Types.should_report(1))
+		Types.report(1, "Trying " + ci);
 
 	    if (callValid(ci, argTypes) && isAccessible(ci, context)) {
-		Types.report(1, "->acceptable: " + ci);
+		if (Types.should_report(1))
+		    Types.report(1, "->acceptable: " + ci);
 		acceptable.add(ci);
 	    }
 	}

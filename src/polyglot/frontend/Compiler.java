@@ -142,13 +142,19 @@ public class Compiler
     }
 
     /** Debug reporting for the frontend. */
-    public static void report(int level, String msg) {
-	Report.report(topics, level, msg);
+    public static boolean should_report(int level) {
+	return Report.should_report(topics, level);
+    }
+    public static void report(String msg, int level) {
+	Report.report(level, msg);
     }
 
     /** Reports the time taken by every pass. */
-    public static void reportTime(int level, String msg) {
-	Report.report(timeTopics, level, msg);
+    public static boolean should_reportTime(int level) {
+	return Report.should_report(timeTopics, level);
+    }
+    public static void reportTime(String msg, int level) {
+	Report.report(level, msg);
     }
 
     static {

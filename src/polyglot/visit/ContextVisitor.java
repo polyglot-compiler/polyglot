@@ -86,7 +86,8 @@ public class ContextVisitor extends ErrorHandlingVisitor
     }
 
     public NodeVisitor enter(Node parent, Node n) {
-        Types.report(5, "enter(" + n + ")");
+        if (Types.should_report(5))
+	    Types.report(5, "enter(" + n + ")");
 
         ContextVisitor v = this;
 

@@ -32,7 +32,8 @@ public class ClassContextResolver extends ClassResolver {
      * @param name The name to search for.
      */
     public Type findType(String name) throws SemanticException {
-        Types.report(1, "Looking for " + name + " in " + this);
+        if (Types.should_report(1))
+	    Types.report(1, "Looking for " + name + " in " + this);
 
         if (! StringUtil.isNameShort(name)) {
             throw new InternalCompilerError(

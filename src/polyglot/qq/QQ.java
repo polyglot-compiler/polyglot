@@ -16,14 +16,11 @@ public class QQ {
     protected ExtensionInfo ext;
     protected Position pos;
 
-    static Collection topics = new ArrayList();
-
-    static {
-        topics.add("qq");
+    public static boolean should_report(int level) {
+        return polyglot.main.Report.should_report("qq", level);
     }
-
-    public static void report(int level, String msg) {
-        polyglot.main.Report.report(topics, level, msg);
+    public static void report(String msg, int level) {
+        polyglot.main.Report.report(level, msg);
     }
 
     protected static final int EXPR = 0;
@@ -100,8 +97,10 @@ public class QQ {
         lexer = new polyglot.ext.jl.qq.Lexer(text, pos);
         grm = new polyglot.ext.jl.qq.Grm(lexer, ts, nf, subst);
 
-        report(1, "qq: " + text);
-        report(1, "subst: " + subst);
+        if (should_report(1)) {
+	    report("qq: " + text, 1);
+	    report("subst: " + subst, 1);
+	}
 
         try {
             java_cup.runtime.Symbol sym;
@@ -130,7 +129,8 @@ public class QQ {
 
             if (sym != null && sym.value instanceof Node) {
                 Node n = (Node) sym.value;
-                report(1, "result: " + n);
+                if (should_report(1))
+		    report("result: " + n, 1);
                 return n;
             }
 

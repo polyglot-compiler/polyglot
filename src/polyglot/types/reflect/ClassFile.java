@@ -198,7 +198,8 @@ public class ClassFile implements LazyClassInitializer {
                 ClassType t = typeForName(ts, name);
 
                 if (t.isMember()) {
-                    Report.report(verbose, 3, "adding member " + t + " to " + ct);
+		    if (Report.should_report(verbose, 3))
+                      Report.report(3, "adding member " + t + " to " + ct);
                     ct.addMemberClass(t.toMember());
                 }
                 else {
@@ -233,7 +234,8 @@ public class ClassFile implements LazyClassInitializer {
         for (int i = 0; i < fields.length; i++) {
             if (! fields[i].name().startsWith("jlc$")) {
                 FieldInstance fi = fields[i].fieldInstance(ts, ct);
-                Report.report(verbose, 3, "adding " + fi + " to " + ct);
+		if (Report.should_report(verbose, 3))
+		    Report.report(3, "adding " + fi + " to " + ct);
                 ct.addField(fi);
             }
         }
@@ -249,7 +251,8 @@ public class ClassFile implements LazyClassInitializer {
             if (! methods[i].name().equals("<init>") &&
                 ! methods[i].name().equals("<clinit>")) {
                 MethodInstance mi = methods[i].methodInstance(ts, ct);
-                Report.report(verbose, 3, "adding " + mi + " to " + ct);
+		if (Report.should_report(verbose,3))
+		    Report.report(3, "adding " + mi + " to " + ct);
                 ct.addMethod(mi);
             }
         }
@@ -264,7 +267,8 @@ public class ClassFile implements LazyClassInitializer {
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].name().equals("<init>")) {
                 ConstructorInstance ci = methods[i].constructorInstance(ts, ct);
-                Report.report(verbose, 3, "adding " + ci + " to " + ct);
+		if (Report.should_report(verbose,3))
+		    Report.report(3, "adding " + ci + " to " + ct);
                 ct.addConstructor(ci);
             }
         }
@@ -331,7 +335,8 @@ public class ClassFile implements LazyClassInitializer {
             }
         }
 
-        Report.report(verbose, 4, "parsed \"" + str + "\" -> " + types);
+	if (Report.should_report(verbose, 4))
+	    Report.report(4, "parsed \"" + str + "\" -> " + types);
 
         return types;
     }
@@ -353,7 +358,8 @@ public class ClassFile implements LazyClassInitializer {
      * Convert a String into a type.
      */
     ClassType typeForName(TypeSystem ts, String name) {
-        Report.report(verbose, 2, "resolving " + name);
+	if (Report.should_report(verbose,2))
+	    Report.report(2, "resolving " + name);
 
         try {
             return (ClassType) ts.systemResolver().findType(name);
@@ -370,7 +376,8 @@ public class ClassFile implements LazyClassInitializer {
         // The name is of the form "p.q.C$I$J".
         String name = classNameCP(thisClass);
 
-        Report.report(verbose, 2, "creating ClassType for " + name);
+	if (Report.should_report(verbose, 2))
+	    Report.report(2, "creating ClassType for " + name);
 
         // This is the "p.q" part.
         String packageName = StringUtil.getPackageComponent(name);
@@ -423,8 +430,8 @@ public class ClassFile implements LazyClassInitializer {
                 }
             }
         }
-
-        Report.report(verbose, 3, name + " is " + kinds[kind]);
+	if (Report.should_report(verbose, 3))
+	    Report.report(3, name + " is " + kinds[kind]);
 
         ParsedClassType ct;
 

@@ -29,7 +29,8 @@ public class SourceLoader
                                   sourceExt.fileExtension() + "\".");
         }
 
-	Compiler.report(2, "Loading class from " + sourceFile);
+	if (Compiler.should_report(2))
+	    Compiler.report("Loading class from " + sourceFile, 2);
 
 	return new FileSource(fileName);
     }
@@ -55,8 +56,9 @@ public class SourceLoader
 	    }
 	    
 	    if (sourceFile.exists()) {
-		Compiler.report(2,
-		    "Loading " + className + " from " + sourceFile);
+		if (Compiler.should_report(2))
+		    Compiler.report(
+			"Loading " + className + " from " + sourceFile, 2);
 
 		return new FileSource(sourceFile.getPath());
 	    }

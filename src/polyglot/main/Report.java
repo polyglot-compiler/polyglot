@@ -13,9 +13,8 @@ public class Report {
 
   /**
    * Return whether a message on <code>topics</code> of obscurity
-   * <code>level</code> should be reported, based on the command-line
-   * switches given by the user. This method is occasionally useful
-   * when the computation of the message to be reported is expensive.
+   * <code>level</code> should be reported, based on use of the
+   * -report command-line switches given by the user.
    */
   public static boolean should_report(Collection topics, int level) {
     if (Options.global.level("verbose") >= level) return true;
@@ -30,18 +29,24 @@ public class Report {
     return false;
   }
 
-  /** This is the standard way to report debugging information in the
-   *  compiler.  It conditionally reports a message if it is related to
-   *  one of the specified topics. The variable <code>topics</code> is a
-   *  collection of strings.  The obscurity of the message is indicated
-   *  by <code>level</code>.  The message is reported only if the user
-   *  has requested (via the -report command-line option) that messages
-   *  of that obscurity be reported for one of the specified topics.
+  /**
+   * Whether a message on the topic "topic" at level "level" should
+   * be reported.
    */
-  public static void report(Collection topics, int level, String message) {
-    if (should_report(topics, level)) {
-	for (int j = 1; j < level; j++) System.err.print("  ");
-	System.err.println(message);
-    }
+  public static boolean should_report(String topic, int level) {
+    if (Options.global.level("verbose") >= level) return true;
+    return (topics != null && Options.global.level(topic) >= level);
+  }
+
+  /** This is the standard way to report debugging information in the
+   *  compiler.  It reports a message of the specified level (which
+   *  controls the presentation of the message. To test whether such
+   *  message should be reported, use "should_report"
+   *
+   *  NOTE: This is a change of spec from earlier versions of Report.
+   */
+  public static void report(int level, String message) {
+    for (int j = 1; j < level; j++) System.err.print("  ");
+    System.err.println(message);
   }
 }
