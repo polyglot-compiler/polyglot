@@ -1,0 +1,15 @@
+Build Instructions
+------------------
+
+First ensure javac is in your path and that you are using JDK 1.2
+or later.  
+
+On Unix, do:
+
+	sh ./configure
+	make
+
+On NT, you will need the Cygnus tools.  While running sh, do:
+
+	sh ./configure
+	make
