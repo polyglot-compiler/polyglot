@@ -81,6 +81,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         LabeledBreak.jl ;
         Local.jl ;
         LocalClass.jl ; LocalClass2.jl ; LocalClass3.jl ; LocalClass4.jl ;
+        LocalInners2.jl ;
         LocalInit.jl ;
         MemberClassFlags.jl ;
         Narrowing.jl ;
@@ -145,6 +146,11 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
 	BadStaticContext.jl (Semantic); 
         BadSwitch1.jl (Semantic, "Case label must be an integral constant");
 	BadSwitch2.jl (Semantic, "Duplicate case label");
+	Constants12.jl (Semantic, "Duplicate case label"),
+                       (Semantic, "Duplicate case label"),
+                       (Semantic, "Duplicate case label"),
+                       (Semantic, "Duplicate case label"),
+                       (Semantic, "Duplicate case label");
 	CircularConstructor.jl (Semantic, "Recursive constructor invocation");
         CircularInheritance1.jl (Semantic, "Circular inheritance");
         CircularInheritance2.jl (Semantic, "Circular inheritance");
