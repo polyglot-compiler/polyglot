@@ -50,24 +50,31 @@ public class ClassFileLoader
 
                 String entryName = name.replace('.', '/');
 
+                /*
 		// The "/" must be appended for the entry to be found;
-                ZipEntry e = zip.getEntry(entryName + "/");
-                return e != null && e.isDirectory();
-/*
+                ZipEntry e = zip.getEntry(entryName);
+
+                if (e != null && e.isDirectory()) {
+                    return true;
+                }
+                else {
+                    e = zip.getEntry(entryName + "/");
+                    return e != null;
+                }
+                */
+
                 // ZipFile.getEntry() one returns file entries.
                 // Walk through the entries to see if the directory
                 // is there.
 
                 for (Enumeration i = zip.entries(); i.hasMoreElements(); ) {
                     ZipEntry e = (ZipEntry) i.nextElement();
-		    System.out.println("Entry name = " + e.getName());
-                    if (e.getName().startsWith(entryName)) {
+                    if (e.getName().startsWith(entryName + "/")) {
                         return true;
                     }
                 }
 
                 return false;
-  */
 	    }
             else {
                 String entryName = name.replace('.', File.separatorChar);
