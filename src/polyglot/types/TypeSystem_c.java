@@ -86,6 +86,14 @@ public class TypeSystem_c implements TypeSystem
 	return new Context_c(this, it);
     }
 
+    public Resolver packageContextResolver(Resolver cr, Package p) {
+	return new PackageContextResolver(this, p, cr);
+    }
+
+    public Resolver classContextResolver(ClassType type) {
+	return new ClassContextResolver(this, type);
+    }
+
     public FieldInstance fieldInstance(Position pos,
 	                               ReferenceType container, Flags flags,
 				       Type type, String name) {
@@ -499,37 +507,6 @@ public class TypeSystem_c implements TypeSystem
 	}
 
 	return false;
-    }
-
-    public Resolver qualifierContextResolver(Qualifier q)
-	throws SemanticException {
-
-	if (q.isPackage()) {
-	    return packageContextResolver(systemResolver, q.toPackage());
-	}
-
-	if (q.isType() && q.toType().isClass()) {
-	    ClassType ct = q.toType().toClass();
-	    return classContextResolver(ct);
-	}
-
-	throw new SemanticException("Invalid type qualifier " + q);
-    }
-
-    public Resolver packageContextResolver(Resolver cr, Package p) {
-	return new PackageContextResolver(this, p, cr);
-    }
-
-    public Resolver classContextResolver(ClassType type) {
-	return new ClassContextResolver(this, type);
-    }
-
-    public Resolver emptyContextResolver(Resolver cr) {
-	return new EmptyContextResolver(this, cr);
-    }
-
-    public Resolver bodyContextResolver(ClassType type, Resolver outer) {
-	return new CompoundResolver(classContextResolver(type), outer);
     }
 
     public void checkCycles(ReferenceType goal) throws SemanticException {

@@ -8,7 +8,6 @@ public abstract class TypeObject_c implements TypeObject
 {
     protected transient TypeSystem ts;
     protected Position position;
-    protected Resolver resolver;
 
     /** Used for deserializing types. */
     protected TypeObject_c() { }
@@ -32,10 +31,6 @@ public abstract class TypeObject_c implements TypeObject
 	}
     }
 
-    public Resolver resolver() {
-        return resolver;
-    }
-
     public TypeSystem typeSystem() {
         return ts;
     }
@@ -44,8 +39,18 @@ public abstract class TypeObject_c implements TypeObject
         return position;
     }
 
-    public TypeObject restore() throws SemanticException {
+    transient boolean restoring = false;
+
+    public TypeObject restore_() throws SemanticException {
 	return this;
+    }
+
+    public TypeObject restore() throws SemanticException {
+	if (restoring) return this;
+	restoring = true;
+	TypeObject o = restore_();
+	restoring = false;
+	return o;
     }
 
     private void writeObject( ObjectOutputStream out) throws IOException {

@@ -39,12 +39,6 @@ public class InitializerInstance_c extends TypeObject_c
         return n;
     }
 
-    public InitializerInstance resolver(Resolver resolver) {
-        InitializerInstance_c n = (InitializerInstance_c) copy();
-	n.resolver = resolver;
-	return n;
-    }
-
     public int hashCode() {
         return container.hashCode() + flags.hashCode();
     }
@@ -62,7 +56,7 @@ public class InitializerInstance_c extends TypeObject_c
         return flags.translate() + "initializer";
     }
 
-    public TypeObject restore() throws SemanticException {
+    public TypeObject restore_() throws SemanticException {
 	return this;
     }
 

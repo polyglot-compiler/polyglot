@@ -36,12 +36,6 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
         return n;
     }
 
-    public FieldInstance resolver(Resolver resolver) {
-        FieldInstance_c n = (FieldInstance_c) copy();
-	n.resolver = resolver;
-	return n;
-    }
-
     public FieldInstance container(ReferenceType container) {
         FieldInstance_c n = (FieldInstance_c) copy();
 	n.container = container;
@@ -80,7 +74,7 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
 	    (constantValue != null ? (" = " + constantValue) : "");
     }
 
-    public TypeObject restore() throws SemanticException {
+    public TypeObject restore_() throws SemanticException {
 	ReferenceType c = (ReferenceType) container.restore();
 	Type t = (Type) type.restore();
 

@@ -16,12 +16,6 @@ public class ConstructorInstance_c extends ProcedureInstance_c
         super(ts, pos, container, flags, argTypes, excTypes);
     }
 
-    public ConstructorInstance resolver(Resolver resolver) {
-        ConstructorInstance_c n = (ConstructorInstance_c) copy();
-	n.resolver = resolver;
-	return n;
-    }
-
     public ConstructorInstance flags(Flags flags) {
         ConstructorInstance_c n = (ConstructorInstance_c) copy();
 	n.flags = flags;
@@ -63,7 +57,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c
 	return s;
     }
 
-    public TypeObject restore() throws SemanticException {
+    public TypeObject restore_() throws SemanticException {
 	ClassType c = (ClassType) container.restore();
 	List a = restoreList(argTypes);
 	List e = restoreList(excTypes);

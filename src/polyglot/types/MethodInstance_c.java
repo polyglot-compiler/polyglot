@@ -22,12 +22,6 @@ public class MethodInstance_c extends ProcedureInstance_c
 	this.name = name;
     }
 
-    public MethodInstance resolver(Resolver resolver) {
-        MethodInstance_c n = (MethodInstance_c) copy();
-	n.resolver = resolver;
-	return n;
-    }
-
     public MethodInstance flags(Flags flags) {
         MethodInstance_c n = (MethodInstance_c) copy();
 	n.flags = flags;
@@ -119,7 +113,7 @@ public class MethodInstance_c extends ProcedureInstance_c
 	return s;
     }
 
-    public TypeObject restore() throws SemanticException {
+    public TypeObject restore_() throws SemanticException {
 	ReferenceType c = (ReferenceType) container.restore();
 	Type t = (Type) returnType.restore();
 	List a = restoreList(argTypes);

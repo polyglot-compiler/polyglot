@@ -36,30 +36,37 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     public boolean isClass() { return true; }
     public ClassType toClass() { return this; }
 
+    /** Get the class's constructors. */
     public List constructors() {
         return Collections.unmodifiableList(constructors);
     }
 
+    /** Get the class's member classes. */
     public List memberClasses() {
         return Collections.unmodifiableList(memberClasses);
     }
 
+    /** Get the class's methods. */
     public List methods() {
         return Collections.unmodifiableList(methods);
     }
 
+    /** Get the class's fields. */
     public List fields() {
         return Collections.unmodifiableList(fields);
     }
 
+    /** Get the class's interfaces. */
     public List interfaces() {
         return Collections.unmodifiableList(interfaces);
     }
 
+    /** Get the class's super type. */
     public Type superType() {
         return superType;
     }
 
+    /** Get a field of the class by name. */
     public FieldInstance fieldNamed(String name) {
         for (Iterator i = fields().iterator(); i.hasNext(); ) {
 	    FieldInstance fi = (FieldInstance) i.next();
@@ -71,6 +78,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 	return null;
     }
 
+    /** Get a member class of the class by name. */
     public MemberClassType memberClassNamed(String name) {
         for (Iterator i = memberClasses().iterator(); i.hasNext(); ) {
 	    MemberClassType t = (MemberClassType) i.next();
@@ -94,7 +102,9 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     public LocalClassType toLocal() { return null; }
     public AnonClassType toAnonymous() { return null; }
 
+    /** Get the class's package. */
     public Package package_() { return package_; }
 
+    /** Get the class's flags. */
     public Flags flags() { return flags; }
 }

@@ -52,16 +52,19 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	interfaces.add(ts.Serializable());
     }
 
+    /** Get the base type of the array. */
     public Type base() {
         return base;
     }
 
+    /** Set the base type of the array. */
     public ArrayType base(Type type) {
 	ArrayType_c n = (ArrayType_c) copy();
 	n.base = base;
 	return n;
     }
 
+    /** Get the ulitimate base type of the array. */
     public Type ultimateBase() {
         if (base.isArray()) {
 	    base.toArray().ultimateBase();
@@ -74,10 +77,12 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
         return base.toString() + "[]";
     }
 
+    /** Translate the type. */
     public String translate(Context c) {
 	return ts.translateArray(c, this);
     }
 
+    /** Returns true iff the type is canonical. */
     public boolean isCanonical() {
 	return base.isCanonical();
     }
@@ -85,31 +90,38 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
     public boolean isArray() { return true; }
     public ArrayType toArray() { return this; }
 
+    /** Get the methods implemented by the array type. */
     public List methods() {
 	return Collections.unmodifiableList(methods);
     }
 
+    /** Get the fields of the array type. */
     public List fields() {
 	return Collections.unmodifiableList(fields);
     }
 
+    /** Get the clone() method. */
     public MethodInstance cloneMethod() {
 	return (MethodInstance) methods.get(0);
     }
 
+    /** Get a field of the type by name. */
     public FieldInstance fieldNamed(String name) {
         FieldInstance fi = lengthField();
         return name.equals(fi.name()) ? fi : null;
     }
 
+    /** Get the length field. */
     public FieldInstance lengthField() {
 	return (FieldInstance) fields.get(0);
     }
 
+    /** Get the super type of the array type. */
     public Type superType() {
 	return ts.Object();
     }
 
+    /** Get the interfaces implemented by the array type. */
     public List interfaces() {
 	return Collections.unmodifiableList(interfaces);
     }
@@ -127,7 +139,8 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	return false;
     }
 
-    public TypeObject restore() throws SemanticException {
+    /** Restore the type after deserialization. */
+    public TypeObject restore_() throws SemanticException {
 	Type base = (Type) this.base.restore();
 
 	if (base != this.base) {

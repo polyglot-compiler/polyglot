@@ -13,12 +13,6 @@ public class LocalInstance_c extends VarInstance_c implements LocalInstance
         super(ts, pos, flags, type, name);
     }
 
-    public LocalInstance resolver(Resolver resolver) {
-        LocalInstance_c n = (LocalInstance_c) copy();
-	n.resolver = resolver;
-	return n;
-    }
-
     public LocalInstance constantValue(Object constantValue) {
 	if (! (constantValue instanceof Boolean) &&
 	    ! (constantValue instanceof Number) &&
@@ -57,7 +51,7 @@ public class LocalInstance_c extends VarInstance_c implements LocalInstance
 	    (constantValue != null ? (" = " + constantValue) : "");
     }
 
-    public TypeObject restore() throws SemanticException {
+    public TypeObject restore_() throws SemanticException {
 	Type t = (Type) type.restore();
 
 	LocalInstance li = this;

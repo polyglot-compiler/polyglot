@@ -144,7 +144,7 @@ public abstract class ParsedClassType_c extends ClassType_c
 	}
     }
 
-    public TypeObject restore() throws SemanticException {
+    public TypeObject restore_() throws SemanticException {
 	if (package_ != null) {
 	    package_ = (Package) package_.restore();
 	}

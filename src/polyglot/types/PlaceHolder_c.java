@@ -36,7 +36,7 @@ public class PlaceHolder_c extends Type_c
 	}
     }
 
-    public TypeObject restore() throws SemanticException {
+    public TypeObject restore_() throws SemanticException {
 	if (primitive) {
 	    return ts.primitiveForName(name);
 	}

@@ -57,9 +57,13 @@ public interface TypeSystem {
      */
     ClassType forClass(Class clazz) throws SemanticException;
 
+    /** Get a place-holder for serializing a type object. */ 
     TypeObject placeHolder(TypeObject o);
 
+    /** Get an unknown type. */
     UnknownType unknownType(Position pos);
+
+    /** Get an unknown type qualifier. */
     UnknownQualifier unknownQualifier(Position pos);
 
     /**
@@ -135,6 +139,7 @@ public interface TypeSystem {
     ////
     // Various one-type predicates.
     ////
+
     /**
      * Requires: all type arguments are canonical.
      *
@@ -177,14 +182,23 @@ public interface TypeSystem {
     MethodInstance findMethod(ReferenceType container,
 	String name, List argTypes, Context c) throws SemanticException;
 
+    /**
+     * Find a constructor.  We need to pass the context because the method
+     * we find depends on whether the method is accessible from the context.
+     */
     ConstructorInstance findConstructor(ClassType container,
 	List argTypes, Context c) throws SemanticException;
 
+    /**
+     * Find a member class.  We need to pass the context because the method
+     * we find depends on whether the method is accessible from the context.
+     */
     MemberClassType findMemberClass(ClassType container, String name, Context c)
 	throws SemanticException;
 
     /**
-     * Returns the immediate supertype of type, or null if type has no supertype.
+     * Returns the immediate supertype of type, or null if type has no
+     * supertype.
      **/
     Type superType(ReferenceType type);
 
@@ -255,16 +269,16 @@ public interface TypeSystem {
 
     Context createContext(ImportTable it);
 
+    /** Get a resolver for looking up a type in a package. */
+    Resolver packageContextResolver(Resolver resolver, Package pkg);
+
+    /** Get a resolver for looking up a type in a class context. */
+    Resolver classContextResolver(ClassType ct);
+
     ParsedAnonClassType anonClassType(Job job);
     ParsedTopLevelClassType topLevelClassType(Job job);
     ParsedMemberClassType memberClassType(Job job);
     ParsedLocalClassType localClassType(Job job);
-
-    Resolver emptyContextResolver(Resolver resolver);
-    Resolver packageContextResolver(Resolver resolver, Package type);
-    Resolver classContextResolver(ClassType ct);
-    Resolver bodyContextResolver(ClassType ct, Resolver outer);
-    Resolver qualifierContextResolver(Qualifier q) throws SemanticException;
 
     /**
      * return the set of objects that should be serialized into the
