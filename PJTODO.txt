@@ -1,0 +1,7 @@
+
+incomplete/incorrect/unimplemented
+* constraint checking (need a visitor to do this step)
+
+* constructors of PJParameterTypes when undergoing constraint checking
+* constructors of PJInstantiatedType
+
