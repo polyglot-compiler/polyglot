@@ -33,6 +33,9 @@ import java.io.*;
  *   <dd> number of conflicts expected/allowed [default 0]
  *   <dt> -compact_red   
  *   <dd> compact tables by defaulting to most frequent reduce
+ *   <dt> -max_actions #
+ *   <dd> maximum number of actions per method in generated code
+ *        (useful if javac complains about code size &gt;64K) [default 1000]
  *   <dt> -nowarn        
  *   <dd> don't warn about useless productions, etc.
  *   <dt> -nosummary     
@@ -96,6 +99,8 @@ public class Main {
   protected static boolean include_non_terms = false;
   /** User option -- do not print a summary. */
   protected static boolean no_summary = false;
+  /** User option -- maximum number of actions per method in generated code */
+  protected static int max_actions = 1000;
   /** User option -- number of conflicts to expect */
   protected static int expect_conflicts = 0;
   /** Whether to report counterexamples when conflicts are found.
@@ -251,6 +256,9 @@ public class Main {
 "    -nonterms      put non terminals in symbol constant class\n" + 
 "    -expect #      number of conflicts expected/allowed [default 0]\n" + 
 "    -compact_red   compact tables by defaulting to most frequent reduce\n" +
+"    -max_actions   maximum number of actions per method in generated code\n" +
+"                   (useful if javac complains about code size >64K)\n" +
+"                   [default 1000]\n" +
 "    -nowarn        don't warn about useless productions, etc.\n" +
 "    -nosummary     don't print the usual summary of parse states, etc.\n" +
 "    -nopositions   don't propagate the left and right token position values\n" +
@@ -327,6 +335,23 @@ public class Main {
 	        expect_conflicts = Integer.parseInt(argv[i]);
 	      } catch (NumberFormatException e) {
 		usage("-expect must be followed by a decimal integer");
+	      }
+	    }
+	  else if (argv[i].equals("-max_actions"))
+	    {
+	      /* must have an arg */
+	      if (++i >= len || argv[i].startsWith("-") || 
+				argv[i].endsWith(".cup")) 
+		usage("-max_actions must have a name argument");
+
+	      /* record the number */
+	      try {
+	        max_actions = Integer.parseInt(argv[i]);
+                if (max_actions <= 0) {
+                  usage("-max_actions must be followed by a positive integer");
+                }
+	      } catch (NumberFormatException e) {
+		usage("-max_actions must be followed by a decimal integer");
 	      }
 	    }
 	  else if (argv[i].equals("-compact_red"))  opt_compact_red = true;
@@ -594,7 +619,8 @@ public class Main {
     {
       emit.symbols(symbol_class_file, include_non_terms, sym_interface);
       emit.parser(parser_class_file, action_table, reduce_table, 
-		  start_state.index(), emit.start_production, opt_compact_red,
+		  start_state.index(), emit.start_production,
+                  opt_compact_red, max_actions,
 		  suppress_scanner);
     }
 

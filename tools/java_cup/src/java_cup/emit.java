@@ -312,10 +312,12 @@ public class emit {
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
   /** Emit code for the non-public class holding the actual action code. 
-   * @param out        stream to produce output on.
-   * @param start_prod the start production of the grammar.
+   * @param out           stream to produce output on.
+   * @param start_prod    the start production of the grammar.
+   * @param max_actions   max number of actions per method in generated code
    */
-  protected static void emit_action_code(PrintWriter out, production start_prod)
+  protected static void emit_action_code(PrintWriter out, production start_prod,
+                                         int max_actions)
     throws internal_error
     {
       production prod;
@@ -347,10 +349,49 @@ public class emit {
       out.println("  }");
 
       /* action method head */
+      emit_do_action_header(out, "");
+
+      int num_prods = production.number();
+
+      if (num_prods > max_actions) {
+        emit_dispatch_search(out, 0, num_prods-1, max_actions, "      ");
+      } else {
+        emit_dispatch_switch(out, 0, num_prods-1, start_prod);
+      }
+
+      /* end of method */
+      out.println("    }");
+
+      if (num_prods > max_actions) {
+        emit_dispatch_methods(out, 0, num_prods-1, max_actions, start_prod);
+      }
+
+      /* end of class */
+      out.println("}");
+      out.println();
+
+      action_code_time = System.currentTimeMillis() - start_time;
+    }
+
+  protected static void emit_do_action_call(PrintWriter out, String suffix)
+    throws internal_error
+    {
+      /* action method head */
+      out.print(pre("do_action" + suffix) + "(");
+      out.print(pre("act_num,"));
+      out.print(pre("parser,"));
+      out.print(pre("stack,"));
+      out.print(pre("top)"));
+    }
+
+  protected static void emit_do_action_header(PrintWriter out, String suffix)
+    throws internal_error
+    {
+      /* action method head */
       out.println();
       out.println("  /** Method with the actual generated action code. */");
       out.println("  public final java_cup.runtime.Symbol " + 
-		     pre("do_action") + "(");
+		     pre("do_action" + suffix) + "(");
       out.println("    int                        " + pre("act_num,"));
       out.println("    java_cup.runtime.lr_parser " + pre("parser,"));
       out.println("    java.util.Stack            " + pre("stack,"));
@@ -360,10 +401,54 @@ public class emit {
 
       /* declaration of result symbol */
       /* New declaration!! now return Symbol
-	 6/13/96 frankf */
+        6/13/96 frankf */
       out.println("      /* Symbol object for return from actions */");
       out.println("      java_cup.runtime.Symbol " + pre("result") + ";");
       out.println();
+    }
+
+  protected static void emit_dispatch_search(PrintWriter out, int lo, int hi,
+                                             int max_actions,
+                                             String in)
+    throws internal_error
+    {
+      if (hi - lo + 1 <= max_actions) {
+        out.print(in + "return ");
+        emit_do_action_call(out, "_" + lo);
+        out.println(";");
+      }
+      else {
+        int mid = (lo + hi) / 2;
+        out.println(in + "if (" + pre("act_num") + " <= " + mid + ") {");
+        emit_dispatch_search(out, lo, mid, max_actions, in + "  ");
+        out.println(in + "} else {");
+        emit_dispatch_search(out, mid+1, hi, max_actions, in + "  ");
+        out.println(in + "}");
+      }
+    }
+
+  protected static void emit_dispatch_methods(PrintWriter out, int lo, int hi,
+                                              int max_actions,
+                                              production start_prod)
+    throws internal_error
+    {
+      if (hi - lo + 1 <= max_actions) {
+        emit_do_action_header(out, "_" + lo);
+        emit_dispatch_switch(out, lo, hi, start_prod);
+        /* end of method */
+        out.println("    }");
+      } else {
+        int mid = (lo + hi) / 2;
+        emit_dispatch_methods(out, lo, mid, max_actions, start_prod);
+        emit_dispatch_methods(out, mid+1, hi, max_actions, start_prod);
+      }
+    }
+
+  protected static void emit_dispatch_switch(PrintWriter out, int lo, int hi,
+                                             production start_prod)
+    throws internal_error
+    {
+      production prod;
 
       /* switch top */
       out.println("      /* select the action based on the action number */");
@@ -372,116 +457,126 @@ public class emit {
 
       /* emit action code for each production as a separate case */
       for (Enumeration p = production.all(); p.hasMoreElements(); )
-	{
-	  prod = (production)p.nextElement();
+        {
+          prod = (production)p.nextElement();
 
-	  /* case label */
+          if (prod.index() < lo || prod.index() > hi)
+            continue;
+
+          /* case label */
           out.println("          /*. . . . . . . . . . . . . . . . . . . .*/");
           out.println("          case " + prod.index() + ": // " + 
-					  prod.to_simple_string());
+                                          prod.to_simple_string());
 
-	  /* give them their own block to work in */
-	  out.println("            {");
+          emit_production_block(out, prod, start_prod);
+        }
 
-	  /* create the result symbol */
-	  /*make the variable RESULT which will point to the new Symbol (see below)
-	    and be changed by action code
-	    6/13/96 frankf */
-	  out.println("              " +  prod.lhs().the_symbol().stack_type() +
-		      " RESULT = null;");
-
-	  /* Add code to propagate RESULT assignments that occur in
-	   * action code embedded in a production (ie, non-rightmost
-	   * action code). 24-Mar-1998 CSA
-	   */
-	  for (int i=0; i<prod.rhs_length(); i++) {
-	    // only interested in non-terminal symbols.
-	    if (!(prod.rhs(i) instanceof symbol_part)) continue;
-	    symbol s = ((symbol_part)prod.rhs(i)).the_symbol();
-	    if (!(s instanceof non_terminal)) continue;
-	    // skip this non-terminal unless it corresponds to
-	    // an embedded action production.
-	    if (((non_terminal)s).is_embedded_action == false) continue;
-	    // OK, it fits.  Make a conditional assignment to RESULT.
-	    int index = prod.rhs_length() - i - 1; // last rhs is on top.
-	    out.println("              " + "// propagate RESULT from " +
-			s.name());
-	    out.println("              " + "if ( " +
-	      "((java_cup.runtime.Symbol) " + emit.pre("stack") + ".elementAt("
-              + emit.pre("top") + "-" + index + ")).value != null )");
-	    out.println("                " + "RESULT = " +
-	      "(" + prod.lhs().the_symbol().stack_type() + ") " +
-	      "((java_cup.runtime.Symbol) " + emit.pre("stack") + ".elementAt("
-              + emit.pre("top") + "-" + index + ")).value;");
-	  }
-
-        /* if there is an action string, emit it */
-          if (prod.action() != null && prod.action().code_string() != null &&
-              !prod.action().equals(""))
-            out.println(prod.action().code_string());
-
-	  /* here we have the left and right values being propagated.  
-		must make this a command line option.
-	     frankf 6/18/96 */
-
-         /* Create the code that assigns the left and right values of
-            the new Symbol that the production is reducing to */
-	  if (emit.lr_values()) {	    
-	    int loffset;
-	    String leftstring, rightstring;
-	    int roffset = 0;
-	    rightstring = "((java_cup.runtime.Symbol)" + emit.pre("stack") + ".elementAt(" + 
-	      emit.pre("top") + "-" + roffset + ")).right";	  
-	    if (prod.rhs_length() == 0) 
-	      leftstring = rightstring;
-	    else {
-	      loffset = prod.rhs_length() - 1;
-	      leftstring = "((java_cup.runtime.Symbol)" + emit.pre("stack") + ".elementAt(" + 
-		emit.pre("top") + "-" + loffset + ")).left";	  
-	    }
-	    out.println("              " + pre("result") + " = new java_cup.runtime.Symbol(" + 
-			prod.lhs().the_symbol().index() + "/*" +
-			prod.lhs().the_symbol().name() + "*/" + 
-			", " + leftstring + ", " + rightstring + ", RESULT);");
-	  } else {
-	    out.println("              " + pre("result") + " = new java_cup.runtime.Symbol(" + 
-			prod.lhs().the_symbol().index() + "/*" +
-			prod.lhs().the_symbol().name() + "*/" + 
-			", RESULT);");
-	  }
-	  
-	  /* end of their block */
-	  out.println("            }");
-
-	  /* if this was the start production, do action for accept */
-	  if (prod == start_prod)
-	    {
-	      out.println("          /* ACCEPT */");
-	      out.println("          " + pre("parser") + ".done_parsing();");
-	    }
-
-	  /* code to return lhs symbol */
-	  out.println("          return " + pre("result") + ";");
-	  out.println();
-	}
+      out.println("          default:");
+      out.println("            {");
+      out.println("              throw new Exception(");
+      out.println("                 \"Invalid action number found in " +
+                                    "internal parse table\");");
+      out.println("            }");
+      out.println();
 
       /* end of switch */
-      out.println("          /* . . . . . .*/");
-      out.println("          default:");
-      out.println("            throw new Exception(");
-      out.println("               \"Invalid action number found in " +
-				  "internal parse table\");");
-      out.println();
       out.println("        }");
+    }
 
-      /* end of method */
-      out.println("    }");
+  /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
-      /* end of class */
-      out.println("}");
+  /** Emit code for a single production.
+   * @param out        stream to produce output on.
+   * @param prod       the production to emit.
+   * @param start_prod the start production of the grammar.
+   */
+  protected static void emit_production_block(PrintWriter out, production prod,
+                                              production start_prod)
+    throws internal_error
+    {
+      /* give them their own block to work in */
+      out.println("            {");
+
+      /* create the result symbol */
+      /*make the variable RESULT which will point to the new Symbol (see below)
+        and be changed by action code
+        6/13/96 frankf */
+      out.println("              " +  prod.lhs().the_symbol().stack_type() +
+                  " RESULT = null;");
+
+      /* Add code to propagate RESULT assignments that occur in
+        * action code embedded in a production (ie, non-rightmost
+        * action code). 24-Mar-1998 CSA
+        */
+      for (int i=0; i<prod.rhs_length(); i++) {
+        // only interested in non-terminal symbols.
+        if (!(prod.rhs(i) instanceof symbol_part)) continue;
+        symbol s = ((symbol_part)prod.rhs(i)).the_symbol();
+        if (!(s instanceof non_terminal)) continue;
+        // skip this non-terminal unless it corresponds to
+        // an embedded action production.
+        if (((non_terminal)s).is_embedded_action == false) continue;
+        // OK, it fits.  Make a conditional assignment to RESULT.
+        int index = prod.rhs_length() - i - 1; // last rhs is on top.
+        out.println("              " + "// propagate RESULT from " +
+                    s.name());
+        out.println("              " + "if ( " +
+          "((java_cup.runtime.Symbol) " + emit.pre("stack") + ".elementAt("
+          + emit.pre("top") + "-" + index + ")).value != null )");
+        out.println("                " + "RESULT = " +
+          "(" + prod.lhs().the_symbol().stack_type() + ") " +
+          "((java_cup.runtime.Symbol) " + emit.pre("stack") + ".elementAt("
+          + emit.pre("top") + "-" + index + ")).value;");
+      }
+
+    /* if there is an action string, emit it */
+      if (prod.action() != null && prod.action().code_string() != null &&
+          !prod.action().equals(""))
+        out.println(prod.action().code_string());
+
+      /* here we have the left and right values being propagated.  
+            must make this a command line option.
+          frankf 6/18/96 */
+
+      /* Create the code that assigns the left and right values of
+        the new Symbol that the production is reducing to */
+      if (emit.lr_values()) {	    
+        int loffset;
+        String leftstring, rightstring;
+        int roffset = 0;
+        rightstring = "((java_cup.runtime.Symbol)" + emit.pre("stack") + ".elementAt(" + 
+          emit.pre("top") + "-" + roffset + ")).right";	  
+        if (prod.rhs_length() == 0) 
+          leftstring = rightstring;
+        else {
+          loffset = prod.rhs_length() - 1;
+          leftstring = "((java_cup.runtime.Symbol)" + emit.pre("stack") + ".elementAt(" + 
+            emit.pre("top") + "-" + loffset + ")).left";	  
+        }
+        out.println("              " + pre("result") + " = new java_cup.runtime.Symbol(" + 
+                    prod.lhs().the_symbol().index() + "/*" +
+                    prod.lhs().the_symbol().name() + "*/" + 
+                    ", " + leftstring + ", " + rightstring + ", RESULT);");
+      } else {
+        out.println("              " + pre("result") + " = new java_cup.runtime.Symbol(" + 
+                    prod.lhs().the_symbol().index() + "/*" +
+                    prod.lhs().the_symbol().name() + "*/" + 
+                    ", RESULT);");
+      }
+      
+      /* end of their block */
+      out.println("            }");
+
+      /* if this was the start production, do action for accept */
+      if (prod == start_prod)
+        {
+          out.println("          /* ACCEPT */");
+          out.println("          " + pre("parser") + ".done_parsing();");
+        }
+
+      /* code to return lhs symbol */
+      out.println("          return " + pre("result") + ";");
       out.println();
-
-      action_code_time = System.currentTimeMillis() - start_time;
     }
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
@@ -536,11 +631,13 @@ public class emit {
    * @param out             stream to produce output on.
    * @param act_tab         the internal representation of the action table.
    * @param compact_reduces do we use the most frequent reduce as default?
+   * @param max_actions     max number of actions per method in generated code
    */
   protected static void do_action_table(
     PrintWriter        out, 
     parse_action_table act_tab,
-    boolean            compact_reduces)
+    boolean            compact_reduces,
+    int                max_actions)
     throws internal_error
     {
       parse_action_row row;
@@ -759,6 +856,7 @@ public class emit {
    * @param start_st        start state of the parse machine.
    * @param start_prod      start production of the grammar.
    * @param compact_reduces do we use most frequent reduce as default?
+   * @param max_actions     max number of actions per method in generated code
    * @param suppress_scanner should scanner be suppressed for compatibility?
    */
   public static void parser(
@@ -768,6 +866,7 @@ public class emit {
     int                start_st,
     production         start_prod,
     boolean            compact_reduces,
+    int                max_actions,
     boolean            suppress_scanner)
     throws internal_error
     {
@@ -813,7 +912,7 @@ public class emit {
 
       /* emit the various tables */
       emit_production_table(out);
-      do_action_table(out, action_table, compact_reduces);
+      do_action_table(out, action_table, compact_reduces, max_actions);
       do_reduce_table(out, reduce_table);
 
       /* instance of the action encapsulation class */
@@ -899,7 +998,7 @@ public class emit {
       out.println("}");
 
       /* put out the action code class */
-      emit_action_code(out, start_prod);
+      emit_action_code(out, start_prod, max_actions);
 
       parser_time = System.currentTimeMillis() - start_time;
     }
