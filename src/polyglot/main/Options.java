@@ -316,6 +316,7 @@ public class Options {
         out.println("usage: " + extension.compilerName() + " [options] " +
                            "<source-file>." + extension.fileExtension() + " ...\n");
         out.println("where [options] includes:");
+        out.println(" @<file>                 read options from <file>");
         out.println(" -d <directory>          output directory");
         out.println(" -assert                 recognize the assert keyword");
         out.println(" -sourcepath <path>      source path");

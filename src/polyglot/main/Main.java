@@ -67,7 +67,7 @@ public class Main
   
   protected void start(String[] argv) {
       source = new HashSet();  
-      List args = new ArrayList(Arrays.asList(argv));
+      List args = explodeOptions(argv);
       ExtensionInfo ext = getExtensionInfo(args);
       Options options = ext.getOptions();
       
@@ -155,9 +155,45 @@ public class Main
           reportTime("Total time=" + (System.currentTimeMillis() - time0), 1);
       }
   }
-  
-  public static final void main(String args[])
-  {      
+ 
+  private List explodeOptions(String[] args) {
+      LinkedList ll = new LinkedList();
+
+      for (int i = 0; i < args.length; i++) {
+          // special case for the @ command-line parameter
+          if (args[i].startsWith("@")) {
+              String fn = args[i].substring(1);
+              try {
+                  BufferedReader lr = new BufferedReader(new FileReader(fn));
+                  LinkedList newArgs = new LinkedList();
+
+                  while (true) {
+                      String l = lr.readLine();
+                      if (l == null)
+                          break;
+
+                      StringTokenizer st = new StringTokenizer(l, " ");
+                      while (st.hasMoreTokens())
+                          newArgs.add(st.nextToken());
+                  }
+
+                  lr.close();
+                  ll.addAll(newArgs);
+              }
+              catch (java.io.IOException e) {
+                  System.err.println("cmdline parser: couldn't read args file "+fn);
+                  System.exit(1);
+              }
+              continue;
+          }
+
+          ll.add(args[i]);
+      }
+
+      return ll;
+  }
+
+  public static final void main(String args[]) {      
       new Main().start(args);
   }
 
