@@ -9,6 +9,7 @@ package polyglot.frontend.passes;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.SupertypesResolved;
 import polyglot.types.ParsedClassType;
+import polyglot.util.InternalCompilerError;
 
 
 public class ResolveSuperTypesPass extends ClassFilePass {
@@ -23,6 +24,7 @@ public class ResolveSuperTypesPass extends ClassFilePass {
     
     public boolean run() {
         ParsedClassType ct = goal.type();
+        if (ct.job() != null) throw new InternalCompilerError("cannot run " + this + " for " + ct + " in " + ct.job());
         ct.superType();
         ct.interfaces();
         ct.setSupertypesResolved(true);

@@ -3,6 +3,7 @@ package polyglot.frontend;
 import java.io.Reader;
 
 import polyglot.ast.NodeFactory;
+import polyglot.ext.jl.JLScheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
 import polyglot.main.Version;
@@ -52,7 +53,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     public void initCompiler(Compiler compiler) {
         this.compiler = compiler;
-        scheduler = new Scheduler(this);
 
         // Register the extension with the compiler.
         compiler.addExtension(this);
@@ -60,6 +60,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         // Create the type system and node factory.
         typeSystem();
         nodeFactory();
+        scheduler();
 
         initTypeSystem();
     }

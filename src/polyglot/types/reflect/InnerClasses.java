@@ -14,13 +14,13 @@ import java.io.*;
  *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)
  */
 class InnerClasses extends Attribute {
-  Info[] classes;
+  private Info[] classes;
 
-  static class Info {
-    int classIndex;
-    int outerClassIndex;
-    int nameIndex;
-    int modifiers;
+  public static class Info {
+    public int classIndex;
+    public int outerClassIndex;
+    public int nameIndex;
+    public int modifiers;
   }
 
   /**
@@ -58,5 +58,9 @@ class InnerClasses extends Attribute {
       // modifiers of inner class
       classes[i].modifiers = in.readUnsignedShort();
     }
+  }
+  
+  public Info[] getClasses() {
+      return classes;
   }
 }

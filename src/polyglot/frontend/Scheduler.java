@@ -102,10 +102,8 @@ public abstract class Scheduler {
     }
 
     /** Add <code>goal</code> to the worklist and return its interned copy. */
-    public Goal addGoal(Goal goal) {
-        goal = internGoal(goal);
+    public void addGoal(Goal goal) {
         addGoalToWorklist(goal);
-        return goal;
     }
 
     private synchronized void addGoalToWorklist(Goal g) {
@@ -115,16 +113,49 @@ public abstract class Scheduler {
         }
     }
     
-    public boolean isGoalSatisfied(Goal g) {
-        g = internGoal(g);
-        return reached(g);
+    // Dummy pass needed for currentGoal(), currentPass(), etc., to work
+    // when checking if a goal was reached.
+    Pass schedulerPass(Goal g) {
+        return new EmptyPass(g) {
+            public boolean run() {
+                return true;
+            }
+        };
     }
     
-    private boolean reached(Goal g) {
+    public boolean reached(Goal g) {
         long t = System.currentTimeMillis();
+        
+        Job job = g.job();
+        Pass pass = schedulerPass(g);
+        Pass oldPass = this.currentPass;
+        this.currentPass = pass;
+
+        // Stop the timer on the old pass. */
+        if (oldPass != null) {
+            oldPass.toggleTimers(true);
+        }
+
+        if (job != null) {
+            job.setRunningPass(pass);
+        }
+        
         boolean result = g.reached();
+        
+        if (job != null) {
+            job.setRunningPass(null);
+        }
+        
+        this.currentPass = oldPass;
+
+        // Restart the timer on the old pass. */
+        if (oldPass != null) {
+            oldPass.toggleTimers(true);
+        }
+
         t = System.currentTimeMillis() - t;
-        extInfo.getStats().accumPassTimes("goal-reached-check", t, t);
+        extInfo.getStats().accumPassTimes("scheduler.reached", t, t);
+        
         return result;
     }
 

@@ -13,9 +13,9 @@ import java.io.*;
  * @author Nate Nystrom
  *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)
  */
-class ConstantValue extends Attribute
+public class ConstantValue extends Attribute
 {
-  int index;
+  private int index;
 
   /**
    * Constructor.  Create a ConstantValue attribute from a data stream.
@@ -34,5 +34,9 @@ class ConstantValue extends Attribute
   {
     super(nameIndex, length);
     index = in.readUnsignedShort();
+  }
+  
+  public int getIndex() {
+      return index;
   }
 }

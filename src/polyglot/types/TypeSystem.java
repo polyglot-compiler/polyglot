@@ -590,6 +590,11 @@ public interface TypeSystem {
     LazyClassInitializer defaultClassInitializer();
 
     /**
+     * The lazy class initializer for deserialized classes.
+     */
+    LazyClassInitializer deserializedClassInitializer();
+
+    /**
      * Create a new empty class.
      */
     ParsedClassType createClassType(LazyClassInitializer init);

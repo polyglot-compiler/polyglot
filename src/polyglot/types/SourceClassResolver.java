@@ -7,6 +7,7 @@ import polyglot.frontend.FileSource;
 import polyglot.frontend.goals.TypesInitialized;
 import polyglot.frontend.goals.TypeExists;
 import polyglot.main.Report;
+import polyglot.types.reflect.*;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLoader;
 import polyglot.util.InternalCompilerError;
@@ -195,7 +196,7 @@ public class SourceClassResolver extends LoadedClassResolver
     if (clazz != null && this.allowRawClasses) {
       if (Report.should_report(report_topics, 4))
 	Report.report(4, "Using raw class file for " + name);
-      return clazz.type(ts);
+      return new ClassFileLazyClassInitializer(clazz, ts).type();
     }
 
     if (source != null) {

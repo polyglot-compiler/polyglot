@@ -45,7 +45,7 @@ public abstract class Barrier extends AbstractGoal {
         for (Iterator i = scheduler.jobs().iterator(); i.hasNext(); ) {
             Job job = (Job) i.next();
             Goal subgoal = goalForJob(job);
-            if (! subgoal.reached()) {
+            if (! scheduler.reached(subgoal)) {
                 try {
                     scheduler.addPrerequisiteDependency(this, subgoal);
                     reached = false;

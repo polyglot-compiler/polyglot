@@ -64,8 +64,8 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
 	}
     }
     
-    public polyglot.frontend.Scheduler scheduler() {
-        return polyglot.ext.jl.Scheduler(this);
+    protected polyglot.frontend.Scheduler createScheduler() {
+        return new JLScheduler(this);
     }
 
     public String defaultFileExtension() {

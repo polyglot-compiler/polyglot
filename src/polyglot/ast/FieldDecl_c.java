@@ -180,9 +180,6 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         Context c = ar.context();
         TypeSystem ts = ar.typeSystem();
 
-        // merge isCanonical with type states
-        // should type states just be booleans?
-        // this.fi.state(AMBIGUOUS)
         if (this.fi.isCanonical()) {
             return this;
         }

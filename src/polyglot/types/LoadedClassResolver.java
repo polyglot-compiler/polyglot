@@ -8,6 +8,7 @@ import java.util.StringTokenizer;
 
 import polyglot.main.Report;
 import polyglot.main.Version;
+import polyglot.types.reflect.*;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLoader;
 import polyglot.types.reflect.ClassPathLoader;
@@ -116,7 +117,7 @@ public class LoadedClassResolver extends ClassResolver implements TopLevelResolv
     if (allowRawClasses) {
       if (Report.should_report(report_topics, 4))
 	Report.report(4, "Using raw class file for " + name);
-      return clazz.type(ts);
+      return new ClassFileLazyClassInitializer(clazz, ts).type();
     }
 
     // We have a raw class, but are not allowed to use it, and

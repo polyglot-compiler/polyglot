@@ -164,7 +164,6 @@ public class TypeBuilder extends HaltingVisitor
 
         ParsedClassType ct = ts.createClassType(job().source());
         
-        ct.setJob(job());
         ct.position(pos);
         ct.flags(flags);
         ct.name(name);
@@ -173,6 +172,7 @@ public class TypeBuilder extends HaltingVisitor
 	if (inCode) {
             ct.kind(ClassType.LOCAL);
 	    ct.outer(currentClass());
+	    ct.setJob(job());
 
 	    if (currentPackage() != null) {
 	      	ct.package_(currentPackage());
@@ -183,6 +183,7 @@ public class TypeBuilder extends HaltingVisitor
 	else if (currentClass() != null) {
             ct.kind(ClassType.MEMBER);
 	    ct.outer(currentClass());
+	    ct.setJob(job());
 
 	    currentClass().addMemberClass(ct);
 
@@ -207,10 +208,11 @@ public class TypeBuilder extends HaltingVisitor
                 satisfyTypeExistsGoal(ct);
             }
 
-	    return ct;
+            return ct;
 	}
 	else {
             ct.kind(ClassType.TOP_LEVEL);
+            ct.setJob(job());
 
 	    if (currentPackage() != null) {
 	      	ct.package_(currentPackage());
@@ -229,6 +231,7 @@ public class TypeBuilder extends HaltingVisitor
 
 	    return ct;
 	}
+    
     }
 
     /**
@@ -252,10 +255,10 @@ public class TypeBuilder extends HaltingVisitor
 	TypeSystem ts = typeSystem();
 
         ParsedClassType ct = ts.createClassType(this.job().source());
-        ct.setJob(job());
         ct.kind(ClassType.ANONYMOUS);
         ct.outer(currentClass());
         ct.position(pos);
+        ct.setJob(job());
 
         if (currentPackage() != null) {
             ct.package_(currentPackage());

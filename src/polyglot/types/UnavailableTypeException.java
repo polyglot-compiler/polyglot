@@ -22,8 +22,8 @@ public class UnavailableTypeException extends RuntimeException {
      * @param job
      * @param className
      */
-    public UnavailableTypeException(Job job, String className) {
-        this(job, className, null);
+    public UnavailableTypeException(Job job, String fullName) {
+        this(job, fullName, null);
     }
 
     /**
@@ -31,13 +31,13 @@ public class UnavailableTypeException extends RuntimeException {
      * @param className
      * @param position
      */
-    public UnavailableTypeException(Job job, String className, Position position) {
-        super(className);
+    public UnavailableTypeException(Job job, String fullName, Position position) {
+        super(fullName);
         this.job = job;
         this.position = position;
     }
     
-    public UnavailableTypeException(ParsedClassType ct) {
+    public UnavailableTypeException(ParsedTypeObject ct) {
         this(ct.job(), ct.fullName(), ct.position());
     }
     

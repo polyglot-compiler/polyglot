@@ -12,35 +12,38 @@ public interface LazyClassInitializer
      */
     public boolean fromClassFile();
 
+    /** Set the class type we're initializing. */
+    public void setClass(ParsedClassType ct);
+    
     /**
      * Initialize <code>ct</code>'s superclass.
      */
-    public void initSuperclass(ParsedClassType ct);
+    public void initSuperclass();
    
     /**
      * Initialize <code>ct</code>'s constructors.
      */
-    public void initConstructors(ParsedClassType ct);
+    public void initConstructors();
 
     /**
      * Initialize <code>ct</code>'s methods.
      */
-    public void initMethods(ParsedClassType ct);
+    public void initMethods();
 
     /**
      * Initialize <code>ct</code>'s fields.
      */
-    public void initFields(ParsedClassType ct);
+    public void initFields();
 
     /**
      * Initialize <code>ct</code>'s member classes.
      */
-    public void initMemberClasses(ParsedClassType ct);
+    public void initMemberClasses();
 
     /**
      * Initialize <code>ct</code>'s interfaces.
      */
-    public void initInterfaces(ParsedClassType ct);
+    public void initInterfaces();
 
     public boolean constructorsInitialized();
 

@@ -9,6 +9,7 @@ package polyglot.frontend.passes;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.MembersAdded;
 import polyglot.types.ParsedClassType;
+import polyglot.types.UnavailableTypeException;
 
 
 public class AddMembersPass extends ClassFilePass {
@@ -23,11 +24,16 @@ public class AddMembersPass extends ClassFilePass {
     
     public boolean run() {
         ParsedClassType ct = goal.type();
-        ct.fields();
-        ct.methods();
-        ct.constructors();
-        ct.memberClasses();
-        ct.setMembersAdded(true);
+        try {
+            // force the members to get initialized.
+            ct.fields();
+            ct.methods();
+            ct.constructors();
+            ct.memberClasses();
+            ct.setMembersAdded(true);
+        }
+        catch (UnavailableTypeException e) {
+        }
         return true;
     }
 }

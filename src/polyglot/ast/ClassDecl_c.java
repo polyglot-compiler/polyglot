@@ -171,8 +171,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 
 	if (type != null) {
 	    type.setMembersAdded(true);
-	    ClassDecl_c n = (ClassDecl_c) type(type).flags(type.flags());
-	    return n.addDefaultConstructorIfNeeded(tb.typeSystem(), tb.nodeFactory());
+	    return type(type).flags(type.flags());
         }
 	else {
 	    throw new InternalCompilerError("Missing type.", position());
@@ -194,8 +193,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         // Make sure that the inStaticContext flag of the class is correct.
         Context ctxt = ar.context();
         type.inStaticContext(ctxt.inStaticContext());
-        
-        return this;
+
+        // FIXME: shouldn't reach MembersAdded(type) until here!
+        return addDefaultConstructorIfNeeded(ar.typeSystem(), ar.nodeFactory());
     }
 
     protected ClassDecl_c disambiguateSupertypes(AmbiguityRemover ar) throws SemanticException {
@@ -287,10 +287,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     }
 
     protected boolean defaultConstructorNeeded() {
-        if (flags().isInterface()) {
-            return false;
-        }
-        return type().constructors().isEmpty();
+        return type().defaultConstructorNeeded();
     }
 
     protected Node addDefaultConstructor(TypeSystem ts, NodeFactory nf) {

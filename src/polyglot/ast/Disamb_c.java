@@ -125,7 +125,6 @@ public class Disamb_c implements Disamb
     }
 
     protected Node disambiguateNoPrefix() throws SemanticException {
-
         // First try local variables and fields.
         VarInstance vi = c.findVariableSilent(name);
         

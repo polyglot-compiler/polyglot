@@ -9,7 +9,7 @@ import polyglot.util.Position;
  * A <code>ParsedClassType</code> represents a class loaded from a source file.
  * <code>ParsedClassType</code>s are mutable.
  */
-public interface ParsedClassType extends ClassType
+public interface ParsedClassType extends ClassType, ParsedTypeObject
 {
     void setJob(Job job);
     
@@ -85,6 +85,8 @@ public interface ParsedClassType extends ClassType
      * Set whether the class was declared in a static context.
      */
     void inStaticContext(boolean inStaticContext);
+    
+    boolean defaultConstructorNeeded();
     
     boolean membersAdded();
     boolean supertypesResolved();

@@ -1557,21 +1557,23 @@ public class TypeSystem_c implements TypeSystem
 	if (name.equals("short")) return Short();
 	if (name.equals("int")) return Int();
 	if (name.equals("long")) return Long();
-	if (name.equals("float")) return Float();
+	
+    if (name.equals("float")) return Float();
 	if (name.equals("double")) return Double();
 
 	throw new SemanticException("Unrecognized primitive type \"" +
 	    name + "\".");
     }
 
-    protected LazyClassInitializer defaultClassInit;
-
     public LazyClassInitializer defaultClassInitializer() {
-        if (defaultClassInit == null) {
-            defaultClassInit = new LazyClassInitializer_c(this);
-        }
-
-        return defaultClassInit;
+        return new LazyClassInitializer_c(this);
+    }
+    
+    /**
+     * The lazy class initializer for deserialized classes.
+     */
+    public LazyClassInitializer deserializedClassInitializer() {
+        return new DeserializedClassInitializer(this);
     }
 
     public final ParsedClassType createClassType() {

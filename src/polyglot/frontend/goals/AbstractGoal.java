@@ -73,7 +73,24 @@ public abstract class AbstractGoal implements Goal {
         }
     }
     
+    private boolean hasConcurrentGoalCycle(Goal current) {
+        if (this == current) {
+            return true;
+        }
+        
+        for (Iterator i = current.concurrentGoals().iterator(); i.hasNext(); ) {
+            Goal subgoal = (Goal) i.next();
+            if (! hasConcurrentGoalCycle(subgoal))
+                return true;
+        }
+
+        return false;
+    }
+    
     public void addConcurrentGoal(Goal g) {
+        if (hasConcurrentGoalCycle(g)) {
+            return;
+        }
         subgoals.add(g);
     }
 

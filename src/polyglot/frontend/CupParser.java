@@ -30,9 +30,6 @@ public class CupParser implements Parser
 		SourceFile sf = (SourceFile) sym.value;
                 return sf.source(source);
 	    }
-
-	    eq.enqueue(ErrorInfo.SYNTAX_ERROR, "Unable to parse " +
-		source.name() + ".");
 	}
 	catch (IOException e) {
 	    eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage());
@@ -47,6 +44,11 @@ public class CupParser implements Parser
 	        eq.enqueue(ErrorInfo.SYNTAX_ERROR, e.getMessage());
 	    }
 	}
+
+        if (! eq.hasErrors()) {
+            eq.enqueue(ErrorInfo.SYNTAX_ERROR, "Unable to parse " +
+                source.path() + ".");
+        }
 
 	return null;
     }

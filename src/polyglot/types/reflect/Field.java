@@ -16,147 +16,14 @@ import java.io.*;
  * @author Nate Nystrom
  *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)
  */
-class Field {
-    ClassFile clazz; 
-    int modifiers;
-    int name;
-    int type;
-    Attribute[] attrs;
-    ConstantValue constantValue;
-    boolean synthetic;
-
-    /**
-     * Return true of t is java.lang.String.
-     * We don't compare against ts.String() because ts.String() may not
-     * yet be set.
-     */
-    boolean isString(Type t) {
-      return t.isClass()
-          && t.toClass().isTopLevel()
-          && t.toClass().fullName().equals("java.lang.String");
-    }
-
-    FieldInstance fieldInstance(TypeSystem ts, ClassType ct) {
-      String name = (String) clazz.constants[this.name].value();
-      String type = (String) clazz.constants[this.type].value();
-
-      FieldInstance fi = ts.fieldInstance(ct.position(), ct,
-                                          ts.flagsForBits(modifiers),
-                                          clazz.typeForString(ts, type), name);
-
-      if (isConstant()) {
-        Constant c = constantValue();
-
-        Object o = null;
-
-        try {
-          switch (c.tag()) {
-            case Constant.STRING: o = getString(); break;
-            case Constant.INTEGER: o = new Integer(getInt()); break;
-            case Constant.LONG: o = new Long(getLong()); break;
-            case Constant.FLOAT: o = new Float(getFloat()); break;
-            case Constant.DOUBLE: o = new Double(getDouble()); break;
-          }
-        }
-        catch (SemanticException e) {
-          throw new ClassFormatError("Unexpected constant pool entry.");
-        }
-
-        fi.setConstantValue(o);
-        return fi;
-      }
-      else {
-        fi.setNotConstant();
-      }
-
-      return fi;
-    }
-
-    boolean isSynthetic() {
-      return synthetic;
-    }
-
-    boolean isConstant() {
-      return this.constantValue != null;
-    }
-    
-    Constant constantValue() {
-      if (this.constantValue != null) {
-        int index = this.constantValue.index;
-        return clazz.constants[index];
-      }
-
-      return null;
-    }
-
-    int getInt() throws SemanticException {
-      Constant c = constantValue();
-
-      if (c != null && c.tag() == Constant.INTEGER) {
-        Integer v = (Integer) c.value();
-        return v.intValue();
-      }
-
-      throw new SemanticException("Could not find expected constant " +
-                                  "pool entry with tag INTEGER.");
-    }
-
-    float getFloat() throws SemanticException {
-      Constant c = constantValue();
-
-      if (c != null && c.tag() == Constant.FLOAT) {
-        Float v = (Float) c.value();
-        return v.floatValue();
-      }
-
-      throw new SemanticException("Could not find expected constant " +
-                                  "pool entry with tag FLOAT.");
-    }
-
-    double getDouble() throws SemanticException {
-      Constant c = constantValue();
-
-      if (c != null && c.tag() == Constant.DOUBLE) {
-        Double v = (Double) c.value();
-        return v.doubleValue();
-      }
-
-      throw new SemanticException("Could not find expected constant " +
-                                  "pool entry with tag DOUBLE.");
-    }
-
-    long getLong() throws SemanticException {
-      Constant c = constantValue();
-
-      if (c != null && c.tag() == Constant.LONG) {
-        Long v = (Long) c.value();
-        return v.longValue();
-      }
-
-      throw new SemanticException("Could not find expected constant " +
-                                  "pool entry with tag LONG.");
-    }
-
-    String getString() throws SemanticException {
-      Constant c = constantValue();
-
-      if (c != null && c.tag() == Constant.STRING) {
-        Integer i = (Integer) c.value();
-        c = clazz.constants[i.intValue()];
-
-        if (c != null && c.tag() == Constant.UTF8) {
-          String v = (String) c.value();
-          return v;
-        }
-      }
-
-      throw new SemanticException("Could not find expected constant " +
-                                  "pool entry with tag STRING or UTF8.");
-    }
-
-    String name() {
-      return (String) clazz.constants[this.name].value();
-    }
+public class Field {
+    private ClassFile clazz; 
+    private int modifiers;
+    private int name;
+    private int type;
+    private Attribute[] attrs;
+    private ConstantValue constantValue;
+    private boolean synthetic;
 
     /**
      * Constructor.  Read a field from a class file.
@@ -175,19 +42,19 @@ class Field {
 
         modifiers = in.readUnsignedShort();
 
-	name = in.readUnsignedShort();
-	type = in.readUnsignedShort();
-
-	int numAttributes = in.readUnsignedShort();
-
+        name = in.readUnsignedShort();
+        type = in.readUnsignedShort();
+        
+        int numAttributes = in.readUnsignedShort();
+        
         attrs = new Attribute[numAttributes];
-
+        
         for (int i = 0; i < numAttributes; i++) {
             int nameIndex = in.readUnsignedShort();
             int length = in.readInt();
-
-            Constant name = clazz.constants[nameIndex];
-
+            
+            Constant name = clazz.getConstants()[nameIndex];
+            
             if (name != null) {
                 if ("ConstantValue".equals(name.value())) {
                     constantValue = new ConstantValue(in, nameIndex, length);
@@ -197,13 +64,128 @@ class Field {
                     synthetic = true;
                 }
             }
-
-	    if (attrs[i] == null) {
+            
+            if (attrs[i] == null) {
                 long n = in.skip(length);
                 if (n != length) {
                     throw new EOFException();
                 }
             }
-	}
+        }
+    }
+    
+    /**
+     * Return true of t is java.lang.String.
+     * We don't compare against ts.String() because ts.String() may not
+     * yet be set.
+     */
+    public boolean isString(Type t) {
+      return t.isClass()
+          && t.toClass().isTopLevel()
+          && t.toClass().fullName().equals("java.lang.String");
+    }
+
+    public boolean isSynthetic() {
+      return synthetic;
+    }
+
+    public boolean isConstant() {
+      return this.constantValue != null;
+    }
+    
+    public Constant constantValue() {
+      if (this.constantValue != null) {
+        int index = this.constantValue.getIndex();
+        return clazz.getConstants()[index];
+      }
+
+      return null;
+    }
+
+    public int getInt() throws SemanticException {
+      Constant c = constantValue();
+
+      if (c != null && c.tag() == Constant.INTEGER) {
+        Integer v = (Integer) c.value();
+        return v.intValue();
+      }
+
+      throw new SemanticException("Could not find expected constant " +
+                                  "pool entry with tag INTEGER.");
+    }
+
+    public float getFloat() throws SemanticException {
+      Constant c = constantValue();
+
+      if (c != null && c.tag() == Constant.FLOAT) {
+        Float v = (Float) c.value();
+        return v.floatValue();
+      }
+
+      throw new SemanticException("Could not find expected constant " +
+                                  "pool entry with tag FLOAT.");
+    }
+
+    public double getDouble() throws SemanticException {
+      Constant c = constantValue();
+
+      if (c != null && c.tag() == Constant.DOUBLE) {
+        Double v = (Double) c.value();
+        return v.doubleValue();
+      }
+
+      throw new SemanticException("Could not find expected constant " +
+                                  "pool entry with tag DOUBLE.");
+    }
+
+    public long getLong() throws SemanticException {
+      Constant c = constantValue();
+
+      if (c != null && c.tag() == Constant.LONG) {
+        Long v = (Long) c.value();
+        return v.longValue();
+      }
+
+      throw new SemanticException("Could not find expected constant " +
+                                  "pool entry with tag LONG.");
+    }
+
+    public String getString() throws SemanticException {
+      Constant c = constantValue();
+
+      if (c != null && c.tag() == Constant.STRING) {
+        Integer i = (Integer) c.value();
+        c = clazz.getConstants()[i.intValue()];
+
+        if (c != null && c.tag() == Constant.UTF8) {
+          String v = (String) c.value();
+          return v;
+        }
+      }
+
+      throw new SemanticException("Could not find expected constant " +
+                                  "pool entry with tag STRING or UTF8.");
+    }
+
+    public Attribute[] getAttrs() {
+        return attrs;
+    }
+    public ClassFile getClazz() {
+        return clazz;
+    }
+    public ConstantValue getConstantValue() {
+        return constantValue;
+    }
+    public int getModifiers() {
+        return modifiers;
+    }
+    public int getName() {
+        return name;
+    }
+    public int getType() {
+        return type;
+    }
+    public String name() {
+      return (String) clazz.getConstants()[this.name].value();
     }
 }

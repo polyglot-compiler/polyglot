@@ -94,8 +94,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
                         (Lexical, "Long literal.*out of range"),
                         (Lexical, "Long literal.*out of range"),
                         (Lexical, "Long literal.*out of range"),
-                        (Syntax),
-                        (Syntax, "Unable to parse");
+                        (Syntax);
         Init6.jl ;
         Init7.jl ; Init8.jl ; Init9.jl ;
         InitializerType1.jl ;

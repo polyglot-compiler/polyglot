@@ -13,9 +13,9 @@ import java.io.*;
  * @author Nate Nystrom
  *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)
  */
-class Exceptions extends Attribute {
-  int[] exceptions;
-  ClassFile clazz;
+public class Exceptions extends Attribute {
+  private int[] exceptions;
+  private ClassFile clazz;
 
   /**
    * Constructor for create an <code>Exceptions</code> from scratch.
@@ -59,5 +59,11 @@ class Exceptions extends Attribute {
     for (int i = 0; i < count; i++) {
       exceptions[i] = in.readUnsignedShort();
     }
+  }
+  public ClassFile getClazz() {
+      return clazz;
+  }
+  public int[] getThrowTypes() {
+      return exceptions;
   }
 }

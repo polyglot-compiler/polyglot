@@ -1,5 +1,7 @@
 package polyglot.ext.jl.types;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.*;
 
 import polyglot.frontend.*;
@@ -42,20 +44,57 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     public ParsedClassType_c(TypeSystem ts, LazyClassInitializer init, 
                              Source fromSource) {
         super(ts);
-        this.init = init;
         this.fromSource = fromSource;
+
+        this.init = init;
+        init.setClass(this);
 
         this.interfaces = new TypedList(new LinkedList(), Type.class, false);
         this.methods = new TypedList(new LinkedList(), MethodInstance.class, false);
         this.fields = new TypedList(new LinkedList(), FieldInstance.class, false);
         this.constructors = new TypedList(new LinkedList(), ConstructorInstance.class, false);
         this.memberClasses = new TypedList(new LinkedList(), Type.class, false);
-        
-        if (init == null) {
-            throw new InternalCompilerError("Null lazy class initializer");
-        }
     }
      
+    public void initDependencies() {
+        Scheduler scheduler = ts.extensionInfo().scheduler();
+        
+        try {
+            if (this.job() != null) {
+                scheduler.addConcurrentDependency(scheduler.MembersAdded(this),
+                                                  scheduler.Parsed(this.job()));
+                scheduler.addConcurrentDependency(scheduler.SupertypesResolved(this),
+                                                  scheduler.TypesInitialized(this.job()));
+                scheduler.addConcurrentDependency(scheduler.AllMembersAdded(this),
+                                                  scheduler.TypesInitialized(this.job()));
+                scheduler.addConcurrentDependency(scheduler.SignaturesResolved(this),
+                                                  scheduler.TypesInitialized(this.job()));
+                /*
+                 scheduler.addConcurrentDependency(scheduler.MembersAdded(ct),
+                 scheduler.TypesInitialized(ct.job()));
+                 scheduler.addConcurrentDependency(scheduler.SupertypesResolved(ct),
+                 scheduler.TypeChecked(ct.job()));
+                 scheduler.addConcurrentDependency(scheduler.AllMembersAdded(ct),
+                 scheduler.TypeChecked(ct.job()));
+                 scheduler.addConcurrentDependency(scheduler.SignaturesResolved(ct),
+                 scheduler.TypeChecked(ct.job()));
+                 */
+            }
+            
+            scheduler.addPrerequisiteDependency(scheduler.AllMembersAdded(this),
+                                                scheduler.MembersAdded(this));
+            scheduler.addPrerequisiteDependency(scheduler.AllMembersAdded(this),
+                                                scheduler.SupertypesResolved(this));
+            scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this),
+                                                scheduler.MembersAdded(this));
+            scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this),
+                                                scheduler.SupertypesResolved(this));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e.getMessage());
+        }
+    }
+
     public Source fromSource() {
         return fromSource;
     }
@@ -66,6 +105,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     
     public void setJob(Job job) {
         this.job = job;
+        initDependencies();
     }
     
     public Kind kind() {
@@ -100,11 +140,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
 
     /** Get the class's super type. */
     public Type superType() {
-        if (init != null && ! init.superclassInitialized()) {
-            init.initSuperclass(this);
-            freeInit();
-        }
-        requireSupertypesResolved();
+        init.initSuperclass();
         return this.superType;
     }
 
@@ -122,16 +158,6 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     
     public void setFlags(Flags flags) {
         this.flags = flags;
-    }
-
-    /** Free the initializer object if we no longer need it. */
-    protected void freeInit() {
-        if (init.initialized()) {
-            init = null;
-        }
-        else if (init == null) {
-            throw new InternalCompilerError("Null lazy class initializer");
-        }
     }
 
     public void flags(Flags flags) {
@@ -195,120 +221,41 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
 	memberClasses.add(t);
     }
     
-    public void requireSupertypesResolved() {
-        if (supertypesResolved) {
-            return;
+    public boolean defaultConstructorNeeded() {
+        if (flags().isInterface()) {
+            return false;
         }
-        
-        Scheduler scheduler = typeSystem().extensionInfo().scheduler();
-        
-        if (job() == scheduler.currentJob()) {
-            // throw new UnavailableTypeException(this);
-            return;
-        }
-        
-        Goal g = scheduler.SupertypesResolved(this);
-        try {
-            boolean result = scheduler.attemptGoal(g);
-        }
-        catch (CyclicDependencyException e) {
-            scheduler.addConcurrentDependency(scheduler.currentGoal(), g);
-            throw new UnavailableTypeException(this);
-        }
-    }
-
-    public void requireMembersAdded() {
-        if (membersAdded) {
-            return;
-        }
-        
-        Scheduler scheduler = typeSystem().extensionInfo().scheduler();
-        
-        if (job() == scheduler.currentJob()) {
-            // throw new UnavailableTypeException(this);
-            return;
-        }
-        
-        Goal g = scheduler.MembersAdded(this);
-        try {
-            boolean result = scheduler.attemptGoal(g);
-        }
-        catch (CyclicDependencyException e) {
-            scheduler.addConcurrentDependency(scheduler.currentGoal(), g);
-            throw new UnavailableTypeException(this);
-        }
-    }
-       
-    public void requireSignaturesResolved() {
-        if (signaturesResolved) {
-            return;
-        }
-        
-        Scheduler scheduler = typeSystem().extensionInfo().scheduler();
-        
-        if (job() == scheduler.currentJob()) {
-            // throw new UnavailableTypeException(this);
-            return;
-        }
-        
-        Goal g = scheduler.SignaturesResolved(this);
-        try {
-            boolean result = scheduler.attemptGoal(g);
-        }
-        catch (CyclicDependencyException e) {
-            scheduler.addConcurrentDependency(scheduler.currentGoal(), g);
-            throw new UnavailableTypeException(this);
-        }
+        return constructors().isEmpty();
     }
     
     /** Return a mutable list of constructors */
     public List constructors() {
-        if (init != null && ! init.constructorsInitialized()) {
-            init.initConstructors(this);
-            freeInit();
-        }
-        requireSignaturesResolved();
-        return constructors;
+        init.initConstructors();
+        return Collections.unmodifiableList(constructors);
     }
 
     /** Return a mutable list of member classes */
     public List memberClasses() {
-        if (init != null && ! init.memberClassesInitialized()) {
-            init.initMemberClasses(this);
-            freeInit();
-        }
-        requireMembersAdded();
-        return memberClasses;
+        init.initMemberClasses();
+        return Collections.unmodifiableList(memberClasses);
     }
 
     /** Return an immutable list of methods. */
     public List methods() {
-        if (init != null && ! init.methodsInitialized()) {
-            init.initMethods(this);
-            freeInit();
-        }
-        requireSignaturesResolved();
-        return methods;
+        init.initMethods();
+        return Collections.unmodifiableList(methods);
     }
 
     /** Return a mutable list of fields */
     public List fields() {
-        if (init != null && ! init.fieldsInitialized()) {
-            init.initFields(this);
-            freeInit();
-        }
-        requireSignaturesResolved();
-        return fields;
+        init.initFields();
+        return Collections.unmodifiableList(fields);
     }
 
     /** Return a mutable list of interfaces */
     public List interfaces() {
-        if (init != null && ! init.interfacesInitialized()) {
-            init.initInterfaces(this);
-            freeInit();
-        }
-        requireSupertypesResolved();
-        return interfaces;
+        init.initInterfaces();
+        return Collections.unmodifiableList(interfaces);
     }
     
     boolean membersAdded;
@@ -444,4 +391,20 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         signaturesResolved = true;
         return true;
     }
+    
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        if (in instanceof TypeInputStream) {
+            fromSource = null;
+            job = null;
+           
+            init = ((TypeInputStream) in).getTypeSystem().deserializedClassInitializer();
+            membersAdded = true;
+            supertypesResolved = true;
+            allMembersAdded = true;
+            signaturesResolved = true;
+        }
+
+        in.defaultReadObject();
+    }
+
 }

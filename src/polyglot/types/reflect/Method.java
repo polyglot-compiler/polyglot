@@ -20,13 +20,13 @@ import java.io.*;
  */
 class Method
 {
-  ClassFile clazz; 
-  int modifiers;
-  int name;
-  int type;
-  Attribute[] attrs;
-  Exceptions exceptions;
-  boolean synthetic;
+  private ClassFile clazz; 
+  private int modifiers;
+  private int name;
+  private int type;
+  private Attribute[] attrs;
+  private Exceptions exceptions;
+  private boolean synthetic;
 
   /**
    * Constructor.  Read a method from a class file.
@@ -55,7 +55,7 @@ class Method
       int nameIndex = in.readUnsignedShort();
       int length = in.readInt();
 
-      Constant name = clazz.constants[nameIndex];
+      Constant name = clazz.getConstants()[nameIndex];
 
       if (name != null) {
         if ("Exceptions".equals(name.value())) {
@@ -76,69 +76,28 @@ class Method
     }
   }
 
-  boolean isSynthetic() {
+  public boolean isSynthetic() {
     return synthetic;
   }
-
-  String name() {
-    return (String) clazz.constants[this.name].value();
+  public Attribute[] getAttrs() {
+      return attrs;
   }
-
-  MethodInstance methodInstance(TypeSystem ts, ClassType ct) {
-    String name = (String) clazz.constants[this.name].value();
-    String type = (String) clazz.constants[this.type].value();
-
-    if (type.charAt(0) != '(') {
-        throw new ClassFormatError("Bad method type descriptor.");
-    }
-
-    int index = type.indexOf(')', 1);
-    List argTypes = clazz.typeListForString(ts, type.substring(1, index));
-    Type returnType = clazz.typeForString(ts, type.substring(index+1));
-
-    List excTypes = new ArrayList();
-
-    if (exceptions != null) {
-        for (int i = 0; i < exceptions.exceptions.length; i++) {
-            String s = clazz.classNameCP(exceptions.exceptions[i]);
-            excTypes.add(clazz.quietTypeForName(ts, s));
-        }
-    }
-
-    return ts.methodInstance(ct.position(), ct,
-                             ts.flagsForBits(modifiers), returnType, name,
-                             argTypes, excTypes);
+  public ClassFile getClazz() {
+      return clazz;
   }
-
-  ConstructorInstance constructorInstance(TypeSystem ts, ClassType ct,
-                                          Field[] fields) {
-    // Get a method instance for the <init> method.
-    MethodInstance mi = methodInstance(ts, ct);
-
-    List formals = mi.formalTypes();
-
-    if (ct.isInnerClass()) {
-        // If an inner class, the first argument may be a reference to an
-        // enclosing class used to initialize a synthetic field.
-
-        // Count the number of synthetic fields.
-        int numSynthetic = 0;
-
-        for (int i = 0; i < fields.length; i++) {
-            if (fields[i].isSynthetic()) {
-                numSynthetic++;
-            }
-        }
-
-        // Ignore a number of parameters equal to the number of synthetic
-        // fields.
-        if (numSynthetic <= formals.size()) {
-            formals = formals.subList(numSynthetic, formals.size());
-        }
-    }
-
-    return ts.constructorInstance(mi.position(), ct,
-                                  mi.flags(), formals,
-                                  mi.throwTypes());
+  public Exceptions getExceptions() {
+      return exceptions;
+  }
+  public int getModifiers() {
+      return modifiers;
+  }
+  public int getName() {
+      return name;
+  }
+  public int getType() {
+      return type;
+  }
+  public String name() {
+    return (String) clazz.getConstants()[this.name].value();
   }
 }
