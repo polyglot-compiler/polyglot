@@ -936,10 +936,6 @@ block_statement ::=
             {: List l = new TypedList(new LinkedList(), Stmt.class, false);
                l.add(parser.nf.LocalClassDecl(parser.pos(a), a));
                RESULT = l; :}
-    |   interface_declaration:a
-            {: List l = new TypedList(new LinkedList(), Stmt.class, false);
-               l.add(parser.nf.LocalClassDecl(parser.pos(a), a));
-               RESULT = l; :}
     ;
 local_variable_declaration_statement ::=
                     // List of LocalDecl
