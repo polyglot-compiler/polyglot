@@ -61,6 +61,10 @@ public class Switch_c extends Stmt_c implements Switch
 	return this;
     }
 
+    public Context enterScope(Context c) {
+        return c.pushBlock();
+    }
+
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
 	Expr expr = (Expr) visitChild(this.expr, v);
