@@ -26,6 +26,9 @@ GOOD =  \
 	Inner8.jl \
 	Inner9.jl \
 	Prim.jl \
+	Return2.jl \
+	Return5.jl \
+	Return8.jl \
 	StaticContext.jl \
 	StaticOps.jl \
 	xIterator.jl
@@ -45,7 +48,11 @@ BAD = \
 	NoInit10.jl \
 	NoInit11.jl \
 	NoInit12.jl \
-	NoReturns.jl \
+	NoReturn1.jl \
+	NoReturn3.jl \
+	NoReturn4.jl \
+	NoReturn6.jl \
+	NoReturn7.jl \
 	Unreachable1.jl \
 	Unreachable2.jl \
 	Unreachable3.jl \
