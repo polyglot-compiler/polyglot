@@ -427,13 +427,13 @@ public class TypeSystem_c implements TypeSystem
     }
 
     /** True if the class ctt accessible from the package pkg. */
-    protected boolean classAccessibleFromPackage(ClassType ctt, Package pkg) {
+    public boolean classAccessibleFromPackage(ClassType ctt, Package pkg) {
         assert_(ctt);
 
-        // Local and anonymous classes are accessible if they can be named.
-        // This method wouldn't be called if they weren't named.
+        // Local and anonymous classes are not accessible from the outermost
+        // scope of a compilation unit.
         if (! ctt.isTopLevel() && ! ctt.isMember())
-            return true;
+            return false;
 
 	Flags flags = ctt.flags();
 

@@ -111,4 +111,7 @@ public interface Context extends Resolver, Copy
 
     /** Return the innermost method or constructor in scope. */
     CodeInstance currentCode();
+
+    /** The current package, or null if not in a package. */
+    Package package_();
 }

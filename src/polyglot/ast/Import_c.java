@@ -65,7 +65,21 @@ public class Import_c extends Node_c implements Import
     /** Check that imported classes and packages exist. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	if (kind == CLASS) {
-            tc.typeSystem().typeForName(name);
+            // The first component of the type name must be a package.
+            String pkgName = StringUtil.getFirstComponent(name);
+            if (! tc.typeSystem().packageExists(pkgName)) {
+                throw new SemanticException("Package \"" + pkgName +
+                    "\" not found.", position());
+            }
+
+            // The type must exist.
+            Type ct = tc.typeSystem().typeForName(name);
+
+            // And the type must be accessible.
+            if (ct.isClass()) {
+                tc.typeSystem().classAccessibleFromPackage(ct.toClass(),
+                    tc.context().package_());
+            }
 	}
 	else if (kind == PACKAGE) {
             if (! tc.typeSystem().packageExists(name)) {

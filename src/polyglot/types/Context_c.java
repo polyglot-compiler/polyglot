@@ -7,6 +7,7 @@ import java.util.Map;
 
 import polyglot.main.Report;
 import polyglot.types.*;
+import polyglot.types.Package;
 import polyglot.util.CollectionUtil;
 import polyglot.util.InternalCompilerError;
 
@@ -95,6 +96,11 @@ public class Context_c implements Context
 
     public ImportTable importTable() {
         return it;
+    }
+
+    /** The current package, or null if not in a package. */
+    public Package package_() {
+        return importTable().package_();
     }
 
     /**

@@ -200,6 +200,12 @@ public interface TypeSystem {
     boolean classAccessible(ClassType ct, Context context);
 
     /**
+     * Checks whether a top-level or member class can be accessed from the
+     * package pkg.  Returns false for local and anonymous classes.
+     */
+    boolean classAccessibleFromPackage(ClassType ct, Package pkg);
+
+    /**
      * Returns whether inner is enclosed within outer
      */
     boolean isEnclosed(ClassType inner, ClassType outer);
