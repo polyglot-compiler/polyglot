@@ -62,6 +62,14 @@ public interface NodeVisitor {
   public Node visitNewObjectExpression(NewObjectExpression oe);
   public Node visitInstanceofExpression(InstanceofExpression ie);
   public Node visitArrayInitializerExpression(ArrayInitializerExpression aie);
+  public Node visitArrayIndexExpression(ArrayIndexExpression aie);
   public Node visitAmbiguousNameExpression(AmbiguousNameExpression ane);
+  public Node visitMethodExpression(MethodExpression me);
+  public Node visitFieldExpression(FieldExpression fe);
+
+  // ClassMemebers
+  public Node visitClassNode(ClassNode cn);
+  public Node visitMethodNode(MethodNode mn);
+
 	 
 }

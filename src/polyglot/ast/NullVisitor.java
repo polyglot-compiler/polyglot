@@ -163,8 +163,34 @@ public class NullVisitor implements NodeVisitor {
     return aie;
   }
 
+  public Node visitArrayIndexExpression(ArrayIndexExpression aie) {
+    aie.visitChildren(this);
+    return aie;
+  }
+
   public Node visitAmbiguousNameExpression(AmbiguousNameExpression ane) {
     ane.visitChildren(this);
     return ane;
+  }
+
+  public Node visitMethodExpression(MethodExpression me) {
+    me.visitChildren(this);
+    return me;
+  }
+
+  public Node visitFieldExpression(FieldExpression fe) {
+    fe.visitChildren(this);
+    return fe;
+  }
+
+  // ClassMembers
+  public Node visitClassNode (ClassNode cn) {
+    cn.visitChildren(this);
+    return cn;
+  }
+  
+  public Node visitMethodNode(MethodNode mn) {
+    mn.visitChildren(this);
+    return mn;
   }
 }

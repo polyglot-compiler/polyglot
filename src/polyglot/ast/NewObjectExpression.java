@@ -19,30 +19,26 @@ import java.util.List;
  * use of the new operator to create a new instance of a class.  In
  * addition to the type of the class being created, a
  * NewObjectExpression has a list of arguments to be passed to the
- * constructor of the object and an optional array of class memebers
- * to support anonymous classes.
+ * constructor of the object and an optional ClassNode used to support
+ * anonymous classes.
  */
 
 public class NewObjectExpression extends Expression {
     
   /**
-   * Requires: <classMemebers> contains only elements of type
-   * ClassMember, arguments contains only elements of type
-   * <Expression>.
+   * Requires: arguments contains only elements of type <Expression>.
    *
    * Effects: Creates a new NewObjectExpression representing the
-   * creation of an object of type <type> calling the constructor
-   * with arguments in <arguments> and optionally using the elements
-   * of <classMembers> to construct a body of the new class
-   * instance.  If there are no specified class body,
-   * <classMembers> can be either empty or null.
+   * creation of an object of type <type> calling the constructor with
+   * arguments in <arguments> and optionally using <classNode> to
+   * extend the class.  If an anonymous class is not being created
+   * classNode should be null.
    */
-  public NewObjectExpression(Type type, List arguments, List classMemebers) {
+  public NewObjectExpression(Type type, List arguments, ClassNode classNode) {
     this.type = type;
     TypedList.check(arguments, Expression.class);
     argumentList = new ArrayList(arguments);
-    TypedList.check(classMembers, ClassMember.class);
-    this.classMembers = new ArrayList(classMembers);
+    this.classNode = classNode;
   }
 
   /**
@@ -78,24 +74,24 @@ public class NewObjectExpression extends Expression {
 				 Expression.class,
 				 false);
   }
-  
+
   /**
-   * Effects: Returns the classMemeber at positions <pos>.  Thorws an
-   * IndexOutOfBoundsException if <pos> is not valid.
+   * Effects: Returns the ClassNode containing the ClassMembers used
+   * to extend the class being created.  If no such extentions exist,
+   * returns null.
    */
-  public ClassMember classMemberAt(int pos) {
-    return (ClassMember) classMembers.get(pos);
+  public ClassNode getClassNode() {
+    return classNode;
   }
 
   /**
-   * Effects: Returns a TypedListIterator which will yield each
-   * ClassMember in the optional ClassBody of this NewObjectExpression
-   * in order.
+   * Effects: Sets the ClassNode containing the ClassMembers used to
+   * extend the class being instatiated to <newClassNode>.  If
+   * <newClassNode> is null, then the class is instantiated with out
+   * being extended.
    */
-  public TypedListIterator classMemebers() {
-    return new TypedListIterator(classMembers.listIterator(),
-				 ClassMember.class,
-				 false);
+  public void setClasNode(ClassNode newClassNode) {
+    classNode = newClassNode;
   }
 
   public Node accept(NodeVisitor v) {
@@ -122,22 +118,15 @@ public class NewObjectExpression extends Expression {
 	i.set(v);
       }
     }
-    for(ListIterator i=classMembers.listIterator(); i.hasNext(); ) {
-      ClassMember m = (ClassMember) i.next();
-      m = (ClassMember) m.accept(v);
-      if (m == null) {
-	i.remove();
-      }
-      else {
-	i.set(v);
-      }
+    if (classNode != null) {
+      classNode = (ClassNode) classNode.accept(v);
     }
   }
 
   public Node copy() {
     NewObjectExpression no = new NewObjectExpression(type,
 						     argumentList,
-						     classMembers);
+						     classNode);
     no.copyAnnotationsFrom(this);
     return no;
   }
@@ -148,19 +137,14 @@ public class NewObjectExpression extends Expression {
       Expression e = (Expression) it.next();
       newArgumentList.add(e.deepCopy());
     }
-    List newClassMemebers = new ArrayList(classMembers.size());
-    for (ListIterator it = newArgumentList.listIterator(); it.hasNext(); ) {
-      ClassMember m = (ClassMember) it.next();
-      newClassMemebers.add(m.deepCopy());
-    }
     NewObjectExpression no =
-      new NewObjectExpression (type, newArgumentList, newClassMemebers);
+      new NewObjectExpression (type, newArgumentList, (ClassNode) classNode.deepCopy());
     no.copyAnnotationsFrom(this);
     return no;
   }
 
   private Type type;
   private List argumentList;
-  private List classMembers;
+  private ClassNode classNode;
 }
   
