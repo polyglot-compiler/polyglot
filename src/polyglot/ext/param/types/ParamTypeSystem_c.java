@@ -13,6 +13,15 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
     implements ParamTypeSystem
 {
     /**
+     * Create a new mutable PClass.
+     *
+     * @param pos The position of the PClass.
+     */
+    public MuPClass mutablePClass(Position pos) {
+        return new MuPClass_c(this, pos);
+    }
+
+    /**
      * Instantiate a parametric type on a list of actual parameters.
      *
      * @param pos The position of the instantiated type
@@ -90,7 +99,8 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
      * @param base The parameterized type
      */
     public ClassType nullInstantiate(Position pos, PClass base) {
-        return uncheckedInstantiate(pos, base, base.formals());
+        return base.clazz();
+        // return uncheckedInstantiate(pos, base, base.formals());
     }
 
     public ClassType nullInstantiate(PClass base) {

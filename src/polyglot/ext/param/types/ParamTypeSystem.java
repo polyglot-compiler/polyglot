@@ -9,6 +9,13 @@ import java.util.*;
  */
 public interface ParamTypeSystem extends TypeSystem {
     /**
+     * Create a new mutable PClass.
+     *
+     * @param pos The position of the pclass
+     */
+    MuPClass mutablePClass(Position pos);
+
+    /**
      * Instantiate a parametric type on its own formals.
      *
      * @param pos The position of the instantiated type

@@ -118,6 +118,14 @@ public class Subst_c implements Subst
         return cached;
     }
 
+    /** Perform substitution on a PClass. */
+    public PClass substPClass(PClass pclazz) {
+        MuPClass newPclazz = ts.mutablePClass(pclazz.position());
+        newPclazz.formals(pclazz.formals());
+        newPclazz.clazz((ClassType) substType(pclazz.clazz()));
+        return newPclazz;
+    }
+
     /** Perform substititions on a field. */
     public FieldInstance substField(FieldInstance fi) {
         ReferenceType ct = (ReferenceType) substType(fi.container());

@@ -24,7 +24,6 @@ public class MuPClass_c extends PClass_c implements MuPClass {
 	super(ts, pos);
 	formals = new TypedList(new LinkedList(), Param.class, false);
     }
-    
 
     /////////////////////////////////////////////////////////////////////////
     // Implement PClass
@@ -40,19 +39,15 @@ public class MuPClass_c extends PClass_c implements MuPClass {
     /////////////////////////////////////////////////////////////////////////
     // Implement MuPClass
 
-    public MuPClass formals(List formals) {
+    public void formals(List formals) {
 	this.formals = formals;
-	return this;
     }
 
-    public MuPClass addFormal(Param param) {
+    public void addFormal(Param param) {
 	formals().add(param);
-        return this;
     }
     
-    public MuPClass clazz(ClassType clazz) {
+    public void clazz(ClassType clazz) {
 	this.clazz = clazz;
-	return this;
     }
-
 }
