@@ -216,7 +216,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     /** Type check the method. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
-
 	try {
 	    ts.checkMethodFlags(flags());
 	}
@@ -261,7 +260,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     }
 
     protected void overrideMethodCheck(TypeChecker tc) throws SemanticException {
-        TypeSystem ts = tc.typeSystem();
+    TypeSystem ts = tc.typeSystem();
 
         for (Iterator j = mi.implemented().iterator(); j.hasNext(); ) {
             MethodInstance mj = (MethodInstance) j.next();
@@ -270,12 +269,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
                 continue;
             }
 
-            if (! ts.canOverride(mi, mj)) {
-                throw new SemanticException("Cannot override " + mj.signature() + " in " +
-                                            mj.container() + " with " + mi.signature() +
-                                            " in " + mi.container() + ".",
-                                            mi.position());
-            }
+            ts.checkOverride(mi, mj);
         }
     }
 

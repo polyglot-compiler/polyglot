@@ -919,7 +919,19 @@ public class TypeSystem_c implements TypeSystem
     }
     
     public boolean canOverride(MethodInstance mi, MethodInstance mj) {
-        return mi.canOverrideImpl(mj);
+        try {
+            return mi.canOverrideImpl(mj, true);
+        }
+        catch (SemanticException e) {
+            // this is the exception thrown by the canOverrideImpl check.
+            // It should never be thrown if the quiet argument of 
+            // canOverrideImpl is true.
+            throw new InternalCompilerError(e.position(), e.getMessage());
+        }
+    }
+
+    public void checkOverride(MethodInstance mi, MethodInstance mj) throws SemanticException {
+        mi.canOverrideImpl(mj, false);
     }
 
     /**

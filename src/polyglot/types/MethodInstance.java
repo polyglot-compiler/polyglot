@@ -63,9 +63,15 @@ public interface MethodInstance extends ProcedureInstance
     List overrides();
 
     /**
-     * Return true if this method can override <code>mi</code>.
+     * Return true if this method can override <code>mi</code>, false otherwise.
      */
     boolean canOverride(MethodInstance mi);
+
+    /**
+     * Return true if this method can override <code>mi</code>, throws
+     * a SemanticException otherwise.
+     */
+    void checkOverride(MethodInstance mi) throws SemanticException;
 
     /**
      * Get the set of methods this method implements.  No ordering is
@@ -104,8 +110,11 @@ public interface MethodInstance extends ProcedureInstance
      * Return true if this method can override <code>mi</code>.
      * This method should not be called except by <code>TypeSystem</code>
      * and by subclasses.
+     * If quiet is true and this method cannot override <code>mi</code>, then
+     * false is returned; otherwise, if quiet is false and this method cannot 
+     * override <code>mi</code>, then a SemanticException is thrown.
      */
-    boolean canOverrideImpl(MethodInstance mi);
+    boolean canOverrideImpl(MethodInstance mi, boolean quiet) throws SemanticException;
 
     /**
      * Get the set of methods in rt and its superinterfaces that

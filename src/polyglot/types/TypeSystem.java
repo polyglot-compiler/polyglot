@@ -568,6 +568,12 @@ public interface TypeSystem {
     boolean canOverride(MethodInstance mi, MethodInstance mj);
 
     /**
+     * Throw a SemanticException if <code>mi</code> cannot override 
+     * <code>mj</code>.
+     */
+    void checkOverride(MethodInstance mi, MethodInstance mj) throws SemanticException;
+
+    /**
      * Get the list of methods <code>mi</code> implements, in no
      * specified order.
      */

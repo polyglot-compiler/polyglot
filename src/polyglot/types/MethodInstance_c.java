@@ -182,32 +182,63 @@ public class MethodInstance_c extends ProcedureInstance_c
         return ts.canOverride(this, mj);
     }
 
-    public boolean canOverrideImpl(MethodInstance mj) {
+    public final void checkOverride(MethodInstance mj) throws SemanticException {
+        ts.checkOverride(this, mj);
+    }
+
+    /**
+     * @param quiet If true, then no Semantic Exceptions will be thrown, and the
+     *              return value will be true or false. Otherwise, if the method
+     *              cannot override, then a SemanticException will be thrown, else
+     *              the method will return true.
+     */
+    public boolean canOverrideImpl(MethodInstance mj, boolean quiet) throws SemanticException {
         MethodInstance mi = this;
 
         if (!(mi.name().equals(mj.name()) && mi.hasFormals(mj.formalTypes()))) {
-            return false;            
+            if (quiet) return false;
+            throw new SemanticException("Arguments are different", mi.position());
         }
 
         if (! ts.equals(mi.returnType(), mj.returnType())) {
             if (Report.should_report(Report.types, 3))
                 Report.report(3, "return type " + mi.returnType() +
                               " != " + mj.returnType());
-            return false;
+            if (quiet) return false;
+            throw new SemanticException(mi.signature() + " in " + mi.container() +
+                                        " cannot override " + 
+                                        mj.signature() + " in " + mj.container() + 
+                                        "; attempting to use incompatible " +
+                                        "return type\n" +                                        
+                                        "found: " + mi.returnType() + "\n" +
+                                        "required: " + mj.returnType(), 
+                                        mi.position());
         } 
 
         if (! ts.throwsSubset(mi, mj)) {
             if (Report.should_report(Report.types, 3))
                 Report.report(3, mi.throwTypes() + " not subset of " +
                               mj.throwTypes());
-            return false;
+            if (quiet) return false;
+            throw new SemanticException(mi.signature() + " in " + mi.container() +
+                                        " cannot override " + 
+                                        mj.signature() + " in " + mj.container() + 
+                                        "; the throwset is not a subset of the " +
+                                        "overridden method's throwset", 
+                                        mi.position());
         }   
 
         if (mi.flags().moreRestrictiveThan(mj.flags())) {
             if (Report.should_report(Report.types, 3))
                 Report.report(3, mi.flags() + " more restrictive than " +
                               mj.flags());
-            return false;
+            if (quiet) return false;
+            throw new SemanticException(mi.signature() + " in " + mi.container() +
+                                        " cannot override " + 
+                                        mj.signature() + " in " + mj.container() + 
+                                        "; attempting to assign weaker " + 
+                                        "access privileges", 
+                                        mi.position());
         }
 
         if (mi.flags().isStatic() != mj.flags().isStatic()) {
@@ -216,14 +247,26 @@ public class MethodInstance_c extends ProcedureInstance_c
                               (mi.flags().isStatic() ? "" : "not") + 
                               " static but " + mj.signature() + " is " +
                               (mj.flags().isStatic() ? "" : "not") + " static");
-            return false;
+            if (quiet) return false;
+            throw new SemanticException(mi.signature() + " in " + mi.container() +
+                                        " cannot override " + 
+                                        mj.signature() + " in " + mj.container() + 
+                                        "; overridden method is " + 
+                                        (mj.flags().isStatic() ? "" : "not") +
+                                        "static", 
+                                        mi.position());
         }
 
         if (mi != mj && !mi.equals(mj) && mj.flags().isFinal()) {
 	    // mi can "override" a final method mj if mi and mj are the same method instance.
             if (Report.should_report(Report.types, 3))
                 Report.report(3, mj.flags() + " final");
-            return false;
+            if (quiet) return false;
+            throw new SemanticException(mi.signature() + " in " + mi.container() +
+                                        " cannot override " + 
+                                        mj.signature() + " in " + mj.container() + 
+                                        "; overridden method is final", 
+                                        mi.position());
         }
 
         return true;
