@@ -67,10 +67,10 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
     /** Get the ulitimate base type of the array. */
     public Type ultimateBase() {
         if (base.isArray()) {
-	    base.toArray().ultimateBase();
-	}
+            return base.toArray().ultimateBase();
+        }
 
-	return base;
+        return base;
     }
     
     public String toString() {
