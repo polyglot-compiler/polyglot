@@ -1600,14 +1600,13 @@ public class TypeSystem_c implements TypeSystem
     /**
      * Assert that <code>ct</code> implements all abstract methods required;
      * that is, if it is a concrete class, then it must implement all
-     * interfaces and abstract methods that it or it's superclasses declare.
+     * interfaces and abstract methods that it or it's superclasses declare, and if 
+     * it is an abstract class then any methods it overrides are overridden correctly.
      */
     public void checkClassConformance(ClassType ct) throws SemanticException {
-        if (ct.flags().isAbstract() || ct.flags().isInterface()) {
-            // ct is abstract or an interface, and so doesn't need to 
-            // implement everything.
-            return;
-        }
+        // if ct is abstract or an interface, then it doesn't need to 
+        // implement everything.
+        boolean mustImplementAll = (!ct.flags().isAbstract() && !ct.flags().isInterface());
         
         // build up a list of superclasses and interfaces that ct 
         // extends/implements that may contain abstract methods that 
@@ -1634,10 +1633,10 @@ public class TypeSystem_c implements TypeSystem
                         MethodInstance mj = (MethodInstance)k.next();
                         if (!mj.flags().isAbstract() && isAccessible(mj, ct)) {
                             // May have found a suitable implementation of mi.
-                            // If the method instance mj is not declared
-                            // in the class type ct, then we need to check
-                            // that it has appropriate protections.
-                            if (!equals(ct, mj.container())) {
+                            // If neither the method instance mj nor the method 
+                            // instance mi is declared in the class type ct, then 
+                            // we need to check that it has appropriate protections.
+                            if (!equals(ct, mj.container()) && !equals(ct, mi.container())) {
                                 try {
                                     // check that mj can override mi, which
                                     // includes access protection checks.
@@ -1652,7 +1651,7 @@ public class TypeSystem_c implements TypeSystem
                                 }
                             }
                             else {
-                                // the method implementation mj we found was 
+                                // the method implementation mj or mi was 
                                 // declared in ct. So other checks will take
                                 // care of access issues
                             }
@@ -1667,7 +1666,7 @@ public class TypeSystem_c implements TypeSystem
                 
 
                 // did we find a suitable implementation of the method mi?
-                if (!implFound) {
+                if (!implFound && mustImplementAll) {
                     throw new SemanticException(ct.fullName() + " should be " +
                             "declared abstract; it does not define " +
                             mi.signature() + ", which is declared in " +
