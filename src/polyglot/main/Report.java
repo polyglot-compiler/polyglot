@@ -30,6 +30,9 @@ public class Report {
   public static String types = "types";
   public static String visit = "visit";
   public static String verbose = "verbose";
+  
+    //This topic is the level of detail that should be in messages.
+  public static String debug = "debug";  
 
   static {
     topics.add(cfg);
@@ -44,6 +47,7 @@ public class Report {
     topics.add(types);
     topics.add(visit);
     topics.add(verbose);
+    topics.add(debug);
 
     should_report.push(verbose);
   }
