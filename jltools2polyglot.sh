@@ -57,7 +57,7 @@ fi
 (
 cd $source
 
-find . -type f -print | grep -v CVS | grep -v \.class$ | while read f
+find . -type f -print | grep -v CVS | grep -v \.jar$ | grep -v jltools2polyglot.sh | grep -v \.class$ | while read f
 do
   g=`echo $f | sed -e 's/\.jlg/.ppg/g' -e 's/JLgen/PPG/g' -e 's/jlgen/ppg/g' \
                    -e 's/jltools/polyglot/g'`
