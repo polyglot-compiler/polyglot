@@ -290,8 +290,8 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 	      	for (int j = i+1; j < l.size(); j++) {
 		    ConstructorInstance cj = (ConstructorInstance) l.get(j);
 
-		    if (ts.hasSameArguments(ci, cj)) {
-			throw new SemanticException("Duplicate constructor \"" + cj + "\".", cj.position());
+		    if (hasSameArguments(ts, ci, cj)) {
+			throw new SemanticException("Duplicate constructor \"" + cj.signature() + "\".", cj.position());
 		    }
 		}
 	    }
@@ -309,9 +309,9 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 		    MethodInstance mj = (MethodInstance) l.get(j);
 
 		    if (mi.name().equals(mj.name()) &&
-		        ts.hasSameArguments(mi, mj)) {
+		        hasSameArguments(ts, mi, mj)) {
 
-			throw new SemanticException("Duplicate method \"" + mj + "\".", mj.position());
+			throw new SemanticException("Duplicate method \"" + mj.signature() + "\".", mj.position());
 		    }
 		}
 	    }
@@ -324,7 +324,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 		MethodInstance mi = (MethodInstance) i.next();
 
 		Type t = type.superType();
-		
+
 		while (t instanceof ReferenceType) {
 		    ReferenceType rt = (ReferenceType) t;
 		    t = rt.superType();
@@ -333,14 +333,14 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 			MethodInstance mj = (MethodInstance) j.next();
 
 			if (! mi.name().equals(mj.name()) ||
-			    ! ts.hasSameArguments(mi, mj) ||
+			    ! hasSameArguments(ts, mi, mj) ||
 			    ! ts.isAccessible(mj, tc.context())) {
 
 			  continue;
 			}
 
 			if (! ts.isSame(mi.returnType(), mj.returnType())) {
-			    throw new SemanticException("Cannot override method \"" + mj + "\" with different return type.", mi.position());
+			    throw new SemanticException("Cannot override method \"" + mj.signature() + "\" with different return type.", mi.position());
 			}
 
 			int ai = 2;
@@ -354,7 +354,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 			if (mj.flags().isPublic()) aj = 3;
 
 			if (ai < aj) {
-			    throw new SemanticException("Cannot override method \"" + mi + "\" with more restrictive access flags.", mi.position());
+			    throw new SemanticException("Cannot override method \"" + mi.signature() + "\" with more restrictive access flags.", mi.position());
 			}
 
 			if (! mi.flags().isStatic() && mj.flags().isStatic()) {
@@ -362,12 +362,20 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 			}
 
 			if (mj.flags().isFinal()) {
-			    throw new SemanticException("Cannot override final method \"" + mi + "\".", mi.position());
+			    throw new SemanticException("Cannot override final method \"" + mi.signature() + "\".", mi.position());
 			}
 		    }
 		}
 	    }
 	}
+
+    /**
+     * Return whether p1 and p2 have arguments that are all of the same
+     * type in the context of overriding/overloading.
+     */
+    protected boolean hasSameArguments(TypeSystem ts, ProcedureInstance p1, ProcedureInstance p2) {
+        return ts.hasSameArguments(p1, p2);
+    }
 
 	public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	    duplicateFieldCheck(tc);
@@ -379,7 +387,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 	}
 
 	public String toString() {
-		return flags.clearInterface().translate() + 
+		return flags.clearInterface().translate() +
 			   (flags.isInterface() ? "interface " : "class ") + name + " " + body;
 	}
 
