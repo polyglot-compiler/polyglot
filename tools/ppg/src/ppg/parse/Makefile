@@ -21,8 +21,9 @@ Parser.java Constant.java: ppg.cup
 all: $(CLASSES)
 	$(subdirs)
 
-clean clobber: cleanclasses
+clean: cleanclasses
+	
+clobber: cleanclasses
 	-rm -f Constant.java Parser.java
-	$(subdirs)
 
 

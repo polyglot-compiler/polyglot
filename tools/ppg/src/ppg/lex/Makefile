@@ -20,7 +20,8 @@ Lexer.java: ppg.flex
 all: $(CLASSES)
 	$(subdirs)
 
-clean clobber: cleanclasses
+clean: cleanclasses
+
+clobber: cleanclasses
 	-rm -f Lexer.java
-	$(subdirs)
 
