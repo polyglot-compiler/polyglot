@@ -39,8 +39,13 @@ public interface ExtensionInfo {
 
     Compiler compiler();
 
-    /** The extension that source files are expected to have. */
-    String fileExtension();
+    /** The extensions that source files are expected to have.
+     * Defaults to the array defaultFileExtensions. */
+    String[] fileExtensions();
+
+    /** The default extensions that source files are expected to have.
+     * Defaults to an array containing defaultFileExtension */
+    String[] defaultFileExtensions();
 
     /** The default extension that source files are expected to have. */
     String defaultFileExtension();

@@ -99,7 +99,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     public boolean runToCompletion() {
         boolean okay = true;
 
-
         while (okay && ! worklist.isEmpty()) {
             SourceJob job = selectJobFromWorklist();
 
@@ -419,20 +418,29 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         }
     }
 
-
     /**
      * Get the file name extension of source files.  This is
      * either the language extension's default file name extension
      * or the string passed in with the "-sx" command-line option.
      */
-    public String fileExtension() {
-	String sx = getOptions() == null ? null : getOptions().source_ext;
+    public String[] fileExtensions() {
+	String[] sx = getOptions() == null ? null : getOptions().source_ext;
 
 	if (sx == null) {
-	    sx = defaultFileExtension();
+	    sx = defaultFileExtensions();
+        }
+
+        if (sx.length == 0) {
+            return defaultFileExtensions();
         }
 
         return sx;
+    }
+
+    /** Get the default list of file extensions. */
+    public String[] defaultFileExtensions() {
+        String ext = defaultFileExtension();
+        return new String[] { ext };
     }
 
     /** Get the source file loader object for this extension. */

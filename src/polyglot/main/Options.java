@@ -36,7 +36,7 @@ public class Options {
     public String bootclasspath = null;
     public boolean assertions = false;
 
-    public String source_ext = null; // e.g., java, jl, pj
+    public String[] source_ext = null; // e.g., java, jl, pj
     public String output_ext = "java"; // java, by default
     public boolean output_stdout = false; // whether to output to stdout
     public String post_compiler;
@@ -240,7 +240,15 @@ public class Options {
         else if (args[i].equals("-sx")) 
         {
             i++;
-            source_ext = args[i];
+            if (source_ext == null) {
+                source_ext = new String[] { args[i] };
+            }
+            else {
+                String[] s = new String[source_ext.length+1];
+                System.arraycopy(source_ext, 0, s, 0, source_ext.length);
+                s[s.length-1] = args[i];
+                source_ext = s;
+            }
             i++;
         }
         else if (args[i].equals("-ox"))
@@ -312,7 +320,7 @@ public class Options {
      */
     public void usage(PrintStream out) {
         out.println("usage: " + extension.compilerName() + " [options] " +
-                           "<source-file>." + extension.fileExtension() + " ...");
+                           "<source-file>." + extension.fileExtensions()[0] + " ...");
         out.println("where [options] includes:");
         usageForFlag(out, "@<file>", "read options from <file>");
         usageForFlag(out, "-d <directory>", "output directory");
