@@ -383,6 +383,11 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     }
 
 
+    /**
+     * Get the file name extension of source files.  This is 
+     * either the language extension's default file name extension
+     * or the string passed in with the "-sx" command-line option.
+     */
     public String fileExtension() {
 	String sx = getOptions() == null ? null : getOptions().source_ext;
 
@@ -393,6 +398,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         return sx;
     }
 
+    /** Get the source file loader object for this extension. */
     public SourceLoader sourceLoader() {
         if (source_loader == null) {
             source_loader = new SourceLoader(this, getOptions().source_path);
@@ -401,6 +407,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         return source_loader;
     }
 
+    /** Get the target factory object for this extension. */
     public TargetFactory targetFactory() {
         if (target_factory == null) {
             target_factory = new TargetFactory(getOptions().output_directory,
@@ -414,6 +421,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     /** Create the type system for this extension. */
     protected abstract TypeSystem createTypeSystem();
 
+    /** Get the type system for this extension. */
     public TypeSystem typeSystem() {
 	if (ts == null) {
 	    ts = createTypeSystem();
@@ -424,6 +432,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     /** Create the node factory for this extension. */
     protected abstract NodeFactory createNodeFactory();
 
+    /** Get the AST node factory for this extension. */
     public NodeFactory nodeFactory() {
 	if (nf == null) {
 	    nf = createNodeFactory();
@@ -431,6 +440,11 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 	return nf;
     }
 
+    /**
+     * Get the job extension for this language extension.  The job
+     * extension is used to extend the <code>Job</code> class
+     * without subtyping.
+     */
     public JobExt jobExt() {
       return null;
     }
@@ -476,7 +490,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
      * and its job discarded to release resources, then <code>null</code> 
      * will be returned.
      */
-    private long startTime = System.currentTimeMillis(); 
     public SourceJob addJob(Source source, Node ast) {
         Object o = jobs.get(source);
         SourceJob job = null;
@@ -560,8 +573,14 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         return j.ast();
     }
 
-    public abstract Parser parser(Reader reader, FileSource source, ErrorQueue eq);
+    /** Get the parser for this language extension. */
+    public abstract Parser parser(Reader reader, FileSource source,
+                                  ErrorQueue eq);
 
+    /**
+     * Replace the pass named <code>id</code> in <code>passes</code> with
+     * the list of <code>newPasses</code>.
+     */
     public void replacePass(List passes, Pass.ID id, List newPasses) {
         for (ListIterator i = passes.listIterator(); i.hasNext(); ) {
           Pass p = (Pass) i.next();
@@ -584,6 +603,9 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         throw new InternalCompilerError("Pass " + id + " not found.");
     }
 
+    /**
+     * Remove the pass named <code>id</code> from <code>passes</code>.
+     */
     public void removePass(List passes, Pass.ID id) {
         for (ListIterator i = passes.listIterator(); i.hasNext(); ) {
           Pass p = (Pass) i.next();
@@ -601,6 +623,10 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         throw new InternalCompilerError("Pass " + id + " not found.");
     }
 
+    /**
+     * Insert the list of <code>newPasses</code> into <code>passes</code>
+     * immediately before the pass named <code>id</code>.
+     */
     public void beforePass(List passes, Pass.ID id, List newPasses) {
         for (ListIterator i = passes.listIterator(); i.hasNext(); ) {
           Pass p = (Pass) i.next();
@@ -620,6 +646,10 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         throw new InternalCompilerError("Pass " + id + " not found.");
     }
 
+    /**
+     * Insert the list of <code>newPasses</code> into <code>passes</code>
+     * immediately after the pass named <code>id</code>.
+     */
     public void afterPass(List passes, Pass.ID id, List newPasses) {
         for (ListIterator i = passes.listIterator(); i.hasNext(); ) {
           Pass p = (Pass) i.next();
@@ -636,20 +666,39 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         throw new InternalCompilerError("Pass " + id + " not found.");
     }
 
+    /**
+     * Replace the pass named <code>id</code> in <code>passes</code> with
+     * the pass <code>pass</code>.
+     */
     public void replacePass(List passes, Pass.ID id, Pass pass) {
         replacePass(passes, id, Collections.singletonList(pass));
     }
 
+    /**
+     * Insert the pass <code>pass</code> into <code>passes</code>
+     * immediately before the pass named <code>id</code>.
+     */
     public void beforePass(List passes, Pass.ID id, Pass pass) {
         beforePass(passes, id, Collections.singletonList(pass));
     }
 
+    /**
+     * Insert the pass <code>pass</code> into <code>passes</code>
+     * immediately after the pass named <code>id</code>.
+     */
     public void afterPass(List passes, Pass.ID id, Pass pass) {
         afterPass(passes, id, Collections.singletonList(pass));
     }
 
+    /**
+     * Get the complete list of passes for the job.
+     */
     public abstract List passes(Job job);
 
+    /**
+     * Get the sub-list of passes for the job between passes
+     * <code>begin</code> and <code>end</code>, inclusive.
+     */
     public List passes(Job job, Pass.ID begin, Pass.ID end) {
         List l = passes(job);
         Pass p = null;

@@ -30,18 +30,19 @@ import polyglot.util.StringUtil;
 public abstract class DataFlow extends ErrorHandlingVisitor
 {
     /**
-     * Is this dataflow a forward analysis?
+     * Indicates whether this dataflow is a forward analysis.
      */
     protected final boolean forward;
     
     /**
-     * Should the dataflow be performed on entering a <code>CodeDecl</code>, 
-     * or on leaving a <code>CodeDecl</code>? If dataflow is performed on 
-     * entry, then the control flow graph will be available when visiting 
-     * children of the <code>CodeDecl</code>, via the 
-     * <code>currentFlowGraph</code> method. If dataflow is performed on 
-     * leaving, then the control flow graph will not be available, but 
-     * nested <code>CodeDecl</code>s will have already been processed.
+     * Indicates whether the dataflow should be performed on entering a
+     * <code>CodeDecl</code>, or on leaving a <code>CodeDecl</code>.
+     * If dataflow is performed on entry, then the control flow graph
+     * will be available when visiting children of the
+     * <code>CodeDecl</code>, via the <code>currentFlowGraph</code>
+     * method. If dataflow is performed on leaving, then the control
+     * flow graph will not be available, but nested
+     * <code>CodeDecl</code>s will have already been processed.
      */
     protected final boolean dataflowOnEntry;
     

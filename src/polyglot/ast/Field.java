@@ -28,8 +28,9 @@ public interface Field extends Variable
     /** Set the field's container object or type. */
     Field target(Receiver target);
 
-    /** Is the target of this field implicit? Should only be true if the
-     * target is "this", or a classname, and the source code did not
+    /**
+     * Returns whether the target of this field is implicit, that is if the
+     * target is either "this" or a classname, and the source code did not
      * explicitly provide a target. 
      */
     boolean isTargetImplicit();
