@@ -8,7 +8,7 @@ import java.io.*;
 /**
  * A place holder type used to serialize types that cannot be serialized.  
  */
-public class PlaceHolder_c extends Type_c
+public class PlaceHolder_c extends Type_c implements PlaceHolder
 {
     boolean primitive;
     String name;
@@ -32,13 +32,21 @@ public class PlaceHolder_c extends Type_c
 	else if (t.isClass() && t.toClass().isMember()) {
 	    primitive = false;
 	    name = t.toClass().toMember().name();
-	    outer = (Type) ts.placeHolder(t.toClass().toMember().container());
+	    outer = t.toClass().toMember().container();
 	}
 	else {
 	    throw new InternalCompilerError("Cannot serialize " + t + ".");
 	}
     }
 
+    public TypeObject resolve() {
+	try {
+	    return restore_();
+	} catch (SemanticException se) {
+	    throw new InternalCompilerError(se.getMessage());
+	}
+    }
+    
     /** Restore the placeholder into a proper type. */ 
     public TypeObject restore_() throws SemanticException {
 	if (primitive) {
@@ -48,7 +56,7 @@ public class PlaceHolder_c extends Type_c
 	    return ts.systemResolver().findType(name);
 	}
 	else {
-	    ClassType o = (ClassType) outer.restore();
+	    ClassType o = (ClassType) outer.toClass();//.restore();
 	    ClassType m = o.memberClassNamed(name);
 
 	    if (m == null) {
@@ -65,6 +73,7 @@ public class PlaceHolder_c extends Type_c
     }
 
     public String toString() {
-	return "PlaceHolder(" + name + ")";
+	return "PlaceHolder(" + (outer == null ? "" : outer.toString() + ", ") 
+	    + name + ")";
     }
 }

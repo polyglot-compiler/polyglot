@@ -130,7 +130,7 @@ public class LoadedClassResolver extends ClassResolver
 	Report.report(2, "Returning serialized ClassType for " +
 		  clazz.name() + ".");
 
-      return (ClassType) dt.restore();
+      return (ClassType) dt;
     }
     catch (SemanticException e) {
       // e.printStackTrace();

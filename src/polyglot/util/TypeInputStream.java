@@ -24,15 +24,26 @@ public class TypeInputStream extends ObjectInputStream
   }
 
   protected Object resolveObject(Object o) {
+    String s = "";
     if (Report.should_report("serialize", 2)) {
-      String s;
       try {
         s = o.toString();
       } catch (NullPointerException e) {
         s = "<NullPointerException thrown>";
       }
-      Report.report(2, "- " + s + " : " + o.getClass());
+    }	  
+    if (o instanceof PlaceHolder) {
+      TypeObject t = ((PlaceHolder) o).resolve();
+      if (Report.should_report("serialize", 2)) {
+        Report.report(2, "- Resolving " + s + " : " + o.getClass()
+          + " to " + t + " : " + t.getClass());      	
+      }
+      return t;
+    } else {
+      if (Report.should_report("serialize", 2)) {    
+        Report.report(2, "- " + s + " : " + o.getClass());
+      }
+      return o;
     }
-    return o;
   }
 }
