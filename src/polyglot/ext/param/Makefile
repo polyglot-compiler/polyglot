@@ -12,7 +12,7 @@ CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 MANIFEST = Makefile $(SOURCES)
 JAR_FILE = param.jar
 
-all: parse $(CLASSES)
+all: $(CLASSES)
 	$(subdirs)
 
 parse: FORCE
