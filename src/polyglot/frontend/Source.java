@@ -64,7 +64,7 @@ public class Source
     }
 
     public String toString() {
-	return name;
+	return path;
     }
     
     public void setUserSpecified(boolean userSpecified) {
