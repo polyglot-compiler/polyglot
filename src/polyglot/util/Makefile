@@ -10,6 +10,7 @@ utl_files 	= Annotate.java \
 			ErrorQueue.java \
 			ErrorQueueFactory.java \
 			FilteringIterator.java \
+			InternalCompilerError.java \
 			NestedMap.java \
 			NilMap.java \
 			Predicate.java \
