@@ -104,6 +104,20 @@ extend statement ::=
 	    {: RESULT = (Stmt) a.node(); :}
     ;
 
+extend statement ::=
+	explicit_constructor_invocation:a
+		{: RESULT = (Stmt) a; :}
+	;
+
+// now ambiguous	
+drop {
+    constructor_body ::= LBRACE explicit_constructor_invocation block_statements RBRACE;
+}
+    
+drop {
+    constructor_body ::= LBRACE explicit_constructor_invocation RBRACE;
+}
+                       
 extend class_or_interface_type ::=
 	COMMA_TYPE:a
 	    {: RESULT = (TypeNode) a.node(); :}
