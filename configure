@@ -22,7 +22,7 @@ exists() {
 }
 
 escape() {
-    sed -e 's%\\%\\\\%g' -e 's%;%\\;%g' | sed 's% %%g'
+    sed -e 's%\\%\\\\%g' -e 's%;%\\;%g' | sed 's% % %g'
 }
 
 JAVA=`find_in_path java`
