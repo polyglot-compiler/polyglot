@@ -997,12 +997,12 @@ public class TypeSystem_c implements TypeSystem
     protected final PrimitiveType FLOAT_   = createPrimitive(PrimitiveType.FLOAT);
     protected final PrimitiveType DOUBLE_  = createPrimitive(PrimitiveType.DOUBLE);
 
-    public TypeObject placeHolder(TypeObject o) {
+    public Object placeHolder(TypeObject o) {
         assert_(o);
     	return placeHolder(o, new HashSet());
     }
 
-    public TypeObject placeHolder(TypeObject o, Set roots) {
+    public Object placeHolder(TypeObject o, Set roots) {
         assert_(o);
 
 	// This should never happen: anonymous and local types cannot

@@ -541,12 +541,12 @@ public interface TypeSystem {
      * @param roots The root objects for the serialization.  Place holders
      * are not created for these.
      */
-    TypeObject placeHolder(TypeObject o, java.util.Set roots);
+    Object placeHolder(TypeObject o, java.util.Set roots);
 
     /** Get a place-holder for serializing a type object.
      * @param o The object to get the place-holder for.
      */
-    TypeObject placeHolder(TypeObject o);
+    Object placeHolder(TypeObject o);
 
     /**
      * Translate a package.
