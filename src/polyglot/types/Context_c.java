@@ -1,10 +1,26 @@
 package polyglot.ext.jl.types;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import polyglot.main.Report;
-import java.util.*;
+import polyglot.types.ClassType;
+import polyglot.types.CodeInstance;
+import polyglot.types.Context;
+import polyglot.types.FieldInstance;
+import polyglot.types.ImportTable;
+import polyglot.types.LocalInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.Named;
+import polyglot.types.NoMemberException;
+import polyglot.types.ParsedClassType;
+import polyglot.types.ReferenceType;
+import polyglot.types.Resolver;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.types.VarInstance;
+import polyglot.util.InternalCompilerError;
 
 /**
  * A visitor which maintains a context.  This is the base class of the
@@ -14,7 +30,7 @@ public class Context_c implements Context
 {
     protected Context outer;
     protected TypeSystem ts;
-
+    
     public Context_c(TypeSystem ts) {
         this.ts = ts;
         this.outer = null;
@@ -55,6 +71,11 @@ public class Context_c implements Context
     protected Map methods;
     protected Map vars;
     protected boolean inCode;
+
+    /**
+     * Is the context static?
+     */
+    protected boolean staticContext;
 
     public static final int BLOCK = 0;
     public static final int CLASS = 1;
@@ -289,6 +310,7 @@ public class Context_c implements Context
         v.kind = SOURCE;
         v.it = it;
         v.inCode = false;
+        v.staticContext = false;
         return v;
     }
 
@@ -303,6 +325,7 @@ public class Context_c implements Context
         v.scope = c;
         v.type = t;
         v.inCode = false;
+        v.staticContext = false;
         return v;
     }
 
@@ -318,6 +341,17 @@ public class Context_c implements Context
     }
 
     /**
+     * pushes an additional static scoping level.
+     */
+    public Context pushStatic() {
+        if (Report.should_report(new String[] {Report.types, Report.context}, 4))
+          Report.report(4, "push static");
+        Context_c v = push();
+        v.staticContext = true;
+        return v;
+    }
+
+    /**
      * enters a method
      */
     public Context pushCode(CodeInstance ci) {
@@ -327,6 +361,7 @@ public class Context_c implements Context
         v.kind = CODE;
         v.code = ci;
         v.inCode = true;
+        v.staticContext = ci.flags().isStatic();
         return v;
     }
 
@@ -343,6 +378,20 @@ public class Context_c implements Context
      */
     public boolean inCode() {
         return inCode;
+    }
+
+    
+    /** 
+     * Returns whether the current context is a static context.
+     * A statement of expression occurs in a static context if and only if the
+     * inner-most method, constructor, instance initializer, static initializer,
+     * field initializer, or explicit constructor statement enclosing the 
+     * statement or expressions is a static method, static initializer, the 
+     * variable initializer of a static variable, or an explicity constructor 
+     * invocation statment. (Java Language Spec, 2nd Edition, 8.1.2)
+     */
+    public boolean isStaticContext() {
+        return staticContext;
     }
 
     /**

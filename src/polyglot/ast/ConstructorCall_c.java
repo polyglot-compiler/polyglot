@@ -76,6 +76,14 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	return n;
     }
 
+    /**
+     * An explicit constructor call is a static context. We need to record
+     * this.
+     */
+    public Context enterScope(Context c) {
+        return c.pushStatic();
+    }
+
     /** Reconstruct the constructor call. */
     protected ConstructorCall_c reconstruct(Expr qualifier, List arguments) {
 	if (qualifier != this.qualifier || ! CollectionUtil.equals(arguments, this.arguments)) {

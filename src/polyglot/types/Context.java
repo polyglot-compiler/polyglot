@@ -1,7 +1,8 @@
 package polyglot.types;
 
-import polyglot.util.*;
 import java.util.List;
+
+import polyglot.util.Copy;
 
 /**
  * A context represents a stack of scopes used for looking up types, methods,
@@ -76,6 +77,12 @@ public interface Context extends Resolver, Copy
     /** Enter the scope of a block. */
     Context pushBlock();
 
+    /** Enter a static scope. In general, this is only used for
+     * explicit constructor calls; static methods, initializers of static
+     * fields and static initializers are generally handled by pushCode().
+     */
+    Context pushStatic();
+
     /** Pop the context. */
     Context pop();
 
@@ -84,6 +91,17 @@ public interface Context extends Resolver, Copy
 
     /** Returns whether the symbol is defined within the current method. */
     boolean isLocal(String name);
+
+    /** 
+     * Returns whether the current context is a static context.
+     * A statement of expression occurs in a static context if and only if the
+     * inner-most method, constructor, instance initializer, static initializer,
+     * field initializer, or explicit constructor statement enclosing the 
+     * statement or expressions is a static method, static initializer, the 
+     * variable initializer of a static variable, or an explicity constructor 
+     * invocation statment. (Java Language Spec, 2nd Edition, 8.1.2)
+     */
+    boolean isStaticContext();
 
     /** Return the innermost class in scope. */
     ClassType currentClass();
