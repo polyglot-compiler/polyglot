@@ -442,24 +442,6 @@ public class TypeSystem_c implements TypeSystem
      * in other words, every member of fromType is member of toType.
      **/
     public boolean isImplicitCastValid(Type fromType, Type toType) {
-        assert_(fromType);
-        assert_(toType);
-
-	if (! fromType.isCanonical() || ! toType.isCanonical()) {
-	    return false;
-	}
-
-	// TODO: read JLS 5.1 to be sure this is valid.
-
-	if (isSame(fromType, toType)) return true;
-
-	if (fromType.isPrimitive() && toType.isPrimitive()) {
-	    return primitiveImplicitCastValid(fromType.toPrimitive(),
-					      toType.toPrimitive());
-	}
-
-	// if (fromType.isPrimitive() || toType.isPrimitive()) return false;
-
 	return isAssignableSubtype(fromType, toType);
     }
 
