@@ -5,6 +5,8 @@ GOOD =  \
 	Narrowing.jl \
 	LabeledBreak.jl \
 	LabeledBreak2.jl \
+	Constants2.jl \
+	Constants.jl \
 	InitializerType1.jl \
 	Semicolon.jl \
 	SemicolonClass.jl \
