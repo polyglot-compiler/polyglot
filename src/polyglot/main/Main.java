@@ -89,33 +89,44 @@ public class Main
     }
   }
 
-  /** This is the standard 
-      Conditionally report a message that is related to one of the specified
-      topics. The variable <code>topics</code> is a collection of strings.
-      The obscurity of the message is indicated by <code>level</code>.
-      The message is reported only if the user has requested (via the
-      -report command-line option) that messages of that obscurity be reported
-      for one of the specified topics.
-  */
-  public static void report(Collection topics, int level, String message) {
+  /**
+   * Return whether a message on <code>topics</code> of obscurity
+   * <code>level</code> should be reported, based on the command-line
+   * switches given by the user. This method is occasionally useful
+   * when the computation of the message to be reported is expensive.
+   */
+  public static boolean should_report(Collection topics, int level) {
     if (topics == null) {
       Object lvo = options.report.get("verbose");
       if (lvo != null && ((Integer) lvo).intValue() >= level) {
-	for (int j = 1; j < level; j++) System.err.print("  ");
-	System.err.println(message);
-	return;
+	return true;
       }
-    } else
+    } else {
 	for (Iterator i = topics.iterator(); i.hasNext();) {
 	    String topic = (String) i.next();
 	    Object lvo = options.report.get(topic);
 	    if (lvo != null && ((Integer) lvo).intValue() >= level) {
-		for (int j = 1; j < level; j++) System.err.print("  ");
-		System.err.println(message);
-		return;
+		return true;
 	    }
 	}
     }
+    return false;
+  }
+
+  /** This is the standard way to report debugging information in the
+   *  compiler.  It conditionally reports a message if it is related to
+   *  one of the specified topics. The variable <code>topics</code> is a
+   *  collection of strings.  The obscurity of the message is indicated
+   *  by <code>level</code>.  The message is reported only if the user
+   *  has requested (via the -report command-line option) that messages
+   *  of that obscurity be reported for one of the specified topics.
+   */
+  public static void report(Collection topics, int level, String message) {
+    if (should_report(topics,level)) {
+	for (int j = 1; j < level; j++) System.err.print("  ");
+	System.err.println(message);
+    }
+  }
 
   static final void loadExtension(String ext) {
     if (ext != null && ! ext.equals("")) {
@@ -234,7 +245,7 @@ public class Main
       {
         i++;
 	Integer level = (Integer) options.report.get("verbose");
-	if (level != null) options.report.put("verbose", new Integer(1));
+	if (level == null) options.report.put("verbose", new Integer(1));
       }
       else if (args[i].equals("-report")) {
         i++;
