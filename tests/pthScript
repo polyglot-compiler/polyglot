@@ -109,6 +109,7 @@ polyglot.ext.jl.ExtensionInfo {
 	BadInner5.jl (Semantic, "Class .* not found in scope of ");
 	BadInner6.jl (Semantic, "The nested class .* does not have an enclosing instance of type");
 	BadInner7.jl (Semantic, "Cannot declare member class .* inside class with the same name");
+	BadInner8.jl (Semantic, "The nested class .* does not have an enclosing instance of type");
 	BadInterface.jl (Semantic, "Cannot declare method that is both abstract and private");
 	BadInterface2.jl (Semantic, "Could not find type");
 	BadMultipleVarDef.jl (Semantic, "Local variable .* multiply defined"),
