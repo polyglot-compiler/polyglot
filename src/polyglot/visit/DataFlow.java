@@ -48,7 +48,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * 
      * @return a non-null Item.
      */
-    protected abstract Item createInitialItem();
+    protected abstract Item createInitialItem(FlowGraph graph);
     
     /**
      * Produce a new Item as appropriate for the Term n and the 
@@ -151,7 +151,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             if (inItems.isEmpty()) {
                 // there are no input Items as yet (or possibly never). Use an 
                 // inital Item, provided by the concrete subclass.
-                p.inItem = this.createInitialItem();
+                p.inItem = this.createInitialItem(graph);
             }
             else if (inItems.size() == 1) {
                 // There is only one input Item, no need to use the confluence 

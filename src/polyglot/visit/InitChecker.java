@@ -326,7 +326,7 @@ public class InitChecker extends DataFlow
      * The initial item to be given to the entry point of the dataflow contains
      * the init counts for the final fields.
      */
-    public Item createInitialItem() {
+    public Item createInitialItem(FlowGraph graph) {
         return new DataFlowItem(new HashMap(currentClassFinalFieldInitCounts));
     }
     

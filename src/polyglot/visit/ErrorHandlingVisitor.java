@@ -199,7 +199,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
      * <code>n</code>.
      */
  
-    public Node leave(Node old, Node n, NodeVisitor v) {
+    public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
         try {
             if (v instanceof ErrorHandlingVisitor &&
                 ((ErrorHandlingVisitor) v).error) {

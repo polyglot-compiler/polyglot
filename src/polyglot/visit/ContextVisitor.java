@@ -119,8 +119,8 @@ public class ContextVisitor extends ErrorHandlingVisitor
         return super.enter(parent, n);
     }
 
-    public Node leave(Node old, Node n, NodeVisitor v) {
-        Node m = super.leave(old, n, v);
+    public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
+        Node m = super.leave(parent, old, n, v);
 
         this.addDecls(m);
 

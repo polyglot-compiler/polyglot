@@ -15,7 +15,7 @@ public class ReachChecker extends DataFlow
 	super(job, ts, nf, true /* forward analysis */);
     }
 
-    public Item createInitialItem() {
+    public Item createInitialItem(FlowGraph graph) {
         return DataFlowItem.NOT_REACHABLE;
     }
 

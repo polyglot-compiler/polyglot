@@ -7,9 +7,9 @@ import polyglot.frontend.*;
 import java.util.*;
 
 public class FlowGraph {
-  Map peerMap;
-  Term root;
-  boolean forward;
+  protected Map peerMap;
+  protected Term root;
+  protected boolean forward;
 
   FlowGraph(Term root, boolean forward) {
     this.root = root;
@@ -82,7 +82,7 @@ public class FlowGraph {
    * data flow analysis, as the dataflow equations can incorporate the 
    * knowledge that a condition is true or false on certain flow paths.
    */
-  static class EdgeKey {
+  protected static class EdgeKey {
       protected Object o;
       protected EdgeKey(Object o) {
           this.o = o;
@@ -157,15 +157,15 @@ public class FlowGraph {
    * Each Edge has an EdgeKey, which identifies when flow uses that edge in 
    * the flow graph. See EdgeKey for more information.
    */
-  static class Edge {
-      Edge(EdgeKey key, Peer target) {
+  protected static class Edge {
+      protected Edge(EdgeKey key, Peer target) {
           this.key = key;
           this.target = target;
       }
-      EdgeKey getKey() {
+      protected EdgeKey getKey() {
           return key;
       }
-      Peer getTarget() {
+      protected Peer getTarget() {
           return target;
       }
       private EdgeKey key;
@@ -176,13 +176,13 @@ public class FlowGraph {
       
   }
   
-  static class Peer {
-    DataFlow.Item inItem;  // Input Item for dataflow analysis
-    Map outItems; // Output Items for dataflow analysis, a map from EdgeKeys to DataFlowlItems
-    Term node;
-    List succs; // List of successor Edges 
-    List preds; // List of predecessor Edges 
-    List path_to_finally;
+  public static class Peer {
+    protected DataFlow.Item inItem;  // Input Item for dataflow analysis
+    protected Map outItems; // Output Items for dataflow analysis, a map from EdgeKeys to DataFlowlItems
+    protected Term node;
+    protected List succs; // List of successor Edges 
+    protected List preds; // List of predecessor Edges 
+    protected List path_to_finally;
     /**
      * Set of all the different EdgeKeys that occur in the Edges in the 
      * succs. This Set is lazily constructed, as needed, by the 
@@ -199,6 +199,10 @@ public class FlowGraph {
       this.preds = new ArrayList();
       this.succEdgeKeys = null;
     }
+
+    public List succs() { return succs; }
+    public List preds() { return preds; }
+    public Term node()  { return node; }
 
     public String toString() {
       return node + "[" + hashCode() + ": " + path_to_finally + "]";
@@ -224,8 +228,8 @@ public class FlowGraph {
     }
   }
 
-  static class ListKey {
-    List list;
+  protected static class ListKey {
+    protected List list;
 
     ListKey(List list) {
       this.list = list;
@@ -238,16 +242,7 @@ public class FlowGraph {
     public boolean equals(Object other) {
       if (other instanceof ListKey) {
           ListKey k = (ListKey) other;
-          if (k.list.size() != list.size())
-            return false;
-          for (int i = 0; i < list.size(); i++) {
-            Object kfrom = k.list.get(i);
-            Object from = list.get(i);
-            if (kfrom != from)
-              return false;
-          }
-
-          return true;
+          return CollectionUtil.equals(list, k.list);
       }
 
       return false;
