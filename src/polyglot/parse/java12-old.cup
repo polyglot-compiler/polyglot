@@ -1386,6 +1386,24 @@ class_instance_creation_expression ::=
 				(ClassNode)Grm.ln(new ClassNode( 
 				new AccessFlags(), "$Anonymous$", 
 				(TypeNode)null, l, null), a)), a); :}
+	|	name:a DOT NEW IDENTIFIER:b
+			LPAREN argument_list_opt:c RPAREN
+			{: RESULT = (NewObjectExpression)Grm.ln(
+				new NewObjectExpression(a, (TypeNode)
+				Grm.ln(new TypeNode(new AmbiguousType(
+				parser.ts, b.getIdentifier())), b), 
+				c, null), a); :}
+	|	name:a DOT NEW IDENTIFIER:b
+			LPAREN argument_list_opt:c RPAREN class_body:d
+			{: TypeNode t = (TypeNode)Grm.ln(new TypeNode(
+				new AmbiguousType(parser.ts,
+				b.getIdentifier())), b); 
+				List l = new LinkedList(); l.add(t); 
+				RESULT = (NewObjectExpression)Grm.ln(
+				new NewObjectExpression(a, t, c,
+				(ClassNode)Grm.ln(new ClassNode( 
+				new AccessFlags(), "$Anonymous$", 
+				(TypeNode)null, l, null), a)), a); :}
 	;
 argument_list_opt ::=
 					// List of Expression
@@ -1460,7 +1478,12 @@ field_access ::=
 	|	name:a DOT SUPER DOT IDENTIFIER:b
 			{: RESULT = (FieldExpression)Grm.ln(
 				new FieldExpression(
-				a.reconstruct(a.getName() + ".super"),
+				(SpecialExpression)Grm.ln(
+				new SpecialExpression((TypeNode)
+				Grm.ln(new TypeNode(
+				new AmbiguousType(parser.ts,
+				a.getName())), a),
+				SpecialExpression.SUPER), a),
 				b.getIdentifier()), a); :}
 	;
 method_invocation ::=
@@ -1482,7 +1505,13 @@ method_invocation ::=
 	|	name:a DOT SUPER DOT IDENTIFIER:b 
 				LPAREN argument_list_opt:c RPAREN
 			{: RESULT = (MethodExpression)Grm.ln(
-				new MethodExpression(a, b.getIdentifier(), c),
+				new MethodExpression(
+				(SpecialExpression)Grm.ln(
+				new SpecialExpression((TypeNode)
+				Grm.ln(new TypeNode(
+				new AmbiguousType(parser.ts, a.getName())), a),
+				SpecialExpression.SUPER), a),
+				b.getIdentifier(), c),
 				a); :}	
 	;
 array_access ::=
