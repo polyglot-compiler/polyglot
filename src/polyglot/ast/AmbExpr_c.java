@@ -19,6 +19,11 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
     this.name = name;
   }
 
+  /** Get the precedence of the field. */
+  public Precedence precedence() {
+    return Precedence.LITERAL;
+  }
+
   /** Get the name of the expression. */
   public String name() {
     return this.name;
