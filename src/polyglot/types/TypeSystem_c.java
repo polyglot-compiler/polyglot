@@ -920,6 +920,11 @@ public class TypeSystem_c implements TypeSystem
 		  			   type1.toPrimitive())) {
 	        return type1;
 	    }
+
+	    if (type1.isChar() && type2.isByte() ||
+	    	type1.isByte() && type2.isChar()) {
+		return Int();
+	    }
 	}
 
 	if (type1.isArray() && type2.isArray()) {
