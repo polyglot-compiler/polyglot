@@ -4,7 +4,6 @@ GOOD =  \
 	ArrayInit.jl \
 	Narrowing.jl \
 	LabeledBreak.jl \
-	LabeledBreak2.jl \
 	Constants2.jl \
 	Constants.jl \
 	InitializerType1.jl \
@@ -49,6 +48,8 @@ GOOD =  \
 	Inner8.jl \
 	Inner9.jl \
 	Local.jl \
+	LocalClass.jl \
+	LocalClass2.jl \
 	Prim.jl \
 	Return1.jl \
 	Return2.jl \
@@ -63,6 +64,7 @@ GOOD =  \
 	xIterator.jl
 
 BAD = \
+	LabeledBreak2.jl \
 	BadAbstract.jl \
 	BadOverride2.jl \
 	BadAlloc.jl \
