@@ -197,7 +197,7 @@ public class StdErrorQueue extends AbstractErrorQueue
             if (i < startIndAt) {
               c = ' ';
             }
-            if (s.charAt(i) == '\t') {
+            if (i < s.length() && s.charAt(i) == '\t') {
               c = '\t';
             }            
             if (i == startIndAt && pos.line() == lineNum) {
