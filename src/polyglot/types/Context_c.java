@@ -118,8 +118,8 @@ public class Context_c implements Context
         if (kind == CLASS) {
             return false;
         }
-
-        if (kind == BLOCK &&
+        
+        if ((kind == BLOCK || kind == CODE) &&
             (findVariableInThisScope(name) != null || findInThisScope(name) != null)) {
             return true;
         }
