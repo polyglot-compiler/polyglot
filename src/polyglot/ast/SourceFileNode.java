@@ -224,6 +224,6 @@ public class SourceFileNode extends Node
  	  
 	  //IGNORE: multi classes in one souce file
 	  ClassNode cn = (ClassNode) classes.get(0);
-	  ((JifClassNode)cn).translate(cg);
+	  //((JifClassNode)cn).translate(cg);
   }
 }

@@ -246,7 +246,7 @@ public class BinaryExpression extends Expression
   public Node typeCheck( LocalContext c) throws SemanticException
   {
     Type ltype = left.getCheckedType(), rtype = right.getCheckedType();
- 
+	
     switch(operator)
     {
     case ASSIGN:
