@@ -144,6 +144,9 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         BadSwitch1.jl (Semantic, "Case label must be an integral constant");
 	BadSwitch2.jl (Semantic, "Duplicate case label");
 	CircularConstructor.jl (Semantic, "Recursive constructor invocation");
+        CircularInheritance1.jl (Semantic, "Circular inheritance");
+        CircularInheritance2.jl (Semantic, "Circular inheritance");
+        CircularInheritance3.jl (Semantic, "Circular inheritance");
 	Errors.jl (Semantic, "No valid method call found");
 	Errors2.jl (Semantic, "Could not find type"); 
 	LabeledBreak2.jl (Semantic, "Unreachable statement"); 
