@@ -121,8 +121,6 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
         Goal serialize = scheduler.Serialized(job);
         Goal output = scheduler.CodeGenerated(job);
         
-        Goal innerTranslate = scheduler.InnerTranslated(job);
-        
         List l = new ArrayList(15);
         
         l.add(parse);
@@ -137,8 +135,6 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
         l.add(initCheck);
         l.add(ctorCheck);
         l.add(frefCheck);
-        
-        l.add(innerTranslate);
         
         l.add(serialize);
         l.add(output);
