@@ -315,8 +315,11 @@ public abstract class Node_c implements Node
             w.end();
     }
 
-    // This is really slow and so you are encouraged to override.
     public String toString() {
-            return new StringPrettyPrinter(5).toString(this);
+          // This is really slow and so you are encouraged to override.
+          // return new StringPrettyPrinter(5).toString(this);
+
+          // Not slow anymore.
+          return "<unknown-node>";
     }
 }

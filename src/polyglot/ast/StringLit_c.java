@@ -41,6 +41,10 @@ public class StringLit_c extends Lit_c implements StringLit
     }
 
     public String toString() {
+        if (value.length() > 11) {
+            return "\"" + StringUtil.escape(value.substring(0,8)) + "...\"";
+        }
+                
 	return "\"" + StringUtil.escape(value) + "\"";
     }
  
