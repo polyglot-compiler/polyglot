@@ -193,4 +193,20 @@ public class NullVisitor implements NodeVisitor {
     mn.visitChildren(this);
     return mn;
   }
+  
+  public Node visitInitializerBlock(InitializerBlock ib) {
+    ib.visitChildren(this);
+    return ib;
+  }
+
+
+  public Node visitImportNode(ImportNode in) {
+    in.visitChildren(this);
+    return in;
+  }
+
+  public Node visitSourceFileNode(SourceFileNode sf) {
+    sf.visitChildren(this);
+    return sf;
+  }
 }

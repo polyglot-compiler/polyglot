@@ -70,6 +70,11 @@ public interface NodeVisitor {
   // ClassMemebers
   public Node visitClassNode(ClassNode cn);
   public Node visitMethodNode(MethodNode mn);
+  public Node visitInitializerBlock(InitializerBlock ib);
+
+
+  public Node visitImportNode(ImportNode in);
+  public Node visitSourceFileNode(SourceFileNode sf);
 
 	 
 }
