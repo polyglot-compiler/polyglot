@@ -1307,17 +1307,17 @@ public class TypeSystem_c implements TypeSystem
 
         if (f.isAbstract() && f.isStatic()) {
 	    throw new SemanticException(
-		"Cannot declare method which is both abstract and static.");
+		"Cannot declare method that is both abstract and static.");
         }
 
         if (f.isAbstract() && f.isFinal()) {
 	    throw new SemanticException(
-		"Cannot declare method which is both abstract and final.");
+		"Cannot declare method that is both abstract and final.");
         }
 
         if (f.isAbstract() && f.isNative()) {
 	    throw new SemanticException(
-		"Cannot declare method which is both abstract and native.");
+		"Cannot declare method that is both abstract and native.");
         }
     }
 
