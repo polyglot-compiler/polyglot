@@ -23,6 +23,7 @@ class Field {
     int type;
     Attribute[] attrs;
     ConstantValue constantValue;
+    boolean synthetic;
 
     /**
      * Return true of t is java.lang.String.
@@ -67,6 +68,10 @@ class Field {
       }
 
       return fi;
+    }
+
+    boolean isSynthetic() {
+      return synthetic;
     }
 
     Constant constantValue() {
@@ -181,6 +186,9 @@ class Field {
                 if ("ConstantValue".equals(name.value())) {
                     constantValue = new ConstantValue(in, nameIndex, length);
                     attrs[i] = constantValue;
+                }
+                if ("Synthetic".equals(name.value())) {
+                    synthetic = true;
                 }
             }
 

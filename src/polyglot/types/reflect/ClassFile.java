@@ -233,7 +233,8 @@ public class ClassFile implements LazyClassInitializer {
         init.initFields(ct);
   
         for (int i = 0; i < fields.length; i++) {
-            if (! fields[i].name().startsWith("jlc$")) {
+            if (! fields[i].name().startsWith("jlc$") &&
+                ! fields[i].isSynthetic()) {
                 FieldInstance fi = fields[i].fieldInstance(ts, ct);
 		if (Report.should_report(verbose, 3))
 		    Report.report(3, "adding " + fi + " to " + ct);
@@ -250,7 +251,8 @@ public class ClassFile implements LazyClassInitializer {
 
         for (int i = 0; i < methods.length; i++) {
             if (! methods[i].name().equals("<init>") &&
-                ! methods[i].name().equals("<clinit>")) {
+                ! methods[i].name().equals("<clinit>") &&
+                ! methods[i].isSynthetic()) {
                 MethodInstance mi = methods[i].methodInstance(ts, ct);
 		if (Report.should_report(verbose,3))
 		    Report.report(3, "adding " + mi + " to " + ct);
@@ -266,8 +268,10 @@ public class ClassFile implements LazyClassInitializer {
         TypeSystem ts = ct.typeSystem();
 
         for (int i = 0; i < methods.length; i++) {
-            if (methods[i].name().equals("<init>")) {
-                ConstructorInstance ci = methods[i].constructorInstance(ts, ct);
+            if (methods[i].name().equals("<init>") &&
+                ! methods[i].isSynthetic()) {
+                ConstructorInstance ci =
+                    methods[i].constructorInstance(ts, ct, fields);
 		if (Report.should_report(verbose,3))
 		    Report.report(3, "adding " + ci + " to " + ct);
                 ct.addConstructor(ci);

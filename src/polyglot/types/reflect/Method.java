@@ -26,6 +26,7 @@ class Method
   int type;
   Attribute[] attrs;
   Exceptions exceptions;
+  boolean synthetic;
 
   /**
    * Constructor.  Read a method from a class file.
@@ -56,14 +57,24 @@ class Method
 
       Constant name = clazz.constants[nameIndex];
 
-      if (name != null && "Exceptions".equals(name.value())) {
-        exceptions = new Exceptions(clazz, in, nameIndex, length);
-        attrs[i] = exceptions;
+      if (name != null) {
+        if ("Exceptions".equals(name.value())) {
+          exceptions = new Exceptions(clazz, in, nameIndex, length);
+          attrs[i] = exceptions;
+        }
+        if ("Synthetic".equals(name.value())) {
+          synthetic = true;
+        }
       }
-      else {
+
+      if (attrs[i] == null) {
         in.skip(length);
       }
     }
+  }
+
+  boolean isSynthetic() {
+    return synthetic;
   }
 
   String name() {
@@ -96,12 +107,35 @@ class Method
                              argTypes, excTypes);
   }
 
-  ConstructorInstance constructorInstance(TypeSystem ts, ClassType ct) {
-
+  ConstructorInstance constructorInstance(TypeSystem ts, ClassType ct,
+                                          Field[] fields) {
     // Get a method instance for the <init> method.
     MethodInstance mi = methodInstance(ts, ct);
+
+    List formals = mi.formalTypes();
+
+    if (ct.isInnerClass()) {
+        // If an inner class, the first argument may be a reference to an
+        // enclosing class used to initialize a synthetic field.
+
+        // Count the number of synthetic fields.
+        int numSynthetic = 0;
+
+        for (int i = 0; i < fields.length; i++) {
+            if (fields[i].isSynthetic()) {
+                numSynthetic++;
+            }
+        }
+
+        // Ignore a number of parameters equal to the number of synthetic
+        // fields.
+        if (numSynthetic <= formals.size()) {
+            formals = formals.subList(numSynthetic, formals.size());
+        }
+    }
+
     return ts.constructorInstance(mi.position(), ct,
-                                  mi.flags(), mi.formalTypes(),
+                                  mi.flags(), formals,
                                   mi.throwTypes());
   }
 }
