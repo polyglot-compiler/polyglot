@@ -23,7 +23,7 @@ public class StandardTypeSystem extends TypeSystem {
   public StandardTypeSystem(ClassResolver resolver) 
   {
     this.resolver = resolver;
-    this.emptyImportTable = new ImportTable(resolver);
+    this.emptyImportTable = new ImportTable(new CompoundClassResolver());
   }
 
   /**
@@ -64,6 +64,10 @@ public class StandardTypeSystem extends TypeSystem {
     if (! ((ClassType)childType).getAccessFlags().isInterface()) {
       // If the child isn't an interface, check whether its supertype is or
       // descends from the ancestorType
+
+      if ( ((ClassType)childType).equals ( OBJECT_))
+        return false;
+
       ClassType parentType = ((ClassType)childType).getSupertype();
       if (parentType.equals(ancestorType) ||
 	  descendsFrom(parentType, ancestorType))
@@ -566,6 +570,9 @@ public class StandardTypeSystem extends TypeSystem {
   {
     FieldInstance fi = null, fiEnclosing = null, fiTemp = null;
     ClassType tEnclosing = null;
+
+    if ( context.inClass  != null)
+      System.err.println(context.inClass.getTypeString() + " supertype: " + context.inClass.getSupertype());
 
     if (type != null) // then we have a starting point. don't have to perform a 2d search
     {

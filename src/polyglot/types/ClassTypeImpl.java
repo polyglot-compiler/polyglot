@@ -40,11 +40,12 @@ public abstract class ClassTypeImpl extends ClassType {
   public List getInnerClasses()         { return innerClasses; }
 
   public ClassType getInnerNamed(String name) {
-    for (Iterator i = innerClasses.iterator(); i.hasNext();) {
-      ClassType innerType = (ClassType) i.next();
-      if (innerType.getShortName().equals(name))
-	return innerType;
-    }
+    if ( innerClasses != null)
+      for (Iterator i = innerClasses.iterator(); i.hasNext();) {
+        ClassType innerType = (ClassType) i.next();
+        if (innerType.getShortName().equals(name))
+          return innerType;
+      }
     return null;
   }
   

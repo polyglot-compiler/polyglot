@@ -20,6 +20,7 @@ public class Annotate {
   static final int LINE_NUMBER            = 1;
   static final int TYPE                   = 2;
   static final int ERROR                  = 3;
+  static final int THROWS_SET             = 4;
 
   /**
    * Notes that o appeared at line i of the source.
@@ -69,6 +70,33 @@ public class Annotate {
   {
     return (List) o.getAnnotation(ERROR);
   }                           
+
+  public static void addThrows( AnnotatedObject o, Type t)
+  {
+    SubtypeSet s = (SubtypeSet)o.getAnnotation(THROWS_SET);
+    if ( s == null)
+    {
+      s = new SubtypeSet();
+      o.setAnnotation( THROWS_SET, s);
+    }
+    s.add ( t );
+  }
+
+  public static void addThrows( AnnotatedObject o, Collection c)
+  {
+    SubtypeSet s = (SubtypeSet)o.getAnnotation(THROWS_SET);
+    if ( s == null)
+    {
+      s = new SubtypeSet();
+      o.setAnnotation( THROWS_SET, s);
+    }
+    s.addAll ( c );
+  }
+
+  public static SubtypeSet getThrows(AnnotatedObject o) 
+  {
+    return (SubtypeSet) o.getAnnotation(THROWS_SET);
+  }
 
   // Never instantiate this class.
   private Annotate() {}

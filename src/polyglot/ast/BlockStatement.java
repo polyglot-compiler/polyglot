@@ -8,7 +8,8 @@ import jltools.util.Assert;
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
 import jltools.util.CodeWriter;
-import jltools.types.LocalContext;
+import jltools.util.Annotate;
+import jltools.types.*;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.ArrayList;
@@ -112,7 +113,10 @@ public class BlockStatement extends Statement {
   
   public Node typeCheck( LocalContext c)
   {
-    // Fixme: implement throws
+    for (Iterator i = statements.iterator(); i.hasNext(); )
+    {
+      Annotate.addThrows( this, Annotate.getThrows ( ((Node)i.next())) );
+    }
     c.popBlock();
     return this;
   }

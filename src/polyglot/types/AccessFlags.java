@@ -4,6 +4,8 @@
 
 package jltools.types;
 
+import java.lang.reflect.Modifier;
+
 /**
  * AccessFlags
  *
@@ -38,20 +40,34 @@ public class AccessFlags implements Cloneable {
    * Given the JVM encoding of a set of flags, returns the AccessFlags object
    * for that encoding.
    **/
-  public static AccessFlags flagsForInt(int fl) {
+  public static AccessFlags flagsForInt(int mod) {
     AccessFlags flags = new AccessFlags();
-    if ((fl & PUBLIC_BIT) != 0)   { flags.setPublic(true); }
-    if ((fl & PRIVATE_BIT) != 0)   { flags.setPrivate(true); }
-    if ((fl & PROTECTED_BIT) != 0)   { flags.setProtected(true); }
-    if ((fl & STATIC_BIT) != 0)   { flags.setStatic(true); }
-    if ((fl & FINAL_BIT) != 0)  { flags.setFinal(true); }
-    if ((fl & SYNCHRONIZED_BIT) != 0)  { flags.setSynchronized(true); }
-    if ((fl & VOLATILE_BIT) != 0)  { flags.setVolatile(true); }
-    if ((fl & TRANSIENT_BIT) != 0)  { flags.setTransient(true); }
-    if ((fl & NATIVE_BIT) != 0) { flags.setNative(true); }
-    if ((fl & INTERFACE_BIT) != 0) { flags.setInterface(true); }
-    if ((fl & ABSTRACT_BIT) != 0) { flags.setAbstract(true); }
-    if ((fl & STRICTFP_BIT) != 0) { flags.setStrictFloatingPoint(true); }
+    /*    if ((fl & PUBLIC_BIT) != 0)   { flags.setPublic(true); }
+          if ((fl & PRIVATE_BIT) != 0)   { flags.setPrivate(true); }
+          if ((fl & PROTECTED_BIT) != 0)   { flags.setProtected(true); }
+          if ((fl & STATIC_BIT) != 0)   { flags.setStatic(true); }
+          if ((fl & FINAL_BIT) != 0)  { flags.setFinal(true); }
+          if ((fl & SYNCHRONIZED_BIT) != 0)  { flags.setSynchronized(true); }
+          if ((fl & VOLATILE_BIT) != 0)  { flags.setVolatile(true); }
+          if ((fl & TRANSIENT_BIT) != 0)  { flags.setTransient(true); }
+          if ((fl & NATIVE_BIT) != 0) { flags.setNative(true); }
+          if ((fl & INTERFACE_BIT) != 0) { flags.setInterface(true); }
+          if ((fl & ABSTRACT_BIT) != 0) { flags.setAbstract(true); }
+          if ((fl & STRICTFP_BIT) != 0) { flags.setStrictFloatingPoint(true); }
+    */
+    flags.setPublic( Modifier.isPublic( mod ));
+    flags.setPrivate( Modifier.isPrivate (mod));
+    flags.setProtected ( Modifier.isProtected (mod ));
+    flags.setStatic ( Modifier.isStatic(mod));
+    flags.setFinal( Modifier.isFinal(mod));
+    flags.setSynchronized ( Modifier.isSynchronized (mod));
+    flags.setVolatile ( Modifier.isVolatile(mod));
+    flags.setTransient ( Modifier.isTransient(mod));
+    flags.setNative ( Modifier.isNative(mod));
+    flags.setInterface ( Modifier.isInterface(mod));
+    flags.setAbstract ( Modifier.isAbstract ( mod ));
+    flags.setStrictFloatingPoint ( Modifier.isStrict(mod));
+                     
     return flags;
   }
 
@@ -227,19 +243,19 @@ public class AccessFlags implements Cloneable {
      return s;
   }
 
-  private static int PUBLIC_BIT       = 1;
-  private static int PROTECTED_BIT    = 2;
-  private static int PRIVATE_BIT      = 4;
+  private static int PUBLIC_BIT       = Modifier.PUBLIC;
+  private static int PROTECTED_BIT    = Modifier.PROTECTED;
+  private static int PRIVATE_BIT      = Modifier.PRIVATE;
   
-  private static int STATIC_BIT       = 8;
-  private static int FINAL_BIT        = 16;
-  private static int SYNCHRONIZED_BIT = 32;
-  private static int TRANSIENT_BIT    = 64;
-  private static int NATIVE_BIT       = 128;
-  private static int INTERFACE_BIT    = 256;
-  private static int ABSTRACT_BIT     = 512;
-  private static int VOLATILE_BIT     = 1024;
-  private static int STRICTFP_BIT     = 2048;
+  private static int STATIC_BIT       = Modifier.STATIC;
+  private static int FINAL_BIT        = Modifier.FINAL;
+  private static int SYNCHRONIZED_BIT = Modifier.SYNCHRONIZED;
+  private static int TRANSIENT_BIT    = Modifier.TRANSIENT;
+  private static int NATIVE_BIT       = Modifier.NATIVE;
+  private static int INTERFACE_BIT    = Modifier.INTERFACE;
+  private static int ABSTRACT_BIT     = Modifier.ABSTRACT;
+  private static int VOLATILE_BIT     = Modifier.VOLATILE;
+  private static int STRICTFP_BIT     = Modifier.STRICT;
 
   // Currently, the above bits fit into a short.  We provide an int here
   // for subclasses.

@@ -158,6 +158,7 @@ public class MethodExpression extends Expression {
     }
     MethodTypeInstance mti = c.getMethod ( ct, name, argTypes );
     setCheckedType ( mti.getType() );
+    jltools.util.Annotate.addThrows( this, mti.exceptionTypes () );
 
     return this;
   }

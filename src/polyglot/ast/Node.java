@@ -84,6 +84,11 @@ public abstract class Node extends jltools.util.AnnotatedObject {
   {
     return null; 
   }
+
+  public Node removeAmbiguities( NodeVisitor vis, LocalContext c) throws TypeCheckException
+  {
+    return removeAmbiguities( c ) ;
+  }
   
   public Node removeAmbiguities( LocalContext c) throws TypeCheckException
   { 

@@ -109,10 +109,17 @@ public class FormalParameter extends Node {
     w.write( ")");
     return null;
   }
-  
+
+  public Node removeAmbiguities( LocalContext c ) throws TypeCheckException
+  {
+    c.addSymbol( name, type.getType());
+    return this;
+  }
+
   public Node typeCheck( LocalContext c) throws TypeCheckException
   {
     Annotate.setType( this, type.getType());
+    c.addSymbol( name, type.getType());
     return this;
   }
   

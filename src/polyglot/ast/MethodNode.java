@@ -317,8 +317,41 @@ public class MethodNode extends ClassMember {
     return null;
   }
 
-  public Node typeCheck( LocalContext c)
+  public Node typeCheck( LocalContext c) throws TypeCheckException
   {
+    boolean bThrowDeclared;
+
+    Annotate.addThrows ( this, Annotate.getThrows(body ) );
+
+    // check our exceptions:
+    
+    SubtypeSet s = jltools.util.Annotate.getThrows( this );
+    if ( s != null)
+    {
+      for (Iterator i = s.iterator(); i.hasNext() ; )
+      {
+        bThrowDeclared = false;
+        Type t = (Type)i.next();
+
+        if ( !t.isUncheckedException() )
+        {
+          for (Iterator i2 = exceptions.iterator(); i2.hasNext() ; )
+          {
+            
+            if ( t.descendsFrom ( (Type)i2.next() ) )
+            {
+              bThrowDeclared = true; 
+              break;
+            }
+          }
+          if ( ! bThrowDeclared)
+            throw new TypeCheckException ( "The method \"" + name + "\" can throw the exception \"" + 
+                                           t.getTypeString() + "\", but it is not declared in the throws clause");
+        }
+      }
+    }
+
+
     c.leaveMethod(  ) ;
     return this;
   }
@@ -328,7 +361,12 @@ public class MethodNode extends ClassMember {
     {
       ((FormalParameter)i.next()).visit(v);
     }
+    for (Iterator i = exceptions.iterator(); i.hasNext(); )
+    {
+      ((TypeNode)i.next()).visit(v);
+    }
     body = (BlockStatement) body.visit(v);
+    
   }
 
   public Node copy() {

@@ -62,7 +62,7 @@ public class ExpressionStatement extends Statement {
 
   public Node typeCheck(LocalContext c)
   {
-    // Fixme: implement
+    Annotate.addThrows ( this, Annotate.getThrows( expression ) );
     return this;
   }
 
