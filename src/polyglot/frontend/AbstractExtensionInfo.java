@@ -3,7 +3,6 @@ package polyglot.frontend;
 import java.io.Reader;
 
 import polyglot.ast.NodeFactory;
-import polyglot.ext.jl.JLScheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
 import polyglot.main.Version;
