@@ -508,8 +508,8 @@ FIXME: check super types as well.
     protected ClassBody typeCheckBody(TypeChecker tc, ClassType superType)
         throws SemanticException
     {
-        Context c = tc.context().pushClass(anonType, anonType);
-        ClassBody b = (ClassBody) tc.job().spawn(c, body,
+        Context bodyCtxt = tc.context().pushClass(anonType, anonType);
+        ClassBody b = (ClassBody) tc.job().spawn(bodyCtxt, body,
                                                  Pass.CLEAN_SUPER,
                                                  Pass.DISAM_ALL);
 
@@ -522,10 +522,11 @@ FIXME: check super types as well.
         }
 
         // Now, type-check the body.
-        b = (ClassBody) visitChild(b, tc.visitChildren());
+        TypeChecker bodyTC = (TypeChecker)tc.context(bodyCtxt);
+        b = (ClassBody) visitChild(b, bodyTC.visitChildren());
 
         // check the class implements all abstract methods that it needs to.
-        tc.typeSystem().checkClassConformance(anonType());
+        bodyTC.typeSystem().checkClassConformance(anonType());
 
         return b;
     }
