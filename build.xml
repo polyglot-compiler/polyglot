@@ -290,7 +290,7 @@
   <target name="standard-ext-qq-dep" if="has-qq">
     <antcall target="standard-ext-qq"/>
   </target>
- 
+
   <!-- Build a standard extension
        @param ext          The name of the extension.
        @param parser.type  Either "cup" or "ppg".
@@ -303,7 +303,13 @@
     <antcall target="compile-ext"/>
   </target>
   
-  <target name="jif" depends="jl">
+  <target name="param" depends="jl">
+    <antcall target="compile-ext">
+      <param name="ext" value="param"/>
+    </antcall>
+  </target>
+  
+  <target name="jif" depends="param">
     <antcall target="standard-ext">
       <param name="ext" value="jif"/>
       <param name="parser.type" value="cup"/>
@@ -316,7 +322,7 @@
     </antcall>
   </target>
 
-  <target name="polyj" depends="jl">
+  <target name="polyj" depends="param">
     <antcall target="standard-ext">
       <param name="ext" value="polyj"/>
       <param name="parser.type" value="ppg"/>
