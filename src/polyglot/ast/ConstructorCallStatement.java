@@ -126,6 +126,10 @@ public class ConstructorCallStatement extends Statement
     return arguments.iterator();
   }
 
+    public List getArgs() {
+	return arguments;
+    }
+
   /**
    * Visit the children of this node.
    *
