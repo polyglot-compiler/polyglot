@@ -8,6 +8,8 @@ import polyglot.ast.ProcedureDecl;
 import polyglot.ast.Term;
 import polyglot.ext.coffer.Topics;
 import polyglot.ext.coffer.extension.CofferExt;
+import polyglot.ext.coffer.extension.ProcedureDeclExt_c;
+import polyglot.ext.coffer.types.*;
 import polyglot.ext.coffer.types.CofferClassType;
 import polyglot.ext.coffer.types.CofferProcedureInstance;
 import polyglot.ext.coffer.types.CofferTypeSystem;
@@ -263,11 +265,11 @@ public class KeyChecker extends DataFlow
         }
         else {
             DataFlowItem df = (DataFlowItem) inItem;
-            check(n, df);
+            check(n, df, true);
         }
     }
 
-    private void check(Term n, DataFlowItem df) throws SemanticException {
+    private void check(Term n, DataFlowItem df, boolean checkHeldKeys) throws SemanticException {
         if (df == null) {
             return;
         }
@@ -289,7 +291,7 @@ public class KeyChecker extends DataFlow
                                         " in a local variable.", n.position());
         }
 
-        if (n.ext() instanceof CofferExt) {
+        if (checkHeldKeys && n.ext() instanceof CofferExt) {
             CofferExt ext = (CofferExt) n.ext();
             ext.checkHeldKeys(df.must_held, df.must_stored);
         }
@@ -298,14 +300,16 @@ public class KeyChecker extends DataFlow
     private void checkExitTerm(FlowGraph graph, ExitTermItem item)
         throws SemanticException
     {
-        check(graph.exitNode(), item.nonExItem);
+        check(graph.exitNode(), item.nonExItem, true);
 
         List excepts;
-
+        ProcedureDeclExt_c ext = null;
+        
         if (graph.exitNode() instanceof ProcedureDecl) {
             ProcedureDecl pd = (ProcedureDecl)graph.exitNode();
-            TypeSystem ts = pd.procedureInstance().typeSystem();
-            excepts = pd.throwTypes(ts);
+            CofferProcedureInstance pi = (CofferProcedureInstance)pd.procedureInstance();
+            excepts = pi.throwConstraints();
+            ext = (ProcedureDeclExt_c)pd.ext();
         }
         else {
             excepts = new ArrayList();
@@ -325,11 +329,25 @@ public class KeyChecker extends DataFlow
         }
 
         for (Iterator i = excepts.iterator(); i.hasNext(); ) {
-            Type excType = (Type)i.next();
+            Object o = i.next();
+            ThrowConstraint tc = null;
+            Type excType = null;
+            if (o instanceof ThrowConstraint) {
+                tc = (ThrowConstraint)o;
+                excType = tc.throwType();
+            }
+            else {
+                excType = (Type)o;
+            }
             List matchingExc = filterItemsExceptionSubclass(excItems, excKeys, excType);
             if (!matchingExc.isEmpty()) {
-                check(graph.exitNode(), (DataFlowItem)
-                        confluence(matchingExc, graph.exitNode(), graph));
+                DataFlowItem df = (DataFlowItem)confluence(matchingExc, graph.exitNode(), graph);
+                check(graph.exitNode(), df, false);
+
+                if (ext != null && tc != null) {
+                    ext.checkHeldKeysThrowConstraint(tc, df.must_held, df.must_stored);
+                }
+
             }
         }
 

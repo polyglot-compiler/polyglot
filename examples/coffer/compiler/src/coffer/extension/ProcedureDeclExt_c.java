@@ -19,21 +19,31 @@ public class ProcedureDeclExt_c extends CofferExt_c {
 
         CofferProcedureInstance pi =
             (CofferProcedureInstance) n.procedureInstance();
+            
+        checkHeldKeys(held, pi.returnKeys(), n.position());
 
-        if (! held.equals(pi.returnKeys())) {
-            KeySet too_much = held.removeAll(pi.returnKeys());
-            KeySet not_enough = pi.returnKeys().removeAll(held);
+    }
+    public void checkHeldKeysThrowConstraint(ThrowConstraint tc, KeySet held, KeySet stored) 
+    throws SemanticException {
+        checkHeldKeys(held, tc.keys(), tc.throwType().position());
+        
+    }
+    
+    private void checkHeldKeys(KeySet held, KeySet returnKeys, Position pos) throws SemanticException {
+        if (! held.equals(returnKeys)) {
+            KeySet too_much = held.removeAll(returnKeys);
+            KeySet not_enough = returnKeys.removeAll(held);
 
             if (too_much.size() == 1) {
                 Key k = (Key) too_much.iterator().next();
                 throw new SemanticException(KeysToString(too_much) +
                                             " not freed at return.",
-                                            n.position());
+                                            pos);
             }
             else if (! too_much.isEmpty()) {
                 throw new SemanticException(KeysToString(too_much) +
                                             " not freed at return.",
-                                            n.position());
+                                            pos);
             }
 
             /*
@@ -42,6 +52,6 @@ public class ProcedureDeclExt_c extends CofferExt_c {
                                             " not held at return.",
                                             n.position());
                                             */
-        }
+        }        
     }
 }
