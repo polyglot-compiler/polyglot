@@ -221,6 +221,18 @@ CircularConstructor.jl:17: Recursive constructor invocation.
 	^
 
 1 error.
+ConformanceCheck1.jl:3: m() in Foo cannot override m() in Bar; attempting to
+    assign weaker access privileges
+class Foobar extends Foo implements Bar {   } // reject since Foo.m() not public
+^
+
+1 error.
+ConformanceCheck2.jl:3: m() in Foo cannot override m() in Bar; the throwset is
+    not a subset of the overridden method's throwset
+class Foobar extends Foo implements Bar {   } // reject since Foo.m() throws too many exceptions
+^
+
+1 error.
 Errors2.jl:2: Could not find type "foo".
   void m(foo x) {
          ^
