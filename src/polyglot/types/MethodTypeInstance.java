@@ -129,4 +129,11 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
   public int hashCode() {
     return returnType.hashCode() + name.hashCode() + enclosingType.hashCode();
   }
+  
+  public boolean equals(Object obj) {
+    if (!(obj instanceof MethodTypeInstance)) return false;
+    MethodTypeInstance mti = (MethodTypeInstance) obj;
+    return super.equals(obj) &&
+	   getTypeSystem().isSameType(enclosingType, mti.enclosingType);
+  }
 }
