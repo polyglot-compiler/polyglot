@@ -1,2 +1,2 @@
 #!/bin/sh
-java -classpath $PWD/../../../../../classes:$CLASSPATH $@
+java -classpath "$PWD/../../../../../classes:$CLASSPATH" "$@"
