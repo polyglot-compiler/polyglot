@@ -184,7 +184,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 		top = new FieldExpression(
 		    c.getTypeSystem().getNewFieldExpressionExtension(),
 		    new SpecialExpression(
-			new TypeNode(fi.getEnclosingType()),
+			(TypeNode) null,
 			SpecialExpression.THIS),
 			fi );
 	    }

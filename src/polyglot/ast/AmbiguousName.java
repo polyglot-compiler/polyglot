@@ -218,7 +218,7 @@ public class AmbiguousName extends Node implements AmbiguousNode {
 		    top = new FieldExpression(
 			c.getTypeSystem().getNewFieldExpressionExtension(),
 			new SpecialExpression(
-			    new TypeNode(fi.getEnclosingType()),
+			    (TypeNode) null,
 			    SpecialExpression.THIS),
 			    fi );
 		}
