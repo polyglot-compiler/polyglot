@@ -74,12 +74,15 @@ public class CopyPropagator extends DataFlow {
 		// Assume both are in consistent data structures, so only check
 		// up pointers.  Also check root pointers because we can.
 		return li == ci.li
-		    && from.li == ci.from.li
+		    && (from == null ? ci.from == null
+			: (ci.from != null && from.li == ci.from.li))
 		    && root.li == ci.root.li;
 	    }
 
 	    public int hashCode() {
-		return li.hashCode() + 31*(from.li.hashCode() + 31*root.li.hashCode());
+		return li.hashCode()
+		    + 31*(from == null ? 0 : from.li.hashCode()
+			+ 31*root.li.hashCode());
 	    }
 	}
 
@@ -135,7 +138,8 @@ public class CopyPropagator extends DataFlow {
 
 		    it.remove();
 
-		    // Unlink.  We'll fix consistency later.
+		    // Surgery.  Bypass and remove the node.  We'll fix
+		    // consistency later.
 		    if (ci.from != null) ci.from.to.remove(ci);
 		    for (Iterator i = ci.to.iterator(); i.hasNext(); ) {
 			CopyInfo toCI = (CopyInfo)i.next();
@@ -145,9 +149,16 @@ public class CopyPropagator extends DataFlow {
 		    continue;
 		}
 
-		// Other DFI contains this key.  See if it also has the uplink.
+		if (ci.from == null) continue;
+
+		// Other DFI contains this key.
+		// Make sure that ci and ci.from are also in the same tree in
+		// the other DFI.  If not, break the link in the intersection
+		// result.
 		CopyInfo otherCI = (CopyInfo)dfi.map.get(li);
-		if (ci.from != null && ci.from.li != otherCI.from.li) {
+		CopyInfo otherCIfrom = (CopyInfo)dfi.map.get(ci.from.li);
+
+		if (otherCIfrom == null || otherCI.root != otherCIfrom.root) {
 		    modified = true;
 
 		    // Remove the uplink.
@@ -183,12 +194,16 @@ public class CopyPropagator extends DataFlow {
 	    CopyInfo ci = (CopyInfo)map.get(var);
 	    map.remove(var);
 
-	    // Unlink and fix consistency.
+	    // Splice out 'ci' and fix consistency.
 	    if (ci.from != null) ci.from.to.remove(ci);
 	    for (Iterator it = ci.to.iterator(); it.hasNext(); ) {
 		CopyInfo toCI = (CopyInfo)it.next();
-		toCI.from = null;
-		toCI.setRoot(toCI);
+		toCI.from = ci.from;
+		if (ci.from == null) {
+		    toCI.setRoot(toCI);
+		} else {
+		    ci.from.to.add(toCI);
+		}
 	    }
 	}
 
@@ -285,6 +300,12 @@ public class CopyPropagator extends DataFlow {
 	return result;
     }
 
+    private void killDecl(DataFlowItem dfi, Stmt stmt) {
+	if (stmt instanceof LocalDecl) {
+	    dfi.kill(((LocalDecl)stmt).localInstance());
+	}
+    }
+
     public Map flow(Item in, FlowGraph graph, Term t, Set succEdgeKeys) {
 	DataFlowItem result = new DataFlowItem((DataFlowItem)in);
 
@@ -324,6 +345,31 @@ public class CopyPropagator extends DataFlow {
 		LocalInstance from = ((Local)n.init()).localInstance();
 		result.add(from, to);
 	    }
+	} else if (t instanceof Block) {
+	    // Kill locals that were declared in the block.
+	    Block n = (Block)t;
+	    for (Iterator it = n.statements().iterator(); it.hasNext(); ) {
+		killDecl(result, (Stmt)it.next());
+	    }
+	} else if (t instanceof Loop) {
+	    if (t instanceof For) {
+		// Kill locals that were declared in the initializers.
+		For n = (For)t;
+		for (Iterator it = n.inits().iterator(); it.hasNext(); ) {
+		    killDecl(result, (Stmt)it.next());
+		}
+	    }
+
+	    // Kill locals that were declared in the body.
+	    killDecl(result, ((Loop)t).body());
+	} else if (t instanceof Catch) {
+	    // Kill catch's formal.
+	    result.kill(((Catch)t).formal().localInstance());
+	} else if (t instanceof If) {
+	    // Kill locals declared in consequent and alternative.
+	    If n = (If)t;
+	    killDecl(result, n.consequent());
+	    killDecl(result, n.alternative());
 	}
 
 	return itemToMap(result, succEdgeKeys);
