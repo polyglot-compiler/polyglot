@@ -8,6 +8,7 @@ while true; do
         "") break;;
         -v) verbose="1"; shift;;
         -classpath) shift; extra_cp=$1; shift;;
+        -profile) shift; profile="-Xrunhprof:cpu=samples"; shift;;
         *) args="$args $1"; shift;;
     esac
 done
@@ -18,7 +19,7 @@ then
 fi
 
 classpath="${TOP}${FILE_SEP}classes${PATH_SEP}${TOP}${FILE_SEP}java_cup.jar${PATH_SEP}.${extra_cp}"
-command="$JAVA -classpath $classpath jltools.main.Main $args"
+command="$JAVA $profile -classpath $classpath jltools.main.Main $args"
 
 if [ -n "$verbose" ]
 then
