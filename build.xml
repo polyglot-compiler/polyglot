@@ -467,6 +467,22 @@ ext=""
   </target>
   
   <!-- SKEL: When using the newext script, copy and modify this target by
+       replacing the name "ibex" with the new extension name. -->
+  <target name="ibex" depends="jl">
+    <antcall target="standard-ext">
+      <param name="ext" value="ibex"/>
+      <param name="parser.type" value="ppg"/>
+      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
+    </antcall>
+  </target>
+
+  <!-- SKEL: When using the newext script, copy and modify this target by
+       replacing the name "ibex" with the new extension name. -->
+  <target name="ibex-jar" depends="ibex">
+    <jar jarfile="${lib}/ibex.jar" basedir="${classes}" includes="polyglot/ext/ibex/**"/>
+  </target>
+
+  <!-- SKEL: When using the newext script, copy and modify this target by
        replacing the name "skel" with the new extension name. -->
   <target name="skel" depends="jl">
     <antcall target="standard-ext">
@@ -597,6 +613,13 @@ ext=""
   <target name="param-dist" depends="jl-dist">
     <copy todir="${dist}/src/polyglot/ext/param">
       <fileset dir="${src}/polyglot/ext/param"
+        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/**/*.results"/>
+    </copy>
+  </target>
+
+  <target name="ibex-dist" depends="jl-dist">
+    <copy todir="${dist}/src/polyglot/ext/ibex">
+      <fileset dir="${src}/polyglot/ext/ibex"
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/**/*.results"/>
     </copy>
   </target>
