@@ -97,7 +97,6 @@ public class Main
   
       long time0 = System.currentTimeMillis();
   
-      String targetName = null;
       if (!compiler.compile(source)) {
           throw new TerminationException(1);
       }
@@ -127,14 +126,15 @@ public class Main
           Runtime runtime = Runtime.getRuntime();
 
           Iterator iter = compiler.outputFiles().iterator();
-          String outputFiles = "";
+          StringBuffer outputFiles = new StringBuffer();
           while(iter.hasNext()) {
-            outputFiles += (String)iter.next() + " ";
+              outputFiles.append((String)iter.next());
+              outputFiles.append(" ");
           }
 
           String command = options.post_compiler + " -classpath " +
                         options.constructPostCompilerClasspath() + " "
-                        + outputFiles;
+                        + outputFiles.toString();
 
           if (Report.should_report(verbose, 1))
               Report.report(1, "Executing post-compiler " + command);
@@ -158,7 +158,7 @@ public class Main
               proc.waitFor();
 
               if (!options.keep_output_files) {
-                String command2 = "rm " + outputFiles;
+                String command2 = "rm " + outputFiles.toString();
                 runtime.exec(command2);
               }
 
