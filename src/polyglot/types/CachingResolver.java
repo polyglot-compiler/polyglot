@@ -8,32 +8,49 @@ import java.util.*;
 /**
  * An <code>CachingResolver</code> memoizes another Resolver
  */
-public class CachingResolver implements Resolver {
-    Resolver inner;
+public class CachingResolver implements TopLevelResolver {
+    TopLevelResolver inner;
     Map cache;
+    Map packageCache;
     ExtensionInfo extInfo;
 
     /**
      * Create a caching resolver.
      * @param inner The resolver whose results this resolver caches.
      */
-    public CachingResolver(Resolver inner, ExtensionInfo extInfo) {
+    public CachingResolver(TopLevelResolver inner, ExtensionInfo extInfo) {
 	this.inner = inner;
 	this.cache = new HashMap();
+	this.packageCache = new HashMap();
         this.extInfo = extInfo;
     }
 
     /**
      * The resolver whose results this resolver caches.
      */
-    public Resolver inner() {
+    public TopLevelResolver inner() {
         return this.inner;
     }
 
     public String toString() {
         return "(cache " + inner.toString() + ")";
     }
-
+    
+    /**
+     * Check if a package exists.
+     */
+    public boolean packageExists(String name) {
+	Boolean b = (Boolean) packageCache.get(name);
+	if (b != null) {
+	    return b.booleanValue();
+	}
+	else {
+	    boolean exists = inner.packageExists(name);
+	    packageCache.put(name, exists ? Boolean.TRUE : Boolean.FALSE);
+	    return exists;
+	}
+    }
+    
     /**
      * Find a type object by name.
      * @param name The name to search for.

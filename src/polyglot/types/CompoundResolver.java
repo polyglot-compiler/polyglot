@@ -8,22 +8,29 @@ import java.util.*;
  * An <code>CompoundResolver</code> resolves names using more than one
  * context.
  */
-public class CompoundResolver implements Resolver {
-    Resolver head;
-    Resolver tail;
+public class CompoundResolver implements TopLevelResolver {
+    TopLevelResolver head;
+    TopLevelResolver tail;
 
     /**
      * Create a compound resolver.
      * @param head The first resolver to search.
      * @param tail The second resolver to search.
      */
-    public CompoundResolver(Resolver head, Resolver tail) {
+    public CompoundResolver(TopLevelResolver head, TopLevelResolver tail) {
 	this.head = head;
 	this.tail = tail;
     }
 
     public String toString() {
         return "(compound " + head + " " + tail + ")";
+    }
+    
+    /**
+     * Check if a package exists.
+     */
+    public boolean packageExists(String name) {
+	return head.packageExists(name) || tail.packageExists(name);
     }
 
     /**

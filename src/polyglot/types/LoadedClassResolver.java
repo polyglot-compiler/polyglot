@@ -18,7 +18,7 @@ import polyglot.util.TypeEncoder;
  * Loads class information from class files, or serialized class infomation
  * from within class files.  It does not load from source files.
  */
-public class LoadedClassResolver extends ClassResolver
+public class LoadedClassResolver extends ClassResolver implements TopLevelResolver
 {
   protected final static int NOT_COMPATIBLE = -1;
   protected final static int MINOR_NOT_COMPATIBLE = 1;

@@ -20,7 +20,7 @@ import polyglot.util.StringUtil;
  **/
 public class TypeSystem_c implements TypeSystem
 {
-    protected Resolver systemResolver;
+    protected TopLevelResolver systemResolver;
     protected TableResolver parsedResolver;
     protected LoadedClassResolver loadedResolver;
     protected Map flagsForName;
@@ -90,7 +90,7 @@ public class TypeSystem_c implements TypeSystem
         */
     }
 
-    public Resolver systemResolver() {
+    public TopLevelResolver systemResolver() {
       return systemResolver;
     }
 
@@ -116,8 +116,7 @@ public class TypeSystem_c implements TypeSystem
      * Returns true if the package named <code>name</code> exists.
      */
     public boolean packageExists(String name) {
-        return parsedResolver.packageExists(name) ||
-               loadedResolver.packageExists(name);
+        return systemResolver.packageExists(name);
     }
 
     protected void assert_(Collection l) {
@@ -1218,7 +1217,30 @@ public class TypeSystem_c implements TypeSystem
     }
 
     public ClassType typeForName(String name) throws SemanticException {
-      return (ClassType) systemResolver.find(name);
+	if (! StringUtil.isNameShort(name)) {
+	    String containerName = StringUtil.getPackageComponent(name);
+	    String shortName = StringUtil.getShortNameComponent(name);
+	    
+	    ClassType container = null;
+	    
+	    try {
+		container = typeForName(containerName);
+	    }
+	    catch (SemanticException e) {
+		// ignore: the container could be a package
+	    }
+	    
+	    if (container != null) {
+		if (systemResolver.packageExists(containerName)) {
+		    throw new SemanticException("Class \"" + containerName +
+						"\" clashes with package of the same name.");
+		}
+		
+		return (ClassType) classContextResolver(container).find(shortName);
+	    }
+	}
+	
+	return (ClassType) systemResolver.find(name);
     }
 
     protected ClassType OBJECT_;

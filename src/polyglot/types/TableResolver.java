@@ -5,7 +5,7 @@ import polyglot.main.Report;
 import java.util.*;
 
 /** A class resolver implemented as a map from names to types. */
-public class TableResolver extends ClassResolver {
+public class TableResolver extends ClassResolver implements TopLevelResolver {
     protected Map table;
 
     /**

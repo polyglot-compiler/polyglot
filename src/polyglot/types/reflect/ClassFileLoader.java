@@ -94,7 +94,7 @@ public class ClassFileLoader
 	    Report.report(3, "looking in " + dir + " for " +
                              name.replace('.', File.separatorChar) + ".class");
         }
-
+	
         try {
             if (dir.getName().endsWith(".jar") ||
                 dir.getName().endsWith(".zip")) {
