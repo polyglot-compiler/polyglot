@@ -22,6 +22,16 @@ do
   fi
 done
 
+# Ensure dependencies are added
+old=""
+while [ "$ext" != "$old" ]
+do
+    old=`echo $ext`
+    ext=`for e in $ext; do grep "^$e:" jltools/ext/Makefile | sed -e 's/://g'; done`
+    ext=`for e in $ext; do echo $e | grep -v '^jl$' | grep -v '^FORCE$'; done | sort -u`
+    ext=`echo $ext`
+done
+
 trap 'rm -f PrintProperty.java PrintProperty.class' 0
 
 find_in_path() {
