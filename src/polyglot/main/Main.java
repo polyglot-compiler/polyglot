@@ -455,7 +455,7 @@ public class Main
     options.put( MAIN_OPT_EXT_JIF, new Boolean( false));
     options.put( MAIN_OPT_THREADS, new Boolean( false));
     
-    options.put( Compiler.OPT_OUTPUT_WIDTH, new Integer(80));
+    options.put( Compiler.OPT_OUTPUT_WIDTH, new Integer(120));
     options.put( Compiler.OPT_VERBOSE, new Boolean( false));
     options.put( Compiler.OPT_FQCN, new Boolean( false));
     options.put( Compiler.OPT_SERIALIZE, new Boolean( true));
