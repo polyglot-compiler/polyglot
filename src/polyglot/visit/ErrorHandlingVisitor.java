@@ -30,13 +30,8 @@ public class ErrorHandlingVisitor extends HaltingVisitor
     }
 
     /**
-     * The begin method is called before the entire tree is visited.
-     * This method allows the visitor to perform any initialization
-     * that cannot be done when the visitor is created.
-     * If <code>null</code> is returned, the ast is not traversed.
-     *
-     * This method is also important for initializing the error 
-     * handling code in this visitor.
+     * Part of the initialization done by begin() in an ErrorHandlingVisitor
+     * method is initializing the error-handling state.
      */
     public NodeVisitor begin() {
         this.error = false;
