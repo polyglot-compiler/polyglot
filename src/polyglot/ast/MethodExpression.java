@@ -68,6 +68,7 @@ public class MethodExpression extends Expression
         || this.args.size() != args.size()) {
       MethodExpression n = new MethodExpression( ext, target, name, args);
       n.copyAnnotationsFrom( this);
+      n.mti = this.mti;
       return n;
     }
     else {
@@ -75,6 +76,7 @@ public class MethodExpression extends Expression
         if( this.args.get( i) != args.get( i)) {
           MethodExpression n = new MethodExpression( ext, target, name, args);
           n.copyAnnotationsFrom( this);
+	  n.mti = this.mti;
           return n;
         }
       }
