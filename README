@@ -1,9 +1,9 @@
                     Polyglot Extensible Compiler Toolkit
                     ------------------------------------
 
-Since you are reading this file, you have already downloaded and unpacked the
-Polyglot distribution.  Your installation directory contains the following
-sub-directories:
+Since you are reading this file, you have already downloaded and
+unpacked the Polyglot distribution.  Your installation directory
+contains the following sub-directories:
 
   - src: the complete source code of Polyglot
   - src/polyglot: the Polyglot base compiler and some simple extensions 
@@ -15,42 +15,43 @@ sub-directories:
 Disclaimer
 ----------
 
-Polglot is ALPHA software.  Some of the interfaces in the framework may change.
-This may require some extensions to be changed to conform to the new
-interfaces.  Also, Polyglot is not well-documented; in particular, some of the
-javadoc is missing or out-of-date.  We are working on writing better
-documentation.  Watch the web page:
+Polyglot is ALPHA software.  Some of the interfaces in the framework
+may change.  This may require some extensions to be changed to conform
+to the new interfaces.  Also, Polyglot is not well-documented; in
+particular, some of the javadoc is missing or out-of-date.  We are
+working on writing better documentation.  Watch the web page:
 
     http://www.cs.cornell.edu/Projects/polyglot
 
-for further updates.  If you use Polyglot, we'd appreciate your letting us
-know.  Send your comments and bug reports to Nate Nystrom at
+for further updates.  If you use Polyglot, we'd appreciate your letting
+us know.  Send your comments and bug reports to Nate Nystrom at
 nystrom@cs.cornell.edu.
 
 Requirements
 ------------
 
 Polyglot builds on Unix and on Windows using the Cygwin environment.  We
-recommend that you use JDK 1.3 or later.  We have experienced problems with
-versions of the JDK older than 1.3.  You must ensure that java and javac are in
-your path.  Polyglot is compiled with the Ant build tool
-(http://jakarta.apache.org/ant).  GNU make is used for compiling
-and running test cases.  We are phasing out the use of make in favor of Ant.
+recommend that you use JDK 1.3 or later.  We have experienced problems
+with versions of the JDK older than 1.3.  You must ensure that java and
+javac are in your path.  Polyglot is compiled with the Ant build tool
+(http://jakarta.apache.org/ant).  GNU make is used for compiling and
+running test cases.  We are phasing out the use of make in favor of Ant.
 
 To build and use Polyglot, you will also need the JFlex scanner generator,
 downloadable from:
 
         http://www.jflex.de
 
-Install JFlex.jar in your classpath or drop it in the lib directory
-of the polyglot distribution.
+Install JFlex.jar in your classpath or drop it in the lib directory of
+the polyglot distribution.
 
-LEGAL NOTE: Polyglot is distributed under LGPL, but JFlex is distributed under
-GPL.  This means that we cannot include JFlex in the Polyglot distribution.
-The output of JFlex inherits the license of the specification (i.e., LGPL in
-Polyglot's case), so using JFlex is not a problem.  You may be able to
-substitute JLex (http://www.cs.princeton.edu/~appel/modern/java/JLex/), but
-this is untested.
+LEGAL NOTE: Polyglot is distributed under LGPL, but JFlex is
+distributed under GPL.  This means that we cannot include JFlex
+in the Polyglot distribution.  The output of JFlex inherits the
+license of the specification (i.e., LGPL in Polyglot's case), so
+using JFlex is not a problem.  You may be able to substitute JLex
+(http://www.cs.princeton.edu/~appel/modern/java/JLex/), but this is
+untested.
 
 Creating an extension
 ---------------------
@@ -104,8 +105,9 @@ Building Polyglot
 
 Follow these steps to build the base compiler and the installed extensions:
 
-1. First ensure javac is in your path and that you are using JDK 1.3 or later.
-Also ensure JFlex.jar is in your classpath or is in the lib directory.
+1. First ensure javac is in your path and that you are using JDK 1.3
+or later.  Also ensure JFlex.jar is in your classpath or is in the lib
+directory.
 
 2. Change to the $POLYGLOT directory.
 
@@ -129,12 +131,13 @@ to create jar files in the lib directory for Polyglot and for each extension.
 
 4. Update PATH and CLASSPATH.
 
-Add $POLYGLOT/bin to your PATH environment variable.  Add $POLYGLOT/classes
-(or $POLYGLOT/polyglot.jar) and $POLYGLOT/java_cup.jar to your CLASSPATH.
+Add $POLYGLOT/bin to your PATH environment variable.  Add
+$POLYGLOT/classes (or $POLYGLOT/polyglot.jar) and $POLYGLOT/java_cup.jar
+to your CLASSPATH.
 
-5. You are now ready create your own extensions to Java.  See doc/Overview.txt
-for instructions on building an extension.  See the instructions earlier in
-this file for how to use the compiler.
+5. You are now ready create your own extensions to Java.  See
+doc/Overview.txt for instructions on building an extension.  See the
+instructions earlier in this file for how to use the compiler.
 
 Credits and Acknowledgments
 ---------------------------
@@ -145,22 +148,20 @@ The current Polyglot developers are:
         Michael Clarkson
         Stephen Chong
 
-Past contributors include:
-
-	Michael Brukman
-        Matt Harren
-        Aleksey Kliger
-        Naveen Sastry
-        Dan Spoonhower
-        Steve Zdancewic
-        Lantian Zheng
-
 The Polyglot project group is supervised by Prof. Andrew Myers at the
 Cornell University Computer Science Department.
 
-The Polyglot class file parsing code (src/polyglot/types/reflect) is derived
-from the BLOAT bytecode optimizer written by Nathaniel Nystrom, David Whitlock,
-and Antony Hosking at Purdue.  See http://www.cs.purdue.edu/s3/projects/bloat/.
+Several other people have contributed to the development:
+
+	Michael Brukman             Matt Harren
+        Aleksey Kliger              Naveen Sastry
+        Dan Spoonhower              Steve Zdancewic
+        Lantian Zheng
+
+The Polyglot class file parsing code (src/polyglot/types/reflect)
+is derived from the BLOAT bytecode optimizer written by Nathaniel
+Nystrom, David Whitlock, and Antony Hosking at Purdue.  See
+http://www.cs.purdue.edu/s3/projects/bloat/.
 
 The development of the Polyglot project has been supported by a number
 of funding sources, including DARPA Contract F30602-99-1-0533, monitored
