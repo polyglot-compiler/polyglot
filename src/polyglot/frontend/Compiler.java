@@ -14,7 +14,7 @@ public class Compiler
 {
   private static TypeSystem ts;
   private static CompoundClassResolver systemResolver;
-  private static TableClassResolver parserResolver;
+  private static TableClassResolver parsedResolver;
 
   private static Map options;
 

@@ -20,10 +20,8 @@ tp_files 	= AccessFlags.java	\
 			NullType.java \
 			ParsedJavaClass.java \
 			PrimitiveType.java \
-			SymbolReader.java \
 			TableClassResolver.java \
 			Type.java \
-			TypeChecker.java \
 			TypeCheckError.java \
 			TypeInstance.java \
 			TypeSystem.java \

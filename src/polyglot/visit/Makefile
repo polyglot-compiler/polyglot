@@ -1,13 +1,13 @@
 
-fe_package	= jltools/visit
-fe_codebase	= ../..
-fe_files 	= TypeChecker.java SymbolReader.java
+vs_package	= jltools/visit
+vs_codebase	= ../..
+vs_files 	= TypeChecker.java SymbolReader.java
 
-FRONTEND_TARGET = $(patsubst %.java, $(fe_package)/%.class, $(fe_files))
+VISIT_TARGET = $(patsubst %.java, $(vs_package)/%.class, $(vs_files))
 
 ifndef CALLED_FROM_PARENT
 all:	
-	cd ../.. && $(MAKE) frontend
+	cd ../.. && $(MAKE) visit
 %:
 	cd ../.. && $(MAKE) $@
 endif
