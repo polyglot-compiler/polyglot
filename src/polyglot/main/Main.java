@@ -159,12 +159,9 @@ public class Main
       else if (args[i].equals("-classpath") ||
                args[i].equals("-cp")) {
 	i++;
-	String current_path = System.getProperty("java.class.path") +
-              File.pathSeparator + System.getProperty("sun.boot.class.path");
-	current_path = args[i] + System.getProperty("path.separator") +
-			current_path;
+	options.classpath = args[i] + System.getProperty("path.separator") +
+			options.default_classpath;
         i++;
-        options.classpath = current_path;
       }
       else if (args[i].equals("-sourcepath"))
       {

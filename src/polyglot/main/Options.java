@@ -17,8 +17,23 @@ public final class Options {
   public int error_count = 100;
   public Collection source_path; // List[String]
   public File output_directory;
-  public String classpath = System.getProperty("java.class.path") +
-      File.pathSeparator + System.getProperty("sun.boot.class.path");
+  public String default_classpath;
+  public String classpath;
+
+  Options() {
+    String bootpath = System.getProperty("sun.boot.class.path");
+    if (bootpath == null) {
+      bootpath = System.getProperty("java.home") +
+                 File.separator + "jre" +
+                 File.separator + "lib" +
+                 File.separator + "rt.jar";
+    }
+
+    default_classpath = System.getProperty("java.class.path") +
+                        File.pathSeparator + bootpath;
+    classpath = default_classpath;
+  }
+
   public String source_ext = null; // e.g., java, jl, pj
   public String output_ext = "java"; // java, by default
   public boolean output_stdout = false; // whether to output to stdout
