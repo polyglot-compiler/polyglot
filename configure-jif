@@ -11,6 +11,10 @@ exists() {
 
 #creating bin/localusers
 
+echo creating ${BIN}/jifc
+(cat ${BIN}/defs; echo 'ext="-ext jif"'; cat ${BIN}/jlc.in) > ${BIN}/jifc
+chmod +x ${BIN}/jifc
+
 echo creating ${BIN}/localusers
 
 cat > ${BIN}/localusers <<EOF

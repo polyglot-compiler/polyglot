@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo creating ${BIN}/polyjc
+(cat ${BIN}/defs; echo 'ext="-ext polyj"'; cat ${BIN}/jlc.in) > ${BIN}/polyjc
+chmod +x ${BIN}/polyjc
