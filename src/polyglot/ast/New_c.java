@@ -125,11 +125,9 @@ public class New_c extends Expr_c implements New
 
     public Context enterScope(Node child, Context c) {
         if (child == body && anonType != null && body != null) {
-            return c.pushClass(anonType, anonType);
+            c = c.pushClass(anonType, anonType);
         }
-        else {
-            return super.enterScope(child, c);
-        }
+        return super.enterScope(child, c);
     }
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
@@ -230,7 +228,7 @@ public class New_c extends Expr_c implements New
                 try {
                     // HACK: PolyJ outer() doesn't work
                     t = ts.staticTarget(t).toClass();
-                    ClassType mt = ts.findMemberClass(t, name, c);
+                    ClassType mt = ts.findMemberClass(t, name, c.currentClass());
 
                     if (ts.equals(mt, ct)) {
                         outer = t;
@@ -279,9 +277,6 @@ public class New_c extends Expr_c implements New
     }
 
     public Node typeCheck(TypeChecker tc) throws SemanticException {
-        TypeSystem ts = tc.typeSystem();
-        Context c = tc.context();
-
         New_c n = this;
 
         if (qualifier != null) {
@@ -448,7 +443,7 @@ FIXME: check super types as well.
         NodeFactory nf = tc.nodeFactory();
         Context c = tc.context();
 
-        ClassType ct = ts.findMemberClass(outer, name, c);
+        ClassType ct = ts.findMemberClass(outer, name, c.currentClass());
         return nf.CanonicalTypeNode(tn.position(), ct);
     }
 
