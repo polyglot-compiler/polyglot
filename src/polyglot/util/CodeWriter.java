@@ -28,7 +28,7 @@ public class CodeWriter
     public CodeWriter(OutputStream o, int width_) {
         output = new OutputStreamWriter(o);
         width = width_;
-        current = input = new Block(null, 0);
+        current = input = new BlockItem(null, 0);
     }
 
     /**
@@ -40,7 +40,7 @@ public class CodeWriter
     public CodeWriter(Writer w, int width_) {
         output = w;
         width = width_;
-        current = input = new Block(null, 0);
+        current = input = new BlockItem(null, 0);
     }
         
     /** Print the string <code>s</code> verbatim on the output stream.
@@ -80,7 +80,7 @@ public class CodeWriter
      * <esc>requires n >= 0</esc>
      */         
     public void begin(int n) {
-        Block b = new Block(current, n);
+        BlockItem b = new BlockItem(current, n);
         current.add(b);
         current = b;
     }
@@ -148,7 +148,7 @@ public class CodeWriter
         input.sendOutput(output, 0, 0);
         output.flush();
         input.free();
-        current = input = new Block(null, 0);
+        current = input = new BlockItem(null, 0);
 	return success;
     }
     /**
@@ -159,8 +159,8 @@ public class CodeWriter
 	return input.toString();
     }
 
-    Block input;
-    Block current;
+    BlockItem input;
+    BlockItem current;
 
     Writer output;
     int width;
@@ -389,18 +389,18 @@ abstract class Item
 }
 
 /**
- * A Block is a formatting unit containing a list of other items
+ * A BlockItem is a formatting unit containing a list of other items
  * to be formatted.
  */
-class Block extends Item {
-    Block parent;
+class BlockItem extends Item {
+    BlockItem parent;
     Item first;
     Item last;
     int indent;
 
     //@ invariant indent >= 0
         
-    Block(Block parent_, int indent_) {
+    BlockItem(BlockItem parent_, int indent_) {
         parent = parent_;
         first = last = null;
         indent = indent_;
@@ -429,7 +429,7 @@ class Block extends Item {
 int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
     		boolean nofail) throws Overrun {
 	if (CodeWriter.debug)
-            System.err.println("Block format " + this + "\n  lmargin = " +
+            System.err.println("BlockItem format " + this + "\n  lmargin = " +
                 lmargin + " pos = " + pos + " fin = " + fin +
 		(can_break ? " can break" : " no breaks") +
 		(nofail ? " [nofail]" : ""));
