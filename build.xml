@@ -482,6 +482,18 @@ ext=""
     <jar jarfile="${lib}/skel.jar" basedir="${classes}" includes="polyglot/ext/skel/**"/>
   </target>
 
+  <target name="j0" depends="jl">
+    <antcall target="standard-ext">
+      <param name="ext" value="j0"/>
+      <param name="parser.type" value="ppg"/>
+      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
+    </antcall>
+  </target>
+
+  <target name="j0-jar" depends="j0">
+    <jar jarfile="${lib}/j0.jar" basedir="${classes}" includes="polyglot/ext/j0/**"/>
+  </target>
+
   <target name="param" 
   	      depends="jl"
           description="Builds the param extension">
