@@ -68,7 +68,8 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
       return n;
     }
    
-    throw new SemanticException("Could not find type \"" + name +
+    throw new SemanticException("Could not find type \"" +
+            (qual == null ? name : qual.toString() + "." + name) +
                                 "\".", position());
   }
 
