@@ -149,18 +149,13 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *          entries for all EdgeKeys in edgeKeys. 
      */
     protected Map flow(List inItems, List inItemKeys, FlowGraph graph, Term n, Set edgeKeys) {
-        Item inItem;
-        if (inItems.isEmpty()) {
-            inItem = this.createInitialItem(graph);
-        }
-        else if (inItems.size() == 1) {
-            inItem = (Item)inItems.get(0);
-        }
-        else {
-            inItem = this.confluence(inItems, inItemKeys, n);
-        }
+        Item inItem = this.safeConfluence(inItems, inItemKeys, n, graph);
+        
         return this.flow(inItem, graph, n, edgeKeys);
     }
+
+        
+    
 
     /**
      * A utility method that simply collects together all the 
@@ -210,28 +205,9 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             }
         }
         
-        Item trueItem = null;
-        Item falseItem = null;
-        Item otherItem = null;
-        
-        if (trueItems.size() == 1) {
-            trueItem = (Item)trueItems.get(0);
-        }
-        else if (trueItems.size() > 1) {
-            trueItem = this.confluence(trueItems, trueItemKeys, n);
-        }
-        if (falseItems.size() == 1) {
-            falseItem = (Item)falseItems.get(0);
-        }
-        else if (falseItems.size() > 1) {
-            falseItem = this.confluence(falseItems, falseItemKeys, n);
-        }
-        if (otherItems.size() == 1) {
-            otherItem = (Item)otherItems.get(0);
-        }
-        else if (otherItems.size() > 1) {
-            otherItem = this.confluence(otherItems, otherItemKeys, n);
-        }
+        Item trueItem = this.safeConfluence(trueItems, trueItemKeys, n, graph);
+        Item falseItem = this.safeConfluence(falseItems, falseItemKeys, n, graph);
+        Item otherItem = this.safeConfluence(otherItems, otherItemKeys, n, graph);
 
         return this.flow(trueItem, falseItem, otherItem, graph, n, edgeKeys);
     }
@@ -249,6 +225,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * node.
      * 
      * @param items List of <code>Item</code>s that flow into <code>node</code>.
+     *            this method will only be called if the list has at least 2
+     *            elements.
      * @param node <code>Term</code> for which the <code>items</code> are 
      *          flowing into.
      * @return a non-null Item.
@@ -261,6 +239,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * node.
      * 
      * @param items List of <code>Item</code>s that flow into <code>node</code>.
+     *               This method will only be called if the list has at least 2
+     *               elements.
      * @param itemKeys List of <code>FlowGraph.ExceptionEdgeKey</code>s for
      *              the edges that the corresponding <code>Item</code>s in
      *              <code>items</code> flowed from.
@@ -270,6 +250,31 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      */
     protected Item confluence(List items, List itemKeys, Term node) {
         return confluence(items, node); 
+    }
+    
+    /**
+     * The confluence operator for many flows. This method produces a single
+     * Item from a List of Items, for the confluence just before flow enters 
+     * node.
+     * 
+     * @param items List of <code>Item</code>s that flow into <code>node</code>.
+     *               This method will only be called if the list has at least 2
+     *               elements.
+     * @param itemKeys List of <code>FlowGraph.ExceptionEdgeKey</code>s for
+     *              the edges that the corresponding <code>Item</code>s in
+     *              <code>items</code> flowed from.
+     * @param node <code>Term</code> for which the <code>items</code> are 
+     *          flowing into.
+     * @return a non-null Item.
+     */
+    protected Item safeConfluence(List items, List itemKeys, Term node, FlowGraph graph) {
+        if (items.isEmpty()) {
+            return this.createInitialItem(graph);
+        }
+        if (items.size() == 1) {
+            return (Item)items.get(0);
+        }
+        return confluence(items, itemKeys, node); 
     }
     
     /**
@@ -352,6 +357,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     
             // calculate the out item
             Map oldOutItems = p.outItems;
+            p.inItem = this.safeConfluence(inItems, inItemKeys, p.node, graph);
             p.outItems = this.flow(inItems, inItemKeys, graph, p.node, p.succEdgeKeys());
                                 
             if (!p.succEdgeKeys().equals(p.outItems.keySet())) {
