@@ -219,7 +219,8 @@ public class AmbiguousName extends Node implements AmbiguousNode {
 
 		    TypeNode base = null;
 
-		    if (container != c.getCurrentClass()) {
+		    if (!c.getTypeSystem().isSameType(container,
+						      c.getCurrentClass())) {
 			base = new TypeNode(container);
 		    }
 
