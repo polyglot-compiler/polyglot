@@ -1,12 +1,17 @@
 package jltools.frontend;
 
+import jltools.ast.*;
+import jltools.util.*;
+
 import java.io.*;
 
-public class Target
+
+public abstract class Target
 {
   protected String name;
   protected Reader source;
   protected Writer output;
+  protected ErrorQueue eq = null;
   
   public Target( String name, Reader source, Writer output)
   {
@@ -28,6 +33,21 @@ public class Target
   public Writer getOutputWriter( String packageName) throws IOException
   {
     return output;
+  }
+
+  public ErrorQueue getErrorQueue()
+  {
+    if( eq == null) {
+      eq = createErrorQueue();
+    }
+    return eq;
+  }
+
+  protected abstract ErrorQueue createErrorQueue();
+
+  public NodeVisitor getNextNodeVisitor( int stage)
+  {
+    return null;
   }
 
   public boolean equals( Object o)
