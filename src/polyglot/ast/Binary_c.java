@@ -189,12 +189,12 @@ public class Binary_c extends Expr_c implements Binary
 	if (op == GT || op == LT || op == GE || op == LE) {
 	    if (! l.isNumeric()) {
 		throw new SemanticException("The " + op +
-		    " operator must have numeric operands.", l.position());
+		    " operator must have numeric operands.", left.position());
 	    }
 
             if (! r.isNumeric()) {
 		throw new SemanticException("The " + op +
-		    " operator must have numeric operands.", r.position());
+		    " operator must have numeric operands.", right.position());
 	    }
 
 	    return type(ts.Boolean());
@@ -225,12 +225,12 @@ public class Binary_c extends Expr_c implements Binary
 	if (op == COND_OR || op == COND_AND) {
 	    if (! l.isBoolean()) {
 		throw new SemanticException("The " + op +
-		    " operator must have boolean operands.", l.position());
+		    " operator must have boolean operands.", left.position());
 	    }
 
 	    if (! r.isBoolean()) {
 		throw new SemanticException("The " + op +
-		    " operator must have boolean operands.", r.position());
+		    " operator must have boolean operands.", right.position());
 	    }
 
 	    return type(ts.Boolean());
@@ -252,12 +252,13 @@ public class Binary_c extends Expr_c implements Binary
             if (! l.isNumeric()) {
                 throw new SemanticException("The " + op +
                     " operator must have numeric or String operands.",
-                    l.position());
+                    left.position());
             }
+
             if (! r.isNumeric()) {
                 throw new SemanticException("The " + op +
                     " operator must have numeric or String operands.",
-                    r.position());
+                    right.position());
             }
         }
 
@@ -265,13 +266,13 @@ public class Binary_c extends Expr_c implements Binary
             if (! l.isNumeric()) {
                 throw new SemanticException("The " + op +
                     " operator must have numeric or boolean operands.",
-                    l.position());
+                    left.position());
             }
 
             if (! r.isNumeric()) {
                 throw new SemanticException("The " + op +
                     " operator must have numeric or boolean operands.",
-                    r.position());
+                    right.position());
             }
         }
 
@@ -280,14 +281,12 @@ public class Binary_c extends Expr_c implements Binary
 
             if (! l.isNumeric()) {
                 throw new SemanticException("The " + op +
-                    " operator must have numeric operands.",
-                    l.position());
+                    " operator must have numeric operands.", left.position());
             }
 
             if (! r.isNumeric()) {
                 throw new SemanticException("The " + op +
-                    " operator must have numeric operands.",
-                    r.position());
+                    " operator must have numeric operands.", right.position());
             }
         }
 
