@@ -22,12 +22,18 @@ public class ParsedClassType extends ClassTypeImpl
 
   public ParsedClassType( TypeSystem ts)
   {
+    this( ts, null);
+  }
+
+  public ParsedClassType( TypeSystem ts, ClassType containingClass)
+  {
     super( ts);
     interfaces = new TypedList( new LinkedList(), ClassType.class, false);
     methods = new TypedList( new LinkedList(), MethodTypeInstance.class,
                              false);
     fields = new TypedList( new LinkedList(), FieldInstance.class, false);
     innerClasses = new TypedList( new LinkedList(), ClassType.class, false);
+    this.containingClass = containingClass;
   }
 
   public void setPackageName( String packageName)

@@ -71,7 +71,7 @@ public class ArrayIndexExpression extends Expression {
     return null;
   }
 
-  public Node typeCheck(LocalContext c)
+  public Node typeCheck(LocalContext c) throws TypeCheckException
   {
     Type btype = base.getCheckedType();
     if ( !(btype instanceof ArrayType)) {

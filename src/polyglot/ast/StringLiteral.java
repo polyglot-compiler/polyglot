@@ -43,9 +43,11 @@ public class StringLiteral extends Literal {
 
    public Node typeCheck(LocalContext c)
    {
+     /* FIXME
       setCheckedType( new ClassType( c.getTypeSystem(), 
                                      "java.lang.String", 
                                      true));
+                                     */
       return this;
    }
 

@@ -133,7 +133,7 @@ public class BinaryExpression extends Expression {
     right = (Expression)right.visit(vis);
   }
 
-  public Node typeCheck(LocalContext c)
+  public Node typeCheck( LocalContext c) throws TypeCheckException
   {
     Type ltype = left.getCheckedType(), rtype = right.getCheckedType();
     

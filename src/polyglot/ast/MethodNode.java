@@ -283,7 +283,29 @@ public class MethodNode extends ClassMember {
   
   public Node readSymbols( SymbolReader sr)
   {
-      return this;
+    ParsedClassType clazz = sr.getCurrentClass();
+    TypeSystem ts = sr.getTypeSystem();
+
+    /* Build a list of argument types. */
+    List argTypes = new LinkedList();
+    Iterator iter = formals.iterator();
+    while( iter.hasNext()) {
+      argTypes.add( ((FormalParameter)iter.next()).getType());
+    }
+
+    if( additionalDimensions == 0) {
+      clazz.addMethod( new MethodTypeInstance( ts, name,
+                          returnType.getType(), argTypes, 
+                          exceptions, accessFlags));
+    }
+    else {
+      clazz.addMethod( new MethodTypeInstance( ts, name,
+                          new ArrayType( ts, returnType.getType(), 
+                                         additionalDimensions),
+                          argTypes, exceptions, accessFlags));     
+    }
+
+    return this;
   }
 
   public Node typeCheck( LocalContext c)

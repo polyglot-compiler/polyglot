@@ -87,26 +87,18 @@ public class ImportNode extends Node {
     return null;
   }
 
-  public Node readSymbols( SymbolReader sr)
+  public Node readSymbols( SymbolReader sr) throws TypeCheckException
   {
-    // FIXME
     ImportTable it = sr.getImportTable();
 
-    try
+    switch( type)
     {
-      switch( type)
-      {
-      case CLASS:
-        it.addClassImport( imports);
-        break;
-      case PACKAGE:
-        it.addPackageImport( imports);
-        break;
-      }
-    }
-    catch( NoClassException e)
-    {
-      throw new Error( e.getMessage());
+    case CLASS:
+      it.addClassImport( imports);
+      break;
+    case PACKAGE:
+      it.addPackageImport( imports);
+      break;
     }
     return this;
   }

@@ -74,17 +74,25 @@ public abstract class Node extends jltools.util.AnnotatedObject {
       //FIXME: Do this
      Type type = Annotate.getType( this);
      if( type != null) {
-       w.write( "T: " + type.toString() + " ");
+       w.write( "T: " + type.getTypeString() + " ");
      }
    }
 
-  public abstract Node readSymbols( SymbolReader sr);
+  public abstract Node readSymbols( SymbolReader sr) throws TypeCheckException;
   
-  public Node removeAmbiguities( LocalContext c) { return this; }
+  public Node adjustScope( LocalContext c)
+  {
+    return null; 
+  }
+  
+  public Node removeAmbiguities( LocalContext c) throws TypeCheckException
+  { 
+    return this; 
+  }
 
-  public abstract Node typeCheck(LocalContext c);
+  public abstract Node typeCheck( LocalContext c) throws TypeCheckException;
   
-  public abstract void translate(LocalContext c, CodeWriter w);
+  public abstract void translate( LocalContext c, CodeWriter w);
   
   public abstract Node dump( CodeWriter w);
 

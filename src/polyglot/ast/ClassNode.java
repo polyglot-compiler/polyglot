@@ -235,9 +235,10 @@ public class ClassNode extends ClassMember {
 
   public Node readSymbols( SymbolReader sr)
   {
-    String packageName = sr.getPackageName();
-    name = (packageName == null ? name : packageName + "." + name);
-    sr.setClassName( name);
+    sr.pushClass( name);
+    visitChildren( sr);
+    sr.popClass();
+    
     return this;
   }
 

@@ -2,64 +2,72 @@ package jltools.visit;
 
 
 import jltools.ast.*;
+import jltools.frontend.Compiler;
 import jltools.types.*;
+import jltools.util.*;
 
 
 public class SymbolReader extends NodeVisitor
 {
   private TypeSystem ts;
   private TableClassResolver cr;
-  private ParsedJavaClass current;
+  private ErrorQueue eq;
+
+  private ParsedClassType current;
 
   private String packageName;
   private ImportTable it;
 
-  public SymbolReader( TypeSystem ts, TableClassResolver cr)
+  public SymbolReader( TableClassResolver cr, TypeSystem ts, ErrorQueue eq)
   {
     this.ts = ts;
     this.cr = cr;
-    current = new ParsedJavaClass( ts);
-  }
-
-  public ClassResolver getClassResolver()
-  {
-    return cr;
+    this.eq = eq;
+    current = null;
   }
 
   public Node visitBefore(Node n)
   {
-    if( n instanceof SourceFileNode)
+    try
     {
-      SourceFileNode sfn = (SourceFileNode)n;
-      packageName = sfn.getPackageName();
+      return n.readSymbols( this);
     }
-    else if( n instanceof ClassNode)
+    catch( TypeCheckException e)
     {
-      
-
+      eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
+                  Annotate.getLineNumber( n));
+      return n;
     }
-    n.readSymbols( this);
-    return null;
   }
 
-  public Node visitAfter( Node n)
+  public void pushClass( String name)
   {
-    if( n instanceof ClassNode)
-    {
+    current = new ParsedClassType( ts, current);
 
+    current.setFullName( (packageName == null ? name : 
+                                packageName + "." + name));
+    cr.addClass( name, current);
+  }
 
+  public void popClass()
+  {
+    ClassType c = current.getContainingClass();
+    if( !(c instanceof ParsedClassType)) {
+      throw new InternalCompilerError( 
+                  "Too many pops from containing class stack.");
     }
-    return n;
+    current = (ParsedClassType)c;
   }
 
-  public ParsedJavaClass getCurrentClass()
+  public void setPackageName( String packageName) throws TypeCheckException
   {
-    return current;
-  }
+    this.packageName = packageName;
+    this.it = new ImportTable( Compiler.getSystemClassResolver());
 
-  public void setImportTable( ImportTable table)
-  {
-    it = table;
+    it.addPackageImport("java.lang");
+    if( packageName != null) {
+      it.addPackageImport( packageName);
+    }
   }
 
   public ImportTable getImportTable()
@@ -67,15 +75,13 @@ public class SymbolReader extends NodeVisitor
     return it;
   }
 
-  public String getPackageName()
+  public ParsedClassType getCurrentClass()
   {
-    return packageName;
+    return current;
   }
 
-  public void setClassName( String name)
+  public TypeSystem getTypeSystem()
   {
-    current.setFullName( name);
-    current.setClassType( new ClassType( ts, name, true));
-    cr.addClass( name, current);
+    return ts;
   }
 }

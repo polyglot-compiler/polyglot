@@ -8,6 +8,8 @@ import jltools.types.*;
 import jltools.util.CodeWriter;
 import jltools.visit.SymbolReader;
 
+import java.util.*;
+
 /**
  * FieldNode
  *
@@ -74,12 +76,23 @@ public class FieldNode extends ClassMember {
     return null;
   } 
 
-  public Node readSymbols( SymbolReader sr)
+  public Node readSymbols( SymbolReader sr) throws TypeCheckException
   {
+    ParsedClassType clazz = sr.getCurrentClass();
+    VariableDeclarationStatement.Declarator declarator;
+    Iterator iter = declare.declarators();
+
+    while( iter.hasNext()) {
+      declarator = (VariableDeclarationStatement.Declarator)iter.next();
+      clazz.addField( new FieldInstance( declarator.name, 
+                                  declare.typeForDeclarator( declarator), 
+                                  clazz, declare.getModifiers()));
+
+    }
     return this;
   }
 
-  public Node typeCheck( LocalContext c)
+  public Node typeCheck( LocalContext c) throws TypeCheckException
   {
     // FIXME; implement
     return this;

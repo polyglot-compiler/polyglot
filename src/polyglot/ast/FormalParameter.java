@@ -4,11 +4,9 @@
 
 package jltools.ast;
 
-import jltools.types.Type;
-import jltools.types.LocalContext;
-import jltools.visit.SymbolReader;
-import jltools.util.Annotate;
-import jltools.util.CodeWriter;
+import jltools.types.*;
+import jltools.util.*;
+import jltools.visit.*;
 
 /**
  * Overview: A FormalParameter is mutable representation of a pair of
@@ -112,8 +110,9 @@ public class FormalParameter extends Node {
     return null;
   }
   
-  public Node typeCheck( LocalContext c)
+  public Node typeCheck( LocalContext c) throws TypeCheckException
   {
+    // FIXME is this necessary?
     Annotate.setType( this, c.checkAndResolveType( type.getType()));
     return this;
   }

@@ -4,16 +4,11 @@
 
 package jltools.ast;
 
-import jltools.util.TypedListIterator;
-import jltools.util.TypedList;
-import jltools.util.CodeWriter;
-import jltools.types.LocalContext;
-import jltools.types.Type;
-import jltools.types.AccessFlags;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.ArrayList;
-import java.util.List;
+import jltools.util.*;
+import jltools.types.*;
+
+import java.util.*;
+
 
 /** 
  * VariableDeclarationStatement
@@ -29,7 +24,7 @@ public class VariableDeclarationStatement extends Statement {
    **/
   public static final class Declarator {
     public String name;
-    public int additionalDims;    
+    public int additionalDimensions;    
     // will be null for uninitialized variable.
     public Expression initializer;
     /**
@@ -38,7 +33,7 @@ public class VariableDeclarationStatement extends Statement {
      **/
     public Declarator(String n, int dims, Expression init) {
       name = n;
-      additionalDims = dims;
+      additionalDimensions = dims;
       initializer = init;
     }
   }
@@ -96,16 +91,18 @@ public class VariableDeclarationStatement extends Statement {
    * Throws an IndexOutOfBoundsException if <pos> is not a valid
    * position.
    **/ 
-  public void removeVariable(int pos) {
+  public void removeVariable(int pos) 
+  {
     variables.remove(pos);
   }
 
   /**
    * Gets the type of this declaration statement.
    **/
-  public TypeNode getType() {
+  public TypeNode getTypeNode() {
     return type;
   }
+
 
   /**
    * Sets the type of this declaration statement.
@@ -126,9 +123,9 @@ public class VariableDeclarationStatement extends Statement {
    *
    * Effects: returns the actual type of the variable declared by <decl>.
    **/
-  public Type typeForDeclarator(Declarator decl) {
-    if (decl.additionalDims > 0)
-      return type.getType().extendArrayDims(decl.additionalDims);
+  public Type typeForDeclarator(Declarator decl) throws TypeCheckException {
+    if (decl.additionalDimensions > 0)
+      return type.getType().extendArrayDims(decl.additionalDimensions);
     else
       return type.getType();
   }
@@ -160,7 +157,7 @@ public class VariableDeclarationStatement extends Statement {
       {
          Expression newExpr = (Expression) pair.initializer.visit(vis);
          if (newExpr != pair.initializer)
-            it.set(new Declarator(pair.name, pair.additionalDims, newExpr));
+            it.set(new Declarator(pair.name, pair.additionalDimensions, newExpr));
       }
     }
    }
@@ -183,7 +180,7 @@ public class VariableDeclarationStatement extends Statement {
       if (pair.initializer != null)
       {
             w.write(pair.name);
-            for (int i = 0; i < pair.additionalDims; i++) {
+            for (int i = 0; i < pair.additionalDimensions; i++) {
               w.write("[]");
             }
             w.write(" = ");
@@ -191,7 +188,7 @@ public class VariableDeclarationStatement extends Statement {
       }
       else {
         w.write(pair.name);
-        for (int i = 0; i < pair.additionalDims; i++) {
+        for (int i = 0; i < pair.additionalDimensions; i++) {
           w.write("[]");
         }
       }
@@ -253,7 +250,7 @@ public class VariableDeclarationStatement extends Statement {
       Declarator d = (Declarator) i.next();
       Expression expr = d.initializer == null ? null :
 	(deep ? (Expression) d.initializer.deepCopy() : d.initializer);
-      list.add(new Declarator(d.name, d.additionalDims, expr));
+      list.add(new Declarator(d.name, d.additionalDimensions, expr));
     }
     TypeNode tn = (TypeNode) type.copy();
     VariableDeclarationStatement vds = 

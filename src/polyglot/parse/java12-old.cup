@@ -49,11 +49,11 @@ parser code  {:
     return n;
   }
 
-  public static TypeNode dim(TypeNode n, int additionalDims) {
-    if(additionalDims > 0)
+  public static TypeNode dim(TypeNode n, int additionalDimensions) {
+    if(additionalDimensions > 0)
     {
       Type type = n.getType();
-      n.setType(new ArrayType(type.getTypeSystem(), type, additionalDims));
+      n.setType(new ArrayType(type.getTypeSystem(), type, additionalDimensions));
     }
     return n;
   }
@@ -370,8 +370,8 @@ class_or_interface_type ::=
 					// TypeNode
 		name:a
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(
-				new ClassType(parser.ts, 
-				a.getName(),false)),a); :}
+				new AmbiguousType(parser.ts, 
+				a.getName())),a); :}
 	;
 class_type ::=
 					// TypeNode
@@ -392,7 +392,7 @@ array_type ::=
 	|	name:a dims:b
 			{: RESULT = (TypeNode)Grm.ln(new TypeNode(
 				new ArrayType(parser.ts, 
-				new ClassType(parser.ts, a.getName(), false),
+				new AmbiguousType(parser.ts, a.getName()),
 				b.intValue())), a); :}
 	;
 // 19.5) Names
@@ -667,7 +667,7 @@ variable_declarator_id ::=
 			{: RESULT = new VariableDeclarationStatement.
 				Declarator(a.getIdentifier(), 0, null); :}
 	|	variable_declarator_id:a LBRACK RBRACK
-			{: RESULT = a; a.additionalDims++; :}
+			{: RESULT = a; a.additionalDimensions++; :}
 	;
 variable_initializer ::=
 					// Expression
@@ -724,11 +724,11 @@ formal_parameter ::=
 		type:a variable_declarator_id:b
 			{: RESULT = (FormalParameter)Grm.ln(
 				new FormalParameter(Grm.dim(a,
-				b.additionalDims), b.name, false), a); :}
+				b.additionalDimensions), b.name, false), a); :}
 	|	FINAL type:a variable_declarator_id:b
 			{: RESULT = (FormalParameter)Grm.ln(
 				new FormalParameter(Grm.dim(a,
-				b.additionalDims), b.name, true), a); :}
+				b.additionalDimensions), b.name, true), a); :}
 	;
 throws_opt ::=				
 					// List of TypeNode
@@ -1302,8 +1302,8 @@ primary_no_new_array ::=
 	|	name:a DOT THIS
 			{: RESULT = (Expression)Grm.ln(
 				new SpecialExpression((TypeNode)Grm.ln(
-				new TypeNode(new ClassType(parser.ts, 
-				a.getName(), false)), a), 
+				new TypeNode(new AmbiguousType(parser.ts, 
+				a.getName())), a), 
 				SpecialExpression.THIS), a); :}
 	;
 class_instance_creation_expression ::=
@@ -1323,15 +1323,15 @@ class_instance_creation_expression ::=
 			LPAREN argument_list_opt:c RPAREN
 			{: RESULT = (NewObjectExpression)Grm.ln(
 				new NewObjectExpression(a, (TypeNode)
-				Grm.ln(new TypeNode(new ClassType(parser.ts, 
-				b.getIdentifier(), false)), b), 
+				Grm.ln(new TypeNode(new AmbiguousType(
+				parser.ts, b.getIdentifier())), b), 
 				c, null), a); :}
 	|	primary:a DOT NEW IDENTIFIER:b
 			LPAREN argument_list_opt:c RPAREN class_body:d
 			{: TypeNode t = (TypeNode)Grm.ln(new TypeNode(
-				new ClassType(parser.ts,b.getIdentifier(),
-				false)), b); List l = new LinkedList(); 
-				l.add(t); 
+				new AmbiguousType(parser.ts,
+				b.getIdentifier())), b); 
+				List l = new LinkedList(); l.add(t); 
 				RESULT = (NewObjectExpression)Grm.ln(
 				new NewObjectExpression(a, t, c,
 				(ClassNode)Grm.ln(new ClassNode( 
@@ -1530,8 +1530,9 @@ cast_expression ::=
 			{: RESULT = (CastExpression)Grm.ln(
 				new CastExpression( a, b), a); :}
 	|	LPAREN name:a dims:b RPAREN unary_expression_not_plus_minus:c
-			{: Type t = new ArrayType(parser.ts, new ClassType(parser.ts, 
-				a.getName(), false), b.intValue());
+			{: Type t = new ArrayType(parser.ts, 
+				new AmbiguousType(parser.ts, 
+				a.getName()), b.intValue());
 				RESULT = (CastExpression)Grm.ln(
 				new CastExpression( new TypeNode(t), c), a); :}
 	;

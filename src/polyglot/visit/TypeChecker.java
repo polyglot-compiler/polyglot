@@ -16,8 +16,23 @@ public class TypeChecker extends NodeVisitor
     this.eq = eq;
   }
 
-  public Node visitAfter(Node n)
+  public Node visitBefore( Node n)
   {
-    return n.typeCheck( c);
+    return n.adjustScope( c);
+  }
+
+  public Node visitAfter( Node n)
+  {
+    try
+    {
+      return n.typeCheck( c);
+    }
+    catch( TypeCheckException e)
+    {
+      eq.enqueue( ErrorInfo.SEMANTIC_ERROR, 
+                  e.getMessage(),
+                  Annotate.getLineNumber( n));
+      return n;
+    }
   }
 }

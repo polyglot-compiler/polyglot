@@ -143,21 +143,9 @@ public class SourceFileNode extends Node {
       }
    }
    
-   public Node readSymbols( SymbolReader sr)
+   public Node readSymbols( SymbolReader sr) throws TypeCheckException
    {
-     it = new ImportTable( Compiler.getSystemClassResolver());
-     try
-     {
-       it.addPackageImport("java.lang");
-       if( packageName != null) {
-         it.addPackageImport( packageName);
-       }
-     }
-     catch( Exception e)
-     {
-       throw new Error( e.getMessage());
-     }
-     sr.setImportTable( it);
+     sr.setPackageName( packageName);
      return this;
    }
 

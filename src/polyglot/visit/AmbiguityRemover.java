@@ -20,27 +20,25 @@ public class AmbiguityRemover extends NodeVisitor
 
   public Node visitBefore(Node n)
   {
-    if( n instanceof SourceFileNode)
-    {
-      SourceFileNode sfn = (SourceFileNode)n;
-      it = sfn.getImportTable();
-    }
-    else if( n instanceof ClassNode)
-    {
-      ClassNode cn = (ClassNode)n;
-      c = new LocalContext( it, new ClassType( ts, cn.getName(), true), 
-                            null, ts);
-    }
+    return n.adjustScope( c);
+  }
+
+  public Node visitAfter( Node n)
+  {
     try
     {
-      n.removeAmbiguities( c);
+      return n.removeAmbiguities( c);
     }
-    catch( TypeCheckError e)
+    catch( TypeCheckException e)
     {
       eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
                   Annotate.getLineNumber( n));
+      return n;
     }
-      
-    return null;
+  }
+
+  public ImportTable getImportTable()
+  {
+    return it;
   }
 }

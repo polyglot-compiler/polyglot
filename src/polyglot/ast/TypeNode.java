@@ -4,13 +4,10 @@
 
 package jltools.ast;
 
-import jltools.types.Type;
-import jltools.types.LocalContext;
+import jltools.frontend.Compiler;
+import jltools.util.*;
+import jltools.types.*;
 import jltools.visit.SymbolReader;
-
-import jltools.util.Annotate;
-import jltools.util.CodeWriter;
-
 
 
 /**
@@ -22,16 +19,23 @@ import jltools.util.CodeWriter;
  **/
 public class TypeNode extends Node {
 
-  public TypeNode(Type type) {
-    this.type = type;
+  public TypeNode( Type type) {
+    this( type, type.getTypeString());
   }
 
-  public TypeNode(TypeNode other) {
-    this.type = other.type;
+  public TypeNode( TypeNode node)
+  {
+    this( node.getType());
+  }
+
+  public TypeNode( Type type, String original) {
+    this.type = type;
+    this.original = original;
   }
 
   public void setType(Type type) {
     this.type = type;
+    this.original = type.getTypeString();
   }
 
   public Type getType() {
@@ -48,7 +52,7 @@ public class TypeNode extends Node {
     return this;
   } 
    
-  public Node removeAmbiguities( LocalContext c)
+  public Node removeAmbiguities( LocalContext c) throws TypeCheckException
   {
     type = c.checkAndResolveType( type);
     Annotate.setType( this, type);
@@ -65,18 +69,22 @@ public class TypeNode extends Node {
 
   public void translate(LocalContext c, CodeWriter w)
   {
-    w.write(type.getTypeString());
+    if( Compiler.useFullyQualifiedNames()) {
+      w.write( type.getTypeString());
+    }
+    else {
+      w.write( original);
+    }
   }
 
-   public Node dump( CodeWriter w)
-   {
-     w.write( "( TYPE");
-     w.write( " < " + type.getTypeString() + "> ");
-     dumpNodeInfo( w);
-     w.write( ")");
-     return null;
-   }
- 
+  public Node dump( CodeWriter w)
+  {
+    w.write( "( TYPE");
+    w.write( " < " + type.getTypeString() + "> ");
+    dumpNodeInfo( w);
+    w.write( ")");
+    return null;
+  }
 
   public Node copy() {
     TypeNode tn = new TypeNode(type);
@@ -89,5 +97,6 @@ public class TypeNode extends Node {
   }
 
   private Type type;
+  private String original;
 }
 

@@ -29,6 +29,7 @@ public class Compiler
   public static int VERSION_PATCHLEVEL      = 0;
 
   private static int outputWidth;
+  private static boolean useFqcn;
   private static Collection compilers;
   protected static TargetFactory tf;
   protected static ErrorQueueFactory eqf;
@@ -44,6 +45,7 @@ public class Compiler
     Compiler.tf = tf;
     Compiler.eqf = eqf;
     Integer width;
+    Boolean fqcn;
 
     /* Read the options. */
     width = (Integer)options.get( OPT_OUTPUT_WIDTH);
@@ -51,6 +53,12 @@ public class Compiler
       width = new Integer( 72);
     }
     outputWidth = width.intValue();
+
+    fqcn = (Boolean)options.get( OPT_FQCN);
+    if( fqcn == null) {
+      fqcn = new Boolean( false);
+    }
+    useFqcn = fqcn.booleanValue();
 
     /* Set up the resolvers. */
     systemResolver = new CompoundClassResolver();
@@ -64,7 +72,16 @@ public class Compiler
     loadedResolver = new LoadedClassResolver();
     systemResolver.addClassResolver( loadedResolver);
 
-    ts = new StandardTypeSystem( systemResolver);
+    try
+    {
+      ts = new StandardTypeSystem( systemResolver);
+    }
+    catch( TypeCheckException e)
+    {
+      throw new InternalCompilerError( "Unable to initialize compiler. " + 
+                                       "Failed to create type system: " +
+                                       e.getMessage());
+    }
     loadedResolver.setTypeSystem( Compiler.ts);
 
     /* Other setup. */
@@ -91,10 +108,15 @@ public class Compiler
   {
     return systemResolver;
   }
-
+  
   public static ClassResolver getParsedClassResolver()
   {
     return parsedResolver;
+  }
+
+  public static boolean useFullyQualifiedNames()
+  {
+    return useFqcn;
   }
 
   static class Job
@@ -245,7 +267,7 @@ public class Compiler
 
   protected Node readSymbols( Node ast, ErrorQueue eq)
   {
-    SymbolReader sr = new SymbolReader( ts, parsedResolver);
+    SymbolReader sr = new SymbolReader( parsedResolver, ts, eq);
     return ast.visit( sr);
   }
 
