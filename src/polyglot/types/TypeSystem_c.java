@@ -458,7 +458,7 @@ public class TypeSystem_c implements TypeSystem
 					      toType.toPrimitive());
 	}
 
-	if (fromType.isPrimitive() || toType.isPrimitive()) return false;
+	// if (fromType.isPrimitive() || toType.isPrimitive()) return false;
 
 	return isAssignableSubtype(fromType, toType);
     }
