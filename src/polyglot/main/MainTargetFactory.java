@@ -185,9 +185,10 @@ public class MainTargetFactory implements TargetFactory
 
     public java_cup.runtime.lr_parser getParser() throws IOException
     {
-      jltools.lex.Lexer lexer = new jltools.lex.Lexer( getSourceReader(), 
-                                                       getErrorQueue());
-      return Main.getParser( lexer, getErrorQueue());
+	// The lexer also depends on which flags are passed to main.
+	//      jltools.lex.Lexer lexer = new jltools.lex.Lexer( getSourceReader(), 
+        //                                               getErrorQueue());
+      return Main.getParser( getSourceReader(), getErrorQueue());
     }
 
     public void closeSource() throws IOException

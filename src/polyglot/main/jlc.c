@@ -1,4 +1,3 @@
-
 /**
  * Spawns a java process with proper comandline arguments.  
  * 
@@ -66,7 +65,7 @@ int main ( int argc, char ** argv)
   for (i = 0; i < prependArgs; strcat( args ,prepend[i++] ), 
          strcat( args, " "));
   for (i = 1; i < argc; strcat ( args, argv[i++]),
-         strcat( args, " "));
+         strcat( args, " "));
   for (i = 0; i < postpendArgs; strcat (args, postpend[i++] ),
          strcat( args, " "));
 

@@ -31,6 +31,8 @@ public class Main
                                         = "Scramble Random Seed (Long)";
   private static final String MAIN_OPT_EXT_OP
                                         = "Use ObjectPrimitive Ext (Boolean)";
+  private static final String MAIN_OPT_EXT_JIF
+                                        = "Use Jif Ext (Boolean)";
   private static final String MAIN_OPT_THREADS
                                         = "Use multiple threads (Boolean)";
 
@@ -56,10 +58,11 @@ public class Main
                                 (Boolean)options.get( MAIN_OPT_STDOUT));
 
     /* Must initialize before instantiating any compilers. */
-    if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()) {
+    if( ((Boolean)options.get( MAIN_OPT_EXT_JIF)).booleanValue()) {
+	ts = new jltools.types.StandardTypeSystem(); // Fix for Jif
+    } else if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()) {
       ts = new jltools.ext.op.ObjectPrimitiveTypeSystem();
-    }
-    else {
+    } else {
       ts = new jltools.types.StandardTypeSystem();
     }
     Compiler.initialize( options, ts, tf);
@@ -357,16 +360,22 @@ public class Main
    * Returns an instance of the parser that should be used during this
    * compilation session.
    */
-  static java_cup.runtime.lr_parser getParser( jltools.lex.Lexer lexer,
-                                               ErrorQueue eq)
-  {
-    if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()) {
-      return new jltools.ext.op.Grm( lexer, ts, eq);
+    static java_cup.runtime.lr_parser getParser(Reader reader, ErrorQueue eq)
+    {
+	if( ((Boolean)options.get( MAIN_OPT_EXT_JIF)).booleanValue()) {
+	    jltools.ext.jif.lex.Lexer lexer = new jltools.ext.jif.lex.Lexer(reader, eq);
+	    return new jltools.ext.jif.parse.Grm( lexer, ts, eq);
+	} else {
+	    jltools.lex.Lexer lexer = new jltools.lex.Lexer(reader, eq);
+      
+	    if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()) {
+		return new jltools.ext.op.Grm( lexer, ts, eq);
+	    }
+	    else {
+		return new jltools.parse.Grm( lexer, ts, eq);
+	    }
+	}
     }
-    else {
-      return new jltools.parse.Grm( lexer, ts, eq);
-    }
-  }
 
   /**
    * Returns a iterator which contains the visitors that should be run in the
@@ -443,6 +452,7 @@ public class Main
     options.put( MAIN_OPT_STDOUT, new Boolean( false));
     options.put( MAIN_OPT_SCRAMBLE, new Boolean( false));
     options.put( MAIN_OPT_EXT_OP, new Boolean( false));
+    options.put( MAIN_OPT_EXT_JIF, new Boolean( false));
     options.put( MAIN_OPT_THREADS, new Boolean( false));
     
     options.put( Compiler.OPT_OUTPUT_WIDTH, new Integer(80));
@@ -539,6 +549,11 @@ public class Main
         i++;
         options.put( MAIN_OPT_EXT_OP, new Boolean( true));
       }
+      else if( args[i].equals( "-jif"))
+      {
+        i++;
+        options.put( MAIN_OPT_EXT_JIF, new Boolean( true));
+      }
       else if( args[i].equals( "-v") || args[i].equals( "-verbose"))
       {
         i++;
@@ -608,6 +623,7 @@ public class Main
     System.err.println( " -noserial               disable class"
                         + " serialization");
     System.err.println( " -op                     use op extension");
+    System.err.println( " -jif                    use jif extension, overrides -op");
     System.err.println( " -post <compiler>        run javac-like compiler" 
                         + " after translation");
     System.err.println( " -v -verbose             print verbose " 
