@@ -1,10 +1,40 @@
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.frontend.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassMember;
+import polyglot.ast.CodeDecl;
+import polyglot.ast.ConstructorCall;
+import polyglot.ast.ConstructorDecl;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.FieldAssign;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.Formal;
+import polyglot.ast.Initializer;
+import polyglot.ast.Local;
+import polyglot.ast.LocalAssign;
+import polyglot.ast.LocalDecl;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.Special;
+import polyglot.ast.Term;
+import polyglot.frontend.Job;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.FieldInstance;
+import polyglot.types.LocalInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.types.VarInstance;
 
 /**
  * Visitor which checks that all local variables must be defined before use, 
@@ -20,40 +50,76 @@ public class InitChecker extends DataFlow
 	super(job, ts, nf, true /* forward analysis */);
     }
     
-    /** The current CodeDecl being processed by the dataflow equations */
-    private CodeDecl currentCodeDecl = null;
-    /** 
-     * A Map of all the final fields in the class currently being processed
-     * to MinMaxInitCounts. This Map is used as the basis for the Maps returned
-     * in createInitialItem(). 
-     * */
-    private Map currentClassFinalFieldInitCounts = null;
-    /**
-     * List of all the constructors. These will be checked once all the
-     * initializer blocks have been processed.
-     */
-    private List allConstructors = null;
+    protected ClassBodyInfo currCBI = null;
     
     /**
-     * Map from ConstructorInstances to ConstructorInstances detailing
-     * which constructors call which constructors.
-     * This is used in checking the initialization of final fields.
+     * This class is just a data structure containing relevant information
+     * needed for performing initialization checking of a class declaration.
+     * 
+     * These objects form a stack, since class declarations can be nested.
      */
-    private Map constructorCalls = null;
-    
-    /**
-     * Map from ConstructorInstances to Sets of FieldInstances, detailing
-     * which final non-static fields each constructor initializes. 
-     * This is used in checking the initialization of final fields.
-     */
-    private Map fieldsConstructorInitializes = null;
+    protected static class ClassBodyInfo {
+        /** 
+         * The info for the outer ClassBody. The <code>ClassBodyInfo</code>s
+         * form a stack. 
+         */
+        ClassBodyInfo outer = null;
+        
+        /** The current CodeDecl being processed by the dataflow equations */
+        CodeDecl currCodeDecl = null;
+        /** 
+         * A Map of all the final fields in the class currently being processed
+         * to MinMaxInitCounts. This Map is used as the basis for the Maps returned
+         * in createInitialItem(). 
+         * */
+        Map currClassFinalFieldInitCounts = new HashMap();
+        /**
+         * List of all the constructors. These will be checked once all the
+         * initializer blocks have been processed.
+         */
+        List allConstructors = new ArrayList();
+
+        /**
+         * Map from ConstructorInstances to ConstructorInstances detailing
+         * which constructors call which constructors.
+         * This is used in checking the initialization of final fields.
+         */
+        Map constructorCalls = new HashMap();
+        
+        /**
+         * Map from ConstructorInstances to Sets of FieldInstances, detailing
+         * which final non-static fields each constructor initializes. 
+         * This is used in checking the initialization of final fields.
+         */
+        Map fieldsConstructorInitializes = new HashMap();
+        
+        /**
+         * Set of LocalInstances from the outer class body that were used
+         * during the declaration of this class. We need to track this
+         * in order to correctly populate <code>localsUsedInClassBodies</code>
+         */
+        Set outerLocalsUsed = new HashSet();
+        
+        /**
+         * Map from <code>ClassBody</code>s to <code>Set</code>s of 
+         * <code>LocalInstance</code>s. If localsUsedInClassBodies(C) = S, then
+         * the class body C is an inner class declared in the current code 
+         * declaration, and S is the set of LocalInstances that are defined
+         * in the current code declaration, but are used in the declaration
+         * of the class C. We need this information in order to ensure that
+         * these local variables are definitely assigned before the class
+         * declaration of C. 
+         */
+        Map localsUsedInClassBodies = new HashMap();
+    }
+
 
     /**
      * Class representing the initialization counts of variables. The
      * different values of the counts that we are interested in are ZERO,
      * ONE and MANY.
      */
-    private static class InitCount {
+    protected static class InitCount {
         static InitCount ZERO = new InitCount(0); 
         static InitCount ONE = new InitCount(1); 
         static InitCount MANY = new InitCount(2); 
@@ -113,7 +179,7 @@ public class InitChecker extends DataFlow
      * Class to record counts of the minimum and maximum number of times
      * a variable or field has been initialized or assigned to.
      */
-    private static class MinMaxInitCount {
+    protected static class MinMaxInitCount {
         private InitCount min, max;
         MinMaxInitCount(InitCount min, InitCount max) {
             MinMaxInitCount.this.min = min;
@@ -186,7 +252,7 @@ public class InitChecker extends DataFlow
      *         FlowGraph.
      */
     protected FlowGraph initGraph(CodeDecl code, Term root) {
-        currentCodeDecl = code;
+        currCBI.currCodeDecl = code;
         return new FlowGraph(root, forward);
     }
 
@@ -196,20 +262,20 @@ public class InitChecker extends DataFlow
      * Set up the state that must be tracked during a Class Declaration.
      */
     protected NodeVisitor enterCall(Node n) throws SemanticException {
-      if (n instanceof ClassDecl) {
+      if (n instanceof ClassBody) {
             // we are starting to process a class declaration, but have yet
             // to do any of the dataflow analysis.
             
-          allConstructors = new ArrayList();
-          constructorCalls = new HashMap();
-          fieldsConstructorInitializes = new HashMap();
+            // set up the new ClassBodyInfo, and make sure that it forms
+            // a stack.
+            ClassBodyInfo newCDI = new ClassBodyInfo();
+            newCDI.outer = currCBI;  
+            currCBI = newCDI;
+            
 
-            // set up currentClassFinalFieldInitCounts to contain mappings
-            // for all the final fields of the class.
-            currentClassFinalFieldInitCounts = new HashMap();            
-            
-            
-            Iterator classMembers = ((ClassDecl)n).body().members().iterator();            
+            // set up currClassFinalFieldInitCounts to contain mappings
+            // for all the final fields of the class.            
+            Iterator classMembers = ((ClassBody)n).members().iterator();            
             while (classMembers.hasNext()) {
                 ClassMember cm = (ClassMember)classMembers.next();
                 if (cm instanceof FieldDecl) {
@@ -219,12 +285,17 @@ public class InitChecker extends DataFlow
                         if (fd.init() != null) {
                             // the field has an initializer
                             initCount = new MinMaxInitCount(InitCount.ONE,InitCount.ONE);
+                            
+                            // do dataflow over the initialization expression
+                            // to pick up any uses of outer local variables.
+                            if (currCBI.outer != null)
+                                dataflow(fd.init());                        
                         }
                         else {
                             // the field does not have an initializer
                             initCount = new MinMaxInitCount(InitCount.ZERO,InitCount.ZERO);
                         }
-                        currentClassFinalFieldInitCounts.put(fd.fieldInstance(),
+                        newCDI.currClassFinalFieldInitCounts.put(fd.fieldInstance(),
                                                              initCount);
                     }
                 }
@@ -248,15 +319,17 @@ public class InitChecker extends DataFlow
         if (n instanceof ConstructorDecl) {
             // postpone the checking of the constructors until all the 
             // initializer blocks have been processed.
-            allConstructors.add(n);
+            currCBI.allConstructors.add(n);
             return n;
         }
         
-        if (n instanceof ClassDecl) {
+        if (n instanceof ClassBody) {
             // Now that we are at the end of the class declaration, and can
             // be sure that all of the initializer blocks have been processed,
             // we can now process the constructors.
-            for (Iterator iter = allConstructors.iterator(); iter.hasNext(); ) {
+            
+            for (Iterator iter = currCBI.allConstructors.iterator(); 
+                    iter.hasNext(); ) {
                 ConstructorDecl cd = (ConstructorDecl)iter.next();
                 
                 // rely on the fact that our dataflow does not change the AST,
@@ -264,77 +337,128 @@ public class InitChecker extends DataFlow
                 dataflow(cd);                
             }
             
-            // check that all static fields have been initialized exactly once.             
-            for (Iterator iter = currentClassFinalFieldInitCounts.entrySet().iterator(); iter.hasNext(); ) {
-                Map.Entry e = (Map.Entry)iter.next();
-                if (e.getKey() instanceof FieldInstance) {
-                    FieldInstance fi = (FieldInstance)e.getKey();
-                    if (fi.flags().isStatic() && fi.flags().isFinal()) {
-                        MinMaxInitCount initCount = (MinMaxInitCount)e.getValue();
-                        if (InitCount.ZERO.equals(initCount.getMin())) {
-                            throw new SemanticException("field \"" + fi.name() +
-                                                        "\" might not have been initialized",
-                                                        n.position());                                
-                        }
-                    }
-                }
-            }   
-
-            // for each non-static final field instance, check that all 
-            // constructors intialize it exactly once, taking into account constructor calls.
-            for (Iterator iter = currentClassFinalFieldInitCounts.keySet().iterator(); iter.hasNext(); ) {
-                FieldInstance fi = (FieldInstance)iter.next();
-                if (fi.flags().isFinal() && !fi.flags().isStatic()) {
-                    // the field is final and not static
-                    // it must be initialized exactly once.
-                    // navigate up through all of the the constructors
-                    // that this constructor calls.
-                    
-                    boolean fieldInitializedBeforeConstructors = false;
-                    MinMaxInitCount ic = (MinMaxInitCount)currentClassFinalFieldInitCounts.get(fi);
-                    if (ic != null && !InitCount.ZERO.equals(ic.getMin())) {
-                        fieldInitializedBeforeConstructors = true;
-                    }
-                            
-                    for (Iterator iter2 = allConstructors.iterator(); iter2.hasNext(); ) {
-                        ConstructorDecl cd = (ConstructorDecl)iter2.next();
-                        ConstructorInstance ciStart = cd.constructorInstance();
-                        ConstructorInstance ci = ciStart;
-                        
-                        boolean isInitialized = fieldInitializedBeforeConstructors;
-                        
-                        while (ci != null) {
-                            Set s = (Set)fieldsConstructorInitializes.get(ci);
-                            if (s != null && s.contains(fi)) {
-                                if (isInitialized) {
-                                    throw new SemanticException("field \"" + fi.name() +
-                                            "\" might have already been initialized",
-                                            cd.position());                                                                        
-                                }
-                                isInitialized = true;
-                            }                                
-                            ci = (ConstructorInstance)constructorCalls.get(ci);
-                        }
-                        if (!isInitialized) {
-                            throw new SemanticException("field \"" + fi.name() +
-                                    "\" might not have been initialized",
-                                    ciStart.position());                                
-                                
-                        }                            
-                    }
-                }
-            }
-        }
+            // check that all static fields have been initialized exactly once 
+            checkStaticFinalFieldsInit((ClassBody)n);
             
+            // check that at the end of each constructor!@!
+            checkNonStaticFinalFieldsInit((ClassBody)n);
+            
+            // copy the locals used to the outer scope
+            if (currCBI.outer != null) {
+                currCBI.outer.localsUsedInClassBodies.put(n, currCBI.outerLocalsUsed);
+            }
+            
+            // pop the stack
+            currCBI = currCBI.outer;
+        }
 
         return super.leaveCall(n);
     }
+
+    /**
+     * Check that each static final field is initialized exactly once.
+     * 
+     * @param cb The ClassBody of the class declaring the fields to check.
+     * @throws SemanticException
+     */
+    protected void checkStaticFinalFieldsInit(ClassBody cb) throws SemanticException {
+        // check that all static fields have been initialized exactly once.             
+        for (Iterator iter = currCBI.currClassFinalFieldInitCounts.entrySet().iterator(); 
+                iter.hasNext(); ) {
+            Map.Entry e = (Map.Entry)iter.next();
+            if (e.getKey() instanceof FieldInstance) {
+                FieldInstance fi = (FieldInstance)e.getKey();
+                if (fi.flags().isStatic() && fi.flags().isFinal()) {
+                    MinMaxInitCount initCount = (MinMaxInitCount)e.getValue();
+                    if (InitCount.ZERO.equals(initCount.getMin())) {
+                        throw new SemanticException("field \"" + fi.name() +
+                            "\" might not have been initialized",
+                            cb.position());                                
+                    }
+                }
+            }
+        }   
+    }
+    
+    /**
+     * Check that each non static final field has been initialized exactly once,
+     * taking into account the fact that constructors may call other 
+     * constructors. 
+     * 
+     * @param cb The ClassBody of the class declaring the fields to check.
+     * @throws SemanticException
+     */
+    protected void checkNonStaticFinalFieldsInit(ClassBody cb) throws SemanticException {
+        // for each non-static final field instance, check that all 
+        // constructors intialize it exactly once, taking into account constructor calls.
+        for (Iterator iter = currCBI.currClassFinalFieldInitCounts.keySet().iterator(); 
+                iter.hasNext(); ) {
+            FieldInstance fi = (FieldInstance)iter.next();
+            if (fi.flags().isFinal() && !fi.flags().isStatic()) {
+                // the field is final and not static
+                // it must be initialized exactly once.
+                // navigate up through all of the the constructors
+                // that this constructor calls.
+                    
+                boolean fieldInitializedBeforeConstructors = false;
+                MinMaxInitCount ic = (MinMaxInitCount)
+                    currCBI.currClassFinalFieldInitCounts.get(fi);
+                if (ic != null && !InitCount.ZERO.equals(ic.getMin())) {
+                    fieldInitializedBeforeConstructors = true;
+                }
+                            
+                for (Iterator iter2 = currCBI.allConstructors.iterator(); 
+                        iter2.hasNext(); ) {
+                    ConstructorDecl cd = (ConstructorDecl)iter2.next();
+                    ConstructorInstance ciStart = cd.constructorInstance();
+                    ConstructorInstance ci = ciStart;
+                        
+                    boolean isInitialized = fieldInitializedBeforeConstructors;
+                        
+                    while (ci != null) {
+                        Set s = (Set)currCBI.fieldsConstructorInitializes.get(ci);
+                        if (s != null && s.contains(fi)) {
+                            if (isInitialized) {
+                                throw new SemanticException("field \"" + fi.name() +
+                                        "\" might have already been initialized",
+                                        cd.position());                                                                        
+                            }
+                            isInitialized = true;
+                        }                                
+                        ci = (ConstructorInstance)currCBI.constructorCalls.get(ci);
+                    }
+                    if (!isInitialized) {
+                        throw new SemanticException("field \"" + fi.name() +
+                                "\" might not have been initialized",
+                                ciStart.position());                                
+                                
+                    }                            
+                }
+            }
+        }        
+    }
+    
+    /**
+     * Construct a flow graph for the <code>Expr</code> provided, and call 
+     * <code>dataflow(FlowGraph)</code>. Is also responsible for calling 
+     * <code>post(FlowGraph, Term)</code> after
+     * <code>dataflow(FlowGraph)</code> has been called. 
+     */
+    protected Expr dataflow(Expr root) throws SemanticException {
+        // Build the control flow graph.
+        FlowGraph g = new FlowGraph(root, forward);
+        CFGBuilder v = new CFGBuilder(ts, g, this);
+        v.visitGraph();
+        dataflow(g);
+        return (Expr)post(g, root);        
+    }
+    
     /**
      * The initial item to be given to the entry point of the dataflow contains
      * the init counts for the final fields.
      */
     public Item createInitialItem(FlowGraph graph) {
-        return new DataFlowItem(new HashMap(currentClassFinalFieldInitCounts));
+        return new DataFlowItem(new HashMap(currCBI.currClassFinalFieldInitCounts));
     }
     
     /**
@@ -364,7 +488,8 @@ public class InitChecker extends DataFlow
     
 
     /**
-     * Perform the appropriate flow operations for the Terms.
+     * Perform the appropriate flow operations for the Terms. This method
+     * delegates to other appropriate methods in this class, for modularity.
      * 
      * To summarize:
      * - Formals: declaration of a Formal param, just insert a new 
@@ -378,84 +503,144 @@ public class InitChecker extends DataFlow
      */
     public Map flow(Item inItem, FlowGraph graph, Term n, Set succEdgeKeys) {
         DataFlowItem inDFItem = ((DataFlowItem)inItem);
-        
-        if (n instanceof Formal) {
+
+        Map ret = null;        
+        if (n instanceof Formal) {            
             // formal argument declaration.
-            Formal f = (Formal) n;
-            Map m = new HashMap(inDFItem.initStatus);
-            // a formal argument is always defined.            
-            m.put(f.localInstance(), new MinMaxInitCount(InitCount.ONE,InitCount.ONE));
-            
-            return itemToMap(new DataFlowItem(m), succEdgeKeys);
+            ret = flowFormal(inDFItem, graph, (Formal)n, succEdgeKeys);
         }
-        
-        if (n instanceof LocalDecl) {
+        else if (n instanceof LocalDecl) {
             // local variable declaration.
-            LocalDecl l = (LocalDecl) n;
-            Map m = new HashMap(inDFItem.initStatus);
-            if (l.init() == null) {
-                // declaration of local var with no initialization
-                m.put(l.localInstance(), new MinMaxInitCount(InitCount.ZERO,InitCount.ZERO));
-            }
-            else {
-                // declaration of local var with initialization.
-                m.put(l.localInstance(), new MinMaxInitCount(InitCount.ONE,InitCount.ONE));
-            }
-            return itemToMap(new DataFlowItem(m), succEdgeKeys);
+            ret = flowLocalDecl(inDFItem, graph, (LocalDecl)n, succEdgeKeys);
         }
-
-        if (n instanceof Assign) {
-            Assign a = (Assign) n;
-            if (a.left() instanceof Local) {
-                Local l = (Local) a.left();
-                Map m = new HashMap(inDFItem.initStatus);
-                MinMaxInitCount initCount = (MinMaxInitCount)m.get(l.localInstance());
-                
-                initCount = new MinMaxInitCount(initCount.getMin().increment(),
-                                                initCount.getMax().increment());
-                m.put(l.localInstance(), initCount);
-                return itemToMap(new DataFlowItem(m), succEdgeKeys);  
-            }            
-            if (a.left() instanceof Field) {
-                Field f = (Field)a.left();
-                FieldInstance fi = f.fieldInstance();
-                if (fi.flags().isFinal() && isFieldsTargetAppropriate(f)) {
-                    // this field is final and the target for this field is 
-                    // appropriate for what we are interested in.
-                    Map m = new HashMap(inDFItem.initStatus);
-                    MinMaxInitCount initCount = (MinMaxInitCount)m.get(fi);
-                    initCount = new MinMaxInitCount(initCount.getMin().increment(),
-                            initCount.getMax().increment());
-                    m.put(fi, initCount);
-                    return itemToMap(new DataFlowItem(m), succEdgeKeys);
-                }                
-            }            
+        else if (n instanceof LocalAssign) {
+            // assignment to a local variable
+            ret = flowLocalAssign(inDFItem, graph, (LocalAssign)n, succEdgeKeys);
+        }
+        else if (n instanceof FieldAssign) {
+            // assignment to a field
+            ret = flowFieldAssign(inDFItem, graph, (FieldAssign)n, succEdgeKeys);
+        }
+        else if (n instanceof ConstructorCall) {
+            // call to another constructor.
+            ret = flowConstructorCall(inDFItem, graph, (ConstructorCall)n, succEdgeKeys);
         }
         
-        if (n instanceof ConstructorCall) {
-            ConstructorCall cc = (ConstructorCall)n;
-            if (ConstructorCall.THIS.equals(cc.kind())) {
-                // currentCodeDecl must be a ConstructorDecl, as that
-                // is the only place constructor calls are allowed
-                // record the fact that the current constructor calls the other
-                // constructor
-                constructorCalls.put(((ConstructorDecl)currentCodeDecl).constructorInstance(), 
-                                     cc.constructorInstance());
-            }
+        if (ret != null) {
+            return ret;
         }
-
         return itemToMap(inItem, succEdgeKeys);
     }
 
+    /**
+     * Perform the appropriate flow operations for declaration of a formal 
+     * parameter
+     */
+    protected Map flowFormal(DataFlowItem inItem, FlowGraph graph, Formal f, Set succEdgeKeys) {
+        Map m = new HashMap(inItem.initStatus);
+        // a formal argument is always defined.            
+        m.put(f.localInstance(), new MinMaxInitCount(InitCount.ONE,InitCount.ONE));
+            
+        return itemToMap(new DataFlowItem(m), succEdgeKeys);
+    }
+
+    /**
+     * Perform the appropriate flow operations for declaration of a local 
+     * variable
+     */
+    protected Map flowLocalDecl(DataFlowItem inItem, 
+                                FlowGraph graph, 
+                                LocalDecl ld, 
+                                Set succEdgeKeys) {
+        Map m = new HashMap(inItem.initStatus);
+        if (ld.init() == null) {
+            // declaration of local var with no initialization
+            m.put(ld.localInstance(), new MinMaxInitCount(InitCount.ZERO,InitCount.ZERO));
+        }
+        else {
+            // declaration of local var with initialization.
+            m.put(ld.localInstance(), new MinMaxInitCount(InitCount.ONE,InitCount.ONE));
+        }
+        return itemToMap(new DataFlowItem(m), succEdgeKeys);
+    }
+    
+    /**
+     * Perform the appropriate flow operations for assignment to a local 
+     * variable
+     */
+    protected Map flowLocalAssign(DataFlowItem inItem, 
+                                  FlowGraph graph, 
+                                  LocalAssign a, 
+                                  Set succEdgeKeys) {
+          Local l = (Local) a.left();
+          Map m = new HashMap(inItem.initStatus);
+          MinMaxInitCount initCount = (MinMaxInitCount)m.get(l.localInstance());
+
+          // initcount could be null if the local is defined in the outer
+          // class.
+          if (initCount != null ) {
+              initCount = new MinMaxInitCount(initCount.getMin().increment(),
+                                              initCount.getMax().increment());
+              m.put(l.localInstance(), initCount);
+              return itemToMap(new DataFlowItem(m), succEdgeKeys);  
+          }
+          return null;
+    }
+
+    /**
+     * Perform the appropriate flow operations for assignment to a field
+     */
+    protected Map flowFieldAssign(DataFlowItem inItem, 
+                                  FlowGraph graph, 
+                                  FieldAssign a, 
+                                  Set succEdgeKeys) {
+        Field f = (Field)a.left();
+        FieldInstance fi = f.fieldInstance();
+        
+        if (fi.flags().isFinal() && isFieldsTargetAppropriate(f)) {
+            // this field is final and the target for this field is 
+            // appropriate for what we are interested in.
+            Map m = new HashMap(inItem.initStatus);
+            MinMaxInitCount initCount = (MinMaxInitCount)m.get(fi);
+            // initCount may be null if the field is defined in an
+            // outer class.
+            if (initCount != null) {
+                initCount = new MinMaxInitCount(initCount.getMin().increment(),
+                          initCount.getMax().increment());
+                m.put(fi, initCount);
+                return itemToMap(new DataFlowItem(m), succEdgeKeys);
+            }
+        }
+        return null;
+    }
+                                  
+    /**
+     * Perform the appropriate flow operations for a constructor call
+     */
+    protected Map flowConstructorCall(DataFlowItem inItem, 
+                                      FlowGraph graph, 
+                                      ConstructorCall cc, 
+                                      Set succEdgeKeys) {
+        if (ConstructorCall.THIS.equals(cc.kind())) {
+            // currCodeDecl must be a ConstructorDecl, as that
+            // is the only place constructor calls are allowed
+            // record the fact that the current constructor calls the other
+            // constructor
+            currCBI.constructorCalls.put(((ConstructorDecl)currCBI.currCodeDecl).constructorInstance(), 
+                                 cc.constructorInstance());
+        }
+        return null;
+    }
+    
     /**
      * Determine if we are interested in this field on the basis of the
      * target of the field. To wit, if the field
      * is static, then the target of the field must be the current class; if
      * the field is not static then the target must be "this".
      */
-    private boolean isFieldsTargetAppropriate(Field f) {
+    protected boolean isFieldsTargetAppropriate(Field f) {
         if (f.fieldInstance().flags().isStatic()) {
-            ClassType containingClass = (ClassType)currentCodeDecl.codeInstance().container();
+            ClassType containingClass = (ClassType)currCBI.currCodeDecl.codeInstance().container();
             return containingClass.equals(f.fieldInstance().container());
         }
         else {
@@ -478,7 +663,7 @@ public class InitChecker extends DataFlow
      * 
      * This method is also responsible for maintaining state between the 
      * dataflows over Initializers, by copying back the appropriate 
-     * MinMaxInitCounts to the map currentClassFinalFieldInitCounts.
+     * MinMaxInitCounts to the map currClassFinalFieldInitCounts.
      */
     public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
         DataFlowItem dfIn = (DataFlowItem)inItem;        
@@ -488,84 +673,35 @@ public class InitChecker extends DataFlow
             // are the same, so just take the first one.
             dfOut = (DataFlowItem)outItems.values().iterator().next(); 
         }
-        if (n instanceof Local) {
-            Local l = (Local) n;
-            MinMaxInitCount initCount = (MinMaxInitCount) 
-                      dfIn.initStatus.get(l.localInstance());
-            if (initCount != null) { // ###@@@ I don't like this line; it's symptomatic of other problems.
-                if (InitCount.ZERO.equals(initCount.getMin())) {
-                    throw new SemanticException("Local variable \"" + l.name() +
-                            "\" may not have been initialized",
-                            l.position());
-                }
-            }
-        }
         
-        if (n instanceof Assign) {
-            Assign a = (Assign)n;
-            if (a.left() instanceof Local) {
-                LocalInstance li = ((Local)a.left()).localInstance();
-                MinMaxInitCount initCount = (MinMaxInitCount) 
-                                       dfOut.initStatus.get(li);                                
-                if (li.flags().isFinal() && InitCount.MANY.equals(initCount.getMax())) {
-                    throw new SemanticException("variable \"" + li.name() +
-                                                "\" might already have been assigned to",
-                                                a.position());
-                }
-            }
+        if (n instanceof Local) {
+            checkLocal(graph, (Local)n, dfIn, dfOut);
+        }
+        else if (n instanceof LocalAssign) {
+            checkLocalAssign(graph, (LocalAssign)n, dfIn, dfOut);
+        }
+        else if (n instanceof FieldAssign) {
+            checkFieldAssign(graph, (FieldAssign)n, dfIn, dfOut);
+        }
+        else if (n instanceof ClassBody) {
+            // we need to check that the locals used inside this class body
+            // have all been defined at this point.
+            Set localsUsed = (Set)currCBI.localsUsedInClassBodies.get(n);
             
-            if (a.left() instanceof Field) {
-                Field f = (Field)a.left();
-                FieldInstance fi = f.fieldInstance();
-                if (fi.flags().isFinal()) {
-                    if ((currentCodeDecl instanceof ConstructorDecl ||
-                        currentCodeDecl instanceof Initializer) &&
-                        isFieldsTargetAppropriate(f)) {
-                        // we are in a constructor or initializer block and 
-                        // if the field is static then the target is the class
-                        // at hand, and if it is not static then the
-                        // target of the field is this. 
-                        // So a final field in this situation can be 
-                        // assigned to at most once.                    
-                        MinMaxInitCount initCount = (MinMaxInitCount) 
-                                               dfOut.initStatus.get(fi);                                
-                        if (InitCount.MANY.equals(initCount.getMax())) {
-                            throw new SemanticException("field \"" + fi.name() +
-                                    "\" might already have been assigned to",
-                                    a.position());
-                        }
-                        
-                        // if the field is non-static and final, and we are in
-                        // a constructor, record the fact that this constructor 
-                        // initializes the field 
-                        if (!fi.flags().isStatic() && currentCodeDecl instanceof ConstructorDecl) {
-                            ConstructorInstance ci = ((ConstructorDecl)currentCodeDecl).constructorInstance();
-                            Set s = (Set)fieldsConstructorInitializes.get(ci);
-                            if (s == null) {
-                                s = new HashSet();
-                                fieldsConstructorInitializes.put(ci, s);
-                            }
-                            s.add(fi);
-                        }
-                    
-                    }
-                    else {
-                        // not in a constructor or intializer, or the target is
-                        // not appropriate. So we cannot assign 
-                        // to a final field at all.
-                        throw new SemanticException("cannot assign a value " +
-                                   "to final variable \"" + fi.name() + "\"",
-                                   a.position());
-                    }
-                }                        
-            }
+            if (localsUsed != null) {
+                checkLocalsUsedByInnerClass(graph, 
+                                            (ClassBody)n, 
+                                            localsUsed,
+                                            dfIn, 
+                                            dfOut);
+            }            
         }
         
         if (n == graph.finishNode()) {            
-            if (currentCodeDecl instanceof Initializer) {
+            if (currCBI.currCodeDecl instanceof Initializer) {
                 // We are finishing the checking of an intializer.
                 // We need to copy back the init counts of any fields back into
-                // currentClassFinalFieldInitCounts, so that the counts are 
+                // currClassFinalFieldInitCounts, so that the counts are 
                 // correct for the next initializer or constructor.
                 Iterator iter = dfOut.initStatus.entrySet().iterator();
                 while (iter.hasNext()) {
@@ -576,7 +712,7 @@ public class InitChecker extends DataFlow
                             // we don't need to join the init counts, as all
                             // dataflows will go through all of the 
                             // initializers
-                            currentClassFinalFieldInitCounts.put(fi, 
+                            currCBI.currClassFinalFieldInitCounts.put(fi, 
                                     e.getValue());
                         }
                     }
@@ -584,4 +720,143 @@ public class InitChecker extends DataFlow
             }
         }        
     }
+
+    /**
+     * Check that the local variable <code>l</code> is used correctly.
+     */
+    protected void checkLocal(FlowGraph graph, 
+                              Local l, 
+                              DataFlowItem dfIn, 
+                              DataFlowItem dfOut) 
+        throws SemanticException {
+        MinMaxInitCount initCount = (MinMaxInitCount) 
+                  dfIn.initStatus.get(l.localInstance());
+        if (initCount == null) {
+            // it's a local variable that has not been declared within
+            // this scope. The only way this can arise is from an
+            // inner class that is not a member of a class (typically
+            // a local class, or an anonymous class declared in a method,
+            // constructor or initializer).
+            // We need to check that it is a final local, and also
+            // keep track of it, to ensure that it has been definitely
+            // assigned at this point.
+            currCBI.outerLocalsUsed.add(l.localInstance());                
+        }
+        else { 
+            if (InitCount.ZERO.equals(initCount.getMin())) {
+                throw new SemanticException("Local variable \"" + l.name() +
+                        "\" may not have been initialized",
+                        l.position());
+            }
+        }
+    }
+        
+    /**
+     * Check that the assignment to a local variable is correct.
+     */
+    protected void checkLocalAssign(FlowGraph graph, 
+                                    LocalAssign a, 
+                                    DataFlowItem dfIn, 
+                                    DataFlowItem dfOut) 
+        throws SemanticException {
+        LocalInstance li = ((Local)a.left()).localInstance();
+        MinMaxInitCount initCount = (MinMaxInitCount) 
+                               dfOut.initStatus.get(li);                                
+        if (initCount == null) {
+            throw new SemanticException("Final local variable \"" + li.name() +
+                    "\" cannot be assigned to in an inner class.",
+                    a.position());                     
+        }
+
+        if (li.flags().isFinal() && InitCount.MANY.equals(initCount.getMax())) {
+            throw new SemanticException("variable \"" + li.name() +
+                                        "\" might already have been assigned to",
+                                        a.position());
+        }
+    }
+
+    /**
+     * Check that the assignment to a field is correct.
+     */
+    protected void checkFieldAssign(FlowGraph graph, 
+                                    FieldAssign a, 
+                                    DataFlowItem dfIn, 
+                                    DataFlowItem dfOut) 
+        throws SemanticException {
+        Field f = (Field)a.left();
+        FieldInstance fi = f.fieldInstance();
+        if (fi.flags().isFinal()) {
+            if ((currCBI.currCodeDecl instanceof ConstructorDecl ||
+                    currCBI.currCodeDecl instanceof Initializer) &&
+                    isFieldsTargetAppropriate(f)) {
+                // we are in a constructor or initializer block and 
+                // if the field is static then the target is the class
+                // at hand, and if it is not static then the
+                // target of the field is this. 
+                // So a final field in this situation can be 
+                // assigned to at most once.                    
+                MinMaxInitCount initCount = (MinMaxInitCount) 
+                                       dfOut.initStatus.get(fi);                                
+                if (InitCount.MANY.equals(initCount.getMax())) {
+                    throw new SemanticException("field \"" + fi.name() +
+                            "\" might already have been assigned to",
+                            a.position());
+                }
+                    
+                // if the field is non-static and final, and we are in
+                // a constructor, record the fact that this constructor 
+                // initializes the field 
+                if (!fi.flags().isStatic() && currCBI.currCodeDecl instanceof ConstructorDecl) {
+                    ConstructorInstance ci = ((ConstructorDecl)currCBI.currCodeDecl).constructorInstance();
+                    Set s = (Set)currCBI.fieldsConstructorInitializes.get(ci);
+                    if (s == null) {
+                        s = new HashSet();
+                        currCBI.fieldsConstructorInitializes.put(ci, s);
+                    }
+                    s.add(fi);
+                }
+                
+            }
+            else {
+                // not in a constructor or intializer, or the target is
+                // not appropriate. So we cannot assign 
+                // to a final field at all.
+                throw new SemanticException("Cannot assign a value " +
+                           "to final field \"" + fi.name() + "\"",
+                           a.position());
+            }
+        }                        
+    }
+    
+    /**
+     * Check that the set of <code>LocalInstance</code>s 
+     * <code>localsUsed</code>, which is the set of locals used in the inner 
+     * class declared by <code>cb</code>
+     * are initialized before the class declaration.
+     */
+    protected void checkLocalsUsedByInnerClass(FlowGraph graph, 
+                                               ClassBody cb,
+                                               Set localsUsed,
+                                               DataFlowItem dfIn,
+                                               DataFlowItem dfOut) 
+    throws SemanticException {
+        for (Iterator iter = localsUsed.iterator(); iter.hasNext(); ) {
+            LocalInstance li = (LocalInstance)iter.next();
+            MinMaxInitCount initCount = (MinMaxInitCount)
+                                            dfOut.initStatus.get(li);                                
+    
+            if (initCount == null) {
+                // the local wasn't defined in this scope.
+                currCBI.outerLocalsUsed.add(li);
+            }
+            else if (InitCount.ZERO.equals(initCount.getMin())) {
+                throw new SemanticException("Local variable \"" + li.name() +
+                        "\" must be initialized before the class " + 
+                        "declaration.",
+                        cb.position());
+            }            
+        }
+    }
+
+    
 }
