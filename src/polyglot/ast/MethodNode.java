@@ -267,8 +267,14 @@ public class MethodNode extends ClassMember {
     
 
     if( !mtiThis.getAccessFlags().isAbstract()) {
-      w.newline( 0);
-      body.translate(c, w);
+      // FIXME should be abstract for interfaces.
+      if( body != null) {
+        w.newline( 0);
+        body.translate(c, w);
+      }
+      else {
+        w.write( ";");
+      }
     }
     else {
       w.write( ";");
@@ -341,42 +347,45 @@ public class MethodNode extends ClassMember {
   {
     boolean bThrowDeclared;
 
-    Annotate.addThrows ( this, Annotate.getThrows(body ) );
+    if( body != null) {
+      Annotate.addThrows ( this, Annotate.getThrows(body ) );
 
-    // check our exceptions:
-    
-    SubtypeSet s = jltools.util.Annotate.getThrows( this );
-    if ( s != null)
-    {
-      for (Iterator i = s.iterator(); i.hasNext() ; )
+      // check our exceptions:
+      
+      SubtypeSet s = jltools.util.Annotate.getThrows( this );
+      if ( s != null)
       {
-        bThrowDeclared = false;
-        Type t = (Type)i.next();
-
-        if ( !t.isUncheckedException() )
+        for (Iterator i = s.iterator(); i.hasNext() ; )
         {
-          for (Iterator i2 = exceptions.iterator(); i2.hasNext() ; )
+          bThrowDeclared = false;
+          Type t = (Type)i.next();
+          
+          if ( !t.isUncheckedException() )
           {
-            Type t2 =  (ClassType)  ((TypeNode)i2.next()).getType();
-            if ( t.equals (t2) || t.descendsFrom (t2 ))
+            for (Iterator i2 = exceptions.iterator(); i2.hasNext() ; )
             {
-              bThrowDeclared = true; 
-              break;
+              Type t2 =  (ClassType)  ((TypeNode)i2.next()).getType();
+              if ( t.equals (t2) || t.descendsFrom (t2 ))
+              {
+                bThrowDeclared = true; 
+                break;
+              }
             }
+            if ( ! bThrowDeclared)
+              throw new TypeCheckException ( 
+                               "Method \"" + name + "\" throws the undeclared "
+                               + "exception \"" + t.getTypeString() + "\".");
           }
-          if ( ! bThrowDeclared)
-            throw new TypeCheckException ( 
-                        "Method \"" + name + "\" throws the undeclared "
-                        + "exception \"" + t.getTypeString() + "\".");
         }
       }
+       
+      // make sure that all paths return, if our return type is not void
+      if ( !mtiThis.getReturnType().equals (c.getTypeSystem().getVoid() ) &&
+             !Annotate.terminatesOnAllPaths ( body ) )
+        throw new TypeCheckException ( 
+                          "Not all execution paths in the method \""
+                          + name + "\" lead to a return or throw statement.");
     }
-
-    // make sure that all paths return, if our return type is not void
-    if ( !mtiThis.getReturnType().equals (c.getTypeSystem().getVoid() ) &&
-         !Annotate.terminatesOnAllPaths ( body ) )
-      throw new TypeCheckException ( "Not all execution paths in the method \""
-                        + name + "\" lead to a return or throw statement.");
       
     c.leaveMethod(  ) ;
     return this;
@@ -406,8 +415,11 @@ public class MethodNode extends ClassMember {
       i.set( t);
     }
 
-    body = (BlockStatement) body.visit(v); 
-    return v.mergeVisitorInfo( Annotate.getVisitorInfo( body), vinfo);
+    if( body != null) {
+      body = (BlockStatement) body.visit(v); 
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( body), vinfo);
+    }
+    return vinfo;
   }
 
   public Node copy() {

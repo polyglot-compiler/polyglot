@@ -7,6 +7,8 @@ import java.io.*;
 
 public class MainErrorQueueFactory implements ErrorQueueFactory
 {
+  private static final int ERROR_COUNT_LIMIT = 98;
+
   private PrintStream err;
 
   public MainErrorQueueFactory()
@@ -51,6 +53,12 @@ public class MainErrorQueueFactory implements ErrorQueueFactory
       else {
         err.println( filename + ":" +  e.getLineNumber() + ": " 
                      + e.getMessage());
+      }
+
+      if( errorCount > ERROR_COUNT_LIMIT) {
+        err.println( filename + ": Too many errors. Aborting compilation.");
+        flush();
+        throw new ErrorLimitError();
       }
     }
 

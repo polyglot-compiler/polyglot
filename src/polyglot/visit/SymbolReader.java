@@ -83,7 +83,7 @@ public class SymbolReader extends NodeVisitor
   public void setPackageName( String packageName) throws TypeCheckException
   {
     this.packageName = packageName;
-    this.it = new ImportTable( systemResolver);
+    this.it = new ImportTable( systemResolver, true);
 
     it.addPackageImport("java.lang");
     if( packageName != null) {

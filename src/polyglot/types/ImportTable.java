@@ -19,8 +19,10 @@ import java.util.Iterator;
  **/
 public  class ImportTable implements ClassResolver {
   // DOCME
-  public ImportTable(ClassResolver base) {
+  public ImportTable(ClassResolver base, boolean shouldCache) {
     resolver = base;
+    caching = shouldCache;
+
     map = new HashMap();
     packageImports = new HashSet();
   }
@@ -69,14 +71,18 @@ public  class ImportTable implements ClassResolver {
 	String fullName = pkgName + "." + name;
 	try {
 	  ClassType class_ = resolver.findClass(fullName);
-	  map.put(name, class_);
+          if( caching) {
+            map.put(name, class_);
+          }
 	  return class_;
 	} catch (NoClassException ex) { /* Do nothing. */ }
       }
       // The name was short, but not in any imported class or package.
       // Check the null package.
       ClassType class_ = resolver.findClass(name); // may throw exception
-      map.put(name,class_);
+      if( caching) {
+        map.put(name,class_);
+      }
       return class_;
     } 
     // The name was long.
@@ -85,6 +91,8 @@ public  class ImportTable implements ClassResolver {
 
   // The underlying resolver.
   ClassResolver resolver;
+  // Should this table cache classes.
+  boolean caching;
   // A list of all package imports.
   Set packageImports;
   // Map from names to classes found.

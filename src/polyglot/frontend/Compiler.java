@@ -10,7 +10,7 @@ import jltools.visit.*;
 import java.io.*;
 import java.util.*;
 
-public class Compiler implements TargetTable
+public class Compiler implements TargetTable, ClassCleaner
 {
   /* Global constants. */
   public static String OPT_OUTPUT_WIDTH     = "Output Width (Integer)";
@@ -184,6 +184,13 @@ public class Compiler implements TargetTable
     }
   }
 
+  public boolean cleanClass( ClassType clazz) throws IOException
+  {
+    Job job = lookupJob( clazz);
+
+    return compile( job, CLEANED);
+  } 
+
   public boolean compile( Target t) throws IOException
   {
     return compile( t, TRANSLATED);
@@ -242,7 +249,7 @@ public class Compiler implements TargetTable
       /* READ. */
       if( (job.status & READ) == 0) {
         verbose( this, "reading " + job.t.getName() + "...");
-        job.cr = new TableClassResolver();
+        job.cr = new TableClassResolver( this);
         parsedResolver.addClassResolver( job.cr);
         job.it = readSymbols( job.ast, job.cr, job.eq);
 
@@ -358,6 +365,13 @@ public class Compiler implements TargetTable
   
   
   /* Protected Methods. */
+  protected Job lookupJob( ClassType clazz) throws IOException
+  {
+    Target t = tf.createClassTarget( clazz.getFullName());
+
+    return lookupJob( t);
+  }
+
   protected Job lookupJob( Target t) throws IOException
   {
     Job job = new Job( t, eqf.createQueue( t.getName(), t.getSourceReader()));
@@ -406,6 +420,7 @@ public class Compiler implements TargetTable
     }
     catch( Exception e)
     {
+      e.printStackTrace();
       eq.enqueue( ErrorInfo.INTERNAL_ERROR, e.getMessage());
       return null;
     }

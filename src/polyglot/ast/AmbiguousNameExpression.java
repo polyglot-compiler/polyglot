@@ -91,11 +91,6 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 
   public void translate( LocalContext c, CodeWriter w)
   {
-    // FIXME: Shouldn't get in here.
-    //w.write ("< AMBIGOUS NAME: ");
-    //dump(c, w);
-    //w.write ( "> ");
-    
     /*
     for (Iterator i = names.listIterator(); i.hasNext(); )
     {
@@ -104,7 +99,8 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
         w.write(".");
     }
     */
-      throw new InternalCompilerError( 
+    
+    throw new InternalCompilerError( 
 			    "Attempted to translate an ambiguous node.");
   }
 

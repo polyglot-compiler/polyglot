@@ -827,6 +827,7 @@ interface_declaration ::=
 	;
 extends_interfaces_opt ::=
 					// List of TypeNode
+			{: RESULT = new LinkedList(); :}
 	|	extends_interfaces:a
 			{: RESULT = a; :}
 	;

@@ -123,10 +123,10 @@ public class ConstructorCallStatement extends Statement {
   
   public Node dump( CodeWriter w)
   {
-    w.write( "(  CONSTRUCTOR CALL STMT ");
+    w.write( " ( CONSTRUCTOR CALL STMT");
     dumpNodeInfo( w);
-    w.write(( type == THIS ? "< this >" : "< super >"));
-    w.write (" )");
+    w.write(( type == THIS ? " < this > " : " < super > "));
+    w.write (")");
     return null;
   }
 

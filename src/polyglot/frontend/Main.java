@@ -5,7 +5,7 @@ import java.util.*;
 
 import jltools.ast.Node;
 import jltools.frontend.Compiler;
-import jltools.util.UnicodeWriter;
+import jltools.util.*;
 
 public class Main
 {
@@ -64,7 +64,10 @@ public class Main
                           + targetName + ": " + e.getMessage());
       System.exit( 1);
     }
-
+    catch( ErrorLimitError ele)
+    {
+      System.exit( 1);
+    }
 
     /* Make sure we do this before we exit. */
     Collection completed = new LinkedList();

@@ -9,6 +9,7 @@ utl_files 	= Annotate.java \
 			ErrorInfo.java \
 			ErrorQueue.java \
 			ErrorQueueFactory.java \
+			ErrorLimitError.java \
 			FilteringIterator.java \
 			InternalCompilerError.java \
 			NestedMap.java \

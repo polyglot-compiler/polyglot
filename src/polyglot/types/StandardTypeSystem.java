@@ -23,7 +23,8 @@ public class StandardTypeSystem extends TypeSystem {
   public StandardTypeSystem(ClassResolver resolver) 
   {
     this.resolver = resolver;
-    this.emptyImportTable = new ImportTable(new CompoundClassResolver());
+    this.emptyImportTable = new ImportTable( new CompoundClassResolver(), 
+                                             false);
   }
 
   /**
@@ -390,8 +391,7 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public Type checkAndResolveType(Type type, Context context) throws TypeCheckException {
 
-    //System.out.println( "resolving: " + type.getTypeString() + " (" 
-    //                    + type.getClass().getName() + ") ");
+    //    System.out.println( "resolving: " + type.getTypeString() + " (" + type.getClass().getName() + ") ");
 
     if (type.isCanonical()) return type;
     if (type instanceof ArrayType) {
@@ -430,8 +430,7 @@ public class StandardTypeSystem extends TypeSystem {
 	// any inners by that name.  If they _both_ do, that's an error.
 	Type resultFromOuter = null;
 	Type resultFromParent = null;
-        //        System.out.println("in " + inClass.getTypeString() + " super: " + 
-        //                 inClass.getSuperType());
+        //        System.out.println("in " + inClass.getTypeString() + " super: " + inClass.getSuperType());
 	ClassType parentType = (ClassType)inClass.getSuperType();
 	ClassType outerType = inClass.getContainingClass();
 	if (outerType != null) {

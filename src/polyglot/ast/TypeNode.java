@@ -93,6 +93,9 @@ public class TypeNode extends Node {
   {
     w.write( "( TYPE");
     w.write( " < " + type.getTypeString() + " > ");
+    if( type instanceof AmbiguousType) {
+      w.write( "AMB ");
+    }
     dumpNodeInfo( w);
     w.write( ")");
     return null;

@@ -301,22 +301,18 @@ public class BinaryExpression extends Expression {
       if( !ltype.isPrimitive()) {
         throw new TypeCheckException( 
                   "Additive operators must have numeric operands.");
-        //      setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
       }
       else if( !((PrimitiveType)ltype).isNumeric()) {
         throw new TypeCheckException( 
                   "Additive operators must have numeric operands.");
-        //      setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
       }
       else if( !rtype.isPrimitive()) {
         throw new TypeCheckException(
                   "Additive operators must have numeric operands.");
-        //        setCheckedType( ltype);
       }
       else if( !((PrimitiveType)rtype).isNumeric()) {
         throw new TypeCheckException(
                   "Additive operators must have numeric operands.");
-        //        setCheckedType( ltype);
       }
       else {
         setCheckedType( PrimitiveType.binaryPromotion( (PrimitiveType)ltype,
@@ -333,13 +329,11 @@ public class BinaryExpression extends Expression {
       if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
         throw new TypeCheckException(
                   "Expected numeric operands to multiplicative operator.");
-        //        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
       }
       else if( !(((PrimitiveType)ltype).isNumeric()
                  && ((PrimitiveType)rtype).isNumeric())) {
         throw new TypeCheckException(
                   "Expected numeric operands to multiplicative operator.");
-        //        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
       }
       else {
         setCheckedType( PrimitiveType.binaryPromotion( (PrimitiveType)ltype,
@@ -357,7 +351,6 @@ public class BinaryExpression extends Expression {
       if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
         throw new TypeCheckException(
                  "Expected primitive operands to bitwise binary operator.");
-        //        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
       }
       else if( ((PrimitiveType)ltype).isNumeric()
                && ((PrimitiveType)rtype).isNumeric()) {
@@ -383,13 +376,11 @@ public class BinaryExpression extends Expression {
       if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
         throw new TypeCheckException(
                   "Expected numeric operands to shift operator.");
-        //        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
       }
       else if( !(((PrimitiveType)ltype).isNumeric()
                  && ((PrimitiveType)rtype).isNumeric())) {
         throw new TypeCheckException(
                   "Expected numeric operands to shift operator.");
-        //        setCheckedType( c.getTypeSystem().getVoid()); /* FIXME */
       }
       else {
         setCheckedType( PrimitiveType.unaryPromotion( (PrimitiveType)ltype));
@@ -397,7 +388,6 @@ public class BinaryExpression extends Expression {
       break;
       
     default:
-      /* FIXME */
       throw new TypeCheckException(
                 "Internal error: unknown binary operator.");
     }

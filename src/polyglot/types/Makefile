@@ -7,6 +7,7 @@ tp_files 	= AccessFlags.java	\
 			ClassResolver.java \
 			ClassType.java \
 			ClassTypeImpl.java \
+			ClassCleaner.java \
 			CompoundClassResolver.java \
 			ConstructorType.java \
 			ConstructorTypeInstance.java \
