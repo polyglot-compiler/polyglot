@@ -273,6 +273,13 @@ public interface TypeSystem {
     MethodInstance findMethod(ReferenceType container,
                               String name, List argTypes,
                               ClassType currClass) throws SemanticException;
+    /**
+     * Deprecated version of the findMethod method.
+     * @deprecated
+     */
+    MethodInstance findMethod(ReferenceType container,
+                              String name, List argTypes,
+                              Context c) throws SemanticException;
 
     /**
      * Find a constructor.  We need to pass the class from which the constructor
@@ -286,13 +293,27 @@ public interface TypeSystem {
                                         ClassType currClass) throws SemanticException;
 
     /**
+     * Deprecated version of the findConstructor method.
+     * @deprecated
+     */
+    ConstructorInstance findConstructor(ClassType container, List argTypes,
+                                        Context c) throws SemanticException;
+
+    /**
      * Find a member class.
-     * We check if the field is accessible from the context 'c'.
+     * We check if the field is accessible from the class currClass.
      * @exception SemanticException if the class cannot be found or is
      * inaccessible.
      */
+    ClassType findMemberClass(ClassType container, String name, ClassType currClass)
+    throws SemanticException;
+
+    /**
+     * Deprecated version of the findMemberClass method.
+     * @deprecated
+     */
     ClassType findMemberClass(ClassType container, String name, Context c)
-	throws SemanticException;
+    throws SemanticException;
 
     /**
      * Find a member class.

@@ -570,14 +570,22 @@ public class TypeSystem_c implements TypeSystem
                                     container + "\".");
     }
 
+    /**
+     * @deprecated
+     */
     public ClassType findMemberClass(ClassType container, String name,
                                      Context c) throws SemanticException {
+        return findMemberClass(container, name, c.currentClass());
+    }
+    
+    public ClassType findMemberClass(ClassType container, String name,
+                                     ClassType currClass) throws SemanticException {
 
         assert_(container);
 
         ClassType t = findMemberClass(container, name);
 
-        if (! isAccessible(t, c)) {
+        if (! isAccessible(t, currClass)) {
             throw new SemanticException("Cannot access member \"" + t + "\".");
         }
 
@@ -647,6 +655,14 @@ public class TypeSystem_c implements TypeSystem
     }
 
     /**
+     * @deprecated
+     */
+    public MethodInstance findMethod(ReferenceType container,
+                                 String name, List argTypes, Context c)
+    throws SemanticException {
+        return findMethod(container, name, argTypes, c.currentClass());
+    }
+    /**
      * Requires: all type arguments are canonical.
      *
      * Returns the MethodInstance named 'name' defined on 'type' visible in
@@ -682,6 +698,15 @@ public class TypeSystem_c implements TypeSystem
 	return mi;
     }
 
+    /**
+     * @deprecated
+     */
+    public ConstructorInstance findConstructor(ClassType container,
+                                 List argTypes, Context c)
+    throws SemanticException {
+        return findConstructor(container, argTypes, c.currentClass());
+    }
+    
     public ConstructorInstance findConstructor(ClassType container,
                            List argTypes, ClassType currClass)
 	throws SemanticException {
