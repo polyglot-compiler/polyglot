@@ -68,7 +68,7 @@ public class Main
       // be fixed somehow. XXX###@@@
       Options.global = options;
       try {
-            argv = (String[]) args.toArray(new String[0]);
+          argv = (String[]) args.toArray(new String[0]);
           options.parseCommandLine(argv, source);
       }
       catch (UsageError ue) {
@@ -96,25 +96,24 @@ public class Main
   
       /* Now call javac or jikes, if necessary. */
       if (options.post_compiler != null && !options.output_stdout) {
-        Runtime runtime = Runtime.getRuntime();
-  
-        Iterator iter = compiler.outputFiles().iterator();
+          Runtime runtime = Runtime.getRuntime();
+
+          Iterator iter = compiler.outputFiles().iterator();
           String outputFiles = "";
           while(iter.hasNext()) {
             outputFiles += (String)iter.next() + " ";
           }
-  
-            String command = options.post_compiler + " -classpath " +
-                          options.constructPostCompilerClasspath() + " "
-                           + outputFiles;
-  
-            if (Report.should_report(verbose, 1))
-                Report.report(1, "Executing post-compiler " + command);
-  
-            try 
-            {
+
+          String command = options.post_compiler + " -classpath " +
+                        options.constructPostCompilerClasspath() + " "
+                        + outputFiles;
+
+          if (Report.should_report(verbose, 1))
+              Report.report(1, "Executing post-compiler " + command);
+
+          try {
               Process proc = runtime.exec(command);
-  
+
               InputStreamReader err = 
                 new InputStreamReader(proc.getErrorStream());
               char[] c = new char[72];
@@ -122,23 +121,22 @@ public class Main
               while((len = err.read(c)) > 0) {
                 System.err.print(String.valueOf(c, 0, len));
               }
-  
+
               proc.waitFor();
-  
+
               if (!options.keep_output_files) {
                 String command2 = "rm " + outputFiles;
                 runtime.exec(command2);
               }
-  
+
               if (proc.exitValue() > 0) {
                 System.exit(proc.exitValue());
               }
-            }
-            catch(Exception e)  
-            {
-                  throw new TerminationException("Caught Exception while running compiler: "
-                                    + e.getMessage());
-            }
+          }
+          catch(Exception e) {
+                throw new TerminationException("Caught Exception while running compiler: "
+                                  + e.getMessage());
+          }
       }
   
       if (Report.should_report(verbose, 1)) {
