@@ -30,7 +30,7 @@ import jltools.util.jlgen.util.*;
 					}
 					System.exit(1);				}
 			}		}
-	}		private boolean isSameProduction (Vector u, Vector v) {		int uIdx = 0, vIdx = 0;
+	}		public static boolean isSameProduction (Vector u, Vector v) {		int uIdx = 0, vIdx = 0;
 		GrammarPart ug = null, vg = null;
 
 		while (uIdx < u.size() && vIdx < v.size()) {
@@ -48,38 +48,17 @@ import jltools.util.jlgen.util.*;
 			// one of the lists was not seen all the way, 			// must check that only semantic actions are left			if (uIdx < u.size()) {				for (; uIdx < u.size(); uIdx++) {					ug = (GrammarPart) u.elementAt(uIdx);					if (! (ug instanceof SemanticAction))						return false;				}
 				return true;			} else { // vIdx < v.size()				for (; vIdx < v.size(); vIdx++) {					vg = (GrammarPart) v.elementAt(vIdx);					if (! (vg instanceof SemanticAction))						return false;				}
 				return true;			}
-		}	}		public void union (Production prod) {		Vector additional = prod.getRHS();
-		union(additional);
-	}
+		}	}		public void union (Production prod) {		Vector additional = prod.getRHS();		union(additional);	}
 	
 	public void union (Vector prodList) {		Vector toAdd, current;
-		for (int i=0; i < prodList.size(); i++) {
-			toAdd = (Vector) prodList.elementAt(i);
-			for (int j=0; j < rhs.size(); j++) {
-				current = (Vector) rhs.elementAt(i);
-				if (isSameProduction(toAdd, current))
-					break;
-				if (j == rhs.size() - 1)
-					rhs.addElement(toAdd);
-			}
-		}
-	}	
+		for (int i=0; i < prodList.size(); i++) {			toAdd = (Vector) prodList.elementAt(i);			for (int j=0; j < rhs.size(); j++) {				current = (Vector) rhs.elementAt(i);				if (isSameProduction(toAdd, current))					break;				if (j == rhs.size() - 1)					rhs.addElement(toAdd);			}		}	}	
 	public void add (Production prod) {		//assertSameLHS(prod, "add");
-		Vector additional = prod.getRHS();
-		for (int i=0; i < additional.size(); i++) {
-			rhs.addElement( additional.elementAt(i) );	
-		}
+		Vector additional = prod.getRHS();		for (int i=0; i < additional.size(); i++) {			rhs.addElement( additional.elementAt(i) );			}	}
+	public void addToRHS (Vector rhsPart) {
+		rhs.addElement(rhsPart);
 	}
 	
-	private void assertSameLHS(Production prod, String function) {
-		if (! (prod.getLHS().equals(lhs)) ) {
-			System.err.println(HEADER + "nonterminals do not match in Production."+
-							   function + "(): current is "+lhs+", given: "+
-							   prod.getLHS());
-			System.exit(1);
-		}
-	}
-	
+	private void assertSameLHS(Production prod, String function) {		if (! (prod.getLHS().equals(lhs)) ) {			System.err.println(HEADER + "nonterminals do not match in Production."+							   function + "(): current is "+lhs+", given: "+							   prod.getLHS());			System.exit(1);		}	}
 	public void unparse (CodeWriter cw) {		cw.begin(0);
 		cw.write(lhs.toString() + " ::=");
 		cw.allowBreak(3);		Vector rhs_part;

@@ -26,12 +26,46 @@ public class CUPSpec extends Spec
 		productions = prods;
 		hashNonterminals();
 	}
-	
 	private void hashNonterminals() {		ntProds = new Hashtable();		if (productions == null)			return;				Production prod;
 		for (int i=0; i < productions.size(); i++) {			prod = (Production) productions.elementAt(i);
 			ntProds.put(prod.getLHS().getName(), new Integer(i));
 		}	}
-		public CUPSpec coalesce() {		// cannot have a parent by definition		return this;	}	
+		public CUPSpec coalesce() {		// cannot have a parent by definition		return this;	}
+	
+	/**
+	 * Provides a copy of the production that was present in the original
+	 * grammar, but is equal (minus semantic actions) to the given production set.
+	 * Thus, we transfer the semantic actions without having to re-specify them.
+	 */
+	public Production findProduction (Production p) {
+		// find the nonterminal which would contain this production
+		Nonterminal nt = p.getLHS();		int pos = errorNotFound(findNonterminal(nt), nt);
+		Production sourceProd = (Production) productions.elementAt(pos);
+		Vector sourceRHSList = sourceProd.getRHS();
+
+		Vector rhs = p.getRHS();
+		Production result = new Production(nt, new Vector());
+
+		Vector toMatch, source, clone;
+		for (int i=0; i < rhs.size(); i++) {
+			toMatch = (Vector) rhs.elementAt(i);
+			for (int j=0; j < sourceRHSList.size(); j++) {
+				source = (Vector) sourceRHSList.elementAt(j);
+				if (Production.isSameProduction(toMatch, source)) {
+					clone = new Vector();
+					for (int k=0; k < source.size(); k++) {
+						clone.addElement( ((GrammarPart)source.elementAt(k)).clone() );
+					}
+					//result.addToRHS((Vector) source.clone());
+					result.addToRHS(clone);
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	public void removeEmptyProductions () {
 		Production prod;		for (int i=0; i < productions.size(); i++) {
 			prod = (Production) productions.elementAt(i);			if (prod.getRHS().size() == 0) {				productions.removeElementAt(i);				i--;			}

@@ -122,11 +122,14 @@ public class JLgenSpec extends Spec
 	}		private void processTransferR (CUPSpec combined, CUPSpec newSpec) {
 		// TRANSFER_R
 		Command cmd;
-		TransferCmd transfer;		Production prod;		Vector prodList;		for (int i=0; i < commands.size(); i++) {
+		TransferCmd transfer;		Production prod, prodTransfer;		Vector prodList;		for (int i=0; i < commands.size(); i++) {
 			cmd = (Command) commands.elementAt(i);			if (cmd instanceof TransferCmd) {
 				transfer = (TransferCmd) cmd;
 				prodList = transfer.getTransferList();				for (int j=0; j < prodList.size(); j++) {
-					prod = (Production) prodList.elementAt(j);					newSpec.addProductions(prod);				}			}
+					prod = (Production) prodList.elementAt(j);
+					prodTransfer = combined.findProduction(prod);
+					newSpec.addProductions(prodTransfer);
+					//newSpec.addProductions(prod);				}			}
 		}	}		private void processNew (CUPSpec combined, CUPSpec newSpec) {
 		// NEW PRODUCTIONS		NewProdCmd newProd;		Command cmd;
 		for (int i=0; i < commands.size(); i++) {

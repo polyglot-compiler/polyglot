@@ -10,4 +10,4 @@ B ::=
 |	a l i ;
 
 
-C ::= d e f;
+C ::= d e f {: sem act :};
