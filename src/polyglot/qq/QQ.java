@@ -35,14 +35,14 @@ import java.io.*;
     <li> <code>%T</code> matches <code>Type</code> or <code>TypeNode></code>
     <li> <code>%E</code> matches <code>Expr</code>
     <li> <code>%S</code> matches <code>Stmt</code>
-    <li> <code>%C</code> matches <code>ClassDecl</code>
+    <li> <code>%D</code> matches <code>ClassDecl</code>
     <li> <code>%M</code> matches <code>ClassMember</code>
     <li> <code>%F</code> matches <code>Formal</code>
 
     <li> <code>%LT</code> matches <code>List&lt;Type&gt;</code> or <code>List&lt;TypeNode&gt;</code>
     <li> <code>%LE</code> matches <code>List&lt;Expr&gt;</code>
     <li> <code>%LS</code> matches <code>List&lt;Stmt&gt;</code>
-    <li> <code>%LC</code> matches <code>List&lt;ClassDecl&gt;</code>
+    <li> <code>%LD</code> matches <code>List&lt;ClassDecl&gt;</code>
     <li> <code>%LM</code> matches <code>List&lt;ClassMember&gt;</code>
     <li> <code>%LF</code> matches <code>List&lt;Formal&gt;</code>
   </ul>
