@@ -99,7 +99,7 @@ public class ReachChecker extends DataFlow
                     // peers may have no successors (e.g. peers that throw an
                     // an exception that is not caught by the method). So we need 
                     // to also check the inItem.
-                    if (p.inItem != null && ((DataFlowItem)p.inItem).reachable) {
+                    if (p.inItem() != null && ((DataFlowItem)p.inItem()).reachable) {
                         return n.reachable(true);                
                     }
                     

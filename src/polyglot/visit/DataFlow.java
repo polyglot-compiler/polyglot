@@ -64,6 +64,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         }
         FlowGraph flowgraph;
         CodeDecl source;
+        public FlowGraph flowGraph() { return flowgraph; }
+        public CodeDecl source() { return source; }
     }
     
     /**
@@ -503,6 +505,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         }
         Item trueItem;
         Item falseItem;
+        public Item trueItem() { return trueItem; }
+        public Item falseItem() { return falseItem; }
         public String toString() {
             return "[ true: " + trueItem + "; false: " + falseItem + " ]";
         }
