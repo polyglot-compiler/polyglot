@@ -103,7 +103,7 @@ public class SourceClassResolver extends LoadedClassResolver
    * Find a type by name.
    */
   public Type findType(String name) throws SemanticException {
-    if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
+    if (Report.should_report(report_topics, 3))
 	Report.report(3, "SourceCR.findType(" + name + ")");
 
     ClassFile clazz = null;
@@ -116,8 +116,8 @@ public class SourceClassResolver extends LoadedClassResolver
 
       // Check for encoded type information.
       if (clazz.encodedClassType(version.name()) != null) {
-        if (Report.should_report(new String[] {Report.types, Report.resolver}, 4))
-	    Report.report(4, "Class " + name + " has encoded type info");
+        if (Report.should_report(report_topics, 4))
+          Report.report(4, "Class " + name + " has encoded type info");
         encodedClazz = clazz;
       }
     }
@@ -128,18 +128,18 @@ public class SourceClassResolver extends LoadedClassResolver
     // Now, try and find the source file.
     try {
       source = ext.sourceLoader().classSource(name);
-      if (Report.should_report(new String[] {Report.types, Report.resolver}, 4))
+      if (Report.should_report(report_topics, 4))
 	Report.report(4, "Class " + name + " found in source " + source);
     }
     catch (IOException e) {
-      if (Report.should_report(new String[] {Report.types, Report.resolver}, 4))
+      if (Report.should_report(report_topics, 4))
 	Report.report(4, "Class " + name + " not found in source file");
       source = null;
     }
 
     // Don't use the raw class if the source or encoded class is available.
     if (encodedClazz != null || source != null) {
-      if (Report.should_report(new String[] {Report.types, Report.resolver}, 4))
+      if (Report.should_report(report_topics, 4))
 	Report.report(4, "Not using raw class file for " + name);
       clazz = null;
     }
@@ -153,39 +153,42 @@ public class SourceClassResolver extends LoadedClassResolver
       int comp = checkCompilerVersion(encodedClazz.compilerVersion(version.name()));
 
       if (classModTime < sourceModTime) {
-        if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
+        if (Report.should_report(report_topics, 3))
 	    Report.report(3, "Source file version is newer than compiled for " +
                       name + ".");
         encodedClazz = null;
       }
       else if (comp != COMPATIBLE) {
         // Incompatible or older version, so go with the source.
-        if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
+        if (Report.should_report(report_topics, 3))
 	    Report.report(3, "Incompatible source file version for " + name + ".");
         encodedClazz = null;
       }
-      else {
-        source = null;
+    }
+
+    if (encodedClazz != null) {
+      if (Report.should_report(report_topics, 4))
+	Report.report(4, "Using encoded class type for " + name);
+      try {
+        return getEncodedType(encodedClazz, name);
+      }
+      catch (SemanticException e) {
+        if (Report.should_report(report_topics, 4))
+          Report.report(4, "Could not load encoded class " + name);
+        encodedClazz = null;
       }
     }
 
-    // At this point, at most one of clazz, encodedClazz, and source
-    // should be set.
+    // At this point, at most one of clazz and source should be set.
 
     if (clazz != null) {
-      if (Report.should_report(new String[] {Report.types, Report.resolver}, 4))
+      if (Report.should_report(report_topics, 4))
 	Report.report(4, "Using raw class file for " + name);
       return clazz.type(ts);
     }
 
-    if (encodedClazz != null) {
-      if (Report.should_report(new String[] {Report.types, Report.resolver}, 4))
-	Report.report(4, "Using encoded class type for " + name);
-      return getEncodedType(encodedClazz, name);
-    }
-
     if (source != null) {
-      if (Report.should_report(new String[] {Report.types, Report.resolver}, 4))
+      if (Report.should_report(report_topics, 4))
 	Report.report(4, "Using source file for " + name);
       return getTypeFromSource(source, name);
     }
