@@ -103,7 +103,7 @@ public class CollectionUtil
 	 */
 	public static List map(List l, Transformation t) {
 		List m = new ArrayList(l.size());
-		for (Iterator i = new TransformingIterator(l, t); 
+		for (Iterator i = new TransformingIterator(l.iterator(), t); 
 			i.hasNext(); )
 		{
 			m.add(i.next());
