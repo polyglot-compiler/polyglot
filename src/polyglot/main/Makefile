@@ -2,14 +2,14 @@ SOURCE = ../..
 PACKAGE = jltools/main
 SUBDIRS =
 
+include $(SOURCE)/Rules.mk
+
 SOURCES = \
 	Main.java \
 	Options.java \
 	MainTargetFactory.java
 
-CLASSES = $(patsubst %.java, %.class, $(SOURCES))
-
-include $(SOURCE)/Rules.mk
+CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
 all: $(CLASSES)
 

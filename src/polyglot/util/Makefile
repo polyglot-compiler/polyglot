@@ -2,6 +2,8 @@ SOURCE = ../..
 PACKAGE = jltools/util
 SUBDIRS = typedump
 
+include $(SOURCE)/Rules.mk
+
 SOURCES = \
 	Annotate.java \
 	AnnotatedObject.java \
@@ -31,9 +33,7 @@ SOURCES = \
 	UniqueID.java \
 	WorkList.java
 
-CLASSES = $(patsubst %.java, %.class, $(SOURCES))
-
-include $(SOURCE)/Rules.mk
+CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
 all: $(CLASSES)
 	$(subdirs)

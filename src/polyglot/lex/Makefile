@@ -2,6 +2,8 @@ SOURCE = ../..
 PACKAGE = jltools/lex
 SUBDIRS =
 
+include $(SOURCE)/Rules.mk
+
 SOURCES = \
 	BooleanLiteral.java \
 	CharacterLiteral.java \
@@ -29,9 +31,7 @@ SOURCES = \
 	TraditionalComment.java \
 	WhiteSpace.java
 
-CLASSES = $(patsubst %.java, %.class, $(SOURCES))
-
-include $(SOURCE)/Rules.mk
+CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
 all: $(CLASSES)
 

@@ -2,6 +2,8 @@ SOURCE = ../..
 PACKAGE = jltools/frontend
 SUBDIRS =
 
+include $(SOURCE)/Rules.mk
+
 SOURCES = \
 	ClassTypeJob.java \
 	Compiler.java \
@@ -12,9 +14,7 @@ SOURCES = \
 	Target.java \
 	TargetFactory.java
 
-CLASSES = $(patsubst %.java, %.class, $(SOURCES))
-
-include $(SOURCE)/Rules.mk
+CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
 all: $(CLASSES)
 

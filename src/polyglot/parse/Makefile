@@ -2,14 +2,14 @@ SOURCE = ../..
 PACKAGE = jltools/parse
 SUBDIRS =
 
+include $(SOURCE)/Rules.mk
+
 SOURCES = \
 	SyntaxException.java \
 	Grm.java \
 	sym.java
 
-CLASSES = $(patsubst %.java, %.class, $(SOURCES))
-
-include $(SOURCE)/Rules.mk
+CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
 all: $(CLASSES)
 

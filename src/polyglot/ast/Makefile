@@ -2,6 +2,8 @@ SOURCE = ../..
 PACKAGE = jltools/ast
 SUBDIRS =
 
+include $(SOURCE)/Rules.mk
+
 SOURCES = \
 	AmbiguousExpression.java \
 	AmbiguousName.java \
@@ -69,9 +71,7 @@ SOURCES = \
 	VariableDeclarationStatement.java \
 	WhileStatement.java
 
-CLASSES = $(SOURCES:.java=.class)
-
-include $(SOURCE)/Rules.mk
+CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
 all: $(CLASSES)
 
