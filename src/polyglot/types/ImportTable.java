@@ -111,7 +111,23 @@ public class ImportTable extends ClassResolver
     }
 
     /**
-     * Find a type by name.
+     * Find a type by name, using the cache and the outer resolver,
+     * but not the import table.
+     */
+    protected Named cachedFind(String name) throws SemanticException {
+        Object res = map.get(name);
+
+        if (res != null) {
+            return (Named) res;
+        }
+
+        Named t = resolver.find(name);
+        map.put(name, t);
+        return t;
+    }
+
+    /**
+     * Find a type by name, searching the import table.
      */
     public Named find(String name) throws SemanticException {
 	// FIXME: need to keep on looking to find conflicts.
@@ -217,8 +233,55 @@ public class ImportTable extends ClassResolver
 		Report.report(2, this + ": import " + longName);
 
 	    try {
-		Named t = resolver.find(longName);
-		String shortName = StringUtil.getShortNameComponent(longName);
+                // Try to find a class named longName.
+                // The class maybe a static member class of another, so we'll
+                // make several attempts.
+                StringTokenizer st = new StringTokenizer(longName, ".");
+                String name = "";
+                Named t = null;
+
+                while (st.hasMoreTokens()) {
+                    String s = st.nextToken();
+                    name += s;
+
+                    try {
+                        t = cachedFind(name);
+
+                        if (! st.hasMoreTokens()) {
+                            // found it
+                            break;
+                        }
+
+                        if (t instanceof ClassType) {
+                            // If we find a class that is further qualfied,
+                            // search for member classes of that class.
+                            ClassType ct = (ClassType) t;
+
+                            while (st.hasMoreTokens()) {
+                                String n = st.nextToken();
+                                t = ct = ts.findMemberClass(ct, n);
+
+                                // cache the result
+                                map.put(n, ct);
+                            }
+                        }
+                        else {
+                            // t, whatever it is, is further qualified, but 
+                            // should be, at least in Java, a ClassType.
+                            throw new InternalCompilerError("Qualified type \"" + t + "\" is not a class type.", sourcePos);
+                        }
+                    }
+                    catch (SemanticException e) {
+                        if (! st.hasMoreTokens()) {
+                            throw e;
+                        }
+
+                        // try again with the next level of type qualification
+                        name += ".";
+                    }
+                }
+
+                String shortName = StringUtil.getShortNameComponent(longName);
 
                 if (Report.should_report(new String[] {Report.types, Report.resolver, Report.imports}, 2))
 		    Report.report(2, this + ": import " + shortName + " as " + t);
@@ -233,7 +296,7 @@ public class ImportTable extends ClassResolver
 		    }
 		}
 
-		map.put(longName, t);
+                // map.put(longName, t); // should already be in the cache
 		map.put(shortName, t);
 	    }
 	    catch (SemanticException e) {
