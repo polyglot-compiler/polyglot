@@ -142,6 +142,12 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         // Add a new SourceJob for the given source. If a Job for the source
         // already exists, then we will be given the existing job.
         SourceJob job = addJob(source);
+        
+        if (job == null) {
+            // addJob returns null if the job has already been completed, in
+            // which case we can just ignore the request to read in the source.
+            return true;
+        }
 
         // Run the new job up to the currentJob's SourceJob's last barrier, to
         // make sure that dependencies are satisfied.
@@ -434,8 +440,12 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
       return null;
     }
 
-    /**
+    /** 
      * Add a new <code>SourceJob</code> for the <code>Source source</code>.
+     * A new job will be created if
+     * needed. If the <code>Source source</code> has already been processed,
+     * and its job discarded to release resources, then <code>null</code> 
+     * will be returned.
      */
     public SourceJob addJob(Source source) {
         return addJob(source, null);
@@ -444,17 +454,20 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     /**
      * Add a new <code>SourceJob</code> for the <code>Source source</code>,
      * with AST <code>ast</code>.
+     * A new job will be created if
+     * needed. If the <code>Source source</code> has already been processed,
+     * and its job discarded to release resources, then <code>null</code> 
+     * will be returned.
      */
     public SourceJob addJob(Source source, Node ast) {
-        SourceJob job = (SourceJob) jobs.get(source);
-        
-        if (job == COMPLETED_JOB) {
-            // XXX is this correct? maybe return null, and change the
-            // semantics of the method?
-            throw new InternalCompilerError("A job for the source " + source 
-                 + " was requested, even though that job has finished.");
+        Object o = jobs.get(source);
+        SourceJob job = null;
+        if (o == COMPLETED_JOB) {
+            // the job has already been completed. 
+            // We don't need to add a job
+            return null;
         }        
-        else if (job == null) {
+        else if (o == null) {
             // No appropriate job yet exists, we will create one.
             
             // find an appropriate parent, if there is one.
@@ -476,6 +489,9 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             if (job.parent() == null) {
                 worklist.add(job);
             }
+        }
+        else {
+            job = (SourceJob)o;
         }
 
         return job;

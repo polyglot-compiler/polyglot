@@ -49,10 +49,21 @@ public interface ExtensionInfo {
     /** Produce a source factory for this language extension. */
     SourceLoader sourceLoader();
 
-    /** Produce a job for the given source. */
+    /** 
+     * Produce a job for the given source. A new job will be created if
+     * needed. If the <code>Source source</code> has already been processed,
+     * and its job discarded to release resources, then <code>null</code> 
+     * will be returned.
+     */
     SourceJob addJob(Source source);
 
-    /** Produce a job for a given source using the given AST. */
+    /** 
+     * Produce a job for a given source using the given AST.
+     * A new job will be created if
+     * needed. If the <code>Source source</code> has already been processed,
+     * and its job discarded to release resources, then <code>null</code> 
+     * will be returned.
+     */
     SourceJob addJob(Source source, Node ast);
 
     /**
