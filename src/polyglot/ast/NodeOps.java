@@ -25,15 +25,29 @@ public interface NodeOps
     Node visitChildren(NodeVisitor v);
 
     /**
-     * Push a new scope for visiting children and add any declarations
-     * to the new context that should be in scope when visiting
-     * children.  This should <i>not</i> update the old context
+     * Push a new scope upon entering this node, and add any declarations to the
+     * context that should be in scope when visiting children of this node.
+     * This should <i>not</i> update the old context
      * imperatively.  Use <code>addDecls</code> when leaving the node
      * for that.
-     *
-     * @param c The context in which to enter scope. 
+     * 
+     * @param c the current <code>Context</code>
+     * @return the <code>Context</code> to be used for visiting this node. 
      */
-    Context enterScope(Context c);
+    public Context enterScope(Context c);
+
+    /**
+     * Push a new scope for visiting the child node <code>child</code>. 
+     * The default behavior is to delegate the call to the child node, and let
+     * it add appropriate declarations that should be in scope. However,
+     * this method gives parent nodes have the ability to modify this behavior.
+     * 
+     * @param child the child node about to be entered.
+     * @param c the current <code>Context</code>
+     * @return the <code>Context</code> to be used for visiting node 
+     *           <code>child</code>
+     */
+    public Context enterScope(Node child, Context c);
 
     /**
      * Add any declarations to the context that should be in scope when

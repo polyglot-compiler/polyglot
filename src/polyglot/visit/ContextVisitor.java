@@ -71,14 +71,19 @@ public class ContextVisitor extends ErrorHandlingVisitor
     }
 
     /**
-     * Returns a new context based on the current context and the
-     * Node that is being entered.  This new context is to be used
-     * for visiting the children of <code>n</code>
+     * Returns a new context based on the current context, the Node current 
+     * being visited (<code>parent</code>), and the Node that is being 
+     * entered (<code>n</code>).  This new context is to be used
+     * for visiting <code>n</code>. 
      *
      * @return The new context after entering Node <code>n</code>.
      */
-    protected Context enterScope(Node n) {
-	return n.enterScope(context);
+    protected Context enterScope(Node parent, Node n) {
+        if (parent != null) {
+            return parent.enterScope(n, context);
+        }
+        // no parent node yet.
+        return n.enterScope(context);
     }
 
     /**
@@ -103,7 +108,7 @@ public class ContextVisitor extends ErrorHandlingVisitor
 
         ContextVisitor v = this;
 
-        Context c = this.enterScope(n);
+        Context c = this.enterScope(parent, n);
 
         if (c != this.context) {
             v = (ContextVisitor) this.copy();

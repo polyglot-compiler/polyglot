@@ -157,11 +157,13 @@ public class New_c extends Expr_c implements New
 	return reconstruct(qualifier, tn, arguments, body);
     }
 
-    public Context enterScope(Context c) {
-        if (anonType != null) {
+    public Context enterScope(Node child, Context c) {
+        if (child == body && anonType != null && body != null) {
             return c.pushClass(anonType, anonType);
         }
-        return c;
+        else {
+            return super.enterScope(child, c);
+        }
     }
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
@@ -499,14 +501,15 @@ FIXME: check super types as well.
                                         this.tn.position());
         }
 
-        // Now, type-check the body.
+        // Now, type-check the type node.
         return (TypeNode) visitChild(tn, tc);
     }
 
     protected ClassBody typeCheckBody(TypeChecker tc, ClassType superType)
         throws SemanticException
     {
-        ClassBody b = (ClassBody) tc.job().spawn(tc.context(), body,
+        Context c = tc.context().pushClass(anonType, anonType);
+        ClassBody b = (ClassBody) tc.job().spawn(c, body,
                                                  Pass.CLEAN_SUPER,
                                                  Pass.DISAM_ALL);
 

@@ -3,9 +3,6 @@ package polyglot.ast;
 import polyglot.util.Copy;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
-import polyglot.types.Context;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
 import polyglot.types.Type;
 import polyglot.visit.*;
 
@@ -79,14 +76,6 @@ public interface Node extends JL, Copy
     Node visitEdge(Node parent, NodeVisitor v);
 
     /**
-     * Visit the children of the node.
-     *
-     * @param v The visitor which will traverse/rewrite the AST.
-     * @return A new AST if a change was made, or <code>this</code>.
-     */
-    // Node visitChildren(NodeVisitor v);
-
-    /**
      * Visit a single child of the node.
      *
      * @param v The visitor which will traverse/rewrite the AST.
@@ -95,20 +84,6 @@ public interface Node extends JL, Copy
      * if <code>child</code> was <code>null</code>.
      */
     Node visitChild(Node child, NodeVisitor v);
-
-    /**
-     * Push a new scope for visiting children and add any declarations to the
-     * new context that should be in scope when visiting children.
-     * This should <i>not</i> update the old context imperatively.  Use
-     * <code>addDecls</code> when leaving the node for that.
-     */
-    // Context enterScope(Context c);
-
-    /**
-     * Add any declarations to the context that should be in scope when
-     * visiting later sibling nodes.
-     */
-    // void addDecls(Context c);
 
     /**
      * Get the expected type of a child expression of <code>this</code>.
