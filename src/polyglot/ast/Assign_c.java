@@ -90,6 +90,11 @@ public abstract class Assign_c extends Expr_c implements Assign
 
     TypeSystem ts = tc.typeSystem();
 
+    if (! (left instanceof Variable)) {
+        throw new SemanticException("Target of assignment must be a variable.",
+                                    position());
+    }
+
     if (op == ASSIGN) {
       if (! ts.isImplicitCastValid(s, t) &&
           ! ts.equals(s, t) &&

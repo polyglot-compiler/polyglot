@@ -109,6 +109,11 @@ public class Unary_c extends Expr_c implements Unary
 		    " operator must be numeric.", expr.position());
 	    }
 
+            if (! (expr instanceof Variable)) {
+		throw new SemanticException("Operand of " + op +
+		    " operator must be a variable.", expr.position());
+            }
+
 	    return type(expr.type());
 	}
 

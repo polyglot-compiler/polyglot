@@ -123,11 +123,13 @@ public class Conditional_c extends Expr_c implements Conditional
 	    // conditional expression is T.
 
             if (t1.isIntOrLess() &&
+                t2.isInt() &&
                 ts.numericConversionValid(t1, e2.constantValue())) {
                 return type(t1);
 	    }
 
             if (t2.isIntOrLess() &&
+                t1.isInt() &&
                 ts.numericConversionValid(t2, e1.constantValue())) {
                 return type(t2);
 	    }
