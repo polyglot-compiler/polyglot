@@ -87,19 +87,8 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
     /** Visit the children of the call. */
     public Node visitChildren(NodeVisitor v) {
-	Expr qualifier = null;
-
-	if (this.qualifier != null) {
-	    qualifier = (Expr) this.qualifier.visit(v);
-	}
-
-	List arguments = new ArrayList(this.arguments.size());
-	for (Iterator i = this.arguments.iterator(); i.hasNext(); ) {
-	    Expr n = (Expr) i.next();
-	    n = (Expr) n.visit(v);
-	    arguments.add(n);
-	}
-
+	Expr qualifier = (Expr) visitChild(this.qualifier, v);
+	List arguments = visitList(this.arguments, v);
 	return reconstruct(qualifier, arguments);
     }
 

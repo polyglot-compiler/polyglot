@@ -43,7 +43,7 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
     }
 
     public Node visitChildren(NodeVisitor v) {
-        TypeNode base = (TypeNode) this.base.visit(v);
+        TypeNode base = (TypeNode) visitChild(this.base, v);
 	return reconstruct(base);
     }
 

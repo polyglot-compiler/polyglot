@@ -63,12 +63,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
     }
 
     public Node visitChildren(NodeVisitor v) {
-	QualifierNode qual = null;
-
-	if (this.qual != null) {
-	    qual = (QualifierNode) this.qual.visit(v);
-	}
-
+	QualifierNode qual = (QualifierNode) visitChild(this.qual, v);
 	return reconstruct(qual);
     }
 

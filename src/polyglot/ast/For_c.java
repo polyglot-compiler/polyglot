@@ -90,28 +90,10 @@ public class For_c extends Stmt_c implements For
 
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
-	List inits = new ArrayList(this.inits.size());
-	for (Iterator i = this.inits.iterator(); i.hasNext(); ) {
-	    ForInit n = (ForInit) i.next();
-	    n = (ForInit) n.visit(v);
-	    inits.add(n);
-	}
-
-	Expr cond = null;
-
-	if (this.cond != null) {
-	    cond = (Expr) this.cond.visit(v);
-	}
-
-	List iters = new ArrayList(this.iters.size());
-	for (Iterator i = this.iters.iterator(); i.hasNext(); ) {
-	    ForUpdate n = (ForUpdate) i.next();
-	    n = (ForUpdate) n.visit(v);
-	    iters.add(n);
-	}
-
-	Stmt body = (Stmt) this.body.visit(v);
-
+	List inits = visitList(this.inits, v);
+	Expr cond = (Expr) visitChild(this.cond, v);
+	List iters = visitList(this.iters, v);
+	Stmt body = (Stmt) visitChild(this.body, v);
 	return reconstruct(inits, cond, iters, body);
     }
 

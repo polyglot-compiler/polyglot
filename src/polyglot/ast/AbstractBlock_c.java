@@ -60,13 +60,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 
     /** Visit the children of the block. */
     public Node visitChildren(NodeVisitor v) {
-	List statements = new ArrayList(this.statements.size());
-	for (Iterator i = this.statements.iterator(); i.hasNext(); ) {
-	    Stmt n = (Stmt) i.next();
-	    n = (Stmt) n.visit(v);
-	    statements.add(n);
-	}
-
+        List statements = visitList(this.statements, v);
 	return reconstruct(statements);
     }
 

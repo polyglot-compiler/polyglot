@@ -74,22 +74,21 @@ public class Try_c extends Stmt_c implements Try
 
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
-	Block tryBlock = (Block) this.tryBlock.visit(v);
-
-	List catchBlocks = new ArrayList(this.catchBlocks.size());
-	for (Iterator i = this.catchBlocks.iterator(); i.hasNext(); ) {
-	    Catch n = (Catch) i.next();
-	    n = (Catch) n.visit(v);
-	    catchBlocks.add(n);
-	}
-
-	Block finallyBlock = null;
-
-	if (this.finallyBlock != null) {
-	    finallyBlock = (Block) this.finallyBlock.visit(v);
-	}
-
+	Block tryBlock = (Block) visitChild(this.tryBlock, v);
+	List catchBlocks = visitList(this.catchBlocks, v);
+	Block finallyBlock = (Block) visitChild(this.finallyBlock, v);
 	return reconstruct(tryBlock, catchBlocks, finallyBlock);
+    }
+
+    /**
+     * Bypass all children when peforming an exception check.
+     * exceptionCheck_(), called from ExceptionChecker.leave(),
+     * will handle visiting children.
+     */
+    public Node exceptionCheckEnter_(ExceptionChecker ec)
+	throws SemanticException
+    {
+      return bypassChildren();
     }
 
     /**
@@ -101,13 +100,13 @@ public class Try_c extends Stmt_c implements Try
      * child node. It contains the exceptions that can be thrown by the try
      * block.
      */
-    public Node exceptionCheckOverride_(ExceptionChecker ec)
+    public Node exceptionCheck_(ExceptionChecker ec)
 	throws SemanticException
     {
 	TypeSystem ts = ec.typeSystem();
 
 	// Visit the try block.
-	Block tryBlock = (Block) this.tryBlock.visit(ec);
+	Block tryBlock = (Block) visitChild(this.tryBlock, ec);
 	// First, get exceptions from the try block.
 	SubtypeSet thrown = ec.throwsSet(); 
         SubtypeSet caught = new SubtypeSet();
@@ -163,24 +162,24 @@ public class Try_c extends Stmt_c implements Try
 	for (Iterator i = this.catchBlocks.iterator(); i.hasNext(); ) {
 	    Catch cb = (Catch) i.next();
 
-	    ExceptionChecker ec2 = ec.alloc();
+            ec.pushScope();
 
-	    cb = (Catch) cb.visit(ec2);
+	    cb = (Catch) visitChild(cb, ec);
 	    catchBlocks.add(cb);
 
-	    thrown.addAll(ec2.throwsSet());
-	    ec.release(ec2);
+	    thrown.addAll(ec.throwsSet());
+            ec.popScope();
 	}
 
 	Block finallyBlock = null;
 
 	if (this.finallyBlock != null) {
-	    ExceptionChecker ec2 = ec.alloc();
+            ec.pushScope();
 
-	    finallyBlock = (Block) this.finallyBlock.visit(ec2);
+	    finallyBlock = (Block) visitChild(this.finallyBlock, ec);
 
-	    thrown.addAll(ec2.throwsSet());
-	    ec.release(ec2);
+	    thrown.addAll(ec.throwsSet());
+            ec.popScope();
 	}
 
 	return reconstruct(tryBlock, catchBlocks, finallyBlock);

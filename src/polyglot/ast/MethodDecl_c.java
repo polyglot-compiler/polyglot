@@ -136,40 +136,16 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 
     /** Visit the children of the method. */
     public Node visitChildren(NodeVisitor v) {
-        MethodDecl_c n = visitNonBodyChildren(v);
-
-	Block body = null;
-
-	if (n.body != null) {
-	    body = (Block) n.body.visit(v);
-	}
-
-	return n.reconstruct(n.returnType, n.formals, n.exceptionTypes, body);
+	TypeNode returnType = (TypeNode) visitChild(this.returnType, v);
+	List formals = visitList(this.formals, v);
+	List exceptionTypes = visitList(this.exceptionTypes, v);
+	Block body = (Block) visitChild(this.body, v);
+	return reconstruct(returnType, formals, exceptionTypes, body);
     }
 
-    protected MethodDecl_c visitNonBodyChildren(NodeVisitor v) {
-	TypeNode returnType = (TypeNode) this.returnType.visit(v);
-
-	List formals = new ArrayList(this.formals.size());
-	for (Iterator i = this.formals.iterator(); i.hasNext(); ) {
-	    Formal n = (Formal) i.next();
-	    n = (Formal) n.visit(v);
-	    formals.add(n);
-	}
-
-	List exceptionTypes = new ArrayList(this.exceptionTypes.size());
-	for (Iterator i = this.exceptionTypes.iterator(); i.hasNext(); ) {
-	    TypeNode n = (TypeNode) i.next();
-	    n = (TypeNode) n.visit(v);
-	    exceptionTypes.add(n);
-	}
-
-	return reconstruct(returnType, formals, exceptionTypes, this.body);
-    }
-
-    public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
         tb.pushScope();
-        return null;
+        return this;
     }
 
     public Node buildTypes_(TypeBuilder tb) throws SemanticException {
@@ -195,31 +171,38 @@ public class MethodDecl_c extends Node_c implements MethodDecl
     }
 
     /** Build type objects for the method. */
-    public Node disambiguateOverride_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguateEnter_(AmbiguityRemover ar) throws SemanticException {
         if (ar.kind() == AmbiguityRemover.SUPER) {
-            return this;
+            return bypassChildren();
+        }
+        else if (ar.kind() == AmbiguityRemover.SIGNATURES) {
+            if (body != null) {
+                return body((Block) body.bypass(true));
+            }
         }
 
-        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-            MethodDecl_c n = visitNonBodyChildren(ar);
+        return this;
+    }
 
+    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
             Context c = ar.context();
             TypeSystem ts = ar.typeSystem();
 
             ParsedClassType ct = c.currentClass();
 
-            MethodInstance mi = n.makeMethodInstance(ct, ts);
+            MethodInstance mi = makeMethodInstance(ct, ts);
 
-            return n.flags(mi.flags()).methodInstance(mi);
+            return flags(mi.flags()).methodInstance(mi);
         }
 
-        return null;
+        return this;
     }
 
-    public Node addMembersOverride_(AddMemberVisitor tc) {
-        ParsedClassType ct = tc.context().currentClass();
+    public Node addMembersEnter_(AddMemberVisitor am) {
+        ParsedClassType ct = am.context().currentClass();
         ct.addMethod(mi);
-        return this;
+        return bypassChildren();
     }
 
     public void enterScope(Context c) {
@@ -256,6 +239,16 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	    throw new SemanticException(
 		"A native method cannot have a body.", position());
 	}
+
+        for (Iterator i = exceptionTypes().iterator(); i.hasNext(); ) {
+            TypeNode tn = (TypeNode) i.next();
+            Type t = tn.type();
+            if (! t.isThrowable()) {
+                throw new SemanticException("Type \"" + t +
+                    "\" is not a subclass of \"" + ts.Throwable() + "\".",
+                    tn.position());
+            }
+        }
 
 	return this;
     }

@@ -115,14 +115,8 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
 
     /** Visit the children of the declaration. */
     public Node visitChildren(NodeVisitor v) {
-        TypeNode type = (TypeNode) type().visit(v);
-
-	Expr init = null;
-
-	if (init() != null) {
-	    init = (Expr) init().visit(v);
-	}
-
+        TypeNode type = (TypeNode) visitChild(type(), v);
+	Expr init = (Expr) visitChild(init(), v);
 	return reconstruct(type, init);
     }
 
@@ -141,15 +135,6 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
         return n.localInstance(li);
     }
 
-    /** Build type objects for the declaration. */
-    public Node disambiguateOverride_(AmbiguityRemover ar) throws SemanticException {
-        if (ar.kind() != AmbiguityRemover.ALL) {
-            return this;
-        }
-
-        return null;
-    }
-
     public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
 	TypeSystem ts = ar.typeSystem();
 
@@ -164,24 +149,23 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
 	return localInstance(li);
     }
 
-    /** Type check the declaration.
-     * Override so we can do this test before we enter scope.
-     * Return null to let the traversal continue.
+    /**
+     * Type check the declaration.  We must do this test before we leave scope.
      */
-    public Node typeCheckOverride_(TypeChecker tc) throws SemanticException {
+    public Node typeCheckEnter_(TypeChecker tc) throws SemanticException {
         Context c = tc.context();
 
 	try {
 	    c.findLocal(li.name());
-
-	    throw new SemanticException(
-		"Local variable " + li + " multiply-defined in " +
-		c.currentCode() + ".");
 	}
 	catch (SemanticException e) {
+            // not found, so not multiply-defined
+            return this;
 	}
 
-	return null;
+        throw new SemanticException(
+            "Local variable " + li + " multiply-defined in " +
+            c.currentCode() + ".");
     }
 
     /** Type check the declaration. */

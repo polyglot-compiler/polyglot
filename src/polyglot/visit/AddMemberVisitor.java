@@ -16,6 +16,10 @@ public class AddMemberVisitor extends SemanticVisitor
         super(job);
     }
 
+    protected Node enterCall(Node n) throws SemanticException {
+        return n.ext().addMembersEnter(this);
+    }
+
     protected Node overrideCall(Node n) throws SemanticException {
         return n.ext().addMembersOverride(this);
     }

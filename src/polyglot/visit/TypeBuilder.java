@@ -5,6 +5,7 @@ import jltools.frontend.*;
 import jltools.types.*;
 import jltools.util.*;
 import jltools.types.Package;
+import jltools.visit.NodeVisitor;
 
 import java.io.IOException;
 import java.util.*;
@@ -55,6 +56,24 @@ public class TypeBuilder extends BaseVisitor
         }
 
         return true;
+    }
+
+    public Node enter(Node n) {
+        try {
+	    return n.ext().buildTypesEnter(this);
+	}
+	catch (SemanticException e) {
+	    Position position = e.position();
+
+	    if (position == null) {
+		position = n.position();
+	    }
+
+	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
+		                 e.getMessage(), position);
+
+            return n;
+	}
     }
 
     public Node override(Node n) {

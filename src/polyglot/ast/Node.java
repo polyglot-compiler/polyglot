@@ -6,6 +6,7 @@ import jltools.util.Copy;
 import jltools.types.Context;
 import jltools.types.SemanticException;
 import jltools.types.TypeSystem;
+import jltools.visit.NodeVisitor;
 import jltools.visit.TypeBuilder;
 import jltools.visit.AmbiguityRemover;
 import jltools.visit.AddMemberVisitor;
@@ -25,10 +26,26 @@ import java.io.Serializable;
 public interface Node extends Copy, Serializable
 {
     /**
+     * Return true if the node should be bypassed on the next visit.
+     */
+    boolean bypass();
+
+    /**
+     * Create a new node with the bypass flag set to <code>bypass</code>.
+     */
+    Node bypass(boolean bypass);
+
+    /**
+     * Create a new node with the bypass flag set to true for all children
+     * of the node.
+     */
+    Node bypassChildren();
+
+    /**
      * Return the delegate for this node.  Some operations on the node should
      * be invoked only through the delegate, for instance as:
      * <pre>
-     *    n.delegate().typeCheck(c)
+     *    n.ext().typeCheck(c)
      * </pre>
      * rather than:
      * <pre>
@@ -63,8 +80,20 @@ public interface Node extends Copy, Serializable
 
     /**
      * Visit the children of the node.
+     *
+     * @param v The visitor which will traverse/rewrite the AST.
+     * @return A new AST if a change was made, or <code>this</code>.
      */
     Node visitChildren(NodeVisitor v);
+
+    /**
+     * Visit a single child of the node.
+     *
+     * @param v The visitor which will traverse/rewrite the AST.
+     * @return The result of <code>child.visit(v)</code>, or <code>null</code>
+     * if <code>child</code> was <code>null</code>.
+     */
+    Node visitChild(Node child, NodeVisitor v);
 
     /**
      * Adjust the environment on entering the scope of the method.
@@ -88,6 +117,7 @@ public interface Node extends Copy, Serializable
      * <code>TypeSystem</code>.
      */
     Node buildTypesOverride_(TypeBuilder tb) throws SemanticException;
+    Node buildTypesEnter_(TypeBuilder tb) throws SemanticException;
     Node buildTypes_(TypeBuilder tb) throws SemanticException;
 
     /**
@@ -96,6 +126,7 @@ public interface Node extends Copy, Serializable
      * @param tc The visitor which builds types.
      */
     Node addMembersOverride_(AddMemberVisitor tc) throws SemanticException;
+    Node addMembersEnter_(AddMemberVisitor tc) throws SemanticException;
     Node addMembers_(AddMemberVisitor tc) throws SemanticException;
 
     /**
@@ -104,6 +135,7 @@ public interface Node extends Copy, Serializable
      * @param ar The visitor which disambiguates.
      */
     Node disambiguateOverride_(AmbiguityRemover ar) throws SemanticException;
+    Node disambiguateEnter_(AmbiguityRemover ar) throws SemanticException;
     Node disambiguate_(AmbiguityRemover ar) throws SemanticException;
 
     /**
@@ -112,6 +144,7 @@ public interface Node extends Copy, Serializable
      * @param cf The constant folding visitor.
      */
     Node foldConstantsOverride_(ConstantFolder cf);
+    Node foldConstantsEnter_(ConstantFolder cf);
     Node foldConstants_(ConstantFolder cf);
 
     /**
@@ -120,6 +153,7 @@ public interface Node extends Copy, Serializable
      * @param tc The type checking visitor.
      */
     Node typeCheckOverride_(TypeChecker tc) throws SemanticException;
+    Node typeCheckEnter_(TypeChecker tc) throws SemanticException;
     Node typeCheck_(TypeChecker tc) throws SemanticException;
 
     /**
@@ -128,6 +162,7 @@ public interface Node extends Copy, Serializable
      * @param ec The visitor.
      */
     Node exceptionCheckOverride_(ExceptionChecker ec) throws SemanticException;
+    Node exceptionCheckEnter_(ExceptionChecker ec) throws SemanticException;
     Node exceptionCheck_(ExceptionChecker ec) throws SemanticException;
 
     /**

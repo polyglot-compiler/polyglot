@@ -1,7 +1,6 @@
 package jltools.visit;
 
 import jltools.ast.Node;
-import jltools.ast.NodeVisitor;
 import jltools.util.CodeWriter;
 import jltools.types.SemanticException;
 
@@ -29,12 +28,12 @@ public class DumpAst extends NodeVisitor
      * that node. Then we begin a new <code>CodeWriter</code> block and traverse
      * the children.
      */
-    public NodeVisitor enter(Node n) {
+    public Node enter(Node n) {
 	w.write("(");
 	n.dump(w);
 	w.allowBreak(4," ");
 	w.begin(0);
-	return this;
+	return n;
     }
 
     /**

@@ -12,6 +12,10 @@ public class ConstantFolder extends BaseVisitor
         super(job);
     }
 
+    public Node enter(Node n) {
+	return n.ext().foldConstantsEnter(this);
+    }
+
     public Node override(Node n) {
 	return n.ext().foldConstantsOverride(this);
     }

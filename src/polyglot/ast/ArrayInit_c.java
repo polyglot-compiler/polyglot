@@ -46,13 +46,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 
     /** Visit the children of the initializer. */
     public Node visitChildren(NodeVisitor v) {
-	List elements = new ArrayList(this.elements.size());
-	for (Iterator i = this.elements.iterator(); i.hasNext(); ) {
-	    Expr n = (Expr) i.next();
-	    n = (Expr) n.visit(v);
-	    elements.add(n);
-	}
-
+	List elements = visitList(this.elements, v);
 	return reconstruct(elements);
     }
 

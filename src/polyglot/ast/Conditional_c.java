@@ -78,9 +78,9 @@ public class Conditional_c extends Expr_c implements Conditional
 
     /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
-	Expr cond = (Expr) this.cond.visit(v);
-	Expr consequent = (Expr) this.consequent.visit(v);
-	Expr alternative = (Expr) this.alternative.visit(v);
+	Expr cond = (Expr) visitChild(this.cond, v);
+	Expr consequent = (Expr) visitChild(this.consequent, v);
+	Expr alternative = (Expr) visitChild(this.alternative, v);
 	return reconstruct(cond, consequent, alternative);
     }
 

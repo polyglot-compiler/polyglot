@@ -88,7 +88,7 @@ public class Formal_c extends Node_c implements Formal
 
     /** Visit the children of the formal. */
     public Node visitChildren(NodeVisitor v) {
-	TypeNode type = (TypeNode) type().visit(v);
+	TypeNode type = (TypeNode) visitChild(type(), v);
 	return reconstruct(type);
     }
 
@@ -119,7 +119,7 @@ public class Formal_c extends Node_c implements Formal
     }
 
     public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
-        if (! li.type().isCanonical()) {
+        if (declType().isCanonical() && ! li.type().isCanonical()) {
             TypeSystem ts = ar.typeSystem();
             LocalInstance li = ts.localInstance(position(), flags(),
                                                 declType(), name());

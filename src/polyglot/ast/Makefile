@@ -32,7 +32,7 @@ SOURCES = \
 	ConstructorCall.java \
 	ConstructorDecl.java \
 	Declarator.java \
-    Disamb.java \
+	Disamb.java \
 	Do.java \
 	Empty.java \
 	Eval.java \
@@ -61,7 +61,6 @@ SOURCES = \
 	New.java \
 	NodeFactory.java \
 	Node.java \
-	NodeVisitor.java \
 	NullLit.java \
 	NumLit.java \
 	PackageNode.java \

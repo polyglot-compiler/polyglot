@@ -93,7 +93,7 @@ public class Field_c extends Expr_c implements Field
 
   /** Visit the children of the field. */
   public Node visitChildren(NodeVisitor v) {
-    Receiver target = (Receiver) this.target.visit(v);
+    Receiver target = (Receiver) visitChild(this.target, v);
     return reconstruct(target);
   }
 

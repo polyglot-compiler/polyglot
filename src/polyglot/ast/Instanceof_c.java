@@ -63,8 +63,8 @@ public class Instanceof_c extends Expr_c implements Instanceof
 
     /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
-	Expr expr = (Expr) this.expr.visit(v);
-	TypeNode compareType = (TypeNode) this.compareType.visit(v);
+	Expr expr = (Expr) visitChild(this.expr, v)  ;
+	TypeNode compareType = (TypeNode) visitChild(this.compareType, v);
 	return reconstruct(expr, compareType);
     }
 

@@ -1,6 +1,7 @@
 package jltools.frontend;
 
-import jltools.ast.*;
+import jltools.ast.Node;
+import jltools.visit.NodeVisitor;
 import jltools.util.*;
 
 /** A pass which runs a visitor. */

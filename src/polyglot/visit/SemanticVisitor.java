@@ -33,6 +33,10 @@ public abstract class SemanticVisitor extends BaseVisitor
 	return context;
     }
 
+    protected Node enterCall(Node n) throws SemanticException {
+        return n;
+    }
+
     protected Node overrideCall(Node n) throws SemanticException {
 	return null;
     }
@@ -82,9 +86,9 @@ public abstract class SemanticVisitor extends BaseVisitor
 	    // visited this node.
 	    context.assertMark(mark);
 
-            Types.report(5, "leave override(" + n + "): " + depth + "->" + oldDepth);
+            Types.report(5, "end override(" + n + "): " + depth + "->" + oldDepth);
             if (m != null) {
-                Types.report(5, "leave override(" + n + "): traversal stopped");
+                Types.report(5, "end override(" + n + "): traversal stopped");
             }
 
             depth = oldDepth;
@@ -106,8 +110,8 @@ public abstract class SemanticVisitor extends BaseVisitor
 
             errors.set(depth);
 
-            Types.report(5, "leave override(" + n + "): " + depth + "->" + oldDepth);
-            Types.report(5, "leave override(" + n + "): traversal stopped");
+            Types.report(5, "end override(" + n + "): " + depth + "->" + oldDepth);
+            Types.report(5, "end override(" + n + "): traversal stopped");
 
             depth = oldDepth;
 
@@ -115,12 +119,37 @@ public abstract class SemanticVisitor extends BaseVisitor
 	}
     }
 
-    public NodeVisitor enter(Node n) {
+    public Node enter(Node n) {
         Types.report(5, "enter(" + n + "): " + depth + "->" + (depth+1));
         depth++;
         errors.clear(depth);
-	enterScope(n);
-        return this;
+
+        enterScope(n);
+
+        try {
+            n = enterCall(n);
+        }
+	catch (SemanticException e) {
+	    Position position = e.position();
+
+	    if (position == null) {
+		position = n.position();
+	    }
+
+	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
+		                 e.getMessage(), position);
+
+            leaveScope(n);
+
+            Types.report(5, "enter(" + n + "): error at " + depth);
+
+            errors.set(depth);
+
+            Types.report(5, "end enter(" + n + "): " + depth + "->" + (depth-1));
+            depth--;
+	}
+
+        return n;
     }
 
     public Node leave(Node old, Node n, NodeVisitor v) {

@@ -1,6 +1,4 @@
-package polyj.tests.bad.semant;
-
-class V[T] {
+class StaticOps {
   static int i = 10;
   static int j = 10;
   void m() {

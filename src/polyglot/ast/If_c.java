@@ -74,14 +74,9 @@ public class If_c extends Stmt_c implements If
 
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
-	Expr cond = (Expr) this.cond.visit(v);
-	Stmt consequent = (Stmt) this.consequent.visit(v);
-	Stmt alternative = null;
-
-	if (this.alternative != null) {
-	    alternative = (Stmt) this.alternative.visit(v);
-	}
-
+	Expr cond = (Expr) visitChild(this.cond, v);
+	Stmt consequent = (Stmt) visitChild(this.consequent, v);
+	Stmt alternative = (Stmt) visitChild(this.alternative, v);
 	return reconstruct(cond, consequent, alternative);
     }
 

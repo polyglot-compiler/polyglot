@@ -18,11 +18,13 @@ public abstract class Node_c implements Node
 {
 	protected Ext ext;
 	protected Position position;
+        protected boolean bypass;
 
 	public Node_c(Ext ext, Position pos) {
 		this.ext = ext;
 		ext.init(this);
 		this.position = pos;
+                this.bypass = false;
 	}
 
 	public Object copy() {
@@ -45,6 +47,32 @@ public abstract class Node_c implements Node
 		}
 	}
 
+        public boolean bypass() {
+                return bypass;
+        }
+
+        public Node bypass(boolean bypass) {
+                if (this.bypass != bypass) {
+                    Node_c n = (Node_c) copy();
+                    n.bypass = bypass;
+                    return n;
+                }
+
+                return this;
+        }
+
+        static class BypassChildrenVisitor extends NodeVisitor {
+            public Node override(Node n) {
+                return n.bypass(true);
+            }
+        }
+
+        static BypassChildrenVisitor bcv = new BypassChildrenVisitor();
+
+        public Node bypassChildren() {
+                return bypass(false).visitChildren(bcv);
+        }
+
 	public Position position() {
 		return this.position;
 	}
@@ -55,25 +83,39 @@ public abstract class Node_c implements Node
 		return n;
 	}
 
-	public Node visit(NodeVisitor v) {
+        public Node visitChild(Node n, NodeVisitor v) {
+                if (n == null) {
+                    return null;
+                }
+
+                // return v.visitEdge(this, n);
+                return n.visit(v);
+        }
+
+        public Node visit(NodeVisitor v) {
+                if (bypass) {
+                    Types.report(5, "skipping " + this);
+                    return bypass(false);
+                }
+
 		Node n = v.override(this);
 
 		if (n == null) {
-			NodeVisitor v_ = v.enter(this);
+			n = v.enter(this);
 
-			if (v_ == null) {
+			if (n == null) {
 				throw new InternalCompilerError(
 					"NodeVisitor.enter() returned null.");
 			}
 
-			n = visitChildren(v_);
+			n = n.visitChildren(v);
 
 			if (n == null) {
 				throw new InternalCompilerError(
 					"Node_c.visitChildren() returned null.");
 			}
 
-			n = v.leave(this, n, v_);
+			n = v.leave(this, n, v);
 
 			if (n == null) {
 				throw new InternalCompilerError(
@@ -95,7 +137,7 @@ public abstract class Node_c implements Node
 	 *         <code>l</code>.  If <code>l</code> is <code>null</code>,
 	 *         <code>null</code> is returned.
 	 */
-	public static List visitList(List l, NodeVisitor v) {
+	public List visitList(List l, NodeVisitor v) {
 		if (l == null) {
 			return null;
 		}
@@ -103,7 +145,7 @@ public abstract class Node_c implements Node
 		List vl = makeVisitedList(l);
 		for (Iterator i = l.iterator(); i.hasNext(); ) {
 			Node n = (Node) i.next();
-			n = n.visit(v);
+			n = visitChild(n, v);
 			vl.add(n);
 		}
 		return vl;
@@ -126,8 +168,8 @@ public abstract class Node_c implements Node
 	}
 	
 	public Node visitChildren(NodeVisitor v) {
-		return this;
-	}
+            return this;
+        }
 
 	/** Adjust the environment for entering a new scope. */
 	public void enterScope(Context c) { }
@@ -139,6 +181,10 @@ public abstract class Node_c implements Node
 		return null;
 	}
 
+	public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
+                return this;
+	}
+
 	public Node buildTypes_(TypeBuilder tb) throws SemanticException {
 		return this;
 	}
@@ -146,6 +192,10 @@ public abstract class Node_c implements Node
 	/** Remove any remaining ambiguities from the AST. */
 	public Node disambiguateOverride_(AmbiguityRemover ar) throws SemanticException {
 		return null;
+	}
+
+	public Node disambiguateEnter_(AmbiguityRemover ar) throws SemanticException {
+                return this;
 	}
 
 	public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
@@ -157,6 +207,10 @@ public abstract class Node_c implements Node
 		return null;
 	}
 
+	public Node addMembersEnter_(AddMemberVisitor am) throws SemanticException {
+                return this;
+	}
+
 	public Node addMembers_(AddMemberVisitor am) throws SemanticException {
 		return this;
 	}
@@ -164,6 +218,10 @@ public abstract class Node_c implements Node
 	/** Fold all constants. */
 	public Node foldConstantsOverride_(ConstantFolder cf) {
 		return null;
+	}
+
+	public Node foldConstantsEnter_(ConstantFolder cf) {
+                return this;
 	}
 
 	public Node foldConstants_(ConstantFolder cf) {
@@ -175,6 +233,10 @@ public abstract class Node_c implements Node
 		return null;
 	}
 
+	public Node typeCheckEnter_(TypeChecker tc) throws SemanticException {
+                return this;
+	}
+
 	public Node typeCheck_(TypeChecker tc) throws SemanticException {
 		return this;
 	}
@@ -182,6 +244,10 @@ public abstract class Node_c implements Node
 	/** Check that exceptions are properly propagated throughout the AST. */
 	public Node exceptionCheckOverride_(ExceptionChecker ec) throws SemanticException {
 		return null;
+	}
+
+	public Node exceptionCheckEnter_(ExceptionChecker ec) throws SemanticException {
+                return this;
 	}
 
 	public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
@@ -216,6 +282,11 @@ public abstract class Node_c implements Node
 								? position.toString()
 								  : "UNKNOWN") + ")");
 		w.end();
+
+		w.allowBreak(4, " ");
+		w.begin(0);
+		w.write("(bypass " + bypass() + ")");
+		w.end();
 	}
 
 	public class StringCodeWriter extends CodeWriter {
@@ -239,64 +310,9 @@ public abstract class Node_c implements Node
 		StringCodeWriter w = new StringCodeWriter(new CharArrayWriter());
 
 		DumpAst v = new DumpAst(w);
-		visit(v);
+		bypass(false).visit(v);
 		v.finish();
 
 		return w.toString();
-	}
-
-	// Now, reserve the signatures of the methods in Ext to ensure they
-	// aren't implemented by nodes.  We make the return type void so that
-	// a compile type error occurs if they are called and the result is used.
-	public final void buildTypesOverride(TypeBuilder tb) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
-	public final void buildTypes(TypeBuilder tb) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
-	public final void disambiguateOverride(AmbiguityRemover ar) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
-	public final void disambiguate(AmbiguityRemover ar) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
-	public final void addMembersOverride(AddMemberVisitor am) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
-	public final void addMembers(AddMemberVisitor am) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
-	public final void foldConstantsOverride(ConstantFolder cf) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
-	public final void foldConstants(ConstantFolder cf) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
-	public final void typeCheckOverride(TypeChecker tc) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
-	public final void typeCheck(TypeChecker tc) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
-	public final void exceptionCheckOverride(ExceptionChecker ec) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
-	public final void exceptionCheck(ExceptionChecker ec) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
-	public final void translate(CodeWriter w, Translator tr) {
-		throw new InternalCompilerError("Use a ext.");
 	}
 }

@@ -76,7 +76,7 @@ public class Initializer_c extends Node_c implements Initializer
 
     /** Visit the children of the initializer. */
     public Node visitChildren(NodeVisitor v) {
-	Block body = (Block) this.body.visit(v);
+	Block body = (Block) visitChild(this.body, v);
 	return reconstruct(body);
     }
 
@@ -88,9 +88,9 @@ public class Initializer_c extends Node_c implements Initializer
 	c.popCode();
     }
 
-    public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
         tb.pushScope();
-        return null;
+        return this;
     }
 
     /** Build type objects for the method. */
@@ -102,13 +102,15 @@ public class Initializer_c extends Node_c implements Initializer
         return initializerInstance(ii);
     }
 
-    public Node disambiguateOverride_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguateEnter_(AmbiguityRemover ar) throws SemanticException {
         // Do not visit body on the clean-super and clean-signatures passes.
-        if (ar.kind() != AmbiguityRemover.ALL) {
-            return this;
+        if (ar.kind() == AmbiguityRemover.SUPER) {
+            return bypassChildren();
         }
-
-        return null;
+        else if (ar.kind() == AmbiguityRemover.SIGNATURES) {
+            return bypassChildren();
+        }
+        return this;
     }
 
     /** Type check the initializer. */

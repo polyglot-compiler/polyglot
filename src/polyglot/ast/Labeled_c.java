@@ -57,7 +57,7 @@ public class Labeled_c extends Stmt_c implements Labeled
 
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
-	Stmt statement = (Stmt) this.statement.visit(v);
+	Stmt statement = (Stmt) visitChild(this.statement, v);
 	return reconstruct(statement);
     }
 

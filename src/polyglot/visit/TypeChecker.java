@@ -13,6 +13,10 @@ public class TypeChecker extends SemanticVisitor
 	super(job);
     }
 
+    protected Node enterCall(Node n) throws SemanticException {
+	return n.ext().typeCheckEnter(this);
+    }
+
     protected Node overrideCall(Node n) throws SemanticException {
 	Node m = n.ext().typeCheckOverride(this);
 

@@ -1,4 +1,7 @@
-package jltools.ast;
+package jltools.visit;
+
+import jltools.ast.Node;
+import java.util.*;
 
 /**
  * The <code>NodeVisitor</code> represents an implementation of the "Visitor"
@@ -45,8 +48,8 @@ public abstract class NodeVisitor
      * @return The <code>NodeVisitor</code> which should be used to visit the
      * children of <code>n</code>.
      */
-    public NodeVisitor enter(Node n) {
-        return this;
+    public Node enter(Node n) {
+        return n;
     }
 
     /**

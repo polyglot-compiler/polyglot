@@ -67,12 +67,8 @@ public class Case_c extends Stmt_c implements Case
 
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
-	if (this.expr != null) {
-	    Expr expr = (Expr) this.expr.visit(v);
-	    return reconstruct(expr);
-	}
-
-	return this;
+        Expr expr = (Expr) visitChild(this.expr, v);
+        return reconstruct(expr);
     }
 
     /** Type check the statement. */

@@ -59,8 +59,8 @@ public class While_c extends Stmt_c implements While
 
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
-	Expr cond = (Expr) this.cond.visit(v);
-	Stmt body = (Stmt) this.body.visit(v);
+	Expr cond = (Expr) visitChild(this.cond, v);
+	Stmt body = (Stmt) visitChild(this.body, v);
 	return reconstruct(cond, body);
     }
 

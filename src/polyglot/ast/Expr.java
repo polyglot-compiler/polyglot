@@ -2,6 +2,7 @@ package jltools.ast;
 
 import jltools.types.Type;
 import jltools.util.CodeWriter;
+import jltools.visit.Translator;
 
 /**
  * An <code>Expr</code> represents any Java expression.  All expressions
@@ -17,4 +18,5 @@ public interface Expr extends Receiver {
     /** Get the precedence of the expression. */
     Precedence precedence();
 
+    void translateSubexpr(Expr expr, CodeWriter w, Translator tr);
 }

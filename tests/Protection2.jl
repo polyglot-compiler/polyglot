@@ -1,5 +1,3 @@
-package polyj.tests.bad.semant;
-
 abstract class Protection2 {
   final void f() {}
 }

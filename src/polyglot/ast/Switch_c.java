@@ -63,15 +63,8 @@ public class Switch_c extends Stmt_c implements Switch
 
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
-	Expr expr = (Expr) this.expr.visit(v);
-
-	List elements = new ArrayList(this.elements.size());
-	for (Iterator i = this.elements.iterator(); i.hasNext(); ) {
-	    SwitchElement n = (SwitchElement) i.next();
-	    n = (SwitchElement) n.visit(v);
-	    elements.add(n);
-	}
-
+	Expr expr = (Expr) visitChild(this.expr, v);
+	List elements = visitList(this.elements, v);
 	return reconstruct(expr, elements);
     }
 

@@ -64,8 +64,8 @@ public class Catch_c extends Stmt_c implements Catch
 
     /** Visit the children of the catch block. */
     public Node visitChildren(NodeVisitor v) {
-	Formal formal = (Formal) this.formal.visit(v);
-	Block body = (Block) this.body.visit(v);
+	Formal formal = (Formal) visitChild(this.formal, v);
+	Block body = (Block) visitChild(this.body, v);
 	return reconstruct(formal, body);
     }
 

@@ -52,13 +52,7 @@ public class ClassBody_c extends Node_c implements ClassBody
     }
 
     public Node visitChildren(NodeVisitor v) {
-        List members = new ArrayList(this.members.size());
-        for (Iterator i = this.members.iterator(); i.hasNext(); ) {
-            ClassMember n = (ClassMember) i.next();
-            n = (ClassMember) n.visit(v);
-            members.add(n);
-        }
-
+        List members = visitList(this.members, v);
         return reconstruct(members);
     }
 

@@ -85,8 +85,8 @@ public class Binary_c extends Expr_c implements Binary
 
     /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
-	Expr left = (Expr) this.left.visit(v);
-	Expr right = (Expr) this.right.visit(v);
+	Expr left = (Expr) visitChild(this.left, v);
+	Expr right = (Expr) visitChild(this.right, v);
 	return reconstruct(left, right);
     }
 

@@ -132,92 +132,14 @@ public class FieldDecl_c extends Node_c implements FieldDecl
 
   /** Visit the children of the declaration. */
   public Node visitChildren(NodeVisitor v) {
-    FieldDecl_c n = visitNonInitChildren(v);
-
-    Expr init = null;
-
-    if (n.init() != null) {
-        init = (Expr) n.init().visit(v);
-    }
-
-    return n.reconstruct(n.type(), init);
+    TypeNode type = (TypeNode) visitChild(type(), v);
+    Expr init = (Expr) visitChild(init(), v);
+    return reconstruct(type, init);
   }
 
-  public FieldDecl_c visitNonInitChildren(NodeVisitor v) {
-    TypeNode type = (TypeNode) type().visit(v);
-    return reconstruct(type, init());
-  }
-
-  /** Type check the field. */
-  /** Build type objects for the declaration. */
-  public Node disambiguateOverride_(AmbiguityRemover ar) throws SemanticException {
-    if (ar.kind() == AmbiguityRemover.SUPER) {
-        return this;
-    }
-
-    if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-      FieldDecl_c n = visitNonInitChildren(ar);
-
-      Context c = ar.context();
-      TypeSystem ts = ar.typeSystem();
-
-      ParsedClassType ct = c.currentClass();
-
-      FieldInstance fi = ts.fieldInstance(n.position(),
-                                          ct, n.flags(), n.declType(), n.name());
-
-      Flags flags = n.flags();
-
-      if (ct.flags().isInterface()) {
-        flags = flags.setPublic();
-        flags = flags.setStatic();
-        flags = flags.setFinal();
-      }
-
-      if (n.init() instanceof Lit && n.flags().isFinal()) {
-        Object value = ((Lit) n.init()).objValue();
-        fi = (FieldInstance) fi.constantValue(value);
-      }
-
-      FieldDecl m = n;
-
-      if (n.init() != null) {
-          Flags f = (n.flags().isStatic()) ?  Flags.STATIC : Flags.NONE;
-          InitializerInstance ii = ts.initializerInstance(n.init().position(),
-                                                          ct, f);
-          m = n.initializerInstance(ii);
-      }
-
-      return m.flags(fi.flags()).fieldInstance(fi);
-    }
-
-    return null;
-  }
-
-  public Node addMembersOverride_(AddMemberVisitor tc) {
-    ParsedClassType ct = tc.context().currentClass();
-    if (fi == null) {
-        throw new InternalCompilerError("null field instance");
-    }
-    ct.addField(fi);
-    return this;
-  }
-
-  public void enterScope(Context c) {
-      if (ii != null) {
-            c.pushCode(ii);
-      }
-  }
-
-  public void leaveScope(Context c) {
-      if (ii != null) {
-            c.popCode();
-      }
-  }
-
-  public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
+  public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
       tb.pushScope();
-      return null;
+      return this;
   }
 
   public Node buildTypes_(TypeBuilder tb) throws SemanticException {
@@ -225,9 +147,87 @@ public class FieldDecl_c extends Node_c implements FieldDecl
 
       TypeSystem ts = tb.typeSystem();
 
-      FieldInstance fi = ts.fieldInstance(position(), ts.Object(), Flags.NONE,
-                                          ts.unknownType(position()), name());
-      return fieldInstance(fi);
+      FieldDecl n;
+
+      if (init() != null) {
+          ClassType ct = tb.currentClass();
+          Flags f = (flags().isStatic()) ? Flags.STATIC : Flags.NONE;
+          InitializerInstance ii = ts.initializerInstance(init().position(),
+                                                          ct, f);
+          n = initializerInstance(ii);
+      }
+      else {
+          n = this;
+      }
+
+      FieldInstance fi = ts.fieldInstance(n.position(), ts.Object(), Flags.NONE,
+                                          ts.unknownType(position()), n.name());
+
+      return n.fieldInstance(fi);
+  }
+
+  /** Build type objects for the declaration. */
+  public Node disambiguateEnter_(AmbiguityRemover ar) throws SemanticException {
+      if (ar.kind() == AmbiguityRemover.SUPER) {
+          return bypassChildren();
+      }
+      else if (ar.kind() == AmbiguityRemover.SIGNATURES) {
+          if (init() != null) {
+              return init((Expr) init().bypass(true));
+          }
+      }
+
+      return this;
+  }
+
+  public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+    if (ar.kind() == AmbiguityRemover.SIGNATURES) {
+      Context c = ar.context();
+      TypeSystem ts = ar.typeSystem();
+
+      ParsedClassType ct = c.currentClass();
+
+      FieldInstance fi = ts.fieldInstance(position(),
+                                          ct, flags(), declType(), name());
+
+      Flags flags = flags();
+
+      if (ct.flags().isInterface()) {
+        flags = flags.setPublic();
+        flags = flags.setStatic();
+        flags = flags.setFinal();
+      }
+
+      if (init() instanceof Lit && flags().isFinal()) {
+        Object value = ((Lit) init()).objValue();
+        fi = (FieldInstance) fi.constantValue(value);
+      }
+
+      return flags(fi.flags()).fieldInstance(fi);
+    }
+
+    return this;
+  }
+
+  public Node addMembersEnter_(AddMemberVisitor am) {
+    ParsedClassType ct = am.context().currentClass();
+    if (fi == null) {
+        throw new InternalCompilerError("null field instance");
+    }
+    ct.addField(fi);
+    return bypassChildren();
+  }
+
+  public void enterScope(Context c) {
+      if (ii != null) {
+          c.pushCode(ii);
+      }
+  }
+
+  public void leaveScope(Context c) {
+      if (ii != null) {
+          c.popCode();
+      }
   }
 
   /** Type check the declaration. */

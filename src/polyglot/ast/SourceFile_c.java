@@ -76,32 +76,15 @@ public class SourceFile_c extends Node_c implements SourceFile
 
     /** Visit the children of the source file. */
     public Node visitChildren(NodeVisitor v) {
-        PackageNode package_ = null;
-
-	if (this.package_ != null) {
-	    package_ = (PackageNode) this.package_.visit(v);
-	}
-
-	List imports = new ArrayList(this.imports.size());
-	for (Iterator i = this.imports.iterator(); i.hasNext(); ) {
-	    Import n = (Import) i.next();
-	    n = (Import) n.visit(v);
-	    imports.add(n);
-	}
-
-	List decls = new ArrayList(this.decls.size());
-	for (Iterator i = this.decls.iterator(); i.hasNext(); ) {
-	    TopLevelDecl n = (TopLevelDecl) i.next();
-	    n = (TopLevelDecl) n.visit(v);
-	    decls.add(n);
-	}
-
+        PackageNode package_ = (PackageNode) visitChild(this.package_, v);
+	List imports = visitList(this.imports, v);
+	List decls = visitList(this.decls, v);
 	return reconstruct(package_, imports, decls);
     }
 
     /** Build type objects for the source file.
      * Set the package before we recurse into the declarations. */
-    public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
         if (package_ != null) {
 	    tb.setPackage(package_.package_());
 	}
@@ -109,7 +92,7 @@ public class SourceFile_c extends Node_c implements SourceFile
 	    tb.setPackage(null);
 	}
 
-	return null;
+        return this;
     }
 
     /** Type check the source file. */

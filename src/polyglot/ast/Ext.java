@@ -23,21 +23,27 @@ public interface Ext extends Copy
     void init(Node n);
 
     Node buildTypesOverride(TypeBuilder tb) throws SemanticException;
+    Node buildTypesEnter(TypeBuilder tb) throws SemanticException;
     Node buildTypes(TypeBuilder tb) throws SemanticException;
 
     Node addMembersOverride(AddMemberVisitor tc) throws SemanticException;
+    Node addMembersEnter(AddMemberVisitor tc) throws SemanticException;
     Node addMembers(AddMemberVisitor tc) throws SemanticException;
 
     Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException;
+    Node disambiguateEnter(AmbiguityRemover ar) throws SemanticException;
     Node disambiguate(AmbiguityRemover ar) throws SemanticException;
 
     Node foldConstantsOverride(ConstantFolder cf);
+    Node foldConstantsEnter(ConstantFolder cf);
     Node foldConstants(ConstantFolder cf);
 
     Node typeCheckOverride(TypeChecker tc) throws SemanticException;
+    Node typeCheckEnter(TypeChecker tc) throws SemanticException;
     Node typeCheck(TypeChecker tc) throws SemanticException;
 
     Node exceptionCheckOverride(ExceptionChecker ec) throws SemanticException;
+    Node exceptionCheckEnter(ExceptionChecker ec) throws SemanticException;
     Node exceptionCheck(ExceptionChecker ec) throws SemanticException;
 
     void translate(CodeWriter w, Translator tr);

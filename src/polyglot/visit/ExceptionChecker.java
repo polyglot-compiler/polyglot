@@ -8,21 +8,31 @@ import java.util.*;
 /** Visitor which checks if exceptions are caught or declared properly. */
 public class ExceptionChecker extends NodeVisitor
 {
-    protected SubtypeSet thrown;
     protected TypeSystem ts;
     protected ErrorQueue eq;
-    protected LinkedList freelist;
+
+    /**
+     * This is a stack of sets of exceptions thrown for each lexical nesting
+     * level.
+     */
+    protected Stack stack;
 
     public ExceptionChecker(TypeSystem ts, ErrorQueue eq) {
-        this(ts, eq, new LinkedList());
+        this.ts = ts;
+        this.eq = eq;
+        this.stack = new Stack();
     }
 
-    protected ExceptionChecker(TypeSystem ts, ErrorQueue eq,
-	                       LinkedList freelist) {
-	this.ts = ts;
-	this.eq = eq; 
-	this.freelist = freelist;
-	this.thrown = new SubtypeSet();
+    public boolean begin() {
+        pushScope();
+        return true;
+    }
+
+    public void finish() {
+        popScope();
+        if (! stack.isEmpty()) {
+            throw new InternalCompilerError("Throws stack not empty.");
+        }
     }
 
     public TypeSystem typeSystem() {
@@ -30,12 +40,12 @@ public class ExceptionChecker extends NodeVisitor
     }
 
     public Node override(Node n) {
-	ExceptionChecker ec = alloc();
+        pushScope();
 
 	try {
-	    Node m = n.ext().exceptionCheckOverride(ec);
-	    this.throwsSet().addAll(ec.throwsSet());
-	    release(ec);
+	    Node m = n.ext().exceptionCheckOverride(this);
+            SubtypeSet t = popScope();
+	    throwsSet().addAll(t);
 	    return m;
 	}
 	catch (SemanticException e) {
@@ -47,7 +57,7 @@ public class ExceptionChecker extends NodeVisitor
 
 	    eq.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), position);
 
-	    release(ec);
+            popScope();
 
 	    return n;
 	}
@@ -65,8 +75,9 @@ public class ExceptionChecker extends NodeVisitor
      *  children of <code>n</code>.
      *
      */
-    public NodeVisitor enter(Node n) {
-	return alloc(); 
+    public Node enter(Node n) {
+        pushScope();
+        return n;
     }
 
     /**
@@ -80,12 +91,10 @@ public class ExceptionChecker extends NodeVisitor
      *  <code>n</code>.
      */
     public Node leave(Node old, Node n, NodeVisitor v) {
-	ExceptionChecker ec = (ExceptionChecker) v;
-
 	// Merge results from the children and free the checker used for the
 	// children.
-	thrown.addAll(ec.throwsSet());
-	release(ec);
+        SubtypeSet t = popScope();
+        throwsSet().addAll(t);
 
 	// gather exceptions from this node.
 	try {
@@ -113,7 +122,7 @@ public class ExceptionChecker extends NodeVisitor
      * @param t The type of exception that the node throws.
      */
     public void throwsException(Type t) {
-	thrown.add(t) ;
+	throwsSet().add(t) ;
     }
     
     /**
@@ -121,21 +130,20 @@ public class ExceptionChecker extends NodeVisitor
      * modify the throwsSet.
      */
     public SubtypeSet throwsSet() {
-	return thrown;
+        return (SubtypeSet) stack.peek();
     }
 
-    public ExceptionChecker alloc() {
-	if (freelist.isEmpty()) {
-	    return new ExceptionChecker(ts, eq, freelist); 
-	}
-	else {
-	    return (ExceptionChecker) freelist.removeLast();
-	}
+    /**
+     * Push a new, empty, throws set.
+     */
+    public void pushScope() {
+        stack.push(new SubtypeSet());
     }
-    
-    public void release(ExceptionChecker ec) {
-	// reuse the ExceptionCheckers. saves an allocation.  
-	ec.throwsSet().clear();
-	freelist.addLast(ec);
+
+    /**
+     * Push the current throws set.
+     */
+    public SubtypeSet popScope() {
+        return (SubtypeSet) stack.pop();
     }
 }

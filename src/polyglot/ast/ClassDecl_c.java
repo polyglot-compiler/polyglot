@@ -104,28 +104,16 @@ public class ClassDecl_c extends Node_c implements ClassDecl
     }
 
     public Node visitChildren(NodeVisitor v) {
-	    TypeNode superClass = null;
-
-	    if (this.superClass != null) {
-		    superClass = (TypeNode) this.superClass.visit(v);
-	    }
-
-	    List interfaces = new ArrayList(this.interfaces.size());
-	    for (Iterator i = this.interfaces.iterator(); i.hasNext(); ) {
-		    TypeNode n = (TypeNode) i.next();
-		    n = (TypeNode) n.visit(v);
-		    interfaces.add(n);
-	    }
-
-	    ClassBody body = (ClassBody) this.body.visit(v);
-
+	    TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
+	    List interfaces = visitList(this.interfaces, v);
+	    ClassBody body = (ClassBody) visitChild(this.body, v);
 	    return reconstruct(superClass, interfaces, body);
     }
 
-    public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
 	TypeSystem ts = tb.typeSystem();
-	ParsedClassType type = tb.pushClass(position(), flags, name);
-        return null;
+	tb.pushClass(position(), flags, name);
+        return this;
     }
 
     public Node buildTypes_(TypeBuilder tb) throws SemanticException {

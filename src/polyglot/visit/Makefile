@@ -5,6 +5,7 @@ SUBDIRS =
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
+	AddMemberVisitor.java \
 	AmbiguityRemover.java \
 	BaseVisitor.java \
 	BlockFlattener.java \
@@ -16,10 +17,10 @@ SOURCES = \
 	FlattenVisitor.java \
 	FlowChecker.java \
 	NodeScrambler.java \
+	NodeVisitor.java \
 	SemanticVisitor.java \
-	TypeBuilder.java \
-	AddMemberVisitor.java \
 	Translator.java \
+	TypeBuilder.java \
 	TypeChecker.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))

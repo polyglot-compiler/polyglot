@@ -17,9 +17,9 @@ public class AmbiguityRemover extends SemanticVisitor
         }
     }
 
-    public static final Kind SUPER = new Kind("super");
-    public static final Kind SIGNATURES = new Kind("signatures");
-    public static final Kind ALL = new Kind("all");
+    public static final Kind SUPER = new Kind("disam-super");
+    public static final Kind SIGNATURES = new Kind("disam-sigs");
+    public static final Kind ALL = new Kind("disam-all");
 
     private Kind kind;
 
@@ -32,14 +32,21 @@ public class AmbiguityRemover extends SemanticVisitor
         return kind;
     }
 
+    protected Node enterCall(Node n) throws SemanticException {
+        Types.report(2, ">> " + kind + "::enter " + n);
+        Node m = n.ext().disambiguateEnter(this);
+        Types.report(2, "<< " + kind + "::enter " + n + " -> " + m);
+        return m;
+    }
+
     protected Node overrideCall(Node n) throws SemanticException {
-        Types.report(2, "disambiguate " + n);
         return n.ext().disambiguateOverride(this);
     }
 
     protected Node leaveCall(Node n) throws SemanticException {
+        Types.report(2, ">> " + kind + "::leave " + n);
         Node m = n.ext().disambiguate(this);
-        Types.report(2, "leaving disambiguate " + n);
+        Types.report(2, "<< " + kind + "::leave " + n + " -> " + m);
         return m;
     }
 }

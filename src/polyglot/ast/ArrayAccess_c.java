@@ -64,8 +64,8 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 
     /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
-	Expr array = (Expr) this.array.visit(v);
-	Expr index = (Expr) this.index.visit(v);
+	Expr array = (Expr) visitChild(this.array, v);
+	Expr index = (Expr) visitChild(this.index, v);
 	return reconstruct(array, index);
     }
 

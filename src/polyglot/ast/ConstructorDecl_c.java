@@ -122,38 +122,15 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 
     /** Visit the children of the constructor. */
     public Node visitChildren(NodeVisitor v) {
-        ConstructorDecl_c n = visitNonBodyChildren(v);
-
-	Block body = null;
-
-	if (n.body != null) {
-	    body = (Block) n.body.visit(v);
-	}
-
-	return n.reconstruct(n.formals, n.exceptionTypes, body);
+	List formals = visitList(this.formals, v);
+	List exceptionTypes = visitList(this.exceptionTypes, v);
+	Block body = (Block) visitChild(this.body, v);
+	return reconstruct(formals, exceptionTypes, body);
     }
 
-    protected ConstructorDecl_c visitNonBodyChildren(NodeVisitor v) {
-	List formals = new ArrayList(this.formals.size());
-	for (Iterator i = this.formals.iterator(); i.hasNext(); ) {
-	    Formal n = (Formal) i.next();
-	    n = (Formal) n.visit(v);
-	    formals.add(n);
-	}
-
-	List exceptionTypes = new ArrayList(this.exceptionTypes.size());
-	for (Iterator i = this.exceptionTypes.iterator(); i.hasNext(); ) {
-	    TypeNode n = (TypeNode) i.next();
-	    n = (TypeNode) n.visit(v);
-	    exceptionTypes.add(n);
-	}
-
-	return reconstruct(formals, exceptionTypes, this.body);
-    }
-
-    public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
         tb.pushScope();
-        return null;
+        return this;
     }
 
     public Node buildTypes_(TypeBuilder tb) throws SemanticException {
@@ -163,12 +140,12 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 
         List l = new ArrayList(formals.size());
         for (int i = 0; i < formals.size(); i++) {
-          l.add(ts.unknownType(position()));
+            l.add(ts.unknownType(position()));
         }
 
         List m = new ArrayList(exceptionTypes.size());
         for (int i = 0; i < exceptionTypes.size(); i++) {
-          l.add(ts.unknownType(position()));
+            l.add(ts.unknownType(position()));
         }
 
         ConstructorInstance ci = ts.constructorInstance(position(), ts.Object(),
@@ -176,31 +153,38 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
         return constructorInstance(ci);
     }
 
-    public Node disambiguateOverride_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguateEnter_(AmbiguityRemover ar) throws SemanticException {
         if (ar.kind() == AmbiguityRemover.SUPER) {
-            return this;
+            return bypassChildren();
+        }
+        else if (ar.kind() == AmbiguityRemover.SIGNATURES) {
+            if (body != null) {
+                return body((Block) body.bypass(true));
+            }
         }
 
-        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-            ConstructorDecl_c n = visitNonBodyChildren(ar);
+        return this;
+    }
 
+    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
             Context c = ar.context();
             TypeSystem ts = ar.typeSystem();
 
             ParsedClassType ct = c.currentClass();
 
-            ConstructorInstance ci = n.makeConstructorInstance(ct, ts);
+            ConstructorInstance ci = makeConstructorInstance(ct, ts);
 
-            return n.constructorInstance(ci);
+            return constructorInstance(ci);
         }
 
-        return null;
+        return this;
     }
 
-    public Node addMembersOverride_(AddMemberVisitor tc) {
-	ParsedClassType ct = tc.context().currentClass();
+    public Node addMembersEnter_(AddMemberVisitor am) {
+	ParsedClassType ct = am.context().currentClass();
         ct.addConstructor(ci);
-        return this;
+        return bypassChildren();
     }
 
     public void enterScope(Context c) {
@@ -224,6 +208,20 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 		position());
 	}
 
+        if (ct.isAnonymous()) {
+	    throw new SemanticException(
+		"Cannot declare a constructor inside an anonymous class.",
+		position());
+        }
+
+        String ctName = ((NamedType) ct).name();
+
+        if (! ctName.equals(name)) {
+	    throw new SemanticException("Constructor name \"" + name +
+                "\" does not match name of containing class \"" +
+                ctName + "\".", position());
+        }
+
 	try {
 	    ts.checkConstructorFlags(flags());
 	}
@@ -241,7 +239,17 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 		"A native constructor cannot have a body.", position());
 	}
 
-	return this;
+        for (Iterator i = exceptionTypes().iterator(); i.hasNext(); ) {
+            TypeNode tn = (TypeNode) i.next();
+            Type t = tn.type();
+            if (! t.isThrowable()) {
+                throw new SemanticException("Type \"" + t +
+                    "\" is not a subclass of \"" + ts.Throwable() + "\".",
+                    tn.position());
+            }
+        }
+
+        return this;
     }
 
     /** Check exceptions thrown by the constructor. */

@@ -66,13 +66,13 @@ public class NodeScrambler extends NodeVisitor
    */
   public class FirstPass extends NodeVisitor 
   {
-    public NodeVisitor enter( Node n)
+    public Node enter( Node n)
     {
       pairs.put( n, currentParents.clone());
       nodes.add( n);
       
       currentParents.add( n);
-      return this;
+      return n;
     }
     
     public Node leave( Node old, Node n, NodeVisitor v)

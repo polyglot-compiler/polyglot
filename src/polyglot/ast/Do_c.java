@@ -59,8 +59,8 @@ public class Do_c extends Stmt_c implements Do
 
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
-	Stmt body = (Stmt) this.body.visit(v);
-	Expr cond = (Expr) this.cond.visit(v);
+	Stmt body = (Stmt) visitChild(this.body, v);
+	Expr cond = (Expr) visitChild(this.cond, v);
 	return reconstruct(body, cond);
     }
 

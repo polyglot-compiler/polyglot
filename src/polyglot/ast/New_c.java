@@ -58,24 +58,16 @@ public class New_c extends AbstractNew_c implements New
     }
 
     /** Visit the children of the expression, except the body. */
-    protected AbstractNew_c visitNonBodyChildren(NodeVisitor v) {
-	TypeNode tn = (TypeNode) this.tn.visit(v);
-
-	List arguments = new ArrayList(this.arguments.size());
-	for (Iterator i = this.arguments.iterator(); i.hasNext(); ) {
-	    Expr n = (Expr) i.next();
-	    n = (Expr) n.visit(v);
-	    arguments.add(n);
-	}
-
-	return reconstruct(tn, arguments, this.body);
+    public Node visitChildren(NodeVisitor v) {
+	TypeNode tn = (TypeNode) visitChild(this.tn, v);
+	List arguments = visitList(this.arguments, v);
+	ClassBody body = (ClassBody) visitChild(this.body, v);
+	return reconstruct(tn, arguments, body);
     }
 
-    /** Type check the expression. */
-    public Node typeCheckOverride_(TypeChecker tc) throws SemanticException {
-        New_c n = (New_c) visitNonBodyChildren(tc);
-	ClassType ct = (ClassType) n.tn.type();
-	return n.typeCheckEpilogue(ct, tc);
+    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+	ClassType ct = (ClassType) tn.type();
+	return typeCheckEpilogue(ct, tc);
     }
 
     public String toString() {

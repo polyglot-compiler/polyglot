@@ -64,12 +64,7 @@ public class Special_c extends Expr_c implements Special
 
     /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
-	TypeNode qualifier = null;
-
-	if (this.qualifier != null) {
-	    qualifier = (TypeNode) this.qualifier.visit(v);
-	}
-
+	TypeNode qualifier = (TypeNode) visitChild(this.qualifier, v);
 	return reconstruct(qualifier);
     }
 

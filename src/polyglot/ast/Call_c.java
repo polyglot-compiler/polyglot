@@ -95,19 +95,8 @@ public class Call_c extends Expr_c implements Call
 
   /** Visit the children of the call. */
   public Node visitChildren(NodeVisitor v) {
-    Receiver target = null;
-
-    if (this.target != null) {
-      target = (Receiver) this.target.visit(v);
-    }
-
-    List arguments = new ArrayList(this.arguments.size());
-    for (Iterator i = this.arguments.iterator(); i.hasNext(); ) {
-      Expr n = (Expr) i.next();
-      n = (Expr) n.visit(v);
-      arguments.add(n);
-    }
-
+    Receiver target = (Receiver) visitChild(this.target, v);
+    List arguments = visitList(this.arguments, v);
     return reconstruct(target, arguments);
   }
 
@@ -216,7 +205,8 @@ public class Call_c extends Expr_c implements Call
       NodeFactory nf = tc.nodeFactory();
 
       if (mi.flags().isStatic()) {
-        r = nf.CanonicalTypeNode(position(), ts.staticTarget(mi.container()));
+        r = nf.CanonicalTypeNode(position(), ts.staticTarget(mi.container())).type(ts.staticTarget(mi.container()));
+
       } else {
         // The field is non-static, so we must prepend with "this", but we
         // need to determine if the "this" should be qualified.  Get the
@@ -228,14 +218,12 @@ public class Call_c extends Expr_c implements Call
         if (! scope.isSame(c.currentClass())) {
           r = nf.This(position(),
                       nf.CanonicalTypeNode(position(),
-                                           ts.staticTarget(scope)));
+                                           ts.staticTarget(scope))).type(ts.staticTarget(scope));
         }
         else {
-          r = nf.This(position());
+          r = nf.This(position()).type(scope);
         }
       }
-
-      r = (Receiver) r.visit(tc);
 
       call = target(r);
     }

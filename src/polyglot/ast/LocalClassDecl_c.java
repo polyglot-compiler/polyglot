@@ -45,7 +45,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
 
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
-        ClassDecl decl = (ClassDecl) this.decl.visit(v);
+        ClassDecl decl = (ClassDecl) visitChild(this.decl, v);
         return reconstruct(decl);
     }
 
@@ -58,34 +58,26 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
         c.addType(decl.type().toClass().toLocal());
     }
 
-    public Node disambiguateOverride_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguateEnter_(AmbiguityRemover ar) throws SemanticException {
         if (ar.kind() == AmbiguityRemover.SUPER) {
-            return this;
+            return bypassChildren();
         }
-
-        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-            return this;
+        else if (ar.kind() == AmbiguityRemover.SIGNATURES) {
+            return bypassChildren();
         }
+        else {
+            ClassDecl d = (ClassDecl) ar.job().spawn(ar.context(), decl,
+                                                     Pass.CLEAN_SUPER,
+                                                     Pass.ADD_MEMBERS_ALL);
 
-        enterScope(ar.context());
+            if (d == null) {
+                throw new SemanticException(
+                    "Could not disambiguate local class \"" + decl.name() + "\".",
+                    position());
+            }
 
-        ClassDecl d = (ClassDecl) ar.job().spawn(ar.context(), decl,
-                                                 Pass.CLEAN_SUPER,
-                                                 Pass.ADD_MEMBERS_ALL);
-
-        if (d == null) {
-            throw new SemanticException(
-                "Could not disambiguate local class \"" + decl.name() + "\".",
-                position());
+            return decl(d);
         }
-
-        LocalClassDecl n = decl(d);
-
-        n = (LocalClassDecl) n.visitChildren(ar);
-
-        n.leaveScope(ar.context());
-
-        return n;
     }
 
     public String toString() {

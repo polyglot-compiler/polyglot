@@ -11,21 +11,21 @@ import jltools.util.*;
  */
 public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver
 {
-	protected Type type;
+    protected Type type;
 
     public AmbReceiver_c(Ext ext, Position pos, Prefix prefix, String name) {
 	super(ext, pos, prefix, name);
     }
 
-	public Type type() {
-		return this.type;
-	}
+    public Type type() {
+            return this.type;
+    }
 
-	public AmbReceiver type(Type type) {
-                AmbReceiver_c n = (AmbReceiver_c) copy();
-		n.type = type;
-                return n;
-	}
+    public AmbReceiver type(Type type) {
+            AmbReceiver_c n = (AmbReceiver_c) copy();
+            n.type = type;
+            return n;
+    }
 
     public Node buildTypes_(TypeBuilder tb) throws SemanticException {
         return type(tb.typeSystem().unknownType(position()));

@@ -97,21 +97,9 @@ public class NewArray_c extends Expr_c implements NewArray
 
     /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
-	TypeNode baseType = (TypeNode) this.baseType.visit(v);
-
-	List dims = new ArrayList(this.dims.size());
-	for (Iterator i = this.dims.iterator(); i.hasNext(); ) {
-	    Expr n = (Expr) i.next();
-	    n = (Expr) n.visit(v);
-	    dims.add(n);
-	}
-
-	ArrayInit init = null;
-
-	if (this.init != null) {
-	    init = (ArrayInit) this.init.visit(v);
-	}
-
+	TypeNode baseType = (TypeNode) visitChild(this.baseType, v);
+	List dims = visitList(this.dims, v);
+	ArrayInit init = (ArrayInit) visitChild(this.init, v);
 	return reconstruct(baseType, dims, init);
     }
 

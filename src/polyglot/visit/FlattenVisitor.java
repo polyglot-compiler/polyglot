@@ -40,7 +40,7 @@ public class FlattenVisitor extends NodeVisitor
      * When entering a BlockStatement, place a new StatementList
      * onto the stack
      */
-    public NodeVisitor enter(Node n) {
+    public Node enter(Node n) {
 	if (n instanceof Block) {
 	    stack.addFirst(new LinkedList());
 	}
@@ -52,7 +52,7 @@ public class FlattenVisitor extends NodeVisitor
 	    noFlatten = s.expr();
 	}
 
-	return this;
+	return n;
     }
 
     /** 
