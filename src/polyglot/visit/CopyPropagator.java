@@ -193,7 +193,7 @@ public class CopyPropagator extends DataFlow {
 	    }
 	}
 
-	protected void kill(LocalInstance var) {
+	public void kill(LocalInstance var) {
 	    if (!map.containsKey(var)) return;
 
 	    CopyInfo ci = (CopyInfo)map.get(var);
@@ -311,7 +311,7 @@ public class CopyPropagator extends DataFlow {
 	}
     }
 
-    public Map flow(Item in, FlowGraph graph, Term t, Set succEdgeKeys) {
+    protected DataFlowItem flow(Item in, FlowGraph graph, Term t) {
 	DataFlowItem result = new DataFlowItem((DataFlowItem)in);
 
 	if (t instanceof Assign) {
@@ -377,7 +377,11 @@ public class CopyPropagator extends DataFlow {
 	    killDecl(result, n.alternative());
 	}
 
-	return itemToMap(result, succEdgeKeys);
+	return result;
+    }
+
+    public Map flow(Item in, FlowGraph graph, Term t, Set succEdgeKeys) {
+	return itemToMap(flow(in, graph, t), succEdgeKeys);
     }
 
     public void post(FlowGraph graph, Term root) throws SemanticException {
