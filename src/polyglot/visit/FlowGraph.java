@@ -91,6 +91,9 @@ public class FlowGraph {
   public Collection peers(Term n) {
     IdentityKey k = new IdentityKey(n);
     Map pathMap = (Map) peerMap.get(k);
+    if (pathMap == null) {
+        return Collections.EMPTY_LIST;
+    }
     return pathMap.values();
   }
 
