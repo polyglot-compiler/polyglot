@@ -29,7 +29,7 @@ public class SpecialExpression extends Expression
   public SpecialExpression( Node ext, TypeNode tn, int kind) 
   {
     if (kind < 0 || kind > MAX_KIND) {
-      throw new IllegalArgumentException( "Invalud kind argument.");
+      throw new IllegalArgumentException( "Invalid kind argument.");
     }
     this.ext = ext;
     this.tn = tn;

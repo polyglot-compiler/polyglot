@@ -51,16 +51,21 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
       this.flags = flags.copy();    
   }
 
-  public Type getReturnType()
+  public void setEnclosingType(ReferenceType enclosingType)
   {
-    return returnType; 
+    this.enclosingType = enclosingType;
   }
-
+  
   public ReferenceType getEnclosingType()
   {
     return enclosingType;
   }
   
+  public Type getReturnType()
+  {
+    return returnType; 
+  }
+
   public void setReturnType( Type returnType)  
   {
     this.returnType = returnType;
