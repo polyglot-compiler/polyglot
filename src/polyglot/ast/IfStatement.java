@@ -22,33 +22,49 @@ public class IfStatement extends Statement
    * @param then The consequent.
    * @param else_ The alternate. This parameter may be <code>null</code>.
    */
-  public IfStatement(Expression cond, Statement then, Statement else_) 
+  public IfStatement( Node ext, Expression cond, Statement then, Statement else_) 
   {
+    this.ext = ext;
     this.cond = cond;
     this.then = then;
     this.else_ = else_;
   }
 
-  public IfStatement(Expression cond, Statement then) 
+    public IfStatement( Expression cond, Statement then, Statement else_) {
+	this(null, cond, then, else_);
+    }
+  
+
+  public IfStatement( Node ext, Expression cond, Statement then) 
   {
-    this( cond, then, null);
+    this( ext, cond, then, null);
   }
+
+    public IfStatement( Expression cond, Statement then) {
+	this(null, cond, then, null);
+    }
 
   /**
    * Lazily reconstruct this node.
    */
-  public IfStatement reconstruct(Expression cond, Statement then, 
+  public IfStatement reconstruct( Node ext, Expression cond, Statement then, 
                                  Statement else_) 
   {
-    if( this.cond == cond && this.then == then && this.else_ == else_) {
+    if( this.cond == cond && this.ext == ext && this.then == then && this.else_ == else_) {
       return this;
     }
     else {
-      IfStatement n = new IfStatement( cond, then, else_);
+      IfStatement n = new IfStatement( ext, cond, then, else_);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+  public IfStatement reconstruct( Expression cond, Statement then, 
+                                 Statement else_) 
+    { 
+	return reconstruct(this.ext, cond, then, else_);
+    }
 
   /**
    * Returns the conditional expression for this statement.
@@ -84,7 +100,7 @@ public class IfStatement extends Statement
    */
   public Node visitChildren(NodeVisitor v) 
   {
-    return reconstruct( (Expression)cond.visit( v),
+    return reconstruct( Node.condVisit(this.ext, v), (Expression)cond.visit( v),
                         (Statement)then.visit( v),
                         (else_ == null ? null : (Statement)else_.visit( v)));
   }

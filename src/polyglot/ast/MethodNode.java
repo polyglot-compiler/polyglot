@@ -37,9 +37,10 @@ public class MethodNode extends ClassMember
    *  <code>FormalParameter</code> and that each element of 
    *  <code>exceptions</code> is of type <code>TypeNode</code>.
    */
-  public MethodNode( AccessFlags accessFlags, TypeNode tn, List formals, 
+  public MethodNode( Node ext, AccessFlags accessFlags, TypeNode tn, List formals, 
                      List exceptions, BlockStatement body) 
   {
+    this.ext = ext;
     this.isConstructor = true;
     this.accessFlags = accessFlags;
     this.returns = tn;
@@ -54,6 +55,12 @@ public class MethodNode extends ClassMember
     mtiThis = null;
   }
 
+  public MethodNode( AccessFlags accessFlags, TypeNode tn, List formals, 
+                     List exceptions, BlockStatement body) {
+      this(null, accessFlags, tn, formals, exceptions, body);
+  }
+
+
   /**
    * Creates a new <code>MethodNode</code> that represents the definition of 
    * an ordinary (non-constructor) method.
@@ -62,15 +69,16 @@ public class MethodNode extends ClassMember
    *  <code>FormalParameter</code> and that each element of 
    *  <code>exceptions</code> is of type <code>TypeNode</code>.
    */ 
-  public MethodNode( AccessFlags accessFlags, TypeNode returns, String name,
+  public MethodNode( Node ext, AccessFlags accessFlags, TypeNode returns, String name,
                      List formals, List exceptions, BlockStatement body)
   {
-    this( accessFlags, returns, name, formals, exceptions, body, 0);
+    this( ext, accessFlags, returns, name, formals, exceptions, body, 0);
   }
 
-    protected MethodNode( boolean isConstructor, AccessFlags accessFlags, TypeNode returns, String name,
+    protected MethodNode( Node ext, boolean isConstructor, AccessFlags accessFlags, TypeNode returns, String name,
 			  List formals, List exceptions, BlockStatement body, int addDims) 
     {
+    this.ext = ext;
     this.isConstructor = isConstructor;
     this.accessFlags = accessFlags;
     this.returns = returns;
@@ -85,6 +93,16 @@ public class MethodNode extends ClassMember
     mtiThis = null;
   }
 	
+  public MethodNode( AccessFlags accessFlags, TypeNode returns, String name,
+                     List formals, List exceptions, BlockStatement body) {
+      this(null, accessFlags, returns, name, formals, exceptions, body);
+  }
+
+    protected MethodNode( boolean isConstructor, AccessFlags accessFlags, TypeNode returns, String name,
+			  List formals, List exceptions, BlockStatement body, int addDims) {
+	this(null, isConstructor, accessFlags, returns, name, formals, exceptions, body, addDims);
+    }
+
 
   /**
    * As above, except this constructor takes an additional, and 
@@ -100,10 +118,11 @@ public class MethodNode extends ClassMember
    * @param addDims The number of additional dimensions of the 
    *  return type.
    */
-  public MethodNode( AccessFlags accessFlags, TypeNode returns, String name,
+  public MethodNode( Node ext, AccessFlags accessFlags, TypeNode returns, String name,
                      List formals, List exceptions, BlockStatement body,
                      int addDims)
   {
+    this.ext = ext;
     this.isConstructor = false;
     this.accessFlags = accessFlags;
     this.returns = returns;
@@ -118,15 +137,24 @@ public class MethodNode extends ClassMember
     mtiThis = null;
   }
 
+  public MethodNode( AccessFlags accessFlags, TypeNode returns, String name,
+                     List formals, List exceptions, BlockStatement body,
+                     int addDims) {
+      this(null, accessFlags, returns, name, formals, exceptions, body, addDims);
+  }
+
+
   /**
    * Lazily reconstruct this node.
    */
-  public MethodNode reconstruct( boolean isConstructor, 
+   public MethodNode reconstruct( Node ext, 
+				 boolean isConstructor, 
                                  AccessFlags accessFlags, TypeNode returns,
                                  String name, List formals, List exceptions,
                                  BlockStatement body, int addDims)
   {
     if( this.isConstructor != isConstructor 
+	|| this.ext != ext
         || !this.accessFlags.equals( accessFlags) 
         || this.returns != returns 
         || (this.name == null && name != null) 
@@ -136,9 +164,9 @@ public class MethodNode extends ClassMember
         || this.body != body 
         || this.addDims != addDims) {
       MethodNode n = (isConstructor ? 
-                      new MethodNode( accessFlags, returns, formals, 
+                      new MethodNode( ext, accessFlags, returns, formals, 
                                       exceptions, body) :
-                      new MethodNode( accessFlags, returns, name, 
+                      new MethodNode( ext, accessFlags, returns, name, 
                                       formals, exceptions, body, 
                                       addDims));
       n.mtiThis = mtiThis;
@@ -149,9 +177,9 @@ public class MethodNode extends ClassMember
       for( int i = 0; i < formals.size(); i++) {
         if( this.formals.get( i) != formals.get( i)) {
           MethodNode n = (isConstructor ? 
-                          new MethodNode( accessFlags, returns, formals, 
+                          new MethodNode( ext, accessFlags, returns, formals, 
                                           exceptions, body) :
-                          new MethodNode( accessFlags, returns, name, 
+                          new MethodNode( ext, accessFlags, returns, name, 
                                           formals, exceptions, body, 
                                           addDims));
           n.copyAnnotationsFrom( this);
@@ -163,9 +191,9 @@ public class MethodNode extends ClassMember
       for( int i = 0; i < exceptions.size(); i++) {
         if( this.exceptions.get( i) != exceptions.get( i)) {
           MethodNode n = (isConstructor ? 
-                          new MethodNode( accessFlags, returns, formals, 
+                          new MethodNode( ext, accessFlags, returns, formals, 
                                           exceptions, body) :
-                          new MethodNode( accessFlags, returns, name, 
+                          new MethodNode( ext, accessFlags, returns, name, 
                                           formals, exceptions, body, 
                                           addDims));
           n.copyAnnotationsFrom( this);
@@ -177,6 +205,14 @@ public class MethodNode extends ClassMember
       return this;
     }
   }
+
+   public MethodNode reconstruct(boolean isConstructor, 
+                                 AccessFlags accessFlags, TypeNode returns,
+                                 String name, List formals, List exceptions,
+                                 BlockStatement body, int addDims) {
+       return reconstruct(this.ext, isConstructor, accessFlags, returns, name, formals, exceptions, body, addDims);
+   }
+
 
   /**
    * Returns <code>true</code> iff this node represents a constructor.
@@ -304,7 +340,7 @@ public class MethodNode extends ClassMember
       newBody = (BlockStatement)body.visit( v); 
     }
 
-    return reconstruct( isConstructor, accessFlags, newReturns, name,
+    return reconstruct( Node.condVisit(this.ext, v), isConstructor, accessFlags, newReturns, name,
                         newFormals, newExceptions, newBody,
                         addDims);
   }

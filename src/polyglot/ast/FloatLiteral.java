@@ -19,41 +19,58 @@ public class FloatLiteral extends Literal
    * Creates a new <code>FloatLiteral</code> storing a float with the value 
    * <code>f</code>.
    */
-  public FloatLiteral( float f) 
+  public FloatLiteral( Node ext, float f) 
   {
-    this( FLOAT, f);
+    this( ext, FLOAT, f);
   }
+
+    public FloatLiteral( float f) {
+	this(null, f);
+    }
 
   /**
    * Creates a new <code>FloatLiteral</code> storing a double with the value
    * <code>d</code>.
    */
-  public FloatLiteral( double d) 
+  public FloatLiteral( Node ext, double d) 
   {
-    this( DOUBLE, d);
+    this( ext, DOUBLE, d);
   }
+
+    public FloatLiteral( double d) {
+	this(null, d);
+    }
 
   /**
    * Creates a new <code>FloatLiteral</code>.
    */
-  public FloatLiteral( int kind, double value)
+  public FloatLiteral( Node ext, int kind, double value)
   {
+    this.ext = ext;
     this.kind = kind;
     this.value = value;
   }
 
+    public FloatLiteral( int kind, double value) {
+	this(null, kind, value);
+    }
+
   /* Lazily reconstruct this node. */
-  public FloatLiteral reconstruct( int kind, double value)
+  public FloatLiteral reconstruct( Node ext, int kind, double value)
   {
-    if( this.kind == kind && (double)this.value == value) {
+    if( this.kind == kind && this.ext == ext && (double)this.value == value) {
       return this;
     }
     else {
-      FloatLiteral n = new FloatLiteral( kind, value);
+      FloatLiteral n = new FloatLiteral( ext, kind, value);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public FloatLiteral reconstruct( int kind, double value) {
+	return reconstruct(this.ext, kind, value);
+    }
 
   /**
    * Returns the kind of this <code>FloatLiteral</code> as specified by the

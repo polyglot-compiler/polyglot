@@ -32,38 +32,51 @@ public class VariableDeclarationStatement extends Statement
      * <code>dims</code> dimensions beyond those of the declarations's base
      * type.
      */
-    public Declarator( VariableDeclarationStatement vds, 
+    public Declarator( Node ext, VariableDeclarationStatement vds, 
                        String n, int dims, Expression init) 
     {
+      this.ext = ext;
       name = n;
       additionalDimensions = dims;
       initializer = init;
       wrVDS = new WeakReference(vds);
     }
 
+    public Declarator( VariableDeclarationStatement vds, 
+                       String n, int dims, Expression init) {
+	this(null, vds, n, dims, init);
+    }
+
+
     /**
      * Lazily reconstruct the Declarator
      */
-    public Declarator reconstruct (VariableDeclarationStatement vds, 
+    public Declarator reconstruct (Node ext, VariableDeclarationStatement vds, 
                                    String n, int dims, Expression init)
     {
-      if ( ! n.equals ( name) ||
+      if ( ! n.equals ( name) || this.ext != ext ||
            dims != additionalDimensions ||
            init != initializer ||
            vds != (VariableDeclarationStatement)wrVDS.get() )
       {
-        Declarator d = new Declarator ( vds, n, dims, init);
+        Declarator d = new Declarator ( ext, vds, n, dims, init);
         d.copyAnnotationsFrom ( this );
         return d;
       }
       return this;
     }
+
+    public Declarator reconstruct (VariableDeclarationStatement vds, 
+                                   String n, int dims, Expression init) {
+	return reconstruct(this.ext, vds, n, dims, init);
+    }
+
     
     public Node visitChildren( NodeVisitor v)
     {
       
       if (initializer != null)
-        return reconstruct ( (VariableDeclarationStatement)wrVDS.get(), name, 
+        return reconstruct ( Node.condVisit(this.ext, v), (VariableDeclarationStatement)wrVDS.get(), name, 
                              additionalDimensions, 
                              (Expression)initializer.visit( v ) );
       return this;
@@ -167,30 +180,36 @@ public class VariableDeclarationStatement extends Statement
    * @pre Every element of <code>declarators</code> must be a 
    *  <code>Declarator</code>.
    */
-  public VariableDeclarationStatement( AccessFlags accessFlags,
+  public VariableDeclarationStatement( Node ext, AccessFlags accessFlags,
                                        TypeNode tn, List declarators) {
+    this.ext = ext;
     this.accessFlags = accessFlags;
     this.tn = tn;
     List l = new ArrayList( declarators.size());
     for (ListIterator i = declarators.listIterator(); i.hasNext(); )
     {
       Declarator d = (Declarator)i.next();
-      l.add( d.reconstruct ( this, d.name, d.additionalDimensions, d.initializer));
+      l.add( d.reconstruct ( d.ext, this, d.name, d.additionalDimensions, d.initializer));
     }
     this.declarators = TypedList.copyAndCheck( l, Declarator.class,
                                                true);
   }
 
+  public VariableDeclarationStatement( AccessFlags accessFlags,
+                                       TypeNode tn, List declarators) {
+      this(null, accessFlags, tn, declarators);
+  }
+
   /**
    * Lazily reconstruct this node.
    */
-  public VariableDeclarationStatement reconstruct( AccessFlags accessFlags,
+  public VariableDeclarationStatement reconstruct( Node ext, AccessFlags accessFlags,
                                                    TypeNode tn,
                                                    List declarators) {
-    if( !this.accessFlags.equals( accessFlags) || this.tn != tn
+    if( !this.accessFlags.equals( accessFlags) || this.tn != tn || this.ext != ext
         || this.declarators.size() != declarators.size()) {
       VariableDeclarationStatement n 
-        = new VariableDeclarationStatement( accessFlags, tn, declarators);
+        = new VariableDeclarationStatement( ext, accessFlags, tn, declarators);
       n.copyAnnotationsFrom( this);
       return n;
     }
@@ -198,13 +217,19 @@ public class VariableDeclarationStatement extends Statement
       for( int i = 0; i < declarators.size(); i++) {
         if( this.declarators.get( i) != declarators.get( i)) {
           VariableDeclarationStatement n 
-            = new VariableDeclarationStatement( accessFlags, tn, declarators);
+            = new VariableDeclarationStatement( ext, accessFlags, tn, declarators);
           n.copyAnnotationsFrom( this);
           return n;
         }
       }
       return this;
     }
+  }
+
+  public VariableDeclarationStatement reconstruct( AccessFlags accessFlags,
+                                                   TypeNode tn,
+                                                   List declarators) {
+      return reconstruct(this.ext, accessFlags, tn, declarators);
   }
 
   /*
@@ -285,7 +310,7 @@ public class VariableDeclarationStatement extends Statement
       newDeclarators.add ( ((Declarator)iter.next()).visit ( v ) );
     }
 
-    return reconstruct( accessFlags, newTn, newDeclarators);
+    return reconstruct( Node.condVisit(this.ext, v), accessFlags, newTn, newDeclarators);
   }
 
   public Node removeAmbiguities( LocalContext c, AmbiguityRemover ar) 
@@ -293,7 +318,7 @@ public class VariableDeclarationStatement extends Statement
   {
     TypeNode newTn = (TypeNode)tn.visit(ar);
     
-    VariableDeclarationStatement vds = reconstruct ( accessFlags, 
+    VariableDeclarationStatement vds = reconstruct ( ext, accessFlags, 
                                                      newTn, declarators);
     List newDeclarators = new ArrayList ( declarators.size());
     for (Iterator iter = vds.declarators(); iter.hasNext(); )

@@ -16,25 +16,34 @@ public class ThrowStatement extends Statement
   /**
    * Creates a new <code>ThrowStatement</code>.
    */
-  public ThrowStatement( Expression expr) 
+  public ThrowStatement( Node ext, Expression expr) 
   {
+    this.ext = ext;
     this.expr = expr;
   }
   
+    public ThrowStatement( Expression expr) {
+	this(null, expr);
+    }
+
   /**
    * Lazily reconstruct this node.
    */
-  public ThrowStatement reconstruct( Expression expr)
+  public ThrowStatement reconstruct( Node ext, Expression expr)
   {
-    if( this.expr == expr) {
+    if( this.expr == expr && this.ext == ext) {
       return this;
     }
     else {
-      ThrowStatement n = new ThrowStatement( expr);
+      ThrowStatement n = new ThrowStatement( ext, expr);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public ThrowStatement reconstruct( Expression expr) {
+	return reconstruct(this.ext, expr);
+    }
 
   /** 
    * Returns the expression whose value is thrown by this statement.
@@ -49,7 +58,7 @@ public class ThrowStatement extends Statement
    */
   public Node visitChildren( NodeVisitor v)
   {
-    return reconstruct( (Expression)expr.visit( v));
+    return reconstruct( Node.condVisit(this.ext, v), (Expression)expr.visit( v));
   }
 
   public Node typeCheck( LocalContext c)

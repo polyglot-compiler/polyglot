@@ -16,26 +16,35 @@ public class InstanceofExpression extends Expression
   /**
    * Creates a new <code>InstanceofExpreession</code>.
    */
-  public InstanceofExpression( Expression expr, TypeNode tn)
+  public InstanceofExpression( Node ext, Expression expr, TypeNode tn)
   {
+    this.ext = ext;
     this.expr = expr;
     this.tn = tn;
   }
 
+    public InstanceofExpression( Expression expr, TypeNode tn){
+	this(null, expr, tn);
+    }
+
   /**
    * Lazily reconstruct this node.
    */
-  public InstanceofExpression reconstruct( Expression expr, TypeNode tn)
+  public InstanceofExpression reconstruct( Node ext, Expression expr, TypeNode tn)
   {
-    if( this.expr == expr && this.tn == tn) {
+    if( this.expr == expr && this.tn == tn && this.ext == ext) {
       return this;
     }
     else {
-      InstanceofExpression n = new InstanceofExpression( expr, tn);
+      InstanceofExpression n = new InstanceofExpression( ext, expr, tn);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public InstanceofExpression reconstruct( Expression expr, TypeNode tn) {
+	return reconstruct(this.ext, expr, tn);
+    }
 
   /**
    * Returns the expression whose type is being checked.
@@ -62,7 +71,7 @@ public class InstanceofExpression extends Expression
    */
   public Node visitChildren( NodeVisitor v) 
   {
-    return reconstruct( (Expression)expr.visit( v),
+    return reconstruct( Node.condVisit(this.ext, v),(Expression)expr.visit( v),
                         (TypeNode)tn.visit( v));
   }
 

@@ -27,13 +27,20 @@ public class TryStatement extends Statement {
    * finally block of <code>finallyBlock</code>.  If there is no finally
    *  block, then <code>finallyBlock</code> should be null.
    */
-  public TryStatement(BlockStatement tryBlock,
+  public TryStatement(Node ext, BlockStatement tryBlock,
 		      List catchBlocks,
 		      BlockStatement finallyBlock) {
+    this.ext = ext;
     this.tryBlock = tryBlock;
     this.finallyBlock = finallyBlock;
     TypedList.check(catchBlocks, CatchBlock.class);
     this.catchBlocks = new ArrayList(catchBlocks);
+  }
+
+  public TryStatement(BlockStatement tryBlock,
+		      List catchBlocks,
+		      BlockStatement finallyBlock) {
+      this(null, tryBlock, catchBlocks, finallyBlock);
   }
 
   /**
@@ -48,15 +55,15 @@ public class TryStatement extends Statement {
    * and block).
    * @param finallyBlock An optional block for the finally clause
    */
-  public TryStatement reconstruct( BlockStatement tryBlock, 
+  public TryStatement reconstruct( Node ext, BlockStatement tryBlock, 
                                    List catchBlocks, 
                                    BlockStatement finallyBlock)
   {
-    if ( tryBlock != this.tryBlock ||
+    if ( tryBlock != this.tryBlock || this.ext != ext ||
          finallyBlock != this.finallyBlock ||
          catchBlocks.size() != this.catchBlocks.size())
     {
-      TryStatement ts = new TryStatement ( tryBlock, catchBlocks, 
+      TryStatement ts = new TryStatement ( ext, tryBlock, catchBlocks, 
                                            finallyBlock) ;
       ts.copyAnnotationsFrom ( this ) ;
       return ts;
@@ -66,7 +73,7 @@ public class TryStatement extends Statement {
     {
       if ( catchBlocks.get( i ) != this.catchBlocks.get( i ) )
       {
-        TryStatement ts = new TryStatement ( tryBlock, catchBlocks, 
+        TryStatement ts = new TryStatement ( ext, tryBlock, catchBlocks, 
                                              finallyBlock) ;
         ts.copyAnnotationsFrom ( this ) ;
         return ts;
@@ -75,6 +82,13 @@ public class TryStatement extends Statement {
     
     return this;
   }
+
+  public TryStatement reconstruct( BlockStatement tryBlock, 
+                                   List catchBlocks, 
+                                   BlockStatement finallyBlock) {
+      return reconstruct(this.ext, tryBlock, catchBlocks, finallyBlock);
+  }
+
 
   /**
    * Effects: Returns the tryBlock for this TryStatement.
@@ -133,7 +147,7 @@ public class TryStatement extends Statement {
       newFinallyBlock = (BlockStatement) finallyBlock.visit( v);
     }
 
-    return reconstruct ( newTryBlock, newCatchBlocks, newFinallyBlock);
+    return reconstruct ( Node.condVisit(this.ext, v), newTryBlock, newCatchBlocks, newFinallyBlock);
   }
 
    public Node typeCheck(LocalContext c) 

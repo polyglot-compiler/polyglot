@@ -28,26 +28,35 @@ public class ImportNode extends Node
   /**
    * Creates new <code>ImportNode</code>.
    */
-  public ImportNode( int kind, String imports) 
+  public ImportNode( Node ext, int kind, String imports) 
   { 
     if (kind < 0 || kind > MAX_KIND) {
       throw new IllegalArgumentException ("Invalid kind for ImportNode.");
     }
+    this.ext = ext;
     this.kind = kind;
     this.imports = imports;
   }
 
-  public ImportNode reconstruct( int kind, String imports) 
+    public ImportNode( int kind, String imports) {
+	this(null, kind, imports);
+    }
+
+  public ImportNode reconstruct( Node ext, int kind, String imports) 
   {
-    if( this.kind == kind && this.imports.equals( imports)) {
+    if( this.kind == kind && this.ext == ext && this.imports.equals( imports)) {
       return this;
     }
     else {
-      ImportNode n = new ImportNode( kind, imports);
+      ImportNode n = new ImportNode( ext, kind, imports);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public ImportNode reconstruct( int kind, String imports) {
+	return reconstruct(this.ext, kind, imports);
+    }
 
   /**
    * Returns the kind of this <code>ImportNode</code>.

@@ -17,22 +17,28 @@ public class WhileStatement extends Statement
   /**
    * Creates a new <code>WhileStatement</code>.
    */
-  public WhileStatement( Expression cond, Statement body) 
+  public WhileStatement( Node ext, Expression cond, Statement body) 
   {
+    this.ext = ext;
     this.cond = cond;
     this.body = body;
   }
 
+    public WhileStatement( Expression cond, Statement body) 
+    {
+	this(null, cond, body);
+    }
+
   /**
    * Lazily reconstruc this node.
    */
-  public WhileStatement reconstruct( Expression cond, Statement body)
+  public WhileStatement reconstruct( Node ext, Expression cond, Statement body)
   {
-    if( this.cond == cond && this.body == body) {
+    if( this.cond == cond && this.body == body && this.ext == ext) {
       return this;
     }
     else {
-      WhileStatement n = new WhileStatement( cond, body);
+      WhileStatement n = new WhileStatement( ext, cond, body);
       n.copyAnnotationsFrom( this);
       return n;
     }
@@ -64,8 +70,8 @@ public class WhileStatement extends Statement
    */
   public Node visitChildren( NodeVisitor v) 
   {
-    return reconstruct( (Expression)cond.visit( v),
-                        (body == null ? null : (Statement)body.visit( v)));
+    return reconstruct( Node.condVisit(this.ext, v), (Expression)cond.visit( v),
+                        (Statement)Node.condVisit(body, v));
   }
 
   public Node typeCheck( LocalContext c) throws SemanticException

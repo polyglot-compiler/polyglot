@@ -36,11 +36,13 @@ public class ClassNode extends ClassMember
   /**
    * FIXME
    */
-  public ClassNode(AccessFlags accessFlags,
+  public ClassNode(Node ext, 
+		   AccessFlags accessFlags,
 		   String name,
 		   TypeNode superClass,
 		   List interfaces,
 		   List members) {
+    this.ext = ext;
     this.accessFlags = accessFlags;
     this.name = name;
     this.superClass = superClass;
@@ -48,6 +50,14 @@ public class ClassNode extends ClassMember
                                               TypeNode.class, true);
     this.members = TypedList.copyAndCheck( members, 
                                            ClassMember.class, true);
+  }
+
+  public ClassNode(AccessFlags accessFlags,
+		   String name,
+		   TypeNode superClass,
+		   List interfaces,
+		   List members) {
+      this(null, accessFlags, name, superClass, interfaces, members);
   }
   
   /**
@@ -58,7 +68,8 @@ public class ClassNode extends ClassMember
    * constructed with the new fields and all annotations from this node are
    * copied over.
    */
-  public ClassNode reconstruct( AccessFlags accessFlags,
+  public ClassNode reconstruct( Node ext,
+			        AccessFlags accessFlags,
                                 String name,
                                 TypeNode superClass,
                                 List interfaces,
@@ -66,9 +77,10 @@ public class ClassNode extends ClassMember
   {
     if( !this.accessFlags.equals( accessFlags) || !this.name.equals( name)
           || this.superClass != superClass
+	  || this.ext != ext
           || this.interfaces.size() != interfaces.size()
           || this.members.size() != members.size()) {
-      ClassNode n = new ClassNode( accessFlags, name, superClass, 
+      ClassNode n = new ClassNode( ext, accessFlags, name, superClass, 
                                    interfaces, members);
 
       n.type = type;
@@ -78,7 +90,7 @@ public class ClassNode extends ClassMember
     else {
       for( int i = 0; i < interfaces.size(); i++) {
         if( this.interfaces.get( i) != interfaces.get( i)) {
-          ClassNode n = new ClassNode( accessFlags, name, superClass, 
+          ClassNode n = new ClassNode( ext, accessFlags, name, superClass, 
                                        interfaces, members);
           n.type = type;
           n.copyAnnotationsFrom( this);
@@ -88,7 +100,7 @@ public class ClassNode extends ClassMember
       }
       for( int i = 0; i < members.size(); i++) {
         if( this.members.get( i) != members.get( i)) {
-          ClassNode n = new ClassNode( accessFlags, name, superClass, 
+          ClassNode n = new ClassNode( ext, accessFlags, name, superClass, 
                                        interfaces, members);
           n.type = type;
           n.copyAnnotationsFrom( this);
@@ -98,6 +110,15 @@ public class ClassNode extends ClassMember
       return this;
     }
   }
+
+  public ClassNode reconstruct( AccessFlags accessFlags,
+                                String name,
+                                TypeNode superClass,
+                                List interfaces,
+                                List members) {
+      return reconstruct(this.ext, accessFlags, name, superClass, interfaces, members);
+  }
+
 
   /**
    * Returns the <code>AccessFlags</code> for this class declaration. 
@@ -191,7 +212,8 @@ public class ClassNode extends ClassMember
       }
     }
 
-    return reconstruct( accessFlags,
+    return reconstruct( Node.condVisit(this.ext, v), 
+			accessFlags,
                         name,
                         newSuperClass,
                         newInterfaces,

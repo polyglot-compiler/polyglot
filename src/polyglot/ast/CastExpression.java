@@ -17,12 +17,17 @@ public class CastExpression extends Expression
    * Creates a new cast expression casting <code>expr</code>> to type
    * <code>type</code>.
    */
-  public CastExpression( TypeNode tn, Expression expr) 
+  public CastExpression( Node ext, TypeNode tn, Expression expr) 
   {
+    this.ext = ext;
     this.tn = tn;
     this.expr = expr;
   }
   
+    public CastExpression( TypeNode tn, Expression expr) {
+	this(null, tn, expr);
+    }
+
   /**
    * Lazily reconstruct this node.
    * <p>
@@ -35,17 +40,21 @@ public class CastExpression extends Expression
    * @param expr The expression that is being cast.
    * @return An <code>CastExpression<code> with the given type and expression.
    */
-  public CastExpression reconstruct( TypeNode tn, Expression expr)
+  public CastExpression reconstruct( Node ext, TypeNode tn, Expression expr)
   {
-    if( this.tn == tn && this.expr == expr) {
+    if( this.tn == tn && this.expr == expr && this.ext == ext) {
       return this;
     }
     else {
-      CastExpression n = new CastExpression( tn, expr);
+      CastExpression n = new CastExpression( ext, tn, expr);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public CastExpression reconstruct( TypeNode tn, Expression expr) {
+	return reconstruct(this.ext, tn, expr);
+    }
 
   /**
    * Returns the type that this <code>CastExpression</code> is casting to.
@@ -72,7 +81,7 @@ public class CastExpression extends Expression
    */ 
   public Node visitChildren( NodeVisitor v) 
   {
-    return reconstruct( (TypeNode)tn.visit( v),
+    return reconstruct( Node.condVisit(this.ext, v), (TypeNode)tn.visit( v),
                         (Expression)expr.visit( v));
   }
 

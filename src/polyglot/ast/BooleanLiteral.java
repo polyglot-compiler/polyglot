@@ -14,20 +14,29 @@ public class BooleanLiteral extends Literal
   /**
    * Creates a new <code>BooleanLiteral</code>.
    */
-  public BooleanLiteral( boolean value)
+  public BooleanLiteral( Node ext, boolean value)
   {
+    this.ext = ext;
     this.value = value;
   }
 
-  public BooleanLiteral reconstruct( boolean value)
+    public BooleanLiteral( boolean value) {
+	this(null, value);
+    }
+
+  public BooleanLiteral reconstruct( Node ext, boolean value)
   {
-    if( this.value == value) {
+    if( this.value == value && this.ext == ext) {
       return this;
     }
     else {
-      return new BooleanLiteral( value);
+      return new BooleanLiteral( ext, value);
     }
   }
+
+    public BooleanLiteral reconstruct( boolean value) {
+	return reconstruct(this.ext, value);
+    }
 
   public boolean getBooleanValue()
   {

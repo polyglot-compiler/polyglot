@@ -15,7 +15,7 @@ import java.util.*;
  * following form, to assist in this reconstuction.
  *
  * <pre><code>
- * public MyNode reconstruct( Extension ext, Expression field1, TypeNode field2)
+ * public MyNode reconstruct( Node ext, Expression field1, TypeNode field2)
  * {
  *   if( this.field1 == field1 && this.field2 == field2 && this.ext == ext) {
  *     return this;
@@ -44,7 +44,7 @@ public abstract class Node extends AnnotatedObject {
     /**
      * The extension object for this node.
      */
-    public Extension ext;
+    public Node ext;
 
     /**
      * Determines whether this node has an extension object.
@@ -57,11 +57,8 @@ public abstract class Node extends AnnotatedObject {
 	this(null);
     }
 
-    public Node(Extension ext) {
+    public Node(Node ext) {
 	this.ext = ext;
-	if (ext != null) {
-	    ext.init(this);
-	}
     }
 
 
@@ -101,6 +98,14 @@ public abstract class Node extends AnnotatedObject {
    *  children; otherwise <code>this</code>.
    */
   protected abstract Node visitChildren(NodeVisitor v);
+
+    protected static Node condVisit(Node n, NodeVisitor v) {
+	if (n != null) {
+	    return n.visit( v);
+	} else {
+	    return null;
+	}
+    }
 
   /**
    * Collects classes, methods, and fields from an AST. The types of fields

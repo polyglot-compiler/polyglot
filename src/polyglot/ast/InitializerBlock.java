@@ -22,26 +22,35 @@ public class InitializerBlock extends ClassMember
   /**
    * Creates a new <code>InitializerBlock</code>.
    */
-  public InitializerBlock( BlockStatement block, boolean isStatic) 
+  public InitializerBlock( Node ext, BlockStatement block, boolean isStatic) 
   {
+    this.ext = ext;
     this.block = block;
     this.isStatic = isStatic;
   }
 
+    public InitializerBlock( BlockStatement block, boolean isStatic) {
+	this(null, block, isStatic);
+    }
+
   /**
    * Lazily reconstruct this node.
    */
-  public InitializerBlock reconstruct( BlockStatement block, boolean isStatic)
+  public InitializerBlock reconstruct( Node ext, BlockStatement block, boolean isStatic)
   {
-    if( this.block == block && this.isStatic == isStatic) {
+    if( this.block == block && this.isStatic == isStatic && this.ext == ext) {
       return this;
     }
     else {
-      InitializerBlock n = new InitializerBlock( block, isStatic);
+      InitializerBlock n = new InitializerBlock( ext, block, isStatic);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public InitializerBlock reconstruct( BlockStatement block, boolean isStatic) {
+	return reconstruct(this.ext, block, isStatic);
+    }
 
   /**
    * Returns true iff this block contains static code.
@@ -62,7 +71,7 @@ public class InitializerBlock extends ClassMember
     
   public Node visitChildren( NodeVisitor v) 
   {
-    return reconstruct( (BlockStatement)block.visit( v), isStatic);
+    return reconstruct( Node.condVisit(this.ext, v),(BlockStatement)block.visit( v), isStatic);
   }
 
   public void enterScope( LocalContext c)

@@ -31,31 +31,39 @@ public class UnaryExpression extends Expression
    * Effects: Creates a new UnaryExpression of <operator> applied
    *    to <expr>.
    */ 
-  public UnaryExpression(Expression expr, int operator) 
+  public UnaryExpression(Node ext, Expression expr, int operator) 
   {
     if( operator < MIN_OPERATOR || operator > MAX_OPERATOR) {
       throw new IllegalArgumentException( "Value for operator to " +
                                           "UnaryExpression not valid.");
     }
-
+    this.ext = ext;
     this.expr = expr;
     this.operator = operator;
   }
   
+    public UnaryExpression(Expression expr, int operator) {
+	this(null, expr, operator);
+    }
+
   /**
    * Lazily reconstruct this node. 
    */
-  public UnaryExpression reconstruct( Expression expr, int operator)
+  public UnaryExpression reconstruct( Node ext, Expression expr, int operator)
   {
-    if( this.expr == expr && this.operator == operator) {
+    if( this.expr == expr && this.operator == operator && this.ext == ext) {
       return this;
     }
     else {
-      UnaryExpression n = new UnaryExpression( expr, operator);
+      UnaryExpression n = new UnaryExpression( ext, expr, operator);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public UnaryExpression reconstruct( Expression expr, int operator) {
+	return reconstruct(this.ext, expr, operator);
+    }
 
   /**
    * Returns the operator corresponding for this expression.
@@ -78,7 +86,7 @@ public class UnaryExpression extends Expression
    */
   public Node visitChildren( NodeVisitor v)
   {
-    return reconstruct( (Expression)expr.visit( v), operator);
+    return reconstruct( Node.condVisit(this.ext, v), (Expression)expr.visit( v), operator);
   }
 
   /**
@@ -96,10 +104,10 @@ public class UnaryExpression extends Expression
       {
         // FIXME: PROMOTION MAY NOT BE CORRECT
       case BITCOMP:
-        newNode = new IntLiteral( ~ lValue);
+        newNode = new IntLiteral(null,  ~ lValue);
         break;
       case NEGATIVE:
-        newNode = new IntLiteral( - lValue);
+        newNode = new IntLiteral(null,  - lValue);
         break;
       case POSITIVE:
         newNode = expr;

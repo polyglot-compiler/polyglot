@@ -26,10 +26,14 @@ public class BranchStatement extends Statement {
    * @param kind Indicates if this is a <code>break</code> or a
    *  <code>continue</code> statement.
    */
-  public BranchStatement( int kind) 
+  public BranchStatement( Node ext, int kind) 
   {
-    this( kind, null);
+    this( ext, kind, null);
   }
+
+    public BranchStatement( int kind) {
+	this( null, kind, null);
+    }
 
   /**
    * Creates a new <code>BranchStatement</code> of kind <code>kind</code>
@@ -40,16 +44,20 @@ public class BranchStatement extends Statement {
    *  <code>continue</codee> statement.
    * @param label Specifies the label that this statement will branch to.
    */
-  public BranchStatement( int kind, String label) 
+  public BranchStatement( Node ext, int kind, String label) 
   {
     if (kind < 0 || kind > MAX_KIND) {
       throw new IllegalArgumentException("Value for kind of " +
 					 "BranchStatement not valid.");
     }
-
+    this.ext = ext;
     this.kind = kind;
     this.label = label;
   }
+
+    public BranchStatement( int kind, String label) {
+	this(null, kind, label);
+    }
 
   /**
    * Lazily reconstruct this node.
@@ -65,16 +73,20 @@ public class BranchStatement extends Statement {
    * @param label Specifies the label that this statement will branch to.
    * @return A <code>BranchStatement</code> with the given kind and label.
    */
-  public BranchStatement reconstruct( int kind, String label) {
-    if( this.kind == kind && ((this.label == null && label == null) 
+  public BranchStatement reconstruct( Node ext, int kind, String label) {
+    if( this.kind == kind && this.ext == ext && ((this.label == null && label == null) 
                               || this.label.equals( label))) {
       return this;
     } 
     else {
-      BranchStatement n = new BranchStatement( kind, label);
+      BranchStatement n = new BranchStatement( ext, kind, label);
       n.copyAnnotationsFrom( this);
       return n;
     }
+  }
+
+  public BranchStatement reconstruct( int kind, String label) {
+      return reconstruct(this.ext, kind, label);
   }
 
   /**

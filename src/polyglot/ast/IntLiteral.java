@@ -21,16 +21,21 @@ public class IntLiteral extends NumericalLiteral
   /**
    * Creates a new IntLiteral storing a byte with the value <code>b</code>.
    */ 
-  public IntLiteral( byte b) 
+  public IntLiteral( Node ext, byte b) 
   {
-    this( BYTE, b);
+    this( ext, BYTE, b);
   }
+
+    public IntLiteral( byte b) {
+	this(null, BYTE, b);
+    }
 
   /**
    * Creates a new IntLiteral storing a short with the value <code>s</code>.
    */ 
-  public IntLiteral( short s) 
+  public IntLiteral( Node ext, short s) 
   {
+    this.ext = ext;
     value = s;
     if ( Math.abs(s) < Byte.MAX_VALUE)
       kind = BYTE;
@@ -38,11 +43,16 @@ public class IntLiteral extends NumericalLiteral
       kind = SHORT;
   }
     
+    public IntLiteral( short s) {
+	this(null, s);
+    }
+
   /**
    * Creates a new IntLiteral storing an integer with the value <code>i</code>.
    */ 
-  public IntLiteral( int i) 
+  public IntLiteral( Node ext, int i) 
   {
+    this.ext = ext;
     value = i;
     if (Math.abs(i) < Byte.MAX_VALUE)
       kind = BYTE;
@@ -52,11 +62,16 @@ public class IntLiteral extends NumericalLiteral
       kind = INT;
   }
 
+    public IntLiteral( int i) {
+	this(null, i);
+    }
+
   /**
    * Creates a new IntLiteral storing a long with the value <code>l</code>.
    */ 
-  public IntLiteral( long l) 
+  public IntLiteral( Node ext, long l) 
   {
+    this.ext = ext;
     value = l;
     if (Math.abs( l) < Byte.MAX_VALUE)
       kind = BYTE;
@@ -68,23 +83,36 @@ public class IntLiteral extends NumericalLiteral
       kind = LONG;
   }
 
-  public IntLiteral( int kind, long value)
+    public IntLiteral( long l) {
+	this(null, l);
+    }
+
+  public IntLiteral( Node ext, int kind, long value)
   {
+    this.ext = ext;
     this.kind = kind;
     this.value = value;
   }
 
-  public IntLiteral reconstruct( int kind, long value) 
+    public IntLiteral( int kind, long value) {
+	this(null, kind, value);
+    }
+
+  public IntLiteral reconstruct( Node ext, int kind, long value) 
   {
-    if( this.kind == kind && this.value == value) {
+    if( this.kind == kind && this.value == value && this.ext == ext) {
       return this;
     }
     else {
-      IntLiteral n = new IntLiteral( kind, value);
+      IntLiteral n = new IntLiteral( ext, kind, value);
       n.copyAnnotationsFrom( this);
       return n;
     }      
   }
+
+    public IntLiteral reconstruct( int kind, long value) {
+	return reconstruct(this.ext, kind, value);
+    }
 
   /** 
    * Returns the kind of this <code>IntLiteral</code> as specified by the

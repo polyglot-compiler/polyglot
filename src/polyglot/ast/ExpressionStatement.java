@@ -15,25 +15,34 @@ public class ExpressionStatement extends Statement
   /**
    * Effects: Create a new ExpressionStatement.
    **/
-  public ExpressionStatement( Expression expr)
+  public ExpressionStatement( Node ext, Expression expr)
   {
+    this.ext = ext;
     this.expr = expr;
   }
+
+    public ExpressionStatement( Expression expr) {
+	this(null, expr);
+    }
 
   /**
    * Lazily reconstuct this node. 
    */
-  public ExpressionStatement reconstruct( Expression expr) 
+  public ExpressionStatement reconstruct( Node ext, Expression expr) 
   {
-    if( this.expr == expr) {
+    if( this.expr == expr && this.ext == ext) {
       return this;
     }
     else {
-      ExpressionStatement n = new ExpressionStatement( expr);
+      ExpressionStatement n = new ExpressionStatement( ext, expr);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public ExpressionStatement reconstruct( Expression expr) {
+	return reconstruct(this.ext, expr);
+    }
 
   /** 
    * Returns the underlying expression of this 
@@ -52,7 +61,7 @@ public class ExpressionStatement extends Statement
    */
   public Node visitChildren( NodeVisitor v) 
   {
-    return reconstruct( (Expression)expr.visit( v));
+    return reconstruct( Node.condVisit(this.ext, v),(Expression)expr.visit( v));
   }
 
   public Node typeCheck( LocalContext c)

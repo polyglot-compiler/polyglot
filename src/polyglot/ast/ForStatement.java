@@ -32,35 +32,42 @@ public class ForStatement extends Statement
    *  <code>Statement</code>. Each element of <code>iters</code> is a
    *  <code>Statement</code>. 
    */
-  public ForStatement( List inits, Expression cond, List iters, 
+  public ForStatement( Node ext, List inits, Expression cond, List iters, 
                        Statement body) 
   {
+    this.ext = ext;
     this.inits = TypedList.copyAndCheck( inits, Statement.class, true);
     this.cond = cond;
     this.iters = TypedList.copyAndCheck( iters, Statement.class, true);
     this.body = body;    
   }
 
-  public ForStatement reconstruct( List inits, Expression cond, List iters, 
+  public ForStatement( List inits, Expression cond, List iters, 
+                       Statement body) {
+      this(null, inits, cond, iters, body);
+  }
+
+
+  public ForStatement reconstruct( Node ext, List inits, Expression cond, List iters, 
                                    Statement body)
   {
-    if( this.inits.size() != inits.size() || this.cond != cond
+    if( this.inits.size() != inits.size() || this.ext != ext || this.cond != cond
         || this.iters.size() != iters.size() || this.body != body) {
-      ForStatement n = new ForStatement( inits, cond, iters, body);
+      ForStatement n = new ForStatement( ext, inits, cond, iters, body);
       n.copyAnnotationsFrom( this);
       return n;
     }
     else {
       for( int i = 0; i < inits.size(); i++) {
         if( this.inits.get( i) != inits.get( i)) {
-          ForStatement n = new ForStatement( inits, cond, iters, body);
+          ForStatement n = new ForStatement( ext, inits, cond, iters, body);
           n.copyAnnotationsFrom( this);
           return n;
         }
       }
       for( int i = 0; i < iters.size(); i++) {
         if( this.iters.get( i) != iters.get( i)) {
-          ForStatement n = new ForStatement( inits, cond, iters, body);
+          ForStatement n = new ForStatement( ext, inits, cond, iters, body);
           n.copyAnnotationsFrom( this);
           return n;
         }
@@ -68,6 +75,13 @@ public class ForStatement extends Statement
       return this;
     }
   }
+
+  public ForStatement reconstruct( List inits, Expression cond, List iters, 
+                                   Statement body)
+    {
+	return reconstruct(this.ext, inits, cond, iters, body);
+    }
+
   
   /**
    * Return an iterator of initializers for this statement.
@@ -152,7 +166,7 @@ public class ForStatement extends Statement
       newBody = (Statement)body.visit( v);
     }
 
-    return reconstruct( newInits, newCond, newIters, newBody);
+    return reconstruct( Node.condVisit(this.ext, v),newInits, newCond, newIters, newBody);
   }
 
   public Node typeCheck( LocalContext c) throws SemanticException

@@ -25,16 +25,25 @@ public class TypeNode extends Node
    */
   protected final String original;
 
-  public TypeNode( Type type) 
+  public TypeNode( Node ext, Type type) 
   { 
-    this( type, type.getTypeString());
+    this( ext, type, type.getTypeString());
   }
 
-  public TypeNode( Type type, String original) 
+    public TypeNode( Type type) {
+	this(null, type);
+    }
+
+  public TypeNode( Node ext, Type type, String original) 
   {
+    this.ext = ext;
     this.type = type;
     this.original = original;
   }
+
+    public TypeNode( Type type, String original) {
+	this(null, type, original);
+    }
 
   /**
    * Lazily reconstruct this node.
@@ -48,17 +57,21 @@ public class TypeNode extends Node
    * @param original The original string that represents .
    * @return An <code>ArrayIndexExpression<code> with the given base and index.
    */
-  public TypeNode reconstruct( Type type, String original) 
+  public TypeNode reconstruct( Node ext, Type type, String original) 
   {
-    if( this.type == type && this.original.equals( original)) {
+    if( this.type == type && this.ext == ext && this.original.equals( original)) {
       return this;
     }
     else {
-      TypeNode n = new TypeNode( type, original);
+      TypeNode n = new TypeNode( ext, type, original);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public TypeNode reconstruct( Type type, String original) {
+	return reconstruct(this.ext, type, original);
+    }
 
   public Type getType() 
   {
@@ -78,7 +91,7 @@ public class TypeNode extends Node
    
   public Node removeAmbiguities( LocalContext c) throws SemanticException
   {
-    return reconstruct( c.getType( type), original);
+    return reconstruct( null, c.getType( type), original);
   }
 
   public Node typeCheck(LocalContext c)

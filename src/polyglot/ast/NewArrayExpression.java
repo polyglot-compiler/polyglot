@@ -30,30 +30,36 @@ public class NewArrayExpression extends Expression
    * @pre <code>addDims</code> >= 0 and each element of <code>dimExprs</code>
    *  is of type <code>Expression</code>.
    */ 
-  public NewArrayExpression( TypeNode base, List dimExprs, int addDims, 
+  public NewArrayExpression( Node ext, TypeNode base, List dimExprs, int addDims, 
                              ArrayInitializerExpression init)
   {
     if (addDims < 0) {
       throw new IllegalArgumentException( "The number of additional dimensions"
                                          + " must be positive.");
     }
-    
+    this.ext = ext;
     this.base = base;
     this.dimExprs = TypedList.copyAndCheck( dimExprs, Expression.class, true);
     this.addDims = addDims;
     this.init = init;
   }
 
+  public NewArrayExpression( TypeNode base, List dimExprs, int addDims, 
+                             ArrayInitializerExpression init) {
+      this(null, base, dimExprs, addDims, init);
+  }
+
+
   /**
    * Lazily reconstruct this node. 
    */
-  public NewArrayExpression reconstruct( TypeNode base, List dimExprs,
+  public NewArrayExpression reconstruct( Node ext, TypeNode base, List dimExprs,
                                          int addDims,
                                          ArrayInitializerExpression init)
   {
-    if( this.base != base || this.dimExprs.size() != dimExprs.size()
+    if( this.base != base || this.ext != ext || this.dimExprs.size() != dimExprs.size()
         || this.addDims != addDims || this.init != init) {
-      NewArrayExpression n = new NewArrayExpression( base, dimExprs, addDims,
+      NewArrayExpression n = new NewArrayExpression( ext, base, dimExprs, addDims,
                                                      init);
       n.copyAnnotationsFrom( this);
       return n;
@@ -61,7 +67,7 @@ public class NewArrayExpression extends Expression
     else {
       for( int i = 0; i < dimExprs.size(); i++) {
         if( this.dimExprs.get( i) != dimExprs.get( i)) {
-          NewArrayExpression n = new NewArrayExpression( base, dimExprs,
+          NewArrayExpression n = new NewArrayExpression( ext, base, dimExprs,
                                                          addDims, init);
           n.copyAnnotationsFrom( this);
           return n;
@@ -70,6 +76,13 @@ public class NewArrayExpression extends Expression
       return this;
     }
   }
+
+  public NewArrayExpression reconstruct( TypeNode base, List dimExprs,
+                                         int addDims,
+                                         ArrayInitializerExpression init) {
+      return reconstruct(this.ext, base, dimExprs, addDims, init);
+  }
+
   
   /**
    * Returns the type of the array being created. That is, the type without
@@ -148,7 +161,7 @@ public class NewArrayExpression extends Expression
       newInit = (ArrayInitializerExpression)init.visit(v);
     }
     
-    return reconstruct( newBase, newDimExprs, addDims, newInit);
+    return reconstruct( Node.condVisit(this.ext, v),newBase, newDimExprs, addDims, newInit);
   }
   
   public Node typeCheck( LocalContext c)

@@ -15,10 +15,30 @@ public class StringLiteral extends Literal
   /**
    * Creates a new <code>StringLiteral</code>.
    */ 
-  public StringLiteral( String value) 
+  public StringLiteral( Node ext, String value) 
   {
+    this.ext = ext;
     this.value = value;
   }
+
+    public StringLiteral(String value) {
+	this(null, value);
+    }
+
+    public StringLiteral reconstruct( Node ext, String value) {
+	if (this.ext == ext && this.value.equals(value)) {
+	    return this;
+	} else {
+	    StringLiteral n = new StringLiteral(ext, value);
+	    n.copyAnnotationsFrom(this);
+	    return n;
+	}
+    }
+
+    public StringLiteral reconstruct(String value) {
+	return reconstruct(this.ext, value);
+    }
+
   
   /**
    * Returns the string value of this node.

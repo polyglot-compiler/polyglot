@@ -34,7 +34,7 @@ public class ConstructorCallStatement extends Statement
    *  <code>static final int</code>s in this class. Also, 
    *  <code>arguments</code> must be a list of <code>Expression</code>.
    */
-  public ConstructorCallStatement( Expression primary,
+  public ConstructorCallStatement( Node ext, Expression primary,
 				  int kind, List arguments) 
   {
     if (kind < 0 || kind > MAX_KIND) {
@@ -42,6 +42,7 @@ public class ConstructorCallStatement extends Statement
                                           "ConstructorCallStatement " +
                                           "is not valid.");
     }
+    this.ext = ext;
     this.kind = kind;
     this.primary = primary;
     this.arguments = TypedList.copyAndCheck( arguments,
@@ -49,15 +50,21 @@ public class ConstructorCallStatement extends Statement
                                              true);
   }
 
+  public ConstructorCallStatement( Expression primary,
+				   int kind, List arguments) {
+      this(null, primary, kind, arguments);
+  }
+
+
   /**
    * Lazily reconstruct this node.
    */
-  public ConstructorCallStatement reconstruct( Expression primary, int kind,
+  public ConstructorCallStatement reconstruct( Node ext, Expression primary, int kind,
                                                List arguments)
   {
-    if( this.primary != primary || this.kind != kind 
+    if( this.primary != primary || this.kind != kind || this.ext != ext
         || this.arguments.size() != arguments.size()) {
-      ConstructorCallStatement n = new ConstructorCallStatement( primary, 
+      ConstructorCallStatement n = new ConstructorCallStatement( ext, primary, 
                                                                  kind, 
                                                                  arguments);
       n.copyAnnotationsFrom( this);
@@ -66,7 +73,7 @@ public class ConstructorCallStatement extends Statement
     else {
       for( int i = 0; i < arguments.size(); i++) {
         if( this.arguments.get( i) != arguments.get( i)) {
-          ConstructorCallStatement n = new ConstructorCallStatement( primary, 
+          ConstructorCallStatement n = new ConstructorCallStatement( ext, primary, 
                                                                      kind, 
                                                                     arguments);
           n.copyAnnotationsFrom( this);
@@ -76,6 +83,13 @@ public class ConstructorCallStatement extends Statement
       return this;
     }
   }
+
+  public ConstructorCallStatement reconstruct( Expression primary, int kind,
+                                               List arguments)
+    {
+	return reconstruct(this.ext, primary, kind, arguments);
+    }
+
 
   /**
    * Returns the expression providing the contect in which this constructor is
@@ -135,7 +149,7 @@ public class ConstructorCallStatement extends Statement
       }
     }
 
-    return reconstruct( newPrimary, kind, newArguments);
+    return reconstruct( Node.condVisit(this.ext, v), newPrimary, kind, newArguments);
   }
 
   public Node typeCheck( LocalContext c)

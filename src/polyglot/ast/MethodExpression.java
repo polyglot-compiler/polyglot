@@ -30,32 +30,36 @@ public class MethodExpression extends Expression
    *  or an <code>Expression</code> or <code>null</code>. Also 
    *  <code>args</code> must be a list of <code>Expression</code>s.
    */
-  public MethodExpression( Node target, String name, List args) 
+  public MethodExpression( Node ext, Node target, String name, List args) 
   {
     if (target != null && ! (target instanceof TypeNode ||
 			     target instanceof Expression))
       throw new Error("Target of a method call must be a type or expression.");
-
+    this.ext = ext;
     this.target = target;
     this.name = name;
     this.args = TypedList.copyAndCheck( args, Expression.class, true);
   }
   
+    public MethodExpression( Node target, String name, List args) {
+	this(null, target, name, args);
+    }
+
   /**
    * Lazily reconstruct this node.
    */
-  public MethodExpression reconstruct( Node target, String name, List args)
+  public MethodExpression reconstruct( Node ext, Node target, String name, List args)
   {
-    if( this.target != target || !this.name.equals( name) 
+    if( this.target != target || this.ext != ext || !this.name.equals( name) 
         || this.args.size() != args.size()) {
-      MethodExpression n = new MethodExpression( target, name, args);
+      MethodExpression n = new MethodExpression( ext, target, name, args);
       n.copyAnnotationsFrom( this);
       return n;
     }
     else {
       for( int i = 0; i < args.size(); i++) {
         if( this.args.get( i) != args.get( i)) {
-          MethodExpression n = new MethodExpression( target, name, args);
+          MethodExpression n = new MethodExpression( ext, target, name, args);
           n.copyAnnotationsFrom( this);
           return n;
         }
@@ -63,6 +67,10 @@ public class MethodExpression extends Expression
       return this;
     }
   }
+
+    public MethodExpression reconstruct( Node target, String name, List args) {
+	return reconstruct(this.ext, target, name, args);
+    }
 
   /**
    * Returns the target that that the method is being called on.
@@ -122,7 +130,7 @@ public class MethodExpression extends Expression
       }
     }
 
-    return reconstruct( newTarget, name, newArgs);
+    return reconstruct( Node.condVisit(this.ext, v),newTarget, name, newArgs);
   }
 
   public Node removeAmbiguities( LocalContext c)
@@ -131,7 +139,7 @@ public class MethodExpression extends Expression
     // i.e, should name always come in as a short name?
     if( !c.getTypeSystem().getPackageComponent(name).equals( ""))
     {
-      Node n = reconstruct( new AmbiguousNameExpression( 
+      Node n = reconstruct( this.ext, new AmbiguousNameExpression( 
                                 c.getTypeSystem().getPackageComponent( name)),
                           c.getTypeSystem().getShortNameComponent( name),
                           args);

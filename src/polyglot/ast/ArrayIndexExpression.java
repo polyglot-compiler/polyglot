@@ -21,11 +21,17 @@ public class ArrayIndexExpression extends Expression
    * Creates a <code>NewArrayIndexExpression</code>, accessing an element of
    * <code>Expression</code> <code>base</code> at index <code>index</code>.
    */
-  public ArrayIndexExpression( Expression base, Expression index) 
+  public ArrayIndexExpression( Node ext, Expression base, Expression index) 
   {
+    this.ext = ext;
     this.base = base;
     this.index = index;
   }
+
+    public ArrayIndexExpression( Expression base, Expression index) 
+    {
+	this(null, base, index);
+    }
 
   /**
    * Lazily reconstruct this node.
@@ -39,17 +45,21 @@ public class ArrayIndexExpression extends Expression
    * @param index The new index expression.
    * @return An <code>ArrayIndexExpression<code> with the given base and index.
    */
-  public ArrayIndexExpression reconstruct( Expression base, Expression index) 
+  public ArrayIndexExpression reconstruct( Node ext, Expression base, Expression index) 
   {
-    if( this.base == base && this.index == index) {
+    if( this.base == base && this.index == index && this.ext == ext) {
       return this;
     }
     else {
-      ArrayIndexExpression n = new ArrayIndexExpression( base, index);
+      ArrayIndexExpression n = new ArrayIndexExpression( ext, base, index);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public ArrayIndexExpression reconstruct( Expression base, Expression index) {
+	return reconstruct(this.ext, base, index);
+    }
 
   /**
    * Returns the base of this <code>ArrayIndexExpression</code>.
@@ -77,7 +87,7 @@ public class ArrayIndexExpression extends Expression
    */  
   public Node visitChildren(NodeVisitor v) 
   {
-    return reconstruct( (Expression)base.visit( v),
+    return reconstruct( Node.condVisit(this.ext, v), (Expression)base.visit( v),
                         (Expression)index.visit( v));
   }
 

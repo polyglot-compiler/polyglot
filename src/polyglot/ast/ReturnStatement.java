@@ -19,25 +19,34 @@ public class ReturnStatement extends Statement
    * @param expr The expression to be returned. May optionally be 
    *  <code>null</code> if no expression is returned.
    */
-  public ReturnStatement( Expression expr) 
+  public ReturnStatement( Node ext, Expression expr) 
   {
+    this.ext = ext;
     this.expr = expr;
   }
   
+    public ReturnStatement( Expression expr) {
+	this(null, expr);
+    }
+
   /**
    * Lazily reconstruct this node.
    */
-  public ReturnStatement reconstruct( Expression expr)
+  public ReturnStatement reconstruct( Node ext, Expression expr)
   {
-    if( this.expr == expr) {
+    if( this.expr == expr && this.ext == ext) {
       return this;
     }
     else {
-      ReturnStatement n = new ReturnStatement( expr);
+      ReturnStatement n = new ReturnStatement( ext, expr);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public ReturnStatement reconstruct( Expression expr) {
+	return reconstruct(this.ext, expr);
+    }
 
   /**
    * Returns the expression which would be returned by this statement.
@@ -55,7 +64,7 @@ public class ReturnStatement extends Statement
    */
   public Node visitChildren( NodeVisitor v) 
   {
-    return reconstruct( (expr == null ? null : (Expression)expr.visit( v)));
+      return reconstruct( Node.condVisit(this.ext, v), (Expression)Node.condVisit(expr, v));
   }
   
   public Node typeCheck( LocalContext c) throws SemanticException

@@ -20,26 +20,35 @@ public class DoStatement extends Statement
    * Creates a new <code>DoStatement</code> with a statement <code>statement>,
    *    and a conditional expression <code>cond</code>.
    */
-  public DoStatement( Statement stmt, Expression cond) 
+  public DoStatement( Node ext, Statement stmt, Expression cond) 
   {
+    this.ext = ext;
     this.stmt = stmt;
     this.cond = cond;
   }
 
+    public DoStatement( Statement stmt, Expression cond) {
+	this(null, stmt, cond);
+    }
+
   /** 
    * Lazily reconstuct this node.
    */
-  public DoStatement reconstruct( Statement stmt, Expression cond)
+  public DoStatement reconstruct( Node ext, Statement stmt, Expression cond)
   {
-    if( this.stmt == stmt && this.cond == cond) {
+    if( this.stmt == stmt && this.cond == cond && this.ext == ext) {
       return this;
     }
     else {
-      DoStatement n = new DoStatement( stmt, cond);
+      DoStatement n = new DoStatement( ext, stmt, cond);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public DoStatement reconstruct( Statement stmt, Expression cond) {
+	return reconstruct(this.ext, stmt, cond);
+    }
 
   /**
    * Returns the <code>Expression</code> that this <code>DoStatement</code>
@@ -69,7 +78,7 @@ public class DoStatement extends Statement
    */  
   public Node visitChildren(NodeVisitor v) 
   {
-    return reconstruct( (Statement)stmt.visit( v),
+    return reconstruct( Node.condVisit(this.ext, v), (Statement)stmt.visit( v),
                         (Expression)cond.visit( v));
   }
 

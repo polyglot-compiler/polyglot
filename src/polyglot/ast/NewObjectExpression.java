@@ -36,24 +36,31 @@ public class NewObjectExpression extends Expression
    * @pre Requires that each element of <code>args</code> is an object of type
    *  <code>Expression</code>.
    */
-  public NewObjectExpression( Expression primary, TypeNode tn,
+  public NewObjectExpression( Node ext, Expression primary, TypeNode tn,
                               List args, ClassNode cn)
   {
+    this.ext = ext;
     this.primary = primary;
     this.tn = tn;
     this.args = TypedList.copyAndCheck( args, Expression.class, true);
     this.cn = cn;
   }
 
+  public NewObjectExpression( Expression primary, TypeNode tn,
+                              List args, ClassNode cn) {
+      this(null, primary, tn, args, cn);
+  }
+
+
   /**
    * Lazily reconstruct this node. 
    */
-  public NewObjectExpression reconstruct( Expression primary, TypeNode tn,
+  public NewObjectExpression reconstruct( Node ext, Expression primary, TypeNode tn,
                                           List args, ClassNode cn)
   {
-    if( this.primary != primary || this.tn != tn
+    if( this.primary != primary || this.tn != tn || this.ext != ext
         || this.args.size() != args.size() || this.cn != cn) {
-      NewObjectExpression n = new NewObjectExpression( primary, tn,
+      NewObjectExpression n = new NewObjectExpression( ext, primary, tn,
                                                        args, cn);
       n.copyAnnotationsFrom( this);
       return n;
@@ -61,7 +68,7 @@ public class NewObjectExpression extends Expression
     else {
       for( int i = 0; i < args.size(); i++) {
         if( this.args.get( i) != args.get( i)) {
-          NewObjectExpression n = new NewObjectExpression( primary, tn,
+          NewObjectExpression n = new NewObjectExpression( ext, primary, tn,
                                                            args, cn);
           n.copyAnnotationsFrom( this);
           return n;
@@ -70,6 +77,12 @@ public class NewObjectExpression extends Expression
       return this;
     }    
   }
+
+  public NewObjectExpression reconstruct( Expression primary, TypeNode tn,
+                                          List args, ClassNode cn) {
+      return reconstruct(this.ext, primary, tn, args, cn);
+  }
+
 
   /**
    * Returns the primary expression of this node or <code>null</code> if there
@@ -150,7 +163,7 @@ public class NewObjectExpression extends Expression
       newCn = (ClassNode)cn.visit( v);
     }
 
-    return reconstruct( newPrimary, newTn, newArgs, newCn);
+    return reconstruct( Node.condVisit(this.ext, v),newPrimary, newTn, newArgs, newCn);
   }
   
   public Node typeCheck( LocalContext c) throws SemanticException

@@ -22,39 +22,51 @@ public class ArrayInitializerExpression extends Expression
   /**
    * Creates a new, empty <code>ArrayInitializerExpression</code>.
    */
-  public ArrayInitializerExpression() {
+  public ArrayInitializerExpression( Node ext) {
+    this.ext = ext;
     children = new ArrayList();
   }
-
+  public ArrayInitializerExpression() {
+      this((Node)null);
+  }
   /**
    * Creates a new <code>ArrayInitializerExpression</code> with 
    * <code>list</code> as its elements.
    *
    * @pre Each element of <code>list</code> is an expression.
    */
-  public ArrayInitializerExpression( List list) {
+  public ArrayInitializerExpression( Node ext, List list) {
+    this.ext = ext;
     children = TypedList.copyAndCheck( list, Expression.class, true);
+  }
+
+  public ArrayInitializerExpression( List list) {
+      this(null, list);
   }
 
   /** 
    * Lazily reconstuct this node.
    */
-  public ArrayInitializerExpression reconstruct( List list) {
-    if( list.size() != children.size()) {
-      ArrayInitializerExpression n = new ArrayInitializerExpression( list);
+  public ArrayInitializerExpression reconstruct( Node ext, List list) {
+    if( list.size() != children.size() || this.ext != ext) {
+      ArrayInitializerExpression n = new ArrayInitializerExpression( ext, list);
       n.copyAnnotationsFrom( this);
       return n;
     }
     else {
       for( int i = 0; i < list.size(); i++) {
         if( list.get( i) != children.get( i)) {
-          ArrayInitializerExpression n = new ArrayInitializerExpression( list);
+          ArrayInitializerExpression n = new ArrayInitializerExpression( ext, list);
           n.copyAnnotationsFrom( this);
           return n;
         }
       }      
       return this;
     }
+  }
+
+  public ArrayInitializerExpression reconstruct( List list) {
+      return reconstruct(this.ext, list);
   }
 
   /**
@@ -89,7 +101,7 @@ public class ArrayInitializerExpression extends Expression
         list.add( expr);
       }
     }
-    return reconstruct( list);
+    return reconstruct( Node.condVisit(this.ext, v), list);
   }
   
   public Node typeCheck( LocalContext c) throws SemanticException

@@ -34,7 +34,8 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
    * <code>s</code>.
    * @pre <code>s</code> is not empty, and does not begin or end with a '.'.
    */
-  public AmbiguousNameExpression( Extension ext, String s) {
+  public AmbiguousNameExpression( Node ext, String s) {
+      this.ext = ext;
       names = new TypedList(new ArrayList(4), String.class, false);
 
       StringTokenizer st = new StringTokenizer( s, ".");
@@ -54,7 +55,13 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
    * <code>this.getName()</code> then return a new expression. Otherwise
    * return <code>this</code>.
    */
-  public AmbiguousNameExpression reconstruct( String s) {
+  public AmbiguousNameExpression reconstruct( Node ext, String s) {
+    if (this.ext != ext) {
+	AmbiguousNameExpression n =  new AmbiguousNameExpression( ext, s);
+	n.copyAnnotationsFrom( this);
+	return n;
+    }
+
     StringTokenizer st = new StringTokenizer( s, ".");
     if( st.countTokens() != names.size()) {
       return new AmbiguousNameExpression( s);
@@ -62,7 +69,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     else {
       for( Iterator iter = names.iterator(); iter.hasNext(); ) {
         if( !iter.next().equals( st.nextToken())) {
-          AmbiguousNameExpression n = new AmbiguousNameExpression( s);
+          AmbiguousNameExpression n = new AmbiguousNameExpression( ext, s);
           n.copyAnnotationsFrom( this);
           return n;
         }
@@ -71,15 +78,19 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     }
   }
 
+  public AmbiguousNameExpression reconstruct( String s) {
+      return reconstruct(this.ext, s);
+  }
+
   /**
    * Returns a new <code>AmbiguousNameExpression</code> whose expression
    * is equivalent to the current expression with <code>s</code> appended.
    *
-   * @post Will copy annotations from <code>this</code> to the new node.
+   * @post Will copy annotations and extensions from <code>this</code> to the new node.
    */
   public AmbiguousNameExpression append( String s)
   {
-    AmbiguousNameExpression n = new AmbiguousNameExpression( getName() + "." 
+    AmbiguousNameExpression n = new AmbiguousNameExpression( this.ext, getName() + "." 
                                                              + s);
     n.copyAnnotationsFrom( this);
     return n;
@@ -134,15 +145,15 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 
 
         if( last == null && c.isDefinedLocally( name) ) {
-          top = new LocalVariableExpression( name);
+          top = new LocalVariableExpression( null, name);
         }
         else {
           if( top == null) {
- 	    top = new FieldExpression( null, //new TypeNode( c.getCurrentClass()), 
+ 	    top = new FieldExpression( null, null, //new TypeNode( c.getCurrentClass()), 
                                        fi.getName());
           }
           else {
-            top = new FieldExpression( top, fi.getName());
+            top = new FieldExpression( null, top, fi.getName());
           }
         }
         
@@ -157,7 +168,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
           /* If it's not a local or field, then try and find a type. */
           try {
             last = (ClassType)c.getType( name);
-            top = new TypeNode( last, name);
+            top = new TypeNode( null, last, name);
             
             /* Clear the name. */
             name = "";

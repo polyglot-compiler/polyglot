@@ -26,31 +26,39 @@ public class SpecialExpression extends Expression
    *
    * @pre Requires that <code>kind</code> is a valid kind for this class.
    */
-  public SpecialExpression( TypeNode tn, int kind) 
+  public SpecialExpression( Node ext, TypeNode tn, int kind) 
   {
     if (kind < 0 || kind > MAX_KIND) {
       throw new IllegalArgumentException( "Invalud kind argument.");
     }
-    
+    this.ext = ext;
     this.tn = tn;
     this.kind = kind;
   }
 
+    public SpecialExpression( TypeNode tn, int kind) {
+	this(null, tn, kind);
+    }
+
   /**
    * Lazily reconstruct this node.
    */
-  public SpecialExpression reconstruct( TypeNode tn, int kind)
+  public SpecialExpression reconstruct( Node ext, TypeNode tn, int kind)
   {
-    if( this.tn == tn && this.kind == kind) {
+    if( this.tn == tn && this.kind == kind && this.ext == ext) {
       return this;
     }
     else {
-      SpecialExpression n = new SpecialExpression( tn, kind);
+      SpecialExpression n = new SpecialExpression( ext, tn, kind);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
   
+    public SpecialExpression reconstruct( TypeNode tn, int kind) {
+	return reconstruct(this.ext, tn, kind);
+    }
+
   /**
    * Returns the type of the qualifying type of this expression, or
    * <code>null</code> of there is no qualifying type.
@@ -74,7 +82,7 @@ public class SpecialExpression extends Expression
    */
   public Node visitChildren( NodeVisitor v)
   {
-    return reconstruct( (tn == null ? null : (TypeNode)tn.visit( v)), kind);
+      return reconstruct( Node.condVisit(this.ext, v), (TypeNode)Node.condVisit(tn, v), kind);
   }
 
   public Node typeCheck( LocalContext c)

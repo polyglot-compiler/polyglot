@@ -16,21 +16,30 @@ public class LocalVariableExpression extends Expression
   /** 
    * Creates a new local variable reference.
    */
-  public LocalVariableExpression( String name) 
+  public LocalVariableExpression( Node ext, String name) 
   {
+    this.ext = ext;
     this.name = name;
   }
 
-  public LocalVariableExpression reconstruct( String name)
+    public LocalVariableExpression( String name) {
+	this(null, name);
+    }
+
+  public LocalVariableExpression reconstruct( Node ext, String name)
   {
-    if( this.name.equals( name)) {
+    if( this.ext == ext && this.name.equals( name)) {
       return this;
     }
     else {
-      LocalVariableExpression n = new LocalVariableExpression( name);
+      LocalVariableExpression n = new LocalVariableExpression( ext, name);
       n.copyAnnotationsFrom( this);
       return n;
     }
+  }
+
+  public LocalVariableExpression reconstruct( String name) {
+      return reconstruct(this.ext, name);
   }
 
   /** 

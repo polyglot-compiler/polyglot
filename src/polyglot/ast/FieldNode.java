@@ -23,28 +23,42 @@ public class FieldNode extends ClassMember
    * <code>declare</code> with modified by the flags in 
    * <code>accessFlags</code>.
    */
-  public FieldNode( AccessFlags accessFlags,
+  public FieldNode( Node ext, AccessFlags accessFlags,
 		    VariableDeclarationStatement declare) 
   {
+    this.ext = ext;
     this.accessFlags = accessFlags;
     this.declare = declare;
   }
 
+  public FieldNode( AccessFlags accessFlags,
+		    VariableDeclarationStatement declare) {
+      this(null, accessFlags, declare);
+  }
+
+
   /**
    * Lazily reconstruct this node.
    */
-  public FieldNode reconstruct( AccessFlags accessFlags, 
+  public FieldNode reconstruct( Node ext, AccessFlags accessFlags, 
                                 VariableDeclarationStatement declare)
   {
-    if( this.accessFlags.equals( accessFlags) && this.declare == declare) {
+    if( this.accessFlags.equals( accessFlags) && this.declare == declare && this.ext == ext) {
       return this;
     }
     else {
-      FieldNode n = new FieldNode( accessFlags, declare);
+      FieldNode n = new FieldNode( ext, accessFlags, declare);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+  public FieldNode reconstruct( AccessFlags accessFlags, 
+                                VariableDeclarationStatement declare) 
+    {
+	return reconstruct(this.ext, accessFlags, declare);
+    }
+
 
   /**
    * Returns the access flags for these fields.
@@ -69,7 +83,7 @@ public class FieldNode extends ClassMember
    */
   public Node visitChildren( NodeVisitor v) 
   {
-    return reconstruct( accessFlags, 
+    return reconstruct( Node.condVisit(this.ext, v),accessFlags, 
                         (VariableDeclarationStatement)declare.visit( v));
   }
 

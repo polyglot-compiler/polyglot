@@ -28,11 +28,16 @@ public class SwitchStatement extends Statement
      * Effects: Creates a new CaseStement with <expr> as the value
      * for the case.
      */
-    public CaseStatement( Expression expr) 
+    public CaseStatement( Node ext, Expression expr) 
     {
+      this.ext = ext;
       this.expr = expr;
       this.def = false;
     }
+
+      public CaseStatement( Expression expr) {
+	  this(null, expr);
+      }
 
     /**
      * Lazily reconstructs the case statement.
@@ -40,12 +45,12 @@ public class SwitchStatement extends Statement
      * @param expr the expression (may be null iff default = true)
      * @param def whether this is the "default" label
      */
-    public CaseStatement reconstruct ( Expression expr, boolean def)
+    public CaseStatement reconstruct ( Node ext, Expression expr, boolean def)
     {
       CaseStatement cs;
-      if ( expr != this.expr || def != this.def)
+      if ( expr != this.expr || def != this.def || this.ext != ext)
       {
-        cs = new CaseStatement( expr);
+        cs = new CaseStatement( ext, expr);
         cs.def = def;
         cs.copyAnnotationsFrom ( this ) ;
         cs.iValue = iValue;
@@ -54,13 +59,22 @@ public class SwitchStatement extends Statement
       return this;
     }
     
+      public CaseStatement reconstruct (Expression expr, boolean def) {
+	  return reconstruct(this.ext, expr, def);
+      }
+
     /**
      * Effects: Creates a new CaseStatement which represents a default Label.
      */
-    public CaseStatement() 
+    public CaseStatement(Node ext) 
     {
+      this.ext = ext;
       this.def = true;
     }
+      public CaseStatement() {
+	  this(null);
+      }
+
     
     /**
      * Effects: Returns true iff this CaseStatement represents a
@@ -87,7 +101,7 @@ public class SwitchStatement extends Statement
     {
       if ( expr != null)
       {
-        return reconstruct ( (Expression)expr.visit ( v ), def) ;
+        return reconstruct ( Node.condVisit(this.ext, v), (Expression)expr.visit ( v ), def) ;
       }
       return this;
     }
@@ -172,24 +186,37 @@ public class SwitchStatement extends Statement
       /**
        * Effects: Creates a new SwitchBlock which contains <block>.
        */
-      public SwitchBlock (BlockStatement block) {
+      public SwitchBlock (Node ext, BlockStatement block) {
+	 this.ext = ext;
          this.block = block;
       }
       
-      public SwitchBlock () {
-         this( new BlockStatement());
+      public SwitchBlock (BlockStatement block) {
+	  this(null, block);
+      }
+
+      public SwitchBlock (Node ext) {
+         this( ext, new BlockStatement());
       }
      
-     public SwitchBlock reconstruct( BlockStatement block) 
+      public SwitchBlock () {
+	  this(null);
+      }
+
+     public SwitchBlock reconstruct( Node ext, BlockStatement block) 
      {
-       if ( block != this.block) 
+       if ( block != this.block || this.ext != ext) 
        {
-         SwitchBlock sb =  new SwitchBlock ( block );
+         SwitchBlock sb =  new SwitchBlock ( ext, block );
          sb.copyAnnotationsFrom ( this );
          return sb;
        }
        return this;
      }
+
+       public SwitchBlock reconstruct( BlockStatement block) {
+	   return reconstruct(this.ext, block);
+       }
 
       /** 
        * Effects: Returns the BlockStatement contained in this switch block.
@@ -200,7 +227,7 @@ public class SwitchStatement extends Statement
 
      public Node visitChildren ( NodeVisitor v)
      {
-       return reconstruct ( (BlockStatement)block.visit( v ));
+       return reconstruct ( Node.condVisit(this.ext, v), (BlockStatement)block.visit( v ));
      }
 
      public Node typeCheck( LocalContext c)
@@ -225,22 +252,28 @@ public class SwitchStatement extends Statement
     * <code>expr</code> and contains the elements of <code>switchElems</code> 
     * in order.
     */
-   public SwitchStatement(Expression expr, List switchElems) {
+   public SwitchStatement(Node ext, Expression expr, List switchElems) {
+      this.ext = ext;
       this.expr = expr;
       TypedList.check(switchElems, Statement.class);
       this.switchElems = new ArrayList(switchElems);
    }
 
+   public SwitchStatement(Expression expr, List switchElems) {
+       this(null, expr, switchElems);
+   }
+
+
   /**
    * Lazily reconstruct the SwitchStatement; perform reconstruction only 
    * if an element of the list changed or expr changed
    */
-  public Node  reconstruct ( Expression expr, List switchElems)
+  public Node  reconstruct ( Node ext, Expression expr, List switchElems)
   {
-    if ( expr != this.expr ||
+    if ( expr != this.expr || this.ext != ext || 
          switchElems.size() != this.switchElems.size() )
     {
-      SwitchStatement ss =  new SwitchStatement ( expr, switchElems);
+      SwitchStatement ss =  new SwitchStatement ( ext, expr, switchElems);
       ss.copyAnnotationsFrom ( this );
       return ss;
     }
@@ -249,13 +282,17 @@ public class SwitchStatement extends Statement
     {
       if ( switchElems.get( i ) != this.switchElems.get( i ) )
       {
-        SwitchStatement ss =  new SwitchStatement ( expr, switchElems);
+        SwitchStatement ss =  new SwitchStatement ( ext, expr, switchElems);
         ss.copyAnnotationsFrom ( this );
         return ss;
       }
     }
     return this;
   }
+
+    public Node  reconstruct ( Expression expr, List switchElems) {
+	return reconstruct(this.ext, expr, switchElems);
+    }
 
    /**
     * Effects: Returns the Expression which this SwitchStatement is
@@ -277,7 +314,7 @@ public class SwitchStatement extends Statement
       newSwitchElems.add ( switchElement ) ;      
     }
 
-    return reconstruct ( e, newSwitchElems);
+    return reconstruct ( Node.condVisit(this.ext, v), e, newSwitchElems);
   }
 
    public Node typeCheck(LocalContext c) throws SemanticException

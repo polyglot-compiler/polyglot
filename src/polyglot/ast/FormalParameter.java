@@ -19,28 +19,39 @@ public class FormalParameter extends Node
   /**
    * Creates a new <code>FormalParameter</code>.
    */
-  public FormalParameter( TypeNode tn, String name, boolean isFinal) 
+  public FormalParameter( Node ext, TypeNode tn, String name, boolean isFinal) 
   {
+    this.ext = ext;
     this.tn = tn;
     this.name = name;
     this.isFinal = isFinal;
   }
 
+    public FormalParameter( TypeNode tn, String name, boolean isFinal) {
+	this(null, tn, name, isFinal);
+    }
+
   /**
    * Lazily reconstruct this node. 
    */
-  public FormalParameter reconstruct( TypeNode tn, String name, 
+  public FormalParameter reconstruct( Node ext, TypeNode tn, String name, 
                                       boolean isFinal)
   {
-    if( this.tn == tn && this.name.equals( name) && this.isFinal == isFinal) {
+    if( this.tn == tn && this.ext == ext && this.name.equals( name) && this.isFinal == isFinal) {
       return this;
     }
     else {
-      FormalParameter n = new FormalParameter( tn, name, isFinal);
+      FormalParameter n = new FormalParameter( ext, tn, name, isFinal);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+  public FormalParameter reconstruct( TypeNode tn, String name, 
+                                      boolean isFinal) {
+      return reconstruct(this.ext, tn, name, isFinal);
+  }
+
 
   /**
    * Returns the type of this parameter.
@@ -74,7 +85,7 @@ public class FormalParameter extends Node
    */
   public Node visitChildren(NodeVisitor v)
   {
-    return reconstruct( (TypeNode)tn.visit( v), name, isFinal);
+    return reconstruct( Node.condVisit(this.ext, v), (TypeNode)tn.visit( v), name, isFinal);
   }
 
   public Node readSymbols( SymbolReader sr)

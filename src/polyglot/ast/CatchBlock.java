@@ -27,11 +27,16 @@ public class CatchBlock extends Node
    * Creates a new <code>CatchBlock</code> to 
    * <formalParameter> and BlockStatement <block>.
    */
-  public CatchBlock( FormalParameter fp, BlockStatement block) 
+  public CatchBlock( Node ext, FormalParameter fp, BlockStatement block) 
   {
+    this.ext = ext;
     this.fp = fp;
     this.block = block;
   }
+
+    public CatchBlock( FormalParameter fp, BlockStatement block) {
+	this(null, fp, block);
+    }
 
   /**
    * Lazily reconstruct this node.
@@ -47,18 +52,22 @@ public class CatchBlock extends Node
    * @return An <code>CatchBlock<code> with the given parameter and block of
    *  statements.
    */
-  public CatchBlock reconstruct( FormalParameter fp, BlockStatement block)
+  public CatchBlock reconstruct( Node ext, FormalParameter fp, BlockStatement block)
   {
-    if( this.fp == fp && this.block == block) {
+    if( this.fp == fp && this.block == block && this.ext == ext) {
       return this;
     }
     else {
-      CatchBlock n = new CatchBlock( fp, block);
+      CatchBlock n = new CatchBlock( ext, fp, block);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
   
+    public CatchBlock reconstruct( FormalParameter fp, BlockStatement block) {
+	return reconstruct(this.ext, fp, block);
+    }
+
   /**
    * Returns the <code>FormalParameter</code> associated with this 
    * <code>CatchBlock</code>.
@@ -97,7 +106,7 @@ public class CatchBlock extends Node
    */
   public Node visitChildren( NodeVisitor v) 
   {
-    return reconstruct( (FormalParameter)fp.visit( v),
+    return reconstruct( Node.condVisit(this.ext, v), (FormalParameter)fp.visit( v),
                         (BlockStatement)block.visit( v));
   }
   

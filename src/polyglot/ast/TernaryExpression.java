@@ -16,29 +16,42 @@ public class TernaryExpression extends Expression
   /**
    * Creates a new <code>TernaryExpression</code>.
    */
-  public TernaryExpression( Expression cond, Expression second,
+  public TernaryExpression( Node ext, Expression cond, Expression second,
                             Expression third) 
   {
+    this.ext = ext;
     this.cond = cond;
     this.second = second;
     this.third = third;
   }
+
+  public TernaryExpression( Expression cond, Expression second,
+                            Expression third) {
+      this(null, cond, second, third);
+  }
+
   
   /**
    * Lazily reconstruct this node.
    */
-  public TernaryExpression reconstruct( Expression cond, Expression second, 
+  public TernaryExpression reconstruct( Node ext, Expression cond, Expression second, 
                                         Expression third)
   {
-    if( this.cond == cond && this.second == second && this.third == third) {
+    if( this.ext == ext && this.cond == cond && this.second == second && this.third == third) {
       return this;
     }
     else {
-      TernaryExpression n = new TernaryExpression( cond, second, third);
+      TernaryExpression n = new TernaryExpression( ext, cond, second, third);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+  public TernaryExpression reconstruct( Expression cond, Expression second, 
+                                        Expression third) {
+      return reconstruct(this.ext, cond, second, third);
+  }
+
 
   /**
    * Returns the condition subexpression.
@@ -66,7 +79,7 @@ public class TernaryExpression extends Expression
 
   public Node visitChildren( NodeVisitor v)
   {
-    return reconstruct( (Expression)cond.visit( v),
+    return reconstruct( Node.condVisit(this.ext, v), (Expression)cond.visit( v),
                         (Expression)second.visit( v),
                         (Expression)third.visit( v));
   }

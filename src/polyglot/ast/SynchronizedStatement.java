@@ -17,27 +17,38 @@ public class SynchronizedStatement extends Statement
   /**
    * Creates a new <code>SynchronizedStatement</code>.
    */
-  public SynchronizedStatement( Expression expr, BlockStatement body) 
+  public SynchronizedStatement( Node ext, Expression expr, BlockStatement body) 
   {
+    this.ext = ext;
     this.expr = expr;
     this.body = body;
   }
   
+    public SynchronizedStatement( Expression expr, BlockStatement body) {
+	this(null, expr, body);
+    }
+
   /**
    * Lazily reconstruct this node.
    */
-  public SynchronizedStatement reconstruct( Expression expr, 
+  public SynchronizedStatement reconstruct( Node ext, Expression expr, 
                                             BlockStatement body)
   {
-    if( this.expr == expr && this.body == body) {
+    if( this.expr == expr && this.body == body && this.ext == ext) {
       return this;
     }
     else {
-      SynchronizedStatement n = new SynchronizedStatement( expr, body);
+      SynchronizedStatement n = new SynchronizedStatement( ext, expr, body);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+  public SynchronizedStatement reconstruct( Expression expr, 
+                                            BlockStatement body) {
+      return reconstruct(this.ext, expr, body);
+  }
+
 
   /**
    * Returns the <code>Expression</code> that this 
@@ -61,7 +72,7 @@ public class SynchronizedStatement extends Statement
    */
   public Node visitChildren( NodeVisitor v)
   {
-    return reconstruct( (Expression)expr.visit( v),
+    return reconstruct( Node.condVisit(this.ext, v), (Expression)expr.visit( v),
                         (BlockStatement)body.visit( v));
   }
 

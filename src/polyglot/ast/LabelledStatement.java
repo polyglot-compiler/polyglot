@@ -16,25 +16,34 @@ public class LabelledStatement extends Statement
   /**
    * Creates a new <code>LabelledStatement</code>.
    */
-  public LabelledStatement( String label, Statement stmt) 
+  public LabelledStatement( Node ext, String label, Statement stmt) 
   {
+    this.ext = ext;
     this.label = label;
     this.stmt = stmt;
   }
 
+    public LabelledStatement( String label, Statement stmt) {
+	this(null, label, stmt);
+    }
+
   /**
    * Lazily reconstruct this node.
    */
-  public LabelledStatement reconstruct( String label, Statement stmt)
+  public LabelledStatement reconstruct( Node ext, String label, Statement stmt)
   {
-    if( this.label.equals( label) && this.stmt == stmt) {
+    if( this.label.equals( label) && this.stmt == stmt && this.ext == ext) {
       return this;
     }
     else {
-      LabelledStatement n = new LabelledStatement( label, stmt);
+      LabelledStatement n = new LabelledStatement( ext, label, stmt);
       n.copyAnnotationsFrom( this);
       return n;
     }
+  }
+
+  public LabelledStatement reconstruct( String label, Statement stmt) {
+      return reconstruct(this.ext, label, stmt);
   }
 
   /**
@@ -61,7 +70,7 @@ public class LabelledStatement extends Statement
    */
   public Node visitChildren(NodeVisitor v) 
   {
-    return reconstruct( label, (Statement)stmt.visit( v));
+    return reconstruct( Node.condVisit(this.ext, v),label, (Statement)stmt.visit( v));
   }
 
   public Node typeCheck(LocalContext c)

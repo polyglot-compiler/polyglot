@@ -17,35 +17,48 @@ public class CharacterLiteral extends NumericalLiteral
    * Creates a new <code>CharacterLiteral</code> storing a character with the
    * value <code>value</code>.
    */
-  public CharacterLiteral( char value) 
+  public CharacterLiteral( Node ext, char value) 
   {
-    this( value, String.valueOf( value));
+    this( ext, value, String.valueOf( value));
   }
+
+    public CharacterLiteral( char value) {
+	this(null, value);
+    }
 
   /**
    * Creates a new <code>CharacterLiteral</code> storing a character with the
    * value <code>c</code> and escaped value <code>escaped</code>.
    */ 
-  public CharacterLiteral( char value, String escaped) 
+  public CharacterLiteral( Node ext, char value, String escaped) 
   {
+    this.ext = ext;
     this.value = value;
     this.escaped = escaped;
   }
   
+    public CharacterLiteral( char value, String escaped) {
+	this(null, value, escaped);
+    }
+
   /**
    * Lazily reconstruct this node.
    */
-  public CharacterLiteral reconstruct( char value, String escaped)
+  public CharacterLiteral reconstruct( Node ext, char value, String escaped)
   {
-    if( this.value == value && this.escaped.equals( escaped)) {
+    if( this.value == value && this.ext == ext && this.escaped.equals( escaped)) {
       return this;
     }
     else {
-      CharacterLiteral n = new CharacterLiteral( value, escaped);
+      CharacterLiteral n = new CharacterLiteral( ext, value, escaped);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public CharacterLiteral reconstruct( char value, String escaped) {
+	return reconstruct(this.ext, value, escaped);
+    }
 
   public long getValue()
   {

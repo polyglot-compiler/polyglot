@@ -17,10 +17,15 @@ public class BlockStatement extends Statement {
   /**
    * Create a new, empty BlockStatement.
    */
-  public BlockStatement() 
+  public BlockStatement(Node ext) 
   {
+    this.ext = ext;
     statements = new ArrayList();
   }
+
+    public BlockStatement() {
+	this((Node)null);
+    }
 
   /**
    * Create a new <code>BlockStatement</code> with <code>statementList</code>
@@ -28,25 +33,30 @@ public class BlockStatement extends Statement {
    *
    * @pre Each element in <code>list</code> is a <code>Statement</code>.
    */
-  public BlockStatement( List list) 
+  public BlockStatement( Node ext, List list) 
   {
+    this.ext = ext;
     statements = TypedList.copyAndCheck( list, Statement.class, true);
   }
+
+    public BlockStatement( List list) {
+	this(null, list);
+    }
 
   /**
    * Lazily reconstuct this node.
    */
-  public BlockStatement reconstruct( List list)
+  public BlockStatement reconstruct( Node ext, List list)
   {
-    if( statements.size() != list.size()) {
-      BlockStatement n = new BlockStatement( list);
+    if( statements.size() != list.size() || this.ext != ext) {
+      BlockStatement n = new BlockStatement( ext, list);
       n.copyAnnotationsFrom( this);
       return n;
     }
     else {
       for( int i = 0; i < list.size(); i++) {
         if( list.get( i) != statements.get( i)) {
-          BlockStatement n = new BlockStatement( list);
+          BlockStatement n = new BlockStatement( ext, list);
           n.copyAnnotationsFrom( this);
           return n;
         }
@@ -54,6 +64,10 @@ public class BlockStatement extends Statement {
       return this;
     }
   }
+
+    public BlockStatement reconstruct( List list) {
+	return reconstruct(this.ext, list);
+    }
 
   /** 
    * Returns a <b>new</b> <code>BlockStatement</code> object which has one
@@ -102,7 +116,7 @@ public class BlockStatement extends Statement {
         list.add( stmt);
       }
     }
-    return reconstruct( list);
+    return reconstruct( Node.condVisit(this.ext, v), list);
   }
 
   public void enterScope( LocalContext c)

@@ -15,10 +15,15 @@ public class ClassDeclarationStatement extends Statement
    * Creates a new <code>ClassDeclarationStatement</code> for the class
    * defined in <code>ClassNode</code>.
    */
-  public ClassDeclarationStatement(ClassNode classNode) 
+  public ClassDeclarationStatement(Node ext, ClassNode classNode) 
   {
+    this.ext = ext;
     this.classNode = classNode;
   }
+
+    public ClassDeclarationStatement(ClassNode classNode) {
+	this(null, classNode);
+    }
 
   /**
    * Lazily reconstruct this node.
@@ -31,17 +36,21 @@ public class ClassDeclarationStatement extends Statement
    * @param classNode The new class definition.
    * @return An <code>ClassDeclarationStatement<code> defining the given class.
    */
-  public ClassDeclarationStatement reconstruct( ClassNode classNode) 
+  public ClassDeclarationStatement reconstruct( Node ext, ClassNode classNode) 
   {
-    if( this.classNode == classNode) {
+    if( this.classNode == classNode && this.ext == ext) {
       return this;
     }
     else {
-      ClassDeclarationStatement n = new ClassDeclarationStatement( classNode);
+      ClassDeclarationStatement n = new ClassDeclarationStatement( ext, classNode);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public ClassDeclarationStatement reconstruct( ClassNode classNode) {
+	return reconstruct(this.ext, classNode);
+    }
 
   /**
    * Returns the <code>ClassNode</code> declared by <code>this</code>.
@@ -63,7 +72,7 @@ public class ClassDeclarationStatement extends Statement
    */
   public Node visitChildren( NodeVisitor v) 
   {
-    return reconstruct( (ClassNode)classNode.visit( v));
+    return reconstruct( Node.condVisit(this.ext, v), (ClassNode)classNode.visit( v));
   }
 
   public Node typeCheck( LocalContext c)

@@ -53,7 +53,7 @@ public class BinaryExpression extends Expression
    * Effects: Creates a new BinaryExpression of <operator> applied
    *    to <left> and <right>.
    */
-  public BinaryExpression( Expression left, int operator, Expression right) {
+  public BinaryExpression( Node ext, Expression left, int operator, Expression right) {
     if( left == null || right == null) {
 	System.out.println("left = "+left);
 	System.out.println("op = "+getOperatorString(operator));
@@ -61,6 +61,7 @@ public class BinaryExpression extends Expression
       throw new NullPointerException ("BinaryExpression cannot " +
                                       "take null Expressions.");
     }
+    this.ext = ext;
     this.left = left;
     this.right = right;
     
@@ -72,7 +73,10 @@ public class BinaryExpression extends Expression
     this.operator = operator;
   }
 
-  
+  public BinaryExpression( Expression left, int operator, Expression right) {  
+      this(null, left, operator, right);
+  }
+
   /**
    * Lazily reconstruct this node.
    * <p>
@@ -85,19 +89,25 @@ public class BinaryExpression extends Expression
    * @return A <code>BinaryExpression</code> with the given expressions and 
    *  operator.
    */
-  public BinaryExpression reconstruct( Expression left, int operator,
+  public BinaryExpression reconstruct( Node ext, Expression left, int operator,
                                        Expression right)
   {
-    if( this.left == left && this.operator == operator && this.right == right)
+    if( this.left == left && this.operator == operator && this.right == right && this.ext == ext)
     {
       return this;
     }
     else {
-      BinaryExpression n = new BinaryExpression( left, operator, right);
+      BinaryExpression n = new BinaryExpression( ext, left, operator, right);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+  public BinaryExpression reconstruct( Expression left, int operator,
+                                       Expression right) {
+      return reconstruct(this.ext, left, operator, right);
+  }
+
 
   /**
    * Returns the left-hand subexpression.
@@ -130,7 +140,7 @@ public class BinaryExpression extends Expression
    */  
   public Node visitChildren( NodeVisitor v)
   {
-    return reconstruct( (Expression)left.visit( v),
+    return reconstruct( Node.condVisit(this.ext, v), (Expression)left.visit( v),
                         operator,
                         (Expression)right.visit( v));
   }
@@ -153,56 +163,56 @@ public class BinaryExpression extends Expression
       switch( operator)
       {
       case GT:
-        newNode = new BooleanLiteral( lLeft > lRight );
+        newNode = new BooleanLiteral( null, lLeft > lRight );
         break;
       case LT:
-        newNode = new BooleanLiteral( lLeft < lRight);
+        newNode = new BooleanLiteral( null, lLeft < lRight);
         break;
       case EQUAL:
-        newNode = new BooleanLiteral( lLeft == lRight);
+        newNode = new BooleanLiteral( null, lLeft == lRight);
         break;
       case LE:
-        newNode = new BooleanLiteral( lLeft <= lRight);
+        newNode = new BooleanLiteral( null, lLeft <= lRight);
         break;
       case GE:
-        newNode = new BooleanLiteral( lLeft >= lRight);
+        newNode = new BooleanLiteral( null, lLeft >= lRight);
         break;
       case NE:
-        newNode = new BooleanLiteral( lLeft != lRight);
+        newNode = new BooleanLiteral( null, lLeft != lRight);
         break;
       case MULT:
-        newNode = new IntLiteral( lLeft * lRight);
+        newNode = new IntLiteral( null, lLeft * lRight);
         break;
       case DIV:
-        newNode = new IntLiteral( lLeft / lRight);
+        newNode = new IntLiteral( null, lLeft / lRight);
         break;
         // FIXME: MAY NOT BE CORRECT: read jls
       case BIT_OR:
-        newNode = new IntLiteral( lLeft | lRight);
+        newNode = new IntLiteral( null, lLeft | lRight);
         break;      
       case BIT_AND:
-        newNode = new IntLiteral( lLeft & lRight);
+        newNode = new IntLiteral( null, lLeft & lRight);
         break;
       case BIT_XOR:
-        newNode = new IntLiteral( lLeft ^ lRight);      
+        newNode = new IntLiteral( null, lLeft ^ lRight);      
         break;
       case MOD:
-        newNode = new IntLiteral( lLeft % lRight);
+        newNode = new IntLiteral( null, lLeft % lRight);
         break;
       case LSHIFT:
-        newNode = new IntLiteral( lLeft << lRight);
+        newNode = new IntLiteral( null, lLeft << lRight);
         break;
       case RSHIFT:
-        newNode = new IntLiteral( lLeft >> lRight);
+        newNode = new IntLiteral( null, lLeft >> lRight);
         break;
       case RUSHIFT:
-        newNode = new IntLiteral( lLeft >>> lRight);
+        newNode = new IntLiteral( null, lLeft >>> lRight);
         break;
       case PLUS:
-        newNode = new IntLiteral( lLeft + lRight);
+        newNode = new IntLiteral( null, lLeft + lRight);
         break;
       case SUB:
-        newNode = new IntLiteral( lLeft - lRight);
+        newNode = new IntLiteral( null, lLeft - lRight);
       }
     }      
     else if ( (left instanceof BooleanLiteral) &&
@@ -214,15 +224,15 @@ public class BinaryExpression extends Expression
       switch( operator)
       {
       case LOGIC_OR:
-        newNode = new BooleanLiteral( bLeft || bRight);
+        newNode = new BooleanLiteral( null, bLeft || bRight);
         break;
       case LOGIC_AND:
-        newNode = new BooleanLiteral( bLeft && bRight);
+        newNode = new BooleanLiteral( null, bLeft && bRight);
       }
     }
     else if ( ( left instanceof StringLiteral) &&
               ( right instanceof StringLiteral)) {
-      newNode = new StringLiteral( ((StringLiteral)left).getString()
+      newNode = new StringLiteral( null, ((StringLiteral)left).getString()
                                 + ((StringLiteral)right).getString());
 
     }

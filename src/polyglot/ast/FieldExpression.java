@@ -26,31 +26,39 @@ public class FieldExpression extends Expression
    * @pre <code>target</code> is either a <code>TypeNode</code> or an 
    * <code>Expression</code>.
    */
-  public FieldExpression( Node target, String name) 
+  public FieldExpression( Node ext, Node target, String name) 
   {
     if (target != null && ! (target instanceof TypeNode ||
 			     target instanceof Expression))
      throw new InternalCompilerError( "Target of a field access must be a "
                                       + "type or expression.");
-
+    this.ext = ext;
     this.target = target;
     this.name = name;
   }
 
+    public FieldExpression( Node target, String name) {
+	this(null, target, name);
+    }
+
   /**
    * Lazily reconstruct this node. 
    */
-  public FieldExpression reconstruct( Node target, String name) 
+  public FieldExpression reconstruct( Node ext, Node target, String name) 
   {
-    if( this.target == target && this.name.equals( name)) {
+    if( this.target == target && this.ext == ext && this.name.equals( name)) {
       return this;
     }
     else {
-      FieldExpression n = new FieldExpression( target, name);
+      FieldExpression n = new FieldExpression( ext, target, name);
       n.copyAnnotationsFrom( this);
       return n;
     }
   }
+
+    public FieldExpression reconstruct( Node target, String name) {
+	return reconstruct(this.ext, target, name);
+    }
 
   /**
    * Returns the target that the field is being accessed from.
@@ -81,7 +89,7 @@ public class FieldExpression extends Expression
   {
     if ( target == null) 
       return this;
-    return reconstruct( target.visit( v), name);
+    return reconstruct( Node.condVisit(this.ext, v),target.visit( v), name);
   }
 
   public Node typeCheck( LocalContext c) throws SemanticException

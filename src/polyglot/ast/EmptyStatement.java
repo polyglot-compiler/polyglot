@@ -10,7 +10,21 @@ import jltools.types.*;
  */
 public class EmptyStatement extends Statement
 {
-  public EmptyStatement() {}
+  public EmptyStatement(Node ext) {this.ext = ext;}
+
+  public EmptyStatement() {this.ext = null;}
+
+    public EmptyStatement reconstruct( Node ext) {
+	if (this.ext == ext) { 
+	    return this;
+	} else {
+	    return new EmptyStatement(ext);
+	}
+    }
+
+    public EmptyStatement reconstruct() {
+	return this;
+    }
 
   public Node visitChildren(NodeVisitor nv)
   {

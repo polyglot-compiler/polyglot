@@ -30,29 +30,34 @@ public class SourceFileNode extends Node
    * package <package_>, containing imports in <imports> and
    * classes in <classes>.
    */
-  public SourceFileNode( String package_, List imports, List classes) 
+  public SourceFileNode( Node ext, String package_, List imports, List classes) 
   {
+    this.ext = ext;
     this.package_ = package_;
     this.imports = TypedList.copyAndCheck( imports, ImportNode.class, true);
     this.classes = TypedList.copyAndCheck( classes, ClassNode.class, true);
   }
 
-  public SourceFileNode reconstruct( String package_, List imports, 
+    public SourceFileNode( String package_, List imports, List classes) {
+	this(null, package_, imports, classes);
+    }
+
+  public SourceFileNode reconstruct( Node ext, String package_, List imports, 
                                      List classes) 
   {
-    if( package_ != null && ! !this.package_.equals( package_) ||
+    if( package_ != null && ! !this.package_.equals( package_) || this.ext != ext ||
         package_ == null && this.package_ != null ||
         package_ != null && this.package_ == null
         || this.imports.size() != imports.size()
         || this.classes.size() != classes.size()) {
-      SourceFileNode n = new SourceFileNode( package_, imports, classes);
+      SourceFileNode n = new SourceFileNode( ext, package_, imports, classes);
       n.copyAnnotationsFrom( this);
       return n;
     }
     else {
       for( int i = 0; i < imports.size(); i++) {
         if( this.imports.get( i) != imports.get( i)) {
-          SourceFileNode n = new SourceFileNode( package_, imports, classes);
+          SourceFileNode n = new SourceFileNode( ext, package_, imports, classes);
           n.copyAnnotationsFrom( this);
           return n;
         }
@@ -60,13 +65,19 @@ public class SourceFileNode extends Node
 
       for( int i = 0; i < classes.size(); i++) {
         if( this.classes.get( i) != classes.get( i)) {
-          SourceFileNode n = new SourceFileNode( package_, imports, classes);
+          SourceFileNode n = new SourceFileNode( ext, package_, imports, classes);
           n.copyAnnotationsFrom( this);
           return n;
         }
       }
       return this;
     }
+  }
+
+
+  public SourceFileNode reconstruct( String package_, List imports, 
+                                     List classes) {
+      return reconstruct(this.ext, package_, imports, classes);
   }
 
   /**
@@ -134,7 +145,7 @@ public class SourceFileNode extends Node
       }
     }
 
-    return reconstruct( package_, newImports, newClasses);
+    return reconstruct( Node.condVisit(this.ext, v), package_, newImports, newClasses);
   }
   
   public Node readSymbols( SymbolReader sr) throws SemanticException

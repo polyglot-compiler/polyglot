@@ -13,6 +13,12 @@ public class NullLiteral extends Literal
    */
   public NullLiteral() {}
 
+  public NullLiteral(Node ext) {this.ext = ext;}
+
+    public NullLiteral reconstruct(Node ext) {
+	if (this.ext == ext) { return this; } else {return new NullLiteral(ext);}
+    }
+
   public Node typeCheck(LocalContext c)
   {
     setCheckedType( c.getTypeSystem().getNull());
