@@ -1,13 +1,34 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
+import java.util.Iterator;
 
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import polyglot.frontend.*;
+import polyglot.ast.ArrayInit;
+import polyglot.ast.Expr;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.Node;
+import polyglot.ast.TypeNode;
 import polyglot.main.Report;
-import java.util.*;
+import polyglot.types.ClassType;
+import polyglot.types.Context;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.InitializerInstance;
+import polyglot.types.ParsedClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.SubtypeSet;
+import polyglot.visit.AddMemberVisitor;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.AscriptionVisitor;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>FieldDecl</code> is an immutable representation of the declaration
@@ -264,6 +285,20 @@ public class FieldDecl_c extends Node_c implements FieldDecl {
                                                 init.position());
                 }
             }
+        }
+        
+        
+        // check that inner classes do not declare static fields, unless they
+        // are compile-time constants
+        if (flags().isStatic() &&
+              fieldInstance().container().toClass().isInnerClass()) {
+            // it's a static field in an inner class.
+            if (!flags().isFinal() || init == null || !init.isConstant()) {
+                throw new SemanticException("Inner classes cannot declare " + 
+                        "static fields, unless they are compile-time " +
+                        "constant fields.", this.position()); 
+            }
+            
         }
 
         return this;

@@ -1,11 +1,28 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import polyglot.frontend.*;
-import java.util.*;
+import java.util.Iterator;
+
+import polyglot.ast.Block;
+import polyglot.ast.CodeDecl;
+import polyglot.ast.Initializer;
+import polyglot.ast.Node;
+import polyglot.types.ClassType;
+import polyglot.types.CodeInstance;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.InitializerInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.util.SubtypeSet;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * An <code>Initializer</code> is an immutable representation of an
@@ -118,6 +135,14 @@ public class Initializer_c extends Term_c implements Initializer
 	catch (SemanticException e) {
 	    throw new SemanticException(e.getMessage(), position());
 	}
+
+        // check that inner classes do not declare static initializers
+        if (flags().isStatic() &&
+              initializerInstance().container().toClass().isInnerClass()) {
+            // it's a static initializer in an inner class.
+            throw new SemanticException("Inner classes cannot declare " + 
+                    "static initializers.", this.position());             
+        }
 
 	return this;
     }

@@ -1,12 +1,35 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import polyglot.frontend.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ConstructorDecl;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.TypeNode;
 import polyglot.main.Report;
-import java.util.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.Named;
+import polyglot.types.ParsedClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.Position;
+import polyglot.util.TypedList;
+import polyglot.visit.AddMemberVisitor;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>ClassDecl</code> is the definition of a class, abstract class,
@@ -285,21 +308,27 @@ public class ClassDecl_c extends Node_c implements ClassDecl
             }
         }
 
+        // check that inner classes do not declare member interfaces
+        if (type().isMember() && flags().isInterface() &&
+              type().outer().isInnerClass()) {
+            // it's a member interface in an inner class.
+            throw new SemanticException("Inner classes cannot declare " + 
+                    "member interfaces.", this.position());             
+        }
+
+        // check that inner classes do not declare static members
+        if (type().isMember() && type().flags().isInterface() &&
+              type().outer().isInnerClass()) {
+            // it's a member interface in an inner class.
+            throw new SemanticException("Inner classes cannot declare " + 
+                    "member interfaces.", this.position());             
+        }
+
         // Make sure that static members are not declared inside inner classes
-        // (recall that, according to the JLS, static member classes are not
-        // really inner classes since they may not refer to their outer
-        // instance).
-        if (this.type.isMember() && this.type.flags().isStatic()) {
-            ClassType container = this.type.outer();
-
-            if (container.isMember() && ! container.flags().isStatic() ||
-                container.isLocal() || container.isAnonymous()) {
-
-                throw new SemanticException("Cannot declare static member " +
-                                            "class \"" + this.type +
-                                            "\" inside inner class \"" +
-                                            container + "\".", position());
-            }
+        if (type().isMember() && type().flags().isStatic() 
+               && type().outer().isInnerClass()) {
+            throw new SemanticException("Inner classes cannot declare static " 
+                                 + "member classes.", position());
         }
 
         if (type.superType() != null) {

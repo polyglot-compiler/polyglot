@@ -1,12 +1,43 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
-import polyglot.frontend.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import polyglot.ast.Block;
+import polyglot.ast.CodeDecl;
+import polyglot.ast.Formal;
+import polyglot.ast.MethodDecl;
+import polyglot.ast.Node;
+import polyglot.ast.Term;
+import polyglot.ast.TypeNode;
 import polyglot.main.Report;
-import java.util.*;
+import polyglot.types.ClassType;
+import polyglot.types.CodeInstance;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.MethodInstance;
+import polyglot.types.ParsedClassType;
+import polyglot.types.ProcedureInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.Position;
+import polyglot.util.SubtypeSet;
+import polyglot.util.TypedList;
+import polyglot.visit.AddMemberVisitor;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.Translator;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A method declaration.
@@ -252,6 +283,14 @@ public class MethodDecl_c extends Term_c implements MethodDecl
                     "\" is not a subclass of \"" + ts.Throwable() + "\".",
                     tn.position());
             }
+        }
+
+        // check that inner classes do not declare static methods
+        if (flags().isStatic() &&
+              methodInstance().container().toClass().isInnerClass()) {
+            // it's a static method in an inner class.
+            throw new SemanticException("Inner classes cannot declare " + 
+                    "static methods.", this.position());             
         }
 
         overrideMethodCheck(tc);
