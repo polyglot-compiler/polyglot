@@ -200,17 +200,17 @@ public class For_c extends Loop_c implements For
     }
 
     private void printForInit(ForInit s, CodeWriter w, PrettyPrinter tr, boolean printType) {
-        tr.appendSemicolon(false);
-        tr.printType(printType);
+        boolean oldSemiColon = tr.appendSemicolon(false);
+        boolean oldPrintType = tr.printType(printType);
         printBlock(s, w, tr);
-        tr.printType(printType);
-        tr.appendSemicolon(true);
+        tr.printType(oldPrintType);
+        tr.appendSemicolon(oldSemiColon);
     }
 
     private void printForUpdate(ForUpdate s, CodeWriter w, PrettyPrinter tr) {
-        tr.appendSemicolon(false);
+        boolean oldSemiColon = tr.appendSemicolon(false);
         printBlock(s, w, tr);
-        tr.appendSemicolon(true);
+        tr.appendSemicolon(oldSemiColon);
     }
 
     public Term entry() {
