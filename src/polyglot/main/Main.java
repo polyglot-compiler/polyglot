@@ -108,11 +108,9 @@ public class Main
           outputFiles += (String)iter.next() + " ";
         }
   
-          String command = options.post_compiler + " -classpath " 
-            + options.output_directory + File.pathSeparator
-            + "." + File.pathSeparator
-            + System.getProperty("java.class.path") + " "
-            + outputFiles;
+          String command = options.post_compiler + " -classpath " +
+                        options.constructPostCompilerClasspath() + " "
+                         + outputFiles;
   
           if (Report.should_report(verbose, 1))
               Report.report(1, "Executing post-compiler " + command);

@@ -359,6 +359,12 @@ public class Options {
       return fullcp.toString();
   }
 
+  public String constructPostCompilerClasspath() {
+      return output_directory + File.pathSeparator
+              + "." + File.pathSeparator
+              + System.getProperty("java.class.path");
+  }
+
   public int level(String name) {
     Object i = report.get(name);
     if (i == null) return 0;
