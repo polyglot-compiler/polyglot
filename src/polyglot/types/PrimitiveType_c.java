@@ -52,13 +52,8 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
             return kind.hashCode();
     }
 
-    public boolean equals(Object o) {
-            if (o instanceof PrimitiveType) {
-                    PrimitiveType t = (PrimitiveType) o;
-                    return kind == t.kind();
-            }
-
-            return false;
+    public boolean isSameImpl(Type t) {
+            return t.isPrimitive() && kind() == t.toPrimitive().kind();
     }
 
     public String wrapperTypeString(TypeSystem ts) {

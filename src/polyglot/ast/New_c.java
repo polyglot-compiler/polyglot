@@ -204,9 +204,10 @@ public class New_c extends Expr_c implements New
                 t = t.toAnonymous().outer();
             }
 
-
             while (t != null) {
                 try {
+                    // HACK: PolyJ outer() doesn't work
+                    t = ts.staticTarget(t).toClass();
                     ClassType mt = ts.findMemberClass(t, name, c);
 
                     if (ts.isSame(mt, ct)) {
@@ -228,7 +229,7 @@ public class New_c extends Expr_c implements New
             // Create the qualifier.
             Expr q;
 
-            if (outer == c.currentClass()) {
+            if (outer.isSame(c.currentClass())) {
                 q = nf.This(position());
             }
             else {

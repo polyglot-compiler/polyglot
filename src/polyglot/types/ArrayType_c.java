@@ -66,23 +66,19 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 
     /** Get the ulitimate base type of the array. */
     public Type ultimateBase() {
-        if (base.isArray()) {
-            return base.toArray().ultimateBase();
+        if (base().isArray()) {
+            return base().toArray().ultimateBase();
         }
 
-        return base;
+        return base();
     }
 
     public int dims() {
-        if (!base.isArray()) {
-            return 1;
-        } else {
-            return 1 + base.toArray().dims();
-        }
+        return 1 + (base().isArray() ? base().toArray().dims() : 0);
     }
 
     public String toString() {
-        return base.toString() + "[]";
+        return base().toString() + "[]";
     }
 
     /** Translate the type. */
@@ -92,7 +88,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 
     /** Returns true iff the type is canonical. */
     public boolean isCanonical() {
-	return base.isCanonical();
+	return base().isCanonical();
     }
 
     public boolean isArray() { return true; }
@@ -135,13 +131,12 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
     }
 
     public int hashCode() {
-	return base.hashCode() << 1;
+	return base().hashCode() << 1;
     }
 
-    public boolean equals(Object o) {
-        if (o instanceof ArrayType) {
-	    ArrayType t = (ArrayType) o;
-	    return ts.isSame(base, t.base());
+    public boolean isSameImpl(Type t) {
+        if (t.isArray()) {
+	    return ts.isSame(base(), t.toArray().base());
 	}
 
 	return false;

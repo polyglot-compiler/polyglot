@@ -140,7 +140,8 @@ public class ClassDecl_c extends Node_c implements ClassDecl
     }
 
     public Context enterScope(Context c) {
-        return c.pushClass(type, type);
+        TypeSystem ts = c.typeSystem();
+        return c.pushClass(type, ts.staticTarget(type).toClass());
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {

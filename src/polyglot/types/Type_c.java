@@ -116,7 +116,11 @@ public abstract class Type_c extends TypeObject_c implements Type
     }
     
     public boolean isSameImpl(Type t) {
-        return equals(t);
+        return t == this;
+    }
+
+    public boolean equals(Object o) {
+        return o instanceof Type && ts.isSame(this, (Type) o);
     }
     
     public final boolean isCastValid(Type toType) {

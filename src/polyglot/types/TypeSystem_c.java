@@ -1415,7 +1415,7 @@ public class TypeSystem_c implements TypeSystem
      * Returns t, modified as necessary to make it a legal
      * static target.
      */
-    public Type staticTarget(Type t) throws SemanticException {
+    public Type staticTarget(Type t) {
         // Nothing needs done in standard Java.
         return t;
     }

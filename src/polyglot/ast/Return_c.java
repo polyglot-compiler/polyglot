@@ -99,9 +99,8 @@ public class Return_c extends Stmt_c implements Return
 		}
 	    }
 
-	    throw new SemanticException("Must return an expression of type " +
-		mi.returnType() + " from " + mi + ".  Expression has type " +
-		expr.type() + ".", expr.position());
+	    throw new SemanticException("Cannot return expression of type " +
+		expr.type() + " from " + mi + ".", expr.position());
 	}
 
 	throw new InternalCompilerError("Unrecognized code type.");

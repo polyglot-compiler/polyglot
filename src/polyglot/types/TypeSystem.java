@@ -359,5 +359,5 @@ public interface TypeSystem {
      * Returns t, modified as necessary to make it a legal
      * static target.
      */
-    public Type staticTarget(Type t) throws SemanticException;
+    public Type staticTarget(Type t);
 }

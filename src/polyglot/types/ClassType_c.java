@@ -112,6 +112,16 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         return flags;
     }
 
+    public boolean isSameImpl(Type t) {
+        if (t.isClass()) {
+            return package_() != null
+                        ? package_().isSame(t.toClass().package_())
+                        : package_() == t.toClass().package_();
+        }
+
+        return false;
+    }
+
     public boolean descendsFromImpl(Type ancestor) {
         if (! ancestor.isCanonical()) {
             return false;
@@ -244,11 +254,11 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 	}
     }
 
-    public final boolean isEnclosed(ClassType outer) {
-        return ts.isEnclosed(this, outer);
+    public final boolean isEnclosed(ClassType maybe_outer) {
+        return ts.isEnclosed(this, maybe_outer);
     }
 
-    public boolean isEnclosedImpl(ClassType outer) {
+    public boolean isEnclosedImpl(ClassType maybe_outer) {
         return false;
     }
 }

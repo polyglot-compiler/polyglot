@@ -7,4 +7,5 @@ public interface Package extends NamedQualifier
 {
     Package prefix();
     String translate(Resolver c);
+    boolean isSame(Package p);
 }
