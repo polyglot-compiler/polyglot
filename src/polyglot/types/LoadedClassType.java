@@ -226,7 +226,7 @@ public class LoadedClassType extends ClassTypeImpl
       excpList.add(ts.typeForClass(excpns[idx]));
     }
     
-    return new ConstructorTypeInstance(ts, this, argList, excpList, flags);
+    return new MethodTypeInstance(ts, this, null, null, argList, excpList, flags, true);
   }
 }
 

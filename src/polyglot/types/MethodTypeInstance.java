@@ -28,6 +28,8 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
   protected Type returnType;
   // The encompassing class
   protected ReferenceType enclosingType;
+  // The constructor flag
+  protected boolean isConstructor;
   
   /**
    *    ExceptionTypes, returnType, and AccessFlags may be null.
@@ -38,7 +40,8 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
                             Type returnType,
                             List argumentTypes,
                             List exceptionTypes,
-                            AccessFlags flags) {
+                            AccessFlags flags,
+							boolean isConstructor) {
     super( ts, methodName, argumentTypes);
 
     this.enclosingType = enclosingType;
@@ -48,7 +51,25 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
 					   Type.class, false);
 
     if (flags != null)
-      this.flags = flags.copy();    
+      this.flags = flags.copy();
+	
+	this.isConstructor = isConstructor;
+	
+	if (isConstructor==true) {
+		super.name = enclosingType.getTypeString() + ".[Constructor]";
+		this.returnType = ts.getVoid(); 
+	}
+  }
+  
+  public MethodTypeInstance(TypeSystem ts, 
+                            ReferenceType enclosingType, 
+                            String methodName, 
+                            Type returnType,
+                            List argumentTypes,
+                            List exceptionTypes,
+							AccessFlags flags) {
+	this(ts, enclosingType, methodName, returnType, argumentTypes, 
+		 exceptionTypes, flags, false);
   }
 
   public void setEnclosingType(ReferenceType enclosingType)
@@ -84,6 +105,10 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
   {
     return returnType;
   }
+  
+  public boolean isConstructor() {
+	return isConstructor;
+  }
 
   public MethodTypeInstance copyInstance()
   {
@@ -93,7 +118,8 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
                returnType, 
                argumentTypes(),                    
                (exceptionTypes != null ? exceptionTypes.copy() : null),
-               (flags != null ? flags.copy() : null));
+               (flags != null ? flags.copy() : null),
+			   isConstructor);
   }
 
   public String toString() {

@@ -299,7 +299,8 @@ public class ClassNode extends ClassMember implements GlobalDeclaration
     boolean bHasConstructor = false;
     for ( Iterator i = type.getMethods().iterator() ; i.hasNext(); )
     {
-      if ( i.next() instanceof ConstructorTypeInstance) 
+	  MethodTypeInstance mti = (MethodTypeInstance) i.next();	
+      if ( mti.isConstructor()) 
       {
         bHasConstructor = true;
         break;
@@ -309,14 +310,14 @@ public class ClassNode extends ClassMember implements GlobalDeclaration
     {
       AccessFlags afPublic = new AccessFlags();
       afPublic.setPublic(true);
-      ((ParsedClassType)type).addMethod ( new ConstructorTypeInstance( 
-                                                                      sr.getTypeSystem(), 
-                                                                      type, 
-                                                                      Collections.EMPTY_LIST, 
-                                                                      Collections.EMPTY_LIST, 
-                                                                      afPublic));
+      ((ParsedClassType)type).addMethod ( new MethodTypeInstance(sr.getTypeSystem(), 
+																 type, 
+																 null, null,
+																 Collections.EMPTY_LIST, 
+																 Collections.EMPTY_LIST, 
+																 afPublic,
+																 true));
     }
-
 
     return this;
   }

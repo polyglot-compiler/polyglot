@@ -527,21 +527,21 @@ public class LocalContext implements TypeContext
     void putVariable(String name, VariableInstance var);
   }
 
-  protected interface TopScope extends Scope {
+  public interface TopScope extends Scope {
   }
 
-  protected interface BlockScope extends Scope {
+  public interface BlockScope extends Scope {
   }
 
-  protected interface ClassScope extends Scope {
+  public interface ClassScope extends Scope {
     ClassType getClassType();
   }
 
-  protected interface MethodScope extends Scope {
+  public interface MethodScope extends Scope {
     MethodTypeInstance getMethod();
   }
 
-  protected abstract class HashScope implements Scope {
+  public abstract class HashScope implements Scope {
     Map types;		// Map from name to type
     Map methods;	// Map from name to class type enclosing the method
 			// (This isn't a map to the method type, since it
@@ -579,13 +579,13 @@ public class LocalContext implements TypeContext
     }
   }
 
-  protected class JavaBlockScope extends HashScope implements BlockScope {
+  public class JavaBlockScope extends HashScope implements BlockScope {
     public String toString() {
 	return "BlockScope";
     }
   }
 
-  protected class JavaMethodScope extends HashScope implements MethodScope {
+  public class JavaMethodScope extends HashScope implements MethodScope {
     private MethodTypeInstance mti;
 
     public JavaMethodScope(MethodTypeInstance mti) {
@@ -601,7 +601,7 @@ public class LocalContext implements TypeContext
     }
   }
 
-  protected class JavaClassScope extends HashScope implements ClassScope {
+  public class JavaClassScope extends HashScope implements ClassScope {
     private ClassType clazz;
 
     public JavaClassScope(ClassType clazz) {
@@ -618,7 +618,7 @@ public class LocalContext implements TypeContext
     }
   }
 
-  protected class JavaTopScope implements TopScope {
+  public class JavaTopScope implements TopScope {
     public Type getType(String name) {
 	try {
 	  Type t = itImports.findClass(name);

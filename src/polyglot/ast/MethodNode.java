@@ -407,8 +407,8 @@ public class MethodNode extends ClassMember
     
     if ( isConstructor)
     {
-      mtiThis = new ConstructorTypeInstance( ts, clazz, argTypes, 
-                                             excTypes, accessFlags) ;
+      mtiThis = new MethodTypeInstance( ts, clazz, null, null, argTypes, 
+                                        excTypes, accessFlags, true) ;
     }
     else if( addDims == 0 ) {
       mtiThis = new MethodTypeInstance( ts, clazz, name,
