@@ -42,7 +42,7 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     }
 
     public int hashCode() {
-        return flags.hashCode() + type.hashCode() + name.hashCode();
+        return flags.hashCode() + name.hashCode();
     }
 
     public boolean equals(Object o) {
