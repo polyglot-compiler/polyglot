@@ -1,8 +1,10 @@
 Polyglot 0.9.1
-            Polyglot Extensible Compiler Toolkit
+
+                    Polyglot Extensible Compiler Toolkit
+                    ------------------------------------
 
 Since you are reading this file, you have already downloaded and unpacked the
-Polyglot Distribution. Your installation directory contains the following
+Polyglot distribution.  Your installation directory contains the following
 sub-directories:
 
   - polyglot: the complete source code of Polyglot 0.9
@@ -18,7 +20,14 @@ Polglot is ALPHA software.  Some of the interfaces in the framework may change.
 This may require some extensions to be changed to conform to the new
 interfaces.  Also, Polyglot is not well-documented; in particular, some of the
 javadoc is missing or out-of-date.  We are working on writing better
-documentation.  Watch the web page for further updates.
+documentation.  Watch the web page:
+
+    http://www.cs.cornell.edu/Projects/polyglot
+
+for further updates.  If you use Polyglot, we'd appreciate your letting us
+know.  Send your comments and bug reports to Nate Nystrom at
+nystrom@cs.cornell.edu.
+
 
 Requirements
 ------------
@@ -96,6 +105,29 @@ To compile using the base compiler:
 
     $ jlc File.jl
 
+Credits
+-------
+
+The current Polyglot developers are:
+
+        Nathaniel Nystrom
+        Michael Clarkson
+        Andrew C. Myers
+
+Other Polyglot contributers:
+
+        Matt Harren
+        Aleksey Kliger
+        Naveen Sastry
+        Dan Spoonhower
+        Steve Zdancewic
+        Lantian Zheng
+
+Michael Brukman and Andrew Myers wrote the PPG parser generator.
+
+Some of the class file parsing code is derived from the BLOAT bytecode
+optimizer written by Nathaniel Nystrom, David Whitlock, and Antony Hosking.
+
 Restrictions on distribution
 ----------------------------
 
@@ -140,10 +172,8 @@ other tortious action, arising out of or in connection with the use or
 performance of this software.
 
 
-
-Some of the class file parsing code in polyglot/types/reflect is derived
-from the BLOAT bytecode optimizer.
------------------------------------------------------------------------
+BLOAT Copyright Notice, License, and Disclaimer
+-----------------------------------------------
 
 All files in the distribution of BLOAT (Bytecode Level Optimization
 and Analysis tool for Java(tm)) are Copyright 1997-2001 by the Purdue
