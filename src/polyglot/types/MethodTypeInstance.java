@@ -94,4 +94,8 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
   public String toString() {
     return getEnclosingType()+"."+getTypeString()+argumentTypes()+" throws "+exceptionTypes();
   }
+
+  public int hashCode() {
+    return returnType.hashCode() + name.hashCode() + enclosingType.hashCode();
+  }
 }

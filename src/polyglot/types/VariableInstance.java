@@ -68,7 +68,10 @@ public abstract class VariableInstance extends AnnotatedObject
   public int hashCode() {
     return getName().hashCode() ^ getType().hashCode();
   }
-      
+
+  public String toString() {
+    return getType() + " " + getName();
+  }
 
   private String name;
   private Type type;

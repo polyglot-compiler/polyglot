@@ -56,6 +56,11 @@ public class LocalVariableExpression extends Expression
     return li;
   }
 
+  public void setLocalInstance(LocalInstance li)
+  {
+    this.li = li;
+  }
+
 
   public Node visitChildren( NodeVisitor v) 
   {

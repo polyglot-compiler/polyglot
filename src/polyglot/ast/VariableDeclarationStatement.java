@@ -29,7 +29,7 @@ public class VariableDeclarationStatement extends Statement
     // avoid cycles in the ast, so that the gc can perform well
     public WeakReference wrVDS;
 
-    public LocalInstance li;
+    public VariableInstance vi;
 
     /**
      * Creates a new Declarator for a variable named <code>n</code>, with 
@@ -44,7 +44,7 @@ public class VariableDeclarationStatement extends Statement
       additionalDimensions = dims;
       initializer = init;
       wrVDS = new WeakReference(vds);
-      this.li = null;
+      this.vi = null;
     }
 
     public Declarator( VariableDeclarationStatement vds, 
@@ -66,7 +66,7 @@ public class VariableDeclarationStatement extends Statement
       {
         Declarator d = new Declarator ( ext, vds, n, dims, init);
         d.copyAnnotationsFrom ( this );
-	d.li = li;
+	d.vi = vi;
         return d;
       }
       return this;
@@ -77,8 +77,12 @@ public class VariableDeclarationStatement extends Statement
 	return reconstruct(this.ext, vds, n, dims, init);
     }
 
+    public FieldInstance getFieldInstance() {
+      return (FieldInstance) vi;
+    }
+
     public LocalInstance getLocalInstance() {
-      return li;
+      return (LocalInstance) vi;
     }
     
     public Node visitChildren( NodeVisitor v)
@@ -95,22 +99,22 @@ public class VariableDeclarationStatement extends Statement
       if( c.inMethodScope() ) {
         VariableDeclarationStatement vdsEnclosing = 
           (VariableDeclarationStatement)wrVDS.get();
-	LocalInstance oldLi = li;
-        li = c.getTypeSystem().newLocalInstance( name, 
+	LocalInstance oldLi = getLocalInstance();
+        vi = c.getTypeSystem().newLocalInstance( name, 
 					  vdsEnclosing.typeForDeclarator(this),
                                               vdsEnclosing.accessFlags );
 	if (oldLi != null) {
-	    li.copyAnnotationsFrom(oldLi);
+	    vi.copyAnnotationsFrom(oldLi);
 	}
         /* If it is a constant numeric expression (final + initializer is 
          * IntLiteral) then mark it "constant" under FieldInstance. */
         // FIXME other literal types?
         if( initializer instanceof NumericalLiteral 
             && initializer != null && vdsEnclosing.accessFlags.isFinal()) {
-          li.setConstantValue( new Long(
+          vi.setConstantValue( new Long(
               ((NumericalLiteral)initializer).getValue())); 
         }
-        c.addSymbol( name, li);
+        c.addSymbol( name, vi);
       }
       return this;
     }
@@ -123,22 +127,22 @@ public class VariableDeclarationStatement extends Statement
       if( c.inMethodScope() ) {
         VariableDeclarationStatement vdsEnclosing = 
           (VariableDeclarationStatement)wrVDS.get();
-	LocalInstance oldLi = li;
-        li = c.getTypeSystem().newLocalInstance( name, 
+	LocalInstance oldLi = getLocalInstance();
+        vi = c.getTypeSystem().newLocalInstance( name, 
 					  vdsEnclosing.typeForDeclarator(this),
                                               vdsEnclosing.accessFlags );
 	if (oldLi != null) {
-	    li.copyAnnotationsFrom(oldLi);
+	    vi.copyAnnotationsFrom(oldLi);
 	}
         /* If it is a constant numeric expression (final + initializer is 
          * IntLiteral) then mark it "constant" under FieldInstance. */
         // FIXME other literal types?
         if( initializer instanceof NumericalLiteral 
             && initializer != null && vdsEnclosing.accessFlags.isFinal()) {
-          li.setConstantValue( new Long(
+          vi.setConstantValue( new Long(
               ((NumericalLiteral)initializer).getValue())); 
         }
-        c.addSymbol( name, li);
+        c.addSymbol( name, vi);
       }
 
       return visitChildren(sc);
@@ -160,19 +164,19 @@ public class VariableDeclarationStatement extends Statement
         /* If it is a constant numeric expression (final + initializer is 
          * IntLiteral) then mark it "constant" under FieldInstance. */
         // FIXME other literal types?
-	LocalInstance oldLi = li;
-        li = c.getTypeSystem().newLocalInstance( name, 
+	LocalInstance oldLi = getLocalInstance();
+        vi = c.getTypeSystem().newLocalInstance( name, 
 					  vdsEnclosing.typeForDeclarator(this),
                                               vdsEnclosing.accessFlags );
 	if (oldLi != null) {
-	    li.copyAnnotationsFrom(oldLi);
+	    vi.copyAnnotationsFrom(oldLi);
 	}
         if( initializer instanceof NumericalLiteral 
             && initializer != null && vdsEnclosing.accessFlags.isFinal()) {
-          li.setConstantValue( new Long(
+          vi.setConstantValue( new Long(
                                  ((NumericalLiteral)initializer).getValue())); 
         }
-        c.addSymbol( name, li);
+        c.addSymbol( name, vi);
       }
       
       if (initializer != null) {

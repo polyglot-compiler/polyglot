@@ -81,6 +81,10 @@ public class FormalParameter extends Node
     return li;
   }
 
+  public void setLocalInstance(LocalInstance li) {
+    this.li = li;
+  }
+
   /**
    * Returns true if this parameter is final.
    */
