@@ -877,8 +877,11 @@ public class StandardTypeSystem extends TypeSystem {
    * <p> Should really be an anonymous class, but isn't because the jltools
    * compiler doesn't yet handle anonymous classes.
    */
-  class MostSpecificComparator implements java.util.Comparator
+  protected class MostSpecificComparator implements java.util.Comparator
   {
+
+    public MostSpecificComparator() {}
+
     public int compare ( Object o1, Object o2)
     {
       if ( !( o1 instanceof MethodTypeInstance ) ||
