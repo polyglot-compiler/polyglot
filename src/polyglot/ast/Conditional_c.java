@@ -172,18 +172,8 @@ public class Conditional_c extends Expr_c implements Conditional
             return ts.Boolean();
         }
 
-        if (child == consequent) {
-            if (alternative.type().isNull()) {
-                return ts.Object();
-            }
-            return alternative.type();
-        }
-
-        if (child == alternative) {
-            if (consequent.type().isNull()) {
-                return ts.Object();
-            }
-            return consequent.type();
+        if (child == consequent || child == alternative) {
+            return type();
         }
 
         return child.type();
