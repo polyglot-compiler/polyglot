@@ -211,8 +211,21 @@ public class SourceLoader
         else if (f1.exists() && f2.exists()) {
             boolean f1Exists = false;
             boolean f2Exists = false;
+System.out.println("f1 = " + f1);
+System.out.println("f2 = " + f2);
 
-            File dir = new File(f1.getParent());
+            File dir;
+
+            if (f1.getParent() != null) {
+                dir = new File(f1.getParent());
+            }
+            else {
+                if (current_dir == null) {
+                    current_dir = new File(System.getProperty("user.dir"));
+                }
+                dir = current_dir;
+            }
+
             File[] ls = dir.listFiles();
             for (int i = 0; i < ls.length; i++) {
                 if (f1.equals(ls[i])) {
