@@ -3,50 +3,51 @@
 <title>JLgen documentation</title>
 </head>
 
-<body>
-<h1>JLgen Documentation</h1>
-<p>December 14, 2001</p>
-<hr>
-<h2>Table of Contents</h2>
-<ul>
-  <li><a href="#what">What</a> is it?
-  <li><a href="#usage">Usage</a>
-  <li><a href="#semantics">Semantics</a>
-</ul>
+<body bgcolor="white">
+<h1>JLgen : a parser generator for extensible grammars</h1>
 
-<a name="what"><h3>What is JLgen?</h3></a>
-JLgen is a parser generator for extensible grammars. It provides the 
-ability of extending languages by inheriting grammars, thus 
-simplifying the revision of language grammars. Base grammars can be
-extended with localized changes, automatically extends modifications
-to all inherting grammars, so changes are localized.
-
-<a name="usage"><h3>Using JLgen</h3></a>
-JLgen is based on the
+JLgen is a parser generator for extensible grammars, based on the
 <a href="http://www.cs.princeton.edu/~appel/modern/java/CUP/">CUP</a>
-parser generator. However, a JLgen grammar differs from a CUP grammar
-in several key ways:
+parser generator. It provides the 
+ability to extend an existing base language grammar written in CUP or
+JLgen with localized, easily maintained changes.
+
+<h2>Distribution of JLgen</h2>
+JLgen was designed and written by Michael Brukman and Andrew C. Myers
+at Cornell University. It is part of the
+<a href="http://www.cs.cornell.edu/Projects/jltools">
+JLtools Java extensible compiler
+toolkit</a>.
+It can be also be obtained
+<a href="http://www.cs.cornell.edu/Projects/jltools/jlgen">
+separately</a>.
+Questions about JLgen should be directed to Andrew Myers
+(<a href="mailto:myers@cs.cornell.edu">myers@cs.cornell.edu)</a>).
+
+<a name="usage"><h2>JLgen syntax</h2></a>
+The JLgen grammar syntax extends that of CUP with several new declarations:
 <ol>
-  <li>The first line of a JLgen specification is
-    <ul><tt><b>include &quot;</b><i>filename</i><b>&quot;</b></tt></ul>
-    where <i>filename</i> is a relative path to the inherited specification.
-    A JLgen spec can include a CUP spec or another JLgen spec. <b>Note:</b>
-    JLgen does not handle recursive/looping includes.
+  <li>The first line of a JLgen specification is <ul><tt><b>include</b>
+    &quot;</tt><i>filename</i><tt>&quot;</tt></ul> where <i>filename</i>
+    is a relative path to the inherited specification.  A JLgen spec can
+    include a CUP spec or another JLgen spec. It is an error for the
+    chain of included files to contain a cycle.
   <li>A JLgen grammar specification can modify the inherited grammar
 	using the following commands:
   <ul>
-	<li><tt><b>precedence</b></tt> [ <b>left</b> | <b>right</b> | <b>nonassoc</b> ]
-		<i>tokenlist</i><b>;</b><br>
-	  is the syntax for specifying new precedence rules, which is exactly
-	  as they are specified in CUP. Specification of new precedence rules in
-	  a JLgen specification replaces the precedence rules in the inherited
-	  grammar with these.
-	  
-	<li><tt><b>precedence;</b></tt><br>
-	  deletes all precedence rules from the inherited grammar, and is mutually
-	  exclusive with the syntax above: to add new precedence rules use the above
-	  syntax, use of this statement will only remove precedence rules.
-	  
+    <li><tt><b>precedence</b></tt> [ <b>left</b> | <b>right</b> |
+	<b>nonassoc</b> ] <i>tokenlist</i><b>;</b><br> is the syntax
+	for specifying new precedence rules, which is exactly as they
+	are specified in CUP. Specification of new precedence rules
+	in a JLgen specification replaces the precedence rules in the
+	inherited grammar with these.
+
+    <li><tt><b>precedence;</b></tt><br> deletes all precedence rules
+	from the inherited grammar, and is mutually exclusive with
+	the syntax above: to add new precedence rules use the above
+	syntax, use of this statement will only remove precedence
+	rules.
+
     <li><tt><b>drop {</b></tt> <i>symbol</i> <tt><b>}</b></tt><br>
       where <i>symbol</i> is an <u>inherited</u> terminal or
       nonterminal.<br> The specified <i>symbol</i> is removed from grammar, and
@@ -56,12 +57,13 @@ in several key ways:
       <b>right-hand side</b>.
       
     <li><tt><b>drop {</b></tt> <i>S</i> <tt><b>::=</b></tt> &lt;
-      <i>productions</i>&gt; <tt><b>; }</b></tt><br>
-      where <i>S</i> is an <u>inherited</u> nonterminal, and <i>productions</i>
+      <i>productions</i>&gt; <tt><b>; }</b></tt><br> where <i>S</i>
+      is an <u>inherited</u> nonterminal, and <i>productions</i>
       are inherited productions. The specified productions are not
-      inherited from the base grammar. The nonterminal remains in the grammar,
-      even if ALL of its productions are dropped in this way; <tt><b>drop {</b> 
-      <i>S</i> <b>}</b></tt> must be used if the nonterminal is to be eliminated.
+      inherited from the base grammar. The nonterminal remains in the
+      grammar, even if ALL of its productions are dropped in this way;
+      <tt><b>drop {</b> <i>S</i> <b>}</b></tt> must be used if the
+      nonterminal is to be eliminated.
       
     <li><tt><b>override</b></tt> <i>S</i> <tt><b>::=</b></tt> &lt;
       <i>productions</i>&gt; <tt><b>;</b></tt><br>
@@ -71,18 +73,18 @@ in several key ways:
       <i>productions</i>&gt; <tt><b>;</b></tt><br>
       Specified productions are added to the nonterminal <i>S</i>.
       
-    <li><tt><b>transfer</b></tt> <i>S</i> <tt><b>to</b></tt> <i>A<sub>1</sub></i>
-      { <i>rhs</i><sub>1</sub> } <tt><b>to</b></tt> <i>A<sub>n</sub></i> {
-      <i>rhs</i><sub>n</sub> }<br>
-      where <i>rhs</i><sub>i</sub> is one or more right-hand sides of productions
-      of <b><i>S</i></b>. Each of nonterminals <i>A<sub>i</sub></i> is extended with
-      productions as specified, and the the union of transferred
-      productions are not inherited by <i>S</i>, so a single production can be
-      transferred to multiple nonterminals. To retain a production in
-      S, manually transfer it to itself, e.g.:<br>
-      <tt><b>transfer S to A<sub>1</sub> {...} ... to A<sub>n</sub>
-      {...} to S {...}</b></tt>
-      
+    <li><tt><b>transfer</b></tt> <i>S</i> <tt><b>to</b></tt>
+      <i>A<sub>1</sub></i> { <i>rhs</i><sub>1</sub> } <tt><b>to</b></tt>
+      <i>A<sub>n</sub></i> { <i>rhs<sub>n</sub></i> }<br> where
+      <i>rhs<sub>i</sub></i> is one or more right-hand sides
+      of productions of <i>S</i>. Each of the nonterminals
+      <i>A<sub>i</sub></i> is extended with productions as specified,
+      and the transferred productions are not inherited
+      by <i>S</i>, so a single production can be transferred to
+      multiple nonterminals. Note that <i>S</i> may be one of the
+      <i>A<sub>i</sub></i>, which has the effect of retaining the
+      productions in <i>S</i>.
+
     <li>New terminals, nonterminals, and productions can be defined
     as in CUP and extend the base grammar.
 
@@ -91,14 +93,14 @@ in several key ways:
 
 
 The syntax for invocation of JLgen is simply<br>
-<ul><tt><b>jlgen &lt;grammar file&gt;</b></tt></ul>
+<ul><tt>jlgen</tt> &lt;<i>grammar file</i>&gt;</ul>
 for either a standard CUP file or for a JLgen-based grammar
 inheritance file.<p>
 
 The inherited base grammar file is searched for relative to the location
 of the JLgen source file.
 
-<a name="semantics"><h3>Semantics of JLgen</h3></a>
+<a name="semantics"><h2>Semantics of JLgen</h2></a>
 
 The order of specification of commands is not important. The resulting
 productions for any nonterminal N is as follows:
