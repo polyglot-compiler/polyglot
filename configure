@@ -296,7 +296,7 @@ BIN="bin"
 TOP="$CWD" 
 #; fi
 else
-    JLC_CP="-classpath \${TOP}${FILE_SEP}lib${FILE_SEP}polyglot.jar${PATH_SEP}\${TOP}${FILE_SEP}lib${FILE_SEP}jif.jar${PATH_SEP}\${TOP}${FILE_SEP}lib${FILE_SEP}java_cup.jar"
+    JLC_CP="-classpath \${TOP}${FILE_SEP}lib${FILE_SEP}polyglot.jar${PATH_SEP}\${TOP}${FILE_SEP}lib${FILE_SEP}java_cup.jar"
     BIN="bin"
     TOP=$CWD
 fi

@@ -364,110 +364,6 @@
     </antcall>
   </target>
 
-  <target name="jif" depends="jif-base,jif-runtime"/>
-
-  <target name="jif-base" depends="param">
-    <antcall target="standard-ext">
-      <param name="ext" value="jif"/>
-      <param name="parser.type" value="ppg"/>
-    </antcall>
-  </target>
-
-  <!-- A target for running the jif compiler jifc.
-       @param jifc.sourcedir   The source directory
-       @param jifc.outputdir   The output directory
-       @param jifc.files       The files to run jifc on
-       @param jifc.nooutput    nooutput option (if this param is set,
-                                then the option -nooutput will be used)
-
-       We use the executable sh due to issues when compiling on
-   Windows. We require that sh is on the path, and then jifc should
-   work fine for all platforms.
-   -->
-  <target name="jifc" depends="jif-base">
-    <!-- set the jifc.nooutput.string approptiately, based on jifc.noouput-->
-    <condition property="jifc.nooutput.string" value="-nooutput">
-      <isset property="jifc.nooutput"/>
-    </condition>
-    <condition property="jifc.nooutput.string" value="">
-      <not>
-        <isset property="jifc.nooutput.string"/>
-      </not>
-    </condition>
-    <exec executable="sh">
-     <arg path="${bin}/jifc"/>
-     <arg value="-d"/>
-     <arg path="${jifc.outputdir}"/>
-     <arg value="-sourcepath"/>
-     <arg path="${jifc.sourcedir}"/>
-     <arg value="${jifc.nooutput.string}"/>
-     <arg path="${jifc.files}"/>
-    </exec>
-  </target>
-
-  <target name="jif-runtime" depends="jif-base"
-    description="compile the jif runtime">
-    <!-- Compile the jif.bin and jif.lang packages -->
-    <javac srcdir="${src}/polyglot/ext/jif/runtime" destdir="${classes}" debug="on"
-      includes="jif/bin/**,jif/lang/**">
-      <classpath refid="standard.classpath"/>
-    </javac>
-    <!-- Compile the headers for jif.lang.NativePM -->
-    <javah class="jif.lang.NativePM" destdir="${src}/polyglot/ext/jif/runtime/jif/native" force="yes">
-      <classpath refid="standard.classpath"/>
-    </javah>
-    <!-- Call rmic for jif.lang.RemotePM -->
-    <rmic classname="jif.lang.RemotePM_c" base="${classes}">
-      <classpath refid="standard.classpath"/>
-    </rmic>
-    <!-- Compile the jif.io package -->
-    <antcall target="jifc">
-      <param name="jifc.sourcedir" value="${src}/polyglot/ext/jif/runtime"/>
-      <param name="jifc.outputdir" value="${classes}"/>
-      <param name="jifc.files" value="${src}/polyglot/ext/jif/runtime/jif/io/*.jif"/>
-      <param name="jifc.nooutput" value="true"/>
-    </antcall>
-    <!-- Compile the jif.runtime java files -->
-    <javac srcdir="${src}/polyglot/ext/jif/runtime" destdir="${classes}" debug="on" deprecation="on"
-      includes="jif/runtime/**"
-      excludes="jif/runtime/Runtime.java">
-      <classpath refid="standard.classpath"/>
-    </javac>
-
-    <!-- Make Runtime.sig -->
-    <antcall target="jifc">
-      <param name="jifc.sourcedir" value="${src}/polyglot/ext/jif/runtime"/>
-      <param name="jifc.outputdir" value="${classes}"/>
-      <param name="jifc.files" value="${src}/polyglot/ext/jif/runtime/jif/runtime/Runtime.jif"/>
-    </antcall>
-    <move file="${classes}/jif/runtime/Runtime.java" tofile="${src}/polyglot/ext/jif/runtime/jif/runtime/Runtime.sig"/>
-
-    <!-- Make Runtime.class -->
-    <copy file="${src}/polyglot/ext/jif/runtime/jif/runtime/Runtime.java" tofile="${src}/polyglot/ext/jif/runtime/jif/runtime/Runtime.java.bak1099"/>
-    <java classname="jif.bin.SigMerge">
-      <classpath refid="standard.classpath"/>
-      <arg path="${src}/polyglot/ext/jif/runtime/jif/runtime/Runtime.sig"/>
-      <arg path="${src}/polyglot/ext/jif/runtime/jif/runtime/Runtime.java"/>
-    </java>
-    <javac srcdir="${src}/polyglot/ext/jif/runtime" destdir="${classes}" debug="on" deprecation="on"
-      includes="jif/runtime/Runtime.java">
-      <classpath refid="standard.classpath"/>
-    </javac>
-    <move file="${src}/polyglot/ext/jif/runtime/jif/runtime/Runtime.java.bak1099" tofile="${src}/polyglot/ext/jif/runtime/jif/runtime/Runtime.java"/>    
-
-    <!-- Compile the headers for jif.runtime.FileSystem and jif.runtime.Runtime -->
-    <javah class="jif.runtime.FileSystem,jif.runtime.Runtime" destdir="${src}/polyglot/ext/jif/runtime/jif/native" force="yes">
-      <classpath refid="standard.classpath"/>
-    </javah>
-  </target>
-
-  <target name="split" depends="jif">
-    <antcall target="compile-ext">
-      <param name="ext" value="split"/>
-      <param name="parser.type" value="cup"/>
-    </antcall>
-  </target>
-
   <target name="polyj" depends="param">
     <antcall target="standard-ext">
       <param name="ext" value="polyj"/>
@@ -637,8 +533,6 @@ ext=''
 
   <target name="polyglot-dist" depends="base-dist,skel-dist,pao-dist,coffer-dist"/>
   <target name="polyglot-dist-javadoc" depends="polyglot-dist,dist-javadoc"/>
-  <target name="jif-dist" depends="base-dist,jif"/>
-  <target name="split-dist" depends="base-dist,split"/>
   <target name="polyj-dist" depends="base-dist,polyj"/>
   <target name="jmatch-dist" depends="base-dist,jmatch"/>
 </project>
