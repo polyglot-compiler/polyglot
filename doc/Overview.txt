@@ -71,11 +71,12 @@ somewhere).  The default set of passes is:
       interface to its type object.
     * disambiguate (AmbiguityRemover):  Removes any ambiguities found
       in the bodies of methods, constructors, or initializers.
-    * constant folding (ConstantFolder):  Performs a simple constant
-      folding optimization.
     * type checking (TypeChecker):  Performs semantic analysis for Java.
     * exception checking (ExceptionChecker):  Performs semantic analysis
       upon exception declaration and propagation.
+    * Reach
+    * Exit
+    * Init //FIXME: describe the dataflow passes
     * dump (DumpAst):  Optional.  A debugging pass that outputs the AST.
     * serialization (ClassSerializer):  Optional.  Serializes information
       about a compiled class and injects it into the class for output
@@ -83,6 +84,9 @@ somewhere).  The default set of passes is:
       extension languages.
     * translation (Translator):  Transforms each AST node to a String
       and writes it to an output file.
+
+//FIXME: describe barrier passes and what they do (If for no other reason
+//       then for my own personal knowledge :) - H)
 
 The ambiguities referred to in the above passes are ambiguities
 resulting from classification of names in Java.  Some names are
@@ -134,44 +138,57 @@ follows:
     following subpackages:
 
 	ext.<ext-name>.ast - AST nodes specific to the extension
+        //FIXME: check the below for correctness
+        //       anything else go in there?
+	ext.<ext-name>.extension - New delegates specific to the extension
 	ext.<ext-name>.types - type checking code specific to the extension
 	ext.<ext-name>.visit - visitors specific to the extension
 	ext.<ext-name>.parse - the parser for the language extension
 
     In addition, an extension must define the class
     ext.<ext-name>.ExtensionInfo, which contains the objects which
-    define how the language is to be parsed and type checked.
+    define how the language is to be parsed and type checked. There should
+    also be a class ext.<ext-name>.Version defined, which specifies the 
+    version number of the extension (nice but not necessary).
 
 
-AST nodes and node extensions
+AST nodes and delegates
 -----------------------------
 
 To allow for greater flexibility in overriding the behavior of an AST
-node, each node has a pointer to an extension object.  Extension objects
+node, each node has a pointer to a delegate object.  Delegate objects
 are useful for adding a field or a method to many different AST nodes.
 They provide functionality similar to mixins.  Their purpose is to allow
 a uniform extension of many AST nodes, not to be the primary vehicle
 through which a language extension is implemented.
 
-In order for the extension object to override the AST node, most calls
+In order for the delegates to override the AST node, most calls
 to the AST node object should be dispatched through the extension
-object.  The default extension object of every AST node just calls the
+object.  The default delegate of every AST node just calls the
 corresponding method in the AST node.
 
 So for instance, to invoke the typeCheck() method on an AST node n, we
 do:
 
-	n.ext().typeCheck(type_checker);
+	n.del().typeCheck(type_checker);
 
 instead of directly calling:
 
-	n.typeCheck_(type_checker);
+	n.typeCheck(type_checker);
 
-Note that we suffix methods which should not be called directly with an
-"_" as a reminder.  Unfortunately, these methods must be declared public
-since extension object classes live in a different package than the AST
-node classes.
+To reduce the proliferation of classes, all nodes in the base compiler use the
+same delegate class. For each compiler pass, the delegate invokes a method in
+the AST node that implements the class. Thus, in the base compiler, passes are
+implemented in the AST nodes themselves. Besides reducing the number of
+classes, this approach also permits more convenient access to instance
+variables of the nodes; delegates access the instance variables of their
+associated node through accessor methods. 
 
+In writing an extension, the designer should avoid using this approach and put
+the pass implementation in the delegates themselves; this leads to less 
+work in the numver of AST nodes that need to be extended. For more details,
+see the paper from which I stole the previous paragraph from (//FIXME: need to
+cite the polyglot paper).
 
 Writing an extension
 --------------------
@@ -203,6 +220,8 @@ the extension will require the following tasks.
     polyglot/ext/newext, which will copy the skeleton to polyglot/ext/L, and
     substitute your language's name at all the appropriate places in the
     skeleton.
+
+//FIXME: this is up to date in CVS right?
 
     1. Implement a new parser using PPG.  To do this, modify
     polyglot/ext/L/parse/L.ppg using the syntactic changes you defined above.
@@ -306,14 +325,38 @@ polyglot/ext/pao.
     We also create a subclass of ParsedTopLevelClassType to allow primitives
     to be cast to Object.
 
-    4. We override type checking for instanceof.  To do so, we create a
-    new AST node, PaoInstanceof_c, that subclasses the original Instanceof_c
-    node.  In it, we override the typeCheck() to allow primitive
-    types to occur in the instanceof expression.
+    5. We create a new Delegate interface, PaoDel, that extends the Del
+    interface. This delegate has the signature for a new method, rewrite,
+    which we will use to rewrite the the new Pao code into valid Java code.
+    We also create a class PaoDel_c which extends Del_c and implements PaoDel.
+    The default action for the rewrite function is to return the node
+    unchanged, which is the behavior that is desired for most nodes.
 
-    We modify PaoNodeFactory_c to create the new Instanceof node.
+    6. We override type checking for the instanceof operation.  To do so, we
+    create a new delegate, PaoInstanceofDel_c, that subclasses the PaoDel_c
+    delegate.  In it, we override the typeCheck() to allow primitive types to
+    occur in the instanceof expression.
 
-    5. We add a pass to insert explicit casts to Object when assigning
+    7. We define the translation that will take our Pao language to standard
+    Java by defining the implementation of the rewrite function. 
+
+    By the translation rules that we have defined, three things will need
+    to be rewritten: casts, instanceof operations, and the == and !=
+    operations.
+
+    In PaoInstanceofDel_c, we override the rewrite method to allow for
+    instanceof operations on primitive types.
+
+    We also create a PaoCastDel_c which extends PaoDel_c, in which we override
+    the rewrite method to box and unbox primitives appropriately to allow
+    casting to and from primitive types.
+
+    In addition, we create a PaoBinaryDel_c that also exends PaoDel_c, which
+    overrides the rewrite method to rewrite == and != expressions to call
+    Primitive.equals(o, p) when comparing two Objects or boxed primitives.
+    This method allows boxed primitives to be compared using == and !=.
+
+    8. We add a pass to insert explicit casts to Object when assigning
     a primitive to an object.  We call this pass PaoBoxer and
     implement it as a visitor.
 
@@ -328,17 +371,21 @@ polyglot/ext/pao.
     ascribe() will be called with expression 3 and type Object.
 
     We override ascribe to insert casts when assigning a primitive to
-    an Object.  We override the visitors leaveCall() method to rewrite
-    casts from primitive to Object in order to box the primitive
-    and to insert unboxing code when casting from Object to primitive.
+    an Object.  We override the visitors leaveCall() method to call the
+    rewrite method if the node's delegate is an instanceof a PaoDel. This
+    makes sure that all the appropriate nodes are rewritten to ensure a 
+    proper translation.
 
-    We further rewrite == and != expressions to call Primitive.equals(o, p)
-    when comparing two Objects or boxed primitives.
-    This method allows boxed primitives to be compared using == and !=.
+    9. We create a new NodeFactory, PaoNodeFactory_c, that extends
+    NodeFactory_c. In this new NodeFactory we over-ride the defaultExt() 
+    method to make the default delegate the PaoDel_c, and also over-ride the
+    InstanceOf, Cast, and Binary methods to return instatiations of the nodes
+    with the PaoInstanceofDel_c, PaoCastDel_c, and PaoBinaryDel_c delegates.
 
-    7. We create the ExtensionInfo that defines our extension.
+    10. We create the ExtensionInfo that defines our extension.
     
         $ cd $POLYGLOT/polyglot/ext/pao
 
     The skeleton generator created most of the necessary code.  We modify
-    the passes() method to add our new boxing pass.
+    the passes() method to add our new boxing pass. We also create a Version
+    class that defines the version of Pao that is being worked on.
