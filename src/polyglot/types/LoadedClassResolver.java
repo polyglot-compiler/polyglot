@@ -214,7 +214,7 @@ public class LoadedClassResolver extends ClassResolver
                                     + ". Try recompiling or obtaining "
                                     + " a newer version of the class file.");
       }
- 
+
       // Alright, go with it!
       field = clazz.getDeclaredField("jlc$ClassType");
       field.setAccessible( true);
@@ -253,14 +253,14 @@ public class LoadedClassResolver extends ClassResolver
       int v;
       v = Integer.parseInt(st.nextToken());
 
-      if (v != jltools.frontend.Compiler.VERSION_MAJOR) {
+      if (v != compiler.options().extension.version().major()) {
 	// Incompatible.
 	return NOT_COMPATIBLE;
       }
 
       v = Integer.parseInt(st.nextToken());
 
-      if (v != jltools.frontend.Compiler.VERSION_MINOR) {
+      if (v != compiler.options().extension.version().minor()) {
 	// Not the best option, but will work if its the only one.
 	return MINOR_NOT_COMPATIBLE;
       }

@@ -1,5 +1,6 @@
 package jltools.visit;
 
+import jltools.main.*;
 import jltools.ast.*;
 import jltools.frontend.Compiler;
 import jltools.types.*;
@@ -54,7 +55,7 @@ public class ClassSerializer extends NodeVisitor
 		ct.fieldNamed("jlc$SourceLastModified") != null ||
 		ct.fieldNamed("jlc$ClassType") != null) {
 
-		eq.enqueue(ErrorInfo.SEMANTIC_ERROR, 
+		eq.enqueue(ErrorInfo.SEMANTIC_ERROR,
 			   "Cannot serialize class information " +
 			   "more than once.");
 
@@ -64,11 +65,12 @@ public class ClassSerializer extends NodeVisitor
 	    Flags flags = Flags.PUBLIC.set(Flags.STATIC).set(Flags.FINAL);
 
 	    FieldDecl f;
-	    
+
 	    /* Add the compiler version number. */
-	    String version = Compiler.VERSION_MAJOR + "." +
-			     Compiler.VERSION_MINOR + "." +
-			     Compiler.VERSION_PATCHLEVEL;
+            Version ver = Options.global.extension.version();
+	    String version = ver.major() + "." +
+			     ver.minor() + "." +
+			     ver.patch_level();
 
 	    f = nf.FieldDecl(null, flags,
 		             nf.CanonicalTypeNode(null, ts.String()),
@@ -101,11 +103,11 @@ public class ClassSerializer extends NodeVisitor
 						 flags, ts.String(),
 						 "jlc$ClassType"));
 	    body = body.addMember(f);
-	    
+
 	    return cn.body(body);
 	}
 	catch (IOException e) {
-	    eq.enqueue(ErrorInfo.IO_ERROR, 
+	    eq.enqueue(ErrorInfo.IO_ERROR,
 		       "Unable to serialize class information.");
 	    return n;
 	}
