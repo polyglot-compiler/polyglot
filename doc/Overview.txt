@@ -1,158 +1,165 @@
 Introduction
 ------------
 
-Jltools is an extensible Java compiler toolkit designed for experimentation
-with new language extensions.
+Jltools is an extensible Java compiler toolkit designed for
+experimentation with new language extensions.
 
-The base jltools compiler, jlc, is a mostly-complete Java frontend; that is, it
-parses and performs semantic checking on Java source code.  The compiler
-outputs Java source code.  Thus, the base compiler implements the identity
-translation.
+The base jltools compiler, jlc, is a mostly-complete Java frontend; that
+is, it parses and performs semantic checking on Java source code.  The
+compiler outputs Java source code.  Thus, the base compiler implements
+the identity translation.
 
-Language extensions are implemented on top of the base compiler by extending
-the concrete and abstract syntax and the type system.  Ideally, after type
-checking the language extension, the abstract syntax tree (AST) is translated 
-into a Java AST and the existing code is output into a Java source file which 
-can then be compiled with javac.  For historical reasons, most extensions 
-just override some portions of the Java output code to handle the extended 
-syntax of the particular language extension being compiled.  We are 
-currently reworkng the compiler to make it easier to rewrite a language 
-extension's AST into a Java AST.
+Language extensions are implemented on top of the base compiler by
+extending the concrete and abstract syntax and the type system.
+Ideally, after type checking the language extension, the abstract syntax
+tree (AST) is translated into a Java AST and the existing code is output
+into a Java source file which can then be compiled with javac.  For
+historical reasons, most extensions just override some portions of
+the Java output code to handle the extended syntax of the particular
+language extension being compiled.  We are currently reworkng the
+compiler to make it easier to rewrite a language extension's AST into a
+Java AST.
 
 
 Architecture
 ------------
 
 The jltools compiler is structured as a set of passes over source files
-that ends with the output Java source code.  The passes parse the original
-source language and create an AST, rewrite the AST to eliminate
+that ends with the output of Java source code.  The passes parse the
+original source language and create an AST, rewrite the AST to eliminate
 any ambiguities, type check the AST, possibly rewrite the AST to another
 AST, then output the AST as Java source code.
 
-When the compiler is invoked (through jltools.main.Main.main()), it parses
-the command line (with jltools.main.Options), then creates a compiler object
-(an instance of jltools.frontend.Compiler) to manage the compilation process.
-An important job of the command line parser is to identify the language
-extension (specified on the command line with -ext L, where L is the name
-of the extension), and load the extension (from jltools.ext.L.ExtensionInfo).
-The compiler uses the extension to determine several important features of
-the language, including its source file extension, AST node factory, type
-system, and pass schedule.
+When the compiler is invoked (through jltools.main.Main.main()), it
+parses the command line (setting options in jltools.main.Options), then
+creates a compiler object (an instance of jltools.frontend.Compiler) to
+manage the compilation process.  An important job of the command line
+parser is to identify the language extension (specified on the command
+line with -ext L, where L is the name of the extension), and load the
+extension (from jltools.ext.L.ExtensionInfo).  The compiler uses the
+extension to determine several important features of the language,
+including its source file extension, AST node factory, type system, and
+pass schedule.
 
-Parsing is done with the Java CUP parser generator and a jltools extension
-to it called JLgen.  JLgen allows CUP files to be selectively extended
-to create parsers for extension languages by providing operations on
-a CUP grammar, including adding, dropping, and renaming of productions.
-The JFlex lexer generator is used to create a lexer for the source
-language.  The semantic actions in the parser create an AST through
-a NodeFactory, which is a class containing factory methods for
+Parsing is done with the Java CUP parser generator and a jltools
+extension to CUP called JLgen.  JLgen allows CUP files to be selectively
+extended to create parsers for extension languages by providing
+operations on a CUP grammar, including adding, dropping, and renaming of
+productions.  The JFlex lexer generator is used to create a lexer for
+the source language.  The semantic actions in the parser create an AST
+through a NodeFactory, which is a class containing factory methods for
 creating AST nodes.
 
 After the AST has been created by the parser, a series of passes is
-performed upon it.  The passes for a language extension, as well as the
-order in which they should be run, are defined in the extension's
-ExtensionInfo class.  The compiler object schedules the passes and runs
-them on the AST.  Most passes are implemented using a modified version
-of the Visitor design pattern (//FIXME: we should describe this somewhere).
-The default set of passes is:
+performed upon it.  The passes for a language extension, as well as
+the order in which they should be run, are defined in the extension's
+ExtensionInfo class.  The compiler object schedules the passes and
+runs them on the AST.  Most passes are implemented using a modified
+version of the Visitor design pattern (//FIXME: we should describe this
+somewhere).  The default set of passes is:
 
     * parsing, as described above
     * build-types (TypeBuilder):  Constructs the Type object representing
-        each type in the source file and stores it in a Resolver
-        associated with the source.
+      each type in the source file and stores it in a Resolver
+      associated with the source.
     * clean-super (AmbiguityRemover):  Removes any ambiguities found
-	in the declaration of the supertypes of a type (e.g., the "extends"
-	clause).
+      in the declaration of the supertypes of a type (e.g., the "extends"
+      clause).
     * clean-sigs (AmbiguityRemover):  Removes any ambiguities found in
-        the signatures of class or interface members.
+      the signatures of class or interface members.
     * add-members (AddMemberVisitor):  Adds the members of a class or
-        interface to its type object.
+      interface to its type object.
     * disambiguate (AmbiguityRemover):  Removes any ambiguities found
-        in the bodies of methods, constructors, or initializers.
+      in the bodies of methods, constructors, or initializers.
     * constant folding (ConstantFolder):  Performs a simple constant
-        folding optimization.
+      folding optimization.
     * type checking (TypeChecker):  Performs semantic analysis for Java.
     * exception checking (ExceptionChecker):  Performs semantic analysis
-        upon exception declaration and propagation.
+      upon exception declaration and propagation.
     * dump (DumpAst):  Optional.  A debugging pass that outputs the AST.
     * serialization (ClassSerializer):  Optional.  Serializes information
-        about a compiled class and injects it into the class for output
-        during translation.  This enables separate compilation of
-        extension languages.
+      about a compiled class and injects it into the class for output
+      during translation.  This enables separate compilation of
+      extension languages.
     * translation (Translator):  Transforms each AST node to a String
-        and writes it to an output file.
+      and writes it to an output file.
 
-The ambiguities referred to in the above passes are ambiguities resulting
-from classification of names in Java.  Some names are syntactically ambiguous
-because their meaning cannot be determined without some semantic analysis
-(see JLS2 6.5.2).  Extensions may also introduce new ambiguities that
-require resolution.
+The ambiguities referred to in the above passes are ambiguities
+resulting from classification of names in Java.  Some names are
+syntactically ambiguous because their meaning cannot be determined
+without some semantic analysis (see JLS2 6.5.2).  Extensions may also
+introduce new ambiguities that require resolution.
 
-Extensions will usually insert passes before type checking to perform some 
-initial semantic analysis or after it to do some final semantic analysis,
-and between exception checking and translation to rewrite the AST.
+Extensions will usually insert passes before type checking to perform
+some initial semantic analysis or after it to do some final semantic
+analysis, and between exception checking and translation to rewrite the
+AST.
 
 
 
 Source code hierarchy
 ---------------------
 
-All jltools code is in the package jltools.  The subpackages are as follows:
+All jltools code is in the package jltools.  The subpackages are as
+follows:
 
-ast - contains the AST node interface files.  All AST nodes implement the
-jltools.ast.Node interface.
+    ast - contains the AST node interface files.  All AST nodes
+    implement the jltools.ast.Node interface.
 
-types - contains the type system interface.
+    types - contains the type system interface.
 
-types/reflect - contains class file parsing code.
+    types/reflect - contains class file parsing code.
 
-visit - contains visitor classes which iterate over abstract syntax trees.
+    visit - contains visitor classes which iterate over abstract syntax
+    trees.
 
-frontend - contains compiler pass scheduling code.
+    frontend - contains compiler pass scheduling code.
 
-main - contains the code for the main method of the compiler in the class
-jltools.main.Main.  It includes code for parsing command line options and for
-debug output.
+    main - contains the code for the main method of the compiler in the
+    class jltools.main.Main.  It includes code for parsing command line
+    options and for debug output.
 
-util - contains utility code.  This includes the parser generator in
-util/jlgen.
+    util - contains utility code.  This includes the parser generator in
+    util/jlgen.
 
-lex - contains some lexer utility code.
+    lex - contains some lexer utility code.
 
-parse - contains some parser utility code.
+    parse - contains some parser utility code.
 
-ext - contains the code for the language extensions.  Source code for a
-language extension lives in the package jltools.ext.<ext-name>.  The default
-language extension is the "jl" extension which implements Java parsing and type
-checking.  Extensions are usually implemented by inheriting from the "jl"
-extension code.  Extensions usually have the following subpackages:
+    ext - contains the code for the language extensions.  Source code for
+    a language extension lives in the package jltools.ext.<ext-name>.  The
+    default language extension is the "jl" extension which implements Java
+    parsing and type checking.  Extensions are usually implemented by
+    inheriting from the "jl" extension code.  Extensions usually have the
+    following subpackages:
 
 	ext.<ext-name>.ast - AST nodes specific to the extension
 	ext.<ext-name>.types - type checking code specific to the extension
 	ext.<ext-name>.visit - visitors specific to the extension
 	ext.<ext-name>.parse - the parser for the language extension
 
-In addition, an extension must define the class ext.<ext-name>.ExtensionInfo,
-which contains the objects which define how the language is to be parsed
-and type checked.
+    In addition, an extension must define the class
+    ext.<ext-name>.ExtensionInfo, which contains the objects which
+    define how the language is to be parsed and type checked.
 
 
 AST nodes and node extensions
 -----------------------------
 
-To allow for greater flexibility in overriding the behavior of an AST node,
-each node has a pointer to an extension object.  Extension objects are useful
-for adding a field or a method to many different AST nodes.  They provide
-functionality similar to mixins.  Their purpose is to allow a uniform extension
-of many AST nodes, not to be the primary vehicle through which a language
-extension is implemented.
+To allow for greater flexibility in overriding the behavior of an AST
+node, each node has a pointer to an extension object.  Extension objects
+are useful for adding a field or a method to many different AST nodes.
+They provide functionality similar to mixins.  Their purpose is to allow
+a uniform extension of many AST nodes, not to be the primary vehicle
+through which a language extension is implemented.
 
-In order for the extension object to override the AST node, most calls to the
-AST node object should be dispatched through the extension object.  The default
-extension object of every AST node just calls the corresponding method in the
-AST node.
+In order for the extension object to override the AST node, most calls
+to the AST node object should be dispatched through the extension
+object.  The default extension object of every AST node just calls the
+corresponding method in the AST node.
 
-So for instance, to invoke the typeCheck() method on an AST node n, we do:
+So for instance, to invoke the typeCheck() method on an AST node n, we
+do:
 
 	n.ext().typeCheck(type_checker);
 
@@ -160,10 +167,10 @@ instead of directly calling:
 
 	n.typeCheck_(type_checker);
 
-Note that we suffix methods which should not be called directly with an "_" as
-a reminder.  Unfortuneately, these methods must be declared public since
-extension object classes usually live in a different package than the AST node
-classes.
+Note that we suffix methods which should not be called directly with an
+"_" as a reminder.  Unfortunately, these methods must be declared public
+since extension object classes live in a different package than the AST
+node classes.
 
 
 Writing an extension
@@ -174,59 +181,60 @@ Suppose you want to create language L that extends the Java language.
 First, you need to design L.  Your design process should include the
 following tasks.
 
-    1. Define the syntactic differences between L and Java,
-       based on the Java grammar found in jltools/ext/jl/parse/java12.cup.
+    1. Define the syntactic differences between L and Java, based on the
+    Java grammar found in jltools/ext/jl/parse/java12.cup.
 
-    2. Define any new AST nodes that L requires.  The existing Java
-       nodes can be found in jltools.ast (interfaces) and jltools.ext.jl.ast
-       (implementations).
+    2. Define any new AST nodes that L requires.  The existing
+    Java nodes can be found in jltools.ast (interfaces) and
+    jltools.ext.jl.ast (implementations).
 
-    3. Define the semantic differences between L and Java.  jltools
-       implements an ever-increasing subset of the static semantic of
-       Java as defined in the Java Language Specification 2.
+    3. Define the semantic differences between L and Java. jltools
+    implements an ever-increasing subset of the static semantic of Java
+    as defined in the Java Language Specification 2.
 
-    4. Define a translation from L to Java.  The translation should produce
-       a legal Java program that can be compiled by javac.
+    4. Define a translation from L to Java.  The translation should
+    produce a legal Java program that can be compiled by javac.
 
 Next, you can implement L by creating a jltools extension.  Implementing
 the extension will require the following tasks.
 
     0. (Optionally) Begin with the skeleton extension found in
-       jltools/ext/skel.  Copy it to jltools/ext/L, and run the
-       customization script X.  FIXME: need this script, which would
-       do s/skel/L on file names and text.
+    jltools/ext/skel.  Copy it to jltools/ext/L, and run the
+    customization script X.  FIXME: need this script, which would do
+    s/skel/L on file names and text.
 
     1. Implement a new parser using JLgen.  To do this, modify
-	   jltools/ext/L/parse/L.jlg using the syntactic changes you
-       defined above.
+    jltools/ext/L/parse/L.jlg using the syntactic changes you defined
+    above.
 
     2. Implement any new AST nodes.  Modify the node factory
-       jltools/ext/L/ast/LNodeFactory_c.java to produce these nodes.
+    jltools/ext/L/ast/LNodeFactory_c.java to produce these nodes.
 
     3. Implement semantic checking for L based on the rules you defined
-	   above.
+    above.
 
-	    a. If L involves changing the semantics of Java, you will probably
-		   want to implement these as part of the TypeCheck pass already
-		   defined by jltools.
+	a. If L involves changing the semantics of Java, you will
+	probably want to implement these as part of the TypeCheck
+	pass already defined by jltools.
 
-        b. If L introduces new semantics that are orthogonal to Java, you
-           may wish to implement an entirely new pass that runs separately
-           from TypeCheck.
+        b. If L introduces new semantics that are orthogonal to Java,
+        you may wish to implement an entirely new pass that runs
+        separately from TypeCheck.
 
-       Semantic changes that are localized to an AST node will probably
-       be implemented by overriding that node's typeCheck_() method.
-       Semantic changes that affect more fundamental properties of the
-       Java type system will probably be implemented by overriding
-       appropriate methods in jltools/ext/L/types/LTypeSystem_c.java.
+    Semantic changes that are localized to an AST node will probably
+    be implemented by overriding that node's typeCheck_() method.
+    Semantic changes that affect more fundamental properties of the
+    Java type system will probably be implemented by overriding
+    appropriate methods in jltools/ext/L/types/LTypeSystem_c.java.
 
     4. Implement the translation from L to Java based on the translation
-       you defined above.  This should be implemented as a visitor pass
-       that rewrites the AST into an AST representing a legal Java program.
+    you defined above.  This should be implemented as a visitor pass
+    that rewrites the AST into an AST representing a legal Java program.
 
-Let's make this more concrete by introducing an actual extension.  We'll use the
-Object Primitive (OP) extension, which extends Java with the ability to use 
-primitive types (e.g., int, float) as Objects.  For example, in OP we can write:
+Let's make this more concrete by introducing an actual extension.  We'll
+use the Object Primitive (OP) extension, which extends Java with the
+ability to use primitive types (e.g., int, float) as Objects.  For
+example, in OP we can write:
 
     Map m = new HashMap();
     m.put(1, 2);
@@ -234,89 +242,88 @@ primitive types (e.g., int, float) as Objects.  For example, in OP we can write:
 
 The changes to Java needed to support this feature are quite minimal.
 
-    1. We modify the grammar to allow instanceof to operate on primitive types.
-       The existing production for instanceof in java12.cup is:
+    1. We modify the grammar to allow instanceof to operate on primitive
+    types.  The existing production for instanceof in java12.cup is:
 
 	    relational_expression ::=
             ...
         |   relational_expression:a INSTANCEOF reference_type:b
         ;
 
-       In order to allow primitives, we should change this to:
+    In order to allow primitives, we should change this to:
 
        	relational_expression ::=
             ...
         |   relational_expression:a INSTANCEOF type:b
         ;
 
-	2. We modify type checking so that primitive values may be used
-       at type Object.  That means for all primitive types P where
-	   P != void, P <: Object (jltools defines void as a primitive type,
-	   but void has no values).  We'll want to use this relationship
-       in assignments and casting, as shown in the example above.  Also,
-       we'll need to allow primitive types to appear inside an instanceof 
-	   operator.
+    2. We modify type checking so that primitive values may be used at
+    type Object.  That means for all primitive types P where P != void,
+    P <: Object (jltools defines void as a primitive type, but void has
+    no values).  We'll want to use this relationship in assignments and
+    casting, as shown in the example above.  Also, we'll need to allow
+    primitive types to appear inside an instanceof operator.
 
-    3. We rewrite the AST to make it a legal Java program.
-       This means that anywhere we see a primitive value being used
-       at Object, we should box the value and insert a cast to Object.
+    3. We rewrite the AST to make it a legal Java program.  This means
+    that anywhere we see a primitive value being used at Object, we
+    should box the value and insert a cast to Object.
 
 We create the extension as follows:
 
     1. The extension is sufficiently simple that we won't need the
-       skeleton.  So we start by creating the directory
-       jltools/ext/op.  // FIXME: perhaps we should have a small-scale
-       and a large-scale extension skeleton.
+    skeleton.  So we start by creating the directory jltools/ext/op.
+    // FIXME: perhaps we should have a small-scale and a large-scale
+    extension skeleton.
 
-    2. We create the JLgen file, op.jlg.  The first 80 lines or so
-	   are just boiler plate code.  Then, we change the grammar for
-	   instanceof by dropping the existing production in relational_expression
-       and adding a new production.  When creating a new parser, it is also
-       necessary to redefine the lexer in the same directory, hence we copy
-       java.flex into our extension and rename it to op.flex.  No changes
-       to it are necessary.  Also, each parser requires its own 
-	   boilerplate implementation of ParserWrapper, which we copy from
-       JLParserWrapper.
+    2. We create the JLgen file, op.jlg.  The first 80 lines or so are
+    just boiler plate code.  Then, we change the grammar for instanceof
+    by dropping the existing production in relational_expression and
+    adding a new production.  When creating a new parser, it is also
+    necessary to redefine the lexer in the same directory, hence we copy
+    java.flex into our extension and rename it to op.flex.  No changes
+    to it are necessary.  Also, each parser requires its own boilerplate
+    implementation of ParserWrapper, which we copy from JLParserWrapper.
 
-    3. We extend the type system in OPTypeSystem.java.  To implement the
-       new subtype relationship, we override four methods from the
-       TypeSystem interface: descendsFrom(), isAssignableSubtype(),
-	   isCastValid(), and isImplicitCastValid().  The implementations
-       of each of these checks for and returns true if a primitive is being used
-       as an Object.  Otherwise, they call their superclass implementation.
+    3. We extend the type system in OPTypeSystem.java.  To implement
+    the new subtype relationship, we override four methods from the
+    TypeSystem interface: descendsFrom(), isAssignableSubtype(),
+    isCastValid(), and isImplicitCastValid().  The implementations
+    of each of these checks for and returns true if a primitive is
+    being used as an Object.  Otherwise, they call their superclass
+    implementation.
 
-    4. We override type checking for instanceof.  To do so, we create a new
-       AST node, OPInstanceOf, that subclasses the original InstanceOf node.
-       In it, we override the typeCheck() to allow primitive types, which
-       the superclass checked for and threw an error upon discovering.
+    4. We override type checking for instanceof.  To do so, we create a
+    new AST node, OPInstanceOf, that subclasses the original InstanceOf
+    node.  In it, we override the typeCheck() to allow primitive
+    types, which the superclass checked for and threw an error upon
+    discovering.
 
-    5. We add a pass to insert explicit casts to Object when assigning a
-	   primitive to an object.  We call this pass OPCastRewriter and
-       implement it as a visitor.  In the leaveCall() of the visitor,
-       we check to see if we're leaving a Cast node.  If so, we check
-       the expectedType() and actual type() of the node.  If there's
-       a mismatch where the expected type is Object but the actual type
-       is a primitive, we insert a cast to object.  Our pass extends
-       SemanticVisitor, which is perhaps the most useful visitor to extend,
-       since it provides access to many extension-specific resources
-       such as the TypeSystem, NodeFactory, etc.
+    5. We add a pass to insert explicit casts to Object when assigning
+    a primitive to an object.  We call this pass OPCastRewriter and
+    implement it as a visitor.  In the leaveCall() of the visitor,
+    we check to see if we're leaving a Cast node.  If so, we check
+    the expectedType() and actual type() of the node.  If there's a
+    mismatch where the expected type is Object but the actual type
+    is a primitive, we insert a cast to object.  Our pass extends
+    SemanticVisitor, which is perhaps the most useful visitor to extend,
+    since it provides access to many extension-specific resources such
+    as the TypeSystem, NodeFactory, etc.
 
-    6. We override translation for instanceof and casts to box and unbox
-	   primitive types as necessary.  We could also have implemented this
-       as part of the rewriting pass, but instead we override the translation
-       for sake of example.  To override the translation, we override
-       the translate_() method.  We already have an AST node in OP for
-       InstanceOf, but we have to create a new node for Cast.  We call
-       it OPCast and use it to subclass the original Cast node.
-       In OPInstanceOf, we substitute the appropriate wrapper class
-       for a cast to a primitive (e.g., Integer for int).  In OPCast,
-       we insert code to box or unbox the result of the cast.
+    6. We override translation for instanceof and casts to box and
+    unbox primitive types as necessary.  We could also have implemented
+    this as part of the rewriting pass, but instead we override the
+    translation for sake of example.  To override the translation, we
+    override the translate_() method.  We already have an AST node in
+    OP for InstanceOf, but we have to create a new node for Cast.  We
+    call it OPCast and use it to subclass the original Cast node.  In
+    OPInstanceOf, we substitute the appropriate wrapper class for a cast
+    to a primitive (e.g., Integer for int).  In OPCast, we insert code
+    to box or unbox the result of the cast.
 
-    7. We create the ExtensionInfo that defines our extension.
-       In it we override factory methods to create our OP type
-       system and node factory instead of the default jltools classes.
-       We also define the file extension for the OP language, ".jop".
-       Finally, we define our new pass and schedule it to run before
-	   translation.
+    7. We create the ExtensionInfo that defines our extension.  In it
+    we override factory methods to create our OP type system and node
+    factory instead of the default jltools classes.  We also define the
+    file extension for the OP language, ".jop".  Finally, we define our
+    new pass and schedule it to run before translation.
 
 Now we've finished creating the OP extension.
