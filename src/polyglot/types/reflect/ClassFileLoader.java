@@ -50,8 +50,8 @@ public class ClassFileLoader
             // to load the same class file.  But, we use a weak hash map
             // to allow garbage collection of ClassFiles when we need it.
             if (c != null) {
-                if (Report.should_report(verbose, 1))
-		    Report.report(1, "loaded class " + c.name());
+                if (Report.should_report(verbose, 2))
+		    Report.report(2, "loaded class " + c.name());
                 cache.put(key, c);
                 return c;
             }

@@ -43,10 +43,10 @@ public class ClassPathLoader
      * Load a class from the classpath.
      */
     public ClassFile loadClass(String name) throws ClassNotFoundException {
-        if (Report.should_report(verbose, 1))
-	    Report.report(1, "attempting to load class " + name);
-        if (Report.should_report(verbose, 2))
+        if (Report.should_report(verbose, 2)) {
+	    Report.report(2, "attempting to load class " + name);
 	    Report.report(2, "classpath = " + classpath);
+	}
 
 	for (Iterator i = classpath.iterator(); i.hasNext(); ) {
 	    File dir = (File) i.next();

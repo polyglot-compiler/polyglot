@@ -10,7 +10,7 @@ public class Types
      * Print debug messages with topic "types".
      */
     public static boolean should_report(int level) {
-        return Report.should_report("types", level);
+        return Report.should_report("types", level+1);
     }
     public static void report(int level, String msg) {
         Report.report(level, msg);
