@@ -100,7 +100,7 @@ public interface ExtensionInfo {
     boolean runToCompletion();
 
     /** Run the given job up to a given pass. */
-    boolean runToPass(Job job, Pass.ID goal);
+    boolean runToPass(Job job, Pass.ID goal) throws CyclicDependencyException;
 
     /** Run the given job to completion. */
     boolean runAllPasses(Job job);

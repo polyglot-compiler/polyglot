@@ -223,7 +223,13 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         while (! job.pendingPasses().isEmpty()) {
             Pass pass = (Pass) job.pendingPasses().get(0);
 
-            runPass(job, pass);
+            try {
+                runPass(job, pass);
+            }
+            catch (CyclicDependencyException e) {
+                // cause the pass to fail.
+                job.finishPass(pass, false);
+            }
 
             if (pass == goal) {
                 break;
@@ -244,11 +250,22 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
      * ensure that the scheduling invariants are enforced by calling
      * <code>enforceInvariants</code>.
      */
-    protected void runPass(Job job, Pass pass) {
+    protected void runPass(Job job, Pass pass) throws CyclicDependencyException
+    {
         // make sure that all scheduling invariants are satisfied before running
         // the next pass. We may thus execute some other passes on other
         // jobs running the given pass.
-        enforceInvariants(job, pass);
+        try {
+            enforceInvariants(job, pass);
+        }
+        catch (CyclicDependencyException e) {
+            // A job that depends on this job is still running 
+            // an earlier pass.  We cannot continue this pass,
+            // but we can just silently fail since the job we're
+            // that depends on this one will eventually try
+            // to run this pass again when it reaches a barrier.
+            return;
+        }
 
         if (getOptions().disable_passes.contains(pass.name())) {
             if (Report.should_report(Report.frontend, 1))
@@ -262,7 +279,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
         if (job.isRunning()) {
             // We're currently running.  We can't reach the goal.
-            throw new InternalCompilerError(job +
+            throw new CyclicDependencyException(job +
                                             " cannot reach pass " +
                                             pass);
         }
@@ -358,7 +375,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
      * on will have already been done.
      *
      */
-    protected void enforceInvariants(Job job, Pass pass) {
+    protected void enforceInvariants(Job job, Pass pass) throws CyclicDependencyException {
         SourceJob srcJob = job.sourceJob();
         if (srcJob == null) {
             return;
@@ -399,10 +416,14 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         if (pass instanceof GlobalBarrierPass) {
             // need to make sure that _all_ jobs have completed just up to
             // this global barrier.
-            List allSrcJobs = new ArrayList(jobs.values());
-            Iterator i = allSrcJobs.iterator();
-            while (i.hasNext()) {
-                Object o = i.next();
+
+            // If we hit a cyclic dependency, ignore it and run the other
+            // jobs up to that pass.  Then try again to run the cyclic
+            // pass.  If we hit the cycle again for the same job, stop.
+            LinkedList barrierWorklist = new LinkedList(jobs.values());
+
+            while (! barrierWorklist.isEmpty()) {
+                Object o = barrierWorklist.removeFirst();
                 if (o == COMPLETED_JOB) continue;
                 SourceJob sj = (SourceJob)o;
                 if (sj.completed(pass.id()) ||
@@ -422,7 +443,19 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                     Report.report(3, "Running " + sj +
                               " to " + beforeGlobal.id() + " for " + srcJob);
                 }
-                runToPass(sj, beforeGlobal);
+
+                // Don't use runToPass, since that catches the
+                // CyclicDependencyException that we should report
+                // back to the caller.
+                while (! sj.pendingPasses().isEmpty()) {
+                    Pass p = (Pass) sj.pendingPasses().get(0);
+
+                    runPass(sj, p);
+
+                    if (p == beforeGlobal) {
+                        break;
+                    }
+                }
             }
         }
     }
