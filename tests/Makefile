@@ -19,6 +19,7 @@ GOOD =  \
 	Inner6.jl \
 	Inner7.jl \
 	Inner8.jl \
+	Inner9.jl \
 	Prim.jl \
 	StaticContext.jl \
 	StaticOps.jl \
