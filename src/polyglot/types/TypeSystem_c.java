@@ -67,6 +67,10 @@ public class TypeSystem_c implements TypeSystem
         // later if these are loaded.
 
         // We cache the most commonly used ones in fields.
+        /* DISABLED CACHING OF COMMON CLASSES; CAUSES PROBLEMS IF
+           COMPILING CORE CLASSES (e.g. java.lang package).
+           TODO: Longer term fix. Maybe a flag to tell if we are compiling
+                 core classes? XXX
         Object();
         Class();
         String();
@@ -82,6 +86,7 @@ public class TypeSystem_c implements TypeSystem
         systemResolver.find("java.lang.ArrayIndexOutOfBoundsException");
         systemResolver.find("java.lang.ArrayStoreException");
         systemResolver.find("java.lang.ArithmeticException");
+        */
     }
 
     public Resolver systemResolver() {
