@@ -6,6 +6,7 @@ include $(SOURCE)/Rules.mk
 
 SOURCES = \
 	NodeFactory.java \
+	ExtFactory.java \
 	AmbExpr.java \
 	Ambiguous.java \
 	LHS.java \
