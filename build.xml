@@ -157,6 +157,7 @@
           unless="cup.parser.up-to-date">
   </target>
 
+
   <!-- The following target builds a cup parser using the version of
        cup already sitting in the java_cup.jar file. This is needed to
        allow the building of cup to be bootstrapped. -->
@@ -256,6 +257,7 @@
       <param name="parser.class" value="Grm"/>
       <param name="symbol.class" value="sym"/>
     </antcall>
+    <copy file="${src}/polyglot/ext/jl/parse/java12.cup" todir="${classes}/polyglot/ext/jl/parse"/>
     <antcall target="standard-ext-qq">
       <param name="ext" value="jl"/>
     </antcall>
