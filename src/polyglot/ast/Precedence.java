@@ -16,11 +16,11 @@ public class Precedence extends Enum {
 
     /** Returns true if this and p have the same precedence. */
     public boolean equals(Object o) {
-        return o instanceof Precedence && isSame((Precedence) o);
+        return o instanceof Precedence && equals((Precedence) o);
     }
 
     /** Returns true if this and p have the same precedence. */
-    public boolean isSame(Precedence p) {
+    public boolean equals(Precedence p) {
 	return value == p.value;
     }
 

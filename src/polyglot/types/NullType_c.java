@@ -24,8 +24,8 @@ public class NullType_c extends Type_c implements NullType
 	return "type(null)";
     }
     
-    public boolean isSameImpl(Type t) {
-        return t.isNull();
+    protected boolean equalsImpl(TypeObject t) {
+        return t instanceof NullType;
     }
 
     public int hashCode() {

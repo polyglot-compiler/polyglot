@@ -59,7 +59,7 @@ public class LocalInstance_c extends VarInstance_c implements LocalInstance
 	this.type = type;
     }
 
-    public boolean equals(Object o) {
+    protected boolean equalsImpl(Object o) {
         if (o instanceof LocalInstance) {
             LocalInstance i = (LocalInstance) o;
             return super.equals(i);

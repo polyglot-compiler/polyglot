@@ -154,7 +154,7 @@ public class ClassFile implements LazyClassInitializer {
     public ParsedClassType type(TypeSystem ts) throws SemanticException {
         ParsedClassType ct = createType(ts);
 
-        if (ts.isSame(ct, ts.Object())) {
+        if (ts.equals(ct, ts.Object())) {
             ct.superType(null);
         }
         else {
@@ -362,7 +362,7 @@ public class ClassFile implements LazyClassInitializer {
 	    Report.report(2, "resolving " + name);
 
         try {
-            return (ClassType) ts.systemResolver().findType(name);
+            return (ClassType) ts.systemResolver().find(name);
         }
         catch (SemanticException e) {
             throw new InternalCompilerError("could not load " + name);

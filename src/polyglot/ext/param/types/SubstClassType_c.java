@@ -113,15 +113,12 @@ public class SubstClassType_c extends ClassType_c implements SubstType
     // Equality tests
 
     /** Type equality test. */
-    public boolean isSameImpl(Type t) {
-        if (! (t instanceof SubstType))
-            return false;
-
-        SubstType x = (SubstType) t;
-        if (! base.isSame(x.base()) || ! subst.equals(x.subst()))
-            return false;
-
-        return true;
+    protected boolean equalsImpl(TypeObject t) {
+        if (t instanceof SubstType) {
+            SubstType x = (SubstType) t;
+            return base.equals(x.base()) && subst.equals(x.subst()); 
+        }
+        return false;
     }
 
     /** Hash code. */

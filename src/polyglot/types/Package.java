@@ -3,7 +3,7 @@ package polyglot.types;
 /**
  * An <code>Package</code> represents a Java package.
  */
-public interface Package extends NamedQualifier
+public interface Package extends Qualifier, Named
 {
     /**
      * The package's outer package.
@@ -19,5 +19,5 @@ public interface Package extends NamedQualifier
     /**
      * Return true if <code>this</code> is the same package as <code>p</code>.
      */
-    boolean isSame(Package p);
+    boolean equals(Package p);
 }

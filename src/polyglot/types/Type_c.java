@@ -100,7 +100,7 @@ public abstract class Type_c extends TypeObject_c implements Type
     }
 
     public boolean isSubtypeImpl(Type t) {
-	return ts.isSame(this, t) || ts.descendsFrom(this, t);
+	return ts.equals(this, t) || ts.descendsFrom(this, t);
     }
     
     public final boolean descendsFrom(Type t) {
@@ -111,18 +111,6 @@ public abstract class Type_c extends TypeObject_c implements Type
         return false;
     }
 
-    public final boolean isSame(Type t) {
-        return ts.isSame(this, t);
-    }
-    
-    public boolean isSameImpl(Type t) {
-        return t == this;
-    }
-
-    public boolean equals(Object o) {
-        return o instanceof Type && ts.isSame(this, (Type) o);
-    }
-    
     public final boolean isCastValid(Type toType) {
 	return ts.isCastValid(this, toType);
     }
@@ -156,8 +144,8 @@ public abstract class Type_c extends TypeObject_c implements Type
     private void writeObject(ObjectOutputStream out) throws IOException {
         // Write out the full name first so we can install correctly
         // when we read back.
-        if (this instanceof ImportableType) {
-            String name = ((ImportableType) this).fullName();
+        if (this instanceof Importable) {
+            String name = ((Importable) this).fullName();
             out.writeObject(name);
         }
 
@@ -168,7 +156,7 @@ public abstract class Type_c extends TypeObject_c implements Type
         throws IOException, ClassNotFoundException
     {
         // Store the type in the system resolver to avoid infinite loop.
-        if (this instanceof ImportableType) {
+        if (this instanceof Importable) {
             String name = (String) in.readObject();
             TypeSystem ts = ((TypeInputStream) in).getTypeSystem();
             ((CachingResolver) ts.systemResolver()).install(name, this);

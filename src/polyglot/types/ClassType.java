@@ -8,7 +8,7 @@ import java.util.List;
  * classpath, parsed from a source file, or obtained from other source.
  * A <code>ClassType</code> is not necessarily named.
  */
-public interface ClassType extends ImportableType, ReferenceType, MemberInstance
+public interface ClassType extends Importable, ReferenceType, MemberInstance
 {
     public static class Kind extends Enum {
         public Kind(String name) {

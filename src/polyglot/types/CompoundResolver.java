@@ -27,26 +27,14 @@ public class CompoundResolver implements Resolver {
     }
 
     /**
-     * Find a qualifier by name.
+     * Find a type object by name.
      */
-    public Qualifier findQualifier(String name) throws SemanticException {
+    public Named find(String name) throws SemanticException {
 	try {
-	    return head.findQualifier(name);
+	    return head.find(name);
 	}
 	catch (NoClassException e) {
-	    return tail.findQualifier(name);
-	}
-    }
-
-    /**
-     * Find a type by name.
-     */
-    public Type findType(String name) throws SemanticException {
-	try {
-	    return head.findType(name);
-	}
-	catch (NoClassException e) {
-	    return tail.findType(name);
+	    return tail.find(name);
 	}
     }
 }

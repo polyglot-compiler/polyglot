@@ -20,7 +20,7 @@ public class PaoBinaryDel_c extends PaoDel_c {
             MethodInstance mi = ((PaoTypeSystem) ts).primitiveEquals();
 
             if (ts.isSubtype(l.type(), mi.container()) ||
-                ts.isSame(l.type(), ts.Object())) {
+                ts.equals(l.type(), ts.Object())) {
 
                 // left is a boxed primitive
                 if (r.type().isReference()) {

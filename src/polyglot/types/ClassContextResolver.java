@@ -29,10 +29,10 @@ public class ClassContextResolver extends ClassResolver {
     }
 
     /**
-     * Find a type in the context of the class.
+     * Find a type object in the context of the class.
      * @param name The name to search for.
      */
-    public Type findType(String name) throws SemanticException {
+    public Named find(String name) throws SemanticException {
         if (Report.should_report(new String[] {Report.types, Report.resolver}, 2))
 	    Report.report(2, "Looking for " + name + " in " + this);
 

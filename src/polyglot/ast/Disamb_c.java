@@ -61,8 +61,15 @@ public class Disamb_c implements Disamb
     protected Node disambiguatePackagePrefix(PackageNode pn) throws SemanticException {
         Resolver pc = ts.packageContextResolver(c.outerResolver(),
                                                 pn.package_());
-        Qualifier q = pc.findQualifier(name);
-
+        
+        Named n = pc.find(name);
+        Qualifier q = null;
+        if (n instanceof Qualifier) {
+            q = (Qualifier) n;
+        } else {
+            return null;
+        }
+        
         if (q.isPackage()) {
             return nf.PackageNode(pos, q.toPackage());
         } else if (q.isType()) {
@@ -73,8 +80,9 @@ public class Disamb_c implements Disamb
     }
 
 
-    protected Node disambiguateTypeNodePrefix(TypeNode tn) throws SemanticException {
-
+    protected Node disambiguateTypeNodePrefix(TypeNode tn) 
+        throws SemanticException 
+    {
         // Try static fields.
         Type t = tn.type();
 
@@ -90,8 +98,11 @@ public class Disamb_c implements Disamb
         // Try member classes.
         if (t.isClass()) {
             Resolver tc = ts.classContextResolver(t.toClass());
-            Type type = tc.findType(name);
-            return nf.CanonicalTypeNode(pos, type);
+            Named n = tc.find(name);
+            if (n instanceof Type) {
+                Type type = (Type) n;
+                return nf.CanonicalTypeNode(pos, type);
+            }
         }
 
         return null;
@@ -119,8 +130,11 @@ public class Disamb_c implements Disamb
         } catch (SemanticException e) {
             // Then try types.
             try {
-                Type type = c.findType(name);
-                return nf.CanonicalTypeNode(pos, type);
+                Named n = c.find(name);
+                if (n instanceof Type) {
+                    Type type = (Type) n;
+                    return nf.CanonicalTypeNode(pos, type);
+                }
             } catch (SemanticException e2) {
                 // must be a package--ignore the error
             }
@@ -143,7 +157,7 @@ public class Disamb_c implements Disamb
             // type of the class we want.
             ClassType scope = c.findFieldScope(name);
 
-            if (! ts.isSame(scope, c.currentClass())) {
+            if (! ts.equals(scope, c.currentClass())) {
                 r = nf.This(pos, nf.CanonicalTypeNode(pos, scope));
             } else {
                 r = nf.This(pos);

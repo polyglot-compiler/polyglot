@@ -67,21 +67,21 @@ public class TypeSystem_c implements TypeSystem
         // later if these are loaded.
 
         // We cache the most commonly used ones in fields.
-        OBJECT_ = (ClassType) systemResolver.findType("java.lang.Object");
-        CLASS_  = (ClassType) systemResolver.findType("java.lang.Class");
-        STRING_ = (ClassType) systemResolver.findType("java.lang.String");
-        THROWABLE_ = (ClassType) systemResolver.findType("java.lang.Throwable");
+        OBJECT_ = (ClassType) systemResolver.find("java.lang.Object");
+        CLASS_  = (ClassType) systemResolver.find("java.lang.Class");
+        STRING_ = (ClassType) systemResolver.find("java.lang.String");
+        THROWABLE_ = (ClassType) systemResolver.find("java.lang.Throwable");
 
-        systemResolver.findType("java.lang.Error");
-        systemResolver.findType("java.lang.Exception");
-        systemResolver.findType("java.lang.RuntimeException");
-        systemResolver.findType("java.lang.Cloneable");
-        systemResolver.findType("java.io.Serializable");
-        systemResolver.findType("java.lang.NullPointerException");
-        systemResolver.findType("java.lang.ClassCastException");
-        systemResolver.findType("java.lang.ArrayIndexOutOfBoundsException");
-        systemResolver.findType("java.lang.ArrayStoreException");
-        systemResolver.findType("java.lang.ArithmeticException");
+        systemResolver.find("java.lang.Error");
+        systemResolver.find("java.lang.Exception");
+        systemResolver.find("java.lang.RuntimeException");
+        systemResolver.find("java.lang.Cloneable");
+        systemResolver.find("java.io.Serializable");
+        systemResolver.find("java.lang.NullPointerException");
+        systemResolver.find("java.lang.ClassCastException");
+        systemResolver.find("java.lang.ArrayIndexOutOfBoundsException");
+        systemResolver.find("java.lang.ArrayStoreException");
+        systemResolver.find("java.lang.ArithmeticException");
     }
 
     public Resolver systemResolver() {
@@ -264,12 +264,17 @@ public class TypeSystem_c implements TypeSystem
     }
 
     /**
-     * Returns true iff type1 and type2 are the same type.
+     * Returns true iff type1 and type2 represent the same type object.
      */
-    public boolean isSame(Type type1, Type type2) {
+    public boolean equals(TypeObject type1, TypeObject type2) {
         assert_(type1);
         assert_(type2);
-	return type1.isSameImpl(type2);
+        if (type1 instanceof TypeObject_c) {
+            return ((TypeObject_c)type1).equalsImpl(type2);
+        } else {
+            throw new InternalCompilerError("Unknown implementation of "
+                + "TypeObject", type1.position());
+        }
     }
 
     /**
@@ -308,7 +313,7 @@ public class TypeSystem_c implements TypeSystem
 
         if (flags.isPublic()) return true;
 
-	if (isSame(target, ctc)) return true;
+	if (equals(target, ctc)) return true;
 
 	if (! target.isClass()) return false;
 
@@ -820,7 +825,7 @@ public class TypeSystem_c implements TypeSystem
         assert_(type1);
         assert_(type2);
 
-	if (isSame(type1, type2)) return type1;
+	if (equals(type1, type2)) return type1;
 
 	if (type1.isNumeric() && type2.isNumeric()) {
 	    if (isImplicitCastValid(type1, type2)) {
@@ -856,8 +861,8 @@ public class TypeSystem_c implements TypeSystem
 	    }
 
 	    // Check against Object to ensure superType() is not null.
-	    if (isSame(type1, Object())) return type1;
-	    if (isSame(type2, Object())) return type2;
+	    if (equals(type1, Object())) return type1;
+	    if (equals(type2, Object())) return type2;
 
 	    if (isSubtype(type1, type2)) return type2;
 	    if (isSubtype(type2, type1)) return type1;
@@ -868,7 +873,7 @@ public class TypeSystem_c implements TypeSystem
 	    Type t2 = leastCommonAncestor(type2.toReference().superType(),
 					  type1);
 
-	    if (isSame(t1, t2)) return t1;
+	    if (equals(t1, t2)) return t1;
 
 	    return Object();
 	}
@@ -965,7 +970,7 @@ public class TypeSystem_c implements TypeSystem
     }
 
     public ClassType typeForName(String name) throws SemanticException {
-      return (ClassType) systemResolver.findType(name);
+      return (ClassType) systemResolver.find(name);
     }
 
     protected ClassType OBJECT_;
@@ -1121,7 +1126,7 @@ public class TypeSystem_c implements TypeSystem
 	    return arrayOf(typeForClass(clazz.getComponentType()));
 	}
 
-	return systemResolver.findType(clazz.getName());
+	return (Type) systemResolver.find(clazz.getName());
     }
 
     public Set getTypeEncoderRootSet(Type t) {

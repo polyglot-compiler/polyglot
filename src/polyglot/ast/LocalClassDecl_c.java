@@ -55,7 +55,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
         if (! decl.type().toClass().isLocal())
             throw new InternalCompilerError("Non-local " + decl.type() +
                                             " found in method body.");
-        c.addType(decl.type().toClass());
+        c.addNamed(decl.type().toClass());
     }
 
     public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {

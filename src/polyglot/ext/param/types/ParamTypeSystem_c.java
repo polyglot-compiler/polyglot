@@ -10,7 +10,7 @@ import java.util.*;
  * Type system for parameterized types.
  */
 public abstract class ParamTypeSystem_c extends TypeSystem_c
-                                     implements ParamTypeSystem
+    implements ParamTypeSystem
 {
     /**
      * Instantiate a parametric type on a list of actual parameters.
@@ -21,8 +21,8 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
      *
      * @throws SemanticException when the actuals do not agree with the formals
      */
-    public Type instantiate(Position pos, ParametricType base,
-                            List actuals) throws SemanticException
+    public ClassType instantiate(Position pos, PClass base, List actuals) 
+        throws SemanticException
     {
         checkInstantiation(pos, base, actuals);
         return uncheckedInstantiate(pos, base, actuals);
@@ -38,8 +38,8 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
      *
      * @throws SemanticException when the actuals do not agree with the formals
      */
-    protected void checkInstantiation(Position pos, ParametricType base,
-                                      List actuals) throws SemanticException
+    protected void checkInstantiation(Position pos, PClass base,
+        List actuals) throws SemanticException
     {
         if (base.formals().size() != actuals.size()) {
             throw new SemanticException("Wrong number of actual parameters " +
@@ -56,8 +56,8 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
      * @param base The parameterized type
      * @param actuals The list of actuals
      */
-    protected Type uncheckedInstantiate(Position pos, ParametricType base,
-                                        List actuals)
+    protected ClassType uncheckedInstantiate(Position pos, PClass base,
+        List actuals)
     {
         Map substMap = new HashMap();
         Iterator i = base.formals().iterator();
@@ -71,11 +71,16 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
 
         if (i.hasNext() || j.hasNext()) {
             throw new InternalCompilerError("Wrong number of actual " +
-                                            "parameters for instantiation " +
-                                            "of \"" + base + "\".", pos);
+                "parameters for instantiation " + "of \"" + base + "\".", pos);
         }
 
-        return subst(base, substMap, new HashMap());
+        Type inst = subst(base.clazz(), substMap, new HashMap());
+        if (!inst.isClass()) {
+            throw new InternalCompilerError("Instantiating a PClass "
+                + "produced something other than a ClassType.", pos);
+        }
+        
+        return inst.toClass();
     }
 
     /**
@@ -84,11 +89,11 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
      * @param pos The position of the instantiated type
      * @param base The parameterized type
      */
-    public Type nullInstantiate(Position pos, ParametricType base) {
+    public ClassType nullInstantiate(Position pos, PClass base) {
         return uncheckedInstantiate(pos, base, base.formals());
     }
 
-    public Type nullInstantiate(ParametricType base) {
+    public ClassType nullInstantiate(PClass base) {
         return nullInstantiate(base.position(), base);
     }
     

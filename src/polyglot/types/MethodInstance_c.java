@@ -76,10 +76,10 @@ public class MethodInstance_c extends ProcedureInstance_c
 	return flags.hashCode() + name.hashCode();
     }
 
-    public boolean equals(Object o) {
+    protected boolean equalsImpl(Object o) {
         if (o instanceof MethodInstance) {
 	    MethodInstance i = (MethodInstance) o;
-	    return ts.isSame(returnType, i.returnType())
+	    return ts.equals(returnType, i.returnType())
 	        && name.equals(i.name())
 		&& super.equals(i);
 	}
@@ -182,7 +182,7 @@ public class MethodInstance_c extends ProcedureInstance_c
     public boolean canOverrideImpl(MethodInstance mj) {
         MethodInstance mi = this;
 
-        if (! ts.isSame(mi.returnType(), mj.returnType())) {
+        if (! ts.equals(mi.returnType(), mj.returnType())) {
             return false;
         } 
 

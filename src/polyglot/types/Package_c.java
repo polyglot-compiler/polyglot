@@ -60,7 +60,7 @@ public class Package_c extends TypeObject_c implements Package
         return name.hashCode();
     }
 
-    public boolean isSame(Package p) {
+    public boolean equals(Package p) {
         if (p == null) {
             return false;
         }
@@ -73,8 +73,8 @@ public class Package_c extends TypeObject_c implements Package
         }
     }
     
-    public boolean equals(Object o) {
-        return o instanceof Package && isSame((Package) o);
+    protected boolean equalsImpl(Object o) {
+        return o instanceof Package && equals((Package) o);
     }
 
     public boolean isCanonical() {

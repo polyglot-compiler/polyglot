@@ -77,7 +77,7 @@ public class CovarRetRewriter extends AscriptionVisitor
             }
 
             if (ts.isSubtype(mi.returnType(), mj.returnType()) &&
-                !ts.isSame(mi.returnType(), mj.returnType())) {
+                !ts.equals(mi.returnType(), mj.returnType())) {
                 // mj.returnType() is the type to use!
                 retType = mj.returnType();
             }

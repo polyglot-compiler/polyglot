@@ -112,10 +112,10 @@ public class ImportTable extends ClassResolver
     /**
      * Find a type by name.
      */
-    public Type findType(String name) throws SemanticException {
+    public Named find(String name) throws SemanticException {
 	// FIXME: need to keep on looking to find conflicts.
         if (Report.should_report(new String[] {Report.types, Report.resolver, Report.imports}, 2))
-	    Report.report(2, this + ".findType(" + name + ")");
+	    Report.report(2, this + ".find(" + name + ")");
 
 	/* First add any lazy imports. */
 	lazyImport();
@@ -125,7 +125,7 @@ public class ImportTable extends ClassResolver
 	    Object res = map.get(name);
 
 	    if (res != null) {
-		return (Type) res;
+		return (Named) res;
 	    }
 
             List imports = new ArrayList(packageImports.size() + 5);
@@ -142,23 +142,16 @@ public class ImportTable extends ClassResolver
 		String pkgName = (String) iter.next();
 		String fullName = pkgName + "." + name;
 
-		boolean inSamePackage = this.pkg != null &&
-					this.pkg.fullName().equals(pkgName);
-
 		try {
-		    Type t = resolver.findType(fullName);
+                    Named n = resolver.find(fullName); 
+                    
+                    // Check if the type is visible in this package.
+                    if (isVisibleFrom(n, pkgName)) {
+                        // Memoize.
+                        map.put(name, n);
 
-		    // Check if the type is visible in this package.
-		    // FIXME: Assume non-class types are always visible.
-		    if (! t.isClass() ||
-			t.toClass().flags().isPublic() ||
-		        inSamePackage) {
-
-			// Memoize.
-			map.put(name, t);
-
-			return t;
-		    }
+                        return n;
+                    }
 		}
 		catch (NoClassException ex) {
 		    // Do nothing.
@@ -167,25 +160,48 @@ public class ImportTable extends ClassResolver
 
 	    // The name was short, but not in any imported class or package.
 	    // Check the null package.
-	    Type t = resolver.findType(name); // may throw exception
+	    Named n = resolver.find(name); // may throw exception
 
-	    if (t.isClass() &&
-		t.toClass().flags().isPackage() && this.pkg != null) {
+            if (!isVisibleFrom(n, "")) {
 	      // Not visible.
 	      throw new NoClassException("Class \"" + name + "\" not found.",
 					 sourcePos);
 	    }
 
 	    // Memoize.
-	    map.put(name, t);
+	    map.put(name, n);
 
-	    return t;
+	    return n;
 	}
 
 	// The name was long.
-	return resolver.findType(name);
+	return resolver.find(name);
     }
 
+    /**
+     * Return whether <code>n</code> is visible from within
+     * package <code>pkg</code>.  The empty string may
+     * be passed in to represent the default package.
+     */
+    protected boolean isVisibleFrom(Named n, String pkgName) {
+        boolean isVisible = false;
+        boolean inSamePackage = this.pkg != null 
+                && this.pkg.fullName().equals(pkgName)
+            || this.pkg == null 
+                && pkgName.equals("");
+        if (n instanceof Type) {
+            Type t = (Type) n;
+            //FIXME: Assume non-class types are always visible.
+            isVisible = !t.isClass() 
+                || t.toClass().flags().isPublic() 
+                || inSamePackage; 
+        } else {
+            //FIXME: Assume non-types are always visible.
+            isVisible = true;
+        }
+        return isVisible;
+    }
+    
     /**
      * Load the class imports, lazily.
      */
@@ -201,16 +217,16 @@ public class ImportTable extends ClassResolver
 		Report.report(2, this + ": import " + longName);
 
 	    try {
-		Type t = resolver.findType(longName);
+		Named t = resolver.find(longName);
 		String shortName = StringUtil.getShortNameComponent(longName);
 
                 if (Report.should_report(new String[] {Report.types, Report.resolver, Report.imports}, 2))
 		    Report.report(2, this + ": import " + shortName + " as " + t);
 
 		if (map.containsKey(shortName)) {
-		    Type s = (Type) map.get(shortName);
+		    Named s = (Named) map.get(shortName);
 
-		    if (! ts.isSame(s, t)) {
+		    if (! ts.equals(s, t)) {
 			throw new SemanticException("Class " + shortName +
 			    " already defined as " + map.get(shortName),
                             sourcePos);

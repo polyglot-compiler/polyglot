@@ -258,7 +258,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl {
                 }
 
                 if (! ts.isImplicitCastValid(init.type(), type.type()) &&
-                    ! ts.isSame(init.type(), type.type()) && ! intConversion) {
+                    ! ts.equals(init.type(), type.type()) && ! intConversion) {
 
                     throw new SemanticException("The type of the variable " +
                                                 "initializer \"" + init.type() +

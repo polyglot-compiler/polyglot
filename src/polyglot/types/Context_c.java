@@ -93,7 +93,7 @@ public class Context_c implements Context
         }
 
         if (kind == BLOCK &&
-            (localFindVariable(name) != null || localFindType(name) != null)) {
+            (localFindVariable(name) != null || localFind(name) != null)) {
             return true;
         }
 
@@ -252,13 +252,6 @@ public class Context_c implements Context
         return "(" + kindStr() + " " + mapsToString() + " " + outer + ")";
     }
 
-    /**
-     * Finds the definition of a particular type qualifier (also a type).
-     */
-    public Qualifier findQualifier(String name) throws SemanticException {
-        return findType(name);
-    }
-
     public Context pop() {
         return outer;
     }
@@ -266,23 +259,23 @@ public class Context_c implements Context
     /**
      * Finds the definition of a particular type.
      */
-    public Type findType(String name) throws SemanticException {
+    public Named find(String name) throws SemanticException {
         if (Report.should_report(new String[] {Report.types, Report.context}, 3))
           Report.report(3, "find-type " + name + " in " + this);
 
-        if (kind == OUTER) return outerResolver().findType(name);
-        if (kind == SOURCE) return it.findType(name);
+        if (kind == OUTER) return outerResolver().find(name);
+        if (kind == SOURCE) return it.find(name);
 
-        Type type = localFindType(name);
+        Named type = localFind(name);
 
         if (type != null) {
             if (Report.should_report(new String[] {Report.types, Report.context}, 3))
-              Report.report(3, "find-type " + name + " -> " + type);
+              Report.report(3, "find " + name + " -> " + type);
             return type;
         }
 
         if (outer != null) {
-            return outer.findType(name);
+            return outer.find(name);
         }
 
         throw new SemanticException("Type " + name + " not found.");
@@ -385,20 +378,20 @@ public class Context_c implements Context
     }
 
     /**
-     * Adds a type to the current scoping level.
+     * Adds a named type object to the current scoping level.
      */
-    public void addType(NamedType t) {
+    public void addNamed(Named t) {
         if (Report.should_report(new String[] {Report.types, Report.context}, 3))
           Report.report(3, "Adding type " + t + " to context.");
-        localAddType(t);
+        localAddNamed(t);
     }
 
-    public Type localFindType(String name) {
+    public Named localFind(String name) {
         if (types == null) return null;
-        return (Type) types.get(name);
+        return (Named) types.get(name);
     }
 
-    public void localAddType(NamedType type) {
+    public void localAddNamed(Named type) {
         if (types == null) types = new HashMap();
         types.put(type.name(), type);
     }

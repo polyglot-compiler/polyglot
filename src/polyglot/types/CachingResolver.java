@@ -33,19 +33,19 @@ public class CachingResolver implements Resolver {
     }
 
     /**
-     * Find a qualifier (a type or package) by name.
+     * Find a type object by name.
      * @param name The name to search for.
      */
-    public Qualifier findQualifier(String name) throws SemanticException {
+    public Named find(String name) throws SemanticException {
         if (Report.should_report(new String[] {Report.types, Report.resolver}, 2))
             Report.report(2, "CachingResolver: find: " + name);
 
-        Qualifier q = (Qualifier) cache.get(name);
+        Named q = (Named) cache.get(name);
 
 	if (q == null) {
             if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
                 Report.report(3, "CachingResolver: not cached: " + name);
-	    q = inner.findQualifier(name);
+	    q = inner.find(name);
 	    cache.put(name, q);
             if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
                 Report.report(3, "CachingResolver: loaded: " + name);
@@ -67,20 +67,6 @@ public class CachingResolver implements Resolver {
         return (Type) cache.get(name);
     }
 
-    /**
-     * Lookup a type, checking the cache first, then the inner resolver. 
-     * @param name The name to search for.
-     */
-    public Type findType(String name) throws SemanticException {
-        Qualifier q = (Qualifier) findQualifier(name);
-
-	if (! (q instanceof Type)) {
-	    throw new NoClassException("Could not find type " + name + ".");
-	}
-
-	return (Type) q;
-    }
-    
     /**
      * Install a qualifier in the cache.
      * @param name The name of the qualifier to insert.

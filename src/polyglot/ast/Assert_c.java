@@ -71,13 +71,13 @@ public class Assert_c extends Stmt_c implements Assert
                        cond.position());
         }
 
-        if (! ts.isSame(cond.type(), ts.Boolean())) {
+        if (! ts.equals(cond.type(), ts.Boolean())) {
             throw new SemanticException("Condition of assert statement " +
                                         "must have boolean type.",
                                         cond.position());
         }
 
-        if (ts.isSame(errorMessage.type(), ts.Void())) {
+        if (ts.equals(errorMessage.type(), ts.Void())) {
             throw new SemanticException("Error message in assert statement " +
                                         "must have a value.",
                                         errorMessage.position());

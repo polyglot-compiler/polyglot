@@ -46,8 +46,8 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         if (isTopLevel() && package_() != null) {
             return package_().fullName() + "." + name();
         }
-        else if (isMember() && container() instanceof NamedType) {
-            return ((NamedType) container()).fullName() + "." + name();
+        else if (isMember() && container() instanceof Named) {
+            return ((Named) container()).fullName() + "." + name();
         }
         else {
             return name();
@@ -117,10 +117,6 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 	return null;
     }
 
-    public boolean isSameImpl(Type t) {
-        return t == this;
-    }
-
     public boolean descendsFromImpl(Type ancestor) {
         if (! ancestor.isCanonical()) {
             return false;
@@ -130,7 +126,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             return false;
         }
 
-        if (ts.isSame(this, ancestor)) {
+        if (ts.equals(this, ancestor)) {
             return false;
         }
 
@@ -138,13 +134,13 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             return false;
         }
 
-        if (ts.isSame(ancestor, ts.Object())) {
+        if (ts.equals(ancestor, ts.Object())) {
             return true;
         }
 
         // Check subtype relation for classes.
         if (! flags().isInterface()) {
-            if (ts.isSame(this, ts.Object())) {
+            if (ts.equals(this, ts.Object())) {
                 return false;
             }
 
@@ -266,9 +262,9 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             // Use the short name if it is unique.
             if (c != null) {
                 try {
-                    Type x = c.findType(name());
+                    Named x = c.find(name());
 
-                    if (ts.isSame(this, x)) {
+                    if (ts.equals(this, x)) {
                         return name();
                     }
                 }
@@ -287,9 +283,9 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             // Use the short name if it is unique.
             if (c != null) {
                 try {
-                    Type x = c.findType(name());
+                    Named x = c.find(name());
 
-                    if (ts.isSame(this, x)) {
+                    if (ts.equals(this, x)) {
                         return name();
                     }
                 }
@@ -335,7 +331,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         if (isTopLevel())
             return false;
         else if (outer() != null)
-            return outer().isSame(maybe_outer) ||
+            return outer().equals(maybe_outer) ||
                   outer().isEnclosed(maybe_outer);
         else
             throw new InternalCompilerError("Inner classes must have outer classes.");

@@ -51,12 +51,6 @@ public interface Type extends Qualifier
     ArrayType toArray();
 
     /**
-     * Return true if this type is the same as <code>t</code>.  This method is
-     * the default implementation of <code>equals(Object)</code>.
-     */
-    boolean isSame(Type t);
-
-    /**
      * Return true if this type is a subtype of <code>ancestor</code>.
      */
     boolean isSubtype(Type ancestor);
@@ -81,11 +75,6 @@ public interface Type extends Qualifier
      * Return true a literal <code>value</code> can be converted to this type.
      */
     boolean numericConversionValid(long value);
-
-    /**
-     * Return true if this type is the same as <code>t</code>.
-     */
-    boolean isSameImpl(Type t);
 
     /**
      * Return true if this type is a subtype of <code>ancestor</code>.
@@ -211,7 +200,7 @@ public interface Type extends Qualifier
     /**
      * Yields a string representing this type.  The string
      * should be consistent with equality.  That is,
-     * if this.isSame(anotherType), then it should be
+     * if this.equals(anotherType), then it should be
      * that this.toString().equals(anotherType.toString()).
      *
      * The string does not have to be a legal Java identifier.

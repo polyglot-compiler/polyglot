@@ -130,7 +130,7 @@ public interface TypeSystem {
      * Returns true iff child descends from ancestor or child == ancestor.
      * This is equivalent to:
      * <pre>
-     *    descendsFrom(child, ancestor) || isSame(child, ancestor)
+     *    descendsFrom(child, ancestor) || equals(child, ancestor)
      * </pre>
      */
     boolean isSubtype(Type child, Type ancestor);
@@ -152,9 +152,9 @@ public interface TypeSystem {
     boolean isImplicitCastValid(Type fromType, Type toType);
 
     /**
-     * Returns true iff type1 and type2 are the same type.
+     * Returns true iff type1 and type2 represent the same type object.
      */
-    boolean isSame(Type type1, Type type2);
+    boolean equals(TypeObject type1, TypeObject type2);
 
     /**
      * Returns true if <code>value</code> can be implicitly cast to

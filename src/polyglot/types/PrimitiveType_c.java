@@ -52,8 +52,12 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
             return kind.hashCode();
     }
 
-    public boolean isSameImpl(Type t) {
-            return t.isPrimitive() && kind() == t.toPrimitive().kind();
+    protected boolean equalsImpl(TypeObject t) {
+        if (t instanceof PrimitiveType) {
+            PrimitiveType p = (PrimitiveType) t;
+            return kind() == p.kind();
+        }
+        return false;
     }
 
     public String wrapperTypeString(TypeSystem ts) {
@@ -81,7 +85,7 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
         if (t.isVoid()) return false;
         if (f.isVoid()) return false;
 
-        if (ts.isSame(t, f)) return true;
+        if (ts.equals(t, f)) return true;
 
         if (t.isBoolean()) return f.isBoolean();
         if (f.isBoolean()) return false;
@@ -120,7 +124,7 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
      **/
     public boolean isCastValidImpl(Type toType) {
 	if (isVoid() || toType.isVoid()) return false;
-        if (ts.isSame(this, toType)) return true;
+        if (ts.equals(this, toType)) return true;
 	if (isNumeric() && toType.isNumeric()) return true;
         return false;
     }

@@ -5,8 +5,10 @@ SUBDIRS =
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
-	ParametricClassType.java \
-	ParametricType.java \
+	PClass.java \
+	PClass_c.java \
+        MuPClass.java \
+	MuPClass_c.java \
 	Param.java \
 	ParamTypeSystem_c.java \
 	ParamTypeSystem.java \

@@ -20,7 +20,7 @@ public class PaoParsedClassType_c extends ParsedClassType_c
 
     /** Returns true iff a cast from this to <code>toType</code> is valid. */
     public boolean isCastValidImpl(Type t) {
-        return t.isPrimitive() && ts.isSame(this, ts.Object()) ||
+        return t.isPrimitive() && ts.equals(this, ts.Object()) ||
                super.isCastValidImpl(t);
     }
 }

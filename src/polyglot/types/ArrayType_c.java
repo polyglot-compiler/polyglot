@@ -136,11 +136,11 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	return base().hashCode() << 1;
     }
 
-    public boolean isSameImpl(Type t) {
-        if (t.isArray()) {
-	    return ts.isSame(base(), t.toArray().base());
-	}
-
+    protected boolean equalsImpl(TypeObject t) {
+        if (t instanceof ArrayType) {
+            ArrayType a = (ArrayType) t;
+            return ts.equals(base(), a.base());
+        }
 	return false;
     }
 
@@ -168,7 +168,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	    Type fromBase = base();
 	    Type toBase = toType.toArray().base();
 
-	    if (fromBase.isPrimitive()) return ts.isSame(toBase, fromBase);
+	    if (fromBase.isPrimitive()) return ts.equals(toBase, fromBase);
 	    if (toBase.isPrimitive()) return false;
 
 	    if (fromBase.isNull()) return false;

@@ -67,6 +67,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
     if (n instanceof TypeNode) {
       return n;
     }
+   
     throw new SemanticException("Could not find type \"" + name +
                                 "\".", position());
   }

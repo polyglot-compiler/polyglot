@@ -214,7 +214,7 @@ public class New_c extends Expr_c implements New
                     t = ts.staticTarget(t).toClass();
                     ClassType mt = ts.findMemberClass(t, name, c);
 
-                    if (ts.isSame(mt, ct)) {
+                    if (ts.equals(mt, ct)) {
                         outer = t;
                         break;
                     }
@@ -233,7 +233,7 @@ public class New_c extends Expr_c implements New
             // Create the qualifier.
             Expr q;
 
-            if (outer.isSame(c.currentClass())) {
+            if (outer.equals(c.currentClass())) {
                 q = nf.This(position());
             }
             else {

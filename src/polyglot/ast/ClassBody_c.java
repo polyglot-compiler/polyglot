@@ -183,7 +183,7 @@ public class ClassBody_c extends Node_c implements ClassBody
             for (Iterator i = type.toClass().memberClasses().iterator();
                  i.hasNext(); ) {
                 ClassType mct = (ClassType) i.next();
-                c.addType(mct);
+                c.addNamed(mct);
             }
         }
     }

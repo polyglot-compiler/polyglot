@@ -211,7 +211,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 		position());
         }
 
-        String ctName = ((NamedType) ct).name();
+        String ctName = ct.name();
 
         if (! ctName.equals(name)) {
 	    throw new SemanticException("Constructor name \"" + name +

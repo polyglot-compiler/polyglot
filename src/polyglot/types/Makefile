@@ -9,7 +9,7 @@ SOURCES = \
 	ArrayType.java \
 	LazyClassInitializer.java \
 	CachingResolver.java \
-	ImportableType.java \
+	Importable.java \
 	ClassContextResolver.java \
 	ClassResolver.java \
 	ClassType.java \
@@ -27,8 +27,7 @@ SOURCES = \
 	LocalInstance.java \
 	MemberInstance.java \
 	MethodInstance.java \
-	NamedQualifier.java \
-	NamedType.java \
+	Named.java \
 	NoClassException.java \
 	NullType.java \
 	Package.java \

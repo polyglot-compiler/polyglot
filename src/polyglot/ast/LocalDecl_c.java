@@ -187,7 +187,7 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
                 }
 
                 if (! ts.isImplicitCastValid(init.type(), type.type()) &&
-                    ! ts.isSame(init.type(), type.type()) && ! intConversion) {
+                    ! ts.equals(init.type(), type.type()) && ! intConversion) {
                     throw new SemanticException("The type of the variable " +
                                                 "initializer \"" + init.type() +
                                                 "\" does not match that of " +

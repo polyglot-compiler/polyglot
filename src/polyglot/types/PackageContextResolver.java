@@ -34,23 +34,9 @@ public class PackageContextResolver implements Resolver
     }
 
     /**
-     * Find a type by name.
+     * Find a type object by name.
      */
-    public Type findType(String name) throws SemanticException {
-        Qualifier q = findQualifier(name);
-
-	if (q.isType()) {
-	    return q.toType();
-	}
-
-	throw new NoClassException("Could not find type " + name +
-				   " in package " + p + ".");
-    }
-
-    /**
-     * Find a qualifier by name.
-     */
-    public Qualifier findQualifier(String name) throws SemanticException {
+    public Named find(String name) throws SemanticException {
 	if (! StringUtil.isNameShort(name)) {
 	    throw new InternalCompilerError(
 		"Cannot lookup qualified name " + name);
@@ -61,7 +47,7 @@ public class PackageContextResolver implements Resolver
         }
 
 	try {
-	    return cr.findType(p.fullName() + "." + name);
+	    return cr.find(p.fullName() + "." + name);
 	}
 	catch (NoClassException e) {
 	    return ts.packageForName(p, name);

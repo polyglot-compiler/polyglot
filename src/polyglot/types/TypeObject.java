@@ -4,7 +4,9 @@ import polyglot.util.*;
 import java.io.*;
 
 /**
- * A <code>TypeObject</code> is an entity created by the type system.
+ * A <code>TypeObject</code> is a compile-time value created by the type system.
+ * It is a static representation of a type that is not necessarily 
+ * first-class.  It is similar to a compile-time meta-object.
  */
 public interface TypeObject extends Copy, Serializable
 {
@@ -22,4 +24,16 @@ public interface TypeObject extends Copy, Serializable
      * The object's position, or null.
      */
     Position position();
+    
+    /**
+     * Return true iff this type object is the same as <code>t</code>.
+     * All Polyglot extensions should attempt to maintain pointer
+     * equality between TypeObjects.  If this cannot be done,
+     * extensions can override TypeObject_c.equalsImpl(), and
+     * don't forget to override hashCode().
+     *
+     * @see polyglot.ext.jl.TypeObject_c#equalsImpl(TypeObject)
+     * @see java.lang.Object#hashCode()
+     */
+    boolean equals(Object t);
 }

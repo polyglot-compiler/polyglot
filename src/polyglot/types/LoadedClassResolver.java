@@ -82,9 +82,9 @@ public class LoadedClassResolver extends ClassResolver
   /**
    * Find a type by name.
    */
-  public Type findType(String name) throws SemanticException {
+  public Named find(String name) throws SemanticException {
     if (Report.should_report(report_topics, 3))
-      Report.report(3, "LoadedCR.findType(" + name + ")");
+      Report.report(3, "LoadedCR.find(" + name + ")");
 
     // First try the class file.
     ClassFile clazz = loadFile(name);
@@ -105,7 +105,7 @@ public class LoadedClassResolver extends ClassResolver
   /**
    * Extract an encoded type from a class file.
    */
-  protected Type getEncodedType(ClassFile clazz, String name)
+  protected ClassType getEncodedType(ClassFile clazz, String name)
     throws SemanticException
   {
     // At this point we've decided to go with the Class. So if something

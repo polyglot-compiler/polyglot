@@ -207,7 +207,7 @@ public class TypeBuilder extends HaltingVisitor
 	      	ct.package_(currentPackage());
 	    }
 
-	    typeSystem().parsedResolver().addType(ct.fullName(), ct);
+	    typeSystem().parsedResolver().addNamed(ct.fullName(), ct);
 
 	    return ct;
 	}

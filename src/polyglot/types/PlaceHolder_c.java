@@ -34,7 +34,7 @@ public class PlaceHolder_c implements PlaceHolder
     public TypeObject resolve(TypeSystem ts) {
         try {
             if (outer == null) {
-                return ts.systemResolver().findType(name);
+                return ts.systemResolver().find(name);
             }
             else {
                 ClassType o = (ClassType) outer.toClass();

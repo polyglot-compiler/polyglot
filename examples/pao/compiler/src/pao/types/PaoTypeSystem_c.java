@@ -22,7 +22,7 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
         String name = WRAPPER_PACKAGE + ".Primitive";
 
         try {
-            Type ct = systemResolver().findType(name);
+            Type ct = (Type) systemResolver().find(name);
 
             List args = new LinkedList();
             args.add(Object());
@@ -85,14 +85,14 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
         String name = WRAPPER_PACKAGE + "." + (String) wrapper.get(t);
 
         try {
-            Type ct = systemResolver().findType(name);
+            Type ct = (Type) systemResolver().find(name);
 
             for (Iterator i = ct.toClass().constructors().iterator();
                  i.hasNext(); ) {
                 ConstructorInstance ci = (ConstructorInstance) i.next();
                 if (ci.formalTypes().size() == 1) {
                     Type argType = (Type) ci.formalTypes().get(0);
-                    if (isSame(argType, t)) {
+                    if (equals(argType, t)) {
                         return ci;
                     }
                 }

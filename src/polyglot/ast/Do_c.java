@@ -70,7 +70,7 @@ public class Do_c extends Loop_c implements Do
     {
         TypeSystem ts = tc.typeSystem();
 
-        if (! ts.isSame(cond.type(), ts.Boolean())) {
+        if (! ts.equals(cond.type(), ts.Boolean())) {
 	    throw new SemanticException(
 		"Condition of do statement must have boolean type.",
 		cond.position());

@@ -99,7 +99,7 @@ public class Assign_c extends Expr_c implements Assign
 
     if (op == ASSIGN) {
       if (! ts.isImplicitCastValid(s, t) &&
-          ! ts.isSame(s, t) &&
+          ! ts.equals(s, t) &&
           ! intConversion) {
 
         throw new SemanticException("Cannot assign " + s + " to " + t + ".",
@@ -110,7 +110,7 @@ public class Assign_c extends Expr_c implements Assign
     }
 
     if (op == ADD_ASSIGN) {
-      if (ts.isSame(t, ts.String()) || ts.isSame(s, ts.String())) {
+      if (ts.equals(t, ts.String()) || ts.equals(s, ts.String())) {
         return type(ts.String());
       }
     }

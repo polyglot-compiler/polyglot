@@ -146,7 +146,7 @@ public class Cast_c extends Expr_c implements Cast
 
         if (v instanceof String) {
             TypeSystem ts = castType.type().typeSystem();
-            if (castType.type().isSame(ts.String())) return v;
+            if (castType.type().equals(ts.String())) return v;
         }
 
         if (v instanceof Double) {

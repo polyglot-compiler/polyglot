@@ -8,6 +8,6 @@ import java.util.List;
  */
 public interface InstType extends SubstType
 {
-    ParametricType instantiatedFrom();
+    PClass instantiatedFrom();
     List actuals();
 }

@@ -49,12 +49,12 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         return container.hashCode() + flags.hashCode();
     }
 
-    public boolean equals(Object o) {
+    protected boolean equalsImpl(Object o) {
         if (o instanceof ProcedureInstance) {
 	    ProcedureInstance i = (ProcedureInstance) o;
 	    // FIXME: Check excTypes too?
 	    return flags.equals(i.flags())
-	        && ts.isSame(container, i.container())
+	        && ts.equals(container, i.container())
 	        && ts.hasFormals(this, i.formalTypes());
 	}
 
@@ -126,7 +126,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
             Type t1 = (Type) i1.next();
             Type t2 = (Type) i2.next();
 
-            if (! ts.isSame(t1, t2)) {
+            if (! ts.equals(t1, t2)) {
                 return false;
             }
         }

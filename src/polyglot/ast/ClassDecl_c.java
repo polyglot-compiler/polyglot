@@ -255,8 +255,8 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         if (this.type.isMember()) {
             ClassType container = this.type.outer();
 
-            while (container instanceof NamedType) {
-                String name = ((NamedType) container).name();
+            while (container instanceof Named) {
+                String name = ((Named) container).name();
 
                 if (name.equals(this.name)) {
                     throw new SemanticException("Cannot declare member " +

@@ -102,9 +102,9 @@ public class SourceClassResolver extends LoadedClassResolver
   /**
    * Find a type by name.
    */
-  public Type findType(String name) throws SemanticException {
+  public Named find(String name) throws SemanticException {
     if (Report.should_report(report_topics, 3))
-	Report.report(3, "SourceCR.findType(" + name + ")");
+	Report.report(3, "SourceCR.find(" + name + ")");
 
     ClassFile clazz = null;
     ClassFile encodedClazz = null;
@@ -199,12 +199,12 @@ public class SourceClassResolver extends LoadedClassResolver
   /**
    * Get a type from a source file.
    */
-  protected Type getTypeFromSource(FileSource source, String name)
+  protected Named getTypeFromSource(FileSource source, String name)
     throws SemanticException
   {
     // Compile the source file just enough to get the type information out.
     if (ext.readSource(source)) {
-      return ts.parsedResolver().findType(name);
+      return ts.parsedResolver().find(name);
     }
     else {
       throw new SemanticException("Error while compiling " + source.name() + ".");

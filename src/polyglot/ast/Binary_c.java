@@ -379,7 +379,7 @@ public class Binary_c extends Expr_c implements Binary
 	}
 
 	if (op == ADD) {
-	    if (ts.isSame(l, ts.String()) || ts.isSame(r, ts.String())) {
+	    if (ts.equals(l, ts.String()) || ts.equals(r, ts.String())) {
 		return precedence(Precedence.STRING_ADD).type(ts.String());
 	    }
 	}
@@ -480,7 +480,7 @@ public class Binary_c extends Expr_c implements Binary
             }
         }
 
-        if (op == ADD && ts.isSame(type, ts.String())) {
+        if (op == ADD && ts.equals(type, ts.String())) {
             // Implicit coercion to String.
             return ts.String();
         }

@@ -23,8 +23,8 @@ public interface Context extends Resolver, Copy
     /** Add a method to the current scope. */
     void addMethod(MethodInstance mi);
 
-    /** Add a type to the current scope. */
-    void addType(NamedType t);
+    /** Add a named type object to the current scope. */
+    void addNamed(Named t);
 
     /** Looks up a method in the current scope.
      * @param formalTypes A list of <code>Type</code>.

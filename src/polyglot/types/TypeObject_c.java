@@ -56,4 +56,19 @@ public abstract class TypeObject_c implements TypeObject
 
         in.defaultReadObject();
     }
+
+    /**
+     * Return whether o equals this.
+     * Implementations should override equalsImpl().
+     */
+    public final boolean equals(Object o) {
+        return o instanceof TypeObject && ts.equals(this, (TypeObject) o);
+    }
+    
+    /**
+     * Default implementation is pointer equality.
+     */
+    protected boolean equalsImpl(TypeObject t) {
+        return t == this;
+    }
 }

@@ -47,10 +47,10 @@ public class InitializerInstance_c extends TypeObject_c
         return container.hashCode() + flags.hashCode();
     }
 
-    public boolean equals(Object o) {
+    protected boolean equalsImpl(Object o) {
         if (o instanceof InitializerInstance) {
 	    InitializerInstance i = (InitializerInstance) o;
-	    return flags.equals(i.flags()) && ts.isSame(container, i.container());
+	    return flags.equals(i.flags()) && ts.equals(container, i.container());
 	}
 
 	return false;

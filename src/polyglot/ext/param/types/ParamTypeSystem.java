@@ -14,7 +14,7 @@ public interface ParamTypeSystem extends TypeSystem {
      * @param pos The position of the instantiated type
      * @param base The parameterized type
      */
-    Type nullInstantiate(Position pos, ParametricType base);
+    ClassType nullInstantiate(Position pos, PClass base);
 
     /**
      * Null instantiate <code>base</code>, using the same Position
@@ -22,7 +22,7 @@ public interface ParamTypeSystem extends TypeSystem {
      *
      * @param base The parameterized type
      */
-    Type nullInstantiate(ParametricType base);
+    ClassType nullInstantiate(PClass base);
 
     /**
      * Instantiate a parametric type on a list of actual parameters.
@@ -33,7 +33,7 @@ public interface ParamTypeSystem extends TypeSystem {
      *
      * @throws SemanticException when the actuals do not agree with the formals
      */
-    Type instantiate(Position pos, ParametricType base, List actuals)
+    ClassType instantiate(Position pos, PClass base, List actuals)
         throws SemanticException;
 
     /**

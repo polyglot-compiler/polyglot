@@ -89,7 +89,7 @@ public class Special_c extends Expr_c implements Special
 
 	    t = qualifier.type().toClass();
 
-            if (! ts.isSame(c.currentClass(), t) &&
+            if (! ts.equals(c.currentClass(), t) &&
                 ! ts.isEnclosed(c.currentClass(), t)) {
                 throw new SemanticException("Qualifier type \"" + t +
                                             "\" is not an enclosing class of " +

@@ -16,35 +16,35 @@ public class TableResolver extends ClassResolver {
     }
 
     /**
-     * Add a type to the table.
+     * Add a named type object to the table.
      */
-    public void addType(NamedType type) {
-        addType(type.name(), type);
+    public void addNamed(Named type) {
+        addNamed(type.name(), type);
     }
 
     /**
-     * Add a type to the table.
+     * Add a named type object to the table.
      */
-    public void addType(String name, NamedType type) {
+    public void addNamed(String name, Named type) {
         if (name == null || type == null) {
             throw new InternalCompilerError("Bad insertion into TableResolver");
         }
         if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
-	    Report.report(3, "TableCR.addType(" + name + ", " + type + ")");
+	    Report.report(3, "TableCR.addNamed(" + name + ", " + type + ")");
 	table.put(name, type);
     }
 
     /**
      * Find a type by name.
      */
-    public Type findType(String name) throws SemanticException {
+    public Named find(String name) throws SemanticException {
         if (Report.should_report(new String[] {Report.types, Report.resolver}, 3))
-	    Report.report(3, "TableCR.findType(" + name + ")");
+	    Report.report(3, "TableCR.find(" + name + ")");
 
-	Type type = (Type) table.get(name);
+	Named n = (Named) table.get(name);
 
-	if (type != null) {
-	    return type;
+	if (n != null) {
+	    return n;
 	}
 
 	throw new NoClassException("Could not find type " + name +
