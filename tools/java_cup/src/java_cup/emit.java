@@ -108,12 +108,8 @@ public class emit {
   /*--- Static (Class) Variables ------------------------------*/
   /*-----------------------------------------------------------*/
 
-  /**
-   * Max constant pool string size, minus a bit for padding (at least 33).
-   * This used to be 65500, but that resulted in strings being much
-   * larger than the real limit of 65536; I don't know why.
-   */
-  public static final int max_string_size = 32000;
+  /** Max constant pool string size (65536), minus a bit for padding. */
+  public static final int max_string_size = 65500;
 
   /** The prefix placed on names that pollute someone else's name space. */
   public static String prefix = "CUP$";
@@ -834,7 +830,6 @@ public class emit {
   // split string if it is very long; start new line occasionally for neatness
   protected static int do_newline(PrintWriter out, int nchar, int nbytes) {
     if (nbytes > max_string_size)  {
-      System.out.println("breaking string at " + nbytes);
         out.println("\", "); out.print("    \""); }
     else if (nchar > 11) { out.println("\" +"); out.print("    \""); }
     else return nchar+1;
