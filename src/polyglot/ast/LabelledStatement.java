@@ -75,6 +75,7 @@ public class LabelledStatement extends Statement {
   public Node deepCopy() {
     LabelledStatement ls =
       new LabelledStatement(label, (Statement) statement.deepCopy());
+    ls.copyAnnotationsFrom(this);
     return ls;
   }
 

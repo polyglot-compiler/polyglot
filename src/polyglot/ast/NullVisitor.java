@@ -71,6 +71,21 @@ public class NullVisitor implements NodeVisitor {
     return ls;
   }
 
+  public Node visitBranchStatement(BranchStatement bs) {
+    bs.visitChildren(this);
+    return bs;
+  }
+
+  public Node visitConstructorCallStatement(ConstructorCallStatement cs) {
+    cs.visitChildren(this);
+    return cs;
+  }
+
+  public Node visitTryStatement (TryStatement ts) {
+    ts.visitChildren(this);
+    return ts;
+  }
+
   // Expressions
   public Node visitNullLiteral(NullLiteral nl) {
     return nl;

@@ -40,7 +40,9 @@ public interface NodeVisitor {
   public Node visitForStatement(ForStatement fs);
   public Node visitSynchronizedStatement(SynchronizedStatement ss);
   public Node visitLabelledStatement(LabelledStatement ss);
-
+  public Node visitBranchStatement(BranchStatement bs);
+  public Node visitConstructorCallStatement(ConstructorCallStatement cs);
+  public Node visitTryStatement(TryStatement ts);
 
   // Expressions
   public Node visitNullLiteral(NullLiteral nl);
