@@ -1631,8 +1631,14 @@ public class TypeSystem_c implements TypeSystem
                     List possible = curr.methods(mi.name(), mi.formalTypes());
                     for (Iterator k = possible.iterator(); k.hasNext(); ) {
                         MethodInstance mj = (MethodInstance)k.next();
-                        if (!mj.flags().isAbstract() && isAccessible(mj, ct)) {
+                        if (!mj.flags().isAbstract() && 
+                            isAccessible(mj, ct) &&
+                            isAccessible(mi, mj.container().toClass())) {
                             // May have found a suitable implementation of mi.
+                            // mj is not abstract, it is accessible from the 
+                            // class ct, and since mi is accessible from the container
+                            // of mj, it is actually overriding mi.
+                            
                             // If neither the method instance mj nor the method 
                             // instance mi is declared in the class type ct, then 
                             // we need to check that it has appropriate protections.
