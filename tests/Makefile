@@ -2,21 +2,22 @@ LOG=log
 
 GOOD =  \
 	ArrayInit.jl \
+	Ctor.jl \
+	Dep1.jl \
+	Equality.jl \
+	Except2.jl \
+	Except3.jl \
+	Except4.jl \
+	Except.jl \
+	FieldAccess.jl \
+	ForwardRef2.jl \
+	ForwardRef3.jl \
+	ForwardRef.jl \
 	Init1.jl \
 	Init2.jl \
 	Init3.jl \
 	Init4.jl \
 	Init5.jl \
-	Ctor.jl \
-	Dep1.jl \
-	Equality.jl \
-	Except.jl \
-	Except2.jl \
-	Except3.jl \
-	Except4.jl \
-	FieldAccess.jl \
-	ForwardRef.jl \
-	ForwardRef2.jl \
 	Inner0.jl \
 	Inner1.jl \
 	Inner2.jl \
@@ -34,11 +35,41 @@ GOOD =  \
 	Return4.jl \
 	StaticContext.jl \
 	StaticOps.jl \
+	Switch1.jl \
+	Switch2.jl \
+	Switch3.jl \
 	xIterator.jl
 
 BAD = \
-	Errors.jl \
+	BadAbstract.jl \
+	BadAlloc.jl \
+	BadCtor.jl \
+	BadExcept2.jl \
+	BadExcept.jl \
+	BadExpCC.jl \
+	BadExtends.jl \
+	BadForwardRef.jl \
+	BadInit.jl \
+	BadInner2.jl \
+	BadInner3.jl \
+	BadInner4.jl \
+	BadInner5.jl \
+	BadInner6.jl \
+	BadInner7.jl \
+	BadInner.jl \
+	BadInterface2.jl \
+	BadInterface.jl \
+	BadOverride.jl \
+	BadPrim.jl \
+	BadProt.jl \
+	BadStaticContext.jl \
+	BadSwitch1.jl \
+	BadSwitch2.jl \
 	Errors2.jl \
+	Errors.jl \
+	NoInit10.jl \
+	NoInit11.jl \
+	NoInit12.jl \
 	NoInit1.jl \
 	NoInit2.jl \
 	NoInit3.jl \
@@ -48,14 +79,15 @@ BAD = \
 	NoInit7.jl \
 	NoInit8.jl \
 	NoInit9.jl \
-	NoInit10.jl \
-	NoInit11.jl \
-	NoInit12.jl \
 	NoReturn1.jl \
 	NoReturn2.jl \
 	NoReturn3.jl \
 	NoReturn4.jl \
 	NoReturn5.jl \
+	Protection2.jl \
+	Protection.jl \
+	Unreachable10.jl \
+	Unreachable11.jl \
 	Unreachable1.jl \
 	Unreachable2.jl \
 	Unreachable3.jl \
@@ -64,32 +96,7 @@ BAD = \
 	Unreachable6.jl \
 	Unreachable7.jl \
 	Unreachable8.jl \
-	Unreachable9.jl \
-	Unreachable10.jl \
-	Unreachable11.jl \
-	BadAbstract.jl \
-	BadAlloc.jl \
-	BadCtor.jl \
-	BadExcept.jl \
-	BadExcept2.jl \
-	BadExpCC.jl \
-	BadExtends.jl \
-	BadInit.jl \
-	BadInner.jl \
-	BadInner2.jl \
-	BadInner3.jl \
-	BadInner4.jl \
-	BadInner5.jl \
-	BadInner6.jl \
-	BadInner7.jl \
-	BadInterface.jl \
-	BadInterface2.jl \
-	BadOverride.jl \
-	BadPrim.jl \
-	BadProt.jl \
-	Protection.jl \
-	Protection2.jl \
-	BadStaticContext.jl
+	Unreachable9.jl
 
 .SUFFIXES: .jl .java
 

@@ -77,8 +77,6 @@ public class Switch_c extends Stmt_c implements Switch
                                         position());
         }
 
-        /* FIXME: we don't set case values correctly yet
-           constant fields are incorrectly recognized
         Collection labels = new HashSet();
 
 	for (Iterator i = elements.iterator(); i.hasNext();) {
@@ -93,10 +91,13 @@ public class Switch_c extends Stmt_c implements Switch
 		   key = "default";
 		   str = "default";
 	       }
-	       else {
+               else if (c.expr().isConstant()) {
 		   key = new Long(c.value());
 		   str = c.expr().toString() + " (" + c.value() + ")";
 	       }
+               else {
+                    continue;
+               }
 
 	       if (labels.contains(key)) {
 		   throw new SemanticException("Duplicate case label: " +
@@ -106,7 +107,6 @@ public class Switch_c extends Stmt_c implements Switch
 	       labels.add(key);
 	   }
 	}
-        */
 
 	return this;
     }

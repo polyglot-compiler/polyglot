@@ -24,8 +24,10 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
         return container;
     }
 
-    public FieldInstance constantValue(Object constantValue) {
-	if (! (constantValue instanceof Boolean) &&
+    /** Destructive update of constant value. */
+    public void setConstantValue(Object constantValue) {
+	if (! (constantValue == null) &&
+	    ! (constantValue instanceof Boolean) &&
 	    ! (constantValue instanceof Number) &&
 	    ! (constantValue instanceof Character) &&
 	    ! (constantValue instanceof String)) {
@@ -34,8 +36,14 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
 		"Can only set constant value to a primitive or String.");
 	}
 
+        this.constantValue = constantValue;
+        this.isConstant = true;
+    }
+
+    /** Non-destructive update of constant value. */
+    public FieldInstance constantValue(Object constantValue) {
         FieldInstance_c n = (FieldInstance_c) copy();
-	n.constantValue = constantValue;
+        n.setConstantValue(constantValue);
         return n;
     }
 

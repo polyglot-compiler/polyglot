@@ -97,12 +97,17 @@ public class Case_c extends Stmt_c implements Case
 	    }
 
 	    if (! fi.isConstant()) {
-                /* FIXME: isConstant() is incorrect 
 	        throw new SemanticException("Case label must be a constant.",
 					    position());
-                */
-                return this;
 	    }
+
+            Object v = fi.constantValue();
+
+            if (v instanceof Double || v instanceof Float ||
+                v instanceof Long || ! (v instanceof Number)) {
+	        throw new SemanticException("Case label must be an int.",
+					    position());
+            }
 
 	    return value(((Number) fi.constantValue()).longValue());
 	}

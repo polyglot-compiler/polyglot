@@ -125,7 +125,6 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
 	l.add(new BarrierPass(Pass.ADD_MEMBERS_ALL, job));
 	l.add(new VisitorPass(Pass.DISAM, job, new
                               AmbiguityRemover(job, ts, nf, AmbiguityRemover.ALL)));
-	l.add(new VisitorPass(Pass.FOLD, job, new ConstantFolder(ts, nf)));
 	l.add(new BarrierPass(Pass.DISAM_ALL, job));
         l.add(new VisitorPass(Pass.TYPE_CHECK, job, new TypeChecker(job, ts, nf)));
 	l.add(new VisitorPass(Pass.EXC_CHECK, job, new ExceptionChecker(ts, compiler.errorQueue())));

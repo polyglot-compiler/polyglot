@@ -19,6 +19,7 @@ public class AmbiguityRemover extends ContextVisitor
 
     public static final Kind SUPER = new Kind("disam-super");
     public static final Kind SIGNATURES = new Kind("disam-sigs");
+    public static final Kind FIELDS = new Kind("disam-fields");
     public static final Kind ALL = new Kind("disam-all");
 
     private Kind kind;

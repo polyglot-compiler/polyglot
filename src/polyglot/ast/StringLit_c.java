@@ -113,4 +113,12 @@ public class StringLit_c extends Lit_c implements StringLit
 
         return result;
     }
+
+    public boolean isConstant() {
+      return true;
+    }
+
+    public Object constantValue() {
+      return value;
+    }
 }

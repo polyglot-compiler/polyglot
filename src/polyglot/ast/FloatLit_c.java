@@ -80,4 +80,12 @@ public class FloatLit_c extends Lit_c implements FloatLit
 		kind);
 	}
     }
+
+    public boolean isConstant() {
+      return true;
+    }
+
+    public Object constantValue() {
+      return new Float(value);
+    }
 }

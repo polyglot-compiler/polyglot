@@ -19,6 +19,15 @@ public interface Expr extends Receiver, Computation
     Precedence precedence();
 
     /**
+     * Return whether the expression evaluates to a constant.
+     * This is not valid until after disambiguation.
+     */
+    boolean isConstant();
+
+    /** Returns the constant value of the expression, if any. */
+    Object constantValue();
+
+    /**
      * Correctly parenthesize the subexpression <code>expr<code>
      * based on its precedence and the precedence of this expression.
      *

@@ -81,7 +81,7 @@ public class Disamb_c implements Disamb
         if (t.isReference()) {
             try {
                 FieldInstance fi = ts.findField(t.toReference(), name, c);
-                return nf.Field(pos, tn, name);
+                return nf.Field(pos, tn, name).fieldInstance(fi);
             } catch (SemanticException e) {
                 // ignore so we can check if we're a member class.
             }
@@ -111,7 +111,7 @@ public class Disamb_c implements Disamb
             if (vi instanceof FieldInstance) {
                 FieldInstance fi = (FieldInstance) vi;
                 Receiver r = makeMissingFieldTarget(fi);
-                return nf.Field(pos, r, name);
+                return nf.Field(pos, r, name).fieldInstance(fi);
             } else if (vi instanceof LocalInstance) {
                 LocalInstance li = (LocalInstance) vi;
                 return nf.Local(pos, name).localInstance(li);

@@ -71,4 +71,12 @@ public class IntLit_c extends NumLit_c implements IntLit
 	    w.write(Long.toString(value));
 	}
     }
+
+    public boolean isConstant() {
+      return true;
+    }
+
+    public Object constantValue() {
+      return new Integer((int) value);
+    }
 }

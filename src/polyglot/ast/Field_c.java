@@ -119,8 +119,7 @@ public class Field_c extends Expr_c implements Field
       // Check that we don't access a non-static field from a static
       // context.
       if (! fi.flags().isStatic()) {
-        throw new SemanticException(
-                                    "Cannot access non-static field " + name +
+        throw new SemanticException("Cannot access non-static field " + name +
                                     " of " + type + " in static context.");
       }
 
@@ -133,8 +132,7 @@ public class Field_c extends Expr_c implements Field
       return fieldInstance(fi).type(fi.type());
     }
 
-    throw new InternalCompilerError(
-                                    "Cannot access field on node of type " +
+    throw new InternalCompilerError("Cannot access field on node of type " +
                                     target.getClass().getName() + ".");
   }
 
@@ -182,5 +180,24 @@ public class Field_c extends Expr_c implements Field
     w.begin(0);
     w.write("(name \"" + name + "\")");
     w.end();
+  }
+
+  public boolean isConstant() {
+    if (fi != null &&
+        (target instanceof TypeNode ||
+         target instanceof Special || target == null)) {
+      return fi.isConstant();
+    }
+
+    return false;
+  }
+
+  public Object constantValue() {
+    if (fi != null &&
+        (target instanceof TypeNode || target instanceof Special)) {
+      return fi.constantValue();
+    }
+
+    return null;
   }
 }

@@ -82,4 +82,12 @@ public class Local_c extends Expr_c implements Local
     w.write("(name " + name + ")");
     w.end();
   }
+
+  public boolean isConstant() {
+    return li.isConstant();
+  }
+
+  public Object constantValue() {
+    return li.constantValue();
+  }
 }

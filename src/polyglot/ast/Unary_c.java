@@ -183,4 +183,56 @@ public class Unary_c extends Expr_c implements Unary
 	    w.write(op.toString());
 	}
     }
+
+    public Object constantValue() {
+        Object v = expr.constantValue();
+
+        if (v instanceof Boolean) {
+            boolean vv = ((Boolean) v).booleanValue();
+            if (op == NOT) return new Boolean(!vv);
+        }
+        if (v instanceof Double) {
+            double vv = ((Double) v).doubleValue();
+            if (op == POS) return new Double(+vv);
+            if (op == NEG) return new Double(-vv);
+        }
+        if (v instanceof Float) {
+            float vv = ((Float) v).floatValue();
+            if (op == POS) return new Float(+vv);
+            if (op == NEG) return new Float(-vv);
+        }
+        if (v instanceof Long) {
+            long vv = ((Long) v).longValue();
+            if (op == BIT_NOT) return new Long(~vv);
+            if (op == POS) return new Long(+vv);
+            if (op == NEG) return new Long(-vv);
+        }
+        if (v instanceof Integer) {
+            int vv = ((Integer) v).intValue();
+            if (op == BIT_NOT) return new Integer(~vv);
+            if (op == POS) return new Integer(+vv);
+            if (op == NEG) return new Integer(-vv);
+        }
+        if (v instanceof Character) {
+            char vv = ((Character) v).charValue();
+            if (op == BIT_NOT) return new Integer(~vv);
+            if (op == POS) return new Integer(+vv);
+            if (op == NEG) return new Integer(-vv);
+        }
+        if (v instanceof Short) {
+            short vv = ((Short) v).shortValue();
+            if (op == BIT_NOT) return new Integer(~vv);
+            if (op == POS) return new Integer(+vv);
+            if (op == NEG) return new Integer(-vv);
+        }
+        if (v instanceof Byte) {
+            byte vv = ((Byte) v).byteValue();
+            if (op == BIT_NOT) return new Integer(~vv);
+            if (op == POS) return new Integer(+vv);
+            if (op == NEG) return new Integer(-vv);
+        }
+
+        // not a constant
+        return null;
+    }
 }

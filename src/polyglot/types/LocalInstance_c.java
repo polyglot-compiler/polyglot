@@ -16,8 +16,9 @@ public class LocalInstance_c extends VarInstance_c implements LocalInstance
         super(ts, pos, flags, type, name);
     }
 
-    public LocalInstance constantValue(Object constantValue) {
-	if (! (constantValue instanceof Boolean) &&
+    public void setConstantValue(Object constantValue) {
+	if (! (constantValue == null) &&
+	    ! (constantValue instanceof Boolean) &&
 	    ! (constantValue instanceof Number) &&
 	    ! (constantValue instanceof Character) &&
 	    ! (constantValue instanceof String)) {
@@ -26,8 +27,13 @@ public class LocalInstance_c extends VarInstance_c implements LocalInstance
 		"Can only set constant value to a primitive or String.");
 	}
 
+	this.constantValue = constantValue;
+        this.isConstant = true;
+    }
+
+    public LocalInstance constantValue(Object constantValue) {
         LocalInstance_c n = (LocalInstance_c) copy();
-	n.constantValue = constantValue;
+        n.setConstantValue(constantValue);
         return n;
     }
 

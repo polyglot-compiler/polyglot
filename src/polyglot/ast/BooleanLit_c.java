@@ -57,4 +57,12 @@ public class BooleanLit_c extends Lit_c implements BooleanLit
     w.write("(value " + value + ")");
     w.end();
   }
+
+  public boolean isConstant() {
+    return true;
+  }
+
+  public Object constantValue() {
+    return new Boolean(value);
+  }
 }

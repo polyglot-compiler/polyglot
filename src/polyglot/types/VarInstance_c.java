@@ -13,6 +13,7 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     protected Type type;
     protected String name;
     protected Object constantValue;
+    protected boolean isConstant;
 
     /** Used for deserializing types. */
     protected VarInstance_c() { }
@@ -26,7 +27,7 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     }
 
     public boolean isConstant() {
-        return constantValue != null;
+        return isConstant;
     }
 
     public Object constantValue() {

@@ -90,6 +90,136 @@ public class Binary_c extends Expr_c implements Binary
 	return reconstruct(left, right);
     }
 
+    public Object constantValue() {
+        Object lv = left.constantValue();
+        Object rv = right.constantValue();
+
+        // if one of the operands is not constant, return null now.
+        if (lv == null || rv == null) {
+            return null;
+        }
+
+        if (op == ADD && (lv instanceof String || rv instanceof String)) {
+            // toString() does what we want for String, Number, and Boolean
+            return lv.toString() + rv.toString();
+        }
+
+        if (op == EQ && (lv instanceof String && rv instanceof String)) {
+            return new Boolean(((String) lv).intern() == ((String) rv).intern());
+        }
+
+        if (op == NE && (lv instanceof String && rv instanceof String)) {
+            return new Boolean(((String) lv).intern() != ((String) rv).intern());
+        }
+
+        try {
+            if (lv instanceof Number && rv instanceof Number) {
+                if (lv instanceof Double || rv instanceof Double) {
+                    double l = ((Number) lv).doubleValue();
+                    double r = ((Number) rv).doubleValue();
+                    if (op == ADD) return new Double(l + r);
+                    if (op == SUB) return new Double(l - r);
+                    if (op == MUL) return new Double(l * r);
+                    if (op == DIV) return new Double(l / r);
+                    if (op == MOD) return new Double(l % r);
+                    if (op == EQ) return new Boolean(l == r);
+                    if (op == NE) return new Boolean(l != r);
+                    if (op == LT) return new Boolean(l < r);
+                    if (op == LE) return new Boolean(l <= r);
+                    if (op == GE) return new Boolean(l >= r);
+                    if (op == GT) return new Boolean(l > r);
+                    return null;
+                }
+
+                if (lv instanceof Float || rv instanceof Float) {
+                    float l = ((Number) lv).floatValue();
+                    float r = ((Number) rv).floatValue();
+                    if (op == ADD) return new Float(l + r);
+                    if (op == SUB) return new Float(l - r);
+                    if (op == MUL) return new Float(l * r);
+                    if (op == DIV) return new Float(l / r);
+                    if (op == MOD) return new Float(l % r);
+                    if (op == EQ) return new Boolean(l == r);
+                    if (op == NE) return new Boolean(l != r);
+                    if (op == LT) return new Boolean(l < r);
+                    if (op == LE) return new Boolean(l <= r);
+                    if (op == GE) return new Boolean(l >= r);
+                    if (op == GT) return new Boolean(l > r);
+                    return null;
+                }
+
+                if (lv instanceof Long && rv instanceof Number) {
+                    long l = ((Long) lv).longValue();
+                    long r = ((Number) rv).longValue();
+                    if (op == SHL) return new Long(l << r);
+                    if (op == SHR) return new Long(l >> r);
+                    if (op == USHR) return new Long(l >>> r);
+                }
+
+                if (lv instanceof Long || rv instanceof Long) {
+                    long l = ((Number) lv).longValue();
+                    long r = ((Number) rv).longValue();
+                    if (op == ADD) return new Long(l + r);
+                    if (op == SUB) return new Long(l - r);
+                    if (op == MUL) return new Long(l * r);
+                    if (op == DIV) return new Long(l / r);
+                    if (op == MOD) return new Long(l % r);
+                    if (op == EQ) return new Boolean(l == r);
+                    if (op == NE) return new Boolean(l != r);
+                    if (op == LT) return new Boolean(l < r);
+                    if (op == LE) return new Boolean(l <= r);
+                    if (op == GE) return new Boolean(l >= r);
+                    if (op == GT) return new Boolean(l > r);
+                    if (op == BIT_AND) return new Long(l & r);
+                    if (op == BIT_OR) return new Long(l | r);
+                    if (op == BIT_XOR) return new Long(l ^ r);
+                    return null;
+                }
+
+                // At this point, both lv and rv must be ints.
+                int l = ((Number) lv).intValue();
+                int r = ((Number) rv).intValue();
+                if (op == ADD) return new Integer(l + r);
+                if (op == SUB) return new Integer(l - r);
+                if (op == MUL) return new Integer(l - r);
+                if (op == DIV) return new Integer(l / r);
+                if (op == MOD) return new Integer(l % r);
+                if (op == EQ) return new Boolean(l == r);
+                if (op == NE) return new Boolean(l != r);
+                if (op == LT) return new Boolean(l < r);
+                if (op == LE) return new Boolean(l <= r);
+                if (op == GE) return new Boolean(l >= r);
+                if (op == GT) return new Boolean(l > r);
+                if (op == BIT_AND) return new Integer(l & r);
+                if (op == BIT_OR) return new Integer(l | r);
+                if (op == BIT_XOR) return new Integer(l ^ r);
+                if (op == SHL) return new Integer(l << r);
+                if (op == SHR) return new Integer(l >> r);
+                if (op == USHR) return new Integer(l >>> r);
+                return null;
+            }
+        }
+        catch (ArithmeticException e) {
+            // ignore div by 0
+            return null;
+        }
+
+        if (lv instanceof Boolean && rv instanceof Boolean) {
+            boolean l = ((Boolean) lv).booleanValue();
+            boolean r = ((Boolean) rv).booleanValue();
+
+            if (op == EQ) return new Boolean(l == r);
+            if (op == NE) return new Boolean(l != r);
+            if (op == BIT_AND) return new Boolean(l & r);
+            if (op == BIT_OR) return new Boolean(l | r);
+            if (op == BIT_XOR) return new Boolean(l ^ r);
+            if (op == COND_AND) return new Boolean(l && r);
+            if (op == COND_OR) return new Boolean(l || r);
+        }
+
+        return null;
+    }
+
     protected Node num(NodeFactory nf, long value) {
         Position p = position();
         Type t = type();

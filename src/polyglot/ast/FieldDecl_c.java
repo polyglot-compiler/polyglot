@@ -5,6 +5,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import polyglot.frontend.*;
 import java.util.*;
 
 /**
@@ -193,12 +194,17 @@ public class FieldDecl_c extends Node_c implements FieldDecl
         flags = flags.setFinal();
       }
 
-      if (init() instanceof Lit && flags().isFinal()) {
-        Object value = ((Lit) init()).objValue();
-        fi = (FieldInstance) fi.constantValue(value);
-      }
-
       return flags(fi.flags()).fieldInstance(fi);
+    }
+
+    if (ar.kind() == AmbiguityRemover.ALL) {
+      FieldInstance fi = this.fi;
+      Expr init = this.init();
+
+      if (init != null && fi.flags().isFinal() && init.isConstant()) {
+          Object value = init.constantValue();
+          fi.setConstantValue(value);
+      }
     }
 
     return this;
@@ -206,11 +212,17 @@ public class FieldDecl_c extends Node_c implements FieldDecl
 
   public NodeVisitor addMembersEnter(AddMemberVisitor am) {
     ParsedClassType ct = am.context().currentClassScope();
+
+    FieldInstance fi = this.fi;
+
     if (fi == null) {
         throw new InternalCompilerError("null field instance");
     }
+
     Types.report(5, "adding " + fi + " to " + ct);
+
     ct.addField(fi);
+
     return am.bypassChildren(this);
   }
 

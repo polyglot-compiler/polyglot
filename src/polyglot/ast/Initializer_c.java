@@ -97,10 +97,8 @@ public class Initializer_c extends Node_c implements Initializer
 
     public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
         // Do not visit body on the clean-super and clean-signatures passes.
-        if (ar.kind() == AmbiguityRemover.SUPER) {
-            return ar.bypassChildren(this);
-        }
-        else if (ar.kind() == AmbiguityRemover.SIGNATURES) {
+        if (ar.kind() == AmbiguityRemover.SUPER ||
+            ar.kind() == AmbiguityRemover.SIGNATURES) {
             return ar.bypassChildren(this);
         }
         return ar;

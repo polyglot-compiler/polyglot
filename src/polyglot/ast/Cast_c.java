@@ -128,4 +128,56 @@ public class Cast_c extends Expr_c implements Cast
 	printSubExpr(expr, w, tr);
 	w.end();
     }
+
+    public Object constantValue() {
+        Object v = expr.constantValue();
+
+        if (v instanceof Boolean) {
+            if (castType.type().isBoolean()) return v;
+        }
+
+        if (v instanceof String) {
+            TypeSystem ts = castType.type().typeSystem();
+            if (castType.type().isSame(ts.String())) return v;
+        }
+
+        if (v instanceof Double) {
+            double vv = ((Double) v).doubleValue();
+
+            if (castType.type().isDouble()) return new Double((double) vv);
+            if (castType.type().isFloat()) return new Float((float) vv);
+            if (castType.type().isLong()) return new Long((long) vv);
+            if (castType.type().isInt()) return new Integer((int) vv);
+            if (castType.type().isChar()) return new Character((char) vv);
+            if (castType.type().isShort()) return new Short((short) vv);
+            if (castType.type().isByte()) return new Byte((byte) vv);
+        }
+
+        if (v instanceof Float) {
+            float vv = ((Float) v).floatValue();
+
+            if (castType.type().isDouble()) return new Double((double) vv);
+            if (castType.type().isFloat()) return new Float((float) vv);
+            if (castType.type().isLong()) return new Long((long) vv);
+            if (castType.type().isInt()) return new Integer((int) vv);
+            if (castType.type().isChar()) return new Character((char) vv);
+            if (castType.type().isShort()) return new Short((short) vv);
+            if (castType.type().isByte()) return new Byte((byte) vv);
+        }
+
+        if (v instanceof Number) {
+            long vv = ((Number) v).longValue();
+
+            if (castType.type().isDouble()) return new Double((double) vv);
+            if (castType.type().isFloat()) return new Float((float) vv);
+            if (castType.type().isLong()) return new Long((long) vv);
+            if (castType.type().isInt()) return new Integer((int) vv);
+            if (castType.type().isChar()) return new Character((char) vv);
+            if (castType.type().isShort()) return new Short((short) vv);
+            if (castType.type().isByte()) return new Byte((byte) vv);
+        }
+
+        // not a constant
+        return null;
+    }
 }

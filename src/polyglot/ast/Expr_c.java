@@ -50,6 +50,50 @@ public abstract class Expr_c extends Node_c implements Expr
 	return Precedence.UNKNOWN;
     }
 
+    public boolean isConstant() {
+        return constantValue() != null;
+    }
+
+    public Object constantValue() {
+        return null;
+    }
+
+    public String stringValue() {
+        return (String) constantValue();
+    }
+
+    public boolean booleanValue() {
+        return ((Boolean) constantValue()).booleanValue();
+    }
+
+    public byte byteValue() {
+        return ((Byte) constantValue()).byteValue();
+    }
+
+    public short shortValue() {
+        return ((Short) constantValue()).shortValue();
+    }
+
+    public char charValue() {
+        return ((Character) constantValue()).charValue();
+    }
+
+    public int intValue() {
+        return ((Integer) constantValue()).intValue();
+    }
+
+    public long longValue() {
+        return ((Long) constantValue()).longValue();
+    }
+
+    public float floatValue() {
+        return ((Float) constantValue()).floatValue();
+    }
+
+    public double doubleValue() {
+        return ((Double) constantValue()).doubleValue();
+    }
+
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         return type(tb.typeSystem().unknownType(position()));
     }
