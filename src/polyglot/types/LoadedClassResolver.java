@@ -104,28 +104,28 @@ public class LoadedClassResolver extends ClassResolver
   {
     Types.report(3, "LoadedCR.loadType(" + name + ")");
 
-    Class clazz = null;
-
-    // Now, try the class file.
     try {
-      clazz = Class.forName(name);
+      Class clazz = Class.forName(name);
+
       Types.report(4, "Class " + name + " found in classpath " +
                    System.getProperty("java.class.path"));
+
+      return getTypeFromClass(clazz, name);
     }
     catch (UnsatisfiedLinkError e) {
       Types.report(4, "Class " + name + " could not be loaded due to " +
                    e.getMessage());
+
+      throw new NoClassException("Class " + name +
+                                " could not be loaded because " +
+                                e.getMessage() + ".");
     }
     catch (Throwable e) {
       Types.report(4, "Class " + name + " not found in classpath " +
                    System.getProperty("java.class.path"));
-    }
 
-    if (clazz != null) {
-      return getTypeFromClass(clazz, name);
+      throw new NoClassException("Class " + name + " not found.");
     }
-
-    throw new NoClassException("Class " + name + " not found.");
   }
 
   public Type findType(String name) throws SemanticException
@@ -154,6 +154,12 @@ public class LoadedClassResolver extends ClassResolver
     catch (UnsatisfiedLinkError e) {
       Types.report(4, "Class " + name + " could not be loaded due to " +
                    e.getMessage());
+
+      if (source == null) {
+        throw new NoClassException("Class " + name +
+                                  " could not be loaded because " +
+                                  e.getMessage() + ".");
+      }
     }
     catch (Throwable e) {
       Types.report(4, "Class " + name + " not found in classpath " +
