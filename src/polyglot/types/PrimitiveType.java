@@ -40,7 +40,7 @@ public class PrimitiveType extends Type
   }
 
   public String translate(LocalContext c) {
-    return getTypeString();
+      return ts.translatePrimitiveType(c, this);
   }
   
   public String getTypeString() 

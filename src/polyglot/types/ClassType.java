@@ -50,40 +50,7 @@ public abstract class ClassType extends ReferenceType
 
   public String translate(LocalContext c) 
   {
-      if (isAnonymous()) {
-	  throw new InternalCompilerError(
-	      "translate() called on anonymous class type " + getTypeString());
-      }
-      else if (isLocal()) {
-	  return getShortName();
-      }
-      else {
-	  ClassType container = getContainingClass();
-
-	  if (isInner() && container.isAnonymous()) {
-	      return getShortName();
-	  }
-
-	  // Return the short name if it is unique.
-	  if (c != null) {
-	      try {
-		  Type t = c.getType(getShortName());
-
-		  if (this.equals(t)) {
-		      return getShortName();
-		  }
-	      }
-	      catch (SemanticException e) {
-	      }
-	  }
-
-	  if (isInner()) {
-	      return container.translate(c) + "." + getShortName();
-	  }
-	  else {
-	      return getFullName();
-	  }
-      }
+      return ts.translateClassType(c, this);
   }
 
   public String getTypeString() 

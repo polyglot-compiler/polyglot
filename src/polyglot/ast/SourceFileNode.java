@@ -150,8 +150,7 @@ public class SourceFileNode extends Node
   public Node readSymbols( SymbolReader sr) throws SemanticException
   {
     sr.setPackageName( package_);
-    visitChildren(sr);
-    return this;
+    return visitChildren(sr);
   }
 
   public Node removeAmbiguities( LocalContext c)

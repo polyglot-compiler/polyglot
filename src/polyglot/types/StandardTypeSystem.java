@@ -1134,4 +1134,53 @@ public class StandardTypeSystem extends TypeSystem {
     return java.util.Collections.singleton(clazz);
   }
 
+  public String translateArrayType(LocalContext c, ArrayType array){
+      StringBuffer sb = new StringBuffer();
+      sb.append(array.getBaseType().translate(c));
+      sb.append("[]");
+      return sb.toString();
+  }
+
+  public String translateClassType(LocalContext c, ClassType clazz){
+      if (clazz.isAnonymous()) {
+	  throw new InternalCompilerError(
+	      "translate() called on anonymous class type " + clazz.getTypeString());
+      }
+      else if (clazz.isLocal()) {
+	  return clazz.getShortName();
+      }
+      else {
+	  ClassType container = clazz.getContainingClass();
+
+	  if (clazz.isInner() && container.isAnonymous()) {
+	      return clazz.getShortName();
+	  }
+
+	  // Return the short name if it is unique.
+	  if (c != null) {
+	      try {
+		  Type t = c.getType(clazz.getShortName());
+
+		  if (clazz.equals(t)) {
+		      return clazz.getShortName();
+		  }
+	      }
+	      catch (SemanticException e) {
+	      }
+	  }
+
+	  if (clazz.isInner()) {
+	      return container.translate(c) + "." + clazz.getShortName();
+	  }
+	  else {
+	      return clazz.getFullName();
+	  }
+      }
+  }
+
+  public String translatePrimitiveType(LocalContext c, PrimitiveType prim){
+      return prim.getTypeString();
+  }
+
 }
+

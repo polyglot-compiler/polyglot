@@ -1,6 +1,7 @@
 package jltools.types;
 
 import java.util.*;
+import jltools.ext.polyj.types.*;
 
 /**
  * An <code>ArrayType</code> represents an array of base java types.
@@ -13,6 +14,8 @@ public class ArrayType extends ReferenceType
   protected List fields;
   protected List methods;
   protected List interfaces;
+  protected int dims;
+  protected Type ultimateBase;
 
   protected ArrayType()
   {
@@ -48,6 +51,9 @@ public class ArrayType extends ReferenceType
     interfaces = new ArrayList(2);
     interfaces.add(ts.getCloneable());
     interfaces.add(ts.getSerializable());
+    
+    this.dims = (base instanceof ArrayType) ? ((ArrayType)base).getDims() + 1 : dims;
+    ultimateBase = (base instanceof ArrayType) ? ((ArrayType)base).getUltimateBaseType() : base;
   }
 
   public ArrayType(TypeSystem ts, Type baseType)
@@ -60,6 +66,16 @@ public class ArrayType extends ReferenceType
     return base;
   }
   
+  public int getDims() 
+  {
+      return dims;
+  }
+
+  public Type getUltimateBaseType() 
+  {
+      return ultimateBase;
+  }
+
   public String getTypeString() {
     StringBuffer sb = new StringBuffer();
     sb.append(base.getTypeString());
@@ -68,10 +84,7 @@ public class ArrayType extends ReferenceType
   }
 
   public String translate(LocalContext c) {
-      StringBuffer sb = new StringBuffer();
-      sb.append(base.translate(c));
-      sb.append("[]");
-      return sb.toString();
+      return ts.translateArrayType(c, this);
   }
 
   public boolean isPrimitive() 

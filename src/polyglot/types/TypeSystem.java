@@ -320,4 +320,8 @@ public abstract class TypeSystem {
    * should be returned in the set in addition to clazz.
    */
   public abstract java.util.Set getTypeEncoderRootSet(Type clazz);
+
+  public abstract String translateArrayType(LocalContext c, ArrayType array);
+  public abstract String translateClassType(LocalContext c, ClassType clazz);
+  public abstract String translatePrimitiveType(LocalContext c, PrimitiveType prim);
 }

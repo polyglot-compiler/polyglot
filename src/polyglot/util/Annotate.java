@@ -28,6 +28,9 @@ public class Annotate {
   
   // True for (PolyJ) expressions that are children of an ExpressionStatement
   static final int IS_EXPR_STATEMENT      = 8; 
+  // True for (PolyJ) expressions that are the left-hand side of an assignment.
+  // Set during translation.
+  static final int IS_LVALUE		  = 9; 
 
     
 
@@ -142,6 +145,21 @@ public class Annotate {
 
   public static boolean isStatementExpr(AnnotatedObject o) {
     Boolean b = (Boolean) o.getAnnotation(IS_EXPR_STATEMENT);
+    if (b == null) 
+      return false;    
+    return b.booleanValue();
+  }
+
+  /**
+   * Label an Expression as being the left side of an assignment
+   * (Only used by PolyJ)
+   **/
+  public static void setLValue(AnnotatedObject o, boolean b) {
+    o.setAnnotation(IS_LVALUE, new Boolean(b));
+  }
+
+  public static boolean isLValue(AnnotatedObject o) {
+    Boolean b = (Boolean) o.getAnnotation(IS_LVALUE);
     if (b == null) 
       return false;    
     return b.booleanValue();
