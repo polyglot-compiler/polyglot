@@ -744,6 +744,13 @@ ext=""
 
   <target name="polyj-dist" depends="jl-dist,polyj"/>
 
+  <target name="jx-jar" depends="jx">
+    <jar jarfile="${lib}/jx.jar" basedir="${classes}" includes="polyglot/ext/jx/**"/>
+    <jar jarfile="${lib}/jxrt.jar" basedir="${classes}" includes="jx/runtime/**"/>
+  </target>
+
+  <target name="jx-dist" depends="jl-dist,jx-jar"/>
+
   <target name="jmatch-jar" depends="jmatch">
     <jar jarfile="${lib}/jmatch.jar" basedir="${classes}" includes="polyglot/ext/jmatch/**"/>
     <jar jarfile="${lib}/jmatch-runtime.jar" basedir="${classes}" includes="polyglot/ext/jmatch/runtime/**"/>
