@@ -670,8 +670,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                               StringUtil.escape(q.getTarget().node.toString()) + " (" + 
                               StringUtil.escape(StringUtil.getShortNameComponent(q.getTarget().node.getClass().getName()))+ ")\" ];");
                 String label = q.getKey().toString();
-                if (q.getTarget().outItems != null) {
-                    label += "\\n" + q.getTarget().outItems.get(q.getKey());
+                if (p.outItems != null) {
+                    label += "\\n" + p.outItems.get(q.getKey());
                 }
                 else {
                     label += "\\n[no dataflow available]";
