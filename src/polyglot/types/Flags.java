@@ -13,133 +13,112 @@ import java.util.*;
  */
 public class Flags implements Serializable
 {
-    protected static ArrayList all_flags = new ArrayList();
+    /** List of all flag bits in order in which they should be printed. */
+    protected static int[] print_order = new int[64];
+    protected static int next_bit = 0;
 
-    protected static class Flag extends Enum {
-        protected Flag(String name) {
-            super(name);
-        }
-    }
+    /** Names of 1-bit flags indexed by flag bit. */
+    protected static String[] flag_names = new String[64];
 
-    public static final Flags NONE         = new Flags();
-    public static final Flags PUBLIC       = createFlag("public");
-    public static final Flags PRIVATE      = createFlag("private");
-    public static final Flags PROTECTED    = createFlag("protected");
-    public static final Flags STATIC       = createFlag("static");
-    public static final Flags FINAL        = createFlag("final");
-    public static final Flags SYNCHRONIZED = createFlag("synchronized");
-    public static final Flags TRANSIENT    = createFlag("transient");
-    public static final Flags NATIVE       = createFlag("native");
-    public static final Flags INTERFACE    = createFlag("interface");
-    public static final Flags ABSTRACT     = createFlag("abstract");
-    public static final Flags VOLATILE     = createFlag("volatile");
-    public static final Flags STRICTFP     = createFlag("strictfp");
+    public static final Flags NONE         = new Flags(0);
+    public static final Flags PUBLIC       = createFlag("public", null);
+    public static final Flags PRIVATE      = createFlag("private", null);
+    public static final Flags PROTECTED    = createFlag("protected", null);
+    public static final Flags STATIC       = createFlag("static", null);
+    public static final Flags FINAL        = createFlag("final", null);
+    public static final Flags SYNCHRONIZED = createFlag("synchronized", null);
+    public static final Flags TRANSIENT    = createFlag("transient", null);
+    public static final Flags NATIVE       = createFlag("native", null);
+    public static final Flags INTERFACE    = createFlag("interface", null);
+    public static final Flags ABSTRACT     = createFlag("abstract", null);
+    public static final Flags VOLATILE     = createFlag("volatile", null);
+    public static final Flags STRICTFP     = createFlag("strictfp", null);
 
     /** All access flags. */
     protected static final Flags ACCESS_FLAGS = PUBLIC.Private().Protected();
 
-    protected Set flags;
+    /** Bit set use to implement a flag set. */
+    protected long bits;
 
     /**
-     * Return a new Flags object with a new name.  Should only be called once
+     * Return a new Flags object with a new name.  Should be called only once
      * per name.
+     *
+     * @param name the name of the new flag
+     * @param after the flags after which this flag should be printed;
+     *        Flags.NONE to print before all other flags, null
+     *        if we should print at the end.
      */
-    public static Flags createFlag(String name) {
-        Flag f = new Flag(name);
-        all_flags.add(f);
-        return new Flags(f);
-    }
-
     public static Flags createFlag(String name, Flags after) {
-        Flag f = new Flag(name);
+        if (next_bit >= flag_names.length)
+            throw new InternalCompilerError("too many flags");
+        if (print_order[next_bit] != 0)
+            throw new InternalCompilerError("print_order and next_bit " +
+                                            "inconsistent");
+        if (flag_names[next_bit] != null)
+            throw new InternalCompilerError("flag_names and next_bit " +
+                                            "inconsistent");
 
-        // Insert in "all_flags" just after the last flag in "after".
-        for (int i = all_flags.size()-1; i >= 0; i--) {
-            Object o = all_flags.get(i);
+        int bit = next_bit++;
+        flag_names[bit] = name;
 
-            if (after.flags.contains(o)) {
-                all_flags.add(i+1, f);
-                return new Flags(f);
+        if (after == null) {
+            print_order[bit] = bit;
+        }
+        else {
+            for (int i = bit; i > 0; i--) {
+                if ((after.bits & print_order[i]) != 0)
+                    break;
+
+                // shift up and fill in the gap with f
+                print_order[i] = print_order[i-1];
+                print_order[i-1] = bit;
             }
         }
 
-        all_flags.add(0, f);
-
-        return new Flags(f);
+        return new Flags(1L << bit);
     }
 
     /**
      * Effects: returns a new accessflags object with no accessflags set.
      */
-    public Flags() {
-        flags = new HashSet();
-    }
-
-    /**
-     * Given the name  encoding of a set of flags, returns the Flags object
-     * for that encoding.
-     */
-    public Flags(Flag flag) {
-        flags = new HashSet();
-        flags.add(flag);
-    }
-
-    /**
-     * Given the name  encoding of a set of flags, returns the Flags object
-     * for that encoding.
-     */
-    private Flags(Set flags) {
-        flags = new HashSet(flags);
+    protected Flags(long bits) {
+        this.bits = bits;
     }
 
     /**
      * Create new flags with the flags in <code>other</code> also set.
      */
     public Flags set(Flags other) {
-        Flags f = new Flags();
-        f.flags.addAll(flags);
-        f.flags.addAll(other.flags);
-        return f;
+        return new Flags(bits | other.bits);
     }
 
     /**
      * Create new flags with the flags in <code>other</code> cleared.
      */
     public Flags clear(Flags other) {
-        Flags f = new Flags();
-        f.flags.addAll(flags);
-        f.flags.removeAll(other.flags);
-        return f;
+        return new Flags(bits & ~other.bits);
     }
 
     /**
      * Create new flags with only flags in <code>other</code> set.
      */
     public Flags retain(Flags other) {
-        Flags f = new Flags();
-        f.flags.addAll(flags);
-        f.flags.retainAll(other.flags);
-        return f;
+        return new Flags(bits & other.bits);
     }
 
     /**
      * Check if <i>any</i> flags in <code>other</code> are set.
      */
     public boolean intersects(Flags other) {
-        for (Iterator i = other.flags.iterator(); i.hasNext(); ) {
-            Flag f = (Flag) i.next();
-            if (flags.contains(f))
-                return true;
-        }
-
-        return false;
+        return (bits & other.bits) != 0;
     }
 
     /**
      * Check if <i>all</i> flags in <code>other</code> are set.
      */
     public boolean contains(Flags other) {
-        return flags.containsAll(other.flags);
+        return (bits & other.bits) == other.bits;
     }
 
     /**
@@ -458,14 +437,13 @@ public class Flags implements Serializable
     public String toString() {
         String s = "";
 
-        List l = new LinkedList(all_flags);
-        l.retainAll(flags);
-
-        for (Iterator i = l.iterator(); i.hasNext(); ) {
-            Flag f = (Flag) i.next();
-            s += f.toString();
-            if (i.hasNext())
-                s += " ";
+        for (int i = 0; i < next_bit; i++) {
+            int bit = print_order[i];
+            if ((bits & (1L << bit)) != 0) {
+                s += flag_names[bit];
+                if (i+1 < next_bit)
+                    s += " ";
+            }
         }
 
         return s;
@@ -485,10 +463,10 @@ public class Flags implements Serializable
     }
 
     public int hashCode() {
-        return flags.hashCode();
+        return (int) (bits >> 32 | bits) * 37;
     }
 
     public boolean equals(Object o) {
-	return o instanceof Flags && flags.equals(((Flags) o).flags);
+	return o instanceof Flags && bits == ((Flags) o).bits;
     }
 }
