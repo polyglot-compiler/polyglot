@@ -34,7 +34,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
     public Node disambiguateOverride_(AmbiguityRemover ar)
 	throws SemanticException {
 
-	Node n = new Disamb().disambiguate(ar, position(), null, name);
+	Node n = ar.nodeFactory().disamb().disambiguate(ar, position(), null, name);
 
 	if (n instanceof Expr) {
 	    return n;

@@ -15,6 +15,10 @@ import java.util.*;
  */
 public class NodeFactory_c implements NodeFactory
 {
+    public Disamb disamb() {
+        return new Disamb_c();
+    }
+
     public AmbPrefix AmbPrefix(Position pos, String name) {
 	return AmbPrefix(pos, null, name);
     }

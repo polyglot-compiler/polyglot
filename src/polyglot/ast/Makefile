@@ -32,6 +32,7 @@ SOURCES = \
 	ConstructorCall.java \
 	ConstructorDecl.java \
 	Declarator.java \
+    Disamb.java \
 	Do.java \
 	Empty.java \
 	Eval.java \

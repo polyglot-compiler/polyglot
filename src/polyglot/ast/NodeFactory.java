@@ -14,6 +14,16 @@ import java.util.List;
  */
 public interface NodeFactory
 {
+
+    /**
+     * Returns a disambiguator for nodes from this factory.
+     */
+    Disamb disamb();
+
+    //////////////////////////////////////////////////////////////////
+    // Factory Methods
+    //////////////////////////////////////////////////////////////////
+
     AmbExpr AmbExpr(Position pos, String name);
 
     // type or expr
