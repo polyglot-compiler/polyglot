@@ -503,7 +503,7 @@ FIXME: check super types as well.
         return (TypeNode) visitChild(tn, tc);
     }
 
-    protected ClassBody typeCheckBody(TypeChecker tc, ClassType ct)
+    protected ClassBody typeCheckBody(TypeChecker tc, ClassType superType)
         throws SemanticException
     {
         ClassBody b = (ClassBody) tc.job().spawn(tc.context(), body,
@@ -513,13 +513,16 @@ FIXME: check super types as well.
         if (b == null) {
             throw new SemanticException("Could not disambiguate body of " +
                                         "anonymous " +
-                                        (ct.flags().isInterface() ?
+                                        (superType.flags().isInterface() ?
                                          "implementor" : "subclass") +
-                                        " of \"" + ct + "\".");
+                                        " of \"" + superType + "\".");
         }
 
         // Now, type-check the body.
-        b = (ClassBody) visitChild(b, tc);
+        b = (ClassBody) visitChild(b, tc.visitChildren());
+
+        // check the class implements all abstract methods that it needs to.
+        tc.typeSystem().checkClassConformance(anonType());
 
         return b;
     }

@@ -1597,7 +1597,7 @@ public class TypeSystem_c implements TypeSystem
 
                 // did we find a suitable implementation of the method mi?
                 if (!implFound) {
-                    throw new SemanticException(ct.name() + " should be " +
+                    throw new SemanticException(ct.fullName() + " should be " +
                             "declared abstract; it does not define " +
                             mi.signature() + ", which is declared in " +
                             rt.toClass().fullName(), ct.position());
