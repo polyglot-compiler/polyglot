@@ -139,6 +139,20 @@ public class SubtypeSet implements java.util.Set
     }
 
     /**
+     * Check whether the type <code>t</code> or a subtype is in the set.
+     * Returns true iff it descends from, is equal to, or is a super type of
+     * one of the elements in the set.
+     */
+    public boolean containsSubtype(Type type) {
+	for (Iterator i = v.iterator(); i.hasNext(); ) {
+	    Type t = (Type)i.next();
+	    if (ts.isSubtype(type, t) || ts.isSubtype(t, type)) return true;
+	}
+
+	return false;
+    }
+
+    /**
      * Checks whether all elements of the collection are in the set
      */
     public boolean containsAll(Collection c) {
