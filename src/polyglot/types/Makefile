@@ -12,6 +12,7 @@ tp_files 	= AccessFlags.java	\
 			ConstructorTypeInstance.java \
 			FieldInstance.java \
 			ImportTable.java \
+			IntCastableTypeSystem.java \
 			LoadedClassResolver.java \
 			LoadedClassType.java \
 			LocalContext.java \
