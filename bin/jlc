@@ -1,5 +1,9 @@
 #!/bin/sh
-. defs
+
+BIN=`dirname "$0"`
+TOP=`dirname "$BIN"`
+
+. ${BIN}/defs
 
 while true; do
     case "$1" in

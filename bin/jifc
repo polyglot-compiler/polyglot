@@ -1,3 +1,4 @@
 #!/bin/sh
 
-jlc -ext jif "$@"
+BIN=`dirname "$0"`
+${BIN}/jlc -ext jif "$@"
