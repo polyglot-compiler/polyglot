@@ -420,8 +420,13 @@ public class Binary_c extends Expr_c implements Binary
     if (type != null) {
       w.allowBreak(4, " ");
       w.begin(0);
-      w.write("(operator " + op + ")");
+      w.write("(type " + type + ")");
       w.end();
     }
+
+    w.allowBreak(4, " ");
+    w.begin(0);
+    w.write("(operator " + op + ")");
+    w.end();
   }
 }
