@@ -2,6 +2,39 @@ Polyglot Change Log
 ===================
 
 This file documents changes between releases of Polyglot.
+Apr 2, 2004: Polyglot 1.2.0
+============================
+  What's new since Polyglot 1.1.1:
+  --------------------------------
+    Miscellaneous bug fixes. 
+
+    The class polyglot.util.Position can now record end column and
+    line numbers. The CUP or PPG grammar file is responsible for
+    setting the position for AST nodes correctly (for an example, see
+    the file src/polyglot/ext/jl/parse/java12.cup). Support is however
+    required from the lexer. If your extension uses a PPG file that
+    extends the file java12.cup, you should be able to take advantage
+    of the end positions by modifying your JFlex file to record end
+    positions, as done in src/polyglot/ext/jl/parse/java.flex. The
+    changes are backwards compatible: if your JFlex file does not
+    record end positions, the functionality of Positions will be the
+    same as in the previous release. Thanks to Ondrej Lhotak and
+    Jennifer Lhotak for suggesting this change, and providing the code
+    for it.
+
+    pth (Polyglot Test Harness) is a small tool to assist in automated
+    regression testing of Polyglot extensions. See the file
+    tools/pth/README for more information.
+
+    Illegal forward references now detected.
+
+    Control flow graph for binary and unary operators is now more
+    precise, permitting more precise dataflow analyses.
+
+    The signature for the methods findMethod, findConstructor, and
+    findMemberClass, in polyglot.types.TypeSystem have changed; old
+    versions of these methods are still present but deprecated.
+
 
 Dec 18, 2003: Polyglot 1.1.1
 ============================

@@ -151,8 +151,9 @@ Several other people have contributed to the development:
 
         Michael Brukman         Michael Clarkson
         Matt Harren             Aleksey Kliger
-        Naveen Sastry           Dan Spoonhower
-        Steve Zdancewic         Lantian Zheng
+        Jed Liu                 Naveen Sastry           
+        Dan Spoonhower          Steve Zdancewic         
+        Lantian Zheng
 
 The Polyglot class file parsing code (src/polyglot/types/reflect)
 is derived from the BLOAT bytecode optimizer written by Nathaniel
@@ -168,6 +169,7 @@ The following people have provided patches:
         Keunwoo Lee <klee@cs.washington.edu>
         Patrick Lam <plam@mit.edu>
         Ondrej Lhotak <olhotak@sable.mcgill.ca>
+        Oege de Moor <Oege.de.Moor@comlab.ox.ac.uk>
 
 The development of the Polyglot project has been supported by a number
 of funding sources, including DARPA Contract F30602-99-1-0533, monitored
