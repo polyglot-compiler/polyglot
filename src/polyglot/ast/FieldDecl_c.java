@@ -347,5 +347,10 @@ public class FieldDecl_c extends Node_c implements FieldDecl {
             w.write("(instance " + fi + ")");
             w.end();
         }
+
+	w.allowBreak(4, " ");
+	w.begin(0);
+	w.write("(name " + name + ")");
+	w.end();
     }
 }
