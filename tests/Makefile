@@ -115,6 +115,7 @@ good: $(GOOD)
 	-rm -f $(GOOD_OUTPUT) good.log
 	cat /dev/null > good.log
 	$(MAKE) LOG=good.log $(GOOD_OUTPUT)
+	-(cd disamb_member; rm -f *.class)
 	(cd disamb_member; jlc -noserial CollectionsTester.jl) > good.log 2>&1
 	@if cmp -s good.log.in good.log; then \
 	    echo "LOG UNCHANGED"; \
