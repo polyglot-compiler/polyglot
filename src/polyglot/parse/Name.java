@@ -63,9 +63,14 @@ public class Name {
 		return nf.AmbQualifierNode(pos, prefix.toQualifier(), name);
 	}
 
-	// type
+	// package
 	public PackageNode toPackage() {
-		return nf.PackageNode(pos, ts.packageForName(toString()));
+                if (prefix == null) {
+                    return nf.PackageNode(pos, ts.createPackage(null, name));
+                }
+                else {
+                    return nf.PackageNode(pos, ts.createPackage(prefix.toPackage().package_(), name));
+                }
 	}
 
 	// type
