@@ -18,5 +18,9 @@ public interface Expr extends Receiver {
     /** Get the precedence of the expression. */
     Precedence precedence();
 
+    /**
+     * Correctly parenthesize the subexpression <code>expr<code> given
+     * based on its precedence and the precedence of this expression.
+     */
     void translateSubexpr(Expr expr, CodeWriter w, Translator tr);
 }
