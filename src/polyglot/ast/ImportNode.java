@@ -71,7 +71,8 @@ public class ImportNode extends Node {
 
   public void translate(Context c, CodeWriter w)
   {
-    w.write(" import " + imports+ (type == PACKAGE ? ".*;" : ";" ));
+    w.write("import " + imports+ (type == PACKAGE ? ".*;" : ";" ));
+    w.newline(0);
   }
 
   public void dump(Context c, CodeWriter w)

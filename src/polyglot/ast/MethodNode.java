@@ -243,7 +243,7 @@ public class MethodNode extends ClassMember {
     if (! isConstructor())
     {
       returnType.translate(c, w);
-      w.write (name + "( ");
+      w.write (" " + name + "( ");
     }
     else
     {
@@ -264,9 +264,8 @@ public class MethodNode extends ClassMember {
         w.write ( ((Type)i.next()).getTypeString() + (i.hasNext() ? ", " : "" ));
       }
     }
-    w.beginBlock();
+    w.newline(0);
     body.translate(c, w);
-    w.endBlock();
   }
 
   public void dump (Context c, CodeWriter w)

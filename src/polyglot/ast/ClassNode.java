@@ -196,7 +196,7 @@ public class ClassNode extends ClassMember {
 
   public void translate ( Context c, CodeWriter w)
   {
-    w.write (accessFlags.getStringRepresentation() + " class " + name);
+    w.write (accessFlags.getStringRepresentation() + "class " + name);
     if (superClass != null)
     {
       w.write (" extends ");
@@ -212,15 +212,21 @@ public class ClassNode extends ClassMember {
              w.write (", ");
       }
     }
-    w.write (" {");
+    w.newline(0);
+    w.write ("{");
     w.beginBlock();
     for (Iterator i = classMembers.listIterator(); i.hasNext(); )
     {
       ((Node)i.next()).translate(c, w);
-      w.newline(0);
+      if (i.hasNext())
+      {
+        w.newline(0);
+        w.newline(0);
+      }
     }
     w.endBlock();
     w.write( "}");
+    w.newline(0);
       
 
   }

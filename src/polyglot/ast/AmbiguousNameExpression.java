@@ -72,8 +72,6 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
       sb.append((String)iter.next());
       if(iter.hasNext())
         sb.append('.');
-      else
-        sb.append(' ');
     }
     return sb.toString();
   }

@@ -81,18 +81,32 @@ public class IfStatement extends Statement {
 
   public void translate(Context c, CodeWriter w)
   {
+    boolean bThenBlockStatement, bElseBlockStatement;
+    bThenBlockStatement = thenStatement instanceof BlockStatement;
+    bElseBlockStatement = elseStatement instanceof BlockStatement;
+    
     w.write ( "if ( " ) ;
     condExpr.translate ( c, w);
     w.write ( " ) " );
-    w.beginBlock();
-    thenStatement.translate(c, w);
-    w.endBlock();
+    if (! bThenBlockStatement)
+    {
+      w.beginBlock();
+      thenStatement.translate(c, w);
+      w.endBlock();
+    }
+    else
+      thenStatement.translate(c, w);
     if ( elseStatement != null)
     {
       w.write ( " else " );
-      w.beginBlock();
-      elseStatement.translate(c, w);
-      w.endBlock();
+      if (! bElseBlockStatement)
+      {
+        w.beginBlock();
+        elseStatement.translate(c, w);
+        w.endBlock();
+      }
+      else
+        elseStatement.translate(c,w );
     }
 
   }

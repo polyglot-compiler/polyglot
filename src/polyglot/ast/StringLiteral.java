@@ -48,12 +48,12 @@ public class StringLiteral extends Literal {
 
    public void  translate(Context c, CodeWriter w)
    {
-      w.write(string);
+      w.write("\"" + string + "\"");
    }
 
    public void dump(Context c, CodeWriter w)
    {
-      w.write("( " + string + " )");
+      w.write("( \"" + string + "\" )");
    }
   
   public Node copy() {

@@ -59,9 +59,14 @@ public class DoStatement extends Statement {
   public void translate(Context c, CodeWriter w)
   {
     w.write (" do " );
-    w.beginBlock();
-    statement.translate(c, w);
-    w.endBlock();
+    if (! (statement instanceof BlockStatement))
+    {
+      w.beginBlock();
+      statement.translate(c, w);
+      w.endBlock();
+    }
+    else
+      statement.translate(c, w);
     w.write (" while ( " );
     condExpr.translate ( c, w);
     w.write ( " ) ");

@@ -38,7 +38,7 @@ public class CodeWriter
    
     public void endBlock()
     {
-       allowBreak(-INDENT);
+       newline(-INDENT);
        end();
     }
     public void newline()

@@ -148,12 +148,18 @@ public class SourceFileNode extends Node {
 
    public void translate(Context c, CodeWriter w)
    {
-     w.write("package " + packageName);
-     w.newline(0);
+     if (packageName != null && !packageName.equals(""))
+     {
+       w.write("package " + packageName + ";");
+       w.newline(0);
+       w.newline(0);
+     }
      for(ListIterator it=imports.listIterator(); it.hasNext(); ) 
      {
        ((ImportNode)it.next()).translate(c, w);
      }
+     if (!imports.isEmpty())
+       w.newline(0);
      for(ListIterator it=classes.listIterator(); it.hasNext(); ) 
      {
        ((ClassNode)it.next()).translate(c, w);

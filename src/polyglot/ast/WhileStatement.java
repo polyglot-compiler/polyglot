@@ -81,9 +81,14 @@ public class WhileStatement extends Statement {
     w.write("while (" );
     condExpr.translate(c, w);
     w.write(") ");
-    w.beginBlock();
-    statement.translate(c, w);
-    w.endBlock();
+    if ( ! (statement instanceof BlockStatement))
+    {
+      w.beginBlock();
+      statement.translate(c, w);
+      w.endBlock();
+    }
+    else
+      statement.translate(c, w);
   }
 
   public void dump(Context c, CodeWriter w)

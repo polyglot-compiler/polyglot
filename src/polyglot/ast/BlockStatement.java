@@ -83,13 +83,16 @@ public class BlockStatement extends Statement {
 
   public void translate(Context c, CodeWriter w)
   {
+    
     w.write("{");
-    w.newline(0);
+    w.beginBlock();
     for (ListIterator it = statements.listIterator(); it.hasNext(); ) 
     {
       ((Node)it.next()).translate(c, w);
-      w.newline(0);
+      if (it.hasNext())
+        w.newline(0);
     }
+    w.endBlock();
     w.write("}");
   }
 
