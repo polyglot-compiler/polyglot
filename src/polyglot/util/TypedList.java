@@ -59,7 +59,7 @@ public class TypedList implements List, java.io.Serializable
   public static void check(List list, Class c) {
     for (Iterator i = list.iterator(); i.hasNext(); ) {
       Object o = i.next();
-      if (!c.isAssignableFrom(o.getClass())) {
+      if (o != null && !c.isAssignableFrom(o.getClass())) {
 	throw new UnsupportedOperationException(
 		     "Tried to add a " + o.getClass().getName() +
    	             " to a list of type " + c.getName());
