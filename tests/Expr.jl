@@ -1,6 +1,8 @@
 
 package test;
 
+import java.util.*;
+
 public class Expr extends Constants
 {
   public void eval()
@@ -8,9 +10,10 @@ public class Expr extends Constants
     int i = 1;
     byte b1 = 2, b2;
     boolean b;
+    String g;
 
     if( b) {
-      String g = "Hello ";
+      g = "Hello ";
       String h = "World!", k;
 
       k = g + h;
@@ -31,5 +34,4 @@ public class Expr extends Constants
     // b1 promoted to int.
     b2 = b1 << 2;
   }
-
 }

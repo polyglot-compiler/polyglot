@@ -306,6 +306,8 @@ public class MethodNode extends ClassMember {
                                          additionalDimensions),
                           argTypes, exceptions, accessFlags);     
     }
+
+    Annotate.setLineNumber( mtiThis, Annotate.getLineNumber( this));
     clazz.addMethod( mtiThis);
 
     return this;
@@ -357,6 +359,7 @@ public class MethodNode extends ClassMember {
   }
 
   public void visitChildren(NodeVisitor v) {
+    returnType = (TypeNode)returnType.visit( v);
     for (Iterator i = formals.iterator(); i.hasNext(); )
     {
       ((FormalParameter)i.next()).visit(v);
@@ -365,8 +368,7 @@ public class MethodNode extends ClassMember {
     {
       ((TypeNode)i.next()).visit(v);
     }
-    body = (BlockStatement) body.visit(v);
-    
+    body = (BlockStatement) body.visit(v); 
   }
 
   public Node copy() {

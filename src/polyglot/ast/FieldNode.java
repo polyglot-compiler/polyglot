@@ -5,7 +5,7 @@
 package jltools.ast;
 
 import jltools.types.*;
-import jltools.util.CodeWriter;
+import jltools.util.*;
 import jltools.visit.SymbolReader;
 
 import java.util.*;
@@ -81,12 +81,15 @@ public class FieldNode extends ClassMember {
     ParsedClassType clazz = sr.getCurrentClass();
     VariableDeclarationStatement.Declarator declarator;
     Iterator iter = declare.declarators();
+    FieldInstance fi;
 
     while( iter.hasNext()) {
       declarator = (VariableDeclarationStatement.Declarator)iter.next();
-      clazz.addField( new FieldInstance( declarator.name, 
-                                  declare.typeForDeclarator( declarator), 
-                                  clazz, declare.getModifiers()));
+      fi = new FieldInstance( declarator.name, 
+                              declare.typeForDeclarator( declarator), 
+                              clazz, declare.getModifiers());
+      Annotate.setLineNumber( fi, Annotate.getLineNumber( this));
+      clazz.addField( fi);
 
     }
     return this;

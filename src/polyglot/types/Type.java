@@ -4,6 +4,8 @@
 
 package jltools.types;
 
+import jltools.util.AnnotatedObject;
+
 /**
  * Type
  *
@@ -14,7 +16,7 @@ package jltools.types;
  *
  *    ==> _All_ types are immutable.
  **/
-public abstract class Type {
+public abstract class Type extends AnnotatedObject {
   // Creates a new type in the given typeSystem.
   public Type(TypeSystem ts) { this.ts = ts; }
 

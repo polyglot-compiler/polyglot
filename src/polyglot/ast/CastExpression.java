@@ -118,7 +118,7 @@ public class CastExpression extends Expression {
       return ce;     
     }
 
-    private Expression expr;
-    private TypeNode type;
+    protected Expression expr;
+    protected TypeNode type;
 }
 

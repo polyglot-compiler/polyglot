@@ -88,7 +88,7 @@ public class SpecialExpression extends Expression {
     if ( kind == THIS)
       setCheckedType( c.getCurrentClass() );
     else
-      setCheckedType ( c.getCurrentClass().getSupertype() );
+      setCheckedType ( c.getCurrentClass().getSuperType() );
     return this;
   }
 

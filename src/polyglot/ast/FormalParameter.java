@@ -45,6 +45,10 @@ public class FormalParameter extends Node {
 	return type.getType();
     }
 
+  public TypeNode getTypeNode() {
+    return type;
+  }
+
     /**
      * Effects: Sets the type of this FormalParameter to be <newType>.
      */

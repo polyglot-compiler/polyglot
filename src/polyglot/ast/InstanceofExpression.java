@@ -4,9 +4,9 @@
 
 package jltools.ast;
 
-import jltools.types.Type;
-import jltools.types.LocalContext;
+import jltools.types.*;
 import jltools.util.CodeWriter;
+
 
 /**
  * InstanceofExpression
@@ -89,9 +89,23 @@ public class InstanceofExpression extends Expression {
     return null;
   }
 
-  public Node typeCheck(LocalContext c)
+  public Node typeCheck( LocalContext c) throws TypeCheckException
   {
-    // FIXME; implement
+    Type rtype = type.getType();
+
+    if( rtype instanceof PrimitiveType) {
+      throw new TypeCheckException( 
+                 "Right operand of \"instanceof\" must be a reference type.");
+    }
+
+    Type ltype = expr.getCheckedType();
+    if( !ltype.isCastValid( rtype)) {
+      throw new TypeCheckException(
+                 "Left operand of \"instanceof\" must be castable to "
+                 + "the right operand.");
+    }
+
+    setCheckedType( c.getTypeSystem().getBoolean());
     return this;
   }
 

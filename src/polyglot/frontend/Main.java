@@ -17,8 +17,10 @@ public class Main
                                         = "Source Extension (String)";
   private static final String MAIN_OPT_STDOUT
                                         = "Output to stdout (Boolean)";
+  private static final String MAIN_OPT_POST_COMPILER
+                                        = "Name of Post Compiler (String)";
 
-  public static final void main(String args[]) throws Exception
+  public static final void main(String args[])
   {
     Map options = new HashMap();
     Set source = new TreeSet();
@@ -35,13 +37,13 @@ public class Main
     
     /* Now compile each file. */
     Compiler compiler = new Compiler();
-    Iterator i = source.iterator();
+    Iterator iter = source.iterator();
     String targetName = null;
 
     try
     {
-      while( i.hasNext()) {
-        targetName = (String)i.next();
+      while( iter.hasNext()) {
+        targetName = (String)iter.next();
         if( !compiler.compileFile( targetName)) {
           System.exit( 1);
         }
@@ -59,9 +61,64 @@ public class Main
       System.exit( 1);
     }
 
+
     /* Make sure we do this before we exit. */
-    if( !Compiler.cleanup()) {
+    Collection completed = new LinkedList();
+    try
+    {
+      if( !compiler.cleanup( completed)) {
+        System.exit( 1);
+      }
+    }
+    catch( IOException e)
+    {
+      System.err.println( "Caught IOException while compiling: "
+                          + e.getMessage());
       System.exit( 1);
+    }
+
+    /* Now call javac or jikes, if necessary. */
+    if( options.get( MAIN_OPT_POST_COMPILER) != null) {
+      Runtime runtime = Runtime.getRuntime();
+      Process proc;
+      MainTargetFactory.MainTarget t;
+      String command;
+
+      iter = completed.iterator();
+      while( iter.hasNext()) {
+        t = (MainTargetFactory.MainTarget)iter.next(); 
+
+        command =  (String)options.get( MAIN_OPT_POST_COMPILER) 
+                        + " -classpath  .:" 
+                        + System.getProperty( "java.class.path") + " "
+                        + t.outputFile.getPath();
+
+        Compiler.verbose( "executing " + command);
+        
+        try 
+        {
+          proc = runtime.exec( command);
+
+          InputStreamReader err = 
+                    new InputStreamReader( proc.getErrorStream());
+          char[] c = new char[ 72];
+          int len;
+          while( (len = err.read( c)) > 0) {
+            System.err.print( String.valueOf( c, 0, len));
+          }
+
+          proc.waitFor();
+          if( proc.exitValue() > 0) {
+            System.exit( proc.exitValue());
+          }
+        }
+        catch( Exception e) 
+        { 
+          System.err.println( "Caught Exception while running post compiler: "
+                              + e.getMessage());
+          System.exit( 1);
+        }
+      }
     }
   }
 
@@ -111,6 +168,12 @@ public class Main
         i++;
         options.put( Compiler.OPT_FQCN, new Boolean( true));
       }
+      else if( args[i].equals( "-post"))
+      {
+        i++;
+        options.put( MAIN_OPT_POST_COMPILER, args[i]);
+        i++;
+      }
       else if( args[i].equals( "-stdout")) 
       {
         i++;
@@ -146,6 +209,8 @@ public class Main
                         + " names in comments");
     System.err.println( " -stdout                 print all source to stdout");
     System.err.println( " -dump                   dump the ast");
+    System.err.println( " -post <compiler>        run javac-like compiler" 
+                        + " after translation");
     System.err.println( " -v -verbose             print verbose " 
                         + "debugging info");
     System.err.println( " -version                print version info");

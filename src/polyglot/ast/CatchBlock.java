@@ -86,7 +86,7 @@ public class CatchBlock extends Node {
 
 
   public void visitChildren(NodeVisitor v) {
-    formalParameter.setType((TypeNode) formalParameter.getType().visit(v));
+    formalParameter.setType((TypeNode) formalParameter.getTypeNode().visit(v));
     block = (BlockStatement) block.visit(v);
   }
 

@@ -96,7 +96,7 @@ public abstract class ClassType extends Type {
    * Returns the supertype of this class.  For every class except Object, this
    * is non-null.
    **/
-  public abstract ClassType getSupertype();
+  public abstract Type getSuperType();
   /**
    * Returns a TypedList of the types of this class's interfaces.
    **/

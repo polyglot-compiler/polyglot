@@ -911,6 +911,7 @@ block ::=
 	;
 block_statements_opt ::=
 					// BlockStatement
+			{: RESULT = new BlockStatement(); :}
 	|	block_statements:a
 			{: RESULT = a; :}
 	;

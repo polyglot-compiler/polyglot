@@ -38,6 +38,7 @@ ast_files   =  AmbiguousExpression.java \
 			Node.java \
 			NodeVisitor.java \
 			NullLiteral.java \
+			ObjectPrimitiveCastExpression.java \
 			ReturnStatement.java \
 			SourceFileNode.java \
 			SpecialExpression.java \

@@ -32,7 +32,7 @@ public abstract class ClassTypeImpl extends ClassType {
   public List getInterfaces()           { return interfaces; }
 
   public AccessFlags getAccessFlags()   { return flags; }
-  public ClassType getSupertype()       { return superType; } 
+  public Type getSuperType()       { return superType; } 
   public boolean isInner()              { return isInner; } 
   public boolean isAnonymous()          { return isAnonymous; }
   public ClassType getContainingClass() { return containingClass; }
@@ -76,7 +76,7 @@ public abstract class ClassTypeImpl extends ClassType {
   // Typing info
   ////
   // The supertype.  (null for JLO)
-  protected ClassType superType;
+  protected Type superType;
   // The TypedList of interface types.
   protected TypedList interfaces;
   // The access flags for this class.

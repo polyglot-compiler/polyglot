@@ -1,6 +1,5 @@
 package jltools.types;
 
-import jltools.frontend.Compiler;
 import jltools.frontend.*;
 import jltools.ast.Node;
 
@@ -12,15 +11,18 @@ import java.util.*;
 public class SourceFileClassResolver implements ClassResolver
 {
   TargetFactory tf;
+  TargetTable tt;
 
-  public SourceFileClassResolver( TargetFactory tf)
+  public SourceFileClassResolver( TargetFactory tf, TargetTable tt)
   {
     this.tf = tf;
+    this.tt = tt;
   }
 
   public ClassType findClass( String name) throws TypeCheckException
   {
     Target t;
+    ClassResolver cr;
     
     try
     {
@@ -28,14 +30,13 @@ public class SourceFileClassResolver implements ClassResolver
     }
     catch( IOException e1)
     {
-      // e1.printStackTrace();
       throw new NoClassException( "Class " + name + " not found.");
     }
 
-    Compiler compiler = new Compiler();
     try
     {
-      if( !compiler.compile( t)) {
+      cr = tt.getResolver( t);
+      if( cr == null) {
         throw new NoClassException( "Errors while parsing " + t.getName());
       }
     }
@@ -45,7 +46,7 @@ public class SourceFileClassResolver implements ClassResolver
                                   + t.getName() + ": " + e2.getMessage());
     }
 
-    return Compiler.getParsedClassResolver().findClass( name);
+    return cr.findClass( name);
   }
 
   public void findPackage( String name) throws NoClassException {}

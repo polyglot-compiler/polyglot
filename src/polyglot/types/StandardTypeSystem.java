@@ -68,7 +68,7 @@ public class StandardTypeSystem extends TypeSystem {
       if ( ((ClassType)childType).equals ( OBJECT_))
         return false;
 
-      ClassType parentType = ((ClassType)childType).getSupertype();
+      ClassType parentType = (ClassType)((ClassType)childType).getSuperType();
       if (parentType.equals(ancestorType) ||
 	  descendsFrom(parentType, ancestorType))
 	return true;
@@ -370,6 +370,8 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public Type checkAndResolveType(Type type, Context context) throws TypeCheckException {
 
+    //    System.out.println( "resolving: " + type.getTypeString());
+
     if (type.isCanonical()) return type;
     if (type instanceof ArrayType) {
       ArrayType at = (ArrayType) type;
@@ -388,6 +390,9 @@ public class StandardTypeSystem extends TypeSystem {
     // Find the context.
     ClassType inClass = context.inClass;
 
+    //    System.out.println( "short? " + (TypeSystem.isNameShort(className)));
+
+
     // Is the name short?
     if (TypeSystem.isNameShort(className)) {
       // Sun's Java compiler seems to follow these steps.  The spec is
@@ -404,7 +409,7 @@ public class StandardTypeSystem extends TypeSystem {
 	// any inners by that name.  If they _both_ do, that's an error.
 	Type resultFromOuter = null;
 	Type resultFromParent = null;
-	ClassType parentType = inClass.getSupertype();
+	ClassType parentType = (ClassType)inClass.getSuperType();
 	ClassType outerType = inClass.getContainingClass();
 	if (outerType != null) {
 	  Context outerContext = new Context(emptyImportTable,
@@ -414,7 +419,13 @@ public class StandardTypeSystem extends TypeSystem {
 	if (parentType != null) {
 	  Context parentContext = new Context(emptyImportTable,
 					      parentType, null);
-	  resultFromParent = checkAndResolveType(type, parentContext);
+          // System.out.println( "recursing to parent..."); 
+          try
+          {
+            resultFromParent = checkAndResolveType(type, parentContext);
+          }
+          catch( TypeCheckException e) {}
+          //  System.out.println( "back from parent!");
 	}
 	if ((resultFromOuter instanceof ClassType) &&
 	    (resultFromParent instanceof ClassType)) {
@@ -429,11 +440,8 @@ public class StandardTypeSystem extends TypeSystem {
 
       // STEP 3
       // Check the import table.  Default to the null package.
-      try 
-      {  return context.table.findClass(className); }
-      catch (NoClassException nce) 
-      { throw new TypeCheckException(" No \"" + className + "\" found in context or import table."); }
-
+      //      context.table.dump();
+      return context.table.findClass(className);
     }
 
     // It looks like we've got a long name.  It can be of only one of
@@ -457,6 +465,7 @@ public class StandardTypeSystem extends TypeSystem {
 
     try
     {
+      //      System.out.println( "recursing to first prefix...");
       result = (ClassType)checkAndResolveType(new AmbiguousType(this, prefix),
                                               context);
     }
@@ -571,8 +580,10 @@ public class StandardTypeSystem extends TypeSystem {
     FieldInstance fi = null, fiEnclosing = null, fiTemp = null;
     ClassType tEnclosing = null;
 
+    /*
     if ( context.inClass  != null)
-      System.err.println(context.inClass.getTypeString() + " supertype: " + context.inClass.getSupertype());
+      System.err.println(context.inClass.getTypeString() + " supertype: " + context.inClass.getSuperType());
+    */
 
     if (type != null) // then we have a starting point. don't have to perform a 2d search
     {
@@ -592,7 +603,7 @@ public class StandardTypeSystem extends TypeSystem {
           }
         }
       }
-      while ( (type = type.getSupertype()) != null);
+      while ( (type = (ClassType)type.getSuperType()) != null);
     }
     else // type == null, ==> no starting point. so check superclasses as well as enclosing classes.
     {
@@ -670,7 +681,7 @@ public class StandardTypeSystem extends TypeSystem {
           }
         }
       }
-      while ( (type = type.getSupertype()) != null);
+      while ( (type = (ClassType)type.getSuperType()) != null);
       mti = null;
     }
     else // type == null, ==> no starting point. so check superclasses as well as enclosing classes.
@@ -725,7 +736,7 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public ClassType getSuperType(ClassType type) throws TypeCheckException
   {
-    return (ClassType)type.getSupertype();
+    return (ClassType)type.getSuperType();
   }
 
   /**

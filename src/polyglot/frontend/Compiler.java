@@ -1,9 +1,8 @@
 package jltools.frontend;
 
-import jltools.lex.Lexer;
-import jltools.ast.Node;
-import jltools.ast.SourceFileNode;
-import jltools.parse.Grm;
+import jltools.ast.*;
+import jltools.parse.*;
+import jltools.lex.*;
 import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
@@ -11,15 +10,9 @@ import jltools.visit.*;
 import java.io.*;
 import java.util.*;
 
-public class Compiler
+public class Compiler implements TargetTable
 {
-  private static TypeSystem ts;
-  private static CompoundClassResolver systemResolver;
-  private static TableClassResolver parsedResolver;
-  private static SourceFileClassResolver sourceResolver;
-  private static LoadedClassResolver loadedResolver;
-
-  private static Map options;
+  /* Global constants. */
   public static String OPT_OUTPUT_WIDTH     = "Output Width (Integer)";
   public static String OPT_VERBOSE          = "Verbose (Boolean)";
   public static String OPT_FQCN             = "FQCN (Boolean)";
@@ -29,17 +22,23 @@ public class Compiler
   public static int VERSION_MINOR           = 0;
   public static int VERSION_PATCHLEVEL      = 0;
 
+  /* Global options and state. */
+  private static Map options;
   private static int outputWidth;
   private static boolean useFqcn;
   private static boolean dumpAst;
-  private static Collection compilers;
-  protected static TargetFactory tf;
-  protected static ErrorQueueFactory eqf;
-  protected static List workList;
+  private static boolean verbose;
 
   private static boolean initialized = false;
 
+  /* Global factories. */
+  protected static TargetFactory tf;
+  protected static ErrorQueueFactory eqf;
 
+  /* What's done and what needs work. */  
+  protected static List workList;
+
+  /* Static initializer method. */
   public static void initialize( Map options, TargetFactory tf, 
                                  ErrorQueueFactory eqf)
   {
@@ -49,6 +48,7 @@ public class Compiler
     Integer width;
     Boolean fqcn;
     Boolean dump;
+    Boolean v;
 
     /* Read the options. */
     width = (Integer)options.get( OPT_OUTPUT_WIDTH);
@@ -69,22 +69,62 @@ public class Compiler
     }
     dumpAst = dump.booleanValue();
 
+    v = (Boolean)options.get( OPT_VERBOSE);
+    if( v == null) {
+      v = new Boolean( false);
+    }
+    verbose = v.booleanValue();
+    
+    /* Other setup. */
+    workList = Collections.synchronizedList( new LinkedList());
+    
+    initialized = true;
+  }
+
+  public static boolean useFullyQualifiedNames()
+  {
+    return useFqcn;
+  }
+
+  public static void verbose( String s)
+  {
+    if( verbose) {
+      System.err.println( "Main: " + s);
+    }
+  }
+ 
+  /* Instance fields. */
+  private TypeSystem ts;
+
+  private CompoundClassResolver systemResolver;
+  private CompoundClassResolver parsedResolver;
+  private SourceFileClassResolver sourceResolver;
+  private LoadedClassResolver loadedResolver;
+
+  /* Public constructor. */
+  public Compiler()
+  {
+    if( !initialized) {
+      throw new InternalCompilerError( "Unable to construct compiler "
+                       + "instance before static initialization.");
+    }
+    
     /* Set up the resolvers. */
     systemResolver = new CompoundClassResolver();
-    
-    parsedResolver = new TableClassResolver();
+        
+    parsedResolver = new CompoundClassResolver();
     systemResolver.addClassResolver( parsedResolver);
-
-    sourceResolver = new SourceFileClassResolver( tf);
+    
+    sourceResolver = new SourceFileClassResolver( tf, this);
     systemResolver.addClassResolver( sourceResolver);
-
+    
     loadedResolver = new LoadedClassResolver();
     systemResolver.addClassResolver( loadedResolver);
-
+    
     ts = new StandardTypeSystem( systemResolver);
-
-    loadedResolver.setTypeSystem( Compiler.ts);
-
+    
+    loadedResolver.setTypeSystem( ts);
+    
     try
     {
       ts.initializeTypeSystem();
@@ -95,81 +135,10 @@ public class Compiler
                                        "Failed to initialize type system: " +
                                        e.getMessage());
     }
-
-
-    /* Other setup. */
-    compilers = new LinkedList();
-    workList = Collections.synchronizedList( new LinkedList());
-
-    initialized = true;
   }
-
-  public static boolean cleanup() throws IOException
-  {
-    Compiler compiler = new Compiler();
-    boolean okay = true;
-
-    for( int i = 0; i < workList.size(); i++)
-    {
-      Job job = (Job)workList.get( i);
-      okay = okay && compiler.compile( job.t);
-    }
-    return okay;
-  }
-
-  public static ClassResolver getSystemClassResolver()
-  {
-    return systemResolver;
-  }
-  
-  public static ClassResolver getParsedClassResolver()
-  {
-    return parsedResolver;
-  }
-
-  public static boolean useFullyQualifiedNames()
-  {
-    return useFqcn;
-  }
-
-  static class Job
-  {
-    Target t;
-    ErrorQueue eq;
-    Node ast;
-    ImportTable it;
-
-    public Job( Target t, ErrorQueue eq) 
-    {
-      this.t = t;
-      this.eq = eq;
-      
-      ast = null;
-      it = null;
-    }
-    
-    boolean hasErrors = false;
-
-    public boolean equals( Object o) {
-      if( o instanceof Job) {
-        return t.equals( ((Job)o).t);
-      }
-      else {
-        return false;
-      }
-    }
-  }
-
-
-
-  public Compiler()
-  {
-    if( !initialized) {
-      throw new Error( "Unable to construct compiler instance before static " 
-                       + "initialization.");
-    }
-  }
-
+ 
+ 
+ /* Public Methods. */
   public boolean compileFile( String filename) throws IOException 
   {
     return compile( tf.createFileTarget( filename)) ;
@@ -180,64 +149,154 @@ public class Compiler
     return compile( tf.createClassTarget( classname));
   }
 
-  public boolean compile( Target t) throws IOException
+  public ClassResolver getResolver( Target t) throws IOException
   {
-    Job job = new Job( t,eqf.createQueue( t.getName(), t.getSourceReader()));
+    Job job = lookupJob( t);
+    boolean success = compile( job, Job.READ);
 
-    if( workList.contains( job)) {
-      job = (Job)workList.get( workList.indexOf( job));
-      if( job.eq.hasErrors()) {
-        return false;
-      }
+    if( success) {
+      return job.cr;
     }
     else {
-      workList.add( job);
+      return null;
     }
-     
+  }
+
+  public boolean compile( Target t) throws IOException
+  {
+    return compile( t, Job.TRANSLATED);
+  }
+ 
+  public boolean cleanup( Collection completed) throws IOException
+  {
+    boolean okay = true, success;
+    
+    for( int i = 0; i < workList.size(); i++)
+    {
+      Job job = (Job)workList.get( i);
+      success = compile( job, Job.TRANSLATED);
+      if( success) {
+        completed.add( job.t);
+      }
+      else {
+        okay = false;
+      }
+    }
+    return okay;
+  }
+
+
+  /* Protected methods. */
+  protected boolean compile( Target t, int goal) throws IOException
+  {
+    Job job = lookupJob( t);
+    return compile( job, goal);
+  }
+
+  protected boolean compile( Job job, int goal) throws IOException
+  {
+    if( hasErrors( job)) {
+      return false;
+    }
+
     try
     {
-      if( job.ast == null) {
+      /* PARSE. */
+      if( (job.status & Job.PARSED) == 0) {
+
+        verbose( "parsing " + job.t.getName() + "...");
         job.ast = parse( job.t, job.eq);
 
-        if( job.eq.hasErrors()) {
-          job.eq.flush();
+        if( hasErrors( job)) {
           return false;
         }
+
+        job.status |= Job.PARSED;
       }
-
-      if( dumpAst) {
-        dump( job.ast);
-      }
-
-      job.it = readSymbols( job.ast, job.eq);
-
-      /* At this point, if this is not the first thing in the workList
-       * then stop and continue later. */
-      if( workList.get( 0) != job) {
-        job.eq.flush();
-        return !(job.eq.hasErrors());
-      }
-
-      job.ast = removeAmbiguities( job.ast, job.it, job.eq);
-
-      if( dumpAst) {
-        dump( job.ast);
-      }
-
-      typeCheck( job.ast, job.it, job.eq);    
       
-      if( dumpAst) {
-        dump( job.ast);
+      if( dumpAst) { dump( job.ast); }
+      if( goal == Job.PARSED) { return true; }
+
+      /* READ. */
+      if( (job.status & Job.READ) == 0) {
+        verbose( "reading " + job.t.getName() + "...");
+        job.cr = new TableClassResolver();
+        parsedResolver.addClassResolver( job.cr);
+        job.it = readSymbols( job.ast, job.cr, job.eq);
+
+        job.status |= Job.READ;
       }
 
-      if( !job.eq.hasErrors()) {
+      if( goal == Job.READ) { return true; }
+
+      /* CLEAN. */
+      if( (job.status & Job.CLEANED) == 0) {
+        verbose( "cleaning " + job.t.getName() + "...");
+        job.cr.cleanupSignatures( ts, job.it, job.eq);
+        if( hasErrors( job)) {
+          return false;
+        }
+
+        job.status |= Job.CLEANED;
+      }
+
+      if( goal == Job.CLEANED) { return true; }
+
+      /* DISAMBIGUATE. */
+      if( (job.status & Job.DISAMBIGUATED) == 0) {
+        verbose( "disambiguating " + job.t.getName() + "...");
+        job.ast = removeAmbiguities( job.ast, job.cr, job.it, job.eq);
+        if( hasErrors( job)) {
+          return false;
+        }
+
+        job.status |= Job.DISAMBIGUATED;
+      }
+
+      if( dumpAst) { dump( job.ast); }
+      if( goal == Job.DISAMBIGUATED) { return true; }
+
+
+      /* Okay. Before we can type check, we need to make sure that 
+       * else in the worklist is at least CLEAN. */
+      boolean okay = true; 
+      for( int i = 0; i < workList.size(); i++) {
+        okay &= compile( (Job)workList.get( i), Job.CLEANED);
+      }
+      if( !okay) {
+        job.eq.enqueue( ErrorInfo.SEMANTIC_ERROR, "Unable to continue " 
+                    + "because of errors in dependencies.");
+        return false;
+      }
+
+
+      /* CHECK. */
+      if( (job.status & Job.CHECKED) == 0) {
+        verbose( "type checking " + job.t.getName() + "...");
+        typeCheck( job.ast, job.it, job.eq);    
+        if( hasErrors( job)) {
+          return false;
+        }
+        
+        job.status |= Job.CHECKED;
+      }
+
+      if( dumpAst) { dump( job.ast); }
+      if( goal == Job.CHECKED) { return true; }
+
+
+      /* TRANSLATE. */
+      if( (job.status & job.TRANSLATED) == 0) {
+        verbose( "translating " + job.t.getName() + "...");
         translate( job.t, job.ast);
+
+        job.status |= Job.TRANSLATED;
       }
     }
     catch( IOException e)
     {
       job.eq.enqueue( ErrorInfo.IO_ERROR, 
-                      "Encounted an I/O error while compiling.");
+                      "Encountered an I/O error while compiling.");
       job.eq.flush();
       throw e;
     }
@@ -248,8 +307,38 @@ public class Compiler
       return false;
     }
     else {
-      workList.remove( job);
       return true;
+    }
+  }
+ 
+  
+  
+  /* Protected Methods. */
+  protected Job lookupJob( Target t) throws IOException
+  {
+    Job job = new Job( t, eqf.createQueue( t.getName(), t.getSourceReader()));
+    
+    if( workList.contains( job)) {
+      job = (Job)workList.get( workList.indexOf( job));
+      if( job.eq.hasErrors()) {
+        return null;
+      }
+    }
+    else {
+      workList.add( job);
+    }
+
+    return job;
+  }
+
+  protected boolean hasErrors( Job job)
+  {
+    if( job.eq.hasErrors()) {
+      job.eq.flush();
+      return true;
+    }
+    else {
+      return false;
     }
   }
 
@@ -296,15 +385,17 @@ public class Compiler
     }
   }
 
-  protected ImportTable readSymbols( Node ast, ErrorQueue eq)
+  protected ImportTable readSymbols( Node ast, TableClassResolver cr,
+                                     ErrorQueue eq)
   {
-    SymbolReader sr = new SymbolReader( parsedResolver, ts, eq);
+    SymbolReader sr = new SymbolReader( systemResolver, cr, ts, eq);
     ast.visit( sr);
 
     return sr.getImportTable();
   }
 
-  protected Node removeAmbiguities( Node ast, ImportTable it, ErrorQueue eq)
+  protected Node removeAmbiguities( Node ast, TableClassResolver cr,
+                                    ImportTable it, ErrorQueue eq)
   {
     AmbiguityRemover ar = new AmbiguityRemover( ts, it, eq);
     return ast.visit( ar);
@@ -339,4 +430,45 @@ public class Compiler
     
     cw.flush();
   }
+  
+  
+ static class Job
+  {
+    Target t;
+    ErrorQueue eq;
+    Node ast;
+    ImportTable it;
+    TableClassResolver cr;
+
+    int status;
+
+    static final int PARSED         = 0x01;
+    static final int READ           = 0x02;
+    static final int CLEANED        = 0x04;
+    static final int DISAMBIGUATED  = 0x08;
+    static final int CHECKED        = 0x10;
+    static final int TRANSLATED     = 0x20;
+
+    public Job( Target t, ErrorQueue eq) 
+    {
+      this.t = t;
+      this.eq = eq;
+      
+      ast = null;
+      it = null;
+      cr = null;
+
+      status = 0;
+    }
+    
+    public boolean equals( Object o) {
+      if( o instanceof Job) {
+        return t.equals( ((Job)o).t);
+      }
+      else {
+        return false;
+      }
+    }
+  }
+  
 }

@@ -83,7 +83,7 @@ public class MainTargetFactory implements TargetFactory
     return new MainTarget( sourceFile.getName(), sourceFile, outputFile);
   }
 
-  class MainTarget extends Target
+  public class MainTarget extends Target
   {
     File sourceFile;
     File outputFile;
@@ -107,12 +107,21 @@ public class MainTargetFactory implements TargetFactory
       }
       else {
         if( outputFile == null) {
-          outputFile = new File( outputDirectory, 
-                                 packageName.replace( '.', File.separatorChar)
-                                 + File.separatorChar
-                                 + name.substring( 0, name.lastIndexOf( 
-                                     sourceExtension))
-                                 + ".java");
+          if( packageName == null) {
+            outputFile = new File( outputDirectory, 
+                                   File.separatorChar
+                                   + name.substring( 0, name.lastIndexOf( 
+                                       sourceExtension))
+                                   + ".java");
+          }
+          else {
+            outputFile = new File( outputDirectory, 
+                                   packageName.replace( '.', File.separatorChar)
+                                   + File.separatorChar
+                                   + name.substring( 0, name.lastIndexOf( 
+                                       sourceExtension))
+                                   + ".java");
+          }
         }
         if( !outputFile.getParentFile().exists()) {
           File parent = outputFile.getParentFile();

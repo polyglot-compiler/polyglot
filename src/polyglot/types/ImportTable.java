@@ -25,6 +25,19 @@ public  class ImportTable implements ClassResolver {
     packageImports = new HashSet();
   }
 
+  public void dump()
+  {
+    Iterator iter = map.keySet().iterator();
+    while( iter.hasNext()) {
+      System.out.println( "import " + (String)iter.next());
+    }
+
+    iter = packageImports.iterator();
+    while( iter.hasNext()) {
+      System.out.println( "import " + (String)iter.next());
+    }
+  }
+
   public void addClassImport(String className) throws TypeCheckException {
     ClassType class_ = resolver.findClass(className);
     String shortName = TypeSystem.getShortNameComponent(className);

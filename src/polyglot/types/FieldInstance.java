@@ -4,6 +4,8 @@
 
 package jltools.types;
 
+import jltools.util.AnnotatedObject;
+
 /**
  * FieldInstance
  *
@@ -12,7 +14,9 @@ package jltools.types;
  *    associated with a Java field: a set of access flags, a name, and
  *    a type.
  **/
-public class FieldInstance implements Cloneable, TypeInstance {
+public class FieldInstance extends AnnotatedObject 
+  implements Cloneable, TypeInstance 
+{
 
   public FieldInstance(String fieldName, Type fieldType, 
                        Type enclosingType, AccessFlags fieldFlags) {
@@ -24,6 +28,7 @@ public class FieldInstance implements Cloneable, TypeInstance {
 
   public AccessFlags getAccessFlags() { return flags.copy(); }
   public Type getType()         { return type; }
+  public void setType( Type type) { this.type = type; }
   public String getName()       { return name; }
   public Type getEnclosingType() { return enclosingType; }
 

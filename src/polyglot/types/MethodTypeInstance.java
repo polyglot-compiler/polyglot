@@ -39,13 +39,22 @@ public class MethodTypeInstance extends MethodType implements TypeInstance
     this.returnType = returnType;
     if (exceptionTypes != null)
       this.exceptionTypes = TypedList.copy(exceptionTypes,
-					   Type.class, true);
+					   Type.class, false);
 
     if (flags != null)
       this.flags = flags.copy();    
   }
 
-  public Type returnType()          { return returnType; }
+  public Type getReturnType()
+  {
+    return returnType; 
+  }
+  
+  public void setReturnType( Type returnType)  
+  {
+    this.returnType = returnType;
+  }
+
   public TypedList exceptionTypes() { 
     if (exceptionTypes == null)
       exceptionTypes = new TypedList(new ArrayList(),

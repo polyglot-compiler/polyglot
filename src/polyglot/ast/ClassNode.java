@@ -236,6 +236,11 @@ public class ClassNode extends ClassMember {
   public Node readSymbols( SymbolReader sr)
   {
     type = sr.pushClass( name);
+    if( superClass != null) {
+      type.setSuperType( superClass.getType());
+    }
+    type.setAccessFlags( accessFlags);
+
     visitChildren( sr);
     sr.popClass();
     
@@ -250,19 +255,6 @@ public class ClassNode extends ClassMember {
 
   public Node removeAmbiguities( LocalContext c) throws TypeCheckException
   {
-    //FIXME: this type of code should really be done on a vistBEFORE ( i.e, in adjust scope
-    //       but only for the removeambiguities pass.
-    //if ( type != null && type instanceof ParsedClassType)
-    //{
-    //    if ( superClass != null)
-    //      ((ParsedClassType)type).setSuperType( (ClassType) superClass.getType() );
-    //    else if ( !accessFlags.isInterface() ) 
-    //      ((ParsedClassType)type).setSuperType ( (ClassType) c.getTypeSystem().getObject() );
-    //    else 
-    //      ((ParsedClassType)type).setSuperType( null );
-    //  }
-    //    visitChildren ( vis );
-
     c.popClass(); 
     return this;
   }
@@ -335,7 +327,7 @@ public class ClassNode extends ClassMember {
   private AccessFlags accessFlags;
   private String name;
   private TypeNode superClass;
-  private ClassType type;
+  private ParsedClassType type;
   private List interfaceList;
   private List classMembers;
 }

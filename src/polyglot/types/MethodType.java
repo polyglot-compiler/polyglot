@@ -25,7 +25,7 @@ public class MethodType extends Type implements Cloneable {
 		    List argumentTypes) {
     super(ts);
     this.name = methodName;
-    this.argumentTypes = TypedList.copy(argumentTypes, Type.class, true);
+    this.argumentTypes = TypedList.copy(argumentTypes, Type.class, false);
   }  
 
   public MethodType copy() {

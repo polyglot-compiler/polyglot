@@ -5,6 +5,9 @@ import jltools.types.*;
 
 public class Statements
 {
+   Object o;
+   boolean b;
+
    public static final void main(String args[])
    {
       int i, n = 10, j = n;
@@ -28,11 +31,11 @@ public class Statements
 
    }
    
-   void foo()
+   void foo() throws Exception
    {
 LOOP:while( true)
      {
-       if( halts(this)) {
+       if( halts(this, false)) {
         break LOOP;       
       }
      }
@@ -40,7 +43,7 @@ LOOP:while( true)
    
    boolean halts(Object o, boolean b) throws Exception
    {
-     Object p = new Object(o);
+     Object p = new Object();
      if( halts(o, b))
        return true;
      else

@@ -22,6 +22,7 @@ tp_files 	= AccessFlags.java	\
 			ParsedClassType.java \
 			PrimitiveType.java \
 			TableClassResolver.java \
+			TargetTable.java \
 			Type.java \
 			TypeCheckException.java \
 			TypeInstance.java \

@@ -9,8 +9,9 @@ import jltools.util.*;
 
 public class SymbolReader extends NodeVisitor
 {
+  private ClassResolver systemResolver;
+  private TableClassResolver currentResolver;
   private TypeSystem ts;
-  private TableClassResolver cr;
   private ErrorQueue eq;
 
   private ParsedClassType current;
@@ -18,10 +19,13 @@ public class SymbolReader extends NodeVisitor
   private String packageName;
   private ImportTable it;
 
-  public SymbolReader( TableClassResolver cr, TypeSystem ts, ErrorQueue eq)
+  public SymbolReader( ClassResolver systemResolver, 
+                       TableClassResolver currentResolver, 
+                       TypeSystem ts, ErrorQueue eq)
   {
+    this.systemResolver = systemResolver;
+    this.currentResolver = currentResolver;
     this.ts = ts;
-    this.cr = cr;
     this.eq = eq;
     current = null;
   }
@@ -40,7 +44,7 @@ public class SymbolReader extends NodeVisitor
     }
   }
 
-  public ClassType pushClass( String name)
+  public ParsedClassType pushClass( String name)
   {
     String fullName;
 
@@ -55,7 +59,7 @@ public class SymbolReader extends NodeVisitor
     current = new ParsedClassType( ts, current);
     current.setFullName( fullName);
 
-    cr.addClass( fullName, current);
+    currentResolver.addClass( fullName, current);
 
     return current;
   }
@@ -74,7 +78,7 @@ public class SymbolReader extends NodeVisitor
   public void setPackageName( String packageName) throws TypeCheckException
   {
     this.packageName = packageName;
-    this.it = new ImportTable( Compiler.getSystemClassResolver());
+    this.it = new ImportTable( systemResolver);
 
     it.addPackageImport("java.lang");
     if( packageName != null) {

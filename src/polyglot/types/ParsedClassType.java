@@ -51,7 +51,7 @@ public class ParsedClassType extends ClassTypeImpl
     this.shortName = shortName;
   }
 
-  public void setSuperType( ClassType superType)
+  public void setSuperType( Type superType)
   {
     this.superType = superType;
   }
