@@ -107,6 +107,10 @@ public class Compiler implements TargetTable, ClassCleaner
 
     systemResolver = new CachingClassResolver( compoundResolver);
 
+    /* Other setup. */
+    workList = Collections.synchronizedList( new LinkedList());
+    workListMap = Collections.synchronizedMap( new HashMap());
+    
     try {
       ts.initializeTypeSystem( systemResolver, compiler);
     }
@@ -115,10 +119,6 @@ public class Compiler implements TargetTable, ClassCleaner
                                        "Failed to initialize type system: " +
                                        e.getMessage());
     }
-    
-    /* Other setup. */
-    workList = Collections.synchronizedList( new LinkedList());
-    workListMap = Collections.synchronizedMap( new HashMap());
     
     initialized = true;
   }
