@@ -1625,13 +1625,14 @@ cast_expression ::=
 				:}
 	|	LPAREN expression:a RPAREN 
 				unary_expression_not_plus_minus:b
-			{: RESULT = (CastExpression)Grm.ln(
-				new CastExpression((TypeNode)
+			{: /* XXX */
+			   CastExpression e = new CastExpression((TypeNode)
 				Grm.ln(new TypeNode( 
 				new AmbiguousNameType( parser.ts, 
 				((AmbiguousName) ((AmbiguousNameExpression)a).getPrefix()).toType(parser.ts),
 				((AmbiguousNameExpression)a).getName())), a),
-				b), a); :}
+				b);
+			   RESULT = (CastExpression)Grm.ln(e, a); :}
 	|	LPAREN name:a dims:b RPAREN unary_expression_not_plus_minus:c
 			{: Type t2 = new ArrayType(parser.ts, 
 				a.toType(parser.ts), b.intValue());

@@ -37,7 +37,7 @@ public class PackageContext implements TypeContext {
   public Type getType(String name) throws SemanticException {
     if (! TypeSystem.isNameShort(name)) {
 	throw new InternalCompilerError(
-	    "getTypeByName: cannot lookup qualified name");
+	    "getTypeByName: cannot lookup qualified name " + name);
     }
 
     try {

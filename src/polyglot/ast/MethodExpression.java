@@ -50,7 +50,7 @@ public class MethodExpression extends Expression
     this.args = TypedList.copyAndCheck( args, Expression.class, true);
 
     if (! TypeSystem.isNameShort(name)) {
-      throw new InternalCompilerError("Method name \"" + name +
+      throw new InternalCompilerError(this, "Method name \"" + name +
 	  "\" should be short.");
     }
   }

@@ -5,7 +5,6 @@
 package jltools.types;
 
 import jltools.util.AnnotatedObject;
-import jltools.util.InternalCompilerError;
 
 /**
  * FieldInstance

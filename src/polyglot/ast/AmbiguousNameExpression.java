@@ -53,7 +53,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
       }
 
       if (this.name == null) {
-	throw new InternalCompilerError("null ambiguous name");
+	throw new InternalCompilerError(prefix, "null ambiguous name");
       }
   }
 

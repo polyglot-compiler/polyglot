@@ -37,7 +37,7 @@ public class AmbiguousName extends Node implements AmbiguousNode {
       }
 
       if (this.name == null) {
-	throw new InternalCompilerError("null ambiguous name");
+	throw new InternalCompilerError(this, "null ambiguous name");
       }
   }
 

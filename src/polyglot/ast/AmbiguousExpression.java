@@ -12,13 +12,13 @@ public abstract class AmbiguousExpression extends Expression
 {
   public Node typeCheck( LocalContext c) throws SemanticException
   {
-    throw new InternalCompilerError( 
+    throw new InternalCompilerError(this,
                      "Attempt to type check an ambiguous node.");
   }
 
   public void translate_no_override( LocalContext c, CodeWriter w) 
   {
-    throw new InternalCompilerError( 
+    throw new InternalCompilerError(this,
                      "Attempt to translate an ambiguous node.");
   }
 

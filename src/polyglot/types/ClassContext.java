@@ -26,7 +26,7 @@ public class ClassContext implements TypeContext {
 
   public Type getType(String name) throws SemanticException {
     if (! TypeSystem.isNameShort(name)) {
-	throw new InternalCompilerError("cannot lookup qualified name");
+	throw new InternalCompilerError("cannot lookup qualified name " + name);
     }
 
     if (name.equals(type.getShortName())) {

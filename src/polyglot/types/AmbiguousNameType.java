@@ -37,7 +37,7 @@ public class AmbiguousNameType extends AmbiguousType
     }
 
     if (this.name == null) {
-      throw new InternalCompilerError("null ambiguous name type");
+      throw new InternalCompilerError(this, "null ambiguous name type");
     }
   }
 

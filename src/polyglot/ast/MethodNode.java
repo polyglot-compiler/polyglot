@@ -247,7 +247,7 @@ public class MethodNode extends ClassMember
       }
       catch( SemanticException e)
       {
-        throw new InternalCompilerError( e.toString());
+        throw new InternalCompilerError(this, e.toString());
       }
     }
     else {

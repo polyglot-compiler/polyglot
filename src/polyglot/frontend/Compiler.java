@@ -96,7 +96,7 @@ public class Compiler implements TargetTable, ClassCleaner
       type_system.initializeTypeSystem(systemResolver, this);
     }
     catch (SemanticException e) {
-      throw new InternalCompilerError( "Unable to initialize compiler. " + 
+      throw new InternalCompilerError("Unable to initialize compiler. " + 
                                        "Failed to initialize type system: " +
                                        e.getMessage());
     }

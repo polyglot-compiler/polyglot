@@ -69,6 +69,8 @@ public class Lexer {
     return !(ie instanceof EOF);
   }
 
+  public int getLineNum() { return line_num; }
+
   String comment;
   public String lastComment() { return comment; }
   public void clearComment() { comment=""; }

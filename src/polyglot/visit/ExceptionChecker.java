@@ -54,7 +54,7 @@ public class ExceptionChecker extends NodeVisitor
       }
       catch ( SemanticException se)
       {
-        throw new InternalCompilerError("Unexpected Semantic Exception.  "
+        throw new InternalCompilerError(n, "Unexpected Semantic Exception.  "
                                        +"It appears that type comparisons"
                                        + "are not working in the " +
                                         "TypeSystem.");

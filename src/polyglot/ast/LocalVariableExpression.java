@@ -16,15 +16,14 @@ public class LocalVariableExpression extends Expression
   /** 
    * Creates a new local variable reference.
    */
-  public LocalVariableExpression( Node ext, String name) 
-  {
+  public LocalVariableExpression( Node ext, String name) {
     this.ext = ext;
     this.name = name;
   }
 
-    public LocalVariableExpression( String name) {
-	this(null, name);
-    }
+  public LocalVariableExpression( String name) {
+    this(null, name);
+  }
 
   public LocalVariableExpression reconstruct( Node ext, String name)
   {

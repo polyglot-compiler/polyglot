@@ -298,7 +298,7 @@ public class NewObjectExpression extends Expression
       ClassType ct = null;
 
       if ( o.isClassType()) ct = o.toClassType();
-      else throw new InternalCompilerError("The constructor throws " +
+      else throw new InternalCompilerError(this, "The constructor throws " +
                                            " exceptions that are not of "
                                            + "ClassType");
 

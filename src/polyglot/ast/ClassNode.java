@@ -340,7 +340,7 @@ public class ClassNode extends ClassMember implements GlobalDeclaration
       // super type, if the assumption proves false, correct the mistake.
 
       if (type.getSuperType() != null || type.getInterfaces().size() != 1) {
-	throw new InternalCompilerError("Anonymous classes should be " +
+	throw new InternalCompilerError(this, "Anonymous classes should be " +
 	  "constructed with a null superclass and one super-interface");
       }
 

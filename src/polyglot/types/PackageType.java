@@ -38,7 +38,7 @@ public class PackageType extends Type
     }
 
     if (this.name == null) {
-      throw new InternalCompilerError("null package type");
+      throw new InternalCompilerError(this, "null package type");
     }
   }
 

@@ -176,7 +176,7 @@ public class UnaryExpression extends Expression
       break;
 
     default:
-      throw new InternalCompilerError( "Unknown unary operator: " + operator);
+      throw new InternalCompilerError(this, "Unknown unary operator: " + operator);
     }
      
     return this;

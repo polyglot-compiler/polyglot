@@ -35,7 +35,7 @@ public class FieldExpression extends Expression
   {
     if (target != null && ! (target instanceof TypeNode ||
 			     target instanceof Expression))
-     throw new InternalCompilerError( "Target of a field access must be a "
+     throw new InternalCompilerError(this, "Target of a field access must be a "
                                       + "type or expression.");
     this.ext = ext;
     this.target = target;
@@ -43,7 +43,7 @@ public class FieldExpression extends Expression
     this.fi = fi;
 
     if (name == null) {
-      throw new InternalCompilerError("Field name cannot be null");
+      throw new InternalCompilerError(this, "Field name cannot be null");
     }
   }
 
@@ -160,7 +160,7 @@ public class FieldExpression extends Expression
       ltype = ((TypeNode)target).getCheckedType();
     }
     else {
-      throw new InternalCompilerError(
+      throw new InternalCompilerError(this,
                               "Attempting field access on node of type " 
                               + target.getClass().getName());
     }
@@ -180,7 +180,7 @@ public class FieldExpression extends Expression
 	else {
 	  FieldInstance fi2 = c.getTypeSystem().getField(ltype, name, c);
 	  if (! fi.equals(fi2)) {
-	    throw new InternalCompilerError(
+	    throw new InternalCompilerError(this,
 	      "Type checked field inconsistency: was " +
 	      fi.getEnclosingType() + " now " + fi2.getEnclosingType());
 	  }

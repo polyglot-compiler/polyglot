@@ -38,7 +38,7 @@ public abstract class VariableInstance extends AnnotatedObject
 
   public Object getConstantValue() 
   { 
-    if ( oValue == null) throw new InternalCompilerError(
+    if ( oValue == null) throw new InternalCompilerError(this,
          "Tried to obtain constant value on a non-constant field.");
     return oValue;
   }

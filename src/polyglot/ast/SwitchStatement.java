@@ -126,7 +126,7 @@ public class SwitchStatement extends Statement
           vi = ((LocalVariableExpression)expr).getLocalInstance();
         
         if ( vi == null)
-          throw new InternalCompilerError("Variable Instance not defined!");
+          throw new InternalCompilerError(this, "Variable Instance not defined!");
         if ( ! vi.isConstant())
           throw new SemanticException("Case must be a constant.",
 				      Annotate.getLineNumber(expr));
