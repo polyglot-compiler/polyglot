@@ -17,6 +17,7 @@ import polyglot.types.Flags;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
+import polyglot.types.VarInstance;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -156,7 +157,10 @@ public class Field_c extends Expr_c implements Field
             target.getClass().getName() + ".");
     }
     
-    return fieldInstance(fi).type(fi.type());
+    Field_c f = (Field_c)fieldInstance(fi).type(fi.type());
+    f.checkConsistency(c);
+    
+    return f;
   }
 
   public Type childExpectedType(Expr child, AscriptionVisitor av)
@@ -237,6 +241,23 @@ public class Field_c extends Expr_c implements Field
     }
 
     return null;
+  }
+  
+  // check that the implicit target setting is correct.
+  protected void checkConsistency(Context c) {
+      if (targetImplicit) {
+          VarInstance vi = c.findVariableSilent(name);
+          if (vi instanceof FieldInstance) {
+              FieldInstance rfi = (FieldInstance) vi;
+              if (c.typeSystem().equals(rfi, fi)) {
+                  // all is OK.
+                  return;
+              }
+          }
+          throw new InternalCompilerError("Field " + this + " has an " +
+               "implicit target, but the name " + name + " resolves to " +
+               vi + " instead of " + target, position());
+      }      
   }
 
 }
