@@ -10,6 +10,7 @@ GOOD =  \
 	Except4.jl \
 	Except.jl \
 	FieldAccess.jl \
+	Field.jl \
 	FinalInit1.jl \
 	FinalInit2.jl \
 	FinalInit3.jl \
@@ -35,6 +36,7 @@ GOOD =  \
 	Inner7.jl \
 	Inner8.jl \
 	Inner9.jl \
+	Local.jl \
 	Prim.jl \
 	Return1.jl \
 	Return2.jl \
