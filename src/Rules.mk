@@ -56,6 +56,9 @@ all clean clobber javadoc release:
 $(PACKAGEPATH)/%.class: %.java
 	$(JC) $(JC_FLAGS) $<
 
+JLGEN_MAIN: 
+	sh -c 'cd $(SOURCE)/jltools/util/jlgen/; make'
+
 cleanclasses:
 	-rm -f $(PACKAGEPATH)/*.class
 
@@ -113,5 +116,6 @@ endef
 
 
 define jlgen
-	$(JAVA) -classpath $(CLASSPATH) jltools.util.jlgen.JLgen $<
+	$(JAVA) -classpath $(CLASSPATH) jltools.util.jlgen.JLgen
 endef
+
