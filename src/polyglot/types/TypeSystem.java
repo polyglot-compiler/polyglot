@@ -157,6 +157,13 @@ public interface TypeSystem {
     boolean equals(TypeObject type1, TypeObject type2);
 
     /**
+     * Returns true if <code>value</code> can be implicitly cast to type
+     * <code>t</code>.  This method should be removed.  It is kept for backward
+     * compatibility.
+     */
+    boolean numericConversionValid(Type t, long value);
+
+    /**
      * Returns true if <code>value</code> can be implicitly cast to
      * type <code>t</code>.
      */

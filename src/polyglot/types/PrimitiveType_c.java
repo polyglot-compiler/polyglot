@@ -131,6 +131,15 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
 
     /**
      * Returns true if literal value <code>value</code> can be converted to
+     * this primitive type.  This method should be removed.  It is kept
+     * for backward compatibility.
+     */
+    public boolean numericConversionValidImpl(long value) {
+        return numericConversionValidImpl(new Long(value));
+    }
+
+    /**
+     * Returns true if literal value <code>value</code> can be converted to
      * this primitive type.
      */
     public boolean numericConversionValidImpl(Object value) {

@@ -332,6 +332,16 @@ public class TypeSystem_c implements TypeSystem
         return t.numericConversionValidImpl(value);
     }
 
+    /**
+     * Returns true if <code>value</code> can be implicitly cast to Primitive
+     * type <code>t</code>.  This method should be removed.  It is kept for
+     * backward compatibility.
+     */
+    public boolean numericConversionValid(Type t, long value) {
+        assert_(t);
+        return t.numericConversionValidImpl(value);
+    }
+
     ////
     // Functions for one-type checking and resolution.
     ////

@@ -77,6 +77,11 @@ public interface Type extends Qualifier
     boolean numericConversionValid(Object value);
 
     /**
+     * Return true a literal <code>value</code> can be converted to this type.
+     */
+    boolean numericConversionValid(long value);
+
+    /**
      * Return true if this type is a subtype of <code>ancestor</code>.
      */
     boolean isSubtypeImpl(Type t);
@@ -101,6 +106,12 @@ public interface Type extends Qualifier
      * Return true a literal <code>value</code> can be converted to this type.
      */
     boolean numericConversionValidImpl(Object value);
+
+    /**
+     * Return true a literal <code>value</code> can be converted to this type.
+     * This method should be removed.  It is kept for backward compatibility.
+     */
+    boolean numericConversionValidImpl(long value);
 
     /**
      * Return true if a primitive type.
@@ -196,6 +207,12 @@ public interface Type extends Qualifier
      * Return true if an unchecked exception.
      */
     boolean isUncheckedException();
+
+    /**
+     * Return true if the types can be compared; that is, if they have
+     * the same type system.
+     */
+    boolean isComparable(Type t);
 
     /**
      * Yields a string representing this type.  The string
