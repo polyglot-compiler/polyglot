@@ -583,56 +583,56 @@ ext=""
   <target name="jl-dist" depends="cup,polyglot-jar,dist-dir">
     <copy todir="${dist}/lib" file="${lib}/polyglot.jar"/>
 
-    <copy todir="${dist}/src/polyglot/ast">
+    <copy todir="${dist}/src/polyglot/ast" includeEmptyDirs="false">
       <fileset dir="${src}/polyglot/ast" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/src/polyglot/ext/jl">
+    <copy todir="${dist}/src/polyglot/ext/jl" includeEmptyDirs="false">
       <fileset dir="${src}/polyglot/ext/jl"
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
     </copy>
 
-    <copy todir="${dist}/src/polyglot/frontend">
+    <copy todir="${dist}/src/polyglot/frontend" includeEmptyDirs="false">
       <fileset dir="${src}/polyglot/frontend" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/src/polyglot/lex">
+    <copy todir="${dist}/src/polyglot/lex" includeEmptyDirs="false">
       <fileset dir="${src}/polyglot/lex" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/src/polyglot/main">
+    <copy todir="${dist}/src/polyglot/main" includeEmptyDirs="false">
       <fileset dir="${src}/polyglot/main" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/src/polyglot/parse">
+    <copy todir="${dist}/src/polyglot/parse" includeEmptyDirs="false">
       <fileset dir="${src}/polyglot/parse" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/src/polyglot/types">
+    <copy todir="${dist}/src/polyglot/types" includeEmptyDirs="false">
       <fileset dir="${src}/polyglot/types" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/src/polyglot/util">
+    <copy todir="${dist}/src/polyglot/util" includeEmptyDirs="false">
       <fileset dir="${src}/polyglot/util" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/src/polyglot/visit">
+    <copy todir="${dist}/src/polyglot/visit" includeEmptyDirs="false">
       <fileset dir="${src}/polyglot/visit" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/src/java_cup">
+    <copy todir="${dist}/src/java_cup" includeEmptyDirs="false">
       <fileset dir="${src}/java_cup"/>
     </copy>
 
-    <copy todir="${dist}/src/ppg">
+    <copy todir="${dist}/src/ppg" includeEmptyDirs="false">
       <fileset dir="${src}/ppg"
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
     </copy>
 
     <copy todir="${dist}/src/polyglot/ext/jl/tests" file="${src}/polyglot/ext/jl/tests/Makefile"/>
 
-    <copy todir="${dist}/tools">
-      <fileset dir="$tools"/>
+    <copy todir="${dist}/tools" includeEmptyDirs="false">
+      <fileset dir="tools"/>
     </copy>
 
     <copy file="${bin}/jlc.in" todir="${dist}/bin"/>
