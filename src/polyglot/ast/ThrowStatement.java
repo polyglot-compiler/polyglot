@@ -1,98 +1,85 @@
-/*
- * ThrowStatement.java
- */
-
 package jltools.ast;
+
 import jltools.util.*;
 import jltools.types.*;
+import jltools.visit.*;
 
 /**
- * ThrowStatement
- * 
- * Overview: ThrowStatement is a mutable representation of a throw
- *    statement.  ThrowStatement contains a single Expression which
- *    evaluates to the object being thrown.
+ * A <code>ThrowStatement</code> is an immutable representation of a
+ * <code>throw</code> statement. Such a statement  contains a single
+ * <code>Expression</code> which evaluates to the object being thrown.
  */
-public class ThrowStatement extends Statement {
+public class ThrowStatement extends Statement 
+{
+  protected final Expression expr;
   
   /**
-   * Effects: Creates a new ThrowStatement which throws the value
-   * of the Expression <expr>.
+   * Creates a new <code>ThrowStatement</code>.
    */
-  public ThrowStatement (Expression expr) {
+  public ThrowStatement( Expression expr) 
+  {
     this.expr = expr;
+  }
+  
+  /**
+   * Lazily reconstruct this node.
+   */
+  public ThrowStatement reconstruct( Expression expr)
+  {
+    if( this.expr == expr) {
+      return this;
+    }
+    else {
+      ThrowStatement n = new ThrowStatement( expr);
+      n.copyAnnotationsFrom( this);
+      return this;
+    }
   }
 
   /** 
-   * Effects: Returns the expression whose value is thrown by
-   *    this ThrowStatement.
+   * Returns the expression whose value is thrown by this statement.
    */
-  public Expression getExpression() {
+  public Expression getExpression() 
+  {
     return expr;
   }
 
   /**
-   * Effects: Sets the expression being thrown by this ThrowStatement
-   *    to <newExpr>.
+   * Visit the children of this node.
    */
-  public void setExpression(Expression newExpr) {
-    expr = newExpr;
-  }
-
-   /**
-    *
-    */
-  Object visitChildren(NodeVisitor v)
+  Node visitChildren( NodeVisitor v)
   {
-    expr = (Expression)expr.visit( v);
-    return v.mergeVisitorInfo( Annotate.getVisitorInfo( this),
-                               Annotate.getVisitorInfo( expr));
+    return reconstruct( (Expression)expr.visit( v));
   }
 
-   public Node typeCheck(LocalContext c)
-   {
-     return this;
-   }
+  public Node typeCheck( LocalContext c)
+  {
+    return this;
+  }
 
   public Node exceptionCheck( ExceptionChecker ec ) throws SemanticException
   {
      if (! expr.getCheckedType().isThrowable())
-       throw new TypeCheckException("Can only throw objects that extend from " 
+       throw new SemanticException("Can only throw objects that extend from " 
                                     + "\"java.lang.Throwable\"");
      else
-       ec.throwsException ( expr.getCheckedType() );
+       ec.throwsException ( (ClassType)expr.getCheckedType() );
      return this;
   }
 
-   public void  translate(LocalContext c, CodeWriter w)
-   {
-      w.write("throw ");
-      expr.translate(c, w);
-      w.write(";");
-   }
-
-   public Node dump( CodeWriter w)
-   {
-      w.write( "( THROW");
-      dumpNodeInfo( w);
-      w.write( ")");
-      return null;
-   }
+  public void translate( LocalContext c, CodeWriter w)
+  {
+    w.write("throw ");
+    expr.translate(c, w);
+    w.write("; ");
+  }
   
-  public Node copy() {
-    ThrowStatement ts = new ThrowStatement(expr);
-    ts.copyAnnotationsFrom(this);
-    return ts;
+  public void dump( CodeWriter w)
+  {
+    w.write( "( THROW");
+    dumpNodeInfo( w);
+    w.write( ")");
   }
-
-  public Node deepCopy() {
-    ThrowStatement ts = new ThrowStatement((Expression) expr.deepCopy());
-    ts.copyAnnotationsFrom(this);
-    return ts;
-  }
-
-  private Expression expr;
-
 }
   
 

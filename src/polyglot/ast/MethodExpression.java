@@ -105,7 +105,7 @@ public class MethodExpression extends Expression
     Node newTarget = null;
 
     if( target != null) {
-      target.visit( v);
+      newTarget = target.visit( v);
     }
     
     List newArgs = new ArrayList( args.size());

@@ -10,7 +10,7 @@ public class Statements
 
    public static final void main(String args[])
    {
-      int i, n = 10, j = n;
+      int i, n = 10, j = 0; // n
       boolean b;
      
       System.out.println("Hello World!");
@@ -25,7 +25,7 @@ public class Statements
       for( int x = 0, y = 0; x < y * y; x++, y++)
         System.out.println( "x: " + x + " y: " + y);
 
-      TypeSystem ts = new StandardTypeSystem( null);
+      TypeSystem ts = new StandardTypeSystem();
       Statements s = new Statements();
       Constants c = new Constants();
 

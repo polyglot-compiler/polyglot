@@ -20,8 +20,6 @@ public class Compiler implements TargetTable, ClassCleaner
   public static String OPT_OUTPUT_WIDTH     = "Output Width (Integer)";
   public static String OPT_VERBOSE          = "Verbose (Boolean)";
   public static String OPT_FQCN             = "FQCN (Boolean)";
-  public static String OPT_DUMP             = "Dump AST (Boolean)";
-  public static String OPT_SCRAMBLE         = "Scramble AST (Boolean)";
 
   public static int VERSION_MAJOR           = 1;
   public static int VERSION_MINOR           = 0;
@@ -31,8 +29,6 @@ public class Compiler implements TargetTable, ClassCleaner
   private static Map options;
   private static int outputWidth;
   private static boolean useFqcn;
-  private static boolean dumpAst;
-  private static boolean scrambleAst;
   private static boolean verbose;
 
   private static boolean initialized = false;
@@ -131,43 +127,15 @@ public class Compiler implements TargetTable, ClassCleaner
                                  TargetFactory tf)
   {
     Compiler.options = options;
+    Compiler.ts = ts;
     Compiler.tf = tf;
-    Integer width;
-    Boolean fqcn;
-    Boolean dump;
-    Boolean scramble;
-    Boolean v;
-
+ 
     /* Read the options. */
-    width = (Integer)options.get( OPT_OUTPUT_WIDTH);
-    if( width == null) {
-      width = new Integer( 72);
-    }
-    outputWidth = width.intValue();
+    outputWidth = ((Integer)options.get( OPT_OUTPUT_WIDTH)).intValue();
 
-    fqcn = (Boolean)options.get( OPT_FQCN);
-    if( fqcn == null) {
-      fqcn = new Boolean( false);
-    }
-    useFqcn = fqcn.booleanValue();
+    useFqcn = ((Boolean)options.get( OPT_FQCN)).booleanValue();
 
-    dump = (Boolean)options.get( OPT_DUMP);
-    if( dump == null) {
-      dump = new Boolean( false);
-    }
-    dumpAst = dump.booleanValue();
-
-    scramble = (Boolean)options.get( OPT_SCRAMBLE);
-    if( scramble == null) {
-      scramble = new Boolean( false);
-    }
-    scrambleAst = scramble.booleanValue();
-
-    v = (Boolean)options.get( OPT_VERBOSE);
-    if( v == null) {
-      v = new Boolean( false);
-    }
-    verbose = v.booleanValue();
+    verbose = ((Boolean)options.get( OPT_VERBOSE)).booleanValue();
 
     /* Set up the resolvers. */
     systemResolver = new CompoundClassResolver();
@@ -175,7 +143,7 @@ public class Compiler implements TargetTable, ClassCleaner
     parsedResolver = new CompoundClassResolver();
     systemResolver.addClassResolver( parsedResolver);
     
-    sourceResolver = new SourceFileClassResolver( tf, /* FIXME!! */ null);
+    sourceResolver = new SourceFileClassResolver( tf, new Compiler( null));
     systemResolver.addClassResolver( sourceResolver);
     
     loadedResolver = new LoadedClassResolver();
@@ -225,6 +193,14 @@ public class Compiler implements TargetTable, ClassCleaner
       throw new InternalCompilerError( "Unable to construct compiler "
                        + "instance before static initialization.");
     }
+  }
+
+  /**
+   * This constructor is used by the static initializer to create new
+   * instances before initialization is comlete.
+   */
+  private Compiler( Object dummy)
+  {
   }
  
  
@@ -407,7 +383,7 @@ public class Compiler implements TargetTable, ClassCleaner
       if( (job.status & CHECKED) == 0) {
         acquireJob( job);
         if( (job.status & CHECKED) == 0) {
-          verbose( this, "type checking " + job.t.getName() + "...");
+          verbose( this, "checking " + job.t.getName() + "...");
           typeCheck( job.ast, job.it, eq);    
           
           if( hasErrors( job)) { releaseJob( job); return false; }
@@ -446,12 +422,12 @@ public class Compiler implements TargetTable, ClassCleaner
     catch( RuntimeException rte)
     {
       if( job.ast != null) {
-        CodeWriter cw = new CodeWriter( new UnicodeWriter( 
+        CodeWriter w = new CodeWriter( new UnicodeWriter( 
                                           new FileWriter( "ast.dump")), 
                                         outputWidth);
-        DumpAst d = new DumpAst( cw);
+        DumpAst d = new DumpAst( w);
         job.ast.visit( d);
-        cw.flush();
+        w.flush();
       }
       throw rte;
     }
@@ -506,8 +482,8 @@ public class Compiler implements TargetTable, ClassCleaner
         {
           throw new InternalCompilerError( e.getMessage());
         }
-        job.status |= IN_USE;
       }
+      job.status |= IN_USE;
     }
   }
 
@@ -520,7 +496,7 @@ public class Compiler implements TargetTable, ClassCleaner
     }
   }
 
-  protected boolean hasErrors( Job job)
+  protected boolean hasErrors( Job job) throws IOException
   {
     ErrorQueue eq = job.t.getErrorQueue();
     if( eq.hasErrors()) {
@@ -564,9 +540,11 @@ public class Compiler implements TargetTable, ClassCleaner
       return null;
     }
 
+    /*
     if( sym.value instanceof SourceFileNode) {
       ((SourceFileNode)sym.value).setFilename( t.getName());
     }
+    */
 
     if( !(sym.value instanceof Node)) {
       eq.enqueue( ErrorInfo.SYNTAX_ERROR, "Unable to parse source file.");
@@ -578,7 +556,7 @@ public class Compiler implements TargetTable, ClassCleaner
   }
 
   protected ImportTable readSymbols( Node ast, TableClassResolver cr,
-                                     Target t)
+                                     Target t) throws IOException
   {
     SymbolReader sr = new SymbolReader( systemResolver, cr, t, tf, ts, 
                                         t.getErrorQueue());
@@ -604,25 +582,13 @@ public class Compiler implements TargetTable, ClassCleaner
     throws IOException
   {
     SourceFileNode sfn = (SourceFileNode)ast;
-    CodeWriter cw = new CodeWriter( t.getOutputWriter( sfn.getPackageName()), 
+    CodeWriter w = new CodeWriter( t.getOutputWriter( sfn.getPackageName()), 
                                     outputWidth);
     
-    ast.translate( new LocalContext(it, ts), cw);
+    ast.translate( new LocalContext(it, ts, null), w);
     
-    cw.flush();
+    w.flush();
     System.out.flush();
-  }
-
-  protected void dump( Node ast) throws IOException
-  {
-    CodeWriter cw = new CodeWriter( new UnicodeWriter( 
-                                       new PrintWriter( System.out)), 
-                                    outputWidth);
-    DumpAst d = new DumpAst( cw);
-    
-    ast.visit( d);
-    
-    cw.flush();
   }
 
   protected Node runVisitors( Target t, Node ast, int stage)
@@ -631,7 +597,9 @@ public class Compiler implements TargetTable, ClassCleaner
     Node result = ast;
 
     while( (v = t.getNextNodeVisitor( stage)) != null) {
+      verbose( this, "running visitor " + v.getClass().getName() + "...");
       result = result.visit( v);
+      v.finish();
     }
 
     return result;

@@ -6,6 +6,7 @@ import jltools.ast.*;
 import jltools.lex.*;
 import jltools.types.*;
 import jltools.util.*;
+import jltools.ext.op.*;
 
 import java.util.*;
 
@@ -38,24 +39,35 @@ parser code  {:
   }
   
   public static Node ln(Node n, Token t) {
-    if(n != null && t != null)
+    if( n != null && t != null) {
     	Annotate.setLineNumber(n, t.getLineNumber()); 
+    }
     return n;
   }
   
   public static Node ln(Node n, Node m) {
-    if(n != null && m != null)
+    if( n != null && m != null) {
     	Annotate.setLineNumber(n, Annotate.getLineNumber(m)); 
+    }
     return n;
   }
 
-  public static TypeNode dim(TypeNode n, int additionalDimensions) {
-    if(additionalDimensions > 0)
-    {
-      Type type = n.getType();
-      n.setType(new ArrayType(type.getTypeSystem(), type, additionalDimensions));
+  public static TypeNode dim(TypeNode n, int addDims) {
+    if(addDims > 0) {
+      Type type = n.getType(), newType = new ArrayType( type.getTypeSystem(), 
+                                                        type, addDims);
+      return n.reconstruct( newType, newType.getTypeString());
     }
-    return n;
+    else {
+      return n; 
+    }
+  }
+
+  public static void addAll( List l, Iterator iter)
+  {
+    while( iter.hasNext()) {
+      l.add( iter.next());
+    }
   }
 
   public void syntax_error(java_cup.runtime.Symbol current) {
@@ -135,7 +147,7 @@ terminal Token ANDEQ, XOREQ, OREQ; // assignment_operator
 
 terminal IntegerLiteral INTEGER_LITERAL;
 terminal jltools.lex.DoubleLiteral FLOATING_POINT_LITERAL;
-terminal BooleanLiteral BOOLEAN_LITERAL;
+terminal jltools.lex.BooleanLiteral BOOLEAN_LITERAL;
 terminal jltools.lex.CharacterLiteral CHARACTER_LITERAL;
 terminal jltools.lex.StringLiteral STRING_LITERAL;
 terminal jltools.lex.NullLiteral NULL_LITERAL;
@@ -286,7 +298,8 @@ literal ::=
 					jltools.ast.FloatLiteral(
 					a.getValue().doubleValue()), a); :}
 	|	BOOLEAN_LITERAL:a
-			{: RESULT = (jltools.ast.Literal)Grm.ln(new IntLiteral(
+			{: RESULT = (jltools.ast.Literal)Grm.ln(new 
+					jltools.ast.BooleanLiteral(
 					a.getValue().booleanValue()), a); :}
 	|	CHARACTER_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(
@@ -424,7 +437,7 @@ compilation_unit ::=
 		import_declarations_opt:b
 		type_declarations_opt:c
 			{: RESULT = (SourceFileNode)Grm.ln
-				(new SourceFileNode(/* FIXME */ null, 
+				(new SourceFileNode( 
 				(a == null ? null : a.getName()),
 				b, c), a); :}
 		;
@@ -684,29 +697,46 @@ variable_initializer ::=
 method_declaration ::=
 					// MethodNode
 		method_header:a method_body:b
-			{: RESULT = a; a.setBody(b); :}
+			{: List f = new LinkedList(), e = new LinkedList(); 
+				Grm.addAll( f, a.formalParameters());
+				Grm.addAll( e, a.exceptions());
+				RESULT = a.reconstruct( false, 
+				a.getAccessFlags(), (TypeNode)
+				Grm.ln( new TypeNode( a.getReturnType()), a), 
+				a.getName(), f, e, b, 0); :}
 	;
 method_header ::=
 					// MethodNode
 		modifiers_opt:a type:b method_declarator:c throws_opt:d
-			{: RESULT = (MethodNode)Grm.ln(c, b);
-				c.setAccessFlags(a); c.setReturnType(b); 
-				c.setExceptions(d); :}
-					
+			{: List f = new LinkedList(); 
+				Grm.addAll( f, c.formalParameters());
+				RESULT = c.reconstruct( false, a, 
+				b, c.getName(), f, d,
+				c.getBody(), 0); :}
 	|	modifiers_opt:a VOID:n method_declarator:c throws_opt:d
-			{: RESULT = (MethodNode)Grm.ln(c, n);
-				c.setAccessFlags(a); 
-				c.setReturnType(new PrimitiveType(parser.ts,
-				PrimitiveType.VOID)); c.setExceptions(d); :}
+			{: List f = new LinkedList(); 
+				Grm.addAll( f, c.formalParameters());
+				RESULT = c.reconstruct( false, a, 
+				(TypeNode)Grm.ln( new TypeNode( 
+				parser.ts.getVoid()), n), c.getName(), f, d,
+				c.getBody(), 0); :}
 	;
 method_declarator ::=
 					// MethodNode
 		IDENTIFIER:a LPAREN formal_parameter_list_opt:b RPAREN
-			{: RESULT = (MethodNode)Grm.ln(new MethodNode(null, 
+			{: RESULT = (MethodNode)Grm.ln(new MethodNode(
+				new AccessFlags(), 
 				null, a.getIdentifier(), b, new LinkedList(), 
-				null), a); :}
+				new BlockStatement()), a); :}
 	|	method_declarator:a LBRACK RBRACK // deprecated
-			{: RESULT = a; a.addAdditionalDimension(); :}
+			{: List f = new LinkedList(), e = new LinkedList();
+				Grm.addAll( f, a.formalParameters());
+				Grm.addAll( e, a.exceptions());
+				RESULT = a.reconstruct(false, 
+				a.getAccessFlags(),
+				(TypeNode)Grm.ln(new TypeNode(
+				a.getReturnType()), a), a.getName(), f, e, 
+				a.getBody(), 1); :}
 	// be careful; the above production also allows 'void foo() []'
 	;
 formal_parameter_list_opt ::=		
@@ -771,25 +801,28 @@ constructor_declaration ::=
 					// MethodNode
 		modifiers_opt:a constructor_declarator:b throws_opt:c 
 			constructor_body:d
-			{: RESULT = b; b.setAccessFlags(a); b.setExceptions(c);
-				b.setBody(d); :}
+			{: List f = new LinkedList(); Grm.addAll(f, 
+				b.formalParameters());
+				RESULT = b.reconstruct( true, a, null, null,
+				f, c, d, 0); :}
 	;
 constructor_declarator ::=
 					// MethodNode
 		simple_name:a LPAREN formal_parameter_list_opt:b RPAREN
-			{: RESULT = (MethodNode)Grm.ln(new MethodNode(null,
-				a.getName(), b, new LinkedList(), 
-				null), a); :}
+			{: RESULT = (MethodNode)Grm.ln(new MethodNode(
+				new AccessFlags(),
+				b, new LinkedList(), null), a); :}
 	;
 constructor_body ::=
 					// BlockStatement
 		LBRACE explicit_constructor_invocation:a
 			block_statements:b RBRACE
-			{: RESULT = (BlockStatement)Grm.ln(b, a); 
-				b.addStatement(a, 0); :}
+			{: List l = new LinkedList(); l.add(a);
+				Grm.addAll(l, b.statements());
+				RESULT = b.reconstruct(l); :}
 	|	LBRACE explicit_constructor_invocation:a RBRACE
-			{: BlockStatement b = new BlockStatement();
-				b.addStatement(a); 
+			{: List l = new LinkedList(); l.add(a);
+				BlockStatement b = new BlockStatement( l);
 				RESULT = (BlockStatement)Grm.ln(b, a); :}
 	|	LBRACE block_statements:a RBRACE
 			{: RESULT = a; :}		
@@ -922,11 +955,11 @@ block_statements_opt ::=
 block_statements ::=
 					// BlockStatement
 		block_statement:a
-			{: BlockStatement b = new BlockStatement();
-				b.addStatement(a); 
+			{: List l = new LinkedList(); l.add(a);
+				BlockStatement b = new BlockStatement(l);
 				RESULT = (BlockStatement)Grm.ln(b,a); :}
 	|	block_statements:a block_statement:b
-			{: RESULT = a; a.addStatement(b); :}
+			{: RESULT = a.appendStatement(b); :}
 	;
 block_statement ::=
 					// Statement
@@ -1294,7 +1327,7 @@ primary_no_new_array ::=
 	|	primitive_type:a DOT CLASS
 			{: RESULT = (Expression)Grm.ln(
 				new FieldExpression((TypeNode)Grm.ln(
-				new TypeNode(a), a), "class"), a); :}
+				new TypeNode(a.getType()), a), "class"), a); :}
 	|	VOID:a DOT CLASS
 			{: RESULT = (Expression)Grm.ln(new FieldExpression( 
 			       Grm.ln(new TypeNode(new PrimitiveType(parser.ts,
@@ -1417,9 +1450,9 @@ field_access ::=
 				a.getIdentifier()), a); :}
 	|	name:a DOT SUPER DOT IDENTIFIER:b
 			{: RESULT = (FieldExpression)Grm.ln(
-				new FieldExpression(a,
-				b.getIdentifier()), a); 
-				a.addIdentifier("super"); :}
+				new FieldExpression(
+				a.reconstruct(a.getName() + ".super"),
+				b.getIdentifier()), a); :}
 	;
 method_invocation ::=
 					// MethodExpression
@@ -1526,12 +1559,12 @@ unary_expression_not_plus_minus ::=
 cast_expression ::=
 					// CastExpression
 		LPAREN primitive_type:a dims_opt:b RPAREN unary_expression:c
-			{: Type t = (b.intValue() == 0 ? a.getType() :
-			    new ArrayType(parser.ts,a.getType(),b.intValue()));
+			{: TypeNode tn = (TypeNode)Grm.ln( new TypeNode( 
+			        (b.intValue() == 0 ? a.getType() :
+			new ArrayType(parser.ts,a.getType(),b.intValue()))),a);
 				RESULT = (ObjectPrimitiveCastExpression)Grm.ln(
-				new ObjectPrimitiveCastExpression( t, c), a);
-				Type t1 = a.getType(); a.setType(
-				t1.extendArrayDims(b.intValue())); :}
+				new ObjectPrimitiveCastExpression( tn, c), a);
+				:}
 	|	LPAREN expression:a RPAREN 
 				unary_expression_not_plus_minus:b
 			{: RESULT = (ObjectPrimitiveCastExpression)Grm.ln(

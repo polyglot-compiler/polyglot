@@ -50,7 +50,7 @@ public class TypeNode extends Node
    */
   public TypeNode reconstruct( Type type, String original) 
   {
-    if( this.type != type && this.original.equals( original)) {
+    if( this.type == type && this.original.equals( original)) {
       return this;
     }
     else {

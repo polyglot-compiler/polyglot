@@ -104,7 +104,7 @@ public class IfStatement extends Statement
   {    
     w.write( "if( ");
     cond.translate( c, w);
-    w.write( ")");
+    w.write( ") ");
    
     if( !(then instanceof BlockStatement)) {
       w.beginBlock();
@@ -118,7 +118,7 @@ public class IfStatement extends Statement
     if ( else_ != null)
     {
       w.newline();
-      w.write ( "else " );
+      w.write ( "else ");
       if( !(else_ instanceof BlockStatement)) {
         w.beginBlock();
         else_.translate( c, w);

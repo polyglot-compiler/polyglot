@@ -1,8 +1,7 @@
 
 ma_package	= jltools/main
 ma_codebase	= ../..
-ma_files 	= MainErrorQueueFactory.java \
-		  MainTargetFactory.java \
+ma_files 	= MainTargetFactory.java \
 		  Main.java
 
 MAIN_TARGET = $(patsubst %.java, $(ma_package)/%.class, $(ma_files))

@@ -103,6 +103,7 @@ public class SymbolReader extends NodeVisitor
     /* Now add the "root" of this source file's package tree to the 
      * source path. This will also throw an exception if the source
      * file is not located in an appropriate directory. */
+    /* FIXME
     try
     {
       tf.addSourceDirectory( target, packageName);
@@ -113,6 +114,7 @@ public class SymbolReader extends NodeVisitor
                       + "\" in a directory matching the package name \"" 
                       + packageName + "\".");
     }
+    */
   }
 
   public ImportTable getImportTable()

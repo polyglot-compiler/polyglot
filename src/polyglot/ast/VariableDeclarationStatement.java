@@ -152,7 +152,7 @@ public class VariableDeclarationStatement extends Statement
    *  of the initializer expressions returns an object of type 
    *  <code>Expression</code>.
    */
-  Node visitChildren(NodeVisitor v)
+  Node visitChildren( NodeVisitor v)
   {
     TypeNode newTn = (TypeNode)tn.visit( v);
 
@@ -160,7 +160,7 @@ public class VariableDeclarationStatement extends Statement
 
     for( Iterator iter = declarators(); iter.hasNext(); ) {
       Declarator decl = (Declarator)iter.next();
-      if( decl != null) {
+      if( decl.initializer != null) {
         Expression newInitializer = (Expression)decl.initializer.visit( v);
         if( newInitializer != decl.initializer) {
           newDeclarators.add( new Declarator( decl.name,
@@ -303,5 +303,3 @@ public class VariableDeclarationStatement extends Statement
     w.endBlock();
   }
 }
-
-    

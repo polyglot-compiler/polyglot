@@ -123,6 +123,7 @@ public class MethodNode extends ClassMember
                       new MethodNode( accessFlags, returns, name, 
                                       formals, exceptions, body, 
                                       addDims));
+      n.mtiThis = mtiThis;
       n.copyAnnotationsFrom( this);
       return n;
     }
@@ -136,6 +137,7 @@ public class MethodNode extends ClassMember
                                           formals, exceptions, body, 
                                           addDims));
           n.copyAnnotationsFrom( this);
+          n.mtiThis = mtiThis;
           return n;
         }
       }
@@ -149,6 +151,7 @@ public class MethodNode extends ClassMember
                                           formals, exceptions, body, 
                                           addDims));
           n.copyAnnotationsFrom( this);
+          n.mtiThis = mtiThis;
           return n;
         }
       }

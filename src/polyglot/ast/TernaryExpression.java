@@ -1,154 +1,113 @@
-/* 
- * TernaryExpression.java
- */
-
 package jltools.ast;
 
 import jltools.util.*;
 import jltools.types.*;
 
 /**
- * TernaryExpression
- * 
- * Overview: A TernayExpression represents a Java ternay (conditional)
- * expression as mutable triple of expressions.
+ * A <code>TernaryExpression</code> represents a Java ternary expression as
+ * an immutable triple of expressions.
  */
-
-public class TernaryExpression extends Expression {
+public class TernaryExpression extends Expression 
+{
+  protected final Expression cond;
+  protected final Expression second;
+  protected final Expression third;
     
-    /**
-     * Effects: Creates a new TernaryExpression consisting of
-     *    <conditionalExpression>, <trueExpression>, and
-     *    <falseExpression> coresponding to
-     *    <conditionalExpression>?<trueExpression>:<falseExpression>.
-     */ 
-    public TernaryExpression(Expression conditionalExpression,
-			     Expression trueResult,
-			     Expression falseResult) {
-	this.conditional = conditionalExpression;
-	this.trueResult = trueResult;
-	this.falseResult = falseResult;
+  /**
+   * Creates a new <code>TernaryExpression</code>.
+   */
+  public TernaryExpression( Expression cond, Expression second,
+                            Expression third) 
+  {
+    this.cond = cond;
+    this.second = second;
+    this.third = third;
+  }
+  
+  /**
+   * Lazily reconstruct this node.
+   */
+  public TernaryExpression reconstruct( Expression cond, Expression second, 
+                                        Expression third)
+  {
+    if( this.cond == cond && this.second == second && this.third == third) {
+      return this;
     }
+    else {
+      TernaryExpression n = new TernaryExpression( cond, second, third);
+      n.copyAnnotationsFrom( this);
+      return n;
+    }
+  }
 
-    /**
-     * Effects: Returns the conditional subexpression
-     */ 
-    public Expression getConditionalExpression() {
-	return conditional;
-    }
+  /**
+   * Returns the condition subexpression.
+   */ 
+  public Expression getCondition()
+  {
+    return cond;
+  }
 
-    /**
-     * Effects: Sets the conditional subexpression to <newConditional>.
-     */
-    public void setConditionalExpression(Expression newConditional) {
-	conditional = newConditional;
-    }
-
-    /**
-     * Effects: Returns the true result
-     */ 
-    public Expression getTrueResult() {
-	return trueResult;
-    }
-
-    /**
-     * Effects: Sets the true result to <newTrueResult>.
-     */
-    public void setTrueResult(Expression newTrueResult) {
-	trueResult = newTrueResult;
-    }
+  /**
+   * Returns the result if the condition is true.
+   */ 
+  public Expression getTrueResult() 
+  {
+    return second;
+  }
     
-    /**
-     * Effects: Returns the false result
-     */ 
-    public Expression getFalseResult() {
-	return falseResult;
+  /**
+   * Returns the result if the condition is false.
+   */ 
+  public Expression getFalseResult() 
+  {
+    return third;
+  }
+
+  Node visitChildren( NodeVisitor v)
+  {
+    return reconstruct( (Expression)cond.visit( v),
+                        (Expression)second.visit( v),
+                        (Expression)third.visit( v));
+  }
+
+  public Node typeCheck( LocalContext c) throws SemanticException
+  {
+    if( !cond.getCheckedType().equals( c.getTypeSystem()
+                                                .getBoolean())) {
+       throw new SemanticException( 
+                              "Ternary condition must be of type boolean.");
     }
+     
+    setCheckedType( c.getTypeSystem().leastCommonAncestor( 
+                                               second.getCheckedType(), 
+                                               third.getCheckedType()));
 
-    /**
-     * Effects: Sets the false result to <newFalseResult>.
-     */
-    public void setFalseResult(Expression newFalseResult) {
-	falseResult = newFalseResult;
-    }
+    return this;
+  }
 
+  public void translate( LocalContext c, CodeWriter w)
+  {
+    translateExpression( cond, c, w);
+    
+    w.write( " ? ");
+    
+    translateExpression( second, c, w);
+    
+    w.write( " : ");
+    
+    translateExpression( third, c, w);
+  }
 
-   Object visitChildren(NodeVisitor v)
-   {
-     Object vinfo = Annotate.getVisitorInfo( this);
-
-     conditional  = (Expression) conditional.visit( v);
-     vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( conditional), vinfo);
-
-     trueResult   = (Expression) trueResult.visit( v);
-     vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( trueResult), vinfo); 
-
-     falseResult  = (Expression) falseResult.visit( v);
-     return v.mergeVisitorInfo( Annotate.getVisitorInfo( falseResult), vinfo); 
-   }
+  public void dump( CodeWriter w)
+  {
+    w.write( "( TERNARY ");
+    dumpNodeInfo( w);
+    w.write( ")");
+  }
 
   public int getPrecedence()
   {
     return PRECEDENCE_TERN;
   }
-
-  public Node typeCheck(LocalContext c) throws TypeCheckException
-  {
-    if( !conditional.getCheckedType().equals( c.getTypeSystem()
-                                                .getBoolean())) {
-       throw new TypeCheckException( 
-                              "Ternary conditional must be of type boolean.");
-    }
-     
-    setCheckedType (c.getTypeSystem().leastCommonAncestor( 
-                                               trueResult.getCheckedType(), 
-                                               falseResult.getCheckedType()));
-    addThrows( conditional.getThrows());
-    addThrows( trueResult.getThrows());
-    addThrows( falseResult.getThrows());
-
-    return this;
-  }
-
-  public void translate(LocalContext c, CodeWriter w)
-  {
-    translateExpression( conditional, c, w);
-
-    w.write( " ? ");
-
-    translateExpression( trueResult, c, w);
-
-    w.write( " : ");
-
-    translateExpression( falseResult, c, w);
-  }
-
-   public Node dump( CodeWriter w)
-   {
-      w.write( "( TERNARY ");
-      dumpNodeInfo( w);
-      w.write( ")");
-      return null;
-   }
-
-    public Node copy() {
-      TernaryExpression te = 
-	new TernaryExpression(conditional, trueResult, falseResult);
-      te.copyAnnotationsFrom(this);
-      return te;						   
-    }
-
-    public Node deepCopy() {
-      TernaryExpression te = 
-	new TernaryExpression((Expression) conditional.deepCopy(), 
-			      (Expression) trueResult.deepCopy(), 
-			      (Expression) falseResult.deepCopy());
-      te.copyAnnotationsFrom(this);
-      return te;
-    }
-
-
-    private Expression conditional;
-    private Expression trueResult;
-    private Expression falseResult;
 }

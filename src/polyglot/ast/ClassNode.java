@@ -80,6 +80,7 @@ public class ClassNode extends ClassMember
         if( this.members.get( i) != members.get( i)) {
           ClassNode n = new ClassNode( accessFlags, name, superClass, 
                                        interfaces, members);
+          n.type = type;
           n.copyAnnotationsFrom( this);
           return n;
         }
@@ -105,7 +106,7 @@ public class ClassNode extends ClassMember
   /**
    * Returns the type of the super class of the the class defined here.
    */
-  public TypeNode getSuper() 
+  public TypeNode getSuperClass() 
   {
     return superClass;
   }
@@ -231,7 +232,6 @@ public class ClassNode extends ClassMember
 
   public void translate( LocalContext c, CodeWriter w)
   {
-    c.pushClass( type);
     w.write( accessFlags.getStringRepresentation() + "class " + name);
     if( superClass != null)
     {
@@ -248,6 +248,7 @@ public class ClassNode extends ClassMember
         }
       }
     }
+    c.pushClass( type);
     w.newline( 0);
     w.write( "{");
     w.beginBlock();

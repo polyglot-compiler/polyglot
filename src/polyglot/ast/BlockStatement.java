@@ -55,6 +55,17 @@ public class BlockStatement extends Statement {
     }
   }
 
+  /** 
+   * Returns a <b>new</b> <code>BlockStatement</code> object which has one
+   * additional statement in it. Namely the argument passed to this method.
+   */
+  public BlockStatement appendStatement( Statement stmt) 
+  {
+    List newStatements = new ArrayList( statements);
+    newStatements.add( stmt);
+    return reconstruct( newStatements);
+  }
+
   /**
    * Returns the child at position <code>pos</code>.
    */

@@ -26,7 +26,8 @@ public class SynchronizedStatement extends Statement
   /**
    * Lazily reconstruct this node.
    */
-  public reconstruct( Expression expr, BlockStatement body)
+  public SynchronizedStatement reconstruct( Expression expr, 
+                                            BlockStatement body)
   {
     if( this.expr == expr && this.body == body) {
       return this;
@@ -61,7 +62,7 @@ public class SynchronizedStatement extends Statement
   Node visitChildren( NodeVisitor v)
   {
     return reconstruct( (Expression)expr.visit( v),
-                        (Statement)body.visit( v));
+                        (BlockStatement)body.visit( v));
   }
 
   public Node typeCheck( LocalContext c) throws SemanticException

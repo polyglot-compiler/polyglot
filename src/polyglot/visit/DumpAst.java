@@ -5,6 +5,8 @@ import jltools.ast.NodeVisitor;
 import jltools.util.CodeWriter;
 import jltools.types.SemanticException;
 
+import java.io.IOException;
+
 
 public class DumpAst extends NodeVisitor
 {
@@ -46,5 +48,17 @@ public class DumpAst extends NodeVisitor
   {
     w.endBlock();
     return n;
+  }
+
+  public void finish()
+  {
+    try
+    {
+      w.flush();
+    }
+    catch( IOException e) 
+    {
+      e.printStackTrace();
+    }
   }
 }

@@ -65,7 +65,7 @@ public class WhileStatement extends Statement
   Node visitChildren( NodeVisitor v) 
   {
     return reconstruct( (Expression)cond.visit( v),
-                        (body == null : null ? (Statement)body.visit( v)));
+                        (body == null ? null : (Statement)body.visit( v)));
   }
 
   public Node typeCheck( LocalContext c) throws SemanticException

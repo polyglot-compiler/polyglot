@@ -22,31 +22,44 @@ public class AmbiguityRemover extends NodeVisitor
     this.it = it;
     this.eq = eq;
     
-    c = new LocalContext( it, ts);
+    c = new LocalContext( it, ts, this);
   }
 
+  /*
+  public Node override( Node n)
+  {
+    if( n instanceof VariableDeclarationStatement) {
+
+    }
+  }
+  */
+
 // XXX document me
-  public VisitorNode enter(Node n)
+  public NodeVisitor enter( Node n)
   {
     n.enterScope( c);
     return this;
   }
 
 // XXX document me
-  public Node leave( Node n)
+  public Node leave( Node old, Node n, NodeVisitor v)
   {
     try
     {
-      n.removeAmbiguities( c);
+      Node m = n.removeAmbiguities( c);
+
+      m.leaveScope( c);
+      return m;
     }
-    catch( TypeCheckException e)
+    catch( SemanticException e)
     {
       eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
                   Annotate.getLineNumber( n));
-      n.setHasError( true);
-     
+      // FIXME n.setHasError( true);
+
+      n.leaveScope( c);
+      return n;
     }
-    n.leaveScope();
   }
 
   public ImportTable getImportTable()

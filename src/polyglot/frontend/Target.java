@@ -35,7 +35,7 @@ public abstract class Target
     return output;
   }
 
-  public ErrorQueue getErrorQueue()
+  public ErrorQueue getErrorQueue() throws IOException
   {
     if( eq == null) {
       eq = createErrorQueue();
@@ -43,7 +43,7 @@ public abstract class Target
     return eq;
   }
 
-  protected abstract ErrorQueue createErrorQueue();
+  protected abstract ErrorQueue createErrorQueue() throws IOException;
 
   public NodeVisitor getNextNodeVisitor( int stage)
   {

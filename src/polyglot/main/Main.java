@@ -2,7 +2,7 @@ package jltools.main;
 
 import jltools.ast.Node;
 import jltools.frontend.Compiler;
-import jltools.type.StandardTypeSystem;
+import jltools.types.StandardTypeSystem;
 import jltools.util.*;
 
 import java.io.*;
@@ -23,13 +23,20 @@ public class Main
                                         = "Output to stdout (Boolean)";
   private static final String MAIN_OPT_POST_COMPILER
                                         = "Name of Post Compiler (String)";
+  private static final String MAIN_OPT_DUMP             
+                                        = "Dump AST (Boolean)";
+  private static final String MAIN_OPT_SCRAMBLE         
+                                        = "Scramble AST (Boolean)";
 
-  private static final int MAX_THREADS = 5;
+  private static final int MAX_THREADS = 1;
+
+  private static Map options;
+  private static Set source;
 
   public static final void main(String args[])
   {
-    Map options = new HashMap();
-    Set source = new TreeSet();
+    options = new HashMap();
+    source = new TreeSet();
     MainTargetFactory tf; 
     
     parseCommandLine(args, options, source);
@@ -37,18 +44,17 @@ public class Main
                                (Collection)options.get( MAIN_OPT_SOURCE_PATH),
                                 (File)options.get( MAIN_OPT_OUTPUT_DIRECTORY),
                                 (String)options.get( MAIN_OPT_OUTPUT_EXT),
-                                (Boolean)options.get( MAIN_OPT_STDOUT),
-                                source);
+                                (Boolean)options.get( MAIN_OPT_STDOUT));
 
     /* Must initialize before instantiating any compilers. */
-    Compiler.initialize( options, new StandardTypeSystem(),
-                         tf, new MainErrorQueueFactory());
+    Compiler.initialize( options, new StandardTypeSystem(), tf);
     
     /* Now compile each file. */
     Iterator iter;
     String targetName = null;
     boolean hasErrors = false;
 
+    /*
     int numberOfThreads = Math.min( source.size(), MAX_THREADS);
 
     Thread thread;
@@ -58,6 +64,9 @@ public class Main
       thread = new Thread( cthreads[ i]);
       thread.start();
     }
+    */
+
+    Compiler compiler = new Compiler();
 
     try
     {
@@ -176,6 +185,19 @@ public class Main
     }
   }
 
+  static Iterator getNodeVisitors( int stage)
+  {
+    List l = new LinkedList();
+    if( ((Boolean)options.get( MAIN_OPT_DUMP)).booleanValue()) {
+      CodeWriter cw = new CodeWriter( new UnicodeWriter( 
+                                        new PrintWriter( System.out)), 
+            ((Integer)options.get( Compiler.OPT_OUTPUT_WIDTH)).intValue()); 
+
+      l.add( new jltools.visit.DumpAst( cw));
+    }
+    return l.iterator();
+  }   
+
   static final void parseCommandLine(String args[], Map options, Set source)
   {
     if(args.length < 1)
@@ -184,11 +206,16 @@ public class Main
       System.exit( 1);
     }
 
+    /* Set defaults. */
     Collection sourcePath = new LinkedList();
     sourcePath.add( new File( "."));
     options.put( MAIN_OPT_SOURCE_PATH, sourcePath);
+    options.put( MAIN_OPT_DUMP, new Boolean( false));
     
-    
+    options.put( Compiler.OPT_OUTPUT_WIDTH, new Integer( 72));
+    options.put( Compiler.OPT_VERBOSE, new Boolean( false));
+    options.put( Compiler.OPT_FQCN, new Boolean( false));
+
     for( int i = 0; i < args.length; )
     {
       if( args[i].equals( "-h")) {
@@ -248,12 +275,12 @@ public class Main
       else if( args[i].equals( "-dump"))
       {
         i++;
-        options.put( Compiler.OPT_DUMP, new Boolean( true));
+        options.put( MAIN_OPT_DUMP, new Boolean( true));
       }
       else if( args[i].equals( "-scramble"))
       {
         i++;
-        options.put( Compiler.OPT_SCRAMBLE, new Boolean( true));
+        options.put( MAIN_OPT_SCRAMBLE, new Boolean( true));
       }
       else if( args[i].equals( "-v") || args[i].equals( "-verbose"))
       {

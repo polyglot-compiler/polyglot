@@ -1,5 +1,7 @@
-package jltools.frontend;
+package jltools.main;
 
+import jltools.ast.NodeVisitor;
+import jltools.frontend.*;
 import jltools.util.*;
 
 import java.io.*;
@@ -91,12 +93,14 @@ public class MainTargetFactory implements TargetFactory
   {
     File sourceFile;
     File outputFile;
+    Iterator visitors;
 
     public MainTarget( String name, File sourceFile, File outputFile)
     {
       super( name, null, null);
       this.sourceFile = sourceFile;
       this.outputFile = outputFile;
+      this.visitors = null;
     }
 
     public Reader getSourceReader() throws IOException
@@ -135,5 +139,81 @@ public class MainTargetFactory implements TargetFactory
       }
     }
 
+    public NodeVisitor getNextNodeVisitor( int stage)
+    {
+      if( visitors == null) {
+        visitors = Main.getNodeVisitors( stage);
+      }
+      
+      if( visitors.hasNext()) {
+        return (NodeVisitor)visitors.next();
+      }
+      else {
+        visitors = null;
+        return null;
+      }
+    }
+
+    protected ErrorQueue createErrorQueue() throws IOException
+    {
+      return new MainErrorQueue( name, new FileReader( sourceFile), 
+                                 System.err);
+    }
+  }
+   
+  class MainErrorQueue extends ErrorQueue
+  {
+    private static final int ERROR_COUNT_LIMIT = 99;
+    
+    private String filename;
+    private Reader source;
+    private PrintStream err;
+
+    private int errorCount;
+    private boolean flushed;
+    
+    public MainErrorQueue( String filename, Reader source, PrintStream err) 
+    {
+      this.filename = filename;
+      this.source = source;
+      this.err = err;
+
+      this.errorCount = 0;
+      this.flushed = true;
+    }
+    
+    public void enqueue( ErrorInfo e)
+    {
+      if( e.getErrorKind() != ErrorInfo.WARNING) {
+        hasErrors = true;
+        errorCount++;
+      }
+      flushed = false;
+
+      String message = ( e.getErrorKind() != ErrorInfo.WARNING ? e.getMessage()
+                           : e.getErrorString() + " -- " + e.getMessage());
+
+      if( e.getLineNumber() == -1) {
+        err.println( filename + ": " + message);
+      } 
+      else {
+        err.println( filename + ":" +  e.getLineNumber() + ": " + message);
+      }
+
+      if( errorCount > ERROR_COUNT_LIMIT) {
+        err.println( filename + ": Too many errors. Aborting compilation.");
+        flush();
+        throw new ErrorLimitError();
+      }
+    }
+    
+    public void flush()
+    {
+      if( hasErrors && !flushed) {
+        err.println( filename + ": " + errorCount + " error" 
+                     + (errorCount > 1 ? "s." : "."));
+        flushed = true;
+      }
+    }
   }
 }

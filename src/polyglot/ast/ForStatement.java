@@ -227,7 +227,7 @@ public class ForStatement extends Statement
       }
     }
 
-    w.write( ")");
+    w.write( ") ");
     
     if (body == null) {
       w.write( "; ");

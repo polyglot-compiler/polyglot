@@ -74,4 +74,13 @@ public abstract class NodeVisitor
   {
     return n;
   }
+
+  /**
+   * The finish method is called after the entire tree has been visited.
+   * This method allows the visitor to perform any last minute cleanup,
+   * including flushing buffers and I/O connections.
+   */
+  public void finish()
+  {
+  }
 }

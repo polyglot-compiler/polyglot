@@ -36,7 +36,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
    */
   public AmbiguousNameExpression( String s) {
 
-    names = new TypedList(new ArrayList(4), String.class, true);
+    names = new TypedList(new ArrayList(4), String.class, false);
 
     StringTokenizer st = new StringTokenizer( s, ".");
 
@@ -148,7 +148,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
         /* Clear the name. */
         name = "";
       }
-      catch( SemanticException tce) 
+      catch( SemanticException se) 
       {
         if( top == null) {
           /* If it's not a local or field, then try and find a type. */
@@ -159,13 +159,13 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
             /* Clear the name. */
             name = "";
           }
-          catch( SemanticException tce2)
+          catch( SemanticException se2)
           {
             /* Not a local, field or type. Must be imcomplete. */
             name += ".";
           }
         }
-        else throw tce;
+        else throw se;
       }
       
       if( top != null) {

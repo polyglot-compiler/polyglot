@@ -39,7 +39,7 @@ CALLED_FROM_PARENT 	= true
 	$(JC) $(JC_FLAGS) $<
 
 #everything:
-all: util types lex parse ast frontend visit runtime 
+all: util lex parse types ast visit ext/op frontend runtime main
 
 #include all of our package makefiles. they give us what class files are in each.
 include jltools/util/Makefile
@@ -48,6 +48,7 @@ include jltools/parse/Makefile
 include jltools/ast/Makefile 
 include jltools/types/Makefile
 include jltools/visit/Makefile
+include jltools/ext/op/Makefile
 include jltools/frontend/Makefile
 include jltools/main/Makefile
 include jltools/runtime/Makefile
@@ -59,11 +60,13 @@ types: util $(TYPES_TARGET)
 
 lex: util types $(LEX_TARGET)
 
-parse: util types lex $(PARSE_TARGET)
+parse: util lex $(PARSE_TARGET)
 
 ast: util types lex $(AST_TARGET)
 
 visit: util types ast $(VISIT_TARGET)
+
+ext/op: util types ast $(EXTOP_TARGET)
 
 frontend: util types lex parse ast visit $(FRONTEND_TARGET)
 
@@ -79,6 +82,7 @@ clean:
 	rm -f jltools/ast/*.class
 	rm -f jltools/types/*.class
 	rm -f jltools/visit/*.class
+	rm -f jltools/ext/op/*.class
 	rm -f jltools/frontend/*.class
 	rm -f jltools/main/*.class
 	rm -f jltools/runtime/*.class
@@ -88,6 +92,7 @@ clean:
 	rm -f jltools/ast/*.html
 	rm -f jltools/types/*.html
 	rm -f jltools/visit/*.html
+	rm -f jltools/ext/op/*.html
 	rm -f jltools/frontend/*.html
 	rm -f jltools/main/*.html
 	rm -f jltools/runtime/*.html
