@@ -153,15 +153,8 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         return ar;
     }
 
-    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (ar.kind() != AmbiguityRemover.SUPER) {
-            return this;
-        }
-
+    protected void disambiguateSuperType(AmbiguityRemover ar) throws SemanticException {
         TypeSystem ts = ar.typeSystem();
-
-        if (Report.should_report(Report.types, 2))
-	    Report.report(2, "Cleaning " + type + ".");
 
         if (this.superClass != null) {
             Type t = this.superClass.type();
@@ -177,19 +170,37 @@ public class ClassDecl_c extends Node_c implements ClassDecl
             }
 
             if (Report.should_report(Report.types, 3))
-		Report.report(3, "setting super type of " + this.type + " to " + t);
+                Report.report(3, "setting super type of " + this.type + " to " + t);
 
             this.type.superType(t);
 
             ts.checkCycles(t.toReference());
         }
-        else if (this.type != ts.Object()) {
+        else if (ts.Object() != this.type && 
+                 !ts.Object().fullName().equals(this.type.fullName())) {
+            // the supertype was not specified, and the type is not the same
+            // as ts.Object() (which is typically java.lang.Object)
+            // As such, the default supertype is ts.Object().
             this.type.superType(ts.Object());
         }
         else {
+            // the type is the same as ts.Object(), so it has no supertype.
             this.type.superType(null);
+        }    
+    }
+
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        if (ar.kind() != AmbiguityRemover.SUPER) {
+            return this;
         }
 
+        TypeSystem ts = ar.typeSystem();
+
+        if (Report.should_report(Report.types, 2))
+	    Report.report(2, "Cleaning " + type + ".");
+
+        disambiguateSuperType(ar);
+        
         for (Iterator i = this.interfaces.iterator(); i.hasNext(); ) {
             TypeNode tn = (TypeNode) i.next();
             Type t = tn.type();
