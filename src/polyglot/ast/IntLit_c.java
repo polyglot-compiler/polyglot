@@ -5,7 +5,7 @@ import jltools.types.*;
 import jltools.visit.*;
 import jltools.util.*;
 
-/** 
+/**
  * An <code>IntLit</code> represents a literal in Java of an integer
  * type.
  */
@@ -60,13 +60,7 @@ public class IntLit_c extends NumLit_c implements IntLit
 
 	Kind kind = kind();
 
-        if (kind == BYTE) {
-	    return type(ts.Byte());
-	}
-	else if (kind == SHORT) {
-	    return type(ts.Short());
-	}
-	else if (kind == INT) {
+        if (kind == BYTE || kind == SHORT || kind == INT) {
 	    return type(ts.Int());
 	}
 	else if (kind == LONG) {
