@@ -21,8 +21,11 @@ import polyglot.visit.TypeChecker;
 
 
 public class Disambiguated extends SourceFileGoal {
+    boolean reached;
+
     public Disambiguated(Job job) {
         super(job);
+        this.reached = false;
     }
 
     public Pass createPass(ExtensionInfo extInfo) {
@@ -31,11 +34,17 @@ public class Disambiguated extends SourceFileGoal {
         return new DisambiguatorPass(this, new AmbiguityRemover(job(), ts, nf));
     }
 
+    /**
+     * Return true if the disambiguation pass has been run at least once
+     * (this forces dependent classes to get loaded) and isDisambiguated()
+     * is true for all nodes in the AST (except possibly those within a
+     * local or anonymous class).
+     */
     public boolean hasBeenReached() {
         if (Report.should_report(TOPICS, 3))
             Report.report(3, "checking " + this);
 
-        if (super.hasBeenReached()) {
+        if (this.reached) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "  ok (cached)");
             return true;
@@ -53,6 +62,7 @@ public class Disambiguated extends SourceFileGoal {
             return false;
         }
         
+        /* XXX breaks for anonymous classes.
         // Do a relatively quick test of the types declared in the AST.
         for (Iterator i = job().ast().typesBelow().iterator(); i.hasNext(); ) {
             ParsedClassType ct = (ParsedClassType) i.next();
@@ -64,6 +74,7 @@ public class Disambiguated extends SourceFileGoal {
                 return false;
             }
         }
+        */
         
         // Now look for ambiguities in the AST.
         final boolean[] allOk = new boolean[] { true };
@@ -74,11 +85,9 @@ public class Disambiguated extends SourceFileGoal {
                     return n;
                 }
                 
-                if (parent instanceof LocalClassDecl && n instanceof ClassDecl) {
-                    return n;
-                }
-                
-                if (parent instanceof New && n instanceof ClassBody) {
+                // Don't check if New is disambiguated; this is handled
+                // during type-checking.
+                if (n instanceof New) {
                     return n;
                 }
 
@@ -96,10 +105,11 @@ public class Disambiguated extends SourceFileGoal {
         if (allOk[0]) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "  ok");
-            this.markRun();
+            this.reached = true;
+            return true;
         }
-        
-        return super.hasBeenReached();
+
+        return false;
     }
     
     private static final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend });

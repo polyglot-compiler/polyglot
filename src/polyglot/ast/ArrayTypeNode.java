@@ -6,7 +6,7 @@ import polyglot.types.Type;
  * An <code>ArrayTypeNode</code> is a type node for a non-canonical
  * array type.
  */
-public interface ArrayTypeNode extends TypeNode
+public interface ArrayTypeNode extends TypeNode, Ambiguous
 {
     /**
      * Base of the array.
