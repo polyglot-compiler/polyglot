@@ -8,6 +8,23 @@ import polyglot.util.InternalCompilerError;
  * This abstract implementation of <code>DelFactory</code> provides
  * a way of chaining together DelFactories, and default implementations
  * of factory methods for each node.
+ * 
+ * <p>
+ * For a given type of AST node <code>N</code>, there are three methods:
+ * <code>delN()</code>,  <code>delNImpl()</code> and <code>postDelN(JL)</code>. 
+ * The method <code>delN()</code> calls <code>delNImpl()</code> to create
+ * an appropriate delegate object, and if other <code>DelFactory</code>s are 
+ * chained onto this one, it will also call <code>delN()</code> on the next 
+ * <code>DelFactory</code>. The method <code>delN()</code> will then 
+ * call <code>postDelN</code>, passing in the newly created extension object.
+ * 
+ * <p>
+ * The default implementation of <code>delNImpl()</code> is to simply call
+ * <code>delMImpl()</code>, where <code>M</code> is the immediate 
+ * superclass of <code>N</code>. Similarly, the default implementation of
+ * <code>postDelN(JL)</code> is to call <code>postDelM(JL)</code>.
+ * 
+ * @see polyglot.ext.jl.ast.AbstractExtFactory_c has a very similar structure. 
  */
 public abstract class AbstractDelFactory_c implements DelFactory
 {
@@ -33,6 +50,11 @@ public abstract class AbstractDelFactory_c implements DelFactory
     /**
      * Compose two delegates together. Order is important: e1 gets added
      * at the end of e2's chain.
+     * @param e1 the <code>JL</code> object to add to the end of e2's 
+     *             chain of delegates. 
+     * @param e2 the second <code>JL</code> object that will have e1 added to 
+     *             its chain of delegates.
+     * @return the result of adding e1 to the end of e2's chain of delegates.
      */
     protected JL composeDels(JL e1, JL e2) {
         if (e1 == null) return e2;        
@@ -812,58 +834,114 @@ public abstract class AbstractDelFactory_c implements DelFactory
     // Impl methods
     // ********************************************
     
+    /**
+     * Create the delegate for a <code>AmbAssign</code> AST node.
+     * @return the delegate for a <code>AmbAssign</code> AST node.
+     */
     protected JL delAmbAssignImpl() {
         return delAssignImpl();
     }
 
+    /**
+     * Create the delegate for a <code>AmbExpr</code> AST node.
+     * @return the delegate for a <code>AmbExpr</code> AST node.
+     */
     protected JL delAmbExprImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>AmbPrefix</code> AST node.
+     * @return the delegate for a <code>AmbPrefix</code> AST node.
+     */
     protected JL delAmbPrefixImpl() {
         return delNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>AmbQualifierNode</code> AST node.
+     * @return the delegate for a <code>AmbQualifierNode</code> AST node.
+     */
     protected JL delAmbQualifierNodeImpl() {
         return delNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>AmbReceiver</code> AST node.
+     * @return the delegate for a <code>AmbReceiver</code> AST node.
+     */
     protected JL delAmbReceiverImpl() {
         return delNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>AmbTypeNode</code> AST node.
+     * @return the delegate for a <code>AmbTypeNode</code> AST node.
+     */
     protected JL delAmbTypeNodeImpl() {
         return delTypeNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>ArrayAccess</code> AST node.
+     * @return the delegate for a <code>ArrayAccess</code> AST node.
+     */
     protected JL delArrayAccessImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>ArrayInit</code> AST node.
+     * @return the delegate for a <code>ArrayInit</code> AST node.
+     */
     protected JL delArrayInitImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>ArrayTypeNode</code> AST node.
+     * @return the delegate for a <code>ArrayTypeNode</code> AST node.
+     */
     protected JL delArrayTypeNodeImpl() {
         return delTypeNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Assert</code> AST node.
+     * @return the delegate for a <code>Assert</code> AST node.
+     */
     protected JL delAssertImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Assign</code> AST node.
+     * @return the delegate for a <code>Assign</code> AST node.
+     */
     protected JL delAssignImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>LocalAssign</code> AST node.
+     * @return the delegate for a <code>LocalAssign</code> AST node.
+     */
     protected JL delLocalAssignImpl() {
         return delAssignImpl();
     }
 
+    /**
+     * Create the delegate for a <code>FieldAssign</code> AST node.
+     * @return the delegate for a <code>FieldAssign</code> AST node.
+     */
     protected JL delFieldAssignImpl() {
         return delAssignImpl();
     }
 
+    /**
+     * Create the delegate for a <code>ArrayAccessAssign</code> AST node.
+     * @return the delegate for a <code>ArrayAccessAssign</code> AST node.
+     */
     protected JL delArrayAccessAssignImpl() {
         return delAssignImpl();
     }
@@ -871,250 +949,493 @@ public abstract class AbstractDelFactory_c implements DelFactory
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Block</code> AST node.
+     * @return the delegate for a <code>Block</code> AST node.
+     */
     protected JL delBlockImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>BooleanLit</code> AST node.
+     * @return the delegate for a <code>BooleanLit</code> AST node.
+     */
     protected JL delBooleanLitImpl() {
         return delLitImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Branch</code> AST node.
+     * @return the delegate for a <code>Branch</code> AST node.
+     */
     protected JL delBranchImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Call</code> AST node.
+     * @return the delegate for a <code>Call</code> AST node.
+     */
     protected JL delCallImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>CanonicalTypeNode</code> AST node.
+     * @return the delegate for a <code>CanonicalTypeNode</code> AST node.
+     */
     protected JL delCanonicalTypeNodeImpl() {
         return delTypeNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Case</code> AST node.
+     * @return the delegate for a <code>Case</code> AST node.
+     */
     protected JL delCaseImpl() {
         return delSwitchElementImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Cast</code> AST node.
+     * @return the delegate for a <code>Cast</code> AST node.
+     */
     protected JL delCastImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Catch</code> AST node.
+     * @return the delegate for a <code>Catch</code> AST node.
+     */
     protected JL delCatchImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>CharLit</code> AST node.
+     * @return the delegate for a <code>CharLit</code> AST node.
+     */
     protected JL delCharLitImpl() {
         return delNumLitImpl();
     }
 
+    /**
+     * Create the delegate for a <code>ClassBody</code> AST node.
+     * @return the delegate for a <code>ClassBody</code> AST node.
+     */
     protected JL delClassBodyImpl() {
         return delTermImpl();
     }
 
+    /**
+     * Create the delegate for a <code>ClassDecl</code> AST node.
+     * @return the delegate for a <code>ClassDecl</code> AST node.
+     */
     protected JL delClassDeclImpl() {
         return delTermImpl();
     }
 
+    /**
+     * Create the delegate for a <code>ClassLit</code> AST node.
+     * @return the delegate for a <code>ClassLit</code> AST node.
+     */
     protected JL delClassLitImpl() {
         return delLitImpl();
     }
 
+    /**
+     * Create the delegate for a <code>ClassMember</code> AST node.
+     * @return the delegate for a <code>ClassMember</code> AST node.
+     */
     protected JL delClassMemberImpl() {
         return delNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>CodeDecl</code> AST node.
+     * @return the delegate for a <code>CodeDecl</code> AST node.
+     */
     protected JL delCodeDeclImpl() {
         return delClassMemberImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Conditional</code> AST node.
+     * @return the delegate for a <code>Conditional</code> AST node.
+     */
     protected JL delConditionalImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>ConstructorCall</code> AST node.
+     * @return the delegate for a <code>ConstructorCall</code> AST node.
+     */
     protected JL delConstructorCallImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>ConstructorDecl</code> AST node.
+     * @return the delegate for a <code>ConstructorDecl</code> AST node.
+     */
     protected JL delConstructorDeclImpl() {
         return delProcedureDeclImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Do</code> AST node.
+     * @return the delegate for a <code>Do</code> AST node.
+     */
     protected JL delDoImpl() {
         return delLoopImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Empty</code> AST node.
+     * @return the delegate for a <code>Empty</code> AST node.
+     */
     protected JL delEmptyImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Eval</code> AST node.
+     * @return the delegate for a <code>Eval</code> AST node.
+     */
     protected JL delEvalImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Expr</code> AST node.
+     * @return the delegate for a <code>Expr</code> AST node.
+     */
     protected JL delExprImpl() {
         return delTermImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Field</code> AST node.
+     * @return the delegate for a <code>Field</code> AST node.
+     */
     protected JL delFieldImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>FieldDecl</code> AST node.
+     * @return the delegate for a <code>FieldDecl</code> AST node.
+     */
     protected JL delFieldDeclImpl() {
         return delClassMemberImpl();
     }
 
+    /**
+     * Create the delegate for a <code>FloatLit</code> AST node.
+     * @return the delegate for a <code>FloatLit</code> AST node.
+     */
     protected JL delFloatLitImpl() {
         return delLitImpl();
     }
 
+    /**
+     * Create the delegate for a <code>For</code> AST node.
+     * @return the delegate for a <code>For</code> AST node.
+     */
     protected JL delForImpl() {
         return delLoopImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Formal</code> AST node.
+     * @return the delegate for a <code>Formal</code> AST node.
+     */
     protected JL delFormalImpl() {
         return delNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>If</code> AST node.
+     * @return the delegate for a <code>If</code> AST node.
+     */
     protected JL delIfImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Import</code> AST node.
+     * @return the delegate for a <code>Import</code> AST node.
+     */
     protected JL delImportImpl() {
         return delNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Initializer</code> AST node.
+     * @return the delegate for a <code>Initializer</code> AST node.
+     */
     protected JL delInitializerImpl() {
         return delCodeDeclImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Instanceof</code> AST node.
+     * @return the delegate for a <code>Instanceof</code> AST node.
+     */
     protected JL delInstanceofImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>IntLit</code> AST node.
+     * @return the delegate for a <code>IntLit</code> AST node.
+     */
     protected JL delIntLitImpl() {
         return delNumLitImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Labeled</code> AST node.
+     * @return the delegate for a <code>Labeled</code> AST node.
+     */
     protected JL delLabeledImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Lit</code> AST node.
+     * @return the delegate for a <code>Lit</code> AST node.
+     */
     protected JL delLitImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Local</code> AST node.
+     * @return the delegate for a <code>Local</code> AST node.
+     */
     protected JL delLocalImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>LocalClassDecl</code> AST node.
+     * @return the delegate for a <code>LocalClassDecl</code> AST node.
+     */
     protected JL delLocalClassDeclImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>LocalDecl</code> AST node.
+     * @return the delegate for a <code>LocalDecl</code> AST node.
+     */
     protected JL delLocalDeclImpl() {
         return delNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Loop</code> AST node.
+     * @return the delegate for a <code>Loop</code> AST node.
+     */
     protected JL delLoopImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>MethodDecl</code> AST node.
+     * @return the delegate for a <code>MethodDecl</code> AST node.
+     */
     protected JL delMethodDeclImpl() {
         return delProcedureDeclImpl();
     }
 
+    /**
+     * Create the delegate for a <code>NewArray</code> AST node.
+     * @return the delegate for a <code>NewArray</code> AST node.
+     */
     protected JL delNewArrayImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Node</code> AST node.
+     * @return the delegate for a <code>Node</code> AST node.
+     */
     protected JL delNodeImpl() {
         return null;
     }
 
+    /**
+     * Create the delegate for a <code>New</code> AST node.
+     * @return the delegate for a <code>New</code> AST node.
+     */
     protected JL delNewImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>NullLit</code> AST node.
+     * @return the delegate for a <code>NullLit</code> AST node.
+     */
     protected JL delNullLitImpl() {
         return delLitImpl();
     }
 
+    /**
+     * Create the delegate for a <code>NumLit</code> AST node.
+     * @return the delegate for a <code>NumLit</code> AST node.
+     */
     protected JL delNumLitImpl() {
         return delLitImpl();
     }
 
+    /**
+     * Create the delegate for a <code>PackageNode</code> AST node.
+     * @return the delegate for a <code>PackageNode</code> AST node.
+     */
     protected JL delPackageNodeImpl() {
         return delNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>ProcedureDecl</code> AST node.
+     * @return the delegate for a <code>ProcedureDecl</code> AST node.
+     */
     protected JL delProcedureDeclImpl() {
         return delCodeDeclImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Return</code> AST node.
+     * @return the delegate for a <code>Return</code> AST node.
+     */
     protected JL delReturnImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>SourceCollection</code> AST node.
+     * @return the delegate for a <code>SourceCollection</code> AST node.
+     */
     protected JL delSourceCollectionImpl() {
         return delNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>SourceFile</code> AST node.
+     * @return the delegate for a <code>SourceFile</code> AST node.
+     */
     protected JL delSourceFileImpl() {
         return delNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Special</code> AST node.
+     * @return the delegate for a <code>Special</code> AST node.
+     */
     protected JL delSpecialImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Stmt</code> AST node.
+     * @return the delegate for a <code>Stmt</code> AST node.
+     */
     protected JL delStmtImpl() {
         return delTermImpl();
     }
 
+    /**
+     * Create the delegate for a <code>StringLit</code> AST node.
+     * @return the delegate for a <code>StringLit</code> AST node.
+     */
     protected JL delStringLitImpl() {
         return delLitImpl();
     }
 
+    /**
+     * Create the delegate for a <code>SwitchBlock</code> AST node.
+     * @return the delegate for a <code>SwitchBlock</code> AST node.
+     */
     protected JL delSwitchBlockImpl() {
         return delSwitchElementImpl();
     }
 
+    /**
+     * Create the delegate for a <code>SwitchElement</code> AST node.
+     * @return the delegate for a <code>SwitchElement</code> AST node.
+     */
     protected JL delSwitchElementImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Switch</code> AST node.
+     * @return the delegate for a <code>Switch</code> AST node.
+     */
     protected JL delSwitchImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Synchronized</code> AST node.
+     * @return the delegate for a <code>Synchronized</code> AST node.
+     */
     protected JL delSynchronizedImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Term</code> AST node.
+     * @return the delegate for a <code>Term</code> AST node.
+     */
     protected JL delTermImpl() {
         return delNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Throw</code> AST node.
+     * @return the delegate for a <code>Throw</code> AST node.
+     */
     protected JL delThrowImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Try</code> AST node.
+     * @return the delegate for a <code>Try</code> AST node.
+     */
     protected JL delTryImpl() {
         return delStmtImpl();
     }
 
+    /**
+     * Create the delegate for a <code>TypeNode</code> AST node.
+     * @return the delegate for a <code>TypeNode</code> AST node.
+     */
     protected JL delTypeNodeImpl() {
         return delNodeImpl();
     }
 
+    /**
+     * Create the delegate for a <code>Unary</code> AST node.
+     * @return the delegate for a <code>Unary</code> AST node.
+     */
     protected JL delUnaryImpl() {
         return delExprImpl();
     }
 
+    /**
+     * Create the delegate for a <code>While</code> AST node.
+     * @return the delegate for a <code>While</code> AST node.
+     */
     protected JL delWhileImpl() {
         return delLoopImpl();
     }
-
 
     // ********************************************
     // Post methods
