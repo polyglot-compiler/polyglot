@@ -1109,4 +1109,11 @@ public class StandardTypeSystem extends TypeSystem {
   public TypeContext getPackageContext(ClassResolver resolver, String name) throws SemanticException {
     return new PackageContext(resolver, new PackageType(this, name));
   }
+
+  public java.util.Set getTypeEncoderRootSet(Type clazz) {
+    /* by default, just clazz should be written out in full.  other
+       classes are written as simple names. */
+    return java.util.Collections.singleton(clazz);
+  }
+
 }

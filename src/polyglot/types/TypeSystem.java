@@ -321,4 +321,16 @@ public abstract class TypeSystem {
   public abstract TypeContext getClassContext(ClassType clazz) throws SemanticException;
   public abstract TypeContext getPackageContext(ClassResolver resolver, PackageType type) throws SemanticException;
   public abstract TypeContext getPackageContext(ClassResolver resolver, String name) throws SemanticException;
+
+  /**
+   * return the set of objects that should be serialized into the
+   * type information for the given ClassType. 
+   * Usually only the clazz itself should get encoded, and references
+   * to other classes should just have their name written out.
+   * If it makes sense for additional types to be fully encoded,
+   * (ie, they're necessary to correctly reconstruct the given clazz,
+   * and the usual class resolvers can't otherwise find them) they
+   * should be returned in the set in addition to clazz.
+   */
+  public abstract java.util.Set getTypeEncoderRootSet(Type clazz);
 }
