@@ -6,6 +6,7 @@ include $(SOURCE)/Rules.mk
 SUBDIRS = jl ${EXT}
 
 all: $(SUBDIRS)
+	chmod +x newext
 
 clean clobber:
 	$(subdirs)
