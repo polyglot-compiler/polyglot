@@ -43,6 +43,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         Constants11.jl ;
         Ctor.jl ;
         Dep1.jl ;
+        DiamondInh.jl ; DiamondInh2.jl ;
         Empty.jl ;
         Equality.jl ;
         Equality2.jl ;
