@@ -51,6 +51,11 @@ public class CopyPropagator extends DataFlow {
 	    CopyInfo root;    // Root CopyInfo node for this tree.
 
 	    protected CopyInfo(LocalInstance li) {
+		if (li == null) {
+		    throw new InternalCompilerError("Null local instance "
+			+ "encountered during copy propagation.");
+		}
+
 		this.li = li;
 		this.from = null;
 		this.to = new HashSet();
