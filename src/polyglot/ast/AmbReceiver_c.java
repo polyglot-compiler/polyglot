@@ -5,12 +5,17 @@ import jltools.types.*;
 import jltools.visit.*;
 import jltools.util.*;
 
+/**
+ * An <code>AmbReceiver</code> is an ambiguous AST node composed of
+ * dot-separated list of identifiers.  It must resolve to a receiver.
+ */
 public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver
 {
     public AmbReceiver_c(Ext ext, Position pos, Prefix prefix, String name) {
 	super(ext, pos, prefix, name);
     }
 
+    /** Disambiguate the receiver. */
     public Node disambiguateOverride_(AmbiguityRemover ar)
 	throws SemanticException {
 
@@ -28,6 +33,7 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver
 	    "local variable \"" + name + "\".", position());
     }
 
+    /** Disambiguate the receiver. */
     public Node disambiguate_(AmbiguityRemover ar)
 	throws SemanticException {
 

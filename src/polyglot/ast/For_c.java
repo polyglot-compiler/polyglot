@@ -26,46 +26,55 @@ public class For_c extends Stmt_c implements For
 	this.body = body;
     }
 
+    /** List of initialization statements */
     public List inits() {
 	return Collections.unmodifiableList(this.inits);
     }
 
+    /** Set the inits of the statement. */
     public For inits(List inits) {
 	For_c n = (For_c) copy();
 	n.inits = TypedList.copyAndCheck(inits, ForInit.class, true);
 	return n;
     }
 
+    /** Loop condition */
     public Expr cond() {
 	return this.cond;
     }
 
+    /** Set the conditional of the statement. */
     public For cond(Expr cond) {
 	For_c n = (For_c) copy();
 	n.cond = cond;
 	return n;
     }
 
+    /** List of iterator expressions. */
     public List iters() {
 	return Collections.unmodifiableList(this.iters);
     }
 
+    /** Set the iterator expressions of the statement. */
     public For iters(List iters) {
 	For_c n = (For_c) copy();
 	n.iters = TypedList.copyAndCheck(iters, ForUpdate.class, true);
 	return n;
     }
 
+    /** Loop body */
     public Stmt body() {
 	return this.body;
     }
 
+    /** Set the body of the statement. */
     public For body(Stmt body) {
 	For_c n = (For_c) copy();
 	n.body = body;
 	return n;
     }
 
+    /** Reconstruct the statement. */
     protected For_c reconstruct(List inits, Expr cond, List iters, Stmt body) {
 	if (! CollectionUtil.equals(inits, this.inits) || cond != this.cond || ! CollectionUtil.equals(iters, this.iters) || body != this.body) {
 	    For_c n = (For_c) copy();
@@ -79,6 +88,7 @@ public class For_c extends Stmt_c implements For
 	return this;
     }
 
+    /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
 	List inits = new ArrayList(this.inits.size());
 	for (Iterator i = this.inits.iterator(); i.hasNext(); ) {
@@ -113,6 +123,7 @@ public class For_c extends Stmt_c implements For
 	c.popBlock();
     }
 
+    /** Type check the statement. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
@@ -126,6 +137,7 @@ public class For_c extends Stmt_c implements For
 	return this;
     }
 
+    /** Write the statement to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
         Context c = tr.context();
 

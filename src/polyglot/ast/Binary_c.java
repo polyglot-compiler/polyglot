@@ -6,8 +6,8 @@ import jltools.visit.*;
 import jltools.types.*;
 
 /**
- * A <code>Binary</code> represents a Java binary expression, a
- * immutable pair of expressions combined with an op.
+ * A <code>Binary</code> represents a Java binary expression, an
+ * immutable pair of expressions combined with an operator.
  */
 public class Binary_c extends Expr_c implements Binary
 {
@@ -24,36 +24,43 @@ public class Binary_c extends Expr_c implements Binary
 	this.precedence = op.precedence();
     }
 
+    /** Get the left operand of the expression. */
     public Expr left() {
 	return this.left;
     }
 
+    /** Set the left operand of the expression. */
     public Binary left(Expr left) {
 	Binary_c n = (Binary_c) copy();
 	n.left = left;
 	return n;
     }
 
+    /** Get the operator of the expression. */
     public Operator operator() {
 	return this.op;
     }
 
+    /** Set the operator of the expression. */
     public Binary operator(Operator op) {
 	Binary_c n = (Binary_c) copy();
 	n.op = op;
 	return n;
     }
 
+    /** Get the right operand of the expression. */
     public Expr right() {
 	return this.right;
     }
 
+    /** Set the right operand of the expression. */
     public Binary right(Expr right) {
 	Binary_c n = (Binary_c) copy();
 	n.right = right;
 	return n;
     }
 
+    /** Get the precedence of the expression. */
     public Precedence precedence() {
 	return this.precedence;
     }
@@ -64,6 +71,7 @@ public class Binary_c extends Expr_c implements Binary
 	return n;
     }
 
+    /** Reconstruct the expression. */
     protected Binary_c reconstruct(Expr left, Expr right) {
 	if (left != this.left || right != this.right) {
 	    Binary_c n = (Binary_c) copy();
@@ -75,12 +83,14 @@ public class Binary_c extends Expr_c implements Binary
 	return this;
     }
 
+    /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
 	Expr left = (Expr) this.left.visit(v);
 	Expr right = (Expr) this.right.visit(v);
 	return reconstruct(left, right);
     }
 
+    /** Fold constants for the expression. */
     public Node foldConstants_(ConstantFolder cf) {
       	NodeFactory nf = cf.nodeFactory();
 
@@ -169,6 +179,7 @@ public class Binary_c extends Expr_c implements Binary
         return this;
     }
 
+    /** Type check the expression. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         Type l = left.type();
 	Type r = right.type();
@@ -257,6 +268,7 @@ public class Binary_c extends Expr_c implements Binary
 	return type(ts.promote(l, r));
     }
   
+    /** Check exceptions thrown by the expression. */
     public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
 	TypeSystem ts = ec.typeSystem();
 
@@ -267,6 +279,7 @@ public class Binary_c extends Expr_c implements Binary
 	return this;
     }
 
+    /** Get the throwsArithmeticException of the expression. */
     public boolean throwsArithmeticException() {
 	// conservatively assume that any division or mod may throw
 	// ArithmeticException this is NOT true-- floats and doubles don't
@@ -278,6 +291,7 @@ public class Binary_c extends Expr_c implements Binary
 	return left + " " + op + " " + right;
     }
 
+    /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	TypeSystem ts = tr.typeSystem();
 

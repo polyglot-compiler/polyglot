@@ -9,8 +9,7 @@ import jltools.visit.*;
 import jltools.main.Options;
 
 /**
- * A <code>TypeNode</code> represents the syntactic representation of a 
- * <code>Type</code> within the abstract syntax tree.
+ * A <code>CanonicalTypeNode</code> is a type node for a canonical type.
  */
 public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
 {
@@ -19,7 +18,7 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
 	this.type = type;
     }
 
-    /*
+    /**
      * If the "use-fully-qualified-class-names" options is used, then the
      * fully qualified names is written out (<code>java.lang.Object</code>).
      * Otherwise, the string that originally represented the type in the

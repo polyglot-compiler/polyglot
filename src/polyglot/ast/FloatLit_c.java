@@ -20,30 +20,36 @@ public class FloatLit_c extends Lit_c implements FloatLit
 	this.value = value;
     }
 
+    /** Get the kind of the literal. */
     public FloatLit.Kind kind() {
 	return this.kind;
     }
 
+    /** Set the kind of the literal. */
     public FloatLit kind(FloatLit.Kind kind) {
 	FloatLit_c n = (FloatLit_c) copy();
 	n.kind = kind;
 	return n;
     }
 
+    /** Get the value of the expression. */
     public double value() {
 	return this.value;
     }
 
+    /** Get the value of the expression, as an object. */
     public Object objValue() {
 	return new Double(this.value);
     }
 
+    /** Set the value of the expression. */
     public FloatLit value(double value) {
 	FloatLit_c n = (FloatLit_c) copy();
 	n.value = value;
 	return n;
     }
 
+    /** Type check the expression. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	if (kind == FLOAT) {
 	    return type(tc.typeSystem().Float());
@@ -61,6 +67,7 @@ public class FloatLit_c extends Lit_c implements FloatLit
 	return Double.toString(value);
     }
 
+    /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
         if (kind == FLOAT) {
 	    w.write(Float.toString((float) value) + "F");

@@ -5,6 +5,9 @@ import jltools.types.*;
 import jltools.visit.*;
 import jltools.util.*;
 
+/**
+ * An <code>Assign</code> represents a Java assignment expression.
+ */
 public class Assign_c extends Expr_c implements Assign
 {
     protected Expr left;
@@ -18,40 +21,48 @@ public class Assign_c extends Expr_c implements Assign
 	this.right = right;
     }
 
+    /** Get the precedence of the expression. */
     public Precedence precedence() {
 	return Precedence.ASSIGN;
     }
 
+    /** Get the left operand of the expression. */
     public Expr left() {
 	return this.left;
     }
 
+    /** Set the left operand of the expression. */
     public Assign left(Expr left) {
 	Assign_c n = (Assign_c) copy();
 	n.left = left;
 	return n;
     }
 
+    /** Get the operator of the expression. */
     public Operator operator() {
 	return this.op;
     }
 
+    /** Set the operator of the expression. */
     public Assign operator(Operator op) {
 	Assign_c n = (Assign_c) copy();
 	n.op = op;
 	return n;
     }
 
+    /** Get the right operand of the expression. */
     public Expr right() {
 	return this.right;
     }
 
+    /** Set the right operand of the expression. */
     public Assign right(Expr right) {
 	Assign_c n = (Assign_c) copy();
 	n.right = right;
 	return n;
     }
 
+    /** Reconstruct the expression. */
     protected Assign_c reconstruct(Expr left, Expr right) {
 	if (left != this.left || right != this.right) {
 	    Assign_c n = (Assign_c) copy();
@@ -63,12 +74,14 @@ public class Assign_c extends Expr_c implements Assign
 	return this;
     }
 
+    /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
 	Expr left = (Expr) this.left.visit(v);
 	Expr right = (Expr) this.right.visit(v);
 	return reconstruct(left, right);
     }
 
+    /** Type check the expression. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	Type t = left.type();
 	Type s = right.type();
@@ -142,6 +155,7 @@ public class Assign_c extends Expr_c implements Assign
 	return type(ts.promote(t, s));
     }
   
+    /** Check exceptions thrown by the expression. */
     public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
 	TypeSystem ts = ec.typeSystem();
 
@@ -156,12 +170,14 @@ public class Assign_c extends Expr_c implements Assign
 	return this;
     }
 
+    /** Get the throwsArrayStoreException of the expression. */
     public boolean throwsArrayStoreException() {
 	return op == ASSIGN &&
 	       left.type().isReference() &&
 	       left instanceof ArrayAccess;
     }
 
+    /** Get the throwsArithmeticException of the expression. */
     public boolean throwsArithmeticException() {
 	// conservatively assume that any division or mod may throw
 	// ArithmeticException this is NOT true-- floats and doubles don't
@@ -173,6 +189,7 @@ public class Assign_c extends Expr_c implements Assign
 	return left + " " + op + " " + right;
     }
 
+    /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	translateSubexpr(left, w, tr);
 	w.write(" ");

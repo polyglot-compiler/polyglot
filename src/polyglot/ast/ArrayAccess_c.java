@@ -8,11 +8,7 @@ import jltools.visit.*;
 
 /**
  * An <code>ArrayAccess</code> is an immutable representation of an
- * access of an array member.  For instance <code>foo[i]</code> accesses the 
- * <code>i</code>'th member of <code>foo</code>.  An 
- * <code>ArrayAccess</code> consists of a base expression which 
- * evaulates to an array, and an index expression which evaluates to an integer
- * indicating the index of the array to be accessed.
+ * access of an array member.
  */
 public class ArrayAccess_c extends Expr_c implements ArrayAccess
 {
@@ -25,30 +21,36 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	this.index = index;
     }
 
+    /** Get the precedence of the expression. */
     public Precedence precedence() { 
 	return Precedence.LITERAL;
     }
 
+    /** Get the array of the expression. */
     public Expr array() {
 	return this.array;
     }
 
+    /** Set the array of the expression. */
     public ArrayAccess array(Expr array) {
 	ArrayAccess_c n = (ArrayAccess_c) copy();
 	n.array = array;
 	return n;
     }
 
+    /** Get the index of the expression. */
     public Expr index() {
 	return this.index;
     }
 
+    /** Set the index of the expression. */
     public ArrayAccess index(Expr index) {
 	ArrayAccess_c n = (ArrayAccess_c) copy();
 	n.index = index;
 	return n;
     }
 
+    /** Reconstruct the expression. */
     protected ArrayAccess_c reconstruct(Expr array, Expr index) {
 	if (array != this.array || index != this.index) {
 	    ArrayAccess_c n = (ArrayAccess_c) copy();
@@ -60,12 +62,14 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	return this;
     }
 
+    /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
 	Expr array = (Expr) this.array.visit(v);
 	Expr index = (Expr) this.index.visit(v);
 	return reconstruct(array, index);
     }
 
+    /** Type check the expression. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
@@ -82,6 +86,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	return type(array.type().toArray().base());
     }
 
+    /** Check exceptions thrown by the expression. */
     public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
 	TypeSystem ts = ec.typeSystem();
 
@@ -95,6 +100,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	return array + "[" + index + "]";
     }
 
+    /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	translateSubexpr(array, w, tr);
 	w.write ("[");

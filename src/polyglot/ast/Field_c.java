@@ -6,7 +6,6 @@ import jltools.types.*;
 import jltools.visit.*;
 import jltools.util.*;
 import java.util.*;
-import jltools.ext.jif.extension.*;
 
 /**
  * A <code>Field</code> is an immutable representation of a Java field
@@ -32,34 +31,41 @@ public class Field_c extends Expr_c implements Field
 	}
     }
 
+    /** Get the precedence of the field. */
     public Precedence precedence() { 
 	return Precedence.LITERAL;
     }
 
+    /** Get the target of the field. */
     public Receiver target() {
 	return this.target;
     }
 
+    /** Set the target of the field. */
     public Field target(Receiver target) {
 	Field_c n = (Field_c) copy();
 	n.target = target;
 	return n;
     }
 
+    /** Get the name of the field. */
     public String name() {
 	return this.name;
     }
 
+    /** Set the name of the field. */
     public Field name(String name) {
 	Field_c n = (Field_c) copy();
 	n.name = name;
 	return n;
     }
 
+    /** Get the field instance of the field. */
     public FieldInstance fieldInstance() {
 	return fi;
     }
 
+    /** Set the field instance of the field. */
     public Field fieldInstance(FieldInstance fi) {
 	if (! fi.type().isCanonical()) {
 	    throw new InternalCompilerError("Type of " + fi + " in " +
@@ -71,6 +77,7 @@ public class Field_c extends Expr_c implements Field
 	return n;
     }
 
+    /** Reconstruct the field. */
     protected Field_c reconstruct(Receiver target) {
 	if (target != this.target) {
 	    Field_c n = (Field_c) copy();
@@ -81,11 +88,13 @@ public class Field_c extends Expr_c implements Field
 	return this;
     }
 
+    /** Visit the children of the field. */
     public Node visitChildren(NodeVisitor v) {
 	Receiver target = (Receiver) this.target.visit(v);
 	return reconstruct(target);
     }
 
+    /** Type check the field. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         Context c = tc.context();
         TypeSystem ts = tc.typeSystem();
@@ -116,6 +125,7 @@ public class Field_c extends Expr_c implements Field
 	    target.getClass().getName() + ".");
     }
 
+    /** Check exceptions thrown by the field. */
     public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
 	TypeSystem ts = ec.typeSystem();
 
@@ -130,6 +140,7 @@ public class Field_c extends Expr_c implements Field
 	return (target != null ? target + "." : "") + name;
     }
 
+    /** Write the field to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	if (target instanceof Expr) {
 	    translateSubexpr((Expr) target, w, tr);

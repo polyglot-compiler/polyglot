@@ -8,9 +8,9 @@ import java.util.*;
 
 /**
  * An <code>ArrayInit</code> is an immutable representation of
- * the an array initializer, such as { 3, 1, { 4, 1, 5 } }. Note that the 
- * elements of these array may be expressions of any type (e.g. 
- * <code>MethedExpr</code>).
+ * an array initializer, such as { 3, 1, { 4, 1, 5 } }.  Note that
+ * the elements of these array may be expressions of any type (e.g.,
+ * <code>Call</code>).
  */
 public class ArrayInit_c extends Expr_c implements ArrayInit
 {
@@ -21,16 +21,19 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 	this.elements = TypedList.copyAndCheck(elements, Expr.class, true);
     }
 
+    /** Get the elements of the initializer. */
     public List elements() {
 	return this.elements;
     }
 
+    /** Set the elements of the initializer. */
     public ArrayInit elements(List elements) {
 	ArrayInit_c n = (ArrayInit_c) copy();
 	n.elements = TypedList.copyAndCheck(elements, Expr.class, true);
 	return n;
     }
 
+    /** Reconstruct the initializer. */
     protected ArrayInit_c reconstruct(List elements) {
 	if (! CollectionUtil.equals(elements, this.elements)) {
 	    ArrayInit_c n = (ArrayInit_c) copy();
@@ -41,6 +44,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 	return this;
     }
 
+    /** Visit the children of the initializer. */
     public Node visitChildren(NodeVisitor v) {
 	List elements = new ArrayList(this.elements.size());
 	for (Iterator i = this.elements.iterator(); i.hasNext(); ) {
@@ -52,6 +56,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 	return reconstruct(elements);
     }
 
+    /** Type check the initializer. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
@@ -80,6 +85,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 	return "{ ... }";
     }
 
+    /** Write the initializer to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	w.write("{ ");
 

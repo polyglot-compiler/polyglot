@@ -7,7 +7,7 @@ import jltools.util.*;
 
 /**
  * A immutable representation of a Java language <code>do</code> statement. 
- * Contains a statement to be executed and an expression to be tested 
+ * It contains a statement to be executed and an expression to be tested 
  * indicating whether to reexecute the statement.
  */ 
 public class Do_c extends Stmt_c implements Do
@@ -21,26 +21,31 @@ public class Do_c extends Stmt_c implements Do
 	this.cond = cond;
     }
 
+    /** Get the body of the statement. */
     public Stmt body() {
 	return this.body;
     }
 
+    /** Set the body of the statement. */
     public Do body(Stmt body) {
 	Do_c n = (Do_c) copy();
 	n.body = body;
 	return n;
     }
 
+    /** Get the conditional of the statement. */
     public Expr cond() {
 	return this.cond;
     }
 
+    /** Set the conditional of the statement. */
     public Do cond(Expr cond) {
 	Do_c n = (Do_c) copy();
 	n.cond = cond;
 	return n;
     }
 
+    /** Reconstruct the statement. */
     protected Do_c reconstruct(Stmt body, Expr cond) {
 	if (body != this.body || cond != this.cond) {
 	    Do_c n = (Do_c) copy();
@@ -52,12 +57,14 @@ public class Do_c extends Stmt_c implements Do
 	return this;
     }
 
+    /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
 	Stmt body = (Stmt) this.body.visit(v);
 	Expr cond = (Expr) this.cond.visit(v);
 	return reconstruct(body, cond);
     }
 
+    /** Type check the statement. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -75,6 +82,7 @@ public class Do_c extends Stmt_c implements Do
 	return "do { ... } while (" + cond + ")";
     }
 
+    /** Write the statement to an output file. */
     public void translate_(CodeWriter w, Translator tr)
     {
 	w.write("do ");

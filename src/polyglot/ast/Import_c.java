@@ -11,7 +11,7 @@ import jltools.main.Options;
 /**
  * An <code>Import</code> is an immutable representation of a Java
  * <code>import</code> statement.  It consists of the string representing the
- * item being imported and the kind  which is either indicating that a class
+ * item being imported and the kind which is either indicating that a class
  * is being imported, or that an entire package is being imported.
  */
 public class Import_c extends Node_c implements Import
@@ -25,26 +25,31 @@ public class Import_c extends Node_c implements Import
 	this.kind = kind;
     }
 
+    /** Get the name of the import. */
     public String name() {
 	return this.name;
     }
 
+    /** Set the name of the import. */
     public Import name(String name) {
 	Import_c n = (Import_c) copy();
 	n.name = name;
 	return n;
     }
 
+    /** Get the kind of the import. */
     public Kind kind() {
 	return this.kind;
     }
 
+    /** Set the kind of the import. */
     public Import kind(Kind kind) {
 	Import_c n = (Import_c) copy();
 	n.kind = kind;
 	return n;
     }
 
+    /** Build type objects for the import. */
     public Node buildTypes_(TypeBuilder tb) throws SemanticException {
 	ImportTable it = tb.importTable();
 
@@ -62,6 +67,7 @@ public class Import_c extends Node_c implements Import
 	return "import " + name + (kind == PACKAGE ? ".*" : "");
     }
 
+    /** Write the import to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	if (! Options.global.fully_qualified_names) {
 	    w.write("import ");

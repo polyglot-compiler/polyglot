@@ -7,8 +7,8 @@ import jltools.visit.*;
 import java.util.*;
 
 /**
- * A <code>Block</code> represents a Java block statement -- a 
- * immutable sequence of statements.
+ * A <code>Block</code> represents a Java block statement -- an immutable
+ * sequence of statements.
  */
 public class Block_c extends AbstractBlock_c implements Block
 {
@@ -20,6 +20,7 @@ public class Block_c extends AbstractBlock_c implements Block
 	return "{ ... }";
     }
 
+    /** Write the block to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	w.write("{");
 	w.allowBreak(4," ");

@@ -7,7 +7,7 @@ import jltools.util.*;
 
 /**
  * A <code>Unary</code> represents a Java unary expression, an
- * immutable pair of an expression and an operator.
+ * immutable pair of an expression and an an operator.
  */
 public class Unary_c extends Expr_c implements Unary
 {
@@ -20,30 +20,36 @@ public class Unary_c extends Expr_c implements Unary
 	this.expr = expr;
     }
 
+    /** Get the precedence of the expression. */
     public Precedence precedence() {
 	return Precedence.UNARY;
     }
 
+    /** Get the sub-expression of the expression. */
     public Expr expr() {
 	return this.expr;
     }
 
+    /** Set the sub-expression of the expression. */
     public Unary expr(Expr expr) {
 	Unary_c n = (Unary_c) copy();
 	n.expr = expr;
 	return n;
     }
 
+    /** Get the operator. */
     public Unary.Operator operator() {
 	return this.op;
     }
 
+    /** Set the operator. */
     public Unary operator(Unary.Operator op) {
 	Unary_c n = (Unary_c) copy();
 	n.op = op;
 	return n;
     }
 
+    /** Reconstruct the expression. */
     protected Unary_c reconstruct(Expr expr) {
 	if (expr != this.expr) {
 	    Unary_c n = (Unary_c) copy();
@@ -54,11 +60,13 @@ public class Unary_c extends Expr_c implements Unary
 	return this;
     }
 
+    /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
 	Expr expr = (Expr) this.expr.visit(v);
 	return reconstruct(expr);
     }
 
+    /** Fold constants for the expression. */
     public Node foldConstants_(ConstantFolder cf) {
       	NodeFactory nf = cf.nodeFactory();
 
@@ -78,6 +86,7 @@ public class Unary_c extends Expr_c implements Unary
         return this;
     }
 
+    /** Type check the expression. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 

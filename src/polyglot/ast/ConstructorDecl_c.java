@@ -6,6 +6,10 @@ import jltools.visit.*;
 import jltools.util.*;
 import java.util.*;
 
+/**
+ * A <code>ConstructorDecl</code> is an immutable representation of a
+ * constructor declaration as part of a class body. 
+ */
 public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 {
     protected Flags flags;
@@ -24,70 +28,84 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	this.body = body;
     }
 
+    /** Get the flags of the constructor. */
     public Flags flags() {
 	return this.flags;
     }
 
+    /** Set the flags of the constructor. */
     public ConstructorDecl flags(Flags flags) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	n.flags = flags;
 	return n;
     }
 
+    /** Get the name of the constructor. */
     public String name() {
 	return this.name;
     }
 
+    /** Set the name of the constructor. */
     public ConstructorDecl name(String name) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	n.name = name;
 	return n;
     }
 
+    /** Get the formals of the constructor. */
     public List formals() {
 	return Collections.unmodifiableList(this.formals);
     }
 
+    /** Set the formals of the constructor. */
     public ConstructorDecl formals(List formals) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
 	return n;
     }
 
+    /** Get the exceptionTypes of the constructor. */
     public List exceptionTypes() {
 	return Collections.unmodifiableList(this.exceptionTypes);
     }
 
+    /** Set the exceptionTypes of the constructor. */
     public ConstructorDecl exceptionTypes(List exceptionTypes) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	n.exceptionTypes = TypedList.copyAndCheck(exceptionTypes, TypeNode.class, true);
 	return n;
     }
 
+    /** Get the body of the constructor. */
     public Block body() {
 	return this.body;
     }
 
+    /** Set the body of the constructor. */
     public ConstructorDecl body(Block body) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	n.body = body;
 	return n;
     }
 
+    /** Get the constructorInstance of the constructor. */
     public ConstructorInstance constructorInstance() {
 	return ci;
     }
 
+    /** Get the procedureInstance of the constructor. */
     public ProcedureInstance procedureInstance() {
 	return ci;
     }
 
+    /** Set the constructorInstance of the constructor. */
     public ConstructorDecl constructorInstance(ConstructorInstance ci) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	n.ci = ci;
 	return n;
     }
 
+    /** Reconstruct the constructor. */
     protected ConstructorDecl_c reconstruct(List formals, List exceptionTypes, Block body) {
 	if (! CollectionUtil.equals(formals, this.formals) || ! CollectionUtil.equals(exceptionTypes, this.exceptionTypes) || body != this.body) {
 	    ConstructorDecl_c n = (ConstructorDecl_c) copy();
@@ -100,6 +118,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	return this;
     }
 
+    /** Visit the children of the constructor. */
     public Node visitChildren(NodeVisitor v) {
 	List formals = new ArrayList(this.formals.size());
 	for (Iterator i = this.formals.iterator(); i.hasNext(); ) {
@@ -124,6 +143,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	return reconstruct(formals, exceptionTypes, body);
     }
 
+    /** Build type objects for the constructor. */
     public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
 	tb.pushScope();
 
@@ -147,6 +167,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
         c.popCode();
     }
 
+    /** Type check the constructor. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         Context c = tc.context();
         TypeSystem ts = tc.typeSystem();
@@ -179,6 +200,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	return this;
     }
 
+    /** Check exceptions thrown by the constructor. */
     public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
 	TypeSystem ts = ec.typeSystem();
 
@@ -217,6 +239,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	return flags.translate() + name + "(...)";
     }
 
+    /** Write the constructor to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
         Context c = tr.context();
 
@@ -281,6 +304,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	}
     }
 
+    /** Reconstruct the type objects for the constructor. */
     public Node reconstructTypes_(NodeFactory nf, TypeSystem ts, Context c)
         throws SemanticException {
 

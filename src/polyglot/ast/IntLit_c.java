@@ -5,6 +5,10 @@ import jltools.types.*;
 import jltools.visit.*;
 import jltools.util.*;
 
+/** 
+ * An <code>IntLit</code> represents a literal in Java of an integer
+ * type.
+ */
 public class IntLit_c extends NumLit_c implements IntLit
 {
     protected Kind kind;
@@ -26,26 +30,31 @@ public class IntLit_c extends NumLit_c implements IntLit
 	}
     }
 
+    /** Get the value of the expression. */
     public long value() {
         return (int) longValue();
     }
 
+    /** Set the value of the expression. */
     public IntLit value(long value) {
         IntLit_c n = (IntLit_c) copy();
 	n.value = value;
 	return n;
     }
 
+    /** Get the kind of the expression. */
     public IntLit.Kind kind() {
         return kind;
     }
 
+    /** Set the kind of the expression. */
     public IntLit kind(IntLit.Kind kind) {
 	IntLit_c n = (IntLit_c) copy();
 	n.kind = kind;
 	return n;
     }
 
+    /** Type check the expression. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 

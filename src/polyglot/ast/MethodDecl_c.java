@@ -7,12 +7,7 @@ import jltools.visit.*;
 import java.util.*;
 
 /**
- * A <code>MethodDecl</code> is an immutable representation of a method
- * definition as part of a class body.  It consists of a method name,
- * a list of formal parameters, a list of exceptions which may be
- * thrown, a return type, access flags, and a method body.  A method
- * may be a constructor in which case it does not have a name (as it
- * must be the same as the class, nor does it have a return type.)
+ * A method declaration.
  */
 public class MethodDecl_c extends Node_c implements MethodDecl
 {
@@ -34,80 +29,96 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	this.body = body;
     }
 
+    /** Get the flags of the method. */
     public Flags flags() {
 	return this.flags;
     }
 
+    /** Set the flags of the method. */
     public MethodDecl flags(Flags flags) {
 	MethodDecl_c n = (MethodDecl_c) copy();
 	n.flags = flags;
 	return n;
     }
 
+    /** Get the return type of the method. */
     public TypeNode returnType() {
 	return this.returnType;
     }
 
+    /** Set the return type of the method. */
     public MethodDecl returnType(TypeNode returnType) {
 	MethodDecl_c n = (MethodDecl_c) copy();
 	n.returnType = returnType;
 	return n;
     }
 
+    /** Get the name of the method. */
     public String name() {
 	return this.name;
     }
 
+    /** Set the name of the method. */
     public MethodDecl name(String name) {
 	MethodDecl_c n = (MethodDecl_c) copy();
 	n.name = name;
 	return n;
     }
 
+    /** Get the formals of the method. */
     public List formals() {
 	return Collections.unmodifiableList(this.formals);
     }
 
+    /** Set the formals of the method. */
     public MethodDecl formals(List formals) {
 	MethodDecl_c n = (MethodDecl_c) copy();
 	n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
 	return n;
     }
 
+    /** Get the exception types of the method. */
     public List exceptionTypes() {
 	return Collections.unmodifiableList(this.exceptionTypes);
     }
 
+    /** Set the exception types of the method. */
     public MethodDecl exceptionTypes(List exceptionTypes) {
 	MethodDecl_c n = (MethodDecl_c) copy();
 	n.exceptionTypes = TypedList.copyAndCheck(exceptionTypes, TypeNode.class, true);
 	return n;
     }
 
+    /** Get the body of the method. */
     public Block body() {
 	return this.body;
     }
 
+    /** Set the body of the method. */
     public MethodDecl body(Block body) {
 	MethodDecl_c n = (MethodDecl_c) copy();
 	n.body = body;
 	return n;
     }
 
+    /** Get the method instance of the method. */
     public MethodInstance methodInstance() {
 	return mi;
     }
 
+    /** Set the method instance of the method. */
     public MethodDecl methodInstance(MethodInstance mi) {
 	MethodDecl_c n = (MethodDecl_c) copy();
 	n.mi = mi;
 	return n;
     }
 
+    /** Get the procedure instance of the method. */
     public ProcedureInstance procedureInstance() {
 	return mi;
     }
 
+    /** Reconstruct the method. */
     protected MethodDecl_c reconstruct(TypeNode returnType, List formals, List exceptionTypes, Block body) {
 	if (returnType != this.returnType || ! CollectionUtil.equals(formals, this.formals) || ! CollectionUtil.equals(exceptionTypes, this.exceptionTypes) || body != this.body) {
 	    MethodDecl_c n = (MethodDecl_c) copy();
@@ -121,6 +132,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	return this;
     }
 
+    /** Visit the children of the method. */
     public Node visitChildren(NodeVisitor v) {
 	TypeNode returnType = (TypeNode) this.returnType.visit(v);
 
@@ -147,6 +159,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	return reconstruct(returnType, formals, exceptionTypes, body);
     }
 
+    /** Build type objects for the method. */
     public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
 	tb.pushScope();
 
@@ -170,6 +183,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
         c.popCode();
     }
 
+    /** Type check the method. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
@@ -197,6 +211,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	return this;
     }
 
+    /** Check exceptions thrown by the method. */
     public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
 	TypeSystem ts = ec.typeSystem();
 
@@ -235,6 +250,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	return flags.translate() + returnType + " " + name + "(...)";
     }
 
+    /** Write the method to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
         Context c = tr.context();
 
@@ -304,6 +320,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	}
     }
 
+    /** Reconstruct the type objects for the method. */
     public Node reconstructTypes_(NodeFactory nf, TypeSystem ts, Context c)
         throws SemanticException {
 

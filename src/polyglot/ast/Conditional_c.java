@@ -6,8 +6,8 @@ import jltools.types.*;
 import jltools.util.*;
 
 /**
- * A <code>Conditional</code> represents a Java ternary expression as
- * an immutable triple of expressions.
+ * A <code>Conditional</code> is a representation of a Java ternary
+ * expression <code>(cond ? consequent : alternative)</code>.
  */
 public class Conditional_c extends Expr_c implements Conditional
 {
@@ -22,40 +22,48 @@ public class Conditional_c extends Expr_c implements Conditional
 	this.alternative = alternative;
     }
 
+    /** Get the precedence of the expression. */
     public Precedence precedence() { 
 	return Precedence.CONDITIONAL;
     }
 
+    /** Get the conditional of the expression. */
     public Expr cond() {
 	return this.cond;
     }
 
+    /** Set the conditional of the expression. */
     public Conditional cond(Expr cond) {
 	Conditional_c n = (Conditional_c) copy();
 	n.cond = cond;
 	return n;
     }
 
+    /** Get the consequent of the expression. */
     public Expr consequent() {
 	return this.consequent;
     }
 
+    /** Set the consequent of the expression. */
     public Conditional consequent(Expr consequent) {
 	Conditional_c n = (Conditional_c) copy();
 	n.consequent = consequent;
 	return n;
     }
 
+    /** Get the alternative of the expression. */
     public Expr alternative() {
 	return this.alternative;
     }
 
+    /** Set the alternative of the expression. */
     public Conditional alternative(Expr alternative) {
 	Conditional_c n = (Conditional_c) copy();
 	n.alternative = alternative;
 	return n;
     }
 
+    /** Reconstruct the expression. */
     protected Conditional_c reconstruct(Expr cond, Expr consequent, Expr alternative) {
 	if (cond != this.cond || consequent != this.consequent || alternative != this.alternative) {
 	    Conditional_c n = (Conditional_c) copy();
@@ -68,6 +76,7 @@ public class Conditional_c extends Expr_c implements Conditional
 	return this;
     }
 
+    /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
 	Expr cond = (Expr) this.cond.visit(v);
 	Expr consequent = (Expr) this.consequent.visit(v);
@@ -75,6 +84,7 @@ public class Conditional_c extends Expr_c implements Conditional
 	return reconstruct(cond, consequent, alternative);
     }
 
+    /** Type check the expression. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
@@ -93,6 +103,7 @@ public class Conditional_c extends Expr_c implements Conditional
 	return cond + " ? " + consequent + " : " + alternative;
     }
 
+    /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr)
     {
 	translateSubexpr(cond, w, tr);

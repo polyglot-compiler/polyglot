@@ -6,8 +6,8 @@ import jltools.visit.*;
 import jltools.util.*;
 
 /**
- * An <code>Eval</code> is a wrapper for an expression (a
- * sequence of Java code that yeilds a value) in the context of a statement.
+ * An <code>Eval</code> is a wrapper for an expression in the context of
+ * a statement.
  */
 public class Eval_c extends Stmt_c implements Eval
 {
@@ -18,16 +18,19 @@ public class Eval_c extends Stmt_c implements Eval
 	this.expr = expr;
     }
 
+    /** Get the expression of the statement. */
     public Expr expr() {
 	return this.expr;
     }
 
+    /** Set the expression of the statement. */
     public Eval expr(Expr expr) {
 	Eval_c n = (Eval_c) copy();
 	n.expr = expr;
 	return n;
     }
 
+    /** Reconstruct the statement. */
     protected Eval_c reconstruct(Expr expr) {
 	if (expr != this.expr) {
 	    Eval_c n = (Eval_c) copy();
@@ -38,6 +41,7 @@ public class Eval_c extends Stmt_c implements Eval
 	return this;
     }
 
+    /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
 	Expr expr = (Expr) this.expr.visit(v);
 	return reconstruct(expr);
@@ -47,6 +51,7 @@ public class Eval_c extends Stmt_c implements Eval
 	return expr.toString();
     }
 
+    /** Write the statement to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	boolean semi = tr.appendSemicolon(true);
 

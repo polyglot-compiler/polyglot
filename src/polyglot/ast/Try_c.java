@@ -7,8 +7,8 @@ import jltools.visit.*;
 import java.util.*;
 
 /**
- * Overview: An immutable representation of a try block, one or more
- * catch blocks, and an optional finally block.
+ * An immutable representation of a <code>try</code> block, one or more
+ * <code>catch</code> blocks, and an optional <code>finally</code> block.
  */
 public class Try_c extends Stmt_c implements Try
 {
@@ -23,36 +23,43 @@ public class Try_c extends Stmt_c implements Try
 	this.finallyBlock = finallyBlock;
     }
 
+    /** Get the try block of the statement. */
     public Block tryBlock() {
 	return this.tryBlock;
     }
 
+    /** Set the try block of the statement. */
     public Try tryBlock(Block tryBlock) {
 	Try_c n = (Try_c) copy();
 	n.tryBlock = tryBlock;
 	return n;
     }
 
+    /** Get the catch blocks of the statement. */
     public List catchBlocks() {
 	return Collections.unmodifiableList(this.catchBlocks);
     }
 
+    /** Set the catch blocks of the statement. */
     public Try catchBlocks(List catchBlocks) {
 	Try_c n = (Try_c) copy();
 	n.catchBlocks = TypedList.copyAndCheck(catchBlocks, Catch.class, true);
 	return n;
     }
 
+    /** Get the finally block of the statement. */
     public Block finallyBlock() {
 	return this.finallyBlock;
     }
 
+    /** Set the finally block of the statement. */
     public Try finallyBlock(Block finallyBlock) {
 	Try_c n = (Try_c) copy();
 	n.finallyBlock = finallyBlock;
 	return n;
     }
 
+    /** Reconstruct the statement. */
     protected Try_c reconstruct(Block tryBlock, List catchBlocks, Block finallyBlock) {
 	if (tryBlock != this.tryBlock || ! CollectionUtil.equals(catchBlocks, this.catchBlocks) || finallyBlock != this.finallyBlock) {
 	    Try_c n = (Try_c) copy();
@@ -65,6 +72,7 @@ public class Try_c extends Stmt_c implements Try
 	return this;
     }
 
+    /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
 	Block tryBlock = (Block) this.tryBlock.visit(v);
 

@@ -7,9 +7,8 @@ import jltools.visit.*;
 import java.util.*;
 
 /**
- * A <code>ClassDecl</code> is the definition of a class, abstract class,
- * or interface. It may be a public or other top-level class, or an inner
- * named class, or an anonymous class.
+ * A local class declaration statement.  The node is just a wrapper around
+ * a class declaration.
  */
 public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
 {
@@ -20,16 +19,19 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
 	this.decl = decl;
     }
 
+    /** Get the class declaration. */
     public ClassDecl decl() {
 	return this.decl;
     }
 
+    /** Set the class declaration. */
     public LocalClassDecl decl(ClassDecl decl) {
 	LocalClassDecl_c n = (LocalClassDecl_c) copy();
 	n.decl = decl;
 	return n;
     }
 
+    /** Reconstruct the statement. */
     protected LocalClassDecl_c reconstruct(ClassDecl decl) {
         if (decl != this.decl) {
 	    LocalClassDecl_c n = (LocalClassDecl_c) copy();
@@ -40,6 +42,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
 	return this;
     }
 
+    /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
         ClassDecl decl = (ClassDecl) this.decl.visit(v);
         return reconstruct(decl);
@@ -58,6 +61,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
 	return decl.toString();
     }
 
+    /** Write the statement to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
         enterScope(tr.context());
         translateBlock(decl, w, tr);

@@ -6,7 +6,7 @@ import jltools.visit.*;
 import jltools.util.*;
 
 /**
- * class for the abstraction of chars and ints, longs, bytes and short literals.
+ * An integer literal: longs, ints, shorts, bytes, and chars.
  */
 public class NumLit_c extends Lit_c implements NumLit
 {
@@ -17,10 +17,12 @@ public class NumLit_c extends Lit_c implements NumLit
 	this.value = value;
     }
 
+    /** Get the value of the expression. */
     public long longValue() {
 	return this.value;
     }
 
+    /** Get the value of the expression, as an object. */
     public Object objValue() {
         return new Long(this.value);
     }

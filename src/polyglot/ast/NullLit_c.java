@@ -6,7 +6,7 @@ import jltools.visit.*;
 import jltools.util.*;
 
 /**
- * An Lit represents the Java literal <code>null</code>.
+ * The Java literal <code>null</code>.
  */
 public class NullLit_c extends Lit_c implements NullLit
 {
@@ -14,10 +14,12 @@ public class NullLit_c extends Lit_c implements NullLit
 	super(ext, pos);
     }
 
+    /** Type check the expression. */
     public Node typeCheck_(TypeChecker tc) {
 	return type(tc.typeSystem().Null());
     }
 
+    /** Get the value of the expression, as an object. */
     public Object objValue() {
 	return null;
     }
@@ -26,6 +28,7 @@ public class NullLit_c extends Lit_c implements NullLit
 	return "null /* lit */";
     }
 
+    /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	w.write("null");
     }

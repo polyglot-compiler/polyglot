@@ -20,30 +20,36 @@ public class Instanceof_c extends Expr_c implements Instanceof
 	this.compareType = compareType;
     }
 
+    /** Get the precedence of the expression. */
     public Precedence precedence() {
 	return Precedence.INSTANCEOF;
     }
 
+    /** Get the expression to be tested. */
     public Expr expr() {
 	return this.expr;
     }
 
+    /** Set the expression to be tested. */
     public Instanceof expr(Expr expr) {
 	Instanceof_c n = (Instanceof_c) copy();
 	n.expr = expr;
 	return n;
     }
 
+    /** Get the type to be compared against. */
     public TypeNode compareType() {
 	return this.compareType;
     }
 
+    /** Set the type to be compared against. */
     public Instanceof compareType(TypeNode compareType) {
 	Instanceof_c n = (Instanceof_c) copy();
 	n.compareType = compareType;
 	return n;
     }
 
+    /** Reconstruct the expression. */
     protected Instanceof_c reconstruct(Expr expr, TypeNode compareType) {
 	if (expr != this.expr || compareType != this.compareType) {
 	    Instanceof_c n = (Instanceof_c) copy();
@@ -55,12 +61,14 @@ public class Instanceof_c extends Expr_c implements Instanceof
 	return this;
     }
 
+    /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
 	Expr expr = (Expr) this.expr.visit(v);
 	TypeNode compareType = (TypeNode) this.compareType.visit(v);
 	return reconstruct(expr, compareType);
     }
 
+    /** Type check the expression. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
@@ -76,13 +84,14 @@ public class Instanceof_c extends Expr_c implements Instanceof
 		expr.position());
 	}
 
-	return type(tc.typeSystem().Boolean());
+	return type(ts.Boolean());
     }
 
     public String toString() {
 	return expr + " instanceof " + compareType;
     }
 
+    /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	translateSubexpr(expr, w, tr);
 	w.write(" instanceof ");

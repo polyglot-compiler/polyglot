@@ -7,9 +7,9 @@ import jltools.util.*;
 import jltools.visit.*;
 
 /**
- * A <code>Formal</code> is immutable representation of a ordered 
- * pair: a type and a variable declarator identifier, used as formal
- * parameters such as in method declarations and catch blocks.
+ * A <code>Formal</code> represents a formal parameter to a method
+ * or constructor or to a catch block.  It consists of a type and a variable
+ * identifier.
  */
 public class Formal_c extends Node_c implements Formal
 {
@@ -21,50 +21,60 @@ public class Formal_c extends Node_c implements Formal
 	this.decl = new Declarator_c(flags, type, name, null);
     }
 
+    /** Get the type of the formal. */
     public Type declType() {
         return decl.declType();
     }
 
+    /** Get the flags of the formal. */
     public Flags flags() {
 	return decl.flags();
     }
 
+    /** Set the flags of the formal. */
     public Formal flags(Flags flags) {
 	Formal_c n = (Formal_c) copy();
 	n.decl = decl.flags(flags);
 	return n;
     }
 
+    /** Get the type node of the formal. */
     public TypeNode type() {
 	return decl.type();
     }
 
+    /** Set the type node of the formal. */
     public Formal type(TypeNode type) {
 	Formal_c n = (Formal_c) copy();
 	n.decl = decl.type(type);
 	return n;
     }
 
+    /** Get the name of the formal. */
     public String name() {
 	return decl.name();
     }
 
+    /** Set the name of the formal. */
     public Formal name(String name) {
 	Formal_c n = (Formal_c) copy();
 	n.decl = decl.name(name);
 	return n;
     }
 
+    /** Get the local instance of the formal. */
     public LocalInstance localInstance() {
         return li;
     }
 
+    /** Set the local instance of the formal. */
     public Formal localInstance(LocalInstance li) {
         Formal_c n = (Formal_c) copy();
 	n.li = li;
 	return n;
     }
 
+    /** Reconstruct the formal. */
     protected Formal_c reconstruct(TypeNode type) {
 	if (type() != type) {
 	    Formal_c n = (Formal_c) copy();
@@ -76,6 +86,7 @@ public class Formal_c extends Node_c implements Formal
 	return this;
     }
 
+    /** Visit the children of the formal. */
     public Node visitChildren(NodeVisitor v) {
 	TypeNode type = (TypeNode) type().visit(v);
 	return reconstruct(type);
@@ -85,10 +96,12 @@ public class Formal_c extends Node_c implements Formal
 	c.addVariable(li);
     }
 
+    /** Write the formal to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
         decl.translate(w, tr, false);
     }
 
+    /** Build type objects for the formal. */
     public Node buildTypes_(TypeBuilder tb) throws SemanticException {
 	TypeSystem ts = tb.typeSystem();
 	LocalInstance li = ts.localInstance(position(), flags(),
@@ -96,6 +109,7 @@ public class Formal_c extends Node_c implements Formal
 	return localInstance(li);
     }
 
+    /** Type check the formal. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 

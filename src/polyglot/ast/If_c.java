@@ -23,36 +23,43 @@ public class If_c extends Stmt_c implements If
 	this.alternative = alternative;
     }
 
+    /** Get the conditional of the statement. */
     public Expr cond() {
 	return this.cond;
     }
 
+    /** Set the conditional of the statement. */
     public If cond(Expr cond) {
 	If_c n = (If_c) copy();
 	n.cond = cond;
 	return n;
     }
 
+    /** Get the consequent of the statement. */
     public Stmt consequent() {
 	return this.consequent;
     }
 
+    /** Set the consequent of the statement. */
     public If consequent(Stmt consequent) {
 	If_c n = (If_c) copy();
 	n.consequent = consequent;
 	return n;
     }
 
+    /** Get the alternative of the statement. */
     public Stmt alternative() {
 	return this.alternative;
     }
 
+    /** Set the alternative of the statement. */
     public If alternative(Stmt alternative) {
 	If_c n = (If_c) copy();
 	n.alternative = alternative;
 	return n;
     }
 
+    /** Reconstruct the statement. */
     protected If_c reconstruct(Expr cond, Stmt consequent, Stmt alternative) {
 	if (cond != this.cond || consequent != this.consequent || alternative != this.alternative) {
 	    If_c n = (If_c) copy();
@@ -65,6 +72,7 @@ public class If_c extends Stmt_c implements If
 	return this;
     }
 
+    /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
 	Expr cond = (Expr) this.cond.visit(v);
 	Stmt consequent = (Stmt) this.consequent.visit(v);
@@ -77,6 +85,7 @@ public class If_c extends Stmt_c implements If
 	return reconstruct(cond, consequent, alternative);
     }
 
+    /** Type check the statement. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
@@ -94,6 +103,7 @@ public class If_c extends Stmt_c implements If
 	    (alternative != null ? " else " + alternative : "");
     }
 
+    /** Write the statement to an output file. */
     public void translate_(CodeWriter w, Translator tr) {    
 	w.write("if (");
 	translateBlock(cond, w, tr);

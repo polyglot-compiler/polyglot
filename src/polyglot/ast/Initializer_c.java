@@ -25,36 +25,43 @@ public class Initializer_c extends Node_c implements Initializer
 	this.body = body;
     }
 
+    /** Get the flags of the initializer. */
     public Flags flags() {
 	return this.flags;
     }
 
+    /** Set the flags of the initializer. */
     public Initializer flags(Flags flags) {
 	Initializer_c n = (Initializer_c) copy();
 	n.flags = flags;
 	return n;
     }
 
+    /** Get the initializer instance of the initializer. */
     public InitializerInstance initializerInstance() {
         return ii;
     }
 
+    /** Set the initializer instance of the initializer. */
     public Initializer initializerInstance(InitializerInstance ii) {
 	Initializer_c n = (Initializer_c) copy();
 	n.ii = ii;
 	return n;
     }
 
+    /** Get the body of the initializer. */
     public Block body() {
 	return this.body;
     }
 
+    /** Set the body of the initializer. */
     public Initializer body(Block body) {
 	Initializer_c n = (Initializer_c) copy();
 	n.body = body;
 	return n;
     }
 
+    /** Reconstruct the initializer. */
     protected Initializer_c reconstruct(Block body) {
 	if (body != this.body) {
 	    Initializer_c n = (Initializer_c) copy();
@@ -65,6 +72,7 @@ public class Initializer_c extends Node_c implements Initializer
 	return this;
     }
 
+    /** Visit the children of the initializer. */
     public Node visitChildren(NodeVisitor v) {
 	Block body = (Block) this.body.visit(v);
 	return reconstruct(body);
@@ -78,6 +86,7 @@ public class Initializer_c extends Node_c implements Initializer
 	c.popCode();
     }
 
+    /** Build type objects for the initializer. */
     public Node buildTypesOverride_(TypeBuilder tb) {
         tb.pushScope();
 
@@ -95,6 +104,7 @@ public class Initializer_c extends Node_c implements Initializer
 	return n.initializerInstance(ii);
     }
 
+    /** Type check the initializer. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
@@ -108,6 +118,7 @@ public class Initializer_c extends Node_c implements Initializer
 	return this;
     }
 
+    /** Check exceptions thrown by the initializer. */
     public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
       	TypeSystem ts = ec.typeSystem();
 
@@ -126,6 +137,7 @@ public class Initializer_c extends Node_c implements Initializer
 	return this;
     }
 
+    /** Write the initializer to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
         Context c = tr.context();
 
@@ -152,6 +164,7 @@ public class Initializer_c extends Node_c implements Initializer
 	return flags.translate() + "{ ... }";
     }
 
+    /** Reconstruct the type objects for the initializer. */
     public Node reconstructTypes_(NodeFactory nf, TypeSystem ts, Context c)
         throws SemanticException {
 

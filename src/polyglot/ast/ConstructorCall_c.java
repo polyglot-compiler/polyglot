@@ -9,11 +9,7 @@ import java.util.*;
 /**
  * A <code>ConstructorCall</code> is an immutable representation of
  * a direct call to a constructor of a class in the form of
- * <code>super(...)</code>  or <code>this(...)</code>.  It consists of the
- * kind of the call (either <code>super</code> or <code>this</code> and a list
- * of expressions to be parameters of the call.  A constructor call statement
- * may also contain an expression providing the context in which it is 
- * executed.
+ * <code>super(...)</code> or <code>this(...)</code>.
  */
 public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 {
@@ -29,46 +25,55 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
     }
 
+    /** Get the qualifier of the constructor call. */
     public Expr qualifier() {
 	return this.qualifier;
     }
 
+    /** Set the qualifier of the constructor call. */
     public ConstructorCall qualifier(Expr qualifier) {
 	ConstructorCall_c n = (ConstructorCall_c) copy();
 	n.qualifier = qualifier;
 	return n;
     }
 
+    /** Get the kind of the constructor call. */
     public Kind kind() {
 	return this.kind;
     }
 
+    /** Set the kind of the constructor call. */
     public ConstructorCall kind(Kind kind) {
 	ConstructorCall_c n = (ConstructorCall_c) copy();
 	n.kind = kind;
 	return n;
     }
 
+    /** Get the arguments of the constructor call. */
     public List arguments() {
 	return Collections.unmodifiableList(this.arguments);
     }
 
+    /** Set the arguments of the constructor call. */
     public ConstructorCall arguments(List arguments) {
 	ConstructorCall_c n = (ConstructorCall_c) copy();
 	n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
 	return n;
     }
 
+    /** Get the constructor we are calling. */
     public ConstructorInstance constructorInstance() {
         return ci;
     }
 
+    /** Set the constructor we are calling. */
     public ConstructorCall constructorInstance(ConstructorInstance ci) {
 	ConstructorCall_c n = (ConstructorCall_c) copy();
 	n.ci = ci;
 	return n;
     }
 
+    /** Reconstruct the constructor call. */
     protected ConstructorCall_c reconstruct(Expr qualifier, List arguments) {
 	if (qualifier != this.qualifier || ! CollectionUtil.equals(arguments, this.arguments)) {
 	    ConstructorCall_c n = (ConstructorCall_c) copy();
@@ -80,6 +85,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	return this;
     }
 
+    /** Visit the children of the call. */
     public Node visitChildren(NodeVisitor v) {
 	Expr qualifier = null;
 
@@ -97,6 +103,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	return reconstruct(qualifier, arguments);
     }
 
+    /** Type check the call. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 	Context c = tc.context();
@@ -128,6 +135,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	return (qualifier != null ? qualifier + "." : "") + kind + "(...)";
     }
 
+    /** Write the call to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	if (qualifier != null) {
 	    qualifier.ext().translate(w, tr);

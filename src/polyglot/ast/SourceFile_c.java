@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * A <code>SourceFile</code> is an immutable representations of a Java
  * langauge source file.  It consists of a package name, a list of 
- * <code>Import</code>s, and a list of <code>GlobalDeclaration</code>s.
+ * <code>Import</code>s, and a list of <code>GlobalDecl</code>s.
  */
 public class SourceFile_c extends Node_c implements SourceFile
 {
@@ -25,36 +25,43 @@ public class SourceFile_c extends Node_c implements SourceFile
 	this.decls = TypedList.copyAndCheck(decls, TopLevelDecl.class, true);
     }
 
+    /** Get the package of the source file. */
     public PackageNode package_() {
 	return this.package_;
     }
 
+    /** Set the package of the source file. */
     public SourceFile package_(PackageNode package_) {
 	SourceFile_c n = (SourceFile_c) copy();
 	n.package_ = package_;
 	return n;
     }
 
+    /** Get the imports of the source file. */
     public List imports() {
 	return Collections.unmodifiableList(this.imports);
     }
 
+    /** Set the imports of the source file. */
     public SourceFile imports(List imports) {
 	SourceFile_c n = (SourceFile_c) copy();
 	n.imports = TypedList.copyAndCheck(imports, Import.class, true);
 	return n;
     }
 
+    /** Get the declarations of the source file. */
     public List decls() {
 	return Collections.unmodifiableList(this.decls);
     }
 
+    /** Set the declarations of the source file. */
     public SourceFile decls(List decls) {
 	SourceFile_c n = (SourceFile_c) copy();
 	n.decls = TypedList.copyAndCheck(decls, TopLevelDecl.class, true);
 	return n;
     }
 
+    /** Reconstruct the source file. */
     protected SourceFile_c reconstruct(PackageNode package_, List imports, List decls) {
 	if (package_ != this.package_ || ! CollectionUtil.equals(imports, this.imports) || ! CollectionUtil.equals(decls, this.decls)) {
 	    SourceFile_c n = (SourceFile_c) copy();
@@ -67,6 +74,7 @@ public class SourceFile_c extends Node_c implements SourceFile
 	return this;
     }
 
+    /** Visit the children of the source file. */
     public Node visitChildren(NodeVisitor v) {
         PackageNode package_ = null;
 
@@ -91,7 +99,8 @@ public class SourceFile_c extends Node_c implements SourceFile
 	return reconstruct(package_, imports, decls);
     }
 
-    // Set the package before we recurse into the declarations.
+    /** Build type objects for the source file.
+     * Set the package before we recurse into the declarations. */
     public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
         if (package_ != null) {
 	    tb.setPackage(package_.package_());
@@ -103,6 +112,7 @@ public class SourceFile_c extends Node_c implements SourceFile
 	return null;
     }
 
+    /** Type check the source file. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	Set names = new HashSet();
 	boolean hasPublic = false;
@@ -136,6 +146,7 @@ public class SourceFile_c extends Node_c implements SourceFile
 	return "/* source file */";
     }
 
+    /** Write the source file to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	if (package_ != null) {
 	    w.write("package ");

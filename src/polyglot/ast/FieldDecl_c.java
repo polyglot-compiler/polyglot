@@ -7,6 +7,10 @@ import jltools.util.*;
 import jltools.visit.*;
 import java.util.*;
 
+/**
+ * A <code>FieldDecl</code> is an immutable representation of the declaration 
+ * of a field of a class.
+ */
 public class FieldDecl_c extends Node_c implements FieldDecl
 {
     Declarator_c decl;
@@ -17,60 +21,72 @@ public class FieldDecl_c extends Node_c implements FieldDecl
 	this.decl = new Declarator_c(flags, type, name, init);
     }
 
+    /** Get the type of the declaration. */
     public Type declType() {
         return decl.declType();
     }
 
+    /** Get the flags of the declaration. */
     public Flags flags() {
 	return decl.flags();
     }
 
+    /** Set the flags of the declaration. */
     public FieldDecl flags(Flags flags) {
 	FieldDecl_c n = (FieldDecl_c) copy();
 	n.decl = decl.flags(flags);
 	return n;
     }
 
+    /** Get the type node of the declaration. */
     public TypeNode type() {
 	return decl.type();
     }
 
+    /** Set the type of the declaration. */
     public FieldDecl type(TypeNode type) {
 	FieldDecl_c n = (FieldDecl_c) copy();
 	n.decl = decl.type(type);
 	return n;
     }
 
+    /** Get the name of the declaration. */
     public String name() {
 	return decl.name();
     }
 
+    /** Set the name of the declaration. */
     public FieldDecl name(String name) {
 	FieldDecl_c n = (FieldDecl_c) copy();
 	n.decl = decl.name(name);
 	return n;
     }
 
+    /** Get the initializer of the declaration. */
     public Expr init() {
 	return decl.init();
     }
 
+    /** Set the initializer of the declaration. */
     public FieldDecl init(Expr init) {
 	FieldDecl_c n = (FieldDecl_c) copy();
 	n.decl = decl.init(init);
 	return n;
     }
 
+    /** Set the field instance of the declaration. */
     public FieldDecl fieldInstance(FieldInstance fi) {
         FieldDecl_c n = (FieldDecl_c) copy();
 	n.fi = fi;
 	return n;
     }
 
+    /** Get the field instance of the declaration. */
     public FieldInstance fieldInstance() {
 	return fi;
     }
 
+    /** Reconstruct the declaration. */
     protected FieldDecl_c reconstruct(TypeNode type, Expr init) {
 	if (type() != type || init() != init) {
 	    FieldDecl_c n = (FieldDecl_c) copy();
@@ -83,6 +99,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
 	return this;
     }
 
+    /** Visit the children of the declaration. */
     public Node visitChildren(NodeVisitor v) {
 	TypeNode type = (TypeNode) type().visit(v);
 
@@ -95,6 +112,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
 	return reconstruct(type, init);
     }
 
+    /** Build type objects for the declaration. */
     public Node buildTypes_(TypeBuilder tb) throws SemanticException {
 	ParsedClassType ct = tb.currentClass();
 	TypeSystem ts = tb.typeSystem();
@@ -120,6 +138,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
 	return flags(fi.flags()).fieldInstance(fi);
     }
 
+    /** Type check the declaration. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
@@ -156,6 +175,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
 	}
     }
 
+    /** Reconstruct the type objects for the declaration. */
     public Node reconstructTypes_(NodeFactory nf, TypeSystem ts, Context c)
 	throws SemanticException {
 

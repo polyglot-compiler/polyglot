@@ -22,30 +22,36 @@ public class Special_c extends Expr_c implements Special
 	this.qualifier = qualifier;
     }
 
+    /** Get the precedence of the expression. */
     public Precedence precedence() {
 	return Precedence.LITERAL;
     }
 
+    /** Get the kind of the special expression, either this or super. */
     public Special.Kind kind() {
 	return this.kind;
     }
 
+    /** Set the kind of the special expression, either this or super. */
     public Special kind(Special.Kind kind) {
 	Special_c n = (Special_c) copy();
 	n.kind = kind;
 	return n;
     }
 
+    /** Get the qualifier of the special expression. */
     public TypeNode qualifier() {
 	return this.qualifier;
     }
 
+    /** Set the qualifier of the special expression. */
     public Special qualifier(TypeNode qualifier) {
 	Special_c n = (Special_c) copy();
 	n.qualifier = qualifier;
 	return n;
     }
 
+    /** Reconstruct the expression. */
     protected Special_c reconstruct(TypeNode qualifier) {
 	if (qualifier != this.qualifier) {
 	    Special_c n = (Special_c) copy();
@@ -56,6 +62,7 @@ public class Special_c extends Expr_c implements Special
 	return this;
     }
 
+    /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
 	TypeNode qualifier = null;
 
@@ -66,6 +73,7 @@ public class Special_c extends Expr_c implements Special
 	return reconstruct(qualifier);
     }
 
+    /** Type check the expression. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
@@ -97,6 +105,7 @@ public class Special_c extends Expr_c implements Special
 	return (qualifier != null ? qualifier + "." : "") + kind;
     }
 
+    /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	if (qualifier != null) {
 	    qualifier.ext().translate(w, tr);

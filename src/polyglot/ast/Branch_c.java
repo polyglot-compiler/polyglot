@@ -6,9 +6,7 @@ import jltools.util.*;
 
 /**
  * A <code>Branch</code> is an immutable representation of a branch
- * statment in Java (a break or continue).  It consists of a kind corresponding
- *  to either break or continue and an optional label specifing where to 
- * branch to.
+ * statment in Java (a break or continue).
  */
 public class Branch_c extends Stmt_c implements Branch
 {
@@ -21,20 +19,24 @@ public class Branch_c extends Stmt_c implements Branch
 	this.label = label;
     }
 
+    /** Get the kind of the branch. */
     public Branch.Kind kind() {
 	return this.kind;
     }
 
+    /** Set the kind of the branch. */
     public Branch kind(Branch.Kind kind) {
 	Branch_c n = (Branch_c) copy();
 	n.kind = kind;
 	return n;
     }
 
+    /** Get the target label of the branch. */
     public String label() {
 	return this.label;
     }
 
+    /** Set the target label of the branch. */
     public Branch label(String label) {
 	Branch_c n = (Branch_c) copy();
 	n.label = label;
@@ -45,6 +47,7 @@ public class Branch_c extends Stmt_c implements Branch
 	return kind.toString() + (label != null ? " " + label : "");
     }
 
+    /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	w.write(kind.toString());
 	if (label != null) {

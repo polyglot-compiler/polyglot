@@ -7,7 +7,7 @@ import jltools.util.*;
 
 /**
  * An immutable representation of a Java language <code>while</code>
- * statement.  Contains a statement to be executed and an expression
+ * statement.  It contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */ 
 public class While_c extends Stmt_c implements While
@@ -21,26 +21,31 @@ public class While_c extends Stmt_c implements While
 	this.body = body;
     }
 
+    /** Get the conditional of the statement. */
     public Expr cond() {
 	return this.cond;
     }
 
+    /** Set the conditional of the statement. */
     public While cond(Expr cond) {
 	While_c n = (While_c) copy();
 	n.cond = cond;
 	return n;
     }
 
+    /** Get the body of the statement. */
     public Stmt body() {
 	return this.body;
     }
 
+    /** Set the body of the statement. */
     public While body(Stmt body) {
 	While_c n = (While_c) copy();
 	n.body = body;
 	return n;
     }
 
+    /** Reconstruct the statement. */
     protected While_c reconstruct(Expr cond, Stmt body) {
 	if (cond != this.cond || body != this.body) {
 	    While_c n = (While_c) copy();
@@ -52,12 +57,14 @@ public class While_c extends Stmt_c implements While
 	return this;
     }
 
+    /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
 	Expr cond = (Expr) this.cond.visit(v);
 	Stmt body = (Stmt) this.body.visit(v);
 	return reconstruct(cond, body);
     }
 
+    /** Type check the statement. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 	
@@ -74,6 +81,7 @@ public class While_c extends Stmt_c implements While
 	return "while (" + cond + ") ...";
     }
 
+    /** Write the statement to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	w.write("while (");
 	translateBlock(cond, w, tr);

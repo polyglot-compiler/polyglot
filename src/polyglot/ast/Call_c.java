@@ -26,50 +26,60 @@ public class Call_c extends Expr_c implements Call
 	this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
     }
 
+    /** Get the precedence of the call. */
     public Precedence precedence() {
 	return Precedence.LITERAL;
     }
 
+    /** Get the target object or type of the call. */
     public Receiver target() {
 	return this.target;
     }
 
+    /** Set the target object or type of the call. */
     public Call target(Receiver target) {
 	Call_c n = (Call_c) copy();
 	n.target = target;
 	return n;
     }
 
+    /** Get the name of the call. */
     public String name() {
 	return this.name;
     }
 
+    /** Set the name of the call. */
     public Call name(String name) {
 	Call_c n = (Call_c) copy();
 	n.name = name;
 	return n;
     }
 
+    /** Get the method instance of the call. */
     public MethodInstance methodInstance() {
 	return this.mi;
     }
 
+    /** Set the method instance of the call. */
     public Call methodInstance(MethodInstance mi) {
 	Call_c n = (Call_c) copy();
 	n.mi = mi;
 	return n;
     }
 
+    /** Get the arguments of the call. */
     public List arguments() {
 	return this.arguments;
     }
 
+    /** Set the arguments of the call. */
     public Call arguments(List arguments) {
 	Call_c n = (Call_c) copy();
 	n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
 	return n;
     }
 
+    /** Reconstruct the call. */
     protected Call_c reconstruct(Receiver target, List arguments) {
 	if (target != this.target || ! CollectionUtil.equals(arguments, this.arguments)) {
 	    Call_c n = (Call_c) copy();
@@ -81,6 +91,7 @@ public class Call_c extends Expr_c implements Call
 	return this;
     }
 
+    /** Visit the children of the call. */
     public Node visitChildren(NodeVisitor v) {
 	Receiver target = null;
 
@@ -98,6 +109,7 @@ public class Call_c extends Expr_c implements Call
 	return reconstruct(target, arguments);
     }
 
+    /** Type check the call. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
         Context c = tc.context();
@@ -192,6 +204,7 @@ public class Call_c extends Expr_c implements Call
 	return call.methodInstance(mi).type(mi.returnType());
     }
 
+    /** Check exceptions thrown by the call. */
     public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
 	if (mi == null) {
 	    throw new InternalCompilerError(position(),
@@ -218,6 +231,7 @@ public class Call_c extends Expr_c implements Call
 	return (target != null ? target.toString() + "." : "") + name + "(...)";
     }
   
+    /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	if (target instanceof Expr) {
 	    translateSubexpr((Expr) target, w, tr);

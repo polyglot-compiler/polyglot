@@ -15,16 +15,19 @@ public class CharLit_c extends NumLit_c implements CharLit
 	super(ext, pos, value);
     }
 
+    /** Get the value of the expression. */
     public char value() {
 	return (char) longValue();
     }
 
+    /** Set the value of the expression. */
     public CharLit value(char value) {
 	CharLit_c n = (CharLit_c) copy();
 	n.value = value;
 	return n;
     }
 
+    /** Type check the expression. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	return type(tc.typeSystem().Char());
     }  
@@ -33,6 +36,7 @@ public class CharLit_c extends NumLit_c implements CharLit
         return "'" + StringUtil.escape((char) value) + "'";
     }
 
+    /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
         w.write("'");
 	w.write(StringUtil.escape((char) value));

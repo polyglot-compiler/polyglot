@@ -7,8 +7,8 @@ import jltools.visit.*;
 import java.util.*;
 
 /**
- * A <code>Block</code> represents a Java block statement -- a 
- * immutable sequence of statements.
+ * A <code>Block</code> represents a Java block statement -- an immutable
+ * sequence of statements.
  */
 public abstract class AbstractBlock_c extends Stmt_c implements Block
 {
@@ -19,16 +19,19 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 	this.statements = TypedList.copyAndCheck(statements, Stmt.class, true);
     }
 
+    /** Get the statements of the block. */
     public List statements() {
 	return this.statements;
     }
 
+    /** Set the statements of the block. */
     public Block statements(List statements) {
 	AbstractBlock_c n = (AbstractBlock_c) copy();
 	n.statements = TypedList.copyAndCheck(statements, Stmt.class, true);
 	return n;
     }
 
+    /** Append a statement to the block. */
     public Block append(Stmt stmt) {
 	List l = new ArrayList(statements.size()+1);
 	l.addAll(statements);
@@ -36,6 +39,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 	return statements(l);
     }
 
+    /** Reconstruct the block. */
     protected AbstractBlock_c reconstruct(List statements) {
 	if (! CollectionUtil.equals(statements, this.statements)) {
 	    AbstractBlock_c n = (AbstractBlock_c) copy();
@@ -46,6 +50,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 	return this;
     }
 
+    /** Visit the children of the block. */
     public Node visitChildren(NodeVisitor v) {
 	List statements = new ArrayList(this.statements.size());
 	for (Iterator i = this.statements.iterator(); i.hasNext(); ) {
@@ -65,6 +70,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 	c.popBlock();
     }
 
+    /** Write the block to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
         enterScope(tr.context());
 

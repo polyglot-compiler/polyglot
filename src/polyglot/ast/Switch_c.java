@@ -8,7 +8,7 @@ import java.util.*;
 
 /**
  * A <code>Switch</code> is an immutable representation of a Java
- * <code>swtich</code> statement.  Such a statement has an expression which
+ * <code>switch</code> statement.  Such a statement has an expression which
  * is evaluated to determine where to branch to, an a list of labels
  * and block statements which are conditionally evaluated.  One of the
  * labels, rather than having a constant expression, may be lablled
@@ -25,26 +25,31 @@ public class Switch_c extends Stmt_c implements Switch
 	this.elements = TypedList.copyAndCheck(elements, SwitchElement.class, true);
     }
 
+    /** Get the expression to switch on. */
     public Expr expr() {
 	return this.expr;
     }
 
+    /** Set the expression to switch on. */
     public Switch expr(Expr expr) {
 	Switch_c n = (Switch_c) copy();
 	n.expr = expr;
 	return n;
     }
 
+    /** Get the switch elements of the statement. */
     public List elements() {
 	return Collections.unmodifiableList(this.elements);
     }
 
+    /** Set the switch elements of the statement. */
     public Switch elements(List elements) {
 	Switch_c n = (Switch_c) copy();
 	n.elements = TypedList.copyAndCheck(elements, SwitchElement.class, true);
 	return n;
     }
 
+    /** Reconstruct the statement. */
     protected Switch_c reconstruct(Expr expr, List elements) {
 	if (expr != this.expr || ! CollectionUtil.equals(elements, this.elements)) {
 	    Switch_c n = (Switch_c) copy();
@@ -56,6 +61,7 @@ public class Switch_c extends Stmt_c implements Switch
 	return this;
     }
 
+    /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
 	Expr expr = (Expr) this.expr.visit(v);
 
@@ -69,6 +75,7 @@ public class Switch_c extends Stmt_c implements Switch
 	return reconstruct(expr, elements);
     }
 
+    /** Type check the statement. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
       	Collection labels = new HashSet();
 
@@ -105,6 +112,7 @@ public class Switch_c extends Stmt_c implements Switch
 	return "switch (" + expr + ") { ... }";
     }
 
+    /** Write the statement to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	w.write("switch (");
 	translateBlock(expr, w, tr);

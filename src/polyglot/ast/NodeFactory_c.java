@@ -8,6 +8,11 @@ import jltools.types.Qualifier;
 import jltools.util.*;
 import java.util.*;
 
+/**
+ * A <code>NodeFactory</code> constructs AST nodes.  All node construction
+ * should go through this factory or by done with the <code>copy()</code>
+ * method of <code>Node</code>.
+ */
 public class NodeFactory_c implements NodeFactory
 {
     public AmbPrefix AmbPrefix(Position pos, String name) {

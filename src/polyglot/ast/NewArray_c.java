@@ -7,12 +7,12 @@ import jltools.util.*;
 import java.util.*;
 
 /**
- * A <code>NewArray</code> is an immutable representation of the
- * creation of a new array such as <code>new File[8][]</code>.  It consists of
- * an element type, in the above example <code>File</code>, a list of dimension
- * expressions (expressions which evaluate to a length for a
- * dimension in this case <code>8</code>), and a number representing the
- * number optional dimensions (in the example 1).
+ * A <code>NewArray</code> represents a new array expression such as <code>new
+ * File[8][] { null }</code>.  It consists of an element type (e.g.,
+ * <code>File</code>), a list of dimension expressions (e.g., 8), 0 or more
+ * additional dimensions (e.g., 1 for []), and an array initializer.  The
+ * dimensions of the array initializer must equal the number of additional "[]"
+ * dimensions.
  */
 public class NewArray_c extends Expr_c implements NewArray
 {
@@ -29,50 +29,60 @@ public class NewArray_c extends Expr_c implements NewArray
 	this.init = init;
     }
 
+    /** Get the base type node of the expression. */
     public TypeNode baseType() {
 	return this.baseType;
     }
 
+    /** Set the base type node of the expression. */
     public NewArray baseType(TypeNode baseType) {
 	NewArray_c n = (NewArray_c) copy();
 	n.baseType = baseType;
 	return n;
     }
 
+    /** Get the dimension expressions of the expression. */
     public List dims() {
 	return Collections.unmodifiableList(this.dims);
     }
 
+    /** Set the dimension expressions of the expression. */
     public NewArray dims(List dims) {
 	NewArray_c n = (NewArray_c) copy();
 	n.dims = TypedList.copyAndCheck(dims, Expr.class, true);
 	return n;
     }
 
+    /** Get the number of dimensions of the expression. */
     public int numDims() {
         return dims.size() + addDims;
     }
 
+    /** Get the number of additional dimensions of the expression. */
     public int additionalDims() {
 	return this.addDims;
     }
 
+    /** Set the number of additional dimensions of the expression. */
     public NewArray additionalDims(int addDims) {
 	NewArray_c n = (NewArray_c) copy();
 	n.addDims = addDims;
 	return n;
     }
 
+    /** Get the initializer of the expression. */
     public ArrayInit init() {
 	return this.init;
     }
 
+    /** Set the initializer of the expression. */
     public NewArray init(ArrayInit init) {
 	NewArray_c n = (NewArray_c) copy();
 	n.init = init;
 	return n;
     }
 
+    /** Reconstruct the expression. */
     protected NewArray_c reconstruct(TypeNode baseType, List dims, ArrayInit init) {
 	if (baseType != this.baseType || ! CollectionUtil.equals(dims, this.dims) || init != this.init) {
 	    NewArray_c n = (NewArray_c) copy();
@@ -85,6 +95,7 @@ public class NewArray_c extends Expr_c implements NewArray
 	return this;
     }
 
+    /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
 	TypeNode baseType = (TypeNode) this.baseType.visit(v);
 
@@ -104,6 +115,7 @@ public class NewArray_c extends Expr_c implements NewArray
 	return reconstruct(baseType, dims, init);
     }
 
+    /** Type check the expression. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
@@ -124,6 +136,7 @@ public class NewArray_c extends Expr_c implements NewArray
 	return "new " + baseType + "[...]";
     }
 
+    /** Write the expression to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	w.write("new ");
 	baseType.ext().translate(w, tr);

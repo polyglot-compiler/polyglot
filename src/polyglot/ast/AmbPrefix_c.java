@@ -5,6 +5,10 @@ import jltools.types.*;
 import jltools.visit.*;
 import jltools.util.*;
 
+/**
+ * An <code>AmbPrefix</code> is an ambiguous AST node composed of dot-separated
+ * list of identifiers.  It must resolve to a prefix.
+ */
 public class AmbPrefix_c extends Node_c implements AmbPrefix
 {
     protected Prefix prefix;
@@ -16,26 +20,31 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
 	this.name = name;
     }
 
+    /** Get the name of the prefix. */
     public String name() {
 	return this.name;
     }
 
+    /** Set the name of the prefix. */
     public AmbPrefix name(String name) {
 	AmbPrefix_c n = (AmbPrefix_c) copy();
 	n.name = name;
 	return n;
     }
 
+    /** Get the prefix of the prefix. */
     public Prefix prefix() {
 	return this.prefix;
     }
 
+    /** Set the prefix of the prefix. */
     public AmbPrefix prefix(Prefix prefix) {
 	AmbPrefix_c n = (AmbPrefix_c) copy();
 	n.prefix = prefix;
 	return n;
     }
 
+    /** Reconstruct the prefix. */
     protected AmbPrefix_c reconstruct(Prefix prefix) {
 	if (prefix != this.prefix) {
 	    AmbPrefix_c n = (AmbPrefix_c) copy();
@@ -46,6 +55,7 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
 	return this;
     }
 
+    /** Visit the children of the prefix. */
     public Node visitChildren(NodeVisitor v) {
 	Prefix prefix = null;
 
@@ -56,20 +66,24 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
 	return reconstruct(prefix);
     }
 
+    /** Disambiguate the prefix. */
     public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
 	return new Disamb().disambiguate(ar, position(), prefix, name);
     }
 
+    /** Type check the prefix. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	throw new InternalCompilerError(position(),
 	    "Cannot type check ambiguous node " + this + ".");
     } 
 
+    /** Check exceptions thrown by the prefix. */
     public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
 	throw new InternalCompilerError(position(),
 	    "Cannot exception check ambiguous node " + this + ".");
     } 
 
+    /** Write the prefix to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	throw new InternalCompilerError(position(),
 	    "Cannot translate ambiguous node " + this + ".");

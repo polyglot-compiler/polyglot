@@ -21,26 +21,31 @@ public class Synchronized_c extends Stmt_c implements Synchronized
 	this.body = body;
     }
 
+    /** Get the expression to synchronize. */
     public Expr expr() {
 	return this.expr;
     }
 
+    /** Set the expression to synchronize. */
     public Synchronized expr(Expr expr) {
 	Synchronized_c n = (Synchronized_c) copy();
 	n.expr = expr;
 	return n;
     }
 
+    /** Get the body of the statement. */
     public Block body() {
 	return this.body;
     }
 
+    /** Set the body of the statement. */
     public Synchronized body(Block body) {
 	Synchronized_c n = (Synchronized_c) copy();
 	n.body = body;
 	return n;
     }
 
+    /** Reconstruct the statement. */
     protected Synchronized_c reconstruct(Expr expr, Block body) {
 	if (expr != this.expr || body != this.body) {
 	    Synchronized_c n = (Synchronized_c) copy();
@@ -52,12 +57,14 @@ public class Synchronized_c extends Stmt_c implements Synchronized
 	return this;
     }
 
+    /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
 	Expr expr = (Expr) this.expr.visit(v);
 	Block body = (Block) this.body.visit(v);
 	return reconstruct(expr, body);
     }
 
+    /** Type check the statement. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
@@ -75,6 +82,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized
 	return "synchronized (" + expr + ") { ... }";
     }
 
+    /** Write the statement to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
 	w.write("synchronized (");
 	translateBlock(expr, w, tr);
