@@ -159,8 +159,8 @@ public class MethodDecl_c extends Term_c implements MethodDecl
           l.add(ts.unknownType(position()));
         }
 
-        List m = new ArrayList(exceptionTypes.size());
-        for (int i = 0; i < exceptionTypes.size(); i++) {
+        List m = new ArrayList(exceptionTypes().size());
+        for (int i = 0; i < exceptionTypes().size(); i++) {
           m.add(ts.unknownType(position()));
         }
 
@@ -313,7 +313,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 	    boolean throwDeclared = false;
 
 	    if (! t.isUncheckedException()) {
-		for (Iterator j = exceptionTypes.iterator(); j.hasNext(); ) {
+		for (Iterator j = exceptionTypes().iterator(); j.hasNext(); ) {
 		    TypeNode tn = (TypeNode) j.next();
 		    Type tj = tn.type();
 
@@ -363,11 +363,11 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 	w.end();
 	w.write(")");
 
-	if (! exceptionTypes.isEmpty()) {
+	if (! exceptionTypes().isEmpty()) {
 	    w.allowBreak(6);
 	    w.write("throws ");
 
-	    for (Iterator i = exceptionTypes.iterator(); i.hasNext(); ) {
+	    for (Iterator i = exceptionTypes().iterator(); i.hasNext(); ) {
 	        TypeNode tn = (TypeNode) i.next();
 		print(tn, w, tr);
 
@@ -438,7 +438,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 	    argTypes.add(f.declType());
 	}
 
-	for (Iterator i = exceptionTypes.iterator(); i.hasNext(); ) {
+	for (Iterator i = exceptionTypes().iterator(); i.hasNext(); ) {
 	    TypeNode tn = (TypeNode) i.next();
 	    excTypes.add(tn.type());
 	}
