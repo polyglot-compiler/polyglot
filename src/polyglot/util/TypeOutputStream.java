@@ -1,5 +1,6 @@
 package polyglot.util;
 
+import polyglot.frontend.Serialize;
 import polyglot.types.*;
 
 import java.io.*;
@@ -19,24 +20,38 @@ public class TypeOutputStream extends ObjectOutputStream
     this.ts = ts;
     this.roots = ts.getTypeEncoderRootSet(root);
 
-    //System.out.println("------------------------------");
-    //System.out.println("roots: " + roots);
-
+    if (Serialize.should_report(2)) {
+        Serialize.report(2, "Began TypeOutputStream with roots: " + roots);
+    }
+    
     enableReplaceObject( true);
   }
 
   protected Object replaceObject(Object o) throws IOException
   {
     if (roots.contains(o)) {
-      //System.out.println("+ In roots: " + o + " : " + o.getClass());
+      if (Serialize.should_report(2)) {
+	Serialize.report(2, "+ In roots: " + o + " : " + o.getClass());
+      }
       return o;
     }
     else if (o instanceof TypeObject) {
-      //System.out.println("+ Replacing: " + o + " : " + o.getClass());
-      return ts.placeHolder((TypeObject) o, roots);
+      Object r = ts.placeHolder((TypeObject) o, roots);
+      if (Serialize.should_report(2)) {
+        if (r != o) {
+          Serialize.report(2, "+ Replacing: " + o + " : " + o.getClass()
+	    + " with " + r);
+        } 
+	else {
+	  Serialize.report(2, "+ " + o + " : " + o.getClass());
+        }
+      }
+      return r;
     }
     else {
-      //System.out.println("+ " + o + " : " + o.getClass());
+      if (Serialize.should_report(2)) {
+	Serialize.report(2, "+ " + o + " : " + o.getClass());
+      }
       return o;
     }
   }

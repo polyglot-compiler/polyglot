@@ -437,6 +437,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     static { Report.topics.add("types"); }
     static { Report.topics.add("frontend"); }
     static { Report.topics.add("loader"); }
+    static { Report.topics.add("serialize"); }
 
     public String toString() {
         return getClass().getName() + " worklist=" + worklist;

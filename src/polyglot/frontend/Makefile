@@ -21,6 +21,7 @@ SOURCES = \
 	ParserPass.java \
 	Pass.java \
 	PrettyPrintPass.java \
+	Serialize.java \
 	Source.java \
 	SourceJob.java \
 	SourceLoader.java \

@@ -1,5 +1,6 @@
 package polyglot.util;
 
+import polyglot.frontend.Serialize;
 import polyglot.types.*;
 
 import java.io.*;
@@ -36,6 +37,10 @@ public class TypeEncoder
     byte[] b;
     StringBuffer sb;
 
+    if (Serialize.should_report(1)) {
+      Serialize.report(1, "Encoding type " + t);
+    }
+    
     baos = new ByteArrayOutputStream();
 
     if (zip) {
