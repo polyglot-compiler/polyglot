@@ -3,5 +3,9 @@ incomplete/incorrect/unimplemented
 * constraint checking (need a visitor to do this step)
 
 * constructors of PJParameterTypes when undergoing constraint checking
-* constructors of PJInstantiatedType
+
+* look over StandardTypeSystem.isAssignableSubtype() again.
+  * Parameter types assignment
+  * currently incorrectly allows 
+    class T[X] { X x; void foo() { x = null; }}
 
