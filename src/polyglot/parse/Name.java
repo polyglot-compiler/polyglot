@@ -15,13 +15,13 @@ public class Name {
 	NodeFactory nf;
 	TypeSystem ts;
 
-	Name(NodeFactory nf, TypeSystem ts, Position pos, String name) {
-		this(nf, ts, pos, null, name);
+	Name(Grm parser, Position pos, String name) {
+		this(parser, pos, null, name);
 	}
 
-	Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix, String name) {
-		this.nf = nf;
-		this.ts = ts;
+	Name(Grm parser, Position pos, Name prefix, String name) {
+		this.nf = parser.nf;
+		this.ts = parser.ts;
 		this.pos = pos;
 		this.prefix = prefix;
 		this.name = name;
