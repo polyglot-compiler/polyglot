@@ -140,6 +140,7 @@ bad: $(BAD)
 clean:
 	-rm -f $(GOOD_OUTPUT)
 	-rm -f $(BAD_OUTPUT)
+	-rm -f disamb_member/*.class
 	-rm -f *.class
 	-rm -f good.log bad.log
 

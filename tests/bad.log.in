@@ -103,7 +103,7 @@ BadInterface.jl:17: Interface methods must be public.
                         ^
 
 1 error.
-BadOverride.java:79: method() in Sub cannot implement method() in Override; attempting to assign weaker access privileges; was public
+BadOverride.java:80: method() in Sub cannot implement method() in Override; attempting to assign weaker access privileges; was public
 class Sub implements Override {
 ^
 1 error
@@ -146,9 +146,9 @@ NoInit10.jl:17: Local variable "x" may not have been initialized.
     ^
 
 1 error.
-NoInit11.jl:7: Local variable "x" may not have been initialized.
-    return x; // BAD
-           ^
+NoInit11.jl:5: Local variable "x" may not have been initialized.
+      x++;
+      ^
 
 1 error.
 NoInit12.jl:9: Local variable "x" may not have been initialized.
