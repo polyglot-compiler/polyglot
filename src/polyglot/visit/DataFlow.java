@@ -542,7 +542,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * Perform the dataflow on the flowgraph provided.
      */
     protected void dataflow(FlowGraph graph) {
-	if (Report.should_report("dataflow", 1)) {
+	if (Report.should_report(Report.dataflow, 1)) {
 	    Report.report(1, "Finding strongly connected components");
 	}
 	LinkedList pair = findSCCs(graph);
@@ -555,7 +555,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 	   begins with a -1 and ends with the index of
 	   the beginning of the SCC.
 	*/
-	if (Report.should_report("dataflow", 1)) {
+	if (Report.should_report(Report.dataflow, 1)) {
 	    Report.report(1, "Iterating dataflow equations");
 	}
 
@@ -617,7 +617,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 		current++;
 	    }
         }
-	if (Report.should_report("dataflow", 1)) {
+	if (Report.should_report(Report.dataflow, 1)) {
 	    Report.report(1, "Done.");
 	}
     }

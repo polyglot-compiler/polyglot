@@ -38,6 +38,7 @@ public class Report {
   /** Report topics understood by the base compiler. */
   public static String cfg = "cfg";
   public static String context = "context";
+  public static String dataflow = "dataflow";
   public static String errors = "errors";
   public static String frontend = "frontend";
   public static String imports = "imports";
@@ -55,6 +56,7 @@ public class Report {
   static {
     topics.add(cfg);
     topics.add(context);
+    topics.add(dataflow);
     topics.add(errors);
     topics.add(frontend);
     topics.add(imports);
