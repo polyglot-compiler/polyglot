@@ -179,7 +179,25 @@ public class Try_c extends Stmt_c implements Try
 
 	    finallyBlock = (Block) visitChild(this.finallyBlock, ec);
 
-	    thrown.addAll(ec.throwsSet());
+            // an interesting thing happens here...
+            // if the finally block can complete normally, then all the
+            // exceptions that the try-block and catch-blocks can throw
+            // can be thrown by the try-catch-finally block. HOWEVER, if
+            // the finally block can not complete normally, then the
+            // try-catch-finally block can only throw the exceptions thrown
+            // by the finally block. Examining the finally-block's reachability
+            // will tell us if the finally-block can complete normally.
+            if (!this.finallyBlock.reachable()) {
+                // warn the user, and remove all the exceptions that have
+                // been added by the try and catch blocks.
+                ec.errorQueue().enqueue(ErrorInfo.WARNING,
+                       "The finally block cannot complete normally", 
+                       finallyBlock.position());
+                
+                thrown.clear();
+            }
+            thrown.addAll(ec.throwsSet());
+            
             ec = ec.pop();
 	}
 
