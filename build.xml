@@ -83,7 +83,7 @@
   </target>
 
   <!-- compile the base compiler excluding the jl extension -->
-  <target name="compile-base" depends="init,bin,ppg" 
+  <target name="compile-base" depends="init,ppg" 
           description="compile the source">
     <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/**"
@@ -418,27 +418,6 @@
     </antcall>
   </target>
 
-  <target name="bin">
-    <echo file="${bin}/defs" append="no">#!/bin/sh
-# DO NOT EDIT - This file was automatically generated.
-
-JAVA='${java.home}/bin/java'
-FILE_SEP='${file.separator}'
-PATH_SEP='${path.separator}'
-TOP='${basedir}'
-
-ext=''
-
-    </echo>
-
-    <concat destfile="${bin}/jlc">
-      <filelist dir="${bin}" files="defs,jlc.in"/>
-    </concat>
-
-    <chmod perm="+x" file="${bin}/jlc"/>
-    <delete file="${bin}/defs"/>
-  </target>
-
   <target name="polyglot-jar" depends="jl">
     <jar jarfile="${lib}/polyglot.jar" basedir="${classes}"
       includes="polyglot/ast/**,polyglot/ext/jl/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**"/>
@@ -459,6 +438,13 @@ ext=''
       <fileset dir="${src}/polyglot/ext/pao"
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
     </copy>
+
+    <copy file="${src}/polyglot/ext/pao/tests/paoc"
+          todir="${dist}/src/polyglot/ext/pao/tests"/>
+    <chmod perm="+x" file="${dist}/src/polyglot/ext/pao/tests/paoc"/>
+    <copy file="${src}/polyglot/ext/pao/tests/paovm"
+          todir="${dist}/src/polyglot/ext/pao/tests"/>
+    <chmod perm="+x" file="${dist}/src/polyglot/ext/pao/tests/paovm"/>
   </target>
 
   <target name="param-jar" depends="param,polyglot-jar">
@@ -488,9 +474,16 @@ ext=''
       <fileset dir="${src}/polyglot/ext/coffer"
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
     </copy>
+
+    <copy file="${src}/polyglot/ext/coffer/tests/cofferc"
+          todir="${dist}/src/polyglot/ext/coffer/tests"/>
+    <chmod perm="+x" file="${dist}/src/polyglot/ext/coffer/tests/cofferc"/>
+    <copy file="${src}/polyglot/ext/coffer/tests/coffervm"
+          todir="${dist}/src/polyglot/ext/coffer/tests"/>
+    <chmod perm="+x" file="${dist}/src/polyglot/ext/coffer/tests/coffervm"/>
   </target>
 
-  <target name="jl-dist" depends="cup,polyglot-jar,dist-dir,bin">
+  <target name="jl-dist" depends="cup,polyglot-jar,dist-dir">
     <copy todir="${dist}/lib" file="${lib}/polyglot.jar"/>
 
     <copy todir="${dist}/src/polyglot/ast">
