@@ -1685,16 +1685,17 @@ public class TypeSystem_c implements TypeSystem
      * Assert that <code>ct</code> implements all abstract methods required;
      * that is, if it is a concrete class, then it must implement all
      * interfaces and abstract methods that it or it's superclasses declare, and if 
-     * it is an abstract class then any methods it overrides are overridden correctly.
+     * it is an abstract class then any methods that it overrides are overridden 
+     * correctly.
      */
     public void checkClassConformance(ClassType ct) throws SemanticException {
-        // if ct is abstract or an interface, then it doesn't need to 
-        // implement everything.
-        boolean mustImplementAll = (!ct.flags().isAbstract() && !ct.flags().isInterface());
-        
+        if (ct.flags().isInterface()) {
+            // don't need to check interfaces            
+            return;
+        }
+
         // build up a list of superclasses and interfaces that ct 
         // extends/implements that may contain abstract methods that 
-
         // ct must define.
         List superInterfaces = abstractSuperInterfaces(ct);
 
@@ -1717,12 +1718,14 @@ public class TypeSystem_c implements TypeSystem
                     for (Iterator k = possible.iterator(); k.hasNext(); ) {
                         MethodInstance mj = (MethodInstance)k.next();
                         if (!mj.flags().isAbstract() && 
-                            isAccessible(mj, ct) &&
-                            isAccessible(mi, mj.container().toClass())) {
-                            // May have found a suitable implementation of mi.
-                            // mj is not abstract, it is accessible from the 
-                            // class ct, and since mi is accessible from the container
-                            // of mj, it is actually overriding mi.
+                            ((isAccessible(mi, ct) && isAccessible(mj, ct)) || 
+                                    isAccessible(mi, mj.container().toClass()))) {
+                            // The method mj may be a suitable implementation of mi.
+                            // mj is not abstract, and either mj's container 
+                            // can access mi (thus mj can really override mi), or
+                            // mi and mj are both accessible from ct (e.g.,
+                            // mi is declared in an interface that ct implements,
+                            // and mj is defined in a superclass of ct).
                             
                             // If neither the method instance mj nor the method 
                             // instance mi is declared in the class type ct, then 
@@ -1751,13 +1754,21 @@ public class TypeSystem_c implements TypeSystem
                         }
                     }
 
+                    if (curr == mi.container()) {
+                        // we've reached the definition of the abstract 
+                        // method. We don't want to look higher in the 
+                        // hierarchy; this is not an optimization, but is 
+                        // required for correctness. 
+                        break;
+                    }
+                    
                     curr = curr.superType() ==  null ?
                            null : curr.superType().toReference();
                 }
 
 
                 // did we find a suitable implementation of the method mi?
-                if (!implFound && mustImplementAll) {
+                if (!implFound && !ct.flags().isAbstract()) {
                     throw new SemanticException(ct.fullName() + " should be " +
                             "declared abstract; it does not define " +
                             mi.signature() + ", which is declared in " +
