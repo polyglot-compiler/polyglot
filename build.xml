@@ -8,21 +8,23 @@
   <!-- source directory -->
   <property name="src" location="${basedir}"/>
 
-  <!-- directory for temporary build targets -->
-  <property name="build" location="build"/>
-
   <!-- directory for class file targets -->
   <property name="classes" location="classes"/>
 
   <!-- distribution directory -->
   <property name="dist"  location="dist"/>
 
+  <path id="standard.classpath">
+    <pathelement location="${classes}"/>
+    <pathelement location="java_cup.jar"/>
+    <pathelement location="jlex.jar"/>
+  </path>
+
   <!-- initialize the build -->
   <target name="init">
     <!-- Create the time stamp -->
     <tstamp/>
     <!-- Create the build directory structure used by compile -->
-    <mkdir dir="${build}"/>
     <mkdir dir="${classes}"/>
   </target>
 
@@ -41,20 +43,17 @@
 
   <target name="clean" description="clean up">
     <!-- Delete the ${classes} and ${dist} directory trees -->
-    <delete dir="${build}"/>
     <delete dir="${classes}"/>
     <delete dir="${dist}"/>
   </target>
 
   <!-- compile the base compiler excluding the jl extension -->
-  <target name="compile-base" depends="init" description="compile the source">
+  <target name="compile-base" depends="init,ppg" 
+          description="compile the source">
     <javac srcdir="${src}" destdir="${classes}"
       includes="polyglot/**"
       excludes="polyglot/ext/**,polyglot/tests/**,polyglot/util/ppg/test/**">
-      <classpath>
-        <pathelement location="${basedir}/java_cup.jar"/>
-        <pathelement location="${basedir}/jlex.jar"/>
-      </classpath>
+      <classpath refid="standard.classpath"/>
     </javac>
   </target>
 
@@ -64,18 +63,114 @@
     <javac srcdir="${src}" destdir="${classes}"
       includes="polyglot/ext/${ext}/**"
       excludes="polyglot/ext/${ext}/test/**,polyglot/ext/${ext}/tests/**">
-      <classpath>
-        <pathelement location="${basedir}/java_cup.jar"/>
-        <pathelement location="${basedir}/jlex.jar"/>
-      </classpath>
+      <classpath refid="standard.classpath"/>
     </javac>
   </target>
 
-  <target name="base">
-    <antcall target="compile-base"/>
+  <!-- Build a PPG parser based on parameters supplied to the target.
+       @param parser.dir    The directory, relative to $basedir, in which
+                            the PPG file is located.
+       @param ppg.file      The name of the PPG file.
+       @param cup.file      The name of the CUP file to output.
+       @param parser.class  The name to be passed to CUP with -parser.
+       @param symbol.class  The name to be passed to CUP with -symbols.
+   -->
+  <target name="ppg-parser" depends="ppg-parser-deps" 
+          unless="ppg.parser.up-to-date">
+    <java classname="polyglot.util.ppg.PPG"
+          fork="true"
+          dir="${parser.dir}"
+	  output="${parser.dir}/${cup.file}">
+      <classpath refid="standard.classpath"/>
+      <arg line="${ppg.file}"/>
+    </java>
+    <antcall target="cup-parser"/>
+  </target>
+
+  <!-- Set the property ppg.parser.up-to-date if the parser is in fact
+       up to date.  Called by the ppg-parser target.
+   -->
+  <target name="ppg-parser-deps" depends="cup-parser-deps">
+    <dependset>
+      <srcfileset dir="${parser.dir}" includes="${ppg.file}"/>
+      <targetfileset dir="${parser.dir}" includes="${cup.file}"/>
+    </dependset>
+    <condition property="ppg.parser.up-to-date">
+      <and>
+        <available file="${parser.dir}/${cup.file}"/>
+	<isset property="cup.parser.up-to-date"/>
+      </and>
+    </condition>
+  </target>
+
+  <!-- Build a CUP parser based on parameters supplied to the target.
+       @param parser.dir    The directory, relative to $basedir, in which
+                            the CUP file is located.
+       @param parser.class  The name to be passed to CUP with -parser.
+       @param symbol.class  The name to be passed to CUP with -symbols.
+       @param cup.file      The name of the CUP file.
+   -->
+  <target name="cup-parser" depends="cup-parser-deps" 
+          unless="cup.parser.up-to-date">
+    <java classname="java_cup.Main"
+          fork="true"
+          dir="${parser.dir}">
+      <classpath refid="standard.classpath"/>
+      <arg line="-parser ${parser.class} -symbols ${symbol.class} ${cup.file}"/>
+    </java>
+  </target>
+
+  <!-- Set the property cup.parser.up-to-date if the parser is in fact
+       up to date.  Called by the cup-parser target.
+   -->
+  <target name="cup-parser-deps">
+    <dependset>
+      <srcfileset dir="${parser.dir}" includes="${cup.file}"/>
+      <targetfileset dir="${parser.dir}" 
+                     includes="${parser.class}.java ${symbol.class}.java"/>
+    </dependset>
+    <condition property="cup.parser.up-to-date">
+      <and>
+        <available file="${parser.dir}/${parser.class}.java"/>
+        <available file="${parser.dir}/${symbol.class}.java"/>	   
+      </and>	       
+    </condition>	      
+  </target>
+
+  <target name="base" depends="compile-base">
+  </target>
+
+  <!-- Builds PPG -->
+  <target name="ppg">
+    <antcall target="cup-parser">
+      <param name="parser.dir" value="polyglot/util/ppg/parse"/>
+      <param name="parser.class" value="Parser"/>
+      <param name="symbol.class" value="Constant"/>
+      <param name="cup.file" value="ppg.cup"/>
+    </antcall>
+    <javac srcdir="${src}" destdir="${classes}"
+      includes="polyglot/util/ppg/**"
+      excludes="polyglot/util/ppg/test/**">
+      <classpath refid="standard.classpath"/>
+    </javac>
   </target>
 
   <target name="jl" depends="base">
+  <!--
+    <antcall target="cup-parser">
+      <param name="parser.dir" value="polyglot/ext/jl/parse"/>
+      <param name="cup.file" value="java12.cup"/>
+      <param name="parser.class" value="Grm"/>
+      <param name="symbol.class" value="sym"/>
+    </antcall>
+    <antcall target="ppg-parser">
+      <param name="parser.dir" value="polyglot/ext/jl/qq"/>
+      <param name="ppg.file" value="qq.ppg"/>
+      <param name="cup.file" value="qq_ppg.cup"/>
+      <param name="parser.class" value="Grm"/>
+      <param name="symbol.class" value="sym"/>
+    </antcall>
+  -->
     <antcall target="compile-ext">
       <param name="ext" value="jl"/>
     </antcall>
@@ -94,6 +189,20 @@
   </target>
 
   <target name="polyj" depends="jl">
+    <antcall target="ppg-parser">
+      <param name="parser.dir" value="polyglot/ext/polyj/parse"/>
+      <param name="ppg.file" value="polyj.ppg"/>
+      <param name="cup.file" value="polyj_ppg.cup"/>
+      <param name="parser.class" value="Grm"/>
+      <param name="symbol.class" value="sym"/>
+    </antcall>
+    <antcall target="ppg-parser">
+      <param name="parser.dir" value="polyglot/ext/polyj/qq"/>
+      <param name="ppg.file" value="qq.ppg"/>
+      <param name="cup.file" value="qq_ppg.cup"/>
+      <param name="parser.class" value="Grm"/>
+      <param name="symbol.class" value="sym"/>
+    </antcall>
     <antcall target="compile-ext">
       <param name="ext" value="polyj"/>
     </antcall>
@@ -116,5 +225,6 @@
   <target name="split-dist" depends="split"/>
   <target name="polyj-dist" depends="polyj"/>
   <target name="jmatch-dist" depends="jmatch"/>
+
 </project>
 
