@@ -54,6 +54,12 @@ public class StandardTypeSystem extends TypeSystem {
     if ( childType instanceof AmbiguousType ||
          ancestorType instanceof AmbiguousType)
       throw new InternalCompilerError("Expected fully qualified classes.");
+
+    if(ancestorType instanceof ClassType &&
+       childType.equals( NULL_)) {
+      return true;
+    }
+
     if (ancestorType.equals(childType) ||
         ! (childType instanceof ClassType) ||
         ! (ancestorType instanceof ClassType) )
@@ -190,19 +196,21 @@ public class StandardTypeSystem extends TypeSystem {
     if (fromType instanceof NullType) return true;
 
     // Array cases.
-    if (fromType instanceof ArrayType) {
-      if (toType instanceof ArrayType) {
-	// FIXME: Make this iterative.
-	Type fromBase = extendArrayDims((ArrayType)fromType,-1);
-	Type toBase   = extendArrayDims((ArrayType)toType,-1);
-	if (fromBase instanceof PrimitiveType) {
-	  return toBase.equals(fromBase);
-	} else if (toBase instanceof PrimitiveType) {
-	  return false;
-	}	
-	// Both bases are reference types.
-	return isCastValid(fromBase, toBase);
-      }
+    if (fromType instanceof ArrayType &&
+          toType instanceof ArrayType) {
+      // FIXME: Make this iterative.
+      Type fromBase = extendArrayDims((ArrayType)fromType,-1);
+      Type toBase   = extendArrayDims((ArrayType)toType,-1);
+      if (fromBase instanceof PrimitiveType) {
+        return toBase.equals(fromBase);
+      } else if (toBase instanceof PrimitiveType) {
+        return false;
+      }	
+      // Both bases are reference types.
+      return isCastValid(fromBase, toBase);
+    }
+    else if (fromType instanceof ArrayType ||
+          toType instanceof ArrayType) {
       // From an array to a non-array.
       return toType.equals(CLONEABLE_) || toType.equals(OBJECT_);
     }
@@ -872,9 +880,41 @@ public class StandardTypeSystem extends TypeSystem {
    * registered in this typeSystem.  Does not register the type in
    * this TypeSystem.  For use only by JavaClass implementations.
    **/
-  public  ClassType typeForClass(Class clazz) throws TypeCheckException
+  public Type typeForClass(Class clazz) throws TypeCheckException
   {
-    return resolver.findClass(clazz.getName());
+    if( clazz == Void.TYPE) {
+      return VOID_;
+    }
+    else if( clazz == Boolean.TYPE) {
+      return BOOLEAN_;
+    }
+    else if( clazz == Byte.TYPE) {
+      return BYTE_;
+    }
+    else if( clazz == Character.TYPE) {
+      return CHAR_;
+    }
+    else if( clazz == Short.TYPE) {
+      return SHORT_;
+    }
+    else if( clazz == Integer.TYPE) {
+      return INT_;
+    }
+    else if( clazz == Long.TYPE) {
+      return LONG_;
+    }
+    else if( clazz == Float.TYPE) {
+      return FLOAT_;
+    }
+    else if( clazz == Double.TYPE) {
+      return DOUBLE_;
+    }
+    else if( clazz.isArray()) {
+      return new ArrayType( this, typeForClass( clazz.getComponentType()), 1);
+    }
+    else {
+      return resolver.findClass(clazz.getName());
+    }
   }
 }
 

@@ -11,14 +11,17 @@ public class MainTargetFactory implements TargetFactory
   String sourceExtension;
   Collection sourcePath;
   File outputDirectory;
+  String outputExtension;
   boolean stdout;
 
   public MainTargetFactory( String sourceExtension, Collection sourcePath,
-                            File outputDirectory, Boolean stdout)
+                            File outputDirectory, String outputExtension,
+                            Boolean stdout)
   {
     this.sourceExtension = sourceExtension;
     this.sourcePath = sourcePath;
     this.outputDirectory = outputDirectory;
+    this.outputExtension = outputExtension;
     this.stdout = (stdout != null) && (stdout.booleanValue());
   }
 
@@ -38,7 +41,8 @@ public class MainTargetFactory implements TargetFactory
       String name = sourceFile.getName();
       outputFile = new File( parentDirectory, 
                              name.substring( 0, name.lastIndexOf(
-                                                  sourceExtension)) + ".java");
+                                                  sourceExtension)) 
+                             + outputExtension);
     }
     else {
       /* Otherwise, we can't tell until we have the package name. */
@@ -54,7 +58,7 @@ public class MainTargetFactory implements TargetFactory
     File sourceFile = null, directory;
     File outputFile = new File( outputDirectory, 
                                 className.replace( '.', File.separatorChar)
-                                + ".java");
+                                + outputExtension);
 
     String fileName = className.replace( '.', File.separatorChar) 
                                          + sourceExtension;
@@ -112,7 +116,7 @@ public class MainTargetFactory implements TargetFactory
                                    File.separatorChar
                                    + name.substring( 0, name.lastIndexOf( 
                                        sourceExtension))
-                                   + ".java");
+                                   + outputExtension);
           }
           else {
             outputFile = new File( outputDirectory, 
@@ -120,7 +124,7 @@ public class MainTargetFactory implements TargetFactory
                                    + File.separatorChar
                                    + name.substring( 0, name.lastIndexOf( 
                                        sourceExtension))
-                                   + ".java");
+                                   + outputExtension);
           }
         }
         if( !outputFile.getParentFile().exists()) {

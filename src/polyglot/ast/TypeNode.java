@@ -42,6 +42,16 @@ public class TypeNode extends Node {
     return type;
   }
 
+  public void setCheckedType( Type type)
+  {
+    Annotate.setCheckedType( this, type);
+  }
+
+  public Type getCheckedType()
+  {
+    return Annotate.getCheckedType( this);
+  }
+
   void visitChildren(NodeVisitor vis)
   {
     // nothing to do
@@ -55,9 +65,7 @@ public class TypeNode extends Node {
   public Node removeAmbiguities( LocalContext c) throws TypeCheckException
   {
     type = c.getType( type);
-    Annotate.setType( this, type);
-
-    //Annotate.setType( this, c.checkAndResolveType( type));
+    setCheckedType( type);
     
     return this;
   }

@@ -18,11 +18,12 @@ import java.util.*;
 public class Annotate {
 
   static final int LINE_NUMBER            = 1;
-  static final int TYPE                   = 2;
+  static final int CHECKED_TYPE           = 2;
   static final int ERROR                  = 3;
   static final int THROWS_SET             = 4;
   // true if the node has all paths ending in function termination (either throws or return).
   static final int TERMINATE_ALL_PATHS    = 5;
+  static final int EXPECTED_TYPE          = 6;
 
   /**
    * Notes that o appeared at line i of the source.
@@ -42,17 +43,31 @@ public class Annotate {
   }
 
   /**
-   * Sets the type of an object.
+   * Sets the checked type of an object.
    **/
-  public static void setType(AnnotatedObject o, Type t) {
-    o.setAnnotation(TYPE, t);
+  public static void setCheckedType(AnnotatedObject o, Type t) {
+    o.setAnnotation(CHECKED_TYPE, t);
   }
 
   /**
-   * Returns the type of an object -- null if not set.
+   * Returns the checked type of an object -- null if not set.
    **/
-  public static Type getType(AnnotatedObject o) {
-    return (Type) o.getAnnotation(TYPE);
+  public static Type getCheckedType(AnnotatedObject o) {
+    return (Type) o.getAnnotation(CHECKED_TYPE);
+  }
+
+  /**
+   * Sets the checked type of an object.
+   **/
+  public static void setExpectedType(AnnotatedObject o, Type t) {
+    o.setAnnotation(EXPECTED_TYPE, t);
+  }
+
+  /**
+   * Returns the checked type of an object -- null if not set.
+   **/
+  public static Type getExpectedType(AnnotatedObject o) {
+    return (Type) o.getAnnotation(EXPECTED_TYPE);
   }
 
   public static void addError(AnnotatedObject o, ErrorInfo e)

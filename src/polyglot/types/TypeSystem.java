@@ -244,7 +244,7 @@ public abstract class TypeSystem {
    * this TypeSystem.  
    * this TypeSystem.  For use only by ClassType implementations.
    **/
-  public abstract ClassType typeForClass(Class clazz)
+  public abstract Type typeForClass(Class clazz)
     throws TypeCheckException;
 
   /**

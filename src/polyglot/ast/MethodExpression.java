@@ -176,6 +176,13 @@ public class MethodExpression extends Expression {
     setCheckedType ( mti.getType() );
     jltools.util.Annotate.addThrows( this, mti.exceptionTypes () );
 
+    List formalTypes = mti.argumentTypes();
+    for ( ListIterator i = arguments.listIterator(),
+            j = formalTypes.listIterator(); i.hasNext(); )
+    {
+       ((Expression)i.next()).setExpectedType( (Type)j.next());
+    }
+
     return this;
   }
   

@@ -72,9 +72,13 @@ public abstract class Node extends jltools.util.AnnotatedObject {
    public void dumpNodeInfo( CodeWriter w)
    {
       //FIXME: Do this
-     Type type = Annotate.getType( this);
+     Type type = Annotate.getCheckedType( this);
      if( type != null) {
        w.write( "T: " + type.getTypeString() + " ");
+     }
+     type = Annotate.getExpectedType( this);
+     if( type != null) {
+       w.write( "E: " + type.getTypeString() + " ");
      }
    }
 

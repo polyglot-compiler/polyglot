@@ -15,6 +15,8 @@ public class Main
                                         = "Output Directory (File)";
   private static final String MAIN_OPT_SOURCE_EXT 
                                         = "Source Extension (String)";
+  private static final String MAIN_OPT_OUTPUT_EXT 
+                                        = "Output Extension (String)";
   private static final String MAIN_OPT_STDOUT
                                         = "Output to stdout (Boolean)";
   private static final String MAIN_OPT_POST_COMPILER
@@ -30,6 +32,7 @@ public class Main
     tf = new MainTargetFactory( (String)options.get( MAIN_OPT_SOURCE_EXT),
                                 (Collection)options.get( MAIN_OPT_SOURCE_PATH),
                                 (File)options.get( MAIN_OPT_OUTPUT_DIRECTORY),
+                                (String)options.get( MAIN_OPT_OUTPUT_EXT),
                                 (Boolean)options.get( MAIN_OPT_STDOUT));
 
     /* Must initialize before instantiating any compilers. */
@@ -39,13 +42,14 @@ public class Main
     Compiler compiler = new Compiler();
     Iterator iter = source.iterator();
     String targetName = null;
+    boolean hasErrors = false;
 
     try
     {
       while( iter.hasNext()) {
         targetName = (String)iter.next();
         if( !compiler.compileFile( targetName)) {
-          System.exit( 1);
+          hasErrors = true;
         }
       }
     }
@@ -76,6 +80,10 @@ public class Main
                           + e.getMessage());
       System.exit( 1);
     }
+    
+    if( hasErrors) {
+      System.exit( 1);
+    }
 
     /* Now call javac or jikes, if necessary. */
     if( options.get( MAIN_OPT_POST_COMPILER) != null) {
@@ -89,11 +97,12 @@ public class Main
         t = (MainTargetFactory.MainTarget)iter.next(); 
 
         command =  (String)options.get( MAIN_OPT_POST_COMPILER) 
-                        + " -classpath  .:" 
+                      + " -classpath " + options.get(MAIN_OPT_OUTPUT_DIRECTORY)
+                        + File.pathSeparator + "." + File.pathSeparator 
                         + System.getProperty( "java.class.path") + " "
                         + t.outputFile.getPath();
 
-        Compiler.verbose( "executing " + command);
+        Compiler.verbose( Main.class, "executing " + command);
         
         try 
         {
@@ -133,7 +142,7 @@ public class Main
     Collection sourcePath = new LinkedList();
     sourcePath.add( new File( "."));
     options.put( MAIN_OPT_SOURCE_PATH, sourcePath);
-    options.put( MAIN_OPT_SOURCE_EXT, ".jl");
+    options.put( MAIN_OPT_OUTPUT_DIRECTORY, new File( "."));
     
     for( int i = 0; i < args.length; )
     {
@@ -179,6 +188,18 @@ public class Main
         i++;
         options.put( MAIN_OPT_STDOUT, new Boolean( true));
       }
+      else if( args[i].equals( "-sx")) 
+      {
+        i++;
+        options.put( MAIN_OPT_SOURCE_EXT, args[i]);
+        i++;
+      }
+      else if( args[i].equals( "-ox")) 
+      {
+        i++;
+        options.put( MAIN_OPT_OUTPUT_EXT, args[i]);
+        i++;
+      }
       else if( args[i].equals( "-dump"))
       {
         i++;
@@ -191,10 +212,32 @@ public class Main
       }
       else
       {
+        if( options.get( MAIN_OPT_SOURCE_EXT) == null) {
+          options.put( MAIN_OPT_SOURCE_EXT, args[i].substring( 
+                           args[i].lastIndexOf( '.')));
+        }
         source.add( args[i]);
         sourcePath.add( new File( args[i]).getParentFile());
         i++;
       }
+    }
+
+    if( options.get( MAIN_OPT_OUTPUT_EXT) == null) {
+      if( options.get( MAIN_OPT_SOURCE_EXT).equals( ".java")) {
+        options.put( MAIN_OPT_OUTPUT_EXT, ".jlava");
+      }
+      else {
+        options.put( MAIN_OPT_OUTPUT_EXT, ".java");
+      }
+    }
+    else
+    {
+      if( options.get( MAIN_OPT_SOURCE_EXT).equals( 
+                      options.get(MAIN_OPT_OUTPUT_EXT))) {
+        System.err.println( "jltools.frontent.Main: Source and output"
+                            + " extensions must differ.");
+        System.exit( 1);
+      } 
     }
   }
 
@@ -208,6 +251,8 @@ public class Main
     System.err.println( " -fqcn                   print fully-qualified class"
                         + " names in comments");
     System.err.println( " -stdout                 print all source to stdout");
+    System.err.println( " -sx <ext>               set source extension");
+    System.err.println( " -ox <ext>               set output extension");
     System.err.println( " -dump                   dump the ast");
     System.err.println( " -post <compiler>        run javac-like compiler" 
                         + " after translation");

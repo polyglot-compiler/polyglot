@@ -128,7 +128,7 @@ public class FormalParameter extends Node {
     modifiers.setFinal ( isFinal );
     c.addSymbol( name, new FieldInstance( name, type.getType(), null, modifiers ));
 
-    Annotate.setType( this, type.getType());
+    Annotate.setCheckedType( this, type.getType());
     return this;
   }
   

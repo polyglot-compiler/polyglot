@@ -31,6 +31,14 @@ public class Compiler implements TargetTable
 
   private static boolean initialized = false;
 
+  /* Stage defining constants. */
+  public static final int PARSED           = 0x01;
+  public static final int READ             = 0x02;
+  public static final int CLEANED          = 0x04;
+  public static final int DISAMBIGUATED    = 0x08;
+  public static final int CHECKED          = 0x10;
+  public static final int TRANSLATED       = 0x20;
+
   /* Global factories. */
   protected static TargetFactory tf;
   protected static ErrorQueueFactory eqf;
@@ -86,10 +94,15 @@ public class Compiler implements TargetTable
     return useFqcn;
   }
 
-  public static void verbose( String s)
+  public static void verbose( Object o, String s)
   {
     if( verbose) {
-      System.err.println( "Main: " + s);
+      if( o instanceof Class) {
+        System.err.println( ((Class)o).getName() + ": " + s);
+      }
+      else {
+        System.err.println( o.getClass().getName() + ": " + s);
+      }
     }
   }
  
@@ -121,7 +134,7 @@ public class Compiler implements TargetTable
     loadedResolver = new LoadedClassResolver();
     systemResolver.addClassResolver( loadedResolver);
     
-    ts = new IntCastableTypeSystem( systemResolver);
+    ts = new ObjectPrimitiveTypeSystem( systemResolver);
     
     loadedResolver.setTypeSystem( ts);
     
@@ -152,7 +165,7 @@ public class Compiler implements TargetTable
   public ClassResolver getResolver( Target t) throws IOException
   {
     Job job = lookupJob( t);
-    boolean success = compile( job, Job.READ);
+    boolean success = compile( job, READ);
 
     if( success) {
       return job.cr;
@@ -164,7 +177,7 @@ public class Compiler implements TargetTable
 
   public boolean compile( Target t) throws IOException
   {
-    return compile( t, Job.TRANSLATED);
+    return compile( t, TRANSLATED);
   }
  
   public boolean cleanup( Collection completed) throws IOException
@@ -174,7 +187,7 @@ public class Compiler implements TargetTable
     for( int i = 0; i < workList.size(); i++)
     {
       Job job = (Job)workList.get( i);
-      success = compile( job, Job.TRANSLATED);
+      success = compile( job, TRANSLATED);
       if( success) {
         completed.add( job.t);
       }
@@ -202,66 +215,66 @@ public class Compiler implements TargetTable
     try
     {
       /* PARSE. */
-      if( (job.status & Job.PARSED) == 0) {
+      if( (job.status & PARSED) == 0) {
 
-        verbose( "parsing " + job.t.getName() + "...");
+        verbose( this, "parsing " + job.t.getName() + "...");
         job.ast = parse( job.t, job.eq);
 
         if( hasErrors( job)) {
           return false;
         }
 
-        job.status |= Job.PARSED;
+        job.status |= PARSED;
       }
       
       if( dumpAst) { dump( job.ast); }
-      if( goal == Job.PARSED) { return true; }
+      if( goal == PARSED) { return true; }
 
       /* READ. */
-      if( (job.status & Job.READ) == 0) {
-        verbose( "reading " + job.t.getName() + "...");
+      if( (job.status & READ) == 0) {
+        verbose( this, "reading " + job.t.getName() + "...");
         job.cr = new TableClassResolver();
         parsedResolver.addClassResolver( job.cr);
         job.it = readSymbols( job.ast, job.cr, job.eq);
 
-        job.status |= Job.READ;
+        job.status |= READ;
       }
 
-      if( goal == Job.READ) { return true; }
+      if( goal == READ) { return true; }
 
       /* CLEAN. */
-      if( (job.status & Job.CLEANED) == 0) {
-        verbose( "cleaning " + job.t.getName() + "...");
+      if( (job.status & CLEANED) == 0) {
+        verbose( this, "cleaning " + job.t.getName() + "...");
         job.cr.cleanupSignatures( ts, job.it, job.eq);
         if( hasErrors( job)) {
           return false;
         }
 
-        job.status |= Job.CLEANED;
+        job.status |= CLEANED;
       }
 
-      if( goal == Job.CLEANED) { return true; }
+      if( goal == CLEANED) { return true; }
 
       /* DISAMBIGUATE. */
-      if( (job.status & Job.DISAMBIGUATED) == 0) {
-        verbose( "disambiguating " + job.t.getName() + "...");
+      if( (job.status & DISAMBIGUATED) == 0) {
+        verbose( this, "disambiguating " + job.t.getName() + "...");
         job.ast = removeAmbiguities( job.ast, job.cr, job.it, job.eq);
         if( hasErrors( job)) {
           return false;
         }
 
-        job.status |= Job.DISAMBIGUATED;
+        job.status |= DISAMBIGUATED;
       }
 
       if( dumpAst) { dump( job.ast); }
-      if( goal == Job.DISAMBIGUATED) { return true; }
+      if( goal == DISAMBIGUATED) { return true; }
 
 
       /* Okay. Before we can type check, we need to make sure that 
        * else in the worklist is at least CLEAN. */
       boolean okay = true; 
       for( int i = 0; i < workList.size(); i++) {
-        okay &= compile( (Job)workList.get( i), Job.CLEANED);
+        okay &= compile( (Job)workList.get( i), CLEANED);
       }
       if( !okay) {
         job.eq.enqueue( ErrorInfo.SEMANTIC_ERROR, "Unable to continue " 
@@ -271,26 +284,28 @@ public class Compiler implements TargetTable
 
 
       /* CHECK. */
-      if( (job.status & Job.CHECKED) == 0) {
-        verbose( "type checking " + job.t.getName() + "...");
+      if( (job.status & CHECKED) == 0) {
+        verbose( this, "type checking " + job.t.getName() + "...");
         typeCheck( job.ast, job.it, job.eq);    
         if( hasErrors( job)) {
           return false;
         }
         
-        job.status |= Job.CHECKED;
+        job.status |= CHECKED;
       }
 
       if( dumpAst) { dump( job.ast); }
-      if( goal == Job.CHECKED) { return true; }
+      if( goal == CHECKED) { return true; }
 
+      ObjectPrimitiveCastRewriter op = new ObjectPrimitiveCastRewriter( ts);
+      job.ast = job.ast.visit( op);
 
       /* TRANSLATE. */
-      if( (job.status & job.TRANSLATED) == 0) {
-        verbose( "translating " + job.t.getName() + "...");
+      if( (job.status & TRANSLATED) == 0) {
+        verbose( this, "translating " + job.t.getName() + "...");
         translate( job.t, job.it, job.ast);
 
-        job.status |= Job.TRANSLATED;
+        job.status |= TRANSLATED;
       }
     }
     catch( IOException e)
@@ -432,7 +447,7 @@ public class Compiler implements TargetTable
   }
   
   
- static class Job
+  static class Job
   {
     Target t;
     ErrorQueue eq;
@@ -441,13 +456,6 @@ public class Compiler implements TargetTable
     TableClassResolver cr;
 
     int status;
-
-    static final int PARSED         = 0x01;
-    static final int READ           = 0x02;
-    static final int CLEANED        = 0x04;
-    static final int DISAMBIGUATED  = 0x08;
-    static final int CHECKED        = 0x10;
-    static final int TRANSLATED     = 0x20;
 
     public Job( Target t, ErrorQueue eq) 
     {

@@ -64,7 +64,7 @@ public class LoadedClassType extends ClassTypeImpl  {
       // FIXME: what about classes inside methods?
       this.isAnonymous = isInner && 
 	Character.isDigit(this.shortName.charAt(0));    
-      this.containingClass = ts.typeForClass(outer);
+      this.containingClass = (ClassType)ts.typeForClass(outer);
       this.innerName = rawName;
     }
 	

@@ -132,23 +132,27 @@ public class IntLiteral extends Literal {
 
   public Node typeCheck(LocalContext c) throws TypeCheckException
   {
+    Type t = null;
+
     switch( type) {
     case BOOLEAN:
-      setCheckedType( c.getTypeSystem().getBoolean());
+      t = c.getTypeSystem().getBoolean();
       break;
     case BYTE:
-      setCheckedType( c.getTypeSystem().getByte());
+      t = c.getTypeSystem().getByte();
       break;
     case SHORT:
-      setCheckedType( c.getTypeSystem().getShort());
+      t = c.getTypeSystem().getShort();
       break;
     case INT:
-      setCheckedType( c.getTypeSystem().getInt());
+      t = c.getTypeSystem().getInt();
       break;
     case LONG:
-      setCheckedType( c.getTypeSystem().getLong());
+      t = c.getTypeSystem().getLong();
       break;
-    } 
+    }     
+    setCheckedType( t);
+    
     return this;
   }  
 

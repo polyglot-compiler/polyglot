@@ -8,23 +8,15 @@ public class Hash
   public static void  main(String [] args) throws Exception
   {
     Hashtable ht = new Hashtable();
-    ht.put ( (Object)32, "Hello");
-    System.out.println ( ht.get( (Object)32) );
-    
-    if ( true) 
-    {
-      throw new java.io.IOException();
-    }
+    ht.put ( 32, "Hello");
+    System.out.println ( ht.get( 32));    
 
-  }
-  
-  int method () throws Exception
-  {
-    if (true) 
-      return 32;
-    else
-    
-    
-        throw new java.io.IOException();
+    ht.put( "World", 39);
+    System.out.println( (int)ht.get( "World") + 3);
+
+    ht.put( "!!!", true);
+    if( (boolean)ht.get( "!!!")) {
+      System.out.println( "World!");
+    }
   }
 }

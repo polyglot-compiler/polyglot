@@ -12,7 +12,6 @@ tp_files 	= AccessFlags.java	\
 			ConstructorTypeInstance.java \
 			FieldInstance.java \
 			ImportTable.java \
-			IntCastableTypeSystem.java \
 			LoadedClassResolver.java \
 			LoadedClassType.java \
 			LocalContext.java \
@@ -20,6 +19,7 @@ tp_files 	= AccessFlags.java	\
 			MethodTypeInstance.java \
 			NoClassException.java \
 			NullType.java \
+			ObjectPrimitiveTypeSystem.java \
 			ParsedClassType.java \
 			PrimitiveType.java \
 			TableClassResolver.java \

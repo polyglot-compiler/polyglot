@@ -147,6 +147,7 @@ public class BinaryExpression extends Expression {
                                       + ltype.getTypeString() + "\".");
       }
       setCheckedType( ltype);
+      right.setExpectedType( ltype);
       break;
       
     case GT:
