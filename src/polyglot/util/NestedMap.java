@@ -30,7 +30,7 @@ public class NestedMap extends AbstractMap implements Map {
    * is null, it defaults to a NilMap.
    **/
   public NestedMap(Map containing) {
-    this.superMap = containing == null ? NilMap.Member : containing;
+    this.superMap = containing == null ? NilMap.EMPTY_MAP : containing;
     this.myMap = new HashMap();
     setView = new EntrySet();
     nShadowed = 0;
@@ -43,7 +43,7 @@ public class NestedMap extends AbstractMap implements Map {
    * Returns the map to which this map defers, or null for none.
    **/
   public Map getContainingMap() {
-    return superMap;
+    return superMap instanceof NilMap ? null : superMap;
   }
 
   /**
