@@ -208,17 +208,21 @@ public abstract class Node extends AnnotatedObject {
    */
   public void dumpNodeInfo( CodeWriter w)
   {
-    Type type = Annotate.getCheckedType( this);
+    Type type1 = Annotate.getCheckedType( this);
+    Type type2 = Annotate.getExpectedType( this);
 
     //    w.write( "C: " + getClass().getName() + " ");
 
-    if( type != null) {
-      w.write( "T: " + type.getTypeString() + " ");
-    }
-    type = Annotate.getExpectedType( this);
-    if( type != null) {
-      w.write( "E: " + type.getTypeString() + " ");
+    if( type1 != null && type2 != null ) {
+      w.begin(0);
+      w.write("T: " + type1.getTypeString());
+      w.allowBreak(0);
+      w.write("E: " + type2.getTypeString());
+      w.end();
+    } else if (type1 != null) {
+      w.write("T: " + type1.getTypeString());
+    } else if (type2 != null) {
+      w.write("E: " + type2.getTypeString());
     }
   }
 }
-
