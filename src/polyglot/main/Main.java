@@ -104,18 +104,17 @@ public class Main
 
   static final void loadExtension(String ext) {
     if (ext != null && ! ext.equals("")) {
-      String extClassName = "polyglot.ext." + ext + ".ExtensionInfo";
+      Class extClass = null;
 
-      Class extClass;
       try {
-	extClass = Class.forName(extClassName);
+        extClass = Class.forName(ext);
       }
       catch (ClassNotFoundException e) {
-	System.err.println("Extension " + ext +
-	  " not found: could not find class " + extClassName + "." +
-	  e.getMessage());
-	System.exit(1);
-	return;
+        System.err.println("Extension " + ext +
+          " not found: could not find class " + ext + "." +
+          e.getMessage());
+        System.exit(1);
+        return;
       }
 
       try {
@@ -123,14 +122,16 @@ public class Main
       }
       catch (ClassCastException e) {
 	System.err.println(ext + " is not a valid polyglot extension:" +
-	    " extension class " + extClassName +
+	    " extension class " + ext +
 	    " exists but is not a subclass of ExtensionInfo");
 	System.exit(1);
+        return;
       }
       catch (Exception e) {
 	System.err.println("Extension " + ext +
-	  " could not be loaded: could not instantiate " + extClassName + ".");
+	  " could not be loaded: could not instantiate " + ext + ".");
 	System.exit(1);
+        return;
       }
     }
   }
@@ -228,6 +229,12 @@ public class Main
           options.output_stdout = true;
         }
         else if (args[i].equals("-ext") || args[i].equals("-extension")) 
+        {
+          i++;
+          loadExtension("polyglot.ext." + args[i] + ".ExtensionInfo");
+          i++;
+        }
+        else if (args[i].equals("-extclass"))
         {
           i++;
           loadExtension(args[i]);
