@@ -1231,11 +1231,6 @@ public class TypeSystem_c implements TypeSystem
 	    }
 	    
 	    if (container != null) {
-		if (systemResolver.packageExists(containerName)) {
-		    throw new SemanticException("Class \"" + containerName +
-						"\" clashes with package of the same name.");
-		}
-		
 		return (ClassType) classContextResolver(container).find(shortName);
 	    }
 	}
