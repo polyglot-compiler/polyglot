@@ -10,6 +10,8 @@ import jltools.main.Main;
 
 import jltools.ext.jif.visit.*;
 import jltools.ext.jif.types.*;
+import jltools.ext.polyj.visit.*;
+import jltools.ext.polyj.types.*;
 
 import splitter.config.*;
 import splitter.*;
@@ -60,6 +62,7 @@ public class Compiler implements TargetTable, ClassCleaner
   private static boolean verbose;
   private static boolean jif;
   private static Config jifSplitConfig;
+  private static boolean polyj;
 
   private static boolean initialized = false;
 
@@ -174,6 +177,12 @@ public class Compiler implements TargetTable, ClassCleaner
 	serialize = false;
 	/* setup the splitter configuration */
 	jifSplitConfig = new Config("config");
+    }
+
+    polyj = ((Boolean)options.get( Main.MAIN_OPT_EXT_POLYJ)).booleanValue();
+
+    if (polyj) {
+	serialize = false;
     }
 
     /* Set up the resolvers. */
@@ -407,6 +416,11 @@ public class Compiler implements TargetTable, ClassCleaner
           verbose( this, "cleaning " + job.t.getName() + "...");
           job.cr.cleanupSignatures( ts, job.it, eq);
           
+	  if (polyj) {
+	      verbose( this, "cleaning polyj " + job.t.getName() + "...");
+	      job.ast = polyjCheck( job.ast, job.it, eq);
+	  }
+
           if( hasErrors( job)) { releaseJob( job); return false; }
           
           job.status |= CLEANED;
@@ -466,7 +480,6 @@ public class Compiler implements TargetTable, ClassCleaner
 	      job.ast = labelCheck( job.ast, job.it, eq);
 	  }
 	      
-
           if( hasErrors( job)) { releaseJob( job); return false; }
         
           job.status |= CHECKED;
@@ -698,6 +711,10 @@ public class Compiler implements TargetTable, ClassCleaner
 	verbose(this, "Using Jif Symbol Reader");
 	sr = new JifSymbolReader(  systemResolver, cr, t, tf, ts, 
                                         t.getErrorQueue());
+    } else if (polyj) {
+	verbose(this, "Using PolyJ Symbol Reader");
+	sr = new PolyJSymbolReader(  systemResolver, cr, t, tf, ts, 
+                                        t.getErrorQueue());
     } else {
 	sr = new SymbolReader( systemResolver, cr, t, tf, ts, 
 			       t.getErrorQueue());
@@ -713,6 +730,9 @@ public class Compiler implements TargetTable, ClassCleaner
     AmbiguityRemover ar;
     if (jif) {
 	verbose(this, "Not Using Jif Ambiguity Remover");
+	ar = new AmbiguityRemover( ts, it, eq);
+    } else if (polyj) {
+	verbose(this, "Not Using PolyJ Ambiguity Remover");
 	ar = new AmbiguityRemover( ts, it, eq);
     } else {
 	ar = new AmbiguityRemover( ts, it, eq);
@@ -762,6 +782,18 @@ public class Compiler implements TargetTable, ClassCleaner
       return ast;
   }
 
+  protected Node polyjCheck( Node ast, ImportTable it, ErrorQueue eq)
+  {
+      PolyJTypeSystem pts;
+      try {
+	  pts = (PolyJTypeSystem)ts;
+      } catch (ClassCastException ce) {
+	  throw new InternalCompilerError("Can't check without PolyJTypeSystem");
+      }
+      // PolyJFooChecker checker = new PolyJFooChecker(pts, it, eq);
+      // ast = ast.visit(checker);
+      return ast;
+  }
 
   protected Node exceptionCheck( Node ast, ErrorQueue eq)
   {

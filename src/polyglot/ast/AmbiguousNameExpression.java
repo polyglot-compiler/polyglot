@@ -168,11 +168,16 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
         if( top == null) {
           /* If it's not a local or field, then try and find a type. */
           try {
-            last = (ClassType)c.getType( name);
-            top = new TypeNode( c.getTypeSystem().getNewTypeNodeExtension(), last, name);
-            
-            /* Clear the name. */
-            name = "";
+            last = c.getType( name);
+	    if (last instanceof ClassType || last instanceof jltools.ext.polyj.types.PolyJParameterType) {
+	      top = new TypeNode( c.getTypeSystem().getNewTypeNodeExtension(), last, name);
+	      /* Clear the name. */
+	      name = "";
+	    }
+	    else {
+	      /* Not a local, field or type. Must be imcomplete. */
+	      name += ".";
+	    }
           }
           catch( SemanticException se2)
           {

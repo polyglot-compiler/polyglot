@@ -22,6 +22,11 @@ public class AmbiguousType extends Type
     this.name = name;
   }
   
+  public String getName() 
+  {
+    return name;
+  }
+  
   public String getTypeString() 
   {
     return name;

@@ -329,7 +329,7 @@ public class ClassNode extends ClassMember
     c.popClass();
   }
   
-  public void dump( CodeWriter w)
+  public void dump( CodeWriter w) throws SemanticException
   {
     w.write( " ( CLASS < " + name + " >");
     w.write( " < " + accessFlags.getStringRepresentation() + "> ");

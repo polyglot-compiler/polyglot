@@ -490,7 +490,7 @@ public class MethodNode extends ClassMember
     w.newline( 0);
   }
 
-  public void dump( CodeWriter w)
+  public void dump( CodeWriter w) throws SemanticException
   {
     w.write( "METHOD");
     w.write( " < " + name + " >");
