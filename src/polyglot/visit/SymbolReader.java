@@ -57,7 +57,7 @@ public class SymbolReader extends NodeVisitor
     String fullName;
     ParsedClassType newClass;
 
-    newClass = ts.newParsedClassType(current);
+    newClass = ts.newParsedClassType(it, current);
 
     if( current == null) {
       if (isLocal || isAnonymous) {

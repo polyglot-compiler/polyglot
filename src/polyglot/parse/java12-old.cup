@@ -38,14 +38,14 @@ parser code  {:
   }
   
   public static Node ln(Node n, Token t) {
-    if( n != null && t != null) {
+    if( n != null && t != null && t.getPosition() != null) {
     	Annotate.setPosition(n, t.getPosition()); 
     }
     return n;
   }
   
   public static Node ln(Node n, Node m) {
-    if( n != null && m != null) {
+    if( n != null && m != null && Annotate.getPosition(m) != null) {
     	Annotate.setPosition(n, Annotate.getPosition(m)); 
     }
     return n;
@@ -734,11 +734,12 @@ method_header ::=
 	;
 method_declarator ::=
 					// MethodNode
-		IDENTIFIER:a LPAREN formal_parameter_list_opt:b RPAREN
+		IDENTIFIER:a LPAREN formal_parameter_list_opt:b RPAREN:x
 			{: RESULT = (MethodNode)Grm.ln(new MethodNode(
 				new AccessFlags(), 
 				null, a.getIdentifier(), b, new LinkedList(), 
-				new BlockStatement()), a); :}
+				(BlockStatement)
+				Grm.ln(new BlockStatement(), x)), a); :}
 	|	method_declarator:a LBRACK RBRACK // deprecated
 			{: List f = new LinkedList(), e = new LinkedList();
 				Grm.addAll( f, a.formalParameters());
@@ -796,8 +797,9 @@ method_body ::=
 					// BlockStatement
 		block:a
 			{: RESULT = a; :}
-	|	SEMICOLON
-			{: RESULT = new BlockStatement(); :}
+	|	SEMICOLON:a
+			{: RESULT = (BlockStatement)
+			   Grm.ln(new BlockStatement(), a); :}
 	;
 
 // 19.8.4) Static Initializers
@@ -960,8 +962,8 @@ variable_initializers ::=
 // 19.11) Blocks and Statements
 block ::=
 					// BlockStatement
-		LBRACE block_statements_opt:a RBRACE
-			{: RESULT = a; :}
+		LBRACE:x block_statements_opt:a RBRACE
+			{: RESULT = (BlockStatement) Grm.ln(a, x); :}
 	;
 block_statements_opt ::=
 					// BlockStatement
@@ -1168,7 +1170,7 @@ switch_block_statement_group ::=
 					// List of SwitchElement
 		switch_labels:a block_statements:b
 			{: List l = new LinkedList(); RESULT = l; l.addAll(a); 
-				l.add(new SwitchStatement.SwitchBlock(b)); :}
+				l.add(Grm.ln(new SwitchStatement.SwitchBlock(b), b)); :}
 	;
 switch_labels ::=
 					// List of CaseStatement

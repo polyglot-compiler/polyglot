@@ -487,31 +487,15 @@ public class StandardTypeSystem extends TypeSystem {
   }
 
   public void cleanClass(ClassType type) throws SemanticException {
-    class HackedTypeContext extends ClassContext {
-	HackedTypeContext(ClassType type) {
-	    super(type);
-	}
-
-	public Type getType(String name) throws SemanticException {
-	    try {
-		return super.getType(name);
-	    }
-	    catch (SemanticException e) {
-		try {
-		    return StandardTypeSystem.this.resolver.findClass(name);
-		}
-		catch (SemanticException e2) {
-		    if (TypeSystem.isNameShort(name)) {
-			return new PackageType(StandardTypeSystem.this, name);
-		    }
-		    throw e2;
-		}
-	    }
-	}
-    };
-
-    cleanSuperTypes(type, getEmptyContext(resolver));
-    cleanClass(type, new HackedTypeContext(type));
+    if (type instanceof ParsedClassType) {
+        ImportTable it = ((ParsedClassType) type).importTable();
+	cleanSuperTypes(type, getEmptyContext(it));
+	cleanClass(type, getClassContext(type, it));
+    }
+    else {
+	cleanSuperTypes(type, getEmptyContext(resolver));
+	cleanClass(type, getClassContext(type, resolver));
+    }
   }
 
   public void cleanSuperTypes(ClassType type, TypeContext tc)
@@ -619,6 +603,13 @@ public class StandardTypeSystem extends TypeSystem {
 	    j.set(checkAndResolveType((Type) j.next(), tc));
 	  }
       }
+      catch (NoClassException e) {
+	  if (e.getPosition() == null) {
+	      throw new NoClassException(e.getMessage(),
+		      			  Annotate.getPosition(mti));
+	  }
+	  throw e;
+      }
       catch (SemanticException e) {
 	  if (e.getPosition() == null) {
 	      throw new SemanticException(e.getMessage(),
@@ -633,6 +624,13 @@ public class StandardTypeSystem extends TypeSystem {
 
       try {
 	  fi.setType(checkAndResolveType(fi.getType(), tc));
+      }
+      catch (NoClassException e) {
+	  if (e.getPosition() == null) {
+	      throw new NoClassException(e.getMessage(),
+		      			  Annotate.getPosition(fi));
+	  }
+	  throw e;
       }
       catch (SemanticException e) {
 	  if (e.getPosition() == null) {
@@ -655,7 +653,7 @@ public class StandardTypeSystem extends TypeSystem {
     Type t = checkAndResolve(type, context);
 
     if (t.isPackageType()) {
-	throw new SemanticException("Type " + type.getTypeString() +
+	throw new NoClassException("Type " + type.getTypeString() +
 	    " not found.");
     }
 
@@ -713,7 +711,7 @@ public class StandardTypeSystem extends TypeSystem {
 	return checkAndResolve(type, packageContext);
     }
     else {
-	throw new SemanticException("Type " + type.getTypeString() +
+	throw new NoClassException("Type " + type.getTypeString() +
 		" not found.");
     }
   }
@@ -753,7 +751,7 @@ public class StandardTypeSystem extends TypeSystem {
 	return packageContext.getType(ambType.getName());
     }
     else {
-	throw new SemanticException("Type " + type + " not found.");
+	throw new NoClassException("Type " + type + " not found.");
     }
   }
 
@@ -1326,7 +1324,11 @@ public class StandardTypeSystem extends TypeSystem {
   }
 
   public TypeContext getClassContext(ClassType type) throws SemanticException {
-    return new ClassContext(type);
+    return new ClassContext(type, resolver);
+  }
+
+  public TypeContext getClassContext(ClassType type, ClassResolver cr) throws SemanticException {
+    return new ClassContext(type, cr);
   }
 
   public TypeContext getPackageContext(ClassResolver resolver, PackageType type) throws SemanticException {
@@ -1391,8 +1393,9 @@ public class StandardTypeSystem extends TypeSystem {
       return prim.getTypeString();
   }
 
-  public ParsedClassType newParsedClassType(ClassType container) {
-      return new ParsedClassType(this, container);
+  public ParsedClassType newParsedClassType(ImportTable it,
+      					    ClassType container) {
+      return new ParsedClassType(this, it, container);
   }
 
   public List defaultPackageImports() {

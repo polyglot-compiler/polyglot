@@ -16,26 +16,33 @@ import java.util.*;
 public class ParsedClassType extends ClassTypeImpl 
 {
   static final long serialVersionUID = 5725500800448862634L;
+
+  ImportTable it;
   
   protected ParsedClassType()
   {
     super();
   }
 
-  public ParsedClassType( TypeSystem ts)
+  public ParsedClassType( TypeSystem ts, ImportTable it)
   {
-    this( ts, null);
+    this( ts, it, null);
   }
 
-  public ParsedClassType( TypeSystem ts, ClassType containingClass)
+  public ParsedClassType( TypeSystem ts, ImportTable it, ClassType containingClass)
   {
     super( ts);
+    this.it = it;
     interfaces = new TypedList( new LinkedList(), Type.class, false);
     methods = new TypedList( new LinkedList(), MethodTypeInstance.class,
                              false);
     fields = new TypedList( new LinkedList(), FieldInstance.class, false);
     innerClasses = new TypedList( new LinkedList(), Type.class, false);
     this.containingClass = containingClass;
+  }
+
+  public ImportTable importTable() {
+    return it;
   }
 
   public void setPackageName( String packageName)

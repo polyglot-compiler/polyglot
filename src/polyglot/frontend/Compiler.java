@@ -227,19 +227,24 @@ public class Compiler
 		}
 	    }
 
+	    eq.flush();
+
 	    return okay;
 	}
 	catch (FileNotFoundException e) {
+	    eq.flush();
 	    System.err.println(options.extension.compilerName() +
 			       ": cannot find source file " + e.getMessage());
 	    return false;
 	}
 	catch (IOException e) {
+	    eq.flush();
 	    System.err.println(options.extension.compilerName() + ": " +
 			       e.getMessage());
 	    return false;
 	}
 	catch (ErrorLimitError e) {
+	    eq.flush();
 	    return false;
 	}
     }
@@ -397,8 +402,6 @@ public class Compiler
     /** Check if the job's error queue is empty. */
     protected boolean hasErrors(Job job) throws IOException {
 	if (eq.hasErrors()) {
-	    eq.flush();
-
 	    try {
 		CodeWriter cw = new CodeWriter(new UnicodeWriter(
 		  new FileWriter("onError.dump")), 76);

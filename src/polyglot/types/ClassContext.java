@@ -18,10 +18,12 @@ import jltools.util.*;
 public class ClassContext implements TypeContext {
   ClassType type;
   TypeSystem ts;
+  ClassResolver cr;
 
-  ClassContext(ClassType type) {
+  ClassContext(ClassType type, ClassResolver cr) {
     this.type = type;
     this.ts = type.getTypeSystem();
+    this.cr = cr;
   }
 
   public Type getType(String name) throws SemanticException {
@@ -70,8 +72,7 @@ public class ClassContext implements TypeContext {
 	return t2;
     }
 
-    throw new SemanticException("Class " + name + " not found in scope of " +
-		type.getFullName());
+    return cr.findClass(name);
   }
 
   public ClassType getClassType() {

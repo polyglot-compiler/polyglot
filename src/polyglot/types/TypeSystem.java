@@ -320,7 +320,7 @@ public abstract class TypeSystem {
   public abstract TypeContext getPackageContext(ClassResolver resolver, PackageType type) throws SemanticException;
   public abstract TypeContext getPackageContext(ClassResolver resolver, String name) throws SemanticException;
 
-  public abstract ParsedClassType newParsedClassType(ClassType container);
+  public abstract ParsedClassType newParsedClassType(ImportTable it, ClassType container);
   public abstract List defaultPackageImports();
 
   /**

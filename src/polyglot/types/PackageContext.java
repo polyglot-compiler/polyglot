@@ -35,7 +35,7 @@ public class PackageContext implements TypeContext {
     try {
 	return resolver.findClass(type.getTypeString() + "." + name);
     }
-    catch (SemanticException e) {
+    catch (NoClassException e) {
 	return new PackageType(type.getTypeSystem(), type, name);
     }
   }
