@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * A method declaration.
  */
-public class MethodDecl_c extends Node_c implements MethodDecl
+public class MethodDecl_c extends Term_c implements MethodDecl
 {
     protected Flags flags;
     protected TypeNode returnType;
@@ -453,4 +453,28 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	    			 ct, flags, returnType.type(), name,
 	                         argTypes, excTypes);
     }
+
+    /**
+     * Return the first (sub)term performed when evaluating this
+     * term.
+     */
+    public Term entry() {
+        return listEntry(formals(), (body()==null? this : body().entry()));
+    }
+
+    /**
+     * Visit this term in evaluation order.
+     */
+    public List acceptCFG(CFGBuilder v, List succs) {
+        if (body() == null) {
+            v.visitCFGList(formals(), this);
+        }
+        else {
+            v.visitCFGList(formals(), body().entry());
+            v.visitCFG(body(), this);
+        }
+        return succs;
+    }
+
+
 }

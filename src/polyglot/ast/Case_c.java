@@ -167,7 +167,7 @@ public class Case_c extends Stmt_c implements Case
 	}
     }
 
-    public Computation entry() {
+    public Term entry() {
         if (expr != null) return expr;
         return this;
     }

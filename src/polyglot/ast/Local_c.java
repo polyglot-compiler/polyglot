@@ -84,7 +84,7 @@ public class Local_c extends Expr_c implements Local
     w.end();
   }
 
-  public Computation lhsEntry(Assign assign) {
+  public Term lhsEntry(Assign assign) {
     if (assign.operator() != Assign.ASSIGN) {
       return this;
     }

@@ -104,7 +104,7 @@ public class Do_c extends Loop_c implements Do
     }
 
 
-    public Computation entry() {
+    public Term entry() {
         return body.entry();
     }
 
@@ -121,7 +121,7 @@ public class Do_c extends Loop_c implements Do
         return succs;
     }
 
-    public Computation continueTarget() {
+    public Term continueTarget() {
         return cond.entry();
     }
 }

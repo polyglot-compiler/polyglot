@@ -72,7 +72,7 @@ public class Labeled_c extends Stmt_c implements Labeled
 	tr.print(statement, w);
     }
 
-    public Computation entry() {
+    public Term entry() {
         return statement.entry();
     }
 

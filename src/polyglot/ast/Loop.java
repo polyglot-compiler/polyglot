@@ -22,5 +22,5 @@ public interface Loop extends CompoundStmt
     Stmt body();
 
     /** Target of a continue statement in the loop body. */
-    Computation continueTarget();
+    Term continueTarget();
 }

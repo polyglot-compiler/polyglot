@@ -8,7 +8,7 @@ import polyglot.visit.PrettyPrinter;
  * An <code>Expr</code> represents any Java expression.  All expressions
  * must be subtypes of Expr.
  */
-public interface Expr extends Receiver, Computation
+public interface Expr extends Receiver, Term
 {
     /**
      * Return an equivalent expression, but with the type <code>type</code>.

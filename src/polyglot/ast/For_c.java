@@ -186,7 +186,7 @@ public class For_c extends Loop_c implements For
         tr.appendSemicolon(true);
     }
 
-    public Computation entry() {
+    public Term entry() {
         return listEntry(inits, (cond != null ? cond.entry() : body.entry()));
     }
 
@@ -208,7 +208,7 @@ public class For_c extends Loop_c implements For
         return succs;
     }
 
-    public Computation continueTarget() {
+    public Term continueTarget() {
         return listEntry(iters, (cond != null ? cond.entry() : body.entry()));
     }
 }

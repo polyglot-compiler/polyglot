@@ -182,7 +182,7 @@ public class Field_c extends Expr_c implements Field
     w.end();
   }
 
-  public Computation entry() {
+  public Term entry() {
       if (target instanceof Expr) {
           return ((Expr) target).entry();
       }
@@ -196,7 +196,7 @@ public class Field_c extends Expr_c implements Field
       return succs;
   }
 
-  public Computation lhsEntry(Assign assign) {
+  public Term lhsEntry(Assign assign) {
       if (target instanceof Expr) {
           return ((Expr) target).entry();
       }

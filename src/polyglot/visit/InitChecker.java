@@ -11,7 +11,7 @@ import java.util.*;
  * and that final variables and fields are initialized correctly.
  * 
  * The checking of the rules is implemented in the methods leaveCall(Node)
- * and check(FlowGraph, Computation, Item, Item).
+ * and check(FlowGraph, Term, Item, Item).
  * 
  */
 public class InitChecker extends DataFlow
@@ -173,7 +173,7 @@ public class InitChecker extends DataFlow
      *         code declaration; otherwise, an apropriately initialized
      *         FlowGraph.
      */
-    protected FlowGraph initGraph(CodeDecl code, Computation root) {
+    protected FlowGraph initGraph(CodeDecl code, Term root) {
         currentCodeDecl = code;
         return new FlowGraph(root, forward, replicateFinally);
     }
@@ -301,7 +301,7 @@ public class InitChecker extends DataFlow
     
 
     /**
-     * Perform the appropriate flow operations for the Computations.
+     * Perform the appropriate flow operations for the Terms.
      * 
      * To summarize:
      * - Formals: declaration of a Formal param, just insert a new 
@@ -313,7 +313,7 @@ public class InitChecker extends DataFlow
      *              are interested in, then increment the min and max counts
      *              for that local var or field.   
      */
-    public Item flow(Item inItem, FlowGraph graph, Computation n) {
+    public Item flow(Item inItem, FlowGraph graph, Term n) {
         DataFlowItem inDFItem = ((DataFlowItem)inItem);
         
         if (n instanceof Formal) {
@@ -347,15 +347,6 @@ public class InitChecker extends DataFlow
                 Map m = new HashMap(inDFItem.initStatus);
                 MinMaxInitCount initCount = (MinMaxInitCount)m.get(l.localInstance());
                 
-                if (initCount == null) {
-                    //### At the moment (19 August 02) assume that a
-                    // null entry in the map for the local instance
-                    // means that the local variable is actually a Formal,
-                    // and there is no entry as Formals are not yet threaded
-                    // onto the dataflow graph. Since we assume the variable
-                    // is a Formal, we assume that it is already defined.
-                    initCount = new MinMaxInitCount(InitCount.ONE, InitCount.ONE);
-                }
                 initCount = new MinMaxInitCount(initCount.getMin().increment(),
                                                 initCount.getMax().increment());
                 m.put(l.localInstance(), initCount);
@@ -415,18 +406,14 @@ public class InitChecker extends DataFlow
      * dataflows over Initializers, by copying back the appropriate 
      * MinMaxInitCounts to the map currentClassFinalFieldInitCounts.
      */
-    public void check(FlowGraph graph, Computation n, Item in, Item out) throws SemanticException {
+    public void check(FlowGraph graph, Term n, Item in, Item out) throws SemanticException {
         DataFlowItem dfIn = (DataFlowItem)in;
         DataFlowItem dfOut = (DataFlowItem)out;
         if (n instanceof Local) {
             Local l = (Local) n;
             MinMaxInitCount initCount = (MinMaxInitCount) 
                       dfIn.initStatus.get(l.localInstance());
-            if (initCount != null && InitCount.ZERO.equals(initCount.getMin())) {
-                // if initCount == null for a LocalInstance, it is assumed 
-                // that the Local is a Formal, and as such is always defined.
-                // ### This assumption can be removed once Formals are threaded
-                // into the dataflow.
+            if (InitCount.ZERO.equals(initCount.getMin())) {
                 throw new SemanticException("Local variable \"" + l.name() +
                                             "\" may not have been initialized",
                                             l.position());

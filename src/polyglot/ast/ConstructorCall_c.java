@@ -250,7 +250,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	w.write(");");
     }
 
-    public Computation entry() {
+    public Term entry() {
         if (qualifier != null) {
             return qualifier.entry();
         }

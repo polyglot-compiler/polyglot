@@ -595,7 +595,7 @@ FIXME: check super types as well.
 	}
     }
 
-    public Computation entry() {
+    public Term entry() {
         if (qualifier != null) return qualifier.entry();
         return listEntry(arguments, this);
     }

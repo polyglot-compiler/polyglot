@@ -20,7 +20,7 @@ public class ExitChecker extends DataFlow
 
     CodeDecl code;
 
-    protected FlowGraph initGraph(CodeDecl code, Computation root) {
+    protected FlowGraph initGraph(CodeDecl code, Term root) {
         boolean returnsValue;
 
         this.code = code;
@@ -64,7 +64,7 @@ public class ExitChecker extends DataFlow
         
     }
     
-    public Item flow(Item in, FlowGraph graph, Computation n) {
+    public Item flow(Item in, FlowGraph graph, Term n) {
         // If every path from the exit node to the entry goes through a return,
         // we're okay.  So make the exit bit false at exit and true at every return;
         // the confluence operation is &&. 
@@ -90,7 +90,7 @@ public class ExitChecker extends DataFlow
         return DataFlowItem.EXITS; 
     }
 
-    public void check(FlowGraph graph, Computation n, Item in, Item out) throws SemanticException {
+    public void check(FlowGraph graph, Term n, Item in, Item out) throws SemanticException {
         // Check for statements not on the path to exit; compound
         // statements are allowed to be off the path.  (e.g., "{ return; }"
         // or "while (true) S").  If a compound statement is truly

@@ -46,7 +46,7 @@ public class ReachChecker extends DataFlow
         }
     }
 
-    public Item flow(Item in, FlowGraph graph, Computation n) {
+    public Item flow(Item in, FlowGraph graph, Term n) {
         if (n == graph.entryNode()) {
             return DataFlowItem.REACHABLE;
         }
@@ -65,10 +65,10 @@ public class ReachChecker extends DataFlow
         return DataFlowItem.NOT_REACHABLE;
     }
 
-    public void check(FlowGraph graph, Computation n, Item inItem, Item outItem) throws SemanticException {
+    public void check(FlowGraph graph, Term n, Item inItem, Item outItem) throws SemanticException {
     }
     
-    public Block post(FlowGraph graph, Block root) throws SemanticException {
+    public CodeDecl post(FlowGraph graph, CodeDecl root) throws SemanticException {
         MAPS:
         for (Iterator i = graph.pathMaps().iterator(); i.hasNext(); ) {
             Map m = (Map) i.next();

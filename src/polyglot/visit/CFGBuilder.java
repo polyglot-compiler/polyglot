@@ -64,11 +64,11 @@ public class CFGBuilder implements Copy
      * the loop, visiting any finally blocks encountered.
      */
     public void visitBranchTarget(Branch b) {
-      Computation last = b;
+      Term last = b;
       CFGBuilder last_visitor = this;
 
       for (CFGBuilder v = this; v != null; v = v.pop()) {
-        Computation c = v.current_block;
+        Term c = v.current_block;
 
         if (c instanceof Try) {
           Try tr = (Try) c;
@@ -129,11 +129,11 @@ public class CFGBuilder implements Copy
      * finally blocks encountered.
      */
     public void visitReturn(Return r) {
-      Computation last = r;
+      Term last = r;
       CFGBuilder last_visitor = this;
 
       for (CFGBuilder v = this; v != null; v = v.pop()) {
-        Computation c = v.current_block;
+        Term c = v.current_block;
 
         if (c instanceof Try) {
           Try tr = (Try) c;
@@ -169,11 +169,11 @@ public class CFGBuilder implements Copy
 
 
     /** Utility function to visit all edges in a list. */
-    public void visitCFGList(List elements, Computation after) {
-        Computation prev = null;
+    public void visitCFGList(List elements, Term after) {
+        Term prev = null;
 
         for (Iterator i = elements.iterator(); i.hasNext(); ) {
-            Computation c = (Computation) i.next();
+            Term c = (Term) i.next();
 
             if (prev != null) {
                 visitCFG(prev, c.entry());
@@ -187,18 +187,18 @@ public class CFGBuilder implements Copy
         }
     }
 
-    public void visitCFG(Computation a, Computation succ) {
+    public void visitCFG(Term a, Term succ) {
         visitCFG(a, Collections.singletonList(succ));
     }
 
-    public void visitCFG(Computation a, List succs) {
+    public void visitCFG(Term a, List succs) {
       if (Report.should_report(Report.cfg, 2))
 	Report.report(2, "// node " + a + " -> " + succs);
 
       succs = a.acceptCFG(this, succs);
 
       for (Iterator i = succs.iterator(); i.hasNext(); ) {
-          Computation out = (Computation) i.next();
+          Term out = (Term) i.next();
           edge(a, out);
       }
 
@@ -220,12 +220,12 @@ public class CFGBuilder implements Copy
       }
     }
 
-    public void visitThrow(Computation t, Type type) {
-      Computation last = t;
+    public void visitThrow(Term t, Type type) {
+      Term last = t;
       CFGBuilder last_visitor = this;
 
       for (CFGBuilder v = this; v != null; v = v.pop()) {
-        Computation c = v.current_block;
+        Term c = v.current_block;
 
         if (c instanceof Try) {
           Try tr = (Try) c;
@@ -258,15 +258,15 @@ public class CFGBuilder implements Copy
       // edge(last_visitor, last, graph.exitNode());
     }
 
-    public CFGBuilder tryFinally(CFGBuilder v, Computation last,
-                                 CFGBuilder last_visitor, Computation f) {
+    public CFGBuilder tryFinally(CFGBuilder v, Term last,
+                                 CFGBuilder last_visitor, Term f) {
         CFGBuilder v_ = v.pop().enterFinally(last);
         v_.edge(last_visitor, last, f.entry());
         v_.visitCFG(f, Collections.EMPTY_LIST);
         return v_;
     }
 
-    public CFGBuilder enterFinally(Computation from) {
+    public CFGBuilder enterFinally(Term from) {
       if (graph.replicateFinally()) {
         CFGBuilder v = (CFGBuilder) copy();
         v.path_to_finally = new ArrayList(path_to_finally.size()+1);
@@ -278,7 +278,7 @@ public class CFGBuilder implements Copy
       }
     }
 
-    public void edge(Computation p, Computation q) {
+    public void edge(Term p, Term q) {
       edge(this, p, q);
     }
 
@@ -288,7 +288,7 @@ public class CFGBuilder implements Copy
      * @param p The predecessor node in the forward graph
      * @param q The successor node in the forward graph
      */
-    public void edge(CFGBuilder p_visitor, Computation p, Computation q) {
+    public void edge(CFGBuilder p_visitor, Term p, Term q) {
       if (Report.should_report(Report.cfg, 2))
 	Report.report(2, "//     edge " + p + " -> " + q);
 

@@ -156,7 +156,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 	w.write(" }");
     }
 
-    public Computation entry() {
+    public Term entry() {
         return listEntry(elements, this);
     }
 

@@ -150,7 +150,7 @@ public class NewArray_c extends Expr_c implements NewArray
 	}
     }
 
-    public Computation entry() {
+    public Term entry() {
         return listEntry(dims, (init != null ? init.entry() : this));
     }
 

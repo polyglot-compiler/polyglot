@@ -226,7 +226,7 @@ public class Try_c extends Stmt_c implements Try
 	}
     }
 
-    public Computation entry() {
+    public Term entry() {
         return tryBlock.entry();
     }
 
@@ -243,7 +243,7 @@ public class Try_c extends Stmt_c implements Try
             v1.visitThrow(tryBlock.entry(), type);
         }
 
-        Computation next;
+        Term next;
 
         // Handle the normal return case.  The throw case will be handled
         // specially.

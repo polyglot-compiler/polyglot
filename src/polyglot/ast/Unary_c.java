@@ -185,7 +185,7 @@ public class Unary_c extends Expr_c implements Unary
 	}
     }
 
-    public Computation entry() {
+    public Term entry() {
         return expr.entry();
     }
 

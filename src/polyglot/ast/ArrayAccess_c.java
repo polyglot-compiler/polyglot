@@ -123,7 +123,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	w.write ("]");
     }
 
-    public Computation entry() {
+    public Term entry() {
         return array.entry();
     }
 
@@ -133,7 +133,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
         return succs;
     }
 
-    public Computation lhsEntry(Assign assign) {
+    public Term lhsEntry(Assign assign) {
         return array.entry();
     }
 

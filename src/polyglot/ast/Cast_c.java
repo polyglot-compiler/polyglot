@@ -130,7 +130,7 @@ public class Cast_c extends Expr_c implements Cast
 	w.end();
     }
 
-    public Computation entry() {
+    public Term entry() {
         return expr.entry();
     }
 

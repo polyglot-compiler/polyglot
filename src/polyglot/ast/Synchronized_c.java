@@ -100,7 +100,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized
 	printSubStmt(body, w, tr);
     }
 
-    public Computation entry() {
+    public Term entry() {
         return expr.entry();
     }
 

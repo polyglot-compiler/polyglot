@@ -9,7 +9,7 @@ import java.util.List;
  * A code declaration.  A "code" is the supertype of methods,
  * constructors, and initalizers.
  */
-public interface CodeDecl extends ClassMember 
+public interface CodeDecl extends ClassMember, Term 
 {
     /** The body of the method, constructor, or initializer. */
     Block body();

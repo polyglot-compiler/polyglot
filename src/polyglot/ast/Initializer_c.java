@@ -14,7 +14,7 @@ import java.util.*;
  * constructors.  Such a block can optionally be static, in which case
  * it is executed when the class is loaded.
  */
-public class Initializer_c extends Node_c implements Initializer
+public class Initializer_c extends Term_c implements Initializer
 {
     protected Flags flags;
     protected Block body;

@@ -3,7 +3,7 @@ public class FinalInit4 {
 
     FinalInit4() {
 	i = 2;
-  	int k;
+  	int k=i;
 	for (int j = 0; j < 5; j++) {
   	    k = k+1;
   	}

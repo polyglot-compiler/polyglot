@@ -212,7 +212,7 @@ public class Conditional_c extends Expr_c implements Conditional
 	printSubExpr(alternative, false, w, tr);
     }
 
-    public Computation entry() {
+    public Term entry() {
         return cond.entry();
     }
 

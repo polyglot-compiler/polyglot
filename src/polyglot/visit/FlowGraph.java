@@ -8,22 +8,22 @@ import java.util.*;
 
 public class FlowGraph {
   Map peerMap;
-  Computation root;
+  Term root;
   boolean forward;
   boolean replicateFinally;
 
-  FlowGraph(Computation root, boolean forward, boolean replicateFinally) {
+  FlowGraph(Term root, boolean forward, boolean replicateFinally) {
     this.root = root;
     this.forward = forward;
     this.replicateFinally = replicateFinally;
     this.peerMap = new HashMap();
   }
 
-  public Computation startNode() { return forward ? root.entry() : root; }
-  public Computation finishNode() { return forward ? root : root.entry(); }
-  public Computation entryNode() { return root.entry(); }
-  public Computation exitNode() { return root; }
-  public Computation root() { return root; }
+  public Term startNode() { return forward ? root.entry() : root; }
+  public Term finishNode() { return forward ? root : root.entry(); }
+  public Term entryNode() { return root.entry(); }
+  public Term exitNode() { return root; }
+  public Term root() { return root; }
   public boolean forward() { return forward; }
   public boolean replicateFinally() { return replicateFinally; }
 
@@ -46,17 +46,17 @@ public class FlowGraph {
     return c;
   }
 
-  public Peer peer(Computation n, DataFlow df) {
+  public Peer peer(Term n, DataFlow df) {
     return peer(n, Collections.EMPTY_LIST, df);
   }
 
-  public Collection peers(Computation n) {
+  public Collection peers(Term n) {
     IdentityKey k = new IdentityKey(n);
     Map pathMap = (Map) peerMap.get(k);
     return pathMap.values();
   }
 
-  public Peer peer(Computation n, List path_to_finally, DataFlow df) {
+  public Peer peer(Term n, List path_to_finally, DataFlow df) {
     IdentityKey k = new IdentityKey(n);
     Map pathMap = (Map) peerMap.get(k);
     if (pathMap == null) {
@@ -76,12 +76,12 @@ public class FlowGraph {
   static class Peer {
     DataFlow.Item inItem;  // Input Item for dataflow analysis
     DataFlow.Item outItem; // Output Item for dataflow analysis
-    Computation node;
+    Term node;
     List succs; // List of successor Peers
     List preds; // List of predecessor Peers
     List path_to_finally;
 
-    public Peer(Computation node, List path_to_finally) {
+    public Peer(Term node, List path_to_finally) {
       this.node = node;
       this.path_to_finally = path_to_finally;
       this.inItem = null;

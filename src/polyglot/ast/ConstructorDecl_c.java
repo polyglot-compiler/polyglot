@@ -11,7 +11,7 @@ import java.util.*;
  * A <code>ConstructorDecl</code> is an immutable representation of a
  * constructor declaration as part of a class body.
  */
-public class ConstructorDecl_c extends Node_c implements ConstructorDecl
+public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 {
     protected Flags flags;
     protected String name;
@@ -382,4 +382,27 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	return ts.constructorInstance(position(), ct, flags,
 		                      argTypes, excTypes);
     }
+    
+    /**
+     * Return the first (sub)term performed when evaluating this
+     * term.
+     */
+    public Term entry() {
+        return listEntry(formals(), (body()==null? this : body().entry()));
+    }
+
+    /**
+     * Visit this term in evaluation order.
+     */
+    public List acceptCFG(CFGBuilder v, List succs) {
+        if (body() == null) {
+            v.visitCFGList(formals(), this);
+        }
+        else {
+            v.visitCFGList(formals(), body().entry());
+            v.visitCFG(body(), this);
+        }
+        return succs;
+    }
+    
 }

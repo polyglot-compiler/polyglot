@@ -142,7 +142,7 @@ public class Formal_c extends Node_c implements Formal
 	return this;
     }
 
-    public Computation entry() {
+    public Term entry() {
         return this;
     }
 

@@ -8,5 +8,5 @@ import polyglot.visit.*;
 public interface LHS extends Expr
 {
     public void visitAssignCFG(Assign assign, CFGBuilder v);
-    public Computation lhsEntry(Assign assign);
+    public Term lhsEntry(Assign assign);
 }

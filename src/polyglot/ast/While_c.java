@@ -100,7 +100,7 @@ public class While_c extends Loop_c implements While
 	printSubStmt(body, w, tr);
     }
 
-    public Computation entry() {
+    public Term entry() {
         return cond.entry();
     }
 
@@ -117,7 +117,7 @@ public class While_c extends Loop_c implements While
         return succs;
     }
 
-    public Computation continueTarget() {
+    public Term continueTarget() {
         return cond.entry();
     }
 }

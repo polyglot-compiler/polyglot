@@ -109,7 +109,7 @@ public class Catch_c extends Stmt_c implements Catch
 	printSubStmt(body, w, tr.context(c));
     }
 
-    public Computation entry() {
+    public Term entry() {
         return body.entry();
     }
 

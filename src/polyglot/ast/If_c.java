@@ -131,7 +131,7 @@ public class If_c extends Stmt_c implements If
 	}
     }
 
-    public Computation entry() {
+    public Term entry() {
         return cond.entry();
     }
 

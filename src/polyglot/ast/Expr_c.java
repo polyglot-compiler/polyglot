@@ -9,7 +9,7 @@ import polyglot.util.*;
  * An <code>Expr</code> represents any Java expression.  All expressions
  * must be subtypes of Expr.
  */
-public abstract class Expr_c extends Computation_c implements Expr
+public abstract class Expr_c extends Term_c implements Expr
 {
     protected Type type;
 

@@ -4,9 +4,9 @@ import polyglot.types.*;
 import java.util.List;
 
 /**
- * A <code>Thrower</code> is any computation that might throw an exception.
+ * A <code>Thrower</code> is any term that might throw an exception.
  */
-public interface Thrower extends Computation
+public interface Thrower extends Term
 {
     /** List of Types of exceptions that might get thrown.  The result is
      * not necessarily correct until after type checking. */

@@ -561,7 +561,7 @@ public class Binary_c extends Expr_c implements Binary
     w.end();
   }
 
-  public Computation entry() {
+  public Term entry() {
     return left.entry();
   }
 

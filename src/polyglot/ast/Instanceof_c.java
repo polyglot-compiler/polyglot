@@ -109,7 +109,7 @@ public class Instanceof_c extends Expr_c implements Instanceof
 	tr.print(compareType, w);
     }
 
-    public Computation entry() {
+    public Term entry() {
         return expr.entry();
     }
 

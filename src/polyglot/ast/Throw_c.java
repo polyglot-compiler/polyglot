@@ -89,7 +89,7 @@ public class Throw_c extends Stmt_c implements Throw
 	w.write(";");
     }
 
-    public Computation entry() {
+    public Term entry() {
         return expr.entry();
     }
 

@@ -223,7 +223,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
         w.end();
     }
 
-    public Computation entry() {
+    public Term entry() {
         if (init() != null) {
             return init().entry();
         }

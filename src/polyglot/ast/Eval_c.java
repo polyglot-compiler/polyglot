@@ -75,7 +75,7 @@ public class Eval_c extends Stmt_c implements Eval
 	tr.appendSemicolon(semi);
     }
 
-    public Computation entry() {
+    public Term entry() {
         return expr.entry();
     }
 

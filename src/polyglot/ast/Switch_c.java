@@ -158,7 +158,7 @@ public class Switch_c extends Stmt_c implements Switch
 	w.write("}");
     }
 
-    public Computation entry() {
+    public Term entry() {
         return expr.entry();
     }
 

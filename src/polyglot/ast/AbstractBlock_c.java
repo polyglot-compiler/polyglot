@@ -89,7 +89,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
         super.translate(w, tr.context(c));
     }
 
-    public Computation entry() {
+    public Term entry() {
         return listEntry(statements, this);
     }
 

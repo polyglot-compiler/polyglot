@@ -53,13 +53,13 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     protected abstract Item createInitialItem();
     
     /**
-     * Produce a new Item as appropriate for the Computation n and the 
-     * input Item in. Note that if the Computation n has many flows going into
+     * Produce a new Item as appropriate for the Term n and the 
+     * input Item in. Note that if the Term n has many flows going into
      * it, the Item in may be the result of a call to confluence(List)
      * 
      * @return a non-null Item.
      */
-    protected abstract Item flow(Item in, FlowGraph graph, Computation n);
+    protected abstract Item flow(Item in, FlowGraph graph, Term n);
     
     /**
      * The confluence operator for many flows. This method produces a single
@@ -70,15 +70,15 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     protected abstract Item confluence(List items);
     
     /**
-     * Check that the computation n satisfies whatever properties this
-     * dataflow is checking for. This method is called for each computation
+     * Check that the term n satisfies whatever properties this
+     * dataflow is checking for. This method is called for each term
      * in a code declaration block after the dataflow for that block of code 
      * has been performed.
      * 
      * @throws SemanticException if the properties this dataflow analysis
      *         is checking for is not satisfied.
      */
-    protected abstract void check(FlowGraph graph, Computation n, Item inItem, Item outItem) throws SemanticException;
+    protected abstract void check(FlowGraph graph, Term n, Item inItem, Item outItem) throws SemanticException;
 
     /**
      * Construct a flow graph for the CodeDecl provided, and call 
@@ -87,11 +87,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * Returns the (possibly new) AST. 
      */
     protected CodeDecl dataflow(CodeDecl cd) throws SemanticException {
-        Block body = cd.body();
-
-        if (body != null) {
+        // only bother to do the flow analysis if the body is not null...
+        if (cd.body() != null) {
             // Compute the successor of each child node.
-            FlowGraph g = initGraph(cd, body);
+            FlowGraph g = initGraph(cd, cd);
 
             if (g != null) {
                 // Build the control flow graph.
@@ -99,11 +98,11 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                 v.visitGraph();
 
                 dataflow(g);
-                
-                return cd.body(post(g, body));
+
+                return post(g, cd);
             }
         }
-        
+
         return cd;
     } 
     
@@ -178,7 +177,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *         code declaration; otherwise, an apropriately initialized
      *         FlowGraph.
      */
-    protected FlowGraph initGraph(CodeDecl code, Computation root) {
+    protected FlowGraph initGraph(CodeDecl code, Term root) {
         return new FlowGraph(root, forward, replicateFinally);
     }
 
@@ -198,7 +197,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * Check all of the Peers in the graph, after the dataflow analysis has
      * been performed.
      */
-    public Block post(FlowGraph graph, Block root) throws SemanticException {
+    public CodeDecl post(FlowGraph graph, CodeDecl root) throws SemanticException {
         // Check the nodes in approximately flow order.
         Set uncheckedPeers = new HashSet(graph.peers());
         LinkedList peersToCheck = new LinkedList(graph.peers(graph.startNode()));

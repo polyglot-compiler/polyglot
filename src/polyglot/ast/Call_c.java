@@ -351,7 +351,7 @@ public class Call_c extends Expr_c implements Call
     w.end();
   }
 
-  public Computation entry() {
+  public Term entry() {
       if (target instanceof Expr) {
           return ((Expr) target).entry();
       }

@@ -135,7 +135,7 @@ public class Return_c extends Stmt_c implements Return
 	w.write(";");
     }
 
-    public Computation entry() {
+    public Term entry() {
         if (expr != null) return expr.entry();
         return this;
     }

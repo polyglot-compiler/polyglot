@@ -137,7 +137,7 @@ public class Assert_c extends Stmt_c implements Assert
         }
     }
 
-    public Computation entry() {
+    public Term entry() {
         return cond.entry();
     }
 
