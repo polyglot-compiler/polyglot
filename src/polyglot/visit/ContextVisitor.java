@@ -7,12 +7,14 @@ import polyglot.frontend.Job;
 import java.util.*;
 
 /**
- * A visitor which maintains a context.  This is the base class of the
- * disambiguation and type checking visitors.
+ * A visitor which maintains a context throughout the visitor's pass.  This is 
+ * the base class of the disambiguation and type checking visitors.
  */
 public class ContextVisitor extends ErrorHandlingVisitor
 {
     protected ContextVisitor outer;
+
+    /** The current context of this visitor. */
     protected Context context;
 
     public ContextVisitor(Job job, TypeSystem ts, NodeFactory nf) {
@@ -33,25 +35,47 @@ public class ContextVisitor extends ErrorHandlingVisitor
         return super.begin();
     }
 
+    /** Returns the context for this visitor.
+     *
+     *  @return Returns the context that is currently in use by this visitor.
+     *  @see polyglot.types.Context
+     */
     public Context context() {
         return context;
     }
 
+    /** Returns a new ContextVisitor that is a copy of the current visitor,
+     *  except with an updated context.
+     *
+     *  @param c The new context that is to be used.
+     *  @return Returns a copy of this visitor with the new context 
+     *  <code>c</code>.
+     */
     public ContextVisitor context(Context c) {
         ContextVisitor v = (ContextVisitor) this.copy();
         v.context = c;
         return v;
     }
 
+    /** Returns a new context based on the current context and the
+     *  Node that is being entered.
+     *
+     *  @return The new context after entering Node <code>n</code>.
+     */
     protected Context enterScope(Node n) {
 	return n.enterScope(context);
     }
 
+    /** Returns a new context based on the current context and the
+     *  Node that is updating the scope of the context.
+     *
+     *  @return The new context after <code>n</code> updates the context.
+     */
+
+     //FIXME does this make sense?
     protected Context updateScope(Node n) {
         return n.updateScope(context);
     }
-
-    public void finish() { }
 
     /** Return true if we should catch errors thrown when visiting the node. */
     protected boolean catchErrors(Node n) {
