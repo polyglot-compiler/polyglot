@@ -428,7 +428,7 @@ ext=''
 
   <target name="polyglot-jar" depends="jl">
     <jar jarfile="${lib}/polyglot.jar" basedir="${classes}"
-      includes="polyglot/ast/**,polyglot/ext/jl/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**"/>
+      includes="polyglot/ast/**,polyglot/ext/jl/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**"/>
   </target>
 
   <target name="pao-jar" depends="pao">
@@ -448,13 +448,10 @@ ext=''
     </copy>
   </target>
 
-  <target name="param-jar" depends="param">
-    <jar jarfile="${lib}/param.jar" basedir="${classes}" includes="polyglot/ext/param/**"/>
+  <target name="param-jar" depends="param,polyglot-jar">
   </target>
 
-  <target name="param-dist" depends="jl-dist,param-jar">
-    <copy todir="${dist}/lib" file="${lib}/param.jar"/>
-
+  <target name="param-dist" depends="jl-dist">
     <copy todir="${dist}/src/polyglot/ext/param">
       <fileset dir="${src}/polyglot/ext/param"
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
@@ -558,7 +555,7 @@ ext=''
 
   <target name="jar" depends="polyglot-jar"/>
 
-  <target name="polyglot-dist" depends="jl-dist,skel-dist,pao-dist,coffer-dist"/>
+  <target name="polyglot-dist" depends="jl-dist,skel-dist,param-dist,pao-dist,coffer-dist"/>
   <target name="polyglot-dist-javadoc" depends="polyglot-dist,dist-javadoc"/>
   <target name="polyj-dist" depends="jl-dist,polyj"/>
   <target name="jmatch-dist" depends="jl-dist,jmatch"/>
