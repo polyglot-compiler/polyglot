@@ -2,9 +2,7 @@ package polyglot.frontend;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 
 import polyglot.types.reflect.ClassFileLoader;
 import polyglot.main.Report;
@@ -19,6 +17,9 @@ public class Compiler
 {
     /** The extension info */
     private ExtensionInfo extensionInfo;
+
+    /** A list of all extension infos active in this compiler. */
+    private List allExtensions;
 
     /** The error queue handles outputting error messages. */
     private ErrorQueue eq;
@@ -54,6 +55,7 @@ public class Compiler
     public Compiler(ExtensionInfo extensionInfo, ErrorQueue eq) {
         this.extensionInfo = extensionInfo;
         this.eq = eq;
+        this.allExtensions = new ArrayList(2);
 
         loader = new ClassFileLoader();
 
@@ -109,7 +111,10 @@ public class Compiler
 
 	eq.flush();
 
-        extensionInfo.getStats().report();
+        for (Iterator i = allExtensions.iterator(); i.hasNext(); ) {
+            ExtensionInfo ext = (ExtensionInfo) i.next();
+            ext.getStats().report();
+        }
 
 	return okay;
     }
@@ -122,6 +127,16 @@ public class Compiler
     /** Should fully qualified class names be used in the output? */
     public boolean useFullyQualifiedNames() {
         return extensionInfo.getOptions().fully_qualified_names;
+    }
+
+    /** Return a list of all languages extensions active in the compiler. */
+    public void addExtension(ExtensionInfo ext) {
+        allExtensions.add(ext);
+    }
+
+    /** Return a list of all languages extensions active in the compiler. */
+    public List allExtensions() {
+        return allExtensions;
     }
 
     /** Get information about the language extension being compiled. */

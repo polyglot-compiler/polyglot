@@ -54,7 +54,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     /** Return a Stats object to accumulate and report statistics. */
     public Stats getStats() {
         if (this.stats == null) {
-            this.stats = new Stats();
+            this.stats = new Stats(this);
         }
         return stats;
     }
@@ -67,6 +67,10 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 	this.compiler = compiler;
         jobs = new HashMap();
         worklist = new LinkedList();
+
+        // Register the extension with the compiler.
+        compiler.addExtension(this);
+
         currentJob = null;
 
         // Create the type system and node factory.
