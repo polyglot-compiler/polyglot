@@ -2,6 +2,10 @@ package jltools.ast;
 
 public class StandardExtensionFactory implements ExtensionFactory
 {
+    public Node getNewVariableDeclaratorExtension() {
+	return null;
+    }
+
     public Node getNewCaseStatementExtension() {
 	return null;
     }

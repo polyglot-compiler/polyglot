@@ -3,6 +3,7 @@ package jltools.ast;
 public interface ExtensionFactory
 {
     public Node getNewCaseStatementExtension();
+    public Node getNewVariableDeclaratorExtension();
     public Node getNewSwitchBlockExtension();
     public Node getNewAmbiguousExpressionExtension();
     public Node getNewAmbiguousNameExtension();

@@ -77,6 +77,10 @@ public class VariableDeclarationStatement extends Statement
 	return reconstruct(this.ext, vds, n, dims, init);
     }
 
+    public VariableInstance getVariableInstance() {
+      return vi;
+    }
+
     public FieldInstance getFieldInstance() {
       return (FieldInstance) vi;
     }
