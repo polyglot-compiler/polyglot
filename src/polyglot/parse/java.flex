@@ -159,6 +159,9 @@ import java.math.BigInteger;
 		    zero = false;
 		    break;
 		}
+                if (s.charAt(i) == 'e' || s.charAt(i) == 'E') {
+                    break; // 0e19 is still 0
+                }
 	    }
 	    if (x.isInfinite() || x.isNaN() || (x.floatValue() == 0 && ! zero)) {
 		eq.enqueue(ErrorInfo.LEXICAL_ERROR,
@@ -182,8 +185,11 @@ import java.math.BigInteger;
 		    zero = false;
 		    break;
 		}
+                if (s.charAt(i) == 'e' || s.charAt(i) == 'E') {
+                    break; // 0e19 is still 0
+                }
 	    }
-	    if (x.isInfinite() || x.isNaN() || (x.floatValue() == 0 && ! zero)) {
+	    if (x.isInfinite() || x.isNaN() || (x.doubleValue() == 0 && ! zero)) {
 		eq.enqueue(ErrorInfo.LEXICAL_ERROR,
 			   "Illegal double literal \"" + yytext() + "\"", pos());
 	    }
