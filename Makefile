@@ -27,6 +27,9 @@ JAVADOC_FLAGS		= -mx40m -ms40m -classpath /home/nks/lib/iDoclet.jar:/usr/local/j
 SOURCE			= .
 PERSONAL_MAKEFILE	= Makefile.personal
 
+BIN 			= .
+CC			= gcc
+
 # allow users to overload the above by overriding the above settings.
 -include $(PERSONAL_MAKEFILE)
 
@@ -72,7 +75,13 @@ ext/op/runtime: $(EXT_OP_RUNTIME_TARGET)
 
 frontend: util types lex parse ast visit $(FRONTEND_TARGET)
 
-main: frontend ext/op/runtime $(MAIN_TARGET)
+main: $(BIN)/jlc $(BIN)/jlcd frontend ext/op/runtime $(MAIN_TARGET)
+
+$(BIN)/jlc: jltools/main/jlc.c
+	$(CC) -o $(BIN)/jlc jltools/main/jlc.c
+
+$(BIN)/jlcd: jltools/main/jlc.c
+	$(CC) -D DEBUG -o $(BIN)/jlcd jltools/main/jlc.c
 
 #clean: (just delete the class files)
 clean: 
@@ -80,7 +89,7 @@ clean:
 	rm -f jltools/lex/*.class
 	rm -f jltools/parse/*.class
 	rm -f jltools/ast/*.class
-	rm -f jltools/types/*.class
+	rm -f jltools/types/*.class\
 	rm -f jltools/visit/*.class
 	rm -f jltools/ext/op/*.class
 	rm -f jltools/frontend/*.class
@@ -89,12 +98,15 @@ clean:
 
 
 # Delete class files as well as the grammar files, so that we can regenerate 
-# them. Also delete the javadoc & jar file, if they exist.
+# them. Also delete the javadoc & jar file, if they exis, as well as the jlc and 
+# jlcd executables.
 clobber superclean: clean
 	rm -f jltools/parse/Grm.java
 	rm -f jltools/parse/sym.java
 	rm -f $(JAR_FILE)
 	rm -rf $(JAVADOC_OUTPUT)
+	rm -f $(BIN)/jlc
+	rm -f $(BIN)/jlcd
 
 # create a jar file
 jar: all
