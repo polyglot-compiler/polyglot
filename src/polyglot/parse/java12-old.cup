@@ -235,8 +235,8 @@ primitive_type ::=
 		numeric_type:a
 			{: RESULT = a; :}
 	|	BOOLEAN
-			{: RESULT = new PrimativeType(null,
-						PrimativeType.BOOLEAN); :}
+			{: RESULT = new PrimitiveType(null,
+						PrimitiveType.BOOLEAN); :}
 	;
 numeric_type::=	integral_type:a
 			{: RESULT = a; :}
@@ -245,28 +245,28 @@ numeric_type::=	integral_type:a
 	;
 integral_type ::= 
 		BYTE 
-			{: RESULT = new PrimativeType(null,
-						PrimativeType.BYTE); :}
+			{: RESULT = new PrimitiveType(null,
+						PrimitiveType.BYTE); :}
 	|	SHORT 
-			{: RESULT = new PrimativeType(null,
-						PrimativeType.SHORT); :}
+			{: RESULT = new PrimitiveType(null,
+						PrimitiveType.SHORT); :}
 	|	INT 
-			{: RESULT = new PrimativeType(null, 
-						PrimativeType.INT); :}
+			{: RESULT = new PrimitiveType(null, 
+						PrimitiveType.INT); :}
 	|	LONG 
-			{: RESULT = new PrimativeType(null,
-						PrimativeType.LONG); :}
+			{: RESULT = new PrimitiveType(null,
+						PrimitiveType.LONG); :}
 	|	CHAR 
-			{: RESULT = new PrimativeType(null, 
-						PrimativeType.CHAR); :}
+			{: RESULT = new PrimitiveType(null, 
+						PrimitiveType.CHAR); :}
 	;
 floating_point_type ::= 
 		FLOAT 
-			{: RESULT = new PrimativeType(null, 
-						PrimativeType.FLOAT); :}
+			{: RESULT = new PrimitiveType(null, 
+						PrimitiveType.FLOAT); :}
 	|	DOUBLE
-			{: RESULT = new PrimativeType(null,
-						PrimativeType.DOUBLE); :}
+			{: RESULT = new PrimitiveType(null,
+						PrimitiveType.DOUBLE); :}
 	;
 
 reference_type ::=
