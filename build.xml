@@ -338,6 +338,21 @@
     <antcall target="compile-ext"/>
   </target>
   
+  <!-- SKEL: When using the newext script, copy and modify this target by
+       replacing the name "skel" with the new extension name. -->
+  <target name="skel" depends="jl">
+    <antcall target="standard-ext">
+      <param name="ext" value="skel"/>
+      <param name="parser.type" value="ppg"/>
+    </antcall>
+  </target>
+
+  <!-- SKEL: When using the newext script, copy and modify this target by
+       replacing the name "skel" with the new extension name. -->
+  <target name="skel-jar" depends="skel">
+    <jar jarfile="skel.jar" basedir="${classes}" includes="polyglot/ext/skel/**"/>
+  </target>
+
   <target name="param" depends="jl">
     <antcall target="compile-ext">
       <param name="ext" value="param"/>
@@ -430,11 +445,21 @@ ext=''
     </copy>
   </target>
 
-  <target name="param-dist" depends="base-dist">
+  <target name="param-dist" depends="base-dist,param">
     <copy todir="${dist}/polyglot/ext/param">
       <fileset dir="${src}/polyglot/ext/param"
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
     </copy>
+  </target>
+
+  <target name="skel-dist" depends="base-dist">
+    <copy todir="${dist}/polyglot/ext/skel">
+      <fileset dir="${src}/polyglot/ext/skel"
+        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
+    </copy>
+
+    <copy file="${src}/polyglot/ext/newext" todir="${dist}/polyglot/ext"/>
+    <chmod perm="+x" file="${dist}/polyglot/ext/newext"/>
   </target>
 
   <target name="coffer-dist" depends="param-dist,coffer-jar">
@@ -515,7 +540,7 @@ ext=''
     </javadoc>
   </target>
 
-  <target name="polyglot-dist" depends="base-dist,pao-dist,coffer-dist"/>
+  <target name="polyglot-dist" depends="base-dist,skel-dist,pao-dist,coffer-dist"/>
   <target name="polyglot-dist-javadoc" depends="polyglot-dist,dist-javadoc"/>
   <target name="jif-dist" depends="base-dist,jif"/>
   <target name="split-dist" depends="base-dist,split"/>

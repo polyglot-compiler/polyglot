@@ -231,12 +231,14 @@ following tasks.
 Next, you can implement L by creating a Polyglot extension.  Implementing
 the extension will require the following tasks.
 
-    0. (Optionally) Begin with the skeleton extension found in
-    polyglot/ext/skel.  Run the customization script found at
-    polyglot/ext/newext, which will copy the skeleton to polyglot/ext/L, and
-    substitute your language's name at all the appropriate places in the
-    skeleton.
+    0. Modify build.xml to add a target for the new extension.  This can
+    usually be done by copying and modifying the "skel" target.
 
+    (Optionally) Begin with the skeleton extension found in polyglot/ext/skel.
+    Run the customization script found at polyglot/ext/newext, which will copy
+    the skeleton to polyglot/ext/L, and substitute your language's name at all
+    the appropriate places in the skeleton.
+    
     1. Implement a new parser using PPG.  To do this, modify
     polyglot/ext/L/parse/L.ppg using the syntactic changes you defined above.
 
