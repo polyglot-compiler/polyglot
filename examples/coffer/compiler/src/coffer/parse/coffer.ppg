@@ -193,10 +193,6 @@ drop {
         block_statement ::= class_declaration;
 }
 
-drop {
-        block_statement ::= interface_declaration;
-}
-
 extend
 class_declaration ::=
       modifiers_opt:a TRACKED LPAREN key:k RPAREN CLASS:n IDENTIFIER:b
