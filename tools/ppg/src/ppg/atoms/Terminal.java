@@ -22,7 +22,9 @@ public class Terminal extends GrammarSymbol
 		if (o instanceof Terminal) {
 			return name.equals( ((Terminal)o).getName() );	
 		} else if (o instanceof String) {
-			// do we even need the nonterminal/terminal distinction?			return name.equals(o);		}
+			// do we even need the nonterminal/terminal distinction?
+			return name.equals(o);
+		}
 		return false;
 	}
 }

@@ -17,16 +17,30 @@ public class SymbolList
 		symbols = syms;
 	}	
 	
-	public boolean dropSymbol (String gs) {		for (int i=0; i < symbols.size(); i++) {			if (gs.equals(symbols.elementAt(i))) {
+	public boolean dropSymbol (String gs) {
+		for (int i=0; i < symbols.size(); i++) {
+			if (gs.equals(symbols.elementAt(i))) {
 				symbols.removeElementAt(i);
-				// assume we do not have duplicates				return true;			}
-		}		return false;
+				// assume we do not have duplicates
+				return true;
+			}
+		}
+		return false;
 	}
-		public Object clone() {		String newType = (type == null) ? null : type.toString();		Vector newSyms = new Vector();		for (int i=0; i < symbols.size(); i++) {			newSyms.addElement( ((String)symbols.elementAt(i)).toString() );		}		return new SymbolList(variety, newType, newSyms);
-	}	
+	
+	public Object clone() {
+		String newType = (type == null) ? null : type.toString();
+		Vector newSyms = new Vector();
+		for (int i=0; i < symbols.size(); i++) {
+			newSyms.addElement( ((String)symbols.elementAt(i)).toString() );
+		}
+		return new SymbolList(variety, newType, newSyms);
+	}
+	
 	public String toString() {
 		String result = "";
-		if (symbols.size() > 0) {
+
+		if (symbols.size() > 0) {
 			switch (variety) {
 				case (TERMINAL): result = "terminal "; break;
 				case (NONTERMINAL): result = "non terminal "; break;
@@ -40,7 +54,10 @@ public class SymbolList
 				result += (String)symbols.elementAt(i);
 				if (i < size - 1)
 					result += ", ";
-			}			result += ";";
-		}				return result;
+			}
+			result += ";";
+		}
+		
+		return result;
 	}
 }

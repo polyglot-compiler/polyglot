@@ -1,17 +1,28 @@
 package polyglot.util.ppg.atoms;
-import polyglot.util.ppg.util.*;
+
+import polyglot.util.ppg.util.*;
 
 public abstract class GrammarSymbol extends GrammarPart implements Equatable
 {
 	protected String name, label;
-	public String getName() {
+
+	public String getName() {
 		return name;	
 	}
 
-	public void unparse(CodeWriter cw) {		cw.begin(0);
+	public void unparse(CodeWriter cw) {
+		cw.begin(0);
 		cw.write(name);
-		if (label != null)			cw.write(":" + label);		cw.end();	}
-		public String toString() {
-		String result = name;		if (label != null)			result += ":" + label;		return result;
-	}	
+		if (label != null)
+			cw.write(":" + label);
+		cw.end();
+	}
+	
+	public String toString() {
+		String result = name;
+		if (label != null)
+			result += ":" + label;
+		return result;
+	}
+	
 }

@@ -11,7 +11,8 @@ interface LexerResult {
 	 * The token has the form &lt;token-type, attribute, line-number&gt;
 	 * @param o The OutputStream onto which to print the token
 	 */
-    void unparse(OutputStream o) throws IOException;        // Print a human-readable representation of this token on the
+    void unparse(OutputStream o) throws IOException;
+        // Print a human-readable representation of this token on the
         // output stream o; one that contains all the relevant information
         // associated with the token. The representation has the form
         // <token-type, attribute, line-number>

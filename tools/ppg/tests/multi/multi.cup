@@ -1,5 +1,6 @@
 import java_cup.runtime.*;
-parser code {: 
+
+parser code {: 
     private Lexer lexer;           
     private static String filename; 
     
@@ -16,7 +17,8 @@ import java_cup.runtime.*;
     public void syntax_error (Symbol cur_token) { 
         Token tok = (Token) cur_token.value; 
         report_error (tok.getFilename()+": syntax error at line " + 
-						tok.getLineno() + ": \"" + tok.getValue() + "\" (" + 						tok.getID() + ")", null); 
+						tok.getLineno() + ": \"" + tok.getValue() + "\" (" + 
+						tok.getID() + ")", null); 
         System.exit(1);
     } 
 
@@ -28,7 +30,8 @@ import java_cup.runtime.*;
         report_error(message, info); 
         System.exit(1);
     } 
-    private static Object program; 
+
+    private static Object program; 
     public static Object getProgramNode() { return program; } 
     public static void setProgramNode(Object n) { program = n; } 
 :}; 
@@ -39,19 +42,36 @@ scan with {:
 
 nonterminal goal;
 nonterminal ParenExpr paren_expr;
-nonterminal Expr expr;terminal Token PLUS, MINUS, RPAREN, LPAREN;
+nonterminal Expr expr;
+
+terminal Token PLUS, MINUS, RPAREN, LPAREN;
 terminal Token NUM;
+
 start with goal;
-goal ::=	paren_expr:pe {: Parser.setProgramNode(pe); :}
+
+goal ::=
+	paren_expr:pe {: Parser.setProgramNode(pe); :}
 ;
-paren_expr ::= 	LPAREN expr:e RPAREN {:
-		RESULT = new ParenExpr(e);	:}
+
+paren_expr ::= 
+	LPAREN expr:e RPAREN {:
+		RESULT = new ParenExpr(e);
+	:}
 ;
+
 expr ::=
+
 	NUM:l PLUS NUM:r {:  RESULT = new Expr((Integer)l.getValue(),
+
 											Constant.PLUS,
+
 											(Integer)r.getValue());  :}
+
 |	NUM:l MINUS NUM:r {:  RESULT = new Expr((Integer)l.getValue(),
+
 											Constant.MINUS,
+
 											(Integer)r.getValue());  :}
+
 ;
+

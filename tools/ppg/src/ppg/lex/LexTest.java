@@ -27,7 +27,8 @@ public class LexTest
 
 		File f = new File(filename);
 		String simpleName = f.getName();
-		Lexer lex = new Lexer(fileInput, simpleName);
+
+		Lexer lex = new Lexer(fileInput, simpleName);
 		Token t = null;
 		try {
 			while (true) {

@@ -8,7 +8,8 @@ public class ScanCode extends Code
 
 	public Object clone () {
 		return new ScanCode(value.toString());	
-	}	
+	}
+	
 	public String toString () {
 		return "scan with {:" + value + ":};";
 	}

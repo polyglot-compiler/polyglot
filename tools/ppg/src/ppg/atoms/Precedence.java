@@ -15,9 +15,15 @@ public class Precedence
 		this.type = type;
 		symbols = syms;
 	}
-		public Object clone () {
-		Vector newSyms = new Vector();		for (int i=0; i < symbols.size(); i++) {			newSyms.addElement( ((GrammarSymbol)symbols.elementAt(i)).clone() );		}		return new Precedence(type, newSyms);
-	}	
+	
+	public Object clone () {
+		Vector newSyms = new Vector();
+		for (int i=0; i < symbols.size(); i++) {
+			newSyms.addElement( ((GrammarSymbol)symbols.elementAt(i)).clone() );
+		}
+		return new Precedence(type, newSyms);
+	}
+	
 	public String toString () {
 		String result = "precedence ";
 		switch (type) {

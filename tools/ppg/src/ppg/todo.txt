@@ -1,7 +1,8 @@
 PPG TODO
 ----------
 * fix documentation
-* error reporting
+
+* error reporting
   - filename/pos on ppg error
   - add usage message on errors
   - dropping nonexistent symbol

@@ -54,7 +54,10 @@ public class Token /*extends Symbol */implements LexerResult {
 		switch (type) {
 			case Constant.PLUS:					return "+";
 			case Constant.MINUS:				return "-";
-			case Constant.EXPR:					return "expr";			case Constant.NUM:					return "num";			case Constant.LPAREN:				return "lparen";			case Constant.RPAREN:				return "rparen";
+			case Constant.EXPR:					return "expr";
+			case Constant.NUM:					return "num";
+			case Constant.LPAREN:				return "lparen";
+			case Constant.RPAREN:				return "rparen";
 						
 			case Constant.EOF:					return "EOF";
 			case Constant.error:				return "ERROR";

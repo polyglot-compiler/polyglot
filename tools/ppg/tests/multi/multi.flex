@@ -64,10 +64,12 @@ whitespace = {white_space_char}+
 slashcomment = "//".*
 
 %%
-<YYINITIAL> "+"				{ return t(Constant.PLUS); }<YYINITIAL> "-"				{ return t(Constant.MINUS); }
+<YYINITIAL> "+"				{ return t(Constant.PLUS); }
+<YYINITIAL> "-"				{ return t(Constant.MINUS); }
 <YYINITIAL> "("				{ return t(Constant.LPAREN); }
 <YYINITIAL> ")"				{ return t(Constant.RPAREN); }
-<YYINITIAL> {digits}		{ return t(Constant.NUM, Integer.valueOf(yytext())); }					    
+<YYINITIAL> {digits}		{ return t(Constant.NUM, Integer.valueOf(yytext())); }
+					    
 <YYINITIAL> {slashcomment}	{}
 <YYINITIAL> {whitespace}	{}
 
