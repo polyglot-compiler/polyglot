@@ -1,13 +1,13 @@
 Introduction
 ------------
 
-Jltools is an extensible Java compiler toolkit designed for
-experimentation with new language extensions.
+Polyglot is an extensible Java compiler toolkit designed for experimentation
+with new language extensions.
 
-The base polyglot compiler, jlc, is a mostly-complete Java frontend; that
-is, it parses and performs semantic checking on Java source code.  The
-compiler outputs Java source code.  Thus, the base compiler implements
-the identity translation.
+The base polyglot compiler, jlc ("Java language compiler"), is a
+mostly-complete Java frontend; that is, it parses and performs semantic
+checking on Java source code.  The compiler outputs Java source code.  Thus,
+the base compiler implements the identity translation.
 
 Language extensions are implemented on top of the base compiler by
 extending the concrete and abstract syntax and the type system.
@@ -24,7 +24,7 @@ Java AST.
 Architecture
 ------------
 
-The polyglot compiler is structured as a set of passes over source files
+The Polyglot compiler is structured as a set of passes over source files
 that ends with the output of Java source code.  The passes parse the
 original source language and create an AST, rewrite the AST to eliminate
 any ambiguities, type check the AST, possibly rewrite the AST to another
@@ -41,7 +41,7 @@ extension to determine several important features of the language,
 including its source file extension, AST node factory, type system, and
 pass schedule.
 
-Parsing is done with the Java CUP parser generator and a polyglot
+Parsing is done with the Java CUP parser generator and a Polyglot
 extension to CUP called PPG.  PPG allows CUP files to be selectively
 extended to create parsers for extension languages by providing
 operations on a CUP grammar, including adding, dropping, and renaming of
@@ -100,7 +100,7 @@ AST.
 Source code hierarchy
 ---------------------
 
-All polyglot code is in the package polyglot.  The subpackages are as
+All Polyglot code is in the package polyglot.  The subpackages are as
 follows:
 
     ast - contains the AST node interface files.  All AST nodes
@@ -188,25 +188,24 @@ following tasks.
     Java nodes can be found in polyglot.ast (interfaces) and
     polyglot.ext.jl.ast (implementations).
 
-    3. Define the semantic differences between L and Java. polyglot
-    implements an ever-increasing subset of the static semantic of Java
-    as defined in the Java Language Specification 2.
+    3. Define the semantic differences between L and Java. The Polyglot base
+    compiler (jlc) implements most of the static semantic of Java as defined in
+    the Java Language Specification 2.
 
-    4. Define a translation from L to Java.  The translation should
-    produce a legal Java program that can be compiled by javac.
+    4. Define a translation from L to Java.  The translation should produce a
+    legal Java program that can be compiled by javac.
 
-Next, you can implement L by creating a polyglot extension.  Implementing
+Next, you can implement L by creating a Polyglot extension.  Implementing
 the extension will require the following tasks.
 
     0. (Optionally) Begin with the skeleton extension found in
     polyglot/ext/skel.  Run the customization script found at
-    polyglot/ext/newext, which will copy the skeleton to polyglot/ext/L,
-    and substitute your language's name at all the appropriate places
-    in the skeleton.
+    polyglot/ext/newext, which will copy the skeleton to polyglot/ext/L, and
+    substitute your language's name at all the appropriate places in the
+    skeleton.
 
     1. Implement a new parser using PPG.  To do this, modify
-    polyglot/ext/L/parse/L.ppg using the syntactic changes you defined
-    above.
+    polyglot/ext/L/parse/L.ppg using the syntactic changes you defined above.
 
     2. Implement any new AST nodes.  Modify the node factory
     polyglot/ext/L/ast/LNodeFactory_c.java to produce these nodes.
@@ -215,27 +214,27 @@ the extension will require the following tasks.
     above.
 
 	a. If L involves changing the semantics of Java, you will
-	probably want to implement these as part of the TypeCheck
-	pass already defined by polyglot.
+	probably want to implement these as part of the type check
+	pass already defined by Polyglot.
 
         b. If L introduces new semantics that are orthogonal to Java,
         you may wish to implement an entirely new pass that runs
-        separately from TypeCheck.
+        separately from the type checker.
 
     Semantic changes that are localized to an AST node will probably
-    be implemented by overriding that node's typeCheck_() method.
+    be implemented by overriding that node's typeCheck() method.
     Semantic changes that affect more fundamental properties of the
     Java type system will probably be implemented by overriding
-    appropriate methods in polyglot/ext/L/types/LTypeSystem_c.java.
+    appropriate methods in polyglot/ext/L/types/LTypeSystemc.java.
 
     4. Implement the translation from L to Java based on the translation
     you defined above.  This should be implemented as a visitor pass
     that rewrites the AST into an AST representing a legal Java program.
 
 Let's make this more concrete by introducing an actual extension.  We'll
-use the Object Primitive (OP) extension, which extends Java with the
+use the "Primitives as Objects" (Pao) extension, which extends Java with the
 ability to use primitive types (e.g., int, float) as Objects.  For
-example, in OP we can write:
+example, in Pao we can write:
 
     Map m = new HashMap();
     m.put(1, 2);
@@ -260,7 +259,7 @@ The changes to Java needed to support this feature are quite minimal.
 
     2. We modify type checking so that primitive values may be used at
     type Object.  That means for all primitive types P where P != void,
-    P <: Object (polyglot defines void as a primitive type, but void has
+    P <: Object (Polyglot defines void as a primitive type, but void has
     no values).  We'll want to use this relationship in assignments and
     casting, as shown in the example above.  Also, we'll need to allow
     primitive types to appear inside an instanceof operator.
@@ -269,62 +268,77 @@ The changes to Java needed to support this feature are quite minimal.
     that anywhere we see a primitive value being used at Object, we
     should box the value and insert a cast to Object.
 
-We create the extension as follows:
+We created the extension as follows.  The complete extension is in
+polyglot/ext/pao.
 
-    1. The extension is sufficiently simple that we won't need the
-    skeleton.  So we start by creating the directory polyglot/ext/op.
-    // FIXME: perhaps we should have a small-scale and a large-scale
-    extension skeleton.
+    1. We used the newext script to generate a skeleton for the extension.
 
-    2. We create the PPG file, op.ppg.  The first 80 lines or so are
-    just boiler plate code.  Then, we change the grammar for instanceof
-    by dropping the existing production in relational_expression and
-    adding a new production.  When creating a new parser, it is also
-    necessary to redefine the lexer in the same directory, hence we copy
-    java.flex into our extension and rename it to op.flex.  No changes
-    to it are necessary.  Also, each parser requires its own boilerplate
-    implementation of ParserWrapper, which we copy from JLParserWrapper.
+        $ cd $POLYGLOT/polyglot/ext/pao
+        $ sh ./newext pao Pao pao
+        $ cd $POLYGLOT/polyglot/ext/pao
 
-    3. We extend the type system in OPTypeSystem.java.  To implement
-    the new subtype relationship, we override four methods from the
-    TypeSystem interface: descendsFrom(), isAssignableSubtype(),
-    isCastValid(), and isImplicitCastValid().  The implementations
-    of each of these checks for and returns true if a primitive is
-    being used as an Object.  Otherwise, they call their superclass
-    implementation.
+    2. We modified parse/pao.ppg to redefine the "instanceof" production to
+    allow any type to be used in an "instanceof" expression.  This required
+    only appending the following code to pao.ppg: 
+
+        extend relational_expression ::=
+                relational_expression:a INSTANCEOF type:b
+                {: RESULT = parser.nf.Instanceof(parser.util.pos(a), a, b); :}
+                ;
+
+        drop { relational_expression ::=
+                relational_expression:a INSTANCEOF reference_type:b; }
+
+    The remainder of the file is boiler plate code.
+
+    4. We next extended the Java type system to handle Pao's semantics.
+
+        $ cd $POLYGLOT/polyglot/ext/pao/types
+
+    We edited PaoTypeSystem_c.java to override the factory methods for
+    primitive types and top-level class types.  We also inserted methods to 
+    provide access to the runtime boxing classes.
+
+    We next create a subclass of PrimitiveType that overrides the methods:
+    descendsFrom(), isImplicitCastValid(), and isCastValid() to
+    allow primitives to be used as Objects.
+    
+    We also create a subclass of ParsedTopLevelClassType to allow primitives
+    to be cast to Object.
 
     4. We override type checking for instanceof.  To do so, we create a
-    new AST node, OPInstanceOf, that subclasses the original InstanceOf
+    new AST node, PaoInstanceof_c, that subclasses the original Instanceof_c
     node.  In it, we override the typeCheck() to allow primitive
-    types, which the superclass checked for and threw an error upon
-    discovering.
+    types to occur in the instanceof expression.
+
+    We modify PaoNodeFactory_c to create the new Instanceof node.
 
     5. We add a pass to insert explicit casts to Object when assigning
-    a primitive to an object.  We call this pass OPCastRewriter and
-    implement it as a visitor.  In the leaveCall() of the visitor,
-    we check to see if we're leaving a Cast node.  If so, we check
-    the expectedType() and actual type() of the node.  If there's a
-    mismatch where the expected type is Object but the actual type
-    is a primitive, we insert a cast to object.  Our pass extends
-    SemanticVisitor, which is perhaps the most useful visitor to extend,
-    since it provides access to many extension-specific resources such
-    as the TypeSystem, NodeFactory, etc.
+    a primitive to an object.  We call this pass PaoBoxer and
+    implement it as a visitor.
 
-    6. We override translation for instanceof and casts to box and
-    unbox primitive types as necessary.  We could also have implemented
-    this as part of the rewriting pass, but instead we override the
-    translation for sake of example.  To override the translation, we
-    override the translate_() method.  We already have an AST node in
-    OP for InstanceOf, but we have to create a new node for Cast.  We
-    call it OPCast and use it to subclass the original Cast node.  In
-    OPInstanceOf, we substitute the appropriate wrapper class for a cast
-    to a primitive (e.g., Integer for int).  In OPCast, we insert code
-    to box or unbox the result of the cast.
+    PaoBoxer is a subclass of AscriptionVisitor, which contains code
+    to locate places where expressions are used.  The ascribe() method
+    is called for each expression and is passed the type the expression
+    is _used at_ rather than the type the type checker assigns to it.
+    For instance, with the following Pao code:
 
-    7. We create the ExtensionInfo that defines our extension.  In it
-    we override factory methods to create our OP type system and node
-    factory instead of the default polyglot classes.  We also define the
-    file extension for the OP language, ".jop".  Finally, we define our
-    new pass and schedule it to run before translation.
+        Object o = 3;
 
-Now we've finished creating the OP extension.
+    ascribe() will be called with expression 3 and type Object.
+
+    We override ascribe to insert casts when assigning a primitive to
+    an Object.  We override the visitors leaveCall() method to rewrite
+    casts from primitive to Object in order to box the primitive
+    and to insert unboxing code when casting from Object to primitive.
+
+    We further rewrite == and != expressions to call Primitive.equals(o, p)
+    when comparing two Objects or boxed primitives.
+    This method allows boxed primitives to be compared using == and !=.
+
+    7. We create the ExtensionInfo that defines our extension.
+    
+        $ cd $POLYGLOT/polyglot/ext/pao
+
+    The skeleton generator created most of the necessary code.  We modify
+    the passes() method to add our new boxing pass.

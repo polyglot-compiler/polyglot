@@ -57,7 +57,6 @@ SOURCES = \
 	LocalClassDecl.java \
 	LocalDecl.java \
 	Local.java \
-	Makefile \
 	MethodDecl.java \
 	NewArray.java \
 	New.java \
@@ -90,9 +89,10 @@ SOURCES = \
 	While.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES)
+JAR_FILE = polyglot.jar
 
 all: $(CLASSES)
 
 clean clobber: cleanclasses
 
-release: release_src

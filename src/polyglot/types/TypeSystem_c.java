@@ -225,111 +225,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean descendsFrom(Type child, Type ancestor) {
         assert_(child);
         assert_(ancestor);
-
-	if (! child.isCanonical() || ! ancestor.isCanonical()) {
-	    return false;
-	}
-
-	if (ancestor.isReference() && child.isNull()) {
-	    return true;
-	}
-
-	if (ancestor.isSame(child) ||
-	    ! child.isReference() || ! ancestor.isReference()) {
-	    return false;
-	}
-
-	boolean isClass = child.isClass() &&
-	                  ! child.toClass().flags().isInterface();
-
-	// If the child isn't an interface or array, check whether its
-	// supertype is or descends from the ancestor
-	if (isClass) {
-	    if (child.isSame(Object())) {
-		return false;
-	    }
-
-	    Type parentType = child.toReference().superType();
-
-	    if (parentType == null) {
-		return false;
-	    }
-
-	    if (isSubtype(parentType, ancestor)) {
-		return true;
-	    }
-	}
-	else {
-	    // if it _is_ an interface or array, check whether the ancestor is
-	    // Object.
-	    if (ancestor.isSame(Object())) {
-		return true;
-	    }
-	}
-
-	// Next check interfaces.
-	for (Iterator i = child.toReference().interfaces().iterator();
-	     i.hasNext(); ) {
-
-	    Type parentType = (Type) i.next();
-
-	    if (isSubtype(parentType, ancestor)) {
-		return true;
-	    }
-	}
-
-	return false;
-    }
-
-    /**
-     * Requires: all type arguments are canonical.
-     *
-     * Returns true iff child and ancestor are non-primitive
-     * types, and a variable of type child may be legally assigned
-     * to a variable of type ancestor.
-     */
-    public boolean isAssignableSubtype(Type child, Type ancestor) {
-        assert_(child);
-        assert_(ancestor);
-
-	if (! child.isCanonical() || ! ancestor.isCanonical()) {
-	    return false;
-	}
-
-        if (isSame(child, ancestor)) return true;
-
-	if (child.isPrimitive() && ancestor.isPrimitive()) {
-	    return primitiveImplicitCastValid(child.toPrimitive(),
-					      ancestor.toPrimitive());
-	}
-
-	if (ancestor.isPrimitive() || child.isPrimitive()) return false;
-
-	if (child.isArray() && ancestor.isArray()) {
-	    return isAssignableSubtype(child.toArray().base(),
-		                       ancestor.toArray().base());
-	}
-
-	if (child.isArray()) {
-	    // Ancestor is not an array, but child is.  Check if the array
-	    // is a subtype of the ancestor.  This happens when ancestor
-	    // is java.lang.Object.
-	    return descendsFrom(child, ancestor);
-	}
-
-	// Both should be reference types or null now.
-
-	// Null can always be assigned to a reference.
-	if (ancestor.isNull()) return false;
-	if (child.isNull()) return true;
-
-	// Both should be reference types now.
-	if (! child.isReference() || ! ancestor.isReference()) {
-	    throw new InternalCompilerError("Missed a case: child=" + child +
-		                            " ancestor=" + ancestor);
-	}
-
-	return isSubtype(child, ancestor);
+        return child.descendsFromImpl(ancestor);
     }
 
     /**
@@ -341,98 +237,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean isCastValid(Type fromType, Type toType) {
         assert_(fromType);
         assert_(toType);
-
-	if (! fromType.isCanonical() || ! toType.isCanonical()) {
-	    return false;
-	}
-
-	if (fromType.isVoid() || toType.isVoid()) return false;
-
-        if (isSame(fromType, toType)) return true;
-
-	if (fromType.isNumeric() && toType.isNumeric()) return true;
-
-	if (fromType.isPrimitive()) return false;
-	if (toType.isPrimitive()) return false;
-
-	// Null can always be assigned to a reference.
-	if (toType.isNull()) return false;
-	if (fromType.isNull()) return true;
-
-	// Both should be reference types now.
-	if (! toType.isReference() || ! fromType.isReference())
-	    throw new InternalCompilerError("Missed a case: from=" + fromType +
-		                            " to=" + toType);
-
-	if (fromType.isArray() && toType.isArray()) {
-	    Type fromBase = fromType.toArray().base();
-	    Type toBase = toType.toArray().base();
-
-	    if (fromBase.isPrimitive()) return isSame(toBase, fromBase);
-	    if (toBase.isPrimitive()) return false;
-
-	    if (fromBase.isNull()) return false;
-	    if (toBase.isNull()) return false;
-
-	    // Both are reference types.
-	    return isCastValid(fromBase, toBase);
-	}
-
-	if (fromType.isArray()) {
-	    // Ancestor is not an array, but child is.  Check if the array
-	    // is a subtype of the ancestor.  This happens when ancestor
-	    // is java.lang.Object.
-	    return descendsFrom(fromType, toType);
-	}
-
-	if (toType.isArray()) {
-	    // Ancestor is not an array, but child is.  Check if the array
-	    // is a subtype of the ancestor.  This happens when ancestor
-	    // is java.lang.Object.
-	    return descendsFrom(toType, fromType);
-	}
-
-	// Both types should be classes now.
-	if (! fromType.isClass() || ! toType.isClass()) return false;
-
-	// From and to are neither primitive nor an array. They are distinct.
-	boolean fromInterface = fromType.toClass().flags().isInterface();
-	boolean toInterface   = toType.toClass().flags().isInterface();
-	boolean fromFinal     = fromType.toClass().flags().isFinal();
-	boolean toFinal       = toType.toClass().flags().isFinal();
-
-	// This is taken from Section 5.5 of the JLS.
-	if (! fromInterface) {
-	    // From is not an interface.
-	    if (! toInterface) {
-		// Nether from nor to is an interface.
-		return descendsFrom(fromType, toType)
-		    || descendsFrom(toType, fromType);
-	    }
-
-	    if (fromFinal) {
-		// From is a final class, and to is an interface
-		return descendsFrom(fromType, toType);
-	    }
-
-	    // From is a non-final class, and to is an interface.
-	    return true;
-	}
-	else {
-	    // From is an interface
-	    if (! toInterface && ! toFinal) {
-		// To is a non-final class.
-		return true;
-	    }
-
-	    if (toFinal) {
-		// To is a final class.
-		return descendsFrom(toType, fromType);
-	    }
-
-	    // To and From are both interfaces.
-	    return true;
-	}
+        return fromType.isCastValidImpl(toType);
     }
 
     /**
@@ -440,49 +245,16 @@ public class TypeSystem_c implements TypeSystem
      *
      * Returns true iff an implicit cast from fromType to toType is valid;
      * in other words, every member of fromType is member of toType.
-     **/
+     *
+     * Returns true iff child and ancestor are non-primitive
+     * types, and a variable of type child may be legally assigned
+     * to a variable of type ancestor.
+     *
+     */
     public boolean isImplicitCastValid(Type fromType, Type toType) {
-	return isAssignableSubtype(fromType, toType);
-    }
-
-    protected boolean primitiveImplicitCastValid(PrimitiveType f,
-					         PrimitiveType t) {
-
-        assert_(f);
-        assert_(t);
-
-	if (t.isVoid()) return false;
-	if (f.isVoid()) return false;
-
-	if (isSame(t, f)) return true;
-
-	if (t.isBoolean()) return f.isBoolean();
-	if (f.isBoolean()) return false;
-
-	if (! f.isNumeric() || ! t.isNumeric()) return false;
-
-	if (t.isDouble()) return true;
-	if (f.isDouble()) return false;
-
-	if (t.isFloat()) return true;
-	if (f.isFloat()) return false;
-
-	if (t.isLong()) return true;
-	if (f.isLong()) return false;
-
-	if (t.isInt()) return true;
-	if (f.isInt()) return false;
-
-	if (t.isShort()) return f.isShort() || f.isByte();
-	if (f.isShort()) return false;
-
-	if (t.isChar()) return f.isChar();
-	if (f.isChar()) return false;
-
-	if (t.isByte()) return f.isByte();
-	if (f.isByte()) return false;
-
-	return false;
+        assert_(fromType);
+        assert_(toType);
+        return fromType.isImplicitCastValidImpl(toType);
     }
 
     /**
@@ -491,7 +263,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean isSame(Type type1, Type type2) {
         assert_(type1);
         assert_(type2);
-	return type1.equals(type2);
+	return type1.isSameImpl(type2);
     }
 
     /**
@@ -500,23 +272,7 @@ public class TypeSystem_c implements TypeSystem
      */
     public boolean numericConversionValid(Type t, long value) {
         assert_(t);
-
-	if (! t.isCanonical()) {
-	    return false;
-	}
-
-	if (t.isByte())
-	    return Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE;
-	if (t.isShort())
-	    return Short.MIN_VALUE <= value && value <= Short.MAX_VALUE;
-	if (t.isChar())
-	    return Character.MIN_VALUE <= value && value <= Character.MAX_VALUE;
-	if (t.isInt())
-	    return Integer.MIN_VALUE <= value && value <= Integer.MAX_VALUE;
-	if (t.isLong())
-	    return true;
-
-	return false;
+        return t.numericConversionValidImpl(value);
     }
 
     ////
@@ -542,6 +298,7 @@ public class TypeSystem_c implements TypeSystem
 	Flags flags = mi.flags();
 
 	ClassType ctc = context.currentClass();
+	ClassType cts = context.currentClassScope();
 
         if (flags.isPublic()) return true;
 
@@ -578,32 +335,14 @@ public class TypeSystem_c implements TypeSystem
 	}
 
 	// protected
-	if (ctc.descendsFrom(ctt) && flags.isProtected()) return true;
+	if (descendsFrom(ctc, ctt) && flags.isProtected()) return true;
 
 	// else,
 	return false;
     }
 
     public boolean isEnclosed(ClassType inner, ClassType outer) {
-        assert_(inner);
-        assert_(outer);
-
-        if (inner.isInner()) {
-	    ClassType c = inner.toInner().outer();
-
-	    if (c == null) {
-	      	throw new InternalCompilerError(inner.position(),
-		    "Inner class " + inner + " has null outer class.");
-	    }
-
-	    if (isSame(c, outer)) {
-		return true;
-	    }
-
-	    return isEnclosed(c, outer);
-	}
-
-	return false;
+        return inner.isEnclosedImpl(outer);
     }
 
     public void checkCycles(ReferenceType goal) throws SemanticException {
@@ -654,7 +393,7 @@ public class TypeSystem_c implements TypeSystem
      **/
     public boolean isThrowable(Type type) {
         assert_(type);
-	return isSubtype(type, Throwable());
+        return type.isThrowable();
     }
 
     /**
@@ -663,22 +402,7 @@ public class TypeSystem_c implements TypeSystem
      */
     public boolean isUncheckedException(Type type) {
         assert_(type);
-
-	// Since we're trying to be extensible, walk through the collection
-	// rather than just checking RuntimeException and Error.
-        if (isThrowable(type)) {
-	    Collection c = uncheckedExceptions();
-
-	    for (Iterator i = c.iterator(); i.hasNext(); ) {
-	        Type t = (Type) i.next();
-
-		if (type.isSubtype(t)) {
-		    return true;
-		}
-	    }
-	}
-
-	return false;
+        return type.isUncheckedException();
     }
 
     /**
@@ -695,7 +419,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean isSubtype(Type t1, Type t2) {
         assert_(t1);
         assert_(t2);
-        return isSame(t1, t2) || descendsFrom(t1, t2);
+        return t1.isSubtypeImpl(t2);
     }
 
     ////
@@ -820,7 +544,7 @@ public class TypeSystem_c implements TypeSystem
                                     container + "\".");
     }
 
-    private String listToString(List l) {
+    protected String listToString(List l) {
 	String s = "";
 
 	for (Iterator i = l.iterator(); i.hasNext(); ) {
@@ -922,7 +646,10 @@ public class TypeSystem_c implements TypeSystem
 	    if (msc.compare(maximal, p) > 0) {
 	        return null;
 	    }
-	} return maximal; }
+	}
+
+        return maximal;
+    }
 
     /**
      * Class to handle the comparisons; dispatches to moreSpecific method.
@@ -1038,34 +765,9 @@ public class TypeSystem_c implements TypeSystem
     /**
      * Returns whether method 1 is <i>more specific</i> than method 2,
      * where <i>more specific</i> is defined as JLS 15.11.2.2
-     * <p>
-     * Note: There is a fair amount of guesswork since the JLS does not
-     * include any
-     * info regarding java 1.2, so all inner class rules are found empirically
-     * using jikes and javac.
      */
-    /**
-     * Note: java 1.2 rule is described in JLS2 in section 15.12.2.2
-     */
-    private boolean moreSpecific(ProcedureInstance p1, ProcedureInstance p2) {
-	// rule 1:
-	ReferenceType t1 = p1.container();
-	ReferenceType t2 = p2.container();
-
-	if (t1.isClass() && t2.isClass()) {
-	    if (! t1.isSubtype(t2) &&
-		! isEnclosed(t1.toClass(), t2.toClass())) {
-		return false;
-	    }
-	}
-	else {
-	    if (! t1.isSubtype(t2)) {
-		return false;
-	    }
-	}
-
-	// rule 2:
-	return callValid(p2, p1) ;
+    public boolean moreSpecific(ProcedureInstance p1, ProcedureInstance p2) {
+        return p1.moreSpecificImpl(p2);
     }
 
     /**
@@ -1098,13 +800,11 @@ public class TypeSystem_c implements TypeSystem
 	if (isSame(type1, type2)) return type1;
 
 	if (type1.isNumeric() && type2.isNumeric()) {
-	    if (primitiveImplicitCastValid(type1.toPrimitive(),
-		  			   type2.toPrimitive())) {
+	    if (isImplicitCastValid(type1, type2)) {
 	        return type2;
 	    }
 
-	    if (primitiveImplicitCastValid(type2.toPrimitive(),
-		  			   type1.toPrimitive())) {
+	    if (isImplicitCastValid(type2, type1)) {
 	        return type1;
 	    }
 
@@ -1136,8 +836,8 @@ public class TypeSystem_c implements TypeSystem
 	    if (isSame(type1, Object())) return type1;
 	    if (isSame(type2, Object())) return type2;
 
-	    if (type1.isSubtype(type2)) return type2;
-	    if (type2.isSubtype(type1)) return type1;
+	    if (isSubtype(type1, type2)) return type2;
+	    if (isSubtype(type2, type1)) return type1;
 
 	    // Walk up the hierarchy
 	    Type t1 = leastCommonAncestor(type1.toReference().superType(),
@@ -1160,66 +860,34 @@ public class TypeSystem_c implements TypeSystem
     ////
 
     /**
-     * Returns true iff <p1> throws fewer exceptions as <p2>.
+     * Returns true iff <p1> throws fewer exceptions than <p2>.
      */
     public boolean throwsSubset(ProcedureInstance p1, ProcedureInstance p2) {
         assert_(p1);
         assert_(p2);
-
-        SubtypeSet s1 = new SubtypeSet();
-        SubtypeSet s2 = new SubtypeSet();
-
-        s1.addAll(p1.exceptionTypes());
-        s2.addAll(p2.exceptionTypes());
-
-        for (Iterator i = s1.iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
-            if (! t.isUncheckedException() && ! s2.contains(t)) {
-                return false;
-            }
-        }
-
-        return true;
+        return p1.throwsSubsetImpl(p2);
     }
 
-    /**
-     * Returns true iff <p1> has the same arguments as <p2>
-     **/
-    public boolean hasSameArguments(ProcedureInstance p1,
-				    ProcedureInstance p2) {
-
-        assert_(p1);
-        assert_(p2);
-
-	List l1 = p1.argumentTypes();
-	List l2 = p2.argumentTypes();
-
-	Iterator i1 = l1.iterator();
-	Iterator i2 = l2.iterator();
-
-	while (i1.hasNext() && i2.hasNext()) {
-	    Type t1 = (Type) i1.next();
-	    Type t2 = (Type) i2.next();
-
-	    if (! isSame(t1, t2)) {
-		return false;
-	    }
-	}
-
-	return ! (i1.hasNext() || i2.hasNext());
+    /** Return true if t overrides mi */
+    public boolean hasArguments(ProcedureInstance pi, List argumentTypes) {
+        assert_(pi);
+        assert_(argumentTypes);
+        return pi.hasArgumentsImpl(argumentTypes);
     }
 
     /** Return true if t overrides mi */
     public boolean hasMethod(ReferenceType t, MethodInstance mi) {
-        for (Iterator j = t.methods().iterator(); j.hasNext(); ) {
-            MethodInstance mj = (MethodInstance) j.next();
+        assert_(t);
+        assert_(mi);
+        return t.hasMethodImpl(mi);
+    }
 
-            if (isSameMethod(mi, mj)) {
-                return true;
-            }
-        }
+    public List overrides(MethodInstance mi) {
+        return mi.overridesImpl();
+    }
 
-        return false;
+    public boolean canOverride(MethodInstance mi, MethodInstance mj) {
+        return mi.canOverrideImpl(mj);
     }
 
     /**
@@ -1228,57 +896,26 @@ public class TypeSystem_c implements TypeSystem
     public boolean isSameMethod(MethodInstance m1, MethodInstance m2) {
         assert_(m1);
         assert_(m2);
-        return m1.name().equals(m2.name()) && hasSameArguments(m1, m2);
-    }
-
-    public boolean methodCallValid(MethodInstance prototype,
-	                           MethodInstance call) {
-        assert_(prototype);
-        assert_(call);
-	return methodCallValid(prototype, call.name(), call.argumentTypes());
-    }
-
-    protected boolean callValid(ProcedureInstance prototype,
-			        ProcedureInstance call)
-    {
-        assert_(prototype);
-        assert_(call);
-	return callValid(prototype, call.argumentTypes());
+        return m1.isSameMethodImpl(m2);
     }
 
     public boolean methodCallValid(MethodInstance prototype,
 				   String name, List argTypes) {
         assert_(prototype);
         assert_(argTypes);
-	return prototype.name().equals(name) && callValid(prototype, argTypes);
+	return prototype.methodCallValidImpl(name, argTypes);
     }
 
-    protected boolean callValid(ProcedureInstance prototype, List argTypes) {
+    public boolean callValid(ProcedureInstance prototype, List argTypes) {
         assert_(prototype);
         assert_(argTypes);
-
-	List l1 = argTypes;
-	List l2 = prototype.argumentTypes();
-
-	Iterator i1 = l1.iterator();
-	Iterator i2 = l2.iterator();
-
-	while (i1.hasNext() && i2.hasNext()) {
-	    Type t1 = (Type) i1.next();
-	    Type t2 = (Type) i2.next();
-
-	    if (! isImplicitCastValid(t1, t2)) {
-		return false;
-	    }
-	}
-
-	return ! (i1.hasNext() || i2.hasNext());
+        return prototype.callValidImpl(argTypes);
     }
 
     ////
     // Functions which yield particular types.
     ////
-    public NullType Null()    { return NULL_; }
+    public NullType Null()         { return NULL_; }
     public PrimitiveType Void()    { return VOID_; }
     public PrimitiveType Boolean() { return BOOLEAN_; }
     public PrimitiveType Char()    { return CHAR_; }
@@ -1328,16 +965,24 @@ public class TypeSystem_c implements TypeSystem
     public ClassType ArrayStoreException()  { return load("java.lang.ArrayStoreException"); }
     public ClassType ArithmeticException()  { return load("java.lang.ArithmeticException"); }
 
-    protected final NullType NULL_         = new NullType_c(this);
-    protected final PrimitiveType VOID_    = new PrimitiveType_c(this, PrimitiveType.VOID);
-    protected final PrimitiveType BOOLEAN_ = new PrimitiveType_c(this, PrimitiveType.BOOLEAN);
-    protected final PrimitiveType CHAR_    = new PrimitiveType_c(this, PrimitiveType.CHAR);
-    protected final PrimitiveType BYTE_    = new PrimitiveType_c(this, PrimitiveType.BYTE);
-    protected final PrimitiveType SHORT_   = new PrimitiveType_c(this, PrimitiveType.SHORT);
-    protected final PrimitiveType INT_     = new PrimitiveType_c(this, PrimitiveType.INT);
-    protected final PrimitiveType LONG_    = new PrimitiveType_c(this, PrimitiveType.LONG);
-    protected final PrimitiveType FLOAT_   = new PrimitiveType_c(this, PrimitiveType.FLOAT);
-    protected final PrimitiveType DOUBLE_  = new PrimitiveType_c(this, PrimitiveType.DOUBLE);
+    protected NullType createNull() {
+        return new NullType_c(this);
+    }
+
+    protected PrimitiveType createPrimitive(PrimitiveType.Kind kind) {
+        return new PrimitiveType_c(this, kind);
+    }
+
+    protected final NullType NULL_         = createNull();
+    protected final PrimitiveType VOID_    = createPrimitive(PrimitiveType.VOID);
+    protected final PrimitiveType BOOLEAN_ = createPrimitive(PrimitiveType.BOOLEAN);
+    protected final PrimitiveType CHAR_    = createPrimitive(PrimitiveType.CHAR);
+    protected final PrimitiveType BYTE_    = createPrimitive(PrimitiveType.BYTE);
+    protected final PrimitiveType SHORT_   = createPrimitive(PrimitiveType.SHORT);
+    protected final PrimitiveType INT_     = createPrimitive(PrimitiveType.INT);
+    protected final PrimitiveType LONG_    = createPrimitive(PrimitiveType.LONG);
+    protected final PrimitiveType FLOAT_   = createPrimitive(PrimitiveType.FLOAT);
+    protected final PrimitiveType DOUBLE_  = createPrimitive(PrimitiveType.DOUBLE);
 
     public TypeObject placeHolder(TypeObject o) {
         assert_(o);
@@ -1367,12 +1012,15 @@ public class TypeSystem_c implements TypeSystem
 	return o;
     }
 
+    protected UnknownType unknownType = new UnknownType_c(this);
+    protected UnknownQualifier unknownQualifier = new UnknownQualifier_c(this);
+
     public UnknownType unknownType(Position pos) {
-	return new UnknownType_c(this, pos);
+	return unknownType;
     }
 
     public UnknownQualifier unknownQualifier(Position pos) {
-	return new UnknownQualifier_c(this, pos);
+	return unknownQualifier;
     }
 
     public Package packageForName(Package prefix, String name) {
@@ -1469,68 +1117,27 @@ public class TypeSystem_c implements TypeSystem
     }
 
     public String translatePackage(Resolver c, Package p) {
-        if (p.prefix() == null) {
-	    return p.name();
-	}
-
-	return p.prefix().translate(c) + "." + p.name();
+        return p.translate(c);
     }
 
     public String translateArray(Resolver c, ArrayType t) {
-	return t.base().translate(c) + "[]";
+        return t.translate(c);
     }
 
     public String translateTopLevelClass(Resolver c, TopLevelClassType t) {
-	if (t.package_() == null) {
-	    return t.name();
-	}
-
-	// Use the short name if it is unique.
-	if (c != null) {
-	    try {
-		Type x = c.findType(t.name());
-
-		if (t.isSame(x)) {
-		    return t.name();
-		}
-	    }
-	    catch (SemanticException e) {
-	    }
-	}
-
-	return t.package_().translate(c) + "." + t.name();
+        return t.translate(c);
     }
 
     public String translateMemberClass(Resolver c, MemberClassType t) {
-        // Use only the short name if the outer class is anonymous.
-        if (t.container().toClass().isAnonymous()) {
-	    return t.name();
-	}
-
-        /*
-	// Use the short name if it is unique.
-	if (c != null) {
-	    try {
-		Type x = c.findType(t.name());
-
-		if (t.isSame(x)) {
-		    return t.name();
-		}
-	    }
-	    catch (SemanticException e) {
-	    }
-	}
-        */
-
-	return t.container().translate(c) + "." + t.name();
+        return t.translate(c);
     }
 
     public String translateLocalClass(Resolver c, LocalClassType t) {
-	return t.name();
+        return t.translate(c);
     }
 
     public String translatePrimitive(Resolver c, PrimitiveType t) {
-	return t.kind().toString();
+        return t.translate(c);
     }
 
     public PrimitiveType primitiveForName(String name)
@@ -1808,7 +1415,7 @@ public class TypeSystem_c implements TypeSystem
      * Returns t, modified as necessary to make it a legal
      * static target.
      */
-    public Type staticTarget(Type t) throws SemanticException {
+    public Type staticTarget(Type t) {
         // Nothing needs done in standard Java.
         return t;
     }

@@ -75,8 +75,8 @@ public abstract class HaltingVisitor extends NodeVisitor implements Copy
     public Object copy() {
         try {
             HaltingVisitor v = (HaltingVisitor) super.clone();
-            v.bypassParent = null;
-            v.bypass = null;
+            // v.bypassParent = null;
+            // v.bypass = null;
             return v;
         }
         catch (CloneNotSupportedException e) {

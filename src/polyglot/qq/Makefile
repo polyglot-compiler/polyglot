@@ -12,6 +12,8 @@ SOURCES = \
 	QQParserWrapper.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES) qq.ppg qq.flex
+JAR_FILE = polyglot.jar
 
 all: $(CLASSES)
 	$(subdirs)
@@ -31,5 +33,3 @@ clean: cleanclasses
 clobber: cleanclasses
 	$(subdirs)
 	-rm -f Grm.java sym.java Lexer.java qq_ppg.cup
-
-release: release_src

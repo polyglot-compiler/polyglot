@@ -6,6 +6,13 @@ package polyglot.types;
  */
 public interface InitializerInstance extends CodeInstance
 {
+    /**
+     * Set the initializer's flags.
+     */
     InitializerInstance flags(Flags flags);
+
+    /**
+     * Set the initializer's containing class.
+     */
     InitializerInstance container(ClassType container);
 }

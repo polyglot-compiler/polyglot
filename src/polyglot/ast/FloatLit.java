@@ -16,9 +16,14 @@ public interface FloatLit extends Lit
     public static final Kind FLOAT = new Kind("float");
     public static final Kind DOUBLE = new Kind("dounle");
 
+    /** The kind of literal: FLOAT or DOUBLE. */
     Kind kind();
+    /** Set the kind of literal: FLOAT or DOUBLE. */
     FloatLit kind(Kind kind);
 
+    /** The literal's value. */
     double value();
+
+    /** Set the literal's value. */
     FloatLit value(double value);
 }

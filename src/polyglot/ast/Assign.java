@@ -25,14 +25,39 @@ public interface Assign extends Expr
     public static final Operator SHR_ASSIGN     = new Operator(">>=");
     public static final Operator USHR_ASSIGN    = new Operator(">>>=");
 
+    /**
+     * Left child (target) of the assignment.
+     */
     Expr left();
+
+    /**
+     * Set the left child (target) of the assignment.
+     */
     Assign left(Expr left);
 
+    /**
+     * The assignment's operator.
+     */
     Operator operator();
+
+    /**
+     * Set the assignment's operator.
+     */
     Assign operator(Operator op);
 
+    /**
+     * Right child (source) of the assignment.
+     */
     Expr right();
+
+    /**
+     * Set the right child (source) of the assignment.
+     */
     Assign right(Expr right);
 
+    /**
+     * Returns true if the assignment might throw an arithmetic exception,
+     * such as division by zero.
+     */
     boolean throwsArithmeticException();
 }

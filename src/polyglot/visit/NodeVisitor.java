@@ -109,4 +109,33 @@ public abstract class NodeVisitor
     public String toString() {
         return getClass().getName();
     }
+
+    public Node visitEdge(Node parent, Node child) {
+	Node n = override(parent, child);
+
+	if (n == null) {
+	    NodeVisitor v_ = this.enter(parent, child);
+
+	    if (v_ == null) {
+		throw new InternalCompilerError(
+		    "NodeVisitor.enter() returned null.");
+	    }
+
+	    n = child.visitChildren(v_);
+
+	    if (n == null) {
+		throw new InternalCompilerError(
+		    "Node_c.visitChildren() returned null.");
+	    }
+
+	    n = this.leave(parent, child, n, v_);
+
+	    if (n == null) {
+		throw new InternalCompilerError(
+		    "NodeVisitor.leave() returned null.");
+	    }
+	}
+
+	return n;
+    }
 }

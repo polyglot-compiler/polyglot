@@ -88,7 +88,7 @@ public class Conditional_c extends Expr_c implements Conditional
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
-	if (! cond.type().isSame(ts.Boolean())) {
+	if (! ts.isSame(cond.type(), ts.Boolean())) {
 	     throw new SemanticException(
 		 "Condition of ternary expression must be of type boolean.",
 		 cond.position());
@@ -168,10 +168,10 @@ public class Conditional_c extends Expr_c implements Conditional
 	// if neither type is assignment compatible with the other type.
 
 	if (t1.isReference() && t2.isReference()) {
-	    if (t1.isAssignableSubtype(t2)) {
+	    if (ts.isImplicitCastValid(t1, t2)) {
 		return type(t2);
 	    }
-	    if (t2.isAssignableSubtype(t1)) {
+	    if (ts.isImplicitCastValid(t2, t1)) {
 		return type(t1);
 	    }
 	}
@@ -181,30 +181,28 @@ public class Conditional_c extends Expr_c implements Conditional
 	    position());
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-      	throws SemanticException
-    {
-        TypeSystem ts = tc.typeSystem();
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        TypeSystem ts = av.typeSystem();
 
         if (child == cond) {
-            return child.expectedType(ts.Boolean());
+            return ts.Boolean();
         }
 
         if (child == consequent) {
             if (alternative.type().isNull()) {
-                return child.expectedType(ts.Object());
+                return ts.Object();
             }
-            return child.expectedType(alternative.type());
+            return alternative.type();
         }
 
         if (child == alternative) {
             if (consequent.type().isNull()) {
-                return child.expectedType(ts.Object());
+                return ts.Object();
             }
-            return child.expectedType(consequent.type());
+            return consequent.type();
         }
 
-        return child;
+        return child.type();
     }
 
     public String toString() {

@@ -6,6 +6,13 @@ package polyglot.types;
 public interface ParsedLocalClassType extends ParsedInnerClassType,
                                               LocalClassType
 {
+    /**
+     * Set the name of the class.
+     */
     void name(String name);
+
+    /**
+     * A unique identifier for this type.
+     */
     int uid();
 }

@@ -29,9 +29,13 @@ public class CarrayAssign_c extends Assign_c
     Type t = left.type();
 
     // check that the left is an assignable location.
-     if (left instanceof ArrayAccess && ((ArrayAccess)left).array().type() instanceof ConstArrayType) {
-        throw new SemanticException("Cannot assign a value to an element of a const array.",
-                                    position());
+    if (left instanceof ArrayAccess) {
+      ArrayAccess a = (ArrayAccess) left;
+      if (a.array().type() instanceof ConstArrayType &&
+          ((ConstArrayType) a.array().type()).isConst()) {
+        throw new SemanticException("Cannot assign a value to an element " +
+                                    "of a const array.", position());
+      }
     }
 
     // let the super class deal with the rest.

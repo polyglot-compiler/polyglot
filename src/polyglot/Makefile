@@ -7,5 +7,4 @@ include $(SOURCE)/Rules.mk
 all clean clobber:
 	$(subdirs)
 
-release: release_src
-	$(subdirs)
+MANIFEST = Makefile $(SOURCES)

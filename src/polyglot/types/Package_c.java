@@ -39,35 +39,42 @@ public class Package_c extends TypeObject_c implements Package
     public String name() {
 	return name;
     }
-    
+
     public String translate(Resolver c) {
-	return ts.translatePackage(c, this);
+        if (prefix() == null) {
+          return name();
+        }
+
+        return prefix().translate(c) + "." + name();
     }
 
     public String fullName() {
-	return prefix == null ? name : prefix.fullName() + "." + name;
+	return prefix() == null ? name : prefix().fullName() + "." + name;
     }
 
     public String toString() {
-	return prefix == null ? name : prefix.toString() + "." + name;
+	return prefix() == null ? name : prefix().toString() + "." + name;
     }
 
     public int hashCode() {
         return name.hashCode();
     }
 
-    public boolean equals(Object o) {
-        if (o instanceof Package) {
-	    Package p = (Package) o;
-	    if (prefix == null) {
-		return p.prefix() == null && name.equals(p.name());
-	    }
-	    else {
-		return prefix.equals(p.prefix()) && name.equals(p.name());
-	    }
-	}
+    public boolean isSame(Package p) {
+        if (p == null) {
+            return false;
+        }
 
-	return false;
+        if (prefix() == null) {
+            return p.prefix() == null && name().equals(p.name());
+        }
+        else {
+            return prefix().equals(p.prefix()) && name().equals(p.name());
+        }
+    }
+    
+    public boolean equals(Object o) {
+        return o instanceof Package && isSame((Package) o);
     }
 
     public boolean isCanonical() {

@@ -18,9 +18,12 @@ SOURCES = \
 	Method.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES)
+JAR_FILE = polyglot.jar
 
 all: $(CLASSES)
 
-release: release_src
+JAR_FILE = polyglot.jar
 
 clean clobber: cleanclasses
+

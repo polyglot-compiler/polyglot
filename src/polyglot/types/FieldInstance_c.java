@@ -70,7 +70,7 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
     public boolean equals(Object o) {
         if (o instanceof FieldInstance) {
 	    FieldInstance i = (FieldInstance) o;
-	    return super.equals(i) && container.isSame(i.container());
+	    return super.equals(i) && ts.isSame(container, i.container());
 	}
 
 	return false;
@@ -110,7 +110,6 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
     }
 
     public boolean isCanonical() {
-	return container.isCanonical()
-	    && type.isCanonical();
+	return container.isCanonical() && type.isCanonical();
     }
 }

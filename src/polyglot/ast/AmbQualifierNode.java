@@ -6,6 +6,13 @@ package polyglot.ast;
  */
 public interface AmbQualifierNode extends Ambiguous, QualifierNode
 {
+    /**
+     * Qualifier of the qualifier.
+     */
     QualifierNode qual();
+
+    /**
+     * Ambiguous name.
+     */
     String name();
 }

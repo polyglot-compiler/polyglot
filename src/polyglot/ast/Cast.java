@@ -7,9 +7,23 @@ package polyglot.ast;
  */ 
 public interface Cast extends Expr
 {
+    /**
+     * The type to cast to.
+     */
     TypeNode castType();
+
+    /**
+     * Set the type to cast to.
+     */
     Cast castType(TypeNode castType);
 
+    /**
+     * The expression to cast.
+     */
     Expr expr();
+
+    /**
+     * Set the expression to cast.
+     */
     Cast expr(Expr expr);
 }

@@ -14,8 +14,8 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
 	return "jl";
     }
 
-    protected NodeFactory createNodeFactory() {
-	return new CovarRetNodeFactory();
+    protected TypeSystem createTypeSystem() {
+	return new CovarRetTypeSystem();
     }
 
     public static final Pass.ID COVAR_RET_CAST_REWRITE = new Pass.ID("covariantReturnCasts");

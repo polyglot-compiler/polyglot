@@ -118,16 +118,11 @@ public class New_c extends Expr_c implements New
 	return reconstruct(qualifier, tn, arguments, body);
     }
 
-    public void enterScope(Context c) {
+    public Context enterScope(Context c) {
         if (anonType != null) {
-            c.pushClass(anonType);
+            return c.pushClass(anonType, anonType);
         }
-    }
-
-    public void leaveScope(Context c) {
-        if (anonType != null) {
-            c.popClass();
-        }
+        return c;
     }
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
@@ -209,12 +204,13 @@ public class New_c extends Expr_c implements New
                 t = t.toAnonymous().outer();
             }
 
-
             while (t != null) {
                 try {
+                    // HACK: PolyJ outer() doesn't work
+                    t = ts.staticTarget(t).toClass();
                     ClassType mt = ts.findMemberClass(t, name, c);
 
-                    if (mt.isSame(ct)) {
+                    if (ts.isSame(mt, ct)) {
                         outer = t;
                         break;
                     }
@@ -233,13 +229,13 @@ public class New_c extends Expr_c implements New
             // Create the qualifier.
             Expr q;
 
-            if (outer == c.currentClass()) {
+            if (outer.isSame(c.currentClass())) {
                 q = nf.This(position());
             }
             else {
                 q = nf.This(position(),
                             nf.CanonicalTypeNode(position(),
-                                                 ts.staticTarget(outer)));
+                                                 outer));
             }
 
             return qualifier(q);
@@ -464,18 +460,16 @@ FIXME: check super types as well.
         return b;
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-      	throws SemanticException
-    {
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
         if (child == qualifier) {
             ReferenceType t = ci.container();
                      
             if (t.isClass() && t.toClass().isMember()) {
                 t = t.toClass().toMember().container();
-                return child.expectedType(t);
+                return t;
             }
 
-            return child;
+            return child.type();
         }
 
         Iterator i = this.arguments.iterator();
@@ -486,11 +480,11 @@ FIXME: check super types as well.
 	    Type t = (Type) j.next();
 
             if (e == child) {
-                return child.expectedType(t);
+                return t;
             }
         }
 
-        return child;
+        return child.type();
     }
 
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {

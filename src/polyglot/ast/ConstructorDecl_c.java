@@ -167,7 +167,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
             Context c = ar.context();
             TypeSystem ts = ar.typeSystem();
 
-            ParsedClassType ct = c.currentClass();
+            ParsedClassType ct = c.currentClassScope();
 
             ConstructorInstance ci = makeConstructorInstance(ct, ts);
 
@@ -178,17 +178,13 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
     }
 
     public NodeVisitor addMembersEnter(AddMemberVisitor am) {
-	ParsedClassType ct = am.context().currentClass();
+	ParsedClassType ct = am.context().currentClassScope();
         ct.addConstructor(ci);
         return am.bypassChildren(this);
     }
 
-    public void enterScope(Context c) {
-        c.pushCode(ci);
-    }
-
-    public void leaveScope(Context c) {
-        c.popCode();
+    public Context enterScope(Context c) {
+        return c.pushCode(ci);
     }
 
     /** Type check the constructor. */
@@ -264,14 +260,14 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 		    TypeNode tn = (TypeNode) j.next();
 		    Type tj = tn.type();
 
-		    if (ts.isSame(t, tj) || ts.descendsFrom(t, tj)) {
+		    if (ts.isSubtype(t, tj)) {
 			throwDeclared = true;
 			break;
 		    }
 		}
 
 		if (! throwDeclared) {
-			ec.throwsSet().clear();
+                    ec.throwsSet().clear();
 		    throw new SemanticException("Constructor \"" + name +
 			"\" throws the undeclared exception \"" + t + "\".",
 		        position());
@@ -344,9 +340,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
         prettyPrintHeader(w, tr);
 
 	if (body != null) {
-	    enterScope(tr.context());
-	    printSubStmt(body, w, tr);
-	    leaveScope(tr.context());
+	    printSubStmt(body, w, tr.context(enterScope(tr.context())));
 	}
 	else {
 	    w.write(";");

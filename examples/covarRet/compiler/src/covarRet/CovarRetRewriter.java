@@ -11,29 +11,40 @@ import java.util.*;
  * This visitor rewrites the AST to translate from Java with covariant returns
  * to standard Java.
  */
-public class CovarRetRewriter extends SemanticVisitor
+public class CovarRetRewriter extends AscriptionVisitor
 {
     public CovarRetRewriter(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
 
-    public Node leaveCall(Node n) {
-        if (n instanceof Call) {
-            /* Add a cast to the appropriate subclass, if neccssary */
-            Call c = (Call) n;
+    public Expr ascribe(Expr e, Type toType) {
+        if (e instanceof Call) {
+            /* Add a cast to the appropriate subclass, if necessary */
+            Call c = (Call) e;
 
             Position p = c.position();
 
-            // Insert a cast, (always at the moment)
-            Type overridenRetType = getOverridenReturnType(c.methodInstance());
-            if (overridenRetType != null && !overridenRetType.isImplicitCastValid(c.expectedType())) {
-              // The overriden return type cannot be implicitly cast to the
-              // expected type, so explicitly cast it.
-              NodeFactory nf = nodeFactory();
-              return nf.Cast(p, nf.CanonicalTypeNode(p, c.methodInstance().returnType()), c);
+            // Insert a cast
+            MethodInstance mi = c.methodInstance();
+            Type overridenRetType = getOverridenReturnType(mi);
+
+            if (overridenRetType != null &&
+                ! ts.isImplicitCastValid(overridenRetType, toType)) {
+
+                // The overriden return type cannot be implicitly cast to the
+                // expected type, so explicitly cast it.
+                NodeFactory nf = nodeFactory();
+                return nf.Cast(p, nf.CanonicalTypeNode(p, mi.returnType()), c);
             }
         }
-        else if (n instanceof MethodDecl) {
+
+        return e;
+    }
+
+    public Node leaveCall(Node old, Node n, NodeVisitor v)
+        throws SemanticException {
+
+        if (n instanceof MethodDecl) {
             // Change the return type of the overridden method
             // to be the same as the superclass's
             MethodDecl md = (MethodDecl)n;
@@ -42,11 +53,12 @@ public class CovarRetRewriter extends SemanticVisitor
             MethodInstance mi = md.methodInstance();
             Type overridenRetType = getOverridenReturnType(mi);
             if (overridenRetType != null) {
-              return md.returnType(nodeFactory().CanonicalTypeNode(p, overridenRetType));
+                NodeFactory nf = nodeFactory();
+                return md.returnType(nf.CanonicalTypeNode(p, overridenRetType));
             }
         }
 
-        return n;
+        return super.leaveCall(old, n, v);
     }
 
     /**
@@ -55,30 +67,22 @@ public class CovarRetRewriter extends SemanticVisitor
      * Return null otherwise.
      */
     private Type getOverridenReturnType(MethodInstance mi) {
-      Type t = mi.container().superType();
-      Type retType = null;
+        Type retType = null;
 
-      while (t instanceof ReferenceType) {
-          ReferenceType rt = (ReferenceType) t;
-          t = rt.superType();
+        for (Iterator j = ts.overrides(mi).iterator(); j.hasNext(); ) {
+            MethodInstance mj = (MethodInstance) j.next();
 
-          for (Iterator j = rt.methods().iterator(); j.hasNext(); ) {
-              MethodInstance mj = (MethodInstance) j.next();
+            if (! ts.isAccessible(mj, this.context)) {
+                break;
+            }
 
-              if (! mi.name().equals(mj.name()) ||
-                  ! ts.hasSameArguments(mi, mj) ||
-                  ! ts.isAccessible(mj, this.context)) {
-
-                  continue;
-              }
-
-              if (ts.isSubtype(mi.returnType(), mj.returnType()) && !ts.isSame(mi.returnType(), mj.returnType())) {
+            if (ts.isSubtype(mi.returnType(), mj.returnType()) &&
+                !ts.isSame(mi.returnType(), mj.returnType())) {
                 // mj.returnType() is the type to use!
                 retType = mj.returnType();
-              }
+            }
+        }
 
-          }
-      }
-      return retType;
+        return retType;
     }
 }

@@ -12,6 +12,7 @@ SOURCES = \
 	BarrierPass.java \
 	CupParser.java \
 	EmptyPass.java \
+	FileSource.java \
 	InnerJob.java \
 	JobExt.java \
 	Job.java \
@@ -19,7 +20,6 @@ SOURCES = \
 	Parser.java \
 	ParserPass.java \
 	Pass.java \
-	PrettyPrintPass.java \
 	PrettyPrintPass.java \
 	Source.java \
 	SourceJob.java \
@@ -29,9 +29,10 @@ SOURCES = \
 	VisitorPass.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES)
+JAR_FILE = polyglot.jar
 
 all: $(CLASSES)
 
-release: release_src
-
 clean clobber: cleanclasses
+

@@ -205,7 +205,7 @@ public class Call_c extends Expr_c implements Call
       NodeFactory nf = tc.nodeFactory();
 
       if (mi.flags().isStatic()) {
-        r = nf.CanonicalTypeNode(position(), ts.staticTarget(mi.container())).type(ts.staticTarget(mi.container()));
+        r = nf.CanonicalTypeNode(position(), mi.container()).type(mi.container());
 
       } else {
         // The field is non-static, so we must prepend with "this", but we
@@ -213,12 +213,11 @@ public class Call_c extends Expr_c implements Call
         // enclosing class which brought the method into scope.  This is
         // different from fi.container().  fi.container() returns a super type
         // of the class we want.
-        ParsedClassType scope = c.findMethodScope(name);
+        ClassType scope = c.findMethodScope(name);
 
-        if (! scope.isSame(c.currentClass())) {
+        if (! ts.isSame(scope, c.currentClass())) {
           r = nf.This(position(),
-                      nf.CanonicalTypeNode(position(),
-                                           ts.staticTarget(scope))).type(ts.staticTarget(scope));
+                      nf.CanonicalTypeNode(position(), scope)).type(scope);
         }
         else {
           r = nf.This(position()).type(scope);
@@ -234,11 +233,10 @@ public class Call_c extends Expr_c implements Call
     return call.methodInstance(mi).type(mi.returnType());
   }
 
-  public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-      throws SemanticException
+  public Type childExpectedType(Expr child, AscriptionVisitor av)
   {
       if (child == target) {
-          return child.expectedType(mi.container());
+          return mi.container();
       }
 
       Iterator i = this.arguments.iterator();
@@ -249,11 +247,11 @@ public class Call_c extends Expr_c implements Call
           Type t = (Type) j.next();
 
           if (e == child) {
-              return child.expectedType(t);
+              return t;
           }
       }
 
-      return child;
+      return child.type();
   }
 
   /** Check exceptions thrown by the call. */

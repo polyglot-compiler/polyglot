@@ -18,9 +18,13 @@ public interface IntLit extends NumLit
     public static final Kind INT   = new Kind("int");
     public static final Kind LONG  = new Kind("long");
 
+    /** Get the literal's value. */
     long value();
+    /** Set the literal's value. */
     IntLit value(long value);
 
+    /** Get the kind of the literal. */
     Kind kind();
+    /** Set the kind of the literal. */
     IntLit kind(Kind kind);
 }

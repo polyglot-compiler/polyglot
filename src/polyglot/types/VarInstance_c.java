@@ -53,7 +53,7 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
         if (o instanceof VarInstance) {
 	    VarInstance i = (VarInstance) o;
 	    return flags.equals(i.flags())
-	        && type.isSame(i.type())
+	        && ts.isSame(type, i.type())
 		&& name.equals(i.name());
 	}
 

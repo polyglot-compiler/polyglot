@@ -5,5 +5,8 @@ package polyglot.types;
  */
 public interface InnerClassType extends ClassType
 {
+    /**
+     * The inner class's outer class.
+     */
     ClassType outer();
 }

@@ -11,6 +11,8 @@ SOURCES = \
 	Token.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES) ppg.flex
+JAR_FILE = polyglot.jar
 
 Lexer.java: ppg.flex
 	$(flex)
@@ -18,8 +20,6 @@ Lexer.java: ppg.flex
 all: $(CLASSES)
 	$(subdirs)
 
-release: release_src
-	$(subdirs)
-
 clean clobber: cleanclasses
 	$(subdirs)
+

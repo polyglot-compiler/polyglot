@@ -11,6 +11,9 @@ public class Types
 	topics.add("types");
     }
 
+    /**
+     * Print debug messages with topic "types".
+     */
     public static void report(int level, String msg) {
         polyglot.main.Report.report(topics, level, msg);
     }

@@ -53,14 +53,14 @@ public abstract class Type_c extends TypeObject_c implements Type
     public boolean isClass() { return false; }
     public boolean isArray() { return false; }
 
-    public final boolean isThrowable() {
-	return ts.isThrowable(this); 
-    }
-    
-    public final boolean isUncheckedException() {
-	return ts.isUncheckedException(this); 
+    public boolean isThrowable() {
+	return false;
     }
 
+    public boolean isUncheckedException() {
+	return false;
+    }
+    
     // Required for 
     /** Returns a non-null iff isClass() returns true. */
     public ClassType toClass() {
@@ -96,30 +96,58 @@ public abstract class Type_c extends TypeObject_c implements Type
     }  
     
     public final boolean isSubtype(Type t) {
-	return ts.isSubtype(this, t); 
+	return ts.isSubtype(this, t);
+    }
+
+    public boolean isSubtypeImpl(Type t) {
+	return ts.isSame(this, t) || ts.descendsFrom(this, t);
     }
     
+    public final boolean descendsFrom(Type t) {
+        return ts.descendsFrom(this, t);
+    }
+
+    public boolean descendsFromImpl(Type t) {
+        return false;
+    }
+
     public final boolean isSame(Type t) {
-	return ts.isSame(this, t); 
+        return ts.isSame(this, t);
     }
     
-    public final boolean descendsFrom(Type ancestor) { 
-	return ts.descendsFrom(this, ancestor); 
+    public boolean isSameImpl(Type t) {
+        return t == this;
     }
-    
-    public final boolean isAssignableSubtype(Type ancestor) {
-	return ts.isAssignableSubtype(this, ancestor); 
+
+    public boolean equals(Object o) {
+        return o instanceof Type && ts.isSame(this, (Type) o);
     }
     
     public final boolean isCastValid(Type toType) {
-	return ts.isCastValid(this, toType); 
+	return ts.isCastValid(this, toType);
+    }
+    
+    public boolean isCastValidImpl(Type toType) {
+	return false;
     }
     
     public final boolean isImplicitCastValid(Type toType) {
-	return ts.isImplicitCastValid(this, toType); 
+        return ts.isImplicitCastValid(this, toType);
+    }
+
+    public boolean isImplicitCastValidImpl(Type toType) {
+        return false;
+    }
+
+    public final boolean numericConversionValid(long value) {
+        return ts.numericConversionValid(this, value);
     }
     
-    public final boolean isComparable(Type t) {
+    public boolean numericConversionValidImpl(long value) {
+        return false;
+    }
+    
+    public boolean isComparable(Type t) {
 	return t.typeSystem() == ts;
     }
 

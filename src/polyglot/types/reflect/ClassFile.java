@@ -34,18 +34,18 @@ public class ClassFile implements LazyClassInitializer {
     static Collection verbose = ClassFileLoader.verbose;
   
     /**
-    * Constructor.  This constructor parses the class file from the input
-    * stream.
-    *
-    * @param file
-    *        The file in which the class resides.
-    * @param loader
-    *        The class info loader which loaded the class.
-    * @param in
-    *        The data stream containing the class.
-    * @exception ClassFormatError
-    *        When the class could not be parsed.
-    */
+     * Constructor.  This constructor parses the class file from the input
+     * stream.
+     *
+     * @param file
+     *        The file in which the class resides.
+     * @param loader
+     *        The class info loader which loaded the class.
+     * @param in
+     *        The data stream containing the class.
+     * @exception ClassFormatError
+     *        When the class could not be parsed.
+     */
     public ClassFile(byte[] code) {
         try {
             ByteArrayInputStream bin = new ByteArrayInputStream(code);
@@ -108,16 +108,25 @@ public class ClassFile implements LazyClassInitializer {
       return jlc;
     }
 
+    /**
+     * Get the encoded source modified time.
+     */
     public long sourceLastModified(String ts) {
       JLCInfo jlc = getJLCInfo(ts);
       return jlc.sourceLastModified;
     }
 
+    /**
+     * Get the encoded compiler version used to compile the source.
+     */
     public String compilerVersion(String ts) {
       JLCInfo jlc = getJLCInfo(ts);
       return jlc.compilerVersion;
     }
 
+    /**
+     * Get the encoded class type.
+     */
     public String encodedClassType(String ts) {
       JLCInfo jlc = getJLCInfo(ts);
       return jlc.encodedClassType;
@@ -125,6 +134,9 @@ public class ClassFile implements LazyClassInitializer {
 
     Map jlcInfo = new HashMap();
 
+    /**
+     * Read the class file.
+     */
     void read(DataInputStream in) throws IOException {
         // Read in file contents from stream
         readHeader(in);
@@ -136,10 +148,13 @@ public class ClassFile implements LazyClassInitializer {
         readAttributes(in);
     }
 
+    /**
+     * Extract the class type from the class file.
+     */
     public ParsedClassType type(TypeSystem ts) throws SemanticException {
         ParsedClassType ct = createType(ts);
 
-        if (ct.isSame(ts.Object())) {
+        if (ts.isSame(ct, ts.Object())) {
             ct.superType(null);
         }
         else {
@@ -156,6 +171,9 @@ public class ClassFile implements LazyClassInitializer {
         return ct;
     }
 
+    /**
+     * Initialize <code>ct</code>'s member classes.
+     */
     public void initMemberClasses(ParsedClassType ct) {
         if (innerClasses == null) {
             return;
@@ -190,6 +208,9 @@ public class ClassFile implements LazyClassInitializer {
         }
     }
 
+    /**
+     * Initialize <code>ct</code>'s interfaces.
+     */
     public void initInterfaces(ParsedClassType ct) {
         TypeSystem ts = ct.typeSystem();
 
@@ -199,6 +220,9 @@ public class ClassFile implements LazyClassInitializer {
         }
     }
 
+    /**
+     * Initialize <code>ct</code>'s fields.
+     */
     public void initFields(ParsedClassType ct) {
         TypeSystem ts = ct.typeSystem();
 
@@ -215,6 +239,9 @@ public class ClassFile implements LazyClassInitializer {
         }
     }
 
+    /**
+     * Initialize <code>ct</code>'s methods.
+     */
     public void initMethods(ParsedClassType ct) {
         TypeSystem ts = ct.typeSystem();
 
@@ -228,6 +255,9 @@ public class ClassFile implements LazyClassInitializer {
         }
     }
 
+    /**
+     * Initialize <code>ct</code>'s constructors.
+     */
     public void initConstructors(ParsedClassType ct) {
         TypeSystem ts = ct.typeSystem();
 
@@ -240,6 +270,9 @@ public class ClassFile implements LazyClassInitializer {
         }
     }
 
+    /**
+     * Create an array of <code>t</code>.
+     */
     Type arrayOf(Type t, int dims) {
       if (dims == 0) {
         return t;
@@ -249,6 +282,9 @@ public class ClassFile implements LazyClassInitializer {
       }
     }
 
+    /**
+     * Convert a descriptor string into a list of types.
+     */
     List typeListForString(TypeSystem ts, String str) {
         List types = new ArrayList();
 
@@ -300,6 +336,9 @@ public class ClassFile implements LazyClassInitializer {
         return types;
     }
 
+    /**
+     * Convert a descriptor string into a type.
+     */
     Type typeForString(TypeSystem ts, String str) {
         List l = typeListForString(ts, str);
 
@@ -310,6 +349,9 @@ public class ClassFile implements LazyClassInitializer {
         throw new InternalCompilerError("Bad type string: \"" + str + "\"");
     }
 
+    /**
+     * Convert a String into a type.
+     */
     ClassType typeForName(TypeSystem ts, String name) {
         Report.report(verbose, 2, "resolving " + name);
 
@@ -321,6 +363,9 @@ public class ClassFile implements LazyClassInitializer {
         }
     }
 
+    /**
+     * Create the type for this class file.
+     */
     ParsedClassType createType(TypeSystem ts) {
         // The name is of the form "p.q.C$I$J".
         String name = classNameCP(thisClass);
@@ -408,6 +453,7 @@ public class ClassFile implements LazyClassInitializer {
         }
 
         // Add unresolved class into the cache to avoid circular resolving.
+
         ((CachingResolver) ts.systemResolver()).medianResult(name, ct);
 
         if (kind != TOP) {
@@ -420,10 +466,16 @@ public class ClassFile implements LazyClassInitializer {
         return ct;
     }
 
+    /**
+     * Create a position for the class file.
+     */
     public Position position() {
         return new Position(name() + ".class");
     }
 
+  /**
+   * Get the class name at the given constant pool index.
+   */
   String classNameCP(int index) {
     Constant c = constants[index];
 
@@ -489,6 +541,7 @@ public class ClassFile implements LazyClassInitializer {
       case Constant.INTERFACE_METHOD_REF:
       case Constant.NAME_AND_TYPE:
 	value = new int[2];
+
 	((int[]) value)[0] = in.readUnsignedShort();
 	((int[]) value)[1] = in.readUnsignedShort();
 	break;

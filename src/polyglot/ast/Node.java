@@ -5,6 +5,8 @@ import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.types.Context;
 import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
+import polyglot.types.Type;
 import polyglot.visit.*;
 
 /**
@@ -77,12 +79,19 @@ public interface Node extends NodeOps, Copy
     /**
      * Adjust the environment on entering the scope of the method.
      */
-    void enterScope(Context c);
+    Context enterScope(Context c);
 
     /**
-     * Adjust the environment on leaving the scope of the method.
+     * Get the expected type of a child expression of <code>this</code>.
+     * The expected type is determined by the context in that the child occurs
+     * (e.g., for <code>x = e</code>, the expected type of <code>e</code> is
+     * the declared type of <code>x</code>.
+     *
+     * @param child A child expression of this node.
+     * @param av An ascription visitor.
+     * @return The expected type of <code>child</code>.
      */
-    void leaveScope(Context c);
+    public Type childExpectedType(Expr child, AscriptionVisitor av);
 
     /**
      * Dump the AST node for debugging purposes.
@@ -124,9 +133,6 @@ public interface Node extends NodeOps, Copy
     public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException;
     /** @deprectated */
     public Node typeCheck(TypeChecker tc) throws SemanticException;
-    /** @deprectated */
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tv)
-        throws SemanticException;
     /** @deprectated */
     public Node exceptionCheckOverride(ExceptionChecker ec) throws SemanticException;
     /** @deprectated */

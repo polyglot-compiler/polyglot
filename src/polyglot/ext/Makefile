@@ -3,15 +3,14 @@ PACKAGE = polyglot/ext
 
 include $(SOURCE)/Rules.mk
 
-SUBDIRS = jl ${EXT}
+SUBDIRS = jl $(EXT)
+MANIFEST = Makefile $(SOURCES) newext skel
+JAR_FILE = polyglot.jar
 
 all: $(SUBDIRS)
 	@chmod +x newext
 
 clean clobber:
-	$(subdirs)
-
-release: release_src
 	$(subdirs)
 
 jl: FORCE
@@ -24,7 +23,7 @@ polyj: jl FORCE
 	$(MAKE) -C $@ all
 jmatch: jl FORCE
 	$(MAKE) -C $@ all
-op: jl FORCE
+pao: jl FORCE
 	$(MAKE) -C $@ all
 carray: jl FORCE
 	$(MAKE) -C $@ all
@@ -34,9 +33,10 @@ carcov: carray covarRet FORCE
 	$(MAKE) -C $@ all
 mixj: polyj FORCE
 	$(MAKE) -C $@ all
-covop: op covarRet FORCE
+covop: pao covarRet FORCE
 	$(MAKE) -C $@ all
 covpolyj: polyj covarRet FORCE
 	$(MAKE) -C $@ all
 
 FORCE:
+

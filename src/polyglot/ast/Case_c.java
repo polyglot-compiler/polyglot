@@ -79,7 +79,7 @@ public class Case_c extends Stmt_c implements Case
 
 	TypeSystem ts = tc.typeSystem();
 
-	if (! expr.type().isImplicitCastValid(ts.Int())) {
+	if (! ts.isImplicitCastValid(expr.type(), ts.Int())) {
 	    throw new SemanticException(
 		"Case label must be an byte, char, short, or int.",
 		position());
@@ -128,16 +128,14 @@ public class Case_c extends Stmt_c implements Case
 	return value(value);
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-      	throws SemanticException
-    {
-        TypeSystem ts = tc.typeSystem();
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        TypeSystem ts = av.typeSystem();
 
         if (child == expr) {
-            return child.expectedType(ts.Int());
+            return ts.Int();
         }
 
-        return child;
+        return child.type();
     }
 
     public String toString() {

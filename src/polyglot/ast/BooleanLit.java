@@ -5,6 +5,13 @@ package polyglot.ast;
  */
 public interface BooleanLit extends Lit
 {
+    /**
+     * The literal's value.
+     */
     boolean value();
+
+    /**
+     * Set the literal's value.
+     */
     BooleanLit value(boolean value);
 }

@@ -16,13 +16,13 @@ public class ExceptionChecker extends HaltingVisitor
     public ExceptionChecker(TypeSystem ts, ErrorQueue eq) {
         this.ts = ts;
         this.eq = eq;
-        this.scope = new SubtypeSet();
+        this.scope = new SubtypeSet(ts);
     }
 
     public ExceptionChecker push() {
         ExceptionChecker ec = (ExceptionChecker) copy();
         ec.outer = this;
-        ec.scope = new SubtypeSet();
+        ec.scope = new SubtypeSet(ts);
         return ec;
     }
 

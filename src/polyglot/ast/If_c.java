@@ -84,7 +84,7 @@ public class If_c extends Stmt_c implements If
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-	if (! cond.type().isSame(ts.Boolean())) {
+	if (! ts.isSame(cond.type(), ts.Boolean())) {
 	    throw new SemanticException(
 		"Condition of if statement must have boolean type.",
 		cond.position());
@@ -93,16 +93,14 @@ public class If_c extends Stmt_c implements If
 	return this;
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-      	throws SemanticException
-    {
-        TypeSystem ts = tc.typeSystem();
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        TypeSystem ts = av.typeSystem();
 
         if (child == cond) {
-            return child.expectedType(ts.Boolean());
+            return ts.Boolean();
         }
 
-        return child;
+        return child.type();
     }
 
     public String toString() {

@@ -14,6 +14,9 @@ public interface TypeSystem {
     /**
      * Initialize the type system with the compiler.  This method must be
      * called before any other type system method is called.
+     *
+     * @param resolver The resolver to use for loading types from class files
+     *                 or other source files.
      */
     void initialize(LoadedClassResolver resolver)
                     throws SemanticException;
@@ -23,13 +26,29 @@ public interface TypeSystem {
      * with fully qualified names from the class path and the source path.
      */
     Resolver systemResolver();
+
+    /**
+     * Return the type system's table resolver.
+     * This resolver contains types parsed from source files.
+     */
     TableResolver parsedResolver();
+
+    /**
+     * Return the type system's loaded resolver.
+     * This resolver contains types loaded from class files.
+     */
     LoadedClassResolver loadedResolver();
 
-    /** Create an import table for the source file. */
+    /** Create an import table for the source file.
+     * @param sourceName Name of the source file to import into.  This is used
+     * mainly for error messages and for debugging. 
+     * @param pkg The package of the source file in which to import.
+     */
     ImportTable importTable(String sourceName, Package pkg);
 
-    /** Create an import table for the source file. */
+    /** Create an import table for the source file.
+     * @param pkg The package of the source file in which to import.
+     */
     ImportTable importTable(Package pkg);
 
     /**
@@ -38,37 +57,68 @@ public interface TypeSystem {
      */
     List defaultPackageImports();
 
-    /** Get the class type with the following name. */
+    /** Get the class type with the following name.
+     * @param name The name to create the type for.
+     * @exception SemanticException when class is not found.    
+     */
     ClassType typeForName(String name) throws SemanticException;
 
-    /** Create an initailizer instance. */
+    /** Create an initailizer instance.
+     * @param pos Position of the initializer.
+     * @param container Containing class of the initializer.
+     * @param flags The initializer's flags.
+     */
     InitializerInstance initializerInstance(Position pos, ClassType container,
-					    Flags flags);
+                                            Flags flags);
 
-    /** Create a constructor instance. */
+    /** Create a constructor instance.
+     * @param pos Position of the constructor.
+     * @param container Containing class of the constructor.
+     * @param flags The constructor's flags.
+     * @param argTypes The constructor's formal parameter types.
+     * @param excTypes The constructor's exception throw types.
+     */
     ConstructorInstance constructorInstance(Position pos, ClassType container,
-					    Flags flags, List argTypes,
-					    List excTypes);
+                                            Flags flags, List argTypes,
+                                            List excTypes);
 
-    /** Create a method instance. */
+    /** Create a method instance.
+     * @param pos Position of the method.
+     * @param container Containing type of the method.
+     * @param flags The method's flags.
+     * @param returnType The method's return type.
+     * @param name The method's name.
+     * @param argTypes The method's formal parameter types.
+     * @param excTypes The method's exception throw types.
+     */
     MethodInstance methodInstance(Position pos, ReferenceType container,
-				  Flags flags, Type returnType, String name,
-				  List argTypes, List excTypes);
+                                  Flags flags, Type returnType, String name,
+                                  List argTypes, List excTypes);
 
-    /** Create a field instance. */
+    /** Create a field instance.
+     * @param pos Position of the field.
+     * @param container Containing type of the field.
+     * @param flags The field's flags.
+     * @param type The field's type.
+     * @param name The field's name.
+     */
     FieldInstance fieldInstance(Position pos, ReferenceType container,
-				Flags flags, Type type, String name);
+                                Flags flags, Type type, String name);
 
-    /** Create a local variable instance. */
+    /** Create a local variable instance.
+     * @param pos Position of the local variable.
+     * @param flags The local variable's flags.
+     * @param type The local variable's type.
+     * @param name The local variable's name.
+     */
     LocalInstance localInstance(Position pos, Flags flags, Type type,
-	                        String name);
+                                String name);
 
-    /** Create a default constructor instance. */
+    /** Create a default constructor instance.
+     * @param pos Position of the constructor.
+     * @param container Containing class of the constructor. 
+     */
     ConstructorInstance defaultConstructor(Position pos, ClassType container);
-
-    /** Get a place-holder for serializing a type object. */
-    TypeObject placeHolder(TypeObject o, java.util.Set roots);
-    TypeObject placeHolder(TypeObject o);
 
     /** Get an unknown type. */
     UnknownType unknownType(Position pos);
@@ -79,54 +129,42 @@ public interface TypeSystem {
     /**
      * Returns true iff child descends from ancestor or child == ancestor.
      * This is equivalent to:
+     * <pre>
      *    descendsFrom(child, ancestor) || isSame(child, ancestor)
+     * </pre>
      */
     boolean isSubtype(Type child, Type ancestor);
 
     /**
-     * Returns true iff child is not ancestor, but child descends from ancestor.
-     */
+     * Returns true iff child is not ancestor, but child descends from ancestor.     */
     boolean descendsFrom(Type child, Type ancestor);
 
     /**
-     * Returns true iff child and ancestor are non-primitive types, and a
-     * variable of type child may be legally assigned to a variable of type
-     * ancestor.
-     */
-    boolean isAssignableSubtype(Type child, Type ancestor);
-
-    /**
-     * Requires: all type arguments are canonical.
-     *
      * Returns true iff a cast from fromType to toType is valid; in other
      * words, some non-null members of fromType are also members of toType.
      */
     boolean isCastValid(Type fromType, Type toType);
 
     /**
-     * Requires: all type arguments are canonical.
-     *
      * Returns true iff an implicit cast from fromType to toType is valid;
      * in other words, every member of fromType is member of toType.
      */
     boolean isImplicitCastValid(Type fromType, Type toType);
 
     /**
-     * Requires: all type arguments are canonical.
-     *
      * Returns true iff type1 and type2 are the same type.
-     **/
+     */
     boolean isSame(Type type1, Type type2);
 
     /**
      * Returns true if <code>value</code> can be implicitly cast to
-     * Primitive type <code>t</code>.
+     * type <code>t</code>.
      */
     boolean numericConversionValid(Type t, long value);
 
     /**
-     * Requires: all type arguments are canonical.
-     * Returns the least common ancestor of Type1 and Type2
+     * Returns the least common ancestor of type1 and type2
+     * @exception SemanticException if the LCA does not exist
      */
     Type leastCommonAncestor(Type type1, Type type2) throws SemanticException;
 
@@ -136,8 +174,7 @@ public interface TypeSystem {
     boolean isCanonical(Type type);
 
     /**
-     * Checks whether a method or field within target with access flags 'flags'
-     * can be accessed from Context context.
+     * Checks whether a class member can be accessed from Context context.
      */
     boolean isAccessible(MemberInstance mi, Context context);
 
@@ -151,10 +188,8 @@ public interface TypeSystem {
     ////
 
     /**
-     * Requires: all type arguments are canonical.
-     *
      * Returns true iff an object of type <type> may be thrown.
-     **/
+     */
     boolean isThrowable(Type type);
 
     /**
@@ -169,10 +204,14 @@ public interface TypeSystem {
      */
     Collection uncheckedExceptions();
 
-    /** Unary promotion for numeric types. */
+    /** Unary promotion for numeric types.
+     * @exception SemanticException if the type cannot be promoted. 
+     */
     PrimitiveType promote(Type t) throws SemanticException;
 
-    /** Binary promotion for numeric types. */
+    /** Binary promotion for numeric types.
+     * @exception SemanticException if the types cannot be promoted. 
+     */
     PrimitiveType promote(Type t1, Type t2) throws SemanticException;
 
     ////
@@ -182,12 +221,16 @@ public interface TypeSystem {
     /**
      * Returns the field named 'name' defined on 'type'.
      * We check if the field is accessible from the context 'c'.
+     * @exception SemanticException if the field cannot be found or is
+     * inaccessible.
      */
     FieldInstance findField(ReferenceType container, String name, Context c)
 	throws SemanticException;
 
     /**
      * Returns the field named 'name' defined on 'type'.
+     * @exception SemanticException if the field cannot be found or is
+     * inaccessible.
      */
     FieldInstance findField(ReferenceType container, String name)
 	throws SemanticException;
@@ -196,27 +239,36 @@ public interface TypeSystem {
      * Find a method.  We need to pass the context because the method
      * we find depends on whether the method is accessible from the context.
      * We also check if the field is accessible from the context 'c'.
+     * @exception SemanticException if the method cannot be found or is
+     * inaccessible.
      */
     MethodInstance findMethod(ReferenceType container,
-	String name, List argTypes, Context c) throws SemanticException;
+                              String name, List argTypes,
+                              Context c) throws SemanticException;
 
     /**
      * Find a constructor.  We need to pass the context because the constructor
      * we find depends on whether the method is accessible from the context.
      * We also check if the field is accessible from the context 'c'.
+     * @exception SemanticException if the constructor cannot be found or is
+     * inaccessible.
      */
-    ConstructorInstance findConstructor(ClassType container,
-	List argTypes, Context c) throws SemanticException;
+    ConstructorInstance findConstructor(ClassType container, List argTypes,
+                                        Context c) throws SemanticException;
 
     /**
      * Find a member class.
      * We check if the field is accessible from the context 'c'.
+     * @exception SemanticException if the class cannot be found or is
+     * inaccessible.
      */
     MemberClassType findMemberClass(ClassType container, String name, Context c)
 	throws SemanticException;
 
     /**
      * Find a member class.
+     * @exception SemanticException if the class cannot be found or is
+     * inaccessible.
      */
     MemberClassType findMemberClass(ClassType container, String name)
 	throws SemanticException;
@@ -238,65 +290,187 @@ public interface TypeSystem {
     ////
 
     /**
-     * Returns true iff <m1> throws fewer exceptions than <m2>
+     * Returns true iff <m1> throws fewer exceptions than <m2>.
      */
     boolean throwsSubset(ProcedureInstance m1, ProcedureInstance m2);
 
     /**
-     * Returns true iff <m1> has the same arguments as <m2>
+     * Returns true iff <m1> has the same arguments as <m2>.
      */
     boolean hasMethod(ReferenceType t, MethodInstance mi);
 
     /**
-     * Returns true iff <m1> has the same arguments as <m2>
-     */
-    boolean hasSameArguments(ProcedureInstance m1, ProcedureInstance m2);
-
-    /**
-     * Returns true iff <m1> is the same method as <m2>
+     * Returns true iff <m1> is the same method as <m2>.
      */
     boolean isSameMethod(MethodInstance m1, MethodInstance m2);
+
+    /**
+     * Returns true iff <m1> is more specific than <m2>.
+     */
+    boolean moreSpecific(ProcedureInstance m1, ProcedureInstance m2);
+
+    /**
+     * Returns true iff <m1> is more specific than <m2>.
+     */
+    boolean hasArguments(ProcedureInstance p, List argumentTypes);
 
     ////
     // Functions which yield particular types.
     ////
+
+    /**
+     * The type of <code>null</code>.
+     */
     NullType Null();
+
+    /**
+     * <code>void</code>
+     */
     PrimitiveType Void();
+
+    /**
+     * <code>boolean</code>
+     */
     PrimitiveType Boolean();
+
+    /**
+     * <code>char</code>
+     */
     PrimitiveType Char();
+
+    /**
+     * <code>byte</code>
+     */
     PrimitiveType Byte();
+
+    /**
+     * <code>short</code>
+     */
     PrimitiveType Short();
+
+    /**
+     * <code>int</code>
+     */
     PrimitiveType Int();
+
+    /**
+     * <code>long</code>
+     */
     PrimitiveType Long();
+
+    /**
+     * <code>float</code>
+     */
     PrimitiveType Float();
+
+    /**
+     * <code>double</code>
+     */
     PrimitiveType Double();
+
+    /**
+     * <code>java.lang.Object</code>
+     */
     ClassType Object();
+
+    /**
+     * <code>java.lang.String</code>
+     */
     ClassType String();
+
+    /**
+     * <code>java.lang.Class</code>
+     */
     ClassType Class();
+
+    /**
+     * <code>java.lang.Throwable</code>
+     */
     ClassType Throwable();
+
+    /**
+     * <code>java.lang.Error</code>
+     */
     ClassType Error();
+
+    /**
+     * <code>java.lang.Exception</code>
+     */
     ClassType Exception();
+
+    /**
+     * <code>java.lang.RuntimeException</code>
+     */
     ClassType RuntimeException();
+
+    /**
+     * <code>java.lang.Cloneable</code>
+     */
     ClassType Cloneable();
+
+    /**
+     * <code>java.io.Serializable</code>
+     */
     ClassType Serializable();
+
+    /**
+     * <code>java.lang.NullPointerException</code>
+     */
     ClassType NullPointerException();
+
+    /**
+     * <code>java.lang.ClassCastException</code>
+     */
     ClassType ClassCastException();
+
+    /**
+     * <code>java.lang.ArrayIndexOutOfBoundsException</code>
+     */
     ClassType OutOfBoundsException();
+
+    /**
+     * <code>java.lang.ArrayStoreException</code>
+     */
     ClassType ArrayStoreException();
+
+    /**
+     * <code>java.lang.ArithmeticException</code>
+     */
     ClassType ArithmeticException();
 
     /**
-     * Returns a type identical to <type>, but with <dims> more array
-     * dimensions.  <dims> must be >= 0.
-     **/
+     * Return an array of <code>type</code>
+     */
     ArrayType arrayOf(Type type);
+
+    /**
+     * Return an array of <code>type</code>
+     */
     ArrayType arrayOf(Position pos, Type type);
+
+    /**
+     * Return a <code>dims</code>-array of <code>type</code>
+     */
     ArrayType arrayOf(Type type, int dims);
+
+    /**
+     * Return a <code>dims</code>-array of <code>type</code>
+     */
     ArrayType arrayOf(Position pos, Type type, int dims);
 
+    /**
+     * Return a package by name.
+     */
     Package packageForName(String name);
+
+    /**
+     * Return a package by name with the given outer package.
+     */
     Package packageForName(Package prefix, String name);
 
+    /**
+     * Create a new context object for looking up variables, types, etc.
+     */
     Context createContext();
 
     /** Get a resolver for looking up a type in a package. */
@@ -305,16 +479,49 @@ public interface TypeSystem {
     /** Get a resolver for looking up a type in a class context. */
     Resolver classContextResolver(ClassType ct);
 
+    /**
+     * The default lazy class initializer.
+     */
     LazyClassInitializer defaultClassInitializer();
 
+    /**
+     * Create a top-level class.
+     */
     ParsedTopLevelClassType topLevelClassType(LazyClassInitializer init);
+
+    /**
+     * Create a member class.
+     */
     ParsedMemberClassType memberClassType(LazyClassInitializer init);
+
+    /**
+     * Create a local class.
+     */
     ParsedLocalClassType localClassType(LazyClassInitializer init);
+
+    /**
+     * Create a anonymous class.
+     */
     ParsedAnonClassType anonClassType(LazyClassInitializer init);
 
+    /**
+     * Create a top-level class.
+     */
     ParsedTopLevelClassType topLevelClassType();
+
+    /**
+     * Create a member class.
+     */
     ParsedMemberClassType memberClassType();
+
+    /**
+     * Create a local class.
+     */
     ParsedLocalClassType localClassType();
+
+    /**
+     * Create a anonymous class.
+     */
     ParsedAnonClassType anonClassType();
 
     /**
@@ -329,31 +536,136 @@ public interface TypeSystem {
      */
     Set getTypeEncoderRootSet(Type clazz);
 
+    /** Get a place-holder for serializing a type object.
+     * @param o The object to get the place-holder for.
+     * @param roots The root objects for the serialization.  Place holders
+     * are not created for these.
+     */
+    TypeObject placeHolder(TypeObject o, java.util.Set roots);
+
+    /** Get a place-holder for serializing a type object.
+     * @param o The object to get the place-holder for.
+     */
+    TypeObject placeHolder(TypeObject o);
+
+    /**
+     * Translate a package.
+     */
     String translatePackage(Resolver c, Package p);
+
+    /**
+     * Translate a primitive type.
+     */
     String translatePrimitive(Resolver c, PrimitiveType t);
+
+    /**
+     * Translate an array type.
+     */
     String translateArray(Resolver c, ArrayType t);
+
+    /**
+     * Translate a top-level class type.
+     */
     String translateTopLevelClass(Resolver c, TopLevelClassType t);
+
+    /**
+     * Translate a member class type.
+     */
     String translateMemberClass(Resolver c, MemberClassType t);
+
+    /**
+     * Translate a local class type.
+     */
     String translateLocalClass(Resolver c, LocalClassType t);
+
+    /**
+     * Return the boxed version of <code>t</code>.
+     */
     String wrapperTypeString(PrimitiveType t);
 
+    /**
+     * Return true if <code>mi</code> can be called with name <code>name</code>
+     * and actual parameters of types <code>actualTypes</code>.
+     */
+    boolean methodCallValid(MethodInstance mi, String name, List argTypes);
+
+    /**
+     * Return true if <code>pi</code> can be called with 
+     * actual parameters of types <code>actualTypes</code>.
+     */
+    boolean callValid(ProcedureInstance mi, List argTypes);
+
+    /**
+     * Get the list of methods <code>mi</code> (potentially) overrides, in
+     * order from this class (i.e., including <code>this</code>) to super
+     * classes.
+     */
+    List overrides(MethodInstance mi);
+
+    /**
+     * Return true if <code>mi</code> can override <code>mj</code>.
+     */
+    boolean canOverride(MethodInstance mi, MethodInstance mj);
+
+    /**
+     * Return the primitive with the given name.
+     */
     PrimitiveType primitiveForName(String name) throws SemanticException;
 
+    /**
+     * Assert if the flags <code>f</code> are legal method flags.
+     */
     void checkMethodFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal local variable flags.
+     */
     void checkLocalFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal field flags.
+     */
     void checkFieldFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal constructor flags.
+     */
     void checkConstructorFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal initializer flags.
+     */
     void checkInitializerFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal top-level class flags.
+     */
     void checkTopLevelClassFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal member class flags.
+     */
     void checkMemberClassFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal local class flags.
+     */
     void checkLocalClassFlags(Flags f) throws SemanticException;
+
+    /**
+     * Assert if the flags <code>f</code> are legal access flags.
+     */
     void checkAccessFlags(Flags f) throws SemanticException;
 
+    /**
+     * Assert that <code>t</code> has no cycles in the super type+inner class
+     * graph starting at <code>t</code>.
+     */
     void checkCycles(ReferenceType t) throws SemanticException;
 
     /**
-     * Returns t, modified as necessary to make it a legal
+     * Returns <code>t</code>, modified as necessary to make it a legal
      * static target.
      */
-    public Type staticTarget(Type t) throws SemanticException;
+    public Type staticTarget(Type t);
 }

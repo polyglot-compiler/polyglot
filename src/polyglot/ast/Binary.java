@@ -41,15 +41,44 @@ public interface Binary extends Expr
     public static final Operator SHR      = new Operator(">>", Precedence.SHIFT);
     public static final Operator USHR     = new Operator(">>>", Precedence.SHIFT);
 
+    /**
+     * Left child of the binary.
+     */
     Expr left();
+
+    /**
+     * Set the left child of the binary.
+     */
     Binary left(Expr left);
 
+    /**
+     * The binary's operator.
+     */
     Operator operator();
+
+    /**
+     * Set the binary's operator.
+     */
     Binary operator(Operator op);
 
+    /**
+     * Right child of the binary.
+     */
     Expr right();
+
+    /**
+     * Set the right child of the binary.
+     */
     Binary right(Expr right);
 
+    /**
+     * Returns true if the binary might throw an arithmetic exception,
+     * such as division by zero.
+     */
     boolean throwsArithmeticException();
+
+    /**
+     * Set the precedence of the expression.
+     */
     Binary precedence(Precedence precedence);
 }

@@ -6,8 +6,7 @@ import polyglot.util.Position;
  * Thrown during any number of phases of the compiler during which a semantic
  * error may be detected.
  */
-public class SemanticException extends Exception
-{
+public class SemanticException extends Exception {
     protected Position position;
     
     public SemanticException() {

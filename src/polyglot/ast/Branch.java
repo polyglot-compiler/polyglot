@@ -16,9 +16,23 @@ public interface Branch extends Stmt
     public static final Kind BREAK    = new Kind("break");
     public static final Kind CONTINUE = new Kind("continue");
 
+    /**
+     * The kind of branch.
+     */
     Kind kind();
+
+    /**
+     * Set the kind of branch.
+     */
     Branch kind(Kind kind);
 
+    /**
+     * Target label of the branch.
+     */
     String label();
+
+    /**
+     * Set the target label of the branch.
+     */
     Branch label(String label);
 }

@@ -9,6 +9,8 @@ SOURCES = \
 	Version.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES) tests
+JAR_FILE = carray.jar
 
 all: parse $(CLASSES)
 	$(subdirs)
@@ -16,10 +18,8 @@ all: parse $(CLASSES)
 parse: FORCE
 	$(MAKE) -C parse all
 
-release: release_src
-	$(subdirs)
-
 clean clobber: cleanclasses
 	$(subdirs)
 
 FORCE:
+

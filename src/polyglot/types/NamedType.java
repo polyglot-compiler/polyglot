@@ -6,6 +6,13 @@ package polyglot.types;
  */
 public interface NamedType extends NamedQualifier, Type
 {
+    /**
+     * Name of the type.
+     */
     String name();
+
+    /**
+     * Full dotted-name of the type.
+     */
     String fullName();
 }

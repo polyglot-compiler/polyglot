@@ -13,21 +13,48 @@ import java.util.List;
  */
 public interface New extends Expr
 {
+    /** The type object for anonymous classes, or null. */
     ParsedAnonClassType anonType();
+
+    /** Set the type object for anonymous classes. */
     New anonType(ParsedAnonClassType anonType);
 
+    /** The constructor invoked by this expression. */
     ConstructorInstance constructorInstance();
+
+    /** Set the constructor invoked by this expression. */
     New constructorInstance(ConstructorInstance ci);
 
+    /**
+     * The qualifier expression for the type, or null. If non-null, this
+     * expression creates an inner class of the static type of the qualifier.
+     */
     Expr qualifier();
+
+    /** Set the qualifier expression for the type. */
     New qualifier(Expr qualifier);
 
+    /** The type we are creating, possibly qualified by qualifier. */
     TypeNode objectType();
+
+    /** Set the type we are creating. */
     New objectType(TypeNode t);
 
+    /** Actual arguments to pass to the constructor.
+     * A list of <code>Expr</code>.
+     * @see polyglot.ast.Expr
+     */
     List arguments();
+
+    /** Set the actual arguments to pass to the constructor.
+     * A list of <code>Expr</code>.
+     * @see polyglot.ast.Expr
+     */
     New arguments(List a);
 
+    /** The class body for anonymous classes, or null. */
     ClassBody body();
+
+    /** Set the class body for anonymous classes. */
     New body(ClassBody b);
 }

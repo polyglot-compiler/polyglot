@@ -11,11 +11,7 @@ import polyglot.util.Position;
 public class UnknownQualifier_c extends TypeObject_c implements UnknownQualifier
 {
     public UnknownQualifier_c(TypeSystem ts) {
-        this(ts, null);
-    }
-
-    public UnknownQualifier_c(TypeSystem ts, Position pos) {
-        super(ts, pos);
+        super(ts);
     }
 
     public boolean isCanonical() { return false; }

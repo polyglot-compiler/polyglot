@@ -6,6 +6,13 @@ package polyglot.types;
  */
 public interface NamedQualifier extends Qualifier
 {
+    /**
+     * Name of the qualifier.
+     */
     String name();
+
+    /**
+     * Full dotted-name of the qualifier.
+     */
     String fullName();
 }

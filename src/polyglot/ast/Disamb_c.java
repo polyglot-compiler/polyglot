@@ -11,7 +11,7 @@ import polyglot.util.*;
  */
 public class Disamb_c implements Disamb
 {
-    protected SemanticVisitor v;
+    protected ContextVisitor v;
     protected Position pos;
     protected Prefix prefix;
     protected String name;
@@ -25,7 +25,7 @@ public class Disamb_c implements Disamb
      * @return An unambiguous AST node, or null if disambiguation
      *         fails.
      */
-    public Node disambiguate(SemanticVisitor v, Position pos,
+    public Node disambiguate(ContextVisitor v, Position pos,
             Prefix prefix, String name) throws SemanticException {
 
         this.v = v;
@@ -133,7 +133,7 @@ public class Disamb_c implements Disamb
         Receiver r;
 
         if (fi.flags().isStatic()) {
-            r = nf.CanonicalTypeNode(pos, ts.staticTarget(fi.container()));
+            r = nf.CanonicalTypeNode(pos, fi.container());
         } else {
             // The field is non-static, so we must prepend with
             // "this", but we need to determine if the "this"
@@ -141,10 +141,10 @@ public class Disamb_c implements Disamb
             // brought the field into scope.  This is different
             // from fi.container().  fi.container() returns a super
             // type of the class we want.
-            ParsedClassType scope = c.findFieldScope(name);
+            ClassType scope = c.findFieldScope(name);
 
-            if (! scope.isSame(c.currentClass())) {
-                r = nf.This(pos, nf.CanonicalTypeNode(pos, ts.staticTarget(scope)));
+            if (! ts.isSame(scope, c.currentClass())) {
+                r = nf.This(pos, nf.CanonicalTypeNode(pos, scope));
             } else {
                 r = nf.This(pos);
             }

@@ -139,12 +139,9 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         return type(type).flags(type.flags());
     }
 
-    public void enterScope(Context c) {
-	    c.pushClass(type);
-    }
-
-    public void leaveScope(Context c) {
-	    c.popClass();
+    public Context enterScope(Context c) {
+        TypeSystem ts = c.typeSystem();
+        return c.pushClass(type, ts.staticTarget(type).toClass());
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
@@ -369,9 +366,8 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 
     public void translate(CodeWriter w, Translator tr) {
         prettyPrintHeader(w, tr);
-        enterScope(tr.context());
-        tr.print(body(), w);
-	leaveScope(tr.context());
+        Context c = enterScope(tr.context());
+        tr.context(c).print(body(), w);
         w.newline(0);
     }
 

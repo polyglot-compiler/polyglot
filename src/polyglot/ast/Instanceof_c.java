@@ -78,7 +78,7 @@ public class Instanceof_c extends Expr_c implements Instanceof
 		compareType.position());
 	}
 
-	if (! expr.type().isCastValid(compareType.type())) {
+	if (! ts.isCastValid(expr.type(), compareType.type())) {
 	    throw new SemanticException(
 		"Expression operand incompatible with type in \"instanceof\".",
 		expr.position());
@@ -87,16 +87,14 @@ public class Instanceof_c extends Expr_c implements Instanceof
 	return type(ts.Boolean());
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-      	throws SemanticException
-    {
-        TypeSystem ts = tc.typeSystem();
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        TypeSystem ts = av.typeSystem();
 
         if (child == expr) {
-            return child.expectedType(ts.Object());
+            return ts.Object();
         }
 
-        return child;
+        return child.type();
     }
 
     public String toString() {

@@ -50,7 +50,7 @@ public class InitializerInstance_c extends TypeObject_c
     public boolean equals(Object o) {
         if (o instanceof InitializerInstance) {
 	    InitializerInstance i = (InitializerInstance) o;
-	    return flags.equals(i.flags()) && container.isSame(i.container());
+	    return flags.equals(i.flags()) && ts.isSame(container, i.container());
 	}
 
 	return false;

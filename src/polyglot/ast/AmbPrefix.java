@@ -6,6 +6,13 @@ package polyglot.ast;
  */
 public interface AmbPrefix extends Prefix, Ambiguous
 {
+    /**
+     * Prefix of the prefix.
+     */
     Prefix prefix();
+
+    /**
+     * Ambiguous name.
+     */
     String name();
 }

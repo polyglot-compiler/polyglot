@@ -12,6 +12,8 @@ SOURCES = \
 	ConstArrayTypeNode_c.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES)
+JAR_FILE = carray.jar
 
 all: $(CLASSES)
 	$(subdirs)
@@ -19,4 +21,3 @@ all: $(CLASSES)
 clean clobber: cleanclasses
 	$(subdirs)
 
-release: release_src

@@ -13,7 +13,6 @@ CC			= gcc
 JC_FLAGS 		= -g -d $(OUTPUT) $(JAVAC_PATHS) -deprecation
 RMIC_FLAGS		= -d $(OUTPUT) -classpath $(CLASSPATH)
 
-JAR_FILE		= polyglot.jar
 JAR_FLAGS		= cf 
 
 JAVADOC_MAIN		= com.sun.tools.javadoc.Main
@@ -25,14 +24,14 @@ BIN 			= $(SOURCE)/bin
 JIF			= $(BIN)/jifc
 JIF_FLAGS		= -d $(OUTPUT) -sourcepath $(BUILDPATH)
 
+RELEASE                 = $(SOURCE)/release
 SOURCEPATH		= $(SOURCE)
 PACKAGEPATH		= $(SOURCE)/classes/$(PACKAGE)
 VPATH			= $(PACKAGEPATH)
-RELPATH			= $(SOURCE)/release/jif
-REL_DOC			= $(RELPATH)/doc
-REL_IMG			= $(RELPATH)/images
-REL_LIB			= $(RELPATH)/lib
-REL_SOURCES		= $(SOURCES)
+
+DIR                     = $(CURDIR)
+MANIFEST                = Makefile $(SOURCES)
+JAR_FILE                = polyglot.jar
 
 # To avoid repeated slashes
 DIR_ = $(DIR)
@@ -64,21 +63,16 @@ clean_java_output:
 classpath:
 	@echo "setenv CLASSPATH $(CLASSPATH)"
 
-release_files:
-	@for i in $(REL_SOURCES); do echo $(REL_SRC)$$i; done
-	echo $(REL_SRC)Makefile
-	@if [ -f package.html ]; then echo $(REL_SRC)package.html; fi
+manifest_files:
+	@for i in $(MANIFEST) /dev/null; do \
+	    if [ -f $(DIR)/$$i -o -d $(DIR)/$$i ]; then \
+	        echo $(DIR)/$$i; \
+	        echo $(DIR)/$$i >> $(SOURCE)/manifest; \
+	    fi; \
+	done
+
+manifest: manifest_files
 	$(subdirs)
-
-release_src:
-	mkdir -p $(REL_SRC)
-	@cp -f $(REL_SOURCES) Makefile $(REL_SRC)
-	@if [ -f package.html ]; then cp package.html $(REL_SRC); fi
-
-release_demo:
-	mkdir -p $(REL_DEMO)
-	@if [ -n "$(DEMOS)" ]; then cp -f $(DEMOS) $(REL_DEMO); fi
-	@if [ -f package.html ]; then cp package.html $(REL_DEMO); fi
 
 define subdirs
 @for i in $(SUBDIRS) ""; do \
@@ -120,4 +114,30 @@ endef
 define ppg
 	$(JAVA) -classpath $(CLASSPATH) polyglot.util.ppg.PPG
 endef
+
+define jar
+	@cd $(SOURCE)/classes; \
+	for f in $(JAR_FILE); do \
+	    x=""; \
+	    for c in $(PACKAGE)/*.class; do \
+	        if [ -f $$c ]; then x="$$x $$c"; fi; \
+	    done; \
+	    if [ ! -z "$$x" ]; then \
+		if [ -f ../$$f ]; then \
+		    echo jar uf ../$$f $$x; \
+		    jar uf ../$$f $$x; \
+		else \
+		    echo jar cf ../$$f $$x; \
+		    jar cf ../$$f $$x; \
+		fi; \
+	    fi; \
+	done
+endef
+
+jar: all
+	$(jar)
+	$(subdirs)
+
+exports:
+	cp $(EXPORTS) $(SOURCE)/export
 

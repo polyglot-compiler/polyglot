@@ -6,6 +6,13 @@ package polyglot.types;
  */
 public interface MemberInstance extends TypeObject
 {
+    /**
+     * Return the member's flags.
+     */
     Flags flags();
+
+    /**
+     * Return the member's containing type.
+     */
     ReferenceType container();
 }

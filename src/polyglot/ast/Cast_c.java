@@ -75,7 +75,7 @@ public class Cast_c extends Expr_c implements Cast
     {
         TypeSystem ts = tc.typeSystem();
 
-        if (! expr.type().isCastValid(castType.type())) {
+        if (! ts.isCastValid(expr.type(), castType.type())) {
 	    throw new SemanticException("Cannot cast the expression of type \"" 
 					+ expr.type() + "\" to type \"" 
 					+ castType.type() + "\".",
@@ -85,24 +85,22 @@ public class Cast_c extends Expr_c implements Cast
 	return type(castType.type());
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-      	throws SemanticException
-    {
-        TypeSystem ts = tc.typeSystem();
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        TypeSystem ts = av.typeSystem();
 
         if (child == expr) {
             if (castType.type().isReference()) {
-                return child.expectedType(ts.Object());
+                return ts.Object();
             }
             else if (castType.type().isNumeric()) {
-                return child.expectedType(ts.Double());
+                return ts.Double();
             }
             else if (castType.type().isBoolean()) {
-                return child.expectedType(ts.Boolean());
+                return ts.Boolean();
             }
         }
 
-        return child;
+        return child.type();
     }
   
     /** Check exceptions thrown by the expression. */

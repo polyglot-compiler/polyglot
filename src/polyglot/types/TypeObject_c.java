@@ -101,11 +101,12 @@ public abstract class TypeObject_c implements TypeObject
 
 	TypeObject o = restore_();
 
-	restoring = false;
-
         if (o.ext() != null) {
-            o.ext().init(o);
+            TypeExt ext = o.ext().restore();
+            o.setExt(ext);
         }
+
+	restoring = false;
 
 	return o;
     }

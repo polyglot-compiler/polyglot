@@ -13,8 +13,15 @@ package polyglot.types;
  *    have one whose behavior is reasonable.
  */
 public abstract class ClassResolver implements Resolver {
+    /**
+     * Find a type by name.
+     */
     public abstract Type findType(String name) throws SemanticException;
 
+    /**
+     * Find a qualifier (a type or package) by name.
+     * Defaults to just invoking <code>findType</code>.
+     */
     public Qualifier findQualifier(String name) throws SemanticException {
         return findType(name);
     }

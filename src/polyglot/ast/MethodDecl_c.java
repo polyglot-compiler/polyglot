@@ -185,7 +185,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
             Context c = ar.context();
             TypeSystem ts = ar.typeSystem();
 
-            ParsedClassType ct = c.currentClass();
+            ParsedClassType ct = c.currentClassScope();
 
             MethodInstance mi = makeMethodInstance(ct, ts);
 
@@ -196,19 +196,15 @@ public class MethodDecl_c extends Node_c implements MethodDecl
     }
 
     public NodeVisitor addMembersEnter(AddMemberVisitor am) {
-        ParsedClassType ct = am.context().currentClass();
+        ParsedClassType ct = am.context().currentClassScope();
         ct.addMethod(mi);
         return am.bypassChildren(this);
     }
 
-    public void enterScope(Context c) {
+    public Context enterScope(Context c) {
         Types.report(5, "enter scope of method " + name);
-        c.pushCode(mi);
-    }
-
-    public void leaveScope(Context c) {
-        Types.report(5, "leave scope of method " + name);
-        c.popCode();
+        c = c.pushCode(mi);
+        return c;
     }
 
     /** Type check the method. */
@@ -253,7 +249,50 @@ public class MethodDecl_c extends Node_c implements MethodDecl
             }
         }
 
+        overrideMethodCheck(tc);
+        abstractMethodCheck(tc);
+
 	return this;
+    }
+
+    protected void overrideMethodCheck(TypeChecker tc) throws SemanticException {
+        TypeSystem ts = tc.typeSystem();
+
+        for (Iterator j = ts.overrides(mi).iterator(); j.hasNext(); ) {
+            MethodInstance mj = (MethodInstance) j.next();
+
+            if (! ts.isAccessible(mj, tc.context())) {
+                continue;
+            }
+
+            if (! ts.canOverride(mi, mj)) {
+                throw new SemanticException("Cannot override " + mj + " in " +
+                                            mj.container() + " with " + mi +
+                                            " in " + mi.container() + ".",
+                                            mi.position());
+            }
+        }
+    }
+
+    protected void abstractMethodCheck(TypeChecker tc) throws SemanticException {
+        ClassType type = tc.context().currentClass();
+        TypeSystem ts = tc.typeSystem();
+
+        // FIXME: check that we implement methods of interfaces and abstract
+        // superclasses.
+        if (type.flags().isAbstract() || type.flags().isInterface()) {
+            return;
+        }
+
+        // Check for abstract methods.
+        if (mi.flags().isAbstract()) {
+            // Clear all flags for the error message.
+            MethodInstance x = mi.flags(mi.flags().clear());
+            throw new SemanticException("Class \"" + type +
+                                        "\" should be declared abstract; " +
+                                        "it does not implement " + x + ".",
+                                        type.position());
+        }
     }
 
     /** Check exceptions thrown by the method. */
@@ -272,15 +311,15 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 		    TypeNode tn = (TypeNode) j.next();
 		    Type tj = tn.type();
 
-		    if (ts.isSame(t, tj) || ts.descendsFrom(t, tj)) {
+		    if (ts.isSubtype(t, tj)) {
 			throwDeclared = true;
 			break;
 		    }
 		}
 
 		if (! throwDeclared) {
-			ec.throwsSet().clear();
-			throw new SemanticException("Method \"" + name +
+                    ec.throwsSet().clear();
+                    throw new SemanticException("Method \"" + name +
 			"\" throws the undeclared exception \"" + t + "\".",
 		        position());
 		}
@@ -359,9 +398,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
         prettyPrintHeader(flags, w, tr);
 
 	if (body != null) {
-	    enterScope(c);
-	    printSubStmt(body, w, tr);
-	    leaveScope(c);
+	    printSubStmt(body, w, tr.context(enterScope(c)));
 	}
 	else {
 	    w.write(";");

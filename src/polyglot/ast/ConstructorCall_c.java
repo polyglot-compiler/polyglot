@@ -193,13 +193,12 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	return constructorInstance(ci);
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-      	throws SemanticException
-    {
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        TypeSystem ts = av.typeSystem();
+
         if (child == qualifier) {
             // FIXME: Can be more specific
-            TypeSystem ts = tc.typeSystem();
-            return child.expectedType(ts.Object());
+            return ts.Object();
         }
 
         Iterator i = this.arguments.iterator();
@@ -210,11 +209,11 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	    Type t = (Type) j.next();
 
             if (e == child) {
-                return child.expectedType(t);
+                return t;
             }
         }
 
-        return child;
+        return child.type();
     }
 
     public String toString() {

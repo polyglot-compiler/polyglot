@@ -59,11 +59,12 @@ SOURCES = \
 	VarInstance.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES)
+JAR_FILE = polyglot.jar
 
 all: $(CLASSES)
 	$(subdirs)
 
-release: release_src
-
 clean clobber: cleanclasses
 	$(subdirs)
+

@@ -97,12 +97,8 @@ public class For_c extends Stmt_c implements For
 	return reconstruct(inits, cond, iters, body);
     }
 
-    public void enterScope(Context c) {
-	c.pushBlock();
-    }
-
-    public void leaveScope(Context c) {
-	c.popBlock();
+    public Context enterScope(Context c) {
+	return c.pushBlock();
     }
 
     /** Type check the statement. */
@@ -110,7 +106,7 @@ public class For_c extends Stmt_c implements For
 	TypeSystem ts = tc.typeSystem();
 
 	if (cond != null &&
-	    ! cond.type().isImplicitCastValid(ts.Boolean())) {
+	    ! ts.isImplicitCastValid(cond.type(), ts.Boolean())) {
 	    throw new SemanticException(
 		"The condition of a for statement must have boolean type.",
 		cond.position());
@@ -119,16 +115,14 @@ public class For_c extends Stmt_c implements For
 	return this;
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-      	throws SemanticException
-    {
-        TypeSystem ts = tc.typeSystem();
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        TypeSystem ts = av.typeSystem();
 
         if (child == cond) {
-            return child.expectedType(ts.Boolean());
+            return ts.Boolean();
         }
 
-        return child;
+        return child.type();
     }
 
     /** Write the statement to an output file. */
@@ -174,12 +168,6 @@ public class For_c extends Stmt_c implements For
 	w.write(")");
 
 	printSubStmt(body, w, tr);
-    }
-
-    public void translate(CodeWriter w, Translator tr) {
-	enterScope(tr.context());
-        super.translate(w, tr);
-	leaveScope(tr.context());
     }
 
     public String toString() {

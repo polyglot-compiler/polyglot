@@ -45,37 +45,24 @@ public class ConstructorInstance_c extends ProcedureInstance_c
     }
 
     public String toString() {
-	String s = "constructor " + flags.translate() + container + "(";
-
-	for (Iterator i = argTypes.iterator(); i.hasNext(); ) {
-	    Type t = (Type) i.next();
-	    s += t.toString();
-
-	    if (i.hasNext()) {
-	        s += ", ";
-	    }
-	}
-
-	s += ")";
-
-	return s;
+	return designator() + " " + flags.translate() + signature();
     }
     
     public String signature() {
-		String s = container + "(";
+        String s = container + "(";
 
-		for (Iterator i = argTypes.iterator(); i.hasNext(); ) {
-		    Type t = (Type) i.next();
-		    s += t.toString();
+        for (Iterator i = argTypes.iterator(); i.hasNext(); ) {
+            Type t = (Type) i.next();
+            s += t.toString();
 
-		    if (i.hasNext()) {
-		        s += ",";
-		    }
-		}
+            if (i.hasNext()) {
+                s += ",";
+            }
+        }
 
-		s += ")";
+        s += ")";
 
-		return s;
+        return s;
     }
 
     public String designator() {

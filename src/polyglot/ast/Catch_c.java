@@ -69,12 +69,8 @@ public class Catch_c extends Stmt_c implements Catch
 	return reconstruct(formal, body);
     }
 
-    public void enterScope(Context c) {
-        c.pushBlock();
-    }
-
-    public void leaveScope(Context c) {
-        c.popBlock();
+    public Context enterScope(Context c) {
+        return c.pushBlock();
     }
 
     /** Type check the catch block. */
@@ -104,14 +100,11 @@ public class Catch_c extends Stmt_c implements Catch
     }
 
     public void translate(CodeWriter w, Translator tr) {
-        Context c = tr.context();
-
 	w.write("catch (");
 	printBlock(formal, w, tr);
 	w.write(")");
 
-	enterScope(c);
-	printSubStmt(body, w, tr);
-	leaveScope(c);
+	Context c = enterScope(tr.context());
+	printSubStmt(body, w, tr.context(c));
     }
 }

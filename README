@@ -1,88 +1,132 @@
-Polyglot 0.9
-            Polyglot Extensible Compiler Toolkit
+Polyglot 0.9.2
 
-When reading this file you have already downloaded and unpacked the Polyglot
-Distribution. Your installation directory contains the following sub-folders:
+                    Polyglot Extensible Compiler Toolkit
+                    ------------------------------------
 
-  - src: the complete source code of Polyglot 0.9
-  - lib: the Polyglot library files and the "CUP Parser Generator for Java"
-    library (a Copyright notice for CUP can be found at the end of this document)
-  - doc: the documentations about writing Polyglot extensions
-  - demo: Jif sample programs
+Since you are reading this file, you have already downloaded and unpacked the
+Polyglot distribution.  Your installation directory contains the following
+sub-directories:
+
+  - polyglot: the complete source code of Polyglot 0.9
+  - doc: old documentation about writing Polyglot extensions
+  - javadoc: Javadoc descriptions of Polyglot classes
   - images: Logos
 
-Installation Instructions
---------------------------
 
-First ensure javac is in your path and that you are using JDK 1.2
-or later.
+Disclaimer
+----------
 
-1. Create "bin" directory and running scripts.
+Polglot is ALPHA software.  Some of the interfaces in the framework may change.
+This may require some extensions to be changed to conform to the new
+interfaces.  Also, Polyglot is not well-documented; in particular, some of the
+javadoc is missing or out-of-date.  We are working on writing better
+documentation.  Watch the web page:
+
+    http://www.cs.cornell.edu/Projects/polyglot
+
+for further updates.  If you use Polyglot, we'd appreciate your letting us
+know.  Send your comments and bug reports to Nate Nystrom at
+nystrom@cs.cornell.edu.
+
+
+Requirements
+------------
+
+Polyglot builds on Unix and on Windows using the Cygwin environment.  We
+recommend that you use JDK 1.3 or later.  We have experienced problems with
+versions of the JDK older than 1.3.  You must ensure that java and javac are in
+your path.
+
+Creating an extension
+---------------------
+
+To create your own extensions, see the file doc/Overview.txt.
+
+Building Polyglot
+-----------------
+
+Follow the following steps to build the base compiler and the installed
+extensions.
+
+1. First ensure javac is in your path and that you are using JDK 1.3 or later.
+Suppose the root directory of the Polyglot installation (the directory this
+README is in) is $POLYGLOT.
+
+2. Configure the build environment.
 
 On Unix, do:
 
-    sh ./configure
+    $ sh ./configure
 
-On Windows NT, you will need the Cygwin environment. While running sh, do:
+On Windows NT, you will need the Cygwin environment.  While running sh, do:
 
-    sh ./configure
+    $ sh ./configure
 
-2. Update PATH and CLASSPATH.
+This script will locate java and javac and determine the values of some
+Java properties.  The script will create Defs.mk and bin/defs.
 
-Suppose <polyglot> is the absolute path of your Polyglot installation directory.
+Running configure with no options will create a Defs.mk file for building all
+installed language extensions.  You may optionally specify on the command line,
+the names of the extensions to build.  The installed extensions can be found in
+the directory polyglot/ext
 
--- Add "<polyglot>/bin" to your PATH environment variable or copy all the files
-in "<polyglot>/bin" to a directory in PATH.
+3. Run make:
 
--- [Jif only] Check your LD_LIBRARY_PATH environment variable on Unix systems,
-and your PATH environment variable on Windows systems. Make sure the value
-contains <polyglot>/lib.
+    $ make
 
--- Update your CLASSPATH environment variable.
+Class files will be dumped in the $POLYGLOT/classes directory.
+You may optionally:
 
-On Unix, do:
+    $ make jar
 
-    CLASSPATH=$CLASSPATH:<polyglot>/lib/polyglot.jar:<polyglot>/lib/jif.jar:<polyglot>/lib/java_cup.jar
+to create jar files for polyglot and each extension.
+
+4. Update PATH and CLASSPATH.
+
+Add $POLYGLOT/bin to your PATH environment variable.
+
+Update your CLASSPATH environment variable.  On Unix, do:
+
+    $ CLASSPATH=$CLASSPATH:$POLYGLOT/classes:$POLYGLOT/java_cup.jar
 
 On Windows, do:
 
-    set CLASSPATH=%CLASSPATH%;<polyglot>\lib\polyglot.jar;<polyglot>\lib\jif.jar;<polyglot>\lib\java_cup.jar
+    $ set CLASSPATH=%CLASSPATH%;$POLYGLOT\classes;$POLYGLOT\java_cup.jar
 
-3. [Jif only] Test Jif compiler
+If you created jar files, adjust the classpath accordingly.
 
-First, you need to create some principals. In Jif, principals are represented
-by classes in the jif.principal package. Suppose <foo> is the directory you
-like to put the jif.principal package in, run:
+4. You are now ready to try out Polyglot.  See doc/Overview.txt for
+instructions on building an extension.  To compile using an existing
+extension do:
 
-    ./bin/sampleusers <foo>
-    ./bin/localusers <foo>
+    $ jlc -ext <extname> File.jl
 
-"sampleusers" is a utility to create some sample principals like Alice and
-Bob. "localusers" will generate Jif principals for users on your local
-machine. Make sure that <foo> is in your CLASSPATH environment variable.
+To compile using the base compiler:
 
-Go to the demo directory, run:
+    $ jlc File.jl
 
-    jif Hello.jif
-    java Hello
+Credits
+-------
 
-If you see "Hello, the world!" printed on the screen, you have successfully
-installed Polyglot. Otherwise, make sure that you have followed every
-instruction in step 1 and 2. If you still cannot run the Hello demo, please
-contact the authors.
+The current Polyglot developers are:
 
-For more information:
----------------------
+        Nathaniel Nystrom
+        Michael Clarkson
+        Andrew C. Myers
 
-For information on how to run the Polyglot translator (jlc) from the command
-line, see the file README-JLC.txt
+Other Polyglot contributers:
 
-For information on specific Java language extensions included with
-this release (e.g. Jif, PolyJ, etc.), see the appropriate README-*
-file in this directory.
+        Matt Harren
+        Aleksey Kliger
+        Naveen Sastry
+        Dan Spoonhower
+        Steve Zdancewic
+        Lantian Zheng
 
-For information on rebuilding Polyglot, see the file src/README.
+Michael Brukman and Andrew Myers wrote the PPG parser generator.
 
+Some of the class file parsing code is derived from the BLOAT bytecode
+optimizer written by Nathaniel Nystrom, David Whitlock, and Antony Hosking.
 
 Restrictions on distribution
 ----------------------------
@@ -128,10 +172,8 @@ other tortious action, arising out of or in connection with the use or
 performance of this software.
 
 
-
-Some of the class file parsing code in polyglot/types/reflect is derived
-from the BLOAT bytecode optimizer.
------------------------------------------------------------------------
+BLOAT Copyright Notice, License, and Disclaimer
+-----------------------------------------------
 
 All files in the distribution of BLOAT (Bytecode Level Optimization
 and Analysis tool for Java(tm)) are Copyright 1997-2001 by the Purdue

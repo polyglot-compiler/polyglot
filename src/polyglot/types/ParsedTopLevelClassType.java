@@ -6,5 +6,8 @@ package polyglot.types;
 public interface ParsedTopLevelClassType extends ParsedClassType,
                                                  TopLevelClassType
 {
+    /**
+     * Set the name of the class.
+     */
     void name(String name);
 }

@@ -7,11 +7,13 @@ include $(SOURCE)/Rules.mk
 SOURCES = \
 	ExtensionInfo.java \
 	Version.java \
-	CovarRetNodeFactory.java \
+	CovarRetTypeSystem.java \
 	CovarRetRewriter.java \
-	CovarRetClassBody_c.java
+	CovarRetMethodInstance_c.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
+MANIFEST = Makefile $(SOURCES) tests
+JAR_FILE = covarRet.jar
 
 all: $(CLASSES)
 	$(subdirs)
@@ -21,5 +23,3 @@ clean: cleanclasses
 
 clobber: cleanclasses
 	$(subdirs)
-
-release: release_src

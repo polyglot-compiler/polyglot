@@ -6,6 +6,13 @@ package polyglot.ast;
  */
 public interface AmbReceiver extends Ambiguous, Receiver
 {
+    /**
+     * Prefix of the receiver.
+     */
     Prefix prefix();
+
+    /**
+     * Ambiguous name.
+     */
     String name();
 }

@@ -11,15 +11,48 @@ import java.util.List;
  */
 public interface Call extends Expr
 {
+    /**
+     * The call's target object.
+     */
     Receiver target();
+
+    /**
+     * Set the call's target.
+     */
     Call target(Receiver target);
 
+    /**
+     * The name of the method to call.
+     */
     String name();
+
+    /**
+     * Set the name of the method to call.
+     */
     Call name(String name);
 
+    /**
+     * The call's arguments.
+     * A list of <code>Expr</code>.
+     * @see polyglot.ast.Expr
+     */
     List arguments();
+
+    /**
+     * Set the call's arguments.
+     * A list of <code>Expr</code>.
+     * @see polyglot.ast.Expr
+     */
     Call arguments(List arguments);
 
+    /**
+     * The type object of the method we are calling.  This is, generally, only
+     * valid after the type-checking pass.
+     */
     MethodInstance methodInstance();
+
+    /**
+     * Set the type object of the method we are calling.
+     */
     Call methodInstance(MethodInstance mi);
 }

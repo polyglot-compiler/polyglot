@@ -7,5 +7,8 @@ package polyglot.types;
 public interface ParsedMemberClassType extends ParsedInnerClassType,
                                                MemberClassType
 {
+    /**
+     * Set the name of the class.
+     */
     void name(String name);
 }

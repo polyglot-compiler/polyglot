@@ -5,7 +5,8 @@
 #
 
 SOURCE = .
-SUBDIRS = polyglot
+SUBDIRS = polyglot bin doc
+TAG = RELEASE_0_9_0
 
 include Rules.mk
 
@@ -30,59 +31,29 @@ clobber:
 	-rm -f $(JAR_FILE)
 	$(subdirs)
 
-javadoc: FORCE
+javadoc:
 	$(javadoc)
 
-norecurse: classes jif polyj split op jmatch
-	$(JC) $(JC_FLAGS) polyglot/main/Main.java
+jar:
+	@rm -f polyglot.jar
+	@for i in $(EXT) ; do rm -f $${i}.jar $${i}rt.jar ; done
+	$(MAKE) -C polyglot jar
 
-jif:
-	$(JC) $(JC_FLAGS) polyglot/ext/jif/ExtensionInfo.java
-polyj:
-	$(JC) $(JC_FLAGS) polyglot/ext/polyj/ExtensionInfo.java
-op:
-	$(JC) $(JC_FLAGS) polyglot/ext/op/ExtensionInfo.java
-split:
-	$(JC) $(JC_FLAGS) polyglot/ext/split/ExtensionInfo.java
-jmatch:
-	$(JC) $(JC_FLAGS) polyglot/ext/jmatch/ExtensionInfo.java
+export: new-manifest export-polyglot
 
-jar: all
-	cd classes ; \
-	$(JAR) $(JAR_FLAGS) ../$(JAR_FILE) `find polyglot -name \*.class`; \
-	$(JAR) $(JAR_FLAGS) ../jif.jar `find jif -name \*.class`
+new-manifest:
+	rm -f manifest
+	$(MAKE) manifest
 
-REL_SOURCES = \
-	Rules.mk \
-	java_cup.jar \
-	jlex.jar \
-	iDoclet.jar \
+export-polyglot:
+	version=`head -1 README | awk '{print $$NF}' | sed 's%[^0-9\.]%%g'`; \
+	rm -rf polyglot-$${version}-src; \
+	mkdir polyglot-$${version}-src; \
+	tar cf - `cat manifest | sed "s%^$(CURDIR)/%%"` | (cd polyglot-$${version}-src; tar xf -); \
+	rm -f polyglot-$${version}-src.tar polyglot-$${version}-src.tar.gz; \
+	tar cf polyglot-$${version}-src.tar polyglot-$${version}-src; \
+	gzip polyglot-$${version}-src.tar
 
-REL_LIBS = \
-	polyglot.jar \
-	java_cup.jar \
-	jif.jar \
-
-release_clean: FORCE
-	rm -rf $(RELPATH)
-	mkdir -p $(RELPATH)
-
-release_doc: FORCE
-	cp LICENSE Readme.html $(RELPATH)
-	mkdir -p $(REL_DOC)
-	mkdir -p $(REL_SRC)
-	mkdir -p $(REL_IMG)
-	cp -f images/*.gif $(REL_IMG)
-	$(MAKE) -C doc release
-
-release: jar release_clean release_doc release_src
-	$(MAKE) -C polyglot/ext/jif/tests release
-	cp -f configure $(RELPATH)/configure
-	$(subdirs)
-	mkdir -p $(REL_LIB)
-	cp $(REL_LIBS) $(REL_LIB)
-	cp lib/*fs.* $(REL_LIB)
-	chmod a+x $(RELPATH)/configure
-	rm polyglot.jar jif.jar
-	
 FORCE:
+
+MANIFEST = Makefile LICENSE README Rules.mk configure java_cup.jar jlex.jar

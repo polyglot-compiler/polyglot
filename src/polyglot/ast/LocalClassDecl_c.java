@@ -49,14 +49,13 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
         return reconstruct(decl);
     }
 
-    public void enterScope(Context c) {
-    }
-
+    /*
     public void leaveScope(Context c) {
         // We should now be back in the scope of the enclosing block.
         // Add the type.
         c.addType(decl.type().toClass().toLocal());
     }
+    */
 
     public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
         return ar.bypassChildren(this);
@@ -89,11 +88,5 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printBlock(decl, w, tr);
 	w.write(";");
-    }
-
-    public void translate(CodeWriter w, Translator tr) {
-        enterScope(tr.context());
-        super.translate(w, tr);
-	leaveScope(tr.context());
     }
 }

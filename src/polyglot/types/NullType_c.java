@@ -24,8 +24,8 @@ public class NullType_c extends Type_c implements NullType
 	return "type(null)";
     }
     
-    public boolean equals(Object o) {
-	return o instanceof NullType;
+    public boolean isSameImpl(Type t) {
+        return t.isNull();
     }
 
     public int hashCode() {
@@ -36,4 +36,28 @@ public class NullType_c extends Type_c implements NullType
     public boolean isNull() { return true; }
 
     public NullType toNull() { return this; }
+
+    public boolean descendsFromImpl(Type ancestor) {
+        if (ancestor.isNull()) return false;
+        if (ancestor.isReference()) return true;
+        return false;
+    }
+
+    public boolean isImplicitCastValidImpl(Type toType) {
+        if (toType.isNull()) return false;
+        if (toType.isReference()) return true;
+        return false;
+    }
+
+    /**
+     * Requires: all type arguments are canonical.  ToType is not a NullType.
+     *
+     * Returns true iff a cast from this to toType is valid; in other
+     * words, some non-null members of this are also members of toType.
+     **/
+    public boolean isCastValidImpl(Type toType) {
+	if (toType.isNull()) return false;
+	if (toType.isReference()) return true;
+        return false;
+    }
 }

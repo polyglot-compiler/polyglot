@@ -69,7 +69,7 @@ public class Do_c extends Stmt_c implements Do
     {
         TypeSystem ts = tc.typeSystem();
 
-        if (! cond.type().isSame(ts.Boolean())) {
+        if (! ts.isSame(cond.type(), ts.Boolean())) {
 	    throw new SemanticException(
 		"Condition of do statement must have boolean type.",
 		cond.position());
@@ -78,16 +78,14 @@ public class Do_c extends Stmt_c implements Do
 	return this;
     }
 
-    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
-      	throws SemanticException
-    {
-        TypeSystem ts = tc.typeSystem();
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+        TypeSystem ts = av.typeSystem();
 
         if (child == cond) {
-            return child.expectedType(ts.Boolean());
+            return ts.Boolean();
         }
 
-        return child;
+        return child.type();
     }
 
     public String toString() {

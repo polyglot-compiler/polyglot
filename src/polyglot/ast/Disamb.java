@@ -11,11 +11,10 @@ import polyglot.util.*;
 public interface Disamb
 {
     /**
-	 * Disambiguate the prefix and name into a unambiguous node type.
-     * @return An unambiguous AST node, or null if disambiguation
-     * 		   fails.
-	 */
-    Node disambiguate(SemanticVisitor v, Position pos,
+     * Disambiguate the prefix and name into a unambiguous node type.
+     * @return An unambiguous AST node, or null if disambiguation fails.
+     */
+    Node disambiguate(ContextVisitor v, Position pos,
 			Prefix prefix, String name) throws SemanticException;
 
 }
