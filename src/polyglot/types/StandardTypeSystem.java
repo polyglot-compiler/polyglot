@@ -47,6 +47,11 @@ public class StandardTypeSystem extends TypeSystem {
     RTEXCEPTION_ = resolver.findClass( "java.lang.RuntimeException");
     CLONEABLE_ = resolver.findClass( "java.lang.Cloneable");
     SERIALIZABLE_ = resolver.findClass( "java.io.Serializable");
+    NULLPOINTER_EXN_ = resolver.findClass("java.lang.NullPointerException");
+    CLASSCAST_EXN_ = resolver.findClass("java.lang.ClassCastException");
+    OUTOFBOUNDS_EXN_ = resolver.findClass("java.lang.ArrayIndexOutOfBoundsException");
+    ARRAYSTORE_EXN_  = resolver.findClass("java.lang.ArrayStoreException");
+    ARITHMETIC_EXN_  = resolver.findClass("java.lang.ArithmeticException");
   }
 
   public LocalContext getLocalContext( ImportTable it, ExtensionFactory ef,
@@ -998,6 +1003,12 @@ public class StandardTypeSystem extends TypeSystem {
   public Type getRTException() { return RTEXCEPTION_; }
   public Type getCloneable() { return CLONEABLE_; }
   public Type getSerializable() { return SERIALIZABLE_; }
+  public Type getNullPointerException() { return NULLPOINTER_EXN_; }
+  public Type getClassCastException()   { return CLASSCAST_EXN_; }
+  public Type getOutOfBoundsException() { return OUTOFBOUNDS_EXN_; }
+  public Type getArrayStoreException()  { return ARRAYSTORE_EXN_; }
+  public Type getArithmeticException()  { return ARITHMETIC_EXN_; }
+
 
   protected final Type NULL_    = new NullType(this);
   protected final Type VOID_    = new PrimitiveType(this, PrimitiveType.VOID);
@@ -1009,15 +1020,20 @@ public class StandardTypeSystem extends TypeSystem {
   protected final Type LONG_    = new PrimitiveType(this, PrimitiveType.LONG);
   protected final Type FLOAT_   = new PrimitiveType(this, PrimitiveType.FLOAT);
   protected final Type DOUBLE_  = new PrimitiveType(this, PrimitiveType.DOUBLE);
-  protected Type OBJECT_      ;
-  protected Type CLASS_       ;
-  protected Type STRING_      ;
-  protected Type THROWABLE_   ;
-  protected Type ERROR_       ;
-  protected Type EXCEPTION_   ;
-  protected Type RTEXCEPTION_ ;
-  protected Type CLONEABLE_   ;
+  protected Type OBJECT_;
+  protected Type CLASS_;
+  protected Type STRING_;
+  protected Type THROWABLE_;
+  protected Type ERROR_;
+  protected Type EXCEPTION_;
+  protected Type RTEXCEPTION_;
+  protected Type CLONEABLE_;
   protected Type SERIALIZABLE_;
+  protected Type NULLPOINTER_EXN_;
+  protected Type CLASSCAST_EXN_;
+  protected Type OUTOFBOUNDS_EXN_;
+  protected Type ARRAYSTORE_EXN_;
+  protected Type ARITHMETIC_EXN_;
   
   protected ClassResolver resolver; //Should do its own caching.
   protected ClassCleaner cleaner;

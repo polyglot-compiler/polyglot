@@ -2,6 +2,7 @@ package jltools.ast;
 
 import jltools.util.*;
 import jltools.types.*;
+import jltools.visit.*;
 
 
 /**
@@ -109,6 +110,16 @@ public class ArrayIndexExpression extends Expression
                     "Array subscript must be an integer.",
 		    Annotate.getLineNumber(index) );
     } 
+
+    return this;
+  }
+
+  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException
+  {
+    TypeSystem ts = ec.getTypeSystem();
+
+    ec.throwsException((ClassType) ts.getNullPointerException());
+    ec.throwsException((ClassType) ts.getOutOfBoundsException());
 
     return this;
   }

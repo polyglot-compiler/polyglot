@@ -1,6 +1,7 @@
 package jltools.ast;
 
 import jltools.util.*;
+import jltools.visit.*;
 import jltools.types.*;
 
 /**
@@ -106,6 +107,18 @@ public class CastExpression extends Expression
     return this;
   }
   
+
+  public Node exceptionCheck(ExceptionChecker ec)
+    throws SemanticException
+  {
+    if (expr.getCheckedType().isReferenceType()) {
+      TypeSystem ts = ec.getTypeSystem();
+      ec.throwsException((ClassType) ts.getClassCastException());
+    }
+
+    return this;
+  }
+
   public void translate_no_override( LocalContext c, CodeWriter w)
   {
     w.begin(0);

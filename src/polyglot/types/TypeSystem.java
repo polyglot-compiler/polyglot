@@ -234,6 +234,11 @@ public abstract class TypeSystem {
   public abstract Type getRTException();
   public abstract Type getCloneable();
   public abstract Type getSerializable();
+  public abstract Type getNullPointerException();
+  public abstract Type getClassCastException();
+  public abstract Type getOutOfBoundsException();
+  public abstract Type getArrayStoreException();
+  public abstract Type getArithmeticException();
 
   /**
    * Returns a non-canonical type object for a class type whose name

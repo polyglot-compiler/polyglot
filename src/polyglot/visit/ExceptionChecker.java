@@ -11,22 +11,29 @@ import java.util.*;
  */
 public class ExceptionChecker extends NodeVisitor
 {  
+  TypeSystem ts;
   SubtypeSet s;
   ErrorQueue eq;
-  private List oldExceptionCheckers;
+  protected List oldExceptionCheckers;
 
-  public ExceptionChecker( ErrorQueue eq )
+  public ExceptionChecker( TypeSystem ts, ErrorQueue eq )
   {
+    this.ts = ts;
     this.eq = eq;
     oldExceptionCheckers = new Vector();
     s = new SubtypeSet();
   }
 
-  private ExceptionChecker (ErrorQueue eq, List oldExceptionCheckers)
+  protected ExceptionChecker (TypeSystem ts, ErrorQueue eq, List oldExceptionCheckers)
   {
     s = new SubtypeSet();
+    this.ts = ts;
     this. eq = eq; 
     this.oldExceptionCheckers = oldExceptionCheckers;
+  }
+
+  public TypeSystem getTypeSystem() {
+    return ts;
   }
 
   public Node override( Node n)
@@ -151,7 +158,7 @@ public class ExceptionChecker extends NodeVisitor
     return s;
   }
 
-  private ExceptionChecker getExceptionChecker ()
+  protected ExceptionChecker getExceptionChecker ()
   {
     ExceptionChecker e = null;
     synchronized ( oldExceptionCheckers )
@@ -162,10 +169,10 @@ public class ExceptionChecker extends NodeVisitor
                     oldExceptionCheckers.size() -1 ) ;
     }
     if ( e != null) return e;
-    return new ExceptionChecker(eq, oldExceptionCheckers); 
+    return new ExceptionChecker(ts, eq, oldExceptionCheckers); 
   }
   
-  private void releaseExceptionChecker(ExceptionChecker oldEC)
+  protected void releaseExceptionChecker(ExceptionChecker oldEC)
   {
     // reuse the ExceptionCheckers. saves an allocation.  
     oldEC.s.clear();

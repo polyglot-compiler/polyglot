@@ -1,6 +1,7 @@
 package jltools.ast;
 
 import jltools.util.*;
+import jltools.visit.*;
 import jltools.types.*;
 
 /**
@@ -521,6 +522,27 @@ public class BinaryExpression extends Expression
 	    return true;
 	default: return false;
 	}
+    }
+
+    public Node exceptionCheck(ExceptionChecker ec)
+      throws SemanticException
+    {
+      TypeSystem ts = ec.getTypeSystem();
+
+      if (throwsArithmeticException()) {
+	ec.throwsException((ClassType) ts.getArithmeticException());
+      }
+
+      if (throwsArrayStoreException()) {
+	ec.throwsException((ClassType) ts.getArrayStoreException());
+      }
+
+      return this;
+    }
+
+    public boolean throwsArrayStoreException() {
+      return operator == ASSIGN && left.getCheckedType().isReferenceType() &&
+	  left instanceof ArrayIndexExpression;
     }
 
     public boolean throwsArithmeticException() {

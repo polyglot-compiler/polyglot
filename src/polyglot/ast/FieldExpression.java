@@ -1,6 +1,7 @@
 package jltools.ast;
 
 import jltools.types.*;
+import jltools.visit.*;
 import jltools.util.*;
 
 import java.util.*;
@@ -62,6 +63,19 @@ public class FieldExpression extends Expression
 
   public FieldExpression( Node target, String name) {
     this(null, target, name, null);
+  }
+
+  public Node exceptionCheck(ExceptionChecker ec)
+    throws SemanticException
+  {
+    TypeSystem ts = ec.getTypeSystem();
+
+    if (target instanceof Expression &&
+	! (target instanceof SpecialExpression)) {
+	ec.throwsException((ClassType) ts.getNullPointerException());
+    }
+
+    return this;
   }
 
   /**

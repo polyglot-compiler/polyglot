@@ -142,7 +142,7 @@ public abstract class Type extends AnnotatedObject implements Serializable
   }
 
   public String toString() {
-    return getTypeString()+(this instanceof AmbiguousType ? "{amb}" : "");
+    return getTypeString() + (this instanceof AmbiguousType ? "{amb}" : "");
   }
 }
 

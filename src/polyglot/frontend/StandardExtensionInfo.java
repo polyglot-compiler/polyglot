@@ -72,7 +72,7 @@ public class StandardExtensionInfo implements ExtensionInfo {
 		break;
 	    case Job.CHECKED:
 		l.add(new TypeChecker(ef, ts, it, eq));
-		l.add(new ExceptionChecker(eq));
+		l.add(new ExceptionChecker(ts, eq));
 		break;
 	    case Job.TRANSLATED:
 		if (Compiler.serializeClassInfo()) {

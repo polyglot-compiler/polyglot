@@ -218,6 +218,14 @@ public class MethodExpression extends Expression
     {
       ec.throwsException( (ClassType)i.next() );
     }
+
+    TypeSystem ts = ec.getTypeSystem();
+
+    if (target instanceof Expression &&
+        ! (target instanceof SpecialExpression)) {
+        ec.throwsException((ClassType) ts.getNullPointerException());
+    }
+
     return this;
   }
   
