@@ -20,39 +20,57 @@ public class ReachChecker extends DataFlow
               true /* replicate finally */);
     }
 
-    public Item createItem(FlowGraph graph, Computation n) {
-        return new DataFlowItem(n == graph.entryNode());
+    public Item createInitialItem() {
+        return DataFlowItem.NOT_REACHABLE;
     }
 
-    class DataFlowItem implements Item {
-        boolean reachable;
+    static class DataFlowItem extends Item {
+        final boolean reachable;
 
-        DataFlowItem(boolean reachable) {
+        private DataFlowItem(boolean reachable) {
             this.reachable = reachable;
         }
+        
+        public static DataFlowItem REACHABLE = new DataFlowItem(true);
+        public static DataFlowItem NOT_REACHABLE = new DataFlowItem(false);
 
         public String toString() {
             return "reachable=" + reachable;
         }
-
-        public Item flow(Computation n) {
-            return this;
+        
+        public boolean equals(Object o) {
+            if (o instanceof DataFlowItem) {
+                return this.reachable == ((DataFlowItem)o).reachable;
+            }
+            return false;
         }
-
-        public boolean meet(Item item) {
-            DataFlowItem x = (DataFlowItem) item;
-
-            boolean old_reachable = reachable;
-            reachable = reachable || x.reachable;
-
-            return reachable != old_reachable;
+        public int hashCode() {
+            return (reachable ? 5423 : 5753);
         }
-
-        public void check(FlowGraph graph, Computation n) throws SemanticException {
-        }
-
     }
 
+    public Item flow(Item in, FlowGraph graph, Computation n) {
+        if (n == graph.entryNode()) {
+            return DataFlowItem.REACHABLE;
+        }
+        else {
+            return in;
+        }
+    }
+
+    public Item confluence(List inItems) {
+        // if any predecessor is reachable, so is this one
+        for (Iterator i = inItems.iterator(); i.hasNext(); ) {
+            if (((DataFlowItem)i.next()).reachable) {
+                return DataFlowItem.REACHABLE;
+            }
+        }
+        return DataFlowItem.NOT_REACHABLE;
+    }
+
+    public void check(FlowGraph graph, Computation n, Item inItem, Item outItem) throws SemanticException {
+    }
+    
     public Block post(FlowGraph graph, Block root) throws SemanticException {
         MAPS:
         for (Iterator i = graph.pathMaps().iterator(); i.hasNext(); ) {
@@ -69,7 +87,7 @@ public class ReachChecker extends DataFlow
                 FlowGraph.Peer p = (FlowGraph.Peer) j.next();
                 n = p.node;
 
-                DataFlowItem item = (DataFlowItem) p.item;
+                DataFlowItem item = (DataFlowItem) p.outItem;
 
                 if (item.reachable) {
                     continue MAPS;

@@ -67,24 +67,27 @@ public class FlowGraph {
     ListKey lk = new ListKey(path_to_finally);
     Peer p = (Peer) pathMap.get(lk);
     if (p == null) {
-      DataFlow.Item item = df.createItem(this, n);
-      p = new Peer(n, path_to_finally, item);
+      p = new Peer(n, path_to_finally);
       pathMap.put(lk, p);
     }
     return p;
   }
 
   static class Peer {
-    DataFlow.Item item;
+    DataFlow.Item inItem;  // Input Item for dataflow analysis
+    DataFlow.Item outItem; // Output Item for dataflow analysis
     Computation node;
-    List succs;
+    List succs; // List of successor Peers
+    List preds; // List of predecessor Peers
     List path_to_finally;
 
-    public Peer(Computation node, List path_to_finally, DataFlow.Item item) {
+    public Peer(Computation node, List path_to_finally) {
       this.node = node;
       this.path_to_finally = path_to_finally;
-      this.item = item;
+      this.inItem = null;
+      this.outItem = null;
       this.succs = new ArrayList();
+      this.preds = new ArrayList();
     }
 
     public String toString() {

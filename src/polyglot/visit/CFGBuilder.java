@@ -308,11 +308,13 @@ public class CFGBuilder implements Copy
 	if (Report.should_report("cfg", 1))
 	    Report.report(1, pp.hashCode() + " -> " + pq.hashCode() + ";");
         pp.succs.add(pq);
+        pq.preds.add(pp);
       }
       else {
 	if (Report.should_report("cfg", 1))
         Report.report(1, pq.hashCode() + " -> " + pp.hashCode() + ";");
         pq.succs.add(pp);
+        pp.preds.add(pq);
       }
     }
 }
