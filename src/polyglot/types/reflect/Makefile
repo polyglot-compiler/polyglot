@@ -14,6 +14,7 @@ SOURCES = \
 	Field.java \
 	GenericAttribute.java \
 	InnerClasses.java \
+	JLCInfo.java \
 	Method.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))

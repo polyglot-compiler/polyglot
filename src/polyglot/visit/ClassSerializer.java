@@ -54,10 +54,14 @@ public class ClassSerializer extends NodeVisitor
 	        return n;
 	    }
 
+	    /* Add the compiler version number. */
+            Version ver = Options.global.extension.version();
+            String suffix = ver.name();
+
 	    // Check if we've already serialized.
-	    if (ct.fieldNamed("jlc$CompilerVersion") != null ||
-		ct.fieldNamed("jlc$SourceLastModified") != null ||
-		ct.fieldNamed("jlc$ClassType") != null) {
+	    if (ct.fieldNamed("jlc$CompilerVersion$" + suffix) != null ||
+		ct.fieldNamed("jlc$SourceLastModified$" + suffix) != null ||
+		ct.fieldNamed("jlc$ClassType$" + suffix) != null) {
 
 		eq.enqueue(ErrorInfo.SEMANTIC_ERROR,
 			   "Cannot serialize class information " +
@@ -69,46 +73,57 @@ public class ClassSerializer extends NodeVisitor
 	    Flags flags = Flags.PUBLIC.set(Flags.STATIC).set(Flags.FINAL);
 
 	    FieldDecl f;
+            FieldInstance fi;
+            InitializerInstance ii;
 
 	    /* Add the compiler version number. */
-            Version ver = Options.global.extension.version();
 	    String version = ver.major() + "." +
 			     ver.minor() + "." +
 			     ver.patch_level();
 
-	    f = nf.FieldDecl(null, flags,
-		             nf.CanonicalTypeNode(null, ts.String()),
-			     "jlc$CompilerVersion",
-			     nf.StringLit(null, version).type(ts.String()));
+            Position pos = Position.COMPILER_GENERATED;
 
-	    f = f.fieldInstance(ts.fieldInstance(null, ct,
-						 flags, ts.String(),
-						 "jlc$CompilerVersion"));
-            f = f.initializerInstance(ts.initializerInstance(null, ct, Flags.STATIC));
+	    fi = ts.fieldInstance(pos, ct,
+                                  flags, ts.String(),
+                                  "jlc$CompilerVersion$" + suffix);
+            ii = ts.initializerInstance(pos, ct, Flags.STATIC);
+	    f = nf.FieldDecl(fi.position(), fi.flags(),
+		             nf.CanonicalTypeNode(fi.position(), fi.type()),
+			     fi.name(),
+			     nf.StringLit(pos, version).type(ts.String()));
+
+	    f = f.fieldInstance(fi);
+            f = f.initializerInstance(ii);
 	    body = body.addMember(f);
 
 	    /* Add the date of the last source file modification. */
 	    long time = date.getTime();
 
-	    f = nf.FieldDecl(null, flags,
-		             nf.CanonicalTypeNode(null, ts.Long()),
-			     "jlc$SourceLastModified",
-			     nf.IntLit(null, time).type(ts.Long()));
-	    f = f.fieldInstance(ts.fieldInstance(null, ct,
-						 flags, ts.Long(),
-						 "jlc$SourceLastModified"));
-            f = f.initializerInstance(ts.initializerInstance(null, ct, Flags.STATIC));
+	    fi = ts.fieldInstance(pos, ct,
+                                  flags, ts.Long(),
+                                  "jlc$SourceLastModified$" + suffix);
+            ii = ts.initializerInstance(pos, ct, Flags.STATIC);
+	    f = nf.FieldDecl(fi.position(), fi.flags(),
+		             nf.CanonicalTypeNode(fi.position(), fi.type()),
+			     fi.name(),
+			     nf.IntLit(pos, time).type(ts.Long()));
+
+	    f = f.fieldInstance(fi);
+            f = f.initializerInstance(ii);
 	    body = body.addMember(f);
 
 	    /* Add the class type info. */
-	    f = nf.FieldDecl(null, flags,
-		             nf.CanonicalTypeNode(null, ts.String()),
-			     "jlc$ClassType",
-			     largeStringLiteral(te.encode(ct)));
-	    f = f.fieldInstance(ts.fieldInstance(null, ct,
-						 flags, ts.String(),
-						 "jlc$ClassType"));
-            f = f.initializerInstance(ts.initializerInstance(null, ct, Flags.STATIC));
+	    fi = ts.fieldInstance(pos, ct,
+                                  flags, ts.String(),
+                                  "jlc$ClassType$" + suffix);
+            ii = ts.initializerInstance(pos, ct, Flags.STATIC);
+	    f = nf.FieldDecl(fi.position(), fi.flags(),
+		             nf.CanonicalTypeNode(fi.position(), fi.type()),
+			     fi.name(),
+			     largeStringLiteral(te.encode(ct)).type(ts.String()));
+
+	    f = f.fieldInstance(fi);
+            f = f.initializerInstance(ii);
 	    body = body.addMember(f);
 
 	    return cn.body(body);
@@ -143,13 +158,15 @@ public class ClassSerializer extends NodeVisitor
 		len += StringUtil.escape(x.charAt(j)).length();
 	    }
 
-	    Expr s = nf.StringLit(null, x.substring(i, j)).type(ts.String());
+	    Expr s = nf.StringLit(Position.COMPILER_GENERATED,
+                                  x.substring(i, j)).type(ts.String());
 
 	    if (result == null) {
 		result = s;
 	    }
 	    else {
-		result = nf.Binary(null, result, Binary.ADD, s).type(ts.String());
+		result = nf.Binary(Position.COMPILER_GENERATED,
+                                   result, Binary.ADD, s).type(ts.String());
 	    }
 
 	    if (j == n)

@@ -105,7 +105,7 @@ public class SourceClassResolver extends LoadedClassResolver
       clazz = loadFile(name);
 
       // Check for encoded type information.
-      if (clazz.encodedClassType() != null) {
+      if (clazz.encodedClassType(version.name()) != null) {
         Types.report(4, "Class " + name + " has encoded type info");
         encodedClazz = clazz;
       }
@@ -133,10 +133,10 @@ public class SourceClassResolver extends LoadedClassResolver
     // If both the source and encoded class are available, we decide which to
     // use based on compiler compatibility and modification times.
     if (encodedClazz != null && source != null) {
-      long classModTime = encodedClazz.sourceLastModified();
+      long classModTime = encodedClazz.sourceLastModified(version.name());
       long sourceModTime = source.lastModified().getTime();
 
-      int comp = checkCompilerVersion(encodedClazz.compilerVersion());
+      int comp = checkCompilerVersion(encodedClazz.compilerVersion(version.name()));
 
       if (classModTime < sourceModTime) {
         Types.report(3, "Source file version is newer than compiled for " +

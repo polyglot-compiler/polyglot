@@ -126,7 +126,7 @@ public class LoadedClassResolver extends ClassResolver
     ClassFile clazz = loadFile(name);
 
     // Check for encoded type information.
-    if (clazz.encodedClassType() != null) {
+    if (clazz.encodedClassType(version.name()) != null) {
       Types.report(4, "Using encoded class type for " + name);
       return getEncodedType(clazz, name);
     }
@@ -146,7 +146,7 @@ public class LoadedClassResolver extends ClassResolver
       // version.
       FieldInstance field;
       
-      int comp = checkCompilerVersion(clazz.compilerVersion());
+      int comp = checkCompilerVersion(clazz.compilerVersion(version.name()));
 
       if (comp == NOT_COMPATIBLE) {
         throw new SemanticException("Unable to find a suitable definition of "
@@ -156,7 +156,7 @@ public class LoadedClassResolver extends ClassResolver
       }
 
       // Alright, go with it!
-      ClassType dt = (ClassType) te.decode(clazz.encodedClassType());
+      ClassType dt = (ClassType) te.decode(clazz.encodedClassType(version.name()));
 
       //HACK: storing median result to avoid circular resolving
       ((CachingResolver) ts.systemResolver()).medianResult(name, dt);

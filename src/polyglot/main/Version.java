@@ -3,6 +3,12 @@ package jltools.main;
 /** This class encapsulates the version of the compiler. */
 public abstract class Version {
     /** 
+     * The name of the language.  Files produced by different languages
+     * are not compatible.
+     */
+    public abstract String name();
+
+    /** 
      * Marks major changes in the output format of the files produced by the
      * compiler. Files produced be different major versions are considered
      * incompatible and will not be used as source of class information.

@@ -63,75 +63,67 @@ public class ClassFile implements LazyClassInitializer {
       return true;
     }
 
-    void setJLCInfo() {
+    JLCInfo getJLCInfo(String ts) {
       // Check if already set.
-      if (initJLCInfo) {
-        return;
+      JLCInfo jlc = (JLCInfo) jlcInfo.get(ts);
+
+      if (jlc != null) {
+        return jlc;
       }
 
-      initJLCInfo = true;
+      jlc = new JLCInfo();
+      jlcInfo.put(ts, jlc);
 
       try {
-        int count = 0;
+        int mask = 0;
 
         for (int i = 0; i < fields.length; i++) {
-          if (fields[i].name().equals("jlc$SourceLastModified")) {
-            sourceLastModified = fields[i].getLong();
-            count++;
+          if (fields[i].name().equals("jlc$SourceLastModified$" + ts)) {
+            jlc.sourceLastModified = fields[i].getLong();
+            mask |= 1;
           }
-          else if (fields[i].name().equals("jlc$CompilerVersion")) {
-            compilerVersion = fields[i].getString();
-            count++;
+          else if (fields[i].name().equals("jlc$CompilerVersion$" + ts)) {
+            jlc.compilerVersion = fields[i].getString();
+            mask |= 2;
           }
-          else if (fields[i].name().equals("jlc$ClassType")) {
-            encodedClassType = fields[i].getString();
-            count++;
+          else if (fields[i].name().equals("jlc$ClassType$" + ts)) {
+            jlc.encodedClassType = fields[i].getString();
+            mask |= 4;
           }
         }
 
-        if (count == 3) {
-          hasJLCInfo = true;
+        if (mask != 7) {
+          // Not all the information is there.  Reset to default.
+          jlc.sourceLastModified = 0;
+          jlc.compilerVersion = null;
+          jlc.encodedClassType = null;
         }
       }
       catch (SemanticException e) {
-      }
-    }
-
-    public long sourceLastModified() {
-      setJLCInfo();
-
-      if (! hasJLCInfo) {
-        return 0;
+        jlc.sourceLastModified = 0;
+        jlc.compilerVersion = null;
+        jlc.encodedClassType = null;
       }
 
-      return sourceLastModified;
+      return jlc;
     }
 
-    public String compilerVersion() {
-      setJLCInfo();
-
-      if (! hasJLCInfo) {
-        return null;
-      }
-
-      return compilerVersion;
+    public long sourceLastModified(String ts) {
+      JLCInfo jlc = getJLCInfo(ts);
+      return jlc.sourceLastModified;
     }
 
-    public String encodedClassType() {
-      setJLCInfo();
-
-      if (! hasJLCInfo) {
-        return null;
-      }
-
-      return encodedClassType;
+    public String compilerVersion(String ts) {
+      JLCInfo jlc = getJLCInfo(ts);
+      return jlc.compilerVersion;
     }
 
-    long sourceLastModified = 0L;
-    String compilerVersion = null;
-    String encodedClassType = null;
-    boolean hasJLCInfo = false;
-    boolean initJLCInfo = false;
+    public String encodedClassType(String ts) {
+      JLCInfo jlc = getJLCInfo(ts);
+      return jlc.encodedClassType;
+    }
+
+    Map jlcInfo = new HashMap();
 
     void read(DataInputStream in) throws IOException {
         // Read in file contents from stream
