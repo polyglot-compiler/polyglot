@@ -50,6 +50,22 @@ public class CarrayTypeSystem extends TypeSystem_c
         if (child instanceof ConstArrayType && !(ancestor instanceof ConstArrayType)) {
             return false;
         }
+
+        if (child.isArray() && ancestor.isArray()) {
+            // both types are arrays.
+            // allow const arrays to be covariantly assignable, but
+            // non-constant arrays are invariant.
+            if (child instanceof ConstArrayType &&
+                  ancestor instanceof ConstArrayType) {
+                return isAssignableSubtype(child.toArray().base(),
+                                           ancestor.toArray().base());
+            }
+            else {
+                // non-const arrays are invariant.
+                return isSame(child, ancestor);
+            }
+        }
+
         return super.isAssignableSubtype(child, ancestor);
     }
 }
