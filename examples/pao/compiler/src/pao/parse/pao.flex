@@ -151,13 +151,12 @@ InputCharacter = [^\r\n]
 WhiteSpace = {LineTerminator} | [ \t\f]
 
 /* comments */
-Comment = {TraditionalComment} | {EndOfLineComment} | {DocumentationComment}
+Comment = {TraditionalComment} | {EndOfLineComment} | {DocumentationComment} | {PrpComment}
 
-TraditionalComment = "/*" [^*] {CommentContent} \*+ "/"
+TraditionalComment = "/*" [^*] ~"*/"
 EndOfLineComment = "//" {InputCharacter}* {LineTerminator}
-DocumentationComment = "/**" {CommentContent} \*+ "/"
-
-CommentContent = ( [^*] | \*+[^*/] )*
+DocumentationComment = "/*" "*"+ [^/*] ~"*/"
+PrpComment = "/*" "*"+ "/" 
 
 /* identifiers */
 Identifier = [:jletter:][:jletterdigit:]*
