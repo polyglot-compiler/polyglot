@@ -26,7 +26,7 @@ public class VariableDeclarationStatement extends Statement
     public Expression initializer;
     // declaration statement that we are a part of; hold it in a weak referenence to 
     // avoid cycles in the ast, so that the gc can perform well
-    WeakReference wrVDS;
+    public WeakReference wrVDS;
 
     /**
      * Creates a new Declarator for a variable named <code>n</code>, with 
