@@ -116,6 +116,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         
         // Member classes of interfaces are implicitly static.
         ParsedClassType ct = tb.currentClass();
+
         if (ct.isMember() && ct.toMember().outer().flags().isInterface()) {
             ct.flags(ct.flags().setStatic());
         }
@@ -126,7 +127,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
     public Node buildTypes_(TypeBuilder tb) throws SemanticException {
 	ParsedClassType type = tb.currentClass();
 	tb.popClass();
-        return type(type);
+        return type(type).flags(type.flags());
     }
 
     public void enterScope(Context c) {
