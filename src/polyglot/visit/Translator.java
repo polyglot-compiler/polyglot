@@ -12,9 +12,24 @@ import java.util.*;
 
 /**
  * A Translator generates output code from the processed AST.
+ * Output is sent to one or more java file in the directory
+ * <code>Options.output_directory</code>.  Each SourceFile in the AST
+ * is output to exactly one java file.  The name of that file is
+ * determined as follows:
+ * <ul>
+ * <li> If the SourceFile has a declaration of a public top-level class "C",
+ * file name is "C.java".  It is an error for there to be more than one
+ * top-level public declaration.
+ * <li> If the SourceFile has no public declarations, the file name
+ * is the input file name (e.g., "X.jl") with the suffix replaced with ".java"
+ * (thus, "X.java").
+ * </ul>
  *
  * To use:
+ * <pre>
  *     new Translator(job, ts, nf, tf).translate(ast);
+ * </pre>
+ * The <code>ast</code> must be either a SourceFile or a SourceCollection.
  */
 public class Translator extends PrettyPrinter implements Copy
 {
@@ -43,6 +58,8 @@ public class Translator extends PrettyPrinter implements Copy
         }
     }
 
+    /** Create a new <code>Translator</code> identical to <code>this</code> but
+     * with new context <code>c</code> */
     public Translator context(Context c) {
         if (c == this.context) {
             return this;
@@ -52,6 +69,7 @@ public class Translator extends PrettyPrinter implements Copy
         return tr;
     }
 
+    /** Copy the translator. */
     public Object copy() {
         try {
             return super.clone();
@@ -61,30 +79,42 @@ public class Translator extends PrettyPrinter implements Copy
         }
     }
 
+    /** Set the outer class context of the translator.  This class is used when
+     * translating "new" expressions for inner classes.  For the expression
+     * "e.new C()", the name "C" needs to be looked up in the context of the
+     * static type of expression "e" (i.e., <code>outerClass</code>), rather
+     * than in the current context returned by <code>context()</code>.
+     */
     public ClassType outerClass() {
         return outerClass;
     }
 
+    /** Destructively set the outer class context of the translator. */
     public void setOuterClass(ClassType ct) {
         this.outerClass = ct;
     }
 
+    /** Get the extension's type system. */
     public TypeSystem typeSystem() {
         return ts;
     }
 
+    /** Get the current context in which we are translating. */
     public Context context() {
         return context;
     }
 
+    /** Get the extension's node factory. */
     public NodeFactory nodeFactory() {
         return nf;
     }
 
+    /** Print an ast node using the given code writer. */
     public void print(Node ast, CodeWriter w) {
         ast.del().translate(w, this);
     }
 
+    /** Translate the entire AST. */
     public boolean translate(Node ast) {
         if (ast instanceof SourceFile) {
             SourceFile sfn = (SourceFile) ast;
@@ -108,6 +138,7 @@ public class Translator extends PrettyPrinter implements Copy
         }
     }
 
+    /** Transate a single SourceFile node */
     protected boolean translateSource(SourceFile sfn) {
         TypeSystem ts = typeSystem();
         NodeFactory nf = nodeFactory();
@@ -189,6 +220,7 @@ public class Translator extends PrettyPrinter implements Copy
         }
     }
 
+    /** Write the package and import declarations for a source file. */
     protected void writeHeader(SourceFile sfn, CodeWriter w) {
 	if (sfn.package_() != null) {
 	    w.write("package ");
@@ -211,6 +243,7 @@ public class Translator extends PrettyPrinter implements Copy
 	}
     }
 
+    /** Get the list of public top-level classes declared in the source file. */
     protected List exports(SourceFile sfn) {
 	List exports = new LinkedList();
 
