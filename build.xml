@@ -47,6 +47,19 @@
     <delete dir="${dist}"/>
   </target>
 
+  <target name="clobber" depends="clean">
+    <delete>
+      <fileset dir="${src}">
+        <include name="**/Grm.java"/>
+	<include name="**/sym.java"/>
+	<include name="**/Lexer.java"/>
+	<include name="**/*_ppg.cup"/>
+	<include name="polyglot/util/ppg/parse/Constant.java"/>
+	<include name="polyglot/util/ppg/parse/Parser.java"/>
+      </fileset>      
+    </delete>
+  </target>
+
   <!-- compile the base compiler excluding the jl extension -->
   <target name="compile-base" depends="init,ppg" 
           description="compile the source">
@@ -191,6 +204,7 @@
     </javac>
   </target>
 
+  <!-- Builds JL -->
   <target name="jl" depends="base">
     <antcall target="jflex-lexer">
       <param name="lexer.dir" value="polyglot/ext/jl/parse"/>
@@ -281,9 +295,10 @@
        @param parser.type  Either "cup" or "ppg".
        @param has-qq       Pass in iff the extension has a qq package.
    -->
-  <target name="standard-ext" depends="standard-ext-qq-dep">
+  <target name="standard-ext">
     <antcall target="standard-ext-lexer"/>
     <antcall target="standard-ext-${parser.type}-parser"/>
+    <antcall target="standard-ext-qq-dep"/>
     <antcall target="compile-ext"/>
   </target>
   
