@@ -11,10 +11,10 @@ import jltools.util.*;
  */
 public class AmbiguityRemover extends NodeVisitor
 {
-  private TypeSystem ts;
-  private ErrorQueue eq;
-  private LocalContext c;
-  private ImportTable it;
+  protected TypeSystem ts;
+  protected ErrorQueue eq;
+  protected LocalContext c;
+  protected ImportTable it;
 
   public AmbiguityRemover( TypeSystem ts, ImportTable it, ErrorQueue eq)
   {

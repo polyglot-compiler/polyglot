@@ -87,9 +87,7 @@ public class FieldExpression extends Expression
    */
   public Node visitChildren( NodeVisitor v) 
   {
-    if ( target == null) 
-      return this;
-    return reconstruct( Node.condVisit(this.ext, v),target.visit( v), name);
+    return reconstruct( Node.condVisit(this.ext, v),Node.condVisit(target, v), name);
   }
 
   public Node typeCheck( LocalContext c) throws SemanticException

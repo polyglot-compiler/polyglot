@@ -62,6 +62,7 @@ include jltools/ext/jif/parse/Makefile
 include jltools/ext/jif/ast/Makefile
 include jltools/ext/jif/types/Makefile
 include jltools/ext/jif/visit/Makefile
+include jltools/ext/jif/extension/Makefile
 
 #generated files:
 gen: $(PARSE_GEN) $(EXTOP_GEN) $(JIFPARSE_GEN)
@@ -86,17 +87,19 @@ ext/op/runtime: $(EXT_OP_RUNTIME_TARGET)
 frontend: util types lex parse ast visit $(FRONTEND_TARGET)
 
 #jif
-jif: gen ext/jif/parse ext/jif/lex ext/jif/ast ext/jif/types ext/jif/visit
+jif: gen ext/jif/parse ext/jif/lex ext/jif/ast ext/jif/types ext/jif/extension ext/jif/visit
 
 ext/jif/parse: util $(EXTJIFPARSE_TARGET)
 
-ext/jif/lex: util ext/jif/parse ext/jif/types $(EXTJIFLEX_TARGET)
+ext/jif/lex: util ext/jif/parse ext/jif/types ext/jif/extension $(EXTJIFLEX_TARGET)
 
 ext/jif/ast: util ext/jif/types  $(EXTJIFAST_TARGET)
 
 ext/jif/types: util types $(JIFTYPES_TARGET)
 
 ext/jif/visit: util visit $(JIFVISIT_TARGET)
+
+ext/jif/extension: util ext/jif/ast/ $(JIFEXTN_TARGET)
 
 main: $(BIN)/jlc $(BIN)/jlcd frontend jif ext/op ext/op/runtime $(MAIN_TARGET)
 
@@ -123,6 +126,7 @@ clean:
 	rm -f jltools/ext/jif/lex/*.class
 	rm -f jltools/ext/jif/types/*.class
 	rm -f jltools/ext/jif/visit/*.class
+	rm -f jltools/ext/jif/extension/*.class
 
 # Delete class files as well as the grammar files, so that we can regenerate 
 # them. Also delete the javadoc & jar file, if they exis, as well as the jlc and 

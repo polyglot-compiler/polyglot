@@ -94,12 +94,12 @@ public class ArrayIndexExpression extends Expression
   public Node typeCheck(LocalContext c) throws SemanticException
   {
     Type btype = base.getCheckedType();
-    if ( !(btype instanceof ArrayType)) {
+    if ( !(btype.isArrayType())) {
       throw new SemanticException(  
                     "Subscript can only follow an array type.");
     }
     else {
-      setCheckedType( ((ArrayType)btype).getBaseType());
+      setCheckedType( (btype.toArrayType()).getBaseType());
     }
 
     Type itype = index.getCheckedType();

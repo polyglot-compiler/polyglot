@@ -124,7 +124,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 
   public Node visitChildren( NodeVisitor v) 
   { 
-    return this;
+      return reconstruct(Node.condVisit(ext, v), getName());
   }
 
   public Node removeAmbiguities( LocalContext c) throws SemanticException
@@ -211,7 +211,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 
   public void dump( CodeWriter w)
   {
-    w.write ("( AMBIGOUS NAME < ");
+    w.write ("( AMBIGUOUS NAME < ");
     for( Iterator i = names.listIterator(); i.hasNext(); ) {
       w.write( (String)i.next());
       if( i.hasNext()) {

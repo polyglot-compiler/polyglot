@@ -74,6 +74,9 @@ public class PrimitiveType extends Type
   }
   public boolean isClassType() { return false; }
   public boolean isArrayType() { return false; }
+    public PrimitiveType toPrimitiveType() {
+	return this;
+    }
 
   public boolean isNumeric() {
     switch(kind) 

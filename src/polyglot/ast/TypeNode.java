@@ -78,10 +78,14 @@ public class TypeNode extends Node
     return type;
   }
 
-  public Node visitChildren(NodeVisitor vis)
+    public String getOriginal() {
+	return original;
+    }
+
+  public Node visitChildren(NodeVisitor v)
   {
     /* Nothing to do. */
-    return this;
+      return reconstruct(Node.condVisit(ext, v), type, original);
   }
    
   public Node readSymbols( SymbolReader sr)
@@ -91,7 +95,7 @@ public class TypeNode extends Node
    
   public Node removeAmbiguities( LocalContext c) throws SemanticException
   {
-    return reconstruct( null, c.getType( type), original);
+    return reconstruct( ext, c.getType( type), original);
   }
 
   public Node typeCheck(LocalContext c)

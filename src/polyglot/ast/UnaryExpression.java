@@ -136,7 +136,7 @@ public class UnaryExpression extends Expression
         throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be numeric.");
       }
-      if( !((PrimitiveType)type).isNumeric()) {
+      if( !(type.toPrimitiveType()).isNumeric()) {
         throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be numeric.");
       }
@@ -150,11 +150,11 @@ public class UnaryExpression extends Expression
         throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be numeric.");
       }
-      if( !((PrimitiveType)type).isNumeric()) {
+      if( !(type.toPrimitiveType()).isNumeric()) {
         throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be numeric.");
       }
-      setCheckedType( PrimitiveType.unaryPromotion( (PrimitiveType)type));
+      setCheckedType( PrimitiveType.unaryPromotion( type.toPrimitiveType()));
       break;
 
     case LOGICALNOT:
@@ -162,7 +162,7 @@ public class UnaryExpression extends Expression
         throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be boolean.");
       }
-      if( !((PrimitiveType)type).isBoolean()) {
+      if( !(type.toPrimitiveType()).isBoolean()) {
         throw new SemanticException( "Operand of " 
                 + getOperatorName() + " operator must be boolean.");
       }

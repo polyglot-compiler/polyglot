@@ -53,6 +53,9 @@ public class ArrayType extends Type
   {
     return false;
   }
+    public ArrayType toArrayType() {
+	return this;
+    }
 
   public boolean isClassType() { return false; }
   public boolean isArrayType() { return true; }

@@ -272,8 +272,8 @@ public class BinaryExpression extends Expression
         throw new SemanticException( 
                   "Operands of numeric comparison operators must be numeric.");
       }
-      if( !((PrimitiveType)ltype).isNumeric() ||
-          !((PrimitiveType)rtype).isNumeric()) {
+      if( !(ltype.toPrimitiveType()).isNumeric() ||
+          !(rtype.toPrimitiveType()).isNumeric()) {
         throw new SemanticException(
                  "Operands of numeric comparison operators must be numeric.");
       }
@@ -284,12 +284,12 @@ public class BinaryExpression extends Expression
     case NE:
       /* See (15.19). */
       if( ltype.isPrimitive()) {
-        if( ((PrimitiveType)ltype).isNumeric()) {
+        if( (ltype.toPrimitiveType()).isNumeric()) {
           if( !rtype.isPrimitive()) {
             throw new SemanticException(
                       "Can only compare two expressions of similar type.");
           }
-          else if( !((PrimitiveType)rtype).isNumeric()) {
+          else if( !(rtype.toPrimitiveType()).isNumeric()) {
             throw new SemanticException(
                       "Can only compare two expressions of similar type.");
           }
@@ -300,7 +300,7 @@ public class BinaryExpression extends Expression
             throw new SemanticException(
                       "Can only compare two expressions of similar type.");
           }
-          else if( ((PrimitiveType)rtype).isNumeric()) {
+          else if( (rtype.toPrimitiveType()).isNumeric()) {
             throw new SemanticException(
                       "Can only compare two expressions of similar type.");
           }
@@ -348,7 +348,7 @@ public class BinaryExpression extends Expression
         throw new SemanticException( 
                   "Additive operators must have numeric operands.");
       }
-      else if( !((PrimitiveType)ltype).isNumeric()) {
+      else if( !(ltype.toPrimitiveType()).isNumeric()) {
         throw new SemanticException( 
                   "Additive operators must have numeric operands.");
       }
@@ -356,13 +356,13 @@ public class BinaryExpression extends Expression
         throw new SemanticException(
                   "Additive operators must have numeric operands.");
       }
-      else if( !((PrimitiveType)rtype).isNumeric()) {
+      else if( !(rtype.toPrimitiveType()).isNumeric()) {
         throw new SemanticException(
                   "Additive operators must have numeric operands.");
       }
       else {
-        setCheckedType( PrimitiveType.binaryPromotion( (PrimitiveType)ltype,
-                                                (PrimitiveType)rtype));
+        setCheckedType( PrimitiveType.binaryPromotion( ltype.toPrimitiveType(),
+                                                rtype.toPrimitiveType()));
       }
       break;
       
@@ -376,14 +376,14 @@ public class BinaryExpression extends Expression
         throw new SemanticException(
                   "Expected numeric operands to multiplicative operator.");
       }
-      else if( !(((PrimitiveType)ltype).isNumeric()
-                 && ((PrimitiveType)rtype).isNumeric())) {
+      else if( !((ltype.toPrimitiveType()).isNumeric()
+                 && (rtype.toPrimitiveType()).isNumeric())) {
         throw new SemanticException(
                   "Expected numeric operands to multiplicative operator.");
       }
       else {
-        setCheckedType( PrimitiveType.binaryPromotion( (PrimitiveType)ltype,
-                                                (PrimitiveType)rtype));
+        setCheckedType( PrimitiveType.binaryPromotion( ltype.toPrimitiveType(),
+                                                rtype.toPrimitiveType()));
       }
       break;
       
@@ -398,13 +398,13 @@ public class BinaryExpression extends Expression
         throw new SemanticException(
                  "Expected primitive operands to bitwise binary operator.");
       }
-      else if( ((PrimitiveType)ltype).isNumeric()
-               && ((PrimitiveType)rtype).isNumeric()) {
-        setCheckedType( PrimitiveType.binaryPromotion( (PrimitiveType)ltype,
-                                                (PrimitiveType)rtype));
+      else if( (ltype.toPrimitiveType()).isNumeric()
+               && (rtype.toPrimitiveType()).isNumeric()) {
+        setCheckedType( PrimitiveType.binaryPromotion( ltype.toPrimitiveType(),
+                                                rtype.toPrimitiveType()));
       }
-      else if( ((PrimitiveType)ltype).isBoolean() 
-               && ((PrimitiveType)rtype).isBoolean()) {
+      else if( (ltype.toPrimitiveType()).isBoolean() 
+               && (rtype.toPrimitiveType()).isBoolean()) {
         setCheckedType( c.getTypeSystem().getBoolean());
       }
       else {
@@ -423,13 +423,13 @@ public class BinaryExpression extends Expression
         throw new SemanticException(
                   "Expected numeric operands to shift operator.");
       }
-      else if( !(((PrimitiveType)ltype).isNumeric()
-                 && ((PrimitiveType)rtype).isNumeric())) {
+      else if( !((ltype.toPrimitiveType()).isNumeric()
+                 && (rtype.toPrimitiveType()).isNumeric())) {
         throw new SemanticException(
                   "Expected numeric operands to shift operator.");
       }
       else {
-        setCheckedType( PrimitiveType.unaryPromotion( (PrimitiveType)ltype));
+        setCheckedType( PrimitiveType.unaryPromotion( ltype.toPrimitiveType()));
       }
       break;
       

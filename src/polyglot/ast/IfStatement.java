@@ -108,7 +108,7 @@ public class IfStatement extends Statement
   public Node typeCheck(LocalContext c) throws SemanticException
   {
     Type ctype = cond.getCheckedType();
-
+    System.out.println("conditional type = " + ctype.getTypeString() + " : " + ctype);
     if( !ctype.equals( c.getTypeSystem().getBoolean())) {
       throw new SemanticException( "Conditional must have boolean type.");
     }

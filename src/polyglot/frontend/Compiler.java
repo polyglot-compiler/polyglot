@@ -9,6 +9,7 @@ import jltools.visit.*;
 import jltools.main.Main;
 
 import jltools.ext.jif.visit.*;
+import jltools.ext.jif.types.*;
 
 import java.io.*;
 import java.util.*;
@@ -450,6 +451,12 @@ public class Compiler implements TargetTable, ClassCleaner
           verbose( this, "exception checking " + job.t.getName() + "...");
           job.ast = exceptionCheck ( job.ast, eq);
 
+	  if (jif) {
+	      verbose( this, "label checking " + job.t.getName() + "...");
+	      job.ast = labelCheck( job.ast, job.it, eq);    
+	  }
+	      
+
           if( hasErrors( job)) { releaseJob( job); return false; }
         
           job.status |= CHECKED;
@@ -693,7 +700,13 @@ public class Compiler implements TargetTable, ClassCleaner
   protected Node removeAmbiguities( Node ast, TableClassResolver cr,
                                     ImportTable it, ErrorQueue eq)
   {
-    AmbiguityRemover ar = new AmbiguityRemover( ts, it, eq);
+    AmbiguityRemover ar;
+    if (jif) {
+	verbose(this, "Using Jif Ambiguity Remover");
+	ar = new JifAmbiguityRemover( ts, it, eq);
+    } else {
+	ar = new AmbiguityRemover( ts, it, eq);
+    }
     return ast.visit( ar);
   }
 
@@ -708,6 +721,19 @@ public class Compiler implements TargetTable, ClassCleaner
     TypeChecker tc = new TypeChecker( ts, it, eq);
     return ast.visit( tc);
   }
+
+  protected Node labelCheck( Node ast, ImportTable it, ErrorQueue eq)
+  {
+      JifTypeSystem jts;
+      try {
+	  jts = (JifTypeSystem)ts;
+      } catch (ClassCastException ce) {
+	  throw new InternalCompilerError("Can't labelcheck without JifTypeSystem");
+      }
+      JifLabelChecker lc = new JifLabelChecker( jts, it, eq);
+      return ast.visit( lc);
+  }
+
 
   protected Node exceptionCheck( Node ast, ErrorQueue eq)
   {

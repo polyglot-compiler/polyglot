@@ -53,10 +53,21 @@ public abstract class Type extends AnnotatedObject implements Serializable
   public abstract boolean isClassType();
   public abstract boolean isArrayType();
 
-    /* Returns a non-null classtype iff isClassType() returns true */
+    /* Returns a non-null classtype iff isClassType() returns true  null otherwise */
     public ClassType toClassType() {
 	return null;
     }
+
+    /* Returns a non-null classtype iff isPrimitiveType() returns true  null otherwise */
+    public PrimitiveType toPrimitiveType() {
+	return null;
+    }
+
+    /* Returns a non-null classtype iff isArrayType() returns true  null otherwise */
+    public ArrayType toArrayType() {
+	return null;
+    }
+
 
   public final Type extendArrayDims(int dims) throws SemanticException
   { 
