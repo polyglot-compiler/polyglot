@@ -271,8 +271,8 @@ public class MethodDecl_c extends Term_c implements MethodDecl
             }
 
             if (! ts.canOverride(mi, mj)) {
-                throw new SemanticException("Cannot override " + mj + " in " +
-                                            mj.container() + " with " + mi +
+                throw new SemanticException("Cannot override " + mj.signature() + " in " +
+                                            mj.container() + " with " + mi.signature() +
                                             " in " + mi.container() + ".",
                                             mi.position());
             }
