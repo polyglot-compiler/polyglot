@@ -11,6 +11,7 @@ import polyglot.util.Position;
 import polyglot.util.ErrorQueue;
 import polyglot.util.ErrorInfo;
 import java.util.HashMap;
+import java.math.BigInteger;
 
 %%
 
@@ -151,13 +152,27 @@ import java.util.HashMap;
     }
 
     private Token int_lit(String s, int radix) {
-        long x = parseLong(s, radix);
-        return new IntegerLiteral(pos(), (int) x, sym.INTEGER_LITERAL);
+	BigInteger x = new BigInteger(s, radix);
+    	BigInteger max = BigInteger.valueOf(Integer.MAX_VALUE);
+	BigInteger min = BigInteger.valueOf(Integer.MIN_VALUE);
+	if (x.compareTo(min) < 0 || x.compareTo(max) > 0) {
+	    eq.enqueue(ErrorInfo.LEXICAL_ERROR, "Integer literal \"" +
+	               yytext() + "\" too large.", pos());
+	    return null;
+	}
+	return new IntegerLiteral(pos(), x.intValue(), sym.INTEGER_LITERAL);
     }
 
     private Token long_lit(String s, int radix) {
-        long x = parseLong(s, radix);
-        return new LongLiteral(pos(), x, sym.LONG_LITERAL);
+	BigInteger x = new BigInteger(s, radix);
+    	BigInteger max = BigInteger.valueOf(Long.MAX_VALUE);
+	BigInteger min = BigInteger.valueOf(Long.MIN_VALUE);
+	if (x.compareTo(min) < 0 || x.compareTo(max) > 0) {
+	    eq.enqueue(ErrorInfo.LEXICAL_ERROR, "Long literal \"" +
+	               yytext() + "\" too large.", pos());
+	    return null;
+	}
+	return new LongLiteral(pos(), x.longValue(), sym.LONG_LITERAL);
     }
 
     private Token float_lit(String s) {
@@ -260,7 +275,7 @@ FloatingPointLiteral = [0-9]+ "." [0-9]* {ExponentPart}?
                      | [0-9]+ {ExponentPart}
 
 ExponentPart = [eE] {SignedInteger}
-SignedInteger = [-+]? [0-9]
+SignedInteger = [-+]? [0-9]+
 
 /* 3.10.4 Character Literals */
 OctalEscape = \\ [0-7]
