@@ -156,7 +156,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 
         List m = new ArrayList(exceptionTypes.size());
         for (int i = 0; i < exceptionTypes.size(); i++) {
-          l.add(ts.unknownType(position()));
+          m.add(ts.unknownType(position()));
         }
 
         MethodInstance mi = ts.methodInstance(position(), ts.Object(),
