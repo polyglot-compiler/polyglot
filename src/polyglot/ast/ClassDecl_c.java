@@ -315,15 +315,16 @@ public class ClassDecl_c extends Term_c implements ClassDecl
             ClassType container = this.type.outer();
 
             while (container instanceof Named) {
-                String name = ((Named) container).name();
-
-                if (name.equals(this.name)) {
-                    throw new SemanticException("Cannot declare member " +
-                                                "class \"" + this.type +
-                                                "\" inside class with the " +
-                                                "same name.", position());
-                }
-
+                if (!container.isAnonymous()) {
+                    String name = ((Named) container).name();
+    
+                    if (name.equals(this.name)) {
+                        throw new SemanticException("Cannot declare member " +
+                                                    "class \"" + this.type +
+                                                    "\" inside class with the " +
+                                                    "same name.", position());
+                    }
+                }    
                 if (container.isNested()) {
                     container = container.outer();
                 }
