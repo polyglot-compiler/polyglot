@@ -91,6 +91,7 @@ public class ImportNode extends Node {
   {
     ImportTable it = sr.getImportTable();
 
+    System.err.println( "Adding import: " + imports);
     switch( type)
     {
     case CLASS:

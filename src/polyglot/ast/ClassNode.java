@@ -242,9 +242,24 @@ public class ClassNode extends ClassMember {
     return this;
   }
 
+  public Node adjustScope( LocalContext c)
+  {
+    // FIXME
+    return null;
+  }
+
+  public Node removeAmbiguities( LocalContext c)
+  {
+
+    c.popScope(); 
+    return this;
+  }
+
   public Node typeCheck( LocalContext c)
   {
     // FIXME: implement;
+
+    c.popScope(); 
     return this;
   }
 

@@ -12,10 +12,13 @@ public class AmbiguityRemover extends NodeVisitor
   private LocalContext c;
   private ImportTable it;
 
-  public AmbiguityRemover( TypeSystem ts, ErrorQueue eq)
+  public AmbiguityRemover( TypeSystem ts, ImportTable it, ErrorQueue eq)
   {
     this.ts = ts;
+    this.it = it;
     this.eq = eq;
+    
+    c = new LocalContext( it, null, null, ts);
   }
 
   public Node visitBefore(Node n)

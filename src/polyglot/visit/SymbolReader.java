@@ -42,17 +42,27 @@ public class SymbolReader extends NodeVisitor
 
   public void pushClass( String name)
   {
-    current = new ParsedClassType( ts, current);
+    String fullName;
 
-    current.setFullName( (packageName == null ? name : 
-                                packageName + "." + name));
-    cr.addClass( name, current);
+    if( current == null) {
+      fullName = (packageName == null ? "" : 
+                                packageName + ".") + name;
+    }
+    else {
+      fullName = current.getFullName() + "." + name;
+    }
+
+    current = new ParsedClassType( ts, current);
+    current.setFullName( fullName);
+
+    cr.addClass( fullName, current);
   }
 
   public void popClass()
   {
     ClassType c = current.getContainingClass();
-    if( !(c instanceof ParsedClassType)) {
+
+    if( !(c instanceof ParsedClassType || c == null)) {
       throw new InternalCompilerError( 
                   "Too many pops from containing class stack.");
     }

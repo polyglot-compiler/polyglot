@@ -146,7 +146,7 @@ public class SourceFileNode extends Node {
    public Node readSymbols( SymbolReader sr) throws TypeCheckException
    {
      sr.setPackageName( packageName);
-     return this;
+     return null;
    }
 
   public Node removeAmbiguities( LocalContext c)

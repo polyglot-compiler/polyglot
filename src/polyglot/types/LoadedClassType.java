@@ -4,12 +4,13 @@
 
 package jltools.types;
 
+import jltools.util.TypedList;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.ArrayList;
-import jltools.util.TypedList;
+import java.util.*;
+
 
 /**
  * LoadedClassType
@@ -24,8 +25,11 @@ public class LoadedClassType extends ClassTypeImpl  {
    * Constructs a new LoadedClassType from a given class, within a given
    * typeSystem.
    **/
-  public LoadedClassType(Class theClass, TypeSystem typeSys) throws TypeCheckException {
+  public LoadedClassType(Class theClass, TypeSystem typeSys) 
+       throws TypeCheckException 
+  {
     super( typeSys);    
+    this.theClass = theClass;
     
     // Set up names and classType.    
     String rawName = theClass.getName(); // pkg1.pkg2.class$inner1$inner2
@@ -37,7 +41,13 @@ public class LoadedClassType extends ClassTypeImpl  {
     this.flags = AccessFlags.flagsForInt(theClass.getModifiers());
 
     if (! this.fullName.equals("java.lang.Object")) {
-      this.superType = ts.typeForClass(theClass.getSuperclass());
+      Class superClass = theClass.getSuperclass();
+      if( superClass != null) {
+        this.superType = ts.typeForClass(theClass.getSuperclass());
+      }
+      else {
+        this.superType = null;
+      }
     }
 
     Class[] interfaceAry = theClass.getInterfaces();
@@ -58,24 +68,66 @@ public class LoadedClassType extends ClassTypeImpl  {
       this.innerName = rawName;
     }
 	
-    // Now for the members!
+    /* Now for the members, add these lazily. 
+     * That is only add them if someone asks for them. */
+    this.fields = null;
+    this.methods = null;
+  }
+
+  public List getFields()
+  {
+    if( fields == null) {
+      try {
+        initializeFields();
+      }
+      catch( TypeCheckException e) {
+        e.printStackTrace();
+        return new LinkedList();
+      }
+    }
+    return super.getFields();
+  }
+
+  public List getMethods()
+  {
+    if( methods == null) {
+      try {
+        initializeMethods();
+      }
+      catch( TypeCheckException e) {
+        e.printStackTrace();
+        return new LinkedList();
+      }
+    }
+    return super.getMethods();
+  }
+
+  protected void initializeFields() throws TypeCheckException
+  {
     Field[]       fieldAry  = theClass.getDeclaredFields();
-    Method[]      methodAry = theClass.getDeclaredMethods();
-    Constructor[] constrAry = theClass.getDeclaredConstructors();
     List fieldLst  = new ArrayList(fieldAry.length + 1);
-    List methodLst = new ArrayList(methodAry.length + constrAry.length + 1);
 
     for (int idx = 0; idx < fieldAry.length; ++idx) {
       fieldLst.add(fieldInstanceForField(fieldAry[idx]));
     }
+
+    fields  = new TypedList(fieldLst,  FieldInstance.class, true);
+  }
+
+  protected void initializeMethods() throws TypeCheckException
+  {
+    Method[]      methodAry = theClass.getDeclaredMethods();
+    Constructor[] constrAry = theClass.getDeclaredConstructors();
+    List methodLst = new ArrayList(methodAry.length + constrAry.length + 1);
+
     for (int idx = 0; idx < methodAry.length; ++idx) {
       methodLst.add(methodTypeForMethod(methodAry[idx]));
     }
     for (int idx = 0; idx < constrAry.length; ++idx) {
       methodLst.add(methodTypeForConstructor(constrAry[idx]));
     }
-    this.fields  = new TypedList(fieldLst,  FieldInstance.class, true);
-    this.methods = new TypedList(methodLst, MethodType.class, true);    
+
+    methods = new TypedList(methodLst, MethodType.class, true);    
   }
 
   protected FieldInstance fieldInstanceForField(Field f) throws TypeCheckException 
@@ -123,5 +175,6 @@ public class LoadedClassType extends ClassTypeImpl  {
     return new ConstructorTypeInstance(ts, argList, excpList, flags);
   }
 
+  Class theClass;
 }
 

@@ -76,7 +76,6 @@ public class Compiler
 
     loadedResolver.setTypeSystem( Compiler.ts);
 
-    System.out.println("Going to init type system");
     try
     {
       ts.initializeTypeSystem();
@@ -94,8 +93,6 @@ public class Compiler
     workList = Collections.synchronizedList( new LinkedList());
 
     initialized = true;
-
-    System.out.println("Setup done.");
   }
 
   public static boolean cleanup() throws IOException
@@ -130,7 +127,17 @@ public class Compiler
   {
     Target t;
     ErrorQueue eq;
-    Node ast = null;
+    Node ast;
+    ImportTable it;
+
+    public Job( Target t, ErrorQueue eq) 
+    {
+      this.t = t;
+      this.eq = eq;
+      
+      ast = null;
+      it = null;
+    }
     
     boolean hasErrors = false;
 
@@ -166,9 +173,7 @@ public class Compiler
 
   public boolean compile( Target t) throws IOException
   {
-    Job job = new Job();
-    job.t = t;
-    job.eq = eqf.createQueue( t.getName(), t.getSourceReader());
+    Job job = new Job( t,eqf.createQueue( t.getName(), t.getSourceReader()));
 
     if( workList.contains( job)) {
       job = (Job)workList.get( workList.indexOf( job));
@@ -193,7 +198,7 @@ public class Compiler
 
       //dump( job.ast);
 
-      readSymbols( job.ast, job.eq);
+      job.it = readSymbols( job.ast, job.eq);
 
       /* At this point, if this is not the first thing in the workList
        * then stop and continue later. */
@@ -202,7 +207,7 @@ public class Compiler
         return !(job.eq.hasErrors());
       }
 
-      removeAmbiguities( job.ast, job.eq);
+      job.ast = removeAmbiguities( job.ast, job.it, job.eq);
 
       // typeCheck( job.ast, job.eq);    
 
@@ -272,15 +277,17 @@ public class Compiler
     }
   }
 
-  protected Node readSymbols( Node ast, ErrorQueue eq)
+  protected ImportTable readSymbols( Node ast, ErrorQueue eq)
   {
     SymbolReader sr = new SymbolReader( parsedResolver, ts, eq);
-    return ast.visit( sr);
+    ast.visit( sr);
+
+    return sr.getImportTable();
   }
 
-  protected Node removeAmbiguities( Node ast, ErrorQueue eq)
+  protected Node removeAmbiguities( Node ast, ImportTable it, ErrorQueue eq)
   {
-    AmbiguityRemover ar = new AmbiguityRemover( ts, eq);
+    AmbiguityRemover ar = new AmbiguityRemover( ts, it, eq);
     return ast.visit( ar);
   }
 

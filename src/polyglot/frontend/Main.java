@@ -105,10 +105,12 @@ public class Main
       }
       else if( args[i].equals( "-fqcn")) 
       {
+        i++;
         options.put( Compiler.OPT_FQCN, new Boolean( true));
       }
       else if( args[i].equals( "-v") || args[i].equals( "-verbose"))
       {
+        i++;
         options.put( Compiler.OPT_VERBOSE, new Boolean( true));
       }
       else
