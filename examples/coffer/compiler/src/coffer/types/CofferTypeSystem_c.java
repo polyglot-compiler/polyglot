@@ -1,6 +1,7 @@
 package polyglot.ext.coffer.types;
 
 import polyglot.ext.param.types.*;
+import polyglot.frontend.Source;
 import polyglot.types.*;
 import polyglot.util.*;
 import java.util.*;
@@ -13,13 +14,14 @@ public class CofferTypeSystem_c extends ParamTypeSystem_c
         // java.lang.Object.
     }
 
-    public ParsedClassType createClassType(LazyClassInitializer init)
+    public ParsedClassType createClassType(LazyClassInitializer init, 
+                                           Source fromSource)
     {
         if (! init.fromClassFile()) {
-            return new CofferParsedClassType_c(this, init);
+            return new CofferParsedClassType_c(this, init, fromSource);
         }
         else {
-            return super.createClassType(init);
+            return super.createClassType(init, fromSource);
         }
     }
 

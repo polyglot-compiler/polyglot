@@ -3,6 +3,8 @@ package polyglot.ext.jl.types;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Source;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.types.Package;
@@ -29,7 +31,7 @@ public class TypeSystem_c implements TypeSystem
      * Initializes the type system and its internal constants (which depend on
      * the resolver).
      */
-    public void initialize(LoadedClassResolver loadedResolver)
+    public void initialize(LoadedClassResolver loadedResolver, ExtensionInfo extInfo)
                            throws SemanticException {
 
         if (Report.should_report(Report.types, 1))
@@ -52,7 +54,7 @@ public class TypeSystem_c implements TypeSystem
         // class names to ClassTypes.  A Job looks up classes first in its
         // import table and then in the system resolver.  The system resolver
         // first tries to find the class in parsed class resolver.
-        this.systemResolver = new CachingResolver(compoundResolver);
+        this.systemResolver = new CachingResolver(compoundResolver, extInfo);
 
         initFlags();
 
@@ -1256,12 +1258,19 @@ public class TypeSystem_c implements TypeSystem
         return defaultClassInit;
     }
 
-    public ParsedClassType createClassType() {
-	return createClassType(defaultClassInitializer());
+    public final ParsedClassType createClassType() {
+        return createClassType(defaultClassInitializer(), null);
+    }
+    public final ParsedClassType createClassType(Source fromSource) {
+        return createClassType(defaultClassInitializer(), fromSource);
     }
 
-    public ParsedClassType createClassType(LazyClassInitializer init) {
-	return new ParsedClassType_c(this, init);
+    public final ParsedClassType createClassType(LazyClassInitializer init) {
+        return createClassType(init, null);
+    }
+
+    public ParsedClassType createClassType(LazyClassInitializer init, Source fromSource) {
+        return new ParsedClassType_c(this, init, fromSource);
     }
 
     public List defaultPackageImports() {

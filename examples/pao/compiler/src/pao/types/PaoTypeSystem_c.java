@@ -2,6 +2,7 @@ package polyglot.ext.pao.types;
 
 import polyglot.types.*;
 import polyglot.ext.jl.types.TypeSystem_c;
+import polyglot.frontend.Source;
 import polyglot.util.*;
 import java.util.*;
 
@@ -13,8 +14,9 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
         return new PaoPrimitiveType_c(this, kind);
     }
 
-    public ParsedClassType createClassType(LazyClassInitializer init) {
-        return new PaoParsedClassType_c(this, init);
+    public ParsedClassType createClassType(LazyClassInitializer init, 
+                                           Source fromSource) {
+        return new PaoParsedClassType_c(this, init, fromSource);
     }
 
     private static final String WRAPPER_PACKAGE = "polyglot.ext.pao.runtime";

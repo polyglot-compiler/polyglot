@@ -49,6 +49,11 @@ public interface ExtensionInfo {
     /** Produce a source factory for this language extension. */
     SourceLoader sourceLoader();
 
+    /**
+     * Adds a dependency from the current job to the given Source. 
+     */
+    void addDependencyToCurrentJob(Source s);
+    
     /** 
      * Produce a job for the given source. A new job will be created if
      * needed. If the <code>Source source</code> has already been processed,

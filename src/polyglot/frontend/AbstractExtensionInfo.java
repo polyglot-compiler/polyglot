@@ -23,9 +23,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected TargetFactory target_factory = null;
 
     /** 
-     * A list of  <code>SourceJob</code>s. We maintain the invariant that if
-     * a <code>SourceJob s</code> is in the <code>worklist</code>, then
-     * <code>s.parent == null</code>.
+     * A list of all active (i.e. uncompleted) <code>SourceJob</code>s.
      */
     protected LinkedList worklist;
 
@@ -220,11 +218,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         if (job.completed()) {
             if (Report.should_report(Report.frontend, 1))
                 Report.report(1, "Job " + job + " completed");
-
-            // Ensure orphaned jobs don't get lost.
-            if (job instanceof SourceJob) {
-                rescueOrphans((SourceJob)job);
-            }
         }
 
         return job.status();
@@ -319,18 +312,21 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected void enforceInvariants(SourceJob job, Pass pass) {
         BarrierPass lastBarrier = job.lastBarrier();
         if (lastBarrier != null) {
-            // make sure that _all_ jobs have completed at least up to 
+            // make sure that _all_ dependent jobs have completed at least up to 
             // the last barrier (not just children).
             //
             // Ideally the invariant should be that only the source jobs that
             // job _depends on_ should be brought up to the last barrier.
             // This is work to be done in the future...
-            List allJobs = new ArrayList(jobs.values());
-            Iterator i = allJobs.iterator();
-            //Iterator i = job.children.iterator();
+            List allDependentSrcs = new ArrayList(job.dependencies());
+            Iterator i = allDependentSrcs.iterator();
             while (i.hasNext()) {
-                Object o = i.next();
+                Source s = (Source)i.next();
+                Object o = jobs.get(s);
                 if (o == COMPLETED_JOB) continue;
+                if (o == null) {
+                    throw new InternalCompilerError("Unknown source " + s);
+                }
                 SourceJob sj = (SourceJob)o;
                 if (sj.pending(lastBarrier.id())) {
                     // Make the job run up to the last barrier.
@@ -346,38 +342,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             }
         }
     }
-            
-    /**
-     * Make sure that the children of the completed Job <code>job</code>
-     * are looked after. To wit, if <code>job</code> was on the worklist, then
-     * the children of <code>job</code> are added to the worklist; otherwise
-     * the parent of <code>job</code> adopts the children of <code>job</code>.
-     */
-    protected void rescueOrphans(SourceJob job) {
-        SourceJob newParent = job.parent();
-        
-        for (Iterator i = job.children().iterator(); i.hasNext(); ) {
-            SourceJob orphan = (SourceJob) i.next();
-            i.remove();
-            orphan.reparent(newParent);
-            
-            if (orphan.completed()) {
-                continue;
-            }
-            if (newParent != null) {
-                if (Report.should_report(Report.frontend, 2))
-                    Report.report(2, "Job " + newParent + " adopting " +
-                                  orphan);
-            }
-            else {
-                if (Report.should_report(Report.frontend, 2)) {
-                    Report.report(2, "Worklist adopting " + orphan);
-                }
-                worklist.add(orphan);
-            }
-        }
-    }
- 
+             
     private static String str(boolean okay) {
         if (okay) {
             return "done";
@@ -440,6 +405,28 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
       return null;
     }
 
+    /**
+     * Adds a dependency from the current job to the given Source. 
+     */
+    public void addDependencyToCurrentJob(Source s) {
+        if (s == null) 
+            return;
+        if (currentJob != null) {
+            Object o = jobs.get(s);
+            if (o != COMPLETED_JOB) {
+                if (Report.should_report(Report.frontend, 2)) {
+                    Report.report(2, "Adding dependency from " + 
+                            currentJob.source() + " to " +
+                            s);
+                }
+                currentJob.sourceJob().addDependency(s);
+            }
+        }
+        else {
+            throw new InternalCompilerError("No current job!");
+        }
+    }
+    
     /** 
      * Add a new <code>SourceJob</code> for the <code>Source source</code>.
      * A new job will be created if
@@ -459,6 +446,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
      * and its job discarded to release resources, then <code>null</code> 
      * will be returned.
      */
+    private long startTime = System.currentTimeMillis(); 
     public SourceJob addJob(Source source, Node ast) {
         Object o = jobs.get(source);
         SourceJob job = null;
@@ -470,24 +458,21 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         else if (o == null) {
             // No appropriate job yet exists, we will create one.
             
-            // find an appropriate parent, if there is one.
-            SourceJob parent = null;
-            if (currentJob != null) {
-                parent = currentJob.sourceJob();
+            job = this.createSourceJob(source, ast);
+
+            // if the current source job caused this job to load, record the
+            // dependency.
+            if (currentJob instanceof SourceJob) {
+               ((SourceJob)currentJob).addDependency(source);
             }
-            job = this.createSourceJob(parent, source, ast);
             
-            // record the job in the map.
+            // record the job in the map and the worklist.
             jobs.put(source, job);
+            worklist.addLast(job);
 
             if (Report.should_report(Report.frontend, 3)) {
                 Report.report(3, "Adding job for " + source + " at the " + 
-                    "request of job " + job.parent());
-            }
-                        
-            // If there is no parent, then add the job to the worklist.
-            if (job.parent() == null) {
-                worklist.add(job);
+                    "request of job " + currentJob);
             }
         }
         else {
@@ -501,8 +486,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
      * Create a new <code>SourceJob</code> for the given source and AST. 
      * In general, this method should only be called by <code>addJob</code>.
      */
-    protected SourceJob createSourceJob(SourceJob parent, Source source, Node ast) {
-        return new SourceJob(this, jobExt(), parent, source, ast);
+    protected SourceJob createSourceJob(Source source, Node ast) {
+        return new SourceJob(this, jobExt(), source, ast);
     }
 
     /**

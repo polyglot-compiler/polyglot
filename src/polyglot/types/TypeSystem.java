@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Source;
 import polyglot.util.Position;
 
 /**
@@ -17,8 +19,9 @@ public interface TypeSystem {
      *
      * @param resolver The resolver to use for loading types from class files
      *                 or other source files.
+     * @param extInfo The ExtensionInfo the TypeSystem is being created for.
      */
-    void initialize(LoadedClassResolver resolver)
+    void initialize(LoadedClassResolver resolver, ExtensionInfo extInfo)
                     throws SemanticException;
 
     /**
@@ -518,6 +521,16 @@ public interface TypeSystem {
      * Create a new empty class.
      */
     ParsedClassType createClassType();
+
+    /**
+     * Create a new empty class.
+     */
+    ParsedClassType createClassType(LazyClassInitializer init, Source fromSource);
+
+    /**
+     * Create a new empty class.
+     */
+    ParsedClassType createClassType(Source fromSource);
 
     /**
      * Return the set of objects that should be serialized into the

@@ -17,24 +17,11 @@ public class SourceJob extends Job
     protected Source source;
 
     /** 
-     * The <code>SourceJob</code> that caused this job to load. The scheduling
-     * of <code>Job</code>s guarantees that child <code>SourceJob</code>s
-     * have completed at least up to the last <code>BarrierPass</code> of the
-     * parent.
-     * 
-     * @see polyglot.frontend.AbstractExtensionInfo
+     * Set of <code>Source</code>s that this SourceJob depends upon.
+     * This will include, but is not limited to, the other Sources that
+     * this SourceJob caused to load.
      */
-    protected SourceJob parent;
-
-    /** 
-     * List of <code>SourceJob</code>s that this SourceJob caused to load.
-     * These <code>SourceJob</code>s are typically loaded with this 
-     * Job references a class not already loaded.
-     * 
-     * We maintain the invariant that for all suitable <code>i</code>,
-     * <code>((SourceJob)this.children.get(i)).parent == this</code>. 
-     */
-    protected List children;
+    protected Set dependencies;
 
 
     /** 
@@ -42,37 +29,23 @@ public class SourceJob extends Job
      */
     public SourceJob(ExtensionInfo lang, 
                      JobExt ext, 
-                     SourceJob parent, 
                      Source source, 
                      Node ast) {
         super(lang, ext, ast);
 
         this.source = source;
-        this.parent = parent;
-        this.children = new LinkedList();
+        this.dependencies = new HashSet();
 
-        if (parent != null) {
-            parent.children().add(this);
+    }
+
+    public Set dependencies() {
+        return dependencies;
+    }
+    
+    public void addDependency(Source s) {
+        if (s != this.source()) {
+            dependencies.add(s);
         }
-    }
-
-    /**
-     * Change the parent of this <code>SourceJob</code> to be parent. 
-     * <code>newParent</code> may be null.
-     */
-    public void reparent(SourceJob newParent) {
-        this.parent = newParent;
-        if (this.parent != null) {
-            this.parent.children().add(this);
-        }
-    }
-
-    public SourceJob parent() {
-        return parent;
-    }
-
-    public List children() {
-        return children;
     }
 
     /**

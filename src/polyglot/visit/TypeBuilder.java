@@ -167,7 +167,7 @@ public class TypeBuilder extends HaltingVisitor
     protected ParsedClassType newClass(Position pos, Flags flags, String name) {
 	TypeSystem ts = typeSystem();
 
-        ParsedClassType ct = ts.createClassType();
+        ParsedClassType ct = ts.createClassType(this.job.source());
 
 	if (inCode) {
             ct.kind(ClassType.LOCAL);
@@ -239,7 +239,7 @@ public class TypeBuilder extends HaltingVisitor
 
 	TypeSystem ts = typeSystem();
 
-        ParsedClassType ct = ts.createClassType();
+        ParsedClassType ct = ts.createClassType(this.job().source());
         ct.kind(ClassType.ANONYMOUS);
         ct.outer(currentClass());
         ct.position(pos);

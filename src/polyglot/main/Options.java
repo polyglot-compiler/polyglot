@@ -191,7 +191,7 @@ public class Options {
             while(st.hasMoreTokens())
             {
                 File f = new File(st.nextToken());
-                if (!source_path.contains(f))
+                if (f != null && !source_path.contains(f))
                     source_path.add(f);
             }
             i++;
@@ -305,7 +305,7 @@ public class Options {
         else if (!args[i].startsWith("-")) {
             source.add(args[i]);
             File f = new File(args[i]).getParentFile();
-            if (!source_path.contains(f))
+            if (f != null && !source_path.contains(f))
                 source_path.add(f);
             i++;
         }

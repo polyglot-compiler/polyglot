@@ -1,6 +1,7 @@
 package polyglot.types;
 
 import polyglot.util.*;
+import polyglot.frontend.ExtensionInfo;
 import polyglot.main.Report;
 import java.util.*;
 
@@ -10,14 +11,16 @@ import java.util.*;
 public class CachingResolver implements Resolver {
     Resolver inner;
     Map cache;
+    ExtensionInfo extInfo;
 
     /**
      * Create a caching resolver.
      * @param inner The resolver whose results this resolver caches.
      */
-    public CachingResolver(Resolver inner) {
+    public CachingResolver(Resolver inner, ExtensionInfo extInfo) {
 	this.inner = inner;
 	this.cache = new HashMap();
+        this.extInfo = extInfo;
     }
 
     /**
@@ -52,6 +55,10 @@ public class CachingResolver implements Resolver {
         else {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "CachingResolver: cached: " + name);
+        }
+        
+        if (q instanceof ParsedClassType) {
+            extInfo.addDependencyToCurrentJob(((ParsedClassType)q).fromSource());
         }
 
 

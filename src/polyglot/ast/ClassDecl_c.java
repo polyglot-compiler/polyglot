@@ -237,6 +237,14 @@ public class ClassDecl_c extends Term_c implements ClassDecl
             // correct
             Context ctxt = ar.context();
             this.type().inStaticContext(ctxt.inStaticContext());
+
+
+        }
+
+        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
+            // make sure that this class has the correct dependencies
+            // recorded for its super classes and interfaces.
+            ar.addSuperDependencies(this.type());
         }
 
         if (ar.kind() != AmbiguityRemover.SUPER) {

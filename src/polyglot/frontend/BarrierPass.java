@@ -20,7 +20,8 @@ public class BarrierPass extends AbstractPass
         if (Report.should_report(Report.frontend, 1))
 	    Report.report(1, job + " at barrier " + id);
         if (Report.should_report(Report.frontend, 2))
-	    Report.report(2, "children of " + job.sourceJob() + " = " + job.sourceJob().children());
+	    Report.report(2, "dependencies of " + job.sourceJob() + 
+                        " = " + job.sourceJob().dependencies());
 
         return !job.compiler().errorQueue().hasErrors();
     }

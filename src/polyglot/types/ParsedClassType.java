@@ -1,5 +1,6 @@
 package polyglot.types;
 
+import polyglot.frontend.Source;
 import polyglot.util.Position;
 
 /**
@@ -12,6 +13,13 @@ public interface ParsedClassType extends ClassType
      * Position of the type's declaration.
      */
     void position(Position pos);
+    
+    /**
+     * The <code>Source</code> that this class type
+     * was loaded from. Should be <code>null</code> if it was not loaded from
+     * a <code>Source</code> during this compilation. 
+     */
+    Source fromSource();
 
     /**
      * Set the class's package.

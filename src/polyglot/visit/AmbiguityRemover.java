@@ -1,5 +1,8 @@
 package polyglot.visit;
 
+import java.util.Iterator;
+import java.util.Stack;
+
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
@@ -50,5 +53,36 @@ public class AmbiguityRemover extends ContextVisitor
         if (Report.should_report(Report.visit, 2))
 	    Report.report(2, "<< " + kind + "::leave " + n + " -> " + m);
         return m;
+    }
+    
+    /**
+     * Add dependencies for the job to the super classes and interface classes
+     * of <code>ct</code>.
+     */
+    public void addSuperDependencies(ClassType ct) {        
+        Stack s = new Stack();
+        s.push(ct);
+        while (! s.isEmpty()) {
+            Type t = (Type) s.pop();
+            if (t.isClass()) {
+                ClassType classt = t.toClass();
+                // add a dependency if its a parsed class type.
+                if (classt instanceof ParsedClassType) {
+                    this.job().extensionInfo().addDependencyToCurrentJob(
+                                      ((ParsedClassType)classt).fromSource());
+                }
+                
+                // add all the interfaces to the stack.
+                for (Iterator i = classt.interfaces().iterator(); i.hasNext(); ) {
+                    s.push(i.next());
+                }
+    
+                // add the superType to the stack.
+                if (classt.superType() != null) {
+                    s.push(classt.superType());
+                }
+            }
+        }
+
     }
 }

@@ -1,11 +1,14 @@
 package polyglot.ext.jl.types;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import polyglot.frontend.Source;
 import polyglot.types.*;
 import polyglot.types.Package;
-import polyglot.frontend.Job;
-import polyglot.util.*;
-import java.io.*;
-import java.util.*;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.TypedList;
 
 /**
  * ParsedClassType
@@ -17,6 +20,7 @@ import java.util.*;
 public class ParsedClassType_c extends ClassType_c implements ParsedClassType
 {
     protected transient LazyClassInitializer init;
+    protected transient Source fromSource;
     protected Type superType;
     protected List interfaces;
     protected List methods;
@@ -35,15 +39,21 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
 	super();
     }
 
-    public ParsedClassType_c(TypeSystem ts, LazyClassInitializer init) {
+    public ParsedClassType_c(TypeSystem ts, LazyClassInitializer init, 
+                             Source fromSource) {
 	super(ts);
         this.init = init;
+        this.fromSource = fromSource;
 
         if (init == null) {
           throw new InternalCompilerError("Null lazy class initializer");
         }
     }
 
+    public Source fromSource() {
+        return fromSource;
+    }
+    
     public Kind kind() {
         return kind;
     }

@@ -3,7 +3,7 @@ package polyglot.ext.coffer.types;
 import polyglot.types.*;
 import polyglot.ext.jl.types.*;
 import polyglot.ext.param.types.*;
-import polyglot.util.*;
+import polyglot.frontend.Source;
 import java.util.*;
 
 public class CofferParsedClassType_c extends ParsedClassType_c
@@ -12,8 +12,9 @@ public class CofferParsedClassType_c extends ParsedClassType_c
     PClass instantiatedFrom;
     Key key;
 
-    public CofferParsedClassType_c(TypeSystem ts, LazyClassInitializer init) {
-        super(ts, init);
+    public CofferParsedClassType_c(TypeSystem ts, LazyClassInitializer init, 
+                                   Source fromSource) {
+        super(ts, init, fromSource);
     }
 
     public PClass instantiatedFrom() {
