@@ -62,6 +62,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         FinalInit5.jl ; FinalInit6.jl ; FinalInit7.jl ;
         ForInit.jl ;
         ForwardRef.jl ; ForwardRef2.jl ; ForwardRef3.jl ;
+        Import.jl ;
         Increment.jl ;
         Infinite.jl (Post, ".*finally clause cannot complete normally.*"); // javac warning
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
