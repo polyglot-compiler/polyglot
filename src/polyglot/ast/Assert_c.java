@@ -6,6 +6,7 @@ import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
 import polyglot.main.Options;
+import java.util.*;
 
 /**
  * An <code>Assert</code> is an assert statement.
@@ -134,5 +135,21 @@ public class Assert_c extends Stmt_c implements Assert
         else {
             prettyPrint(w, tr);
         }
+    }
+
+    public Computation entry() {
+        return cond.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        if (errorMessage != null) {
+            v.visitCFG(cond, errorMessage.entry());
+            v.visitCFG(errorMessage, this);
+        }
+        else {
+            v.visitCFG(cond, this);
+        }
+
+        return succs;
     }
 }

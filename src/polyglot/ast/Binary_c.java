@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.util.*;
 import polyglot.visit.*;
 import polyglot.types.*;
+import java.util.*;
 
 /**
  * A <code>Binary</code> represents a Java binary expression, an
@@ -558,5 +559,43 @@ public class Binary_c extends Expr_c implements Binary
     w.begin(0);
     w.write("(operator " + op + ")");
     w.end();
+  }
+
+  public Computation entry() {
+    return left.entry();
+  }
+
+  public List acceptCFG(CFGBuilder v, List succs) {
+    if (op == COND_AND || op == COND_OR) {
+      // short-circuit
+      if (left instanceof BooleanLit) {
+        BooleanLit b = (BooleanLit) left;
+        if ((b.value() && op == COND_OR) || (! b.value() && op == COND_AND)) {
+          v.visitCFG(left, this);
+        }
+        else {
+          v.visitCFG(left, right.entry());
+          v.visitCFG(right, this);
+        }
+      }
+      else {
+        v.visitCFG(left, CollectionUtil.list(right.entry(), this));
+        v.visitCFG(right, this);
+      }
+    }
+    else {
+      v.visitCFG(left, right.entry());
+      v.visitCFG(right, this);
+    }
+
+    return succs;
+  }
+
+  public List throwTypes(TypeSystem ts) {
+    if (throwsArithmeticException()) {
+      return Collections.singletonList(ts.ArithmeticException());
+    }
+
+    return Collections.EMPTY_LIST;
   }
 }

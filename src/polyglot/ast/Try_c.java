@@ -187,8 +187,26 @@ public class Try_c extends Stmt_c implements Try
     }
 
     public String toString() {
-	return "try { ... } " + (catchBlocks.isEmpty() ? "" : "catch ...") +
-	                        (finallyBlock != null ? "finally { ... }" : "");
+	String s = "try " + tryBlock.toString();
+
+        int count = 0;
+
+	for (Iterator it = catchBlocks.iterator(); it.hasNext(); ) {
+	    Catch cb = (Catch) it.next();
+
+            if (count++ > 2) {
+              s += "...";
+              break;
+            }
+
+            s += " " + cb.toString();
+        }
+
+        if (finallyBlock != null) {
+            s += " finally " + finallyBlock.toString();
+        }
+
+        return s;
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
@@ -206,5 +224,44 @@ public class Try_c extends Stmt_c implements Try
 	    w.write ("finally");
 	    printSubStmt(finallyBlock, w, tr);
 	}
+    }
+
+    public Computation entry() {
+        return tryBlock.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        // Add edges from the try entry to any catch blocks for Error and
+        // RuntimeException.
+        TypeSystem ts = v.typeSystem();
+
+        CFGBuilder v1 = v.push(this, false);
+        CFGBuilder v2 = v.push(this, true);
+
+        for (Iterator i = ts.uncheckedExceptions().iterator(); i.hasNext(); ) {
+            Type type = (Type) i.next();
+            v1.visitThrow(tryBlock.entry(), type);
+        }
+
+        Computation next;
+
+        // Handle the normal return case.  The throw case will be handled
+        // specially.
+        if (finallyBlock == null) {
+            next = this;
+        }
+        else {
+            next = finallyBlock.entry();
+            v.visitCFG(finallyBlock, this);
+        }
+
+        v1.visitCFG(tryBlock, next);
+
+        for (Iterator it = catchBlocks.iterator(); it.hasNext(); ) {
+            Catch cb = (Catch) it.next();
+            v2.visitCFG(cb, next);
+        }
+
+        return succs;
     }
 }

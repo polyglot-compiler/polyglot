@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * A local variable declaration statement: a type, a name and an optional
@@ -190,7 +191,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
     }
 
     public String toString() {
-	return decl.toString();
+	return decl.toString() + ";";
     }
 
     /** Write the declaration to an output file. */
@@ -220,5 +221,20 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
         w.begin(0);
         w.write("(decl " + decl + ")");
         w.end();
+    }
+
+    public Computation entry() {
+        if (init() != null) {
+            return init().entry();
+        }
+        return this;
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        if (init() != null) {
+            v.visitCFG(init(), this);
+        }
+
+        return succs;
     }
 }

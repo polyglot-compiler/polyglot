@@ -21,6 +21,10 @@ public class BarrierPass extends AbstractPass
     public boolean run() {
         Compiler.report(1, job + " at barrier " + id);
 
+        if (job.compiler().errorQueue().hasErrors()) {
+            return false;
+        }
+
         // Bring all our children up to the barrier.
         for (Iterator i = job.children().iterator(); i.hasNext(); ) {
             Job child = (Job) i.next();

@@ -83,7 +83,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
     }
 
     /** Set the body of the constructor. */
-    public ConstructorDecl body(Block body) {
+    public CodeDecl body(Block body) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	n.body = body;
 	return n;

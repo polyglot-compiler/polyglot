@@ -47,12 +47,6 @@ public interface MethodDecl extends ProcedureDecl
      */
     MethodDecl exceptionTypes(List exceptionTypes);
 
-    /** The method's body. */
-    Block body();
-
-    /** Set the method's body. */
-    MethodDecl body(Block body);
-
     /**
      * The method type object.  This field may not be valid until
      * after signature disambiguation.

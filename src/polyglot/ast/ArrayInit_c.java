@@ -155,4 +155,13 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 
 	w.write(" }");
     }
+
+    public Computation entry() {
+        return listEntry(elements, this);
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFGList(elements, this);
+        return succs;
+    }
 }

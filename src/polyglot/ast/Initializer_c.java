@@ -56,7 +56,7 @@ public class Initializer_c extends Node_c implements Initializer
     }
 
     /** Set the body of the initializer. */
-    public Initializer body(Block body) {
+    public CodeDecl body(Block body) {
 	Initializer_c n = (Initializer_c) copy();
 	n.body = body;
 	return n;

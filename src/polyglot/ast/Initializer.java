@@ -10,17 +10,12 @@ import polyglot.types.Flags;
  * constructors.  Such a block can optionally be static, in which case
  * it is executed when the class is loaded.  
  */
-public interface Initializer extends ClassMember 
+public interface Initializer extends CodeDecl 
 {
     /** Get the initializer's flags. */
     Flags flags();
     /** Set the initializer's flags. */
     Initializer flags(Flags flags);
-
-    /** Get the initializer's body. */
-    Block body();
-    /** Set the initializer's body. */
-    Initializer body(Block body);
 
     /**
      * Get the initializer's type object.  This field may not be valid until

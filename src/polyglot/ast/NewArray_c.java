@@ -149,4 +149,16 @@ public class NewArray_c extends Expr_c implements NewArray
 	    tr.print(init, w);
 	}
     }
+
+    public Computation entry() {
+        return listEntry(dims, (init != null ? init.entry() : this));
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFGList(dims, (init != null ? init.entry() : this));
+        if (init != null) {
+            v.visitCFG(init, this);
+        }
+        return succs;
+    }
 }

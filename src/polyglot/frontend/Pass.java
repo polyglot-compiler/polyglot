@@ -26,6 +26,9 @@ public interface Pass
     public static final ID SET_EXPECTED_TYPES = new ID("set-expected-types");
     public static final ID EXC_CHECK = new ID("exc-check");
     public static final ID FOLD = new ID("fold");
+    public static final ID INIT_CHECK = new ID("init-check");
+    public static final ID REACH_CHECK = new ID("reach-check");
+    public static final ID EXIT_CHECK = new ID("exit-check");
     public static final ID DUMP = new ID("dump");
     public static final ID PRE_OUTPUT_ALL = new ID("pre-output-barrier");
     public static final ID SERIALIZE = new ID("serialize");

@@ -11,7 +11,7 @@ import java.util.*;
  * statement.  Contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */
-public class For_c extends Stmt_c implements For
+public class For_c extends Loop_c implements For
 {
     protected List inits;
     protected Expr cond;
@@ -184,5 +184,31 @@ public class For_c extends Stmt_c implements For
         tr.appendSemicolon(false);
         printBlock(s, w, tr);
         tr.appendSemicolon(true);
+    }
+
+    public Computation entry() {
+        return listEntry(inits, (cond != null ? cond.entry() : body.entry()));
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFGList(inits, (cond != null ? cond.entry() : body.entry()));
+
+        if (cond != null) {
+            if (condIsConstantTrue()) {
+                v.visitCFG(cond, body.entry());
+            }
+            else {
+                v.visitCFG(cond, CollectionUtil.list(body.entry(), this));
+            }
+        }
+
+        v.push(this).visitCFG(body, continueTarget());
+        v.visitCFGList(iters, (cond != null ? cond.entry() : body.entry()));
+
+        return succs;
+    }
+
+    public Computation continueTarget() {
+        return listEntry(iters, (cond != null ? cond.entry() : body.entry()));
     }
 }

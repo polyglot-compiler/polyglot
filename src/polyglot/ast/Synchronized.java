@@ -5,7 +5,7 @@ package polyglot.ast;
  * block. Contains an expression being tested and a statement to be executed
  * while the expression is <code>true</code>.
  */
-public interface Synchronized extends Stmt
+public interface Synchronized extends CompoundStmt
 {
     /** The expression to lock. */
     Expr expr();

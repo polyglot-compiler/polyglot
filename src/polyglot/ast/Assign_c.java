@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * An <code>Assign</code> represents a Java assignment expression.
@@ -214,5 +215,28 @@ public class Assign_c extends Expr_c implements Assign
     w.begin(0);
     w.write("(operator " + op + ")");
     w.end();
+  }
+
+  public Computation entry() {
+    return ((LHS) left).lhsEntry(this);
+  }
+
+  public List acceptCFG(CFGBuilder v, List succs) {
+    ((LHS) left).visitAssignCFG(this, v);
+    return succs;
+  }
+
+  public List throwTypes(TypeSystem ts) {
+    List l = new LinkedList();
+
+    if (throwsArithmeticException()) {
+      l.add(ts.ArithmeticException());
+    }
+
+    if (throwsArrayStoreException()) {
+      l.add(ts.ArrayStoreException());
+    }
+
+    return l;
   }
 }

@@ -4,13 +4,14 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * An immutable representation of a Java language <code>while</code>
  * statement.  It contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */ 
-public class While_c extends Stmt_c implements While
+public class While_c extends Loop_c implements While
 {
     protected Expr cond;
     protected Stmt body;
@@ -97,5 +98,26 @@ public class While_c extends Stmt_c implements While
 	printBlock(cond, w, tr);
 	w.write(")");
 	printSubStmt(body, w, tr);
+    }
+
+    public Computation entry() {
+        return cond.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        if (condIsConstantTrue()) {
+            v.visitCFG(cond, body.entry());
+        }
+        else {
+            v.visitCFG(cond, CollectionUtil.list(body.entry(), this));
+        }
+
+        v.push(this).visitCFG(body, cond.entry());
+
+        return succs;
+    }
+
+    public Computation continueTarget() {
+        return cond.entry();
     }
 }

@@ -10,38 +10,15 @@ import java.util.*;
  * A visitor which maintains a context.  This is the base class of the
  * disambiguation and type checking visitors.
  */
-public class ContextVisitor extends HaltingVisitor
+public class ContextVisitor extends ErrorHandlingVisitor
 {
-    protected boolean error;
-    protected Job job;
-    protected TypeSystem ts;
-    protected NodeFactory nf;
     protected ContextVisitor outer;
     protected Context context;
 
     public ContextVisitor(Job job, TypeSystem ts, NodeFactory nf) {
-        this.job = job;
-        this.ts = ts;
-        this.nf = nf;
+        super(job, ts, nf);
         this.outer = null;
         this.context = null;
-        this.error = false;
-    }
-
-    public Job job() {
-        return job;
-    }
-
-    public ErrorQueue errorQueue() {
-        return job.compiler().errorQueue();
-    }
-
-    public NodeFactory nodeFactory() {
-        return nf;
-    }
-
-    public TypeSystem typeSystem() {
-        return ts;
     }
 
     public NodeVisitor begin() {
@@ -54,25 +31,6 @@ public class ContextVisitor extends HaltingVisitor
         outer = null;
 
         return super.begin();
-    }
-
-    protected NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
-        Types.report(1, "enter: " + parent + " -> " + n);
-        return enterCall(n);
-    }
-
-    protected NodeVisitor enterCall(Node n) throws SemanticException {
-        return this;
-    }
-
-    protected Node leaveCall(Node old, Node n, NodeVisitor v)
-        throws SemanticException {
-
-	return leaveCall(n);
-    }
-
-    protected Node leaveCall(Node n) throws SemanticException {
-	return n;
     }
 
     public Context context() {
@@ -117,72 +75,10 @@ public class ContextVisitor extends HaltingVisitor
             v.error = false;
         }
 
-        try {
-            v = (ContextVisitor) v.enterCall(parent, n);
-        }
-	catch (SemanticException e) {
-	    Position position = e.position();
-
-	    if (position == null) {
-		position = n.position();
-	    }
-
-	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-		                 e.getMessage(), position);
-
-            v.error = true;
-        }
-
-        return v;
+        return v.superEnter(parent, n);
     }
 
-    public Node leave(Node old, Node n, NodeVisitor v) {
-        try {
-            if (v instanceof ContextVisitor && ((ContextVisitor) v).error) {
-                Types.report(5, "leave(" + n + "): error below");
-
-                // There was an error below us.
-                if (! catchErrors(n)) {
-                    // Propagate error up one level
-                    this.error = true;
-                    Types.report(5, "leave(" + n + "): error propagated");
-                }
-                else {
-                    Types.report(5, "leave(" + n + "): error not propagated");
-                }
-
-                return n;
-            }
-
-            Types.report(5, "leave(" + n + "): calling leaveCall");
-            Node m = leaveCall(old, n, v);
-
-            // FIXME: hack to allow locals added to the context by enterScope
-            // to propagate outward.  We need this until we have true
-            // "let"-style local decls.  This, of course, makes this visitor
-            // imperative.
-            this.context = this.updateScope(m);
-
-            return m;
-	}
-	catch (SemanticException e) {
-	    Position position = e.position();
-
-	    if (position == null) {
-		position = n.position();
-	    }
-
-	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-		                 e.getMessage(), position);
-
-            // There was an error below us.
-            if (! catchErrors(n)) {
-                // Propagate error up one level
-                this.error = true;
-            }
-
-            // don't visit the node
-            return n;
-        }
+    public NodeVisitor superEnter(Node parent, Node n) {
+        return super.enter(parent, n);
     }
 }

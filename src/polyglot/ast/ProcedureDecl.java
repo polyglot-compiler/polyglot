@@ -8,7 +8,7 @@ import java.util.List;
  * A procedure declaration.  A procedure is the supertype of methods and
  * constructors.
  */
-public interface ProcedureDecl extends ClassMember 
+public interface ProcedureDecl extends CodeDecl 
 {
     /** The procedure's flags. */
     Flags flags();
@@ -25,9 +25,6 @@ public interface ProcedureDecl extends ClassMember
      * @return A list of {@link polyglot.ast.TypeNode TypeNode}.
      */
     List exceptionTypes();
-
-    /** The procedure's body. */
-    Block body();
 
     /**
      * The procedure type object.  This field may not be valid until

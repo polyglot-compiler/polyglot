@@ -5,6 +5,7 @@ import polyglot.ast.*;
 import polyglot.util.*;
 import polyglot.types.*;
 import polyglot.visit.*;
+import java.util.*;
 
 /**
  * A <code>Throw</code> is an immutable representation of a <code>throw</code>
@@ -78,7 +79,7 @@ public class Throw_c extends Stmt_c implements Throw
     }
 
     public String toString() {
-	return "throw " + expr;
+	return "throw " + expr + ";";
     }
 
     /** Write the statement to an output file. */
@@ -86,5 +87,20 @@ public class Throw_c extends Stmt_c implements Throw
 	w.write("throw ");
 	tr.print(expr, w);
 	w.write(";");
+    }
+
+    public Computation entry() {
+        return expr.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFG(expr, this);
+
+        // Throw edges will be handled by visitor.
+        return Collections.EMPTY_LIST;
+    }
+
+    public List throwTypes(TypeSystem ts) {
+      return Collections.singletonList(expr.type());
     }
 }

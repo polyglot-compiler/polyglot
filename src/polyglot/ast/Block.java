@@ -6,7 +6,7 @@ import java.util.List;
  * A <code>Block</code> represents a Java block statement -- an immutable
  * sequence of statements.
  */
-public interface Block extends Stmt
+public interface Block extends CompoundStmt
 {
     /**
      * Get the statements in the block.

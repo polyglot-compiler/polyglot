@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * Am immutable representation of a Java statement with a label.  A labeled
@@ -69,5 +70,14 @@ public class Labeled_c extends Stmt_c implements Labeled
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write(label + ": ");
 	tr.print(statement, w);
+    }
+
+    public Computation entry() {
+        return statement.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.push(this).visitCFG(statement, this);
+        return succs;
     }
 }

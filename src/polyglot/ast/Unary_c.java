@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * A <code>Unary</code> represents a Java unary expression, an
@@ -182,6 +183,15 @@ public class Unary_c extends Expr_c implements Unary
 	    printSubExpr(expr, w, tr);
 	    w.write(op.toString());
 	}
+    }
+
+    public Computation entry() {
+        return expr.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFG(expr, this);
+        return succs;
     }
 
     public Object constantValue() {

@@ -44,12 +44,20 @@ public class VisitorPass extends AbstractPass
             ast = ast.visit(v_);
             v_.finish(ast);
 
+            /*
+            // if the ast did not change, there no need to stop even if there
+            // are errors
+            if (ast == job.ast()) {
+                return true;
+            }
+            */
+
             int nErrsAfter = q.errorCount();
 
             job.ast(ast);
 
             return (nErrsBefore == nErrsAfter);
-            // because, if they're equal, no new errors occured,
+            // because, if they're equal, no new errors occurred,
             // so the run was successful.
         }
 

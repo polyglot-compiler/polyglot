@@ -10,7 +10,7 @@ import java.util.List;
  * labels, rather than having a constant expression, may be lablled
  * default.
  */
-public interface Switch extends Stmt 
+public interface Switch extends CompoundStmt 
 {
     /** The expression on which to switch. */
     Expr expr();

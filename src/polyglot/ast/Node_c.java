@@ -284,6 +284,6 @@ public abstract class Node_c implements Node
           // return new StringPrettyPrinter(5).toString(this);
 
           // Not slow anymore.
-          return "<unknown-node>";
+          return getClass().getName();
     }
 }

@@ -5,6 +5,7 @@ import polyglot.ast.*;
 import polyglot.util.*;
 import polyglot.types.*;
 import polyglot.visit.*;
+import java.util.*;
 
 /**
  * An <code>ArrayAccess</code> is an immutable representation of an
@@ -120,5 +121,39 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	w.write ("[");
 	printBlock(index, w, tr);
 	w.write ("]");
+    }
+
+    public Computation entry() {
+        return array.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFG(array, index.entry());
+        v.visitCFG(index, this);
+        return succs;
+    }
+
+    public Computation lhsEntry(Assign assign) {
+        return array.entry();
+    }
+
+    public void visitAssignCFG(Assign assign, CFGBuilder v) {
+        v.visitCFG(array, index.entry());
+
+        if (assign.operator() != Assign.ASSIGN) {
+            // a[i] OP= e: visit a -> i -> a[i] -> e -> (a[i] OP= e)
+            v.visitCFG(index, this);
+            v.edge(this, assign.right().entry());
+        }
+        else {
+            // a[i] = e: visit a -> i -> e -> (a[i] OP= e)
+            v.visitCFG(index, assign.right().entry());
+        }
+
+        v.visitCFG(assign.right(), assign);
+    }
+
+    public List throwTypes(TypeSystem ts) {
+      return Collections.singletonList(ts.OutOfBoundsException());
     }
 }

@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * A <code>Return</code> represents a <code>return</code> statement in Java.
@@ -121,7 +122,7 @@ public class Return_c extends Stmt_c implements Return
     }
 
     public String toString() {
-	return "return" + (expr != null ? " " + expr : ";");
+	return "return" + (expr != null ? " " + expr : "") + ";";
     }
 
     /** Write the statement to an output file. */
@@ -134,4 +135,17 @@ public class Return_c extends Stmt_c implements Return
 	w.write(";");
     }
 
+    public Computation entry() {
+        if (expr != null) return expr.entry();
+        return this;
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        if (expr != null) {
+            v.visitCFG(expr, this);
+        }
+
+        v.visitReturn(this);
+        return Collections.EMPTY_LIST;
+    }
 }

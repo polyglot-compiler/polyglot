@@ -128,6 +128,9 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
 	l.add(new BarrierPass(Pass.DISAM_ALL, job));
         l.add(new VisitorPass(Pass.TYPE_CHECK, job, new TypeChecker(job, ts, nf)));
 	l.add(new VisitorPass(Pass.EXC_CHECK, job, new ExceptionChecker(ts, compiler.errorQueue())));
+        l.add(new VisitorPass(Pass.REACH_CHECK, job, new ReachChecker(job, ts, nf)));
+        l.add(new VisitorPass(Pass.EXIT_CHECK, job, new ExitChecker(job, ts, nf)));
+        l.add(new VisitorPass(Pass.INIT_CHECK, job, new InitChecker(job, ts, nf)));
 	l.add(new BarrierPass(Pass.PRE_OUTPUT_ALL, job));
 
 	if (compiler.dumpAst()) {

@@ -157,4 +157,36 @@ public class Switch_c extends Stmt_c implements Switch
         w.allowBreak(0, " ");
 	w.write("}");
     }
+
+    public Computation entry() {
+        return expr.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        SwitchElement prev = null;
+
+        List cases = new LinkedList();
+        boolean hasDefault = false;
+
+        for (Iterator i = elements.iterator(); i.hasNext(); ) {
+            SwitchElement s = (SwitchElement) i.next();
+
+            if (s instanceof Case) {
+                cases.add(s.entry());
+                if (((Case) s).expr() == null) {
+                    hasDefault = true;
+                }
+            }
+        }
+
+        // If there is no default case, add an edge to the end of the switch.
+        if (! hasDefault) {
+            cases.add(this);
+        }
+
+        v.visitCFG(expr, cases);
+        v.push(this).visitCFGList(elements, this);
+
+        return succs;
+    }
 }

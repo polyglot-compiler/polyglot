@@ -4,7 +4,7 @@ package polyglot.ast;
  * An <code>ArrayAccess</code> is an immutable representation of an
  * access of an array member.
  */
-public interface ArrayAccess extends Expr 
+public interface ArrayAccess extends LHS, Thrower
 {
     /**
      * Array to access.

@@ -6,7 +6,7 @@ import polyglot.util.Enum;
  * A <code>Binary</code> represents a Java binary expression, an
  * immutable pair of expressions combined with an operator.
  */
-public interface Binary extends Expr 
+public interface Binary extends Expr, Thrower
 {
     /** Binary expression operator. */
     public static class Operator extends Enum {

@@ -279,7 +279,26 @@ public class Call_c extends Expr_c implements Call
   }
 
   public String toString() {
-    return (target != null ? target.toString() + "." : "") + name + "(...)";
+    String s = (target != null ? target.toString() + "." : "") + name + "(";
+
+    int count = 0;
+
+    for (Iterator i = arguments.iterator(); i.hasNext(); ) {
+        if (count++ > 2) {
+            s += "...";
+            break;
+        }
+
+        Expr n = (Expr) i.next();
+        s += n.toString();
+
+        if (i.hasNext()) {
+            s += ", ";
+        }
+    }
+
+    s += ")";
+    return s;
   }
 
   /** Write the expression to an output file. */
@@ -330,5 +349,36 @@ public class Call_c extends Expr_c implements Call
     w.begin(0);
     w.write("(arguments " + arguments + ")");
     w.end();
+  }
+
+  public Computation entry() {
+      if (target instanceof Expr) {
+          return ((Expr) target).entry();
+      }
+      return listEntry(arguments, this);
+  }
+
+  public List acceptCFG(CFGBuilder v, List succs) {
+      if (target instanceof Expr) {
+          Expr t = (Expr) target;
+          v.visitCFG(t, listEntry(arguments, this));
+      }
+
+      v.visitCFGList(arguments, this);
+
+      return succs;
+  }
+
+  public List throwTypes(TypeSystem ts) {
+    List l = new LinkedList();
+
+    l.addAll(mi.exceptionTypes());
+    l.addAll(ts.uncheckedExceptions());
+
+    if (target instanceof Expr && ! (target instanceof Special)) {
+      l.add(ts.NullPointerException());
+    }
+
+    return l;
   }
 }

@@ -182,6 +182,69 @@ public class Field_c extends Expr_c implements Field
     w.end();
   }
 
+  public Computation entry() {
+      if (target instanceof Expr) {
+          return ((Expr) target).entry();
+      }
+      return this;
+  }
+
+  public List acceptCFG(CFGBuilder v, List succs) {
+      if (target instanceof Expr) {
+          v.visitCFG((Expr) target, this);
+      }
+      return succs;
+  }
+
+  public Computation lhsEntry(Assign assign) {
+      if (target instanceof Expr) {
+          return ((Expr) target).entry();
+      }
+      else {
+          if (assign.operator() != Assign.ASSIGN) {
+              return this;
+          }
+          else {
+              return assign.right().entry();
+          }
+      }
+  }
+
+  public void visitAssignCFG(Assign assign, CFGBuilder v) {
+      if (target instanceof Expr) {
+          Expr t = (Expr) target;
+
+          if (assign.operator() != Assign.ASSIGN) {
+              // o.f OP= e: visit o -> o.f -> e -> (o.f OP= e)
+              v.visitCFG(t, this);
+              v.edge(this, assign.right().entry());
+          }
+          else {
+              // o.f = e: visit o -> e -> (o.f OP= e)
+              v.visitCFG(t, assign.right().entry());
+          }
+      }
+      else {
+          if (assign.operator() != Assign.ASSIGN) {
+              // T.f OP= e: visit T.f -> e -> (T.f OP= e)
+              v.edge(this, assign.right().entry());
+          }
+          else {
+              // T.f = e: visit e -> (T.f OP= e)
+          }
+      }
+
+      v.visitCFG(assign.right(), assign);
+  }
+
+  public List throwTypes(TypeSystem ts) {
+      if (target instanceof Expr && ! (target instanceof Special)) {
+          return Collections.singletonList(ts.NullPointerException());
+      }
+
+      return Collections.EMPTY_LIST;
+  }
+
   public boolean isConstant() {
     if (fi != null &&
         (target instanceof TypeNode ||

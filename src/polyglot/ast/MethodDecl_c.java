@@ -96,7 +96,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
     }
 
     /** Set the body of the method. */
-    public MethodDecl body(Block body) {
+    public CodeDecl body(Block body) {
 	MethodDecl_c n = (MethodDecl_c) copy();
 	n.body = body;
 	return n;

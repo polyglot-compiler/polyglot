@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * A <code>Branch</code> is an immutable representation of a branch
@@ -55,5 +56,10 @@ public class Branch_c extends Stmt_c implements Branch
 	    w.write(" " + label);
 	}
 	w.write(";");
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitBranchTarget(this);
+        return Collections.EMPTY_LIST;
     }
 }

@@ -5,6 +5,7 @@ import polyglot.ast.*;
 import polyglot.util.*;
 import polyglot.visit.*;
 import polyglot.types.*;
+import java.util.*;
 
 /**
  * A <code>Cast</code> is an immutable representation of a casting
@@ -127,6 +128,23 @@ public class Cast_c extends Expr_c implements Cast
 	w.allowBreak(2, " ");
 	printSubExpr(expr, w, tr);
 	w.end();
+    }
+
+    public Computation entry() {
+        return expr.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFG(expr, this);
+        return succs;
+    }
+
+    public List throwTypes(TypeSystem ts) {
+        if (expr.type().isReference()) {
+            return Collections.singletonList(ts.ClassCastException());
+        }
+
+        return Collections.EMPTY_LIST;
     }
 
     public Object constantValue() {

@@ -4,13 +4,14 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * A immutable representation of a Java language <code>do</code> statement. 
  * It contains a statement to be executed and an expression to be tested 
  * indicating whether to reexecute the statement.
  */ 
-public class Do_c extends Stmt_c implements Do
+public class Do_c extends Loop_c implements Do
 {
     protected Stmt body;
     protected Expr cond;
@@ -102,4 +103,25 @@ public class Do_c extends Stmt_c implements Do
 	w.write("); ");
     }
 
+
+    public Computation entry() {
+        return body.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.push(this).visitCFG(body, cond.entry());
+
+        if (condIsConstantTrue()) {
+            v.visitCFG(cond, body.entry());
+        }
+        else {
+            v.visitCFG(cond, CollectionUtil.list(body.entry(), this));
+        }
+
+        return succs;
+    }
+
+    public Computation continueTarget() {
+        return cond.entry();
+    }
 }

@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * An <code>Instanceof</code> is an immutable representation of
@@ -106,5 +107,14 @@ public class Instanceof_c extends Expr_c implements Instanceof
 	printSubExpr(expr, w, tr);
 	w.write(" instanceof ");
 	tr.print(compareType, w);
+    }
+
+    public Computation entry() {
+        return expr.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFG(expr, this);
+        return succs;
     }
 }

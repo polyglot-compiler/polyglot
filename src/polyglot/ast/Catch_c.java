@@ -5,6 +5,7 @@ import polyglot.ast.*;
 import polyglot.util.*;
 import polyglot.types.*;
 import polyglot.visit.*;
+import java.util.*;
 
 /**
  * A <code>Catch</code> represents one half of a <code>try... catch</code>
@@ -106,5 +107,14 @@ public class Catch_c extends Stmt_c implements Catch
 
 	Context c = enterScope(tr.context());
 	printSubStmt(body, w, tr.context(c));
+    }
+
+    public Computation entry() {
+        return body.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFG(body, this);
+        return succs;
     }
 }

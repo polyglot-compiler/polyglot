@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * A <code>Case</code> is a representation of a Java <code>case</code>
@@ -164,5 +165,18 @@ public class Case_c extends Stmt_c implements Case
 	    tr.print(expr, w);
 	    w.write(":");
 	}
+    }
+
+    public Computation entry() {
+        if (expr != null) return expr;
+        return this;
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        if (expr != null) {
+            v.visitCFG(expr, this);
+        }
+
+        return succs;
     }
 }

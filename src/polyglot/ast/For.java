@@ -7,7 +7,7 @@ import java.util.*;
  * statement.  Contains a statement to be executed and an expression
  * to be tested indicating whether to reexecute the statement.
  */
-public interface For extends Stmt 
+public interface For extends Loop 
 {    
     /** List of initialization statements.
      * @return A list of {@link polyglot.ast.ForInit ForInit}.
@@ -18,9 +18,6 @@ public interface For extends Stmt
      * @param inits A list of {@link polyglot.ast.ForInit ForInit}.
      */
     For inits(List inits);
-
-    /** Loop condition */
-    Expr cond();
 
     /** Set the loop condition */
     For cond(Expr cond);
@@ -34,9 +31,6 @@ public interface For extends Stmt
      * @param iters A list of {@link polyglot.ast.ForUpdate ForUpdate}.
      */
     For iters(List iters);
-
-    /** Loop body */
-    Stmt body();
 
     /** Set the loop body */
     For body(Stmt body);

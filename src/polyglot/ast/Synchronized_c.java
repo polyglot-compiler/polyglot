@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * An immutable representation of a Java language <code>synchronized</code>
@@ -97,5 +98,15 @@ public class Synchronized_c extends Stmt_c implements Synchronized
 	printBlock(expr, w, tr);
 	w.write(") ");
 	printSubStmt(body, w, tr);
+    }
+
+    public Computation entry() {
+        return expr.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFG(expr, body.entry());
+        v.visitCFG(body, this);
+        return succs;
     }
 }

@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.visit.*;
 import polyglot.types.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * A <code>Conditional</code> is a representation of a Java ternary
@@ -209,6 +210,19 @@ public class Conditional_c extends Expr_c implements Conditional
 	printSubExpr(consequent, false, w, tr);
 	w.write(" : ");
 	printSubExpr(alternative, false, w, tr);
+    }
+
+    public Computation entry() {
+        return cond.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFG(cond, CollectionUtil.list(consequent.entry(),
+                                             alternative.entry()));
+        v.visitCFG(consequent, this);
+        v.visitCFG(alternative, this);
+
+        return succs;
     }
 
     public Object constantValue() {

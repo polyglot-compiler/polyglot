@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * An <code>Eval</code> is a wrapper for an expression in the context of
@@ -58,7 +59,7 @@ public class Eval_c extends Stmt_c implements Eval
     }
 
     public String toString() {
-	return expr.toString();
+	return "eval(" + expr.toString() + ");";
     }
 
     /** Write the statement to an output file. */
@@ -72,5 +73,14 @@ public class Eval_c extends Stmt_c implements Eval
 	}
 
 	tr.appendSemicolon(semi);
+    }
+
+    public Computation entry() {
+        return expr.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFG(expr, this);
+        return succs;
     }
 }

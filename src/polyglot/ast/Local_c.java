@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /** 
  * A local variable expression.
@@ -81,6 +82,26 @@ public class Local_c extends Expr_c implements Local
     w.begin(0);
     w.write("(name " + name + ")");
     w.end();
+  }
+
+  public Computation lhsEntry(Assign assign) {
+    if (assign.operator() != Assign.ASSIGN) {
+      return this;
+    }
+
+    return assign.right().entry();
+  }
+
+  public void visitAssignCFG(Assign assign, CFGBuilder v) {
+    if (assign.operator() != Assign.ASSIGN) {
+        // x OP= e: visit x -> e -> (x OP= e)
+        v.edge(this, assign.right().entry());
+    }
+    else {
+        // x OP= e: visit e -> (x OP= e)
+    }
+
+    v.visitCFG(assign.right(), assign);
   }
 
   public boolean isConstant() {

@@ -45,12 +45,6 @@ public interface ConstructorDecl extends ProcedureDecl
      */
     ConstructorDecl exceptionTypes(List exceptionTypes);
 
-    /** The constructor's body. */
-    Block body();
-
-    /** Set the constructor's body. */
-    ConstructorDecl body(Block body);
-
     /**
      * The constructor type object.  This field may not be valid until
      * after signature disambiguation.

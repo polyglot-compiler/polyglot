@@ -9,7 +9,7 @@ import java.util.List;
  * It may also have either a Type upon which the method is being
  * called or an expression upon which the method is being called.
  */
-public interface Call extends Expr
+public interface Call extends Expr, Thrower
 {
     /**
      * The call's target object.

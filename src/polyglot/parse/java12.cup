@@ -687,7 +687,7 @@ variable_initializer ::=
 method_declaration ::=
                     // MethodDecl
         method_header:a method_body:b
-            {: RESULT = a.body(b); :}
+            {: RESULT = (MethodDecl) a.body(b); :}
     ;
 method_header ::=
                     // MethodDecl

@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /**
  * An immutable representation of a Java language <code>if</code> statement.
@@ -128,5 +129,24 @@ public class If_c extends Stmt_c implements If
 	    w.write ("else");
 	    printSubStmt(alternative, w, tr);
 	}
+    }
+
+    public Computation entry() {
+        return cond.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        if (alternative == null) {
+            v.visitCFG(cond, CollectionUtil.list(consequent.entry(), this));
+            v.visitCFG(consequent, this);
+        }
+        else {
+            v.visitCFG(cond, CollectionUtil.list(consequent.entry(),
+                                                 alternative.entry()));
+            v.visitCFG(consequent, this);
+            v.visitCFG(alternative, this);
+        }
+
+        return succs;
     }
 }

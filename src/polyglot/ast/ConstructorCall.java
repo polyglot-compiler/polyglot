@@ -9,7 +9,7 @@ import java.util.List;
  * a direct call to a constructor of a class in the form of
  * <code>super(...)</code> or <code>this(...)</code>.
  */
-public interface ConstructorCall extends Stmt
+public interface ConstructorCall extends Stmt, Thrower
 {
     /** Constructor call kind: either "super" or "this". */
     public static class Kind extends Enum {

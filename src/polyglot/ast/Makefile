@@ -8,6 +8,9 @@ SOURCES = \
 	NodeFactory.java \
 	AmbExpr.java \
 	Ambiguous.java \
+	LHS.java \
+	Loop.java \
+	CodeDecl.java \
 	Computation.java \
 	Assert.java \
 	AmbPrefix.java \

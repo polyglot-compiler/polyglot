@@ -245,4 +245,28 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
 	w.write(");");
     }
+
+    public Computation entry() {
+        if (qualifier != null) {
+            return qualifier.entry();
+        }
+        return listEntry(arguments, this);
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        if (qualifier != null) {
+            v.visitCFG(qualifier, listEntry(arguments, this));
+        }
+
+        v.visitCFGList(arguments, this);
+
+        return succs;
+    }
+
+    public List throwTypes(TypeSystem ts) {
+        List l = new LinkedList();
+        l.addAll(ci.exceptionTypes());
+        l.addAll(ts.uncheckedExceptions());
+        return l;
+    }
 }

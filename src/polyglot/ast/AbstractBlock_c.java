@@ -88,4 +88,33 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
         Context c = enterScope(tr.context());
         super.translate(w, tr.context(c));
     }
+
+    public Computation entry() {
+        return listEntry(statements, this);
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFGList(statements, this);
+        return succs;
+    }
+
+    public String toString() {
+        String s = "{";
+
+        int count = 0;
+
+        for (Iterator i = statements.iterator(); i.hasNext(); ) {
+            if (count++ > 2) {
+                s += " ...";
+                break;
+            }
+
+            Stmt n = (Stmt) i.next();
+            s += " ";
+            s += n.toString();
+        }
+
+        s += " }";
+        return s;
+    }
 }

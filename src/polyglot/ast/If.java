@@ -5,7 +5,7 @@ package polyglot.ast;
  * Contains an expression whose value is tested, a ``then'' statement 
  * (consequent), and optionally an ``else'' statement (alternate).
  */
-public interface If extends Stmt 
+public interface If extends CompoundStmt 
 {
     /** Get the if's condition. */
     Expr cond();
