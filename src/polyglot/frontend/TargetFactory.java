@@ -68,7 +68,7 @@ public class TargetFactory
 				   + className
 				   + "." + outputExtension);
 
-	if (outputFile.getPath().equals(source.path())) {
+        if (source != null && outputFile.getPath().equals(source.path())) {
 	    throw new InternalCompilerError("The output file is the same as the source file");
 	}
 	
