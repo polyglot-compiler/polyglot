@@ -116,6 +116,9 @@ public interface Node extends JL, Copy
      * (e.g., for <code>x = e</code>, the expected type of <code>e</code> is
      * the declared type of <code>x</code>.
      *
+     * The expected type should impose the least constraints on the child's
+     * type that are allowed by the parent node.
+     *
      * @param child A child expression of this node.
      * @param av An ascription visitor.
      * @return The expected type of <code>child</code>.

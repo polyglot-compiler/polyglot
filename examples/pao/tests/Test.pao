@@ -16,5 +16,11 @@ class Test {
 	Object[] a = new Object[] { 0, 1 };
 	Object[][] b = new Object[][] { { 0, 1}, { 2, 3 } };
 
+        int i = 0;
+        int j = 0;
+
+        Object p = 1 + 2;
+        Object q = i + j;
+        Object r = i + "j";
     }
 }

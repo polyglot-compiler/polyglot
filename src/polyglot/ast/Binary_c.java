@@ -513,7 +513,7 @@ public class Binary_c extends Expr_c implements Binary
             return ts.Long();
         }
 
-        if (op == SUB || op == MUL || op == DIV || op == MOD) {
+        if (op == ADD || op == SUB || op == MUL || op == DIV || op == MOD) {
             return ts.Double();
         }
 
