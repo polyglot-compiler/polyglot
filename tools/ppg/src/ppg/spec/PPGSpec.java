@@ -91,17 +91,19 @@ public class JLgenSpec extends Spec
 		// Parse Code
 		String parseCode = "";
 		// should it be dynamically generated?
-		String currSymbolName = "curr_sym";
+		String currSymbolName = "jlgen_curr_sym";
 		parseCode += "Symbol " + currSymbolName + ";\n\n";
-				
+		
+		// Generate token names		Vector tokens = new Vector();
+		for (int i=0; i < startSyms.size(); i+=2) {			tokens.addElement(new String("JLGEN_TOKEN_"+String.valueOf(i/2)));		}		
 		String startSym, method, token;
-		for (int i=0; i < startSyms.size(); i+=3) {
+		for (int i=0; i < startSyms.size(); i += 2) {
 			startSym = (String) startSyms.elementAt(i);
 			method = (String) startSyms.elementAt(i+1);
-			token = (String) startSyms.elementAt(i+2);
+			token = (String) tokens.elementAt(i/2); //startSyms.elementAt(i+2);
 			parseCode += "public Symbol "+ method + " () throws Exception {\n"+
-						 "\t"+currSymbolName+" = "+"new Symbol(Constant."+token+")"+";\n"+
-						 "\t"+"return parse();\n}\n\n";
+						 "\t"+currSymbolName+" = "+"new Symbol("+
+						 JLgen.SYMBOL_CLASS_NAME+"."+token+")"+";\n"+"\t"+						 "return parse();\n}\n\n";
 		}
 		// append parseCode to the actual parse code
 		cupSpec.parserCode.append(parseCode);
@@ -131,16 +133,21 @@ public class JLgenSpec extends Spec
 		cupSpec.setStart(newStartSym);
 		Nonterminal startNT = new Nonterminal(newStartSym, null);		Vector newSymbols = new Vector();
 		newSymbols.addElement(newStartSym);
-				SymbolList sl = new SymbolList(SymbolList.NONTERMINAL, null, newSymbols);
-		Vector addedSymbols = new Vector(); addedSymbols.addElement(sl);		cupSpec.addSymbols(addedSymbols);		
+		
+		// add start symbol to the grammar		SymbolList sl = new SymbolList(SymbolList.NONTERMINAL, null, newSymbols);
+		Vector addedSymbols = new Vector(); addedSymbols.addElement(sl);		cupSpec.addSymbols(addedSymbols);
+		
+		// add token declaration to the grammar
+		SymbolList tokenList = new SymbolList(SymbolList.TERMINAL, "Symbol", tokens);
+		Vector addedTokens = new Vector(); addedTokens.addElement(tokenList);
+		cupSpec.addSymbols(addedTokens);		
 		Vector rhs = new Vector();
 		
 		//String grammarPatch = newStartSym + " ::=\n";
 		Vector rhsPart;
-		for (int i=0; i < startSyms.size(); i+=3) {
+		for (int i=0; i < startSyms.size(); i += 2) {
 			rhsPart = new Vector();
-			startSym = (String) startSyms.elementAt(i);
-			token = (String) startSyms.elementAt(i+2);
+			startSym = (String) startSyms.elementAt(i);			token = (String) tokens.elementAt(i/2); //startSyms.elementAt(i+2); 
 			//if (i > 0) grammarPatch += "|";
 			//grammarPatch += "\t"+token+" "+startSym+":s {: RESULT = s; :}\n";
 			// add new symbols into vector

@@ -8,12 +8,11 @@ SOURCES = \
 	Constant.java \
 	ParserError.java \
 	Parser.java \
-	ParseTest.java \
 	Unparse.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
-Parser.java Constant.java:	jlgen.cup
+Parser.java Constant.java: jlgen.cup
 	java -cp $(CUP_RUNTIME) java_cup.Main -parser Parser -symbols Constant < jlgen.cup
 
 all: $(CLASSES)

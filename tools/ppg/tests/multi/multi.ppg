@@ -1,6 +1,8 @@
 include "multi.cup"
+
+package jltools.util.jlgen.test.multi;
 terminal Token EXPR, PAREN_EXPR;
-start with expr parse_expr EXPR;
-start with paren_expr parse_paren_expr PAREN_EXPR;
+start with expr parse_expr;
+start with paren_expr parse_paren_expr;
 
 drop {goal}

@@ -129,6 +129,7 @@ include_spec ::=
 	;
 symbol_list_opt ::=
 	symbol_list:sym_list {: RESULT = sym_list; :}|	{: RESULT = null; :};
+
 jlgen_precedence_list ::=
 	precedence_list:p_l {: RESULT = p_l; :}
 |	PRECEDENCE SEMI // remove all precedence instructions from grammar
@@ -153,11 +154,10 @@ jlgen_start_spec_list ::=
 ;
 
 jlgen_start_spec_elt ::=
-	START WITH ID:start ID:method ID:token SEMI {:
+	START WITH ID:start ID:method SEMI {:
 		Vector m = new Vector();
 		m.addElement(start.getValue());
 		m.addElement(method.getValue());
-		m.addElement(token.getValue());
 		RESULT = m;
 	:}
 ;
@@ -182,7 +182,6 @@ command ::=
 			RESULT = new OverrideCmd(p);
 		} 
 	:}
-/*|	DROP nt_id:nt {: RESULT = new DropCmd(nt); :}*/
 |	DROP LBRACE production:p RBRACE {: RESULT = new DropCmd(p); :}|	DROP LBRACE nt_id_list:nt_list RBRACE {: 		RESULT = new DropCmd(nt_list);	:}
 |	TRANSFER nt_id:nt transfer_list:tlist {:		RESULT = new TransferCmd(nt, tlist);	:}
 ;
@@ -272,23 +271,6 @@ label_id ::=
 
 robust_id ::= /* all ids that aren't reserved words in Java */
 	ID:the_id	{: RESULT = (String)the_id.getValue(); :}
-	/* package is reserved. */
-	/* import is reserved. */	/*
-	| CODE		{: RESULT = "code"; :}
-	| ACTION	{: RESULT = "action"; :}
-	| PARSER	{: RESULT = "parser"; :}
-	| TERMINAL	{: RESULT = "terminal"; :}
-	| NON		{: RESULT = "non"; :}
-	| NONTERMINAL   {: RESULT = "nonterminal"; :}
-	| INIT		{: RESULT = "init"; :}
-	| SCAN		{: RESULT = "scan"; :}
-	| WITH		{: RESULT = "with"; :}
-	| START		{: RESULT = "start"; :}
-	| PRECEDENCE	{: RESULT = "precedence"; :}
-	| LEFT		{: RESULT = "left"; :}
-	| RIGHT		{: RESULT = "right"; :}
-	| NONASSOC	{: RESULT = "nonassoc"; :}
-	*/
 ;
 
 non_terminal ::= NON TERMINAL | NONTERMINAL;

@@ -11,7 +11,7 @@ public class JLgen
 {
 	public static final String HEADER = "jlgen: ";
 	public static final String DEBUG_HEADER = "jlgen [debug]: ";
-	public static boolean debug = false;
+	public static boolean debug = false;	public static String SYMBOL_CLASS_NAME = "sym";
 
 	public static void DEBUG (String s) {
 		if (debug)
@@ -20,27 +20,26 @@ public class JLgen
 	
 	public static void main (String args[]) {
 		FileInputStream fileInput;
-		String filename = null;				for (int i=0; i < args.length; i++) {
-			// assume all switches begin with a dash '-'
-			if (args[i].charAt(0) == '-') {
-				if (args[i].equals("-c")) {
-					// constant class
-				}
-				else { // invalid switch
-					System.err.println(HEADER+" invalid switch: "+args[i]);
-					usage();
-				}
-			} else {
-				// not a switch: this must be a filename
-				// but only do the 1st filename on the command line
-				if (filename == null) {
-					filename = args[i];
+		String filename = null;		
+		try {			for (int i=0; i < args.length; i++) {
+				// assume all switches begin with a dash '-'
+				if (args[i].charAt(0) == '-') {
+					if (args[i].equals("-symbols")) {						if (args.length > i)
+							SYMBOL_CLASS_NAME = args[++i];						else 							throw new Exception("No filename specified after -c");
+					}
+					else // invalid switch						throw new Exception("Invalid switch: "+args[i]);
 				} else {
-					System.err.println("Error: multiple source files specified.");
-					usage();
+					// not a switch: this must be a filename
+					// but only do the 1st filename on the command line
+					if (filename == null)
+						filename = args[i];
+					else						throw new Exception("Error: multiple source files specified.");
 				}
-			}
-		}		if (filename == null) {
+			}		} catch (Exception e) {			System.err.println(HEADER+e.getMessage());
+			usage();
+		}
+		
+				if (filename == null) {
 			System.err.println("Error: no filename specified.");
 			usage();
 		}		
