@@ -21,7 +21,6 @@ public class SemanticException extends Exception
 
     public SemanticException(String m) {
 	super(m);
-	this.position = position;
     }
 
     public SemanticException(String m, Position position) {
