@@ -226,6 +226,13 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	    throw new SemanticException(e.getMessage(), position());
 	}
 
+        if (tc.context().currentClass().flags().isInterface()) {
+            if (flags().isProtected() || flags().isPrivate()) {
+                throw new SemanticException("Interface methods must be public.",
+                                            position());
+            }
+        }
+
 	if (body == null && ! (flags().isAbstract() || flags().isNative())) {
 	    throw new SemanticException("Missing method body.", position());
 	}

@@ -241,6 +241,13 @@ public class FieldDecl_c extends Node_c implements FieldDecl
       throw new SemanticException(e.getMessage(), position());
     }
 
+    if (tc.context().currentClass().flags().isInterface()) {
+        if (flags().isProtected() || flags().isPrivate()) {
+            throw new SemanticException("Interface members must be public.",
+                                        position());
+        }
+    }
+
     decl.typeCheck(tc);
 
     return this;
