@@ -143,7 +143,7 @@ good: $(GOOD)
 	-(cd disamb_member; rm -f *.class)
 	(cd disamb_member; jlc -noserial CollectionsTester.jl) >> good.log 2>&1
 	-(cd package1; rm -f *.class)
-	(cd package1; jlc InnerClassAccess.jl) >> good.log 2>&1
+	jlc pacakge1/InnerClassAccess.jl >> good.log 2>&1
 	-(cd recursive_serialize; rm -f *.class)
 	(cd recursive_serialize; jlc Main.jl) >> good.log 2>&1
 	(cd recursive_serialize; jlc Main.jl) >> good.log 2>&1
