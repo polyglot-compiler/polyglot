@@ -1,30 +1,58 @@
 #!/bin/sh
 
 source=$1
+target=$2
 
-if [ $# -ne 1 ]
+if [ $# -ne 2 ]
 then
   echo usage: `basename $0` source-jltools-dir
-  echo example: `basename $0` /foo/bar/old/jltools
+  echo example: `basename $0` /foo/jltools /bar/polyglot
   exit 1
 fi
 
 if [ ! -d $source ]; then
-  echo cannot merge $source into $PWD/jltools
+  echo $source not found
+  echo cannot merge $source into $target
   exit 1
 fi
 
 if [ `basename $source` != jltools ]; then
-  echo cannot merge $source into $PWD/jltools
+  echo cannot merge $source into $target
   exit 1
 fi
 
-target=$PWD/polyglot
+if [ ! -d `dirname $target` ]; then
+  echo `dirname $target` not found
+  echo cannot merge $source into $target
+  exit 1
+fi
 
-if [ ! -d $target ]
-then
+(cd $source;
+if [ ! -d `dirname $target` ]; then
+  echo `dirname $target` 'not found--is it an absolute path?'
+  echo cannot merge $source into $target
+  exit 1
+fi
+)
+
+if [ `basename $target` != polyglot ]; then
+  echo cannot merge $source into $target
+  exit 1
+fi
+
+(
+cd `dirname $target`
+
+if [ ! -d $target ]; then
     cvs checkout polyglot
 fi
+
+if [ ! -d $target ]; then
+    echo $target not found
+    echo cvs checkout failed
+    exit 1
+fi
+)
 
 (
 cd $source
