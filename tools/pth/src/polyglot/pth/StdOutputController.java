@@ -58,6 +58,7 @@ public class StdOutputController extends OutputController{
         out.println("  Contains tests:");
         
         int total = 0;
+        int grandTotal = 0;
         int lastSuccess = 0;
         int neverRun = 0;
         int neverSuccess = 0;
@@ -66,26 +67,42 @@ public class StdOutputController extends OutputController{
             TestResult tr = (TestResult)tsr.testResults.get(testName);
             if (TestSuite.executeTest(testName, tr)) {
                 displayTestResults(tr);
+
+                total++;
+                if (tr.dateLastSuccess != null && tr.dateLastSuccess.equals(tr.dateTestRun)) {
+                    lastSuccess++;
+                }
+                if (tr.dateTestRun == null) {
+                    neverRun++;
+                }
+                if (tr.dateLastSuccess == null) {
+                    neverSuccess++;
+                }
             }
-            total++;
-            if (tr.dateLastSuccess != null && tr.dateLastSuccess.equals(tr.dateTestRun)) {
-                lastSuccess++;
-            }
-            if (tr.dateTestRun == null) {
-                neverRun++;
-            }
-            if (tr.dateLastSuccess == null) {
-                neverSuccess++;
-            }
+            grandTotal++;
         }
-        out.println("Total tests: " + total);
+        out.print("Total tests displayed: " + total);
+        if (total != grandTotal) {
+            out.print(" (out of " + grandTotal + " in script)");
+        }
+        out.println();
         out.println("   Succeeded last run: " + lastSuccess);
         out.println("   Never run         : " + neverRun);
         out.println("   Never succeeded   : " + neverSuccess);
     }
 
+    private static final int TEST_NAME_COLUMN_WIDTH = 30;
     public void displayTestResults(TestResult tr) {
-        out.print("    " + tr.testName);
-        out.println("\t\t run " + getDateDisplay(tr.dateTestRun) + "; success " + getDateDisplay(tr.dateLastSuccess));
+        StringBuffer sb = new StringBuffer();
+        sb.append("    ");
+        sb.append(tr.testName);
+        while (sb.length() < TEST_NAME_COLUMN_WIDTH) {
+            sb.append(' ');
+        }
+        sb.append(" run ");
+        sb.append(getDateDisplay(tr.dateTestRun));
+        sb.append("; success ");
+        sb.append(getDateDisplay(tr.dateLastSuccess));
+        out.println(sb.toString());
     }
 }

@@ -48,9 +48,13 @@ public class Main {
             // More output controllers should be written, for varying degrees
             // of detail.
             case 0:
-            case 1:
                 return new SilentOutputController(System.out);
-
+            case 1:
+                return new QuietOutputController(System.out, false, true, false, false, false);
+            case 2:
+                return new QuietOutputController(System.out, false, true, false, false, true);
+            case 3:
+                return new QuietOutputController(System.out, true, true, false, false, true);
             case 8:
                 return new VerboseOutputController(System.out, false);
             case 9:
