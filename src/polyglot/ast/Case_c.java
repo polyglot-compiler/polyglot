@@ -85,10 +85,8 @@ public class Case_c extends Stmt_c implements Case
 		position());
 	}
 
-	long value;
-
 	if (expr instanceof NumLit) {
-	    value = ((NumLit) expr).longValue();
+            return value(((NumLit) expr).longValue());
 	}
 	else if (expr instanceof Field) {
 	    FieldInstance fi = ((Field) expr).fieldInstance();
@@ -99,11 +97,14 @@ public class Case_c extends Stmt_c implements Case
 	    }
 
 	    if (! fi.isConstant()) {
+                /* FIXME: isConstant() is incorrect 
 	        throw new SemanticException("Case label must be a constant.",
 					    position());
+                */
+                return this;
 	    }
 
-	    value = ((Number) fi.constantValue()).longValue();
+	    return value(((Number) fi.constantValue()).longValue());
 	}
 	else if (expr instanceof Local) {
 	    LocalInstance li = ((Local) expr).localInstance();
@@ -114,18 +115,19 @@ public class Case_c extends Stmt_c implements Case
 	    }
 
 	    if (! li.isConstant()) {
+                /* FIXME: isConstant() is incorrect 
 	        throw new SemanticException("Case label must be a constant.",
 					    position());
+                */
+                return this;
 	    }
 
-	    value = ((Number) li.constantValue()).longValue();
+	    return value(((Number) li.constantValue()).longValue());
 	}
 	else {
 	    throw new SemanticException("Case label must be a constant.",
 					position());
 	}
-
-	return value(value);
     }
 
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
