@@ -93,7 +93,7 @@ import jltools.util.ErrorInfo;
 
     private Token long_token(String s, int radix) {
         long x = parseLong(s, radix);
-        return new LongLiteral(pos(), x, sym.INTEGER_LITERAL);
+        return new LongLiteral(pos(), x, sym.LONG_LITERAL);
     }
 
     private Token float_token(String s) {
