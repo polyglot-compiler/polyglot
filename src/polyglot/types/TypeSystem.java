@@ -191,6 +191,12 @@ public interface TypeSystem {
      */
     boolean isEnclosed(ClassType inner, ClassType outer);
 
+    /**
+     * Returns whether an object of the inner class <code>inner</code> has an
+     * enclosing instance of class <code>encl</code>. 
+     */
+    boolean hasEnclosingInstance(ClassType inner, ClassType encl);
+    
     ////
     // Various one-type predicates.
     ////

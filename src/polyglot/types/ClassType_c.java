@@ -1,10 +1,21 @@
 package polyglot.ext.jl.types;
 
-import polyglot.types.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import polyglot.types.ClassType;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.Named;
+import polyglot.types.Package;
+import polyglot.types.ReferenceType;
+import polyglot.types.Resolver;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import polyglot.types.Package;
-import java.util.*;
 
 /**
  * A <code>ClassType</code> represents a class -- either loaded from a
@@ -63,7 +74,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     * @deprecated Was incorrectly defined. Use isNested for nested classes, 
     *          and isInnerClass for inner classes.
     */
-    public boolean isInner() {
+    public final boolean isInner() {
         return isNested();
     }
 
@@ -74,7 +85,8 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     }
     
     public boolean isInnerClass() {
-        
+        // it's an inner class if it is not an interface, it is a nested
+        // class, and it is not explicitly or implicitly static. 
         return !flags().isInterface() && isNested() && !flags().isStatic();
     }
     
@@ -266,6 +278,10 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         return ts.isEnclosed(this, maybe_outer);
     }
 
+    public final boolean hasEnclosingInstance(ClassType encl) {
+        return ts.hasEnclosingInstance(this, encl);
+    }
+
     public String translate(Resolver c) {
         if (isTopLevel()) {
             if (package_() == null) {
@@ -347,6 +363,29 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             return outer().equals(maybe_outer) ||
                   outer().isEnclosed(maybe_outer);
         else
-            throw new InternalCompilerError("Inner classes must have outer classes.");
+            throw new InternalCompilerError("Non top-level classes " + 
+                    "must have outer classes.");
+    }
+
+    /** 
+     * Return true if an object of the class has
+     * an enclosing instance of <code>encl</code>. 
+     */
+    public boolean hasEnclosingInstanceImpl(ClassType encl) {
+        if (this.equals(encl)) {
+            // object o is the zeroth lexically enclosing instance of itself. 
+            return true;
+        }
+        
+        if (!isInnerClass() || isInStaticContext()) {
+            // this class is not an inner class, or was declared in a static
+            // context; it cannot have an enclosing
+            // instance of anything. 
+            return false;
+        }
+        
+        // see if the immediately lexically enclosing class has an 
+        // appropriate enclosing instance
+        return this.outer().hasEnclosingInstance(encl);
     }
 }

@@ -70,6 +70,12 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance
     boolean isAnonymous();
 
     /**
+     * Return true if the class declaration occurs in a static context.
+     * Is used to determine if a nested class is implicitly static.
+     */
+    boolean isInStaticContext();
+    
+    /**
      * The class's constructors.
      * A list of <code>ConstructorInstance</code>.
      * @see polyglot.types.ConstructorInstance
@@ -98,6 +104,17 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance
      * or by a subclass.
      */
     boolean isEnclosedImpl(ClassType outer);
+
+    /** Return true if an object of the class has
+     * an enclosing instance of <code>encl</code>. */
+    boolean hasEnclosingInstance(ClassType encl);
+
+    /**
+     * Implementation of <code>hasEnclosingInstance</code>.
+     * This method should only be called by the <code>TypeSystem</code>
+     * or by a subclass.
+     */
+    boolean hasEnclosingInstanceImpl(ClassType encl);
 
     /** The class's outer class if this is a nested class, or null. */
     ClassType outer();

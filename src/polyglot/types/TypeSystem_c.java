@@ -412,6 +412,10 @@ public class TypeSystem_c implements TypeSystem
         return inner.isEnclosedImpl(outer);
     }
 
+    public boolean hasEnclosingInstance(ClassType inner, ClassType encl) {
+        return inner.hasEnclosingInstanceImpl(encl);
+    }
+
     public void checkCycles(ReferenceType goal) throws SemanticException {
 	checkCycles(goal, goal);
     }
@@ -1430,7 +1434,7 @@ public class TypeSystem_c implements TypeSystem
     public void checkTopLevelClassFlags(Flags f) throws SemanticException {
       	if (! f.clear(TOP_LEVEL_CLASS_FLAGS).equals(Flags.NONE)) {
 	    throw new SemanticException(
-		"Cannot declare top-level class with flags " +
+		"Cannot declare a top-level class with flag(s) " +
 		f.clear(TOP_LEVEL_CLASS_FLAGS) + ".");
 	}
 
@@ -1444,7 +1448,7 @@ public class TypeSystem_c implements TypeSystem
     public void checkMemberClassFlags(Flags f) throws SemanticException {
       	if (! f.clear(MEMBER_CLASS_FLAGS).equals(Flags.NONE)) {
 	    throw new SemanticException(
-		"Cannot declare member class with flags " +
+		"Cannot declare a member class with flag(s) " +
 		f.clear(MEMBER_CLASS_FLAGS) + ".");
 	}
 
@@ -1458,7 +1462,7 @@ public class TypeSystem_c implements TypeSystem
     public void checkLocalClassFlags(Flags f) throws SemanticException {
       	if (! f.clear(LOCAL_CLASS_FLAGS).equals(Flags.NONE)) {
 	    throw new SemanticException(
-		"Cannot declare member class with flags " +
+		"Cannot declare a local class with flag(s) " +
 		f.clear(LOCAL_CLASS_FLAGS) + ".");
 	}
 
@@ -1647,4 +1651,5 @@ public class TypeSystem_c implements TypeSystem
     public String toString() {
         return StringUtil.getShortNameComponent(getClass().getName());
     }
+
 }

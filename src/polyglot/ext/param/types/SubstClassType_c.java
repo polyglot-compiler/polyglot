@@ -97,6 +97,11 @@ public class SubstClassType_c extends ClassType_c implements SubstType
         return base.kind();
     }
 
+    /** Get whether the class was declared in a static context */
+    public boolean isInStaticContext() {
+        return base.isInStaticContext();
+    }
+
     /** Get the class's full name, if possible. */
     public String fullName() {
         return base.fullName();
