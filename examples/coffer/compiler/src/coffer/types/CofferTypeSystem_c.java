@@ -126,7 +126,9 @@ public class CofferTypeSystem_c extends ParamTypeSystem_c
         return new CofferContext_c(this);
     }
 
+    /*
     public Collection uncheckedExceptions() {
         return Collections.singletonList(Error());
     }
+    */
 }
