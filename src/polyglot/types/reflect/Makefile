@@ -13,7 +13,6 @@ SOURCES = \
 	ConstantValue.java \
 	Exceptions.java \
 	Field.java \
-	GenericAttribute.java \
 	InnerClasses.java \
 	JLCInfo.java \
 	Method.java
