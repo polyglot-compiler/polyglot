@@ -200,7 +200,15 @@ public class ClassFile implements LazyClassInitializer {
                 if (t.isMember()) {
 		    if (Report.should_report(verbose, 3))
                         Report.report(3, "adding member " + t + " to " + ct);
+
                     ct.addMemberClass(t);
+                    
+                    // HACK: set the access flags of the member class
+                    // using the modifier bits of the InnerClass attribute.
+                    if (t instanceof ParsedClassType) {
+                        ParsedClassType pt = (ParsedClassType) t;
+                        pt.flags(ts.flagsForBits(c.modifiers));
+                    }
                 }
                 else {
                     throw new InternalCompilerError(name + " should be a member class.");
