@@ -50,7 +50,7 @@ public class TestSuite extends AbstractTest {
         }        
         
         Map oldTestResults = new HashMap(this.getTestSuiteResult().testResults);
-        this.getTestSuiteResult().testResults.clear();
+        Map newResults = new HashMap();
         
         for (Iterator i = tests.iterator(); i.hasNext(); ) {
             Test t = (Test)i.next();
@@ -74,10 +74,17 @@ public class TestSuite extends AbstractTest {
                 }
             }
             this.getTestSuiteResult().testResults.put(t.getName(), tr);
+            newResults.put(t.getName(), tr);
+            this.postIndividualTest();
         }        
+        this.getTestSuiteResult().testResults.clear();
+        this.getTestSuiteResult().testResults.putAll(newResults);
         return okay;
     }
     
+    protected void postIndividualTest() {
+    }
+
     public int getTotalTestCount() {
         return totalTests;
     }
@@ -106,6 +113,10 @@ public class TestSuite extends AbstractTest {
         return (TestSuiteResult)this.getTestResult();
     }
     
+    public List getTests() {
+        return Collections.unmodifiableList(this.tests);
+    }
+
     protected TestResult createTestResult(Date lastSuccess) {
         Map testResults;
         if (this.getTestSuiteResult() != null) {

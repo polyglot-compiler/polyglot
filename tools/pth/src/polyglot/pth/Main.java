@@ -35,7 +35,7 @@ public class Main {
             ScriptTestSuite t = new ScriptTestSuite(filename);
             t.setOutputController(outCtrl);
             if (options.showResultsOnly) {
-                outCtrl.displayTestSuiteResults(t.getName(), t.getTestSuiteResult());
+                outCtrl.displayTestSuiteResults(t.getName(), t);
             }
             else {          
                 t.run();

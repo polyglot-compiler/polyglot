@@ -90,7 +90,8 @@ public class VerboseOutputController extends OutputController{
     }
     
 
-    public void displayTestSuiteResults(String suiteName, TestSuiteResult tsr) {
+    public void displayTestSuiteResults(String suiteName, TestSuite ts) {
+        TestSuiteResult tsr = ts.getTestSuiteResult();
         if (tsr == null || tsr.testResults.isEmpty()) {
             out.println("No test results for " + suiteName);
             return;
@@ -104,20 +105,21 @@ public class VerboseOutputController extends OutputController{
         int lastSuccess = 0;
         int neverRun = 0;
         int neverSuccess = 0;
-        for (Iterator iter = tsr.testResults.keySet().iterator(); iter.hasNext(); ) {
-            String testName = (String)iter.next();
+        for (Iterator iter = ts.getTests().iterator(); iter.hasNext(); ) {
+            Test t = (Test)iter.next();
+            String testName = t.getName();
             TestResult tr = (TestResult)tsr.testResults.get(testName);
             if (TestSuite.executeTest(testName, tr)) {
-                displayTestResults(tr);
+                displayTestResults(tr, testName);
             }
             total++;
-            if (tr.dateLastSuccess != null && tr.dateLastSuccess.equals(tr.dateTestRun)) {
+            if (tr != null && tr.dateLastSuccess != null && tr.dateLastSuccess.equals(tr.dateTestRun)) {
                 lastSuccess++;
             }
-            if (tr.dateTestRun == null) {
+            if (tr == null || tr.dateTestRun == null) {
                 neverRun++;
             }
-            if (tr.dateLastSuccess == null) {
+            if (tr == null || tr.dateLastSuccess == null) {
                 neverSuccess++;
             }
         }
@@ -127,9 +129,9 @@ public class VerboseOutputController extends OutputController{
         out.println("   Never succeeded   : " + neverSuccess);
     }
 
-    public void displayTestResults(TestResult tr) {
-        out.println("    " + tr.testName);
-        out.println("      Last run    : " + getDateDisplay(tr.dateTestRun));
-        out.println("      Last success: " + getDateDisplay(tr.dateLastSuccess));
+    public void displayTestResults(TestResult tr, String testName) {
+        out.println("    " + testName);
+        out.println("      Last run    : " + getDateDisplay(tr==null?null:tr.dateTestRun));
+        out.println("      Last success: " + getDateDisplay(tr==null?null:tr.dateLastSuccess));
     }
 }

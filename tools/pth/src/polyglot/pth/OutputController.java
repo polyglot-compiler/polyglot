@@ -53,8 +53,8 @@ public abstract class OutputController {
     protected abstract void finishScriptTestSuite(ScriptTestSuite sts);
     protected abstract void finishSourceFileTest(SourceFileTest sft, ErrorQueue eq);
     
-    public abstract void displayTestSuiteResults(String suiteName, TestSuiteResult tsr);
-    public abstract void displayTestResults(TestResult tr);
+    public abstract void displayTestSuiteResults(String suiteName, TestSuite ts);
+    public abstract void displayTestResults(TestResult tr, String testName);
         
     protected DateFormat getDefaultDateFormat() {
         return new SimpleDateFormat("d-MMM-YY");

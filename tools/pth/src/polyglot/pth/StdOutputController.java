@@ -47,7 +47,9 @@ public class StdOutputController extends OutputController{
     }
     
 
-    public void displayTestSuiteResults(String suiteName, TestSuiteResult tsr) {
+    public void displayTestSuiteResults(String suiteName, TestSuite ts) {
+        TestSuiteResult tsr = ts.getTestSuiteResult();
+        
         if (tsr == null || tsr.testResults.isEmpty()) {
             out.println("No test results for " + suiteName);
             return;
@@ -62,20 +64,21 @@ public class StdOutputController extends OutputController{
         int lastSuccess = 0;
         int neverRun = 0;
         int neverSuccess = 0;
-        for (Iterator iter = tsr.testResults.keySet().iterator(); iter.hasNext(); ) {
-            String testName = (String)iter.next();
+        for (Iterator iter = ts.getTests().iterator(); iter.hasNext(); ) {
+            Test t = (Test)iter.next();
+            String testName = t.getName();
             TestResult tr = (TestResult)tsr.testResults.get(testName);
             if (TestSuite.executeTest(testName, tr)) {
-                displayTestResults(tr);
+                displayTestResults(tr, testName);
 
                 total++;
-                if (tr.dateLastSuccess != null && tr.dateLastSuccess.equals(tr.dateTestRun)) {
+                if (tr != null && tr.dateLastSuccess != null && tr.dateLastSuccess.equals(tr.dateTestRun)) {
                     lastSuccess++;
                 }
-                if (tr.dateTestRun == null) {
+                if (tr == null || tr.dateTestRun == null) {
                     neverRun++;
                 }
-                if (tr.dateLastSuccess == null) {
+                if (tr == null || tr.dateLastSuccess == null) {
                     neverSuccess++;
                 }
             }
@@ -92,17 +95,17 @@ public class StdOutputController extends OutputController{
     }
 
     private static final int TEST_NAME_COLUMN_WIDTH = 30;
-    public void displayTestResults(TestResult tr) {
+    public void displayTestResults(TestResult tr, String testName) {
         StringBuffer sb = new StringBuffer();
         sb.append("    ");
-        sb.append(tr.testName);
+        sb.append(testName);
         while (sb.length() < TEST_NAME_COLUMN_WIDTH) {
             sb.append(' ');
         }
         sb.append(" run ");
-        sb.append(getDateDisplay(tr.dateTestRun));
+        sb.append(getDateDisplay(tr==null?null:tr.dateTestRun));
         sb.append("; success ");
-        sb.append(getDateDisplay(tr.dateLastSuccess));
+        sb.append(getDateDisplay(tr==null?null:tr.dateLastSuccess));
         out.println(sb.toString());
     }
 }
