@@ -31,7 +31,10 @@ public final class Options {
 
   /** Inject type information in serialized form into output file? */
   public boolean serialize_type_info = true;
-  
+
+  /** Dump the AST? */
+  public boolean dump_ast = false;
+
   /** keep output files */
   public boolean keep_output_files = true;
 

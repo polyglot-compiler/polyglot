@@ -272,6 +272,24 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	    return beforeTranslate;
 	}
 
+    /** The AST dump pass. */
+    protected Pass dump;
+
+    /** The AST dump pass. */
+    public Pass dumpPass() {
+		if (dump == null) {
+ 			if (compiler().dumpAst()) {
+ 				dump = new VisitorPass(this,
+	                       new DumpAst(new CodeWriter(System.err, 78)));
+				dump.runAfter(beforeTranslatePass());
+	        } else {
+                dump = beforeTranslatePass();
+            }
+        }
+
+        return dump;
+    }
+
 	/** The class serialization pass. */
 	protected Pass serialize;
 
@@ -288,10 +306,10 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 		if (compiler.serializeClassInfo()) {
 		    serialize = new VisitorPass(this,
 			new ClassSerializer(ts, nf, source.lastModified(), eq));
-		    serialize.runAfter(beforeTranslatePass());
+		    serialize.runAfter(dumpPass());
 		}
 		else {
-		    serialize = beforeTranslatePass();
+		    serialize = dumpPass();
 		}
 	    }
 

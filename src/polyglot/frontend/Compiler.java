@@ -360,6 +360,11 @@ OUTER:
 	return options.serialize_type_info;
     }
 
+    /** Should the AST be dumped? */
+    public boolean dumpAst() {
+        return options.dump_ast;
+    }
+
     /** Get the compiler's error queue. */
     public ErrorQueue errorQueue() {
 	return eq;

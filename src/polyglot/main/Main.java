@@ -54,7 +54,7 @@ public class Main
 	  + "." + File.pathSeparator
 	  + System.getProperty("java.class.path") + " "
 	  + outputFiles;
-	
+
 	Report.report(null, 1, "Executing post-compiler " + command);
 	
 	try 
@@ -226,17 +226,23 @@ public class Main
         options.source_ext = args[i];
         i++;
       }
-      else if (args[i].equals("-ox")) 
+      else if (args[i].equals("-ox"))
       {
         i++;
         options.output_ext = args[i];
         i++;
       }
-      else if (args[i].equals("-noserial")) 
+      else if (args[i].equals("-noserial"))
       {
         i++;
 	options.serialize_type_info = false;
       }
+      else if (args[i].equals("-dump"))
+      {
+        i++;
+	options.dump_ast = true;
+      }
+
       else if (args[i].equals("-nooutput"))
       {
 	i++;
