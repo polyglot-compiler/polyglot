@@ -12,11 +12,10 @@ SOURCES = \
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
-lexer: jlgen.lex
-	java -classpath $(LEX_RUNTIME) JFlex.Main jlgen.lex
-	mv jlgen.lex.java Lexer.java
+Lexer.java: jlgen.flex
+	$(flex)
 
-all: lexer $(CLASSES)
+all: $(CLASSES)
 	$(subdirs)
 
 release: release_src

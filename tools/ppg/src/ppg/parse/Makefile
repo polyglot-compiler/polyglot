@@ -13,10 +13,10 @@ SOURCES = \
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
-parser:	jlgen.cup
+Parser.java Constant.java:	jlgen.cup
 	java -cp $(CUP_RUNTIME) java_cup.Main -parser Parser -symbols Constant < jlgen.cup
 
-all: parser $(CLASSES)
+all: $(CLASSES)
 	$(subdirs)
 
 release: release_src

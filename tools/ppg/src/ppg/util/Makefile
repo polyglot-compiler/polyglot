@@ -1,4 +1,4 @@
-SOURCE = ../../..
+SOURCE = ../../../..
 PACKAGE = jltools/util/jlgen/util
 SUBDIRS = 
 
