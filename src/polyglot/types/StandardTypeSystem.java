@@ -54,6 +54,29 @@ public class StandardTypeSystem extends TypeSystem {
     ARITHMETIC_EXN_  = resolver.findClass("java.lang.ArithmeticException");
   }
 
+  public String getWrapperTypeString(PrimitiveType t) {
+    switch (t.getKind()) {
+      case PrimitiveType.BOOLEAN:
+        return "java.lang.Boolean";
+      case PrimitiveType.CHAR:
+        return "java.lang.Character";
+      case PrimitiveType.BYTE:
+        return "java.lang.Byte";
+      case PrimitiveType.SHORT:
+        return "java.lang.Short";
+      case PrimitiveType.INT:
+        return "java.lang.Integer";
+      case PrimitiveType.LONG:
+        return "java.lang.Long";
+      case PrimitiveType.FLOAT:
+        return "java.lang.Float";
+      case PrimitiveType.DOUBLE:
+        return "java.lang.Double";
+      default: 
+        return "???";
+    }
+  }
+
   public LocalContext getLocalContext( ImportTable it, ExtensionFactory ef,
 	NodeVisitor visitor )
   {

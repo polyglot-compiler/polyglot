@@ -26,6 +26,8 @@ public abstract class TypeSystem {
                                              ClassCleaner cleaner)
     throws SemanticException;
 
+  public abstract String getWrapperTypeString(PrimitiveType t);
+
   public abstract LocalContext getLocalContext( ImportTable it,
 	ExtensionFactory ef, NodeVisitor visitor );
 

@@ -71,27 +71,7 @@ public class PrimitiveType extends Type
   }
   
   public String getWrapperTypeString() {
-    switch(kind)
-    {
-      case BOOLEAN:
-        return "jltools.ext.polyj.wrappers.BoolWrap";
-      case CHAR:
-        return "jltools.ext.polyj.wrappers.CharWrap";
-      case BYTE:
-        return "jltools.ext.polyj.wrappers.ByteWrap";
-      case SHORT:
-        return "jltools.ext.polyj.wrappers.ShortWrap";
-      case INT:
-        return "jltools.ext.polyj.wrappers.IntWrap";
-      case LONG:
-        return "jltools.ext.polyj.wrappers.LongWrap";
-      case FLOAT:
-        return "jltools.ext.polyj.wrappers.FloatWrap";
-      case DOUBLE:
-        return "jltools.ext.polyj.wrappers.DoubleWrap";
-      default:
-        return "???";
-    }
+    return ts.getWrapperTypeString(this);
   }
   
   public final boolean isPrimitive() {
