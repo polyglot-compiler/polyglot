@@ -71,6 +71,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
                         (Lexical, "Illegal double literal"),
                         (Lexical, "Illegal double literal"),
                         (Syntax),
+                        (Syntax),
                         (Lexical, "Integer literal.*out of range"),
                         (Lexical, "Integer literal.*out of range"),
                         (Lexical, "Integer literal.*out of range"),

@@ -21,6 +21,8 @@ public class LiteralsCf {
         int i, i1, i2, i3;
         long l, l1, l2, l3;
 
+        i = 25+-2147483648; //OK
+        i = 25-2147483648; //ERR: too big
         i = 2147483648; //ERR: too big
         i = 2147483647; //OK
         i = -2147483648; //OK
