@@ -2,11 +2,16 @@ LOG=log
 
 GOOD =  \
 	ArrayInit.jl \
+	Assignment.jl \
+	Assignment2.jl \
+	Assignment3.jl \
 	Ctor.jl \
 	Dep1.jl \
 	Equality.jl \
 	Except.jl \
 	Except2.jl \
+	Except3.jl \
+	Except4.jl \
 	FieldAccess.jl \
 	ForwardRef.jl \
 	ForwardRef2.jl \
@@ -28,9 +33,8 @@ GOOD =  \
 BAD = \
 	Errors.jl \
 	Errors2.jl \
-	Except3.jl \
-	Except4.jl \
 	NoInit.jl \
+	NoInit2.jl \
 	NoReturns.jl \
 	Unreachable.jl \
 	BadAbstract.jl \
