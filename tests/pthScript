@@ -55,6 +55,7 @@ polyglot.ext.jl.ExtensionInfo {
         InitializerType1.jl ;
         Inner0.jl ; Inner1.jl ; Inner2.jl ; Inner3.jl ; Inner4.jl ;
         Inner5.jl ; Inner6.jl ; Inner7.jl ; Inner8.jl ; Inner9.jl ;
+        Inner10.jl ; Inner11.jl ; Inner12.jl ;
         InterfaceOverride.jl ;
         LabeledBreak.jl ;
         Local.jl ;
@@ -172,6 +173,8 @@ polyglot.ext.jl.ExtensionInfo {
 	BadForwardRef.jl (Semantic, "Illegal forward ref"); 
 	BadForwardRef2.jl (Semantic, "Illegal forward ref"); 
 	BadForwardRef3.jl (Semantic, "Illegal forward ref"); 
+        Continue1.jl (Semantic, "Target.*not found");
+        Continue2.jl (Semantic, "must be a loop");
 	ForwardRef4.jl (Semantic, "Illegal forward ref"); 
 	ForwardRef5.jl; 
 	// the following test has exactly 4 errors in it
