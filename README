@@ -156,11 +156,12 @@ Several other people have contributed to the development:
 
 The Polyglot class file parsing code (src/polyglot/types/reflect)
 is derived from the BLOAT bytecode optimizer written by Nathaniel
-Nystrom, David Whitlock, and Antony Hosking at Purdue.  See
+Nystrom, David Whitlock, and Antony Hosking at Purdue University.  See
 http://www.cs.purdue.edu/s3/projects/bloat/.
 
-The Base64 code (polyglot.util.Base64) by Kevin 
-Kelley.  XXX URL?
+The Base64 code (polyglot.util.Base64) by Kevin Kelley
+<kelley@ruralnet.net>, 30718 Rd. 28, La Junta, CO, 81050 USA.
+http://kevinkelley.mystarband.net/java/goodies.html
 
 The development of the Polyglot project has been supported by a number
 of funding sources, including DARPA Contract F30602-99-1-0533, monitored
@@ -188,6 +189,7 @@ Lesser General Public License for more details.
 
 A copy of the GNU Lesser General Public License can be found in the file
 LICENSE, included in this distribution.
+
 
 CUP Parser Generator Copyright Notice, License, and Disclaimer
 ---------------------------------------------------------------
@@ -224,9 +226,7 @@ BASE64 Copyright Notice, License, and Disclaimer
 ------------------------------------------------
 The Base64 code (polyglot.util.Base64) is Copyright (c) 1998 by Kevin 
 Kelley. It is licensed under the LGPL and has the same restrictions 
-on distributed as Polyglot.  See the file LICENSE for a copy.
+on distribution as Polyglot.  See the file LICENSE for a copy.
 
- Kevin Kelley <kelley@ruralnet.net> - 30718 Rd. 28, La Junta, CO,
- 81050  USA.
 
 Java is a trademark of Sun Microsystems, Inc.
