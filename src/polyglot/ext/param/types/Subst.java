@@ -23,6 +23,9 @@ public interface Subst extends Serializable
     /** Perform substitutions on a type. */
     public Type substType(Type t);
 
+    /** Perform substitutions on a PClass. */
+    public PClass substPClass(PClass pc);
+
     /** Perform substititions on a field. */
     public FieldInstance substField(FieldInstance fi);
 
