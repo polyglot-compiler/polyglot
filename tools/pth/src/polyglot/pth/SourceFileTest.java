@@ -69,6 +69,18 @@ public class SourceFileTest extends AbstractTest {
                 }                    
             }
         }        
+        catch (RuntimeException e) {
+            if (e.getMessage() != null) {
+                setFailureMessage(e.getMessage());
+                e.printStackTrace();
+                return false;
+            }
+            else {
+                setFailureMessage("Uncaught " + e.getClass().getName());
+                e.printStackTrace();
+                return false;
+            }
+        }        
         return checkErrorQueue(eq);
     }
     
