@@ -10,8 +10,13 @@ public class SourceLoader
 {
     protected ExtensionInfo sourceExt;
     protected Collection sourcePath;
+
     /** 0 if unknown, 1 if case insensitive, -1 if not. */
     protected int caseInsensitive;
+
+    /** Set of sources already loaded.  An attempt to load a source
+      * already loaded will cause an IOException. */
+    protected Set loadedSources;
 
     /**
      * This is a map from Files (of directories) to Set[String]s, which
@@ -25,33 +30,32 @@ public class SourceLoader
 	this.sourceExt = sourceExt;
         this.directoryContentsCache = new HashMap();
         this.caseInsensitive = 0;
+        this.loadedSources = new HashSet();
     }
 
     /** Load a source from a specific file. */
     public FileSource fileSource(String fileName) throws IOException {
+        // If we haven't done so already,
+        // determine if the file system is case insensitive
+        fileName = canonicalize(fileName);
+
 	File sourceFile = new File(fileName);
 
 	if (! sourceFile.exists()) {
 	    throw new FileNotFoundException(fileName);
 	}
 
-        // If we haven't done so already,
-        // determine if the file system is case insensitive
-        setCaseInsensitive(fileName);
-
-        if (caseInsensitive()) {
-            fileName = fileName.toLowerCase();
+        if (loadedSources.contains(sourceFile)) {
+	    throw new FileNotFoundException(fileName);
         }
+
+        loadedSources.add(sourceFile);
 
         String[] exts = sourceExt.fileExtensions();
         boolean ok = false;
 
         for (int i = 0; i < exts.length; i++) {
-            String ext = exts[i];
-
-            if (caseInsensitive()) {
-                ext = ext.toLowerCase();
-            }
+            String ext = canonicalize(exts[i]);
 
             if (fileName.endsWith("." + ext)) {
                 ok = true;
@@ -126,15 +130,11 @@ public class SourceLoader
             current_dir = new File(System.getProperty("user.dir"));
         }
 
-        setCaseInsensitive(current_dir.getPath());
-
         for (int k = 0; k < exts.length; k++) {
             String fileName = className.replace('.', File.separatorChar) +
                                       "." + exts[k];
 
-            if (caseInsensitive()) {
-                fileName = fileName.toLowerCase();
-            }
+            fileName = canonicalize(fileName);
 
             for (Iterator i = sourcePath.iterator(); i.hasNext(); ) {
                 File directory = (File) i.next();
@@ -145,12 +145,7 @@ public class SourceLoader
                     if (directory.exists()) {
                         String[] contents = directory.list();
                         for (int j = 0; j < contents.length; j++) {
-                            if (caseInsensitive()) {
-                                dirContents.add(contents[j].toLowerCase());
-                            }
-                            else {
-                                dirContents.add(contents[j]);
-                            }
+                            dirContents.add(canonicalize(contents[j]));
                         }
                     }                
                 }
@@ -172,6 +167,13 @@ public class SourceLoader
                         sourceFile = new File(directory, fileName);
                     }
                     
+                    // Skip it if already loaded
+                    if (loadedSources.contains(sourceFile)) {
+                        continue;
+                    }
+
+                    loadedSources.add(sourceFile);
+
                     if (sourceFile.exists()) {
                         if (Report.should_report(Report.frontend, 2))
                             Report.report(2, "Loading " + className + " from " + sourceFile);
@@ -211,8 +213,6 @@ public class SourceLoader
         else if (f1.exists() && f2.exists()) {
             boolean f1Exists = false;
             boolean f2Exists = false;
-System.out.println("f1 = " + f1);
-System.out.println("f2 = " + f2);
 
             File dir;
 
@@ -247,5 +247,23 @@ System.out.println("f2 = " + f2);
         else {
             caseInsensitive = -1;
         }
+    }
+
+    // Map canonicalFileNames = new HashMap();
+
+    protected String canonicalize(String fileName) {
+        setCaseInsensitive(fileName);
+        if (caseInsensitive()) {
+            return fileName.toLowerCase();
+        }
+        /*
+            String s = (String) canonicalFileNames.get(fileName.toLowerCase());
+            if (s == null) {
+                s = fileName;
+                canonicalFileNames.put(fileName.toLowerCase(), s);
+            }
+            return s;
+        */
+        return fileName;
     }
 }
