@@ -1010,7 +1010,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext extLocalDeclImpl() {
-        return extNodeImpl();
+        return extStmtImpl();
     }
 
     protected Ext extLoopImpl() {
