@@ -83,6 +83,7 @@ BAD = \
 	BadInner.jl \
 	BadInterface2.jl \
 	BadInterface.jl \
+	BadMultipleVarDef.jl \
 	BadOverride.jl \
 	BadPrim.jl \
 	BadProt.jl \

@@ -165,13 +165,22 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
         // Check if the variable is multiply defined.
         Context c = tc.context();
 
+	LocalInstance outerLocal = null;
+
         try {
-            c.findLocal(li.name());
-        }
+            outerLocal = c.findLocal(li.name());
+	}
         catch (SemanticException e) {
-            // not found, so not multiply-defined
-            return this;
+            // not found, so not multiply defined
         }
+
+	if (outerLocal != null) {
+	    throw new SemanticException("Local variable \"" + name +
+					"\" multiply defined.  " +
+					"Previous definition at " +
+					outerLocal.position() + ".",
+					init.position());
+	}
 
         if (init != null) {
             if (init instanceof ArrayInit) {
