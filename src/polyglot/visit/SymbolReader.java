@@ -165,6 +165,10 @@ public class SymbolReader extends NodeVisitor
     */
   }
 
+  public TableClassResolver getCurrentResolver() {
+    return currentResolver;
+  }
+
   public ImportTable getImportTable()
   {
     return it;

@@ -13,7 +13,7 @@ import java.io.IOException;
  * or interface. It may be a public or other top-level class, or an inner
  * named class, or an anonymous class.
  */
-public class ClassNode extends ClassMember 
+public class ClassNode extends ClassMember implements GlobalDeclaration
 {
   /** Defines visibililty etc. for this class. */
   protected final AccessFlags accessFlags;

@@ -122,8 +122,14 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     if (prefix instanceof AmbiguousName) {
       return ((AmbiguousName) prefix).getFullName() + "." + name;
     }
+    else if (prefix instanceof AmbiguousNameExpression) {
+      return ((AmbiguousNameExpression) prefix).getFullName() + "." + name;
+    }
+    else if (prefix instanceof TypeNode) {
+      return ((TypeNode) prefix).getType().getTypeString() + "." + name;
+    }
     else if (prefix != null) {
-      throw new InternalCompilerError("Cannot get full name of partially unambiguous AmbiguousNameExpression prefix isa " + prefix.getClass().getName() );
+      return "<ambiguous>." + name;
     }
     else {
       return name;

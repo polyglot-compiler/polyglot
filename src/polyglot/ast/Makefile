@@ -4,9 +4,9 @@ SUBDIRS =
 
 SOURCES = \
 	AmbiguousExpression.java \
-	AmbiguousNode.java \
 	AmbiguousName.java \
 	AmbiguousNameExpression.java \
+	AmbiguousNode.java \
 	ArrayIndexExpression.java \
 	ArrayInitializerExpression.java \
 	BinaryExpression.java \
@@ -29,6 +29,7 @@ SOURCES = \
 	FloatLiteral.java \
 	ForStatement.java \
 	FormalParameter.java \
+	GlobalDeclaration.java \
 	IfStatement.java \
 	ImportNode.java \
 	InitializerBlock.java \

@@ -6,69 +6,65 @@ import jltools.util.*;
 import jltools.visit.*;
 
 import java.util.*;
-/*
-import splitter.util.*;
-import jltools.ext.jif.ast.*;
-*/
 
 /**
  * A <code>SourceFileNode</code> is an immutable representations of a Java
  * langauge source file.  It consists of a package name, a list of 
- * <code>ImportNode</code>s, and a list of <code>ClassNode</code>s.
+ * <code>ImportNode</code>s, and a list of <code>GlobalDeclaration</code>s.
  */
 public class SourceFileNode extends Node 
 {
   protected final String package_;
   protected final List imports;
-  protected final List classes;
+  protected final List decls;
 
   // FIXME
   private ImportTable it;
 
   /**
    * Requires: <imports> contains elements only of type ImportNode,
-   * <classes> contains elemetns only of type ClassNode.
+   * <decls> contains elements only of type GlobalDeclaration.
    *
    * Effects: Creates a new SourceFileNode with filename <filename> in
    * package <package_>, containing imports in <imports> and
-   * classes in <classes>.
+   * decls in <decls>.
    */
-  public SourceFileNode( Node ext, String package_, List imports, List classes) 
+  public SourceFileNode( Node ext, String package_, List imports, List decls) 
   {
     this.ext = ext;
     this.package_ = package_;
     this.imports = TypedList.copyAndCheck( imports, ImportNode.class, true);
-    this.classes = TypedList.copyAndCheck( classes, ClassNode.class, true);
+    this.decls = TypedList.copyAndCheck( decls, GlobalDeclaration.class, true);
   }
 
-    public SourceFileNode( String package_, List imports, List classes) {
-	this(null, package_, imports, classes);
+    public SourceFileNode( String package_, List imports, List decls) {
+	this(null, package_, imports, decls);
     }
 
   public SourceFileNode reconstruct( Node ext, String package_, List imports, 
-                                     List classes) 
+                                     List decls) 
   {
     if( package_ != null && ! !this.package_.equals( package_) || this.ext != ext ||
         package_ == null && this.package_ != null ||
         package_ != null && this.package_ == null
         || this.imports.size() != imports.size()
-        || this.classes.size() != classes.size()) {
-      SourceFileNode n = new SourceFileNode( ext, package_, imports, classes);
+        || this.decls.size() != decls.size()) {
+      SourceFileNode n = new SourceFileNode( ext, package_, imports, decls);
       n.copyAnnotationsFrom( this);
       return n;
     }
     else {
       for( int i = 0; i < imports.size(); i++) {
         if( this.imports.get( i) != imports.get( i)) {
-          SourceFileNode n = new SourceFileNode( ext, package_, imports, classes);
+          SourceFileNode n = new SourceFileNode( ext, package_, imports, decls);
           n.copyAnnotationsFrom( this);
           return n;
         }
       }
 
-      for( int i = 0; i < classes.size(); i++) {
-        if( this.classes.get( i) != classes.get( i)) {
-          SourceFileNode n = new SourceFileNode( ext, package_, imports, classes);
+      for( int i = 0; i < decls.size(); i++) {
+        if( this.decls.get( i) != decls.get( i)) {
+          SourceFileNode n = new SourceFileNode( ext, package_, imports, decls);
           n.copyAnnotationsFrom( this);
           return n;
         }
@@ -79,8 +75,8 @@ public class SourceFileNode extends Node
 
 
   public SourceFileNode reconstruct( String package_, List imports, 
-                                     List classes) {
-      return reconstruct(this.ext, package_, imports, classes);
+                                     List decls) {
+      return reconstruct(this.ext, package_, imports, decls);
   }
 
   /**
@@ -110,17 +106,17 @@ public class SourceFileNode extends Node
   }
   
   /**
-   * Returns the <code>ClassNode</code> at position <code>pos</code> in this
+   * Returns the <code>GlobalDeclaration</code> at position <code>pos</code> in this
    * node.
    */
-  public ClassNode getClassNodeAt( int pos) 
+  public GlobalDeclaration getGlobalDeclarationAt( int pos) 
   {
-    return (ClassNode)classes.get( pos);
+    return (GlobalDeclaration) decls.get( pos);
   }
 
-  public Iterator classNodes()
+  public Iterator declarations()
   {
-    return classes.iterator();
+    return decls.iterator();
   }
 
   // FIXME necessary?
@@ -131,8 +127,8 @@ public class SourceFileNode extends Node
 
   public Node visitChildren( NodeVisitor v)
   {
-    List newImports = new ArrayList( imports.size()),
-      newClasses = new ArrayList( classes.size());
+    List newImports = new ArrayList( imports.size());
+    List newDecls = new ArrayList( decls.size());
 
     for( Iterator iter = importNodes(); iter.hasNext(); ) {
       ImportNode in = (ImportNode)((ImportNode)iter.next()).visit( v);
@@ -141,14 +137,14 @@ public class SourceFileNode extends Node
       }
     }
 
-    for( Iterator iter = classNodes(); iter.hasNext(); ) {
-      ClassNode cn = (ClassNode)((ClassNode)iter.next()).visit( v);
+    for( Iterator iter = declarations(); iter.hasNext(); ) {
+      GlobalDeclaration cn = (GlobalDeclaration)((Node)iter.next()).visit( v);
       if( cn != null) {
-        newClasses.add( cn);
+        newDecls.add( cn);
       }
     }
 
-    return reconstruct( Node.condVisit(this.ext, v), package_, newImports, newClasses);
+    return reconstruct( Node.condVisit(this.ext, v), package_, newImports, newDecls);
   }
   
   public Node readSymbols( SymbolReader sr) throws SemanticException
@@ -165,25 +161,47 @@ public class SourceFileNode extends Node
 
   public Node typeCheck( LocalContext c) throws SemanticException
   {
+    Set vNames = new HashSet();
+    Set publicDecls = new HashSet();
+
     /* FIXME
-    Vector vNames = new Vector();
     String sSourceName = TypeSystem.getFirstComponent ( sourceFilename );
-     
-     for(ListIterator it=classes.listIterator(); it.hasNext(); ) {
-       ClassNode cn = (ClassNode)it.next();
-       String s = TypeSystem.getShortNameComponent (cn.getName() );
-       if ( vNames.contains (s ) )
-         throw new SemanticException ( "The source file contains two classes named \"" + s + "\".", 
-                                        Annotate.getLineNumber ( cn ));
-       vNames.add ( s );
-       if ( cn.getAccessFlags().isPublic() && !s.equals ( sSourceName ) )
-         throw new SemanticException ( "The name of the public class \"" + s + 
-                                        "\" must match the source file name", 
-                                        Annotate.getLineNumber( cn ));
-     }
     */
-     return this;
-   }
+     
+    for (Iterator i = decls.iterator(); i.hasNext(); ) {
+      GlobalDeclaration cn = (GlobalDeclaration) i.next();
+      String s = cn.getName();
+
+      if (vNames.contains(s)) {
+	throw new SemanticException(
+	  "The source file contains two global declarations named \"" +
+	  s + "\".", Annotate.getLineNumber((Node) cn));
+      }
+
+      vNames.add(s);
+
+      // FIXME: Is this right?
+      if (cn.getAccessFlags().isPublic()) {
+	if (! publicDecls.isEmpty()) {
+	  throw new SemanticException(
+	    "The source file contains more than one public global declaration.",
+	    Annotate.getLineNumber((Node) cn));
+	}
+
+	publicDecls.add(cn);
+      }
+
+      /* FIXME
+      if (cn.getAccessFlags().isPublic() && ! s.equals(sSourceName)) {
+	throw new SemanticException("The name of the public declaration \"" +
+	  s + "\" must match the source file name",
+	  Annotate.getLineNumber((Node) cn));
+      }
+      */
+    }
+ 
+    return this;
+  }
 
   public void translate( LocalContext c, CodeWriter w)
   {
@@ -200,8 +218,8 @@ public class SourceFileNode extends Node
       w.newline(0);
     }
 
-    for( Iterator iter = classNodes(); iter.hasNext(); ) {
-      ((ClassNode)iter.next()).translate( c, w);
+    for( Iterator iter = declarations(); iter.hasNext(); ) {
+      ((Node) iter.next()).translate( c, w);
     }
   }
 
@@ -212,23 +230,4 @@ public class SourceFileNode extends Node
     w.write( " < " + package_ + " > ");
     dumpNodeInfo( w);
   }	
-  
-/*
-  public void translate(CodeGenerator cg) {
-	  //write interface
-	  for( Iterator iter = importNodes(); iter.hasNext(); ) {
-		  ImportNode importNode = (ImportNode) iter.next();
-		  importNode.translate( null , cg.ri);
-		  importNode.translate( null , cg.master);
-		  for (Iterator it = cg.slaveWriters(); it.hasNext(); ) {
-			  CodeWriter slave = (CodeWriter) it.next();
-			  importNode.translate( null , slave);
-		  }
-      }
- 	  
-	  //IGNORE: multi classes in one souce file
-	  ClassNode cn = (ClassNode) classes.get(0);
-	  //((JifClassNode)cn).translate(cg);
-  }
-*/
 }
