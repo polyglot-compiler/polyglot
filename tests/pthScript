@@ -60,6 +60,10 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         Init6.jl ;
         Init7.jl ; Init8.jl ; Init9.jl ;
         InitializerType1.jl ;
+        Initializer1.jl (Semantic, "Initializers must be able to complete normally");
+        Initializer2.jl (Semantic, "Initializers must be able to complete normally");
+        Initializer3.jl ;
+        Initializer4.jl ;
         Inner0.jl ; Inner1.jl ; Inner2.jl ; Inner3.jl ; Inner4.jl ;
         Inner5.jl ; Inner6.jl ; Inner7.jl ; Inner8.jl ; Inner9.jl ;
         Inner10.jl ; Inner11.jl ; Inner12.jl ;
