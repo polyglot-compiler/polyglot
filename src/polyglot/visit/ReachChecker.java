@@ -67,7 +67,7 @@ public class ReachChecker extends DataFlow
         }
     }
 
-    public Item confluence(List inItems, Term node) {
+    public Item confluence(List inItems, Term node, FlowGraph graph) {
         // if any predecessor is reachable, so is this one
         for (Iterator i = inItems.iterator(); i.hasNext(); ) {
             if (((DataFlowItem)i.next()).reachable) {

@@ -95,7 +95,7 @@ public class ExitChecker extends DataFlow
     }
 
 
-    public Item confluence(List inItems, Term node) {
+    public Item confluence(List inItems, Term node, FlowGraph graph) {
         // all paths must have an exit
         for (Iterator i = inItems.iterator(); i.hasNext(); ) {
             if (!((DataFlowItem)i.next()).exits) {

@@ -461,7 +461,7 @@ public class InitChecker extends DataFlow
      * for these <code>Term</code>s, otherwise 
      * <code>confluence(List, Term)</code> is called instead. 
      */
-    protected Item confluence(List items, List itemKeys, Term node) {
+    protected Item confluence(List items, List itemKeys, Term node, FlowGraph graph) {
         if (node instanceof Initializer || node instanceof ConstructorDecl) {
             List filtered = filterItemsNonException(items, itemKeys);
             if (filtered.isEmpty()) {
@@ -471,10 +471,10 @@ public class InitChecker extends DataFlow
                 return (Item)filtered.get(0);
             }
             else {
-               return confluence(filtered, node);
+               return confluence(filtered, node, graph);
             } 
         }
-        return confluence(items, node); 
+        return confluence(items, node, graph); 
     }
 
     /**
@@ -484,7 +484,7 @@ public class InitChecker extends DataFlow
      * VarInstance, the conflict must be resolved, by using the
      * minimum of all mins and the maximum of all maxs. 
      */
-    public Item confluence(List inItems, Term node) {        
+    public Item confluence(List inItems, Term node, FlowGraph graph) {        
         // Resolve any conflicts pairwise.
         Iterator iter = inItems.iterator();
         Map m = new HashMap(((DataFlowItem)iter.next()).initStatus);

@@ -6,11 +6,15 @@ import polyglot.ast.*;
 import polyglot.frontend.Job;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
+import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.IdentityKey;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
-import polyglot.visit.FlowGraph.*;
+import polyglot.visit.FlowGraph.Edge;
+import polyglot.visit.FlowGraph.EdgeKey;
+import polyglot.visit.FlowGraph.ExceptionEdgeKey;
+import polyglot.visit.FlowGraph.Peer;
 
 /**
  * Abstract dataflow Visitor, to allow simple dataflow equations to be easily
@@ -279,7 +283,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *          flowing into.
      * @return a non-null Item.
      */
-    protected abstract Item confluence(List items, Term node);
+    protected abstract Item confluence(List items, Term node, FlowGraph graph);
     
     /**
      * The confluence operator for many flows. This method produces a single
@@ -296,8 +300,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *          flowing into.
      * @return a non-null Item.
      */
-    protected Item confluence(List items, List itemKeys, Term node) {
-        return confluence(items, node); 
+    protected Item confluence(List items, List itemKeys, Term node, FlowGraph graph) {
+        return confluence(items, node, graph); 
     }
     
     /**
@@ -322,7 +326,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         if (items.size() == 1) {
             return (Item)items.get(0);
         }
-        return confluence(items, itemKeys, node); 
+        return confluence(items, itemKeys, node, graph); 
     }
 
     protected Item safeConfluence(Item item1, FlowGraph.EdgeKey key1,
@@ -703,39 +707,79 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         return filtered;
     }
     
-    /**
-     * Filter a list of <code>Item</code>s to contain only <code>Item</code>s
-     * that are not associated with exception flows, that is, only 
-     * <code>Item</code>s whose associated <code>EdgeKey</code>s are not 
-     * <code>FlowGraph.ExceptionEdgeKey</code>s.
-     * 
-     * @param items List of Items to filter
-     * @param itemKeys List of <code>EdgeKey</code>s corresponding
-     *            to the edge keys for the <code>Item</code>s in <code>items</code>.
-     * @return a filtered list of items, containing only those whose edge keys
-     *            are not <code>FlowGraph.ExceptionEdgeKey</code>s.
-     */    
-    protected final List filterItemsNonException(List items, List itemKeys) {
-        List filtered = new ArrayList(items.size());
-        Iterator i = items.iterator();
-        Iterator j = itemKeys.iterator();
-        while (i.hasNext() && j.hasNext()) {
-            Item item = (Item)i.next();
-            EdgeKey key = (EdgeKey)j.next();
+	/**
+	 * Filter a list of <code>Item</code>s to contain only <code>Item</code>s
+	 * that are not associated with exception flows, that is, only 
+	 * <code>Item</code>s whose associated <code>EdgeKey</code>s are not 
+	 * <code>FlowGraph.ExceptionEdgeKey</code>s.
+	 * 
+	 * @param items List of Items to filter
+	 * @param itemKeys List of <code>EdgeKey</code>s corresponding
+	 *            to the edge keys for the <code>Item</code>s in <code>items</code>.
+	 * @return a filtered list of items, containing only those whose edge keys
+	 *            are not <code>FlowGraph.ExceptionEdgeKey</code>s.
+	 */    
+	protected final List filterItemsNonException(List items, List itemKeys) {
+		List filtered = new ArrayList(items.size());
+		Iterator i = items.iterator();
+		Iterator j = itemKeys.iterator();
+		while (i.hasNext() && j.hasNext()) {
+			Item item = (Item)i.next();
+			EdgeKey key = (EdgeKey)j.next();
             
-            if (!(key instanceof ExceptionEdgeKey)) {
-                // the key is not an exception edge key.
-                filtered.add(item);
-            }
-        }
+			if (!(key instanceof ExceptionEdgeKey)) {
+				// the key is not an exception edge key.
+				filtered.add(item);
+			}
+		}
         
-        if (i.hasNext() || j.hasNext()) {
-            throw new InternalCompilerError("item and item key lists " +
-                                            "have different sizes.");
-        }
+		if (i.hasNext() || j.hasNext()) {
+			throw new InternalCompilerError("item and item key lists " +
+											"have different sizes.");
+		}
         
-        return filtered;
-    }
+		return filtered;
+	}
+ 
+	/**
+	 * Filter a list of <code>Item</code>s to contain only <code>Item</code>s
+	 * that are associated with exception flows, whose exception is a subclass
+	 * of <code>excType</code>. That is, only 
+	 * <code>Item</code>s whose associated <code>EdgeKey</code>s are  
+	 * <code>FlowGraph.ExceptionEdgeKey</code>s, with the type a subclass
+	 * of <code>excType</code>.
+	 * 
+	 * @param items List of Items to filter
+	 * @param itemKeys List of <code>EdgeKey</code>s corresponding
+	 *            to the edge keys for the <code>Item</code>s in <code>items</code>.
+	 * @param excType an Exception <code>Type</code>.
+	 * @return a filtered list of items, containing only those whose edge keys
+	 *            are not <code>FlowGraph.ExceptionEdgeKey</code>s.
+	 */    
+	protected final List filterItemsExceptionSubclass(List items, List itemKeys, Type excType) {
+		List filtered = new ArrayList(items.size());
+		Iterator i = items.iterator();
+		Iterator j = itemKeys.iterator();
+		while (i.hasNext() && j.hasNext()) {
+			Item item = (Item)i.next();
+			EdgeKey key = (EdgeKey)j.next();
+            
+			if (key instanceof ExceptionEdgeKey) {
+				// the key is an exception edge key.
+				ExceptionEdgeKey eek = (ExceptionEdgeKey)key;
+				if (eek.type().isImplicitCastValid(excType)) {
+					filtered.add(item);
+				}
+			}
+		}
+        
+		if (i.hasNext() || j.hasNext()) {
+			throw new InternalCompilerError("item and item key lists " +
+											"have different sizes.");
+		}
+        
+		return filtered;
+	}
  
     /**
      * Filter a list of <code>Item</code>s to contain only <code>Item</code>s
