@@ -23,5 +23,9 @@ public class IdentityKey
         return other instanceof IdentityKey
             && ((IdentityKey) other).obj == obj;
     }
+
+    public String toString() {
+        return "Id(" + obj + ")";
+    }
 }
 
