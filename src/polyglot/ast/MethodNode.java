@@ -286,11 +286,29 @@ public class MethodNode extends ClassMember
   }
 
   /**
+   * Returns the number of formal parameters.
+   */
+  public int numFormalParameters()
+  {
+    return formals.size();
+  }
+
+  /**
    * Returns the exception at position <code>pos</code> in the exception list.
    */
   public TypeNode getExceptionAt( int pos) 
   {
     return (TypeNode)exceptions.get( pos);
+  }
+
+  /**
+   * Returns a list of the exceptions thrown by this method
+   * (in order).
+   *
+   * @post Each member of the list is of type <code>TypeNode</code>.
+   */
+  public List getExceptions() {
+    return exceptions;
   }
 
   /**
