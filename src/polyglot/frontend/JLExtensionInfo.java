@@ -80,7 +80,7 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
     }
 
     public String fileExtension() {
-	String sx = options.source_ext;
+	String sx = options == null ? null : options.source_ext;
 
 	if (sx == null) {
 	    sx = defaultFileExtension();
