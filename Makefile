@@ -59,11 +59,11 @@ export: javadoc
 	cvs rtag $(TAG) polyglot
 	cd release; cvs export -r $(TAG) -f polyglot
 	cvs rtag -d $(TAG) polyglot
-	for i in $(EXT) skel; do \
+	for i in $(EXT) jl skel; do \
 		mv release/polyglot/polyglot/ext/$$i release; \
 	done
 	rm -rf release/polyglot/polyglot/ext/*/
-	for i in $(EXT) skel; do \
+	for i in $(EXT) jl skel; do \
 		mv release/$$i release/polyglot/polyglot/ext; \
 	done
 	mv javadoc release/polyglot
@@ -80,7 +80,7 @@ export: javadoc
 	rm release/polyglot/bin/polyjc
 	rm release/polyglot/README-JIF.txt
 	rm -rf release/polyglot/classes
-	bin/jlc > release/polyglot/README-JLC.txt
+	-bin/jlc > release/polyglot/README-JLC.txt 2>&1
 	cd release; jar cf polyglot-src.jar polyglot
 
 REL_SOURCES = \
