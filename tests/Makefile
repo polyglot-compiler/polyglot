@@ -4,6 +4,7 @@ GOOD =  \
 	ArrayInit.jl \
 	Ctor.jl \
 	Dep1.jl \
+	Empty.jl \
 	Equality.jl \
 	Except2.jl \
 	Except3.jl \
