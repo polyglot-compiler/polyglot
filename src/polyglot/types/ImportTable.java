@@ -31,6 +31,7 @@ public class ImportTable extends ClassResolver
     protected Source source;
     /** Our package */
     protected String pkgName;
+    protected Package pkg;
 
     public ImportTable(TypeSystem ts, Resolver base,
 	               Source source, ErrorQueue eq) {
@@ -53,8 +54,13 @@ public class ImportTable extends ClassResolver
 	}
     }
 
+    public Package package_() {
+        return pkg;
+    }
+
     public void setPackage(String pkgName) {
 	this.pkgName = pkgName;
+        this.pkg = ts.packageForName(pkgName);
 
 	if (packageImports.size() != 0) {
 	  throw new InternalCompilerError(
