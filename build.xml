@@ -32,6 +32,10 @@
   </target>
 
   <target name="configure-deps">
+    <dependset>
+      <srcfileset dir="${bin}" includes="jlc.in"/>
+      <targetfileset dir="${bin}" includes="jlc"/>
+    </dependset>
     <condition property="configure.up-to-date">
       <and>
         <available file="${bin}/jlc"/>

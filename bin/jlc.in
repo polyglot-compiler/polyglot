@@ -4,6 +4,7 @@ while true; do
         -v) verbose="1"; shift;;
         -classpath) shift; extra_cp=$1; shift;;
         -profile) profile="-Xrunhprof:cpu=samples"; shift;;
+        -ext) shift; ext=$1; args="$args -ext '$1'"; shift;;
         *) args="$args '$1'"; shift;;
     esac
 done
@@ -13,8 +14,13 @@ then
     extra_cp="${PATH_SEP}${extra_cp}"
 fi
 
-classpath="${TOP}${FILE_SEP}classes${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}polyglot.jar${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}java_cup.jar${extra_cp}"
-command="\"$JAVA\" $profile -classpath \"$classpath\" polyglot.main.Main $ext $args"
+if [ -n "$ext" ]
+then
+    ext_cp="${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}${ext}.jar"
+fi
+
+classpath="${TOP}${FILE_SEP}classes${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}polyglot.jar${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}java_cup.jar${ext_cp}${extra_cp}"
+command="\"$JAVA\" $profile -classpath \"$classpath\" polyglot.main.Main $args"
 
 if [ -n "$verbose" ]
 then
