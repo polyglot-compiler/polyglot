@@ -197,10 +197,11 @@ public class SourceClassResolver extends LoadedClassResolver
     if (clazz != null && !this.allowRawClasses) {
         // We have a raw class only. We do not have the source code,
         // or encoded class information. 
-        throw new SemanticException("Found a class file for " + name
-            + " but it did not contain appropriate information for the" 
-            + " Polyglot-based compiler " + ext.compilerName() + ". Try using "
-            + ext.compilerName() + " to recompile the source code.");
+        throw new SemanticException("Class \"" + name + "\" not found."
+            + " A class file was found, but it did not contain appropriate" 
+            + " information for the Polyglot-based compiler " + 
+            ext.compilerName() + ". Try using " + ext.compilerName() 
+            + " to recompile the source code.");
     }
     throw new NoClassException(name);
   }

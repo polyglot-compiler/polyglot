@@ -107,7 +107,8 @@ public class LoadedClassResolver extends ClassResolver
 
     // We have a raw class, but are not allowed to use it, and
     // cannot find appropriate encoded info. 
-    throw new SemanticException("Found a class file for " + name
+    throw new SemanticException("Unable to find a suitable definition of \""
+        + name +"\". A class file was found,"
         + " but it did not contain appropriate information for this" 
         + " language extension. If the source for this file is written"
         + " in the language extension, try recompiling the source code.");
