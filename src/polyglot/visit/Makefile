@@ -6,9 +6,9 @@ include $(SOURCE)/Rules.mk
 
 SOURCES = \
 	AddMemberVisitor.java \
+	AlphaRenamer.java \
 	AmbiguityRemover.java \
 	AscriptionVisitor.java \
-	BlockFlattener.java \
 	ClassSerializer.java \
 	CodeCleaner.java \
 	ConstantFolder.java \
