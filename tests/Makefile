@@ -61,7 +61,6 @@ GOOD =  \
 	LocalClass2.jl \
 	LocalClass3.jl \
 	LocalClass4.jl \
-	LocalClass5.jl \
 	LocalInit.jl \
 	MemberClassFlags.jl \
 	Narrowing.jl \
@@ -86,8 +85,6 @@ GOOD =  \
 	xIterator.jl
 
 BAD = \
-	ConformanceCheck1.jl \
-	ConformanceCheck2.jl \
 	BadAbstract.jl \
 	BadAlloc.jl \
 	BadCtor.jl \
@@ -132,11 +129,14 @@ BAD = \
 	BadSwitch1.jl \
 	BadSwitch2.jl \
 	CircularConstructor.jl \
+	ConformanceCheck1.jl \
+	ConformanceCheck2.jl \
 	DoubleFlags.jl \
 	Errors.jl \
 	Errors2.jl \
 	ForwardRef4.jl \
 	LabeledBreak2.jl \
+	LocalClass5.jl \
 	NoInit1.jl \
 	NoInit10.jl \
 	NoInit11.jl \
@@ -216,7 +216,7 @@ bad: $(BAD)
 	$(MAKE) LOG=bad.log $(BAD_OUTPUT)
 	-(cd package1; rm -f *.class)
 	-(cd package2; rm -f *.class)
-	jlc package2/BadProtectedCtorAccess.jl >> bad.log 2>&1
+	-jlc package2/BadProtectedCtorAccess.jl >> bad.log 2>&1
 	@if cmp -s bad.log.in bad.log; then \
 	    echo "LOG UNCHANGED"; \
 	    diff bad.log.in bad.log; \
