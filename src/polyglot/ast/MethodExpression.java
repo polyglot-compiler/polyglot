@@ -159,17 +159,34 @@ public class MethodExpression extends Expression {
   {
     // fixme: exceptions
     ClassType ct; 
-    if (target == null) 
-      ct = null;
-    else if ( target instanceof TypeNode && ((TypeNode)target).getType() instanceof ClassType)
-      ct = (ClassType) ((TypeNode)target).getType() ;
-    else if ( target instanceof Expression && ((Expression)target).getCheckedType() instanceof ClassType)
-      ct = (ClassType)   ((Expression)target).getCheckedType();
+    if (target == null) {
+      ct = c.getCurrentClass();
+    }
+    else if ( target instanceof TypeNode 
+                && ((TypeNode)target).getType() instanceof ClassType) {
+      ct = (ClassType) ((TypeNode)target).getType();
+    }
+    else if( target instanceof Expression) {
+      if( ((Expression)target).getCheckedType() instanceof ClassType) {
+        ct = (ClassType)((Expression)target).getCheckedType();
+      }
+      else if( ((Expression)target).getCheckedType() instanceof ArrayType) {
+        // FIXME protected methods
+        ct = (ClassType)c.getTypeSystem().getObject();
+      }
+      else {
+        throw new TypeCheckException( "Cannot invoke method \""
+                           + name + "\" on an expression of primitive type.");
+      }
+    }
     else
     {
       System.out.println("it is of type: " + target);
-      System.out.println(((FieldExpression)target).getName());
-      throw new TypeCheckException (" Target of method invocation must be a ClassType");
+      if( target instanceof FieldExpression) {
+        System.out.println(((FieldExpression)target).getName());
+      }
+      throw new TypeCheckException( 
+                         "Target of method invocation must be a ClassType");
     }
 
     List argTypes = new ArrayList();

@@ -293,8 +293,6 @@ public class Compiler implements TargetTable, ClassCleaner
         okay &= compile( (Job)workList.get( i), CLEANED);
       }
       if( !okay) {
-        job.eq.enqueue( ErrorInfo.SEMANTIC_ERROR, "Unable to continue " 
-                    + "because of errors in dependencies.");
         return false;
       }
       

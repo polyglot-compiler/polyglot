@@ -4,8 +4,7 @@
 
 package jltools.ast;
 
-import jltools.types.Type;
-import jltools.types.LocalContext;
+import jltools.types.*;
 import jltools.util.*;
 
 import java.util.*;
@@ -205,6 +204,9 @@ public class NewArrayExpression extends Expression {
   
   public Node typeCheck (LocalContext c)
   {
+    setCheckedType( new ArrayType( c.getTypeSystem(), type.getType(),
+                                   dimensionExpressions.size() + 
+                                   additionalDimensions));
     return this;
   }
 
@@ -229,7 +231,7 @@ public class NewArrayExpression extends Expression {
         i.remove();
       }
       else {
-        i.set(v);
+        i.set(e);
       }
     }
     if( initializer != null) {

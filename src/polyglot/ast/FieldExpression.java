@@ -73,7 +73,8 @@ public class FieldExpression extends Expression {
         w.write( ".");
       }
       else if( target instanceof TypeNode) {
-        if( ((TypeNode)target).getCheckedType() != c.getCurrentClass()) {
+        if( ((TypeNode)target).getCheckedType() != c.getCurrentClass() ||
+            name.equals( "class")) {
           target.translate(c, w);
           w.write( ".");
         }
@@ -113,8 +114,6 @@ public class FieldExpression extends Expression {
       ltype = ((TypeNode)target).getCheckedType();
     }
     else {
-	System.out.println( "!!!" + target);
-	System.out.println( "!!!" + target.getClass().getName());
       throw new InternalCompilerError(
                               "Attempting field access on node of type " 
                               + target.getClass().getName());
@@ -126,14 +125,13 @@ public class FieldExpression extends Expression {
     else if( ltype instanceof ClassType) {
       if (name.equals("class"))
       {
-        setCheckedType( c.getTypeSystem().typeForClass( java.lang.Class.class));
-        // FIXME what to do about expected type?
+        Annotate.setExpectedType( target, ltype);
+        setCheckedType( c.getType( "java.lang.Class"));
       }      
       else
       {
         fi = c.getField( (ClassType)ltype, name);
         
-        // FIXME is this expected type correct?
         Annotate.setExpectedType( target, fi.getEnclosingType());
         setCheckedType( fi.getType());
       }
