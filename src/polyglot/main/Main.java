@@ -127,13 +127,13 @@ public class Main
       }
       catch( FileNotFoundException fnfe)
       {
-        System.err.println( Main.class.getName() 
+        System.err.println( compilerName()
                             + ": cannot find source file -- " + targetName);
         System.exit( 1);
       }
       catch( IOException e)
       {
-        System.err.println( Main.class.getName() 
+        System.err.println( compilerName()
                             + ": caught IOException while compiling -- " 
                             + targetName + ": " + e.getMessage());
         System.exit( 1);
@@ -339,13 +339,13 @@ public class Main
       }  
       catch( FileNotFoundException fnfe)
       {
-        System.err.println( Main.class.getName() 
+        System.err.println( compilerName()
                             + ": cannot find source file -- " + targetName);
           setHasErrors( true);
       }
       catch( IOException e)
       {
-        System.err.println( Main.class.getName() 
+        System.err.println( compilerName()
                             + ": caught IOException while compiling -- " 
                             + targetName + ": " + e.getMessage());
         setHasErrors( true);
@@ -465,7 +465,8 @@ public class Main
         i++;
         options.put( MAIN_OPT_EXT, args[i]);
 	loadExtension(args[i]);
-	if (i+1 < args.length)
+	i++;
+	if (i < args.length)
 	    try  {
 		i = extInfo.parseCommandLine(args, i+1, options);
 	    }
@@ -521,7 +522,7 @@ public class Main
       }
       else if( args[i].startsWith( "-"))
       {
-        System.err.println( Main.class.getName() + ": illegal option -- " 
+        System.err.println( compilerName() + ": illegal option -- " 
                             + args[ i]);
         i++;
         hasError = true;
@@ -550,7 +551,7 @@ public class Main
     }
 
     if( source.size() < 1) {
-      System.err.println( Main.class.getName() 
+      System.err.println( compilerName()
                           + ": must specify at least one source file");
       usage();
       System.exit( 1);
@@ -567,15 +568,18 @@ public class Main
     }
   }
 
+  private static String compilerName() {
+    if (extInfo == null) return "jlc";
+      else return extInfo.compilerName();
+  }
+
   private static void usage()
   {
     String fileext, compilerName;
     if (extInfo == null) fileext = "jl";
       else fileext = extInfo.fileExtension();
-    if (extInfo == null) compilerName = "jltools";
-      else compilerName = extInfo.compilerName();
 
-    System.err.println("usage: " + compilerName + " [options] " +
+    System.err.println("usage: " + compilerName() + " [options] " +
                         "<source-file>." + fileext + " ...\n");
     System.err.println( "where [options] includes:");
     System.err.println( " -d <directory>          output directory");
