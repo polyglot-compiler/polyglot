@@ -1,6 +1,5 @@
 package jltools.ast;
 
-import jltools.util.Mix;
 import jltools.util.CodeWriter;
 import jltools.util.Copy;
 import jltools.types.SemanticException;
