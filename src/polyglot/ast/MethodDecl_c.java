@@ -318,6 +318,11 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	    w.write("(instance " + mi + ")");
 	    w.end();
 	}
+
+        w.allowBreak(4, " ");
+        w.begin(0);
+        w.write("(name " + name + ")");
+        w.end();
     }
 
     /** Reconstruct the type objects for the method. */

@@ -208,6 +208,11 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
 	    w.write("(instance " + li + ")");
 	    w.end();
 	}
+
+        w.allowBreak(4, " ");
+        w.begin(0);
+        w.write("(decl " + decl + ")");
+        w.end();
     }
 
     /** Reconstruct the type objects for the declaration. */

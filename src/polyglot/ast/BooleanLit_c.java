@@ -10,41 +10,51 @@ import jltools.util.*;
  */
 public class BooleanLit_c extends Lit_c implements BooleanLit
 {
-    protected boolean value;
+  protected boolean value;
 
-    public BooleanLit_c(Ext ext, Position pos, boolean value) {
-	super(ext, pos);
-	this.value = value;
-    }
+  public BooleanLit_c(Ext ext, Position pos, boolean value) {
+    super(ext, pos);
+    this.value = value;
+  }
 
-    /** Get the value of the expression. */
-    public boolean value() {
-	return this.value;
-    }
+  /** Get the value of the expression. */
+  public boolean value() {
+    return this.value;
+  }
 
-    /** Set the value of the expression. */
-    public BooleanLit value(boolean value) {
-	BooleanLit_c n = (BooleanLit_c) copy();
-	n.value = value;
-	return n;
-    }
+  /** Set the value of the expression. */
+  public BooleanLit value(boolean value) {
+    BooleanLit_c n = (BooleanLit_c) copy();
+    n.value = value;
+    return n;
+  }
 
-    /** Get the value of the expression, as an object. */
-    public Object objValue() {
-	return new Boolean(this.value);
-    }
+  /** Get the value of the expression, as an object. */
+  public Object objValue() {
+    return new Boolean(this.value);
+  }
 
-    /** Type check the expression. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
-        return type(tc.typeSystem().Boolean());
-    }
+  /** Type check the expression. */
+  public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    return type(tc.typeSystem().Boolean());
+  }
 
-    public String toString() {
-	return "" + value;
-    }
+  public String toString() {
+    return "" + value;
+  }
 
-    /** Write the expression to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
-	w.write("" + value);
-    }
+  /** Write the expression to an output file. */
+  public void translate_(CodeWriter w, Translator tr) {
+    w.write("" + value);
+  }
+
+  /** Dumps the AST. */
+  public void dump(CodeWriter w) {
+    super.dump(w);
+
+    w.allowBreak(4, " ");
+    w.begin(0);
+    w.write("(value " + value + ")");
+    w.end();
+  }
 }
