@@ -103,7 +103,7 @@ BadInterface.jl:17: Interface methods must be public.
                         ^
 
 1 error.
-BadOverride.java:80: method() in Sub cannot implement method() in Override; attempting to assign weaker access privileges; was public
+BadOverride.java:84: method() in Sub cannot implement method() in Override; attempting to assign weaker access privileges; was public
 class Sub implements Override {
 ^
 1 error
@@ -141,27 +141,27 @@ Errors.jl:5: No valid method call found for m(int) in Errors.
            ^
 
 1 error.
-NoInit10.jl:17: Local variable "x" may not have been initialized.
+NoInit10.jl:17: Local variable "x" may not have been initialized
     x++; // BAD
     ^
 
 1 error.
-NoInit11.jl:5: Local variable "x" may not have been initialized.
+NoInit11.jl:5: Local variable "x" may not have been initialized
       x++;
       ^
 
 1 error.
-NoInit12.jl:9: Local variable "x" may not have been initialized.
+NoInit12.jl:9: Local variable "x" may not have been initialized
     return x; // BAD
            ^
 
 1 error.
-NoInit1.jl:9: Local variable "i" may not have been initialized.
+NoInit1.jl:9: Local variable "i" may not have been initialized
     foo(i); // BAD (m1)
         ^
 
 1 error.
-NoInit2.jl:15: Local variable "i" may not have been initialized.
+NoInit2.jl:15: Local variable "i" may not have been initialized
     foo(i);
         ^
 
@@ -171,32 +171,32 @@ NoInit3.jl:15: Unreachable statement.
       ^
 
 1 error.
-NoInit4.jl:34: Local variable "j" may not have been initialized.
+NoInit4.jl:34: Local variable "j" may not have been initialized
     foo(j); // BAD (m4)
         ^
 
 1 error.
-NoInit5.jl:29: Local variable "i" may not have been initialized.
+NoInit5.jl:29: Local variable "i" may not have been initialized
     foo(i); // BAD (m5)
         ^
 
 1 error.
-NoInit6.jl:20: Local variable "i" may not have been initialized.
+NoInit6.jl:20: Local variable "i" may not have been initialized
     i++; // BAD uninitialized (m11)
     ^
 
 1 error.
-NoInit7.jl:9: Local variable "x" may not have been initialized.
+NoInit7.jl:9: Local variable "x" may not have been initialized
     x++; // BAD
     ^
 
 1 error.
-NoInit8.jl:4: Local variable "x" may not have been initialized.
+NoInit8.jl:4: Local variable "x" may not have been initialized
     return x; // BAD
            ^
 
 1 error.
-NoInit9.jl:7: Local variable "x" may not have been initialized.
+NoInit9.jl:7: Local variable "x" may not have been initialized
     return x; // BAD
            ^
 
