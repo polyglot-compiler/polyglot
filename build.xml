@@ -737,11 +737,18 @@ ext=""
 	excludes="**/tests/**,**/doc/**"/>
     </copy>
 
-    <!-- copy in JMatch examples -->
+    <!-- copy in current JMatch examples -->
     <copy todir="${dist}/examples">
+      <fileset dir="${src}/polyglot/ext/jmatch/tests/delete"
+	includes="**/*.jm"
+	excludes="**/output/**,**/*PerfTest.jm,**/*ProfTest.jm"/>
+    </copy>
+
+    <!-- copy in old JMatch examples -->
+    <copy todir="${dist}/examples/old">
       <fileset dir="${src}/polyglot/ext/jmatch/tests"
 	includes="**/*.jm"
-	excludes="**/attic/**,**/unused/**,**/collections/**,**/output/**,**/*PerfTest.jm,**/*ProfTest.jm"/>
+	excludes="**/attic/**,**/unused/**,**/collections/**,**/delete/**,**/output/**"/>
     </copy>
 
     <!-- copy in JMatch Ant files -->
