@@ -413,6 +413,8 @@ public class MethodNode extends ClassMember
 
   public Node exceptionCheck (ExceptionChecker ec ) throws SemanticException
   {
+    TypeSystem ts = ec.getTypeSystem();
+
     SubtypeSet s = (SubtypeSet)ec.getThrowsSet();
     // check our exceptions:
     for (Iterator i = s.iterator(); i.hasNext() ; )
@@ -424,8 +426,8 @@ public class MethodNode extends ClassMember
       {
         for (Iterator i2 = exceptions.iterator(); i2.hasNext() ; )
         {
-          Type t2 =  (ClassType)  ((TypeNode)i2.next()).getType();
-          if ( t.equals (t2) || t.descendsFrom (t2 ))
+          Type t2 =  ((TypeNode)i2.next()).getType().toClassType();
+          if ( ts.isSameType (t, t2) || ts.descendsFrom (t, t2 ))
           {
             bThrowDeclared = true; 
             break;
