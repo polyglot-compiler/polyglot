@@ -121,7 +121,7 @@ public class Compiler
     public boolean readSource(Source source) throws IOException {
 	Job job = jobForSource(source);
 	addPass(job.translatePass());
-	return runToPass(job.buildPass());
+	return runToPass(job.disambTypesPass()); 
     }
 
     /** Compile the source file for a given class to completion. */
