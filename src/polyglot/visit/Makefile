@@ -9,6 +9,7 @@ SOURCES = \
 	DumpAst.java \
 	ExceptionChecker.java \
 	FlowChecker.java \
+	FlattenVisitor.java \
 	NodeScrambler.java \
 	SignatureCleaner.java \
 	SymbolReader.java \
