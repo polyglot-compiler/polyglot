@@ -24,12 +24,11 @@ public class AscriptionVisitor extends ContextVisitor
     Type type;
     AscriptionVisitor outer;
 
-    // FIXME go to the constructor, not just the class in the see tag
     /**
      *  Default constructor. See the constructor in <code> ErrorHandingVisitor
      *  </code> for more details.
      * 
-     *  @see polyglot.visit.ErrorHandlingVisitor
+     *  @see polyglot.visit.ErrorHandlingVisitor#ErrorHandlingVisitor
      */
     public AscriptionVisitor(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
