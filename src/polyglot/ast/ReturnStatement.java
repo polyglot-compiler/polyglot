@@ -116,8 +116,7 @@ public class ReturnStatement extends Statement
 
   public void dump( CodeWriter w)
   {
-    w.write( "( RETURN ");
+    w.write( "RETURN ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

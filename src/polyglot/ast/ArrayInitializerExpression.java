@@ -136,9 +136,8 @@ public class ArrayInitializerExpression extends Expression
   
   public void dump( CodeWriter w)
   {
-    w.write( "( ARRAY INITIALIZER ");
+    w.write( "ARRAY INITIALIZER ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
   
   public int getPrecedence()

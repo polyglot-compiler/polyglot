@@ -199,9 +199,8 @@ public class IntLiteral extends NumericalLiteral
 
   public void dump( CodeWriter w)
   {
-    w.write( "( INTEGER LITERAL");
+    w.write( "INTEGER LITERAL");
     w.write( " < " + value + " > ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

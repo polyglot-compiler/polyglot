@@ -32,8 +32,7 @@ public class NullLiteral extends Literal
 
   public void dump( CodeWriter w)
   {
-    w.write( "( NULL ");
+    w.write( "NULL ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

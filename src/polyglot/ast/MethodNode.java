@@ -492,7 +492,7 @@ public class MethodNode extends ClassMember
 
   public void dump( CodeWriter w)
   {
-    w.write( "( METHOD");
+    w.write( "METHOD");
     w.write( " < " + name + " >");
     w.write( " < " + accessFlags.getStringRepresentation() + "> ");
     if( isConstructor) {
@@ -502,6 +502,5 @@ public class MethodNode extends ClassMember
       w.write( "< " + addDims + " > ");
     }
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

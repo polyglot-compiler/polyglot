@@ -26,7 +26,8 @@ public class DumpAst extends NodeVisitor
   {
     try
     {
-      n.dump( w);
+      w.write("( ");
+      n.dump(w);
     }
     catch( SemanticException e)
     {
@@ -48,6 +49,7 @@ public class DumpAst extends NodeVisitor
   public Node leave( Node old, Node n, NodeVisitor v)
   {
     w.end();
+    w.write(" )");
     w.allowBreak(0, " ");
     return n;
   }

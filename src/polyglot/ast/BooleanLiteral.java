@@ -63,9 +63,8 @@ public class BooleanLiteral extends Literal
 
   public void dump( CodeWriter w) 
   {
-    w.write( "( BOOLEAN LITERAL");
+    w.write( "BOOLEAN LITERAL");
     w.write( " < " + value + " > ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

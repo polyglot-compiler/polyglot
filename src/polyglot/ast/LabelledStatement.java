@@ -89,10 +89,9 @@ public class LabelledStatement extends Statement
 
   public void dump( CodeWriter w)
   {
-    w.write( "( LABEL");
+    w.write( "LABEL");
     w.write( " < " + label + " > ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }
     

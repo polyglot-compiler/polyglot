@@ -217,31 +217,30 @@ public class UnaryExpression extends Expression
   public void dump( CodeWriter w)
   {
     if( operator == NEGATIVE) {
-      w.write( "( NEGATIVE ");
+      w.write( "NEGATIVE ");
     }
     if( operator == BITCOMP) {
-      w.write( "( BIT-COMPL");
+      w.write( "BIT-COMPL");
     }
     if( operator == PREINCR) {
-      w.write( "( PRE-INCR ");
+      w.write( "PRE-INCR ");
     }
     if( operator == PREDECR) {
-      w.write( "( PRE-DECR ");
+      w.write( "PRE-DECR ");
     }
     if( operator == POSTINCR) {
-      w.write( "( POST-INCR ");
+      w.write( "POST-INCR ");
     }
     if( operator == POSTDECR) {
-      w.write( "( POST-DECR ");
+      w.write( "POST-DECR ");
     }
     if( operator == POSITIVE) {
-      w.write( "( POSITIVE ");
+      w.write( "POSITIVE ");
     }
     if( operator == LOGICALNOT) {
-      w.write( "( LOGICAL-NOT ");
+      w.write( "LOGICAL-NOT ");
     }
     dumpNodeInfo( w);
-    w.write( ")");
   }
 
   public int getPrecedence()

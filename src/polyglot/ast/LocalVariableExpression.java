@@ -84,10 +84,9 @@ public class LocalVariableExpression extends Expression
 
   public void dump( CodeWriter w)
   {
-    w.write( "( LOCAL");
+    w.write( "LOCAL");
     w.write( " < " + name + " > ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 
   public int getPrecedence()

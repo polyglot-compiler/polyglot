@@ -115,10 +115,9 @@ public class ImportNode extends Node
 
   public void dump( CodeWriter w)
   {
-    w.write( "( IMPORT < " + (kind == PACKAGE ? "PACKAGE" : "CLASS"));
+    w.write( "IMPORT < " + (kind == PACKAGE ? "PACKAGE" : "CLASS"));
     w.write( " > < " + imports + " > ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }
 

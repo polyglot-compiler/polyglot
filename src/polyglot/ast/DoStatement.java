@@ -99,8 +99,7 @@ public class DoStatement extends Statement
 
   public void dump( CodeWriter w)
   {
-    w.write( "( DO ");
+    w.write( "DO ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

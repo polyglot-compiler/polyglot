@@ -124,9 +124,8 @@ public class ArrayIndexExpression extends Expression
   
   public void dump( CodeWriter w)
   {
-    w.write( "( ARRAY INDEX EXPR ") ;
+    w.write( "ARRAY INDEX EXPR ") ;
     dumpNodeInfo( w);
-    w.write( ")");
   }
 
   public int getPrecedence()

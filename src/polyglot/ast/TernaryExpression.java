@@ -114,9 +114,8 @@ public class TernaryExpression extends Expression
 
   public void dump( CodeWriter w)
   {
-    w.write( "( TERNARY ");
+    w.write( "TERNARY ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 
   public int getPrecedence()

@@ -169,9 +169,8 @@ public class SwitchStatement extends Statement
     
     public void dump( CodeWriter cw)
     {
-      cw.write( "( CASE ");
+      cw.write( "CASE ");
       dumpNodeInfo( cw);
-      cw.write( ")");
     }
 
     private boolean def;
@@ -365,8 +364,7 @@ public class SwitchStatement extends Statement
 
    public void dump( CodeWriter w)
    {
-      w.write( "( SWITCH ");
+      w.write( "SWITCH ");
       dumpNodeInfo( w);
-      w.write( ")");
    }
 }

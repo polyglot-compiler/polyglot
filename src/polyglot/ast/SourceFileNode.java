@@ -203,10 +203,9 @@ public class SourceFileNode extends Node
 
   public void dump( CodeWriter w)
   {
-    w.write( "( SOURCE FILE");
+    w.write( "SOURCE FILE");
     //    w.write( " < " + sourceFilename + " >");
     w.write( " < " + package_ + " > ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

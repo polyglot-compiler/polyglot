@@ -125,11 +125,10 @@ public class FormalParameter extends Node
 
   public void dump( CodeWriter w)
   {
-    w.write( "( FORMAL PARAM <" + name + "> ");
+    w.write( "FORMAL PARAM <" + name + "> ");
     if( isFinal) {
       w.write( "< final > ");
     }
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

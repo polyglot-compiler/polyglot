@@ -107,10 +107,9 @@ public class SpecialExpression extends Expression
 
   public void dump( CodeWriter w)
   {
-    w.write( "( SPECIAL");
+    w.write( "SPECIAL");
     w.write( " < " + (kind == SUPER ? "super" : "this") + " > ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 
   public int getPrecedence()

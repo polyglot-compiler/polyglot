@@ -111,9 +111,8 @@ public class InstanceofExpression extends Expression
 
   public void dump( CodeWriter w)
   {
-    w.write( "( INSTANCEOF ");
+    w.write( "INSTANCEOF ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 
   public int getPrecedence()

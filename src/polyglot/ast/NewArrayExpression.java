@@ -199,10 +199,9 @@ public class NewArrayExpression extends Expression
 
   public void dump( CodeWriter w)
   {
-    w.write( "( NEW");
+    w.write( "NEW");
     w.write( " < " + addDims + " > ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 
   public int getPrecedence()

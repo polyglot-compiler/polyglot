@@ -150,8 +150,7 @@ public class CatchBlock extends Node
   
   public void dump( CodeWriter w)
   {
-    w.write( "( CATCH BLOCK ");
+    w.write( "CATCH BLOCK ");
     dumpNodeInfo( w);
-    w.write( ")"); 
   }
 }

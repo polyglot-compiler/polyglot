@@ -119,9 +119,8 @@ public class CastExpression extends Expression
   
   public void dump( CodeWriter w)
   {
-    w.write( "( CAST ");
+    w.write( "CAST ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 
   public int getPrecedence()

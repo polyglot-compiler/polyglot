@@ -157,9 +157,8 @@ public class BlockStatement extends Statement {
 
   public void dump( CodeWriter w)
   {
-    w.write( "( BLOCK ");
+    w.write( "BLOCK ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }
 

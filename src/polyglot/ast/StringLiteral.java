@@ -93,9 +93,8 @@ public class StringLiteral extends Literal
 
   public void dump( CodeWriter w)
   {
-    w.write( "( STRING LITERAL");
+    w.write( "STRING LITERAL");
     w.write( " < " + value + " > ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

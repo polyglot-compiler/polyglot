@@ -129,11 +129,10 @@ public class FloatLiteral extends Literal
 
   public void dump( CodeWriter w)
   {
-    w.write( "( " + (kind == FLOAT ? " FLOAT LITERAL < " 
+    w.write( "" + (kind == FLOAT ? " FLOAT LITERAL < " 
                                         + Float.toString((float)value) :
                                " DOUBLE LITERAL < " 
                                         + Double.toString( value ) ) + " > ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

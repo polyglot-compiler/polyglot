@@ -85,9 +85,8 @@ public class ThrowStatement extends Statement
   
   public void dump( CodeWriter w)
   {
-    w.write( "( THROW ");
+    w.write( "THROW ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }
   

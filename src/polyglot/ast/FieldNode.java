@@ -129,10 +129,9 @@ public class FieldNode extends ClassMember
 
   public void dump( CodeWriter w)
   {
-    w.write ( "( FIELD DECLARATION ");
+    w.write ( "FIELD DECLARATION ");
        /* + accessFlags.getStringRepresentation() */
     dumpNodeInfo( w);
-    w.write( ")");
   } 
 }
 

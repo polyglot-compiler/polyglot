@@ -258,9 +258,8 @@ public class ForStatement extends Statement
 
   public void dump( CodeWriter w)
   {
-    w.write( "( FOR ");
+    w.write( "FOR ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }
 

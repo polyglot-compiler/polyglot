@@ -468,7 +468,7 @@ public class BinaryExpression extends Expression
 
    public void dump( CodeWriter w)
    {
-      w.write( "( BINARY EXPR < ");
+      w.write( "BINARY EXPR < ");
       w.write( getOperatorString(operator));
       w.write( " > ");
       dumpNodeInfo( w);

@@ -77,9 +77,8 @@ public class ExpressionStatement extends Statement
 
   public void dump( CodeWriter w)
   {
-    w.write( "( EXPR STMT ");
+    w.write( "EXPR STMT ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }
 

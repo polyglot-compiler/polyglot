@@ -122,13 +122,12 @@ public class TypeNode extends Node
 
   public void dump( CodeWriter w)
   {
-    w.write( "( TYPE");
+    w.write( "TYPE");
     w.write( " < " + type.getTypeString() + " > ");
     if( type instanceof AmbiguousType) {
       w.write( "AMB ");
     }
     dumpNodeInfo( w);
-    w.write( ")");
   }
 
   public void setCheckedType( Type type)

@@ -260,9 +260,8 @@ public class TryStatement extends Statement {
 
    public void dump( CodeWriter w)
    {
-      w.write( "( TRY ");
+      w.write( "TRY ");
       dumpNodeInfo( w);
-      w.write( ")");
    }
 
   private BlockStatement tryBlock;

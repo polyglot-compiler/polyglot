@@ -352,10 +352,9 @@ public class VariableDeclarationStatement extends Statement
   
   public void dump( CodeWriter w) throws SemanticException
   {
-    w.write( "( VAR DECL");
+    w.write( "VAR DECL");
     w.write( " < " + accessFlags.getStringRepresentation() + "> ");
     dumpNodeInfo( w);
-    w.write(")");
     
   }
 }

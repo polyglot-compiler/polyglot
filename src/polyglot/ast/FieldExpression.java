@@ -155,10 +155,9 @@ public class FieldExpression extends Expression
 
   public void dump( CodeWriter w)
   {
-    w.write( "( FIELD ACCESS");
+    w.write( "FIELD ACCESS");
     w.write( " < " + name + " > ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 
   public int getPrecedence()

@@ -100,8 +100,7 @@ public class WhileStatement extends Statement
 
   public void dump( CodeWriter w)
   {
-    w.write( "( WHILE ");
+    w.write( "WHILE ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

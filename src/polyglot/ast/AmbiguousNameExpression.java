@@ -212,7 +212,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 
   public void dump( CodeWriter w)
   {
-    w.write ("( AMBIGUOUS NAME < ");
+    w.write ("AMBIGUOUS NAME < ");
     for( Iterator i = names.listIterator(); i.hasNext(); ) {
       w.write( (String)i.next());
       if( i.hasNext()) {
@@ -221,6 +221,5 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     }
     w.write( " > ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

@@ -117,12 +117,11 @@ public class InitializerBlock extends ClassMember
 
   public void dump( CodeWriter w)
   {
-    w.write( "( INITIALIZER BLOCK ");
+    w.write( "INITIALIZER BLOCK ");
     if( isStatic) {
       w.write( "< static > ");
     }
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }
 

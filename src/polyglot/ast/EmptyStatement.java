@@ -43,8 +43,7 @@ public class EmptyStatement extends Statement
 
   public void dump( CodeWriter w) throws SemanticException
   {
-    w.write( "( EMPTY_STATEMENT");
+    w.write( "EMPTY_STATEMENT");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

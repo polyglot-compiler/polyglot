@@ -136,8 +136,7 @@ public class IfStatement extends Statement
 
   public void dump(CodeWriter w)
   {
-    w.write( "( IF ");
+    w.write( "IF ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

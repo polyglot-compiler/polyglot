@@ -98,9 +98,8 @@ public class SynchronizedStatement extends Statement
 
   public void dump( CodeWriter w)
   {
-    w.write( "( SYNCHRONIZED ");
+    w.write( "SYNCHRONIZED ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }
 

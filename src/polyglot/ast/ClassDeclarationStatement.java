@@ -88,8 +88,7 @@ public class ClassDeclarationStatement extends Statement
   
   public void dump( CodeWriter w)
   {
-    w.write( "( CLASS DECLARATION");
+    w.write( "CLASS DECLARATION");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

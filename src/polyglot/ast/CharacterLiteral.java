@@ -88,9 +88,8 @@ public class CharacterLiteral extends NumericalLiteral
 
   public void dump( CodeWriter w)
   {
-    w.write( "( CHAR LITERAL");
+    w.write( "CHAR LITERAL");
     w.write( " < " + value + " > ");
     dumpNodeInfo( w);
-    w.write( ")");
   }
 }

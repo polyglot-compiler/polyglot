@@ -286,9 +286,8 @@ public class NewObjectExpression extends Expression
 
   public void dump( CodeWriter w)
   {
-    w.write ("( NEW " );
+    w.write ("NEW " );
     dumpNodeInfo( w);
-    w.write( ")");
   }
   
   public int getPrecedence()
