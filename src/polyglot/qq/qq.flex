@@ -12,6 +12,7 @@ import polyglot.util.Position;
 import polyglot.util.InternalCompilerError;
 import java.util.*;
 import java.io.StringReader;
+import java.math.BigInteger;
 
 %%
 
@@ -262,45 +263,45 @@ import java.io.StringReader;
         return new Identifier(pos(), yytext(), sym.IDENTIFIER);
     }
 
-    /* Roll our own integer parser.  We can't use Long.parseLong because
-     * it doesn't handle numbers greater than 0x7fffffffffffffff correctly.
-     */
-    private long parseLong(String s, int radix) {
-        long x = 0L;
-
-        s = s.toLowerCase();
-
-        for (int i = 0; i < s.length(); i++) {
-            int c = s.charAt(i);
-
-            if (c < '0' || c > '9') {
-                c = c - 'a' + 10;
-            }
-            else {
-                c = c - '0';
-            }
-
-            x *= radix;
-            x += c;
-        }
-
-        return x;
-    }
-
     private Token int_lit(String s, int radix) {
-        long x = parseLong(s, radix);
-        return new IntegerLiteral(pos(), (int) x, sym.INTEGER_LITERAL);
+        BigInteger x = new BigInteger(s, radix);
+        boolean boundary = (radix == 10 && s.equals("2147483648"));
+        int bits = radix == 10 ? 31 : 32;
+        if (x.bitLength() > bits && ! boundary) {
+            error("Integer literal \"" + yytext() + "\" out of range.", pos());
+            return null;
+        }
+        return new IntegerLiteral(pos(), x.intValue(),
+                boundary ? sym.INTEGER_LITERAL_BD : sym.INTEGER_LITERAL);
     }
 
     private Token long_lit(String s, int radix) {
-        long x = parseLong(s, radix);
-        return new LongLiteral(pos(), x, sym.LONG_LITERAL);
+        BigInteger x = new BigInteger(s, radix);
+        boolean boundary = (radix == 10 && s.equals("9223372036854775808"));
+        int bits = radix == 10 ? 63 : 64;
+        if (x.bitLength() > bits && ! boundary) {
+            error("Long literal \"" + yytext() + "\" out of range.", pos());
+            return null;
+        }
+        return new LongLiteral(pos(), x.longValue(),
+                boundary ? sym.LONG_LITERAL_BD : sym.LONG_LITERAL);
     }
 
     private Token float_lit(String s) {
         try {
-            float x = Float.parseFloat(s);
-            return new FloatLiteral(pos(), x, sym.FLOAT_LITERAL);
+            Float x = Float.valueOf(s);
+	    boolean zero = true;
+	    for (int i = 0; i < s.length(); i++) {
+		if ('1' <= s.charAt(i) && s.charAt(i) <= '9') {
+		    zero = false;
+		    break;
+		}
+	    }
+	    if (x.isInfinite() || x.isNaN() || (x.floatValue() == 0 && ! zero)) {
+		error("Illegal float literal \"" + yytext() + "\"", pos());
+		return null;
+	    }
+            return new FloatLiteral(pos(), x.floatValue(), sym.FLOAT_LITERAL);
         }
         catch (NumberFormatException e) {
             error("Illegal float literal \"" + yytext() + "\"", pos());
@@ -310,11 +311,22 @@ import java.io.StringReader;
 
     private Token double_lit(String s) {
         try {
-            double x = Double.parseDouble(s);
-            return new DoubleLiteral(pos(), x, sym.DOUBLE_LITERAL);
+            Double x = Double.valueOf(s);
+	    boolean zero = true;
+	    for (int i = 0; i < s.length(); i++) {
+		if ('1' <= s.charAt(i) && s.charAt(i) <= '9') {
+		    zero = false;
+		    break;
+		}
+	    }
+	    if (x.isInfinite() || x.isNaN() || (x.floatValue() == 0 && ! zero)) {
+		error("Illegal double literal \"" + yytext() + "\"", pos());
+		return null;
+	    }
+            return new DoubleLiteral(pos(), x.doubleValue(), sym.DOUBLE_LITERAL);
         }
         catch (NumberFormatException e) {
-            error("Illegal float literal \"" + yytext() + "\"", pos());
+            error("Illegal double literal \"" + yytext() + "\"", pos());
             return null;
         }
     }
@@ -394,7 +406,7 @@ FloatingPointLiteral = [0-9]+ "." [0-9]* {ExponentPart}?
                      | [0-9]+ {ExponentPart}
 
 ExponentPart = [eE] {SignedInteger}
-SignedInteger = [-+]? [0-9]
+SignedInteger = [-+]? [0-9]+
 
 /* 3.10.4 Character Literals */
 OctalEscape = \\ [0-7]
@@ -552,18 +564,19 @@ OctalEscape = \\ [0-7]
                                        sb.append((char) x);
                                    }
                                    catch (NumberFormatException e) {
-                                       error("Illegal octal escape \"" +
-                                             yytext() + "\"", pos());
+                                       error("Illegal octal escape \""
+                                                  + yytext() + "\"", pos());
                                    }
                                  }
 
     /* Illegal escape character */
     \\.                          { error("Illegal escape character \"" +
-                                         yytext() + "\"", pos()); }
+                                              yytext() + "\"", pos()); }
 
     /* Unclosed character literal */
     {LineTerminator}             { yybegin(YYINITIAL);
-                                  error("Unclosed character literal", pos()); }
+                                  error("Unclosed character literal",
+                                             pos(sb.length())); }
 
     /* Anything else is okay */
     [^\r\n\'\\]+                 { sb.append( yytext() ); }
@@ -588,17 +601,19 @@ OctalEscape = \\ [0-7]
                                        sb.append((char) x);
                                    }
                                    catch (NumberFormatException e) {
-                                       error("Illegal octal escape \"" +
-                                             yytext() + "\"", pos());
+                                       error("Illegal octal escape \""
+                                                  + yytext() + "\"", pos());
                                    }
                                  }
 
     /* Illegal escape character */
     \\.                          { error("Illegal escape character \"" +
-                                         yytext() + "\"", pos()); }
+                                              yytext() + "\"", pos()); }
 
     /* Unclosed string literal */
-    {LineTerminator}             { error("Unclosed string literal", pos()); }
+    {LineTerminator}             { yybegin(YYINITIAL);
+                                   error("Unclosed string literal",
+                                              pos(sb.length())); }
 
     /* Anything else is okay */
     [^\r\n\"\\]+                 { sb.append( yytext() ); }
@@ -606,4 +621,4 @@ OctalEscape = \\ [0-7]
 
 /* Fallthrough case: anything not matched above is an error */
 .|\n                             { error("Illegal character \"" +
-                                         yytext() + "\"", pos()); }
+                                              yytext() + "\"", pos()); }

@@ -15,19 +15,31 @@ public class LiteralsCf {
         long l, l1, l2, l3;
 
         i = 2147483648; //ERR: too big
+        i = 2147483647; //OK
+        i = -2147483648; //OK
         i = 0x1ffffffff; //ERR: too big
+        i = 0x7fffffff; //OK
+        i = 0xffffffff; //OK
         i = 01234567012345670; //ERR: too big
-        i2 = 0x800000000;
-        i3 = 0200000000000;
-        i2 = 0x100000000;
-        i3 = 040000000000;
+        i2 = 0x800000000; //ERR: too big
+        i3 = 0200000000000; //ERR: too big
+        i2 = 0x100000000; //ERR: too big
+        i3 = 040000000000; //ERR: too big
 
         i = -2147483649; //ERR: too small
 
         l = 9223372036854775808L; //ERR: too big
+        l = 9223372036854775807L; //OK
         l = -9223372036854775809L; //ERR: too small
+        l = -9223372036854775808L; //OK
         l2 = 0x80000000000000000L;
+        l2 = 0xffffffffffffffffL; //OK
+        l2 = 0x1ffffffffffffffffL; //ERR: too big
+        l2 = 0x10000000000000000L; //ERR: too big
         l3 = 010000000000000000000000L;
+        l3 =  01777777777777777777777L; //OK
+        l3 =  02000000000000000000000L; //ERR: too big
+        l3 =  03777777777777777777777L; //ERR: too big
 
         i = 09; //ERR: illegal octal
 

@@ -11,11 +11,21 @@ import polyglot.util.*;
  */
 public class IntLit_c extends NumLit_c implements IntLit
 {
+    /** The kind of literal: INT or LONG. */ 
     protected Kind kind;
 
     public IntLit_c(Position pos, Kind kind, long value) {
 	super(pos, value);
         this.kind = kind;
+    }
+
+    /**
+     * @return True if this is a boundary case: the literal can only appear
+     * as the operand of a unary minus.
+     */
+    protected boolean boundary() {
+        return (kind == INT && (int) value == Integer.MIN_VALUE)
+            || (kind == LONG && value == Long.MIN_VALUE);
     }
 
     /** Get the value of the expression. */
@@ -61,20 +71,27 @@ public class IntLit_c extends NumLit_c implements IntLit
 
     public String toString() {
 	if (kind() == LONG) {
-            return Long.toString(value) + "L";
-        }
-        else {
-            return Long.toString(value);
-        }
+            if (boundary()) {
+                // the literal is negative, but print it as positive.
+                return "9223372036854775808L";
+            }
+            else {
+                return Long.toString(value) + "L";
+            }
+	}
+	else {
+            if (boundary()) {
+                // the literal is negative, but print it as positive.
+                return "2147483648";
+            }
+            else {
+                return Long.toString(value);
+            }
+	}
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-	if (kind() == LONG) {
-	    w.write(Long.toString(value) + "L");
-	}
-	else {
-	    w.write(Long.toString(value));
-	}
+        w.write(toString());
     }
 
     public Object constantValue() {
@@ -87,7 +104,7 @@ public class IntLit_c extends NumLit_c implements IntLit
     }
 
     public Precedence precedence() {
-        if (value < 0) {
+        if (value < 0L && ! boundary()) {
             return Precedence.UNARY;
         }
         else {

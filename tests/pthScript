@@ -37,6 +37,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         ConformanceCheck6.jl ;         
         ConformanceCheck7.jl (Semantic, "should be declared abstract");        
         packA/ConformanceCheck8.jl packB/ConformanceCheck8b.jl (Semantic, "should be declared abstract"); 
+        packA/Foo.jl packB/Bar.jl (Semantic, "Cannot call inaccessible method");
         package1/InnerClassAccess.jl package1/InnerClassProblem.jl ;
         Constants.jl ;  Constants2.jl ; Constants3.jl ; Constants4.jl ;
         Constants5.jl ; Constants6.jl ; Constants7.jl ; Constants8.jl;
@@ -64,23 +65,27 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         Increment.jl ;
         Infinite.jl (Post, ".*finally clause cannot complete normally.*"); // javac warning
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
-        LiteralsCf.jl   (Lexical, "Illegal float literal"), (Syntax),
-                        (Lexical, "Illegal float literal"), (Syntax),
-                        (Lexical, "Illegal float literal"), (Syntax),
-                        (Lexical, "Illegal double literal"), (Syntax),
-                        (Lexical, "Illegal double literal"), (Syntax),
-                        (Lexical, "Integer literal.*out of range"), (Syntax),
-                        (Lexical, "Integer literal.*out of range"), (Syntax),
-                        (Lexical, "Integer literal.*out of range"), (Syntax),
-                        (Lexical, "Integer literal.*out of range"), (Syntax),
-                        (Lexical, "Integer literal.*out of range"), (Syntax),
-                        (Lexical, "Integer literal.*out of range"), (Syntax),
-                        (Lexical, "Integer literal.*out of range"), (Syntax),
-                        (Lexical, "Integer literal.*out of range"), (Syntax),
-                        (Lexical, "Long literal.*out of range"), (Syntax),
-                        (Lexical, "Long literal.*out of range"), (Syntax),
-                        (Lexical, "Long literal.*out of range"), (Syntax),
-                        (Lexical, "Long literal.*out of range"), (Syntax),
+        LiteralsCf.jl   (Lexical, "Illegal float literal"),
+                        (Lexical, "Illegal float literal"),
+                        (Lexical, "Illegal float literal"),
+                        (Lexical, "Illegal double literal"),
+                        (Lexical, "Illegal double literal"),
+                        (Syntax),
+                        (Lexical, "Integer literal.*out of range"),
+                        (Lexical, "Integer literal.*out of range"),
+                        (Lexical, "Integer literal.*out of range"),
+                        (Lexical, "Integer literal.*out of range"),
+                        (Lexical, "Integer literal.*out of range"),
+                        (Lexical, "Integer literal.*out of range"),
+                        (Lexical, "Integer literal.*out of range"),
+                        (Syntax),
+                        (Lexical, "Long literal.*out of range"),
+                        (Lexical, "Long literal.*out of range"),
+                        (Lexical, "Long literal.*out of range"),
+                        (Lexical, "Long literal.*out of range"),
+                        (Lexical, "Long literal.*out of range"),
+                        (Lexical, "Long literal.*out of range"),
+                        (Lexical, "Long literal.*out of range"),
                         (Syntax),
                         (Syntax, "Unable to parse");
         Init6.jl ;

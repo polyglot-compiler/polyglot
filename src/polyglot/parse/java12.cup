@@ -131,7 +131,9 @@ terminal Token LSHIFTEQ, RSHIFTEQ, URSHIFTEQ; // assignment_operator
 terminal Token ANDEQ, XOREQ, OREQ; // assignment_operator
 
 terminal polyglot.lex.IntegerLiteral INTEGER_LITERAL;
+terminal polyglot.lex.IntegerLiteral INTEGER_LITERAL_BD;
 terminal polyglot.lex.LongLiteral LONG_LITERAL;
+terminal polyglot.lex.LongLiteral LONG_LITERAL_BD;
 terminal polyglot.lex.DoubleLiteral DOUBLE_LITERAL;
 terminal polyglot.lex.FloatLiteral FLOAT_LITERAL;
 terminal polyglot.lex.BooleanLiteral BOOLEAN_LITERAL;
@@ -152,6 +154,7 @@ terminal CONST, GOTO;
 non terminal SourceFile goal;
 // 19.3) Lexical Structure
 non terminal polyglot.ast.Lit literal;
+non terminal polyglot.ast.Lit boundary_literal;
 // 19.4) Types, Values, and Variables
 non terminal TypeNode type, primitive_type, numeric_type;
 non terminal TypeNode integral_type, floating_point_type;
@@ -306,6 +309,16 @@ literal ::=
     |   NULL_LITERAL:a
             {: RESULT = parser.nf.NullLit(parser.pos(a)); :}
     ;
+boundary_literal ::=
+                    // Lit
+        INTEGER_LITERAL_BD:a    
+            {: RESULT = parser.nf.IntLit(parser.pos(a), IntLit.INT,
+                                     a.getValue().intValue()); :} 
+    |   LONG_LITERAL_BD:a    
+            {: RESULT = parser.nf.IntLit(parser.pos(a), IntLit.LONG,
+                     a.getValue().longValue()); :} 
+    ;
+
 
 // 19.4) Types, Values, and Variables
 type ::=
@@ -1444,6 +1457,8 @@ unary_expression ::=
     |   PLUS:b unary_expression:a
             {: RESULT = parser.nf.Unary(parser.pos(b,a,a), Unary.POS, a); :}
     |   MINUS:b unary_expression:a
+            {: RESULT = parser.nf.Unary(parser.pos(b,a,a), Unary.NEG, a); :}
+    |   MINUS:b boundary_literal:a
             {: RESULT = parser.nf.Unary(parser.pos(b,a,a), Unary.NEG, a); :}
     |   unary_expression_not_plus_minus:a
             {: RESULT = a; :}
