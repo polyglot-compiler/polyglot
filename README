@@ -163,6 +163,12 @@ The Base64 code (polyglot.util.Base64) by Kevin Kelley
 <kelley@ruralnet.net>, 30718 Rd. 28, La Junta, CO, 81050 USA.
 http://kevinkelley.mystarband.net/java/goodies.html
 
+The following people have provided patches:
+
+        Keunwoo Lee <klee@cs.washington.edu>
+        Patrick Lam <plam@mit.edu>
+        Ondrej Lhotak <olhotak@sable.mcgill.ca>
+
 The development of the Polyglot project has been supported by a number
 of funding sources, including DARPA Contract F30602-99-1-0533, monitored
 by USAF Rome Laboratory, ONR Grant N00014-01-1-0968, NSF Grant 0208642,
