@@ -14,6 +14,7 @@ public class Position implements Serializable
     int column;
 
     public static final int UNKNOWN = -1;
+	public static final Position COMPILER_GENERATED = new Position("Compiler Generated");
 
     /** For deserialization. */
     protected Position() { }
