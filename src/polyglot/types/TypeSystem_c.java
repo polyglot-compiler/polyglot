@@ -795,6 +795,44 @@ public class TypeSystem_c implements TypeSystem
     throws SemanticException {
         return findMethod(container, name, argTypes, c.currentClass());
     }
+
+    /**
+     * Returns the list of methods with the given name defined or inherited
+     * into container, checking if the methods are accessible from the
+     * body of currClass
+     */
+    public boolean hasMethodNamed(ReferenceType container, String name) {
+        assert_(container);
+
+        if (container == null) {
+            throw new InternalCompilerError("Cannot access method \"" + name +
+                "\" within a null container type.");
+        }
+
+	if (! container.methodsNamed(name).isEmpty()) {
+            return true;
+	}
+
+	if (container.superType() != null && container.superType().isReference()) {
+            if (hasMethodNamed(container.superType().toReference(), name)) {
+                return true;
+            }
+	}
+
+	if (container.isClass()) {
+	    ClassType ct = container.toClass();
+	
+	    for (Iterator i = ct.interfaces().iterator(); i.hasNext(); ) {
+		Type it = (Type) i.next();
+                if (hasMethodNamed(it.toReference(), name)) {
+                    return true;
+                }
+	    }
+	}
+	
+        return false;
+    }
+
     /**
      * Requires: all type arguments are canonical.
      *

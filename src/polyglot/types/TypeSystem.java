@@ -380,6 +380,12 @@ public interface TypeSystem {
     boolean hasMethod(ReferenceType t, MethodInstance mi);
 
     /**
+     * Returns true iff <code>t</code> has a method with name <code>name</code>
+     * either defined in <code>t</code> or inherited into it.
+     */
+    boolean hasMethodNamed(ReferenceType t, String name);
+
+    /**
      * Returns true iff <code>m1</code> is the same method as <code>m2</code>.
      */
     boolean isSameMethod(MethodInstance m1, MethodInstance m2);

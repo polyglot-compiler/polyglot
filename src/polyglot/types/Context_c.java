@@ -139,7 +139,7 @@ public class Context_c implements Context
         // If found, stop the search since it shadows any enclosing
         // classes method of the same name.
         if (this.currentClass() != null &&
-            ! this.currentClass().methodsNamed(name).isEmpty()) {
+            ts.hasMethodNamed(this.currentClass(), name)) {
             if (Report.should_report(TOPICS, 3))
               Report.report(3, "find-method " + name + argTypes + " -> " +
                                 this.currentClass());
@@ -199,7 +199,7 @@ public class Context_c implements Context
           Report.report(3, "find-method-scope " + name + " in " + this);
 
         if (this.currentClass() != null &&
-            ! this.currentClass().methodsNamed(name).isEmpty()) {
+            ts.hasMethodNamed(this.currentClass(), name)) {
             if (Report.should_report(TOPICS, 3))
               Report.report(3, "find-method-scope " + name + " -> " +
                                 this.currentClass());
@@ -484,10 +484,8 @@ public class Context_c implements Context
     }
 
     public ClassType findMethodContainerInThisScope(String name) {
-        if (isClass()) {
-            if (! this.type.methodsNamed(name).isEmpty()) {
-                return this.type;
-            }
+        if (isClass() && ts.hasMethodNamed(this.currentClass(), name)) {
+            return this.type;
         }
         return null;
     }
