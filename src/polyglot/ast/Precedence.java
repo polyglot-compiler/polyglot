@@ -36,37 +36,37 @@ public class Precedence extends Enum {
     /** The precedence of a literal */
     public static final Precedence LITERAL     = new Precedence("literal", 0);
     /** The precedence of a unary expression. */
-    public static final Precedence UNARY       = new Precedence("unary", 1);
+    public static final Precedence UNARY       = new Precedence("unary", 10);
     /** The precedence of a cast expression. */
-    public static final Precedence CAST        = new Precedence("cast", 1);
+    public static final Precedence CAST        = new Precedence("cast", 10);
     /** The precedence of a <code>*</code>, <code>/</code>, or <code>%</code> expression. */
-    public static final Precedence MUL         = new Precedence("*", 2);
+    public static final Precedence MUL         = new Precedence("*", 20);
     /** The precedence of a <code>+</code> when applied to Strings.  This is of higher precedence than <code>+</code> applied to numbers. */
-    public static final Precedence STRING_ADD  = new Precedence("string+", 3);
+    public static final Precedence STRING_ADD  = new Precedence("string+", 30);
     /** The precedence of a <code>+</code> when applied to numbers, and the precedence of <code>-</code>. */
-    public static final Precedence ADD         = new Precedence("+", 4);
+    public static final Precedence ADD         = new Precedence("+", 40);
     /** The precedence of the shift expressions <code>&lt;&lt;</code>, <code>&gt;&gt;</code>, and <code>&gt;&gt;&gt;</code>. */
-    public static final Precedence SHIFT       = new Precedence("<<", 5);
+    public static final Precedence SHIFT       = new Precedence("<<", 50);
     /** The precedence of the relational expressions <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, and <code>&gt;=</code>. */
-    public static final Precedence RELATIONAL  = new Precedence("<", 6);
+    public static final Precedence RELATIONAL  = new Precedence("<", 60);
     /** The precedence of <code>instanceof</code> expressions. */
-    public static final Precedence INSTANCEOF  = new Precedence("isa", 7);
+    public static final Precedence INSTANCEOF  = new Precedence("isa", 70);
     /** The precedence of equality operators.  That is, precedence of <code>==</code> and <code>!=</code> expressions. */
-    public static final Precedence EQUAL       = new Precedence("==", 8);
+    public static final Precedence EQUAL       = new Precedence("==", 80);
     /** The precedence of bitwise AND (<code>&amp;<code>) expressions. */
-    public static final Precedence BIT_AND     = new Precedence("&", 9);
+    public static final Precedence BIT_AND     = new Precedence("&", 90);
     /** The precedence of bitwise XOR (<code>^<code>) expressions. */
-    public static final Precedence BIT_XOR     = new Precedence("^", 10);
+    public static final Precedence BIT_XOR     = new Precedence("^", 100);
     /** The precedence of bitwise OR (<code>|<code>) expressions. */
-    public static final Precedence BIT_OR      = new Precedence("|", 11);
+    public static final Precedence BIT_OR      = new Precedence("|", 110);
     /** The precedence of conditional AND (<code>&&<code>) expressions. */
-    public static final Precedence COND_AND    = new Precedence("&&", 12);
+    public static final Precedence COND_AND    = new Precedence("&&", 120);
     /** The precedence of conditional OR (<code>||<code>) expressions. */
-    public static final Precedence COND_OR     = new Precedence("||", 13);
+    public static final Precedence COND_OR     = new Precedence("||", 130);
     /** The precedence of ternary conditional expressions. */
-    public static final Precedence CONDITIONAL = new Precedence("?:", 14);
+    public static final Precedence CONDITIONAL = new Precedence("?:", 140);
     /** The precedence of assignment expressions. */
-    public static final Precedence ASSIGN      = new Precedence("=", 13);
+    public static final Precedence ASSIGN      = new Precedence("=", 130);
     /** The precedence of all other expressions. This has the lowest precedence to ensure the expression is parenthesized on output. */
     public static final Precedence UNKNOWN     = new Precedence("unknown", 999);
 }
