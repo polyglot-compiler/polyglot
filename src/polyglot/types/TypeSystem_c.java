@@ -812,7 +812,7 @@ public class TypeSystem_c implements TypeSystem
         assert_(container);
         assert_(argTypes);
 
-	List acceptable = findAcceptableMethods(container, name, argTypes);
+	List acceptable = findAcceptableMethods(container, name, argTypes, currClass);
 
 	if (acceptable.size() == 0) {
 	    throw new NoMemberException(NoMemberException.METHOD,
@@ -831,11 +831,6 @@ public class TypeSystem_c implements TypeSystem
 					+ acceptable);
 	}
 		
-	if (! isAccessible(mi, currClass)) {
-	    throw new NoMemberException(NoMemberException.METHOD,
-					"Cannot call inaccessible " + mi + ".");
-	}
-
 	return mi;
     }
 
@@ -855,7 +850,7 @@ public class TypeSystem_c implements TypeSystem
         assert_(container);
         assert_(argTypes);
 
-	List acceptable = findAcceptableConstructors(container, argTypes);
+	List acceptable = findAcceptableConstructors(container, argTypes, currClass);
 
 	if (acceptable.size() == 0) {
 	    throw new NoMemberException(NoMemberException.CONSTRUCTOR,
@@ -872,11 +867,6 @@ public class TypeSystem_c implements TypeSystem
 		"constructors match: " + acceptable);
 	}
 
-	if (! isAccessible(ci, currClass)) {
-	    throw new NoMemberException(NoMemberException.CONSTRUCTOR,
-					"Cannot invoke inaccessible " + ci + ".");
-	}
-	
 	return ci;
     }
 
@@ -937,14 +927,23 @@ public class TypeSystem_c implements TypeSystem
      * Applicable and Accessible as defined by JLS 15.11.2.1
      */
     protected List findAcceptableMethods(ReferenceType container, String name,
-                                     List argTypes)
+                                     List argTypes, ClassType currClass)
 	throws SemanticException {
 
         assert_(container);
         assert_(argTypes);
 
+        // The list of acceptable methods. These methods are accessible from
+        // currClass, the method call is valid, and they are not overridden
+        // by an unacceptable method (which can occur with protected methods
+        // only).
         List acceptable = new ArrayList();
 
+        // A list of unacceptable methods, where the method call is valid, but
+        // the method is not accessible. This list is needed to make sure that
+        // the acceptable methods are not overridden by an unacceptable method.
+        List unacceptable = new ArrayList();
+        
 	Set visitedTypes = new HashSet();
 
 	LinkedList typeQueue = new LinkedList();
@@ -959,7 +958,7 @@ public class TypeSystem_c implements TypeSystem
 
 	    visitedTypes.add(type);
 
-	    if (Report.should_report(Report.types, 2))
+            if (Report.should_report(Report.types, 2))
 		Report.report(2, "Searching type " + type + " for method " +
                               name + "(" + listToString(argTypes) + ")");
 
@@ -968,31 +967,44 @@ public class TypeSystem_c implements TypeSystem
 		    " non-reference type " + type + ".");
 	    }
 	    
-	    boolean stop = false;
-
-	    for (Iterator i = type.toReference().methods().iterator();
-		 i.hasNext(); ) {
-
+	    for (Iterator i = type.toReference().methods().iterator(); i.hasNext(); ) {
 		MethodInstance mi = (MethodInstance) i.next();
 
 		if (Report.should_report(Report.types, 3))
 		    Report.report(3, "Trying " + mi);
 
-		if (methodCallValid(mi, name, argTypes)) {
-		    acceptable.add(mi);
+                if (methodCallValid(mi, name, argTypes)) {
+                    if (isAccessible(mi, currClass)) {
+                        if (Report.should_report(Report.types, 3)) {
+                            Report.report(3, "->acceptable: " + mi + " in "
+                                          + mi.container());
+                        }
+
+                        acceptable.add(mi);
+                    }
+                    else {
+                        // method call is valid, but the method is
+                        // unacceptable.
+                        unacceptable.add(mi);
+                    }
 		}
-	    }
-	    
-	    if (! stop) {
-		if (type.toReference().superType() != null) {
-		    typeQueue.addLast(type.toReference().superType());
-		}
-		
-		typeQueue.addAll(type.toReference().interfaces());
-	    }
-	}
-    
-	return acceptable;
+            }
+            if (type.toReference().superType() != null) {
+                typeQueue.addLast(type.toReference().superType());
+            }
+
+            typeQueue.addAll(type.toReference().interfaces());
+        }
+
+        // remove any method in acceptable that are overridden by an
+        // unacceptable
+        // method.
+        for (Iterator i = unacceptable.iterator(); i.hasNext();) {
+            MethodInstance mi = (MethodInstance)i.next();
+            acceptable.removeAll(mi.overrides());
+        }
+
+        return acceptable;
     }
 
     /**
@@ -1000,7 +1012,8 @@ public class TypeSystem_c implements TypeSystem
      * Applicable and Accessible as defined by JLS 15.11.2.1
      */
     protected List findAcceptableConstructors(ClassType container,
-                                              List argTypes) {
+                                              List argTypes,
+                                              ClassType currClass) {
         assert_(container);
         assert_(argTypes);
 
@@ -1017,7 +1030,7 @@ public class TypeSystem_c implements TypeSystem
 	    if (Report.should_report(Report.types, 3))
 		Report.report(3, "Trying " + ci);
 
-	    if (callValid(ci, argTypes)) {
+	    if (callValid(ci, argTypes) && isAccessible(ci, currClass)) {
 		if (Report.should_report(Report.types, 3))
 		    Report.report(3, "->acceptable: " + ci);
 		acceptable.add(ci);
