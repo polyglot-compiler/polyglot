@@ -7,7 +7,7 @@ find_in_path() {
     OLD_IFS="${IFS}"
     IFS=':'
     (for i in ${PATH} ; do
-        if test -f $i/$1 && test -x $i/$1 ; then
+        if command test -f $i/$1 && command test -x $i/$1 ; then
             echo $i/$1 ;
         fi ;
     done) | head -1
@@ -66,14 +66,6 @@ echo java_cup.jar is ./java_cup.jar
 exists -f ./iDoclet.jar
 echo iDoclet.jar is ./iDoclet.jar
 
-TEST=`find_in_path test`
-echo test is "${TEST}"
-
-if [ -z "${TEST}" ] ; then
-    echo test not found in path using shell builtin
-    TEST='test'
-fi
-
 echo determining some Java properties:
 
 cat > PrintProperty.java <<EOF
@@ -120,8 +112,6 @@ echo creating Defs.mk
     echo
     echo ESC_SOURCE = '$(subst /,'${FILE_SEP}',$(SOURCE))'
     echo ESC_BUILDPATH = '$(subst /,'${FILE_SEP}',$(BUILDPATH))'
-    echo
-    echo TEST = "${TEST}"
     echo
     echo JAVA_HOME = "${JAVA_HOME}"
     echo

@@ -21,7 +21,7 @@ SOURCEPATH		= $(SOURCE)
 BIN 			= $(SOURCE)
 
 %.class: %.java
-	@if ${TEST} ! -f $(SOURCE)/classes/$(subst .,/,$(PACKAGE))/$@ || ${TEST} $< -nt $(SOURCE)/classes/$(subst .,/,$(PACKAGE))/$@ ; then \
+	@if command test ! -f $(SOURCE)/classes/$(subst .,/,$(PACKAGE))/$@ || command test $< -nt $(SOURCE)/classes/$(subst .,/,$(PACKAGE))/$@ ; then \
 		echo "$(JC)" $(JC_FLAGS) $< ; \
 		"$(JC)" $(JC_FLAGS) $< ; \
 	else \
