@@ -57,9 +57,11 @@ include jltools/frontend/Makefile
 include jltools/main/Makefile
 
 # JIF
-#include jltools/ext/jif/Makefile
+include jltools/ext/jif/lex/Makefile
 include jltools/ext/jif/parse/Makefile
 include jltools/ext/jif/ast/Makefile
+include jltools/ext/jif/types/Makefile
+
 
 #other targets:
 util: $(UTIL_TARGET) 
@@ -81,14 +83,17 @@ ext/op/runtime: $(EXT_OP_RUNTIME_TARGET)
 frontend: util types lex parse ast visit $(FRONTEND_TARGET)
 
 #jif
-#ext/jif: util types ast ext/op/jif/parse $(EXTJIF_TARGET)
+jif: util types ast ext/jif/lex ext/jif/parse ext/jif/ast ext/jif/types
+
+ext/jif/lex: util $(EXTJIFLEX_TARGET)
 
 ext/jif/parse: util $(EXTJIFPARSE_TARGET)
 
-ext/jif/ast: util types ast $(EXTJIFAST_TARGET)
+ext/jif/ast: util types ast  $(EXTJIFAST_TARGET)
 
-main: $(BIN)/jlc $(BIN)/jlcd frontend ext/op/runtime $(MAIN_TARGET)
-#main: frontend ext/op/runtime $(MAIN_TARGET)
+ext/jif/types: util $(JIFTYPES_TARGET)
+
+main: $(BIN)/jlc $(BIN)/jlcd frontend jif ext/op ext/op/runtime $(MAIN_TARGET)
 
 $(BIN)/jlc: jltools/main/jlc.c
 	$(CC) -o $(BIN)/jlc jltools/main/jlc.c
@@ -108,7 +113,8 @@ clean:
 	rm -f jltools/frontend/*.class
 	rm -f jltools/main/*.class
 	rm -f jltools/runtime/*.class
-
+	rm -f jltools/ext/jif/parse/*.class
+	rm -f jltools/ext/jif/ast/*.class
 
 # Delete class files as well as the grammar files, so that we can regenerate 
 # them. Also delete the javadoc & jar file, if they exis, as well as the jlc and 
@@ -122,6 +128,10 @@ clobber superclean: clean
 	rm -rf $(JAVADOC_OUTPUT)
 	rm -f $(BIN)/jlc
 	rm -f $(BIN)/jlcd
+	rm -f $(BIN)/jlc.exe
+	rm -f $(BIN)/jlcd.exe
+	rm -f jltools/ext/jif/parse/Grm.java
+	rm -f jltools/ext/jif/parse/sym.java
 
 # create a jar file
 jar: all
@@ -140,7 +150,9 @@ javadoc: FORCE
 			jltools.visit    \
 			jltools.main     \
 			jltools.ext.op   \
-			jltools.ext.op.runtime
+			jltools.ext.op.runtime \
+			jltools.ext.jif.ast \
+			jltools.ext.jif.parse
 
 FORCE:
 
