@@ -34,6 +34,11 @@ public class SubtypeSet implements java.util.Set
       ts = s.ts;
     }
 
+    public SubtypeSet(TypeSystem ts, Collection c) {
+      this(ts);
+      addAll(c);
+    }
+
     /**
      * Add an element of type <code>polyglot.types.Type</code> to the set
      * only if it has no supertypes already in the set. If we do add it, 
