@@ -28,7 +28,7 @@ public abstract class AbstractTest implements Test {
     }
     
     public final boolean run() {
-        output.startTest(this);
+        preRun();
         this.success = this.runTest();
         
         this.hasRun = true;
@@ -37,7 +37,6 @@ public abstract class AbstractTest implements Test {
             lastSuccess = this.getTestResult().dateLastSuccess;
         }
         this.setTestResult(this.createTestResult(lastSuccess));
-        output.finishTest(this);
         postRun();
         return success(); 
     }
@@ -45,7 +44,12 @@ public abstract class AbstractTest implements Test {
     
     protected abstract boolean runTest();
     
-    protected void postRun() {};
+    protected void preRun() {
+        output.startTest(this);
+    }
+    protected void postRun() {
+        output.finishTest(this, null);
+    }
     
     protected TestResult createTestResult(Date lastSuccess) {
         Date lastRun = new Date();

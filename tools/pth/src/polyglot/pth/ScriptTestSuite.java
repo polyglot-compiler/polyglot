@@ -42,6 +42,7 @@ public class ScriptTestSuite extends TestSuite {
     }
         
     protected void postRun() {
+        super.postRun();
         this.saveResults();
     }
 

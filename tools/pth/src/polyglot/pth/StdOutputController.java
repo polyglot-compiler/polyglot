@@ -5,11 +5,9 @@
 package polyglot.pth;
 
 import java.io.PrintStream;
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.regex.Pattern;
+
+import polyglot.util.ErrorQueue;
 
 /**
  * 
@@ -36,7 +34,7 @@ public class StdOutputController extends OutputController{
         out.print("  " + sft.getName() + ": ");
     }
     
-    protected void finishSourceFileTest(SourceFileTest sft) {
+    protected void finishSourceFileTest(SourceFileTest sft, ErrorQueue eq) {
         if (sft.success()) {
             out.println("OK");
         }

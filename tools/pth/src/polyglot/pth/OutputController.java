@@ -9,8 +9,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.regex.Pattern;
+
+import polyglot.util.ErrorQueue;
 
 /**
  * 
@@ -39,19 +39,19 @@ public abstract class OutputController {
             startSourceFileTest((SourceFileTest)t);
         }
     }
-    public void finishTest(Test t) {
+    public void finishTest(Test t, ErrorQueue eq) {
         if (t instanceof ScriptTestSuite) {
             finishScriptTestSuite((ScriptTestSuite)t);
         }
         else if (t instanceof SourceFileTest) {
-            finishSourceFileTest((SourceFileTest)t);
+            finishSourceFileTest((SourceFileTest)t, eq);
         }
     }
     
     protected abstract void startScriptTestSuite(ScriptTestSuite sts);
     protected abstract void startSourceFileTest(SourceFileTest sft);
     protected abstract void finishScriptTestSuite(ScriptTestSuite sts);
-    protected abstract void finishSourceFileTest(SourceFileTest sft);
+    protected abstract void finishSourceFileTest(SourceFileTest sft, ErrorQueue eq);
     
     public abstract void displayTestSuiteResults(String suiteName, TestSuiteResult tsr);
     public abstract void displayTestResults(TestResult tr);

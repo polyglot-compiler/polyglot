@@ -48,7 +48,12 @@ public class Main {
             // More output controllers should be written, for varying degrees
             // of detail.
             case 0:
+            case 1:
                 return new SilentOutputController(System.out);
+
+            case 8:
+            case 9:
+                return new VerboseOutputController(System.out);
 
             default:
                 return new StdOutputController(System.out);                

@@ -71,6 +71,10 @@ public class SourceFileTest extends AbstractTest {
         return checkErrorQueue(eq);
     }
     
+    protected void postRun() {
+        output.finishTest(this, eq);
+    }
+
     protected boolean checkErrorQueue(SilentErrorQueue eq) {
         List errors = new ArrayList(eq.getErrors());
         

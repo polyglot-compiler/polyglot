@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
+import polyglot.util.ErrorQueue;
+
 /**
  * 
  */
@@ -22,7 +24,7 @@ public class SilentOutputController extends OutputController{
     protected void startScriptTestSuite(ScriptTestSuite sts) { }
     protected void startSourceFileTest(SourceFileTest sft) { }
     protected void finishScriptTestSuite(ScriptTestSuite sts) { }
-    protected void finishSourceFileTest(SourceFileTest sft) { }
+    protected void finishSourceFileTest(SourceFileTest sft, ErrorQueue eq) { }
     public void displayTestSuiteResults(String suiteName, TestSuiteResult tsr) { }
     public void displayTestResults(TestResult tr) { }
 }
