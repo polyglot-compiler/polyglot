@@ -251,6 +251,10 @@ public class MethodNode extends ClassMember
     }
   }
 
+    public void setMTI(MethodTypeInstance mti) {
+	mtiThis = mti;
+    }
+
   public TypeNode getReturnTypeNode()
   {
     return returns;
@@ -265,6 +269,14 @@ public class MethodNode extends ClassMember
   {
     return name;
   }
+
+    public boolean getIsConstructor() {
+	return isConstructor;
+    }
+
+    public int getAddDims() {
+	return addDims;
+    }
 
   /**
    * Returns the parameter of this method as position <code>pos</code>.
