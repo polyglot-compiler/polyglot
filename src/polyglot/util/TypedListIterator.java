@@ -5,7 +5,7 @@
 package jltools.util;
 
 import java.util.ListIterator;
-import java.util.UnsupportedOperationException;
+import java.lang.UnsupportedOperationException;
 
 /**
  * A TypedListIterator is an ListIterator which will not allow members
