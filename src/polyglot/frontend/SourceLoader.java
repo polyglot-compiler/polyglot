@@ -3,13 +3,16 @@ package polyglot.frontend;
 import java.io.*;
 import java.util.*;
 import polyglot.main.Report;
+import polyglot.util.InternalCompilerError;
 
 /** A <code>SourceLoader</code> is responsible for loading source files. */
 public class SourceLoader
 {
     protected ExtensionInfo sourceExt;
     protected Collection sourcePath;
-    
+    /** 0 if unknown, 1 if case insensitive, -1 if not. */
+    protected int caseInsensitive;
+
     /**
      * This is a map from Files (of directories) to Set[String]s, which
      * records the first level of contents of the directory. This cache
@@ -21,6 +24,7 @@ public class SourceLoader
 	this.sourcePath = sourcePath;
 	this.sourceExt = sourceExt;
         this.directoryContentsCache = new HashMap();
+        this.caseInsensitive = 0;
     }
 
     /** Load a source from a specific file. */
@@ -31,12 +35,27 @@ public class SourceLoader
 	    throw new FileNotFoundException(fileName);
 	}
 
+        // If we haven't done so already,
+        // determine if the file system is case insensitive
+        setCaseInsensitive(fileName);
+
+        if (caseInsensitive()) {
+            fileName = fileName.toLowerCase();
+        }
+
         String[] exts = sourceExt.fileExtensions();
         boolean ok = false;
 
         for (int i = 0; i < exts.length; i++) {
-            if (fileName.endsWith("." + exts[i])) {
+            String ext = exts[i];
+
+            if (caseInsensitive()) {
+                ext = ext.toLowerCase();
+            }
+
+            if (fileName.endsWith("." + ext)) {
                 ok = true;
+                break;
             }
         }
 
@@ -103,12 +122,18 @@ public class SourceLoader
 	/* Search the source path. */
         String[] exts = sourceExt.fileExtensions();
 
+        if (current_dir == null) {
+            current_dir = new File(System.getProperty("user.dir"));
+        }
+
+        setCaseInsensitive(current_dir.getPath());
+
         for (int k = 0; k < exts.length; k++) {
             String fileName = className.replace('.', File.separatorChar) +
                                       "." + exts[k];
 
-            if (current_dir == null) {
-                current_dir = new File(System.getProperty("user.dir"));
+            if (caseInsensitive()) {
+                fileName = fileName.toLowerCase();
             }
 
             for (Iterator i = sourcePath.iterator(); i.hasNext(); ) {
@@ -120,7 +145,12 @@ public class SourceLoader
                     if (directory.exists()) {
                         String[] contents = directory.list();
                         for (int j = 0; j < contents.length; j++) {
-                            dirContents.add(contents[j]);
+                            if (caseInsensitive()) {
+                                dirContents.add(contents[j].toLowerCase());
+                            }
+                            else {
+                                dirContents.add(contents[j]);
+                            }
                         }
                     }                
                 }
@@ -153,5 +183,56 @@ public class SourceLoader
         }
 
         return null;
+    }
+
+    /** Is the file system case insensitive. */
+    public boolean caseInsensitive() {
+        if (caseInsensitive == 0) {
+            throw new InternalCompilerError("unknown case sensitivity");
+        }
+        return caseInsensitive == 1;
+    }
+
+    protected void setCaseInsensitive(String fileName) {
+        if (caseInsensitive != 0) {
+            return;
+        }
+
+        // File.equals doesn't work correctly on the Mac.
+        // So, get the list of files in the same directory
+        // as sourceFile.  Check if the sourceFile with two
+        // different cases exists but only appears in the list once.
+        File f1 = new File(fileName.toUpperCase());
+        File f2 = new File(fileName.toLowerCase());
+
+        if (f1.equals(f2)) {
+            caseInsensitive = 1;
+        }
+        else if (f1.exists() && f2.exists()) {
+            boolean f1Exists = false;
+            boolean f2Exists = false;
+
+            File dir = new File(f1.getParent());
+            File[] ls = dir.listFiles();
+            for (int i = 0; i < ls.length; i++) {
+                if (f1.equals(ls[i])) {
+                    f1Exists = true;
+                }
+                if (f2.equals(ls[i])) {
+                    f2Exists = true;
+                }
+            }
+
+            if (! f1Exists || ! f2Exists) {
+                caseInsensitive = 1;
+            }
+            else {
+                // There are two files.
+                caseInsensitive = -1;
+            }
+        }
+        else {
+            caseInsensitive = -1;
+        }
     }
 }
