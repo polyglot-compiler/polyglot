@@ -14,8 +14,8 @@ public class Eval_c extends Stmt_c implements Eval
 {
     protected Expr expr;
 
-    public Eval_c(Del ext, Position pos, Expr expr) {
-	super(ext, pos);
+    public Eval_c(JL del, Ext ext, Position pos, Expr expr) {
+	super(del, ext, pos);
 	this.expr = expr;
     }
 

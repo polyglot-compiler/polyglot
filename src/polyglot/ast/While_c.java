@@ -16,8 +16,8 @@ public class While_c extends Loop_c implements While
     protected Expr cond;
     protected Stmt body;
 
-    public While_c(Del ext, Position pos, Expr cond, Stmt body) {
-	super(ext, pos);
+    public While_c(JL del, Ext ext, Position pos, Expr cond, Stmt body) {
+	super(del, ext, pos);
 	this.cond = cond;
 	this.body = body;
     }

@@ -16,8 +16,8 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
     protected Expr array;
     protected Expr index;
 
-    public ArrayAccess_c(Del ext, Position pos, Expr array, Expr index) {
-	super(ext, pos);
+    public ArrayAccess_c(JL del, Ext ext, Position pos, Expr array, Expr index) {
+	super(del, ext, pos);
 	this.array = array;
 	this.index = index;
     }

@@ -12,8 +12,8 @@ import java.util.*;
  */
 public abstract class Term_c extends Node_c implements Term
 {
-    public Term_c(Del ext, Position pos) {
-	super(ext, pos);
+    public Term_c(JL del, Ext ext, Position pos) {
+	super(del, ext, pos);
     }
 
     /**

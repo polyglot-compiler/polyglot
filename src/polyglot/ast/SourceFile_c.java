@@ -21,8 +21,8 @@ public class SourceFile_c extends Node_c implements SourceFile
     protected ImportTable importTable;
     protected Source source;
 
-    public SourceFile_c(Del ext, Position pos, PackageNode package_, List imports, List decls) {
-	super(ext, pos);
+    public SourceFile_c(JL del, Ext ext, Position pos, PackageNode package_, List imports, List decls) {
+	super(del, ext, pos);
 	this.package_ = package_;
 	this.imports = TypedList.copyAndCheck(imports, Import.class, true);
 	this.decls = TypedList.copyAndCheck(decls, TopLevelDecl.class, true);

@@ -14,8 +14,8 @@ import polyglot.util.*;
  */
 public class CarrayAssign_c extends Assign_c
 {
-  public CarrayAssign_c(Del ext, Position pos, Expr left, Operator op, Expr right) {
-    super(ext, pos, left, op, right);
+  public CarrayAssign_c(JL del, Ext ext, Position pos, Expr left, Operator op, Expr right) {
+    super(del, ext, pos, left, op, right);
   }
 
   /**

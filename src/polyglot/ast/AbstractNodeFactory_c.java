@@ -11,17 +11,13 @@ import java.util.*;
 
 /**
  * This is a node factory that creates no nodes.  It, rather than
- * NodeFactory_c should be subclassed by any extension which should
+ * NodeFactory_c, should be subclassed by any extension which should
  * override the creation of <a>all</a> nodes.
  */
 public abstract class AbstractNodeFactory_c implements NodeFactory
 {
     public Disamb disamb() {
         return new Disamb_c();
-    }
-
-    public Del defaultExt() {
-        return new Del_c();
     }
 
     public final AmbPrefix AmbPrefix(Position pos, String name) {

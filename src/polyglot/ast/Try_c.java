@@ -16,8 +16,8 @@ public class Try_c extends Stmt_c implements Try
     protected List catchBlocks;
     protected Block finallyBlock;
 
-    public Try_c(Del ext, Position pos, Block tryBlock, List catchBlocks, Block finallyBlock) {
-	super(ext, pos);
+    public Try_c(JL del, Ext ext, Position pos, Block tryBlock, List catchBlocks, Block finallyBlock) {
+	super(del, ext, pos);
 	this.tryBlock = tryBlock;
 	this.catchBlocks = TypedList.copyAndCheck(catchBlocks, Catch.class, true);
 	this.finallyBlock = finallyBlock;

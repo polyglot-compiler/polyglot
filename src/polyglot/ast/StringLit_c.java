@@ -14,8 +14,8 @@ public class StringLit_c extends Lit_c implements StringLit
 {
     protected String value;
 
-    public StringLit_c(Del ext, Position pos, String value) {
-	super(ext, pos);
+    public StringLit_c(JL del, Ext ext, Position pos, String value) {
+	super(del, ext, pos);
 	this.value = value;
     }
 

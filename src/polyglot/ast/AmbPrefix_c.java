@@ -14,8 +14,8 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
     protected Prefix prefix;
     protected String name;
 
-    public AmbPrefix_c(Del ext, Position pos, Prefix prefix, String name) {
-	super(ext, pos);
+    public AmbPrefix_c(JL del, Ext ext, Position pos, Prefix prefix, String name) {
+	super(del, ext, pos);
 	this.prefix = prefix;
 	this.name = name;
     }

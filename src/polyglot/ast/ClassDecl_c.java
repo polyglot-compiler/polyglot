@@ -23,8 +23,8 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 
     protected ParsedClassType type;
 
-    public ClassDecl_c(Del ext, Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body) {
-	    super(ext, pos);
+    public ClassDecl_c(JL del, Ext ext, Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body) {
+	    super(del, ext, pos);
 	    this.flags = flags;
 	    this.name = name;
 	    this.superClass = superClass;

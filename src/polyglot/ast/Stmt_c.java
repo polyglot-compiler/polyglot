@@ -10,7 +10,7 @@ import polyglot.util.*;
  */
 public abstract class Stmt_c extends Term_c implements Stmt
 {
-    public Stmt_c(Del ext, Position pos) {
-	super(ext, pos);
+    public Stmt_c(JL del, Ext ext, Position pos) {
+	super(del, ext, pos);
     }
 }

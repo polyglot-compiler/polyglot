@@ -11,8 +11,8 @@ import polyglot.main.Options;
  */
 public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
 {
-  public CanonicalTypeNode_c(Del ext, Position pos, Type type) {
-    super(ext, pos);
+  public CanonicalTypeNode_c(JL del, Ext ext, Position pos, Type type) {
+    super(del, ext, pos);
     this.type = type;
   }
 

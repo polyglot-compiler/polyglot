@@ -2,6 +2,7 @@ package polyglot.frontend;
 
 import polyglot.ast.Node;
 import polyglot.visit.NodeVisitor;
+import polyglot.main.Report;
 import polyglot.util.*;
 
 /** A pass which runs a visitor. */
@@ -40,6 +41,9 @@ public class VisitorPass extends AbstractPass
         if (v_ != null) {
 	    ErrorQueue q = job.compiler().errorQueue();
 	    int nErrsBefore = q.errorCount();
+
+            if (Report.should_report(Report.frontend, 3))
+                Report.report(3, "Running " + v_ + " on " + ast);
 
             ast = ast.visit(v_);
             v_.finish(ast);

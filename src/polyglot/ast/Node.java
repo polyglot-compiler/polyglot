@@ -15,17 +15,37 @@ import polyglot.visit.*;
  * of the node should copy the node, set the field in the copy, and then
  * return the copy.
  */
-public interface Node extends NodeOps, Copy
+public interface Node extends JL, Copy
 {
     /**
      * Set the delegate of the node.
      */
-    Node del(Del del);
+    Node del(JL del);
 
     /**
      * Get the node's delegate.
      */
-    Del del();
+    JL del();
+
+    /**
+     * Set the extension of the node.
+     */
+    Node ext(Ext ext);
+
+    /**
+     * Get the node's extension.
+     */
+    Ext ext();
+
+    /**
+     * Set the node's nth extension, n &gt;= 1.
+     */
+    Node ext(int n, Ext ext);
+
+    /**
+     * Get the node's nth extension, n &gt;= 1.
+     */
+    Ext ext(int n);
 
     /**
      * Get the position of the node in the source file.  Returns null if
@@ -106,50 +126,4 @@ public interface Node extends NodeOps, Copy
      * Dump the AST node for debugging purposes.
      */
     void dump(CodeWriter w);
-
-    //////////////////////////////////////////////////////////////// 
-    // Duplicate the NodeOps interface, but deprecate the methods.
-    // That way, we'll get a warning if we try to call these directly.
-    //////////////////////////////////////////////////////////////// 
-
-    /** @deprectated */
-    Node buildTypesOverride(TypeBuilder tb) throws SemanticException;
-    /** @deprectated */
-    NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException;
-    /** @deprectated */
-    Node buildTypes(TypeBuilder tb) throws SemanticException;
-    /** @deprectated */
-    Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException;
-    /** @deprectated */
-    NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException;
-    /** @deprectated */
-    Node disambiguate(AmbiguityRemover ar) throws SemanticException;
-    /** @deprectated */
-    Node addMembersOverride(AddMemberVisitor am) throws SemanticException;
-    /** @deprectated */
-    NodeVisitor addMembersEnter(AddMemberVisitor am) throws SemanticException;
-    /** @deprectated */
-    Node addMembers(AddMemberVisitor am) throws SemanticException;
-    /** @deprectated */
-    Node foldConstantsOverride(ConstantFolder cf);
-    /** @deprectated */
-    NodeVisitor foldConstantsEnter(ConstantFolder cf);
-    /** @deprectated */
-    Node foldConstants(ConstantFolder cf);
-    /** @deprectated */
-    Node typeCheckOverride(TypeChecker tc) throws SemanticException;
-    /** @deprectated */
-    NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException;
-    /** @deprectated */
-    Node typeCheck(TypeChecker tc) throws SemanticException;
-    /** @deprectated */
-    Node exceptionCheckOverride(ExceptionChecker ec) throws SemanticException;
-    /** @deprectated */
-    NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException;
-    /** @deprectated */
-    Node exceptionCheck(ExceptionChecker ec) throws SemanticException;
-    /** @deprectated */
-    void translate(CodeWriter w, Translator tr);
-    /** @deprectated */
-    void prettyPrint(CodeWriter w, PrettyPrinter pp);
 }

@@ -18,8 +18,8 @@ public class Import_c extends Node_c implements Import
     protected Kind kind;
     protected String name;
 
-    public Import_c(Del ext, Position pos, Kind kind, String name) {
-	super(ext, pos);
+    public Import_c(JL del, Ext ext, Position pos, Kind kind, String name) {
+	super(del, ext, pos);
 	this.name = name;
 	this.kind = kind;
     }

@@ -9,10 +9,13 @@
   <property name="src" location="${basedir}"/>
 
   <!-- directory for class file targets -->
-  <property name="classes" location="classes"/>
+  <property name="classes" location="${basedir}/classes"/>
 
   <!-- distribution directory -->
-  <property name="dist"  location="dist"/>
+  <property name="dist"  location="${basedir}/dist"/>
+
+  <!-- binaries directory -->
+  <property name="bin"  location="${basedir}/bin"/>
 
   <path id="standard.classpath">
     <pathelement location="${classes}"/>
@@ -37,9 +40,6 @@
     description="generate the distribution">
     <!-- Create the distribution directory -->
     <mkdir dir="${dist}/lib"/>
-
-    <!-- Put everything in ${classes} into the polyglot-${DSTAMP}.jar file -->
-    <jar jarfile="${dist}/lib/polyglot-${DSTAMP}.jar" basedir="${classes}"/>
   </target>
 
   <target name="clean" description="clean up">
@@ -63,7 +63,7 @@
   </target>
 
   <!-- compile the base compiler excluding the jl extension -->
-  <target name="compile-base" depends="init,ppg" 
+  <target name="compile-base" depends="init,bin,ppg" 
           description="compile the source">
     <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/**"
@@ -354,6 +354,7 @@
   <target name="split" depends="jif">
     <antcall target="compile-ext">
       <param name="ext" value="split"/>
+      <param name="parser.type" value="cup"/>
     </antcall>
   </target>
 
@@ -386,12 +387,118 @@
     </antcall>
   </target>
 
-  <target name="polyglot-dist" depends="jl,pao"/>
-  <target name="jif-dist" depends="jif"/>
-  <target name="split-dist" depends="split"/>
-  <target name="polyj-dist" depends="polyj"/>
-  <target name="jmatch-dist" depends="jmatch"/>
-  <target name="coffer-dist" depends="coffer"/>
+  <target name="bin">
+    <echo file="${bin}/defs" append="no">#\!/bin/sh
+# DO NOT EDIT - This file was automatically generated.
 
+JAVA='${java.home}/bin/java'
+FILE_SEP='${file.separator}'
+PATH_SEP='${path.separator}'
+TOP='${basedir}'
+
+ext=''
+
+    </echo>
+
+    <concat destfile="${bin}/jlc">
+      <filelist dir="${bin}" files="defs,jlc.in"/>
+    </concat>
+
+    <chmod perm="+x" file="${bin}/jlc"/>
+    <delete file="${bin}/defs"/>
+  </target>
+
+  <target name="jar" depends="jl">
+    <jar jarfile="jl.jar" basedir="${classes}"
+      includes="polyglot/ast/**,polyglot/ext/jl/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**"/>
+  </target>
+
+  <target name="pao-jar" depends="pao">
+    <jar jarfile="pao.jar" basedir="${classes}" includes="polyglot/ext/pao/**"/>
+  </target>
+
+  <target name="coffer-jar" depends="coffer">
+    <jar jarfile="coffer.jar" basedir="${classes}" includes="polyglot/ext/coffer/**"/>
+  </target>
+
+  <target name="pao-dist" depends="base-dist,pao-jar">
+    <copy todir="${dist}/lib" file="pao.jar"/>
+  </target>
+
+  <target name="coffer-dist" depends="base-dist,coffer-jar">
+    <copy todir="${dist}/lib" file="coffer.jar"/>
+  </target>
+
+  <target name="base-dist" depends="jar,dist,bin">
+    <copy todir="${dist}/lib" file="jl.jar"/>
+
+    <copy todir="${dist}/polyglot/ast">
+      <fileset dir="${src}/polyglot/ast" excludes="**/Makefile"/>
+    </copy>
+
+    <copy todir="${dist}/polyglot/ext/jl">
+      <fileset dir="${src}/polyglot/ext/jl" excludes="**/Makefile"/>
+    </copy>
+
+    <copy todir="${dist}/polyglot/frontend">
+      <fileset dir="${src}/polyglot/frontend" excludes="**/Makefile"/>
+    </copy>
+
+    <copy todir="${dist}/polyglot/lex">
+      <fileset dir="${src}/polyglot/lex" excludes="**/Makefile"/>
+    </copy>
+
+    <copy todir="${dist}/polyglot/main">
+      <fileset dir="${src}/polyglot/main" excludes="**/Makefile"/>
+    </copy>
+
+    <copy todir="${dist}/polyglot/parse">
+      <fileset dir="${src}/polyglot/parse" excludes="**/Makefile"/>
+    </copy>
+
+    <copy todir="${dist}/polyglot/types">
+      <fileset dir="${src}/polyglot/types" excludes="**/Makefile"/>
+    </copy>
+
+    <copy todir="${dist}/polyglot/util">
+      <fileset dir="${src}/polyglot/util" excludes="**/Makefile"/>
+    </copy>
+
+    <copy todir="${dist}/polyglot/visit">
+      <fileset dir="${src}/polyglot/visit" excludes="**/Makefile"/>
+    </copy>
+
+    <copy todir="${dist}/java_cup">
+      <fileset dir="java_cup"/>
+    </copy>
+
+    <copy file="${bin}/jlc.in" todir="${dist}/bin"/>
+    <copy file="doc/Overview.txt" todir="${dist}/doc"/>
+    <copy file="jlex.jar" todir="${dist}"/>
+    <copy file="build.xml" todir="${dist}"/>
+    <copy file="README" todir="${dist}"/>
+    <copy file="LICENSE" todir="${dist}"/>
+  </target>
+
+  <target name="dist-javadoc" depends="base-dist">
+    <ant inheritAll="false" antfile="${dist}/build.xml" dir="${dist}" target="javadoc"/>
+    <ant inheritAll="false" antfile="${dist}/build.xml" dir="${dist}" target="clobber"/>
+  </target>
+
+  <target name="javadoc" depends="jl">
+    <javadoc sourcepath="${basedir}" destdir="doc/api">
+      <packageset dir="${basedir}" defaultexcludes="yes">
+        <include name="polyglot/**"/>
+        <exclude name="**/tests"/>
+        <exclude name="**/test"/>
+      </packageset>
+    </javadoc>
+  </target>
+
+  <target name="polyglot-dist" depends="base-dist,pao-dist,coffer-dist,dist-javadoc"/>
+  <target name="jif-dist" depends="base-dist,jif"/>
+  <target name="split-dist" depends="base-dist,split"/>
+  <target name="polyj-dist" depends="base-dist,polyj"/>
+  <target name="jmatch-dist" depends="base-dist,jmatch"/>
 </project>
 

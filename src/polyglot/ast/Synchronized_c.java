@@ -16,8 +16,8 @@ public class Synchronized_c extends Stmt_c implements Synchronized
     protected Expr expr;
     protected Block body;
 
-    public Synchronized_c(Del ext, Position pos, Expr expr, Block body) {
-	super(ext, pos);
+    public Synchronized_c(JL del, Ext ext, Position pos, Expr expr, Block body) {
+	super(del, ext, pos);
 	this.expr = expr;
 	this.body = body;
     }

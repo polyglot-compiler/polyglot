@@ -1,11 +1,12 @@
 package polyglot.ext.pao;
 
-import polyglot.ext.pao.parse.Lexer;
+import polyglot.ext.pao.parse.Lexer_c;
 import polyglot.ext.pao.parse.Grm;
 import polyglot.ext.pao.ast.*;
 import polyglot.ext.pao.types.*;
 import polyglot.ext.pao.visit.*;
 
+import polyglot.lex.Lexer;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
@@ -29,7 +30,7 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
     }
 
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
-        Lexer lexer = new Lexer(reader, source.name(), eq);
+        Lexer lexer = new Lexer_c(reader, source.name(), eq);
         Grm grm = new Grm(lexer, ts, nf, eq);
         return new CupParser(grm, source, eq);
     }

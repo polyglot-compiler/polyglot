@@ -20,8 +20,8 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     protected Block body;
     protected ConstructorInstance ci;
 
-    public ConstructorDecl_c(Del ext, Position pos, Flags flags, String name, List formals, List throwTypes, Block body) {
-	super(ext, pos);
+    public ConstructorDecl_c(JL del, Ext ext, Position pos, Flags flags, String name, List formals, List throwTypes, Block body) {
+	super(del, ext, pos);
 	this.flags = flags;
 	this.name = name;
 	this.formals = TypedList.copyAndCheck(formals, Formal.class, true);

@@ -19,8 +19,8 @@ public class Field_c extends Expr_c implements Field
   protected String name;
   protected FieldInstance fi;
 
-  public Field_c(Del ext, Position pos, Receiver target, String name) {
-    super(ext, pos);
+  public Field_c(JL del, Ext ext, Position pos, Receiver target, String name) {
+    super(del, ext, pos);
     this.target = target;
     this.name = name;
 

@@ -17,8 +17,8 @@ public class Special_c extends Expr_c implements Special
     protected Special.Kind kind;
     protected TypeNode qualifier;
 
-    public Special_c(Del ext, Position pos, Special.Kind kind, TypeNode qualifier) {
-	super(ext, pos);
+    public Special_c(JL del, Ext ext, Position pos, Special.Kind kind, TypeNode qualifier) {
+	super(del, ext, pos);
 	this.kind = kind;
 	this.qualifier = qualifier;
     }

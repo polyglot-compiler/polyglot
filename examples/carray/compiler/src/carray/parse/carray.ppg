@@ -5,81 +5,35 @@ package polyglot.ext.carray.parse;
 import polyglot.ext.carray.types.CarrayTypeSystem;
 import polyglot.ext.carray.ast.CarrayNodeFactory;
 import polyglot.ext.jl.parse.Name;
-import polyglot.ext.jl.parse.JLUtil;
 
-parser code {:
-	ErrorQueue eq;
-	Lexer lexer;
-	CarrayTypeSystem ts;
-	CarrayNodeFactory nf;
-	JLUtil util;
+parser Grm extends polyglot.ext.jl.parse.Grm {:
+    final CarrayTypeSystem ts;
+    final CarrayNodeFactory nf;
 
-	public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
-		this();
-		eq = q;
-		lexer = l;
-		ts = (CarrayTypeSystem) t;
-		nf = (CarrayNodeFactory) n;
-		util = new JLUtil(new CarrayParserWrapper(this));
-	}
+    public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
+        super(l, t, n, q);
+        ts = (CarrayTypeSystem) t;
+        nf = (CarrayNodeFactory) n;
+    }
 
     /**
-	 * Override the default CUP routine.
-	 */
-    public void syntax_error(java_cup.runtime.Symbol current) {
-        Position p = ((Token) current.value).getPosition();
-
-        if (current.sym == sym.EOF) {
-            report_error("Unexpected end of file.", p);
-        } else {
-            report_error("Syntax error.", p);
+      * Return a TypeNode representing a <code>dims</code>-dimensional
+      * const array of <code>n</code>.
+      */
+    public TypeNode constArray(TypeNode n, int dims) throws Exception {
+        if (dims > 0) {
+            if (n instanceof CanonicalTypeNode) {
+                Type t = ((CanonicalTypeNode) n).type();
+                return nf.CanonicalTypeNode(n.position(),
+                                            ts.constArrayOf(n.position(),
+                                                            t, dims));
+            }
+            return nf.ConstArrayTypeNode(n.position(), constArray(n, dims-1));
+        }
+        else {
+            return n;
         }
     }
-
-	/**
-	 * Override the default CUP routine.
-	 */
-    public void report_error(String message, Object info) {
-        if (info instanceof Position) {
-            eq.enqueue(ErrorInfo.SYNTAX_ERROR, message, (Position) info);
-        } else {
-            eq.enqueue(ErrorInfo.SYNTAX_ERROR, message);
-        }
-    }
-
-	/**
-	 * Override the default CUP routine.
-	 */
-	public void report_fatal_error(String message, Object info)
-        throws Exception
-    {
-        report_error(message, info);
-		eq.enqueue(ErrorInfo.SYNTAX_ERROR,
-            "Unable to recover from previous errors.");
-        die();
-	}
-
-	/**
-	 * Report a fatal error then abort parsing.
-	 */
-    public void die(String msg, Position pos) throws Exception {
-		report_fatal_error(msg, pos);
-    }
-
-	/**
-	 * Report a fatal error then abort parsing.
-	 */
-    public void die(Position pos) throws Exception {
-		report_fatal_error("Syntax error.", pos);
-    }
-
-	/**
-	 * Report a fatal error then abort parsing.
-	 */
-    public void die() throws Exception {
-		throw new Exception("Couldn't repair and continue parse");
-    }
-
 :};
 
 start with goal;
@@ -88,9 +42,9 @@ start with goal;
 extend array_type ::=
                     // TypeNode
         primitive_type:a CONST dims:b
-            {: RESULT = ((CarrayParserWrapper)parser.util.parser()).constArray(a, b.intValue()); :}
+            {: RESULT = parser.constArray(a, b.intValue()); :}
     |   name:a CONST dims:b
-            {: RESULT = ((CarrayParserWrapper)parser.util.parser()).constArray(a.toType(), b.intValue()); :}
+            {: RESULT = parser.constArray(a.toType(), b.intValue()); :}
     ;
 
 

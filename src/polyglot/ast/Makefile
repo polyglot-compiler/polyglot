@@ -22,6 +22,7 @@ SOURCES = \
 	ArrayTypeNode.java \
 	Assign.java \
 	Binary.java \
+	JL.java \
 	Block.java \
 	BooleanLit.java \
 	Branch.java \
@@ -38,7 +39,6 @@ SOURCES = \
 	ConstructorCall.java \
 	ConstructorDecl.java \
 	Disamb.java \
-	Del.java \
 	Do.java \
 	Empty.java \
 	Eval.java \

@@ -10,8 +10,8 @@ import polyglot.util.*;
  */
 public class NullLit_c extends Lit_c implements NullLit
 {
-    public NullLit_c(Del ext, Position pos) {
-	super(ext, pos);
+    public NullLit_c(JL del, Ext ext, Position pos) {
+	super(del, ext, pos);
     }
 
     /** Type check the expression. */

@@ -37,8 +37,8 @@ public class PaoBoxer extends AscriptionVisitor
     public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         n = super.leaveCall(old, n, v);
 
-        if (n.del() instanceof PaoDel) {
-            return ((PaoDel) n.del()).rewrite((PaoTypeSystem) typeSystem(),
+        if (n.ext() instanceof PaoExt) {
+            return ((PaoExt) n.ext()).rewrite((PaoTypeSystem) typeSystem(),
                                               (PaoNodeFactory) nodeFactory());
         }
 

@@ -41,6 +41,7 @@ import polyglot.util.ErrorInfo;
 
 %public
 %class Lexer_c
+%implements Lexer
 %type Token
 %function nextToken
 

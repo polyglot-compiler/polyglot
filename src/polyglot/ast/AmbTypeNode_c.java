@@ -13,9 +13,9 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
   protected QualifierNode qual;
   protected String name;
 
-  public AmbTypeNode_c(Del ext, Position pos, QualifierNode qual,
+  public AmbTypeNode_c(JL del, Ext ext, Position pos, QualifierNode qual,
                        String name) {
-    super(ext, pos);
+    super(del, ext, pos);
 
     this.qual = qual;
     this.name = name;

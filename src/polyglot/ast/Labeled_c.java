@@ -15,8 +15,8 @@ public class Labeled_c extends Stmt_c implements Labeled
     protected String label;
     protected Stmt statement;
 
-    public Labeled_c(Del ext, Position pos, String label, Stmt statement) {
-	super(ext, pos);
+    public Labeled_c(JL del, Ext ext, Position pos, String label, Stmt statement) {
+	super(del, ext, pos);
 	this.label = label;
 	this.statement = statement;
     }

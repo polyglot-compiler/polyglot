@@ -20,10 +20,10 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
     Expr init;
     LocalInstance li;
 
-    public LocalDecl_c(Del ext, Position pos, Flags flags, TypeNode type,
+    public LocalDecl_c(JL del, Ext ext, Position pos, Flags flags, TypeNode type,
                        String name, Expr init)
     {
-        super(ext, pos);
+        super(del, ext, pos);
         this.flags = flags;
         this.type = type;
         this.name = name;

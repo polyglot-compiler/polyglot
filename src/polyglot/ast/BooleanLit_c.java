@@ -12,8 +12,8 @@ public class BooleanLit_c extends Lit_c implements BooleanLit
 {
   protected boolean value;
 
-  public BooleanLit_c(Del ext, Position pos, boolean value) {
-    super(ext, pos);
+  public BooleanLit_c(JL del, Ext ext, Position pos, boolean value) {
+    super(del, ext, pos);
     this.value = value;
   }
 

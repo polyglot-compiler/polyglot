@@ -16,8 +16,8 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 {
     protected List elements;
 
-    public ArrayInit_c(Del ext, Position pos, List elements) {
-	super(ext, pos);
+    public ArrayInit_c(JL del, Ext ext, Position pos, List elements) {
+	super(del, ext, pos);
 	this.elements = TypedList.copyAndCheck(elements, Expr.class, true);
     }
 

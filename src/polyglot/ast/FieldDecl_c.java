@@ -21,10 +21,10 @@ public class FieldDecl_c extends Node_c implements FieldDecl {
     FieldInstance fi;
     InitializerInstance ii;
 
-    public FieldDecl_c(Del ext, Position pos, Flags flags, TypeNode type,
+    public FieldDecl_c(JL del, Ext ext, Position pos, Flags flags, TypeNode type,
                        String name, Expr init)
     {
-        super(ext, pos);
+        super(del, ext, pos);
         this.flags = flags;
         this.type = type;
         this.name = name;

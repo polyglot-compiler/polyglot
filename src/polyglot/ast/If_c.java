@@ -17,8 +17,8 @@ public class If_c extends Stmt_c implements If
     protected Stmt consequent;
     protected Stmt alternative;
 
-    public If_c(Del ext, Position pos, Expr cond, Stmt consequent, Stmt alternative) {
-	super(ext, pos);
+    public If_c(JL del, Ext ext, Position pos, Expr cond, Stmt consequent, Stmt alternative) {
+	super(del, ext, pos);
 	this.cond = cond;
 	this.consequent = consequent;
 	this.alternative = alternative;

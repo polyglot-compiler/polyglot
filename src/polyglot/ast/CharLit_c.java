@@ -11,8 +11,8 @@ import polyglot.util.*;
  */
 public class CharLit_c extends NumLit_c implements CharLit
 {
-    public CharLit_c(Del ext, Position pos, char value) {
-	super(ext, pos, value);
+    public CharLit_c(JL del, Ext ext, Position pos, char value) {
+	super(del, ext, pos, value);
     }
 
     /** Get the value of the expression. */

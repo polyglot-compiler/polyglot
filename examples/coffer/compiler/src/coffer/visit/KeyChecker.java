@@ -90,8 +90,8 @@ public class KeyChecker extends DataFlow
     public Map flow(Item in, FlowGraph graph, Term n, Set succEdgeKeys) {
         DataFlowItem df = (DataFlowItem) in;
 
-        if (n.del() instanceof CofferDel) {
-            CofferDel ndel = (CofferDel) n.del();
+        if (n.ext() instanceof CofferExt) {
+            CofferExt ext = (CofferExt) n.ext();
 
             Map m = new HashMap();
 
@@ -103,10 +103,10 @@ public class KeyChecker extends DataFlow
                     t = ((FlowGraph.ExceptionEdgeKey) e).type();
                 }
 
-                KeySet must_held = ndel.keyFlow(df.must_held, t);
-                KeySet may_held = ndel.keyFlow(df.may_held, t);
-                KeySet must_stored = ndel.keyAlias(df.must_stored, t);
-                KeySet may_stored = ndel.keyAlias(df.may_stored, t);
+                KeySet must_held = ext.keyFlow(df.must_held, t);
+                KeySet may_held = ext.keyFlow(df.may_held, t);
+                KeySet must_stored = ext.keyAlias(df.must_stored, t);
+                KeySet may_stored = ext.keyAlias(df.may_stored, t);
 
                 must_stored = must_stored.retainAll(must_held);
                 may_stored = may_stored.retainAll(may_held);
@@ -194,9 +194,9 @@ public class KeyChecker extends DataFlow
                                         " in a local variable.", n.position());
         }
 
-        if (n.del() instanceof CofferDel) {
-            CofferDel ndel = (CofferDel) n.del();
-            ndel.checkHeldKeys(df.must_held, df.must_stored);
+        if (n.ext() instanceof CofferExt) {
+            CofferExt ext = (CofferExt) n.ext();
+            ext.checkHeldKeys(df.must_held, df.must_stored);
         }
     }
 }

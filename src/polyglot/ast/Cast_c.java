@@ -17,8 +17,8 @@ public class Cast_c extends Expr_c implements Cast
     protected TypeNode castType;
     protected Expr expr;
 
-    public Cast_c(Del ext, Position pos, TypeNode castType, Expr expr) {
-	super(ext, pos);
+    public Cast_c(JL del, Ext ext, Position pos, TypeNode castType, Expr expr) {
+	super(del, ext, pos);
 	this.castType = castType;
 	this.expr = expr;
     }

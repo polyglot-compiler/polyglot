@@ -18,8 +18,8 @@ public class For_c extends Loop_c implements For
     protected List iters;
     protected Stmt body;
 
-    public For_c(Del ext, Position pos, List inits, Expr cond, List iters, Stmt body) {
-	super(ext, pos);
+    public For_c(JL del, Ext ext, Position pos, List inits, Expr cond, List iters, Stmt body) {
+	super(del, ext, pos);
 	this.inits = TypedList.copyAndCheck(inits, ForInit.class, true);
 	this.cond = cond;
 	this.iters = TypedList.copyAndCheck(iters, ForUpdate.class, true);

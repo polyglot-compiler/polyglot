@@ -11,70 +11,92 @@ import polyglot.types.Qualifier;
 import polyglot.util.*;
 import java.util.*;
 
-/**
- * NodeFactory for coffer extension.
+/** An implementation of the <code>CofferNodeFactory</code> interface. 
  */
-public class CofferNodeFactory_c extends NodeFactory_c
-                             implements CofferNodeFactory
+public class CofferNodeFactory_c extends ExtNodeFactory_c implements CofferNodeFactory
 {
-    public Del defaultExt() { return new CofferDel_c(); }
-
-    /*
-    public CanonicalTypeNode CanonicalTypeNode(Position pos, Type t) {
-        return new CanonicalTypeNode_c(new TypeNodeDel_c(), pos, t);
-    }
-    */
-
-    public Assign Assign(Position pos, Expr left, Assign.Operator op, Expr right) {
-        return (Assign) super.Assign(pos, left, op, right).del(new AssignDel_c());
+    public CofferNodeFactory_c() {
+        super(new NodeFactory_c());
     }
 
-    public Local Local(Position pos, String name) {
-        return (Local) super.Local(pos, name).del(new LocalDel_c());
+    public Node extNode(Node n) {
+        return n.ext(new CofferExt_c());
     }
 
-    public Special Special(Position pos, Special.Kind kind, TypeNode outer) {
-        return (Special) super.Special(pos, kind, outer).del(new SpecialDel_c());
+    public Assign extAssign(Assign n) {
+        return (Assign) super.extAssign(n).del(new AssignDel_c()).ext(new AssignExt_c());
     }
 
-    public LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, String name, Expr init) {
-        return (LocalDecl) super.LocalDecl(pos, flags, type, name, init).del(new LocalDeclDel_c());
+    public Local extLocal(Local n) {
+        return (Local) super.extLocal(n).ext(new LocalExt_c());
     }
 
-    public Call Call(Position pos, Receiver target, String name, List args) {
-        return (Call) super.Call(pos, target, name, args).del(new CallDel_c());
+    public Special extSpecial(Special n) {
+        return (Special) super.extSpecial(n).ext(new SpecialExt_c());
     }
 
-    public New New(Position pos, Expr outer, TypeNode objectType, List args, ClassBody body) {
-        return (New) super.New(pos, outer, objectType, args, body).del(new NewDel_c());
+    public LocalDecl extLocalDecl(LocalDecl n) {
+        return (LocalDecl) super.extLocalDecl(n).ext(new LocalDeclExt_c());
+    }
+
+    public ConstructorCall extConstructorCall(ConstructorCall n) {
+        return (ConstructorCall) extProcedureCall(super.extConstructorCall(n));
+    }
+
+    public Call extCall(Call n) {
+        return (Call) extProcedureCall(super.extCall(n));
+    }
+
+    public ProcedureCall extProcedureCall(ProcedureCall n) {
+        return (ProcedureCall) n.ext(new ProcedureCallExt_c());
+    }
+
+    public New extNew(New n) {
+        return (New) super.extNew(n).ext(new NewExt_c());
     }
 
     public New TrackedNew(Position pos, Expr outer, KeyNode key, TypeNode objectType, List args, ClassBody body) {
         return New(pos, outer, TrackedTypeNode(key.position(), key, objectType), args, body);
     }
 
-    public ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind, Expr outer, List args) {
-        return (ConstructorCall) super.ConstructorCall(pos, kind, outer, args).del(new ConstructorCallDel_c());
+    public Free extFree(Free n) {
+        return (Free) extStmt(n).ext(new FreeExt_c());
     }
 
     public Free Free(Position pos, Expr expr) {
-        return new Free_c(new FreeDel_c(), pos, expr);
+        return extFree(new Free_c(null, null, pos, expr));
+    }
+
+    public TrackedTypeNode extTrackedTypeNode(TrackedTypeNode n) {
+        return (TrackedTypeNode) extTypeNode(n);
     }
 
     public TrackedTypeNode TrackedTypeNode(Position pos, KeyNode key, TypeNode base) {
-        return new TrackedTypeNode_c(defaultExt(), pos, key, base);
+        return extTrackedTypeNode(new TrackedTypeNode_c(null, null, pos, key, base));
+    }
+
+    public AmbKeySetNode extAmbKeySetNode(AmbKeySetNode n) {
+        return (AmbKeySetNode) extNode(n);
     }
 
     public AmbKeySetNode AmbKeySetNode(Position pos, List keys) {
-        return new AmbKeySetNode_c(defaultExt(), pos, keys);
+        return extAmbKeySetNode(new AmbKeySetNode_c(null, null, pos, keys));
+    }
+
+    public CanonicalKeySetNode extCanonicalKeySetNode(CanonicalKeySetNode n) {
+        return (CanonicalKeySetNode) extNode(n);
     }
 
     public CanonicalKeySetNode CanonicalKeySetNode(Position pos, KeySet keys) {
-        return new CanonicalKeySetNode_c(defaultExt(), pos, keys);
+        return extCanonicalKeySetNode(new CanonicalKeySetNode_c(null, null, pos, keys));
+    }
+
+    public KeyNode extKeyNode(KeyNode n) {
+        return (KeyNode) extNode(n);
     }
 
     public KeyNode KeyNode(Position pos, Key key) {
-        return new KeyNode_c(defaultExt(), pos, key);
+        return extKeyNode(new KeyNode_c(null, null, pos, key));
     }
 
     public ClassDecl ClassDecl(Position pos, Flags flags, String name,
@@ -90,12 +112,16 @@ public class CofferNodeFactory_c extends NodeFactory_c
                                          TypeNode superClass, List interfaces,
                                          ClassBody body)
     {
-        return new CofferClassDecl_c(defaultExt(), pos, flags, name, key,
-                                    superClass, interfaces, body);
+        return (CofferClassDecl) extClassDecl(new CofferClassDecl_c(null, null, pos, flags, name, key,
+                                    superClass, interfaces, body));
+    }
+
+    public ThrowConstraintNode extThrowConstraintNode(ThrowConstraintNode n) {
+        return (ThrowConstraintNode) extNode(n);
     }
 
     public ThrowConstraintNode ThrowConstraintNode(Position pos, TypeNode tn, KeySetNode keys) {
-        return new ThrowConstraintNode_c(defaultExt(), pos, tn, keys);
+        return extThrowConstraintNode(new ThrowConstraintNode_c(null, null, pos, tn, keys));
     }
 
     public MethodDecl MethodDecl(Position pos, Flags flags,
@@ -129,6 +155,10 @@ public class CofferNodeFactory_c extends NodeFactory_c
                                      null, null, l, body);
     }
 
+    public ProcedureDecl extProcedureDecl(ProcedureDecl n) {
+        return (ProcedureDecl) n.ext(new ProcedureDeclExt_c());
+    }
+
     public CofferMethodDecl CofferMethodDecl(Position pos, Flags flags,
                                               TypeNode returnType, String name,
                                               List argTypes,
@@ -137,8 +167,8 @@ public class CofferNodeFactory_c extends NodeFactory_c
                                               List throwConstraints,
                                               Block body)
     {
-        return new CofferMethodDecl_c(new ProcedureDeclDel_c(), pos, flags, returnType, name, argTypes,
-                                     entryKeys, returnKeys, throwConstraints, body);
+        return (CofferMethodDecl) extMethodDecl(new CofferMethodDecl_c(null, null, pos, flags, returnType, name, argTypes,
+                                     entryKeys, returnKeys, throwConstraints, body));
     }
 
     public CofferConstructorDecl CofferConstructorDecl(Position pos,
@@ -150,8 +180,7 @@ public class CofferNodeFactory_c extends NodeFactory_c
                                                         List throwConstraints,
                                                         Block body)
     {
-        return new CofferConstructorDecl_c(new ProcedureDeclDel_c(), pos, flags, name, argTypes,
-                                          entryKeys, returnKeys, throwConstraints, body);
+        return (CofferConstructorDecl) extConstructorDecl(new CofferConstructorDecl_c(null, null, pos, flags, name, argTypes,
+                                          entryKeys, returnKeys, throwConstraints, body));
     }
 }
-

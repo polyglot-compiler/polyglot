@@ -14,8 +14,8 @@ public class FloatLit_c extends Lit_c implements FloatLit
     protected FloatLit.Kind kind;
     protected double value;
 
-    public FloatLit_c(Del ext, Position pos, FloatLit.Kind kind, double value) {
-	super(ext, pos);
+    public FloatLit_c(JL del, Ext ext, Position pos, FloatLit.Kind kind, double value) {
+	super(del, ext, pos);
 	this.kind = kind;
 	this.value = value;
     }

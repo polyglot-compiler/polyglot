@@ -19,9 +19,9 @@ public class Call_c extends Expr_c implements Call
   protected List arguments;
   protected MethodInstance mi;
 
-  public Call_c(Del ext, Position pos, Receiver target, String name,
+  public Call_c(JL del, Ext ext, Position pos, Receiver target, String name,
                 List arguments) {
-    super(ext, pos);
+    super(del, ext, pos);
     this.target = target;
     this.name = name;
     this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);

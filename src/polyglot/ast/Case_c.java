@@ -15,8 +15,8 @@ public class Case_c extends Stmt_c implements Case
     protected Expr expr;
     protected long value;
 
-    public Case_c(Del ext, Position pos, Expr expr) {
-	super(ext, pos);
+    public Case_c(JL del, Ext ext, Position pos, Expr expr) {
+	super(del, ext, pos);
 	this.expr = expr;
     }
 

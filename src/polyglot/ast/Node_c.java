@@ -17,37 +17,123 @@ import java.util.*;
 public abstract class Node_c implements Node
 {
     protected Position position;
-    protected Del del;
+    protected JL del;
+    protected Ext ext;
 
-    public Node_c(Del del, Position pos) {
+    public Node_c(JL del, Ext ext, Position pos) {
         this.del = del;
-        this.del.init(this);
+
+        if (del != null) {
+            this.del.init(this);
+        }
+
+        this.ext = ext;
+
+        if (ext != null) {
+            this.ext.init(this);
+        }
+
 	this.position = pos;
     }
 
-    public Del del() {
-        return del;
+    public void init(Node node) {
+        if (node != this) {
+            throw new InternalCompilerError("Cannot use a Node as a delegate or extension.");
+        }
     }
 
-    public Node del(Del del) {
+    public Node node() {
+        return this;
+    }
+
+    public JL del() {
+        return del != null ? del : this;
+    }
+
+    public Node del(JL del) {
         if (this.del == del) {
             return this;
         }
 
-        try {
-            // use clone here, not copy to avoid copying the del as well
-            Node_c n = (Node_c) super.clone();
-            n.del = del;
+        JL old = this.del;
+        this.del = null;
+
+        Node_c n = (Node_c) copy();
+
+        n.del = del != this ? del : null;
+
+        if (n.del != null) {
             n.del.init(n);
+        }
+
+        this.del = old;
+
+        return n;
+    }
+
+    public Ext ext(int n) {
+        if (n < 1) throw new InternalCompilerError("n must be >= 1");
+        Ext ext = this.ext;
+        while (n > 1) {
+            ext = ext.ext();
+        }
+        return ext;
+    }
+
+    public Node ext(int n, Ext ext) {
+        if (n < 1)
+            throw new InternalCompilerError("n must be >= 1");
+        if (n == 1)
+            return ext(ext);
+
+        Ext prev = this.ext(n-1);
+        return this.ext(n-1, prev.ext(ext));
+    }
+
+    public Ext ext() {
+        return ext;
+    }
+
+    public Node ext(Ext ext) {
+        if (this.ext == ext) {
+            return this;
+        }
+
+        Ext old = this.ext;
+        this.ext = null;
+
+        Node_c n = (Node_c) copy();
+
+        n.ext = ext;
+
+        if (n.ext != null) {
+            n.ext.init(n);
+        }
+
+        this.ext = old;
+
+        return n;
+    }
+
+    public Object copy() {
+        try {
+            Node_c n = (Node_c) super.clone();
+
+            if (this.del != null) {
+                n.del = (JL) this.del.copy();
+                n.del.init(n);
+            }
+
+            if (this.ext != null) {
+                n.ext = (Ext) this.ext.copy();
+                n.ext.init(n);
+            }
+
             return n;
         }
         catch (CloneNotSupportedException e) {
             throw new InternalCompilerError("Java clone() weirdness.");
         }
-    }
-
-    public Object copy() {
-        return del((Del) this.del.copy());
     }
 
     public Position position() {

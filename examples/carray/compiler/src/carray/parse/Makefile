@@ -10,8 +10,7 @@ SOURCES = \
 	sym.java \
 	$(SRC)
 
-SRC = \
-	CarrayParserWrapper.java
+SRC =
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 MANIFEST = Makefile $(SRC) carray.flex carray.ppg

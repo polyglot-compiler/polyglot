@@ -41,6 +41,6 @@ public class SourceJob extends Job
         return source.toString() + " (" +
             (done() ? "done"
                     : ((isRunning() ? "running "
-                                    : "before ") + nextPass()) + ")");
+                                    : "before ") + nextPass())) + ")";
     }
 }

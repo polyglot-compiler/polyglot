@@ -18,10 +18,10 @@ public class Formal_c extends Node_c implements Formal
     TypeNode type;
     String name;
 
-    public Formal_c(Del ext, Position pos, Flags flags, TypeNode type,
+    public Formal_c(JL del, Ext ext, Position pos, Flags flags, TypeNode type,
                     String name)
     {
-	super(ext, pos);
+	super(del, ext, pos);
         this.flags = flags;
         this.type = type;
         this.name = name;

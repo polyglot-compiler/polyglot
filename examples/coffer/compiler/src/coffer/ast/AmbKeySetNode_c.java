@@ -13,8 +13,8 @@ public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
     protected List keys;
     protected KeySet keySet;
 
-    public AmbKeySetNode_c(Del del, Position pos, List keys) {
-        super(del, pos);
+    public AmbKeySetNode_c(JL del, Ext ext, Position pos, List keys) {
+        super(del, ext, pos);
         this.keys = TypedList.copyAndCheck(keys, KeyNode.class, true);
     }
 

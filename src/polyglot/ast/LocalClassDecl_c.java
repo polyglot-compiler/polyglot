@@ -15,8 +15,8 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
 {
     protected ClassDecl decl;
 
-    public LocalClassDecl_c(Del ext, Position pos, ClassDecl decl) {
-	super(ext, pos);
+    public LocalClassDecl_c(JL del, Ext ext, Position pos, ClassDecl decl) {
+	super(del, ext, pos);
 	this.decl = decl;
     }
 

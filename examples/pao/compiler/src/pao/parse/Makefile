@@ -10,9 +10,7 @@ SOURCES = \
 	sym.java \
 	$(SRC)
 
-SRC = \
-	PaoParserWrapper.java \
-	PaoUtil.java
+SRC =
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 MANIFEST = Makefile $(SRC) pao.ppg pao.flex

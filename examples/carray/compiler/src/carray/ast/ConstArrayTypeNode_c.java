@@ -16,8 +16,8 @@ import java.io.IOException;
  */
 public class ConstArrayTypeNode_c extends ArrayTypeNode_c implements ConstArrayTypeNode
 {
-    public ConstArrayTypeNode_c(Del ext, Position pos, TypeNode base) {
-        super(ext, pos, base);
+    public ConstArrayTypeNode_c(JL del, Ext ext, Position pos, TypeNode base) {
+        super(del, ext, pos, base);
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {

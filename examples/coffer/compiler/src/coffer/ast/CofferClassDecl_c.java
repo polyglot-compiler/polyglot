@@ -15,10 +15,10 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
 {
     protected KeyNode key;
 
-    public CofferClassDecl_c(Del del, Position pos, Flags flags, String name,
+    public CofferClassDecl_c(JL del, Ext ext, Position pos, Flags flags, String name,
 	    KeyNode key, TypeNode superClass, List interfaces,
 	    ClassBody body) {
-	super(del, pos, flags, name, superClass, interfaces, body);
+	super(del, ext, pos, flags, name, superClass, interfaces, body);
         this.key = key;
     }
 

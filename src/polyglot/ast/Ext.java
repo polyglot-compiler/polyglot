@@ -16,4 +16,7 @@ public interface Ext extends Copy
      * Initialize the Ext with a Node.
      */
     void init(Node node);
+
+    Ext ext();
+    Ext ext(Ext ext);
 }

@@ -16,8 +16,8 @@ public class Free_c extends Stmt_c implements Free
 {
     protected Expr expr;
 
-    public Free_c(Del del, Position pos, Expr expr) {
-        super(del, pos);
+    public Free_c(JL del, Ext ext, Position pos, Expr expr) {
+        super(del, ext, pos);
         this.expr = expr;
     }
 

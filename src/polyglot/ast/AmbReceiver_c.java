@@ -13,8 +13,8 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver
 {
     protected Type type;
 
-    public AmbReceiver_c(Del ext, Position pos, Prefix prefix, String name) {
-	super(ext, pos, prefix, name);
+    public AmbReceiver_c(JL del, Ext ext, Position pos, Prefix prefix, String name) {
+	super(del, ext, pos, prefix, name);
     }
 
     public Type type() {

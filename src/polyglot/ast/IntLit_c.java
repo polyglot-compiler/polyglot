@@ -13,8 +13,8 @@ public class IntLit_c extends NumLit_c implements IntLit
 {
     protected Kind kind;
 
-    public IntLit_c(Del ext, Position pos, Kind kind, long value) {
-	super(ext, pos, value);
+    public IntLit_c(JL del, Ext ext, Position pos, Kind kind, long value) {
+	super(del, ext, pos, value);
         this.kind = kind;
     }
 

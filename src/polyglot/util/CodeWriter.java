@@ -22,8 +22,9 @@ public class CodeWriter
     /**
      * Create a CodeWriter object with output stream <code>o</code>
      * and width <code>width_</code>.
+     * <esc>requires o != null</esc>
+     * <esc>requires width_ > 0</esc>
      */
-
     public CodeWriter(OutputStream o, int width_) {
         output = new OutputStreamWriter(o);
         width = width_;
@@ -33,6 +34,8 @@ public class CodeWriter
     /**
      * Create a CodeWriter object with output <code>w</code> and
      * width <code>width_</code>.
+     * <esc>requires w != null</esc>
+     * <esc>requires width_ > 0</esc>
      */
     public CodeWriter(Writer w, int width_) {
         output = w;
@@ -40,7 +43,9 @@ public class CodeWriter
         current = input = new Block(null, 0);
     }
         
-    /** Print the string <code>s</code> verbatim on the output stream. */
+    /** Print the string <code>s</code> verbatim on the output stream.
+     * <esc>requires s != null</esc>
+     */
     public void write(String s) {
        if (s.length() > 0)
           current.add(new StringItem(s));
@@ -71,6 +76,8 @@ public class CodeWriter
      * 
      * @param n the number of characters increased on indentation (relative
      * to the current position) for all lines in the block.
+     *
+     * <esc>requires n >= 0</esc>
      */         
     public void begin(int n) {
         Block b = new Block(current, n);
@@ -83,7 +90,8 @@ public class CodeWriter
      */
     public void end() {
         current = current.parent;
-        if (current == null) throw new RuntimeException();
+        //@ assert current != null
+        // if (current == null) throw new RuntimeException();
     }
 
     /**
@@ -92,6 +100,8 @@ public class CodeWriter
      *
      * @param n the amount of increase in indentation if
      * the newline is inserted.
+     *
+     * <esc>requires n >= 0</esc>
      */ 
     public void allowBreak(int n) {
         current.add(new AllowBreak(n, " "));
@@ -104,6 +114,9 @@ public class CodeWriter
      *  the newline is inserted.
      * @param alt if no newline is inserted, the string <code>alt</code> is
      *  output instead.   
+     *
+     * <esc>requires n >= 0</esc>
+     * <esc>requires alt != null</esc>
      */ 
     public void allowBreak(int n, String alt) {
         current.add(new AllowBreak(n, alt));
@@ -114,6 +127,8 @@ public class CodeWriter
      * should be used sparingly; usually a call to <code>allowBreak</code> is
      * preferable because forcing a newline also causes all breaks
      * in containing blocks to be broken.
+     *
+     * <esc>requires n >= 0</esc>
      */
     public void newline(int n) {
         current.add(new Newline(n));
@@ -151,6 +166,11 @@ public class CodeWriter
     int width;
     public static final boolean debug = false;
     public static boolean precompute = false;
+
+    //@ invariant current != null
+    //@ invariant input != null
+    //@ invariant output != null
+    //@ invariant width > 0
 }
 
 /**
@@ -162,8 +182,9 @@ class Overrun extends Exception
     int amount;
 
     private Overrun() { }
-    private static Overrun overrun = new Overrun();
+    private /*@ non_null */ static Overrun overrun = new Overrun();
 
+    //@ ensures \result != null
     static Overrun overrun(int amount) {
 	if (CodeWriter.debug) System.err.println("-- Overrun: " + amount);
         overrun.amount = amount;
@@ -196,6 +217,9 @@ abstract class Item
      * the coding of formatN.)
      *
      * Requires: rmargin &lt; lmargin, pos &lt;= rmargin.
+     * <esc>requires lmargin < rmargin</esc>
+     * <xxx>requires pos <= rmargin</xxx>
+     * <esc>requires lmargin >= 0</esc>
      */
 
     abstract int formatN(int lmargin, int pos, int rmargin, int fin,
@@ -203,6 +227,9 @@ abstract class Item
     /**
      * Send the output associated with this item to <code>o</code>, using the
      * current break settings.
+     * <esc>requires o != null</esc>
+     * <esc>requires lmargin >= 0</esc>
+     * <esc>requires pos >= 0</esc>
      */
     abstract int sendOutput(Writer o, int lmargin, int pos)
       throws IOException;
@@ -220,6 +247,10 @@ abstract class Item
      * The initial position may be an overrun (this is the only way
      * that overruns are checked!) <code>it</code> may be also null,
      * signifying an empty list.
+     *
+     * <esc>requires lmargin < rmargin</esc>
+     * <xxx>requires pos <= rmargin</xxx>
+     * <esc>requires lmargin >= 0</esc>
      */
     static int format(Item it, int lmargin, int pos, int rmargin, int fin,
 	  	          boolean can_break, boolean nofail) throws Overrun {
@@ -275,6 +306,9 @@ abstract class Item
    <---->
    min_indent (at most min_width)
 */
+
+    //@ invariant min_pos_width <= min_width
+    //@ invariant min_indent <= min_width
 
     /** Minimum lmargin-rhs width. */
     int min_width = -1;
@@ -363,13 +397,15 @@ class Block extends Item {
     Item first;
     Item last;
     int indent;
+
+    //@ invariant indent >= 0
         
     Block(Block parent_, int indent_) {
         parent = parent_;
         first = last = null;
         indent = indent_;
     }
-        
+
     /**
      * Add a new item to the end of the block. Successive
      * StringItems are concatenated together to limit recursion
@@ -486,6 +522,9 @@ int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
 
 class StringItem extends Item {
     String s;
+    //@ invariant s != null
+
+    //@ requires s_ != null
     StringItem(String s_) { s = s_; }
         
     int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
@@ -519,6 +558,11 @@ class AllowBreak extends Item
     boolean broken = true;
     String alt;
         
+    //@ invariant indent >= 0
+    //@ invariant alt != null
+
+    //@ requires n_ >= 0
+    //@ requires alt_ != null
     AllowBreak(int n_, String alt_) { indent = n_; alt = alt_; }
         
     int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,
@@ -551,6 +595,7 @@ class AllowBreak extends Item
 
 class Newline extends AllowBreak 
 {
+    //@ requires n_ >= 0
     Newline(int n_) { super(n_, ""); }
         
     int formatN(int lmargin, int pos, int rmargin, int fin, boolean can_break,

@@ -1,4 +1,4 @@
-Polyglot 0.9.3
+Polyglot 0.9.4
 
                     Polyglot Extensible Compiler Toolkit
                     ------------------------------------
@@ -45,39 +45,24 @@ To create your own extensions, see the file doc/Overview.txt.
 Building Polyglot
 -----------------
 
-Follow the following steps to build the base compiler and the installed
-extensions.
+Polyglot is compiled with the Ant build tool (http://jakarta.apache.org/ant).
+Follow these steps to build the base compiler and the installed extensions:
 
 1. First ensure javac is in your path and that you are using JDK 1.3 or later.
-Suppose the root directory of the Polyglot installation (the directory this
+
+2. Suppose the root directory of the Polyglot installation (the directory this
 README is in) is $POLYGLOT.
 
-2. Configure the build environment.
+    $ cd $POLYGLOT
 
-On Unix, do:
+3. Run ant to build the base compiler (jl) and some extensions.
 
-    $ sh ./configure
-
-On Windows NT, you will need the Cygwin environment.  While running sh, do:
-
-    $ sh ./configure
-
-This script will locate java and javac and determine the values of some
-Java properties.  The script will create Defs.mk and bin/defs.
-
-Running configure with no options will create a Defs.mk file for building all
-installed language extensions.  You may optionally specify on the command line,
-the names of the extensions to build.  The installed extensions can be found in
-the directory polyglot/ext
-
-3. Run make:
-
-    $ make
-
+    $ ant jl coffer pao
+  
 Class files will be dumped in the $POLYGLOT/classes directory.
 You may optionally:
 
-    $ make jar
+    $ ant jar
 
 to create jar files for polyglot and each extension.
 
@@ -95,7 +80,7 @@ On Windows, do:
 
 If you created jar files, adjust the classpath accordingly.
 
-4. You are now ready to try out Polyglot.  See doc/Overview.txt for
+5. You are now ready to try out Polyglot.  See doc/Overview.txt for
 instructions on building an extension.  To compile using an existing
 extension do:
 
@@ -126,7 +111,8 @@ Other Polyglot contributers:
 Michael Brukman and Andrew Myers wrote the PPG parser generator.
 
 Some of the class file parsing code is derived from the BLOAT bytecode
-optimizer written by Nathaniel Nystrom, David Whitlock, and Antony Hosking.
+optimizer written by Nathaniel Nystrom, David Whitlock, and Antony Hosking
+at Purdue.
 
 Restrictions on distribution
 ----------------------------

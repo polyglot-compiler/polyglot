@@ -14,8 +14,8 @@ public class PackageNode_c extends Node_c implements PackageNode
 {
     protected Package package_;
 
-    public PackageNode_c(Del ext, Position pos, Package package_) {
-	super(ext, pos);
+    public PackageNode_c(JL del, Ext ext, Position pos, Package package_) {
+	super(del, ext, pos);
 	this.package_ = package_;
     }
 
