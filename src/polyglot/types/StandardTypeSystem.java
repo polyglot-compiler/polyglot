@@ -180,8 +180,9 @@ public class StandardTypeSystem extends TypeSystem {
     if (childType instanceof NullType) 
       return true;
  
+    // kliger - can we say ReferenceType here?
     // So childType is definitely a ClassType.
-    if (! (ancestorType instanceof ClassType))
+    if (! (ancestorType instanceof ReferenceType))
 	return false;
     
     return (childType.equals(ancestorType) || 
