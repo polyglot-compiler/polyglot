@@ -2,6 +2,10 @@ LOG=log
 
 GOOD =  \
 	ArrayInit.jl \
+	InitializerType1.jl \
+	Semicolon.jl \
+	SemicolonClass.jl \
+	TypeShadowing.jl \
 	Ctor.jl \
 	Dep1.jl \
 	Empty.jl \
@@ -155,6 +159,14 @@ good: $(GOOD)
 	    echo "LOG CHANGED"; \
 	    false; \
 	fi
+
+mauve:
+	find gnu -name \*.jl -print -exec jlc {} \;
+
+jacks:
+	cd jacks
+	# Pretend we're jikes
+	./jacks jikes
 
 bad: $(BAD)
 	-rm -f $(BAD_OUTPUT) bad.log
