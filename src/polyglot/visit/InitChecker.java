@@ -290,12 +290,19 @@ public class InitChecker extends DataFlow
                     // navigate up through all of the the constructors
                     // that this constructor calls.
                     
+                    boolean fieldInitializedBeforeConstructors = false;
+                    MinMaxInitCount ic = (MinMaxInitCount)currentClassFinalFieldInitCounts.get(fi);
+                    if (ic != null && !InitCount.ZERO.equals(ic.getMin())) {
+                        fieldInitializedBeforeConstructors = true;
+                    }
+                            
                     for (Iterator iter2 = allConstructors.iterator(); iter2.hasNext(); ) {
                         ConstructorDecl cd = (ConstructorDecl)iter2.next();
-                        ConstructorInstance ci = cd.constructorInstance();
+                        ConstructorInstance ciStart = cd.constructorInstance();
+                        ConstructorInstance ci = ciStart;
                         
-                        boolean isInitialized = false;
-                            
+                        boolean isInitialized = fieldInitializedBeforeConstructors;
+                        
                         while (ci != null) {
                             Set s = (Set)fieldsConstructorInitializes.get(ci);
                             if (s != null && s.contains(fi)) {
@@ -311,7 +318,7 @@ public class InitChecker extends DataFlow
                         if (!isInitialized) {
                             throw new SemanticException("field \"" + fi.name() +
                                     "\" might not have been initialized",
-                                    cd.position());                                
+                                    ciStart.position());                                
                                 
                         }                            
                     }
