@@ -631,6 +631,10 @@ ext=""
 
     <copy todir="${dist}/src/polyglot/ext/jl/tests" file="${src}/polyglot/ext/jl/tests/Makefile"/>
 
+    <copy todir="${dist}/tools">
+      <fileset dir="${src}/tools"/>
+    </copy>
+
     <copy file="${bin}/jlc.in" todir="${dist}/bin"/>
     <copy file="doc/Overview.txt" todir="${dist}/doc"/>
     <copy file="doc/ppg.html" todir="${dist}/doc"/>
