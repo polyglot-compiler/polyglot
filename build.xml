@@ -428,11 +428,7 @@ ext=''
 
   <target name="polyglot-jar" depends="jl">
     <jar jarfile="${lib}/polyglot.jar" basedir="${classes}"
-      includes="polyglot/ast/**,polyglot/ext/jl/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**"/>
-  </target>
-
-  <target name="ppg-jar" depends="jl">
-    <jar jarfile="${lib}/ppg.jar" basedir="${classes}" includes="ppg/**"/>
+      includes="polyglot/ast/**,polyglot/ext/jl/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**"/>
   </target>
 
   <target name="pao-jar" depends="pao">
@@ -484,7 +480,7 @@ ext=''
     </copy>
   </target>
 
-  <target name="jl-dist" depends="cup,ppg-jar,polyglot-jar,dist-dir,bin">
+  <target name="jl-dist" depends="cup,polyglot-jar,dist-dir,bin">
     <copy todir="${dist}/lib" file="${lib}/polyglot.jar"/>
 
     <copy todir="${dist}/src/polyglot/ast">
@@ -538,9 +534,7 @@ ext=''
     <copy file="${bin}/jlc.in" todir="${dist}/bin"/>
     <copy file="doc/Overview.txt" todir="${dist}/doc"/>
     <copy file="doc/ppg.html" todir="${dist}/doc"/>
-    <copy file="${lib}/jlex.jar" todir="${dist}/lib"/>
     <copy file="${lib}/java_cup.jar" todir="${dist}/lib"/>
-    <copy file="${lib}/ppg.jar" todir="${dist}/lib"/>
     <copy file="build.xml" todir="${dist}"/>
     <copy file="configure.xml" todir="${dist}"/>
     <copy file="README" todir="${dist}"/>
@@ -562,7 +556,7 @@ ext=''
     </javadoc>
   </target>
 
-  <target name="jar" depends="polyglot-jar,ppg-jar"/>
+  <target name="jar" depends="polyglot-jar"/>
 
   <target name="polyglot-dist" depends="jl-dist,skel-dist,pao-dist,coffer-dist"/>
   <target name="polyglot-dist-javadoc" depends="polyglot-dist,dist-javadoc"/>
