@@ -1,0 +1,37 @@
+<project name="j0-configure" default="instructions" basedir=".">
+  <description>
+    J0 configure file
+  </description>
+
+  <target name="instructions" 
+          description="Tell the user the instructions for using this build file">
+    <echo>
+This build file is meant to be used only from the main buildfile build.xml.
+    </echo>
+    <fail/>
+  </target>
+
+  <target name="configure" 
+          description="Configure J0" 
+          depends="check-classpath,executables">
+  </target>
+
+  <target name="check-classpath" description="Check the classpath contains the appropriate directories/jars">
+  </target>
+
+  <target name="executables" 
+          description="creates the executable script j0c">
+    <echo message="Creating ${bin}/j0c"/>
+    <concat destfile="${bin}/j0c" append="no">
+      <filelist dir="${bin}" files="defs"/>
+    </concat>
+    <concat destfile="${bin}/j0c" append="yes">
+ext="j0"
+    </concat>
+    <concat destfile="${bin}/j0c" append="yes">
+      <filelist dir="${bin}" files="jlc.in"/>
+    </concat>
+    <chmod perm="+x" file="${bin}/j0c"/>
+  </target>
+</project>
+
