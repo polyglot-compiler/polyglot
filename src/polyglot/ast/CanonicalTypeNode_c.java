@@ -30,17 +30,20 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
   public void translate(CodeWriter w, Translator tr) {
     TypeSystem ts = tr.typeSystem();
 
-
     if (tr.outerClass() != null) {
       w.write(type.translate(ts.classContextResolver(tr.outerClass())));
     }
     else if (type.isClass() && type.toClass().isMember()) {
+      // tr.context()?  eliminate this case?
+      // passing null forces the name to be fully qualified
       w.write(type.translate(null));
     }
     else if (! Options.global.fully_qualified_names) {
       w.write(type.translate(tr.context()));
     }
     else {
+      // FIXME: variable capture bug?
+      // What if a field in this context shadows the package name?
       w.write(type.translate(null));
     }
   }
