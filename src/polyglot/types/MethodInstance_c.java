@@ -71,8 +71,9 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     public int hashCode() {
-        return container.hashCode() + flags.hashCode() +
-	       returnType.hashCode() + name.hashCode();
+        //return container.hashCode() + flags.hashCode() +
+	//       returnType.hashCode() + name.hashCode();
+	return flags.hashCode() + name.hashCode();
     }
 
     public boolean equals(Object o) {
