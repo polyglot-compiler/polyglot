@@ -21,35 +21,48 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	super(ts, pos);
 	this.base = base;
 
-	methods = new ArrayList(1);
-	fields = new ArrayList(2);
-	interfaces = new ArrayList(2);
+        methods = null;
+        fields = null;
+        interfaces = null;
+    }
 
-	// Add method public Object clone()
-	methods.add(ts.methodInstance(position(),
-				      this,
-	                              ts.Public(),
-				      ts.Object(),
-	                              "clone",
-				      Collections.EMPTY_LIST,
-				      Collections.EMPTY_LIST));
+    void init() {
+        if (methods == null) {
+            methods = new ArrayList(1);
 
-	// Add field public final int length
-	fields.add(ts.fieldInstance(position(),
-	                            this,
-				    ts.Public().Final(),
-				    ts.Int(),
-				    "length"));
+            // Add method public Object clone()
+            methods.add(ts.methodInstance(position(),
+                                          this,
+                                          ts.Public(),
+                                          ts.Object(),
+                                          "clone",
+                                          Collections.EMPTY_LIST,
+                                          Collections.EMPTY_LIST));
+        }
 
-	// Add field public static final Class class
-	fields.add(ts.fieldInstance(position(),
-	                            this,
-				    ts.Public().Static().Final(),
-				    ts.Class(),
-				    "class"));
+        if (fields == null) {
+            fields = new ArrayList(2);
 
-	interfaces.add(ts.Cloneable());
-	interfaces.add(ts.Serializable());
+            // Add field public final int length
+            fields.add(ts.fieldInstance(position(),
+                                        this,
+                                        ts.Public().Final(),
+                                        ts.Int(),
+                                        "length"));
+
+            // Add field public static final Class class
+            fields.add(ts.fieldInstance(position(),
+                                        this,
+                                        ts.Public().Static().Final(),
+                                        ts.Class(),
+                                        "class"));
+        }
+
+        if (interfaces == null) {
+            interfaces = new ArrayList(2);
+            interfaces.add(ts.Cloneable());
+            interfaces.add(ts.Serializable());
+        }
     }
 
     /** Get the base type of the array. */
@@ -98,17 +111,19 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 
     /** Get the methods implemented by the array type. */
     public List methods() {
+        init();
 	return Collections.unmodifiableList(methods);
     }
 
     /** Get the fields of the array type. */
     public List fields() {
+        init();
 	return Collections.unmodifiableList(fields);
     }
 
     /** Get the clone() method. */
     public MethodInstance cloneMethod() {
-	return (MethodInstance) methods.get(0);
+	return (MethodInstance) methods().get(0);
     }
 
     /** Get a field of the type by name. */
@@ -119,7 +134,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 
     /** Get the length field. */
     public FieldInstance lengthField() {
-	return (FieldInstance) fields.get(0);
+	return (FieldInstance) fields().get(0);
     }
 
     /** Get the super type of the array type. */
@@ -129,6 +144,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 
     /** Get the interfaces implemented by the array type. */
     public List interfaces() {
+        init();
 	return Collections.unmodifiableList(interfaces);
     }
 
