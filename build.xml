@@ -28,10 +28,12 @@
   </path>
 
   <target name="configure" description="Configure Polyglot"
-          depends="check-classpath">
+          depends="check-classpath"
+          unless="configure.up-to-date">
     <echo message="java version is ${java.version}"/>
     <echo message="current directory is ${user.dir}"/>
     <echo message="Java home directory is ${java.home}"/>
+    <property name="configure.up-to-date" value="true"/>
   </target>
 
   <target name="check-classpath" description="Check that the classpath contains the appropriate directories/jars">
@@ -58,9 +60,7 @@
       <targetfileset dir="${bin}" includes="jlc"/>
     </dependset>
     <condition property="bin.up-to-date">
-      <and>
-        <available file="${bin}/jlc"/>
-      </and>
+      <available file="${bin}/jlc"/>
     </condition>
   </target> 
 
@@ -492,7 +492,7 @@ ext=""
     </antcall>
   </target>
 
-  <target name="polyglot-jar" depends="jl">
+  <target name="polyglot-jar" depends="jl,param,ppg">
     <jar jarfile="${lib}/polyglot.jar" basedir="${classes}"
       includes="polyglot/ast/**,polyglot/ext/jl/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**"/>
   </target>
@@ -629,6 +629,7 @@ ext=""
       <packageset dir="${src}" defaultexcludes="yes">
         <include name="polyglot/**"/>
         <include name="ppg/**"/>
+        <exclude name="polyglot/ext/skel/**"/>
         <exclude name="**/tests"/>
         <exclude name="**/test"/>
       </packageset>
