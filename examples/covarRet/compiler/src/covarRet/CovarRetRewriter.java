@@ -56,6 +56,7 @@ public class CovarRetRewriter extends SemanticVisitor
      */
     private Type getOverridenReturnType(MethodInstance mi) {
       Type t = mi.container().superType();
+      Type retType = null;
 
       while (t instanceof ReferenceType) {
           ReferenceType rt = (ReferenceType) t;
@@ -73,11 +74,11 @@ public class CovarRetRewriter extends SemanticVisitor
 
               if (ts.isSubtype(mi.returnType(), mj.returnType()) && !ts.isSame(mi.returnType(), mj.returnType())) {
                 // mj.returnType() is the type to use!
-                return mj.returnType();
+                retType = mj.returnType();
               }
 
           }
       }
-      return null;
+      return retType;
     }
 }
