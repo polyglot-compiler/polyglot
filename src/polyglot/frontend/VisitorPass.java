@@ -34,6 +34,7 @@ public class VisitorPass implements Pass
 	}
 
 	ast = ast.visit(v);
+        v.finish();
 
 	job.ast(ast);
 
