@@ -167,6 +167,41 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         if (Compiler.should_report(1))
 	    Compiler.report("Pass " + goal + " " + str(okay), 1);
 
+        // Ensure orphaned jobs don't get lost.
+        if (job.completed()) {
+            if (Compiler.should_report(1))
+                Compiler.report("Job " + job + " completed", 1);
+
+            for (Iterator i = job.children().iterator(); i.hasNext(); ) {
+                Job orphan = (Job) i.next();
+
+                if (orphan.completed()) {
+                    continue;
+                }
+
+                if (! (orphan instanceof SourceJob)) {
+                    throw new InternalCompilerError("Cannot adopt inner job " +
+                                                    job + "; it should be " +
+                                                    "done already.");
+                }
+
+
+                if (job.parent() != null) {
+                    if (Compiler.should_report(2))
+                        Compiler.report("Job " + job.parent() + " adopting " +
+                                        orphan, 2);
+                    orphan.reparent(job.parent());
+                }
+                else {
+                    if (Compiler.should_report(2))
+                        Compiler.report("Worklist adopting " + orphan, 2);
+                    SourceJob sj = (SourceJob) orphan;
+                    jobs.put(sj.source(), sj);
+                    worklist.add(sj);
+                }
+            }
+        }
+
         return okay;
     }
  

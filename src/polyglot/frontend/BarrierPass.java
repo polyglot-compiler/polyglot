@@ -21,6 +21,8 @@ public class BarrierPass extends AbstractPass
     public boolean run() {
         if (Compiler.should_report(1))
 	    Compiler.report(job + " at barrier " + id, 1);
+        if (Compiler.should_report(2))
+	    Compiler.report("children of " + job + " = " + job.children(), 1);
 
         if (job.compiler().errorQueue().hasErrors()) {
             return false;
@@ -29,6 +31,9 @@ public class BarrierPass extends AbstractPass
         // Bring all our children up to the barrier.
         for (Iterator i = job.children().iterator(); i.hasNext(); ) {
             Job child = (Job) i.next();
+
+            if (Compiler.should_report(2))
+                Compiler.report(job + " bringing " + child + " to barrier " + id, 1);
 
             if (! job.extensionInfo().runToPass(child, id)) {
                 return false;

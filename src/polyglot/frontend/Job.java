@@ -55,14 +55,23 @@ public abstract class Job
         }
     }
 
+    public void reparent(Job parent) {
+        if (this.parent != null) {
+            this.parent.children().remove(this);
+        }
+
+        if (parent != null) {
+            parent.children().add(this);
+        }
+
+        this.parent = parent;
+    }
+
     public JobExt ext() {
       return ext;
     }
 
     public Job parent() {
-        if (parent == null) {
-            throw new InternalCompilerError("Null parent.");
-        }
         return parent;
     }
 
