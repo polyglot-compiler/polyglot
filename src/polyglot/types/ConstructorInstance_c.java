@@ -56,6 +56,11 @@ public class ConstructorInstance_c extends ProcedureInstance_c
 
 	return s;
     }
+    
+    public boolean equals(Object o) {
+        if (! (o instanceof ConstructorInstance) ) return false;
+        return super.equals(o);
+    }
 
     public TypeObject restore_() throws SemanticException {
 	ClassType c = (ClassType) container.restore();

@@ -11,4 +11,5 @@ public interface VarInstance extends TypeObject
     Type type();
     Object constantValue();
     boolean isConstant();
+    void setType(Type type); //destructive update    
 }
