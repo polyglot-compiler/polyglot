@@ -3,6 +3,7 @@ package jltools.types;
 
 import java.util.*;
 import jltools.util.InternalCompilerError;
+import jltools.types.MethodType;
 
 /**
  * A context to be used within the scope of a method body.  It provides a convenient wrapper
@@ -61,6 +62,14 @@ public class LocalContext
     return ts.getMethod( type, new MethodType( ts, methodName, argumentTypes), ((ClassTuple)stkContexts.peek()).getContext() ); 
   }
 
+  /**
+   * Gets the methodMatch with name with of a MethodNode m on object t type may be null; 
+   */
+  public MethodTypeInstance getMethod( ClassType t, MethodType m) throws TypeCheckException
+  {
+    return ts.getMethod( t, m, ((ClassTuple)stkContexts.peek()).getContext() );
+  }
+  
   /**
    * Gets a field matched against a particular type
    */  

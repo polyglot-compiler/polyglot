@@ -47,7 +47,7 @@ public class MethodType extends Type implements Cloneable {
   public boolean isPrimitive() { return false; }
   // FIXME: is this correct?
   public  boolean isCanonical() { return true; }
-
+  
   public boolean equals(Object o)
   {
     if (o instanceof MethodType)

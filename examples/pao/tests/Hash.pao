@@ -5,8 +5,20 @@ import java.util.*;
 
 public class Hash
 {
+  public Hash(int i) 
+  {
+    System.out.println("Creating!");
+  }
+
   public static void  main(String [] args) throws Exception
   {
+    new Hash(432);
+
+    synchronized(3)
+    {
+      System.out.println("syncedh");
+    }
+
     Hashtable ht = new Hashtable();
     ht.put ( 32, "Hello");
     System.out.println ( ht.get( 32));    

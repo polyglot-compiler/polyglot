@@ -69,9 +69,13 @@ public class SynchronizedStatement extends Statement {
 
    public Node typeCheck(LocalContext c) throws TypeCheckException
    {
-     if ( !( expr.getCheckedType() instanceof ClassType))
-       throw new TypeCheckException ("The type of the expression \"" + expr.getCheckedType() + 
+     if ( !( expr.getCheckedType().descendsFrom ( c.getTypeSystem().getObject() )) &&
+          !( expr.getCheckedType().equals ( c.getTypeSystem().getObject())))
+       throw new TypeCheckException ("The type of the expression \"" + 
+                                     expr.getCheckedType().getTypeString() + 
                                      "\" is not valid to synchronize on.");
+
+     expr.setExpectedType( c.getTypeSystem().getObject()) ;
      addThrows ( expr.getThrows() );
      addThrows ( body.getThrows() );
      Annotate.setTerminatesOnAllPaths (this, Annotate.terminatesOnAllPaths ( body ) );

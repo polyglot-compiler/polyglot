@@ -8,6 +8,17 @@ public class ObjectPrimitiveTypeSystem extends StandardTypeSystem
     super ( resolver);
   }
 
+  
+  public boolean descendsFrom(Type child, Type ancestor) throws TypeCheckException
+  {
+    if( child.isPrimitive() && ancestor.equals( getObject())) {
+      return !((PrimitiveType)child).isVoid();
+    }
+    return super.descendsFrom( child, ancestor);
+      
+    
+  }
+
   public boolean isCastValid(Type fromType, Type toType)
     throws TypeCheckException
   {

@@ -354,8 +354,11 @@ public class StandardTypeSystem extends TypeSystem {
     ClassType ctContext = (ClassType)context.inClass;
     
     // check for package level scope. ( same package and flags has package level scope.
-    if (ctTarget.getPackage().equals
-        (ctContext.getPackage()) &&
+    if ( ctTarget.getPackage() == null && ctContext.getPackage() == null && flags.isPackage())
+      return true;
+
+    if (ctTarget.getPackage() != null &&
+        ctTarget.getPackage().equals (ctContext.getPackage()) &&
         flags.isPackage())
       return true;
     

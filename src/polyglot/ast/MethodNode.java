@@ -30,12 +30,13 @@ public class MethodNode extends ClassMember {
    * for a body.
    */
   public MethodNode(AccessFlags accessFlags,
-        String name,
+                    String name,
 		    List formals,
 		    List exceptions,
 		    BlockStatement body) {
     this.accessFlags = accessFlags;
     TypedList.check(formals, FormalParameter.class);
+    if ( formals == null) throw new Error();
     this.formals = new ArrayList(formals);
     TypedList.check(exceptions, TypeNode.class);
     this.exceptions = new ArrayList(exceptions);
@@ -288,6 +289,12 @@ public class MethodNode extends ClassMember {
     ParsedClassType clazz = sr.getCurrentClass();
     TypeSystem ts = sr.getTypeSystem();
 
+    if ( isConstructor )
+    {
+      returnType = new TypeNode (ts.getVoid());
+      Annotate.setLineNumber( returnType, Annotate.getLineNumber( this ) );
+    }
+
     /* Build a list of argument types. */
     List argTypes = new LinkedList();
     Iterator iter = formals.iterator();
@@ -295,7 +302,11 @@ public class MethodNode extends ClassMember {
       argTypes.add( ((FormalParameter)iter.next()).getType());
     }
     
-    if( additionalDimensions == 0) {
+    if ( isConstructor)
+    {
+      mtiThis = new ConstructorTypeInstance( ts, argTypes, exceptions, accessFlags) ;
+    }
+    else if( additionalDimensions == 0 ) {
       mtiThis = new MethodTypeInstance( ts, name,
                           returnType.getType(), argTypes, 
                           exceptions, accessFlags);

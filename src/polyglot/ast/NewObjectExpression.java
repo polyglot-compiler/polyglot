@@ -4,8 +4,7 @@
 
 package jltools.ast;
 
-import jltools.types.Type;
-import jltools.types.LocalContext;
+import jltools.types.*;
 import jltools.util.*;
 
 import java.util.*;
@@ -202,12 +201,46 @@ public class NewObjectExpression extends Expression {
     return null;
   }
   
-  public Node typeCheck(LocalContext c)
+  public Node typeCheck(LocalContext c) throws TypeCheckException
   {
-    // FIXME: check that the constructors match.
+    // make sure that primary is the "containing" class for the inner class, if appropriate
+    if (primary != null && !primary.getCheckedType().equals((ClassType)type.getType()))
+      throw new TypeCheckException (" The containing instance must be the containing class of \"" +
+                                    type.getType().getTypeString() + "\"");
+
+    if ( primary != null && ((ClassType)type.getType()).getAccessFlags().isStatic())
+      throw new TypeCheckException ( " Cannot specify a containing instance for static classes.");
+
+    if ( ((ClassType)type.getType()).getAccessFlags().isAbstract())
+      throw new TypeCheckException ( " Cannot instantiate an abstract class.");
+
+    ClassType ct; 
+    ct = (ClassType)type.getType();
+
+    List argTypes = new ArrayList();
+    for ( ListIterator i = argumentList.listIterator() ; i.hasNext(); )
+    {
+      argTypes.add (  ((Expression)i.next()).getCheckedType() );
+    }
+    MethodTypeInstance mti = null;
+    try
+    {
+      mti = c.getMethod ( ct, new ConstructorType ( c.getTypeSystem(), argTypes) );
+    }
+    catch (TypeCheckException tce)
+    {
+      throw new TypeCheckException ( " No acceptable constructor found for the creation of \"" 
+                                     + type.getType().getTypeString() + "\"");
+    }
     setCheckedType ( type.getType() );
-    // FIXME: 
-    // need to find the throws of this particular constructor and add it to the throws of this.
+    jltools.util.Annotate.addThrows( this, mti.exceptionTypes () );
+
+    List formalTypes = mti.argumentTypes();
+    for ( ListIterator i = argumentList.listIterator(),
+            j = formalTypes.listIterator(); i.hasNext(); )
+    {
+       ((Expression)i.next()).setExpectedType( (Type)j.next());
+    }
     return this;
   }
 
