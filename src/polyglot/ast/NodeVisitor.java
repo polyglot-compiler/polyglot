@@ -33,6 +33,7 @@ public interface NodeVisitor {
   public Node visitExpressionStatement(ExpressionStatement es);
 
   // Expressions
+  public Node visitNullLiteral(NullLiteral nl);
 }
 
 

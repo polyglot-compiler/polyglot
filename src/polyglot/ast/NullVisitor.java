@@ -25,6 +25,9 @@ public class NullVisitor implements NodeVisitor {
   }
 
   // Expressions
+  public Node visitNullLiteral(NullLiteral nl) {
+    return nl;
+  }
 }
 
 
