@@ -240,103 +240,15 @@ public class InnerTranslator extends NodeVisitor {
 	public NodeVisitor enter(Node n) {
 		if (n instanceof ClassDecl) {
 			ClassDecl cd = (ClassDecl)n;
-			ParsedClassType ct = cd.type();
-			ClassInfo cinfo = new ClassInfo(ct);
-			if (ct.isInnerClass() && ct.isMember()) {
-				ClassInfo classInfo = (ClassInfo)classContext.peek();
-				cinfo.addConsFormal(produceOuterFormal(ct, classInfo.classType()));
-				cinfo.hasOuterField(true);
-				classInfo.addInnerClassInfo(cinfo);
-				innerClassInfoMap.put(ct.fullName(), cinfo);
-			}
-			if (ct.isLocal()) {
-				CodeInfo codeInfo = (CodeInfo)codeContext.peek();
-				ClassInfo classInfo = (ClassInfo)classContext.peek();
-				if (!codeInfo.isStatic()) {
-					// If this local/anonymous class is inside a static method, 
-					// then it shouldn't have an outer field.
-					cinfo.addConsFormal(produceOuterFormal(cd.type(), classInfo.classType()));
-					cinfo.hasOuterField(true);
-				}
-				codeInfo.addLocalClassInfo(cinfo);
-				cinfo.insideCode(codeInfo);
-				ct.kind(ClassType.MEMBER);
-				ct.outer(classInfo.classType());
-				ct.needSerialization(false); // local classes don't need serialization.
-				String className = classInfo.localClassName(cd.name(), classInfo.addLocalClassName(cd.name()));
-				ct.name(className);
-				for (Iterator it = codeInfo.finalList().iterator(); it.hasNext(); ) {
-					LocalInstance li = (LocalInstance)it.next();
-					String name = li.name();
-					Formal f = nf.Formal(Position.compilerGenerated(), 
-										 Flags.NONE, 
-										 nf.CanonicalTypeNode(Position.compilerGenerated(), 
-															  li.type()), 
-										 name);
-					f = f.localInstance(ts.localInstance(Position.compilerGenerated(), 
-									    f.flags(), 
-									    f.type().type(), 
-									    f.name()));
-					cinfo.addConsFormal(f);
-				}
-				innerClassInfoMap.put(ct.fullName(), cinfo);
-			}
-			classContext.push(cinfo);
+			enterClassDecl(cd);
 		}
 		else if (n instanceof New) {
 			New newExpr = (New)n;
-			if (newExpr.body() != null) {
-				// If this is an anonymous class declaration.
-				ParsedClassType ct = newExpr.anonType();
-				ct.flags(Flags.NONE);
-				ClassInfo cinfo = new ClassInfo(ct);
-				CodeInfo codeInfo = (CodeInfo)codeContext.peek();
-				ClassInfo classInfo = (ClassInfo)classContext.peek();
-				if (!codeInfo.isStatic()) {
-					// If this local/anonymous class is inside a static method, 
-					// then it shouldn't have an outer field.
-					cinfo.addConsFormal(produceOuterFormal(ct, classInfo.classType()));
-					cinfo.hasOuterField(true);
-				}
-				codeInfo.addLocalClassInfo(cinfo);
-				cinfo.insideCode(codeInfo);
-				ct.kind(ClassType.MEMBER);
-				ct.outer(classInfo.classType());
-				ct.needSerialization(false); // anonymous classes don't need serialization.
-				String className = classInfo.localClassName("", classInfo.addLocalClassName(""));
-				ct.name(className);
-				for (Iterator it = codeInfo.finalList().iterator(); it.hasNext(); ) {
-					LocalInstance li = (LocalInstance)it.next();
-					String name = li.name();
-					Formal f = nf.Formal(Position.compilerGenerated(), 
-										 Flags.NONE, 
-										 nf.CanonicalTypeNode(Position.compilerGenerated(), 
-															  li.type()), 
-										 name);
-					f = f.localInstance(ts.localInstance(Position.compilerGenerated(), 
-									    f.flags(), 
-									    f.type().type(), 
-									    f.name()));
-					cinfo.addConsFormal(f);
-				}
-				innerClassInfoMap.put(ct.fullName(), cinfo);
-				classContext.push(cinfo);
-			}
+			enterNew(newExpr);
 		}
 		else if (n instanceof CodeDecl) {
 			CodeDecl cd = (CodeDecl)n;
-			CodeInfo cinfo = new CodeInfo(cd.codeInstance());
-			// If it is a constructor or method, find all the final arguments and add them to the finalVar map. 
-			if (cd instanceof ProcedureDecl) {
-				ProcedureDecl pd = (ProcedureDecl)cd;
-				for (Iterator it = pd.formals().iterator(); it.hasNext(); ) {
-					Formal f = (Formal)it.next();
-					if (f.flags().isFinal()) {
-						cinfo.addFinalArg(f.localInstance());
-					}
-				}
-			}
-			codeContext.push(cinfo);
+			enterCodeDecl(cd);
 		}
 		else if (n instanceof Block) {
 			CodeInfo cinfo = (CodeInfo)codeContext.peek();
@@ -344,13 +256,125 @@ public class InnerTranslator extends NodeVisitor {
 		}
 		else if (n instanceof LocalDecl) {
 			LocalDecl ld = (LocalDecl)n;
-			if (ld.flags().isFinal()) {
-				((CodeInfo)codeContext.peek()).addFinalLocal(ld.localInstance());
-			}
+			enterLocalDecl(ld);
 		}
 		return this;
 	}
 
+	protected void enterClassDecl(ClassDecl cd) {
+		ParsedClassType ct = cd.type();
+		ClassInfo cinfo = new ClassInfo(ct);
+		if (ct.isInnerClass() && ct.isMember()) {
+			ClassInfo classInfo = (ClassInfo)classContext.peek();
+			cinfo.addConsFormal(produceOuterFormal(ct, classInfo.classType()));
+			cinfo.hasOuterField(true);
+			classInfo.addInnerClassInfo(cinfo);
+			innerClassInfoMap.put(ct.fullName(), cinfo);
+		}
+		
+		if (ct.isLocal()) {
+			CodeInfo codeInfo = (CodeInfo)codeContext.peek();
+			ClassInfo classInfo = (ClassInfo)classContext.peek();
+			if (!codeInfo.isStatic()) {
+				// If this local/anonymous class is inside a static method, 
+				// then it shouldn't have an outer field.
+				cinfo.addConsFormal(produceOuterFormal(cd.type(), classInfo.classType()));
+				cinfo.hasOuterField(true);
+			}
+			codeInfo.addLocalClassInfo(cinfo);
+			cinfo.insideCode(codeInfo);
+			ct.kind(ClassType.MEMBER);
+			ct.outer(classInfo.classType());
+			ct.needSerialization(false); // local classes don't need serialization.
+			String className = classInfo.localClassName(cd.name(), classInfo.addLocalClassName(cd.name()));
+			ct.name(className);
+		
+			for (Iterator it = codeInfo.finalList().iterator(); it.hasNext(); ) {
+				LocalInstance li = (LocalInstance)it.next();
+				String name = li.name();
+				Formal f = nf.Formal(Position.compilerGenerated(), 
+									 Flags.NONE, 
+									 nf.CanonicalTypeNode(Position.compilerGenerated(), 
+														  li.type()), 
+									 name);
+				f = f.localInstance(ts.localInstance(Position.compilerGenerated(), 
+								    f.flags(), 
+								    f.type().type(), 
+								    f.name()));
+				cinfo.addConsFormal(f);
+			}
+			innerClassInfoMap.put(ct.fullName(), cinfo);
+		}
+		
+		classContext.push(cinfo);
+	}
+	
+	protected void enterNew(New newExpr) {
+		if (newExpr.body() != null) {
+			// If this is an anonymous class declaration.
+			ParsedClassType ct = newExpr.anonType();
+			ct.flags(Flags.NONE);
+			ClassInfo cinfo = new ClassInfo(ct);
+			CodeInfo codeInfo = (CodeInfo)codeContext.peek();
+			ClassInfo classInfo = (ClassInfo)classContext.peek();
+			
+			if (!codeInfo.isStatic()) {
+				// If this local/anonymous class is inside a static method, 
+				// then it shouldn't have an outer field.
+				cinfo.addConsFormal(produceOuterFormal(ct, classInfo.classType()));
+				cinfo.hasOuterField(true);
+			}
+			codeInfo.addLocalClassInfo(cinfo);
+			cinfo.insideCode(codeInfo);
+			ct.kind(ClassType.MEMBER);
+			ct.outer(classInfo.classType());
+			ct.needSerialization(false); // anonymous classes don't need serialization.
+			String className = classInfo.localClassName("", classInfo.addLocalClassName(""));
+			ct.name(className);
+			
+			for (Iterator it = codeInfo.finalList().iterator(); it.hasNext(); ) {
+				LocalInstance li = (LocalInstance)it.next();
+				String name = li.name();
+				Formal f = nf.Formal(Position.compilerGenerated(), 
+									 Flags.NONE, 
+									 nf.CanonicalTypeNode(Position.compilerGenerated(), 
+														  li.type()), 
+									 name);
+				f = f.localInstance(ts.localInstance(Position.compilerGenerated(), 
+								    f.flags(), 
+								    f.type().type(), 
+								    f.name()));
+				cinfo.addConsFormal(f);
+			}
+			innerClassInfoMap.put(ct.fullName(), cinfo);
+
+			classContext.push(cinfo);
+		}
+	}
+	
+	protected void enterCodeDecl(CodeDecl cd) {
+		CodeInfo cinfo = new CodeInfo(cd.codeInstance());
+		
+		// If it is a constructor or method, find all the final arguments and add them to the finalVar map. 
+		if (cd instanceof ProcedureDecl) {
+			ProcedureDecl pd = (ProcedureDecl)cd;
+			for (Iterator it = pd.formals().iterator(); it.hasNext(); ) {
+				Formal f = (Formal)it.next();
+				if (f.flags().isFinal()) {
+					cinfo.addFinalArg(f.localInstance());
+				}
+			}
+		}
+		
+		codeContext.push(cinfo);
+	}
+	
+	protected void enterLocalDecl(LocalDecl ld) {
+		if (ld.flags().isFinal()) {
+			((CodeInfo)codeContext.peek()).addFinalLocal(ld.localInstance());
+		}
+	}
+	
 	public Node leave(Node old, Node n, NodeVisitor v) {
 		if (n instanceof ClassDecl) {
 			ClassDecl cd = (ClassDecl)n;
@@ -361,7 +385,9 @@ public class InnerTranslator extends NodeVisitor {
 			// Do nothing if it is already a static class, or it is a toplevel class,  
 			// but need to add those classes converted from local/anonymous classes.
 			if (ct.flags().isStatic() || ct.isTopLevel()) {
-				cd = addMemberClasses(cd, selfInfo);
+				if (selfInfo.newMemberClasses().size() > 0) {
+					cd = addMemberClasses(cd, selfInfo);
+				}
 				return cd;
 			}
 			
@@ -618,7 +644,9 @@ public class InnerTranslator extends NodeVisitor {
 		List members = new ArrayList(cd.body().members().size() + cinfo.newMemberClasses().size());
 		members.addAll(cd.body().members());
 		members.addAll(cinfo.newMemberClasses());
-		cd = cd.body(nf.ClassBody(cd.body().position(), members));
+		ClassBody b = nf.ClassBody(cd.body().position(), members);
+		b = (ClassBody)b.exceptions(cd.body().exceptions());
+		cd = cd.body(b);
 		ParsedClassType ct = cd.type(); 
 		for (Iterator it = cinfo.newMemberClasses().iterator(); it.hasNext(); ) {
 			ClassDecl addedCd = (ClassDecl)it.next();
@@ -629,7 +657,7 @@ public class InnerTranslator extends NodeVisitor {
 	}
 	
 	protected Expr updateNewExpr(New newExpr) {
-		ClassType ct = (ClassType)newExpr.type();
+		ClassType ct = (ClassType)newExpr.type(); 
 		ClassInfo classInfo = (ClassInfo)classContext.peek();
 		CodeInfo codeInfo = (CodeInfo)codeContext.peek();
 		ClassInfo cinfo = codeInfo.findLocalClassInfo(ct);
@@ -656,7 +684,7 @@ public class InnerTranslator extends NodeVisitor {
 			for (; it.hasNext(); ) {
 				Formal f = (Formal)it.next();
 				args.add(nf.Local(Position.compilerGenerated(), f.name()));
-				ftypes.add(f.type());
+				ftypes.add(f.type().type());
 			}
 			args.addAll(newExpr.arguments());
 			ftypes.addAll(ci.formalTypes());
