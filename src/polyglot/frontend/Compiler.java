@@ -752,6 +752,9 @@ public class Compiler implements TargetTable, ClassCleaner
 	  CodeWriter cw = new CodeWriter(System.out, outputWidth);
 	  soln.dump(cw);
 	  cw.flush();
+	  // Now substitute the solution for the variables in the path maps
+	  JifLabelSubst ls = new JifLabelSubst(soln);
+	  ast = ast.visit(ls);
       } catch (SemanticException e) {
 	  eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), -1);
       } catch (IOException e) {
