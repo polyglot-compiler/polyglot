@@ -15,28 +15,36 @@ import jltools.util.*;
  */
 public class CharacterLiteral extends Literal {
 
+
+  /**
+   * Creates a new CharacterLiteral storing a character with the value <c>.
+   */
+  public CharacterLiteral( char c) 
+  {
+    this( c, String.valueOf( c));
+  }
+
   /**
    * Creates a new CharacterLiteral storing a character with the value <c>
+   * and escaped value <escaped>.
    */ 
-  public CharacterLiteral (char c) {
-    value = String.valueOf(c);
+  public CharacterLiteral( char c, String escaped) 
+  {
+    value = c;
+    escapedValue = escaped;
   }
 
-  /**
-   * Creates a new CharacterLiteral storing the String s. This is useful
-   * when storing escaped character values.
-   */
-  public CharacterLiteral (String s) {
-    value = s;
-  }
-
-  public String getCharValue() {
+  public char getCharValue() {
     return value;
+  }
+
+  public String getEscapedCharValue() {
+    return escapedValue;
   }
 
   public void translate(LocalContext c, CodeWriter w)
   {
-    w.write( "'" + value + "'");
+    w.write( "'" + escapedValue + "'");
   }
 
   public Node dump( CodeWriter w)
@@ -61,16 +69,18 @@ public class CharacterLiteral extends Literal {
   }
 
   public Node copy() {
-    CharacterLiteral cl = new CharacterLiteral(value);
+    CharacterLiteral cl = new CharacterLiteral(value, escapedValue);
     cl.copyAnnotationsFrom(this);
     return cl;
   }
 
   public Node deepCopy() {
-    CharacterLiteral cl = new CharacterLiteral(new String(value));
+    CharacterLiteral cl = new CharacterLiteral(value, 
+                                               new String(escapedValue));
     cl.copyAnnotationsFrom(this);
     return cl;
   }
   
-  private String value;
+  protected char value;
+  protected String escapedValue;
 }

@@ -381,11 +381,11 @@ public class Lexer {
 
   CharacterLiteral getCharLiteral() {
     char firstquote = consume();
-    String val;
+    char val;
                                   
     switch (line.charAt(line_pos)) {
     case '\\':
-      val = getEscapeSequence();
+      val = getEscapeCharacter();
       break;
     case '\'':
       eq.enqueue( ErrorInfo.LEXICAL_ERROR,
@@ -398,7 +398,7 @@ public class Lexer {
                              line_num);
       return null;
     default:
-      val = String.valueOf(consume());
+      val = consume();
       break;
     }
 
@@ -483,6 +483,48 @@ public class Lexer {
     }
   }
 
+  char getEscapeCharacter() {
+    if (consume() != '\\') {
+      eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                             "Invalid escape sequence.",
+                             line_num);
+      return 0;
+    }
+    switch(line.charAt(line_pos)) {
+    case 'b':
+      consume(); return '\b';
+    case 't':
+      consume(); return '\t';
+    case 'n':
+      consume(); return '\n';
+    case 'f':
+      consume(); return '\f';
+    case 'r':
+      consume(); return '\r';
+    case '\"':
+      consume(); return '\\';
+    case '\'':
+      consume(); return '\'';
+    case '\\':
+      consume(); return '\\';
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+      return getOctalEscapeCharacter(3);
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+      return getOctalEscapeCharacter(2);
+    default:
+      eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                             "Invalid escape sequence.",
+                             line_num);
+      return 0;
+    }
+  }
+
   String getOctalEscapeSequence(int maxlength) {
     String result = "\\";
     char digit;
@@ -498,6 +540,26 @@ public class Lexer {
       result += digit;
     }
     return result;
+  }
+
+  char getOctalEscapeCharacter( int maxlength) {
+    int val = 0;
+    int i;
+    for( i = 0; i < maxlength; i++) {
+      if( Character.digit( line.charAt( line_pos), 8) != -1) {
+        val = (8 * val) + Character.digit( consume(), 8);
+      }
+      else {
+        break;
+      }
+    }
+    if( (i == 0) || (val > 0xFF)) {
+      eq.enqueue( ErrorInfo.LEXICAL_ERROR,
+                             "Invalid octal escape sequence.",
+                             line_num);
+      return 0;
+    }
+    return (char)val;
   }
 
   boolean isOctalDigit(char c)

@@ -291,7 +291,8 @@ literal ::=
 	|	CHARACTER_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(
 					new jltools.ast.CharacterLiteral( 
-					a.getValue()), a); :}
+					a.getValue(), a.getEscapedValue())
+					, a); :}
 	|	STRING_LITERAL:a
 			{: RESULT = (jltools.ast.Literal)Grm.ln(
 				new jltools.ast.StringLiteral(
