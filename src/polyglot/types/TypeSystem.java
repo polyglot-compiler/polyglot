@@ -561,6 +561,11 @@ public interface TypeSystem {
     Package packageForName(Package prefix, String name) throws SemanticException;
 
     /**
+     * Return a package by name.
+     */
+    Package createPackage(String name);
+
+    /**
      * Return a package by name with the given outer package.
      */
     Package createPackage(Package prefix, String name);

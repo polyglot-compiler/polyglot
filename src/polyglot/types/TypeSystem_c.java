@@ -1403,6 +1403,17 @@ public class TypeSystem_c implements TypeSystem
 	return new Package_c(this, prefix, name);
     }
 
+    public Package createPackage(String name) {
+        if (name == null || name.equals("")) {
+	    return null;
+	}
+
+	String s = StringUtil.getShortNameComponent(name);
+	String p = StringUtil.getPackageComponent(name);
+
+	return createPackage(createPackage(p), s);
+    }
+
     /**
      * Returns a type identical to <type>, but with <dims> more array
      * dimensions.
