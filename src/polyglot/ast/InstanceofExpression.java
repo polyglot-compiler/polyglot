@@ -19,9 +19,17 @@ public class InstanceofExpression extends Expression {
    * Effects: Creates a new InstanceofExpreession which is testing if
    *    <expr> is an instance of <type>.
    */
-  public InstanceofExpression (Expression expr, Type type) {
+  public InstanceofExpression (Expression expr, TypeNode type) {
     this.expr = expr;
     this.type = type;
+  }
+  /**
+   * Effects: Creates a new InstanceofExpreession which is testing if
+   *    <expr> is an instance of <type>.
+   */
+  public InstanceofExpression (Expression expr, Type type) {
+    this.expr = expr;
+    this.type = new TypeNode(type);
   }
 
   /**
@@ -42,7 +50,7 @@ public class InstanceofExpression extends Expression {
    * Effects: Returns the type to which the type of the expression
    *    is being compared. 
    */
-  public Type getType() {
+  public TypeNode getType() {
     return type;
   }
 
@@ -50,8 +58,16 @@ public class InstanceofExpression extends Expression {
    * Effects: Changes the type of being checked in this expression
    *    to <newType>.
    */
-  public void setType(Type newType) {
+  public void setType(TypeNode newType) {
     type = newType;
+  }
+
+  /**
+   * Effects: Changes the type of being checked in this expression
+   *    to <newType>.
+   */
+  public void setType(Type newType) {
+    type = new TypeNode(newType);
   }
 
   public Node accept(NodeVisitor v) {
@@ -65,6 +81,7 @@ public class InstanceofExpression extends Expression {
    *     Visits the subexpression of this.
    */
   public void visitChildren(NodeVisitor v) {
+    type = (TypeNode) type.accept(v);
     expr = (Expression) expr.accept(v);
   }
 
@@ -76,12 +93,13 @@ public class InstanceofExpression extends Expression {
 
   public Node deepCopy() {
     InstanceofExpression ie = 
-      new InstanceofExpression((Expression) expr.deepCopy(), type);
+      new InstanceofExpression((Expression) expr.deepCopy(), 
+			       (TypeNode) type.deepCopy());
     ie.copyAnnotationsFrom(this);
     return ie;
   }
 
   private Expression expr;
-  private Type type;
+  private TypeNode type;
 }
   

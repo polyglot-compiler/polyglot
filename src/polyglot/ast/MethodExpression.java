@@ -21,21 +21,19 @@ import java.util.ArrayList;
  */
 public class MethodExpression extends Expression {
   /**
-   * Requires: Either <type> or <expr> or both are null, all
-   * elements of <arguments> are of type Expression.
+   * Requires: <target> is either a TypeNode or an Expression or null.
    *
    * Effects: Creates a new MethodExpression calling a method named
    * <name> with arguments in <arguments> being called optionally on
-   * either <type> or <expr>.
+   * <target>.
    */
-  public MethodExpression(Type type, Expression expr, String name,
+  public MethodExpression(Node target, String name,
 			  List arguments) {
-    if (type != null & expr != null) {
-      throw new IllegalArgumentException("A MethodExpression must have either"+
-					 " a null type or expression. ");
-    }
-    this.type = type;
-    this.expr = expr;
+    if (target != null && ! (target instanceof TypeNode ||
+			     target instanceof Expression))
+      throw new Error("Target of a method call must be a type or expression.");
+
+    this.target = target;
     this.name = name;
     TypedList.check(arguments, Expression.class);
     this.arguments = new ArrayList(arguments);
@@ -88,42 +86,28 @@ public class MethodExpression extends Expression {
   public void removeArgument(int pos) {
     arguments.remove(pos);
   }
-
+  
   /**
-   * Effects: Returns the Type that the method is being called on.  If
-   * the method is being called on an object or a local call, returns
-   * null.
+   * Effects: Returns the target that that the method is being called on.
+   * 
+   * (The target will be either an Expression (possibly ambiguous) or a
+   *  TypeNode.)
    */
-  public Type getTargetType() {
-    return type;
+  public Node getTarget() {
+    return target;
   }
 
   /**
-   * Effects: Sets this method to be called on <newType>.  If
-   * <newType> is not null, any expression which this method was
-   * previously set to be called on will be set to null.
+   * Requires: newTarget is an Expression or a TypeNode.
+   *
+   * Effects: Sets this method to be called on <newTarget>.
    */
-  public void setTargetType(Type newType) {
-    type = newType;
-    if (type != null) expr = null;
-  }
-
-  /**
-   * Effects: Returns the expression upon which this method is being
-   * called, or null if it is not being called on an expression.
-   */
-  public Expression getTargetExpression() {
-    return expr;
-  }
-
-  /**
-   * Effects: Sets this MethodExpression to be called on <newExpr>.
-   * If this MethodExpression was previously called on a Type, then
-   * the type is set to null.
-   */
-  public void setTargetExpression(Expression newExpr) {
-    expr = newExpr;
-    if (expr != null) type = null;
+  public void setTarget(Node newTarget) {
+    if (newTarget != null && ! (newTarget instanceof TypeNode ||
+				newTarget instanceof Expression))
+      throw new Error("Target of a method call must be a type or expression.");
+    
+    target = newTarget;
   }
 
   public Node accept(NodeVisitor v) {
@@ -131,8 +115,8 @@ public class MethodExpression extends Expression {
   }
 
   public void visitChildren(NodeVisitor v) {
-    if (expr != null) {
-      expr = (Expression) expr.accept(v);
+    if (target != null) {
+      target = target.accept(v);
     }
 
     for(ListIterator it=arguments.listIterator(); it.hasNext(); ) {
@@ -142,8 +126,7 @@ public class MethodExpression extends Expression {
   }
 
   public Node copy() {
-    MethodExpression me = new MethodExpression(type,
-					       expr,
+    MethodExpression me = new MethodExpression(target,
 					       name,
 					       arguments);
     me.copyAnnotationsFrom(this);
@@ -155,16 +138,16 @@ public class MethodExpression extends Expression {
     for (ListIterator i=arguments.listIterator(); i.hasNext(); ) {
       newArguments.add(i.next());
     }
-    MethodExpression me = new MethodExpression(type,
-					       (Expression) expr.deepCopy(),
+    MethodExpression me = new MethodExpression(target != null ? 
+					          target.deepCopy() :
+					          target,
 					       name,
 					       newArguments);
     me.copyAnnotationsFrom(this);
     return me;
   }
 
-  private Type type;
-  private Expression expr;
+  private Node target;
   private String name;
   private List arguments;
 }

@@ -56,6 +56,7 @@ public class CatchBlock extends Node {
   }
 
   public void visitChildren(NodeVisitor v) {
+    formalParameter.setType((TypeNode) formalParameter.getType().accept(v));
     block = (BlockStatement) block.accept(v);
   }
 
@@ -67,7 +68,8 @@ public class CatchBlock extends Node {
 
   public Node deepCopy() {
     CatchBlock cb = 
-      new CatchBlock(formalParameter, (BlockStatement) block.deepCopy());
+      new CatchBlock(formalParameter.deepCopy(), 
+		     (BlockStatement) block.deepCopy());
     cb.copyAnnotationsFrom(this);
     return cb;
   }

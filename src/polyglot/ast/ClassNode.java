@@ -35,17 +35,45 @@ public class ClassNode extends ClassMember {
    */
   public ClassNode(AccessFlags accessFlags,
 		   String name,
-		   Type superClass,
+		   TypeNode superClass,
 		   List interfaceList,
 		   List classMembers) {
     this.accessFlags = accessFlags;
     this.name = name;
     this.superClass = superClass;
-    TypedList.check(interfaceList, Type.class);
+    TypedList.check(interfaceList, TypeNode.class);
     this.interfaceList = new ArrayList(interfaceList);
     TypedList.check(classMembers, ClassMember.class);
     this.classMembers = new ArrayList(classMembers);
   }
+
+  /**
+   * Requires: <interfaces> contains only elements of type Type,
+   * <classMemebers> contains only elements of type ClassMemeber.
+   *
+   * Effects: Creates a new instance of ClassNode for
+   * a class named <name>, with access flags <accessFlags>, superclass
+   * <superClass>, implementing interfaces <interfaceList>, and a
+   * class body containing elements of <classMembers>.
+   */
+  public ClassNode(AccessFlags accessFlags,
+		   String name,
+		   Type superClass,
+		   List interfaceList,
+		   List classMembers) {
+    this.accessFlags = accessFlags;
+    this.name = name;
+    this.superClass = new TypeNode(superClass);
+    TypedList.check(interfaceList, Type.class);
+    this.interfaceList = new ArrayList(interfaceList.size());
+    for (Iterator i = interfaceList.iterator(); i.hasNext(); ) {
+      this.interfaceList.add(i.next());
+    }
+    TypedList.check(classMembers, ClassMember.class);
+    this.classMembers = new ArrayList(classMembers);
+  }
+
+
 
   /**
    * Effects: returns the AccessFlags for this class declaration. 
@@ -60,7 +88,7 @@ public class ClassNode extends ClassMember {
   public void setAccessFlags(AccessFlags newFlags) {
     accessFlags = newFlags;
   }
-
+  
   /** 
    * Effects: Returns the name of this class.
    */
@@ -78,25 +106,32 @@ public class ClassNode extends ClassMember {
   /**
    * Effects: Returns the type of the super class of this.
    */
-  public Type getSuper() {
+  public TypeNode getSuper() {
     return superClass;
   }
 
   /**
    * Effects: Sets the superclass of this to be <newSuper>.
    */
-  public void setSuper(Type newSuper) {
+  public void setSuper(TypeNode newSuper) {
     superClass = newSuper;
   }
 
   /**
+   * Effects: Sets the superclass of this to be <newSuper>.
+   */
+  public void setSuper(Type newSuper) {
+    superClass = new TypeNode(newSuper);
+  }
+
+  /**
    * Effects: Returns a TypedListIterator which will return the
-   * interfaces implemented by this ClassNode in
+   * TypeNodes interfaces implemented by this ClassNode in
    * order.
    */
   public TypedListIterator interfaces() {
     return new TypedListIterator (interfaceList.listIterator(),
-				  Type.class,
+				  TypeNode.class,
 				  false);
   }
 
@@ -112,7 +147,7 @@ public class ClassNode extends ClassMember {
    * Effects: Adds <inter> to the list of interfaces implemented by
    * the class declared by this.
    */
-  public void addInterface(Type inter) {
+  public void addInterface(TypeNode inter) {
     interfaceList.add(inter);
   }
 
@@ -170,6 +205,11 @@ public class ClassNode extends ClassMember {
    * removed. 
    */
   public void visitChildren(NodeVisitor v) {
+    if (superClass != null) 
+      superClass = (TypeNode) superClass.accept(v);
+    for(ListIterator i = interfaceList.listIterator(); i.hasNext(); ) {
+      i.set( ((TypeNode) i.next()).accept(v));
+    }
     for(ListIterator i=classMembers.listIterator(); i.hasNext(); ) {
       ClassMember m = (ClassMember) i.next();
       m = (ClassMember) m.accept(v);
@@ -186,7 +226,7 @@ public class ClassNode extends ClassMember {
     ClassNode cn = new ClassNode(accessFlags.copy(),
 				 name,
 				 superClass,
-				 interfaceList,
+				 new ArrayList(interfaceList),
 				 classMembers);
     cn.copyAnnotationsFrom(this);
     return cn;
@@ -198,10 +238,14 @@ public class ClassNode extends ClassMember {
       ClassMember m = (ClassMember) i.next();
       newClassMembers.add(m.deepCopy());
     }
+    ArrayList newInterfaceList = new ArrayList(interfaceList.size());
+    for(Iterator i = interfaceList.iterator(); i.hasNext(); ) {
+      newInterfaceList.add( ((TypeNode) i.next()).deepCopy() );
+    }
     ClassNode cn = new ClassNode(accessFlags.copy(),
 				  name,
-				  superClass,
-				  interfaceList,
+				  new TypeNode(superClass),
+				  newInterfaceList,
 				  newClassMembers);
     cn.copyAnnotationsFrom(this);
     return cn;
@@ -209,7 +253,7 @@ public class ClassNode extends ClassMember {
 
   private AccessFlags accessFlags;
   private String name;
-  private Type superClass;
+  private TypeNode superClass;
   private List interfaceList;
   private List classMembers;
 }

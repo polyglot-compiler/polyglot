@@ -19,8 +19,19 @@ public class FormalParameter {
      * the name <name>.  The FormalParameter is final if <isFinal> is
      * true.
      */
-    public FormalParameter (Type type, String name, boolean isFinal) {
+    public FormalParameter (TypeNode type, String name, boolean isFinal) {
 	this.type = type;
+	this.name = name;
+	this.isFinal = isFinal;
+    }
+
+    /**
+     * Effects: Creates a new FormalParameter of type <type> bound to
+     * the name <name>.  The FormalParameter is final if <isFinal> is
+     * true.
+     */
+    public FormalParameter (Type type, String name, boolean isFinal) {
+	this.type = new TypeNode(type);
 	this.name = name;
 	this.isFinal = isFinal;
     }
@@ -28,15 +39,22 @@ public class FormalParameter {
     /**
      * Effects: Returns the type of this parameter.
      */
-    public Type getType() {
+    public TypeNode getType() {
 	return type;
     }
 
     /**
      * Effects: Sets the type of this FormalParameter to be <newType>.
      */
-    public void setType(Type newType) {
+    public void setType(TypeNode newType) {
 	type = newType;
+    }
+
+    /**
+     * Effects: Sets the type of this FormalParameter to be <newType>.
+     */
+    public void setType(Type newType) {
+	type = new TypeNode(newType);
     }
 
     /**
@@ -69,7 +87,13 @@ public class FormalParameter {
 	this.isFinal = isFinal;
     }
 
-    private Type type;
+    public FormalParameter deepCopy() {
+      return new FormalParameter((TypeNode) type.deepCopy(),
+				 name,
+				 isFinal);
+    }
+
+    private TypeNode type;
     private String name;
     private boolean isFinal;
 }

@@ -13,6 +13,13 @@ package jltools.ast;
  **/
 public class NullVisitor implements NodeVisitor {
 
+  // Misc
+
+  public Node visitTypeNode(TypeNode tn) {
+    tn.visitChildren(this);
+    return tn;
+  }
+
   // Statements
 
   public Node visitBlockStatement(BlockStatement bs) {

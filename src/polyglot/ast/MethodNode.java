@@ -38,7 +38,7 @@ public class MethodNode extends ClassMember {
     this.accessFlags = accessFlags;
     TypedList.check(formals, FormalParameter.class);
     this.formals = new ArrayList(formals);
-    TypedList.check(exceptions, Type.class);
+    TypedList.check(exceptions, TypeNode.class);
     this.exceptions = new ArrayList(exceptions);
     this.body = body;
     this.name = null;
@@ -56,7 +56,7 @@ public class MethodNode extends ClassMember {
    * by <accessFlags> and contains <body> for a body.
    */
   public MethodNode(AccessFlags accessFlags,
-		    Type returnType,
+		    TypeNode returnType,
 		    String name,
 		    List formals,
 		    List exceptions,
@@ -64,7 +64,7 @@ public class MethodNode extends ClassMember {
     this.accessFlags = accessFlags;
     TypedList.check(formals, FormalParameter.class);
     this.formals = new ArrayList(formals);
-    TypedList.check(exceptions, Type.class);
+    TypedList.check(exceptions, TypeNode.class);
     this.exceptions = new ArrayList(exceptions);
     this.body = body;
     this.name = name;
@@ -96,7 +96,7 @@ public class MethodNode extends ClassMember {
   /**
    * Effects: Returns the return type of this MethodNode.
    */
-  public Type getReturnType() {
+  public TypeNode getReturnType() {
     return returnType;
   }
 
@@ -104,8 +104,16 @@ public class MethodNode extends ClassMember {
    * Effects: Sets the return type for this MethodNode to be
    * <newReturnType>.
    */
-  public void setReturnType(Type newReturnType) {
+  public void setReturnType(TypeNode newReturnType) {
     returnType = newReturnType;
+  }
+
+  /**
+   * Effects: Sets the return type for this MethodNode to be
+   * <newReturnType>.
+   */
+  public void setReturnType(Type newReturnType) {
+    returnType = new TypeNode(newReturnType);
   }
 
   /**
@@ -186,7 +194,7 @@ public class MethodNode extends ClassMember {
    */
   public TypedListIterator exceptions() {
     return new TypedListIterator(exceptions.listIterator(),
-				 Type.class,
+				 TypeNode.class,
 				 false);
   }
   
@@ -214,48 +222,38 @@ public class MethodNode extends ClassMember {
   }
 
   public Node copy() {
-    MethodNode mn;
-    if (isConstructor()) {
-      mn =  new MethodNode(accessFlags.copy(),
-			   formals,
-			   exceptions,
-			   body);
-    }
-    else {
-      mn = new MethodNode(accessFlags,
-			  returnType,
-			  name,
-			  formals,
-			  exceptions,
-			  body);
-    }
-    mn.copyAnnotationsFrom(this);
-    return mn;
+    return copy(false);
   }
 
   public Node deepCopy() {
+    return copy(true);
+  }
+
+  private Node copy(boolean deep) {
     MethodNode mn;
+    List newFormals = new ArrayList(formals.size());
+    for (Iterator i = formals.iterator(); i.hasNext(); ) {
+      newFormals.add(deep? ((FormalParameter) i.next()).deepCopy() :i.next());
+    }
     if (isConstructor()) {
       mn = new MethodNode(accessFlags.copy(),
-			  formals,
-			  exceptions,
-			  (BlockStatement) body.deepCopy());
-    }
-    else {
-      mn = new MethodNode(accessFlags,
-			  returnType,
+			  newFormals,
+			  deep ? Node.deepCopyList(exceptions) : exceptions,
+			  deep ? (BlockStatement) body.deepCopy() : body);
+    } else {
+      mn = new MethodNode(accessFlags.copy(),
+			  deep ? (TypeNode)returnType.deepCopy() :returnType,
 			  name,
-			  formals,
-			  exceptions,
-			  (BlockStatement) body.deepCopy());
+			  newFormals,
+			  deep ? Node.deepCopyList(exceptions) : exceptions,
+			  deep ? (BlockStatement) body.deepCopy() : body);
     }
-    mn.copyAnnotationsFrom(this);
     return mn;
   }
 
   private boolean constructor;
   private AccessFlags accessFlags;
-  private Type returnType;
+  private TypeNode returnType;
   private String name;
   private List formals;
   private List exceptions;

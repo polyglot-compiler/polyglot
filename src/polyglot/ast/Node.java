@@ -4,6 +4,10 @@
 
 package jltools.ast;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 /**
  * Node
  *
@@ -48,6 +52,34 @@ public abstract class Node extends jltools.util.AnnotatedObject {
    * every child of this node, replacing that child with the return value.
    **/
   public abstract void visitChildren(NodeVisitor vis);
+
+  
+  /**
+   * Return a new array containing all the elements of lst, in the same order.
+   *
+   * Used to implement many copy functions.
+   **/
+  public static List copyList(List lst) {
+    ArrayList newList = new ArrayList(lst.size());
+    for (Iterator it = lst.iterator(); it.hasNext(); ) {
+      newList.add( it.next() );
+    }
+    return newList;
+  }
+
+  /**
+   * Return a new array containing all the elements of lst, in the same order,
+   * after a deep copy operation.
+   *
+   * Used to implement many deepCopy functions.
+   **/
+  public static List deepCopyList(List lst) {
+    ArrayList newList = new ArrayList(lst.size());
+    for (Iterator it = lst.iterator(); it.hasNext(); ) {
+      newList.add( ((Node) it.next()).deepCopy() );
+    }
+    return newList;
+  }
 
 }
 

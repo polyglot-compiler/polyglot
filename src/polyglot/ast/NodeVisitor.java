@@ -28,6 +28,9 @@ package jltools.ast;
  **/
 public interface NodeVisitor {
 
+  // Misc
+  public Node visitTypeNode(TypeNode tn);
+
   // Statements
   public Node visitBlockStatement(BlockStatement bs);  
   public Node visitExpressionStatement(ExpressionStatement es);

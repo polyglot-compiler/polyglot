@@ -35,7 +35,7 @@ public class NewArrayExpression extends Expression {
    *    <additionalDim> additional dimensions of unspecified length,
    *    and (optionally) <optInitializer> as an initializer expression.
    */ 
-  public NewArrayExpression(Type elemType, 
+  public NewArrayExpression(TypeNode elemType, 
 			    List lengthExpressions, 
 			    int additionalDim,
 			    ArrayInitializerExpression optInitializer) {
@@ -48,19 +48,42 @@ public class NewArrayExpression extends Expression {
     dimensionExpressions = new ArrayList(lengthExpressions);
     initializer = optInitializer;
   }
+
+  /**
+   * Requires: additionalDim >= 0, and every element of lengthExpressions is 
+   *    an Expression.  optInitializer may be null.
+   * Effects: Creates a NewArrayExpression with element type <elemType>,
+   *    <lengthExpressions> as supplied dimensions,
+   *    <additionalDim> additional dimensions of unspecified length,
+   *    and (optionally) <optInitializer> as an initializer expression.
+   */ 
+  public NewArrayExpression(Type elemType, 
+			    List lengthExpressions, 
+			    int additionalDim,
+			    ArrayInitializerExpression optInitializer) {
+    this(new TypeNode(elemType), lengthExpressions, additionalDim, 
+		      optInitializer);
+  }
   
   /**
    * Effects: Returns the type of the array being created. 
    */
-  public Type getArrayType() {
+  public TypeNode getArrayType() {
     return type;
   }
   
   /** 
    * Effects: Sets the type of the array being create to <newType>.
    */
-  public void setArrayType(Type newType) {
+  public void setArrayType(TypeNode newType) {
     type = newType;
+  }
+
+  /** 
+   * Effects: Sets the type of the array being create to <newType>.
+   */
+  public void setArrayType(Type newType) {
+    type = new TypeNode(newType);
   }
 
   /**
@@ -147,9 +170,9 @@ public class NewArrayExpression extends Expression {
     initializer = expr;
   }
 
-    public Node accept(NodeVisitor v) {
-	return v.visitNewArrayExpression(this);
-    }
+  public Node accept(NodeVisitor v) {
+    return v.visitNewArrayExpression(this);
+  }
 
     /** 
      * Requires: v will not transform an Expression into anything
@@ -158,6 +181,7 @@ public class NewArrayExpression extends Expression {
      * Effects: visits the subexpression of this.  
      */
     public void visitChildren(NodeVisitor v) {
+      type = (TypeNode) type.accept(v);
       for (ListIterator i=dimensionExpressions.listIterator(); i.hasNext(); ) {
 	Expression e = (Expression) i.next();
 	e = (Expression) e.accept(v);
@@ -185,7 +209,7 @@ public class NewArrayExpression extends Expression {
   public Node deepCopy() {
     ArrayInitializerExpression init = initializer == null ? null
       : (ArrayInitializerExpression) initializer.deepCopy();
-    NewArrayExpression na = new NewArrayExpression(type,
+    NewArrayExpression na = new NewArrayExpression((TypeNode) type.deepCopy(),
 						   new ArrayList(),
 						   additionalDimensions,
 						   init);
@@ -197,7 +221,7 @@ public class NewArrayExpression extends Expression {
     return na;
   }
 
-  private Type type;
+  private TypeNode type;
   // RI: contains only elements of type Expression 
   private ArrayList dimensionExpressions;
   private int additionalDimensions;

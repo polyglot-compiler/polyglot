@@ -46,12 +46,23 @@ public class VariableDeclarationStatement extends Statement {
    *    with optional modifiers <optModifiers>, and declarations <declList>.
    **/
   public VariableDeclarationStatement(AccessFlags optModifiers,
-				      Type type, List declList) {
+				      TypeNode type, List declList) {
     modifiers = optModifiers;
     this.type = type;
     TypedList.check(declList, Declarator.class);
     variables = new ArrayList(declList);
   }     
+
+  /**
+   * Requires: Every element of <declList> is a Declarator.
+   * Effects: Creates a new VariableDeclarationStatement of type <type>,
+   *    with optional modifiers <optModifiers>, and declarations <declList>.
+   **/
+  public VariableDeclarationStatement(AccessFlags optModifiers,
+				      Type type, List declList) {
+    this (optModifiers, new TypeNode(type), declList);
+  }     
+
 
   /**
    * Effects: Creates a new VariableDeclarationStatement of type <type>
@@ -88,15 +99,36 @@ public class VariableDeclarationStatement extends Statement {
   }
 
   /**
+   * Gets the type of this declaration statement.
+   **/
+  public TypeNode getType() {
+    return type;
+  }
+
+  /**
+   * Sets the type of this declaration statement.
+   **/
+  public void setType(TypeNode type) {
+    this.type = type;
+  }
+
+  /**
+   * Sets the type of this declaration statement.
+   **/
+  public void setType(Type type) {
+    this.type = new TypeNode(type);
+  }
+
+  /**
    * Requires: decl is a declarator in this.
    *
    * Effects: returns the actual type of the variable declared by <decl>.
    **/
   public Type typeForDeclarator(Declarator decl) {
     if (decl.additionalDims > 0)
-      return type.extendArrayDims(decl.additionalDims);
+      return type.getType().extendArrayDims(decl.additionalDims);
     else
-      return type;
+      return type.getType();
   }
 
   /**
@@ -122,6 +154,7 @@ public class VariableDeclarationStatement extends Statement {
    *   another Expression or null.
    */
   public void visitChildren(NodeVisitor v) {
+    type = (TypeNode) type.accept(v);
     ListIterator it = variables.listIterator();
     while (it.hasNext()) {
       Declarator pair = (Declarator)it.next();
@@ -155,13 +188,14 @@ public class VariableDeclarationStatement extends Statement {
 	(deep ? (Expression) d.initializer.deepCopy() : d.initializer);
       list.add(new Declarator(d.name, d.additionalDims, expr));
     }
+    TypeNode tn = (TypeNode) type.copy();
     VariableDeclarationStatement vds = 
       new VariableDeclarationStatement(mods, type, list);
     vds.copyAnnotationsFrom(this);
     return vds;
   }
   
-  private Type type; 
+  private TypeNode type; 
   // RI: every member is a Declarator
   private List variables; 
   private AccessFlags modifiers;

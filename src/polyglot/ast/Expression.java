@@ -19,7 +19,7 @@ public abstract class Expression extends Node {
    * Sets the type of this expression to be <type>.  A 'null' value signifies
    * an unresolved type.
    **/
-  public void setType(Type type) {
+  public void setExprType(Type type) {
     Annotate.setType(this, type);
   }
 
@@ -27,7 +27,7 @@ public abstract class Expression extends Node {
    * Gets the type of this expression.  A 'null' value signifies
    * an unresolved type.
    **/
-  public Type getType() {
+  public Type getExprType() {
     return Annotate.getType(this);
   }    
 }

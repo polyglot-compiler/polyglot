@@ -34,18 +34,24 @@ public class NewObjectExpression extends Expression {
    * extend the class.  If an anonymous class is not being created
    * classNode should be null.
    */
-  public NewObjectExpression(Type type, List arguments, ClassNode classNode) {
+  public NewObjectExpression(TypeNode type, List arguments, 
+			     ClassNode classNode) {
     this.type = type;
     TypedList.check(arguments, Expression.class);
     argumentList = new ArrayList(arguments);
     this.classNode = classNode;
   }
 
+  public NewObjectExpression(Type type, List arguments, 
+			     ClassNode classNode) {
+    this(new TypeNode(type), arguments, classNode);
+  }
+
   /**
    * Effects: Returns the type of the object being created by this
    * NewObjectExpression.
    */
-  public Type getType() {
+  public TypeNode getType() {
     return getType();
   }
     
@@ -53,9 +59,14 @@ public class NewObjectExpression extends Expression {
    * Effects: Sets the type of the object being created by this to
    * be <newType>.
    */
-  public void setType(Type newType) {
+  public void setType(TypeNode newType) {
     type = newType;
   }
+
+  public void setType(Type newType) {
+    type = new TypeNode(newType);
+  }
+
 
   /**
    * Effects: Returns the argument at position <pos>.  Throws
@@ -108,6 +119,7 @@ public class NewObjectExpression extends Expression {
    * for a memeber of the class body, then that member is removed. 
    */
   public void visitChildren(NodeVisitor v) {
+    type = (TypeNode) type.accept(v);
     for(ListIterator i=argumentList.listIterator(); i.hasNext(); ) {
       Expression e = (Expression) i.next();
       e = (Expression) e.accept(v);
@@ -132,18 +144,16 @@ public class NewObjectExpression extends Expression {
   }
 
   public Node deepCopy() {
-    List newArgumentList = new ArrayList(argumentList.size());
-    for (ListIterator it = newArgumentList.listIterator(); it.hasNext();) {
-      Expression e = (Expression) it.next();
-      newArgumentList.add(e.deepCopy());
-    }
+    List newArgumentList = Node.deepCopyList(argumentList);
     NewObjectExpression no =
-      new NewObjectExpression (type, newArgumentList, (ClassNode) classNode.deepCopy());
+      new NewObjectExpression((TypeNode) type.deepCopy(), 
+			      newArgumentList, 
+			      (ClassNode) classNode.deepCopy());
     no.copyAnnotationsFrom(this);
     return no;
   }
 
-  private Type type;
+  private TypeNode type;
   private List argumentList;
   private ClassNode classNode;
 }
