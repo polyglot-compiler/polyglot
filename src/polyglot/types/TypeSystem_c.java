@@ -1400,6 +1400,88 @@ public class TypeSystem_c implements TypeSystem
 		"Invalid access flags: " + f.retain(ACCESS_FLAGS) + ".");
 	}
     }
+    
+    /**
+     * Assert that <code>ct</code> implements all abstract methods that it 
+     * has to, i.e. if it is a concrete class, then it must implement all
+     * interfaces and abstract methods that it or it's superclasses declare.
+     */
+    public void checkClassConformance(ClassType ct) throws SemanticException {
+        if (ct.flags().isAbstract() || ct.flags().isInterface()) {
+            // ct is abstract or an interface, and so doesn't need to 
+            // implement everything.
+            return;
+        }
+        
+        // build up a list of superclasses and interfaces that ct that may
+        // contain abstract methods that ct must implement.
+        List superInterfaces = new LinkedList();
+
+        superInterfaces.add(ct);
+        superInterfaces.addAll(ct.interfaces());
+
+
+        Type t = ct.superType();
+
+        while (t != null) {
+            ClassType c = t.toClass();
+            if (!c.flags().isAbstract()) {
+                // the superclass is not abstract, so it must implement
+                // all abstract methods of any interfaces it implements, and
+                // any superclasses it may have.
+                break;
+            }
+            superInterfaces.add(c);
+            superInterfaces.addAll(c.interfaces());
+            t = c.superType();
+        }
+        
+        // the list superInterfaces now contains all the interfaces and
+        // superclasses that may contain abstract methods that the class ct 
+        // must implement.
+        
+        // check each abstract method of the classes and interfaces in 
+        // superInterfaces
+        for (Iterator i = superInterfaces.iterator(); i.hasNext(); ) {
+            ReferenceType rt = (ReferenceType)i.next();
+            for (Iterator j = rt.methods().iterator(); j.hasNext(); ) {
+                MethodInstance mi = (MethodInstance)j.next();
+                if (!mi.flags().isAbstract()) {
+                    // the method isn't abstract, so ct doesn't have to 
+                    // implement it.
+                    continue;
+                }
+                
+                boolean implFound = false;
+                ReferenceType curr = ct;
+                while (curr != null && !implFound) {
+                    List possible = curr.methods(mi.name(), mi.formalTypes());
+                    for (Iterator k = possible.iterator(); k.hasNext(); ) {
+                        MethodInstance mj = (MethodInstance)k.next();
+                        if (!mj.flags().isAbstract()) {
+                            // found a suitable implementation of it.
+                            // it may have the wrong protections, but other 
+                            // checks will take care of that.
+                            implFound = true;
+                            break;
+                        }                        
+                    }
+
+                    curr = curr.superType() ==  null ? 
+                           null : curr.superType().toReference();
+                }
+                
+
+                // did we find a suitable implementation of the method mi?
+                if (!implFound) {
+                    throw new SemanticException(ct.name() + " should be " +
+                            "declared abstract; it does not define " +
+                            mi.signature() +", which is declared in " +
+                            rt.toClass().fullName(), ct.position());
+                }
+            }
+        }
+    }
 
     /**
      * Returns t, modified as necessary to make it a legal

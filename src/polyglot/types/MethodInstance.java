@@ -56,7 +56,8 @@ public interface MethodInstance extends ProcedureInstance
      * Get the list of methods this method (potentially) overrides, in order
      * from this class (i.e., including <code>this</code>) to super classes.
      * @return A list of <code>MethodInstance</code>, starting with
-     * <code>this</code>.
+     * <code>this</code>. Note that this list does not include methods declared
+     * in interfaces. Use <code>implemented</code> for that.
      * @see polyglot.types.MethodInstance
      */
     List overrides();

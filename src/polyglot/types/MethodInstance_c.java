@@ -160,18 +160,20 @@ public class MethodInstance_c extends ProcedureInstance_c
 
     public List overridesImpl() {
         List l = new LinkedList();
+        ReferenceType rt = container();
 
-        Type t = container().superType();
+        while (rt != null) {
+            // add any method with the same name and argTypes from 
+            // rt
+            l.addAll(rt.methods(name, argTypes));
 
-        while (t instanceof ReferenceType) {
-            ReferenceType rt = (ReferenceType) t;
-            t = rt.superType();
-
-            for (Iterator i = rt.methods(name, argTypes).iterator(); i.hasNext(); ) {
-                MethodInstance mi = (MethodInstance) i.next();
-                l.add(mi);
+            ReferenceType sup = null;
+            if (rt.superType() != null && rt.superType().isReference()) {
+                sup = (ReferenceType) rt.superType();    
             }
-        }
+            
+            rt = sup;
+        };
 
         return l;
     }
@@ -182,6 +184,10 @@ public class MethodInstance_c extends ProcedureInstance_c
 
     public boolean canOverrideImpl(MethodInstance mj) {
         MethodInstance mi = this;
+
+        if (!(mi.name().equals(mj.name()) && mi.hasFormals(mj.formalTypes()))) {
+            return false;            
+        }
 
         if (! ts.equals(mi.returnType(), mj.returnType())) {
             if (Report.should_report(Report.types, 3))

@@ -256,7 +256,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl
         }
 
         overrideMethodCheck(tc);
-        abstractMethodCheck(tc);
 
 	return this;
     }
@@ -264,7 +263,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     protected void overrideMethodCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-        for (Iterator j = ts.overrides(mi).iterator(); j.hasNext(); ) {
+        for (Iterator j = mi.implemented().iterator(); j.hasNext(); ) {
             MethodInstance mj = (MethodInstance) j.next();
 
             if (! ts.isAccessible(mj, tc.context())) {
@@ -277,27 +276,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl
                                             " in " + mi.container() + ".",
                                             mi.position());
             }
-        }
-    }
-
-    protected void abstractMethodCheck(TypeChecker tc) throws SemanticException {
-        ClassType type = tc.context().currentClass();
-        TypeSystem ts = tc.typeSystem();
-
-        // FIXME: check that we implement methods of interfaces and abstract
-        // superclasses.
-        if (type.flags().isAbstract() || type.flags().isInterface()) {
-            return;
-        }
-
-        // Check for abstract methods.
-        if (mi.flags().isAbstract()) {
-            // Clear all flags for the error message.
-            MethodInstance x = mi.flags(Flags.NONE);
-            throw new SemanticException("Class \"" + type +
-                                        "\" should be declared abstract; " +
-                                        "it does not implement " + x + ".",
-                                        type.position());
         }
     }
 

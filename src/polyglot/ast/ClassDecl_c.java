@@ -321,6 +321,9 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         catch (SemanticException e) {
             throw new SemanticException(e.getMessage(), position());
         }
+        
+        // check the class implements all abstract methods that it needs to.
+        ts.checkClassConformance(type);
 
         return this;
     }

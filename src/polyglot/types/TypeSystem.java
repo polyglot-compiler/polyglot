@@ -295,7 +295,7 @@ public interface TypeSystem {
     boolean throwsSubset(ProcedureInstance m1, ProcedureInstance m2);
 
     /**
-     * Returns true iff <m1> has the same arguments as <m2>.
+     * Returns true iff <t> has the method <mi>.
      */
     boolean hasMethod(ReferenceType t, MethodInstance mi);
 
@@ -310,7 +310,7 @@ public interface TypeSystem {
     boolean moreSpecific(ProcedureInstance m1, ProcedureInstance m2);
 
     /**
-     * Returns true iff <m1> is more specific than <m2>.
+     * Returns true iff <p> has exactly the formal arguments <formalTypes>.
      */
     boolean hasFormals(ProcedureInstance p, List formalTypes);
 
@@ -628,6 +628,13 @@ public interface TypeSystem {
      * graph starting at <code>t</code>.
      */
     void checkCycles(ReferenceType t) throws SemanticException;
+
+    /**
+     * Assert that <code>ct</code> implements all abstract methods that it 
+     * has to, i.e. if it is a concrete class, then it must implement all
+     * interfaces and abstract methods that it or its superclasses declare.
+     */
+    public void checkClassConformance(ClassType ct) throws SemanticException;
 
     /**
      * Returns <code>t</code>, modified as necessary to make it a legal
