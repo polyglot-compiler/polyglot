@@ -18,16 +18,9 @@ JAVADOC_OUTPUT		= $(SOURCE)/javadoc
 JAVADOC_FLAGS		= -mx40m -ms40m -classpath "$(JAVADOC_CLASSPATH)"
 
 BIN 			= $(SOURCE)
-SHELL			= /bin/bash
-CC			= gcc
 
 %.class: %.java
-	@if ! [ -f $@ ] || [ $< -nt $@ ] ; then \
-	    echo "$(JC)" "$(JC_FLAGS)" -classpath "$(CLASSPATH)" $< ; \
-	    "$(JC)" "$(JC_FLAGS)" -classpath "$(CLASSPATH)" $< ; \
-	else \
-	    touch $@ ; \
-	fi
+	"$(JC)" "$(JC_FLAGS)" -classpath "$(CLASSPATH)" $<
 
 all clean clobber javadoc:
 

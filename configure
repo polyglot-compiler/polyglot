@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 
 trap 'rm -f PrintProperty.java PrintProperty.class' EXIT
 
 find_in_path() {
-    type "$1" 2>&1 | grep -v 'not found' | sed 's/'"$1"' is //' | awk '{print $0}'
+    type "$1" 2>&1 | grep -v 'not found' | sed 's/.* is //' | awk '{print $0}'
 }
 
 exists() {
@@ -17,7 +17,7 @@ escape() {
     sed -e 's%\\%\\\\%g' -e 's%;%\\;%g' | sed 's%%%g'
 }
 
-JAVAC=$(find_in_path javac)
+JAVAC=`find_in_path javac`
 
 if [ -z "${JAVAC}" ]; then
     echo javac not found
@@ -27,7 +27,8 @@ fi
 exists -x "${JAVAC}"
 echo javac is "${JAVAC}"
 
-JAVA_HOME=$(dirname "$(dirname "${JAVAC}")")
+tmp=`dirname "${JAVAC}"`
+JAVA_HOME=`dirname "$tmp"`
 exists -d "${JAVA_HOME}"
 echo Java home directory is "${JAVA_HOME}"
 
@@ -72,13 +73,13 @@ exists -f PrintProperty.java
 "${JAVAC}" PrintProperty.java
 exists -f PrintProperty.class
 
-PATH_SEP=$("${JAVA}" PrintProperty path.separator | escape)
+PATH_SEP=`"${JAVA}" PrintProperty path.separator | escape`
 echo path separator is ${PATH_SEP}
 
-FILE_SEP=$("${JAVA}" PrintProperty file.separator | escape)
+FILE_SEP=`"${JAVA}" PrintProperty file.separator | escape`
 echo file separator is ${FILE_SEP}
 
-ESC_JAVA_HOME=$("${JAVA}" PrintProperty java.home | escape)
+ESC_JAVA_HOME=`"${JAVA}" PrintProperty java.home | escape`
 if [ -f "${ESC_JAVA_HOME}${FILE_SEP}lib${FILE_SEP}rt.jar" ]; then
     ESC_JAVA_HOME="${ESC_JAVA_HOME}${FILE_SEP}.." # %%${FILE_SEP}jre}
 fi
