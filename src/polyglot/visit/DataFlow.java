@@ -380,7 +380,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 
             if (g != null) {
                 // Build the control flow graph.
-                CFGBuilder v = new CFGBuilder(ts, g, this);
+                CFGBuilder v = createCFGBuilder(ts, g);
                 v.visitGraph();
 
                 dataflow(g);
@@ -394,7 +394,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         }
     } 
     
-    /**
+	/**
      * Perform the dataflow on the flowgraph provided.
      */
     protected void dataflow(FlowGraph graph) {
@@ -476,6 +476,17 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         return new FlowGraph(root, forward);
     }
 
+	/**
+	 * Construct a CFGBuilder.
+	 * 
+	 * @param ts
+	 * @param g
+	 * @param flow
+	 * @return
+	 */
+	protected CFGBuilder createCFGBuilder(TypeSystem ts, FlowGraph g) {
+		return new CFGBuilder(ts, g, this);
+	}
     /**
      * Overridden superclass method, to build the flow graph, perform dataflow
      * analysis, and check the analysis for CodeDecl nodes.

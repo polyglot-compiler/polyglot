@@ -438,7 +438,7 @@ public class InitChecker extends DataFlow
     protected void dataflow(Expr root) throws SemanticException {
         // Build the control flow graph.
         FlowGraph g = new FlowGraph(root, forward);
-        CFGBuilder v = new CFGBuilder(ts, g, this);
+        CFGBuilder v = createCFGBuilder(ts, g);
         v.visitGraph();
         dataflow(g);
         post(g, root);        
