@@ -577,17 +577,28 @@ public class InitChecker extends DataFlow
         Map m = new HashMap(inItem.initStatus);
         MinMaxInitCount initCount = (MinMaxInitCount)m.get(ld.localInstance());
         if (initCount == null) {
-            initCount = new MinMaxInitCount(InitCount.ZERO,InitCount.ZERO);
-        }
-        
-        if (ld.init() != null) {
-            // declaration of local var with initialization.
-            initCount = new MinMaxInitCount(initCount.getMin().increment(),
-                                            initCount.getMax().increment());
-        }
+            if (ld.init() != null) {
+                // declaration of local var with initialization.
+                initCount = new MinMaxInitCount(InitCount.ONE,
+                                                InitCount.ONE);
+            }
+            else {
+                // declaration of local var with no initialization.
+                initCount = new MinMaxInitCount(InitCount.ZERO,InitCount.ZERO);
+            }     
 
-        m.put(ld.localInstance(), initCount);
-        
+            m.put(ld.localInstance(), initCount);
+        }
+        else {
+            // the initCount is not null. We now have a problem. Why is the
+            // initCount not null? Has this variable been assigned in its own
+            // initialization, or is this a declaration inside a loop body?
+            // XXX@@@ THIS IS A BUG THAT NEEDS TO BE FIXED.
+            // Currently, the declaration "final int i = (i=5);" will 
+            // not be rejected, as we cannot distinguish between that and
+            // "while (true) {final int i = 4;}"
+        }
+                
         // record the fact that we have seen a local declaration
         currCBI.localDeclarations.add(ld.localInstance());
         
