@@ -30,7 +30,7 @@ public class ParserPass extends AbstractPass
 
 	    Parser p = compiler.sourceExtension().parser(reader, source, eq);
 
-	    if (Report.should_report("frontend", 2))
+	    if (Report.should_report(Report.frontend, 2))
 		Report.report(2, "Using parser " + p);
 
 	    Node ast = p.parse();

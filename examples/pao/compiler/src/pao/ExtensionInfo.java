@@ -20,10 +20,6 @@ import java.io.*;
  * Extension information for PAO extension.
  */
 public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
-    static {
-        Report.topics.add("pao");
-    }
-
     public String defaultFileExtension() {
         return "pao";
     }
@@ -54,4 +50,6 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
                                   job, new PaoBoxer(job, ts, nf)));
         return passes;
     }
+
+    static { Topics t = new Topics(); }
 }

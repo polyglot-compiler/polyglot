@@ -29,7 +29,7 @@ public class SourceLoader
                                   sourceExt.fileExtension() + "\".");
         }
 
-	if (Report.should_report("frontend", 2))
+	if (Report.should_report(Report.frontend, 2))
 	    Report.report(2, "Loading class from " + sourceFile);
 
 	return new FileSource(fileName);
@@ -56,7 +56,7 @@ public class SourceLoader
 	    }
 	    
 	    if (sourceFile.exists()) {
-		if (Report.should_report("frontend", 2))
+		if (Report.should_report(Report.frontend, 2))
 		    Report.report(2, "Loading " + className + " from " + sourceFile);
 
 		return new FileSource(sourceFile.getPath());

@@ -18,13 +18,13 @@ public class AddMemberVisitor extends ContextVisitor
     }
 
     protected NodeVisitor enterCall(Node n) throws SemanticException {
-        if (Report.should_report("visit", 4))
+        if (Report.should_report(Report.visit, 4))
 	    Report.report(4, ">> AddMemberVisitor::enter " + n);
         return n.del().addMembersEnter(this);
     }
 
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
-      if (Report.should_report("visit", 4))
+      if (Report.should_report(Report.visit, 4))
 	Report.report(4, "<< AddMemberVisitor::leave " + n);
         return n.del().addMembers((AddMemberVisitor) v);
     }

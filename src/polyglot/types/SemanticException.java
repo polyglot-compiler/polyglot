@@ -38,7 +38,7 @@ public class SemanticException extends Exception {
     }
 
     static void trace(Exception e, int level) {
-        if (Report.should_report("errors", level)) {
+        if (Report.should_report(Report.errors, level)) {
             e.printStackTrace();
         }
     }

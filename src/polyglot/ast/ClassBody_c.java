@@ -134,7 +134,7 @@ public class ClassBody_c extends Node_c implements ClassBody
 
     protected void addMembers(Context c, ReferenceType type,
                               Set visited, boolean inherit) {
-        if (Report.should_report(new String[]{"ts","context"}, 2))
+        if (Report.should_report(new String[]{Report.types, Report.context}, 2))
 	    Report.report(2, "addMembers(" + type + ")");
 
         if (visited.contains(type)) {

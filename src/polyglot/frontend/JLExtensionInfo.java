@@ -157,6 +157,5 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
         return l;
     }
 
-    static { Report.topics.add("jl"); }
-    static { Report.topics.add("qq"); }
+    static { Topics t = new Topics(); }
 }

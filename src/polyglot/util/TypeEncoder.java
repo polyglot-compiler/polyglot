@@ -37,7 +37,7 @@ public class TypeEncoder
     byte[] b;
     StringBuffer sb;
 
-    if (Report.should_report("serialize", 1)) {
+    if (Report.should_report(Report.serialize, 1)) {
       Report.report(1, "Encoding type " + t);
     }
     

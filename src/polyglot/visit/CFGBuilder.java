@@ -154,8 +154,8 @@ public class CFGBuilder implements Copy
         String name = StringUtil.getShortNameComponent(df.getClass().getName());
         name += counter++;
 
-	if (Report.should_report("cfg",1))
-	    Report.report(1, "digraph " + name + " {");
+	if (Report.should_report(Report.cfg, 2))
+	    Report.report(2, "digraph " + name + " {");
 
         // create peers for the entry and exit nodes.
         graph.peer(graph.entryNode(), Collections.EMPTY_LIST, df);
@@ -163,8 +163,8 @@ public class CFGBuilder implements Copy
 
         this.visitCFG(graph.root(), Collections.EMPTY_LIST);
 
-	if (Report.should_report("cfg",1))
-	    Report.report(1, "}");
+	if (Report.should_report(Report.cfg, 2))
+	    Report.report(2, "}");
     }
 
 
@@ -192,8 +192,8 @@ public class CFGBuilder implements Copy
     }
 
     public void visitCFG(Computation a, List succs) {
-      if (Report.should_report("cfg",1))
-	Report.report(1, "// node " + a + " -> " + succs);
+      if (Report.should_report(Report.cfg, 2))
+	Report.report(2, "// node " + a + " -> " + succs);
 
       succs = a.acceptCFG(this, succs);
 
@@ -289,30 +289,30 @@ public class CFGBuilder implements Copy
      * @param q The successor node in the forward graph
      */
     public void edge(CFGBuilder p_visitor, Computation p, Computation q) {
-      if (Report.should_report("cfg", 1))
-	Report.report(1, "//     edge " + p + " -> " + q);
+      if (Report.should_report(Report.cfg, 2))
+	Report.report(2, "//     edge " + p + " -> " + q);
 
       FlowGraph.Peer pp = graph.peer(p, p_visitor.path_to_finally, df);
       FlowGraph.Peer pq = graph.peer(q, path_to_finally, df);
 
-      if (Report.should_report("cfg", 1)) {
-	Report.report(1,
+      if (Report.should_report(Report.cfg, 2)) {
+	Report.report(2,
 			pp.hashCode() + " [ label = \"" +
 			StringUtil.escape(pp.toString()) + "\" ];");
-	Report.report(1,
+	Report.report(2,
 			pq.hashCode() + " [ label = \"" +
 			StringUtil.escape(pq.toString()) + "\" ];");
       }
 
       if (graph.forward()) {
-	if (Report.should_report("cfg", 1))
-	    Report.report(1, pp.hashCode() + " -> " + pq.hashCode() + ";");
+	if (Report.should_report(Report.cfg, 2))
+	    Report.report(2, pp.hashCode() + " -> " + pq.hashCode() + ";");
         pp.succs.add(pq);
         pq.preds.add(pp);
       }
       else {
-	if (Report.should_report("cfg", 1))
-        Report.report(1, pq.hashCode() + " -> " + pp.hashCode() + ";");
+	if (Report.should_report(Report.cfg, 2))
+        Report.report(2, pq.hashCode() + " -> " + pp.hashCode() + ";");
         pq.succs.add(pp);
         pp.preds.add(pq);
       }

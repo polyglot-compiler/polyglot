@@ -203,7 +203,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
     }
 
     public Context enterScope(Context c) {
-        if (Report.should_report(new String[]{"ts","context"}, 5))
+        if (Report.should_report(new String[]{Report.types, Report.context}, 5))
 	    Report.report(5, "enter scope of method " + name);
         c = c.pushCode(mi);
         return c;

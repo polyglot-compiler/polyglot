@@ -52,19 +52,19 @@ public class LoadedClassResolver extends ClassResolver
       try {
         ClassFile clazz = loader.loadClass(name);
 
-        if (Report.should_report(new String[] {"ts","resolver","loader"}, 4))
+        if (Report.should_report(new String[] {Report.types, Report.resolver, Report.loader}, 4))
 	    Report.report(4, "Class " + name + " found in classpath " +
                     loader.classpath());
 
         return clazz;
       }
       catch (ClassNotFoundException e) {
-        if (Report.should_report(new String[] {"ts","resolver","loader"}, 4))
+        if (Report.should_report(new String[] {Report.types, Report.resolver, Report.loader}, 4))
 	    Report.report(4, "Class " + name + " not found in classpath " +
                     loader.classpath());
       }
       catch (ClassFormatError e) {
-        if (Report.should_report(new String[] {"ts","resolver","loader"}, 4))
+        if (Report.should_report(new String[] {Report.types, Report.resolver, Report.loader}, 4))
 	    Report.report(4, "Class " + name + " format error");
       }
     }
@@ -78,7 +78,7 @@ public class LoadedClassResolver extends ClassResolver
    * Find a type by name.
    */
   public Type findType(String name) throws SemanticException {
-    if (Report.should_report(new String[] {"ts","resolver","loader"}, 3))
+    if (Report.should_report(new String[] {Report.types, Report.resolver, Report.loader}, 3))
 	Report.report(3, "LoadedCR.findType(" + name + ")");
 
     // First try the class file.
@@ -86,12 +86,12 @@ public class LoadedClassResolver extends ClassResolver
 
     // Check for encoded type information.
     if (clazz.encodedClassType(version.name()) != null) {
-      if (Report.should_report(new String[] {"ts","resolver","loader"}, 4))
+      if (Report.should_report(new String[] {Report.types, Report.resolver, Report.loader}, 4))
 	Report.report(4, "Using encoded class type for " + name);
       return getEncodedType(clazz, name);
     }
     else {
-      if (Report.should_report(new String[] {"ts","resolver","loader"}, 4))
+      if (Report.should_report(new String[] {Report.types, Report.resolver, Report.loader}, 4))
 	Report.report(4, "Using raw class file for " + name);
       return clazz.type(ts);
     }
@@ -126,9 +126,8 @@ public class LoadedClassResolver extends ClassResolver
 
       ((CachingResolver) ts.systemResolver()).medianResult(name, dt);
 
-      if (Report.should_report(new String[] {"ts","resolver","loader"}, 2))
-	Report.report(2, "Returning serialized ClassType for " +
-		  clazz.name() + ".");
+      if (Report.should_report(new String[] {Report.types, Report.resolver, Report.loader}, 2))
+	Report.report(2, "Returning serialized ClassType for " + clazz.name() + ".");
 
       return (ClassType) dt;
     }

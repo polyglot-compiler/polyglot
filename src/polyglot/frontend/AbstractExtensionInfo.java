@@ -64,7 +64,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         // inter-dependent jobs in the worklist are kept in sync.
         while (okay && ! worklist.isEmpty()) {
             SourceJob job = (SourceJob) worklist.removeFirst();
-            if (Report.should_report("frontend", 1))
+            if (Report.should_report(Report.frontend, 1))
 		Report.report(1, "Running job " + job);
             okay &= runNextPass(job);
 
@@ -73,7 +73,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             }
         }
 
-        if (Report.should_report("frontend", 1))
+        if (Report.should_report(Report.frontend, 1))
 	    Report.report(1, "Finished all passes -- " +
                         (okay ? "okay" : "failed"));
 
@@ -106,7 +106,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     /** Run a job until the <code>goal</code> pass completes. */
     public boolean runToPass(Job job, Pass.ID goal) {
-        if (Report.should_report("frontend", 1))
+        if (Report.should_report(Report.frontend, 1))
 	    Report.report(1, "Running " + job + " to pass named " + goal);
 
         if (job.completed(goal)) {
@@ -120,7 +120,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     /** Run a job up to the <code>goal</code> pass. */
     public boolean runToPass(Job job, Pass goal) {
-        if (Report.should_report("frontend", 1))
+        if (Report.should_report(Report.frontend, 1))
 	    Report.report(1, "Running " + job + " to pass " + goal);
 
         boolean okay = job.status();
@@ -128,7 +128,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         while (! job.pendingPasses().isEmpty()) {
             Pass pass = (Pass) job.pendingPasses().get(0);
 
-            if (Report.should_report("frontend", 1))
+            if (Report.should_report(Report.frontend, 1))
 		Report.report(1, "Trying to run pass " + pass);
 
             if (job.isRunning()) {
@@ -156,9 +156,9 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
             job.finishPass(pass, okay);
 
-            if (Report.should_report("frontend", 1))
+            if (Report.should_report(Report.frontend, 1))
 		Report.report(1, "Finished " + pass + " status=" + str(okay));
-            if (Report.should_report("time", 1))
+            if (Report.should_report(Report.time, 1))
 		Report.report(1, "Finished " + pass +
                               " status=" + str(okay) + " time=" +
                               (System.currentTimeMillis() - start_time));
@@ -168,12 +168,12 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             }
         }
 
-        if (Report.should_report("frontend", 1))
+        if (Report.should_report(Report.frontend, 1))
 	    Report.report(1, "Pass " + goal + " " + str(okay));
 
         // Ensure orphaned jobs don't get lost.
         if (job.completed()) {
-            if (Report.should_report("frontend", 1))
+            if (Report.should_report(Report.frontend, 1))
                 Report.report(1, "Job " + job + " completed");
 
             for (Iterator i = job.children().iterator(); i.hasNext(); ) {
@@ -191,13 +191,13 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
 
                 if (job.parent() != null) {
-                    if (Report.should_report("frontend", 2))
+                    if (Report.should_report(Report.frontend, 2))
                         Report.report(2, "Job " + job.parent() + " adopting " +
                                       orphan);
                     orphan.reparent(job.parent());
                 }
                 else {
-                    if (Report.should_report("frontend", 2))
+                    if (Report.should_report(Report.frontend, 2))
                         Report.report(2, "Worklist adopting " + orphan);
                     SourceJob sj = (SourceJob) orphan;
                     jobs.put(sj.source(), sj);
@@ -436,19 +436,6 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
         return l;
     }
-
-    static { Report.topics.add("verbose"); }
-
-    static { Report.topics.add("context"); }
-    static { Report.topics.add("errors"); }
-    static { Report.topics.add("frontend"); }
-    static { Report.topics.add("import"); }
-    static { Report.topics.add("loader"); }
-    static { Report.topics.add("resolver"); }
-    static { Report.topics.add("serialize"); }
-    static { Report.topics.add("time"); }
-    static { Report.topics.add("ts"); }
-    static { Report.topics.add("visit"); }
 
     public String toString() {
         return getClass().getName() + " worklist=" + worklist;

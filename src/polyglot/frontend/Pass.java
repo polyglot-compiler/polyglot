@@ -32,7 +32,7 @@ public interface Pass
     public static final ID EXIT_CHECK = new ID("exit-check");
     public static final ID DUMP = new ID("dump");
     public static final ID PRE_OUTPUT_ALL = new ID("pre-output-barrier");
-    public static final ID SERIALIZE = new ID("serialize");
+    public static final ID SERIALIZE = new ID("serialization");
     public static final ID OUTPUT = new ID("output");
 
     public static final ID FIRST_BARRIER = BUILD_TYPES_ALL;

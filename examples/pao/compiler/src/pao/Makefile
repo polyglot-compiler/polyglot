@@ -6,6 +6,7 @@ include $(SOURCE)/Rules.mk
 
 SOURCES = \
 	ExtensionInfo.java \
+	Topics.java \
 	Version.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))

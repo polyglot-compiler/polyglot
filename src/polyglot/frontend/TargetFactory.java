@@ -30,7 +30,7 @@ public class TargetFactory
 
     /** Open a writer to the output file. */
     public Writer outputWriter(File outputFile) throws IOException {
-	if (Report.should_report("frontend", 2))
+	if (Report.should_report(Report.frontend, 2))
 	    Report.report(2, "Opening " + outputFile + " for output.");
 
 	if (outputStdout) {

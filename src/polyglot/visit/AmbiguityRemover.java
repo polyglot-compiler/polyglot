@@ -35,19 +35,19 @@ public class AmbiguityRemover extends ContextVisitor
     }
 
     protected NodeVisitor enterCall(Node n) throws SemanticException {
-        if (Report.should_report("visit", 2))
+        if (Report.should_report(Report.visit, 2))
 	    Report.report(2, ">> " + kind + "::enter " + n);
         NodeVisitor v = n.del().disambiguateEnter(this);
-        if (Report.should_report("visit", 2))
+        if (Report.should_report(Report.visit, 2))
 	    Report.report(2, "<< " + kind + "::enter " + n + " -> " + v);
         return v;
     }
 
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
-        if (Report.should_report("visit", 2))
+        if (Report.should_report(Report.visit, 2))
 	    Report.report(2, ">> " + kind + "::leave " + n);
         Node m = n.del().disambiguate((AmbiguityRemover) v);
-        if (Report.should_report("visit", 2))
+        if (Report.should_report(Report.visit, 2))
 	    Report.report(2, "<< " + kind + "::leave " + n + " -> " + m);
         return m;
     }

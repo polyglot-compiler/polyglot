@@ -91,7 +91,7 @@ public class QQ {
         lexer = new polyglot.ext.jl.qq.Lexer(text, pos);
         grm = new polyglot.ext.jl.qq.Grm(lexer, ts, nf, subst);
 
-        if (Report.should_report("qq", 1)) {
+        if (Report.should_report(polyglot.ext.jl.Topics.qq, 1)) {
 	    Report.report(1, "qq: " + text);
 	    Report.report(1, "subst: " + subst);
 	}
@@ -123,7 +123,7 @@ public class QQ {
 
             if (sym != null && sym.value instanceof Node) {
                 Node n = (Node) sym.value;
-                if (Report.should_report("qq", 1))
+                if (Report.should_report(polyglot.ext.jl.Topics.qq, 1))
 		    Report.report(1, "result: " + n);
                 return n;
             }

@@ -87,7 +87,7 @@ public class ContextVisitor extends ErrorHandlingVisitor
     }
 
     public NodeVisitor enter(Node parent, Node n) {
-        if (Report.should_report("visit", 5))
+        if (Report.should_report(Report.visit, 5))
 	    Report.report(5, "enter(" + n + ")");
 
         ContextVisitor v = this;

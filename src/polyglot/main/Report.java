@@ -17,8 +17,35 @@ public class Report {
       if we should report. */
   public static Stack should_report = new Stack();
 
+  /** Report topics understood by the base compiler. */
+  public static String cfg = "cfg";
+  public static String context = "context";
+  public static String errors = "errors";
+  public static String frontend = "frontend";
+  public static String imports = "imports";
+  public static String loader = "loader";
+  public static String resolver = "resolver";
+  public static String serialize = "serialize";
+  public static String time = "time";
+  public static String types = "types";
+  public static String visit = "visit";
+  public static String verbose = "verbose";
+
   static {
-    should_report.push("verbose");
+    topics.add(cfg);
+    topics.add(context);
+    topics.add(errors);
+    topics.add(frontend);
+    topics.add(imports);
+    topics.add(loader);
+    topics.add(resolver);
+    topics.add(serialize);
+    topics.add(time);
+    topics.add(types);
+    topics.add(visit);
+    topics.add(verbose);
+
+    should_report.push(verbose);
   }
 
   /**

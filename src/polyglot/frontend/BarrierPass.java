@@ -19,9 +19,9 @@ public class BarrierPass extends AbstractPass
 
     /** Run all the other jobs with the same parent up to this pass. */
     public boolean run() {
-        if (Report.should_report("frontend", 1))
+        if (Report.should_report(Report.frontend, 1))
 	    Report.report(1, job + " at barrier " + id);
-        if (Report.should_report("frontend", 2))
+        if (Report.should_report(Report.frontend, 2))
 	    Report.report(2, "children of " + job + " = " + job.children());
 
         if (job.compiler().errorQueue().hasErrors()) {
@@ -32,7 +32,7 @@ public class BarrierPass extends AbstractPass
         for (Iterator i = job.children().iterator(); i.hasNext(); ) {
             Job child = (Job) i.next();
 
-            if (Report.should_report("frontend", 2))
+            if (Report.should_report(Report.frontend, 2))
                 Report.report(2, job + " bringing " + child + " to barrier " + id);
 
             if (! job.extensionInfo().runToPass(child, id)) {

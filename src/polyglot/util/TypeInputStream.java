@@ -25,7 +25,7 @@ public class TypeInputStream extends ObjectInputStream
 
   protected Object resolveObject(Object o) {
     String s = "";
-    if (Report.should_report("serialize", 2)) {
+    if (Report.should_report(Report.serialize, 2)) {
       try {
         s = o.toString();
       } catch (NullPointerException e) {

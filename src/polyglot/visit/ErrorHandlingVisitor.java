@@ -84,8 +84,8 @@ public class ErrorHandlingVisitor extends HaltingVisitor
      */
     protected NodeVisitor enterCall(Node parent, Node n)
                 throws SemanticException {
-        if (Report.should_report("visit", 1))
-	    Report.report(1, "enter: " + parent + " -> " + n);
+        if (Report.should_report(Report.visit, 3))
+	    Report.report(3, "enter: " + parent + " -> " + n);
         return enterCall(n);
     }
 
@@ -145,7 +145,7 @@ public class ErrorHandlingVisitor extends HaltingVisitor
      * children of <code>n</code>.
      */
     public NodeVisitor enter(Node parent, Node n) {
-        if (Report.should_report("visit", 5))
+        if (Report.should_report(Report.visit, 5))
 	    Report.report(5, "enter(" + n + ")");
 
         ErrorHandlingVisitor v = this;
@@ -203,25 +203,25 @@ public class ErrorHandlingVisitor extends HaltingVisitor
         try {
             if (v instanceof ErrorHandlingVisitor &&
                 ((ErrorHandlingVisitor) v).error) {
-                if (Report.should_report("visit", 5))
+                if (Report.should_report(Report.visit, 5))
 		    Report.report(5, "leave(" + n + "): error below");
 
                 // There was an error below us.
                 if (! catchErrors(n)) {
                     // Propagate error up one level
                     this.error = true;
-                    if (Report.should_report("visit", 5))
+                    if (Report.should_report(Report.visit, 5))
 			Report.report(5, "leave(" + n + "): error propagated");
                 }
                 else {
-                    if (Report.should_report("visit", 5))
+                    if (Report.should_report(Report.visit, 5))
 			Report.report(5, "leave(" + n + "): error not propagated");
                 }
 
                 return n;
             }
 
-            if (Report.should_report("visit", 5))
+            if (Report.should_report(Report.visit, 5))
 		Report.report(5, "leave(" + n + "): calling leaveCall");
             return leaveCall(old, n, v);
 	}

@@ -33,7 +33,7 @@ public class ClassContextResolver extends ClassResolver {
      * @param name The name to search for.
      */
     public Type findType(String name) throws SemanticException {
-        if (Report.should_report(new String[] {"ts","resolver"}, 2))
+        if (Report.should_report(new String[] {Report.types, Report.resolver}, 2))
 	    Report.report(2, "Looking for " + name + " in " + this);
 
         if (! StringUtil.isNameShort(name)) {
@@ -45,7 +45,7 @@ public class ClassContextResolver extends ClassResolver {
         MemberClassType inner = ts.findMemberClass(type, name);
 
         if (inner != null) {
-            if (Report.should_report(new String[] {"ts","resolver"}, 2))
+            if (Report.should_report(new String[] {Report.types, Report.resolver}, 2))
                 Report.report(2, "Found member class " + inner);
             return inner;
         }

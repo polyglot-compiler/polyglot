@@ -160,7 +160,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 
         TypeSystem ts = ar.typeSystem();
 
-        if (Report.should_report("ts", 2))
+        if (Report.should_report(Report.types, 2))
 	    Report.report(2, "Cleaning " + type + ".");
 
         if (this.superClass != null) {
@@ -176,7 +176,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
                         type + " is not a class.", superClass.position());
             }
 
-            if (Report.should_report("ts", 3))
+            if (Report.should_report(Report.types, 3))
 		Report.report(3, "setting super type of " + this.type + " to " + t);
 
             this.type.superType(t);
@@ -201,7 +201,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
                         type + " is not an interface.", tn.position());
             }
 
-            if (Report.should_report("ts", 3))
+            if (Report.should_report(Report.types, 3))
 		Report.report(3, "adding interface of " + this.type + " to " + t);
 
             this.type.addInterface(t);
