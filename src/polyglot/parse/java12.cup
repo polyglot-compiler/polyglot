@@ -604,11 +604,14 @@ class_body_declaration ::=
                l.add(parser.nf.Initializer(parser.pos(a), Flags.NONE, a));
                RESULT = l; :}
     |   SEMICOLON
-            {: RESULT = Collections.EMPTY_LIST; :}
+            {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+               RESULT = l; :}
     |   error SEMICOLON:a
-            {: RESULT = Collections.EMPTY_LIST; :}
+            {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+               RESULT = l; :}
     |   error LBRACE:a
-            {: RESULT = Collections.EMPTY_LIST; :}
+            {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
+               RESULT = l; :}
     ;
 class_member_declaration ::=
                     // List of ClassMember
