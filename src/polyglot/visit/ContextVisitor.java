@@ -11,6 +11,7 @@ import java.util.*;
  * A visitor which maintains a context throughout the visitor's pass.  This is 
  * the base class of the disambiguation and type checking visitors.
  *
+ * TODO: update this documentation.
  * For a node <code>n</code> methods are called in this order:
  * <pre>
  * v.enter(n)
@@ -80,10 +81,10 @@ public class ContextVisitor extends ErrorHandlingVisitor
      */
     protected Context enterScope(Node parent, Node n) {
         if (parent != null) {
-            return parent.enterScope(n, context);
+            return parent.del().enterScope(n, context);
         }
         // no parent node yet.
-        return n.enterScope(context);
+        return n.del().enterScope(context);
     }
 
     /**

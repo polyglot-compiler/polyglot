@@ -237,7 +237,7 @@ public abstract class Node_c implements Node
      *           <code>child</code>
      */
     public Context enterScope(Node child, Context c) { 
-        return child.enterScope(c); 
+        return child.del().enterScope(c); 
     }
 
     /**
