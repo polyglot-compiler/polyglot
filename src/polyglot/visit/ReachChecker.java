@@ -29,10 +29,10 @@ public class ReachChecker extends DataFlow
         return DataFlowItem.NOT_REACHABLE;
     }
 
-    static class DataFlowItem extends Item {
+    protected static class DataFlowItem extends Item {
         final boolean reachable;
 
-        private DataFlowItem(boolean reachable) {
+        protected DataFlowItem(boolean reachable) {
             this.reachable = reachable;
         }
         

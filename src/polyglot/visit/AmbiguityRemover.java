@@ -13,7 +13,7 @@ import polyglot.main.Report;
 public class AmbiguityRemover extends ContextVisitor
 {
     public static class Kind extends Enum {
-        private Kind(String name) {
+        protected Kind(String name) {
             super(name);
         }
     }
@@ -23,7 +23,7 @@ public class AmbiguityRemover extends ContextVisitor
     public static final Kind FIELDS = new Kind("disam-fields");
     public static final Kind ALL = new Kind("disam-all");
 
-    private Kind kind;
+    protected Kind kind;
 
     public AmbiguityRemover(Job job, TypeSystem ts, NodeFactory nf, Kind kind) {
         super(job, ts, nf);

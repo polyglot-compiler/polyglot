@@ -32,7 +32,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     /**
      * Is this dataflow a forward analysis?
      */
-    boolean forward;
+    protected boolean forward;
 
     /**
      * Constructor.
@@ -515,12 +515,12 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         public abstract BoolItem handleExpression(Expr expr, Item startingItem);
     }
     
-    private static int flowCounter = 0;
+    protected static int flowCounter = 0;
     /**
      * Dump a flow graph, labeling edges with their flows, to aid in the
      * debugging of data flow.
      */
-    private void dumpFlowGraph(FlowGraph graph, Term root) {
+    protected void dumpFlowGraph(FlowGraph graph, Term root) {
         String name = StringUtil.getShortNameComponent(this.getClass().getName());
         name += flowCounter++;
 

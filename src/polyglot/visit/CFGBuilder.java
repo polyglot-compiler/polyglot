@@ -31,16 +31,16 @@ import polyglot.util.StringUtil;
 public class CFGBuilder implements Copy
 {
     /** The flowgraph under construction. */
-    FlowGraph graph;
+    protected FlowGraph graph;
 
     /** The type system. */
-    TypeSystem ts;
+    protected TypeSystem ts;
 
     /**
      * The outer CFGBuilder.  We create a new inner CFGBuilder when entering a
      * loop or try-block and when entering a finally block.
      */
-    CFGBuilder outer;
+    protected CFGBuilder outer;
 
     /**
      * The innermost loop or try-block in lexical scope.  We maintain a stack
@@ -48,7 +48,7 @@ public class CFGBuilder implements Copy
      * statements and for exception throws.  When such a jump is encountered we
      * traverse the stack, searching for the target of the jump.
      */
-    Stmt innermostTarget;
+    protected Stmt innermostTarget;
 
     /**
      * List of terms on the path to the innermost finally block.  If we are
@@ -58,16 +58,16 @@ public class CFGBuilder implements Copy
      * is empty if this CFGBuilder is not constructing the CFG for a finally
      * block.
      */
-    List path_to_finally;
+    protected List path_to_finally;
 
     /** The data flow analysis for which we are constructing the graph. */
-    DataFlow df;
+    protected DataFlow df;
 
     /**
      * Should we skip the catch blocks for the innermost try when building
      * edges for an exception throw?
      */
-    boolean skipInnermostCatches;
+    protected boolean skipInnermostCatches;
 
     public CFGBuilder(TypeSystem ts, FlowGraph graph, DataFlow df) {
         this.ts = ts;
@@ -294,7 +294,7 @@ public class CFGBuilder implements Copy
         visitCFG(a, l);
     }
 
-    private static class EdgeKeyTermPair {
+    protected static class EdgeKeyTermPair {
         public EdgeKeyTermPair(FlowGraph.EdgeKey edgeKey, Term term) {
             this.edgeKey = edgeKey;
             this.term = term;
@@ -309,7 +309,7 @@ public class CFGBuilder implements Copy
      * @param a the source node for the edges.
      * @param succs a list of <code>EdgeKeyTermPair</code>s
      */
-    private void visitCFG(Term a, List succs) {
+    protected void visitCFG(Term a, List succs) {
         if (Report.should_report(Report.cfg, 2))
             Report.report(2, "// node " + a + " -> " + succs);
 

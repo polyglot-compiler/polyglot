@@ -12,11 +12,11 @@ import java.util.*;
  */
 public class ExitChecker extends DataFlow
 {
+    protected CodeDecl code;
+
     public ExitChecker(Job job, TypeSystem ts, NodeFactory nf) {
 	super(job, ts, nf, false /* backward analysis */);
     }
-
-    CodeDecl code;
 
     protected FlowGraph initGraph(CodeDecl code, Term root) {
         boolean returnsValue;
@@ -37,10 +37,10 @@ public class ExitChecker extends DataFlow
         return DataFlowItem.EXITS;
     }
 
-    static class DataFlowItem extends Item {
+    protected static class DataFlowItem extends Item {
         final boolean exits; // whether all paths leaving this node lead to an exit 
 
-        private DataFlowItem(boolean exits) {
+        protected DataFlowItem(boolean exits) {
             this.exits = exits;
         }
         

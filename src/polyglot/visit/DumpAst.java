@@ -11,8 +11,8 @@ import java.io.Writer;
 /** Visitor which dumps the AST to a file. */
 public class DumpAst extends NodeVisitor
 {
-    private Writer fw;
-    private CodeWriter w;
+    protected Writer fw;
+    protected CodeWriter w;
 
     public DumpAst(String name, int width) throws IOException {
         this.fw = new FileWriter(name);

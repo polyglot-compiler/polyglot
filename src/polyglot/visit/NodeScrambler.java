@@ -18,13 +18,13 @@ public class NodeScrambler extends NodeVisitor
 {
   public FirstPass fp;
 
-  private HashMap pairs;
-  private LinkedList nodes;
-  private LinkedList currentParents;
-  private long seed;
-  private Random ran;
-  private boolean scrambled = false;
-  private CodeWriter cw;
+  protected HashMap pairs;
+  protected LinkedList nodes;
+  protected LinkedList currentParents;
+  protected long seed;
+  protected Random ran;
+  protected boolean scrambled = false;
+  protected CodeWriter cw;
 
   public NodeScrambler()
   {

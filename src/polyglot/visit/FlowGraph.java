@@ -173,8 +173,8 @@ public class FlowGraph {
       protected Peer getTarget() {
           return target;
       }
-      private EdgeKey key;
-      private Peer target;
+      protected EdgeKey key;
+      protected Peer target;
       public String toString() {
           return "(" + key + ")" + target;
       }

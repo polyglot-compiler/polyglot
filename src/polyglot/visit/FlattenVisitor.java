@@ -10,9 +10,9 @@ import java.util.*;
  */
 public class FlattenVisitor extends NodeVisitor
 {
-    TypeSystem ts;
-    NodeFactory nf;
-    LinkedList stack;
+    protected TypeSystem ts;
+    protected NodeFactory nf;
+    protected LinkedList stack;
 
     public FlattenVisitor(TypeSystem ts, NodeFactory nf) {
 	this.ts = ts;
@@ -28,13 +28,13 @@ public class FlattenVisitor extends NodeVisitor
 	return null;
     }
 
-    static int count = 0;
+    protected static int count = 0;
 
-    private static String newID() {
+    protected static String newID() {
 	return "flat$$$" + count++;
     }
 
-    Node noFlatten = null;
+    protected Node noFlatten = null;
 
     /** 
      * When entering a BlockStatement, place a new StatementList

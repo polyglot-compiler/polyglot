@@ -27,6 +27,9 @@ public class TypeBuilder extends HaltingVisitor
     protected TypeSystem ts;
     protected NodeFactory nf;
     protected TypeBuilder outer;
+    protected boolean inCode; // true if the last scope pushed as not a class.
+    protected boolean global; // true if all scopes pushed have been classes.
+    protected ParsedClassType type; // last class pushed.
 
     public TypeBuilder(Job job, TypeSystem ts, NodeFactory nf) {
         this.job = job;
@@ -145,10 +148,6 @@ public class TypeBuilder extends HaltingVisitor
 	}
     }
 
-    boolean inCode; // true if the last scope pushed as not a class.
-    boolean global; // true if all scopes pushed have been classes.
-    ParsedClassType type; // last class pushed.
-
     public TypeBuilder pushCode() {
         if (Report.should_report(Report.visit, 4))
 	    Report.report(4, "TB pushing code");
@@ -174,7 +173,7 @@ public class TypeBuilder extends HaltingVisitor
         return tb;
     }
 
-    private ParsedClassType newClass(Position pos, Flags flags, String name) {
+    protected ParsedClassType newClass(Position pos, Flags flags, String name) {
 	TypeSystem ts = typeSystem();
 
         ParsedClassType ct = ts.createClassType();

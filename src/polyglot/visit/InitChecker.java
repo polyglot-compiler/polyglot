@@ -123,8 +123,8 @@ public class InitChecker extends DataFlow
         static InitCount ZERO = new InitCount(0); 
         static InitCount ONE = new InitCount(1); 
         static InitCount MANY = new InitCount(2); 
-        private int count;
-        private InitCount(int i) {
+        protected int count;
+        protected InitCount(int i) {
             count = i;
         }
         
@@ -180,7 +180,7 @@ public class InitChecker extends DataFlow
      * a variable or field has been initialized or assigned to.
      */
     protected static class MinMaxInitCount {
-        private InitCount min, max;
+        protected InitCount min, max;
         MinMaxInitCount(InitCount min, InitCount max) {
             MinMaxInitCount.this.min = min;
             MinMaxInitCount.this.max = max;
