@@ -134,7 +134,6 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     }
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
-	TypeSystem ts = tb.typeSystem();
 	tb = tb.pushClass(position(), flags, name);
         
         ParsedClassType ct = tb.currentClass();
@@ -162,9 +161,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         return type(type).flags(type.flags());
     }
 
-    public Context enterScope(Context c) {
-        TypeSystem ts = c.typeSystem();
-        return c.pushClass(type, ts.staticTarget(type).toClass());
+    public Context enterScope(Node child, Context c) {
+        if (child == this.body) {
+            TypeSystem ts = c.typeSystem();
+            c = c.pushClass(type, ts.staticTarget(type).toClass());
+        }
+        return super.enterScope(child, c);
     }
 
     public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
@@ -330,16 +332,13 @@ public class ClassDecl_c extends Term_c implements ClassDecl
                         
             if (this.type().isLocal()) {
                 // a local class name cannot be redeclared within the same
-                // method, constructor or initializer, and within its scope
-                
-                // outerCtxt is the scope in which this local class was
-                // declared.
-                Context outerCtxt = tc.context().pop();
+                // method, constructor or initializer, and within its scope                
+                Context ctxt = tc.context();
 
-                if (outerCtxt.isLocal(this.name)) {
+                if (ctxt.isLocal(this.name)) {
                     // something with the same name was declared locally.
                     // (but not in an enclosing class)                                    
-                    Named nm = outerCtxt.find(this.name);
+                    Named nm = ctxt.find(this.name);
                     if (nm instanceof Type) {
                         Type another = (Type)nm;
                         if (another.isClass() && another.toClass().isLocal()) {
