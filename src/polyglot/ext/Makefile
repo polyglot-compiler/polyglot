@@ -1,6 +1,6 @@
 SOURCE = ../..
 PACKAGE = jltools/ext
-SUBDIRS = jif
+SUBDIRS = jl jif
 
 include $(SOURCE)/Rules.mk
 
