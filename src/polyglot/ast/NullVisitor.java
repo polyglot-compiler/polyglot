@@ -142,4 +142,8 @@ public class NullVisitor implements NodeVisitor {
     return aie;
   }
 
+  public Node visitAmbiguousNameExpression(AmbiguousNameExpression ane) {
+    ane.visitChildren(this);
+    return ane;
+  }
 }

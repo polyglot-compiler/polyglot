@@ -17,7 +17,6 @@ public class BranchStatement extends Statement {
   public static final int BREAK     = 0; // break statement
   public static final int CONTINUE  = 1; // continue statement
 
-
   public static final int MAX_TYPE = CONTINUE; // largest type used.
 
   /**

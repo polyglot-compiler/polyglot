@@ -9,7 +9,7 @@ package jltools.ast;
  * FormalParameters which represent a catch block.
  */
 
-public class CatchBlock {
+public class CatchBlock extends Node {
   
   /**
    * Effects: creates a new CatchBlock with FormalParameter
@@ -51,9 +51,29 @@ public class CatchBlock {
     block = newBlock;
   }
 
+  public Node accept(NodeVisitor v) {
+    return v.visitCatchBlock(this);
+  }
+
+  public void visitChildren(NodeVisitor v) {
+    block = block.accept(v);
+  }
+
+  public Node copy() {
+    CatchBlock cb = new CatchBlock(formalParamenter, block);
+    cb.copyAnnotationsFrom(this);
+    return cb;
+  }
+
+  public Node deepCopy() {
+    CatchBlock cb = 
+      new CatchBlock(formalParamenter, (BlockStatement) block.deepCopy());
+    cb.copyAnnotationsFrom(this);
+    return cb;
+  }
+
   private FormalParameter formalParameter;
   private BlockStatement block;
-
 }
   
 

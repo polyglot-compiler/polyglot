@@ -57,5 +57,6 @@ public interface NodeVisitor {
   public Node visitNewArrayExpression(NewArrayExpression ae);
   public Node visitInstanceofExpression(InstanceofExpression ie);
   public Node visitArrayInitializerExpression(ArrayInitializerExpression aie);
+  public Node visitAmbiguousNameExpression(AmbiguousNameExpression ane);
 	 
 }

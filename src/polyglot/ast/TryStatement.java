@@ -27,10 +27,10 @@ public class TryStatement extends Statement {
    */
   public TryStatement(BlockStatement tryBlock,
 		      List catchBlocks,
-		      CatchBlock finallyBlock) {
+		      BlockStatement finallyBlock) {
     this.tryBlock = tryBlock;
     this.finallyBlock = finallyBlock;
-      TypedList.check(catchBlocks, CatchBlock.class);
+    TypedList.check(catchBlocks, CatchBlock.class);
     this.catchBlocks = new ArrayList(catchBlocks);
   }
 
@@ -52,14 +52,14 @@ public class TryStatement extends Statement {
    * Effects: returns the finally block for this TryStatement, or
    * null if there is none.
    */
-  public CatchBlock getFinallyBlock() {
+  public BlockStatement getFinallyBlock() {
     return finallyBlock;
   }
 
   /**
    * Effects: sets the finally block of this to be <newFinallyBlock>.
    */
-  public void setFinallyBlock(CatchBlock newFinallyBlock) {
+  public void setFinallyBlock(BlockStatement newFinallyBlock) {
     finallyBlock = newFinallyBlock;
   }
 
@@ -77,21 +77,38 @@ public class TryStatement extends Statement {
   }
 
   public void visitChildren(NodeVisitor v) {
-    //TODO:
+    tryBlock = (BlockStatement) tryBlock.accept(v);
+    for (ListIterator iter = catchBlocks.listIterator(); it.hasNext(); ) {
+      CatchBlock cb = (CatchBlock) it.next();
+      it.set((CatchBlock) cb.accept(v));
+    }
+    finallyBlock = (BlockStatement) finallyBlock.accept(v);
   }
 
   public Node copy() {
-    //TODO:
-    return null;
+    TryStatement ts = new TryStatement(tryBlock,
+				       new ArrayList(catchBlocks),
+				       finallyBlock);
+    ts.copyAnnotationsFrom(this);
+    return ts;
   }
 
   public Node deepCopy() {
-    //TODO:
-    return null;
+    List newCatchBlocks = new ArrayList(catchBlocks.size());
+    for(Iterator it = catchBlocks.iterator(); it.hasNext(); ) {
+      CatchBlock cb = (CatchBlock) it.next();
+      newCatchBlocks.add(cb.deepCopy());
+    }
+    TryStatement ts = 
+      new TryStatement((BlockStatement) tryBlock.deepCopy(),
+		       newCatchBlocks,
+		       (BlockStatement) finallyBlock.deepCopy());
+    ts.copyAnnotationsFrom(this);
+    return ts;
   }
 
   private BlockStatement tryBlock;
   private List catchBlocks;
-  private CatchBlock finallyBlock;
+  private BlockStatement finallyBlock;
 }
 

@@ -108,15 +108,22 @@ public class ConstructorCallStatement extends Statement {
     }
   }
 
-
   public Node copy() {
     ConstructorCallStatement ca = new ConstructorCallStatement(type,
 							       argumentList);
-    ca.copyAnnotationsFrom(this);
+
     return ca;
   }
 
   public Node deepCopy() {
+    List newArgumentList = new ArrayList(argumentList.size());
+    for (ListIterator it = newArgumentList.listIterator(); it.hasNext(); ) {
+      Expression e = (Expression) it.next();
+      it.set(e.deepCopy());
+    }
+    ConstructorCallStatement ca = 
+      new ConstructorCallStatement(type, newArgumentList);
+    ca.copyAnnotationsFrom(this);        
     return copy();
   }
 
