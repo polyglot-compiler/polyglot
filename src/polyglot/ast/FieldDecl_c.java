@@ -1,6 +1,6 @@
 package polyglot.ext.jl.ast;
 
-import java.util.Iterator;
+import java.util.*;
 
 import polyglot.ast.*;
 import polyglot.main.Report;
@@ -12,7 +12,7 @@ import polyglot.visit.*;
  * A <code>FieldDecl</code> is an immutable representation of the declaration
  * of a field of a class.
  */
-public class FieldDecl_c extends Node_c implements FieldDecl {
+public class FieldDecl_c extends Term_c implements FieldDecl {
     Flags flags;
     TypeNode type;
     String name;
@@ -324,6 +324,25 @@ public class FieldDecl_c extends Node_c implements FieldDecl {
 
         return child.type();
     }
+
+    /**
+     * Return the first (sub)term performed when evaluating this
+     * term.
+     */
+    public Term entry() {
+        return init != null ? init.entry() : this;
+    }
+
+    /**
+     * Visit this term in evaluation order.
+     */
+    public List acceptCFG(CFGBuilder v, List succs) {
+        if (init != null) {
+            v.visitCFG(init, this);
+        }
+        return succs;
+    }
+
 
     public String toString() {
         return flags.translate() + type + " " + name +

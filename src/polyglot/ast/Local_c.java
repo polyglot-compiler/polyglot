@@ -2,6 +2,7 @@ package polyglot.ext.jl.ast;
 
 import polyglot.ast.Local;
 import polyglot.ast.Node;
+import polyglot.ast.Term;
 import polyglot.ast.Precedence;
 import polyglot.types.Context;
 import polyglot.types.Flags;
@@ -93,8 +94,16 @@ public class Local_c extends Expr_c implements Local
   }
 
   /**
-    * Visit this term in evaluation order.
-    */
+   * Return the first (sub)term performed when evaluating this
+   * term.
+   */
+  public Term entry() {
+      return this;
+  }
+
+  /**
+   * Visit this term in evaluation order.
+   */
   public List acceptCFG(CFGBuilder v, List succs) {
       return succs;
   }

@@ -21,6 +21,14 @@ public class Empty_c extends Stmt_c implements Empty
     }
 
     /**
+     * Return the first (sub)term performed when evaluating this
+     * term.
+     */
+    public Term entry() {
+        return this;
+    }
+
+    /**
      * Visit this term in evaluation order.
      */
     public List acceptCFG(CFGBuilder v, List succs) {

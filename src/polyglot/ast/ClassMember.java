@@ -7,6 +7,6 @@ import polyglot.types.Context;
  * initializer block, or another class declaration.  It is any node that may
  * occur directly inside a class body.
  */
-public interface ClassMember extends Node 
+public interface ClassMember extends Term 
 {
 }

@@ -7,7 +7,7 @@ import polyglot.types.*;
  * A local class declaration statement.  The node is just a wrapper around
  * a class declaration.
  */
-public interface LocalClassDecl extends Stmt
+public interface LocalClassDecl extends CompoundStmt
 {
     /** The class declaration. */
     ClassDecl decl();

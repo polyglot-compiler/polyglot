@@ -23,6 +23,14 @@ public abstract class Lit_c extends Expr_c implements Lit
     }
 
     /**
+     * Return the first (sub)term performed when evaluating this
+     * term.
+     */
+    public Term entry() {
+        return this;
+    }
+
+    /**
      * Visit this term in evaluation order.
      */
     public List acceptCFG(CFGBuilder v, List succs) {

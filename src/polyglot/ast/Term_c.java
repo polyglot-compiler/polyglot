@@ -22,9 +22,7 @@ public abstract class Term_c extends Node_c implements Term
      * Return the first (sub)term performed when evaluating this
      * term.
      */
-    public Term entry() {
-        return this;
-    }
+    public abstract Term entry();
 
     /**
      * Visit this term in evaluation order.

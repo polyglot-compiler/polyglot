@@ -58,6 +58,14 @@ public class Branch_c extends Stmt_c implements Branch
 	w.write(";");
     }
 
+    /**
+     * Return the first (sub)term performed when evaluating this
+     * term.
+     */
+    public Term entry() {
+        return this;
+    }
+
     public List acceptCFG(CFGBuilder v, List succs) {
         v.visitBranchTarget(this);
         return Collections.EMPTY_LIST;

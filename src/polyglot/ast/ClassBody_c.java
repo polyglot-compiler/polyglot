@@ -6,6 +6,7 @@ import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
 import polyglot.ast.ClassMember;
 import polyglot.ast.Node;
+import polyglot.ast.Term;
 import polyglot.frontend.Job;
 import polyglot.frontend.Pass;
 import polyglot.main.Report;
@@ -281,6 +282,15 @@ public class ClassBody_c extends Term_c implements ClassBody
             w.end();
             w.newline(0);
         }
+    }
+
+    /**
+     * Return the first (sub)term performed when evaluating this
+     * term.
+     */
+    public Term entry() {
+        // Do _not_ visit class members.
+        return this;
     }
 
     /**

@@ -74,6 +74,14 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
   }
 
   /**
+   * Return the first (sub)term performed when evaluating this
+   * term.
+   */
+  public Term entry() {
+      return this;
+  }
+
+  /**
    * Visit this term in evaluation order.
    */
   public List acceptCFG(CFGBuilder v, List succs) {
