@@ -190,6 +190,11 @@ public interface TypeSystem {
     boolean isAccessible(MemberInstance mi, Context context);
 
     /**
+     * Checks whether a class can be accessed from Context context.
+     */
+    boolean classAccessible(ClassType ct, Context context);
+
+    /**
      * Returns whether inner is enclosed within outer
      */
     boolean isEnclosed(ClassType inner, ClassType outer);

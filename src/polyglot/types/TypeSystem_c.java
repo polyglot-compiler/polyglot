@@ -320,7 +320,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean isAccessible(MemberInstance mi, Context context) {
         return isAccessible(mi, context.currentClass());
     }
-    
+
     /**
      * Checks whether the member mi can be accessed from code that is
      * declared in the class ctc.
@@ -331,63 +331,140 @@ public class TypeSystem_c implements TypeSystem
         ReferenceType target = mi.container();
 	Flags flags = mi.flags();
 
-        if (flags.isPublic()) return true;
+        if (! target.isClass()) {
+            // public members of non-classes are accessible;
+            // non-public members of non-classes are inaccessible
+            return flags.isPublic();
+        }
 
-	if (equals(target, ctc)) return true;
+        ClassType ctt = target.toClass();
 
-	if (! target.isClass()) return false;
+        if (! classAccessible(ctt, ctc)) {
+            return false;
+        }
 
-	ClassType ctt = target.toClass();
+        if (equals(ctt, ctc))
+            return true;
 
         // If the current class and the target class are both in the
         // same class body, then protection doesn't matter, i.e.
-        // protected and private members may be accessed. Do this by 
+        // protected and private members may be accessed. Do this by
         // working up through ctc's containers.
-        if (isEnclosed(ctc, ctt)) return true;                    
-        if (isEnclosed(ctt, ctc)) return true;                        
+        if (isEnclosed(ctc, ctt) || isEnclosed(ctt, ctc))
+            return true;
+
         ClassType ctcContainer = ctc;
         while (!ctcContainer.isTopLevel()) {
             ctcContainer = ctcContainer.outer();
-            if (isEnclosed(ctt, ctcContainer)) return true;                        
-        };
-
-	// Check for package level scope.
-	if (ctt.package_() == null && ctc.package_() == null &&
-	    (flags.isPackage() || flags.isProtected()))
-	    return true;
-
-	// kliger: this used to only allow access if the context and the
-	//   target are in the same package and the flags have package-level
-	//   access set.
-	// However, JLS2 6.6.1 says that if the protected flag is set, then
-	//   if the package is the same for target and context, then access
-	//   is allowed, as well.  (in addition to the normal "subclasses get
-	//   access" rule for protected members).
-	// This is confusing for C++ programmers like me.
-	if (ctt.package_() != null && ctt.package_().equals (ctc.package_()) &&
-	    (flags.isPackage() || flags.isProtected())) {
-	    return true;
-	}
+            if (isEnclosed(ctt, ctcContainer))
+                return true;
+        }
 
 	// protected
         if (flags.isProtected()) {
             // If the current class is in a
-            // class body that extends/implements the target class, then 
-            // protected members can be accessed. Do this by 
+            // class body that extends/implements the target class, then
+            // protected members can be accessed. Do this by
             // working up through ctc's containers.
             if (descendsFrom(ctc, ctt)) {
                 return true;
-            }            
+            }
+
             ctcContainer = ctc;
             while (!ctcContainer.isTopLevel()) {
                 ctcContainer = ctcContainer.outer();
                 if (descendsFrom(ctcContainer, ctt)) {
                     return true;
-                }            
-            }         
+                }
+            }
         }
 
-	// else,
+        return accessibleFromPackage(flags, ctt.package_(), ctc.package_());
+    }
+
+    /** True if the class ctt accessible from the context. */
+    public boolean classAccessible(ClassType ctt, Context context) {
+        if (context.currentClass() == null) {
+            return classAccessibleFromPackage(ctt, context.importTable().package_());
+        }
+        else {
+            return classAccessible(ctt, context.currentClass());
+        }
+    }
+
+    /** True if the class ctt accessible from the body of class ctc. */
+    protected boolean classAccessible(ClassType ctt, ClassType ctc) {
+        assert_(ctt);
+
+        if (ctt.isMember()) {
+            return isAccessible(ctt, ctc);
+        }
+
+        // Local and anonymous classes are accessible if they can be named.
+        // This method wouldn't be called if they weren't named.
+        if (! ctt.isTopLevel()) {
+            return true;
+        }
+
+        // ctt must be a top-level class
+        
+        // same class
+	if (equals(ctt, ctc))
+            return true;
+
+        if (isEnclosed(ctc, ctt))
+            return true;
+
+        return accessibleFromPackage(ctt.flags(),
+                                     ctt.package_(), ctc.package_());
+    }
+
+    /** True if the class ctt accessible from the package pkg. */
+    protected boolean classAccessibleFromPackage(ClassType ctt, Package pkg) {
+        assert_(ctt);
+
+        // Local and anonymous classes are accessible if they can be named.
+        // This method wouldn't be called if they weren't named.
+        if (! ctt.isTopLevel() && ! ctt.isMember())
+            return true;
+
+	Flags flags = ctt.flags();
+
+        if (ctt.isMember()) {
+            if (! ctt.container().isClass()) {
+                // public members of non-classes are accessible
+                return flags.isPublic();
+            }
+
+            if (! classAccessibleFromPackage(ctt.container().toClass(), pkg)) {
+                return false;
+            }
+        }
+
+        return accessibleFromPackage(flags, ctt.package_(), pkg);
+    }
+
+    /**
+     * Return true if a member (in an accessible container) or a
+     * top-level class with access flags <code>flags</code>
+     * in package <code>pkg1</code> is accessible from package
+     * <code>pkg2</code>.
+     */
+    protected boolean accessibleFromPackage(Flags flags, Package pkg1, Package pkg2) {
+        // Check if public.
+        if (flags.isPublic()) {
+            return true;
+        }
+
+        // Check if same package.
+        if (flags.isPackage() || flags.isProtected()) {
+            if (pkg1 == null && pkg2 == null)
+                return true;
+            if (pkg1 != null && pkg1.equals(pkg2))
+                return true;
+	}
+
+        // Otherwise private.
 	return false;
     }
 
@@ -443,8 +520,8 @@ public class TypeSystem_c implements TypeSystem
     ////
 
     /**
-     * Returns true iff the type t can be coerced to a String in the given 
-     * Context. If a type can be coerced to a String then it can be 
+     * Returns true iff the type t can be coerced to a String in the given
+     * Context. If a type can be coerced to a String then it can be
      * concatenated with Strings, e.g. if o is of type T, then the code snippet
      *         "" + o
      * would be allowed.
@@ -572,7 +649,7 @@ public class TypeSystem_c implements TypeSystem
             }
 	}
 
-	throw new NoMemberException(NoMemberException.FIELD, 
+	throw new NoMemberException(NoMemberException.FIELD,
                                     "Field \"" + name +
 				    "\" not found in type \"" +
                                     container + "\".");
@@ -585,7 +662,7 @@ public class TypeSystem_c implements TypeSystem
                                      Context c) throws SemanticException {
         return findMemberClass(container, name, c.currentClass());
     }
-    
+
     public ClassType findMemberClass(ClassType container, String name,
                                      ClassType currClass) throws SemanticException {
 
@@ -714,7 +791,7 @@ public class TypeSystem_c implements TypeSystem
     throws SemanticException {
         return findConstructor(container, argTypes, c.currentClass());
     }
-    
+
     public ConstructorInstance findConstructor(ClassType container,
                            List argTypes, ClassType currClass)
 	throws SemanticException {
@@ -864,7 +941,7 @@ public class TypeSystem_c implements TypeSystem
      * Applicable and Accessible as defined by JLS 15.11.2.1
      */
     protected List findAcceptableConstructors(ClassType container,
-                                              List argTypes, 
+                                              List argTypes,
                                               ClassType currClass) {
         assert_(container);
         assert_(argTypes);
@@ -1024,14 +1101,14 @@ public class TypeSystem_c implements TypeSystem
     public List implemented(MethodInstance mi) {
 	return mi.implementedImpl(mi.container());
     }
-    
+
     public boolean canOverride(MethodInstance mi, MethodInstance mj) {
         try {
             return mi.canOverrideImpl(mj, true);
         }
         catch (SemanticException e) {
             // this is the exception thrown by the canOverrideImpl check.
-            // It should never be thrown if the quiet argument of 
+            // It should never be thrown if the quiet argument of
             // canOverrideImpl is true.
             throw new InternalCompilerError(e);
         }
@@ -1205,7 +1282,7 @@ public class TypeSystem_c implements TypeSystem
     protected ArrayType arrayType(Position pos, Type type) {
 	return new ArrayType_c(this, pos, type);
     }
-    
+
     public ArrayType arrayOf(Type type, int dims) {
         return arrayOf(null, type, dims);
     }
@@ -1275,7 +1352,7 @@ public class TypeSystem_c implements TypeSystem
                 return null;
             }
         }
-            
+
         sb.insert(0, ct.fullName());
         return sb.toString();
     }
@@ -1565,22 +1642,22 @@ public class TypeSystem_c implements TypeSystem
 		"Invalid access flags: " + f.retain(ACCESS_FLAGS) + ".");
 	}
     }
-    
+
     /**
-     * Utility method to gather all the superclasses and interfaces of 
-     * <code>ct</code> that may contain abstract methods that must be 
-     * implemented by <code>ct</code>. The list returned also contains 
+     * Utility method to gather all the superclasses and interfaces of
+     * <code>ct</code> that may contain abstract methods that must be
+     * implemented by <code>ct</code>. The list returned also contains
      * <code>ct</code>.
      */
     protected List abstractSuperInterfaces(ReferenceType rt) {
         List superInterfaces = new LinkedList();
         superInterfaces.add(rt);
-        
+
         for (Iterator iter = rt.interfaces().iterator(); iter.hasNext(); ) {
             ClassType interf = (ClassType)iter.next();
             superInterfaces.addAll(abstractSuperInterfaces(interf));
         }
-        
+
         if (rt.superType() != null) {
             ClassType c = rt.superType().toClass();
             if (c.flags().isAbstract()) {
@@ -1591,12 +1668,12 @@ public class TypeSystem_c implements TypeSystem
             else {
                 // the superclass is not abstract, so it must implement
                 // all abstract methods of any interfaces it implements, and
-                // any superclasses it may have.                
+                // any superclasses it may have.
             }
-        }    
+        }
         return superInterfaces;
     }
-    
+
     /**
      * Assert that <code>ct</code> implements all abstract methods required;
      * that is, if it is a concrete class, then it must implement all
@@ -1610,21 +1687,22 @@ public class TypeSystem_c implements TypeSystem
         
         // build up a list of superclasses and interfaces that ct 
         // extends/implements that may contain abstract methods that 
+
         // ct must define.
         List superInterfaces = abstractSuperInterfaces(ct);
 
-        // check each abstract method of the classes and interfaces in 
+        // check each abstract method of the classes and interfaces in
         // superInterfaces
         for (Iterator i = superInterfaces.iterator(); i.hasNext(); ) {
             ReferenceType rt = (ReferenceType)i.next();
             for (Iterator j = rt.methods().iterator(); j.hasNext(); ) {
                 MethodInstance mi = (MethodInstance)j.next();
                 if (!mi.flags().isAbstract()) {
-                    // the method isn't abstract, so ct doesn't have to 
+                    // the method isn't abstract, so ct doesn't have to
                     // implement it.
                     continue;
                 }
-                
+
                 boolean implFound = false;
                 ReferenceType curr = ct;
                 while (curr != null && !implFound) {
@@ -1646,7 +1724,7 @@ public class TypeSystem_c implements TypeSystem
                                 try {
                                     // check that mj can override mi, which
                                     // includes access protection checks.
-                                    checkOverride(mj, mi);                                
+                                    checkOverride(mj, mi);
                                 }
                                 catch (SemanticException e) {
                                     // change the position of the semantic
@@ -1657,19 +1735,19 @@ public class TypeSystem_c implements TypeSystem
                                 }
                             }
                             else {
-                                // the method implementation mj or mi was 
+                                // the method implementation mj or mi was
                                 // declared in ct. So other checks will take
                                 // care of access issues
                             }
                             implFound = true;
                             break;
-                        }                        
+                        }
                     }
 
-                    curr = curr.superType() ==  null ? 
+                    curr = curr.superType() ==  null ?
                            null : curr.superType().toReference();
                 }
-                
+
 
                 // did we find a suitable implementation of the method mi?
                 if (!implFound && mustImplementAll) {
@@ -1726,7 +1804,7 @@ public class TypeSystem_c implements TypeSystem
     public Flags Abstract()     { return Flags.ABSTRACT; }
     public Flags Volatile()     { return Flags.VOLATILE; }
     public Flags StrictFP()     { return Flags.STRICTFP; }
-        
+
     public Flags flagsForBits(int bits) {
         Flags f = Flags.NONE;
 

@@ -27,6 +27,24 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
     else w.write(type.toString());
   }
 
+  /** Type check the type node.  Check accessibility of class types. */
+  public Node typeCheck(TypeChecker tc) throws SemanticException {
+      TypeSystem ts = tc.typeSystem();
+
+      if (type.isClass()) {
+          ClassType ct = type.toClass();
+          if (ct.isTopLevel() || ct.isMember()) {
+              if (! ts.classAccessible(ct, tc.context())) {
+                  throw new SemanticException("Cannot access class \"" +
+                      ct + "\" from the body of \"" +
+                      tc.context().currentClass() + "\".", position());
+              }
+          }
+      }
+
+      return this;
+  }
+
   public void translate(CodeWriter w, Translator tr) {
     TypeSystem ts = tr.typeSystem();
 
