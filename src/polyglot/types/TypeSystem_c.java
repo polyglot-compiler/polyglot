@@ -1572,4 +1572,13 @@ public class TypeSystem_c implements TypeSystem
 		"Invalid access flags: " + f.retain(ACCESS_FLAGS) + ".");
 	}
     }
+
+    /**
+     * Returns t, modified as necessary to make it a legal
+     * static target.
+     */
+    public Type staticTarget(Type t) throws SemanticException {
+        // Nothing needs done in standard Java.
+        return t;
+    }
 }

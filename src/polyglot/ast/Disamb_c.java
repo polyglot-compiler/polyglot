@@ -125,11 +125,11 @@ public class Disamb_c implements Disamb
 	    return nf.PackageNode(pos, ts.packageForName(name));
     }
 
-    protected Receiver makeMissingFieldTarget(FieldInstance fi) throws SemanticException{
+    protected Receiver makeMissingFieldTarget(FieldInstance fi) throws SemanticException {
         Receiver r;
 
 		if (fi.flags().isStatic()) {
-			r = makeStaticFieldTarget(fi);
+			r = nf.CanonicalTypeNode(pos, ts.staticTarget(fi.container()));
 		} else {
 			// The field is non-static, so we must prepend with
 			// "this", but we need to determine if the "this"
@@ -140,17 +140,13 @@ public class Disamb_c implements Disamb
 			ParsedClassType scope = c.findFieldScope(name);
 
 			if (! scope.isSame(c.currentClass())) {
-				r = nf.This(pos, nf.CanonicalTypeNode(pos, scope));
+				r = nf.This(pos, nf.CanonicalTypeNode(pos, ts.staticTarget(scope)));
 			} else {
 				r = nf.This(pos);
 			}
 		}
 
         return r;
-    }
-
-    protected Receiver makeStaticFieldTarget(FieldInstance fi) {
-        return nf.CanonicalTypeNode(pos, fi.container());
     }
 
 }

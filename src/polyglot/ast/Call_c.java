@@ -175,7 +175,7 @@ public class Call_c extends Expr_c implements Call
 	    NodeFactory nf = tc.nodeFactory();
 
 	    if (mi.flags().isStatic()) {
-		r = nf.CanonicalTypeNode(position(), mi.container());
+		r = nf.CanonicalTypeNode(position(), ts.staticTarget(mi.container()));
 	    }
 	    else {
 		// The field is non-static, so we must prepend with
@@ -188,13 +188,14 @@ public class Call_c extends Expr_c implements Call
 
 		if (! scope.isSame(c.currentClass())) {
 		    r = nf.This(position(),
-			        nf.CanonicalTypeNode(position(), scope));
+			        nf.CanonicalTypeNode(position(), 
+						ts.staticTarget(scope)));
 		}
 		else {
 		    r = nf.This(position());
 		}
 	    }
-	    
+
 	    r = (Receiver) r.visit(tc);
 
 	    call = target(r);

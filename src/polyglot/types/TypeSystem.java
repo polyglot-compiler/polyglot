@@ -318,4 +318,10 @@ public interface TypeSystem {
     void checkAccessFlags(Flags f) throws SemanticException;
 
     void checkCycles(ReferenceType t) throws SemanticException;
+
+    /**
+     * Returns t, modified as necessary to make it a legal
+     * static target.
+     */
+    public Type staticTarget(Type t) throws SemanticException;
 }
