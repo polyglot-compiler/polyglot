@@ -10,10 +10,11 @@ import java.util.*;
 public class CachingResolver implements Resolver {
     Resolver inner;
     Map cache;
-
+    Map workingCache; //storing the unrestored class types
     public CachingResolver(Resolver inner) {
 	this.inner = inner;
 	this.cache = new HashMap();
+	this.workingCache = new HashMap();
     }
 
     public Resolver inner() {
@@ -28,6 +29,8 @@ public class CachingResolver implements Resolver {
         Qualifier q = (Qualifier) cache.get(name);
 
 	if (q == null) {
+	    Qualifier qq = (Qualifier) workingCache.get(name);
+	    if (qq!=null) return qq;
 	    q = inner.findQualifier(name);
 	    cache.put(name, q);
 	}
@@ -43,5 +46,9 @@ public class CachingResolver implements Resolver {
 	}
 
 	return (Type) q;
+    }
+    
+    public void medianResult(String name, Qualifier q) {
+	workingCache.put(name, q);
     }
 }

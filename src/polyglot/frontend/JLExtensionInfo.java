@@ -18,7 +18,7 @@ import java.util.*;
 /** 
  * This is the default <code>ExtensionInfo</code> for the Java language. 
  * 
- * Compiling Passes:
+ * Compilation Passes and visitors:
  * 1. parse
  * 2. build types (TypeBuilder)
  * 3. disambiguate types (TypeAmbiguityRemover)

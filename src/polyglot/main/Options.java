@@ -31,6 +31,9 @@ public final class Options {
 
   /** Inject type information in serialized form into output file? */
   public boolean serialize_type_info = true;
+  
+  /** keep output files */
+  public boolean keep_output_files = true;
 
   public ExtensionInfo extension = new jltools.ext.jl.ExtensionInfo();
      // The extension information
@@ -90,6 +93,8 @@ public final class Options {
     System.err.println(" -scramble [seed]        scramble the ast");
     System.err.println(" -noserial               disable class"
                         + " serialization");
+    System.err.println(" -nooutput               delete output files after" +
+		       " compilation");
     System.err.println(" -ext <extension>        use language extension");
     System.err.println(" -c                      compile only to .java");
     System.err.println(" -post <compiler>        run javac-like compiler" 

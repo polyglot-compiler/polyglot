@@ -64,6 +64,12 @@ public class Main
 	  }
 	  
 	  proc.waitFor();
+	  
+	  if (!options.keep_output_files) {
+	    String command2 = "rm " + outfile;
+	    runtime.exec(command2);
+	  }
+	  
 	  if (proc.exitValue() > 0) {
 	    System.exit(proc.exitValue());
 	  }
@@ -218,6 +224,11 @@ public class Main
       {
         i++;
 	options.serialize_type_info = false;
+      }
+      else if (args[i].equals("-nooutput"))
+      {
+	i++;
+	options.keep_output_files = false;
       }
       else if (args[i].equals("-nosourcecheck")) 
       {

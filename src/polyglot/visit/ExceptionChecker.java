@@ -33,6 +33,7 @@ public class ExceptionChecker extends NodeVisitor
 
 	try {
 	    Node m = n.ext().exceptionCheckOverride(ec);
+	    this.throwsSet().addAll(ec.throwsSet());
 	    release(ec);
 	    return m;
 	}

@@ -101,10 +101,9 @@ public class SubtypeSet implements java.util.Set
     public boolean contains(Object o) {
 	if (o instanceof Type) {
 	    Type type = (Type) o;
-
+	    
 	    for (Iterator i = v.iterator(); i.hasNext(); ) {
 		Type t = (Type) i.next();
-
 		if (type.isSubtype(t)) {
 		    return true;
 		}

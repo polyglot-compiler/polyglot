@@ -1,5 +1,5 @@
 SOURCE = ..
-SUBDIRS = ext lex main frontend ast types util visit
+SUBDIRS = lex main frontend ast types util visit ext
 
 include $(SOURCE)/Rules.mk
 

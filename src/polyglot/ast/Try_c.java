@@ -108,7 +108,6 @@ public class Try_c extends Stmt_c implements Try
 
 	// Visit the try block.
 	Block tryBlock = (Block) this.tryBlock.visit(ec);
-
 	// First, get exceptions from the try block.
 	SubtypeSet thrown = ec.throwsSet(); 
         SubtypeSet caught = new SubtypeSet();
@@ -176,11 +175,9 @@ public class Try_c extends Stmt_c implements Try
 	Block finallyBlock = null;
 
 	if (this.finallyBlock != null) {
-	    thrown.clear();
-
 	    ExceptionChecker ec2 = ec.alloc();
 
-	    finallyBlock = (Block) this.finallyBlock.visit(ec);
+	    finallyBlock = (Block) this.finallyBlock.visit(ec2);
 
 	    thrown.addAll(ec2.throwsSet());
 	    ec.release(ec2);

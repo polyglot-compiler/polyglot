@@ -155,7 +155,7 @@ public class Call_c extends Expr_c implements Call
 	}
 
 	MethodInstance mi;
-	
+
 	if (rt != null) {
 	    mi = ts.findMethod(rt, name, argTypes, c);
 	}
@@ -194,6 +194,8 @@ public class Call_c extends Expr_c implements Call
 		    r = nf.This(position());
 		}
 	    }
+	    
+	    r = (Receiver) r.visit(tc);
 
 	    call = target(r);
 	}

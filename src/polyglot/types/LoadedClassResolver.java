@@ -118,7 +118,7 @@ public class LoadedClassResolver extends ClassResolver
     try {
       clazz = Class.forName(name);
     }
-    catch (Exception e) {
+    catch (Throwable e) {
     }
 
     boolean useClassFile = clazz != null;
@@ -167,7 +167,7 @@ public class LoadedClassResolver extends ClassResolver
     }
 
     if (useClassFile) {
-      return getTypeFromClass(clazz);
+      return getTypeFromClass(clazz, name);
     }
 
     if (source != null) {
@@ -194,7 +194,7 @@ public class LoadedClassResolver extends ClassResolver
     throw new SemanticException("Error while compiling " + source.name() + ".");
   }
 
-  protected Type getTypeFromClass(Class clazz)
+  protected Type getTypeFromClass(Class clazz, String name)
     throws SemanticException
   {
     // At this point we've decided to go with the Class. So if something
@@ -221,7 +221,10 @@ public class LoadedClassResolver extends ClassResolver
       field.setAccessible( true);
 
       ClassType t = (ClassType) te.decode((String) field.get(null));
- 
+
+      //HACK: storing median result to avoid circular resolving
+      ((CachingResolver)ts.systemResolver()).medianResult(name, t);
+      
       Types.report(1, "Returning serialized ClassType for " +
 		  clazz.getName() + ".");
 
