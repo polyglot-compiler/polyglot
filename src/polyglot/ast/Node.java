@@ -7,8 +7,8 @@ import jltools.types.Context;
 import jltools.types.SemanticException;
 import jltools.types.TypeSystem;
 import jltools.visit.TypeBuilder;
-import jltools.visit.TypeAmbiguityRemover;
 import jltools.visit.AmbiguityRemover;
+import jltools.visit.AddMemberVisitor;
 import jltools.visit.ConstantFolder;
 import jltools.visit.TypeChecker;
 import jltools.visit.ExceptionChecker;
@@ -76,13 +76,6 @@ public interface Node extends Copy, Serializable
      */
     void leaveScope(Context c);
 
-    /**
-     * This method can be called after a node is visited to ensure its
-     * type information is reconstructed.
-     */
-    Node reconstructTypes_(NodeFactory nf, TypeSystem ts, Context c)
-	throws SemanticException;
-
     // Implementations of the default passes.  These methods should only
     // be called through the delegate.
 
@@ -98,13 +91,12 @@ public interface Node extends Copy, Serializable
     Node buildTypes_(TypeBuilder tb) throws SemanticException;
 
     /**
-     * Constructs a context for each type declared in the AST.
-     * A context is used to look up names when cleaning class signatures.
+     * Adds disambiguated methods and fields to the types.
      *
-     * @param cb The visitor which builds contexts.
+     * @param tc The visitor which builds types.
      */
-    Node disambiguateTypesOverride_(TypeAmbiguityRemover sc) throws SemanticException;
-    Node disambiguateTypes_(TypeAmbiguityRemover sc) throws SemanticException;
+    Node addMembersOverride_(AddMemberVisitor tc) throws SemanticException;
+    Node addMembers_(AddMemberVisitor tc) throws SemanticException;
 
     /**
      * Remove any remaining ambiguities from the AST.

@@ -302,7 +302,7 @@ public class Context_c implements Context
      * Pushes on a class  scoping
      */
     public void pushClass(ParsedClassType c) {
-        Types.report(4, "push class " + c);
+        Types.report(4, "push class " + c + " " + c.position());
 	scopes.push(getClassMark(c));
 	pushBlock();
     }
@@ -313,11 +313,10 @@ public class Context_c implements Context
     public void popClass() {
 	popBlock();
 
-        Types.report(4, "pop class");
-
         try {
 	    // Force a type check.
 	    ClassMark m = (ClassMark) scopes.pop();
+            Types.report(4, "pop class " + m.type() + " " + m.type().position());
 	}
 	catch (EmptyStackException ese ) {
 	    throw new InternalCompilerError("No more scopes to pop");
@@ -336,11 +335,10 @@ public class Context_c implements Context
      * Removes a scoping level
      */
     public void popBlock() {
-	Types.report(4, "pop block");
-
 	try {
 	    // Force a type check.
 	    Scope s = (Scope) scopes.pop();
+            Types.report(4, "pop block");
 	}
 	catch (EmptyStackException ese ) {
 	    throw new InternalCompilerError("No more scopes to pop!");
@@ -351,7 +349,7 @@ public class Context_c implements Context
      * enters a method
      */
     public void pushCode(CodeInstance ci) {
-	Types.report(4, "push code " + ci);
+	Types.report(4, "push code " + ci + " " + ci.position());
 	scopes.push(getCodeMark(ci));
 	pushBlock();
     }
@@ -362,11 +360,10 @@ public class Context_c implements Context
     public void popCode() {
         popBlock();
 
-	Types.report(4, "pop code");
-
 	try {
 	    // Force a type check.
 	    CodeMark m = (CodeMark) scopes.pop();
+            Types.report(4, "pop code " + m.code() + " " + m.code().position());
 	}
 	catch (EmptyStackException ese ) {
 	    throw new InternalCompilerError("No more method scopes to pop!");

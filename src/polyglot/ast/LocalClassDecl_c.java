@@ -4,6 +4,7 @@ import jltools.ast.*;
 import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
+import jltools.frontend.*;
 import java.util.*;
 
 /**
@@ -55,6 +56,36 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
         // We should now be back in the scope of the enclosing block.
         // Add the type.
         c.addType(decl.type().toClass().toLocal());
+    }
+
+    public Node disambiguateOverride_(AmbiguityRemover ar) throws SemanticException {
+        if (ar.kind() == AmbiguityRemover.SUPER) {
+            return this;
+        }
+
+        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
+            return this;
+        }
+
+        enterScope(ar.context());
+
+        ClassDecl d = (ClassDecl) ar.job().spawn(ar.context(), decl,
+                                                 Pass.CLEAN_SUPER,
+                                                 Pass.ADD_MEMBERS_ALL);
+
+        if (d == null) {
+            throw new SemanticException(
+                "Could not disambiguate local class \"" + decl.name() + "\".",
+                position());
+        }
+
+        LocalClassDecl n = decl(d);
+
+        n = (LocalClassDecl) n.visitChildren(ar);
+
+        n.leaveScope(ar.context());
+
+        return n;
     }
 
     public String toString() {

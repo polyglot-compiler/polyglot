@@ -3,10 +3,11 @@ package jltools.ast;
 import jltools.types.Type;
 import jltools.types.Flags;
 import jltools.types.FieldInstance;
+import jltools.types.InitializerInstance;
 import jltools.types.SemanticException;
 
 /**
- * A <code>FieldDecl</code> is an immutable representation of the declaration 
+ * A <code>FieldDecl</code> is an immutable representation of the declaration
  * of a field of a class.
  */
 public interface FieldDecl extends ClassMember
@@ -27,4 +28,7 @@ public interface FieldDecl extends ClassMember
 
     FieldInstance fieldInstance();
     FieldDecl fieldInstance(FieldInstance fi);
+
+    InitializerInstance initializerInstance();
+    FieldDecl initializerInstance(InitializerInstance fi);
 }

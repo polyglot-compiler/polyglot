@@ -103,6 +103,22 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	return reconstruct(qualifier, arguments);
     }
 
+    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+        ConstructorCall_c n = (ConstructorCall_c) super.buildTypes_(tb);
+
+        TypeSystem ts = tb.typeSystem();
+
+        List l = new ArrayList(arguments.size());
+        for (int i = 0; i < arguments.size(); i++) {
+          l.add(ts.unknownType(position()));
+        }
+
+        ConstructorInstance ci = ts.constructorInstance(position(), ts.Object(),
+                                                        Flags.NONE, l,
+                                                        Collections.EMPTY_LIST);
+        return n.constructorInstance(ci);
+    }
+
     /** Type check the call. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();

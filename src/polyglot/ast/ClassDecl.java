@@ -11,6 +11,7 @@ import jltools.types.ParsedClassType;
 public interface ClassDecl extends Node, TopLevelDecl, ClassMember
 {
     ParsedClassType type();
+    ClassDecl type(ParsedClassType type);
 
     Flags flags();
     ClassDecl flags(Flags flags);

@@ -5,7 +5,7 @@ import jltools.types.*;
 import jltools.visit.*;
 import jltools.util.*;
 
-/** 
+/**
  * A local variable declaration statement: a type, a name and an optional
  * initializer.
  */
@@ -84,13 +84,13 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
 		return n;
     }
 
-	/** 
+	/**
 	 * Get the declarator.
 	 */
 	protected Declarator decl() {
 		return decl;
 	}
-	
+
 	/**
 	 * Set the declarator.
 	 */
@@ -99,7 +99,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
 		n.decl = decl;
 		return n;
 	}
-	
+
     /** Reconstruct the declaration. */
     protected LocalDecl_c reconstruct(TypeNode type, Expr init) {
         if (type() != type || init() != init) {
@@ -131,9 +131,27 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
         c.addVariable(li);
     }
 
-    /** Build type objects for the declaration. */
     public Node buildTypes_(TypeBuilder tb) throws SemanticException {
-	TypeSystem ts = tb.typeSystem();
+        LocalDecl_c n = (LocalDecl_c) super.buildTypes_(tb);
+
+        TypeSystem ts = tb.typeSystem();
+
+        LocalInstance li = ts.localInstance(position(), Flags.NONE,
+                                            ts.unknownType(position()), name());
+        return n.localInstance(li);
+    }
+
+    /** Build type objects for the declaration. */
+    public Node disambiguateOverride_(AmbiguityRemover ar) throws SemanticException {
+        if (ar.kind() != AmbiguityRemover.ALL) {
+            return this;
+        }
+
+        return null;
+    }
+
+    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+	TypeSystem ts = ar.typeSystem();
 
 	LocalInstance li = ts.localInstance(position(),
 	    				    flags(), declType(), name());
@@ -213,38 +231,5 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
         w.begin(0);
         w.write("(decl " + decl + ")");
         w.end();
-    }
-
-    /** Reconstruct the type objects for the declaration. */
-    public Node reconstructTypes_(NodeFactory nf, TypeSystem ts, Context c)
-        throws SemanticException {
-
-	Flags flags = flags();
-        Type type = declType();
-        String name = name();
-	Expr init = init();
-
-	LocalInstance li = this.li;
-
-	if (! flags.equals(li.flags())) li = li.flags(flags);
-	if (! type.equals(li.type())) li = li.type(type);
-	if (! name.equals(li.name())) li = li.name(name);
-
-	if (init instanceof Lit && flags.isFinal()) {
-	    Object value = ((Lit) init).objValue();
-
-	    if (value != li.constantValue()) {
-		li = (LocalInstance) li.constantValue(value);
-	    }
-	}
-	else if (li.isConstant()) {
-	    li = (LocalInstance) li.constantValue(null);
-	}
-
-	if (li != this.li) {
-	    return localInstance(li);
-	}
-
-	return this;
     }
 }

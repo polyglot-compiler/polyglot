@@ -47,6 +47,16 @@ public class Local_c extends Expr_c implements Local
     return n;
   }
 
+  public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+      Local_c n = (Local_c) super.buildTypes_(tb);
+
+      TypeSystem ts = tb.typeSystem();
+
+      LocalInstance li = ts.localInstance(position(), Flags.NONE,
+                                          ts.unknownType(position()), name);
+      return n.localInstance(li);
+  }
+
   /** Type check the local. */
   public Node typeCheck_(TypeChecker tc) throws SemanticException {
     Context c = tc.context();

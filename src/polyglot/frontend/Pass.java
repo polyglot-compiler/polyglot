@@ -6,39 +6,29 @@ import java.util.*;
 /** A <code>Pass</code> represents a compiler pass. */
 public interface Pass
 {
-    /** The status of the pass. */
-    public static class Status extends Enum {
-	Status(String name) { super(name); }
+    public static class ID extends Enum {
+        public ID(String name) { super(name); }
     }
 
-    /** The pass is new and has not been added to the run queue. */
-    public static final Status NEW      = new Status("new");
-    /** The pass is in the run queue. */
-    public static final Status ENQUEUED = new Status("enqueued");
-    /** The pass is running. */
-    public static final Status RUNNING  = new Status("running");
-    /** The pass has run and has failed.  It may still be rerun. */
-    public static final Status FAILED   = new Status("failed");
-    /** The pass has run and has succeeded.  It may still be rerun. */
-    public static final Status DONE     = new Status("done");
+    public ID id();
 
-    /** Get the status of the pass. */
-    public Status status();
-
-    /** Set the status of the pass. */
-    public void status(Status status);
-
-    /** Return true if the pass should be rerun. */
-    public boolean repeat();
-
-    /** Reinitialize the pass so it can be rerun. */
-    public void reinit();
-
-    /** Return the list of passes which we must run after. */
-    public List runAfter();
-
-    /** Run this pass after <code>pass</code>.  This will cause the pass to be rerun if it is currently running. */
-    public void runAfter(Pass pass);
+    public static final ID PARSE = new ID("parse");
+    public static final ID BUILD_TYPES = new ID("build-types");
+    public static final ID BUILD_TYPES_ALL = new ID("build-types-barrier");
+    public static final ID CLEAN_SUPER = new ID("clean-super");
+    public static final ID CLEAN_SUPER_ALL = new ID("clean-super-barrier");
+    public static final ID CLEAN_SIGS = new ID("clean-sigs");
+    public static final ID ADD_MEMBERS = new ID("add-members");
+    public static final ID ADD_MEMBERS_ALL = new ID("add-members-barrier");
+    public static final ID DISAM = new ID("disam");
+    public static final ID DISAM_ALL = new ID("disam-barrier");
+    public static final ID TYPE_CHECK = new ID("type-check");
+    public static final ID EXC_CHECK = new ID("exc-check");
+    public static final ID FOLD = new ID("fold");
+    public static final ID DUMP = new ID("dump");
+    public static final ID PRE_OUTPUT_ALL = new ID("pre-output-barrier");
+    public static final ID SERIALIZE = new ID("serialize");
+    public static final ID OUTPUT = new ID("output");
 
     /** Run the pass. */
     public boolean run();

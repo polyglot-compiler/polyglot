@@ -10,22 +10,23 @@ import jltools.util.*;
  */
 public class ParserPass extends AbstractPass
 {
-    Job job;
-    ExtensionInfo extInfo;
+    SourceJob job;
+    Compiler compiler;
 
-    public ParserPass(Job job, ExtensionInfo extInfo) {
+    public ParserPass(Pass.ID id, Compiler compiler, SourceJob job) {
+        super(id);
+	this.compiler = compiler;
 	this.job = job;
-	this.extInfo = extInfo;
     }
 
     public boolean run() {
+	ErrorQueue eq = compiler.errorQueue();
 	Source source = job.source();
-	ErrorQueue eq = job.compiler().errorQueue();
 
 	try {
 	    Reader reader = source.open();
 
-	    Parser p = extInfo.parser(reader, job);
+	    Parser p = compiler.extensionInfo().parser(reader, source, eq);
 
 	    jltools.frontend.Compiler.report(2, "Using parser " + p);
 
@@ -47,6 +48,6 @@ public class ParserPass extends AbstractPass
     }
 
     public String toString() {
-	return "Parse(" + job + ")";
+	return id + "(" + job.source() + ")";
     }
 }

@@ -21,6 +21,16 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver
 		return this.type;
 	}
 
+	public AmbReceiver type(Type type) {
+                AmbReceiver_c n = (AmbReceiver_c) copy();
+		n.type = type;
+                return n;
+	}
+
+    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+        return type(tb.typeSystem().unknownType(position()));
+    }
+
     /** Disambiguate the receiver. */
     public Node disambiguateOverride_(AmbiguityRemover ar)
 	throws SemanticException {

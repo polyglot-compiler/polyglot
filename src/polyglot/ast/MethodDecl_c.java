@@ -4,6 +4,8 @@ import jltools.ast.*;
 import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
+import jltools.frontend.*;
+import jltools.frontend.Compiler;
 import java.util.*;
 
 /**
@@ -134,6 +136,18 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 
     /** Visit the children of the method. */
     public Node visitChildren(NodeVisitor v) {
+        MethodDecl_c n = visitNonBodyChildren(v);
+
+	Block body = null;
+
+	if (n.body != null) {
+	    body = (Block) n.body.visit(v);
+	}
+
+	return n.reconstruct(n.returnType, n.formals, n.exceptionTypes, body);
+    }
+
+    protected MethodDecl_c visitNonBodyChildren(NodeVisitor v) {
 	TypeNode returnType = (TypeNode) this.returnType.visit(v);
 
 	List formals = new ArrayList(this.formals.size());
@@ -150,36 +164,71 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	    exceptionTypes.add(n);
 	}
 
-	Block body = null;
+	return reconstruct(returnType, formals, exceptionTypes, this.body);
+    }
 
-	if (this.body != null) {
-	    body = (Block) this.body.visit(v);
-	}
+    public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
+        tb.pushScope();
+        return null;
+    }
 
-	return reconstruct(returnType, formals, exceptionTypes, body);
+    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+        tb.popScope();
+
+        TypeSystem ts = tb.typeSystem();
+
+        List l = new ArrayList(formals.size());
+        for (int i = 0; i < formals.size(); i++) {
+          l.add(ts.unknownType(position()));
+        }
+
+        List m = new ArrayList(exceptionTypes.size());
+        for (int i = 0; i < exceptionTypes.size(); i++) {
+          l.add(ts.unknownType(position()));
+        }
+
+        MethodInstance mi = ts.methodInstance(position(), ts.Object(),
+                                              Flags.NONE,
+                                              ts.unknownType(position()),
+                                              name, l, m);
+        return methodInstance(mi);
     }
 
     /** Build type objects for the method. */
-    public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
-	tb.pushScope();
+    public Node disambiguateOverride_(AmbiguityRemover ar) throws SemanticException {
+        if (ar.kind() == AmbiguityRemover.SUPER) {
+            return this;
+        }
 
-	MethodDecl_c n = (MethodDecl_c) visitChildren(tb);
+        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
+            MethodDecl_c n = visitNonBodyChildren(ar);
 
-	tb.popScope();
+            Context c = ar.context();
+            TypeSystem ts = ar.typeSystem();
 
-	ParsedClassType ct = tb.currentClass();
+            ParsedClassType ct = c.currentClass();
 
-	MethodInstance mi = n.makeMethodInstance(ct, tb.typeSystem());
-	ct.addMethod(mi);
+            MethodInstance mi = n.makeMethodInstance(ct, ts);
 
-	return n.flags(mi.flags()).methodInstance(mi);
+            return n.flags(mi.flags()).methodInstance(mi);
+        }
+
+        return null;
+    }
+
+    public Node addMembersOverride_(AddMemberVisitor tc) {
+        ParsedClassType ct = tc.context().currentClass();
+        ct.addMethod(mi);
+        return this;
     }
 
     public void enterScope(Context c) {
+        Types.report(5, "enter scope of method " + name);
         c.pushCode(mi);
     }
 
     public void leaveScope(Context c) {
+        Types.report(5, "leave scope of method " + name);
         c.popCode();
     }
 
@@ -221,14 +270,14 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	    Type t = (Type) i.next();
 
 	    boolean throwDeclared = false;
-	    
+
 	    if (! t.isUncheckedException()) {
 		for (Iterator j = exceptionTypes.iterator(); j.hasNext(); ) {
 		    TypeNode tn = (TypeNode) j.next();
 		    Type tj = tn.type();
 
 		    if (ts.isSame(t, tj) || ts.descendsFrom(t, tj)) {
-			throwDeclared = true; 
+			throwDeclared = true;
 			break;
 		    }
 		}
@@ -326,67 +375,11 @@ public class MethodDecl_c extends Node_c implements MethodDecl
         w.end();
     }
 
-    /** Reconstruct the type objects for the method. */
-    public Node reconstructTypes_(NodeFactory nf, TypeSystem ts, Context c)
-        throws SemanticException {
-
-	ParsedClassType ct = c.currentClass();
-
-	MethodInstance mi = this.mi; 
-
-	if (ct != mi.container()) {
-	    mi = mi.container(ct);
-	}
-
-	if (! flags.equals(mi.flags())) {
-	    mi = mi.flags(flags);
-	}
-
-	if (! returnType.type().equals(mi.returnType())) {
-	    mi = mi.returnType(returnType.type());
-	}
-
-	if (! name.equals(mi.name())) {
-	    mi = mi.name(name);
-	}
-
-	List l;
-
-	l = new LinkedList();
-
-	for (Iterator i = formals.iterator(); i.hasNext(); ) {
-	    Formal f = (Formal) i.next();
-	    l.add(f.declType());
-	}
-
-	if (! l.equals(mi.argumentTypes())) {
-	    mi = mi.argumentTypes(l);
-	}
-
-	l = new LinkedList();
-
-	for (Iterator i = exceptionTypes.iterator(); i.hasNext(); ) {
-	    TypeNode tn = (TypeNode) i.next();
-	    l.add(tn.type());
-	}
-
-	if (! l.equals(mi.exceptionTypes())) {
-	    mi = mi.exceptionTypes(l);
-	}
-
-	if (mi != this.mi) {
-	    ct.replaceMethod(this.mi, mi);
-	    return methodInstance(mi);
-	}
-
-	return this;
-    }
-
     protected MethodInstance makeMethodInstance(ClassType ct, TypeSystem ts)
 	throws SemanticException {
 
 	List argTypes = new LinkedList();
-	List excTypes = new LinkedList(); 
+	List excTypes = new LinkedList();
 
 	for (Iterator i = formals.iterator(); i.hasNext(); ) {
 	    Formal f = (Formal) i.next();

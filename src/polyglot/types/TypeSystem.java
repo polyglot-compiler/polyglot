@@ -221,6 +221,11 @@ public interface TypeSystem {
     ////
 
     /**
+     * Returns true iff <m1> throws fewer exceptions than <m2>
+     */
+    boolean throwsSubset(ProcedureInstance m1, ProcedureInstance m2);
+
+    /**
      * Returns true iff <m1> has the same arguments as <m2>
      */
     boolean hasSameArguments(ProcedureInstance m1, ProcedureInstance m2);

@@ -4,11 +4,13 @@ import jltools.ast.*;
 import jltools.types.*;
 import jltools.visit.*;
 import jltools.util.*;
+import jltools.frontend.*;
+import jltools.frontend.Compiler;
 import java.util.*;
 
 /**
  * A <code>ConstructorDecl</code> is an immutable representation of a
- * constructor declaration as part of a class body. 
+ * constructor declaration as part of a class body.
  */
 public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 {
@@ -120,6 +122,18 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 
     /** Visit the children of the constructor. */
     public Node visitChildren(NodeVisitor v) {
+        ConstructorDecl_c n = visitNonBodyChildren(v);
+
+	Block body = null;
+
+	if (n.body != null) {
+	    body = (Block) n.body.visit(v);
+	}
+
+	return n.reconstruct(n.formals, n.exceptionTypes, body);
+    }
+
+    protected ConstructorDecl_c visitNonBodyChildren(NodeVisitor v) {
 	List formals = new ArrayList(this.formals.size());
 	for (Iterator i = this.formals.iterator(); i.hasNext(); ) {
 	    Formal n = (Formal) i.next();
@@ -134,29 +148,59 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	    exceptionTypes.add(n);
 	}
 
-	Block body = null;
-
-	if (this.body != null) {
-	    body = (Block) this.body.visit(v);
-	}
-
-	return reconstruct(formals, exceptionTypes, body);
+	return reconstruct(formals, exceptionTypes, this.body);
     }
 
-    /** Build type objects for the constructor. */
     public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
-	tb.pushScope();
+        tb.pushScope();
+        return null;
+    }
 
-	ConstructorDecl_c n = (ConstructorDecl_c) visitChildren(tb);
+    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+        tb.popScope();
 
-	tb.popScope();
+        TypeSystem ts = tb.typeSystem();
 
-	ParsedClassType ct = tb.currentClass();
+        List l = new ArrayList(formals.size());
+        for (int i = 0; i < formals.size(); i++) {
+          l.add(ts.unknownType(position()));
+        }
 
-	ConstructorInstance ci = n.makeConstructorInstance(ct, tb.typeSystem());
-	ct.addConstructor(ci);
+        List m = new ArrayList(exceptionTypes.size());
+        for (int i = 0; i < exceptionTypes.size(); i++) {
+          l.add(ts.unknownType(position()));
+        }
 
-	return n.constructorInstance(ci);
+        ConstructorInstance ci = ts.constructorInstance(position(), ts.Object(),
+                                                        Flags.NONE, l, m);
+        return constructorInstance(ci);
+    }
+
+    public Node disambiguateOverride_(AmbiguityRemover ar) throws SemanticException {
+        if (ar.kind() == AmbiguityRemover.SUPER) {
+            return this;
+        }
+
+        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
+            ConstructorDecl_c n = visitNonBodyChildren(ar);
+
+            Context c = ar.context();
+            TypeSystem ts = ar.typeSystem();
+
+            ParsedClassType ct = c.currentClass();
+
+            ConstructorInstance ci = n.makeConstructorInstance(ct, ts);
+
+            return n.constructorInstance(ci);
+        }
+
+        return null;
+    }
+
+    public Node addMembersOverride_(AddMemberVisitor tc) {
+	ParsedClassType ct = tc.context().currentClass();
+        ct.addConstructor(ci);
+        return this;
     }
 
     public void enterScope(Context c) {
@@ -210,14 +254,14 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	    Type t = (Type) i.next();
 
 	    boolean throwDeclared = false;
-	    
+
 	    if (! t.isUncheckedException()) {
 		for (Iterator j = exceptionTypes.iterator(); j.hasNext(); ) {
 		    TypeNode tn = (TypeNode) j.next();
 		    Type tj = tn.type();
 
 		    if (ts.isSame(t, tj) || ts.descendsFrom(t, tj)) {
-			throwDeclared = true; 
+			throwDeclared = true;
 			break;
 		    }
 		}
@@ -305,59 +349,11 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	}
     }
 
-    /** Reconstruct the type objects for the constructor. */
-    public Node reconstructTypes_(NodeFactory nf, TypeSystem ts, Context c)
-        throws SemanticException {
-
-	ParsedClassType ct = c.currentClass();
-
-	ConstructorInstance ci = this.ci; 
-
-	if (ct != ci.container()) {
-	    ci = ci.container(ct);
-	}
-
-	if (! flags.equals(ci.flags())) {
-	    ci = ci.flags(flags);
-	}
-
-	List l;
-
-	l = new LinkedList();
-
-	for (Iterator i = formals.iterator(); i.hasNext(); ) {
-	    Formal f = (Formal) i.next();
-	    l.add(f.declType());
-	}
-
-	if (! l.equals(ci.argumentTypes())) {
-	    ci = ci.argumentTypes(l);
-	}
-
-	l = new LinkedList();
-
-	for (Iterator i = exceptionTypes.iterator(); i.hasNext(); ) {
-	    TypeNode tn = (TypeNode) i.next();
-	    l.add(tn.type());
-	}
-
-	if (! l.equals(ci.exceptionTypes())) {
-	    ci = ci.exceptionTypes(l);
-	}
-
-	if (ci != this.ci) {
-	    ct.replaceConstructor(this.ci, ci);
-	    return constructorInstance(ci);
-	}
-
-	return this;
-    }
-
     protected ConstructorInstance makeConstructorInstance(ClassType ct,
 	TypeSystem ts) throws SemanticException {
 
 	List argTypes = new LinkedList();
-	List excTypes = new LinkedList(); 
+	List excTypes = new LinkedList();
 
 	for (Iterator i = formals.iterator(); i.hasNext(); ) {
 	    Formal f = (Formal) i.next();

@@ -68,10 +68,12 @@ public class Field_c extends Expr_c implements Field
 
   /** Set the field instance of the field. */
   public Field fieldInstance(FieldInstance fi) {
+    /*
     if (! fi.type().isCanonical()) {
       throw new InternalCompilerError("Type of " + fi + " in " +
                                       fi.container() + " is not canonical.");
     }
+    */
 
     Field_c n = (Field_c) copy();
     n.fi = fi;
@@ -93,6 +95,16 @@ public class Field_c extends Expr_c implements Field
   public Node visitChildren(NodeVisitor v) {
     Receiver target = (Receiver) this.target.visit(v);
     return reconstruct(target);
+  }
+
+  public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+      Field_c n = (Field_c) super.buildTypes_(tb);
+
+      TypeSystem ts = tb.typeSystem();
+
+      FieldInstance fi = ts.fieldInstance(position(), ts.Object(), Flags.NONE,
+                                          ts.unknownType(position()), name);
+      return n.fieldInstance(fi);
   }
 
   /** Type check the field. */

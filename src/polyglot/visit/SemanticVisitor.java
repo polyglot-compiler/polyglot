@@ -13,16 +13,20 @@ import java.util.*;
 public abstract class SemanticVisitor extends BaseVisitor
 {
     protected Context context;
+    protected Context.Mark top;
     protected int depth;
-    protected int errorDepth;
+    protected BitSet errors;
 
     public SemanticVisitor(Job job) {
         super(job);
-	context = typeSystem().createContext(importTable());
+    }
 
-        // start at depth 1 do that depth > errorDepth
-        depth = 1;
-        errorDepth = 0;
+    public boolean begin() {
+	context = job.context();
+        top = context.mark();
+        depth = 0;
+        errors = new BitSet();
+        return true;
     }
 
     public Context context() {
@@ -51,6 +55,10 @@ public abstract class SemanticVisitor extends BaseVisitor
 	n.leaveScope(context);
     }
 
+    public void finish() {
+        context.assertMark(top);
+    }
+
     /** Return true if we should catch errors thrown when visiting the node. */
     protected boolean catchErrors(Node n) {
 	return n instanceof Stmt
@@ -62,7 +70,10 @@ public abstract class SemanticVisitor extends BaseVisitor
     public Node override(Node n) {
 	Context.Mark mark = context.mark();
 
+        Types.report(5, "enter override(" + n + "): " + depth + "->" + (depth+1));
+
         int oldDepth = depth++;
+        errors.clear(depth);
 
         try {
             Node m = overrideCall(n);
@@ -71,26 +82,14 @@ public abstract class SemanticVisitor extends BaseVisitor
 	    // visited this node.
 	    context.assertMark(mark);
 
-            if (errorDepth >= depth) {
-                if (! catchErrors(n)) {
-                    errorDepth = oldDepth;
-                }
-                else {
-                    errorDepth = 0;
-                }
-
-                m = n;
+            Types.report(5, "leave override(" + n + "): " + depth + "->" + oldDepth);
+            if (m != null) {
+                Types.report(5, "leave override(" + n + "): traversal stopped");
             }
 
             depth = oldDepth;
-
-            if (m == null) {
-                return m;
-            }
-
-            return m.ext().reconstructTypes(nodeFactory(),
-                                            typeSystem(), context);
-	}
+            return m;
+        }
 	catch (SemanticException e) {
 	    Position position = e.position();
 
@@ -101,14 +100,14 @@ public abstract class SemanticVisitor extends BaseVisitor
 	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
 		                 e.getMessage(), position);
 
-            context.popToMark(mark);
+	    context.popToMark(mark);
 
-            if (! catchErrors(n)) {
-                errorDepth = oldDepth;
-            }
-            else {
-                errorDepth = 0;
-            }
+            Types.report(5, "override(" + n + "): error at " + depth);
+
+            errors.set(depth);
+
+            Types.report(5, "leave override(" + n + "): " + depth + "->" + oldDepth);
+            Types.report(5, "leave override(" + n + "): traversal stopped");
 
             depth = oldDepth;
 
@@ -117,37 +116,44 @@ public abstract class SemanticVisitor extends BaseVisitor
     }
 
     public NodeVisitor enter(Node n) {
+        Types.report(5, "enter(" + n + "): " + depth + "->" + (depth+1));
         depth++;
+        errors.clear(depth);
 	enterScope(n);
         return this;
     }
 
     public Node leave(Node old, Node n, NodeVisitor v) {
-        int oldDepth = depth - 1;
-
-	try {
+        try {
             Node m;
 
-            if (errorDepth >= depth) {
+            if (errors.get(depth)) {
+                Types.report(5, "leave(" + n + "): error below at " + (depth+1));
+
+                // There was an error below us.
                 if (! catchErrors(n)) {
-                    errorDepth = oldDepth;
+                    // Propagate error up one level
+                    errors.set(depth-1);
+                    Types.report(5, "leave(" + n + "): error propagated to depth " + depth);
                 }
                 else {
-                    errorDepth = 0;
+                    Types.report(5, "leave(" + n + "): error not propagated");
                 }
+
+                errors.clear(depth);
 
                 m = n;
             }
             else {
+                Types.report(5, "leave(" + n + "): calling leaveCall");
                 m = leaveCall(old, n, v);
             }
 
-	    leaveScope(m);
-
-            depth = oldDepth;
-
-            return m.ext().reconstructTypes(nodeFactory(),
-                                            typeSystem(), context);
+            // don't visit the node
+            Types.report(5, "leave(" + m + "): " + depth + "->" + (depth-1));
+            leaveScope(m);
+            depth--;
+            return m;
 	}
 	catch (SemanticException e) {
 	    Position position = e.position();
@@ -159,18 +165,19 @@ public abstract class SemanticVisitor extends BaseVisitor
 	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
 		                 e.getMessage(), position);
 
-            leaveScope(n);
+            Types.report(5, "leave(" + n + "): error at " + depth);
 
+            // There was an error below us.
             if (! catchErrors(n)) {
-                errorDepth = oldDepth;
-            }
-            else {
-                errorDepth = 0;
+                // Propagate error up one level
+                errors.set(depth-1);
             }
 
-            depth = oldDepth;
-
+            // don't visit the node
+            Types.report(5, "leave(" + n + "): " + depth + "->" + (depth-1));
+            leaveScope(n);
+            depth--;
             return n;
-	}
+        }
     }
 }

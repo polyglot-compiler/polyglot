@@ -41,12 +41,12 @@ public class Ext_c implements Ext {
 	return n.buildTypes_(tb);
     }
 
-    public Node disambiguateTypesOverride(TypeAmbiguityRemover sc) throws SemanticException {
-	return n.disambiguateTypesOverride_(sc);
+    public Node addMembersOverride(AddMemberVisitor tc) throws SemanticException {
+	return n.addMembersOverride_(tc);
     }
 
-    public Node disambiguateTypes(TypeAmbiguityRemover sc) throws SemanticException {
-	return n.disambiguateTypes_(sc);
+    public Node addMembers(AddMemberVisitor tc) throws SemanticException {
+	return n.addMembers_(tc);
     }
 
     public Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException {
@@ -83,11 +83,6 @@ public class Ext_c implements Ext {
 
     public void translate(CodeWriter w, Translator tr) {
 	n.translate_(w, tr);
-    }
-
-    public Node reconstructTypes(NodeFactory nf, TypeSystem ts, Context c)
-	    throws SemanticException {
-	return n.reconstructTypes_(nf, ts, c);
     }
 
     public String toString() {

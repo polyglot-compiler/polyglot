@@ -51,6 +51,10 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
     return this;
   }
 
+  public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+    return type(tb.typeSystem().unknownType(position()));
+  }
+
   public Node visitChildren(NodeVisitor v) {
     QualifierNode qual = null;
 
@@ -61,14 +65,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
     return reconstruct(qual);
   }
 
-  public Node buildTypes_(TypeBuilder tb) throws SemanticException {
-    TypeSystem ts = tb.typeSystem();
-    return type(ts.unknownType(position()));
-  }
-
-  public Node disambiguateTypes_(TypeAmbiguityRemover sc)
-    throws SemanticException {
-
+  public Node disambiguate_(AmbiguityRemover sc) throws SemanticException {
     Node n = sc.nodeFactory().disamb().disambiguate(sc, position(), qual,
                                                     name);
 
@@ -77,12 +74,6 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
     }
     throw new SemanticException("Could not find type \"" + name +
                                 "\".", position());
-  }
-
-  public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
-    throw new InternalCompilerError(position(),
-                                    "Cannot disambiguate ambiguous node "
-                                    + this + ".");
   }
 
   public Node typeCheck_(TypeChecker tc) throws SemanticException {

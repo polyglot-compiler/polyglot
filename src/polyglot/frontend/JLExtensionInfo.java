@@ -15,21 +15,21 @@ import jltools.frontend.Compiler;
 import java.io.*;
 import java.util.*;
 
-/** 
- * This is the default <code>ExtensionInfo</code> for the Java language. 
- * 
+/**
+ * This is the default <code>ExtensionInfo</code> for the Java language.
+ *
  * Compilation passes and visitors:
  * <ol>
  * <li> parse </li>
  * <li> build types (TypeBuilder) </li>
- * <li> disambiguate types (TypeAmbiguityRemover) </li>
- * <li> disambiguate (AmbiguityRemover) </li>
- * <li> constant folding (ConstantFolder)
+ * <li> disambiguate1 (AmbiguityRemover) </li>
+ * <li> disambiguate2 (AmbiguityRemover) </li>
  * <hr>
  * <center>BARRIER</center>
  * <hr>
  * <li> type checking (TypeChecker) </li>
  * <li> exception checking (ExceptionChecker)
+ * <li> constant folding (ConstantFolder)
  * <hr>
  * <center>BARRIER</center>
  * <hr>
@@ -102,8 +102,16 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	return new SourceLoader(options.source_path, sx);
     }
 
-    public Job createJob(Source s) {
-      return new JLJob(s, compiler);
+    public JobExt jobExt() {
+      return null;
+    }
+
+    public SourceJob createJob(Job parent, Source source) {
+	return new SourceJob(compiler, jobExt(), parent, source);
+    }
+
+    public Job createJob(Node ast, Context context, Job outer, Pass.ID begin, Pass.ID end) {
+	return new InnerJob(compiler, jobExt(), ast, context, outer, begin, end);
     }
 
     public TargetFactory targetFactory() {
@@ -131,203 +139,148 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	return nf;
     }
 
-    public Parser parser(Reader reader, Job job) {
+    public Parser parser(Reader reader, Source source, ErrorQueue eq) {
 	jltools.ext.jl.parse.Lexer lexer;
 	java_cup.runtime.lr_parser grm;
 
-	ErrorQueue eq = job.compiler().errorQueue();
-
-	lexer = new jltools.ext.jl.parse.Lexer(reader, job.source().name(), eq);
+	lexer = new jltools.ext.jl.parse.Lexer(reader, source.name(), eq);
 	grm = new jltools.ext.jl.parse.Grm(lexer, ts, nf, eq);
 
-	return new CupParser(grm, job);
+	return new CupParser(grm, source, eq);
     }
 
-    /** An implementation of the Job class.   We make it an inner class to avoid creating a ext/jl/frontend directory. */
-    protected static class JLJob extends Job {
-	protected JLJob(Source s, Compiler c) {
-	    super(s, c);
-	}
+    public void replacePass(List passes, Pass.ID id, List newPasses) {
+        for (ListIterator i = passes.listIterator(); i.hasNext(); ) {
+          Pass p = (Pass) i.next();
 
-	/** The parse pass. */
-	protected Pass parse;
-
-	/** The parse pass. */
-	public Pass parsePass() {
-	    if (parse == null) {
-		parse = new ParserPass(this, compiler().extensionInfo());
-	    }
-
-	    return parse;
-	}
-
-	/** The build pass. */
-	protected Pass build;
-
-	/** The build pass. */
-	public Pass buildPass() {
-	    if (build == null) {
-		build = new VisitorPass(this, new TypeBuilder(this));
-		build.runAfter(parsePass());
-	    }
-
-	    return build;
-	}
-
-	/** The disambiguate types pass. */
-	protected Pass disambTypes;
-
-	/** The disambiguate types pass. */
-	public Pass disambTypesPass() {
-	    if (disambTypes == null) {
-		disambTypes = new VisitorPass(this, new TypeAmbiguityRemover(this));
-		disambTypes.runAfter(buildPass());
-	    }
-
-	    return disambTypes;
-	}
-
-	/** The disambiguate pass. */
-	protected Pass disamb;
-
-	/** The disambiguate pass. */
-	public Pass disambPass() {
-	    if (disamb == null) {
-		disamb = new VisitorPass(this, new AmbiguityRemover(this));
-		disamb.runAfter(disambTypesPass());
-	    }
-
-	    return disamb;
-	}
-
-	/** The constant fold pass. */
-	protected Pass fold;
-
-	/** The constant fold pass. */
-	public Pass foldPass() {
-	    if (fold == null) {
-		fold = new VisitorPass(this, new ConstantFolder(this));
-		fold.runAfter(disambPass());
-	    }
-
-	    return fold;
-	}
-
-	/** A barrier pass that runs before type checking. */
-	protected Pass beforeCheck;
-
-	/** A barrier pass that runs before type checking. */
-	public Pass beforeCheckPass() {
-	    if (beforeCheck == null) {
-		beforeCheck = new BarrierPass(compiler()) {
-		    public Pass pass(Job job) {
-			return ((JLJob) job).foldPass();
-		    }
-		};
-	    }
-
-	    return beforeCheck;
-	}
-
-	/** The type check pass. */
-	protected Pass typeCheck;
-
-	/** The type check pass. */
-	public Pass checkPass() {
-	    if (typeCheck == null) {
-		typeCheck = new VisitorPass(this, new TypeChecker(this));
-		typeCheck.runAfter(beforeCheckPass());
-	    }
-
-	    return typeCheck;
-	}
-
-	/** The exception check pass. */
-	protected Pass excCheck;
-
-	/** The exception check pass. */
-	public Pass excCheckPass() {
-	    if (excCheck == null) {
-		excCheck = new VisitorPass(this, new ExceptionChecker(
-			    compiler().typeSystem(), compiler().errorQueue()));
-		excCheck.runAfter(checkPass());
-	    }
-
-	    return excCheck;
-	}
-
-	/** A barrier pass that runs before translation. */
-	protected Pass beforeTranslate;
-
-	/** A barrier pass that runs before translation. */
-	public Pass beforeTranslatePass() {
-	    if (beforeTranslate == null) {
-		beforeTranslate = new BarrierPass(compiler()) {
-		    public Pass pass(Job job) {
-			return ((JLJob) job).excCheckPass();
-		    }
-		};
-	    }
-
-	    return beforeTranslate;
-	}
-
-    /** The AST dump pass. */
-    protected Pass dump;
-
-    /** The AST dump pass. */
-    public Pass dumpPass() {
-		if (dump == null) {
- 			if (compiler().dumpAst()) {
- 				dump = new VisitorPass(this,
-	                       new DumpAst(new CodeWriter(System.err, 78)));
-				dump.runAfter(beforeTranslatePass());
-	        } else {
-                dump = beforeTranslatePass();
+          if (p.id() == id) {
+            if (p instanceof BarrierPass) {
+              throw new InternalCompilerError("Cannot replace a barrier pass.");
             }
+
+            i.remove();
+
+            for (Iterator j = newPasses.iterator(); j.hasNext(); ) {
+              i.add(j.next());
+            }
+
+            return;
+          }
         }
 
-        return dump;
+        throw new InternalCompilerError("Pass " + id + " not found.");
     }
 
-	/** The class serialization pass. */
-	protected Pass serialize;
+    public void beforePass(List passes, Pass.ID id, List newPasses) {
+        for (ListIterator i = passes.listIterator(); i.hasNext(); ) {
+          Pass p = (Pass) i.next();
 
-	/** The class serialization pass. */
-	public Pass serializePass() {
-	    if (serialize == null) {
-		Source source = source();
-		Compiler compiler = compiler();
+          if (p.id() == id) {
+            // Backup one position.
+            i.previous();
 
-		TypeSystem ts = compiler.typeSystem();
-		NodeFactory nf = compiler.nodeFactory();
-		ErrorQueue eq = compiler.errorQueue();
+            for (Iterator j = newPasses.iterator(); j.hasNext(); ) {
+              i.add(j.next());
+            }
 
-		if (compiler.serializeClassInfo()) {
-		    serialize = new VisitorPass(this,
-			new ClassSerializer(ts, nf, source.lastModified(), eq));
-		    serialize.runAfter(dumpPass());
-		}
-		else {
-		    serialize = dumpPass();
-		}
-	    }
+            return;
+          }
+        }
 
-	    return serialize;
+        throw new InternalCompilerError("Pass " + id + " not found.");
+    }
+
+    public void afterPass(List passes, Pass.ID id, List newPasses) {
+        for (ListIterator i = passes.listIterator(); i.hasNext(); ) {
+          Pass p = (Pass) i.next();
+
+          if (p.id() == id) {
+            for (Iterator j = newPasses.iterator(); j.hasNext(); ) {
+              i.add(j.next());
+            }
+
+            return;
+          }
+        }
+
+        throw new InternalCompilerError("Pass " + id + " not found.");
+    }
+
+    public void replacePass(List passes, Pass.ID id, Pass pass) {
+        replacePass(passes, id, Collections.singletonList(pass));
+    }
+
+    public void beforePass(List passes, Pass.ID id, Pass pass) {
+        beforePass(passes, id, Collections.singletonList(pass));
+    }
+
+    public void afterPass(List passes, Pass.ID id, Pass pass) {
+        afterPass(passes, id, Collections.singletonList(pass));
+    }
+
+    public void removePass(List passes, Pass.ID id) {
+        replacePass(passes, id, new EmptyPass(id));
+    }
+
+    public List transformPasses(Job job) {
+        ArrayList l = new ArrayList(15);
+
+        l.add(new VisitorPass(Pass.BUILD_TYPES, job, new TypeBuilder(job)));
+	l.add(new BarrierPass(Pass.BUILD_TYPES_ALL, job));
+	l.add(new VisitorPass(Pass.CLEAN_SUPER, job,
+                              new AmbiguityRemover(job, AmbiguityRemover.SUPER)));
+	l.add(new BarrierPass(Pass.CLEAN_SUPER_ALL, job));
+	l.add(new VisitorPass(Pass.CLEAN_SIGS, job,
+                              new AmbiguityRemover(job, AmbiguityRemover.SIGNATURES)));
+	l.add(new VisitorPass(Pass.ADD_MEMBERS, job, new AddMemberVisitor(job)));
+	l.add(new BarrierPass(Pass.ADD_MEMBERS_ALL, job));
+	l.add(new VisitorPass(Pass.DISAM, job, new
+                              AmbiguityRemover(job, AmbiguityRemover.ALL)));
+	l.add(new VisitorPass(Pass.FOLD, job, new ConstantFolder(job)));
+	l.add(new BarrierPass(Pass.DISAM_ALL, job));
+        l.add(new VisitorPass(Pass.TYPE_CHECK, job, new TypeChecker(job)));
+	l.add(new VisitorPass(Pass.EXC_CHECK, job, new ExceptionChecker(ts, compiler.errorQueue())));
+	l.add(new BarrierPass(Pass.PRE_OUTPUT_ALL, job));
+
+	if (compiler.dumpAst()) {
+	    l.add(new VisitorPass(Pass.DUMP, job,
+				  new DumpAst(new CodeWriter(System.err, 78))));
 	}
 
-	/** The translation pass. */
-	protected Pass translate;
+        return l;
+    }
 
-	/** The translation pass. */
-	public Pass translatePass() {
-	    if (translate == null) {
-		translate = new Translator(this);
-		translate.runAfter(serializePass());
-	    }
+    public List transformPasses(Job job, Pass.ID begin, Pass.ID end) {
+        List l = transformPasses(job);
+        boolean in = false;
 
-	    return translate;
+        for (Iterator i = l.iterator(); i.hasNext(); ) {
+            Pass p = (Pass) i.next();
+            in = in || begin == p.id();
+            if (! (p instanceof BarrierPass) && ! in) i.remove();
+            in = in && end != p.id();
+        }
+
+        return l;
+    }
+
+    public List passes(SourceJob job) {
+      	List l = new ArrayList();
+
+	l.add(new ParserPass(Pass.PARSE, compiler, job));
+
+	l.addAll(transformPasses(job));
+
+	if (compiler.serializeClassInfo()) {
+	    l.add(new VisitorPass(Pass.SERIALIZE,
+				  job, new ClassSerializer(ts, nf,
+							   job.source().lastModified(),
+							   compiler.errorQueue())));
 	}
+
+	l.add(new Translator(Pass.OUTPUT, compiler, job));
+
+	return l;
     }
 
     static { Report.topics.add("jl"); }

@@ -17,8 +17,8 @@ SOURCES = \
 	FlowChecker.java \
 	NodeScrambler.java \
 	SemanticVisitor.java \
-	TypeAmbiguityRemover.java \
 	TypeBuilder.java \
+	AddMemberVisitor.java \
 	Translator.java \
 	TypeChecker.java
 

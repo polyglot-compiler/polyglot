@@ -111,6 +111,24 @@ public class Call_c extends Expr_c implements Call
     return reconstruct(target, arguments);
   }
 
+  public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+    Call_c n = (Call_c) super.buildTypes_(tb);
+
+    TypeSystem ts = tb.typeSystem();
+
+    List l = new ArrayList(arguments.size());
+    for (int i = 0; i < arguments.size(); i++) {
+      l.add(ts.unknownType(position()));
+    }
+
+    MethodInstance mi = ts.methodInstance(position(), ts.Object(),
+                                          Flags.NONE,
+                                          ts.unknownType(position()),
+                                          name, l,
+                                          Collections.EMPTY_LIST);
+    return n.methodInstance(mi);
+  }
+
   /** Type check the call. */
   public Node typeCheck_(TypeChecker tc) throws SemanticException {
     TypeSystem ts = tc.typeSystem();

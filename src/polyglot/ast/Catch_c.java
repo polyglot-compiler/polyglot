@@ -70,11 +70,11 @@ public class Catch_c extends Stmt_c implements Catch
     }
 
     public void enterScope(Context c) {
-      c.pushBlock();
+        c.pushBlock();
     }
 
     public void leaveScope(Context c) {
-      c.popBlock();
+        c.popBlock();
     }
 
     /** Type check the catch block. */

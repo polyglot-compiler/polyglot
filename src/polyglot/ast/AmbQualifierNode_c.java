@@ -73,13 +73,10 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
     }
 
     public Node buildTypes_(TypeBuilder tb) throws SemanticException {
-	TypeSystem ts = tb.typeSystem();
-	return qualifier(ts.unknownQualifier(position()));
+        return qualifier(tb.typeSystem().unknownQualifier(position()));
     }
 
-    public Node disambiguateTypes_(TypeAmbiguityRemover sc)
-	throws SemanticException {
-
+    public Node disambiguate_(AmbiguityRemover sc) throws SemanticException {
 	Node n = sc.nodeFactory().disamb().disambiguate(sc, position(), qual, name);
 
 	if (n instanceof QualifierNode) {

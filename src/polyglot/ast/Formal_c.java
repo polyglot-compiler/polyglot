@@ -92,8 +92,13 @@ public class Formal_c extends Node_c implements Formal
 	return reconstruct(type);
     }
 
+    public void enterScope(Context c) {
+    }
+
     public void leaveScope(Context c) {
-	c.addVariable(li);
+        if (li != null) {
+            c.addVariable(li);
+        }
     }
 
     /** Write the formal to an output file. */
@@ -103,10 +108,25 @@ public class Formal_c extends Node_c implements Formal
 
     /** Build type objects for the formal. */
     public Node buildTypes_(TypeBuilder tb) throws SemanticException {
-	TypeSystem ts = tb.typeSystem();
-	LocalInstance li = ts.localInstance(position(), flags(),
-		                            declType(), name());
-	return localInstance(li);
+        Formal_c n = (Formal_c) super.buildTypes_(tb);
+
+        TypeSystem ts = tb.typeSystem();
+
+        LocalInstance li = ts.localInstance(position(), Flags.NONE,
+                                            ts.unknownType(position()), name());
+
+        return n.localInstance(li);
+    }
+
+    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+        if (! li.type().isCanonical()) {
+            TypeSystem ts = ar.typeSystem();
+            LocalInstance li = ts.localInstance(position(), flags(),
+                                                declType(), name());
+            return localInstance(li);
+        }
+
+        return this;
     }
 
     /** Type check the formal. */
@@ -138,25 +158,5 @@ public class Formal_c extends Node_c implements Formal
 
     public String toString() {
 	return decl.toString();
-    }
-
-    public Node reconstructTypes_(NodeFactory nf, TypeSystem ts, Context c)
-        throws SemanticException {
-
-	Flags flags = flags();
-        Type type = declType();
-        String name = name();
-
-	LocalInstance li = this.li;
-
-	if (! flags.equals(li.flags())) li = li.flags(flags);
-	if (! type.equals(li.type())) li = li.type(type);
-	if (! name.equals(li.name())) li = li.name(name);
-        
-	if (li != this.li) {
-	    return localInstance(li);
-	}
-
-	return this;
     }
 }

@@ -135,31 +135,11 @@ public abstract class Node_c implements Node
 	/** Adjust the environment for leaving the current scope. */
 	public void leaveScope(Context c) { }
 
-	/**
-	 * This method can be called after a node is visited to ensure its
-	 * type information is reconstructed.
-	 */
-	public Node reconstructTypes_(NodeFactory nf, TypeSystem ts, Context c)
-		throws SemanticException {
-		return this;
-	}
-
 	public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
 		return null;
 	}
 
 	public Node buildTypes_(TypeBuilder tb) throws SemanticException {
-		return this;
-	}
-
-	/**
-	 * Clean type signatures.
-	 */
-	public Node disambiguateTypesOverride_(TypeAmbiguityRemover sc) throws SemanticException {
-		return null;
-	}
-
-	public Node disambiguateTypes_(TypeAmbiguityRemover sc) throws SemanticException {
 		return this;
 	}
 
@@ -169,6 +149,15 @@ public abstract class Node_c implements Node
 	}
 
 	public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+		return this;
+	}
+
+	/** Add members to a class. */
+	public Node addMembersOverride_(AddMemberVisitor am) throws SemanticException {
+		return null;
+	}
+
+	public Node addMembers_(AddMemberVisitor am) throws SemanticException {
 		return this;
 	}
 
@@ -267,19 +256,19 @@ public abstract class Node_c implements Node
 		throw new InternalCompilerError("Use a ext.");
 	}
 
-	public final void disambiguateTypesOverride(TypeAmbiguityRemover sc) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
-	public final void disambiguateTypes(TypeAmbiguityRemover sc) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
 	public final void disambiguateOverride(AmbiguityRemover ar) {
 		throw new InternalCompilerError("Use a ext.");
 	}
 
 	public final void disambiguate(AmbiguityRemover ar) {
+		throw new InternalCompilerError("Use a ext.");
+	}
+
+	public final void addMembersOverride(AddMemberVisitor am) {
+		throw new InternalCompilerError("Use a ext.");
+	}
+
+	public final void addMembers(AddMemberVisitor am) {
 		throw new InternalCompilerError("Use a ext.");
 	}
 
@@ -308,10 +297,6 @@ public abstract class Node_c implements Node
 	}
 
 	public final void translate(CodeWriter w, Translator tr) {
-		throw new InternalCompilerError("Use a ext.");
-	}
-
-	public final void reconstructTypes(NodeFactory nf, TypeSystem ts, Context c) {
 		throw new InternalCompilerError("Use a ext.");
 	}
 }

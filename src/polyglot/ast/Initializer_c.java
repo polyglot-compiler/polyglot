@@ -4,6 +4,8 @@ import jltools.ast.*;
 import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
+import jltools.frontend.*;
+import jltools.frontend.Compiler;
 import java.util.*;
 
 /**
@@ -11,7 +13,7 @@ import java.util.*;
  * initializer block in a Java class (which appears outside of any
  * method).  Such a block is executed before the code for any of the
  * constructors.  Such a block can optionally be static, in which case
- * it is executed when the class is loaded.  
+ * it is executed when the class is loaded.
  */
 public class Initializer_c extends Node_c implements Initializer
 {
@@ -86,22 +88,18 @@ public class Initializer_c extends Node_c implements Initializer
 	c.popCode();
     }
 
-    /** Build type objects for the initializer. */
-    public Node buildTypesOverride_(TypeBuilder tb) {
+    public Node buildTypesOverride_(TypeBuilder tb) throws SemanticException {
         tb.pushScope();
+        return null;
+    }
 
-	Initializer_c n = (Initializer_c) visitChildren(tb);
-
-	tb.popScope();
-
-	TypeSystem ts = tb.typeSystem();
-
-	ClassType ct = tb.currentClass();
-
-        InitializerInstance ii = ts.initializerInstance(position(),
-	                                                ct, n.flags);
-
-	return n.initializerInstance(ii);
+    /** Build type objects for the method. */
+    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+        tb.popScope();
+        TypeSystem ts = tb.typeSystem();
+        ClassType ct = tb.currentClass();
+        InitializerInstance ii = ts.initializerInstance(position(), ct, flags);
+        return initializerInstance(ii);
     }
 
     /** Type check the initializer. */
@@ -162,20 +160,5 @@ public class Initializer_c extends Node_c implements Initializer
 
     public String toString() {
 	return flags.translate() + "{ ... }";
-    }
-
-    /** Reconstruct the type objects for the initializer. */
-    public Node reconstructTypes_(NodeFactory nf, TypeSystem ts, Context c)
-        throws SemanticException {
-
-	ClassType ct = c.currentClass();
-
-	if (ct != ii.container() || ! flags.equals(ii.flags())) {
-	    InitializerInstance ii = ts.initializerInstance(position(),
-							    ct, flags);
-	    return initializerInstance(ii);
-	}
-
-	return this;
     }
 }

@@ -13,12 +13,48 @@ import java.util.*;
 public class TypeBuilder extends BaseVisitor
 {
     protected Stack stack;
-    protected Package currentPackage;
+    protected Context context;
 
     public TypeBuilder(Job job) {
 	super(job);
 	stack = new Stack();
-	currentPackage = null;
+    }
+
+    public boolean begin() {
+        // Initialize the stack from the context.
+        context = job.context();
+
+        Stack s = new Stack();
+
+        for (ParsedClassType ct = context.currentClass(); ct != null; ) {
+            s.push(ct);
+
+            if (ct.isInner()) {
+                ct = (ParsedClassType) ct.toInner().outer();
+            }
+            else {
+                ct = null;
+            }
+        }
+
+        while (! s.isEmpty()) {
+            ParsedClassType ct = (ParsedClassType) s.pop();
+
+            try {
+                pushClass(ct);
+            }
+            catch (SemanticException e) {
+                errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
+                                     e.getMessage(), ct.position());
+                return false;
+            }
+
+            if (ct.isLocal() || ct.isAnonymous()) {
+                pushScope();
+            }
+        }
+
+        return true;
     }
 
     public Node override(Node n) {
@@ -60,6 +96,7 @@ public class TypeBuilder extends BaseVisitor
     Object inCode = new Object();
 
     public void pushScope() {
+        Types.report(4, "TB pushing code");
         stack.push(inCode);
     }
 
@@ -72,10 +109,14 @@ public class TypeBuilder extends BaseVisitor
 	    throw new InternalCompilerError("No method to pop.");
 	}
 
+        Types.report(4, "TB popping code");
+
         stack.pop();
     }
 
     public void pushClass(ParsedClassType type) throws SemanticException {
+        Types.report(4, "TB pushing class " + type);
+
         stack.push(type);
 
 	// Make sure the import table finds this class.
@@ -93,6 +134,8 @@ public class TypeBuilder extends BaseVisitor
 	    throw new InternalCompilerError("No class to pop.");
 	}
 
+        Types.report(4, "TB popping " + stack.peek());
+
         stack.pop();
     }
 
@@ -106,8 +149,8 @@ public class TypeBuilder extends BaseVisitor
 	    ct.name(name);
 	    ct.position(pos);
 
-	    if (currentPackage != null) {
-	      	ct.package_(currentPackage);
+	    if (currentPackage() != null) {
+	      	ct.package_(currentPackage());
 	    }
 
 	    return ct;
@@ -121,8 +164,8 @@ public class TypeBuilder extends BaseVisitor
 
 	    currentClass().addMemberClass(ct);
 
-	    if (currentPackage != null) {
-	      	ct.package_(currentPackage);
+	    if (currentPackage() != null) {
+	      	ct.package_(currentPackage());
 	    }
 
 	    return ct;
@@ -133,14 +176,37 @@ public class TypeBuilder extends BaseVisitor
 	    ct.name(name);
 	    ct.position(pos);
 
-	    if (currentPackage != null) {
-	      	ct.package_(currentPackage);
+	    if (currentPackage() != null) {
+	      	ct.package_(currentPackage());
 	    }
 
 	    job.compiler().parsedResolver().addType(ct.fullName(), ct);
 
 	    return ct;
 	}
+    }
+
+    public ParsedAnonClassType pushAnonClass(Position pos)
+        throws SemanticException {
+
+        if (! isLocal()) {
+            throw new InternalCompilerError(
+                "Cannot push anonymous class outside method scope.");
+        }
+
+	TypeSystem ts = typeSystem();
+
+        ParsedAnonClassType ct = ts.anonClassType(job);
+        ct.outer(currentClass());
+        ct.position(pos);
+
+        if (currentPackage() != null) {
+            ct.package_(currentPackage());
+        }
+
+        pushClass(ct);
+
+        return ct;
     }
 
     public ParsedClassType pushClass(Position pos, Flags flags, String name)
@@ -175,12 +241,10 @@ public class TypeBuilder extends BaseVisitor
     }
 
     public Package currentPackage() {
-	return currentPackage;
+	return importTable().package_();
     }
 
     public void setPackage(Package p) throws SemanticException {
-	this.currentPackage = p;
-
 	// The order of setPackage and addDefaultImports is important.
 
 	if (p != null) {

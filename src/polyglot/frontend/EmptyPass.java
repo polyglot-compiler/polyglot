@@ -5,15 +5,11 @@ package jltools.frontend;
  */
 public class EmptyPass extends AbstractPass
 {
-    public EmptyPass() {
-	super();
+    public EmptyPass(Pass.ID id) {
+      	super(id);
     }
 
     public boolean run() {
 	return true;
-    }
-
-    public String toString() {
-        return "Empty";
     }
 }

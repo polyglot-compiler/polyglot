@@ -33,22 +33,6 @@ public abstract class Expr_c extends Node_c implements Expr
 	return n;
     }
 
-    /** Build type objects for the expression. */
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
-	return type(tb.typeSystem().unknownType(position()));
-    }
-
-    /** Reconstruct the type objects for the expression. */
-    public Node reconstructTypes_(NodeFactory nf, TypeSystem ts, Context c) 
-	throws SemanticException {
-
-	if (type == null) {
-	    return type(ts.unknownType(position()));
-	}
-
-	return this;
-    }
-
     public void dump(CodeWriter w) {
         super.dump(w);
 
@@ -63,6 +47,10 @@ public abstract class Expr_c extends Node_c implements Expr
     /** Get the precedence of the expression. */
     public Precedence precedence() {
 	return Precedence.UNKNOWN;
+    }
+
+    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+        return type(tb.typeSystem().unknownType(position()));
     }
 
     /**

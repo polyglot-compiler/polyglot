@@ -10,7 +10,7 @@ import jltools.main.Main;
 import java.io.IOException;
 
 /**
- * A <code>TypeNode</code> represents the syntactic representation of a 
+ * A <code>TypeNode</code> represents the syntactic representation of a
  * <code>Type</code> within the abstract syntax tree.
  */
 public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
@@ -52,13 +52,13 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
         return type(ts.arrayOf(position(), base.type()));
     }
 
-    public Node disambiguateTypes_(TypeAmbiguityRemover sc) throws SemanticException {
-	TypeSystem ts = sc.typeSystem();
-	NodeFactory nf = sc.nodeFactory();
+    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+	TypeSystem ts = ar.typeSystem();
+	NodeFactory nf = ar.nodeFactory();
 
         Type baseType = base.type();
 
-        if (! baseType.isCanonical()) { 
+        if (! baseType.isCanonical()) {
 	    throw new SemanticException(
 		"Base type " + baseType + " of array could not be resolved.",
 		base.position());
@@ -68,20 +68,15 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
 		                    ts.arrayOf(position(), baseType));
     }
 
-    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
-	throw new InternalCompilerError(position(),
-	    "Cannot disambiguate ambiguous node " + this + ".");
-    }
-
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	throw new InternalCompilerError(position(),
 	    "Cannot type check ambiguous node " + this + ".");
-    } 
+    }
 
     public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
 	throw new InternalCompilerError(position(),
 	    "Cannot exception check ambiguous node " + this + ".");
-    } 
+    }
 
     public void translate_(CodeWriter w, Translator tr) {
 	throw new InternalCompilerError(position(),

@@ -3,9 +3,9 @@ package jltools.ast;
 import jltools.util.CodeWriter;
 import jltools.util.Copy;
 import jltools.visit.TypeBuilder;
-import jltools.visit.TypeAmbiguityRemover;
 import jltools.visit.AmbiguityRemover;
 import jltools.visit.ConstantFolder;
+import jltools.visit.AddMemberVisitor;
 import jltools.visit.TypeChecker;
 import jltools.visit.ExceptionChecker;
 import jltools.visit.Translator;
@@ -25,8 +25,8 @@ public interface Ext extends Copy
     Node buildTypesOverride(TypeBuilder tb) throws SemanticException;
     Node buildTypes(TypeBuilder tb) throws SemanticException;
 
-    Node disambiguateTypesOverride(TypeAmbiguityRemover sc) throws SemanticException;
-    Node disambiguateTypes(TypeAmbiguityRemover sc) throws SemanticException;
+    Node addMembersOverride(AddMemberVisitor tc) throws SemanticException;
+    Node addMembers(AddMemberVisitor tc) throws SemanticException;
 
     Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException;
     Node disambiguate(AmbiguityRemover ar) throws SemanticException;
@@ -41,7 +41,4 @@ public interface Ext extends Copy
     Node exceptionCheck(ExceptionChecker ec) throws SemanticException;
 
     void translate(CodeWriter w, Translator tr);
-
-    Node reconstructTypes(NodeFactory nf, TypeSystem ts, Context c)
-	throws SemanticException;
 }

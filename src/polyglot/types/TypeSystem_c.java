@@ -986,6 +986,19 @@ public class TypeSystem_c implements TypeSystem
     ////
 
     /**
+     * Returns true iff <p1> throws fewer exceptions as <p2>.
+     */
+    public boolean throwsSubset(ProcedureInstance p1, ProcedureInstance p2) {
+        SubtypeSet s1 = new SubtypeSet();
+        SubtypeSet s2 = new SubtypeSet();
+
+        s1.addAll(p1.exceptionTypes());
+        s2.addAll(p2.exceptionTypes());
+
+        return s2.containsAll(s1);
+    }
+
+    /**
      * Returns true iff <p1> has the same arguments as <p2>
      **/
     public boolean hasSameArguments(ProcedureInstance p1,

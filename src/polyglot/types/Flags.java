@@ -250,6 +250,22 @@ public class Flags implements Copy, Serializable
 	return is_set(STRICTFP);
     }
 
+    public boolean moreRestrictiveThan(Flags f) {
+        if (isPrivate() && (f.isProtected() || f.isPackage() || f.isPublic())) {
+            return true;
+        }
+
+        if (isProtected() && (f.isPackage() || f.isPublic())) {
+            return true;
+        }
+
+        if (isPackage() && f.isPublic()) {
+            return true;
+        }
+
+        return false;
+    }
+
     public String toString() {
         String s = "";
         if (isPublic())       s += (s.equals("") ? "" : " ") + "public";

@@ -1,41 +1,35 @@
 package jltools.frontend;
 
 import jltools.frontend.Compiler;
+import jltools.util.InternalCompilerError;
 import java.util.*;
 
 /**
  * A <code>BarrierPass</code> is a special pass that ensures that
  * all jobs complete a goal pass before any job continues.
  */
-public abstract class BarrierPass extends AbstractPass
+public class BarrierPass extends AbstractPass
 {
-    Compiler compiler;
+    Job job;
 
-    public BarrierPass(Compiler compiler) {
-	this.compiler = compiler;
+    public BarrierPass(Pass.ID id, Job job) {
+      	super(id);
+	this.job = job;
     }
 
-    /** Get the pass we're supposed to run for each job. */
-    public abstract Pass pass(Job job);
-
-    public List runAfter() {
-	List deps = new ArrayList(compiler.jobs().size());
-
-	for (Iterator i = compiler.jobs().iterator(); i.hasNext(); ) {
-	    Job job = (Job) i.next();
-	    Pass pass = pass(job);
-	    deps.add(pass);
-	}
-
-	return deps;
-    }
-
-    /** Do nothing.  Getting here is enough. */
+    /** Run all the other jobs with the same parent up to this pass. */
     public boolean run() {
-	return true;
-    }
+        Compiler.report(1, job + " at barrier " + id);
 
-    public String toString() {
-	return "Barrier";
+        // Bring all our children up to the barrier.
+        for (Iterator i = job.children().iterator(); i.hasNext(); ) {
+            Job child = (Job) i.next();
+
+            if (! job.compiler().runToPass(child, id)) {
+                return false;
+	    }
+        }
+
+	return true;
     }
 }

@@ -54,19 +54,58 @@ public interface ExtensionInfo {
 
     /** Produce a type system for this language extension. */
     TypeSystem typeSystem();
-    
+
     /** Produce a node factory for this language extension. */
     NodeFactory nodeFactory();
 
     /** Produce a source factory for this language extension. */
     SourceLoader sourceLoader();
 
-    /** Produce a job used to compile the given source. */
-    Job createJob(Source source);
+    /** Produce a job for the given source. */
+    SourceJob createJob(Job parent, Source source);
+
+    /** Produce a job for the given context. */
+    Job createJob(Node ast, Context context, Job outer, Pass.ID begin, Pass.ID end);
 
     /** Produce a target factory for this language extension. */
     TargetFactory targetFactory();
 
     /** Get a parser for this language extension. */
-    Parser parser(Reader reader, Job job);
+    Parser parser(Reader reader, Source source, ErrorQueue eq);
+
+    /** Get the list of passes for a given source job. */
+    List passes(SourceJob job);
+
+    /**
+     * Get the sublist of passes for a given job that performs AST
+     * transformations.
+     */
+    List transformPasses(Job job);
+
+    /**
+     * Get the sublist of passes for a given job that performs AST
+     * transformations.
+     */
+    List transformPasses(Job job, Pass.ID begin, Pass.ID end);
+
+    /** Add a pass before an existing pass. */
+    void beforePass(List passes, Pass.ID oldPass, Pass newPass);
+
+    /** Add a list of passes before an existing pass. */
+    void beforePass(List passes, Pass.ID oldPass, List newPasses);
+
+    /** Add a pass after an existing pass. */
+    void afterPass(List passes, Pass.ID oldPass, Pass newPass);
+
+    /** Add a list of passes after an existing pass. */
+    void afterPass(List passes, Pass.ID oldPass, List newPasses);
+
+    /** Replace an existing pass with a new pass. */
+    void replacePass(List passes, Pass.ID oldPass, Pass newPass);
+
+    /** Replace an existing pass with a list of new passes. */
+    void replacePass(List passes, Pass.ID oldPass, List newPasses);
+
+    /** Remove a pass.  The removed pass cannot be a barrier. */
+    void removePass(List passes, Pass.ID oldPass);
 }

@@ -1,6 +1,7 @@
 package jltools.ast;
 
 import jltools.types.ConstructorInstance;
+import jltools.types.ClassType;
 import java.util.List;
 
 /**
@@ -12,8 +13,11 @@ import java.util.List;
  * support anonymous classes.  It is also preceded by an qualifier expression
  * which specifies the context in which the object is being created.
  */
-public interface QualifiedNew extends Expr 
+public interface QualifiedNew extends Expr
 {
+    ClassType anonType();
+    ConstructorInstance constructorInstance();
+
     Expr qualifier();
     QualifiedNew qualifier(Expr qualifier);
 

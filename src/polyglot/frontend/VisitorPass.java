@@ -9,11 +9,12 @@ public class VisitorPass extends AbstractPass
     Job job;
     NodeVisitor v;
 
-    public VisitorPass(Job job) {
-	this(job, null);
+    public VisitorPass(Pass.ID id, Job job) {
+	this(id, job, null);
     }
 
-    public VisitorPass(Job job, NodeVisitor v) {
+    public VisitorPass(Pass.ID id, Job job, NodeVisitor v) {
+        super(id);
 	this.job = job;
 	this.v = v;
     }
@@ -34,8 +35,8 @@ public class VisitorPass extends AbstractPass
 	}
 
         if (v.begin()) {
-            ErrorQueue q = job.compiler().errorQueue();
-            int nErrsBefore = q.errorCount();
+	    ErrorQueue q = job.compiler().errorQueue();
+	    int nErrsBefore = q.errorCount();
 
             ast = ast.visit(v);
             v.finish();
@@ -53,6 +54,6 @@ public class VisitorPass extends AbstractPass
     }
 
     public String toString() {
-	return v.getClass().getName() + "(" + job + ")";
+	return id.toString();
     }
 }

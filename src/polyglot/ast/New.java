@@ -1,6 +1,7 @@
 package jltools.ast;
 
 import jltools.types.ConstructorInstance;
+import jltools.types.ClassType;
 import java.util.List;
 
 /**
@@ -10,8 +11,11 @@ import java.util.List;
  * list of arguments to be passed to the constructor of the object and an
  * optional <code>ClassBody</code> used to support anonymous classes.
  */
-public interface New extends Expr 
+public interface New extends Expr
 {
+    ClassType anonType();
+    ConstructorInstance constructorInstance();
+
     TypeNode objectType();
     New objectType(TypeNode t);
 
@@ -20,6 +24,4 @@ public interface New extends Expr
 
     ClassBody body();
     New body(ClassBody b);
-
-    ConstructorInstance constructorInstance();
 }

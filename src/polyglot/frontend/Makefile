@@ -11,12 +11,16 @@ SOURCES = \
 	CupParser.java \
 	EmptyPass.java \
 	ExtensionInfo.java \
+	InnerJob.java \
 	Job.java \
+	JobExt.java \
 	Parser.java \
 	ParserPass.java \
 	Pass.java \
 	Source.java \
+	SourceJob.java \
 	SourceLoader.java \
+	SpawnPass.java \
 	TargetFactory.java \
 	VisitorPass.java
 

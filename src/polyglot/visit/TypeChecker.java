@@ -13,24 +13,6 @@ public class TypeChecker extends SemanticVisitor
 	super(job);
     }
 
-    public TypeBuilder typeBuilder(Package p) {
-        TypeBuilder tb = new TypeBuilder(job);
-	tb.currentPackage = p;
-	return tb;
-    }
-
-    public TypeAmbiguityRemover typeAmbiguityRemover() {
-        TypeAmbiguityRemover sc = new TypeAmbiguityRemover(job);
-	sc.context = context;
-	return sc;
-    }
-
-    public AmbiguityRemover ambiguityRemover() {
-        AmbiguityRemover ar = new AmbiguityRemover(job);
-	ar.context = context;
-	return ar;
-    }
-
     protected Node overrideCall(Node n) throws SemanticException {
 	Node m = n.ext().typeCheckOverride(this);
 

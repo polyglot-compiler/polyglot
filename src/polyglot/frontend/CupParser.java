@@ -10,17 +10,16 @@ import jltools.util.*;
 public class CupParser implements Parser
 {
     java_cup.runtime.lr_parser grm;
-    Job job;
+    Source source;
+    ErrorQueue eq;
 
-    public CupParser(java_cup.runtime.lr_parser grm, Job job) {
+    public CupParser(java_cup.runtime.lr_parser grm, Source source, ErrorQueue eq) {
 	this.grm = grm;
-	this.job = job;
+	this.source = source;
+       	this.eq = eq;
     }
 
     public Node parse() {
-	Source s = job.source();
-	ErrorQueue eq = job.compiler().errorQueue();
-
 	try {
 	    java_cup.runtime.Symbol sym = grm.parse();
 
@@ -29,7 +28,7 @@ public class CupParser implements Parser
 	    }
 
 	    eq.enqueue(ErrorInfo.SYNTAX_ERROR, "Unable to parse " +
-		s.name() + ".");
+		source.name() + ".");
 	}
 	catch (IOException e) {
 	    eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage());

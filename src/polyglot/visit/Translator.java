@@ -5,6 +5,7 @@ import jltools.frontend.*;
 import jltools.types.*;
 import jltools.util.*;
 import jltools.types.Package;
+import jltools.frontend.Compiler;
 
 import java.io.*;
 import java.util.*;
@@ -12,7 +13,8 @@ import java.util.*;
 /** A Translator generates output code from the processed AST. */
 public class Translator extends AbstractPass
 {
-    protected Job job;
+    protected Compiler compiler;
+    protected SourceJob job;
     protected Context context;
     protected boolean appendSemicolon = true;
 
@@ -20,8 +22,11 @@ public class Translator extends AbstractPass
      * Create a Translator.  The output of the visitor is a collection of files
      * whose names are added to the collection <code>outputFiles</code>.
      */
-    public Translator(Job job) {
+    public Translator(Pass.ID id, Compiler compiler, SourceJob job) {
+	super(id);
+	this.compiler = compiler;
 	this.job = job;
+	this.context = job.context();
     }
 
     public boolean appendSemicolon() {
@@ -39,23 +44,19 @@ public class Translator extends AbstractPass
     }
 
     public TypeSystem typeSystem() {
-        return job.compiler().typeSystem();
+        return compiler.typeSystem();
     }
 
     public NodeFactory nodeFactory() {
-        return job.compiler().nodeFactory();
+        return compiler.nodeFactory();
     }
 
     public boolean run() {
-	jltools.frontend.Compiler compiler = job.compiler();
-
 	TypeSystem ts = compiler.typeSystem();
 	NodeFactory nf = compiler.nodeFactory();
 	TargetFactory tf = compiler.targetFactory();
 	int outputWidth = compiler.outputWidth();
 	Collection outputFiles = compiler.outputFiles();
-
-	this.context = ts.createContext(job.importTable());
 
 	SourceFile sfn = (SourceFile) job.ast();
 
@@ -88,7 +89,7 @@ public class Translator extends AbstractPass
 		first = (TopLevelDecl) exports.get(0);
 	    	of = tf.outputFile(pkg, first.name(), job.source());
 	    }
-            
+
             String opfPath = of.getPath();
             if (!opfPath.endsWith("$")) outputFiles.add(of.getPath());
 	    ofw = tf.outputWriter(of);
@@ -126,7 +127,7 @@ public class Translator extends AbstractPass
 	    return true;
 	}
 	catch (IOException e) {
-	    job.compiler().errorQueue().enqueue(ErrorInfo.IO_ERROR,
+	    compiler.errorQueue().enqueue(ErrorInfo.IO_ERROR,
 		       "I/O error while translating: " + e.getMessage());
 	    return false;
 	}
@@ -148,7 +149,7 @@ public class Translator extends AbstractPass
 	    imp.ext().translate(w, this);
 	    newline = true;
 	}
-		   
+
 	if (newline) {
 	    w.newline(0);
 	}
@@ -169,6 +170,6 @@ public class Translator extends AbstractPass
     }
 
     public String toString() {
-	return "Translator(" + job + ")";
+	return "Translator(" + job.source() + ")";
     }
 }
