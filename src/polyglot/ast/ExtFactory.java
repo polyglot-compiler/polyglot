@@ -16,6 +16,11 @@ import java.util.List;
 public interface ExtFactory
 {
 
+    /**
+     * The next extFactory in the chain. 
+     */
+    ExtFactory nextExtFactory();
+
     //////////////////////////////////////////////////////////////////
     // Factory Methods
     //////////////////////////////////////////////////////////////////
