@@ -279,7 +279,7 @@ public class DeadCodeEliminator extends DataFlow {
 	}
 
 	public NodeVisitor enter(Node n) {
-	    if (n instanceof Assign) {
+	    if (n instanceof LocalAssign) {
 		return bypass(((Assign)n).left());
 	    }
 
