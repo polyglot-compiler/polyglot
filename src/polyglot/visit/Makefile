@@ -6,7 +6,8 @@ vs_files 	= SymbolReader.java \
 		  TypeChecker.java \
 		  ExceptionChecker.java \
 		  FlowChecker.java \
-		  DumpAst.java  
+		  DumpAst.java \
+		  NodeScrambler.java
 
 VISIT_TARGET = $(patsubst %.java, $(vs_package)/%.class, $(vs_files))
 

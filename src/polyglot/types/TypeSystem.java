@@ -31,11 +31,11 @@ public abstract class TypeSystem {
    * The MethodType field may be null.
    **/
   public static class Context {
-    public final ImportTable table;
+    public final ClassResolver table;
     public final ClassType inClass;
     public final MethodType inMethod;
     
-    public Context(ImportTable t, ClassType type, MethodType m) 
+    public Context(ClassResolver t, ClassType type, MethodType m) 
       { table = t; inClass = type; inMethod = m; }
     public Context(ClassType type, MethodType m) 
       { table = null; inClass = type; inMethod = m; }

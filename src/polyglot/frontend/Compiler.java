@@ -212,12 +212,12 @@ public class Compiler implements TargetTable, ClassCleaner
   
   public boolean compileFile( String filename) throws IOException 
   {
-    return compile( tf.createFileTarget( filename));
+    return compile( tf.createFileTarget( filename), TRANSLATED);
   }
 
   public boolean compileClass( String classname) throws IOException
   {
-    return compile( tf.createClassTarget( classname));
+    return compile( lookupJob( classname), TRANSLATED);
   }
 
   public ClassResolver getResolver( Target t) throws IOException
@@ -237,7 +237,7 @@ public class Compiler implements TargetTable, ClassCleaner
   {
     try
     {
-      Job job = lookupJob( tf.createClassTarget( clazz.getFullName()));
+      Job job = lookupJob( clazz.getFullName());
       return compile( job, CLEANED);
     }
     catch( FileNotFoundException e)
@@ -367,7 +367,7 @@ public class Compiler implements TargetTable, ClassCleaner
         
           job.status |= DISAMBIGUATED;
 
-          job.ast = runVisitors( job.t, job.ast, CLEANED);
+          job.ast = runVisitors( job.t, job.ast, DISAMBIGUATED);
         }
         releaseJob( job);
       }
@@ -460,7 +460,24 @@ public class Compiler implements TargetTable, ClassCleaner
     }
   }
   
-  /* Protected Methods. */
+  protected Job lookupJob( String classname) throws IOException
+  {
+    Job job;
+
+    synchronized( workList) 
+    {
+      for( Iterator iter = workList.iterator(); iter.hasNext(); ) {
+        job = (Job)iter.next();
+        try {
+          job.cr.findClass( classname);
+          return job;
+        }
+        catch( SemanticException e) {}
+      }
+    }
+    return lookupJob( tf.createClassTarget( classname)); 
+  }
+
   protected Job lookupJob( Target t) throws IOException
   {
     /* Now check the worklist. */
@@ -545,12 +562,6 @@ public class Compiler implements TargetTable, ClassCleaner
       eq.enqueue( ErrorInfo.SYNTAX_ERROR, "Unable to parse source file.");
       return null;
     }
-
-    /*
-    if( sym.value instanceof SourceFileNode) {
-      ((SourceFileNode)sym.value).setFilename( t.getName());
-    }
-    */
 
     if( !(sym.value instanceof Node)) {
       eq.enqueue( ErrorInfo.SYNTAX_ERROR, "Unable to parse source file.");

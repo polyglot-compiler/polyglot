@@ -30,7 +30,6 @@ public class MainTargetFactory implements TargetFactory
 
   public Target createFileTarget( String fileName) throws IOException
   {
-    //System.out.println( "FILE " + fileName);
     File sourceFile = new File( fileName);
     File outputFile;
 
@@ -67,7 +66,6 @@ public class MainTargetFactory implements TargetFactory
 
   public Target createClassTarget( String className) throws IOException
   {
-    //System.out.println( "CLASS " + className);
     /* Search the source path. */
     File sourceFile = null, directory;
     File outputFile = new File( outputDirectory, 

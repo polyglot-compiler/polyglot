@@ -27,6 +27,8 @@ public class Main
                                         = "Dump AST (Boolean)";
   private static final String MAIN_OPT_SCRAMBLE         
                                         = "Scramble AST (Boolean)";
+  private static final String MAIN_OPT_SCRAMBLE_SEED  
+                                        = "Scramble Random Seed (Long)";
   private static final String MAIN_OPT_EXT_OP
                                         = "Use ObjectPrimitive Ext (Boolean)";
 
@@ -204,6 +206,10 @@ public class Main
     }
   }
 
+  /**
+   * Returns an instance of the parser that should be used during this
+   * compilation session.
+   */
   static java_cup.runtime.lr_parser getParser( jltools.lex.Lexer lexer,
                                                ErrorQueue eq)
   {
@@ -215,9 +221,38 @@ public class Main
     }
   }
 
+  /**
+   * Returns a iterator which contains the visitors that should be run in the
+   * current stage of the compiler.
+   */
   static Iterator getNodeVisitors( int stage)
   {
     List l = new LinkedList();
+
+    if( ((Boolean)options.get( MAIN_OPT_SCRAMBLE)).booleanValue()
+        && stage == Compiler.DISAMBIGUATED) {
+      
+      if( ((Boolean)options.get( MAIN_OPT_DUMP)).booleanValue()) {
+        CodeWriter cw = new CodeWriter( new UnicodeWriter( 
+                                          new PrintWriter( System.out)), 
+               ((Integer)options.get( Compiler.OPT_OUTPUT_WIDTH)).intValue()); 
+
+        l.add( new jltools.visit.DumpAst( cw));
+      }
+
+      jltools.visit.NodeScrambler ns;
+      Long seed = (Long)options.get( MAIN_OPT_SCRAMBLE_SEED);
+      if( seed == null) {
+        ns = new jltools.visit.NodeScrambler();
+      }
+      else {
+        ns = new jltools.visit.NodeScrambler( seed.longValue());
+      }
+
+      l.add( ns.fp);
+      l.add( ns);
+    }
+
     if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()
         && stage == Compiler.CHECKED) {
       
@@ -232,6 +267,7 @@ public class Main
       l.add( new jltools.ext.op.ObjectPrimitiveCastRewriter( ts));
 
     }
+
     if( ((Boolean)options.get( MAIN_OPT_DUMP)).booleanValue()) {
       CodeWriter cw = new CodeWriter( new UnicodeWriter( 
                                         new PrintWriter( System.out)), 
@@ -257,6 +293,7 @@ public class Main
     sourcePath.add( new File( "."));
     options.put( MAIN_OPT_SOURCE_PATH, sourcePath);
     options.put( MAIN_OPT_DUMP, new Boolean( false));
+    options.put( MAIN_OPT_SCRAMBLE, new Boolean( false));
     options.put( MAIN_OPT_EXT_OP, new Boolean( false));
     
     options.put( Compiler.OPT_OUTPUT_WIDTH, new Integer( 72));
@@ -290,6 +327,7 @@ public class Main
         {
           sourcePath.add( new File( st.nextToken()));
         }
+        i++;
       }
       else if( args[i].equals( "-fqcn")) 
       {
@@ -328,6 +366,13 @@ public class Main
       {
         i++;
         options.put( MAIN_OPT_SCRAMBLE, new Boolean( true));
+        try
+        {
+          long l = Long.parseLong( args[i]);
+          options.put( MAIN_OPT_SCRAMBLE_SEED, new Long( l));
+          i++;
+        }
+        catch( NumberFormatException e) {}
       }
       else if( args[i].equals( "-op"))
       {
@@ -399,7 +444,7 @@ public class Main
     System.err.println( " -sx <ext>               set source extension");
     System.err.println( " -ox <ext>               set output extension");
     System.err.println( " -dump                   dump the ast");
-    System.err.println( " -scramble               scramble the ast");
+    System.err.println( " -scramble [seed]        scramble the ast");
     System.err.println( " -op                     use op extension");
     System.err.println( " -post <compiler>        run javac-like compiler" 
                         + " after translation");

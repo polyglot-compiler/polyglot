@@ -92,7 +92,7 @@ public class SymbolReader extends NodeVisitor
   public void setPackageName( String packageName) throws SemanticException
   {
     this.packageName = packageName;
-    this.it = new ImportTable( systemResolver, true);
+    this.it = new ImportTable( systemResolver, true, eq);
 
     it.addPackageImport("java.lang");
     if( packageName != null) {

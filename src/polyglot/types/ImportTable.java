@@ -1,64 +1,83 @@
-/*
- * Type.java
- */
-
 package jltools.types;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.Iterator;
+import jltools.util.*;
+
+import java.util.*;
+
 
 /**
- * ImportTable
- *
- * An ImportTable is a ClassResolver.  It has a set of package and
- * class imports, which caches the results of lookups for future
- * reference.
- **/
-public  class ImportTable implements ClassResolver {
+ * An <code>ImportTable</code> is a type of <code>ClassResolver</code> that
+ * corresponds to a particular source file.
+ * <p>
+ * It has a set of package and class imports, which caches the results of
+ * lookups for future reference.
+ */
+public  class ImportTable implements ClassResolver 
+{
+  /** The underlying resolver. */
+  protected ClassResolver resolver;
+  /** Determines whether this table caches classes. */
+  protected boolean caching;
+  /** A list of all package imports. */
+  protected Set packageImports;
+  /** Map from names to classes found. */
+  protected Map map;
+  /** List of imports which will be lazily added to the table. */
+  protected List lazyImports;
+  /** Used to report errors for lazily added imports. */
+  protected ErrorQueue eq;
+
   // DOCME
-  public ImportTable(ClassResolver base, boolean shouldCache) {
+  public ImportTable( ClassResolver base, boolean caching, ErrorQueue eq)
+  {
     resolver = base;
-    caching = shouldCache;
+    this.caching = caching;
+    this.eq = eq;
 
     map = new HashMap();
     packageImports = new HashSet();
+    lazyImports = new ArrayList();
   }
 
-  public void dump()
+  public void addClassImport( String className) throws SemanticException 
   {
-    Iterator iter = map.keySet().iterator();
-    while( iter.hasNext()) {
-      System.out.println( "import " + (String)iter.next());
-    }
-
-    iter = packageImports.iterator();
-    while( iter.hasNext()) {
-      System.out.println( "import " + (String)iter.next() + ".*");
-    }
-  }
-
-  public void addClassImport(String className) throws SemanticException {
-    ClassType class_ = resolver.findClass(className);
-    String shortName = TypeSystem.getShortNameComponent(className);
-    map.put(className, class_);
-    map.put(shortName, class_);    
+    lazyImports.add( className);
   }
   
-  public void addPackageImport(String pkgName) throws NoClassException {
+  public void addPackageImport( String pkgName) throws NoClassException {
     resolver.findPackage(pkgName);
     packageImports.add(pkgName);
   }
     
-  public void findPackage(String name) throws NoClassException {
+  public void findPackage( String name) throws NoClassException {
     resolver.findPackage(name);
   }
 
-  public ClassType findClass(String name)  throws SemanticException {
+  public ClassType findClass( String name)  throws SemanticException {
     // FIXME: need to keep on looking to find conflicts.
-    //System.out.println( "looking " + name + " " + TypeSystem.isNameShort(name));
+
+    /* First add any lazy imports. */
+    if( lazyImports.size() > 0) {
+      for( Iterator iter = lazyImports.iterator(); iter.hasNext(); ) {
+        String longName = (String)iter.next();
+        //        System.out.println( "lazily adding: " + longName);
+        try 
+        {
+          ClassType clazz = resolver.findClass( longName);
+          String shortName = TypeSystem.getShortNameComponent( longName);
+
+          map.put( longName, clazz);
+          map.put( shortName, clazz);    
+        }
+        catch( NoClassException e)
+        {
+          eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), -1);
+        }
+      }
+
+      lazyImports = new ArrayList();
+    }
+
     if (TypeSystem.isNameShort(name)) {
       Object res = map.get(name);
       // First see if we have a mapping already.
@@ -89,12 +108,16 @@ public  class ImportTable implements ClassResolver {
     return resolver.findClass(name);
   }
 
-  // The underlying resolver.
-  ClassResolver resolver;
-  // Should this table cache classes.
-  boolean caching;
-  // A list of all package imports.
-  Set packageImports;
-  // Map from names to classes found.
-  Map map;
+  public void dump()
+  {
+    Iterator iter = map.keySet().iterator();
+    while( iter.hasNext()) {
+      System.out.println( "import " + (String)iter.next());
+    }
+
+    iter = packageImports.iterator();
+    while( iter.hasNext()) {
+      System.out.println( "import " + (String)iter.next() + ".*");
+    }
+  }
 }

@@ -30,10 +30,9 @@ public class StandardTypeSystem extends TypeSystem {
     throws SemanticException
   {
     this.resolver = resolver;
-    this.emptyImportTable = new ImportTable( new CompoundClassResolver(), 
-                                             false);
+    this.emptyResolver = new CompoundClassResolver();
 
-    OBJECT_  = resolver.findClass( "java.lang.Object");
+    OBJECT_ = resolver.findClass( "java.lang.Object");
     THROWABLE_ = resolver.findClass( "java.lang.Throwable");
     ERROR_ = resolver.findClass( "java.lang.Error");
     RTEXCEPTION_ = resolver.findClass( "java.lang.RuntimeException");
@@ -414,6 +413,8 @@ public class StandardTypeSystem extends TypeSystem {
     // We have a class type on our hands.
     String className = ((AmbiguousType) type).getTypeString();
 
+    //    System.out.println( "looking for " + className);
+
     // Find the context.
     ClassType inClass = context.inClass;
 
@@ -441,11 +442,11 @@ public class StandardTypeSystem extends TypeSystem {
 	// any inners by that name.  If they _both_ do, that's an error.
 	Type resultFromOuter = null;
 	Type resultFromParent = null;
-        //        System.out.println("in " + inClass.getTypeString() + " super: " + inClass.getSuperType());
+        //  System.out.println("in " + inClass.getTypeString() + " super: " + inClass.getSuperType());
 	ClassType parentType = (ClassType)inClass.getSuperType();
 	ClassType outerType = inClass.getContainingClass();
 	if (outerType != null) {
-	  Context outerContext = new Context(emptyImportTable,
+	  Context outerContext = new Context(emptyResolver,
 					     outerType, null);
 
           try {
@@ -454,7 +455,7 @@ public class StandardTypeSystem extends TypeSystem {
           catch( SemanticException e) {}
 	}
 	if (parentType != null) {
-	  Context parentContext = new Context(emptyImportTable,
+	  Context parentContext = new Context(emptyResolver,
 					      parentType, null);
           // System.out.println( "recursing to parent..."); 
           try
@@ -1020,7 +1021,7 @@ public class StandardTypeSystem extends TypeSystem {
   private Type SERIALIZABLE_;
   
   protected ClassResolver resolver; //Should do its own caching.
-  protected ImportTable emptyImportTable;
+  protected ClassResolver emptyResolver;
 
   /**
    * Returns a non-canonical type object for a class type whose name

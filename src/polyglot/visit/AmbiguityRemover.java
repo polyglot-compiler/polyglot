@@ -25,23 +25,12 @@ public class AmbiguityRemover extends NodeVisitor
     c = new LocalContext( it, ts, this);
   }
 
-  /*
-  public Node override( Node n)
-  {
-    if( n instanceof VariableDeclarationStatement) {
-
-    }
-  }
-  */
-
-// XXX document me
   public NodeVisitor enter( Node n)
   {
     n.enterScope( c);
     return this;
   }
 
-// XXX document me
   public Node leave( Node old, Node n, NodeVisitor v)
   {
     try

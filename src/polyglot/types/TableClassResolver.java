@@ -72,10 +72,11 @@ public class TableClassResolver implements ClassResolver
     context = new TypeSystem.Context( it, (ClassType)ts.getObject(), null);
 
     type = clazz.getSuperType();
+
     if( type != null) {
       try {
         superClazz = (ClassType)ts.checkAndResolveType( type, context);
-        
+
         /* Now we must clean all our super classes. But we need to check
          * first to see if the super class is defined in this file. If
          * so then clean here it, but if not, then ask then ask the
@@ -130,8 +131,6 @@ public class TableClassResolver implements ClassResolver
         clazz.setSuperType( (ClassType)ts.getObject());
       }
     }
-
-
 
     for (ListIterator i = clazz.getInterfaces().listIterator(); i.hasNext(); )
     {

@@ -44,7 +44,7 @@ public class LocalContext
     
     stkContexts = new Stack();
   }
-  
+
   /**
    * Returns whether the particular symbol is defined locally. If it 
    * isn't in this scope, we ask the parent scope, but don't traverse to 
