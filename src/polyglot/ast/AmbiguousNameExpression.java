@@ -145,15 +145,16 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 
 
         if( last == null && c.isDefinedLocally( name) ) {
-          top = new LocalVariableExpression( null, name);
+          top = new LocalVariableExpression( c.getTypeSystem().getNewLocalVariableExpressionExtension(), name);
         }
         else {
           if( top == null) {
- 	    top = new FieldExpression( null, null, //new TypeNode( c.getCurrentClass()), 
+	      System.out.println("top == null");
+ 	    top = new FieldExpression( c.getTypeSystem().getNewFieldExpressionExtension(), null, //new TypeNode( c.getCurrentClass()), 
                                        fi.getName());
           }
           else {
-            top = new FieldExpression( null, top, fi.getName());
+            top = new FieldExpression(  c.getTypeSystem().getNewFieldExpressionExtension(), top, fi.getName());
           }
         }
         
@@ -168,7 +169,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
           /* If it's not a local or field, then try and find a type. */
           try {
             last = (ClassType)c.getType( name);
-            top = new TypeNode( null, last, name);
+            top = new TypeNode( c.getTypeSystem().getNewTypeNodeExtension(), last, name);
             
             /* Clear the name. */
             name = "";

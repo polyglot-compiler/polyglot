@@ -475,6 +475,32 @@ public class BinaryExpression extends Expression
       w.write( ")");
    }
 
+    public boolean isAssignment() {
+	switch( operator) {
+	case ASSIGN:
+	case PLUSASSIGN:
+	case SUBASSIGN:
+	case MULTASSIGN:
+	case DIVASSIGN:
+	case ANDASSIGN:
+	case ORASSIGN:
+	case XORASSIGN:
+	case MODASSIGN:
+	case LSHIFTASSIGN: 
+	case RSHIFTASSIGN: 
+	case RUSHIFTASSIGN:
+	    return true;
+	default: return false;
+	}
+    }
+
+    public boolean throwsArithmeticException() {
+	// conservatively assume that any division or mod may throw ArithmeticException
+	// this is NOT true-- floats and doubles don't throw any exceptions ever...
+	if (operator == DIV || operator == MOD) return true;
+	else return false;
+    }
+
   public int getPrecedence()
   {
     switch( operator)

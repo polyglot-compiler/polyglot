@@ -6,7 +6,7 @@ package jltools.types;
 
 import java.util.Iterator;
 import java.util.List;
-
+import jltools.ast.*;
 
 /**
  * TypeSystem
@@ -248,6 +248,17 @@ public abstract class TypeSystem {
    **/
   public abstract Type extendArrayDims(Type type, int dims)
     throws SemanticException;
+
+
+    public Node getNewTypeNodeExtension() {
+	return null;
+    }
+    public Node getNewLocalVariableExpressionExtension() {
+	return null;
+    }
+    public Node getNewFieldExpressionExtension() {
+	return null;
+    }
 
   /**
    * Returns a canonical type corresponding to the Java Class object
