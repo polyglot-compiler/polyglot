@@ -90,6 +90,29 @@ public class Binary_c extends Expr_c implements Binary
 	return reconstruct(left, right);
     }
 
+    protected Node num(NodeFactory nf, long value) {
+        Position p = position();
+        Type t = type();
+        TypeSystem ts = t.typeSystem();
+
+        // Binary promotion
+        IntLit.Kind kind = IntLit.INT;
+
+        if (left instanceof IntLit && ((IntLit) left).kind() == IntLit.LONG) {
+            kind = IntLit.LONG;
+        }
+
+        if (right instanceof IntLit && ((IntLit) right).kind() == IntLit.LONG) {
+            kind = IntLit.LONG;
+        }
+
+        return nf.IntLit(p, kind, value).type(t);
+    }
+
+    protected Node bool(NodeFactory nf, boolean value) {
+        return nf.BooleanLit(position(), value).type(type());
+    }
+
     /** Fold constants for the expression. */
     public Node foldConstants(ConstantFolder cf) {
       	NodeFactory nf = cf.nodeFactory();
@@ -98,23 +121,23 @@ public class Binary_c extends Expr_c implements Binary
 	    long l = ((NumLit) left).longValue();
 	    long r = ((NumLit) right).longValue();
 
-	    if (op == ADD) return nf.IntLit(position(), l + r).type(type());
-	    if (op == SUB) return nf.IntLit(position(), l - r).type(type());
-	    if (op == MUL) return nf.IntLit(position(), l * r).type(type());
-	    if (op == DIV && r != 0) return nf.IntLit(position(), l / r).type(type());
-	    if (op == MOD && r != 0) return nf.IntLit(position(), l % r).type(type());
-	    if (op == BIT_OR) return nf.IntLit(position(), l | r).type(type());
-	    if (op == BIT_AND) return nf.IntLit(position(), l & r).type(type());
-	    if (op == BIT_XOR) return nf.IntLit(position(), l ^ r).type(type());
-	    if (op == SHL) return nf.IntLit(position(), l << r).type(type());
-	    if (op == SHR) return nf.IntLit(position(), l >> r).type(type());
-	    if (op == USHR) return nf.IntLit(position(), l >>> r).type(type());
-	    if (op == GT) return nf.BooleanLit(position(), l > r).type(type());
-	    if (op == LT) return nf.BooleanLit(position(), l < r).type(type());
-	    if (op == GE) return nf.BooleanLit(position(), l >= r).type(type());
-	    if (op == LE) return nf.BooleanLit(position(), l <= r).type(type());
-	    if (op == NE) return nf.BooleanLit(position(), l != r).type(type());
-	    if (op == EQ) return nf.BooleanLit(position(), l == r).type(type());
+	    if (op == ADD) return num(nf, l + r);
+	    if (op == SUB) return num(nf, l - r);
+	    if (op == MUL) return num(nf, l * r);
+	    if (op == DIV && r != 0) return num(nf, l / r);
+	    if (op == MOD && r != 0) return num(nf, l % r);
+	    if (op == BIT_OR) return num(nf, l | r);
+	    if (op == BIT_AND) return num(nf, l & r);
+	    if (op == BIT_XOR) return num(nf, l ^ r);
+	    if (op == SHL) return num(nf, l << r);
+	    if (op == SHR) return num(nf, l >> r);
+	    if (op == USHR) return num(nf, l >>> r);
+	    if (op == GT) return bool(nf, l > r);
+	    if (op == LT) return bool(nf, l < r);
+	    if (op == GE) return bool(nf, l >= r);
+	    if (op == LE) return bool(nf, l <= r);
+	    if (op == NE) return bool(nf, l != r);
+	    if (op == EQ) return bool(nf, l == r);
 	}
 	else if (left instanceof NumLit) {
 	    long l = ((NumLit) left).longValue();

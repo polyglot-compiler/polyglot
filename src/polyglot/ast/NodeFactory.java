@@ -141,7 +141,7 @@ public interface NodeFactory
 
     Instanceof Instanceof(Position pos, Expr expr, TypeNode type);
 
-    IntLit IntLit(Position pos, long value);
+    IntLit IntLit(Position pos, IntLit.Kind kind, long value);
 
     Labeled Labeled(Position pos, String label, Stmt body);
 

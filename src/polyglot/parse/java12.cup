@@ -294,10 +294,10 @@ goal ::=
 literal ::=
                     // Lit
         INTEGER_LITERAL:a    
-            {: RESULT = parser.nf.IntLit(parser.util.pos(a),
+            {: RESULT = parser.nf.IntLit(parser.util.pos(a), IntLit.INT,
                                      a.getValue().intValue()); :} 
     |   LONG_LITERAL:a    
-            {: RESULT = parser.nf.IntLit(parser.util.pos(a), 
+            {: RESULT = parser.nf.IntLit(parser.util.pos(a), IntLit.LONG,
                      a.getValue().longValue()); :} 
     |   DOUBLE_LITERAL:a
             {: RESULT = parser.nf.FloatLit(parser.util.pos(a), FloatLit.DOUBLE,

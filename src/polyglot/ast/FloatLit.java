@@ -8,16 +8,17 @@ import polyglot.util.Enum;
  */
 public interface FloatLit extends Lit 
 {    
-    /** Floating point literal kind: either float or double. */
+    /** Integer literal kinds: float (e.g., 0.0F) or double (e.g., 0.0). */
     public static class Kind extends Enum {
         Kind(String name) { super(name); }
     }
 
     public static final Kind FLOAT = new Kind("float");
-    public static final Kind DOUBLE = new Kind("dounle");
+    public static final Kind DOUBLE = new Kind("double");
 
     /** The kind of literal: FLOAT or DOUBLE. */
     Kind kind();
+
     /** Set the kind of literal: FLOAT or DOUBLE. */
     FloatLit kind(Kind kind);
 

@@ -115,7 +115,7 @@ public class ClassSerializer extends NodeVisitor
 	    f = nf.FieldDecl(fi.position(), fi.flags(),
 		             nf.CanonicalTypeNode(fi.position(), fi.type()),
 			     fi.name(),
-			     nf.IntLit(pos, time).type(ts.Long()));
+			     nf.IntLit(pos, IntLit.LONG, time).type(ts.Long()));
 
 	    f = f.fieldInstance(fi);
             f = f.initializerInstance(ii);

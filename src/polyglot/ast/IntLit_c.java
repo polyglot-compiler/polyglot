@@ -13,21 +13,9 @@ public class IntLit_c extends NumLit_c implements IntLit
 {
     protected Kind kind;
 
-    public IntLit_c(Del ext, Position pos, long value) {
+    public IntLit_c(Del ext, Position pos, Kind kind, long value) {
 	super(ext, pos, value);
-
-        if (Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE) {
-	    kind = BYTE;
-	}
-	else if (Short.MIN_VALUE <= value && value <= Short.MAX_VALUE) {
-	    kind = SHORT;
-	}
-	else if (Integer.MIN_VALUE <= value && value <= Integer.MAX_VALUE) {
-	    kind = INT;
-	}
-	else {
-	    kind = LONG;
-	}
+        this.kind = kind;
     }
 
     /** Get the value of the expression. */
@@ -60,7 +48,7 @@ public class IntLit_c extends NumLit_c implements IntLit
 
 	Kind kind = kind();
 
-        if (kind == BYTE || kind == SHORT || kind == INT) {
+        if (kind == INT) {
 	    return type(ts.Int());
 	}
 	else if (kind == LONG) {

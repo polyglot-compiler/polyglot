@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import java.util.*;
 
 /** 
  * A <code>StringLit</code> represents an immutable instance of a 
@@ -51,44 +52,43 @@ public class StringLit_c extends Lit_c implements StringLit
     protected int MAX_LENGTH = 60;
  
     /** Write the expression to an output file. */
-    public void translate(CodeWriter w, Translator tr) {
-        if (StringUtil.unicodeEscape(value).length() > MAX_LENGTH) {
-            tr.print(breakupString(tr.nodeFactory(), tr.typeSystem()), w);
-        }
-        else {
-            w.write("\"");
-            w.write(StringUtil.escape(value));
-            w.write("\"");
-        }
-    }
-
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        w.write("\"");
+        List l = breakupString();
 
-        if (StringUtil.unicodeEscape(value).length() > 11) {
-            w.write(StringUtil.escape(value.substring(0,8) + "..."));
-        }
-        else {
-            w.write(StringUtil.escape(value));
+        for (Iterator i = l.iterator(); i.hasNext(); ) {
+            String s = (String) i.next();
+            w.begin(0);
         }
 
-        w.write("\"");
+        for (Iterator i = l.iterator(); i.hasNext(); ) {
+            String s = (String) i.next();
+
+            w.write("\"");
+            w.write(StringUtil.escape(s));
+            w.write("\"");
+            w.end();
+
+            if (i.hasNext()) {
+                w.write(" +");
+                w.allowBreak(0, " ");
+            }
+        }
     }
 
     /**
      * Break a long string literal into a concatenation of small string
      * literals.  This avoids messing up the pretty printer and editors. 
      */
-    protected Expr breakupString(NodeFactory nf, TypeSystem ts) {
-        Expr result = null;
+    protected List breakupString() {
+        List result = new LinkedList();
         int n = value.length();
         int i = 0;
 
-        for (;;) {
+        while (i < n) {
             int j;
 
             // Compensate for the unicode transformation by computing
-            // the length of the encoded string (or something close to it).
+            // the length of the encoded string.
             int len = 0;
 
             for (j = i; j < n; j++) {
@@ -98,27 +98,19 @@ public class StringLit_c extends Lit_c implements StringLit
                 len += k;
             }
 
-            StringLit s = nf.StringLit(position(), value.substring(i, j));
-            s = (StringLit) s.type(ts.String());
-
-            // Check that we don't create a string that's too long.
-            // Otherwise we'll infinitely recurse.
-            if (StringUtil.unicodeEscape(s.value()).length() > MAX_LENGTH) {
-                throw new InternalCompilerError("Max string length exceeded.");
-            }
-
-            if (result == null) {
-                result = s;
-            }
-            else {
-                result = nf.Binary(position(), result, Binary.ADD, s);
-                result = result.type(ts.String());
-            }
-
-            if (j == n)
-                return result;
+            result.add(value.substring(i, j));
 
             i = j;
         }
+
+        if (result.isEmpty()) {
+            // This should only happen when value == "".
+            if (! value.equals("")) {
+                throw new InternalCompilerError("breakupString failed");
+            }
+            result.add(value);
+        }
+
+        return result;
     }
 }

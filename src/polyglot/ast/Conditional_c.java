@@ -122,30 +122,22 @@ public class Conditional_c extends Expr_c implements Conditional
 	    // conditional expression is T.
 
 	    Type t = null;
-	    long lit = 0;
+            IntLit lit = null;
 
 	    if (e1 instanceof IntLit) {
 	      	t = t2;
-		lit = ((IntLit) e1).value();
+		lit = (IntLit) e1;
 	    }
 	    else if (e2 instanceof IntLit) {
 	      	t = t1;
-		lit = ((IntLit) e2).value();
+		lit = (IntLit) e2;
 	    }
-
-	    if (t != null) {
-		if (t.isByte() &&
-		    Byte.MIN_VALUE <= lit && lit <= Byte.MAX_VALUE) {
-		    return type(ts.Byte());
-		}
-		if (t.isShort() &&
-		    Short.MIN_VALUE <= lit && lit <= Short.MAX_VALUE) {
-		    return type(ts.Short());
-		}
-		if (t.isChar() &&
-		    Character.MIN_VALUE <= lit && lit <= Character.MAX_VALUE) {
-		    return type(ts.Char());
-		}
+            
+            if (lit != null && lit.kind() == IntLit.INT) {
+                if ((t.isByte() || t.isShort() || t.isChar()) &&
+                    ts.numericConversionValid(t, lit.value())) {
+                    return type(t);
+                }
 	    }
 
 	    // - Otherwise, binary numeric promotion (§5.6.2) is applied to the

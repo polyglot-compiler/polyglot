@@ -155,8 +155,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return new Instanceof_c(defaultExt(), pos, expr, type);
     }
 
-    public IntLit IntLit(Position pos, long value) {
-        return new IntLit_c(defaultExt(), pos, value);
+    public IntLit IntLit(Position pos, IntLit.Kind kind, long value) {
+        return new IntLit_c(defaultExt(), pos, kind, value);
     }
 
     public Labeled Labeled(Position pos, String label, Stmt body) {
