@@ -14,7 +14,7 @@ done
 
 if [ -n "$extra_cp" ]
 then
-    extra_cp="${FILE_SEP}${extra_cp}"
+    extra_cp="${PATH_SEP}${extra_cp}"
 fi
 
 classpath="${TOP}${FILE_SEP}classes${PATH_SEP}${TOP}${FILE_SEP}java_cup.jar${PATH_SEP}.${extra_cp}"
