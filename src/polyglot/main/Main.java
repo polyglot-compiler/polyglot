@@ -10,12 +10,18 @@ import jltools.util.*;
 import java.io.*;
 import java.util.*;
 
+/** Main is the main program of the extensible compiler. It should not
+ * need to be replaced.
+ */
 public class Main
 {
   /** Compiler options. Access to compiler options via the Compiler object,
       rather than through this static variable, is encouraged for future
       extensibility. */
   public static Options options = new Options();
+
+  /** A collection of string names of topics which can be used with the
+      -report command-line switch */
   public static Collection report_topics = new HashSet();
 
   /** Source files specified on the command line */
