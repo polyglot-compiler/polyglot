@@ -355,17 +355,21 @@ public class TypeSystem_c implements TypeSystem
     }
 
     /**
-     * Checks whether a method, field or nested class within "outer" with access
-     * flags "flags" can be accessed from Context "context".
+     * Checks whether the member mi can be accessed from Context "context".
      */
     public boolean isAccessible(MemberInstance mi, Context context) {
+        return isAccessible(mi, context.currentClass());
+    }
+    
+    /**
+     * Checks whether the member mi can be accessed from code that is
+     * declared in the class ctc.
+     */
+    protected boolean isAccessible(MemberInstance mi, ClassType ctc) {
         assert_(mi);
 
         ReferenceType target = mi.container();
 	Flags flags = mi.flags();
-
-	ClassType ctc = context.currentClass();
-	ClassType cts = context.currentClassScope();
 
         if (flags.isPublic()) return true;
 
@@ -1557,10 +1561,30 @@ public class TypeSystem_c implements TypeSystem
                     List possible = curr.methods(mi.name(), mi.formalTypes());
                     for (Iterator k = possible.iterator(); k.hasNext(); ) {
                         MethodInstance mj = (MethodInstance)k.next();
-                        if (!mj.flags().isAbstract()) {
-                            // found a suitable implementation of it.
-                            // it may have the wrong protections, but other 
-                            // checks will take care of that.
+                        if (!mj.flags().isAbstract() && isAccessible(mj, ct)) {
+                            // May have found a suitable implementation of mi.
+                            // If the method instance mj is not declared
+                            // in the class type ct, then we need to check
+                            // that it has appropriate protections.
+                            if (!equals(ct, mj.container())) {
+                                try {
+                                    // check that mj can override mi, which
+                                    // includes access protection checks.
+                                    checkOverride(mj, mi);                                
+                                }
+                                catch (SemanticException e) {
+                                    // change the position of the semantic
+                                    // exception to be the class that we
+                                    // are checking.
+                                    throw new SemanticException(e.getMessage(),
+                                        ct.position());
+                                }
+                            }
+                            else {
+                                // the method implementation mj we found was 
+                                // declared in ct. So other checks will take
+                                // care of access issues
+                            }
                             implFound = true;
                             break;
                         }                        
