@@ -30,7 +30,7 @@
     <pathelement location="${lib}/JFlex.jar"/>
   </path>
 
-  <target name="configure" description="Configure Polyglot"
+  <target name="configure" description="Configures Polyglot"
           depends="check-classpath"
           unless="configure.up-to-date">
     <echo message="java version is ${java.version}"/>
@@ -39,7 +39,8 @@
     <property name="configure.up-to-date" value="true"/>
   </target>
 
-  <target name="check-classpath" description="Check that the classpath contains the appropriate directories/jars">
+  <!-- Check that the class path is correct. -->
+  <target name="check-classpath">
 <!--
     <available classname="java_cup.Main" property="cp_existence.java_cup"/>
     <available classname="JFlex.Main" property="cp_existence.jlex"/>
@@ -50,8 +51,8 @@
 -->
   </target>
 
+  <!-- create appropriate executables in the bin directory -->
   <target name="bin" 
-          description="Configure Polyglot" 
           depends="configure,bin-deps"
           unless="bin.up-to-date">
     <antcall target="jlc"/>
@@ -74,8 +75,8 @@
     </condition>
   </target> 
 
-  <target name="executable-defs" depends="defs-deps" unless="defs.up-to-date"
-          description="creates a file containing common environment variable definitions">
+  <!-- creates a file containing common environment variable definitions -->
+  <target name="executable-defs" depends="defs-deps" unless="defs.up-to-date">
     <echo message="Creating ${bin}/defs"/>
     <echo file="${bin}/defs" append="no">#!/bin/sh
 # DO NOT EDIT - This file was automatically generated.
@@ -87,10 +88,9 @@ TOP='${basedir}'
     </echo>
   </target>
 
+  <!-- creates the executable script jlc -->
   <target name="jlc" 
-          depends="executable-defs" 
-          description="creates the executable script jlc">
-    <!-- Create jlc -->
+          depends="executable-defs">
     <echo message="Creating ${bin}/jlc"/>
     <concat destfile="${bin}/jlc" append="no">
       <filelist dir="${bin}" files="defs"/>
@@ -133,27 +133,27 @@ ext=""
   </target>
 
   <!-- compile the base compiler -->
-  <target name="all" depends="compile" description="compile the source"/>
+  <target name="all" depends="compile" description="Builds the base compiler"/>
 
   <!-- compile the base compiler -->
-  <target name="compile" depends="base,jl" description="compile the source"/>
+  <target name="compile" depends="base,jl" description="Builds the base compiler"/>
 
-  <!-- generate the Polyglot distribution -->
-  <target name="dist-dir" depends="compile"
-    description="generate the distribution">
-    <!-- Create the distribution directory -->
+  <!-- Create the distribution directory -->
+  <target name="dist-dir" depends="compile">
     <mkdir dir="${dist}/lib"/>
   </target>
 
-  <target name="clean" description="clean up">
+  <target name="clean" 
+  	      description="Cleans up the directory tree: deletes the distribution directory and the classes directories">
     <!-- Delete the ${classes} and ${dist} directory trees -->
     <delete dir="${classes}"/>
     <delete dir="${cup-classes}"/>
     <delete dir="${dist}"/>
   </target>
 
-  <target name="clobber" depends="clean">
-    <delete>
+  <target name="clobber" depends="clean"
+	description="Cleans up the directory tree and deletes generated files">
+	<delete>
       <fileset dir="${src}">
         <include name="**/Grm.java"/>
 	<include name="**/sym.java"/>
@@ -172,8 +172,7 @@ ext=""
   </target>
 
   <!-- compile the base compiler excluding the jl extension -->
-  <target name="compile-base" depends="init,ppg" 
-          description="compile the source">
+  <target name="compile-base" depends="init,ppg">
     <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/**"
       excludes="polyglot/ext/**,polyglot/tests/**,ppg/test/**">
@@ -182,7 +181,7 @@ ext=""
   </target>
 
   <target name="cup" depends="init" 
-          description="compile the extended CUP parser generator">
+          description="Builds the extended CUP parser generator">
     <antcall target="cup-parser-using-jar">
       <param name="parser.dir" value="${src}/java_cup"/>
       <param name="cup.file" value="parser.cup"/>
@@ -197,8 +196,7 @@ ext=""
   </target>
 
   <!-- compile a single extension, named ${ext} -->
-  <target name="compile-ext"
-    description="compile an extension">
+  <target name="compile-ext">
     <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/ext/${ext}/**"
       excludes="**/qq/**,**/test/**,**/tests/**,**/runtime/**">
@@ -212,8 +210,8 @@ ext=""
     <antcall target="compile-ext-qq"/>
   </target>
 
-  <target name="compile-ext-qq"
-    description="compile an extension's quasiquoter">
+  <!-- compile the extension ${ext}'s quasiquoter -->
+  <target name="compile-ext-qq">
     <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/ext/${ext}/qq/**">
       <classpath refid="standard.classpath"/>
@@ -484,7 +482,9 @@ ext=""
     <jar jarfile="${lib}/skel.jar" basedir="${classes}" includes="polyglot/ext/skel/**"/>
   </target>
 
-  <target name="param" depends="jl">
+  <target name="param" 
+  	      depends="jl"
+          description="Builds the param extension">
     <antcall target="compile-ext">
       <param name="ext" value="param"/>
     </antcall>
@@ -520,7 +520,9 @@ ext=""
     </antcall>
   </target>
 
-  <target name="pao" depends="jl">
+  <target name="pao" 
+  	      depends="jl"
+  	      description="Builds the pao extension">
     <antcall target="standard-ext">
       <param name="ext" value="pao"/>
       <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
@@ -533,7 +535,9 @@ ext=""
     </javac>
   </target>
 
-  <target name="coffer" depends="param">
+  <target name="coffer" 
+    description="Builds the coffer extension" 
+  	depends="param">
     <antcall target="standard-ext">
       <param name="ext" value="coffer"/>
       <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
@@ -541,16 +545,16 @@ ext=""
     </antcall>
   </target>
 
-  <target name="polyglot-jar" depends="jl,param,ppg">
+  <target name="polyglot-jar" depends="jl,param,ppg" description="Builds polyglot.jar">
     <jar jarfile="${lib}/polyglot.jar" basedir="${classes}"
       includes="polyglot/ast/**,polyglot/ext/jl/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**"/>
   </target>
 
-  <target name="pao-jar" depends="pao">
+  <target name="pao-jar" depends="pao" description="Builds pao.jar">
     <jar jarfile="${lib}/pao.jar" basedir="${classes}" includes="polyglot/ext/pao/**"/>
   </target>
 
-  <target name="coffer-jar" depends="coffer">
+  <target name="coffer-jar" depends="coffer" description="Builds coffer.jar">
     <jar jarfile="${lib}/coffer.jar" basedir="${classes}" includes="polyglot/ext/coffer/**,polyglot/ext/param/**"/>
   </target>
 
@@ -570,7 +574,8 @@ ext=""
     <chmod perm="+x" file="${dist}/src/polyglot/ext/pao/tests/paovm"/>
   </target>
 
-  <target name="param-jar" depends="param,polyglot-jar">
+  <target name="param-jar" depends="param,polyglot-jar" description="Builds param.jar">
+    <jar jarfile="${lib}/param.jar" basedir="${classes}" includes="polyglot/ext/param/**"/>
   </target>
 
   <target name="param-dist" depends="jl-dist">
@@ -678,7 +683,9 @@ ext=""
     <ant inheritAll="false" antfile="${dist}/build.xml" dir="${dist}" target="clobber"/>
   </target>
 
-  <target name="javadoc" depends="jl">
+  <target name="javadoc" 
+    description="Runs javadoc over the Polyglot source code" 
+  	depends="jl">
     <javadoc sourcepath="${basedir}" destdir="doc/api" encoding="iso-8859-1">
       <packageset dir="${src}" defaultexcludes="yes">
         <include name="polyglot/**"/>
@@ -693,7 +700,8 @@ ext=""
   <target name="jar" depends="polyglot-jar"/>
   <target name="polyglot-dist" depends="jl-dist,skel-dist,param-dist,pao-dist,coffer-dist,pth-dist"/>
   <target name="polyglot-dist-javadoc" depends="polyglot-dist,dist-javadoc"/>
-  <target name="dist" depends="polyglot-dist-javadoc"/>
+  <target name="dist" depends="polyglot-dist-javadoc"
+                      description="Builds the Polyglot distribution"/>
 
   <target name="polyj-dist" depends="jl-dist,polyj"/>
 
@@ -715,8 +723,7 @@ ext=""
   </target>
   
   <!-- compile pth (Polyglot Test Harness) -->
-  <target name="pth-compile" depends="jl"
-          description="compile the pth source">
+  <target name="pth-compile" depends="jl">
     <antcall target="jflex-lexer">
       <param name="lexer.dir" value="${pthdir}/src/polyglot/pth"/>
       <param name="lexer.class" value="Lexer_c"/>
@@ -736,14 +743,13 @@ ext=""
   
   <!-- create jar pth (Polyglot Test Harness) -->
   <target name="pth-jar" depends="pth-compile"
-          description="create the pth jar file">
+          description="Builds pth.jar">
     <jar jarfile="${lib}/pth.jar" basedir="${classes}" includes="polyglot/pth/**"/>
   </target>  
   
   <!-- Create pth executable -->
   <target name="pth-bin" 
-          depends="executable-defs" 
-          description="creates the executable script pth">
+          depends="executable-defs">
     <echo message="Creating ${bin}/pth"/>
     <concat destfile="${bin}/pth" append="no">
       <filelist dir="${bin}" files="defs"/>
@@ -756,7 +762,7 @@ ext=""
   </target>
 
   <!-- create pth (Polyglot Test Harness) -->
-  <target name="pth" depends="pth-jar"/>
+  <target name="pth" depends="pth-jar" description="Builds the pth (Polyglot Test Harness) tool"/>
 
   <!-- create distribution for pth (Polyglot Test Harness) -->
   <target name="pth-dist" depends="pth">
