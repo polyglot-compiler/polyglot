@@ -1367,6 +1367,11 @@ public class TypeSystem_c implements TypeSystem
 		f.clear(METHOD_FLAGS) + ".");
 	}
 
+        if (f.isAbstract() && f.isPrivate()) {
+	    throw new SemanticException(
+		"Cannot declare method that is both abstract and private.");
+        }
+
         if (f.isAbstract() && f.isStatic()) {
 	    throw new SemanticException(
 		"Cannot declare method that is both abstract and static.");
