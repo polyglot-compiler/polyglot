@@ -19,6 +19,7 @@ public final class Options {
   public File output_directory;
   public String default_classpath;
   public String classpath;
+  public boolean assertions = false;
 
   Options() {
     String bootpath = System.getProperty("sun.boot.class.path");
@@ -104,6 +105,7 @@ public final class Options {
                         "<source-file>." + fileext + " ...\n");
     System.err.println("where [options] includes:");
     System.err.println(" -d <directory>          output directory");
+    System.err.println(" -assert                 recognize the assert keyword");
     System.err.println(" -sourcepath <path list> source path");
     System.err.println(" -ext <extension>        use language extension");
     System.err.println(" -fqcn                   use fully-qualified class"

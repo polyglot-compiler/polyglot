@@ -182,7 +182,10 @@ public class StdErrorQueue implements ErrorQueue
     
     public void flush() {
 	if (! flushed) {
-	    err.println(errorCount + " error" + (errorCount > 1 ? "s." : "."));
+            if (errorCount > 0) {
+                err.println(errorCount + " error" +
+                            (errorCount > 1 ? "s." : "."));
+            }
 	    flushed = true;
 	}
     }

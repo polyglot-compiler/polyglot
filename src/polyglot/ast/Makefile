@@ -9,6 +9,7 @@ SOURCES = \
 	AmbExpr.java \
 	Ambiguous.java \
 	Computation.java \
+	Assert.java \
 	AmbPrefix.java \
 	AmbQualifierNode.java \
 	AmbReceiver.java \

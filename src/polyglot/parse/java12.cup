@@ -9,12 +9,15 @@ import polyglot.lex.*;
 import polyglot.parse.*;
 import polyglot.types.*;
 import polyglot.util.*;
+import polyglot.ast.Assert;
 
 // This parser is based on:
 /* Java 1.2 parser for CUP.
  * Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
  * This program is released under the terms of the GPL; see the file
  * COPYING for more details.  There is NO WARRANTY on this code.
+ *
+ * extended to support Java 1.4 (assert keyword).
  */
 
 parser code {:
@@ -157,6 +160,9 @@ terminal polyglot.lex.NullLiteral NULL_LITERAL;
 // strictfp keyword, new in Java 1.2
 terminal Token STRICTFP;
 
+// assert keyword, new in Java 1.4
+terminal Token ASSERT;
+
 // Reserved but unused:
 terminal CONST, GOTO;
 
@@ -254,6 +260,7 @@ non terminal Try try_statement;
 non terminal List catches_opt, catches;
 non terminal Catch catch_clause;
 non terminal Block finally;
+non terminal Assert assert_statement;
 // 19.12) Expressions
 non terminal Expr primary, primary_no_new_array;
 non terminal Expr class_instance_creation_expression;
@@ -1007,6 +1014,8 @@ statement_without_trailing_substatement ::=
             {: RESULT = a; :}
     |   try_statement:a
             {: RESULT = a; :}
+    |   assert_statement:a
+            {: RESULT = a; :}
     ;
 empty_statement ::=
                     // Empty
@@ -1251,6 +1260,14 @@ finally ::=
                     // Block
         FINALLY block:a
             {: RESULT = a; :}
+    ;
+
+assert_statement ::=
+                    // Assert
+        ASSERT:x expression:a SEMICOLON
+                {: RESULT = parser.nf.Assert(parser.util.pos(x), a); :}
+    |   ASSERT:x expression:a COLON expression:b SEMICOLON
+                {: RESULT = parser.nf.Assert(parser.util.pos(x), a, b); :}
     ;
 
 // 19.12) Expressions

@@ -49,6 +49,9 @@ public interface NodeFactory
     ArrayInit ArrayInit(Position pos);
     ArrayInit ArrayInit(Position pos, List elements);
 
+    Assert Assert(Position pos, Expr cond);
+    Assert Assert(Position pos, Expr cond, Expr errorMessage);
+
     Assign Assign(Position pos, Expr target, Assign.Operator op, Expr source);
 
     Binary Binary(Position pos, Expr left, Binary.Operator op, Expr right);

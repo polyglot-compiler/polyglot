@@ -254,6 +254,7 @@ SingleCharacter = [^\r\n\'\\]
   "try"                          { return key(sym.TRY); }
   "volatile"                     { return key(sym.VOLATILE); }
   "strictfp"                     { return key(sym.STRICTFP); }
+  "assert"                       { return key(sym.ASSERT); }
 
   /* boolean literals */
   "true"                         { return boolean_token(true); }

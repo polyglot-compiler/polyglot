@@ -174,6 +174,11 @@ public class Main
           }
           i++;
         }
+        else if (args[i].equals("-assert")) 
+        {
+          i++;
+          options.assertions = true;
+        }
         else if (args[i].equals("-fqcn")) 
         {
           i++;

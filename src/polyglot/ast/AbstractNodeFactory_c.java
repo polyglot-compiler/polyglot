@@ -1,6 +1,7 @@
 package polyglot.ext.jl.ast;
 
 import polyglot.ast.*;
+import polyglot.ast.Assert;
 import polyglot.types.Flags;
 import polyglot.types.Package;
 import polyglot.types.Type;
@@ -41,6 +42,10 @@ public abstract class AbstractNodeFactory_c implements NodeFactory
 
     public final ArrayInit ArrayInit(Position pos) {
 	return ArrayInit(pos, Collections.EMPTY_LIST);
+    }
+
+    public final Assert Assert(Position pos, Expr cond) {
+        return Assert(pos, cond, null);
     }
 
     public final Block Block(Position pos) {
