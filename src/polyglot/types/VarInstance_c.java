@@ -64,4 +64,12 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     public boolean isCanonical() {
 	return true;
     }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public void setFlags(Flags flags) {
+        this.flags = flags;
+    }
 }
