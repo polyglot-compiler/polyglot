@@ -225,9 +225,10 @@ public class NewObjectExpression extends Expression
     mti = null;
     try
     {
-      mti = c.getMethod( ct, new ConstructorType( c.getTypeSystem(), 
-                                                  ct, 
-                                                  argTypes));
+//        mti = c.getMethod( ct, new ConstructorType( c.getTypeSystem(), 
+//                                                    ct, 
+//                                                    argTypes));
+      mti = c.getTypeSystem().getConstructor(ct, argTypes, c);
     }
     catch (SemanticException e)
     {

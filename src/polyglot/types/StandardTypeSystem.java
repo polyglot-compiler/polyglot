@@ -615,7 +615,7 @@ public class StandardTypeSystem extends TypeSystem {
     
     if (lAcceptable.size() == 0)
       throw new SemanticException ( "No valid method call found for \"" + 
-                                     method.getName() + "\".");
+                                     method.getName() + "\" in "+ t + ".");
 
     // now, use JLS 15.11.2.2
     Object [] mtiArray = lAcceptable.toArray(  );
@@ -723,6 +723,21 @@ public class StandardTypeSystem extends TypeSystem {
       return false;
     }
   }
+
+  /**
+   * Returns the ConstructorTypeInstance correpsonding to the
+   *   constructor call for the given class on the given args
+   */
+  public MethodTypeInstance getConstructor(ClassType clazz, List args,
+					   LocalContext context)
+    throws SemanticException
+  {
+    return context.getMethod(clazz,
+			     new ConstructorType(context.getTypeSystem(),
+						 clazz, args));
+  }
+					   
+
 
   /**
    * Returns the supertype of type, or null if type has no supertype.

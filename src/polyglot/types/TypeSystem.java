@@ -197,6 +197,16 @@ public abstract class TypeSystem {
 					LocalContext context)
     throws SemanticException;
 
+  /**
+   * If a constructor call on <clazz> with arguments <args> would
+   *  succeed in <context> returns the actual ConstructorTypeInstance
+   *  for the constructor call, otherwise throws a SemanticException.
+   */
+  public abstract MethodTypeInstance getConstructor(ClassType clazz,
+						    List args,
+						    LocalContext context)
+    throws SemanticException;
+
   ////
   // Functions which yield particular types.
   ////
