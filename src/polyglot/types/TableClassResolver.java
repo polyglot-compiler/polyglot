@@ -66,7 +66,7 @@ public class TableClassResolver implements ClassResolver
     FieldInstance field;
     Type type;
     TypeNode typeNode;
-    ClassType superClazz;
+    ClassType superClazz, implementsClazz;
     List list1, list2;
     
     context = new TypeSystem.Context( it, (ClassType)ts.getObject(), null);
@@ -129,6 +129,64 @@ public class TableClassResolver implements ClassResolver
         clazz.setSuperType( (ClassType)ts.getObject());
       }
     }
+
+
+
+    for (ListIterator i = clazz.getInterfaces().listIterator(); i.hasNext(); )
+    {
+      type = (Type)i.next();
+      try {
+        implementsClazz = (ClassType)ts.checkAndResolveType( type, context);
+        
+        /* Now we must clean all our interfaces. But we need to check
+         * first to see if the interface is defined in this file. If
+         * so then clean here it, but if not, then ask then ask the
+         * "ClassCleaner" to so do.
+         * Either way do so recursively. Note that if things fail here
+         * we're in a lot of trouble so immediately return false. */
+        if( implementsClazz instanceof ParsedClassType) {
+          if( table.containsKey( implementsClazz.getFullName())) {
+            if( !cleanupClassSignatures( (ParsedClassType)implementsClazz, 
+                                         ts, it, eq)) { 
+              eq.enqueue( ErrorInfo.SEMANTIC_ERROR,
+                          "Errors while compiling dependencies of "
+                          + clazz.getShortName() + "\".");
+              queue.remove( clazz);
+              return false;
+            }
+          }
+          else {
+            try {
+              if( !cc.cleanClass( implementsClazz)) {
+                eq.enqueue( ErrorInfo.SEMANTIC_ERROR,
+                            "Errors while compiling dependencies of "
+                            + clazz.getShortName() + "\".");
+                queue.remove( clazz);
+                return false;
+              }
+            }
+            catch( IOException e) 
+            {
+              eq.enqueue( ErrorInfo.IO_ERROR, 
+                        "Encountered an I/O error while compiling "
+                        + "dependencies of \"" + clazz.getShortName() + "\".");
+              queue.remove( clazz);
+              return false;
+            }
+          }
+        }
+
+        i.set( implementsClazz );          
+      }
+      catch( TypeCheckException e)
+      {
+        eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage());
+        queue.remove( clazz);
+        return false;
+      }
+    }
+
+
 
     context = new TypeSystem.Context( it, clazz, null);
 

@@ -136,7 +136,14 @@ public class LoadedClassType extends ClassTypeImpl  {
     Type type = ts.typeForClass(f.getType());
     AccessFlags flags = AccessFlags.flagsForInt(f.getModifiers());    
     
-    return new FieldInstance(fieldName, type, this,  flags);
+    FieldInstance fi = new FieldInstance(fieldName, type, this,  flags);
+    // gets the constant field and sets it.
+    try
+    {    
+      fi.setConstantValue ( f.get(null) );
+    }
+    catch (Exception e) {}
+    return fi;
   }
 
   protected MethodType methodTypeForMethod(Method m) throws TypeCheckException 

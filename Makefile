@@ -20,7 +20,7 @@ JAR_FILE		= jltools.jar
 JAR_FLAGS		= cf 
 
 JAVADOC_OUTPUT		= ./javadoc
-JAVADOC_FLAGS		= -classpath $(CLASSPATHFLAG) 
+JAVADOC_FLAGS		= $(CLASSPATHFLAG) 
 
 SOURCE			= .
 PERSONAL_MAKEFILE	= Makefile.personal

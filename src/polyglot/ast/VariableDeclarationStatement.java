@@ -188,7 +188,8 @@ public class VariableDeclarationStatement extends Statement {
         if (d.initializer instanceof IntLiteral && 
             d.initializer != null &&
             modifiers.isFinal())
-          fi.setConstantValue ( ((IntLiteral)d.initializer).getLongValue() );
+          fi.setConstantValue ( new Long (
+              ((IntLiteral)d.initializer).getLongValue() ));
         c.addSymbol( d.name, fi);
       }
     
@@ -215,7 +216,8 @@ public class VariableDeclarationStatement extends Statement {
             d.initializer != null &&
             modifiers.isFinal())
         {
-          fi.setConstantValue ( ((IntLiteral)d.initializer).getLongValue() );
+          fi.setConstantValue ( new Long( 
+                 ((IntLiteral)d.initializer).getLongValue() ));
         }
         c.addSymbol( d.name, fi);
        }

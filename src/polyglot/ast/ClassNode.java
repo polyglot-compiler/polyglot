@@ -242,6 +242,14 @@ public class ClassNode extends ClassMember {
     if( superClass != null) {
       type.setSuperType( superClass.getType());
     }
+
+    for (Iterator i = interfaceList.listIterator(); i.hasNext() ; )
+    {
+      Type t = ((TypeNode)i.next()).getType();
+      type.addInterface ( t ) ;
+      System.out.println( "adding ambig iface: " + t.getTypeString() + " to pct");
+    }
+
     type.setAccessFlags( accessFlags);
 
     visitChildren( sr);

@@ -93,8 +93,11 @@ public class FieldNode extends ClassMember {
       if (declarator.initializer instanceof IntLiteral && 
           declarator.initializer != null &&
           declare.getModifiers().isFinal())
-        fi.setConstantValue ( (int)((IntLiteral)
-                               declarator.initializer).getLongValue() );
+      {
+        fi.setConstantValue ( new Long ( 
+                ((IntLiteral)declarator.initializer).getLongValue()) );
+      }
+
       Annotate.setLineNumber( fi, Annotate.getLineNumber( this));
       clazz.addField( fi);
 

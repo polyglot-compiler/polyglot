@@ -151,9 +151,13 @@ public class BlockStatement extends Statement {
   Object visitChildren(NodeVisitor v, boolean flatten) 
   {
     Object vinfo = Annotate.getVisitorInfo( this);
-
     for (ListIterator it = statements.listIterator(); it.hasNext(); ) {
       Node node = (Node) it.next();
+      if (node == null)
+      {
+        it.remove();
+        continue;
+      }
       Node newNode = node.visit(v);
       if (newNode == null) {
 	// Remove the node.

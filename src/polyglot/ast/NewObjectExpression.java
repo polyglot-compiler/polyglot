@@ -203,13 +203,18 @@ public class NewObjectExpression extends Expression {
   
   public Node typeCheck(LocalContext c) throws TypeCheckException
   {
-    // make sure that primary is the "containing" class for the inner class, if appropriate
-    if (primary != null && !primary.getCheckedType().equals((ClassType)type.getType()))
-      throw new TypeCheckException (" The containing instance must be the containing class of \"" +
-                                    type.getType().getTypeString() + "\"");
+    // make sure that primary is the "containing" class for the inner class, 
+    // if appropriate
+    if (primary != null && 
+        !primary.getCheckedType().equals((ClassType)type.getType()))
+      throw new TypeCheckException (
+              " The containing instance must be the containing class of \"" +
+              type.getType().getTypeString() + "\"");
 
-    if ( primary != null && ((ClassType)type.getType()).getAccessFlags().isStatic())
-      throw new TypeCheckException ( " Cannot specify a containing instance for static classes.");
+    if ( primary != null && 
+         ((ClassType)type.getType()).getAccessFlags().isStatic())
+      throw new TypeCheckException (
+             "Cannot specify a containing instance for static classes.");
 
     if ( ((ClassType)type.getType()).getAccessFlags().isAbstract())
       throw new TypeCheckException ( " Cannot instantiate an abstract class.");
@@ -229,8 +234,14 @@ public class NewObjectExpression extends Expression {
     }
     catch (TypeCheckException tce)
     {
-      throw new TypeCheckException ( " No acceptable constructor found for the creation of \"" 
-                                     + type.getType().getTypeString() + "\"");
+      for (Iterator i = argTypes.iterator(); i.hasNext() ; )
+      {
+        Type t = (Type)i.next();
+        System.out.println( t + t.getTypeString());
+      }
+      throw new TypeCheckException ( 
+              " No acceptable constructor found for the creation of \"" 
+              + type.getType().getTypeString() + "\"");
     }
     setCheckedType ( type.getType() );
     jltools.util.Annotate.addThrows( this, mti.exceptionTypes () );

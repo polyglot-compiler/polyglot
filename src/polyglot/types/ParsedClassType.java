@@ -28,7 +28,7 @@ public class ParsedClassType extends ClassTypeImpl
   public ParsedClassType( TypeSystem ts, ClassType containingClass)
   {
     super( ts);
-    interfaces = new TypedList( new LinkedList(), ClassType.class, false);
+    interfaces = new TypedList( new LinkedList(), Type.class, false);
     methods = new TypedList( new LinkedList(), MethodTypeInstance.class,
                              false);
     fields = new TypedList( new LinkedList(), FieldInstance.class, false);
@@ -56,7 +56,7 @@ public class ParsedClassType extends ClassTypeImpl
     this.superType = superType;
   }
 
-  public void addInterface( ClassType interface_)
+  public void addInterface( Type interface_)
   {
     interfaces.add( interface_);
   }

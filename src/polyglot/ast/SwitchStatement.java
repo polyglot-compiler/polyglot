@@ -81,8 +81,12 @@ public class SwitchStatement extends Statement {
 
      public Object visitChildren ( NodeVisitor v)
      {
-       expr = (Expression)expr.visit ( v );
-       return Annotate.getVisitorInfo ( expr );
+       if ( expr != null)
+       {
+         expr = (Expression)expr.visit ( v );
+         return Annotate.getVisitorInfo ( expr );
+       }
+       return null;
      }
 
      public Node typeCheck( LocalContext c ) throws TypeCheckException
@@ -95,30 +99,38 @@ public class SwitchStatement extends Statement {
 
        if ( ! expr.getCheckedType().isImplicitCastValid ( 
                   c.getTypeSystem().getInt()))
+       {
+         System.out.println("TYPE  " + expr.getCheckedType().getTypeString());
          throw new TypeCheckException ( "The case label must be a byte, char,"
                                         + " short or int.");
+       }
 
-       if ( expr instanceof FieldExpression)
-       {
-         FieldInstance fi = ((FieldExpression)expr).getFieldInstance();
-         if ( fi == null)
-           throw new InternalCompilerError("Field Instance not defined!");
-         if ( ! fi.isConstant())
-           throw new TypeCheckException(" Case must be a constant.");
-         iValue = fi.getConstantValue();
-       }
-       else if (expr instanceof LocalVariableExpression)
-       {
-         FieldInstance fi = ((LocalVariableExpression)expr).getFieldInstance();
-         if ( fi == null)
-           throw new InternalCompilerError("Field Instance not defined!");
-         if ( ! fi.isConstant())
-           throw new TypeCheckException(" Case must be a constant.");
-         iValue = fi.getConstantValue();
-       }
-       else if ( expr instanceof IntLiteral)
+       if ( expr instanceof IntLiteral)
        {
          iValue = (int)((IntLiteral)expr).getLongValue();
+       }
+       else if ( expr instanceof FieldExpression || 
+                 expr instanceof LocalVariableExpression)
+       {
+         FieldInstance fi;
+         if ( expr instanceof FieldExpression)
+         {
+           fi = ((FieldExpression)expr).getFieldInstance();
+         }
+         else
+           fi = ((LocalVariableExpression)expr).getFieldInstance();
+
+         if ( fi == null)
+           throw new InternalCompilerError("Field Instance not defined!");
+         if ( ! fi.isConstant())
+           throw new TypeCheckException(" Case must be a constant.");
+
+         if ( fi.getConstantValue() instanceof Integer)
+           iValue = (int)((Integer)fi.getConstantValue()).intValue();
+         else if ( fi.getConstantValue() instanceof Long)
+           iValue = (int)((Long)fi.getConstantValue()).longValue();
+         else throw new InternalCompilerError("Unexpected Constant type.");
+           
        }
        else
          throw new TypeCheckException (" Cast must be a constant");
@@ -211,6 +223,9 @@ public class SwitchStatement extends Statement {
 
      public Node typeCheck( LocalContext lc )
      {
+       Annotate.addThrows( this, Annotate.getThrows(block));
+       Annotate.setTerminatesOnAllPaths(this, 
+                                        Annotate.terminatesOnAllPaths(block));
        return this;
      }
 
@@ -317,28 +332,35 @@ public class SwitchStatement extends Statement {
 
    public Node typeCheck(LocalContext c) throws TypeCheckException
    {
-     //FIXME: add exceptions, return path stuff
-
      List lDefinedCaseLabels = new ArrayList();
-     
-    for (ListIterator it = switchElems.listIterator(); it.hasNext(); ) {
-      SwitchElement se = (SwitchElement) it.next();
+     Annotate.addThrows(this, Annotate.getThrows(expr));
+     boolean bHasBlocks = false;
+     boolean bAllBlocksReturn = true;
 
-      if ( se instanceof CaseStatement)
-      {
-        Object key;
-        if ( ((CaseStatement)se).def)
-          key = "default";
-        else
-          key = new Long ( ((CaseStatement)se).iValue);
-        
-        if ( lDefinedCaseLabels.contains( key ) )
-          throw new TypeCheckException( " Duplicate case label.", 
-                                        Annotate.getLineNumber( se ) );
-        lDefinedCaseLabels.add ( key );                                        
-      }
-      
-    }
+     for (ListIterator it = switchElems.listIterator(); it.hasNext(); ) {
+       SwitchElement se = (SwitchElement) it.next();
+       if ( se instanceof CaseStatement)
+       {
+         Object key;
+         if ( ((CaseStatement)se).def)
+           key = "default";
+         else
+           key = new Long ( ((CaseStatement)se).iValue);
+         
+         if ( lDefinedCaseLabels.contains( key ) )
+           throw new TypeCheckException( " Duplicate case label.", 
+                                         Annotate.getLineNumber( se ) );
+         lDefinedCaseLabels.add ( key );                                        
+       }
+       else
+       {
+         bHasBlocks = true;
+         if ( !Annotate.terminatesOnAllPaths(se) )
+           bAllBlocksReturn = false;
+       }
+       Annotate.addThrows( this, Annotate.getThrows( se ) );
+       Annotate.setTerminatesOnAllPaths(this, bHasBlocks && bAllBlocksReturn);
+     }
      
      return this;
    }

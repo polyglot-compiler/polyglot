@@ -73,13 +73,16 @@ public class WhileStatement extends Statement {
     condExpr = (Expression) condExpr.visit(v);
     vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( condExpr), vinfo);   
 
-    Node newNode = (Node) statement.visit(v);
-    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newNode), vinfo);
-    if (newNode instanceof Expression) {
-      statement = new ExpressionStatement((Expression) newNode);
-    }
-    else {
-      statement = (Statement) newNode;
+    if ( statement != null)
+    {
+      Node newNode = (Node) statement.visit(v);
+      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( newNode), vinfo);
+      if (newNode instanceof Expression) {
+        statement = new ExpressionStatement((Expression) newNode);
+      }
+      else {
+        statement = (Statement) newNode;
+      }
     }
     
     return vinfo;
@@ -90,6 +93,12 @@ public class WhileStatement extends Statement {
     w.write("while( " );
     condExpr.translate(c, w);
     w.write(")");
+    if (statement == null)
+    {
+      w.write ( " ; ");
+      return;
+    }
+
     if ( ! (statement instanceof BlockStatement))
     {
       w.beginBlock();
