@@ -273,6 +273,27 @@ public class FieldDecl_c extends Node_c implements FieldDecl {
         return this;
     }
 
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
+        TypeSystem ts = ec.typeSystem();
+
+        SubtypeSet s = (SubtypeSet) ec.throwsSet();
+
+        for (Iterator i = s.iterator(); i.hasNext(); ) {
+            Type t = (Type) i.next();
+
+            if (! t.isUncheckedException()) {
+                ec.throwsSet().clear();
+                throw new SemanticException(
+                    "A field initializer may not throw a " 
+                    + t + ".", position());
+            }
+        }
+
+        ec.throwsSet().clear();
+
+        return this;
+    }
+
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
         if (child == init) {
             return type.type();
