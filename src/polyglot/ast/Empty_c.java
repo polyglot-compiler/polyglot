@@ -19,9 +19,7 @@ public class Empty_c extends Stmt_c implements Empty
 	w.write(";");
     }
 
-    /*
     public String toString() {
-	return "/* empty *\/";
+	return ";";
     }
-    */
 }

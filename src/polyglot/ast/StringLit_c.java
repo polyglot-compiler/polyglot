@@ -40,11 +40,9 @@ public class StringLit_c extends Lit_c implements StringLit
         return type(tc.typeSystem().String());
     }
 
-    /*
     public String toString() {
 	return "\"" + StringUtil.escape(value) + "\"";
     }
-    */
  
     /** Write the expression to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

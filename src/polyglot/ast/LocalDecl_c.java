@@ -190,11 +190,9 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
         return decl.setExpectedType(child, tc);
     }
 
-    /*
     public String toString() {
 	return decl.toString();
     }
-    */
 
     /** Write the declaration to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

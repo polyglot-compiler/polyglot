@@ -126,11 +126,9 @@ public class NewArray_c extends Expr_c implements NewArray
         return child;
     }
 
-    /*
     public String toString() {
 	return "new " + baseType + "[...]";
     }
-    */
 
     /** Write the expression to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

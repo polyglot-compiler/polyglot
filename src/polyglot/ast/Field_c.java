@@ -159,11 +159,9 @@ public class Field_c extends Expr_c implements Field
     return this;
   }
 
-  /*
   public String toString() {
     return (target != null ? target + "." : "") + name;
   }
-  */
 
   /** Write the field to an output file. */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

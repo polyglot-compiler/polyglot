@@ -182,11 +182,9 @@ public class SourceFile_c extends Node_c implements SourceFile
 	return this;
     }
 
-    /*
     public String toString() {
-	return "/* source file *\/";
+        return "<<<< " + source + " >>>>";
     }
-    */
 
     /** Write the source file to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

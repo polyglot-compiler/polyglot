@@ -207,11 +207,9 @@ public class Conditional_c extends Expr_c implements Conditional
         return child;
     }
 
-    /*
     public String toString() {
 	return cond + " ? " + consequent + " : " + alternative;
     }
-    */
 
     /** Write the expression to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr)

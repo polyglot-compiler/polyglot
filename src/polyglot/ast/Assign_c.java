@@ -194,11 +194,9 @@ public class Assign_c extends Expr_c implements Assign
     return op == DIV_ASSIGN || op == MOD_ASSIGN;
   }
 
-  /*
   public String toString() {
     return left + " " + op + " " + right;
   }
-  */
 
   /** Write the expression to an output file. */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

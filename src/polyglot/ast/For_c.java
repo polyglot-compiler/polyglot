@@ -182,11 +182,9 @@ public class For_c extends Stmt_c implements For
 	leaveScope(tr.context());
     }
 
-    /*
     public String toString() {
 	return "for (...) ...";
     }
-    */
 
     private void printForInit(ForInit s, CodeWriter w, PrettyPrinter tr) {
         tr.appendSemicolon(false);

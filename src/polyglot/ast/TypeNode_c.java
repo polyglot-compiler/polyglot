@@ -45,7 +45,6 @@ public abstract class TypeNode_c extends Node_c implements TypeNode
         }
     }
 
-    /*
     public String toString() {
 	if (type != null) {
 	    return type.toString();
@@ -54,7 +53,6 @@ public abstract class TypeNode_c extends Node_c implements TypeNode
 	    return "<unknown type>";
 	}
     }
-    */
 
     public abstract void prettyPrint(CodeWriter w, PrettyPrinter tr);
 }

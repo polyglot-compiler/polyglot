@@ -295,11 +295,9 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	return this;
     }
 
-    /*
     public String toString() {
 	return flags.translate() + returnType + " " + name + "(...)";
     }
-    */
 
     /** Write the method to an output file. */
     public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {

@@ -314,12 +314,10 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         return this;
     }
 
-    /*
     public String toString() {
 	    return flags.clearInterface().translate() +
 		       (flags.isInterface() ? "interface " : "class ") + name + " " + body;
     }
-    */
 
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
         if (flags.isInterface()) {

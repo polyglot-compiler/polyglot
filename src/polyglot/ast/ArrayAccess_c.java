@@ -112,11 +112,9 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	return this;
     }
 
-    /*
     public String toString() {
 	return array + "[" + index + "]";
     }
-    */
 
     /** Write the expression to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

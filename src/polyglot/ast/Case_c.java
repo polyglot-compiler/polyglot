@@ -140,7 +140,6 @@ public class Case_c extends Stmt_c implements Case
         return child;
     }
 
-    /*
     public String toString() {
         if (expr == null) {
 	    return "default:";
@@ -149,7 +148,6 @@ public class Case_c extends Stmt_c implements Case
 	    return "case " + expr + ":";
 	}
     }
-    */
 
     /** Write the statement to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

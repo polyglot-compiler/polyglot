@@ -120,11 +120,9 @@ public class Switch_c extends Stmt_c implements Switch
         return child;
     }
 
-    /*
     public String toString() {
 	return "switch (" + expr + ") { ... }";
     }
-    */
 
     /** Write the statement to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

@@ -46,9 +46,7 @@ public class PackageNode_c extends Node_c implements PackageNode
         w.write(tr.typeSystem().translatePackage(tr.context(), package_));
     }
 
-    /*
     public String toString() {
         return package_.toString();
     }
-    */
 }

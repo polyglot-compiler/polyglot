@@ -59,11 +59,9 @@ public class Eval_c extends Stmt_c implements Eval
 	return reconstruct(expr);
     }
 
-    /*
     public String toString() {
 	return expr.toString();
     }
-    */
 
     /** Write the statement to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

@@ -89,11 +89,9 @@ public class While_c extends Stmt_c implements While
         return child;
     }
 
-    /*
     public String toString() {
 	return "while (" + cond + ") ...";
     }
-    */
 
     /** Write the statement to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

@@ -62,11 +62,9 @@ public class Import_c extends Node_c implements Import
 	return this;
     }
    
-    /*
     public String toString() {
 	return "import " + name + (kind == PACKAGE ? ".*" : "");
     }
-    */
 
     /** Write the import to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

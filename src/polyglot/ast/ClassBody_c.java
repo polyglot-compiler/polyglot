@@ -129,11 +129,9 @@ public class ClassBody_c extends Node_c implements ClassBody
         c.popBlock();
     }
 
-    /*
     public String toString() {
         return "{ ... }";
     }
-    */
 
     protected void duplicateFieldCheck(TypeChecker tc) throws SemanticException {
         ClassType type = tc.context().currentClass();

@@ -380,11 +380,9 @@ public class Binary_c extends Expr_c implements Binary
 	return op == DIV || op == MOD;
     }
 
-    /*
     public String toString() {
 	return left + " " + op + " " + right;
     }
-    */
 
     /** Write the expression to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

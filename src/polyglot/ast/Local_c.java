@@ -64,11 +64,9 @@ public class Local_c extends Expr_c implements Local
     return type(li.type());
   }
 
-  /*
   public String toString() {
     return name;
   }
-  */
 
   /** Write the local to an output file. */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

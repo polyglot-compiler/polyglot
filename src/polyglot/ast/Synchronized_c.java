@@ -89,11 +89,9 @@ public class Synchronized_c extends Stmt_c implements Synchronized
         return child;
     }
 
-    /*
     public String toString() {
 	return "synchronized (" + expr + ") { ... }";
     }
-    */
 
     /** Write the statement to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

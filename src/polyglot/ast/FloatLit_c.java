@@ -63,11 +63,9 @@ public class FloatLit_c extends Lit_c implements FloatLit
 	}
     }  
 
-    /*
     public String toString() {
 	return Double.toString(value);
     }
-    */
 
     /** Write the expression to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

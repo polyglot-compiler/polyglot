@@ -44,11 +44,9 @@ public class Branch_c extends Stmt_c implements Branch
 	return n;
     }
 
-    /*
     public String toString() {
 	return kind.toString() + (label != null ? " " + label : "");
     }
-    */
 
     /** Write the expression to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

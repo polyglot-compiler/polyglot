@@ -257,11 +257,9 @@ public class FieldDecl_c extends Node_c implements FieldDecl
       return decl.setExpectedType(child, tc);
   }
 
-  /*
   public String toString() {
     return decl.toString();
   }
-  */
 
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
     boolean isInterface = fi != null && fi.container() != null &&

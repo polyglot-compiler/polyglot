@@ -98,13 +98,11 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
                                     + this + ".");
   }
 
-  /*
   public String toString() {
     return (qual == null
             ? name
             : qual.toString() + "." + name) + "{amb}";
   }
-  */
 
   public void dump(CodeWriter w) {
     super.dump(w);

@@ -280,11 +280,9 @@ public class Call_c extends Expr_c implements Call
     return this;
   }
 
-  /*
   public String toString() {
     return (target != null ? target.toString() + "." : "") + name + "(...)";
   }
-  */
 
   /** Write the expression to an output file. */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

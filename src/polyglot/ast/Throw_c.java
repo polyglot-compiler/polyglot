@@ -79,11 +79,9 @@ public class Throw_c extends Stmt_c implements Throw
 	return this;
     }
 
-    /*
     public String toString() {
 	return "throw " + expr;
     }
-    */
 
     /** Write the statement to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

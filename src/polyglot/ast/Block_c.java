@@ -16,11 +16,9 @@ public class Block_c extends AbstractBlock_c implements Block
 	super(ext, pos, statements);
     }
 
-    /*
     public String toString() {
 	return "{ ... }";
     }
-    */
 
     /** Write the block to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

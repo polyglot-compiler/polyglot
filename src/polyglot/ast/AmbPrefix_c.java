@@ -93,11 +93,9 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
 	    "Cannot translate ambiguous node " + this + ".");
     }
 
-    /*
     public String toString() {
 	return (prefix == null
 		? name
 		: prefix.toString() + "." + name) + "{amb}";
     }
-    */
 }

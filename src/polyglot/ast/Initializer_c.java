@@ -168,9 +168,7 @@ public class Initializer_c extends Node_c implements Initializer
 	}
     }
 
-    /*
     public String toString() {
 	return flags.translate() + "{ ... }";
     }
-    */
 }

@@ -91,11 +91,9 @@ public class Catch_c extends Stmt_c implements Catch
 	return this;
     }
 
-    /*
     public String toString() {
 	return "catch (" + formal + ") " + body;
     }
-    */
 
     /** Write the catch block to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

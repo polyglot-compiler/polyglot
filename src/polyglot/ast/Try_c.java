@@ -185,12 +185,10 @@ public class Try_c extends Stmt_c implements Try
 	return reconstruct(tryBlock, catchBlocks, finallyBlock);
     }
 
-    /*
     public String toString() {
 	return "try { ... } " + (catchBlocks.isEmpty() ? "" : "catch ...") +
 	                        (finallyBlock != null ? "finally { ... }" : "");
     }
-    */
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("try");

@@ -519,12 +519,10 @@ FIXME: check super types as well.
         return Precedence.LITERAL;
     }
 
-    /*
     public String toString() {
 	return (qualifier != null ? (qualifier.toString() + ".") : "") +
             "new " + tn + "(...)" + (body != null ? " " + body : "");
     }
-    */
 
     /** Write the expression to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

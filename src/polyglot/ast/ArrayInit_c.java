@@ -133,11 +133,9 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
         }
     }
 
-    /*
     public String toString() {
 	return "{ ... }";
     }
-    */
 
     /** Write the initializer to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

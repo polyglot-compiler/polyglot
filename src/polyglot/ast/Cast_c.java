@@ -115,11 +115,9 @@ public class Cast_c extends Expr_c implements Cast
       return this;
     }
 
-    /*
     public String toString() {
 	return "(" + castType + ") " + expr;
     }
-    */
 
     /** Write the expression to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr)

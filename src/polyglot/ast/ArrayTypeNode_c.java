@@ -87,9 +87,7 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
                                       + this + ".");
     }
 
-    /*
     public String toString() {
         return base.toString() + "[]";
     }
-    */
 }

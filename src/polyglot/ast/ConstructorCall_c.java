@@ -217,11 +217,9 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
         return child;
     }
 
-    /*
     public String toString() {
 	return (qualifier != null ? qualifier + "." : "") + kind + "(...)";
     }
-    */
 
     /** Write the call to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

@@ -103,11 +103,9 @@ public class Special_c extends Expr_c implements Special
 	}
     }
 
-    /*
     public String toString() {
 	return (qualifier != null ? qualifier + "." : "") + kind;
     }
-    */
 
     /** Write the expression to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
@@ -119,14 +117,14 @@ public class Special_c extends Expr_c implements Special
 	w.write(kind.toString());
     }
 
-  public void dump(CodeWriter w) {
-    super.dump(w);
+    public void dump(CodeWriter w) {
+      super.dump(w);
 
-    if (type != null) {
-      w.allowBreak(4, " ");
-      w.begin(0);
-      w.write("(kind " + kind + ")");
-      w.end();
+      if (type != null) {
+        w.allowBreak(4, " ");
+        w.begin(0);
+        w.write("(kind " + kind + ")");
+        w.end();
+      }
     }
-  }
 }

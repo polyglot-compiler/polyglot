@@ -90,11 +90,9 @@ public class Do_c extends Stmt_c implements Do
         return child;
     }
 
-    /*
     public String toString() {
 	return "do { ... } while (" + cond + ")";
     }
-    */
 
     /** Write the statement to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr)

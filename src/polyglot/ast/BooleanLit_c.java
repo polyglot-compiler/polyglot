@@ -39,11 +39,9 @@ public class BooleanLit_c extends Lit_c implements BooleanLit
     return type(tc.typeSystem().Boolean());
   }
 
-  /*
   public String toString() {
     return "" + value;
   }
-  */
 
   /** Write the expression to an output file. */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

@@ -68,11 +68,9 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
                                     + this + ".");
   }
 
-  /*
   public String toString() {
     return name + "{amb}";
   }
-  */
 
   public void dump(CodeWriter w) {
     super.dump(w);

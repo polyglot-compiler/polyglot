@@ -287,11 +287,9 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	return this;
     }
 
-    /*
     public String toString() {
 	return flags.translate() + name + "(...)";
     }
-    */
 
     /** Write the constructor to an output file. */
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {

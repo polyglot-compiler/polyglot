@@ -156,9 +156,7 @@ public class Formal_c extends Node_c implements Formal
 	}
     }
 
-    /*
     public String toString() {
 	return decl.toString();
     }
-    */
 }

@@ -105,12 +105,10 @@ public class If_c extends Stmt_c implements If
         return child;
     }
 
-    /*
     public String toString() {
 	return "if (" + cond + ") " + consequent +
 	    (alternative != null ? " else " + alternative : "");
     }
-    */
 
     /** Write the statement to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {    

@@ -24,11 +24,9 @@ public class NullLit_c extends Lit_c implements NullLit
 	return null;
     }
 
-    /*
     public String toString() {
-	return "null /* lit *\/";
+	return "null";
     }
-    */
 
     /** Write the expression to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

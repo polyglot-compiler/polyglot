@@ -18,11 +18,9 @@ public class SourceCollection_c extends Node_c implements SourceCollection
 	this.sources = TypedList.copyAndCheck(sources, SourceFile.class, true);
     }
 
-    /*
     public String toString() {
 	return sources.toString();
     }
-    */
 
     /** Get the source files. */
     public List sources() {
