@@ -482,14 +482,14 @@ FIXME: check super types as well.
         Job sj = tc.job().spawn(bodyCtxt, body,
                                 Pass.CLEAN_SUPER, Pass.DISAM_ALL);
 
-        if (! sj.reportedErrors()) {
-            throw new SemanticException("Could not disambiguate body of " +
-                                        "anonymous " +
-                                        (superType.flags().isInterface() ?
-                                         "implementor" : "subclass") +
-                                        " of \"" + superType + "\".");
-        }
-        else if (! sj.status()) {
+        if (! sj.status()) {
+            if (! sj.reportedErrors()) {
+                throw new SemanticException("Could not disambiguate body of " +
+                                            "anonymous " +
+                                            (superType.flags().isInterface() ?
+                                             "implementor" : "subclass") +
+                                            " of \"" + superType + "\".");
+            }
             throw new SemanticException();
         }
 
