@@ -311,7 +311,12 @@ public class ClassNode extends ClassMember
       }
     }
 
-    c.pushClass( type);
+    translateBody(c, w);
+  }
+
+  public void translateBody( LocalContext c, CodeWriter w)
+  {
+    enterScope(c);
     w.newline( 0);
     w.write( "{");
     w.newline(4);
@@ -326,7 +331,7 @@ public class ClassNode extends ClassMember
     w.newline(0);
     w.write("}");
     w.newline(0);
-    c.popClass();
+    leaveScope(c);
   }
   
   public void dump( CodeWriter w)
