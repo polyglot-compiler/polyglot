@@ -212,9 +212,16 @@ public class Call_c extends Expr_c implements Call
         if (staticContext && !mi.flags().isStatic()) {
             throw new SemanticException("Cannot call non-static method " + this.name
                                   + " of " + targetType + " in static "
-                                  + "context.");
+                                  + "context.", this.position());
         }
 
+        // If the target is super, but the method is abstract, then complain.
+        if (this.target instanceof Special && 
+            ((Special)this.target).kind() == Special.SUPER &&
+            mi.flags().isAbstract()) {
+                throw new SemanticException("Cannot call an abstract method " +
+                               "of the super class", this.position());            
+        }
         // If we found a method, the call must type check, so no need to check
         // the arguments here.
         
