@@ -17,6 +17,7 @@ public class Formal_c extends Node_c implements Formal
     Flags flags;
     TypeNode type;
     String name;
+    boolean reachable;
 
     public Formal_c(Position pos, Flags flags, TypeNode type,
                     String name)
@@ -152,6 +153,29 @@ public class Formal_c extends Node_c implements Formal
 
     public List acceptCFG(CFGBuilder v, List succs) {
         return succs;
+    }
+
+    /**
+     * Is this term reachable? This attribute is not guaranteed correct until
+     * after the reachability pass
+     *
+     * @see polyglot.visit.ReachChecker
+     */
+    public boolean reachable() {
+        return reachable;
+    }
+
+    /**
+     * Set the reachability of this term.
+     */
+    public Term reachable(boolean reachability) {
+        if (this.reachable = reachability) {
+            return this;
+        }
+        
+        Formal_c t = (Formal_c) copy();
+        t.reachable = reachability;
+        return t;
     }
 
     public void dump(CodeWriter w) {

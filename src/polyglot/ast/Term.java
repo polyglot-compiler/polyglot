@@ -20,4 +20,17 @@ public interface Term extends Node
      * if data flows on that edge.
      */
     public List acceptCFG(CFGBuilder v, List succs);
+    
+    /**
+     * Is this term reachable? This attribute is not guaranteed correct until
+     * after the reachability pass
+     *
+     * @see polyglot.visit.ReachChecker
+     */
+    public boolean reachable();
+
+    /**
+     * Set the reachability of this term.
+     */
+    public Term reachable(boolean reachability);
 }

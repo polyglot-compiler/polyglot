@@ -5,8 +5,6 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
-import polyglot.frontend.*;
-import polyglot.main.Report;
 import java.util.*;
 
 /**
@@ -19,6 +17,7 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
     String name;
     Expr init;
     LocalInstance li;
+    boolean reachable;
 
     public LocalDecl_c(Position pos, Flags flags, TypeNode type,
                        String name, Expr init)
@@ -286,5 +285,28 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
         }
 
         return succs;
+    }
+    
+    /**
+     * Is this term reachable? This attribute is not guaranteed correct until
+     * after the reachability pass
+     *
+     * @see polyglot.visit.ReachChecker
+     */
+    public boolean reachable() {
+        return reachable;
+    }
+
+    /**
+     * Set the reachability of this term.
+     */
+    public Term reachable(boolean reachability) {
+        if (this.reachable = reachability) {
+            return this;
+        }
+        
+        Local_c t = (Local_c) copy();
+        t.reachable = reachability;
+        return t;
     }
 }

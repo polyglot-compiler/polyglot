@@ -15,6 +15,8 @@ public abstract class Term_c extends Node_c implements Term
     public Term_c(Position pos) {
 	super(pos);
     }
+    
+    protected boolean reachable;
 
     /**
      * Return the first (sub)term performed when evaluating this
@@ -29,6 +31,29 @@ public abstract class Term_c extends Node_c implements Term
      */
     public List acceptCFG(CFGBuilder v, List succs) {
         return succs;
+    }
+
+    /**
+     * Is this term reachable? This attribute is not guaranteed correct until
+     * after the reachability pass
+     *
+     * @see polyglot.visit.ReachChecker
+     */
+    public boolean reachable() {
+        return reachable;
+    }
+
+    /**
+     * Set the reachability of this term.
+     */
+    public Term reachable(boolean reachability) {
+        if (this.reachable = reachability) {
+            return this;
+        }
+        
+        Term_c t = (Term_c) copy();
+        t.reachable = reachability;
+        return t;
     }
 
     /** Utility function to get the first entry of a list, or else alt. */
