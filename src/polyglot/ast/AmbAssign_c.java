@@ -7,7 +7,7 @@ import polyglot.util.*;
 import java.util.*;
 
 /**
- * A <code>AmvAssign</code> represents a Java assignment expression to
+ * A <code>AmbAssign</code> represents a Java assignment expression to
  * an as yet unknown expression.
  */
 public class AmbAssign_c extends Assign_c implements AmbAssign
@@ -46,6 +46,7 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
           return ar.nodeFactory().ArrayAccessAssign(n.position(), (ArrayAccess)left(), operator(), right());
       }
 
+      new Exception().printStackTrace();
       throw new SemanticException("Could not disambiguate left side of assignment!", n.position());
   }
   
