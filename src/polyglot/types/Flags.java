@@ -435,31 +435,24 @@ public class Flags implements Serializable
     }
 
     public String toString() {
-        String s = "";
-
-        for (int i = 0; i < next_bit; i++) {
-            int bit = print_order[i];
-            if ((bits & (1L << bit)) != 0) {
-                s += flag_names[bit];
-                if (i+1 < next_bit)
-                    s += " ";
-            }
-        }
-
-        return s;
+        return translate().trim();
     }
 
     /**
      * Return "" if no flags set, or toString() + " " if some flags are set.
      */
     public String translate() {
-        String s = toString();
+        String s = "";
 
-	if (! s.equals("")) {
-	    return s + " ";
-	}
+        for (int i = 0; i < next_bit; i++) {
+            int bit = print_order[i];
+            if ((bits & (1L << bit)) != 0) {
+                s += flag_names[bit];
+                s += " ";
+            }
+        }
 
-	return "";
+        return s;
     }
 
     public int hashCode() {
