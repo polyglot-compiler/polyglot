@@ -344,9 +344,10 @@ public class ClassNode extends ClassMember
       if (superClazz instanceof ParsedClassType) {
 	if (! sc.containsClass(superClazz.getFullName())) {
 	  if (! sc.cleanClass(superClazz)) {
-	    throw new SemanticException("Could not clean superclass " +
-		superClazz.getTypeString() + " of " + type.getTypeString() +
-		": cannot continue", Annotate.getLineNumber(this) );
+	    throw new SemanticException("Errors while compiling " +
+		"superclass " + superClazz.getTypeString() +
+		" of " + type.getTypeString() + ".",
+		Annotate.getLineNumber(this) );
 	  }
 	}
       }
@@ -364,8 +365,7 @@ public class ClassNode extends ClassMember
 */
     }
     
-    for (ListIterator i = type.getInterfaces().listIterator(); i.hasNext(); )
-    {
+    for (ListIterator i = type.getInterfaces().listIterator(); i.hasNext(); ) {
       Type interfaceType = (Type) i.next();
 
       ClassType interfaceClazz = (ClassType) c.getType(interfaceType);
@@ -373,9 +373,10 @@ public class ClassNode extends ClassMember
       if (interfaceClazz instanceof ParsedClassType) {
 	if (! sc.containsClass(interfaceClazz.getFullName())) {
 	  if (! sc.cleanClass(interfaceClazz)) {
-	    throw new SemanticException("Could not clean super-interface " +
-		interfaceClazz.getTypeString() + " of " + type.getTypeString() +
-		": cannot continue", Annotate.getLineNumber(this) );
+	    throw new SemanticException("Errors while compiling " +
+		"super-interface " + interfaceClazz.getTypeString() +
+		" of " + type.getTypeString() + ".",
+		Annotate.getLineNumber(this) );
 	  }
 	}
       }
@@ -414,8 +415,6 @@ public class ClassNode extends ClassMember
       Type t = fi.getType();
       fi.setType( c.getType(t) );
     }
-
-    visitChildren(sc);
 
     n.leaveScope(c);
 
