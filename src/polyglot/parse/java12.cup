@@ -586,6 +586,8 @@ class_body_declaration ::=
             {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
                l.add(parser.nf.Initializer(parser.pos(a), Flags.NONE, a));
                RESULT = l; :}
+    |   SEMICOLON
+            {: RESULT = Collections.EMPTY_LIST; :}
     ;
 class_member_declaration ::=
                     // List of ClassMember
