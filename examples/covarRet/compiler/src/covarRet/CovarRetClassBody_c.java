@@ -11,6 +11,10 @@ import java.util.*;
 /**
  * A <code>ClassBody</code> represents the body of a class or interface
  * declaration or the body of an anonymous class.
+ *
+ * The covariant return extension overrides the overrideMethodCheck method
+ * to allow the return type of a method to be a subclass of the return type
+ * declared in a superclass.
  */
 public class CovarRetClassBody_c extends ClassBody_c
 {
@@ -41,7 +45,7 @@ public class CovarRetClassBody_c extends ClassBody_c
                         continue;
                     }
 
-                    /* ### Made this change only!!! */
+                    // This condition is the only change from the superclass!
                     if (! ts.isSubtype(mi.returnType(), mj.returnType())) {
                         throw new SemanticException("Cannot override " + mj + " in " + rt + " with " + mi + " in " + type + "; overridden method returns " + mi.returnType() + ", which is not a subtype of " + mj.returnType() + ".", mi.position());
                     }

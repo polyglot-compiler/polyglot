@@ -7,6 +7,10 @@ import jltools.frontend.*;
 import jltools.visit.*;
 import java.util.*;
 
+/**
+ * This visitor rewrites the AST to translate from Java with covariant returns
+ * to standard Java.
+ */
 public class CovarRetRewriter extends SemanticVisitor
 {
     public CovarRetRewriter(Job job, TypeSystem ts, NodeFactory nf) {
@@ -23,12 +27,15 @@ public class CovarRetRewriter extends SemanticVisitor
             // Insert a cast, (always at the moment)
             Type overridenRetType = getOverridenReturnType(c.methodInstance());
             if (overridenRetType != null && !overridenRetType.isImplicitCastValid(c.expectedType())) {
+              // The overriden return type cannot be implicitly cast to the
+              // expected type, so explicitly cast it.
               NodeFactory nf = nodeFactory();
               return nf.Cast(p, nf.CanonicalTypeNode(p, c.methodInstance().returnType()), c);
             }
         }
         else if (n instanceof MethodDecl) {
-            /* Change the return type to be the same as the superclass's */
+            // Change the return type of the overridden method
+            // to be the same as the superclass's
             MethodDecl md = (MethodDecl)n;
             Position p = md.position();
 
@@ -42,6 +49,11 @@ public class CovarRetRewriter extends SemanticVisitor
         return n;
     }
 
+    /**
+     * Get the return type of the method that mi overrides if
+     * that return type varies from the return type of the method mi.
+     * Return null otherwise.
+     */
     private Type getOverridenReturnType(MethodInstance mi) {
       Type t = mi.container().superType();
 

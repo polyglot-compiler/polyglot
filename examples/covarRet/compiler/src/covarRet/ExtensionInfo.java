@@ -19,7 +19,6 @@ public class ExtensionInfo extends jltools.ext.jl.ExtensionInfo {
     }
 
     public static final Pass.ID COVAR_RET_CAST_REWRITE = new Pass.ID("covariantReturnCasts");
-
     public List passes(Job job) {
         List l = super.passes(job);
         beforePass(l, Pass.PRE_OUTPUT_ALL,

@@ -1,15 +1,22 @@
 import java.util.*;
 
+/**
+ * Test code for covarRet - Covariant Return extension
+ */
 public class Test {
     public void bar() {
-	Sup A = new Sup();
-	Sub B = new Sub();
+        // instantiate a Sup and a Sub,
+        // and check that can assign
+        // to variables appropriatly.
+        Sup A = new Sup();
+        Sub B = new Sub();
 
-	Set s = B.foo();
-	HashSet t = B.foo();
-	Set u = A.foo();
+        Set s = B.foo();
+        HashSet t = B.foo();
+        Set u = A.foo();
 
-	int a = A.quux();
+        // check that primitives still work.
+        int a = A.quux();
         float b = B.quux();
 
     }
