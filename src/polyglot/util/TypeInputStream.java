@@ -47,7 +47,14 @@ public class TypeInputStream extends ObjectInputStream
           + " to " + t + " : " + t.getClass());      	
       }
       return t;
-    } else {
+    }
+    else if (o instanceof Enum) {
+      if (Report.should_report(Report.serialize, 2)) {    
+        Report.report(2, "- Interning " + s + " : " + o.getClass());
+      }
+      return ((Enum) o).intern();
+    }
+    else {
       if (Report.should_report(Report.serialize, 2)) {    
         Report.report(2, "- " + s + " : " + o.getClass());
       }

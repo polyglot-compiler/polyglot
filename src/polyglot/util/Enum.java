@@ -9,26 +9,23 @@ import java.util.*;
 /** An enumerated type.  Enums are interned and can be compared with ==. */
 public class Enum implements Serializable
 {
-    /** The name of the enum--for debugging only. */
+    /** The name of the enum.  Used for debugging and interning. */
     private String name;
-
-    /** A key used to distinguish objects of the same type. */
-    private int key;
-
-    /** The next key to allocate. */
-    private static int next = 0;
 
     /** The intern cache. */
     private static Map cache = new HashMap();
 
     protected Enum(String name) {
 	this.name = name;
-	this.key = next++;
+
+        // intern the enum and make sure this one is unique
+        if (intern() != this) {
+            throw new InternalCompilerError("Duplicate enum \"" + name + "\"");
+        }
     }
 
     /** For serialization. */
-    private Enum() {
-    }
+    private Enum() { }
 
     public boolean equals(Object o) {
 	return this == o;
@@ -47,12 +44,12 @@ public class Enum implements Serializable
 
 	public boolean equals(Object o) {
 	    return o instanceof Enum
-	        && e.key == ((Enum) o).key
+	        && e.name.equals(((Enum) o).name)
 	        && e.getClass() == o.getClass();
 	}
 
 	public int hashCode() {
-	    return e.getClass().hashCode() ^ e.key;
+	    return e.getClass().hashCode() ^ e.name.hashCode();
 	}
     }
 
@@ -67,21 +64,5 @@ public class Enum implements Serializable
 	}
 
 	return e;
-    }
-
-    private Object readObject(ObjectInputStream in)
-	throws IOException, ClassNotFoundException {
-
-        String n = in.readUTF();
-	int k = in.readInt();
-	Enum e = new Enum();
-	e.name = n;
-	e.key = k;
-	return e.intern();
-    }
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeUTF(name);
-	out.writeInt(key);
     }
 }
