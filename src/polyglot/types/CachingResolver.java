@@ -102,11 +102,17 @@ public class CachingResolver implements TopLevelResolver {
 
             try {
                 q = inner.find(name);
-                cache.put(name, q);
             }
             catch (NoClassException e) {
                 cache.put(name, NOT_FOUND);
                 throw e;
+            }
+
+            install(name, q);
+
+            if (q instanceof ClassType) {
+                Package p = ((ClassType) q).package_();
+                cachePackage(p);
             }
 
             if (Report.should_report(TOPICS, 3))
@@ -121,16 +127,6 @@ public class CachingResolver implements TopLevelResolver {
             extInfo.addDependencyToCurrentJob(((ParsedClassType)q).fromSource());
         }
 
-        if (q instanceof ClassType) {
-            Package p = ((ClassType) q).package_();
-            cachePackage(p);
-        }
-
-	if (q instanceof Type && packageExists(name)) {
-	    throw new SemanticException("Type \"" + name +
-					"\" clashes with package of the same name.");
-	}
-
 	return q;
     }
 
@@ -139,7 +135,7 @@ public class CachingResolver implements TopLevelResolver {
      * @param name The name to search for.
      */
     public Type checkType(String name) {
-        return (Type) cache.get(name);
+        return (Type) check(name);
     }
 
     /**
@@ -147,6 +143,8 @@ public class CachingResolver implements TopLevelResolver {
      * @param name The name to search for.
      */
     public Named check(String name) {
+        Object o = cache.get(name);
+        if (o == NOT_FOUND) return null;
         return (Named) cache.get(name);
     }
 
@@ -155,8 +153,13 @@ public class CachingResolver implements TopLevelResolver {
      * @param name The name of the qualifier to insert.
      * @param q The qualifier to insert.
      */
-    public void install(String name, Qualifier q) {
+    public void install(String name, Named q) throws SemanticException {
 	cache.put(name, q);
+
+	if (q instanceof Type && packageExists(name)) {
+	    throw new SemanticException("Type \"" + name +
+					"\" clashes with package of the same name.", q.position());
+	}
     }
 
     private static final Collection TOPICS = 

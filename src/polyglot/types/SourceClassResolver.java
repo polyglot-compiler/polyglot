@@ -98,6 +98,7 @@ public class SourceClassResolver extends LoadedClassResolver
     this.ext = ext;
   }
 
+  /* NJN: It seens like javac doesn't to this check.  So we shouldn't either.
   public boolean packageExists(String name) {
     if (super.packageExists(name)) {
         return true;
@@ -109,6 +110,7 @@ public class SourceClassResolver extends LoadedClassResolver
 
     return false;
   }
+  */
 
   /**
    * Find a type by name.

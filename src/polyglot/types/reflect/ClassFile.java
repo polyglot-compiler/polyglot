@@ -388,7 +388,7 @@ public class ClassFile implements LazyClassInitializer {
     /**
      * Create the type for this class file.
      */
-    ParsedClassType createType(TypeSystem ts) {
+    ParsedClassType createType(TypeSystem ts) throws SemanticException {
         // The name is of the form "p.q.C$I$J".
         String name = classNameCP(thisClass);
 
