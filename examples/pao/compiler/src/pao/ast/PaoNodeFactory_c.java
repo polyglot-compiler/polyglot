@@ -9,24 +9,17 @@ import java.util.*;
 /**
  * NodeFactory for pao extension.
  */
-public class PaoNodeFactory_c extends ExtNodeFactory_c implements PaoNodeFactory {
+public class PaoNodeFactory_c extends NodeFactory_c implements PaoNodeFactory {
     public PaoNodeFactory_c() {
-        super(new NodeFactory_c());
+        super(new PaoExtFactory_c());
+    }
+    protected PaoNodeFactory_c(ExtFactory extFact) {
+        super(extFact);
     }
 
-    public Node extNode(Node n) {
-        return n.ext(new PaoExt_c());
-    }
-
-    public Instanceof extInstanceof(Instanceof n) {
-        return (Instanceof) super.extInstanceof(n).del(new PaoInstanceofDel_c()).ext(new PaoInstanceofExt_c());
-    }
-
-    public Cast extCast(Cast n) {
-        return (Cast) super.extCast(n).ext(new PaoCastExt_c());
-    }
-
-    public Binary extBinary(Binary n) {
-        return (Binary) super.extBinary(n).ext(new PaoBinaryExt_c());
+    public Instanceof Instanceof(Position pos, Expr expr, TypeNode type) {
+        Instanceof n = new Instanceof_c(pos, expr, type);
+        n = (Instanceof)n.ext(extFactory().extInstanceof());
+        return (Instanceof)n.del(new PaoInstanceofDel_c());
     }
 }
