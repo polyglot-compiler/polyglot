@@ -498,6 +498,11 @@ ext=""
       <param name="ext" value="jmatch"/>
       <param name="parser.type" value="ppg"/>
     </antcall>
+    <!-- compile the JMatch runtime -->
+    <javac srcdir="${src}" destdir="${classes}" debug="on"
+      includes="polyglot/ext/jmatch/runtime/**">
+      <classpath refid="standard.classpath"/>
+    </javac>
   </target>
 
   <target name="jx" depends="jl">
