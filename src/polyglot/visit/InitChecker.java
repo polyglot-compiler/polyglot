@@ -262,67 +262,35 @@ public class InitChecker extends DataFlow
      * Set up the state that must be tracked during a Class Declaration.
      */
     protected NodeVisitor enterCall(Node n) throws SemanticException {
-      if (n instanceof ClassBody) {
+      if (n instanceof ClassBody) {            
             // we are starting to process a class declaration, but have yet
             // to do any of the dataflow analysis.
             
             // set up the new ClassBodyInfo, and make sure that it forms
             // a stack.
-            ClassBodyInfo newCDI = new ClassBodyInfo();
-            newCDI.outer = currCBI;  
-            currCBI = newCDI;
-            
-
-            // set up currClassFinalFieldInitCounts to contain mappings
-            // for all the final fields of the class.            
-            Iterator classMembers = ((ClassBody)n).members().iterator();            
-            while (classMembers.hasNext()) {
-                ClassMember cm = (ClassMember)classMembers.next();
-                if (cm instanceof FieldDecl) {
-                    FieldDecl fd = (FieldDecl)cm;
-                    if (fd.flags().isFinal()) {
-                        MinMaxInitCount initCount;
-                        if (fd.init() != null) {
-                            // the field has an initializer
-                            initCount = new MinMaxInitCount(InitCount.ONE,InitCount.ONE);
-                            
-                            // do dataflow over the initialization expression
-                            // to pick up any uses of outer local variables.
-                            if (currCBI.outer != null)
-                                dataflow(fd.init());                        
-                        }
-                        else {
-                            // the field does not have an initializer
-                            initCount = new MinMaxInitCount(InitCount.ZERO,InitCount.ZERO);
-                        }
-                        newCDI.currClassFinalFieldInitCounts.put(fd.fieldInstance(),
-                                                             initCount);
-                    }
-                }
-            }             
+            setupClassBody((ClassBody)n);
         }
-        return super.enterCall(n);
-    }
-
-    /**
-     * Postpone the checking of constructors until the end of the class 
-     * declaration is encountered, to ensure that all initializers are 
-     * processed first.
-     * 
-     * Also, at the end of the class declaration, check that all static final
-     * fields have been initialized at least once, and that for each constructor
-     * all non-static final fields must have been initialized at least once,
-     * taking into account the constructor calls.
-     * 
-     */
-    public Node leaveCall(Node n) throws SemanticException {
+        
+        // Postpone the checking of constructors until leaving the class 
+        // declaration, to ensure that all initializers are 
+        // processed first.
         if (n instanceof ConstructorDecl) {
             // postpone the checking of the constructors until all the 
             // initializer blocks have been processed.
             currCBI.allConstructors.add(n);
-            return n;
+            return this;
         }
         
+        // otherwise, let the superclass process the node appropriately...
+        return super.enterCall(n);
+    }
+
+    protected Node leaveCall(Node n) throws SemanticException {
+        // At the end of the class declaration, check that all static final
+        // fields have been initialized at least once, and that for each constructor
+        // all non-static final fields must have been initialized at least once,
+        // taking into account the constructor calls.
+
         if (n instanceof ClassBody) {
             // Now that we are at the end of the class declaration, and can
             // be sure that all of the initializer blocks have been processed,
@@ -332,8 +300,7 @@ public class InitChecker extends DataFlow
                     iter.hasNext(); ) {
                 ConstructorDecl cd = (ConstructorDecl)iter.next();
                 
-                // rely on the fact that our dataflow does not change the AST,
-                // so we can discard the result of this call.
+                // perform the dataflow on the constructor declaration
                 dataflow(cd);                
             }
             
@@ -345,16 +312,52 @@ public class InitChecker extends DataFlow
             
             // copy the locals used to the outer scope
             if (currCBI.outer != null) {
-                currCBI.outer.localsUsedInClassBodies.put(n, currCBI.outerLocalsUsed);
+                currCBI.outer.localsUsedInClassBodies.put(n, 
+                                                    currCBI.outerLocalsUsed);
             }
             
             // pop the stack
             currCBI = currCBI.outer;
         }
-
-        return super.leaveCall(n);
+        
+        return super.leaveCall(n);     
     }
+    
+    protected void setupClassBody(ClassBody n) throws SemanticException {
+        ClassBodyInfo newCDI = new ClassBodyInfo();
+        newCDI.outer = currCBI;  
+        currCBI = newCDI;
+            
 
+        // set up currClassFinalFieldInitCounts to contain mappings
+        // for all the final fields of the class.            
+        Iterator classMembers = n.members().iterator();            
+        while (classMembers.hasNext()) {
+            ClassMember cm = (ClassMember)classMembers.next();
+            if (cm instanceof FieldDecl) {
+                FieldDecl fd = (FieldDecl)cm;
+                if (fd.flags().isFinal()) {
+                    MinMaxInitCount initCount;
+                    if (fd.init() != null) {
+                        // the field has an initializer
+                        initCount = new MinMaxInitCount(InitCount.ONE,InitCount.ONE);
+                            
+                        // do dataflow over the initialization expression
+                        // to pick up any uses of outer local variables.
+                        if (currCBI.outer != null)
+                            dataflow(fd.init());                        
+                    }
+                    else {
+                        // the field does not have an initializer
+                        initCount = new MinMaxInitCount(InitCount.ZERO,InitCount.ZERO);
+                    }
+                    newCDI.currClassFinalFieldInitCounts.put(fd.fieldInstance(),
+                                                         initCount);
+                }
+            }
+        }             
+    }
+    
     /**
      * Check that each static final field is initialized exactly once.
      * 
@@ -442,17 +445,19 @@ public class InitChecker extends DataFlow
      * Construct a flow graph for the <code>Expr</code> provided, and call 
      * <code>dataflow(FlowGraph)</code>. Is also responsible for calling 
      * <code>post(FlowGraph, Term)</code> after
-     * <code>dataflow(FlowGraph)</code> has been called. 
+     * <code>dataflow(FlowGraph)</code> has been called.
+     * There is no need to push a CFG onto the stack, as the expression
+     * cannot contain CodeDecls. 
      */
-    protected Expr dataflow(Expr root) throws SemanticException {
+    protected void dataflow(Expr root) throws SemanticException {
         // Build the control flow graph.
         FlowGraph g = new FlowGraph(root, forward);
         CFGBuilder v = new CFGBuilder(ts, g, this);
         v.visitGraph();
         dataflow(g);
-        return (Expr)post(g, root);        
+        post(g, root);        
     }
-    
+        
     /**
      * The initial item to be given to the entry point of the dataflow contains
      * the init counts for the final fields.

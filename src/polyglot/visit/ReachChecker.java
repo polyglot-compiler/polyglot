@@ -1,5 +1,6 @@
 package polyglot.visit;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -73,46 +74,38 @@ public class ReachChecker extends DataFlow
         return DataFlowItem.NOT_REACHABLE;
     }
 
-    public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
-        throw new InternalCompilerError("ReachChecker.check should " +
-                "never be called.");
+    public Node leaveCall(Node n) throws SemanticException {
+        // check for reachability.
+        if (n instanceof Term) {
+           n = checkReachability((Term)n);
+        }
+         
+        return super.leaveCall(n);
     }
+
+    protected Node checkReachability(Term n) throws SemanticException {
+        FlowGraph g = currentFlowGraph();
+            
+        Collection peers = g.peers(n);
+        if (!peers.isEmpty()) {
+            for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
+                FlowGraph.Peer p = (FlowGraph.Peer) iter.next();
     
-    public Term post(FlowGraph graph, Term root) throws SemanticException {
-        // A node is reachable if any peer is reachable; not all
-        // peers need be.  Go through every path map to check that at
-        // least one peer is reachable.
-        MAPS:
-        for (Iterator i = graph.pathMaps().iterator(); i.hasNext(); ) {
-            Map m = (Map) i.next();
-
-            if (m.isEmpty()) {
-                continue;
-            }
-
-            Node n = null;
-
-            // Check that some path to a node makes the node reachable.
-            for (Iterator j = m.values().iterator(); j.hasNext(); ) {
-                FlowGraph.Peer p = (FlowGraph.Peer) j.next();
-
-                if (n != null && n != p.node) {
-                    throw new InternalCompilerError("");
-                }
-
-                n = p.node;
-
                 if (p.outItems != null) {
-                  for (Iterator k = p.outItems.values().iterator(); k.hasNext(); ) {
-                      DataFlowItem item = (DataFlowItem) k.next();
-
-                      if (item != null && item.reachable) {
-                          continue MAPS;
-                      }                    
-                  }
+                    for (Iterator k = p.outItems.values().iterator(); k.hasNext(); ) {
+                        DataFlowItem item = (DataFlowItem) k.next();
+                    
+                        if (item != null && item.reachable) {
+                            // n is reachable.
+                            return n.reachable(true);
+                        }                    
+                    }
                 }
             }
-
+            
+            // if we fall through to here, then no peer for n was reachable.
+            n = n.reachable(false);
+            
             // Compound statements are allowed to be unreachable
             // (e.g., "{ // return; }" or "while (true) S").  If a compound
             // statement is truly unreachable, one of its sub-statements will
@@ -124,7 +117,18 @@ public class ReachChecker extends DataFlow
                                             n.position());
             }
         }
-
-        return root;
+        
+        return n;
     }
+    
+    public void post(FlowGraph graph, Term root) throws SemanticException {
+        // There is no need to do any checking in this method, as this will
+        // be handled by leaveCall and checkReachability.
+    } 
+
+    public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
+        throw new InternalCompilerError("ReachChecker.check should " +
+                "never be called.");
+    }
+    
 }

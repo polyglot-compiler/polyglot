@@ -35,11 +35,30 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     protected boolean forward;
 
     /**
+     * A stack of <code>FlowGraphSource</code>. The flow graph is constructed 
+     * upon entering a CodeDecl AST node, and dataflow performed on that flow 
+     * graph immediately. The flow graph is available during the visiting of 
+     * children of the CodeDecl, if subclasses want to use this information
+     * to update AST nodes.
+     */
+    protected LinkedList flowgraphStack;
+    
+    protected static class FlowGraphSource {
+        FlowGraphSource(FlowGraph g, CodeDecl s) {
+            flowgraph = g;
+            source = s;
+        }
+        FlowGraph flowgraph;
+        CodeDecl source;
+    }
+    
+    /**
      * Constructor.
      */
     public DataFlow(Job job, TypeSystem ts, NodeFactory nf, boolean forward) {
 	super(job, ts, nf);
         this.forward = forward;
+        this.flowgraphStack = new LinkedList();
     }
 
     /**
@@ -108,10 +127,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * Construct a flow graph for the <code>CodeDecl</code> provided, and call 
      * <code>dataflow(FlowGraph)</code>. Is also responsible for calling 
      * <code>post(FlowGraph, Block)</code> after
-     * <code>dataflow(FlowGraph)</code> has been called. 
-     * @return the (possibly new) AST. 
+     * <code>dataflow(FlowGraph)</code> has been called, and for pushing
+     * the <code>FlowGraph</code> onto the stack of <code>FlowGraph</code>s.
      */
-    protected CodeDecl dataflow(CodeDecl cd) throws SemanticException {
+    protected void dataflow(CodeDecl cd) throws SemanticException {
         // only bother to do the flow analysis if the body is not null...
         if (cd.body() != null) {
             // Compute the successor of each child node.
@@ -124,11 +143,12 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 
                 dataflow(g);
 
-                return (CodeDecl)post(g, cd);
+                post(g, cd);
+
+                // push the CFG onto the stack
+                flowgraphStack.addFirst(new FlowGraphSource(g, cd));
             }
         }
-
-        return cd;
     } 
     
     /**
@@ -231,9 +251,26 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * Overridden superclass method, to build the flow graph, perform dataflow
      * analysis, and check the analysis for CodeDecl nodes.
      */
-    public Node leaveCall(Node n) throws SemanticException {
+    protected NodeVisitor enterCall(Node n) throws SemanticException {
         if (n instanceof CodeDecl) {
-            return dataflow((CodeDecl)n);
+            dataflow((CodeDecl)n);
+        }
+        
+        return this;
+    }
+
+    /**
+     * Overridden superclass method, to pop from the stack of
+     * <code>FlowGraph</code>s if necessary.
+     */
+    protected Node leaveCall(Node n) throws SemanticException {
+        if (n instanceof CodeDecl && !flowgraphStack.isEmpty()) {
+            FlowGraphSource fgs = (FlowGraphSource)flowgraphStack.getFirst();
+            if (fgs.source.equals(n)) {
+                // we are leaving the code decl that pushed this flowgraph 
+                // on the stack. pop tbe stack.
+                flowgraphStack.removeFirst();
+            }
         }
 
         return n;
@@ -243,7 +280,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * Check all of the Peers in the graph, after the dataflow analysis has
      * been performed.
      */
-    public Term post(FlowGraph graph, Term root) throws SemanticException {
+    protected void post(FlowGraph graph, Term root) throws SemanticException {
         if (Report.should_report(Report.cfg, 2)) {
             dumpFlowGraph(graph, root);
         }
@@ -273,8 +310,21 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             }
             
         }
-
-        return root;
+    }
+    
+    /**
+     * Return the <code>FlowGraph</code> at the top of the stack. If this 
+     * method is called by a subclass from the <code>enterCall</code> 
+     * or <code>leaveCall</code> methods, for an AST node that is a child
+     * of a <code>CodeDecl</code>, then the <code>FlowGraph</code> returned 
+     * should be the <code>FlowGraph</code> for the dataflow for innermost
+     * <code>CodeDecl</code>.
+     */
+    protected FlowGraph currentFlowGraph() {
+        if (flowgraphStack.isEmpty()) {
+            return null;
+        }
+        return ((FlowGraphSource)flowgraphStack.getFirst()).flowgraph;
     }
     
     /**
