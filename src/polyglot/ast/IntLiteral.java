@@ -8,7 +8,7 @@ import jltools.util.*;
  * An <code>IntLiteral</code> represents a literal in Java of an integer
  * type.
  */
-public class IntLiteral extends Literal 
+public class IntLiteral extends NumericalLiteral 
 {
   public static final int BYTE    = 0;
   public static final int SHORT   = 1;
@@ -122,7 +122,7 @@ public class IntLiteral extends Literal
   /**
    * Returns the <code>long</code> value of this literal.
    */
-  public long getLongValue() 
+  public long getValue() 
   {
     return value;   
   } 

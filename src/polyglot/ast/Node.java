@@ -109,6 +109,16 @@ public abstract class Node extends AnnotatedObject {
   }
 
   /**
+   * Fold all constants.
+   *
+   * @return The node with all constants folded in.
+   */
+  public Node foldConstants() 
+  {
+    return this;
+  }
+  
+  /**
    * Check the AST to ensure that expressions and statements follow the 
    * rules of the established type system. 
    * 

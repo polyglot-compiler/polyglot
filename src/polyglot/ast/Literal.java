@@ -22,3 +22,4 @@ public abstract class Literal extends Expression {
     return PRECEDENCE_OTHER;
   }
 }
+

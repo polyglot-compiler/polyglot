@@ -335,7 +335,7 @@ public class StandardTypeSystem extends TypeSystem {
    * Returns true if <code>value</code> can be implicitly cast to Primitive type
    * <code>t</code>.
    */
-  public  boolean numbericConversionValid ( Type t, long value)
+  public  boolean numericConversionValid ( Type t, long value)
   {
     if ( !(t instanceof PrimitiveType)) return false;
     
@@ -344,7 +344,7 @@ public class StandardTypeSystem extends TypeSystem {
     {
     case PrimitiveType.BYTE: return (Math.abs( value) <= Byte.MAX_VALUE);
     case PrimitiveType.SHORT: return (Math.abs( value) <= Short.MAX_VALUE);
-    case PrimitiveType.CHAR: return (value > 0 && value <= Character.MAX_VALUE);
+    case PrimitiveType.CHAR: return (value >= 0 && value <= Character.MAX_VALUE);
     case PrimitiveType.INT: return ( Math.abs(value) <= Integer.MAX_VALUE);
     case PrimitiveType.LONG: return true;
     default: return false;

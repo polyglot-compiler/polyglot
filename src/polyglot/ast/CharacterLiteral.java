@@ -8,7 +8,7 @@ import jltools.util.*;
  * An <code>CharacterLiteral</code> represents a literal in java of
  * <code>char</code> type.
  */
-public class CharacterLiteral extends Literal 
+public class CharacterLiteral extends NumericalLiteral 
 {  
   protected final char value;
   protected final String escaped;
@@ -47,7 +47,7 @@ public class CharacterLiteral extends Literal
     }
   }
 
-  public char getCharValue()
+  public long getValue()
   {
     return value;
   }

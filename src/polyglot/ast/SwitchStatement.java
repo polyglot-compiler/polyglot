@@ -107,13 +107,9 @@ public class SwitchStatement extends Statement
                                        + " short or int.");
       }
       
-      if ( expr instanceof IntLiteral)
+      if ( expr instanceof NumericalLiteral)
       {
-        iValue = (int)((IntLiteral)expr).getLongValue();
-      }
-      else if (expr instanceof CharacterLiteral)
-      {
-        iValue = (int) ((CharacterLiteral)expr).getCharValue() ;
+        iValue = (int)((NumericalLiteral)expr).getValue();
       }
       else if ( expr instanceof FieldExpression || 
                 expr instanceof LocalVariableExpression)

@@ -82,10 +82,10 @@ public class VariableDeclarationStatement extends Statement
         /* If it is a constant numeric expression (final + initializer is 
          * IntLiteral) then mark it "constant" under FieldInstance. */
         // FIXME other literal types?
-        if( initializer instanceof IntLiteral 
+        if( initializer instanceof NumericalLiteral 
             && initializer != null && vdsEnclosing.accessFlags.isFinal()) {
           fi.setConstantValue( new Long(
-              ((IntLiteral)initializer).getLongValue())); 
+              ((NumericalLiteral)initializer).getValue())); 
         }
         c.addSymbol( name, fi);
       }
@@ -110,10 +110,10 @@ public class VariableDeclarationStatement extends Statement
         FieldInstance fi = new FieldInstance( name, 
                                               vdsEnclosing.typeForDeclarator(this), 
                                               null, vdsEnclosing.accessFlags);
-        if( initializer instanceof IntLiteral 
+        if( initializer instanceof NumericalLiteral 
             && initializer != null && vdsEnclosing.accessFlags.isFinal()) {
           fi.setConstantValue( new Long(
-                                 ((IntLiteral)initializer).getLongValue())); 
+                                 ((NumericalLiteral)initializer).getValue())); 
         }
         c.addSymbol( name, fi);
       }

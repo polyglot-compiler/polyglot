@@ -132,6 +132,98 @@ public class BinaryExpression extends Expression
                         (Expression)right.visit( v));
   }
 
+  /**
+   * Fold all constants.
+   *
+   * @return The node with all constants folded in.
+   */
+  public Node foldConstants() 
+  {
+    Expression newNode = this;
+
+    if ( (left instanceof NumericalLiteral) &&
+         (right instanceof NumericalLiteral))
+    {
+      long lLeft = ((NumericalLiteral)left).getValue();
+      long lRight = ((NumericalLiteral)right).getValue();
+
+      switch( operator)
+      {
+      case GT:
+        newNode = new BooleanLiteral( lLeft > lRight );
+        break;
+      case LT:
+        newNode = new BooleanLiteral( lLeft < lRight);
+        break;
+      case EQUAL:
+        newNode = new BooleanLiteral( lLeft == lRight);
+        break;
+      case LE:
+        newNode = new BooleanLiteral( lLeft <= lRight);
+        break;
+      case GE:
+        newNode = new BooleanLiteral( lLeft >= lRight);
+        break;
+      case NE:
+        newNode = new BooleanLiteral( lLeft != lRight);
+        break;
+      case MULT:
+        newNode = new IntLiteral( lLeft * lRight);
+        break;
+      case DIV:
+        newNode = new IntLiteral( lLeft / lRight);
+        break;
+        // FIXME: MAY NOT BE CORRECT: read jls
+      case BIT_OR:
+        newNode = new IntLiteral( lLeft | lRight);
+        break;      
+      case BIT_AND:
+        newNode = new IntLiteral( lLeft & lRight);
+        break;
+      case BIT_XOR:
+        newNode = new IntLiteral( lLeft ^ lRight);      
+        break;
+      case MOD:
+        newNode = new IntLiteral( lLeft % lRight);
+        break;
+      case LSHIFT:
+        newNode = new IntLiteral( lLeft << lRight);
+        break;
+      case RSHIFT:
+        newNode = new IntLiteral( lLeft >> lRight);
+        break;
+      case RUSHIFT:
+        newNode = new IntLiteral( lLeft >>> lRight);
+        break;
+      case PLUS:
+        newNode = new IntLiteral( lLeft + lRight);
+        break;
+      case SUB:
+        newNode = new IntLiteral( lLeft - lRight);
+      }
+    }      
+    else if ( (left instanceof BooleanLiteral) &&
+         (right instanceof BooleanLiteral))
+    {
+      boolean bLeft = ((BooleanLiteral)left).getBooleanValue(), 
+        bRight = ((BooleanLiteral)right).getBooleanValue();
+
+      switch( operator)
+      {
+      case LOGIC_OR:
+        newNode = new BooleanLiteral( bLeft || bRight);
+        break;
+      case LOGIC_AND:
+        newNode = new BooleanLiteral( bLeft && bRight);
+      }
+    }
+
+    // copy the line number:
+    if ( newNode != this)
+      Annotate.setLineNumber( newNode, Annotate.getLineNumber ( left ));
+    return newNode;
+  }
+
   public Node typeCheck( LocalContext c) throws SemanticException
   {
     Type ltype = left.getCheckedType(), rtype = right.getCheckedType();
@@ -140,7 +232,10 @@ public class BinaryExpression extends Expression
     {
     case ASSIGN:
       /* See (5.2). */
-      if( !rtype.isAssignableSubtype(ltype)) {
+      if( !rtype.isAssignableSubtype(ltype) &&
+          ! ( right instanceof NumericalLiteral && 
+              c.getTypeSystem().numericConversionValid(ltype, 
+                                   ((NumericalLiteral)right).getValue()))   ) {
         throw new SemanticException( "Unable to assign \"" + 
                                       rtype.getTypeString() + "\" to \""
                                       + ltype.getTypeString() + "\".");

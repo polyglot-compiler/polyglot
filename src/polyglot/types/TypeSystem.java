@@ -96,7 +96,7 @@ public abstract class TypeSystem {
    * Returns true if <code>value</code> can be implicitly cast to Primitive type
    * <code>t</code>.
    */
-  public abstract boolean numbericConversionValid ( Type t, long value);
+  public abstract boolean numericConversionValid ( Type t, long value);
 
   /**
    * Requires: all type arguments are canonical.

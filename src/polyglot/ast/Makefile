@@ -40,6 +40,7 @@ ast_files     =	AmbiguousExpression.java \
 		Node.java \
 		NodeVisitor.java \
 		NullLiteral.java \
+		NumericalLiteral.java \
 		ReturnStatement.java \
 		SourceFileNode.java \
 		SpecialExpression.java \

@@ -81,6 +81,40 @@ public class UnaryExpression extends Expression
     return reconstruct( (Expression)expr.visit( v), operator);
   }
 
+  /**
+   * Fold all constants.
+   *
+   * @return The node with all constants folded in.
+   */
+  public Node foldConstants() 
+  {
+    Node newNode = this;
+    if (expr instanceof IntLiteral)
+    {
+      long lValue = ((IntLiteral)expr).getValue();
+      switch(operator)
+      {
+        // FIXME: PROMOTION MAY NOT BE CORRECT
+      case BITCOMP:
+        newNode = new IntLiteral( ~ lValue);
+        break;
+      case NEGATIVE:
+        newNode = new IntLiteral( - lValue);
+        break;
+      case POSITIVE:
+        newNode = expr;
+        break;
+      }
+    }
+    else if (expr instanceof BooleanLiteral && operator == LOGICALNOT)
+      newNode = new BooleanLiteral ( ! ((BooleanLiteral)expr).getBooleanValue() );
+
+    // copy the line number:
+    if ( newNode != this)
+      Annotate.setLineNumber( newNode, Annotate.getLineNumber ( expr ));
+    return newNode;
+  }
+
   public Node typeCheck( LocalContext c) throws SemanticException
   {
     Type type = expr.getCheckedType();

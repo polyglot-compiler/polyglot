@@ -19,7 +19,11 @@ public class BitVector
   public final void setBit( int which, boolean value)
   {
     if( which >= size) {
-      boolean[] newBits = new boolean[ which + 1];
+      size += 32;
+      boolean[] newBits = new boolean[ size ];
+      for( int i = 0; i < bits.length; i++)
+        newBits[i] = bits[i];
+      bits = newBits;
     }
     
     bits[ which] = value;
@@ -27,7 +31,7 @@ public class BitVector
 
   public final boolean getBit( int which)
   {
-    if( which > size) {
+    if( which >= size) {
       return false;
     }
     else {

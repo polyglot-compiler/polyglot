@@ -3,6 +3,7 @@ vs_package	= jltools/visit
 vs_codebase	= ../..
 vs_files 	= SymbolReader.java \
 		  AmbiguityRemover.java \
+		  ConstantFolder.java \
 		  TypeChecker.java \
 		  ExceptionChecker.java \
 		  FlowChecker.java \

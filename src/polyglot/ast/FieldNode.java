@@ -90,7 +90,7 @@ public class FieldNode extends ClassMember
       if( decl.initializer instanceof IntLiteral 
           && decl.initializer != null && accessFlags.isFinal()) {
         fi.setConstantValue( new Long(
-            ((IntLiteral)decl.initializer).getLongValue())); 
+            ((IntLiteral)decl.initializer).getValue())); 
       }
 
       Annotate.setLineNumber( fi, Annotate.getLineNumber( this));

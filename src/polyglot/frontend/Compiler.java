@@ -408,6 +408,9 @@ public class Compiler implements TargetTable, ClassCleaner
           verbose( this, "disambiguating " + job.t.getName() + "...");
           job.ast = removeAmbiguities( job.ast, job.cr, job.it, eq);
           
+          verbose (this, "folding constants " + job.t.getName() + "...");
+          job.ast = foldConstants ( job.ast );
+          
           if( hasErrors( job)) { releaseJob( job); return false; }
         
           job.status |= DISAMBIGUATED;
@@ -677,6 +680,12 @@ public class Compiler implements TargetTable, ClassCleaner
   {
     AmbiguityRemover ar = new AmbiguityRemover( ts, it, eq);
     return ast.visit( ar);
+  }
+
+  protected Node foldConstants ( Node ast )
+  {
+    ConstantFolder cf = new ConstantFolder();
+    return ast.visit( cf);
   }
 
   protected Node typeCheck( Node ast, ImportTable it, ErrorQueue eq)

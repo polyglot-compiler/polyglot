@@ -80,8 +80,11 @@ public class ReturnStatement extends Statement
                        "A return statement which returns a value can only"
                        + " occur in a method which does not have type void.");
       }
-      else if( !expr.getCheckedType().descendsFrom( mti.getReturnType()) &&
-               !expr.getCheckedType().equals( mti.getReturnType())) {
+      else if( ! expr.getCheckedType().isImplicitCastValid ( mti.getReturnType()) &&
+               ! (( expr instanceof NumericalLiteral) && 
+                    c.getTypeSystem().numericConversionValid( 
+                                         mti.getReturnType(), 
+                                         ((NumericalLiteral)expr).getValue()))) {
         throw new SemanticException( 
                           "Method \"" + mti.getName() + "\" must return "
                           + "an expression of type \"" 
