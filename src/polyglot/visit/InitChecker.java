@@ -18,9 +18,9 @@ import polyglot.types.*;
 public class InitChecker extends DataFlow
 {
     public InitChecker(Job job, TypeSystem ts, NodeFactory nf) {
-    super(job, ts, nf, 
-          true /* forward analysis */,
-          false /* perform dataflow when leaving CodeDecls, not when entering */);
+        super(job, ts, nf, 
+              true /* forward analysis */,
+              false /* perform dataflow when leaving CodeDecls, not when entering */);
     }
     
     protected ClassBodyInfo currCBI = null;
@@ -527,7 +527,6 @@ public class InitChecker extends DataFlow
                                      otherItem, FlowGraph.EDGE_KEY_OTHER,
                                      n, graph);
         DataFlowItem inDFItem = ((DataFlowItem)inItem);
-
         Map ret = null;        
         if (n instanceof Formal) {            
             // formal argument declaration.
@@ -551,9 +550,14 @@ public class InitChecker extends DataFlow
         }
         else if (n instanceof Expr && ((Expr)n).type().isBoolean() && 
                     (n instanceof Binary || n instanceof Unary)) {
+            if (trueItem == null) {
+                trueItem = inDFItem;
+            }
+            if (falseItem == null) {
+                falseItem =  inDFItem;
+            }            
             ret = flowBooleanConditions(trueItem, falseItem, inDFItem, graph, (Expr)n, succEdgeKeys);                        
         } 
-        
         if (ret != null) {
             return ret;
         }

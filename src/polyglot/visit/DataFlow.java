@@ -220,10 +220,21 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                                        "needed");        
     }
     
+    /**
+     * 
+     * @param trueItem The item for flows coming into n for true conditions. Cannot be null.
+     * @param falseItem The item for flows coming into n for false conditions. Cannot be null.
+     * @param otherItem The item for all other flows coming into n 
+     * @param n The boolean expression.
+     * @param edgeKeys The outgoing edges 
+     */
     protected Map flowBooleanConditions(Item trueItem, Item falseItem, Item otherItem, 
                                         FlowGraph graph, Expr n, Set edgeKeys) {
-        if (trueItem == null) trueItem = createInitialItem(graph);
-        if (falseItem == null) falseItem = createInitialItem(graph);
+        if (trueItem == null || falseItem == null) {
+            throw new InternalCompilerError("The true and false items cannot be null. " +
+                "It is often correct to set them to otherItem, but this should be " +
+                "done by the caller.");
+        }
         
         if (!n.type().isBoolean() || !(n instanceof Binary || n instanceof Unary)) {
             throw new InternalCompilerError("This method only takes binary " +
