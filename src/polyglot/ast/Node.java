@@ -142,7 +142,7 @@ public abstract class Node extends AnnotatedObject {
    *
    * @return The node with all constants folded in.
    */
-  public Node foldConstants() 
+  public Node foldConstants(TypeSystem ts) 
   {
     return this;
   }
@@ -189,6 +189,13 @@ public abstract class Node extends AnnotatedObject {
     translate(c, w);
     w.end();
   }
+
+    /** Adds an explicit THIS SpecialExpression to every FieldExpression with null target
+     */
+    public Node addThis() {
+	return this;
+    }
+
   
   /**
    * Print relevant debugging info for this node to the writer. (This method

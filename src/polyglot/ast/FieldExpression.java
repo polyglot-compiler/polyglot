@@ -5,6 +5,9 @@ import jltools.util.*;
 
 import java.util.*;
 
+//*** EVIL, TEMPORARY HASK
+import jltools.ext.jif.extension.*;
+
 
 /**
  * A <code>Field</code> is an immutable representation of a Java field
@@ -89,6 +92,17 @@ public class FieldExpression extends Expression
   {
     return reconstruct( Node.condVisit(this.ext, v),Node.condVisit(target, v), name);
   }
+
+    public Node addThis() {
+	Node newTarget;
+	if (target == null) {
+	    newTarget = new SpecialExpression(new JifSpecialExpressionExtension(), null,
+					      SpecialExpression.THIS);
+	} else {
+	    newTarget = target;
+	}
+	return reconstruct(this.ext, newTarget, name);
+    }
 
   public Node typeCheck( LocalContext c) throws SemanticException
   {

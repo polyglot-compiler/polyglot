@@ -259,6 +259,10 @@ public abstract class TypeSystem {
     public Node getNewFieldExpressionExtension() {
 	return null;
     }
+    public Node getNewLiteralExtension() {
+	return null;
+    }
+
 
   /**
    * Returns a canonical type corresponding to the Java Class object

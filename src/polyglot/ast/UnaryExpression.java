@@ -94,7 +94,7 @@ public class UnaryExpression extends Expression
    *
    * @return The node with all constants folded in.
    */
-  public Node foldConstants() 
+  public Node foldConstants(TypeSystem ts) 
   {
     Node newNode = this;
     if (expr instanceof IntLiteral)
@@ -104,10 +104,10 @@ public class UnaryExpression extends Expression
       {
         // FIXME: PROMOTION MAY NOT BE CORRECT
       case BITCOMP:
-        newNode = new IntLiteral(null,  ~ lValue);
+        newNode = new IntLiteral(ts.getNewLiteralExtension(),  ~ lValue);
         break;
       case NEGATIVE:
-        newNode = new IntLiteral(null,  - lValue);
+        newNode = new IntLiteral(ts.getNewLiteralExtension(),  - lValue);
         break;
       case POSITIVE:
         newNode = expr;
@@ -115,7 +115,7 @@ public class UnaryExpression extends Expression
       }
     }
     else if (expr instanceof BooleanLiteral && operator == LOGICALNOT)
-      newNode = new BooleanLiteral ( ! ((BooleanLiteral)expr).getBooleanValue() );
+      newNode = new BooleanLiteral ( ts.getNewLiteralExtension(), ! ((BooleanLiteral)expr).getBooleanValue() );
 
     // copy the line number:
     if ( newNode != this)

@@ -463,7 +463,7 @@ public class Compiler implements TargetTable, ClassCleaner
 
 	  if (jif) {
 	      verbose( this, "label checking " + job.t.getName() + "...");
-	     // job.ast = labelCheck( job.ast, job.it, eq);  ***********  
+	      job.ast = labelCheck( job.ast, job.it, eq);
 	  }
 	      
 
@@ -717,12 +717,16 @@ public class Compiler implements TargetTable, ClassCleaner
     } else {
 	ar = new AmbiguityRemover( ts, it, eq);
     }
-    return ast.visit( ar);
+    ast =  ast.visit( ar);
+    //    verbose(this, "Adding THIS references...");
+    //JifThisVisitor jtv = new JifThisVisitor();
+    //ast = ast.visit(jtv);
+    return ast;
   }
 
   protected Node foldConstants ( Node ast )
   {
-    ConstantFolder cf = new ConstantFolder();
+    ConstantFolder cf = new ConstantFolder(ts);
     return ast.visit( cf);
   }
 
@@ -740,8 +744,17 @@ public class Compiler implements TargetTable, ClassCleaner
       } catch (ClassCastException ce) {
 	  throw new InternalCompilerError("Can't labelcheck without JifTypeSystem");
       }
-      JifLabelChecker lc = new JifLabelChecker( jts, it, eq);
-      return ast.visit( lc);
+      JifPrincipalHeirarchy PH = new JifPrincipalHeirarchy();
+      JifLabelChecker lc = new JifLabelChecker( jts, it, eq, PH);
+      ast = ast.visit( lc);
+      try {
+	  JifVarMap soln = lc.solver.solve(PH);
+	  CodeWriter cw = new CodeWriter(System.out, outputWidth);
+	  soln.dump(cw);
+      } catch (SemanticException e) {
+	  eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), -1);
+      }
+      return ast;
   }
 
 
@@ -756,6 +769,7 @@ public class Compiler implements TargetTable, ClassCleaner
   {
     if (jif) {
 	verbose(this, "Splitting the file...");
+	/*
 	{CodeWriter w = new CodeWriter(new UnicodeWriter( 
                                           new FileWriter( "ast001.dump")),
 								  outputWidth);
@@ -772,6 +786,7 @@ public class Compiler implements TargetTable, ClassCleaner
 	instAst.visit(d);
 	w.flush();
 	verbose(this, "Splitting end");
+	*/
     } else {
 	SourceFileNode sfn = (SourceFileNode)ast;
 	Writer ofw = t.getOutputWriter( sfn.getPackageName());
