@@ -21,6 +21,9 @@
   <!-- binaries directory -->
   <property name="bin"  location="${basedir}/bin"/>
 
+  <!-- pth (Polyglot Test Harness) directory -->
+  <property name="pthdir"  location="${basedir}/tools/pth"/>
+
   <path id="standard.classpath">
     <pathelement location="${classes}"/>
     <pathelement location="${lib}/java_cup.jar"/>
@@ -52,6 +55,7 @@
           depends="configure,bin-deps"
           unless="bin.up-to-date">
     <antcall target="jlc"/>
+    <antcall target="pth-bin"/>
   </target>
 
   <target name="bin-deps">
@@ -671,7 +675,7 @@ ext=""
   </target>
 
   <target name="jar" depends="polyglot-jar"/>
-  <target name="polyglot-dist" depends="jl-dist,skel-dist,param-dist,pao-dist,coffer-dist"/>
+  <target name="polyglot-dist" depends="jl-dist,skel-dist,param-dist,pao-dist,coffer-dist,pth-dist"/>
   <target name="polyglot-dist-javadoc" depends="polyglot-dist,dist-javadoc"/>
   <target name="dist" depends="polyglot-dist-javadoc"/>
 
@@ -692,6 +696,44 @@ ext=""
     <copy file="${basedir}/configure-jmatch.xml" tofile="${dist}/configure-jmatch.xml"/>
     <move file="${dist}/README" tofile="${dist}/README-POLYGLOT"/>
     <copy file="${src}/polyglot/ext/jmatch/doc/README" tofile="${dist}/README"/>
+  </target>
+  
+  <!-- compile pth (Polyglot Test Harness) -->
+  <target name="pth-compile" 
+          description="compile the pth source">
+    <javac srcdir="${pthdir}/src" destdir="${classes}" debug="on"
+      includes="polyglot/**">
+      <classpath refid="standard.classpath"/>
+    </javac>
+  </target>
+  
+  <!-- create jar pth (Polyglot Test Harness) -->
+  <target name="pth-jar" depends="pth-compile"
+          description="create the pth jar file">
+    <jar jarfile="${lib}/pth.jar" basedir="${classes}" includes="polyglot/pth/**"/>
+  </target>  
+  
+  <!-- Create pth executable -->
+  <target name="pth-bin" 
+          depends="executable-defs" 
+          description="creates the executable script pth">
+    <echo message="Creating ${bin}/pth"/>
+    <concat destfile="${bin}/pth" append="no">
+      <filelist dir="${bin}" files="defs"/>
+    </concat>
+    <concat destfile="${bin}/pth" append="yes">
+      <filelist dir="${bin}" files="pth.in"/>
+    </concat>
+    <chmod perm="+x" file="${bin}/pth"/>
+    <delete file="${bin}/defs"/>
+  </target>
+
+  <!-- create pth (Polyglot Test Harness) -->
+  <target name="pth" depends="pth-jar"/>
+
+  <!-- create distribution for pth (Polyglot Test Harness) -->
+  <target name="pth-dist" depends="pth">
+    <copy todir="${dist}/lib" file="${lib}/pth.jar"/>
   </target>
 </project>
 
