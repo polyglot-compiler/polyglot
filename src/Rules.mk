@@ -25,7 +25,7 @@ BIN 			= $(SOURCE)
 		echo "$(JC)" $(JC_FLAGS) $< ; \
 		"$(JC)" $(JC_FLAGS) $< ; \
 	else \
-		echo $< ; \
+		true echo "$<" ; \
 	fi
 
 all clean clobber javadoc:
