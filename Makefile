@@ -115,6 +115,8 @@ clean:
 	rm -f jltools/runtime/*.class
 	rm -f jltools/ext/jif/parse/*.class
 	rm -f jltools/ext/jif/ast/*.class
+	rm -f jltools/ext/jif/lex/*.class
+	rm -f jltools/ext/jif/types/*.class
 
 # Delete class files as well as the grammar files, so that we can regenerate 
 # them. Also delete the javadoc & jar file, if they exis, as well as the jlc and 
@@ -139,7 +141,7 @@ jar: all
 
 javadoc: FORCE
 	-mkdir -p $(JAVADOC_OUTPUT)
-	$(JAVA) $(JAVADOC_FLAGS) $(JAVADOC_MAIN) -d $(JAVADOC_OUTPUT) \
+	$(JAVADOC) $(JAVADOC_FLAGS) -d $(JAVADOC_OUTPUT) \
 		-classpath $(CLASSPATH) $(JAVADOC_DOCLET) -package\
 			jltools.ast      \
 			jltools.lex      \

@@ -68,6 +68,24 @@ public class MethodNode extends ClassMember
     this( accessFlags, returns, name, formals, exceptions, body, 0);
   }
 
+    protected MethodNode( boolean isConstructor, AccessFlags accessFlags, TypeNode returns, String name,
+			  List formals, List exceptions, BlockStatement body, int addDims) 
+    {
+    this.isConstructor = isConstructor;
+    this.accessFlags = accessFlags;
+    this.returns = returns;
+    this.name = (isConstructor ? null : name);
+    this.formals = TypedList.copyAndCheck( formals, FormalParameter.class, 
+                                           true);
+    this.exceptions = TypedList.copyAndCheck( exceptions, TypeNode.class,
+                                              true);
+    this.body = body;
+    this.addDims = addDims;
+
+    mtiThis = null;
+  }
+	
+
   /**
    * As above, except this constructor takes an additional, and 
    * infrequently used, parameter. This parameter may be used for definitions
