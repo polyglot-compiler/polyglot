@@ -55,6 +55,11 @@ public class StringLit_c extends Lit_c implements StringLit
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         List l = breakupString();
 
+        // If we break up the string, parenthesize it to avoid precedence bugs.
+        if (l.size() > 1) {
+            w.write("(");
+        }
+
         for (Iterator i = l.iterator(); i.hasNext(); ) {
             String s = (String) i.next();
             w.begin(0);
@@ -72,6 +77,10 @@ public class StringLit_c extends Lit_c implements StringLit
                 w.write(" +");
                 w.allowBreak(0, " ");
             }
+        }
+
+        if (l.size() > 1) {
+            w.write(")");
         }
     }
 
