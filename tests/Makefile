@@ -33,10 +33,24 @@ GOOD =  \
 BAD = \
 	Errors.jl \
 	Errors2.jl \
-	NoInit.jl \
+	NoInit1.jl \
 	NoInit2.jl \
+	NoInit3.jl \
+	NoInit4.jl \
+	NoInit5.jl \
+	NoInit6.jl \
 	NoReturns.jl \
-	Unreachable.jl \
+	Unreachable1.jl \
+	Unreachable2.jl \
+	Unreachable3.jl \
+	Unreachable4.jl \
+	Unreachable5.jl \
+	Unreachable6.jl \
+	Unreachable7.jl \
+	Unreachable8.jl \
+	Unreachable9.jl \
+	Unreachable10.jl \
+	Unreachable11.jl \
 	BadAbstract.jl \
 	BadAlloc.jl \
 	BadCtor.jl \

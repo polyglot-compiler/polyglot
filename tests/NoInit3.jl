@@ -1,16 +1,18 @@
 // This tests whether we detect variables which are used before they get
 // initialized.
 
-public class NoInit2 {
+public class NoInit3 {
   void foo(int i) {}
 
-  void m2() {
+  void m3() {
     int i;
-    while (true) {
-      if (1==1) {
-	break;
+  l1:
+    while(true) {
+    l2:
+      while(true) {
+	break l1;
       }
-      i = 3; // BAD (m2) -- unreachable
+      i = 3; // BAD (m3) -- unreachable
     }
     foo(i);
   } 
