@@ -303,11 +303,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                 System.err.println("Pretty-printing AST for " + job +
                                    " after " + pass.name());
 
-		NodeVisitor dumper =
-		  new DumpAst(new CodeWriter(System.err, 78));
-		dumper = dumper.begin();
-		job.ast().visit(dumper);
-		dumper.finish();
+                PrettyPrinter pp = new PrettyPrinter();
+                pp.printAst(job.ast(), new CodeWriter(System.err, 78));
             }
 
             // dump this pass if we need to.
@@ -317,8 +314,11 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                 System.err.println("Dumping AST for " + job +
                                    " after " + pass.name());
 
-                PrettyPrinter pp = new PrettyPrinter();
-                pp.printAst(job.ast(), new CodeWriter(System.err, 78));
+		NodeVisitor dumper =
+		  new DumpAst(new CodeWriter(System.err, 78));
+		dumper = dumper.begin();
+		job.ast().visit(dumper);
+		dumper.finish();
             }
 
             // This seems to work around a VM bug on linux with JDK
