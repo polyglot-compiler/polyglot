@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import polyglot.main.Options;
 import polyglot.types.reflect.ClassFileLoader;
 import polyglot.util.*;
 
@@ -40,23 +39,19 @@ public class Compiler
      *
      * @param extensionInfo the <code>ExtensionInfo</code> this compiler is for.
      */
-    public Compiler(ExtensionInfo extensionInfo) {
-	this.extensionInfo = extensionInfo;
-
-        Options options = extensionInfo.getOptions();
-        
-	eq = new StdErrorQueue(System.err, options.error_count,
-                               extensionInfo.compilerName());
+    public Compiler(ExtensionInfo extensionInfo, ErrorQueue eq) {
+    this.extensionInfo = extensionInfo;
+    this.eq = eq;
 
         loader = new ClassFileLoader();
 
-	// This must be done last.
-	extensionInfo.initCompiler(this);
+    // This must be done last.
+    extensionInfo.initCompiler(this);
     }
 
     /** Return a set of output filenames resulting from a compilation. */
     public Collection outputFiles() {
-	return outputFiles;
+    return outputFiles;
     }
 
     /**

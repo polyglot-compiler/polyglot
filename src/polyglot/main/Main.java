@@ -2,6 +2,9 @@ package polyglot.main;
 
 import polyglot.frontend.Compiler;
 import polyglot.frontend.ExtensionInfo;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
+import polyglot.util.StdErrorQueue;
 
 import java.io.*;
 import java.util.*;
@@ -58,7 +61,11 @@ public class Main
       return loadExtension("polyglot.ext.jl.ExtensionInfo");
   }
   
-  protected void start(String[] argv) throws TerminationException {
+  public void start(String[] argv) throws TerminationException {
+      start(argv, null);
+  }
+  
+  public void start(String[] argv, ErrorQueue eq) throws TerminationException {
       source = new HashSet();  
       List args = explodeOptions(argv);
       ExtensionInfo ext = getExtensionInfo(args);
@@ -80,7 +87,13 @@ public class Main
           throw new TerminationException(ue.exitCode);
       }
       
-      Compiler compiler = new Compiler(ext);
+      if (eq == null) {
+          eq = new StdErrorQueue(System.err, 
+                                 options.error_count, 
+                                 ext.compilerName());
+      }
+      
+      Compiler compiler = new Compiler(ext, eq);
   
       long time0 = System.currentTimeMillis();
   
@@ -95,6 +108,21 @@ public class Main
       long start_time = System.currentTimeMillis();
   
       /* Now call javac or jikes, if necessary. */
+      if (!invokePostCompiler(options, compiler, eq)) {
+          throw new TerminationException(1);
+      }
+  
+      if (Report.should_report(verbose, 1)) {
+          reportTime("Finished compiling Java output files. time=" + 
+                  (System.currentTimeMillis() - start_time), 1);
+  
+          reportTime("Total time=" + (System.currentTimeMillis() - time0), 1);
+      }
+  }
+ 
+  protected boolean invokePostCompiler(Options options, 
+                                    Compiler compiler, 
+                                    ErrorQueue eq) {
       if (options.post_compiler != null && !options.output_stdout) {
           Runtime runtime = Runtime.getRuntime();
 
@@ -118,8 +146,13 @@ public class Main
                 new InputStreamReader(proc.getErrorStream());
               char[] c = new char[72];
               int len;
+              StringBuffer sb = new StringBuffer();
               while((len = err.read(c)) > 0) {
-                System.err.print(String.valueOf(c, 0, len));
+                  sb.append(String.valueOf(c, 0, len));
+              }
+              
+              if (sb.length() != 0) {
+                  eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, sb.toString());
               }
 
               proc.waitFor();
@@ -130,23 +163,19 @@ public class Main
               }
 
               if (proc.exitValue() > 0) {
-                System.exit(proc.exitValue());
+                eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, 
+                                 "Non-zero return code: " + proc.exitValue());
+                return false;
               }
           }
           catch(Exception e) {
-                throw new TerminationException("Caught Exception while running compiler: "
-                                  + e.getMessage());
+              eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, e.getMessage());
+              return false;
           }
       }
-  
-      if (Report.should_report(verbose, 1)) {
-          reportTime("Finished compiling Java output files. time=" + 
-                  (System.currentTimeMillis() - start_time), 1);
-  
-          reportTime("Total time=" + (System.currentTimeMillis() - time0), 1);
-      }
+      return true;
   }
- 
+  
   private List explodeOptions(String[] args) throws TerminationException {
       LinkedList ll = new LinkedList();
 
