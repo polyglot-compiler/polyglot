@@ -13,12 +13,6 @@ import java.util.*;
  * NodeFactory for carray extension.
  *
  */
-public class CarrayNodeFactory extends NodeFactory_c {
-    public ConstArrayTypeNode ConstArrayTypeNode(Position pos, TypeNode base) {
-        return new ConstArrayTypeNode_c(new Ext_c(), pos, base);
-    }
-    public Assign Assign(Position pos, Expr left, Assign.Operator op, Expr right) {
-        return new CarrayAssign_c(new Ext_c(), pos, left, op, right);
-    }
-
+public interface CarrayNodeFactory extends NodeFactory {
+    public ConstArrayTypeNode ConstArrayTypeNode(Position pos, TypeNode base);
 }
