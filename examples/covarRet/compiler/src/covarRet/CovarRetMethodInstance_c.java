@@ -21,7 +21,7 @@ public class CovarRetMethodInstance_c extends MethodInstance_c
         super(ts, pos, container, flags, returnType, name, argTypes, excTypes);
     }
 
-    public boolean canOverride(TypeSystem ts, MethodInstance mj) {
+    public boolean canOverride(MethodInstance mj) {
         MethodInstance mi = this;
 
         // This is the only rule that has changed.
@@ -31,6 +31,6 @@ public class CovarRetMethodInstance_c extends MethodInstance_c
 
         // Force the return types to be the same and then let the super
         // class perform the remainder of the tests.
-        return super.canOverride(ts, mj.returnType(mi.returnType()));
+        return super.canOverride(mj.returnType(mi.returnType()));
     }
 }

@@ -25,7 +25,7 @@ public interface ProcedureInstance extends CodeInstance
 
     boolean hasSameArguments(ProcedureInstance pi);
     boolean hasArguments(List arguments);
-    boolean throwsSubset(TypeSystem ts, ProcedureInstance pi);
-    boolean callValid(TypeSystem ts, ProcedureInstance call);
-    boolean callValid(TypeSystem ts, List actualTypes);
+    boolean throwsSubset(ProcedureInstance pi);
+    boolean callValid(ProcedureInstance call);
+    boolean callValid(List actualTypes);
 }

@@ -13,7 +13,6 @@ CC			= gcc
 JC_FLAGS 		= -g -d $(OUTPUT) $(JAVAC_PATHS) -deprecation
 RMIC_FLAGS		= -d $(OUTPUT) -classpath $(CLASSPATH)
 
-JAR_FILE		= polyglot.jar
 JAR_FLAGS		= cf 
 
 JAVADOC_MAIN		= com.sun.tools.javadoc.Main
@@ -121,3 +120,25 @@ define ppg
 	$(JAVA) -classpath $(CLASSPATH) polyglot.util.ppg.PPG
 endef
 
+define jar
+	@cd $(SOURCE)/classes; \
+	for f in $(JAR_FILE); do \
+	    x=""; \
+	    for c in $(PACKAGE)/*.class; do \
+	        if [ -f $$c ]; then x="$$x $$c"; fi; \
+	    done; \
+	    if [ ! -z "$$x" ]; then \
+		if [ -f ../$$f ]; then \
+		    echo jar uf ../$$f $$x; \
+		    jar uf ../$$f $$x; \
+		else \
+		    echo jar cf ../$$f $$x; \
+		    jar cf ../$$f $$x; \
+		fi; \
+	    fi; \
+	done
+endef
+
+jar: all
+	$(jar)
+	$(subdirs)

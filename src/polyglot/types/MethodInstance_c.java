@@ -145,11 +145,11 @@ public class MethodInstance_c extends ProcedureInstance_c
     }
 
     /** Returns true iff <this> is the same method as <m> */
-    public boolean isSameMethod(TypeSystem ts, MethodInstance m) {
+    public boolean isSameMethod(MethodInstance m) {
         return this.name().equals(m.name()) && ts.hasSameArguments(this, m);
     }
 
-    public List overrides(TypeSystem ts) {
+    public List overrides() {
         List l = new LinkedList();
 
         Type t = container().superType();
@@ -174,15 +174,15 @@ public class MethodInstance_c extends ProcedureInstance_c
 	    && listIsCanonical(excTypes);
     }
 
-    public boolean methodCallValid(TypeSystem ts, MethodInstance call) {
+    public boolean methodCallValid(MethodInstance call) {
         return name().equals(call.name()) && ts.callValid(this, call);
     }
 
-    public boolean methodCallValid(TypeSystem ts, String name, List argTypes) {
+    public boolean methodCallValid(String name, List argTypes) {
         return name().equals(name) && ts.callValid(this, argTypes);
     }
 
-    public boolean canOverride(TypeSystem ts, MethodInstance mj) {
+    public boolean canOverride(MethodInstance mj) {
         MethodInstance mi = this;
 
         if (! ts.isSame(mi.returnType(), mj.returnType())) {

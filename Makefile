@@ -34,24 +34,8 @@ clobber:
 javadoc:
 	$(javadoc)
 
-norecurse: classes jif polyj split op jmatch
-	$(JC) $(JC_FLAGS) polyglot/main/Main.java
-
-jif:
-	$(JC) $(JC_FLAGS) polyglot/ext/jif/ExtensionInfo.java
-polyj:
-	$(JC) $(JC_FLAGS) polyglot/ext/polyj/ExtensionInfo.java
-op:
-	$(JC) $(JC_FLAGS) polyglot/ext/op/ExtensionInfo.java
-split:
-	$(JC) $(JC_FLAGS) polyglot/ext/split/ExtensionInfo.java
-jmatch:
-	$(JC) $(JC_FLAGS) polyglot/ext/jmatch/ExtensionInfo.java
-
 jar: all
-	cd classes ; \
-	$(JAR) $(JAR_FLAGS) ../$(JAR_FILE) `find polyglot -name \*.class`; \
-	$(JAR) $(JAR_FLAGS) ../jif.jar `find jif -name \*.class`
+	$(subdirs)
 
 export: javadoc
 	rm -rf release

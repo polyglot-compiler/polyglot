@@ -158,7 +158,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	return this;
     }
 
-    public boolean isImplicitCastValid(TypeSystem ts, Type toType) {
+    public boolean isImplicitCastValid(Type toType) {
         if (toType.isArray()) {
             return ts.isImplicitCastValid(base(), toType.toArray().base());
         }
@@ -175,7 +175,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
      * Returns true iff a cast from this to toType is valid; in other
      * words, some non-null members of this are also members of toType.
      **/
-    public boolean isCastValid(TypeSystem ts, Type toType) {
+    public boolean isCastValid(Type toType) {
         if (! toType.isReference()) return false;
 
 	if (toType.isArray()) {

@@ -43,11 +43,11 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
         return isConst;
     }
 
-    public boolean isImplicitCastValid(TypeSystem ts, Type toType) {
+    public boolean isImplicitCastValid(Type toType) {
         if (toType instanceof ConstArrayType &&
             ((ConstArrayType) toType).isConst()) {
             // int const[] = int[] 
-            return super.isImplicitCastValid(ts, toType);
+            return super.isImplicitCastValid(toType);
         }
 
         // From this point, toType is not a const array
@@ -59,7 +59,7 @@ public class ConstArrayType_c extends ArrayType_c implements ConstArrayType
             }
             else {
                 // Object = int[] 
-                return super.isImplicitCastValid(ts, toType);
+                return super.isImplicitCastValid(toType);
             }
         }
 

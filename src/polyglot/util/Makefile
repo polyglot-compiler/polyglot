@@ -1,6 +1,7 @@
 SOURCE = ../..
 PACKAGE = polyglot/util
 SUBDIRS = typedump ppg
+JAR_FILE = polyglot.jar
 
 include $(SOURCE)/Rules.mk
 

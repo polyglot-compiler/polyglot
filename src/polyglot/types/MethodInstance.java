@@ -19,9 +19,9 @@ public interface MethodInstance extends ProcedureInstance
     MethodInstance exceptionTypes(List l);
     MethodInstance container(ReferenceType container);
 
-    List overrides(TypeSystem ts);
-    boolean canOverride(TypeSystem ts, MethodInstance mi);
-    boolean isSameMethod(TypeSystem ts, MethodInstance mi);
-    boolean methodCallValid(TypeSystem ts, MethodInstance call);
-    boolean methodCallValid(TypeSystem ts, String name, List actualTypes);
+    List overrides();
+    boolean canOverride(MethodInstance mi);
+    boolean isSameMethod(MethodInstance mi);
+    boolean methodCallValid(MethodInstance call);
+    boolean methodCallValid(String name, List actualTypes);
 }

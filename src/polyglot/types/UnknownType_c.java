@@ -16,11 +16,11 @@ public class UnknownType_c extends Type_c implements UnknownType
     
     /** Creates a new type in the given a TypeSystem. */
     public UnknownType_c(TypeSystem ts) {
-        this(ts, null);
+        super(ts);
     }
 
-    public UnknownType_c(TypeSystem ts, Position pos) {
-        super(ts, pos);
+    public boolean isCanonical() {
+        return false;
     }
 
     public String translate(Resolver c) {

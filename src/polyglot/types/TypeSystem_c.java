@@ -225,7 +225,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean descendsFrom(Type child, Type ancestor) {
         assert_(child);
         assert_(ancestor);
-        return child.descendsFrom(this, ancestor);
+        return child.descendsFrom(ancestor);
     }
 
     /**
@@ -237,7 +237,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean isCastValid(Type fromType, Type toType) {
         assert_(fromType);
         assert_(toType);
-        return fromType.isCastValid(this, toType);
+        return fromType.isCastValid(toType);
     }
 
     /**
@@ -254,7 +254,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean isImplicitCastValid(Type fromType, Type toType) {
         assert_(fromType);
         assert_(toType);
-        return fromType.isImplicitCastValid(this, toType);
+        return fromType.isImplicitCastValid(toType);
     }
 
     /**
@@ -263,7 +263,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean isSame(Type type1, Type type2) {
         assert_(type1);
         assert_(type2);
-	return type1.isSame(this, type2);
+	return type1.isSame(type2);
     }
 
     /**
@@ -272,7 +272,7 @@ public class TypeSystem_c implements TypeSystem
      */
     public boolean numericConversionValid(Type t, long value) {
         assert_(t);
-        return t.numericConversionValid(this, value);
+        return t.numericConversionValid(value);
     }
 
     ////
@@ -437,7 +437,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean isSubtype(Type t1, Type t2) {
         assert_(t1);
         assert_(t2);
-        return t1.isSubtype(this, t2);
+        return t1.isSubtype(t2);
     }
 
     ////
@@ -905,7 +905,7 @@ public class TypeSystem_c implements TypeSystem
     public boolean throwsSubset(ProcedureInstance p1, ProcedureInstance p2) {
         assert_(p1);
         assert_(p2);
-        return p1.throwsSubset(this, p2);
+        return p1.throwsSubset(p2);
     }
 
     /**
@@ -927,11 +927,11 @@ public class TypeSystem_c implements TypeSystem
     }
 
     public List overrides(MethodInstance mi) {
-        return mi.overrides(this);
+        return mi.overrides();
     }
 
     public boolean canOverride(MethodInstance mi, MethodInstance mj) {
-        return mi.canOverride(this, mj);
+        return mi.canOverride(mj);
     }
 
     /**
@@ -940,14 +940,14 @@ public class TypeSystem_c implements TypeSystem
     public boolean isSameMethod(MethodInstance m1, MethodInstance m2) {
         assert_(m1);
         assert_(m2);
-        return m1.isSameMethod(this, m2);
+        return m1.isSameMethod(m2);
     }
 
     public boolean methodCallValid(MethodInstance prototype,
 	                           MethodInstance call) {
         assert_(prototype);
         assert_(call);
-	return prototype.methodCallValid(this, call);
+	return prototype.methodCallValid(call);
     }
 
     public boolean callValid(ProcedureInstance prototype,
@@ -955,20 +955,20 @@ public class TypeSystem_c implements TypeSystem
     {
         assert_(prototype);
         assert_(call);
-	return prototype.callValid(this, call);
+	return prototype.callValid(call);
     }
 
     public boolean methodCallValid(MethodInstance prototype,
 				   String name, List argTypes) {
         assert_(prototype);
         assert_(argTypes);
-	return prototype.methodCallValid(this, name, argTypes);
+	return prototype.methodCallValid(name, argTypes);
     }
 
     public boolean callValid(ProcedureInstance prototype, List argTypes) {
         assert_(prototype);
         assert_(argTypes);
-        return prototype.callValid(this, argTypes);
+        return prototype.callValid(argTypes);
     }
 
     ////
@@ -1071,12 +1071,15 @@ public class TypeSystem_c implements TypeSystem
 	return o;
     }
 
+    protected UnknownType unknownType = new UnknownType_c(this);
+    protected UnknownQualifier unknownQualifier = new UnknownQualifier_c(this);
+
     public UnknownType unknownType(Position pos) {
-	return new UnknownType_c(this, pos);
+	return unknownType;
     }
 
     public UnknownQualifier unknownQualifier(Position pos) {
-	return new UnknownQualifier_c(this, pos);
+	return unknownQualifier;
     }
 
     public Package packageForName(Package prefix, String name) {

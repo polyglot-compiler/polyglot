@@ -95,27 +95,27 @@ public abstract class Type_c extends TypeObject_c implements Type
 	return ts.arrayOf(this);
     }  
     
-    public boolean isSubtype(TypeSystem ts, Type t) {
+    public boolean isSubtype(Type t) {
 	return ts.isSame(this, t) || ts.descendsFrom(this, t);
     }
     
-    public boolean descendsFrom(TypeSystem ts, Type t) {
+    public boolean descendsFrom(Type t) {
         return false;
     }
 
-    public boolean isSame(TypeSystem ts, Type t) {
+    public boolean isSame(Type t) {
         return equals(t);
     }
     
-    public boolean isCastValid(TypeSystem ts, Type toType) {
+    public boolean isCastValid(Type toType) {
 	return false;
     }
     
-    public boolean isImplicitCastValid(TypeSystem ts, Type toType) {
+    public boolean isImplicitCastValid(Type toType) {
         return false;
     }
 
-    public boolean numericConversionValid(TypeSystem ts, long value) {
+    public boolean numericConversionValid(long value) {
         return false;
     }
     
@@ -124,11 +124,4 @@ public abstract class Type_c extends TypeObject_c implements Type
     }
 
     public abstract String toString();
-
-    public final void isSubtype(Type t) { }
-    public final void descendsFrom(Type t) { }
-    public final void isSame(Type t) { }
-    public final void isCastValid(Type toType) { }
-    public final void isImplicitCastValid(Type toType) { }
-    public final void numericConversionValid(long value) { }
 }

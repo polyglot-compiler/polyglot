@@ -73,11 +73,11 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
             return name();
     }
 
-    public boolean descendsFrom(TypeSystem ts, Type ancestor) {
+    public boolean descendsFrom(Type ancestor) {
         return false;
     }
 
-    public boolean isImplicitCastValid(TypeSystem ts, Type toType) {
+    public boolean isImplicitCastValid(Type toType) {
         if (! toType.isPrimitive()) return false;
 
         PrimitiveType t = toType.toPrimitive();
@@ -123,14 +123,14 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
      * Returns true iff a cast from this to toType is valid; in other
      * words, some non-null members of this are also members of toType.
      **/
-    public boolean isCastValid(TypeSystem ts, Type toType) {
+    public boolean isCastValid(Type toType) {
 	if (isVoid() || toType.isVoid()) return false;
         if (ts.isSame(this, toType)) return true;
 	if (isNumeric() && toType.isNumeric()) return true;
         return false;
     }
 
-    public boolean numericConversionValid(TypeSystem ts, long value) {
+    public boolean numericConversionValid(long value) {
         if (isByte())
             return Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE;
         if (isShort())

@@ -1,6 +1,7 @@
 SOURCE = ../../../..
 PACKAGE = polyglot/ext/pao/types
 SUBDIRS =
+JAR_FILE = pao.jar
 
 include $(SOURCE)/Rules.mk
 

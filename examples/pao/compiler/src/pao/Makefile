@@ -1,6 +1,7 @@
 SOURCE = ../../..
 PACKAGE = polyglot/ext/pao
 SUBDIRS = parse ast extension visit types
+JAR_FILE = pao.jar
 
 include $(SOURCE)/Rules.mk
 

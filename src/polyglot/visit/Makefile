@@ -1,6 +1,7 @@
 SOURCE = ../..
 PACKAGE = polyglot/visit
 SUBDIRS =
+JAR_FILE = polyglot.jar
 
 include $(SOURCE)/Rules.mk
 

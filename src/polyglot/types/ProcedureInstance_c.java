@@ -112,7 +112,7 @@ public abstract class ProcedureInstance_c extends TypeObject_c
     }
 
     /** Returns true iff <this> throws fewer exceptions than <p>. */
-    public boolean throwsSubset(TypeSystem ts, ProcedureInstance p) {
+    public boolean throwsSubset(ProcedureInstance p) {
         SubtypeSet s1 = new SubtypeSet(ts);
         SubtypeSet s2 = new SubtypeSet(ts);
 
@@ -129,11 +129,11 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         return true;
     }
 
-    public boolean callValid(TypeSystem ts, ProcedureInstance call) {
+    public boolean callValid(ProcedureInstance call) {
         return ts.callValid(this, call.argumentTypes());
     }
 
-    public boolean callValid(TypeSystem ts, List argTypes) {
+    public boolean callValid(List argTypes) {
         List l1 = this.argumentTypes();
         List l2 = argTypes;
 

@@ -1,6 +1,7 @@
 SOURCE = ../../..
 PACKAGE = polyglot/types/reflect
 SUBDIRS =
+JAR_FILE = polyglot.jar
 
 include $(SOURCE)/Rules.mk
 
@@ -20,6 +21,11 @@ SOURCES = \
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
 all: $(CLASSES)
+
+JAR_FILE = polyglot.jar
+
+jar: all
+	$(jar)
 
 release: release_src
 

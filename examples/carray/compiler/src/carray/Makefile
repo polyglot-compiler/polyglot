@@ -1,6 +1,7 @@
 SOURCE = ../../..
 PACKAGE = polyglot/ext/carray
 SUBDIRS = parse ast types
+JAR_FILE = carray.jar
 
 include $(SOURCE)/Rules.mk
 

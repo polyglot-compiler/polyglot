@@ -1,6 +1,7 @@
 SOURCE = ../../..
 PACKAGE = polyglot/ext/covarRet
 #SUBDIRS = runtime
+JAR_FILE = covarRet.jar
 
 include $(SOURCE)/Rules.mk
 

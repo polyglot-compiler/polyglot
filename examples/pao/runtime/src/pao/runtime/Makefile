@@ -1,6 +1,7 @@
 SOURCE = ../../../..
 PACKAGE = polyglot/ext/pao/runtime
 SUBDIRS =
+JAR_FILE = pao.jar paort.jar
 
 include $(SOURCE)/Rules.mk
 
