@@ -5,6 +5,7 @@ import polyglot.ext.jl.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.frontend.*;
+import polyglot.main.Report;
 import java.util.*;
 
 /**
@@ -223,6 +224,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * been performed.
      */
     public CodeDecl post(FlowGraph graph, CodeDecl root) throws SemanticException {
+        if (Report.should_report(Report.cfg, 2)) {
+            dumpFlowGraph(graph, root);
+        }
+        
         // Check the nodes in approximately flow order.
         Set uncheckedPeers = new HashSet(graph.peers());
         LinkedList peersToCheck = new LinkedList(graph.peers(graph.startNode()));
@@ -474,5 +479,39 @@ public abstract class DataFlow extends ErrorHandlingVisitor
          * a boolean operator, such as &&, &, ||, | or !.
          */
         public abstract BoolItem handleExpression(Expr expr, Item startingItem);
+    }
+    
+    private static int flowCounter = 0;
+    /**
+     * Dump a flow graph, labelling edges with their flows, to aid in the
+     * debugging of data flow.
+     */
+    private void dumpFlowGraph(FlowGraph graph, CodeDecl root) {
+        Report.report(2, "digraph Flow" + (flowCounter++) + " {");
+        Report.report(2, "  center=true; ratio=auto; size = \"8.5,11\";");
+        // Loop around the nodes...
+        for (Iterator iter = graph.peers().iterator(); iter.hasNext(); ) {
+            FlowGraph.Peer p = (FlowGraph.Peer)iter.next();
+            
+            // dump out this node
+            Report.report(2,
+                          p.hashCode() + " [ label = \"" +
+                          StringUtil.escape(p.node.toString()) + " (" + 
+                          StringUtil.escape(StringUtil.getShortNameComponent(p.node.getClass().getName()))+ ")\" ];");
+            
+            // dump out the successors.
+            for (Iterator iter2 = p.succs.iterator(); iter2.hasNext(); ) {
+                FlowGraph.Edge q = (FlowGraph.Edge)iter2.next();
+                Report.report(2,
+                              q.getTarget().hashCode() + " [ label = \"" +
+                              StringUtil.escape(q.getTarget().node.toString()) + " (" + 
+                              StringUtil.escape(StringUtil.getShortNameComponent(q.getTarget().node.getClass().getName()))+ ")\" ];");
+                Report.report(2, p.hashCode() + " -> " + q.getTarget().hashCode() + 
+                              " [label=\"" + q.getKey() + ": " + 
+                              q.getTarget().outItems.get(q.getKey()) + "\"];");
+            }
+            
+        }
+        Report.report(2, "}");
     }
 }
