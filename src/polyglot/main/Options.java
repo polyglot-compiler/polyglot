@@ -21,20 +21,30 @@ public final class Options {
   public File output_directory;
   public String default_classpath;
   public String classpath;
+  public String bootclasspath = null;
   public boolean assertions = false;
 
   Options() {
-    String bootpath = System.getProperty("sun.boot.class.path");
-    if (bootpath == null) {
-      bootpath = System.getProperty("java.home") +
+    String default_bootpath = System.getProperty("sun.boot.class.path");
+    if (default_bootpath == null) {
+      default_bootpath = System.getProperty("java.home") +
                  File.separator + "jre" +
                  File.separator + "lib" +
                  File.separator + "rt.jar";
     }
 
     default_classpath = System.getProperty("java.class.path") +
-                        File.pathSeparator + bootpath;
+                        File.pathSeparator + default_bootpath;
     classpath = default_classpath;
+  }
+
+  public String constructFullClasspath() {
+      StringBuffer fullcp = new StringBuffer();
+      if (bootclasspath != null) {
+	  fullcp.append(bootclasspath);
+      }
+      fullcp.append(classpath);
+      return fullcp.toString();
   }
 
   public String source_ext = null; // e.g., java, jl, pj
@@ -111,7 +121,8 @@ public final class Options {
     System.err.println("where [options] includes:");
     System.err.println(" -d <directory>          output directory");
     System.err.println(" -assert                 recognize the assert keyword");
-    System.err.println(" -sourcepath <path list> source path");
+    System.err.println(" -sourcepath <path>      source path");
+    System.err.println(" -bootclasspath <path>   path for bootstrap class files");
     System.err.println(" -ext <extension>        use language extension");
     System.err.println(" -fqcn                   use fully-qualified class"
                         + " names");

@@ -170,6 +170,11 @@ public class Main
                           options.default_classpath;
           i++;
         }
+        else if (args[i].equals("-bootclasspath")) {
+          i++;
+          options.bootclasspath = args[i];
+          i++;
+        }
         else if (args[i].equals("-sourcepath"))
         {
           i++;
@@ -304,6 +309,7 @@ public class Main
               System.err.println(compilerName() + ": illegal option -- " 
                                   + args[i]);
               i++;
+	      options.usage();
               System.exit(1);
           }
           //System.err.println("Extension: " + i + " to " + i2);

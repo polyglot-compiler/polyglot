@@ -54,7 +54,7 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
     protected void initTypeSystem() {
 	try {
             LoadedClassResolver lr;
-            lr = new SourceClassResolver(compiler, this, options.classpath,
+            lr = new SourceClassResolver(compiler, this, options.constructFullClasspath(),
                                          compiler.loader(), true);
             ts.initialize(lr);
 	}
