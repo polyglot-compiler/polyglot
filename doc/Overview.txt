@@ -5,20 +5,18 @@ Polyglot is an extensible Java compiler toolkit designed for experimentation
 with new language extensions.
 
 The base polyglot compiler, jlc ("Java language compiler"), is a
-mostly-complete Java frontend; that is, it parses and performs semantic
+mostly-complete Java front end; that is, it parses and performs semantic
 checking on Java source code.  The compiler outputs Java source code.  Thus,
 the base compiler implements the identity translation.
 
 Language extensions are implemented on top of the base compiler by
 extending the concrete and abstract syntax and the type system.
-Ideally, after type checking the language extension, the abstract syntax
+After type checking the language extension, the abstract syntax
 tree (AST) is translated into a Java AST and the existing code is output
 into a Java source file which can then be compiled with javac.  For
-historical reasons, most extensions just override some portions of
+historical reasons, some extensions just override some portions of
 the Java output code to handle the extended syntax of the particular
-language extension being compiled.  We are currently reworkng the
-compiler to make it easier to rewrite a language extension's AST into a
-Java AST.
+language extension being compiled rather than rewriting the AST.
 
 
 Architecture
@@ -53,15 +51,16 @@ creating AST nodes.
 After the AST has been created by the parser, a series of passes is
 performed upon it.  The passes for a language extension, as well as
 the order in which they should be run, are defined in the extension's
-ExtensionInfo class.  The compiler object schedules the passes and
-runs them on the AST.  Most passes are implemented using a modified
-version of the Visitor design pattern (//FIXME: we should describe this
-somewhere).  The default set of passes is:
+ExtensionInfo class.  The compiler object runs the passes in the order
+specified so that that dependencies between compilation units are
+satisfied.  Most passes are implemented using a modified version of the
+Visitor design pattern, described later (see also TR 2002-1871).  The
+default set of passes is:
 
     * parsing, as described above
-    * build-types (TypeBuilder):  Constructs the Type object representing
-      each type in the source file and stores it in a Resolver
-      associated with the source.
+    * build-types (TypeBuilder):  Constructs a Type object representing
+      each type in the source file and stores it in a Resolver associated
+      with the source file.  Resolvers are used to lookup types by name.
     * clean-super (AmbiguityRemover):  Removes any ambiguities found
       in the declaration of the supertypes of a type (e.g., the "extends"
       clause).
@@ -74,10 +73,13 @@ somewhere).  The default set of passes is:
     * type checking (TypeChecker):  Performs semantic analysis for Java.
     * exception checking (ExceptionChecker):  Performs semantic analysis
       upon exception declaration and propagation.
-    * Reach
-    * Exit
-    * Init //FIXME: describe the dataflow passes
-    * dump (DumpAst):  Optional.  A debugging pass that outputs the AST.
+    * reachability checking (ReachChecker):  Checks that all statements
+      in each method are reachable from the method entry.
+    * exit checking (ExitChecker):  Checks that all paths through methods
+      that should return a value do so.
+    * initialization checking (InitChecker): Checks that local variables
+      are initialized before use.
+    * dump (PrettyPrinter):  Optional.  A debugging pass that outputs the AST.
     * serialization (ClassSerializer):  Optional.  Serializes information
       about a compiled class and injects it into the class for output
       during translation.  This enables separate compilation of
@@ -85,8 +87,11 @@ somewhere).  The default set of passes is:
     * translation (Translator):  Transforms each AST node to a String
       and writes it to an output file.
 
-//FIXME: describe barrier passes and what they do (If for no other reason
-//       then for my own personal knowledge :) - H)
+After many of these passes are "barrier" passes (implemented by
+BarrierPass).  A barrier pass compiles all source files on which a given
+source depends up to the same barrier.  This ensures that enough of
+the type information of dependent sources has been computed before the
+compilation continues.
 
 The ambiguities referred to in the above passes are ambiguities
 resulting from classification of names in Java.  Some names are
@@ -138,22 +143,22 @@ follows:
     following subpackages:
 
 	ext.<ext-name>.ast - AST nodes specific to the extension
-        //FIXME: check the below for correctness
-        //       anything else go in there?
 	ext.<ext-name>.extension - New delegates specific to the extension
-	ext.<ext-name>.types - type checking code specific to the extension
+        ext.<ext-name>.types - type objects and typing judgments specific to
+                               the extension
 	ext.<ext-name>.visit - visitors specific to the extension
-	ext.<ext-name>.parse - the parser for the language extension
+	ext.<ext-name>.parse - the parser and lexer for the language extension
 
     In addition, an extension must define the class
     ext.<ext-name>.ExtensionInfo, which contains the objects which
     define how the language is to be parsed and type checked. There should
     also be a class ext.<ext-name>.Version defined, which specifies the 
-    version number of the extension (nice but not necessary).
+    version number of the extension.  The Version class is used as a check
+    when extracting extension-specific type information from .class files.
 
 
 AST nodes and delegates
------------------------------
+-----------------------
 
 To allow for greater flexibility in overriding the behavior of an AST
 node, each node has a pointer to a delegate object.  Delegate objects
@@ -187,8 +192,7 @@ associated node through accessor methods.
 In writing an extension, the designer should avoid using this approach and put
 the pass implementation in the delegates themselves; this leads to less 
 work in the numver of AST nodes that need to be extended. For more details,
-see the paper from which I stole the previous paragraph from (//FIXME: need to
-cite the polyglot paper).
+see the tech report (Cornell CS-TR 2002-1871).
 
 Writing an extension
 --------------------
@@ -220,8 +224,6 @@ the extension will require the following tasks.
     polyglot/ext/newext, which will copy the skeleton to polyglot/ext/L, and
     substitute your language's name at all the appropriate places in the
     skeleton.
-
-//FIXME: this is up to date in CVS right?
 
     1. Implement a new parser using PPG.  To do this, modify
     polyglot/ext/L/parse/L.ppg using the syntactic changes you defined above.
@@ -285,7 +287,12 @@ The changes to Java needed to support this feature are quite minimal.
 
     3. We rewrite the AST to make it a legal Java program.  This means
     that anywhere we see a primitive value being used at Object, we
-    should box the value and insert a cast to Object.
+    should box the value and insert a cast to Object.  We also need to unbox
+    primitives when casting from Object to a primitive type.  For completeness,
+    we also rewrite '==' to have this operation compare boxed values by value
+    rather than by pointer.  This gives the illusion that all primitives
+    with the same value are boxed into the same object.
+
 
 We created the extension as follows.  The complete extension is in
 polyglot/ext/pao.
