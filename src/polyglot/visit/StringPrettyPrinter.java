@@ -27,7 +27,7 @@ public class StringPrettyPrinter extends PrettyPrinter
         depth++;
 
         if (depth < maxdepth) {
-            ast.del().prettyPrint(w, this);
+            super.print(ast, w);
         }
         else {
             w.write("...");

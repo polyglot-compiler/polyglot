@@ -31,7 +31,9 @@ public class PrettyPrinter
     }
 
     public void print(Node ast, CodeWriter w) {
-        ast.del().prettyPrint(w, this);
+        if (ast != null) {
+            ast.del().prettyPrint(w, this);
+        }
     }
 
     public void printAst(Node ast, CodeWriter w) {
