@@ -128,11 +128,9 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     public void addDecls(Context c) {
-        // Add the declaration of the variable if we haven't already done
+        // Add the declaration of the variable in case we haven't already done
         // so in enterScope, when visiting the initializer.
-        if (init == null) {
-            c.addVariable(li);
-        }
+        c.addVariable(li);
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
