@@ -664,7 +664,7 @@ ext=""
   </target>
 
   <target name="javadoc" depends="jl">
-    <javadoc sourcepath="${basedir}" destdir="doc/api">
+    <javadoc sourcepath="${basedir}" destdir="doc/api" encoding="iso-8859-1">
       <packageset dir="${src}" defaultexcludes="yes">
         <include name="polyglot/**"/>
         <include name="ppg/**"/>
