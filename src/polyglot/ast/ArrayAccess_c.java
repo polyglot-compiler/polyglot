@@ -51,6 +51,11 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	return n;
     }
 
+    /** Return the access flags of the variable. */
+    public Flags flags() {
+        return Flags.NONE;
+    }
+
     /** Reconstruct the expression. */
     protected ArrayAccess_c reconstruct(Expr array, Expr index) {
 	if (array != this.array || index != this.index) {

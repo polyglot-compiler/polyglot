@@ -113,6 +113,12 @@ public class Unary_c extends Expr_c implements Unary
 		throw new SemanticException("Operand of " + op +
 		    " operator must be a variable.", expr.position());
             }
+            
+            if (((Variable) expr).flags().isFinal()) {
+		throw new SemanticException("Operand of " + op +
+		    " operator must be a non-final variable.",
+                    expr.position());
+            }
 
 	    return type(expr.type());
 	}

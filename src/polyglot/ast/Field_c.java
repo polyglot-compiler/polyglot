@@ -81,6 +81,11 @@ public class Field_c extends Expr_c implements Field
     return n;
   }
 
+  /** Return the access flags of the variable. */
+  public Flags flags() {
+    return fi.flags();
+  }
+
   /** Get the field instance of the field. */
   public FieldInstance fieldInstance() {
     return fi;

@@ -44,6 +44,11 @@ public class Local_c extends Expr_c implements Local
     return n;
   }
 
+  /** Return the access flags of the variable. */
+  public Flags flags() {
+    return li.flags();
+  }
+
   /** Get the local instance of the local. */
   public LocalInstance localInstance() {
     return li;

@@ -166,7 +166,7 @@ public class New_c extends Expr_c implements New
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         if (body != null) {
-            tb = tb.pushAnonClass(position());
+            return tb.bypassChildren(body);
         }
 
         return tb;
@@ -174,9 +174,11 @@ public class New_c extends Expr_c implements New
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         New_c n = this;
-
+        
         if (body != null) {
-            ParsedClassType type = (ParsedClassType) tb.currentClass();
+            TypeBuilder bodyTB = tb.pushAnonClass(position());
+            n = (New_c) this.visit(bodyTB);
+            ParsedClassType type = (ParsedClassType) bodyTB.currentClass();
             n = (New_c) anonType(type);
         }
 
