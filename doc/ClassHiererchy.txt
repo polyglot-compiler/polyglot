@@ -20,20 +20,21 @@ CLASSES
 Type							[jltools.types]
   PrimitiveType					 <<*>>  [jltools.types]
   ClassType					 <<*>>  [jltools.types]
-MethodType (A)					 <<*>>  [jltools.types]
-  JavaMethodType				 <<*>>  [jltools.types]
-AccessFlags					 <<*>>  [jltools.types]
+MethodType					        [jltools.types]
+FieldType                                               [jltools.types]
+AccessFlags					        [jltools.types]
 
-TypeSystem (I)					 <<*>>  [jltools.types]
+TypeSystem (I)					        [jltools.types]
 JavaTypeSystem (TypeSystem)			 <<*>>  [jltools.types]
 
-JavaClass (A)					 <<*>>  [jltools.types]
+JavaClass (A)					        [jltools.types]
   ClassFileClass				 <<*>>  [jltools.types]
   ParsedSourceClass                              <<*>>  [jltools.types]
 ImportTable					 <<*>>  [jltools.types]
 
 NodeVisitor (I)					 	[jltools.ast]
 NullVisitor (NodeVisitor)				[jltools.ast]
+ClassPath					 <<*>>	[jltools.util]
 
 AnnotatedObject	(A)					[jltools.util]
   Node (A)						[jltools.ast]
@@ -85,10 +86,13 @@ AnnotatedObject	(A)					[jltools.util]
 Annotate (S)						[jltools.util]
 Assert (S)						[jltools.util]
 ErrMsgs						 <<*>>  [jltools.util]
-ClassPath					 <<*>>	[jltools.util]
 
 TypedCollection					 <<*>>  [jltools.util]
-  TypedList					 <<*>>	[jltools.util]
+TypedList					 	[jltools.util]
 TypedListIterator				 	[jltools.util]
 TypedMap					 <<*>>	[jltools.util]
+
+FilteringIterator					[jltools.util]
+Predicate (I)						[jltools.util]
+ConcatenatedIterator					[jltools.util]
 
