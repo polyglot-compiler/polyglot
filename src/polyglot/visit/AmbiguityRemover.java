@@ -85,4 +85,8 @@ public class AmbiguityRemover extends ContextVisitor
         }
 
     }
+
+    public String toString() {
+	return super.toString() + "(" + kind + ")";
+    }
 }
