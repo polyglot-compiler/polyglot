@@ -98,23 +98,23 @@ public class Binary_c extends Expr_c implements Binary
 	    long l = ((NumLit) left).longValue();
 	    long r = ((NumLit) right).longValue();
 
-	    if (op == ADD) return nf.IntLit(position(), l + r);
-	    if (op == SUB) return nf.IntLit(position(), l - r);
-	    if (op == MUL) return nf.IntLit(position(), l * r);
-	    if (op == DIV && r != 0) return nf.IntLit(position(), l / r);
-	    if (op == MOD && r != 0) return nf.IntLit(position(), l % r);
-	    if (op == BIT_OR) return nf.IntLit(position(), l | r);
-	    if (op == BIT_AND) return nf.IntLit(position(), l & r);
-	    if (op == BIT_XOR) return nf.IntLit(position(), l ^ r);
-	    if (op == SHL) return nf.IntLit(position(), l << r);
-	    if (op == SHR) return nf.IntLit(position(), l >> r);
-	    if (op == USHR) return nf.IntLit(position(), l >>> r);
-	    if (op == GT) return nf.BooleanLit(position(), l > r);
-	    if (op == LT) return nf.BooleanLit(position(), l < r);
-	    if (op == GE) return nf.BooleanLit(position(), l >= r);
-	    if (op == LE) return nf.BooleanLit(position(), l <= r);
-	    if (op == NE) return nf.BooleanLit(position(), l != r);
-	    if (op == EQ) return nf.BooleanLit(position(), l == r);
+	    if (op == ADD) return nf.IntLit(position(), l + r).type(type());
+	    if (op == SUB) return nf.IntLit(position(), l - r).type(type());
+	    if (op == MUL) return nf.IntLit(position(), l * r).type(type());
+	    if (op == DIV && r != 0) return nf.IntLit(position(), l / r).type(type());
+	    if (op == MOD && r != 0) return nf.IntLit(position(), l % r).type(type());
+	    if (op == BIT_OR) return nf.IntLit(position(), l | r).type(type());
+	    if (op == BIT_AND) return nf.IntLit(position(), l & r).type(type());
+	    if (op == BIT_XOR) return nf.IntLit(position(), l ^ r).type(type());
+	    if (op == SHL) return nf.IntLit(position(), l << r).type(type());
+	    if (op == SHR) return nf.IntLit(position(), l >> r).type(type());
+	    if (op == USHR) return nf.IntLit(position(), l >>> r).type(type());
+	    if (op == GT) return nf.BooleanLit(position(), l > r).type(type());
+	    if (op == LT) return nf.BooleanLit(position(), l < r).type(type());
+	    if (op == GE) return nf.BooleanLit(position(), l >= r).type(type());
+	    if (op == LE) return nf.BooleanLit(position(), l <= r).type(type());
+	    if (op == NE) return nf.BooleanLit(position(), l != r).type(type());
+	    if (op == EQ) return nf.BooleanLit(position(), l == r).type(type());
 	}
 	else if (left instanceof NumLit) {
 	    long l = ((NumLit) left).longValue();
@@ -143,21 +143,21 @@ public class Binary_c extends Expr_c implements Binary
 	    boolean l = ((BooleanLit) left).value();
 	    boolean r = ((BooleanLit) right).value();
 
-	    if (op == BIT_OR) return nf.BooleanLit(position(), l | r);
-	    if (op == BIT_AND) return nf.BooleanLit(position(), l & r);
-	    if (op == BIT_XOR) return nf.BooleanLit(position(), l ^ r);
-	    if (op == COND_OR) return nf.BooleanLit(position(), l || r);
-	    if (op == COND_AND) return nf.BooleanLit(position(), l && r);
-	    if (op == NE) return nf.BooleanLit(position(), l != r);
-	    if (op == EQ) return nf.BooleanLit(position(), l == r);
+	    if (op == BIT_OR) return nf.BooleanLit(position(), l | r).type(type());
+	    if (op == BIT_AND) return nf.BooleanLit(position(), l & r).type(type());
+	    if (op == BIT_XOR) return nf.BooleanLit(position(), l ^ r).type(type());
+	    if (op == COND_OR) return nf.BooleanLit(position(), l || r).type(type());
+	    if (op == COND_AND) return nf.BooleanLit(position(), l && r).type(type());
+	    if (op == NE) return nf.BooleanLit(position(), l != r).type(type());
+	    if (op == EQ) return nf.BooleanLit(position(), l == r).type(type());
 	}
 	else if (left instanceof BooleanLit) {
 	    boolean l = ((BooleanLit) left).value();
 
 	    // These are safe because the right expression would have been
 	    // short-circuited.  BIT_OR and BIT_AND are not safe here.
-	    if (op == COND_OR && l) return nf.BooleanLit(position(), true);
-	    if (op == COND_AND && ! l) return nf.BooleanLit(position(), false);
+	    if (op == COND_OR && l) return nf.BooleanLit(position(), true).type(type());
+	    if (op == COND_AND && ! l) return nf.BooleanLit(position(), false).type(type());
 
 	    // Here, the non-literal is always evaluated, so this is safe.
 	    if (op == COND_OR && ! l) return right;
@@ -185,11 +185,11 @@ public class Binary_c extends Expr_c implements Binary
 	Type r = right.type();
 
 	TypeSystem ts = tc.typeSystem();
-	    
+
 	if (op == GT || op == LT || op == GE || op == LE) {
 	    if (! l.isNumeric() || ! r.isNumeric()) {
 		throw new SemanticException("The " + op +
-		    "operator must have numeric operands.", position());
+		    " operator must have numeric operands.", position());
 	    }
 
 	    return type(ts.Boolean());
@@ -198,29 +198,29 @@ public class Binary_c extends Expr_c implements Binary
 	if (op == EQ || op == NE) {
 	    if (l.isNumeric() && ! r.isNumeric()) {
 		throw new SemanticException("The " + op +
-		    "operator must have operands of similar type.",
+		    " operator must have operands of similar type.",
 		    position());
 	    }
 
 	    if (l.isBoolean() && ! r.isBoolean()) {
 		throw new SemanticException("The " + op +
-		    "operator must have operands of similar type.",
+		    " operator must have operands of similar type.",
 		    position());
 	    }
 
 	    if (l.isReference() && ! (r.isReference() || r.isNull())) {
 		throw new SemanticException("The " + op +
-		    "operator must have operands of similar type.",
+		    " operator must have operands of similar type.",
 		    position());
 	    }
 
 	    return type(ts.Boolean());
 	}
-	    
+
 	if (op == COND_OR || op == COND_AND) {
 	    if (! l.isBoolean() || ! r.isBoolean()) {
 		throw new SemanticException("The " + op +
-		    "operator must have boolean operands.",
+		    " operator must have boolean operands.",
 		    position());
 	    }
 
@@ -267,7 +267,7 @@ public class Binary_c extends Expr_c implements Binary
 
 	return type(ts.promote(l, r));
     }
-  
+
     /** Check exceptions thrown by the expression. */
     public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
 	TypeSystem ts = ec.typeSystem();

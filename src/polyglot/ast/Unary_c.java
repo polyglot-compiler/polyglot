@@ -73,14 +73,14 @@ public class Unary_c extends Expr_c implements Unary
         if (expr instanceof NumLit) {
 	    long x = ((NumLit) expr).longValue();
 
-	    if (op == BIT_NOT) return nf.IntLit(position(), ~x);
-	    if (op == NEG) return nf.IntLit(position(), -x);
-	    if (op == POS) return nf.IntLit(position(), x);
+	    if (op == BIT_NOT) return nf.IntLit(position(), ~x).type(type());
+	    if (op == NEG) return nf.IntLit(position(), -x).type(type());
+	    if (op == POS) return nf.IntLit(position(), x).type(type());
 	}
 	else if (expr instanceof BooleanLit) {
 	    boolean x = ((BooleanLit) expr).value();
 
-	    if (op == BIT_NOT) return nf.BooleanLit(position(), !x);
+	    if (op == NOT) return nf.BooleanLit(position(), !x).type(type());
 	}
 
         return this;
