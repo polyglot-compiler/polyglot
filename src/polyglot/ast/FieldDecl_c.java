@@ -13,7 +13,7 @@ import java.util.*;
  */
 public class FieldDecl_c extends Node_c implements FieldDecl
 {
-    Declarator_c decl;
+    Declarator decl;
     FieldInstance fi;
 
     public FieldDecl_c(Ext ext, Position pos, Flags flags, TypeNode type, String name, Expr init) {

@@ -13,7 +13,7 @@ import jltools.visit.*;
  */
 public class Formal_c extends Node_c implements Formal
 {
-    Declarator_c decl;
+    Declarator decl;
     LocalInstance li;
 
     public Formal_c(Ext ext, Position pos, Flags flags, TypeNode type, String name) {
