@@ -297,9 +297,10 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 
 		if (! throwDeclared) {
                     ec.throwsSet().clear();
-                    throw new SemanticException("Method \"" + name +
-			"\" throws the undeclared exception \"" + t + "\".",
-		        position());
+                    Position pos = ec.exceptionPosition(t);
+                    throw new SemanticException("The exception \"" + t + 
+                        "\" must either be caught or declared to be thrown.",
+		        pos==null?position():pos);
 		}
 	    }
 	}

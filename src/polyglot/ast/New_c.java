@@ -500,7 +500,7 @@ FIXME: check super types as well.
 
 	for (Iterator i = ci.throwTypes().iterator(); i.hasNext(); ) {
 	    Type t = (Type) i.next();
-	    ec.throwsException(t);
+	    ec.throwsException(t, position());
 	}
 
 	return this;

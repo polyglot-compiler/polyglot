@@ -1,11 +1,41 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import polyglot.frontend.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import polyglot.ast.Block;
+import polyglot.ast.CodeDecl;
+import polyglot.ast.ConstructorDecl;
+import polyglot.ast.Formal;
+import polyglot.ast.Node;
+import polyglot.ast.Term;
+import polyglot.ast.TypeNode;
+import polyglot.types.ClassType;
+import polyglot.types.CodeInstance;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.Flags;
+import polyglot.types.ParsedClassType;
+import polyglot.types.ProcedureInstance;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.CodeWriter;
+import polyglot.util.CollectionUtil;
+import polyglot.util.Position;
+import polyglot.util.SubtypeSet;
+import polyglot.util.TypedList;
+import polyglot.visit.AddMemberVisitor;
+import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.CFGBuilder;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
+import polyglot.visit.TypeBuilder;
+import polyglot.visit.TypeChecker;
 
 /**
  * A <code>ConstructorDecl</code> is an immutable representation of a
@@ -273,9 +303,10 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 
 		if (! throwDeclared) {
                     ec.throwsSet().clear();
-		    throw new SemanticException("Constructor \"" + name +
-			"\" throws the undeclared exception \"" + t + "\".",
-		        position());
+                    Position pos = ec.exceptionPosition(t);
+                    throw new SemanticException("The exception \"" + t + 
+                        "\" must either be caught or declared to be thrown.",
+                        pos==null?position():pos);
 		}
 	    }
 	}

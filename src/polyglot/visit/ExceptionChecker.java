@@ -1,9 +1,17 @@
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.util.*;
-import polyglot.types.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import polyglot.ast.Node;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.SubtypeSet;
 
 /** Visitor which checks if exceptions are caught or declared properly. */
 public class ExceptionChecker extends HaltingVisitor
@@ -12,17 +20,20 @@ public class ExceptionChecker extends HaltingVisitor
     protected ErrorQueue eq;
     protected ExceptionChecker outer;
     protected SubtypeSet scope;
+    protected Map exceptionPositions;
 
     public ExceptionChecker(TypeSystem ts, ErrorQueue eq) {
         this.ts = ts;
         this.eq = eq;
         this.scope = new SubtypeSet(ts);
+        this.exceptionPositions = new HashMap();
     }
 
     public ExceptionChecker push() {
         ExceptionChecker ec = (ExceptionChecker) copy();
         ec.outer = this;
         ec.scope = new SubtypeSet(ts);
+        ec.exceptionPositions = new HashMap();
         return ec;
     }
 
@@ -86,6 +97,7 @@ public class ExceptionChecker extends HaltingVisitor
         ExceptionChecker inner = (ExceptionChecker) v;
         SubtypeSet t = inner.throwsSet();
         throwsSet().addAll(t);
+        exceptionPositions.putAll(inner.exceptionPositions);
 
         if (inner.outer != this) throw new InternalCompilerError("oops!");
 
@@ -114,8 +126,9 @@ public class ExceptionChecker extends HaltingVisitor
      *
      * @param t The type of exception that the node throws.
      */
-    public void throwsException(Type t) {
+    public void throwsException(Type t, Position pos) {
 	throwsSet().add(t) ;
+        exceptionPositions.put(t, pos);
     }
     
     /**
@@ -124,5 +137,13 @@ public class ExceptionChecker extends HaltingVisitor
      */
     public SubtypeSet throwsSet() {
         return (SubtypeSet) scope;
+    }
+    
+    /**
+     * Method to determine the position at which a particular exception is 
+     * thrown
+     */
+    public Position exceptionPosition(Type t) {
+        return (Position)exceptionPositions.get(t);
     }
 }
