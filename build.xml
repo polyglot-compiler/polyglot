@@ -753,7 +753,7 @@ ext=""
   <target name="polyj-dist" depends="jl-dist,polyj"/>
 
   <!-- Creates the Windows and UNIX distributions for j0. -->
-  <target name="j0-dist" depends="j0-jar,polyglot-jar,cup" 
+  <target name="j0-dist" depends="j0-jar,polyglot-jar,cup,jl-dist" 
     description="Builds the j0 Windows and UNIX distribution files and puts them in the dist directory.">
 
     <!-- Creates the Windows distribution .zip. -->
