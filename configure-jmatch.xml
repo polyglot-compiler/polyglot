@@ -1,0 +1,37 @@
+<project name="jmatch-configure" default="instructions" basedir=".">
+  <description>
+    JMatch configure file
+  </description>
+
+  <target name="instructions" 
+          description="Tell the user the instructions for using this build file">
+    <echo>
+This build file is meant to only be used from the main buildfile build.xml.
+    </echo>
+    <fail/>
+  </target>
+
+  <target name="configure" 
+          description="Configure JMatch" 
+          depends="check-classpath,executables">
+  </target>
+
+  <target name="check-classpath" description="Check the classpath contains the appropriate directories/jars">
+  </target>
+
+  <target name="executables" 
+          description="creates the executable script jmc">
+    <echo message="Creating ${bin}/jmc"/>
+    <concat destfile="${bin}/jmc" append="no">
+      <filelist dir="${bin}" files="defs"/>
+    </concat>
+    <concat destfile="${bin}/jmc" append="yes">
+ext="-ext jmatch"
+    </concat>
+    <concat destfile="${bin}/jmc" append="yes">
+      <filelist dir="${bin}" files="jlc.in"/>
+    </concat>
+    <chmod perm="+x" file="${bin}/jmc"/>
+  </target>
+</project>
+

@@ -26,6 +26,10 @@
     <pathelement location="${lib}/jlex.jar"/>
   </path>
 
+  <target name="configure" description="Configure Polyglot">
+    <ant antfile="configure.xml" target="configure"/>
+  </target>
+
   <!-- initialize the build -->
   <target name="init">
     <!-- Create the time stamp -->
@@ -337,6 +341,9 @@
        @param has-qq       Pass in iff the extension has a qq package.
    -->
   <target name="standard-ext">
+    <ant antfile="configure.xml" 
+	 target="configure-ext"
+	 inheritRefs="true"/>
     <antcall target="standard-ext-lexer"/>
     <antcall target="standard-ext-${parser.type}-parser"/>
     <antcall target="standard-ext-qq-dep"/>
