@@ -7,9 +7,16 @@ public class LiteralsCf {
 
         f = 1e39f; //ERR: rounds to +INF
         f = 0.0000000000000000000000000000000000000000000000001f; //ERR: rounds to 0
+
         f = -1234567890123456789012345678901234567890123f; //ERR: rounds to -INF
+
+        f = 0e7f; //OK
+
         d = -1e310; //ERR: rounds to -INF
         d = 1e500; //ERR: rounds to +INF
+
+        d = 0e19; //OK
+
 
         int i, i1, i2, i3;
         long l, l1, l2, l3;
