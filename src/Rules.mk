@@ -32,7 +32,7 @@ all clean clobber javadoc:
 
 define subdirs
 @for i in $(SUBDIRS) ""; do \
-    if [ "x$$i" != "x" ]; then $(MAKE) -C $$i $@; fi; \
+    if [ "x$$i" != "x" ]; then $(MAKE) -C $$i $@ || exit 1; fi; \
 done
 endef
 
