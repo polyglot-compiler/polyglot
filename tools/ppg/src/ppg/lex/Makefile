@@ -16,11 +16,11 @@ JAR_FILE = polyglot.jar
 
 Lexer.java: ppg.flex
 	$(flex)
-	$(MAKE) -C ../parse Parser.java
 
 all: $(CLASSES)
 	$(subdirs)
 
 clean clobber: cleanclasses
+	-rm -f Lexer.java
 	$(subdirs)
 
