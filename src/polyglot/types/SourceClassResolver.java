@@ -92,9 +92,10 @@ public class SourceClassResolver extends LoadedClassResolver
    * @param loader The class file loader to use.
    */
   public SourceClassResolver(Compiler compiler, ExtensionInfo ext,
-                             String classpath, ClassFileLoader loader)
+                             String classpath, ClassFileLoader loader,
+                             boolean allowRawClasses)
   {
-    super(ext.typeSystem(), classpath, loader, ext.version());
+    super(ext.typeSystem(), classpath, loader, ext.version(), allowRawClasses);
     this.compiler = compiler;
     this.ext = ext;
   }
@@ -138,7 +139,7 @@ public class SourceClassResolver extends LoadedClassResolver
     }
 
     // Don't use the raw class if the source or encoded class is available.
-    if (encodedClazz != null || source != null) {
+    if (encodedClazz != null || source != null || ! this.allowRawClasses) {
       if (Report.should_report(report_topics, 4))
 	Report.report(4, "Not using raw class file for " + name);
       clazz = null;

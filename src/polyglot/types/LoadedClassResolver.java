@@ -27,6 +27,7 @@ public class LoadedClassResolver extends ClassResolver
   ClassPathLoader loader;
   Version version;
   Set nocache;
+  boolean allowRawClasses;
 
   final static String[] report_topics = new String[] {
     Report.types, Report.resolver, Report.loader
@@ -40,13 +41,15 @@ public class LoadedClassResolver extends ClassResolver
    * @param version The version of classes to load.
    */
   public LoadedClassResolver(TypeSystem ts, String classpath,
-                             ClassFileLoader loader, Version version)
+                             ClassFileLoader loader, Version version,
+                             boolean allowRawClasses)
   {
     this.ts = ts;
     this.te = new TypeEncoder(ts);
     this.loader = new ClassPathLoader(classpath, loader);
     this.version = version;
     this.nocache = new HashSet();
+    this.allowRawClasses = allowRawClasses;
   }
 
   /**
@@ -95,10 +98,16 @@ public class LoadedClassResolver extends ClassResolver
 	Report.report(4, "Using encoded class type for " + name);
       return getEncodedType(clazz, name);
     }
-    else {
+    else if (allowRawClasses) {
       if (Report.should_report(report_topics, 4))
 	Report.report(4, "Using raw class file for " + name);
       return clazz.type(ts);
+    }
+    else {
+      throw new SemanticException("Unable to find a suitable definition of "
+                                  + name
+                                  + ". Try recompiling or obtaining "
+                                  + " a newer version of the class file.");
     }
   }
 
