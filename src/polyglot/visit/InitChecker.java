@@ -503,6 +503,10 @@ public class InitChecker extends DataFlow
     }
     
 
+    protected Map flow(List inItems, List inItemKeys, FlowGraph graph, Term n, Set edgeKeys) {
+        return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, edgeKeys);
+    }
+
     /**
      * Perform the appropriate flow operations for the Terms. This method
      * delegates to other appropriate methods in this class, for modularity.
@@ -517,7 +521,11 @@ public class InitChecker extends DataFlow
      *              are interested in, then increment the min and max counts
      *              for that local var or field.   
      */
-    public Map flow(Item inItem, FlowGraph graph, Term n, Set succEdgeKeys) {
+    public Map flow(Item trueItem, Item falseItem, Item otherItem, FlowGraph graph, Term n, Set succEdgeKeys) {
+        Item inItem = safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, 
+                                     falseItem, FlowGraph.EDGE_KEY_FALSE,
+                                     otherItem, FlowGraph.EDGE_KEY_OTHER,
+                                     n, graph);
         DataFlowItem inDFItem = ((DataFlowItem)inItem);
 
         Map ret = null;        
@@ -541,6 +549,10 @@ public class InitChecker extends DataFlow
             // call to another constructor.
             ret = flowConstructorCall(inDFItem, graph, (ConstructorCall)n, succEdgeKeys);
         }
+        else if (n instanceof Expr && ((Expr)n).type().isBoolean() && 
+                    (n instanceof Binary || n instanceof Unary)) {
+            ret = flowBooleanConditions(trueItem, falseItem, inDFItem, graph, (Expr)n, succEdgeKeys);                        
+        } 
         
         if (ret != null) {
             return ret;
@@ -717,9 +729,8 @@ public class InitChecker extends DataFlow
             // no unreachable statement, the Java Language Spec permits it.
             
             // Set inItem to a default Item
-            dfIn = (DataFlowItem)createInitialItem(graph);             
+            dfIn = (DataFlowItem)createInitialItem(graph);
         }
-        
         DataFlowItem dfOut = null;
         if (outItems != null && !outItems.isEmpty()) {
             // due to the flow equations, all DataFlowItems in the outItems map
@@ -863,7 +874,7 @@ public class InitChecker extends DataFlow
         }
         else { 
             MinMaxInitCount initCount = (MinMaxInitCount) 
-                      dfIn.initStatus.get(l.localInstance());           
+                      dfIn.initStatus.get(l.localInstance());         
             if (initCount != null && InitCount.ZERO.equals(initCount.getMin())) {
                 // the local variable may not have been initialized. 
                 // However, we only want to complain if the local is reachable
@@ -871,7 +882,7 @@ public class InitChecker extends DataFlow
                     throw new SemanticException("Local variable \"" + l.name() +
                             "\" may not have been initialized",
                             l.position());
-                }
+            	}
             }
         }
     }
