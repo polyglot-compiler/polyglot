@@ -700,7 +700,7 @@ ext=""
   </target>
   
   <!-- compile pth (Polyglot Test Harness) -->
-  <target name="pth-compile" 
+  <target name="pth-compile" depends="jl"
           description="compile the pth source">
     <antcall target="jflex-lexer">
       <param name="lexer.dir" value="${pthdir}/src/polyglot/pth"/>
