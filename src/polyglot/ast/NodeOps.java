@@ -102,7 +102,7 @@ public interface NodeOps
      *
      * @param ar The visitor which disambiguates.
      */
-    Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException;
+    Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException;
     NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException;
 
     /**

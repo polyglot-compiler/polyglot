@@ -65,8 +65,6 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
                                                   scheduler.Parsed(this.job()));
                 scheduler.addConcurrentDependency(scheduler.SupertypesResolved(this),
                                                   scheduler.TypesInitialized(this.job()));
-                scheduler.addConcurrentDependency(scheduler.AllMembersAdded(this),
-                                                  scheduler.TypesInitialized(this.job()));
                 scheduler.addConcurrentDependency(scheduler.SignaturesResolved(this),
                                                   scheduler.TypesInitialized(this.job()));
                 /*
@@ -81,10 +79,6 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
                  */
             }
             
-            scheduler.addPrerequisiteDependency(scheduler.AllMembersAdded(this),
-                                                scheduler.MembersAdded(this));
-            scheduler.addPrerequisiteDependency(scheduler.AllMembersAdded(this),
-                                                scheduler.SupertypesResolved(this));
             scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this),
                                                 scheduler.MembersAdded(this));
             scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this),
@@ -260,15 +254,8 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     
     boolean membersAdded;
     boolean supertypesResolved;
-    boolean allMembersAdded;
     boolean signaturesResolved;
 
-    /**
-     * @param allMembersAdded The allMembersAdded to set.
-     */
-    public void setAllMembersAdded(boolean allMembersAdded) {
-        this.allMembersAdded = allMembersAdded;
-    }
     /**
      * @return Returns the membersAdded.
      */
@@ -299,60 +286,6 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
      */
     public void setSupertypesResolved(boolean supertypesResolved) {
         this.supertypesResolved = supertypesResolved;
-    }
-
-    public boolean allMembersAdded() {
-        Scheduler scheduler = typeSystem().extensionInfo().scheduler();
-        
-        if (allMembersAdded) {
-            return true;
-        }
-        
-        if (! membersAdded()) {
-            try {
-                scheduler.addPrerequisiteDependency(scheduler.AllMembersAdded(this), scheduler.MembersAdded(this));
-            }
-            catch (CyclicDependencyException e) {
-                throw new InternalCompilerError(e.getMessage());
-            }
-            return false;
-        }
-        
-        if (! supertypesResolved()) {
-            try {
-                scheduler.addPrerequisiteDependency(scheduler.AllMembersAdded(this), scheduler.SupertypesResolved(this));
-            }
-            catch (CyclicDependencyException e) {
-                throw new InternalCompilerError(e.getMessage());
-            }
-            return false;
-        }
-        
-        // Don't use superType() or interfaces() since
-        // they ensure that supertypes are resolved and this method
-        // is just suppossed to check if they are resolved.
-
-        if (superType instanceof ParsedClassType) {
-            ParsedClassType superCT = (ParsedClassType) superType;
-            if (! superCT.allMembersAdded()) {
-                scheduler.addConcurrentDependency(scheduler.AllMembersAdded(this), scheduler.AllMembersAdded(superCT));
-                return false;
-            }
-        }
-        
-        for (Iterator i = interfaces.iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
-            if (t instanceof ParsedClassType) {
-                ParsedClassType superCT = (ParsedClassType) t;
-                if (! superCT.allMembersAdded()) {
-                    scheduler.addConcurrentDependency(scheduler.AllMembersAdded(this), scheduler.AllMembersAdded(superCT));
-                    return false;
-                }
-            }
-        }
-     
-        allMembersAdded = true;
-        return true;
     }
 
     public boolean signaturesResolved() {
@@ -400,7 +333,6 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
             init = ((TypeInputStream) in).getTypeSystem().deserializedClassInitializer();
             membersAdded = true;
             supertypesResolved = true;
-            allMembersAdded = true;
             signaturesResolved = true;
         }
 

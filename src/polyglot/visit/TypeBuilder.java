@@ -20,7 +20,7 @@ import polyglot.util.*;
 public class TypeBuilder extends HaltingVisitor
 {
     protected ImportTable importTable;
-    protected Goal goal;
+    protected Job job;
     protected TypeSystem ts;
     protected NodeFactory nf;
     protected TypeBuilder outer;
@@ -28,8 +28,8 @@ public class TypeBuilder extends HaltingVisitor
     protected boolean global; // true if all scopes pushed have been classes.
     protected ParsedClassType type; // last class pushed.
 
-    public TypeBuilder(Goal goal, TypeSystem ts, NodeFactory nf) {
-        this.goal = goal;
+    public TypeBuilder(Job job, TypeSystem ts, NodeFactory nf) {
+        this.job = job;
         this.ts = ts;
         this.nf = nf;
         this.outer = null;
@@ -45,14 +45,10 @@ public class TypeBuilder extends HaltingVisitor
         return outer;
     }
     
-    public Goal goal() {
-        return goal;
-    }
-
     public Job job() {
-        return goal.job();
+        return job;
     }
-
+    
     public ErrorQueue errorQueue() {
         return job().compiler().errorQueue();
     }

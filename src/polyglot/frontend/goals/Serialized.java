@@ -24,9 +24,7 @@ public class Serialized extends SourceFileGoal {
             TypeSystem ts = extInfo.typeSystem();
             NodeFactory nf = extInfo.nodeFactory();
             return new VisitorPass(this,
-                                   new ClassSerializer(
-                                                       this,
-                                                       ts,
+                                   new ClassSerializer(ts,
                                                        nf,
                                                        job().source().lastModified(),
                                                        compiler.errorQueue(),
@@ -35,7 +33,7 @@ public class Serialized extends SourceFileGoal {
         else {
             return new EmptyPass(this) {
                 public boolean run() {
-                    Serialized.this.markReached();
+                    Serialized.this.markRun();
                     return true;
                 }
             };

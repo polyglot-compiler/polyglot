@@ -27,7 +27,7 @@ public class MembersAdded extends ClassTypeGoal {
         if (job() != null) {
             TypeSystem ts = extInfo.typeSystem();
             NodeFactory nf = extInfo.nodeFactory();
-            return new VisitorPass(this, new TypeBuilder(this, ts, nf));
+            return new VisitorPass(this, new TypeBuilder(job(), ts, nf));
         }
         return new AddMembersPass(extInfo.scheduler(), this);
     }

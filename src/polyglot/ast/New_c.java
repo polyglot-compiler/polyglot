@@ -189,6 +189,11 @@ public class New_c extends Expr_c implements New
         
         return n.type(ts.unknownType(position()));
     }
+    
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
+        // Skip it -- we'll do all the disambiguation during type checking.
+        return this;
+    }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         New_c n = this;

@@ -28,7 +28,7 @@ public class CodeGenerated extends SourceFileGoal {
     public Pass createPass(ExtensionInfo extInfo) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        return new OutputPass(this, new Translator(this, ts, nf,
+        return new OutputPass(this, new Translator(job(), ts, nf,
                                                    extInfo.targetFactory()));
     }
     

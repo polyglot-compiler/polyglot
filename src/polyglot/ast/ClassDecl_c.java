@@ -220,7 +220,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
             
             if (! supertypesResolved) {
                 Scheduler scheduler = ar.job().extensionInfo().scheduler();
-                scheduler.addConcurrentDependency(ar.goal(), scheduler.SupertypesResolved(type));
+                scheduler.addConcurrentDependency(scheduler.currentGoal(), scheduler.SupertypesResolved(type));
 //                System.out.println("    not resolved");
             }
             else {            
@@ -508,10 +508,10 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 
     /**
      * @param parent
-     * @param tc
+     * @param ar
      * @return
      */
-    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
         // Don't do anything special for member classes; the disambiguation passes
         // for the container have already been run and visited this class.
         if (type.isMember()) {
@@ -529,7 +529,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         for (Iterator i = n.typesBelow().iterator(); i.hasNext(); ) {
             ParsedClassType ct = (ParsedClassType) i.next();
             if (! ct.supertypesResolved()) {
-                SupertypeDisambiguator sd = new SupertypeDisambiguator(tc);
+                SupertypeDisambiguator sd = new SupertypeDisambiguator(ar);
                 n = (ClassDecl) sd.visitEdgeNoOverride(parent, n);
                 if (sd.hasErrors()) throw new SemanticException();
                 break;
@@ -542,24 +542,20 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         for (Iterator i = n.typesBelow().iterator(); i.hasNext(); ) {
             ParsedClassType ct = (ParsedClassType) i.next();
             if (! ct.signaturesResolved()) {
-                SignatureDisambiguator sd = new SignatureDisambiguator(tc);
+                SignatureDisambiguator sd = new SignatureDisambiguator(ar);
                 n = (ClassDecl) sd.visitEdgeNoOverride(parent, n);
                 if (sd.hasErrors()) throw new SemanticException();
                 break;
             }
         }
-    
-        BodyDisambiguator bd = new BodyDisambiguator(tc);
-        n = (ClassDecl) bd.visitEdgeNoOverride(parent, n);
-        if (bd.hasErrors()) throw new SemanticException();
         
         // Call enter and leave to manage the context.
-        TypeChecker childtc = (TypeChecker) tc.enter(parent, n);
-        if (tc.hasErrors()) throw new SemanticException();
+        AmbiguityRemover childVisitor = (AmbiguityRemover) ar.enter(parent, n);
+        if (ar.hasErrors()) throw new SemanticException();
     
-        n = (ClassDecl) n.visitChildren(childtc);
-        if (childtc.hasErrors()) throw new SemanticException();
+        n = (ClassDecl) n.visitChildren(childVisitor);
+        if (childVisitor.hasErrors()) throw new SemanticException();
     
-        return tc.leave(parent, old, n, childtc);
+        return ar.leave(parent, old, n, childVisitor);
     }
 }

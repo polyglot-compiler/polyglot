@@ -12,6 +12,7 @@ import java.util.HashSet;
 
 import polyglot.frontend.*;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.StringUtil;
 
 /**
  * Comment for <code>AbstractGoal</code>
@@ -27,7 +28,7 @@ public abstract class AbstractGoal implements Goal {
         
     public AbstractGoal(Job job) {
         this(job, null);
-        this.name = getClass().getName();
+        this.name = StringUtil.getShortNameComponent(getClass().getName());
     }
 
     public AbstractGoal(Job job, String name) {

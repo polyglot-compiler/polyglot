@@ -7,7 +7,7 @@ import polyglot.types.Context;
  * A visitor which traverses the AST and remove ambiguities found in fields,
  * method signatures and the code itself.
  */
-public class BodyDisambiguator extends AmbiguityRemover
+public class BodyDisambiguator extends Disambiguator
 {
     public BodyDisambiguator(DisambiguationDriver dd) {
         super(dd);;

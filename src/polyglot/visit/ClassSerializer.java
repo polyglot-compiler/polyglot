@@ -17,7 +17,6 @@ import java.util.*;
  */
 public class ClassSerializer extends NodeVisitor
 {
-    protected Goal goal;
     protected TypeEncoder te;
     protected ErrorQueue eq;
     protected Date date;
@@ -25,8 +24,7 @@ public class ClassSerializer extends NodeVisitor
     protected NodeFactory nf;
     protected Version ver;
 
-    public ClassSerializer(Goal goal, TypeSystem ts, NodeFactory nf, Date date, ErrorQueue eq, Version ver) {
-        this.goal = goal;
+    public ClassSerializer(TypeSystem ts, NodeFactory nf, Date date, ErrorQueue eq, Version ver) {
         this.ts = ts;
         this.nf = nf;
         this.te = new TypeEncoder( ts);

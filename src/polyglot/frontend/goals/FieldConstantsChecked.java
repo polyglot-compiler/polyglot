@@ -45,7 +45,7 @@ public class FieldConstantsChecked extends AbstractGoal {
         if (job() != null) {
             TypeSystem ts = extInfo.typeSystem();
             NodeFactory nf = extInfo.nodeFactory();
-            return new ConstantCheckPass(this, new ConstantChecker(this, ts, nf));
+            return new ConstantCheckPass(this, new ConstantChecker(job(), ts, nf));
         }
         return new CheckFieldConstantsPass(extInfo.scheduler(), this);
     }

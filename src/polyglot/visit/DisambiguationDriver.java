@@ -1,6 +1,7 @@
 package polyglot.visit;
 
 import polyglot.ast.NodeFactory;
+import polyglot.frontend.Job;
 import polyglot.frontend.goals.Goal;
 import polyglot.types.TypeSystem;
 
@@ -10,7 +11,7 @@ import polyglot.types.TypeSystem;
  */
 public class DisambiguationDriver extends ContextVisitor
 {
-    public DisambiguationDriver(Goal goal, TypeSystem ts, NodeFactory nf) {
-        super(goal, ts, nf);
+    public DisambiguationDriver(Job job, TypeSystem ts, NodeFactory nf) {
+        super(job, ts, nf);
     }
 }

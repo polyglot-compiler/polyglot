@@ -20,22 +20,25 @@ import polyglot.visit.ConstantChecker;
 import polyglot.visit.NodeVisitor;
 
 
-public class ConstantsCheckedForFile extends CyclicSourceFileGoal {
+public class ConstantsCheckedForFile extends SourceFileGoal {
+    boolean reached;
+    
     public ConstantsCheckedForFile(Job job) {
         super(job);
+        this.reached = false;
     }
 
     public Pass createPass(ExtensionInfo extInfo) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        return new ConstantCheckPass(this, new ConstantChecker(this, ts, nf));
+        return new ConstantCheckPass(this, new ConstantChecker(job(), ts, nf));
     }
 
     public boolean reached() {
         if (Report.should_report(TOPICS, 3))
             Report.report(3, "checking " + this);
 
-        if (super.reached()) {
+        if (this.reached) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "  ok (cached)");
             return true;
@@ -88,10 +91,11 @@ public class ConstantsCheckedForFile extends CyclicSourceFileGoal {
         if (allOk[0]) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "  ok");
-            this.markReached();
+            this.reached = true;
+            return true;
         }
         
-        return super.reached();
+        return false;
     }
     
     private static final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend });

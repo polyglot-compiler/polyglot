@@ -8,10 +8,12 @@ package polyglot.frontend.goals;
 
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
+import polyglot.frontend.passes.*;
 import polyglot.frontend.passes.ResolveSuperTypesPass;
 import polyglot.frontend.passes.TypeCheckPass;
 import polyglot.types.ParsedClassType;
 import polyglot.types.TypeSystem;
+import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeChecker;
 
 /**
@@ -28,7 +30,7 @@ public class SupertypesResolved extends ClassTypeGoal {
         if (job() != null) {
             TypeSystem ts = extInfo.typeSystem();
             NodeFactory nf = extInfo.nodeFactory();
-            return new TypeCheckPass(this, new TypeChecker(this, ts, nf));
+            return new DisambiguatorPass(this, new AmbiguityRemover(job(), ts, nf));
         }
         return new ResolveSuperTypesPass(extInfo.scheduler(), this);
     }

@@ -66,11 +66,7 @@ public class Translator extends PrettyPrinter implements Copy
         this.nf = nf;
         this.tf = tf;
         this.ts = ts;
-        this.context = job.context();
-
-        if (this.context == null) {
-            this.context = ts.createContext();
-        }
+        this.context = ts.createContext();
     }
 
     /**

@@ -1,6 +1,7 @@
 package polyglot.visit;
 
 import polyglot.ast.*;
+import polyglot.frontend.Job;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
 import polyglot.types.*;
@@ -9,8 +10,8 @@ import polyglot.util.*;
 /** Visitor which performs type checking on the AST. */
 public class TypeChecker extends DisambiguationDriver
 {
-    public TypeChecker(Goal goal, TypeSystem ts, NodeFactory nf) {
-        super(goal, ts, nf);
+    public TypeChecker(Job job, TypeSystem ts, NodeFactory nf) {
+        super(job, ts, nf);
     }
    
     public Node override(Node parent, Node n) {

@@ -6,10 +6,15 @@
  */
 package polyglot.ext.jl;
 
+import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
 import polyglot.frontend.goals.*;
+import polyglot.types.*;
 import polyglot.types.FieldInstance;
 import polyglot.types.ParsedClassType;
+import polyglot.visit.*;
+import polyglot.visit.ExceptionChecker;
+import polyglot.visit.ReachChecker;
 
 /**
  * Comment for <code>Scheduler</code>
@@ -33,10 +38,6 @@ public class JLScheduler extends Scheduler {
         return internGoal(new MembersAdded(ct));
     }
     
-    public Goal AllMembersAdded(ParsedClassType ct) {
-        return internGoal(new AllMembersAdded(ct));
-    }
-    
     public Goal SupertypesResolved(ParsedClassType ct) {
         return internGoal(new SupertypesResolved(ct));
     }
@@ -54,7 +55,9 @@ public class JLScheduler extends Scheduler {
     }
     
     public Goal TypesInitialized(Job job) {
-        return internGoal(new TypesInitialized(job));
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        return internGoal(new VisitorGoal(job, new TypeBuilder(job, ts, nf)));
     }
 
     public Goal TypesInitializedForCommandLine() {
@@ -63,6 +66,10 @@ public class JLScheduler extends Scheduler {
                 return JLScheduler.this.TypesInitialized(j);
             }
         });
+    }
+
+    public Goal Disambiguated(Job job) {
+        return internGoal(new Disambiguated(job));
     }
 
     public Goal TypeChecked(Job job) {
@@ -74,27 +81,39 @@ public class JLScheduler extends Scheduler {
     }
 
     public Goal ReachabilityChecked(Job job) {
-        return internGoal(new ReachabilityChecked(job));
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        return internGoal(new VisitorGoal(job, new ReachChecker(job, ts, nf)));
     }
 
     public Goal ExceptionsChecked(Job job) {
-        return internGoal(new ExceptionsChecked(job));
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        return internGoal(new VisitorGoal(job, new ExceptionChecker(job, ts, nf)));
     }
 
     public Goal ExitPathsChecked(Job job) {
-        return internGoal(new ExitPathsChecked(job));
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        return internGoal(new VisitorGoal(job, new ExitChecker(job, ts, nf)));
     }
 
     public Goal InitializationsChecked(Job job) {
-        return internGoal(new InitializationsChecked(job));
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        return internGoal(new VisitorGoal(job, new InitChecker(job, ts, nf)));
     }
 
     public Goal ConstructorCallsChecked(Job job) {
-        return internGoal(new ConstructorCallsChecked(job));
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        return internGoal(new VisitorGoal(job, new ConstructorCallChecker(job, ts, nf)));
     }
 
     public Goal ForwardReferencesChecked(Job job) {
-        return internGoal(new ForwardReferencesChecked(job));
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        return internGoal(new VisitorGoal(job, new FwdReferenceChecker(job, ts, nf)));
     }
 
     public Goal Serialized(Job job) {

@@ -16,27 +16,31 @@ import polyglot.frontend.Job;
  */
 public abstract class SourceFileGoal extends AbstractGoal {
 
-    private boolean reached;
+    protected boolean runOnce;
     
     public SourceFileGoal(Job job) {
         super(job);
-        this.reached = false;
+        this.runOnce = false;
     }
 
     public SourceFileGoal(Job job, String name) {
         super(job, name);
-        this.reached = false;
+        this.runOnce = false;
     }
     
     public boolean reached() {
-        return reached;
+        return runOnce;
     }
     
-    public void markReached() {
-        this.reached = true;
+    public void markRun() {
+        this.runOnce = true;
     }
     
+    public boolean hasBeenRun() {
+        return runOnce;
+    }
+
     public String toString() {
-        return super.toString() + (reached ? " (reached)" : " (unreached)");
+        return super.toString() + (runOnce ? " (run)" : " (not-run)");
     }
 }

@@ -13,26 +13,22 @@ import java.util.*;
 public class ErrorHandlingVisitor extends HaltingVisitor
 {
     protected boolean error;
-    protected Goal goal;
+    protected Job job;
     protected TypeSystem ts;
     protected NodeFactory nf;
 
-    public ErrorHandlingVisitor(Goal goal, TypeSystem ts, NodeFactory nf) {
-        this.goal = goal;
+    public ErrorHandlingVisitor(Job job, TypeSystem ts, NodeFactory nf) {
+        this.job = job;
         this.ts = ts;
         this.nf = nf;
     }
     
-    public Goal goal() {
-        return goal;
-    }
-
     /** Returns the <code>Job</code> that this Visitor is part of.
      *
      * @see polyglot.frontend.Job
      */
     public Job job() {
-        return goal.job();
+        return job;
     }
 
     /**

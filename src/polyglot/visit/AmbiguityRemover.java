@@ -3,7 +3,10 @@ package polyglot.visit;
 import polyglot.ast.*;
 import polyglot.ast.Ambiguous;
 import polyglot.ast.Node;
+import polyglot.frontend.Job;
+import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
+import polyglot.types.*;
 import polyglot.types.SemanticException;
 import polyglot.types.UnavailableTypeException;
 import polyglot.util.*;
@@ -14,28 +17,18 @@ import polyglot.util.Position;
  * A visitor which traverses the AST and remove ambiguities found in fields,
  * method signatures and the code itself.
  */
-public abstract class AmbiguityRemover extends ContextVisitor
+public class AmbiguityRemover extends DisambiguationDriver
 {
-    DisambiguationDriver dd;
-    
-    public AmbiguityRemover(DisambiguationDriver dd) {
-        super(dd.goal(), dd.typeSystem(), dd.nodeFactory());
-        this.dd = dd;
-        this.context = dd.context();
+    public AmbiguityRemover(Job job, TypeSystem ts, NodeFactory nf) {
+        super(job, ts, nf);
     }
 
-    public NodeVisitor begin() {
-        AmbiguityRemover v = (AmbiguityRemover) super.begin();
-        v.context = dd.context();
-        return v;
-    }
-    
     public Node override(Node parent, Node n) {
         try {
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, ">> " + this + "::override " + n);
             
-            Node m = n.disambiguateOverride(this);
+            Node m = n.disambiguateOverride(parent, this);
             
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, "<< " + this + "::override " + n + " -> " + m);
@@ -105,4 +98,5 @@ public abstract class AmbiguityRemover extends ContextVisitor
         
         return m;
     }  
+  
 }

@@ -32,8 +32,8 @@ public class ContextVisitor extends ErrorHandlingVisitor
     /** The current context of this visitor. */
     protected Context context;
 
-    public ContextVisitor(Goal goal, TypeSystem ts, NodeFactory nf) {
-        super(goal, ts, nf);
+    public ContextVisitor(Job job, TypeSystem ts, NodeFactory nf) {
+        super(job, ts, nf);
         this.outer = null;
         this.context = null;
     }

@@ -305,7 +305,7 @@ public abstract class Node_c implements Node
 	return this;
     }
 
-    public Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
 	return null;
     }
     

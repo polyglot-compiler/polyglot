@@ -181,6 +181,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         TypeSystem ts = ar.typeSystem();
 
         if (this.fi.isCanonical()) {
+            // Nothing to do.
             return this;
         }
 
@@ -202,7 +203,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         if (init != null && ! init.constantValueSet()) {
             // HACK to add dependencies for computing the constant value.
             final Scheduler scheduler = cc.typeSystem().extensionInfo().scheduler();
-            final Goal ccgoal = cc.goal();
+            final Goal ccgoal = scheduler.currentGoal();
             
             init.visit(new NodeVisitor() {
                public Node leave(Node old, Node n, NodeVisitor v) {

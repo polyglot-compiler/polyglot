@@ -2,15 +2,16 @@ package polyglot.visit;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
+import polyglot.frontend.Job;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
 import polyglot.types.*;
 
 /** Visitor which performs type checking on the AST. */
-public class ConstantChecker extends DisambiguationDriver
+public class ConstantChecker extends ContextVisitor
 {
-    public ConstantChecker(Goal goal, TypeSystem ts, NodeFactory nf) {
-        super(goal, ts, nf);
+    public ConstantChecker(Job job, TypeSystem ts, NodeFactory nf) {
+        super(job, ts, nf);
     }
     
     /*

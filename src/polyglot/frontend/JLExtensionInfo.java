@@ -109,6 +109,7 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
         Goal parse = scheduler.Parsed(job);
         Goal buildTypes = scheduler.TypesInitialized(job);
         Goal buildTypesBarrier = scheduler.TypesInitializedForCommandLine();
+        Goal disam = scheduler.Disambiguated(job);
         Goal typeCheck = scheduler.TypeChecked(job);
         Goal constCheck = scheduler.ConstantsChecked(job);
         Goal reachCheck = scheduler.ReachabilityChecked(job);
@@ -125,6 +126,7 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
         l.add(parse);
         l.add(buildTypes);
         l.add(buildTypesBarrier);
+        l.add(disam);
         l.add(typeCheck);
         l.add(constCheck);
         l.add(reachCheck);

@@ -69,7 +69,7 @@ public class VisitorPass extends AbstractPass
     
     public void markGoalReached() {
         if (goal instanceof SourceFileGoal) {
-            ((SourceFileGoal) goal).markReached();
+            ((SourceFileGoal) goal).markRun();
         }
     }
 

@@ -443,7 +443,7 @@ public abstract class Scheduler {
             if (extInfo.getOptions().disable_passes.contains(pass.name())) {
                 if (Report.should_report(Report.frontend, 1))
                     Report.report(1, "Skipping pass " + pass);
-                ((SourceFileGoal) goal).markReached();
+                ((SourceFileGoal) goal).markRun();
                 return true;
             }
         }
@@ -561,13 +561,13 @@ public abstract class Scheduler {
     
     public abstract Goal TypeExists(String name);
     public abstract Goal MembersAdded(ParsedClassType ct);
-    public abstract Goal AllMembersAdded(ParsedClassType ct);
     public abstract Goal SupertypesResolved(ParsedClassType ct);
     public abstract Goal SignaturesResolved(ParsedClassType ct);
     public abstract Goal FieldConstantsChecked(FieldInstance fi);
     public abstract Goal Parsed(Job job);
     public abstract Goal TypesInitialized(Job job);
     public abstract Goal TypesInitializedForCommandLine();
+    public abstract Goal Disambiguated(Job job);
     public abstract Goal TypeChecked(Job job);
     public abstract Goal ConstantsChecked(Job job);
     public abstract Goal ReachabilityChecked(Job job);

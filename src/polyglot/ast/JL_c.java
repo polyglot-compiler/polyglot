@@ -125,8 +125,8 @@ public class JL_c extends Ext_c implements JL {
      *
      * @param ar The visitor which disambiguates.
      */
-    public Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException {
-	return jl().disambiguateOverride(ar);
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
+	return jl().disambiguateOverride(parent, ar);
     }
     public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
 	return jl().disambiguateEnter(ar);

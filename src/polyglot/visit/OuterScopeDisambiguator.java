@@ -7,7 +7,7 @@ import polyglot.ast.Node;
  * A visitor which traverses the AST and remove ambiguities found in fields,
  * method signatures and the code itself.
  */
-public class OuterScopeDisambiguator extends AmbiguityRemover
+public class OuterScopeDisambiguator extends Disambiguator
 {
     public OuterScopeDisambiguator(DisambiguationDriver dd) {
         super(dd);

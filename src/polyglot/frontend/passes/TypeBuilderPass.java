@@ -39,6 +39,6 @@ public class TypeBuilderPass extends VisitorPass {
     public void markGoalReached() {
         Scheduler scheduler = job.extensionInfo().scheduler();
         TypesInitialized g = (TypesInitialized) scheduler.TypesInitialized(job);
-        g.markReached();
+        g.markRun();
     }
 }

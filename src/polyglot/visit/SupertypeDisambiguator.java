@@ -11,7 +11,7 @@ import polyglot.types.SemanticException;
  * A visitor which traverses the AST and remove ambiguities found in fields,
  * method signatures and the code itself.
  */
-public class SupertypeDisambiguator extends AmbiguityRemover
+public class SupertypeDisambiguator extends Disambiguator
 {
     public SupertypeDisambiguator(DisambiguationDriver dd) {
         super(dd);
