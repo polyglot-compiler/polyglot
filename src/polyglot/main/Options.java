@@ -153,7 +153,8 @@ public class Options {
      * @return the next index to process. i.e., if calling this method
      *         processes two commands, then the return value should be index+2
      */
-    protected int parseCommand(String args[], int index, Set source) throws UsageError {
+    protected int parseCommand(String args[], int index, Set source) 
+            throws UsageError, Main.TerminationException {
         int i = index;
         if (args[i].equals("-h") || 
             args[i].equals("-help") || 
@@ -161,12 +162,14 @@ public class Options {
             throw new UsageError("", 0);
         }
         else if (args[i].equals("-version")) {
-            if (extension != null)
-                System.out.println(extension.compilerName() +
-                                   " version " + extension.version());
-            System.out.println("Polyglot compiler toolkit version " +
+            StringBuffer sb = new StringBuffer();
+            if (extension != null) {
+                sb.append(extension.compilerName() + 
+                          " version " + extension.version() + "\n");
+            }
+            sb.append("Polyglot compiler toolkit version " +
                                new polyglot.ext.jl.Version());
-            System.exit(0);
+            throw new Main.TerminationException(sb.toString(), 0);
         }
         else if (args[i].equals("-d"))
         {

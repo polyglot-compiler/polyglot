@@ -1,10 +1,7 @@
 package polyglot.main;
 
-import polyglot.ast.Node;
 import polyglot.frontend.Compiler;
 import polyglot.frontend.ExtensionInfo;
-import polyglot.types.TypeSystem;
-import polyglot.util.*;
 
 import java.io.*;
 import java.util.*;
@@ -21,7 +18,7 @@ public class Main
   final static String verbose = "verbose";
 
   /* modifies args */
-  protected ExtensionInfo getExtensionInfo(List args) {
+  protected ExtensionInfo getExtensionInfo(List args) throws TerminationException {
       ExtensionInfo ext = null;
       
       for (Iterator i = args.iterator(); i.hasNext(); ) {
@@ -29,14 +26,12 @@ public class Main
           if (s.equals("-ext") || s.equals("-extension")) 
           {
               if (ext != null) {
-                  System.err.println("only one extension can be specified");
-                  System.exit(1);                  
+                  throw new TerminationException("only one extension can be specified");
               }
               
               i.remove();
               if (!i.hasNext()) {
-                  System.err.println("missing argument");
-                  System.exit(1);
+                  throw new TerminationException("missing argument");
               }
               String extName = (String)i.next();
               i.remove();
@@ -45,14 +40,12 @@ public class Main
           else if (s.equals("-extclass"))
           {
               if (ext != null) {
-                  System.err.println("only one extension can be specified");
-                  System.exit(1);                  
+                  throw new TerminationException("only one extension can be specified");
               }
 
               i.remove();
               if (!i.hasNext()) {
-                  System.err.println("missing argument");
-                  System.exit(1);
+                  throw new TerminationException("missing argument");
               }
               String extClass = (String)i.next();
               i.remove();
@@ -65,7 +58,7 @@ public class Main
       return loadExtension("polyglot.ext.jl.ExtensionInfo");
   }
   
-  protected void start(String[] argv) {
+  protected void start(String[] argv) throws TerminationException {
       source = new HashSet();  
       List args = explodeOptions(argv);
       ExtensionInfo ext = getExtensionInfo(args);
@@ -84,7 +77,7 @@ public class Main
               out.println(ext.compilerName() +": " + ue.getMessage());
           }
           options.usage(out);
-          System.exit(ue.exitCode);
+          throw new TerminationException(ue.exitCode);
       }
       
       Compiler compiler = new Compiler(ext);
@@ -92,7 +85,9 @@ public class Main
       long time0 = System.currentTimeMillis();
   
       String targetName = null;
-      if (!compiler.compile(source)) System.exit(1);
+      if (!compiler.compile(source)) {
+          throw new TerminationException(1);
+      }
   
       if (Report.should_report(verbose, 1))
           Report.report(1, "Output files: " + compiler.outputFiles());
@@ -104,48 +99,46 @@ public class Main
         Runtime runtime = Runtime.getRuntime();
   
         Iterator iter = compiler.outputFiles().iterator();
-        String outputFiles = "";
-        while(iter.hasNext()) {
-          outputFiles += (String)iter.next() + " ";
-        }
-  
-          String command = options.post_compiler + " -classpath " +
-                        options.constructPostCompilerClasspath() + " "
-                         + outputFiles;
-  
-          if (Report.should_report(verbose, 1))
-              Report.report(1, "Executing post-compiler " + command);
-  
-          try 
-          {
-            Process proc = runtime.exec(command);
-  
-            InputStreamReader err = 
-              new InputStreamReader(proc.getErrorStream());
-            char[] c = new char[72];
-            int len;
-            while((len = err.read(c)) > 0) {
-              System.err.print(String.valueOf(c, 0, len));
-            }
-  
-            proc.waitFor();
-  
-            if (!options.keep_output_files) {
-              String command2 = "rm " + outputFiles;
-              runtime.exec(command2);
-            }
-  
-            if (proc.exitValue() > 0) {
-              System.exit(proc.exitValue());
-            }
-          }
-          catch(Exception e) 
-          { 
-            System.err.println("Caught Exception while running compiler: "
-                                + e.getMessage());
-            System.exit(1);
+          String outputFiles = "";
+          while(iter.hasNext()) {
+            outputFiles += (String)iter.next() + " ";
           }
   
+            String command = options.post_compiler + " -classpath " +
+                          options.constructPostCompilerClasspath() + " "
+                           + outputFiles;
+  
+            if (Report.should_report(verbose, 1))
+                Report.report(1, "Executing post-compiler " + command);
+  
+            try 
+            {
+              Process proc = runtime.exec(command);
+  
+              InputStreamReader err = 
+                new InputStreamReader(proc.getErrorStream());
+              char[] c = new char[72];
+              int len;
+              while((len = err.read(c)) > 0) {
+                System.err.print(String.valueOf(c, 0, len));
+              }
+  
+              proc.waitFor();
+  
+              if (!options.keep_output_files) {
+                String command2 = "rm " + outputFiles;
+                runtime.exec(command2);
+              }
+  
+              if (proc.exitValue() > 0) {
+                System.exit(proc.exitValue());
+              }
+            }
+            catch(Exception e)  
+            {
+                  throw new TerminationException("Caught Exception while running compiler: "
+                                    + e.getMessage());
+            }
       }
   
       if (Report.should_report(verbose, 1)) {
@@ -156,7 +149,7 @@ public class Main
       }
   }
  
-  private List explodeOptions(String[] args) {
+  private List explodeOptions(String[] args) throws TerminationException {
       LinkedList ll = new LinkedList();
 
       for (int i = 0; i < args.length; i++) {
@@ -181,8 +174,7 @@ public class Main
                   ll.addAll(newArgs);
               }
               catch (java.io.IOException e) {
-                  System.err.println("cmdline parser: couldn't read args file "+fn);
-                  System.exit(1);
+                  throw new TerminationException("cmdline parser: couldn't read args file "+fn);
               }
               continue;
           }
@@ -194,10 +186,17 @@ public class Main
   }
 
   public static final void main(String args[]) {      
-      new Main().start(args);
+      try {
+          new Main().start(args);
+      }
+      catch (TerminationException te) {
+          if (te.getMessage() != null)
+              (te.exitCode==0?System.out:System.err).println(te.getMessage());
+          System.exit(te.exitCode);
+      }
   }
 
-  static final ExtensionInfo loadExtension(String ext) {
+  static final ExtensionInfo loadExtension(String ext) throws TerminationException {
     if (ext != null && ! ext.equals("")) {
       Class extClass = null;
 
@@ -205,26 +204,25 @@ public class Main
         extClass = Class.forName(ext);
       }
       catch (ClassNotFoundException e) {
-        System.err.println("Extension " + ext +
-          " not found: could not find class " + ext + "." +
-          e.getMessage());
-        System.exit(1);
-        return null;
+          throw new TerminationException(
+            "Extension " + ext +
+            " not found: could not find class " + ext + "." +
+                e.getMessage());
       }
 
       try {
         return (ExtensionInfo) extClass.newInstance();
       }
       catch (ClassCastException e) {
-	System.err.println(ext + " is not a valid polyglot extension:" +
+          throw new TerminationException(
+	    ext + " is not a valid polyglot extension:" +
 	    " extension class " + ext +
 	    " exists but is not a subclass of ExtensionInfo");
-	System.exit(1);
       }
       catch (Exception e) {
-	System.err.println("Extension " + ext +
-	  " could not be loaded: could not instantiate " + ext + ".");
-	System.exit(1);
+          throw new TerminationException(
+	           "Extension " + ext +
+	           " could not be loaded: could not instantiate " + ext + ".");
       }
     }
     return null;
@@ -237,5 +235,25 @@ public class Main
 
   static private void reportTime(String msg, int level) {
       Report.report(level, msg);
+  }
+  
+  /**
+   * This exception signals termination of the compiler. It should be used
+   * instead of <code>System.exit</code> to allow Polyglot to be called
+   * within a JVM that wasn't started specifically for Polyglot, e.g. the
+   * Apache ANT framework.
+   */
+  public static class TerminationException extends RuntimeException {
+      final public int exitCode;
+      public TerminationException(String msg) {
+          this(msg, 1);
+      }
+      public TerminationException(int exit) {
+          this.exitCode = exit;
+      }
+      public TerminationException(String msg, int exit) {
+          super(msg);
+          this.exitCode = exit;
+      }
   }
 }
