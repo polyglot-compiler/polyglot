@@ -590,35 +590,66 @@ public class TypeSystem_c implements TypeSystem
         if (c != null) ct = c.currentClass();
         return findField(container, name, ct);
     }
+    
     /**
-     * Requires: all type arguments are canonical.
-     *
-     * Returns the fieldMatch named 'name' defined on 'type' visible from
-     * cirrClass.  If no such field may be found, returns a fieldmatch
-     * with an error explaining why. name and currClass may be null, in which case
-     * they will not restrict the output.
+     * Returns the FieldInstance for the field <code>name</code> defined
+     * in type <code>container</code> or a supertype, and visible from
+     * <code>currClass</code>.  If no such field is found, a SemanticException
+     * is thrown.  <code>currClass</code> may be null.
      **/
     public FieldInstance findField(ReferenceType container, String name,
 	                           ClassType currClass) throws SemanticException {
+	List fields = findFields(container, name);
+	
+	if (fields.size() == 0) {
+	    throw new NoMemberException(NoMemberException.FIELD,
+					"Field \"" + name +
+					"\" not found in type \"" +
+					container + "\".");
+	}
+	
+	FieldInstance fi;
 
-        assert_(container);
-
-        if (container == null) {
-            throw new InternalCompilerError("Cannot access field \"" + name +
-                "\" within a null container type.");
-        }
-
-        FieldInstance fi = findField(container, name);
-
-        if (! isAccessible(fi, currClass)) {
+	if (fields.size() > 1) {
+	    Iterator i = fields.iterator();
+	    FieldInstance fi1 = (FieldInstance) i.next();
+	    FieldInstance fi2 = (FieldInstance) i.next();
+	    
+	    throw new SemanticException("Field \"" + name +
+					"\" is ambiguous; it is defined in both " +
+					fi1.container() + " and " +
+					fi2.container() + "."); 
+	}
+	else {
+	    Iterator i = fields.iterator();
+	    fi = (FieldInstance) i.next();
+	}
+	
+	if (currClass != null && ! isAccessible(fi, currClass)) {
             throw new SemanticException("Cannot access " + fi + ".");
         }
-
+	
         return fi;
     }
 
+    /**
+     * Returns the FieldInstance for the field <code>name</code> defined
+     * in type <code>container</code> or a supertype.  If no such field is
+     * found, a SemanticException is thrown.
+     */
     public FieldInstance findField(ReferenceType container, String name)
-                                   throws SemanticException {
+	throws SemanticException {
+	
+	return findField(container, name, (ClassType) null);
+    }
+	    
+    
+    /**
+     * Returns a list of fields named <code>name</code> defined
+     * in type <code>container</code> or a supertype.  The list
+     * returned may be empty.
+     */
+    protected List findFields(ReferenceType container, String name) {
         assert_(container);
 
         if (container == null) {
@@ -626,44 +657,31 @@ public class TypeSystem_c implements TypeSystem
                 "\" within a null container type.");
         }
 
-        Stack s = new Stack();
-        s.push(container);
-
-        while (! s.isEmpty()) {
-            Type t = (Type) s.pop();
-
-	    if (! t.isReference()) {
-	        throw new SemanticException("Cannot access a field in " +
-		    " non-reference type " + t + ".");
-	    }
-
-            ReferenceType rt = t.toReference();
-
-            FieldInstance fi = rt.fieldNamed(name);
-
-            if (fi != null) {
-                return fi;
-            }
-
-            if (rt.isClass()) {
-                // Need to check interfaces for static fields.
-                ClassType ct = rt.toClass();
-
-                for (Iterator i = ct.interfaces().iterator(); i.hasNext(); ) {
-                    Type it = (Type) i.next();
-                    s.push(it);
-                }
-            }
-
-            if (rt.superType() != null) {
-                s.push(rt.superType());
-            }
+	FieldInstance fi = container.fieldNamed(name);
+	
+	if (fi != null) {
+	    return Collections.singletonList(fi);
 	}
 
-	throw new NoMemberException(NoMemberException.FIELD,
-                                    "Field \"" + name +
-				    "\" not found in type \"" +
-                                    container + "\".");
+	List l = new ArrayList();
+
+	if (container.superType() != null && container.superType().isReference()) {
+	    List l2 = findFields(container.superType().toReference(), name);
+	    l.addAll(l2);
+	}
+
+	if (container.isClass()) {
+	    // Need to check interfaces for static fields.
+	    ClassType ct = container.toClass();
+	
+	    for (Iterator i = ct.interfaces().iterator(); i.hasNext(); ) {
+		Type it = (Type) i.next();
+		List l2 = findFields(it.toReference(), name);
+		l.addAll(l2);
+	    }
+	 }
+	
+	return l;
     }
 
     /**
