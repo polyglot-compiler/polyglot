@@ -6,7 +6,7 @@
 
 SOURCE = .
 SUBDIRS = polyglot
-TAG = POLYGLOT_0_9_0
+TAG = POLYGLOT_0_90
 
 include Rules.mk
 
@@ -66,7 +66,19 @@ export:
 	for i in $(EXT) skel; do \
 		mv release/$$i release/polyglot/polyglot/ext; \
 	done
-	mv javadoc release
+	mv javadoc release/polyglot
+	rm release/polyglot/jltools2polyglot.sh
+	rm release/polyglot/iDoclet.jar
+	rm release/polyglot/jsse.jar
+	rm release/polyglot/jnet.jar
+	rm release/polyglot/jcert.jar
+	rm release/polyglot/cryptix32.jar
+	rm -rf release/polyglot/bugs
+	rm -rf release/polyglot/example
+	rm -rf release/polyglot/splitter
+	rm -rf release/polyglot/test
+	rm release/polyglot/bin/polyjc
+	rm -rf release/polyglot/classes
 	cd release; jar cf polyglot-src.jar polyglot
 
 REL_SOURCES = \
