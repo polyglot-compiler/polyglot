@@ -59,6 +59,10 @@ public class TypeBuilder extends NodeVisitor
             }
         }
 
+        if (context.importTable() != null) {
+            setImportTable(context.importTable());
+        }
+
         while (! s.isEmpty()) {
             ParsedClassType ct = (ParsedClassType) s.pop();
 
