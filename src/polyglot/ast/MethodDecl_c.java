@@ -5,7 +5,6 @@ import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
 import jltools.frontend.*;
-import jltools.frontend.Compiler;
 import java.util.*;
 
 /**

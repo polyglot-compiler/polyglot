@@ -1,6 +1,7 @@
 package jltools.ext.jl.ast;
 
 import jltools.ast.*;
+import jltools.types.*;
 import jltools.visit.*;
 import jltools.util.*;
 

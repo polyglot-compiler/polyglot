@@ -1,10 +1,8 @@
 package jltools.ext.jl.ast;
 
 import jltools.ast.*;
-
-import jltools.frontend.Compiler;
-import jltools.util.*;
 import jltools.types.*;
+import jltools.util.*;
 import jltools.visit.*;
 import jltools.main.Main;
 import java.io.IOException;

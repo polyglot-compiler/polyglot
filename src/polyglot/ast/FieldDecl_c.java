@@ -3,10 +3,8 @@ package jltools.ext.jl.ast;
 import jltools.ast.*;
 
 import jltools.types.*;
-import jltools.util.*;
 import jltools.visit.*;
-import jltools.frontend.*;
-import jltools.frontend.Compiler;
+import jltools.util.*;
 import java.util.*;
 
 /**
@@ -24,17 +22,17 @@ public class FieldDecl_c extends Node_c implements FieldDecl
     this.decl = new Declarator_c(flags, type, name, init);
   }
 
-    /** Get the initializer instance of the initializer. */
-    public InitializerInstance initializerInstance() {
-        return ii;
-    }
+  /** Get the initializer instance of the initializer. */
+  public InitializerInstance initializerInstance() {
+    return ii;
+  }
 
-    /** Set the initializer instance of the initializer. */
-    public FieldDecl initializerInstance(InitializerInstance ii) {
-        FieldDecl_c n = (FieldDecl_c) copy();
-        n.ii = ii;
-        return n;
-    }
+  /** Set the initializer instance of the initializer. */
+  public FieldDecl initializerInstance(InitializerInstance ii) {
+    FieldDecl_c n = (FieldDecl_c) copy();
+    n.ii = ii;
+    return n;
+  }
 
   /** Get the type of the declaration. */
   public Type declType() {
