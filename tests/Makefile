@@ -11,6 +11,7 @@ GOOD =  \
 	Dep1.jl \
 	Empty.jl \
 	Equality.jl \
+	Equality2.jl \
 	Except.jl \
 	Except2.jl \
 	Except3.jl \
