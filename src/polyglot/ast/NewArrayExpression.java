@@ -6,12 +6,13 @@ package jltools.ast;
 
 import jltools.types.Type;
 import jltools.util.TypedListIterator;
+import jltools.util.TypedList;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.ArrayList;
+import java.util.List;
 
 
-// FIXME: This doesn't handle initialized arrays.
 
 
 /**
@@ -27,16 +28,25 @@ import java.util.ArrayList;
 
 public class NewArrayExpression extends Expression {
   /**
-   * Effects: Creates a NewArrayExpression with element type <elemType>
-   *    and <additionalDim> additional dimensions of unspecified length.
+   * Requires: additionalDim >= 0, and every element of lengthExpressions is 
+   *    an Expression.  optInitializer may be null.
+   * Effects: Creates a NewArrayExpression with element type <elemType>,
+   *    <lengthExpressions> as supplied dimensions,
+   *    <additionalDim> additional dimensions of unspecified length,
+   *    and (optionally) <optInitializer> as an initializer expression.
    */ 
-  public NewArrayExpression(Type elemType, int additionalDim) {
+  public NewArrayExpression(Type elemType, 
+			    List lengthExpressions, 
+			    int additionalDim,
+			    ArrayInitializerExpression optInitializer) {
     if (additionalDim < 0) {
       throw new IllegalArgumentException("additionalDim must be positive");
     }
-    type = elemType;
+    TypedList.check(lengthExpressions, Expression.class);
+    type = elemType;    
     additionalDimensions = additionalDim;
-    dimensionExpressions = new ArrayList();
+    dimensionExpressions = new ArrayList(lengthExpressions);
+    initializer = optInitializer;
   }
   
   /**
@@ -111,19 +121,32 @@ public class NewArrayExpression extends Expression {
    */
   public Expression dimensionExpressionAt(int pos) {
     return (Expression) dimensionExpressions.get(pos);
-  }
+  }  
 
   /**
    * Returns a TypedListIterator which will yield each expression
    * which specifies a dimension of this.
    */
-  public TypedListIterator iterator() {
+  public TypedListIterator lengths() {
     return new TypedListIterator(dimensionExpressions.listIterator(),
 				 Expression.class,
 				 false);
   }
 
-     
+  /**
+   * Returns the initializer for this expression, or null if none exists.
+   **/
+  public ArrayInitializerExpression getInitializer() {
+    return initializer;
+  }
+
+  /**
+   * Sets the initializer for this expression to equal <expr>
+   **/
+  public void setInitializer(ArrayInitializerExpression expr) {
+    initializer = expr;
+  }
+
     public Node accept(NodeVisitor v) {
 	return v.visitNewArrayExpression(this);
     }
@@ -149,7 +172,9 @@ public class NewArrayExpression extends Expression {
 
   public Node copy() {
     NewArrayExpression na = new NewArrayExpression(type,
-						   additionalDimensions);
+						   new ArrayList(),
+						   additionalDimensions,
+						   initializer);
     na.copyAnnotationsFrom(this);
     for (Iterator i = dimensionExpressions.iterator(); i.hasNext() ; ) {
       na.addDimensionExpression((Expression) i.next());
@@ -158,8 +183,12 @@ public class NewArrayExpression extends Expression {
   }
 
   public Node deepCopy() {
+    ArrayInitializerExpression init = initializer == null ? null
+      : (ArrayInitializerExpression) initializer.deepCopy();
     NewArrayExpression na = new NewArrayExpression(type,
-						   additionalDimensions);
+						   new ArrayList(),
+						   additionalDimensions,
+						   init);
     na.copyAnnotationsFrom(this);
     for (Iterator i = dimensionExpressions.iterator(); i.hasNext() ; ) {
       Expression e = (Expression) i.next();
@@ -168,11 +197,11 @@ public class NewArrayExpression extends Expression {
     return na;
   }
 
-
   private Type type;
   // RI: contains only elements of type Expression 
   private ArrayList dimensionExpressions;
   private int additionalDimensions;
+  private ArrayInitializerExpression initializer;
 }
 
     

@@ -131,8 +131,7 @@ public class BinaryExpression extends Expression {
     public void visitChildren(NodeVisitor v) {
 	left  = (Expression) left.accept(v);
 	right = (Expression) right.accept(v);
-    }
-    
+    }    
 
     public Node copy() {
       BinaryExpression be = new BinaryExpression(left, operator, right);

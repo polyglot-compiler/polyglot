@@ -35,25 +35,23 @@ public interface NodeVisitor {
   public Node visitReturnStatement(ReturnStatement re);
   public Node visitThrowStatement(ThrowStatement ts);
   public Node visitIfStatement(IfStatement is);
-  //public Node visitWhileStatement(WhileStatement ws);
+  public Node visitWhileStatement(WhileStatement ws);
   public Node visitDoStatement(DoStatement ds);
+  public Node visitForStatement(ForStatement fs);
   public Node visitSynchronizedStatement(SynchronizedStatement ss);
 
   // Expressions
   public Node visitNullLiteral(NullLiteral nl);
   public Node visitStringLiteral(StringLiteral sl);
   public Node visitIntLiteral(IntLiteral il);
-  public Node visitFloatLiteral(FloatLiteral fl);
-  
+  public Node visitFloatLiteral(FloatLiteral fl); 
   public Node visitCastExpression(CastExpression ce);
   public Node visitUnaryExpression(UnaryExpression ue);
   public Node visitBinaryExpression(BinaryExpression be);
-  public Node visitTernaryExpression(TernaryExpression te);
-  
+  public Node visitTernaryExpression(TernaryExpression te);  
   public Node visitLocalVariableExpression(LocalVariableExpression ve);
   public Node visitNewArrayExpression(NewArrayExpression ae);
- 
   public Node visitInstanceofExpression(InstanceofExpression ie);
-    
+  public Node visitArrayInitializerExpression(ArrayInitializerExpression aie);
 	 
 }

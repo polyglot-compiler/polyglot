@@ -18,8 +18,7 @@ public class IntLiteral extends Literal {
   public static final int SHORT   = 3;
   public static final int INT     = 4;
   public static final int LONG    = 5;
-  
-    
+      
   /**
    * Creates a new IntLiteral storing a boolean with the value <b>
    */ 

@@ -20,6 +20,8 @@ public class UnaryExpression extends Expression {
     public static final int PREINCR        = 33; // ++<?> operator
     public static final int PREDECR        = 34; // --<?> operator
 
+    public static final int MIN_OPERATOR = BITCOMP;
+    public static final int MAX_OPERATOR = PREDECR;  
 
     /** 
      * Requires: A valid value for <operator> as listed in public
@@ -45,7 +47,7 @@ public class UnaryExpression extends Expression {
      * Effects: Changes the operator of <this> to <newOperator>.
      */
     public void setOperator(int newOperator) {
-	if (newOperator < 29 || newOperator > 34) {
+	if (newOperator < MIN_OPERATOR || newOperator > MAX_OPERATOR) {
 	    throw new IllegalArgumentException("Value for operator to " +
 					       "UnaryExpression not valid.");
 	}

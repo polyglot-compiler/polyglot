@@ -30,6 +30,7 @@ public class FloatLiteral extends Literal {
     type = DOUBLE;
     value = d;
   }
+
   /**
    * Effects: Returns the type of this FloatLiteral as specified by the
    *   public static constants in this class.
@@ -75,7 +76,6 @@ public class FloatLiteral extends Literal {
   }
   
   private int type;
-  private double value;
-  
+  private double value;  
 }
 

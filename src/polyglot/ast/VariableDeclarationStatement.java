@@ -5,11 +5,13 @@
 package jltools.ast;
 
 import jltools.util.TypedListIterator;
+import jltools.util.TypedList;
 import jltools.types.Type;
+import jltools.types.AccessFlags;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.ArrayList;
-
+import java.util.List;
 
 /** 
  * VariableDeclarationStatement
@@ -19,56 +21,98 @@ import java.util.ArrayList;
  *   names, and possible initilization expressions.
  */
 public class VariableDeclarationStatement extends Statement {
-  private static final class VariableDeclarationPair {
-    String name;
-    Expression initializer; // will be null for unitilized variable
-    public VariableDeclarationPair(String n, Expression i) {
+  /**
+   * This class corresponds to the VariableDeclarator production in
+   * the Java grammar. (Section 19.8.2)
+   **/
+  public static final class Declarator {
+    public String name;
+    public final int additionalDims;    
+    // will be null for uninitialized variable.
+    public final Expression initializer;
+    /**
+     * Creates a new Declarator for a variable named <n>, with <dims>
+     *   dimensions beyond those of the declarations's base type.
+     **/
+    public Declarator(String n, int dims, Expression init) {
       name = n;
-      initializer = i;
+      additionalDims = dims;
+      initializer = init;
     }
   }
+  /**
+   * Requires: Every element of <declList> is a Declarator.
+   * Effects: Creates a new VariableDeclarationStatement of type <type>,
+   *    with optional modifiers <optModifiers>, and declarations <declList>.
+   **/
+  public VariableDeclarationStatement(AccessFlags optModifiers,
+				      Type type, List declList) {
+    modifiers = optModifiers;
+    this.type = type;
+    TypedList.check(declList, Declarator.class);
+    variables = new ArrayList(declList);
+  }     
+
   /**
    * Effects: Creates a new VariableDeclarationStatement of type <type>
    *   with no variables being declared.
    */
-  public VariableDeclarationStatement (Type type) {
+  public VariableDeclarationStatement (Type baseType) {
     this.type = type;
+    variables = new ArrayList();
   }
 
   /**
    * Adds a new variable named <var> with initializer <init> to
    * this VariableDelarationStatement.
    */
-  public void addVariable(String var, Expression init) {
-    variables.add(new VariableDeclarationPair(var, init));
+  public void addVariable(Declarator decl) {
+    variables.add(decl);
   }
 
   /** 
    * Returns the variable name at position <pos>.  Throws an
    * IndexOutOfboundsException if <pos> is not a valid position.
-   */ 
-  public String variableNameAt(int pos) {
-    return ((VariableDeclarationPair) variables.get(pos)).name;
-  }
-
-  /** 
-   * Returns the initializer at position <pos>.  If the variable is
-   * not explicitly initialized, returns null.  Throws an
-   * IndexOutOfboundsException if <pos> is not a valid position.
-   */ 
-  public Expression initializerAt(int pos) {
-    return ((VariableDeclarationPair) variables.get(pos)).initializer;
+   **/ 
+  public Declarator variableAt(int pos) {
+    return (Declarator) variables.get(pos);
   }
   
   /**
    * Removes the variable at position <pos> in the variable declaration.
    * Throws an IndexOutOfBoundsException if <pos> is not a valid
    * position.
-   */ 
+   **/ 
   public void removeVariable(int pos) {
     variables.remove(pos);
   }
 
+  /**
+   * Requires: decl is a declarator in this.
+   *
+   * Effects: returns the actual type of the variable declared by <decl>.
+   **/
+  public Type typeForDeclarator(Declarator decl) {
+    if (decl.additionalDims > 0)
+      return type.extendArrayDims(decl.additionalDims);
+    else
+      return type;
+  }
+
+  /**
+   * Returns the modifiers for this, or null for none.
+   **/
+  public AccessFlags getModifiers() {
+    return modifiers;
+  }
+
+  /**
+   * Sets the modifiers for this to be <modifiers>
+   **/
+  public AccessFlags setModifiers() {
+    return modifiers;
+  }
+  
   public Node accept(NodeVisitor v) {
     return v.visitVariableDeclarationStatement(this);
   }
@@ -80,30 +124,47 @@ public class VariableDeclarationStatement extends Statement {
   public void visitChildren(NodeVisitor v) {
     ListIterator it = variables.listIterator();
     while (it.hasNext()) {
-      VariableDeclarationPair pair = (VariableDeclarationPair)it.next();
-      pair.initializer = (Expression) pair.initializer.accept(v);
+      Declarator pair = (Declarator)it.next();
+      Expression newExpr = (Expression) pair.initializer.accept(v);
+      if (newExpr != pair.initializer)
+	it.set(new Declarator(pair.name, pair.additionalDims, newExpr));
     }
   }
 
-  // FIXME No set, get operations;
-  // FIXME No iterators.
+  /**
+   * Yields all the declarators in this, in order. 
+   **/
+  public Iterator declarators() {
+    return new TypedListIterator(variables.listIterator(), 
+				 Declarator.class, false);
+  }
 
   public Node copy() {
-    VariableDeclarationStatement vds = 
-      new VariableDeclarationStatement(type);
-    // FIXME
-    return null;
+    return copy(false);
   }
-
   public Node deepCopy() {
-    return null; // FIXME
+    return copy(true);
   }
-
+  
+  private Node copy(boolean deep) {
+    AccessFlags mods = modifiers == null ? null : modifiers.copy();
+    ArrayList list = new ArrayList(variables.size());
+    for (Iterator i = variables.iterator(); i.hasNext(); ) {
+      Declarator d = (Declarator) i.next();
+      Expression expr = d.initializer == null ? null :
+	(deep ? (Expression) d.initializer.deepCopy() : d.initializer);
+      list.add(new Declarator(d.name, d.additionalDims, expr));
+    }
+    VariableDeclarationStatement vds = 
+      new VariableDeclarationStatement(mods, type, list);
+    vds.copyAnnotationsFrom(this);
+    return vds;
+  }
   
   private Type type; 
-  // RI: every member is a VariableDeclarationPair
-  private ArrayList variables; 
-
+  // RI: every member is a Declarator
+  private List variables; 
+  private AccessFlags modifiers;
 }
 
     

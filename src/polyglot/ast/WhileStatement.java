@@ -1,28 +1,28 @@
 /*
- * DoStatement.java
+ * WhileStatement.java
  */
 
 package jltools.ast;
 
 /**
- * DoStatement
+ * WhileStatement
  *
- * Overview: A mutable representation of a Java language do
+ * Overview: A mutable representation of a Java language while
  *   statment.  Contains a statement to be executed and an expression
  *   to be tested indicating whether to reexecute the statement.
  */ 
-public class DoStatement extends Statement {
+public class WhileStatement extends Statement {
   /**
-   * Effects: Creates a new DoStatement with a statement <statement>,
+   * Effects: Creates a new WhileStatement with a statement <statement>,
    *    and a conditional expression <condExpr>.
    */
-  public DoStatement (Statement statement, Expression condExpr) {
+  public WhileStatement(Expression condExpr, Statement statement) {
     this.condExpr = condExpr;
     this.statement = statement;
   }
 
   /**
-   * Effects: Returns the Expression that this DoStatement is
+   * Effects: Returns the Expression that this WhileStatement is
    * conditioned on.
    */
   public Expression getConditionalExpression() {
@@ -38,14 +38,14 @@ public class DoStatement extends Statement {
 
   /**
    * Effects: Returns the statement associated with this
-   *    DoStatement.
+   *    WhileStatement.
    */
   public Statement getBody() {
     return statement;
   }
 
   /**
-   * Effects: Sets the statement of this DoStatement to be
+   * Effects: Sets the statement of this WhileStatement to be
    *    <newStatement>.
    */
   public void setBody(Statement newStatement) {
@@ -53,7 +53,7 @@ public class DoStatement extends Statement {
   }
 
   public Node accept(NodeVisitor v) {
-    return v.visitDoStatement(this);
+    return v.visitWhileStatement(this);
   }
 
   /** 
@@ -77,14 +77,14 @@ public class DoStatement extends Statement {
   }
 
   public Node copy() {
-    DoStatement ds = new DoStatement(statement, condExpr);
+    WhileStatement ds = new WhileStatement(condExpr, statement);
     ds.copyAnnotationsFrom(this);
     return ds;
   }
 
   public Node deepCopy() {
-    DoStatement ds = new DoStatement((Statement) statement.deepCopy(), 
-				     (Expression) condExpr.deepCopy());
+    WhileStatement ds = new WhileStatement((Expression) condExpr.deepCopy(),
+					   (Statement) statement.deepCopy());
     ds.copyAnnotationsFrom(this);
     return ds;
   }

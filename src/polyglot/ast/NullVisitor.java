@@ -19,6 +19,7 @@ public class NullVisitor implements NodeVisitor {
     bs.visitChildren(this);
     return bs;
   }
+
   public Node visitExpressionStatement(ExpressionStatement es) {
     es.visitChildren(this);
     return es;
@@ -45,16 +46,19 @@ public class NullVisitor implements NodeVisitor {
     return is;
   }
 
-  /*
   public Node visitWhileStatement(WhileStatement ws) {
     ws.visitChildren(this);
     return ws;
   }
-  */
 
   public Node visitDoStatement(DoStatement ds) {
     ds.visitChildren(this);
     return ds;
+  }
+
+  public Node visitForStatement(ForStatement fs) {
+    fs.visitChildren(this);
+    return fs;
   }
 
   public Node visitSynchronizedStatement(SynchronizedStatement ss) {
@@ -111,6 +115,11 @@ public class NullVisitor implements NodeVisitor {
   public Node visitInstanceofExpression(InstanceofExpression ie) {
     ie.visitChildren(this);
     return ie;
+  }
+
+  public Node visitArrayInitializerExpression(ArrayInitializerExpression aie) {
+    aie.visitChildren(this);
+    return aie;
   }
 
 }

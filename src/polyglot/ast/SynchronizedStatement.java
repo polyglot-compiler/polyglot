@@ -14,11 +14,11 @@ package jltools.ast;
 public class SynchronizedStatement extends Statement {
   /**
    * Effects: Creates a new SynchronizedStatment with expression
-   *    <expr>, and a statement <statement>.
+   *    <expr>, and a statement <body>.
    */
-  public SynchronizedStatement (Expression expr, Statement statement) {
+  public SynchronizedStatement (Expression expr, BlockStatement body) {
     this.expr = expr;
-    this.statement = statement;
+    this.body = body;
   }
 
   /**
@@ -41,16 +41,16 @@ public class SynchronizedStatement extends Statement {
    * Effects: Returns the statement associated with this
    *    SynchronizedStatement.
    */
-  public Statement getStatement() {
-    return statement;
+  public BlockStatement getBody() {
+    return body;
   }
 
   /**
    * Effects: Sets the statement of this SynchronizedStatement to be
    *    <newStatement>.
    */
-  public void setStatement(Statement newStatement) {
-    statement = newStatement;
+  public void setStatement(BlockStatement newBody) {
+    body = newBody;
   }
 
   public Node accept(NodeVisitor v) {
@@ -60,25 +60,18 @@ public class SynchronizedStatement extends Statement {
   /** 
    * Requires: v will not transform an expression into anything other
    *    than another expression, and that v will not transform a
-   *    Statement into anything other than another Statement or
-   *    Expression.
+   *    BlockStatement into anything other than another BlockStatement.
    * Effects: visits each of the children of this node with <v>.  If <v>
    *    returns an expression in place of the sub-statement, it is
    *    wrapped in an ExpressionStatement.
    */
   public void visitChildren(NodeVisitor v) {
     expr = (Expression) expr.accept(v);
-    Node newNode = (Node) statement.accept(v);
-    if (newNode instanceof Expression) {
-      statement = new ExpressionStatement((Expression) newNode);
-    }
-    else {
-      statement = (Statement) newNode;
-    }
+    body = (BlockStatement) body.accept(v);
   }
 
   public Node copy() {
-    SynchronizedStatement ss = new SynchronizedStatement(expr, statement);
+    SynchronizedStatement ss = new SynchronizedStatement(expr, body);
     ss.copyAnnotationsFrom(this);
     return ss;
   }
@@ -86,12 +79,12 @@ public class SynchronizedStatement extends Statement {
   public Node deepCopy() {
     SynchronizedStatement ss = 
       new SynchronizedStatement((Expression) expr.deepCopy(), 
-				(Statement) statement.deepCopy());      
+				(BlockStatement) body.deepCopy());      
     ss.copyAnnotationsFrom(this);
     return ss;
   }
 
   private Expression expr;
-  private Statement statement;
+  private BlockStatement body;
 }
 

@@ -5,11 +5,12 @@
 package jltools.ast;
 
 import jltools.util.Assert;
+import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.ArrayList;
-
+import java.util.List;
 
 /**
  * BlockStatement
@@ -23,6 +24,16 @@ public class BlockStatement extends Statement {
    **/
   public BlockStatement() {
     statements = new ArrayList();
+  }
+
+  /**
+   * Requires: every element of statementList is a Statement.
+   * Effects: Create a new BlockStatement with <statementList> as its
+   * statements.
+   **/
+  public BlockStatement(List statementList) {
+    TypedList.check(statementList, Statement.class);
+    statements = new ArrayList(statementList);
   }
 
   /**     
