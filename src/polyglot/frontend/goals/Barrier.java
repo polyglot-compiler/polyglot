@@ -60,4 +60,12 @@ public abstract class Barrier extends AbstractGoal {
     }
     
     public abstract Goal goalForJob(Job job); 
+    
+    public int hashCode() {
+        return System.identityHashCode(this);
+    }
+
+    public boolean equals(Object o) {
+        return this == o;
+    }
 }
