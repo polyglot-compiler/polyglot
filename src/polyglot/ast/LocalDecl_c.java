@@ -137,8 +137,20 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
         return n.localInstance(li);
     }
 
+    /*
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         TypeSystem ts = ar.typeSystem();
+
+        LocalInstance li = ts.localInstance(position(),
+                                            flags(), declType(), name());
+
+        return localInstance(li);
+    }
+    */
+
+    /** Type check the declaration. */
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        TypeSystem ts = tc.typeSystem();
 
         LocalInstance li = ts.localInstance(position(),
                                             flags(), declType(), name());
@@ -147,13 +159,6 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
             Object value = init().constantValue();
             li = (LocalInstance) li.constantValue(value);
         }
-
-        return localInstance(li);
-    }
-
-    /** Type check the declaration. */
-    public Node typeCheck(TypeChecker tc) throws SemanticException {
-        TypeSystem ts = tc.typeSystem();
 
         try {
             ts.checkLocalFlags(flags);
@@ -201,7 +206,7 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
             }
         }
 
-        return this;
+        return localInstance(li);
     }
 
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
