@@ -134,8 +134,11 @@ public class Main
         t = (MainTargetFactory.MainTarget)iter.next(); 
 
         command =  (String)options.get( MAIN_OPT_POST_COMPILER) 
-                      + " -classpath " + options.get(MAIN_OPT_OUTPUT_DIRECTORY)
-                        + File.pathSeparator + "." + File.pathSeparator 
+                      + " -classpath " 
+                        + ( options.get(MAIN_OPT_OUTPUT_DIRECTORY) != null ?
+                            options.get(MAIN_OPT_OUTPUT_DIRECTORY) 
+                            + File.pathSeparator + "." + File.pathSeparator :
+                            "") 
                         + System.getProperty( "java.class.path") + " "
                         + t.outputFile.getPath();
 

@@ -40,7 +40,9 @@ public class SourceFileNode extends Node
   public SourceFileNode reconstruct( String package_, List imports, 
                                      List classes) 
   {
-    if( !this.package_.equals( package_) 
+    if( package_ != null && ! !this.package_.equals( package_) ||
+        package_ == null && this.package_ != null ||
+        package_ != null && this.package_ == null
         || this.imports.size() != imports.size()
         || this.classes.size() != classes.size()) {
       SourceFileNode n = new SourceFileNode( package_, imports, classes);

@@ -411,7 +411,7 @@ public class MethodNode extends ClassMember
       }
     }
     
-    if( !mtiThis.getAccessFlags().isAbstract()) {
+    if( !mtiThis.getAccessFlags().isAbstract() ) {
       // FIXME should be abstract for interfaces.
       if( body != null) {
         w.newline( 0);

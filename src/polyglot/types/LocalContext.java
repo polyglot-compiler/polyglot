@@ -143,10 +143,13 @@ public class LocalContext
    */
   public void pushClass( ClassType c)
   {
+    if ( c == null)
+      throw new InternalCompilerError("Tried to push a null class.");
     stkContexts.push ( new ClassTuple ( 
                       new TypeSystem.Context ( itImports, c, null) ));
     if ( c.getSuperType() instanceof AmbiguousType)
-      throw new Error();
+      throw new InternalCompilerError("Tried to push a class with an ambiguous " +
+                                      "supertype.");
   }
 
   /**

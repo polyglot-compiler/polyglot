@@ -72,7 +72,6 @@ public class SymbolReader extends NodeVisitor
 
     newClass.setFullName( fullName);
     newClass.setShortName( name);
-
     currentResolver.addClass( fullName, newClass);
 
     current = newClass;

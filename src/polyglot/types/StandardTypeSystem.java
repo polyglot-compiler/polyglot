@@ -692,37 +692,10 @@ public class StandardTypeSystem extends TypeSystem {
       throw new SemanticException ( "No valid method call found for \"" + 
                                      method.getName() + "\".");
 
-    // At this point, the List lAcceptable contains all those which are 
-    // Acceptable and Accessible as defined by JLS 15.11.2.1
-    //    for (Iterator i = lAcceptable.listIterator(); i.hasNext(); )
-    //    {
-    //      MethodTypeInstance mti = (MethodTypeInstance)i.next();
-    //      System.out.print( mti.getEnclosingType().getTypeString() + "::" + 
-    //                        method.getName() + "(" );
-    //      for (Iterator i2 = mti.argumentTypes().listIterator(); i2.hasNext(); )
-    //      {
-    //        System.out.print( ((Type)i2.next()).getTypeString() + ", ");
-    //      }
-    //      System.out.println(");");
-    //    }
-    //    System.out.println("=====");
-
     // now, use JLS 15.11.2.2
     Object [] mtiArray = lAcceptable.toArray(  );
     MostSpecificComparator msc = new MostSpecificComparator();
     java.util.Arrays.sort( mtiArray, msc);
-
-    //    for (int i = 0; i < mtiArray.length; i++)
-    //    {
-    //      MethodTypeInstance mti = (MethodTypeInstance)mtiArray[i];
-    //      System.out.print( mti.getEnclosingType().getTypeString() + "::" + 
-    //                        method.getName() + "(" );
-    //      for (Iterator i2 = mti.argumentTypes().listIterator(); i2.hasNext(); )
-    //      {
-    //        System.out.print( ((Type)i2.next()).getTypeString() + ", ");
-    //      }
-    //      System.out.println(");");
-    //    }
 
     // now check to make sure that we have a maximal most specific method.
     // (if we did, it would be in the 0th index.

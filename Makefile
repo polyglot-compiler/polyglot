@@ -39,7 +39,7 @@ CALLED_FROM_PARENT 	= true
 	$(JC) $(JC_FLAGS) $<
 
 #everything:
-all: util lex parse types ast visit ext/op frontend runtime main
+all: util lex parse types ast visit ext/op frontend ext/op/runtime main
 
 #include all of our package makefiles. they give us what class files are in each.
 include jltools/util/Makefile
@@ -49,6 +49,7 @@ include jltools/ast/Makefile
 include jltools/types/Makefile
 include jltools/visit/Makefile
 include jltools/ext/op/Makefile
+include jltools/ext/op/runtime/Makefile
 include jltools/frontend/Makefile
 include jltools/main/Makefile
 
@@ -65,13 +66,13 @@ ast: util types lex $(AST_TARGET)
 
 visit: util types ast $(VISIT_TARGET)
 
-ext/op: util types ast $(EXTOP_TARGET)
+ext/op: util types ast ext/op/runtime $(EXTOP_TARGET)
+
+ext/op/runtime: $(EXT_OP_RUNTIME_TARGET)
 
 frontend: util types lex parse ast visit $(FRONTEND_TARGET)
 
-runtime: $(RUNTIME_TARGET)
-
-main: frontend runtime $(MAIN_TARGET)
+main: frontend ext/op/runtime $(MAIN_TARGET)
 
 #clean: (just delete the class files)
 clean: 

@@ -25,6 +25,12 @@ public class ClassNode extends ClassMember
   /** A list of member (e.g. fields, methods) of this class. */
   protected final List members;
 
+  /**
+   * FIXME: This field doesn't actually follow the immutablility rule.  It is changed
+   * within the various passes, but does not result in the creation of a new 
+   * ClassNode. Consequently, whenever we create a new node via reconstruct, we always
+   * copy its old value to the new value.
+   */
   protected ParsedClassType type;
   
   /**
@@ -64,6 +70,7 @@ public class ClassNode extends ClassMember
           || this.members.size() != members.size()) {
       ClassNode n = new ClassNode( accessFlags, name, superClass, 
                                    interfaces, members);
+      n.type = this.type;
       n.copyAnnotationsFrom( this);
       return n;
     }
@@ -73,6 +80,7 @@ public class ClassNode extends ClassMember
           ClassNode n = new ClassNode( accessFlags, name, superClass, 
                                        interfaces, members);
           n.copyAnnotationsFrom( this);
+          n.type = this.type;
           return n;
         }
       }
@@ -205,7 +213,7 @@ public class ClassNode extends ClassMember
     type.setAccessFlags( accessFlags);
 
     visitChildren( sr);
-    
+    sr.popClass();
     return this;
   }
 
@@ -232,7 +240,9 @@ public class ClassNode extends ClassMember
 
   public void translate( LocalContext c, CodeWriter w)
   {
-    w.write( accessFlags.getStringRepresentation() + "class " + name);
+    w.write( accessFlags.getStringRepresentation() + 
+             (accessFlags.isInterface() ? "" : "class ") 
+             + name);
     if( superClass != null)
     {
       w.write( " extends ");
@@ -248,6 +258,7 @@ public class ClassNode extends ClassMember
         }
       }
     }
+
     c.pushClass( type);
     w.newline( 0);
     w.write( "{");

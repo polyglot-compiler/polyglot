@@ -63,7 +63,7 @@ public class LocalVariableExpression extends Expression
      * the ugly point of whether we should reconstruct this or not. I am not 
      * reconstructing here, but perhaps we should?
      */
-    FieldInstance fi = c.getField( null, name);
+    fi = c.getField( null, name);
     setCheckedType( fi.getType());
 
     return this;

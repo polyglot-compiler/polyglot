@@ -51,11 +51,12 @@ public class SwitchStatement extends Statement
     public CaseStatement reconstruct ( Expression expr, boolean def)
     {
       CaseStatement cs;
-      if ( expr != this.expr && def != this.def)
+      if ( expr != this.expr || def != this.def)
       {
         cs = new CaseStatement( expr);
         cs.def = def;
         cs.copyAnnotationsFrom ( this ) ;
+        cs.iValue = iValue;
         return cs;
       }
       return this;
@@ -101,6 +102,7 @@ public class SwitchStatement extends Statement
     
     public Node typeCheck( LocalContext c ) throws SemanticException
     {
+
       if ( def)
       {
         return this;
@@ -125,6 +127,7 @@ public class SwitchStatement extends Statement
                 expr instanceof LocalVariableExpression)
       {
         FieldInstance fi;
+
         if ( expr instanceof FieldExpression)
         {
           fi = ((FieldExpression)expr).getFieldInstance();
@@ -164,7 +167,9 @@ public class SwitchStatement extends Statement
     
     public void dump( CodeWriter cw)
     {
-      
+      cw.write( "( CASE ");
+      dumpNodeInfo( cw);
+      cw.write( ")");
     }
 
     private boolean def;
@@ -225,10 +230,12 @@ public class SwitchStatement extends Statement
    }
 
    /**
-    * Requires: <switchElems> contains only elements of type SwitchElement.
+    * Requires: <code>switchElems</code> contains only elements of type 
+    * SwitchElement.
     *
     * Effects: Creates a new SwitchStatement which is conditioned on
-    * <expr> and contains the elements of <switchElems> in order.
+    * <code>expr</code> and contains the elements of <code>switchElems</code> 
+    * in order.
     */
    public SwitchStatement(Expression expr, List switchElems) {
       this.expr = expr;
@@ -236,6 +243,10 @@ public class SwitchStatement extends Statement
       this.switchElems = new ArrayList(switchElems);
    }
 
+  /**
+   * Lazily reconstruct the SwitchStatement; perform reconstruction only 
+   * if an element of the list changed or expr changed
+   */
   public Node  reconstruct ( Expression expr, List switchElems)
   {
     if ( expr != this.expr ||
@@ -243,6 +254,7 @@ public class SwitchStatement extends Statement
     {
       SwitchStatement ss =  new SwitchStatement ( expr, switchElems);
       ss.copyAnnotationsFrom ( this );
+      return ss;
     }
     
     for ( int i = 0; i < switchElems.size() ; i ++)
@@ -251,6 +263,7 @@ public class SwitchStatement extends Statement
       {
         SwitchStatement ss =  new SwitchStatement ( expr, switchElems);
         ss.copyAnnotationsFrom ( this );
+        return ss;
       }
     }
     return this;
@@ -267,9 +280,9 @@ public class SwitchStatement extends Statement
    /**
     * Effects: Adds <sw> to the list of SwitchElements of this.
     */
-   public void addSwitchElement(SwitchElement sw) {
-      switchElems.add(sw);
-   }
+  //   public void addSwitchElement(SwitchElement sw) {
+  //      switchElems.add(sw);
+  //   }
 
    /**
     * Effects: Returns the SwitchElement at position <pos>.  Throws an
@@ -277,14 +290,6 @@ public class SwitchStatement extends Statement
     */
    public SwitchElement getSwitchElementAt(int pos) {
       return (SwitchElement) switchElems.get(pos);
-   }
-
-   /**
-    * Effects: Removes the SwitchElement at position <pos>.  Throws an
-    * IndexOutOfBoundsException if <pos> is not valid.
-    */
-   public void removeSwitchElement(int pos) {
-      switchElems.remove(pos);
    }
 
    /**
@@ -305,7 +310,7 @@ public class SwitchStatement extends Statement
     List newSwitchElems = new ArrayList ( switchElems.size() );
 
     for (ListIterator it = switchElems.listIterator(); it.hasNext(); ) {
-      SwitchElement se = (SwitchElement) it.next();
+      SwitchElement se = (SwitchElement)((SwitchElement) it.next()).visit( v );
       newSwitchElems.add ( se ) ;      
     }
 
