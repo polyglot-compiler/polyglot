@@ -566,7 +566,7 @@ public interface TypeSystem {
 
     /**
      * Get the list of methods <code>mi</code> (potentially) overrides, in
-     * order from this class (i.e., including <code>this</code>) to super
+     * order from this class (that is, including <code>this</code>) to super
      * classes.
      */
     List overrides(MethodInstance mi);
@@ -646,7 +646,7 @@ public interface TypeSystem {
 
     /**
      * Assert that <code>ct</code> implements all abstract methods that it 
-     * has to, i.e. if it is a concrete class, then it must implement all
+     * has to; that is, if it is a concrete class, then it must implement all
      * interfaces and abstract methods that it or its superclasses declare.
      */
     public void checkClassConformance(ClassType ct) throws SemanticException;

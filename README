@@ -136,18 +136,18 @@ Add $POLYGLOT/bin to your PATH environment variable.  Add $POLYGLOT/classes
 for instructions on building an extension.  See the instructions earlier in
 this file for how to use the compiler.
 
-Credits
--------
+Credits and Acknowledgments
+---------------------------
 
 The current Polyglot developers are:
 
         Nathaniel Nystrom
         Michael Clarkson
         Stephen Chong
-        Andrew C. Myers
 
-Other Polyglot contributers:
+Past contributors include:
 
+	Michael Brukman
         Matt Harren
         Aleksey Kliger
         Naveen Sastry
@@ -155,11 +155,17 @@ Other Polyglot contributers:
         Steve Zdancewic
         Lantian Zheng
 
-Michael Brukman and Andrew Myers wrote the PPG parser generator.
+The Polyglot project group is supervised by Prof. Andrew Myers at the
+Cornell University Computer Science Department.
 
 The Polyglot class file parsing code (src/polyglot/types/reflect) is derived
 from the BLOAT bytecode optimizer written by Nathaniel Nystrom, David Whitlock,
 and Antony Hosking at Purdue.  See http://www.cs.purdue.edu/s3/projects/bloat/.
+
+The development of the Polyglot project has been supported by a number
+of funding sources, including DARPA Contract F30602-99-1-0533, monitored
+by USAF Rome Laboratory, ONR Grant N00014-01-1-0968, NSF Grant 0208642,
+an NSF CAREER award, and an Alfred P.\@ Sloan Research Fellowship.
 
 Restrictions on distribution
 ----------------------------
@@ -182,7 +188,6 @@ Lesser General Public License for more details.
 
 A copy of the GNU Lesser General Public License can be found in the file
 LICENSE, included in this distribution.
-
 
 CUP Parser Generator Copyright Notice, License, and Disclaimer
 ---------------------------------------------------------------

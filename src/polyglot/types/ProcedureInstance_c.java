@@ -78,14 +78,13 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 
 
     /**
-     * Returns whether this is <i>more specific</i> than p,
-     * where <i>more specific</i> is defined as JLS 15.12.2.2
-     * <p>
-     * Note: There is a fair amount of guesswork since the JLS does not
-     * include any info regarding java 1.2, so all inner class rules are
-     * found empirically using jikes and javac.
-     *
-     * Note: java 1.2 rule is described in JLS2 in section 15.12.2.2
+     * Returns whether <code>this</code> is <i>more specific</i> than
+     * <code>p</code>, where <i>more specific</i> is defined as JLS
+     * 15.12.2.2.
+     *<p>
+     * <b>Note:</b> There is a fair amount of guesswork since the JLS
+     * does not include any info regarding Java 1.2, so all inner class
+     * rules are found empirically using jikes and javac.
      */
     public boolean moreSpecificImpl(ProcedureInstance p) {
         ProcedureInstance p1 = this;
