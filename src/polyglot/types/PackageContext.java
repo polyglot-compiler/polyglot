@@ -40,6 +40,18 @@ public class PackageContext implements TypeContext {
 	    "getTypeByName: cannot lookup qualified name");
     }
 
-    return resolver.findClass(type.getTypeString() + "." + name);
+    try {
+	return resolver.findClass(type.getTypeString() + "." + name);
+    }
+    catch (SemanticException e) {
+	try {
+	    resolver.findPackage(type.getTypeString() + "." + name);
+	    return new PackageType(type.getTypeSystem(), type, name);
+	}
+	catch (NoClassException e2) {
+	  throw new SemanticException("Package " + type.getTypeString() +
+				      "." + name + " not found");
+	}
+    }
   }
 }
