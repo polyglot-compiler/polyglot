@@ -113,7 +113,7 @@ public class New_c extends Expr_c implements New
 	return this;
     }
 
-    /** Visit the children of the expression, except the body. */
+    /** Visit the children of the expression. */
     public Node visitChildren(NodeVisitor v) {
 	Expr qualifier = (Expr) visitChild(this.qualifier, v);
 	TypeNode tn = (TypeNode) visitChild(this.tn, v);
