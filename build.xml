@@ -544,7 +544,7 @@ ext=""
 
     <copy todir="${dist}/src/polyglot/ext/pao">
       <fileset dir="${src}/polyglot/ext/pao"
-        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
+        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/***.results"/>
     </copy>
 
     <copy file="${src}/polyglot/ext/pao/tests/paoc"
@@ -561,14 +561,14 @@ ext=""
   <target name="param-dist" depends="jl-dist">
     <copy todir="${dist}/src/polyglot/ext/param">
       <fileset dir="${src}/polyglot/ext/param"
-        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
+        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/***.results"/>
     </copy>
   </target>
 
   <target name="skel-dist" depends="jl-dist">
     <copy todir="${dist}/src/polyglot/ext/skel">
       <fileset dir="${src}/polyglot/ext/skel"
-        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
+        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/***.results"/>
     </copy>
 
     <copy file="${src}/polyglot/ext/newext" todir="${dist}/src/polyglot/ext"/>
@@ -580,7 +580,7 @@ ext=""
 
     <copy todir="${dist}/src/polyglot/ext/coffer">
       <fileset dir="${src}/polyglot/ext/coffer"
-        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
+        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/***.results"/>
     </copy>
 
     <copy file="${src}/polyglot/ext/coffer/tests/cofferc"
@@ -600,7 +600,7 @@ ext=""
 
     <copy todir="${dist}/src/polyglot/ext/jl" includeEmptyDirs="false">
       <fileset dir="${src}/polyglot/ext/jl"
-        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
+        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/***.results"/>
     </copy>
 
     <copy todir="${dist}/src/polyglot/frontend" includeEmptyDirs="false">
@@ -637,7 +637,7 @@ ext=""
 
     <copy todir="${dist}/src/ppg" includeEmptyDirs="false">
       <fileset dir="${src}/ppg"
-        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class"/>
+        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/***.results"/>
     </copy>
 
     <copy todir="${dist}/src/polyglot/ext/jl/tests" file="${src}/polyglot/ext/jl/tests/Makefile"/>
