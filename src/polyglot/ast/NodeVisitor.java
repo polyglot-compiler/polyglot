@@ -73,6 +73,16 @@ public abstract class NodeVisitor
     }
 
     /**
+     * The begin method is called before the entire tree is visited.
+     * This method allows the visitor to perform any initialization
+     * that cannot be done when the visitor is created.
+     * If <code>false</code> is returned, the ast is not traversed.
+     */
+    public boolean begin() {
+        return true;
+    }
+
+    /**
      * The finish method is called after the entire tree has been visited.
      * This method allows the visitor to perform any last minute cleanup,
      * including flushing buffers and I/O connections.
