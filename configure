@@ -91,7 +91,10 @@ echo current directory is ${CWD}
 
 JAVA_HOME=`"${JAVA}" -cp . PrintProperty java.home | escape`
 if [ -f "${JAVA_HOME}/lib/rt.jar" ]; then
-    JAVA_HOME=`dirname ${JAVA_HOME}`
+    if [ -n `uname|grep "CYGWIN"` ]; then
+    	JAVA_HOME=`cygpath -u ${JAVA_HOME}`
+    fi
+    JAVA_HOME=`dirname "${JAVA_HOME}"`
 fi
 echo Java home directory is ${JAVA_HOME}
 
