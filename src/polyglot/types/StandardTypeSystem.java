@@ -26,10 +26,12 @@ public class StandardTypeSystem extends TypeSystem {
    * Initializes the type system and its internal constants (which depend on
    * the resolver).
    */
-  public void initializeTypeSystem( ClassResolver resolver) 
+  public void initializeTypeSystem( ClassResolver resolver, 
+                                    ClassCleaner cleaner) 
     throws SemanticException
   {
     this.resolver = resolver;
+    this.cleaner = cleaner;
     this.emptyResolver = new CompoundClassResolver();
 
     OBJECT_ = resolver.findClass( "java.lang.Object");
@@ -669,6 +671,21 @@ public class StandardTypeSystem extends TypeSystem {
     if (result == null)
       throw new SemanticException( "Field \"" + name + "\" not found");
     // ah ha! we have a type. to work against.
+    if (rest.length() == 0)
+      throw new SemanticException( "Field \"" + name + "\" not fount");
+
+    // We must make sure this class is clean before we start looking for 
+    // fields in it and its supertypes.
+    try {
+      if( !cleaner.cleanClass( result)) {
+        throw new SemanticException( "Field \"" + name + "\" not found.");
+      }
+    }
+    catch( java.io.IOException e)
+    {
+      throw new SemanticException( "Field \"" + name + "\" not found.");
+    }
+
     return getField ( result, rest, context );
     
   }
@@ -1023,6 +1040,7 @@ public class StandardTypeSystem extends TypeSystem {
   private Type SERIALIZABLE_;
   
   protected ClassResolver resolver; //Should do its own caching.
+  protected ClassCleaner cleaner;
   protected ClassResolver emptyResolver;
 
   /**

@@ -44,7 +44,8 @@ public abstract class TypeSystem {
   /**
    * performs any initizlation necessary that requries resolvers.
    */
-  public abstract void initializeTypeSystem( ClassResolver resolver)
+  public abstract void initializeTypeSystem( ClassResolver resolver,
+                                             ClassCleaner cleaner)
     throws SemanticException;
 
   ////

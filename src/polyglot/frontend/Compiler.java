@@ -152,7 +152,7 @@ public class Compiler implements TargetTable, ClassCleaner
     
     try
     {
-      ts.initializeTypeSystem( systemResolver);
+      ts.initializeTypeSystem( systemResolver, new Compiler( null));
     }
     catch( SemanticException e)
     {
@@ -372,7 +372,7 @@ public class Compiler implements TargetTable, ClassCleaner
         releaseJob( job);
       }
 
-      if( goal == DISAMBIGUATED) { return true; }
+      if( goal == DISAMBIGUATED) { return true; } 
 
       /* Okay. Before we can type check, we need to make sure that everyone
        * else in the worklist is at least CLEAN. */
@@ -384,7 +384,7 @@ public class Compiler implements TargetTable, ClassCleaner
       if( !okay) {
         return false;
       }
-      
+     
       /* CHECK. */
       if( (job.status & CHECKED) == 0) {
         acquireJob( job);
