@@ -290,13 +290,16 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         ConstructorInstance ci = ts.defaultConstructor(position(), this.type);
         this.type.addConstructor(ci);
         Block block = null;
-        if (this.type.superType() == null) {
-            block = nf.Block(position());
+        if (this.type.superType() instanceof ClassType) {
+            ConstructorInstance sci = ts.defaultConstructor(position(),
+                                                (ClassType) this.type.superType());
+            ConstructorCall cc = nf.SuperCall(position(), 
+                                              Collections.EMPTY_LIST);
+            cc = cc.constructorInstance(sci);
+            block = nf.Block(position(), cc);
         }
         else {
-            block = nf.Block(position(),
-                            nf.SuperCall(position(), 
-                                         Collections.EMPTY_LIST));
+            block = nf.Block(position());
         }
         ConstructorDecl cd = nf.ConstructorDecl(position(), Flags.PUBLIC,
                                                 name, Collections.EMPTY_LIST,
