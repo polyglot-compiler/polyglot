@@ -13,7 +13,7 @@ import polyglot.visit.*;
 import java.util.*;
 
 /**
- * Visitor which checks that all statements must be reachable
+ * Data flow analysis to compute and check held key sets.
  */
 public class KeyChecker extends DataFlow
 {
