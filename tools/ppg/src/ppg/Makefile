@@ -8,7 +8,10 @@ SOURCES = JLgen.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
-all: $(CLASSES)
+$(SOURCE)/classes:
+	mkdir $(SOURCE)/classes
+
+all: $(CLASSES) $(SOURCE)/classes
 	$(subdirs)
 
 release: release_src
