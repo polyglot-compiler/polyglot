@@ -20,8 +20,8 @@ public class Main
 
   final static String verbose = "verbose";
 
-  private List args;
-  protected ExtensionInfo getExtensionInfo() {
+  /* modifies args */
+  protected ExtensionInfo getExtensionInfo(List args) {
       ExtensionInfo ext = null;
       
       for (Iterator i = args.iterator(); i.hasNext(); ) {
@@ -67,15 +67,16 @@ public class Main
   
   protected void start(String[] argv) {
       source = new HashSet();  
-      this.args = new ArrayList(Arrays.asList(argv));
-      ExtensionInfo ext = getExtensionInfo();
+      List args = new ArrayList(Arrays.asList(argv));
+      ExtensionInfo ext = getExtensionInfo(args);
       Options options = ext.getOptions();
       
       // Allow all objects to get access to the Options object. This hack should
       // be fixed somehow. XXX###@@@
       Options.global = options;
       try {
-          options.parseCommandLine((String[])args.toArray(new String[0]), source);
+            argv = (String[]) args.toArray(new String[0]);
+          options.parseCommandLine(argv, source);
       }
       catch (UsageError ue) {
           PrintStream out = (ue.exitCode==0 ? System.out : System.err);
