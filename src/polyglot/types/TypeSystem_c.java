@@ -1536,6 +1536,11 @@ public class TypeSystem_c implements TypeSystem
 	    throw new SemanticException(
 		"Cannot declare method which is both abstract and final.");
         }
+
+        if (f.isAbstract() && f.isNative()) {
+	    throw new SemanticException(
+		"Cannot declare method which is both abstract and native.");
+        }
     }
 
     public void checkLocalFlags(Flags f) throws SemanticException {
