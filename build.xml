@@ -122,7 +122,7 @@ ext=""
   </target>
 
   <!-- compile the base compiler -->
-  <target name="all" depends="compile,bin" description="compile the source"/>
+  <target name="all" depends="compile" description="compile the source"/>
 
   <!-- compile the base compiler -->
   <target name="compile" depends="base,jl" description="compile the source"/>
@@ -326,7 +326,7 @@ ext=""
                file="${lexer.dir}/${lexer.class}.java"/>
   </target>
   
-  <target name="base" depends="compile-base">
+  <target name="base" depends="bin,compile-base">
   </target>
 
   <!-- Builds PPG -->
