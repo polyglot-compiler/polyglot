@@ -7,7 +7,6 @@ Distribution. Your installation directory contains the following sub-folders:
   - polyglot: the complete source code of Polyglot 0.9
   - doc: old documentation about writing Polyglot extensions
   - javadoc: Javadoc descriptions of Polyglot classes
-  - demo: Jif sample programs
   - images: Logos
 
 Disclaimer
@@ -42,54 +41,15 @@ Suppose <polyglot> is the absolute path of your Polyglot installation directory.
 -- Add "<polyglot>/bin" to your PATH environment variable or copy all the files
 in "<polyglot>/bin" to a directory in PATH.
 
--- [Jif only] Check your LD_LIBRARY_PATH environment variable on Unix systems,
-and your PATH environment variable on Windows systems. Make sure the value
-contains <polyglot>/lib.
-
 -- Update your CLASSPATH environment variable.
 
 On Unix, do:
 
-    CLASSPATH=$CLASSPATH:<polyglot>/lib/polyglot.jar:<polyglot>/lib/jif.jar:<polyglot>/lib/java_cup.jar
+    CLASSPATH=$CLASSPATH:<polyglot>/polyglot.jar:<polyglot>/ib/java_cup.jar
 
 On Windows, do:
 
-    set CLASSPATH=%CLASSPATH%;<polyglot>\lib\polyglot.jar;<polyglot>\lib\jif.jar;<polyglot>\lib\java_cup.jar
-
-3. [Jif only] Test Jif compiler
-
-First, you need to create some principals. In Jif, principals are represented
-by classes in the jif.principal package. Suppose <foo> is the directory you
-like to put the jif.principal package in, run:
-
-    ./bin/sampleusers <foo>
-    ./bin/localusers <foo>
-
-"sampleusers" is a utility to create some sample principals like Alice and
-Bob. "localusers" will generate Jif principals for users on your local
-machine. Make sure that <foo> is in your CLASSPATH environment variable.
-
-Go to the demo directory, run:
-
-    jif Hello.jif
-    java Hello
-
-If you see "Hello, the world!" printed on the screen, you have successfully
-installed Polyglot. Otherwise, make sure that you have followed every
-instruction in step 1 and 2. If you still cannot run the Hello demo, please
-contact the authors.
-
-For more information:
----------------------
-
-For information on how to run the Polyglot translator (jlc) from the command
-line, see the file README-JLC.txt
-
-For information on specific Java language extensions included with
-this release (e.g. Jif, PolyJ, etc.), see the appropriate README-*
-file in this directory.
-
-For information on rebuilding Polyglot, see the file src/README.
+    set CLASSPATH=%CLASSPATH%;<polyglot>\polyglot.jar;<polyglot>\java_cup.jar
 
 
 Restrictions on distribution

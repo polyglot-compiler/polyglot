@@ -78,7 +78,9 @@ export: javadoc
 	rm -rf release/polyglot/splitter
 	rm -rf release/polyglot/test
 	rm release/polyglot/bin/polyjc
+	rm release/polyglot/README-JIF.txt
 	rm -rf release/polyglot/classes
+	bin/jlc > release/polyglot/README-JLC.txt
 	cd release; jar cf polyglot-src.jar polyglot
 
 REL_SOURCES = \
