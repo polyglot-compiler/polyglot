@@ -171,20 +171,6 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 
 	if (type != null) {
 	    type.setMembersAdded(true);
-	   
-        /*
-         
-             Scheduler scheduler = tb.job().extensionInfo().scheduler();
-        
-	    scheduler.addDependency(new DisamSupertypesInFile(tb.job()),
-	                            new SuperTypesResolved(type));
-	    scheduler.addDependency(new DisamSignaturesInFile(tb.job()),
-	                            new AllMembersAdded(type));
-	    scheduler.addDependency(new DisamSignaturesInFile(tb.job()),
-	                            new SignaturesDisambiguated(type));
-                                
-                                */
-        
 	    ClassDecl_c n = (ClassDecl_c) type(type).flags(type.flags());
 	    return n.addDefaultConstructorIfNeeded(tb.typeSystem(), tb.nodeFactory());
         }
@@ -234,7 +220,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
             
             if (! supertypesResolved) {
                 Scheduler scheduler = ar.job().extensionInfo().scheduler();
-                scheduler.addConcurrentDependency(ar.goal(), new SupertypesResolved(type));
+                scheduler.addConcurrentDependency(ar.goal(), scheduler.SupertypesResolved(type));
 //                System.out.println("    not resolved");
             }
             else {            

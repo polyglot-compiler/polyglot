@@ -207,7 +207,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
             return;
         }
         
-        Goal g = new SupertypesResolved(this);
+        Goal g = scheduler.SupertypesResolved(this);
         try {
             boolean result = scheduler.attemptGoal(g);
         }
@@ -229,7 +229,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
             return;
         }
         
-        Goal g = new MembersAdded(this);
+        Goal g = scheduler.MembersAdded(this);
         try {
             boolean result = scheduler.attemptGoal(g);
         }
@@ -251,7 +251,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
             return;
         }
         
-        Goal g = new SignaturesResolved(this);
+        Goal g = scheduler.SignaturesResolved(this);
         try {
             boolean result = scheduler.attemptGoal(g);
         }
@@ -363,7 +363,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         
         if (! membersAdded()) {
             try {
-                scheduler.addPrerequisiteDependency(new AllMembersAdded(this), new MembersAdded(this));
+                scheduler.addPrerequisiteDependency(scheduler.AllMembersAdded(this), scheduler.MembersAdded(this));
             }
             catch (CyclicDependencyException e) {
                 throw new InternalCompilerError(e.getMessage());
@@ -373,7 +373,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         
         if (! supertypesResolved()) {
             try {
-                scheduler.addPrerequisiteDependency(new AllMembersAdded(this), new SupertypesResolved(this));
+                scheduler.addPrerequisiteDependency(scheduler.AllMembersAdded(this), scheduler.SupertypesResolved(this));
             }
             catch (CyclicDependencyException e) {
                 throw new InternalCompilerError(e.getMessage());
@@ -388,7 +388,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         if (superType instanceof ParsedClassType) {
             ParsedClassType superCT = (ParsedClassType) superType;
             if (! superCT.allMembersAdded()) {
-                scheduler.addConcurrentDependency(new AllMembersAdded(this), new AllMembersAdded(superCT));
+                scheduler.addConcurrentDependency(scheduler.AllMembersAdded(this), scheduler.AllMembersAdded(superCT));
                 return false;
             }
         }
@@ -398,7 +398,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
             if (t instanceof ParsedClassType) {
                 ParsedClassType superCT = (ParsedClassType) t;
                 if (! superCT.allMembersAdded()) {
-                    scheduler.addConcurrentDependency(new AllMembersAdded(this), new AllMembersAdded(superCT));
+                    scheduler.addConcurrentDependency(scheduler.AllMembersAdded(this), scheduler.AllMembersAdded(superCT));
                     return false;
                 }
             }
@@ -417,7 +417,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         
         if (! membersAdded()) {
             try {
-                scheduler.addPrerequisiteDependency(new SignaturesResolved(this), new MembersAdded(this));
+                scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this), scheduler.MembersAdded(this));
             }
             catch (CyclicDependencyException e) {
                 throw new InternalCompilerError(e.getMessage());

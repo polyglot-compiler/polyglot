@@ -236,9 +236,8 @@ public class TypeBuilder extends HaltingVisitor
      */
     private void satisfyTypeExistsGoal(ParsedClassType ct) {
         Scheduler scheduler = job().extensionInfo().scheduler();
-        TypeExists goal = new TypeExists(ct.fullName());
-        goal = (TypeExists) scheduler.internGoal(goal);
-        goal.setSatisfied();
+        TypeExists goal = (TypeExists) scheduler.TypeExists(ct.fullName());
+        goal.markReached();
     }
 
     public TypeBuilder pushAnonClass(Position pos) throws SemanticException {

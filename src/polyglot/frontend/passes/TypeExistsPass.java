@@ -27,7 +27,7 @@ public class TypeExistsPass extends ClassFilePass {
         String name = goal.typeName();
         try {
             Type t = ts.typeForName(name);
-            goal.setSatisfied();
+            goal.markReached();
         }
         catch (SemanticException e) {
             goal.setUnreachable();

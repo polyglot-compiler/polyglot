@@ -29,7 +29,6 @@ public interface ExtensionInfo {
      * The goal may have subgoals on which it depends.
      */
     Goal getCompileGoal(Job job);
-    Goal getReadFileGoal(Job job);
     
     /** 
      * Return an Options object, which will be given the command line to parse.

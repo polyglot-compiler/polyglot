@@ -101,41 +101,20 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
 	return new CupParser(parser, source, eq);
     }
     
-    /**
-     * Return the <code>Goal</code> to read the source file associated with
-     * <code>job</code> and initialize the symbol tables.
-     */
-    public Goal getReadFileGoal(Job job) {
-        try {
-            Goal parse = scheduler.internGoal(new Parsed(job));
-            Goal buildTypes = scheduler.internGoal(new TypesInitialized(job));
-        
-            buildTypes.addPrerequisiteGoal(parse);
-            return buildTypes;
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e.getMessage());
-        }
-    }
- 
     protected List compileGoalList(Job job) {
-        Goal parse = scheduler.internGoal(new Parsed(job));
-        Goal buildTypes = scheduler.internGoal(new TypesInitialized(job));
-        Goal buildTypesBarrier = scheduler.internGoal(new Barrier(scheduler) {
-            public Goal goalForJob(Job j) {
-                return new TypesInitialized(j);
-            }
-        });
-        Goal typeCheck = scheduler.internGoal(new TypeChecked(job));
-        Goal constCheck = scheduler.internGoal(new ConstantsCheckedForFile(job));
-        Goal reachCheck = scheduler.internGoal(new ReachabilityChecked(job));
-        Goal excCheck = scheduler.internGoal(new ExceptionsChecked(job));
-        Goal exitCheck = scheduler.internGoal(new ExitPathsChecked(job));
-        Goal initCheck = scheduler.internGoal(new InitializationsChecked(job));
-        Goal ctorCheck = scheduler.internGoal(new ConstructorCallsChecked(job));
-        Goal frefCheck = scheduler.internGoal(new ForwardReferencesChecked(job));
-        Goal serialize = scheduler.internGoal(new Serialized(job));
-        Goal output = scheduler.internGoal(new CodeGenerated(job));
+        Goal parse = scheduler.Parsed(job);
+        Goal buildTypes = scheduler.TypesInitialized(job);
+        Goal buildTypesBarrier = scheduler.TypesInitializedForCommandLine();
+        Goal typeCheck = scheduler.TypeChecked(job);
+        Goal constCheck = scheduler.ConstantsChecked(job);
+        Goal reachCheck = scheduler.ReachabilityChecked(job);
+        Goal excCheck = scheduler.ExceptionsChecked(job);
+        Goal exitCheck = scheduler.ExitPathsChecked(job);
+        Goal initCheck = scheduler.InitializationsChecked(job);
+        Goal ctorCheck = scheduler.ConstructorCallsChecked(job);
+        Goal frefCheck = scheduler.ForwardReferencesChecked(job);
+        Goal serialize = scheduler.Serialized(job);
+        Goal output = scheduler.CodeGenerated(job);
         
         List l = new ArrayList(15);
         

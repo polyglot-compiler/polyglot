@@ -247,7 +247,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
                    if (n instanceof Field) {
                        Field f = (Field) n;
                        if (! f.fieldInstance().constantValueSet()) {
-                           Goal g = new FieldConstantsChecked(f.fieldInstance());
+                           Goal g = scheduler.FieldConstantsChecked(f.fieldInstance());
                            try {
                                scheduler.addPrerequisiteDependency(ccgoal, g);
                            }

@@ -57,7 +57,8 @@ public class TypeChecked extends CyclicSourceFileGoal {
             if (! ct.signaturesResolved()) {
                 if (Report.should_report(TOPICS, 3))
                     Report.report(3, "  signatures for " + ct + " ambiguous");
-                job().extensionInfo().scheduler().addConcurrentDependency(this, new SignaturesResolved(ct));
+                Scheduler scheduler = job().extensionInfo().scheduler();
+                scheduler.addConcurrentDependency(this, scheduler.SignaturesResolved(ct));
                 return false;
             }
         }

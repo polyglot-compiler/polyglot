@@ -212,7 +212,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
                    if (n instanceof Field) {
                        Field f = (Field) n;
                        if (! f.fieldInstance().constantValueSet()) {
-                           Goal g = new FieldConstantsChecked(f.fieldInstance());
+                           Goal g = scheduler.FieldConstantsChecked(f.fieldInstance());
                            try {
                                scheduler.addPrerequisiteDependency(ccgoal, g);
                            }

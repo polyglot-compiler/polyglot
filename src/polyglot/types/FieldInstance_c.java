@@ -31,7 +31,7 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
         if (! constantValueSet) {
             Scheduler scheduler = typeSystem().extensionInfo().scheduler();
             try {
-                scheduler.addPrerequisiteDependency(scheduler.currentGoal(), new FieldConstantsChecked(this));
+                scheduler.addPrerequisiteDependency(scheduler.currentGoal(), scheduler.FieldConstantsChecked(this));
             }
             catch (CyclicDependencyException e) {
                 setNotConstant();

@@ -35,7 +35,7 @@ public class TypeExists extends AbstractGoal {
         return typeName;
     }
 
-    public void setSatisfied() {
+    public void markReached() {
         this.satisfied = true;
     }
     

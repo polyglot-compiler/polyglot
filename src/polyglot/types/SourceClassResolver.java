@@ -232,11 +232,11 @@ public class SourceClassResolver extends LoadedClassResolver
     boolean result = false;
     try {
         // Compile the source file just enough to get the type information out.
-        result = ext.scheduler().attemptGoal(new TypesInitialized(job));
+        result = ext.scheduler().attemptGoal(ext.scheduler(). TypesInitialized(job));
     }
     catch (CyclicDependencyException e) {
         ext.scheduler().addConcurrentDependency(ext.scheduler().currentGoal(),
-                                                new TypeExists(name));
+                                                ext.scheduler().TypeExists(name));
         throw new UnavailableTypeException(job, name);
     }
     
