@@ -21,7 +21,7 @@ public class ImportTable extends ClassResolver
     protected Resolver resolver;
     /** A list of all package imports. */
     protected List packageImports;
-    /** Map from names to classes found. */
+    /** Map from names to classes found, or to the NOT_FOUND object. */
     protected Map map;
     /** List of imports which will be lazily added to the table. */
     protected List lazyImports;
@@ -34,6 +34,8 @@ public class ImportTable extends ClassResolver
     /** Our package */
     protected Package pkg;
 
+    private static final Object NOT_FOUND = "NOT FOUND";
+    
     /**
      * Create an import table.
      * @param ts The type system
@@ -154,67 +156,77 @@ public class ImportTable extends ClassResolver
         Object res = map.get(name);
 
         if (res != null) {
+            if (res == NOT_FOUND) {
+                throw new NoClassException(name, sourcePos);
+            }
             return (Named) res;
         }
 
-        if (pkg != null) {
-            // check if the current package defines it.
-            // If so, this takes priority over the package imports (or 
-            // "type-import-on-demand" declarations as they are called in
-            // the JLS), so even if another package defines the same name,
-            // there is no conflict. See Section 6.5.2 of JLS, 2nd Ed.
-            Named n = findInPkg(name, pkg.fullName());
-            if (n != null) {
-                // Memoize the result.
-                map.put(name, n);
-                return n;
-            }
-        }
-
-        List imports = new ArrayList(packageImports.size() + 5);
-
-        imports.addAll(ts.defaultPackageImports());
-        imports.addAll(packageImports);
-
-        // It wasn't a ClassImport.  Maybe it was a PackageImport?
-        Named resolved = null;
-        for (Iterator iter = imports.iterator(); iter.hasNext(); ) {
-            String pkgName = (String) iter.next();
-            Named n = findInPkg(name, pkgName);
-            if (n != null) {
-                if (resolved == null) {
-                    // this is the first occurance of name we've found
-                    // in a package import.
-                    // Record it, and keep going, to see if there
-                    // are any conflicts.
-                    resolved = n;
-                }
-                else {
-                    // this is the 2nd occurance of name we've found
-                    // in an imported package.
-                    // That's bad.
-                    throw new SemanticException("Reference to \"" + 
-                            name + "\" is ambiguous; both " + 
-                            resolved.fullName() + " and " + n.fullName() + 
-                            " match.");
+        try {
+            if (pkg != null) {
+                // check if the current package defines it.
+                // If so, this takes priority over the package imports (or 
+                // "type-import-on-demand" declarations as they are called in
+                // the JLS), so even if another package defines the same name,
+                // there is no conflict. See Section 6.5.2 of JLS, 2nd Ed.
+                Named n = findInPkg(name, pkg.fullName());
+                if (n != null) {
+                    // Memoize the result.
+                    map.put(name, n);
+                    return n;
                 }
             }
-        }
-
-        if (resolved == null) {
-            // The name was short, but not in any imported class or package.
-            // Check the null package.
-            resolved = resolver.find(name); // may throw exception
-    
-            if (!isVisibleFrom(resolved, "")) {
-                // Not visible.
-                throw new NoClassException(name, sourcePos);
+            
+            List imports = new ArrayList(packageImports.size() + 5);
+            
+            imports.addAll(ts.defaultPackageImports());
+            imports.addAll(packageImports);
+            
+            // It wasn't a ClassImport.  Maybe it was a PackageImport?
+            Named resolved = null;
+            for (Iterator iter = imports.iterator(); iter.hasNext(); ) {
+                String pkgName = (String) iter.next();
+                Named n = findInPkg(name, pkgName);
+                if (n != null) {
+                    if (resolved == null) {
+                        // this is the first occurance of name we've found
+                        // in a package import.
+                        // Record it, and keep going, to see if there
+                        // are any conflicts.
+                        resolved = n;
+                    }
+                    else {
+                        // this is the 2nd occurance of name we've found
+                        // in an imported package.
+                        // That's bad.
+                        throw new SemanticException("Reference to \"" + 
+                                name + "\" is ambiguous; both " + 
+                                resolved.fullName() + " and " + n.fullName() + 
+                                " match.");
+                    }
+                }
             }
+            
+            if (resolved == null) {
+                // The name was short, but not in any imported class or package.
+                // Check the null package.
+                resolved = resolver.find(name); // may throw exception
+            
+                if (!isVisibleFrom(resolved, "")) {
+                    // Not visible.
+                    throw new NoClassException(name, sourcePos);
+                }
+            }
+            
+            // Memoize the result.
+            map.put(name, resolved);
+            return resolved;
         }
-        
-        // Memoize the result.
-        map.put(name, resolved);
-        return resolved;
+        catch (NoClassException e) {
+            // memoize the no class exception
+            map.put(name, NOT_FOUND);
+            throw e;
+        }
     }
     
     protected Named findInPkg(String name, String pkgName) throws SemanticException {
