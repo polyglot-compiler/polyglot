@@ -31,10 +31,18 @@ public interface NodeVisitor {
   // Statements
   public Node visitBlockStatement(BlockStatement bs);  
   public Node visitExpressionStatement(ExpressionStatement es);
+  public Node visitVariableDeclarationStatement(VariableDeclarationStatement vs);
+  public Node visitReturnStatement(ReturnStatement re);
+  public Node visitThrowStatement(ThrowStatement ts);
+  public Node visitIfStatement(IfStatement is);
+  public Node visitWhileStatement(WhileStatement ws);
+  public Node visitDoStatement(DoStatement ds);
 
   // Expressions
   public Node visitNullLiteral(NullLiteral nl);
   public Node visitStringLiteral(StringLiteral sl);
+  public Node visitIntLiteral(IntLiteral il);
+  public Node visitFloatLiteral(FloatLiteral fl);
   
   public Node visitCastExpression(CastExpression ce);
   public Node visitUnaryExpression(UnaryExpression ue);
@@ -44,7 +52,7 @@ public interface NodeVisitor {
   public Node visitLocalVariableExpression(LocalVariableExpression ve);
   public Node visitNewArrayExpression(NewArrayExpression ae);
  
+  public Node visitInstanceofExpression(InstanceofExpression ie);
+    
 	 
 }
-
-

@@ -24,6 +24,36 @@ public class NullVisitor implements NodeVisitor {
     return es;
   }
 
+  public Node visitVariableDeclarationStatement(VariableDeclarationStatement v)
+  {
+    v.visitChildren(this);
+    return v;
+  }
+
+  public Node visitReturnStatement(ReturnStatement rs) {
+    rs.visitChildren(this);
+    return rs;
+  }
+
+  public Node visitThrowStatement(ThrowStatement ts) {
+    ts.visitChildren(this);
+    return ts;
+  }
+
+  public Node visitIfStatement(IfStatement is) {
+    is.visitChildren(this);
+    return is;
+  }
+
+  public Node visitWhileStatement(WhileStatement ws) {
+    ws.visitChildren(this);
+    return ws;
+  }
+
+  public Node visitDoStatement(DoStatement ds) {
+    ds.visitChildren(this);
+  }
+
   // Expressions
   public Node visitNullLiteral(NullLiteral nl) {
     return nl;
@@ -31,6 +61,14 @@ public class NullVisitor implements NodeVisitor {
 
   public Node visitStringLiteral(StringLiteral sl) {
     return sl;
+  }
+
+  public Node visitIntLiteral(IntLiteral il) {
+    return il;
+  }
+
+  public Node visitFloatLiteral(FloatLiteral fl) {
+    return fl;
   }
 
   public Node visitCastExpression(CastExpression ce) {
@@ -62,7 +100,9 @@ public class NullVisitor implements NodeVisitor {
     return ae;
   }
 
-  
+  public Node visitInstanceofExpression(InstanceofExpression ie) {
+    ie.visitChildren(this);
+    return ie;
+  }
+
 }
-
-
