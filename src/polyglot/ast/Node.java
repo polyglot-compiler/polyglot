@@ -63,6 +63,18 @@ public abstract class Node extends AnnotatedObject {
     }
   }
 
+    /**
+     * The extension object for this node.
+     */
+    public Object ext;
+
+    /**
+     * Determines whether this node has an extension object.
+     */
+    public boolean isExtended() {
+	return ext == null;
+    }
+
   /**
    * Defines the fashion in which the AST traversed. That is, each node 
    * should override this method and call <code>visit</code> on each of its
