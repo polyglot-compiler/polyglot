@@ -108,6 +108,15 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
         return n.constructorInstance(ci);
     }
 
+    // The arguments are evaluated in static scope.
+    public void enterScope(Context c) {
+        c.pushStatic(true);
+    }
+   
+    public void leaveScope(Context c) {
+        c.popStatic();
+    }
+
     /** Type check the call. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
@@ -146,6 +155,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
             ClassType qct = qt.toClass();
             ClassType superType = ct.superType().toClass();
 
+            /*
             boolean found = false;
 
             // Check if ct or a supertype of ct is an member of qct.
@@ -170,6 +180,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
                                             "\" is not a member of \"" + qt +
                                             "\".", position());
             }
+            */
         }
 
 	if (kind == SUPER) {
