@@ -24,14 +24,14 @@ public class ExceptionChecker extends ErrorHandlingVisitor
     public ExceptionChecker(Job job, TypeSystem ts, NodeFactory nf) {
 	super(job, ts, nf);
 	this.outer = null;
-        this.scope = new SubtypeSet(ts);
+        this.scope = new SubtypeSet(ts.Throwable());
         this.exceptionPositions = new HashMap();
     }
 
     public ExceptionChecker push() {
         ExceptionChecker ec = (ExceptionChecker) copy();
         ec.outer = this;
-        ec.scope = new SubtypeSet(ts);
+        ec.scope = new SubtypeSet(ts.Throwable());
         ec.exceptionPositions = new HashMap();
         return ec;
     }

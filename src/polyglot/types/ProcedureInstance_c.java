@@ -144,8 +144,8 @@ public abstract class ProcedureInstance_c extends TypeObject_c
     /** Returns true iff <code>this</code> throws fewer exceptions than
      * <code>p</code>. */
     public boolean throwsSubsetImpl(ProcedureInstance p) {
-        SubtypeSet s1 = new SubtypeSet(ts);
-        SubtypeSet s2 = new SubtypeSet(ts);
+        SubtypeSet s1 = new SubtypeSet(ts.Throwable());
+        SubtypeSet s2 = new SubtypeSet(ts.Throwable());
 
         s1.addAll(this.throwTypes());
         s2.addAll(p.throwTypes());

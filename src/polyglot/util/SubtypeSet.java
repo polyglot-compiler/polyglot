@@ -17,13 +17,19 @@ public class SubtypeSet implements java.util.Set
 {
     Vector v; 
     TypeSystem ts;
+    Type topType;  // Everything in the set must be a subtype of topType.
 
     /**
      * Creates an empty SubtypeSet
      */
     public SubtypeSet(TypeSystem ts) {
+	this(ts.Object());
+    }
+
+    public SubtypeSet(Type top) {
 	v = new Vector();
-        this.ts = ts;
+        this.ts = top.typeSystem();
+	this.topType = top;
     }
 
     /**
@@ -32,10 +38,16 @@ public class SubtypeSet implements java.util.Set
     public SubtypeSet(SubtypeSet s) {
       v = new Vector(s.v);
       ts = s.ts;
+      topType = s.topType;
     }
 
     public SubtypeSet(TypeSystem ts, Collection c) {
       this(ts);
+      addAll(c);
+    }
+
+    public SubtypeSet(Type top, Collection c) {
+      this(top);
       addAll(c);
     }
 
@@ -54,7 +66,7 @@ public class SubtypeSet implements java.util.Set
 	if (o instanceof Type) {
 	    Type type = (Type) o;
 
-	    if (type.isThrowable()) {
+	    if (ts.isSubtype(type, topType)) {
 		boolean haveToAdd = true;
 
 		for (Iterator i = v.iterator(); i.hasNext(); ) {
@@ -79,7 +91,7 @@ public class SubtypeSet implements java.util.Set
 	}
 
 	throw new InternalCompilerError(
-	      "Can only add Throwables to the set. Got a " + o);
+	      "Can only add " + topType + "s to the set. Got a " + o);
     }
 
     /**

@@ -110,7 +110,7 @@ public class Try_c extends Stmt_c implements Try
 	Block tryBlock = (Block) visitChild(this.tryBlock, ec);
 	// First, get exceptions from the try block.
 	SubtypeSet thrown = ec.throwsSet(); 
-        SubtypeSet caught = new SubtypeSet(ts);
+        SubtypeSet caught = new SubtypeSet(ts.Throwable());
         ec = ec.pop();
 
 	// Add the unchecked exceptions.
