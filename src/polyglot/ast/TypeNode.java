@@ -9,6 +9,5 @@ import jltools.types.SemanticException;
  */
 public interface TypeNode extends Receiver, QualifierNode
 {
-    Type type();
     TypeNode type(Type type);
 }

@@ -47,7 +47,6 @@ PACKAGES = \
 	jltools.frontend \
 	jltools.lex \
 	jltools.main \
-	jltools.parse \
 	jltools.types \
 	jltools.util \
 	jltools.visit \

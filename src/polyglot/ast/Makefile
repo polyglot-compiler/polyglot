@@ -80,6 +80,7 @@ SOURCES = \
 	Throw.java \
 	TopLevelDecl.java \
 	Try.java \
+	Typed.java \
 	TypeNode.java \
 	Unary.java \
 	While.java

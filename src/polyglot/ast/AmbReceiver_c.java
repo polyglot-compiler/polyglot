@@ -11,9 +11,15 @@ import jltools.util.*;
  */
 public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver
 {
+	protected Type type;
+
     public AmbReceiver_c(Ext ext, Position pos, Prefix prefix, String name) {
 	super(ext, pos, prefix, name);
     }
+
+	public Type type() {
+		return this.type;
+	}
 
     /** Disambiguate the receiver. */
     public Node disambiguateOverride_(AmbiguityRemover ar)

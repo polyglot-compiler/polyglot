@@ -5,6 +5,6 @@ package jltools.ast;
  * receiver of a method or of a field access.  Usually, this is just
  * expressions and types.
  */
-public interface Receiver extends Prefix
+public interface Receiver extends Prefix, Typed
 {
 }
