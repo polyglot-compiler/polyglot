@@ -48,6 +48,70 @@ BadExtends.jl:3: Cannot extend final class "C0".
          ^
 
 1 error.
+BadFinalInit1.jl:4: Local variable "i" may not have been initialized
+	int j = i + 1; // bad: no initialization of final variable
+	        ^
+
+1 error.
+BadFinalInit2.jl:5: variable "i" might already have been assigned to
+	i = 2; // bad: i might have already been assigned to.
+	^
+
+1 error.
+BadFinalInit3.jl:7: variable "i" might already have been assigned to
+	i = 2; // bad: i might have already been assigned to.
+	^
+
+1 error.
+BadFinalInit4.jl:4: variable "i" might already have been assigned to
+	    i = 1; // bad: i might have already been assigned to, as it is a formal
+	    ^
+
+1 error.
+BadFinalInit5.jl:3: variable "i" might not have been initialized
+    BadFinalInit5() {
+                    ^
+
+1 error.
+BadFinalInit6.jl:5: variable "i" might already have been assigned to
+	i = 4; // bad: more than one assignment to i.
+	^
+
+1 error.
+BadFinalInit7.jl:8: cannot assign a value to final variable "i"
+	i = 4; // bad: assignment to final field outside of constructor
+	^
+
+1 error.
+BadFinalInit8.jl:4: variable "i" might already have been assigned to
+	i = 4; // bad: more than one assignment to i.
+	^
+
+1 error.
+BadFinalInit9.jl:4: variable "i" might already have been assigned to
+	i = 4; // Bad
+	^
+
+1 error.
+BadFinalInit10.jl:4: variable "i" might already have been assigned to
+	i = 2; // Bad
+	^
+
+1 error.
+c:\data\compext\polyglot\polyglot\ext\jl\tests\BadFinalInit11.java:6: variable i might already have been assigned to
+        this.i = 2;
+        ^
+1 error
+BadFinalInit12.jl:5: cannot assign a value to final variable "x"
+	a.x = 0; // bad, even though a is a synonym for this, only acceptable target is this.
+	^
+
+1 error.
+BadFinalInit13.jl:1: variable "x" might not have been initialized
+class BadFinalInit13 {
+^
+
+1 error.
 BadInit.jl:4: Method no_such_fn not found.
     int a = no_such_fn();
             ^

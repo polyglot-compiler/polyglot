@@ -10,6 +10,12 @@ GOOD =  \
 	Except4.jl \
 	Except.jl \
 	FieldAccess.jl \
+	FinalInit1.jl \
+	FinalInit2.jl \
+	FinalInit3.jl \
+	FinalInit4.jl \
+	FinalInit5.jl \
+	FinalInit6.jl \
 	ForwardRef2.jl \
 	ForwardRef3.jl \
 	ForwardRef.jl \
@@ -50,6 +56,19 @@ BAD = \
 	BadExcept.jl \
 	BadExpCC.jl \
 	BadExtends.jl \
+	BadFinalInit1.jl \
+	BadFinalInit2.jl \
+	BadFinalInit3.jl \
+	BadFinalInit4.jl \
+	BadFinalInit5.jl \
+	BadFinalInit6.jl \
+	BadFinalInit7.jl \
+	BadFinalInit8.jl \
+	BadFinalInit9.jl \
+	BadFinalInit10.jl \
+	BadFinalInit11.jl \
+	BadFinalInit12.jl \
+	BadFinalInit13.jl \
 	BadForwardRef.jl \
 	BadInit.jl \
 	BadInner2.jl \
