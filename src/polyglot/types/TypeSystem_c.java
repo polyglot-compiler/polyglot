@@ -88,8 +88,13 @@ public class TypeSystem_c implements TypeSystem
         return loadedResolver;
     }
 
-    public ImportTable importTable(Source source, Package pkg) {
-        return new ImportTable(this, systemResolver, source, pkg);
+
+    public ImportTable importTable(String sourceName, Package pkg) {
+        return new ImportTable(this, systemResolver, pkg, sourceName);
+    }
+
+    public ImportTable importTable(Package pkg) {
+        return new ImportTable(this, systemResolver, pkg);
     }
 
     public String wrapperTypeString(PrimitiveType t) {

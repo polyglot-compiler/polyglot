@@ -63,6 +63,11 @@ public interface Context extends Resolver
     /** Get import table currently in scope. */
     ImportTable importTable();
 
+    /** Get the outer-most resolver for the source file currently in scope.
+     * This is usually just the import table.
+     */
+    Resolver outerResolver();
+
     /** Enter the scope of a source file. */
     void pushSource(ImportTable it);
 

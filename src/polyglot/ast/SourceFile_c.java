@@ -119,10 +119,10 @@ public class SourceFile_c extends Node_c implements SourceFile
         ImportTable it;
 
         if (package_ != null) {
-            it = ts.importTable(source, package_.package_());
+            it = ts.importTable(source.name(), package_.package_());
 	}
 	else {
-            it = ts.importTable(source, null);
+            it = ts.importTable(source.name(), null);
 	}
 
         tb.setImportTable(it);

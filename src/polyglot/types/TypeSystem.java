@@ -28,7 +28,10 @@ public interface TypeSystem {
     LoadedClassResolver loadedResolver();
 
     /** Create an import table for the source file. */
-    ImportTable importTable(Source source, Package pkg);
+    ImportTable importTable(String sourceName, Package pkg);
+
+    /** Create an import table for the source file. */
+    ImportTable importTable(Package pkg);
 
     /**
      * Return a list of the packages names that will be imported by

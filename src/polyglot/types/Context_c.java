@@ -30,9 +30,18 @@ public class Context_c implements Context
 	this.ts = ts;
 	scopes = new Stack();
 	scopes.push(new OuterMark());
+        this.it = null;
     }
 
     public TypeSystem typeSystem() { return ts; }
+
+    public Resolver outerResolver() {
+        if (it != null) {
+            return it;
+        }
+        return ts.systemResolver();
+    }
+
     public ImportTable importTable() { return it; }
 
     /**
@@ -261,7 +270,7 @@ public class Context_c implements Context
 	    }
 	}
 
-	return it.findType(name);
+        return outerResolver().findType(name);
     }
 
     /** Return the mark at the top of the stack. */
