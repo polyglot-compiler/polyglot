@@ -1,0 +1,127 @@
+Introduction
+------------
+
+Jltools is an extensible Java compiler toolkit designed for experimentation
+with new language extensions.
+
+The base jltools compiler, jlc, is a mostly-complete Java frontend; that is, it
+parses and performs semantic checking on Java source code.  The compiler
+outputs Java source code.  Thus, the base compiler implements the identity
+translation.
+
+Language extensions are implemented on top of the base compiler by extending
+the concrete and abstract syntax and the type system.  Ideally, after type
+checking the language extension, the AST is translated into a Java AST and the
+existing code is output into a Java source file which can then be compiled with
+javac.  For historical reasons, most extensions just override some portions of
+the Java output code to handle the extended syntax of the particular language
+extension being compiled.  We are currently reworkng the compiler to make it
+easier to rewrite a language extension's AST into a Java AST.
+
+Source code overview
+--------------------
+
+All jltools code is in the package jltools.  The subpackages are as follows:
+
+ast - contains the AST node interface files.  All AST nodes implement the
+jltools.ast.Node interface.
+
+types - contains the type system interface.
+
+types/reflect - contains class file parsing code.
+
+visit - contains visitor classes which iterate over abstract syntax trees.
+
+frontend - contains compiler pass scheduling code.
+
+main - contains the code for the main method of the compiler in the class
+jltools.main.Main.  It includes code for parsing command line options and for
+debug output.
+
+util - contains utility code.  This includes the parser generator in
+util/jlgen.
+
+lex - contains some lexer utility code.
+
+parse - contains some parser utility code.
+
+ext - contains the code for the language extensions.  Source code for a
+language extension lives in the package jltools.ext.<ext-name>.  The default
+language extension is the "jl" extension which implements Java parsing and type
+checking.  Extensions are usually implemented by inheriting from the "jl"
+extension code.  Extensions usually have the following subpackages:
+
+	ext.<ext-name>.ast - AST nodes specific to the extension
+	ext.<ext-name>.types - type checking code specific to the extension
+	ext.<ext-name>.visit - visitors specific to the extension
+	ext.<ext-name>.parse - the parser for the language extension
+
+In addition, an extension must define the class ext.<ext-name>.ExtensionInfo,
+which contains the objects which define how the language is to be parsed
+and type checked.
+
+AST nodes and node extensions
+-----------------------------
+
+To allow for greated flexibility in overriding the behaviour of an AST node,
+each node has a pointer to an extension object.  Extension objects are useful
+for adding a field or a method to many different AST nodes.  They provide
+functionality similar to mixins.
+
+In order for the extension object to override the AST node, most calls to the
+AST node object should be dispatched through the extension object.  The default
+extension object of every AST node just calls the corresponding method in the
+AST node.
+
+So for instance, to invoke the typeCheck() method on an AST node n, we do:
+
+	n.ext().typeCheck(type_checker);
+
+instead of directly calling:
+
+	n.typeCheck_(type_checker);
+
+Note that we suffix methods which should not be called directly with an "_" as
+a reminder.  Unfortuneately, these methods must be declared public since
+extension object classes usually live in a different package than the AST node
+classes.
+
+Writing an extension
+--------------------
+
+This is an attempt to guide you through creating an extension.  We'll use the
+Object Primitive (OP) extension for pedagogical purposes.  This extends Java
+with the ability to use primitive types (e.g., int, float) as Objects.  For
+instance, we can do:
+
+    Map m = new HashMap();
+    m.put(1, 2);
+    int x = (int) m.get(1);
+
+The changes to Java needed to support this feature are quite minimal.
+
+    1. We modify type checking so that primitive values may be
+    assigned to variables of type Object.
+
+    2. We modify the grammar to allow instanceof to operate on primitive types.
+
+    3. We insert casts into the AST so that javac will accept the output.
+
+To create an extension, the first step is to create a directory under
+jltools/ext.  In this case, jltools/ext/op.
+
+Next, we write a grammer file, op.jlg.  After a bunch of boiler plate code, we
+change the rule for instanceof.  FIXME: flesh this out.
+
+Next, we extend the type system "OPTypeSystem.java".  FIXME: flesh this out.
+
+We override type checking for instanceof.  FIXME: flesh this out.
+
+We override translation for instanceof and casts to box and unbox primitive
+types as necessary.  FIXME: flesh this out.
+
+We add a pass to insert explicit casts to Object when assigning a primitive to
+an object.  FIXME: flesh this out.
+
+ExtensionInfo.java.  FIXME: flesh this out.
+
