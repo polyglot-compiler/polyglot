@@ -146,10 +146,12 @@ good: $(GOOD)
 	cat /dev/null > good.log
 	$(MAKE) LOG=good.log $(GOOD_OUTPUT)
 	-(cd disamb_member; rm -f *.class)
-	(cd disamb_member; jlc -noserial CollectionsTester.jl) >> good.log 2>&1
-	-(cd package1; rm -f *.class)
-	jlc package1/InnerClassAccess.jl >> good.log 2>&1
 	-(cd recursive_serialize; rm -f *.class)
+	-(cd package1; rm -f *.class)
+	-(cd package2; rm -f *.class)
+	(cd disamb_member; jlc -noserial CollectionsTester.jl) >> good.log 2>&1
+	jlc package1/InnerClassAccess.jl >> good.log 2>&1
+	jlc package2/ProtectedCtorAccess.jl >> good.log 2>&1
 	(cd recursive_serialize; jlc Main.jl) >> good.log 2>&1
 	(cd recursive_serialize; jlc Main.jl) >> good.log 2>&1
 	@if cmp -s good.log.in good.log; then \
@@ -172,6 +174,9 @@ bad: $(BAD)
 	-rm -f $(BAD_OUTPUT) bad.log
 	cat /dev/null > bad.log
 	$(MAKE) LOG=bad.log $(BAD_OUTPUT)
+	-(cd package1; rm -f *.class)
+	-(cd package2; rm -f *.class)
+	jlc package2/BadProtectedCtorAccess.jl >> bad.log 2>&1
 	@if cmp -s bad.log.in bad.log; then \
 	    echo "LOG UNCHANGED"; \
 	    diff bad.log.in bad.log; \
