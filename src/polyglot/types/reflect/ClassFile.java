@@ -753,7 +753,10 @@ public class ClassFile implements LazyClassInitializer {
           attrs[i] = innerClasses;
       }
       else {
-          in.skip(length);
+          long n = in.skip(length);
+          if (n != length) {
+              throw new EOFException();
+          }
       }
     }
   }

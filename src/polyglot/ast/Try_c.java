@@ -216,7 +216,9 @@ public class Try_c extends Stmt_c implements Try
     }
 
     public String toString() {
-	String s = "try " + tryBlock.toString();
+        StringBuffer sb = new StringBuffer();
+        sb.append("try ");
+        sb.append(tryBlock.toString());
 
         int count = 0;
 
@@ -224,18 +226,20 @@ public class Try_c extends Stmt_c implements Try
 	    Catch cb = (Catch) it.next();
 
             if (count++ > 2) {
-              s += "...";
+              sb.append("...");
               break;
             }
 
-            s += " " + cb.toString();
+            sb.append(" ");
+            sb.append(cb.toString());
         }
 
         if (finallyBlock != null) {
-            s += " finally " + finallyBlock.toString();
+            sb.append(" finally ");
+            sb.append(finallyBlock.toString());
         }
 
-        return s;
+        return sb.toString();
     }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

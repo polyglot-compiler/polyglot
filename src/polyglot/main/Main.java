@@ -23,15 +23,15 @@ public class Main
   /* modifies args */
   protected ExtensionInfo getExtensionInfo(List args) throws TerminationException {
       ExtensionInfo ext = null;
-      
+
       for (Iterator i = args.iterator(); i.hasNext(); ) {
           String s = (String)i.next();
-          if (s.equals("-ext") || s.equals("-extension")) 
+          if (s.equals("-ext") || s.equals("-extension"))
           {
               if (ext != null) {
                   throw new TerminationException("only one extension can be specified");
               }
-              
+
               i.remove();
               if (!i.hasNext()) {
                   throw new TerminationException("missing argument");
@@ -53,24 +53,24 @@ public class Main
               String extClass = (String)i.next();
               i.remove();
               ext = loadExtension(extClass);
-          }      
+          }
       }
       if (ext != null) {
           return ext;
       }
       return loadExtension("polyglot.ext.jl.ExtensionInfo");
   }
-  
+
   public void start(String[] argv) throws TerminationException {
       start(argv, null);
   }
-  
+
   public void start(String[] argv, ErrorQueue eq) throws TerminationException {
-      source = new HashSet();  
+      source = new HashSet();
       List args = explodeOptions(argv);
       ExtensionInfo ext = getExtensionInfo(args);
       Options options = ext.getOptions();
-      
+
       // Allow all objects to get access to the Options object. This hack should
       // be fixed somehow. XXX###@@@
       Options.global = options;
@@ -86,41 +86,41 @@ public class Main
           options.usage(out);
           throw new TerminationException(ue.exitCode);
       }
-      
+
       if (eq == null) {
-          eq = new StdErrorQueue(System.err, 
-                                 options.error_count, 
+          eq = new StdErrorQueue(System.err,
+                                 options.error_count,
                                  ext.compilerName());
       }
-      
+
       Compiler compiler = new Compiler(ext, eq);
-  
+
       long time0 = System.currentTimeMillis();
-  
+
       if (!compiler.compile(source)) {
           throw new TerminationException(1);
       }
-  
+
       if (Report.should_report(verbose, 1))
           Report.report(1, "Output files: " + compiler.outputFiles());
-  
+
       long start_time = System.currentTimeMillis();
-  
+
       /* Now call javac or jikes, if necessary. */
       if (!invokePostCompiler(options, compiler, eq)) {
           throw new TerminationException(1);
       }
-  
+
       if (Report.should_report(verbose, 1)) {
-          reportTime("Finished compiling Java output files. time=" + 
+          reportTime("Finished compiling Java output files. time=" +
                   (System.currentTimeMillis() - start_time), 1);
-  
+
           reportTime("Total time=" + (System.currentTimeMillis() - time0), 1);
       }
   }
- 
-  protected boolean invokePostCompiler(Options options, 
-                                    Compiler compiler, 
+
+  protected boolean invokePostCompiler(Options options,
+                                    Compiler compiler,
                                     ErrorQueue eq) {
       if (options.post_compiler != null && !options.output_stdout) {
           Runtime runtime = Runtime.getRuntime();
@@ -142,17 +142,23 @@ public class Main
           try {
               Process proc = runtime.exec(command);
 
-              InputStreamReader err = 
-                new InputStreamReader(proc.getErrorStream());
-              char[] c = new char[72];
-              int len;
-              StringBuffer sb = new StringBuffer();
-              while((len = err.read(c)) > 0) {
-                  sb.append(String.valueOf(c, 0, len));
+              InputStreamReader err = null;
+
+              try {
+                  err = new InputStreamReader(proc.getErrorStream());
+                  char[] c = new char[72];
+                  int len;
+                  StringBuffer sb = new StringBuffer();
+                  while((len = err.read(c)) > 0) {
+                      sb.append(String.valueOf(c, 0, len));
+                  }
+
+                  if (sb.length() != 0) {
+                      eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, sb.toString());
+                  }
               }
-              
-              if (sb.length() != 0) {
-                  eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, sb.toString());
+              finally {
+                  err.close();
               }
 
               proc.waitFor();
@@ -163,7 +169,7 @@ public class Main
               }
 
               if (proc.exitValue() > 0) {
-                eq.enqueue(ErrorInfo.POST_COMPILER_ERROR, 
+                eq.enqueue(ErrorInfo.POST_COMPILER_ERROR,
                                  "Non-zero return code: " + proc.exitValue());
                 return false;
               }
@@ -175,7 +181,7 @@ public class Main
       }
       return true;
   }
-  
+
   private List explodeOptions(String[] args) throws TerminationException {
       LinkedList ll = new LinkedList();
 
@@ -212,7 +218,7 @@ public class Main
       return ll;
   }
 
-  public static final void main(String args[]) {      
+  public static final void main(String args[]) {
       try {
           new Main().start(args);
       }
@@ -263,7 +269,7 @@ public class Main
   static private void reportTime(String msg, int level) {
       Report.report(level, msg);
   }
-  
+
   /**
    * This exception signals termination of the compiler. It should be used
    * instead of <code>System.exit</code> to allow Polyglot to be called

@@ -218,7 +218,7 @@ public class Unary_c extends Expr_c implements Unary
 
         if (v instanceof Boolean) {
             boolean vv = ((Boolean) v).booleanValue();
-            if (op == NOT) return new Boolean(!vv);
+            if (op == NOT) return Boolean.valueOf(!vv);
         }
         if (v instanceof Double) {
             double vv = ((Double) v).doubleValue();

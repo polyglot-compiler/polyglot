@@ -50,7 +50,7 @@ public class StringPrettyPrinter extends PrettyPrinter
         return w.toString();
     }
 
-    public class StringCodeWriter extends CodeWriter {
+    public static class StringCodeWriter extends CodeWriter {
         CharArrayWriter w;
 
         public StringCodeWriter(CharArrayWriter w) {

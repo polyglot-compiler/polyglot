@@ -94,14 +94,24 @@ public class SourceLoader
 	if (Report.should_report(Report.frontend, 2))
 	    Report.report(2, "Loading class from " + sourceFile);
 
-	return new FileSource(fileName);
+	return new FileSource(sourceFile);
     }
 
     /**
      * The current user directory. We make it static so we don't need to
      * keep on making copies of it. 
      */
-    protected static File current_dir = null;
+    static File current_dir = null;
+
+    /**
+     * The current user directory.
+     */
+    protected static File current_dir() {
+        if (current_dir == null) {
+            current_dir = new File(System.getProperty("user.dir"));
+        }
+        return current_dir;
+    }
 
     /** Check if a directory for a package exists. */
     public boolean packageExists(String name) {
@@ -125,10 +135,6 @@ public class SourceLoader
     public FileSource classSource(String className) {
 	/* Search the source path. */
         String[] exts = sourceExt.fileExtensions();
-
-        if (current_dir == null) {
-            current_dir = new File(System.getProperty("user.dir"));
-        }
 
         for (int k = 0; k < exts.length; k++) {
             String fileName = className.replace('.', File.separatorChar) +
@@ -158,7 +164,7 @@ public class SourceLoader
                     // file path. We will check if this file exists.
                     File sourceFile;
                     
-                    if (directory != null && directory.equals(current_dir)) {
+                    if (directory != null && directory.equals(current_dir())) {
                         sourceFile = new File(fileName);
                     }
                     else {
@@ -170,13 +176,14 @@ public class SourceLoader
                         continue;
                     }
 
-                    loadedSources.add(fileKey(sourceFile));
-
-                    if (sourceFile.exists()) {
+                    try {
                         if (Report.should_report(Report.frontend, 2))
                             Report.report(2, "Loading " + className + " from " + sourceFile);
-                    
-                        return new FileSource(sourceFile);
+                        FileSource s = new FileSource(sourceFile);
+                        loadedSources.add(fileKey(sourceFile));
+                        return s;
+                    }
+                    catch (IOException e) {
                     }
                 }
             }
@@ -226,10 +233,7 @@ public class SourceLoader
                 dir = new File(f1.getParent());
             }
             else {
-                if (current_dir == null) {
-                    current_dir = new File(System.getProperty("user.dir"));
-                }
-                dir = current_dir;
+                dir = current_dir();
             }
 
             File[] ls = dir.listFiles();

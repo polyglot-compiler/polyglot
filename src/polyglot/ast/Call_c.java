@@ -275,26 +275,29 @@ public class Call_c extends Expr_c implements Call
   }
 
   public String toString() {
-    String s = (targetImplicit ? "" : target.toString() + ".") + name + "(";
+    StringBuffer sb = new StringBuffer();
+    sb.append(targetImplicit ? "" : target.toString() + ".");
+    sb.append(name);
+    sb.append("(");
 
     int count = 0;
 
     for (Iterator i = arguments.iterator(); i.hasNext(); ) {
         if (count++ > 2) {
-            s += "...";
+            sb.append("...");
             break;
         }
 
         Expr n = (Expr) i.next();
-        s += n.toString();
+        sb.append(n.toString());
 
         if (i.hasNext()) {
-            s += ", ";
+            sb.append(", ");
         }
     }
 
-    s += ")";
-    return s;
+    sb.append(")");
+    return sb.toString();
   }
 
   /** Write the expression to an output file. */

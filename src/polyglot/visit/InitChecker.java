@@ -109,6 +109,10 @@ public class InitChecker extends DataFlow
         protected InitCount(int i) {
             count = i;
         }
+
+        public int hashCode() {
+            return count;
+        }
         
         public boolean equals(Object o) {
             if (o instanceof InitCount) {
@@ -169,6 +173,9 @@ public class InitChecker extends DataFlow
         }
         InitCount getMin() { return min; }
         InitCount getMax() { return max; }
+        public int hashCode() {
+            return min.hashCode() * 4 + max.hashCode();
+        }
         public String toString() {
             return "[ min: " + min + "; max: " + max + " ]";
         }

@@ -22,6 +22,6 @@ public abstract class Loop_c extends Stmt_c implements Loop
     }
 
     public boolean condIsConstantTrue() {
-        return new Boolean(true).equals(cond().constantValue());
+        return Boolean.TRUE.equals(cond().constantValue());
     }
 }

@@ -8,7 +8,7 @@ public class BooleanLiteral extends Literal {
   Boolean val;
   public BooleanLiteral(Position position, boolean b, int sym) {
       super(position, sym);
-      this.val = new Boolean(b);
+      this.val = Boolean.valueOf(b);
   }
   
   public Boolean getValue() { return val; }

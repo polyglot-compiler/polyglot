@@ -163,7 +163,7 @@ public class ClassFileLoader
 
     ClassFile loadFromZip(ZipFile zip, String entryName) throws IOException {
         if (Report.should_report(verbose, 2))
-            Report.report(2, "Looking for " + entryName + " in " + zip);
+            Report.report(2, "Looking for " + entryName + " in " + zip.getName());
         if (zip != null) {
             ZipEntry entry = zip.getEntry(entryName);
             if (entry != null) {

@@ -112,11 +112,11 @@ public class Binary_c extends Expr_c implements Binary
 	}
 
         if (op == EQ && (lv instanceof String && rv instanceof String)) {
-            return new Boolean(((String) lv).intern() == ((String) rv).intern());
+            return Boolean.valueOf(((String) lv).intern() == ((String) rv).intern());
         }
 
         if (op == NE && (lv instanceof String && rv instanceof String)) {
-            return new Boolean(((String) lv).intern() != ((String) rv).intern());
+            return Boolean.valueOf(((String) lv).intern() != ((String) rv).intern());
         }
 
         // promote chars to ints.
@@ -138,12 +138,12 @@ public class Binary_c extends Expr_c implements Binary
                     if (op == MUL) return new Double(l * r);
                     if (op == DIV) return new Double(l / r);
                     if (op == MOD) return new Double(l % r);
-                    if (op == EQ) return new Boolean(l == r);
-                    if (op == NE) return new Boolean(l != r);
-                    if (op == LT) return new Boolean(l < r);
-                    if (op == LE) return new Boolean(l <= r);
-                    if (op == GE) return new Boolean(l >= r);
-                    if (op == GT) return new Boolean(l > r);
+                    if (op == EQ) return Boolean.valueOf(l == r);
+                    if (op == NE) return Boolean.valueOf(l != r);
+                    if (op == LT) return Boolean.valueOf(l < r);
+                    if (op == LE) return Boolean.valueOf(l <= r);
+                    if (op == GE) return Boolean.valueOf(l >= r);
+                    if (op == GT) return Boolean.valueOf(l > r);
                     return null;
                 }
 
@@ -155,12 +155,12 @@ public class Binary_c extends Expr_c implements Binary
                     if (op == MUL) return new Float(l * r);
                     if (op == DIV) return new Float(l / r);
                     if (op == MOD) return new Float(l % r);
-                    if (op == EQ) return new Boolean(l == r);
-                    if (op == NE) return new Boolean(l != r);
-                    if (op == LT) return new Boolean(l < r);
-                    if (op == LE) return new Boolean(l <= r);
-                    if (op == GE) return new Boolean(l >= r);
-                    if (op == GT) return new Boolean(l > r);
+                    if (op == EQ) return Boolean.valueOf(l == r);
+                    if (op == NE) return Boolean.valueOf(l != r);
+                    if (op == LT) return Boolean.valueOf(l < r);
+                    if (op == LE) return Boolean.valueOf(l <= r);
+                    if (op == GE) return Boolean.valueOf(l >= r);
+                    if (op == GT) return Boolean.valueOf(l > r);
                     return null;
                 }
 
@@ -180,12 +180,12 @@ public class Binary_c extends Expr_c implements Binary
                     if (op == MUL) return new Long(l * r);
                     if (op == DIV) return new Long(l / r);
                     if (op == MOD) return new Long(l % r);
-                    if (op == EQ) return new Boolean(l == r);
-                    if (op == NE) return new Boolean(l != r);
-                    if (op == LT) return new Boolean(l < r);
-                    if (op == LE) return new Boolean(l <= r);
-                    if (op == GE) return new Boolean(l >= r);
-                    if (op == GT) return new Boolean(l > r);
+                    if (op == EQ) return Boolean.valueOf(l == r);
+                    if (op == NE) return Boolean.valueOf(l != r);
+                    if (op == LT) return Boolean.valueOf(l < r);
+                    if (op == LE) return Boolean.valueOf(l <= r);
+                    if (op == GE) return Boolean.valueOf(l >= r);
+                    if (op == GT) return Boolean.valueOf(l > r);
                     if (op == BIT_AND) return new Long(l & r);
                     if (op == BIT_OR) return new Long(l | r);
                     if (op == BIT_XOR) return new Long(l ^ r);
@@ -201,12 +201,12 @@ public class Binary_c extends Expr_c implements Binary
                 if (op == MUL) return new Integer(l * r);
                 if (op == DIV) return new Integer(l / r);
                 if (op == MOD) return new Integer(l % r);
-                if (op == EQ) return new Boolean(l == r);
-                if (op == NE) return new Boolean(l != r);
-                if (op == LT) return new Boolean(l < r);
-                if (op == LE) return new Boolean(l <= r);
-                if (op == GE) return new Boolean(l >= r);
-                if (op == GT) return new Boolean(l > r);
+                if (op == EQ) return Boolean.valueOf(l == r);
+                if (op == NE) return Boolean.valueOf(l != r);
+                if (op == LT) return Boolean.valueOf(l < r);
+                if (op == LE) return Boolean.valueOf(l <= r);
+                if (op == GE) return Boolean.valueOf(l >= r);
+                if (op == GT) return Boolean.valueOf(l > r);
                 if (op == BIT_AND) return new Integer(l & r);
                 if (op == BIT_OR) return new Integer(l | r);
                 if (op == BIT_XOR) return new Integer(l ^ r);
@@ -225,13 +225,13 @@ public class Binary_c extends Expr_c implements Binary
             boolean l = ((Boolean) lv).booleanValue();
             boolean r = ((Boolean) rv).booleanValue();
 
-            if (op == EQ) return new Boolean(l == r);
-            if (op == NE) return new Boolean(l != r);
-            if (op == BIT_AND) return new Boolean(l & r);
-            if (op == BIT_OR) return new Boolean(l | r);
-            if (op == BIT_XOR) return new Boolean(l ^ r);
-            if (op == COND_AND) return new Boolean(l && r);
-            if (op == COND_OR) return new Boolean(l || r);
+            if (op == EQ) return Boolean.valueOf(l == r);
+            if (op == NE) return Boolean.valueOf(l != r);
+            if (op == BIT_AND) return Boolean.valueOf(l & r);
+            if (op == BIT_OR) return Boolean.valueOf(l | r);
+            if (op == BIT_XOR) return Boolean.valueOf(l ^ r);
+            if (op == COND_AND) return Boolean.valueOf(l && r);
+            if (op == COND_OR) return Boolean.valueOf(l || r);
         }
 
         return null;

@@ -79,7 +79,7 @@ public class CachingResolver implements TopLevelResolver {
             cachePackage(p.prefix());
         }
     }
-    
+
     /**
      * Find a type object by name.
      * @param name The name to search for.
@@ -122,7 +122,7 @@ public class CachingResolver implements TopLevelResolver {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "CachingResolver: cached: " + name);
         }
-        
+
         if (q instanceof ParsedClassType) {
             extInfo.addDependencyToCurrentJob(((ParsedClassType)q).fromSource());
         }
@@ -171,7 +171,7 @@ public class CachingResolver implements TopLevelResolver {
 	}
     }
 
-    private static final Collection TOPICS = 
-                    CollectionUtil.list(Report.types, 
+    private static final Collection TOPICS =
+                    CollectionUtil.list(Report.types,
                                         Report.resolver);
 }

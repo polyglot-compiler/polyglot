@@ -13,17 +13,17 @@ import java.util.Stack;
 public class Report {
   /** A collection of string names of topics which can be used with the
       -report command-line switch */
-  public static Collection topics = new HashSet();
+  public final static Collection topics = new HashSet();
 
   /** A collection of string names of topics which we should always check
       if we should report. */
-  public static Stack should_report = new Stack();
+  public final static Stack should_report = new Stack();
 
   /** 
    * The topics that the user has selected to report, mapped to the level
    * they want to report them to.
    */
-  protected static Map reportTopics = new HashMap(); // Map[String, Integer]
+  protected final static Map reportTopics = new HashMap(); // Map[String, Integer]
   
 
   /**
@@ -33,25 +33,25 @@ public class Report {
    * this flag to bypass a lot of the checking. When the options are processed,
    * this flag should be changed.
    */
-  protected static boolean noReporting = true;
+  static boolean noReporting = true;
   
   /** Report topics understood by the base compiler. */
-  public static String cfg = "cfg";
-  public static String context = "context";
-  public static String dataflow = "dataflow";
-  public static String errors = "errors";
-  public static String frontend = "frontend";
-  public static String imports = "imports";
-  public static String loader = "loader";
-  public static String resolver = "resolver";
-  public static String serialize = "serialize";
-  public static String time = "time";
-  public static String types = "types";
-  public static String visit = "visit";
-  public static String verbose = "verbose";
+  public final static String cfg = "cfg";
+  public final static String context = "context";
+  public final static String dataflow = "dataflow";
+  public final static String errors = "errors";
+  public final static String frontend = "frontend";
+  public final static String imports = "imports";
+  public final static String loader = "loader";
+  public final static String resolver = "resolver";
+  public final static String serialize = "serialize";
+  public final static String time = "time";
+  public final static String types = "types";
+  public final static String visit = "visit";
+  public final static String verbose = "verbose";
   
   // This topic is the level of detail that should be in messages.
-  public static String debug = "debug";  
+  public final static String debug = "debug";  
 
   static {
     topics.add(cfg);

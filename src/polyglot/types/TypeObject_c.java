@@ -64,6 +64,10 @@ public abstract class TypeObject_c implements TypeObject
     public final boolean equals(Object o) {
         return o instanceof TypeObject && ts.equals(this, (TypeObject) o);
     }
+
+    public int hashCode() {
+        return super.hashCode();
+    }
     
     /**
      * Default implementation is pointer equality.

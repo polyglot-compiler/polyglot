@@ -94,22 +94,23 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
     }
 
     public String toString() {
-        String s = "{";
+        StringBuffer sb = new StringBuffer();
+        sb.append("{");
 
         int count = 0;
 
         for (Iterator i = statements.iterator(); i.hasNext(); ) {
             if (count++ > 2) {
-                s += " ...";
+                sb.append(" ...");
                 break;
             }
 
             Stmt n = (Stmt) i.next();
-            s += " ";
-            s += n.toString();
+            sb.append(" ");
+            sb.append(n.toString());
         }
 
-        s += " }";
-        return s;
+        sb.append(" }");
+        return sb.toString();
     }
 }

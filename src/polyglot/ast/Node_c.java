@@ -20,14 +20,6 @@ public abstract class Node_c implements Node
     protected Ext ext;
 
     public Node_c(Position pos) {
-        if (del != null) {
-            this.del.init(this);
-        }
-
-        if (ext != null) {
-            this.ext.init(this);
-        }
-
         this.position = pos;
     }
 

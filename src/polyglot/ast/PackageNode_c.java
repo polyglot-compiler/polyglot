@@ -38,8 +38,12 @@ public class PackageNode_c extends Node_c implements PackageNode
 
     /** Write the package name to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-        if (package_ == null) w.write("<unknown-package>");
-        else w.write(package_.toString());
+        if (package_ == null) {
+            w.write("<unknown-package>");
+        }
+        else {
+            w.write(package_.toString());
+        }
     }
 
     public void translate(CodeWriter w, Translator tr) {

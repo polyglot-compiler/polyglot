@@ -54,6 +54,6 @@ public class BooleanLit_c extends Lit_c implements BooleanLit
   }
 
   public Object constantValue() {
-    return new Boolean(value);
+    return Boolean.valueOf(value);
   }
 }

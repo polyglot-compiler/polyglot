@@ -193,7 +193,10 @@ class Field {
             }
 
 	    if (attrs[i] == null) {
-                in.skip(length);
+                long n = in.skip(length);
+                if (n != length) {
+                    throw new EOFException();
+                }
             }
 	}
     }

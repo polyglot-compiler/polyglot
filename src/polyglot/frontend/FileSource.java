@@ -11,32 +11,16 @@ public class FileSource extends Source
     protected final File file;
     protected FileReader reader;
 
-    public FileSource(String name) throws IOException {
-        this(name, false);
-    }
-    
-    public FileSource(String name, boolean userSpecified) throws IOException {
-        super(name, userSpecified);
-        this.file = new File(name);
-        if (! file.exists()) {
-            throw new FileNotFoundException(name);
-        }
-
-        path = file.getPath();
-        lastModified = new Date(file.lastModified());
-    }
-
-    public FileSource(File file) {
+    public FileSource(File file) throws IOException {
         this(file, false);
     }
     
-    public FileSource(File file, boolean userSpecified) {
-        super(file.getPath(), userSpecified);
+    public FileSource(File file, boolean userSpecified) throws IOException {
+        super(file.getName(), userSpecified);
         this.file = file;
     
         if (! file.exists()) {
-            throw new InternalCompilerError("FileSource given a " + 
-                        "non-existent file");
+            throw new FileNotFoundException(file.getName());
         }
 
         path = file.getPath();
@@ -53,7 +37,7 @@ public class FileSource extends Source
     }
 
     public int hashCode() {
-	return file.getAbsolutePath().hashCode();
+	return file.getPath().hashCode();
     }
 
     /** Open the source file. */
@@ -74,6 +58,6 @@ public class FileSource extends Source
     }
 
     public String toString() {
-	return file.getName();
+	return file.getPath();
     }
 }
