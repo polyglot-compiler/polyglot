@@ -103,6 +103,7 @@ public class FieldNode extends ClassMember
       FieldInstance fi = sr.getTypeSystem().newFieldInstance( decl.name, 
                               declare.typeForDeclarator( decl), 
                               clazz, af);
+      decl.setVariableInstance(fi);
       /* If it is a constant numeric expression (final + initializer is 
        * IntLiteral) then mark it "constant" under FieldInstance. */
       // FIXME other literal types?

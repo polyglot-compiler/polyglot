@@ -60,6 +60,10 @@ public class MethodNode extends ClassMember
       this(null, accessFlags, tn, formals, exceptions, body);
   }
 
+  public MethodTypeInstance getMTI() {
+    return mtiThis;
+  }
+
 
   /**
    * Creates a new <code>MethodNode</code> that represents the definition of 

@@ -27,6 +27,10 @@ public class MethodExpression extends Expression
 	return mti;
     }
 
+    public void setMTI(MethodTypeInstance mti) {
+	this.mti = mti;
+    }
+
   /**
    * Create a new <code>MethodExpression</code>.
    * 
