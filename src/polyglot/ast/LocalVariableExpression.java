@@ -11,8 +11,7 @@ import jltools.util.*;
 public class LocalVariableExpression extends Expression 
 {
   protected final String name;
-  // FIXME is this necessary?
-  //  private FieldInstance fi;
+  private FieldInstance fi;
     
   /** 
    * Creates a new local variable reference.
@@ -42,14 +41,11 @@ public class LocalVariableExpression extends Expression
     return name;
   }
 
-  /*
-   * FIXME is this necessary?
-   *
   public FieldInstance getFieldInstance()
   {
     return fi;
   }
-  */
+
 
   Node visitChildren( NodeVisitor v) 
   {
@@ -59,6 +55,14 @@ public class LocalVariableExpression extends Expression
 
   public Node typeCheck( LocalContext c) throws SemanticException
   {
+    /**
+     * FIXME:
+     * This was previously not here (ala spoons) since we weren't sure whether it
+     * was necessary.  The switchStatement uses it to determine the labels
+     * so that it can resolve final names to case lables. However, this brings up
+     * the ugly point of whether we should reconstruct this or not. I am not 
+     * reconstructing here, but perhaps we should?
+     */
     FieldInstance fi = c.getField( null, name);
     setCheckedType( fi.getType());
 

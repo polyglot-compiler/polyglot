@@ -41,6 +41,25 @@ public class SwitchStatement extends Statement
       this.expr = expr;
       this.def = false;
     }
+
+    /**
+     * Lazily reconstructs the case statement.
+     * 
+     * @param expr the expression (may be null iff default = true)
+     * @param def whether this is the "default" label
+     */
+    public CaseStatement reconstruct ( Expression expr, boolean def)
+    {
+      CaseStatement cs;
+      if ( expr != this.expr && def != this.def)
+      {
+        cs = new CaseStatement( expr);
+        cs.def = def;
+        cs.copyAnnotationsFrom ( this ) ;
+        return cs;
+      }
+      return this;
+    }
     
     /**
      * Effects: Creates a new CaseStatement which represents a default Label.
@@ -71,14 +90,13 @@ public class SwitchStatement extends Statement
       }
     }
     
-    public Object visitChildren ( NodeVisitor v)
+    public Node visitChildren ( NodeVisitor v)
     {
       if ( expr != null)
       {
-        expr = (Expression)expr.visit ( v );
-        return Annotate.getVisitorInfo ( expr );
+        return reconstruct ( (Expression)expr.visit ( v ), def) ;
       }
-      return null;
+      return this;
     }
     
     public Node typeCheck( LocalContext c ) throws SemanticException
@@ -144,17 +162,20 @@ public class SwitchStatement extends Statement
       }
     }
     
-    public Node dump( CodeWriter cw)
+    public void dump( CodeWriter cw)
     {
-      return this;
+      
     }
 
-      private boolean def;
-      private Expression expr;
-     private int iValue;
+    private boolean def;
+    private Expression expr;
+    private int iValue;
    }
 
    public static class SwitchBlock extends SwitchElement {
+    
+      private BlockStatement block;
+
       /**
        * Effects: Creates a new SwitchBlock which contains <block>.
        */
@@ -165,6 +186,16 @@ public class SwitchStatement extends Statement
       public SwitchBlock () {
          this( new BlockStatement());
       }
+     
+     public SwitchBlock reconstruct( BlockStatement block) 
+     {
+       if ( block != this.block) 
+       {
+         SwitchBlock sb =  new SwitchBlock ( block );
+         sb.copyAnnotationsFrom ( this );
+       }
+       return this;
+     }
 
       /** 
        * Effects: Returns the BlockStatement contained in this switch block.
@@ -173,10 +204,9 @@ public class SwitchStatement extends Statement
          return block;
       }
 
-     public Object visitChildren ( NodeVisitor v)
+     public Node visitChildren ( NodeVisitor v)
      {
-       block = (BlockStatement)block.visit( v );
-       return null;
+       return reconstruct ( (BlockStatement)block.visit( v ));
      }
 
      public Node typeCheck( LocalContext c)
@@ -189,12 +219,9 @@ public class SwitchStatement extends Statement
        block.translate(c, w);
      }
 
-     public Node dump ( CodeWriter cw)
+     public void  dump ( CodeWriter cw)
      {
-       return this;
      }
-    
-      private BlockStatement block;
    }
 
    /**
@@ -208,6 +235,26 @@ public class SwitchStatement extends Statement
       TypedList.check(switchElems, SwitchElement.class);
       this.switchElems = new ArrayList(switchElems);
    }
+
+  public Node  reconstruct ( Expression expr, List switchElems)
+  {
+    if ( expr != this.expr ||
+         switchElems.size() != this.switchElems.size() )
+    {
+      SwitchStatement ss =  new SwitchStatement ( expr, switchElems);
+      ss.copyAnnotationsFrom ( this );
+    }
+    
+    for ( int i = 0; i < switchElems.size() ; i ++)
+    {
+      if ( switchElems.get( i ) != this.switchElems.get( i ) )
+      {
+        SwitchStatement ss =  new SwitchStatement ( expr, switchElems);
+        ss.copyAnnotationsFrom ( this );
+      }
+    }
+    return this;
+  }
 
    /**
     * Effects: Returns the Expression which this SwitchStatement is
@@ -251,28 +298,24 @@ public class SwitchStatement extends Statement
    }
 
 
-  Object visitChildren(NodeVisitor v)
+  public Node visitChildren(NodeVisitor v)
   {
-    Object vinfo = Annotate.getVisitorInfo( this);
+    Expression e = (Expression) expr.visit( v);
 
-    expr = (Expression) expr.visit( v);
-    vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( expr), vinfo);
-    
+    List newSwitchElems = new ArrayList ( switchElems.size() );
+
     for (ListIterator it = switchElems.listIterator(); it.hasNext(); ) {
       SwitchElement se = (SwitchElement) it.next();
-      it.set ( se.visit ( v) );
-      vinfo = v.mergeVisitorInfo ( Annotate.getVisitorInfo ( se ), vinfo );
-      
+      newSwitchElems.add ( se ) ;      
     }
 
-    return vinfo;
+    return reconstruct ( e, newSwitchElems);
   }
 
    public Node typeCheck(LocalContext c) throws SemanticException
    {
      List lDefinedCaseLabels = new ArrayList();
-     boolean bHasBlocks = false;
-     boolean bAllBlocksReturn = true;
+
 
      for (ListIterator it = switchElems.listIterator(); it.hasNext(); ) {
        SwitchElement se = (SwitchElement) it.next();
@@ -288,12 +331,6 @@ public class SwitchStatement extends Statement
            throw new SemanticException( "Duplicate case label: " + key, 
                                          Annotate.getLineNumber( se ) );
          lDefinedCaseLabels.add ( key );                                        
-       }
-       else
-       {
-         bHasBlocks = true;
-         if ( !Annotate.terminatesOnAllPaths(se) )
-           bAllBlocksReturn = false;
        }
      }     
      return this;
@@ -323,11 +360,10 @@ public class SwitchStatement extends Statement
       w.write("}");
    }
 
-   public Node dump( CodeWriter w)
+   public void dump( CodeWriter w)
    {
       w.write( "( SWITCH ");
       dumpNodeInfo( w);
       w.write( ")");
-      return null;
    }
 }

@@ -345,56 +345,34 @@ public class MethodNode extends ClassMember
     return this;
   }
 
-
-  /*
-   * FIXME this is most of the implementation of exception check
-   *
-    boolean bThrowDeclared;
-
-    if( body != null) {
-      Annotate.addThrows ( this, Annotate.getThrows(body ) );
-
-      // check our exceptions:
+  public Node exceptionCheck (ExceptionChecker ec ) throws SemanticException
+  {
+    SubtypeSet s = (SubtypeSet)ec.getThrowsSet();
+    // check our exceptions:
+    for (Iterator i = s.iterator(); i.hasNext() ; )
+    {
+      boolean bThrowDeclared = false;
+      Type t = (Type)i.next();
       
-      SubtypeSet s = jltools.util.Annotate.getThrows( this );
-      if ( s != null)
+      if ( !t.isUncheckedException() )
       {
-        for (Iterator i = s.iterator(); i.hasNext() ; )
+        for (Iterator i2 = exceptions.iterator(); i2.hasNext() ; )
         {
-          bThrowDeclared = false;
-          Type t = (Type)i.next();
-          
-          if ( !t.isUncheckedException() )
+          Type t2 =  (ClassType)  ((TypeNode)i2.next()).getType();
+          if ( t.equals (t2) || t.descendsFrom (t2 ))
           {
-            for (Iterator i2 = exceptions.iterator(); i2.hasNext() ; )
-            {
-              Type t2 =  (ClassType)  ((TypeNode)i2.next()).getType();
-              if ( t.equals (t2) || t.descendsFrom (t2 ))
-              {
-                bThrowDeclared = true; 
-                break;
-              }
-            }
-            if ( ! bThrowDeclared)
-              throw new SemanticException ( 
-                    "Method \"" + name + "\" throws the undeclared "
-                    + "exception \"" + t.getTypeString() + "\".");
+            bThrowDeclared = true; 
+            break;
           }
         }
+        if ( ! bThrowDeclared)
+          ec.reportError("Method \"" + name + "\" throws the undeclared "
+                         + "exception \"" + t.getTypeString() + "\".", 
+                         Annotate.getLineNumber( this ) );
       }
-       
-      // make sure that all paths return, if our return type is not void
-      if ( !mtiThis.getreturns().equals (c.getTypeSystem().getVoid() ) &&
-             !Annotate.terminatesOnAllPaths ( body ) &&
-           ! mtiThis.getAccessFlags().isAbstract() )
-        throw new SemanticException ( 
-                          "Not all execution paths in the method \""
-                          + name + "\" lead to a return or throw statement.");
     }
-
     return this;
-  }
-  */
+  }    
 
   public void translate( LocalContext c, CodeWriter w)
   {

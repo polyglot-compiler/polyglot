@@ -6,25 +6,26 @@ package jltools.ast;
 
 import jltools.util.*;
 import jltools.types.*;
+import jltools.visit.*;
 import java.util.ListIterator;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Overview: A mutable representation of a try block, one or more
+ * Overview: An immutable representation of a try block, one or more
  * catch blocks, and an optional finally block.
  */
 public class TryStatement extends Statement {
     
   /**
-   * Requires: <catchBlocks> contains only elements of
+   * Requires: <code>catchBlocks</code> contains only elements of
    * type CatchStatement
    *
-   * Effects: Creates a new TryStatement with <tryBlock> as the try
-   * block, the catch blocks in <catchBlocks> and a fiannly block of
-   * <finallyBlock>.  If there is no finally block, then
-   * <finallyBlock> should be null.
+   * Effects: Creates a new TryStatement with <code>tryBlock</code> as the try
+   * block, the catch blocks in <code>catchBlocks</code> and a finally block of
+   * <code>finallyBlock</code>.  If there is no finally block, then
+   * <code>finallyBlock</code> should be null.
    */
   public TryStatement(BlockStatement tryBlock,
 		      List catchBlocks,
@@ -33,6 +34,42 @@ public class TryStatement extends Statement {
     this.finallyBlock = finallyBlock;
     TypedList.check(catchBlocks, CatchBlock.class);
     this.catchBlocks = new ArrayList(catchBlocks);
+  }
+
+  /**
+   * Lazily reconstruct this node.
+   * <p> 
+   * If any of the children change (upon visitition) construct a new node and return it. OW, 
+   * return <code>this</code>.
+   *
+   * @param tryBlock The Block enclosed under the try
+   * @param catchBlocks List of catchblocks (which is a tuple of a formalparamater and block).
+   * @param finallyBlock An optional block for the finally clause
+   */
+  public TryStatement reconstruct( BlockStatement tryBlock, 
+                                   List catchBlocks, 
+                                   BlockStatement finallyBlock)
+  {
+    if ( tryBlock != this.tryBlock ||
+         finallyBlock != this.finallyBlock ||
+         catchBlocks.size() != this.catchBlocks.size())
+    {
+      TryStatement ts = new TryStatement ( tryBlock, catchBlocks, finallyBlock) ;
+      ts.copyAnnotationsFrom ( this ) ;
+      return ts;
+    }
+    
+    for( int i = 0; i < catchBlocks.size(); i++)
+    {
+      if ( catchBlocks.get( i ) != this.catchBlocks.get( i ) )
+      {
+        TryStatement ts = new TryStatement ( tryBlock, catchBlocks, finallyBlock) ;
+        ts.copyAnnotationsFrom ( this ) ;
+        return ts;
+      }
+    }
+    
+    return this;
   }
 
   /**
@@ -76,72 +113,92 @@ public class TryStatement extends Statement {
   /**
    *
    */
-  Object visitChildren(NodeVisitor v)
+  public Node visitChildren(NodeVisitor v)
   {
-    Object vinfo = Annotate.getVisitorInfo( this);
-
-    tryBlock = (BlockStatement) tryBlock.visit( v);
+    BlockStatement newTryBlock = (BlockStatement) tryBlock.visit( v);
+    List newCatchBlocks = new ArrayList ( catchBlocks.size() );
+    
     for (ListIterator it = catchBlocks.listIterator(); it.hasNext(); ) {
-      CatchBlock cb = (CatchBlock) it.next();
-      cb = (CatchBlock)cb.visit( v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( cb), vinfo);
-      it.set( cb);
-    }
-    if ( finallyBlock != null) {
-      finallyBlock = (BlockStatement) finallyBlock.visit( v);
-      vinfo = v.mergeVisitorInfo( Annotate.getVisitorInfo( finallyBlock),
-                                  vinfo);
+      CatchBlock cb =  (CatchBlock)((CatchBlock) it.next()).visit ( v ) ;
+      if ( cb != null) 
+        newCatchBlocks.add ( cb ) ;
     }
     
-    return vinfo;
+    BlockStatement newFinallyBlock = null;
+    if ( finallyBlock != null) {
+      newFinallyBlock = (BlockStatement) finallyBlock.visit( v);
+    }
+
+    return reconstruct ( newTryBlock, newCatchBlocks, newFinallyBlock);
   }
 
-   public Node typeCheck(LocalContext c) throws TypeCheckException
+   public Node typeCheck(LocalContext c) 
    {
-     SubtypeSet sCaught = new SubtypeSet();
-     SubtypeSet sThrown = tryBlock.getThrows();
-     boolean bTerminates = Annotate.terminatesOnAllPaths( tryBlock );
-
-     for (Iterator it = catchBlocks.listIterator() ; it.hasNext() ; )
-     {
-       CatchBlock cb = (CatchBlock)it.next();
-       if ( (sThrown != null) && (sThrown.remove( cb.getCatchBlockType() ) ) )
-       {
-         if ( ! sCaught.add ( cb.getCatchBlockType() ) )
-           throw new TypeCheckException (" The exception \"" +
-                                         cb.getCatchBlockType().getTypeString() + 
-                                         "\" has already been caught in this try block.", 
-                                         Annotate.getLineNumber ( cb ));
-       }
-       else if ( sThrown.contains( cb.getCatchBlockType( ) ) )
-         throw new TypeCheckException (" The exception \"" +
-                                       cb.getCatchBlockType().getTypeString() + 
-                                       "\" has already been caught in this try blcok.", 
-                                       Annotate.getLineNumber ( cb ));
-       else if ( cb.getCatchBlockType().descendsFrom ( c.getTypeSystem().getError() ) ||
-                 cb.getCatchBlockType().descendsFrom ( c.getTypeSystem().getRTException() ) ||
-                 cb.getCatchBlockType().equals ( c.getTypeSystem().getRTException() ) ||
-                 cb.getCatchBlockType().equals ( c.getTypeSystem().getError() ) ||
-                 c.getTypeSystem().getRTException().descendsFrom(cb.getCatchBlockType() ))
-         sThrown.add ( cb.getCatchBlockType() );
-       else
-         throw new TypeCheckException ( 
-            "The catch block is unreachable since no exceptions of type " 
-            + "\"" + cb.getCatchBlockType().getTypeString() 
-            + "\" can reach this point.", 
-            Annotate.getLineNumber ( cb ));
-
-       bTerminates &= Annotate.terminatesOnAllPaths ( cb );
-     }
-     addThrows ( sThrown );
-     if (finallyBlock != null)
-     {
-       addThrows ( finallyBlock.getThrows() );
-       bTerminates |= Annotate.terminatesOnAllPaths( finallyBlock );
-     }
-     Annotate.setTerminatesOnAllPaths ( this, bTerminates );
+     // nothing to do. most stuff done in exceptionCheck.
      return this;
    }
+
+  // ecTryStatement: the final set of exceptions that we throw should be ADDED to this.
+  // ecTryBlock: 
+
+  /**
+   * Performs exceptionChecking. This is a special method that is called via the 
+   * exceptionChecker's override method (i.e, doesn't follow the standard model for 
+   * visitation.  
+   *
+   * @param ecTryStatement The ExceptionChecker that this node will "deposit" it's exceptions
+   *  into
+   * @param ecTryBlock The ExceptionCheckerthat was run against the child node. It contains
+   * the exceptions that can be thrown by the tryBlock
+   */
+  public Node exceptionCheck(ExceptionChecker ecTryStatement, 
+                             ExceptionChecker ecTryBlock) throws SemanticException
+  {
+    
+    // first, get exceptions from the try block
+    SubtypeSet sThrown = ecTryBlock.getThrowsSet(), sCaught = new SubtypeSet();
+    
+    // walk through our catch blocks, making sure that they each can "catch" something.
+    for (Iterator it = catchBlocks.listIterator(); it.hasNext() ; )
+    {
+      CatchBlock cb = (CatchBlock)it.next();
+      TypeSystem typeSystem = cb.getCatchType().getTypeSystem();
+
+      if ( sThrown.remove ( cb.getCatchType() ))
+      {
+        if ( ! sCaught.add ( cb.getCatchType()))
+        {
+          ecTryBlock.reportError( " The exception \"" +
+                                  cb.getCatchType().getTypeString() + 
+                                  "\" has already been caught in this try block.", 
+                                  Annotate.getLineNumber ( cb ));
+        }
+        else if ( cb.getCatchType().isUncheckedException() ||
+                  typeSystem.getRTException().descendsFrom(cb.getCatchType() ))
+        {
+          // exceptions that don't need to be explicitly declared ( eg runtime, 
+          // or java.lang.exception. (Object gets screened out because of the way that 
+          // typeCheck works on CatchBlocks
+          if ( ! sCaught.add ( cb.getCatchType() ) )
+            ecTryBlock.reportError( " The exception \"" +
+                                    cb.getCatchType().getTypeString() + 
+                                    "\" has already been caught in this try block.", 
+                                    Annotate.getLineNumber ( cb ));
+          
+        }
+        else
+        {
+          // this catch block is useless, since no one can throw to it
+          ecTryBlock.reportError( "The catch block is unreachable since no exceptions of type " 
+                                  + "\"" + cb.getCatchType().getTypeString() 
+                                  + "\" can reach this point.", 
+                                  Annotate.getLineNumber ( cb ));
+        }
+      }    
+    }
+    // ecTryBlock now contains any exceptions which the try block doesn't catch. 
+    return this;
+  }
 
    public void  translate(LocalContext c, CodeWriter w)
    {
@@ -167,35 +224,12 @@ public class TryStatement extends Statement {
       }
    }
 
-   public Node dump( CodeWriter w)
+   public void dump( CodeWriter w)
    {
       w.write( "( TRY ");
       dumpNodeInfo( w);
       w.write( ")");
-      return null;
    }
-
-  public Node copy() {
-    TryStatement ts = new TryStatement(tryBlock,
-				       new ArrayList(catchBlocks),
-				       finallyBlock);
-    ts.copyAnnotationsFrom(this);
-    return ts;
-  }
-
-  public Node deepCopy() {
-    List newCatchBlocks = new ArrayList(catchBlocks.size());
-    for(Iterator it = catchBlocks.iterator(); it.hasNext(); ) {
-      CatchBlock cb = (CatchBlock) it.next();
-      newCatchBlocks.add(cb.deepCopy());
-    }
-    TryStatement ts = 
-      new TryStatement((BlockStatement) tryBlock.deepCopy(),
-		       newCatchBlocks,
-		       (BlockStatement) finallyBlock.deepCopy());
-    ts.copyAnnotationsFrom(this);
-    return ts;
-  }
 
   private BlockStatement tryBlock;
   private List catchBlocks;

@@ -49,15 +49,20 @@ public class ThrowStatement extends Statement {
                                Annotate.getVisitorInfo( expr));
   }
 
-   public Node typeCheck(LocalContext c) throws TypeCheckException
+   public Node typeCheck(LocalContext c)
    {
-     if (! expr.getCheckedType().isThrowable())
-       throw new TypeCheckException("Can only throw objects that extend from \"java.lang.Throwable\"");
-     Annotate.addThrows ( this, expr.getCheckedType()  );
-     Annotate.addThrows ( this, Annotate.getThrows( expr ) );
-     Annotate.setTerminatesOnAllPaths (this, true);
      return this;
    }
+
+  public Node exceptionCheck( ExceptionChecker ec ) throws SemanticException
+  {
+     if (! expr.getCheckedType().isThrowable())
+       throw new TypeCheckException("Can only throw objects that extend from " 
+                                    + "\"java.lang.Throwable\"");
+     else
+       ec.throwsException ( expr.getCheckedType() );
+     return this;
+  }
 
    public void  translate(LocalContext c, CodeWriter w)
    {
