@@ -2,6 +2,7 @@ LOG=log
 
 GOOD =  \
 	ArrayInit.jl \
+	Conditional1.jl \
 	Constants.jl \
 	Constants2.jl \
 	Constants3.jl \
@@ -33,6 +34,7 @@ GOOD =  \
 	ForwardRef2.jl \
 	ForwardRef3.jl \
 	ForwardRef4.jl \
+	Increment.jl \
 	Infinite.jl \
 	Init1.jl \
 	Init2.jl \
@@ -75,16 +77,18 @@ GOOD =  \
 	xIterator.jl
 
 BAD = \
-	LabeledBreak2.jl \
 	BadAbstract.jl \
-	BadOverride2.jl \
 	BadAlloc.jl \
 	BadCtor.jl \
-	BadExcept2.jl \
 	BadExcept.jl \
+	BadExcept2.jl \
 	BadExpCC.jl \
 	BadExtends.jl \
 	BadFinalInit1.jl \
+	BadFinalInit10.jl \
+	BadFinalInit11.jl \
+	BadFinalInit12.jl \
+	BadFinalInit13.jl \
 	BadFinalInit2.jl \
 	BadFinalInit3.jl \
 	BadFinalInit4.jl \
@@ -93,37 +97,38 @@ BAD = \
 	BadFinalInit7.jl \
 	BadFinalInit8.jl \
 	BadFinalInit9.jl \
-	BadFinalInit10.jl \
-	BadFinalInit11.jl \
-	BadFinalInit12.jl \
-	BadFinalInit13.jl \
 	BadForwardRef.jl \
+	BadIncrement1.jl \
+	BadIncrement2.jl \
+	BadIncrement3.jl \
+	BadIncrement4.jl \
 	BadInit.jl \
+	BadInner.jl \
 	BadInner2.jl \
 	BadInner3.jl \
 	BadInner4.jl \
 	BadInner5.jl \
 	BadInner6.jl \
 	BadInner7.jl \
-	BadInner.jl \
-	BadInterface2.jl \
 	BadInterface.jl \
+	BadInterface2.jl \
 	BadMultipleVarDef.jl \
 	BadOverride.jl \
+	BadOverride2.jl \
 	BadPrim.jl \
 	BadProt.jl \
 	BadStaticContext.jl \
-	StaticContext2.jl \
 	BadSwitch1.jl \
 	BadSwitch2.jl \
 	CircularConstructor.jl \
 	DoubleFlags.jl \
-	Errors2.jl \
 	Errors.jl \
+	Errors2.jl \
+	LabeledBreak2.jl \
+	NoInit1.jl \
 	NoInit10.jl \
 	NoInit11.jl \
 	NoInit12.jl \
-	NoInit1.jl \
 	NoInit2.jl \
 	NoInit3.jl \
 	NoInit4.jl \
@@ -137,8 +142,10 @@ BAD = \
 	NoReturn3.jl \
 	NoReturn4.jl \
 	NoReturn5.jl \
-	Protection2.jl \
 	Protection.jl \
+	Protection2.jl \
+	StaticContext2.jl \
+	Unreachable1.jl \
 	Unreachable10.jl \
 	Unreachable11.jl \
 	Unreachable12.jl \
@@ -146,7 +153,6 @@ BAD = \
 	Unreachable14.jl \
 	Unreachable15.jl \
 	Unreachable16.jl \
-	Unreachable1.jl \
 	Unreachable2.jl \
 	Unreachable3.jl \
 	Unreachable4.jl \
