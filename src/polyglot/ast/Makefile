@@ -3,6 +3,14 @@ PACKAGE = jltools.ast
 SUBDIRS =
 
 SOURCES = \
+	CleanupSignaturesOverride.java \
+	ReadSymbolsOverride.java \
+	RemoveAmbiguitiesOverride.java \
+	TranslateBodyOverride.java \
+	TranslateOverride.java \
+	TypeCheckOverride.java \
+	ExtensionFactory.java \
+	StandardExtensionFactory.java \
 	AmbiguousExpression.java \
 	AmbiguousName.java \
 	AmbiguousNameExpression.java \

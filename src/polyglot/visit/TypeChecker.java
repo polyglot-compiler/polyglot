@@ -12,26 +12,34 @@ public class TypeChecker extends NodeVisitor
   protected BitVector errors;
   protected int depth;
   
-  public TypeChecker( TypeSystem ts, ImportTable im, ErrorQueue eq)
+  public TypeChecker(ExtensionFactory ef,
+    TypeSystem ts, ImportTable im, ErrorQueue eq)
   {
     this.eq = eq;
 
-    this.c = ts.getLocalContext( im, this);
+    this.c = ts.getLocalContext(im, ef, this);
     this.errors = new BitVector();
     this.depth = 0;
   }
 
-  /* FIXME
   public Node override( Node n)
   {
-    if( n.hasError()) {
-      return n;
+    if (n.ext instanceof TypeCheckOverride) {
+      LocalContext.Mark mark = c.getMark();
+
+      try {
+        return ((TypeCheckOverride) n.ext).typeCheck(n, this, c);
+      }
+      catch ( SemanticException e) {
+        eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
+                    Annotate.getLineNumber(n ));
+        c.popToMark(mark);
+        return n;
+      }
     }
-    else {
-      return null;
-    }
+
+    return null;
   }
-  */
 
   public NodeVisitor enter( Node n)
   {

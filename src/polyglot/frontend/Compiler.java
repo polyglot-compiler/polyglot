@@ -58,6 +58,7 @@ public class Compiler implements TargetTable, ClassCleaner
 
   /* Static fields. */
   private static TypeSystem ts;
+  private static ExtensionFactory ef;
   private static ExtensionInfo extInfo;
   private static Compiler compiler;
 
@@ -85,6 +86,7 @@ public class Compiler implements TargetTable, ClassCleaner
   {
     Compiler.options = options;
     Compiler.ts = extInfo.getTypeSystem();
+    Compiler.ef = extInfo.getExtensionFactory();
     Compiler.tf = tf;
     Compiler.extInfo = extInfo;
  
@@ -131,6 +133,11 @@ public class Compiler implements TargetTable, ClassCleaner
   public static TargetFactory getTargetFactory()
   {
     return tf;
+  }
+
+  public static ExtensionFactory getExtensionFactory()
+  {
+    return ef;
   }
 
   public static TypeSystem getTypeSystem()

@@ -27,7 +27,7 @@ public abstract class TypeSystem {
     throws SemanticException;
 
   public abstract LocalContext getLocalContext( ImportTable it,
-	NodeVisitor visitor );
+	ExtensionFactory ef, NodeVisitor visitor );
 
   public abstract FieldInstance newFieldInstance( String name, Type type,
 	ReferenceType enclosingType, AccessFlags af);
@@ -249,24 +249,6 @@ public abstract class TypeSystem {
    **/
   public abstract Type extendArrayDims(Type type, int dims)
     throws SemanticException;
-
-
-    public Node getNewSpecialExpressionExtension() {
-	return null;
-    }
-    public Node getNewTypeNodeExtension() {
-	return null;
-    }
-    public Node getNewLocalVariableExpressionExtension() {
-	return null;
-    }
-    public Node getNewFieldExpressionExtension() {
-	return null;
-    }
-    public Node getNewLiteralExtension() {
-	return null;
-    }
-
 
   /**
    * Returns a canonical type corresponding to the Java Class object

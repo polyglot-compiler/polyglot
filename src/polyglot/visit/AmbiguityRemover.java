@@ -16,13 +16,14 @@ public class AmbiguityRemover extends NodeVisitor
   protected LocalContext c;
   protected ImportTable it;
 
-  public AmbiguityRemover( TypeSystem ts, ImportTable it, ErrorQueue eq)
+  public AmbiguityRemover( ExtensionFactory ef,
+    TypeSystem ts, ImportTable it, ErrorQueue eq)
   {
     this.ts = ts;
     this.it = it;
     this.eq = eq;
     
-    c = ts.getLocalContext( it, this);
+    c = ts.getLocalContext( it, ef, this);
   }
 
   public NodeVisitor enter( Node n)
@@ -57,24 +58,24 @@ public class AmbiguityRemover extends NodeVisitor
 
   public Node override( Node n)
   {
-    if ( n instanceof VariableDeclarationStatement)
-    {
-      LocalContext.Mark mark = c.getMark();
+    LocalContext.Mark mark = c.getMark();
 
-      try
-      {
+    try {
+      if (n.ext instanceof RemoveAmbiguitiesOverride) {
+	return ((RemoveAmbiguitiesOverride) n.ext).removeAmbiguities(
+		n, this, c);
+      }
+      else if (n instanceof VariableDeclarationStatement) {
         Node m = ((VariableDeclarationStatement)n).removeAmbiguities(c, this);
 	c.assertMark(mark);
         return m;
       }
-      catch ( SemanticException e)
-      {
-        eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
-                    Annotate.getLineNumber(n ));
-        // FIXME: n.setHasError(true);
-	c.popToMark(mark);
-        return n;
-      }
+    }
+    catch (SemanticException e) {
+      eq.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
+		 Annotate.getLineNumber(n));
+      c.popToMark(mark);
+      return n;
     }
 
     return null;

@@ -153,7 +153,7 @@ public abstract class Node extends AnnotatedObject {
    *
    * @return The node with all constants folded in.
    */
-  public Node foldConstants(TypeSystem ts) 
+  public Node foldConstants(ExtensionFactory ef) 
   {
     return this;
   }

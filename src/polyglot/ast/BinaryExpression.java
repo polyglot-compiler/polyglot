@@ -150,7 +150,7 @@ public class BinaryExpression extends Expression
    *
    * @return The node with all constants folded in.
    */
-  public Node foldConstants(TypeSystem ts) 
+  public Node foldConstants(ExtensionFactory ef)
   {
     Expression newNode = this;
 
@@ -163,56 +163,56 @@ public class BinaryExpression extends Expression
       switch( operator)
       {
       case GT:
-        newNode = new BooleanLiteral( ts.getNewLiteralExtension(), lLeft > lRight );
+        newNode = new BooleanLiteral( ef.getNewLiteralExtension(), lLeft > lRight );
         break;
       case LT:
-        newNode = new BooleanLiteral( ts.getNewLiteralExtension(), lLeft < lRight);
+        newNode = new BooleanLiteral( ef.getNewLiteralExtension(), lLeft < lRight);
         break;
       case EQUAL:
-        newNode = new BooleanLiteral( ts.getNewLiteralExtension(), lLeft == lRight);
+        newNode = new BooleanLiteral( ef.getNewLiteralExtension(), lLeft == lRight);
         break;
       case LE:
-        newNode = new BooleanLiteral( ts.getNewLiteralExtension(), lLeft <= lRight);
+        newNode = new BooleanLiteral( ef.getNewLiteralExtension(), lLeft <= lRight);
         break;
       case GE:
-        newNode = new BooleanLiteral( ts.getNewLiteralExtension(), lLeft >= lRight);
+        newNode = new BooleanLiteral( ef.getNewLiteralExtension(), lLeft >= lRight);
         break;
       case NE:
-        newNode = new BooleanLiteral( ts.getNewLiteralExtension(), lLeft != lRight);
+        newNode = new BooleanLiteral( ef.getNewLiteralExtension(), lLeft != lRight);
         break;
       case MULT:
-        newNode = new IntLiteral( ts.getNewLiteralExtension(), lLeft * lRight);
+        newNode = new IntLiteral( ef.getNewLiteralExtension(), lLeft * lRight);
         break;
       case DIV:
-        newNode = new IntLiteral( ts.getNewLiteralExtension(), lLeft / lRight);
+        newNode = new IntLiteral( ef.getNewLiteralExtension(), lLeft / lRight);
         break;
         // FIXME: MAY NOT BE CORRECT: read jls
       case BIT_OR:
-        newNode = new IntLiteral( ts.getNewLiteralExtension(), lLeft | lRight);
+        newNode = new IntLiteral( ef.getNewLiteralExtension(), lLeft | lRight);
         break;      
       case BIT_AND:
-        newNode = new IntLiteral( ts.getNewLiteralExtension(), lLeft & lRight);
+        newNode = new IntLiteral( ef.getNewLiteralExtension(), lLeft & lRight);
         break;
       case BIT_XOR:
-        newNode = new IntLiteral( ts.getNewLiteralExtension(), lLeft ^ lRight);      
+        newNode = new IntLiteral( ef.getNewLiteralExtension(), lLeft ^ lRight);      
         break;
       case MOD:
-        newNode = new IntLiteral( ts.getNewLiteralExtension(), lLeft % lRight);
+        newNode = new IntLiteral( ef.getNewLiteralExtension(), lLeft % lRight);
         break;
       case LSHIFT:
-        newNode = new IntLiteral( ts.getNewLiteralExtension(), lLeft << lRight);
+        newNode = new IntLiteral( ef.getNewLiteralExtension(), lLeft << lRight);
         break;
       case RSHIFT:
-        newNode = new IntLiteral( ts.getNewLiteralExtension(), lLeft >> lRight);
+        newNode = new IntLiteral( ef.getNewLiteralExtension(), lLeft >> lRight);
         break;
       case RUSHIFT:
-        newNode = new IntLiteral( ts.getNewLiteralExtension(), lLeft >>> lRight);
+        newNode = new IntLiteral( ef.getNewLiteralExtension(), lLeft >>> lRight);
         break;
       case PLUS:
-        newNode = new IntLiteral( ts.getNewLiteralExtension(), lLeft + lRight);
+        newNode = new IntLiteral( ef.getNewLiteralExtension(), lLeft + lRight);
         break;
       case SUB:
-        newNode = new IntLiteral( ts.getNewLiteralExtension(), lLeft - lRight);
+        newNode = new IntLiteral( ef.getNewLiteralExtension(), lLeft - lRight);
       }
     }      
     else if ( (left instanceof BooleanLiteral) &&
@@ -224,15 +224,15 @@ public class BinaryExpression extends Expression
       switch( operator)
       {
       case LOGIC_OR:
-        newNode = new BooleanLiteral( ts.getNewLiteralExtension(), bLeft || bRight);
+        newNode = new BooleanLiteral( ef.getNewLiteralExtension(), bLeft || bRight);
         break;
       case LOGIC_AND:
-        newNode = new BooleanLiteral( ts.getNewLiteralExtension(), bLeft && bRight);
+        newNode = new BooleanLiteral( ef.getNewLiteralExtension(), bLeft && bRight);
       }
     }
     else if ( ( left instanceof StringLiteral) &&
               ( right instanceof StringLiteral)) {
-      newNode = new StringLiteral( ts.getNewLiteralExtension(), ((StringLiteral)left).getString()
+      newNode = new StringLiteral( ef.getNewLiteralExtension(), ((StringLiteral)left).getString()
                                 + ((StringLiteral)right).getString());
 
     }

@@ -6,14 +6,14 @@ import jltools.types.TypeSystem;
 
 public class ConstantFolder extends NodeVisitor
 {
-    private TypeSystem ts;
-    public ConstantFolder(TypeSystem ts) {
-	this.ts = ts;
+    private ExtensionFactory ef;
+    public ConstantFolder(ExtensionFactory ef) {
+	this.ef = ef;
     }
 
   public Node leave( Node old, Node n, NodeVisitor v)
   {
-    return n.foldConstants(ts);
+    return n.foldConstants(ef);
   }
   
 }

@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.HashSet;
 
 import jltools.ast.NodeVisitor;
+import jltools.ast.ExtensionFactory;
 import jltools.util.InternalCompilerError;
 
 
@@ -48,9 +49,10 @@ public class StandardTypeSystem extends TypeSystem {
     SERIALIZABLE_ = resolver.findClass( "java.io.Serializable");
   }
 
-  public LocalContext getLocalContext( ImportTable it, NodeVisitor visitor )
+  public LocalContext getLocalContext( ImportTable it, ExtensionFactory ef,
+	NodeVisitor visitor )
   {
-    return new LocalContext( it, this, visitor );
+    return new LocalContext( it, this, ef, visitor );
   }
 
   public FieldInstance newFieldInstance( String name, Type type,

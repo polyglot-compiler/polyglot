@@ -41,10 +41,13 @@ public class SymbolReader extends NodeVisitor
 
   public Node override(Node n)
   {
-    try
-    {
-      // System.out.println(indent() + "override " + n);
-      return n.readSymbols( this);
+    try {
+      if (n.ext instanceof ReadSymbolsOverride) {
+	return ((ReadSymbolsOverride) n.ext).readSymbols(n, this);
+      }
+      else {
+	return n.readSymbols( this);
+      }
     }
     catch( SemanticException e)
     {
@@ -53,28 +56,6 @@ public class SymbolReader extends NodeVisitor
       return n;
     }
   }
-
-/*
-  public NodeVisitor enter(Node n)
-  {
-    System.out.println(indent() + "enter " + n); indent++;
-    return this;
-  }
-
-  public Node leave(Node old, Node n, NodeVisitor v)
-  {
-    indent--; System.out.println(indent() + "leave " + n);
-    return n;
-  }
-
-  int indent = 0;
-
-  String indent() {
-    String s = "";
-    for (int i = 0; i < indent; i++) s += " ";
-    return s;
-  }
-*/
 
   protected ParsedClassType newParsedClassType() {
     return new ParsedClassType( ts, current);

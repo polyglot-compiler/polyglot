@@ -185,8 +185,8 @@ public class AmbiguousName extends Node implements AmbiguousNode {
 		    ReferenceType refType = type.toReferenceType();
 		    FieldInstance fi =
 			c.getTypeSystem().getField(refType, name, c);
-		    top = new FieldExpression(
-			c.getTypeSystem().getNewFieldExpressionExtension(),
+		    top = new FieldExpression(c.getExtensionFactory().
+			getNewFieldExpressionExtension(),
 			(TypeNode) prefix, fi );
 		}
 		catch (SemanticException e) {
@@ -203,7 +203,7 @@ public class AmbiguousName extends Node implements AmbiguousNode {
 	else if (prefix instanceof Expression) {
 	    /* Try non-static fields. */
 	    top = new FieldExpression(
-		c.getTypeSystem().getNewFieldExpressionExtension(),
+		c.getExtensionFactory().getNewFieldExpressionExtension(),
 		(Expression) prefix, name );
 	}
     }
@@ -216,8 +216,8 @@ public class AmbiguousName extends Node implements AmbiguousNode {
 		FieldInstance fi = (FieldInstance) vi;
 
 		if (fi.getAccessFlags().isStatic() ) {
-		    top = new FieldExpression(
-			c.getTypeSystem().getNewFieldExpressionExtension(),
+		    top = new FieldExpression(c.getExtensionFactory().
+			getNewFieldExpressionExtension(),
 			new TypeNode(fi.getEnclosingType()), fi );
 		}
 		else {
@@ -230,17 +230,17 @@ public class AmbiguousName extends Node implements AmbiguousNode {
 			base = new TypeNode(container);
 		    }
 
-		    top = new FieldExpression(
-			c.getTypeSystem().getNewFieldExpressionExtension(),
-			new SpecialExpression(
-			c.getTypeSystem().getNewSpecialExpressionExtension(),
+		    top = new FieldExpression(c.getExtensionFactory().
+			getNewFieldExpressionExtension(),
+			new SpecialExpression(c.getExtensionFactory().
+			getNewSpecialExpressionExtension(),
 			base, SpecialExpression.THIS),
 			fi);
 		}
 	    }
 	    else if (vi instanceof LocalInstance) {
-	      top = new LocalVariableExpression(
-		c.getTypeSystem().getNewLocalVariableExpressionExtension(),
+	      top = new LocalVariableExpression(c.getExtensionFactory().
+		getNewLocalVariableExpressionExtension(),
 		name);
 	    }
 	    else {

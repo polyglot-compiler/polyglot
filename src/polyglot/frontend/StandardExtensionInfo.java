@@ -1,5 +1,6 @@
 package jltools.frontend;
 
+import jltools.ast.*;
 import jltools.types.*;
 import jltools.util.*;
 import jltools.visit.*;
@@ -9,6 +10,7 @@ import java.util.*;
 
 public class StandardExtensionInfo implements ExtensionInfo {
     protected TypeSystem ts = null;
+    protected ExtensionFactory ef = null;
 
     protected TypeSystem createTypeSystem() {
 	return new StandardTypeSystem();
@@ -19,6 +21,17 @@ public class StandardExtensionInfo implements ExtensionInfo {
 	  ts = createTypeSystem();
 	}
 	return ts;
+    }
+
+    protected ExtensionFactory createExtensionFactory() {
+	return new StandardExtensionFactory();
+    }
+
+    public ExtensionFactory getExtensionFactory() {
+	if (ef == null) {
+	  ef = createExtensionFactory();
+	}
+	return ef;
     }
 
     public List getNodeVisitors(SourceJob job, int goal) {
@@ -47,21 +60,21 @@ public class StandardExtensionInfo implements ExtensionInfo {
 		l.add(new SymbolReader(it, cr, t, tf, ts, eq));
 		break;
 	    case Job.CLEANED:
-		l.add(new SignatureCleaner(ts, it, cr, eq, compiler));
+		l.add(new SignatureCleaner(ef, ts, it, cr, eq, compiler));
 		break;
 	    case Job.DISAMBIGUATED:
-		l.add(new AmbiguityRemover(ts, it, eq));
-		l.add(new ConstantFolder(ts));
+		l.add(new AmbiguityRemover(ef, ts, it, eq));
+		l.add(new ConstantFolder(ef));
 		break;
 	    case Job.CHECKED:
-		l.add(new TypeChecker(ts, it, eq));
+		l.add(new TypeChecker(ef, ts, it, eq));
 		l.add(new ExceptionChecker(eq));
 		break;
 	    case Job.TRANSLATED:
 		if (Compiler.serializeClassInfo()) {
 		    l.add(new ClassSerializer(ts, t.getLastModifiedDate(), eq));
 		}
-		l.add(new TranslationVisitor(it, t, ts, eq, outputWidth));
+		l.add(new TranslationVisitor(ef, it, t, ts, eq, outputWidth));
 		break;
 	    default:
 		throw new InternalCompilerError("Invalid compiler stage: " +

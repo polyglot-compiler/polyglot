@@ -163,14 +163,14 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 		FieldInstance fi =
 		    c.getTypeSystem().getField(refType, name, c);
 		top = new FieldExpression(
-		    c.getTypeSystem().getNewFieldExpressionExtension(),
+		    c.getExtensionFactory().getNewFieldExpressionExtension(),
 		    (TypeNode) prefix, fi );
 	    }
 	}
 	else if (prefix instanceof Expression) {
 	    /* Try non-static fields. */
 	    top = new FieldExpression(
-		c.getTypeSystem().getNewFieldExpressionExtension(),
+		c.getExtensionFactory().getNewFieldExpressionExtension(),
 		(Expression) prefix, name );
 	}
     }
@@ -183,7 +183,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 
 	    if (fi.getAccessFlags().isStatic() ) {
 		top = new FieldExpression(
-		    c.getTypeSystem().getNewFieldExpressionExtension(),
+		    c.getExtensionFactory().getNewFieldExpressionExtension(),
 		    new TypeNode(fi.getEnclosingType()), fi );
 	    }
 	    else {
@@ -196,16 +196,16 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
 		}
 
 		top = new FieldExpression(
-		    c.getTypeSystem().getNewFieldExpressionExtension(),
+		    c.getExtensionFactory().getNewFieldExpressionExtension(),
 		    new SpecialExpression(
-		    c.getTypeSystem().getNewSpecialExpressionExtension(),
+		    c.getExtensionFactory().getNewSpecialExpressionExtension(),
 		    base, SpecialExpression.THIS),
 		    fi);
 	    }
 	}
 	else if (vi instanceof LocalInstance) {
 	  top = new LocalVariableExpression(
-	    c.getTypeSystem().getNewLocalVariableExpressionExtension(),
+	    c.getExtensionFactory().getNewLocalVariableExpressionExtension(),
 	    name);
 	}
 	else {

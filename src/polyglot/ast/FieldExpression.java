@@ -130,18 +130,7 @@ public class FieldExpression extends Expression
   }
 
     public Node addThis() {
-	Node newTarget;
-/*
-	if (target == null) {
-	    newTarget = new SpecialExpression(new JifSpecialExpressionExtension(), null,
-					      SpecialExpression.THIS);
-	} else {
-*/
-	    newTarget = target;
-/*
-	}
-*/
-	return reconstruct(this.ext, newTarget, name, fi);
+	return reconstruct(this.ext, target, name, fi);
     }
 
   public Node typeCheck( LocalContext c) throws SemanticException

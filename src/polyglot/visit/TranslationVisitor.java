@@ -9,18 +9,21 @@ import java.io.*;
 
 public class TranslationVisitor extends NodeVisitor
 {
+  protected ExtensionFactory ef;
   protected ImportTable it;
   protected Target target;
   protected TypeSystem ts;
   protected ErrorQueue eq;
   protected int outputWidth;
 
-  public TranslationVisitor(ImportTable it,
+  public TranslationVisitor(ExtensionFactory ef,
+			    ImportTable it,
 			    Target target,
 			    TypeSystem ts,
 			    ErrorQueue eq,
 			    int outputWidth)
   {
+    this.ef = ef;
     this.it = it;
     this.target = target;
     this.ts = ts;
@@ -36,7 +39,7 @@ public class TranslationVisitor extends NodeVisitor
 	try {
 	    Writer ofw = target.getOutputWriter(sfn.getPackageName());
 	    CodeWriter w = new CodeWriter(ofw, outputWidth);
-	    LocalContext c = ts.getLocalContext(it, this);
+	    LocalContext c = ts.getLocalContext(it, ef, this);
 	    n.translate(c, w);
 	    w.flush();
 	    System.out.flush();

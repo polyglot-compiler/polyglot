@@ -12,6 +12,7 @@ import java.io.IOException;
  */
 public class SignatureCleaner extends NodeVisitor
 {
+  protected ExtensionFactory ef;
   protected TypeSystem ts;
   protected ErrorQueue eq;
   protected LocalContext c;
@@ -19,16 +20,19 @@ public class SignatureCleaner extends NodeVisitor
   protected TableClassResolver cr;
   protected ClassCleaner cc;
 
-  public SignatureCleaner( TypeSystem ts, ImportTable it, TableClassResolver cr,
+  public SignatureCleaner( ExtensionFactory ef,
+			   TypeSystem ts, ImportTable it,
+			   TableClassResolver cr,
 			   ErrorQueue eq, ClassCleaner cc)
   {
+    this.ef = ef;
     this.ts = ts;
     this.it = it;
     this.cr = cr;
     this.cc = cc;
     this.eq = eq;
     
-    c = ts.getLocalContext( it, this);
+    c = ts.getLocalContext( it, ef, this);
   }
 
   public boolean cleanClass(ClassType type) throws IOException
@@ -57,27 +61,29 @@ public class SignatureCleaner extends NodeVisitor
   {
     LocalContext.Mark mark = c.getMark();
 
-    try
-    {
-      Node m = n.cleanupSignatures(c, this);
+    try {
+      Node m;
+      if (n.ext instanceof CleanupSignaturesOverride) {
+        m = ((CleanupSignaturesOverride) n.ext).cleanupSignatures(n, this, c);
+      }
+      else {
+	m = n.cleanupSignatures(c, this);
+      }
+
       c.assertMark(mark);
       return m;
     }
-    catch( SemanticException e)
-    {
+    catch (SemanticException e) {
       eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
                   (e.getLineNumber() == SemanticException.INVALID_LINE ?
 		   Annotate.getLineNumber( n) :
 		   e.getLineNumber()) );
       c.popToMark(mark);
-      // FIXME n.setHasError( true);
     }
-    catch( IOException e)
-    {
+    catch (IOException e) {
       eq.enqueue( ErrorInfo.IO_ERROR, e.getMessage(), 
                   Annotate.getLineNumber( n));
       c.popToMark(mark);
-      // FIXME n.setHasError( true);
     }
 
     c.assertMark(mark);

@@ -2,6 +2,7 @@ package jltools.types;
 
 import jltools.util.InternalCompilerError;
 import jltools.ast.NodeVisitor;
+import jltools.ast.ExtensionFactory;
 
 import java.util.*;
 
@@ -11,6 +12,10 @@ import java.util.*;
  */
 public class LocalContext implements TypeContext
 {
+  /**
+   * Create node extensions.
+   */
+  protected ExtensionFactory ef;
   /**
    * Resolve anything that we don't know about to the type system
    */
@@ -28,10 +33,11 @@ public class LocalContext implements TypeContext
    */
   protected NodeVisitor visitor;
 
-  public LocalContext( ImportTable itImports, TypeSystem ts,
-                       NodeVisitor visitor) 
+  public LocalContext(ImportTable itImports, TypeSystem ts,
+		      ExtensionFactory ef, NodeVisitor visitor) 
   {  
     this.itImports = itImports;
+    this.ef = ef;
     this.ts = ts;
     this.visitor = visitor;
     
@@ -240,6 +246,11 @@ public class LocalContext implements TypeContext
   public TypeSystem getTypeSystem()
   {
     return ts;
+  }
+
+  public ExtensionFactory getExtensionFactory()
+  {
+    return ef;
   }
 
   protected TopScope getTopScope()
