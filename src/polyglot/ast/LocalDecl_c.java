@@ -11,7 +11,7 @@ import jltools.util.*;
  */
 public class LocalDecl_c extends Stmt_c implements LocalDecl
 {
-    Declarator_c decl;
+    Declarator decl;
     LocalInstance li;
 
     public LocalDecl_c(Ext ext, Position pos, Flags flags, TypeNode type, String name, Expr init) {
@@ -80,10 +80,26 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
     /** Set the local instance of the declaration. */
     public LocalDecl localInstance(LocalInstance li) {
         LocalDecl_c n = (LocalDecl_c) copy();
-	n.li = li;
-	return n;
+		n.li = li;
+		return n;
     }
 
+	/** 
+	 * Get the declarator.
+	 */
+	protected Declarator decl() {
+		return decl;
+	}
+	
+	/**
+	 * Set the declarator.
+	 */
+	protected LocalDecl decl(Declarator decl) {
+		LocalDecl_c n = (LocalDecl_c) copy();
+		n.decl = decl;
+		return n;
+	}
+	
     /** Reconstruct the declaration. */
     protected LocalDecl_c reconstruct(TypeNode type, Expr init) {
         if (type() != type || init() != init) {
