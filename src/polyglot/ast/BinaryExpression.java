@@ -56,9 +56,6 @@ public class BinaryExpression extends Expression
    */
   public BinaryExpression( Node ext, Expression left, int operator, Expression right) {
     if( left == null || right == null) {
-	System.out.println("left = "+left);
-	System.out.println("op = "+getOperatorString(operator));
-	System.out.println("right = " + right);
       throw new NullPointerException ("BinaryExpression cannot " +
                                       "take null Expressions.");
     }
