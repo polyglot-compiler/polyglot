@@ -1,40 +1,11 @@
 package polyglot.visit;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.Map.Entry;
 
-import polyglot.ast.ClassBody;
-import polyglot.ast.ClassMember;
-import polyglot.ast.CodeDecl;
-import polyglot.ast.ConstructorCall;
-import polyglot.ast.ConstructorDecl;
-import polyglot.ast.Expr;
-import polyglot.ast.Field;
-import polyglot.ast.FieldAssign;
-import polyglot.ast.FieldDecl;
-import polyglot.ast.Formal;
-import polyglot.ast.Initializer;
-import polyglot.ast.Local;
-import polyglot.ast.LocalAssign;
-import polyglot.ast.LocalDecl;
-import polyglot.ast.Node;
-import polyglot.ast.NodeFactory;
-import polyglot.ast.Special;
-import polyglot.ast.Term;
+import polyglot.ast.*;
 import polyglot.frontend.Job;
-import polyglot.types.ClassType;
-import polyglot.types.ConstructorInstance;
-import polyglot.types.FieldInstance;
-import polyglot.types.LocalInstance;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
-import polyglot.types.VarInstance;
+import polyglot.types.*;
 
 /**
  * Visitor which checks that all local variables must be defined before use, 
@@ -321,7 +292,8 @@ public class InitChecker extends DataFlow
             // check that all static fields have been initialized exactly once 
             checkStaticFinalFieldsInit((ClassBody)n);
             
-            // check that at the end of each constructor!@!
+            // check that at the end of each constructor all non-static final
+            // fields are initialzed.
             checkNonStaticFinalFieldsInit((ClassBody)n);
             
             // copy the locals used to the outer scope
@@ -480,6 +452,31 @@ public class InitChecker extends DataFlow
         return new DataFlowItem(new HashMap(currCBI.currClassFinalFieldInitCounts));
     }
     
+    /**
+     * The confluence operator for <code>Initializer</code>s and 
+     * <code>Constructor</code>s needs to be a 
+     * little special, as we are only concerned with non-exceptional flows in 
+     * these cases.
+     * This method ensures that a slightly different confluence is performed
+     * for these <code>Term</code>s, otherwise 
+     * <code>confluence(List, Term)</code> is called instead. 
+     */
+    protected Item confluence(List items, List itemKeys, Term node) {
+        if (node instanceof Initializer || node instanceof ConstructorDecl) {
+            List filtered = filterItemsNonException(items, itemKeys);
+            if (filtered.isEmpty()) {
+                return new DataFlowItem(new HashMap(currCBI.currClassFinalFieldInitCounts));
+            }
+            else if (filtered.size() == 1) {
+                return (Item)filtered.get(0);
+            }
+            else {
+               return confluence(filtered, node);
+            } 
+        }
+        return confluence(items, node); 
+    }
+
     /**
      * The confluence operator is essentially the union of all of the
      * inItems. However, if two or more of the initCount maps from
@@ -755,28 +752,96 @@ public class InitChecker extends DataFlow
         
         if (n == graph.finishNode()) {            
             if (currCBI.currCodeDecl instanceof Initializer) {
-                // We are finishing the checking of an intializer.
-                // We need to copy back the init counts of any fields back into
-                // currClassFinalFieldInitCounts, so that the counts are 
-                // correct for the next initializer or constructor.
-                Iterator iter = dfOut.initStatus.entrySet().iterator();
-                while (iter.hasNext()) {
-                    Map.Entry e = (Map.Entry)iter.next();
-                    if (e.getKey() instanceof FieldInstance) {
-                        FieldInstance fi = (FieldInstance)e.getKey();
-                        if (fi.flags().isFinal()) {
-                            // we don't need to join the init counts, as all
-                            // dataflows will go through all of the 
-                            // initializers
-                            currCBI.currClassFinalFieldInitCounts.put(fi, 
-                                    e.getValue());
-                        }
-                    }
-                }                
+                finishInitializer(graph, 
+                                (Initializer)currCBI.currCodeDecl, 
+                                dfIn, 
+                                dfOut);
+            }
+            if (currCBI.currCodeDecl instanceof ConstructorDecl) {
+                finishConstructorDecl(graph, 
+                                    (ConstructorDecl)currCBI.currCodeDecl, 
+                                    dfIn, 
+                                    dfOut);
             }
         }        
     }
 
+    /**
+     * Perform necessary actions upon seeing the Initializer 
+     * <code>initializer</code>.
+     */
+    protected void finishInitializer(FlowGraph graph, 
+                                    Initializer initializer, 
+                                    DataFlowItem dfIn, 
+                                    DataFlowItem dfOut) {
+        // We are finishing the checking of an intializer.
+        // We need to copy back the init counts of any fields back into
+        // currClassFinalFieldInitCounts, so that the counts are 
+        // correct for the next initializer or constructor.
+        Iterator iter = dfOut.initStatus.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry e = (Map.Entry)iter.next();
+            if (e.getKey() instanceof FieldInstance) {
+                FieldInstance fi = (FieldInstance)e.getKey();
+                if (fi.flags().isFinal()) {
+                    // we don't need to join the init counts, as all
+                    // dataflows will go through all of the 
+                    // initializers
+                    currCBI.currClassFinalFieldInitCounts.put(fi, 
+                            e.getValue());
+                }
+            }
+        }                
+    }
+
+    /**
+     * Perform necessary actions upon seeing the ConstructorDecl 
+     * <code>cd</code>.
+     */
+    protected void finishConstructorDecl(FlowGraph graph, 
+                                        ConstructorDecl cd, 
+                                        DataFlowItem dfIn, 
+                                        DataFlowItem dfOut) {
+        ConstructorInstance ci = cd.constructorInstance();
+        
+        // we need to set currCBI.fieldsConstructorInitializes correctly.
+        // It is meant to contain the non-static final fields that the
+        // constructor ci initializes.
+        //
+        // Note that dfOut.initStatus contains only the MinMaxInitCounts
+        // for _normal_ termination of the constructor (see the
+        // method confluence). This means that if dfOut says the min
+        // count of the initialization for a final non-static field
+        // is one, and that is different from what is recoreded in
+        // currCBI.currClassFinalFieldInitCounts (which is the counts
+        // of the initializations performed by initializers), then
+        // the constructor does indeed initialize the field.
+
+        Set s = new HashSet();
+                
+        // go through every final non-static field in dfOut.initStatus
+        Iterator iter = dfOut.initStatus.entrySet().iterator();
+        while (iter.hasNext()) {
+            Entry e = (Entry)iter.next();
+            if (e.getKey() instanceof FieldInstance && 
+                    ((FieldInstance)e.getKey()).flags().isFinal() && 
+                    !((FieldInstance)e.getKey()).flags().isStatic()) {
+                // we have a final non-static field                           
+                FieldInstance fi = (FieldInstance)e.getKey();
+                MinMaxInitCount initCount = (MinMaxInitCount)e.getValue();
+                MinMaxInitCount origInitCount = (MinMaxInitCount)currCBI.currClassFinalFieldInitCounts.get(fi);
+                if (initCount.getMin() == InitCount.ONE &&
+                     (origInitCount == null || origInitCount.getMin() == InitCount.ZERO)) {
+                    // the constructor initialized this field
+                    s.add(fi);
+                }
+            }
+        }
+        if (!s.isEmpty()) {
+            currCBI.fieldsConstructorInitializes.put(ci, s);
+        }
+    }
+    
     /**
      * Check that the local variable <code>l</code> is used correctly.
      */
@@ -862,21 +927,7 @@ public class InitChecker extends DataFlow
                     throw new SemanticException("field \"" + fi.name() +
                             "\" might already have been assigned to",
                             a.position());
-                }
-                    
-                // if the field is non-static and final, and we are in
-                // a constructor, record the fact that this constructor 
-                // initializes the field 
-                if (!fi.flags().isStatic() && currCBI.currCodeDecl instanceof ConstructorDecl) {
-                    ConstructorInstance ci = ((ConstructorDecl)currCBI.currCodeDecl).constructorInstance();
-                    Set s = (Set)currCBI.fieldsConstructorInitializes.get(ci);
-                    if (s == null) {
-                        s = new HashSet();
-                        currCBI.fieldsConstructorInitializes.put(ci, s);
-                    }
-                    s.add(fi);
-                }
-                
+                }                                    
             }
             else {
                 // not in a constructor or intializer, or the target is
