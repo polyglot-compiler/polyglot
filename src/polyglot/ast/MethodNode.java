@@ -380,6 +380,7 @@ public class MethodNode extends ClassMember
 
   public void translate( LocalContext c, CodeWriter w)
   {
+    w.begin(0);
     w.write( accessFlags.getStringRepresentation());
     if( !isConstructor()) {
       returns.translate( c, w);
@@ -418,6 +419,7 @@ public class MethodNode extends ClassMember
 	}
       }
     }
+    w.end();
     
     if( !mtiThis.getAccessFlags().isAbstract() ) {
       // FIXME should be abstract for interfaces.
