@@ -23,6 +23,7 @@ public interface Pass
     public static final ID DISAM = new ID("disam");
     public static final ID DISAM_ALL = new ID("disam-barrier");
     public static final ID TYPE_CHECK = new ID("type-check");
+    public static final ID SET_EXPECTED_TYPES = new ID("set-expected-types");
     public static final ID EXC_CHECK = new ID("exc-check");
     public static final ID FOLD = new ID("fold");
     public static final ID DUMP = new ID("dump");

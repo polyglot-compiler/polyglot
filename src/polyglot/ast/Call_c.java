@@ -234,6 +234,28 @@ public class Call_c extends Expr_c implements Call
     return call.methodInstance(mi).type(mi.returnType());
   }
 
+  public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      throws SemanticException
+  {
+      if (child == target) {
+          return child.expectedType(mi.container());
+      }
+
+      Iterator i = this.arguments.iterator();
+      Iterator j = mi.argumentTypes().iterator();
+
+      while (i.hasNext() && j.hasNext()) {
+          Expr e = (Expr) i.next();
+          Type t = (Type) j.next();
+
+          if (e == child) {
+              return child.expectedType(t);
+          }
+      }
+
+      return child;
+  }
+
   /** Check exceptions thrown by the call. */
   public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
     if (mi == null) {

@@ -81,6 +81,7 @@ public class Assign_c extends Expr_c implements Assign
     return reconstruct(left, right);
   }
 
+
   /** Type check the expression. */
   public Node typeCheck_(TypeChecker tc) throws SemanticException {
     Type t = left.type();
@@ -155,6 +156,14 @@ public class Assign_c extends Expr_c implements Assign
     return type(ts.promote(t, s));
   }
   
+  public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc) throws SemanticException {
+      if (child == right) {
+          return child.expectedType(left.type());
+      }
+
+      return child;
+  }
+
   /** Check exceptions thrown by the expression. */
   public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
     TypeSystem ts = ec.typeSystem();

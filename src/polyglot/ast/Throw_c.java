@@ -60,6 +60,18 @@ public class Throw_c extends Stmt_c implements Throw
 	return this;
     }
 
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      	throws SemanticException
+    {
+        TypeSystem ts = tc.typeSystem();
+
+        if (child == expr) {
+            return child.expectedType(ts.Throwable());
+        }
+
+        return child;
+    }
+
     /** Check exceptions thrown by the statement. */
     public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException
     {

@@ -86,6 +86,22 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	return type(array.type().toArray().base());
     }
 
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      	throws SemanticException
+    {
+        TypeSystem ts = tc.typeSystem();
+
+        if (child == index) {
+            return child.expectedType(ts.Int());
+        }
+
+        if (child == array) {
+            return child.expectedType(ts.arrayOf(this.type));
+        }
+
+        return child;
+    }
+
     /** Check exceptions thrown by the expression. */
     public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
 	TypeSystem ts = ec.typeSystem();

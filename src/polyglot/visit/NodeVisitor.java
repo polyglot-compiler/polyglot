@@ -35,6 +35,10 @@ public abstract class NodeVisitor
      * @return A node if normal traversal is to stop, <code>null</code> if it
      * is to continue.
      */
+    public Node override(Node parent, Node n) {
+        return override(n);
+    }
+
     public Node override(Node n) {
 	return null;
     }
@@ -48,6 +52,10 @@ public abstract class NodeVisitor
      * @return The <code>NodeVisitor</code> which should be used to visit the
      * children of <code>n</code>.
      */
+    public Node enter(Node parent, Node n) {
+        return enter(n);
+    }
+
     public Node enter(Node n) {
         return n;
     }
@@ -71,6 +79,10 @@ public abstract class NodeVisitor
      * @return The final result of the traversal of the tree rooted at
      * <code>n</code>.
      */
+    public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
+        return leave(old, n, v);
+    }
+
     public Node leave(Node old, Node n, NodeVisitor v) {
         return n;
     }

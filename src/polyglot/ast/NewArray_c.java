@@ -116,6 +116,16 @@ public class NewArray_c extends Expr_c implements NewArray
 	return type(type);
     }
 
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+        throws SemanticException
+    {
+        if (child == init) {
+            return child.expectedType(this.type);
+        }
+
+        return child;
+    }
+
     public String toString() {
 	return "new " + baseType + "[...]";
     }

@@ -399,12 +399,12 @@ name    ::=
 simple_name ::=
                     // Name
         IDENTIFIER:a
-            {: RESULT = new Name(parser, parser.util.pos(a), a.getIdentifier()); :}
+            {: RESULT = new Name(parser.util.parser(), parser.util.pos(a), a.getIdentifier()); :}
     ;
 qualified_name ::=
                     // Name
         name:a DOT IDENTIFIER:b
-            {: RESULT = new Name(parser, parser.util.pos(a), a, b.getIdentifier()); :}
+            {: RESULT = new Name(parser.util.parser(), parser.util.pos(a), a, b.getIdentifier()); :}
     ;
 // 19.6) Packages
 compilation_unit ::=
@@ -1181,7 +1181,7 @@ identifier_opt ::=
                     // Name
             {: RESULT = null; :}
     |   IDENTIFIER:a
-            {: RESULT = new Name(parser, parser.util.pos(a), 
+            {: RESULT = new Name(parser.util.parser(), parser.util.pos(a), 
                 a.getIdentifier()); :}
     ;
 

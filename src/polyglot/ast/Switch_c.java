@@ -70,7 +70,14 @@ public class Switch_c extends Stmt_c implements Switch
 
     /** Type check the statement. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
-      	Collection labels = new HashSet();
+        TypeSystem ts = tc.typeSystem();
+
+        if (! expr.type().isImplicitCastValid(ts.Int())) {
+            throw new SemanticException("Switch index must be an integer.",
+                                        position());
+        }
+
+        Collection labels = new HashSet();
 
 	for (Iterator i = elements.iterator(); i.hasNext();) {
 	   SwitchElement s = (SwitchElement) i.next();
@@ -99,6 +106,18 @@ public class Switch_c extends Stmt_c implements Switch
 	}
 
 	return this;
+    }
+
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      	throws SemanticException
+    {
+        TypeSystem ts = tc.typeSystem();
+
+        if (child == expr) {
+            return child.expectedType(ts.Int());
+        }
+
+        return child;
     }
 
     public String toString() {

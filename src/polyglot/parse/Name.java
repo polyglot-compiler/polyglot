@@ -9,26 +9,26 @@ import jltools.util.*;
  * Represents an ambiguous, possibly qualified, identifier encountered while parsing.
  */
 public class Name {
+	public final Name prefix;
+	public final String name;
 	Position pos;
-	Name prefix;
-	String name;
 	NodeFactory nf;
 	TypeSystem ts;
 
-	Name(Grm parser, Position pos, String name) {
+	public Name(ParserWrapper parser, Position pos, String name) {
 		this(parser, pos, null, name);
 	}
 
-	Name(Grm parser, Position pos, Name prefix, String name) {
-		this.nf = parser.nf;
-		this.ts = parser.ts;
+	public Name(ParserWrapper parser, Position pos, Name prefix, String name) {
+		this.nf = parser.nodeFactory();
+		this.ts = parser.typeSystem();
 		this.pos = pos;
 		this.prefix = prefix;
 		this.name = name;
 	}
 
 	// expr
-	Expr toExpr() {
+	public Expr toExpr() {
 		if (prefix == null) {
 			return nf.AmbExpr(pos, name);
 		}
@@ -37,7 +37,7 @@ public class Name {
 	}
 
 	// expr or type
-	Receiver toReceiver() {
+	public Receiver toReceiver() {
 		if (prefix == null) {
 			return nf.AmbReceiver(pos, name);
 		}
@@ -46,7 +46,7 @@ public class Name {
 	}
 
 	// expr, type, or package
-	Prefix toPrefix() {
+	public Prefix toPrefix() {
 		if (prefix == null) {
 			return nf.AmbPrefix(pos, name);
 		}
@@ -55,7 +55,7 @@ public class Name {
 	}
 
 	// type or package
-	QualifierNode toQualifier() {
+	public QualifierNode toQualifier() {
 		if (prefix == null) {
 			return nf.AmbQualifierNode(pos, name);
 		}
@@ -64,12 +64,12 @@ public class Name {
 	}
 
 	// type
-	PackageNode toPackage() {
+	public PackageNode toPackage() {
 		return nf.PackageNode(pos, ts.packageForName(toString()));
 	}
 
 	// type
-	TypeNode toType() {
+	public TypeNode toType() {
 		if (prefix == null) {
 			return nf.AmbTypeNode(pos, name);
 		}

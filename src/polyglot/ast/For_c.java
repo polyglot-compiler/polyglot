@@ -119,6 +119,18 @@ public class For_c extends Stmt_c implements For
 	return this;
     }
 
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      	throws SemanticException
+    {
+        TypeSystem ts = tc.typeSystem();
+
+        if (child == cond) {
+            return child.expectedType(ts.Boolean());
+        }
+
+        return child;
+    }
+
     /** Write the statement to an output file. */
     public void translate_(CodeWriter w, Translator tr) {
         Context c = tr.context();

@@ -7,6 +7,7 @@ import jltools.visit.AmbiguityRemover;
 import jltools.visit.ConstantFolder;
 import jltools.visit.AddMemberVisitor;
 import jltools.visit.TypeChecker;
+import jltools.visit.ExpectedTypeVisitor;
 import jltools.visit.ExceptionChecker;
 import jltools.visit.Translator;
 import jltools.types.SemanticException;
@@ -41,6 +42,7 @@ public interface Ext extends Copy
     Node typeCheckOverride(TypeChecker tc) throws SemanticException;
     Node typeCheckEnter(TypeChecker tc) throws SemanticException;
     Node typeCheck(TypeChecker tc) throws SemanticException;
+    Expr setExpectedType(Expr child, ExpectedTypeVisitor tc) throws SemanticException;
 
     Node exceptionCheckOverride(ExceptionChecker ec) throws SemanticException;
     Node exceptionCheckEnter(ExceptionChecker ec) throws SemanticException;

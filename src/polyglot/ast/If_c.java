@@ -93,6 +93,18 @@ public class If_c extends Stmt_c implements If
 	return this;
     }
 
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      	throws SemanticException
+    {
+        TypeSystem ts = tc.typeSystem();
+
+        if (child == cond) {
+            return child.expectedType(ts.Boolean());
+        }
+
+        return child;
+    }
+
     public String toString() {
 	return "if (" + cond + ") " + consequent +
 	    (alternative != null ? " else " + alternative : "");

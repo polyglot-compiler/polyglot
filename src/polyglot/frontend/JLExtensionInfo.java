@@ -251,6 +251,7 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	l.add(new VisitorPass(Pass.FOLD, job, new ConstantFolder(job)));
 	l.add(new BarrierPass(Pass.DISAM_ALL, job));
         l.add(new VisitorPass(Pass.TYPE_CHECK, job, new TypeChecker(job)));
+        l.add(new VisitorPass(Pass.SET_EXPECTED_TYPES, job, new ExpectedTypeVisitor(job)));
 	l.add(new VisitorPass(Pass.EXC_CHECK, job, new ExceptionChecker(ts, compiler.errorQueue())));
 	l.add(new BarrierPass(Pass.PRE_OUTPUT_ALL, job));
 

@@ -181,6 +181,33 @@ public class Conditional_c extends Expr_c implements Conditional
 	    position());
     }
 
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      	throws SemanticException
+    {
+        TypeSystem ts = tc.typeSystem();
+
+        if (child == cond) {
+            return child.expectedType(ts.Boolean());
+        }
+
+        if (child == consequent) {
+            if (alternative.type().isNull()) {
+                return child.expectedType(ts.Object());
+            }
+            return child.expectedType(alternative.type());
+        }
+
+        if (child == alternative) {
+            if (consequent.type().isNull()) {
+                return child.expectedType(ts.Object());
+            }
+            return child.expectedType(consequent.type());
+        }
+
+        return child;
+    }
+
+
     public String toString() {
 	return cond + " ? " + consequent + " : " + alternative;
     }

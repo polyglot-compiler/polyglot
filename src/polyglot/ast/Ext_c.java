@@ -93,6 +93,10 @@ public class Ext_c implements Ext {
 	return n.typeCheck_(tc);
     }
 
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc) throws SemanticException {
+        return n.setExpectedType_(child, tc);
+    }
+
     public Node exceptionCheckOverride(ExceptionChecker ec) throws SemanticException {
 	return n.exceptionCheckOverride_(ec);
     }

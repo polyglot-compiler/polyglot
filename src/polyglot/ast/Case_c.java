@@ -128,6 +128,18 @@ public class Case_c extends Stmt_c implements Case
 	return value(value);
     }
 
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      	throws SemanticException
+    {
+        TypeSystem ts = tc.typeSystem();
+
+        if (child == expr) {
+            return child.expectedType(ts.Int());
+        }
+
+        return child;
+    }
+
     public String toString() {
         if (expr == null) {
 	    return "default:";

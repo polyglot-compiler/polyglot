@@ -26,10 +26,15 @@ public class Util {
 		this.nf = parser.nodeFactory();
 		this.ts = parser.typeSystem();
 	}
+
+        public ParserWrapper parser() {
+                return parser;
+        }
 	
 	/**
 	 * Return the position of the Token.
-	 */	public static Position pos(Token t) {
+	 */
+        public static Position pos(Token t) {
 		if (t == null) {
 			return null;
 		}
@@ -207,4 +212,4 @@ public class Util {
 		parser.die(pos(e));
 		return null;
 	}	
-}
+}

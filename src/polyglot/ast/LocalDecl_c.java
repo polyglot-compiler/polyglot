@@ -184,6 +184,12 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
 	return this;
     }
 
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+        throws SemanticException
+    {
+        return decl.setExpectedType(child, tc);
+    }
+
     public String toString() {
 	return decl.toString();
     }

@@ -84,6 +84,26 @@ public class Cast_c extends Expr_c implements Cast
 
 	return type(castType.type());
     }
+
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      	throws SemanticException
+    {
+        TypeSystem ts = tc.typeSystem();
+
+        if (child == expr) {
+            if (castType.type().isReference()) {
+                return child.expectedType(ts.Object());
+            }
+            else if (castType.type().isNumeric()) {
+                return child.expectedType(ts.Double());
+            }
+            else if (castType.type().isBoolean()) {
+                return child.expectedType(ts.Boolean());
+            }
+        }
+
+        return child;
+    }
   
     /** Check exceptions thrown by the expression. */
     public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {

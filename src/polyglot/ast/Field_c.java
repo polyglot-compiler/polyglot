@@ -138,6 +138,16 @@ public class Field_c extends Expr_c implements Field
                                     target.getClass().getName() + ".");
   }
 
+  public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      throws SemanticException
+  {
+      if (child == target) {
+          return child.expectedType(fi.container());
+      }
+
+      return child;
+  }
+
   /** Check exceptions thrown by the field. */
   public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
     TypeSystem ts = ec.typeSystem();

@@ -12,6 +12,7 @@ import jltools.visit.AmbiguityRemover;
 import jltools.visit.AddMemberVisitor;
 import jltools.visit.ConstantFolder;
 import jltools.visit.TypeChecker;
+import jltools.visit.ExpectedTypeVisitor;
 import jltools.visit.ExceptionChecker;
 import jltools.visit.Translator;
 
@@ -68,15 +69,26 @@ public interface Node extends Copy, Serializable
     Object copy();
 
     /**
-     * Visit the node.  This method is called by a <code>NodeVisitor</code> to
-     * traverse the AST starting at this node.  This method should call the
-     * <code>override</code>, <code>enter</code>, and <code>leave<code> methods
-     * of the visitor.  The method may return a new version of the node.
+     * Visit the node.  This method is equivalent to <code>visitEdge(null,
+     * v)</code>.
      *
      * @param v The visitor which will traverse/rewrite the AST.
      * @return A new AST if a change was made, or <code>this</code>.
      */
     Node visit(NodeVisitor v);
+
+    /**
+     * Visit the node, passing in the node's parent.  This method is called by
+     * a <code>NodeVisitor</code> to traverse the AST starting at this node.
+     * This method should call the <code>override</code>, <code>enter</code>,
+     * and <code>leave<code> methods of the visitor.  The method may return a
+     * new version of the node.
+     *
+     * @param parent The parent of <code>this</code> in the AST.
+     * @param v The visitor which will traverse/rewrite the AST.
+     * @return A new AST if a change was made, or <code>this</code>.
+     */
+    Node visitEdge(Node parent, NodeVisitor v);
 
     /**
      * Visit the children of the node.
@@ -155,6 +167,7 @@ public interface Node extends Copy, Serializable
     Node typeCheckOverride_(TypeChecker tc) throws SemanticException;
     Node typeCheckEnter_(TypeChecker tc) throws SemanticException;
     Node typeCheck_(TypeChecker tc) throws SemanticException;
+    Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc) throws SemanticException;
 
     /**
      * Check that exceptions are properly propagated throughout the AST.

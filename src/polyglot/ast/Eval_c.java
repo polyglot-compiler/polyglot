@@ -41,6 +41,18 @@ public class Eval_c extends Stmt_c implements Eval
 	return this;
     }
 
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      	throws SemanticException
+    {
+        TypeSystem ts = tc.typeSystem();
+
+        if (child == expr) {
+            return child.expectedType(ts.Void());
+        }
+
+        return child;
+    }
+
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
 	Expr expr = (Expr) visitChild(this.expr, v);

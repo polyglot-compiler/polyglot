@@ -12,6 +12,7 @@ import jltools.util.*;
 public abstract class Expr_c extends Node_c implements Expr
 {
     protected Type type;
+    protected Type expectedType;
 
     public Expr_c(Ext ext, Position pos) {
 	super(ext, pos);
@@ -33,6 +34,24 @@ public abstract class Expr_c extends Node_c implements Expr
 	return n;
     }
 
+    /**
+     * Get the expected type of the expression.
+     */
+    public Type expectedType() {
+        if (this.expectedType == null) {
+            return this.type;
+        }
+
+	return this.expectedType;
+    }
+
+    /** Set the type of the expression. */
+    public Expr expectedType(Type expectedType) {
+	Expr_c n = (Expr_c) copy();
+	n.expectedType = expectedType;
+	return n;
+    }
+
     public void dump(CodeWriter w) {
         super.dump(w);
 
@@ -40,6 +59,9 @@ public abstract class Expr_c extends Node_c implements Expr
 	    w.allowBreak(4, " ");
 	    w.begin(0);
 	    w.write("(type " + type + ")");
+	    w.end();
+	    w.begin(0);
+	    w.write("(expectedType " + expectedType + ")");
 	    w.end();
 	}
     }

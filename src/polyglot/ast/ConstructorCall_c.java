@@ -110,6 +110,12 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
     /** Type check the call. */
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
+        // FIXME: What about the qualifier?
+        if (qualifier != null) {
+            throw new InternalCompilerError("Qualifier constructor calls not " +
+                                            "implemented.", position());
+        }
+
 	TypeSystem ts = tc.typeSystem();
 	Context c = tc.context();
 
@@ -134,6 +140,30 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	ConstructorInstance ci = ts.findConstructor(ct, argTypes, c);
 
 	return constructorInstance(ci);
+    }
+
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      	throws SemanticException
+    {
+        // FIXME: What about the qualifier?
+        if (child == qualifier) {
+            throw new InternalCompilerError("Qualifier constructor calls not " +
+                                            "implemented.", position());
+        }
+
+        Iterator i = this.arguments.iterator();
+        Iterator j = ci.argumentTypes().iterator();
+
+        while (i.hasNext() && j.hasNext()) {
+	    Expr e = (Expr) i.next();
+	    Type t = (Type) j.next();
+
+            if (e == child) {
+                return child.expectedType(t);
+            }
+        }
+
+        return child;
     }
 
     public String toString() {

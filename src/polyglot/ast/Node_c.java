@@ -88,20 +88,23 @@ public abstract class Node_c implements Node
                     return null;
                 }
 
-                // return v.visitEdge(this, n);
-                return n.visit(v);
+                return n.visitEdge(this, v);
         }
 
         public Node visit(NodeVisitor v) {
+                return visitEdge(null, v);
+        }
+
+        public Node visitEdge(Node parent, NodeVisitor v) {
                 if (bypass) {
                     Types.report(5, "skipping " + this);
                     return bypass(false);
                 }
 
-		Node n = v.override(this);
+		Node n = v.override(parent, this);
 
 		if (n == null) {
-			n = v.enter(this);
+			n = v.enter(parent, this);
 
 			if (n == null) {
 				throw new InternalCompilerError(
@@ -115,7 +118,7 @@ public abstract class Node_c implements Node
 					"Node_c.visitChildren() returned null.");
 			}
 
-			n = v.leave(this, n, v);
+			n = v.leave(parent, this, n, v);
 
 			if (n == null) {
 				throw new InternalCompilerError(
@@ -240,6 +243,10 @@ public abstract class Node_c implements Node
 	public Node typeCheck_(TypeChecker tc) throws SemanticException {
 		return this;
 	}
+
+        public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc) throws SemanticException {
+                return child;
+        }
 
 	/** Check that exceptions are properly propagated throughout the AST. */
 	public Node exceptionCheckOverride_(ExceptionChecker ec) throws SemanticException {

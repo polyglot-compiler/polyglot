@@ -107,6 +107,22 @@ public class Return_c extends Stmt_c implements Return
 	throw new InternalCompilerError("Unrecognized code type.");
     }
   
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      	throws SemanticException
+    {
+        if (child == expr) {
+            Context c = tc.context();
+            CodeInstance ci = c.currentCode();
+
+            if (ci instanceof MethodInstance) {
+                MethodInstance mi = (MethodInstance) ci;
+                return child.expectedType(mi.returnType());
+            }
+        }
+
+        return child;
+    }
+
     public String toString() {
 	return "return" + (expr != null ? " " + expr : "");
     }

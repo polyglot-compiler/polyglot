@@ -201,19 +201,7 @@ public class Binary_c extends Expr_c implements Binary
 	}
 
 	if (op == EQ || op == NE) {
-	    if (l.isNumeric() && ! r.isNumeric()) {
-		throw new SemanticException("The " + op +
-		    " operator must have operands of similar type.",
-		    position());
-	    }
-
-	    if (l.isBoolean() && ! r.isBoolean()) {
-		throw new SemanticException("The " + op +
-		    " operator must have operands of similar type.",
-		    position());
-	    }
-
-	    if (l.isReference() && ! (r.isReference() || r.isNull())) {
+            if (! ts.isCastValid(l, r) && ! ts.isCastValid(r, l)) {
 		throw new SemanticException("The " + op +
 		    " operator must have operands of similar type.",
 		    position());
@@ -263,22 +251,20 @@ public class Binary_c extends Expr_c implements Binary
         }
 
         if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
-            if (! l.isNumeric()) {
+            if (! l.isImplicitCastValid(ts.Long())) {
                 throw new SemanticException("The " + op +
                     " operator must have numeric or boolean operands.",
                     left.position());
             }
 
-            if (! r.isNumeric()) {
+            if (! r.isImplicitCastValid(ts.Long())) {
                 throw new SemanticException("The " + op +
                     " operator must have numeric or boolean operands.",
                     right.position());
             }
         }
 
-        if (op == SUB || op == MUL || op == DIV || op == MOD ||
-            op == SHL || op == SHR || op == USHR) {
-
+        if (op == SUB || op == MUL || op == DIV || op == MOD) {
             if (! l.isNumeric()) {
                 throw new SemanticException("The " + op +
                     " operator must have numeric operands.", left.position());
@@ -290,12 +276,89 @@ public class Binary_c extends Expr_c implements Binary
             }
         }
 
+        if (op == SHL || op == SHR || op == USHR) {
+            if (! l.isImplicitCastValid(ts.Long())) {
+                throw new SemanticException("The " + op +
+                    " operator must have numeric operands.", left.position());
+            }
+
+            if (! r.isImplicitCastValid(ts.Long())) {
+                throw new SemanticException("The " + op +
+                    " operator must have numeric operands.", right.position());
+            }
+        }
+
 	if (op == SHL || op == SHR || op == USHR) {
 	    // For shift, only promote the left operand.
 	    return type(ts.promote(l));
 	}
 
 	return type(ts.promote(l, r));
+    }
+
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+        throws SemanticException
+    {
+        Expr other;
+
+        if (child == left) {
+            other = right;
+        }
+        else if (child == right) {
+            other = left;
+        }
+        else {
+            return child;
+        }
+
+	TypeSystem ts = tc.typeSystem();
+
+	if (op == EQ || op == NE) {
+            // Coercion to compatible types.
+            if (other.type().isReference() || other.type().isNull()) {
+                return child.expectedType(ts.Object());
+            }
+
+            if (other.type().isBoolean()) {
+                return child.expectedType(ts.Boolean());
+            }
+
+            if (other.type().isNumeric()) {
+                return child.expectedType(ts.Double());
+            }
+        }
+
+        if (op == ADD && type.isSame(ts.String())) {
+            // Implicit coercion to String.
+            return child.expectedType(ts.String());
+        }
+
+        if (op == GT || op == LT || op == GE || op == LE) {
+            if (other.type().isNumeric()) {
+                return child.expectedType(ts.Double());
+            }
+        }
+
+        if (op == COND_OR || op == COND_AND) {
+            return child.expectedType(ts.Boolean());
+        }
+
+	if (op == BIT_AND || op == BIT_OR || op == BIT_XOR) {
+            if (other.type().isBoolean()) {
+                return child.expectedType(ts.Boolean());
+            }
+            return child.expectedType(ts.Long());
+        }
+
+        if (op == SUB || op == MUL || op == DIV || op == MOD) {
+            return child.expectedType(ts.Double());
+        }
+
+        if (op == SHL || op == SHR || op == USHR) {
+            return child.expectedType(ts.Long());
+        }
+
+        return child;
     }
 
     /** Check exceptions thrown by the expression. */

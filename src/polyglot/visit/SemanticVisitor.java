@@ -33,6 +33,10 @@ public abstract class SemanticVisitor extends BaseVisitor
 	return context;
     }
 
+    protected Node enterCall(Node parent, Node n) throws SemanticException {
+        return enterCall(n);
+    }
+
     protected Node enterCall(Node n) throws SemanticException {
         return n;
     }
@@ -119,7 +123,7 @@ public abstract class SemanticVisitor extends BaseVisitor
 	}
     }
 
-    public Node enter(Node n) {
+    public Node enter(Node parent, Node n) {
         Types.report(5, "enter(" + n + "): " + depth + "->" + (depth+1));
         depth++;
         errors.clear(depth);
@@ -127,7 +131,7 @@ public abstract class SemanticVisitor extends BaseVisitor
         enterScope(n);
 
         try {
-            n = enterCall(n);
+            n = enterCall(parent, n);
         }
 	catch (SemanticException e) {
 	    Position position = e.position();

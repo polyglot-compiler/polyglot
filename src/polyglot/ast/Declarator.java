@@ -55,14 +55,20 @@ public interface Declarator extends Copy {
      */
     Declarator init(Expr init);
 	
-	/** 
-	 * Type check the declarator. 
-	 */
+    /** 
+      * Type check the declarator. 
+      */
     void typeCheck(TypeChecker tc) throws SemanticException;
 	
-	/** 
-	 * Write the declarator to an output file. 
-	 */
+    /** 
+      * Type check a child of the declarator. 
+      */
+    Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
+          throws SemanticException;
+
+    /** 
+      * Write the declarator to an output file. 
+      */
     void translate(CodeWriter w, Translator tr, boolean field);
 	
 }

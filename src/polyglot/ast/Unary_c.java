@@ -102,7 +102,7 @@ public class Unary_c extends Expr_c implements Unary
 	}
 
 	if (op == BIT_NOT || op == NEG || op == POS) {
-	    if (! expr.type().isNumeric()) {
+	    if (! expr.type().isImplicitCastValid(ts.Long())) {
 		throw new SemanticException("Operand of " + op +
 		    " operator must be numeric.", expr.position());
 	    }
@@ -122,6 +122,29 @@ public class Unary_c extends Expr_c implements Unary
 	return this;
     }
 
+    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      	throws SemanticException
+    {
+        TypeSystem ts = tc.typeSystem();
+
+        if (child == expr) {
+            if (op == POST_INC || op == POST_DEC ||
+                op == PRE_INC || op == PRE_DEC) {
+
+                return child.expectedType(ts.Double());
+            }
+            else if (op == BIT_NOT || op == NEG || op == POS) {
+                return child.expectedType(ts.Long());
+            }
+            else if (op == NOT) {
+                return child.expectedType(ts.Boolean());
+            }
+        }
+
+        return child;
+    }
+
+    /** Check exceptions thrown by the statement. */
     public String toString() {
         if (op.isPrefix()) {
 	    return op.toString() + expr.toString();

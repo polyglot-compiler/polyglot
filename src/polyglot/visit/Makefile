@@ -14,6 +14,7 @@ SOURCES = \
 	ConstantFolder.java \
 	DumpAst.java \
 	ExceptionChecker.java \
+	ExpectedTypeVisitor.java \
 	FlattenVisitor.java \
 	FlowChecker.java \
 	NodeScrambler.java \

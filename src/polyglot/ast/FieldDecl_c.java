@@ -246,6 +246,12 @@ public class FieldDecl_c extends Node_c implements FieldDecl
     return this;
   }
 
+  public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+      throws SemanticException
+  {
+      return decl.setExpectedType(child, tc);
+  }
+
   public String toString() {
     return decl.toString();
   }
