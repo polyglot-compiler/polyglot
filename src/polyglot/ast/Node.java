@@ -40,28 +40,28 @@ import java.io.IOException;
  * @see jltools.ast.NodeVisitor
  */
 public abstract class Node extends AnnotatedObject {
-
-    /**
-     * The extension object for this node.
-     */
-    public Node ext;
-
-    /**
-     * Determines whether this node has an extension object.
-     */
-    public boolean isExtended() {
-	return ext == null;
-    }
-
-    public Node() {
-	this(null);
-    }
-
-    public Node(Node ext) {
-	this.ext = ext;
-    }
-
-
+  
+  /**
+   * The extension object for this node.
+   */
+  public Node ext;
+  
+  /**
+   * Determines whether this node has an extension object.
+   */
+  public boolean isExtended() {
+    return ext == null;
+  }
+  
+  public Node() {
+    this(null);
+  }
+  
+  public Node(Node ext) {
+    this.ext = ext;
+  }
+  
+  
   /**
    * The main entry point to the AST when using <code>NodeVisitor</code>s to
    * traverse the tree.
@@ -73,7 +73,7 @@ public abstract class Node extends AnnotatedObject {
   public final Node visit( NodeVisitor v)
   {
     Node n = v.override( this);
-
+    
     if( n != null) {
       return n;
     }
@@ -83,7 +83,7 @@ public abstract class Node extends AnnotatedObject {
       return v.leave( this, n, v_);
     }
   }
-
+  
   /**
    * Defines the fashion in which the AST traversed. That is, each node 
    * should override this method and call <code>visit</code> on each of its
@@ -97,16 +97,16 @@ public abstract class Node extends AnnotatedObject {
    * @return A new node if any changes where made to this node (or its 
    *  children; otherwise <code>this</code>.
    */
-  protected abstract Node visitChildren(NodeVisitor v);
-
-    protected static Node condVisit(Node n, NodeVisitor v) {
-	if (n != null) {
-	    return n.visit( v);
-	} else {
-	    return null;
-	}
+  public abstract Node visitChildren(NodeVisitor v);
+  
+  protected static Node condVisit(Node n, NodeVisitor v) {
+    if (n != null) {
+      return n.visit( v);
+    } else {
+      return null;
     }
-
+  }
+  
   /**
    * Collects classes, methods, and fields from an AST. The types of fields
    * as well as the return, argument, and exception types of the methods
@@ -196,10 +196,10 @@ public abstract class Node extends AnnotatedObject {
    */
   public void translate( LocalContext c, CodeWriter w) {
     if (ext instanceof TranslateOverride) {
-        ((TranslateOverride) ext).translate(this, c, w);
+      ((TranslateOverride) ext).translate(this, c, w);
     }
     else {
-	translate_no_override(c, w);
+      translate_no_override(c, w);
     }
   }
 
@@ -211,10 +211,12 @@ public abstract class Node extends AnnotatedObject {
     w.end();
   }
 
-    /** Adds an explicit THIS SpecialExpression to every FieldExpression with null target
+    /**
+     * Adds an explicit THIS SpecialExpression to every FieldExpression with
+     * null target
      */
     public Node addThis() {
-	return this;
+      return this;
     }
 
   
