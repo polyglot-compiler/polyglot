@@ -75,6 +75,11 @@ public class Compiler
 		for (Iterator i = sources.iterator(); i.hasNext(); ) {
 		    String sourceName = (String) i.next();
 		    FileSource source = source_loader.fileSource(sourceName);
+
+                    // mark this source as being explicitly specified
+                    // by the user.
+                    source.setUserSpecified(true);
+
 		    sourceExtension().addJob(source);
 		}
 

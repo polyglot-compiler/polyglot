@@ -1,24 +1,38 @@
 package polyglot.frontend;
 
-import java.io.*;
-import java.util.*;
-import polyglot.util.*;
+import java.util.Date;
 
 /** A <code>Source</code> represents a source file. */
 public class Source
 {
-    String name;
-    String path;
-    Date lastModified;
+    protected String name;
+    protected String path;
+    protected Date lastModified;
+    
+    /**
+     * Indicates if this source was explicitly specified by the user,
+     * or if it a source that has been drawn in to the compilation process
+     * due to a dependency.
+     */
+    protected boolean userSpecified;
 
     protected Source(String name) {
-	this.name = name;
+        this(name, null, null, false);
+    }
+
+    protected Source(String name, boolean userSpecified) {
+        this(name, null, null, userSpecified);
     }
 
     public Source(String name, String path, Date lastModified) {
+        this(name, path, lastModified, false);
+    }
+    
+    public Source(String name, String path, Date lastModified, boolean userSpecified) {
 	this.name = name;
         this.path = path;
 	this.lastModified = lastModified;
+        this.userSpecified = userSpecified;   
     }
 
     public boolean equals(Object o) {
@@ -51,5 +65,13 @@ public class Source
 
     public String toString() {
 	return name;
+    }
+    
+    public void setUserSpecified(boolean userSpecified) {
+        this.userSpecified = userSpecified;
+    }
+    
+    public boolean userSpecified() {
+        return userSpecified;
     }
 }

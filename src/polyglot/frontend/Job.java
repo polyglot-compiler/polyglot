@@ -120,6 +120,15 @@ public abstract class Job
     public Source source() {
         return this.sourceJob().source();
     }
+    
+    /**
+     * Returns whether the source for this job was explicitly specified
+     * by the user, or if it was drawn into the compilation process due
+     * to some dependency.
+     */
+    public boolean userSpecified() {
+        return this.source().userSpecified();
+    }
 
     /**
      * Get the initial list of passes that this <code>Job</code> should go 

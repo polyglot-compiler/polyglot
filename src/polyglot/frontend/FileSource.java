@@ -12,10 +12,12 @@ public class FileSource extends Source
     protected FileReader reader;
 
     public FileSource(String name) throws IOException {
-        super(name);
-
+        this(name, false);
+    }
+    
+    public FileSource(String name, boolean userSpecified) throws IOException {
+        super(name, userSpecified);
         this.file = new File(name);
-
         if (! file.exists()) {
             throw new FileNotFoundException(name);
         }
@@ -25,8 +27,11 @@ public class FileSource extends Source
     }
 
     public FileSource(File file) {
-        super(file.getPath());
-
+        this(file, false);
+    }
+    
+    public FileSource(File file, boolean userSpecified) {
+        super(file.getPath(), userSpecified);
         this.file = file;
     
         if (! file.exists()) {
