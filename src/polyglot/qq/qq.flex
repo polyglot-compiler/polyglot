@@ -33,9 +33,17 @@ package polyglot.ext.jl.qq;
 
 import java_cup.runtime.Symbol;
 import polyglot.lex.*;
+import polyglot.ast.Expr;
+import polyglot.ast.Stmt;
+import polyglot.ast.TypeNode;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassMember;
 import polyglot.ext.jl.qq.sym;
 import polyglot.util.Position;
 import polyglot.util.InternalCompilerError;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Iterator;
 import java.io.*;
 
 %%
@@ -47,7 +55,7 @@ import java.io.*;
 %function nextToken
 
 %unicode
-%pack
+/* %pack */
 
 %line
 %column
@@ -55,15 +63,140 @@ import java.io.*;
 %{
     StringBuffer sb = new StringBuffer();
     String file;
+    LinkedList subst;
 
-    public Lexer_c(String s, Position pos) {
+    public Lexer_c(String s, Position pos, List subst) {
 	this(new EscapedUnicodeReader(new StringReader(s)));
 	if (pos != null) {
-	    this.file = pos + ": quasi-quote(" + s + ")";
+	    this.file = pos + ": quasiquote(" + s + ")";
 	}
 	else {
-	    this.file = "quasi-quote(" + s + ")";
+	    this.file = "quasiquote(" + s + ")";
 	}
+
+        this.subst = new LinkedList(subst);
+    }
+
+    protected String substKind(char kind) { return substKind(kind, false); }
+
+    protected String substKind(char kind, boolean list) {
+        switch (kind) {
+            case 's': return "String";
+            case 'E': return "Expr";
+            case 'S': return "Stmt";
+            case 'T': return "TypeNode";
+            case 'D': return "ClassDecl";
+            case 'M': return "ClassMember";
+            default:
+                error("Bad quasiquoting substitution type: \"" + kind + "\".",
+                      pos());
+                return null;
+        }
+    }
+
+    public Token substList(char kind) {
+        if (subst.isEmpty()) {
+            error("Not enough arguments to quasiquoter.", pos());
+        }
+
+        Object o = subst.removeFirst();
+        String expected = substKind(kind, true);
+
+        if (o instanceof List) {
+            List l = (List) o;
+
+            for (Iterator i = l.iterator(); i.hasNext(); ) {
+                Object p = i.next();
+
+                switch (kind) {
+                    case 'E':
+                        if (p instanceof Expr) continue;
+                        break;
+                    case 'S':
+                        if (p instanceof Stmt) continue;
+                        break;
+                    case 'T':
+                        if (p instanceof TypeNode) continue;
+                        break;
+                    case 'D':
+                        if (p instanceof ClassDecl) continue;
+                        break;
+                    case 'M':
+                        if (p instanceof ClassMember) continue;
+                        break;
+                    default:
+                        break;
+                }
+
+                error("Bad quasiquoting substitution: expected List of " + expected + ".", pos());
+            }
+
+            return new QQListToken(pos(), l, sym.COMMA_LIST);
+        }
+        else {
+            error("Bad quasiquoting substitution: expected List of " + expected + ".", pos());
+            return null;
+        }
+    }
+
+    public Token subst(char kind) {
+        if (subst.isEmpty()) {
+            error("Not enough arguments to quasiquoter.", pos());
+        }
+
+        Object o = subst.removeFirst();
+        String expected = substKind(kind);
+
+        switch (kind) {
+            case 's': {
+                if (o instanceof String) {
+                    String s = (String) o;
+                    return new Identifier(pos(), s, sym.IDENTIFIER);
+                }
+                break;
+            }
+            case 'E': {
+                if (o instanceof Expr) {
+                    Expr e = (Expr) o;
+                    return new QQNodeToken(pos(), e, sym.COMMA_EXPR);
+                }
+                break;
+            }
+            case 'S': {
+                if (o instanceof Stmt) {
+                    Stmt s = (Stmt) o;
+                    return new QQNodeToken(pos(), s, sym.COMMA_STMT);
+                }
+                break;
+            }
+            case 'T': {
+                if (o instanceof TypeNode) {
+                    TypeNode t = (TypeNode) o;
+                    return new QQNodeToken(pos(), t, sym.COMMA_TYPE);
+                }
+                break;
+            }
+            case 'D': {
+                if (o instanceof ClassDecl) {
+                    ClassDecl d = (ClassDecl) o;
+                    return new QQNodeToken(pos(), d, sym.COMMA_DECL);
+                }
+                break;
+            }
+            case 'M': {
+                if (o instanceof ClassMember) {
+                    ClassMember m = (ClassMember) o;
+                    return new QQNodeToken(pos(), m, sym.COMMA_MEMB);
+                }
+                break;
+            }
+            default:
+                // error: should be caught in substKind
+                return null;
+        }
+
+        error("Bad quasiquoting substitution: expected " + expected + ".", pos());
+        return null;
     }
 
     public String file() {
@@ -143,10 +276,6 @@ import java.io.*;
   }
 %}
 
-%eofval{
-        return new EOF(pos(), sym.EOF); 
-%eofval}
-
 /* main character classes */
 LineTerminator = \r|\n|\r\n
 InputCharacter = [^\r\n]
@@ -196,15 +325,22 @@ SingleCharacter = [^\r\n\'\\]
 
 %%
 
+<<EOF>> { return new EOF(pos(), sym.EOF); }
+
 <YYINITIAL> {
 
-  /* quasi-quoting operators */
-  "%e:"                          { return key(sym.COMMA_EXPR); }
-  "%s:"                          { return key(sym.COMMA_STMT); }
-  "%t:"                          { return key(sym.COMMA_TYPE); }
-  "%d:"                          { return key(sym.COMMA_DECL); }
-  "%m:"                          { return key(sym.COMMA_MEMB); }
-  "%l:"                          { return key(sym.COMMA_LIST); }
+  /* quasiquoting operators */
+  "%s"                           { return subst('s'); }
+  "%E"                           { return subst('E'); }
+  "%S"                           { return subst('S'); }
+  "%T"                           { return subst('T'); }
+  "%D"                           { return subst('D'); }
+  "%M"                           { return subst('M'); }
+  "%LE"                          { return substList('E'); }
+  "%LS"                          { return substList('S'); }
+  "%LT"                          { return substList('T'); }
+  "%LD"                          { return substList('D'); }
+  "%LM"                          { return substList('M'); }
 
   /* keywords */
   "abstract"                     { return key(sym.ABSTRACT); }

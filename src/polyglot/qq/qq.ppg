@@ -5,20 +5,16 @@ package polyglot.ext.jl.qq;
 import polyglot.ext.jl.parse.Name;
 import polyglot.lex.Lexer;
 
-parser Grm extends polyglot.ext.jl.parse.Grm {:
-    public final Map subst;
-
-    public Grm(Lexer l, TypeSystem t, NodeFactory n, Map subst) {
-	super(l, t, n, (ErrorQueue)null);
-	this.subst = subst;
+parser Grm extends polyglot.ext.jl.parse.Grm implements QQParser {:
+    public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue eq) {
+	super(l, t, n, eq);
     }
 
   /**
    * Override the default CUP routine.
    */
-  public void syntax_error (java_cup.runtime.Symbol current)
-  {
-    Position p = ((Token) current.value).getPosition ();
+  public void syntax_error (java_cup.runtime.Symbol current) {
+    Position p = ((Token) current.value).getPosition();
     System.out.println("p = " + p);
     if (current.sym == sym.EOF)
 	report_error ("Unexpected end of file.", p);
@@ -27,12 +23,12 @@ parser Grm extends polyglot.ext.jl.parse.Grm {:
   }
 :};
 
-terminal Token COMMA_EXPR;
-terminal Token COMMA_STMT;
-terminal Token COMMA_TYPE;
-terminal Token COMMA_DECL;
-terminal Token COMMA_MEMB;
-terminal Token COMMA_LIST;
+terminal QQNodeToken COMMA_EXPR;
+terminal QQNodeToken COMMA_STMT;
+terminal QQNodeToken COMMA_TYPE;
+terminal QQNodeToken COMMA_DECL;
+terminal QQNodeToken COMMA_MEMB;
+terminal QQListToken COMMA_LIST;
 
 non terminal Node qq_expr;
 non terminal Node qq_stmt;
@@ -81,90 +77,80 @@ qq_member ::=
      	    {: RESULT = a; :}
      /* Simplified version of field_declaration with only one declarator. */
     |	modifiers_opt:a type:b variable_declarator:d SEMICOLON
-	    {: RESULT = parser.nf.FieldDecl(parser.pos(b),
+	    {: RESULT = parser.nf.FieldDecl(parser.pos(b), 
 					    a, parser.array(b, d.dims),
 					    d.name, d.init); :}
     ;
 
 extend primary_no_new_array ::=
-	COMMA_EXPR IDENTIFIER:a
-	    {: RESULT = (Expr) parser.subst.get(a.getIdentifier()); :}
+	COMMA_EXPR:a
+	    {: RESULT = (Expr) a.node(); :}
     ;
 
 extend statement_expression ::=
-	COMMA_EXPR IDENTIFIER:a
-	    {: RESULT = (Expr) parser.subst.get(a.getIdentifier()); :}
+	COMMA_EXPR:a
+	    {: RESULT = (Expr) a.node(); :}
     ;
 
 extend cast_expression ::=
         // Cast
-        LPAREN COMMA_TYPE IDENTIFIER:a RPAREN unary_expression:b
-            {: RESULT = parser.nf.Cast(parser.pos(a),
-                                       (TypeNode) parser.subst.get(a.getIdentifier()), b);
-            :}
+        LPAREN COMMA_TYPE:a RPAREN unary_expression:b
+            {: RESULT = parser.nf.Cast(parser.pos(a), (TypeNode) a.node(), b); :}
     ;
 
 extend statement ::=
-	COMMA_STMT IDENTIFIER:a
-	    {: RESULT = (Stmt) parser.subst.get(a.getIdentifier()); :}
+	COMMA_STMT:a
+	    {: RESULT = (Stmt) a.node(); :}
     ;
 
 extend class_or_interface_type ::=
-	COMMA_TYPE IDENTIFIER:a
-	    {: RESULT = (TypeNode) parser.subst.get(a.getIdentifier()); :}
+	COMMA_TYPE:a
+	    {: RESULT = (TypeNode) a.node(); :}
     ;
 
 extend array_type ::=
-	COMMA_TYPE IDENTIFIER:a dims:b
-	    {: TypeNode tn = (TypeNode) parser.subst.get(a.getIdentifier());
-	       RESULT = parser.array(tn, b.intValue()); :}
+	COMMA_TYPE:a dims:b
+	    {: RESULT = parser.array((TypeNode) a.node(), b.intValue()); :}
     ;
 
 extend type_declaration ::=
-	COMMA_DECL IDENTIFIER:a
-	    {: RESULT = (ClassDecl) parser.subst.get(a.getIdentifier()); :}
+	COMMA_DECL:a
+	    {: RESULT = (ClassDecl) a.node(); :}
     ;
 
 extend class_member_declaration ::=
-	COMMA_MEMB IDENTIFIER:a
-	    {: ClassMember m = (ClassMember) parser.subst.get(a.getIdentifier());
-	       List l = new ArrayList(1);
-	       l.add(m);
+	COMMA_MEMB:a
+	    {: List l = new ArrayList(1);
+	       l.add((ClassMember) a.node());
 	       RESULT = l; :}
     ;
 
 extend interface_member_declarations ::=
-        COMMA_LIST IDENTIFIER:a
-	    {: List l = (List) parser.subst.get(a.getIdentifier());
-	       RESULT = l; :}
+        COMMA_LIST:a
+	    {: RESULT = a.list(); :}
     ;
 
 extend class_body_declarations ::=
-        COMMA_LIST IDENTIFIER:a
-	    {: List l = (List) parser.subst.get(a.getIdentifier());
-	       RESULT = l; :}
+        COMMA_LIST:a
+	    {: RESULT = a.list(); :}
     ;
 
 extend formal_parameter_list ::=
-	COMMA_LIST IDENTIFIER:a
-	    {: List l = (List) parser.subst.get(a.getIdentifier());
-	       RESULT = l; :}
+	COMMA_LIST:a
+	    {: RESULT = a.list(); :}
     ;
 
 extend throws ::=
-	COMMA_LIST IDENTIFIER:a
-	    {: List l = (List) parser.subst.get(a.getIdentifier());
-	       RESULT = l; :}
+	COMMA_LIST:a
+	    {: RESULT = a.list(); :}
     ;
 
 extend class_type_list ::=
-	COMMA_LIST IDENTIFIER:a
-	    {: List l = (List) parser.subst.get(a.getIdentifier());
-	       RESULT = l; :}
+	COMMA_LIST:a
+	    {: RESULT = a.list(); :}
     ;
 
 extend argument_list ::=
-	COMMA_LIST IDENTIFIER:a
-	    {: List l = (List) parser.subst.get(a.getIdentifier());
-	       RESULT = l; :}
+	COMMA_LIST:a
+	    {: RESULT = a.list(); :}
     ;
