@@ -1526,6 +1526,16 @@ public class TypeSystem_c implements TypeSystem
 		"Cannot declare method with flags " +
 		f.clear(METHOD_FLAGS) + ".");
 	}
+
+        if (f.isAbstract() && f.isStatic()) {
+	    throw new SemanticException(
+		"Cannot declare method which is both abstract and static.");
+        }
+
+        if (f.isAbstract() && f.isFinal()) {
+	    throw new SemanticException(
+		"Cannot declare method which is both abstract and final.");
+        }
     }
 
     public void checkLocalFlags(Flags f) throws SemanticException {
