@@ -6,6 +6,7 @@ GOOD =  \
 	Constants2.jl \
 	Constants3.jl \
 	Constants4.jl \
+	Constants5.jl \
 	Ctor.jl \
 	Dep1.jl \
 	Empty.jl \
