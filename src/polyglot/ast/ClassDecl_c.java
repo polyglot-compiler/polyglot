@@ -239,6 +239,30 @@ public class ClassDecl_c extends Node_c implements ClassDecl
     }
 
     public Node typeCheck_(TypeChecker tc) throws SemanticException {
+        // The class cannot have the same simple name as any enclosing class.
+
+        if (this.type.isMember()) {
+            ClassType container = this.type.toMember().outer();
+
+            while (container instanceof NamedType) {
+                String name = ((NamedType) container).name();
+
+                if (name.equals(this.name)) {
+                    throw new SemanticException("Cannot declare member " +
+                                                "class \"" + this.type +
+                                                "\" inside class with the " +
+                                                "same name.", position());
+                }
+
+                if (container.isMember()) {
+                    container = container.toMember().outer();
+                }
+                else {
+                    break;
+                }
+            }
+        }
+
         // Make sure that static members are not declared inside inner classes
         // (recall that, according to the JLS, static member classes are not
         // really inner classes since they may not refer to their outer
