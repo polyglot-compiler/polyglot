@@ -5,7 +5,6 @@ import polyglot.types.*;
 import polyglot.util.*;
 import java.io.*;
 import java.util.*;
-import polyglot.main.UsageError;
 import polyglot.main.Options;
 
 /**
@@ -56,11 +55,12 @@ public interface ExtensionInfo {
     /** Produce a job for a given source using the given AST. */
     SourceJob addJob(Source source, Node ast);
 
-    /** Produce a job for the given AST (possibly null). */
-    SourceJob createJob(Job parent, Source source, Node ast);
-
-    /** Produce a job for the given context. */
-    Job createJob(Node ast, Context context, Job outer, Pass.ID begin, Pass.ID end);
+    /**
+     * Spawn a new job. All passes between the pass <code>begin</code>
+     * and <code>end</code> inclusive will be performed immediately on
+     * the AST <code>ast</code>.
+     */
+    Node spawnJob(Context c, Node ast, Job outerJob, Pass.ID begin, Pass.ID end);    
 
     /** Run all jobs to completion. */
     boolean runToCompletion();

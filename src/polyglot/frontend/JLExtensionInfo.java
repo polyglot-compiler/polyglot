@@ -11,6 +11,7 @@ import polyglot.ext.jl.parse.Lexer_c;
 import polyglot.ext.jl.types.TypeSystem_c;
 import polyglot.frontend.BarrierPass;
 import polyglot.frontend.CupParser;
+import polyglot.frontend.EmptyPass;
 import polyglot.frontend.FileSource;
 import polyglot.frontend.Job;
 import polyglot.frontend.JobExt;
@@ -121,7 +122,6 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
         ArrayList l = new ArrayList(15);
 
 	l.add(new ParserPass(Pass.PARSE, compiler, job));
-
         l.add(new VisitorPass(Pass.BUILD_TYPES, job, new TypeBuilder(job, ts, nf)));
 	l.add(new BarrierPass(Pass.BUILD_TYPES_ALL, job));
 	l.add(new VisitorPass(Pass.CLEAN_SUPER, job,
@@ -140,7 +140,7 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
         l.add(new VisitorPass(Pass.EXIT_CHECK, job, new ExitChecker(job, ts, nf)));
         l.add(new VisitorPass(Pass.INIT_CHECK, job, new InitChecker(job, ts, nf)));
         l.add(new VisitorPass(Pass.CONSTRUCTOR_CHECK, job, new ConstructorCallChecker(job, ts, nf)));
-	l.add(new BarrierPass(Pass.PRE_OUTPUT_ALL, job));
+	l.add(new EmptyPass(Pass.PRE_OUTPUT_ALL));
 
 	if (compiler.serializeClassInfo()) {
 	    l.add(new VisitorPass(Pass.SERIALIZE,

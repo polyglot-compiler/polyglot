@@ -1,8 +1,6 @@
 package polyglot.frontend;
 
 import polyglot.main.Report;
-import polyglot.util.InternalCompilerError;
-import java.util.*;
 
 /**
  * A <code>BarrierPass</code> is a special pass that ensures that
@@ -22,24 +20,8 @@ public class BarrierPass extends AbstractPass
         if (Report.should_report(Report.frontend, 1))
 	    Report.report(1, job + " at barrier " + id);
         if (Report.should_report(Report.frontend, 2))
-	    Report.report(2, "children of " + job + " = " + job.children());
+	    Report.report(2, "children of " + job.sourceJob() + " = " + job.sourceJob().children());
 
-        if (job.compiler().errorQueue().hasErrors()) {
-            return false;
-        }
-
-        // Bring all our children up to the barrier.
-        for (Iterator i = job.children().iterator(); i.hasNext(); ) {
-            Job child = (Job) i.next();
-
-            if (Report.should_report(Report.frontend, 2))
-                Report.report(2, job + " bringing " + child + " to barrier " + id);
-
-            if (! job.extensionInfo().runToPass(child, id)) {
-                return false;
-	    }
-        }
-
-	return true;
+        return !job.compiler().errorQueue().hasErrors();
     }
 }
