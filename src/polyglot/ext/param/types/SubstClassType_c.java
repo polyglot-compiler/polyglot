@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import polyglot.ext.jl.types.ClassType_c;
+import polyglot.frontend.Job;
+import polyglot.types.*;
 import polyglot.types.ClassType;
 import polyglot.types.Flags;
 import polyglot.types.Package;
@@ -144,5 +146,24 @@ public class SubstClassType_c extends ClassType_c implements SubstType
 
     public String toString() {
         return base.toString() + subst.toString();
+    }
+    
+
+    public Job job() {
+        return null;
+    }
+
+    /**
+     * 
+     */
+    public void setFlags(Flags flags) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * 
+     */
+    public void setContainer(ReferenceType container) {
+        throw new UnsupportedOperationException();
     }
 }
