@@ -44,6 +44,14 @@ JAVA="${JAVA_HOME}/bin/java"
 exists -x "${JAVA}"
 echo java is "${JAVA}"
 
+JAVAH="${JAVA_HOME}/bin/javah"
+exists -x "${JAVAH}"
+echo javah is "${JAVAH}"
+
+RMIC="${JAVA_HOME}/bin/rmic"
+exists -x "${RMIC}"
+echo rmic is "${RMIC}"
+
 JAVADOC="${JAVA_HOME}/bin/javadoc"
 exists -x "${JAVADOC}"
 echo javadoc is "${JAVADOC}"
@@ -132,6 +140,8 @@ echo creating Defs.mk
     echo
     echo JC = "${JAVAC}"
     echo JAVA = "${JAVA}"
+    echo JAVAH = "${JAVAH}"
+    echo RMIC = "${RMIC}"
     echo JAVADOC = "${JAVADOC}"
     echo
     echo OS = "${OS}"
