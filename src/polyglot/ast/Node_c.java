@@ -61,7 +61,7 @@ public abstract class Node_c implements Node
     public Ext ext(int n) {
         if (n < 1) throw new InternalCompilerError("n must be >= 1");
         if (n == 1) return ext();
-        return ext(n-1);
+        return ext(n-1).ext();
     }
 
     public Node ext(int n, Ext ext) {
