@@ -9,7 +9,7 @@ import jltools.util.Enum;
  * This class should never be instantiated directly. Instead, you should
  * use the <code>TypeSystem.get*</code> methods.
  */
-public interface PrimitiveType extends Type 
+public interface PrimitiveType extends NamedType 
 {
     /** The kind of the primitive type. */
     public class Kind extends Enum {
