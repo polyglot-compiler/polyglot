@@ -54,6 +54,13 @@ public class NestedMap extends AbstractMap implements Map {
     myMap.remove(key);
   }  
 
+  /**
+   * Returns the map containing the elements for this level of nesting.
+   **/
+  public Map getInnerMap() {
+    return myMap;
+  }
+
   /////
   // Methods required for AbstractMap.
   /////
