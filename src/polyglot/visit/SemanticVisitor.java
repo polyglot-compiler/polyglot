@@ -10,15 +10,36 @@ import java.util.*;
  * A visitor which maintains a context.  This is the base class of the
  * disambiguation and type checking visitors.
  */
-public abstract class SemanticVisitor extends BaseVisitor
+public abstract class SemanticVisitor extends NodeVisitor
 {
     protected Context context;
     protected Context.Mark top;
     protected int depth;
     protected BitSet errors;
+    protected Job job;
+    protected TypeSystem ts;
+    protected NodeFactory nf;
 
-    public SemanticVisitor(Job job) {
-        super(job);
+    public SemanticVisitor(Job job, TypeSystem ts, NodeFactory nf) {
+        this.job = job;
+        this.ts = ts;
+        this.nf = nf;
+    }
+
+    public Job job() {
+        return job;
+    }
+
+    public ErrorQueue errorQueue() {
+        return job.compiler().errorQueue();
+    }
+
+    public NodeFactory nodeFactory() {
+        return nf;
+    }
+
+    public TypeSystem typeSystem() {
+        return ts;
     }
 
     public boolean begin() {

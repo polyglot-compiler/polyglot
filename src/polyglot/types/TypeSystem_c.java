@@ -5,6 +5,7 @@ import jltools.types.*;
 import jltools.types.Package;
 import jltools.types.reflect.ClassFile;
 import jltools.frontend.Compiler;
+import jltools.frontend.Source;
 
 import java.util.*;
 
@@ -16,8 +17,9 @@ import java.util.*;
  **/
 public class TypeSystem_c implements TypeSystem
 {
-    Compiler compiler;
     Resolver systemResolver;
+    TableResolver parsedResolver;
+    LoadedClassResolver loadedResolver;
 
     public TypeSystem_c() {}
 
@@ -25,10 +27,34 @@ public class TypeSystem_c implements TypeSystem
      * Initializes the type system and its internal constants (which depend on
      * the resolver).
      */
-    public void initialize(Compiler compiler) throws SemanticException {
-	this.compiler = compiler;
-	this.systemResolver = compiler.systemResolver();
+    public void initialize(LoadedClassResolver loadedResolver)
+                           throws SemanticException {
 
+        Types.report(1, "Initializing " + getClass().getName());
+
+        // The parsed class resolver.  This resolver contains classes parsed
+        // from source files.
+        this.parsedResolver = new TableResolver();
+
+
+        // The loaded class resolver.  This resolver automatically loads types
+        // from class files and from source files not mentioned on the command
+        // line.
+        this.loadedResolver = loadedResolver;
+
+        CompoundResolver compoundResolver =
+            new CompoundResolver(parsedResolver, loadedResolver);
+
+        // The system class resolver.  The class resolver contains a map from
+        // class names to ClassTypes.  A Job looks up classes first in its
+        // import table and then in the system resolver.  The system resolver
+        // first tries to find the class in parsed class resolver.
+        this.systemResolver = new CachingResolver(compoundResolver);
+
+        initTypes();
+    }
+
+    protected void initTypes() throws SemanticException {
         // Prime the resolver cache so that we don't need to check
         // later if these are loaded.
 
@@ -50,12 +76,20 @@ public class TypeSystem_c implements TypeSystem
         systemResolver.findType("java.lang.ArithmeticException");
     }
 
-    public Compiler compiler() {
-      return compiler;
-    }
-
     public Resolver systemResolver() {
       return systemResolver;
+    }
+
+    public TableResolver parsedResolver() {
+        return parsedResolver;
+    }
+
+    public LoadedClassResolver loadedResolver() {
+        return loadedResolver;
+    }
+
+    public ImportTable importTable(Source source, Package pkg) {
+        return new ImportTable(this, systemResolver, source, pkg);
     }
 
     public String wrapperTypeString(PrimitiveType t) {
@@ -93,8 +127,8 @@ public class TypeSystem_c implements TypeSystem
 	throw new InternalCompilerError("Unrecognized primitive type.");
     }
 
-    public Context createContext(ImportTable it) {
-	return new Context_c(this, it);
+    public Context createContext() {
+	return new Context_c(this);
     }
 
     public Resolver packageContextResolver(Resolver cr, Package p) {
@@ -1146,13 +1180,17 @@ public class TypeSystem_c implements TypeSystem
 
     protected ClassType load(String name) {
       try {
-          return (ClassType) systemResolver.findType(name);
+          return typeForName(name);
       }
       catch (SemanticException e) {
           throw new InternalCompilerError("Cannot find class \"" +
                                           name + "\"; " + e.getMessage(),
                                           e.position());
       }
+    }
+
+    public ClassType typeForName(String name) throws SemanticException {
+      return (ClassType) systemResolver.findType(name);
     }
 
     protected ClassType OBJECT_;

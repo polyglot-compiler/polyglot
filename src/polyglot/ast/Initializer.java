@@ -19,4 +19,5 @@ public interface Initializer extends ClassMember
     Initializer body(Block body);
 
     InitializerInstance initializerInstance();
+    Initializer initializerInstance(InitializerInstance ii);
 }

@@ -20,44 +20,6 @@ public class Compiler
     /** Command-line options */
     private Options options;
 
-    /**
-     * The system class resolver.  The class resolver contains a map from class
-     * names to ClassTypes.  A Job looks up classes first in its import table
-     * and then in the system resolver.  The system resolver first tries to
-     * find the class in parsed class resolver
-     */
-    private Resolver systemResolver;
-
-    /**
-     * The parsed class resolver.  This resolver contains classes parsed from
-     * source files.
-     */
-    private TableResolver parsedResolver;
-
-    /**
-     * The loaded class resolver.  This resolver automatically loads types from
-     * class files and from source files not mentioned on the command line.
-     */
-    private LoadedClassResolver loadedResolver;
-
-    /** The type system. */
-    protected TypeSystem type_system;
-
-    /** The node factory creates AST node objects. */
-    protected NodeFactory node_factory;
-
-    /**
-     * The source loader is responsible for loading source files from the
-     * source path.
-     */
-    protected SourceLoader source_loader;
-
-    /**
-     * The target factory is responsible for naming and opening output files
-     * given a package name and a class or source file name.
-     */
-    protected TargetFactory target_factory;
-
     /** The error queue handles outputting error messages. */
     ErrorQueue eq;
 
@@ -84,26 +46,8 @@ public class Compiler
     public Compiler(Options options_) {
 	options = options_;
 
-	// These must be done after the extension is initialized.
-	source_loader = options.extension.sourceLoader();
-	target_factory = options.extension.targetFactory();
-
-	type_system = options.extension.typeSystem();
-	node_factory = options.extension.nodeFactory();
-
 	eq = new ErrorQueue(System.err, options.error_count,
 		            options.extension.compilerName());
-
-	// Create the compiler and set up the resolvers.
-	parsedResolver = new TableResolver();
-	loadedResolver = new LoadedClassResolver(this, type_system,
-                                                 options.classpath,
-						 options.no_source_check);
-
-	CompoundResolver compoundResolver =
-	    new CompoundResolver(parsedResolver, loadedResolver);
-
-	systemResolver = new CachingResolver(compoundResolver);
 
 	/* Other setup. */
 	jobs = new HashMap();
@@ -123,8 +67,18 @@ public class Compiler
      * Compile a source file until the types in the source file are
      * constructed.
      */
-    public boolean readSource(Source source) throws IOException {
-	Job job = jobForSource(source);
+    public boolean readSource(ExtensionInfo sourceExt, Source source) throws IOException {
+	Job job = jobForSource(sourceExt, source);
+
+        if (sourceExt != sourceExtension()) {
+            // Abort now is the source file is for a language other than the
+            // source language.  We cannot support this now because each
+            // extension has its own list of passes and the barrier passes
+            // might not match up.
+            throw new InternalCompilerError("Loading source files for " +
+                                            "multiple languages is not " +
+                                            "supported.");
+        }
 
         // Run the new job up to its owner's (the current job's) barrier.
         Pass.ID barrier;
@@ -145,18 +99,12 @@ public class Compiler
         return runToPass(job, barrier);
     }
 
-    /** Compile the source file for a given class to completion. */
-    public boolean readClass(String className) throws IOException {
-	Source source = source_loader.classSource(className);
-	return readSource(source);
-    }
-
     /** Get a job for the source. */
-    public SourceJob jobForSource(Source source) {
+    public SourceJob jobForSource(ExtensionInfo sourceExt, Source source) {
 	SourceJob job = (SourceJob) jobs.get(source);
 
 	if (job == null) {
-	    job = options.extension.createJob(currentJob, source);
+            job = sourceExt.createJob(currentJob, source);
 	    jobs.put(source, job);
             worklist.add(job);
 	}
@@ -175,10 +123,12 @@ public class Compiler
 
 	try {
 	    try {
+                SourceLoader source_loader = sourceExtension().sourceLoader();
+
 		for (Iterator i = sources.iterator(); i.hasNext(); ) {
 		    String sourceName = (String) i.next();
 		    Source source = source_loader.fileSource(sourceName);
-		    Job u = jobForSource(source);
+		    Job u = jobForSource(sourceExtension(), source);
 		}
 
 		okay = finish();
@@ -316,44 +266,9 @@ public class Compiler
 	return options.fully_qualified_names;
     }
 
-    /** Get the compiler's source loader */
-    public SourceLoader sourceLoader() {
-	return source_loader;
-    }
-
-    /** Get the compiler's target factory */
-    public TargetFactory targetFactory() {
-	return target_factory;
-    }
-
-    /** Get the compiler's node extension factory */
-    public NodeFactory nodeFactory() {
-	return node_factory;
-    }
-
-    /** Get the compiler's type system */
-    public TypeSystem typeSystem() {
-	return type_system;
-    }
-
     /** Get information about the language extension being compiled. */
-    public ExtensionInfo extensionInfo() {
+    public ExtensionInfo sourceExtension() {
 	return options.extension;
-    }
-
-    /** Get the compiler's system resolver */
-    public Resolver systemResolver() {
-	return systemResolver;
-    }
-
-    /** Get the compiler's parsed-file resolver */
-    public LoadedClassResolver loadedResolver() {
-	return loadedResolver;
-    }
-
-    /** Get the compiler's parsed-file resolver */
-    public TableResolver parsedResolver() {
-	return parsedResolver;
     }
 
     /** Maximum number of characters on each line of output */

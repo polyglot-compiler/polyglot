@@ -22,6 +22,7 @@ SOURCES = \
 	InitializerInstance.java \
 	InnerClassType.java \
 	LoadedClassResolver.java \
+	SourceClassResolver.java \
 	LocalClassType.java \
 	LocalInstance.java \
 	MemberClassType.java \

@@ -49,8 +49,11 @@ public interface ExtensionInfo {
      */
     void initCompiler(jltools.frontend.Compiler compiler);
 
-    /** The default extension that source files are expected to have */
+    /** The extension that source files are expected to have. */
     String fileExtension();
+
+    /** The default extension that source files are expected to have. */
+    String defaultFileExtension();
 
     /** Produce a type system for this language extension. */
     TypeSystem typeSystem();
@@ -67,26 +70,21 @@ public interface ExtensionInfo {
     /** Produce a job for the given context. */
     Job createJob(Node ast, Context context, Job outer, Pass.ID begin, Pass.ID end);
 
-    /** Produce a target factory for this language extension. */
+    /**
+     * Produce a target factory for this language extension.  The target
+     * factory is responsible for naming and opening output files given a
+     * package name and a class or source file name.
+     */
     TargetFactory targetFactory();
 
     /** Get a parser for this language extension. */
     Parser parser(Reader reader, Source source, ErrorQueue eq);
 
     /** Get the list of passes for a given source job. */
-    List passes(SourceJob job);
+    List passes(Job job);
 
-    /**
-     * Get the sublist of passes for a given job that performs AST
-     * transformations.
-     */
-    List transformPasses(Job job);
-
-    /**
-     * Get the sublist of passes for a given job that performs AST
-     * transformations.
-     */
-    List transformPasses(Job job, Pass.ID begin, Pass.ID end);
+    /** Get the sublist of passes for a given job. */
+    List passes(Job job, Pass.ID begin, Pass.ID end);
 
     /** Add a pass before an existing pass. */
     void beforePass(List passes, Pass.ID oldPass, Pass newPass);

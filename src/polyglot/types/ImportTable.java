@@ -25,27 +25,29 @@ public class ImportTable extends ClassResolver
     protected Map map;
     /** List of imports which will be lazily added to the table. */
     protected List lazyImports;
-    /** Used to report errors for lazily added imports. */
-    protected ErrorQueue eq;
     /** The source file associated with the import table. */
     protected Source source;
     /** Our package */
-    protected String pkgName;
     protected Package pkg;
 
-    public ImportTable(TypeSystem ts, Resolver base,
-	               Source source, ErrorQueue eq) {
+    public ImportTable(TypeSystem ts, Resolver base, Source src, Package pkg) {
 	this.resolver = base;
 	this.ts = ts;
-	this.source = source;
-	this.eq = eq;
+	this.source = src;
+        this.pkg = pkg;
 
 	this.map = new HashMap();
 	this.packageImports = new ArrayList();
 	this.lazyImports = new ArrayList();
+
+        if (pkg != null) {
+	    addPackageImport(pkg.fullName());
+        }
+
+        addDefaultImports();
     }
 
-    public void addDefaultImports() throws SemanticException {
+    public void addDefaultImports() {
 	List imports = ts.defaultPackageImports();
 
 	for (Iterator i = imports.iterator(); i.hasNext(); ) {
@@ -56,21 +58,6 @@ public class ImportTable extends ClassResolver
 
     public Package package_() {
         return pkg;
-    }
-
-    public void setPackage(String pkgName) {
-	this.pkgName = pkgName;
-        this.pkg = ts.packageForName(pkgName);
-
-	if (packageImports.size() != 0) {
-	  throw new InternalCompilerError(
-	      "ImportTable.setPackage() must be called before any " +
-	      "package imports are added.");
-	}
-
-	if (pkgName != null) {
-	    addPackageImport(pkgName);
-	}
     }
 
     public void addClassImport(String className) {
@@ -102,8 +89,8 @@ public class ImportTable extends ClassResolver
 		String pkgName = (String) iter.next();
 		String fullName = pkgName + "." + name;
 
-		boolean inSamePackage = this.pkgName != null &&
-					this.pkgName.equals(pkgName);
+		boolean inSamePackage = this.pkg != null &&
+					this.pkg.fullName().equals(pkgName);
 
 		try {
 		    Type t = resolver.findType(fullName);
@@ -124,12 +111,13 @@ public class ImportTable extends ClassResolver
 		    // Do nothing.
 		}
 	    }
+
 	    // The name was short, but not in any imported class or package.
 	    // Check the null package.
 	    Type t = resolver.findType(name); // may throw exception
 
 	    if (t.isClass() &&
-		t.toClass().flags().isPackage() && this.pkgName != null) {
+		t.toClass().flags().isPackage() && this.pkg != null) {
 	      // Not visible.
 	      throw new NoClassException("Class \"" + name + "\" not found.",
 					 new Position(source.name()));
@@ -149,9 +137,9 @@ public class ImportTable extends ClassResolver
       return "(import " + source.name() + ")";
     }
 
-    protected void lazyImport() {
+    protected void lazyImport() throws SemanticException {
 	if (lazyImports.isEmpty()) {
-	  return;
+            return;
 	}
 
 	for (int i = 0; i < lazyImports.size(); i++) {
@@ -179,8 +167,12 @@ public class ImportTable extends ClassResolver
 		map.put(shortName, t);
 	    }
 	    catch (SemanticException e) {
-		eq.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
-			      new Position(source.name()));
+                if (e.position() == null) {
+                    throw new SemanticException(e.getMessage(),
+                                                new Position(source.name()));
+                }
+
+                throw e;
 	    }
 	}
 

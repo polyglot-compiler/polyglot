@@ -1,5 +1,7 @@
 package jltools.ast;
 
+import jltools.types.ImportTable;
+import jltools.frontend.Source;
 import java.util.List;
 
 /**
@@ -17,4 +19,10 @@ public interface SourceFile extends Node
 
     List decls();
     SourceFile decls(List decls);
+
+    ImportTable importTable();
+    SourceFile importTable(ImportTable importTable);
+ 
+    Source source();
+    SourceFile source(Source source);
 }

@@ -24,7 +24,8 @@ public class CupParser implements Parser
 	    java_cup.runtime.Symbol sym = grm.parse();
 
 	    if (sym != null && sym.value instanceof Node) {
-		return (Node) sym.value;
+		SourceFile sf = (SourceFile) sym.value;
+                return sf.source(source);
 	    }
 
 	    eq.enqueue(ErrorInfo.SYNTAX_ERROR, "Unable to parse " +

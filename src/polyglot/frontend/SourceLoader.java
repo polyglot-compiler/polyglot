@@ -7,12 +7,12 @@ import jltools.frontend.Compiler;
 /** A <code>SourceLoader</code> is responsible for loading source files. */
 public class SourceLoader
 {
-    String sourceExtension;
+    ExtensionInfo sourceExt;
     Collection sourcePath;
 
-    public SourceLoader(Collection sourcePath, String sourceExtension) {
+    public SourceLoader(ExtensionInfo sourceExt, Collection sourcePath) {
 	this.sourcePath = sourcePath;
-	this.sourceExtension = sourceExtension;
+	this.sourceExt = sourceExt;
     }
 
     /** Load a source from a specific file. */
@@ -23,16 +23,22 @@ public class SourceLoader
 	    throw new FileNotFoundException(fileName);
 	}
 
+        if (! fileName.endsWith("." + sourceExt.fileExtension())) {
+            throw new IOException("Source \"" + fileName +
+                                  "\" does not have the extension \"." +
+                                  sourceExt.fileExtension() + "\".");
+        }
+
 	Compiler.report(2, "Loading class from " + sourceFile);
 
-	return new Source(fileName, sourceExtension);
+	return new Source(fileName);
     }
 
     /** Load the source file for the given class name using the source path. */
     public Source classSource(String className) throws IOException {
 	/* Search the source path. */
-	String fileName = className.replace('.', File.separatorChar) 
-			   + "." + sourceExtension;
+        String fileName = className.replace('.', File.separatorChar) +
+                                        "." + sourceExt.fileExtension();
 
 	File current_dir = new File(System.getProperty("user.dir"));
 
@@ -52,7 +58,7 @@ public class SourceLoader
 		Compiler.report(2,
 		    "Loading " + className + " from " + sourceFile);
 
-		return new Source(sourceFile.getPath(), sourceExtension);
+		return new Source(sourceFile.getPath());
 	    }
 	}
 

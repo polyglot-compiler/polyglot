@@ -13,11 +13,17 @@ public class TableResolver extends ClassResolver
     }
 
     public void addType(NamedType type) {
+        if (type == null) {
+            throw new InternalCompilerError("Bad insertion into TableResolver");
+        }
 	Types.report(1, "TableCR.addType(" + type + ")");
 	table.put(type.name(), type);
     }
 
     public void addType(String name, NamedType type) {
+        if (name == null || type == null) {
+            throw new InternalCompilerError("Bad insertion into TableResolver");
+        }
 	Types.report(1, "TableCR.addType(" + name + ", " + type + ")");
 	table.put(name, type);
     }

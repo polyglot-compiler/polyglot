@@ -13,8 +13,11 @@ import java.util.*;
 /** A Translator generates output code from the processed AST. */
 public class Translator extends AbstractPass
 {
-    protected Compiler compiler;
-    protected SourceJob job;
+    protected Job job;
+    protected TypeSystem ts;
+    protected NodeFactory nf;
+    protected TargetFactory tf;
+
     protected Context context;
     protected boolean appendSemicolon = true;
     protected ClassType outerClass = null;
@@ -23,10 +26,12 @@ public class Translator extends AbstractPass
      * Create a Translator.  The output of the visitor is a collection of files
      * whose names are added to the collection <code>outputFiles</code>.
      */
-    public Translator(Pass.ID id, Compiler compiler, SourceJob job) {
+    public Translator(Pass.ID id, Job job, TypeSystem ts, NodeFactory nf, TargetFactory tf) {
 	super(id);
-	this.compiler = compiler;
 	this.job = job;
+        this.ts = ts;
+        this.nf = nf;
+        this.tf = tf;
 	this.context = job.context();
     }
 
@@ -53,93 +58,120 @@ public class Translator extends AbstractPass
     }
 
     public TypeSystem typeSystem() {
-        return compiler.typeSystem();
+        return ts;
     }
 
     public NodeFactory nodeFactory() {
-        return compiler.nodeFactory();
+        return nf;
     }
 
     public boolean run() {
-	TypeSystem ts = compiler.typeSystem();
-	NodeFactory nf = compiler.nodeFactory();
-	TargetFactory tf = compiler.targetFactory();
-	int outputWidth = compiler.outputWidth();
-	Collection outputFiles = compiler.outputFiles();
+        Node ast = job.ast();
 
-	SourceFile sfn = (SourceFile) job.ast();
+        if (ast == null) {
+            throw new InternalCompilerError("AST is null");
+        }
 
-	// Find the public declarations in the file.  We'll use these to
-	// derive the names of the target files.  There will be one
-	// target file per public declaration.  If there are no public
-	// declarations, we'll use the source file name to derive the
-	// target file name.
-	List exports = exports(sfn);
+        if (ast instanceof SourceFile) {
+            SourceFile sfn = (SourceFile) ast;
+            return translateSource(sfn);
+        }
+        else if (ast instanceof SourceCollection) {
+            SourceCollection sc = (SourceCollection) ast;
 
-	try {
-	    File of;
-	    Writer ofw;
-	    CodeWriter w;
+            for (Iterator i = sc.sources().iterator(); i.hasNext(); ) {
+                SourceFile sfn = (SourceFile) i.next();
+                return translateSource(sfn);
+            }
+        }
 
-	    String pkg = "";
+        throw new InternalCompilerError("AST root must be a SourceFile; " +
+                                        "found a " + ast.getClass().getName());
+    }
 
-	    if (sfn.package_() != null) {
-		Package p = sfn.package_().package_();
-		pkg = p.toString();
-	    }
+    protected boolean translateSource(SourceFile sfn) {
+        TypeSystem ts = typeSystem();
+        NodeFactory nf = nodeFactory();
+	TargetFactory tf = this.tf;
+	int outputWidth = job.compiler().outputWidth();
+	Collection outputFiles = job.compiler().outputFiles();
 
-	    TopLevelDecl first = null;
+        // Find the public declarations in the file.  We'll use these to
+        // derive the names of the target files.  There will be one
+        // target file per public declaration.  If there are no public
+        // declarations, we'll use the source file name to derive the
+        // target file name.
+        List exports = exports(sfn);
 
-	    if (exports.size() == 0) {
-		// Use the source name to derive a default output file name.
-	    	of = tf.outputFile(pkg, job.source());
-	    }
-	    else {
-		first = (TopLevelDecl) exports.get(0);
-	    	of = tf.outputFile(pkg, first.name(), job.source());
-	    }
+        try {
+            File of;
+            Writer ofw;
+            CodeWriter w;
+
+            String pkg = "";
+
+            if (sfn.package_() != null) {
+                Package p = sfn.package_().package_();
+                pkg = p.toString();
+            }
+
+            sfn.enterScope(context);
+
+            TopLevelDecl first = null;
+
+            if (exports.size() == 0) {
+                // Use the source name to derive a default output file name.
+                of = tf.outputFile(pkg, sfn.source());
+            }
+            else {
+                first = (TopLevelDecl) exports.get(0);
+                of = tf.outputFile(pkg, first.name(), sfn.source());
+            }
 
             String opfPath = of.getPath();
             if (!opfPath.endsWith("$")) outputFiles.add(of.getPath());
-	    ofw = tf.outputWriter(of);
-	    w = new CodeWriter(ofw, outputWidth);
+            ofw = tf.outputWriter(of);
+            w = new CodeWriter(ofw, outputWidth);
 
-	    writeHeader(sfn, w);
+            writeHeader(sfn, w);
 
-	    for (Iterator i = sfn.decls().iterator(); i.hasNext(); ) {
-		TopLevelDecl decl = (TopLevelDecl) i.next();
+            for (Iterator i = sfn.decls().iterator(); i.hasNext(); ) {
+                TopLevelDecl decl = (TopLevelDecl) i.next();
 
-		if (decl.flags().isPublic() && decl != first) {
-		    // We hit a new exported declaration, open a new file.
-		    // But, first close the old file.
-		    w.flush();
-		    ofw.close();
+                if (decl.flags().isPublic() && decl != first) {
+                    // We hit a new exported declaration, open a new file.
+                    // But, first close the old file.
+                    w.flush();
+                    ofw.close();
 
-		    of = tf.outputFile(pkg, decl.name(), job.source());
-		    outputFiles.add(of.getPath());
-		    ofw = tf.outputWriter(of);
-		    w = new CodeWriter(ofw, outputWidth);
+                    of = tf.outputFile(pkg, decl.name(), sfn.source());
+                    outputFiles.add(of.getPath());
+                    ofw = tf.outputWriter(of);
+                    w = new CodeWriter(ofw, outputWidth);
 
-		    writeHeader(sfn, w);
-		}
+                    writeHeader(sfn, w);
+                }
 
-		decl.ext().translate(w, this);
-		w.newline(0);
+                decl.ext().translate(w, this);
 
-		if (i.hasNext()) {
-		    w.newline(0);
-		}
-	    }
+                w.newline(0);
 
-	    w.flush();
-	    ofw.close();
-	    return true;
-	}
-	catch (IOException e) {
-	    compiler.errorQueue().enqueue(ErrorInfo.IO_ERROR,
-		       "I/O error while translating: " + e.getMessage());
-	    return false;
-	}
+                if (i.hasNext()) {
+                    w.newline(0);
+                }
+            }
+
+            sfn.leaveScope(context);
+
+            w.flush();
+            ofw.close();
+            return true;
+        }
+        catch (IOException e) {
+            job.compiler().errorQueue().enqueue(ErrorInfo.IO_ERROR,
+                      "I/O error while translating: " + e.getMessage());
+            return false;
+        }
     }
 
     protected void writeHeader(SourceFile sfn, CodeWriter w) {
@@ -179,6 +211,6 @@ public class Translator extends AbstractPass
     }
 
     public String toString() {
-	return "Translator(" + job.source() + ")";
+	return "Translator";
     }
 }

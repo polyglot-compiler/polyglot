@@ -12,28 +12,13 @@ public class Source
     FileReader reader;
     Date lastModified;
 
-    public Source(String name, String sourceExtension) throws IOException {
+    public Source(String name) throws IOException {
 	this.name = name;
 	this.file = new File(name);
 
 	if (! file.exists()) {
 	    throw new FileNotFoundException(name);
 	}
-
-	StringTokenizer st = new StringTokenizer(sourceExtension, ";, ");
-	
-	boolean sat = false;
-	while (st.hasMoreTokens() && !sat) {
-	    String ext = st.nextToken();
-	    
-	    if (name.endsWith("." + ext)) 
-		sat = true;
-	}
-	
-	if (!sat) 
-	    throw new IOException(
-		    "Source \"" + name + "\" does not have the extension \"." +
-		    sourceExtension + "\".");
 
 	lastModified = new Date(file.lastModified());
     }

@@ -10,10 +10,10 @@ import jltools.util.*;
  */
 public class ParserPass extends AbstractPass
 {
-    SourceJob job;
+    Job job;
     Compiler compiler;
 
-    public ParserPass(Pass.ID id, Compiler compiler, SourceJob job) {
+    public ParserPass(Pass.ID id, Compiler compiler, Job job) {
         super(id);
 	this.compiler = compiler;
 	this.job = job;
@@ -26,7 +26,7 @@ public class ParserPass extends AbstractPass
 	try {
 	    Reader reader = source.open();
 
-	    Parser p = compiler.extensionInfo().parser(reader, source, eq);
+	    Parser p = compiler.sourceExtension().parser(reader, source, eq);
 
 	    jltools.frontend.Compiler.report(2, "Using parser " + p);
 

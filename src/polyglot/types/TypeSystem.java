@@ -3,6 +3,7 @@ package jltools.types;
 import java.util.*;
 import jltools.util.Position;
 import jltools.frontend.Job;
+import jltools.frontend.Source;
 import jltools.frontend.Compiler;
 import jltools.types.reflect.ClassFile;
 
@@ -15,24 +16,28 @@ public interface TypeSystem {
      * Initialize the type system with the compiler.  This method must be
      * called before any other type system method is called.
      */
-    void initialize(Compiler compiler) throws SemanticException;
-
-    /**
-     * Return the compiler associated with this type system.
-     */
-    Compiler compiler();
+    void initialize(LoadedClassResolver resolver)
+                    throws SemanticException;
 
     /**
      * Returns the system resolver.  This resolver can load top-level classes
      * with fully qualified names from the class path and the source path.
      */
     Resolver systemResolver();
+    TableResolver parsedResolver();
+    LoadedClassResolver loadedResolver();
+
+    /** Create an import table for the source file. */
+    ImportTable importTable(Source source, Package pkg);
 
     /**
      * Return a list of the packages names that will be imported by
      * default.  A list of Strings is returned, not a list of Packages.
      */
     List defaultPackageImports();
+
+    /** Get the class type with the following name. */
+    ClassType typeForName(String name) throws SemanticException;
 
     /** Create an initailizer instance. */
     InitializerInstance initializerInstance(Position pos, ClassType container,
@@ -285,7 +290,7 @@ public interface TypeSystem {
     Package packageForName(String name);
     Package packageForName(Package prefix, String name);
 
-    Context createContext(ImportTable it);
+    Context createContext();
 
     /** Get a resolver for looking up a type in a package. */
     Resolver packageContextResolver(Resolver resolver, Package pkg);

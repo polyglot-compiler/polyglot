@@ -1,6 +1,7 @@
 package jltools.ext.jl.types;
 
 import jltools.types.*;
+import jltools.util.InternalCompilerError;
 import java.util.*;
 
 /**

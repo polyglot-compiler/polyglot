@@ -2,14 +2,25 @@ package jltools.visit;
 
 import jltools.ast.*;
 import jltools.types.TypeSystem;
-import jltools.frontend.Pass;
 import jltools.frontend.Job;
 
 /** Visitor which performs constant folding. */
-public class ConstantFolder extends BaseVisitor
+public class ConstantFolder extends NodeVisitor
 {
-    public ConstantFolder(Job job) {
-        super(job);
+    TypeSystem ts;
+    NodeFactory nf;
+
+    public ConstantFolder(TypeSystem ts, NodeFactory nf) {
+        this.ts = ts;
+        this.nf = nf;
+    }
+
+    public TypeSystem typeSystem() {
+      return ts;
+    }
+
+    public NodeFactory nodeFactory() {
+      return nf;
     }
 
     public Node enter(Node n) {

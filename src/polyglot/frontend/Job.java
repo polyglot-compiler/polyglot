@@ -103,7 +103,7 @@ public abstract class Job
     }
 
     public abstract Context context();
-    public abstract ImportTable importTable();
+    public abstract Source source();
 
     protected abstract List getPasses();
 
@@ -196,7 +196,7 @@ public abstract class Job
     }
 
     public Node spawn(Context c, Node ast, Pass.ID begin, Pass.ID end) {
-        Job j = compiler.extensionInfo().createJob(ast, c, this, begin, end);
+        Job j = compiler.sourceExtension().createJob(ast, c, this, begin, end);
 
         Compiler.report(1, this + " spawning " + j);
 

@@ -17,31 +17,24 @@ import java.io.IOException;
 public class SourceJob extends Job
 {
     protected Source source;
-    protected ImportTable it;
     protected Context context;
 
     /** Construct a new job for a given source and compiler. */
     public SourceJob(Compiler c, JobExt ext, Job parent, Source source) {
         super(c, ext, parent, null);
         this.source = source;
-        this.it = new ImportTable(c.typeSystem(), c.systemResolver(),
-				  source, c.errorQueue());
     }
 
     public List getPasses() {
-      	return compiler.extensionInfo().passes(this);
+      	return compiler.sourceExtension().passes(this);
     }
 
     public Context context() {
 	if (context == null) {
-	    context = compiler.typeSystem().createContext(it);
+	    context = compiler.sourceExtension().typeSystem().createContext();
 	}
 
 	return context;
-    }
-
-    public ImportTable importTable() {
-        return it;
     }
 
     public Source source() {

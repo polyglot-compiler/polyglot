@@ -54,6 +54,8 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
     protected Options options;
     protected TypeSystem ts = null;
     protected NodeFactory nf = null;
+    protected SourceLoader source_loader = null;
+    protected TargetFactory target_factory = null;
 
     public void setOptions(Options options) throws UsageError {
 	this.options = options;
@@ -63,7 +65,13 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 	this.compiler = compiler;
 
 	try {
-	    ts.initialize(compiler);
+            // Create the type system and node factory.
+            typeSystem();
+            nodeFactory();
+
+            LoadedClassResolver lr = new SourceClassResolver(compiler, this,
+                                                             options.classpath);
+            ts.initialize(lr);
 	}
 	catch (SemanticException e) {
 	    throw new InternalCompilerError(
@@ -72,7 +80,17 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
     }
 
     public String fileExtension() {
-	return "jl";
+	String sx = options.source_ext;
+
+	if (sx == null) {
+	    sx = defaultFileExtension();
+        }
+
+        return sx;
+    }
+
+    public String defaultFileExtension() {
+        return "jl";
     }
 
     public String compilerName() {
@@ -105,13 +123,11 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
     }
 
     public SourceLoader sourceLoader() {
-	String sx = options.source_ext;
+        if (source_loader == null) {
+            source_loader = new SourceLoader(this, options.source_path);
+        }
 
-	if (sx == null) {
-	    sx = fileExtension();
-	}
-
-	return new SourceLoader(options.source_path, sx);
+        return source_loader;
     }
 
     public JobExt jobExt() {
@@ -127,16 +143,13 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
     }
 
     public TargetFactory targetFactory() {
-	String sx = options.source_ext;
-
-	if (sx == null) {
-	    sx = fileExtension();
-	}
-
-	return new TargetFactory(options.output_directory,
-				 options.output_ext,
-				 sx,
-				 options.output_stdout);
+        if (target_factory == null) {
+            target_factory = new TargetFactory(options.output_directory,
+                                               options.output_ext,
+                                               options.output_stdout);
+        }
+        
+        return target_factory;
     }
 
     /** Create the node factory for this extension. */
@@ -234,24 +247,26 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
         replacePass(passes, id, new EmptyPass(id));
     }
 
-    public List transformPasses(Job job) {
+    public List passes(Job job) {
         ArrayList l = new ArrayList(15);
 
-        l.add(new VisitorPass(Pass.BUILD_TYPES, job, new TypeBuilder(job)));
+	l.add(new ParserPass(Pass.PARSE, compiler, job));
+
+        l.add(new VisitorPass(Pass.BUILD_TYPES, job, new TypeBuilder(job, ts, nf)));
 	l.add(new BarrierPass(Pass.BUILD_TYPES_ALL, job));
 	l.add(new VisitorPass(Pass.CLEAN_SUPER, job,
-                              new AmbiguityRemover(job, AmbiguityRemover.SUPER)));
+                              new AmbiguityRemover(job, ts, nf, AmbiguityRemover.SUPER)));
 	l.add(new BarrierPass(Pass.CLEAN_SUPER_ALL, job));
 	l.add(new VisitorPass(Pass.CLEAN_SIGS, job,
-                              new AmbiguityRemover(job, AmbiguityRemover.SIGNATURES)));
-	l.add(new VisitorPass(Pass.ADD_MEMBERS, job, new AddMemberVisitor(job)));
+                              new AmbiguityRemover(job, ts, nf, AmbiguityRemover.SIGNATURES)));
+	l.add(new VisitorPass(Pass.ADD_MEMBERS, job, new AddMemberVisitor(job, ts, nf)));
 	l.add(new BarrierPass(Pass.ADD_MEMBERS_ALL, job));
 	l.add(new VisitorPass(Pass.DISAM, job, new
-                              AmbiguityRemover(job, AmbiguityRemover.ALL)));
-	l.add(new VisitorPass(Pass.FOLD, job, new ConstantFolder(job)));
+                              AmbiguityRemover(job, ts, nf, AmbiguityRemover.ALL)));
+	l.add(new VisitorPass(Pass.FOLD, job, new ConstantFolder(ts, nf)));
 	l.add(new BarrierPass(Pass.DISAM_ALL, job));
-        l.add(new VisitorPass(Pass.TYPE_CHECK, job, new TypeChecker(job)));
-        l.add(new VisitorPass(Pass.SET_EXPECTED_TYPES, job, new ExpectedTypeVisitor(job)));
+        l.add(new VisitorPass(Pass.TYPE_CHECK, job, new TypeChecker(job, ts, nf)));
+        l.add(new VisitorPass(Pass.SET_EXPECTED_TYPES, job, new ExpectedTypeVisitor(job, ts, nf)));
 	l.add(new VisitorPass(Pass.EXC_CHECK, job, new ExceptionChecker(ts, compiler.errorQueue())));
 	l.add(new BarrierPass(Pass.PRE_OUTPUT_ALL, job));
 
@@ -260,11 +275,20 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
 				  new DumpAst(new CodeWriter(System.err, 78))));
 	}
 
+	if (compiler.serializeClassInfo()) {
+	    l.add(new VisitorPass(Pass.SERIALIZE,
+				  job, new ClassSerializer(ts, nf,
+							   job.source().lastModified(),
+							   compiler.errorQueue())));
+	}
+
+	l.add(new Translator(Pass.OUTPUT, job, ts, nf, targetFactory()));
+
         return l;
     }
 
-    public List transformPasses(Job job, Pass.ID begin, Pass.ID end) {
-        List l = transformPasses(job);
+    public List passes(Job job, Pass.ID begin, Pass.ID end) {
+        List l = passes(job);
         boolean in = false;
 
         for (Iterator i = l.iterator(); i.hasNext(); ) {
@@ -275,25 +299,6 @@ public class ExtensionInfo implements jltools.frontend.ExtensionInfo {
         }
 
         return l;
-    }
-
-    public List passes(SourceJob job) {
-      	List l = new ArrayList();
-
-	l.add(new ParserPass(Pass.PARSE, compiler, job));
-
-	l.addAll(transformPasses(job));
-
-	if (compiler.serializeClassInfo()) {
-	    l.add(new VisitorPass(Pass.SERIALIZE,
-				  job, new ClassSerializer(ts, nf,
-							   job.source().lastModified(),
-							   compiler.errorQueue())));
-	}
-
-	l.add(new Translator(Pass.OUTPUT, compiler, job));
-
-	return l;
     }
 
     static { Report.topics.add("jl"); }

@@ -12,20 +12,12 @@ public class TargetFactory
 {
     File outputDirectory;
     String outputExtension;
-    String sourceExtension;
     boolean outputStdout;
 
-    public TargetFactory(File outDir, String outExt, String srcExt,
-			 boolean so) {
+    public TargetFactory(File outDir, String outExt, boolean so) {
 	outputDirectory = outDir;
 	outputExtension = outExt;
-	sourceExtension = srcExt;
 	outputStdout = so;
-    }
-
-    private String fixExt(String name) {
-	return name.substring(0, name.lastIndexOf(sourceExtension)) +
-		outputExtension;
     }
 
     /** Open a writer to the output file for the class in the given package. */
@@ -60,8 +52,7 @@ public class TargetFactory
     }
 
     /** Return a file object for the output of the class in the given package. */
-    public File outputFile(String packageName, String className, 
-	    		   Source source)
+    public File outputFile(String packageName, String className, Source source)
     {
 	if (outputDirectory == null) {
 	      throw new InternalCompilerError("Output directory not set.");

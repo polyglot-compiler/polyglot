@@ -26,9 +26,8 @@ public class Context_c implements Context
      */
     protected TypeSystem ts;
 
-    public Context_c(TypeSystem ts, ImportTable it) {
+    public Context_c(TypeSystem ts) {
 	this.ts = ts;
-	this.it = it;
 	scopes = new Stack();
 	scopes.push(new OuterMark());
     }
@@ -234,6 +233,7 @@ public class Context_c implements Context
         return s;
     }
 
+
     /**
      * Finds the definition of a particular type qualifier (also a type).
      */
@@ -299,7 +299,21 @@ public class Context_c implements Context
     }
 
     /**
-     * Pushes on a class  scoping
+     * Push a source file scope.
+     */
+    public void pushSource(ImportTable it) {
+        this.it = it;
+    }
+
+    /**
+     * Pop a source file scope.
+     */
+    public void popSource() {
+        it = null;
+    }
+
+    /**
+     * Pushes on a class scoping
      */
     public void pushClass(ParsedClassType c) {
         Types.report(4, "push class " + c + " " + c.position());

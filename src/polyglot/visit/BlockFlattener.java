@@ -1,26 +1,23 @@
 package jltools.visit;
 
 import jltools.ast.*;
-import jltools.frontend.*;
 import java.util.*;
 
 /**
  * The <code>BlockFlattener</code> runs over the AST and, as the name
  * suggests, flattens blocks whenever possible.
  **/
-public class BlockFlattener extends BaseVisitor {
+public class BlockFlattener extends NodeVisitor {
 
-  NodeFactory nf;
+  protected NodeFactory nf;
 
   /**
    * Creates a visitor for flattening blocks.
    *
    * @param job  The job in which this visitor is being executed.
    **/
-  public BlockFlattener(Job job) {
-    super(job);
-
-    nf = nodeFactory();
+  public BlockFlattener(NodeFactory nf) {
+    this.nf = nf;
   }
 
   public Node leave( Node old, Node n, NodeVisitor v ) {

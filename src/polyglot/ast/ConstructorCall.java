@@ -29,4 +29,5 @@ public interface ConstructorCall extends Stmt
     ConstructorCall arguments(List arguments);
 
     ConstructorInstance constructorInstance();
+    ConstructorCall constructorInstance(ConstructorInstance ci);
 }

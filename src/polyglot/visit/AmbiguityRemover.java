@@ -23,8 +23,8 @@ public class AmbiguityRemover extends SemanticVisitor
 
     private Kind kind;
 
-    public AmbiguityRemover(Job job, Kind kind) {
-        super(job);
+    public AmbiguityRemover(Job job, TypeSystem ts, NodeFactory nf, Kind kind) {
+        super(job, ts, nf);
         this.kind = kind;
     }
 

@@ -8,7 +8,7 @@ import java.util.*;
  * The <code>CodeCleaner</code> runs over the AST and performs some trivial
  * dead code elimination.
  **/
-public class CodeCleaner extends BaseVisitor {
+public class CodeCleaner extends NodeVisitor {
 
   protected NodeFactory nf;
 
@@ -16,10 +16,8 @@ public class CodeCleaner extends BaseVisitor {
    * Creates a visitor for eliminating dead code.
    * @param job  The job in which this visitor is being executed.
    **/
-  public CodeCleaner(Job job) {
-    super(job);
-
-    nf = nodeFactory();
+  public CodeCleaner(NodeFactory nf) {
+    this.nf = nf;
   }
 
   public Node leave( Node old, Node n, NodeVisitor v ) {

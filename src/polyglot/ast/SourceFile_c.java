@@ -4,6 +4,7 @@ import jltools.ast.*;
 import jltools.types.*;
 import jltools.visit.*;
 import jltools.util.*;
+import jltools.frontend.Source;
 import jltools.types.Package;
 import java.util.*;
 
@@ -17,12 +18,26 @@ public class SourceFile_c extends Node_c implements SourceFile
     protected PackageNode package_;
     protected List imports;
     protected List decls;
+    protected ImportTable importTable;
+    protected Source source;
 
     public SourceFile_c(Ext ext, Position pos, PackageNode package_, List imports, List decls) {
 	super(ext, pos);
 	this.package_ = package_;
 	this.imports = TypedList.copyAndCheck(imports, Import.class, true);
 	this.decls = TypedList.copyAndCheck(decls, TopLevelDecl.class, true);
+    }
+
+    /** Get the source of the source file. */
+    public Source source() {
+	return this.source;
+    }
+
+    /** Set the source of the source file. */
+    public SourceFile source(Source source) {
+	SourceFile_c n = (SourceFile_c) copy();
+	n.source = source;
+	return n;
     }
 
     /** Get the package of the source file. */
@@ -61,6 +76,18 @@ public class SourceFile_c extends Node_c implements SourceFile
 	return n;
     }
 
+    /** Get the declarations of the source file. */
+    public ImportTable importTable() {
+	return this.importTable;
+    }
+
+    /** Set the declarations of the source file. */
+    public SourceFile importTable(ImportTable importTable) {
+	SourceFile_c n = (SourceFile_c) copy();
+	n.importTable = importTable;
+	return n;
+    }
+
     /** Reconstruct the source file. */
     protected SourceFile_c reconstruct(PackageNode package_, List imports, List decls) {
 	if (package_ != this.package_ || ! CollectionUtil.equals(imports, this.imports) || ! CollectionUtil.equals(decls, this.decls)) {
@@ -82,17 +109,47 @@ public class SourceFile_c extends Node_c implements SourceFile
 	return reconstruct(package_, imports, decls);
     }
 
-    /** Build type objects for the source file.
-     * Set the package before we recurse into the declarations. */
+    /**
+     * Build type objects for the source file.  Set the visitor's import table
+     * field before we recurse into the declarations.
+     */
     public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
+        TypeSystem ts = tb.typeSystem();
+
+        ImportTable it;
+
         if (package_ != null) {
-	    tb.setPackage(package_.package_());
+            it = ts.importTable(source, package_.package_());
 	}
 	else {
-	    tb.setPackage(null);
+            it = ts.importTable(source, null);
 	}
 
+        tb.setImportTable(it);
+
         return this;
+    }
+
+    /**
+     * Build type objects for the source file.  Sets the import table field for
+     * the source.
+     */
+    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+        ImportTable it = tb.importTable();
+
+        // Clear the import table in case we use the same visitor
+        // to visit a different source file.
+        tb.setImportTable(null);
+
+        return importTable(it);
+    }
+
+    public void enterScope(Context c) {
+        c.pushSource(importTable);
+    }
+
+    public void leaveScope(Context c) {
+        c.popSource();
     }
 
     /** Type check the source file. */

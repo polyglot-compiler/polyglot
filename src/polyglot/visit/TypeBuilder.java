@@ -11,19 +11,40 @@ import java.io.IOException;
 import java.util.*;
 
 /** Visitor which traverses the AST constructing type objects. */
-public class TypeBuilder extends BaseVisitor
+public class TypeBuilder extends NodeVisitor
 {
     protected Stack stack;
-    protected Context context;
+    protected ImportTable importTable;
+    protected Job job;
+    protected TypeSystem ts;
+    protected NodeFactory nf;
 
-    public TypeBuilder(Job job) {
-	super(job);
+    public TypeBuilder(Job job, TypeSystem ts, NodeFactory nf) {
+        this.job = job;
+        this.ts = ts;
+        this.nf = nf;
 	stack = new Stack();
+    }
+
+    public Job job() {
+        return job;
+    }
+
+    public ErrorQueue errorQueue() {
+        return job.compiler().errorQueue();
+    }
+
+    public NodeFactory nodeFactory() {
+        return nf;
+    }
+
+    public TypeSystem typeSystem() {
+        return ts;
     }
 
     public boolean begin() {
         // Initialize the stack from the context.
-        context = job.context();
+        Context context = job.context();
 
         Stack s = new Stack();
 
@@ -199,7 +220,7 @@ public class TypeBuilder extends BaseVisitor
 	      	ct.package_(currentPackage());
 	    }
 
-	    job.compiler().parsedResolver().addType(ct.fullName(), ct);
+	    typeSystem().parsedResolver().addType(ct.fullName(), ct);
 
 	    return ct;
 	}
@@ -260,16 +281,14 @@ public class TypeBuilder extends BaseVisitor
     }
 
     public Package currentPackage() {
-	return importTable().package_();
+	return importTable.package_();
     }
 
-    public void setPackage(Package p) throws SemanticException {
-	// The order of setPackage and addDefaultImports is important.
+    public ImportTable importTable() {
+        return importTable;
+    }
 
-	if (p != null) {
-	    importTable().setPackage(p.fullName());
-	}
-
-	importTable().addDefaultImports();
+    public void setImportTable(ImportTable it) {
+        this.importTable = it;
     }
 }

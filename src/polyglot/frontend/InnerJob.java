@@ -48,7 +48,7 @@ public class InnerJob extends Job
     }
 
     public List getPasses() {
-      	List l = compiler.extensionInfo().transformPasses(this, begin, end);
+      	List l = compiler.sourceExtension().passes(this, begin, end);
 
         for (int i = 0; i < l.size(); i++) {
             Pass pass = (Pass) l.get(i);
@@ -64,7 +64,7 @@ public class InnerJob extends Job
 	return context;
     }
 
-    public ImportTable importTable() {
-	return outer.importTable();
+    public Source source() {
+	return outer.source();
     }
 }

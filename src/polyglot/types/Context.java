@@ -60,6 +60,15 @@ public interface Context extends Resolver
      */
     ParsedClassType findMethodScope(String name) throws SemanticException;
 
+    /** Get import table currently in scope. */
+    ImportTable importTable();
+
+    /** Enter the scope of a source file. */
+    void pushSource(ImportTable it);
+
+    /** Leave the scope of a source file. */
+    void popSource();
+
     /** Enter the scope of a class. */
     void pushClass(ParsedClassType c);
 

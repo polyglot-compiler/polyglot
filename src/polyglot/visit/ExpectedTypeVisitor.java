@@ -9,8 +9,8 @@ import jltools.types.Package;
 /** Visitor which performs type checking on the AST. */
 public class ExpectedTypeVisitor extends SemanticVisitor
 {
-    public ExpectedTypeVisitor(Job job) {
-	super(job);
+    public ExpectedTypeVisitor(Job job, TypeSystem ts, NodeFactory nf) {
+	super(job, ts, nf);
     }
 
     protected Node enterCall(Node parent, Node n) throws SemanticException {

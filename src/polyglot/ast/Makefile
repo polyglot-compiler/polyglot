@@ -71,6 +71,7 @@ SOURCES = \
 	Receiver.java \
 	Return.java \
 	SourceFile.java \
+	SourceCollection.java \
 	Special.java \
 	Stmt.java \
 	StringLit.java \

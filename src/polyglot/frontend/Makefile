@@ -5,15 +5,15 @@ SUBDIRS =
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
+	Compiler.java \
 	AbstractPass.java \
 	BarrierPass.java \
-	Compiler.java \
 	CupParser.java \
 	EmptyPass.java \
 	ExtensionInfo.java \
 	InnerJob.java \
-	Job.java \
 	JobExt.java \
+	Job.java \
 	Parser.java \
 	ParserPass.java \
 	Pass.java \

@@ -12,8 +12,8 @@ import java.util.*;
 /** Visitor which traverses the AST constructing type objects. */
 public class AddMemberVisitor extends SemanticVisitor
 {
-    public AddMemberVisitor(Job job) {
-        super(job);
+    public AddMemberVisitor(Job job, TypeSystem ts, NodeFactory nf) {
+        super(job, ts, nf);
     }
 
     protected Node enterCall(Node n) throws SemanticException {

@@ -7,7 +7,6 @@ include $(SOURCE)/Rules.mk
 SOURCES = \
 	AddMemberVisitor.java \
 	AmbiguityRemover.java \
-	BaseVisitor.java \
 	BlockFlattener.java \
 	ClassSerializer.java \
 	CodeCleaner.java \
