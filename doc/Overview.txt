@@ -185,7 +185,7 @@ instead of directly calling:
 
 To reduce the proliferation of classes, all nodes in the base compiler use the
 same delegate class. For each compiler pass, the delegate invokes a method in
-the AST node that implements the class. Thus, in the base compiler, passes are
+the AST node that implements the pass. Thus, in the base compiler, passes are
 implemented in the AST nodes themselves. Besides reducing the number of
 classes, this approach also permits more convenient access to instance
 variables of the nodes; delegates access the instance variables of their
@@ -205,6 +205,13 @@ adding a member to the common base class of several classes, use an extension.
 use a delegate.
 
 3. Otherwise, use inheritance.
+
+
+If the designer chooses to use delegates or extensions, delegate
+factories and extension factories simplify the task of instantiating
+appropriate delegate and extension objects respectively. See below for
+more information on node, extension and delegate factories.
+  
 
 Writing an extension
 --------------------
@@ -411,3 +418,74 @@ polyglot/ext/pao.
     The skeleton generator created most of the necessary code.  We modify
     the passes() method to add our new boxing pass. We also create a Version
     class that defines the version of Pao that is being worked on.
+
+
+Node, Extension and Delegate Factories
+--------------------------------------
+
+Node factories are used to create instances of AST nodes. Extension
+and delegate factories simplify the task of instantiating appropriate
+delegate and extension objects for the AST nodes.
+
+Language extensions will typically implement node factories by
+extending the NodeFactory_c class in the package
+polyglot.ext.jl.ast. The NodeFactory_c class can be given a delegate
+factory and/or an extension factory to use. The classes
+AbstractDelFactory_c and AbstractExtFactory_c in the same package
+provide convenient base classes for language extensions to extend.
+
+For any AST node <node>, the node factory typically has one or more
+methods called <node>, to create instances of <node>. The
+implementation of these methods in NodeFactory_c have the following
+form:
+
+    public <node> <node>(Position pos, ...) {
+        <node> n = new <node>_c(pos, ...);
+        n = (<node>)n.ext(extFactory.ext<node>());
+        n = (<node>)n.del(delFactory.del<node>());
+        return n;
+    }
+
+Note that first an object that implements the interface <node> is
+created: <node>_c. An extension object for the newly created AST node
+is obtained by calling the appropriate method on the extension
+factory. A delegate object is obtained by a similar call to the
+delegate factory. The extension object and/or the delegate object
+returned by these calls may be null.
+
+The AbstractExtFactory_c class implements the ext<node> methods and
+provides convenient hooks for language extensions to override. The
+implementation of the ext<node> method in AbstractExtFactory_c has the
+following form:
+
+    public final Ext ext<node>() {
+        Ext e = ext<node>Impl();
+        return postExt<node>(e);
+    }
+
+The ext<node>Impl() is responsible for creating an appropriate Ext
+object. The default implementation of these methods in
+AbstractExtFactory_c is simply to call the ext<super>Impl() method,
+where <super> is the superclass of <node>. Thus, for example, the
+implementation of extArrayAccessImpl in AbstractExtFactory_c is:
+
+    protected Ext extArrayAccessImpl() {
+        return extExprImpl();
+    }
+
+For example, a language extension that needs to provide extension
+objects for all expressions and also for class declarations would thus
+need to override only two methods of AbstractExtFactory_c:
+extExprImpl() and extClassDeclImpl(). Another example: if a language
+extension needs to use a single Ext class for all AST nodes, then only
+the single method extNodeImpl() needs to be overridden.
+
+The postExt<node>(Ext) methods provide hooks for subclasses to
+manipulate Ext objects after they have been created. The default
+implementation of these methods in AbstractExtFactory_c is simply to
+call the postExt<super>(Ext) method, where <super> is the superclass
+of <node>.
+
+The structure of the delegate factory AbstractDelFactory_c class is
+analogous to that of AbstractExtFactory_c.
+
