@@ -158,6 +158,13 @@ public class SourceFileTest extends AbstractTest {
             args.add(s);                        
         }
 
+        if ((s = Main.options.extraArgs) != null) {
+            sa = breakString(Main.options.extraArgs);
+            for (int i = 0; i < sa.length; i++) {
+                args.add(sa[i]);
+            }
+        }
+
         if ((sa = getExtraCmdLineArgs()) != null) {
             for (int i = 0; i < sa.length; i++) {
                 args.add(sa[i]);
@@ -180,15 +187,19 @@ public class SourceFileTest extends AbstractTest {
     protected String[] getExtraCmdLineArgs() {
         return this.extraArgs;
     }
+    
+    protected static String[] breakString(String s) {
+        StringTokenizer st = new StringTokenizer(s);
+        ArrayList l = new ArrayList(st.countTokens());
+        while (st.hasMoreTokens()) {
+            l.add(st.nextToken());
+        }
+            
+        return (String[])l.toArray(new String[l.size()]);
+    }
     protected void setExtraCmdLineArgs(String args) {
         if (args != null) {
-            StringTokenizer st = new StringTokenizer(args);
-            ArrayList l = new ArrayList(st.countTokens());
-            while (st.hasMoreTokens()) {
-                l.add(st.nextToken());
-            }
-            
-            this.extraArgs = (String[])l.toArray(new String[0]);
+            this.extraArgs = breakString(args);
         } 
     }
     protected String getAdditionalClasspath() {

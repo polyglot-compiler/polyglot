@@ -20,6 +20,9 @@ public class Options {
     // classpath for the compiler.
     protected String classpath = null;
     
+    // Extra command line args for the compiler
+    protected String extraArgs = null;
+    
     // filter for tests
     protected String testFilter = null;
     
@@ -68,6 +71,13 @@ public class Options {
                            "set the class path for the Polyglot compiler.") { 
                protected int invoke(int index, String[] args) {
                    classpath = getStringArg(++index, args);
+                   return index + 1;
+               }
+         },
+        new CommandLineOption(new String[] {"args"}, "extraArgs", 
+                           "provide additional command line arguments to the Polyglot compiler.") { 
+               protected int invoke(int index, String[] args) {
+                   extraArgs = getStringArg(++index, args);
                    return index + 1;
                }
          },
