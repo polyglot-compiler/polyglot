@@ -195,8 +195,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
 	if (! flags.equals(fi.flags())) {
 	    fi = fi.flags(flags);
 	}
-	//FIXME: 
-	//if (! type.equals(fi.type())) {
+
 	if (type != fi.type()) {
 	    fi = fi.type(type);
 	}
