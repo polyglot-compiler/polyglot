@@ -7,9 +7,9 @@ include $(SOURCE)/Rules.mk
 SOURCES = \
 	ExtensionInfo.java \
 	Version.java \
-	CovarRetTypeSystem.java \
 	CovarRetNodeFactory.java \
-	CovarRetRewriter.java
+	CovarRetRewriter.java \
+	CovarRetClassBody_c.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 
