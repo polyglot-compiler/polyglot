@@ -25,11 +25,18 @@
 #      CmdLineArgs  :   additional command line args for the Polyglot 
 #                       compiler; is always enclosed in quotes.
 
-polyglot.ext.jl.ExtensionInfo {
+polyglot.ext.jl.ExtensionInfo "-cp ." {
         ArrayInit.jl ;
         ClassLit.jl ;
         Conditional1.jl ;
-        ConformanceCheck3.jl ;
+	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
+	ConformanceCheck2.jl (Semantic, "cannot override.*throw set is not a subset");
+        ConformanceCheck3.jl ;        
+        ConformanceCheck4.jl ConformanceCheck4a.jl (Semantic, "should be declared abstract");
+        ConformanceCheck5.jl ;        
+        ConformanceCheck6.jl ;         
+        ConformanceCheck7.jl (Semantic, "should be declared abstract");        
+        packA/ConformanceCheck8.jl packB/ConformanceCheck8b.jl (Semantic, "should be declared abstract"); 
         Constants.jl ;  Constants2.jl ; Constants3.jl ; Constants4.jl ;
         Constants5.jl ; Constants6.jl ; Constants7.jl ; Constants8.jl;
         Constants9.jl ;
@@ -133,8 +140,6 @@ polyglot.ext.jl.ExtensionInfo {
         BadSwitch1.jl (Semantic, "Case label must be an integral constant");
 	BadSwitch2.jl (Semantic, "Duplicate case label");
 	CircularConstructor.jl (Semantic, "Recursive constructor invocation");
-	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
-	ConformanceCheck2.jl (Semantic, "cannot override.*throw set is not a subset");
 	Errors.jl (Semantic, "No valid method call found");
 	Errors2.jl (Semantic, "Could not find type"); 
 	LabeledBreak2.jl (Semantic, "Unreachable statement"); 
