@@ -1,11 +1,13 @@
 package polyglot.ext.jl.ast;
 
 import java.util.Iterator;
+import java.util.List;
 
 import polyglot.ast.Block;
 import polyglot.ast.CodeDecl;
 import polyglot.ast.Initializer;
 import polyglot.ast.Node;
+import polyglot.ast.Term;
 import polyglot.types.ClassType;
 import polyglot.types.CodeInstance;
 import polyglot.types.Context;
@@ -18,6 +20,7 @@ import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.util.SubtypeSet;
 import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.CFGBuilder;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
@@ -106,6 +109,19 @@ public class Initializer_c extends Term_c implements Initializer
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         return tb.pushCode();
+    }
+
+    /**
+     * Return the first (sub)term performed when evaluating this
+     * term.
+     */
+    public Term entry() {
+        return this.body().entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFG(this.body(), this);
+        return succs;
     }
 
     /** Build type objects for the method. */
