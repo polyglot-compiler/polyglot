@@ -46,34 +46,40 @@ public class StringUtil
 
 	for (int i = 0; i < s.length(); i++) {
 	    char c = s.charAt(i);
-	    sb.append(escape(c));
+	    escape(sb, c);
 	}
 
 	return sb.toString();
     }
 
     public static String escape(char c) {
+        return escape("" + c);
+    }
+
+    private static void escape(StringBuffer sb, char c) {
         if (c > 0xff) {
-	    return "" + c;
+            sb.append(c);
+	    return;
 	}
 
 	switch (c) {
-	    case '\b': return "\\b";
-	    case '\t': return "\\t";
-	    case '\n': return "\\n";
-	    case '\f': return "\\f";
-	    case '\r': return "\\r";
-	    case '\"': return "\\" + c; // "\\\"";
-	    case '\'': return "\\" + c; // "\\\'";
-	    case '\\': return "\\" + c; // "\\\\";
+	    case '\b': sb.append("\\b"); return;
+	    case '\t': sb.append("\\t"); return;
+	    case '\n': sb.append("\\n"); return;
+	    case '\f': sb.append("\\f"); return;
+	    case '\r': sb.append("\\r"); return;
+	    case '\"': sb.append("\\" + c); return; // "\\\"";
+	    case '\'': sb.append("\\" + c); return; // "\\\'";
+	    case '\\': sb.append("\\" + c); return; // "\\\\";
 	}
 
-	if (c >= 0x20 && c < 0x7f) {
-	    return "" + c;
+        if (c >= 0x20 && c < 0x7f) {
+            sb.append(c);
+	    return;
 	}
 
-	return "\\" + (char) ('0' + c / 64)
-		    + (char) ('0' + (c & 63) / 8)
-		    + (char) ('0' + (c & 7));
+        sb.append("\\" + (char) ('0' + c / 64)
+                       + (char) ('0' + (c & 63) / 8)
+                       + (char) ('0' + (c & 7)));
     }
 }
