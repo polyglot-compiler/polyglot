@@ -62,8 +62,10 @@
     description="compile an extension">
     <javac srcdir="${src}" destdir="${classes}"
       includes="polyglot/ext/${ext}/**"
-      excludes="polyglot/ext/${ext}/test/**,polyglot/ext/${ext}/tests/**">
+      excludes="**/test/**,**/tests/**,**/runtime/**">
       <classpath refid="standard.classpath"/>
+      <!-- HACK: the excludes above wouldn't be necessary if we
+           reorganized the source tree -->
     </javac>
   </target>
 
@@ -80,7 +82,8 @@
     <java classname="polyglot.util.ppg.PPG"
           fork="true"
           dir="${parser.dir}"
-	  output="${parser.dir}/${cup.file}">
+	  output="${parser.dir}/${cup.file}"
+	  failonerror="true">
       <classpath refid="standard.classpath"/>
       <arg line="${ppg.file}"/>
     </java>
@@ -90,17 +93,14 @@
   <!-- Set the property ppg.parser.up-to-date if the parser is in fact
        up to date.  Called by the ppg-parser target.
    -->
-  <target name="ppg-parser-deps" depends="cup-parser-deps">
+  <target name="ppg-parser-deps" depends="cup-parser-deps"
+          if="cup.parser.up-to-date">
     <dependset>
       <srcfileset dir="${parser.dir}" includes="${ppg.file}"/>
       <targetfileset dir="${parser.dir}" includes="${cup.file}"/>
     </dependset>
-    <condition property="ppg.parser.up-to-date">
-      <and>
-        <available file="${parser.dir}/${cup.file}"/>
-	<isset property="cup.parser.up-to-date"/>
-      </and>
-    </condition>
+    <available property="ppg.parser.up-to-date" 
+               file="${parser.dir}/${cup.file}"/>
   </target>
 
   <!-- Build a CUP parser based on parameters supplied to the target.
@@ -114,7 +114,8 @@
           unless="cup.parser.up-to-date">
     <java classname="java_cup.Main"
           fork="true"
-          dir="${parser.dir}">
+          dir="${parser.dir}"
+	  failonerror="true">
       <classpath refid="standard.classpath"/>
       <arg line="-parser ${parser.class} -symbols ${symbol.class} ${cup.file}"/>
     </java>
@@ -137,11 +138,46 @@
     </condition>	      
   </target>
 
+  <!-- Build a JFlex lexer based on parameters supplied to the target.
+       @param lexer.dir     The directory, relative to $basedir, in which
+                            the JFlex file is located.
+       @param lexer.class   The name of the lexer as declared with %class
+                            in the JFlex file.
+       @param jflex.file    The name of the JFlex file.
+   -->
+  <target name="jflex-lexer" depends="jflex-lexer-deps"
+                             unless="jflex.lexer.up-to-date">
+    <java classname="JFlex.Main"
+	  fork="true"
+	  dir="${lexer.dir}"
+	  failonerror="true">
+      <classpath refid="standard.classpath"/>	  
+      <arg line="${jflex.file}"/>
+    </java>
+  </target>
+
+  <!-- Set the property jflex.lexer.up-to-date if the lexer is in fact
+       up to date.  Called by the jflex-lexer target.
+   -->
+  <target name="jflex-lexer-deps">
+    <dependset>
+      <srcfileset dir="${lexer.dir}" includes="${jflex.file}"/>
+      <targetfileset dir="${lexer.dir}" includes="${lexer.class}.java"/>
+    </dependset>
+    <available property="jflex.lexer.up-to-date" 
+               file="${lexer.dir}/${lexer.class}.java"/>
+  </target>
+  
   <target name="base" depends="compile-base">
   </target>
 
   <!-- Builds PPG -->
   <target name="ppg">
+    <antcall target="jflex-lexer">
+      <param name="lexer.dir" value="polyglot/util/ppg/lex"/>
+      <param name="lexer.class" value="Lexer"/>
+      <param name="jflex.file" value="ppg.flex"/>
+    </antcall>
     <antcall target="cup-parser">
       <param name="parser.dir" value="polyglot/util/ppg/parse"/>
       <param name="parser.class" value="Parser"/>
@@ -156,29 +192,105 @@
   </target>
 
   <target name="jl" depends="base">
-  <!--
+    <antcall target="jflex-lexer">
+      <param name="lexer.dir" value="polyglot/ext/jl/parse"/>
+      <param name="lexer.class" value="Lexer"/>
+      <param name="jflex.file" value="java.flex"/>
+    </antcall>
     <antcall target="cup-parser">
       <param name="parser.dir" value="polyglot/ext/jl/parse"/>
       <param name="cup.file" value="java12.cup"/>
       <param name="parser.class" value="Grm"/>
       <param name="symbol.class" value="sym"/>
     </antcall>
-    <antcall target="ppg-parser">
-      <param name="parser.dir" value="polyglot/ext/jl/qq"/>
-      <param name="ppg.file" value="qq.ppg"/>
-      <param name="cup.file" value="qq_ppg.cup"/>
-      <param name="parser.class" value="Grm"/>
-      <param name="symbol.class" value="sym"/>
+    <antcall target="standard-ext-qq">
+      <param name="ext" value="jl"/>
     </antcall>
-  -->
     <antcall target="compile-ext">
       <param name="ext" value="jl"/>
     </antcall>
   </target>
 
+  <!-- Build the quasi-quote parser and lexer for an extension, assuming the
+       standard names and places.
+       @param ext    The extension name.
+   -->
+  <target name="standard-ext-qq">
+    <antcall target="jflex-lexer">
+      <param name="lexer.dir" value="polyglot/ext/${ext}/qq"/>
+      <param name="lexer.class" value="Lexer"/>
+      <param name="jflex.file" value="qq.flex"/>
+    </antcall>
+    <antcall target="ppg-parser">
+      <param name="parser.dir" value="polyglot/ext/${ext}/qq"/>
+      <param name="ppg.file" value="qq.ppg"/>
+      <param name="cup.file" value="qq_ppg.cup"/>
+      <param name="parser.class" value="Grm"/>
+      <param name="symbol.class" value="sym"/>
+    </antcall>
+  </target>
+
+  <!-- Build the PPG parser for an extension, assuming that
+       it is located in the standard place and named
+       the standard name that we usually use.
+       @param ext    The extension name.
+   -->
+  <target name="standard-ext-ppg-parser">
+    <antcall target="ppg-parser">
+      <param name="parser.dir" value="polyglot/ext/${ext}/parse"/>
+      <param name="ppg.file" value="${ext}.ppg"/>
+      <param name="cup.file" value="${ext}_ppg.cup"/>
+      <param name="parser.class" value="Grm"/>
+      <param name="symbol.class" value="sym"/>
+    </antcall>
+  </target>
+
+  <!-- Build the CUP parser for an extension, assuming that
+       it is located in the standard place and named
+       the standard name that we usually use.
+       @param ext    The extension name.
+   -->
+  <target name="standard-ext-cup-parser">
+    <antcall target="cup-parser">
+      <param name="parser.dir" value="polyglot/ext/${ext}/parse"/>
+      <param name="cup.file" value="${ext}.cup"/>
+      <param name="parser.class" value="Grm"/>
+      <param name="symbol.class" value="sym"/>
+    </antcall>
+  </target>
+
+  <!-- Build the lexer for an extension, assuming that
+       they it is located in the standard place and named
+       the standard name that we usually use.
+       @param ext    The extension name.
+   -->
+  <target name="standard-ext-lexer">
+    <antcall target="jflex-lexer">
+      <param name="lexer.dir" value="polyglot/ext/${ext}/parse"/>
+      <param name="lexer.class" value="Lexer"/>
+      <param name="jflex.file" value="${ext}.flex"/>
+    </antcall>
+  </target>
+
+  <target name="standard-ext-qq-dep" if="has-qq">
+    <antcall target="standard-ext-qq"/>
+  </target>
+ 
+  <!-- Build a standard extension
+       @param ext          The name of the extension.
+       @param parser.type  Either "cup" or "ppg".
+       @param has-qq       Pass in iff the extension has a qq package.
+   -->
+  <target name="standard-ext" depends="standard-ext-qq-dep">
+    <antcall target="standard-ext-lexer"/>
+    <antcall target="standard-ext-${parser.type}-parser"/>
+    <antcall target="compile-ext"/>
+  </target>
+  
   <target name="jif" depends="jl">
-    <antcall target="compile-ext">
+    <antcall target="standard-ext">
       <param name="ext" value="jif"/>
+      <param name="parser.type" value="cup"/>
     </antcall>
   </target>
 
@@ -189,34 +301,24 @@
   </target>
 
   <target name="polyj" depends="jl">
-    <antcall target="ppg-parser">
-      <param name="parser.dir" value="polyglot/ext/polyj/parse"/>
-      <param name="ppg.file" value="polyj.ppg"/>
-      <param name="cup.file" value="polyj_ppg.cup"/>
-      <param name="parser.class" value="Grm"/>
-      <param name="symbol.class" value="sym"/>
-    </antcall>
-    <antcall target="ppg-parser">
-      <param name="parser.dir" value="polyglot/ext/polyj/qq"/>
-      <param name="ppg.file" value="qq.ppg"/>
-      <param name="cup.file" value="qq_ppg.cup"/>
-      <param name="parser.class" value="Grm"/>
-      <param name="symbol.class" value="sym"/>
-    </antcall>
-    <antcall target="compile-ext">
+    <antcall target="standard-ext">
       <param name="ext" value="polyj"/>
+      <param name="parser.type" value="ppg"/>
+      <param name="has-qq" value=""/>
     </antcall>
   </target>
 
   <target name="jmatch" depends="jl">
-    <antcall target="compile-ext">
+    <antcall target="standard-ext">
       <param name="ext" value="jmatch"/>
+      <param name="parser.type" value="cup"/>
     </antcall>
   </target>
 
   <target name="pao" depends="jl">
-    <antcall target="compile-ext">
+    <antcall target="standard-ext">
       <param name="ext" value="pao"/>
+      <param name="parser.type" value="ppg"/>
     </antcall>
   </target>
 
