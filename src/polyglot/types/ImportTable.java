@@ -42,6 +42,7 @@ public  class ImportTable implements ClassResolver {
   }
 
   public JavaClass findClass(String name) throws NoClassException {
+    // FIXME: need to keep on looking to find conflicts.
     if (TypeSystem.isNameShort(name)) {
       Object res = map.get(name);
       // First see if we have a mapping already.

@@ -1,7 +1,6 @@
 
 package jltools.types;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
 /**
  * A context to be used within the scope of a method body.  It provides a convenient wrapper
@@ -9,53 +8,56 @@ import java.util.List;
  */
 public class LocalContext 
 {
-  LocalContext lcParent;
-  TypeSystem ts;
-  ImportTable itImports;
-  Type tEnclosingClass;
-  Hashtable htLocalVariables;
-
   /**
-   * Creates a LocalContext with a parent context. We refer to the parent
-   * whenever the symbol is not found locally.
+   * Resolve anything that we dont' know about to the type system
    */
-  public LocalContext( LocalContext lcParent)
-  {
-    this.lcParent = lcParent;
-    this.itImports = null;
-    this.ts = null;
-    this.tEnclosingClass = null;
-    htLocalVariables = new Hashtable();
-  }
+  TypeSystem ts;
+  /**
+   * our wrapper class
+   */
+  LocalContext lcEnclosingClass ;
+  /**
+   * the context which we pass on to the typesystem. tells it who "we" are.
+   */
+  TypeSystem.Context context; 
+  /**
+   *contains the hashtable mapping for name => symbol. top of stack is context for current scope.
+   */
+  Stack /* of Hashtable */ stkContexts; 
+
 
   /** 
    * Creates a LocalContext without a parent context (i.e, for a method level
    * block).  All unresolved queries are passed on to the TypeSystem.  To do this, 
    * we'll also need the import table and what our enclosing class is.
    */
-  public LocalContext ( ImportTable itImports, Type tEnclosingClass, TypeSystem ts)
+  public LocalContext ( ImportTable itImports, Type tThisClass, LocalContext lcEnclosingClass, TypeSystem ts)
   {  
-    this.lcParent = null;
-    this.itImports = itImports;
-    this.tEnclosingClass = tEnclosingClass;
+    this.lcEnclosingClass = lcEnclosingClass;
     this.ts = ts;
-    htLocalVariables = new Hashtable();
+    
+    context = new TypeSystem.Context ( itImports, tThisClass, null);
+    
+    stkContexts = new Stack();
+    stkContexts.push( new Hashtable () );
   }
   
   /**
    * Returns whether the particular symbol is defined locally. If it isn't in this 
-   * scope, we ask the parent scope, as long as it is not a ClassContext
+   * scope, we ask the parent scope, but don't traverse to enclosing classes.
    */
   public boolean isDefinedLocally(String s)
   {
-    boolean b = htLocalVariables.contains(s);
-    
-    return (  ( b || lcParent != null) ? 
-              b : lcParent.isDefinedLocally(s));
+    for (ListIterator i = stkContexts.listIterator(stkContexts.size()) ; i.hasPrevious() ; )
+    {
+      if ( ((Hashtable) i.previous()).contains( s ) )
+        return true;
+    }
+    return false;
   }
 
   /**
-   * Gets the methodMatch with  name with "name" and a list of argument types "argumentTypes"
+   * Gets the methodMatch with name with "name" and a list of argument types "argumentTypes"
    * against Type "type".
    */
   public TypeSystem.MethodMatch getMethod( Type type, String methodName, List argumentTypes)
@@ -86,30 +88,28 @@ public class LocalContext
    */  
   public TypeSystem.FieldMatch getField( Type type, String fieldName)
   {
-    // look up locally (only if type is null)
-    if ( type == null)
+    Object result;
+    if ( type == null ) // could be a local, so check there first.
     {
-      Object o = htLocalVariables.get(fieldName);
-      if (o != null) 
-        return new TypeSystem.FieldMatch(null, 
-                              new FieldInstance (fieldName, 
-                                                 (Type)o, 
-                                                 null, 
-                                                 AccessFlags.flagsForInt(0)
-                                                 )
-                                );
-    }
-    if (lcParent != null)
-    {
-      return lcParent.getField(type, fieldName);
-    }
-    else 
-    {
-      // Fixme: implement
-      // pass on call to typesystem.
-      return null;
+      for (ListIterator i = stkContexts.listIterator(stkContexts.size()) ; i.hasPrevious() ; )
+      {
+        if ( (result = ((Hashtable) i.previous()).get( fieldName )) != null )
+        {
+          return new TypeSystem.FieldMatch (null, new FieldInstance (fieldName, 
+                                                                     (Type)result, 
+                                                                     null, 
+                                                                     AccessFlags.flagsForInt(0)));
+        }
+      }      
+      // not in this class. check enclosing class.
+      if ( lcEnclosingClass != null) 
+        return lcEnclosingClass.getField(type, fieldName);
     }
 
+    // pass on to type system:
+    Iterator i = ts.getField(type, fieldName, context);
+    if ( i == null ) return null;
+    return (TypeSystem.FieldMatch)i.next();
   }
 
   /**
@@ -118,8 +118,7 @@ public class LocalContext
    **/
   public Type checkAndResolveType( Type type ) throws TypeCheckError
   {
-    return ts.checkAndResolveType(type, 
-                               new TypeSystem.Context ( itImports, tEnclosingClass , null)) ;
+    return ts.checkAndResolveType(type, context);
   }
 
   /**
@@ -127,8 +126,7 @@ public class LocalContext
    */
   public Type getType( String s)
   {
-    // FIXME: implement
-    return null;
+    return ts.checkAndResolveType( new ClassType( ts, s, false), context);
   }
   
   /**
@@ -142,19 +140,26 @@ public class LocalContext
   /**
    * Returns a new LocalContext with an additional scoping level.
    */
-  public LocalContext pushScope()
+  public void pushScope()
   {
-    return new LocalContext( this );
+    stkContexts.push(new Hashtable());
   }
 
   /**
    * Removes a scoping level by returning our parent context
    */
-  public LocalContext popScope()
+  public void popScope()
   {
-    if (lcParent != null)
-      return  lcParent;
-    return this;
+    if ( stkContexts.size() > 1)
+    {
+      try { stkContexts.pop(); }
+      catch (EmptyStackException ese ) { }
+    }
+    else
+    {
+      throw new TypeCheckError("No more scopes to pop!");
+    }
+
   }
 
   /**
@@ -162,7 +167,7 @@ public class LocalContext
    */
   public void addSymbol( String sName, Type t)
   {
-    htLocalVariables.put(sName, t);
+    ((Hashtable)stkContexts.peek()).put(sName, t);
   }
-
+ 
 }

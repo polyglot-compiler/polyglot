@@ -904,8 +904,15 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public  ClassType typeForClass(Class theClass)
   {
-    // FIXME: implement
-    return null;
+    try
+    {
+      JavaClass jc = resolver.findClass(theClass.getName());
+      return ( jc != null ? (ClassType)jc.getType() : null);
+    }
+    catch ( NoClassException nce)
+    {
+      return null;
+    }
   }
 
 
