@@ -54,6 +54,7 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
 
     /** Set the type of the declaration. */
     public LocalDecl type(TypeNode type) {
+        if (type == this.type) return this;
         LocalDecl_c n = (LocalDecl_c) copy();
         n.type = type;
         return n;
@@ -66,6 +67,7 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
 
     /** Set the name of the declaration. */
     public LocalDecl name(String name) {
+        if (name.equals(this.name)) return this;
         LocalDecl_c n = (LocalDecl_c) copy();
         n.name = name;
         return n;
@@ -78,6 +80,7 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
 
     /** Set the initializer of the declaration. */
     public LocalDecl init(Expr init) {
+        if (init == this.init) return this;
         LocalDecl_c n = (LocalDecl_c) copy();
         n.init = init;
         return n;
@@ -85,6 +88,7 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
 
     /** Set the local instance of the declaration. */
     public LocalDecl localInstance(LocalInstance li) {
+        if (li == this.li) return this;
         LocalDecl_c n = (LocalDecl_c) copy();
         n.li = li;
         return n;
@@ -137,7 +141,6 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
         return n.localInstance(li);
     }
 
-    /*
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         TypeSystem ts = ar.typeSystem();
 
@@ -146,14 +149,12 @@ public class LocalDecl_c extends Node_c implements LocalDecl {
 
         return localInstance(li);
     }
-    */
 
     /** Type check the declaration. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
-        LocalInstance li = ts.localInstance(position(),
-                                            flags(), declType(), name());
+        LocalInstance li = this.li;
 
         if (li.flags().isFinal() && init() != null && init().isConstant()) {
             Object value = init().constantValue();
