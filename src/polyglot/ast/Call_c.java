@@ -18,6 +18,7 @@ public class Call_c extends Expr_c implements Call
   protected String name;
   protected List arguments;
   protected MethodInstance mi;
+  protected boolean targetImplicit;
 
   public Call_c(Position pos, Receiver target, String name,
                 List arguments) {
@@ -25,6 +26,7 @@ public class Call_c extends Expr_c implements Call
     this.target = target;
     this.name = name;
     this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
+    this.targetImplicit = (target == null);
   }
 
   /** Get the precedence of the call. */
@@ -70,6 +72,20 @@ public class Call_c extends Expr_c implements Call
     Call_c n = (Call_c) copy();
     n.mi = mi;
     return n;
+  }
+
+  public boolean isTargetImplicit() {
+      return this.targetImplicit;
+  }
+
+  public Call targetImplicit(boolean targetImplicit) {
+      if (targetImplicit == this.targetImplicit) {
+          return this;
+      }
+      
+      Call_c n = (Call_c) copy();
+      n.targetImplicit = targetImplicit;
+      return n;
   }
 
   /** Get the actual arguments of the call. */
@@ -122,120 +138,113 @@ public class Call_c extends Expr_c implements Call
     return n.methodInstance(mi);
   }
 
-  /** Type check the call. */
-  public Node typeCheck(TypeChecker tc) throws SemanticException {
-    TypeSystem ts = tc.typeSystem();
-    Context c = tc.context();
+    /**
+     * Typecheck the Call when the target is null. This method finds
+     * an appropriate target, and then type checks accordingly.
+     * 
+     * @param argTypes list of <code>Type</code>s of the arguments
+     */
+    protected Node typeCheckNullTarget(TypeChecker tc, List argTypes) throws SemanticException {
+        TypeSystem ts = tc.typeSystem();
+        NodeFactory nf = tc.nodeFactory();
+        Context c = tc.context();
 
-    ReferenceType targetType = null;
+        // the target is null, and thus implicit
+        // let's find the target, using the context, and
+        // set the target appropriately, and then type check
+        // the result
+        MethodInstance mi =  c.findMethod(this.name, argTypes);
+        
+        Receiver r;
+        if (mi.flags().isStatic()) {
+            r = nf.CanonicalTypeNode(position(), mi.container()).type(mi.container());
+        } else {
+            // The method is non-static, so we must prepend with "this", but we
+            // need to determine if the "this" should be qualified.  Get the
+            // enclosing class which brought the method into scope.  This is
+            // different from mi.container().  mi.container() returns a super type
+            // of the class we want.
+            ClassType scope = c.findMethodScope(name);
 
-    /* By default, we're not in a static context.  But if the
-     * target of the method is a type name, or if the target isn't
-     * specified, and we're inside a static method, then we're
-     * in a static context. */
-    boolean staticContext = false;
+            if (! ts.equals(scope, c.currentClass())) {
+                r = nf.This(position(),
+                            nf.CanonicalTypeNode(position(), scope)).type(scope);
+            }
+            else {
+                r = nf.This(position()).type(scope);
+            }
+        }
 
-    if (target instanceof TypeNode) {
-      TypeNode tn = (TypeNode) target;
-      Type t = tn.type();
-
-      staticContext = true;
-
-      if (t.isReference()) {
-        targetType = t.toReference();
-      } else {
-        throw new SemanticException("Cannot invoke static method \"" + name
-                                    + "\" on non-reference type " + t + ".",
-                                    tn.position());
-      }
-    } else if (target instanceof Expr) {
-      Expr e = (Expr) target;
-
-      if (e.type().isReference()) {
-        targetType = e.type().toReference();
-      } else {
-        throw new SemanticException("Cannot invoke method \"" + name + "\" on "
-                                    + "an expression of non-reference type "
-                                    + e.type() + ".", e.position());
-      }
-    } else if (target != null) {
-      throw new SemanticException("Receiver of method invocation must be a "
-                                  + "reference type.",
-                                  target.position());
-    } else { // target == null
-      CodeInstance ci = c.currentCode();
-      if (ci.flags().isStatic()) {
-        staticContext = true;
-      }
+        // we call typeCheck on the reciever too.
+        r = (Receiver)r.typeCheck(tc);
+        return this.targetImplicit(true).target(r).typeCheck(tc);
     }
 
-    List argTypes = new ArrayList(arguments.size());
+    /** Type check the call. */
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+        TypeSystem ts = tc.typeSystem();
+        Context c = tc.context();
 
-    for (Iterator i = arguments.iterator(); i.hasNext(); ) {
-      Expr e = (Expr) i.next();
-      argTypes.add(e.type());
-    }
+        List argTypes = new ArrayList(this.arguments.size());
 
-    MethodInstance mi;
+        for (Iterator i = this.arguments.iterator(); i.hasNext(); ) {
+            Expr e = (Expr) i.next();
+            argTypes.add(e.type());
+        }
 
-    if (targetType != null) {
-      mi = ts.findMethod(targetType, name, argTypes, c.currentClass());
-    }
-    else {
-      mi = c.findMethod(name, argTypes);
-    }
+        if (this.target == null) {
+            return this.typeCheckNullTarget(tc, argTypes);
+        }
 
-    if (staticContext && !mi.flags().isStatic()) {
-      Type containingClass;
-      if (targetType == null) {
-        containingClass = c.findMethodScope(name);
-      } else {
-        containingClass = targetType;
-      }
-      throw new SemanticException("Cannot call non-static method " + name
-                                  + " of " + containingClass + " in static "
+        ReferenceType targetType = this.findTargetType();
+        MethodInstance mi = ts.findMethod(targetType, 
+                                          this.name, 
+                                          argTypes, 
+                                          c.currentClass());
+        
+        
+        /* This call is in a static context if and only if
+         * the target (possibly implicit) is a type node.
+         */
+        boolean staticContext = (this.target instanceof TypeNode);
+
+
+        if (staticContext && !mi.flags().isStatic()) {
+            throw new SemanticException("Cannot call non-static method " + this.name
+                                  + " of " + targetType + " in static "
                                   + "context.");
-    }
-
-    // If we found a method, the call must type check, so no need to check
-    // the arguments here.
-
-    // Now we should set the target if it is not null.
-    Call call;
-
-    if (target == null) {
-      Receiver r;
-
-      NodeFactory nf = tc.nodeFactory();
-
-      if (mi.flags().isStatic()) {
-        r = nf.CanonicalTypeNode(position(), mi.container()).type(mi.container());
-
-      } else {
-        // The field is non-static, so we must prepend with "this", but we
-        // need to determine if the "this" should be qualified.  Get the
-        // enclosing class which brought the method into scope.  This is
-        // different from fi.container().  fi.container() returns a super type
-        // of the class we want.
-        ClassType scope = c.findMethodScope(name);
-
-        if (! ts.equals(scope, c.currentClass())) {
-          r = nf.This(position(),
-                      nf.CanonicalTypeNode(position(), scope)).type(scope);
         }
-        else {
-          r = nf.This(position()).type(scope);
+
+        // If we found a method, the call must type check, so no need to check
+        // the arguments here.
+        
+        Call_c call = (Call_c)this.methodInstance(mi).type(mi.returnType());
+        call.checkConsistency(c);
+        return call;
+    }
+    
+    protected ReferenceType findTargetType() throws SemanticException { 
+        Type t = target.type();
+        if (t.isReference()) {
+            return t.toReference();
+        } else {
+            // trying to invoke a method on a non-reference type.
+            // let's pull out an appropriate error message.
+            if (target instanceof Expr) {
+                throw new SemanticException("Cannot invoke method \"" + name + "\" on "
+                                    + "an expression of non-reference type "
+                                    + t + ".", target.position());
+            }
+            else if (target instanceof TypeNode) {
+                throw new SemanticException("Cannot invoke static method \"" + name
+                                    + "\" on non-reference type " + t + ".",
+                                    target.position());
+            }            
+            throw new SemanticException("Receiver of method invocation must be a "
+                                    + "reference type.",
+                                        target.position());
         }
-      }
-
-      call = target(r);
     }
-    else {
-      call = this;
-    }
-
-    return call.methodInstance(mi).type(mi.returnType());
-  }
 
   public Type childExpectedType(Expr child, AscriptionVisitor av)
   {
@@ -259,7 +268,7 @@ public class Call_c extends Expr_c implements Call
   }
 
   public String toString() {
-    String s = (target != null ? target.toString() + "." : "") + name + "(";
+    String s = (targetImplicit ? "" : target.toString() + ".") + name + "(";
 
     int count = 0;
 
@@ -283,13 +292,15 @@ public class Call_c extends Expr_c implements Call
 
   /** Write the expression to an output file. */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-    if (target instanceof Expr) {
-      printSubExpr((Expr) target, w, tr);
-      w.write(".");
-    }
-    else if (target != null) {
-      print(target, w, tr);
-      w.write(".");
+    if (!targetImplicit) {
+        if (target instanceof Expr) {
+          printSubExpr((Expr) target, w, tr);
+          w.write(".");
+        }
+        else if (target != null) {
+          print(target, w, tr);
+          w.write(".");
+        }
     }
 
     w.write(name + "(");
@@ -373,4 +384,24 @@ public class Call_c extends Expr_c implements Call
 
     return l;
   }
+  
+  // check that the implicit target setting is correct.
+  protected void checkConsistency(Context c) throws SemanticException {
+      if (targetImplicit) {
+          // the target is implicit. Check that the
+          // method found in the target type is the
+          // same as the method found in the context.
+
+          MethodInstance ctxtMI = c.findMethod(name, mi.formalTypes());
+          
+          if (c.typeSystem().equals(ctxtMI, mi)) {
+              // all is OK.
+              return;
+          }
+          throw new InternalCompilerError("Method call " + this + " has an " +
+               "implicit target, but the name " + name + " resolves to " +
+               ctxtMI + " instead of " + mi, position());
+      }      
+  }
+  
 }

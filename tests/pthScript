@@ -48,7 +48,7 @@ polyglot.ext.jl.ExtensionInfo {
         Increment.jl ;
         Infinite.jl (Post, ".*finally clause cannot complete normally.*"); // javac warning
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
-#KNOWN BUG:         Init6.jl ;
+        Init6.jl ;
         Init7.jl ;
         InitializerType1.jl ;
         Inner0.jl ; Inner1.jl ; Inner2.jl ; Inner3.jl ; Inner4.jl ;
@@ -103,31 +103,31 @@ polyglot.ext.jl.ExtensionInfo {
                      (Semantic, "Cannot specify a containing instance for static classes");
         BadInner3.jl (Semantic, "The nested class .* does not have an enclosing instance of type .*");
         BadInner4.jl (Semantic, "The type of the qualifier .* does not match the immediately enclosing class  of the super class .*");
-       BadInner5.jl (Semantic, "Class .* not found in scope of ");
-       BadInner6.jl (Semantic, "The nested class .* does not have an enclosing instance of type");
-       BadInner7.jl (Semantic, "Cannot declare member class .* inside class with the same name");
-       BadInterface.jl (Semantic, "Cannot declare method that is both abstract and private");
-       BadInterface2.jl (Semantic, "Could not find type");
-       BadMultipleVarDef.jl (Semantic, "Local variable .* multiply defined"),
-                            (Semantic, "Local variable .* multiply defined");
-       BadOverride.jl (Semantic, "cannot override.*attempting to assign weaker access privileges");
-       BadPrim.jl (Semantic, "No valid method call found"); 
-       BadProt.jl (Semantic, "Interface methods must be public");
-       BadSwitch1.jl (Semantic, "Case label must be an integral constant");
-       BadSwitch2.jl (Semantic, "Duplicate case label");
-       CircularConstructor.jl (Semantic, "Recursive constructor invocation");
-       ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
-       ConformanceCheck2.jl (Semantic, "cannot override.*throw set is not a subset");
-       Errors.jl (Semantic, "No valid method call found");
-       Errors2.jl (Semantic, "Could not find type"); 
-       LabeledBreak2.jl (Semantic, "Unreachable statement"); 
-       NoInit1.jl (Semantic, "Local variable .* may not have been initialized"); 
-       NoInit10.jl (Semantic, "Local variable .* may not have been initialized"); 
-       NoInit11.jl (Semantic, "Local variable .* may not have been initialized"); 
-       NoInit12.jl (Semantic, "Local variable .* may not have been initialized"); 
-       NoInit2.jl (Semantic, "Local variable .* may not have been initialized"); 
-       NoInit3.jl (Semantic, "Unreachable statement");
-       NoInit4.jl (Semantic, "Local variable .* may not have been initialized"); 
+	BadInner5.jl (Semantic, "Class .* not found in scope of ");
+	BadInner6.jl (Semantic, "The nested class .* does not have an enclosing instance of type");
+	BadInner7.jl (Semantic, "Cannot declare member class .* inside class with the same name");
+	BadInterface.jl (Semantic, "Cannot declare method that is both abstract and private");
+	BadInterface2.jl (Semantic, "Could not find type");
+	BadMultipleVarDef.jl (Semantic, "Local variable .* multiply defined"),
+			     (Semantic, "Local variable .* multiply defined");
+	BadOverride.jl (Semantic, "cannot override.*attempting to assign weaker access privileges");
+	BadPrim.jl (Semantic, "No valid method call found"); 
+	BadProt.jl (Semantic, "Interface methods must be public");
+	BadStaticContext.jl (Semantic);        BadSwitch1.jl (Semantic, "Case label must be an integral constant");
+	BadSwitch2.jl (Semantic, "Duplicate case label");
+	CircularConstructor.jl (Semantic, "Recursive constructor invocation");
+	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
+	ConformanceCheck2.jl (Semantic, "cannot override.*throw set is not a subset");
+	Errors.jl (Semantic, "No valid method call found");
+	Errors2.jl (Semantic, "Could not find type"); 
+	LabeledBreak2.jl (Semantic, "Unreachable statement"); 
+	NoInit1.jl (Semantic, "Local variable .* may not have been initialized"); 
+	NoInit10.jl (Semantic, "Local variable .* may not have been initialized"); 
+	NoInit11.jl (Semantic, "Local variable .* may not have been initialized"); 
+	NoInit12.jl (Semantic, "Local variable .* may not have been initialized"); 
+	NoInit2.jl (Semantic, "Local variable .* may not have been initialized"); 
+	NoInit3.jl (Semantic, "Unreachable statement");
+	NoInit4.jl (Semantic, "Local variable .* may not have been initialized"); 
 	NoInit5.jl (Semantic, "Local variable .* may not have been initialized"); 
 	NoInit6.jl (Semantic, "Local variable .* may not have been initialized"); 
 	NoInit7.jl (Semantic, "Local variable .* may not have been initialized"); 
@@ -177,6 +177,4 @@ polyglot.ext.jl.ExtensionInfo {
 		       (Semantic, "Illegal forward ref"), 
 		       (Semantic, "Illegal forward ref"), 
 		       (Semantic, "Illegal forward ref"); 
-
-	BadStaticContext.jl (Semantic); // we should be checking that "this" is not referenced before the super constructor has been called.
 }

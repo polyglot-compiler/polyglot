@@ -32,6 +32,18 @@ public interface Call extends Expr, ProcedureCall
     Call name(String name);
 
     /**
+     * Indicates if the target of this call is implicit, that 
+     * is, was not specified explicitly in the syntax.  
+     * @return boolean indicating if the target of this call is implicit
+     */
+    boolean isTargetImplicit();
+    
+    /**
+     * Set whether the target of this call is implicit.
+     */
+    Call targetImplicit(boolean targetImplicit);
+    
+    /**
      * The call's actual arguments.
      * @return A list of {@link polyglot.ast.Expr Expr}.
      */
