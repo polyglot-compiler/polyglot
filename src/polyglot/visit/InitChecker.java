@@ -226,6 +226,14 @@ public class InitChecker extends DataFlow
         }
 
     }
+    
+    protected static final Item BOTTOM = new Item() {
+        public boolean equals(Object i) {
+            return i == this;
+        }
+        public int hashCode() {
+            return -5826349;
+        }};
 
     /**
      * Initialise the FlowGraph to be used in the dataflow analysis.
@@ -452,7 +460,7 @@ public class InitChecker extends DataFlow
         if (node == graph.startNode()) {
             return createInitDFI();
         }
-        return null;
+        return BOTTOM;
     }
 
     private DataFlowItem createInitDFI() {
@@ -494,17 +502,26 @@ public class InitChecker extends DataFlow
     public Item confluence(List inItems, Term node, FlowGraph graph) {        
         // Resolve any conflicts pairwise.
         Iterator iter = inItems.iterator();
-        Map m = new HashMap(((DataFlowItem)iter.next()).initStatus);
+        Map m = null;
         while (iter.hasNext()) {
-            Map n = ((DataFlowItem)iter.next()).initStatus;
-            for (Iterator iter2 = n.entrySet().iterator(); iter2.hasNext(); ) {
-                Map.Entry entry = (Map.Entry)iter2.next();
-                VarInstance v = (VarInstance)entry.getKey();
-                MinMaxInitCount initCount1 = (MinMaxInitCount)m.get(v);
-                MinMaxInitCount initCount2 = (MinMaxInitCount)entry.getValue();
-                m.put(v, MinMaxInitCount.join(initCount1, initCount2));                                        
+            Item itm = (Item)iter.next();
+            if (itm == BOTTOM) continue;
+            if (m == null) {
+                m = new HashMap(((DataFlowItem)itm).initStatus);
+            } 
+            else { 
+                Map n = ((DataFlowItem)itm).initStatus;
+                for (Iterator iter2 = n.entrySet().iterator(); iter2.hasNext(); ) {
+                    Map.Entry entry = (Map.Entry)iter2.next();
+                    VarInstance v = (VarInstance)entry.getKey();
+                    MinMaxInitCount initCount1 = (MinMaxInitCount)m.get(v);
+                    MinMaxInitCount initCount2 = (MinMaxInitCount)entry.getValue();
+                    m.put(v, MinMaxInitCount.join(initCount1, initCount2));                                        
+                }
             }
         }
+        
+        if (m == null) return BOTTOM;
         
         return new DataFlowItem(m);
     }
@@ -978,6 +995,13 @@ public class InitChecker extends DataFlow
                 currCBI.outerLocalsUsed.add(li);
             }
             else if (initCount == null || InitCount.ZERO.equals(initCount.getMin())) {
+                // initCount will in general not be null, as the local variable
+                // li is declared in the current class; however, if the inner
+                // class is declared in the initializer of the local variable
+                // declaration, then initCount could in fact be null, as we 
+                // leave the inner class before we have performed flowLocalDecl
+                // for the local variable declaration.
+                
                 throw new SemanticException("Local variable \"" + li.name() +
                         "\" must be initialized before the class " + 
                         "declaration.",
