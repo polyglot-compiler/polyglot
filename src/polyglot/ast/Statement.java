@@ -18,7 +18,7 @@ public abstract class Statement extends Node {
   
   public Node readSymbols( SymbolReader sr)
   {
-    return this;
+    return null;
   }
 
   public void translate_substmt(LocalContext c, CodeWriter w) {

@@ -80,7 +80,8 @@ public class WhileStatement extends Statement
     
     if( !ctype.equals( c.getTypeSystem().getBoolean())) {
       throw new SemanticException( "Condition expression of while statement "
-                                    + "must have boolean type.");
+                                    + "must have boolean type.",
+				   Annotate.getLineNumber(cond));
     }
     
     return this;

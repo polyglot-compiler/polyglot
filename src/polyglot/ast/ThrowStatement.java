@@ -70,7 +70,8 @@ public class ThrowStatement extends Statement
   {
      if (! expr.getCheckedType().isThrowable())
        throw new SemanticException("Can only throw objects that extend from " 
-                                    + "\"java.lang.Throwable\"");
+                                    + "\"java.lang.Throwable\"",
+				    Annotate.getLineNumber(expr));
      else
        ec.throwsException ( (ClassType)expr.getCheckedType() );
      return this;

@@ -8,6 +8,7 @@ vs_files 	= SymbolReader.java \
 		  ExceptionChecker.java \
 		  FlowChecker.java \
 		  ClassSerializer.java \
+		  SignatureCleaner.java \
 		  DumpAst.java \
 		  NodeScrambler.java
 

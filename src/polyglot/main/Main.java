@@ -62,10 +62,10 @@ public class Main
     /* Must initialize before instantiating any compilers. */
     if( ((Boolean)options.get( MAIN_OPT_EXT_JIF)).booleanValue()) {
 	ts = new jltools.ext.jif.types.JifTypeSystem(); // Fix for Jif
+    } else if( ((Boolean)options.get( MAIN_OPT_EXT_POLYJ)).booleanValue()) {
+	ts = new jltools.ext.polyj.types.PolyJTypeSystem(); // Fix for PolyJ
     } else if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()) {
       ts = new jltools.ext.op.ObjectPrimitiveTypeSystem();
-    } else if( ((Boolean)options.get( MAIN_OPT_EXT_POLYJ)).booleanValue()) {
-      ts = new jltools.ext.polyj.types.PolyJTypeSystem();
     } else {
       ts = new jltools.types.StandardTypeSystem();
     }
@@ -372,12 +372,15 @@ public class Main
 	} else if( ((Boolean)options.get( MAIN_OPT_EXT_POLYJ)).booleanValue()) {
 	    jltools.ext.polyj.lex.Lexer lexer = new jltools.ext.polyj.lex.Lexer(reader, eq);
 	    return new jltools.ext.polyj.parse.Grm( lexer, ts, eq);
-	} else if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()) {
-	    jltools.lex.Lexer lexer = new jltools.lex.Lexer(reader, eq);
-	    return new jltools.ext.op.Grm( lexer, ts, eq);
 	} else {
 	    jltools.lex.Lexer lexer = new jltools.lex.Lexer(reader, eq);
-	    return new jltools.parse.Grm( lexer, ts, eq);
+      
+	    if( ((Boolean)options.get( MAIN_OPT_EXT_OP)).booleanValue()) {
+		return new jltools.ext.op.Grm( lexer, ts, eq);
+	    }
+	    else {
+		return new jltools.parse.Grm( lexer, ts, eq);
+	    }
 	}
     }
 
@@ -455,9 +458,11 @@ public class Main
     options.put( MAIN_OPT_DUMP, new Boolean( false));
     options.put( MAIN_OPT_STDOUT, new Boolean( false));
     options.put( MAIN_OPT_SCRAMBLE, new Boolean( false));
+
     options.put( MAIN_OPT_EXT_OP, new Boolean( false));
     options.put( MAIN_OPT_EXT_JIF, new Boolean( false));
     options.put( MAIN_OPT_EXT_POLYJ, new Boolean( false));
+
     options.put( MAIN_OPT_THREADS, new Boolean( false));
     
     options.put( Compiler.OPT_OUTPUT_WIDTH, new Integer(120));

@@ -384,6 +384,8 @@ public class MethodNode extends ClassMember
     Annotate.setLineNumber( mtiThis, Annotate.getLineNumber( this));
     clazz.addMethod( mtiThis);
 
+    visitChildren(sr);
+
     return this;
   }
 
@@ -475,6 +477,8 @@ public class MethodNode extends ClassMember
     }
     w.end();
     
+    enterScope(c);
+
     if( !mtiThis.getAccessFlags().isAbstract() ) {
       // FIXME should be abstract for interfaces.
       if( body != null) {
@@ -486,6 +490,8 @@ public class MethodNode extends ClassMember
     else {
       w.write(";");
     }
+
+    leaveScope(c);
 
     w.newline( 0);
   }

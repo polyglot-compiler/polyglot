@@ -111,6 +111,8 @@ public class FieldNode extends ClassMember
       clazz.addField( fi);
     }
   
+    visitChildren(sr);
+
     return this;
   }
 

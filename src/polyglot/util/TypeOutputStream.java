@@ -27,7 +27,7 @@ public class TypeOutputStream extends ObjectOutputStream
       return o;
     }
     else if( o instanceof ClassType) {
-      return new AmbiguousType( ts, ((ClassType)o).getTypeString());
+      return new AmbiguousNameType( ts, ((ClassType)o).getTypeString());
     }
     else {
       return o;

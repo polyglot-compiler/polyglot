@@ -16,7 +16,7 @@ public class TypeChecker extends NodeVisitor
   {
     this.eq = eq;
 
-    this.c = new LocalContext( im, ts, this);
+    this.c = ts.getLocalContext( im, this);
     this.errors = new BitVector();
     this.depth = 0;
   }

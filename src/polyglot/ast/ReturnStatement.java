@@ -72,14 +72,16 @@ public class ReturnStatement extends Statement
     MethodTypeInstance mti = c.getCurrentMethod();
     if (mti instanceof MethodTypeInstanceInitializer)
       throw new SemanticException( "Return statements are not valid inside an " +
-                                   "initializer block.");
+                                   "initializer block.",
+				  Annotate.getLineNumber(this));
                                   
     if( expr == null) {
       if( !mti.getReturnType().equals( c.getTypeSystem().getVoid())) {
         throw new SemanticException( 
                           "Method \"" + mti.getName() + "\" must return "
                           + "an expression of type \"" 
-                          + mti.getReturnType().getTypeString() + "\".");
+                          + mti.getReturnType().getTypeString() + "\".",
+			  Annotate.getLineNumber(this));
 
       }
     }
@@ -87,7 +89,8 @@ public class ReturnStatement extends Statement
       if( mti.getReturnType().equals( c.getTypeSystem().getNull())) {
         throw new SemanticException(
                        "A return statement which returns a value can only"
-                       + " occur in a method which does not have type void.");
+                       + " occur in a method which does not have type void.",
+			Annotate.getLineNumber(this));
       }
       else if( ! expr.getCheckedType().isImplicitCastValid ( mti.getReturnType()) &&
                ! (( expr instanceof NumericalLiteral) && 
@@ -97,7 +100,8 @@ public class ReturnStatement extends Statement
         throw new SemanticException( 
                           "Method \"" + mti.getName() + "\" must return "
                           + "an expression of type \"" 
-                          + mti.getReturnType().getTypeString() + "\".");
+                          + mti.getReturnType().getTypeString() + "\".",
+			  Annotate.getLineNumber(this));
       } 
     }
     

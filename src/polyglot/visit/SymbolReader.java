@@ -49,29 +49,54 @@ public class SymbolReader extends NodeVisitor
     catch( SemanticException e)
     {
       eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(),
-                  Annotate.getLineNumber( n));
+		  Annotate.getLineNumber( n));
       return n;
     }
   }
 
-  public ParsedClassType pushClass( String name)
+  protected ParsedClassType newParsedClassType() {
+    return new ParsedClassType( ts, current);
+  }
+
+  public ParsedClassType pushClass( String name,
+				    boolean isLocal, boolean isAnonymous)
   {
     String fullName;
     ParsedClassType newClass;
 
-    newClass = new ParsedClassType( ts, current);
+    newClass = newParsedClassType();
 
     if( current == null) {
+      if (isLocal || isAnonymous) {
+	throw new InternalCompilerError(	
+	    "Top-level class cannot be local or anonymous");
+      }
       fullName = (packageName == null ? "" : 
                                 packageName + ".") + name;
     }
     else {
-      fullName = current.getFullName() + "." + name;
+      if (isLocal || isAnonymous) {
+	String prefix = isLocal ? "$Local$" : "$Anonymous$";
+	int i = 1;
+	String suffix;
+	do {
+	  suffix = prefix + i + "." + name;
+	  i++;
+	} while (current.getInnerNamed(suffix) != null);
+	fullName = current.getFullName() + "." + suffix;
+      }
+      else {
+	fullName = current.getFullName() + "." + name;
+      }
       current.addInnerClass( newClass);
     }
 
     newClass.setFullName( fullName);
     newClass.setShortName( name);
+
+    newClass.setIsLocal(isLocal);
+    newClass.setIsAnonymous(isAnonymous);
+
     currentResolver.addClass( fullName, newClass);
 
     current = newClass;

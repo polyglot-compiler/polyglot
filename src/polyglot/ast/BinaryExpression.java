@@ -257,7 +257,8 @@ public class BinaryExpression extends Expression
                                    ((NumericalLiteral)right).getValue()))   ) {
         throw new SemanticException( "Unable to assign \"" + 
                                       rtype.getTypeString() + "\" to \""
-                                      + ltype.getTypeString() + "\".");
+                                      + ltype.getTypeString() + "\".",
+				     Annotate.getLineNumber(this) );
       }
       setCheckedType( ltype);
       right.setExpectedType( ltype);
@@ -270,12 +271,14 @@ public class BinaryExpression extends Expression
       /* See (15.19.1). */
       if( !ltype.isPrimitive() || !rtype.isPrimitive()) {
         throw new SemanticException( 
-                  "Operands of numeric comparison operators must be numeric.");
+                  "Operands of numeric comparison operators must be numeric.",
+				     Annotate.getLineNumber(this) );
       }
       if( !(ltype.toPrimitiveType()).isNumeric() ||
           !(rtype.toPrimitiveType()).isNumeric()) {
         throw new SemanticException(
-                 "Operands of numeric comparison operators must be numeric.");
+                 "Operands of numeric comparison operators must be numeric.",
+				     Annotate.getLineNumber(this) );
       }
       setCheckedType( c.getTypeSystem().getBoolean());
       break;
@@ -287,22 +290,26 @@ public class BinaryExpression extends Expression
         if( (ltype.toPrimitiveType()).isNumeric()) {
           if( !rtype.isPrimitive()) {
             throw new SemanticException(
-                      "Can only compare two expressions of similar type.");
+                      "Can only compare two expressions of similar type.",
+				     Annotate.getLineNumber(this) );
           }
           else if( !(rtype.toPrimitiveType()).isNumeric()) {
             throw new SemanticException(
-                      "Can only compare two expressions of similar type.");
+                      "Can only compare two expressions of similar type.",
+				     Annotate.getLineNumber(this) );
           }
         }
         else {
           /* ltype is boolean. */
           if( !rtype.isPrimitive()) {
             throw new SemanticException(
-                      "Can only compare two expressions of similar type.");
+                      "Can only compare two expressions of similar type.",
+				     Annotate.getLineNumber(this) );
           }
           else if( (rtype.toPrimitiveType()).isNumeric()) {
             throw new SemanticException(
-                      "Can only compare two expressions of similar type.");
+                      "Can only compare two expressions of similar type.",
+				     Annotate.getLineNumber(this) );
           }
         }
       }
@@ -310,11 +317,13 @@ public class BinaryExpression extends Expression
         /* ltype is a reference type. */
         if( rtype.isPrimitive()) {
           throw new SemanticException(
-                    "Can only compare two expressions of similar type.");
+                    "Can only compare two expressions of similar type.",
+				     Annotate.getLineNumber(this) );
         }
-        else if( !(rtype.isClassType() || rtype instanceof NullType)) {
+        else if( !(rtype.isReferenceType() || rtype instanceof NullType)) {
           throw new SemanticException(
-                    "Can only compare two expressions of similar type.");
+                    "Can only compare two expressions of similar type.",
+				     Annotate.getLineNumber(this) );
         }
       }
       setCheckedType( c.getTypeSystem().getBoolean());
@@ -325,7 +334,8 @@ public class BinaryExpression extends Expression
       if( !(ltype.isSameType( c.getTypeSystem().getBoolean()) 
             && rtype.isSameType( c.getTypeSystem().getBoolean()))) {
         throw new SemanticException(
-                  "Operands of logical operator must be boolean.");
+                  "Operands of logical operator must be boolean.",
+				     Annotate.getLineNumber(this) );
       }
       setCheckedType( c.getTypeSystem().getBoolean());
       break;
@@ -346,19 +356,23 @@ public class BinaryExpression extends Expression
     case SUBASSIGN:
       if( !ltype.isPrimitive()) {
         throw new SemanticException( 
-                  "Additive operators must have numeric operands.");
+                  "Additive operators must have numeric operands.",
+				     Annotate.getLineNumber(this) );
       }
       else if( !(ltype.toPrimitiveType()).isNumeric()) {
         throw new SemanticException( 
-                  "Additive operators must have numeric operands.");
+                  "Additive operators must have numeric operands.",
+				     Annotate.getLineNumber(this) );
       }
       else if( !rtype.isPrimitive()) {
         throw new SemanticException(
-                  "Additive operators must have numeric operands.");
+                  "Additive operators must have numeric operands.",
+				     Annotate.getLineNumber(this) );
       }
       else if( !(rtype.toPrimitiveType()).isNumeric()) {
         throw new SemanticException(
-                  "Additive operators must have numeric operands.");
+                  "Additive operators must have numeric operands.",
+				     Annotate.getLineNumber(this) );
       }
       else {
         setCheckedType( PrimitiveType.binaryPromotion( ltype.toPrimitiveType(),
@@ -374,12 +388,14 @@ public class BinaryExpression extends Expression
     case MODASSIGN:
       if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
         throw new SemanticException(
-                  "Expected numeric operands to multiplicative operator.");
+                  "Expected numeric operands to multiplicative operator.",
+				     Annotate.getLineNumber(this) );
       }
       else if( !((ltype.toPrimitiveType()).isNumeric()
                  && (rtype.toPrimitiveType()).isNumeric())) {
         throw new SemanticException(
-                  "Expected numeric operands to multiplicative operator.");
+                  "Expected numeric operands to multiplicative operator.",
+				     Annotate.getLineNumber(this) );
       }
       else {
         setCheckedType( PrimitiveType.binaryPromotion( ltype.toPrimitiveType(),
@@ -396,7 +412,8 @@ public class BinaryExpression extends Expression
       /* Either both are either numeric or boolean (15.21). */
       if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
         throw new SemanticException(
-                 "Expected primitive operands to bitwise binary operator.");
+                 "Expected primitive operands to bitwise binary operator.",
+				     Annotate.getLineNumber(this) );
       }
       else if( (ltype.toPrimitiveType()).isNumeric()
                && (rtype.toPrimitiveType()).isNumeric()) {
@@ -409,7 +426,8 @@ public class BinaryExpression extends Expression
       }
       else {
         throw new SemanticException(
-            "Bitwise operators require two boolean or two numeric operands.");
+            "Bitwise operators require two boolean or two numeric operands.",
+				     Annotate.getLineNumber(this) );
       }
       break;
       
@@ -421,12 +439,14 @@ public class BinaryExpression extends Expression
     case RUSHIFTASSIGN:
       if( !(ltype.isPrimitive() && rtype.isPrimitive())) {
         throw new SemanticException(
-                  "Expected numeric operands to shift operator.");
+                  "Expected numeric operands to shift operator.",
+				     Annotate.getLineNumber(this) );
       }
       else if( !((ltype.toPrimitiveType()).isNumeric()
                  && (rtype.toPrimitiveType()).isNumeric())) {
         throw new SemanticException(
-                  "Expected numeric operands to shift operator.");
+                  "Expected numeric operands to shift operator.",
+				     Annotate.getLineNumber(this) );
       }
       else {
         setCheckedType( PrimitiveType.unaryPromotion( ltype.toPrimitiveType()));
@@ -435,7 +455,8 @@ public class BinaryExpression extends Expression
       
     default:
       throw new SemanticException(
-                "Internal error: unknown binary operator.");
+                "Internal error: unknown binary operator.",
+				     Annotate.getLineNumber(this) );
     }
     
     return this;

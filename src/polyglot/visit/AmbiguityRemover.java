@@ -22,7 +22,7 @@ public class AmbiguityRemover extends NodeVisitor
     this.it = it;
     this.eq = eq;
     
-    c = new LocalContext( it, ts, this);
+    c = ts.getLocalContext( it, this);
   }
 
   public NodeVisitor enter( Node n)

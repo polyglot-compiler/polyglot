@@ -36,9 +36,10 @@ public class MethodExpression extends Expression
    */
   public MethodExpression( Node ext, Node target, String name, List args) 
   {
-    if (target != null && ! (target instanceof TypeNode ||
+    if (target != null && ! (target instanceof AmbiguousName ||
+			     target instanceof TypeNode ||
 			     target instanceof Expression))
-      throw new Error("Target of a method call must be a type or expression.");
+      throw new Error("Target of a method call must be an ambiguous name, a type, or an expression.");
     this.ext = ext;
     this.target = target;
     this.name = name;
@@ -158,31 +159,30 @@ public class MethodExpression extends Expression
 
   public Node typeCheck( LocalContext c) throws SemanticException
   {
-    ClassType ct; 
+    ReferenceType ct; 
 
     if( target == null) {
       //      ct = c.getCurrentClass();
       ct = null;
     }
     else if( target instanceof TypeNode 
-                && ((TypeNode)target).getType().isClassType()) {
-      ct = ((TypeNode)target).getType().toClassType();
+                && ((TypeNode)target).getType().isReferenceType()) {
+      ct = ((TypeNode)target).getType().toReferenceType();
     }
     else if( target instanceof Expression) {
-      if( ((Expression)target).getCheckedType().isClassType()) {
-        ct = ((Expression)target).getCheckedType().toClassType();
-      }
-      else if( ((Expression)target).getCheckedType().isArrayType()) {
-        ct = c.getTypeSystem().getObject().toClassType();
+      if( ((Expression)target).getCheckedType().isReferenceType()) {
+        ct = ((Expression)target).getCheckedType().toReferenceType();
       }
       else {
         throw new SemanticException( "Cannot invoke method \""
-                           + name + "\" on an expression of primitive type.");
+			 + name + "\" on an expression of non-reference type.",
+				  Annotate.getLineNumber(target));
       }
     }
     else {
       throw new SemanticException( 
-                         "Target of method invocation must be a class type.");
+		       "Target of method invocation must be a reference type.",
+				  Annotate.getLineNumber(target));
     }
 
     List argTypes = new ArrayList( args.size());
@@ -192,20 +192,6 @@ public class MethodExpression extends Expression
 
     mti = c.getMethod( ct, name, argTypes);
     setCheckedType( mti.getType());
-
-    /* 
-     * SPECIAL CASE EXCEPTION
-     * ArrayType.clone should not throw the CloneNotSupportedException, 
-     * as per JLS 10.7.
-     */
-    /*
-      //FIXME don't forget this in exceptionCheck
-    if( !(target instanceof Expression &&
-            ((Expression)target).getCheckedType() instanceof ArrayType &&
-          name.equals( "clone"))) {
-      jltools.util.Annotate.addThrows( this, mti.exceptionTypes());
-    }
-    */
 
     List formalTypes = mti.argumentTypes();
     for( Iterator iter1 = arguments(),

@@ -5,6 +5,7 @@ import jltools.util.*;
 import jltools.visit.*;
 
 import java.util.*;
+import java.io.IOException;
 
 
 /**
@@ -24,6 +25,10 @@ public class ClassNode extends ClassMember
   protected final List interfaces;
   /** A list of member (e.g. fields, methods) of this class. */
   protected final List members;
+  /** A flag indicating the class is local. */
+  protected final boolean isLocal;
+  /** A flag indicating the class is anonymous. */
+  protected final boolean isAnonymous;
 
   /**
    * FIXME: This field doesn't actually follow the immutablility rule.  It is changed
@@ -41,15 +46,29 @@ public class ClassNode extends ClassMember
 		   String name,
 		   TypeNode superClass,
 		   List interfaces,
-		   List members) {
+		   List members,
+		   boolean isLocal,
+		   boolean isAnonymous) {
+
     this.ext = ext;
-    this.accessFlags = accessFlags;
+    this.accessFlags = accessFlags.copy();
     this.name = name;
     this.superClass = superClass;
     this.interfaces = TypedList.copyAndCheck( interfaces, 
                                               TypeNode.class, true);
     this.members = TypedList.copyAndCheck( members, 
                                            ClassMember.class, true);
+    this.isLocal = isLocal;
+    this.isAnonymous = isAnonymous;
+  }
+
+  public ClassNode(Node ext, 
+		   AccessFlags accessFlags,
+		   String name,
+		   TypeNode superClass,
+		   List interfaces,
+		   List members) {
+    this(ext, accessFlags, name, superClass, interfaces, members, false, false);
   }
 
   public ClassNode(AccessFlags accessFlags,
@@ -57,7 +76,17 @@ public class ClassNode extends ClassMember
 		   TypeNode superClass,
 		   List interfaces,
 		   List members) {
-      this(null, accessFlags, name, superClass, interfaces, members);
+    this(null, accessFlags, name, superClass, interfaces, members, false, false);
+  }
+  
+  public ClassNode(AccessFlags accessFlags,
+		   String name,
+		   TypeNode superClass,
+		   List interfaces,
+		   List members,
+		   boolean isLocal,
+		   boolean isAnonymous) {
+    this(null, accessFlags, name, superClass, interfaces, members, isLocal, isAnonymous);
   }
   
   /**
@@ -73,15 +102,19 @@ public class ClassNode extends ClassMember
                                 String name,
                                 TypeNode superClass,
                                 List interfaces,
-                                List members)
+                                List members,
+				boolean isLocal,
+				boolean isAnonymous)
   {
     if( !this.accessFlags.equals( accessFlags) || !this.name.equals( name)
           || this.superClass != superClass
 	  || this.ext != ext
           || this.interfaces.size() != interfaces.size()
-          || this.members.size() != members.size()) {
+          || this.members.size() != members.size()
+          || this.isLocal != isLocal
+          || this.isAnonymous != isAnonymous) {
       ClassNode n = new ClassNode( ext, accessFlags, name, superClass, 
-                                   interfaces, members);
+                                   interfaces, members, isLocal, isAnonymous);
 
       n.type = type;
       n.copyAnnotationsFrom( this);
@@ -91,7 +124,7 @@ public class ClassNode extends ClassMember
       for( int i = 0; i < interfaces.size(); i++) {
         if( this.interfaces.get( i) != interfaces.get( i)) {
           ClassNode n = new ClassNode( ext, accessFlags, name, superClass, 
-                                       interfaces, members);
+                                       interfaces, members, isLocal, isAnonymous);
           n.type = type;
           n.copyAnnotationsFrom( this);
           n.type = this.type;
@@ -101,7 +134,7 @@ public class ClassNode extends ClassMember
       for( int i = 0; i < members.size(); i++) {
         if( this.members.get( i) != members.get( i)) {
           ClassNode n = new ClassNode( ext, accessFlags, name, superClass, 
-                                       interfaces, members);
+                                       interfaces, members, isLocal, isAnonymous);
           n.type = type;
           n.copyAnnotationsFrom( this);
           return n;
@@ -111,14 +144,32 @@ public class ClassNode extends ClassMember
     }
   }
 
+  public ClassNode reconstruct( Node ext,
+			        AccessFlags accessFlags,
+                                String name,
+                                TypeNode superClass,
+                                List interfaces,
+                                List members) {
+      return reconstruct(ext, accessFlags, name, superClass, interfaces, members, false, false);
+  }
+
+  public ClassNode reconstruct( AccessFlags accessFlags,
+                                String name,
+                                TypeNode superClass,
+                                List interfaces,
+                                List members,
+				boolean isLocal,
+				boolean isAnonymous) {
+    return reconstruct(this.ext, accessFlags, name, superClass, interfaces, members, isLocal, isAnonymous);
+  }
+
   public ClassNode reconstruct( AccessFlags accessFlags,
                                 String name,
                                 TypeNode superClass,
                                 List interfaces,
                                 List members) {
-      return reconstruct(this.ext, accessFlags, name, superClass, interfaces, members);
+      return reconstruct(this.ext, accessFlags, name, superClass, interfaces, members, false, false);
   }
-
 
   /**
    * Returns the <code>AccessFlags</code> for this class declaration. 
@@ -217,13 +268,15 @@ public class ClassNode extends ClassMember
                         name,
                         newSuperClass,
                         newInterfaces,
-                        newMembers);
+                        newMembers,
+			isLocal,
+			isAnonymous);
   }
 
-  public Node readSymbols( SymbolReader sr)
+  public Node readSymbols( SymbolReader sr) throws SemanticException
   {
-    type = sr.pushClass( name);
-  
+    type = sr.pushClass( name, isLocal, isAnonymous );
+
     if( superClass != null) {
       type.setSuperType( superClass.getType());
     }
@@ -236,7 +289,8 @@ public class ClassNode extends ClassMember
 
     type.setAccessFlags( accessFlags);
 
-    visitChildren( sr);
+    visitChildren(sr);
+
     sr.popClass();
     
     if ( accessFlags.isAbstract() || accessFlags.isInterface())
@@ -279,6 +333,95 @@ public class ClassNode extends ClassMember
     c.popClass();
   }
 
+  public Node cleanupSignatures( LocalContext c, SignatureCleaner sc)
+    throws SemanticException, IOException
+  {
+    Type superType = type.getSuperType();
+
+    if (superType != null) {
+      ClassType superClazz = (ClassType) c.getType(superType);
+
+      if (superClazz instanceof ParsedClassType) {
+	if (! sc.containsClass(superClazz.getFullName())) {
+	  if (! sc.cleanClass(superClazz)) {
+	    throw new SemanticException("Could not clean superclass " +
+		superClazz.getTypeString() + " of " + type.getTypeString() +
+		": cannot continue", Annotate.getLineNumber(this) );
+	  }
+	}
+      }
+
+      type.setSuperType(superClazz);
+    }
+    else {
+      // FIXME: Aren't array suptypes of Object, too?
+/*
+      if (! type.getAccessFlags().isInterface()) {
+*/
+	type.setSuperType((ClassType) c.getTypeSystem().getObject());
+/*
+      }
+*/
+    }
+    
+    for (ListIterator i = type.getInterfaces().listIterator(); i.hasNext(); )
+    {
+      Type interfaceType = (Type) i.next();
+
+      ClassType interfaceClazz = (ClassType) c.getType(interfaceType);
+
+      if (interfaceClazz instanceof ParsedClassType) {
+	if (! sc.containsClass(interfaceClazz.getFullName())) {
+	  if (! sc.cleanClass(interfaceClazz)) {
+	    throw new SemanticException("Could not clean super-interface " +
+		interfaceClazz.getTypeString() + " of " + type.getTypeString() +
+		": cannot continue", Annotate.getLineNumber(this) );
+	  }
+	}
+      }
+
+      i.set(interfaceClazz);
+    }
+
+    enterScope(c);
+
+    ClassNode n = (ClassNode) visitChildren(sc);
+
+    // We do methods and fields here because it's simpler to do it here than
+    // in MethodNode or FieldNode.
+
+    for (ListIterator i = n.type.getMethods().listIterator(); i.hasNext(); ) {
+      MethodTypeInstance mti = (MethodTypeInstance) i.next();
+      Type rt = mti.getReturnType();
+
+      mti.setReturnType( c.getType(rt) );
+
+      List argTypes = mti.argumentTypes();
+      for (ListIterator j = argTypes.listIterator(); j.hasNext(); ) {
+	  Type t = (Type) j.next();
+	  j.set( c.getType(t) );
+      }
+
+      List excTypes = mti.exceptionTypes();
+      for (ListIterator j = excTypes.listIterator(); j.hasNext(); ) {
+	  Type t = (Type) j.next();
+	  j.set( c.getType(t) );
+      }
+    }
+
+    for (ListIterator i = n.type.getFields().listIterator(); i.hasNext(); ) {
+      FieldInstance fi = (FieldInstance) i.next();
+      Type t = fi.getType();
+      fi.setType( c.getType(t) );
+    }
+
+    visitChildren(sc);
+
+    n.leaveScope(c);
+
+    return n;
+  }
+
   public Node removeAmbiguities( LocalContext c)
   {
     return this;
@@ -311,7 +454,12 @@ public class ClassNode extends ClassMember
       }
     }
 
-    c.pushClass( type);
+    translateBody(c, w);
+  }
+
+  public void translateBody( LocalContext c, CodeWriter w)
+  {
+    enterScope(c);
     w.newline( 0);
     w.write( "{");
     w.newline(4);
@@ -326,7 +474,7 @@ public class ClassNode extends ClassMember
     w.newline(0);
     w.write("}");
     w.newline(0);
-    c.popClass();
+    leaveScope(c);
   }
   
   public void dump( CodeWriter w) throws SemanticException

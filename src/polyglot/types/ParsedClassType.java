@@ -55,6 +55,7 @@ public class ParsedClassType extends ClassTypeImpl
 
   public void setSuperType( Type superType)
   {
+// new Exception("changed superclass of " + getTypeString() + " from " + (this.superType == null ? "null" : this.superType.getTypeString()) + " to " + (superType == null ? "null" : superType.getTypeString())).printStackTrace(System.out);
     this.superType = superType;
   }
 
@@ -83,8 +84,14 @@ public class ParsedClassType extends ClassTypeImpl
     this.isInner = isInner;
   }
 
+  public void setIsLocal( boolean isLocal)
+  {
+    this.isLocal = isLocal;
+  }
+
   public void setIsAnonymous( boolean isAnonymous)
   {
+    this.isLocal = isLocal;
     this.isAnonymous = isAnonymous;
   }
 

@@ -183,21 +183,25 @@ public class NewObjectExpression extends Expression
     // make sure that primary is the "containing" class for the inner class, 
     // if appropriate
     if( primary != null && 
-        !primary.getCheckedType().equals((ClassType)tn.getType())) {
+        !primary.getCheckedType().equals(
+	((ClassType)tn.getType()).getContainingClass())) {
       throw new SemanticException (
               "The containing instance must be the containing class of \"" +
-              tn.getType().getTypeString() + "\".");
+              tn.getType().getTypeString() + "\".",
+	      Annotate.getLineNumber(primary));
     }
 
     if( primary != null && 
          ((ClassType)tn.getType()).getAccessFlags().isStatic()) {
       // FIXME is this really true?
       throw new SemanticException(
-             "Cannot specify a containing instance for static classes.");
+             "Cannot specify a containing instance for static classes.",
+	      Annotate.getLineNumber(primary));
     }
 
     if( ((ClassType)tn.getType()).getAccessFlags().isAbstract()) {
-      throw new SemanticException( "Cannot instantiate an abstract class.");
+      throw new SemanticException( "Cannot instantiate an abstract class.",
+	      Annotate.getLineNumber(this));
     }
 
     ClassType ct; 
@@ -206,6 +210,16 @@ public class NewObjectExpression extends Expression
     List argTypes = new ArrayList( args.size());
     for( Iterator iter = arguments(); iter.hasNext(); ) {
       argTypes.add( ((Expression)iter.next()).getCheckedType());
+    }
+
+    // We could be creating an anonymous class which implements an interface.
+    // An empty argument list is okay in this case.
+    if (cn != null &&
+	ct.getAccessFlags().isInterface() &&
+	argTypes.size() == 0) {
+
+      setCheckedType( ct);
+      return this;
     }
 
     mti = null;
@@ -226,7 +240,8 @@ public class NewObjectExpression extends Expression
       System.out.println( ct.getTypeString() );
       throw new SemanticException ( 
               "No acceptable constructor found for the creation of \"" 
-              + ct.getTypeString() + "\".");
+              + ct.getTypeString() + "\".",
+	      Annotate.getLineNumber(this));
     }
     setCheckedType( ct);
 
@@ -288,7 +303,7 @@ public class NewObjectExpression extends Expression
     w.end(); w.write(")");
 
     if( cn != null) {
-      cn.translate(c, w);
+      cn.translateBody(c, w);
     }
   }
 

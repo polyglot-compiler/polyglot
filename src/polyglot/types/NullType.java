@@ -32,6 +32,10 @@ public class NullType extends Type
   {
     return false;
   }
+  public boolean isReferenceType()
+  {
+    return false;
+  }
   public boolean isClassType()
   {
     return false;
@@ -40,6 +44,8 @@ public class NullType extends Type
   {
     return false;
   }
+
+  public boolean isPackageType() { return false; }
 
   public boolean isCanonical()
   {

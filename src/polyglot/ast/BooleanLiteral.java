@@ -30,7 +30,9 @@ public class BooleanLiteral extends Literal
       return this;
     }
     else {
-      return new BooleanLiteral( ext, value);
+      BooleanLiteral n = new BooleanLiteral( ext, value);
+      n.copyAnnotationsFrom(this);
+      return n;
     }
   }
 

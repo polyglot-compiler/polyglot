@@ -16,7 +16,14 @@ public class NullLiteral extends Literal
   public NullLiteral(Node ext) {this.ext = ext;}
 
     public NullLiteral reconstruct(Node ext) {
-	if (this.ext == ext) { return this; } else {return new NullLiteral(ext);}
+	if (this.ext == ext) {
+	    return this;
+	}
+	else {
+	    NullLiteral n = new NullLiteral(ext);
+	    n.copyAnnotationsFrom(this);
+	    return n;
+	}
     }
 
   public Node typeCheck(LocalContext c)

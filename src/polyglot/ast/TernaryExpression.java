@@ -89,7 +89,8 @@ public class TernaryExpression extends Expression
     if( !cond.getCheckedType().equals( c.getTypeSystem()
                                                 .getBoolean())) {
        throw new SemanticException( 
-                              "Ternary condition must be of type boolean.");
+                              "Ternary condition must be of type boolean.",
+			      Annotate.getLineNumber(cond));
     }
      
     setCheckedType( c.getTypeSystem().leastCommonAncestor( 

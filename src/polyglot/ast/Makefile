@@ -2,6 +2,7 @@
 ast_package   = jltools/ast
 ast_codebase  = ../..
 ast_files     =	AmbiguousExpression.java \
+		AmbiguousName.java \
 		AmbiguousNameExpression.java \
 		ArrayIndexExpression.java \
 		ArrayInitializerExpression.java \

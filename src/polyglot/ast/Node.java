@@ -5,7 +5,7 @@ import jltools.util.*;
 import jltools.visit.*;
 
 import java.util.*;
-
+import java.io.IOException;
 
 /**
  * A <code>Node</code> is an AST node.  All other nodes in the AST must be 
@@ -135,6 +135,17 @@ public abstract class Node extends AnnotatedObject {
   public Node removeAmbiguities( LocalContext c) throws SemanticException
   { 
     return this; 
+  }
+
+  /**
+   * Cleanup class signatures in the AST.
+   *
+   * @return See notes for <code>visit</code> and <code>visitChildren</code>.
+   */
+  public Node cleanupSignatures(LocalContext c, SignatureCleaner sc)
+    throws SemanticException, IOException
+  { 
+    return null; 
   }
 
   /**

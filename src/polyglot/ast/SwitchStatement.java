@@ -118,7 +118,8 @@ public class SwitchStatement extends Statement
                                     c.getTypeSystem().getInt()))
       {
         throw new SemanticException ( "The case label must be a byte, char,"
-                                       + " short or int.");
+                                       + " short or int.",
+				      Annotate.getLineNumber(expr));
       }
       
       if ( expr instanceof NumericalLiteral)
@@ -128,29 +129,32 @@ public class SwitchStatement extends Statement
       else if ( expr instanceof FieldExpression || 
                 expr instanceof LocalVariableExpression)
       {
-        FieldInstance fi;
+        VariableInstance vi;
 
         if ( expr instanceof FieldExpression)
         {
-          fi = ((FieldExpression)expr).getFieldInstance();
+          vi = ((FieldExpression)expr).getFieldInstance();
         }
         else
-          fi = ((LocalVariableExpression)expr).getFieldInstance();
+          vi = ((LocalVariableExpression)expr).getLocalInstance();
         
-        if ( fi == null)
-          throw new InternalCompilerError("Field Instance not defined!");
-        if ( ! fi.isConstant())
-          throw new SemanticException(" Case must be a constant.");
+        if ( vi == null)
+          throw new InternalCompilerError("Variable Instance not defined!");
+        if ( ! vi.isConstant())
+          throw new SemanticException("Case must be a constant.",
+				      Annotate.getLineNumber(expr));
         
-        if ( fi.getConstantValue() instanceof Integer)
-          iValue = (int)((Integer)fi.getConstantValue()).intValue();
-        else if ( fi.getConstantValue() instanceof Long)
-          iValue = (int)((Long)fi.getConstantValue()).longValue();
-        else throw new InternalCompilerError("Unexpected Constant type.");
+        if ( vi.getConstantValue() instanceof Integer)
+          iValue = (int)((Integer)vi.getConstantValue()).intValue();
+        else if ( vi.getConstantValue() instanceof Long)
+          iValue = (int)((Long)vi.getConstantValue()).longValue();
+        else throw new SemanticException("Case must be a constant.",
+					  Annotate.getLineNumber(expr));
         
       }
       else
-        throw new SemanticException (" Case must be a constant");
+        throw new SemanticException ("Case must be a constant",
+				      Annotate.getLineNumber(expr));
       
       return this;
     }

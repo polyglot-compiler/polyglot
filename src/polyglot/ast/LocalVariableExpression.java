@@ -11,7 +11,7 @@ import jltools.util.*;
 public class LocalVariableExpression extends Expression 
 {
   protected final String name;
-  private FieldInstance fi;
+  private LocalInstance li;
     
   /** 
    * Creates a new local variable reference.
@@ -50,9 +50,9 @@ public class LocalVariableExpression extends Expression
     return name;
   }
 
-  public FieldInstance getFieldInstance()
+  public LocalInstance getLocalInstance()
   {
-    return fi;
+    return li;
   }
 
 
@@ -71,8 +71,8 @@ public class LocalVariableExpression extends Expression
      * the ugly point of whether we should reconstruct this or not. I am not 
      * reconstructing here, but perhaps we should?
      */
-    fi = c.getField( null, name);
-    setCheckedType( fi.getType());
+    li = c.getLocal( name);
+    setCheckedType( li.getType());
 
     return this;
   }

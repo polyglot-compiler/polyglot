@@ -176,7 +176,8 @@ public class ForStatement extends Statement
          !cond.getCheckedType().isImplicitCastValid( 
                       c.getTypeSystem().getBoolean())) {
       throw new SemanticException("The condition of a for statement must "
-                                  + "evaluate to a boolean expression.");
+                                  + "evaluate to a boolean expression.",
+				  Annotate.getLineNumber(cond));
     }
 
     /*
@@ -197,6 +198,7 @@ public class ForStatement extends Statement
     if( inits != null) {
       for( Iterator iter = inits.iterator(); iter.hasNext(); ) {
         Statement stmt = (Statement)iter.next();
+	enterScope(c);
         if( stmt instanceof VariableDeclarationStatement) {
           stmt.translate_block (c, w);
           writeSemicolon = false;
@@ -253,7 +255,17 @@ public class ForStatement extends Statement
     if (body == null) {
       w.write(";");
     }
+
+    enterScope(c);
     body.translate_substmt(c, w);
+    leaveScope(c);
+
+    if( inits != null) {
+      for( Iterator iter = inits.iterator(); iter.hasNext(); ) {
+        Statement stmt = (Statement)iter.next();
+	leaveScope(c);
+      }
+    }
   }
 
   public void dump( CodeWriter w)

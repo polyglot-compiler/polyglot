@@ -6,8 +6,10 @@ import jltools.util.*;
 import jltools.visit.*;
 
 import java.util.*;
+/*
 import splitter.util.*;
 import jltools.ext.jif.ast.*;
+*/
 
 /**
  * A <code>SourceFileNode</code> is an immutable representations of a Java
@@ -152,7 +154,8 @@ public class SourceFileNode extends Node
   public Node readSymbols( SymbolReader sr) throws SemanticException
   {
     sr.setPackageName( package_);
-    return null;
+    visitChildren(sr);
+    return this;
   }
 
   public Node removeAmbiguities( LocalContext c)
@@ -210,6 +213,7 @@ public class SourceFileNode extends Node
     dumpNodeInfo( w);
   }	
   
+/*
   public void translate(CodeGenerator cg) {
 	  //write interface
 	  for( Iterator iter = importNodes(); iter.hasNext(); ) {
@@ -226,4 +230,5 @@ public class SourceFileNode extends Node
 	  ClassNode cn = (ClassNode) classes.get(0);
 	  //((JifClassNode)cn).translate(cg);
   }
+*/
 }

@@ -117,7 +117,12 @@ public class ArrayInitializerExpression extends Expression
                                   child.getCheckedType()));
     }
     
-    setCheckedType( type);
+    if (type != null) {
+      setCheckedType( new ArrayType(c.getTypeSystem(), type, 1) );
+    }
+    else {
+      setCheckedType( c.getTypeSystem().getNull() );
+    }
     
     return this;
   }

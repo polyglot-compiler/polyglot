@@ -90,7 +90,7 @@ public class TypeNode extends Node
    
   public Node readSymbols( SymbolReader sr)
   {
-    return this;
+    return null;
   } 
    
   public Node removeAmbiguities( LocalContext c) throws SemanticException
@@ -98,9 +98,14 @@ public class TypeNode extends Node
     return reconstruct( ext, c.getType( type), original);
   }
 
-  public Node typeCheck(LocalContext c)
+  public Node typeCheck(LocalContext c) throws SemanticException
   {
     setCheckedType( type);
+    if (type.isPackageType()) {
+	throw new SemanticException("Type " + type.getTypeString() +
+				    " not defined",
+				    Annotate.getLineNumber(this));
+    }
     return this;
   }
 
