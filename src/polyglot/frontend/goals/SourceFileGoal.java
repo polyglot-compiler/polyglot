@@ -28,7 +28,7 @@ public abstract class SourceFileGoal extends AbstractGoal {
         this.runOnce = false;
     }
     
-    public boolean reached() {
+    public boolean hasBeenReached() {
         return runOnce;
     }
     

@@ -95,13 +95,13 @@ public abstract class AbstractGoal implements Goal {
         subgoals.add(g);
     }
 
-    public abstract boolean reached();
+    public abstract boolean hasBeenReached();
     
     public void setUnreachable() {
         this.reachable = false;
     }
     
-    public boolean reachable() {
+    public boolean isReachable() {
         return this.reachable;
     }
 

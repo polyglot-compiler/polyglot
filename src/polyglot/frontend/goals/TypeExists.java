@@ -39,7 +39,7 @@ public class TypeExists extends AbstractGoal {
         this.satisfied = true;
     }
     
-    public boolean reached() {
+    public boolean hasBeenReached() {
         return this.satisfied;
     }
     

@@ -24,7 +24,7 @@ public interface Goal {
     public Pass createPass(ExtensionInfo extInfo);
     
     /**
-     * Goals on which this goal mutually depends. If the the passes for all
+     * Goals on which this goal may mutually depend. If the passes for all
      * concurrent goals are run (possibly more than once) the concurrent goals
      * should eventually be reached.
      */
@@ -54,13 +54,13 @@ public interface Goal {
     public void addPrerequisiteGoal(Goal g) throws CyclicDependencyException;
 
     /** Return true if this goal is reachable. */
-    public boolean reachable();
+    public boolean isReachable();
 
     /** Set a flag indicating that this rule is unreachable. */
     public void setUnreachable();
     
     /** Return true if this goal has been reached. */
-    public boolean reached();
+    public boolean hasBeenReached();
 
     /** Get the job associated with this goal, or null. */
     public Job job();

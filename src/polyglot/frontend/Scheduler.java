@@ -140,7 +140,7 @@ public abstract class Scheduler {
             job.setRunningPass(pass);
         }
         
-        boolean result = g.reached();
+        boolean result = g.hasBeenReached();
         
         if (job != null) {
             job.setRunningPass(null);
@@ -298,7 +298,7 @@ public abstract class Scheduler {
             return true;
         }
 
-        if (! goal.reachable()) {
+        if (! goal.isReachable()) {
             return false;
         }
         
@@ -411,7 +411,7 @@ public abstract class Scheduler {
             return true;
         }
         
-        if (! goal.reachable()) {
+        if (! goal.isReachable()) {
             return false;
         }
         

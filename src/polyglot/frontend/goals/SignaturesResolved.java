@@ -36,7 +36,7 @@ public class SignaturesResolved extends ClassTypeGoal {
         return new DisambiguateSignaturesPass(extInfo.scheduler(), this);
     }
     
-    public boolean reached() {
+    public boolean hasBeenReached() {
         return type().signaturesResolved();
     }
     

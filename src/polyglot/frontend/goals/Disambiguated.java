@@ -31,11 +31,11 @@ public class Disambiguated extends SourceFileGoal {
         return new DisambiguatorPass(this, new AmbiguityRemover(job(), ts, nf));
     }
 
-    public boolean reached() {
+    public boolean hasBeenReached() {
         if (Report.should_report(TOPICS, 3))
             Report.report(3, "checking " + this);
 
-        if (super.reached()) {
+        if (super.hasBeenReached()) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "  ok (cached)");
             return true;
@@ -95,7 +95,7 @@ public class Disambiguated extends SourceFileGoal {
             this.markRun();
         }
         
-        return super.reached();
+        return super.hasBeenReached();
     }
     
     private static final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend });

@@ -35,7 +35,7 @@ public class SupertypesResolved extends ClassTypeGoal {
         return new ResolveSuperTypesPass(extInfo.scheduler(), this);
     }
     
-    public boolean reached() {
+    public boolean hasBeenReached() {
         return type().supertypesResolved();
     }
 

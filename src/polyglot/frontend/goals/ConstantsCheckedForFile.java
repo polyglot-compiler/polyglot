@@ -34,7 +34,7 @@ public class ConstantsCheckedForFile extends SourceFileGoal {
         return new ConstantCheckPass(this, new ConstantChecker(job(), ts, nf));
     }
 
-    public boolean reached() {
+    public boolean hasBeenReached() {
         if (Report.should_report(TOPICS, 3))
             Report.report(3, "checking " + this);
 

@@ -39,7 +39,7 @@ public abstract class Barrier extends AbstractGoal {
     /* (non-Javadoc)
      * @see polyglot.frontend.goals.Goal#reached()
      */
-    public boolean reached() {
+    public boolean hasBeenReached() {
         boolean reached = true;
         
         for (Iterator i = scheduler.jobs().iterator(); i.hasNext(); ) {

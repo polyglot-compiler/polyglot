@@ -32,7 +32,7 @@ public class MembersAdded extends ClassTypeGoal {
         return new AddMembersPass(extInfo.scheduler(), this);
     }
     
-    public boolean reached() {
+    public boolean hasBeenReached() {
         return type().membersAdded();
     }
     
