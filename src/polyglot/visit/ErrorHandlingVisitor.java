@@ -93,6 +93,18 @@ public class ErrorHandlingVisitor extends HaltingVisitor
         return this;
     }
 
+    /** This method determines what should be returned by <code>enter()</code>
+      * should its call to <code>enterCall()</code> throw a
+      * <code>SemanticException</code>.
+      *
+      * @param n The root of the subtree that was traversed.
+      * @return The <code>ErrorHandlingVisitor</code> which should be
+      * used to visit the childre of <code>n</code>.
+      */
+    protected NodeVisitor enterError(Node n) {
+	return this;
+    }
+
     /** Contains all of the functionality that can be done in the <code> leave
       * </code> method, but allows <code>SemanticExceptions</code> to be
       * thrown.
@@ -148,10 +160,8 @@ public class ErrorHandlingVisitor extends HaltingVisitor
         if (Report.should_report(Report.visit, 5))
 	    Report.report(5, "enter(" + n + ")");
 
-        ErrorHandlingVisitor v = this;
-
         try {
-            v = (ErrorHandlingVisitor) v.enterCall(parent, n);
+            return (ErrorHandlingVisitor) enterCall(parent, n);
         }
 	catch (SemanticException e) {
 	    Position position = e.position();
@@ -163,10 +173,9 @@ public class ErrorHandlingVisitor extends HaltingVisitor
 	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
 		                 e.getMessage(), position);
 
-            v.error = true;
+            error = true;
+	    return enterError(n);
         }
-
-        return v;
     }
 
 

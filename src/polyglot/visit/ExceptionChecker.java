@@ -4,27 +4,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.frontend.Job;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
-import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 import polyglot.util.SubtypeSet;
 
 /** Visitor which checks if exceptions are caught or declared properly. */
-public class ExceptionChecker extends HaltingVisitor
+public class ExceptionChecker extends ErrorHandlingVisitor
 {
-    protected TypeSystem ts;
-    protected ErrorQueue eq;
     protected ExceptionChecker outer;
     protected SubtypeSet scope;
     protected Map exceptionPositions;
 
-    public ExceptionChecker(TypeSystem ts, ErrorQueue eq) {
-        this.ts = ts;
-        this.eq = eq;
+    public ExceptionChecker(Job job, TypeSystem ts, NodeFactory nf) {
+	super(job, ts, nf);
+	this.outer = null;
         this.scope = new SubtypeSet(ts);
         this.exceptionPositions = new HashMap();
     }
@@ -41,17 +40,6 @@ public class ExceptionChecker extends HaltingVisitor
         return outer;
     }
 
-    public NodeVisitor begin() {
-        return this;
-    }
-
-    public void finish() {
-    }
-
-    public TypeSystem typeSystem() {
-	return ts;
-    }
-
     /**
      * This method is called when we are to perform a "normal" traversal of 
      * a subtree rooted at <code>n</code>.   At every node, we will push a 
@@ -64,21 +52,12 @@ public class ExceptionChecker extends HaltingVisitor
      *  children of <code>n</code>.
      *
      */
-    public NodeVisitor enter(Node n) {
-        try {
-            return n.exceptionCheckEnter(push());
-        }
-	catch (SemanticException e) {
-	    Position position = e.position();
+    protected NodeVisitor enterCall(Node n) throws SemanticException {
+	return n.exceptionCheckEnter(push());
+    }
 
-	    if (position == null) {
-		position = n.position();
-	    }
-
-	    eq.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), position);
-
-	    return push();
-	}
+    protected NodeVisitor enterError(Node n) {
+	return push();
     }
 
     /**
@@ -91,7 +70,9 @@ public class ExceptionChecker extends HaltingVisitor
      * @return The final result of the traversal of the tree rooted at 
      *  <code>n</code>.
      */
-    public Node leave(Node old, Node n, NodeVisitor v) {
+    protected Node leaveCall(Node old, Node n, NodeVisitor v)
+	throws SemanticException {
+
 	// Merge results from the children and free the checker used for the
 	// children.
         ExceptionChecker inner = (ExceptionChecker) v;
@@ -102,20 +83,7 @@ public class ExceptionChecker extends HaltingVisitor
         if (inner.outer != this) throw new InternalCompilerError("oops!");
 
 	// gather exceptions from this node.
-	try {
-	    return n.del().exceptionCheck(this);
-	}
-	catch (SemanticException e) {
-	    Position position = e.position();
-
-	    if (position == null) {
-		position = n.position();
-	    }
-
-	    eq.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), position);
-
-	    return n;
-	}
+	return n.del().exceptionCheck(this);
     }
 
     /**
@@ -145,9 +113,5 @@ public class ExceptionChecker extends HaltingVisitor
      */
     public Position exceptionPosition(Type t) {
         return (Position)exceptionPositions.get(t);
-    }
-
-    public ErrorQueue errorQueue() {
-        return eq;
     }
 }
