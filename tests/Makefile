@@ -2,6 +2,7 @@ LOG=log
 
 GOOD =  \
 	ArrayInit.jl \
+	LabeledBreak.jl \
 	InitializerType1.jl \
 	Semicolon.jl \
 	SemicolonClass.jl \
