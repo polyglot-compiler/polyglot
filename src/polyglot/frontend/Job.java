@@ -31,8 +31,8 @@ public abstract class Job
     /** Index of the next pass to run. */
     protected int nextPass;
 
-    /** True if currently running a pass. */
-    protected boolean isRunning;
+    /** The currently running pass, or null. */
+    protected Pass runningPass;
 
     /** True if all passes run so far have been successful. */
     protected boolean status;
@@ -48,7 +48,7 @@ public abstract class Job
 	this.passes = null;
         this.passMap = null;
         this.nextPass = 0;
-        this.isRunning = false;
+        this.runningPass = null;
         this.status = true;
     }
 
@@ -73,12 +73,16 @@ public abstract class Job
         return null;
     }
 
-    public void setIsRunning(boolean flag) {
-        isRunning = flag;
+    public void setRunningPass(Pass pass) {
+        runningPass = pass;
     }
 
     public boolean isRunning() {
-        return isRunning;
+        return runningPass != null;
+    }
+
+    public Pass runningPass() {
+        return runningPass;
     }
 
     /** Get the state's AST. */

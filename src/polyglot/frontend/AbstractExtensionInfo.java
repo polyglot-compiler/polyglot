@@ -21,15 +21,15 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected SourceLoader source_loader = null;
     protected TargetFactory target_factory = null;
 
-    /** 
+    /**
      * A list of all active (that is, uncompleted) <code>SourceJob</code>s.
      */
     protected LinkedList worklist;
 
-    /** 
+    /**
      * A map from <code>Source</code>s to <code>SourceJob</code>s or to
      * the <code>COMPLETED_JOB</code> object if the SourceJob previously existed
-     * but has now finished. The map contains entries for all 
+     * but has now finished. The map contains entries for all
      * <code>Source</code>s that have had <code>Job</code>s added for them.
      */
     protected Map jobs;
@@ -49,7 +49,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected Options createOptions() {
         return new Options(this);
     }
-        
+
     public Compiler compiler() {
         return compiler;
     }
@@ -69,19 +69,19 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     protected abstract void initTypeSystem();
 
-    /** 
-     * Run all jobs in the work list (and any children they have) to 
+    /**
+     * Run all jobs in the work list (and any children they have) to
      * completion. This method returns <code>true</code> if all jobs were
      * successfully completed. If all jobs were successfully completed, then
      * the worklist will be empty.
-     * 
-     * The scheduling of <code>Job</code>s uses two methods to maintain 
+     *
+     * The scheduling of <code>Job</code>s uses two methods to maintain
      * scheduling invariants: <code>selectJobFromWorklist</code> selects
-     * a <code>SourceJob</code> from <code>worklist</code> (a list of 
+     * a <code>SourceJob</code> from <code>worklist</code> (a list of
      * jobs that still need to be processed); <code>enforceInvariants</code> is
      * called before a pass is performed on a <code>SourceJob</code> and is
      * responsible for ensuring all dependencies are satisfied before the
-     * pass proceeds, i.e. enforcing any scheduling invariants.    
+     * pass proceeds, i.e. enforcing any scheduling invariants.
      */
     public boolean runToCompletion() {
         boolean okay = true;
@@ -89,7 +89,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
         while (okay && ! worklist.isEmpty()) {
             SourceJob job = selectJobFromWorklist();
-            
+
             if (Report.should_report(Report.frontend, 1)) {
 		Report.report(1, "Running job " + job);
             }
@@ -97,16 +97,16 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             okay &= runAllPasses(job);
 
             if (job.completed()) {
-                // the job has finished. Let's remove it from the map so it 
+                // the job has finished. Let's remove it from the map so it
                 // can be garbage collected, and free up the AST.
                 jobs.put(job.source(), COMPLETED_JOB);
-                
+
                 if (Report.should_report(Report.frontend, 1)) {
                     Report.report(1, "Completed job " + job);
                 }
             }
             else {
-                // the job is not yet completed (although, it really 
+                // the job is not yet completed (although, it really
                 // should be...)
                 if (Report.should_report(Report.frontend, 1)) {
                     Report.report(1, "Failed to complete job " + job);
@@ -121,11 +121,11 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
         return okay;
     }
-    
+
     /**
-     * Select and remove a <code>SourceJob</code> from the non-empty 
+     * Select and remove a <code>SourceJob</code> from the non-empty
      * <code>worklist</code>. Return the selected <code>SourceJob</code>
-     * which will be scheduled to run all of its remaining passes. 
+     * which will be scheduled to run all of its remaining passes.
      */
     protected SourceJob selectJobFromWorklist() {
         return (SourceJob)worklist.remove(0);
@@ -139,7 +139,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         // Add a new SourceJob for the given source. If a Job for the source
         // already exists, then we will be given the existing job.
         SourceJob job = addJob(source);
-        
+
         if (job == null) {
             // addJob returns null if the job has already been completed, in
             // which case we can just ignore the request to read in the source.
@@ -171,18 +171,18 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
      */
     public boolean runAllPasses(Job job) {
         List pending = job.pendingPasses();
-    
+
         // Run until there are no more passes.
         if (!pending.isEmpty()) {
             Pass lastPass = (Pass)pending.get(pending.size() - 1);
             return runToPass(job, lastPass);
         }
-    
+
         return true;
     }
 
-    /** 
-     * Run a job until the <code>goal</code> pass completes. 
+    /**
+     * Run a job until the <code>goal</code> pass completes.
      */
     public boolean runToPass(Job job, Pass.ID goal) {
         if (Report.should_report(Report.frontend, 1))
@@ -197,8 +197,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
         return runToPass(job, pass);
     }
 
-    /** 
-     * Run a job up to the <code>goal</code> pass. 
+    /**
+     * Run a job up to the <code>goal</code> pass.
      */
     public boolean runToPass(Job job, Pass goal) {
         if (Report.should_report(Report.frontend, 1))
@@ -221,27 +221,26 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
         return job.status();
     }
-    
+
     /**
      * Run the pass <code>pass</code> on the job. Before running the pass on
-     * the job, if the job is a <code>SourceJob</code>, then this method will 
-     * ensure that the scheduling invariants are enforced by calling 
+     * the job, if the job is a <code>SourceJob</code>, then this method will
+     * ensure that the scheduling invariants are enforced by calling
      * <code>enforceInvariants</code>.
      */
     protected void runPass(Job job, Pass pass) {
         // make sure that all scheduling invariants are satisfied before running
-        // the next pass. We may thus execute some other passes on other 
+        // the next pass. We may thus execute some other passes on other
         // jobs running the given pass.
         enforceInvariants(job, pass);
-        
-        
+
         if (getOptions().disable_passes.contains(pass.name())) {
             if (Report.should_report(Report.frontend, 1))
                 Report.report(1, "Skipping pass " + pass);
             job.finishPass(pass, true);
-            return;                
+            return;
         }
-        
+
         if (Report.should_report(Report.frontend, 1))
             Report.report(1, "Trying to run pass " + pass + " on " + job.source());
 
@@ -252,20 +251,37 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                                             pass);
         }
 
-        long start_time = System.currentTimeMillis();
-        
         boolean result = false;
-        if (job.status()) {            
+        if (job.status()) {
             Job oldCurrentJob = this.currentJob;
             this.currentJob = job;
             Report.should_report.push(pass.name());
-            job.setIsRunning(true);
-            
+
+            // Stop the timer on the old pass. */
+            Pass oldPass = oldCurrentJob != null
+                         ? oldCurrentJob.runningPass()
+                         : null;
+
+            if (oldPass != null) {
+                oldPass.toggleTimers(true);
+            }
+
+            job.setRunningPass(pass);
+            pass.resetTimers();
+            pass.toggleTimers(false);
+
             result = pass.run();
-            
-            job.setIsRunning(false);
+
+            pass.toggleTimers(false);
+            job.setRunningPass(null);
+
             Report.should_report.pop();
             this.currentJob = oldCurrentJob;
+
+            // Restart the timer on the old pass. */
+            if (oldPass != null) {
+                oldPass.toggleTimers(true);
+            }
 
             // dump this pass if we need to.
             if (getOptions().dump_ast.contains(pass.name())) {
@@ -288,8 +304,9 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
         if (Report.should_report(Report.time, 1)) {
             Report.report(1, "Finished " + pass +
-                          " status=" + str(result) + " time=" +
-                          (System.currentTimeMillis() - start_time));
+                          " status=" + str(result) + " inclusive_time=" +
+                          pass.inclusiveTime() + " exclusive_time=" +
+                          pass.exclusiveTime());
         }
         else if (Report.should_report(Report.frontend, 1)) {
             Report.report(1, "Finished " + pass +
@@ -298,23 +315,23 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
         job.finishPass(pass, result);
     }
-    
+
     /**
      * Before running <code>Pass pass</code> on <code>SourceJob job</code>
      * make sure that all appropriate scheduling invariants are satisfied,
      * to ensure that all passes of other jobs that <code>job</code> depends
      * on will have already been done.
-     * 
+     *
      */
     protected void enforceInvariants(Job job, Pass pass) {
         SourceJob srcJob = job.sourceJob();
         if (srcJob == null) {
             return;
         }
-        
+
         BarrierPass lastBarrier = srcJob.lastBarrier();
         if (lastBarrier != null) {
-            // make sure that _all_ dependent jobs have completed at least up to 
+            // make sure that _all_ dependent jobs have completed at least up to
             // the last barrier (not just children).
             //
             // Ideally the invariant should be that only the source jobs that
@@ -332,18 +349,18 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                 SourceJob sj = (SourceJob)o;
                 if (sj.pending(lastBarrier.id())) {
                     // Make the job run up to the last barrier.
-                    // We ignore the return result, since even if the job 
+                    // We ignore the return result, since even if the job
                     // fails, we will keep on going and see
                     // how far we get...
                     if (Report.should_report(Report.frontend, 3)) {
                         Report.report(3, "Running " + sj +
                                   " to " + lastBarrier.id() + " for " + srcJob);
-                    } 
+                    }
                     runToPass(sj, lastBarrier.id());
                 }
             }
         }
-        
+
         if (pass instanceof GlobalBarrierPass) {
             // need to make sure that _all_ jobs have completed just up to
             // this global barrier.
@@ -360,21 +377,21 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                     // game), or is right up to the global barrier.
                     continue;
                 }
-                
+
                 // Make the job run up to just before the global barrier.
-                // We ignore the return result, since even if the job 
+                // We ignore the return result, since even if the job
                 // fails, we will keep on going and see
                 // how far we get...
                 Pass beforeGlobal = sj.getPreviousTo(pass.id());
                 if (Report.should_report(Report.frontend, 3)) {
                     Report.report(3, "Running " + sj +
                               " to " + beforeGlobal.id() + " for " + srcJob);
-                } 
+                }
                 runToPass(sj, beforeGlobal);
             }
         }
     }
-             
+
     private static String str(boolean okay) {
         if (okay) {
             return "done";
@@ -386,7 +403,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
 
     /**
-     * Get the file name extension of source files.  This is 
+     * Get the file name extension of source files.  This is
      * either the language extension's default file name extension
      * or the string passed in with the "-sx" command-line option.
      */
@@ -416,7 +433,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
                                                getOptions().output_ext,
                                                getOptions().output_stdout);
         }
-        
+
         return target_factory;
     }
 
@@ -452,16 +469,16 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     }
 
     /**
-     * Adds a dependency from the current job to the given Source. 
+     * Adds a dependency from the current job to the given Source.
      */
     public void addDependencyToCurrentJob(Source s) {
-        if (s == null) 
+        if (s == null)
             return;
         if (currentJob != null) {
             Object o = jobs.get(s);
             if (o != COMPLETED_JOB) {
                 if (Report.should_report(Report.frontend, 2)) {
-                    Report.report(2, "Adding dependency from " + 
+                    Report.report(2, "Adding dependency from " +
                             currentJob.source() + " to " +
                             s);
                 }
@@ -472,12 +489,12 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             throw new InternalCompilerError("No current job!");
         }
     }
-    
-    /** 
+
+    /**
      * Add a new <code>SourceJob</code> for the <code>Source source</code>.
      * A new job will be created if
      * needed. If the <code>Source source</code> has already been processed,
-     * and its job discarded to release resources, then <code>null</code> 
+     * and its job discarded to release resources, then <code>null</code>
      * will be returned.
      */
     public SourceJob addJob(Source source) {
@@ -489,28 +506,28 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
      * with AST <code>ast</code>.
      * A new job will be created if
      * needed. If the <code>Source source</code> has already been processed,
-     * and its job discarded to release resources, then <code>null</code> 
+     * and its job discarded to release resources, then <code>null</code>
      * will be returned.
      */
     public SourceJob addJob(Source source, Node ast) {
         Object o = jobs.get(source);
         SourceJob job = null;
         if (o == COMPLETED_JOB) {
-            // the job has already been completed. 
+            // the job has already been completed.
             // We don't need to add a job
             return null;
-        }        
+        }
         else if (o == null) {
             // No appropriate job yet exists, we will create one.
-            
+
             job = this.createSourceJob(source, ast);
-            
+
             // record the job in the map and the worklist.
             jobs.put(source, job);
             worklist.addLast(job);
 
             if (Report.should_report(Report.frontend, 3)) {
-                Report.report(3, "Adding job for " + source + " at the " + 
+                Report.report(3, "Adding job for " + source + " at the " +
                     "request of job " + currentJob);
             }
         }
@@ -528,7 +545,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     }
 
     /**
-     * Create a new <code>SourceJob</code> for the given source and AST. 
+     * Create a new <code>SourceJob</code> for the given source and AST.
      * In general, this method should only be called by <code>addJob</code>.
      */
     protected SourceJob createSourceJob(Source source, Node ast) {
@@ -538,11 +555,11 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     /**
      * Create a new non-<code>SourceJob</code> <code>Job</code>, for the
      * given AST. In general this method should only be called by
-     * <code>spawnJob</code>. 
-     * 
+     * <code>spawnJob</code>.
+     *
      * @param ast the AST the new Job is for.
      * @param context the context that the AST occurs in
-     * @param outer the <code>Job</code> that spawned this job. 
+     * @param outer the <code>Job</code> that spawned this job.
      * @param begin the first pass to perform for this job.
      * @param end the last pass to perform for this job.
      */
@@ -554,14 +571,14 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
      * Spawn a new job. All passes between the pass <code>begin</code>
      * and <code>end</code> inclusive will be performed immediately on
      * the AST <code>ast</code>.
-     * 
+     *
      * @param c the context that the AST occurs in
      * @param ast the AST the new Job is for.
-     * @param outerJob the <code>Job</code> that spawned this job. 
+     * @param outerJob the <code>Job</code> that spawned this job.
      * @param begin the first pass to perform for this job.
      * @param end the last pass to perform for this job.
      */
-    public Node spawnJob(Context c, Node ast, Job outerJob, 
+    public Node spawnJob(Context c, Node ast, Job outerJob,
                            Pass.ID begin, Pass.ID end) {
         Job j = createJob(ast, c, outerJob, begin, end);
 

@@ -27,6 +27,20 @@ public interface Pass
     /** Run the pass. */
     public boolean run();
 
+    /** Reset the pass timers to 0. */
+    public void resetTimers();
+
+    /** Start/stop the pass timers. */
+    public void toggleTimers(boolean exclusive_only);
+
+    /** The total accumulated time in ms since the last timer reset
+      * that the pass was running, including spawned passes. */
+    public long inclusiveTime();
+
+    /** The total accumulated time in ms since the last timer reset
+      * that the pass was running, excluding spawned passes. */
+    public long exclusiveTime();
+
     // Below are the IDs of all the passes of the base compiler,
     // plus a few optional passes that extensions may use.
 
