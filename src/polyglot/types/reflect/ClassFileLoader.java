@@ -48,7 +48,12 @@ public class ClassFileLoader
 
         if (c == null) {
             c = findClass(name);
-            cache.put(name, c);
+
+            // Don't cache.  We'll never use the cache since the class resolver
+            // caches ClassTypes.  We're just preventing ClassFiles from
+            // getting garbage collected.
+
+            // cache.put(name, c);
         }
         else {
             Report.report(verbose, 2, "already loaded " + c.name());
