@@ -77,9 +77,17 @@ public interface Node extends NodeOps, Copy
     Node visitChild(Node child, NodeVisitor v);
 
     /**
-     * Adjust the environment on entering the scope of the method.
+     * Adjust the environment on entering the scope of the node.
      */
     Context enterScope(Context c);
+
+    /**
+     * Adjust the environment on leaving the scope of the node.
+     * This method is used to add local variables to the context of
+     * the enclosing block.  The method is deprecated and should 
+     * eventually be removed by making locals decls behave more like "let".
+     */
+    Context updateScope(Context c);
 
     /**
      * Get the expected type of a child expression of <code>this</code>.

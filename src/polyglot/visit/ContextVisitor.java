@@ -53,7 +53,7 @@ public class ContextVisitor extends HaltingVisitor
 
         outer = null;
 
-        return this;
+        return super.begin();
     }
 
     protected NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
@@ -87,6 +87,10 @@ public class ContextVisitor extends HaltingVisitor
 
     protected Context enterScope(Node n) {
 	return n.enterScope(context);
+    }
+
+    protected Context updateScope(Node n) {
+        return n.updateScope(context);
     }
 
     public void finish() { }
@@ -132,44 +136,6 @@ public class ContextVisitor extends HaltingVisitor
         return v;
     }
 
-    /*
-    public NodeVisitor enter(Node parent, Node n) {
-        Types.report(5, "enter(" + n + ")");
-
-        ContextVisitor v = this;
-        boolean error = false;
-
-        try {
-            v = (ContextVisitor) this.enterCall(parent, n);
-        }
-	catch (SemanticException e) {
-	    Position position = e.position();
-
-	    if (position == null) {
-		position = n.position();
-	    }
-
-	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-		                 e.getMessage(), position);
-
-            error = true;
-        }
-
-        Context c = v.enterScope(n);
-
-        if (true || c != v.context || error != v.error) {
-            ContextVisitor v2 = (ContextVisitor) v.copy();
-            v2.context = c;
-            v2.outer = v;
-            v2.error = error;
-            return v2;
-        }
-        else {
-            return v;
-        }
-    }
-    */
-
     public Node leave(Node old, Node n, NodeVisitor v) {
         try {
             if (v instanceof ContextVisitor && ((ContextVisitor) v).error) {
@@ -189,7 +155,15 @@ public class ContextVisitor extends HaltingVisitor
             }
 
             Types.report(5, "leave(" + n + "): calling leaveCall");
-            return leaveCall(old, n, v);
+            Node m = leaveCall(old, n, v);
+
+            // FIXME: hack to allow locals added to the context by enterScope
+            // to propagate outward.  We need this until we have true
+            // "let"-style local decls.  This, of course, makes this visitor
+            // imperative.
+            this.context = this.updateScope(m);
+
+            return m;
 	}
 	catch (SemanticException e) {
 	    Position position = e.position();

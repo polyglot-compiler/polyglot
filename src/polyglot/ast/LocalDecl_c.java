@@ -125,6 +125,11 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
         return c;
     }
 
+    public Context updateScope(Context c) {
+        c.addVariable(li);
+        return c;
+    }
+
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         LocalDecl_c n = (LocalDecl_c) super.buildTypes(tb);
 

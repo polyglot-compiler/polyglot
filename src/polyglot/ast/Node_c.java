@@ -149,6 +149,11 @@ public abstract class Node_c implements Node
     /** Adjust the environment for entering a new scope. */
     public Context enterScope(Context c) { return c; }
 
+    /** Adjust the environment when leaving a scope.
+     * This is called to add local variables to the parent's scope.
+     */
+    public Context updateScope(Context c) { return c; }
+
     // These methods override the methods in Ext_c.
     // These are the default implementation of these passes.
 
