@@ -1,7 +1,7 @@
 /**
  * Test that const arrays can be cast away
  */
-public class TestC {
+public class TestH {
     int const[] A;
     int [] B;
 
