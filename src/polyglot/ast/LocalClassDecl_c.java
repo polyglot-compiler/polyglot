@@ -73,7 +73,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
             }
 
             LocalClassDecl n = decl(d);
-            return n.visitChild(d, ar);
+            return n.visitChildren(ar);
         }
 
         return this;
