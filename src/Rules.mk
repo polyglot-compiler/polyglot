@@ -21,6 +21,7 @@ JAVADOC_OUTPUT		= $(SOURCE)/javadoc
 JAVADOC_FLAGS		= -mx40m -ms40m -classpath "$(JAVADOC_CLASSPATH)" -sourcepath "$(JAVADOC_SOURCEPATH)"
 
 BIN 			= $(SOURCE)/bin
+JLC			= $(BIN)/jlc
 JIF			= $(BIN)/jifc
 JIF_FLAGS		= -d $(OUTPUT) -sourcepath $(BUILDPATH)
 
