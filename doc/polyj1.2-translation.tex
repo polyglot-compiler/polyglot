@@ -1,0 +1,401 @@
+% This is a -*- latex -*- file
+
+\documentclass[11pt]{article}
+
+\title{PolyJ 1.2 Translation}
+\author{Jed Liu \and Grant Wang\footnote{Translated to \LaTeX\ by Aleksey Kliger}}
+\date{11 August 2000\footnote{Submitted to Andrew Myers}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+A summary of the design of the translation phase of the PolyJ 1.2
+compiler.  Highlights differences between the PolyJ 1.0.2 and PolyJ 1.2
+compilers.  Summarizes the current status of the PolyJ 1.2 implementation.
+\end{abstract}
+
+\tableofcontents
+
+\section{Adapter Interfaces and Classes}
+
+Translation in PolyJ 1.2 occurs exactly as in PolyJ 1.0.2, except that
+the abstract adapter classes (e.g., \verb+Vector$$$W+) are now adapter
+interfaces.  This was done to avoid having an adapter class pointer at
+every level in the class hierarchy.  This change has a few
+repercussions.
+
+\begin{itemize}
+\item The \verb+$cast+ and \verb+$instanceof+ methods have been moved
+into the Java translations of the .pj files.  These methods are also
+no longer static, so as to support nested classes.
+\item The class hierarchy of the polymorphic classes is mirrored in the
+adapter classes. (e.g., if \verb+A+ is a subclass of \verb+B+ then
+\verb+A$$$W+ is a sub-interface of \verb+B$$$W+)
+\item Only the polymorphic classes at the top of the class hierarchy
+have the \verb+$W+ adapter pointer.  This means that whenever we need
+to use an adapter object, we will need to cast it to the
+appropriate level in the adapter class hierarchy.
+\item The \verb-$PSig-, \verb-$FetchS- and \verb-$SetS- methods are now
+flagged with class anmed.  (e.g., if we have \verb-A[int]-, then the
+adapter interface \verb-A$$$W- will have an abstract method named
+\verb-A$$$W$PSig$1- and in the \verb-A$$int- implementation of this
+interface, the method would return the string ``\verb-I-''.)
+\end{itemize}
+
+\section{Translation Infrastructure}
+
+Translation in PolyJ $1.2$ is handled by a translation visitor that
+extends the existing translation visitor in JLTools.  The PolyJ
+translation visitor first walks over the AST and produces a Java
+translation of the .pj file.  As it does this, the visitor saves
+information to three data structures so that it can generate the
+appropriate adapter interfaces and classes once the .pj file is
+translated.  The classes for these data structures are kept in the
+package \verb-jltools.ext.polyj.util-.
+
+The first of these data structures, \verb-WhereBindingTable-, holds
+information about the method constraints found in the where clauses of
+the .pj file.  The member field of interest in this class is the
+Hashtable \verb-whereBindings-.  This object is a Hashtable of
+Hashtables of Hashtables of \verb-WhereBindingTableEntry- objects,
+making for a three-dimensional table of \verb-WhereBindingTableEntry-
+objects.  Each of these \verb-WhereBindingTableEntry- objects holds data
+about a single method constraint and the where method to which it is
+bound.  A \verb-WhereBindingTableEntry- for any given method constraint can
+be obtained from the table by indexing into it three times: first, by
+the fully-qualified name of the class constrained by the method;
+second, by the name of the parameter to which the constraint applies;
+and finally, by an encoding of the method signature of the constraint.
+
+Method signatures are encoded into a dash-delimitated string, where
+first we have the fully-qualified name of the return type, followed by
+the method name, followed by the fully-qualified names of the formal
+arguments in order.  For example, if \verb-X- is a class parameter,
+then the method constraint
+``\verb-void insertElementAt(X x, int pos)-'' would be encoded as
+``\verb+void--insertElementAt--X--int+''.  For this encoding,
+constructors are considered to have void return types.
+
+The second data structure, \verb-InstantiationTable-, holds
+information about instantiations of polymorphic types found in the .pj
+file.  The member field of interest in this class is the Hashtable
+\verb-instantiationTable-.  This object is a Hashtable of
+\verb-InstantiationTableEntry- objects, indexed by the fully-qualified names
+of polymorphic classes.  Each \verb-InstantiationTableEntry- holds
+information on the instantiations of that particular polymorphic
+class, having a Hashtable that maps the fully-qualified name of an
+adapter class to its corresponding PJInstantiatedType object.
+
+The last data structure is \verb-StaticFieldBindingTable-.  As its
+name suggests, this data structure holds information about the static
+field members of the polymorphic types found in the .pj file.  The
+member field of interest in this class is the Hashtable
+\verb-fieldBindings-.  This object is a Hashtable of Hashtables of
+\verb-StaticFieldBindingTableEntry- objects, making for a
+two-dimensional table of \verb-StaticFieldBindingTableEntry- objects.
+Each of these \verb-StaticFieldBindingTableEntry- objects holds data
+about a single static field and the Fetch and Set methods to which it
+is bound.  A \verb-StaticFieldBindingTableEntry- for any given static
+field can be obtained from the table by indexing into it twice: first,
+by the fully-qualified name of the class of which the field is a
+member; and second, by the name of the static field itself.
+
+\section{The \emph{Status Quo}}
+
+This is what has been done so far.  The focus has mainly been on
+getting the translation of basic programs to work so that we can
+expand on language features from there.  As such, we haven't been
+focusing on nested classes; it was decided that patching translation
+to support inner classes should not be difficult.
+
+\subsection{Translation of polymorphic classes}
+
+\paragraph{Changes:}
+\verb-$cast-, \verb-$instanceof- generated for polymorphic classes.
+
+\paragraph{Files:}
+\begin{itemize}
+\item \verb-jltools.ext.polyj.ast.PolyJClassNode-
+\end{itemize}
+
+\subsection{Generation of adapter interfaces and adapter classes}
+
+\paragraph{Changes:}
+Adapter interfaces and adapter classes generated.
+
+\paragraph{Files:}
+\begin{itemize}
+\item \verb-jltools.ext.polyj.visit.PolyJTranslationVisitor-
+\end{itemize}
+
+\subsection{Generation of \texttt{\$FetchS} and \texttt{\$SetS}}
+
+\paragraph{Changes:}
+Abstract methods \verb+$FetchS+ and \verb+$SetS+ generated in
+adapter interfaces, implemented in adapter classes.
+
+\paragraph{Files:}
+\begin{itemize}
+\item \verb+jltools.ext.polyj.visit.PolyJTranslationVisitor+
+\end{itemize}
+
+\subsection{Translation of cast and instanceof expressions.}
+
+\paragraph{Changes:}
+Translates cast and instanceof expressions to method calls if type
+is polymorphic, does not handle types instantiated on
+\verb+PJParameterType+
+
+\paragraph{Files:}
+\begin{itemize}
+\item \verb+jltools.ext.polyj.ast.PolyJCastExpression+
+\item \verb+jltools.ext.polyj.ast.PolyJInstanceOfExpression+
+\end{itemize}
+
+\subsection{Constructor Translation.}
+\paragraph{Changes:}
+Adds a parameter to constructors if the class is polymorphic, but
+does not add the ``\verb+this.$W = $W+'' statement to the body of
+the constructor.
+\paragraph{Files:}
+\begin{itemize}
+\item \verb+jltools.ext.polyj.ast.PolyJMethodExpression+
+\end{itemize}
+
+\subsection{Translation infrastructure}
+As described previously in this document.
+
+\subsection{Translation of constructor calls (\(\texttt{super}(\ldots)\),
+\(\texttt{this}(\ldots)\))}
+\paragraph{Changes:}
+Adds \verb+$W+ to argument list of call to \verb+this()+ or \verb+super()+
+is a call to a polymorphic class constructor.
+
+\paragraph{Files:}
+\begin{itemize}
+\item \verb+jltools.ext.polyj.ast.PolyJConstructorCallStatement+
+\end{itemize}
+
+\subsection{Field Expression translation.}
+\paragraph{Changes:}
+If the field is a static expression, it's translated to a fetch call.
+Additionally, if the field is known, a cast is done.
+
+\paragraph{Files:}
+\begin{itemize}
+\item \verb+jltools.ext.polyj.ast.PolyJFieldExpression+
+\end{itemize}
+
+\subsection{Method expressions (including translation of where methods
+to \texttt{\$W.\$Where\$x})}
+\paragraph{Changes:}
+If the method call is a where method, we translate to call the correct
+\verb+$W.$Where$x+ method in the adapter class.
+
+\paragraph{Files:}
+\begin{itemize}
+\item \verb+jltools.ext.polyj.ast.PolyJMethodExpression+
+\end{itemize}
+
+\subsection{Addition of \texttt{PolyJAmbiguousName} and \texttt{PolyJAmbiguousNameExpression}}
+So that \verb+PolyJFieldExpression+s are generated during
+disambiguating.
+
+\subsection{Modifications to \texttt{polyj.cup}}
+To allow generation of PolyJ specific AST nodes.
+
+\section{Known Deficiencies}
+
+\subsection{Translation of local classes is broken.}
+
+When we translate the new object expression, we refer to the fully
+qualified class name, when we should just refer to the short name.
+Additionally, the adapter classes are not generated with the correct
+names.  Translation of new object expressions for member classes is
+correct, but, as with local classes, the adapter class name needs to
+be mangled, i.e.
+
+\begin{verbatim}
+class A[X] {
+    class B[X] {}
+    void foo() {
+        B[Object] bar = new B[Object]();
+    }
+}
+\end{verbatim}
+
+is translated to 
+
+\begin{verbatim}
+class A {
+    class B { // typechecking methods in here }
+    void foo() {
+        A.B bar =
+            new A.B(pjIns.A.B$$java$lang$Object.getInstance());
+    }
+}
+\end{verbatim}
+
+Note here that the reference to the adapter class is incorrect since the
+name should be mangled: instead of \verb+pjIns.A.B$$java$lang$Object+,
+it shoudl eb \verb+pjIns.A$B$$java$lang$Object+.
+
+
+\subsection{Instantiation on \texttt{PJParameterType} is not complete.\label{sec:param}}
+We do not reference the \verb+getWhere+ and \verb+PSig+ methods, i.e.
+code such as the following does not translate correctly:
+
+\begin{verbatim}
+class A[X,Y] {
+    void foo() {
+        A[X,X] bar = new A[X,X]();
+    }
+}
+\end{verbatim}
+
+should generate something like the following below, but does not.
+
+\begin{verbatim}
+class A {
+    void foo() {
+        A var = new A($W.getWhere$1());
+    }
+}
+\end{verbatim}
+
+Here, we need a binding from types to \verb+getWhere+ methods
+in the translation infrastructure.
+
+\subsection{Translation of static fields.}
+
+The \verb+$FetchS+ and \verb+$SetS+ methods are generated in the
+adapter classes.  Calls to \verb+$FetchS+ are being made, but
+assignments to static fields are broken.  For these, \verb+$SetS+
+calls need to be generated.
+
+\subsection{Type descriptors for types such as \texttt{A[String]}
+are not produced.}
+
+That is, they are not of the form used by PolyJ 1.0.2.  For example
+``\verb+A[String]+'' should translate to ``\verb+LA<java/lang/String;>+'',
+but this does not occur.  Therefore, casts such as:
+\verb+(A[B[String]])x+ are not translated correctly.  This
+corresponds to \ref{sec:param} above, since type descriptors
+for \verb+PJParameterType+s come in the form of calls to \verb+$PSig+
+methods, such as the following below:
+
+\begin{verbatim}
+class A[X,Y] {
+    void foo() {
+        A[X,X] bar = new A[X,X]();
+        ((A[X,X])bar).toString();
+    }
+}
+\end{verbatim}
+
+should be translated to something like:
+
+\begin{verbatim}
+class A{
+    void foo() {
+        A bar = new A($W.GetWhere$1());
+        A.$cast(bar, $W.psig$1);
+    }
+}
+\end{verbatim}
+
+\subsection{Translation of constructors in polymorphic classes.}
+While signatures are translated correctly, i.e. \verb+public A()+
+\(\mapsto\) \verb+public A(A$$$W $W)+, the addition of the statement
+``\verb+this.$W = $W+'' is not added to the body of the constructor.
+
+
+\section{Known Bugs}
+
+This is a list of known bugs elsewhere in the compiler that we have come
+across while working on translation.
+
+\subsection{Parsing problem}
+
+The following code does not parse:
+
+\begin{verbatim}
+class A[X] {
+    void foo() {
+        A[B[String]] x = new A[B[String]]();
+        ((A[B[String]])x).toString();
+    }
+}
+
+class B[X] { }
+\end{verbatim}
+
+\subsection{Multiple public classes per file.}
+
+The following code compiles, but should not.  We cannot declare two
+public classes in a file.  The example code was compiled in a file named
+\verb+G.pj+, and yet the code compiled without throwing errors.
+This is different from the Sun \verb+javac+ behaviour.
+
+\begin{verbatim}
+public class A[X] { }
+
+public class B {
+    A[String] x = new A[String]();
+}
+\end{verbatim}
+
+\subsection{Overloading based on return type.}
+
+\begin{verbatim}
+class A[X] 
+  where X { boolean foo(Object o);  int foo(Object o); }
+{
+    X me;
+
+    void foo() {
+        int x = 3 + me.foo(“hi”);
+    }
+}
+\end{verbatim}
+
+The above code throws the following error.
+
+\begin{verbatim}
+D.pj:5: Additive operators must have numeric operands.
+\end{verbatim}
+
+However, if the order of the where methods is switched, the code
+compiles fine.  We believe that the compiler should throw a type
+checking error, since it is impossible for any class X to have methods
+boolean foo(Object o) and int foo(Object o) that differ only in return
+type.
+
+\subsection{Accessing static fields as \texttt{instance.field}.}
+
+\begin{verbatim}
+interface I {
+    public int a = 0;
+    public int b = 0;
+}
+
+class C implements I { }
+
+class E {
+    C c = new C();
+    void main() {
+        if ( c.a == c.b ) { }
+    }
+}
+\end{verbatim}
+
+The above code generates the following error.
+
+\begin{verbatim}
+static.pj:11: Field "a" not found in context C
+static.pj:11: Field "b" not found in context C
+static.pj: 2 errors.
+\end{verbatim}
+
+\end{document}
