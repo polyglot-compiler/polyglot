@@ -550,13 +550,20 @@ public interface TypeSystem {
 
     /**
      * Return a package by name.
+     * Fail if the package does not exists.
      */
-    Package packageForName(String name);
+    Package packageForName(String name) throws SemanticException;
+
+    /**
+     * Return a package by name with the given outer package.
+     * Fail if the package does not exists.
+     */
+    Package packageForName(Package prefix, String name) throws SemanticException;
 
     /**
      * Return a package by name with the given outer package.
      */
-    Package packageForName(Package prefix, String name);
+    Package createPackage(Package prefix, String name);
 
     /**
      * Create a new context object for looking up variables, types, etc.

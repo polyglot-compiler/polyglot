@@ -1383,12 +1383,11 @@ public class TypeSystem_c implements TypeSystem
 	return unknownQualifier;
     }
 
-    public Package packageForName(Package prefix, String name) {
-        assert_(prefix);
-	return new Package_c(this, prefix, name);
+    public Package packageForName(Package prefix, String name) throws SemanticException {
+        return createPackage(prefix, name);
     }
 
-    public Package packageForName(String name) {
+    public Package packageForName(String name) throws SemanticException {
         if (name == null || name.equals("")) {
 	    return null;
 	}
@@ -1397,6 +1396,11 @@ public class TypeSystem_c implements TypeSystem
 	String p = StringUtil.getPackageComponent(name);
 
 	return packageForName(packageForName(p), s);
+    }
+
+    public Package createPackage(Package prefix, String name) {
+        assert_(prefix);
+	return new Package_c(this, prefix, name);
     }
 
     /**

@@ -50,7 +50,7 @@ public class PackageContextResolver implements Resolver
 	}
 
         if (cr == null) {
-	    return ts.packageForName(p, name);
+	    return ts.createPackage(p, name);
         }
 
 	try {
@@ -60,7 +60,7 @@ public class PackageContextResolver implements Resolver
             if (!e.getClassName().equals(p.fullName() + "." + name)) {
                 throw e;
             }
-	    return ts.packageForName(p, name);
+	    return ts.createPackage(p, name);
 	}
     }
 
