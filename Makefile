@@ -52,18 +52,19 @@ PACKAGES = \
 	jltools.ext.jl.ast \
 	jltools.ext.jl.parse \
 	jltools.ext.jl.types \
-	jltools.ext.op \
+	jltools.ext.jif \
+	jltools.ext.jif.ast \
+	jltools.ext.jif.extension \
+	jltools.ext.jif.types \
+	jltools.ext.jif.visit \
+
+#jltools.ext.op \
 	jltools.ext.op.runtime \
 	jltools.ext.polyj \
 	jltools.ext.polyj.ast \
 	jltools.ext.polyj.extension \
 	jltools.ext.polyj.types \
 	jltools.ext.polyj.visit \
-	jltools.ext.jif \
-	jltools.ext.jif.ast \
-	jltools.ext.jif.extension \
-	jltools.ext.jif.types \
-	jltools.ext.jif.visit \
 	jltools.ext.jmatch \
 	jltools.ext.jmatch.ast \
 	jltools.ext.jmatch.extension \
@@ -104,7 +105,6 @@ release_doc: FORCE
 	cp LICENSE README README-JIF.txt $(RELPATH)
 	mkdir -p $(REL_DOC)
 	mkdir -p $(REL_SRC)
-	cp -f BUILD.txt $(REL_SRC)/README
 	$(MAKE) -C doc release
 
 release: jar release_clean release_doc release_src
