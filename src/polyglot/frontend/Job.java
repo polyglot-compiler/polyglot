@@ -40,6 +40,12 @@ public abstract class Job
     /** Map from pass id to pass. */
     protected Map passMap;
 
+    /** Initial count of errors before running the job. */
+    protected int initialErrorCount;
+
+    /** True if the the job has reported an error. */
+    protected boolean reportedErrors;
+
     public Job(ExtensionInfo lang, JobExt ext, Node ast) {
         this.lang = lang;
         this.ext = ext;
@@ -50,6 +56,8 @@ public abstract class Job
         this.nextPass = 0;
         this.runningPass = null;
         this.status = true;
+        this.initialErrorCount = 0;
+        this.reportedErrors = false;
     }
 
     public JobExt ext() {
@@ -74,6 +82,22 @@ public abstract class Job
     }
 
     public void setRunningPass(Pass pass) {
+        // The pass is not-null iff the job is running
+        if (pass != null) {
+            // We're starting to run the pass. 
+            // Record the initial error count.
+            this.initialErrorCount = compiler().errorQueue().errorCount();
+        }
+        else {
+            // We've stopped running a pass. 
+            // Check if the error count changed.
+            int errorCount = compiler().errorQueue().errorCount();
+
+            if (errorCount > initialErrorCount) {
+                reportedErrors = true;
+            }
+        }
+
         runningPass = pass;
     }
 
@@ -93,6 +117,11 @@ public abstract class Job
     /** Set the state's AST. */
     public void ast(Node ast) {
         this.ast = ast;
+    }
+
+    /** True if some pass reported an error. */
+    public boolean reportedErrors() {
+        return reportedErrors;
     }
 
     public void dump(CodeWriter cw) {
@@ -305,12 +334,18 @@ public abstract class Job
      * and <code>end</code> inclusive will be performed immediately on
      * the AST <code>ast</code>, and the resulting AST returned.
      * 
-     * @param ast the AST the new Job is for.
+     * Spawn a new job. All passes between the pass <code>begin</code>
+     * and <code>end</code> inclusive will be performed immediately on
+     * the AST <code>ast</code>.
+     *
      * @param c the context that the AST occurs in
+     * @param ast the AST the new Job is for.
      * @param begin the first pass to perform for this job.
      * @param end the last pass to perform for this job.
+     * @return the new job.  The caller can check the result with
+     * <code>j.status()</code> and get the ast with <code>j.ast()</code>.
      */
-    public Node spawn(Context c, Node ast, Pass.ID begin, Pass.ID end) {
+    public Job spawn(Context c, Node ast, Pass.ID begin, Pass.ID end) {
         return lang.spawnJob(c, ast, this, begin, end);
     }
 }

@@ -595,19 +595,21 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
      * @param outerJob the <code>Job</code> that spawned this job.
      * @param begin the first pass to perform for this job.
      * @param end the last pass to perform for this job.
+     * @return the new job.  The caller can check the result with
+     * <code>j.status()</code> and get the ast with <code>j.ast()</code>.
      */
-    public Node spawnJob(Context c, Node ast, Job outerJob,
+    public Job spawnJob(Context c, Node ast, Job outerJob,
                            Pass.ID begin, Pass.ID end) {
         Job j = createJob(ast, c, outerJob, begin, end);
 
         if (Report.should_report(Report.frontend, 1))
             Report.report(1, this +" spawning " + j);
 
-        if (!runAllPasses(j)) {
-            return null;
-        }
+        // Run all the passes
+        runAllPasses(j);
 
-        return j.ast();
+        // Return the job.  The caller can check the result with j.status().
+        return j;
     }
 
     /** Get the parser for this language extension. */

@@ -164,14 +164,20 @@ public class ErrorHandlingVisitor extends HaltingVisitor
             return (ErrorHandlingVisitor) enterCall(parent, n);
         }
 	catch (SemanticException e) {
-	    Position position = e.position();
+            if (e.getMessage() != null) {
+                Position position = e.position();
 
-	    if (position == null) {
-		position = n.position();
-	    }
+                if (position == null) {
+                    position = n.position();
+                }
 
-	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-		                 e.getMessage(), position);
+                errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
+                                    e.getMessage(), position);
+            }
+            else {
+                // silent error; these should be thrown only
+                // when the error has already been reported 
+            }
 
             error = true;
 	    return enterError(n);
@@ -235,14 +241,20 @@ public class ErrorHandlingVisitor extends HaltingVisitor
             return leaveCall(old, n, v);
 	}
 	catch (SemanticException e) {
-	    Position position = e.position();
+            if (e.getMessage() != null) {
+                Position position = e.position();
 
-	    if (position == null) {
-		position = n.position();
-	    }
+                if (position == null) {
+                    position = n.position();
+                }
 
-	    errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
-		                 e.getMessage(), position);
+                errorQueue().enqueue(ErrorInfo.SEMANTIC_ERROR,
+                                    e.getMessage(), position);
+            }
+            else {
+                // silent error; these should be thrown only
+                // when the error has already been reported 
+            }
 
             // There was an error below us.
             if (! catchErrors(n)) {

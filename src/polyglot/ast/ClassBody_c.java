@@ -111,16 +111,19 @@ public class ClassBody_c extends Term_c implements ClassBody
                 ClassMember n = (ClassMember) i.next();
 
                 if (n instanceof ClassDecl) {
-                    ClassDecl m = (ClassDecl) j.spawn(ar.context(), n,
-                                                      Pass.CLEAN_SUPER,
-                                                      Pass.CLEAN_SUPER_ALL);
+                    Job sj = j.spawn(ar.context(), n,
+                                     Pass.CLEAN_SUPER, Pass.CLEAN_SUPER_ALL);
 
-                    if (m == null) {
+                    if (! sj.reportedErrors()) {
                         throw new SemanticException("Could not disambiguate " +
                                                     "class member.",
                                                     n.position());
                     }
+                    else if (! sj.status()) {
+                        throw new SemanticException();
+                    }
 
+                    ClassDecl m = (ClassDecl) sj.ast();
                     l.add(m.visit(ar.visitChildren()));
                 }
                 else {

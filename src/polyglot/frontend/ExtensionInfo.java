@@ -80,8 +80,16 @@ public interface ExtensionInfo {
      * Spawn a new job. All passes between the pass <code>begin</code>
      * and <code>end</code> inclusive will be performed immediately on
      * the AST <code>ast</code>.
+     *
+     * @param c the context that the AST occurs in
+     * @param ast the AST the new Job is for.
+     * @param outerJob the <code>Job</code> that spawned this job.
+     * @param begin the first pass to perform for this job.
+     * @param end the last pass to perform for this job.
+     * @return the new job.  The caller can check the result with
+     * <code>j.status()</code> and get the ast with <code>j.ast()</code>.
      */
-    Node spawnJob(Context c, Node ast, Job outerJob, Pass.ID begin, Pass.ID end);    
+    Job spawnJob(Context c, Node ast, Job outerJob, Pass.ID begin, Pass.ID end);    
 
     /** Run all jobs to completion. */
     boolean runToCompletion();

@@ -80,16 +80,19 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (ar.kind() == AmbiguityRemover.ALL) {
-            ClassDecl d = (ClassDecl) ar.job().spawn(ar.context(), decl,
-                                                     Pass.CLEAN_SUPER,
-                                                     Pass.ADD_MEMBERS_ALL);
+            Job sj = ar.job().spawn(ar.context(), decl,
+                                    Pass.CLEAN_SUPER, Pass.ADD_MEMBERS_ALL);
 
-            if (d == null) {
-                throw new SemanticException(
-                    "Could not disambiguate local class \"" + decl.name() + "\".",
-                    position());
+            if (! sj.reportedErrors()) {
+                throw new SemanticException("Could not disambiguate local " +
+                                            "class \"" + decl.name() + "\".",
+                                            position());
+            }
+            else if (! sj.status()) {
+                throw new SemanticException();
             }
 
+            ClassDecl d = (ClassDecl) sj.ast();
             LocalClassDecl n = decl(d);
             return n.visitChildren(ar);
         }

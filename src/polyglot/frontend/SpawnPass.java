@@ -24,7 +24,7 @@ public class SpawnPass extends AbstractPass {
             throw new InternalCompilerError("Null AST.");
         }
 
-	Node n = job.spawn(job.context(), job.ast(), begin, end);
-	return n != null;
+        Job j = job.spawn(job.context(), job.ast(), begin, end);
+        return j.status();
     }
 }

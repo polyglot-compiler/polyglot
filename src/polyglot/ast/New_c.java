@@ -4,6 +4,7 @@ import java.util.*;
 
 import polyglot.ast.*;
 import polyglot.frontend.Pass;
+import polyglot.frontend.Job;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -457,13 +458,18 @@ FIXME: check super types as well.
         }
 
         // Run the disambiguation passes on the node.
-        tn = (TypeNode) tc.job().spawn(tc.context(), tn,
-                                       Pass.CLEAN_SUPER, Pass.DISAM_ALL);
+        Job sj = tc.job().spawn(tc.context(), tn,
+                                Pass.CLEAN_SUPER, Pass.DISAM_ALL);
 
-        if (tn == null) {
+        if (! sj.reportedErrors()) {
             throw new SemanticException("Could not disambiguate type.",
                                         this.tn.position());
         }
+        else if (! sj.status()) {
+            throw new SemanticException();
+        }
+
+        tn = (TypeNode) sj.ast();
 
         // Now, type-check the type node.
         return (TypeNode) visitChild(tn, tc);
@@ -473,17 +479,21 @@ FIXME: check super types as well.
         throws SemanticException
     {
         Context bodyCtxt = tc.context().pushClass(anonType, anonType);
-        ClassBody b = (ClassBody) tc.job().spawn(bodyCtxt, body,
-                                                 Pass.CLEAN_SUPER,
-                                                 Pass.DISAM_ALL);
+        Job sj = tc.job().spawn(bodyCtxt, body,
+                                Pass.CLEAN_SUPER, Pass.DISAM_ALL);
 
-        if (b == null) {
+        if (! sj.reportedErrors()) {
             throw new SemanticException("Could not disambiguate body of " +
                                         "anonymous " +
                                         (superType.flags().isInterface() ?
                                          "implementor" : "subclass") +
                                         " of \"" + superType + "\".");
         }
+        else if (! sj.status()) {
+            throw new SemanticException();
+        }
+
+        ClassBody b = (ClassBody) sj.ast();
 
         // Now, type-check the body.
         TypeChecker bodyTC = (TypeChecker)tc.context(bodyCtxt);
