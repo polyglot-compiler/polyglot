@@ -199,10 +199,10 @@ do
     continue
   fi
 
-  pkg=`awk '/^PACKAGE\>/ {print $NF}' $dir/Makefile`
+  pkg=`awk '/^PACKAGE/ {print $NF}' $dir/Makefile`
 
-  if [ "$pkg" != "$dir" -a "$pkg" != "=" ]; then
-    d=${dir%%/$pkg}
+  if [ x"$pkg" != x"$dir" -a x"$pkg" != x"=" ]; then
+    d=`echo $dir | sed "s%/$pkg\$%%"`
     package_dirs="$package_dirs $d"
   fi
 
