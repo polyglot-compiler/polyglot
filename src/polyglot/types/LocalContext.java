@@ -15,28 +15,32 @@ public class LocalContext
    */
   TypeSystem ts;
   /**
-   * the context which we pass on to the typesystem. tells it who "we" are.
-   */
-  TypeSystem.Context context; 
-  /**
    * Contains the hashtable mapping for name => symbol. top of stack is context for current scope.
    */
-  Stack /* of Hashtable */ stkContexts; 
-
+  Stack /* of Hashtable */ stkBlocks; 
+  /**
+   * Contains the stack of inner class contexts.
+   */
+  Stack /* of TypeSystem.Context */ stkContexts;
+  /**
+   * the import table for the file
+   */
+  ImportTable itImports;
 
   /** 
    * Creates a LocalContext without a parent context (i.e, for a method level
    * block).  All unresolved queries are passed on to the TypeSystem.  To do this, 
    * we'll also need the import table and what our enclosing class is.
    */
-  public LocalContext ( ImportTable itImports, ClassType tThisClass, TypeSystem ts)
+  public LocalContext ( ImportTable itImports, TypeSystem ts)
   {  
+    this.itImports = itImports;
     this.ts = ts;
     
-    context = new TypeSystem.Context ( itImports, tThisClass, null);
-    
+    stkBlocks = new Stack();
+    stkBlocks.push( new Hashtable () );
+
     stkContexts = new Stack();
-    stkContexts.push( new Hashtable () );
   }
   
   /**
@@ -45,7 +49,7 @@ public class LocalContext
    */
   public boolean isDefinedLocally(String s)
   {
-    for (ListIterator i = stkContexts.listIterator(stkContexts.size()) ; i.hasPrevious() ; )
+    for (ListIterator i = stkBlocks.listIterator(stkBlocks.size()) ; i.hasPrevious() ; )
     {
       if ( ((Hashtable) i.previous()).contains( s ) )
         return true;
@@ -59,7 +63,7 @@ public class LocalContext
    */
   public MethodTypeInstance getMethod( ClassType type, String methodName, List argumentTypes) throws TypeCheckException
   {
-    return ts.getMethod( type, new MethodType( ts, methodName, argumentTypes), context);
+    return ts.getMethod( type, new MethodType( ts, methodName, argumentTypes), (TypeSystem.Context)stkContexts.peek());
   }
 
   /**
@@ -70,7 +74,7 @@ public class LocalContext
     Object result;
     if ( type == null ) // could be a local, so check there first.
     {
-      for (ListIterator i = stkContexts.listIterator(stkContexts.size()) ; i.hasPrevious() ; )
+      for (ListIterator i = stkBlocks.listIterator(stkBlocks.size()) ; i.hasPrevious() ; )
       {
         if ( (result = ((Hashtable) i.previous()).get( fieldName )) != null )
         {
@@ -79,7 +83,7 @@ public class LocalContext
       }      
     }
     // not a local variable, so pass on to the type system.
-    return ts.getField(type, fieldName, context);
+    return ts.getField(type, fieldName, (TypeSystem.Context)stkContexts.peek());
   }
 
   /**
@@ -88,7 +92,7 @@ public class LocalContext
    **/
   public Type getType( Type type ) throws TypeCheckException
   {
-    return ts.checkAndResolveType(type, context);
+    return ts.checkAndResolveType(type, (TypeSystem.Context)stkContexts.peek());
   }
 
   /**
@@ -96,7 +100,7 @@ public class LocalContext
    */
   public Type getType( String s) throws Exception
   {
-    return ts.checkAndResolveType( new AmbiguousType( ts, s), context);
+    return ts.checkAndResolveType( new AmbiguousType( ts, s), (TypeSystem.Context)stkContexts.peek());
   }
   
   /**
@@ -108,17 +112,17 @@ public class LocalContext
   }
 
   /**
-   * Returns a new LocalContext with an additional scoping level.
+   * Pushes on a class  scoping
    */
-  public void pushScope()
+  public void pushClass( ClassType c)
   {
-    stkContexts.push(new Hashtable());
+    stkContexts.push ( new TypeSystem.Context ( itImports, c, null) );
   }
 
   /**
-   * Removes a scoping level by returning our parent context
+   * Pops the most recently pushed class scoping
    */
-  public void popScope()
+  public void popClass()
   {
     if ( stkContexts.size() > 1)
     {
@@ -127,7 +131,31 @@ public class LocalContext
     }
     else
     {
-      throw new InternalCompilerError("No more scopes to pop!");
+      throw new InternalCompilerError("No more class-scopes to pop!");
+    }
+  }
+
+  /**
+   * pushes an additional block-scoping level.
+   */
+  public void pushBlock()
+  {
+    stkBlocks.push(new Hashtable());
+  }
+
+  /**
+   * Removes a scoping level 
+   */
+  public void popBlock()
+  {
+    if ( stkBlocks.size() > 1)
+    {
+      try { stkBlocks.pop(); }
+      catch (EmptyStackException ese ) { }
+    }
+    else
+    {
+      throw new InternalCompilerError("No more block-scopes to pop!");
     }
   }
 
@@ -136,7 +164,7 @@ public class LocalContext
    */
   public void addSymbol( String sName, Type t)
   {
-    ((Hashtable)stkContexts.peek()).put(sName, t);
+    ((Hashtable)stkBlocks.peek()).put(sName, t);
   }
- 
+
 }
