@@ -42,8 +42,7 @@ public class ReturnStatement extends Statement {
    *   another expression.
    */
   public void visitChildren(NodeVisitor v) {
-    expr = expr.accept(v);
+    expr = (Expression) expr.accept(v);
   }
 
-  private Expression expr;
-}
+  private Express

@@ -4,7 +4,7 @@
 
 package jltools.ast;
 
-impot jltools.types.Type;
+import jltools.types.Type;
 
 /**
  * InstanceofExpression
@@ -19,7 +19,7 @@ public class InstanceofExpression extends Expression {
    * Effects: Creates a new InstanceofExpreession which is testing if
    *    <expr> is an instance of <type>.
    */
-  public InstanceOfExpression (Expression expr, Type type) {
+  public InstanceofExpression (Expression expr, Type type) {
     this.expr = expr;
     this.type = type;
   }

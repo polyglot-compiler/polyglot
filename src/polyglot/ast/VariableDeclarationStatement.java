@@ -5,9 +5,11 @@
 package jltools.ast;
 
 import jltools.util.TypedListIterator;
+import jltools.types.Type;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.ArrayList;
+
 
 /** 
  * VariableDeclarationStatement
@@ -20,7 +22,7 @@ public class VariableDeclarationStatement extends Statement {
   private static final class VariableDeclarationPair {
     String name;
     Expression initializer; // will be null for unitilized variable
-    public VariableDeclarationPari(String n, Expression i) {
+    public VariableDeclarationPair(String n, Expression i) {
       name = n;
       initializer = i;
     }
@@ -79,7 +81,7 @@ public class VariableDeclarationStatement extends Statement {
     ListIterator it = variables.listIterator();
     while (it.hasNext()) {
       VariableDeclarationPair pair = (VariableDeclarationPair)it.next();
-      pair.initilizer = (Expression) pair.initilizer.accept(v);
+      pair.initializer = (Expression) pair.initializer.accept(v);
     }
   }
 
