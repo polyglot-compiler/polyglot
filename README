@@ -40,6 +40,17 @@ your path.  Polyglot is compiled with the Ant build tool
 (http://jakarta.apache.org/ant).  GNU make is used for compiling
 and running test cases.  We are phasing out the use of make in favor of Ant.
 
+To build and use Polyglot, you will also need the JFlex scanner generator,
+downloadable from:
+
+        http://www.jflex.de
+
+LEGAL NOTE: Polyglot is distributed under LGPL, but JFlex is distributed under
+GPL.  This means that we cannot include JFlex in the Polyglot distribution.
+The output of JFlex inherits the license of the specification (i.e., LGPL in
+Polyglot's case).  You may be able to substitute JLex
+(http://www.cs.princeton.edu/~appel/modern/java/JLex/), but this is untested.
+
 Creating an extension
 ---------------------
 
