@@ -34,6 +34,7 @@ public class LocalVariableExpression extends Expression
     else {
       LocalVariableExpression n = new LocalVariableExpression( ext, name);
       n.copyAnnotationsFrom( this);
+      n.li = li;
       return n;
     }
   }
