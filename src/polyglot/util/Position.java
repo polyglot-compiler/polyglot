@@ -40,14 +40,11 @@ public class Position {
 	String s = file;
 
 	if (line != UNKNOWN) {
-	    s += ": line " + line;
+	    s += ":" + line;
 
 	    if (column != UNKNOWN) {
-		s += ", column " + column;
+		s += "," + column;
 	    }
-	}
-	else if (column != UNKNOWN) {
-	    s += ": column " + column;
 	}
 
 	return s;
