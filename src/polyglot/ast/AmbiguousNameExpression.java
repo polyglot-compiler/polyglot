@@ -27,8 +27,8 @@ import java.util.*;
  **/
 public class AmbiguousNameExpression extends AmbiguousExpression {
 
-  Node prefix;
-  String name;
+  protected Node prefix;
+  protected String name;
 
   /**
    * Creates a new AmbiguousNameExpression for the identifier in
