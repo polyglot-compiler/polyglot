@@ -190,10 +190,22 @@ ext=""
     description="compile an extension">
     <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/ext/${ext}/**"
-      excludes="**/test/**,**/tests/**,**/runtime/**">
+      excludes="**/qq/**,**/test/**,**/tests/**,**/runtime/**">
       <classpath refid="standard.classpath"/>
       <!-- HACK: the excludes above wouldn't be necessary if we
            reorganized the source tree -->
+    </javac>
+  </target>
+
+  <target name="compile-ext-qq-dep" if="has-qq">
+    <antcall target="compile-ext-qq"/>
+  </target>
+
+  <target name="compile-ext-qq"
+    description="compile an extension's quasiquoter">
+    <javac srcdir="${src}" destdir="${classes}" debug="on"
+      includes="polyglot/ext/${ext}/qq/**">
+      <classpath refid="standard.classpath"/>
     </javac>
   </target>
 
@@ -357,6 +369,9 @@ ext=""
     <antcall target="compile-ext">
       <param name="ext" value="jl"/>
     </antcall>
+    <antcall target="compile-ext-qq">
+      <param name="ext" value="jl"/>
+    </antcall>
   </target>
 
   <!-- Build the quasi-quote parser and lexer for an extension, assuming the
@@ -435,6 +450,7 @@ ext=""
     <antcall target="standard-ext-${parser.type}-parser"/>
     <antcall target="standard-ext-qq-dep"/>
     <antcall target="compile-ext"/>
+    <antcall target="compile-ext-qq-dep"/>
   </target>
   
   <!-- SKEL: When using the newext script, copy and modify this target by
@@ -462,7 +478,7 @@ ext=""
     <antcall target="standard-ext">
       <param name="ext" value="polyj"/>
       <param name="parser.type" value="ppg"/>
-      <param name="has-qq" value=""/>
+      <!-- <param name="has-qq" value=""/> -->
     </antcall>
   </target>
 

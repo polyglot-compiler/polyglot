@@ -26,7 +26,7 @@ This build file is meant to be used only from the main buildfile build.xml.
       <filelist dir="${bin}" files="defs"/>
     </concat>
     <concat destfile="${bin}/polyjc" append="yes">
-ext="-ext polyj"
+ext="polyj"
     </concat>
     <concat destfile="${bin}/polyjc" append="yes">
       <filelist dir="${bin}" files="jlc.in"/>
