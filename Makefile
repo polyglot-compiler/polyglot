@@ -105,8 +105,10 @@ release_clean: FORCE
 	rm -rf $(RELPATH)/*
 
 release_doc: FORCE
-	cp LICENSE $(RELPATH)
+	cp LICENSE README README-JIF.txt $(RELPATH)
 	mkdir -p $(REL_DOC)
+	mkdir -p $(REL_SRC)
+	cp -f BUILD.txt $(REL_SRC)/README
 	$(MAKE) -C doc release
 
 release_demo: FORCE
