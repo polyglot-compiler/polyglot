@@ -3,6 +3,7 @@ package polyglot.ext.jl.ast;
 import java.util.Collections;
 import java.util.List;
 
+import polyglot.ast.AmbReceiver;
 import polyglot.ast.Expr;
 import polyglot.ast.Field;
 import polyglot.ast.Node;
@@ -194,7 +195,7 @@ public class Field_c extends Expr_c implements Field
         if (target instanceof Expr) {
           printSubExpr((Expr) target, w, tr);
         }
-        else if (target instanceof TypeNode) {
+        else if (target instanceof TypeNode || target instanceof AmbReceiver) {
           print(target, w, tr);
         }
     
