@@ -4,6 +4,8 @@
 
 package jltools.util;
 
+import java.util.Iterator;
+
 /**
  * ConcatenatedIterator
  *
@@ -58,7 +60,7 @@ public final class ConcatenatedIterator implements Iterator {
 	index++;
       }
     }
-    next_iterm = null;
+    next_item = null;
   }
   
   // AF:  if next_item==null, this iterator has no more elts to yield.
