@@ -11,6 +11,9 @@
   <!-- directory for class file targets -->
   <property name="classes" location="${basedir}/classes"/>
 
+  <!-- directory for jar files -->
+  <property name="lib" location="${basedir}/lib"/>
+
   <!-- distribution directory -->
   <property name="dist"  location="${basedir}/dist"/>
 
@@ -19,8 +22,8 @@
 
   <path id="standard.classpath">
     <pathelement location="${classes}"/>
-    <pathelement location="lib/java_cup.jar"/>
-    <pathelement location="lib/jlex.jar"/>
+    <pathelement location="${lib}/java_cup.jar"/>
+    <pathelement location="${lib}/jlex.jar"/>
   </path>
 
   <!-- initialize the build -->
@@ -86,7 +89,7 @@
       includes="java_cup/**">
       <classpath refid="standard.classpath"/>
     </javac>
-    <jar jarfile="${basedir}/lib/java_cup.jar" basedir="${cup-classes}"/>
+    <jar jarfile="${lib}/java_cup.jar" basedir="${cup-classes}"/>
   </target>
 
   <!-- compile a single extension, named ${ext} -->

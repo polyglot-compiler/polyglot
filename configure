@@ -2,7 +2,7 @@
 
 # List of extensions to build.
 ext=$*
-allext=`/bin/ls -1d polyglot/ext/*/ExtensionInfo.java | cut -d/ -f3`
+allext=`/bin/ls -1d src/polyglot/ext/*/ExtensionInfo.java | cut -d/ -f4`
 allext=`echo $allext`
 
 if [ "$ext" = "" ]
@@ -12,7 +12,7 @@ fi
 
 for e in $ext
 do
-  if [ ! -f polyglot/ext/$e/ExtensionInfo.java ]
+  if [ ! -f src/polyglot/ext/$e/ExtensionInfo.java ]
   then
     echo "** Error: $e is not a polyglot extension"
     echo "usage: `basename $0` <extensions>"
@@ -27,7 +27,7 @@ old=""
 while [ "$ext" != "$old" ]
 do
     old=`echo $ext`
-    ext=`for e in $ext; do grep "^$e:" polyglot/ext/Makefile | sed -e 's/://g'; done`
+    ext=`for e in $ext; do grep "^$e:" src/polyglot/ext/Makefile | sed -e 's/://g'; done`
     ext=`for e in $ext; do echo $e | grep -v '^jl$' | grep -v '^FORCE$'; done | sort -u`
     ext=`echo $ext`
 done
@@ -78,11 +78,11 @@ exists -x "${JAR}" jar
 
 exists -x "${RMIC}" rmic
 
-if [ ! -d src ] 
+if [ ! -d lib ] 
 then
 	exists -f ./java_cup.jar java_cup.jar
 else
-	exists -f ./src/java_cup.jar java_cup.jar
+	exists -f ./lib/java_cup.jar java_cup.jar
 fi
 
 echo determining some Java properties:
@@ -275,13 +275,13 @@ exists -f ${DEFS_MK} Defs.mk
 
 # Create the bin directory and scripts
 
-if [ -d src ] 
-then 
-    mkdir src/bin || echo ok
-    LOOP="install build"
-else
+#if [ -d src ] 
+#then 
+#    mkdir src/bin || echo ok
+#    LOOP="install build"
+#else
     LOOP="build"
-fi
+#fi
 
 for i in $LOOP
 do
@@ -289,8 +289,12 @@ do
 if [ $i = build ] 
 then 
     JLC_CP="-classpath \${TOP}${FILE_SEP}classes${PATH_SEP}\${TOP}${FILE_SEP}java_cup.jar\${PATH_SEP}."
-    if [ -d src ]; then BIN="src/bin"; else BIN="bin"; fi
-    if [ -d src ]; then TOP="${CWD}${FILE_SEP}src"; else TOP="$CWD" ; fi
+#    if [ -d src ]; then BIN="src/bin"; else 
+BIN="bin"
+#; fi
+#    if [ -d src ]; then TOP="${CWD}${FILE_SEP}src"; else 
+TOP="$CWD" 
+#; fi
 else
     JLC_CP="-classpath \${TOP}${FILE_SEP}lib${FILE_SEP}polyglot.jar${PATH_SEP}\${TOP}${FILE_SEP}lib${FILE_SEP}jif.jar${PATH_SEP}\${TOP}${FILE_SEP}lib${FILE_SEP}java_cup.jar"
     BIN="bin"
