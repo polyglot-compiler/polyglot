@@ -6,6 +6,7 @@ package polyglot.pth;
 
 import java.io.PrintStream;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -14,77 +15,79 @@ import java.util.regex.Pattern;
 /**
  * 
  */
-public class OutputController {
+public abstract class OutputController {
     protected final PrintStream out;
-    protected final int verbosity;
-    
-    public OutputController(PrintStream out, int verbosity) {
+    protected final Calendar today;    
+    protected final Calendar week;
+    public OutputController(PrintStream out) {
         this.out = out;
-        this.verbosity = verbosity;
+        today = Calendar.getInstance();
+        week = Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
+         
+        today.clear();
+        today.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DATE));
+        week.setTimeInMillis(today.getTimeInMillis());
+        week.add(Calendar.DATE, -6);
     }
      
     public void startTest(Test t) {
         if (t instanceof ScriptTestSuite) {
-            ScriptTestSuite sts = (ScriptTestSuite)t;
-            out.println("Test script " + sts.getName());
+            startScriptTestSuite((ScriptTestSuite)t);
         }
         else if (t instanceof SourceFileTest) {
-            SourceFileTest sft = (SourceFileTest)t;
-            out.print("  " + sft.getName() + ": ");
+            startSourceFileTest((SourceFileTest)t);
         }
     }
-    
     public void finishTest(Test t) {
         if (t instanceof ScriptTestSuite) {
-            ScriptTestSuite sts = (ScriptTestSuite)t;
-            out.println(sts.getName() + ": " + 
-                sts.getSuccesfulTestCount() + " out of " + sts.getTotalTestCount() + 
-                " tests suceeded.");
+            finishScriptTestSuite((ScriptTestSuite)t);
         }
         else if (t instanceof SourceFileTest) {
-            SourceFileTest sft = (SourceFileTest)t;
-            if (sft.success()) {
-                out.println("OK");
-            }
-            else {
-                out.println("Failed with message \"" + sft.getFailureMessage() + "\"");
-            }
+            finishSourceFileTest((SourceFileTest)t);
         }
     }
     
-    public void displayTestSuiteResults(TestSuiteResult tsr) {
-        if (tsr == null || tsr.testResults.isEmpty()) {
-            out.println("No test results for " + tsr.testName);
-            return;
-        }
+    protected abstract void startScriptTestSuite(ScriptTestSuite sts);
+    protected abstract void startSourceFileTest(SourceFileTest sft);
+    protected abstract void finishScriptTestSuite(ScriptTestSuite sts);
+    protected abstract void finishSourceFileTest(SourceFileTest sft);
+    
+    public abstract void displayTestSuiteResults(String suiteName, TestSuiteResult tsr);
+    public abstract void displayTestResults(TestResult tr);
         
-        out.println("Test script \"" + tsr.testName + "\"");
-        out.println("    Last run: " + getDateDisplay(tsr.dateTestRun));
-        out.println("  Tests:  (name, lastRun, lastSucceeded)");
-        for (Iterator iter = tsr.testResults.keySet().iterator(); iter.hasNext(); ) {
-            String testName = (String)iter.next();
-            if (Main.options.testFilter == null || Pattern.matches(Main.options.testFilter, testName)) {
-                TestResult tr = (TestResult)tsr.testResults.get(testName);
-                out.print("    " + testName);
-                out.println(", " + getDateDisplay(tr.dateTestRun) + ", " + getDateDisplay(tr.dateLastSuccess));
-            }
-        }
+    protected DateFormat getDefaultDateFormat() {
+        return new SimpleDateFormat("d-MMM-YY");
     }
-
-    public void displayTestResults(TestResult tr) {
+    protected DateFormat getSameYearDateFormat() {
+        return new SimpleDateFormat("d-MMM");
     }
-
+    protected DateFormat getSameWeekDateFormat() {
+        return new SimpleDateFormat("EEE k:mm");
+    }
+    protected DateFormat getTodayDateFormat() {
+        return new SimpleDateFormat("k:mm");
+    }
     public String getDateDisplay(Date d) {
         if (d == null) return "never";        
-        DateFormat df;
-        Date now = new Date();
-        if (now.getYear() == d.getYear() && now.getMonth() == d.getMonth() 
-            && now.getDate() == d.getDate()) {
-          df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+
+        DateFormat df;                
+        Calendar dt = Calendar.getInstance();
+        dt.setTime(d);
+        
+        if (dt.after(today)) {
+            df = getTodayDateFormat();
+        }
+        else if (dt.after(week)) {
+            df = getSameWeekDateFormat();
+        }
+        else if (dt.get(Calendar.YEAR) == today.get(Calendar.YEAR)) {
+            df = getSameYearDateFormat();
         }
         else {
-            df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-        }
+            df = getDefaultDateFormat();
+        }            
+
         return df.format(d);
     }    
 }

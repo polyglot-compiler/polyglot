@@ -1,7 +1,3 @@
-/*
- * Author : Stephen Chong
- * Created: Jan 9, 2004
- */
 package polyglot.pth;
 
 import java.io.PrintStream;
@@ -39,7 +35,7 @@ public class Main {
             ScriptTestSuite t = new ScriptTestSuite(filename);
             t.setOutputController(outCtrl);
             if (options.showResultsOnly) {
-                outCtrl.displayTestSuiteResults(t.getTestSuiteResult());
+                outCtrl.displayTestSuiteResults(t.getName(), t.getTestSuiteResult());
             }
             else {          
                 t.run();
@@ -48,7 +44,15 @@ public class Main {
     }
     
     protected OutputController createOutputController(Options options) {
-        return new OutputController(System.out, options.verbosity);
+        switch (options.verbosity) {
+            // More output controllers should be written, for varying degrees
+            // of detail.
+            case 0:
+                return new SilentOutputController(System.out);
+
+            default:
+                return new StdOutputController(System.out);                
+        }
     }    
     
 }

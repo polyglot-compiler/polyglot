@@ -35,7 +35,7 @@ public class ScriptTestSuite extends TestSuite {
             if (!parseScript()) {
                 return false;
             }
-            
+
             this.setOutputController(output);
             return super.runTest();            
         }
@@ -61,7 +61,7 @@ public class ScriptTestSuite extends TestSuite {
         try {        
             ObjectInputStream ois = 
                  new ObjectInputStream(
-                          new FileInputStream(this.scriptFile.getAbsolutePath() + ".pth"));
+                          new FileInputStream(this.scriptFile.getAbsolutePath() + TestSuiteResult.RESULT_FILE_SUFFIX));
             TestResult tr = (TestResult)ois.readObject();
             this.setTestResult(tr);
         }
@@ -79,7 +79,7 @@ public class ScriptTestSuite extends TestSuite {
         try {        
             ObjectOutputStream oos = 
                  new ObjectOutputStream(
-                          new FileOutputStream(this.scriptFile.getAbsolutePath() + ".pth"));
+                          new FileOutputStream(this.scriptFile.getAbsolutePath() + TestSuiteResult.RESULT_FILE_SUFFIX));
             oos.writeObject(this.getTestSuiteResult());            
         }
         catch (IOException e) {

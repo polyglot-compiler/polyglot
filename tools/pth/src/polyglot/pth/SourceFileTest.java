@@ -7,7 +7,6 @@ package polyglot.pth;
 import java.io.File;
 import java.util.*;
 
-import polyglot.main.Main;
 import polyglot.util.ErrorInfo;
 import polyglot.util.SilentErrorQueue;
 
@@ -20,7 +19,7 @@ public class SourceFileTest extends AbstractTest {
     protected String[] extraArgs;
     protected final SilentErrorQueue eq;
     
-    protected Set expectedFailures;
+    protected List expectedFailures;
         
     public SourceFileTest(String filename) {
         super(new File(filename).getName());
@@ -39,7 +38,7 @@ public class SourceFileTest extends AbstractTest {
         this(Arrays.asList(filenames).toString());
     }
     
-    public void setExpectedFailures(Set expectedFailures) {
+    public void setExpectedFailures(List expectedFailures) {
         this.expectedFailures = expectedFailures;
     }
 
@@ -75,8 +74,14 @@ public class SourceFileTest extends AbstractTest {
     protected boolean checkErrorQueue(SilentErrorQueue eq) {
         List errors = new ArrayList(eq.getErrors());
         
+        boolean swallowRemainingFailures = false;
         for (Iterator i = expectedFailures.iterator(); i.hasNext(); ) {
             ExpectedFailure f = (ExpectedFailure)i.next();
+            if (f instanceof AnyExpectedFailure) {
+                swallowRemainingFailures = true;
+                continue;
+            }
+            
             boolean found = false;
             for (Iterator j = errors.iterator(); j.hasNext(); ) {
                 ErrorInfo e =(ErrorInfo)j.next();
@@ -94,19 +99,21 @@ public class SourceFileTest extends AbstractTest {
         }
         
         // are there any unaccounted for errors?
-        if (!errors.isEmpty()) {
+        if (!errors.isEmpty() && !swallowRemainingFailures) {
             StringBuffer sb = new StringBuffer();
             for (Iterator iter = errors.iterator(); iter.hasNext(); ) {
                 ErrorInfo err = (ErrorInfo)iter.next();                        
                 sb.append(err.getMessage());
-                sb.append(" (");
-                sb.append(err.getPosition());
-                sb.append(")");
+                if (err.getPosition() != null) {
+                    sb.append(" (");
+                    sb.append(err.getPosition());
+                    sb.append(")");
+                }
                 if (iter.hasNext()) sb.append("; ");
             }
             setFailureMessage(sb.toString());
         }            
-        return errors.isEmpty();
+        return errors.isEmpty() || swallowRemainingFailures;
     }
     
     protected String[] getSourceFileNames() {
@@ -117,7 +124,7 @@ public class SourceFileTest extends AbstractTest {
         throws polyglot.main.Main.TerminationException 
     {
         String[] cmdLine = buildCmdLine(files);
-        Main polyglotMain = new polyglot.main.Main();
+        polyglot.main.Main polyglotMain = new polyglot.main.Main();
         polyglotMain.start(cmdLine, eq);
     }
 
@@ -170,16 +177,18 @@ public class SourceFileTest extends AbstractTest {
         return this.extraArgs;
     }
     protected void setExtraCmdLineArgs(String args) {
-        StringTokenizer st = new StringTokenizer(args);
-        ArrayList l = new ArrayList(st.countTokens());
-        while (st.hasMoreTokens()) {
-            l.add(st.nextToken());
-        }
-        
-        this.extraArgs = (String[])l.toArray(new String[0]); 
+        if (args != null) {
+            StringTokenizer st = new StringTokenizer(args);
+            ArrayList l = new ArrayList(st.countTokens());
+            while (st.hasMoreTokens()) {
+                l.add(st.nextToken());
+            }
+            
+            this.extraArgs = (String[])l.toArray(new String[0]);
+        } 
     }
     protected String getAdditionalClasspath() {
-        return null;
+        return Main.options.classpath;
     }
     protected String getDestDir() {
         return null;

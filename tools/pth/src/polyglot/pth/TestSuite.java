@@ -49,7 +49,6 @@ public class TestSuite extends AbstractTest {
             this.setTestResult(this.createTestResult(null));
         }        
         
-        StringBuffer sb = new StringBuffer();
         for (Iterator i = tests.iterator(); i.hasNext(); ) {
             Test t = (Test)i.next();
             
@@ -67,14 +66,11 @@ public class TestSuite extends AbstractTest {
                 if (!result && haltOnFirstFailure) {
                     break;
                 }
-                else {
+                else if (result) {
                     successfulTests++;
                 }
             }
-        }
-        
-        this.setFailureMessage(sb.toString());        
-
+        }        
         return okay;
     }
     
@@ -89,12 +85,16 @@ public class TestSuite extends AbstractTest {
     }
 
     protected boolean executeTest(Test t) {
+        return executeTest(t.getName(), 
+                          (TestResult)getTestSuiteResult().testResults.get(t.getName()));
+    }
+    
+    protected static boolean executeTest(String testName, TestResult tr) {
         if (Main.options.testFilter != null &&
-            !Pattern.matches(Main.options.testFilter, t.getName())) {
+            !Pattern.matches(Main.options.testFilter, testName)) {
             return false;
         }
         
-        TestResult tr = (TestResult)getTestSuiteResult().testResults.get(t.getName());
         if (Main.options.testPreviouslyFailedOnly &&
             tr != null && tr.dateLastSuccess != null &&
             tr.dateLastSuccess.equals(tr.dateTestRun)) {
@@ -102,6 +102,7 @@ public class TestSuite extends AbstractTest {
         }
         return true;
     }
+
     protected TestSuiteResult getTestSuiteResult() {
         return (TestSuiteResult)this.getTestResult();
     }

@@ -14,7 +14,7 @@ public abstract class AbstractTest implements Test {
     protected String description;
     protected boolean success = false;
     protected boolean hasRun = false;
-    protected String failureMessage = "FAILED";
+    protected String failureMessage = null;
     protected TestResult testResult;
     
     protected OutputController output;

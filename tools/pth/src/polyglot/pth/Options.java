@@ -17,6 +17,9 @@ public class Options {
     // verbosity level, from 0 to 9.
     protected int verbosity = 5;
     
+    // classpath for the compiler.
+    protected String classpath = null;
+    
     // filter for tests
     protected String testFilter = null;
     
@@ -58,6 +61,13 @@ public class Options {
                        throw new IllegalArgumentException("Verbosity must be " +
                              "between 0 and 9 inclusive.");
                    }
+                   return index + 1;
+               }
+         },
+        new CommandLineOption(new String[] {"cp", "classpath"}, "path", 
+                           "set the class path for the Polyglot compiler.") { 
+               protected int invoke(int index, String[] args) {
+                   classpath = getStringArg(++index, args);
                    return index + 1;
                }
          },
@@ -156,6 +166,9 @@ public class Options {
 
     protected void parseCommandLine(String[] args) {
         int ind = 0;
+        if (args == null || args.length == 0) {
+            args = new String[] {"-h"};
+        }
         while (ind < args.length) {
             int newInd = ind;
             for (int i = 0; i < commandLineOpts.length && newInd == ind; i++) {

@@ -11,6 +11,7 @@ import java.util.Map;
  * 
  */
 public final class TestSuiteResult extends TestResult {
+    public static final String RESULT_FILE_SUFFIX = ".pthres";
     public final Map testResults;
     public TestSuiteResult(Test t, Date dateTestRun, Map testResults, Date dateLastSuccess) {
         super(t, dateTestRun, dateLastSuccess);

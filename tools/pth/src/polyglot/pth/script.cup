@@ -58,8 +58,8 @@ non terminal List filetest_list;           // List of SourceFileTest
 non terminal SourceFileTest filetest;
 non terminal List filename_list;           // List of String
 non terminal String description_opt;
-non terminal Set failure_set_opt;         // Set of ExpectedFailure
-non terminal Set failure_set;             // Set of ExpectedFailure
+non terminal List failure_set_opt;         // List of ExpectedFailure
+non terminal List failure_set;             // List of ExpectedFailure
 non terminal String sentence;        
 non terminal ExpectedFailure failure;
 
@@ -150,8 +150,8 @@ sentence ::=
     ;
 
 failure_set_opt ::=
-            {: Set set = new HashSet();
-               RESULT = set;
+            {: List l = new ArrayList();
+               RESULT = l;
             :}
     | failure_set:a
             {: RESULT = a; :}
@@ -159,9 +159,9 @@ failure_set_opt ::=
     
 failure_set ::=
         failure:a
-            {: Set set = new HashSet();
-               set.add(a);
-               RESULT = set;
+            {: List l = new ArrayList();
+               l.add(a);
+               RESULT = l;
             :}
     |   failure_set:a  COMMA failure:b
             {: a.add(b); RESULT = a; :}
@@ -171,6 +171,10 @@ failure ::=
          LPAREN IDENT:a RPAREN 
             {: 
               RESULT = new ExpectedFailure(Grm.findErrorKind(a));
+             :}
+    |    LPAREN RPAREN 
+            {: 
+              RESULT = new AnyExpectedFailure();
              :}
     |    LPAREN IDENT:a COMMA STRING_LITERAL:b RPAREN 
             {: 
