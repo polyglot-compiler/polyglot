@@ -133,8 +133,8 @@ public class Initializer_c extends Term_c implements Initializer
 
 	    if (! t.isUncheckedException()) {
 		throw new SemanticException(
-		    "An initializer block may not throw" +
-		    " a " + t + ".", position());
+		    "An initializer block may not throw a " + t + ".",
+                    position());
 	    }
 	}
 
