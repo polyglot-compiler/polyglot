@@ -319,20 +319,30 @@ public class Context_c implements Context
     }
 
     /**
-     * Pushes on a class scoping
+     * Pushes on a class scoping.
+     * @param classScope The class whose scope is being entered.  This is
+     * the object associated with the class declaration and is returned by
+     * currentClassScope.  This is a mutable class type since for some
+     * passes (e.g., addMembers), the object returned by currentClassScope
+     * is modified.
+     * @param type The type to be returned by currentClass().  For JL, this
+     * type is the same as classScope.  For other languages, it may differ
+     * since currentClassScope might not represent a type.
+     * @return A new context with a new scope and which maps the short name
+     * of type to type.
      */
-    public Context pushClass(ParsedClassType c, ClassType t) {
+    public Context pushClass(ParsedClassType classScope, ClassType type) {
         if (Report.should_report(TOPICS, 4))
-          Report.report(4, "push class " + c + " " + c.position());
+          Report.report(4, "push class " + classScope + " " + classScope.position());
         Context_c v = push();
         v.kind = CLASS;
-        v.scope = c;
-        v.type = t;
+        v.scope = classScope;
+        v.type = type;
         v.inCode = false;
         v.staticContext = false;
 
-        if (! t.isAnonymous()) {
-            v.addNamed(t);
+        if (! type.isAnonymous()) {
+            v.addNamed(type);
         }
 
         return v;
