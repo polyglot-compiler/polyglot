@@ -15,7 +15,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
     protected QualifierNode qual;
     protected String name;
 
-    public AmbQualifierNode_c(Ext ext, Position pos, QualifierNode qual, String name) {
+    public AmbQualifierNode_c(Del ext, Position pos, QualifierNode qual, String name) {
 	super(ext, pos);
 
 	this.qual = qual;
@@ -67,11 +67,11 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 	return reconstruct(qual);
     }
 
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
         return qualifier(tb.typeSystem().unknownQualifier(position()));
     }
 
-    public Node disambiguate_(AmbiguityRemover sc) throws SemanticException {
+    public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
 	Node n = sc.nodeFactory().disamb().disambiguate(sc, position(), qual, name);
 
 	if (n instanceof QualifierNode) {
@@ -82,17 +82,17 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 	    "\".", position());
     }
 
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	throw new InternalCompilerError(position(),
 	    "Cannot type check ambiguous node " + this + ".");
     } 
 
-    public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
 	throw new InternalCompilerError(position(),
 	    "Cannot exception check ambiguous node " + this + ".");
     } 
 
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	throw new InternalCompilerError(position(),
 	    "Cannot translate ambiguous node " + this + ".");
     }

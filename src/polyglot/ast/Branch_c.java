@@ -14,7 +14,7 @@ public class Branch_c extends Stmt_c implements Branch
     protected Branch.Kind kind;
     protected String label;
 
-    public Branch_c(Ext ext, Position pos, Branch.Kind kind, String label) {
+    public Branch_c(Del ext, Position pos, Branch.Kind kind, String label) {
 	super(ext, pos);
 	this.kind = kind;
 	this.label = label;
@@ -49,7 +49,7 @@ public class Branch_c extends Stmt_c implements Branch
     }
 
     /** Write the expression to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	w.write(kind.toString());
 	if (label != null) {
 	    w.write(" " + label);

@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class Block_c extends AbstractBlock_c implements Block
 {
-    public Block_c(Ext ext, Position pos, List statements) {
+    public Block_c(Del ext, Position pos, List statements) {
 	super(ext, pos, statements);
     }
 
@@ -21,11 +21,11 @@ public class Block_c extends AbstractBlock_c implements Block
     }
 
     /** Write the block to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	w.write("{");
 	w.allowBreak(4," ");
 
-	super.translate_(w, tr);
+	super.translate(w, tr);
 
 	w.allowBreak(0, " ");
 	w.write("}");

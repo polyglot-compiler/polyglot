@@ -16,7 +16,7 @@ public class Cast_c extends Expr_c implements Cast
     protected TypeNode castType;
     protected Expr expr;
 
-    public Cast_c(Ext ext, Position pos, TypeNode castType, Expr expr) {
+    public Cast_c(Del ext, Position pos, TypeNode castType, Expr expr) {
 	super(ext, pos);
 	this.castType = castType;
 	this.expr = expr;
@@ -71,7 +71,7 @@ public class Cast_c extends Expr_c implements Cast
     }
 
     /** Type check the expression. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException
+    public Node typeCheck(TypeChecker tc) throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
 
@@ -85,7 +85,7 @@ public class Cast_c extends Expr_c implements Cast
 	return type(castType.type());
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -106,7 +106,7 @@ public class Cast_c extends Expr_c implements Cast
     }
   
     /** Check exceptions thrown by the expression. */
-    public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
       if (expr.type().isReference()) {
 	  TypeSystem ts = ec.typeSystem();
 	  ec.throwsException(ts.ClassCastException());
@@ -120,11 +120,11 @@ public class Cast_c extends Expr_c implements Cast
     }
 
     /** Write the expression to an output file. */
-    public void translate_(CodeWriter w, Translator tr)
+    public void translate(CodeWriter w, Translator tr)
     {
 	w.begin(0);
 	w.write("(");
-	castType.translate(w, tr);
+	castType.del().translate(w, tr);
 	w.write(")");
 	w.allowBreak(2, " ");
 	translateSubexpr(expr, w, tr);

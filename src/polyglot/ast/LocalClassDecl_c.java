@@ -15,7 +15,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
 {
     protected ClassDecl decl;
 
-    public LocalClassDecl_c(Ext ext, Position pos, ClassDecl decl) {
+    public LocalClassDecl_c(Del ext, Position pos, ClassDecl decl) {
 	super(ext, pos);
 	this.decl = decl;
     }
@@ -58,7 +58,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
         c.addType(decl.type().toClass().toLocal());
     }
 
-    public Node disambiguateEnter_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
         if (ar.kind() == AmbiguityRemover.SUPER) {
             return bypassChildren();
         }
@@ -85,7 +85,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
     }
 
     /** Write the statement to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         enterScope(tr.context());
         translateBlock(decl, w, tr);
 	w.write(";");

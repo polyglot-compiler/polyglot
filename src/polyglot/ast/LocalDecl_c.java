@@ -14,7 +14,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
     Declarator decl;
     LocalInstance li;
 
-    public LocalDecl_c(Ext ext, Position pos, Flags flags, TypeNode type, String name, Expr init) {
+    public LocalDecl_c(Del ext, Position pos, Flags flags, TypeNode type, String name, Expr init) {
         super(ext, pos);
 	this.decl = new Declarator_c(flags, type, name, init);
     }
@@ -125,8 +125,8 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
         c.addVariable(li);
     }
 
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
-        LocalDecl_c n = (LocalDecl_c) super.buildTypes_(tb);
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+        LocalDecl_c n = (LocalDecl_c) super.buildTypes(tb);
 
         TypeSystem ts = tb.typeSystem();
 
@@ -135,7 +135,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
         return n.localInstance(li);
     }
 
-    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
 	TypeSystem ts = ar.typeSystem();
 
 	LocalInstance li = ts.localInstance(position(),
@@ -152,7 +152,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
     /**
      * Type check the declaration.  We must do this test before we leave scope.
      */
-    public Node typeCheckEnter_(TypeChecker tc) throws SemanticException {
+    public Node typeCheckEnter(TypeChecker tc) throws SemanticException {
         Context c = tc.context();
 
 	try {
@@ -169,7 +169,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
     }
 
     /** Type check the declaration. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
 	try {
@@ -184,7 +184,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
 	return this;
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
         throws SemanticException
     {
         return decl.setExpectedType(child, tc);
@@ -195,7 +195,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl
     }
 
     /** Write the declaration to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         boolean semi = tr.appendSemicolon(true);
 
 	decl.translate(w, tr, false);

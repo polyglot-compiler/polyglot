@@ -15,7 +15,7 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
 {
     protected TypeNode base;
 
-    public ArrayTypeNode_c(Ext ext, Position pos, TypeNode base) {
+    public ArrayTypeNode_c(Del ext, Position pos, TypeNode base) {
 	super(ext, pos);
 	this.base = base;
     }
@@ -45,12 +45,12 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
 	return reconstruct(base);
     }
 
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
 	TypeSystem ts = tb.typeSystem();
         return type(ts.arrayOf(position(), base.type()));
     }
 
-    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
 	TypeSystem ts = ar.typeSystem();
 	NodeFactory nf = ar.nodeFactory();
 
@@ -66,17 +66,17 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
 		                    ts.arrayOf(position(), baseType));
     }
 
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	throw new InternalCompilerError(position(),
 	    "Cannot type check ambiguous node " + this + ".");
     }
 
-    public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
 	throw new InternalCompilerError(position(),
 	    "Cannot exception check ambiguous node " + this + ".");
     }
 
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	throw new InternalCompilerError(position(),
 	    "Cannot translate ambiguous node " + this + ".");
     }

@@ -20,7 +20,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
     protected Block body;
     protected ConstructorInstance ci;
 
-    public ConstructorDecl_c(Ext ext, Position pos, Flags flags, String name, List formals, List exceptionTypes, Block body) {
+    public ConstructorDecl_c(Del ext, Position pos, Flags flags, String name, List formals, List exceptionTypes, Block body) {
 	super(ext, pos);
 	this.flags = flags;
 	this.name = name;
@@ -127,12 +127,12 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 	return reconstruct(formals, exceptionTypes, body);
     }
 
-    public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException {
         tb.pushScope();
         return this;
     }
 
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
         tb.popScope();
 
         TypeSystem ts = tb.typeSystem();
@@ -152,7 +152,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
         return constructorInstance(ci);
     }
 
-    public Node disambiguateEnter_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
         if (ar.kind() == AmbiguityRemover.SUPER) {
             return bypassChildren();
         }
@@ -165,7 +165,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
         return this;
     }
 
-    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (ar.kind() == AmbiguityRemover.SIGNATURES) {
             Context c = ar.context();
             TypeSystem ts = ar.typeSystem();
@@ -180,7 +180,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
         return this;
     }
 
-    public Node addMembersEnter_(AddMemberVisitor am) {
+    public Node addMembersEnter(AddMemberVisitor am) {
 	ParsedClassType ct = am.context().currentClass();
         ct.addConstructor(ci);
         return bypassChildren();
@@ -195,7 +195,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
     }
 
     /** Type check the constructor. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         Context c = tc.context();
         TypeSystem ts = tc.typeSystem();
 
@@ -252,7 +252,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
     }
 
     /** Check exceptions thrown by the constructor. */
-    public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
 	TypeSystem ts = ec.typeSystem();
 
 	SubtypeSet s = (SubtypeSet) ec.throwsSet();
@@ -292,7 +292,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
     }
 
     /** Write the constructor to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         Context c = tr.context();
 
 	w.begin(0);
@@ -305,7 +305,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 
 	for (Iterator i = formals.iterator(); i.hasNext(); ) {
 	    Formal f = (Formal) i.next();
-	    f.translate(w, tr);
+	    f.del().translate(w, tr);
 
 	    if (i.hasNext()) {
 		w.write(",");
@@ -322,7 +322,7 @@ public class ConstructorDecl_c extends Node_c implements ConstructorDecl
 
 	    for (Iterator i = exceptionTypes.iterator(); i.hasNext(); ) {
 	        TypeNode tn = (TypeNode) i.next();
-		tn.translate(w, tr);
+		tn.del().translate(w, tr);
 
 		if (i.hasNext()) {
 		    w.write(",");

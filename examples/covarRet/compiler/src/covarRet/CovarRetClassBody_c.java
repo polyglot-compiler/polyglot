@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class CovarRetClassBody_c extends ClassBody_c
 {
-    public CovarRetClassBody_c(Ext ext, Position pos, List members) {
+    public CovarRetClassBody_c(Del ext, Position pos, List members) {
         super(ext, pos, members);
     }
 

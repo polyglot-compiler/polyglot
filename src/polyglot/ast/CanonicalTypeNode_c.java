@@ -11,7 +11,7 @@ import jltools.main.Options;
  */
 public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
 {
-  public CanonicalTypeNode_c(Ext ext, Position pos, Type type) {
+  public CanonicalTypeNode_c(Del ext, Position pos, Type type) {
     super(ext, pos);
     this.type = type;
   }
@@ -22,7 +22,7 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
    * Otherwise, the string that originally represented the type in the
    * source file is used.
    */
-  public void translate_(CodeWriter w, Translator tr) {
+  public void translate(CodeWriter w, Translator tr) {
     TypeSystem ts = tr.typeSystem();
 
     if (tr.outerClass() != null) {

@@ -16,7 +16,7 @@ public class Binary_c extends Expr_c implements Binary
     protected Expr right;
     protected Precedence precedence;
 
-    public Binary_c(Ext ext, Position pos, Expr left, Operator op, Expr right) {
+    public Binary_c(Del ext, Position pos, Expr left, Operator op, Expr right) {
 	super(ext, pos);
 	this.left = left;
 	this.op = op;
@@ -91,7 +91,7 @@ public class Binary_c extends Expr_c implements Binary
     }
 
     /** Fold constants for the expression. */
-    public Node foldConstants_(ConstantFolder cf) {
+    public Node foldConstants(ConstantFolder cf) {
       	NodeFactory nf = cf.nodeFactory();
 
         if (left instanceof NumLit && right instanceof NumLit) {
@@ -180,7 +180,7 @@ public class Binary_c extends Expr_c implements Binary
     }
 
     /** Type check the expression. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         Type l = left.type();
 	Type r = right.type();
 
@@ -296,7 +296,7 @@ public class Binary_c extends Expr_c implements Binary
 	return type(ts.promote(l, r));
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
         throws SemanticException
     {
         Expr other;
@@ -362,7 +362,7 @@ public class Binary_c extends Expr_c implements Binary
     }
 
     /** Check exceptions thrown by the expression. */
-    public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
 	TypeSystem ts = ec.typeSystem();
 
 	if (throwsArithmeticException()) {
@@ -385,7 +385,7 @@ public class Binary_c extends Expr_c implements Binary
     }
 
     /** Write the expression to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	TypeSystem ts = tr.typeSystem();
 
 	translateSubexpr(left, true, w, tr);

@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 public class ConstArrayTypeNode_c extends ArrayTypeNode_c implements ConstArrayTypeNode
 {
-    public ConstArrayTypeNode_c(Ext ext, Position pos, TypeNode base) {
+    public ConstArrayTypeNode_c(Del ext, Position pos, TypeNode base) {
         super(ext, pos, base);
     }
 

@@ -11,7 +11,7 @@ import java.util.*;
  */
 public class SwitchBlock_c extends AbstractBlock_c implements SwitchBlock
 {
-    public SwitchBlock_c(Ext ext, Position pos, List statements) {
+    public SwitchBlock_c(Del ext, Position pos, List statements) {
 	super(ext, pos, statements);
     }
 

@@ -19,7 +19,7 @@ public class Call_c extends Expr_c implements Call
   protected List arguments;
   protected MethodInstance mi;
 
-  public Call_c(Ext ext, Position pos, Receiver target, String name,
+  public Call_c(Del ext, Position pos, Receiver target, String name,
                 List arguments) {
     super(ext, pos);
     this.target = target;
@@ -100,8 +100,8 @@ public class Call_c extends Expr_c implements Call
     return reconstruct(target, arguments);
   }
 
-  public Node buildTypes_(TypeBuilder tb) throws SemanticException {
-    Call_c n = (Call_c) super.buildTypes_(tb);
+  public Node buildTypes(TypeBuilder tb) throws SemanticException {
+    Call_c n = (Call_c) super.buildTypes(tb);
 
     TypeSystem ts = tb.typeSystem();
 
@@ -119,7 +119,7 @@ public class Call_c extends Expr_c implements Call
   }
 
   /** Type check the call. */
-  public Node typeCheck_(TypeChecker tc) throws SemanticException {
+  public Node typeCheck(TypeChecker tc) throws SemanticException {
     TypeSystem ts = tc.typeSystem();
     Context c = tc.context();
 
@@ -234,7 +234,7 @@ public class Call_c extends Expr_c implements Call
     return call.methodInstance(mi).type(mi.returnType());
   }
 
-  public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+  public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       throws SemanticException
   {
       if (child == target) {
@@ -257,7 +257,7 @@ public class Call_c extends Expr_c implements Call
   }
 
   /** Check exceptions thrown by the call. */
-  public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
+  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
     if (mi == null) {
       throw new InternalCompilerError(position(),
                                       "Null method instance after type "
@@ -285,13 +285,13 @@ public class Call_c extends Expr_c implements Call
   }
 	
   /** Write the expression to an output file. */
-  public void translate_(CodeWriter w, Translator tr) {
+  public void translate(CodeWriter w, Translator tr) {
     if (target instanceof Expr) {
       translateSubexpr((Expr) target, w, tr);
       w.write(".");
     }
     else if (target != null) {
-      target.translate(w, tr);
+      target.del().translate(w, tr);
       w.write(".");
     }
 
@@ -300,7 +300,7 @@ public class Call_c extends Expr_c implements Call
 		
     for(Iterator i = arguments.iterator(); i.hasNext();) {
       Expr e = (Expr) i.next();
-      e.translate(w, tr);
+      e.del().translate(w, tr);
 
       if (i.hasNext()) {
         w.write(",");

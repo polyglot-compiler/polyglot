@@ -10,7 +10,7 @@ import jltools.util.*;
  */
 public abstract class Stmt_c extends Node_c implements Stmt
 {
-    public Stmt_c(Ext ext, Position pos) {
+    public Stmt_c(Del ext, Position pos) {
 	super(ext, pos);
     }
 }

@@ -20,7 +20,7 @@ public class Initializer_c extends Node_c implements Initializer
     protected Block body;
     protected InitializerInstance ii;
 
-    public Initializer_c(Ext ext, Position pos, Flags flags, Block body) {
+    public Initializer_c(Del ext, Position pos, Flags flags, Block body) {
 	super(ext, pos);
 	this.flags = flags;
 	this.body = body;
@@ -87,13 +87,13 @@ public class Initializer_c extends Node_c implements Initializer
 	c.popCode();
     }
 
-    public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException {
         tb.pushScope();
         return this;
     }
 
     /** Build type objects for the method. */
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
         tb.popScope();
         TypeSystem ts = tb.typeSystem();
         ClassType ct = tb.currentClass();
@@ -101,7 +101,7 @@ public class Initializer_c extends Node_c implements Initializer
         return initializerInstance(ii);
     }
 
-    public Node disambiguateEnter_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
         // Do not visit body on the clean-super and clean-signatures passes.
         if (ar.kind() == AmbiguityRemover.SUPER) {
             return bypassChildren();
@@ -113,7 +113,7 @@ public class Initializer_c extends Node_c implements Initializer
     }
 
     /** Type check the initializer. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
 	try {
@@ -127,7 +127,7 @@ public class Initializer_c extends Node_c implements Initializer
     }
 
     /** Check exceptions thrown by the initializer. */
-    public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
       	TypeSystem ts = ec.typeSystem();
 
 	SubtypeSet s = (SubtypeSet) ec.throwsSet();
@@ -146,7 +146,7 @@ public class Initializer_c extends Node_c implements Initializer
     }
 
     /** Write the initializer to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         Context c = tr.context();
 
 	enterScope(c);

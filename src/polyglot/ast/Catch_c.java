@@ -15,7 +15,7 @@ public class Catch_c extends Stmt_c implements Catch
     protected Formal formal;
     protected Block body;
 
-    public Catch_c(Ext ext, Position pos, Formal formal, Block body) {
+    public Catch_c(Del ext, Position pos, Formal formal, Block body) {
 	super(ext, pos);
 	this.formal = formal;
 	this.body = body;
@@ -78,7 +78,7 @@ public class Catch_c extends Stmt_c implements Catch
     }
 
     /** Type check the catch block. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
 	if (! catchType().isThrowable()) {
@@ -96,7 +96,7 @@ public class Catch_c extends Stmt_c implements Catch
     }
 
     /** Write the catch block to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         Context c = tr.context();
 
 	w.write("catch(");

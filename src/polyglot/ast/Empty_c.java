@@ -10,12 +10,12 @@ import jltools.util.*;
  */
 public class Empty_c extends Stmt_c implements Empty
 {
-    public Empty_c(Ext ext, Position pos) {
+    public Empty_c(Del ext, Position pos) {
 	super(ext, pos);
     }
 
     /** Write the statement to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	w.write(";");
     }
 

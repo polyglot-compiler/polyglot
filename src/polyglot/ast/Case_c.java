@@ -14,7 +14,7 @@ public class Case_c extends Stmt_c implements Case
     protected Expr expr;
     protected long value;
 
-    public Case_c(Ext ext, Position pos, Expr expr) {
+    public Case_c(Del ext, Position pos, Expr expr) {
 	super(ext, pos);
 	this.expr = expr;
     }
@@ -72,7 +72,7 @@ public class Case_c extends Stmt_c implements Case
     }
 
     /** Type check the statement. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         if (expr == null) {
 	    return this;
 	}
@@ -128,7 +128,7 @@ public class Case_c extends Stmt_c implements Case
 	return value(value);
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -150,13 +150,13 @@ public class Case_c extends Stmt_c implements Case
     }
 
     /** Write the statement to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         if (expr == null) {
 	    w.write("default:");
 	}
 	else {
 	    w.write("case ");
-	    expr.translate(w, tr);
+	    expr.del().translate(w, tr);
 	    w.write(":");
 	}
     }

@@ -18,7 +18,7 @@ public class Import_c extends Node_c implements Import
     protected Kind kind;
     protected String name;
 
-    public Import_c(Ext ext, Position pos, Kind kind, String name) {
+    public Import_c(Del ext, Position pos, Kind kind, String name) {
 	super(ext, pos);
 	this.name = name;
 	this.kind = kind;
@@ -49,7 +49,7 @@ public class Import_c extends Node_c implements Import
     }
 
     /** Build type objects for the import. */
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
 	ImportTable it = tb.importTable();
 
 	if (kind == CLASS) {
@@ -67,7 +67,7 @@ public class Import_c extends Node_c implements Import
     }
 
     /** Write the import to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	if (! Options.global.fully_qualified_names) {
 	    w.write("import ");
 	    w.write(name);

@@ -14,7 +14,7 @@ public class PackageNode_c extends Node_c implements PackageNode
 {
     protected Package package_;
 
-    public PackageNode_c(Ext ext, Position pos, Package package_) {
+    public PackageNode_c(Del ext, Position pos, Package package_) {
 	super(ext, pos);
 	this.package_ = package_;
     }
@@ -37,7 +37,7 @@ public class PackageNode_c extends Node_c implements PackageNode
     }
 
     /** Write the package name to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         w.write(tr.typeSystem().translatePackage(tr.context(), package_));
     }
 

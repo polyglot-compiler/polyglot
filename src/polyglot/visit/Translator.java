@@ -152,7 +152,7 @@ public class Translator extends AbstractPass
                     writeHeader(sfn, w);
                 }
 
-                decl.translate(w, this);
+                decl.del().translate(w, this);
 
                 w.newline(0);
 
@@ -177,7 +177,7 @@ public class Translator extends AbstractPass
     protected void writeHeader(SourceFile sfn, CodeWriter w) {
 	if (sfn.package_() != null) {
 	    w.write("package ");
-	    sfn.package_().translate(w, this);
+	    sfn.package_().del().translate(w, this);
 	    w.write(";");
 	    w.newline(0);
 	    w.newline(0);
@@ -187,7 +187,7 @@ public class Translator extends AbstractPass
 
 	for (Iterator i = sfn.imports().iterator(); i.hasNext(); ) {
 	    Import imp = (Import) i.next();
-	    imp.translate(w, this);
+	    imp.del().translate(w, this);
 	    newline = true;
 	}
 

@@ -16,7 +16,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 {
     protected List elements;
 
-    public ArrayInit_c(Ext ext, Position pos, List elements) {
+    public ArrayInit_c(Del ext, Position pos, List elements) {
 	super(ext, pos);
 	this.elements = TypedList.copyAndCheck(elements, Expr.class, true);
     }
@@ -51,7 +51,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
     }
 
     /** Type check the initializer. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
 	Type type = null;
@@ -75,7 +75,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 	}
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         if (elements.isEmpty()) {
@@ -138,13 +138,13 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
     }
 
     /** Write the initializer to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	w.write("{ ");
 
 	for (Iterator i = elements.iterator(); i.hasNext(); ) {
 	    Expr e = (Expr) i.next();
 
-	    e.translate(w, tr);
+	    e.del().translate(w, tr);
 
 	    if (i.hasNext()) {
 		w.write(", ");

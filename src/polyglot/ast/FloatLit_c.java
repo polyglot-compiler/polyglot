@@ -14,7 +14,7 @@ public class FloatLit_c extends Lit_c implements FloatLit
     protected FloatLit.Kind kind;
     protected double value;
 
-    public FloatLit_c(Ext ext, Position pos, FloatLit.Kind kind, double value) {
+    public FloatLit_c(Del ext, Position pos, FloatLit.Kind kind, double value) {
 	super(ext, pos);
 	this.kind = kind;
 	this.value = value;
@@ -50,7 +50,7 @@ public class FloatLit_c extends Lit_c implements FloatLit
     }
 
     /** Type check the expression. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	if (kind == FLOAT) {
 	    return type(tc.typeSystem().Float());
 	}
@@ -68,7 +68,7 @@ public class FloatLit_c extends Lit_c implements FloatLit
     }
 
     /** Write the expression to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         if (kind == FLOAT) {
 	    w.write(Float.toString((float) value) + "F");
 	}

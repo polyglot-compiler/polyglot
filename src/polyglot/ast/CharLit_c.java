@@ -11,7 +11,7 @@ import jltools.util.*;
  */
 public class CharLit_c extends NumLit_c implements CharLit
 {
-    public CharLit_c(Ext ext, Position pos, char value) {
+    public CharLit_c(Del ext, Position pos, char value) {
 	super(ext, pos, value);
     }
 
@@ -28,7 +28,7 @@ public class CharLit_c extends NumLit_c implements CharLit
     }
 
     /** Type check the expression. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	return type(tc.typeSystem().Char());
     }  
 
@@ -37,7 +37,7 @@ public class CharLit_c extends NumLit_c implements CharLit
     }
 
     /** Write the expression to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         w.write("'");
 	w.write(StringUtil.escape((char) value));
         w.write("'");

@@ -13,7 +13,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
 {
   protected String name;
 
-  public AmbExpr_c(Ext ext, Position pos, String name) {
+  public AmbExpr_c(Del ext, Position pos, String name) {
     super(ext, pos);
     this.name = name;
   }
@@ -31,7 +31,7 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
   }
 
   /** Disambiguate the expression. */
-  public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+  public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
     Node n = ar.nodeFactory().disamb().disambiguate(ar, position(),
                                                     null, name);
 
@@ -44,21 +44,21 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
   }
 
   /** Type check the expression. */
-  public Node typeCheck_(TypeChecker tc) throws SemanticException {
+  public Node typeCheck(TypeChecker tc) throws SemanticException {
     throw new InternalCompilerError(position(),
                                     "Cannot type check ambiguous node "
                                     + this + ".");
   } 
 
   /** Check exceptions thrown by the expression. */
-  public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
+  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
     throw new InternalCompilerError(position(),
                                     "Cannot exception check ambiguous node "
                                     + this + ".");
   } 
 
   /** Write the expression to an output file. */
-  public void translate_(CodeWriter w, Translator tr) {
+  public void translate(CodeWriter w, Translator tr) {
     throw new InternalCompilerError(position(),
                                     "Cannot translate ambiguous node "
                                     + this + ".");

@@ -18,7 +18,7 @@ public class For_c extends Stmt_c implements For
     protected List iters;
     protected Stmt body;
 
-    public For_c(Ext ext, Position pos, List inits, Expr cond, List iters, Stmt body) {
+    public For_c(Del ext, Position pos, List inits, Expr cond, List iters, Stmt body) {
 	super(ext, pos);
 	this.inits = TypedList.copyAndCheck(inits, ForInit.class, true);
 	this.cond = cond;
@@ -106,7 +106,7 @@ public class For_c extends Stmt_c implements For
     }
 
     /** Type check the statement. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
 	if (cond != null &&
@@ -119,7 +119,7 @@ public class For_c extends Stmt_c implements For
 	return this;
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -132,7 +132,7 @@ public class For_c extends Stmt_c implements For
     }
 
     /** Write the statement to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         Context c = tr.context();
 
 	w.write("for (");

@@ -18,7 +18,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     protected List arguments;
     protected ConstructorInstance ci;
 
-    public ConstructorCall_c(Ext ext, Position pos, Kind kind, Expr qualifier, List arguments) {
+    public ConstructorCall_c(Del ext, Position pos, Kind kind, Expr qualifier, List arguments) {
 	super(ext, pos);
 	this.kind = kind;
 	this.qualifier = qualifier;
@@ -92,8 +92,8 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	return reconstruct(qualifier, arguments);
     }
 
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
-        ConstructorCall_c n = (ConstructorCall_c) super.buildTypes_(tb);
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+        ConstructorCall_c n = (ConstructorCall_c) super.buildTypes(tb);
 
         TypeSystem ts = tb.typeSystem();
 
@@ -109,7 +109,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     }
 
     /** Type check the call. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 	Context c = tc.context();
 
@@ -193,7 +193,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	return constructorInstance(ci);
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         if (child == qualifier) {
@@ -222,9 +222,9 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     }
 
     /** Write the call to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	if (qualifier != null) {
-	    qualifier.translate(w, tr);
+	    qualifier.del().translate(w, tr);
 	    w.write(".");
 	} 
 
@@ -234,7 +234,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
 	for (Iterator i = arguments.iterator(); i.hasNext(); ) {
 	    Expr e = (Expr) i.next();
-	    e.translate(w, tr);
+	    e.del().translate(w, tr);
 
 	    if (i.hasNext()) {
 		w.write(",");

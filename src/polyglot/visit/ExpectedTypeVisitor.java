@@ -15,7 +15,7 @@ public class ExpectedTypeVisitor extends SemanticVisitor
 
     protected Node enterCall(Node parent, Node n) throws SemanticException {
         if (parent != null && n instanceof Expr) {
-            n = parent.setExpectedType((Expr) n, this);
+            n = parent.del().setExpectedType((Expr) n, this);
         }
 
 	return super.enterCall(parent, n);

@@ -13,7 +13,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
   protected QualifierNode qual;
   protected String name;
 
-  public AmbTypeNode_c(Ext ext, Position pos, QualifierNode qual,
+  public AmbTypeNode_c(Del ext, Position pos, QualifierNode qual,
                        String name) {
     super(ext, pos);
 
@@ -51,7 +51,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
     return this;
   }
 
-  public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+  public Node buildTypes(TypeBuilder tb) throws SemanticException {
     return type(tb.typeSystem().unknownType(position()));
   }
 
@@ -60,7 +60,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
     return reconstruct(qual);
   }
 
-  public Node disambiguate_(AmbiguityRemover sc) throws SemanticException {
+  public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
     Node n = sc.nodeFactory().disamb().disambiguate(sc, position(), qual,
                                                     name);
 
@@ -71,19 +71,19 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
                                 "\".", position());
   }
 
-  public Node typeCheck_(TypeChecker tc) throws SemanticException {
+  public Node typeCheck(TypeChecker tc) throws SemanticException {
     throw new InternalCompilerError(position(),
                                     "Cannot type check ambiguous node "
                                     + this + ".");
   } 
 
-  public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
+  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
     throw new InternalCompilerError(position(),
                                     "Cannot exception check ambiguous node "
                                     + this + ".");
   } 
 
-  public void translate_(CodeWriter w, Translator tr) {
+  public void translate(CodeWriter w, Translator tr) {
     throw new InternalCompilerError(position(),
                                     "Cannot translate ambiguous node "
                                     + this + ".");

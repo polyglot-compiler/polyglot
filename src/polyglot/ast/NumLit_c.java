@@ -12,7 +12,7 @@ public abstract class NumLit_c extends Lit_c implements NumLit
 {
     protected long value;
 
-    public NumLit_c(Ext ext, Position pos, long value) {
+    public NumLit_c(Del ext, Position pos, long value) {
 	super(ext, pos);
 	this.value = value;
     }

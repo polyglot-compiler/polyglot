@@ -34,6 +34,7 @@ SOURCES = \
 	ConstructorDecl.java \
 	Declarator.java \
 	Disamb.java \
+	Del.java \
 	Do.java \
 	Empty.java \
 	Eval.java \
@@ -61,6 +62,7 @@ SOURCES = \
 	NewArray.java \
 	New.java \
 	Node.java \
+	NodeOps.java \
 	NullLit.java \
 	NumLit.java \
 	PackageNode.java \
@@ -70,8 +72,8 @@ SOURCES = \
 	QualifierNode.java \
 	Receiver.java \
 	Return.java \
-	SourceFile.java \
 	SourceCollection.java \
+	SourceFile.java \
 	Special.java \
 	Stmt.java \
 	StringLit.java \

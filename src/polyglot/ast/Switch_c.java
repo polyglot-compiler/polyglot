@@ -19,7 +19,7 @@ public class Switch_c extends Stmt_c implements Switch
     protected Expr expr;
     protected List elements;
 
-    public Switch_c(Ext ext, Position pos, Expr expr, List elements) {
+    public Switch_c(Del ext, Position pos, Expr expr, List elements) {
 	super(ext, pos);
 	this.expr = expr;
 	this.elements = TypedList.copyAndCheck(elements, SwitchElement.class, true);
@@ -69,7 +69,7 @@ public class Switch_c extends Stmt_c implements Switch
     }
 
     /** Type check the statement. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
         if (! expr.type().isImplicitCastValid(ts.Int())) {
@@ -108,7 +108,7 @@ public class Switch_c extends Stmt_c implements Switch
 	return this;
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -125,7 +125,7 @@ public class Switch_c extends Stmt_c implements Switch
     }
 
     /** Write the statement to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	w.write("switch (");
 	translateBlock(expr, w, tr);
 	w.write(") {");
@@ -134,7 +134,7 @@ public class Switch_c extends Stmt_c implements Switch
 
 	for (Iterator i = elements.iterator(); i.hasNext();) {
 	   SwitchElement s = (SwitchElement) i.next();
-	   s.translate(w, tr);
+	   s.del().translate(w, tr);
 	   if (i.hasNext()) {
 	       w.newline(0);
 	   }

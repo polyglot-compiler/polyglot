@@ -12,7 +12,7 @@ public class BooleanLit_c extends Lit_c implements BooleanLit
 {
   protected boolean value;
 
-  public BooleanLit_c(Ext ext, Position pos, boolean value) {
+  public BooleanLit_c(Del ext, Position pos, boolean value) {
     super(ext, pos);
     this.value = value;
   }
@@ -35,7 +35,7 @@ public class BooleanLit_c extends Lit_c implements BooleanLit
   }
 
   /** Type check the expression. */
-  public Node typeCheck_(TypeChecker tc) throws SemanticException {
+  public Node typeCheck(TypeChecker tc) throws SemanticException {
     return type(tc.typeSystem().Boolean());
   }
 
@@ -44,7 +44,7 @@ public class BooleanLit_c extends Lit_c implements BooleanLit
   }
 
   /** Write the expression to an output file. */
-  public void translate_(CodeWriter w, Translator tr) {
+  public void translate(CodeWriter w, Translator tr) {
     w.write("" + value);
   }
 

@@ -21,7 +21,7 @@ public class NewArray_c extends Expr_c implements NewArray
     protected int addDims;
     protected ArrayInit init;
 
-    public NewArray_c(Ext ext, Position pos, TypeNode baseType, List dims, int addDims, ArrayInit init) {
+    public NewArray_c(Del ext, Position pos, TypeNode baseType, List dims, int addDims, ArrayInit init) {
 	super(ext, pos);
 	this.baseType = baseType;
 	this.dims = TypedList.copyAndCheck(dims, Expr.class, true);
@@ -104,7 +104,7 @@ public class NewArray_c extends Expr_c implements NewArray
     }
 
     /** Type check the expression. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
 	ArrayType type = ts.arrayOf(baseType.type(), dims.size() + addDims);
@@ -116,7 +116,7 @@ public class NewArray_c extends Expr_c implements NewArray
 	return type(type);
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
         throws SemanticException
     {
         if (child == init) {
@@ -131,9 +131,9 @@ public class NewArray_c extends Expr_c implements NewArray
     }
 
     /** Write the expression to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	w.write("new ");
-	baseType.translate(w, tr);
+	baseType.del().translate(w, tr);
 
 	for (Iterator i = dims.iterator(); i.hasNext();) {
 	  Expr e = (Expr) i.next();
@@ -148,7 +148,7 @@ public class NewArray_c extends Expr_c implements NewArray
 
 	if (init != null) {
 	    w.write(" ");
-	    init.translate(w, tr);
+	    init.del().translate(w, tr);
 	}
     }
 }

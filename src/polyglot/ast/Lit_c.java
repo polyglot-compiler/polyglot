@@ -10,7 +10,7 @@ import jltools.util.*;
  */
 public abstract class Lit_c extends Expr_c implements Lit
 {
-    public Lit_c(Ext ext, Position pos) {
+    public Lit_c(Del ext, Position pos) {
 	super(ext, pos);
     }
 

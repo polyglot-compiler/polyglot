@@ -1,22 +1,11 @@
 package jltools.ast;
 
+import jltools.util.Copy;
 import jltools.util.CodeWriter;
 import jltools.util.Position;
-import jltools.util.Copy;
 import jltools.types.Context;
 import jltools.types.SemanticException;
-import jltools.types.TypeSystem;
-import jltools.visit.NodeVisitor;
-import jltools.visit.TypeBuilder;
-import jltools.visit.AmbiguityRemover;
-import jltools.visit.AddMemberVisitor;
-import jltools.visit.ConstantFolder;
-import jltools.visit.TypeChecker;
-import jltools.visit.ExpectedTypeVisitor;
-import jltools.visit.ExceptionChecker;
-import jltools.visit.Translator;
-
-import java.io.Serializable;
+import jltools.visit.*;
 
 /**
  * A <code>Node</code> represents an AST node.  All AST nodes must implement
@@ -24,12 +13,17 @@ import java.io.Serializable;
  * of the node should copy the node, set the field in the copy, and then
  * return the copy.
  */
-public interface Node extends Ext, Serializable
+public interface Node extends NodeOps, Copy
 {
     /**
-     * Set the node's extension.
+     * Set the delegate of the node.
      */
-    Node ext(Ext ext);
+    Node del(Del del);
+
+    /**
+     * Get the node's delegate.
+     */
+    Del del();
 
     /**
      * Return true if the node should be bypassed on the next visit.
@@ -47,16 +41,18 @@ public interface Node extends Ext, Serializable
      */
     Node bypassChildren();
 
-    /** Get the position of the node in the source file.  Returns null if
-     * the position is not set. */
+    /**
+     * Get the position of the node in the source file.  Returns null if
+     * the position is not set.
+     */
     Position position();
 
     /** Create a copy of the node with a new position. */
     Node position(Position position);
 
     /**
-     * Visit the node.  This method is equivalent to <code>visitEdge(null,
-     * v)</code>.
+     * Visit the node.  This method is equivalent to
+     * <code>visitEdge(null, v)</code>.
      *
      * @param v The visitor which will traverse/rewrite the AST.
      * @return A new AST if a change was made, or <code>this</code>.
@@ -88,6 +84,7 @@ public interface Node extends Ext, Serializable
      * Visit a single child of the node.
      *
      * @param v The visitor which will traverse/rewrite the AST.
+     * @param child The child to visit.
      * @return The result of <code>child.visit(v)</code>, or <code>null</code>
      * if <code>child</code> was <code>null</code>.
      */
@@ -107,4 +104,51 @@ public interface Node extends Ext, Serializable
      * Dump the AST node for debugging purposes.
      */
     void dump(CodeWriter w);
+
+    //////////////////////////////////////////////////////////////// 
+    // Duplicate the NodeOps interface, but deprecate the methods.
+    // That way, we'll get a warning if we try to call these directly.
+    //////////////////////////////////////////////////////////////// 
+
+    /** @deprectated */
+    public Node buildTypesOverride(TypeBuilder tb) throws SemanticException;
+    /** @deprectated */
+    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException;
+    /** @deprectated */
+    public Node buildTypes(TypeBuilder tb) throws SemanticException;
+    /** @deprectated */
+    public Node disambiguateOverride(AmbiguityRemover ar) throws SemanticException;
+    /** @deprectated */
+    public Node disambiguateEnter(AmbiguityRemover ar) throws SemanticException;
+    /** @deprectated */
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException;
+    /** @deprectated */
+    public Node addMembersOverride(AddMemberVisitor am) throws SemanticException;
+    /** @deprectated */
+    public Node addMembersEnter(AddMemberVisitor am) throws SemanticException;
+    /** @deprectated */
+    public Node addMembers(AddMemberVisitor am) throws SemanticException;
+    /** @deprectated */
+    public Node foldConstantsOverride(ConstantFolder cf);
+    /** @deprectated */
+    public Node foldConstantsEnter(ConstantFolder cf);
+    /** @deprectated */
+    public Node foldConstants(ConstantFolder cf);
+    /** @deprectated */
+    public Node typeCheckOverride(TypeChecker tc) throws SemanticException;
+    /** @deprectated */
+    public Node typeCheckEnter(TypeChecker tc) throws SemanticException;
+    /** @deprectated */
+    public Node typeCheck(TypeChecker tc) throws SemanticException;
+    /** @deprectated */
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tv)
+        throws SemanticException;
+    /** @deprectated */
+    public Node exceptionCheckOverride(ExceptionChecker ec) throws SemanticException;
+    /** @deprectated */
+    public Node exceptionCheckEnter(ExceptionChecker ec) throws SemanticException;
+    /** @deprectated */
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException;
+    /** @deprectated */
+    public void translate(CodeWriter w, Translator tr);
 }

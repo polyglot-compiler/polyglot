@@ -19,7 +19,7 @@ public class Field_c extends Expr_c implements Field
   protected String name;
   protected FieldInstance fi;
 
-  public Field_c(Ext ext, Position pos, Receiver target, String name) {
+  public Field_c(Del ext, Position pos, Receiver target, String name) {
     super(ext, pos);
     this.target = target;
     this.name = name;
@@ -97,8 +97,8 @@ public class Field_c extends Expr_c implements Field
     return reconstruct(target);
   }
 
-  public Node buildTypes_(TypeBuilder tb) throws SemanticException {
-      Field_c n = (Field_c) super.buildTypes_(tb);
+  public Node buildTypes(TypeBuilder tb) throws SemanticException {
+      Field_c n = (Field_c) super.buildTypes(tb);
 
       TypeSystem ts = tb.typeSystem();
 
@@ -108,7 +108,7 @@ public class Field_c extends Expr_c implements Field
   }
 
   /** Type check the field. */
-  public Node typeCheck_(TypeChecker tc) throws SemanticException {
+  public Node typeCheck(TypeChecker tc) throws SemanticException {
     Context c = tc.context();
     TypeSystem ts = tc.typeSystem();
 
@@ -138,7 +138,7 @@ public class Field_c extends Expr_c implements Field
                                     target.getClass().getName() + ".");
   }
 
-  public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+  public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       throws SemanticException
   {
       if (child == target) {
@@ -149,7 +149,7 @@ public class Field_c extends Expr_c implements Field
   }
 
   /** Check exceptions thrown by the field. */
-  public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
+  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
     TypeSystem ts = ec.typeSystem();
 
     if (target instanceof Expr && ! (target instanceof Special)) {
@@ -164,12 +164,12 @@ public class Field_c extends Expr_c implements Field
   }
 
   /** Write the field to an output file. */
-  public void translate_(CodeWriter w, Translator tr) {
+  public void translate(CodeWriter w, Translator tr) {
     if (target instanceof Expr) {
       translateSubexpr((Expr) target, w, tr);
     }
     else if (target instanceof TypeNode) {
-      target.translate(w, tr);
+      target.del().translate(w, tr);
     }
 
     w.write(".");

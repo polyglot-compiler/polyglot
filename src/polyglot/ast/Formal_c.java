@@ -16,7 +16,7 @@ public class Formal_c extends Node_c implements Formal
     Declarator decl;
     LocalInstance li;
 
-    public Formal_c(Ext ext, Position pos, Flags flags, TypeNode type, String name) {
+    public Formal_c(Del ext, Position pos, Flags flags, TypeNode type, String name) {
 	super(ext, pos);
 	this.decl = new Declarator_c(flags, type, name, null);
     }
@@ -102,13 +102,13 @@ public class Formal_c extends Node_c implements Formal
     }
 
     /** Write the formal to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         decl.translate(w, tr, false);
     }
 
     /** Build type objects for the formal. */
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
-        Formal_c n = (Formal_c) super.buildTypes_(tb);
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+        Formal_c n = (Formal_c) super.buildTypes(tb);
 
         TypeSystem ts = tb.typeSystem();
 
@@ -118,7 +118,7 @@ public class Formal_c extends Node_c implements Formal
         return n.localInstance(li);
     }
 
-    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (declType().isCanonical() && ! li.type().isCanonical()) {
             TypeSystem ts = ar.typeSystem();
             LocalInstance li = ts.localInstance(position(), flags(),
@@ -130,7 +130,7 @@ public class Formal_c extends Node_c implements Formal
     }
 
     /** Type check the formal. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
 	try {

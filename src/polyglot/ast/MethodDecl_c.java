@@ -20,7 +20,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
     protected Block body;
     protected MethodInstance mi;
 
-    public MethodDecl_c(Ext ext, Position pos, Flags flags, TypeNode returnType, String name, List formals, List exceptionTypes, Block body) {
+    public MethodDecl_c(Del ext, Position pos, Flags flags, TypeNode returnType, String name, List formals, List exceptionTypes, Block body) {
 	super(ext, pos);
 	this.flags = flags;
 	this.returnType = returnType;
@@ -142,12 +142,12 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 	return reconstruct(returnType, formals, exceptionTypes, body);
     }
 
-    public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException {
         tb.pushScope();
         return this;
     }
 
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
         tb.popScope();
 
         TypeSystem ts = tb.typeSystem();
@@ -170,7 +170,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
     }
 
     /** Build type objects for the method. */
-    public Node disambiguateEnter_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
         if (ar.kind() == AmbiguityRemover.SUPER) {
             return bypassChildren();
         }
@@ -183,7 +183,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
         return this;
     }
 
-    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (ar.kind() == AmbiguityRemover.SIGNATURES) {
             Context c = ar.context();
             TypeSystem ts = ar.typeSystem();
@@ -198,7 +198,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
         return this;
     }
 
-    public Node addMembersEnter_(AddMemberVisitor am) {
+    public Node addMembersEnter(AddMemberVisitor am) {
         ParsedClassType ct = am.context().currentClass();
         ct.addMethod(mi);
         return bypassChildren();
@@ -215,7 +215,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
     }
 
     /** Type check the method. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
 	try {
@@ -260,7 +260,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
     }
 
     /** Check exceptions thrown by the method. */
-    public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
 	TypeSystem ts = ec.typeSystem();
 
 	SubtypeSet s = (SubtypeSet) ec.throwsSet();
@@ -300,7 +300,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
     }
 
     /** Write the method to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         Context c = tr.context();
 
 	Flags flags = flags();
@@ -312,14 +312,14 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 
 	w.begin(0);
 	w.write(flags.translate());
-	returnType.translate(w, tr);
+	returnType.del().translate(w, tr);
 	w.write(" " + name + "(");
 
 	w.begin(0);
 
 	for (Iterator i = formals.iterator(); i.hasNext(); ) {
 	    Formal f = (Formal) i.next();
-	    f.translate(w, tr);
+	    f.del().translate(w, tr);
 
 	    if (i.hasNext()) {
 		w.write(",");
@@ -336,7 +336,7 @@ public class MethodDecl_c extends Node_c implements MethodDecl
 
 	    for (Iterator i = exceptionTypes.iterator(); i.hasNext(); ) {
 	        TypeNode tn = (TypeNode) i.next();
-		tn.translate(w, tr);
+		tn.del().translate(w, tr);
 
 		if (i.hasNext()) {
 		    w.write(",");

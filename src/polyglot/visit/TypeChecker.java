@@ -14,11 +14,11 @@ public class TypeChecker extends SemanticVisitor
     }
 
     protected Node enterCall(Node parent, Node n) throws SemanticException {
-	return n.typeCheckEnter(this);
+	return n.del().typeCheckEnter(this);
     }
 
     protected Node overrideCall(Node n) throws SemanticException {
-	Node m = n.typeCheckOverride(this);
+	Node m = n.del().typeCheckOverride(this);
 
 	if (m instanceof Expr && ((Expr) m).type() == null) {
 	    throw new InternalCompilerError("Null type for " + m, m.position());
@@ -28,7 +28,7 @@ public class TypeChecker extends SemanticVisitor
     }
 
     protected Node leaveCall(Node n) throws SemanticException {
-	Node m = n.typeCheck(this);
+	Node m = n.del().typeCheck(this);
 
 	if (m instanceof Expr && ((Expr) m).type() == null) {
 	    throw new InternalCompilerError("Null type for " + m, m.position());

@@ -14,7 +14,7 @@ public abstract class Expr_c extends Node_c implements Expr
     protected Type type;
     protected Type expectedType;
 
-    public Expr_c(Ext ext, Position pos) {
+    public Expr_c(Del ext, Position pos) {
 	super(ext, pos);
     }
 
@@ -71,7 +71,7 @@ public abstract class Expr_c extends Node_c implements Expr
 	return Precedence.UNKNOWN;
     }
 
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
         return type(tb.typeSystem().unknownType(position()));
     }
 

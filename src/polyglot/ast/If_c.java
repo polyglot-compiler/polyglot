@@ -16,7 +16,7 @@ public class If_c extends Stmt_c implements If
     protected Stmt consequent;
     protected Stmt alternative;
 
-    public If_c(Ext ext, Position pos, Expr cond, Stmt consequent, Stmt alternative) {
+    public If_c(Del ext, Position pos, Expr cond, Stmt consequent, Stmt alternative) {
 	super(ext, pos);
 	this.cond = cond;
 	this.consequent = consequent;
@@ -81,7 +81,7 @@ public class If_c extends Stmt_c implements If
     }
 
     /** Type check the statement. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
 	if (! cond.type().isSame(ts.Boolean())) {
@@ -93,7 +93,7 @@ public class If_c extends Stmt_c implements If
 	return this;
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -111,7 +111,7 @@ public class If_c extends Stmt_c implements If
     }
 
     /** Write the statement to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {    
+    public void translate(CodeWriter w, Translator tr) {    
 	w.write("if (");
 	translateBlock(cond, w, tr);
 	w.write(")");

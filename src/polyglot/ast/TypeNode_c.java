@@ -14,7 +14,7 @@ public abstract class TypeNode_c extends Node_c implements TypeNode
 {
     protected Type type;
 
-    public TypeNode_c(Ext ext, Position pos) {
+    public TypeNode_c(Del ext, Position pos) {
 	super(ext, pos);
     }
 
@@ -44,5 +44,5 @@ public abstract class TypeNode_c extends Node_c implements TypeNode
 	}
     }
 
-    public abstract void translate_(CodeWriter w, Translator tr);
+    public abstract void translate(CodeWriter w, Translator tr);
 }

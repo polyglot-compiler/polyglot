@@ -14,7 +14,7 @@ public class Instanceof_c extends Expr_c implements Instanceof
     protected Expr expr;
     protected TypeNode compareType;
 
-    public Instanceof_c(Ext ext, Position pos, Expr expr, TypeNode compareType) {
+    public Instanceof_c(Del ext, Position pos, Expr expr, TypeNode compareType) {
 	super(ext, pos);
 	this.expr = expr;
 	this.compareType = compareType;
@@ -69,7 +69,7 @@ public class Instanceof_c extends Expr_c implements Instanceof
     }
 
     /** Type check the expression. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
         if (! compareType.type().isReference()) {
@@ -87,7 +87,7 @@ public class Instanceof_c extends Expr_c implements Instanceof
 	return type(ts.Boolean());
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -104,9 +104,9 @@ public class Instanceof_c extends Expr_c implements Instanceof
     }
 
     /** Write the expression to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	translateSubexpr(expr, w, tr);
 	w.write(" instanceof ");
-	compareType.translate(w, tr);
+	compareType.del().translate(w, tr);
     }
 }

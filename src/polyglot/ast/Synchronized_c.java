@@ -15,7 +15,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized
     protected Expr expr;
     protected Block body;
 
-    public Synchronized_c(Ext ext, Position pos, Expr expr, Block body) {
+    public Synchronized_c(Del ext, Position pos, Expr expr, Block body) {
 	super(ext, pos);
 	this.expr = expr;
 	this.body = body;
@@ -65,7 +65,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized
     }
 
     /** Type check the statement. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
 	if (! expr.type().isSubtype(ts.Object()) ) {
@@ -77,7 +77,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized
 	return this;
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -94,7 +94,7 @@ public class Synchronized_c extends Stmt_c implements Synchronized
     }
 
     /** Write the statement to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	w.write("synchronized (");
 	translateBlock(expr, w, tr);
 	w.write(") ");

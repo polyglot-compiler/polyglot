@@ -15,7 +15,7 @@ public class ClassBody_c extends Node_c implements ClassBody
 {
     protected List members;
 
-    public ClassBody_c(Ext ext, Position pos, List members) {
+    public ClassBody_c(Del ext, Position pos, List members) {
         super(ext, pos);
         this.members = TypedList.copyAndCheck(members, ClassMember.class, true);
     }
@@ -267,7 +267,7 @@ public class ClassBody_c extends Node_c implements ClassBody
         }
     }
 
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         duplicateFieldCheck(tc);
         duplicateConstructorCheck(tc);
         duplicateMethodCheck(tc);
@@ -277,7 +277,7 @@ public class ClassBody_c extends Node_c implements ClassBody
         return this;
     }
 
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         enterScope(tr.context());
 
         if (members.isEmpty()) {

@@ -13,7 +13,7 @@ public class IntLit_c extends NumLit_c implements IntLit
 {
     protected Kind kind;
 
-    public IntLit_c(Ext ext, Position pos, long value) {
+    public IntLit_c(Del ext, Position pos, long value) {
 	super(ext, pos, value);
 
         if (Byte.MIN_VALUE <= value && value <= Byte.MAX_VALUE) {
@@ -55,7 +55,7 @@ public class IntLit_c extends NumLit_c implements IntLit
     }
 
     /** Type check the expression. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
 	Kind kind = kind();
@@ -75,7 +75,7 @@ public class IntLit_c extends NumLit_c implements IntLit
 	return Long.toString(value);
     }
 
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	if (kind() == LONG) {
 	    w.write(Long.toString(value) + "L");
 	}

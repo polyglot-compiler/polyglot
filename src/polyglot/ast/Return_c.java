@@ -14,7 +14,7 @@ public class Return_c extends Stmt_c implements Return
 {
     protected Expr expr;
 
-    public Return_c(Ext ext, Position pos, Expr expr) {
+    public Return_c(Del ext, Position pos, Expr expr) {
 	super(ext, pos);
 	this.expr = expr;
     }
@@ -49,7 +49,7 @@ public class Return_c extends Stmt_c implements Return
     }
 
     /** Type check the statement. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 	Context c = tc.context();
 
@@ -107,7 +107,7 @@ public class Return_c extends Stmt_c implements Return
 	throw new InternalCompilerError("Unrecognized code type.");
     }
   
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         if (child == expr) {
@@ -128,11 +128,11 @@ public class Return_c extends Stmt_c implements Return
     }
 
     /** Write the statement to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	w.write("return") ;
 	if (expr != null) {
 	    w.write(" ");
-	    expr.translate(w, tr);
+	    expr.del().translate(w, tr);
 	}
 	w.write(";");
     }

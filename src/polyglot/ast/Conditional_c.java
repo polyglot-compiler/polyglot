@@ -15,7 +15,7 @@ public class Conditional_c extends Expr_c implements Conditional
     protected Expr consequent;
     protected Expr alternative;
 
-    public Conditional_c(Ext ext, Position pos, Expr cond, Expr consequent, Expr alternative) {
+    public Conditional_c(Del ext, Position pos, Expr cond, Expr consequent, Expr alternative) {
 	super(ext, pos);
 	this.cond = cond;
 	this.consequent = consequent;
@@ -85,7 +85,7 @@ public class Conditional_c extends Expr_c implements Conditional
     }
 
     /** Type check the expression. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
 	if (! cond.type().isSame(ts.Boolean())) {
@@ -181,7 +181,7 @@ public class Conditional_c extends Expr_c implements Conditional
 	    position());
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -213,7 +213,7 @@ public class Conditional_c extends Expr_c implements Conditional
     }
 
     /** Write the expression to an output file. */
-    public void translate_(CodeWriter w, Translator tr)
+    public void translate(CodeWriter w, Translator tr)
     {
 	translateSubexpr(cond, false, w, tr);
 	w.write(" ? ");

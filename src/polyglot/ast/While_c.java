@@ -15,7 +15,7 @@ public class While_c extends Stmt_c implements While
     protected Expr cond;
     protected Stmt body;
 
-    public While_c(Ext ext, Position pos, Expr cond, Stmt body) {
+    public While_c(Del ext, Position pos, Expr cond, Stmt body) {
 	super(ext, pos);
 	this.cond = cond;
 	this.body = body;
@@ -65,7 +65,7 @@ public class While_c extends Stmt_c implements While
     }
 
     /** Type check the statement. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 	
 	if (! cond.type().isSame(ts.Boolean())) {
@@ -77,7 +77,7 @@ public class While_c extends Stmt_c implements While
 	return this;
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -94,7 +94,7 @@ public class While_c extends Stmt_c implements While
     }
 
     /** Write the statement to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	w.write("while (");
 	translateBlock(cond, w, tr);
 	w.write(")");

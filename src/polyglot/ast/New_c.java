@@ -23,7 +23,7 @@ public class New_c extends Expr_c implements New
     protected ConstructorInstance ci;
     protected ParsedAnonClassType anonType;
 
-    public New_c(Ext ext, Position pos, Expr qualifier, TypeNode tn, List arguments, ClassBody body) {
+    public New_c(Del ext, Position pos, Expr qualifier, TypeNode tn, List arguments, ClassBody body) {
 	super(ext, pos);
         this.qualifier = qualifier;
         this.tn = tn;
@@ -130,7 +130,7 @@ public class New_c extends Expr_c implements New
         }
     }
 
-    public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException {
         if (body != null) {
             tb.pushAnonClass(position());
         }
@@ -138,7 +138,7 @@ public class New_c extends Expr_c implements New
         return this;
     }
 
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
         New_c n = this;
 
         if (body != null) {
@@ -162,7 +162,7 @@ public class New_c extends Expr_c implements New
         return n.type(ts.unknownType(position()));
     }
 
-    public Node disambiguateEnter_(AmbiguityRemover ar)
+    public Node disambiguateEnter(AmbiguityRemover ar)
         throws SemanticException
     {
         New n = this;
@@ -183,7 +183,7 @@ public class New_c extends Expr_c implements New
         return n;
     }
 
-    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (ar.kind() != AmbiguityRemover.ALL) {
             return this;
         }
@@ -250,7 +250,7 @@ public class New_c extends Expr_c implements New
         return this;
     }
 
-    public Node typeCheckEnter_(TypeChecker tc) throws SemanticException {
+    public Node typeCheckEnter(TypeChecker tc) throws SemanticException {
         New n = this;
 
         if (n.qualifier() != null) {
@@ -264,7 +264,7 @@ public class New_c extends Expr_c implements New
         return n;
     }
 
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
         Context c = tc.context();
 
@@ -468,7 +468,7 @@ FIXME: check super types as well.
         return b;
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         if (child == qualifier) {
@@ -497,7 +497,7 @@ FIXME: check super types as well.
         return child;
     }
 
-    public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
 	// something didn't work in the type check phase, so just ignore it.
 	if (ci == null) {
 	    throw new InternalCompilerError(position(),
@@ -523,9 +523,9 @@ FIXME: check super types as well.
     }
 
     /** Write the expression to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         if (qualifier != null) {
-            qualifier.translate(w, tr);
+            qualifier.del().translate(w, tr);
             w.write(".");
         }
 
@@ -540,11 +540,11 @@ FIXME: check super types as well.
             }
 
             tr.setOuterClass(ct.toMember().outer());
-            tn.translate(w, tr);
+            tn.del().translate(w, tr);
             tr.setOuterClass(null);
         }
         else {
-            tn.translate(w, tr);
+            tn.del().translate(w, tr);
         }
 
 	w.write("(");
@@ -553,7 +553,7 @@ FIXME: check super types as well.
 	for (Iterator i = arguments.iterator(); i.hasNext();) {
 	    Expr e = (Expr) i.next();
 
-	    e.translate(w, tr);
+	    e.del().translate(w, tr);
 
 	    if (i.hasNext()) {
 		w.write(",");
@@ -566,7 +566,7 @@ FIXME: check super types as well.
 
 	if (body != null) {
 	    w.write(" ");
-	    body.translate(w, tr);
+	    body.del().translate(w, tr);
 	}
     }
 }

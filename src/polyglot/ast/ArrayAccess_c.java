@@ -15,7 +15,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
     protected Expr array;
     protected Expr index;
 
-    public ArrayAccess_c(Ext ext, Position pos, Expr array, Expr index) {
+    public ArrayAccess_c(Del ext, Position pos, Expr array, Expr index) {
 	super(ext, pos);
 	this.array = array;
 	this.index = index;
@@ -70,7 +70,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
     }
 
     /** Type check the expression. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
 	if (! array.type().isArray()) {
@@ -86,7 +86,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	return type(array.type().toArray().base());
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -103,7 +103,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
     }
 
     /** Check exceptions thrown by the expression. */
-    public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
 	TypeSystem ts = ec.typeSystem();
 
 	ec.throwsException(ts.NullPointerException());
@@ -117,7 +117,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
     }
 
     /** Write the expression to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	translateSubexpr(array, w, tr);
 	w.write ("[");
 	translateBlock(index, w, tr);

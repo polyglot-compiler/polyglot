@@ -13,7 +13,7 @@ public class Eval_c extends Stmt_c implements Eval
 {
     protected Expr expr;
 
-    public Eval_c(Ext ext, Position pos, Expr expr) {
+    public Eval_c(Del ext, Position pos, Expr expr) {
 	super(ext, pos);
 	this.expr = expr;
     }
@@ -41,7 +41,7 @@ public class Eval_c extends Stmt_c implements Eval
 	return this;
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -64,10 +64,10 @@ public class Eval_c extends Stmt_c implements Eval
     }
 
     /** Write the statement to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	boolean semi = tr.appendSemicolon(true);
 
-	expr.translate(w, tr);
+	expr.del().translate(w, tr);
 
 	if (semi) {
 	    w.write(";");

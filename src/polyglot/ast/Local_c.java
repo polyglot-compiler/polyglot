@@ -13,7 +13,7 @@ public class Local_c extends Expr_c implements Local
   protected String name;
   protected LocalInstance li;
 
-  public Local_c(Ext ext, Position pos, String name) {
+  public Local_c(Del ext, Position pos, String name) {
     super(ext, pos);
     this.name = name;
   }
@@ -47,8 +47,8 @@ public class Local_c extends Expr_c implements Local
     return n;
   }
 
-  public Node buildTypes_(TypeBuilder tb) throws SemanticException {
-      Local_c n = (Local_c) super.buildTypes_(tb);
+  public Node buildTypes(TypeBuilder tb) throws SemanticException {
+      Local_c n = (Local_c) super.buildTypes(tb);
 
       TypeSystem ts = tb.typeSystem();
 
@@ -58,7 +58,7 @@ public class Local_c extends Expr_c implements Local
   }
 
   /** Type check the local. */
-  public Node typeCheck_(TypeChecker tc) throws SemanticException {
+  public Node typeCheck(TypeChecker tc) throws SemanticException {
     Context c = tc.context();
     LocalInstance li = c.findLocal(name);
     return type(li.type());
@@ -69,7 +69,7 @@ public class Local_c extends Expr_c implements Local
   }
 
   /** Write the local to an output file. */
-  public void translate_(CodeWriter w, Translator tr) {
+  public void translate(CodeWriter w, Translator tr) {
     w.write(name);
   }
 

@@ -14,7 +14,7 @@ import jltools.util.*;
  */
 public class CarrayAssign_c extends Assign_c
 {
-  public CarrayAssign_c(Ext ext, Position pos, Expr left, Operator op, Expr right) {
+  public CarrayAssign_c(Del ext, Position pos, Expr left, Operator op, Expr right) {
     super(ext, pos, left, op, right);
   }
 
@@ -23,7 +23,7 @@ public class CarrayAssign_c extends Assign_c
    * The only change is that elements of a const array cannot be modified.
    *
    */
-  public Node typeCheck_(TypeChecker tc) throws SemanticException {
+  public Node typeCheck(TypeChecker tc) throws SemanticException {
     CarrayTypeSystem ts = (CarrayTypeSystem)tc.typeSystem();
 
     Type t = left.type();
@@ -35,6 +35,6 @@ public class CarrayAssign_c extends Assign_c
     }
 
     // let the super class deal with the rest.
-    return super.typeCheck_(tc);
+    return super.typeCheck(tc);
   }
 }

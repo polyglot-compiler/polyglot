@@ -14,7 +14,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 {
     protected List statements;
 
-    public AbstractBlock_c(Ext ext, Position pos, List statements) {
+    public AbstractBlock_c(Del ext, Position pos, List statements) {
 	super(ext, pos);
 	this.statements = TypedList.copyAndCheck(statements, Stmt.class, true);
     }
@@ -73,7 +73,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
     }
 
     /** Write the block to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         enterScope(tr.context());
 
 	w.begin(0);

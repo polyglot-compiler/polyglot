@@ -16,7 +16,7 @@ public class Special_c extends Expr_c implements Special
     protected Special.Kind kind;
     protected TypeNode qualifier;
 
-    public Special_c(Ext ext, Position pos, Special.Kind kind, TypeNode qualifier) {
+    public Special_c(Del ext, Position pos, Special.Kind kind, TypeNode qualifier) {
 	super(ext, pos);
 	this.kind = kind;
 	this.qualifier = qualifier;
@@ -69,7 +69,7 @@ public class Special_c extends Expr_c implements Special
     }
 
     /** Type check the expression. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
         Context c = tc.context();
 
@@ -108,9 +108,9 @@ public class Special_c extends Expr_c implements Special
     }
 
     /** Write the expression to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	if (qualifier != null) {
-	    qualifier.translate(w, tr);
+	    qualifier.del().translate(w, tr);
 	    w.write(".");
 	}
 

@@ -17,7 +17,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
   FieldInstance fi;
   InitializerInstance ii;
 
-  public FieldDecl_c(Ext ext, Position pos, Flags flags, TypeNode type, String name, Expr init) {
+  public FieldDecl_c(Del ext, Position pos, Flags flags, TypeNode type, String name, Expr init) {
     super(ext, pos);
     this.decl = new Declarator_c(flags, type, name, init);
   }
@@ -135,12 +135,12 @@ public class FieldDecl_c extends Node_c implements FieldDecl
     return reconstruct(type, init);
   }
 
-  public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
+  public Node buildTypesEnter(TypeBuilder tb) throws SemanticException {
       tb.pushScope();
       return this;
   }
 
-  public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+  public Node buildTypes(TypeBuilder tb) throws SemanticException {
       tb.popScope();
 
       TypeSystem ts = tb.typeSystem();
@@ -165,7 +165,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
   }
 
   /** Build type objects for the declaration. */
-  public Node disambiguateEnter_(AmbiguityRemover ar) throws SemanticException {
+  public Node disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
       if (ar.kind() == AmbiguityRemover.SUPER) {
           return bypassChildren();
       }
@@ -178,7 +178,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
       return this;
   }
 
-  public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+  public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
     if (ar.kind() == AmbiguityRemover.SIGNATURES) {
       Context c = ar.context();
       TypeSystem ts = ar.typeSystem();
@@ -207,7 +207,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
     return this;
   }
 
-  public Node addMembersEnter_(AddMemberVisitor am) {
+  public Node addMembersEnter(AddMemberVisitor am) {
     ParsedClassType ct = am.context().currentClass();
     if (fi == null) {
         throw new InternalCompilerError("null field instance");
@@ -229,7 +229,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
   }
 
   /** Type check the declaration. */
-  public Node typeCheck_(TypeChecker tc) throws SemanticException {
+  public Node typeCheck(TypeChecker tc) throws SemanticException {
     TypeSystem ts = tc.typeSystem();
 
     try {
@@ -251,7 +251,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
     return this;
   }
 
-  public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+  public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       throws SemanticException
   {
       return decl.setExpectedType(child, tc);
@@ -261,7 +261,7 @@ public class FieldDecl_c extends Node_c implements FieldDecl
     return decl.toString();
   }
 
-  public void translate_(CodeWriter w, Translator tr) {
+  public void translate(CodeWriter w, Translator tr) {
     decl.translate(w, tr, true);
     w.write(";");
     w.newline(0);

@@ -15,7 +15,7 @@ public class Do_c extends Stmt_c implements Do
     protected Stmt body;
     protected Expr cond;
 
-    public Do_c(Ext ext, Position pos, Stmt body, Expr cond) {
+    public Do_c(Del ext, Position pos, Stmt body, Expr cond) {
 	super(ext, pos);
 	this.body = body;
 	this.cond = cond;
@@ -65,7 +65,7 @@ public class Do_c extends Stmt_c implements Do
     }
 
     /** Type check the statement. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException
+    public Node typeCheck(TypeChecker tc) throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
 
@@ -78,7 +78,7 @@ public class Do_c extends Stmt_c implements Do
 	return this;
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -95,7 +95,7 @@ public class Do_c extends Stmt_c implements Do
     }
 
     /** Write the statement to an output file. */
-    public void translate_(CodeWriter w, Translator tr)
+    public void translate(CodeWriter w, Translator tr)
     {
 	w.write("do ");
 	translateSubstmt(body, w, tr);

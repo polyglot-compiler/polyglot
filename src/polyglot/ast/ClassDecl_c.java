@@ -22,7 +22,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 
     protected ParsedClassType type;
 
-    public ClassDecl_c(Ext ext, Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body) {
+    public ClassDecl_c(Del ext, Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body) {
 	    super(ext, pos);
 	    this.flags = flags;
 	    this.name = name;
@@ -110,7 +110,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 	    return reconstruct(superClass, interfaces, body);
     }
 
-    public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException {
 	TypeSystem ts = tb.typeSystem();
 	tb.pushClass(position(), flags, name);
         
@@ -134,7 +134,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         return this;
     }
 
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
 	ParsedClassType type = tb.currentClass();
 	tb.popClass();
         return type(type).flags(type.flags());
@@ -148,7 +148,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 	    c.popClass();
     }
 
-    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (ar.kind() != AmbiguityRemover.SUPER) {
             return this;
         }
@@ -204,7 +204,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         return this;
     }
 
-    public Node addMembers_(AddMemberVisitor tc) throws SemanticException {
+    public Node addMembers(AddMemberVisitor tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 	NodeFactory nf = tc.nodeFactory();
         return addDefaultConstructorIfNeeded(ts, nf);
@@ -238,7 +238,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
         return body(body.addMember(cd));
     }
 
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         // The class cannot have the same simple name as any enclosing class.
 
         if (this.type.isMember()) {
@@ -313,7 +313,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 		       (flags.isInterface() ? "interface " : "class ") + name + " " + body;
     }
 
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	    enterScope(tr.context());
 
             if (flags.isInterface()) {
@@ -334,7 +334,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 
 	    if (superClass() != null) {
 		    w.write(" extends ");
-		    superClass().translate(w, tr);
+		    superClass().del().translate(w, tr);
 	    }
 
 	    if (! interfaces.isEmpty()) {
@@ -347,7 +347,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 
 		    for (Iterator i = interfaces().iterator(); i.hasNext(); ) {
 			    TypeNode tn = (TypeNode) i.next();
-			    tn.translate(w, tr);
+			    tn.del().translate(w, tr);
 
 			    if (i.hasNext()) {
 				    w.write (", ");
@@ -356,7 +356,7 @@ public class ClassDecl_c extends Node_c implements ClassDecl
 	    }
 
 	    w.write(" ");
-	    body().translate(w, tr);
+	    body().del().translate(w, tr);
 
 	    leaveScope(tr.context());
     }

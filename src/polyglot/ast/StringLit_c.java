@@ -13,7 +13,7 @@ public class StringLit_c extends Lit_c implements StringLit
 {
     protected String value;
 
-    public StringLit_c(Ext ext, Position pos, String value) {
+    public StringLit_c(Del ext, Position pos, String value) {
 	super(ext, pos);
 	this.value = value;
     }
@@ -36,7 +36,7 @@ public class StringLit_c extends Lit_c implements StringLit
     }
 
     /** Type check the expression. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         return type(tc.typeSystem().String());
     }
 
@@ -45,7 +45,7 @@ public class StringLit_c extends Lit_c implements StringLit
     }
     
     /** Write the expression to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	w.write("\"");
 	w.write(StringUtil.escape(value));
 	w.write("\"");

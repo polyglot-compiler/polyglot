@@ -13,7 +13,7 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver
 {
     protected Type type;
 
-    public AmbReceiver_c(Ext ext, Position pos, Prefix prefix, String name) {
+    public AmbReceiver_c(Del ext, Position pos, Prefix prefix, String name) {
 	super(ext, pos, prefix, name);
     }
 
@@ -27,13 +27,13 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver
             return n;
     }
 
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
         return type(tb.typeSystem().unknownType(position()));
     }
 
     /** Disambiguate the receiver. */
-    public Node disambiguate_(AmbiguityRemover ar) throws SemanticException {
-	Node n = super.disambiguate_(ar);
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+	Node n = super.disambiguate(ar);
 
 	if (n instanceof Receiver) {
 	    return n;

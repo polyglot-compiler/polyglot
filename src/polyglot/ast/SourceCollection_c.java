@@ -13,7 +13,7 @@ public class SourceCollection_c extends Node_c implements SourceCollection
 {
     protected List sources;
 
-    public SourceCollection_c(Ext ext, Position pos, List sources) {
+    public SourceCollection_c(Del ext, Position pos, List sources) {
 	super(ext, pos);
 	this.sources = TypedList.copyAndCheck(sources, SourceFile.class, true);
     }
@@ -52,10 +52,10 @@ public class SourceCollection_c extends Node_c implements SourceCollection
     }
 
     /** Write the source files to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         for (Iterator i = sources.iterator(); i.hasNext(); ) {
             SourceFile s = (SourceFile) i.next();
-            s.translate(w, tr);
+            s.del().translate(w, tr);
         }
     }
 }

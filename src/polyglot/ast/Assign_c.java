@@ -14,7 +14,7 @@ public class Assign_c extends Expr_c implements Assign
   protected Operator op;
   protected Expr right;
 
-  public Assign_c(Ext ext, Position pos, Expr left, Operator op, Expr right) {
+  public Assign_c(Del ext, Position pos, Expr left, Operator op, Expr right) {
     super(ext, pos);
     this.left = left;
     this.op = op;
@@ -83,7 +83,7 @@ public class Assign_c extends Expr_c implements Assign
 
 
   /** Type check the expression. */
-  public Node typeCheck_(TypeChecker tc) throws SemanticException {
+  public Node typeCheck(TypeChecker tc) throws SemanticException {
     Type t = left.type();
     Type s = right.type();
 
@@ -156,7 +156,7 @@ public class Assign_c extends Expr_c implements Assign
     return type(ts.promote(t, s));
   }
   
-  public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc) throws SemanticException {
+  public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc) throws SemanticException {
       if (child == right) {
           return child.expectedType(left.type());
       }
@@ -165,7 +165,7 @@ public class Assign_c extends Expr_c implements Assign
   }
 
   /** Check exceptions thrown by the expression. */
-  public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException {
+  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
     TypeSystem ts = ec.typeSystem();
 
     if (throwsArithmeticException()) {
@@ -199,7 +199,7 @@ public class Assign_c extends Expr_c implements Assign
   }
 
   /** Write the expression to an output file. */
-  public void translate_(CodeWriter w, Translator tr) {
+  public void translate(CodeWriter w, Translator tr) {
     translateSubexpr(left, true, w, tr);
     w.write(" ");
     w.write(op.toString());

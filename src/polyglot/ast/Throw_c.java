@@ -15,7 +15,7 @@ public class Throw_c extends Stmt_c implements Throw
 {
     protected Expr expr;
 
-    public Throw_c(Ext ext, Position pos, Expr expr) {
+    public Throw_c(Del ext, Position pos, Expr expr) {
 	super(ext, pos);
 	this.expr = expr;
     }
@@ -50,7 +50,7 @@ public class Throw_c extends Stmt_c implements Throw
     }
 
     /** Type check the statement. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	if (! expr.type().isThrowable()) {
 	    throw new SemanticException(
 		"Can only throw subclasses of \"" +
@@ -60,7 +60,7 @@ public class Throw_c extends Stmt_c implements Throw
 	return this;
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -73,7 +73,7 @@ public class Throw_c extends Stmt_c implements Throw
     }
 
     /** Check exceptions thrown by the statement. */
-    public Node exceptionCheck_(ExceptionChecker ec) throws SemanticException
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException
     {
 	ec.throwsException(expr.type());
 	return this;
@@ -84,10 +84,10 @@ public class Throw_c extends Stmt_c implements Throw
     }
 
     /** Write the statement to an output file. */
-    public void translate_(CodeWriter w, Translator tr)
+    public void translate(CodeWriter w, Translator tr)
     {
 	w.write("throw ");
-	expr.translate(w, tr);
+	expr.del().translate(w, tr);
 	w.write(";");
     }
 }

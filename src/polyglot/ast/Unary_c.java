@@ -14,7 +14,7 @@ public class Unary_c extends Expr_c implements Unary
     protected Unary.Operator op;
     protected Expr expr;
 
-    public Unary_c(Ext ext, Position pos, Unary.Operator op, Expr expr) {
+    public Unary_c(Del ext, Position pos, Unary.Operator op, Expr expr) {
 	super(ext, pos);
 	this.op = op;
 	this.expr = expr;
@@ -67,7 +67,7 @@ public class Unary_c extends Expr_c implements Unary
     }
 
     /** Fold constants for the expression. */
-    public Node foldConstants_(ConstantFolder cf) {
+    public Node foldConstants(ConstantFolder cf) {
       	NodeFactory nf = cf.nodeFactory();
 
         if (expr instanceof NumLit) {
@@ -87,7 +87,7 @@ public class Unary_c extends Expr_c implements Unary
     }
 
     /** Type check the expression. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
 	if (op == POST_INC || op == POST_DEC ||
@@ -131,7 +131,7 @@ public class Unary_c extends Expr_c implements Unary
 	return this;
     }
 
-    public Expr setExpectedType_(Expr child, ExpectedTypeVisitor tc)
+    public Expr setExpectedType(Expr child, ExpectedTypeVisitor tc)
       	throws SemanticException
     {
         TypeSystem ts = tc.typeSystem();
@@ -166,7 +166,7 @@ public class Unary_c extends Expr_c implements Unary
 	}
     }
 
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
         if (op.isPrefix()) {
 	    w.write(op.toString());
 	    translateSubexpr(expr, w, tr);

@@ -21,7 +21,7 @@ public class SourceFile_c extends Node_c implements SourceFile
     protected ImportTable importTable;
     protected Source source;
 
-    public SourceFile_c(Ext ext, Position pos, PackageNode package_, List imports, List decls) {
+    public SourceFile_c(Del ext, Position pos, PackageNode package_, List imports, List decls) {
 	super(ext, pos);
 	this.package_ = package_;
 	this.imports = TypedList.copyAndCheck(imports, Import.class, true);
@@ -113,7 +113,7 @@ public class SourceFile_c extends Node_c implements SourceFile
      * Build type objects for the source file.  Set the visitor's import table
      * field before we recurse into the declarations.
      */
-    public Node buildTypesEnter_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypesEnter(TypeBuilder tb) throws SemanticException {
         TypeSystem ts = tb.typeSystem();
 
         ImportTable it;
@@ -134,7 +134,7 @@ public class SourceFile_c extends Node_c implements SourceFile
      * Build type objects for the source file.  Sets the import table field for
      * the source.
      */
-    public Node buildTypes_(TypeBuilder tb) throws SemanticException {
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
         ImportTable it = tb.importTable();
 
         // Clear the import table in case we use the same visitor
@@ -153,7 +153,7 @@ public class SourceFile_c extends Node_c implements SourceFile
     }
 
     /** Type check the source file. */
-    public Node typeCheck_(TypeChecker tc) throws SemanticException {
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
 	Set names = new HashSet();
 	boolean hasPublic = false;
 
@@ -187,10 +187,10 @@ public class SourceFile_c extends Node_c implements SourceFile
     }
 
     /** Write the source file to an output file. */
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	if (package_ != null) {
 	    w.write("package ");
-	    package_.translate(w, tr);
+	    package_.del().translate(w, tr);
 	    w.write(";");
 	    w.newline(0);
 	    w.newline(0);
@@ -198,7 +198,7 @@ public class SourceFile_c extends Node_c implements SourceFile
 
 	for (Iterator i = imports.iterator(); i.hasNext(); ) {
 	    Import im = (Import) i.next();
-	    im.translate(w, tr);
+	    im.del().translate(w, tr);
 	}
 	 
 	if (! imports.isEmpty()) {
@@ -207,7 +207,7 @@ public class SourceFile_c extends Node_c implements SourceFile
 
 	for (Iterator i = decls.iterator(); i.hasNext(); ) {
 	    ClassDecl cd = (ClassDecl) i.next();
-	    cd.translate(w, tr);
+	    cd.del().translate(w, tr);
 	    w.newline(0);
 	}
     }

@@ -16,7 +16,7 @@ public class Try_c extends Stmt_c implements Try
     protected List catchBlocks;
     protected Block finallyBlock;
 
-    public Try_c(Ext ext, Position pos, Block tryBlock, List catchBlocks, Block finallyBlock) {
+    public Try_c(Del ext, Position pos, Block tryBlock, List catchBlocks, Block finallyBlock) {
 	super(ext, pos);
 	this.tryBlock = tryBlock;
 	this.catchBlocks = TypedList.copyAndCheck(catchBlocks, Catch.class, true);
@@ -82,10 +82,10 @@ public class Try_c extends Stmt_c implements Try
 
     /**
      * Bypass all children when peforming an exception check.
-     * exceptionCheck_(), called from ExceptionChecker.leave(),
+     * exceptionCheck(), called from ExceptionChecker.leave(),
      * will handle visiting children.
      */
-    public Node exceptionCheckEnter_(ExceptionChecker ec)
+    public Node exceptionCheckEnter(ExceptionChecker ec)
 	throws SemanticException
     {
       return bypassChildren();
@@ -100,7 +100,7 @@ public class Try_c extends Stmt_c implements Try
      * child node. It contains the exceptions that can be thrown by the try
      * block.
      */
-    public Node exceptionCheck_(ExceptionChecker ec)
+    public Node exceptionCheck(ExceptionChecker ec)
 	throws SemanticException
     {
 	TypeSystem ts = ec.typeSystem();
@@ -190,7 +190,7 @@ public class Try_c extends Stmt_c implements Try
 	                        (finallyBlock != null ? "finally { ... }" : "");
     }
 
-    public void translate_(CodeWriter w, Translator tr) {
+    public void translate(CodeWriter w, Translator tr) {
 	w.write("try ");
 	translateSubstmt(tryBlock, w, tr);
 
