@@ -6,6 +6,8 @@ package polyglot.ast;
  */
 public interface StringLit extends Lit 
 {
+    /** The string. */
     String value();
+    /** Set the string. */
     StringLit value(String value);
 }

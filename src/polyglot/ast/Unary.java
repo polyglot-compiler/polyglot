@@ -30,9 +30,13 @@ public interface Unary extends Expr
     public static final Operator POS      = new Operator("+", true);
     public static final Operator NOT      = new Operator("!", true);
 
+    /** The sub-expression on that to apply the operator. */
     Expr expr();
+    /** Set the sub-expression on that to apply the operator. */
     Unary expr(Expr e);
 
+    /** The operator to apply on the sub-expression. */
     Operator operator();
+    /** Set the operator to apply on the sub-expression. */
     Unary operator(Operator o);
 }

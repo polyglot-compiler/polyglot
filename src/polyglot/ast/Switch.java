@@ -12,9 +12,15 @@ import java.util.List;
  */
 public interface Switch extends Stmt 
 {
+    /** The expression on which to switch. */
     Expr expr();
+
+    /** Set the expression on which to switch. */
     Switch expr(Expr expr);
 
+    /** List of switch elements: cast statements or blocks. */
     List elements();
+
+    /** Set the list of switch elements: cast statements or blocks. */
     Switch elements(List elements);
 }

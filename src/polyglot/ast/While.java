@@ -7,9 +7,15 @@ package polyglot.ast;
  */ 
 public interface While extends Stmt 
 {
+    /** The loop condition. */
     Expr cond();
+
+    /** Set the loop condition. */
     While cond(Expr cond);
 
+    /** The loop body. */
     Stmt body();
+
+    /** Set the loop body. */
     While body(Stmt body);
 }

@@ -9,5 +9,6 @@ import polyglot.types.SemanticException;
  */
 public interface TypeNode extends Receiver, QualifierNode
 {
+    /** Set the type object for this node. */
     TypeNode type(Type type);
 }

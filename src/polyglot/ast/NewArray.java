@@ -12,17 +12,33 @@ import java.util.List;
  */
 public interface NewArray extends Expr
 {
+    /** The array's base type. */
     TypeNode baseType();
+
+    /** Set the array's base type. */
     NewArray baseType(TypeNode baseType);
 
+    /**
+     * The number of array dimensions.
+     * Same as dims().size() + additionalDims().
+     */
     int numDims();
 
+    /** List of dimension expressions. */
     List dims();
+
+    /** Set the list of dimension expressions. */
     NewArray dims(List dims);
 
+    /** The number of additional dimensions. */
     int additionalDims();
+
+    /** Set the number of additional dimensions. */
     NewArray additionalDims(int addDims);
 
+    /** The array initializer, or null. */
     ArrayInit init();
+
+    /** Set the array initializer. */
     NewArray init(ArrayInit init);
 }

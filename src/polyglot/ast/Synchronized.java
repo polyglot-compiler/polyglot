@@ -7,9 +7,15 @@ package polyglot.ast;
  */
 public interface Synchronized extends Stmt
 {
+    /** The expression to lock. */
     Expr expr();
+
+    /** Set the expression to lock. */
     Synchronized expr(Expr expr);
 
+    /** The body in that the lock is held. */
     Block body();
+
+    /** Set the body in that the lock is held. */
     Synchronized body(Block body);
 }

@@ -8,6 +8,8 @@ import polyglot.types.Package;
  */
 public interface PackageNode extends Node, Prefix, QualifierNode
 {
+    /** The package type object. */
     Package package_();
+    /** Set the package type object. */
     PackageNode package_(Package p);
 }

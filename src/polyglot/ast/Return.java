@@ -7,6 +7,8 @@ package polyglot.ast;
  */
 public interface Return extends Stmt
 {
+    /** The expression to return. */
     Expr expr();
+    /** Set the expression to return. */
     Return expr(Expr expr);
 }

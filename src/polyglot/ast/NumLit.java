@@ -5,5 +5,6 @@ package polyglot.ast;
  */
 public interface NumLit extends Lit
 {
+    /** The literal's value. */
     long longValue();
 }

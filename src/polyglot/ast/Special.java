@@ -18,9 +18,15 @@ public interface Special extends Expr
     public static final Kind SUPER = new Kind("super");
     public static final Kind THIS  = new Kind("this");
 
+    /** Get the kind of expression: SUPER or THIS. */
     Kind kind();
+
+    /** Set the kind of expression: SUPER or THIS. */
     Special kind(Kind kind);
 
+    /** Get the outer class qualifier of the expression. */
     TypeNode qualifier();
+
+    /** Set the outer class qualifier of the expression. */
     Special qualifier(TypeNode qualifier);
 }

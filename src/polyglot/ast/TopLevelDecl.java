@@ -8,6 +8,9 @@ import polyglot.types.Flags;
  */
 public interface TopLevelDecl extends Node
 {
+    /** The declaration's flags. */
     Flags flags();
+
+    /** The declaration's name. */
     String name();
 }
