@@ -6,6 +6,7 @@ vs_files 	= SymbolReader.java \
 		  TypeChecker.java \
 		  ExceptionChecker.java \
 		  FlowChecker.java \
+		  ClassSerializer.java \
 		  DumpAst.java \
 		  NodeScrambler.java
 

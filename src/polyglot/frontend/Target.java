@@ -4,6 +4,7 @@ import jltools.ast.*;
 import jltools.util.*;
 
 import java.io.*;
+import java.util.*;
 
 
 public abstract class Target
@@ -56,6 +57,8 @@ public abstract class Target
     return null;
   }
 
+  public abstract Date getLastModifiedDate();
+ 
   public boolean equals( Object o)
   { 
     if( o instanceof Target) {

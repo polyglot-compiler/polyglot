@@ -16,8 +16,9 @@ import jltools.util.InternalCompilerError;
  *    a type.
  **/
 public class FieldInstance extends AnnotatedObject 
-  implements Cloneable, TypeInstance 
+  implements Cloneable, TypeInstance, java.io.Serializable 
 {
+  static final long serialVersionUID = -3339170626027684669L;
 
   public FieldInstance(String fieldName, Type fieldType, 
                        Type enclosingType, AccessFlags fieldFlags) {

@@ -15,7 +15,9 @@ import java.util.List;
  *    associated with a Java constructor.
  *
  **/
-public class ConstructorTypeInstance extends MethodTypeInstance {
+public class ConstructorTypeInstance extends MethodTypeInstance 
+{
+  static final long serialVersionUID = 1113653833108152935L;
 
   /**
    *    ExceptionTypes and AccessFlags may be null.

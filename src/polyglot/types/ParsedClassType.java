@@ -1,13 +1,9 @@
-/*
- * ParsedClassType.java
- */
-
 package jltools.types;
 
-import java.util.*;
+import jltools.util.*;
 
-import jltools.util.TypedList;
-import jltools.util.AnnotatedObject;
+import java.io.*;
+import java.util.*;
 
 
 /**
@@ -19,6 +15,12 @@ import jltools.util.AnnotatedObject;
  **/
 public class ParsedClassType extends ClassTypeImpl 
 {
+  static final long serialVersionUID = 5725500800448862634L;
+  
+  protected ParsedClassType()
+  {
+    super();
+  }
 
   public ParsedClassType( TypeSystem ts)
   {
@@ -99,6 +101,24 @@ public class ParsedClassType extends ClassTypeImpl
   public void addInnerClass( ClassType innerClass)
   {
     innerClasses.add( innerClass);
+  }
+
+  /**
+   * Used to serialize this class into the output file.
+   */
+  private void writeObject( ObjectOutputStream out)
+     throws IOException
+  {
+    if( out instanceof TypeOutputStream
+        && ((TypeOutputStream)out).atRootType()) {
+      /* We are the actual class being written out. */
+      out.defaultWriteObject();
+    }
+    else {
+      /* We are somewhere below the root class, so sever any links to other
+       * types. */
+      out.writeObject( new AmbiguousType( ts, getTypeString()));
+    }
   }
 }
 

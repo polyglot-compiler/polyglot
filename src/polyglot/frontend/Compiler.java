@@ -20,15 +20,36 @@ public class Compiler implements TargetTable, ClassCleaner
   public static String OPT_OUTPUT_WIDTH     = "Output Width (Integer)";
   public static String OPT_VERBOSE          = "Verbose (Boolean)";
   public static String OPT_FQCN             = "FQCN (Boolean)";
+  public static String OPT_SERIALIZE        = "Class Serialization (Boolean)";
 
+  /** 
+   * Marks major changes in the output format of the files produced by the
+   * compiler. Files produced be different major versions are considered 
+   * incompatible and will not be used as source of class information.
+   */
   public static int VERSION_MAJOR           = 1;
+  
+  /** 
+   * Indicates a change in the compiler that does not affect the output format.
+   * Source files will be prefered over class files build by compilers with
+   * different minor versions, but if no source file is available, then the
+   * class file will be used.
+   */
   public static int VERSION_MINOR           = 0;
+
+  /**
+   * Denote minor changes and bugfixes to the compiler. Class files compiled
+   * with versions of the compiler that only differ in patchlevel (from the
+   * current instantiation) will always be preferred over source files (unless
+   * the source files have newer modification dates).
+   */
   public static int VERSION_PATCHLEVEL      = 0;
 
   /* Global options and state. */
   private static Map options;
   private static int outputWidth;
   private static boolean useFqcn;
+  private static boolean serialize;
   private static boolean verbose;
 
   private static boolean initialized = false;
@@ -105,10 +126,9 @@ public class Compiler implements TargetTable, ClassCleaner
   /* Static fields. */
   private static TypeSystem ts;
 
-  private static CompoundClassResolver systemResolver;
+  private static CachingClassResolver systemResolver;
   private static CompoundClassResolver parsedResolver;
-  private static SourceFileClassResolver sourceResolver;
-  private static LoadedClassResolver loadedResolver;
+  private static LoadedClassResolver sourceResolver;
 
   protected static TargetFactory tf;
 
@@ -136,23 +156,25 @@ public class Compiler implements TargetTable, ClassCleaner
     useFqcn = ((Boolean)options.get( OPT_FQCN)).booleanValue();
 
     verbose = ((Boolean)options.get( OPT_VERBOSE)).booleanValue();
+    
+    serialize = ((Boolean)options.get( OPT_SERIALIZE)).booleanValue();
 
     /* Set up the resolvers. */
-    systemResolver = new CompoundClassResolver();
+    Compiler compiler = new Compiler( null);
+
+    CompoundClassResolver compoundResolver = new CompoundClassResolver();
         
     parsedResolver = new CompoundClassResolver();
-    systemResolver.addClassResolver( parsedResolver);
+    compoundResolver.addClassResolver( parsedResolver);
     
-    sourceResolver = new SourceFileClassResolver( tf, new Compiler( null));
-    systemResolver.addClassResolver( sourceResolver);
-    
-    loadedResolver = new LoadedClassResolver();
-    systemResolver.addClassResolver( loadedResolver);
-    loadedResolver.setTypeSystem( ts);
-    
+    sourceResolver = new LoadedClassResolver( tf, compiler, ts);
+
+    compoundResolver.addClassResolver( sourceResolver);
+
+    systemResolver = new CachingClassResolver( compoundResolver);
     try
     {
-      ts.initializeTypeSystem( systemResolver, new Compiler( null));
+      ts.initializeTypeSystem( systemResolver, compiler);
     }
     catch( SemanticException e)
     {
@@ -170,6 +192,11 @@ public class Compiler implements TargetTable, ClassCleaner
   public static boolean useFullyQualifiedNames()
   {
     return useFqcn;
+  }
+
+  public static TypeSystem getTypeSystem()
+  {
+    return ts;
   }
 
   public static void verbose( Object o, String s)
@@ -233,17 +260,17 @@ public class Compiler implements TargetTable, ClassCleaner
     }
   }
 
+  public void addTarget( ClassType clazz) throws IOException
+  {
+    /* All we need to do here is "look" for a job that contains this class.
+     * If no job is found, then a new one will automatically created. */
+    lookupJob( clazz);
+  }
+
   public boolean cleanClass( ClassType clazz) throws IOException
   {
-    try
-    {
-      Job job = lookupJob( clazz.getFullName());
-      return compile( job, CLEANED);
-    }
-    catch( FileNotFoundException e)
-    {
-      return false;
-    }
+    Job job = lookupJob( clazz);
+    return compile( job, CLEANED);
   } 
 
   public boolean compile( Target t) throws IOException
@@ -364,8 +391,10 @@ public class Compiler implements TargetTable, ClassCleaner
           if( hasErrors( job)) { releaseJob( job); return false; }
           
           job.status |= CLEANED;
-
-          job.ast = runVisitors( job.t, job.ast, CLEANED);
+          
+          if( job.ast != null) {
+            job.ast = runVisitors( job.t, job.ast, CLEANED);
+          }
         }
         releaseJob( job);
       }
@@ -394,7 +423,6 @@ public class Compiler implements TargetTable, ClassCleaner
        * else in the worklist is at least CLEAN. */
       boolean okay = true; 
       for( int i = 0; i < workList.size(); i++) {
-        // FIXME wokrlist
         okay &= compile( (Job)workList.get( i), CLEANED);
       }
       if( !okay) {
@@ -426,6 +454,12 @@ public class Compiler implements TargetTable, ClassCleaner
       if( (job.status & TRANSLATED) == 0) {
         acquireJob( job);
         if( (job.status & TRANSLATED) == 0) {
+          if( serialize) {
+            verbose( this, "serializing class info for " 
+                     + job.t.getName() + "...");
+            job.ast = serializeClassInfo( job.t, job.ast, eq);
+          }
+
           verbose( this, "translating " + job.t.getName() + "...");
           translate( job.t, job.ast, job.it);
 
@@ -478,7 +512,42 @@ public class Compiler implements TargetTable, ClassCleaner
       return true;
     }
   }
-  
+
+  protected Job lookupJob( ClassType clazz) throws IOException
+  {
+    Job job;
+
+    synchronized( workList) 
+    {
+      for( Iterator iter = workList.iterator(); iter.hasNext(); ) {
+        job = (Job)iter.next();
+        try {
+          job.cr.findClass( clazz.getFullName());
+          return job;
+        }
+        catch( SemanticException e) {}
+      }
+    }
+
+    // System.err.println( "Creating new job for class: " + clazz.getFullName());
+
+    job = new Job( tf.createClassTarget( clazz));
+    job.it = new ImportTable( systemResolver, true, job.t.getErrorQueue());
+    job.cr = new TableClassResolver( this);
+    job.cr.addClass( clazz.getFullName(), clazz);
+
+    job.status = PARSED | READ | DISAMBIGUATED | CHECKED | TRANSLATED;
+
+    synchronized( workList)
+    {
+      workList.add( job);
+    }
+
+    parsedResolver.addClassResolver( job.cr);
+
+    return job;
+  }
+
   protected Job lookupJob( String classname) throws IOException
   {
     Job job;
@@ -634,8 +703,12 @@ public class Compiler implements TargetTable, ClassCleaner
     w.flush();
     System.out.flush();
     t.closeDestination();
+  }
 
-
+  protected Node serializeClassInfo( Target t, Node ast, ErrorQueue eq)
+  {
+    ClassSerializer sc = new ClassSerializer( ts, t.getLastModifiedDate(), eq);
+    return ast.visit( sc);
   }
 
   protected Node runVisitors( Target t, Node ast, int stage)
@@ -682,5 +755,4 @@ public class Compiler implements TargetTable, ClassCleaner
       }
     }
   }
-  
 }

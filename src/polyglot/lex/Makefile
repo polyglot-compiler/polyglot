@@ -22,7 +22,6 @@ lex_files 	=  BooleanLiteral.java \
 			Operator.java \
 			Separator.java \
 			StringLiteral.java \
-			Sym.java \
 			Token.java \
 			TraditionalComment.java \
 			WhiteSpace.java \

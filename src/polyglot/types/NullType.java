@@ -1,18 +1,18 @@
-/*
- * NullType.java
- */
-
 package jltools.types;
 
 /**
- * NullType
- *
- * Overview:
- *    An NullType represents an Null of base java types.
- *
- *    ==> _All_ types are immutable.
- **/
-public class NullType extends Type {
+ * A <code>NullType</code> represents the type of the Java keyword
+ * <code>null</code>.
+ */
+public class NullType extends Type 
+{
+  static final long serialVersionUID = 6122344225204874423L;
+
+  protected NullType()
+  {
+    super();
+  }
+
   public NullType(TypeSystem ts) { 
     super(ts);
   }
@@ -35,7 +35,6 @@ public class NullType extends Type {
 
   public boolean isCanonical()
   {
-    // FIXME: Correct?
     return true;
   }
 }

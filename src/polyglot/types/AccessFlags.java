@@ -14,7 +14,9 @@ import java.lang.reflect.Modifier;
  *    We represent pacakge protection as the abscence of private, public
  *    and protected.
  **/
-public class AccessFlags implements Cloneable {
+public class AccessFlags implements Cloneable, java.io.Serializable {
+
+  static final long serialVersionUID = -5861922980904884299L;
 
   /**
    * Effects: returns a new accessflags object with no accessflags set.

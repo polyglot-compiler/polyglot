@@ -1,20 +1,23 @@
-/*
- * ArrayType.java
- */
-
 package jltools.types;
 
 /**
- * ArrayType
- *
- * Overview:
- *    An ArrayType represents an array of base java types.
- *
- *    ==> _All_ types are immutable.
- **/
-public class ArrayType extends Type {
-  public ArrayType(TypeSystem ts, Type baseType, int dims) { 
-    super(ts);
+ * An <code>ArrayType</code> represents an array of base java types.
+ */
+public class ArrayType extends Type 
+{
+  static final long serialVersionUID = -2145638221364361658L;
+
+  protected Type base;
+  protected int dims;
+
+  protected ArrayType()
+  {
+    super();
+  }
+
+  public ArrayType(TypeSystem ts, Type baseType, int dims) 
+  { 
+    super( ts);
     if (dims <= 0) 
       throw new Error("Tried to create ArrayType with <=0 dimensions");
     if (baseType instanceof ArrayType) {
@@ -27,13 +30,13 @@ public class ArrayType extends Type {
     }
   }
 
-  private Type base;
-  private int dims;
-
-  public Type getBaseType() {
+  public Type getBaseType() 
+  {
     return base;
   }
-  public int getDimensions() {
+  
+  public int getDimensions() 
+  {
     return dims;
   }
   
@@ -46,22 +49,26 @@ public class ArrayType extends Type {
     return sb.toString();
   }
 
-  ////
-  // Methods to be filled in by subtypes.
-  ////
-  public boolean isPrimitive() {
+  public boolean isPrimitive() 
+  {
     return false;
   }
-  public boolean isCanonical() {
+
+  public boolean isCanonical() 
+  {
     return base.isCanonical();
   }
-  public boolean equals(Object o) {
+
+  public boolean equals(Object o)
+  {
     if (! (o instanceof ArrayType)) return false;
 
     ArrayType t = (ArrayType) o;
     return t.dims == dims && getTypeSystem().isSameType(t.base, base);
   }
-  public int hashCode() {
+  
+  public int hashCode() 
+  {
     return base.hashCode() ^ (dims << 3);
   }
 }

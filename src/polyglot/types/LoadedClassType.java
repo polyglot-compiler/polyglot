@@ -1,7 +1,3 @@
-/*
- * LoadedClassType.java
- */
-
 package jltools.types;
 
 import jltools.util.TypedList;
@@ -9,26 +5,33 @@ import jltools.util.TypedList;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
+
+import java.io.*;
 import java.util.*;
 
 
 /**
- * LoadedClassType
- *
- * Overview: 
- *    A LoadedClassType is a ClassType which derives from a file
- *    loaded at run time.
- **/
-public class LoadedClassType extends ClassTypeImpl  {
+ * A <code>LoadedClassType</code> is a class type which is derived from a file
+ * loaded at run time.
+ * <p>
+ * Note that though this class is <code>Serializable</code> it should never
+ * actually be deserialized, since the default behavior is to only serialize
+ * the name of the class as an <code>AmbiguousType</code>.
+ */
+public class LoadedClassType extends ClassTypeImpl  
+{
+  static final long serialVersionUID = 8605280214426739323L;
+
+  protected Class theClass;
 
   /**
    * Constructs a new LoadedClassType from a given class, within a given
-   * typeSystem.
-   **/
-  public LoadedClassType(Class theClass, TypeSystem typeSys) 
+   * type sytem.
+   */
+  public LoadedClassType(TypeSystem ts, Class theClass) 
        throws SemanticException 
   {
-    super( typeSys);    
+    super( ts);    
     this.theClass = theClass;
 
     // Set up names and classType.    
@@ -130,7 +133,8 @@ public class LoadedClassType extends ClassTypeImpl  {
     methods = new TypedList(methodLst, MethodType.class, true);    
   }
 
-  protected FieldInstance fieldInstanceForField(Field f) throws SemanticException 
+  protected FieldInstance fieldInstanceForField(Field f) 
+    throws SemanticException 
   {
     String fieldName = f.getName();
     Type type = ts.typeForClass(f.getType());
@@ -166,7 +170,8 @@ public class LoadedClassType extends ClassTypeImpl  {
                                   argList, excpList, flags);
   }
 
-  protected MethodType methodTypeForConstructor(Constructor m) throws SemanticException
+  protected MethodType methodTypeForConstructor(Constructor m) 
+    throws SemanticException
   {
     AccessFlags flags = AccessFlags.flagsForInt(m.getModifiers());
     Class[] args = m.getParameterTypes();
@@ -183,6 +188,9 @@ public class LoadedClassType extends ClassTypeImpl  {
     return new ConstructorTypeInstance(ts, this, argList, excpList, flags);
   }
 
-  Class theClass;
+  protected Object writeReplace() throws ObjectStreamException
+  {
+    return new AmbiguousType( ts, getTypeString());
+  }
 }
 

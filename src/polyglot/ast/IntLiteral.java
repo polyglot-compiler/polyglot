@@ -156,7 +156,7 @@ public class IntLiteral extends Literal
   public void translate( LocalContext c, CodeWriter w)
   {
     if( kind == LONG) {
-      w.write( Long.toString( value ) /* + 'L' */);
+      w.write( Long.toString( value ) + 'L');
     }
     else {
       w.write( Long.toString( value ));

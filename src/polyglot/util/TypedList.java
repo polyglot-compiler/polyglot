@@ -26,7 +26,10 @@ import java.lang.UnsupportedOperationException;
  *
  * This is a poor substitute for PolyJ.
  **/
-public class TypedList implements List {
+public class TypedList implements List, java.io.Serializable 
+{
+  static final long serialVersionUID = -1390984392613203018L;
+
   /**
    * Requires: <list> not null, and every element of <list> may be
    *    cast to class <c>.

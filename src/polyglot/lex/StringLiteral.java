@@ -6,7 +6,7 @@ public class StringLiteral extends Literal {
   String val;
   StringLiteral(int line, String s) { super(line); this.val = s; }
 
-  public Symbol symbol() { return new Symbol(Sym.STRING_LITERAL, this); }
+  public Symbol symbol() { return new Symbol(jltools.parse.sym.STRING_LITERAL, this); }
 
   public String getValue() { return val; }
 

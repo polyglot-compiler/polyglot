@@ -141,7 +141,8 @@ public class Main
     }
 
     /* Now call javac or jikes, if necessary. */
-    if( options.get( MAIN_OPT_POST_COMPILER) != null) {
+    if( options.get( MAIN_OPT_POST_COMPILER) != null
+        && !((Boolean)options.get( MAIN_OPT_STDOUT)).booleanValue()) {
       Runtime runtime = Runtime.getRuntime();
       Process proc;
       MainTargetFactory.MainTarget t;
@@ -158,7 +159,7 @@ public class Main
                             + File.pathSeparator + "." + File.pathSeparator :
                             "") 
                         + System.getProperty( "java.class.path") + " "
-                        + t.outputFile.getPath();
+                        + t.outputFileName;
 
         Compiler.verbose( Main.class, "executing " + command);
         
@@ -293,12 +294,14 @@ public class Main
     sourcePath.add( new File( "."));
     options.put( MAIN_OPT_SOURCE_PATH, sourcePath);
     options.put( MAIN_OPT_DUMP, new Boolean( false));
+    options.put( MAIN_OPT_STDOUT, new Boolean( false));
     options.put( MAIN_OPT_SCRAMBLE, new Boolean( false));
     options.put( MAIN_OPT_EXT_OP, new Boolean( false));
     
     options.put( Compiler.OPT_OUTPUT_WIDTH, new Integer(80));
     options.put( Compiler.OPT_VERBOSE, new Boolean( false));
     options.put( Compiler.OPT_FQCN, new Boolean( false));
+    options.put( Compiler.OPT_SERIALIZE, new Boolean( true));
 
     for( int i = 0; i < args.length; )
     {
@@ -374,6 +377,11 @@ public class Main
         }
         catch( NumberFormatException e) {}
       }
+      else if( args[i].equals( "-noserial")) 
+      {
+        i++;
+        options.put( Compiler.OPT_SERIALIZE, new Boolean( false));
+      }
       else if( args[i].equals( "-op"))
       {
         i++;
@@ -445,6 +453,8 @@ public class Main
     System.err.println( " -ox <ext>               set output extension");
     System.err.println( " -dump                   dump the ast");
     System.err.println( " -scramble [seed]        scramble the ast");
+    System.err.println( " -noserial               disable class"
+                        + " serialization");
     System.err.println( " -op                     use op extension");
     System.err.println( " -post <compiler>        run javac-like compiler" 
                         + " after translation");

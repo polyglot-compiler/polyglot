@@ -11,7 +11,8 @@ import jltools.types.*;
  */
 public class MethodTypeInstanceInitializer extends MethodTypeInstance
 {
-  
+  static final long serialVersionUID = -4797644839050139801L;
+
   public MethodTypeInstanceInitializer( TypeSystem ts, ClassType ctEnclosing, 
                                         boolean bStatic)
   {

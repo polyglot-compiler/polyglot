@@ -60,7 +60,7 @@ public class Lexer {
     sym.left = startpos; sym.right = endpos;
     // return token.
 
-    /* return sym; */
+    /* return jltools.parse.sym; */
     return (Token)ie;
   }
   public boolean debug_lex() throws java.io.IOException {

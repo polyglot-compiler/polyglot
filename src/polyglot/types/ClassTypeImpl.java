@@ -1,7 +1,3 @@
-/*
- * ClassTypeImpl.java
- */
-
 package jltools.types;
 
 import java.util.List;
@@ -10,13 +6,15 @@ import jltools.util.AnnotatedObject;
 import java.util.Iterator;
 
 /**
- * ClassTypeImpl
- *
- * Overview: 
- *    A ClassTypeImpl is used to implement non-lazy Java classes: ones where
- *    information is computed once, rather than on demand. 
- **/
-public abstract class ClassTypeImpl extends ClassType {
+ * A <code>ClassTypeImpl</code> is used to implement non-lazy Java classes.
+ * That is, ones where information is computed once, rather than on demand. 
+ */
+public abstract class ClassTypeImpl extends ClassType 
+{
+  protected ClassTypeImpl()
+  {
+    super();
+  }
 
   public ClassTypeImpl( TypeSystem ts)
   {
@@ -64,21 +62,6 @@ public abstract class ClassTypeImpl extends ClassType {
   }
       
 
-  ////
-  // All or most of the information below must be initialized before
-  // we can use this class.
-  ////
-
-  ////
-  // Metadata
-  ////
-  // The associated TypeSystem.
-  /* Now found in Type. */
-  // protected TypeSystem ts;
-  
-  ////
-  // Names
-  ////
   // The package name.
   protected String packageName;
   // The full name, including package and outers.

@@ -20,6 +20,9 @@ utl_files 	= Annotate.java \
 		  TransformingIterator.java \
 		  TypedList.java \
 		  TypedListIterator.java \
+		  TypeInputStream.java \
+		  TypeOutputStream.java \
+		  TypeEncoder.java \
 		  UnicodeWriter.java \
 		  WorkList.java \
 

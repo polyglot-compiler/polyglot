@@ -110,6 +110,7 @@ public class FieldNode extends ClassMember
   {
     //w.write(accessFlags.getStringRepresentation());
     declare.translate(c, w);
+    w.newline( 0);
   }
 
   public void dump( CodeWriter w)

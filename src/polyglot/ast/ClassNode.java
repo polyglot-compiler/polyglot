@@ -31,7 +31,7 @@ public class ClassNode extends ClassMember
    * ClassNode. Consequently, whenever we create a new node via reconstruct, we always
    * copy its old value to the new value.
    */
-  protected ParsedClassType type;
+  public ParsedClassType type;
   
   /**
    * FIXME

@@ -5,6 +5,7 @@ tp_files 	= AccessFlags.java	\
 			AmbiguousType.java \
 			ArrayType.java  \
 			ClassResolver.java \
+			CachingClassResolver.java \
 			ClassType.java \
 			ClassTypeImpl.java \
 			ClassCleaner.java \
@@ -29,7 +30,6 @@ tp_files 	= AccessFlags.java	\
 			TypeInstance.java \
 			TypeSystem.java \
 			SemanticException.java \
-			SourceFileClassResolver.java \
 			StandardTypeSystem.java 
 
 

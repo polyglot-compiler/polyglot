@@ -23,7 +23,7 @@ public class CharacterLiteral extends Literal {
 
   public Symbol symbol() 
   {
-    return new Symbol(Sym.CHARACTER_LITERAL, this); 
+    return new Symbol(jltools.parse.sym.CHARACTER_LITERAL, this); 
   }
 
   public String toString() 

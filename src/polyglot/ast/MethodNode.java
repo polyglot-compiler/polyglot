@@ -432,6 +432,8 @@ public class MethodNode extends ClassMember
     else {
       w.write(";");
     }
+
+    w.newline( 0);
   }
 
   public void dump( CodeWriter w)

@@ -2,6 +2,7 @@ package jltools.main;
 
 import jltools.ast.NodeVisitor;
 import jltools.frontend.*;
+import jltools.types.ClassType;
 import jltools.util.*;
 
 import java.io.*;
@@ -100,6 +101,11 @@ public class MainTargetFactory implements TargetFactory
     return new MainTarget( sourceFile.getName(), sourceFile, outputFile);
   }
 
+  public Target createClassTarget( ClassType classType) throws IOException
+  {
+    return new MainTarget( classType.getShortName(), null, null);
+  }
+
   public class MainTarget extends Target
   {
     File sourceFile;
@@ -107,6 +113,10 @@ public class MainTargetFactory implements TargetFactory
     FileReader sourceFileReader;
     Writer outputWriter;
     Iterator visitors;
+
+    Date lastModified;
+    String outputFileName;
+
 
     public MainTarget( String name, File sourceFile, File outputFile)
     {
@@ -120,6 +130,8 @@ public class MainTargetFactory implements TargetFactory
 
     public Reader getSourceReader() throws IOException
     {
+      lastModified = new Date( sourceFile.lastModified());
+
       if (sourceFileReader != null) return sourceFileReader;
       return (sourceFileReader = new FileReader( sourceFile));
     }
@@ -127,8 +139,10 @@ public class MainTargetFactory implements TargetFactory
     public Writer getOutputWriter( String packageName) throws IOException
     {
       if (outputWriter != null) return outputWriter;
+
       if( stdout) {
-        return (outputWriter = new UnicodeWriter( new PrintWriter( System.out)));
+        return (outputWriter = new UnicodeWriter( 
+                                     new PrintWriter( System.out)));
       }
       else {
         if( outputFile == null) {
@@ -153,7 +167,11 @@ public class MainTargetFactory implements TargetFactory
           File parent = outputFile.getParentFile();
           parent.mkdirs();
         }
-        return (outputWriter = new UnicodeWriter( new FileWriter( outputFile)));
+
+        outputFileName = outputFile.getPath();
+
+        return (outputWriter = new UnicodeWriter( 
+                                 new FileWriter( outputFile)));
       }
     }
 
@@ -168,9 +186,9 @@ public class MainTargetFactory implements TargetFactory
     {
       if ( sourceFileReader != null) sourceFileReader.close();
       sourceFileReader =null;
-      sourceFile = null;
-      
+      sourceFile = null;      
     }
+
     public void closeDestination() throws IOException
     {
       if ( outputWriter != null) outputWriter.close();
@@ -197,6 +215,11 @@ public class MainTargetFactory implements TargetFactory
     {
       return new MainErrorQueue( name, System.err);
     }
+
+    public Date getLastModifiedDate()
+    {
+      return lastModified;
+    }
   }
    
   class MainErrorQueue extends ErrorQueue
@@ -204,13 +227,12 @@ public class MainTargetFactory implements TargetFactory
     private static final int ERROR_COUNT_LIMIT = 99;
     
     private String filename;
-    private Reader source;
     private PrintStream err;
 
     private int errorCount;
     private boolean flushed;
     
-    public MainErrorQueue( String filename,  PrintStream err) 
+    public MainErrorQueue( String filename, PrintStream err) 
     {
       this.filename = filename;
       this.err = err;

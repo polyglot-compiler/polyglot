@@ -7,6 +7,6 @@ public class DoubleLiteral extends NumericLiteral {
 
   public Symbol symbol()
   {
-    return new Symbol(Sym.FLOATING_POINT_LITERAL, this); 
+    return new Symbol(jltools.parse.sym.FLOATING_POINT_LITERAL, this); 
   }
 }

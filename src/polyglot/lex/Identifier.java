@@ -19,5 +19,5 @@ public class Identifier extends Token {
    * return the string value of the identifier in the parser token.
    * Should be fixed now. ;-) <cananian@alumni.princeton.edu>
    */
-  public Symbol symbol() { return new Symbol(Sym.IDENTIFIER, this); }
+  public Symbol symbol() { return new Symbol(jltools.parse.sym.IDENTIFIER, this); }
 }

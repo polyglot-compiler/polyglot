@@ -17,7 +17,10 @@ import java.util.List;
  *    list of arguments.  Such objects are used as keys for method
  *    lookup.
  **/
-public class ConstructorType extends MethodType {
+public class ConstructorType extends MethodType 
+{
+  static final long serialVersionUID = -7339674873980799450L;
+
   public ConstructorType(TypeSystem ts, ClassType ct, List argumentTypes) {
     super(ts, ct.getTypeString() + ".[Constructor]", argumentTypes);
   }

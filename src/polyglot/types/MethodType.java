@@ -1,7 +1,3 @@
-/*
- * MethodType.java
- */
-
 package jltools.types;
 
 import jltools.util.TypedList;
@@ -9,20 +5,29 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * MethodType
- *
- * Overview:
- *    A MethodType represents the immutable typing information
- *    associated with a Java method.
- *
- *    A MethodType can be used as keys for method lookup; a particualr defn 
- *    would be a MethodTypeInstance with the additional fields of returnType, 
- *    accessFlags and exceptionTypes, in which case the TypeSystem would be null.
- **/
-public class MethodType extends Type implements Cloneable {
+ * A <code>MethodType</code> represents the immutable typing information
+ * associated with a Java method.
+ * <p>
+ * A MethodType can be used as keys for method lookup; a particualr defn 
+ * would be a MethodTypeInstance with the additional fields of returnType, 
+ * accessFlags and exceptionTypes, in which case the TypeSystem would be null.
+ */
+public class MethodType extends Type implements Cloneable 
+{
+  static final long serialVersionUID = 5464098520246013181L;
+
+  protected String name;
+  protected TypedList argumentTypes;
+
+  protected MethodType()
+  {
+    super();
+  }
+
   public MethodType(TypeSystem ts, 
                     String methodName,
-		    List argumentTypes) {
+		    List argumentTypes) 
+  {
     super(ts);
     this.name = methodName;
     this.argumentTypes = TypedList.copy(argumentTypes, Type.class, false);
@@ -57,9 +62,4 @@ public class MethodType extends Type implements Cloneable {
     }
     return false;
   }
-
-  private String name;
-  // RI: every element is a Type.  Immutable.
-  private TypedList argumentTypes;
-
 }

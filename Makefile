@@ -61,11 +61,11 @@ util: $(UTIL_TARGET)
 
 types: util $(TYPES_TARGET)
 
-lex: util types $(LEX_TARGET)
+lex: util types parse $(LEX_TARGET)
 
-parse: util lex $(PARSE_TARGET)
+parse: util $(PARSE_TARGET)
 
-ast: util types lex $(AST_TARGET)
+ast: util types $(AST_TARGET)
 
 visit: util types ast $(VISIT_TARGET)
 
@@ -127,8 +127,7 @@ javadoc: FORCE
 			jltools.visit    \
 			jltools.main     \
 			jltools.ext.op   \
-			jltools.ext.op.runtime  \
-
+			jltools.ext.op.runtime
 
 FORCE:
 

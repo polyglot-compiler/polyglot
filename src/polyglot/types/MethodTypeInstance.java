@@ -18,6 +18,8 @@ import jltools.util.TypedList;
  */
 public class MethodTypeInstance extends MethodType implements TypeInstance
 {
+  static final long serialVersionUID = 327848486110215910L;
+
   // RI: every element is a Type.  May be null.  Immutable.
   private TypedList exceptionTypes;
   // RI: May be null.
