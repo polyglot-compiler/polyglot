@@ -489,7 +489,7 @@ ext=""
     <antcall target="standard-ext">
       <param name="ext" value="polyj"/>
       <param name="parser.type" value="ppg"/>
-      <!-- <param name="has-qq" value=""/> -->
+      <param name="has-qq" value=""/>
     </antcall>
   </target>
 
