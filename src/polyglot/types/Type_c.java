@@ -229,7 +229,7 @@ public abstract class Type_c extends TypeObject_c implements Type
             out.writeObject(name);
             String memberName = null;
             if (this.isClass() && this.toClass().isMember()) {
-                memberName = getTransformedClassName(this.toClass());
+                memberName = this.typeSystem().getTransformedClassName(this.toClass());
             }
             out.writeObject(memberName);
         }
@@ -254,22 +254,5 @@ public abstract class Type_c extends TypeObject_c implements Type
         }
 
         in.defaultReadObject();
-    }
-    
-    /**
-     * This utility method returns the "mangled" name of the given class,
-     * whereby all periods ('.') following the toplevel class name
-     * are replaced with dollar signs ('$').
-     */
-    public static String getTransformedClassName(ClassType ct) {
-        StringBuffer sb = new StringBuffer(ct.fullName().length());
-        while (ct.isMember()) {
-            sb.insert(0, ct.name());
-            sb.insert(0, '$');
-            ct = ct.outer();
-        }
-            
-        sb.insert(0, ct.fullName());
-        return sb.toString();
-    }
+    }    
 }

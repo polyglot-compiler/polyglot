@@ -22,7 +22,7 @@ public class PlaceHolder_c implements PlaceHolder
     /** Creates a place holder type for the type. */
     public PlaceHolder_c(Type t) {
 	if (t.isClass()) {
-            name = Type_c.getTransformedClassName(t.toClass());
+            name = t.typeSystem().getTransformedClassName(t.toClass());
         }
 	else {
 	    throw new InternalCompilerError("Cannot serialize " + t + ".");
