@@ -356,7 +356,8 @@ public class ClassFile implements LazyClassInitializer {
     }
 
     /**
-     * Convert a String into a type.
+     * Convert a String into a type.  Throws an InternalCompilerError
+     * if this cannot be done.
      */
     ClassType quietTypeForName(TypeSystem ts, String name) {
 	if (Report.should_report(verbose,2))
@@ -371,7 +372,8 @@ public class ClassFile implements LazyClassInitializer {
     }
 
     /**
-     * Convert a String into a type.
+     * Convert a String into a type.  Throws a SemanticException if this
+     * cannot be done.
      */
     ClassType typeForName(TypeSystem ts, String name) throws SemanticException {
 	if (Report.should_report(verbose,2))

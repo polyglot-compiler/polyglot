@@ -29,7 +29,7 @@ public class SemanticException extends Exception {
 
     public SemanticException(String m) {
         super(m);
-       trace(this, 5);
+        trace(this, 5);
     }
 
     public SemanticException(String m, Throwable cause) {
