@@ -6,18 +6,9 @@ import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
 import polyglot.main.Report;
-import polyglot.types.ClassType;
-import polyglot.types.Context;
-import polyglot.types.Flags;
-import polyglot.types.ImportTable;
+import polyglot.types.*;
 import polyglot.types.Package;
-import polyglot.types.ParsedClassType;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
-import polyglot.util.ErrorInfo;
-import polyglot.util.ErrorQueue;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
+import polyglot.util.*;
 
 /** Visitor which traverses the AST constructing type objects. */
 public class TypeBuilder extends HaltingVisitor
@@ -203,6 +194,21 @@ public class TypeBuilder extends HaltingVisitor
 	    if (currentPackage() != null) {
 	      	ct.package_(currentPackage());
 	    }
+
+            // if all the containing classes for this class are member
+            // classes or top level classes, then add this class to the
+            // parsed resolver.
+            ClassType container = ct.outer();
+            boolean allMembers = (container.isMember() || container.isTopLevel());
+            while (container.isMember()) {
+                container = container.outer();
+                allMembers = allMembers && 
+                        (container.isMember() || container.isTopLevel());
+            }
+            if (allMembers) {
+                typeSystem().parsedResolver().addNamed(
+                        typeSystem().getTransformedClassName(ct), ct);
+            }
 
 	    return ct;
 	}
