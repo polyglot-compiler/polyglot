@@ -21,6 +21,7 @@ SOURCES = \
 	NodeVisitor.java \
 	PrettyPrinter.java \
 	SemanticVisitor.java \
+	OldSemanticVisitor.java \
 	StringPrettyPrinter.java \
 	Translator.java \
 	TypeBuilder.java \
