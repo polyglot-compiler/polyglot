@@ -1227,7 +1227,7 @@ public class TypeSystem_c implements TypeSystem
 
     protected ClassType load(String name) {
       try {
-          return typeForName(name);
+          return (ClassType) typeForName(name);
       }
       catch (SemanticException e) {
           throw new InternalCompilerError("Cannot find class \"" +
@@ -1235,10 +1235,10 @@ public class TypeSystem_c implements TypeSystem
                                           e);
       }
     }
-
-    public ClassType typeForName(String name) throws SemanticException {
+    
+    public Named forName(String name) throws SemanticException {
         try {
-            return (ClassType) systemResolver.find(name);
+            return systemResolver.find(name);
         }
         catch (SemanticException e) {
             if (! StringUtil.isNameShort(name)) {
@@ -1246,17 +1246,22 @@ public class TypeSystem_c implements TypeSystem
                 String shortName = StringUtil.getShortNameComponent(name);
                 
                 try {
-                    ClassType container = typeForName(containerName);
-                    return (ClassType)
-                        classContextResolver(container).find(shortName);
+                    Named container = forName(containerName);
+		    if (container instanceof ClassType) {
+			return classContextResolver((ClassType) container).find(shortName);
+		    }
                 }
                 catch (SemanticException e2) {
                 }
             }
-
+	    
             // throw the original exception
             throw e;
         }
+    }
+
+    public Type typeForName(String name) throws SemanticException {
+	return (Type) forName(name);
     }
 
     protected ClassType OBJECT_;

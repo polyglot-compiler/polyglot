@@ -73,12 +73,15 @@ public class Import_c extends Node_c implements Import
             }
 
             // The type must exist.
-            Type ct = tc.typeSystem().typeForName(name);
+            Named nt = tc.typeSystem().forName(name);
 
             // And the type must be accessible.
-            if (ct.isClass()) {
-                tc.typeSystem().classAccessibleFromPackage(ct.toClass(),
-                    tc.context().package_());
+            if (nt instanceof Type) {
+                Type t = (Type) nt;
+                if (t.isClass()) {
+                    tc.typeSystem().classAccessibleFromPackage(t.toClass(),
+                        tc.context().package_());
+                }
             }
 	}
 	else if (kind == PACKAGE) {

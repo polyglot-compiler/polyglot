@@ -65,11 +65,17 @@ public interface TypeSystem {
      */
     boolean packageExists(String name);
 
-    /** Get the class type with the following name.
-     * @param name The name to create the type for.
-     * @exception SemanticException when class is not found.    
+    /** Get the named type object with the following name.
+     * @param name The name of the type object to look for.
+     * @exception SemanticException when object is not found.    
      */
-    ClassType typeForName(String name) throws SemanticException;
+    Named forName(String name) throws SemanticException;
+    
+    /** Get the  type with the following name.
+     * @param name The name to create the type for.
+     * @exception SemanticException when type is not found.    
+     */
+    Type typeForName(String name) throws SemanticException;
 
     /** Create an initailizer instance.
      * @param pos Position of the initializer.
