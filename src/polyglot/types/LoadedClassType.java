@@ -37,7 +37,7 @@ public class LoadedClassType extends ClassTypeImpl
     // Set up names and classType.    
     String rawName = theClass.getName(); // pkg1.pkg2.class$inner1$inner2
     this.packageName = TypeSystem.getPackageComponent(rawName);
-    this.fullName = theClass.getName();
+    this.fullName = theClass.getName().replace( '$', '.');
     this.shortName = TypeSystem.getShortNameComponent(fullName);
 
     // Set up the rest of the typing information
@@ -70,11 +70,12 @@ public class LoadedClassType extends ClassTypeImpl
       this.containingClass = (ClassType)ts.typeForClass(outer);
       this.innerName = rawName;
     }
-	
+
     /* Now for the members, add these lazily. 
      * That is only add them if someone asks for them. */
     this.fields = null;
     this.methods = null;
+    this.innerClasses = null;
   }
 
   public List getFields()
@@ -105,6 +106,34 @@ public class LoadedClassType extends ClassTypeImpl
     return super.getMethods();
   }
 
+  public List getInnerClasses()         
+  { 
+    if( innerClasses == null) {
+      try {
+        initializeInnerClasses();
+      }
+      catch( SemanticException e) {
+        e.printStackTrace();
+        return new LinkedList();
+      }
+    }
+    return super.getInnerClasses();
+  }
+
+  public Type getInnerNamed(String name)
+  {
+    if( innerClasses == null) {
+      try {
+        initializeInnerClasses();
+      }
+      catch( SemanticException e) {
+        e.printStackTrace();
+        return null;
+      }
+    }
+    return super.getInnerNamed( name);
+  }
+
   protected void initializeFields() throws SemanticException
   {
     Field[]       fieldAry  = theClass.getDeclaredFields();
@@ -131,6 +160,18 @@ public class LoadedClassType extends ClassTypeImpl
     }
 
     methods = new TypedList(methodLst, MethodType.class, true);    
+  }
+
+  protected void initializeInnerClasses() throws SemanticException
+  {
+    // do inner classes
+    Class[] innerAry = theClass.getDeclaredClasses();
+    List innerLst = new ArrayList(innerAry.length +1);      
+    for (int idx = 0; idx < innerAry.length; ++idx) {
+      innerLst.add(ts.typeForClass(innerAry[idx]));
+    }
+    this.innerClasses = new TypedList(innerLst, Type.class, true);
+
   }
 
   protected FieldInstance fieldInstanceForField(Field f) 

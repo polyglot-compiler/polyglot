@@ -423,7 +423,7 @@ public class StandardTypeSystem extends TypeSystem {
    **/
   public Type checkAndResolveType(Type type, Context context) throws SemanticException {
 
-    // System.out.println( "Checking: " + type + " " + type.getTypeString());
+    //    System.out.println( "Checking: " + type + " " + type.getTypeString());
 
     if (type.isCanonical()) return type;
     if (type instanceof ArrayType) {
@@ -465,7 +465,7 @@ public class StandardTypeSystem extends TypeSystem {
 	// any inners by that name.  If they _both_ do, that's an error.
 	Type resultFromOuter = null;
 	Type resultFromParent = null;
-        // System.out.println("in " + inClass.getTypeString() + " super: " + inClass.getSuperType());
+        //        System.out.println("in " + inClass.getTypeString() + " super: " + inClass.getSuperType() + " " + inClass.getTypeString());
 	ClassType parentType = (ClassType)inClass.getSuperType();
 	ClassType outerType = inClass.getContainingClass();
 	if (outerType != null) {
@@ -547,11 +547,16 @@ public class StandardTypeSystem extends TypeSystem {
     // JavaClass resultClass = getClassForType(outer);
     while (rest.length() > 0) {
       String innerName = TypeSystem.getFirstComponent(rest);
-      result = result.getInnerNamed(innerName);
-      if (result == null)
+      Type inner = result.getInnerNamed( innerName);
+
+      if (inner == null) {
 	throw new SemanticException ("Class \"" + prefix 
                                      + "\" has no inner class named \"" 
-                                     + innerName + "\"");
+                                     + innerName + "\".");
+      }
+
+      result = (ClassType)checkAndResolveType( inner, context);
+
       prefix = prefix + "." + innerName;
       rest = TypeSystem.removeFirstComponent(rest);
     }

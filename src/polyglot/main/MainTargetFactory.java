@@ -62,7 +62,8 @@ public class MainTargetFactory implements TargetFactory
       outputFile = null;
     }
   
-    return new MainTarget( sourceFile.getName(), sourceFile, outputFile);
+    return new MainTarget( sourceFile.getName(), sourceFile.getPath(), 
+                           sourceFile, outputFile);
   }
 
   public Target createClassTarget( String className) throws IOException
@@ -98,16 +99,19 @@ public class MainTargetFactory implements TargetFactory
                                + outputExtension + "$");
     }
 
-    return new MainTarget( sourceFile.getName(), sourceFile, outputFile);
+    return new MainTarget( sourceFile.getName(), sourceFile.getPath(), 
+                           sourceFile, outputFile);
   }
 
   public Target createClassTarget( ClassType classType) throws IOException
   {
-    return new MainTarget( classType.getShortName() + ".class", null, null);
+    return new MainTarget( classType.getShortName() + ".class", 
+                           classType.getFullName() + ".class", null, null);
   }
 
   public class MainTarget extends Target
   {
+    String fullName;
     File sourceFile;
     File outputFile;
     FileReader sourceFileReader;
@@ -118,9 +122,11 @@ public class MainTargetFactory implements TargetFactory
     String outputFileName;
 
 
-    public MainTarget( String name, File sourceFile, File outputFile)
+    public MainTarget( String name, String fullName,
+                       File sourceFile, File outputFile)
     {
       super( name, null, null);
+      this.fullName = fullName;
       this.sourceFile = sourceFile;
       this.outputFile = outputFile;
       this.visitors = null;
@@ -221,6 +227,16 @@ public class MainTargetFactory implements TargetFactory
     public Date getLastModifiedDate()
     {
       return lastModified;
+    }
+
+    public boolean equals( Object o)
+    {
+      if( o instanceof MainTarget) {
+        return fullName.equals( ((MainTarget)o).fullName);
+      }
+      else {
+        return false;
+      }
     }
   }
    

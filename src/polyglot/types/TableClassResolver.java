@@ -27,6 +27,19 @@ public class TableClassResolver implements ClassResolver
     queue.add( clazz);
   }
 
+  /**
+   * Adds all the classes found in <code>other</code> to the current table.
+   * 
+   * @post <code>other</code>remains unchanged.
+   */
+  public void include( TableClassResolver other)
+  {
+    for( Iterator iter = other.table.entrySet().iterator(); iter.hasNext(); ) {
+      Map.Entry entry = (Map.Entry)iter.next();
+      table.put( entry.getKey(), entry.getValue());
+    }
+  }
+
   public Iterator classes() 
   {
     return queue.iterator();

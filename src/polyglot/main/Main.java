@@ -31,12 +31,15 @@ public class Main
                                         = "Scramble Random Seed (Long)";
   private static final String MAIN_OPT_EXT_OP
                                         = "Use ObjectPrimitive Ext (Boolean)";
+  private static final String MAIN_OPT_THREADS
+                                        = "Use multiple threads (Boolean)";
 
-  private static final int MAX_THREADS = 1;
+  private static final int MAX_THREADS = 2;
 
   private static Map options;
   private static Set source;
   private static TypeSystem ts;
+  private static boolean hasErrors = false;
 
   public static final void main(String args[])
   {
@@ -62,151 +65,290 @@ public class Main
     Compiler.initialize( options, ts, tf);
     
     /* Now compile each file. */
-    Iterator iter;
-    String targetName = null;
-    boolean hasErrors = false;
+    int totalThreads;
 
-    /*
-    int numberOfThreads = Math.min( source.size(), MAX_THREADS);
-
-    Thread thread;
-    MainCompilerThread[] cthreads = new MainCompilerThread[ numberOfThreads];
-    for( int i = 0; i < numberOfThreads) {
-      cthreads[ i] = new MainCompilerThread( compiler, source);
-      thread = new Thread( cthreads[ i]);
-      thread.start();
+    if( ((Boolean)options.get( MAIN_OPT_THREADS)).booleanValue()) {
+      totalThreads = Math.min( source.size(), MAX_THREADS);
     }
-    */
+    else {
+      totalThreads = 1;
+    }
 
+    TargetSet tl = new TargetSet( source, totalThreads);
     Compiler compiler = new Compiler();
 
-    try
-    {
-      Compiler.verbose( Main.class, "read all files from the command-line.");
+    /* A note about threads: the multithreaded implementation is not entirely 
+     * complete. It will translate any file given on the command-line, but
+     * will not translate dependent class files. Also the -post options does
+     * not work with the multithreaded implementation. (It could but was 
+     * never fully implemented.) The rationale here is that the multithreaded
+     * version really isn't any faster and so there was no reason to finish it.
+     */
 
-      iter = source.iterator();
-      while( iter.hasNext()) {
-        targetName = (String)iter.next();
-        if( !compiler.readFile( targetName)) {
-          hasErrors = true;
-        }
+    if( totalThreads > 1) {
+      /* Start the threads. */
+      for( int i = 0; i < totalThreads; i++) {
+        WorkThread wt = new WorkThread( tl, compiler);
+        Thread thread = new Thread( wt);
+        
+        thread.start();
       }
+    }
+    else {
+      /* Single threaded mode. */
+      Iterator iter;
+      String targetName = null;
 
-      Compiler.verbose( Main.class, "done reading, now translating...");
-
-      iter = source.iterator();
-      while( iter.hasNext()) {
-        targetName = (String)iter.next();
-        if( !compiler.compileFile( targetName)) {
-          hasErrors = true;
+      try
+      {
+        Compiler.verbose( Main.class, "read all files from the command-line.");
+        
+        iter = source.iterator();
+        while( iter.hasNext()) {
+          targetName = (String)iter.next();
+          if( !compiler.readFile( targetName)) {
+            hasErrors = true;
+          }
         }
+        
+        Compiler.verbose( Main.class, "done reading, now translating...");
+        
+        iter = source.iterator();
+        while( iter.hasNext()) {
+          targetName = (String)iter.next();
+          if( !compiler.compileFile( targetName)) {
+            hasErrors = true;
+          }
+        }
+        
       }
-
-    }
-    catch( FileNotFoundException fnfe)
-    {
-      System.err.println( Main.class.getName() 
-                          + ": cannot find source file -- " + targetName);
-      System.exit( 1);
-    }
-    catch( IOException e)
-    {
-      System.err.println( Main.class.getName() 
-                          + ": caught IOException while compiling -- " 
-                          + targetName + ": " + e.getMessage());
-      System.exit( 1);
-    }
-    catch( ErrorLimitError ele)
-    {
-      System.exit( 1);
-    }
-
-    /* Make sure we do this before we exit. */
-    Collection completed = new LinkedList();
-    try
-    {
-      if( !compiler.cleanup( completed)) {
+      catch( FileNotFoundException fnfe)
+      {
+        System.err.println( Main.class.getName() 
+                            + ": cannot find source file -- " + targetName);
         System.exit( 1);
       }
-    }
-    catch( IOException e)
-    {
-      System.err.println( "Caught IOException while compiling: "
-                          + e.getMessage());
-      System.exit( 1);
-    }
-    
-    if( hasErrors) {
-      System.exit( 1);
-    }
-
-    /* Now call javac or jikes, if necessary. */
-    if( options.get( MAIN_OPT_POST_COMPILER) != null
-        && !((Boolean)options.get( MAIN_OPT_STDOUT)).booleanValue()) {
-      Runtime runtime = Runtime.getRuntime();
-      Process proc;
-      MainTargetFactory.MainTarget t;
-      String command;
-
-      iter = completed.iterator();
-      while( iter.hasNext()) {
-        t = (MainTargetFactory.MainTarget)iter.next(); 
-
-        if( t.outputFileName == null) {
-          continue;
-        }
-
-        command =  (String)options.get( MAIN_OPT_POST_COMPILER) 
-                      + " -classpath " 
-                        + ( options.get(MAIN_OPT_OUTPUT_DIRECTORY) != null ?
-                            options.get(MAIN_OPT_OUTPUT_DIRECTORY) 
-                            + File.pathSeparator + "." + File.pathSeparator :
-                            "") 
-                        + System.getProperty( "java.class.path") + " "
-                        + t.outputFileName;
-
-        Compiler.verbose( Main.class, "executing " + command);
-        
-        try 
-        {
-          proc = runtime.exec( command);
-
-          InputStreamReader err = 
-                    new InputStreamReader( proc.getErrorStream());
-          char[] c = new char[ 72];
-          int len;
-          while( (len = err.read( c)) > 0) {
-            System.err.print( String.valueOf( c, 0, len));
-          }
-
-          proc.waitFor();
-          if( proc.exitValue() > 0) {
-            System.exit( proc.exitValue());
-          }
-        }
-        catch( Exception e) 
-        { 
-          System.err.println( "Caught Exception while running post compiler: "
-                              + e.getMessage());
+      catch( IOException e)
+      {
+        System.err.println( Main.class.getName() 
+                            + ": caught IOException while compiling -- " 
+                            + targetName + ": " + e.getMessage());
+        System.exit( 1);
+      }
+      catch( ErrorLimitError ele)
+      {
+        System.exit( 1);
+      }
+      
+      /* Make sure we do this before we exit. */
+      Collection completed = new LinkedList();
+      try
+      {
+        if( !compiler.cleanup( completed)) {
           System.exit( 1);
+        }
+      }
+      catch( IOException e)
+      {
+        System.err.println( "Caught IOException while compiling: "
+                            + e.getMessage());
+        System.exit( 1);
+      }
+      
+      if( hasErrors) {
+        System.exit( 1);
+      }
+      
+      /* Now call javac or jikes, if necessary. */
+      if( options.get( MAIN_OPT_POST_COMPILER) != null
+          && !((Boolean)options.get( MAIN_OPT_STDOUT)).booleanValue()) {
+        Runtime runtime = Runtime.getRuntime();
+        Process proc;
+        MainTargetFactory.MainTarget t;
+        String command;
+        
+        iter = completed.iterator();
+        while( iter.hasNext()) {
+          t = (MainTargetFactory.MainTarget)iter.next(); 
+          
+          if( t.outputFileName == null) {
+            continue;
+          }
+          
+          command =  (String)options.get( MAIN_OPT_POST_COMPILER) 
+            + " -classpath " 
+            + ( options.get(MAIN_OPT_OUTPUT_DIRECTORY) != null ?
+                options.get(MAIN_OPT_OUTPUT_DIRECTORY) 
+                + File.pathSeparator + "." + File.pathSeparator :
+                "") 
+            + System.getProperty( "java.class.path") + " "
+            + t.outputFileName;
+          
+          Compiler.verbose( Main.class, "executing " + command);
+          
+          try 
+          {
+            proc = runtime.exec( command);
+            
+            InputStreamReader err = 
+              new InputStreamReader( proc.getErrorStream());
+            char[] c = new char[ 72];
+            int len;
+            while( (len = err.read( c)) > 0) {
+              System.err.print( String.valueOf( c, 0, len));
+            }
+            
+            proc.waitFor();
+            if( proc.exitValue() > 0) {
+              System.exit( proc.exitValue());
+            }
+          }
+          catch( Exception e) 
+          { 
+            System.err.println( "Caught Exception while running compiler: "
+                                + e.getMessage());
+            System.exit( 1);
+          }
         }
       }
     }
   }
 
-  static class MainCompilerThread implements Runnable
+
+  private static void setHasErrors( boolean b)
   {
-    MainCompilerThread()
+    hasErrors = b;
+  }
+  
+  private static class TargetSet 
+  {
+    private static final int READ = 0;
+    private static final int COMPILE = 1;
+
+    private Set source;
+    private int totalThreads;
+    private int phase = READ;
+
+    private Iterator sourceIter;
+
+    private Object countLock = new Object();
+    private int threadsInNext = 0;
+    
+    private Object sourceLock = new Object();
+    
+    TargetSet( Set source, int totalThreads)
     {
+      this.source = source;
+      this.totalThreads = totalThreads;
+
+      sourceIter = source.iterator();
+
+      Compiler.verbose( Main.class, "read all files from the command-line.");
+    }
+
+    String nextTarget()
+    {
+      String result;
+      
+      synchronized( countLock) {
+        threadsInNext++;
+      }
+
+      synchronized( sourceLock) {
+        if( !sourceIter.hasNext()) {
+          /* There is nothing to do, so figure out if there are still threads
+           * reading something, if so, then wait, otherwise, just fall out
+           * and return null.
+           */
+          if( threadsInNext == totalThreads && phase == READ) {
+            Compiler.verbose( Main.class, "done reading, now translating...");
+
+            phase = COMPILE;
+
+            sourceIter = source.iterator();
+            sourceLock.notifyAll();
+
+            result = null;
+          }
+          else if( phase == COMPILE) {
+            /* If we are compiling then there is no need to wait. */
+            result = null;
+          }
+          else {
+            /* Nope, still threads reading, we need to wait. */
+            try
+            {
+              sourceLock.wait();
+            }
+            catch( InterruptedException e)
+            {
+              setHasErrors( true);
+            }
+
+            /* When we wake up we will to return null. */
+            result = null;
+          }
+
+        }
+        else {
+          /* There is something to do... */
+          result = (String)sourceIter.next();
+        }
+      }
+      
+      
+      synchronized( countLock) {
+        threadsInNext--;
+      }
+      
+      return result;
+    }
+  }
+
+  private static class WorkThread implements Runnable
+  {
+    TargetSet tl;
+    Compiler compiler;
+
+    WorkThread( TargetSet tl, Compiler compiler)
+    {
+      this.tl = tl;
+      this.compiler = compiler;
     }
     
     public void run()
     {
-      while( true) {
-        
-
-
-
+      String targetName = null;
+      try
+      {
+        while( (targetName = tl.nextTarget()) != null) {
+          if( !compiler.readFile( targetName)) {
+            setHasErrors( true);
+          }
+        }
+          
+        while( (targetName = tl.nextTarget()) != null) {
+          if( !compiler.compileFile( targetName)) {
+            setHasErrors( true);
+          }
+        }
+      }  
+      catch( FileNotFoundException fnfe)
+      {
+        System.err.println( Main.class.getName() 
+                            + ": cannot find source file -- " + targetName);
+          setHasErrors( true);
+      }
+      catch( IOException e)
+      {
+        System.err.println( Main.class.getName() 
+                            + ": caught IOException while compiling -- " 
+                            + targetName + ": " + e.getMessage());
+        setHasErrors( true);
+        }
+      catch( ErrorLimitError ele)
+      {
+        setHasErrors( true);
       }
     }
   }
@@ -301,6 +443,7 @@ public class Main
     options.put( MAIN_OPT_STDOUT, new Boolean( false));
     options.put( MAIN_OPT_SCRAMBLE, new Boolean( false));
     options.put( MAIN_OPT_EXT_OP, new Boolean( false));
+    options.put( MAIN_OPT_THREADS, new Boolean( false));
     
     options.put( Compiler.OPT_OUTPUT_WIDTH, new Integer(80));
     options.put( Compiler.OPT_VERBOSE, new Boolean( false));
@@ -385,6 +528,11 @@ public class Main
       {
         i++;
         options.put( Compiler.OPT_SERIALIZE, new Boolean( false));
+      }
+      else if( args[i].equals( "-threads")) 
+      {
+        i++;
+        options.put( MAIN_OPT_THREADS, new Boolean( true));
       }
       else if( args[i].equals( "-op"))
       {

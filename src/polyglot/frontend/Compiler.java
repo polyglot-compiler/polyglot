@@ -127,7 +127,7 @@ public class Compiler implements TargetTable, ClassCleaner
   private static TypeSystem ts;
 
   private static CachingClassResolver systemResolver;
-  private static CompoundClassResolver parsedResolver;
+  private static TableClassResolver parsedResolver;
   private static LoadedClassResolver sourceResolver;
 
   protected static TargetFactory tf;
@@ -164,7 +164,7 @@ public class Compiler implements TargetTable, ClassCleaner
 
     CompoundClassResolver compoundResolver = new CompoundClassResolver();
         
-    parsedResolver = new CompoundClassResolver();
+    parsedResolver = new TableClassResolver( compiler);
     compoundResolver.addClassResolver( parsedResolver);
     
     sourceResolver = new LoadedClassResolver( tf, compiler, ts);
@@ -367,9 +367,10 @@ public class Compiler implements TargetTable, ClassCleaner
         if( (job.status & READ) == 0) {
           verbose( this, "reading " + job.t.getName() + "...");
           job.cr = new TableClassResolver( this);
-          parsedResolver.addClassResolver( job.cr);
-          job.it = readSymbols( job.ast, job.cr, job.t);
           
+          job.it = readSymbols( job.ast, job.cr, job.t);
+          parsedResolver.include( job.cr);
+
           if( hasErrors( job)) { releaseJob( job); return false; }
           
           job.status |= READ;
@@ -546,7 +547,7 @@ public class Compiler implements TargetTable, ClassCleaner
       workList.add( job);
     }
 
-    parsedResolver.addClassResolver( job.cr);
+    parsedResolver.include( job.cr);
 
     return job;
   }

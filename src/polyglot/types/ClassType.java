@@ -121,7 +121,7 @@ public abstract class ClassType extends Type
    * Returns the type of the inner in this whose short name is <name>.
    * Returns null if no such inner exists.
    */
-  public abstract ClassType getInnerNamed(String name);
+  public abstract Type getInnerNamed(String name);
   
   // FIXME:  InMethod?
 }

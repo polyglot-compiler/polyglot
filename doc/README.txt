@@ -28,6 +28,7 @@ where [options] includes:
  -ox <ext>               set output extension
  -dump                   dump the ast
  -scramble [seed]        scramble the ast
+ -noserial               disable class serialization
  -op                     use op extension
  -post <compiler>        run javac-like compiler after translation
  -v -verbose             print verbose debugging info
@@ -38,7 +39,7 @@ Output Directory: -d
 By default, output files are written in the same directory as the
 source files they are derived from. This option specifies a directory
 which will become the root directory of the package hierarchy for all
-output files. If this directory does not exists then it will we
+output files. If this directory does not exist then it will be
 created when the first output file is written to disk.
 
 Source Path: -S
@@ -78,6 +79,14 @@ more info. Optionally takes an argument which is the long integer seed
 for the random number generator used to pick which part of the tree is
 scrambled. 
 
+No Serialization: -noserial
+By default all translated class type information is serialized into
+the output files. This information will persist into the .class file
+and will continue to be available to jlc even if the source or
+translated Java file are lost. This allows the distribution of a set
+of .class files which still can be used with the jltools
+translator. This option disables class type serialization.
+
 ObjectPrimitive Extension: -op
 Defaults to OFF. Enables the ObjectPrimitive extension. This is a
 modification to the standard java type system in which primtive types
@@ -101,17 +110,69 @@ Help: -h
 Print out a summary of the usage options.
 
 
---- Where Source Files Are Found ---
+--- Where Class Definitions Are Found ---
 
-When the jltools translator looks for a class by the name
-"foo.bar.Quux" it first searches for that class in any file given on
-the command line. If none of these files contain the desired class,
-then the source path is searched next. For example, if the source
-extension is ".jl" and the source path is "mydir:." then the
-translator looks for files "mydir/foo/bar/Quux.jl" and
-"./foo/bar/Quux.jl". If neither of these files exist, then the classpath
-is used to find an appropriate class file. (Note that this sequence is
-subject to change.)
+1. When the jltools translator looks for a class by the name
+   "foo.bar.Quux" it first searches for that class in any file given
+   on the command line. If the class is found one of these files, then
+   this definition is used and the remainder of the steps are
+   skipped.
+
+2. If none of these files contain the desired class, then the source
+   path is searched  next. For example, if the source extension is
+   ".jl" and the source path is "mydir:." then the translator looks
+   for files "mydir/foo/bar/Quux.jl" and "./foo/bar/Quux.jl". (The
+   source path may be set using the -S options, see above.)
+
+3. Regardless of whether or not a source file is found, the translator
+   searches the classpath (defined as normal through the environment
+   and command-line options to the interpreter) for the desired class.
+
+4. If no source file exists, and no class is found then an error is
+   reported (skipping the rest of the steps below).
+
+5. If a source file is found, but no class, then the source file is
+   parsed. If it contains the desired class definition (which it
+   should) then that definition is used and the remainder of the steps
+   are skipped. (If it does not contain this definition, an error is
+   reported and the remainder of the steps are skipped.
+
+6. If a class is found but no source file, then the class is examined
+   for jlc class type information. If the class contains no class type
+   information (this is the case if the class file was compiled from
+   raw Java source rather than jlc translated output) then this class
+   is used as the desired class definition (skipping all steps below).
+
+7. (class, but no still no source) If the class does contain jlc class
+   type information, then the version number of translator used to
+   translate the source which created the given class file is compared
+   against the version of the current instantiation of the translator.
+   If the versions are compatible, then the jlc class type information
+   is used as the desired definiton. If the versions are incompatible
+   (see the documentation in Compiler.java) then an error is reported.
+   In either case, all remaining steps are skipped.
+
+8. If both a suitable source file and class are found then we have a
+   choice. If the class definition does not contain jlc class type
+   information then the source file is parsed as the definition found
+   in this file is used as desired definiton and we stop here. If the
+   class does contain jlc class type information, then continue.
+
+9. (source and class with jlc info) Next the last modification date of
+   the source file is compared to the last modification date of the
+   source file used to generate the class file. If the source file is
+   more recent, the it is parsed as used as the desired definition and
+   all remaining steps are skipped.
+
+10. (source and class with jlc info) Next the jlc version of the class
+    and of the current translator are compared (as in 7.). If the
+    verisions are incompatible, then we use the definition from the
+    parsed source file. If the versions are compatible, then we use
+    the definition given by the jlc class type information.
+
+Finally, if at any point an error occurs while reading jlc class type
+information (e.g. if this information exists but is corrupted), then
+an error is reported. 
 
 
 --- Miscellaneous ---

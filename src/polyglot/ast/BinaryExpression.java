@@ -217,6 +217,12 @@ public class BinaryExpression extends Expression
         newNode = new BooleanLiteral( bLeft && bRight);
       }
     }
+    else if ( ( left instanceof StringLiteral) &&
+              ( right instanceof StringLiteral)) {
+      newNode = new StringLiteral( ((StringLiteral)left).getString()
+                                + ((StringLiteral)right).getString());
+
+    }
 
     // copy the line number:
     if ( newNode != this)

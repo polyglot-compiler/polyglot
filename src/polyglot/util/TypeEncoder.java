@@ -6,7 +6,17 @@ import java.io.*;
 import java.util.zip.*;
 
 /**
- * FIXME docs
+ * The <code>TypeEncoder</code> gives the ability to encode a jltools 
+ * <code>Type</code> as a Java string.
+ * <p>
+ * It uses a form of serialization to encode the <code>Type</code> into
+ * a byte stream and then converts the byte stream to a stardard Java string.
+ * <p>
+ * The difference between the encoder and a normal serialization process, is
+ * that in order to encode this type, we need to sever any links to other types
+ * in the current envorinment. So any <code>ClassType</code> other than the 
+ * the type being encoded is replaced in the stream with an 
+ * <code>AmbiguousType</code> that contains the fully qualified name.
  */
 public class TypeEncoder
 {

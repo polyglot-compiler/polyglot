@@ -39,11 +39,11 @@ public abstract class ClassTypeImpl extends ClassType
   public String getInnerName()          { return innerName; }
   public List getInnerClasses()         { return innerClasses; }
 
-  public ClassType getInnerNamed(String name) {
+  public Type getInnerNamed(String name) {
     if ( innerClasses != null)
       for (Iterator i = innerClasses.iterator(); i.hasNext();) {
-        ClassType innerType = (ClassType) i.next();
-        if (innerType.getShortName().equals(name))
+        Type innerType = (Type) i.next();
+        if (innerType.getTypeString().equals( fullName + "." + name))
           return innerType;
       }
     return null;
@@ -53,15 +53,20 @@ public abstract class ClassTypeImpl extends ClassType
   {
     System.out.println( "---------------------");
     System.out.println( "Class: " + fullName);
-    System.out.println( "Super: " + superType.getTypeString() + " ("
-                        + superType.getClass().getName() + ")");
+    if( superType != null) {
+      System.out.println( "Super: " + superType.getTypeString() + " ("
+                          + superType.getClass().getName() + ")");
+    }
+    else {
+      System.out.println( "Super: ");
+    }
     System.out.println( "Inner Classes: ");
-    for (Iterator i = innerClasses.iterator(); i.hasNext();) {
-      ClassType innerType = (ClassType) i.next();
+    for (Iterator i = getInnerClasses().iterator(); i.hasNext();) {
+      Type innerType = (Type) i.next();
       System.out.println( "  " + innerType.getTypeString());
     }
     System.out.println( "Fields: ");
-    for( Iterator iter = fields.iterator(); iter.hasNext(); ) {
+    for( Iterator iter = getFields().iterator(); iter.hasNext(); ) {
       FieldInstance fi = (FieldInstance)iter.next();
       System.out.println( "  " + fi.getName());
       System.out.println( "    " + fi.getAccessFlags().getStringRepresentation());
