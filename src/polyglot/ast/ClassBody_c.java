@@ -1,11 +1,6 @@
 package polyglot.ext.jl.ast;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import polyglot.ast.ClassBody;
 import polyglot.ast.ClassDecl;
@@ -14,25 +9,9 @@ import polyglot.ast.Node;
 import polyglot.frontend.Job;
 import polyglot.frontend.Pass;
 import polyglot.main.Report;
-import polyglot.types.ClassType;
-import polyglot.types.ConstructorInstance;
-import polyglot.types.Context;
-import polyglot.types.FieldInstance;
-import polyglot.types.MethodInstance;
-import polyglot.types.ReferenceType;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.types.TypeSystem;
-import polyglot.util.CodeWriter;
-import polyglot.util.CollectionUtil;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
-import polyglot.util.TypedList;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeChecker;
-import polyglot.visit.CFGBuilder;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
 
 /**
  * A <code>ClassBody</code> represents the body of a class or interface
@@ -87,7 +66,6 @@ public class ClassBody_c extends Term_c implements ClassBody
     }
 
     public Context enterScope(Context c, boolean inherit) {
-        c = c.pushBlock();
         ClassType type = c.currentClass();
         addMembers(c, type, new HashSet(), inherit);
         return c;
@@ -220,7 +198,6 @@ public class ClassBody_c extends Term_c implements ClassBody
 
     protected void duplicateFieldCheck(TypeChecker tc) throws SemanticException {
         ClassType type = tc.context().currentClass();
-        TypeSystem ts = tc.typeSystem();
 
         ArrayList l = new ArrayList(type.fields());
 
@@ -239,7 +216,6 @@ public class ClassBody_c extends Term_c implements ClassBody
 
     protected void duplicateConstructorCheck(TypeChecker tc) throws SemanticException {
         ClassType type = tc.context().currentClass();
-        TypeSystem ts = tc.typeSystem();
 
         ArrayList l = new ArrayList(type.constructors());
 
