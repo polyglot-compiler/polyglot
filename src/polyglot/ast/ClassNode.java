@@ -265,17 +265,18 @@ public class ClassNode extends ClassMember
     c.pushClass( type);
     w.newline( 0);
     w.write( "{");
-    w.beginBlock();
+    w.newline(4);
+    w.begin(0);
     for( Iterator iter = members(); iter.hasNext(); ) {
-      ((Node)iter.next()).translate( c, w);
+      ((Node)iter.next()).translate_block( c, w);
       if( iter.hasNext()) {
-        w.newline( 0);
         w.newline( 0);
       }
     }
-    w.endBlock();
-    w.write( "}");
-    w.newline( 0);
+    w.end();
+    w.newline(0);
+    w.write("}");
+    w.newline(0);
     c.popClass();
   }
   

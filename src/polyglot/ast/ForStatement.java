@@ -177,69 +177,69 @@ public class ForStatement extends Statement
   {
     boolean writeSemicolon = true;
     
-    w.write( "for( ");
+    w.write( "for (");
+    w.begin(0);
 
     if( inits != null) {
       for( Iterator iter = inits.iterator(); iter.hasNext(); ) {
         Statement stmt = (Statement)iter.next();
         if( stmt instanceof VariableDeclarationStatement) {
-          stmt.translate( c, w);
+          stmt.translate_block (c, w);
           writeSemicolon = false;
+	  w.allowBreak(0);
         } 
         else {
-          ((ExpressionStatement)stmt).getExpression().translate(c, w);
+          ((ExpressionStatement)stmt).getExpression().translate_block(c, w);
         }
 
         if( iter.hasNext()) {
-          w.write( ", ");
+          w.write( ",");
+	  w.allowBreak(2, " ");
         }
       }   
     }
 
     /*
-     * If the initilizer is a single variable declaration statement, then
+     * If the initializer is a single variable declaration statement, then
      * we don't want to write out the semicolon, since the subnode has 
      * already done this.
      */
     if( writeSemicolon) {
-      w.write( "; "); 
+      w.write(";"); 
+      w.allowBreak(0);
     }
     
     if( cond != null) {
-      cond.translate(c, w);
+      cond.translate_block(c, w);
     }
 
-    w.write ("; " ); /* cond is a expr, so write semicolon. */
+    w.write (";"); /* cond is a expr, so write semicolon. */
+    w.allowBreak(0);
     
     if( iters != null) {
       for( Iterator iter = iters.iterator(); iter.hasNext(); ) {
         Statement stmt = (Statement)iter.next();
         if( stmt instanceof ExpressionStatement) {
-          ((ExpressionStatement)stmt).getExpression().translate(c, w);      
+          ((ExpressionStatement)stmt).getExpression().translate_block(c, w);
         }
         else {
-          stmt.translate( c, w);
+          stmt.translate_block(c, w);
         }
         
         if( iter.hasNext()) {
-          w.write( ", ");
+          w.write(",");
+	  w.allowBreak(2, " ");
         }
       }
     }
 
-    w.write( ") ");
+    w.end();
+    w.write( ")");
     
     if (body == null) {
-      w.write( "; ");
+      w.write(";");
     }
-    else if( !(body instanceof BlockStatement)) {
-      w.beginBlock();
-      body.translate( c, w);
-      w.endBlock();
-    }
-    else {
-      body.translate( c, w);
-    }
+    body.translate_substmt(c, w);
   }
 
   public void dump( CodeWriter w)

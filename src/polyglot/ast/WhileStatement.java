@@ -82,23 +82,14 @@ public class WhileStatement extends Statement
 
   public void translate( LocalContext c, CodeWriter w)
   {
-    w.write( "while( " );
-    cond.translate( c, w);
+    w.write( "while (" );
+    cond.translate_block( c, w);
     w.write( ")");
 
-    if( body == null){
-      w.write( "; ");
-      return;
-    }
-
-    if( !(body instanceof BlockStatement)) {
-      w.beginBlock();
-      body.translate( c, w);
-      w.endBlock();
-    }
-    else {
-      body.translate( c, w);
-    }
+    if( body == null)
+	w.write( " ;");
+    else
+	body.translate_substmt(c, w);
   }
 
   public void dump( CodeWriter w)

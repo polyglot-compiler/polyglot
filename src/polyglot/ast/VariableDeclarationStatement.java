@@ -256,7 +256,7 @@ public class VariableDeclarationStatement extends Statement
   {
     w.write( accessFlags.getStringRepresentation());
     tn.translate( c, w);
-    w.write( " ");
+    w.write(" ");
     for( Iterator iter = declarators(); iter.hasNext(); ) {
       Declarator decl = (Declarator)iter.next();
       if( decl.initializer != null) {
@@ -264,7 +264,8 @@ public class VariableDeclarationStatement extends Statement
         for (int i = 0; i < decl.additionalDimensions; i++) {
           w.write( "[]");
         }
-        w.write( " = ");
+        w.write( " =");
+	w.allowBreak(2, " ");
         decl.initializer.translate( c, w);
       }
       else {
@@ -274,10 +275,11 @@ public class VariableDeclarationStatement extends Statement
         }
       }
       if( iter.hasNext()) {
-        w.write( ", ");
+        w.write( ",");
+	w.allowBreak(2, " ");
       }
     }
-    w.write( "; ");
+    w.write(";");
   }
   
   public void dump( CodeWriter w) throws SemanticException
@@ -287,7 +289,7 @@ public class VariableDeclarationStatement extends Statement
     dumpNodeInfo( w);
     w.write(")");
     
-    w.beginBlock();
+    w.begin(0);
     
     for( Iterator iter = declarators(); iter.hasNext(); ) {
       Declarator decl = (Declarator)iter.next();
@@ -301,10 +303,10 @@ public class VariableDeclarationStatement extends Statement
                  + typeForDeclarator( decl).getTypeString() + " > ) ");
       }
       if( iter.hasNext()) {
-        w.newline();
+        w.allowBreak(0, " ");
       }
     }
     
-    w.endBlock();
+    w.end();
   }
 }

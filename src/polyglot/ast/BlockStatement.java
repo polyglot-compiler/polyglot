@@ -120,17 +120,24 @@ public class BlockStatement extends Statement {
     return this;
   }
 
+  public void translate_substmt(LocalContext c, CodeWriter w) {
+      w.write(" ");
+      translate(c, w);
+  }
+
   public void translate( LocalContext c, CodeWriter w)
   {
     w.write("{");
-    w.beginBlock();
+    w.allowBreak(4," ");
+    w.begin(0);
     for (ListIterator it = statements.listIterator(); it.hasNext(); ) 
     {
-      ((Node)it.next()).translate(c, w);
+      ((Node)it.next()).translate_block(c, w);
       if (it.hasNext())
         w.newline(0);
     }
-    w.endBlock();
+    w.end();
+    w.allowBreak(0, " ");
     w.write("}");
   }
 

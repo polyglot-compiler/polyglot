@@ -80,16 +80,9 @@ public class SynchronizedStatement extends Statement
   public void translate( LocalContext c, CodeWriter w)
   {
     w.write( "synchronized (");
-    expr.translate( c, w);
+    expr.translate_block( c, w);
     w.write( ") ");
-    if( !(body instanceof BlockStatement)) {
-      w.beginBlock();
-      body.translate( c, w);
-      w.endBlock();
-    }
-    else {
-      body.translate( c, w);
-    }
+    body.translate_substmt( c, w);
   }
 
   public void dump( CodeWriter w)

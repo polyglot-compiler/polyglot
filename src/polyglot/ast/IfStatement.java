@@ -22,14 +22,14 @@ public class IfStatement extends Statement
    * @param then The consequent.
    * @param else_ The alternate. This parameter may be <code>null</code>.
    */
-  public IfStatement( Expression cond, Statement then, Statement else_) 
+  public IfStatement(Expression cond, Statement then, Statement else_) 
   {
     this.cond = cond;
     this.then = then;
     this.else_ = else_;
   }
 
-  public IfStatement( Expression cond, Statement then) 
+  public IfStatement(Expression cond, Statement then) 
   {
     this( cond, then, null);
   }
@@ -37,8 +37,8 @@ public class IfStatement extends Statement
   /**
    * Lazily reconstruct this node.
    */
-  public IfStatement reconstruct( Expression cond, Statement then, 
-                                  Statement else_) 
+  public IfStatement reconstruct(Expression cond, Statement then, 
+                                 Statement else_) 
   {
     if( this.cond == cond && this.then == then && this.else_ == else_) {
       return this;
@@ -100,37 +100,22 @@ public class IfStatement extends Statement
     return this;
   }
 
-  public void translate( LocalContext c, CodeWriter w)
+  public void translate(LocalContext c, CodeWriter w)
   {    
-    w.write( "if( ");
-    cond.translate( c, w);
-    w.write( ") ");
+    w.write( "if (");
+    cond.translate_block(c, w);
+    w.write( ")");
    
-    if( !(then instanceof BlockStatement)) {
-      w.beginBlock();
-      then.translate( c, w);
-      w.endBlock();
-    } 
-    else {
-      then.translate(c, w);
-    }
+    then.translate_substmt(c, w);
 
-    if ( else_ != null)
-    {
-      w.newline();
+    if ( else_ != null) {
+      w.allowBreak(0, " ");
       w.write ( "else ");
-      if( !(else_ instanceof BlockStatement)) {
-        w.beginBlock();
-        else_.translate( c, w);
-        w.endBlock();
-      }
-      else {
-        else_.translate( c, w);
-      }
+      else_.translate_substmt(c, w);
     }
   }
 
-  public void dump( CodeWriter w)
+  public void dump(CodeWriter w)
   {
     w.write( "( IF ");
     dumpNodeInfo( w);

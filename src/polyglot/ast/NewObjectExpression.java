@@ -248,7 +248,7 @@ public class NewObjectExpression extends Expression
     }
 
     tn.translate( c, w);
-    w.write( "( ");
+    w.write( "(");
 
     for( Iterator iter = arguments(); iter.hasNext(); ) {
       ((Expression)iter.next()).translate( c, w);

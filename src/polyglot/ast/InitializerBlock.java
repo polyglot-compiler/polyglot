@@ -76,11 +76,11 @@ public class InitializerBlock extends ClassMember
 
   public void translate( LocalContext c, CodeWriter w)
   {
-    w.beginBlock();
-    w.write( "{ ");
-    block.translate( c, w);
-    w.write( " }");
-    w.endBlock();
+    w.write("{");
+    w.newline(4);
+    block.translate_block( c, w);
+    w.newline(0);
+    w.write("}");
   }
 
   public void dump( CodeWriter w)

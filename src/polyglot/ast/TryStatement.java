@@ -227,25 +227,20 @@ public class TryStatement extends Statement {
 
    public void  translate(LocalContext c, CodeWriter w)
    {
-      w.write("try ");
-      w.beginBlock();
-      tryBlock.translate(c, w);
-      w.endBlock();
+      w.write("try");
+      tryBlock.translate_substmt(c, w);
       
       for (ListIterator it = catchBlocks.listIterator(); it.hasNext(); )
       {
          CatchBlock cb = (CatchBlock) it.next();
-         w.beginBlock();
-         cb.translate(c, w);
-         w.endBlock();
+	 w.newline(4);
+         cb.translate_block(c, w);
       }
-      w.beginBlock();
       if (finallyBlock != null)
       {
-         w.write ("finally ");
-         w.beginBlock();
-         finallyBlock.translate(c, w);
-         w.endBlock();
+	 w.newline(4);
+         w.write ("finally");
+         finallyBlock.translate_substmt(c, w);
       }
    }
 

@@ -296,7 +296,7 @@ public class Main
     options.put( MAIN_OPT_SCRAMBLE, new Boolean( false));
     options.put( MAIN_OPT_EXT_OP, new Boolean( false));
     
-    options.put( Compiler.OPT_OUTPUT_WIDTH, new Integer( 72));
+    options.put( Compiler.OPT_OUTPUT_WIDTH, new Integer(80));
     options.put( Compiler.OPT_VERBOSE, new Boolean( false));
     options.put( Compiler.OPT_FQCN, new Boolean( false));
 

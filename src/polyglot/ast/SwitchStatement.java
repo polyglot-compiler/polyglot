@@ -160,7 +160,7 @@ public class SwitchStatement extends Statement
       else
       {
         w.write("case ");
-        getExpression().translate(c, w);
+        getExpression().translate_block(c, w);
         w.write(": " );
       }
     }
@@ -222,7 +222,7 @@ public class SwitchStatement extends Statement
 
      public void translate( LocalContext c, CodeWriter w)
      {
-       block.translate(c, w);
+       block.translate_substmt(c, w);
      }
 
      public void  dump ( CodeWriter cw)
@@ -349,20 +349,22 @@ public class SwitchStatement extends Statement
       SwitchBlock cb;
 
       w.write("switch (");
-      expr.translate(c, w);
+      expr.translate_block(c, w);
       w.write(") {");
-      w.beginBlock();
+      w.allowBreak(4, " ");
+      w.begin(0);
 
       for (ListIterator it = switchElems.listIterator(); it.hasNext(); )
       {
          se = (SwitchElement) it.next();
-         se.translate(c, w);
+         se.translate_block(c, w);
 
          if (it.hasNext()) {
            w.newline(0);
          }
       }
-      w.endBlock();      
+      w.end();
+      w.allowBreak(0, " ");
       w.write("}");
    }
 

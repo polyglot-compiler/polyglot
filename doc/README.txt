@@ -45,7 +45,7 @@ Source Path: -S
 Defaults to the current directory plus any directory in which a source
 file is found. The path list must be a set of directories separated by
 the system-dependent path separator (":" on solaris, ";" on NT). See
-"Where Source File Are Found" below. 
+"Where Source Files Are Found" below. 
 
 Fully Qualified Class Names: -fqcn
 Defaults to OFF. If this options is given, each class name will be
@@ -69,7 +69,7 @@ name, then the output file name will be extended with an additional
 the output file. It will, however, overwrite older output files.
 
 Dump: -dump
-Defaults to OFF. If this options is given, then the abstract syntax
+Defaults to OFF. If this option is given, then the abstract syntax
 tree is printed out (to stdout) after each stage of the translator.
 
 Scramble: -scramble
@@ -92,7 +92,7 @@ translated by jlc. Note that most javac-like compiler require input
 files to have the ".java" extension. 
 
 Verbose: -v -verbose
-Print out profuse debugging information to strerr.
+Print out profuse debugging information to stderr.
 
 Version: -version
 Print out the current version of the translator and exit.
@@ -104,18 +104,18 @@ Print out a summary of the usage options.
 --- Where Source Files Are Found ---
 
 When the jltools translator looks for a class by the name
-"foo.bar.Quux" it first searchs for that class in any file given on
+"foo.bar.Quux" it first searches for that class in any file given on
 the command line. If none of these files contain the desired class,
 then the source path is searched next. For example, if the source
 extension is ".jl" and the source path is "mydir:." then the
 translator looks for files "mydir/foo/bar/Quux.jl" and
-"./foo/bar/Quux.jl" if neither of these files exist, then the classpath
+"./foo/bar/Quux.jl". If neither of these files exist, then the classpath
 is used to find an appropriate class file. (Note that this sequence is
 subject to change.)
 
 
 --- Miscellaneous ---
 
-The solaris release includes an additional file jlc.c which invokes
-the java interpreter. This file may be compiled into an executable
-which provides a shortcut to the translator.
+The Solaris release includes an additional file jlc.c which invokes
+the java interpreter. This file may be compiled to create an executable
+that provides a shortcut to the translator.

@@ -224,14 +224,17 @@ public class MethodExpression extends Expression
       w.write( ".");
     }
 
-    w.write( name + "( ");
+    w.write( name + "(");
+    w.begin(0);
     
     for( Iterator iter = arguments(); iter.hasNext(); ) {
       ((Expression)iter.next()).translate( c, w);
       if (iter.hasNext()) {
-        w.write( ", ");
+        w.write( ",");
+	w.allowBreak(2, " ");
       }
     }
+    w.end();
     w.write( ")");
   }
   

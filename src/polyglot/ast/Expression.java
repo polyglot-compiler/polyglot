@@ -62,9 +62,9 @@ public abstract class Expression extends Node
                                          CodeWriter w)
   {
     if( expr.getPrecedence() > getPrecedence()) {
-      w.write( "(");
+      w.write("(");
     }
-    expr.translate( c, w);
+    expr.translate_block(c, w);
     if( expr.getPrecedence() > getPrecedence()) {
       w.write( ")");
     }

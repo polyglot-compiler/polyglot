@@ -145,6 +145,11 @@ public abstract class Node extends AnnotatedObject {
    * Rather, it uses a traditional recursive traversal.
    */
   public abstract void translate( LocalContext c, CodeWriter w);
+  public void translate_block( LocalContext c, CodeWriter w) {
+    w.begin(0);
+    translate(c, w);
+    w.end();
+  }
   
   /**
    * Print relevant debugging info for this node to the writer. (This method

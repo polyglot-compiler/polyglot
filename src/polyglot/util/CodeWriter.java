@@ -14,7 +14,7 @@ import java.util.Vector;
 
 public class CodeWriter
 {
-   public static final int INDENT = 3;
+   public static final int INDENT = 4;
    
     // A code-writer formats text onto an
     // output stream "o" while keeping the width of the output
@@ -36,18 +36,7 @@ public class CodeWriter
         if(s != null)
           current.add(new StringItem(s));
     }
-   
-    public void beginBlock()
-    {
-       newline(INDENT);
-       begin(0);
-    }
-   
-    public void endBlock()
-    {
-       newline(-INDENT);
-       end();
-    }
+
     public void newline()
     {
        newline(0);
@@ -67,7 +56,13 @@ public class CodeWriter
     }
     public void allowBreak(int n) {
         // Allow a newline. Indentation will be preserved.
-        current.add(new AllowBreak(n));
+	// If no newline is inserted, the string " " is output instead.
+        current.add(new AllowBreak(n, " "));
+    }
+    public void allowBreak(int n, String alt) {
+        // Allow a newline. Indentation will be preserved.
+	// If no newline is inserted, the string "alt" is output instead.
+        current.add(new AllowBreak(n, alt));
     }
     public void newline(int n) {
         // Force a newline. Indentation will be preserved.
@@ -182,7 +177,8 @@ class StringItem extends Item {
 class AllowBreak extends Item {
     int indent;
     boolean broken = true;
-    AllowBreak(int n_) { indent = n_; }
+    String alt;
+    AllowBreak(int n_, String alt_) { indent = n_; alt = alt_; }
     int format1(int lmargin, int pos, int rmargin, boolean canBreak) 
         throws Overrun {
         if (canBreak) {
@@ -190,7 +186,7 @@ class AllowBreak extends Item {
             return lmargin + indent;
         } else {
             broken = false;
-            return pos;
+            return pos + alt.length();
         }
     }
     int sendOutput(Writer o, int lmargin, int pos)
@@ -200,13 +196,14 @@ class AllowBreak extends Item {
             for (int i = 0; i < lmargin + indent; i++) o.write(" ");
             return lmargin + indent;
         } else {
-            return pos;
+	    o.write(alt);
+            return pos + alt.length();
         }
     }
 }
 
 class Newline extends AllowBreak {
-    Newline(int n_) { super(n_); }
+    Newline(int n_) { super(n_, ""); }
     int format1(int lmargin, int pos, int rmargin, boolean canBreak, boolean forceBreak) 
         throws Overrun {
         if (!canBreak) throw new Overrun(1);

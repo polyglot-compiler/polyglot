@@ -336,7 +336,7 @@ public class BinaryExpression extends Expression
        if( getCheckedType().equals( c.getType( "java.lang.String")) 
            && left.getCheckedType().isPrimitive()) {
          w.write( "(");
-         left.translate( c, w);
+         left.translate_block( c, w);
          w.write( ")");
        }
        else {
@@ -345,12 +345,12 @@ public class BinaryExpression extends Expression
        
        w.write( " ");
        w.write( getOperatorString( operator));
-       w.write( " ");
+       w.allowBreak(2, " ");
        
        if( getCheckedType().equals( c.getType( "java.lang.String")) 
            && right.getCheckedType().isPrimitive()) {
          w.write( "(");
-         right.translate( c, w);
+	 right.translate_block( c, w);
          w.write( ")");
        }
        else {

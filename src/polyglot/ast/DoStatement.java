@@ -82,16 +82,9 @@ public class DoStatement extends Statement
   public void translate(LocalContext c, CodeWriter w)
   {
     w.write( "do ");
-    if( !(stmt instanceof BlockStatement)) {
-      w.beginBlock();
-      stmt.translate( c, w);
-      w.endBlock();
-    }
-    else {
-      stmt.translate( c, w);
-    }
-    w.write( "while( ");
-    cond.translate( c, w);
+    stmt.translate_substmt( c, w);
+    w.write( "while(");
+    cond.translate_block( c, w);
     w.write( "); ");
   }
 

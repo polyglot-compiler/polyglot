@@ -164,7 +164,9 @@ public class NewArrayExpression extends Expression
     base.translate( c, w);
     for( Iterator iter = dimensionExpressions(); iter.hasNext(); ) {
       w.write( "[");
+      w.begin(0);
       ((Expression)iter.next()).translate( c, w);
+      w.end();
       w.write( "]");
     }
 

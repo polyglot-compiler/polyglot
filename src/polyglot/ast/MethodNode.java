@@ -383,20 +383,23 @@ public class MethodNode extends ClassMember
     w.write( accessFlags.getStringRepresentation());
     if( !isConstructor()) {
       returns.translate( c, w);
-      w.write( " " + name + "( ");
+      w.write( " " + name + "(");
     }
     else {
       returns.translate( c, w);
-      w.write( "( ");
+      w.write( "(");
     }
+    w.begin(0);
 
     for( Iterator iter = formals.iterator(); iter.hasNext(); )
     {
       ((FormalParameter)iter.next()).translate(c, w);
       if( iter.hasNext()) {
-        w.write( ", ");
+        w.write( ",");
+	w.allowBreak(0, " ");
       }
     }
+    w.end();
     w.write( ")");
 
     if( addDims > 0) {
@@ -406,25 +409,26 @@ public class MethodNode extends ClassMember
     }
 
     if( !exceptions.isEmpty()) {
-      w.write( " throws ");
+      w.allowBreak(6);
+      w.write( "throws ");
       for( Iterator i = exceptions.iterator(); i.hasNext(); ) {
         w.write ( ((TypeNode)i.next()).getType().getTypeString());
-        w.write ( (i.hasNext() ? ", " : "" ));
+	if (i.hasNext()) {
+	    w.write(","); w.allowBreak(4, " ");
+	}
       }
     }
     
     if( !mtiThis.getAccessFlags().isAbstract() ) {
       // FIXME should be abstract for interfaces.
       if( body != null) {
-        w.newline( 0);
-        body.translate(c, w);
-      }
-      else {
-        w.write( ";");
+        body.translate_substmt(c, w);
+      } else {
+        w.write(";");
       }
     }
     else {
-      w.write( ";");
+      w.write(";");
     }
   }
 

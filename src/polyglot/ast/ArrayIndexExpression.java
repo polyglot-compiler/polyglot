@@ -106,7 +106,9 @@ public class ArrayIndexExpression extends Expression
     translateExpression( base, c, w);
 
     w.write ("[");
+    w.begin(0);
     index.translate(c, w);
+    w.end();
     w.write ("]");
   }
   

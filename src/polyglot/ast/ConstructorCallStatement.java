@@ -148,10 +148,10 @@ public class ConstructorCallStatement extends Statement
   {
     if( primary != null) {
       primary.translate( c, w);
-      w.write( "." + (kind == THIS ? "this( " : "super( "));
+      w.write( "." + (kind == THIS ? "this(" : "super("));
     } 
     else {
-      w.write( (kind == THIS ? "this( " : "super( "));
+      w.write( (kind == THIS ? "this(" : "super("));
     }
 
     for( Iterator iter = arguments(); iter.hasNext(); ) {

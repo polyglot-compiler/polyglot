@@ -132,13 +132,11 @@ public class CatchBlock extends Node
 
   public void translate( LocalContext c, CodeWriter w)
   {
-    w.write ( "catch( ");
-    fp.translate( c, w);
-    w.write ( ")");
+    w.write("catch(");
+    fp.translate_block(c, w);
+    w.write(")");
 
-    w.beginBlock();
-    block.translate( c, w);
-    w.endBlock();
+    block.translate_substmt(c, w);
   }
   
   public void dump( CodeWriter w)
