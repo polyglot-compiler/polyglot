@@ -21,8 +21,7 @@ public class FlattenVisitor extends NodeVisitor
   }
 
   public Node override (Node n) {
-      // do not enter FieldNodes 
-      if (n instanceof FieldNode) {
+      if (n instanceof FieldNode || n instanceof ConstructorCallStatement) {
           return n;
       }
       return null;
