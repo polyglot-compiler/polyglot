@@ -352,9 +352,8 @@ public class TypeSystem_c implements TypeSystem
         };
 
 	// Check for package level scope.
-	// FIXME: protected too?
 	if (ctt.package_() == null && ctc.package_() == null &&
-	    flags.isPackage())
+	    (flags.isPackage() || flags.isProtected()))
 	    return true;
 
 	// kliger: this used to only allow access if the context and the
