@@ -7,6 +7,7 @@ package jltools.ast;
 import jltools.util.TypedList;
 import jltools.util.TypedListIterator;
 import java.util.ListIterator;
+import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,7 +79,7 @@ public class TryStatement extends Statement {
 
   public void visitChildren(NodeVisitor v) {
     tryBlock = (BlockStatement) tryBlock.accept(v);
-    for (ListIterator iter = catchBlocks.listIterator(); it.hasNext(); ) {
+    for (ListIterator it = catchBlocks.listIterator(); it.hasNext(); ) {
       CatchBlock cb = (CatchBlock) it.next();
       it.set((CatchBlock) cb.accept(v));
     }

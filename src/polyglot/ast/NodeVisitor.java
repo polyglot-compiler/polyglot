@@ -44,6 +44,8 @@ public interface NodeVisitor {
   public Node visitConstructorCallStatement(ConstructorCallStatement cs);
   public Node visitTryStatement(TryStatement ts);
 
+  public Node visitCatchBlock(CatchBlock cb);
+
   // Expressions
   public Node visitNullLiteral(NullLiteral nl);
   public Node visitStringLiteral(StringLiteral sl);
@@ -55,6 +57,7 @@ public interface NodeVisitor {
   public Node visitTernaryExpression(TernaryExpression te);  
   public Node visitLocalVariableExpression(LocalVariableExpression ve);
   public Node visitNewArrayExpression(NewArrayExpression ae);
+  public Node visitNewObjectExpression(NewObjectExpression oe);
   public Node visitInstanceofExpression(InstanceofExpression ie);
   public Node visitArrayInitializerExpression(ArrayInitializerExpression aie);
   public Node visitAmbiguousNameExpression(AmbiguousNameExpression ane);

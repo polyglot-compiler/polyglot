@@ -86,6 +86,12 @@ public class NullVisitor implements NodeVisitor {
     return ts;
   }
 
+
+  public Node visitCatchBlock(CatchBlock cb) {
+    cb.visitChildren(this);
+    return cb;
+  }
+
   // Expressions
   public Node visitNullLiteral(NullLiteral nl) {
     return nl;
@@ -130,6 +136,11 @@ public class NullVisitor implements NodeVisitor {
   public Node visitNewArrayExpression(NewArrayExpression ae) {
     ae.visitChildren(this);
     return ae;
+  }
+
+  public Node visitNewObjectExpression(NewObjectExpression oe) {
+    oe.visitChildren(this);
+    return oe;
   }
 
   public Node visitInstanceofExpression(InstanceofExpression ie) {

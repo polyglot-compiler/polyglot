@@ -7,6 +7,7 @@ package jltools.ast;
 import jltools.util.TypedList;
 import java.util.List;
 import java.util.Enumeration;
+import java.util.ArrayList;
 
 /**
  * AmbiguousNameExpression
@@ -32,7 +33,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
    * Effects: creates a new AmbiguousNameExpression for the names in lst.
    **/
   public AmbiguousNameExpression(List lst) {
-    names = TypedList.checkAndCopy(lst, String.class, false);
+    names = TypedList.copyAndCheck(lst, String.class, false);
     if (lst.size() < 1) throw new Error();    
   }
 
@@ -57,7 +58,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
   }
 
   public Node copy() {
-    AmbiguousNameExpression ane = new AmbiguougNameExpression(names);
+    AmbiguousNameExpression ane = new AmbiguousNameExpression(names);
     ane.copyAnnotationsFrom(this);
     return ane;
   }
@@ -70,8 +71,7 @@ public class AmbiguousNameExpression extends AmbiguousExpression {
     return v.visitAmbiguousNameExpression(this);
   }
 
-  public void visitChildrent(NodeVisitor v) { }
+  public void visitChildren(NodeVisitor v) { }
 
   TypedList names;
 }
-
