@@ -1,10 +1,11 @@
 package polyglot.visit;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.frontend.*;
 import java.util.*;
+
+import polyglot.ast.*;
+import polyglot.frontend.Job;
+import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
 
 /**
  * Visitor which checks that all (terminating) paths through a 
@@ -66,12 +67,28 @@ public class ExitChecker extends DataFlow
         // If every path from the exit node to the entry goes through a return,
         // we're okay.  So make the exit bit false at exit and true at every return;
         // the confluence operation is &&. 
+        // We deal with exceptions specially, and assume that any exception
+        // edge to the exit node is OK.
         if (n instanceof Return) {
             return itemToMap(DataFlowItem.EXITS, succEdgeKeys);
         }
 
-        if (n == graph.exitNode()) {
-            return itemToMap(DataFlowItem.DOES_NOT_EXIT, succEdgeKeys);
+        if (n == graph.exitNode()) {           
+            // all exception edges to the exit node are regarded as exiting
+            // correctly. Make sure non-exception edges have the
+            // exit bit false.
+            Map m = itemToMap(DataFlowItem.EXITS, succEdgeKeys);
+            if (succEdgeKeys.contains(FlowGraph.EDGE_KEY_OTHER)) {
+                m.put(FlowGraph.EDGE_KEY_OTHER, DataFlowItem.DOES_NOT_EXIT);
+            }
+            if (succEdgeKeys.contains(FlowGraph.EDGE_KEY_TRUE)) {
+                m.put(FlowGraph.EDGE_KEY_TRUE, DataFlowItem.DOES_NOT_EXIT);
+            }
+            if (succEdgeKeys.contains(FlowGraph.EDGE_KEY_FALSE)) {
+                m.put(FlowGraph.EDGE_KEY_FALSE, DataFlowItem.DOES_NOT_EXIT);
+            }
+            
+            return m;
         }
 
         return itemToMap(in, succEdgeKeys);

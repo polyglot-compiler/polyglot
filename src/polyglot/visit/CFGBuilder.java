@@ -381,8 +381,8 @@ public class CFGBuilder implements Copy
             }
         }
 
-        // If not caught, do _not_ insert a node from the thrower to exit.
-        // edge(last_visitor, last, graph.exitNode());
+        // If not caught, insert a node from the thrower to exit.
+        edge(last_visitor, last, graph.exitNode(), new FlowGraph.ExceptionEdgeKey(type));
     }
 
     /** Create edges for a try finally block. */
