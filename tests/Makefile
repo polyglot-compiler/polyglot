@@ -60,6 +60,7 @@ GOOD =  \
 	LocalClass2.jl \
 	LocalClass3.jl \
 	LocalClass4.jl \
+	LocalClass5.jl \
 	LocalInit.jl \
 	Narrowing.jl \
 	Prim.jl \
