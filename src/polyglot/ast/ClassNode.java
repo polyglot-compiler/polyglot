@@ -424,27 +424,46 @@ public class ClassNode extends ClassMember
 
     for (ListIterator i = n.type.getMethods().listIterator(); i.hasNext(); ) {
       MethodTypeInstance mti = (MethodTypeInstance) i.next();
-      Type rt = mti.getReturnType();
 
-      mti.setReturnType( c.getType(rt) );
+      try {
+	Type rt = mti.getReturnType();
+	mti.setReturnType( c.getType(rt) );
 
-      List argTypes = mti.argumentTypes();
-      for (ListIterator j = argTypes.listIterator(); j.hasNext(); ) {
+	List argTypes = mti.argumentTypes();
+	for (ListIterator j = argTypes.listIterator(); j.hasNext(); ) {
 	  Type t = (Type) j.next();
 	  j.set( c.getType(t) );
-      }
+	}
 
-      List excTypes = mti.exceptionTypes();
-      for (ListIterator j = excTypes.listIterator(); j.hasNext(); ) {
+	List excTypes = mti.exceptionTypes();
+	for (ListIterator j = excTypes.listIterator(); j.hasNext(); ) {
 	  Type t = (Type) j.next();
 	  j.set( c.getType(t) );
+	}
+      } catch (SemanticException exn) {
+	//rethrow with line number of current method type instance
+	System.err.println("rethrowing a semantic exception");
+	if (exn.getLineNumber() == SemanticException.INVALID_LINE) {
+	  System.err.println("adjusting line number to be "+
+			     Annotate.getLineNumber(mti));
+	  throw new SemanticException(exn.getMessage(),
+				      Annotate.getLineNumber(mti));
+	}
       }
     }
 
     for (ListIterator i = n.type.getFields().listIterator(); i.hasNext(); ) {
       FieldInstance fi = (FieldInstance) i.next();
-      Type t = fi.getType();
-      fi.setType( c.getType(t) );
+
+      try {
+	Type t = fi.getType();
+	fi.setType( c.getType(t) );
+      } catch (SemanticException exn) {
+	//rethrow with line number of current field instance
+	if (exn.getLineNumber() == SemanticException.INVALID_LINE)
+	  throw new SemanticException(exn.getMessage(),
+				      Annotate.getLineNumber(fi));
+      }
     }
 
     n.leaveScope(c);

@@ -62,7 +62,9 @@ public class SignatureCleaner extends NodeVisitor
     catch( SemanticException e)
     {
       eq.enqueue( ErrorInfo.SEMANTIC_ERROR, e.getMessage(), 
-                  Annotate.getLineNumber( n));
+                  (e.getLineNumber() == SemanticException.INVALID_LINE ?
+		   Annotate.getLineNumber( n) :
+		   e.getLineNumber()) );
       // FIXME n.setHasError( true);
     }
     catch( IOException e)
