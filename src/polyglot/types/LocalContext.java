@@ -15,15 +15,11 @@ public class LocalContext
    */
   TypeSystem ts;
   /**
-   * our wrapper class
-   */
-  LocalContext lcEnclosingClass ;
-  /**
    * the context which we pass on to the typesystem. tells it who "we" are.
    */
   TypeSystem.Context context; 
   /**
-   *contains the hashtable mapping for name => symbol. top of stack is context for current scope.
+   * Contains the hashtable mapping for name => symbol. top of stack is context for current scope.
    */
   Stack /* of Hashtable */ stkContexts; 
 
@@ -33,9 +29,8 @@ public class LocalContext
    * block).  All unresolved queries are passed on to the TypeSystem.  To do this, 
    * we'll also need the import table and what our enclosing class is.
    */
-  public LocalContext ( ImportTable itImports, ClassType tThisClass, LocalContext lcEnclosingClass, TypeSystem ts)
+  public LocalContext ( ImportTable itImports, ClassType tThisClass, TypeSystem ts)
   {  
-    this.lcEnclosingClass = lcEnclosingClass;
     this.ts = ts;
     
     context = new TypeSystem.Context ( itImports, tThisClass, null);
@@ -60,35 +55,17 @@ public class LocalContext
 
   /**
    * Gets the methodMatch with name with "name" and a list of argument types "argumentTypes"
-   * against Type "type".
+   * against Type "type". type may be null; 
    */
-  public MethodTypeInstance getMethod( Type type, String methodName, List argumentTypes)
+  public MethodTypeInstance getMethod( ClassType type, String methodName, List argumentTypes) throws TypeCheckException
   {
-    //FIXME: implement
-    return null;
-  }
-
-  /**
-   * Gets the MethodMatch with a possibly ambiguous name "name" and list of "argumentTypes"
-   */
-  public MethodTypeInstance getMethod( String methodName, List argumentTypes)
-  {
-    // FIXME: implement
-    return null;
-  }
-
-  /**
-   * Finds a particular field within the current type system.
-   */
-  public FieldInstance getField (String fieldName) throws TypeCheckException
-  {
-    return getField(null, fieldName);
+    return ts.getMethod( type, new MethodType( ts, methodName, argumentTypes), context);
   }
 
   /**
    * Gets a field matched against a particular type
    */  
-  public FieldInstance getField( Type type, String fieldName) throws TypeCheckException
+  public FieldInstance getField( ClassType type, String fieldName) throws TypeCheckException
   {
     Object result;
     if ( type == null ) // could be a local, so check there first.
@@ -100,22 +77,16 @@ public class LocalContext
           return new FieldInstance (fieldName, (Type)result, null, AccessFlags.flagsForInt(0));
         }
       }      
-      // not in this class. check enclosing class.
-      if ( lcEnclosingClass != null) 
-        return lcEnclosingClass.getField(type, fieldName);
     }
-
-    // pass on to type system:
-    // FIXME: nks: 
-    //return ts.getField(type, fieldName, context);
-    return null;
+    // not a local variable, so pass on to the type system.
+    return ts.getField(type, fieldName, context);
   }
 
   /**
    * If <type> is a valid type in the given context, returns a
    * canonical form of that type.  
    **/
-  public Type checkAndResolveType( Type type ) throws TypeCheckException
+  public Type getType( Type type ) throws TypeCheckException
   {
     return ts.checkAndResolveType(type, context);
   }
@@ -158,7 +129,6 @@ public class LocalContext
     {
       throw new InternalCompilerError("No more scopes to pop!");
     }
-
   }
 
   /**
