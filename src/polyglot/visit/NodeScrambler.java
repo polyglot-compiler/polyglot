@@ -6,6 +6,7 @@ import jltools.util.*;
 
 import java.util.*;
 
+// XXX document me
 public class NodeScrambler extends NodeVisitor
 {
   public FirstPass fp;

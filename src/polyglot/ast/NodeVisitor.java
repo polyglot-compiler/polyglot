@@ -16,7 +16,7 @@ package jltools.ast;
  *    If you want to add nodes to the AST outside of jtools.ast, don't add
  *    them to NodeVisitor.  Instead, make a new visitor interface which
  *    extends NodeVisitor, and have your code look a little like:
- *         Node accept(NodeVistor v) {
+ *         Node accept(NodeVisitor v) {
  *             if (v instanceof SpecialVisitor)
  *                return v.visitSpecial(this);
  *             else {
@@ -29,21 +29,25 @@ package jltools.ast;
  **/
 public abstract class NodeVisitor 
 {
+// XXX document me
    public Node visitBefore(Node n)
    {
       return null;
    }
 
+// XXX document me
    public Node visitAfter(Node n)
    {
       return n;
    }
 
+// XXX document me
   public Node visitAfter(Node n, Object vinfo)
   {
     return visitAfter( n);
   }
 
+// XXX document me
   public Object mergeVisitorInfo( Object vinfo1, Object vinfo2)
   {
     return null;

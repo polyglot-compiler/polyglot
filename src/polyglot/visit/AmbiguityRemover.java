@@ -5,6 +5,7 @@ import jltools.types.*;
 import jltools.util.*;
 
 
+// XXX document me
 public class AmbiguityRemover extends NodeVisitor
 {
   private TypeSystem ts;
@@ -21,11 +22,13 @@ public class AmbiguityRemover extends NodeVisitor
     c = new LocalContext( it, ts);
   }
 
+// XXX document me
   public Node visitBefore(Node n)
   {
     return n.adjustScope( c);
   }
 
+// XXX document me
   public Node visitAfter( Node n)
   {
     try
