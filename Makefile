@@ -50,6 +50,9 @@ PACKAGES = \
 	jltools.types \
 	jltools.util \
 	jltools.visit \
+	jltools.ext.jl.ast \
+	jltools.ext.jl.parse \
+	jltools.ext.jl.types \
 	jltools.ext.op \
 	jltools.ext.op.runtime \
 	jltools.ext.polyj \
