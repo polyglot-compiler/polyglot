@@ -21,7 +21,7 @@ public class Expr
 	
 	public String toString() {
 		if (lExpr == null) {
-			return String.valueOf(lNum) + /*Token.toString(op)*/ " " + String.valueOf(rNum);
+			return String.valueOf(lNum) + " " + Token.toString(op) + " " + String.valueOf(rNum);
 		} else {
 			return lExpr.toString() + Token.toString(op) + rExpr.toString();
 		}

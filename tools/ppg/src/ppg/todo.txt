@@ -1,6 +1,7 @@
 JLgen TODO
 ----------
-* error reporting
+* add/remove precedence* fix documentation
+* error reporting
   - filename/pos on jlgen error
   - add usage message on errors
   - dropping nonexistent symbol

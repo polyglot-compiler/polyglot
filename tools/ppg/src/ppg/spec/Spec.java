@@ -11,7 +11,7 @@ public abstract class Spec implements Unparse
 		child = null;
 	}	
 	public void setPkgName (String pkgName) {		if (pkgName != null)
-			packageName = pkgName;
+			packageName = pkgName; 
 	}
 	
 	public void replaceCode (Vector codeParts) {		if (codeParts == null) 			return;				Code code=null;

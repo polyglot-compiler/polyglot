@@ -46,21 +46,13 @@ public class Token /*extends Symbol */implements LexerResult {
 
     public String getID () {
 		return toString(symbol.sym);
-		/*
-		switch (symbol.sym) {
-
-			// tokens
-			default: break;
-		}
-		throw new IllegalStateException ("Unknown symbol code: " + symbol.sym);
-		*/
 	}
 
 	public static String toString (int type) {
 		switch (type) {
 			case Constant.PLUS:					return "+";
 			case Constant.MINUS:				return "-";
-			case Constant.EXPR:					return "expr";
+			case Constant.EXPR:					return "expr";			case Constant.NUM:					return "num";			case Constant.LPAREN:				return "lparen";			case Constant.RPAREN:				return "rparen";
 						
 			case Constant.EOF:					return "EOF";
 			case Constant.error:				return "ERROR";
