@@ -124,6 +124,13 @@ public class VariableDeclarationStatement extends Statement
         }
         c.addSymbol( name, vi);
       }
+
+      // HACK: Update the type of the variable instance.
+      VariableDeclarationStatement vdsEnclosing = 
+	(VariableDeclarationStatement) wrVDS.get();
+      VariableInstance vi = getVariableInstance();
+      vi.setType(vdsEnclosing.typeForDeclarator(this));
+
       return this;
     }
       
@@ -153,7 +160,15 @@ public class VariableDeclarationStatement extends Statement
         c.addSymbol( name, vi);
       }
 
-      return visitChildren(sc);
+      Declarator d = (Declarator) visitChildren(sc);
+
+      // HACK: Update the type of the variable instance.
+      VariableDeclarationStatement vdsEnclosing = 
+	(VariableDeclarationStatement) d.wrVDS.get();
+      VariableInstance vi = d.getVariableInstance();
+      vi.setType(vdsEnclosing.typeForDeclarator(d));
+
+      return d;
     }
       
     public Node typeCheck( LocalContext c) throws SemanticException

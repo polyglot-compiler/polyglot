@@ -33,7 +33,6 @@ public class FieldNode extends ClassMember
       this(null, declare);
   }
 
-
   /**
    * Lazily reconstruct this node.
    */
