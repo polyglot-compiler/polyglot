@@ -8,7 +8,7 @@ Polyglot distribution.  Your installation directory contains the following
 sub-directories:
 
   - polyglot: the complete source code of Polyglot 0.9
-  - doc: old documentation about writing Polyglot extensions
+  - doc: documentation about writing Polyglot extensions
   - javadoc: Javadoc descriptions of Polyglot classes
   - images: Logos
 
