@@ -5,7 +5,6 @@ SUBDIRS =
 include $(SOURCE)/Rules.mk
 
 SOURCES = \
-	PaoInstanceof_c.java \
 	PaoNodeFactory_c.java \
 	PaoNodeFactory.java
 

@@ -4,7 +4,12 @@ SUBDIRS =
 
 include $(SOURCE)/Rules.mk
 
-SOURCES =
+SOURCES = \
+	PaoBinaryDel_c.java \
+	PaoCastDel_c.java \
+	PaoDel_c.java \
+	PaoDel.java \
+	PaoInstanceofDel_c.java
 
 CLASSES = $(patsubst %.java, $(PACKAGEPATH)/%.class, $(SOURCES))
 MANIFEST = Makefile $(SOURCES)
