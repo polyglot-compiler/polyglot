@@ -25,6 +25,7 @@ public class FieldInstance implements Cloneable, TypeInstance {
   public AccessFlags getAccessFlags() { return flags.copy(); }
   public Type getType()         { return type; }
   public String getName()       { return name; }
+  public Type getEnclosingType() { return enclosingType; }
 
   private String name;
   private Type type, enclosingType;

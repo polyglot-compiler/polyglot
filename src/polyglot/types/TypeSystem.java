@@ -41,6 +41,11 @@ public abstract class TypeSystem {
       { table = null; inClass = type; inMethod = m; }
   }
 
+  /**
+   * performs any initizlation necessary that requries resolvers.
+   */
+  public abstract void initializeTypeSystem() throws TypeCheckException;
+
   ////
   // Functions for two-type comparison.
   ////
@@ -96,11 +101,16 @@ public abstract class TypeSystem {
     throws TypeCheckException ;
 
   /**
-   * Checks whether a method or field within tEnclosingClass with access flags 'flags' can
+   * Checks whether a method or field within ctTarget with access flags 'flags' can
    * be accessed from Context context. 
    */
-  public abstract boolean isAccessible(ClassType tEnclosingClass, AccessFlags flags, Context context)
+  public abstract boolean isAccessible(ClassType ctTarget, AccessFlags flags, Context context)
     throws TypeCheckException ;
+
+  /**
+   * Returns whether inner is enclosed within outer
+   */
+  public abstract boolean isEnclosed( ClassType tInner, ClassType tOuter);
 
   /**
    * If <type> is a valid type in the given context, returns a
@@ -173,7 +183,7 @@ public abstract class TypeSystem {
    * context.  If no such field may be found, returns a fieldmatch
    * with an error explaining why. Considers accessflags
    **/
-  public abstract FieldInstance getField(ClassType type, String name, Context context, boolean bIsThis)
+  public abstract FieldInstance getField(ClassType type, String name, Context context)
     throws TypeCheckException;
 
   /**
@@ -232,7 +242,7 @@ public abstract class TypeSystem {
    * (Guavac gets this wrong.)
    **/
   public abstract MethodTypeInstance getMethod(ClassType type, MethodType method, 
-					Context context, boolean isThis)
+					Context context)
     throws TypeCheckException;
   /**
    * If an attempt to call a method of type <method> on <type> would

@@ -20,12 +20,18 @@ import jltools.util.InternalCompilerError;
 public class StandardTypeSystem extends TypeSystem {
 
   // resolver should handle caching.
-  public StandardTypeSystem(ClassResolver resolver) throws TypeCheckException
+  public StandardTypeSystem(ClassResolver resolver) 
   {
     this.resolver = resolver;
     this.emptyImportTable = new ImportTable(resolver);
-    
-    // set up final objects:
+  }
+
+  /**
+   * Initiazlies the type system to internal constants (which depend on the resolver 
+   * being properly initialized) are themselves initialized.
+   */
+  public void initializeTypeSystem( ) throws TypeCheckException
+  {
     OBJECT_  = resolver.findClass( "java.lang.Object");
     THROWABLE_ = resolver.findClass( "java.lang.Throwable");
     ERROR_ = resolver.findClass( "java.lang.Error");
@@ -282,15 +288,22 @@ public class StandardTypeSystem extends TypeSystem {
   }
       
   /**
-   * Checks whether a method, field or inner class  within tEnclosingClass with access flags 'flags' can
+   * Checks whether a method, field or inner class within ctTarget with access flags 'flags' can
    * be accessed from Context context, where context is a class type.
    */
-  public boolean isAccessible(ClassType ctEnclosingClass, AccessFlags flags, Context context) 
+  public boolean isAccessible(ClassType ctTarget, AccessFlags flags, Context context) 
     throws TypeCheckException 
   {
     // check if in same class or public 
-    if ( isSameType( ctEnclosingClass, context.inClass) ||
+    if ( isSameType( ctTarget, context.inClass) ||
          flags.isPublic())
+      return true;
+
+    // check if context is an inner class of ctEnclosingClass, in which case protection doesnt matter
+    if ( isEnclosed ( context.inClass, ctTarget))
+      return true;
+    // check if ctTarget is an inner of context, in which case protection doesnt matter either
+    if ( isEnclosed ( ctTarget, context.inClass))
       return true;
 
     if ( ! (context.inClass instanceof ClassType))
@@ -301,18 +314,26 @@ public class StandardTypeSystem extends TypeSystem {
     ClassType ctContext = (ClassType)context.inClass;
     
     // check for package level scope. ( same package and flags has package level scope.
-    if (ctEnclosingClass.getPackage().equals
+    if (ctTarget.getPackage().equals
         (ctContext.getPackage()) &&
         flags.isPackage())
       return true;
     
     // protected
-    if ( ctContext.descendsFrom( ctEnclosingClass ) &&
+    if ( ctContext.descendsFrom( ctTarget ) &&
          flags.isProtected())
       return true;
     
     // else, 
     return false;
+  }
+
+  public boolean isEnclosed(ClassType tInner, ClassType tOuter)
+  {
+    ClassType ct; 
+    while ( (ct = tInner.getContainingClass()) != null &&
+            ! ct.equals(tOuter));
+    return ct != null;
   }
 
   /**
@@ -511,65 +532,72 @@ public class StandardTypeSystem extends TypeSystem {
    * with an error explaining why. name and context may be null, in which case
    * they will not restrict the output.
    **/
-  public FieldInstance getField(ClassType type, String name, Context context, boolean bIsThis ) throws TypeCheckException
+  public FieldInstance getField(ClassType type, String name, Context context ) throws TypeCheckException
   {
-    /*    if (! type.isCanonical() )
-      throw new TypeCheckException("Type: \"" + type + "\" not a canoncial type.");
-    
-    LinkedList worklistEnclosingTypes = new LinkedList();
-    Type tResult;
-    List lTempResult; // Typed list containing FieldInstances
-    Type tEnclosing;
+    FieldInstance fi = null, fiEnclosing = null, fiTemp = null;
+    ClassType tEnclosing = null;
 
-    // check ourselves:
-    lTempResults = type.getFields();
-    for (Iterator i = lTempResult.listIterator(); i.hasNext(); )
+    if (type != null) // then we have a starting point. don't have to perform a 2d search
     {
-      FieldInstance fi = (FieldInstance)i.next();
-      if (fi.getName().equals(name))
-        // found it. can stop looking since guaranteed that it is not looking.
-        return fi;
-    }
-
-    // now look through those classes that type descended from
-    while (type != null)
-    {
-      lTempResult = type.getFields();
-      for (Iterator i = lTempResult.listIterator(); i.hasNext(); )
+      do 
       {
-        FieldInstance fi = (FieldInstance)i.next();
-        // only "find"those fields which match our input criteria, namely, 
-        //   - make sure that the names match
-        //   - make sure that we have proper access from this context.
-        if ( (fi.getName().equals (name)))
-          if ( isAccessible( type, fi.getAccessFlags(),  context))
+        for (Iterator i = type.getFields().iterator(); i.hasNext() ; )
+        {
+          fi = (FieldInstance)i.next();
+          if ( fi.getName().equals(name))
           {
-            tResult = fi;
+            if ( isAccessible( type, fi.getAccessFlags(), context))
+              return fi;
+            throw new TypeCheckException(" Field \"" + name + "\" found in \"" + type.getFullName() + 
+                                         "\", but with wrong access permissions.");
           }
-          else 
-            throw new TypeCheckError( "Cannot access 
-
+        }
       }
-      // if we have an enclosing class, throw it in the worklist.
-      tEnclosing = type.getContainingClass();
-      if (tEnclosing != null && ! worklistEnclosingTypes.contains(tEnclosing))
-        worklistEnclosingTypes.add( tEnclosing );
-      type = getClassForType( class_.getSupertype());
+      while ( (type = type.getSupertype()) != null);
     }
-
-    // now go through our worklist.
-    for (Iterator iWorklist = worklistEnclosingTypes.iterator(); iWorklist.hasNext() ; )
+    else // type == null, ==> no starting point. so check superclasses as well as enclosing classes.
     {
-      Iterator iResult = getFieldsForType( (Type)iWorklist.next() );
-      // and add 'em to our result list.
-      for (; iResult.hasNext() ; )
+      // check ourselves, first. this is because if a field is in this class, it cannot be ambiguous
+      for (Iterator i = context.inClass.getFields().iterator(); i.hasNext(); )
       {
-        lResults.add ( iResult.next() );
+        fi = (FieldInstance)i.next();
+        if (fi.getName().equals(name))
+          // found it. can stop looking since guaranteed that it is not ambiguous
+          return fi;
+      }
+
+      // check the lineage of where we are
+      try {  fi = getField( context.inClass, name, context); }
+      catch ( TypeCheckException tce) { /* must have been something we couldnt access */ }
+
+      boolean bFound = (fi == null);
+      
+      // now check all enclosing classes (this will also look for conflicts)
+      tEnclosing = context.inClass.getContainingClass();
+      while (tEnclosing != null)
+      {
+        try { fiTemp = getField(tEnclosing, name, context); }
+        catch (TypeCheckException tce ) { /* must have been something we couldn't access */ }
+
+        if (bFound && fiTemp != null)
+        {
+          throw new TypeCheckException("Ambiguous referenct to field \"" + name + "\"");
+        }
+        else if (fiTemp != null)
+        {
+          fi = fiTemp;
+          bFound = true;
+        }
+      }
+      if ( fi != null && fiEnclosing != null)
+      {
+        throw new TypeCheckException("Ambiguous referenct to field \"" + name + "\"");
       }
     }
-    return lResults.iterator();
-    */
-    return null;
+
+    if ( fi!= null) return fi;
+    if ( fiEnclosing != null) return fiEnclosing;
+    throw new TypeCheckException("Field \"" + name + "\" not found");
   }
 
  /**
@@ -579,55 +607,74 @@ public class StandardTypeSystem extends TypeSystem {
    * context.  If no such field may be found, returns a fieldmatch
    * with an error explaining why. Considers accessflags.
    **/
-  public Iterator getMethod(ClassType type, String name, Context context)
+  public MethodTypeInstance getMethod(ClassType type, MethodType method, Context context)
     throws TypeCheckException
   {
-    /*    // FIXME: nks: deprecated
+    MethodTypeInstance mti = null, mtiEnclosing = null, mtiTemp = null;
+    ClassType tEnclosing = null;
 
-    if (! type.isCanonical() )
-      throw new TypeCheckException("Type: \"" + type + "\" not a canoncial type.");
-    
-    LinkedList worklistEnclosingTypes = new LinkedList();
-    List lResults = new LinkedList();
-    List lTempResult; // Typed list containing MethodTypeIstances
-    Type tEnclosing;
-
-    // first add all that we descend from
-    while (type != null)
+    if (type != null) // then we have a starting point. don't have to perform a 2d search
     {
-      lTempResult = type.getMethods();
-      // wrap all the MethodTypeInstances in MethodMatches, and add them to our list.
-      for (Iterator i = lTempResult.listIterator(); i.hasNext(); )
+      do 
       {
-        MethodTypeInstance mti =  (MethodTypeInstance)i.next();
-        // only add those methods which match our input criteria, namely, 
-        //   - make sure that the names match (if specified) and 
-        //   - make sure that we have proper access from this context (if specified)
-        if ( (mti.getName().equals( name) || name == null) &&
-             (context == null || isAccessible( type, 
-                                               mti.getAccessFlags(), context)))
-          lResults.add( new MethodMatch ( class_.getType(), mti));
+        for (Iterator i = type.getMethods().iterator(); i.hasNext() ; )
+        {
+          mti = (MethodTypeInstance)i.next();
+          if ( methodCallValid( mti, method))
+          {
+            if ( isAccessible( type, mti.getAccessFlags(), context))
+              return mti;
+            throw new TypeCheckException(" Method \"" + method.getName() + "\" found in \"" + type.getFullName() + 
+                                         "\", but with wrong access permissions.");
+          }
+        }
       }
-      // if we have an enclosing class, throw it in the worklist.
-      tEnclosing = type.getContainingClass();
-      if (tEnclosing != null && ! worklistEnclosingTypes.contains(tEnclosing))
-        worklistEnclosingTypes.add( tEnclosing );
-      type = getClassForType( type.getSupertype());
+      while ( (type = type.getSupertype()) != null);
+    }
+    else // type == null, ==> no starting point. so check superclasses as well as enclosing classes.
+    {
+      // check ourselves, first. this is because if a field is in this class, it cannot be ambiguous
+      for (Iterator i = context.inClass.getMethods().iterator(); i.hasNext(); )
+      {
+        mti = (MethodTypeInstance)i.next();
+        if (methodCallValid(mti, method))
+          // found it. can stop looking since guaranteed that it is not ambiguous
+          return mti;
+      }
+
+      // check the lineage of where we are
+      try {  mti = getMethod( context.inClass, method, context); }
+      catch ( TypeCheckException tce) { /* must have been something we couldnt access */ }
+
+      boolean bFound = (mti == null);
+      
+      // now check all enclosing classes (this will also look for conflicts)
+      tEnclosing = context.inClass.getContainingClass();
+      while (tEnclosing != null)
+      {
+        try { mtiTemp = getMethod(tEnclosing, method, context); }
+        catch (TypeCheckException tce ) { /* must have been something we couldn't access */ }
+
+        if (bFound && mtiTemp != null)
+        {
+          throw new TypeCheckException("Ambiguous referenct to method \"" + method.getName() + "\"");
+        }
+        else if (mtiTemp != null)
+        {
+          mti = mtiTemp;
+          bFound = true;
+        }
+      }
+      if ( mti != null && mtiEnclosing != null)
+      {
+        throw new TypeCheckException("Ambiguous referenct to method \"" + method.getName() + "\"");
+      }
     }
 
-    // now go through our worklist.
-    for (Iterator iWorklist = worklistEnclosingTypes.iterator(); iWorklist.hasNext() ; )
-    {
-      Iterator iResult = getMethodsForType( (Type)iWorklist.next() );
-      // and add 'em to our result list.
-      for (; iResult.hasNext() ; )
-      {
-        lResults.add ( iResult.next() );
-      }
-    }
-    return lResults.iterator();
-    */
-    return null;
+    if ( mti != null) return mti;
+    if ( mtiEnclosing != null) return mtiEnclosing;
+    throw new TypeCheckException("No method \"" + method.getName() + "\" found with proper signature.");
+
   }
 
   /**
@@ -723,31 +770,7 @@ public class StandardTypeSystem extends TypeSystem {
                                       Context context, boolean isThis)
     throws TypeCheckException 
   {
-    /*    // we first get the list of methods which match our type, method name and 
-    // are accessible from our context.  We make use of the fact that 
-    // the methods come back such taht those in the subclass come before those in a 
-    // super class.
-    MethodMatch match = null, temp = null;
-    for ( Iterator i = getMethod( type, method.getName() , context)   ; i.hasNext() ; )
-    {
-      temp = (MethodMatch)temp;
-      // if isThis is true, make sure we don't check enclosing classes (checking super
-      // classes is ok, though) & that the type signatures are compatible
-      if (   ( ( !isThis ) || context.inClass.descendsFrom ( temp.onClass ) ) &&
-             methodCallValid( temp.method, method) )
-        // new ==> this is our candidation.  keep looking to make sure that this  isn't
-        //         ambiguous
-        if (match == null)
-          match = temp;
-        else 
-          // we have a match already. if our temp refines the signature of our current match
-          // (from the subclass), then we have an ambiguous situation.
-          if ( methodCallValid( temp.method, match.method) )
-            throw new TypeCheckException(" The call is ambiguous; more than 1 prototype will match");
-    }
-    return match;
-    */
-    return null;
+    throw new TypeCheckException("Deprecated method");
   }
 
   /**
@@ -834,11 +857,11 @@ public class StandardTypeSystem extends TypeSystem {
   private final Type LONG_    = new PrimitiveType(this, PrimitiveType.LONG);
   private final Type FLOAT_   = new PrimitiveType(this, PrimitiveType.FLOAT);
   private final Type DOUBLE_  = new PrimitiveType(this, PrimitiveType.DOUBLE);
-  private final Type OBJECT_      ;
-  private final Type THROWABLE_   ;
-  private final Type ERROR_       ;
-  private final Type RTEXCEPTION_ ;
-  private final Type CLONEABLE_   ;
+  private Type OBJECT_      ;
+  private Type THROWABLE_   ;
+  private Type ERROR_       ;
+  private Type RTEXCEPTION_ ;
+  private Type CLONEABLE_   ;
   
   protected ClassResolver resolver; //Should do its own caching.
   protected ImportTable emptyImportTable;

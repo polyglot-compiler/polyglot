@@ -72,23 +72,30 @@ public class Compiler
     loadedResolver = new LoadedClassResolver();
     systemResolver.addClassResolver( loadedResolver);
 
+    ts = new StandardTypeSystem( systemResolver);
+
+    loadedResolver.setTypeSystem( Compiler.ts);
+
+    System.out.println("Going to init type system");
     try
     {
-      ts = new StandardTypeSystem( systemResolver);
+      ts.initializeTypeSystem();
     }
     catch( TypeCheckException e)
     {
       throw new InternalCompilerError( "Unable to initialize compiler. " + 
-                                       "Failed to create type system: " +
+                                       "Failed to initialize type system: " +
                                        e.getMessage());
     }
-    loadedResolver.setTypeSystem( Compiler.ts);
+
 
     /* Other setup. */
     compilers = new LinkedList();
     workList = Collections.synchronizedList( new LinkedList());
 
     initialized = true;
+
+    System.out.println("Setup done.");
   }
 
   public static boolean cleanup() throws IOException
