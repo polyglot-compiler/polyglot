@@ -18,6 +18,7 @@ public class Main
 
   /** Source files specified on the command line */
   private static Set source;
+  public static Options options;
 
   /** Whether any errors seen yet */
   private boolean hasErrors = false;
@@ -25,7 +26,7 @@ public class Main
   public static final void main(String args[])
   {
     source = new HashSet();
-    Options options = Options.global;
+    options = Options.global;
     
     parseCommandLine(args, options, source);
 
