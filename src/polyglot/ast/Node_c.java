@@ -360,6 +360,11 @@ public abstract class Node_c implements Node
 
         w.allowBreak(4, " ");
         w.begin(0);
+        w.write("(ext " + ext() + ")");
+        w.end();
+
+        w.allowBreak(4, " ");
+        w.begin(0);
         w.write("(position " + (position != null ? position.toString()
                                                   : "UNKNOWN") + ")");
         w.end();
