@@ -88,6 +88,10 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
         return uncheckedInstantiate(pos, base, base.formals());
     }
 
+    public Type nullInstantiate(ParametricType base) {
+        return nullInstantiate(base.position(), base);
+    }
+    
     /**
      * Apply a parameter substitution to a type.
      *

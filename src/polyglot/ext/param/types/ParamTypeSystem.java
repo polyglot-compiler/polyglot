@@ -17,6 +17,14 @@ public interface ParamTypeSystem extends TypeSystem {
     Type nullInstantiate(Position pos, ParametricType base);
 
     /**
+     * Null instantiate <code>base</code>, using the same Position
+     * as <code>base</code>.
+     *
+     * @param base The parameterized type
+     */
+    Type nullInstantiate(ParametricType base);
+
+    /**
      * Instantiate a parametric type on a list of actual parameters.
      *
      * @param pos The position of the instantiated type
