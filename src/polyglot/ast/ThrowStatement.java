@@ -4,7 +4,8 @@
 
 package jltools.ast;
 import jltools.util.CodeWriter;
-import jltools.types.LocalContext;
+import jltools.types.*;
+import jltools.util.Annotate;
 
 /**
  * ThrowStatement
@@ -47,10 +48,13 @@ public class ThrowStatement extends Statement {
       expr = (Expression)expr.visit(vis);
    }
 
-   public Node typeCheck(LocalContext c)
+   public Node typeCheck(LocalContext c) throws TypeCheckException
    {
-      // FIXME: implement
-      return this;
+     if (! expr.getCheckedType().isThrowable())
+       throw new TypeCheckException("Can only throw objects that extend from \"java.lang.Throwable\"");
+     Annotate.addThrows ( this, expr.getCheckedType()  );
+     Annotate.addThrows ( this, Annotate.getThrows( expr ) );
+     return this;
    }
 
    public void  translate(LocalContext c, CodeWriter w)

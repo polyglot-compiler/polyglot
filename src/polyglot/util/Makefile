@@ -14,6 +14,7 @@ utl_files 	= Annotate.java \
 			NestedMap.java \
 			NilMap.java \
 			Predicate.java \
+			SubtypeSet.java \
 			Transformation.java \
 			TransformingIterator.java \
 			TypedList.java \

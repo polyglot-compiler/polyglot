@@ -189,6 +189,10 @@ public class NewObjectExpression extends Expression {
   
   public Node typeCheck(LocalContext c)
   {
+    // FIXME: check that the constructors match.
+    setCheckedType ( type.getType() );
+    // FIXME: 
+    // need to find the throws of this particular constructor and add it to the throws of this.
     return this;
   }
 

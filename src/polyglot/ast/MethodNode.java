@@ -337,8 +337,8 @@ public class MethodNode extends ClassMember {
         {
           for (Iterator i2 = exceptions.iterator(); i2.hasNext() ; )
           {
-            
-            if ( t.descendsFrom ( (Type)i2.next() ) )
+            Type t2 =  (ClassType)  ((TypeNode)i2.next()).getType();
+            if ( t.equals (t2) || t.descendsFrom (t2 ))
             {
               bThrowDeclared = true; 
               break;
