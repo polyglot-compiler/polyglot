@@ -38,11 +38,13 @@ public class Field_c extends Expr_c implements Field
   protected Receiver target;
   protected String name;
   protected FieldInstance fi;
+  protected boolean targetImplicit;
 
   public Field_c(Position pos, Receiver target, String name) {
     super(pos);
     this.target = target;
     this.name = name;
+    this.targetImplicit = false;
 
     if (target == null) {
       throw new InternalCompilerError("Cannot create a field with a null "
@@ -105,6 +107,16 @@ public class Field_c extends Expr_c implements Field
     return n;
   }
 
+  public boolean isTargetImplicit() {
+      return this.targetImplicit;
+  }
+
+  public Field targetImplicit(boolean implicit) {
+      Field_c n = (Field_c) copy();
+      n.targetImplicit = implicit;
+      return n;
+  }
+
   /** Reconstruct the field. */
   protected Field_c reconstruct(Receiver target) {
     if (target != this.target) {
@@ -158,14 +170,17 @@ public class Field_c extends Expr_c implements Field
 
   /** Write the field to an output file. */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-    if (target instanceof Expr) {
-      printSubExpr((Expr) target, w, tr);
+    if (!targetImplicit) {
+        // explicit target.
+        if (target instanceof Expr) {
+          printSubExpr((Expr) target, w, tr);
+        }
+        else if (target instanceof TypeNode) {
+          print(target, w, tr);
+        }
+    
+        w.write(".");
     }
-    else if (target instanceof TypeNode) {
-      print(target, w, tr);
-    }
-
-    w.write(".");
     w.write(name);
   }
 
@@ -194,7 +209,7 @@ public class Field_c extends Expr_c implements Field
 
 
   public String toString() {
-    return (target != null ? target + "." : "") + name;
+    return ((target != null && !targetImplicit)? target + "." : "") + name;
   }
 
 
@@ -209,7 +224,7 @@ public class Field_c extends Expr_c implements Field
   public boolean isConstant() {
     if (fi != null &&
         (target instanceof TypeNode ||
-         target instanceof Special || target == null)) {
+         (target instanceof Special && targetImplicit))) {
       return fi.isConstant();
     }
 
@@ -217,11 +232,11 @@ public class Field_c extends Expr_c implements Field
   }
 
   public Object constantValue() {
-    if (fi != null &&
-        (target instanceof TypeNode || target instanceof Special)) {
+    if (isConstant()) {
       return fi.constantValue();
     }
 
     return null;
   }
+
 }

@@ -133,7 +133,7 @@ public class Disamb_c implements Disamb
             if (vi instanceof FieldInstance) {
                 FieldInstance fi = (FieldInstance) vi;
                 Receiver r = makeMissingFieldTarget(fi);
-                return nf.Field(pos, r, name).fieldInstance(fi);
+                return nf.Field(pos, r, name).fieldInstance(fi).targetImplicit(true);
             } else if (vi instanceof LocalInstance) {
                 LocalInstance li = (LocalInstance) vi;
                 return nf.Local(pos, name).localInstance(li);

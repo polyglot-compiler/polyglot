@@ -28,6 +28,17 @@ public interface Field extends Variable
     /** Set the field's container object or type. */
     Field target(Receiver target);
 
+    /** Is the target of this field implicit? Should only be true if the
+     * target is "this", or a classname, and the source code did not
+     * explicitly provide a target. 
+     */
+    boolean isTargetImplicit();
+    
+    /** 
+     * Set whether the target of the field is implicit.
+     */
+    Field targetImplicit(boolean implicit);
+    
     /** Get the field's name. */
     String name();
     /** Set the field's name. */
