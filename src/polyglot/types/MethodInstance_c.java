@@ -217,7 +217,8 @@ public class MethodInstance_c extends ProcedureInstance_c
             return false;
         }
 
-        if (mj.flags().isFinal()) {
+        if (mi != mj && !mi.equals(mj) && mj.flags().isFinal()) {
+	    // mi can "override" a final method mj if mi and mj are the same method instance.
             if (Report.should_report(Report.types, 3))
                 Report.report(3, mj.flags() + " final");
             return false;
