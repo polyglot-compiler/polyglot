@@ -15,6 +15,10 @@ import polyglot.util.*;
  * Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
  * This program is released under the terms of the GPL; see the file
  * COPYING for more details.  There is NO WARRANTY on this code.
+ *
+ * As a special exception, C. Scott Ananian additionally permits the use of
+ * this modified version of the parser, distributed with Polyglot, under
+ * the terms of the LGPL.
  */
 
 parser code {:
