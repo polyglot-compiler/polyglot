@@ -1,7 +1,5 @@
 package polyglot.main;
 import java.util.Collection;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -59,9 +57,6 @@ public class Options {
   
     /** keep output files */
     public boolean keep_output_files = true;
-  
-
-    public Map report = new HashMap(); // Map[String, Integer]
   
 
     /**
@@ -288,8 +283,7 @@ public class Options {
         else if (args[i].equals("-v") || args[i].equals("-verbose"))
         {
             i++;
-            Integer level = (Integer) report.get("verbose");
-            if (level == null) report.put("verbose", new Integer(1));
+            Report.addTopic("verbose", 1);
         }
         else if (args[i].equals("-report")) {
             i++;
@@ -303,7 +297,7 @@ public class Options {
                 } 
                 catch (NumberFormatException e) {}
             }
-            report.put(topic, new Integer(level));
+            Report.addTopic(topic, level);
             i++;
         }        
         else if (!args[i].startsWith("-")) {
@@ -371,11 +365,4 @@ public class Options {
               + "." + File.pathSeparator
               + System.getProperty("java.class.path");
   }
-
-  public int level(String name) {
-    Object i = report.get(name);
-    if (i == null) return 0;
-    else return ((Integer)i).intValue();
-  }
-
 }

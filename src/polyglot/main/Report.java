@@ -3,8 +3,10 @@ package polyglot.main;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Stack;
 
 /** Class used for reporting debug messages. */
@@ -17,6 +19,22 @@ public class Report {
       if we should report. */
   public static Stack should_report = new Stack();
 
+  /** 
+   * The topics that the user has selected to report, mapped to the level
+   * they want to report them to.
+   */
+  protected static Map reportTopics = new HashMap(); // Map[String, Integer]
+  
+
+  /**
+   * Indicates if there is no reporting at all.
+   * The normal case is that we do not report anything, so for efficiency 
+   * reasons, since <code>should_report</code> is called so often, we'll use
+   * this flag to bypass a lot of the checking. When the options are processed,
+   * this flag should be changed.
+   */
+  protected static boolean noReporting = true;
+  
   /** Report topics understood by the base compiler. */
   public static String cfg = "cfg";
   public static String context = "context";
@@ -31,7 +49,7 @@ public class Report {
   public static String visit = "visit";
   public static String verbose = "verbose";
   
-    //This topic is the level of detail that should be in messages.
+  // This topic is the level of detail that should be in messages.
   public static String debug = "debug";  
 
   static {
@@ -58,6 +76,8 @@ public class Report {
    * -report command-line switches given by the user.
    */
   public static boolean should_report(String topic, int level) {
+    if (noReporting)
+        return false;
     return should_report(Collections.singletonList(topic), level); 
   }
 
@@ -67,6 +87,8 @@ public class Report {
    * -report command-line switches given by the user.
    */
   public static boolean should_report(String[] topics, int level) {
+      if (noReporting)
+          return false;
     return should_report(Arrays.asList(topics), level);
   }
 
@@ -76,17 +98,33 @@ public class Report {
    * -report command-line switches given by the user.
    */
   public static boolean should_report(Collection topics, int level) {
+      if (noReporting)
+          return false;
     for (Iterator i = should_report.iterator(); i.hasNext();) {
         String topic = (String) i.next();
-        if (Options.global.level(topic) >= level) return true;
+        if (level(topic) >= level) return true;
     }
     if (topics != null) {
 	for (Iterator i = topics.iterator(); i.hasNext();) {
 	    String topic = (String) i.next();
-	    if (Options.global.level(topic) >= level) return true;
+	    if (level(topic) >= level) return true;
 	}
     }
     return false;
+  }
+  
+  public static void addTopic(String topic, int level) {
+      Integer i = (Integer)reportTopics.get(topic);
+      if (i == null || i.intValue() < level) {
+          reportTopics.put(topic, new Integer(level));
+      }
+      noReporting = false;
+  }
+
+  protected static int level(String name) {
+      Object i = reportTopics.get(name);
+      if (i == null) return 0;
+      else return ((Integer)i).intValue();
   }
 
   /** This is the standard way to report debugging information in the
