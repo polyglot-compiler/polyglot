@@ -1,8 +1,8 @@
-class C0 implements I0
+class C0 implements NotDefined
 {
-  protected I0 m0 ()
+  protected NotDefined m0 ()
   {
-    new I0 ().m0 ();
+    new NotDefined ().m0 ();
       return null;
   }
 }

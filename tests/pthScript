@@ -141,6 +141,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
 	BadInner8.jl (Semantic, "The nested class .* does not have an enclosing instance of type");
 	BadInterface.jl (Semantic, "Interface methods must be public");
 	BadInterface2.jl (Semantic, "Could not find type");
+	BadInterface3.jl (Semantic, "Cannot instantiate an interface");
 	BadMultipleVarDef.jl (Semantic, "Local variable .* multiply defined"),
 			     (Semantic, "Local variable .* multiply defined");
 	BadOverride.jl (Semantic, "cannot override.*attempting to assign weaker access privileges");
