@@ -110,7 +110,8 @@ public abstract class Assign_c extends Expr_c implements Assign
     }
 
     if (op == ADD_ASSIGN) {
-      if (ts.equals(t, ts.String()) || ts.equals(s, ts.String())) {
+      // t += s
+      if (ts.equals(t, ts.String()) && ts.canCoerceToString(s, tc.context())) {
         return type(ts.String());
       }
     }

@@ -1,15 +1,56 @@
 package polyglot.ext.jl.types;
 
-import polyglot.util.*;
-import polyglot.types.*;
-import polyglot.types.Package;
-import polyglot.types.reflect.ClassFile;
-import polyglot.frontend.Compiler;
-import polyglot.frontend.Source;
-import polyglot.main.Report;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
-import java.util.*;
+import polyglot.main.Report;
+import polyglot.types.ArrayType;
+import polyglot.types.CachingResolver;
+import polyglot.types.ClassContextResolver;
+import polyglot.types.ClassType;
+import polyglot.types.CompoundResolver;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.ImportTable;
+import polyglot.types.InitializerInstance;
+import polyglot.types.LazyClassInitializer;
+import polyglot.types.LoadedClassResolver;
+import polyglot.types.LocalInstance;
+import polyglot.types.MemberInstance;
+import polyglot.types.MethodInstance;
+import polyglot.types.NoClassException;
+import polyglot.types.NoMemberException;
+import polyglot.types.NullType;
+import polyglot.types.Package;
+import polyglot.types.PackageContextResolver;
+import polyglot.types.ParsedClassType;
+import polyglot.types.PrimitiveType;
+import polyglot.types.ProcedureInstance;
+import polyglot.types.ReferenceType;
+import polyglot.types.Resolver;
+import polyglot.types.SemanticException;
+import polyglot.types.TableResolver;
+import polyglot.types.Type;
+import polyglot.types.TypeObject;
+import polyglot.types.TypeSystem;
+import polyglot.types.UnknownQualifier;
+import polyglot.types.UnknownType;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.util.StringUtil;
 
 /**
  * TypeSystem_c
@@ -403,6 +444,18 @@ public class TypeSystem_c implements TypeSystem
     ////
     // Various one-type predicates.
     ////
+
+    /**
+     * Returns true iff the type t can be coerced to a String in the given 
+     * Context. If a type can be coerced to a String then it can be 
+     * concatenated with Strings, e.g. if o is of type T, then the code snippet
+     *         "" + o
+     * would be allowed.
+     */
+    public boolean canCoerceToString(Type t, Context c) {
+        // every Object can be coerced to a string, as can any primitive.
+        return true;
+    }
 
     /**
      * Returns true iff an object of type <type> may be thrown.

@@ -1,10 +1,10 @@
 package polyglot.types;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import polyglot.util.Position;
-import polyglot.frontend.Job;
-import polyglot.frontend.Compiler;
-import polyglot.types.reflect.ClassFile;
 
 /**
  * The <code>TypeSystem</code> defines the types of the language and
@@ -187,6 +187,15 @@ public interface TypeSystem {
     // Various one-type predicates.
     ////
 
+    /**
+     * Returns true iff the type t can be coerced to a String in the given 
+     * Context. If a type can be coerced to a String then it can be 
+     * concatenated with Strings, e.g. if o is of type T, then the code snippet
+     *         "" + o
+     * would be allowed.
+     */
+    boolean canCoerceToString(Type t, Context c);
+    
     /**
      * Returns true iff an object of type <type> may be thrown.
      */
