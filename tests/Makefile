@@ -78,6 +78,8 @@ GOOD =  \
 	Switch1.jl \
 	Switch2.jl \
 	Switch3.jl \
+	Switch4.jl \
+	Switch5.jl \
 	TypeShadowing.jl \
 	xIterator.jl
 
