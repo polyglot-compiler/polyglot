@@ -46,6 +46,10 @@ public class InnerTranslator extends NodeVisitor {
 			insideCode = null;
 		}
 		
+		public String toString() {
+			return ct.toString();
+		}
+		
 		// For anonymous classes, name would be "".
 		public int addLocalClassName(String name) { 
 			if (localNameCount.containsKey(name)) {
@@ -141,6 +145,10 @@ public class InnerTranslator extends NodeVisitor {
 			blockFinals = new Stack();
 		}
 		
+		public String toString() {
+			return ci.toString();
+		}
+		
 		public void addFinalArg(LocalInstance li) {
 			finalArgs.add(li);
 		}
@@ -217,6 +225,9 @@ public class InnerTranslator extends NodeVisitor {
 	Stack codeContext; // The context stack of all the enclosing code.
 					  // It is a stack of CodeInfo.
 	HashMap innerClassInfoMap; // The map from full names to class infos of inner classes.
+	Stack insideCode; // Boolean stack that indicates whether it is inside a piece of code now. 
+	Stack staticFieldDecl; // Boolean stack that indicates whether it is inside 
+						  // the initialization of a static field.
 	
 	protected String namePrefix() {
 		return "jl$";
@@ -235,6 +246,8 @@ public class InnerTranslator extends NodeVisitor {
 		classContext = new Stack();
 		codeContext = new Stack();
 		innerClassInfoMap = new HashMap();
+		insideCode = new Stack();
+		staticFieldDecl = new Stack();
 	}
 	
 	public NodeVisitor enter(Node n) {
@@ -257,6 +270,17 @@ public class InnerTranslator extends NodeVisitor {
 		else if (n instanceof LocalDecl) {
 			LocalDecl ld = (LocalDecl)n;
 			enterLocalDecl(ld);
+		}
+		else if (n instanceof ClassBody) {
+			insideCode.push(new Boolean(false));
+		}
+		else if (n instanceof FieldDecl) {
+			if (((FieldDecl)n).flags().isStatic()) {
+				staticFieldDecl.push(new Boolean(true));
+			}
+			else {
+				staticFieldDecl.push(new Boolean(false));
+			}
 		}
 		return this;
 	}
@@ -315,37 +339,54 @@ public class InnerTranslator extends NodeVisitor {
 			ParsedClassType ct = newExpr.anonType();
 			ct.flags(Flags.NONE);
 			ClassInfo cinfo = new ClassInfo(ct);
-			CodeInfo codeInfo = (CodeInfo)codeContext.peek();
+			
+			// Check whether the anonymous class is defined outside a code (as the initialization of a field)
+			boolean inCode = ((Boolean)insideCode.peek()).booleanValue();
+			CodeInfo codeInfo = null;
+			if (inCode) {
+				codeInfo = (CodeInfo)codeContext.peek();
+			}
 			ClassInfo classInfo = (ClassInfo)classContext.peek();
 			
-			if (!codeInfo.isStatic()) {
+			if (inCode && !codeInfo.isStatic() 
+			|| !inCode && !((Boolean)staticFieldDecl.peek()).booleanValue()) {
 				// If this local/anonymous class is inside a static method, 
 				// then it shouldn't have an outer field.
 				cinfo.addConsFormal(produceOuterFormal(ct, classInfo.classType()));
 				cinfo.hasOuterField(true);
 			}
-			codeInfo.addLocalClassInfo(cinfo);
+			
+			if (inCode) {
+				codeInfo.addLocalClassInfo(cinfo);
+			}
+			else {
+				classInfo.addInnerClassInfo(cinfo);
+			}
 			cinfo.insideCode(codeInfo);
+			
 			ct.kind(ClassType.MEMBER);
 			ct.outer(classInfo.classType());
 			ct.needSerialization(false); // anonymous classes don't need serialization.
 			String className = classInfo.localClassName("", classInfo.addLocalClassName(""));
 			ct.name(className);
 			
-			for (Iterator it = codeInfo.finalList().iterator(); it.hasNext(); ) {
-				LocalInstance li = (LocalInstance)it.next();
-				String name = li.name();
-				Formal f = nf.Formal(Position.compilerGenerated(), 
-									 Flags.NONE, 
-									 nf.CanonicalTypeNode(Position.compilerGenerated(), 
-														  li.type()), 
-									 name);
-				f = f.localInstance(ts.localInstance(Position.compilerGenerated(), 
-								    f.flags(), 
-								    f.type().type(), 
-								    f.name()));
-				cinfo.addConsFormal(f);
+			if (inCode) {
+				for (Iterator it = codeInfo.finalList().iterator(); it.hasNext(); ) {
+					LocalInstance li = (LocalInstance)it.next();
+					String name = li.name();
+					Formal f = nf.Formal(Position.compilerGenerated(), 
+										 Flags.NONE, 
+										 nf.CanonicalTypeNode(Position.compilerGenerated(), 
+															  li.type()), 
+										 name);
+					f = f.localInstance(ts.localInstance(Position.compilerGenerated(), 
+									    f.flags(), 
+									    f.type().type(), 
+									    f.name()));
+					cinfo.addConsFormal(f);
+				}
 			}
+			
 			innerClassInfoMap.put(ct.fullName(), cinfo);
 
 			classContext.push(cinfo);
@@ -367,6 +408,7 @@ public class InnerTranslator extends NodeVisitor {
 		}
 		
 		codeContext.push(cinfo);
+		insideCode.push(new Boolean(true));
 	}
 	
 	protected void enterLocalDecl(LocalDecl ld) {
@@ -468,6 +510,7 @@ public class InnerTranslator extends NodeVisitor {
 		}
 		else if (n instanceof CodeDecl) {
 			codeContext.pop();
+			insideCode.pop();
 		}
 		else if (n instanceof Block) {
 			CodeInfo cinfo = (CodeInfo)codeContext.peek();
@@ -491,6 +534,12 @@ public class InnerTranslator extends NodeVisitor {
 				}
 			}
 			return local;
+		}
+		else if (n instanceof ClassBody) {
+			insideCode.pop();
+		}
+		else if (n instanceof FieldDecl) {
+			staticFieldDecl.pop();
 		}
 		
 		return n;
@@ -659,8 +708,12 @@ public class InnerTranslator extends NodeVisitor {
 	protected Expr updateNewExpr(New newExpr) {
 		ClassType ct = (ClassType)newExpr.type(); 
 		ClassInfo classInfo = (ClassInfo)classContext.peek();
-		CodeInfo codeInfo = (CodeInfo)codeContext.peek();
-		ClassInfo cinfo = codeInfo.findLocalClassInfo(ct);
+		ClassInfo cinfo = null;
+		boolean inCode = ((Boolean)insideCode.peek()).booleanValue();
+		if (inCode) {
+			CodeInfo codeInfo = (CodeInfo)codeContext.peek();
+			cinfo = codeInfo.findLocalClassInfo(ct);
+		}
 		if (cinfo == null) {
 			cinfo = classInfo.findInnerClassInfo(ct);
 		}
