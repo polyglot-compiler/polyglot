@@ -3,32 +3,10 @@ package polyglot.ext.jl.ast;
 import java.util.Collections;
 import java.util.List;
 
-import polyglot.ast.AmbReceiver;
-import polyglot.ast.Expr;
-import polyglot.ast.Field;
-import polyglot.ast.Node;
-import polyglot.ast.Precedence;
-import polyglot.ast.Receiver;
-import polyglot.ast.Special;
-import polyglot.ast.Term;
-import polyglot.ast.TypeNode;
-import polyglot.types.Context;
-import polyglot.types.FieldInstance;
-import polyglot.types.Flags;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.types.TypeSystem;
-import polyglot.types.VarInstance;
-import polyglot.util.CodeWriter;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.util.*;
 import polyglot.visit.*;
-import polyglot.visit.AscriptionVisitor;
-import polyglot.visit.CFGBuilder;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeBuilder;
-import polyglot.visit.TypeChecker;
 
 /**
  * A <code>Field</code> is an immutable representation of a Java field
@@ -164,9 +142,10 @@ public class Field_c extends Expr_c implements Field
 	                                      target.getClass().getName() + ".");
 	  }
 	  
-	  checkConsistency(c);
+	  Field_c f = (Field_c)fieldInstance(fi).type(fi.type());  
+	  f.checkConsistency(c);
 	  
-	  return fieldInstance(fi).type(fi.type());
+	  return f; 
       }
 
       throw new SemanticException("Cannot access field \"" + name +
@@ -283,6 +262,8 @@ public class Field_c extends Expr_c implements Field
                   // all is OK.
                   return;
               }
+              System.out.println("(found) rfi is " + rfi);
+              System.out.println("(actual) fi is " + fi);
           }
           throw new InternalCompilerError("Field " + this + " has an " +
                "implicit target, but the name " + name + " resolves to " +
