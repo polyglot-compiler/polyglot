@@ -22,13 +22,14 @@ import java.util.*;
  */
 
 public class InnerTranslator extends NodeVisitor {
-	TypeSystem ts;
-	NodeFactory nf;
+	protected TypeSystem ts;
+	protected NodeFactory nf;
 	
-	class ClassInfo {
+	protected class ClassInfo {
 		ParsedClassType ct;
 		Map localNameCount; // Count how many local/anonymous classes with a particular name have appeared.
-		List newMemberClasses; // New member class declarations converted from local/anonymous classes. 
+		List newMemberClasses; // New member class declarations converted from local/anonymous classes.
+		List newMemberMethods; // New member methods added.
 		List newConsFormals; // The list of added formals to constructors. 
 							 // The first one should be the reference to the outer class instance, 
 							 // and the remaining ones are the final locals.
@@ -40,6 +41,7 @@ public class InnerTranslator extends NodeVisitor {
 			this.ct = ct;
 			localNameCount = new HashMap();
 			newMemberClasses = new LinkedList();
+			newMemberMethods = new LinkedList();
 			newConsFormals = new LinkedList();
 			innerClassInfo = new LinkedList();
 			hasOuterField = false;
@@ -96,6 +98,15 @@ public class InnerTranslator extends NodeVisitor {
 			ct.addMemberClass(cd.type());
 		}
 		
+		public List newMemberMethods() {
+			return newMemberMethods;
+		}
+		
+		public void addMemberMethods(MethodDecl md) {
+			newMemberMethods.add(md);
+			ct.addMethod(md.methodInstance());
+		}
+		
 //		public ClassType memberClassNamed(String name) {
 //			return cd.type().memberClassNamed(name);
 //		}
@@ -107,7 +118,7 @@ public class InnerTranslator extends NodeVisitor {
 		public ClassInfo findInnerClassInfo(ClassType ct) {
 			for (Iterator it = innerClassInfo.iterator(); it.hasNext(); ) {
 				ClassInfo cinfo = (ClassInfo)it.next();
-				if (cinfo.classType() == ct) {
+				if (cinfo.classType().equals(ct)) {
 					return cinfo;
 				}
 			}
@@ -132,7 +143,7 @@ public class InnerTranslator extends NodeVisitor {
 	}
 	
 	// Information about methods, constructors, and initializers.
-	class CodeInfo {
+	protected class CodeInfo {
 		CodeInstance ci;
 		List finalArgs; // the list of final arguments if any. 
 		List localClassInfo; // List of local/anonymous class info.
@@ -179,7 +190,7 @@ public class InnerTranslator extends NodeVisitor {
 		public ClassInfo findLocalClassInfo(ClassType ct) {
 			for (Iterator it = localClassInfo.iterator(); it.hasNext(); ) {
 				ClassInfo cinfo = (ClassInfo)it.next();
-				if (cinfo.classType() == ct) {
+				if (cinfo.classType().equals(ct)) {
 					return cinfo;
 				}
 			}
@@ -220,14 +231,14 @@ public class InnerTranslator extends NodeVisitor {
 		}
 	}
 
-	Stack classContext; // The context stack of all the enclosing classes.
-					   // It is a stack of ClassInfo.
-	Stack codeContext; // The context stack of all the enclosing code.
-					  // It is a stack of CodeInfo.
-	HashMap innerClassInfoMap; // The map from full names to class infos of inner classes.
-	Stack insideCode; // Boolean stack that indicates whether it is inside a piece of code now. 
-	Stack staticFieldDecl; // Boolean stack that indicates whether it is inside 
-						  // the initialization of a static field.
+	protected Stack classContext; // The context stack of all the enclosing classes.
+								// It is a stack of ClassInfo.
+	protected Stack codeContext; // The context stack of all the enclosing code.
+								// It is a stack of CodeInfo.
+	protected HashMap innerClassInfoMap; // The map from full names to class infos of inner classes.
+	protected Stack insideCode; // Boolean stack that indicates whether it is inside a piece of code now. 
+	protected Stack staticFieldDecl; // Boolean stack that indicates whether it is inside 
+									// the initialization of a static field.
 	
 	protected String namePrefix() {
 		return "jl$";
@@ -275,16 +286,21 @@ public class InnerTranslator extends NodeVisitor {
 			insideCode.push(new Boolean(false));
 		}
 		else if (n instanceof FieldDecl) {
-			if (((FieldDecl)n).flags().isStatic()) {
-				staticFieldDecl.push(new Boolean(true));
-			}
-			else {
-				staticFieldDecl.push(new Boolean(false));
-			}
+			FieldDecl fd = (FieldDecl)n;
+			enterFieldDecl(fd);
 		}
 		return this;
 	}
 
+	protected void enterFieldDecl(FieldDecl fd) {
+		if (fd.flags().isStatic()) {
+			staticFieldDecl.push(new Boolean(true));
+		}
+		else {
+			staticFieldDecl.push(new Boolean(false));
+		}
+	}
+	
 	protected void enterClassDecl(ClassDecl cd) {
 		ParsedClassType ct = cd.type();
 		ClassInfo cinfo = new ClassInfo(ct);
@@ -420,89 +436,23 @@ public class InnerTranslator extends NodeVisitor {
 	public Node leave(Node old, Node n, NodeVisitor v) {
 		if (n instanceof ClassDecl) {
 			ClassDecl cd = (ClassDecl)n;
-			ParsedClassType ct = cd.type();
-
-			ClassInfo selfInfo = (ClassInfo)classContext.pop();
-
-			// Do nothing if it is already a static class, or it is a toplevel class,  
-			// but need to add those classes converted from local/anonymous classes.
-			if (ct.flags().isStatic() || ct.isTopLevel()) {
-				if (selfInfo.newMemberClasses().size() > 0) {
-					cd = addMemberClasses(cd, selfInfo);
-				}
-				return cd;
-			}
-			
-			// Deal with ordinary inner classes.
-			if (selfInfo.insideCode() == null) {
-				cd = updateClassDecl(cd, ct, selfInfo);
-			}
-			else {
-				ClassInfo cinfo = (ClassInfo)classContext.peek();
-				cd = cd.name(ct.name());
-				cd = updateClassDecl(cd, ct, selfInfo);
-				cinfo.addMemberClass(cd);
-			}
-			
-			return cd;
+			return leaveClassDecl(old, cd, v);
 		}
 		else if (n instanceof New) {
 			New newExpr = (New)n;
-			if (newExpr.body() != null) {
-				// Anonymous class declaration.
-				// Need to create a class declaration, and add it to the enclosing class.
-				ParsedClassType ct = newExpr.anonType();
-				ClassDecl cd = nf.ClassDecl(Position.compilerGenerated(), 
-										   ct.flags(), 
-										   ct.name(), 
-										   nf.CanonicalTypeNode(Position.compilerGenerated(), 
-										   					   ct.superType()), 
-										   Collections.EMPTY_LIST, 
-										   newExpr.body());
-				cd = cd.type(ct);
-				
-				ClassInfo selfInfo = (ClassInfo)classContext.pop();
-				ClassInfo cinfo = (ClassInfo)classContext.peek();
-				cd = cd.name(ct.name());
-				cd = addAnonymousConstructor(cd, ct, selfInfo, newExpr);
-				cd = updateClassDecl(cd, ct, selfInfo);
-				cinfo.addMemberClass(cd);
-			}
-			return updateNewExpr(newExpr);
+			return leaveNew(old, newExpr, v);
 		}
 		else if (n instanceof ConstructorCall) {
 			ConstructorCall cc = (ConstructorCall)n;
-			return updateConstructorCall(cc);
+			return leaveConstructorCall(old, cc, v);
 		}
 		else if (n instanceof Special) {
 			Special s = (Special)n;
-			if (s.kind() == Special.THIS && s.qualifier() != null) {
-				ClassType tOuter = (ClassType)s.qualifier().type();
-				ClassType tThis = ((ClassInfo)classContext.peek()).classType();
-				Expr t = s.qualifier(null);
-				while (!ts.equals(tOuter, tThis)) {
-					t = nf.Field(Position.compilerGenerated(), t, newFieldName(outerThisName(tThis)));
-					tThis = (ClassType)tThis.outer();
-				}
-				return t;
-			}
-			return s;
+			return leaveSpecial(old, s, v);
 		}
 		else if (n instanceof Field) {
-			// Check whether the field access is a disguised form of "A.this.f".
 			Field field = (Field)n;
-			if (field.isTargetImplicit()) {
-				ClassType tOuter = findField(field.name());
-				ClassType tThis = ((ClassInfo)classContext.peek()).classType();
-				Expr t = nf.Special(Position.compilerGenerated(), Special.THIS);
-				while (!ts.equals(tOuter, tThis)) {
-					t = nf.Field(Position.compilerGenerated(), t, newFieldName(outerThisName(tThis)));
-					tThis = (ClassType)tThis.outer();
-				}
-				Field f = nf.Field(Position.compilerGenerated(), t, field.name());
-				return f;
-			}
-			return field;
+			return leaveField(old, field, v);
 		}
 		else if (n instanceof LocalClassDecl) {
 			// Need to remove local class declarations.
@@ -518,22 +468,7 @@ public class InnerTranslator extends NodeVisitor {
 		}
 		else if (n instanceof Local) {
 			Local local = (Local)n;
-			if (local.flags().isFinal()) {
-				CodeInfo codeInfo = (CodeInfo)codeContext.peek();
-				if (!codeInfo.existFinal(local.name())) {
-					String newName = newFieldName(local.name());
-					ClassType tOuter = findField(newName);
-					ClassType tThis = ((ClassInfo)classContext.peek()).classType();
-					Expr t = nf.Special(Position.compilerGenerated(), Special.THIS);
-					while (!ts.equals(tOuter, tThis)) {
-						t = nf.Field(Position.compilerGenerated(), t, newFieldName(outerThisName(tThis)));
-						tThis = (ClassType)tThis.outer();
-					}
-					Field f = nf.Field(Position.compilerGenerated(), t, newName);
-					return f;
-				}
-			}
-			return local;
+			return leaveLocal(old, local, v);
 		}
 		else if (n instanceof ClassBody) {
 			insideCode.pop();
@@ -544,6 +479,119 @@ public class InnerTranslator extends NodeVisitor {
 		
 		return n;
     }
+	
+	protected Node leaveClassDecl(Node old, ClassDecl cd, NodeVisitor v) {
+		ParsedClassType ct = cd.type();
+
+		ClassInfo selfInfo = (ClassInfo)classContext.pop();
+
+		// Do nothing if it is already a static class, or it is a toplevel class,  
+		// but need to add those classes converted from local/anonymous classes.
+		if (ct.flags().isStatic() || ct.isTopLevel()) {
+			if (selfInfo.newMemberClasses().size() > 0 || selfInfo.newMemberMethods().size() > 0) {
+				cd = addNewMembers(cd, selfInfo);
+			}
+			return cd;
+		}
+		
+		// Deal with ordinary inner classes.
+		if (selfInfo.insideCode() == null) {
+			cd = updateClassDecl(cd, ct, selfInfo);
+		}
+		else {
+			ClassInfo cinfo = (ClassInfo)classContext.peek();
+			cd = cd.name(ct.name());
+			cd = updateClassDecl(cd, ct, selfInfo);
+			cinfo.addMemberClass(cd);
+		}
+		
+		return cd;
+	}
+	
+	protected Node leaveNew(Node old, New newExpr, NodeVisitor v) {
+		if (newExpr.body() != null) {
+			// Anonymous class declaration.
+			// Need to create a class declaration, and add it to the enclosing class.
+			ParsedClassType ct = newExpr.anonType();
+			ClassDecl cd = nf.ClassDecl(Position.compilerGenerated(), 
+									   ct.flags(), 
+									   ct.name(), 
+									   nf.CanonicalTypeNode(Position.compilerGenerated(), 
+									   					   ct.superType()), 
+									   Collections.EMPTY_LIST, 
+									   newExpr.body());
+			cd = cd.type(ct);
+			
+			ClassInfo selfInfo = (ClassInfo)classContext.pop();
+			ClassInfo cinfo = (ClassInfo)classContext.peek();
+			cd = cd.name(ct.name());
+			cd = addAnonymousConstructor(cd, ct, selfInfo, newExpr);
+			cd = updateClassDecl(cd, ct, selfInfo);
+			cinfo.addMemberClass(cd);
+		}
+		
+		return updateNewExpr(newExpr);
+	}
+	
+	protected Node leaveConstructorCall(Node old, ConstructorCall cc, NodeVisitor v) {
+		return updateConstructorCall(cc);
+	}
+	
+	protected Node leaveSpecial(Node old, Special s, NodeVisitor v) {
+		if (s.kind() == Special.THIS && s.qualifier() != null) {
+			ClassType tOuter = (ClassType)s.qualifier().type();
+			ClassType tThis = ((ClassInfo)classContext.peek()).classType();
+			Expr t = s.qualifier(null);
+			while (!ts.equals(tOuter, tThis)) {
+//				t = nf.Field(Position.compilerGenerated(), t, newFieldName(outerThisName(tThis)));
+				t = produceOuterField(tThis, t);
+				tThis = (ClassType)tThis.outer();
+			}
+			
+			return t;
+		}
+
+		return s;
+	}
+	
+	protected Node leaveField(Node old, Field field, NodeVisitor v) {
+		// Check whether the field access is a disguised form of "A.this.f".
+		if (field.isTargetImplicit()) {
+			ClassType tOuter = findField(field.name());
+			ClassType tThis = ((ClassInfo)classContext.peek()).classType();
+			Expr t = nf.Special(Position.compilerGenerated(), Special.THIS);
+			while (!ts.equals(tOuter, tThis)) {
+//				t = nf.Field(Position.compilerGenerated(), t, newFieldName(outerThisName(tThis)));
+				t = produceOuterField(tThis, t);
+				tThis = (ClassType)tThis.outer();
+			}
+			Field f = nf.Field(Position.compilerGenerated(), t, field.name());
+			return f;
+		}
+
+		return field;
+	}
+	
+	protected Node leaveLocal(Node old, Local local, NodeVisitor v) {
+		if (local.flags().isFinal()) {
+			CodeInfo codeInfo = (CodeInfo)codeContext.peek();
+			if (!codeInfo.existFinal(local.name())) {
+				String newName = newFieldName(local.name());
+				ClassType tOuter = findField(newName);
+				ClassType tThis = ((ClassInfo)classContext.peek()).classType();
+				Expr t = nf.Special(Position.compilerGenerated(), Special.THIS);
+				while (!ts.equals(tOuter, tThis)) {
+//					t = nf.Field(Position.compilerGenerated(), t, newFieldName(outerThisName(tThis)));
+					t = produceOuterField(tThis, t);
+					tThis = (ClassType)tThis.outer();
+				}
+				Field f = nf.Field(Position.compilerGenerated(), t, newName);
+				return f;
+			}
+		}
+		
+		return local;
+	}
 	
 	/*
 	 * Add the constructor for an anonymous class.
@@ -602,10 +650,10 @@ public class InnerTranslator extends NodeVisitor {
 	/*
 	 * Find the class type inside which a field with specified name is declared.
 	 */
-	protected ClassType findField(String name) {
+	protected ParsedClassType findField(String name) {
 		for (int i = classContext.size() - 1; i >= 0; i--) {
 			ClassInfo cinfo = (ClassInfo)classContext.get(i);
-			ClassType ct = cinfo.classType();
+			ParsedClassType ct = cinfo.classType();
 			FieldInstance fi = ct.fieldNamed(name);
 			if (fi != null) {
 				return ct;
@@ -687,24 +735,31 @@ public class InnerTranslator extends NodeVisitor {
 	}
 	
 	/*
-	 * Add those member classes converted from local/anonymous classes to the class declaration.
+	 * Add new member classes/methods.
 	 */
-	protected ClassDecl addMemberClasses(ClassDecl cd, ClassInfo cinfo) {
-		List members = new ArrayList(cd.body().members().size() + cinfo.newMemberClasses().size());
+	protected ClassDecl addNewMembers(ClassDecl cd, ClassInfo cinfo) {
+		List members = new ArrayList(cd.body().members().size() 
+								 + cinfo.newMemberClasses().size()
+								 + cinfo.newMemberMethods().size());
 		members.addAll(cd.body().members());
 		members.addAll(cinfo.newMemberClasses());
+		members.addAll(cinfo.newMemberMethods());
 		ClassBody b = nf.ClassBody(cd.body().position(), members);
 		b = (ClassBody)b.exceptions(cd.body().exceptions());
 		cd = cd.body(b);
-		ParsedClassType ct = cd.type(); 
-		for (Iterator it = cinfo.newMemberClasses().iterator(); it.hasNext(); ) {
-			ClassDecl addedCd = (ClassDecl)it.next();
-			ct.addMemberClass(addedCd.type());
-		}
-		cd = cd.type(ct);
+//		ParsedClassType ct = cd.type(); 
+//		for (Iterator it = cinfo.newMemberClasses().iterator(); it.hasNext(); ) {
+//			ClassDecl addedCd = (ClassDecl)it.next();
+//			ct.addMemberClass(addedCd.type());
+//		}
+//		for (Iterator it = cinfo.newMemberMethods().iterator(); it.hasNext(); ) {
+//			MethodDecl md = (MethodDecl)it.next();
+//			ct.addMethod(md.methodInstance());
+//		}
+//		cd = cd.type(ct);
 		return cd;
 	}
-	
+		
 	protected Expr updateNewExpr(New newExpr) {
 		ClassType ct = (ClassType)newExpr.type(); 
 		ClassInfo classInfo = (ClassInfo)classContext.peek();
@@ -782,6 +837,8 @@ public class InnerTranslator extends NodeVisitor {
 	
 	protected ClassDecl updateClassDecl(ClassDecl cd, ParsedClassType ct, ClassInfo cinfo) {
 		Flags f = ct.flags().Static();
+		ct.flags(f);
+		
 		List members = new LinkedList();
 		
 		List fields = produceFieldDecls(ct, cinfo);
@@ -812,6 +869,8 @@ public class InnerTranslator extends NodeVisitor {
 		
 		List newMemClasses = cinfo.newMemberClasses();
 		members.addAll(newMemClasses);
+		List newMethods = cinfo.newMemberMethods();
+		members.addAll(newMethods);
 //		for (Iterator it = newMemClasses.iterator(); it.hasNext(); ) {
 //			ClassDecl memCd = (ClassDecl)it.next();
 //			ct.addMemberClass(memCd.type());
@@ -821,7 +880,7 @@ public class InnerTranslator extends NodeVisitor {
 		cb = cb.members(members);
 		cd = cd.body(cb);
 		cd = cd.type(ct);
-		cd = cd.flags(cd.flags().Static());
+		cd = cd.flags(f);
 		
 		return cd;
 	}
@@ -852,10 +911,10 @@ public class InnerTranslator extends NodeVisitor {
 	}
 			
 	/*
-	 * ct  - ClassType of the inner class that we are dealing with.
-	 * oct - ClassType of the outer class.
+	 * ct  - ParsedClassType of the inner class that we are dealing with.
+	 * oct - ParsedClassType of the outer class.
 	 */
-	protected Formal produceOuterFormal(ClassType ct, ClassType oct) {
+	protected Formal produceOuterFormal(ParsedClassType ct, ParsedClassType oct) {
 		String fn = outerThisName(ct);
 		Formal formal = nf.Formal(Position.compilerGenerated(), 
 				                  Flags.NONE, 
@@ -866,6 +925,16 @@ public class InnerTranslator extends NodeVisitor {
 													formal.type().type(), 
 													formal.name()));
 		return formal;
+	}
+	
+	protected Field produceOuterField(ClassType ct, Expr rec) {
+		Field f = nf.Field(Position.compilerGenerated(), rec, newFieldName(outerThisName(ct)));
+		f = f.fieldInstance(ts.fieldInstance(Position.compilerGenerated(), 
+										   ct, 
+										   Flags.PROTECTED, 
+										   ct.container(), 
+										   f.name()));
+		return f;
 	}
 	
 	protected ConstructorInstance updateConstructorInst(ClassType ct, ConstructorInstance ci, ClassInfo cinfo) {
@@ -930,9 +999,17 @@ public class InnerTranslator extends NodeVisitor {
 		for (Iterator it = newFormals.iterator(); it.hasNext(); ) {
 			Formal formal = (Formal)it.next();
 			Local local = nf.Local(Position.compilerGenerated(), formal.name());
+			local = local.localInstance(formal.localInstance());
+			Special thisExpr = nf.This(Position.compilerGenerated());
+			thisExpr = (Special)thisExpr.type(cinfo.classType());
 			Field field = nf.Field(Position.compilerGenerated(), 
-								  nf.This(Position.compilerGenerated()), 
+								  thisExpr, 
 								  newFieldName(formal.name()));
+			field = field.fieldInstance(ts.fieldInstance(Position.compilerGenerated(), 
+													   cinfo.classType(), 
+													   Flags.PROTECTED, 
+													   formal.type().type(), 
+													   field.name()));
 			FieldAssign fAssign = nf.FieldAssign(Position.compilerGenerated(), 
 											   field, 
 											   Assign.ASSIGN, 
