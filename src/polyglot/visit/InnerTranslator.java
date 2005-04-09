@@ -454,6 +454,8 @@ public class InnerTranslator extends NodeVisitor {
 			Field field = (Field)n;
 			return leaveField(old, field, v);
 		}
+		// TODO: like Field accesses, we might also have method calls that have no explicit "A.this." 
+		// qualifiers, while it means to. 
 		else if (n instanceof LocalClassDecl) {
 			// Need to remove local class declarations.
 			return nf.Empty(Position.compilerGenerated());
@@ -559,13 +561,14 @@ public class InnerTranslator extends NodeVisitor {
 		if (field.isTargetImplicit()) {
 			ClassType tOuter = findField(field.name());
 			ClassType tThis = ((ClassInfo)classContext.peek()).classType();
-			Expr t = nf.Special(Position.compilerGenerated(), Special.THIS);
+			Expr t = produceThis(tThis);
 			while (!ts.equals(tOuter, tThis)) {
 //				t = nf.Field(Position.compilerGenerated(), t, newFieldName(outerThisName(tThis)));
 				t = produceOuterField(tThis, t);
 				tThis = (ClassType)tThis.outer();
 			}
 			Field f = nf.Field(Position.compilerGenerated(), t, field.name());
+			f = f.fieldInstance(field.fieldInstance());
 			return f;
 		}
 
@@ -579,18 +582,34 @@ public class InnerTranslator extends NodeVisitor {
 				String newName = newFieldName(local.name());
 				ClassType tOuter = findField(newName);
 				ClassType tThis = ((ClassInfo)classContext.peek()).classType();
-				Expr t = nf.Special(Position.compilerGenerated(), Special.THIS);
+				Expr t = produceThis(tThis);
 				while (!ts.equals(tOuter, tThis)) {
 //					t = nf.Field(Position.compilerGenerated(), t, newFieldName(outerThisName(tThis)));
 					t = produceOuterField(tThis, t);
 					tThis = (ClassType)tThis.outer();
 				}
 				Field f = nf.Field(Position.compilerGenerated(), t, newName);
+				f = f.fieldInstance(ts.fieldInstance(Position.compilerGenerated(), 
+						   		   (ReferenceType)t.type(), 
+								   Flags.PROTECTED, 
+								   local.type(), 
+								   f.name()));
 				return f;
 			}
 		}
 		
 		return local;
+	}
+	
+	/**
+	 * Generate a special node "this" with the correct type.
+	 * @param ct
+	 * @return
+	 */
+	protected Special produceThis(ClassType ct) {
+		Special s = nf.Special(Position.compilerGenerated(), Special.THIS);
+		s = (Special)s.type(ct);
+		return s;
 	}
 	
 	/*
@@ -710,11 +729,16 @@ public class InnerTranslator extends NodeVisitor {
 					// The super class is a local class, and they are not within the same code.
 					// Need to first find an enclosing class that is inside the same code as the super class,
 					// and use its fields as arguments.
-					Expr outer = nf.Local(Position.compilerGenerated(), outerThisName(ct));
+					Local outerLocal = nf.Local(Position.compilerGenerated(), outerThisName(ct));
+					outerLocal = outerLocal.localInstance(((Formal)selfInfo.newConsFormals().get(0)).localInstance());
+					Expr outer = outerLocal;
 					ClassType outerCt = selfInfo.classType().outer();
+					ClassType tThis = ct;
 					ClassInfo outerCInfo = (ClassInfo)innerClassInfoMap.get(outerCt.fullName());
 					while (outerCInfo.insideCode() != cinfo.insideCode()) {
-						outer = nf.Field(Position.compilerGenerated(), outer, newFieldName(outerThisName(ct)));
+//						outer = nf.Field(Position.compilerGenerated(), outer, newFieldName(outerThisName(tThis)));
+						outer = produceOuterField(tThis, outer);
+						tThis = outerCt;
 						outerCt = outerCt.outer();
 						outerCInfo = (ClassInfo)innerClassInfoMap.get(outerCt.fullName());
 					}
@@ -760,18 +784,28 @@ public class InnerTranslator extends NodeVisitor {
 		return cd;
 	}
 		
+	/**
+	 * Find ClassInfo for ClassType ct, from innerClassInfoMap. 
+	 * @param ct
+	 * @return
+	 */
+	protected ClassInfo findClassInfo(ClassType ct) {
+		ClassInfo cinfo = (ClassInfo)innerClassInfoMap.get(ct.fullName());
+		return cinfo;
+	}
+	
 	protected Expr updateNewExpr(New newExpr) {
 		ClassType ct = (ClassType)newExpr.type(); 
 		ClassInfo classInfo = (ClassInfo)classContext.peek();
-		ClassInfo cinfo = null;
-		boolean inCode = ((Boolean)insideCode.peek()).booleanValue();
-		if (inCode) {
-			CodeInfo codeInfo = (CodeInfo)codeContext.peek();
-			cinfo = codeInfo.findLocalClassInfo(ct);
-		}
-		if (cinfo == null) {
-			cinfo = classInfo.findInnerClassInfo(ct);
-		}
+		ClassInfo cinfo = findClassInfo(ct);
+//		boolean inCode = ((Boolean)insideCode.peek()).booleanValue();
+//		if (inCode) {
+//			CodeInfo codeInfo = (CodeInfo)codeContext.peek();
+//			cinfo = codeInfo.findLocalClassInfo(ct);
+//		}
+//		if (cinfo == null) {
+//			cinfo = classInfo.findInnerClassInfo(ct);
+//		}
 		if (cinfo != null) {
 			ConstructorInstance ci = newExpr.constructorInstance();
 			List formals = cinfo.newConsFormals();
@@ -812,6 +846,9 @@ public class InnerTranslator extends NodeVisitor {
 			return nExpr;
 		}
 		else if (ct.isInnerClass()) {
+			// FIXME: ct might be a inner class, but it might be from java library, 
+			// then we should keep it as it is.
+			
 			// Maybe we have encountered the new expression of an inner class before it is translated.
 			ConstructorInstance ci = newExpr.constructorInstance();
 			List args = new ArrayList(newExpr.arguments().size() + 1);
@@ -932,7 +969,7 @@ public class InnerTranslator extends NodeVisitor {
 		f = f.fieldInstance(ts.fieldInstance(Position.compilerGenerated(), 
 										   ct, 
 										   Flags.PROTECTED, 
-										   ct.container(), 
+										   ct.container(), // FIXME: use the type of outer formal stored in cinfo?
 										   f.name()));
 		return f;
 	}
