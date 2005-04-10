@@ -794,6 +794,21 @@ public class InnerTranslator extends NodeVisitor {
 		return cinfo;
 	}
 	
+	/**
+	 * Check whether ct is a type in source language.
+	 * @param ct
+	 * @return
+	 */
+	protected boolean isSourceType(ClassType ct) {
+		return true;
+	}
+	
+	/**
+	 * Update new expressions to include necessary arguments (e.g. enclosing instances), and eliminate
+	 * qualifers. 
+	 * @param newExpr
+	 * @return
+	 */
 	protected Expr updateNewExpr(New newExpr) {
 		ClassType ct = (ClassType)newExpr.type(); 
 		ClassInfo classInfo = (ClassInfo)classContext.peek();
@@ -845,11 +860,9 @@ public class InnerTranslator extends NodeVisitor {
 			
 			return nExpr;
 		}
-		else if (ct.isInnerClass()) {
-			// FIXME: ct might be a inner class, but it might be from java library, 
-			// then we should keep it as it is.
-			
+		else if (ct.isInnerClass() && isSourceType(ct)) { 
 			// Maybe we have encountered the new expression of an inner class before it is translated.
+			// But we have to make sure that ct is a type in the source language.
 			ConstructorInstance ci = newExpr.constructorInstance();
 			List args = new ArrayList(newExpr.arguments().size() + 1);
 			List ftypes = new ArrayList(newExpr.arguments().size() + 1);
