@@ -31,14 +31,24 @@ public class FieldConstantsChecked extends AbstractGoal {
         super(null);
         this.vi = vi;
         
-        if (vi.container() instanceof ParsedClassType) {
-            ParsedClassType ct = (ParsedClassType) vi.container();
-            this.job = ct.job();
-            this.ct = ct;
-        }
-        else if (! vi.constantValueSet()) {
+        ParsedClassType ct = (ParsedClassType) findContainer();
+        this.job = ct.job();
+        this.ct = ct;
+        
+        if (job == null && ! vi.constantValueSet()) {
             throw new InternalCompilerError(this + " is unreachable.");
         }
+    }
+    
+    public ParsedClassType container() {
+        return ct;
+    }
+    
+    protected ParsedClassType findContainer() {
+        if (vi.container() instanceof ParsedClassType) {
+            return (ParsedClassType) vi.container();
+        }
+        return null;
     }
 
     public Pass createPass(ExtensionInfo extInfo) {
@@ -52,10 +62,6 @@ public class FieldConstantsChecked extends AbstractGoal {
     
     public boolean hasBeenReached() {
         return vi.constantValueSet();
-    }
-    
-    public ParsedClassType container() {
-        return ct;
     }
     
     public FieldInstance var() {
