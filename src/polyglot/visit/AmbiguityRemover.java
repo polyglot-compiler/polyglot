@@ -1,16 +1,17 @@
 package polyglot.visit;
 
-import polyglot.ast.*;
+import java.util.Collection;
+
 import polyglot.ast.Ambiguous;
 import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
-import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
-import polyglot.types.*;
 import polyglot.types.SemanticException;
+import polyglot.types.TypeSystem;
 import polyglot.types.UnavailableTypeException;
-import polyglot.util.*;
 import polyglot.util.ErrorInfo;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /**
@@ -97,6 +98,22 @@ public class AmbiguityRemover extends DisambiguationDriver
             Report.report(2, "<< " + this + "::leave " + n + " -> " + m);
         
         return m;
-    }  
+    }
+    
+    public HaltingVisitor bypass(Collection c) {
+        throw new InternalCompilerError("AmbiguityRemover does not support bypassing. " +
+                                        "Implement any required functionality using " +
+                                        "Node.disambiguateOverride(Node, AmbiguityRemover).");
+    }
+    public HaltingVisitor bypass(Node n) {
+        throw new InternalCompilerError("AmbiguityRemover does not support bypassing. " +
+                                        "Implement any required functionality using " +
+                                        "Node.disambiguateOverride(Node, AmbiguityRemover).");
+    }
+    public HaltingVisitor bypassChildren(Node n) {
+        throw new InternalCompilerError("AmbiguityRemover does not support bypassing. " +
+                                        "Implement any required functionality using " +
+                                        "Node.disambiguateOverride(Node, AmbiguityRemover).");
+    }
   
 }
