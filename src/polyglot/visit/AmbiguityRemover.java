@@ -29,7 +29,7 @@ public class AmbiguityRemover extends DisambiguationDriver
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, ">> " + this + "::override " + n);
             
-            Node m = n.disambiguateOverride(parent, this);
+            Node m = n.del().disambiguateOverride(parent, this);
             
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, "<< " + this + "::override " + n + " -> " + m);
