@@ -12,6 +12,8 @@ import polyglot.util.*;
 
 import java.util.*;
 
+import com.sun.rsasign.c;
+
 /**
  * @author xinqi
  *
@@ -885,6 +887,30 @@ public class InnerTranslator extends NodeVisitor {
 		return newExpr;
 	}
 	
+	protected ConstructorDecl produceDefaultConstructor(ParsedClassType ct) {
+		ConstructorCall cc = nf.ConstructorCall(Position.compilerGenerated(), 
+												ConstructorCall.SUPER, 
+												Collections.EMPTY_LIST);
+		ConstructorInstance ci = ts.constructorInstance(Position.compilerGenerated(), 
+														(ClassType)ct.superType(), 
+														Flags.PUBLIC, // XXX: how to find the real flags? 
+														Collections.EMPTY_LIST, 
+														Collections.EMPTY_LIST);
+		cc = cc.constructorInstance(ci);
+		ConstructorDecl cd = nf.ConstructorDecl(Position.compilerGenerated(), 
+												Flags.PUBLIC, 
+												ct.name(), 
+												Collections.EMPTY_LIST, 
+												Collections.EMPTY_LIST, 
+												nf.Block(Position.compilerGenerated(), cc));
+		cd = cd.constructorInstance(ts.constructorInstance(Position.compilerGenerated(), 
+														   ct, 
+														   Flags.PUBLIC,  
+														   Collections.EMPTY_LIST, 
+														   Collections.EMPTY_LIST));
+		return cd;
+	}
+	
 	protected ClassDecl updateClassDecl(ClassDecl cd, ParsedClassType ct, ClassInfo cinfo) {
 		Flags f = ct.flags().Static();
 		ct.flags(f);
@@ -899,7 +925,18 @@ public class InnerTranslator extends NodeVisitor {
 //			ct.addField(fd.fieldInstance());
 //		}
 		
-		ct.clearConstructors();
+		if (ct.constructors().size() == 0) {
+			// Add a default constructor for inner classes, if there is none,
+			// in case that it is inherited from another inner class, and 
+			// the default constructor is not having "default" behavior.
+			ct.clearConstructors();
+			ConstructorDecl cons = updateConstructor(cd, ct, produceDefaultConstructor(ct), cinfo);
+			members.add(cons);
+			ct.addConstructor(cons.constructorInstance());
+		}
+		else {
+			ct.clearConstructors();
+		}
 		
 		for (Iterator it = cd.body().members().iterator(); it.hasNext(); ) {
 			ClassMember m = (ClassMember)it.next();
@@ -1000,6 +1037,20 @@ public class InnerTranslator extends NodeVisitor {
 		return ci;
 	}
 	
+	protected ConstructorCall produceDefaultSuperConstructorCall(ClassType ct) {
+		ConstructorCall superCc = nf.ConstructorCall(Position.compilerGenerated(), 
+				 									 ConstructorCall.SUPER, 
+													 Collections.EMPTY_LIST);
+		ConstructorInstance superCi = ts.constructorInstance(Position.compilerGenerated(), 
+						 									 (ClassType)ct.superType(), 
+															 Flags.PUBLIC, 
+															 Collections.EMPTY_LIST, 
+															 Collections.EMPTY_LIST);
+		superCc = superCc.constructorInstance(superCi);
+		superCc = updateConstructorCall(superCc);
+		return superCc;
+	}
+	
 	// Add new argument(s) to a constructor
 	protected ConstructorDecl updateConstructor(ClassDecl cd, ClassType ct, ConstructorDecl cons, ClassInfo cinfo) {
 		List newFormals = cinfo.newConsFormals();
@@ -1022,11 +1073,16 @@ public class InnerTranslator extends NodeVisitor {
 				}
 			}
 			else {
+				// If there is no explicit constructor call, we need to add the default 
+				// constructor call, and update it, in case it is from another inner class,
+				// and therefore needs adding new formals.
+				stmts.add(produceDefaultSuperConstructorCall(ct));
 				stmts.addAll(produceFieldInits(cinfo));
 				stmts.add(s);
 			}
 		}
 		else {
+			stmts.add(produceDefaultSuperConstructorCall(ct));
 			stmts.addAll(produceFieldInits(cinfo));
 		}
 		while (it.hasNext()) {
@@ -1034,12 +1090,14 @@ public class InnerTranslator extends NodeVisitor {
 		}
 		
 		Block b = nf.Block(Position.compilerGenerated(), stmts);
-		return nf.ConstructorDecl(Position.compilerGenerated(), 
-								cons.flags(), 
-								ct.name(), 
-								formals, 
-								cons.throwTypes(), 
-								b);
+		ConstructorDecl newCons = nf.ConstructorDecl(Position.compilerGenerated(), 
+													 cons.flags(), 
+													 ct.name(), 
+													 formals, 
+													 cons.throwTypes(), 
+													 b);
+		newCons = newCons.constructorInstance(updateConstructorInst(ct, cons.constructorInstance(), cinfo));
+		return newCons;
 	}
 	
 	// Generate a list that contains all the field assignments for initializing newly added fields.
