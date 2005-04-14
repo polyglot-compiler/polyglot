@@ -131,6 +131,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         Shadowing.jl ;
         Statements.jl ;
         StaticContext.jl ;
+        StaticMethod.jl ;
         StaticOps.jl ;
         Switch1.jl ; Switch2.jl ; Switch3.jl ; Switch4.jl ; Switch5.jl ;
         Switch6.jl ; Switch7.jl ;
