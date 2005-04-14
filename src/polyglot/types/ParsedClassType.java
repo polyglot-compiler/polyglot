@@ -102,6 +102,11 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
      */
     void clearConstructors();
     
+    /**
+     * Clear all the method instances in the class type.
+     */
+    void clearMethods();
+    
     boolean needSerialization();
     void needSerialization(boolean b);
 }

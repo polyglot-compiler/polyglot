@@ -353,4 +353,8 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     public boolean needSerialization() {
         return needSerialization;
     }
+    
+    public void clearMethods() {
+    	methods.clear();
+    }
 }
