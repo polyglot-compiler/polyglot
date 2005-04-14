@@ -1,11 +1,11 @@
 package polyglot.ext.jl.ast;
 
+import java.util.*;
+
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
-
-import java.util.*;
 
 /**
  * A <code>Call</code> is an immutable representation of a Java
@@ -162,7 +162,8 @@ public class Call_c extends Expr_c implements Call
         
         Receiver r;
         if (mi.flags().isStatic()) {
-            r = nf.CanonicalTypeNode(position(), mi.container()).type(mi.container());
+            Type container = ts.staticTarget(mi.container());
+            r = nf.CanonicalTypeNode(position(), container).type(container);
         } else {
             // The method is non-static, so we must prepend with "this", but we
             // need to determine if the "this" should be qualified.  Get the
