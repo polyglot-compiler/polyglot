@@ -538,7 +538,8 @@ public class InnerTranslator extends NodeVisitor {
 	}
 	
 	protected Node leaveConstructorCall(Node old, ConstructorCall cc, NodeVisitor v) {
-		return updateConstructorCall(cc);
+		ClassInfo cinfo = (ClassInfo)classContext.peek();
+		return updateConstructorCall(cc, cinfo);
 	}
 	
 	protected Node leaveSpecial(Node old, Special s, NodeVisitor v) {
@@ -647,7 +648,7 @@ public class InnerTranslator extends NodeVisitor {
 		}
 		ConstructorCall cc = nf.SuperCall(Position.compilerGenerated(), args);
 		cc = cc.constructorInstance(newExpr.constructorInstance());
-		cc = updateConstructorCall(cc);
+		cc = updateConstructorCall(cc, cinfo);
 		ConstructorDecl cons = nf.ConstructorDecl(Position.compilerGenerated(), 
 											    Flags.NONE, 
 												ct.name(), 
@@ -683,7 +684,7 @@ public class InnerTranslator extends NodeVisitor {
 		throw new RuntimeException("Unable to find field " + name + ".");
 	}
 		
-	protected ConstructorCall updateConstructorCall(ConstructorCall cc) {
+	protected ConstructorCall updateConstructorCall(ConstructorCall cc, ClassInfo selfInfo) {
 		ConstructorInstance ci = cc.constructorInstance();
 		ClassType ct = (ClassType)ci.container();
 		if (cc.kind().equals(ConstructorCall.THIS)) {
@@ -694,7 +695,10 @@ public class InnerTranslator extends NodeVisitor {
 			List args = new ArrayList(cc.arguments().size() + formals.size());
 			for (Iterator it = formals.iterator(); it.hasNext(); ) {
 				Formal f = (Formal)it.next();
-				args.add(nf.Local(Position.compilerGenerated(), f.name()));
+				Local l = nf.Local(Position.compilerGenerated(), f.name());
+				l = l.localInstance(f.localInstance());
+				l = (Local)l.type(f.type().type());
+				args.add(l);
 			}
 			args.addAll(cc.arguments());
 			cc = (ConstructorCall)cc.arguments(args);
@@ -704,12 +708,15 @@ public class InnerTranslator extends NodeVisitor {
 			ClassInfo cinfo = (ClassInfo)innerClassInfoMap.get(ct.fullName());
 			if (cinfo != null) {
 				// it is an inner class.
-				ClassInfo selfInfo = (ClassInfo)classContext.peek();
 				if (cinfo.insideCode() == null) {
 					// For member inner classes, only need to add one formal that refers to the outer instance.
 					ci = updateConstructorInst(ct, ci, cinfo);
 					List args = new ArrayList(cc.arguments().size() + 1);
-					args.add(nf.Local(Position.compilerGenerated(), outerThisName(ct)));
+					Formal f = (Formal)selfInfo.newConsFormals().get(0);
+					Local l = nf.Local(Position.compilerGenerated(), outerThisName(ct));
+					l = l.localInstance(f.localInstance());
+					l = (Local)l.type(f.type().type());
+					args.add(l);
 					args.addAll(cc.arguments());
 					cc = (ConstructorCall)cc.arguments(args);
 					cc = cc.constructorInstance(ci);
@@ -887,27 +894,29 @@ public class InnerTranslator extends NodeVisitor {
 		return newExpr;
 	}
 	
-	protected ConstructorDecl produceDefaultConstructor(ParsedClassType ct) {
+	protected ConstructorDecl produceDefaultConstructor(ParsedClassType ct, ClassInfo cinfo) {
 		ConstructorCall cc = nf.ConstructorCall(Position.compilerGenerated(), 
 												ConstructorCall.SUPER, 
 												Collections.EMPTY_LIST);
-		ConstructorInstance ci = ts.constructorInstance(Position.compilerGenerated(), 
-														(ClassType)ct.superType(), 
-														Flags.PUBLIC, // XXX: how to find the real flags? 
-														Collections.EMPTY_LIST, 
-														Collections.EMPTY_LIST);
-		cc = cc.constructorInstance(ci);
+		ConstructorInstance cci = ts.constructorInstance(Position.compilerGenerated(), 
+														 (ClassType)ct.superType(), 
+														 Flags.PUBLIC, // XXX: how to find the real flags? 
+														 Collections.EMPTY_LIST, 
+														 Collections.EMPTY_LIST);
+		cc = cc.constructorInstance(cci);
+		cc = updateConstructorCall(cc, cinfo);
 		ConstructorDecl cd = nf.ConstructorDecl(Position.compilerGenerated(), 
 												Flags.PUBLIC, 
 												ct.name(), 
 												Collections.EMPTY_LIST, 
 												Collections.EMPTY_LIST, 
 												nf.Block(Position.compilerGenerated(), cc));
-		cd = cd.constructorInstance(ts.constructorInstance(Position.compilerGenerated(), 
-														   ct, 
-														   Flags.PUBLIC,  
-														   Collections.EMPTY_LIST, 
-														   Collections.EMPTY_LIST));
+		ConstructorInstance cdi = ts.constructorInstance(Position.compilerGenerated(), 
+				   										 ct, 
+														 Flags.PUBLIC,  
+														 Collections.EMPTY_LIST, 
+														 Collections.EMPTY_LIST);
+		cd = cd.constructorInstance(cdi);
 		return cd;
 	}
 	
@@ -930,30 +939,30 @@ public class InnerTranslator extends NodeVisitor {
 			// in case that it is inherited from another inner class, and 
 			// the default constructor is not having "default" behavior.
 			ct.clearConstructors();
-			ConstructorDecl cons = updateConstructor(cd, ct, produceDefaultConstructor(ct), cinfo);
+			ConstructorDecl cons = updateConstructor(cd, 
+													 ct, 
+													 produceDefaultConstructor(ct, cinfo), 
+													 cinfo);
 			members.add(cons);
 			ct.addConstructor(cons.constructorInstance());
 		}
 		else {
 			ct.clearConstructors();
-		}
-		
-		for (Iterator it = cd.body().members().iterator(); it.hasNext(); ) {
-			ClassMember m = (ClassMember)it.next();
-			if (m instanceof ConstructorDecl) {
-				ConstructorDecl cons = (ConstructorDecl)m;
-				ConstructorInstance ci = cons.constructorInstance();
-				ConstructorDecl newCons = updateConstructor(cd, ct, cons, cinfo);
-				ConstructorInstance newCi = updateConstructorInst(ct, ci, cinfo);
-				newCons = newCons.constructorInstance(newCi);
-				members.add(newCons);
-				ct.addConstructor(newCi);
-			}
-			else {
-			    members.add(m);
+			for (Iterator it = cd.body().members().iterator(); it.hasNext(); ) {
+				ClassMember m = (ClassMember)it.next();
+				if (m instanceof ConstructorDecl) {
+					ConstructorDecl cons = (ConstructorDecl)m;
+					ConstructorInstance ci = cons.constructorInstance();
+					ConstructorDecl newCons = updateConstructor(cd, ct, cons, cinfo);
+					members.add(newCons);
+					ct.addConstructor(newCons.constructorInstance());
+				}
+				else {
+				    members.add(m);
+				}
 			}
 		}
-		
+				
 		List newMemClasses = cinfo.newMemberClasses();
 		members.addAll(newMemClasses);
 		List newMethods = cinfo.newMemberMethods();
@@ -1047,7 +1056,7 @@ public class InnerTranslator extends NodeVisitor {
 															 Collections.EMPTY_LIST, 
 															 Collections.EMPTY_LIST);
 		superCc = superCc.constructorInstance(superCi);
-		superCc = updateConstructorCall(superCc);
+		superCc = updateConstructorCall(superCc, (ClassInfo)classContext.peek());
 		return superCc;
 	}
 	
