@@ -162,7 +162,7 @@ public class Call_c extends Expr_c implements Call
         
         Receiver r;
         if (mi.flags().isStatic()) {
-            Type container = ts.staticTarget(mi.container());
+            Type container = findContainer(ts, mi);            
             r = nf.CanonicalTypeNode(position(), container).type(container);
         } else {
             // The method is non-static, so we must prepend with "this", but we
@@ -184,6 +184,15 @@ public class Call_c extends Expr_c implements Call
         // we call computeTypes on the reciever too.
         Call_c call = (Call_c) this.targetImplicit(true).target(r);
         return call.visit(tc);
+    }
+
+    /**
+     * Used to find the missing static target of a static method call.
+     * Should return the container of the method instance. 
+     * 
+     */
+    protected Type findContainer(TypeSystem ts, MethodInstance mi) {
+        return ts.staticTarget(mi.container());    
     }
 
     /** Type check the call. */
