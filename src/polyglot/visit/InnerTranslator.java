@@ -561,7 +561,8 @@ public class InnerTranslator extends NodeVisitor {
 	
 	protected Node leaveField(Node old, Field field, NodeVisitor v) {
 		// Check whether the field access is a disguised form of "A.this.f".
-		if (field.isTargetImplicit()) {
+		// Note: we only need to check non-static fields!
+		if (!field.flags().isStatic() && field.isTargetImplicit()) {
 			ClassType tOuter = findField(field.name());
 			ClassType tThis = ((ClassInfo)classContext.peek()).classType();
 			Expr t = produceThis(tThis);
@@ -570,7 +571,7 @@ public class InnerTranslator extends NodeVisitor {
 				t = produceOuterField(tThis, t);
 				tThis = (ClassType)tThis.outer();
 			}
-			Field f = nf.Field(Position.compilerGenerated(), t, field.name());
+			Field f = nf.Field(field.position(), t, field.name());
 			f = f.fieldInstance(field.fieldInstance());
 			return f;
 		}
@@ -934,33 +935,31 @@ public class InnerTranslator extends NodeVisitor {
 //			ct.addField(fd.fieldInstance());
 //		}
 		
+		ct.clearConstructors();
+		for (Iterator it = cd.body().members().iterator(); it.hasNext(); ) {
+			ClassMember m = (ClassMember)it.next();
+			if (m instanceof ConstructorDecl) {
+				ConstructorDecl cons = (ConstructorDecl)m;
+				ConstructorInstance ci = cons.constructorInstance();
+				ConstructorDecl newCons = updateConstructor(cd, ct, cons, cinfo);
+				members.add(newCons);
+				ct.addConstructor(newCons.constructorInstance());
+			}
+			else {
+			    members.add(m);
+			}
+		}
+
 		if (ct.constructors().size() == 0) {
 			// Add a default constructor for inner classes, if there is none,
 			// in case that it is inherited from another inner class, and 
 			// the default constructor is not having "default" behavior.
-			ct.clearConstructors();
 			ConstructorDecl cons = updateConstructor(cd, 
 													 ct, 
 													 produceDefaultConstructor(ct, cinfo), 
 													 cinfo);
 			members.add(cons);
 			ct.addConstructor(cons.constructorInstance());
-		}
-		else {
-			ct.clearConstructors();
-			for (Iterator it = cd.body().members().iterator(); it.hasNext(); ) {
-				ClassMember m = (ClassMember)it.next();
-				if (m instanceof ConstructorDecl) {
-					ConstructorDecl cons = (ConstructorDecl)m;
-					ConstructorInstance ci = cons.constructorInstance();
-					ConstructorDecl newCons = updateConstructor(cd, ct, cons, cinfo);
-					members.add(newCons);
-					ct.addConstructor(newCons.constructorInstance());
-				}
-				else {
-				    members.add(m);
-				}
-			}
 		}
 				
 		List newMemClasses = cinfo.newMemberClasses();
