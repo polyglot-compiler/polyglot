@@ -12,8 +12,6 @@ import polyglot.util.*;
 
 import java.util.*;
 
-import com.sun.rsasign.c;
-
 /**
  * @author xinqi
  *
@@ -567,8 +565,8 @@ public class InnerTranslator extends NodeVisitor {
 		// Check whether the field access is a disguised form of "A.this.f".
 		// Note: we only need to check non-static fields!
 		if (!field.flags().isStatic() && field.isTargetImplicit()) {
-			ClassType tOuter = findField(field.name());
 			ClassType tThis = ((ClassInfo)classContext.peek()).classType();
+			ClassType tOuter = findField(field.name(), tThis);
 			Expr t = produceThis(tThis);
 			while (!ts.equals(tOuter, tThis)) {
 //				t = nf.Field(Position.compilerGenerated(), t, newFieldName(outerThisName(tThis)));
@@ -586,8 +584,8 @@ public class InnerTranslator extends NodeVisitor {
 	protected Node leaveCall(Node old, Call c, NodeVisitor v) {
 		MethodInstance mi = c.methodInstance();
 		if (!mi.flags().isStatic() && c.isTargetImplicit()) {
-			ClassType tOuter = findMethod(mi);
 			ClassType tThis = ((ClassInfo)classContext.peek()).classType();
+			ClassType tOuter = findMethod(mi, tThis);
 			Expr t = produceThis(tThis);
 			while (!ts.equals(tOuter, tThis)) {
 //				t = nf.Field(Position.compilerGenerated(), t, newFieldName(outerThisName(tThis)));
@@ -606,8 +604,8 @@ public class InnerTranslator extends NodeVisitor {
 			CodeInfo codeInfo = (CodeInfo)codeContext.peek();
 			if (!codeInfo.existFinal(local.name())) {
 				String newName = newFieldName(local.name());
-				ClassType tOuter = findField(newName);
 				ClassType tThis = ((ClassInfo)classContext.peek()).classType();
+				ClassType tOuter = findField(newName, tThis);
 				Expr t = produceThis(tThis);
 				while (!ts.equals(tOuter, tThis)) {
 //					t = nf.Field(Position.compilerGenerated(), t, newFieldName(outerThisName(tThis)));
@@ -695,14 +693,17 @@ public class InnerTranslator extends NodeVisitor {
 	/**
 	 * Find the class type inside which a field with specified name is declared.
 	 */
-	protected ParsedClassType findField(String name) {
+	protected ParsedClassType findField(String name, ClassType current) {
 		for (int i = classContext.size() - 1; i >= 0; i--) {
 			ClassInfo cinfo = (ClassInfo)classContext.get(i);
 			ParsedClassType ct = cinfo.classType();
-			FieldInstance fi = ct.fieldNamed(name);
-			if (fi != null) {
-				return ct;
+			try {
+			    FieldInstance fi = ts.findField(ct, name, current);
 			}
+			catch (SemanticException se) {
+				continue;
+			}
+			return ct;
 		}
 		throw new RuntimeException("Unable to find field " + name + ".");
 	}
@@ -710,15 +711,19 @@ public class InnerTranslator extends NodeVisitor {
 	/**
 	 * Find the class type inside which a field with specified name is declared.
 	 */
-	protected ParsedClassType findMethod(MethodInstance mi) {
+	protected ParsedClassType findMethod(MethodInstance mi, ClassType current) {
 		for (int i = classContext.size() - 1; i >= 0; i--) {
 			ClassInfo cinfo = (ClassInfo)classContext.get(i);
 			ParsedClassType ct = cinfo.classType();
-			if (ct.hasMethod(mi)) {
-				return ct;
+			try {
+				MethodInstance temp = ts.findMethod(ct, mi.name(), mi.formalTypes(), current);
 			}
+			catch (SemanticException se) {
+				continue;
+			}
+			return ct;
 		}
-		throw new RuntimeException("Unable to find method " + mi + ".");
+		throw new RuntimeException("Unable to find " + mi + ".");
 	}
 
 	protected ConstructorCall updateConstructorCall(ConstructorCall cc, ClassInfo selfInfo) {
