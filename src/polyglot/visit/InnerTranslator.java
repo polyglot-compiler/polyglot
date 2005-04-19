@@ -534,6 +534,7 @@ public class InnerTranslator extends NodeVisitor {
 			cd = addAnonymousConstructor(cd, ct, selfInfo, newExpr);
 			cd = updateClassDecl(cd, ct, selfInfo);
 			cinfo.addMemberClass(cd);
+			newExpr = (New)newExpr.type(ct);
 		}
 		
 		return updateNewExpr(newExpr);
@@ -599,6 +600,13 @@ public class InnerTranslator extends NodeVisitor {
 		return c;
 	}
 	
+	/**
+	 * Translate final local variables that should become field accesses of local/anonymous classes. 
+	 * @param old
+	 * @param local
+	 * @param v
+	 * @return
+	 */
 	protected Node leaveLocal(Node old, Local local, NodeVisitor v) {
 		if (local.flags().isFinal()) {
 			CodeInfo codeInfo = (CodeInfo)codeContext.peek();
@@ -822,16 +830,6 @@ public class InnerTranslator extends NodeVisitor {
 		ClassBody b = nf.ClassBody(cd.body().position(), members);
 		b = (ClassBody)b.exceptions(cd.body().exceptions());
 		cd = cd.body(b);
-//		ParsedClassType ct = cd.type(); 
-//		for (Iterator it = cinfo.newMemberClasses().iterator(); it.hasNext(); ) {
-//			ClassDecl addedCd = (ClassDecl)it.next();
-//			ct.addMemberClass(addedCd.type());
-//		}
-//		for (Iterator it = cinfo.newMemberMethods().iterator(); it.hasNext(); ) {
-//			MethodDecl md = (MethodDecl)it.next();
-//			ct.addMethod(md.methodInstance());
-//		}
-//		cd = cd.type(ct);
 		return cd;
 	}
 		
