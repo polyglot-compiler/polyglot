@@ -1,14 +1,12 @@
 package polyglot.ext.param.types;
 
-import polyglot.ext.jl.types.*;
-import polyglot.types.*;
-import polyglot.types.Package;
-import polyglot.util.*;
-import java.util.*;
 import java.io.IOException;
+import java.util.*;
 
 import polyglot.ext.param.Topics;
 import polyglot.main.Report;
+import polyglot.types.*;
+import polyglot.util.*;
 
 /**
  * Utility class that performs substitutions on type objects using a
@@ -71,19 +69,7 @@ public class Subst_c implements Subst
                 Object formal = e.getKey();
                 Object actual = e.getValue();
                 
-                Object existent = getSubstValueAsKey(actual);
-                if (existent != null) {
-                    // In this case:
-                    //   this.base is C[T], where T is a formal of C
-                    //   t.base is D[U], where U is a formal of D
-                    //   t.subst has U -> T, thus t is D[T]
-                    //   this.subst has T -> X
-                    // so replace U -> T in t.subst with U -> X
-                    newSubst.put(formal, existent);
-                }
-                else {
-                    newSubst.put(formal, actual);
-                }
+                newSubst.put(formal, substSubstValue(actual));
             }
 
             // Now add our substitutions, overriding any substitutions
@@ -102,17 +88,19 @@ public class Subst_c implements Subst
         return t;
     }
 
+
     /**
      * When adding a new substitution A-&gt;B to the map, we need to check if 
      * there are already any existing substitutions, say C-&gt;A, and if so,
      * replace them appropriately, in this case with C-&gt;B.
      * 
-     * This method allows subclasses to check if a value (B in the 
-     * example above) is present as a key. Subclasses may need to override this
+     * This method allows subclasses to perform substitution on a value in
+     * the substitution map (B in the 
+     * example above). Subclasses may need to override this
      * if the keys and values are not the same object.
      */
-    protected Object getSubstValueAsKey(Object v) {
-        return substitutions().get(v);
+    protected Object substSubstValue(Object value) {
+        return value;
     }
     
     /** Perform substitutions on a class type. Substitutions are performed
