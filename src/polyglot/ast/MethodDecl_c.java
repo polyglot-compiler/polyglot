@@ -300,11 +300,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     }
 
     protected void overrideMethodCheck(TypeChecker tc) throws SemanticException {
-        if (flags.isStatic()) {
-            // static methods do not override.
-            return;
-        }
-        
         TypeSystem ts = tc.typeSystem();
 
         for (Iterator j = mi.implemented().iterator(); j.hasNext(); ) {
