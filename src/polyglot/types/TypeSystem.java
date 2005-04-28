@@ -773,6 +773,20 @@ public interface TypeSystem {
     public void checkClassConformance(ClassType ct) throws SemanticException;
 
     /**
+     * Find a potentially suitable implementation of the method <code>mi</code>
+     * in the class <code>ct</code> or a supertype thereof. Since we are
+     * looking for implementations, <code>ct</code> cannot be an interface.
+     * The first potentially satisfying method is returned, that is, the method
+     * that is visible from <code>ct</code>, with the correct signature, in
+     * the most precise class in the class hierarchy starting from
+     * <code>ct</code>.
+     * 
+     * @return a suitable implementation of the method mi in the class
+     *         <code>ct</code> or a supertype thereof, null if none exists.
+     */
+    public MethodInstance findImplementingMethod(ClassType ct, MethodInstance mi);
+    
+    /**
      * Returns <code>t</code>, modified as necessary to make it a legal
      * static target.
      */

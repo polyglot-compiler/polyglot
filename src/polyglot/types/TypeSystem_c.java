@@ -1819,7 +1819,7 @@ public class TypeSystem_c implements TypeSystem
      * Utility method to gather all the superclasses and interfaces of
      * <code>ct</code> that may contain abstract methods that must be
      * implemented by <code>ct</code>. The list returned also contains
-     * <code>ct</code>.
+     * <code>rt</code>.
      */
     protected List abstractSuperInterfaces(ReferenceType rt) {
         List superInterfaces = new LinkedList();
@@ -1876,71 +1876,67 @@ public class TypeSystem_c implements TypeSystem
                     continue;
                 }
 
-                boolean implFound = false;
-                ReferenceType curr = ct;
-                while (curr != null && !implFound) {
-                    List possible = curr.methods(mi.name(), mi.formalTypes());
-                    for (Iterator k = possible.iterator(); k.hasNext(); ) {
-                        MethodInstance mj = (MethodInstance)k.next();
-                        if (!mj.flags().isAbstract() && 
-                            ((isAccessible(mi, ct) && isAccessible(mj, ct)) || 
-                                    isAccessible(mi, mj.container().toClass()))) {
-                            // The method mj may be a suitable implementation of mi.
-                            // mj is not abstract, and either mj's container 
-                            // can access mi (thus mj can really override mi), or
-                            // mi and mj are both accessible from ct (e.g.,
-                            // mi is declared in an interface that ct implements,
-                            // and mj is defined in a superclass of ct).
-                            
-                            // If neither the method instance mj nor the method 
-                            // instance mi is declared in the class type ct, then 
-                            // we need to check that it has appropriate protections.
-                            if (!equals(ct, mj.container()) && !equals(ct, mi.container())) {
-                                try {
-                                    // check that mj can override mi, which
-                                    // includes access protection checks.
-                                    checkOverride(mj, mi);
-                                }
-                                catch (SemanticException e) {
-                                    // change the position of the semantic
-                                    // exception to be the class that we
-                                    // are checking.
-                                    throw new SemanticException(e.getMessage(),
-                                        ct.position());
-                                }
-                            }
-                            else {
-                                // the method implementation mj or mi was
-                                // declared in ct. So other checks will take
-                                // care of access issues
-                            }
-                            implFound = true;
-                            break;
-                        }
-                    }
-
-                    if (curr == mi.container()) {
-                        // we've reached the definition of the abstract 
-                        // method. We don't want to look higher in the 
-                        // hierarchy; this is not an optimization, but is 
-                        // required for correctness. 
-                        break;
-                    }
-                    
-                    curr = curr.superType() ==  null ?
-                           null : curr.superType().toReference();
+                MethodInstance mj = findImplementingMethod(ct, mi);
+                if (mj == null && !ct.flags().isAbstract()) {
+                    throw new SemanticException(ct.fullName() + " should be " +
+                                                "declared abstract; it does not define " +
+                                                mi.signature() + ", which is declared in " +
+                                                rt.toClass().fullName(), ct.position());
                 }
 
-
-                // did we find a suitable implementation of the method mi?
-                if (!implFound && !ct.flags().isAbstract()) {
-                    throw new SemanticException(ct.fullName() + " should be " +
-                            "declared abstract; it does not define " +
-                            mi.signature() + ", which is declared in " +
-                            rt.toClass().fullName(), ct.position());
+                if (!equals(ct, mj.container()) && !equals(ct, mi.container())) {
+                    try {
+                        // check that mj can override mi, which
+                        // includes access protection checks.
+                        checkOverride(mj, mi);
+                    }
+                    catch (SemanticException e) {
+                        // change the position of the semantic
+                        // exception to be the class that we
+                        // are checking.
+                        throw new SemanticException(e.getMessage(),
+                            ct.position());
+                    }
+                }
+                else {
+                    // the method implementation mj or mi was
+                    // declared in ct. So other checks will take
+                    // care of access issues
                 }
             }
         }
+    }
+    
+    public MethodInstance findImplementingMethod(ClassType ct, MethodInstance mi) {
+        ReferenceType curr = ct;
+        while (curr != null) {
+            List possible = curr.methods(mi.name(), mi.formalTypes());
+            for (Iterator k = possible.iterator(); k.hasNext(); ) {
+                MethodInstance mj = (MethodInstance)k.next();
+                if (!mj.flags().isAbstract() && 
+                    ((isAccessible(mi, ct) && isAccessible(mj, ct)) || 
+                            isAccessible(mi, mj.container().toClass()))) {
+                    // The method mj may be a suitable implementation of mi.
+                    // mj is not abstract, and either mj's container 
+                    // can access mi (thus mj can really override mi), or
+                    // mi and mj are both accessible from ct (e.g.,
+                    // mi is declared in an interface that ct implements,
+                    // and mj is defined in a superclass of ct).
+                    return mj;                    
+                }
+            }
+            if (curr == mi.container()) {
+                // we've reached the definition of the abstract 
+                // method. We don't want to look higher in the 
+                // hierarchy; this is not an optimization, but is 
+                // required for correctness. 
+                break;
+            }
+            
+            curr = curr.superType() ==  null ?
+                   null : curr.superType().toReference();
+        }
+        return null;
     }
 
     /**
