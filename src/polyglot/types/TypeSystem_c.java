@@ -1877,14 +1877,18 @@ public class TypeSystem_c implements TypeSystem
                 }
 
                 MethodInstance mj = findImplementingMethod(ct, mi);
-                if (mj == null && !ct.flags().isAbstract()) {
-                    throw new SemanticException(ct.fullName() + " should be " +
+                if (mj == null) {
+                    if (!ct.flags().isAbstract()) {
+                        throw new SemanticException(ct.fullName() + " should be " +
                                                 "declared abstract; it does not define " +
                                                 mi.signature() + ", which is declared in " +
                                                 rt.toClass().fullName(), ct.position());
+                    }
+                    else { 
+                        // no implementation, but that's ok, the class is abstract.
+                    }
                 }
-
-                if (!equals(ct, mj.container()) && !equals(ct, mi.container())) {
+                else if (!equals(ct, mj.container()) && !equals(ct, mi.container())) {
                     try {
                         // check that mj can override mi, which
                         // includes access protection checks.
