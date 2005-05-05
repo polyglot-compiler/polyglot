@@ -566,6 +566,18 @@ ext=""
     </javac>
   </target>
 
+	  <target name="jxmi" depends="jx">
+	    <antcall target="standard-ext">
+	      <param name="ext" value="jxmi"/>
+	      <param name="base.parser" value="polyglot/ext/jx/parse/jx_ppg.cup"/>
+	      <param name="parser.type" value="ppg"/>
+	    </antcall>
+	    <javac srcdir="${src}/polyglot/ext/jx/runtime/src" destdir="${classes}" debug="on"
+	      includes="jxmi/runtime/**">
+	      <classpath refid="standard.classpath"/>
+	    </javac>
+	  </target>
+
   <target name="pao"
   	      depends="jl"
   	      description="Builds the pao extension">
