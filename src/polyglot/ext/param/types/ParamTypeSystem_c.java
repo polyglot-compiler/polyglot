@@ -53,7 +53,7 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
         if (base.formals().size() != actuals.size()) {
             throw new SemanticException("Wrong number of actual parameters " +
                                         "for instantiation of \"" +
-                                        base + "\".", pos);
+                                        base.clazz() + "\".", pos);
         }
     }
 
