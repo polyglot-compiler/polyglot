@@ -125,10 +125,10 @@ public class StdErrorQueue extends AbstractErrorQueue
     }
 
     protected Reader reader(Position pos) throws IOException {
-      if (pos.file() != null && pos.line() != Position.UNKNOWN) {
-	  return new FileReader(pos.file());
-      }
-      return null;
+        if (pos.path() != null && pos.line() != Position.UNKNOWN) {
+            return new FileReader(pos.path());
+        }
+        return null;
     }
 
     private void showError(Position pos) {

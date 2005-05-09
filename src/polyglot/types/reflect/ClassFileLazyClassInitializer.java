@@ -57,7 +57,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * Create a position for the class file.
      */
     public Position position() {
-        return new Position(clazz.name() + ".class");
+        return new Position(null, clazz.name() + ".class");
     }
 
     /**

@@ -33,16 +33,19 @@ import java.math.BigInteger;
 %{
     StringBuffer sb = new StringBuffer();
     String file;
+    String path;
     HashMap keywords;
     LinkedList subst;
 
     public Lexer_c(String s, Position pos, List subst) {
         this(new EscapedUnicodeReader(new StringReader(s)));
         if (pos != null) {
-            this.file = pos + ": quasiquote(" + s + "," + subst + ")";
+            this.file = pos.file() + ": quasiquote(" + s + "," + subst + ")";
+            this.path = pos.path();
         }
         else {
             this.file = "quasiquote(" + s + "," + subst + ")";
+            this.path = null;
         }
 
         this.subst = new LinkedList(subst);
@@ -241,13 +244,17 @@ import java.math.BigInteger;
         return file;
     }
 
+    public String path() {
+        return path;
+    }
+
     private Position pos() {
-        return new Position(file, yyline+1, yycolumn, yyline+1,
+        return new Position(path, file, yyline+1, yycolumn, yyline+1,
                             yycolumn + yytext().length());
     }
 
     private Position pos(int len) {
-        return new Position(file, yyline+1, yycolumn-len-1, yyline+1,
+        return new Position(path, file, yyline+1, yycolumn-len-1, yyline+1,
                             yycolumn+1);
     }
 

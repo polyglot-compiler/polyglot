@@ -10,6 +10,7 @@ import polyglot.lex.*;
 import polyglot.util.Position;
 import polyglot.util.ErrorQueue;
 import polyglot.util.ErrorInfo;
+import polyglot.frontend.FileSource;
 import java.util.HashMap;
 import java.math.BigInteger;
 
@@ -32,17 +33,19 @@ import java.math.BigInteger;
 %{
     StringBuffer sb = new StringBuffer();
     String file;
+    String path;
     ErrorQueue eq;
     HashMap keywords;
 
-    public Lexer_c(java.io.InputStream in, String file, ErrorQueue eq) {
+    public Lexer_c(java.io.InputStream in, FileSource file, ErrorQueue eq) {
         this(new java.io.BufferedReader(new java.io.InputStreamReader(in)),
              file, eq);
     }
 
-    public Lexer_c(java.io.Reader reader, String file, ErrorQueue eq) {
+    public Lexer_c(java.io.Reader reader, FileSource file, ErrorQueue eq) {
         this(new EscapedUnicodeReader(reader));
-        this.file = file;
+        this.file = file.name();
+        this.path = file.path();
         this.eq = eq;
         this.keywords = new HashMap();
         init_keywords();
@@ -104,13 +107,17 @@ import java.math.BigInteger;
         return file;
     }
 
+    public String path() {
+        return path;
+    }
+
     private Position pos() {
-        return new Position(file, yyline+1, yycolumn, yyline+1,
+        return new Position(path, file, yyline+1, yycolumn, yyline+1,
                             yycolumn + yytext().length());
     }
 
     private Position pos(int len) {
-        return new Position(file, yyline+1, yycolumn-len-1, yyline+1,
+        return new Position(path, file, yyline+1, yycolumn-len-1, yyline+1,
                             yycolumn+1);
     }
 

@@ -59,7 +59,7 @@ public class ImportTable extends ClassResolver
         this.resolver = base;
         this.ts = ts;
         this.sourceName = src;
-        this.sourcePos = src != null ? new Position(src) : null;
+        this.sourcePos = src != null ? new Position(null, src) : null;
         this.pkg = pkg;
 
 	this.map = new HashMap();

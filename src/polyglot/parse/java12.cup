@@ -414,12 +414,12 @@ compilation_unit ::=
         package_declaration_opt:a
         import_declarations_opt:b
         type_declarations_opt:c
-            {: RESULT = parser.nf.SourceFile(new Position(parser.lexer.file()),
+            {: RESULT = parser.nf.SourceFile(new Position(parser.lexer.path(), parser.lexer.file()),
 					     a, b, c);
 	    :}
     |   error
         type_declarations_opt:c
-            {: RESULT = parser.nf.SourceFile(new Position(parser.lexer.file()),
+            {: RESULT = parser.nf.SourceFile(new Position(parser.lexer.path(), parser.lexer.file()),
 					     null, Collections.EMPTY_LIST, c);
 	    :}
         ;

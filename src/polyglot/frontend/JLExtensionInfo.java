@@ -99,7 +99,7 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
      * <code>reader</code>.
      */
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
-	polyglot.lex.Lexer lexer = new Lexer_c(reader, source.name(), eq);
+	polyglot.lex.Lexer lexer = new Lexer_c(reader, source, eq);
 	polyglot.parse.BaseParser parser = new Grm(lexer, ts, nf, eq);
 
 	return new CupParser(parser, source, eq);
