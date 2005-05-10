@@ -201,9 +201,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl
         }
 
         Context c = ar.context();
-        TypeSystem ts = ar.typeSystem();
-
-        ParsedClassType ct = c.currentClassScope();
 
         if (! returnType.type().isCanonical()) {
             return this;
@@ -317,7 +314,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
 	TypeSystem ts = ec.typeSystem();
 
-	SubtypeSet s = (SubtypeSet) ec.throwsSet();
+	SubtypeSet s = ec.throwsSet();
 
 	for (Iterator i = s.iterator(); i.hasNext(); ) {
 	    Type t = (Type) i.next();
@@ -452,11 +449,12 @@ public class MethodDecl_c extends Term_c implements MethodDecl
      * Visit this term in evaluation order.
      */
     public List acceptCFG(CFGBuilder v, List succs) {
+        v.visitCFGList(formals(), returnType.entry());
         if (body() == null) {
-            v.visitCFGList(formals(), this);
+            v.visitCFG(returnType, this);
         }
         else {
-            v.visitCFGList(formals(), body().entry());
+            v.visitCFG(returnType, body().entry());
             v.visitCFG(body(), this);
         }
         return succs;

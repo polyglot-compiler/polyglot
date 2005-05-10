@@ -1,11 +1,13 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
+import java.util.Collections;
+import java.util.List;
 
-import polyglot.util.*;
-import polyglot.visit.*;
+import polyglot.ast.*;
 import polyglot.types.*;
-import java.util.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.*;
 
 /**
  * A <code>Cast</code> is an immutable representation of a casting
@@ -125,7 +127,8 @@ public class Cast_c extends Expr_c implements Cast
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(expr, this);
+        v.visitCFG(expr, castType.entry());
+        v.visitCFG(castType, this);
         return succs;
     }
 

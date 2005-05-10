@@ -1,15 +1,12 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.ClassLit;
-import polyglot.ast.Expr;
-import polyglot.ast.Node;
-import polyglot.ast.TypeNode;
+import java.util.List;
+
+import polyglot.ast.*;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.PrettyPrinter;
-import polyglot.visit.TypeChecker;
+import polyglot.visit.*;
 
 /**
  * A <code>ClassLit</code> represents a class literal expression. 
@@ -45,6 +42,15 @@ public class ClassLit_c extends Lit_c implements ClassLit
    */
   public Object objValue() {
     return null;
+  }
+
+  public Term entry() {
+      return typeNode.entry();
+  }
+
+  public List acceptCFG(CFGBuilder v, List succs) {
+      v.visitCFG(typeNode, this);
+      return succs;
   }
 
   public Node visitChildren(NodeVisitor v) {

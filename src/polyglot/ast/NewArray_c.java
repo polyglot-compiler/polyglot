@@ -159,11 +159,13 @@ public class NewArray_c extends Expr_c implements NewArray
     }
 
     public Term entry() {
-        return listEntry(dims, (init != null ? init.entry() : this));
+        return baseType.entry();
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFGList(dims, (init != null ? init.entry() : this));
+        Term next = init != null ? init.entry() : this;
+        v.visitCFG(baseType, listEntry(dims, next));
+        v.visitCFGList(dims, next);
         if (init != null) {
             v.visitCFG(init, this);
         }

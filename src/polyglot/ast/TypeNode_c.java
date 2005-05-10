@@ -1,5 +1,7 @@
 package polyglot.ext.jl.ast;
 
+import java.util.List;
+
 import polyglot.ast.*;
 
 import polyglot.util.*;
@@ -10,7 +12,7 @@ import polyglot.visit.*;
  * A <code>TypeNode</code> is the syntactic representation of a 
  * <code>Type</code> within the abstract syntax tree.
  */
-public abstract class TypeNode_c extends Node_c implements TypeNode
+public abstract class TypeNode_c extends Term_c implements TypeNode
 {
     protected Type type;
 
@@ -47,6 +49,14 @@ public abstract class TypeNode_c extends Node_c implements TypeNode
         else {
             return this;
         }
+    }
+
+    public Term entry() {
+        return this;
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        return succs;
     }
 
     public String toString() {

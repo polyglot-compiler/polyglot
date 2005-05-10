@@ -3,11 +3,10 @@ package polyglot.ext.jl.ast;
 import java.util.List;
 
 import polyglot.ast.*;
-import polyglot.frontend.*;
-import polyglot.frontend.goals.FieldConstantsChecked;
+import polyglot.frontend.CyclicDependencyException;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
-import polyglot.util.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.*;
@@ -343,13 +342,15 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     public Term entry() {
-        if (init() != null) {
-            return init().entry();
-        }
-        return this;
+        return type.entry();
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
+        Term next = this;
+        if (init() != null) {
+            next = init().entry();
+        }
+        v.visitCFG(type, next);
         if (init() != null) {
             v.visitCFG(init(), this);
         }

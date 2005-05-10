@@ -375,15 +375,15 @@ public class Call_c extends Expr_c implements Call
   }
 
   public Term entry() {
-      if (target instanceof Expr) {
-          return ((Expr) target).entry();
+      if (target instanceof Term) {
+          return ((Term) target).entry();
       }
       return listEntry(arguments, this);
   }
 
   public List acceptCFG(CFGBuilder v, List succs) {
-      if (target instanceof Expr) {
-          Expr t = (Expr) target;
+      if (target instanceof Term) {
+          Term t = (Term) target;
           v.visitCFG(t, listEntry(arguments, this));
       }
 

@@ -4,7 +4,6 @@ import java.util.List;
 
 import polyglot.ast.*;
 import polyglot.types.*;
-import polyglot.util.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.*;
@@ -121,6 +120,9 @@ public class Special_c extends Expr_c implements Special
      * term.
      */
     public Term entry() {
+        if (qualifier != null) {
+            return qualifier.entry();
+        }
         return this;
     }
 
@@ -128,6 +130,9 @@ public class Special_c extends Expr_c implements Special
      * Visit this term in evaluation order.
      */
     public List acceptCFG(CFGBuilder v, List succs) {
+        if (qualifier != null) {
+            v.visitCFG(qualifier, this);
+        }
         return succs;
     }
 

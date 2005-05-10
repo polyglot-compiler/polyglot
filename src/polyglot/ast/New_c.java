@@ -3,8 +3,6 @@ package polyglot.ext.jl.ast;
 import java.util.*;
 
 import polyglot.ast.*;
-import polyglot.frontend.Pass;
-import polyglot.frontend.Job;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -179,7 +177,7 @@ public class New_c extends Expr_c implements New
             n = (New_c) n.body((ClassBody)n.body().visit(bodyTB));
             ParsedClassType type = (ParsedClassType) bodyTB.currentClass();
             */
-            ParsedClassType type = (ParsedClassType) tb.currentClass();
+            ParsedClassType type = tb.currentClass();
             n = (New_c) n.anonType(type);
             
             type.setMembersAdded(true);
@@ -439,8 +437,6 @@ public class New_c extends Expr_c implements New
     }
 
     protected void typeCheckFlags(TypeChecker tc) throws SemanticException {
-        TypeSystem ts = tc.typeSystem();
-
         ClassType ct = tn.type().toClass();
 
 	if (this.body == null) {
@@ -599,11 +595,7 @@ public class New_c extends Expr_c implements New
 
     public Term entry() {
         if (qualifier != null) return qualifier.entry();
-        Term afterArgs = this;
-        if (body() != null) {
-            afterArgs = body();
-        }
-        return listEntry(arguments, afterArgs);
+        return tn.entry();
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
@@ -613,8 +605,9 @@ public class New_c extends Expr_c implements New
         }
 
         if (qualifier != null) {
-            v.visitCFG(qualifier, listEntry(arguments, afterArgs));
+            v.visitCFG(qualifier, tn.entry());
         }
+        v.visitCFG(tn, listEntry(arguments, afterArgs));
 
         v.visitCFGList(arguments, afterArgs);
 

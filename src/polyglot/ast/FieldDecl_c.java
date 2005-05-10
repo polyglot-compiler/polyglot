@@ -1,12 +1,12 @@
 package polyglot.ext.jl.ast;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 import polyglot.ast.*;
-import polyglot.frontend.*;
-import polyglot.frontend.goals.FieldConstantsChecked;
+import polyglot.frontend.CyclicDependencyException;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
-import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -181,9 +181,6 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        Context c = ar.context();
-        TypeSystem ts = ar.typeSystem();
-
         if (this.fi.isCanonical()) {
             // Nothing to do.
             return this;
@@ -267,8 +264,6 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
                 ((ArrayInit) init).typeCheckElements(type.type());
             }
             else {
-                boolean intConversion = false;
-
                 if (! ts.isImplicitCastValid(init.type(), type.type()) &&
                     ! ts.equals(init.type(), type.type()) &&
                     ! ts.numericConversionValid(type.type(),
@@ -301,9 +296,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     }
 
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-        TypeSystem ts = ec.typeSystem();
-
-        SubtypeSet s = (SubtypeSet) ec.throwsSet();
+        SubtypeSet s = ec.throwsSet();
 
         for (Iterator i = s.iterator(); i.hasNext(); ) {
             Type t = (Type) i.next();
@@ -343,13 +336,15 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
      * term.
      */
     public Term entry() {
-        return init != null ? init.entry() : this;
+        return type.entry();
     }
 
     /**
      * Visit this term in evaluation order.
      */
-    public List acceptCFG(CFGBuilder v, List succs) {
+    public List acceptCFG(CFGBuilder v, List succs) {        
+        Term next = init != null ? init.entry() : this;
+        v.visitCFG(type, next);
         if (init != null) {
             v.visitCFG(init, this);
         }

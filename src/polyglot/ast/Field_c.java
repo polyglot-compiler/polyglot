@@ -198,16 +198,17 @@ public class Field_c extends Expr_c implements Field
   }
 
   public Term entry() {
-      if (target instanceof Expr) {
-          return ((Expr) target).entry();
+      if (target instanceof Term) {
+          return ((Term) target).entry();
       }
       return this;
   }
 
   public List acceptCFG(CFGBuilder v, List succs) {
-      if (target instanceof Expr) {
-          v.visitCFG((Expr) target, this);
+      if (target instanceof Term) {
+          v.visitCFG((Term) target, this);
       }
+      
       return succs;
   }
 

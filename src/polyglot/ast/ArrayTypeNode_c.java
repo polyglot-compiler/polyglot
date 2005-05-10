@@ -4,8 +4,6 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
-import polyglot.main.Main;
-import java.io.IOException;
 
 /**
  * A <code>TypeNode</code> represents the syntactic representation of a
