@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import polyglot.ast.*;
 import polyglot.frontend.Job;
 import polyglot.types.*;
+import polyglot.util.Position;
 
 /**
  * Visitor which checks that all local variables must be defined before use, 
@@ -13,6 +14,15 @@ import polyglot.types.*;
  * 
  * The checking of the rules is implemented in the methods leaveCall(Node)
  * and check(FlowGraph, Term, Item, Item).
+ * 
+ * If language extensions have new constructs that use local variables, they can
+ * override the method <code>checkOther</code> to check that the uses of these
+ * local variables are correctly initialized. (The implementation of the method will
+ * probably call checkLocalInstanceInit to see if the local used is initialized).
+ * 
+ * If language extensions have new constructs that assign to local variables,
+ * they can override the method <code>flowOther</code> to capture the way 
+ * the new construct's initialization behavior.
  * 
  */
 public class InitChecker extends DataFlow
@@ -210,7 +220,7 @@ public class InitChecker extends DataFlow
      * 
      * This class is immutable.
      */
-    static class DataFlowItem extends Item {
+    protected static class DataFlowItem extends Item {
         Map initStatus; // map of VarInstances to MinMaxInitCount
 
         DataFlowItem(Map m) {
@@ -589,6 +599,9 @@ public class InitChecker extends DataFlow
             if (falseItem == null) falseItem = inDFItem;
             ret = flowBooleanConditions(trueItem, falseItem, inDFItem, graph, (Expr)n, succEdgeKeys);                        
         } 
+        else {
+            ret = flowOther(inDFItem, graph, n, succEdgeKeys);
+        }
         if (ret != null) {
             return ret;
         }
@@ -721,6 +734,13 @@ public class InitChecker extends DataFlow
     }
     
     /**
+     * Allow subclasses to override if necessary.
+     */
+    protected Map flowOther(DataFlowItem inItem, FlowGraph graph, Node n, Set succEdgeKeys) {
+        return null;
+    }
+    
+    /**
      * Determine if we are interested in this field on the basis of the
      * target of the field. To wit, if the field
      * is static, then the target of the field must be the current class; if
@@ -784,17 +804,10 @@ public class InitChecker extends DataFlow
             checkFieldAssign(graph, (FieldAssign)n, dfIn, dfOut);
         }
         else if (n instanceof ClassBody) {
-            // we need to check that the locals used inside this class body
-            // have all been defined at this point.
-            Set localsUsed = (Set)currCBI.localsUsedInClassBodies.get(n);
-            
-            if (localsUsed != null) {
-                checkLocalsUsedByInnerClass(graph, 
-                                            (ClassBody)n, 
-                                            localsUsed,
-                                            dfIn, 
-                                            dfOut);
-            }            
+            checkClassBody(graph, (ClassBody)n, dfIn, dfOut);
+        }
+        else {
+            checkOther(graph, n, dfIn, dfOut);            
         }
         
         if (n == graph.finishNode()) {            
@@ -922,6 +935,19 @@ public class InitChecker extends DataFlow
             }
         }
     }
+    
+    protected void checkLocalInstanceInit(LocalInstance li, 
+                                          DataFlowItem dfIn, 
+                                          Position pos) 
+    throws SemanticException {
+        MinMaxInitCount initCount = (MinMaxInitCount)dfIn.initStatus.get(li);         
+        if (initCount != null && InitCount.ZERO.equals(initCount.getMin())) {
+            // the local variable may not have been initialized. 
+            throw new SemanticException("Local variable \"" + li.name() +
+                                        "\" may not have been initialized",
+                                        pos);
+	}
+    }
         
     /**
      * Check that the assignment to a local variable is correct.
@@ -986,6 +1012,30 @@ public class InitChecker extends DataFlow
             }
         }                        
     }
+    /**
+     * Check that the set of <code>LocalInstance</code>s 
+     * <code>localsUsed</code>, which is the set of locals used in the inner 
+     * class declared by <code>cb</code>
+     * are initialized before the class declaration.
+     * @throws SemanticException
+     */
+    protected void checkClassBody(FlowGraph graph, 
+                                  ClassBody cb, 
+                                  DataFlowItem dfIn, 
+                                  DataFlowItem dfOut) 
+    throws SemanticException {  
+        // we need to check that the locals used inside this class body
+        // have all been defined at this point.
+        Set localsUsed = (Set)currCBI.localsUsedInClassBodies.get(cb);
+    
+        if (localsUsed != null) {
+            checkLocalsUsedByInnerClass(graph, 
+                                        cb, 
+                                        localsUsed,
+                                        dfIn, 
+                                        dfOut);
+        }
+    }            
     
     /**
      * Check that the set of <code>LocalInstance</code>s 
@@ -1023,5 +1073,13 @@ public class InitChecker extends DataFlow
         }
     }
 
-    
+    /**
+     * Allow subclasses to override the checking of other nodes, if needed.
+     */
+    protected void checkOther(FlowGraph graph, 
+                              Node n, 
+                              DataFlowItem dfIn, 
+                              DataFlowItem dfOut) 
+    throws SemanticException {
+    }    
 }
