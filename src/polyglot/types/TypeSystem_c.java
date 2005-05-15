@@ -869,16 +869,16 @@ public class TypeSystem_c implements TypeSystem
         assert_(container);
         assert_(argTypes);
         
-	List acceptable = findAcceptableMethods(container, name, argTypes, currClass);
-
-	if (acceptable.size() == 0) {
-	    throw new NoMemberException(NoMemberException.METHOD,
-		"No valid method call found for " + name +
-		"(" + listToString(argTypes) + ")" +
-		" in " +
-		container + ".");
-	}
-
+        List acceptable = findAcceptableMethods(container, name, argTypes, currClass);
+        
+        if (acceptable.size() == 0) {
+            throw new NoMemberException(NoMemberException.METHOD,
+                                        "No valid method call found for " + name +
+                                        "(" + listToString(argTypes) + ")" +
+                                        " in " +
+                                        container + ".");
+        }
+    
 	MethodInstance mi = (MethodInstance)
 	    findProcedure(acceptable, container, argTypes, currClass);
 
@@ -978,7 +978,7 @@ public class TypeSystem_c implements TypeSystem
 	    return -1;
 	}
     }
-
+    
     /**
      * Populates the list acceptable with those MethodInstances which are
      * Applicable and Accessible as defined by JLS 15.11.2.1
@@ -989,7 +989,9 @@ public class TypeSystem_c implements TypeSystem
 
         assert_(container);
         assert_(argTypes);
-
+        
+        SemanticException error = null;
+        
         // The list of acceptable methods. These methods are accessible from
         // currClass, the method call is valid, and they are not overridden
         // by an unacceptable method (which can occur with protected methods
@@ -1029,6 +1031,10 @@ public class TypeSystem_c implements TypeSystem
 
 		if (Report.should_report(Report.types, 3))
 		    Report.report(3, "Trying " + mi);
+        
+		if (! mi.name().equals(name)) {
+		    continue;
+		}
 
                 if (methodCallValid(mi, name, argTypes)) {
                     if (isAccessible(mi, currClass)) {
@@ -1043,8 +1049,23 @@ public class TypeSystem_c implements TypeSystem
                         // method call is valid, but the method is
                         // unacceptable.
                         unacceptable.add(mi);
+                        if (error == null) {
+                            error = new NoMemberException(NoMemberException.METHOD,
+                                                          "Method " + mi.signature() +
+                                                          " in " + container +
+                                                          " is inaccessible."); 
+                        }
                     }
 		}
+                else {
+                    if (error == null) {
+                        error = new NoMemberException(NoMemberException.METHOD,
+                                                      "Method " + mi.signature() +
+                                                      " in " + container +
+                                                      " cannot be called with arguments " +
+                                                      "(" + listToString(argTypes) + ")."); 
+                    }
+                }
             }
             if (type.toReference().superType() != null) {
                 typeQueue.addLast(type.toReference().superType());
@@ -1053,6 +1074,18 @@ public class TypeSystem_c implements TypeSystem
             typeQueue.addAll(type.toReference().interfaces());
         }
 
+	if (error == null) {
+	    error = new NoMemberException(NoMemberException.METHOD,
+	                                  "No valid method call found for " + name +
+	                                  "(" + listToString(argTypes) + ")" +
+	                                  " in " +
+	                                  container + ".");
+	}
+
+	if (acceptable.size() == 0) {
+	    throw error;
+	}
+
         // remove any method in acceptable that are overridden by an
         // unacceptable
         // method.
@@ -1060,7 +1093,11 @@ public class TypeSystem_c implements TypeSystem
             MethodInstance mi = (MethodInstance)i.next();
             acceptable.removeAll(mi.overrides());
         }
-
+        
+        if (acceptable.size() == 0) {
+            throw error;
+        }
+        
         return acceptable;
     }
 
