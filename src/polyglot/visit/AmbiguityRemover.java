@@ -2,9 +2,7 @@ package polyglot.visit;
 
 import java.util.Collection;
 
-import polyglot.ast.Ambiguous;
-import polyglot.ast.Node;
-import polyglot.ast.NodeFactory;
+import polyglot.ast.*;
 import polyglot.frontend.Job;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
@@ -116,4 +114,34 @@ public class AmbiguityRemover extends DisambiguationDriver
                                         "Node.disambiguateOverride(Node, AmbiguityRemover).");
     }
   
+    public boolean isASTDisambiguated(Node n) {
+        return isASTDisambiguated_(n);
+    }
+    
+    public static boolean isASTDisambiguated_(Node n) {
+        final boolean[] allOk = new boolean[] { true };
+        
+        n.visit(new NodeVisitor() {
+            public Node override(Node parent, Node n) {
+                if (! allOk[0]) {
+                    return n;
+                }
+                
+                // Don't check if New is disambiguated; this is handled
+                // during type-checking.
+                if (n instanceof New) {
+                    return n;
+                }
+
+                if (! n.isDisambiguated()) {
+                    allOk[0] = false;
+                    return n;
+                }
+                
+                return null;
+            }
+        });
+        
+        return allOk[0];
+    }
 }

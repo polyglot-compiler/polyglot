@@ -77,32 +77,7 @@ public class Disambiguated extends SourceFileGoal {
         */
         
         // Now look for ambiguities in the AST.
-        final boolean[] allOk = new boolean[] { true };
-        
-        job().ast().visit(new NodeVisitor() {
-            public Node override(Node parent, Node n) {
-                if (! allOk[0]) {
-                    return n;
-                }
-                
-                // Don't check if New is disambiguated; this is handled
-                // during type-checking.
-                if (n instanceof New) {
-                    return n;
-                }
-
-                if (! n.isDisambiguated()) {
-                    if (Report.should_report(TOPICS, 3))
-                        Report.report(3, "  not ok at " + n);
-                    allOk[0] = false;
-                    return n;
-                }
-                
-                return null;
-            }
-        });
-        
-        if (allOk[0]) {
+        if (AmbiguityRemover.isASTDisambiguated_(job.ast())) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "  ok");
             this.reached = true;
