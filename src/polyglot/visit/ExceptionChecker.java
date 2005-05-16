@@ -25,7 +25,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
     public ExceptionChecker push() {
         ExceptionChecker ec = (ExceptionChecker) this.visitChildren();
         ec.outer = this;
-        ec.exceptionPositions = new HashMap();
+        ec.exceptionPositions = this.exceptionPositions;
         return ec;
     }
 
