@@ -206,16 +206,25 @@ public class SourceFileTest extends AbstractTest {
             args.add(s);                        
         }
 
+        char pathSep = File.pathSeparatorChar;            
         if ((s = Main.options.extraArgs) != null) {
             sa = breakString(Main.options.extraArgs);
             for (int i = 0; i < sa.length; i++) {
-                args.add(sa[i]);
+                String sas = sa[i];
+                if (pathSep != ':' && sas.indexOf(':') >= 0) {
+                    sas = replacePathSep(sas, pathSep);
+                }
+                args.add(sas);
             }
         }
 
         if ((sa = getExtraCmdLineArgs()) != null) {
             for (int i = 0; i < sa.length; i++) {
-                args.add(sa[i]);
+                String sas = sa[i];
+                if (pathSep != ':' && sas.indexOf(':') >= 0) {
+                    sas = replacePathSep(sas, pathSep);
+                }
+                args.add(sas);
             }
         }
         
@@ -224,6 +233,31 @@ public class SourceFileTest extends AbstractTest {
         return (String[])args.toArray(new String[0]);
     }
         
+    /**
+     * @param sas
+     * @param pathSep
+     * @return
+     */
+    private String replacePathSep(String sas, char pathSep) {
+        // replace path separater ':' with appropriate 
+        // system specific one
+        StringBuffer sb = new StringBuffer();
+        for (int j = 0; j < sas.length(); j++) {
+            if (sas.charAt(j) == '\\' && (j+1) < sas.length() && sas.charAt(j+1) == ':') {
+                // escaped ':'
+                j++;
+                sb.append(':');
+            }
+            else if (sas.charAt(j) == ':') {
+                sb.append(pathSep);
+            }
+            else {
+                sb.append(sas.charAt(j));
+            }
+        }
+        return sb.toString();
+    }
+
     protected String getExtensionClassname() {
         return extensionClassname;
     }
