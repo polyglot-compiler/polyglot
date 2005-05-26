@@ -1,8 +1,5 @@
 /*
- * Created on Mar 13, 2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * Created on May 16, 2005
  */
 package polyglot.visit;
 
@@ -16,20 +13,19 @@ import java.util.*;
 /**
  * @author nystrom
  *
- * This class translates inner classes to static nested classes with a field referring to the enclosing 
- * instance. It will also add constructors to the nested classes.
- * 
+ * This class translates local classes and anonymous classes to member classes.
+ * It adds fields to the classes for each local variable in the enclosing method
+ * that is used in the class body.
  */
-
 public class LocalClassRemover extends ContextVisitor
 {
     List unclaimedDecls;
-    Map liMap;
+    Map envMap;
     int[] count;
     
     public LocalClassRemover(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
-        liMap = new HashMap();
+        envMap = new HashMap();
         unclaimedDecls = new ArrayList();
         count = new int[1];
     }
@@ -305,7 +301,7 @@ public class LocalClassRemover extends ContextVisitor
     List env(ClassType ct) {
         if (ct != null) {
             List superEnv = env((ClassType) ct.superType());
-            List env = (List) liMap.get(ct);
+            List env = (List) envMap.get(ct);
             if (env == null || env.isEmpty()) {
                 return superEnv;
             }
@@ -446,7 +442,7 @@ public class LocalClassRemover extends ContextVisitor
         List members = new ArrayList(body.members());
 
         List env = computeClosure(body, context);
-        liMap.put(ct, env);
+        envMap.put(ct, env);
         env = env(ct);
 
         Map m = new HashMap();
