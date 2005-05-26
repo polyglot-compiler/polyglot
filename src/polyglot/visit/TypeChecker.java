@@ -19,7 +19,7 @@ public class TypeChecker extends DisambiguationDriver
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, ">> " + this + "::override " + n);
             
-            Node m = n.typeCheckOverride(parent, this);
+            Node m = n.del().typeCheckOverride(parent, this);
             
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, "<< " + this + "::override " + n + " -> " + m);
