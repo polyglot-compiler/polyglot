@@ -3,6 +3,7 @@ package polyglot.ext.jl.ast;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.Position;
+import polyglot.util.InternalCompilerError;
 import polyglot.visit.ContextVisitor;
 
 /**
@@ -139,6 +140,9 @@ public class Disamb_c implements Disamb
                 Named n = c.find(name);
                 if (n instanceof Type) {
                     Type type = (Type) n;
+                    if (! type.isCanonical()) {
+                        throw new InternalCompilerError("Found an ambiguous type in the context: " + type, pos);
+                    }
                     return nf.CanonicalTypeNode(pos, type);
                 }
             } catch (NoClassException e) {
