@@ -949,7 +949,7 @@ public class TypeSystem_c implements TypeSystem
 	while (i.hasNext()) {
 	    ProcedureInstance p = (ProcedureInstance) i.next();
 
-	    if (msc.compare(maximal, p) > 0) {
+	    if (msc.compare(maximal, p) >= 0) {
 	        return null;
 	    }
 	}
@@ -1112,6 +1112,8 @@ public class TypeSystem_c implements TypeSystem
     {
         assert_(container);
         assert_(argTypes);
+        
+        SemanticException error = null;
 
 	List acceptable = new ArrayList();
 
@@ -1125,12 +1127,40 @@ public class TypeSystem_c implements TypeSystem
 
 	    if (Report.should_report(Report.types, 3))
 		Report.report(3, "Trying " + ci);
-
-	    if (callValid(ci, argTypes) && isAccessible(ci, currClass)) {
-		if (Report.should_report(Report.types, 3))
-		    Report.report(3, "->acceptable: " + ci);
-		acceptable.add(ci);
+	    
+	    if (callValid(ci, argTypes)) {
+	        if (isAccessible(ci, currClass)) {
+	            if (Report.should_report(Report.types, 3))
+	                Report.report(3, "->acceptable: " + ci);
+	            acceptable.add(ci);
+	        }
+	        else {
+	            if (error == null) {
+	                error = new NoMemberException(NoMemberException.CONSTRUCTOR,
+	                                              "Constructor " + ci.signature() +
+	                                              " is inaccessible."); 
+	            }
+	        }
 	    }
+	    else {
+	        if (error == null) {
+                    error = new NoMemberException(NoMemberException.CONSTRUCTOR,
+                                                  "Constructor " + ci.signature() +
+                                                  " cannot be invoked with arguments " +
+                                                  "(" + listToString(argTypes) + ")."); 
+      
+	        }
+	    }
+	}
+
+	if (acceptable.size() == 0) {
+	    if (error == null) {
+	        error = new NoMemberException(NoMemberException.CONSTRUCTOR,
+	                                      "No valid constructor found for " + container +
+	                                      "(" + listToString(argTypes) + ").");
+	    }
+	
+	    throw error;
 	}
 
 	return acceptable;
