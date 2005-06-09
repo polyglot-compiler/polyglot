@@ -119,6 +119,8 @@ public class AmbiguityRemover extends DisambiguationDriver
     }
     
     public static boolean isASTDisambiguated_(Node n) {
+        final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend, "disam-check" });
+
         final boolean[] allOk = new boolean[] { true };
         
         n.visit(new NodeVisitor() {
@@ -134,6 +136,8 @@ public class AmbiguityRemover extends DisambiguationDriver
                 }
 
                 if (! n.isDisambiguated()) {
+                    if (Report.should_report(TOPICS, 3))
+                        Report.report(3, "  not ok at " + n + " (" + n.getClass().getName() + ")");
                     allOk[0] = false;
                     return n;
                 }

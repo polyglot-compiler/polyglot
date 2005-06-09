@@ -35,6 +35,9 @@ public class ConstantsCheckedForFile extends SourceFileGoal {
     }
 
     public boolean hasBeenReached() {
+        final Collection TOPICS = new ArrayList(ConstantsCheckedForFile.TOPICS);
+        TOPICS.add("const-check");
+    
         if (Report.should_report(TOPICS, 3))
             Report.report(3, "checking " + this);
 
@@ -83,7 +86,7 @@ public class ConstantsCheckedForFile extends SourceFileGoal {
                 
                 if (!allOk[0]) {
                     if (Report.should_report(TOPICS, 3))
-                        Report.report(3, "  not ok at " + n);
+                        Report.report(3, "  not ok at " + n + " (" + n.getClass().getName() + ")");
                 }
                 
                 return allOk[0] ? null : n;
