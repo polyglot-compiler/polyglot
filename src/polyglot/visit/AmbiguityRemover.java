@@ -1,5 +1,6 @@
 package polyglot.visit;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import polyglot.ast.*;
