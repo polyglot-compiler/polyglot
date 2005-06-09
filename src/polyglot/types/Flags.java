@@ -13,14 +13,29 @@ import java.util.*;
  */
 public class Flags implements Serializable
 {
-    /** List of all flag bits in order in which they should be printed. */
-    static final int[] print_order = new int[64];
-    static int next_bit = 0;
+    protected Set flags;
 
-    /** Names of 1-bit flags indexed by flag bit. */
-    static final String[] flag_names = new String[64];
+    protected static class FlagComparator implements Comparator {
+        protected static List order = new ArrayList(
+            Arrays.asList(new String[] {
+                "public", "private", "protected", "static", "final",
+                "synchronized", "transient", "native", "interface",
+                "abstract", "volatile", "strictfp"
+            }));
 
-    public static final Flags NONE         = new Flags(0);
+        public int compare(Object o1, Object o2) {
+            if (o1.equals(o2)) return 0;
+
+            for (int i = 0; i < order.size(); i++) {
+                if (o1.equals(order.get(i))) return -1;
+                if (o2.equals(order.get(i))) return 1;
+            }
+
+            return ((String) o1).compareTo(o2);
+        }
+    }
+
+    public static final Flags NONE         = new Flags();
     public static final Flags PUBLIC       = createFlag("public", null);
     public static final Flags PRIVATE      = createFlag("private", null);
     public static final Flags PROTECTED    = createFlag("protected", null);
@@ -37,9 +52,6 @@ public class Flags implements Serializable
     /** All access flags. */
     protected static final Flags ACCESS_FLAGS = PUBLIC.set(PRIVATE).set(PROTECTED);
 
-    /** Bit set use to implement a flag set. */
-    protected long bits;
-
     /**
      * Return a new Flags object with a new name.  Should be called only once
      * per name.
@@ -50,75 +62,95 @@ public class Flags implements Serializable
      *        if we should print at the end.
      */
     public static Flags createFlag(String name, Flags after) {
-        if (next_bit >= flag_names.length)
-            throw new InternalCompilerError("too many flags");
-        if (print_order[next_bit] != 0)
-            throw new InternalCompilerError("print_order and next_bit " +
-                                            "inconsistent");
-        if (flag_names[next_bit] != null)
-            throw new InternalCompilerError("flag_names and next_bit " +
-                                            "inconsistent");
-
-        int bit = next_bit++;
-        flag_names[bit] = name;
+        List order = FlagComparator.order;
+        boolean added = false;
 
         if (after == null) {
-            print_order[bit] = bit;
+            order.add(name);
+        }
+        else if (after.flags.isEmpty()) {
+            order.add(0, name);
         }
         else {
-            for (int i = bit; i > 0; i--) {
-                if ((after.bits & print_order[i]) != 0)
+            for (ListIterator i = order.listIterator(); i.hasNext(); ) {
+                String s = (String) i.next();
+                after = after.clear(new Flags(s));
+                if (after.flags.isEmpty()) {
+                    i.add(name);
+                    added = true;
                     break;
+                }
+            }
 
-                // shift up and fill in the gap with f
-                print_order[i] = print_order[i-1];
-                print_order[i-1] = bit;
+            if (! added) {
+                // shouldn't happen
+                order.add(name);
             }
         }
 
-        return new Flags(1L << bit);
+        return new Flags(name);
     }
 
     /**
      * Effects: returns a new accessflags object with no accessflags set.
      */
-    protected Flags(long bits) {
-        this.bits = bits;
+    protected Flags() {
+        this.flags = new TreeSet();
+    }
+
+    protected Flags(String name) {
+        this();
+        flags.add(name);
     }
 
     /**
      * Create new flags with the flags in <code>other</code> also set.
      */
     public Flags set(Flags other) {
-        return new Flags(bits | other.bits);
+        Flags f = new Flags();
+        f.flags.addAll(this.flags);
+        f.flags.addAll(other.flags);
+        return f;
     }
 
     /**
      * Create new flags with the flags in <code>other</code> cleared.
      */
     public Flags clear(Flags other) {
-        return new Flags(bits & ~other.bits);
+        Flags f = new Flags();
+        f.flags.addAll(this.flags);
+        f.flags.removeAll(other.flags);
+        return f;
     }
 
     /**
      * Create new flags with only flags in <code>other</code> set.
      */
     public Flags retain(Flags other) {
-        return new Flags(bits & other.bits);
+        Flags f = new Flags();
+        f.flags.addAll(this.flags);
+        f.flags.retainAll(other.flags);
+        return f;
     }
 
     /**
      * Check if <i>any</i> flags in <code>other</code> are set.
      */
     public boolean intersects(Flags other) {
-        return (bits & other.bits) != 0;
+        for (Iterator i = this.flags.iterator(); i.hasNext(); ) {
+            String name = (String) i.next();
+            if (other.flags.contains(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
      * Check if <i>all</i> flags in <code>other</code> are set.
      */
     public boolean contains(Flags other) {
-        return (bits & other.bits) == other.bits;
+        return this.flags.containsAll(other.flags);
     }
 
     /**
@@ -444,22 +476,21 @@ public class Flags implements Serializable
     public String translate() {
         StringBuffer sb = new StringBuffer();
 
-        for (int i = 0; i < next_bit; i++) {
-            int bit = print_order[i];
-            if ((bits & (1L << bit)) != 0) {
-                sb.append(flag_names[bit]);
-                sb.append(" ");
-            }
+        for (Iterator i = this.flags.iterator(); i.hasNext(); ) {
+            String s = (String) i.next();
+
+            sb.append(s);
+            sb.append(" ");
         }
 
         return sb.toString();
     }
 
     public int hashCode() {
-        return (int) (bits >> 32 | bits) * 37;
+        return flags.hashCode();
     }
 
     public boolean equals(Object o) {
-	return o instanceof Flags && bits == ((Flags) o).bits;
+	return o instanceof Flags && flags.equals(((Flags) o).flags);
     }
 }
