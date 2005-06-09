@@ -50,9 +50,9 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     /** Get the container class if a member class. */
     public ReferenceType container() {
         if (! isMember())
-            throw new InternalCompilerError("Non-member classes cannot have container classes.");
+            throw new InternalCompilerError("Non-member class " + this + " cannot have container classes.");
         if (outer() == null)
-            throw new InternalCompilerError("Nested classes must have outer classes.");
+            throw new InternalCompilerError("Nested class " + this + " must have an outer class.");
         return outer();
     }
 
@@ -252,8 +252,8 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 	if (! toType.isReference()) return false;
 
 	if (toType.isArray()) {
-	    // Ancestor is not an array, but child is.  Check if the array
-	    // is a subtype of the ancestor.  This happens when ancestor
+	    // From type is not an array, but to type is.  Check if the array
+	    // is a subtype of the from type.  This happens when from type
 	    // is java.lang.Object.
 	    return ts.isSubtype(toType, this);
 	}
