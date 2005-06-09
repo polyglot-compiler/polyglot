@@ -3,6 +3,7 @@ package polyglot.ext.jl.types;
 import polyglot.frontend.*;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.FieldConstantsChecked;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
 import polyglot.util.*;
 
@@ -15,12 +16,12 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
 
     /** Used for deserializing types. */
     protected FieldInstance_c() { }
-
+    
     public FieldInstance_c(TypeSystem ts, Position pos,
 			   ReferenceType container,
 	                   Flags flags, Type type, String name) {
         super(ts, pos, flags, type, name);
-	this.container = container;
+        this.container = container;
     }
 
     public ReferenceType container() {
@@ -31,7 +32,12 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
         if (! constantValueSet) {
             Scheduler scheduler = typeSystem().extensionInfo().scheduler();
             try {
-                scheduler.addPrerequisiteDependency(scheduler.currentGoal(), scheduler.FieldConstantsChecked(this));
+                Goal g = scheduler.FieldConstantsChecked(this);
+                if (container instanceof ParsedTypeObject) {
+                    Job job = ((ParsedTypeObject) container).job();
+                    scheduler.addPrerequisiteDependency(g, scheduler.TypeChecked(job));
+                }
+                scheduler.addPrerequisiteDependency(scheduler.currentGoal(), g);
             }
             catch (CyclicDependencyException e) {
                 setNotConstant();
