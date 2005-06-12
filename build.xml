@@ -262,6 +262,50 @@ ext=""
     </condition>
   </target>
 
+  <!-- Build an Ibex parser based on parameters supplied to the target.
+       @param parser.dir    The directory, relative to $basedir, in which
+                            the Ibex file is located.
+       @param ppg.file      The name of the Ibex file.
+       @param cup.file      The name of the CUP file to output.
+   -->
+  <target name="ibex-parser" depends="ibex-parser-deps" 
+          unless="ibex.parser.up-to-date">
+    <java classname="polyglot.main.Main"
+          fork="true"
+          failonerror="true">
+      <classpath refid="standard.classpath"/>
+      <arg line="-c"/>
+      <arg line="-classpath ${classes}"/>
+      <arg line="-sourcepath ${src}"/>
+      <arg line="-d ${src}"/>
+      <arg line="-ext ibex"/>
+      <arg line="-nomergecheck"/>
+      <arg line="-report dump-lr=1"/>
+      <arg line="-report ibex=1"/>
+      <arg line="${parser.dir}/${ibex.file}"/>
+    </java>
+  </target>
+
+  <!-- Set the property ibex.parser.up-to-date if the parser is in fact
+       up to date.  Called by the ibex-parser target.
+   -->
+  <target name="ibex-parser-deps">
+    <dependset>
+      <srcfileset dir="${parser.dir}">
+        <include name="${ibex.file}"/>
+        <include name="${base.parser}"/>
+      </srcfileset>
+      <targetfileset dir="${parser.dir}">
+        <include name="${parser.class}.java"/>
+      </targetfileset>
+    </dependset>
+    <condition property="ibex.parser.up-to-date">
+      <and>
+        <available file="${parser.dir}/${parser.class}.java"/>
+      </and>
+    </condition>
+  </target>
+
   <!-- Build a CUP parser based on parameters supplied to the target.
        @param parser.dir    The directory, relative to $basedir, in which
                             the CUP file is located.
@@ -426,6 +470,19 @@ ext=""
     </antcall>
   </target>
 
+  <!-- Build the Ibex parser for an extension, assuming that
+       it is located in the standard place and named
+       the standard name that we usually use.
+       @param ext    The extension name.
+   -->
+  <target name="standard-ext-ibex-parser">
+    <antcall target="ibex-parser">
+      <param name="parser.dir" value="${src}/polyglot/ext/${ext}/parse"/>
+      <param name="ibex.file" value="JavaParser.ibex"/>
+      <param name="parser.class" value="JavaParser"/>
+    </antcall>
+  </target>
+
   <!-- Build the CUP parser for an extension, assuming that
        it is located in the standard place and named
        the standard name that we usually use.
@@ -472,18 +529,35 @@ ext=""
     <antcall target="compile-ext-qq-dep"/>
   </target>
 
-  <!-- SKEL: When using the newext script, copy and modify this target by
-       replacing the name "ibex" with the new extension name. -->
+  <target name="ji" depends="jl,ibex">
+    <antcall target="standard-ext">
+      <param name="ext" value="ji"/>
+      <param name="parser.type" value="ibex"/>
+    </antcall>
+  </target>
+
+  <target name="jxi" depends="jx,ji">
+    <antcall target="standard-ext">
+      <param name="ext" value="jxi"/>
+      <param name="parser.type" value="ibex"/>
+    </antcall>
+  </target>
+
   <target name="ibex" depends="jl">
     <antcall target="standard-ext">
       <param name="ext" value="ibex"/>
       <param name="parser.type" value="ppg"/>
       <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
     </antcall>
+    <antcall target="ibex-runtime"/>
   </target>
 
-  <!-- SKEL: When using the newext script, copy and modify this target by
-       replacing the name "ibex" with the new extension name. -->
+  <target name="ibex-runtime">
+    <javac srcdir="${src}/polyglot/ext/ibex/runtime/src" destdir="${classes}" debug="on" includes="ibex/runtime/**">
+      <classpath refid="standard.classpath"/>
+    </javac>
+  </target>
+
   <target name="ibex-jar" depends="ibex">
     <jar jarfile="${lib}/ibex.jar" basedir="${classes}" includes="polyglot/ext/ibex/**"/>
   </target>
