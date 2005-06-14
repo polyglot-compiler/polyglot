@@ -183,7 +183,7 @@ public class TypedList implements List, java.io.Serializable
       throw new UnsupportedOperationException(
 			         "Add to an immutable TypedListIterator");
     
-    if (allowed_type != null && 
+    if (allowed_type != null && o != null &&
 	!allowed_type.isAssignableFrom(o.getClass())) {
       String why = "Tried to add a " + o.getClass().getName() +
 	" to a list of type " + allowed_type.getName();
@@ -198,12 +198,7 @@ public class TypedList implements List, java.io.Serializable
     
     for (Iterator it = coll.iterator(); it.hasNext(); ) {
       Object o = it.next();
-      if (allowed_type != null && 
-	  !allowed_type.isAssignableFrom(o.getClass())) {
-	String why = "Tried to add a " + o.getClass().getName() +
-	  " to a list of type " + allowed_type.getName();
-	throw new UnsupportedOperationException(why);
-      }    
+      tryIns(o);
     }
   }
 
