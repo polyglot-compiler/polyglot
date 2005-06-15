@@ -90,7 +90,7 @@ public class LocalClassRemover extends ContextVisitor
     }
     
     FieldInstance localToField(ParsedClassType ct, LocalInstance li) {
-        FieldInstance fi = ts.fieldInstance(li.position(), ct, li.flags().Private(), li.type(), namePrefix() + li.name());
+        FieldInstance fi = ts.fieldInstance(li.position(), ct, li.flags().Protected(), li.type(), namePrefix() + li.name());
         return fi;
     }
     
