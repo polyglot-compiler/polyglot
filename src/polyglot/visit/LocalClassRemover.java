@@ -43,12 +43,14 @@ public class LocalClassRemover extends ContextVisitor
 
     static class EnvCollector extends ContextVisitor {
         List env;
-        Context c;
+        Context outerContext;
+        Context innerContext;
 
-        EnvCollector(Job job, TypeSystem ts, NodeFactory nf, Context context) {
+        EnvCollector(Job job, TypeSystem ts, NodeFactory nf, Context context, Context innerContext) {
             super(job, ts, nf);
-            env = new ArrayList();
-            c = context;
+            this.env = new ArrayList();
+            this.outerContext = context;
+            this.innerContext = innerContext;
         }
 
         List env() {
@@ -57,15 +59,47 @@ public class LocalClassRemover extends ContextVisitor
 
         public NodeVisitor begin() {
             ContextVisitor v = (ContextVisitor) super.begin();
-            v.context = c;
+            v.context = innerContext;
             return v;
         }
+        
+        /*
+        public Node override(Node parent, Node n) {
+            if (n instanceof LocalClassDecl) {
+                return n;
+            }
+            if (parent instanceof New && n instanceof ClassBody) {
+                return n;
+            }
+            return super.override(n);
+        }
+        */
 
         public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
             if (n instanceof Local) {
                 Local local = (Local) n;
+                System.out.println("checking " + n + "\nin " + context + "\nin " + outerContext);
+                
+                // The variable should be in the environment if it's not in the local
+                // scope here, but is in the local scope of outerContext.
                 if (! context.isLocal(local.name())) {
-                    env.add(local.localInstance());
+                    try {
+                        LocalInstance li = outerContext.findLocal(local.name());
+                        // found!
+                        System.out.println("  found " + li);
+                        if (outerContext.isLocal(local.name())) {
+                            // and not local to the outer context too
+                        System.out.println("  defined in enclosing method: " + n);
+                            env.add(local.localInstance());
+                        }
+                    }
+                    catch (SemanticException e) {
+                        System.out.println("  not in scope of enclosing method: " + n);
+                        // The local was defined somewhere within the class body.
+                    }
+                }
+                else {
+                    System.out.println("  is local to the inner scope " + n);
                 }
             }
 
@@ -73,11 +107,23 @@ public class LocalClassRemover extends ContextVisitor
         }
     }
     
-    List computeClosure(ClassBody body, Context context) {
-        EnvCollector v = new EnvCollector(job, ts, nf, context);
+    List computeClosure(ClassBody body, Context context, Context innerContext) {
+        EnvCollector v = new EnvCollector(job, ts, nf, context, innerContext);
         v = (EnvCollector) v.begin();
         body.visit(v);
         v.finish();
+        
+        System.out.println("env of ");
+        try {
+            CodeWriter cw = new CodeWriter(System.out, 72);
+            cw.begin(4);
+            body.del().prettyPrint(cw, new PrettyPrinter());
+            cw.end();
+            cw.flush();
+        }
+        catch (java.io.IOException e) { }
+        System.out.println(" = " + v.env());
+
         return v.env();
     }
     
@@ -100,21 +146,36 @@ public class LocalClassRemover extends ContextVisitor
         return fd;
     }
     
-    class ClassBodyTranslator extends NodeVisitor { 
+    class ClassBodyTranslator extends ContextVisitor { 
         ParsedClassType ct;
-        Map m;
+        Map fieldMap;
+        Context outerContext;
         
-        ClassBodyTranslator(ParsedClassType ct, Map m) {
+        ClassBodyTranslator(ParsedClassType ct, Map fieldMap, Job job, TypeSystem ts, NodeFactory nf, Context context) {
+            super(job, ts, nf);
             this.ct = ct;
-            this.m = m;
+            this.fieldMap = fieldMap;
+            this.outerContext = context;
         }
-        
-        public Node leave(Node old, Node n, NodeVisitor v) {
+       
+        public NodeVisitor begin() {
+            ContextVisitor v = (ContextVisitor) super.begin();
+            v.context = outerContext;
+            return v;
+        } 
+   
+        public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
             if (n instanceof Local) {
                 Local l = (Local) n;
-                FieldInstance fi = (FieldInstance) m.get(new IdentityKey(l.localInstance()));
+                FieldInstance fi = (FieldInstance) fieldMap.get(new IdentityKey(l.localInstance()));
                 if (fi != null) {
-                    Special this_ = nf.Special(l.position(), Special.THIS);
+                    Special this_;
+                    if (ct.equals(context.currentClass())) {
+                        this_ = nf.Special(l.position(), Special.THIS);
+                    }
+                    else {
+                        this_ = nf.Special(l.position(), Special.THIS, nf.CanonicalTypeNode(l.position(), ct));
+                    }
                     this_ = (Special) this_.type(ct);
                     Field f = nf.Field(l.position(), this_, fi.name());
                     f = f.fieldInstance(fi);
@@ -127,11 +188,11 @@ public class LocalClassRemover extends ContextVisitor
                 ClassType ct2 = (ClassType)
                     ctd.constructorInstance().container();
                 if (ct2.equals(ct)) {
-                    ctd = translateConstructorDecl(ct, ctd, m);
+                    ctd = translateConstructorDecl(ct, ctd, fieldMap);
                 }
                 n = ctd;
             }
-            return super.leave(old, n, v);
+            return super.leaveCall(old, n, v);
         }
     }
     
@@ -335,7 +396,7 @@ public class LocalClassRemover extends ContextVisitor
     List env(ClassType ct) {
         if (ct != null) {
             List superEnv = env((ClassType) ct.superType());
-            List env = envMap(ct);
+            List env = (List) envMap.get(ct);
             if (env == null || env.isEmpty()) {
                 return superEnv;
             }
@@ -349,10 +410,6 @@ public class LocalClassRemover extends ContextVisitor
             return l;
         }
         return Collections.EMPTY_LIST;
-    }
-    
-    private List envMap(ClassType ct) {
-        return (List) envMap.get(ct);
     }
     
     List envAsFormalTypes(List env) {
@@ -523,7 +580,7 @@ public class LocalClassRemover extends ContextVisitor
             ParsedClassType pct = cd.type();
             ClassBody body = cd.body();
             Context c = cd.enterScope(body, context);
-            List env = computeClosure(body, context);
+            List env = computeClosure(body, context, c);
             envMap.put(pct, env);
         }
         return super.enterCall(n);
@@ -534,12 +591,12 @@ public class LocalClassRemover extends ContextVisitor
 
         List env = env(ct);
 
-        Map m = new HashMap();
+        Map fieldMap = new HashMap();
 
         for (Iterator i = env.iterator(); i.hasNext(); ) {
             LocalInstance li = (LocalInstance) i.next();
             FieldInstance fi = localToField(ct, li);
-            m.put(new IdentityKey(li), fi);
+            fieldMap.put(new IdentityKey(li), fi);
 
             ct.addField(fi);
             members.add(createFieldDecl(fi));
@@ -574,16 +631,20 @@ public class LocalClassRemover extends ContextVisitor
         body = body.members(members);
 
         // Rewrite the class body.
-        ClassBodyTranslator v = new ClassBodyTranslator(ct, m);
+        ClassBodyTranslator v = new ClassBodyTranslator(ct, fieldMap, job, ts, nf, context);
         v = (ClassBodyTranslator) v.begin();
         body = (ClassBody) body.visit(v);
+        v.finish();
 
-//        try {
-//            CodeWriter cw = new CodeWriter(System.out, 72);
-//            body.del().prettyPrint(cw, new PrettyPrinter());
-//            cw.flush();
-//        }
-//        catch (java.io.IOException e) { }
+        System.out.println("----------------------------------");
+        System.out.println("new class body:");
+        try {
+            CodeWriter cw = new CodeWriter(System.out, 72);
+            body.del().prettyPrint(cw, new PrettyPrinter());
+            cw.flush();
+        }
+        catch (java.io.IOException e) { }
+        System.out.println("----------------------------------");
 
         ClassDecl cd = createMemberClass(ct, body);
         cd = cd.type(ct);
