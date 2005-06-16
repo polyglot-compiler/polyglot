@@ -18,7 +18,7 @@ import polyglot.types.TypeSystem;
  */
 public class TypeExists extends AbstractGoal {
     private String typeName;
-    private boolean satisfied;
+    private boolean reached;
     
     public TypeExists(String name) {
         super(null);
@@ -36,11 +36,11 @@ public class TypeExists extends AbstractGoal {
     }
 
     public void markReached() {
-        this.satisfied = true;
+        this.reached = true;
     }
     
-    public boolean hasBeenReached() {
-        return this.satisfied;
+    public int distanceFromGoal() {
+        return this.reached ? 0 : 1;
     }
     
     public int hashCode() {

@@ -17,7 +17,7 @@ public class Parsed extends SourceFileGoal {
         return new ParserPass(extInfo.compiler(), this);
     }
     
-    public boolean hasBeenReached() {
-        return job().ast() != null;
+    public int distanceFromGoal() {
+        return job().ast() != null ? 0 : 1;
     }
 }

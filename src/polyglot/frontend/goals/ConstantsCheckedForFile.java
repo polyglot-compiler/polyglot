@@ -34,7 +34,7 @@ public class ConstantsCheckedForFile extends SourceFileGoal {
         return new ConstantCheckPass(this, new ConstantChecker(job(), ts, nf));
     }
 
-    public boolean hasBeenReached() {
+    public int distanceFromGoal() {
         final Collection TOPICS = new ArrayList(ConstantsCheckedForFile.TOPICS);
         TOPICS.add("const-check");
     
@@ -44,63 +44,61 @@ public class ConstantsCheckedForFile extends SourceFileGoal {
         if (this.reached) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "  ok (cached)");
-            return true;
+            return 0;
         }
         
         if (! hasBeenRun()) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "  not run yet");
-            return false;
+            return Integer.MAX_VALUE;
         }
         
         if (job().ast() == null) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "  null ast for " + job());
-            return false;
+            return Integer.MAX_VALUE;
         }
         
         // Now look for ambiguities in the AST.
-        final boolean[] allOk = new boolean[] { true };
+        final int[] notOkCount = new int[] { 0 };
         
         job().ast().visit(new NodeVisitor() {
             public Node override(Node n) {
-                if (! allOk[0]) {
-                    return n;
-                }
-                
+                boolean ok = true;
                 if (! n.isTypeChecked()) {
                     // We should depend on type checking, so there's no need
                     // to add any new dependencies.
-                    allOk[0] = false;
+                    ok = false;
                 }
                 else if (n instanceof Expr) {
                     if (! ((Expr) n).constantValueSet()) {
-                        allOk[0] = false;
+                        ok = false;
                     }
                 }
                 else if (n instanceof VarInit) {
                     if (! ((VarInit) n).constantValueSet()) {
-                        allOk[0] = false;
+                        ok = false;
                     }
                 }
                 
-                if (!allOk[0]) {
+                if (! ok) {
+                    notOkCount[0]++;
                     if (Report.should_report(TOPICS, 3))
                         Report.report(3, "  not ok at " + n + " (" + n.getClass().getName() + ")");
                 }
-                
-                return allOk[0] ? null : n;
+
+                return null;
             }
         });
         
-        if (allOk[0]) {
+        if (notOkCount[0] == 0) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "  ok");
             this.reached = true;
-            return true;
+            return 0;
         }
         
-        return false;
+        return notOkCount[0];
     }
     
     private static final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend });

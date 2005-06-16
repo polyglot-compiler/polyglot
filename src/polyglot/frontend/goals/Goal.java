@@ -59,8 +59,12 @@ public interface Goal {
     /** Set a flag indicating that this rule is unreachable. */
     public void setUnreachable();
     
-    /** Return true if this goal has been reached. */
+    /** Return true if this goal has been reached.  Equivalent to distanceFromGoal() == 0. */
     public boolean hasBeenReached();
+    
+    /** Return 0 if the goal is reached, > 0 if unreached.  The return value
+     * should monotonically decrease (possibly by 0) with each invocation. */
+    public int distanceFromGoal();
 
     /** Get the job associated with this goal, or null. */
     public Job job();

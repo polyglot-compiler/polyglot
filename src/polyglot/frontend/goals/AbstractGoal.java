@@ -95,7 +95,8 @@ public abstract class AbstractGoal implements Goal {
         subgoals.add(g);
     }
 
-    public abstract boolean hasBeenReached();
+    public abstract int distanceFromGoal();
+    public final boolean hasBeenReached() { return distanceFromGoal() == 0; }
     
     public void setUnreachable() {
         this.reachable = false;

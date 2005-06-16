@@ -60,8 +60,8 @@ public class FieldConstantsChecked extends AbstractGoal {
         return new CheckFieldConstantsPass(extInfo.scheduler(), this);
     }
     
-    public boolean hasBeenReached() {
-        return vi.constantValueSet();
+    public int distanceFromGoal() {
+        return vi.constantValueSet() ? 0 : 1;
     }
     
     public FieldInstance var() {

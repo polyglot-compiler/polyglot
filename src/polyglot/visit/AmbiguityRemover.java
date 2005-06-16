@@ -19,11 +19,27 @@ import polyglot.util.Position;
  */
 public class AmbiguityRemover extends DisambiguationDriver
 {
+    boolean visitSigs;
+    boolean visitBodies;
+    
     public AmbiguityRemover(Job job, TypeSystem ts, NodeFactory nf) {
+        this(job, ts, nf, true, true);
+    }
+    
+    public AmbiguityRemover(Job job, TypeSystem ts, NodeFactory nf, boolean visitSigs, boolean visitBodies) {
         super(job, ts, nf);
+        this.visitSigs = visitSigs;
+        this.visitBodies = visitBodies;
     }
 
     public Node override(Node parent, Node n) {
+        if (! visitSigs && n instanceof ClassMember && ! (n instanceof ClassDecl)) {
+            return n;
+        }
+        if ((! visitBodies || ! visitSigs) && (n instanceof Expr || n instanceof Stmt)) {
+            return n;
+        }
+        
         try {
             if (Report.should_report(Report.visit, 2))
                 Report.report(2, ">> " + this + "::override " + n);
@@ -116,20 +132,16 @@ public class AmbiguityRemover extends DisambiguationDriver
     }
   
     public boolean isASTDisambiguated(Node n) {
-        return isASTDisambiguated_(n);
+        return astAmbiguityCount(n) == 0;
     }
     
-    public static boolean isASTDisambiguated_(Node n) {
+    public static int astAmbiguityCount(Node n) {
         final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend, "disam-check" });
 
-        final boolean[] allOk = new boolean[] { true };
+        final int[] notOkCount = new int[] { 0 };
         
         n.visit(new NodeVisitor() {
             public Node override(Node parent, Node n) {
-                if (! allOk[0]) {
-                    return n;
-                }
-                
                 // Don't check if New is disambiguated; this is handled
                 // during type-checking.
                 if (n instanceof New) {
@@ -139,14 +151,13 @@ public class AmbiguityRemover extends DisambiguationDriver
                 if (! n.isDisambiguated()) {
                     if (Report.should_report(TOPICS, 3))
                         Report.report(3, "  not ok at " + n + " (" + n.getClass().getName() + ")");
-                    allOk[0] = false;
-                    return n;
+                    notOkCount[0]++;
                 }
                 
                 return null;
             }
         });
         
-        return allOk[0];
+        return notOkCount[0];
     }
 }

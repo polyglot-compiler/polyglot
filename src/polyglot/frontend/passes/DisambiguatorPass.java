@@ -25,9 +25,10 @@ public class DisambiguatorPass extends VisitorPass {
 
     public void markGoalReached() {
         AmbiguityRemover v = (AmbiguityRemover) visitor();
-        // Don't mark the goal reached; the pass will be rerun only if necessary
-        // Record that we've run the pass at least once.
-        Scheduler scheduler = v.typeSystem().extensionInfo().scheduler();
-        ((Disambiguated) scheduler.Disambiguated(v.job())).markRun();
+        if (goal instanceof Disambiguated) {
+            // Record that the pass was run, but not that the goal was reached.
+            // The pass will be rerun only if necessary.
+            ((Disambiguated) goal).markRun();
+        }
     }
 }

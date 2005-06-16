@@ -32,8 +32,8 @@ public class MembersAdded extends ClassTypeGoal {
         return new AddMembersPass(extInfo.scheduler(), this);
     }
     
-    public boolean hasBeenReached() {
-        return type().membersAdded();
+    public int distanceFromGoal() {
+        return type().membersAdded() ? 0 : 1;
     }
     
     public boolean equals(Object o) {

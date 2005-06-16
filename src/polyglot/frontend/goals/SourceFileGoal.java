@@ -28,8 +28,8 @@ public abstract class SourceFileGoal extends AbstractGoal {
         this.runOnce = false;
     }
     
-    public boolean hasBeenReached() {
-        return runOnce;
+    public int distanceFromGoal() {
+        return runOnce ? 0 : 1;
     }
     
     public void markRun() {

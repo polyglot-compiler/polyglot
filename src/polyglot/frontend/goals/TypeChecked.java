@@ -32,28 +32,29 @@ public class TypeChecked extends SourceFileGoal {
         return new TypeCheckPass(this, new TypeChecker(job(), ts, nf));
     }
 
-    public boolean hasBeenReached() {
+    public int distanceFromGoal() {
         if (Report.should_report(TOPICS, 3))
             Report.report(3, "checking " + this);
 
         if (this.reached) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "  ok (cached)");
-            return true;
+            return 0;
         }
         
         if (! hasBeenRun()) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "  not run yet");
-            return false;
+            return Integer.MAX_VALUE;
         }
         
         if (job().ast() == null) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "  null ast for " + job());
-            return false;
+            return Integer.MAX_VALUE;
         }
         
+        /*
         // Do a relatively quick test of the types contained in the AST.
         for (Iterator i = job().ast().typesBelow().iterator(); i.hasNext(); ) {
             ParsedClassType ct = (ParsedClassType) i.next();
@@ -65,35 +66,31 @@ public class TypeChecked extends SourceFileGoal {
                 return false;
             }
         }
+*/
         
         // Now look for ambiguities in the AST.
-        final boolean[] allOk = new boolean[] { true };
+        final int[] notOkCount = new int[] { 0 };
         
         job().ast().visit(new NodeVisitor() {
             public Node override(Node n) {
-                if (! allOk[0]) {
-                    return n;
-                }
-                
                 if (! n.isTypeChecked()) {
                     if (Report.should_report(TOPICS, 3))
                         Report.report(3, "  not ok at " + n);
-                    allOk[0] = false;
-                    return n;
+                    notOkCount[0]++;
                 }
                 
                 return null;
             }
         });
         
-        if (allOk[0]) {
+        if (notOkCount[0] == 0) {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "  ok");
             this.reached = true;
-            return true;
+            return 0;
         }
         
-        return false;
+        return notOkCount[0];
     }
     
     private static final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend });

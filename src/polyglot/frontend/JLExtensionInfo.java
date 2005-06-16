@@ -13,6 +13,9 @@ import polyglot.frontend.goals.*;
 import polyglot.types.*;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
+import polyglot.visit.*;
+import polyglot.visit.LocalClassRemover;
+import polyglot.visit.InnerClassRewriter;
 
 /**
  * This is the default <code>ExtensionInfo</code> for the Java language.
@@ -22,20 +25,9 @@ import polyglot.util.InternalCompilerError;
  * <li> parse </li>
  * <li> build-types (TypeBuilder) </li>
  * <hr>
- * <center>GLOBAL BARRIER</center>
- * <hr>
- * <li> clean-super (AmbiguityRemover) </li>
- * <hr>
- * <center>BARRIER</center>
- * <hr>
- * <li> clean-sigs (AmbiguityRemover) </li>
- * <li> add-members (AddMemberVisitor) </li>
- * <hr>
  * <center>BARRIER</center>
  * <hr>
  * <li> disambiguate (AmbiguityRemover) </li>
- * <hr>
- * <center>BARRIER</center>
  * <hr>
  * <li> type checking (TypeChecker) </li>
  * <li> reachable checking (ReachChecker) </li>
@@ -55,7 +47,7 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
 	try {
             LoadedClassResolver lr;
             lr = new SourceClassResolver(compiler, this, getOptions().constructFullClasspath(),
-                                         compiler.loader(), true);
+                                         compiler.loader(), true, getOptions().compile_command_line_only);
             ts.initialize(lr, this);
 	}
 	catch (SemanticException e) {
@@ -129,6 +121,7 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
         l.add(disam);
         l.add(typeCheck);
         l.add(constCheck);
+        
         l.add(reachCheck);
         l.add(excCheck);
         l.add(exitCheck);
@@ -137,6 +130,12 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
         l.add(frefCheck);
         
         l.add(serialize);
+
+        l.add(scheduler.internGoal(new VisitorGoal(job, new LocalClassRemover(job, ts, nf))));
+        l.add(scheduler.internGoal(new VisitorGoal(job, new InnerClassConstructorFixer(job, ts, nf))));
+        l.add(scheduler.internGoal(new VisitorGoal(job, new InnerClassRewriter(job, ts, nf))));
+        l.add(scheduler.internGoal(new VisitorGoal(job, new InnerClassRemover(job, ts, nf))));
+        
         l.add(output);
         
         return l;

@@ -93,6 +93,7 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
     boolean membersAdded();
     boolean supertypesResolved();
     boolean signaturesResolved();
+    int numSignaturesUnresolved();
     void setMembersAdded(boolean flag);
     void setSupertypesResolved(boolean flag);
     void setSignaturesResolved(boolean flag);

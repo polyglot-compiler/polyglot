@@ -31,13 +31,13 @@ public class SignaturesResolved extends ClassTypeGoal {
         if (job() != null) {
             TypeSystem ts = extInfo.typeSystem();
             NodeFactory nf = extInfo.nodeFactory();
-            return new DisambiguatorPass(this, new AmbiguityRemover(job(), ts, nf));
+            return new DisambiguatorPass(this, new AmbiguityRemover(job(), ts, nf, true, false));
         }
         return new DisambiguateSignaturesPass(extInfo.scheduler(), this);
     }
     
-    public boolean hasBeenReached() {
-        return type().signaturesResolved();
+    public int distanceFromGoal() {
+        return type().signaturesResolved() ? 0 : 1;
     }
     
     public boolean equals(Object o) {

@@ -39,8 +39,8 @@ public abstract class Barrier extends AbstractGoal {
     /* (non-Javadoc)
      * @see polyglot.frontend.goals.Goal#reached()
      */
-    public boolean hasBeenReached() {
-        boolean reached = true;
+    public int distanceFromGoal() {
+        int distance = 0;
         
         for (Iterator i = scheduler.jobs().iterator(); i.hasNext(); ) {
             Job job = (Job) i.next();
@@ -48,7 +48,7 @@ public abstract class Barrier extends AbstractGoal {
             if (! scheduler.reached(subgoal)) {
                 try {
                     scheduler.addPrerequisiteDependency(this, subgoal);
-                    reached = false;
+                    distance++;
                 }
                 catch (CyclicDependencyException e) {
                     throw new InternalCompilerError(e.getMessage());
@@ -56,7 +56,7 @@ public abstract class Barrier extends AbstractGoal {
             }
         }
         
-        return reached;
+        return distance;
     }
     
     public abstract Goal goalForJob(Job job); 

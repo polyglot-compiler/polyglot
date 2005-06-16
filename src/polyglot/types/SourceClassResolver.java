@@ -83,24 +83,28 @@ public class SourceClassResolver extends LoadedClassResolver
 {
   Compiler compiler;
   ExtensionInfo ext;
-
+  boolean compileCommandLineOnly;
+  
   /**
    * Create a loaded class resolver.
-   * @param compiler The compiler.
-   * @param ext The extension to load sources for.
-   * @param classpath The class path.
-   * @param loader The class file loader to use.
-   * @param allowRawClasses True if vanilla Java class files without
+ * @param compiler The compiler.
+ * @param ext The extension to load sources for.
+ * @param classpath The class path.
+ * @param loader The class file loader to use.
+ * @param allowRawClasses True if vanilla Java class files without
    *                        Polyglot-embedded type information should be
    *                        allowed.
+ * @param compileCommandLineOnly TODO
    */
   public SourceClassResolver(Compiler compiler, ExtensionInfo ext,
                              String classpath, ClassFileLoader loader,
-                             boolean allowRawClasses)
+                             boolean allowRawClasses,
+                             boolean compileCommandLineOnly)
   {
     super(ext.typeSystem(), classpath, loader, ext.version(), allowRawClasses);
     this.compiler = compiler;
     this.ext = ext;
+    this.compileCommandLineOnly = compileCommandLineOnly;
   }
 
   public boolean packageExists(String name) {
@@ -223,7 +227,7 @@ public class SourceClassResolver extends LoadedClassResolver
   protected Named getTypeFromSource(FileSource source, String name)
     throws SemanticException
   {
-    Job job = ext.scheduler().loadSource(source);
+    Job job = ext.scheduler().loadSource(source, ! compileCommandLineOnly);
 
     if (job == null) {
         // the source has already been compiled; what are we doing here?

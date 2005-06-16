@@ -47,6 +47,19 @@ public abstract class Scheduler {
     /** Map from goals to number of times a pass was run for the goal. */
     protected Map runCount;
 
+    /**
+     * Map from goals to the number of amount of progress made since just before
+     * the goal was last attempted.
+     */
+    Map progressMap;
+    
+    /**
+     * Progress made since the start of the compilation.  When a pass is run,
+     * progress is incremented by the difference in distance from the goal before
+     * and after the pass is run. 
+     */
+    int currentProgress;
+
     protected static final Object COMPLETED_JOB = "COMPLETED JOB";
 
     /** The currently running pass, or null if no pass is running. */
@@ -58,9 +71,11 @@ public abstract class Scheduler {
         this.jobs = new HashMap();
         this.goals = new HashMap();
         this.runCount = new HashMap();
+        this.progressMap = new HashMap();
         this.inWorklist = new HashSet();
         this.worklist = new LinkedList();
         this.currentPass = null;
+        this.currentProgress = 0;
     }
     
     /**
@@ -239,10 +254,14 @@ public abstract class Scheduler {
     }
     
     /**         
-     * Read a source file and compile it up to the the current job's last
-     * barrier.
+     * Load a source file and create a job for it.  Optionally add a goal
+     * to compile the job to Java.
+     * 
+     * @param source The source file to load.
+     * @param compile True if the compile goal should be added for the new job.
+     * @return The new job or null if the job has already completed.
      */         
-    public Job loadSource(FileSource source) {
+    public Job loadSource(FileSource source, boolean compile) {
         // Add a new Job for the given source. If a Job for the source
         // already exists, then we will be given the existing job.
         Job job = addJob(source);
@@ -253,9 +272,15 @@ public abstract class Scheduler {
             // source.
             return null;
         }               
+        
+        // Create a goal for the job; this will set up dependencies for the goal,
+        // even if the goal isn't added to the work list.
+        Goal compileGoal = extInfo.getCompileGoal(job);
 
-        // Now, add a goal for completing the job.
-        addGoal(extInfo.getCompileGoal(job));
+        if (compile) {
+            // Now, add a goal for completing the job.
+            addGoal(compileGoal);
+        }
         
         return job;
     }
@@ -410,7 +435,7 @@ public abstract class Scheduler {
         }
             
         // Check for completion again -- the goal may have been reached
-        // while processing sg.
+        // while processing a subgoal.
         if (reached(goal)) {
             return true;
         }
@@ -432,6 +457,19 @@ public abstract class Scheduler {
         
         return result;
     }       
+   
+    private int progressSinceLastAttempt(Goal goal) {
+        int progress;
+        Integer i = (Integer) progressMap.get(goal);
+        if (i == null) {
+            return Integer.MAX_VALUE;
+        }
+        else {
+            progress = i.intValue();
+        }
+    
+        return currentProgress - progress;
+    }
 
     /**         
      * Run the pass <code>pass</code>.  All subgoals of the pass's goal
@@ -459,6 +497,10 @@ public abstract class Scheduler {
             throw new InternalCompilerError("Cannot run a pass for completed goal " + goal);
         }
         
+        if (progressSinceLastAttempt(goal) == 0) {
+            throw new InternalCompilerError("Possible infinite loop detected trying to run a pass for " + goal + "; no progress made since last attempt.  Current distance from goal is " + goal.distanceFromGoal() + ".");
+        }
+        
         final int MAX_RUN_COUNT = 10;
         Integer countObj = (Integer) this.runCount.get(goal);
         int count = countObj != null ? countObj.intValue() : 0;
@@ -482,6 +524,7 @@ public abstract class Scheduler {
         pass.resetTimers();
 
         boolean result = false;
+        int oldDistance = goal.distanceFromGoal();
 
         if (job == null || job.status()) {
             Pass oldPass = this.currentPass;
@@ -555,6 +598,14 @@ public abstract class Scheduler {
         Stats stats = extInfo.getStats();
         stats.accumPassTimes(pass.name(), pass.inclusiveTime(),
                              pass.exclusiveTime());
+
+        // Record the progress made before running the pass and then update
+        // the current progress.
+        progressMap.put(goal, new Integer(currentProgress));
+        int newDistance = goal.distanceFromGoal();
+        int progress = newDistance - oldDistance;
+        progress = progress > 0 ? progress : 0;
+        currentProgress += progress;
             
         if (Report.should_report(Report.time, 2)) {
             Report.report(2, "Finished " + pass +
@@ -564,7 +615,8 @@ public abstract class Scheduler {
         }
         else if (Report.should_report(Report.frontend, 1)) {
             Report.report(1, "Finished " + pass +
-                          " status=" + statusString(result));
+                          " status=" + statusString(result) +
+                          " distance=" + oldDistance + "->" + newDistance);
         }
         
         if (job != null) {

@@ -30,13 +30,13 @@ public class SupertypesResolved extends ClassTypeGoal {
         if (job() != null) {
             TypeSystem ts = extInfo.typeSystem();
             NodeFactory nf = extInfo.nodeFactory();
-            return new DisambiguatorPass(this, new AmbiguityRemover(job(), ts, nf));
+            return new DisambiguatorPass(this, new AmbiguityRemover(job(), ts, nf, false, false));
         }
         return new ResolveSuperTypesPass(extInfo.scheduler(), this);
     }
     
-    public boolean hasBeenReached() {
-        return type().supertypesResolved();
+    public int distanceFromGoal() {
+        return type().numSignaturesUnresolved();
     }
 
     public boolean equals(Object o) {

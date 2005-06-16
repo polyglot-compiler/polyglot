@@ -43,5 +43,5 @@ public abstract class ClassTypeGoal extends AbstractGoal {
         return StringUtil.getShortNameComponent(getClass().getName()) + "(" + ct + ")";
     }
     
-    public abstract boolean hasBeenReached();
+    public abstract int distanceFromGoal();
 }

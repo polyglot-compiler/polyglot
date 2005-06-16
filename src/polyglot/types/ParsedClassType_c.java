@@ -291,6 +291,48 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         this.supertypesResolved = supertypesResolved;
     }
 
+    public int numSignaturesUnresolved() {
+        Scheduler scheduler = typeSystem().extensionInfo().scheduler();
+        
+        if (signaturesResolved) {
+            return 0;
+        }
+        
+        if (! membersAdded()) {
+            try {
+                scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this), scheduler.MembersAdded(this));
+            }
+            catch (CyclicDependencyException e) {
+                throw new InternalCompilerError(e.getMessage());
+            }
+            return Integer.MAX_VALUE;
+        }
+
+        // Create a new list of members.  Don't use members() since
+        // it ensures that signatures be resolved and this method
+        // is just suppossed to check if they are resolved.
+        List l = new ArrayList();
+        l.addAll(methods);
+        l.addAll(fields);
+        l.addAll(constructors);
+        l.addAll(memberClasses);
+        
+        int count = 0;
+        
+        for (Iterator i = l.iterator(); i.hasNext(); ) {
+            MemberInstance mi = (MemberInstance) i.next();
+            if (! mi.isCanonical()) {
+                count++;
+            }
+        }
+        
+        if (count == 0) {
+            signaturesResolved = true;
+        }
+        
+        return count;
+    }
+
     public boolean signaturesResolved() {
         Scheduler scheduler = typeSystem().extensionInfo().scheduler();
         
@@ -307,7 +349,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
             }
             return false;
         }
-
+    
         // Create a new list of members.  Don't use members() since
         // it ensures that signatures be resolved and this method
         // is just suppossed to check if they are resolved.

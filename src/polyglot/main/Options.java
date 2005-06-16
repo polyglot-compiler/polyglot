@@ -35,6 +35,8 @@ public class Options {
     public String classpath;
     public String bootclasspath = null;
     public boolean assertions = false;
+    
+    public boolean compile_command_line_only = false;
 
     public String[] source_ext = null; // e.g., java, jl, pj
     public String output_ext = "java"; // java, by default
@@ -198,6 +200,11 @@ public class Options {
             }
             i++;
         }
+        else if (args[i].equals("-commandlineonly")) 
+        {
+            i++;
+            compile_command_line_only = true;
+        }
         else if (args[i].equals("-assert")) 
         {
             i++;
@@ -340,6 +347,7 @@ public class Options {
                           "path for bootstrap class files");
         usageForFlag(out, "-ext <extension>", "use language extension");
         usageForFlag(out, "-extclass <ext-class>", "use language extension");
+        usageForFlag(out, "-commandlineonly", "only compile files named on the command-line (may also require -c)");
         usageForFlag(out, "-fqcn", "use fully-qualified class names");
         usageForFlag(out, "-sx <ext>", "set source extension");
         usageForFlag(out, "-ox <ext>", "set output extension");
