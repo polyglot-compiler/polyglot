@@ -151,7 +151,7 @@ public class LocalClassRemover extends ContextVisitor
         Map fieldMap;
         Context outerContext;
         
-        ClassBodyTranslator(ParsedClassType ct, Map fieldMap, Job job, TypeSystem ts, NodeFactory nf, Context context) {
+        ClassBodyTranslator(Job job, TypeSystem ts, NodeFactory nf, Context context, ParsedClassType ct, Map fieldMap) {
             super(job, ts, nf);
             this.ct = ct;
             this.fieldMap = fieldMap;
@@ -631,7 +631,7 @@ public class LocalClassRemover extends ContextVisitor
         body = body.members(members);
 
         // Rewrite the class body.
-        ClassBodyTranslator v = new ClassBodyTranslator(ct, fieldMap, job, ts, nf, context);
+        ClassBodyTranslator v = new ClassBodyTranslator(job, ts, nf, context, ct, fieldMap);
         v = (ClassBodyTranslator) v.begin();
         body = (ClassBody) body.visit(v);
         v.finish();
