@@ -123,7 +123,7 @@ public class MethodInstance_c extends ProcedureInstance_c
 
     public String toString() {
 	String s = designator() + " " + flags.translate() + returnType + " " +
-                   signature();
+                   container() + "." + signature();
 
 	if (! throwTypes.isEmpty()) {
 	    s += " throws " + TypeSystem_c.listToString(throwTypes);

@@ -879,12 +879,45 @@ public class TypeSystem_c implements TypeSystem
                                         container + ".");
         }
     
-	MethodInstance mi = (MethodInstance)
-	    findProcedure(acceptable, container, argTypes, currClass);
+        Collection maximal =
+            findMostSpecificProcedures(acceptable, container, argTypes, currClass);
+       
+        if (maximal.size() > 1) {
+            // If all methods have the same signature and there is at most one class,
+            // just pick any one of the set.
+            boolean sameFormals = true;
+            
+            Iterator i = maximal.iterator();
+            MethodInstance first = (MethodInstance) i.next();
+            
+            while (i.hasNext()) {
+                MethodInstance p = (MethodInstance) i.next();
+                if (! first.hasFormals(p.formalTypes())) {
+                    sameFormals = false;
+                    break;
+                }
+            }
+            
+            if (sameFormals) {
+                int numClasses = 0;
+                for (Iterator j = maximal.iterator(); j.hasNext(); ) {
+                    MethodInstance p = (MethodInstance) j.next();
+                    if (p.container().isClass()) {
+                        if (! p.container().toClass().flags().isInterface()) {
+                            numClasses++;
+                        }
+                    }
+                }
+                
+                if (numClasses <= 1) {
+                    maximal = Collections.singletonList(maximal.iterator().next());
+                }
+            }
+        }
 
-	if (mi == null) {
+	if (maximal.size() > 1) {
 	    StringBuffer sb = new StringBuffer();
-            for (Iterator i = acceptable.iterator(); i.hasNext();) {
+            for (Iterator i = maximal.iterator(); i.hasNext();) {
                 MethodInstance ma = (MethodInstance) i.next();
                 sb.append(ma.returnType());
                 sb.append(" ");
@@ -892,7 +925,7 @@ public class TypeSystem_c implements TypeSystem
                 sb.append(".");
                 sb.append(ma.signature());
                 if (i.hasNext()) {
-                    if (acceptable.size() == 2) {
+                    if (maximal.size() == 2) {
                         sb.append(" and ");
                     }
                     else {
@@ -906,6 +939,7 @@ public class TypeSystem_c implements TypeSystem
 					+ sb.toString());
 	}
 		
+	MethodInstance mi = (MethodInstance) maximal.iterator().next();
 	return mi;
     }
 
@@ -933,15 +967,15 @@ public class TypeSystem_c implements TypeSystem
                                         container + "(" + listToString(argTypes) + ").");
 	}
 
-	ConstructorInstance ci = (ConstructorInstance)
-	    findProcedure(acceptable, container, argTypes, currClass);
+	Collection maximal = findMostSpecificProcedures(acceptable, container, argTypes, currClass);
 
-	if (ci == null) {
+	if (maximal.size() > 1) {
 	    throw new NoMemberException(NoMemberException.CONSTRUCTOR,
 		"Reference to " + container + " is ambiguous, multiple " +
-		"constructors match: " + acceptable);
+		"constructors match: " + maximal);
 	}
 
+	ConstructorInstance ci = (ConstructorInstance) maximal.iterator().next();
 	return ci;
     }
 
@@ -949,6 +983,20 @@ public class TypeSystem_c implements TypeSystem
 	                                      ReferenceType container,
 					      List argTypes,
 					      ClassType currClass)
+    throws SemanticException {
+        Collection maximal = findMostSpecificProcedures(acceptable, container, argTypes, currClass);
+        
+       
+        if (maximal.size() == 1) {
+            return (ProcedureInstance) maximal.iterator().next();
+        }
+        return null;
+    }
+    
+    protected Collection findMostSpecificProcedures(List acceptable,
+                                                    ReferenceType container,
+                                                    List argTypes,
+                                                    ClassType currClass)
 	throws SemanticException {
 
         assert_(container);
@@ -959,20 +1007,38 @@ public class TypeSystem_c implements TypeSystem
 	MostSpecificComparator msc = new MostSpecificComparator();
 	Collections.sort(acceptable, msc);
 
-	Iterator i = acceptable.iterator();
+	List maximal = new ArrayList(acceptable.size());
 
-	ProcedureInstance maximal = (ProcedureInstance) i.next();
+	Iterator i = acceptable.iterator();
+    
+	ProcedureInstance first = (ProcedureInstance) i.next();
+	maximal.add(first);
 
 	// Now check to make sure that we have a maximal most-specific method.
 	while (i.hasNext()) {
 	    ProcedureInstance p = (ProcedureInstance) i.next();
 
-	    if (msc.compare(maximal, p) >= 0) {
-	        return null;
+	    if (msc.compare(first, p) >= 0) {
+	        maximal.add(p);
 	    }
 	}
-
-        return maximal;
+	
+	if (maximal.size() > 1) {
+	    // If exactly one method is not abstract, it is the most specific.
+	    List notAbstract = new ArrayList(maximal.size());
+	    for (Iterator j = maximal.iterator(); j.hasNext(); ) {
+	        ProcedureInstance p = (ProcedureInstance) j.next();
+	        if (! p.flags().isAbstract()) {
+	            notAbstract.add(p);
+	        }
+	    }
+	    
+	    if (notAbstract.size() == 1) {
+	        maximal = notAbstract;
+	    }
+	}
+  
+	return maximal;
     }
 
     /**
@@ -985,15 +1051,7 @@ public class TypeSystem_c implements TypeSystem
 
 	    if (moreSpecific(p1, p2)) return -1;
 	    if (moreSpecific(p2, p1)) return 1;
-
-	    // otherwise equally maximally specific
-
-	    // JLS2 15.12.2.2 "two or more maximally specific methods"
-	    // if both abstract or not abstract, equally applicable
-	    // otherwise the non-abstract is more applicable
-	    if (p1.flags().isAbstract() == p2.flags().isAbstract()) return 0;
-	    if (p1.flags().isAbstract()) return 1;
-	    return -1;
+	    return 0;
 	}
     }
     
