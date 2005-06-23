@@ -881,40 +881,7 @@ public class TypeSystem_c implements TypeSystem
     
         Collection maximal =
             findMostSpecificProcedures(acceptable, container, argTypes, currClass);
-       
-        if (maximal.size() > 1) {
-            // If all methods have the same signature and there is at most one class,
-            // just pick any one of the set.
-            boolean sameFormals = true;
-            
-            Iterator i = maximal.iterator();
-            MethodInstance first = (MethodInstance) i.next();
-            
-            while (i.hasNext()) {
-                MethodInstance p = (MethodInstance) i.next();
-                if (! first.hasFormals(p.formalTypes())) {
-                    sameFormals = false;
-                    break;
-                }
-            }
-            
-            if (sameFormals) {
-                int numClasses = 0;
-                for (Iterator j = maximal.iterator(); j.hasNext(); ) {
-                    MethodInstance p = (MethodInstance) j.next();
-                    if (p.container().isClass()) {
-                        if (! p.container().toClass().flags().isInterface()) {
-                            numClasses++;
-                        }
-                    }
-                }
-                
-                if (numClasses <= 1) {
-                    maximal = Collections.singletonList(maximal.iterator().next());
-                }
-            }
-        }
-
+    
 	if (maximal.size() > 1) {
 	    StringBuffer sb = new StringBuffer();
             for (Iterator i = maximal.iterator(); i.hasNext();) {
@@ -1035,6 +1002,21 @@ public class TypeSystem_c implements TypeSystem
 	    
 	    if (notAbstract.size() == 1) {
 	        maximal = notAbstract;
+	    }
+	    else if (notAbstract.size() == 0) {
+	        // all are abstract; if all signatures match, any will do.
+	        Iterator j = maximal.iterator();
+	        first = (ProcedureInstance) j.next();
+	        while (j.hasNext()) {
+	            ProcedureInstance p = (ProcedureInstance) j.next();
+	            if (! first.hasFormals(p.formalTypes())) {
+	                // not all signatures match; must be ambiguous
+	                return maximal;
+	            }
+	        }
+	        
+	        // all signatures match, just take the first
+	        maximal = Collections.singletonList(first);
 	    }
 	}
   
