@@ -883,9 +883,27 @@ public class TypeSystem_c implements TypeSystem
 	    findProcedure(acceptable, container, argTypes, currClass);
 
 	if (mi == null) {
+	    StringBuffer sb = new StringBuffer();
+            for (Iterator i = acceptable.iterator(); i.hasNext();) {
+                MethodInstance ma = (MethodInstance) i.next();
+                sb.append(ma.returnType());
+                sb.append(" ");
+                sb.append(ma.container());
+                sb.append(".");
+                sb.append(ma.signature());
+                if (i.hasNext()) {
+                    if (acceptable.size() == 2) {
+                        sb.append(" and ");
+                    }
+                    else {
+                        sb.append(", ");
+                    }
+                }
+	    }
+        
 	    throw new SemanticException("Reference to " + name +
 					" is ambiguous, multiple methods match: "
-					+ acceptable);
+					+ sb.toString());
 	}
 		
 	return mi;
