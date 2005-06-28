@@ -142,6 +142,15 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
         return n;
     }
     
+    public FieldAssign FieldAssign(Position pos, Field left, Assign.Operator op, Expr right) {
+        return (FieldAssign) super.FieldAssign(pos, left, op, right).del(new AssignDel_c());
+    }
+    public ArrayAccessAssign ArrayAccessAssign(Position pos, ArrayAccess left, Assign.Operator op, Expr right) {
+        return (ArrayAccessAssign) super.ArrayAccessAssign(pos, left, op, right).del(new AssignDel_c());
+    }
+    public LocalAssign LocalAssign(Position pos, Local left, Assign.Operator op, Expr right) {
+        return (LocalAssign) super.LocalAssign(pos, left, op, right).del(new AssignDel_c());
+    }
     public Assign Assign(Position pos, Expr left, Assign.Operator op, Expr right) {
         return (Assign) super.Assign(pos, left, op, right).del(new AssignDel_c());
     }

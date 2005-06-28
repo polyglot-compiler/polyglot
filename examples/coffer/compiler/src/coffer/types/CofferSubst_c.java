@@ -43,11 +43,11 @@ public class CofferSubst_c extends Subst_c implements CofferSubst
         mi = super.substMethod(mi);
 
         if (mi instanceof CofferMethodInstance) {
-            CofferMethodInstance vmi = (CofferMethodInstance) mi;
+            CofferMethodInstance vmi = (CofferMethodInstance) mi.copy();
 
-            vmi = (CofferMethodInstance) vmi.entryKeys(substKeySet(vmi.entryKeys()));
-            vmi = (CofferMethodInstance) vmi.returnKeys(substKeySet(vmi.returnKeys()));
-            vmi = (CofferMethodInstance) vmi.throwConstraints(substThrowConstraintList(vmi.throwConstraints()));
+            vmi.setEntryKeys(substKeySet(vmi.entryKeys()));
+            vmi.setReturnKeys(substKeySet(vmi.returnKeys()));
+            vmi.setThrowConstraints(substThrowConstraintList(vmi.throwConstraints()));
 
             mi = vmi;
         }
@@ -59,11 +59,11 @@ public class CofferSubst_c extends Subst_c implements CofferSubst
         ci = super.substConstructor(ci);
 
         if (ci instanceof CofferConstructorInstance) {
-            CofferConstructorInstance vci = (CofferConstructorInstance) ci;
+            CofferConstructorInstance vci = (CofferConstructorInstance) ci.copy();
 
-            vci = (CofferConstructorInstance) vci.entryKeys(substKeySet(vci.entryKeys()));
-            vci = (CofferConstructorInstance) vci.returnKeys(substKeySet(vci.returnKeys()));
-            vci = (CofferConstructorInstance) vci.throwConstraints(substThrowConstraintList(vci.throwConstraints()));
+            vci.setEntryKeys(substKeySet(vci.entryKeys()));
+            vci.setReturnKeys(substKeySet(vci.returnKeys()));
+            vci.setThrowConstraints(substThrowConstraintList(vci.throwConstraints()));
 
             ci = vci;
         }
@@ -96,7 +96,9 @@ public class CofferSubst_c extends Subst_c implements CofferSubst
         KeySet k = substKeySet(c.keys());
 
         if (t != c.throwType() || k != c.keys()) {
-            return c.throwType(t).keys(k);
+            c = (ThrowConstraint) c.copy();
+            c.setThrowType(t);
+            c.setKeys(k);
         }
 
         return c;

@@ -11,6 +11,9 @@ import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
 import polyglot.frontend.*;
+import polyglot.frontend.goals.*;
+import polyglot.frontend.goals.Goal;
+import polyglot.frontend.goals.Serialized;
 import polyglot.main.*;
 import polyglot.lex.Lexer;
 
@@ -35,7 +38,7 @@ public class ExtensionInfo extends polyglot.ext.param.ExtensionInfo {
     }
 
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
-        Lexer lexer = new Lexer_c(reader, source.name(), eq);
+        Lexer lexer = new Lexer_c(reader, source, eq);
         Grm grm = new Grm(lexer, ts, nf, eq);
         return new CupParser(grm, source, eq);
     }
@@ -47,16 +50,18 @@ public class ExtensionInfo extends polyglot.ext.param.ExtensionInfo {
         return new CofferTypeSystem_c();
     }
 
-    public static final Pass.ID KEY_CHECK = new Pass.ID("key-check");
-
-    public List passes(Job job) {
-        List passes = super.passes(job);
-
-        beforePass(passes, Pass.PRE_OUTPUT_ALL,
-                   new VisitorPass(KEY_CHECK,
-                                   job, new KeyChecker(job, ts, nf)));
-
-        return passes;
+   protected List compileGoalList(Job job) {
+        List oldGoals = super.compileGoalList(job);
+        ArrayList newGoals = new ArrayList(oldGoals.size() + 1);
+        
+        for (Iterator i = oldGoals.iterator(); i.hasNext(); ) {
+            Goal g = (Goal) i.next();
+            if (g instanceof Serialized) {
+                newGoals.add(new VisitorGoal(job, new KeyChecker(job, ts, nf)));
+            }
+            newGoals.add(g);
+        }
+        
+        return newGoals;
     }
-
 }

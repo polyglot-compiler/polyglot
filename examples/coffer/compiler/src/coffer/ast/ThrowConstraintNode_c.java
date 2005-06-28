@@ -22,6 +22,10 @@ public class ThrowConstraintNode_c extends Node_c implements ThrowConstraintNode
         this.tn = tn;
         this.keys = keys;
     }
+    
+    public boolean isTypeChecked() {
+        return super.isTypeChecked() && constraint != null && constraint.isCanonical();
+    }
 
     public TypeNode type() { return tn; }
     public KeySetNode keys() { return keys; }
@@ -35,13 +39,20 @@ public class ThrowConstraintNode_c extends Node_c implements ThrowConstraintNode
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (ar.kind() == AmbiguityRemover.SIGNATURES) {
-            CofferTypeSystem ts = (CofferTypeSystem) ar.typeSystem();
-            ThrowConstraint constraint = ts.throwConstraint(position(),
-                                                            tn.type(),
-                                                            keys != null ? keys.keys() : null);
-            return constraint(constraint);
+        if (constraint.isCanonical()) {
+            return this;
         }
+        if (! tn.type().isCanonical()) {
+            return this;
+        }
+        if (keys != null && ! keys.keys().isCanonical()) {
+            return this;
+        }
+        
+        CofferTypeSystem ts = (CofferTypeSystem) ar.typeSystem();
+        
+        constraint.setThrowType(tn.type());
+        constraint.setKeys(keys != null ? keys.keys() : null);
 
         return this;
     }

@@ -27,6 +27,25 @@ public class CofferConstructorInstance_c extends ConstructorInstance_c
         if (entryKeys == null)
             throw new InternalCompilerError("null entry keys for " + this);
     }
+    
+    public boolean isCanonical() {
+        for (Iterator i = throwConstraints.iterator(); i.hasNext(); ) {
+            ThrowConstraint c = (ThrowConstraint) i.next();
+            if (! c.isCanonical()) {
+                return false;
+            }
+        }
+        
+        if (! entryKeys.isCanonical()) {
+            return false;
+        }
+        
+        if (returnKeys != null && ! returnKeys.isCanonical()) {
+            return false;
+        }
+        
+        return super.isCanonical();
+    }
 
     public KeySet entryKeys() {
 	return entryKeys;
@@ -50,11 +69,9 @@ public class CofferConstructorInstance_c extends ConstructorInstance_c
         }
     }
 
-    public ConstructorInstance throwTypes(List throwTypes) {
+    public void setThrowTypes(List throwTypes) {
         Iterator i = throwTypes.iterator();
         Iterator j = throwConstraints.iterator();
-
-        boolean changed = false;
 
         List l = new LinkedList();
 
@@ -62,8 +79,8 @@ public class CofferConstructorInstance_c extends ConstructorInstance_c
             Type t = (Type) i.next();
             ThrowConstraint c = (ThrowConstraint) j.next();
             if (t != c.throwType()) {
-                c = c.throwType(t);
-                changed = true;
+                c = (ThrowConstraint) c.copy();
+                c.setThrowType(t);
             }
 
             l.add(c);
@@ -73,29 +90,19 @@ public class CofferConstructorInstance_c extends ConstructorInstance_c
             throw new InternalCompilerError("unimplemented");
         }
 
-        if (! changed) {
-            return this;
-        }
-
-        return (ConstructorInstance) throwConstraints(l);
+        this.throwConstraints = l;
     }
 
-    public CofferProcedureInstance entryKeys(KeySet entryKeys) {
-	CofferConstructorInstance_c n = (CofferConstructorInstance_c) copy();
-        n.entryKeys = entryKeys;
-	return n;
+    public void setEntryKeys(KeySet entryKeys) {
+        this.entryKeys = entryKeys;
     }
 
-    public CofferProcedureInstance returnKeys(KeySet returnKeys) {
-	CofferConstructorInstance_c n = (CofferConstructorInstance_c) copy();
-        n.returnKeys = returnKeys;
-	return n;
+    public void setReturnKeys(KeySet returnKeys) {
+        this.returnKeys = returnKeys;
     }
 
-    public CofferProcedureInstance throwConstraints(List throwConstraints) {
-	CofferConstructorInstance_c n = (CofferConstructorInstance_c) copy();
-        n.throwConstraints = TypedList.copyAndCheck(throwConstraints, ThrowConstraint.class, true);
-	return n;
+    public void setThrowConstraints(List throwConstraints) {
+        this.throwConstraints = TypedList.copyAndCheck(throwConstraints, ThrowConstraint.class, true);
     }
 
     public String toString() {

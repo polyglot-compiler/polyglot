@@ -20,27 +20,23 @@ public class ThrowConstraint_c extends TypeObject_c implements ThrowConstraint {
         return keys;
     }
 
-    public ThrowConstraint keys(KeySet keys) {
-        ThrowConstraint_c n = (ThrowConstraint_c) copy();
-        n.keys = keys;
-        return n;
+    public void setKeys(KeySet keys) {
+        this.keys = keys;
     }
 
     public Type throwType() {
         return throwType;
     }
 
-    public ThrowConstraint throwType(Type throwType) {
-        ThrowConstraint_c n = (ThrowConstraint_c) copy();
-        n.throwType = throwType;
-        return n;
+    public void setThrowType(Type throwType) {
+        this.throwType = throwType;
     }
 
     public boolean isCanonical() {
-        return keys.isCanonical() && throwType.isCanonical();
+        return (keys == null || keys.isCanonical()) && throwType.isCanonical();
     }
 
     public String toString() {
-        return throwType.toString() + keys.toString();
+        return throwType.toString() + (keys == null ? "" : keys.toString());
     }
 }

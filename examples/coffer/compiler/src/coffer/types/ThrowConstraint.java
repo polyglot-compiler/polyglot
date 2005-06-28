@@ -2,9 +2,9 @@ package polyglot.ext.coffer.types;
 
 import polyglot.types.*;
 
-public interface ThrowConstraint {
+public interface ThrowConstraint extends TypeObject {
     public KeySet keys();
-    public ThrowConstraint keys(KeySet keys);
+    public void setKeys(KeySet keys);
     public Type throwType();
-    public ThrowConstraint throwType(Type throwType);
+    public void setThrowType(Type throwType);
 }

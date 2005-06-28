@@ -143,6 +143,29 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
             n = n.throwConstraints(l);
         }
 
+        CofferTypeSystem vts = (CofferTypeSystem) tb.typeSystem();
+        ClassType ct = tb.currentClass();
+        
+        KeySet entryKeys;
+        KeySet returnKeys;
+        
+        if (n.entryKeys() == null) {
+            entryKeys = vts.emptyKeySet(position());
+        }
+        else {
+            entryKeys = n.entryKeys().keys();
+        }
+        
+        if (n.returnKeys() == null) {
+            returnKeys = vts.emptyKeySet(position());
+        }
+        else {
+            returnKeys = n.returnKeys().keys();
+        }
+        
+        mi.setEntryKeys(entryKeys);
+        mi.setReturnKeys(returnKeys);
+
         return n;
     }
 
@@ -162,59 +185,55 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
 
         return super.typeCheck(tc);
     }
-
-    protected MethodInstance makeMethodInstance(ClassType ct, TypeSystem ts)
-    	throws SemanticException
-    {
-	CofferMethodInstance mi = (CofferMethodInstance)
-	    super.makeMethodInstance(ct, ts);
-
-	CofferTypeSystem vts = (CofferTypeSystem) ts;
-
+    
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        if (this.mi.isCanonical()) {
+            return this;
+        }
+        
+        CofferMethodDecl_c n = (CofferMethodDecl_c) super.disambiguate(ar);
+        
+        CofferTypeSystem vts = (CofferTypeSystem) ar.typeSystem();
+        ClassType ct = ar.context().currentClass();
+        
         KeySet entryKeys;
         KeySet returnKeys;
-
-	if (this.entryKeys == null) {
+        
+        if (n.entryKeys == null) {
             entryKeys = vts.emptyKeySet(position());
-            if (ct instanceof CofferClassType) {
-                CofferClassType vct = (CofferClassType) ct;
-                if (vct.key() != null)
-                    entryKeys = entryKeys.add(vct.key());
-            }
         }
         else {
-            entryKeys = this.entryKeys.keys();
+            entryKeys = n.entryKeys.keys();
         }
-
-	if (this.returnKeys == null) {
+        
+        if (n.returnKeys == null) {
             returnKeys = vts.emptyKeySet(position());
-
-            if (ct instanceof CofferClassType) {
-                CofferClassType vct = (CofferClassType) ct;
-                if (vct.key() != null)
-                    returnKeys = returnKeys.add(vct.key());
-            }
         }
         else {
-            returnKeys = this.returnKeys.keys();
+            returnKeys = n.returnKeys.keys();
         }
-
-        mi = (CofferMethodInstance) mi.entryKeys(entryKeys);
-        mi = (CofferMethodInstance) mi.returnKeys(returnKeys);
-
-	List throwConstraints = new ArrayList(this.throwConstraints.size());
-	for (Iterator i = this.throwConstraints.iterator(); i.hasNext(); ) {
-	    ThrowConstraintNode cn = (ThrowConstraintNode) i.next();
-
+        
+        CofferMethodInstance mi = (CofferMethodInstance) n.mi;
+        mi.setEntryKeys(entryKeys);
+        mi.setReturnKeys(returnKeys);
+        
+        List throwConstraints = new ArrayList(n.throwConstraints.size());
+        for (Iterator i = n.throwConstraints.iterator(); i.hasNext(); ) {
+            ThrowConstraintNode cn = (ThrowConstraintNode) i.next();
+            
             if (cn.constraint().keys() != null) {
                 throwConstraints.add(cn.constraint());
             }
             else {
-                throwConstraints.add(cn.constraint().keys(entryKeys));
+                ThrowConstraint c = (ThrowConstraint) cn.constraint().copy();
+                c.setKeys(entryKeys);
+                throwConstraints.add(c);
             }
-	}
-
-	return (CofferMethodInstance) mi.throwConstraints(throwConstraints);
+        }
+        
+        mi.setThrowConstraints(throwConstraints);
+        
+        return n;
     }
 
     /** Write the method to an output file. */
@@ -238,6 +257,17 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
 
 	w.end();
 	w.write(")");
+    
+	if (! (tr instanceof Translator)) {
+	    if (entryKeys != null) {
+	        w.allowBreak(6, " ");
+	        print(entryKeys, w, tr);
+	    }
+	    if (returnKeys != null) {
+	        w.write(" -> ");
+	        print(returnKeys, w, tr);
+	    }
+	}
 
 	if (! throwConstraints.isEmpty()) {
 	    w.allowBreak(6);

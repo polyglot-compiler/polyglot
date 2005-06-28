@@ -12,7 +12,7 @@ public interface CofferProcedureInstance extends ProcedureInstance
     KeySet returnKeys();
     List throwConstraints();
 
-    CofferProcedureInstance entryKeys(KeySet entryKeys);
-    CofferProcedureInstance returnKeys(KeySet returnKeys);
-    CofferProcedureInstance throwConstraints(List throwConstraints);
+    void setEntryKeys(KeySet entryKeys);
+    void setReturnKeys(KeySet returnKeys);
+    void setThrowConstraints(List throwConstraints);
 }

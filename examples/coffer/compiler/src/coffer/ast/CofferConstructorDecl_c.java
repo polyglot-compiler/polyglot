@@ -137,6 +137,35 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
         if (changed) {
             n = n.throwConstraints(l);
         }
+        
+        CofferTypeSystem vts = (CofferTypeSystem) tb.typeSystem();
+        ClassType ct = tb.currentClass();
+        
+        KeySet entryKeys;
+        KeySet returnKeys;
+        
+        if (n.entryKeys() == null) {
+            entryKeys = vts.emptyKeySet(position());
+        }
+        else {
+            entryKeys = n.entryKeys().keys();
+        }
+        
+        if (n.returnKeys() == null) {
+            returnKeys = vts.emptyKeySet(position());
+            
+            if (ct instanceof CofferClassType) {
+                CofferClassType vct = (CofferClassType) ct;
+                if (vct.key() != null)
+                    returnKeys = returnKeys.add(vct.key());
+            }
+        }
+        else {
+            returnKeys = n.returnKeys().keys();
+        }
+        
+        ci.setEntryKeys(entryKeys);
+        ci.setReturnKeys(returnKeys);
 
         return n;
     }
@@ -164,26 +193,35 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
         return super.typeCheck(tc);
     }
 
-    protected ConstructorInstance makeConstructorInstance(ClassType ct,
-                                                          TypeSystem ts)
-    	throws SemanticException
-    {
-	CofferConstructorInstance ci = (CofferConstructorInstance)
-	    super.makeConstructorInstance(ct, ts);
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+        if (this.ci.isCanonical()) {
+            return this;
+        }
+        
+        if (this.entryKeys != null && ! this.entryKeys.keys().isCanonical()) {
+            return this;
+        }
 
-	CofferTypeSystem vts = (CofferTypeSystem) ts;
+        if (this.returnKeys != null && ! this.returnKeys.keys().isCanonical()) {
+            return this;
+        }
+
+        CofferConstructorDecl_c n = (CofferConstructorDecl_c) super.disambiguate(ar);
+
+	CofferTypeSystem vts = (CofferTypeSystem) ar.typeSystem();
+	ClassType ct = ar.context().currentClass();
 
         KeySet entryKeys;
         KeySet returnKeys;
 
-	if (this.entryKeys == null) {
+	if (n.entryKeys == null) {
             entryKeys = vts.emptyKeySet(position());
         }
         else {
-            entryKeys = this.entryKeys.keys();
+            entryKeys = n.entryKeys.keys();
         }
 
-	if (this.returnKeys == null) {
+	if (n.returnKeys == null) {
             returnKeys = vts.emptyKeySet(position());
 
             if (ct instanceof CofferClassType) {
@@ -193,25 +231,30 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
             }
         }
         else {
-            returnKeys = this.returnKeys.keys();
+            returnKeys = n.returnKeys.keys();
         }
 
-        ci = (CofferConstructorInstance) ci.entryKeys(entryKeys);
-        ci = (CofferConstructorInstance) ci.returnKeys(returnKeys);
+	CofferConstructorInstance ci = (CofferConstructorInstance) n.ci;
+        ci.setEntryKeys(entryKeys);
+        ci.setReturnKeys(returnKeys);
 
-	List throwConstraints = new ArrayList(this.throwConstraints.size());
-	for (Iterator i = this.throwConstraints.iterator(); i.hasNext(); ) {
+	List throwConstraints = new ArrayList(n.throwConstraints.size());
+	for (Iterator i = n.throwConstraints.iterator(); i.hasNext(); ) {
 	    ThrowConstraintNode cn = (ThrowConstraintNode) i.next();
 
             if (cn.constraint().keys() != null) {
                 throwConstraints.add(cn.constraint());
             }
             else {
-                throwConstraints.add(cn.constraint().keys(entryKeys));
+                ThrowConstraint c = (ThrowConstraint) cn.constraint().copy();
+                c.setKeys(entryKeys);
+                throwConstraints.add(c);
             }
 	}
 
-	return (CofferConstructorInstance) ci.throwConstraints(throwConstraints);
+	ci.setThrowConstraints(throwConstraints);
+    
+	return n;
     }
 
     /** Write the constructor to an output file. */
@@ -236,6 +279,17 @@ public class CofferConstructorDecl_c extends ConstructorDecl_c implements Coffer
 
 	w.end();
 	w.write(")");
+    
+	if (! (tr instanceof Translator)) {
+	    if (entryKeys != null) {
+	        w.allowBreak(6, " ");
+	        print(entryKeys, w, tr);
+	    }
+	    if (returnKeys != null) {
+	        w.write(" -> ");
+	        print(returnKeys, w, tr);
+	    }
+	}
 
 	if (! throwConstraints.isEmpty()) {
 	    w.allowBreak(6);

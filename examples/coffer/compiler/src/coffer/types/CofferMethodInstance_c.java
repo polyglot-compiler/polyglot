@@ -3,6 +3,7 @@ package polyglot.ext.coffer.types;
 import polyglot.ext.jl.types.*;
 import polyglot.types.*;
 import polyglot.util.*;
+
 import java.util.*;
 
 /** An implementation of the <code>CofferMethodInstance</code> interface. 
@@ -28,6 +29,25 @@ public class CofferMethodInstance_c extends MethodInstance_c
         if (entryKeys == null)
             throw new InternalCompilerError("null entry keys for " + this);
     }
+    
+    public boolean isCanonical() {
+        for (Iterator i = throwConstraints.iterator(); i.hasNext(); ) {
+            ThrowConstraint c = (ThrowConstraint) i.next();
+            if (! c.isCanonical()) {
+                return false;
+            }
+        }
+        
+        if (! entryKeys.isCanonical()) {
+            return false;
+        }
+        
+        if (returnKeys != null && ! returnKeys.isCanonical()) {
+            return false;
+        }
+        
+        return super.isCanonical();
+    }
 
     public KeySet entryKeys() {
 	return entryKeys;
@@ -45,11 +65,15 @@ public class CofferMethodInstance_c extends MethodInstance_c
         return new CachingTransformingList(throwConstraints, new GetType());
     }
 
-    public MethodInstance throwTypes(List throwTypes) {
+    public class GetType implements Transformation {
+        public Object transform(Object o) {
+            return ((ThrowConstraint) o).throwType();
+        }
+    }
+
+    public void setThrowTypes(List throwTypes) {
         Iterator i = throwTypes.iterator();
         Iterator j = throwConstraints.iterator();
-
-        boolean changed = false;
 
         List l = new LinkedList();
 
@@ -57,8 +81,8 @@ public class CofferMethodInstance_c extends MethodInstance_c
             Type t = (Type) i.next();
             ThrowConstraint c = (ThrowConstraint) j.next();
             if (t != c.throwType()) {
-                c = c.throwType(t);
-                changed = true;
+                c = (ThrowConstraint) c.copy();
+                c.setThrowType(t);
             }
 
             l.add(c);
@@ -68,35 +92,19 @@ public class CofferMethodInstance_c extends MethodInstance_c
             throw new InternalCompilerError("unimplemented");
         }
 
-        if (! changed) {
-            return this;
-        }
-
-        return (MethodInstance) throwConstraints(l);
+        this.throwConstraints = l;
     }
 
-    public class GetType implements Transformation {
-        public Object transform(Object o) {
-            return ((ThrowConstraint) o).throwType();
-        }
+    public void setEntryKeys(KeySet entryKeys) {
+        this.entryKeys = entryKeys;
     }
 
-    public CofferProcedureInstance entryKeys(KeySet entryKeys) {
-	CofferMethodInstance_c n = (CofferMethodInstance_c) copy();
-        n.entryKeys = entryKeys;
-	return n;
+    public void setReturnKeys(KeySet returnKeys) {
+        this.returnKeys = returnKeys;
     }
 
-    public CofferProcedureInstance returnKeys(KeySet returnKeys) {
-	CofferMethodInstance_c n = (CofferMethodInstance_c) copy();
-        n.returnKeys = returnKeys;
-	return n;
-    }
-
-    public CofferProcedureInstance throwConstraints(List throwConstraints) {
-	CofferMethodInstance_c n = (CofferMethodInstance_c) copy();
-        n.throwConstraints = TypedList.copyAndCheck(throwConstraints, ThrowConstraint.class, true);
-	return n;
+    public void setThrowConstraints(List throwConstraints) {
+        this.throwConstraints = TypedList.copyAndCheck(throwConstraints, ThrowConstraint.class, true);
     }
 
     public boolean canOverrideImpl(MethodInstance mj, boolean quiet) throws SemanticException {
