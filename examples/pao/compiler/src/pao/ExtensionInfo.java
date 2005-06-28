@@ -1,6 +1,8 @@
 package polyglot.ext.pao;
 
 import java.io.Reader;
+import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import polyglot.ast.NodeFactory;
@@ -10,6 +12,9 @@ import polyglot.ext.pao.parse.Lexer_c;
 import polyglot.ext.pao.types.PaoTypeSystem_c;
 import polyglot.ext.pao.visit.PaoBoxer;
 import polyglot.frontend.*;
+import polyglot.frontend.goals.*;
+import polyglot.frontend.goals.Goal;
+import polyglot.frontend.goals.Serialized;
 import polyglot.lex.Lexer;
 import polyglot.types.TypeSystem;
 import polyglot.util.ErrorQueue;
@@ -34,7 +39,7 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
     }
 
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
-        Lexer lexer = new Lexer_c(reader, source.name(), eq);
+        Lexer lexer = new Lexer_c(reader, source, eq);
         Grm grm = new Grm(lexer, ts, nf, eq);
         return new CupParser(grm, source, eq);
     }
@@ -46,14 +51,19 @@ public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
         return new PaoTypeSystem_c();
     }
 
-    public static final Pass.ID CAST_REWRITE = new Pass.ID("cast-rewrite");
-
-    public List passes(Job job) {
-        List passes = super.passes(job);
-        beforePass(passes, Pass.PRE_OUTPUT_ALL,
-                  new VisitorPass(CAST_REWRITE,
-                                  job, new PaoBoxer(job, ts, nf)));
-        return passes;
+    protected List compileGoalList(Job job) {
+        List oldGoals = super.compileGoalList(job);
+        ArrayList newGoals = new ArrayList(oldGoals.size() + 1);
+        
+        for (Iterator i = oldGoals.iterator(); i.hasNext(); ) {
+            Goal g = (Goal) i.next();
+            if (g instanceof Serialized) {
+                newGoals.add(new VisitorGoal(job, new PaoBoxer(job, ts, nf)));
+            }
+            newGoals.add(g);
+        }
+        
+        return newGoals;
     }
 
     static {

@@ -10,7 +10,9 @@ import polyglot.lex.*;
 import polyglot.util.Position;
 import polyglot.util.ErrorQueue;
 import polyglot.util.ErrorInfo;
+import polyglot.frontend.FileSource;
 import java.util.HashMap;
+import java.math.BigInteger;
 
 %%
 
@@ -31,17 +33,19 @@ import java.util.HashMap;
 %{
     StringBuffer sb = new StringBuffer();
     String file;
+    String path;
     ErrorQueue eq;
     HashMap keywords;
 
-    public Lexer_c(java.io.InputStream in, String file, ErrorQueue eq) {
+    public Lexer_c(java.io.InputStream in, FileSource file, ErrorQueue eq) {
         this(new java.io.BufferedReader(new java.io.InputStreamReader(in)),
              file, eq);
     }
 
-    public Lexer_c(java.io.Reader reader, String file, ErrorQueue eq) {
+    public Lexer_c(java.io.Reader reader, FileSource file, ErrorQueue eq) {
         this(new EscapedUnicodeReader(reader));
-        this.file = file;
+        this.file = file.name();
+        this.path = file.path();
         this.eq = eq;
         this.keywords = new HashMap();
         init_keywords();
@@ -97,19 +101,25 @@ import java.util.HashMap;
         keywords.put("void",          new Integer(sym.VOID));
         keywords.put("volatile",      new Integer(sym.VOLATILE));
         keywords.put("while",         new Integer(sym.WHILE));
+
+        /* Pao-specific keywords */
     }
 
     public String file() {
         return file;
     }
 
+    public String path() {
+        return path;
+    }
+
     private Position pos() {
-        return new Position(file, yyline+1, yycolumn, yyline+1,
+        return new Position(path, file, yyline+1, yycolumn, yyline+1,
                             yycolumn + yytext().length());
     }
 
     private Position pos(int len) {
-        return new Position(file, yyline+1, yycolumn-len-1, yyline+1,
+        return new Position(path, file, yyline+1, yycolumn-len-1, yyline+1,
                             yycolumn+1);
     }
 
@@ -125,62 +135,79 @@ import java.util.HashMap;
         return new Identifier(pos(), yytext(), sym.IDENTIFIER);
     }
 
-    /* Roll our own integer parser.  We can't use Long.parseLong because
-     * it doesn't handle numbers greater than 0x7fffffffffffffff correctly.
-     */
-    private long parseLong(String s, int radix) {
-        long x = 0L;
-
-        s = s.toLowerCase();
-
-        for (int i = 0; i < s.length(); i++) {
-            int c = s.charAt(i);
-
-            if (c < '0' || c > '9') {
-                c = c - 'a' + 10;
-            }
-            else {
-                c = c - '0';
-            }
-
-            x *= radix;
-            x += c;
-        }
-
-        return x;
-    }
-
     private Token int_lit(String s, int radix) {
-        long x = parseLong(s, radix);
-        return new IntegerLiteral(pos(), (int) x, sym.INTEGER_LITERAL);
+        BigInteger x = new BigInteger(s, radix);
+        boolean boundary = (radix == 10 && s.equals("2147483648"));
+        int bits = radix == 10 ? 31 : 32;
+        if (x.bitLength() > bits && ! boundary) {
+            eq.enqueue(ErrorInfo.LEXICAL_ERROR, "Integer literal \"" +
+                        yytext() + "\" out of range.", pos());
+        }
+        return new IntegerLiteral(pos(), x.intValue(),
+                boundary ? sym.INTEGER_LITERAL_BD : sym.INTEGER_LITERAL);
     }
 
     private Token long_lit(String s, int radix) {
-        long x = parseLong(s, radix);
-        return new LongLiteral(pos(), x, sym.LONG_LITERAL);
+        BigInteger x = new BigInteger(s, radix);
+        boolean boundary = (radix == 10 && s.equals("9223372036854775808"));
+        int bits = radix == 10 ? 63 : 64;
+        if (x.bitLength() > bits && ! boundary) {
+            eq.enqueue(ErrorInfo.LEXICAL_ERROR, "Long literal \"" +
+                        yytext() + "\" out of range.", pos());
+        }
+        return new LongLiteral(pos(), x.longValue(),
+                boundary ? sym.LONG_LITERAL_BD : sym.LONG_LITERAL);
     }
 
     private Token float_lit(String s) {
         try {
-            float x = Float.parseFloat(s);
-            return new FloatLiteral(pos(), x, sym.FLOAT_LITERAL);
+            Float x = Float.valueOf(s);
+	    boolean zero = true;
+	    for (int i = 0; i < s.length(); i++) {
+		if ('1' <= s.charAt(i) && s.charAt(i) <= '9') {
+		    zero = false;
+		    break;
+		}
+                if (s.charAt(i) == 'e' || s.charAt(i) == 'E') {
+                    break; // 0e19 is still 0
+                }
+	    }
+	    if (x.isInfinite() || x.isNaN() || (x.floatValue() == 0 && ! zero)) {
+		eq.enqueue(ErrorInfo.LEXICAL_ERROR,
+			   "Illegal float literal \"" + yytext() + "\"", pos());
+	    }
+            return new FloatLiteral(pos(), x.floatValue(), sym.FLOAT_LITERAL);
         }
         catch (NumberFormatException e) {
             eq.enqueue(ErrorInfo.LEXICAL_ERROR,
                        "Illegal float literal \"" + yytext() + "\"", pos());
-            return null;
+            return new FloatLiteral(pos(), 0f, sym.FLOAT_LITERAL);
         }
     }
 
     private Token double_lit(String s) {
         try {
-            double x = Double.parseDouble(s);
-            return new DoubleLiteral(pos(), x, sym.DOUBLE_LITERAL);
+            Double x = Double.valueOf(s);
+	    boolean zero = true;
+	    for (int i = 0; i < s.length(); i++) {
+		if ('1' <= s.charAt(i) && s.charAt(i) <= '9') {
+		    zero = false;
+		    break;
+		}
+                if (s.charAt(i) == 'e' || s.charAt(i) == 'E') {
+                    break; // 0e19 is still 0
+                }
+	    }
+	    if (x.isInfinite() || x.isNaN() || (x.doubleValue() == 0 && ! zero)) {
+		eq.enqueue(ErrorInfo.LEXICAL_ERROR,
+			   "Illegal double literal \"" + yytext() + "\"", pos());
+	    }
+            return new DoubleLiteral(pos(), x.doubleValue(), sym.DOUBLE_LITERAL);
         }
         catch (NumberFormatException e) {
             eq.enqueue(ErrorInfo.LEXICAL_ERROR,
-                       "Illegal float literal \"" + yytext() + "\"", pos());
-            return null;
+                       "Illegal double literal \"" + yytext() + "\"", pos());
+            return new DoubleLiteral(pos(), 0., sym.DOUBLE_LITERAL);
         }
     }
 
@@ -192,7 +219,7 @@ import java.util.HashMap;
         else {
             eq.enqueue(ErrorInfo.LEXICAL_ERROR,
                        "Illegal character literal \'" + s + "\'", pos(s.length()));
-            return null;
+            return new CharacterLiteral(pos(), '\0', sym.CHARACTER_LITERAL);
         }
     }
 
@@ -260,7 +287,7 @@ FloatingPointLiteral = [0-9]+ "." [0-9]* {ExponentPart}?
                      | [0-9]+ {ExponentPart}
 
 ExponentPart = [eE] {SignedInteger}
-SignedInteger = [-+]? [0-9]
+SignedInteger = [-+]? [0-9]+
 
 /* 3.10.4 Character Literals */
 OctalEscape = \\ [0-7]
@@ -344,30 +371,19 @@ OctalEscape = \\ [0-7]
     ">>>=" { return op(sym.URSHIFTEQ);  }
 
     /* 3.10.1 Integer Literals */
-    {OctalNumeral} [lL]          { Token t = long_lit(chop(), 8);
-                                   if (t != null) return t; }
-    {HexNumeral} [lL]            { Token t = long_lit(chop(2,1), 16);
-                                   if (t != null) return t; }
-    {DecimalNumeral} [lL]        { Token t = long_lit(chop(), 10);
-                                   if (t != null) return t; }
-    {OctalNumeral}               { Token t = int_lit(yytext(), 8);
-                                   if (t != null) return t; }
-    {HexNumeral}                 { Token t = int_lit(chop(2,0), 16);
-                                   if (t != null) return t; }
-    {DecimalNumeral}             { Token t = int_lit(yytext(), 10);
-                                   if (t != null) return t; }
+    {OctalNumeral} [lL]          { return long_lit(chop(), 8); }
+    {HexNumeral} [lL]            { return long_lit(chop(2,1), 16); }
+    {DecimalNumeral} [lL]        { return long_lit(chop(), 10); }
+    {OctalNumeral}               { return int_lit(yytext(), 8); }
+    {HexNumeral}                 { return int_lit(chop(2,0), 16); }
+    {DecimalNumeral}             { return int_lit(yytext(), 10); }
 
     /* 3.10.2 Floating-Point Literals */
-    {FloatingPointLiteral} [fF]  { Token t = float_lit(chop());
-                                   if (t != null) return t; }
-    {DecimalNumeral} [fF]        { Token t = float_lit(chop());
-                                   if (t != null) return t; }
-    {FloatingPointLiteral} [dD]  { Token t = double_lit(chop());
-                                   if (t != null) return t; }
-    {DecimalNumeral} [dD]        { Token t = double_lit(chop());
-                                   if (t != null) return t; }
-    {FloatingPointLiteral}       { Token t = double_lit(yytext());
-                                   if (t != null) return t; }
+    {FloatingPointLiteral} [fF]  { return float_lit(chop()); }
+    {DecimalNumeral} [fF]        { return float_lit(chop()); }
+    {FloatingPointLiteral} [dD]  { return double_lit(chop()); }
+    {DecimalNumeral} [dD]        { return double_lit(chop()); }
+    {FloatingPointLiteral}       { return double_lit(yytext()); }
 
     /* 3.6 White Space */
     {WhiteSpace}                 { /* ignore */ }
@@ -386,8 +402,7 @@ OctalEscape = \\ [0-7]
 <CHARACTER> {
     /* End of the character literal */
     \'                           { yybegin(YYINITIAL);
-                                   Token t = char_lit(sb.toString());
-                                   if (t != null) return t; }
+                                   return char_lit(sb.toString()); }
 
     /* 3.10.6 Escape Sequences for Character and String Literals */
     "\\b"                        { sb.append('\b'); }
@@ -418,7 +433,7 @@ OctalEscape = \\ [0-7]
     {LineTerminator}             { yybegin(YYINITIAL);
                                   eq.enqueue(ErrorInfo.LEXICAL_ERROR,
                                              "Unclosed character literal",
-                                             pos()); }
+                                             pos(sb.length())); }
 
     /* Anything else is okay */
     [^\r\n\'\\]+                 { sb.append( yytext() ); }
@@ -455,9 +470,10 @@ OctalEscape = \\ [0-7]
                                               yytext() + "\"", pos()); }
 
     /* Unclosed string literal */
-    {LineTerminator}             { eq.enqueue(ErrorInfo.LEXICAL_ERROR,
+    {LineTerminator}             { yybegin(YYINITIAL);
+                                   eq.enqueue(ErrorInfo.LEXICAL_ERROR,
                                               "Unclosed string literal",
-                                              pos()); }
+                                              pos(sb.length())); }
 
     /* Anything else is okay */
     [^\r\n\"\\]+                 { sb.append( yytext() ); }
