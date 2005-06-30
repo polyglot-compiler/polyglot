@@ -531,28 +531,15 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     
         // Check typesBelow to see if we need to disambiguate supertypes
         // and signatures.
-        for (Iterator i = n.typesBelow().iterator(); i.hasNext(); ) {
-            ParsedClassType ct = (ParsedClassType) i.next();
-            if (! ct.supertypesResolved()) {
-                SupertypeDisambiguator sd = new SupertypeDisambiguator(ar);
-                n = (ClassDecl) sd.visitEdgeNoOverride(parent, n);
-                if (sd.hasErrors()) throw new SemanticException();
-                break;
-            }
-        }
+        SupertypeDisambiguator supDisamb = new SupertypeDisambiguator(ar);
+        n = (ClassDecl) supDisamb.visitEdgeNoOverride(parent, n);
+        if (supDisamb.hasErrors()) throw new SemanticException();
     
         // Hack to force n.disambiguate() to be called and supertypes set.
         // n = (ClassDecl) new SupertypeDisambiguator(tc).leave(parent, old, n, new SupertypeDisambiguator(tc));
-    
-        for (Iterator i = n.typesBelow().iterator(); i.hasNext(); ) {
-            ParsedClassType ct = (ParsedClassType) i.next();
-            if (! ct.signaturesResolved()) {
-                SignatureDisambiguator sd = new SignatureDisambiguator(ar);
-                n = (ClassDecl) sd.visitEdgeNoOverride(parent, n);
-                if (sd.hasErrors()) throw new SemanticException();
-                break;
-            }
-        }
+        SignatureDisambiguator sigDisamb = new SignatureDisambiguator(ar);
+        n = (ClassDecl) sigDisamb.visitEdgeNoOverride(parent, n);
+        if (sigDisamb.hasErrors()) throw new SemanticException();
         
         // Call enter and leave to manage the context.
         AmbiguityRemover childVisitor = (AmbiguityRemover) ar.enter(parent, n);

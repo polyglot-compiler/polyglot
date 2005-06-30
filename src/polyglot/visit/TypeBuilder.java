@@ -87,30 +87,7 @@ public class TypeBuilder extends HaltingVisitor
 
     public Node leave(Node old, Node n, NodeVisitor v) {
 	try {
-	    Node m = n.del().buildTypes((TypeBuilder) v);
-        
-	    final Collection typesBelow = new HashSet();
-	    m.visitChildren(new NodeVisitor() {
-	        public Node override(Node parent, Node n) {
-	            typesBelow.addAll(n.typesBelow());
-	            return n;
-	        }
-	    });
-	
-	    // TODO: change interface to allow easier aggregation of results computed
-	    // by children.
-	    if (m instanceof ClassDecl) {
-	        ClassDecl cd = (ClassDecl) m;
-	        typesBelow.add(cd.type());
-	    }
-	    else if (m instanceof New) {
-	        New nw = (New) m;
-	        if (nw.anonType() != null) {
-	            typesBelow.add(nw.anonType());
-	        }
-	    }
-	    
-	    return m.typesBelow(typesBelow);
+	    return n.del().buildTypes((TypeBuilder) v);
 	}
 	catch (SemanticException e) {
 	    Position position = e.position();

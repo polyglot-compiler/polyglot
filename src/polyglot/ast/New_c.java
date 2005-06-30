@@ -674,27 +674,14 @@ public class New_c extends Expr_c implements New
         if (childtc.hasErrors()) throw new SemanticException();
         
         // Now visit the body.
-        // Check typesBelow to see if we need to disambiguate supertypes
-        // and signatures.
         if (nn.body() != null) {
-            for (Iterator i = nn.body().typesBelow().iterator(); i.hasNext(); ) {
-                ParsedClassType ct = (ParsedClassType) i.next();
-                if (! ct.supertypesResolved()) {
-                    SupertypeDisambiguator sd = new SupertypeDisambiguator(childtc);
-                    nn = nn.body((ClassBody) nn.visitChild(nn.body(), sd));
-                    if (sd.hasErrors()) throw new SemanticException();
-                    break;
-                }
-            }
-            for (Iterator i = nn.body().typesBelow().iterator(); i.hasNext(); ) {
-                ParsedClassType ct = (ParsedClassType) i.next();
-                if (! ct.signaturesResolved()) {
-                    SignatureDisambiguator sd = new SignatureDisambiguator(childtc);
-                    nn = nn.body((ClassBody) nn.visitChild(nn.body(), sd));
-                    if (sd.hasErrors()) throw new SemanticException();
-                    break;
-                }
-            }
+            SupertypeDisambiguator supDisamb = new SupertypeDisambiguator(childtc);
+            nn = nn.body((ClassBody) nn.visitChild(nn.body(), supDisamb));
+            if (supDisamb.hasErrors()) throw new SemanticException();
+            
+            SignatureDisambiguator sigDisamb = new SignatureDisambiguator(childtc);
+            nn = nn.body((ClassBody) nn.visitChild(nn.body(), sigDisamb));
+            if (sigDisamb.hasErrors()) throw new SemanticException();
         }
     
         // Now visit the body.

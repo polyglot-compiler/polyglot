@@ -488,55 +488,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @param file
      * @return
      */
-    public boolean constructorsInitialized() {
-        return constructorsInitialized;
-    }
-
-    /**
-     * @param file
-     * @return
-     */
-    public boolean fieldsInitialized() {
-        return fieldsInitialized;
-    }
-
-    /**
-     * @param file
-     * @return
-     */
-    public boolean interfacesInitialized() {
-        return interfacesInitialized;
-    }
-
-    /**
-     * @param file
-     * @return
-     */
-    public boolean memberClassesInitialized() {
-        return memberClassesInitialized;
-    }
-
-    /**
-     * @param file
-     * @return
-     */
-    public boolean methodsInitialized() {
-        return methodsInitialized;
-    }
-
-    /**
-     * @param file
-     * @return
-     */
-    public boolean superclassInitialized() {
-        return superclassInitialized;
-    }
-
-    /**
-     * @param file
-     * @return
-     */
-    public boolean initialized() {
+    protected boolean initialized() {
         return superclassInitialized && interfacesInitialized
                 && memberClassesInitialized && methodsInitialized
                 && fieldsInitialized && constructorsInitialized;

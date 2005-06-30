@@ -37,7 +37,7 @@ public class SignaturesResolved extends ClassTypeGoal {
     }
     
     public int distanceFromGoal() {
-        return type().signaturesResolved() ? 0 : 1;
+        return type().numSignaturesUnresolved();
     }
     
     public boolean equals(Object o) {

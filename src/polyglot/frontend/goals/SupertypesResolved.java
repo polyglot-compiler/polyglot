@@ -36,7 +36,7 @@ public class SupertypesResolved extends ClassTypeGoal {
     }
     
     public int distanceFromGoal() {
-        return type().numSignaturesUnresolved();
+        return type().supertypesResolved() ? 0 : 1;
     }
 
     public boolean equals(Object o) {

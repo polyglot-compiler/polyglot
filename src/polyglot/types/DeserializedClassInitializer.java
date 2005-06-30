@@ -43,32 +43,4 @@ public class DeserializedClassInitializer implements LazyClassInitializer {
 
     public void initFields() {
     }
-
-    public boolean constructorsInitialized() {
-        return true;
-    }
-
-    public boolean fieldsInitialized() {
-        return true;
-    }
-
-    public boolean interfacesInitialized() {
-        return true;
-    }
-
-    public boolean memberClassesInitialized() {
-        return true;
-    }
-
-    public boolean methodsInitialized() {
-        return true;
-    }
-
-    public boolean superclassInitialized() {
-        return true;
-    }
-
-    public boolean initialized() {
-        return true;
-    }
 }

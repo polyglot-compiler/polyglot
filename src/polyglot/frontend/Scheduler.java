@@ -59,6 +59,9 @@ public abstract class Scheduler {
      * and after the pass is run. 
      */
     int currentProgress;
+    
+    /** True if any pass has failed. */
+    boolean failed;
 
     protected static final Object COMPLETED_JOB = "COMPLETED JOB";
 
@@ -248,6 +251,17 @@ public abstract class Scheduler {
         // completion. The idea is to finish a job as quickly as possible in
         // order to free its memory.
         
+        // Pick a goal not recently run, if available.
+        for (Iterator i = worklist.iterator(); i.hasNext(); ) {
+            Goal goal = (Goal) i.next();
+            Integer progress = (Integer) progressMap.get(goal);
+            if (progress == null || progress.intValue() < currentProgress) {
+                i.remove();
+                inWorklist.remove(goal);
+                return goal;
+            }
+        }
+        
         Goal goal = (Goal) worklist.removeFirst();
         inWorklist.remove(goal);
         return goal;
@@ -317,6 +331,8 @@ public abstract class Scheduler {
             Report.report(2, "Running to goal " + goal);
         
         if (Report.should_report(Report.frontend, 3)) {
+            Report.report(3, "  Distance = " + goal.distanceFromGoal());
+            Report.report(3, "  Reachable = " + goal.isReachable());
             Report.report(3, "  Prerequisites for " + goal + " = " + goal.prerequisiteGoals());
             Report.report(3, "  Concurrent goals for " + goal + " = " + goal.concurrentGoals());
             Report.report(3, "  Prereqs = " + prereqs);
@@ -324,10 +340,14 @@ public abstract class Scheduler {
         }
         
         if (reached(goal)) {
+            if (Report.should_report(Report.frontend, 3))
+                Report.report(3, "Already reached goal " + goal);
             return true;
         }
 
         if (! goal.isReachable()) {
+            if (Report.should_report(Report.frontend, 3))
+                Report.report(3, "Cannot reach goal " + goal);
             return false;
         }
         
@@ -398,6 +418,8 @@ public abstract class Scheduler {
             
             if (! okay) {
                 goal.setUnreachable();
+                if (Report.should_report(Report.frontend, 3))
+                    Report.report(3, "Cannot reach goal " + goal + "; " + subgoal + " failed");
                 return false;
             }
             
@@ -405,6 +427,8 @@ public abstract class Scheduler {
                 // put the subgoal back on the worklist
                 addGoal(subgoal);
                 runPass = false;
+                if (Report.should_report(Report.frontend, 3))
+                    Report.report(3, "Will delay goal " + goal + "; " + subgoal + " not reached");
             }
         }
 
@@ -415,6 +439,8 @@ public abstract class Scheduler {
             
             if (! okay) {
                 goal.setUnreachable();
+                if (Report.should_report(Report.frontend, 3))
+                    Report.report(3, "Cannot reach goal " + goal + "; " + subgoal + " failed");
                 return false;
             }
             
@@ -426,21 +452,30 @@ public abstract class Scheduler {
                 // needs to be completed first.
                 if (goal.job() != null && subgoal.job() == goal.job() && subgoal != goal) {
                     runPass = false;
+
+                    if (Report.should_report(Report.frontend, 3))
+                        Report.report(3, "Will delay goal " + goal + "; " + subgoal + " not reached");
                 }
             }
         }
 
         if (! runPass) {
+            if (Report.should_report(Report.frontend, 3))
+                Report.report(3, "A subgoal wasn't reached, delaying goal " + goal);
             throw new CyclicDependencyException();
         }
             
         // Check for completion again -- the goal may have been reached
         // while processing a subgoal.
         if (reached(goal)) {
+            if (Report.should_report(Report.frontend, 3))
+                Report.report(3, "Already reached goal " + goal + " (second check)");
             return true;
         }
         
         if (! goal.isReachable()) {
+            if (Report.should_report(Report.frontend, 3))
+                Report.report(3, "Cannot reach goal " + goal + " (second check)");
             return false;
         }
         
@@ -498,10 +533,13 @@ public abstract class Scheduler {
         }
         
         if (progressSinceLastAttempt(goal) == 0) {
+            if (failed) {
+                return false;
+            }
             throw new InternalCompilerError("Possible infinite loop detected trying to run a pass for " + goal + "; no progress made since last attempt.  Current distance from goal is " + goal.distanceFromGoal() + ".");
         }
         
-        final int MAX_RUN_COUNT = 10;
+        final int MAX_RUN_COUNT = 100;
         Integer countObj = (Integer) this.runCount.get(goal);
         int count = countObj != null ? countObj.intValue() : 0;
         count++;
@@ -599,12 +637,17 @@ public abstract class Scheduler {
         stats.accumPassTimes(pass.name(), pass.inclusiveTime(),
                              pass.exclusiveTime());
 
+        if (! result) {
+            failed = true;
+        }
+        
         // Record the progress made before running the pass and then update
         // the current progress.
         progressMap.put(goal, new Integer(currentProgress));
         int newDistance = goal.distanceFromGoal();
         int progress = newDistance - oldDistance;
-        progress = progress > 0 ? progress : 0;
+        progress = progress > 0 ? progress : 0; // make sure progress is forward
+        if (! result) progress++; // count a failure as progress
         currentProgress += progress;
             
         if (Report.should_report(Report.time, 2)) {

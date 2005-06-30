@@ -57,12 +57,6 @@ public interface Node extends JL, Copy
     /** Create a copy of the node with a new position. */
     Node position(Position position);
     
-    /** 
-     * Collection of all ParsedClassTypes whose ClassDecl is at this node or below.
-     */
-    Collection typesBelow();
-    Node typesBelow(Collection typesBelow);
-    
     /** Return true if there an error in this node or its children. */
     boolean error();
     Node error(boolean flag);

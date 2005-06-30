@@ -132,6 +132,10 @@ public class AmbiguityRemover extends DisambiguationDriver
     }
   
     public boolean isASTDisambiguated(Node n) {
+        return isASTDisambiguated_(n);
+    }
+  
+    public boolean isASTDisambiguated_(Node n) {
         return astAmbiguityCount(n) == 0;
     }
     
