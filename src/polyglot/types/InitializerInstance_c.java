@@ -30,7 +30,7 @@ public class InitializerInstance_c extends TypeObject_c
     public InitializerInstance container(ClassType container) {
         if (this.container != container) {
             InitializerInstance_c n = (InitializerInstance_c) copy();
-            n.container = container;
+            n.setContainer(container);
             return n;
         }
         return this;
@@ -47,7 +47,7 @@ public class InitializerInstance_c extends TypeObject_c
     public InitializerInstance flags(Flags flags) {
         if (!flags.equals(this.flags)) {
             InitializerInstance_c n = (InitializerInstance_c) copy();
-            n.flags = flags;
+            n.setFlags(flags);
             return n;
         }
         return this;

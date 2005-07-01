@@ -33,4 +33,53 @@ public class LocalInstance_c extends VarInstance_c implements LocalInstance
     public boolean isCanonical() {
 	return type.isCanonical();
     }
+    
+    public LocalInstance flags(Flags flags) {
+        if (!flags.equals(this.flags)) {
+            LocalInstance n = (LocalInstance) copy();
+            n.setFlags(flags);
+            return n;
+        }
+        return this;
+    }
+
+    public LocalInstance name(String name) {
+        if ((name != null && !name.equals(this.name)) ||
+            (name == null && this.name != null)) {
+            LocalInstance n = (LocalInstance) copy();
+            n.setName(name);
+            return n;
+        }
+        return this;
+    }
+
+    public LocalInstance type(Type type) {
+        if (this.type != type) {
+            LocalInstance n = (LocalInstance) copy();
+            n.setType(type);
+            return n;
+        }
+        return this;
+    }
+
+    public LocalInstance constantValue(Object constantValue) {
+        if ( ! constantValueSet ||
+                (constantValue != null && !constantValue.equals(this.constantValue))
+                || (constantValue == null && this.constantValue != null)) {
+            LocalInstance copy = (LocalInstance) this.copy();
+            copy.setConstantValue(constantValue);
+            return copy;
+        }
+        return this;
+    }
+    
+    public LocalInstance notConstant() {
+        if (! this.constantValueSet || this.isConstant) {
+            LocalInstance copy = (LocalInstance) this.copy();
+            copy.setNotConstant();
+            return copy;
+        }
+        return this;
+    }
+
 }

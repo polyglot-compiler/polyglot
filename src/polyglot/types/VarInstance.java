@@ -32,7 +32,6 @@ public interface VarInstance extends TypeObject
      */
     Object constantValue();
 
-
     /**
      * Destructively set the constant value of the field.
      * @param value the constant value.  Should be an instance of String,
@@ -60,4 +59,5 @@ public interface VarInstance extends TypeObject
      * Destructively set the flags of the variable.
      */
     void setFlags(Flags flags);
+
 }

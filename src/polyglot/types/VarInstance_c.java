@@ -55,7 +55,7 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     public Flags flags() {
         return flags;
     }
-
+    
     public Type type() {
         return type;
     }

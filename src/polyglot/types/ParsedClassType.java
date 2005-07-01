@@ -43,14 +43,29 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
     void addInterface(Type t);
 
     /**
+     * Set the class's interfaces.
+     */
+    void setInterfaces(List l);
+    
+    /**
      * Add a field to the class.
      */
     void addField(FieldInstance fi);
 
     /**
+     * Set the class's fields.
+     */
+    void setFields(List l);
+    
+    /**
      * Add a method to the class.
      */
     void addMethod(MethodInstance mi);
+
+    /**
+     * Set the class's methods.
+     */
+    void setMethods(List l);
 
     /**
      * Add a constructor to the class.
@@ -58,9 +73,19 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
     void addConstructor(ConstructorInstance ci);
 
     /**
+     * Set the class's constructors.
+     */
+    void setConstructors(List l);
+    
+    /**
      * Add a member class to the class.
      */
     void addMemberClass(ClassType t);
+
+    /**
+     * Set the class's member classes.
+     */
+    void setMemberClasses(List l);
 
     /**
      * Set the flags of the class.
@@ -97,16 +122,6 @@ public interface ParsedClassType extends ClassType, ParsedTypeObject
     void setMembersAdded(boolean flag);
     void setSupertypesResolved(boolean flag);
     void setSignaturesResolved(boolean flag);
-    
-    /**
-     * Clear all the constructor instances in the class type.
-     */
-    void clearConstructors();
-    
-    /**
-     * Clear all the method instances in the class type.
-     */
-    void clearMethods();
     
     boolean needSerialization();
     void needSerialization(boolean b);

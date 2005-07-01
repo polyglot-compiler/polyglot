@@ -27,6 +27,14 @@ public class MethodInstance_c extends ProcedureInstance_c
 	this.name = name;
     }
 
+    public String name() {
+        return name;
+    }
+
+    public Type returnType() {
+        return returnType;
+    }
+
     public MethodInstance flags(Flags flags) {
         if (!flags.equals(this.flags)) {
             MethodInstance_c n = (MethodInstance_c) copy();
@@ -34,10 +42,6 @@ public class MethodInstance_c extends ProcedureInstance_c
             return n;
         }
         return this;
-    }
-
-    public String name() {
-        return name;
     }
 
     public MethodInstance name(String name) {
@@ -48,10 +52,6 @@ public class MethodInstance_c extends ProcedureInstance_c
             return n;
         }
         return this;
-    }
-
-    public Type returnType() {
-        return returnType;
     }
 
     public MethodInstance returnType(Type returnType) {

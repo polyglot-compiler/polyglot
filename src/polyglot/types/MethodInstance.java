@@ -1,6 +1,10 @@
 package polyglot.types;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import polyglot.ext.jl.types.MethodInstance_c;
+import polyglot.util.CollectionUtil;
 
 /**
  * A <code>MethodInstance</code> represents the type information for a Java
@@ -30,6 +34,13 @@ public interface MethodInstance extends ProcedureInstance
      */
     void setName(String name);
 
+    /** Non-destructive updates. */
+    MethodInstance flags(Flags flags);
+    MethodInstance name(String name);
+    MethodInstance returnType(Type returnType);
+    MethodInstance formalTypes(List l);
+    MethodInstance throwTypes(List l);
+    MethodInstance container(ReferenceType container);
 
     /**
      * Get the list of methods this method (potentially) overrides, in order

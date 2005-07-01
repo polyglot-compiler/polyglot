@@ -218,6 +218,26 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
 	memberClasses.add(t);
     }
     
+    public void setInterfaces(List l) {
+        this.interfaces = new ArrayList(l);
+    }
+    
+    public void setMethods(List l) {
+        this.methods = new ArrayList(l);
+    }
+
+    public void setFields(List l) {
+        this.fields = new ArrayList(l);
+    }
+    
+    public void setConstructors(List l) {
+        this.constructors = new ArrayList(l);
+    }
+
+    public void setMemberClasses(List l) {
+        this.memberClasses = new ArrayList(l);
+    }
+                                          
     public boolean defaultConstructorNeeded() {
         if (flags().isInterface()) {
             return false;
@@ -384,19 +404,11 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         in.defaultReadObject();
     }
 
-    public void clearConstructors() {
-    	constructors.clear();
-    }
-    
     public void needSerialization(boolean b) {
         needSerialization = b;
     }
     
     public boolean needSerialization() {
         return needSerialization;
-    }
-    
-    public void clearMethods() {
-    	methods.clear();
     }
 }
