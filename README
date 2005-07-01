@@ -142,17 +142,17 @@ Credits and Acknowledgments
 The current Polyglot developers are:
 
         Nathaniel Nystrom
-        Stephen Chong
 
 The Polyglot project group is supervised by Prof. Andrew Myers at the
 Cornell University Computer Science Department.
 
 Several other people have contributed to the development:
 
-        Michael Brukman         Michael Clarkson
-        Matt Harren             Aleksey Kliger
-        Jed Liu                 Naveen Sastry           
-        Dan Spoonhower          Steve Zdancewic         
+        Michael Brukman         Stephen Chong
+        Michael Clarkson        Matt Harren            
+        Aleksey Kliger          Jed Liu
+        Naveen Sastry           Dan Spoonhower 
+        Xin Qi                  Steve Zdancewic         
         Lantian Zheng
 
 The Polyglot class file parsing code (src/polyglot/types/reflect)
@@ -160,9 +160,8 @@ is derived from the BLOAT bytecode optimizer written by Nathaniel
 Nystrom, David Whitlock, and Antony Hosking at Purdue University.  See
 http://www.cs.purdue.edu/s3/projects/bloat/.
 
-The Base64 code (polyglot.util.Base64) by Kevin Kelley
-<kelley@ruralnet.net>, 30718 Rd. 28, La Junta, CO, 81050 USA.
-http://kevinkelley.mystarband.net/java/goodies.html
+The Base64 code (polyglot.util.Base64) is derived from public domain
+code by Robert Harder <rob@iharder.net>.  See http://iharder.net/base64.
 
 The following people have provided patches:
 
@@ -171,6 +170,7 @@ The following people have provided patches:
         Ondrej Lhotak <olhotak@sable.mcgill.ca>
         Oege de Moor <Oege.de.Moor@comlab.ox.ac.uk>
         Pavel Avgustinov <pavel.avgustinov@magdalen.oxford.ac.uk>
+        Alessandro Warth <alexwarth@gmail.com>
 
 The development of the Polyglot project has been supported by a number
 of funding sources, including DARPA Contract F30602-99-1-0533, monitored
@@ -198,8 +198,17 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 Lesser General Public License for more details.
 
 A copy of the GNU Lesser General Public License can be found in the file
-LICENSE, included in this distribution.
+LICENSE.LGPL, included in this distribution.
 
+
+Except for the files listed below, all files in this distribution are also
+released under the Eclipse Public License Version 1.0.  A copy of the license
+can be found in the file LICENSE.Eclipse, included in this distribution.
+
+The following files are covered by the LGPL, but are not released under
+the Eclipse Public License:
+
+        src/polyglot/ext/jl/parse/java12.cup
 
 CUP Parser Generator Copyright Notice, License, and Disclaimer
 ---------------------------------------------------------------
@@ -229,14 +238,14 @@ Research Foundation of Purdue University.
 
 BLOAT was written by Nathaniel Nystrom, David Whitlock, and Antony Hosking
 at Purdue University.  BLOAT is licensed under the LGPL and has the same
-restrictions on distributed as Polyglot.  See the file LICENSE for a copy.
+restrictions on distributed as Polyglot.  See the file LICENSE.LGPL for
+a copy.
 
 
 BASE64 Copyright Notice, License, and Disclaimer
 ------------------------------------------------
-The Base64 code (polyglot.util.Base64) is Copyright (c) 1998 by Kevin 
-Kelley.  It is licensed under the LGPL and has the same restrictions 
-on distribution as Polyglot.  See the file LICENSE for a copy.
+The Base64 code (polyglot.util.Base64) is derived from public domain
+code by Robert Harder <rob@iharder.net>.  See http://iharder.net/base64.
 
 
 Java is a trademark of Sun Microsystems, Inc.
