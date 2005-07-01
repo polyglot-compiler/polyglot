@@ -1,3 +1,5 @@
+package polyglot.util;
+
 /**
  * Encodes and decodes to and from Base64 notation.
  *
