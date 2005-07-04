@@ -974,7 +974,7 @@ public class InnerTranslator extends NodeVisitor {
 //			ct.addField(fd.fieldInstance());
 //		}
 		
-		ct.clearConstructors();
+		ct.setConstructors(Collections.EMPTY_LIST);
 		for (Iterator it = cd.body().members().iterator(); it.hasNext(); ) {
 			ClassMember m = (ClassMember)it.next();
 			if (m instanceof ConstructorDecl) {
