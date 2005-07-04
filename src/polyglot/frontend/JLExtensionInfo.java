@@ -131,10 +131,12 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
         
         l.add(serialize);
 
+        /*
         l.add(scheduler.internGoal(new VisitorGoal(job, new LocalClassRemover(job, ts, nf))));
         l.add(scheduler.internGoal(new VisitorGoal(job, new InnerClassConstructorFixer(job, ts, nf))));
         l.add(scheduler.internGoal(new VisitorGoal(job, new InnerClassRewriter(job, ts, nf))));
         l.add(scheduler.internGoal(new VisitorGoal(job, new InnerClassRemover(job, ts, nf))));
+        */
         
         l.add(output);
         
