@@ -814,7 +814,8 @@ ext=""
     <copy file="build.xml" todir="${dist}"/>
     <copy file="README" todir="${dist}"/>
     <copy file="CHANGES" todir="${dist}"/>
-    <copy file="LICENSE" todir="${dist}"/>
+    <copy file="LICENSE.LGPL" todir="${dist}"/>
+    <copy file="LICENSE.Eclipse" todir="${dist}"/>
   </target>
 
   <target name="dist-javadoc" depends="jl-dist">
