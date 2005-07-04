@@ -10,7 +10,6 @@ public interface ConstructorInstance extends ProcedureInstance
 {
     /** Non-destructive updates. */
     ConstructorInstance flags(Flags flags);
-    ConstructorInstance name(String name);
     ConstructorInstance formalTypes(List l);
     ConstructorInstance throwTypes(List l);
     ConstructorInstance container(ClassType container);
