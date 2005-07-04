@@ -23,7 +23,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c
     public ConstructorInstance flags(Flags flags) {
         if (!flags.equals(this.flags)) {
             ConstructorInstance_c n = (ConstructorInstance_c) copy();
-            n.flags = flags;
+            n.setFlags(flags);
             return n;
         }
         return this;
@@ -32,7 +32,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c
     public ConstructorInstance formalTypes(List l) {
         if (!CollectionUtil.equals(this.formalTypes, l)) {
             ConstructorInstance_c n = (ConstructorInstance_c) copy();
-            n.formalTypes = new ArrayList(l);
+            n.setFormalTypes(l);
             return n;
         }
         return this;
@@ -41,7 +41,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c
     public ConstructorInstance throwTypes(List l) {
         if (!CollectionUtil.equals(this.throwTypes, l)) {
             ConstructorInstance_c n = (ConstructorInstance_c) copy();
-            n.throwTypes = new ArrayList(l);
+            n.setThrowTypes(l);
             return n;
         }
         return this;
@@ -50,7 +50,7 @@ public class ConstructorInstance_c extends ProcedureInstance_c
     public ConstructorInstance container(ClassType container) {
         if (this.container != container) {
             ConstructorInstance_c n = (ConstructorInstance_c) copy();
-            n.container = container;
+            n.setContainer(container);
             return n;
         }
         return this;

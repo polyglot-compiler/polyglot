@@ -65,8 +65,8 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
     }
     
     public FieldInstance constantValue(Object constantValue) {
-        if ( ! constantValueSet ||
-                (constantValue != null && !constantValue.equals(this.constantValue))
+        if (!constantValueSet
+                || (constantValue != null && !constantValue.equals(this.constantValue))
                 || (constantValue == null && this.constantValue != null)) {
             FieldInstance copy = (FieldInstance) this.copy();
             copy.setConstantValue(constantValue);
