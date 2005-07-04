@@ -546,16 +546,11 @@ public abstract class Scheduler {
         this.runCount.put(goal, new Integer(count));
         
         if (count >= MAX_RUN_COUNT) {
-            String cardinal = "";
-            if (count % 10 == 1 && count != 11) {
-                cardinal = count + "st";
-            }
-            else if (count % 10 == 2 && count != 12) {
-                cardinal = count + "nd";
-            }
-            else {
-                cardinal = count + "th";
-            }
+            String[] suffix = new String[] { "th", "st", "nd", "rd" };
+            int index = count % 10;
+            if (index > 3) index = 0;
+            if (11 <= count && count <= 13) index = 0;
+            String cardinal = count + suffix[index];
             throw new InternalCompilerError("Possible infinite loop detected trying to run a pass for " + goal + " for the " + cardinal + " time.");
         }
         

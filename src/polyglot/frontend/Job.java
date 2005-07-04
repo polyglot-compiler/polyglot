@@ -9,7 +9,7 @@ import polyglot.util.CodeWriter;
  * particular compilation unit carried between phases of the compiler.
  * Only one pass should be run over a job at a time.
  * 
- * TODO: The class should be renamed CompilationUnit.
+ * TODO: The class should probably be renamed to, say, CompilationUnit.
  */
 public class Job
 {
