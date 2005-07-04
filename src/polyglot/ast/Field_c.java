@@ -20,7 +20,7 @@ public class Field_c extends Expr_c implements Field
   protected String name;
   protected FieldInstance fi;
   protected boolean targetImplicit;
-
+  
   public Field_c(Position pos, Receiver target, String name) {
     super(pos);
     this.target = target;
@@ -214,7 +214,7 @@ public class Field_c extends Expr_c implements Field
 
 
   public String toString() {
-    return ((target != null && !targetImplicit)? target + "." : "") + name;
+    return (target != null ? target + "." : "") + name;
   }
 
 
