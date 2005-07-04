@@ -987,8 +987,7 @@ public class Base64
      * Encodes a byte array into Base64 notation.
      * Does not GZip-compress data.
      * Added for backward compatibility with old Base64 implementation.
-     *
-     * @author nystrom
+     * --nystrom
      *
      * @param data The data to convert
      */
@@ -1002,10 +1001,9 @@ public class Base64
      * Decodes data from Base64 notation, automatically
      * detecting gzip-compressed data and decompressing it.
      * Added for backward compatibility with old Base64 implementation.
+     * --nystrom
      *
-     * @author nystrom
-     *
-     * @param s the character array to decode
+     * @param data the character array to decode
      * @return the decoded data
      */
     public static byte[] decode(char[] data)
