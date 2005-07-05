@@ -185,7 +185,7 @@ This release of the Polyglot distribution is governed by the LGPL
 license as described by the following copyright notice.
 
 Polyglot extensible compiler framework
-Copyright (C) 2000-2004 Polyglot project group, Cornell University
+Copyright (C) 2000-2005 Polyglot project group, Cornell University
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -201,14 +201,18 @@ A copy of the GNU Lesser General Public License can be found in the file
 LICENSE.LGPL, included in this distribution.
 
 
-Except for the files listed below, all files in this distribution are also
-released under the Eclipse Public License Version 1.0.  A copy of the license
-can be found in the file LICENSE.Eclipse, included in this distribution.
+Excluding the exceptions listed below, all files in this release are also
+released under the Eclipse Public License.  A copy of the license can be
+found in the file LICENSE.Eclipse, included in this distribution.
 
-The following files are covered by the LGPL, but are not released under
+The following files are covered by the LGPL, but are NOT released under
 the Eclipse Public License:
 
         src/polyglot/ext/jl/parse/java12.cup
+
+Additionally, any build targets (e.g., polyglot.jar) derived from the
+above files are not released under the Eclipse Public License.
+
 
 CUP Parser Generator Copyright Notice, License, and Disclaimer
 ---------------------------------------------------------------
