@@ -199,9 +199,9 @@ public abstract class NodeVisitor
      * 
      * @param parent the parent node of <code>child</code>, <code>null</code> if
      *         <code>child</code> was visited by calling 
-     *         {@link Node#visit(NodeVisitor) Node.visit(NodeVisitor)} instead
-     *         of {@link Node#visitChild(Node, NodeVisitor) 
-     *         Node.visitChild(Node, NodeVisitor)}.
+     *         {@link polyglot.ast.Node#visit(NodeVisitor) Node.visit(NodeVisitor)} instead
+     *         of {@link polyglot.ast.Node#visitChild(Node, NodeVisitor) 
+     *         polyglot.ast.Node.visitChild(Node, NodeVisitor)}.
      * @param child the child node of <code>parent</code> to be visited.
      * @return the (possibly new) version of <code>child</code> after the 
      *       subtree rooted at <code>child</code> has been recursively visited.

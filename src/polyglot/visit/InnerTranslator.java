@@ -853,8 +853,8 @@ public class InnerTranslator extends NodeVisitor {
 	}
 	
 	/**
-	 * Update new expressions to include necessary arguments (e.g. enclosing instances), and eliminate
-	 * qualifers. 
+         * Update new expressions to include necessary arguments (for example,
+         * enclosing instances) and eliminate qualifers. 
 	 * @param newExpr
 	 * @return
 	 */

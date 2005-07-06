@@ -20,7 +20,7 @@ public class UnavailableTypeException extends RuntimeException {
     
     /**
      * @param job
-     * @param className
+     * @param fullName
      */
     public UnavailableTypeException(Job job, String fullName) {
         this(job, fullName, null);
@@ -28,7 +28,7 @@ public class UnavailableTypeException extends RuntimeException {
 
     /**
      * @param job
-     * @param className
+     * @param fullName
      * @param position
      */
     public UnavailableTypeException(Job job, String fullName, Position position) {

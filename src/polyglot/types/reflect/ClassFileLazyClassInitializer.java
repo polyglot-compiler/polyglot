@@ -34,12 +34,6 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
 
     static Collection verbose = ClassFileLoader.verbose;
 
-    /**
-     * Constructor. This constructor parses the class file from the byte array
-     * 
-     * @param code
-     *            A byte array containing the class data
-     */
     public ClassFileLazyClassInitializer(ClassFile file, TypeSystem ts) {
         this.clazz = file;
         this.ts = ts;
