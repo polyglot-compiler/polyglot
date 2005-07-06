@@ -7,12 +7,13 @@ Jul 6, 2005: Polyglot 2.0alpha
 ==============================
   What's new since Polyglot 1.3.2:
   --------------------------------
-    New pass scheduler.
-
-    Miscellaneous bug fixes.
-    
+    New pass scheduler and many other non-backward-compatible changes.
     See doc/Upgrade.txt for more details on the changes and
     for instructions on upgrading extensions.
+
+    New command-line option, -commandlineonly, tells the compiler
+    to compile only files listed on the command-line, not dependees
+    of those files.
 
 
 Jul 5, 2005: Polyglot 1.3.2
