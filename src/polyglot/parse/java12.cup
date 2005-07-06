@@ -22,6 +22,9 @@ import polyglot.ast.Assert;
  * distribution of this modified version of the parser and its derivatives
  * under the terms of the LGPL.
  *
+ * NOTE: Unlike most files in the Polyglot distribution, this file is
+ * NOT released under the Eclipse Public License.
+ *
  * extended to support Java 1.4 (assert keyword).
  */
 
