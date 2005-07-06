@@ -232,7 +232,6 @@ public class New_c extends Expr_c implements New
     /**
      * @param ar
      * @param ct
-     * @return
      * @throws SemanticException
      */
     private New_c findQualifier(AmbiguityRemover ar, ClassType ct) throws SemanticException {
@@ -628,7 +627,6 @@ public class New_c extends Expr_c implements New
     /**
      * @param parent
      * @param tc
-     * @return
      */
     public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
         New nn = this;

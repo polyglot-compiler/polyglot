@@ -514,7 +514,6 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     /**
      * @param parent
      * @param ar
-     * @return
      */
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
         // Don't do anything special for member classes; the disambiguation passes

@@ -224,7 +224,8 @@ public abstract class NodeVisitor
      * 
      * @param parent
      * @param child
-     * @return
+     * @return the (possibly new) version of <code>child</code> after the 
+     *       subtree rooted at <code>child</code> has been recursively visited.
      */
     public Node visitEdgeNoOverride(Node parent, Node child) {
         if (child == null) {

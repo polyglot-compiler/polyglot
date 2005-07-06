@@ -213,7 +213,6 @@ public class SourceFile_c extends Node_c implements SourceFile
     /**
      * @param parent
      * @param ar
-     * @return
      */
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
         SourceFile n = this;

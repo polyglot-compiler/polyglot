@@ -605,7 +605,6 @@ public class InnerTranslator extends NodeVisitor {
 	 * @param old
 	 * @param local
 	 * @param v
-	 * @return
 	 */
 	protected Node leaveLocal(Node old, Local local, NodeVisitor v) {
 		if (local.flags().isFinal()) {
@@ -636,7 +635,6 @@ public class InnerTranslator extends NodeVisitor {
 	/**
 	 * Generate a special node "this" with the correct type.
 	 * @param ct
-	 * @return
 	 */
 	protected Special produceThis(ClassType ct) {
 		Special s = nf.Special(Position.compilerGenerated(), Special.THIS);
@@ -836,7 +834,6 @@ public class InnerTranslator extends NodeVisitor {
 	/**
 	 * Find ClassInfo for ClassType ct, from innerClassInfoMap. 
 	 * @param ct
-	 * @return
 	 */
 	protected ClassInfo findClassInfo(ClassType ct) {
 		ClassInfo cinfo = (ClassInfo)innerClassInfoMap.get(ct.fullName());
@@ -846,7 +843,6 @@ public class InnerTranslator extends NodeVisitor {
 	/**
 	 * Check whether ct is a type in source language.
 	 * @param ct
-	 * @return
 	 */
 	protected boolean isSourceType(ClassType ct) {
 		return true;
@@ -856,7 +852,6 @@ public class InnerTranslator extends NodeVisitor {
          * Update new expressions to include necessary arguments (for example,
          * enclosing instances) and eliminate qualifers. 
 	 * @param newExpr
-	 * @return
 	 */
 	protected Expr updateNewExpr(New newExpr) {
 		ClassType ct = (ClassType)newExpr.type(); 
