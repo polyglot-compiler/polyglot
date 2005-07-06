@@ -163,9 +163,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     }
 
     /**
-     * @param ts
-     * @return
-     * @throws SemanticException
+     * Create the type for this class file.
      */
     public ParsedClassType type() throws SemanticException {
         ParsedClassType ct = createType();
@@ -173,9 +171,10 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     }
 
     /**
-     * @param t
-     * @param dims
-     * @return
+     * Return an array type.
+     * @param t The array base type.
+     * @param dims The number of dimensions of the array.
+     * @return An array type.
      */
     Type arrayOf(Type t, int dims) {
         if (dims == 0) {
@@ -187,8 +186,9 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     }
 
     /**
-     * @param str
-     * @return
+     * Return a list of types based on a JVM type descriptor string.
+     * @param str The type descriptor.
+     * @return The corresponding list of types.
      */
     List typeListForString(String str) {
         List types = new ArrayList();
@@ -252,8 +252,9 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     }
 
     /**
-     * @param str
-     * @return
+     * Return a type based on a JVM type descriptor string. 
+     * @param str The type descriptor.
+     * @return The corresponding type.
      */
     Type typeForString(String str) {
         List l = typeListForString(str);
@@ -266,8 +267,10 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     }
 
     /**
-     * @param name
-     * @return
+     * Looks up a class by name, assuming the class exists.
+     * @param name Name of the class to find.
+     * @return A ClassType with the given name.
+     * @throws InternalCompilerError if the class does not exist.
      */
     ClassType quietTypeForName(String name) {
         if (Report.should_report(verbose, 2))
@@ -282,9 +285,10 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     }
 
     /**
-     * @param name
-     * @return
-     * @throws SemanticException
+     * Looks up a class by name.
+     * @param name Name of the class to find.
+     * @return A ClassType with the given name.
+     * @throws SemanticException if the class does not exist.
      */
     ClassType typeForName(String name) throws SemanticException {
         if (Report.should_report(verbose, 2))
@@ -292,9 +296,6 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         return (ClassType) ts.systemResolver().find(name);
     }
 
-    /**
-     * @param ct
-     */
     public void initSuperclass() {
         if (superclassInitialized) {
             return;
@@ -321,10 +322,6 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
     }
 
-    /**
-     * @param ct
-     * @param file
-     */
     public void initInterfaces() {
         if (interfacesInitialized) {
             return;
@@ -343,9 +340,6 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
     }
 
-    /**
-     * @param ct
-     */
     public void initMemberClasses() {
         if (memberClassesInitialized) {
             return;
@@ -400,10 +394,6 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
     }
 
-    /**
-     * @param ct
-     * @param file
-     */
     public void initFields() {
         if (fieldsInitialized) {
             return;
@@ -427,10 +417,6 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
     }
 
-    /**
-     * @param ct
-     * @param file
-     */
     public void initMethods() {
         if (methodsInitialized) {
             return;
@@ -455,10 +441,6 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
     }
 
-    /**
-     * @param ct
-     * @param file
-     */
     public void initConstructors() {
         if (constructorsInitialized) {
             return;
@@ -484,10 +466,6 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
     }
 
-    /**
-     * @param file
-     * @return
-     */
     protected boolean initialized() {
         return superclassInitialized && interfacesInitialized
                 && memberClassesInitialized && methodsInitialized
@@ -495,9 +473,9 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     }
 
     /**
-     * @param method
-     * @param ct
-     * @return
+     * Create a MethodInstance.
+     * @param method The JVM Method data structure.
+     * @param ct The class containing the method.
      */
     MethodInstance methodInstance(Method method, ClassType ct) {
         Constant[] constants = clazz.getConstants();
@@ -529,10 +507,11 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
       }
 
     /**
-     * @param method
-     * @param ct
-     * @param fields
-     * @return
+     * Create a ConstructorInstance.
+     * @param method The JVM Method data structure for the constructor.
+     * @param ct The class containing the method.
+     * @param fields The constructor's fields, needed to remove parameters
+     * passed to initialize synthetic fields.
      */
     ConstructorInstance constructorInstance(Method method, ClassType ct, Field[] fields) {
         // Get a method instance for the <init> method.
@@ -565,9 +544,9 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     }
 
     /**
-     * @param field
-     * @param ct
-     * @return
+     * Create a FieldInstance.
+     * @param field The JVM Field data structure for the field.
+     * @param ct The class containing the field.
      */
     FieldInstance fieldInstance(Field field, ClassType ct) {
       Constant[] constants = clazz.getConstants();

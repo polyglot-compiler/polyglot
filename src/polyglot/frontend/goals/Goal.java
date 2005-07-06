@@ -37,7 +37,7 @@ public interface Goal {
     public Collection prerequisiteGoals();
      
     /**
-     * Add a new concurrent subgoal <code>g</code>.<code>g</code> is a
+     * Add a new concurrent subgoal <code>g</code>.  <code>g</code> is a
      * goal on which this goal mutually depends.  The caller must be careful
      * to ensure that all concurrent goals can be eventually reached.
      * <code>g</code> should be interned.
@@ -45,7 +45,7 @@ public interface Goal {
     public void addConcurrentGoal(Goal g);
     
     /**
-     * Add a new subgoal <code>g</code>.<code>g</code> must be completed
+     * Add a new subgoal <code>g</code>.  <code>g</code> must be completed
      * before this goal is attempted.  <code>g</code> should be interned.
      * 
      * @throws CyclicDependencyException

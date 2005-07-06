@@ -9,13 +9,13 @@ import polyglot.types.MethodInstance;
  * <code>Binary</code> AST node.
  */
 public class PaoBinaryExt_c extends PaoExt_c {
-	/**
-     * Rewrite the binary operators <code>==</code> and <code>!=</code> to 
+    /**
+     * Rewrite the binary operators <code>==</code> and <code>&excl;=</code> to 
      * invoke <code>Primitive.equals(o, p)</code>.
-	 * 
-	 * @see PaoExt#rewrite(PaoTypeSystem, NodeFactory)
-	 * @see polyglot.ext.pao.runtime.Primitive#equals(Object, Object)
-	 */
+     * 
+     * @see PaoExt#rewrite(PaoTypeSystem, NodeFactory)
+     * @see polyglot.ext.pao.runtime.Primitive#equals(Object, Object)
+     */
     public Node rewrite(PaoTypeSystem ts, NodeFactory nf) {
         Binary b = (Binary) node();
         Expr l = b.left();
