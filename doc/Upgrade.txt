@@ -33,16 +33,17 @@ The new schedule has the following passes:
         type check
         ...
 
-Not only is the scheduler shorter, but the compiler should use less
-memory as well (I'm still doing performance tuning).
+Not only is the schedule much shorter, but the compiler should use less
+memory as well because it uses fewer barriers (I'm still doing performance
+tuning, though).
 
 The changes to the scheduler are not backward compatible and some
 porting effort is required.  Porting small extensions (e.g., PAO) takes
 a few minutes.  Porting Coffer took a few hours.  Larger extensions
 (e.g., Jif, Jx) may take a few days or a week.
 
-Changes
--------
+The Scheduler
+-------------
 
 The new scheduler works by attempting to satisfy _goals_.
 Examples of goals are:

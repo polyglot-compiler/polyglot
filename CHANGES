@@ -3,6 +3,48 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
+Jul 6, 2005: Polyglot 2.0alpha
+==============================
+  What's new since Polyglot 1.3.2:
+  --------------------------------
+    New pass scheduler.
+
+    Miscellaneous bug fixes.
+    
+    See doc/Upgrade.txt for more details on the changes and
+    for instructions on upgrading extensions.
+
+
+Jul 5, 2005: Polyglot 1.3.2
+===========================
+  What's new since Polyglot 1.3.1:
+  --------------------------------
+    Miscellaneous bug fixes with method lookup.
+
+    Changed implementation of polyglot.util.Base64 to allow relicensing.
+
+    Certain files in the distribution are now licensed under the Eclipse Public
+    License as well as LGPL.  See the README for more details.
+
+
+Mar 24, 2005: Polyglot 1.3.1
+============================
+  What's new since Polyglot 1.3.0:
+  --------------------------------
+    Miscellaneous bug fixes with operator precedence, lexing,
+    pass scheduling, data flow, class loading.
+
+    Added -j to jlc script to allow options to be passed to the VM.
+    For example, 'jlc -j -Xmx512m -ext pao' will pass -Xmx512m to the VM.
+
+    Added method Position.compilerGenerated(), which creates a Position
+    object for the line number in the compiler that called
+    Position.compilerGenerated().
+
+    TypeSystem.packageForName can now throw a SemanticException.
+    TypeSystem.createPackage implements the old behavior.
+
+
 Jul 30, 2004: Polyglot 1.3.0
 ============================
   What's new since Polyglot 1.2.0:
