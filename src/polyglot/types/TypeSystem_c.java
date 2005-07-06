@@ -1691,7 +1691,7 @@ public class TypeSystem_c implements TypeSystem
     }
 
     public LazyClassInitializer defaultClassInitializer() {
-        return new LazyClassInitializer_c(this);
+        return new SchedulerClassInitializer(this);
     }
     
     /**
