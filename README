@@ -209,9 +209,15 @@ The following files are covered by the LGPL, but are NOT released under
 the Eclipse Public License:
 
         src/polyglot/ext/jl/parse/java12.cup
+        lib/polyglot.jar
+        lib/coffer.jar
+        lib/pao.jar
 
-Additionally, any build targets (e.g., polyglot.jar) derived from the
-above files are not released under the Eclipse Public License.
+        src/java_cup (and all files in subdirectories)
+        lib/java_cup.jar
+
+Additionally, any build targets derived from the above files are not
+released under the Eclipse Public License.
 
 
 CUP Parser Generator Copyright Notice, License, and Disclaimer
