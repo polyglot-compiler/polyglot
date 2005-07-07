@@ -39,8 +39,8 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         ConformanceCheck6.jl ;         
         ConformanceCheck7.jl (Semantic, "should be declared abstract");        
         packA/ConformanceCheck8.jl packB/ConformanceCheck8b.jl (Semantic, "should be declared abstract"); 
-        packA/ProtectedAccess1.jl packB/ProtectedAccess2.jl (Semantic, "No valid method call");
-        package1/ProtectedTest.jl package2/ProtectedTestBase.jl (Semantic, "No valid method call");
+        packA/ProtectedAccess1.jl packB/ProtectedAccess2.jl (Semantic, "Method.*inaccessible");
+        package1/ProtectedTest.jl package2/ProtectedTestBase.jl (Semantic, "Method.*inaccessible");
         package1/InnerClassAccess.jl package1/InnerClassProblem.jl ;
         Constants.jl ;  Constants2.jl ; Constants3.jl ; Constants4.jl ;
         Constants5.jl ; Constants6.jl ; Constants7.jl ; Constants8.jl;
@@ -69,7 +69,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         Import.jl ;
         Increment.jl ;
         Infinite.jl ;
-        Inherit.jl (Semantic, "No valid method call found");
+        Inherit.jl (Semantic, "Method.*cannot be called with arguments");
         InheritClass.jl ;
         Init1.jl ; Init2.jl ; Init3.jl ; Init4.jl ; Init5.jl ;
         LiteralsCf.jl   (Lexical, "Illegal float literal"),
@@ -167,8 +167,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         BadInit.jl (Semantic, "Method .* not found"),
                    (Semantic, "Method .* not found");
         BadInner.jl (Semantic, "Could not find non-static member class");
-        BadInner2.jl (Semantic, "Cannot provide a containing instance for non-inner class"),
-                     (Semantic, "Cannot provide a containing instance for non-inner class");
+        BadInner2.jl (Semantic, "Cannot provide a containing instance for non-inner class");
         BadInner3.jl (Semantic, "The nested class .* does not have an enclosing instance of type .*");
         BadInner4.jl (Semantic, "The type of the qualifier .* does not match the immediately enclosing class  of the super class .*");
 	BadInner5.jl (Semantic, "Class .* not found in scope of ");
@@ -182,7 +181,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
 	BadMultipleVarDef.jl (Semantic, "Local variable .* multiply defined"),
 			     (Semantic, "Local variable .* multiply defined");
 	BadOverride.jl (Semantic, "cannot override.*attempting to assign weaker access privileges");
-	BadPrim.jl (Semantic, "No valid method call found"); 
+	BadPrim.jl (Semantic, "Method.*cannot be called with arguments"); 
 	BadProt.jl (Semantic, "Interface methods must be public");
 	BadReferences.jl (Semantic, "Member type.*ambiguous");
 	BadReferences2.jl (Semantic, "Field.*ambiguous");
@@ -198,7 +197,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         CircularInheritance1.jl (Semantic, "Circular inheritance");
         CircularInheritance2.jl (Semantic, "Circular inheritance");
         CircularInheritance3.jl (Semantic, "Circular inheritance");
-	Errors.jl (Semantic, "No valid method call found");
+	Errors.jl (Semantic, "Method.*cannot be called with arguments");
 	Errors2.jl (Semantic, "Could not find type"); 
 	LabeledBreak2.jl (Semantic, "Unreachable statement"); 
 	NoInit1.jl (Semantic, "Local variable .* may not have been initialized"); 
