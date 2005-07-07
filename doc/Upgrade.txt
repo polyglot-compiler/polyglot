@@ -82,7 +82,9 @@ dependencies.  If a goal has a concurrent dependency, running a pass for
 the dependency may help the dependent goal be satisfied.  Having a cycle
 of concurrent dependencies may or may not cause the compiler to go into
 an infinite loop.  This situation is detected at run time and the
-compiler aborts.
+compiler aborts.  There is a known bug with this detection: if the
+file being compiled has an error, the compiler may abort first rather
+than report the error and exit.
 
 Concurrent dependencies should be avoided, if possible.  I want to get
 rid of them because of the infinite loop problems.
