@@ -807,6 +807,7 @@ ext=""
 
     <copy file="${bin}/jlc.in" todir="${dist}/bin"/>
     <copy file="${bin}/pth.in" todir="${dist}/bin"/>
+    <copy file="doc/Upgrade.txt" todir="${dist}/doc"/>
     <copy file="doc/Overview.txt" todir="${dist}/doc"/>
     <copy file="doc/ppg.html" todir="${dist}/doc"/>
     <copy file="${lib}/java_cup.jar" todir="${dist}/lib"/>
