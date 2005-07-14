@@ -64,12 +64,12 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         
         try {
             if (this.job() != null) {
-                scheduler.addConcurrentDependency(scheduler.MembersAdded(this),
-                                                  scheduler.Parsed(this.job()));
-                scheduler.addConcurrentDependency(scheduler.SupertypesResolved(this),
-                                                  scheduler.TypesInitialized(this.job()));
-                scheduler.addConcurrentDependency(scheduler.SignaturesResolved(this),
-                                                  scheduler.TypesInitialized(this.job()));
+                scheduler.addPrerequisiteDependency(scheduler.MembersAdded(this),
+                                                    scheduler.Parsed(this.job()));
+                scheduler.addPrerequisiteDependency(scheduler.SupertypesResolved(this),
+                                                    scheduler.TypesInitialized(this.job()));
+                scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this),
+                                                    scheduler.TypesInitialized(this.job()));
                 /*
                  scheduler.addConcurrentDependency(scheduler.MembersAdded(ct),
                  scheduler.TypesInitialized(ct.job()));
@@ -354,40 +354,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     }
 
     public boolean signaturesResolved() {
-        Scheduler scheduler = typeSystem().extensionInfo().scheduler();
-        
-        if (signaturesResolved) {
-            return true;
-        }
-        
-        if (! membersAdded()) {
-            try {
-                scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this), scheduler.MembersAdded(this));
-            }
-            catch (CyclicDependencyException e) {
-                throw new InternalCompilerError(e.getMessage());
-            }
-            return false;
-        }
-    
-        // Create a new list of members.  Don't use members() since
-        // it ensures that signatures be resolved and this method
-        // is just suppossed to check if they are resolved.
-        List l = new ArrayList();
-        l.addAll(methods);
-        l.addAll(fields);
-        l.addAll(constructors);
-        l.addAll(memberClasses);
-        
-        for (Iterator i = l.iterator(); i.hasNext(); ) {
-            MemberInstance mi = (MemberInstance) i.next();
-            if (! mi.isCanonical()) {
-                return false;
-            }
-        }
-        
-        signaturesResolved = true;
-        return true;
+        return numSignaturesUnresolved() == 0;
     }
     
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
