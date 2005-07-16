@@ -31,7 +31,7 @@ public class Flags implements Serializable
                 if (o2.equals(order.get(i))) return 1;
             }
 
-            return ((String) o1).compareTo(o2);
+            return ((String) o1).compareTo((String) o2);
         }
     }
 
