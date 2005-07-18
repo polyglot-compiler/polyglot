@@ -149,6 +149,11 @@ public abstract class Scheduler {
         long t = System.currentTimeMillis();
         
         Job job = g.job();
+        
+        if (job != null && job.isRunning()) {
+            return false;
+        }
+        
         Pass pass = schedulerPass(g);
         Pass oldPass = this.currentPass;
         this.currentPass = pass;
