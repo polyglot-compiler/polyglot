@@ -640,7 +640,7 @@ public abstract class Scheduler {
         // the current progress.
         progressMap.put(goal, new Integer(currentProgress));
         int newDistance = goal.distanceFromGoal();
-        int progress = newDistance - oldDistance;
+        int progress = oldDistance - newDistance;
         progress = progress > 0 ? progress : 0; // make sure progress is forward
         if (! result) progress++; // count a failure as progress
         currentProgress += progress;
@@ -692,8 +692,6 @@ public abstract class Scheduler {
     public abstract Goal ForwardReferencesChecked(Job job);
     public abstract Goal Serialized(Job job);
     public abstract Goal CodeGenerated(Job job);
-    
-    public abstract Goal InnerTranslated(Job job);
     
     /** Return all compilation units currently being compiled. */
     public Collection jobs() {
