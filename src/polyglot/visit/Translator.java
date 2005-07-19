@@ -3,6 +3,7 @@ package polyglot.visit;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -218,7 +219,7 @@ public class Translator extends PrettyPrinter implements Copy
             String opfPath = of.getPath();
             if (!opfPath.endsWith("$")) outputFiles.add(of.getPath());
             ofw = tf.outputWriter(of);
-            w = new CodeWriter(ofw, outputWidth);
+            w = new CodeWriter(new PrintWriter(ofw), outputWidth);
 
             writeHeader(sfn, w);
 
@@ -234,7 +235,7 @@ public class Translator extends PrettyPrinter implements Copy
                     of = tf.outputFile(pkg, decl.name(), sfn.source());
                     outputFiles.add(of.getPath());
                     ofw = tf.outputWriter(of);
-                    w = new CodeWriter(ofw, outputWidth);
+                    w = new CodeWriter(new PrintWriter(ofw), outputWidth);
 
                     writeHeader(sfn, w);
                 }

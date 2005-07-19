@@ -7,15 +7,16 @@ import polyglot.types.SemanticException;
 import java.io.IOException;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.io.PrintWriter;
 
 /** Visitor which dumps the AST to a file. */
 public class DumpAst extends NodeVisitor
 {
-    protected Writer fw;
+    protected PrintWriter fw;
     protected CodeWriter w;
 
     public DumpAst(String name, int width) throws IOException {
-        this.fw = new FileWriter(name);
+        this.fw = new PrintWriter(new FileWriter(name));
 	this.w = new CodeWriter(fw, width);
     }
 
@@ -31,7 +32,7 @@ public class DumpAst extends NodeVisitor
     public NodeVisitor enter(Node n) {
 	w.write("(");
 	n.dump(w);
-	w.allowBreak(4," ");
+	w.allowBreak(4);
 	w.begin(0);
 	return this;
     }
@@ -43,12 +44,12 @@ public class DumpAst extends NodeVisitor
      */
     public Node leave(Node old, Node n, NodeVisitor v) {
         // w.write("(types-below");
-	// w.allowBreak(4," ");
+	// w.allowBreak(4);
         // w.write(n.typesBelow().toString());
         // w.write(")");
 	w.end();
 	w.write(")");
-	w.allowBreak(0, " ");
+	w.allowBreak(0);
 	return n;
     }
 

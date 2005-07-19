@@ -54,7 +54,7 @@ public class StringPrettyPrinter extends PrettyPrinter
         CharArrayWriter w;
 
         public StringCodeWriter(CharArrayWriter w) {
-            super(w, 1000);
+            super(new PrintWriter(w), 1000);
             this.w = w;
         }
 

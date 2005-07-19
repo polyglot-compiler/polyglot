@@ -9,6 +9,8 @@
 package polyglot.util;
 
 import java.io.PrintWriter;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,8 +29,19 @@ import java.util.Map;
 public class CodeWriter
 {
     /**
-     * Create a CodeWriter object with output stream <code>o</code> and width
-     * <code>width_</code>. Requires <code>width_ &gt; 0</code>.
+     * Create a CodeWriter object with output stream <code>o</code>
+     * and width <code>width_</code>.
+     */
+    public CodeWriter(OutputStream o, int width_) {
+        output = new PrintWriter(new OutputStreamWriter(o));
+        width = width_;
+        current = input = new BlockItem(null, 0);
+    }
+
+    /**
+     * Create a CodeWriter object.
+     * @param w the output to write to. Must be non-null.
+     * @param width the formatting width. Must be positive.
      */
     public CodeWriter(PrintWriter o, int width_) {
         output = o;
@@ -38,7 +51,7 @@ public class CodeWriter
         
     /**
      * Print the string <code>s</code> verbatim on the output stream.
-     * <esc>requires s != null </esc>
+     * @param the string to print.
      */
     public void write(String s) {
        if (s.length() > 0) write(s, s.length());
@@ -144,6 +157,10 @@ public class CodeWriter
     public void allowBreak(int n) {
         allowBreak(n, 1, " ", 1);
     }
+    public void allowBreak(int n, String alt) {
+        allowBreak(n, 1, alt, 1);
+    }
+
 
     /**
      * Force a newline. Indentation will be preserved. This method should be
@@ -155,6 +172,13 @@ public class CodeWriter
     public void newline() {
         current.add(new AllowBreak(0, 0, "", 0, false));
     }
+    /**
+     * Like newline(), but forces a newline with a specified indentation.
+     */
+    public void newline(int n) {
+        current.add(new AllowBreak(n, 0, "", 0, false));
+    }
+
 
     /**
      * Send out the current batch of text to be formatted. All outstanding
@@ -336,8 +360,7 @@ abstract class Item
     	throws Overrun;
     /**
      * Send the output associated with this item to <code>o</code>, using the
-     * current break settings. <esc>requires o != null </esc> <esc>requires
-     * lmargin >= 0 </esc> <esc>requires pos >= 0 </esc>
+     * current break settings.
      * 
      * @param success
      */
@@ -365,12 +388,12 @@ abstract class Item
 	if (CodeWriter.debug) {
 	    if (it != null && it != CodeWriter.top) {
 	        System.err.println("SNAPSHOT:");
-	        PrintWriter w = new PrintWriter(System.err);
+	        PrintWriter w = new PrintWriter(new OutputStreamWriter(System.err));
 	        try {	            	            
 	            CodeWriter.top.sendOutput(w, 0, 0, true, it);
 	        }
 	        catch (IOException e) {  }
-	        w.println("<END>");
+	        w.write("<END>\n");
 	        w.flush();
 	    }
 	    System.err.println("Format: " + it + "\n  lmargin = " +
