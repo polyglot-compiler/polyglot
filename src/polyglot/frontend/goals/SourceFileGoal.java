@@ -29,7 +29,7 @@ public abstract class SourceFileGoal extends AbstractGoal {
     }
     
     public int distanceFromGoal() {
-        return runOnce ? 0 : 1;
+        return hasBeenRun() ? 0 : 1;
     }
     
     public void markRun() {
