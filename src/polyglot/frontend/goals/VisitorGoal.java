@@ -42,6 +42,6 @@ public class VisitorGoal extends SourceFileGoal {
     }
     
     public String toString() {
-        return job.toString() + ":" + v.toString();
+        return job.toString() + ":" + v.toString() + " (" + (runOnce ? "run" : "not-run") + ")";
     }
 }
