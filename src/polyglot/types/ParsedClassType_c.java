@@ -60,36 +60,36 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     }
      
     public void initDependencies() {
-        Scheduler scheduler = ts.extensionInfo().scheduler();
-        
-        try {
-            if (this.job() != null) {
-                scheduler.addPrerequisiteDependency(scheduler.MembersAdded(this),
-                                                    scheduler.Parsed(this.job()));
-                scheduler.addPrerequisiteDependency(scheduler.SupertypesResolved(this),
-                                                    scheduler.TypesInitialized(this.job()));
-                scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this),
-                                                    scheduler.TypesInitialized(this.job()));
-                /*
-                 scheduler.addConcurrentDependency(scheduler.MembersAdded(ct),
-                 scheduler.TypesInitialized(ct.job()));
-                 scheduler.addConcurrentDependency(scheduler.SupertypesResolved(ct),
-                 scheduler.TypeChecked(ct.job()));
-                 scheduler.addConcurrentDependency(scheduler.AllMembersAdded(ct),
-                 scheduler.TypeChecked(ct.job()));
-                 scheduler.addConcurrentDependency(scheduler.SignaturesResolved(ct),
-                 scheduler.TypeChecked(ct.job()));
-                 */
-            }
-            
-            scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this),
-                                                scheduler.MembersAdded(this));
-            scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this),
-                                                scheduler.SupertypesResolved(this));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e.getMessage());
-        }
+//        Scheduler scheduler = ts.extensionInfo().scheduler();
+//        
+//        try {
+//            if (this.job() != null) {
+//                scheduler.addPrerequisiteDependency(scheduler.MembersAdded(this),
+//                                                    scheduler.Parsed(this.job()));
+//                scheduler.addPrerequisiteDependency(scheduler.SupertypesResolved(this),
+//                                                    scheduler.TypesInitialized(this.job()));
+//                scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this),
+//                                                    scheduler.TypesInitialized(this.job()));
+//                /*
+//                 scheduler.addConcurrentDependency(scheduler.MembersAdded(ct),
+//                 scheduler.TypesInitialized(ct.job()));
+//                 scheduler.addConcurrentDependency(scheduler.SupertypesResolved(ct),
+//                 scheduler.TypeChecked(ct.job()));
+//                 scheduler.addConcurrentDependency(scheduler.AllMembersAdded(ct),
+//                 scheduler.TypeChecked(ct.job()));
+//                 scheduler.addConcurrentDependency(scheduler.SignaturesResolved(ct),
+//                 scheduler.TypeChecked(ct.job()));
+//                 */
+//            }
+//            
+//            scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this),
+//                                                scheduler.MembersAdded(this));
+//            scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this),
+//                                                scheduler.SupertypesResolved(this));
+//        }
+//        catch (CyclicDependencyException e) {
+//            throw new InternalCompilerError(e.getMessage());
+//        }
     }
 
     public Source fromSource() {
