@@ -12,6 +12,7 @@ import polyglot.frontend.goals.*;
 import polyglot.types.*;
 import polyglot.types.FieldInstance;
 import polyglot.types.ParsedClassType;
+import polyglot.util.InternalCompilerError;
 import polyglot.visit.*;
 import polyglot.visit.ExceptionChecker;
 import polyglot.visit.ReachChecker;
@@ -35,31 +36,88 @@ public class JLScheduler extends Scheduler {
     }
     
     public Goal MembersAdded(ParsedClassType ct) {
-        return internGoal(new MembersAdded(ct));
+        Goal g = internGoal(new MembersAdded(ct));
+        try {
+            if (ct.job() != null) {
+                addPrerequisiteDependency(g, Parsed(ct.job()));
+                addConcurrentDependency(g, TypesInitialized(ct.job()));
+            }
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
     
     public Goal SupertypesResolved(ParsedClassType ct) {
-        return internGoal(new SupertypesResolved(ct));
+        Goal g = internGoal(new SupertypesResolved(ct));
+        try {
+            if (ct.job() != null) {
+                addPrerequisiteDependency(g, TypesInitialized(ct.job()));
+                addConcurrentDependency(g, Disambiguated(ct.job()));
+            }
+            addPrerequisiteDependency(g, MembersAdded(ct));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
     
     public Goal SignaturesResolved(ParsedClassType ct) {
-        return internGoal(new SignaturesResolved(ct));
+        Goal g = internGoal(new SignaturesResolved(ct));
+        try {
+            if (ct.job() != null) {
+                addPrerequisiteDependency(g, TypesInitialized(ct.job()));
+                addConcurrentDependency(g, Disambiguated(ct.job()));
+            }
+            addPrerequisiteDependency(g, SupertypesResolved(ct));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
 
     public Goal FieldConstantsChecked(FieldInstance fi) {
-        return internGoal(new FieldConstantsChecked(fi));
+        Goal g = internGoal(new FieldConstantsChecked(fi));
+        try {
+            ReferenceType container = fi.container();
+            if (container instanceof ParsedTypeObject) {
+                ParsedTypeObject ct = (ParsedTypeObject) container;
+                if (ct.job() != null) {
+                    addConcurrentDependency(g, ConstantsChecked(ct.job()));
+                }
+            }
+            if (container instanceof ParsedClassType) {
+                ParsedClassType ct = (ParsedClassType) container;
+                addPrerequisiteDependency(g, SignaturesResolved(ct));
+            }
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
     
     public Goal Parsed(Job job) {
-        return internGoal(new Parsed(job));
+        Goal g = internGoal(new Parsed(job));
+        return g;
     }
     
     public Goal TypesInitialized(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        return internGoal(new VisitorGoal(job, new TypeBuilder(job, ts, nf)));
+        Goal g = internGoal(new VisitorGoal(job, new TypeBuilder(job, ts, nf)));
+        try {
+            addPrerequisiteDependency(g, Parsed(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
-
+    
     public Goal TypesInitializedForCommandLine() {
         return internGoal(new Barrier(this) {
             public Goal goalForJob(Job j) {
@@ -67,66 +125,148 @@ public class JLScheduler extends Scheduler {
             }
         });
     }
-
+    
     public Goal Disambiguated(Job job) {
-        return internGoal(new Disambiguated(job));
+        Goal g = internGoal(new Disambiguated(job));
+        try {
+            addPrerequisiteDependency(g, TypesInitializedForCommandLine());
+            addPrerequisiteDependency(g, TypesInitialized(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
-
+    
     public Goal TypeChecked(Job job) {
-        return internGoal(new TypeChecked(job));
+        Goal g = internGoal(new TypeChecked(job));
+        try {
+            addPrerequisiteDependency(g, Disambiguated(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
-
+    
     public Goal ConstantsChecked(Job job) {
-        return internGoal(new ConstantsCheckedForFile(job));
+        Goal g = internGoal(new ConstantsCheckedForFile(job));
+        try {
+            addPrerequisiteDependency(g, TypeChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
-
+    
     public Goal ReachabilityChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        return internGoal(new VisitorGoal(job, new ReachChecker(job, ts, nf)));
+        Goal g = internGoal(new VisitorGoal(job, new ReachChecker(job, ts, nf)));
+        try {
+            addPrerequisiteDependency(g, TypeChecked(job));
+            addPrerequisiteDependency(g, ConstantsChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
+        
     }
-
+    
     public Goal ExceptionsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        return internGoal(new VisitorGoal(job, new ExceptionChecker(job, ts, nf)));
+        Goal g = internGoal(new VisitorGoal(job, new ExceptionChecker(job, ts, nf)));
+        try {
+            addPrerequisiteDependency(g, TypeChecked(job));
+            addPrerequisiteDependency(g, ReachabilityChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
-
+    
     public Goal ExitPathsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        return internGoal(new VisitorGoal(job, new ExitChecker(job, ts, nf)));
+        Goal g =internGoal(new VisitorGoal(job, new ExitChecker(job, ts, nf)));
+        try {
+            addPrerequisiteDependency(g, ReachabilityChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
-
+    
     public Goal InitializationsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        return internGoal(new VisitorGoal(job, new InitChecker(job, ts, nf)));
+        Goal g = internGoal(new VisitorGoal(job, new InitChecker(job, ts, nf)));
+        try {
+            addPrerequisiteDependency(g, ReachabilityChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
-
+    
     public Goal ConstructorCallsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        return internGoal(new VisitorGoal(job, new ConstructorCallChecker(job, ts, nf)));
+        Goal g = internGoal(new VisitorGoal(job, new ConstructorCallChecker(job, ts, nf)));
+        try {
+            addPrerequisiteDependency(g, ReachabilityChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g; 
     }
-
+    
     public Goal ForwardReferencesChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        return internGoal(new VisitorGoal(job, new FwdReferenceChecker(job, ts, nf)));
-    }
-
-    public Goal Serialized(Job job) {
-        return internGoal(new Serialized(job));
-    }
-
-    public Goal CodeGenerated(Job job) {
-        return internGoal(new CodeGenerated(job));
+        Goal g = internGoal(new VisitorGoal(job, new FwdReferenceChecker(job, ts, nf)));
+        try {
+            addPrerequisiteDependency(g, ReachabilityChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
     
-    public Goal InnerTranslated(Job job) {
-        TypeSystem ts = extInfo.typeSystem();
-        NodeFactory nf = extInfo.nodeFactory();
-        return internGoal(new VisitorGoal(job, new InnerTranslator(ts, nf)));
+    public Goal Serialized(Job job) {
+        Goal g = internGoal(new Serialized(job));
+        try {
+            addPrerequisiteDependency(g, TypeChecked(job));
+            addPrerequisiteDependency(g, ConstantsChecked(job));
+            addPrerequisiteDependency(g, ReachabilityChecked(job));
+            addPrerequisiteDependency(g, ExceptionsChecked(job));
+            addPrerequisiteDependency(g, ExitPathsChecked(job));
+            addPrerequisiteDependency(g, InitializationsChecked(job));
+            addPrerequisiteDependency(g, ConstructorCallsChecked(job));
+            addPrerequisiteDependency(g, ForwardReferencesChecked(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
+    }
+    
+    public Goal CodeGenerated(Job job) {
+        Goal g = internGoal(new CodeGenerated(job));
+        try {
+            addPrerequisiteDependency(g, Serialized(job));
+        }
+        catch (CyclicDependencyException e) {
+            throw new InternalCompilerError(e);
+        }
+        return g;
     }
 }

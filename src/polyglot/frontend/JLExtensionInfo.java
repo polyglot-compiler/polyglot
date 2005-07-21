@@ -97,78 +97,12 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
 	return new CupParser(parser, source, eq);
     }
     
-    protected List compileGoalList(Job job) {
-        Goal parse = scheduler.Parsed(job);
-        Goal buildTypes = scheduler.TypesInitialized(job);
-        Goal buildTypesBarrier = scheduler.TypesInitializedForCommandLine();
-        Goal disam = scheduler.Disambiguated(job);
-        Goal typeCheck = scheduler.TypeChecked(job);
-        Goal constCheck = scheduler.ConstantsChecked(job);
-        Goal reachCheck = scheduler.ReachabilityChecked(job);
-        Goal excCheck = scheduler.ExceptionsChecked(job);
-        Goal exitCheck = scheduler.ExitPathsChecked(job);
-        Goal initCheck = scheduler.InitializationsChecked(job);
-        Goal ctorCheck = scheduler.ConstructorCallsChecked(job);
-        Goal frefCheck = scheduler.ForwardReferencesChecked(job);
-        Goal serialize = scheduler.Serialized(job);
-        Goal output = scheduler.CodeGenerated(job);
-        
-        List l = new ArrayList(15);
-        
-        l.add(parse);
-        l.add(buildTypes);
-        l.add(buildTypesBarrier);
-        l.add(disam);
-        l.add(typeCheck);
-        l.add(constCheck);
-        
-        l.add(reachCheck);
-        l.add(excCheck);
-        l.add(exitCheck);
-        l.add(initCheck);
-        l.add(ctorCheck);
-        l.add(frefCheck);
-        
-        l.add(serialize);
-
-        /*
-        l.add(scheduler.internGoal(new VisitorGoal(job, new LocalClassRemover(job, ts, nf))));
-        l.add(scheduler.internGoal(new VisitorGoal(job, new InnerClassConstructorFixer(job, ts, nf))));
-        l.add(scheduler.internGoal(new VisitorGoal(job, new InnerClassRewriter(job, ts, nf))));
-        l.add(scheduler.internGoal(new VisitorGoal(job, new InnerClassRemover(job, ts, nf))));
-        */
-        
-        l.add(output);
-        
-        return l;
-    }
-    
     /**
      * Return the <code>Goal</code> to compile the source file associated with
      * <code>job</code> to completion.
      */
     public Goal getCompileGoal(Job job) {
-        try {
-            List l = compileGoalList(job);
-            Iterator i = l.iterator();
-            
-            if (! i.hasNext()) {
-                throw new InternalCompilerError("Empty list of compile goals.");
-            }
-            
-            Goal prev = (Goal) i.next();
-            
-            while (i.hasNext()) {
-                Goal g = (Goal) i.next();
-                scheduler.addPrerequisiteDependency(g, prev);
-                prev = g;
-            }
-            
-            return prev;
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e.getMessage());
-        }
+        return scheduler.CodeGenerated(job);
     }
     
     static { Topics t = new Topics(); }
