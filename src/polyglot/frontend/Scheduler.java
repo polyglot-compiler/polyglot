@@ -104,6 +104,17 @@ public abstract class Scheduler {
         goal.addPrerequisiteGoal(subgoal);
     }
     
+    /** Add prerequisite dependencies between adjacent items in a list of goals. */
+    public void addPrerequisiteDependencyChain(List deps) throws CyclicDependencyException {
+        Goal prev = null;
+        for (Iterator i = deps.iterator(); i.hasNext(); ) {
+            Goal curr = (Goal) i.next();
+            if (prev != null)
+                addPrerequisiteDependency(curr, prev);
+            prev = curr;
+        }
+    }
+    
     /**
      * Intern the <code>goal</code> so that there is only one copy of the goal.
      * All goals passed into and returned by scheduler should be interned.
