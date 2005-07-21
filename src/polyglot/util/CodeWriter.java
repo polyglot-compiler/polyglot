@@ -9,6 +9,7 @@
 package polyglot.util;
 
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.IOException;
@@ -48,6 +49,18 @@ public class CodeWriter
         width = width_;
         current = input = new BlockItem(null, 0);
     }
+
+    /**
+     * Create a CodeWriter object.
+     * @param w the output to write to. Must be non-null.
+     * @param width the formatting width. Must be positive.
+     */
+    public CodeWriter(Writer o, int width_) {
+        output = new PrintWriter(o);
+        width = width_;
+        current = input = new BlockItem(null, 0);
+    }
+        
         
     /**
      * Print the string <code>s</code> verbatim on the output stream.
