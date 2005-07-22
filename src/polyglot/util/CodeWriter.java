@@ -1,9 +1,11 @@
 /**
  * CodeWriter -- Andrew C. Myers, May 2005
- *   Originally developed for use in Cornell University Computer Science 412/413, April 2001.
+ *   Originally developed for use in Cornell University Computer Science
+ *   412/413, April 2001.
  * 
- * The pretty-printing algorithm is loosely based on the Modula-3 pretty-printer,
- * and on notes by Greg Nelson. It was extended to support breaks at multiple levels.
+ * The pretty-printing algorithm is loosely based on the Modula-3
+ * pretty-printer, and on notes by Greg Nelson. It was extended to support
+ * breaks at multiple levels.
  */
 
 package polyglot.util;
@@ -95,14 +97,14 @@ public class CodeWriter
      * <p>
      * If either of the two conditions is satisfied, the formatting algorithm
      * will break the block into lines by generating newlines for some of the
-     * inserted breaks. The first line is printed at the current cursor position
-     * <code>pos</code>, all the following lines are printed at the position
-     * <code>pos+n</code>.
+     * inserted breaks. The first line is printed at the current cursor
+     * position <code>pos</code>, all the following lines are printed at the
+     * position <code>pos+n</code>.
      * 
      * @param n
-     *            the number of characters increased on indentation (relative to
-     *            the current position) for all lines in the block. Requires: n >=
-     *            0.
+     *            the number of characters increased on indentation (relative
+     *            to the current position) for all lines in the block.
+     *            Requires: n >= 0.
      */         
     public void begin(int n) {
         BlockItem b = new BlockItem(current, n);
@@ -125,8 +127,8 @@ public class CodeWriter
      * newline. The codewriter tries to avoid breaking higher-level breaks, and
      * the higher the level, the harder it tries. It follows the "break from
      * root" rule: if a break is broken, breaks of equal or lower level in all
-     * containing blocks must also be broken, and breaks of strictly lower level
-     * in the same block must also be broken.
+     * containing blocks must also be broken, and breaks of strictly lower
+     * level in the same block must also be broken.
      * 
      * @param n
      *            indentation relative to the current block if the newline is
@@ -216,7 +218,7 @@ public class CodeWriter
 	    try {
 	        top = input;
 	        Item.format(input, 0, 0, width, width,
-	                new MaxLevels(Integer.MAX_VALUE, Integer.MAX_VALUE), 0, 0);
+                    new MaxLevels(Integer.MAX_VALUE, Integer.MAX_VALUE), 0, 0);
 	    } catch (Overrun o) { success = false; }
 	} else success = false;
 	
@@ -230,8 +232,8 @@ public class CodeWriter
 	return success;
     }
     /**
-     * Return a readable representation of all the structured input given to the
-     * CodeWriter since the last flush.
+     * Return a readable representation of all the structured input given to
+     * the CodeWriter since the last flush.
      */
     public String toString() {
 	return input.toString();
@@ -252,8 +254,8 @@ public class CodeWriter
 /**
  * An <code>Overrun</code> represents a formatting that failed because the
  * right margin was exceeded by at least <code>amount</code> chars. If
- * sameLine, the overrun occurred on the first line of the requested formatting;
- * otherwise, it occurred on a subsequent line.
+ * sameLine, the overrun occurred on the first line of the requested
+ * formatting; otherwise, it occurred on a subsequent line.
  */
 class Overrun extends Exception 
 {
@@ -317,19 +319,20 @@ abstract class Item
      * Breaks may be broken up to level maxLevel, which is set whenever a break
      * is not broken. Not breaking an ordinary break means that equal or
      * higher-level breaks in all contained blocks must not be broken either,
-     * and breaks of strictly higher level in the same block must not be broken.
-     * Not breaking a unified break means that breaks of the same level in the
-     * same block must not also be broken. The parameter maxLevelInner controls
-     * the maxLevel in nested blocks; it is equal to either maxLevel or
-     * maxLevel-1.
+     * and breaks of strictly higher level in the same block must not be
+     * broken.  Not breaking a unified break means that breaks of the same
+     * level in the same block must not also be broken. The parameter
+     * maxLevelInner controls the maxLevel in nested blocks; it is equal to
+     * either maxLevel or maxLevel-1.
      * 
      * <p>
      * <dl>
      * <dt>Example 1:
      * <dd>Suppose we have a current maxLevel of 4, and an ordinary,
-     * non-unified break of level 2 is not broken. Then for that block, maxLevel
-     * is set to 2 and maxLevelInner is set to 1. This permits further breaks of
-     * level 1 or 2 in the same block, but only level-1 breaks in inner blocks.
+     * non-unified break of level 2 is not broken. Then for that block,
+     * maxLevel is set to 2 and maxLevelInner is set to 1. This permits further
+     * breaks of level 1 or 2 in the same block, but only level-1 breaks in
+     * inner blocks.
      * 
      * <dt>Example 2:</dt>
      * <dd>Suppose we have a current maxLevel of 4, and a unified break of
@@ -343,11 +346,10 @@ abstract class Item
      * higher-level breaks in containing blocks must be broken. However, these
      * breaks may be encountered after the nested block. The parameter
      * <code>minLevel</code> is used to communicate the level of breaks broken
-     * in nested blocks (and earlier in the current block). Any break of level <=
-     * minLevel <em>must</em> be broken. The parameter <code>
-     * minLevelUnified</code>
-     * is the minimum level at which unified breaks must be broken.
-     * minLevelUnified is equal to either minLevel or minLevel+1.
+     * in nested blocks (and earlier in the current block). Any break of level
+     * <= minLevel <em>must</em> be broken. The parameter <code>
+     * minLevelUnified</code> is the minimum level at which unified breaks must
+     * be broken.  minLevelUnified is equal to either minLevel or minLevel+1.
      * </p>
      * 
      * <dl>
@@ -381,17 +383,18 @@ abstract class Item
       throws IOException;
     
     // XXX
-    // the getminwidth etc. code is starting to duplicate the logic of the main formatting
-    // code. This suggests they should be merged. format can take two width arguments: one
-    // the width left on the current line, and one the width of subsequent lines. Hmmm --
-    // new blocks start relative to current position, so knowing the initial width isn't enough.
+    // the getminwidth etc. code is starting to duplicate the logic of the main
+    // formatting code. This suggests they should be merged. format can take
+    // two width arguments: one the width left on the current line, and one the
+    // width of subsequent lines. Hmmm -- new blocks start relative to current
+    // position, so knowing the initial width isn't enough.
 
     /**
      * Try to format a whole sequence of items in the manner of formatN. Unlike
-     * for formatN, The initial position may be an overrun (this is the only way
-     * that overruns are checked!). The item <code>it</code> may be also null,
-     * signifying an empty list. Requires: lmargin < rmargin, pos <= rmargin,
-     * lmargin >= 0.
+     * for formatN, The initial position may be an overrun (this is the only
+     * way that overruns are checked!). The item <code>it</code> may be also
+     * null, signifying an empty list. Requires: lmargin < rmargin, pos <=
+     * rmargin, lmargin >= 0.
      * 
      * @see formatN
      */
@@ -813,8 +816,10 @@ class BlockItem extends Item {
                 new MaxLevels(m.maxLevelInner, m.maxLevelInner));
     }
     
-    /** Map from maxlevels to either null or non-null, the latter if it can contain breaks
-     *  at those maxlevels. */
+    /**
+     * Map from maxlevels to either null or non-null, the latter if it can
+     * contain breaks at those maxlevels.
+     */
     Map containsBreaks = new HashMap();
     
     boolean selfContainsBreaks(MaxLevels m) {
