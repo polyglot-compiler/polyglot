@@ -54,20 +54,6 @@ public class TypeChecked extends SourceFileGoal {
             return Integer.MAX_VALUE;
         }
         
-        /*
-        // Do a relatively quick test of the types contained in the AST.
-        for (Iterator i = job().ast().typesBelow().iterator(); i.hasNext(); ) {
-            ParsedClassType ct = (ParsedClassType) i.next();
-            if (! ct.signaturesResolved()) {
-                if (Report.should_report(TOPICS, 3))
-                    Report.report(3, "  signatures for " + ct + " ambiguous");
-                Scheduler scheduler = job().extensionInfo().scheduler();
-                scheduler.addConcurrentDependency(this, scheduler.SignaturesResolved(ct));
-                return false;
-            }
-        }
-*/
-        
         // Now look for ambiguities in the AST.
         final int[] notOkCount = new int[] { 0 };
         
