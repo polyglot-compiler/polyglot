@@ -51,6 +51,10 @@ public class AmbiguityRemover extends DisambiguationDriver
             
             return m;
         }
+        catch (UnavailableTypeException e) {
+            // Ignore: we'll rerun the pass later
+            return n;
+        }
         catch (SemanticException e) {
             if (e.getMessage() != null) {
                 Position position = e.position();
