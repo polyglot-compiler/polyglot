@@ -13,6 +13,7 @@ import polyglot.frontend.goals.*;
 import polyglot.main.Report;
 import polyglot.types.FieldInstance;
 import polyglot.types.ParsedClassType;
+import polyglot.types.UnavailableTypeException;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.visit.*;
@@ -548,7 +549,7 @@ public abstract class Scheduler {
             throw new InternalCompilerError("Cannot run a pass for completed goal " + goal);
         }
         
-        if (progressSinceLastAttempt(goal) == 0) {
+        if (false && progressSinceLastAttempt(goal) == 0) {
             if (failed) {
                 return false;
             }
@@ -574,6 +575,7 @@ public abstract class Scheduler {
 
         boolean result = false;
         int oldDistance = goal.distanceFromGoal();
+        int distanceAdjust = 0;
 
         if (job == null || job.status()) {
             Pass oldPass = this.currentPass;
@@ -591,7 +593,13 @@ public abstract class Scheduler {
             
             pass.toggleTimers(false);
 
-            result = pass.run();
+            try {
+                result = pass.run();
+            }
+            catch (UnavailableTypeException e) {
+                result = true;
+                distanceAdjust++;
+            }
             
             pass.toggleTimers(false);
             
@@ -656,7 +664,7 @@ public abstract class Scheduler {
         // the current progress.
         progressMap.put(goal, new Integer(currentProgress));
         int newDistance = goal.distanceFromGoal();
-        int progress = oldDistance - newDistance;
+        int progress = oldDistance - newDistance + distanceAdjust;
         progress = progress > 0 ? progress : 0; // make sure progress is forward
         if (! result) progress++; // count a failure as progress
         currentProgress += progress;
