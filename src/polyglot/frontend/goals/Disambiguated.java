@@ -15,6 +15,7 @@ import polyglot.frontend.passes.TypeCheckPass;
 import polyglot.main.Report;
 import polyglot.types.ParsedClassType;
 import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 import polyglot.visit.*;
 import polyglot.visit.NodeVisitor;
 import polyglot.visit.TypeChecker;
@@ -61,20 +62,6 @@ public class Disambiguated extends SourceFileGoal {
                 Report.report(3, "  null ast for " + job());
             return Integer.MAX_VALUE;
         }
-        
-        /* XXX breaks for anonymous classes.
-        // Do a relatively quick test of the types declared in the AST.
-        for (Iterator i = job().ast().typesBelow().iterator(); i.hasNext(); ) {
-            ParsedClassType ct = (ParsedClassType) i.next();
-            if (! ct.signaturesResolved()) {
-                if (Report.should_report(TOPICS, 3))
-                    Report.report(3, "  signatures for " + ct + " ambiguous");
-                Scheduler scheduler = job().extensionInfo().scheduler();
-                scheduler.addConcurrentDependency(this, scheduler.SignaturesResolved(ct));
-                return false;
-            }
-        }
-        */
         
         // Now look for ambiguities in the AST.
         int count = AmbiguityRemover.astAmbiguityCount(job.ast());
