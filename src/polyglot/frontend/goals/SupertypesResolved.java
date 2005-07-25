@@ -13,6 +13,7 @@ import polyglot.frontend.passes.ResolveSuperTypesPass;
 import polyglot.frontend.passes.TypeCheckPass;
 import polyglot.types.ParsedClassType;
 import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeChecker;
 
@@ -27,11 +28,11 @@ public class SupertypesResolved extends ClassTypeGoal {
     }
     
     public Pass createPass(ExtensionInfo extInfo) {
-        if (job() != null) {
-            TypeSystem ts = extInfo.typeSystem();
-            NodeFactory nf = extInfo.nodeFactory();
-            return new DisambiguatorPass(this, new AmbiguityRemover(job(), ts, nf, false, false));
-        }
+//        if (job() != null) {
+//            TypeSystem ts = extInfo.typeSystem();
+//            NodeFactory nf = extInfo.nodeFactory();
+//            return new DisambiguatorPass(this, new AmbiguityRemover(job(), ts, nf, false, false));
+//        }
         return new ResolveSuperTypesPass(extInfo.scheduler(), this);
     }
     

@@ -14,6 +14,7 @@ import polyglot.frontend.passes.DisambiguateSignaturesPass;
 import polyglot.frontend.passes.TypeCheckPass;
 import polyglot.types.ParsedClassType;
 import polyglot.types.TypeSystem;
+import polyglot.util.InternalCompilerError;
 import polyglot.visit.AmbiguityRemover;
 import polyglot.visit.TypeChecker;
 
@@ -25,14 +26,14 @@ import polyglot.visit.TypeChecker;
 public class SignaturesResolved extends ClassTypeGoal {
     public SignaturesResolved(ParsedClassType ct) {
         super(ct);
-    }
+      }
     
     public Pass createPass(ExtensionInfo extInfo) {
-        if (job() != null) {
-            TypeSystem ts = extInfo.typeSystem();
-            NodeFactory nf = extInfo.nodeFactory();
-            return new DisambiguatorPass(this, new AmbiguityRemover(job(), ts, nf, true, false));
-        }
+//        if (job() != null) {
+//            TypeSystem ts = extInfo.typeSystem();
+//            NodeFactory nf = extInfo.nodeFactory();
+//            return new DisambiguatorPass(this, new AmbiguityRemover(job(), ts, nf, true, false));
+//        }
         return new DisambiguateSignaturesPass(extInfo.scheduler(), this);
     }
     
