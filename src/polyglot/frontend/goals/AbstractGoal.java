@@ -15,7 +15,8 @@ import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
 
 /**
- * Comment for <code>AbstractGoal</code>
+ * An <code>AbstractGoal</code> is the base class of most <code>Goal</code>
+ * implementations.
  *
  * @author nystrom
  */
@@ -25,18 +26,21 @@ public abstract class AbstractGoal implements Goal {
     boolean reachable;
     Collection subgoals;
     Collection required;
-        
+    
     public AbstractGoal(Job job) {
-        this(job, null);
+        this.job = job;
         this.name = StringUtil.getShortNameComponent(getClass().getName());
+        this.reachable = true;
+        this.required = new HashSet();
+        this.subgoals = new HashSet();
     }
 
     public AbstractGoal(Job job, String name) {
         this.job = job;
         this.name = name;
         this.reachable = true;
-        this.subgoals = new HashSet();
         this.required = new HashSet();
+        this.subgoals = new HashSet();
     }
     
     /** Creates a pass to attempt to satisfy the goal. */
