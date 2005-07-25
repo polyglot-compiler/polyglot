@@ -27,15 +27,17 @@ public class FieldConstantsChecked extends AbstractGoal {
     FieldInstance vi;
     ParsedClassType ct;
     
-    public FieldConstantsChecked(FieldInstance vi) {
+    public FieldConstantsChecked(FieldInstance fi) {
         super(null);
-        this.vi = vi;
+        this.vi = fi;
         
         ParsedClassType ct = (ParsedClassType) findContainer();
-        this.job = ct.job();
+        if (ct != null) {
+            this.job = ct.job();
+        }
         this.ct = ct;
         
-        if (job == null && ! vi.constantValueSet()) {
+        if (this.job == null && ! fi.constantValueSet()) {
             throw new InternalCompilerError(this + " is unreachable.");
         }
     }
