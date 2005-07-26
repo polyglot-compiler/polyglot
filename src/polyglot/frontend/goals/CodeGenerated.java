@@ -16,7 +16,7 @@ import polyglot.visit.Translator;
  *
  * @author nystrom
  */
-public class CodeGenerated extends SourceFileGoal {
+public class CodeGenerated extends SourceFileGoal implements EndGoal {
 
     /**
      * @param job The job to compile.
