@@ -43,10 +43,6 @@ public class DumpAst extends NodeVisitor
      * <code>enter</code>.
      */
     public Node leave(Node old, Node n, NodeVisitor v) {
-        // w.write("(types-below");
-	// w.allowBreak(4);
-        // w.write(n.typesBelow().toString());
-        // w.write(")");
 	w.end();
 	w.write(")");
 	w.allowBreak(0);
