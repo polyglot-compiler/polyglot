@@ -16,6 +16,7 @@ import polyglot.types.ParsedClassType;
 import polyglot.types.UnavailableTypeException;
 import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
+import polyglot.util.StringUtil;
 import polyglot.visit.*;
 
 
@@ -89,7 +90,7 @@ public abstract class Scheduler {
      * can be eventually reached.
      */
     public void addConcurrentDependency(Goal goal, Goal subgoal) {
-        goal.addConcurrentGoal(subgoal);
+        goal.addConcurrentGoal(subgoal, this);
     }
 
     /**
@@ -102,7 +103,7 @@ public abstract class Scheduler {
      *             <code>goal</code>
      */
     public void addPrerequisiteDependency(Goal goal, Goal subgoal) throws CyclicDependencyException {
-        goal.addPrerequisiteGoal(subgoal);
+        goal.addPrerequisiteGoal(subgoal, this);
     }
     
     /** Add prerequisite dependencies between adjacent items in a list of goals. */
@@ -158,6 +159,14 @@ public abstract class Scheduler {
     }
     
     public boolean reached(Goal g) {
+        for (Iterator i = new ArrayList(g.prerequisiteGoals(this)).iterator(); i.hasNext(); ) {
+            Goal subgoal = (Goal) i.next();
+            
+            if (! reached(subgoal)) {
+                return false;
+            }
+        }
+        
         long t = System.currentTimeMillis();
         
         Job job = g.job();
@@ -214,6 +223,7 @@ public abstract class Scheduler {
             Goal goal = selectGoalFromWorklist();
             
             if (reached(goal)) {
+                currentProgress++;
                 continue;
             }
             
@@ -240,7 +250,7 @@ public abstract class Scheduler {
             
                 addGoalToWorklist(goal);
             }
-            else if (goal instanceof CodeGenerated) {
+            else if (goal instanceof EndGoal) {
                 // the job has finished. Let's remove it from the map so it
                 // can be garbage collected, and free up the AST.
                 jobs.put(goal.job().source(), COMPLETED_JOB);
@@ -344,14 +354,17 @@ public abstract class Scheduler {
                                 final Set prereqs, final Set goals)
             throws CyclicDependencyException
     {
+        if (Report.should_report("dump-dep-graph", 2))
+            dumpDependenceGraph();
+
         if (Report.should_report(Report.frontend, 2))
             Report.report(2, "Running to goal " + goal);
         
         if (Report.should_report(Report.frontend, 3)) {
             Report.report(3, "  Distance = " + goal.distanceFromGoal());
             Report.report(3, "  Reachable = " + goal.isReachable());
-            Report.report(3, "  Prerequisites for " + goal + " = " + goal.prerequisiteGoals());
-            Report.report(3, "  Concurrent goals for " + goal + " = " + goal.concurrentGoals());
+            Report.report(3, "  Prerequisites for " + goal + " = " + goal.prerequisiteGoals(this));
+            Report.report(3, "  Concurrent goals for " + goal + " = " + goal.concurrentGoals(this));
             Report.report(3, "  Prereqs = " + prereqs);
             Report.report(3, "  Dependees = " + goals);
         }
@@ -428,7 +441,7 @@ public abstract class Scheduler {
         // it complete before trying this goal again.
         boolean runPass = true;
 
-        for (Iterator i = new ArrayList(goal.prerequisiteGoals()).iterator(); i.hasNext(); ) {
+        for (Iterator i = new ArrayList(goal.prerequisiteGoals(this)).iterator(); i.hasNext(); ) {
             Goal subgoal = (Goal) i.next();
             
             boolean okay = attemptGoal(subgoal, true, prereqs, goals);
@@ -449,7 +462,7 @@ public abstract class Scheduler {
             }
         }
 
-        for (Iterator i = new ArrayList(goal.concurrentGoals()).iterator(); i.hasNext(); ) {
+        for (Iterator i = new ArrayList(goal.concurrentGoals(this)).iterator(); i.hasNext(); ) {
             Goal subgoal = (Goal) i.next();
             
             boolean okay = attemptGoal(subgoal, true, new HashSet(), goals);
@@ -790,6 +803,50 @@ public abstract class Scheduler {
     public String toString() {
         return getClass().getName() + " worklist=" + worklist;
     }   
+
+    protected static int flowCounter = 0;
+
+    /**
+     * Dump the dependence graph to a DOT file.
+     */
+    protected void dumpDependenceGraph() {
+        String name = StringUtil.getShortNameComponent(this.getClass().getName());
+        name += flowCounter++;
+
+        String rootName = "";
+
+        Report.report(2, "digraph " + name + " {");
+        Report.report(2, "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
+
+        for (Iterator i = goals.keySet().iterator(); i.hasNext(); ) {
+            Goal g = (Goal) i.next(); 
+            g = internGoal(g);
+
+            int h = System.identityHashCode(g);
+            
+            // dump out this node
+            Report.report(2,
+                          h + " [ label = \"" +
+                          StringUtil.escape(g.toString()) + "\" ];");
+            
+            // dump out the successors.
+            for (Iterator j = new ArrayList(g.prerequisiteGoals(this)).iterator(); j.hasNext(); ) {
+                Goal g2 = (Goal) j.next();
+                g2 = internGoal(g2);
+                int h2 = System.identityHashCode(g2);
+                Report.report(2, h2 + " -> " + h);
+            }
+
+            for (Iterator j = new ArrayList(g.concurrentGoals(this)).iterator(); j.hasNext(); ) {
+                Goal g2 = (Goal) j.next();
+                g2 = internGoal(g2);
+                int h2 = System.identityHashCode(g2);
+                Report.report(2, h2 + " -> " + h + " [style=dotted]");
+            }
+            
+        }
+        Report.report(2, "}");
+    }
 }
 
 
