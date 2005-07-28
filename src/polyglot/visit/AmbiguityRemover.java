@@ -42,12 +42,12 @@ public class AmbiguityRemover extends DisambiguationDriver
         
         try {
             if (Report.should_report(Report.visit, 2))
-                Report.report(2, ">> " + this + "::override " + n);
+                Report.report(2, ">> " + this + "::override " + n + " (" + n.getClass().getName() + ")");
             
             Node m = n.del().disambiguateOverride(parent, this);
             
             if (Report.should_report(Report.visit, 2))
-                Report.report(2, "<< " + this + "::override " + n + " -> " + m);
+                Report.report(2, "<< " + this + "::override " + n + " -> " + m + (m != null ? (" (" + m.getClass().getName() + ")") : ""));
             
             return m;
         }
@@ -77,19 +77,19 @@ public class AmbiguityRemover extends DisambiguationDriver
     
     protected NodeVisitor enterCall(Node n) throws SemanticException {
         if (Report.should_report(Report.visit, 2))
-            Report.report(2, ">> " + this + "::enter " + n);
+            Report.report(2, ">> " + this + "::enter " + n + " (" + n.getClass().getName() + ")");
         
         AmbiguityRemover v = (AmbiguityRemover) n.del().disambiguateEnter(this);
         
         if (Report.should_report(Report.visit, 2))
-            Report.report(2, "<< " + this + "::enter " + n + " -> " + v);
+            Report.report(2, "<< " + this + "::enter " + n+ " (" + n.getClass().getName() + ")" + " -> " + v);
         
         return v;
     }
     
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (Report.should_report(Report.visit, 2))
-            Report.report(2, ">> " + this + "::leave " + n);
+            Report.report(2, ">> " + this + "::leave " + n + " (" + n.getClass().getName() + ")");
 
         final boolean[] amb = new boolean[1];
         
@@ -111,10 +111,11 @@ public class AmbiguityRemover extends DisambiguationDriver
         }
         catch (UnavailableTypeException e) {
             // ignore: we'll rerun the pass later
+            e.printStackTrace();
         }
         
         if (Report.should_report(Report.visit, 2))
-            Report.report(2, "<< " + this + "::leave " + n + " -> " + m);
+            Report.report(2, "<< " + this + "::leave " + n + " -> " + m + (m != null ? (" (" + m.getClass().getName() + ")") : ""));
         
         return m;
     }
