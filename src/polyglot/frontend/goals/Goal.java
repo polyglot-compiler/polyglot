@@ -27,14 +27,16 @@ public interface Goal {
      * Goals on which this goal may mutually depend. If the passes for all
      * concurrent goals are run (possibly more than once) the concurrent goals
      * should eventually be reached.
+     * @param scheduler TODO
      */
-    public Collection concurrentGoals();
+    public Collection concurrentGoals(Scheduler scheduler);
     
     /**
      * Goals that must be completed before attempting this goal. The graph of
      * dependencies between prerequisite goals should be acyclic.
+     * @param scheduler TODO
      */
-    public Collection prerequisiteGoals();
+    public Collection prerequisiteGoals(Scheduler scheduler);
      
     /**
      * Add a new concurrent subgoal <code>g</code>.  <code>g</code> is a
@@ -42,7 +44,7 @@ public interface Goal {
      * to ensure that all concurrent goals can be eventually reached.
      * <code>g</code> should be interned.
      */
-    public void addConcurrentGoal(Goal g);
+    public void addConcurrentGoal(Goal g, Scheduler scheduler);
     
     /**
      * Add a new subgoal <code>g</code>.  <code>g</code> must be completed
@@ -51,7 +53,7 @@ public interface Goal {
      * @throws CyclicDependencyException
      *             if a prerequisite of <code>g</code> is <code>this</code>
      */
-    public void addPrerequisiteGoal(Goal g) throws CyclicDependencyException;
+    public void addPrerequisiteGoal(Goal g, Scheduler scheduler) throws CyclicDependencyException;
 
     /** Return true if this goal is reachable. */
     public boolean isReachable();

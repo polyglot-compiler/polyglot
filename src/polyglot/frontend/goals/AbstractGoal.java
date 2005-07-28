@@ -54,46 +54,46 @@ public abstract class AbstractGoal implements Goal {
         return job;
     }
     
-    public Collection prerequisiteGoals() {
+    public Collection prerequisiteGoals(Scheduler scheduler) {
         return required;
     }
     
-    public Collection concurrentGoals() {
+    public Collection concurrentGoals(Scheduler scheduler) {
         return subgoals;
     }
 
-    public void addPrerequisiteGoal(Goal g) throws CyclicDependencyException {
-        checkCycles(g);
+    public void addPrerequisiteGoal(Goal g, Scheduler scheduler) throws CyclicDependencyException {
+        checkCycles(g, scheduler);
         required.add(g);
     }
     
-    private void checkCycles(Goal current) throws CyclicDependencyException {
+    private void checkCycles(Goal current, Scheduler scheduler) throws CyclicDependencyException {
         if (this == current) {
             throw new CyclicDependencyException("Goal " + this + " cannot depend on itself.");
         }
         
-        for (Iterator i = current.prerequisiteGoals().iterator(); i.hasNext(); ) {
+        for (Iterator i = current.prerequisiteGoals(scheduler).iterator(); i.hasNext(); ) {
             Goal subgoal = (Goal) i.next();
-            checkCycles(subgoal);
+            checkCycles(subgoal, scheduler);
         }
     }
     
-    private boolean hasConcurrentGoalCycle(Goal current) {
+    private boolean hasConcurrentGoalCycle(Goal current, Scheduler scheduler) {
         if (this == current) {
             return true;
         }
         
-        for (Iterator i = current.concurrentGoals().iterator(); i.hasNext(); ) {
+        for (Iterator i = current.concurrentGoals(scheduler).iterator(); i.hasNext(); ) {
             Goal subgoal = (Goal) i.next();
-            if (! hasConcurrentGoalCycle(subgoal))
+            if (! hasConcurrentGoalCycle(subgoal, scheduler))
                 return true;
         }
 
         return false;
     }
     
-    public void addConcurrentGoal(Goal g) {
-        if (hasConcurrentGoalCycle(g)) {
+    public void addConcurrentGoal(Goal g, Scheduler scheduler) {
+        if (hasConcurrentGoalCycle(g, scheduler)) {
             return;
         }
         subgoals.add(g);
