@@ -6,6 +6,8 @@
  */
 package polyglot.frontend.goals;
 
+import java.util.*;
+import java.util.Collection;
 import java.util.Iterator;
 
 import polyglot.frontend.*;
@@ -58,14 +60,46 @@ public abstract class Barrier extends AbstractGoal {
         
         return distance;
     }
+
+//    public Collection prerequisiteGoals(Scheduler scheduler) {
+//        List l = new ArrayList();
+//        l.addAll(super.prerequisiteGoals(scheduler));
+//        
+//        for (Iterator i = scheduler.jobs().iterator(); i.hasNext(); ) {
+//            Job job = (Job) i.next();
+//            Goal subgoal = goalForJob(job);
+//            l.add(subgoal);
+//        }
+//        
+//        return l;
+//    }
     
     public abstract Goal goalForJob(Job job); 
+
+    public String toString() {
+        if (name == null) {
+            return super.toString();
+        }
+        return name;
+    }
     
     public int hashCode() {
-        return System.identityHashCode(this);
+        if (name == null) {
+            return System.identityHashCode(this);
+        }
+        else {
+            return name.hashCode();
+        }
     }
 
     public boolean equals(Object o) {
-        return this == o;
+        if (name == null) {
+            return this == o;
+        }
+        else if (o instanceof Barrier) {
+            Barrier b = (Barrier) o;
+            return name.equals(b.name);
+        }
+        return false;
     }
 }
