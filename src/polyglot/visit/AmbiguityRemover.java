@@ -111,7 +111,6 @@ public class AmbiguityRemover extends DisambiguationDriver
         }
         catch (UnavailableTypeException e) {
             // ignore: we'll rerun the pass later
-            e.printStackTrace();
         }
         
         if (Report.should_report(Report.visit, 2))
