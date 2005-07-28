@@ -528,8 +528,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         // Ensure supertypes and signatures are disambiguated for all
         // classes visible from this class's scope.
     
-        // Check typesBelow to see if we need to disambiguate supertypes
-        // and signatures.
+        // Disambiguate supertypes and signatures.
         SupertypeDisambiguator supDisamb = new SupertypeDisambiguator(ar);
         n = (ClassDecl) supDisamb.visitEdgeNoOverride(parent, n);
         if (supDisamb.hasErrors()) throw new SemanticException();
