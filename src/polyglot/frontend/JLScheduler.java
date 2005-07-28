@@ -6,6 +6,10 @@
  */
 package polyglot.ext.jl;
 
+import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
 import polyglot.frontend.goals.*;
@@ -28,7 +32,6 @@ public class JLScheduler extends Scheduler {
      */
     public JLScheduler(ExtensionInfo extInfo) {
         super(extInfo);
-        // TODO Auto-generated constructor stub
     }
     
     public Goal TypeExists(String name) {
@@ -48,7 +51,7 @@ public class JLScheduler extends Scheduler {
         }
         return g;
     }
-    
+
     public Goal SupertypesResolved(ParsedClassType ct) {
         Goal g = internGoal(new SupertypesResolved(ct));
         try {
@@ -63,7 +66,7 @@ public class JLScheduler extends Scheduler {
         }
         return g;
     }
-    
+
     public Goal SignaturesResolved(ParsedClassType ct) {
         Goal g = internGoal(new SignaturesResolved(ct));
         try {
@@ -82,16 +85,15 @@ public class JLScheduler extends Scheduler {
     public Goal FieldConstantsChecked(FieldInstance fi) {
         Goal g = internGoal(new FieldConstantsChecked(fi));
         try {
-            ReferenceType container = fi.container();
-            if (container instanceof ParsedTypeObject) {
-                ParsedTypeObject ct = (ParsedTypeObject) container;
-                if (ct.job() != null) {
-                    addConcurrentDependency(g, ConstantsChecked(ct.job()));
+            if (fi.container() instanceof ParsedTypeObject) {
+                ParsedTypeObject t = (ParsedTypeObject) fi.container();
+                if (t.job() != null) {
+                    addConcurrentDependency(g, ConstantsChecked(t.job()));
                 }
-            }
-            if (container instanceof ParsedClassType) {
-                ParsedClassType ct = (ParsedClassType) container;
-                addPrerequisiteDependency(g, SignaturesResolved(ct));
+                if (t instanceof ParsedClassType) {
+                    ParsedClassType ct = (ParsedClassType) t;
+                    addPrerequisiteDependency(g, SignaturesResolved(ct));
+                }
             }
         }
         catch (CyclicDependencyException e) {
@@ -101,8 +103,7 @@ public class JLScheduler extends Scheduler {
     }
     
     public Goal Parsed(Job job) {
-        Goal g = internGoal(new Parsed(job));
-        return g;
+        return internGoal(new Parsed(job));
     }
     
     public Goal TypesInitialized(Job job) {
@@ -116,10 +117,10 @@ public class JLScheduler extends Scheduler {
             throw new InternalCompilerError(e);
         }
         return g;
-    }
+ }
     
     public Goal TypesInitializedForCommandLine() {
-        return internGoal(new Barrier(this) {
+        return internGoal(new Barrier("TYPES_INIT_BARRIER", this) {
             public Goal goalForJob(Job j) {
                 return JLScheduler.this.TypesInitialized(j);
             }
@@ -172,7 +173,6 @@ public class JLScheduler extends Scheduler {
             throw new InternalCompilerError(e);
         }
         return g;
-        
     }
     
     public Goal ExceptionsChecked(Job job) {
@@ -192,7 +192,7 @@ public class JLScheduler extends Scheduler {
     public Goal ExitPathsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g =internGoal(new VisitorGoal(job, new ExitChecker(job, ts, nf)));
+        Goal g = internGoal(new VisitorGoal(job, new ExitChecker(job, ts, nf)));
         try {
             addPrerequisiteDependency(g, ReachabilityChecked(job));
         }
