@@ -18,12 +18,10 @@ public abstract class Node_c implements Node
     protected Position position;
     protected JL del;
     protected Ext ext;
-    protected Collection typesBelow;
     protected boolean error;
 
     public Node_c(Position pos) {
         this.position = pos;
-        this.typesBelow = Collections.EMPTY_SET;
         this.error = false;
     }
 
@@ -134,27 +132,6 @@ public abstract class Node_c implements Node
 	Node_c n = (Node_c) copy();
 	n.position = position;
 	return n;
-    }
-
-    public Collection typesBelow() {
-        return typesBelow;
-    }
-    
-    public Node typesBelow(Collection types) {
-        if (types.isEmpty() && this.typesBelow.isEmpty()) {
-            return this;
-        }
-        
-        Node_c n = (Node_c) copy();
-        
-        if (types.isEmpty()) {
-            n.typesBelow = Collections.EMPTY_SET;
-        }
-        else {
-            n.typesBelow = new HashSet(types);
-        }
-        
-        return n;
     }
     
     public boolean isTypeChecked() {
