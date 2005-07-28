@@ -234,7 +234,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         if (init != null && ! init.constantValueSet()) {
             // HACK to add dependencies for computing the constant value.
             final Scheduler scheduler = cc.typeSystem().extensionInfo().scheduler();
-            final Goal ccgoal = scheduler.currentGoal();
+            final Goal ccgoal = scheduler.ConstantsChecked(cc.job());
             
             init.visit(new NodeVisitor() {
                public Node leave(Node old, Node n, NodeVisitor v) {
@@ -242,11 +242,13 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
                        Field f = (Field) n;
                        if (! f.fieldInstance().constantValueSet()) {
                            Goal g = scheduler.FieldConstantsChecked(f.fieldInstance());
-                           try {
-                               scheduler.addPrerequisiteDependency(ccgoal, g);
-                           }
-                           catch (CyclicDependencyException e) {
-                               LocalDecl_c.this.li.setNotConstant();
+                           if (g.job() != ccgoal.job()) {
+                               try {
+                                   scheduler.addPrerequisiteDependency(ccgoal, g);
+                               }
+                               catch (CyclicDependencyException e) {
+                                   LocalDecl_c.this.li.setNotConstant();
+                               }
                            }
                        }
                    }
