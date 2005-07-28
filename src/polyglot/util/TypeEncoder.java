@@ -24,7 +24,7 @@ import java.util.zip.*;
 public class TypeEncoder
 {
   protected TypeSystem ts;
-  protected final boolean zip = true;
+  protected final boolean zip = false;
   protected final boolean base64 = true;
   protected final boolean test = false;
 
