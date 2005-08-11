@@ -1,4 +1,4 @@
 class FieldClassConflict {
-  int x;
+  int FieldClassConflict;
   FieldClassConflict m() { return null; }
 }
