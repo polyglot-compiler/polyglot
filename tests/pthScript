@@ -62,6 +62,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         FieldAccess3.jl ;
         FieldAccess4.jl (Semantic, "Field.*ambiguous");
         FieldAccess5.jl (Semantic, "Field.*ambiguous");
+        FieldClassConflict.jl ;
         FinalInit1.jl ; FinalInit2.jl ; FinalInit3.jl ; FinalInit4.jl ;
         FinalInit5.jl ; FinalInit6.jl ; FinalInit7.jl ;
         ForInit.jl ;
