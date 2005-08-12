@@ -126,14 +126,16 @@ public class Disamb_c implements Disamb
     }
 
     protected Node disambiguateNoPrefix() throws SemanticException {
-        // First try local variables and fields.
-        VarInstance vi = c.findVariableSilent(name);
-        
-        if (vi != null && exprOK()) {
-            Node n = disambiguateVarInstance(vi);
-            if (n != null) return n;
+        if (exprOK()) {
+            // First try local variables and fields.
+            VarInstance vi = c.findVariableSilent(name);
+            
+            if (vi != null) {
+                Node n = disambiguateVarInstance(vi);
+                if (n != null) return n;
+            }
         }
-
+        
         // no variable found. try types.
         if (typeOK()) {
             try {
@@ -215,6 +217,7 @@ public class Disamb_c implements Disamb
 
     protected boolean exprOK() {
         return ! (amb instanceof QualifierNode) &&
+               ! (amb instanceof TypeNode) &&
               (amb instanceof Expr || amb instanceof Receiver ||
                amb instanceof Prefix);
     }
