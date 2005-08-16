@@ -228,6 +228,9 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @param otherItem The item for all other flows coming into n 
      * @param n The boolean expression.
      * @param edgeKeys The outgoing edges 
+     * @return Map from edge keys to Items. Will return null if the binary
+     *      operator was not one of !, &&, ||, & or |, to allow the calling
+     *      method to determine which map to use.
      */
     protected Map flowBooleanConditions(Item trueItem, Item falseItem, Item otherItem, 
                                         FlowGraph graph, Expr n, Set edgeKeys) {
@@ -375,7 +378,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * in a code declaration block after the dataflow for that block of code 
      * has been performed.
      * 
-     * @throws <code>SemanticException</code> if the properties this dataflow
+     * @throws SemanticException if the properties this dataflow
      *         analysis is checking for is not satisfied.
      */
     protected abstract void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException;
@@ -600,7 +603,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             Map oldOutItems = p.outItems;
             p.inItem = this.safeConfluence(inItems, inItemKeys, p.node, graph);
             p.outItems = this.flow(inItems, inItemKeys, graph, p.node, p.succEdgeKeys());
-                                
+                    
             if (!p.succEdgeKeys().equals(p.outItems.keySet())) {
                 // This check is more for developers to ensure that they
                 // have implemented their dataflow correctly. If performance
@@ -1018,6 +1021,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *              navigator, and all other objects in
      *              <code>succEdgeKeys</code> are mapped to
      *              <code>startingItem</code>.
+     * @deprecated
      */
     protected static Map constructItemsFromCondition(Expr booleanCond, 
                                                      Item startingItem,
@@ -1056,6 +1060,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * <code>Item</code> that is used when an expression is true, the
      * other being the one that is used when an expression is false. It is used
      * by the <code>ConditionNavigator</code>.
+     * @deprecated Use flowBooleanConditions
      */
     protected static class BoolItem {
         public BoolItem(Item trueItem, Item falseItem) {
