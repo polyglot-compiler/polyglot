@@ -24,7 +24,7 @@ import java.util.zip.*;
 public class TypeEncoder
 {
   protected TypeSystem ts;
-  protected final boolean zip = false;
+  protected final boolean zip = true;
   protected final boolean base64 = true;
   protected final boolean test = false;
 
@@ -110,7 +110,10 @@ public class TypeEncoder
     }
     
     try {
-        if (zip) {
+        if (zip && !base64) {
+            // The base64 decoder automatically unzips byte streams, so
+            // we only need an explicit GZIPInputStream if we are not
+            // using base64 encoding.
             ois = new TypeInputStream( new GZIPInputStream( 
     				     new ByteArrayInputStream( b)), ts);
         }
