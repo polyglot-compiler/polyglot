@@ -124,32 +124,8 @@ public class AmbiguityRemover extends DisambiguationDriver
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::leave " + n + " (" + n.getClass().getName() + ")");
 
-        final boolean[] amb = new boolean[1];
-        
-        n.visitChildren(new NodeVisitor() {
-            public Node override(Node n) {
-                if (n instanceof Ambiguous) {
-            // System.out.println("ambiguous node " + n + " (" + n.getClass().getName() + ")");
-                    amb[0] = true;
-                }
-                return n;
-            }
-        });
-        
-        Node m = n;
-        
-        if (! amb[0]) {
-            m = m.del().disambiguate((AmbiguityRemover) v);
-        }
-        else {
-            // System.out.println("ambiguous node at " + m + " (" + m.getClass().getName() + ")");
-            for (Iterator i = context.goalStack().iterator(); i.hasNext(); ) {
-                Goal g = (Goal) i.next();
-                // System.out.println("  " + g + " unreachable");
-                g.setUnreachableThisRun();
-            }
-        }
-        
+        Node m = n.del().disambiguate((AmbiguityRemover) v);
+
         if (Report.should_report(Report.visit, 2))
             Report.report(2, "<< " + this + "::leave " + n + " -> " + m + (m != null ? (" (" + m.getClass().getName() + ")") : ""));
         
