@@ -30,7 +30,7 @@ public class VisitorGoal extends SourceFileGoal {
     }
     
     public int hashCode() {
-        return toString().hashCode();
+        return job().hashCode() + visitor().getClass().hashCode();
     }
     
     public boolean equals(Object o) {
@@ -42,6 +42,6 @@ public class VisitorGoal extends SourceFileGoal {
     }
     
     public String toString() {
-        return job.toString() + ":" + v.toString() + " (" + (runOnce ? "run" : "not-run") + ")";
+        return job() + ":" + visitor() + " (" + stateString() + ")";
     }
 }

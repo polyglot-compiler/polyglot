@@ -9,8 +9,6 @@ package polyglot.frontend.passes;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.MembersAdded;
 import polyglot.types.ParsedClassType;
-import polyglot.types.UnavailableTypeException;
-
 
 public class AddMembersPass extends ClassFilePass {
     Scheduler scheduler;
@@ -24,16 +22,12 @@ public class AddMembersPass extends ClassFilePass {
     
     public boolean run() {
         ParsedClassType ct = goal.type();
-        try {
-            // force the members to get initialized.
-            ct.fields();
-            ct.methods();
-            ct.constructors();
-            ct.memberClasses();
-            ct.setMembersAdded(true);
-        }
-        catch (UnavailableTypeException e) {
-        }
+        // force the members to get initialized.
+        ct.fields();
+        ct.methods();
+        ct.constructors();
+        ct.memberClasses();
+        ct.setMembersAdded(true);
         return true;
     }
 }

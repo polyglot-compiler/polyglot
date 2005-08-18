@@ -3,7 +3,9 @@ package polyglot.visit;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
+import polyglot.frontend.*;
 import polyglot.frontend.Job;
+import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
 import java.util.*;
@@ -40,6 +42,7 @@ public class ContextVisitor extends ErrorHandlingVisitor
 
     public NodeVisitor begin() {
         context = ts.createContext();
+        context = context.pushGoal(job.extensionInfo().scheduler().currentGoal());
         outer = null;
         return super.begin();
     }
@@ -76,47 +79,72 @@ public class ContextVisitor extends ErrorHandlingVisitor
      */
     protected Context enterScope(Node parent, Node n) {
         if (parent != null) {
-            return parent.del().enterScope(n, context);
+            return parent.del().enterChildScope(n, context, this);
         }
         // no parent node yet.
-        return n.del().enterScope(context);
+        return n.del().enterScope(context, null);
     }
-
+   
     /**
      * Imperatively update the context with declarations to be added after
      * visiting the node.
      */
     protected void addDecls(Node n) {
-        n.addDecls(context);
+        n.addDecls(context, this);
     }
 
     public NodeVisitor enter(Node parent, Node n) {
         if (Report.should_report(Report.visit, 5))
 	    Report.report(5, "enter(" + n + ")");
 
-        ContextVisitor v = this;
-
-        Context c = this.enterScope(parent, n);
-
-        if (c != this.context) {
-            v = (ContextVisitor) this.copy();
-            v.context = c;
-            v.outer = this;
-            v.error = false;
+        try {
+            ContextVisitor v = this;
+            
+            Context c = this.enterScope(parent, n);
+            
+            if (c != this.context) {
+                v = (ContextVisitor) this.copy();
+                v.context = c;
+                v.outer = this;
+                v.error = false;
+            }
+            
+            return v.superEnter(parent, n);
         }
-
-        return v.superEnter(parent, n);
-    }
+        catch (MissingDependencyException e) {
+            Scheduler scheduler = job.extensionInfo().scheduler();
+            for (Iterator i = context.goalStack().iterator(); i.hasNext(); ) {
+                Goal g = (Goal) i.next();
+                if (Report.should_report(Report.frontend, 3))
+                    e.printStackTrace();
+                scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
+                g.setUnreachableThisRun();
+            }
+        }
+        
+        return this;
+     }
 
     public NodeVisitor superEnter(Node parent, Node n) {
         return super.enter(parent, n);
     }
 
     public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
-        Node m = super.leave(parent, old, n, v);
-
-        this.addDecls(m);
-
-        return m;
+        try {
+            Node m = super.leave(parent, old, n, v);
+            this.addDecls(m);
+            return m;
+        }
+        catch (MissingDependencyException e) {
+            Scheduler scheduler = job.extensionInfo().scheduler();
+            for (Iterator i = context.goalStack().iterator(); i.hasNext(); ) {
+                Goal g = (Goal) i.next();
+                if (Report.should_report(Report.frontend, 3))
+                    e.printStackTrace();
+                scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
+                g.setUnreachableThisRun();
+            }
+        }
+        return n;
     }
 }

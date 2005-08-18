@@ -6,6 +6,8 @@
  */
 package polyglot.frontend.goals;
 
+import java.util.*;
+
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
 import polyglot.frontend.passes.CheckFieldConstantsPass;
@@ -55,15 +57,28 @@ public class FieldConstantsChecked extends AbstractGoal {
 
     public Pass createPass(ExtensionInfo extInfo) {
         if (job() != null) {
-            TypeSystem ts = extInfo.typeSystem();
-            NodeFactory nf = extInfo.nodeFactory();
-            return new ConstantCheckPass(this, new ConstantChecker(job(), ts, nf));
+//          TypeSystem ts = extInfo.typeSystem();
+//          NodeFactory nf = extInfo.nodeFactory();
+//          return new ConstantCheckPass(this, new ConstantChecker(job(), ts, nf));
+            return new EmptyPass(this);
         }
         return new CheckFieldConstantsPass(extInfo.scheduler(), this);
     }
     
-    public int distanceFromGoal() {
-        return vi.constantValueSet() ? 0 : 1;
+    public Collection prerequisiteGoals(Scheduler scheduler) {
+        List l = new ArrayList(super.prerequisiteGoals(scheduler));
+        if (ct != null) {
+            l.add(scheduler.SignaturesResolved(ct));
+        }
+        return l;
+    }
+
+    public Collection corequisiteGoals(Scheduler scheduler) {
+        List l = new ArrayList(super.corequisiteGoals(scheduler));
+        if (ct != null && ct.job() != null) {
+            l.add(scheduler.ConstantsChecked(ct.job()));
+        }
+        return l;
     }
     
     public FieldInstance var() {

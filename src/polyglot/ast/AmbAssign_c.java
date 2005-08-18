@@ -16,10 +16,6 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
     super(pos, left, op, right);
   }
   
-  public boolean isDisambiguated() {
-      return false;
-  }
-
   public Term entry() {
     if (operator() != Assign.ASSIGN) {
       return left();

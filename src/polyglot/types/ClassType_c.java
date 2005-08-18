@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import polyglot.frontend.Job;
+import polyglot.frontend.goals.SupertypesResolved;
 import polyglot.types.ClassType;
 import polyglot.types.FieldInstance;
 import polyglot.types.Flags;
@@ -58,18 +59,10 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 
     /** Get the full name of the class, if possible. */
     public String fullName() {
-        String name;
         if (isAnonymous()) {
-            if (superType() != null) {
-                name = "<anon subtype of " + superType().toString() + ">";
-            }
-            else {
-                name = "<anon subtype of unknown>";
-            }
+            return toString();
         }
-        else {
-            name = name();
-        } 
+        String name = name();
         if (isTopLevel() && package_() != null) {
             return package_().fullName() + "." + name;
         }
@@ -372,12 +365,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             return name();
         }
         else if (isAnonymous()) {
-            if (superType() != null) {
-                return "<anon subtype of " + superType().toString() + ">";
-            }
-            else {
-                return "<anon subtype of unknown>";
-            }
+            return "<anonymous class>";
         }
         else {
             return "<unknown class>";

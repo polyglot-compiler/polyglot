@@ -80,6 +80,7 @@ public class Compiler
 	    try {
                 SourceLoader source_loader = sourceExtension().sourceLoader();
                 Scheduler scheduler = sourceExtension().scheduler();
+                List jobs = new ArrayList();
 
                 // First, create a goal to compile every source file.
                 for (Iterator i = sources.iterator(); i.hasNext(); ) {
@@ -93,11 +94,14 @@ public class Compiler
                     // Add a new SourceJob for the given source. If a Job for the source
                     // already exists, then we will be given the existing job.
                     Job job = scheduler.addJob(source);
-
+                    jobs.add(job);
+                    
                     // Now, add a goal for completing the job.
                     scheduler.addGoal(sourceExtension().getCompileGoal(job));
                 }
-		    
+                
+                scheduler.setCommandLineJobs(jobs);
+                
                 // Then, compile the files to completion.
                 okay = scheduler.runToCompletion();
 	    }

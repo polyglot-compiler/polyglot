@@ -1,10 +1,12 @@
 package polyglot.ext.jl.types;
 
+import java.util.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Collection;
 import java.util.Map;
 
+import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.types.Package;
@@ -26,6 +28,7 @@ public class Context_c implements Context
 {
     protected Context outer;
     protected TypeSystem ts;
+    protected List goalStack;
 
     public static class Kind extends Enum {
 	public Kind(String name) {
@@ -43,6 +46,34 @@ public class Context_c implements Context
         this.ts = ts;
         this.outer = null;
         this.kind = OUTER;
+    }
+    
+    /** Stack of goals being worked on in this context. */
+    public List goalStack() {
+        if (goalStack == null) {
+            return Collections.EMPTY_LIST;
+        }
+        return goalStack;
+    }
+    
+    /** Push a goal onto the goal stack. */
+    public Context pushGoal(Goal goal) {
+        List s;
+        if (goalStack == null) {
+            s = Collections.singletonList(goal);
+        }
+        else {
+            s = new ArrayList(goalStack);
+            s.add(goal);
+        }
+        return pushGoalStack(s);
+    }
+
+    /** Push a goal onto the goal stack. */
+    public Context pushGoalStack(List s) {
+        Context_c c = (Context_c) pushBlock();
+        c.goalStack = Collections.unmodifiableList(s);
+        return c;
     }
 
     public boolean isBlock() { return kind == BLOCK; }

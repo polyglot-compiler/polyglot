@@ -59,20 +59,12 @@ public class VisitorPass extends AbstractPass
                 return false;
             }
            
-            markGoalReached();
-        
             return true;
         }
 
         return false;
     }
     
-    public void markGoalReached() {
-        if (goal instanceof SourceFileGoal) {
-            ((SourceFileGoal) goal).markRun();
-        }
-    }
-
     public String name() {
         if (v != null)
             return v.toString();

@@ -18,10 +18,6 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
     super(pos);
     this.name = name;
   }
-  
-  public boolean isDisambiguated() {
-      return false;
-  }
 
   /** Get the precedence of the field. */
   public Precedence precedence() {

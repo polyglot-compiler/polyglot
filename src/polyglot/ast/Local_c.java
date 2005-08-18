@@ -29,10 +29,6 @@ public class Local_c extends Expr_c implements Local
     super(pos);
     this.name = name;
   }
-  
-  public boolean isTypeChecked() {
-      return li != null && li.isCanonical() && super.isTypeChecked();
-  }
 
   /** Get the precedence of the local. */
   public Precedence precedence() { 

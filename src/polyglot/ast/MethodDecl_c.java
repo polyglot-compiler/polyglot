@@ -35,10 +35,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 	this.body = body;
     }
 
-    public boolean isDisambiguated() {
-        return mi != null && mi.isCanonical() && super.isDisambiguated();
-    }
-    
     public MemberInstance memberInstance() {
         return mi;
     }
@@ -234,7 +230,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
         return this;
     }
 
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, NodeVisitor v) {
         if (Report.should_report(TOPICS, 5))
 	    Report.report(5, "enter scope of method " + name);
         c = c.pushCode(mi);

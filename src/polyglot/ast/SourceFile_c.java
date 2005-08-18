@@ -28,10 +28,6 @@ public class SourceFile_c extends Node_c implements SourceFile
 	this.decls = TypedList.copyAndCheck(decls, TopLevelDecl.class, true);
     }
     
-    public boolean isDisambiguated() {
-        return super.isDisambiguated() && this.importTable != null;
-    }
-
     /** Get the source of the source file. */
     public Source source() {
 	return this.source;
@@ -119,6 +115,17 @@ public class SourceFile_c extends Node_c implements SourceFile
      */
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         TypeSystem ts = tb.typeSystem();
+        if (package_ != null) {
+            return tb.pushPackage(package_.package_());
+        }
+        return tb;
+    }
+
+    /**
+     * Build type objects for the source file.  Set the visitor's import table
+     * field before we recurse into the declarations.
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
+        TypeSystem ts = tb.typeSystem();
 
         ImportTable it;
 
@@ -133,11 +140,11 @@ public class SourceFile_c extends Node_c implements SourceFile
 
         return tb;
     }
+     */
 
     /**
      * Build type objects for the source file.  Sets the import table field for
      * the source.
-     */
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         ImportTable it = tb.importTable();
 
@@ -147,8 +154,9 @@ public class SourceFile_c extends Node_c implements SourceFile
 
         return importTable(it);
     }
+     */
 
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, NodeVisitor v) {
         return c.pushSource(importTable);
     }
 
@@ -219,6 +227,7 @@ public class SourceFile_c extends Node_c implements SourceFile
      * @param ar
      */
     public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
+        /*
         SourceFile n = this;
         
         // Disambiguate imports and package declarations.
@@ -241,5 +250,15 @@ public class SourceFile_c extends Node_c implements SourceFile
         if (ar.hasErrors()) throw new SemanticException();
         
         return n.disambiguate(ar);
+         */
+        return null;
+    }
+    
+    public void dump(CodeWriter w) {
+        super.dump(w);
+        w.begin(0);
+        w.allowBreak(4, " ");
+        w.write("(import-table " + importTable + ")");
+        w.end();
     }
 }

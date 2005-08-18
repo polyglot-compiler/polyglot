@@ -1,11 +1,7 @@
 package polyglot.visit;
 
-import java.util.LinkedList;
-
 import polyglot.ast.Node;
-import polyglot.frontend.VisitorPass;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.StringUtil;
+import polyglot.util.*;
 
 /**
  * The <code>NodeVisitor</code> represents an implementation of the "Visitor"
@@ -23,7 +19,7 @@ import polyglot.util.StringUtil;
  * @see polyglot.ast.Node#visit
  * @see polyglot.ast.Node
  */
-public abstract class NodeVisitor
+public abstract class NodeVisitor implements Copy
 {
     /**
      * Given a tree rooted at <code>n</code>, the visitor has the option of
@@ -251,5 +247,15 @@ public abstract class NodeVisitor
         }
         
         return n;
+    }
+    
+
+    public Object copy() {
+        try {
+            return (NodeVisitor) super.clone();
+        }
+        catch (CloneNotSupportedException e) {
+            throw new InternalCompilerError("Java clone() weirdness.");
+        }
     }
 }

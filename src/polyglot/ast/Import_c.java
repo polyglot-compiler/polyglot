@@ -48,7 +48,8 @@ public class Import_c extends Node_c implements Import
 	return n;
     }
 
-    /** Build type objects for the import. */
+    /**
+     * Build type objects for the import.
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
 	ImportTable it = tb.importTable();
 
@@ -61,6 +62,7 @@ public class Import_c extends Node_c implements Import
 
 	return this;
     }
+     */
 
     /** Check that imported classes and packages exist. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {

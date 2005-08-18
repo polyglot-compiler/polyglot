@@ -22,59 +22,15 @@ import polyglot.visit.TypeChecker;
 
 
 public class Disambiguated extends SourceFileGoal {
-    boolean reached;
-
     public Disambiguated(Job job) {
         super(job);
-        this.reached = false;
     }
 
     public Pass createPass(ExtensionInfo extInfo) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        return new DisambiguatorPass(this, new AmbiguityRemover(job(), ts, nf));
+        return new VisitorPass(this, new AmbiguityRemover(job(), ts, nf));
     }
 
-    /**
-     * Return true if the disambiguation pass has been run at least once
-     * (this forces dependent classes to get loaded) and isDisambiguated()
-     * is true for all nodes in the AST (except possibly those within a
-     * local or anonymous class).
-     */
-    public int distanceFromGoal() {
-        if (Report.should_report(TOPICS, 3))
-            Report.report(3, "checking " + this);
-
-        if (this.reached) {
-            if (Report.should_report(TOPICS, 3))
-                Report.report(3, "  ok (cached)");
-            return 0;
-        }
-        
-        if (! hasBeenRun()) {
-            if (Report.should_report(TOPICS, 3))
-                Report.report(3, "  not run yet");
-            return Integer.MAX_VALUE;
-        }
-        
-        if (job().ast() == null) {
-            if (Report.should_report(TOPICS, 3))
-                Report.report(3, "  null ast for " + job());
-            return Integer.MAX_VALUE;
-        }
-        
-        // Now look for ambiguities in the AST.
-        int count = AmbiguityRemover.astAmbiguityCount(job.ast());
-
-        if (count == 0) {
-            if (Report.should_report(TOPICS, 3))
-                Report.report(3, "  ok");
-            this.reached = true;
-            return 0;
-        }
-
-        return count;
-    }
-    
     private static final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend });
 }

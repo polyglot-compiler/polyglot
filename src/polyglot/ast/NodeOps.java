@@ -30,32 +30,34 @@ public interface NodeOps
      * This should <i>not</i> update the old context
      * imperatively.  Use <code>addDecls</code> when leaving the node
      * for that.
-     * 
      * @param c the current <code>Context</code>
+     * @param v The visitor currently running over the AST, or null
+     * 
      * @return the <code>Context</code> to be used for visiting this node. 
      */
-    public Context enterScope(Context c);
+    public Context enterScope(Context c, NodeVisitor v);
 
     /**
      * Push a new scope for visiting the child node <code>child</code>. 
      * The default behavior is to delegate the call to the child node, and let
      * it add appropriate declarations that should be in scope. However,
      * this method gives parent nodes have the ability to modify this behavior.
+     * @param child The child node about to be entered.
+     * @param c The current <code>Context</code>
+     * @param v The visitor currently running over the AST, or null
      * 
-     * @param child the child node about to be entered.
-     * @param c the current <code>Context</code>
      * @return the <code>Context</code> to be used for visiting node 
      *           <code>child</code>
      */
-    public Context enterScope(Node child, Context c);
+    public Context enterChildScope(Node child, Context c, NodeVisitor v);
 
     /**
      * Add any declarations to the context that should be in scope when
      * visiting later sibling nodes.
-     *
      * @param c The context to which to add declarations.
+     * @param v The visitor currently running over the AST, or null
      */
-    void addDecls(Context c);
+    void addDecls(Context c, NodeVisitor v);
 
     /**
      * Collects classes, methods, and fields from the AST rooted at this node

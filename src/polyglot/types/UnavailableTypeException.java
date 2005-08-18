@@ -7,14 +7,16 @@
 package polyglot.types;
 
 import polyglot.frontend.Job;
+import polyglot.frontend.SchedulerException;
 import polyglot.util.Position;
 
 /**
- * Comment for <code>UnavailableTypeException</code>
- *
+ * An <code>UnavailableTypeException</code> is an exception thrown when a type
+ * object is not in a required state to continue a pass.
+ * 
  * @author nystrom
  */
-public class UnavailableTypeException extends RuntimeException {
+public class UnavailableTypeException extends SchedulerException {
     Job job;
     Position position;
     

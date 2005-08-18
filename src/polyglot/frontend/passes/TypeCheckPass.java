@@ -21,12 +21,4 @@ public class TypeCheckPass extends VisitorPass {
     public TypeCheckPass(Goal goal, TypeChecker v) {
         super(goal, v);
     }
-
-    public void markGoalReached() {
-        TypeChecker v = (TypeChecker) visitor();
-        // Don't mark the goal reached; the pass will be rerun only if necessary
-        // Record that we've run the pass at least once.
-        Scheduler scheduler = v.typeSystem().extensionInfo().scheduler();
-        ((TypeChecked) scheduler.TypeChecked(v.job())).markRun();
-    }
 }

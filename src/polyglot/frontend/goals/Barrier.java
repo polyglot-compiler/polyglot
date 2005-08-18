@@ -30,42 +30,34 @@ public abstract class Barrier extends AbstractGoal {
         super(null, name);
         this.scheduler = scheduler;
     }
+    
+    public Collection jobs() {
+        return scheduler.jobs();
+    }
 
     /* (non-Javadoc)
      * @see polyglot.frontend.goals.Goal#createPass(polyglot.frontend.ExtensionInfo)
      */
     public Pass createPass(ExtensionInfo extInfo) {
-        return new EmptyPass(this);
+        return new EmptyPass(this) {
+            public boolean run() {
+                for (Iterator i = Barrier.this.jobs().iterator(); i.hasNext(); ) {
+                    Job job = (Job) i.next();
+                    Goal subgoal = goalForJob(job);
+                    if (! subgoal.hasBeenReached()) {
+                        throw new MissingDependencyException(subgoal, true);
+                    }
+                }
+                return true;
+            }
+        };
     }
     
-    /* (non-Javadoc)
-     * @see polyglot.frontend.goals.Goal#reached()
-     */
-    public int distanceFromGoal() {
-        int distance = 0;
-        
-        for (Iterator i = scheduler.jobs().iterator(); i.hasNext(); ) {
-            Job job = (Job) i.next();
-            Goal subgoal = goalForJob(job);
-            if (! scheduler.reached(subgoal)) {
-                try {
-                    scheduler.addPrerequisiteDependency(this, subgoal);
-                    distance++;
-                }
-                catch (CyclicDependencyException e) {
-                    throw new InternalCompilerError(e.getMessage());
-                }
-            }
-        }
-        
-        return distance;
-    }
-
 //    public Collection prerequisiteGoals(Scheduler scheduler) {
 //        List l = new ArrayList();
 //        l.addAll(super.prerequisiteGoals(scheduler));
 //        
-//        for (Iterator i = scheduler.jobs().iterator(); i.hasNext(); ) {
+//        for (Iterator i = Barrier.this.jobs().iterator(); i.hasNext(); ) {
 //            Job job = (Job) i.next();
 //            Goal subgoal = goalForJob(job);
 //            l.add(subgoal);

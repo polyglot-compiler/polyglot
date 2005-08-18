@@ -23,26 +23,36 @@ import polyglot.util.StringUtil;
 public abstract class AbstractGoal implements Goal {
     Job job;
     String name;
-    boolean reachable;
-    Collection subgoals;
-    Collection required;
+    int state;
+    Set corequisites;
+    Set prerequisites;
+
+    private AbstractGoal() {
+        this.state = UNREACHED;
+        this.prerequisites = Collections.EMPTY_SET;
+        this.corequisites = Collections.EMPTY_SET;
+    }
     
-    public AbstractGoal(Job job) {
+    protected AbstractGoal(Job job) {
+        this();
         this.job = job;
         this.name = StringUtil.getShortNameComponent(getClass().getName());
-        this.reachable = true;
-        this.required = new HashSet();
-        this.subgoals = new HashSet();
     }
 
-    public AbstractGoal(Job job, String name) {
+    protected AbstractGoal(Job job, String name) {
+        this();
         this.job = job;
         this.name = name;
-        this.reachable = true;
-        this.required = new HashSet();
-        this.subgoals = new HashSet();
     }
     
+    /**
+     * Return true if this goal conflicts with the other; that is passes running
+     * over both goals could access the same data.
+     */
+    public boolean conflictsWith(Goal goal) {
+        return job() != null && job() == goal.job();
+    }
+   
     /** Creates a pass to attempt to satisfy the goal. */
     public abstract Pass createPass(ExtensionInfo extInfo);
     
@@ -55,16 +65,20 @@ public abstract class AbstractGoal implements Goal {
     }
     
     public Collection prerequisiteGoals(Scheduler scheduler) {
-        return required;
+        return prerequisites;
     }
     
-    public Collection concurrentGoals(Scheduler scheduler) {
-        return subgoals;
+    public Collection corequisiteGoals(Scheduler scheduler) {
+        return corequisites;
     }
 
     public void addPrerequisiteGoal(Goal g, Scheduler scheduler) throws CyclicDependencyException {
-        checkCycles(g, scheduler);
-        required.add(g);
+        // This takes a hell of a long time.  Disable the check for now.
+        // checkCycles(g, scheduler);
+        if (prerequisites == Collections.EMPTY_SET) {
+            prerequisites = new HashSet();
+        }
+        prerequisites.add(g);
     }
     
     private void checkCycles(Goal current, Scheduler scheduler) throws CyclicDependencyException {
@@ -78,36 +92,36 @@ public abstract class AbstractGoal implements Goal {
         }
     }
     
-    private boolean hasConcurrentGoalCycle(Goal current, Scheduler scheduler) {
-        if (this == current) {
-            return true;
+    public void addCorequisiteGoal(Goal g, Scheduler scheduler) {
+        if (corequisites == Collections.EMPTY_SET) {
+            corequisites = new HashSet();
         }
-        
-        for (Iterator i = current.concurrentGoals(scheduler).iterator(); i.hasNext(); ) {
-            Goal subgoal = (Goal) i.next();
-            if (! hasConcurrentGoalCycle(subgoal, scheduler))
-                return true;
-        }
+        corequisites.add(g);
+    }
 
-        return false;
+    /** Mark the goal as reached or not reached. */
+    public void setUnreachableThisRun() {
+        setState(UNREACHABLE_THIS_RUN);
     }
     
-    public void addConcurrentGoal(Goal g, Scheduler scheduler) {
-        if (hasConcurrentGoalCycle(g, scheduler)) {
-            return;
-        }
-        subgoals.add(g);
+    public int state() {
+        return state;
+    }
+    
+    public void setState(int state) {
+        this.state = state;
     }
 
-    public abstract int distanceFromGoal();
-    public final boolean hasBeenReached() { return distanceFromGoal() == 0; }
+    public boolean hasBeenReached() {
+        return state == REACHED;
+    }
     
     public void setUnreachable() {
-        this.reachable = false;
+        setState(UNREACHABLE);
     }
     
     public boolean isReachable() {
-        return this.reachable;
+        return this.state != UNREACHABLE;
     }
 
     public int hashCode() {
@@ -127,7 +141,25 @@ public abstract class AbstractGoal implements Goal {
         return false;
     }
     
+    protected String stateString() {
+        switch (state) {
+            case UNREACHABLE:
+                return "unreachable";
+            case UNREACHABLE_THIS_RUN:
+                return "running-but-unreachable-this-run";
+            case UNREACHED:
+                return "unreached";
+            case ATTEMPTED:
+                return "attempted";
+            case REACHED:
+                return "reached";
+            case RUNNING:
+                return "running";
+        }
+        return "unknown-goal-state";
+    }
+    
     public String toString() {
-        return job + ":" + name;
+        return job + ":" + name + " (" + stateString() + ")";
     }
 }

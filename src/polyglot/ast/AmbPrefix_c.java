@@ -20,10 +20,6 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
 	this.name = name;
     }
     
-    public boolean isDisambiguated() {
-        return false;
-    }
-
     /** Get the name of the prefix. */
     public String name() {
 	return this.name;

@@ -39,10 +39,6 @@ public class TypeExists extends AbstractGoal {
         this.reached = true;
     }
     
-    public int distanceFromGoal() {
-        return this.reached ? 0 : 1;
-    }
-    
     public int hashCode() {
         return typeName.hashCode() + super.hashCode();
     }

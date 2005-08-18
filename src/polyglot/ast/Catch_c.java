@@ -5,6 +5,7 @@ import polyglot.ast.*;
 import polyglot.util.*;
 import polyglot.types.*;
 import polyglot.visit.*;
+
 import java.util.*;
 
 /**
@@ -70,7 +71,7 @@ public class Catch_c extends Stmt_c implements Catch
 	return reconstruct(formal, body);
     }
 
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, NodeVisitor v) {
         return c.pushBlock();
     }
 

@@ -61,7 +61,7 @@ public class Switch_c extends Stmt_c implements Switch
 	return this;
     }
 
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, NodeVisitor v) {
         return c.pushBlock();
     }
 

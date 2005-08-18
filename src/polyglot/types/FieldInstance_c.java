@@ -92,17 +92,8 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
     public boolean isConstant() {
         if (! constantValueSet) {
             Scheduler scheduler = typeSystem().extensionInfo().scheduler();
-            try {
-                Goal g = scheduler.FieldConstantsChecked(this);
-                if (container instanceof ParsedTypeObject) {
-                    Job job = ((ParsedTypeObject) container).job();
-                    scheduler.addPrerequisiteDependency(g, scheduler.TypeChecked(job));
-                }
-                scheduler.addPrerequisiteDependency(scheduler.currentGoal(), g);
-            }
-            catch (CyclicDependencyException e) {
-                setNotConstant();
-            }
+            Goal g = scheduler.FieldConstantsChecked(this);
+            throw new MissingDependencyException(g);
         }
             
         return isConstant;

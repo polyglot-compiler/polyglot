@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import polyglot.ast.*;
+import polyglot.frontend.*;
 import polyglot.frontend.CyclicDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
@@ -33,10 +34,6 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         this.init = init;
     }
     
-    public boolean isDisambiguated() {
-        return fi != null && fi.isCanonical() && (init == null || (ii != null && ii.isCanonical())) && super.isDisambiguated();
-    }
-
     public MemberInstance memberInstance() {
         return fi;
     }
@@ -193,7 +190,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return this;
     }
 
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, NodeVisitor v) {
         if (ii != null) {
             return c.pushCode(ii);
         }
@@ -204,23 +201,24 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         if (init != null && ! init.constantValueSet()) {
             // HACK to add dependencies for computing the constant value.
             final Scheduler scheduler = cc.typeSystem().extensionInfo().scheduler();
-            final Goal ccgoal = scheduler.currentGoal();
-            
+            final Goal myGoal = scheduler.FieldConstantsChecked(this.fi);
+
             init.visit(new NodeVisitor() {
-               public Node leave(Node old, Node n, NodeVisitor v) {
-                   if (n instanceof Field) {
-                       Field f = (Field) n;
-                       if (! f.fieldInstance().constantValueSet()) {
-                           Goal g = scheduler.FieldConstantsChecked(f.fieldInstance());
-                           try {
-                               scheduler.addPrerequisiteDependency(ccgoal, g);
-                           }
-                           catch (CyclicDependencyException e) {
-                               FieldDecl_c.this.fi.setNotConstant();
-                           }
-                       }
-                   }
-                   return n;
+                public Node leave(Node old, Node n, NodeVisitor v) {
+                    if (n instanceof Field) {
+                        Field f = (Field) n;
+                        if (!f.fieldInstance().constantValueSet()) {
+                            Goal newGoal = scheduler.FieldConstantsChecked(f.fieldInstance());
+                            for (Iterator i = newGoal.prerequisiteGoals(scheduler).iterator(); i.hasNext();) {
+                                Goal g = (Goal) i.next();
+                                if (scheduler.prerequisiteDependsOn(g, myGoal)) {
+                                    FieldDecl_c.this.fi.setNotConstant();
+                                }
+                            }
+                            throw new MissingDependencyException(newGoal, true);
+                        }
+                    }
+                    return n;
                }
             });
             

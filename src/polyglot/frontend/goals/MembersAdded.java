@@ -6,6 +6,10 @@
  */
 package polyglot.frontend.goals;
 
+import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
 import polyglot.frontend.passes.AddMembersPass;
@@ -22,19 +26,39 @@ import polyglot.visit.TypeBuilder;
 public class MembersAdded extends ClassTypeGoal {
     public MembersAdded(ParsedClassType ct) {
         super(ct);
-      }
+    }
 
     public Pass createPass(ExtensionInfo extInfo) {
-//        if (job() != null) {
-//            TypeSystem ts = extInfo.typeSystem();
-//            NodeFactory nf = extInfo.nodeFactory();
-//            return new VisitorPass(this, new TypeBuilder(job(), ts, nf));
-//        }
+        if (job() != null) {
+//          TypeSystem ts = extInfo.typeSystem();
+//          NodeFactory nf = extInfo.nodeFactory();
+//          return new VisitorPass(this, new TypeBuilder(job(), ts, nf));
+            return new EmptyPass(this) {
+                public boolean run() {
+                    if (! MembersAdded.this.type().membersAdded()) {
+                        throw new SchedulerException();
+                    }
+                    return true;
+                }
+            };
+        }
         return new AddMembersPass(extInfo.scheduler(), this);
     }
     
-    public int distanceFromGoal() {
-        return type().membersAdded() ? 0 : 1;
+    public Collection prerequisiteGoals(Scheduler scheduler) {
+        List l = new ArrayList(super.prerequisiteGoals(scheduler));
+        if (ct.job() != null) {
+            l.add(scheduler.Parsed(ct.job()));
+        }
+        return l;
+    }
+
+    public Collection corequisiteGoals(Scheduler scheduler) {
+        List l = new ArrayList(super.corequisiteGoals(scheduler));
+        if (ct.job() != null) {
+            l.add(scheduler.TypesInitialized(ct.job()));
+        }
+        return l;
     }
     
     public boolean equals(Object o) {

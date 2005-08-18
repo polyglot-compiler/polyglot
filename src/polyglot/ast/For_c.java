@@ -97,7 +97,7 @@ public class For_c extends Loop_c implements For
 	return reconstruct(inits, cond, iters, body);
     }
 
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, NodeVisitor v) {
 	return c.pushBlock();
     }
 

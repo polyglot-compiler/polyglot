@@ -17,10 +17,6 @@ public abstract class Expr_c extends Term_c implements Expr
 	super(pos);
     }
 
-    public boolean isTypeChecked() {
-        return type != null && type.isCanonical() && super.isTypeChecked();
-    }
-    
     /**
      * Get the type of the expression.  This may return an
      * <code>UnknownType</code> before type-checking, but should return the

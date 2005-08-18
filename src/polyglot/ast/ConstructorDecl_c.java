@@ -33,10 +33,6 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	this.body = body;
     }
     
-    public boolean isDisambiguated() {
-        return ci != null && ci.isCanonical() && super.isDisambiguated();
-    }
-    
     public MemberInstance memberInstance() {
         return ci;
     }
@@ -210,7 +206,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
         return this;
     }
 
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, NodeVisitor v) {
         return c.pushCode(ci);
     }
 

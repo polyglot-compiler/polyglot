@@ -32,52 +32,5 @@ public class TypeChecked extends SourceFileGoal {
         return new TypeCheckPass(this, new TypeChecker(job(), ts, nf));
     }
 
-    public int distanceFromGoal() {
-        if (Report.should_report(TOPICS, 3))
-            Report.report(3, "checking " + this);
-
-        if (this.reached) {
-            if (Report.should_report(TOPICS, 3))
-                Report.report(3, "  ok (cached)");
-            return 0;
-        }
-        
-        if (! hasBeenRun()) {
-            if (Report.should_report(TOPICS, 3))
-                Report.report(3, "  not run yet");
-            return Integer.MAX_VALUE;
-        }
-        
-        if (job().ast() == null) {
-            if (Report.should_report(TOPICS, 3))
-                Report.report(3, "  null ast for " + job());
-            return Integer.MAX_VALUE;
-        }
-        
-        // Now look for ambiguities in the AST.
-        final int[] notOkCount = new int[] { 0 };
-        
-        job().ast().visit(new NodeVisitor() {
-            public Node override(Node n) {
-                if (! n.isTypeChecked()) {
-                    if (Report.should_report(TOPICS, 3))
-                        Report.report(3, "  not ok at " + n);
-                    notOkCount[0]++;
-                }
-                
-                return null;
-            }
-        });
-        
-        if (notOkCount[0] == 0) {
-            if (Report.should_report(TOPICS, 3))
-                Report.report(3, "  ok");
-            this.reached = true;
-            return 0;
-        }
-        
-        return notOkCount[0];
-    }
-    
     private static final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend });
 }

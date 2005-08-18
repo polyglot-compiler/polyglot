@@ -40,65 +40,21 @@ public class JLScheduler extends Scheduler {
     
     public Goal MembersAdded(ParsedClassType ct) {
         Goal g = internGoal(new MembersAdded(ct));
-        try {
-            if (ct.job() != null) {
-                addPrerequisiteDependency(g, Parsed(ct.job()));
-                addConcurrentDependency(g, TypesInitialized(ct.job()));
-            }
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
         return g;
     }
 
     public Goal SupertypesResolved(ParsedClassType ct) {
         Goal g = internGoal(new SupertypesResolved(ct));
-        try {
-            if (ct.job() != null) {
-                addPrerequisiteDependency(g, TypesInitialized(ct.job()));
-                addConcurrentDependency(g, Disambiguated(ct.job()));
-            }
-            addPrerequisiteDependency(g, MembersAdded(ct));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
         return g;
     }
 
     public Goal SignaturesResolved(ParsedClassType ct) {
         Goal g = internGoal(new SignaturesResolved(ct));
-        try {
-            if (ct.job() != null) {
-                addPrerequisiteDependency(g, TypesInitialized(ct.job()));
-                addConcurrentDependency(g, Disambiguated(ct.job()));
-            }
-            addPrerequisiteDependency(g, SupertypesResolved(ct));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
         return g;
     }
 
     public Goal FieldConstantsChecked(FieldInstance fi) {
         Goal g = internGoal(new FieldConstantsChecked(fi));
-        try {
-            if (fi.container() instanceof ParsedTypeObject) {
-                ParsedTypeObject t = (ParsedTypeObject) fi.container();
-                if (t.job() != null) {
-                    addConcurrentDependency(g, ConstantsChecked(t.job()));
-                }
-                if (t instanceof ParsedClassType) {
-                    ParsedClassType ct = (ParsedClassType) t;
-                    addPrerequisiteDependency(g, SignaturesResolved(ct));
-                }
-            }
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
         return g;
     }
     
@@ -106,16 +62,17 @@ public class JLScheduler extends Scheduler {
         return internGoal(new Parsed(job));
     }
     
-    public Goal TypesInitialized(Job job) {
+    public Goal TypesInitialized(final Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new TypeBuilder(job, ts, nf)));
-        try {
-            addPrerequisiteDependency(g, Parsed(job));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
+        Goal g = internGoal(new VisitorGoal(job, new TypeBuilder(job, ts, nf)) {
+            public Collection prerequisiteGoals(Scheduler scheduler) {
+                List l = new ArrayList();
+                l.addAll(super.prerequisiteGoals(scheduler));
+                l.add(Parsed(job));
+                return l;
+            }
+        });
         return g;
  }
     
@@ -124,149 +81,163 @@ public class JLScheduler extends Scheduler {
             public Goal goalForJob(Job j) {
                 return JLScheduler.this.TypesInitialized(j);
             }
+//            
+//            public Collection jobs() {
+//                return JLScheduler.this.commandLineJobs();
+//            }
         });
     }
     
-    public Goal Disambiguated(Job job) {
-        Goal g = internGoal(new Disambiguated(job));
-        try {
-            addPrerequisiteDependency(g, TypesInitializedForCommandLine());
-            addPrerequisiteDependency(g, TypesInitialized(job));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
-        return g;
-    }
-    
-    public Goal TypeChecked(Job job) {
-        Goal g = internGoal(new TypeChecked(job));
-        try {
-            addPrerequisiteDependency(g, Disambiguated(job));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
-        return g;
-    }
-    
-    public Goal ConstantsChecked(Job job) {
-        Goal g = internGoal(new ConstantsCheckedForFile(job));
-        try {
-            addPrerequisiteDependency(g, TypeChecked(job));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
-        return g;
-    }
-    
-    public Goal ReachabilityChecked(Job job) {
+    public Goal ImportTableInitialized(final Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new ReachChecker(job, ts, nf)));
-        try {
-            addPrerequisiteDependency(g, TypeChecked(job));
-            addPrerequisiteDependency(g, ConstantsChecked(job));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
+        Goal g = internGoal(new VisitorGoal(job, new InitImportsVisitor(job, ts, nf)) {
+            public Collection prerequisiteGoals(Scheduler scheduler) {
+                List l = new ArrayList();
+                l.addAll(super.prerequisiteGoals(scheduler));
+                l.add(TypesInitializedForCommandLine());
+                l.add(TypesInitialized(job));
+                return l;
+            }
+        });
         return g;
     }
     
-    public Goal ExceptionsChecked(Job job) {
+    public Goal Disambiguated(final Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new ExceptionChecker(job, ts, nf)));
-        try {
-            addPrerequisiteDependency(g, TypeChecked(job));
-            addPrerequisiteDependency(g, ReachabilityChecked(job));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
+        Goal g = internGoal(new VisitorGoal(job, new AmbiguityRemover(job, ts, nf)) {
+            public Collection prerequisiteGoals(Scheduler scheduler) {
+                List l = new ArrayList();
+                l.addAll(super.prerequisiteGoals(scheduler));
+                l.add(ImportTableInitialized(job));
+                return l;
+            }
+        });
         return g;
     }
     
-    public Goal ExitPathsChecked(Job job) {
+    public Goal TypeChecked(final Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new ExitChecker(job, ts, nf)));
-        try {
-            addPrerequisiteDependency(g, ReachabilityChecked(job));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
+        Goal g = internGoal(new VisitorGoal(job, new TypeChecker(job, ts, nf)) {
+            public Collection prerequisiteGoals(Scheduler scheduler) {
+                List l = new ArrayList();
+                l.addAll(super.prerequisiteGoals(scheduler));
+                l.add(Disambiguated(job));
+                return l;
+            }
+        });
         return g;
     }
     
-    public Goal InitializationsChecked(Job job) {
+    public Goal ConstantsChecked(final Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new InitChecker(job, ts, nf)));
-        try {
-            addPrerequisiteDependency(g, ReachabilityChecked(job));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
+        Goal g = internGoal(new VisitorGoal(job, new ConstantChecker(job, ts, nf)) {
+            public Collection prerequisiteGoals(Scheduler scheduler) {
+                List l = new ArrayList();
+                l.addAll(super.prerequisiteGoals(scheduler));
+                l.add(TypeChecked(job));
+                return l;
+            }
+        });
         return g;
     }
     
-    public Goal ConstructorCallsChecked(Job job) {
+    public Goal ReachabilityChecked(final Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new ConstructorCallChecker(job, ts, nf)));
-        try {
-            addPrerequisiteDependency(g, ReachabilityChecked(job));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
+        Goal g = internGoal(new VisitorGoal(job, new ReachChecker(job, ts, nf)) {
+            public Collection prerequisiteGoals(Scheduler scheduler) {
+                List l = new ArrayList();
+                l.addAll(super.prerequisiteGoals(scheduler));
+                l.add(TypeChecked(job));
+                l.add(ConstantsChecked(job));
+                return l;
+            }
+        });
+        return g;
+    }
+    
+    public Goal ExceptionsChecked(final Job job) {
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = internGoal(new VisitorGoal(job, new ExceptionChecker(job, ts, nf)) {
+            public Collection prerequisiteGoals(Scheduler scheduler) {
+                List l = new ArrayList();
+                l.addAll(super.prerequisiteGoals(scheduler));
+                l.add(TypeChecked(job));
+                l.add(ReachabilityChecked(job));
+                return l;
+            }
+        });
+        return g;
+    }
+    
+    public Goal ExitPathsChecked(final Job job) {
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = internGoal(new VisitorGoal(job, new ExitChecker(job, ts, nf)) {
+            public Collection prerequisiteGoals(Scheduler scheduler) {
+                List l = new ArrayList();
+                l.addAll(super.prerequisiteGoals(scheduler));
+                l.add(ReachabilityChecked(job));
+                return l;
+            }
+        });
+        return g;
+    }
+    
+    public Goal InitializationsChecked(final Job job) {
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = internGoal(new VisitorGoal(job, new InitChecker(job, ts, nf)) {
+            public Collection prerequisiteGoals(Scheduler scheduler) {
+                List l = new ArrayList();
+                l.addAll(super.prerequisiteGoals(scheduler));
+                l.add(ReachabilityChecked(job));
+                return l;
+            }
+        });
+        return g;
+    }
+    
+    public Goal ConstructorCallsChecked(final Job job) {
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = internGoal(new VisitorGoal(job, new ConstructorCallChecker(job, ts, nf)) {
+            public Collection prerequisiteGoals(Scheduler scheduler) {
+                List l = new ArrayList();
+                l.addAll(super.prerequisiteGoals(scheduler));
+                l.add(ReachabilityChecked(job));
+                return l;
+            }
+        });
         return g; 
     }
     
-    public Goal ForwardReferencesChecked(Job job) {
+    public Goal ForwardReferencesChecked(final Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new FwdReferenceChecker(job, ts, nf)));
-        try {
-            addPrerequisiteDependency(g, ReachabilityChecked(job));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
+        Goal g = internGoal(new VisitorGoal(job, new FwdReferenceChecker(job, ts, nf)) {
+            public Collection prerequisiteGoals(Scheduler scheduler) {
+                List l = new ArrayList();
+                l.addAll(super.prerequisiteGoals(scheduler));
+                l.add(ReachabilityChecked(job));
+                return l;
+            }
+        });
         return g;
     }
     
     public Goal Serialized(Job job) {
         Goal g = internGoal(new Serialized(job));
-        try {
-            addPrerequisiteDependency(g, TypeChecked(job));
-            addPrerequisiteDependency(g, ConstantsChecked(job));
-            addPrerequisiteDependency(g, ReachabilityChecked(job));
-            addPrerequisiteDependency(g, ExceptionsChecked(job));
-            addPrerequisiteDependency(g, ExitPathsChecked(job));
-            addPrerequisiteDependency(g, InitializationsChecked(job));
-            addPrerequisiteDependency(g, ConstructorCallsChecked(job));
-            addPrerequisiteDependency(g, ForwardReferencesChecked(job));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
         return g;
     }
     
     public Goal CodeGenerated(Job job) {
         Goal g = internGoal(new CodeGenerated(job));
-        try {
-            addPrerequisiteDependency(g, Serialized(job));
-        }
-        catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
-        }
         return g;
     }
 }

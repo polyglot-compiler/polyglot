@@ -30,10 +30,6 @@ public class Call_c extends Expr_c implements Call
     this.targetImplicit = (target == null);
   }
 
-  public boolean isTypeChecked() {
-      return mi != null && mi.isCanonical() && super.isTypeChecked();
-  }
-
   /** Get the precedence of the call. */
   public Precedence precedence() {
     return Precedence.LITERAL;

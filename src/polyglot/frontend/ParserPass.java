@@ -41,9 +41,6 @@ public class ParserPass extends AbstractPass
 
 	    if (ast != null) {
 		goal.job().ast(ast);
-		if (goal instanceof SourceFileGoal) {
-		    ((SourceFileGoal) goal).markRun();
-		}
 		return true;
 	    }
 

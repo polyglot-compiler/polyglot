@@ -13,10 +13,7 @@ import polyglot.frontend.goals.*;
 import polyglot.main.Report;
 import polyglot.types.FieldInstance;
 import polyglot.types.ParsedClassType;
-import polyglot.types.UnavailableTypeException;
-import polyglot.util.CodeWriter;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.StringUtil;
+import polyglot.util.*;
 import polyglot.visit.*;
 
 
@@ -42,25 +39,14 @@ public abstract class Scheduler {
      * <code>Source</code>s that have had <code>Job</code>s added for them.
      */
     protected Map jobs;
+    
+    protected Collection commandLineJobs;
 
     /** Map from goals to goals used to intern goals. */
     protected Map goals;
     
     /** Map from goals to number of times a pass was run for the goal. */
     protected Map runCount;
-
-    /**
-     * Map from goals to the number of amount of progress made since just before
-     * the goal was last attempted.
-     */
-    Map progressMap;
-    
-    /**
-     * Progress made since the start of the compilation.  When a pass is run,
-     * progress is incremented by the difference in distance from the goal before
-     * and after the pass is run. 
-     */
-    int currentProgress;
     
     /** True if any pass has failed. */
     boolean failed;
@@ -69,28 +55,72 @@ public abstract class Scheduler {
 
     /** The currently running pass, or null if no pass is running. */
     protected Pass currentPass;
-
+    
     public Scheduler(ExtensionInfo extInfo) {
         this.extInfo = extInfo;
 
         this.jobs = new HashMap();
         this.goals = new HashMap();
         this.runCount = new HashMap();
-        this.progressMap = new HashMap();
         this.inWorklist = new HashSet();
         this.worklist = new LinkedList();
         this.currentPass = null;
-        this.currentProgress = 0;
     }
     
+    public Collection commandLineJobs() {
+        return this.commandLineJobs;
+    }
+    
+    public void setCommandLineJobs(Collection c) {
+        this.commandLineJobs = Collections.unmodifiableCollection(c);
+    }
+    
+    public boolean prerequisiteDependsOn(Goal goal, Goal subgoal) {
+        if (goal == subgoal) {
+            return true;
+        }
+
+        for (Iterator i = goal.prerequisiteGoals(this).iterator(); i.hasNext();) {
+            Goal g = (Goal) i.next();
+            if (prerequisiteDependsOn(g, subgoal)) {
+                return true;
+            }
+        }
+        return false;
+    }
+        
     /**
-     * Add a new concurrent <code>subgoal</code> of the <code>goal</code>.
+     * Add a new corequisite <code>subgoal</code> of the <code>goal</code>.
      * <code>subgoal</code> is a goal on which <code>goal</code> mutually
-     * depends. The caller must be careful to ensure that all concurrent goals
+     * depends. The caller must be careful to ensure that all corequisite goals
      * can be eventually reached.
      */
-    public void addConcurrentDependency(Goal goal, Goal subgoal) {
-        goal.addConcurrentGoal(subgoal, this);
+    public void addCorequisiteDependency(Goal goal, Goal subgoal) {
+        if (! goal.corequisiteGoals(this).contains(subgoal)) {
+            if (Report.should_report(Report.frontend, 3) || Report.should_report("deps", 1))
+                Report.report(3, "Adding coreq edge: " + subgoal + " -> " + goal);
+            goal.addCorequisiteGoal(subgoal, this);
+        }
+    }
+    
+    public void addCorequisiteDependencyAndEnqueue(Goal goal, Goal subgoal) {
+        addCorequisiteDependency(goal, subgoal);
+        addGoal(subgoal);
+    }
+
+    public void addDependencyAndEnqueue(Goal goal, Goal subgoal, boolean prerequisite) {
+        if (prerequisite) {
+            try {
+                addPrerequisiteDependency(goal, subgoal);
+            }
+            catch (CyclicDependencyException e) {
+                throw new InternalCompilerError(e);
+            }
+        }
+        else {
+            addCorequisiteDependency(goal, subgoal);
+        }
+        addGoal(subgoal);
     }
 
     /**
@@ -103,7 +133,11 @@ public abstract class Scheduler {
      *             <code>goal</code>
      */
     public void addPrerequisiteDependency(Goal goal, Goal subgoal) throws CyclicDependencyException {
-        goal.addPrerequisiteGoal(subgoal, this);
+        if (! goal.prerequisiteGoals(this).contains(subgoal)) {
+            if (Report.should_report(Report.frontend, 3) || Report.should_report("deps", 1))
+                Report.report(3, "Adding prereq edge: " + subgoal + " => " + goal);
+            goal.addPrerequisiteGoal(subgoal, this);
+        }
     }
     
     /** Add prerequisite dependencies between adjacent items in a list of goals. */
@@ -128,15 +162,15 @@ public abstract class Scheduler {
         if (g == null) {
             g = goal;
             goals.put(g, g);
-            if (Report.should_report(Report.frontend, 2))
-                Report.report(2, "new goal " + g);
             if (Report.should_report(Report.frontend, 3))
-                Report.report(3, "goals = " + goals.keySet());
+                Report.report(3, "new goal " + g);
+            if (Report.should_report(Report.frontend, 4))
+                Report.report(4, "goals = " + goals.keySet());
         }
         return g;   
     }
 
-    /** Add <code>goal</code> to the worklist and return its interned copy. */
+    /** Add <code>goal</code> to the worklist. */
     public void addGoal(Goal goal) {
         addGoalToWorklist(goal);
     }
@@ -148,17 +182,27 @@ public abstract class Scheduler {
         }
     }
     
+    private synchronized void prependGoal(Goal g) {
+        if (! inWorklist.contains(g)) {
+            inWorklist.add(g);
+            worklist.add(0, g);
+        }
+        else {
+            worklist.remove(g);
+            worklist.add(0, g);
+        }
+    }
+    
+    /*
     // Dummy pass needed for currentGoal(), currentPass(), etc., to work
     // when checking if a goal was reached.
     Pass schedulerPass(Goal g) {
-        return new EmptyPass(g) {
-            public boolean run() {
-                return true;
-            }
-        };
+        return new EmptyPass(g);
     }
+    */
     
     public boolean reached(Goal g) {
+      /*
         for (Iterator i = new ArrayList(g.prerequisiteGoals(this)).iterator(); i.hasNext(); ) {
             Goal subgoal = (Goal) i.next();
             
@@ -166,7 +210,9 @@ public abstract class Scheduler {
                 return false;
             }
         }
+        */
         
+        /*
         long t = System.currentTimeMillis();
         
         Job job = g.job();
@@ -179,7 +225,7 @@ public abstract class Scheduler {
         Pass oldPass = this.currentPass;
         this.currentPass = pass;
 
-        // Stop the timer on the old pass. */
+        // Stop the timer on the old pass.
         if (oldPass != null) {
             oldPass.toggleTimers(true);
         }
@@ -187,23 +233,26 @@ public abstract class Scheduler {
         if (job != null) {
             job.setRunningPass(pass);
         }
+        */
         
         boolean result = g.hasBeenReached();
         
+        /*
         if (job != null) {
             job.setRunningPass(null);
         }
         
         this.currentPass = oldPass;
 
-        // Restart the timer on the old pass. */
+        // Restart the timer on the old pass.
         if (oldPass != null) {
             oldPass.toggleTimers(true);
         }
 
         t = System.currentTimeMillis() - t;
         extInfo.getStats().accumPassTimes("scheduler.reached", t, t);
-        
+        */
+
         return result;
     }
 
@@ -223,12 +272,11 @@ public abstract class Scheduler {
             Goal goal = selectGoalFromWorklist();
             
             if (reached(goal)) {
-                currentProgress++;
                 continue;
             }
             
             if (Report.should_report(Report.frontend, 1)) {
-                Report.report(1, "Running to goal " + goal);
+                Report.report(1, "Selected goal " + goal);
             }
 
             try {
@@ -279,15 +327,15 @@ public abstract class Scheduler {
         // order to free its memory.
         
         // Pick a goal not recently run, if available.
-        for (Iterator i = worklist.iterator(); i.hasNext(); ) {
-            Goal goal = (Goal) i.next();
-            Integer progress = (Integer) progressMap.get(goal);
-            if (progress == null || progress.intValue() < currentProgress) {
-                i.remove();
-                inWorklist.remove(goal);
-                return goal;
-            }
-        }
+//        for (Iterator i = worklist.iterator(); i.hasNext(); ) {
+//            Goal goal = (Goal) i.next();
+//            Integer progress = (Integer) progressMap.get(goal);
+//            if (progress == null || progress.intValue() < currentProgress) {
+//                i.remove();
+//                inWorklist.remove(goal);
+//                return goal;
+//            }
+//        }
         
         Goal goal = (Goal) worklist.removeFirst();
         inWorklist.remove(goal);
@@ -326,6 +374,10 @@ public abstract class Scheduler {
         return job;
     }
     
+    public boolean sourceHasJob(Source s) {
+        return jobs.get(s) != null;
+    }
+    
     public Job currentJob() {
         return currentPass != null ? currentPass.goal().job() : null;
     }
@@ -351,22 +403,23 @@ public abstract class Scheduler {
      *         there was no error, even if the goal was not reached.
      */ 
     private boolean attemptGoal(final Goal goal, boolean sameThread,
-                                final Set prereqs, final Set goals)
+                                final Set prereqsAbove, final Set goalsAbove)
             throws CyclicDependencyException
     {
         if (Report.should_report("dump-dep-graph", 2))
-            dumpDependenceGraph();
+            dumpInFlightDependenceGraph();
 
         if (Report.should_report(Report.frontend, 2))
             Report.report(2, "Running to goal " + goal);
         
         if (Report.should_report(Report.frontend, 3)) {
-            Report.report(3, "  Distance = " + goal.distanceFromGoal());
             Report.report(3, "  Reachable = " + goal.isReachable());
             Report.report(3, "  Prerequisites for " + goal + " = " + goal.prerequisiteGoals(this));
-            Report.report(3, "  Concurrent goals for " + goal + " = " + goal.concurrentGoals(this));
-            Report.report(3, "  Prereqs = " + prereqs);
-            Report.report(3, "  Dependees = " + goals);
+            Report.report(3, "  Corequisites for " + goal + " = " + goal.corequisiteGoals(this));
+        }
+        if (Report.should_report(Report.frontend, 4)) {
+            Report.report(4, "  Prereqs = " + prereqsAbove);
+            Report.report(4, "  Dependees = " + goalsAbove);
         }
         
         if (reached(goal)) {
@@ -381,8 +434,10 @@ public abstract class Scheduler {
             return false;
         }
         
-        if (prereqs.contains(goal)) {
+        if (prereqsAbove.contains(goal)) {
             // The goal has itself as a prerequisite.
+            if (Report.should_report("dump-dep-graph", 1))
+                dumpInFlightDependenceGraph();
             throw new InternalCompilerError("Goal " + goal + " depends on itself.");
         }
         
@@ -390,50 +445,19 @@ public abstract class Scheduler {
         // the goal yet, so just return and let the other pass complete.  This
         // goal will be reattempted later, if necessary.
         if (goal.job() != null && goal.job().isRunning()) {
+            if (Report.should_report(Report.frontend, 3))
+                Report.report(3, "Job " + goal.job() + " is running");
             throw new CyclicDependencyException();
         }
         
-        if (goals.contains(goal)) {
-            throw new CyclicDependencyException();
+        if (goalsAbove.contains(goal)) {
+            if (Report.should_report(Report.frontend, 3))
+                Report.report(3, "Goal " + goal + " is being processed above");
+            return true;
         }
 
-        final boolean FORK = false;
-        
-        // Fork a new thread so that the stack depth does not get too large.
-        if (FORK && ! sameThread) {
-            System.out.println("spawning thread for " + goal);
-            final int[] r = new int[1];
-            
-            Thread th = new Thread() {
-                public void run() {
-                    try {
-                        boolean result = Scheduler.this.attemptGoal(goal, true, prereqs, goals);
-                        r[0] = result ? 1 : 0;
-                    }
-                    catch (CyclicDependencyException e) {
-                        r[0] = -1;
-                    }
-                }
-            };
-            
-            th.start();
-            
-            try {
-                th.join();
-            }
-            catch (InterruptedException e) {
-                return false;
-            }
-            
-            if (r[0] == -1) {
-                throw new CyclicDependencyException();
-            }
-            
-            return r[0] == 1;
-        }
-        
-        prereqs.add(goal);
-        goals.add(goal);
+        prereqsAbove.add(goal);
+        goalsAbove.add(goal);
         
         // Make sure all subgoals have been completed,
         // except those that recursively depend on this goal.
@@ -444,7 +468,7 @@ public abstract class Scheduler {
         for (Iterator i = new ArrayList(goal.prerequisiteGoals(this)).iterator(); i.hasNext(); ) {
             Goal subgoal = (Goal) i.next();
             
-            boolean okay = attemptGoal(subgoal, true, prereqs, goals);
+            boolean okay = attemptGoal(subgoal, true, prereqsAbove, goalsAbove);
             
             if (! okay) {
                 goal.setUnreachable();
@@ -462,10 +486,10 @@ public abstract class Scheduler {
             }
         }
 
-        for (Iterator i = new ArrayList(goal.concurrentGoals(this)).iterator(); i.hasNext(); ) {
+        for (Iterator i = new ArrayList(goal.corequisiteGoals(this)).iterator(); i.hasNext(); ) {
             Goal subgoal = (Goal) i.next();
             
-            boolean okay = attemptGoal(subgoal, true, new HashSet(), goals);
+            boolean okay = attemptGoal(subgoal, true, new HashSet(), goalsAbove);
             
             if (! okay) {
                 goal.setUnreachable();
@@ -477,15 +501,6 @@ public abstract class Scheduler {
             if (! reached(subgoal)) {
                 // put the subgoal on the worklist
                 addGoal(subgoal);
-                
-                // Don't run the pass if another pass over the same job
-                // needs to be completed first.
-                if (goal.job() != null && subgoal.job() == goal.job() && subgoal != goal) {
-                    runPass = false;
-
-                    if (Report.should_report(Report.frontend, 3))
-                        Report.report(3, "Will delay goal " + goal + "; " + subgoal + " not reached");
-                }
             }
         }
 
@@ -512,8 +527,8 @@ public abstract class Scheduler {
         Pass pass = goal.createPass(extInfo);
         boolean result = runPass(pass);
 
-        goals.remove(goal);
-        prereqs.remove(goal);
+        goalsAbove.remove(goal);
+        prereqsAbove.remove(goal);
         
         if (result && ! reached(goal)) {
             // Add the goal back on the worklist.
@@ -523,19 +538,6 @@ public abstract class Scheduler {
         return result;
     }       
    
-    private int progressSinceLastAttempt(Goal goal) {
-        int progress;
-        Integer i = (Integer) progressMap.get(goal);
-        if (i == null) {
-            return Integer.MAX_VALUE;
-        }
-        else {
-            progress = i.intValue();
-        }
-    
-        return currentProgress - progress;
-    }
-
     /**         
      * Run the pass <code>pass</code>.  All subgoals of the pass's goal
      * required to start the pass should be satisfied.  Running the pass
@@ -546,13 +548,12 @@ public abstract class Scheduler {
         Goal goal = pass.goal();
         Job job = goal.job();
                 
-        if (goal instanceof SourceFileGoal) {
-            if (extInfo.getOptions().disable_passes.contains(pass.name())) {
-                if (Report.should_report(Report.frontend, 1))
-                    Report.report(1, "Skipping pass " + pass);
-                ((SourceFileGoal) goal).markRun();
-                return true;
-            }
+        if (extInfo.getOptions().disable_passes.contains(pass.name())) {
+            if (Report.should_report(Report.frontend, 1))
+                Report.report(1, "Skipping pass " + pass);
+            
+            goal.setState(Goal.REACHED);
+            return true;
         }
         
         if (Report.should_report(Report.frontend, 1))
@@ -562,20 +563,17 @@ public abstract class Scheduler {
             throw new InternalCompilerError("Cannot run a pass for completed goal " + goal);
         }
         
-        if (false && progressSinceLastAttempt(goal) == 0) {
-            if (failed) {
-                return false;
-            }
-            throw new InternalCompilerError("Possible infinite loop detected trying to run a pass for " + goal + "; no progress made since last attempt.  Current distance from goal is " + goal.distanceFromGoal() + ".");
-        }
-        
-        final int MAX_RUN_COUNT = 100;
+        // final int MAX_RUN_COUNT = 20;
+        final int MAX_RUN_COUNT = 200;
         Integer countObj = (Integer) this.runCount.get(goal);
         int count = countObj != null ? countObj.intValue() : 0;
         count++;
         this.runCount.put(goal, new Integer(count));
         
         if (count >= MAX_RUN_COUNT) {
+            if (Report.should_report("dump-dep-graph", 1))
+                dumpInFlightDependenceGraph();
+
             String[] suffix = new String[] { "th", "st", "nd", "rd" };
             int index = count % 10;
             if (index > 3) index = 0;
@@ -587,8 +585,6 @@ public abstract class Scheduler {
         pass.resetTimers();
 
         boolean result = false;
-        int oldDistance = goal.distanceFromGoal();
-        int distanceAdjust = 0;
 
         if (job == null || job.status()) {
             Pass oldPass = this.currentPass;
@@ -606,19 +602,56 @@ public abstract class Scheduler {
             
             pass.toggleTimers(false);
 
+            goal.setState(Goal.RUNNING);
+
+            long t = System.currentTimeMillis();
+            String key = goal.toString();
+            
             try {
-                result = pass.run();
+                 result = pass.run();
+
+                if (! result) {
+                    goal.setState(Goal.UNREACHABLE);
+                    if (Report.should_report(Report.frontend, 1))
+                        Report.report(1, "Failed pass " + pass + " for " + goal);
+                }
+                else {
+                    if (goal.state() == Goal.RUNNING) {
+                        goal.setState(Goal.REACHED);
+                        if (Report.should_report(Report.frontend, 1))
+                            Report.report(1, "Completed pass " + pass + " for " + goal);
+                    }
+                    else {
+                        goal.setState(Goal.ATTEMPTED);                    
+                        if (Report.should_report(Report.frontend, 1))
+                            Report.report(1, "Completed (unreached) pass " + pass + " for " + goal);
+                    }
+                }
             }
-            catch (UnavailableTypeException e) {
+            catch (MissingDependencyException e) {
+                if (Report.should_report(Report.frontend, 1))
+                    Report.report(1, "Did not complete pass " + pass + " for " + goal);
+
+                if (Report.should_report(Report.frontend, 3))
+                    e.printStackTrace();
+                
+                addDependencyAndEnqueue(goal, e.goal(), e.prerequisite());
+                
+                goal.setState(Goal.ATTEMPTED);
                 result = true;
-                distanceAdjust++;
             }
+            catch (SchedulerException e) {
+                if (Report.should_report(Report.frontend, 1))
+                    Report.report(1, "Did not complete pass " + pass + " for " + goal);
+                
+                goal.setState(Goal.ATTEMPTED);
+                result = true;
+            }
+            
+            t = System.currentTimeMillis() - t;
+            extInfo.getStats().accumPassTimes(key, t, t);
             
             pass.toggleTimers(false);
-            
-            if (! result) {
-                goal.setUnreachable();
-            }
             
             if (job != null) {
                 job.setRunningPass(null);
@@ -675,13 +708,6 @@ public abstract class Scheduler {
         
         // Record the progress made before running the pass and then update
         // the current progress.
-        progressMap.put(goal, new Integer(currentProgress));
-        int newDistance = goal.distanceFromGoal();
-        int progress = oldDistance - newDistance + distanceAdjust;
-        progress = progress > 0 ? progress : 0; // make sure progress is forward
-        if (! result) progress++; // count a failure as progress
-        currentProgress += progress;
-            
         if (Report.should_report(Report.time, 2)) {
             Report.report(2, "Finished " + pass +
                           " status=" + statusString(result) + " inclusive_time=" +
@@ -690,8 +716,7 @@ public abstract class Scheduler {
         }
         else if (Report.should_report(Report.frontend, 1)) {
             Report.report(1, "Finished " + pass +
-                          " status=" + statusString(result) +
-                          " distance=" + oldDistance + "->" + newDistance);
+                          " status=" + statusString(result));
         }
         
         if (job != null) {
@@ -776,7 +801,7 @@ public abstract class Scheduler {
             // No appropriate job yet exists, we will create one.
             
             job = this.createSourceJob(source, ast);
-        
+
             // record the job in the map and the worklist.
             jobs.put(source, job);
     
@@ -804,22 +829,89 @@ public abstract class Scheduler {
         return getClass().getName() + " worklist=" + worklist;
     }   
 
-    protected static int flowCounter = 0;
+    protected static int dumpCounter = 0;
 
     /**
      * Dump the dependence graph to a DOT file.
      */
     protected void dumpDependenceGraph() {
-        String name = StringUtil.getShortNameComponent(this.getClass().getName());
-        name += flowCounter++;
+        String name = "FullDepGraph";
+        name += dumpCounter++;
 
         String rootName = "";
 
         Report.report(2, "digraph " + name + " {");
         Report.report(2, "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
 
-        for (Iterator i = goals.keySet().iterator(); i.hasNext(); ) {
-            Goal g = (Goal) i.next(); 
+        for (Iterator i = new ArrayList(goals.keySet()).iterator(); i.hasNext(); ) {
+            Goal g = (Goal) i.next();
+            g = internGoal(g);
+            
+            String h = g.getClass().getName() + System.identityHashCode(g);
+            
+            // dump out this node
+            Report.report(2,
+                          h + " [ label = \"" +
+                          StringUtil.escape(g.toString()) + "\" ];");
+            
+            // dump out the successors.
+            for (Iterator j = new ArrayList(g.prerequisiteGoals(this)).iterator(); j.hasNext(); ) {
+                Goal g2 = (Goal) j.next();
+                g2 = internGoal(g2);
+                String h2 = g2.getClass().getName() + System.identityHashCode(g2);
+                Report.report(2, h2 + " -> " + h + " [style=bold]");
+            }
+            
+            for (Iterator j = new ArrayList(g.corequisiteGoals(this)).iterator(); j.hasNext(); ) {
+                Goal g2 = (Goal) j.next();
+                g2 = internGoal(g2);
+                String h2 = g2.getClass().getName() + System.identityHashCode(g2);
+                Report.report(2, h2 + " -> " + h);
+            }
+        }
+        
+        Report.report(2, "}");
+    }
+
+    /**
+     * Dump the dependence graph to a DOT file.
+     */
+    protected void dumpInFlightDependenceGraph() {
+        String name = "InFlightDepGraph";
+        name += dumpCounter++;
+    
+        String rootName = "";
+    
+        Report.report(2, "digraph " + name + " {");
+        Report.report(2, "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
+
+        Set print = new HashSet();
+    
+        for (Iterator i = new ArrayList(goals.keySet()).iterator(); i.hasNext(); ) {
+            Goal g = (Goal) i.next();
+            g = internGoal(g);
+            
+            if (g.state() == Goal.REACHED || g.state() == Goal.UNREACHED || g.state() == Goal.UNREACHABLE) {
+                continue;
+            }
+
+            print.add(g);
+
+            for (Iterator j = new ArrayList(g.prerequisiteGoals(this)).iterator(); j.hasNext(); ) {
+                Goal g2 = (Goal) j.next();
+                g2 = internGoal(g2);
+                print.add(g2);
+            }
+
+            for (Iterator j = new ArrayList(g.corequisiteGoals(this)).iterator(); j.hasNext(); ) {
+                Goal g2 = (Goal) j.next();
+                g2 = internGoal(g2);
+                print.add(g2);
+            }
+        }
+
+        for (Iterator i = print.iterator(); i.hasNext(); ) {
+            Goal g = (Goal) i.next();
             g = internGoal(g);
 
             int h = System.identityHashCode(g);
@@ -833,18 +925,76 @@ public abstract class Scheduler {
             for (Iterator j = new ArrayList(g.prerequisiteGoals(this)).iterator(); j.hasNext(); ) {
                 Goal g2 = (Goal) j.next();
                 g2 = internGoal(g2);
+                if (! print.contains(g2))
+                    continue;
+                int h2 = System.identityHashCode(g2);
+                Report.report(2, h2 + " -> " + h + " [style=bold]");
+            }
+            
+            for (Iterator j = new ArrayList(g.corequisiteGoals(this)).iterator(); j.hasNext(); ) {
+                Goal g2 = (Goal) j.next();
+                g2 = internGoal(g2);
+                if (! print.contains(g2))
+                    continue;
                 int h2 = System.identityHashCode(g2);
                 Report.report(2, h2 + " -> " + h);
             }
-
-            for (Iterator j = new ArrayList(g.concurrentGoals(this)).iterator(); j.hasNext(); ) {
-                Goal g2 = (Goal) j.next();
-                g2 = internGoal(g2);
-                int h2 = System.identityHashCode(g2);
-                Report.report(2, h2 + " -> " + h + " [style=dotted]");
-            }
-            
         }
+        
+        Report.report(2, "}");
+    }
+
+    /**
+     * Dump the dependence graph to a DOT file.
+     */
+    protected void dumpDependenceGraph(Goal g) {
+        String name = "DepGraph";
+        name += dumpCounter++;
+
+        String rootName = "";
+
+        Report.report(2, "digraph " + name + " {");
+        Report.report(2, "  fontsize=20; center=true; ratio=auto; size = \"8.5,11\";");
+
+        g = internGoal(g);
+        
+        int h = System.identityHashCode(g);
+        
+        // dump out this node
+        Report.report(2,
+                      h + " [ label = \"" +
+                      StringUtil.escape(g.toString()) + "\" ];");
+        
+        Set seen = new HashSet();
+        seen.add(new Integer(h));
+        
+        // dump out the successors.
+        for (Iterator j = new ArrayList(g.prerequisiteGoals(this)).iterator(); j.hasNext(); ) {
+            Goal g2 = (Goal) j.next();
+            g2 = internGoal(g2);
+            int h2 = System.identityHashCode(g2);
+            if (! seen.contains(new Integer(h2))) {
+                seen.add(new Integer(h2));
+                Report.report(2,
+                              h2 + " [ label = \"" +
+                              StringUtil.escape(g2.toString()) + "\" ];");
+            }        
+            Report.report(2, h2 + " -> " + h + " [style=bold]");
+        }
+        
+        for (Iterator j = new ArrayList(g.corequisiteGoals(this)).iterator(); j.hasNext(); ) {
+            Goal g2 = (Goal) j.next();
+            g2 = internGoal(g2);
+            int h2 = System.identityHashCode(g2);
+            if (! seen.contains(new Integer(h2))) {
+                seen.add(new Integer(h2));
+                Report.report(2,
+                              h2 + " [ label = \"" +
+                              StringUtil.escape(g2.toString()) + "\" ];");
+            }        
+            Report.report(2, h2 + " -> " + h);
+        }
+        
         Report.report(2, "}");
     }
 }

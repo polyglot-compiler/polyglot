@@ -17,12 +17,12 @@ import polyglot.util.StringUtil;
 public abstract class ClassTypeGoal extends AbstractGoal {
     protected ParsedClassType ct;
 
-    public ClassTypeGoal(ParsedClassType ct) {
+    protected ClassTypeGoal(ParsedClassType ct) {
         super(ct.job());
         this.ct = ct;
     }
     
-    public ClassTypeGoal(ParsedClassType ct, String name) {
+    protected ClassTypeGoal(ParsedClassType ct, String name) {
         super(ct.job(), name);
         this.ct = ct;
     }
@@ -36,12 +36,10 @@ public abstract class ClassTypeGoal extends AbstractGoal {
     }
     
     public boolean equals(Object o) {
-        return o instanceof ClassTypeGoal && ((ClassTypeGoal) o).ct.equals(ct) && super.equals(o);
+        return o instanceof ClassTypeGoal && ((ClassTypeGoal) o).ct == ct && super.equals(o);
     }
     
     public String toString() {
         return StringUtil.getShortNameComponent(getClass().getName()) + "(" + ct + ")";
     }
-    
-    public abstract int distanceFromGoal();
 }

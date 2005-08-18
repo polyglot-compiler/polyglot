@@ -205,15 +205,16 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     }
                                           
     public boolean defaultConstructorNeeded() {
+        init.initConstructors();
         if (flags().isInterface()) {
             return false;
         }
-        return constructors().isEmpty();
+        return this.constructors.isEmpty();
     }
     
     /** Return an immutable list of constructors */
     public List constructors() {
-        init.initConstructors();
+        init.canonicalConstructors();
         return Collections.unmodifiableList(constructors);
     }
 
@@ -225,13 +226,13 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
 
     /** Return an immutable list of methods. */
     public List methods() {
-        init.initMethods();
+        init.canonicalMethods();
         return Collections.unmodifiableList(methods);
     }
 
     /** Return an immutable list of fields */
     public List fields() {
-        init.initFields();
+        init.canonicalFields();
         return Collections.unmodifiableList(fields);
     }
 
@@ -251,7 +252,6 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     public boolean membersAdded() {
         return membersAdded;
     }
-    
     /**
      * @param membersAdded The membersAdded to set.
      */
@@ -285,12 +285,6 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         }
         
         if (! membersAdded()) {
-            try {
-                scheduler.addPrerequisiteDependency(scheduler.SignaturesResolved(this), scheduler.MembersAdded(this));
-            }
-            catch (CyclicDependencyException e) {
-                throw new InternalCompilerError(e.getMessage());
-            }
             return Integer.MAX_VALUE;
         }
 
@@ -322,7 +316,19 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     public boolean signaturesResolved() {
         return numSignaturesUnresolved() == 0;
     }
-    
+
+    public String toString() {
+        if (isAnonymous()) {
+            if (interfaces != null && ! interfaces.isEmpty()) {
+                return "<anonymous subtype of " + interfaces.get(0) + ">";
+            }
+            if (superType != null) {
+                return "<anonymous subclass of " + superType + ">";
+            }
+        }
+        return super.toString();
+    }
+
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         if (in instanceof TypeInputStream) {
             fromSource = null;

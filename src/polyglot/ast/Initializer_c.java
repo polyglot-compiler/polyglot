@@ -29,10 +29,6 @@ public class Initializer_c extends Term_c implements Initializer
 	this.body = body;
     }
     
-    public boolean isDisambiguated() {
-        return ii != null && ii.isCanonical() && super.isDisambiguated();
-    }
-
     public MemberInstance memberInstance() {
         return ii;
     }
@@ -94,7 +90,7 @@ public class Initializer_c extends Term_c implements Initializer
 	return reconstruct(body);
     }
 
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, NodeVisitor v) {
 	return c.pushCode(ii);
     }
 

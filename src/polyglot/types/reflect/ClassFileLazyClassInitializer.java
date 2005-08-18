@@ -388,6 +388,18 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
     }
 
+    public void canonicalFields() {
+        initFields();
+    }
+    
+    public void canonicalMethods() {
+        initMethods();
+    }
+    
+    public void canonicalConstructors() {
+        initConstructors();
+    }
+    
     public void initFields() {
         if (fieldsInitialized) {
             return;

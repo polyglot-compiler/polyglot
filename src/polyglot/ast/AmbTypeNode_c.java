@@ -23,10 +23,6 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
     this.qual = qual;
     this.name = name;
   }
-  
-  public boolean isDisambiguated() {
-      return false;
-  }
 
   public String name() {
     return this.name;

@@ -2,14 +2,9 @@ package polyglot.types;
 
 import polyglot.frontend.*;
 import polyglot.frontend.Compiler;
-import polyglot.frontend.ExtensionInfo;
-import polyglot.frontend.FileSource;
-import polyglot.frontend.goals.TypesInitialized;
-import polyglot.frontend.goals.TypeExists;
+import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
 import polyglot.types.reflect.*;
-import polyglot.types.reflect.ClassFile;
-import polyglot.types.reflect.ClassFileLoader;
 import polyglot.util.InternalCompilerError;
 
 /**
@@ -143,6 +138,13 @@ public class SourceClassResolver extends LoadedClassResolver
 
     // Now, try and find the source file.
     source = ext.sourceLoader().classSource(name);
+
+    // Check if a job for the source already exists.
+    if (ext.scheduler().sourceHasJob(source)) {
+        // the source has already been compiled; what are we doing here?
+        return getTypeFromSource(source, name);
+    }
+    
     if (Report.should_report(report_topics, 4)) {
         if (source == null) 
             Report.report(4, "Class " + name + " not found in source file");
@@ -227,26 +229,18 @@ public class SourceClassResolver extends LoadedClassResolver
   protected Named getTypeFromSource(FileSource source, String name)
     throws SemanticException
   {
-    Job job = ext.scheduler().loadSource(source, ! compileCommandLineOnly);
+    Scheduler scheduler = ext.scheduler();
+    Job job = scheduler.loadSource(source, ! compileCommandLineOnly);
 
     if (job == null) {
         // the source has already been compiled; what are we doing here?
         throw new InternalCompilerError("Attempted to load source " + source + ", but it's already loaded.");
     }
     
-    boolean result = false;
-    try {
-        // Compile the source file just enough to get the type information out.
-        result = ext.scheduler().attemptGoal(ext.scheduler().TypesInitialized(job));
-    }
-    catch (CyclicDependencyException e) {
-        ext.scheduler().addConcurrentDependency(ext.scheduler().currentGoal(),
-                                                ext.scheduler().TypeExists(name));
-        throw new UnavailableTypeException(job, name);
-    }
+    Goal g = scheduler.TypesInitialized(job);
     
-    if (!result) {
-        throw new NoClassException(name);
+    if (! scheduler.reached(g)) {
+        throw new MissingDependencyException(g);
     }
     
     // Even if there was an error when compiling the source file, we may

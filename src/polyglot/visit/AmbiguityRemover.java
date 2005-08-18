@@ -1,17 +1,15 @@
 package polyglot.visit;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 import polyglot.ast.*;
+import polyglot.frontend.*;
 import polyglot.frontend.Job;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
-import polyglot.types.SemanticException;
-import polyglot.types.TypeSystem;
-import polyglot.types.UnavailableTypeException;
-import polyglot.util.ErrorInfo;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
+import polyglot.types.*;
+import polyglot.util.*;
 
 /**
  * A visitor which traverses the AST and remove ambiguities found in fields,
@@ -30,6 +28,34 @@ public class AmbiguityRemover extends DisambiguationDriver
         super(job, ts, nf);
         this.visitSigs = visitSigs;
         this.visitBodies = visitBodies;
+    }
+    
+    protected Context enterScope(Node parent, Node n) {
+        Context c = super.enterScope(parent, n);
+        
+        Scheduler scheduler = job.extensionInfo().scheduler();
+        ParsedClassType ct = c.currentClassScope();
+        
+        if (parent instanceof ClassMember && (n instanceof Stmt || n instanceof Expr)) {
+            List l = new ArrayList(c.goalStack());
+            l.remove(scheduler.SupertypesResolved(ct));
+            l.remove(scheduler.SignaturesResolved(ct));
+            c = c.pushGoalStack(l);
+        }
+        else if (n instanceof FieldDecl || n instanceof MethodDecl || n instanceof ConstructorDecl) {
+            c = c.pushGoal(scheduler.SignaturesResolved(ct));
+        }
+        else if (n instanceof ClassDecl) {
+            c = c.pushGoal(scheduler.SupertypesResolved(((ClassDecl) n).type()));
+        }
+        else if (n instanceof ClassBody) {
+            List l = new ArrayList(c.goalStack());
+            l.remove(scheduler.SupertypesResolved(ct));
+            l.remove(scheduler.SignaturesResolved(ct));
+            c = c.pushGoalStack(l);
+        }
+        
+        return c;
     }
 
     public Node override(Node parent, Node n) {
@@ -51,8 +77,15 @@ public class AmbiguityRemover extends DisambiguationDriver
             
             return m;
         }
-        catch (UnavailableTypeException e) {
-            // Ignore: we'll rerun the pass later
+        catch (MissingDependencyException e) {
+            Scheduler scheduler = job.extensionInfo().scheduler();
+            for (Iterator i = context.goalStack().iterator(); i.hasNext(); ) {
+                Goal g = (Goal) i.next();
+                if (Report.should_report(Report.frontend, 3))
+                    e.printStackTrace();
+                scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
+                g.setUnreachableThisRun();
+            }
             return n;
         }
         catch (SemanticException e) {
@@ -96,6 +129,7 @@ public class AmbiguityRemover extends DisambiguationDriver
         n.visitChildren(new NodeVisitor() {
             public Node override(Node n) {
                 if (n instanceof Ambiguous) {
+            // System.out.println("ambiguous node " + n + " (" + n.getClass().getName() + ")");
                     amb[0] = true;
                 }
                 return n;
@@ -104,13 +138,16 @@ public class AmbiguityRemover extends DisambiguationDriver
         
         Node m = n;
         
-        try {
-            if (! amb[0]) {
-                m = m.del().disambiguate((AmbiguityRemover) v);
-            }
+        if (! amb[0]) {
+            m = m.del().disambiguate((AmbiguityRemover) v);
         }
-        catch (UnavailableTypeException e) {
-            // ignore: we'll rerun the pass later
+        else {
+            // System.out.println("ambiguous node at " + m + " (" + m.getClass().getName() + ")");
+            for (Iterator i = context.goalStack().iterator(); i.hasNext(); ) {
+                Goal g = (Goal) i.next();
+                // System.out.println("  " + g + " unreachable");
+                g.setUnreachableThisRun();
+            }
         }
         
         if (Report.should_report(Report.visit, 2))
@@ -133,39 +170,5 @@ public class AmbiguityRemover extends DisambiguationDriver
         throw new InternalCompilerError("AmbiguityRemover does not support bypassing. " +
                                         "Implement any required functionality using " +
                                         "Node.disambiguateOverride(Node, AmbiguityRemover).");
-    }
-  
-    public boolean isASTDisambiguated(Node n) {
-        return isASTDisambiguated_(n);
-    }
-  
-    public boolean isASTDisambiguated_(Node n) {
-        return astAmbiguityCount(n) == 0;
-    }
-    
-    public static int astAmbiguityCount(Node n) {
-        final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend, "disam-check" });
-
-        final int[] notOkCount = new int[] { 0 };
-        
-        n.visit(new NodeVisitor() {
-            public Node override(Node parent, Node n) {
-                // Don't check if New is disambiguated; this is handled
-                // during type-checking.
-                if (n instanceof New) {
-                    return n;
-                }
-
-                if (! n.isDisambiguated()) {
-                    if (Report.should_report(TOPICS, 3))
-                        Report.report(3, "  not ok at " + n + " (" + n.getClass().getName() + ")");
-                    notOkCount[0]++;
-                }
-                
-                return null;
-            }
-        });
-        
-        return notOkCount[0];
     }
 }

@@ -17,7 +17,7 @@ import polyglot.types.Package;
 import polyglot.util.*;
 
 /** Visitor which traverses the AST constructing type objects. */
-public class TypeBuilder extends HaltingVisitor
+public class TypeBuilder extends NodeVisitor
 {
     protected ImportTable importTable;
     protected Job job;
@@ -26,6 +26,7 @@ public class TypeBuilder extends HaltingVisitor
     protected TypeBuilder outer;
     protected boolean inCode; // true if the last scope pushed as not a class.
     protected boolean global; // true if all scopes pushed have been classes.
+    protected Package package_;
     protected ParsedClassType type; // last class pushed.
 
     public TypeBuilder(Job job, TypeSystem ts, NodeFactory nf) {
@@ -103,6 +104,15 @@ public class TypeBuilder extends HaltingVisitor
 
 	    return n;
 	}
+    }
+
+    public TypeBuilder pushPackage(Package p) {
+        if (Report.should_report(Report.visit, 4))
+	    Report.report(4, "TB pushing package " + p + ": " + context());
+        TypeBuilder tb = push();
+        tb.inCode = false;
+        tb.package_ = p;
+        return tb;
     }
 
     public TypeBuilder pushCode() {
@@ -254,8 +264,7 @@ public class TypeBuilder extends HaltingVisitor
     }
 
     public Package currentPackage() {
-        if (importTable() == null) return null;
-	return importTable.package_();
+        return package_;
     }
 
     public ImportTable importTable() {

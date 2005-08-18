@@ -34,10 +34,6 @@ public class Field_c extends Expr_c implements Field
                                       + "this.");
     }
   }
-  
-  public boolean isTypeChecked() {
-      return fi != null && fi.isCanonical() && super.isTypeChecked();
-  }
 
   /** Get the precedence of the field. */
   public Precedence precedence() { 

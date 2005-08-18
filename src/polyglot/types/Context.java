@@ -2,6 +2,7 @@ package polyglot.types;
 
 import java.util.List;
 
+import polyglot.frontend.goals.Goal;
 import polyglot.util.Copy;
 
 /**
@@ -18,6 +19,15 @@ public interface Context extends Resolver, Copy
     /** The type system. */
     TypeSystem typeSystem();
 
+    /** Stack of goals being worked on in this context.  The innermost goal is first. */
+    List goalStack();
+    
+    /** Create a new context, replacing the goal stack with the list of goals <code>s</code>. */
+    Context pushGoalStack(List s);
+    
+    /** Push a goal onto the goal stack. */
+    Context pushGoal(Goal goal);
+    
     /** Add a variable to the current scope. */
     void addVariable(VarInstance vi);
 

@@ -18,10 +18,6 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
 	this.base = base;
     }
 
-    public boolean isDisambiguated() {
-        return false;
-    }
-
     public TypeNode base() {
         return base;
     }

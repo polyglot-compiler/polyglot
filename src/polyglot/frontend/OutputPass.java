@@ -28,9 +28,6 @@ public class OutputPass extends AbstractPass
         }
 
         if (translator.translate(ast)) {
-            if (goal instanceof SourceFileGoal) {
-                ((SourceFileGoal) goal).markRun();
-            }
             return true;
         }
         

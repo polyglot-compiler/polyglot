@@ -6,6 +6,10 @@
  */
 package polyglot.frontend.goals;
 
+import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
 import polyglot.types.TypeSystem;
@@ -30,6 +34,13 @@ public class CodeGenerated extends SourceFileGoal implements EndGoal {
         NodeFactory nf = extInfo.nodeFactory();
         return new OutputPass(this, new Translator(job(), ts, nf,
                                                    extInfo.targetFactory()));
+    }
+    
+    public Collection prerequisiteGoals(Scheduler scheduler) {
+        List l = new ArrayList();
+        l.addAll(super.prerequisiteGoals(scheduler));
+        l.add(scheduler.Serialized(job));
+        return l;
     }
     
 }

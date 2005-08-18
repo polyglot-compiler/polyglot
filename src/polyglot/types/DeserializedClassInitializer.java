@@ -43,4 +43,13 @@ public class DeserializedClassInitializer implements LazyClassInitializer {
 
     public void initFields() {
     }
+
+    public void canonicalConstructors() {
+    }
+
+    public void canonicalMethods() {
+    }
+
+    public void canonicalFields() {
+    }
 }

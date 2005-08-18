@@ -16,7 +16,7 @@ public class SourceLoader
 
     /** Set of sources already loaded.  An attempt to load a source
       * already loaded will cause an IOException. */
-    protected Set loadedSources;
+    protected Map loadedSources;
 
     /**
      * This is a map from Files (of directories) to Set[String]s, which
@@ -30,7 +30,7 @@ public class SourceLoader
 	this.sourceExt = sourceExt;
         this.directoryContentsCache = new HashMap();
         this.caseInsensitive = 0;
-        this.loadedSources = new HashSet();
+        this.loadedSources = new HashMap();
     }
 
     /** Load a source from a specific file. */
@@ -38,34 +38,28 @@ public class SourceLoader
         // If we haven't done so already,
         // determine if the file system is case insensitive
         setCaseInsensitive(fileName);
-
-	File sourceFile = new File(fileName);
-
-	if (! sourceFile.exists()) {
-	    throw new FileNotFoundException(fileName);
-	}
-
-        if (loadedSources.contains(fileKey(sourceFile))) {
-	    throw new FileNotFoundException(fileName);
+        
+        File sourceFile = new File(fileName);
+        
+        if (! sourceFile.exists()) {
+            throw new FileNotFoundException(fileName);
         }
-
-        loadedSources.add(fileKey(sourceFile));
-
+        
         String[] exts = sourceExt.fileExtensions();
         boolean ok = false;
-
+        
         for (int i = 0; i < exts.length; i++) {
             String ext = exts[i];
-
+            
             if (fileName.endsWith("." + ext)) {
                 ok = true;
                 break;
             }
         }
-
+        
         if (! ok) {
             String extString = "";
-
+            
             for (int i = 0; i < exts.length; i++) {
                 if (exts.length == 2 && i == exts.length-1) {
                     extString += " or ";
@@ -78,7 +72,7 @@ public class SourceLoader
                 }
                 extString = extString + "\"." + exts[i] + "\"";
             }
-
+            
             if (exts.length == 1) {
                 throw new IOException("Source \"" + fileName +
                                       "\" does not have the extension "
@@ -90,11 +84,19 @@ public class SourceLoader
                                       + extString + ".");
             }
         }
+        
+        if (Report.should_report(Report.frontend, 2))
+            Report.report(2, "Loading class from " + sourceFile);
 
-	if (Report.should_report(Report.frontend, 2))
-	    Report.report(2, "Loading class from " + sourceFile);
-
-	return new FileSource(sourceFile);
+        FileSource s = (FileSource) loadedSources.get(fileKey(sourceFile));
+        
+        if (s != null) {
+            return s;
+        }
+        
+        s = new FileSource(sourceFile);
+        loadedSources.put(fileKey(sourceFile), s);
+        return s;
     }
 
     /**
@@ -172,15 +174,17 @@ public class SourceLoader
                     }
                     
                     // Skip it if already loaded
-                    if (loadedSources.contains(fileKey(sourceFile))) {
-                        continue;
-                    }
+                    FileSource s = (FileSource) loadedSources.get(fileKey(sourceFile));
 
+                    if (s != null) {
+                        return s;
+                    }
+                    
                     try {
                         if (Report.should_report(Report.frontend, 2))
                             Report.report(2, "Loading " + className + " from " + sourceFile);
-                        FileSource s = new FileSource(sourceFile);
-                        loadedSources.add(fileKey(sourceFile));
+                        s = new FileSource(sourceFile);
+                        loadedSources.put(fileKey(sourceFile), s);
                         return s;
                     }
                     catch (IOException e) {

@@ -3,6 +3,7 @@ package polyglot.ext.jl.ast;
 import java.util.List;
 
 import polyglot.ast.*;
+import polyglot.frontend.*;
 import polyglot.frontend.CyclicDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
@@ -32,10 +33,6 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         this.init = init;
     }
     
-    public boolean isDisambiguated() {
-        return li != null && li.isCanonical() && super.isDisambiguated();
-    }
-
     /** Get the type of the declaration. */
     public Type declType() {
         return type.type();
@@ -132,14 +129,14 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
      * Add the declaration of the variable as we enter the scope of the
      * intializer
      */
-    public Context enterScope(Node child, Context c) {
+    public Context enterChildScope(Node child, Context c, NodeVisitor v) {
         if (child == init) {
             c.addVariable(li);
         }
-        return super.enterScope(child, c);
+        return super.enterChildScope(child, c, v);
     }
 
-    public void addDecls(Context c) {
+    public void addDecls(Context c, NodeVisitor v) {
         // Add the declaration of the variable in case we haven't already done
         // so in enterScope, when visiting the initializer.
         c.addVariable(li);
@@ -242,14 +239,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
                        Field f = (Field) n;
                        if (! f.fieldInstance().constantValueSet()) {
                            Goal g = scheduler.FieldConstantsChecked(f.fieldInstance());
-                           if (g.job() != ccgoal.job()) {
-                               try {
-                                   scheduler.addPrerequisiteDependency(ccgoal, g);
-                               }
-                               catch (CyclicDependencyException e) {
-                                   LocalDecl_c.this.li.setNotConstant();
-                               }
-                           }
+                           throw new MissingDependencyException(g);
                        }
                    }
                    if (n instanceof Local) {

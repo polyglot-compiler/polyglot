@@ -24,10 +24,6 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
     }
     
-    public boolean isTypeChecked() {
-        return ci != null && ci.isCanonical() && super.isTypeChecked();
-    }
-
     /** Get the qualifier of the constructor call. */
     public Expr qualifier() {
 	return this.qualifier;
@@ -84,7 +80,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
      * An explicit constructor call is a static context. We need to record
      * this.
      */
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, NodeVisitor v) {
         return c.pushStatic();
     }
 

@@ -65,7 +65,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
         return reconstruct(decl);
     }
 
-    public void addDecls(Context c) {
+    public void addDecls(Context c, NodeVisitor v) {
         // We should now be back in the scope of the enclosing block.
         // Add the type.
         if (! decl.type().toClass().isLocal())

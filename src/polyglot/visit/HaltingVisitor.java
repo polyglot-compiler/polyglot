@@ -9,7 +9,7 @@ import java.util.*;
  * particular node.  Clients can call <code>bypass(Node n) </code> to 
  * have the visitor skip n and its children when recursing through the AST.
  */
-public abstract class HaltingVisitor extends NodeVisitor implements Copy
+public abstract class HaltingVisitor extends NodeVisitor
 {
     Node bypassParent;
     Collection bypass;
@@ -82,17 +82,5 @@ public abstract class HaltingVisitor extends NodeVisitor implements Copy
         }
 
         return null;
-    }
-
-    public Object copy() {
-        try {
-            HaltingVisitor v = (HaltingVisitor) super.clone();
-            // v.bypassParent = null;
-            // v.bypass = null;
-            return v;
-        }
-        catch (CloneNotSupportedException e) {
-            throw new InternalCompilerError("Java clone() weirdness.");
-        }
     }
 }

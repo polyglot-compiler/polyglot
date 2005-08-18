@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
+
 import java.util.*;
 
 /**
@@ -64,7 +65,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 	return reconstruct(statements);
     }
 
-    public Context enterScope(Context c) {
+    public Context enterScope(Context c, NodeVisitor v) {
 	return c.pushBlock();
     }
 

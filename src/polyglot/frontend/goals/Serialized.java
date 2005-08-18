@@ -6,6 +6,10 @@
  */
 package polyglot.frontend.goals;
 
+import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
@@ -31,12 +35,21 @@ public class Serialized extends SourceFileGoal {
                                                        extInfo.version()));
         }
         else {
-            return new EmptyPass(this) {
-                public boolean run() {
-                    Serialized.this.markRun();
-                    return true;
-                }
-            };
+            return new EmptyPass(this);
         }
+    }
+    
+    public Collection prerequisiteGoals(Scheduler scheduler) {
+        List l = new ArrayList();
+        l.addAll(super.prerequisiteGoals(scheduler));
+        l.add(scheduler.TypeChecked(job));
+        l.add(scheduler.ConstantsChecked(job));
+        l.add(scheduler.ReachabilityChecked(job));
+        l.add(scheduler.ExceptionsChecked(job));
+        l.add(scheduler.ExitPathsChecked(job));
+        l.add(scheduler.InitializationsChecked(job));
+        l.add(scheduler.ConstructorCallsChecked(job));
+        l.add(scheduler.ForwardReferencesChecked(job));
+        return l;
     }
 }

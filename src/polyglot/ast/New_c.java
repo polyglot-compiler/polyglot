@@ -3,6 +3,10 @@ package polyglot.ext.jl.ast;
 import java.util.*;
 
 import polyglot.ast.*;
+import polyglot.frontend.*;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.SchedulerException;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -29,10 +33,6 @@ public class New_c extends Expr_c implements New
         this.tn = tn;
 	this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
 	this.body = body;
-    }
-    
-    public boolean isTypeChecked() {
-        return ci != null && ci.isCanonical() && (body == null || (anonType != null && anonType.isCanonical())) && super.isTypeChecked();
     }
 
     /** Get the qualifier expression of the allocation. */
@@ -126,11 +126,11 @@ public class New_c extends Expr_c implements New
 	return reconstruct(qualifier, tn, arguments, body);
     }
 
-    public Context enterScope(Node child, Context c) {
+    public Context enterChildScope(Node child, Context c, NodeVisitor v) {
         if (child == body && anonType != null && body != null) {
             c = c.pushClass(anonType, anonType);
         }
-        return super.enterScope(child, c);
+        return super.enterChildScope(child, c, v);
     }
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
@@ -152,7 +152,6 @@ public class New_c extends Expr_c implements New
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         New_c n = this;
-        
         TypeSystem ts = tb.typeSystem();
 
         List l = new ArrayList(n.arguments.size());
@@ -195,6 +194,10 @@ public class New_c extends Expr_c implements New
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         New_c n = this;
+
+        if (! tn.type().isCanonical()) {
+            return this;
+        }
         
         if (! tn.type().isClass()) {
             return this;
@@ -209,7 +212,7 @@ public class New_c extends Expr_c implements New
         }
         
         if (n.qualifier() != null && ! n.qualifier().type().isCanonical()) {
-            return n;
+            return this;
         }
         
         if (anonType != null && ! anonType.supertypesResolved()) {
@@ -300,7 +303,9 @@ public class New_c extends Expr_c implements New
             Type qt = qualifier.type();
 
             if (! qt.isCanonical()) {
-                return this;
+                Scheduler scheduler = tc.job().extensionInfo().scheduler();
+                Goal g = scheduler.TypeChecked(tc.job());
+                throw new MissingDependencyException(g);
             }
             
             if (! qt.isClass()) {
@@ -632,11 +637,12 @@ public class New_c extends Expr_c implements New
         New nn = this;
         New old = nn;
         
-        TypeChecker childtc = (TypeChecker) tc.enter(parent, this);
         BodyDisambiguator bd = new BodyDisambiguator(tc);
         BodyDisambiguator childbd = (BodyDisambiguator) bd.enter(parent, this);
+
+        TypeChecker childtc = (TypeChecker) tc.enter(parent, this);
         
-        // Override to ensure that when the qualifier type is known before
+        // Override to ensure that the qualifier type is known before
         // the TypeNode is disambiguated.
         nn = nn.qualifier((Expr) nn.visitChild(nn.qualifier(), childbd));
         if (childbd.hasErrors()) throw new SemanticException();
@@ -645,7 +651,7 @@ public class New_c extends Expr_c implements New
         if (childtc.hasErrors()) throw new SemanticException();
         
         // Hack to ensure nn.disambiguate is invoked to set the qualifier.
-        nn = (New_c) bd.leave(parent, old, nn, childbd);
+        nn = (New_c) nn.del().disambiguate(bd);
         if (bd.hasErrors()) throw new SemanticException();
         
         // Now disambiguate nn.objectType().
@@ -662,7 +668,7 @@ public class New_c extends Expr_c implements New
         }
 
         // Hack to ensure nn.disambiguate is invoked to set the supertypes.
-        nn = (New_c) bd.leave(parent, old, nn, childbd);
+        nn = (New_c) nn.del().disambiguate(bd);
         if (bd.hasErrors()) throw new SemanticException();
 
         nn = (New) nn.arguments(nn.visitList(nn.arguments(), childbd));
