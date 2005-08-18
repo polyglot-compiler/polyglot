@@ -46,7 +46,9 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
           return ar.nodeFactory().ArrayAccessAssign(n.position(), (ArrayAccess)left(), operator(), right());
       }
 
-      throw new SemanticException("Could not disambiguate left side of assignment!", n.position());
+      // LHS is still ambiguous.  The pass should get rerun later.
+      return this;
+      // throw new SemanticException("Could not disambiguate left side of assignment!", n.position());
   }
   
 

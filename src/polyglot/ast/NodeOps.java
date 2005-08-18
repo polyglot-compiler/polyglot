@@ -116,6 +116,10 @@ public interface NodeOps
      * <code>this</code> or a new copy of the node which will be
      * installed as a child of the node's parent.
      *
+     * The node should not assume that its children have been disambiguated.
+     * If it depends on a child being disambiguated,
+     * it may just return <code>this</code> without doing any work.
+     *
      * @param ar The visitor which disambiguates.
      */
     Node disambiguate(AmbiguityRemover ar) throws SemanticException;
