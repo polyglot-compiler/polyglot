@@ -230,7 +230,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
         return this;
     }
 
-    public Context enterScope(Context c, NodeVisitor v) {
+    public Context enterScope(Context c) {
         if (Report.should_report(TOPICS, 5))
 	    Report.report(5, "enter scope of method " + name);
         c = c.pushCode(mi);

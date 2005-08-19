@@ -190,7 +190,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return this;
     }
 
-    public Context enterScope(Context c, NodeVisitor v) {
+    public Context enterScope(Context c) {
         if (ii != null) {
             return c.pushCode(ii);
         }

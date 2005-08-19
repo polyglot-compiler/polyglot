@@ -99,7 +99,7 @@ public class Formal_c extends Term_c implements Formal
 	return reconstruct(type);
     }
 
-    public void addDecls(Context c, NodeVisitor v) {
+    public void addDecls(Context c) {
         c.addVariable(li);
     }
 

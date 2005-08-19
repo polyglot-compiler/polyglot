@@ -137,18 +137,18 @@ public class Translator extends PrettyPrinter implements Copy
         Translator tr;
 
         if (parent != null) {
-            Context c = parent.del().enterChildScope(child, context, null);
+            Context c = parent.del().enterChildScope(child, context);
             tr = this.context(c);
         }
         else {
-            Context c = child.del().enterScope(context, null);
+            Context c = child.del().enterScope(context);
             tr = this.context(c);
         }
 
         child.del().translate(w, tr);
 
         if (parent != null) {
-            parent.addDecls(context, null);
+            parent.addDecls(context);
         }
     }
 
@@ -203,7 +203,7 @@ public class Translator extends PrettyPrinter implements Copy
                 pkg = p.toString();
             }
 
-            Context c = sfn.del().enterScope(context, null);
+            Context c = sfn.del().enterScope(context);
 
             TopLevelDecl first = null;
 

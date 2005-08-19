@@ -129,14 +129,14 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
      * Add the declaration of the variable as we enter the scope of the
      * intializer
      */
-    public Context enterChildScope(Node child, Context c, NodeVisitor v) {
+    public Context enterChildScope(Node child, Context c) {
         if (child == init) {
             c.addVariable(li);
         }
-        return super.enterChildScope(child, c, v);
+        return super.enterChildScope(child, c);
     }
 
-    public void addDecls(Context c, NodeVisitor v) {
+    public void addDecls(Context c) {
         // Add the declaration of the variable in case we haven't already done
         // so in enterScope, when visiting the initializer.
         c.addVariable(li);

@@ -241,10 +241,9 @@ public abstract class Node_c implements Node
      * Push a new scope upon entering this node, and add any declarations to the
      * context that should be in scope when visiting children of this node.
      * @param c the current <code>Context</code>
-     * 
      * @return the <code>Context</code> to be used for visiting this node. 
      */
-    public Context enterScope(Context c, NodeVisitor v) { return c; }
+    public Context enterScope(Context c) { return c; }
 
     /**
      * Push a new scope for visiting the child node <code>child</code>. 
@@ -253,19 +252,18 @@ public abstract class Node_c implements Node
      * this method gives parent nodes have the ability to modify this behavior.
      * @param child the child node about to be entered.
      * @param c the current <code>Context</code>
-     * 
      * @return the <code>Context</code> to be used for visiting node 
      *           <code>child</code>
      */
-    public Context enterChildScope(Node child, Context c, NodeVisitor v) { 
-        return child.del().enterScope(c, v); 
+    public Context enterChildScope(Node child, Context c) { 
+        return child.del().enterScope(c); 
     }
 
     /**
      * Add any declarations to the context that should be in scope when
      * visiting later sibling nodes.
      */
-    public void addDecls(Context c, NodeVisitor v) { }
+    public void addDecls(Context c) { }
 
     // These methods override the methods in Ext_c.
     // These are the default implementation of these passes.

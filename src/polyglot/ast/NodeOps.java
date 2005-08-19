@@ -31,11 +31,9 @@ public interface NodeOps
      * imperatively.  Use <code>addDecls</code> when leaving the node
      * for that.
      * @param c the current <code>Context</code>
-     * @param v The visitor currently running over the AST, or null
-     * 
      * @return the <code>Context</code> to be used for visiting this node. 
      */
-    public Context enterScope(Context c, NodeVisitor v);
+    public Context enterScope(Context c);
 
     /**
      * Push a new scope for visiting the child node <code>child</code>. 
@@ -44,20 +42,17 @@ public interface NodeOps
      * this method gives parent nodes have the ability to modify this behavior.
      * @param child The child node about to be entered.
      * @param c The current <code>Context</code>
-     * @param v The visitor currently running over the AST, or null
-     * 
      * @return the <code>Context</code> to be used for visiting node 
      *           <code>child</code>
      */
-    public Context enterChildScope(Node child, Context c, NodeVisitor v);
+    public Context enterChildScope(Node child, Context c);
 
     /**
      * Add any declarations to the context that should be in scope when
      * visiting later sibling nodes.
      * @param c The context to which to add declarations.
-     * @param v The visitor currently running over the AST, or null
      */
-    void addDecls(Context c, NodeVisitor v);
+    void addDecls(Context c);
 
     /**
      * Collects classes, methods, and fields from the AST rooted at this node

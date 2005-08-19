@@ -80,7 +80,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
      * An explicit constructor call is a static context. We need to record
      * this.
      */
-    public Context enterScope(Context c, NodeVisitor v) {
+    public Context enterScope(Context c) {
         return c.pushStatic();
     }
 

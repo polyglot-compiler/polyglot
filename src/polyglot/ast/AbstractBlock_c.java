@@ -65,7 +65,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 	return reconstruct(statements);
     }
 
-    public Context enterScope(Context c, NodeVisitor v) {
+    public Context enterScope(Context c) {
 	return c.pushBlock();
     }
 

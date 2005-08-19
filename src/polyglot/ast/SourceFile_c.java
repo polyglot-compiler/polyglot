@@ -156,7 +156,7 @@ public class SourceFile_c extends Node_c implements SourceFile
     }
      */
 
-    public Context enterScope(Context c, NodeVisitor v) {
+    public Context enterScope(Context c) {
         return c.pushSource(importTable);
     }
 

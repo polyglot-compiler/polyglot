@@ -44,11 +44,10 @@ public class JL_c extends Ext_c implements JL {
      * imperatively.  Use <code>addDecls</code> when leaving the node
      * for that.
      * @param c the current <code>Context</code>
-     * 
      * @return the <code>Context</code> to be used for visiting this node. 
      */
-    public Context enterScope(Context c, NodeVisitor v) {
-        return jl().enterScope(c, v);
+    public Context enterScope(Context c) {
+        return jl().enterScope(c);
     }
 
     /**
@@ -58,12 +57,11 @@ public class JL_c extends Ext_c implements JL {
      * this method gives parent nodes have the ability to modify this behavior.
      * @param child the child node about to be entered.
      * @param c the current <code>Context</code>
-     * 
      * @return the <code>Context</code> to be used for visiting node 
      *           <code>child</code>
      */
-    public Context enterChildScope(Node child, Context c, NodeVisitor v) {
-        return jl().enterChildScope(child, c, v);
+    public Context enterChildScope(Node child, Context c) {
+        return jl().enterChildScope(child, c);
     }
 
     /**
@@ -71,8 +69,8 @@ public class JL_c extends Ext_c implements JL {
      * visiting later sibling nodes.
      * @param c The context to which to add declarations.
      */
-    public void addDecls(Context c, NodeVisitor v) {
-        jl().addDecls(c, v);
+    public void addDecls(Context c) {
+        jl().addDecls(c);
     }
 
     /**

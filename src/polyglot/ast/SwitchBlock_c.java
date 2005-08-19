@@ -5,7 +5,6 @@ import java.util.List;
 import polyglot.ast.SwitchBlock;
 import polyglot.types.Context;
 import polyglot.util.Position;
-import polyglot.visit.NodeVisitor;
 
 /**
  * A <code>SwitchBlock</code> is a list of statements within a switch.
@@ -30,7 +29,7 @@ public class SwitchBlock_c extends AbstractBlock_c implements SwitchBlock
      * } 
      * </pre>
      */
-    public Context enterScope(Context c, NodeVisitor v) {
+    public Context enterScope(Context c) {
         return c;
     }
 }

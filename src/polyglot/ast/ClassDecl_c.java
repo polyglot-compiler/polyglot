@@ -177,12 +177,12 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         return type(type).flags(type.flags());
     }
 
-    public Context enterChildScope(Node child, Context c, NodeVisitor v) {
+    public Context enterChildScope(Node child, Context c) {
         if (child == this.body) {
             TypeSystem ts = c.typeSystem();
             c = c.pushClass(type, ts.staticTarget(type).toClass());
         }
-        return super.enterChildScope(child, c, v);
+        return super.enterChildScope(child, c);
     }
     
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {

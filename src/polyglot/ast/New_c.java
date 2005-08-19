@@ -126,11 +126,11 @@ public class New_c extends Expr_c implements New
 	return reconstruct(qualifier, tn, arguments, body);
     }
 
-    public Context enterChildScope(Node child, Context c, NodeVisitor v) {
+    public Context enterChildScope(Node child, Context c) {
         if (child == body && anonType != null && body != null) {
             c = c.pushClass(anonType, anonType);
         }
-        return super.enterChildScope(child, c, v);
+        return super.enterChildScope(child, c);
     }
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {

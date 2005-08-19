@@ -90,7 +90,7 @@ public class Initializer_c extends Term_c implements Initializer
 	return reconstruct(body);
     }
 
-    public Context enterScope(Context c, NodeVisitor v) {
+    public Context enterScope(Context c) {
 	return c.pushCode(ii);
     }
 

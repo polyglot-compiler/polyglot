@@ -71,7 +71,7 @@ public class Catch_c extends Stmt_c implements Catch
 	return reconstruct(formal, body);
     }
 
-    public Context enterScope(Context c, NodeVisitor v) {
+    public Context enterScope(Context c) {
         return c.pushBlock();
     }
 

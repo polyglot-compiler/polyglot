@@ -504,7 +504,7 @@ public class LocalClassRemover extends ContextVisitor
                       pct.setFlags(pct.flags().Static());
                   }
 
-                  Context c = newExp.enterChildScope(newExp.body(), context, this);
+                  Context c = newExp.enterChildScope(newExp.body(), context);
                   ClassBody body = newExp.body();
                   translateLocalClassBody(pct, body, c);
 
@@ -549,7 +549,7 @@ public class LocalClassRemover extends ContextVisitor
                   }
 
                   ClassBody body = cd.body();
-                  Context c = cd.enterChildScope(body, context, this);
+                  Context c = cd.enterChildScope(body, context);
                   translateLocalClassBody(pct, body, c);
               }
               return nf.Empty(lcd.position());
@@ -579,7 +579,7 @@ public class LocalClassRemover extends ContextVisitor
             ClassDecl cd = lcd.decl();
             ParsedClassType pct = cd.type();
             ClassBody body = cd.body();
-            Context c = cd.enterChildScope(body, context, this);
+            Context c = cd.enterChildScope(body, context);
             List env = computeClosure(body, context, c);
             envMap.put(pct, env);
         }

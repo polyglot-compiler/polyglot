@@ -206,7 +206,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
         return this;
     }
 
-    public Context enterScope(Context c, NodeVisitor v) {
+    public Context enterScope(Context c) {
         return c.pushCode(ci);
     }
 

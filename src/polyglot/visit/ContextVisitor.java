@@ -79,10 +79,10 @@ public class ContextVisitor extends ErrorHandlingVisitor
      */
     protected Context enterScope(Node parent, Node n) {
         if (parent != null) {
-            return parent.del().enterChildScope(n, context, this);
+            return parent.del().enterChildScope(n, context);
         }
         // no parent node yet.
-        return n.del().enterScope(context, null);
+        return n.del().enterScope(context);
     }
    
     /**
@@ -90,7 +90,7 @@ public class ContextVisitor extends ErrorHandlingVisitor
      * visiting the node.
      */
     protected void addDecls(Node n) {
-        n.addDecls(context, this);
+        n.addDecls(context);
     }
 
     public NodeVisitor enter(Node parent, Node n) {
