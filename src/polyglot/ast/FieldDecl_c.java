@@ -33,6 +33,10 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         this.name = name;
         this.init = init;
     }
+
+    public boolean isDisambiguated() {
+        return fi != null && fi.isCanonical() && (init == null || (ii != null && ii.isCanonical())) && super.isDisambiguated();
+    }
     
     public MemberInstance memberInstance() {
         return fi;

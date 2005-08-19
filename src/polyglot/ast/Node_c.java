@@ -133,6 +133,10 @@ public abstract class Node_c implements Node
 	n.position = position;
 	return n;
     }
+        
+    public boolean isDisambiguated() {
+        return !(this instanceof Ambiguous);
+    }
     
     public boolean error() {
         return error;

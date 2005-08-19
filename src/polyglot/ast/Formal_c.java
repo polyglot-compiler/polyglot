@@ -28,7 +28,11 @@ public class Formal_c extends Term_c implements Formal
         this.type = type;
         this.name = name;
     }
-    
+
+    public boolean isDisambiguated() {
+        return li != null && li.isCanonical() && super.isDisambiguated();
+    }
+
     /** Get the type of the formal. */
     public Type declType() {
         return type.type();

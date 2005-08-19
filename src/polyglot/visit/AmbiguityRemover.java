@@ -147,4 +147,34 @@ public class AmbiguityRemover extends DisambiguationDriver
                                         "Implement any required functionality using " +
                                         "Node.disambiguateOverride(Node, AmbiguityRemover).");
     }
+  
+    public boolean isASTDisambiguated(Node n) {
+        return astAmbiguityCount(n) == 0;
+    }
+    
+    public static int astAmbiguityCount(Node n) {
+        final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend, "disam-check" });
+
+        final int[] notOkCount = new int[] { 0 };
+        
+        n.visit(new NodeVisitor() {
+            public Node override(Node parent, Node n) {
+                // Don't check if New is disambiguated; this is handled
+                // during type-checking.
+                if (n instanceof New) {
+                    return n;
+                }
+
+                if (! n.isDisambiguated()) {
+                    if (Report.should_report(TOPICS, 3))
+                        Report.report(3, "  not ok at " + n + " (" + n.getClass().getName() + ")");
+                    notOkCount[0]++;
+                }
+                
+                return null;
+            }
+        });
+        
+        return notOkCount[0];
+    }
 }

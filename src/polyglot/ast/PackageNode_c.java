@@ -19,6 +19,10 @@ public class PackageNode_c extends Node_c implements PackageNode
 	this.package_ = package_;
     }
     
+    public boolean isDisambiguated() {
+        return package_ != null && package_.isCanonical() && super.isDisambiguated();
+    }
+
     /** Get the package as a qualifier. */
     public Qualifier qualifier() {
         return this.package_;

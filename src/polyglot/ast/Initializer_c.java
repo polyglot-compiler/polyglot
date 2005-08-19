@@ -29,6 +29,10 @@ public class Initializer_c extends Term_c implements Initializer
 	this.body = body;
     }
     
+    public boolean isDisambiguated() {
+        return ii != null && ii.isCanonical() && super.isDisambiguated();
+    }
+
     public MemberInstance memberInstance() {
         return ii;
     }

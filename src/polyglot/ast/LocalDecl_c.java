@@ -33,6 +33,10 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         this.init = init;
     }
     
+    public boolean isDisambiguated() {
+        return li != null && li.isCanonical() && super.isDisambiguated();
+    }
+
     /** Get the type of the declaration. */
     public Type declType() {
         return type.type();

@@ -37,7 +37,11 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
 
 	return this;
     }
-
+    
+    public boolean isDisambiguated() {
+        return false;
+    }
+    
     public Node visitChildren(NodeVisitor v) {
         TypeNode base = (TypeNode) visitChild(this.base, v);
 	return reconstruct(base);

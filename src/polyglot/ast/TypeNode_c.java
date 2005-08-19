@@ -20,6 +20,10 @@ public abstract class TypeNode_c extends Term_c implements TypeNode
 	super(pos);
     }
     
+    public boolean isDisambiguated() {
+        return super.isDisambiguated() && type != null && type.isCanonical();
+    }
+
     /** Get the type as a qualifier. */
     public Qualifier qualifier() {
         return type();

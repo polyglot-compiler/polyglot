@@ -44,6 +44,10 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 	    this.body = body;
     }
     
+    public boolean isDisambiguated() {
+        return super.isDisambiguated() && type != null && type.isCanonical() && type.supertypesResolved() && type.signaturesResolved();
+    }
+    
     public MemberInstance memberInstance() {
         return type;
     }
