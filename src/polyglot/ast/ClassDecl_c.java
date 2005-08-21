@@ -195,9 +195,15 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 	}
 
         ClassDecl_c n = disambiguateSupertypes(ar);
+        checkSupertypeCycles(ar.typeSystem());
+
         ParsedClassType type = n.type();
 
-        checkSupertypeCycles(ar.typeSystem());
+        if (! type.signaturesResolved()) {
+            Scheduler scheduler = ar.job().extensionInfo().scheduler();
+            Goal g = scheduler.SignaturesResolved(type);
+            throw new MissingDependencyException(g);
+        }
 
         // Make sure that the inStaticContext flag of the class is correct.
         Context ctxt = ar.context();
@@ -216,13 +222,13 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 //        System.out.println("  " + ar + ".disamsuper: " + this);
         
         if (! type.supertypesResolved()) {
-            if (superClass != null && ! superClass.type().isCanonical()) {
+            if (superClass != null && ! superClass.isDisambiguated()) {
                 supertypesResolved = false;
             }
             
             for (Iterator i = interfaces.iterator(); supertypesResolved && i.hasNext(); ) {
                 TypeNode tn = (TypeNode) i.next();
-                if (! tn.type().isCanonical()) {
+                if (! tn.isDisambiguated()) {
                     supertypesResolved = false;
                 }
             }
