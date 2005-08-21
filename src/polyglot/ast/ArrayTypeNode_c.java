@@ -56,12 +56,14 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
 	TypeSystem ts = ar.typeSystem();
 	NodeFactory nf = ar.nodeFactory();
 
+        if (! base.isDisambiguated()) {
+            return this;
+        }
+
         Type baseType = base.type();
 
         if (! baseType.isCanonical()) {
-	    throw new SemanticException(
-		"Base type " + baseType + " of array could not be resolved.",
-		base.position());
+            return this;
 	}
 
         return nf.CanonicalTypeNode(position(),

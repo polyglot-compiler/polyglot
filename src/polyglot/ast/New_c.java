@@ -195,10 +195,10 @@ public class New_c extends Expr_c implements New
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         New_c n = this;
 
-        if (! tn.type().isCanonical()) {
+        if (! tn.isDisambiguated()) {
             return this;
         }
-        
+
         if (! tn.type().isClass()) {
             return this;
         }
@@ -211,7 +211,7 @@ public class New_c extends Expr_c implements New
             }
         }
         
-        if (n.qualifier() != null && ! n.qualifier().type().isCanonical()) {
+        if (n.qualifier() != null && ! n.qualifier().isDisambiguated()) {
             return this;
         }
         

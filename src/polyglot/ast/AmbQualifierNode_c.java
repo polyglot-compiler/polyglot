@@ -72,11 +72,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
     }
 
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-        if (qual instanceof Ambiguous) {
-            return this;
-        }
-        
-        if (qual != null && ! qual.qualifier().isCanonical()) {
+        if (qual != null && ! qual.isDisambiguated()) {
             return this;
         }
         

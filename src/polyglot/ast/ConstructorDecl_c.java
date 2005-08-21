@@ -176,6 +176,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (this.ci.isCanonical()) {
+            // already done
             return this;
         }
 
@@ -189,7 +190,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
             
         for (Iterator i = formals.iterator(); i.hasNext(); ) {
             Formal f = (Formal) i.next();
-            if (! f.declType().isCanonical()) {
+            if (! f.isDisambiguated()) {
                 return this;
             }
             formalTypes.add(f.declType());
@@ -199,7 +200,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 
         for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
             TypeNode tn = (TypeNode) i.next();
-            if (! tn.type().isCanonical()) {
+            if (! tn.isDisambiguated()) {
                 return this;
             }
             throwTypes.add(tn.type());

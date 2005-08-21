@@ -64,14 +64,10 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
   }
 
   public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
-      if (qual instanceof Ambiguous) {
+      if (qual != null && ! qual.isDisambiguated()) {
           return this;
       }
-      
-      if (qual != null && ! qual.qualifier().isCanonical()) {
-          return this;
-      }
-      
+
       Node n = sc.nodeFactory().disamb().disambiguate(this, sc, position(), qual,
                                                       name);
       

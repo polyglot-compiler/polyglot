@@ -197,12 +197,13 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
         if (this.mi.isCanonical()) {
+            // already done
             return this;
         }
 
         Context c = ar.context();
 
-        if (! returnType.type().isCanonical()) {
+        if (! returnType.isDisambiguated()) {
             return this;
         }
 
@@ -213,7 +214,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 
         for (Iterator i = formals.iterator(); i.hasNext(); ) {
             Formal f = (Formal) i.next();
-            if (! f.declType().isCanonical()) { 
+            if (! f.isDisambiguated()) {
                 return this;
             }
             formalTypes.add(f.declType());
@@ -223,7 +224,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 
         for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
             TypeNode tn = (TypeNode) i.next();
-            if (! tn.type().isCanonical()) {
+            if (! tn.isDisambiguated()) {
                 return this;
             }
             throwTypes.add(tn.type());
