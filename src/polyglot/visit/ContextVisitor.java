@@ -97,6 +97,10 @@ public class ContextVisitor extends ErrorHandlingVisitor
         if (Report.should_report(Report.visit, 5))
 	    Report.report(5, "enter(" + n + ")");
 
+        if (prune) {
+            return new PruningVisitor();
+        }
+
         try {
             ContextVisitor v = this;
             
@@ -120,16 +124,30 @@ public class ContextVisitor extends ErrorHandlingVisitor
                 scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
                 g.setUnreachableThisRun();
             }
+
+            // The context for visiting the children
+            // isn't set up correctly, so prune the traversal here.
+            // The context might also be incorrect for later siblings
+            // of this node, so set a flag to prune until the scope
+            // is popped.
+            this.prune = true;
+            return new PruningVisitor();
         }
-        
-        return this;
-     }
+    }
+
+    boolean prune;
 
     public NodeVisitor superEnter(Node parent, Node n) {
         return super.enter(parent, n);
     }
 
     public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
+        // If the traversal was pruned, just return n since leaveCall
+        // might expect a ContextVisitor, not a PruningVisitor.
+        if (v instanceof PruningVisitor || prune) {
+            return n;
+        }
+
         try {
             Node m = super.leave(parent, old, n, v);
             this.addDecls(m);
