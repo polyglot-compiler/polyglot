@@ -36,7 +36,8 @@ public class AmbiguityRemover extends DisambiguationDriver
         Scheduler scheduler = job.extensionInfo().scheduler();
         ParsedClassType ct = c.currentClassScope();
         
-        if (parent instanceof ClassMember && (n instanceof Stmt || n instanceof Expr)) {
+        if ((parent instanceof ProcedureDecl && n == ((ProcedureDecl) parent).body())
+         || (parent instanceof FieldDecl && n == ((FieldDecl) parent).init())) {
             List l = new ArrayList(c.goalStack());
             l.remove(scheduler.SupertypesResolved(ct));
             l.remove(scheduler.SignaturesResolved(ct));
