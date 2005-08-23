@@ -174,7 +174,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 	ParsedClassType type = tb.currentClass();        
 
 	if (type == null) {
-	    throw new InternalCompilerError("Missing type.", position());
+            return this;
 	}
 
         type.setMembersAdded(true);
