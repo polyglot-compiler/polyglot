@@ -791,7 +791,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
 
     /**
-     * This utility methods is for subclasses to convert a Items into
+     * This utility method is for subclasses to convert Items into
      * a <code>Map</code>, to return from the
      * <code>flow</code> methods. 
      * 

@@ -9,7 +9,7 @@ import polyglot.util.*;
  * which states that traversals will <i>lazily reconstruct</i> the tree. That
  * is, the AST is functionally "modified" by creating new nodes on each
  * traversal, but only when necessary-- only when nodes (or their children) are
- * actually changed. Up to three seperate calls into the visitor may be invoked
+ * actually changed. Up to three separate calls into the visitor may be invoked
  * for each AST node. <code>override</code> allows the visitor to redefine the
  * entire traversal for a particular subtree. <code>enter</code> notifies the
  * visitor that traversal of a particular subtree has begun.
