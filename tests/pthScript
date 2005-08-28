@@ -240,9 +240,9 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
 	DoubleFlags.jl (Syntax), ();
 	LocalClass5.jl ;
 	LocalClass6.jl (Semantic, "Circular inheritance");
-	Protection.jl (Semantic, "Cannot declare method that is both abstract and static"),
-		      (Semantic, "Cannot declare method that is both abstract and final"),
-		      (Semantic, "Cannot declare method that is both abstract and native");
+	Protection.jl (Semantic, "Cannot declare abstract method with flags static"),
+		      (Semantic, "Cannot declare abstract method with flags final"),
+		      (Semantic, "Cannot declare abstract method with flags native");
 	Protection2.jl (Semantic, "cannot override.*overridden method is final");
 
         // on the following file, javac produces an error, but we intentionally do not.
