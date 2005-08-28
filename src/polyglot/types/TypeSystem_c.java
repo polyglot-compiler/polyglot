@@ -1770,41 +1770,80 @@ public class TypeSystem_c implements TypeSystem
     }
 
     /** All possible <i>access</i> flags. */
-    protected final Flags ACCESS_FLAGS = Public().Protected().Private();
+    public Flags legalAccessFlags() {
+        return Public().Protected().Private();
+    }
+    
+    protected final Flags ACCESS_FLAGS = legalAccessFlags();
 
     /** All flags allowed for a local variable. */
-    protected final Flags LOCAL_FLAGS = Final();
+    public Flags legalLocalFlags() {
+        return Final();
+    }
+    
+    protected final Flags LOCAL_FLAGS = legalLocalFlags();
 
     /** All flags allowed for a field. */
-    protected final Flags FIELD_FLAGS = ACCESS_FLAGS.Static().Final()
-                                        .Transient().Volatile();
+    public Flags legalFieldFlags() {
+        return legalAccessFlags().Static().Final().Transient().Volatile();
+    }
+    
+    protected final Flags FIELD_FLAGS = legalFieldFlags();
 
     /** All flags allowed for a constructor. */
-    protected final Flags CONSTRUCTOR_FLAGS = ACCESS_FLAGS
-                                              .Synchronized().Native();
+    public Flags legalConstructorFlags() {
+        return legalAccessFlags().Synchronized().Native();
+    }
+
+    protected final Flags CONSTRUCTOR_FLAGS = legalConstructorFlags();
 
     /** All flags allowed for an initializer block. */
-    protected final Flags INITIALIZER_FLAGS = Static();
+    public Flags legalInitializerFlags() {
+        return Static();
+    }
+    
+    protected final Flags INITIALIZER_FLAGS = legalInitializerFlags();
 
     /** All flags allowed for a method. */
-    protected final Flags METHOD_FLAGS = ACCESS_FLAGS.Abstract().Static()
-                                         .Final().Native()
-                                         .Synchronized().StrictFP();
+    public Flags legalMethodFlags() {
+        return legalAccessFlags().Abstract().Static().Final().Native().Synchronized().StrictFP();
+    }
+    
+    protected final Flags METHOD_FLAGS = legalMethodFlags();
 
+    public Flags legalAbstractMethodFlags() {
+        return legalAccessFlags().Abstract();
+    }
+
+    protected final Flags ABSTRACT_METHOD_FLAGS = legalAbstractMethodFlags();
+    
     /** All flags allowed for a top-level class. */
-    protected final Flags TOP_LEVEL_CLASS_FLAGS = ACCESS_FLAGS.clear(Private())
-                                                  .Abstract().Final()
-                                                  .StrictFP().Interface();
+    public Flags legalTopLevelClassFlags() {
+        return legalAccessFlags().clear(Private()).Abstract().Final().StrictFP().Interface();
+    }
+
+    protected final Flags TOP_LEVEL_CLASS_FLAGS = legalTopLevelClassFlags();
+
+    /** All flags allowed for an interface. */
+    public Flags legalInterfaceFlags() {
+        return legalAccessFlags().Abstract().Interface().Static();
+    }
+    
+    protected final Flags INTERFACE_FLAGS = legalInterfaceFlags();
 
     /** All flags allowed for a member class. */
-    protected final Flags MEMBER_CLASS_FLAGS = ACCESS_FLAGS.Static()
-                                                  .Abstract().Final()
-                                                  .StrictFP().Interface();
-
+    public Flags legalMemberClassFlags() {
+        return legalAccessFlags().Static().Abstract().Final().StrictFP().Interface();
+    }
+    
+    protected final Flags MEMBER_CLASS_FLAGS = legalMemberClassFlags();
 
     /** All flags allowed for a local class. */
-    protected final Flags LOCAL_CLASS_FLAGS = TOP_LEVEL_CLASS_FLAGS
-                                              .clear(ACCESS_FLAGS);
+    public Flags legalLocalClassFlags() {
+        return Abstract().Final().StrictFP().Interface();
+    }
+
+    protected final Flags LOCAL_CLASS_FLAGS = legalLocalClassFlags();
 
     public void checkMethodFlags(Flags f) throws SemanticException {
       	if (! f.clear(METHOD_FLAGS).equals(Flags.NONE)) {
@@ -1813,34 +1852,10 @@ public class TypeSystem_c implements TypeSystem
 		f.clear(METHOD_FLAGS) + ".");
 	}
 
-        if (f.isAbstract() && f.isPrivate()) {
+        if (f.isAbstract() && ! f.clear(ABSTRACT_METHOD_FLAGS).equals(Flags.NONE)) {
 	    throw new SemanticException(
-		"Cannot declare method that is both abstract and private.");
-        }
-
-        if (f.isAbstract() && f.isStatic()) {
-	    throw new SemanticException(
-		"Cannot declare method that is both abstract and static.");
-        }
-
-        if (f.isAbstract() && f.isFinal()) {
-	    throw new SemanticException(
-		"Cannot declare method that is both abstract and final.");
-        }
-
-        if (f.isAbstract() && f.isNative()) {
-	    throw new SemanticException(
-		"Cannot declare method that is both abstract and native.");
-        }
-
-        if (f.isAbstract() && f.isSynchronized()) {
-	    throw new SemanticException(
-		"Cannot declare method that is both abstract and synchronized.");
-        }
-
-        if (f.isAbstract() && f.isStrictFP()) {
-	    throw new SemanticException(
-		"Cannot declare method that is both abstract and strictfp.");
+		"Cannot declare abstract method with flags " +
+		f.clear(ABSTRACT_METHOD_FLAGS) + ".");
         }
 
 	checkAccessFlags(f);
@@ -1887,11 +1902,13 @@ public class TypeSystem_c implements TypeSystem
 	    throw new SemanticException(
 		"Cannot declare a top-level class with flag(s) " +
 		f.clear(TOP_LEVEL_CLASS_FLAGS) + ".");
-	}
-
-        if (f.isFinal() && f.isInterface()) {
-            throw new SemanticException("Cannot declare a final interface.");
-        }
+      	}
+      	
+      	
+      	if (f.isInterface() && ! f.clear(INTERFACE_FLAGS).equals(Flags.NONE)) {
+      	    throw new SemanticException("Cannot declare interface with flags " +
+      	                                f.clear(INTERFACE_FLAGS) + ".");
+      	}
 
 	checkAccessFlags(f);
     }
@@ -1902,14 +1919,6 @@ public class TypeSystem_c implements TypeSystem
 		"Cannot declare a member class with flag(s) " +
 		f.clear(MEMBER_CLASS_FLAGS) + ".");
 	}
-
-        if (f.isStrictFP() && f.isInterface()) {
-            throw new SemanticException("Cannot declare a strictfp interface.");
-        }
-
-        if (f.isFinal() && f.isInterface()) {
-            throw new SemanticException("Cannot declare a final interface.");
-        }
 
 	checkAccessFlags(f);
     }

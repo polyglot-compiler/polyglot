@@ -714,6 +714,39 @@ public interface TypeSystem {
      */
     PrimitiveType primitiveForName(String name) throws SemanticException;
 
+    /** All possible <i>access</i> flags. */
+    public abstract Flags legalAccessFlags();
+
+    /** All flags allowed for a local variable. */
+    public abstract Flags legalLocalFlags();
+
+    /** All flags allowed for a field. */
+    public abstract Flags legalFieldFlags();
+
+    /** All flags allowed for a constructor. */
+    public abstract Flags legalConstructorFlags();
+
+    /** All flags allowed for an initializer block. */
+    public abstract Flags legalInitializerFlags();
+
+    /** All flags allowed for a method. */
+    public abstract Flags legalMethodFlags();
+
+    /** All flags allowed for an abstract method. */
+    public abstract Flags legalAbstractMethodFlags();
+
+    /** All flags allowed for an interface. */
+    public abstract Flags legalInterfaceFlags();
+
+    /** All flags allowed for a top-level class. */
+    public abstract Flags legalTopLevelClassFlags();
+
+    /** All flags allowed for a member class. */
+    public abstract Flags legalMemberClassFlags();
+
+    /** All flags allowed for a local class. */
+    public abstract Flags legalLocalClassFlags();
+    
     /**
      * Assert if the flags <code>f</code> are legal method flags.
      */
