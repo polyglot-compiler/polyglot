@@ -222,16 +222,18 @@ public abstract class Node_c implements Node
 	    return null;
 	}
 
-        List result = l;
+	List result = l;
 	List vl = new ArrayList(l.size());
-
+	
 	for (Iterator i = l.iterator(); i.hasNext(); ) {
 	    Node n = (Node) i.next();
 	    Node m = visitChild(n, v);
-            if (n != m) {
-                result = vl;
-            }
-	    vl.add(m);
+	    if (n != m) {
+	        result = vl;
+	    }
+	    if (m != null) {
+	        vl.add(m);
+	    }
 	}
 
 	return result;

@@ -242,9 +242,9 @@ public abstract class NodeVisitor implements Copy
         
         n = this.leave(parent, child, n, v_);
         
-        if (n == null) {
-            throw new InternalCompilerError("NodeVisitor.leave() returned null.");
-        }
+//        if (n == null) {
+//            throw new InternalCompilerError("NodeVisitor.leave() returned null.");
+//        }
         
         return n;
     }
