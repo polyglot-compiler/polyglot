@@ -1812,7 +1812,7 @@ public class TypeSystem_c implements TypeSystem
     protected final Flags METHOD_FLAGS = legalMethodFlags();
 
     public Flags legalAbstractMethodFlags() {
-        return legalAccessFlags().Abstract();
+        return legalAccessFlags().clear(Private()).Abstract();
     }
 
     protected final Flags ABSTRACT_METHOD_FLAGS = legalAbstractMethodFlags();
