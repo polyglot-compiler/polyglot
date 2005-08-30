@@ -14,6 +14,7 @@ import polyglot.frontend.*;
 import polyglot.frontend.goals.*;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.Serialized;
+import polyglot.ext.jl.JLScheduler;
 import polyglot.main.*;
 import polyglot.lex.Lexer;
 
@@ -50,18 +51,52 @@ public class ExtensionInfo extends polyglot.ext.param.ExtensionInfo {
         return new CofferTypeSystem_c();
     }
 
-   protected List compileGoalList(Job job) {
-        List oldGoals = super.compileGoalList(job);
-        ArrayList newGoals = new ArrayList(oldGoals.size() + 1);
-        
-        for (Iterator i = oldGoals.iterator(); i.hasNext(); ) {
-            Goal g = (Goal) i.next();
-            if (g instanceof Serialized) {
-                newGoals.add(new VisitorGoal(job, new KeyChecker(job, ts, nf)));
-            }
-            newGoals.add(g);
+    public Scheduler createScheduler() {
+        return new CofferScheduler(this);
+    }
+
+    static class CofferScheduler extends JLScheduler {
+        CofferScheduler(ExtensionInfo extInfo) {
+            super(extInfo);
         }
-        
-        return newGoals;
+
+        public Goal KeyCheck(final Job job) { 
+            TypeSystem ts = job.extensionInfo().typeSystem();
+            NodeFactory nf = job.extensionInfo().nodeFactory();
+
+            Goal g = internGoal(new VisitorGoal(job, new KeyChecker(job, ts, nf)) {
+                public Collection prerequisiteGoals(Scheduler scheduler) {
+                    List l = new ArrayList();
+                    l.addAll(super.prerequisiteGoals(scheduler));
+                    l.add(scheduler.TypeChecked(job));
+                    l.add(scheduler.ConstantsChecked(job));
+                    l.add(scheduler.ReachabilityChecked(job));
+                    l.add(scheduler.ExceptionsChecked(job));
+                    l.add(scheduler.ExitPathsChecked(job));
+                    l.add(scheduler.InitializationsChecked(job));
+                    l.add(scheduler.ConstructorCallsChecked(job));
+                    l.add(scheduler.ForwardReferencesChecked(job));
+                    return l;
+                }
+            });
+            return g;
+        }
+
+        public Goal Serialized(final Job job) { 
+            Goal g = internGoal(new Serialized(job) {
+                public Collection prerequisiteGoals(Scheduler scheduler) {
+                    List l = new ArrayList();
+                    l.addAll(super.prerequisiteGoals(scheduler));
+                    l.add(KeyCheck(job));
+                    return l;
+                }
+            });
+            return g;
+        }
+    }
+
+    static {
+        // Make sure the class Topics is loaded.
+        new Topics(); 
     }
 }
