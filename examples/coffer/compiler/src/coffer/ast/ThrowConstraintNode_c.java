@@ -23,10 +23,6 @@ public class ThrowConstraintNode_c extends Node_c implements ThrowConstraintNode
         this.keys = keys;
     }
     
-    public boolean isTypeChecked() {
-        return super.isTypeChecked() && constraint != null && constraint.isCanonical();
-    }
-
     public TypeNode type() { return tn; }
     public KeySetNode keys() { return keys; }
 

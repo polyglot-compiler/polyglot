@@ -52,11 +52,10 @@ public class KeyNode_c extends Node_c implements KeyNode
                     throw e;
                 }
             }
-        }
 
-        if (! key.isCanonical()) {
-            throw new SemanticException("Could not disambiguate key \"" +
-                                        key + "\".", position());
+            if (! key.isCanonical()) {
+                return this;
+            }
         }
 
         return this.key(key);

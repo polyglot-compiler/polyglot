@@ -75,14 +75,10 @@ public class AmbKeySetNode_c extends Node_c implements AmbKeySetNode
         for (Iterator i = keys.iterator(); i.hasNext(); ) {
             KeyNode key = (KeyNode) i.next();
 
-            if (key.key().isCanonical()) {
-                s = s.add(key.key());
+            if (! key.key().isCanonical()) {
+                return this;
             }
-            else {
-                // return this;
-                throw new SemanticException("Could not disambiguate " +
-                                            this + ".");
-            }
+            s = s.add(key.key());
         }
 
         return nf.CanonicalKeySetNode(position(), s);

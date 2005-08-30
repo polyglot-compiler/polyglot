@@ -220,6 +220,10 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
         List throwConstraints = new ArrayList(n.throwConstraints.size());
         for (Iterator i = n.throwConstraints.iterator(); i.hasNext(); ) {
             ThrowConstraintNode cn = (ThrowConstraintNode) i.next();
+
+            if (! cn.isDisambiguated()) {
+                return this;
+            }
             
             if (cn.constraint().keys() != null) {
                 throwConstraints.add(cn.constraint());

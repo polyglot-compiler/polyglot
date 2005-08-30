@@ -19,10 +19,6 @@ public class CanonicalKeySetNode_c extends Node_c implements CanonicalKeySetNode
         super(pos);
         this.keys = keys;
     }
-    
-    public boolean isTypeChecked() {
-        return super.isTypeChecked() && (keys == null || keys.isCanonical());
-    }
 
     public KeySet keys() {
         return keys;

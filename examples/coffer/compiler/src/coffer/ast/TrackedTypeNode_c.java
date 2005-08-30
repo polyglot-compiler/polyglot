@@ -64,8 +64,9 @@ public class TrackedTypeNode_c extends TypeNode_c implements TrackedTypeNode
 	Type b = (Type) base.type();
 
 	if (! b.isCanonical()) {
-	    throw new SemanticException(
-		"Cannot instantiate from a non-canonical type " + b);
+            return this;
+	    // throw new SemanticException(
+		// "Cannot instantiate from a non-canonical type " + b);
 	}
 
         if (! (b instanceof CofferClassType)) {
@@ -78,8 +79,9 @@ public class TrackedTypeNode_c extends TypeNode_c implements TrackedTypeNode
         Key key = this.key.key();
 
         if (! key.isCanonical()) {
-	    throw new SemanticException(
-		"Cannot instantiate from a non-canonical key " + key);
+            return this;
+	    // throw new SemanticException(
+		// "Cannot instantiate from a non-canonical key " + key);
 	}
 
         Key formal = t.key();
