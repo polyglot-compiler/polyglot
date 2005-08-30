@@ -444,6 +444,8 @@ public abstract class Scheduler {
         // Another pass is being run over the same source file.  We cannot reach
         // the goal yet, so just return and let the other pass complete.  This
         // goal will be reattempted later, if necessary.
+        //
+        // FIXME: Should remove this; passes are not recursive.
         if (goal.job() != null && goal.job().isRunning()) {
             if (Report.should_report(Report.frontend, 3))
                 Report.report(3, "Job " + goal.job() + " is running");
@@ -468,41 +470,64 @@ public abstract class Scheduler {
         for (Iterator i = new ArrayList(goal.prerequisiteGoals(this)).iterator(); i.hasNext(); ) {
             Goal subgoal = (Goal) i.next();
             
-            boolean okay = attemptGoal(subgoal, true, prereqsAbove, goalsAbove);
-            
-            if (! okay) {
-                goal.setUnreachable();
-                if (Report.should_report(Report.frontend, 3))
-                    Report.report(3, "Cannot reach goal " + goal + "; " + subgoal + " failed");
-                return false;
-            }
-            
             if (! reached(subgoal)) {
-                // put the subgoal back on the worklist
                 addGoal(subgoal);
                 runPass = false;
-                if (Report.should_report(Report.frontend, 3))
-                    Report.report(3, "Will delay goal " + goal + "; " + subgoal + " not reached");
             }
         }
+        
+        if (! runPass) {
+            if (Report.should_report(Report.frontend, 3))
+                Report.report(3, "A subgoal wasn't reached, delaying goal " + goal);
+            return true;
+        }
+            
+//        for (Iterator i = new ArrayList(goal.prerequisiteGoals(this)).iterator(); i.hasNext(); ) {
+//            Goal subgoal = (Goal) i.next();
+//            
+//            boolean okay = attemptGoal(subgoal, true, prereqsAbove, goalsAbove);
+//            
+//            if (! okay) {
+//                goal.setUnreachable();
+//                if (Report.should_report(Report.frontend, 3))
+//                    Report.report(3, "Cannot reach goal " + goal + "; " + subgoal + " failed");
+//                return false;
+//            }
+//            
+//            if (! reached(subgoal)) {
+//                // put the subgoal back on the worklist
+//                addGoal(subgoal);
+//                runPass = false;
+//                if (Report.should_report(Report.frontend, 3))
+//                    Report.report(3, "Will delay goal " + goal + "; " + subgoal + " not reached");
+//            }
+//        }
 
         for (Iterator i = new ArrayList(goal.corequisiteGoals(this)).iterator(); i.hasNext(); ) {
             Goal subgoal = (Goal) i.next();
             
-            boolean okay = attemptGoal(subgoal, true, new HashSet(), goalsAbove);
-            
-            if (! okay) {
-                goal.setUnreachable();
-                if (Report.should_report(Report.frontend, 3))
-                    Report.report(3, "Cannot reach goal " + goal + "; " + subgoal + " failed");
-                return false;
-            }
-            
             if (! reached(subgoal)) {
-                // put the subgoal on the worklist
                 addGoal(subgoal);
             }
         }
+
+//        for (Iterator i = new ArrayList(goal.corequisiteGoals(this)).iterator(); i.hasNext(); ) {
+//            Goal subgoal = (Goal) i.next();
+//            
+//            boolean okay = attemptGoal(subgoal, true, new HashSet(), goalsAbove);
+//            
+//            if (! okay) {
+//                goal.setUnreachable();
+//                if (Report.should_report(Report.frontend, 3))
+//                    Report.report(3, "Cannot reach goal " + goal + "; " + subgoal + " failed");
+//                return false;
+//            }
+//            
+//            if (! reached(subgoal)) {
+//                // put the subgoal on the worklist
+//                addGoal(subgoal);
+//            }
+//        }
 
         if (! runPass) {
             if (Report.should_report(Report.frontend, 3))
