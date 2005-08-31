@@ -122,6 +122,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         LocalInit.jl ;
         MemberClassFlags.jl ;
         Narrowing.jl ;
+        Output.jl ;
         Prim.jl ;
         Prec.jl ; Prec2.jl ;
         Return1.jl ; Return2.jl ; Return3.jl ;
