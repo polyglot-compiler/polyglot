@@ -22,6 +22,10 @@ public class ThrowConstraintNode_c extends Node_c implements ThrowConstraintNode
         this.tn = tn;
         this.keys = keys;
     }
+
+    public boolean isDisambiguated() {
+        return super.isDisambiguated() && constraint != null && constraint.isCanonical();
+    }
     
     public TypeNode type() { return tn; }
     public KeySetNode keys() { return keys; }

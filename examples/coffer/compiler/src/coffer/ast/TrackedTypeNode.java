@@ -6,7 +6,7 @@ import java.util.*;
 
 /** Type node for a class instantiated with a key.
  */
-public interface TrackedTypeNode extends TypeNode
+public interface TrackedTypeNode extends TypeNode, Ambiguous
 {
     TypeNode base();
     TrackedTypeNode base(TypeNode base);

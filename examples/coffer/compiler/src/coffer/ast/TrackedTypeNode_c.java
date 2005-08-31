@@ -61,13 +61,12 @@ public class TrackedTypeNode_c extends TypeNode_c implements TrackedTypeNode
 
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         CofferTypeSystem ts = (CofferTypeSystem) sc.typeSystem();
-	Type b = (Type) base.type();
-
-	if (! b.isCanonical()) {
+        
+        if (! base.isDisambiguated() || ! key.isDisambiguated()) {
             return this;
-	    // throw new SemanticException(
-		// "Cannot instantiate from a non-canonical type " + b);
-	}
+        }
+        
+	Type b = (Type) base.type();
 
         if (! (b instanceof CofferClassType)) {
 	    throw new SemanticException(
@@ -77,12 +76,6 @@ public class TrackedTypeNode_c extends TypeNode_c implements TrackedTypeNode
 	CofferClassType t = (CofferClassType) b;
 
         Key key = this.key.key();
-
-        if (! key.isCanonical()) {
-            return this;
-	    // throw new SemanticException(
-		// "Cannot instantiate from a non-canonical key " + key);
-	}
 
         Key formal = t.key();
         Map subst = new HashMap();

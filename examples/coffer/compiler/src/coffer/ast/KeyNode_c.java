@@ -33,6 +33,10 @@ public class KeyNode_c extends Node_c implements KeyNode
         return n;
     }
 
+    public boolean isDisambiguated() {
+        return super.isDisambiguated() && key != null && key.isCanonical();
+    }
+
     public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
         CofferTypeSystem ts = (CofferTypeSystem) sc.typeSystem();
 
