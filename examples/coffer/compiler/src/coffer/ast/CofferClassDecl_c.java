@@ -53,18 +53,20 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
 	ClassBody body = (ClassBody) visitChild(this.body, v);
 	return reconstruct(key, superClass, interfaces, body);
     }
-
-    public Context enterScope(Context context) {
+    
+    public Context enterChildScope(Node child, Context context) {
         CofferContext c = (CofferContext) context;
         CofferTypeSystem ts = (CofferTypeSystem) c.typeSystem();
 
         CofferParsedClassType ct = (CofferParsedClassType) this.type;
         CofferClassType inst = (CofferClassType) ct;
-
-        c = (CofferContext) c.pushClass(ct, inst);
-
-        if (key != null)
-            c.addKey(key.key());
+        
+        if (child == this.body) {
+            c = (CofferContext) c.pushClass(ct, inst);
+            
+            if (key != null)
+                c.addKey(key.key());
+        }
 
         return c;
     }
