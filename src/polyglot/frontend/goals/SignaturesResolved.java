@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import polyglot.ast.NodeFactory;
-import polyglot.ext.jx.VirtualTypeBoundResolved;
-import polyglot.ext.jx.types.ExplicitVirtualClassType;
 import polyglot.frontend.*;
 import polyglot.frontend.passes.*;
 import polyglot.frontend.passes.DisambiguateSignaturesPass;
