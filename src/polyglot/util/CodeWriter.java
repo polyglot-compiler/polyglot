@@ -34,6 +34,8 @@ public class CodeWriter
     /**
      * Create a CodeWriter object with output stream <code>o</code>
      * and width <code>width_</code>.
+     * @param o the writer to write to. Must be non-null.
+     * @param width_ the formatting width. Must be positive.
      */
     public CodeWriter(OutputStream o, int width_) {
         this(new PrintWriter(new OutputStreamWriter(o)), width_);
@@ -41,8 +43,8 @@ public class CodeWriter
 
     /**
      * Create a CodeWriter object.
-     * @param w the output to write to. Must be non-null.
-     * @param width the formatting width. Must be positive.
+     * @param o the writer to write to. Must be non-null.
+     * @param width_ the formatting width. Must be positive.
      */
     public CodeWriter(PrintWriter o, int width_) {
         output = o;
@@ -55,8 +57,8 @@ public class CodeWriter
 
     /**
      * Create a CodeWriter object.
-     * @param w the output to write to. Must be non-null.
-     * @param width the formatting width. Must be positive.
+     * @param o the writer to write to. Must be non-null.
+     * @param width_ the formatting width. Must be positive.
      */
     public CodeWriter(Writer o, int width_) {
         this(new PrintWriter(o), width_);
@@ -65,7 +67,7 @@ public class CodeWriter
         
     /**
      * Print the string <code>s</code> verbatim on the output stream.
-     * @param the string to print.
+     * @param s the string to print.
      */
     public void write(String s) {
        if (s.length() > 0) write(s, s.length());
@@ -170,7 +172,7 @@ public class CodeWriter
      *            the level of the break
      * @param alt
      *            the alternative text
-     * @see allowBreak
+     * @see polyglot.util.CodeWriter#allowBreak
      */
     public void unifiedBreak(int n, int level, String alt, int altlen) {
         if (CodeWriter.trace) {
