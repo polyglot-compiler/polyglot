@@ -18,7 +18,26 @@ import polyglot.visit.*;
 
 
 /**
- * Comment for <code>Scheduler</code>
+ * The <code>Scheduler</code> manages <code>Goal</code>s and runs
+ * <code>Pass</code>es.
+ * 
+ * The basic idea is to have the scheduler try to satisfy goals.
+ * To reach a goal, a pass is run.  The pass could modify an AST or it
+ * could, for example, initialize the members of a class loaded from a
+ * class file.  Passes may be rerun if a goal is not reached.  Goals are
+ * processed via a worklist.  A goal may have <i>prerequisite</i>
+ * dependencies and <i>corequisite</i> dependencies.  All prerequisites
+ * must be reached before the goal is attempted.  A corequisite may be
+ * reached while satisfying the goal itself, or vice versa.
+ *
+ * Recursive passes are not allowed.  If a goal cannot be reached a
+ * SchedulerException (or more usually the subclass
+ * MissingDependencyException) is thrown.  The scheduler catches the
+ * exception and adds the goal back onto the worklist and adds the
+ * missing dependency, if any, to the dependency graph.  Optionally, a
+ * pass may catch the exception, but it must mark the goal as unreachable
+ * on this run so that it will be added back to the worklist; the pass
+ * must also add any missing dependencies.
  *
  * @author nystrom
  */
