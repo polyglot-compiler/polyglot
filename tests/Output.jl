@@ -2,7 +2,7 @@ public class Header  {
 
     private void jsa$html$BlockContainer$(String s, Object n) { }
 
-    public Header jsa$html$Header$(final int level,
+    public Header jsa$html$HeaderXX(final int level,
                                             final Object contents) {
         {
 	    
