@@ -36,9 +36,7 @@ public class CodeWriter
      * and width <code>width_</code>.
      */
     public CodeWriter(OutputStream o, int width_) {
-        output = new PrintWriter(new OutputStreamWriter(o));
-        width = width_;
-        current = input = new BlockItem(null, 0);
+        this(new PrintWriter(new OutputStreamWriter(o)), width_);
     }
 
     /**
@@ -50,6 +48,9 @@ public class CodeWriter
         output = o;
         width = width_;
         current = input = new BlockItem(null, 0);
+        if (CodeWriter.trace) {
+            trace("new CodeWriter: width = " + width);
+        }
     }
 
     /**
@@ -58,9 +59,7 @@ public class CodeWriter
      * @param width the formatting width. Must be positive.
      */
     public CodeWriter(Writer o, int width_) {
-        output = new PrintWriter(o);
-        width = width_;
-        current = input = new BlockItem(null, 0);
+        this(new PrintWriter(o), width_);
     }
         
         
@@ -71,6 +70,7 @@ public class CodeWriter
     public void write(String s) {
        if (s.length() > 0) write(s, s.length());
     }
+
     /**
      * Print the string <code>s</code> on the output stream. Pretend that it
      * has width <code>length</code> even if it has a different number of
@@ -81,6 +81,9 @@ public class CodeWriter
      * @param length
      */
     public void write(String s, int length) {
+        if (CodeWriter.trace) {
+            trace("write '" + s + "' (" + length + ")");
+        }
         current.add(new TextItem(s, length));
     }
 
@@ -107,6 +110,10 @@ public class CodeWriter
      *            Requires: n >= 0.
      */         
     public void begin(int n) {
+        if (CodeWriter.trace) {
+            trace("begin " + n);
+            incIndent();
+        }
         BlockItem b = new BlockItem(current, n);
         current.add(b);
         current = b;
@@ -116,6 +123,10 @@ public class CodeWriter
      * Terminate the most recent outstanding <code>begin</code>.
      */
     public void end() {
+        if (CodeWriter.trace) {
+            decIndent();
+            trace("end");
+        }
         current = current.parent;
         //@ assert current != null
         // if (current == null) throw new RuntimeException();
@@ -140,6 +151,9 @@ public class CodeWriter
      *            the level of the break. Requires: level >= 0
      */ 
     public void allowBreak(int n, int level, String alt, int altlen) {
+        if (CodeWriter.trace) {
+            trace("allowBreak " + n);
+        }
         current.add(new AllowBreak(n, level, alt, altlen, false));
     }
     /**
@@ -159,6 +173,9 @@ public class CodeWriter
      * @see allowBreak
      */
     public void unifiedBreak(int n, int level, String alt, int altlen) {
+        if (CodeWriter.trace) {
+            trace("unifiedBreak " + n);
+        }
         current.add(new AllowBreak(n, level, alt, altlen, true));
     }
     
@@ -185,12 +202,15 @@ public class CodeWriter
      *  
      */
     public void newline() {
-        current.add(new AllowBreak(0, 0, "", 0, false));
+        newline(0);
     }
     /**
      * Like newline(), but forces a newline with a specified indentation.
      */
     public void newline(int n) {
+        if (CodeWriter.trace) {
+            trace("newline " + n);
+        }
         current.add(new AllowBreak(n, 0, "", 0, false));
     }
 
@@ -204,6 +224,7 @@ public class CodeWriter
     public boolean flush() throws IOException {
         return flush(true);
     }
+
     /** Like <code>flush</code>, but passing <code>format=false</code>
      * causes output to be generated in the fastest way possible, with
      * all breaks broken.
@@ -212,6 +233,9 @@ public class CodeWriter
      * @throws IOException
      */
     public boolean flush(boolean format) throws IOException {
+        if (CodeWriter.trace) {
+            trace("flush");
+        }
 	boolean success = true;
 	format_calls = 0;
 	if (format) {
@@ -248,7 +272,29 @@ public class CodeWriter
     int width;
     static int format_calls = 0;
     public static final boolean debug = false;
+    public static final boolean trace = false;
     public static final boolean precompute = true;
+
+    // Debugging methods
+
+    /** Amount to indent during tracing. */
+    int trace_indent = 0;
+
+    /** Increment tracing indentation. */
+    void incIndent() { trace_indent++; }
+
+    /** Decrement tracing indentation. */
+    void decIndent() {
+        trace_indent--;
+        if (trace_indent < 0) throw new RuntimeException("unmatched end");
+    }
+
+    /** Print a debug message. */
+    void trace(String s) {
+        for (int i = 0; i < trace_indent; i++) System.out.print(" ");
+        System.out.println(s);
+    }
+
 }
 
 /**
