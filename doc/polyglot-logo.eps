@@ -1,0 +1,172 @@
+%!PS-Adobe-3.0
+%%Creator: Juno-2
+%%Title: Juno.ps
+%%CreationDate: Wed, Jul 27, 13:26:39 EDT, 2005
+%%BoundingBox: (atend)
+%%Pages: (atend)
+%%PageOrder: Ascend
+%%Orientation: Portrait
+%%EndComments
+
+%%BeginPrologue
+% InitializeJunoPage
+%
+% Sets the initial graphics state for a Juno page
+/InitializeJunoPage {
+  0 0 0 setrgbcolor
+  1 setlinewidth
+  0 setlinecap
+  0 setlinejoin
+  10.435 setmiterlimit
+  /Times-Roman FindFontISO 17.744171 scalefont setfont
+  306 396 translate
+} def
+
+% Inserted file: juno-app/src/rsrc/prologue.ps
+% Last modified on Mon Oct  9 14:16:28 PDT 1995 by heydon
+
+% The following procedures are used to lazily redefine fonts to have
+% an ISOLatin1 encoding. This file should be inserted in the Prologue
+% section of the PostScript file that adheres to the DSC.
+
+% Of these procedures, the only one that should be used in the body of
+% a document is "FindFontISO", which looks up the ISOLatin1-encoded
+% version of a font, and lazily creates the ISOLatin1-encoded version
+% if it was not defined in the "FontDirectory".
+
+% ISOLatin1
+%
+% This defines the ISOLatin1 encoding vector, which is defined under
+% the name "ISOLatin1Encoding" in Level-2 PostScript, but is defined
+% here for Level-1 compatibility. See Appendices E.5 and E.7 of the
+% "PostScript Language Reference Manual", Second Edition.
+%
+/ISOLatin1 [
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/space /exclam /quotedbl /numbersign /dollar /percent /ampersand /quoteright
+/parenleft /parenright /asterisk /plus /comma /minus /period /slash
+/zero /one /two /three /four /five /six /seven
+/eight /nine /colon /semicolon /less /equal /greater /question
+/at /A /B /C /D /E /F /G
+/H /I /J /K /L /M /N /O
+/P /Q /R /S /T /U /V /W
+/X /Y /Z /bracketleft /backslash /bracketright /asciicircum /underscore
+/quoteleft /a /b /c /d /e /f /g
+/h /i /j /k /l /m /n /o
+/p /q /r /s /t /u /v /w
+/x /y /z /braceleft /bar /braceright /asciitilde /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/dotlessi /grave /acute /circumflex /tilde /macron /breve /dotaccent
+/dieresis /.notdef /ring /cedilla /.notdef /hungarumlaut /ogonek /caron
+/space /exclamdown /cent /sterling /currency /yen /brokenbar /section
+/dieresis /copyright /ordfeminine /guillemotleft /logicalnot /hyphen
+  /registered /macron
+/degree /plusminus /twosuperior /threesuperior /acute /mu /paragraph
+  /periodcentered
+/cedilla /onesuperior /ordmasculine /guillemotright /onequarter /onehalf
+  /threequarters /questiondown
+/Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla
+/Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis
+/Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply
+/Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls
+/agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla
+/egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis
+/eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide
+/oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis 
+] def
+
+% name AppendISO name
+%
+% The result name is the same as the argument name, but with the
+% string "-ISO" appended.
+%
+/AppendISO {
+  1 dict begin
+    dup /bigstr exch length 4 add string def
+    dup bigstr cvs pop
+    bigstr exch length (-ISO) putinterval
+    bigstr cvn
+  end
+} def
+
+% fontname MakeISOLatin1Font -
+%
+% Looks up the font "fontname", creates a new font identical to it but
+% with the ISOLatin1 encoding, and binds the font to the name "fontname"
+% concatenated with the string "-ISO".
+%
+/MakeISOLatin1Font {
+dup findfont
+dup length dict begin
+  {1 index /FID ne {def} {pop pop} ifelse} forall
+  /Encoding ISOLatin1 def
+  currentdict
+end
+exch AppendISO exch
+definefont pop
+} def
+
+% fontname FindFontISO font
+%
+% Looks up the font with the name "fontname" concatenated with the
+% string "-ISO". If that font is not found, it is created from the
+% font named "fontname" using the "MakeISOLatin1Font" operator above.
+% If "fontname" is "Symbol", then this is equivalent to "findfont",
+% since the Symbol font on X uses the standard encoding.
+%
+/FindFontISO {
+  dup /Symbol ne
+  { dup FontDirectory exch AppendISO known not
+    { dup MakeISOLatin1Font } if
+    AppendISO
+  } if
+  findfont
+} def
+
+% end prologue.ps
+%%EndPrologue
+
+%%BeginSetup
+% define the coordinates of the center of the page
+/xCenter 0 def /yCenter 0 def
+%%EndSetup
+
+%%Page: 1 1
+save
+InitializeJunoPage
+0.03 0.05 0.4 setrgbcolor
+-25.171774 240.79926 moveto
+227.9275 -77.87244 lineto
+-278.27106 -77.87244 lineto
+-25.171774 240.79926 lineto
+fill
+1 1 0.9 setrgbcolor
+-60.4314 196.40465 moveto
+157.40826 -77.87244 lineto
+122.95607 -77.87244 lineto
+-25.171776 108.63203 lineto
+-60.4314 64.23742 lineto
+52.436832 -77.87244 lineto
+17.98462 -77.87244 lineto
+-25.171768 -23.535198 lineto
+-68.32815 -77.87244 lineto
+-102.78036 -77.87244 lineto
+-42.397873 -1.8461928 lineto
+-77.65751 42.548416 lineto
+-173.2996 -77.87244 lineto
+-207.75182 -77.87244 lineto
+-42.397877 130.32103 lineto
+-77.6575 174.71564 lineto
+-60.4314 196.40465 lineto
+fill
+restore
+showpage
+
+%%Trailer
+%%BoundingBox: 0 0 612 792 
+%%Pages: 1
+%%EOF
