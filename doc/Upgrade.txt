@@ -75,19 +75,24 @@ the disambiguation pass is rescheduled to run after the members have
 been added.
 
 There are two types of dependencies between goals: prerequisite and
-concurrent dependencies.  If a goal has a prerequisite dependency, that
+corequisite dependencies.  If a goal has a prerequisite dependency, that
 dependency must be satisfied before the goal is attempted.  The compiler
 will throw an InternalCompilerError if there is a cycle of prerequisite
-dependencies.  If a goal has a concurrent dependency, running a pass for
+dependencies.  If a goal has a corequisite dependency, running a pass for
 the dependency may help the dependent goal be satisfied.  Having a cycle
-of concurrent dependencies may or may not cause the compiler to go into
+of corequisite dependencies may or may not cause the compiler to go into
 an infinite loop.  This situation is detected at run time and the
-compiler aborts.  There is a known bug with this detection: if the
-file being compiled has an error, the compiler may abort first rather
-than report the error and exit.
+compiler aborts.  Infinite loop detection is still buggy.
 
-Concurrent dependencies should be avoided, if possible.  I want to get
-rid of them because of the infinite loop problems.
+If, while a pass is running, a dependency cannot be satisfied, the
+pass should throw a SchedulerException (or more usually a
+MissingDependencyException The scheduler catches the exception and adds
+the goal back onto the worklist and adds the missing dependency, if any,
+to the dependency graph.  Optionally, a pass may catch the exception,
+but it must mark the goal as unreachable on this run (call
+Goal.setUnreachableThisRun) so that it will be added back to the
+worklist; the pass must also add any missing dependencies.
+
 
 Specific changes
 ----------------
@@ -111,44 +116,11 @@ should return true if the TypeObject for the node has been completely
 disambiguated.  It should not recurse on the node's children (a visitor
 does that).
 
-Non-declaration nodes should also implement isTypeChecked().  This
-method should return true if the TypeObject for the node has been
-resolved and completely disambiguated.  Node_c.isTypeChecked() calls
-Node_c.isDisambiguated().
-
 Pass.ID is no longer used.  It has been subsumed by Goal.
 
-ExtensionInfo.passes() has been replaced by ExtensionInfo.compileGoalList().
-To add a new pass, the old code would look like:
-
-      public List passes(Job job) {
-          List passes = super.passes(job);
-          beforePass(passes, Pass.PRE_OUTPUT_ALL,
-                     new VisitorPass(CAST_REWRITE, job,
-                                     new PaoBoxer(job, ts, nf)));
-          return passes;
-      }
-
-new code looks like:
-
-      protected List compileGoalList(Job job) {
-          List oldGoals = super.compileGoalList(job);
-          ArrayList newGoals = new ArrayList(oldGoals.size() + 1);
-
-          for (Iterator i = oldGoals.iterator(); i.hasNext(); ) {
-              Goal g = (Goal) i.next();
-              if (g instanceof Serialized) {
-                  newGoals.add(new VisitorGoal(job,
-                                               new PaoBoxer(job, ts, nf)));
-              }
-              newGoals.add(g);
-          }
-
-          return newGoals;
-      }
-
-Alternatively, you can override the caller of compileGoalList(),
-getCompileGoal().
+ExtensionInfo.passes() has been removed.  Extensions should override
+the scheduler to modify the dependency graph for new and inherited
+goals.  See the PAO and Coffer extensions for examples.
 
 HaltingVisitor is deprecated; return a non-null Node from
 NodeVisitor.override() to prune a visitor traversal.  InnerJob has been
@@ -161,7 +133,7 @@ init methods.  Extend SchedulerClassInitializer to enforce scheduler
 dependencies and DeserializedLazyClassInitializer also.  Override
 TypeSystem_c.defaultClassInitializer() and
 TypeSystem_c.deserializedClassInitializer().  Also override
-ParsedClassType_c.numSignaturesResolved().
+ParsedClassType_c.signaturesResolved().
 
 Lexer_c now takes a Source object, not the name of a source.
 Adjust *.flex and ExtensionInfo accordingly.  It's probably easiest
