@@ -141,36 +141,33 @@ public class Switch_c extends Stmt_c implements Switch
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
 	w.write("switch (");
 	printBlock(expr, w, tr);
-	w.write(") ");
-
-        w.begin(0);
-	w.write("{");
+	w.write(") {");
         w.allowBreak(4, " ");
-
 	w.begin(0);
 
+        boolean lastWasCase = false;
         boolean first = true;
 
 	for (Iterator i = elements.iterator(); i.hasNext();) {
             SwitchElement s = (SwitchElement) i.next();
             if (s instanceof Case) {
-                if (! first)
-                    w.newline(0);
+                if (lastWasCase) w.newline(0);
+                else if (! first) w.allowBreak(0, " ");
+                printBlock(s, w, tr);
+                lastWasCase = true;
             }
             else {
                 w.allowBreak(4," ");
+                print(s, w, tr);
+                lastWasCase = false;
             }
-
-            printBlock(s, w, tr);
 
             first = false;
 	}
 
 	w.end();
-
         w.allowBreak(0, " ");
 	w.write("}");
-	w.end();
     }
 
     public Term entry() {

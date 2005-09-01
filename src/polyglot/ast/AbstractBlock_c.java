@@ -78,8 +78,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 	    printBlock(n, w, tr);
 
 	    if (i.hasNext()) {
-                w.newline(0);
-		// w.allowBreak(0, " ");
+		w.newline(0);
 	    }
 	}
 
