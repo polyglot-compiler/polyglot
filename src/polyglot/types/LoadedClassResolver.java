@@ -14,6 +14,7 @@ import polyglot.types.reflect.ClassFileLoader;
 import polyglot.types.reflect.ClassPathLoader;
 import polyglot.util.CollectionUtil;
 import polyglot.util.TypeEncoder;
+import polyglot.util.InternalCompilerError;
 
 /**
  * Loads class information from class files, or serialized class infomation
@@ -157,6 +158,10 @@ public class LoadedClassResolver extends ClassResolver implements TopLevelResolv
     
     try {
         dt = (ClassType) te.decode(clazz.encodedClassType(version.name()));
+    }
+    catch (InternalCompilerError e) {
+	System.err.println("Failed decoding " + clazz.name());
+	throw e;
     }
     catch (InvalidClassException e) {
         throw new BadSerializationException(clazz.name());

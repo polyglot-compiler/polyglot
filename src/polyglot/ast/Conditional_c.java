@@ -134,10 +134,10 @@ public class Conditional_c extends Expr_c implements Conditional
                 return type(t2);
             }
             
-            // - Otherwise, binary numeric promotion (§5.6.2) is applied to the
+            // - Otherwise, binary numeric promotion (Sec. 5.6.2) is applied to the
             // operand types, and the type of the conditional expression is the
             // promoted type of the second and third operands. Note that binary
-            // numeric promotion performs value set conversion (§5.1.8).
+            // numeric promotion performs value set conversion (Sec. 5.1.8).
             return type(ts.promote(t1, t2));
         }
         
@@ -149,7 +149,7 @@ public class Conditional_c extends Expr_c implements Conditional
         
         // If the second and third operands are of different reference types,
         // then it must be possible to convert one of the types to the other
-        // type (call this latter type T) by assignment conversion (§5.2); the
+        // type (call this latter type T) by assignment conversion (Sec. 5.2); the
         // type of the conditional expression is T. It is a compile-time error
         // if neither type is assignment compatible with the other type.
         
