@@ -273,8 +273,8 @@ public class CodeWriter
     PrintWriter output;
     int width;
     static int format_calls = 0;
-    public static final boolean debug = true;
-    public static final boolean trace = true;
+    public static final boolean debug = false;
+    public static final boolean trace = false;
     public static final boolean precompute = true;
 
     // Debugging methods
