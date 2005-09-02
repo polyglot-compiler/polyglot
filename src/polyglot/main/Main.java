@@ -97,7 +97,7 @@ public class Main
 
       long time0 = System.currentTimeMillis();
 
-      if (!compiler.compile(source)) {
+      if (!compiler.compileFiles(source)) {
           throw new TerminationException(1);
       }
 

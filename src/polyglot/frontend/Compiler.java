@@ -73,23 +73,80 @@ public class Compiler
      * used to obtain the output of the compilation.  This is the main entry
      * point for the compiler, called from main().
      */
-    public boolean compile(Collection sources) {
-	boolean okay = false;
-    
-	try {
-	    try {
-                SourceLoader source_loader = sourceExtension().sourceLoader();
-                Scheduler scheduler = sourceExtension().scheduler();
-                List jobs = new ArrayList();
+    public boolean compileFiles(Collection filenames) {
+        List sources = new ArrayList(filenames.size());
 
-                // First, create a goal to compile every source file.
-                for (Iterator i = sources.iterator(); i.hasNext(); ) {
+        // Construct a list of sources from the list of file names.
+        try {
+            try {
+                SourceLoader source_loader = sourceExtension().sourceLoader();
+
+                for (Iterator i = filenames.iterator(); i.hasNext(); ) {
                     String sourceName = (String) i.next();
                     FileSource source = source_loader.fileSource(sourceName);
                     
                     // mark this source as being explicitly specified
                     // by the user.
                     source.setUserSpecified(true);
+
+                    sources.add(source);
+                }
+            }
+            catch (FileNotFoundException e) {
+                eq.enqueue(ErrorInfo.IO_ERROR,
+                    "Cannot find source file \"" + e.getMessage() + "\".");
+                eq.flush();
+                return false;
+	    }
+	    catch (IOException e) {
+		eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage());
+                eq.flush();
+                return false;
+	    }
+	    catch (InternalCompilerError e) {
+                // Report it like other errors, but rethrow to get the stack
+                // trace.
+		try {
+                    eq.enqueue(ErrorInfo.INTERNAL_ERROR, e.message(),
+                               e.position());
+		}
+		catch (ErrorLimitError e2) {
+		}
+
+		eq.flush();
+		throw e;
+	    }
+	    catch (RuntimeException e) {
+		// Flush the error queue, then rethrow to get the stack trace.
+		eq.flush();
+		throw e;
+	    }
+        }
+	catch (ErrorLimitError e) {
+            eq.flush();
+            return false;
+	}
+
+        return compile(sources);
+    }
+
+    /**
+     * Compile all the files listed in the set of Sources <code>source</code>.
+     * Return true on success. The method <code>outputFiles</code> can be
+     * used to obtain the output of the compilation.  This is the main entry
+     * point for the compiler, called from main().
+     */
+    public boolean compile(Collection sources) {
+	boolean okay = false;
+    
+	try {
+	    try {
+                Scheduler scheduler = sourceExtension().scheduler();
+                List jobs = new ArrayList();
+
+                // First, create a goal to compile every source file.
+                for (Iterator i = sources.iterator(); i.hasNext(); ) {
+                    Source source = (Source) i.next();
                     
                     // Add a new SourceJob for the given source. If a Job for the source
                     // already exists, then we will be given the existing job.
@@ -99,18 +156,11 @@ public class Compiler
                     // Now, add a goal for completing the job.
                     scheduler.addGoal(sourceExtension().getCompileGoal(job));
                 }
-                
+
                 scheduler.setCommandLineJobs(jobs);
                 
                 // Then, compile the files to completion.
                 okay = scheduler.runToCompletion();
-	    }
-	    catch (FileNotFoundException e) {
-		eq.enqueue(ErrorInfo.IO_ERROR,
-		    "Cannot find source file \"" + e.getMessage() + "\".");
-	    }
-	    catch (IOException e) {
-		eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage());
 	    }
 	    catch (InternalCompilerError e) {
 		// Report it like other errors, but rethrow to get the stack trace.
