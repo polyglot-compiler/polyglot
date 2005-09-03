@@ -55,10 +55,7 @@ public class StringLit_c extends Lit_c implements StringLit
             w.write("(");
         }
 
-        for (Iterator i = l.iterator(); i.hasNext(); ) {
-            String s = (String) i.next();
-            w.begin(0);
-        }
+        w.begin(0);
 
         for (Iterator i = l.iterator(); i.hasNext(); ) {
             String s = (String) i.next();
@@ -66,13 +63,14 @@ public class StringLit_c extends Lit_c implements StringLit
             w.write("\"");
             w.write(StringUtil.escape(s));
             w.write("\"");
-            w.end();
 
             if (i.hasNext()) {
                 w.write(" +");
                 w.allowBreak(0, " ");
             }
         }
+
+        w.end();
 
         if (l.size() > 1) {
             w.write(")");
