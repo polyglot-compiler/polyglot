@@ -16,7 +16,7 @@ public class StdErrorQueue extends AbstractErrorQueue
     }
 
     public void displayError(ErrorInfo e) {
-	String message = e.getErrorKind() != ErrorInfo.WARNING
+	String message = e.getErrorKind() != ErrorInfo.DEBUG
 		       ? e.getMessage()
 		       : e.getErrorString() + " -- " + e.getMessage();
 

@@ -8,6 +8,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
+import polyglot.util.SimpleErrorQueue;
 
 /** Class used for reporting debug messages. */
 public class Report {
@@ -25,6 +28,8 @@ public class Report {
    */
   protected final static Map reportTopics = new HashMap(); // Map[String, Integer]
   
+  /** Error queue to which to write messages. */
+  static ErrorQueue eq;
 
   /**
    * Indicates if there is no reporting at all.
@@ -123,6 +128,19 @@ public class Report {
       noReporting = false;
   }
 
+  /** Get the error queue, possibly creating it if not set. */
+  public static ErrorQueue getQueue() {
+      if (eq == null) {
+          eq = new SimpleErrorQueue();
+      }
+      return eq;
+  }
+
+  /** Set the error queue. */
+  public static void setQueue(ErrorQueue eq) {
+      Report.eq = eq;
+  }
+
   protected static int level(String name) {
       Object i = reportTopics.get(name);
       if (i == null) return 0;
@@ -137,7 +155,11 @@ public class Report {
    *  NOTE: This is a change of spec from earlier versions of Report.
    */
   public static void report(int level, String message) {
-    for (int j = 1; j < level; j++) System.err.print("  ");
-    System.err.println(message);
+    StringBuffer buf = new StringBuffer(message.length() + level);
+    for (int j = 1; j < level; j++) {
+        buf.append(" ");
+    }
+    buf.append(message);
+    getQueue().enqueue(ErrorInfo.DEBUG, buf.toString());
   }
 }
