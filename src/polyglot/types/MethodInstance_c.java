@@ -247,8 +247,8 @@ public class MethodInstance_c extends ProcedureInstance_c
             throw new SemanticException(mi.signature() + " in " + mi.container() +
                                         " cannot override " + 
                                         mj.signature() + " in " + mj.container() + 
-                                        "; the throw set is not a subset of the " +
-                                        "overridden method's throw set", 
+                                        "; the throw set " + mi.throwTypes() + " is not a subset of the " +
+                                        "overridden method's throw set " + mj.throwTypes() + ".", 
                                         mi.position());
         }   
 
