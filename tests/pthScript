@@ -32,7 +32,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         ClassLit.jl ;
         Conditional1.jl ;
 	ConformanceCheck1.jl (Semantic, "cannot override.*attempting to assign weaker access");
-	ConformanceCheck2.jl (Semantic, "cannot override.*throw set is not a subset");
+	ConformanceCheck2.jl (Semantic, "cannot override.*throw set.*is not a subset");
         ConformanceCheck3.jl ;        
         ConformanceCheck4.jl ConformanceCheck4a.jl (Semantic, "should be declared abstract");
         ConformanceCheck5.jl ;        
