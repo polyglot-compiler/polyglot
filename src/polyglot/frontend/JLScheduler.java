@@ -127,6 +127,13 @@ public class JLScheduler extends Scheduler {
                 l.add(Disambiguated(job));
                 return l;
             }
+
+            public Collection corequisiteGoals(Scheduler scheduler) {
+                List l = new ArrayList();
+                l.addAll(super.corequisiteGoals(scheduler));
+                l.add(ConstantsChecked(job));
+                return l;
+            }
         });
         return g;
     }
@@ -138,6 +145,13 @@ public class JLScheduler extends Scheduler {
             public Collection prerequisiteGoals(Scheduler scheduler) {
                 List l = new ArrayList();
                 l.addAll(super.prerequisiteGoals(scheduler));
+                l.add(Disambiguated(job));
+                return l;
+            }
+
+            public Collection corequisiteGoals(Scheduler scheduler) {
+                List l = new ArrayList();
+                l.addAll(super.corequisiteGoals(scheduler));
                 l.add(TypeChecked(job));
                 return l;
             }
