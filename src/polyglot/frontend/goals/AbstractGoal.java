@@ -8,7 +8,7 @@ package polyglot.frontend.goals;
 
 import java.util.*;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import polyglot.frontend.*;
 import polyglot.util.InternalCompilerError;
@@ -76,7 +76,7 @@ public abstract class AbstractGoal implements Goal {
         // This takes a hell of a long time.  Disable the check for now.
         // checkCycles(g, scheduler);
         if (prerequisites == Collections.EMPTY_SET) {
-            prerequisites = new HashSet();
+            prerequisites = new LinkedHashSet();
         }
         prerequisites.add(g);
     }
@@ -94,7 +94,7 @@ public abstract class AbstractGoal implements Goal {
     
     public void addCorequisiteGoal(Goal g, Scheduler scheduler) {
         if (corequisites == Collections.EMPTY_SET) {
-            corequisites = new HashSet();
+            corequisites = new LinkedHashSet();
         }
         corequisites.add(g);
     }
