@@ -42,6 +42,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         packA/ProtectedAccess1.jl packB/ProtectedAccess2.jl (Semantic, "Method.*inaccessible");
         package1/ProtectedTest.jl package2/ProtectedTestBase.jl (Semantic, "Method.*inaccessible");
         package1/InnerClassAccess.jl package1/InnerClassProblem.jl ;
+        ConstantInit.jl ;
         Constants.jl ;  Constants2.jl ; Constants3.jl ; Constants4.jl ;
         Constants5.jl ; Constants6.jl ; Constants7.jl ; Constants8.jl;
         Constants9.jl ;
