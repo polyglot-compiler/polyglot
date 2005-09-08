@@ -82,11 +82,10 @@ public class TypeChecker extends DisambiguationDriver
         
         n.visitChildren(new NodeVisitor() {
             public Node override(Node n) {    
-                if (n instanceof Ambiguous) {
-                    amb[0] = true;
-                }
                 if (n instanceof Expr &&
                     (((Expr) n).type() == null || ! ((Expr) n).type().isCanonical())) {
+//                    System.out.println("  !!!!! no type at " + n + " (" + n.getClass().getName() + ")");
+//                    System.out.println("   !!!! n.type = " + ((Expr) n).type());
                     amb[0] = true;
                 }
                 return n;
@@ -104,10 +103,10 @@ public class TypeChecker extends DisambiguationDriver
             }
         }
         else {
-                // System.out.println("  no type at " + m);
+//                 System.out.println("  no type at " + m);
             for (Iterator i = context.goalStack().iterator(); i.hasNext(); ) {
                 Goal g = (Goal) i.next();
-                // System.out.println("  " + g + " unreachable");
+//                 System.out.println("  " + g + " unreachable");
                 g.setUnreachableThisRun();
             }
         }
