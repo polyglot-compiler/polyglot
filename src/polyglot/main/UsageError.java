@@ -8,4 +8,5 @@ public class UsageError extends Exception {
             super(s); 
             this.exitCode = exitCode; 
     }
+    public int exitCode() { return exitCode; }
 }
