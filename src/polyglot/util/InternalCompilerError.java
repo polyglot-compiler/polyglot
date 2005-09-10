@@ -30,6 +30,10 @@ public class InternalCompilerError extends RuntimeException
         pos = position;
     }
 
+    public void setPosition(Position pos) {
+	this.pos = pos;
+    }
+
     public Position position() {
 	return pos;
     }

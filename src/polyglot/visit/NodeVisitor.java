@@ -203,13 +203,20 @@ public abstract class NodeVisitor implements Copy
      *       subtree rooted at <code>child</code> has been recursively visited.
      */
     public Node visitEdge(Node parent, Node child) {
-	Node n = override(parent, child);
+        try {
+            Node n = override(parent, child);
 
-	if (n == null) {
-	    return visitEdgeNoOverride(parent, child);
-	}
-
-	return n;
+            if (n == null) {
+                return visitEdgeNoOverride(parent, child);
+            }
+            
+            return n;
+        }
+        catch (InternalCompilerError e) {
+            if (e.position() == null && child != null)
+                e.setPosition(child.position());
+            throw e;
+        }
     }
 
     /**
@@ -240,11 +247,14 @@ public abstract class NodeVisitor implements Copy
             throw new InternalCompilerError("Node.visitChildren() returned null.");
         }
         
-        n = this.leave(parent, child, n, v_);
-        
-//        if (n == null) {
-//            throw new InternalCompilerError("NodeVisitor.leave() returned null.");
-//        }
+        try {
+            n = this.leave(parent, child, n, v_);
+        }
+        catch (InternalCompilerError e) {
+            if (e.position() == null && n != null)
+                e.setPosition(n.position());
+            throw e;
+        }
         
         return n;
     }
