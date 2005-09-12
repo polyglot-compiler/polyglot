@@ -299,17 +299,18 @@ public class New_c extends Expr_c implements New
         
         // The type for qualifier should already have been computed.
         if (qualifier != null) {
-            // Get the qualifier type first.
-            Type qt = qualifier.type();
-
-            if (! qt.isCanonical()) {
+            if (! qualifier.isDisambiguated()) {
                 Scheduler scheduler = tc.job().extensionInfo().scheduler();
                 Goal g = scheduler.TypeChecked(tc.job());
                 throw new MissingDependencyException(g);
             }
-            
+
+            // Get the qualifier type first.
+            Type qt = qualifier.type();
+
             if (! qt.isClass()) {
-                return this;
+                throw new SemanticException("Cannot instantiate non-class " +
+                                            qt + ".");
             }
             
             // Disambiguate the type node as a member of the qualifier type.
@@ -342,7 +343,7 @@ public class New_c extends Expr_c implements New
         }
         else {
             throw new SemanticException(
-                "Cannot instantiate an member class.",
+                "Cannot instantiate a member class.",
                 tn.position());
         }
 
@@ -361,13 +362,13 @@ public class New_c extends Expr_c implements New
         
         for (Iterator i = this.arguments.iterator(); i.hasNext(); ) {
             Expr e = (Expr) i.next();
-            if (! e.type().isCanonical()) {
+            if (! e.isDisambiguated()) {
                 return this;
             }
             argTypes.add(e.type());
         }
         
-        if (! tn.type().isCanonical() || ! tn.type().isClass()) {
+        if (! tn.isDisambiguated() || ! tn.type().isClass()) {
             return this;
         }
         
