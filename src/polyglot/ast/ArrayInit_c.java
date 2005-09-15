@@ -149,7 +149,8 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 	    print(e, w, tr);
 
 	    if (i.hasNext()) {
-		w.write(", ");
+		w.write(",");
+                w.allowBreak(0, " ");
 	    }
 	}
 
