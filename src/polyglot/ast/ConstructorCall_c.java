@@ -146,6 +146,10 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
         //     ChildOfInner() { (new Outer()).super(); }
         // }
         if (qualifier != null) {
+            if (! qualifier.isDisambiguated()) {
+                return this;
+            }
+          
             if (kind != SUPER) {
                 throw new SemanticException("Can only qualify a \"super\"" +
                                             "constructor invocation.",
@@ -209,9 +213,9 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	
 	for (Iterator iter = this.arguments.iterator(); iter.hasNext();) {
 	    Expr e = (Expr) iter.next();
-            if (! e.type().isCanonical()) {
-                return this;
-            }
+	    if (! e.isDisambiguated()) {
+	        return this;
+	    }
 	    argTypes.add(e.type());
 	}
 	
