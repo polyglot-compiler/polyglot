@@ -28,18 +28,7 @@ public class NodeScrambler extends NodeVisitor
 
   public NodeScrambler()
   {
-    this.fp = new FirstPass();
-
-    this.pairs = new HashMap();
-    this.nodes = new LinkedList();
-    this.currentParents = new LinkedList();
-    this.cw = new CodeWriter( System.err, 72);
-
-    Random ran = new Random();
-    seed = ran.nextLong();
-    
-    System.err.println( "Using seed: " + seed);
-    this.ran = new Random( seed);
+    this(new Random().nextLong());
   }
 
   /**
@@ -100,13 +89,9 @@ public class NodeScrambler extends NodeVisitor
 
         try {
           System.err.println( "Replacing:");
-          n.dump( cw);
-          cw.newline();
-          cw.flush();
+          n.del().dump(System.err);
           System.err.println( "With:");
-          m.dump( cw);
-          cw.newline();
-          cw.flush();
+          m.del().dump(System.err);
         }
         catch( Exception e)
         {

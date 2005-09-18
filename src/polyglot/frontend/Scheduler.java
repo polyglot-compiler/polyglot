@@ -716,8 +716,7 @@ public abstract class Scheduler {
                 System.err.println("Pretty-printing AST for " + job +
                                    " after " + pass.name());
 
-                PrettyPrinter pp = new PrettyPrinter();
-                pp.printAst(job.ast(), new CodeWriter(System.err, 78));
+                job.ast().prettyPrint(System.err);
             }
 
             // dump this pass if we need to.
@@ -727,11 +726,7 @@ public abstract class Scheduler {
                 System.err.println("Dumping AST for " + job +
                                    " after " + pass.name());
                 
-                NodeVisitor dumper =
-                  new DumpAst(new CodeWriter(System.err, 78));
-                dumper = dumper.begin();
-                job.ast().visit(dumper);
-                dumper.finish();
+                job.ast().dump(System.err);
             }
 
             // This seems to work around a VM bug on linux with JDK

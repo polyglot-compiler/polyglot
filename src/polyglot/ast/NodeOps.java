@@ -1,5 +1,7 @@
 package polyglot.ast;
 
+import java.io.OutputStream;
+import java.io.Writer;
 import java.util.List;
 
 import polyglot.util.CodeWriter;
@@ -182,6 +184,18 @@ public interface NodeOps
      */
     List throwTypes(TypeSystem ts);
 
+    /** Dump the AST for debugging. */
+    public void dump(OutputStream os);
+    
+    /** Dump the AST for debugging. */
+    public void dump(Writer w);
+    
+    /** Pretty-print the AST for debugging. */
+    public void prettyPrint(OutputStream os);
+    
+    /** Pretty-print the AST for debugging. */
+    public void prettyPrint(Writer w);
+ 
     /**
      * Pretty-print the AST using the given code writer.
      *

@@ -113,15 +113,8 @@ public class LocalClassRemover extends ContextVisitor
         body.visit(v);
         v.finish();
         
-        System.out.println("env of ");
-        try {
-            CodeWriter cw = new CodeWriter(System.out, 72);
-            cw.begin(4);
-            body.del().prettyPrint(cw, new PrettyPrinter());
-            cw.end();
-            cw.flush();
-        }
-        catch (java.io.IOException e) { }
+        System.out.println("env of:");
+        body.del().prettyPrint(System.out);
         System.out.println(" = " + v.env());
 
         return v.env();
@@ -638,12 +631,7 @@ public class LocalClassRemover extends ContextVisitor
 
         System.out.println("----------------------------------");
         System.out.println("new class body:");
-        try {
-            CodeWriter cw = new CodeWriter(System.out, 72);
-            body.del().prettyPrint(cw, new PrettyPrinter());
-            cw.flush();
-        }
-        catch (java.io.IOException e) { }
+        body.del().prettyPrint(System.out);
         System.out.println("----------------------------------");
 
         ClassDecl cd = createMemberClass(ct, body);
