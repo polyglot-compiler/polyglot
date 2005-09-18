@@ -40,7 +40,7 @@ import java.math.BigInteger;
     public Lexer_c(String s, Position pos, List subst) {
         this(new EscapedUnicodeReader(new StringReader(s)));
         if (pos != null) {
-            this.file = pos.file() + ": quasiquote(" + s + "," + subst + ")";
+            this.file = pos.toString() + ": quasiquote(" + s + "," + subst + ")";
             this.path = pos.path();
         }
         else {
