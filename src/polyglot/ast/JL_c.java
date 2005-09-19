@@ -2,6 +2,8 @@ package polyglot.ext.jl.ast;
 
 import java.util.Collections;
 import java.util.List;
+import java.io.OutputStream;
+import java.io.Writer;
 
 import polyglot.ast.*;
 import polyglot.types.*;
@@ -220,6 +222,26 @@ public class JL_c extends Ext_c implements JL {
      */
     public List throwTypes(TypeSystem ts) {
 	   return jl().throwTypes(ts);
+    }
+
+    /** Dump the AST for debugging. */
+    public void dump(OutputStream os) {
+            jl().dump(os);
+    }
+    
+    /** Dump the AST for debugging. */
+    public void dump(Writer w) {
+            jl().dump(w);
+    }
+    
+    /** Pretty-print the AST for debugging. */
+    public void prettyPrint(OutputStream os) {
+            jl().prettyPrint(os);
+    }
+    
+    /** Pretty-print the AST for debugging. */
+    public void prettyPrint(Writer w) {
+            jl().prettyPrint(w);
     }
 
     /**
