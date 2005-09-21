@@ -21,7 +21,7 @@ import java.util.*;
  *
  * This is a poor substitute for PolyJ.
  **/
-public class TypedList implements List, java.io.Serializable 
+public class TypedList implements List, java.io.Serializable, Cloneable
 {
   static final long serialVersionUID = -1390984392613203018L;
 
@@ -95,6 +95,7 @@ public class TypedList implements List, java.io.Serializable
   public TypedList copy() {
       return (TypedList) clone();
   }
+
   public Object clone() {
       try {
           TypedList l = (TypedList) super.clone();
