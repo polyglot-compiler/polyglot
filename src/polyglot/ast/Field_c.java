@@ -187,6 +187,13 @@ public class Field_c extends Expr_c implements Field
   public void dump(CodeWriter w) {
     super.dump(w);
 
+    if (fi != null) {                       
+        w.allowBreak(4, " ");
+        w.begin(0);
+        w.write("(instance " + fi + ")");   
+        w.end();                            
+    }                                       
+
     w.allowBreak(4, " ");
     w.begin(0);
     w.write("(name \"" + name + "\")");
