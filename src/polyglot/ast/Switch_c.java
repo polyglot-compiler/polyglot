@@ -87,40 +87,41 @@ public class Switch_c extends Stmt_c implements Switch
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
         Collection labels = new HashSet();
 
-	for (Iterator i = elements.iterator(); i.hasNext();) {
-	   SwitchElement s = (SwitchElement) i.next();
-
-	   if (s instanceof Case) {
-	       Case c = (Case) s;
-	       Object key;
-	       String str;
-
-	       if (c.isDefault()) {
-		   key = "default";
-		   str = "default";
-	       }
-	       else if (! c.expr().constantValueSet()) {
-	           // Constant not known yet; we'll try again later.
-	           return this;
-	       }
-               else if (c.expr().isConstant()) {
-		   key = new Long(c.value());
-		   str = c.expr().toString() + " (" + c.value() + ")";
-	       }
-               else {
+        // Check for duplicate labels.
+        for (Iterator i = elements.iterator(); i.hasNext();) {
+            SwitchElement s = (SwitchElement) i.next();
+            
+            if (s instanceof Case) {
+                Case c = (Case) s;
+                Object key;
+                String str;
+                
+                if (c.isDefault()) {
+                    key = "default";
+                    str = "default";
+                }
+                else if (! c.expr().constantValueSet()) {
+                    // Constant not known yet; we'll try again later.
+                    return this;
+                }
+                else if (c.expr().isConstant()) {
+                    key = new Long(c.value());
+                    str = c.expr().toString() + " (" + c.value() + ")";
+                }
+                else {
                     continue;
-               }
-
-	       if (labels.contains(key)) {
-		   throw new SemanticException("Duplicate case label: " +
-		       str + ".", c.position());
-	       }
-
-	       labels.add(key);
-	   }
-	}
-
-	return this;
+                }
+                
+                if (labels.contains(key)) {
+                    throw new SemanticException("Duplicate case label: " +
+                                                str + ".", c.position());
+                }
+                
+                labels.add(key);
+            }
+        }
+        
+        return this;
     }
 
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
