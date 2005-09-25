@@ -319,7 +319,7 @@ public class Context_c implements Context
      */
     public Named find(String name) throws SemanticException {
         if (Report.should_report(TOPICS, 3))
-          Report.report(3, "find-type " + name + " in " + this);
+            Report.report(3, "find-type " + name + " in " + this);
 
         if (isOuter()) return outerResolver().find(name);
         if (isSource()) return it.find(name);
