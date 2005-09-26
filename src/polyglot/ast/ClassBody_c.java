@@ -162,12 +162,17 @@ public class ClassBody_c extends Term_c implements ClassBody
         if (!members.isEmpty()) {
             w.newline(4);
             w.begin(0);
+	    ClassMember prev = null;
 
             for (Iterator i = members.iterator(); i.hasNext(); ) {
                 ClassMember member = (ClassMember) i.next();
+		if ((member instanceof polyglot.ast.CodeDecl) ||
+		    (prev instanceof polyglot.ast.CodeDecl)) {
+			w.newline(0);
+		}
+		prev = member;
                 printBlock(member, w, tr);
                 if (i.hasNext()) {
-                    w.newline(0);
                     w.newline(0);
                 }
             }

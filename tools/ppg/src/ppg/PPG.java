@@ -128,7 +128,7 @@ public class PPG
             }
 
 	    CUPSpec combined = spec.coalesce ();
-	    CodeWriter cw = new CodeWriter (out, 72);
+	    CodeWriter cw = new CodeWriter (out, 80);
 	    combined.unparse (cw);
 	    cw.flush ();
 	}

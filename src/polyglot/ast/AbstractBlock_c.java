@@ -3,6 +3,7 @@ package polyglot.ext.jl.ast;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
+import polyglot.util.CodeWriter;
 import polyglot.visit.*;
 
 import java.util.*;

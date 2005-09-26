@@ -21,7 +21,7 @@ import polyglot.types.ClassType;
 import polyglot.types.Context;
 import polyglot.types.Package;
 import polyglot.types.TypeSystem;
-import polyglot.util.CodeWriter;
+import polyglot.util.*;
 import polyglot.util.Copy;
 import polyglot.util.ErrorInfo;
 import polyglot.util.InternalCompilerError;
@@ -176,7 +176,7 @@ public class Translator extends PrettyPrinter implements Copy
         }
     }
 
-    /** Transate a single SourceFile node */
+    /** Translate a single SourceFile node */
     protected boolean translateSource(SourceFile sfn) {
         TypeSystem ts = typeSystem();
         NodeFactory nf = nodeFactory();
@@ -193,7 +193,6 @@ public class Translator extends PrettyPrinter implements Copy
 
         try {
             File of;
-            Writer ofw;
             CodeWriter w;
 
             String pkg = "";
@@ -218,8 +217,7 @@ public class Translator extends PrettyPrinter implements Copy
 
             String opfPath = of.getPath();
             if (!opfPath.endsWith("$")) outputFiles.add(of.getPath());
-            ofw = tf.outputWriter(of);
-            w = new CodeWriter(new PrintWriter(ofw), outputWidth);
+            w = tf.outputCodeWriter(of);
 
             writeHeader(sfn, w);
 
@@ -230,12 +228,11 @@ public class Translator extends PrettyPrinter implements Copy
                     // We hit a new exported declaration, open a new file.
                     // But, first close the old file.
                     w.flush();
-                    ofw.close();
+		    w.close();
 
                     of = tf.outputFile(pkg, decl.name(), sfn.source());
                     outputFiles.add(of.getPath());
-                    ofw = tf.outputWriter(of);
-                    w = new CodeWriter(new PrintWriter(ofw), outputWidth);
+                    w = tf.outputCodeWriter(of);
 
                     writeHeader(sfn, w);
                 }
@@ -248,7 +245,6 @@ public class Translator extends PrettyPrinter implements Copy
             }
 
             w.flush();
-            ofw.close();
             return true;
         }
         catch (IOException e) {

@@ -2,6 +2,7 @@
 package polyglot.util.typedump;
 
 import polyglot.util.*;
+import polyglot.util.*;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.frontend.ExtensionInfo;
@@ -55,7 +56,7 @@ public class Main {
 	    TypeSystem ts = extInfo.typeSystem();
 	    TypeDumper t = TypeDumper.load(className, ts);
 
-	    CodeWriter cw = new CodeWriter(System.out, 72);
+	    CodeWriter cw = new SimpleCodeWriter(System.out, 72);
 	    
 	    t.dump(cw);
 	    cw.newline(0);

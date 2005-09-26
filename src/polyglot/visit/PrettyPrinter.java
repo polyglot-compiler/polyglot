@@ -3,13 +3,14 @@ package polyglot.visit;
 import polyglot.ast.*;
 import polyglot.frontend.*;
 import polyglot.util.*;
+import polyglot.util.CodeWriter;
 
 import java.io.*;
 import java.util.*;
 
 /**
  * A PrettyPrinter generates output code from the processed AST.
- * Output is sent to a code writer passes into the printAst method.
+ * Output is sent to a code writer passed into the printAst method.
  *
  * To use:
  *     new PrettyPrinter().printAst(node, new CodeWriter(out));

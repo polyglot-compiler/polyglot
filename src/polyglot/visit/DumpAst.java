@@ -2,6 +2,7 @@ package polyglot.visit;
 
 import polyglot.ast.Node;
 import polyglot.util.CodeWriter;
+import polyglot.util.SimpleCodeWriter;
 import polyglot.types.SemanticException;
 
 import java.io.IOException;
@@ -9,15 +10,17 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.io.PrintWriter;
 
+
 /** Visitor which dumps the AST to a file. */
 public class DumpAst extends NodeVisitor
 {
     protected PrintWriter fw;
     protected CodeWriter w;
 
+    /** @deprecated Use the other constructor. */
     public DumpAst(String name, int width) throws IOException {
         this.fw = new PrintWriter(new FileWriter(name));
-	this.w = new CodeWriter(fw, width);
+	this.w = new SimpleCodeWriter(fw, width);
     }
 
     public DumpAst(CodeWriter w) {

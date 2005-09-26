@@ -1,6 +1,7 @@
 package polyglot.ext.jl;
 
 import java.io.Reader;
+import java.io.OutputStream;
 import java.util.*;
 
 import polyglot.ast.NodeFactory;
@@ -11,8 +12,7 @@ import polyglot.ext.jl.types.TypeSystem_c;
 import polyglot.frontend.*;
 import polyglot.frontend.goals.*;
 import polyglot.types.*;
-import polyglot.util.ErrorQueue;
-import polyglot.util.InternalCompilerError;
+import polyglot.util.*;
 import polyglot.visit.*;
 import polyglot.visit.LocalClassRemover;
 import polyglot.visit.InnerClassRewriter;
@@ -104,6 +104,8 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
     public Goal getCompileGoal(Job job) {
         return scheduler.CodeGenerated(job);
     }
-    
+
     static { Topics t = new Topics(); }
+
+
 }

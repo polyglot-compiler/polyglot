@@ -152,7 +152,7 @@ public class Switch_c extends Stmt_c implements Switch
 	for (Iterator i = elements.iterator(); i.hasNext();) {
             SwitchElement s = (SwitchElement) i.next();
             if (s instanceof Case) {
-                if (lastWasCase) w.newline(0);
+                if (lastWasCase) w.allowBreak(0, " ");
                 else if (! first) w.allowBreak(0, " ");
                 printBlock(s, w, tr);
                 lastWasCase = true;

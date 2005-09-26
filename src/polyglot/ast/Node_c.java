@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+import polyglot.util.SimpleCodeWriter;
 
 import java.io.OutputStream;
 import java.io.Writer;
@@ -335,7 +336,7 @@ public abstract class Node_c implements Node
     
     /** Dump the AST for debugging. */
     public void dump(OutputStream os) {
-        NodeVisitor dumper = new DumpAst(new CodeWriter(os, 72));
+        NodeVisitor dumper = new DumpAst(new SimpleCodeWriter(os, 72));
         dumper = dumper.begin();
         this.visit(dumper);
         dumper.finish();
@@ -343,7 +344,7 @@ public abstract class Node_c implements Node
     
     /** Dump the AST for debugging. */
     public void dump(Writer w) {
-        NodeVisitor dumper = new DumpAst(new CodeWriter(w, 72));
+        NodeVisitor dumper = new DumpAst(new SimpleCodeWriter(w, 72));
         dumper = dumper.begin();
         this.visit(dumper);
         dumper.finish();
@@ -352,7 +353,7 @@ public abstract class Node_c implements Node
     /** Pretty-print the AST for debugging. */
     public void prettyPrint(OutputStream os) {
         try {
-            CodeWriter cw = new CodeWriter(os, 72);
+            CodeWriter cw = new SimpleCodeWriter(os, 80);
             this.del().prettyPrint(cw, new PrettyPrinter());
             cw.flush();
         }
@@ -362,7 +363,7 @@ public abstract class Node_c implements Node
     /** Pretty-print the AST for debugging. */
     public void prettyPrint(Writer w) {
         try {
-            CodeWriter cw = new CodeWriter(w, 72);
+            CodeWriter cw = new SimpleCodeWriter(w, 80);
             this.del().prettyPrint(cw, new PrettyPrinter());
             cw.flush();
         }
@@ -382,8 +383,7 @@ public abstract class Node_c implements Node
         if (stmt instanceof Block) {
             w.write(" ");
             print(stmt, w, pp);
-        }
-        else {
+        } else {
             w.allowBreak(4, " ");
             printBlock(stmt, w, pp);
         }

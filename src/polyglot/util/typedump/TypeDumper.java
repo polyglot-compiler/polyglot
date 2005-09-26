@@ -2,6 +2,7 @@
 package polyglot.util.typedump;
 
 import polyglot.util.*;
+import polyglot.util.CodeWriter;
 import polyglot.types.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
