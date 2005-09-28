@@ -59,6 +59,6 @@ public class SupertypeDisambiguator extends Disambiguator
             return n;
         }
         
-        return null;
+        return super.override(parent, n);
     }
 }

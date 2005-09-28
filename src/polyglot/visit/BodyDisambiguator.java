@@ -14,14 +14,11 @@ public class BodyDisambiguator extends Disambiguator
     }
 
     public Node override(Node parent, Node n) {
-        if (n instanceof New) {
-            return n;
-        }
         Context c = this.context();
         if (n instanceof ClassDecl && ! ((ClassDecl) n).type().isMember()) {
             // Will be invoked by ComputeTypesVisitor.override.
             return n;
         }
-        return null;
+        return super.override(parent, n);
     }
 }

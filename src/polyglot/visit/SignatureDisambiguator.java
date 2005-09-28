@@ -16,6 +16,6 @@ public class SignatureDisambiguator extends Disambiguator
         if (n instanceof Stmt || n instanceof Expr) {
             return n;
         }
-        return null;
+        return super.override(parent, n);
     }
 }
