@@ -54,6 +54,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         Empty.jl ;
         Equality.jl ;
         Equality2.jl ;
+        ExcTest.jl ;
         Except.jl ; Except2.jl ; Except3.jl ; Except4.jl ;
         Except5.jl ;
         Except6.jl ;
