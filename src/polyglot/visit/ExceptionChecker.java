@@ -24,6 +24,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
     
     public ExceptionChecker pushNew() {
         ExceptionChecker ec = (ExceptionChecker) this.visitChildren();
+        ec.scope = null;
         ec.outer = this;
         ec.exceptionPositions = new HashMap();
         return ec;
@@ -61,7 +62,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
     }
 
     /**
-     * Here, we pop the stack frame that we pushed in enter and agregate the 
+     * Here, we pop the stack frame that we pushed in enter and aggregate the 
      * exceptions.
      *
      * @param old The original state of root of the current subtree.
