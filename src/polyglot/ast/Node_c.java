@@ -319,7 +319,7 @@ public abstract class Node_c implements Node
     }
 
     public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
-	return ec;
+	return ec.push();
     }
 
     public Node exceptionCheck(ExceptionChecker ec) throws SemanticException { 

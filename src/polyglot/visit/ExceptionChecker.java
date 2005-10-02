@@ -17,11 +17,18 @@ public class ExceptionChecker extends ErrorHandlingVisitor
     protected Map exceptionPositions;
 
     public ExceptionChecker(Job job, TypeSystem ts, NodeFactory nf) {
-	super(job, ts, nf);
-	this.outer = null;
+        super(job, ts, nf);
+        this.outer = null;
         this.exceptionPositions = new HashMap();
     }
-
+    
+    public ExceptionChecker pushNew() {
+        ExceptionChecker ec = (ExceptionChecker) this.visitChildren();
+        ec.outer = this;
+        ec.exceptionPositions = new HashMap();
+        return ec;
+    }
+    
     public ExceptionChecker push() {
         ExceptionChecker ec = (ExceptionChecker) this.visitChildren();
         ec.outer = this;
@@ -46,7 +53,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
      *
      */
     protected NodeVisitor enterCall(Node n) throws SemanticException {
-	return n.exceptionCheckEnter(push());
+        return n.exceptionCheckEnter(this);
     }
 
     protected NodeVisitor enterError(Node n) {

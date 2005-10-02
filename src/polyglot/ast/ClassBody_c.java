@@ -157,6 +157,10 @@ public class ClassBody_c extends Term_c implements ClassBody
 
         return this;
     }
+    
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
+        return ec.pushNew();
+    }
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         if (!members.isEmpty()) {
