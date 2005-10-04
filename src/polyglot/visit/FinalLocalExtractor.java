@@ -80,10 +80,10 @@ public class FinalLocalExtractor extends NodeVisitor {
             Unary u = (Unary) n;
             if (u.expr() instanceof Local) {
                 Local l = (Local) u.expr();
-                LocalInstance li = (LocalInstance) l.localInstance();
+                LocalInstance li = l.localInstance().orig();
                 if (u.operator() == Unary.PRE_DEC || u.operator() == Unary.POST_DEC ||
                     u.operator() == Unary.PRE_INC || u.operator() == Unary.POST_INC) {
-                    if (! isFinal.contains(li)) {
+                    if (! isFinal.contains(li.orig())) {
                         li.setFlags(li.flags().clearFinal());
                     }
                 }
@@ -92,7 +92,7 @@ public class FinalLocalExtractor extends NodeVisitor {
         if (n instanceof Assign) {
             Assign a = (Assign) n;
             if (a.left() instanceof Local) {
-                LocalInstance li = ((Local) a.left()).localInstance();
+                LocalInstance li = ((Local) a.left()).localInstance().orig();
                 if (! isFinal.contains(li)) {
                     li.setFlags(li.flags().clearFinal());
                 }

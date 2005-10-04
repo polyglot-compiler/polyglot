@@ -321,11 +321,11 @@ public class CopyPropagator extends DataFlow {
 	    Expr right = n.right();
 
 	    if (left instanceof Local) {
-		LocalInstance to = ((Local)left).localInstance();
+		LocalInstance to = ((Local)left).localInstance().orig();
 		result.kill(to);
 
 		if (right instanceof Local && op == Assign.ASSIGN) {
-		    LocalInstance from = ((Local)right).localInstance();
+		    LocalInstance from = ((Local)right).localInstance().orig();
 		    result.add(from, to);
 		}
 	    }
@@ -338,7 +338,7 @@ public class CopyPropagator extends DataFlow {
 		|| op == Unary.POST_DEC || op == Unary.PRE_INC
 		|| op == Unary.PRE_DEC)) {
 
-		result.kill(((Local)expr).localInstance());
+		result.kill(((Local)expr).localInstance().orig());
 	    }
 	} else if (t instanceof LocalDecl) {
 	    LocalDecl n = (LocalDecl)t;
@@ -351,7 +351,7 @@ public class CopyPropagator extends DataFlow {
 	    // non-final local declarations because final locals have special
 	    // use in local classes.
 	    if (!n.flags().isFinal() && n.init() instanceof Local) {
-		LocalInstance from = ((Local)n.init()).localInstance();
+		LocalInstance from = ((Local)n.init()).localInstance().orig();
 		result.add(from, to);
 	    }
 	} else if (t instanceof Block) {
@@ -422,7 +422,7 @@ public class CopyPropagator extends DataFlow {
 	    DataFlowItem in = (DataFlowItem)confluence(items, l, g);
 	    if (in == null) return n;
 
-	    LocalInstance root = in.getRoot(l.localInstance());
+	    LocalInstance root = in.getRoot(l.localInstance().orig());
 	    if (root == null) return n;
 	    return l.name(root.name()).localInstance(root);
 	}

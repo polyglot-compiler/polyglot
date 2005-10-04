@@ -362,7 +362,7 @@ public class InitChecker extends DataFlow
                         // the field does not have an initializer
                         initCount = new MinMaxInitCount(InitCount.ZERO,InitCount.ZERO);
                     }
-                    newCDI.currClassFinalFieldInitCounts.put(fd.fieldInstance(),
+                    newCDI.currClassFinalFieldInitCounts.put(fd.fieldInstance().orig(),
                                                          initCount);
                 }
             }
@@ -416,7 +416,7 @@ public class InitChecker extends DataFlow
                     
                 boolean fieldInitializedBeforeConstructors = false;
                 MinMaxInitCount ic = (MinMaxInitCount)
-                    currCBI.currClassFinalFieldInitCounts.get(fi);
+                    currCBI.currClassFinalFieldInitCounts.get(fi.orig());
                 if (ic != null && !InitCount.ZERO.equals(ic.getMin())) {
                     fieldInitializedBeforeConstructors = true;
                 }
@@ -430,7 +430,7 @@ public class InitChecker extends DataFlow
                     boolean isInitialized = fieldInitializedBeforeConstructors;
                         
                     while (ci != null) {
-                        Set s = (Set)currCBI.fieldsConstructorInitializes.get(ci);
+                        Set s = (Set)currCBI.fieldsConstructorInitializes.get(ci.orig());
                         if (s != null && s.contains(fi)) {
                             if (isInitialized) {
                                 throw new SemanticException("field \"" + fi.name() +
@@ -439,7 +439,7 @@ public class InitChecker extends DataFlow
                             }
                             isInitialized = true;
                         }                                
-                        ci = (ConstructorInstance)currCBI.constructorCalls.get(ci);
+                        ci = (ConstructorInstance)currCBI.constructorCalls.get(ci.orig());
                     }
                     if (!isInitialized) {
                         throw new SemanticException("field \"" + fi.name() +
@@ -672,7 +672,7 @@ public class InitChecker extends DataFlow
                                   Set succEdgeKeys) {
           Local l = (Local) a.left();
           Map m = new HashMap(inItem.initStatus);
-          MinMaxInitCount initCount = (MinMaxInitCount)m.get(l.localInstance());
+          MinMaxInitCount initCount = (MinMaxInitCount)m.get(l.localInstance().orig());
 
           // initcount could be null if the local is defined in the outer
           // class, or if we have not yet seen its declaration (i.e. the
@@ -702,13 +702,13 @@ public class InitChecker extends DataFlow
             // this field is final and the target for this field is 
             // appropriate for what we are interested in.
             Map m = new HashMap(inItem.initStatus);
-            MinMaxInitCount initCount = (MinMaxInitCount)m.get(fi);
+            MinMaxInitCount initCount = (MinMaxInitCount)m.get(fi.orig());
             // initCount may be null if the field is defined in an
             // outer class.
             if (initCount != null) {
                 initCount = new MinMaxInitCount(initCount.getMin().increment(),
                           initCount.getMax().increment());
-                m.put(fi, initCount);
+                m.put(fi.orig(), initCount);
                 return itemToMap(new DataFlowItem(m), succEdgeKeys);
             }
         }
@@ -728,7 +728,7 @@ public class InitChecker extends DataFlow
             // record the fact that the current constructor calls the other
             // constructor
             currCBI.constructorCalls.put(((ConstructorDecl)currCBI.currCodeDecl).constructorInstance(), 
-                                 cc.constructorInstance());
+                                 cc.constructorInstance().orig());
         }
         return null;
     }
@@ -847,7 +847,7 @@ public class InitChecker extends DataFlow
                     // we don't need to join the init counts, as all
                     // dataflows will go through all of the 
                     // initializers
-                    currCBI.currClassFinalFieldInitCounts.put(fi, 
+                    currCBI.currClassFinalFieldInitCounts.put(fi.orig(), 
                             e.getValue());
                 }
             }
@@ -898,7 +898,7 @@ public class InitChecker extends DataFlow
             }
         }
         if (!s.isEmpty()) {
-            currCBI.fieldsConstructorInitializes.put(ci, s);
+            currCBI.fieldsConstructorInitializes.put(ci.orig(), s);
         }
     }
     
@@ -910,7 +910,7 @@ public class InitChecker extends DataFlow
                               DataFlowItem dfIn, 
                               DataFlowItem dfOut) 
         throws SemanticException {
-        if (!currCBI.localDeclarations.contains(l.localInstance())) {
+        if (!currCBI.localDeclarations.contains(l.localInstance().orig())) {
             // it's a local variable that has not been declared within
             // this scope. The only way this can arise is from an
             // inner class that is not a member of a class (typically
@@ -919,11 +919,11 @@ public class InitChecker extends DataFlow
             // We need to check that it is a final local, and also
             // keep track of it, to ensure that it has been definitely
             // assigned at this point.
-            currCBI.outerLocalsUsed.add(l.localInstance());                
+            currCBI.outerLocalsUsed.add(l.localInstance().orig());                
         }
         else { 
             MinMaxInitCount initCount = (MinMaxInitCount) 
-                      dfIn.initStatus.get(l.localInstance());         
+                      dfIn.initStatus.get(l.localInstance().orig());         
             if (initCount != null && InitCount.ZERO.equals(initCount.getMin())) {
                 // the local variable may not have been initialized. 
                 // However, we only want to complain if the local is reachable
@@ -940,7 +940,7 @@ public class InitChecker extends DataFlow
                                           DataFlowItem dfIn, 
                                           Position pos) 
     throws SemanticException {
-        MinMaxInitCount initCount = (MinMaxInitCount)dfIn.initStatus.get(li);         
+        MinMaxInitCount initCount = (MinMaxInitCount)dfIn.initStatus.get(li.orig());         
         if (initCount != null && InitCount.ZERO.equals(initCount.getMin())) {
             // the local variable may not have been initialized. 
             throw new SemanticException("Local variable \"" + li.name() +
@@ -958,14 +958,14 @@ public class InitChecker extends DataFlow
                                     DataFlowItem dfOut) 
         throws SemanticException {
         LocalInstance li = ((Local)a.left()).localInstance();
-        if (!currCBI.localDeclarations.contains(li)) {
+        if (!currCBI.localDeclarations.contains(li.orig())) {
             throw new SemanticException("Final local variable \"" + li.name() +
                     "\" cannot be assigned to in an inner class.",
                     a.position());                     
         }
 
         MinMaxInitCount initCount = (MinMaxInitCount) 
-                               dfOut.initStatus.get(li);                                
+                               dfOut.initStatus.get(li.orig());                                
 
         if (li.flags().isFinal() && InitCount.MANY.equals(initCount.getMax())) {
             throw new SemanticException("variable \"" + li.name() +
@@ -995,7 +995,7 @@ public class InitChecker extends DataFlow
                 // So a final field in this situation can be 
                 // assigned to at most once.                    
                 MinMaxInitCount initCount = (MinMaxInitCount) 
-                                       dfOut.initStatus.get(fi);                                
+                                       dfOut.initStatus.get(fi.orig());                                
                 if (InitCount.MANY.equals(initCount.getMax())) {
                     throw new SemanticException("field \"" + fi.name() +
                             "\" might already have been assigned to",
@@ -1052,10 +1052,10 @@ public class InitChecker extends DataFlow
         for (Iterator iter = localsUsed.iterator(); iter.hasNext(); ) {
             LocalInstance li = (LocalInstance)iter.next();
             MinMaxInitCount initCount = (MinMaxInitCount)
-                                            dfOut.initStatus.get(li);                                
-            if (!currCBI.localDeclarations.contains(li)) {
+                                            dfOut.initStatus.get(li.orig());                                
+            if (!currCBI.localDeclarations.contains(li.orig())) {
                 // the local wasn't defined in this scope.
-                currCBI.outerLocalsUsed.add(li);
+                currCBI.outerLocalsUsed.add(li.orig());
             }
             else if (initCount == null || InitCount.ZERO.equals(initCount.getMin())) {
                 // initCount will in general not be null, as the local variable

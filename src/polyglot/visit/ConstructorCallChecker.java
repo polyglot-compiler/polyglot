@@ -33,8 +33,8 @@ public class ConstructorCallChecker extends ContextVisitor
                     throw new InternalCompilerError("Constructor call " +
                         "occurring in a non-constructor.", cc.position());
                 }
-                ConstructorInstance srcCI = (ConstructorInstance)ctxt.currentCode();
-                ConstructorInstance destCI = cc.constructorInstance();
+                ConstructorInstance srcCI = ((ConstructorInstance)ctxt.currentCode()).orig();
+                ConstructorInstance destCI = cc.constructorInstance().orig();
                 
                 constructorInvocations.put(srcCI, destCI);
                 while (destCI != null) {

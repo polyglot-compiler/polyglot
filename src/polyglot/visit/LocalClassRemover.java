@@ -90,7 +90,7 @@ public class LocalClassRemover extends ContextVisitor
                         if (outerContext.isLocal(local.name())) {
                             // and not local to the outer context too
                         System.out.println("  defined in enclosing method: " + n);
-                            env.add(local.localInstance());
+                            env.add(local.localInstance().orig());
                         }
                     }
                     catch (SemanticException e) {
@@ -160,7 +160,7 @@ public class LocalClassRemover extends ContextVisitor
         public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
             if (n instanceof Local) {
                 Local l = (Local) n;
-                FieldInstance fi = (FieldInstance) fieldMap.get(new IdentityKey(l.localInstance()));
+                FieldInstance fi = (FieldInstance) fieldMap.get(new IdentityKey(l.localInstance().orig()));
                 if (fi != null) {
                     Special this_;
                     if (ct.equals(context.currentClass())) {
@@ -208,7 +208,7 @@ public class LocalClassRemover extends ContextVisitor
             ConstructorCall superCall;
 
             if (!ct.flags().isStatic()) {
-                Special this_ = nf.Special(ci.position(), Special.THIS);
+                Special this_ = nf.Special(ci.position(), Special.THIS, nf.CanonicalTypeNode(ci.position(), ct.container()));
                 this_ = (Special) this_.type(ct.container());
                 superCall = nf.SuperCall(ci.position(), this_,
                                          Collections.EMPTY_LIST);

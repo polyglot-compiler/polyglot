@@ -226,7 +226,7 @@ public class DeadCodeEliminator extends DataFlow {
 	    }
 
 	    DataFlowItem in = getItem(eval);
-	    if (in == null || in.needDef(local.localInstance())) return n;
+	    if (in == null || in.needDef(local.localInstance().orig())) return n;
 
 	    if (right != null) {
 		return getEffects(right);
@@ -288,11 +288,11 @@ public class DeadCodeEliminator extends DataFlow {
 
 	public Node leave(Node old, Node n, NodeVisitor v) {
 	    if (n instanceof Local) {
-		use.add(((Local)n).localInstance());
+		use.add(((Local)n).localInstance().orig());
 	    } else if (n instanceof Assign) {
 		Expr left = ((Assign)n).left();
 		if (left instanceof Local) {
-		    def.add(((Local)left).localInstance());
+		    def.add(((Local)left).localInstance().orig());
 		}
 	    }
 
