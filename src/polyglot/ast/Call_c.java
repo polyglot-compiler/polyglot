@@ -262,11 +262,11 @@ public class Call_c extends Expr_c implements Call
             }
             else if (target instanceof TypeNode) {
                 throw new SemanticException("Cannot invoke static method \"" + name
-                                    + "\" on non-reference type " + t + ".",
-                                    target.position());
+                                            + "\" on non-reference type " + t + ".",
+                                            target.position());
             }            
-            throw new SemanticException("Receiver of method invocation must be a "
-                                    + "reference type.",
+            throw new SemanticException("Cannot invoke method \"" + name
+                                        + "\" on non-reference type " + t + ".",
                                         target.position());
         }
     }
