@@ -1,22 +1,14 @@
 package polyglot.ext.jl.ast;
 
 import java.util.*;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 import polyglot.ast.*;
 import polyglot.frontend.*;
-import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.SupertypesResolved;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.*;
-import polyglot.util.CodeWriter;
-import polyglot.util.CollectionUtil;
-import polyglot.util.Position;
-import polyglot.util.TypedList;
 import polyglot.visit.*;
 
 /**
@@ -260,7 +252,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         }
     }
     
-    protected void setSuperClass(AmbiguityRemover ar, TypeNode superClass) {
+    protected void setSuperClass(AmbiguityRemover ar, TypeNode superClass) throws SemanticException {
         TypeSystem ts = ar.typeSystem();
 
         if (superClass != null) {
@@ -285,9 +277,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         }    
     }
 
-    protected void setInterfaces(AmbiguityRemover ar, List newInterfaces) {
-        TypeSystem ts = ar.typeSystem();
-     
+    protected void setInterfaces(AmbiguityRemover ar, List newInterfaces) throws SemanticException {
         for (Iterator i = newInterfaces.iterator(); i.hasNext(); ) {
             TypeNode tn = (TypeNode) i.next();
             Type t = tn.type();
