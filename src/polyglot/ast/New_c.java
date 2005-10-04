@@ -305,7 +305,7 @@ public class New_c extends Expr_c implements New
      * @param ct
      * @throws SemanticException
      */
-    private New findQualifier(AmbiguityRemover ar, ClassType ct) throws SemanticException {
+    protected New findQualifier(AmbiguityRemover ar, ClassType ct) throws SemanticException {
         // If we're instantiating a non-static member class, add a "this"
         // qualifier.
         NodeFactory nf = ar.nodeFactory();
@@ -358,6 +358,7 @@ public class New_c extends Expr_c implements New
                                              outer));
         }
         
+        q = q.type(outer);
         return qualifier(q);
     }
     
