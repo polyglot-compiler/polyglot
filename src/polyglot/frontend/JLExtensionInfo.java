@@ -14,8 +14,6 @@ import polyglot.frontend.goals.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
-import polyglot.visit.LocalClassRemover;
-import polyglot.visit.InnerClassRewriter;
 
 /**
  * This is the default <code>ExtensionInfo</code> for the Java language.
