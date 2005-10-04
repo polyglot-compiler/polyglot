@@ -1,22 +1,11 @@
 package polyglot.ext.jl.types;
 
 import java.util.*;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 import polyglot.frontend.Job;
 import polyglot.frontend.goals.SupertypesResolved;
-import polyglot.types.ClassType;
-import polyglot.types.FieldInstance;
-import polyglot.types.Flags;
-import polyglot.types.Named;
+import polyglot.types.*;
 import polyglot.types.Package;
-import polyglot.types.ReferenceType;
-import polyglot.types.Resolver;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
@@ -30,11 +19,22 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
     protected ClassType_c() { }
 
     public ClassType_c(TypeSystem ts) {
-	this(ts, null);
+        this(ts, null);
     }
 
     public ClassType_c(TypeSystem ts, Position pos) {
-	super(ts, pos);
+        super(ts, pos);
+        this.decl = this;
+    }
+    
+    protected ClassType decl;
+    
+    public Declaration declaration() {
+        return decl;
+    }
+    
+    public void setDeclaration(Declaration decl) {
+        this.decl = (ClassType) decl;        
     }
 
     public abstract Job job();

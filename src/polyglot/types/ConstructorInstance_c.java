@@ -20,6 +20,10 @@ public class ConstructorInstance_c extends ProcedureInstance_c
         super(ts, pos, container, flags, formalTypes, excTypes);
     }
 
+    public ConstructorInstance orig() {
+        return (ConstructorInstance) declaration();
+    }
+    
     public ConstructorInstance flags(Flags flags) {
         if (!flags.equals(this.flags)) {
             ConstructorInstance_c n = (ConstructorInstance_c) copy();

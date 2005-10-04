@@ -141,6 +141,10 @@ public abstract class Node_c implements Node
         return !(this instanceof Ambiguous);
     }
     
+    public boolean isTypeChecked() {
+        return isDisambiguated();
+    }
+    
     public boolean error() {
         return error;
     }

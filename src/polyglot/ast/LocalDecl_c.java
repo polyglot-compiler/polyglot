@@ -157,12 +157,11 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        TypeSystem ts = ar.typeSystem();
-
-        LocalInstance li = ts.localInstance(position(),
-                                            flags(), declType(), name());
-
-        return localInstance(li);
+        if (type.isDisambiguated() && ! li.type().isCanonical()) {
+            li.setFlags(flags());
+            li.setType(declType());
+        }
+        return this;
     }
 
     /**
@@ -193,7 +192,6 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         }
         
         return super.typeCheckEnter(tc);
-
     }
     
     /** Type check the declaration. */
@@ -241,14 +239,14 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
                public Node leave(Node old, Node n, NodeVisitor v) {
                    if (n instanceof Field) {
                        Field f = (Field) n;
-                       if (! f.fieldInstance().constantValueSet()) {
-                           Goal g = scheduler.FieldConstantsChecked(f.fieldInstance());
+                       if (! f.fieldInstance().orig().constantValueSet()) {
+                           Goal g = scheduler.FieldConstantsChecked(f.fieldInstance().orig());
                            throw new MissingDependencyException(g);
                        }
                    }
                    if (n instanceof Local) {
                        Local l = (Local) n;
-                       if (! l.localInstance().constantValueSet()) {
+                       if (! l.localInstance().orig().constantValueSet()) {
                            // Undefined variable or forward reference.
                            LocalDecl_c.this.li.setNotConstant();
                        }

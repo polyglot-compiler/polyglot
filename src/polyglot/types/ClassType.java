@@ -9,7 +9,7 @@ import polyglot.util.Enum;
  * classpath, parsed from a source file, or obtained from other source.
  * A <code>ClassType</code> is not necessarily named.
  */
-public interface ClassType extends Importable, ReferenceType, MemberInstance
+public interface ClassType extends Importable, ReferenceType, MemberInstance, Declaration
 {
     public static class Kind extends Enum {
         public Kind(String name) {

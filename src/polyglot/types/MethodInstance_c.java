@@ -1,9 +1,11 @@
 package polyglot.ext.jl.types;
 
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.main.Report;
 import java.util.*;
+
+import polyglot.main.Report;
+import polyglot.types.*;
+import polyglot.util.CollectionUtil;
+import polyglot.util.Position;
 
 /**
  * A <code>MethodInstance</code> represents the type information for a Java
@@ -26,7 +28,11 @@ public class MethodInstance_c extends ProcedureInstance_c
 	this.returnType = returnType;
 	this.name = name;
     }
-
+    
+    public MethodInstance orig() {
+        return (MethodInstance) declaration();
+    }
+    
     public String name() {
         return name;
     }

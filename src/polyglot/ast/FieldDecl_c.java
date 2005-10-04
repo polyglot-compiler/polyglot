@@ -211,8 +211,8 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
                 public Node leave(Node old, Node n, NodeVisitor v) {
                     if (n instanceof Field) {
                         Field f = (Field) n;
-                        if (!f.fieldInstance().constantValueSet()) {
-                            Goal newGoal = scheduler.FieldConstantsChecked(f.fieldInstance());
+                        if (!f.fieldInstance().orig().constantValueSet()) {
+                            Goal newGoal = scheduler.FieldConstantsChecked(f.fieldInstance().orig());
                             for (Iterator i = newGoal.prerequisiteGoals(scheduler).iterator(); i.hasNext();) {
                                 Goal g = (Goal) i.next();
                                 if (scheduler.prerequisiteDependsOn(g, myGoal)) {

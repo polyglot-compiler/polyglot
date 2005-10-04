@@ -3,7 +3,7 @@ package polyglot.types;
 /**
  * An <code>Package</code> represents a Java package.
  */
-public interface Package extends Qualifier, Named
+public interface Package extends Qualifier, Named, Declaration
 {
     /**
      * The package's outer package.

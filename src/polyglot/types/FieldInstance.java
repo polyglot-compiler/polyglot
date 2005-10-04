@@ -11,4 +11,5 @@ public interface FieldInstance extends VarInstance, MemberInstance
     FieldInstance type(Type type);   
     FieldInstance constantValue(Object value);
     FieldInstance notConstant();
+    FieldInstance orig();
 }

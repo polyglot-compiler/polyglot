@@ -27,6 +27,17 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 	this.flags = flags;
 	this.formalTypes = TypedList.copyAndCheck(formalTypes, Type.class, true);
 	this.throwTypes = TypedList.copyAndCheck(excTypes, Type.class, true);
+    this.decl = this;
+    }
+    
+    protected ProcedureInstance decl;
+    
+    public Declaration declaration() {
+        return decl;
+    }
+    
+    public void setDeclaration(Declaration decl) {
+        this.decl = (ProcedureInstance) decl;        
     }
 
     public ReferenceType container() {
@@ -119,8 +130,8 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         ProcedureInstance p2 = p;
 
         // rule 1:
-        ReferenceType t1 = p1.container();
-        ReferenceType t2 = p2.container();
+        ReferenceType t1 = ((ProcedureInstance) p1.declaration()).container();
+        ReferenceType t2 = ((ProcedureInstance) p2.declaration()).container();
 
         if (t1.isClass() && t2.isClass()) {
             if (! t1.isSubtype(t2) &&

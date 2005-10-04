@@ -27,8 +27,19 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
 	this.flags = flags;
 	this.type = type;
 	this.name = name;
+    this.decl = this;
     }
-
+    
+    protected VarInstance decl;
+    
+    public Declaration declaration() {
+        return decl;
+    }
+    
+    public void setDeclaration(Declaration decl) {
+        this.decl = (VarInstance) decl;        
+    }
+    
     public boolean constantValueSet() {
         return constantValueSet;
     }

@@ -13,4 +13,5 @@ public interface ConstructorInstance extends ProcedureInstance
     ConstructorInstance formalTypes(List l);
     ConstructorInstance throwTypes(List l);
     ConstructorInstance container(ClassType container);
+    ConstructorInstance orig();
 }

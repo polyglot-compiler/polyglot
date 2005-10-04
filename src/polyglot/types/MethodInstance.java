@@ -41,6 +41,8 @@ public interface MethodInstance extends ProcedureInstance
     MethodInstance formalTypes(List l);
     MethodInstance throwTypes(List l);
     MethodInstance container(ReferenceType container);
+    
+    MethodInstance orig();
 
     /**
      * Get the list of methods this method (potentially) overrides, in order

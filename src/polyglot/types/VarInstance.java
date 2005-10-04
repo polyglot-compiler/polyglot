@@ -4,7 +4,7 @@ package polyglot.types;
  * A <code>VarInstance</code> contains type information for a variable.  It may
  * be either a local or a field.
  */
-public interface VarInstance extends TypeObject
+public interface VarInstance extends TypeObject, Declaration
 {
     /**
      * The flags of the variable.

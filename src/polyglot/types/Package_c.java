@@ -32,6 +32,17 @@ public class Package_c extends TypeObject_c implements Package
         super(ts);
 	this.prefix = prefix;
 	this.name = name;
+    this.decl = this;
+    }
+    
+    protected Package decl;
+    
+    public Declaration declaration() {
+        return decl;
+    }
+    
+    public void setDeclaration(Declaration decl) {
+        this.decl = (Package) decl;        
     }
 
     public boolean isType() { return false; }

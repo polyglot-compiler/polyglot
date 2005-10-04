@@ -62,10 +62,16 @@ public interface Node extends JL, Copy
     Node error(boolean flag);
     
     /**
-     * Return true if the all type information for the node (but not necessarily
+     * @return true if the all type information for the node (but not necessarily
      * for the node's children) is unambiguous.
      */
     boolean isDisambiguated();
+    
+    /**
+     * @return true if all the type information for the node (but not necessarily
+     * for the node's children) has been computed.
+     */
+    boolean isTypeChecked();
     
     /**
      * Visit the node.  This method is equivalent to

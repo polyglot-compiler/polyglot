@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import polyglot.frontend.*;
-import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.FieldConstantsChecked;
 import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
@@ -25,6 +24,10 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
 	                   Flags flags, Type type, String name) {
         super(ts, pos, flags, type, name);
         this.container = container;
+    }
+    
+    public FieldInstance orig() {
+        return (FieldInstance) declaration();
     }
     
     public FieldInstance flags(Flags flags) {

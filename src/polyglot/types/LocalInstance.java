@@ -10,4 +10,5 @@ public interface LocalInstance extends VarInstance
     LocalInstance type(Type type);   
     LocalInstance constantValue(Object value);
     LocalInstance notConstant();
+    LocalInstance orig();
 }

@@ -15,6 +15,10 @@ public class LocalInstance_c extends VarInstance_c implements LocalInstance
 	  		   Flags flags, Type type, String name) {
         super(ts, pos, flags, type, name);
     }
+    
+    public LocalInstance orig() {
+        return (LocalInstance) declaration();
+    }
 
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof LocalInstance) {
