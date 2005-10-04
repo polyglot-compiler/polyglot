@@ -81,14 +81,12 @@ public class AmbiguityRemover extends DisambiguationDriver
             return m;
         }
         catch (MissingDependencyException e) {
+            if (Report.should_report(Report.frontend, 3))
+                e.printStackTrace();
             Scheduler scheduler = job.extensionInfo().scheduler();
-            for (Iterator i = context.goalStack().iterator(); i.hasNext(); ) {
-                Goal g = (Goal) i.next();
-                if (Report.should_report(Report.frontend, 3))
-                    e.printStackTrace();
-                scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
-                g.setUnreachableThisRun();
-            }
+            Goal g = scheduler.currentGoal();
+            scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
+            g.setUnreachableThisRun();
             return n;
         }
         catch (SemanticException e) {

@@ -32,14 +32,12 @@ public class TypeChecker extends DisambiguationDriver
             return m;
         }
         catch (MissingDependencyException e) {
+            if (Report.should_report(Report.frontend, 3))
+                e.printStackTrace();
             Scheduler scheduler = job.extensionInfo().scheduler();
-            for (Iterator i = context.goalStack().iterator(); i.hasNext(); ) {
-                Goal g = (Goal) i.next();
-                if (Report.should_report(Report.frontend, 3))
-                    e.printStackTrace();
-                scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
-                g.setUnreachableThisRun();
-            }
+            Goal g = scheduler.currentGoal();
+            scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
+            g.setUnreachableThisRun();
             return n;
         }
         catch (SemanticException e) {
@@ -81,11 +79,11 @@ public class TypeChecker extends DisambiguationDriver
         final boolean[] amb = new boolean[1];
         
         n.visitChildren(new NodeVisitor() {
-            public Node override(Node n) {    
-                if (n instanceof Expr &&
-                    (((Expr) n).type() == null || ! ((Expr) n).type().isCanonical())) {
+            public Node override(Node n) {   
+                if (! n.isDisambiguated() || ! n.isTypeChecked()) {
 //                    System.out.println("  !!!!! no type at " + n + " (" + n.getClass().getName() + ")");
-//                    System.out.println("   !!!! n.type = " + ((Expr) n).type());
+//                    if (n instanceof Expr)  
+//                        System.out.println("   !!!! n.type = " + ((Expr) n).type());
                     amb[0] = true;
                 }
                 return n;
@@ -94,21 +92,18 @@ public class TypeChecker extends DisambiguationDriver
         
         Node m = n;
         
-        if (! amb[0]) {
+        if (! amb[0] && m.isDisambiguated()) {
 //          System.out.println("running typeCheck for " + m);
             m = m.del().typeCheck((TypeChecker) v);
             
-            if (m instanceof Expr && ((Expr) m).type() == null) {
-                throw new InternalCompilerError("Null type for " + m, m.position());
-            }
+//            if (! m.isTypeChecked()) {
+//                throw new InternalCompilerError("Type checking failed for " + m + " (" + m.getClass().getName() + ")", m.position());
+//            }
         }
         else {
 //                 System.out.println("  no type at " + m);
-            for (Iterator i = context.goalStack().iterator(); i.hasNext(); ) {
-                Goal g = (Goal) i.next();
-//                 System.out.println("  " + g + " unreachable");
-                g.setUnreachableThisRun();
-            }
+            Goal g = job.extensionInfo().scheduler().currentGoal();
+            g.setUnreachableThisRun();
         }
         
         if (Report.should_report(Report.visit, 2))

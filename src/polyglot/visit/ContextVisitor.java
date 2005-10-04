@@ -42,7 +42,6 @@ public class ContextVisitor extends ErrorHandlingVisitor
 
     public NodeVisitor begin() {
         context = ts.createContext();
-        context = context.pushGoal(job.extensionInfo().scheduler().currentGoal());
         outer = null;
         return super.begin();
     }
@@ -116,14 +115,12 @@ public class ContextVisitor extends ErrorHandlingVisitor
             return v.superEnter(parent, n);
         }
         catch (MissingDependencyException e) {
+            if (Report.should_report(Report.frontend, 3))
+                e.printStackTrace();
             Scheduler scheduler = job.extensionInfo().scheduler();
-            for (Iterator i = context.goalStack().iterator(); i.hasNext(); ) {
-                Goal g = (Goal) i.next();
-                if (Report.should_report(Report.frontend, 3))
-                    e.printStackTrace();
-                scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
-                g.setUnreachableThisRun();
-            }
+            Goal g = scheduler.currentGoal();
+            scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
+            g.setUnreachableThisRun();
 
             // The context for visiting the children
             // isn't set up correctly, so prune the traversal here.
@@ -154,14 +151,12 @@ public class ContextVisitor extends ErrorHandlingVisitor
             return m;
         }
         catch (MissingDependencyException e) {
+            if (Report.should_report(Report.frontend, 3))
+                e.printStackTrace();
             Scheduler scheduler = job.extensionInfo().scheduler();
-            for (Iterator i = context.goalStack().iterator(); i.hasNext(); ) {
-                Goal g = (Goal) i.next();
-                if (Report.should_report(Report.frontend, 3))
-                    e.printStackTrace();
-                scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
-                g.setUnreachableThisRun();
-            }
+            Goal g = scheduler.currentGoal();
+            scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
+            g.setUnreachableThisRun();
         }
         return n;
     }
