@@ -98,6 +98,10 @@ public abstract class Expr_c extends Term_c implements Expr
         return ((Double) constantValue()).doubleValue();
     }
 
+    public boolean isTypeChecked() {
+        return super.isTypeChecked() && type != null && type.isCanonical();
+    }
+    
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
         return type(tb.typeSystem().unknownType(position()));
     }
