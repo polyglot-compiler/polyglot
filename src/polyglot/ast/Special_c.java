@@ -82,23 +82,27 @@ public class Special_c extends Expr_c implements Special
             // an unqualified "this" or "super"
             t = c.currentClass();
         }
-        else if (qualifier.type().isClass()) {
-            t = qualifier.type().toClass();
-
-            if (!c.currentClass().hasEnclosingInstance(t)) {
-                throw new SemanticException("The nested class \"" + 
-                            c.currentClass() + "\" does not have " +
-                            "an enclosing instance of type \"" +
-                            t + "\".", qualifier.position());
+        else {
+            if (! qualifier.isDisambiguated()) {
+                return this;
+            }
+            
+            if (qualifier.type().isClass()) {
+                t = qualifier.type().toClass();
+                
+                if (!c.currentClass().hasEnclosingInstance(t)) {
+                    throw new SemanticException("The nested class \"" + 
+                                                c.currentClass() + "\" does not have " +
+                                                "an enclosing instance of type \"" +
+                                                t + "\".", qualifier.position());
+                }
+            }
+            else {
+                throw new SemanticException("Invalid qualifier for \"this\" or \"super\".", qualifier.position());
             }
         }
         
-        if (t == null) {
-            // Cannot determine the type yet.
-            return this;
-        }
-        
-        if (c.inStaticContext() && ts.equals(t, c.currentClass())) {
+        if (t == null || (c.inStaticContext() && ts.equals(t, c.currentClass()))) {
             // trying to access "this" or "super" from a static context.
             throw new SemanticException("Cannot access a non-static " +
                 "field or method, or refer to \"this\" or \"super\" " + 
