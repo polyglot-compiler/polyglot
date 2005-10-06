@@ -188,10 +188,10 @@ public class Conditional_c extends Expr_c implements Conditional
     public void prettyPrint(CodeWriter w, PrettyPrinter tr)
     {
 	printSubExpr(cond, false, w, tr);
-        w.allowBreak(0, " ");
+        w.unifiedBreak(2);
 	w.write("? ");
 	printSubExpr(consequent, false, w, tr);
-        w.allowBreak(0, " ");
+        w.unifiedBreak(2);
 	w.write(": ");
 	printSubExpr(alternative, false, w, tr);
     }

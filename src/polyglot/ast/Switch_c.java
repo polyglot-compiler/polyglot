@@ -143,7 +143,7 @@ public class Switch_c extends Stmt_c implements Switch
 	w.write("switch (");
 	printBlock(expr, w, tr);
 	w.write(") {");
-        w.allowBreak(4, " ");
+        w.unifiedBreak(4);
 	w.begin(0);
 
         boolean lastWasCase = false;
@@ -152,13 +152,13 @@ public class Switch_c extends Stmt_c implements Switch
 	for (Iterator i = elements.iterator(); i.hasNext();) {
             SwitchElement s = (SwitchElement) i.next();
             if (s instanceof Case) {
-                if (lastWasCase) w.allowBreak(0, " ");
-                else if (! first) w.allowBreak(0, " ");
+                if (lastWasCase) w.unifiedBreak(0);
+                else if (! first) w.unifiedBreak(0);
                 printBlock(s, w, tr);
                 lastWasCase = true;
             }
             else {
-                w.allowBreak(4," ");
+                w.unifiedBreak(4);
                 print(s, w, tr);
                 lastWasCase = false;
             }
@@ -167,7 +167,7 @@ public class Switch_c extends Stmt_c implements Switch
 	}
 
 	w.end();
-        w.allowBreak(0, " ");
+        w.unifiedBreak(0);
 	w.write("}");
     }
 
