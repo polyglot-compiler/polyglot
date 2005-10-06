@@ -3,7 +3,6 @@ package polyglot.types;
 import java.util.ArrayList;
 import java.util.List;
 
-import polyglot.ext.jl.types.MethodInstance_c;
 import polyglot.util.CollectionUtil;
 
 /**
