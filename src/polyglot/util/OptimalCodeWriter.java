@@ -204,14 +204,17 @@ public class OptimalCodeWriter extends CodeWriter {
     BlockItem input;
     BlockItem current;
     
-    static Item top;    
+    static Item top;
 
     PrintWriter output;
     int width;
     static int format_calls = 0;
-    public static final boolean debug = false;
-    public static final boolean trace = true;
-    public static final boolean precompute = true;
+    public static final boolean debug = false; // show everything
+    public static final boolean trace = false;  // show inputs
+    public static final boolean visualize = false; // visualize formatting
+      						  // (requires VT100 terminal)
+
+    public static final boolean precompute = true; // use memoization
 
     // Debugging methods
 
@@ -252,8 +255,23 @@ class Overrun extends Exception
     private static final Overrun overrun = new Overrun();
 
     private Overrun() {}
-    static Overrun overrun(int amount, int type) {
+    static Overrun overrun(Item where, int amount, int type) {
 	if (OptimalCodeWriter.debug) System.err.println("-- Overrun: " + amount);
+	if (OptimalCodeWriter.visualize) {
+	    System.err.print("\033[H\033[2J");
+	    PrintWriter w = new PrintWriter(new OutputStreamWriter(System.err));
+	    try {	            	            
+		OptimalCodeWriter.top.sendOutput(w, 0, 0, true, where);
+	    }
+	    catch (IOException e) {  }
+	    w.flush();
+	    System.err.println();
+	    String type_name = "pos";
+	    if (type == 1) type_name = "width";
+	    else if (type == 2) type_name = "fin";
+	    System.err.println("Overrun: type " + type_name + " amount: " + amount);
+	    try { System.in.read(); } catch (IOException e) {}
+	}
         overrun.amount = amount;
         overrun.type = type;
         return overrun;
@@ -382,8 +400,11 @@ abstract class Item
      * 
      * @see formatN
      */
-    static FormatResult format(Item it, int lmargin, int pos, int rmargin, int fin,
-            		  MaxLevels m, int minLevel, int minLevelUnified) throws Overrun {
+    static FormatResult format(Item it,
+			       int lmargin, int pos, int rmargin, int fin,
+            		       MaxLevels m, int minLevel, int minLevelUnified)
+	throws Overrun
+    {
         OptimalCodeWriter.format_calls++;
 	if (OptimalCodeWriter.debug) {
 	    if (it != null && it != OptimalCodeWriter.top) {
@@ -413,18 +434,18 @@ abstract class Item
 	    if (pos > fin) {
 	        if (OptimalCodeWriter.debug)
 	            System.err.println("Final position overrun: " + (pos-fin));
-	        throw Overrun.overrun(pos - fin, Overrun.FIN);
+	        throw Overrun.overrun(it, pos - fin, Overrun.FIN);
 	    }
 	    else return new FormatResult(pos, minLevelUnified);
 	}
 	
-	int amount2 = lmargin + getMinWidth(it, m) - rmargin; // lmargin is too far
-                                                       // right
+	int amount2 = lmargin + getMinWidth(it, m) - rmargin;
+						// lmargin is too far right
 	if (amount2 > 0) {
 	    if (OptimalCodeWriter.debug)
 	        System.err.println("Width overrun: " + amount2);
 	 
-	    throw Overrun.overrun(amount2, Overrun.WIDTH);
+	    throw Overrun.overrun(it, amount2, Overrun.WIDTH);
 	}
 	
 	int amount = pos + getMinPosWidth(it, m) - rmargin; // overrun on first line
@@ -432,7 +453,7 @@ abstract class Item
 	    if (OptimalCodeWriter.debug)
 	        System.err.println("Position (first line) overrun: " + amount);
 
-	    throw Overrun.overrun(amount, Overrun.POS);
+	    throw Overrun.overrun(it, amount, Overrun.POS);
 	}
 	
 
@@ -441,7 +462,7 @@ abstract class Item
 	    if (OptimalCodeWriter.debug)
 	        System.err.println("Final position (predicted) overrun: " + amount3);
 
-	    throw Overrun.overrun(amount3, Overrun.FIN);
+	    throw Overrun.overrun(it, amount3, Overrun.FIN);
 	}	
 
 	return it.formatN(lmargin, pos, rmargin, fin, m, minLevel, minLevelUnified);
@@ -458,9 +479,11 @@ abstract class Item
  *       | xxxxx
  *       xxxxxxxx
  *       xxxxxx
- *       <------> min_width (at least min_pos_width): distance from lmargin to rightmost char
- *         <---> min_pos_width: distance from initial pos to end of first line
- *       <----> min_indent (at most min_width): distance from lmargin to final position on last line
+ *       <------> min_width (at least min_pos_width):
+ * 		    distance from lmargin to rightmost char
+ *         <--->  min_pos_width: distance from initial pos to end of first line
+ *       <---->   min_indent (at most min_width):
+ *                  distance from lmargin to final position on last line
  */
 
     static final int NO_WIDTH = -9999;    
@@ -800,13 +823,17 @@ class BlockItem extends Item {
     int sendOutput(PrintWriter o, int lmargin, int pos, boolean success, Item last) throws IOException {
         Item it = first;
         lmargin = pos + indent;
-        while (it != null) {
+	if (last != this) {
+          while (it != null) {
             pos = it.sendOutput(o, lmargin, pos, success, last);
             if (last != null && it == last) {
                 throw new IOException();
             }
             it = it.next;
-        }
+          }
+	} else {
+	    o.print("...");
+	}
         return pos;
     }
 
@@ -833,7 +860,9 @@ class BlockItem extends Item {
 	if (containsBreaks.containsKey(m)) {
 	    return (containsBreaks.get(m) != null);
 	}
-	boolean result = containsBreaks(first, new MaxLevels(m.maxLevelInner, m.maxLevelInner));	
+	boolean result =
+	    containsBreaks(first,
+	                   new MaxLevels(m.maxLevelInner, m.maxLevelInner));	
 	containsBreaks.put(m, result ? m : null);
 	return result;
     }
@@ -864,7 +893,8 @@ class MaxLevels {
     public boolean equals(Object o) {
         if (o instanceof MaxLevels) {
             MaxLevels m2 = (MaxLevels)o;
-            return (maxLevel == m2.maxLevel && maxLevelInner == m2.maxLevelInner);
+            return (maxLevel == m2.maxLevel &&
+	            maxLevelInner == m2.maxLevelInner);
         } else
             return false;
     }
