@@ -1,5 +1,5 @@
 /*
- * Disambiguated.java
+ * ExitPathsChecked.java
  * 
  * Author: nystrom
  * Creation date: Oct 11, 2005
@@ -12,21 +12,21 @@ import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
 import polyglot.frontend.Scheduler;
 import polyglot.types.TypeSystem;
-import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.ExitChecker;
 
-public class Disambiguated extends VisitorGoal {
+public class ExitPathsChecked extends VisitorGoal {
     public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
-        return scheduler.internGoal(new Disambiguated(job, ts, nf));
+        return scheduler.internGoal(new ExitPathsChecked(job, ts, nf));
     }
 
-    protected Disambiguated(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, new AmbiguityRemover(job, ts, nf, true, true));
+    protected ExitPathsChecked(Job job, TypeSystem ts, NodeFactory nf) {
+        super(job, new ExitChecker(job, ts, nf));
     }
 
     public Collection prerequisiteGoals(Scheduler scheduler) {
         List l = new ArrayList();
         l.addAll(super.prerequisiteGoals(scheduler));
-        l.add(scheduler.ImportTableInitialized(job));
+        l.add(scheduler.ReachabilityChecked(job));
         return l;
     }
 }

@@ -13,8 +13,6 @@ import polyglot.frontend.*;
 import polyglot.frontend.passes.CheckFieldConstantsPass;
 import polyglot.frontend.passes.ConstantCheckPass;
 import polyglot.types.*;
-import polyglot.types.ParsedClassType;
-import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.StringUtil;
 import polyglot.visit.ConstantChecker;
@@ -26,10 +24,14 @@ import polyglot.visit.TypeBuilder;
  * @author nystrom
  */
 public class FieldConstantsChecked extends AbstractGoal {
+    public static Goal create(Scheduler scheduler, FieldInstance fi) {
+        return scheduler.internGoal(new FieldConstantsChecked(fi));
+    }
+
     FieldInstance vi;
     ParsedClassType ct;
     
-    public FieldConstantsChecked(FieldInstance fi) {
+    protected FieldConstantsChecked(FieldInstance fi) {
         super(null);
         this.vi = fi;
         

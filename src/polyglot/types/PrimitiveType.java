@@ -12,7 +12,7 @@ import polyglot.util.Enum;
 public interface PrimitiveType extends Type, Named
 {
     /** The kind of the primitive type. */
-    public class Kind extends Enum {
+    public static class Kind extends Enum {
 	public Kind(String name) { super(name); }
     }
 

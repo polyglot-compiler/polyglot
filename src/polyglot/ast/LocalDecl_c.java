@@ -228,33 +228,40 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
         return localInstance(li);
     }
+
+    protected static class AddDependenciesVisitor extends NodeVisitor {
+        ConstantChecker cc;
+        LocalInstance li;
+
+        AddDependenciesVisitor(ConstantChecker cc, LocalInstance li) {
+            this.cc = cc;
+            this.li = li;
+        }
+        
+        public Node leave(Node old, Node n, NodeVisitor v) {
+            if (n instanceof Field) {
+                Field f = (Field) n;
+                if (! f.fieldInstance().orig().constantValueSet()) {
+                    Scheduler scheduler = cc.job().extensionInfo().scheduler();
+                    Goal g = scheduler.FieldConstantsChecked(f.fieldInstance().orig());
+                    throw new MissingDependencyException(g);
+                }
+            }
+            if (n instanceof Local) {
+                Local l = (Local) n;
+                if (! l.localInstance().orig().constantValueSet()) {
+                    // Undefined variable or forward reference.
+                    li.setNotConstant();
+                }
+            }
+            return n;
+        }
+    }
     
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
         if (init != null && ! init.constantValueSet()) {
             // HACK to add dependencies for computing the constant value.
-            final Scheduler scheduler = cc.typeSystem().extensionInfo().scheduler();
-            final Goal ccgoal = scheduler.ConstantsChecked(cc.job());
-            
-            init.visit(new NodeVisitor() {
-               public Node leave(Node old, Node n, NodeVisitor v) {
-                   if (n instanceof Field) {
-                       Field f = (Field) n;
-                       if (! f.fieldInstance().orig().constantValueSet()) {
-                           Goal g = scheduler.FieldConstantsChecked(f.fieldInstance().orig());
-                           throw new MissingDependencyException(g);
-                       }
-                   }
-                   if (n instanceof Local) {
-                       Local l = (Local) n;
-                       if (! l.localInstance().orig().constantValueSet()) {
-                           // Undefined variable or forward reference.
-                           LocalDecl_c.this.li.setNotConstant();
-                       }
-                   }
-                   return n;
-               }
-            });
-            
+            init.visit(new AddDependenciesVisitor(cc, li));
             return this;
         }
         

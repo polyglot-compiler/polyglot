@@ -18,15 +18,19 @@ public class NodeFactory_c extends AbstractNodeFactory_c
 {
     private final ExtFactory extFactory;
     private final DelFactory delFactory;
+    
+    // use an empty implementation of AbstractExtFactory_c and
+    // AbstractDelFactory_c, so we don't need to do null checks
+    protected static class EmptyExtFactory extends AbstractExtFactory_c { }
+    protected static class EmptyDelFactory extends AbstractDelFactory_c { }
+    
     public NodeFactory_c() {
-        // use an empty implementation of AbstractExtFactory_c and
-        // AbstractDelFactory_c, so we don't need to do null checks
-        this(new AbstractExtFactory_c() {}, 
-             new AbstractDelFactory_c() {}); 
+        this(new EmptyExtFactory(), 
+             new EmptyDelFactory()); 
     }
     public NodeFactory_c(ExtFactory extFactory) {
         this(extFactory, 
-             new AbstractDelFactory_c() {}); 
+             new EmptyDelFactory()); 
     }
     public NodeFactory_c(ExtFactory extFactory,
                            DelFactory delFactory ) {

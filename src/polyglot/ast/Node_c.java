@@ -193,23 +193,6 @@ public abstract class Node_c implements Node
 	    }
 	}
     
-    /*
-	if (! n.error() && n != this) {
-	    final boolean[] error = new boolean[1];
-	    n.del().visitChildren(new NodeVisitor() {
-	        public Node override(Node m) {
-	            if (m.error()) {
-	                error[0] = true;
-	            }
-	            return m;
-	        }
-	    });
-	    
-	    if (error[0])
-	        return n.error(true);
-	}
-    */
-    
 	return n;
     }
 

@@ -41,10 +41,18 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     }
     
     public boolean constantValueSet() {
+        if (this != declaration()) {
+            return ((VarInstance) declaration()).constantValueSet();
+        }
+        
         return constantValueSet;
     }
     
     public boolean isConstant() {
+        if (this != declaration()) {
+            return ((VarInstance) declaration()).isConstant();
+        }
+        
         if (! constantValueSet) {
             if (! flags.isFinal()) {
                 setNotConstant();
@@ -57,6 +65,10 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
     }
 
     public Object constantValue() {
+        if (this != declaration()) {
+            return ((VarInstance) declaration()).constantValue();
+        }
+
         if (isConstant()) {
             return constantValue;
         }

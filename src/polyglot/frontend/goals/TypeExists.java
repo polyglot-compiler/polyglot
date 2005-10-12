@@ -17,10 +17,13 @@ import polyglot.types.TypeSystem;
  * @author nystrom
  */
 public class TypeExists extends AbstractGoal {
-    private String typeName;
-    private boolean reached;
+    public static Goal create(Scheduler scheduler, String name) {
+        return scheduler.internGoal(new TypeExists(name));
+    }
+
+    protected String typeName;
     
-    public TypeExists(String name) {
+    protected TypeExists(String name) {
         super(null);
         this.typeName = name;
     }
@@ -35,10 +38,6 @@ public class TypeExists extends AbstractGoal {
         return typeName;
     }
 
-    public void markReached() {
-        this.reached = true;
-    }
-    
     public int hashCode() {
         return typeName.hashCode() + super.hashCode();
     }

@@ -19,14 +19,14 @@ import polyglot.util.InternalCompilerError;
  * @author nystrom
  */
 public abstract class Barrier extends AbstractGoal {
-    Scheduler scheduler;
+    protected Scheduler scheduler;
     
-    public Barrier(Scheduler scheduler) {
+    protected Barrier(Scheduler scheduler) {
         super(null);
         this.scheduler = scheduler;
     }
 
-    public Barrier(String name, Scheduler scheduler) {
+    protected Barrier(String name, Scheduler scheduler) {
         super(null, name);
         this.scheduler = scheduler;
     }
@@ -39,33 +39,31 @@ public abstract class Barrier extends AbstractGoal {
      * @see polyglot.frontend.goals.Goal#createPass(polyglot.frontend.ExtensionInfo)
      */
     public Pass createPass(ExtensionInfo extInfo) {
-        return new EmptyPass(this) {
-            public boolean run() {
-                for (Iterator i = Barrier.this.jobs().iterator(); i.hasNext(); ) {
-                    Job job = (Job) i.next();
-                    Goal subgoal = goalForJob(job);
-                    if (! subgoal.hasBeenReached()) {
-                        throw new MissingDependencyException(subgoal, true);
-                    }
-                }
-                return true;
-            }
-        };
+        return new BarrierPass(scheduler, this);
     }
-    
-//    public Collection prerequisiteGoals(Scheduler scheduler) {
-//        List l = new ArrayList();
-//        l.addAll(super.prerequisiteGoals(scheduler));
-//        
-//        for (Iterator i = Barrier.this.jobs().iterator(); i.hasNext(); ) {
-//            Job job = (Job) i.next();
-//            Goal subgoal = goalForJob(job);
-//            l.add(subgoal);
-//        }
-//        
-//        return l;
-//    }
-    
+
+    protected static class BarrierPass extends AbstractPass {
+        Scheduler scheduler;
+        
+        protected BarrierPass(Scheduler scheduler, Barrier barrier) {
+            super(barrier);
+            this.scheduler = scheduler;
+        }
+                
+        public boolean run() {
+            Barrier barrier = (Barrier) goal();
+            for (Iterator i = barrier.jobs().iterator(); i.hasNext(); ) {
+                Job job = (Job) i.next();
+                Goal subgoal = barrier.goalForJob(job);
+                if (! subgoal.hasBeenReached()) {
+                    scheduler.addDependencyAndEnqueue(barrier, subgoal, true);
+                    barrier.setUnreachableThisRun();
+                }
+            }
+            return true;
+        }
+    }
+
     public abstract Goal goalForJob(Job job); 
 
     public String toString() {

@@ -93,7 +93,16 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
     }
     
     public boolean isConstant() {
+        if (this != orig()) {
+            return orig().isConstant();
+        }
+    
         if (! constantValueSet) {
+            if (! flags.isFinal()) {
+                setNotConstant();
+                return isConstant;
+            }
+
             Scheduler scheduler = typeSystem().extensionInfo().scheduler();
             Goal g = scheduler.FieldConstantsChecked(this);
             throw new MissingDependencyException(g);

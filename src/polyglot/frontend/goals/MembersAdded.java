@@ -7,8 +7,6 @@
 package polyglot.frontend.goals;
 
 import java.util.*;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
@@ -24,23 +22,31 @@ import polyglot.visit.TypeBuilder;
  * @author nystrom
  */
 public class MembersAdded extends ClassTypeGoal {
-    public MembersAdded(ParsedClassType ct) {
+    public static Goal create(Scheduler scheduler, ParsedClassType ct) {
+        return scheduler.internGoal(new MembersAdded(ct));
+    }
+
+    protected MembersAdded(ParsedClassType ct) {
         super(ct);
+    }
+
+    protected static class MembersAddedPass extends AbstractPass {
+        MembersAddedPass(Goal goal) {
+            super(goal);
+        }
+        
+        public boolean run() {
+            MembersAdded goal = (MembersAdded) this.goal;
+            if (! goal.type().membersAdded()) {
+                throw new SchedulerException();
+            }
+            return true;
+        }
     }
 
     public Pass createPass(ExtensionInfo extInfo) {
         if (job() != null) {
-//          TypeSystem ts = extInfo.typeSystem();
-//          NodeFactory nf = extInfo.nodeFactory();
-//          return new VisitorPass(this, new TypeBuilder(job(), ts, nf));
-            return new EmptyPass(this) {
-                public boolean run() {
-                    if (! MembersAdded.this.type().membersAdded()) {
-                        throw new SchedulerException();
-                    }
-                    return true;
-                }
-            };
+            return new MembersAddedPass(this);
         }
         return new AddMembersPass(extInfo.scheduler(), this);
     }

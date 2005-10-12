@@ -7,8 +7,6 @@
 package polyglot.frontend.goals;
 
 import java.util.*;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
@@ -20,7 +18,11 @@ import polyglot.visit.NodeVisitor;
 
 
 public class Serialized extends SourceFileGoal {
-    public Serialized(Job job) { super(job); }
+    public static Goal create(Scheduler scheduler, Job job) {
+        return scheduler.internGoal(new Serialized(job));
+    }
+
+    protected Serialized(Job job) { super(job); }
     
     public Pass createPass(ExtensionInfo extInfo) {
         Compiler compiler = extInfo.compiler();

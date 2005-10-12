@@ -7,19 +7,15 @@
 package polyglot.ext.jl;
 
 import java.util.*;
-import java.util.ArrayList;
-import java.util.Collections;
 
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
 import polyglot.frontend.goals.*;
+import polyglot.frontend.goals.Disambiguated;
+import polyglot.frontend.goals.TypeChecked;
 import polyglot.types.*;
-import polyglot.types.FieldInstance;
-import polyglot.types.ParsedClassType;
 import polyglot.util.InternalCompilerError;
 import polyglot.visit.*;
-import polyglot.visit.ExceptionChecker;
-import polyglot.visit.ReachChecker;
 
 /**
  * Comment for <code>Scheduler</code>
@@ -35,223 +31,135 @@ public class JLScheduler extends Scheduler {
     }
     
     public Goal TypeExists(String name) {
-        return internGoal(new TypeExists(name));
+        return TypeExists.create(this, name);
     }
     
     public Goal MembersAdded(ParsedClassType ct) {
-        Goal g = internGoal(new MembersAdded(ct));
+        Goal g = MembersAdded.create(this, ct);
         return g;
     }
 
     public Goal SupertypesResolved(ParsedClassType ct) {
-        Goal g = internGoal(new SupertypesResolved(ct));
+        Goal g = SupertypesResolved.create(this, ct);
         return g;
     }
 
     public Goal SignaturesResolved(ParsedClassType ct) {
-        Goal g = internGoal(new SignaturesResolved(ct));
+        Goal g = SignaturesResolved.create(this, ct);
         return g;
     }
 
     public Goal FieldConstantsChecked(FieldInstance fi) {
-        Goal g = internGoal(new FieldConstantsChecked(fi));
+        Goal g = FieldConstantsChecked.create(this, fi);
         return g;
     }
     
     public Goal Parsed(Job job) {
-        return internGoal(new Parsed(job));
+        return Parsed.create(this, job);
     }
     
-    public Goal TypesInitialized(final Job job) {
+    public Goal TypesInitialized(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new TypeBuilder(job, ts, nf)) {
-            public Collection prerequisiteGoals(Scheduler scheduler) {
-                List l = new ArrayList();
-                l.addAll(super.prerequisiteGoals(scheduler));
-                l.add(Parsed(job));
-                return l;
-            }
-        });
+        Goal g = TypesInitialized.create(this, job, ts, nf);
         return g;
- }
+    }
     
     public Goal TypesInitializedForCommandLine() {
-        return internGoal(new Barrier("TYPES_INIT_BARRIER", this) {
-            public Goal goalForJob(Job j) {
-                return JLScheduler.this.TypesInitialized(j);
-            }
-//            
-//            public Collection jobs() {
-//                return JLScheduler.this.commandLineJobs();
-//            }
-        });
+        return TypesInitializedForCommandLine.create(this);
     }
     
-    public Goal ImportTableInitialized(final Job job) {
+    public Goal ImportTableInitialized(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new InitImportsVisitor(job, ts, nf)) {
-            public Collection prerequisiteGoals(Scheduler scheduler) {
-                List l = new ArrayList();
-                l.addAll(super.prerequisiteGoals(scheduler));
-                l.add(TypesInitializedForCommandLine());
-                l.add(TypesInitialized(job));
-                return l;
-            }
-        });
+        Goal g = ImportTableInitialized.create(this, job, ts, nf);
         return g;
     }
     
-    public Goal Disambiguated(final Job job) {
+    public Goal Disambiguated(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new AmbiguityRemover(job, ts, nf)) {
-            public Collection prerequisiteGoals(Scheduler scheduler) {
-                List l = new ArrayList();
-                l.addAll(super.prerequisiteGoals(scheduler));
-                l.add(ImportTableInitialized(job));
-                return l;
-            }
-        });
+        Goal g = (Disambiguated.create(this, job, ts, nf));
         return g;
     }
     
-    public Goal TypeChecked(final Job job) {
+    public Goal SignaturesDisambiguated(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new TypeChecker(job, ts, nf)) {
-            public Collection prerequisiteGoals(Scheduler scheduler) {
-                List l = new ArrayList();
-                l.addAll(super.prerequisiteGoals(scheduler));
-                l.add(Disambiguated(job));
-                return l;
-            }
+        Goal g = SignaturesDisambiguated.create(this, job, ts, nf);
+        return g;
+    }
 
-            public Collection corequisiteGoals(Scheduler scheduler) {
-                List l = new ArrayList();
-                l.addAll(super.corequisiteGoals(scheduler));
-                l.add(ConstantsChecked(job));
-                return l;
-            }
-        });
+    public Goal SupertypesDisambiguated(Job job) {
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = SupertypesDisambiguated.create(this, job, ts, nf);
         return g;
     }
     
-    public Goal ConstantsChecked(final Job job) {
+    public Goal TypeChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new ConstantChecker(job, ts, nf)) {
-            public Collection prerequisiteGoals(Scheduler scheduler) {
-                List l = new ArrayList();
-                l.addAll(super.prerequisiteGoals(scheduler));
-                l.add(Disambiguated(job));
-                return l;
-            }
-
-            public Collection corequisiteGoals(Scheduler scheduler) {
-                List l = new ArrayList();
-                l.addAll(super.corequisiteGoals(scheduler));
-                l.add(TypeChecked(job));
-                return l;
-            }
-        });
+        Goal g = TypeChecked.create(this, job, ts, nf);
         return g;
     }
     
-    public Goal ReachabilityChecked(final Job job) {
+    public Goal ConstantsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new ReachChecker(job, ts, nf)) {
-            public Collection prerequisiteGoals(Scheduler scheduler) {
-                List l = new ArrayList();
-                l.addAll(super.prerequisiteGoals(scheduler));
-                l.add(TypeChecked(job));
-                l.add(ConstantsChecked(job));
-                return l;
-            }
-        });
+        Goal g = ConstantsChecked.create(this, job, ts, nf);
         return g;
     }
     
-    public Goal ExceptionsChecked(final Job job) {
+    public Goal ReachabilityChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new ExceptionChecker(job, ts, nf)) {
-            public Collection prerequisiteGoals(Scheduler scheduler) {
-                List l = new ArrayList();
-                l.addAll(super.prerequisiteGoals(scheduler));
-                l.add(TypeChecked(job));
-                l.add(ReachabilityChecked(job));
-                return l;
-            }
-        });
+        Goal g = ReachabilityChecked.create(this, job, ts, nf);
         return g;
     }
     
-    public Goal ExitPathsChecked(final Job job) {
+    public Goal ExceptionsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new ExitChecker(job, ts, nf)) {
-            public Collection prerequisiteGoals(Scheduler scheduler) {
-                List l = new ArrayList();
-                l.addAll(super.prerequisiteGoals(scheduler));
-                l.add(ReachabilityChecked(job));
-                return l;
-            }
-        });
+        Goal g = ExceptionsChecked.create(this, job, ts, nf);
         return g;
     }
     
-    public Goal InitializationsChecked(final Job job) {
+    public Goal ExitPathsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new InitChecker(job, ts, nf)) {
-            public Collection prerequisiteGoals(Scheduler scheduler) {
-                List l = new ArrayList();
-                l.addAll(super.prerequisiteGoals(scheduler));
-                l.add(ReachabilityChecked(job));
-                return l;
-            }
-        });
+        Goal g = ExitPathsChecked.create(this, job, ts, nf);
         return g;
     }
     
-    public Goal ConstructorCallsChecked(final Job job) {
+    public Goal InitializationsChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new ConstructorCallChecker(job, ts, nf)) {
-            public Collection prerequisiteGoals(Scheduler scheduler) {
-                List l = new ArrayList();
-                l.addAll(super.prerequisiteGoals(scheduler));
-                l.add(ReachabilityChecked(job));
-                return l;
-            }
-        });
+        Goal g = InitializationsChecked.create(this, job, ts, nf);
+        return g;
+    }
+    
+    public Goal ConstructorCallsChecked(Job job) {
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = ConstructorCallsChecked.create(this, job, ts, nf);
         return g; 
     }
     
-    public Goal ForwardReferencesChecked(final Job job) {
+    public Goal ForwardReferencesChecked(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        Goal g = internGoal(new VisitorGoal(job, new FwdReferenceChecker(job, ts, nf)) {
-            public Collection prerequisiteGoals(Scheduler scheduler) {
-                List l = new ArrayList();
-                l.addAll(super.prerequisiteGoals(scheduler));
-                l.add(ReachabilityChecked(job));
-                return l;
-            }
-        });
+        Goal g = ForwardReferencesChecked.create(this, job, ts, nf);
         return g;
     }
     
     public Goal Serialized(Job job) {
-        Goal g = internGoal(new Serialized(job));
+        Goal g = Serialized.create(this, job);
         return g;
     }
     
     public Goal CodeGenerated(Job job) {
-        Goal g = internGoal(new CodeGenerated(job));
+        Goal g = CodeGenerated.create(this, job);
         return g;
     }
 }

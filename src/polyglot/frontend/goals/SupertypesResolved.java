@@ -7,14 +7,11 @@
 package polyglot.frontend.goals;
 
 import java.util.*;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
+import polyglot.frontend.goals.SignaturesResolved.SignaturesResolvedPass;
 import polyglot.frontend.passes.*;
-import polyglot.frontend.passes.ResolveSuperTypesPass;
-import polyglot.frontend.passes.TypeCheckPass;
 import polyglot.types.ParsedClassType;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
@@ -27,27 +24,35 @@ import polyglot.visit.TypeChecker;
  * @author nystrom
  */
 public class SupertypesResolved extends ClassTypeGoal {
-    public SupertypesResolved(ParsedClassType ct) {
+    public static Goal create(Scheduler scheduler, ParsedClassType ct) {
+        return scheduler.internGoal(new SupertypesResolved(ct));
+    }
+
+    protected SupertypesResolved(ParsedClassType ct) {
         super(ct);
     }
     
+    protected static class SupertypesResolvedPass extends AbstractPass {
+        SupertypesResolvedPass(Goal goal) {
+            super(goal);
+        }
+        
+        public boolean run() {
+            SupertypesResolved goal = (SupertypesResolved) this.goal;
+            if (! goal.type().supertypesResolved()) {
+                throw new SchedulerException();
+            }
+            return true;
+        }
+    }
+
     public Pass createPass(ExtensionInfo extInfo) {
         if (job() != null) {
-//            TypeSystem ts = extInfo.typeSystem();
-//            NodeFactory nf = extInfo.nodeFactory();
-//            return new DisambiguatorPass(this, new AmbiguityRemover(job(), ts, nf, false, false));
-            return new EmptyPass(this) {
-                public boolean run() {
-                    if (! SupertypesResolved.this.type().supertypesResolved()) {
-                        throw new SchedulerException();
-                    }
-                    return true;
-                }
-            };
+            return new SupertypesResolvedPass(this);
         }
         return new ResolveSuperTypesPass(extInfo.scheduler(), this);
     }
-    
+
     public Collection prerequisiteGoals(Scheduler scheduler) {
         List l = new ArrayList(super.prerequisiteGoals(scheduler));
         l.add(scheduler.MembersAdded(ct));
@@ -57,10 +62,19 @@ public class SupertypesResolved extends ClassTypeGoal {
         return l;
     }
 
+    protected boolean isGlobal(ParsedClassType ct) {
+        return ct.isTopLevel() || (ct.isMember() && isGlobal((ParsedClassType) ct.container()));
+    }
+    
     public Collection corequisiteGoals(Scheduler scheduler) {
         List l = new ArrayList(super.corequisiteGoals(scheduler));
         if (ct.job() != null) {
-            l.add(scheduler.Disambiguated(ct.job()));
+            if (isGlobal(ct)) {
+                l.add(scheduler.SupertypesDisambiguated(ct.job()));
+            }
+            else {
+                l.add(scheduler.Disambiguated(ct.job()));
+            }
         }
         return l;
     }

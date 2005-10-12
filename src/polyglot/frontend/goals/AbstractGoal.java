@@ -21,11 +21,11 @@ import polyglot.util.StringUtil;
  * @author nystrom
  */
 public abstract class AbstractGoal implements Goal {
-    Job job;
-    String name;
-    int state;
-    Set corequisites;
-    Set prerequisites;
+    protected Job job;
+    protected String name;
+    protected int state;
+    protected Set corequisites;
+    protected Set prerequisites;
 
     private AbstractGoal() {
         this.state = UNREACHED;
@@ -81,7 +81,7 @@ public abstract class AbstractGoal implements Goal {
         prerequisites.add(g);
     }
     
-    private void checkCycles(Goal current, Scheduler scheduler) throws CyclicDependencyException {
+    protected void checkCycles(Goal current, Scheduler scheduler) throws CyclicDependencyException {
         if (this == current) {
             throw new CyclicDependencyException("Goal " + this + " cannot depend on itself.");
         }

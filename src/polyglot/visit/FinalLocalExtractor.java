@@ -101,23 +101,25 @@ public class FinalLocalExtractor extends NodeVisitor {
         return super.enter(parent, n);
     }
     
+    protected static class LocalDeclFixer extends NodeVisitor {
+        public Node leave(Node old, Node n, NodeVisitor v) {
+            if (n instanceof Formal) {
+                Formal d = (Formal) n;
+                return d.flags(d.localInstance().flags());
+            }
+            if (n instanceof LocalDecl) {
+                LocalDecl d = (LocalDecl) n;
+                return d.flags(d.localInstance().flags());
+            }
+            return n;
+        }
+    }
+    
     public Node leave(Node old, Node n, NodeVisitor v) {
         // Revisit everything to ensure the local decls' flags agree with
         // their local instance's.
         if (n instanceof SourceFile) {
-            return n.visit(new NodeVisitor() {
-                public Node leave(Node old, Node n, NodeVisitor v) {
-                    if (n instanceof Formal) {
-                        Formal d = (Formal) n;
-                        return d.flags(d.localInstance().flags());
-                    }
-                    if (n instanceof LocalDecl) {
-                        LocalDecl d = (LocalDecl) n;
-                        return d.flags(d.localInstance().flags());
-                    }
-                    return n;
-                }
-            });
+            return n.visit(new LocalDeclFixer());
         }
         return n;
     }

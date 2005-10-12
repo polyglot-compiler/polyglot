@@ -244,13 +244,16 @@ public class InitChecker extends DataFlow
 
     }
     
-    protected static final Item BOTTOM = new Item() {
+    protected static class BottomItem extends Item {
         public boolean equals(Object i) {
             return i == this;
         }
         public int hashCode() {
             return -5826349;
-        }};
+        }
+    }
+
+    protected static final Item BOTTOM = new BottomItem();
 
     /**
      * Initialise the FlowGraph to be used in the dataflow analysis.

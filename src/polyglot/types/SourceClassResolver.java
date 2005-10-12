@@ -236,6 +236,9 @@ public class SourceClassResolver extends LoadedClassResolver
         // the source has already been compiled; what are we doing here?
         throw new InternalCompilerError("Attempted to load source " + source + ", but it's already loaded.");
     }
+
+    if (Report.should_report("sourceloader", 3))
+        new Exception("loaded " + source).printStackTrace();
     
     Goal g = scheduler.TypesInitialized(job);
     

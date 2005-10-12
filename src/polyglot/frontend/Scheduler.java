@@ -181,10 +181,10 @@ public abstract class Scheduler {
         if (g == null) {
             g = goal;
             goals.put(g, g);
-            if (Report.should_report(Report.frontend, 3))
-                Report.report(3, "new goal " + g);
             if (Report.should_report(Report.frontend, 4))
-                Report.report(4, "goals = " + goals.keySet());
+                Report.report(4, "new goal " + g);
+            if (Report.should_report(Report.frontend, 5))
+                Report.report(5, "goals = " + goals.keySet());
         }
         return g;   
     }
@@ -285,8 +285,8 @@ public abstract class Scheduler {
         boolean okay = true;
         
         while (! worklist.isEmpty()) {
-            if (Report.should_report(Report.frontend, 2))
-                Report.report(2, "processing next in worklist " + worklist);
+            if (Report.should_report(Report.frontend, 4))
+                Report.report(4, "processing next in worklist " + worklist);
     
             Goal goal = selectGoalFromWorklist();
             
@@ -294,12 +294,12 @@ public abstract class Scheduler {
                 continue;
             }
             
-            if (Report.should_report(Report.frontend, 1)) {
-                Report.report(1, "Selected goal " + goal);
+            if (Report.should_report(Report.frontend, 2)) {
+                Report.report(2, "Selected goal " + goal);
             }
 
             try {
-                okay &= attemptGoal(goal, true, new HashSet(), new HashSet());
+                okay &= attemptGoal(goal);
             }
             catch (CyclicDependencyException e) {
                 addGoalToWorklist(goal);
@@ -311,8 +311,8 @@ public abstract class Scheduler {
             }
             
             if (! reached(goal)) {
-                if (Report.should_report(Report.frontend, 1)) {
-                    Report.report(1, "Failed to reach " + goal + "; will reattempt");
+                if (Report.should_report(Report.frontend, 2)) {
+                    Report.report(2, "Failed to reach " + goal + "; will reattempt");
                 }
             
                 addGoalToWorklist(goal);
@@ -381,12 +381,12 @@ public abstract class Scheduler {
             return null;
         }               
         
-        // Create a goal for the job; this will set up dependencies for the goal,
-        // even if the goal isn't added to the work list.
+        // Create a goal for the job; this will set up dependencies for
+        // the goal, even if the goal isn't to be added to the work list.
         Goal compileGoal = extInfo.getCompileGoal(job);
 
         if (compile) {
-            // Now, add a goal for completing the job.
+            // Now, add a goal for compiling the source.
             addGoal(compileGoal);
         }
         
@@ -409,10 +409,6 @@ public abstract class Scheduler {
         return currentPass != null ? currentPass.goal() : null;
     }
     
-    public boolean attemptGoal(Goal goal) throws CyclicDependencyException {
-        return attemptGoal(goal, true, new HashSet(), new HashSet());
-    }
-    
     /**
      * Run a passes until the <code>goal</code> is attempted. Callers should
      * check goal.completed() and should be able to handle the goal not being
@@ -421,43 +417,29 @@ public abstract class Scheduler {
      * @return false if there was an error trying to reach the goal; true if
      *         there was no error, even if the goal was not reached.
      */ 
-    private boolean attemptGoal(final Goal goal, boolean sameThread,
-                                final Set prereqsAbove, final Set goalsAbove)
-            throws CyclicDependencyException
-    {
+    public boolean attemptGoal(Goal goal) throws CyclicDependencyException {
         if (Report.should_report("dump-dep-graph", 2))
             dumpInFlightDependenceGraph();
 
         if (Report.should_report(Report.frontend, 2))
             Report.report(2, "Running to goal " + goal);
         
-        if (Report.should_report(Report.frontend, 3)) {
-            Report.report(3, "  Reachable = " + goal.isReachable());
-            Report.report(3, "  Prerequisites for " + goal + " = " + goal.prerequisiteGoals(this));
-            Report.report(3, "  Corequisites for " + goal + " = " + goal.corequisiteGoals(this));
-        }
-        if (Report.should_report(Report.frontend, 4)) {
-            Report.report(4, "  Prereqs = " + prereqsAbove);
-            Report.report(4, "  Dependees = " + goalsAbove);
+        if (Report.should_report(Report.frontend, 1)) {
+            Report.report(4, "  Reachable = " + goal.isReachable());
+            Report.report(4, "  Prerequisites for " + goal + " = " + goal.prerequisiteGoals(this));
+            Report.report(4, "  Corequisites for " + goal + " = " + goal.corequisiteGoals(this));
         }
         
         if (reached(goal)) {
-            if (Report.should_report(Report.frontend, 3))
+            if (Report.should_report(Report.frontend, 1))
                 Report.report(3, "Already reached goal " + goal);
             return true;
         }
 
         if (! goal.isReachable()) {
-            if (Report.should_report(Report.frontend, 3))
+            if (Report.should_report(Report.frontend, 1))
                 Report.report(3, "Cannot reach goal " + goal);
             return false;
-        }
-        
-        if (prereqsAbove.contains(goal)) {
-            // The goal has itself as a prerequisite.
-            if (Report.should_report("dump-dep-graph", 1))
-                dumpInFlightDependenceGraph();
-            throw new InternalCompilerError("Goal " + goal + " depends on itself.");
         }
         
         // Another pass is being run over the same source file.  We cannot reach
@@ -470,15 +452,6 @@ public abstract class Scheduler {
                 Report.report(3, "Job " + goal.job() + " is running");
             throw new CyclicDependencyException();
         }
-        
-        if (goalsAbove.contains(goal)) {
-            if (Report.should_report(Report.frontend, 3))
-                Report.report(3, "Goal " + goal + " is being processed above");
-            return true;
-        }
-
-        prereqsAbove.add(goal);
-        goalsAbove.add(goal);
         
         // Make sure all subgoals have been completed,
         // except those that recursively depend on this goal.
@@ -501,27 +474,6 @@ public abstract class Scheduler {
             return true;
         }
             
-//        for (Iterator i = new ArrayList(goal.prerequisiteGoals(this)).iterator(); i.hasNext(); ) {
-//            Goal subgoal = (Goal) i.next();
-//            
-//            boolean okay = attemptGoal(subgoal, true, prereqsAbove, goalsAbove);
-//            
-//            if (! okay) {
-//                goal.setUnreachable();
-//                if (Report.should_report(Report.frontend, 3))
-//                    Report.report(3, "Cannot reach goal " + goal + "; " + subgoal + " failed");
-//                return false;
-//            }
-//            
-//            if (! reached(subgoal)) {
-//                // put the subgoal back on the worklist
-//                addGoal(subgoal);
-//                runPass = false;
-//                if (Report.should_report(Report.frontend, 3))
-//                    Report.report(3, "Will delay goal " + goal + "; " + subgoal + " not reached");
-//            }
-//        }
-
         for (Iterator i = new ArrayList(goal.corequisiteGoals(this)).iterator(); i.hasNext(); ) {
             Goal subgoal = (Goal) i.next();
             
@@ -529,24 +481,6 @@ public abstract class Scheduler {
                 addGoal(subgoal);
             }
         }
-
-//        for (Iterator i = new ArrayList(goal.corequisiteGoals(this)).iterator(); i.hasNext(); ) {
-//            Goal subgoal = (Goal) i.next();
-//            
-//            boolean okay = attemptGoal(subgoal, true, new HashSet(), goalsAbove);
-//            
-//            if (! okay) {
-//                goal.setUnreachable();
-//                if (Report.should_report(Report.frontend, 3))
-//                    Report.report(3, "Cannot reach goal " + goal + "; " + subgoal + " failed");
-//                return false;
-//            }
-//            
-//            if (! reached(subgoal)) {
-//                // put the subgoal on the worklist
-//                addGoal(subgoal);
-//            }
-//        }
 
         if (! runPass) {
             if (Report.should_report(Report.frontend, 3))
@@ -571,9 +505,6 @@ public abstract class Scheduler {
         Pass pass = goal.createPass(extInfo);
         boolean result = runPass(pass);
 
-        goalsAbove.remove(goal);
-        prereqsAbove.remove(goal);
-        
         if (result && ! reached(goal)) {
             // Add the goal back on the worklist.
             addGoalToWorklist(goal);
@@ -650,22 +581,34 @@ public abstract class Scheduler {
 
             long t = System.currentTimeMillis();
             String key = goal.toString();
+
+            extInfo.getStats().accumPassTimes(key + " attempts", 1, 1);
+            extInfo.getStats().accumPassTimes("goal attempts", 1, 1);
             
             try {
-                 result = pass.run();
+                result = pass.run();
 
                 if (! result) {
+                    extInfo.getStats().accumPassTimes(key + " failures", 1, 1);
+                    extInfo.getStats().accumPassTimes("goal failures", 1, 1);
+
                     goal.setState(Goal.UNREACHABLE);
                     if (Report.should_report(Report.frontend, 1))
                         Report.report(1, "Failed pass " + pass + " for " + goal);
                 }
                 else {
                     if (goal.state() == Goal.RUNNING) {
+                        extInfo.getStats().accumPassTimes(key + " reached", 1, 1);
+                        extInfo.getStats().accumPassTimes("goal reached", 1, 1);
+
                         goal.setState(Goal.REACHED);
                         if (Report.should_report(Report.frontend, 1))
                             Report.report(1, "Completed pass " + pass + " for " + goal);
                     }
                     else {
+                        extInfo.getStats().accumPassTimes(key + " unreached", 1, 1);
+                        extInfo.getStats().accumPassTimes("goal unreached", 1, 1);
+
                         goal.setState(Goal.ATTEMPTED);                    
                         if (Report.should_report(Report.frontend, 1))
                             Report.report(1, "Completed (unreached) pass " + pass + " for " + goal);
@@ -679,6 +622,9 @@ public abstract class Scheduler {
                 if (Report.should_report(Report.frontend, 3))
                     e.printStackTrace();
                 
+                extInfo.getStats().accumPassTimes(key + " aborts", 1, 1);
+                extInfo.getStats().accumPassTimes("goal aborts", 1, 1);
+
                 addDependencyAndEnqueue(goal, e.goal(), e.prerequisite());
                 
                 goal.setState(Goal.ATTEMPTED);
@@ -687,6 +633,9 @@ public abstract class Scheduler {
             catch (SchedulerException e) {
                 if (Report.should_report(Report.frontend, 1))
                     Report.report(1, "Did not complete pass " + pass + " for " + goal);
+
+                extInfo.getStats().accumPassTimes(key + " aborts", 1, 1);
+                extInfo.getStats().accumPassTimes("goal aborts", 1, 1);
                 
                 goal.setState(Goal.ATTEMPTED);
                 result = true;
@@ -782,6 +731,9 @@ public abstract class Scheduler {
     public abstract Goal Parsed(Job job);
     public abstract Goal TypesInitialized(Job job);
     public abstract Goal TypesInitializedForCommandLine();
+    public abstract Goal ImportTableInitialized(final Job job);
+    public abstract Goal SignaturesDisambiguated(Job job);
+    public abstract Goal SupertypesDisambiguated(Job job);
     public abstract Goal Disambiguated(Job job);
     public abstract Goal TypeChecked(Job job);
     public abstract Goal ConstantsChecked(Job job);
@@ -844,8 +796,8 @@ public abstract class Scheduler {
             // record the job in the map and the worklist.
             jobs.put(source, job);
     
-            if (Report.should_report(Report.frontend, 3)) {
-                Report.report(3, "Adding job for " + source + " at the " +
+            if (Report.should_report(Report.frontend, 4)) {
+                Report.report(4, "Adding job for " + source + " at the " +
                     "request of pass " + currentPass);
             }
         }

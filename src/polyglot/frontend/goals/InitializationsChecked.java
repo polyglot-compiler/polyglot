@@ -1,5 +1,5 @@
 /*
- * Disambiguated.java
+ * InitializationsChecked.java
  * 
  * Author: nystrom
  * Creation date: Oct 11, 2005
@@ -12,21 +12,21 @@ import polyglot.ast.NodeFactory;
 import polyglot.frontend.Job;
 import polyglot.frontend.Scheduler;
 import polyglot.types.TypeSystem;
-import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.InitChecker;
 
-public class Disambiguated extends VisitorGoal {
+public class InitializationsChecked extends VisitorGoal {
     public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
-        return scheduler.internGoal(new Disambiguated(job, ts, nf));
+        return scheduler.internGoal(new InitializationsChecked(job, ts, nf));
     }
 
-    protected Disambiguated(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, new AmbiguityRemover(job, ts, nf, true, true));
+    protected InitializationsChecked(Job job, TypeSystem ts, NodeFactory nf) {
+        super(job, new InitChecker(job, ts, nf));
     }
 
     public Collection prerequisiteGoals(Scheduler scheduler) {
         List l = new ArrayList();
         l.addAll(super.prerequisiteGoals(scheduler));
-        l.add(scheduler.ImportTableInitialized(job));
+        l.add(scheduler.ReachabilityChecked(job));
         return l;
     }
 }

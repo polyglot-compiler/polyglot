@@ -30,34 +30,36 @@ public class ConstantChecker extends ContextVisitor
     }
     */
     
+    protected static class TypeCheckChecker extends NodeVisitor {
+        boolean checked = true;
+        public Node override(Node n) {   
+            if (! n.isTypeChecked()) {
+                checked = false;
+            }
+            return n;
+        }
+    }
+    
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::leave " + n);
         
-        final boolean[] typeChecked = new boolean[1];
+        TypeCheckChecker tcc = new TypeCheckChecker();
         
         if (n instanceof Expr) {
             Expr e = (Expr) n;
-            if (e.type() == null || ! e.type().isCanonical()) {
-                typeChecked[0] = true;
+            if (! e.isTypeChecked()) {
+                tcc.checked = false;
             }
         }
 
-        if (! typeChecked[0]) {
-            n.visitChildren(new NodeVisitor() {
-                public Node override(Node n) {    
-                    if (n instanceof Expr &&
-                        (((Expr) n).type() == null || ! ((Expr) n).type().isCanonical())) {
-                        typeChecked[0] = true;
-                    }
-                    return n;
-                }
-            });
+        if (tcc.checked) {
+            n.visitChildren(tcc);
         }
         
         Node m = n;
         
-        if (! typeChecked[0]) {
+        if (tcc.checked) {
             m = m.del().checkConstants((ConstantChecker) v);
         }
         else {

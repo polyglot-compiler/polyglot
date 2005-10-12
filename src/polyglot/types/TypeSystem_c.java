@@ -1026,13 +1026,13 @@ public class TypeSystem_c implements TypeSystem
     /**
      * Class to handle the comparisons; dispatches to moreSpecific method.
      */
-    protected class MostSpecificComparator implements Comparator {
+    protected static class MostSpecificComparator implements Comparator {
 	public int compare(Object o1, Object o2) {
 	    ProcedureInstance p1 = (ProcedureInstance) o1;
 	    ProcedureInstance p2 = (ProcedureInstance) o2;
 
-	    if (moreSpecific(p1, p2)) return -1;
-	    if (moreSpecific(p2, p1)) return 1;
+	    if (p1.moreSpecific(p2)) return -1;
+	    if (p2.moreSpecific(p1)) return 1;
 	    return 0;
 	}
     }

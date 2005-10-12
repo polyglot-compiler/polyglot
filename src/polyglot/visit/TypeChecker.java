@@ -72,27 +72,30 @@ public class TypeChecker extends DisambiguationDriver
         return v;
     }
     
+    protected static class AmbChecker extends NodeVisitor {
+        boolean amb;
+        
+        public Node override(Node n) {   
+            if (! n.isDisambiguated() || ! n.isTypeChecked()) {
+//                System.out.println("  !!!!! no type at " + n + " (" + n.getClass().getName() + ")");
+//                if (n instanceof Expr)  
+//                    System.out.println("   !!!! n.type = " + ((Expr) n).type());
+                amb = true;
+            }
+            return n;
+        }
+    }
+    
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::leave " + n);
 
-        final boolean[] amb = new boolean[1];
-        
-        n.visitChildren(new NodeVisitor() {
-            public Node override(Node n) {   
-                if (! n.isDisambiguated() || ! n.isTypeChecked()) {
-//                    System.out.println("  !!!!! no type at " + n + " (" + n.getClass().getName() + ")");
-//                    if (n instanceof Expr)  
-//                        System.out.println("   !!!! n.type = " + ((Expr) n).type());
-                    amb[0] = true;
-                }
-                return n;
-            }
-        });
+        AmbChecker ac = new AmbChecker();
+        n.visitChildren(ac);
         
         Node m = n;
         
-        if (! amb[0] && m.isDisambiguated()) {
+        if (! ac.amb && m.isDisambiguated()) {
 //          System.out.println("running typeCheck for " + m);
             m = m.del().typeCheck((TypeChecker) v);
             

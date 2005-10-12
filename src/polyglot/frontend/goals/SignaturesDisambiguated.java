@@ -14,13 +14,13 @@ import polyglot.frontend.Scheduler;
 import polyglot.types.TypeSystem;
 import polyglot.visit.AmbiguityRemover;
 
-public class Disambiguated extends VisitorGoal {
+public class SignaturesDisambiguated extends VisitorGoal {
     public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
-        return scheduler.internGoal(new Disambiguated(job, ts, nf));
+        return scheduler.internGoal(new SignaturesDisambiguated(job, ts, nf));
     }
 
-    protected Disambiguated(Job job, TypeSystem ts, NodeFactory nf) {
-        super(job, new AmbiguityRemover(job, ts, nf, true, true));
+    protected SignaturesDisambiguated(Job job, TypeSystem ts, NodeFactory nf) {
+        super(job, new AmbiguityRemover(job, ts, nf, true, false));
     }
 
     public Collection prerequisiteGoals(Scheduler scheduler) {

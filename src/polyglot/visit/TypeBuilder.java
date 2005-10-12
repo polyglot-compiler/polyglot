@@ -188,7 +188,6 @@ public class TypeBuilder extends NodeVisitor
             if (allMembers) {
                 typeSystem().parsedResolver().addNamed(
                     typeSystem().getTransformedClassName(ct), ct);
-                satisfyTypeExistsGoal(ct);
             }
 
             return ct;
@@ -210,20 +209,10 @@ public class TypeBuilder extends NodeVisitor
 
             typeSystem().parsedResolver().addNamed(ct.fullName(), ct);
             ((CachingResolver) typeSystem().systemResolver()).addNamed(ct.fullName(), ct);
-            satisfyTypeExistsGoal(ct);
 
 	    return ct;
 	}
     
-    }
-
-    /**
-     * @param ct
-     */
-    private void satisfyTypeExistsGoal(ParsedClassType ct) {
-        Scheduler scheduler = job().extensionInfo().scheduler();
-        TypeExists goal = (TypeExists) scheduler.TypeExists(ct.fullName());
-        goal.markReached();
     }
 
     public TypeBuilder pushAnonClass(Position pos) throws SemanticException {

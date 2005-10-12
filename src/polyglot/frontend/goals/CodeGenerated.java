@@ -7,8 +7,6 @@
 package polyglot.frontend.goals;
 
 import java.util.*;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
@@ -21,11 +19,14 @@ import polyglot.visit.Translator;
  * @author nystrom
  */
 public class CodeGenerated extends SourceFileGoal implements EndGoal {
+    public static Goal create(Scheduler scheduler, Job job) {
+        return scheduler.internGoal(new CodeGenerated(job));
+    }
 
     /**
      * @param job The job to compile.
      */
-    public CodeGenerated(Job job) {
+    protected CodeGenerated(Job job) {
         super(job);
     }
     
