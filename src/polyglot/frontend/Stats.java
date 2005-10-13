@@ -66,15 +66,15 @@ public class Stats
         if (Report.should_report(Report.time, 1)) {
             Report.report(1, "\nStatistics for " + ext.compilerName() +
                           " (" + ext.getClass().getName() + ")");
-            Report.report(1, "Pass Inclusive Exclusive");
-            Report.report(1, "---- --------- ---------");
+            Report.report(1, "Inclusive Exclusive Key");
+            Report.report(1, "--------- --------- ---");
 
             for (Iterator i = keys.iterator(); i.hasNext(); ) {
                 Object key = i.next();
                 Times t = (Times) passTimes.get(key);
 
-                Report.report(1, key.toString() + " " +
-                                 t.inclusive + " " + t.exclusive);
+                Report.report(1, t.inclusive + " " + t.exclusive + " " +
+                                 key.toString());
             }
         }
     }
