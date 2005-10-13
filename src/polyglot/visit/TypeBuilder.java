@@ -186,8 +186,9 @@ public class TypeBuilder extends NodeVisitor
             }
 
             if (allMembers) {
-                typeSystem().parsedResolver().addNamed(
-                    typeSystem().getTransformedClassName(ct), ct);
+                String fullName = typeSystem().getTransformedClassName(ct);
+                typeSystem().parsedResolver().addNamed(fullName, ct);
+                ((CachingResolver) typeSystem().systemResolver()).addNamed(fullName, ct);
             }
 
             return ct;
