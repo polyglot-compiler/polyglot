@@ -424,20 +424,20 @@ public abstract class Scheduler {
         if (Report.should_report(Report.frontend, 2))
             Report.report(2, "Running to goal " + goal);
         
-        if (Report.should_report(Report.frontend, 1)) {
+        if (Report.should_report(Report.frontend, 4)) {
             Report.report(4, "  Reachable = " + goal.isReachable());
             Report.report(4, "  Prerequisites for " + goal + " = " + goal.prerequisiteGoals(this));
             Report.report(4, "  Corequisites for " + goal + " = " + goal.corequisiteGoals(this));
         }
         
         if (reached(goal)) {
-            if (Report.should_report(Report.frontend, 1))
+            if (Report.should_report(Report.frontend, 3))
                 Report.report(3, "Already reached goal " + goal);
             return true;
         }
 
         if (! goal.isReachable()) {
-            if (Report.should_report(Report.frontend, 1))
+            if (Report.should_report(Report.frontend, 3))
                 Report.report(3, "Cannot reach goal " + goal);
             return false;
         }
