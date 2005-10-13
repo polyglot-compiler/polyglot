@@ -43,7 +43,6 @@ public class Serialized extends SourceFileGoal {
     
     public Collection prerequisiteGoals(Scheduler scheduler) {
         List l = new ArrayList();
-        l.addAll(super.prerequisiteGoals(scheduler));
         l.add(scheduler.TypeChecked(job));
         l.add(scheduler.ConstantsChecked(job));
         l.add(scheduler.ReachabilityChecked(job));
@@ -52,6 +51,7 @@ public class Serialized extends SourceFileGoal {
         l.add(scheduler.InitializationsChecked(job));
         l.add(scheduler.ConstructorCallsChecked(job));
         l.add(scheduler.ForwardReferencesChecked(job));
+        l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }
 }

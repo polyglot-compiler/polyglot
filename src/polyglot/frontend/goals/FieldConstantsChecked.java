@@ -68,18 +68,20 @@ public class FieldConstantsChecked extends AbstractGoal {
     }
     
     public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList(super.prerequisiteGoals(scheduler));
+        List l = new ArrayList();
         if (ct != null) {
             l.add(scheduler.SignaturesResolved(ct));
         }
+        l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }
 
     public Collection corequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList(super.corequisiteGoals(scheduler));
+        List l = new ArrayList();
         if (ct != null && ct.job() != null) {
             l.add(scheduler.ConstantsChecked(ct.job()));
         }
+        l.addAll(super.corequisiteGoals(scheduler));
         return l;
     }
     

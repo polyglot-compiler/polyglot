@@ -25,9 +25,9 @@ public class ExceptionsChecked extends VisitorGoal {
 
     public Collection prerequisiteGoals(Scheduler scheduler) {
         List l = new ArrayList();
-        l.addAll(super.prerequisiteGoals(scheduler));
         l.add(scheduler.TypeChecked(job));
         l.add(scheduler.ReachabilityChecked(job));
+        l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }
 }

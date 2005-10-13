@@ -25,8 +25,8 @@ public class TypesInitialized extends VisitorGoal {
 
     public Collection prerequisiteGoals(Scheduler scheduler) {
         List l = new ArrayList();
-        l.addAll(super.prerequisiteGoals(scheduler));
         l.add(scheduler.Parsed(job));
+        l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }
 }

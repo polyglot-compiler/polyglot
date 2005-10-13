@@ -54,11 +54,12 @@ public class SignaturesResolved extends ClassTypeGoal {
     }
     
     public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList(super.prerequisiteGoals(scheduler));
+        List l = new ArrayList();
         if (ct.job() != null) {
             l.add(scheduler.TypesInitialized(ct.job()));
         }
         l.add(scheduler.SupertypesResolved(ct));
+        l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }
 
@@ -67,7 +68,7 @@ public class SignaturesResolved extends ClassTypeGoal {
     }
     
     public Collection corequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList(super.corequisiteGoals(scheduler));
+        List l = new ArrayList();
         if (ct.job() != null) {
             if (isGlobal(ct)) {
                 l.add(scheduler.SignaturesDisambiguated(ct.job()));
@@ -76,6 +77,7 @@ public class SignaturesResolved extends ClassTypeGoal {
                 l.add(scheduler.Disambiguated(ct.job()));
             }
         }
+        l.addAll(super.corequisiteGoals(scheduler));
         return l;
     }
     

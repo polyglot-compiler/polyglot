@@ -408,6 +408,47 @@ public abstract class Scheduler {
     public Goal currentGoal() {
         return currentPass != null ? currentPass.goal() : null;
     }
+
+    boolean addPrereqsToWorklist(Goal goal, Set seen) {
+        boolean runPass = true;
+
+        if (seen.contains(goal)) {
+            return runPass;
+        }
+
+        seen.add(goal);
+
+        for (Iterator i = goal.prerequisiteGoals(this).iterator(); i.hasNext(); ) {
+            Goal subgoal = (Goal) i.next();
+            
+            if (! reached(subgoal)) {
+                addPrereqsToWorklist(subgoal, seen);
+                addCoreqsToWorklist(subgoal, seen);
+                addGoal(subgoal);
+                runPass = false;
+            }
+        }
+
+        return runPass;
+    }
+    
+    void addCoreqsToWorklist(Goal goal, Set seen) {
+        if (seen.contains(goal)) {
+            return;
+        }
+
+        seen.add(goal);
+
+        for (Iterator i = goal.corequisiteGoals(this).iterator(); i.hasNext(); ) {
+            Goal subgoal = (Goal) i.next();
+            
+            if (! reached(subgoal)) {
+                addPrereqsToWorklist(subgoal, seen);
+                addCoreqsToWorklist(subgoal, seen);
+                addGoal(subgoal);
+            }
+        }
+    }
     
     /**
      * Run a passes until the <code>goal</code> is attempted. Callers should
@@ -452,55 +493,25 @@ public abstract class Scheduler {
                 Report.report(3, "Job " + goal.job() + " is running");
             throw new CyclicDependencyException();
         }
-        
-        // Make sure all subgoals have been completed,
-        // except those that recursively depend on this goal.
+
+        // Make sure all prerequisite subgoals have been completed.
         // If a subgoal has not been completed, just return and let
         // it complete before trying this goal again.
         boolean runPass = true;
 
-        for (Iterator i = new ArrayList(goal.prerequisiteGoals(this)).iterator(); i.hasNext(); ) {
-            Goal subgoal = (Goal) i.next();
-            
-            if (! reached(subgoal)) {
-                addGoal(subgoal);
-                runPass = false;
-            }
-        }
-        
-        if (! runPass) {
-            if (Report.should_report(Report.frontend, 3))
-                Report.report(3, "A subgoal wasn't reached, delaying goal " + goal);
-            return true;
-        }
-            
-        for (Iterator i = new ArrayList(goal.corequisiteGoals(this)).iterator(); i.hasNext(); ) {
-            Goal subgoal = (Goal) i.next();
-            
-            if (! reached(subgoal)) {
-                addGoal(subgoal);
-            }
-        }
+        Set seen = new HashSet();
+        runPass = addPrereqsToWorklist(goal, seen);
 
         if (! runPass) {
             if (Report.should_report(Report.frontend, 3))
-                Report.report(3, "A subgoal wasn't reached, delaying goal " + goal);
-            throw new CyclicDependencyException();
-        }
-            
-        // Check for completion again -- the goal may have been reached
-        // while processing a subgoal.
-        if (reached(goal)) {
-            if (Report.should_report(Report.frontend, 3))
-                Report.report(3, "Already reached goal " + goal + " (second check)");
+                Report.report(3, "A prerequisite subgoal wasn't reached, delaying goal " + goal);
+
+            // Add back to the worklist, after all the prereqs.
+            addGoalToWorklist(goal);
             return true;
         }
-        
-        if (! goal.isReachable()) {
-            if (Report.should_report(Report.frontend, 3))
-                Report.report(3, "Cannot reach goal " + goal + " (second check)");
-            return false;
-        }
+            
+        addCoreqsToWorklist(goal, seen);
         
         Pass pass = goal.createPass(extInfo);
         boolean result = runPass(pass);
@@ -583,14 +594,14 @@ public abstract class Scheduler {
             String key = goal.toString();
 
             extInfo.getStats().accumPassTimes(key + " attempts", 1, 1);
-            extInfo.getStats().accumPassTimes("goal attempts", 1, 1);
+            extInfo.getStats().accumPassTimes("total goal attempts", 1, 1);
             
             try {
                 result = pass.run();
 
                 if (! result) {
                     extInfo.getStats().accumPassTimes(key + " failures", 1, 1);
-                    extInfo.getStats().accumPassTimes("goal failures", 1, 1);
+                    extInfo.getStats().accumPassTimes("total goal failures", 1, 1);
 
                     goal.setState(Goal.UNREACHABLE);
                     if (Report.should_report(Report.frontend, 1))
@@ -599,7 +610,7 @@ public abstract class Scheduler {
                 else {
                     if (goal.state() == Goal.RUNNING) {
                         extInfo.getStats().accumPassTimes(key + " reached", 1, 1);
-                        extInfo.getStats().accumPassTimes("goal reached", 1, 1);
+                        extInfo.getStats().accumPassTimes("total goal reached", 1, 1);
 
                         goal.setState(Goal.REACHED);
                         if (Report.should_report(Report.frontend, 1))
@@ -607,7 +618,7 @@ public abstract class Scheduler {
                     }
                     else {
                         extInfo.getStats().accumPassTimes(key + " unreached", 1, 1);
-                        extInfo.getStats().accumPassTimes("goal unreached", 1, 1);
+                        extInfo.getStats().accumPassTimes("total goal unreached", 1, 1);
 
                         goal.setState(Goal.ATTEMPTED);                    
                         if (Report.should_report(Report.frontend, 1))
@@ -623,7 +634,7 @@ public abstract class Scheduler {
                     e.printStackTrace();
                 
                 extInfo.getStats().accumPassTimes(key + " aborts", 1, 1);
-                extInfo.getStats().accumPassTimes("goal aborts", 1, 1);
+                extInfo.getStats().accumPassTimes("total goal aborts", 1, 1);
 
                 addDependencyAndEnqueue(goal, e.goal(), e.prerequisite());
                 

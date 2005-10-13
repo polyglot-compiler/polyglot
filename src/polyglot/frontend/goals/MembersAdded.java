@@ -52,18 +52,20 @@ public class MembersAdded extends ClassTypeGoal {
     }
     
     public Collection prerequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList(super.prerequisiteGoals(scheduler));
+        List l = new ArrayList();
         if (ct.job() != null) {
             l.add(scheduler.Parsed(ct.job()));
         }
+        l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }
 
     public Collection corequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList(super.corequisiteGoals(scheduler));
+        List l = new ArrayList();
         if (ct.job() != null) {
             l.add(scheduler.TypesInitialized(ct.job()));
         }
+        l.addAll(super.corequisiteGoals(scheduler));
         return l;
     }
     

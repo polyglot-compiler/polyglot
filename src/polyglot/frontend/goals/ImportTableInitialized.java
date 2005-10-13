@@ -25,9 +25,9 @@ public class ImportTableInitialized extends VisitorGoal {
 
     public Collection prerequisiteGoals(Scheduler scheduler) {
         List l = new ArrayList();
-        l.addAll(super.prerequisiteGoals(scheduler));
-        l.add(scheduler.TypesInitializedForCommandLine());
         l.add(scheduler.TypesInitialized(job));
+        l.add(scheduler.TypesInitializedForCommandLine());
+        l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }
 }

@@ -25,15 +25,15 @@ public class ConstantsChecked extends VisitorGoal {
 
     public Collection prerequisiteGoals(Scheduler scheduler) {
         List l = new ArrayList();
-        l.addAll(super.prerequisiteGoals(scheduler));
         l.add(scheduler.Disambiguated(job));
+        l.addAll(super.prerequisiteGoals(scheduler));
         return l;
     }
 
     public Collection corequisiteGoals(Scheduler scheduler) {
         List l = new ArrayList();
-        l.addAll(super.corequisiteGoals(scheduler));
         l.add(scheduler.TypeChecked(job));
+        l.addAll(super.corequisiteGoals(scheduler));
         return l;
     }
 }
