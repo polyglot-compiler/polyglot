@@ -23,7 +23,7 @@ public class ConstantCheckPass extends VisitorPass {
     public ConstantCheckPass(FieldConstantsChecked goal, ConstantChecker v) {
         this((Goal) goal, v);
     }
-    private ConstantCheckPass(Goal goal, ConstantChecker v) {
+    protected ConstantCheckPass(Goal goal, ConstantChecker v) {
         super(goal, v);
     }
 }
