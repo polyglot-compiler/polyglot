@@ -76,13 +76,6 @@ public class JLScheduler extends Scheduler {
         return g;
     }
     
-    public Goal Disambiguated(Job job) {
-        TypeSystem ts = extInfo.typeSystem();
-        NodeFactory nf = extInfo.nodeFactory();
-        Goal g = (Disambiguated.create(this, job, ts, nf));
-        return g;
-    }
-    
     public Goal SignaturesDisambiguated(Job job) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
@@ -94,6 +87,13 @@ public class JLScheduler extends Scheduler {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
         Goal g = SupertypesDisambiguated.create(this, job, ts, nf);
+        return g;
+    }
+    
+    public Goal Disambiguated(Job job) {
+        TypeSystem ts = extInfo.typeSystem();
+        NodeFactory nf = extInfo.nodeFactory();
+        Goal g = Disambiguated.create(this, job, ts, nf);
         return g;
     }
     
