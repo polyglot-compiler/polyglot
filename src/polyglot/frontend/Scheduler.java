@@ -194,14 +194,14 @@ public abstract class Scheduler {
         addGoalToWorklist(goal);
     }
 
-    private synchronized void addGoalToWorklist(Goal g) {
+    protected synchronized void addGoalToWorklist(Goal g) {
         if (! inWorklist.contains(g)) {
             inWorklist.add(g);
             worklist.add(g);
         }
     }
     
-    private synchronized void prependGoal(Goal g) {
+    protected synchronized void prependGoal(Goal g) {
         if (! inWorklist.contains(g)) {
             inWorklist.add(g);
             worklist.add(0, g);
@@ -339,7 +339,7 @@ public abstract class Scheduler {
      * <code>worklist</code>. Return the selected <code>Goal</code>
      * which will be scheduled to run all of its remaining passes.
      */
-    private Goal selectGoalFromWorklist() {
+    protected Goal selectGoalFromWorklist() {
         // TODO: Select the goal that will cause it's associated job to complete
         // first. This is the goal with the fewest subgoals closest to job
         // completion. The idea is to finish a job as quickly as possible in
@@ -409,22 +409,17 @@ public abstract class Scheduler {
         return currentPass != null ? currentPass.goal() : null;
     }
 
-    boolean addPrereqsToWorklist(Goal goal, Set seen) {
+    boolean addPrereqsToWorklist(Goal goal) {
         boolean runPass = true;
-
-        if (seen.contains(goal)) {
-            return runPass;
-        }
-
-        seen.add(goal);
 
         for (Iterator i = goal.prerequisiteGoals(this).iterator(); i.hasNext(); ) {
             Goal subgoal = (Goal) i.next();
             
             if (! reached(subgoal)) {
-                addPrereqsToWorklist(subgoal, seen);
-                addCoreqsToWorklist(subgoal, seen);
-                addGoal(subgoal);
+                if (! inWorklist.contains(subgoal)) {
+                    addPrereqsToWorklist(subgoal);
+                    addGoal(subgoal);
+                }
                 runPass = false;
             }
         }
@@ -432,19 +427,11 @@ public abstract class Scheduler {
         return runPass;
     }
     
-    void addCoreqsToWorklist(Goal goal, Set seen) {
-        if (seen.contains(goal)) {
-            return;
-        }
-
-        seen.add(goal);
-
+    void addCoreqsToWorklist(Goal goal) {
         for (Iterator i = goal.corequisiteGoals(this).iterator(); i.hasNext(); ) {
             Goal subgoal = (Goal) i.next();
             
             if (! reached(subgoal)) {
-                addPrereqsToWorklist(subgoal, seen);
-                addCoreqsToWorklist(subgoal, seen);
                 addGoal(subgoal);
             }
         }
@@ -499,8 +486,7 @@ public abstract class Scheduler {
         // it complete before trying this goal again.
         boolean runPass = true;
 
-        Set seen = new HashSet();
-        runPass = addPrereqsToWorklist(goal, seen);
+        runPass = addPrereqsToWorklist(goal);
 
         if (! runPass) {
             if (Report.should_report(Report.frontend, 3))
@@ -511,18 +497,17 @@ public abstract class Scheduler {
             return true;
         }
             
-        addCoreqsToWorklist(goal, seen);
-        
         Pass pass = goal.createPass(extInfo);
         boolean result = runPass(pass);
 
         if (result && ! reached(goal)) {
-            // Add the goal back on the worklist.
+            // Add the goal and its coreqs to the worklist.
+            addCoreqsToWorklist(goal);
             addGoalToWorklist(goal);
         }
         
         return result;
-    }       
+    }
    
     /**         
      * Run the pass <code>pass</code>.  All subgoals of the pass's goal
@@ -530,7 +515,7 @@ public abstract class Scheduler {
      * may not satisfy the goal, forcing it to be retried later with new
      * subgoals.
      */
-    private boolean runPass(Pass pass) {
+    protected boolean runPass(Pass pass) {
         Goal goal = pass.goal();
         Job job = goal.job();
                 
@@ -725,7 +710,7 @@ public abstract class Scheduler {
         return result;             
     }           
                                    
-    private static String statusString(boolean okay) {
+    protected static String statusString(boolean okay) {
         if (okay) {
             return "done";
         }
@@ -823,7 +808,7 @@ public abstract class Scheduler {
      * Create a new <code>Job</code> for the given source and AST.
      * In general, this method should only be called by <code>addJob</code>.
      */
-    private Job createSourceJob(Source source, Node ast) {
+    protected Job createSourceJob(Source source, Node ast) {
         return new Job(extInfo, extInfo.jobExt(), source, ast);
     }
 
