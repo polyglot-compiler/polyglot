@@ -58,7 +58,7 @@ public abstract class TypeObject_c implements TypeObject
     }
 
     /**
-     * Return whether o equals this.
+     * Return whether o is structurally equivalent to o.
      * Implementations should override equalsImpl().
      */
     public final boolean equals(Object o) {

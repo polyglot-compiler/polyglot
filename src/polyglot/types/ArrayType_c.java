@@ -155,10 +155,18 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	return false;
     }
 
+    public boolean typeEqualsImpl(TypeObject t) {
+        if (t instanceof ArrayType) {
+            ArrayType a = (ArrayType) t;
+            return ts.typeEquals(base(), a.base());
+        }
+	return false;
+    }
+
     public boolean isImplicitCastValidImpl(Type toType) {
         if (toType.isArray()) {
             if (base().isPrimitive() || toType.toArray().base().isPrimitive()) {
-                return ts.equals(base(), toType.toArray().base());
+                return ts.typeEquals(base(), toType.toArray().base());
             }
             else {
                 return ts.isImplicitCastValid(base(), toType.toArray().base());
@@ -184,7 +192,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	    Type fromBase = base();
 	    Type toBase = toType.toArray().base();
 
-	    if (fromBase.isPrimitive()) return ts.equals(toBase, fromBase);
+	    if (fromBase.isPrimitive()) return ts.typeEquals(toBase, fromBase);
 	    if (toBase.isPrimitive()) return false;
 
 	    if (fromBase.isNull()) return false;

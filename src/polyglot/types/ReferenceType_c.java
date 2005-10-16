@@ -84,7 +84,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
             return false;
         }
 
-        if (ts.equals(this, ancestor)) {
+        if (ts.typeEquals(this, ancestor)) {
             return false;
         }
 
@@ -92,7 +92,7 @@ public abstract class ReferenceType_c extends Type_c implements ReferenceType
             return false;
         }
 
-        if (ts.equals(ancestor, ts.Object())) {
+        if (ts.typeEquals(ancestor, ts.Object())) {
             return true;
         }
 

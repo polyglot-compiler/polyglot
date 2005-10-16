@@ -1,5 +1,6 @@
 package polyglot.ext.jl.types;
 
+import polyglot.ext.jx.types.JxPackage;
 import polyglot.types.*;
 import polyglot.types.Package;
 
@@ -44,6 +45,33 @@ public class Package_c extends TypeObject_c implements Package
     public void setDeclaration(Declaration decl) {
         this.decl = (Package) decl;        
     }
+    
+    public boolean equalsImpl(TypeObject o) {
+        if (o instanceof Package) {
+            Package p = (Package) o;
+            if (name.equals(p.name())) {
+                if (prefix == null)
+                    return p.prefix() == null;
+                else
+                    return ts.equals(prefix, p.prefix());
+            }
+        }
+        return false;
+    }
+        
+    public final boolean packageEquals(Package p) {
+        return ts.packageEquals(this, p);
+    }
+    
+    public boolean packageEqualsImpl(Package p) {
+        if (name.equals(p.name())) {
+            if (prefix == null)
+                return p.prefix() == null;
+            else
+                return ts.packageEquals(prefix, p.prefix());
+        }
+        return false;
+    }
 
     public boolean isType() { return false; }
     public boolean isPackage() { return true; }
@@ -79,24 +107,6 @@ public class Package_c extends TypeObject_c implements Package
 
     public int hashCode() {
         return name.hashCode();
-    }
-
-    public boolean equalsImpl(TypeObject o) {
-        if (o instanceof Package) {
-            Package p = (Package) o;
-            if (p == null) {
-                return false;
-            }
-
-            if (prefix() == null) {
-                return p.prefix() == null && name().equals(p.name());
-            }
-            else {
-                return prefix().equals(p.prefix()) && name().equals(p.name());
-            }
-        }
-
-        return false;
     }
 
     public boolean isCanonical() {

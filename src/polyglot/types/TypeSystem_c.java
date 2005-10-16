@@ -300,12 +300,25 @@ public class TypeSystem_c implements TypeSystem
     public boolean equals(TypeObject type1, TypeObject type2) {
         assert_(type1);
         assert_(type2);
-        if (type1 instanceof TypeObject_c) {
-            return ((TypeObject_c)type1).equalsImpl(type2);
-        } else {
-            throw new InternalCompilerError("Unknown implementation of "
-                + "TypeObject", type1.position());
-        }
+        return type1.equalsImpl(type2);
+    }
+
+    /**
+     * Returns true iff type1 and type2 are equivalent.
+     */
+    public boolean typeEquals(Type type1, Type type2) {
+        assert_(type1);
+        assert_(type2);
+        return type1.typeEqualsImpl(type2);
+    }
+    
+    /**
+     * Returns true iff type1 and type2 are equivalent.
+     */
+    public boolean packageEquals(Package type1, Package type2) {
+        assert_(type1);
+        assert_(type2);
+        return type1.packageEqualsImpl(type2);
     }
 
     /**
@@ -350,7 +363,7 @@ public class TypeSystem_c implements TypeSystem
      * Checks whether the member mi can be accessed from code that is
      * declared in the class contextClass.
      */
-    protected boolean isAccessible(MemberInstance mi, ClassType contextClass) {
+    public boolean isAccessible(MemberInstance mi, ClassType contextClass) {
         assert_(mi);
 
         ReferenceType target = mi.container();
@@ -418,7 +431,7 @@ public class TypeSystem_c implements TypeSystem
     }
 
     /** True if the class targetClass accessible from the body of class contextClass. */
-    protected boolean classAccessible(ClassType targetClass, ClassType contextClass) {
+    public boolean classAccessible(ClassType targetClass, ClassType contextClass) {
         assert_(targetClass);
 
         if (targetClass.isMember()) {
@@ -1259,7 +1272,7 @@ public class TypeSystem_c implements TypeSystem
         assert_(type1);
         assert_(type2);
 
-	if (equals(type1, type2)) return type1;
+	if (typeEquals(type1, type2)) return type1;
 
 	if (type1.isNumeric() && type2.isNumeric()) {
 	    if (isImplicitCastValid(type1, type2)) {
@@ -1300,8 +1313,8 @@ public class TypeSystem_c implements TypeSystem
 	    }
 
 	    // Check against Object to ensure superType() is not null.
-	    if (equals(type1, Object())) return type1;
-	    if (equals(type2, Object())) return type2;
+	    if (typeEquals(type1, Object())) return type1;
+	    if (typeEquals(type2, Object())) return type2;
 
 	    if (isSubtype(type1, type2)) return type2;
 	    if (isSubtype(type2, type1)) return type1;
@@ -1312,7 +1325,7 @@ public class TypeSystem_c implements TypeSystem
 	    Type t2 = leastCommonAncestor(type2.toReference().superType(),
 					  type1);
 
-	    if (equals(t1, t2)) return t1;
+	    if (typeEquals(t1, t2)) return t1;
 
 	    return Object();
 	}

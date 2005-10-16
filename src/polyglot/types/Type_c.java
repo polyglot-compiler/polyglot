@@ -112,6 +112,14 @@ public abstract class Type_c extends TypeObject_c implements Type
 	return ts.arrayOf(this);
     }  
     
+    public final boolean typeEquals(Type t) {
+        return ts.typeEquals(this, t);
+    }
+    
+    public boolean typeEqualsImpl(Type t) {
+        return this == t;
+    }
+    
     /**
      * Return true if this type is a subtype of <code>ancestor</code>.
      */
@@ -123,7 +131,7 @@ public abstract class Type_c extends TypeObject_c implements Type
      * Return true if this type is a subtype of <code>ancestor</code>.
      */
     public boolean isSubtypeImpl(Type t) {
-	return ts.equals(this, t) || ts.descendsFrom(this, t);
+	return ts.typeEquals(this, t) || ts.descendsFrom(this, t);
     }
     
     /**

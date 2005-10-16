@@ -51,6 +51,24 @@ public interface Type extends Qualifier
     ArrayType toArray();
 
     /**
+     * Return true if this type is equivalent to t.
+     * Usually this is the same as equalsImpl(TypeObject), but that
+     * method should return true only if the types are <i>structurally equivalent</i>.
+     * @param t Type to compare to
+     * @return True if this type is equivalent to t.
+     */
+    boolean typeEquals(Type t);
+    
+    /**
+     * Return true if this type is equivalent to t.
+     * Usually this is the same as equalsImpl(TypeObject), but that
+     * method should return true only if the types are <i>structurally equivalent</i>.
+     * @param t Type to compare to
+     * @return True if this type is equivalent to t.
+     */
+    boolean typeEqualsImpl(Type t);
+    
+    /**
      * Return true if this type is a subtype of <code>ancestor</code>.
      */
     boolean isSubtype(Type ancestor);

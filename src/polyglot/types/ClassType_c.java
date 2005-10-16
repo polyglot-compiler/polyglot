@@ -170,7 +170,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             return false;
         }
 
-        if (ts.equals(this, ancestor)) {
+        if (ts.typeEquals(this, ancestor)) {
             return false;
         }
 
@@ -178,13 +178,13 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             return false;
         }
 
-        if (ts.equals(ancestor, ts.Object())) {
+        if (ts.typeEquals(ancestor, ts.Object())) {
             return true;
         }
 
         // Check subtype relation for classes.
         if (! flags().isInterface()) {
-            if (ts.equals(this, ts.Object())) {
+            if (ts.typeEquals(this, ts.Object())) {
                 return false;
             }
 

@@ -177,6 +177,20 @@ public interface TypeSystem {
     boolean equals(TypeObject type1, TypeObject type2);
 
     /**
+     * Returns true iff type1 and type2 are equivalent.
+     * This is usually the same as equals(type1, type2), but may
+     * differ in the presence of, say, type aliases.
+     */
+    boolean typeEquals(Type type1, Type type2);
+
+    /**
+     * Returns true iff type1 and type2 are equivalent.
+     * This is usually the same as equals(type1, type2), but may
+     * differ in the presence of, say, type aliases.
+     */
+    boolean packageEquals(Package type1, Package type2);
+
+    /**
      * Returns true if <code>value</code> can be implicitly cast to type
      * <code>t</code>.  This method should be removed.  It is kept for backward
      * compatibility.
@@ -202,15 +216,25 @@ public interface TypeSystem {
     boolean isCanonical(Type type);
 
     /**
-     * Checks whether a class member can be accessed from Context context.
+     * Checks whether a class member can be accessed from <code>context</code>.
      */
     boolean isAccessible(MemberInstance mi, Context context);
+
+    /**
+     * Checks whether a class member can be accessed from the body of
+     * class <code>contextClass</code>.
+     */
+    boolean isAccessible(MemberInstance mi, ClassType contextClass);
+
 
     /**
      * Checks whether a class can be accessed from Context context.
      */
     boolean classAccessible(ClassType ct, Context context);
 
+    /** True if the class targetClass accessible from the body of class contextClass. */
+    boolean classAccessible(ClassType targetClass, ClassType contextClass);
+   
     /**
      * Checks whether a top-level or member class can be accessed from the
      * package pkg.  Returns false for local and anonymous classes.
