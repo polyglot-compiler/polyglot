@@ -128,7 +128,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
             }
 
             if (! ts.isImplicitCastValid(s, t) &&
-                ! ts.equals(s, t) &&
+                ! ts.typeEquals(s, t) &&
                 ! ts.numericConversionValid(t, e.constantValue())) {
                 throw new SemanticException("Cannot assign " + s +
                                             " to " + t + ".", e.position());

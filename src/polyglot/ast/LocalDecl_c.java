@@ -213,7 +213,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
             }
             else {
                 if (! ts.isImplicitCastValid(init.type(), type.type()) &&
-                    ! ts.equals(init.type(), type.type()) &&
+                    ! ts.typeEquals(init.type(), type.type()) &&
                     ! ts.numericConversionValid(type.type(),
                                                 init.constantValue())) {
                     throw new SemanticException("The type of the variable " +

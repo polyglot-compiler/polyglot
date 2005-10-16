@@ -94,7 +94,7 @@ public class Conditional_c extends Expr_c implements Conditional
         Type t1 = e1.type();
         Type t2 = e2.type();
       
-        if (! ts.equals(cond.type(), ts.Boolean())) {
+        if (! ts.typeEquals(cond.type(), ts.Boolean())) {
             throw new SemanticException(
                                         "Condition of ternary expression must be of type boolean.",
                                         cond.position());
@@ -103,7 +103,7 @@ public class Conditional_c extends Expr_c implements Conditional
         // From the JLS, section:
         // If the second and third operands have the same type (which may be
         // the null type), then that is the type of the conditional expression.
-        if (ts.equals(t1, t2)) {
+        if (ts.typeEquals(t1, t2)) {
             return type(t1);
         }
         

@@ -277,7 +277,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
             }
             else {
                 if (! ts.isImplicitCastValid(init.type(), type.type()) &&
-                    ! ts.equals(init.type(), type.type()) &&
+                    ! ts.typeEquals(init.type(), type.type()) &&
                     ! ts.numericConversionValid(type.type(),
                                                 init.constantValue())) {
 

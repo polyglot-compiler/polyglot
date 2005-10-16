@@ -287,7 +287,7 @@ public class Binary_c extends Expr_c implements Binary
 	}
 
 	if (op == ADD) {
-	    if (ts.equals(l, ts.String()) || ts.equals(r, ts.String())) {
+	    if (ts.typeEquals(l, ts.String()) || ts.typeEquals(r, ts.String())) {
                 if (!ts.canCoerceToString(r, tc.context())) {
                     throw new SemanticException("Cannot coerce an expression " + 
                                 "of type " + r + " to a String.", 
@@ -406,7 +406,7 @@ public class Binary_c extends Expr_c implements Binary
                 return child.type();
             }
 
-            if (op == ADD && ts.equals(type, ts.String())) {
+            if (op == ADD && ts.typeEquals(type, ts.String())) {
                 // Implicit coercion to String. 
                 return ts.String();
             }

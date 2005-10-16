@@ -97,7 +97,7 @@ public abstract class Assign_c extends Expr_c implements Assign
 
     if (op == ASSIGN) {
       if (! ts.isImplicitCastValid(s, t) &&
-          ! ts.equals(s, t) &&
+          ! ts.typeEquals(s, t) &&
           ! ts.numericConversionValid(t, right.constantValue())) {
 
         throw new SemanticException("Cannot assign " + s + " to " + t + ".",
@@ -109,7 +109,7 @@ public abstract class Assign_c extends Expr_c implements Assign
 
     if (op == ADD_ASSIGN) {
       // t += s
-      if (ts.equals(t, ts.String()) && ts.canCoerceToString(s, tc.context())) {
+      if (ts.typeEquals(t, ts.String()) && ts.canCoerceToString(s, tc.context())) {
         return type(ts.String());
       }
 

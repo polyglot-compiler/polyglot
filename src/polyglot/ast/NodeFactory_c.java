@@ -437,7 +437,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
     }
 
     public Special Special(Position pos, Special.Kind kind, TypeNode outer) {
-        Special n = new Special_c(pos, kind, outer);
+         Special n = new Special_c(pos, kind, outer);
         n = (Special)n.ext(extFactory.extSpecial());
         n = (Special)n.del(delFactory.delSpecial());
         return n;
