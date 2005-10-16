@@ -40,17 +40,32 @@ import java.math.BigInteger;
     public Lexer_c(String s, Position pos, List subst) {
         this(new EscapedUnicodeReader(new StringReader(s)));
         if (pos != null) {
-            this.file = pos.toString() + ": quasiquote(" + s + "," + subst + ")";
+            this.file = pos.toString() + ": quasiquote(" + stringSubst(s ,subst) + ")";
             this.path = pos.path();
         }
         else {
-            this.file = "quasiquote(" + s + "," + subst + ")";
+            this.file = "quasiquote(" + stringSubst(s ,subst) + ")";
             this.path = null;
         }
 
         this.subst = new LinkedList(subst);
         this.keywords = new HashMap();
         init_keywords();
+    }
+
+    private String stringSubst(String s, List subst) {
+        StringBuffer sb = new StringBuffer();
+        Iterator j = subst.iterator();
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '%' && j.hasNext()) {
+                i++;
+                sb.append(j.next());
+            }
+            else {
+                sb.append(s.charAt(i));
+            }
+        }
+        return sb.toString();
     }
 
     private void error(String msg, Position pos) {
