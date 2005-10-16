@@ -5,14 +5,10 @@ import polyglot.frontend.goals.Goal;
 
 /** A <code>Pass</code> represents a compiler pass.
  * A <code>Job</code> runs a series of passes over the AST. 
- * Each pass has an ID that is used to identify similar passes across
- * several jobs.  For example, most jobs contain a pass named PARSE
- * that returns an AST for a source file and a pass TYPE_CHECK
- * that performs type checking on the job's AST.
+ * A pass is run to attempt to satisfy a goal.
  */
 public interface Pass
 {
-    public static class ID { }
     /** The goal the pass is trying to satisfy. */
     public Goal goal();
     
