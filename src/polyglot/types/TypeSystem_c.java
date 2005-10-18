@@ -300,6 +300,8 @@ public class TypeSystem_c implements TypeSystem
     public boolean equals(TypeObject type1, TypeObject type2) {
         assert_(type1);
         assert_(type2);
+        if (type1 == type2) return true;
+        if (type1 == null || type2 == null) return false;
         return type1.equalsImpl(type2);
     }
 
@@ -452,9 +454,8 @@ public class TypeSystem_c implements TypeSystem
 
         if (isEnclosed(contextClass, targetClass))
             return true;
-
-        return accessibleFromPackage(targetClass.flags(),
-                                     targetClass.package_(), contextClass.package_());
+        
+        return classAccessibleFromPackage(targetClass, contextClass.package_());
     }
 
     /** True if the class targetClass accessible from the package pkg. */
