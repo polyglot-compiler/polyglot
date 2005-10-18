@@ -140,6 +140,8 @@ public class ClassSerializer extends NodeVisitor
 	    return cn.body(body);
 	}
 	catch (IOException e) {
+            if (Report.should_report(Report.serialize, 1))
+                e.printStackTrace();
 	    eq.enqueue(ErrorInfo.IO_ERROR,
 		       "Unable to serialize class information.");
 	    return n;
