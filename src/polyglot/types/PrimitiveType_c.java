@@ -60,7 +60,7 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
         return false;
     }
 
-    public boolean typeEqualsImpl(TypeObject t) {
+    public boolean typeEqualsImpl(Type t) {
         if (t instanceof PrimitiveType) {
             PrimitiveType p = (PrimitiveType) t;
             return kind() == p.kind();

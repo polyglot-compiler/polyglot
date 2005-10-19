@@ -155,7 +155,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
 	return false;
     }
 
-    public boolean typeEqualsImpl(TypeObject t) {
+    public boolean typeEqualsImpl(Type t) {
         if (t instanceof ArrayType) {
             ArrayType a = (ArrayType) t;
             return ts.typeEquals(base(), a.base());
