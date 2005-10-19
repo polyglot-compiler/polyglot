@@ -1,6 +1,5 @@
 package polyglot.types;
 
-import polyglot.ext.jx.types.JxPackage;
 
 /**
  * An <code>Package</code> represents a Java package.

@@ -1,6 +1,5 @@
 package polyglot.ext.jl.types;
 
-import polyglot.ext.jx.types.JxPackage;
 import polyglot.types.*;
 import polyglot.types.Package;
 
