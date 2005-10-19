@@ -27,7 +27,7 @@ public class ClassSerializer extends NodeVisitor
     public ClassSerializer(TypeSystem ts, NodeFactory nf, Date date, ErrorQueue eq, Version ver) {
         this.ts = ts;
         this.nf = nf;
-        this.te = new TypeEncoder( ts);
+        this.te = new TypeEncoder(ts);
         this.eq = eq;
         this.date = date;
         this.ver = ver;
@@ -47,11 +47,23 @@ public class ClassSerializer extends NodeVisitor
 	    return n;
 	}
 
+        ClassDecl cn = (ClassDecl) n;
+        ClassBody body = cn.body();
+
+        List l = createSerializationMembers(cn.type());
+
+        for (Iterator i = l.iterator(); i.hasNext(); ) {
+            ClassMember m = (ClassMember) i.next();
+	    body = body.addMember(m);
+        }
+
+        return cn.body(body);
+    }
+
+    public List createSerializationMembers(ClassType ct) {
 	try {
-	    ClassDecl cn = (ClassDecl) n;
-	    ClassBody body = cn.body();
-	    ParsedClassType ct = cn.type();
 	    byte[] b;
+            List newMembers = new ArrayList(3);
 
             // HACK: force class members to get created from lazy class
             // initializer.
@@ -63,7 +75,7 @@ public class ClassSerializer extends NodeVisitor
             ct.superType();
 
 	    if (! (ct.isTopLevel() || ct.isMember())) {
-	        return n;
+                return Collections.EMPTY_LIST;
 	    }
 
 	    /* Add the compiler version number. */
@@ -78,7 +90,7 @@ public class ClassSerializer extends NodeVisitor
 			   "Cannot serialize class information " +
 			   "more than once.");
 
-		return n;
+		return Collections.EMPTY_LIST;
 	    }
 
 	    Flags flags = Flags.PUBLIC.set(Flags.STATIC).set(Flags.FINAL);
@@ -105,7 +117,7 @@ public class ClassSerializer extends NodeVisitor
 
 	    f = f.fieldInstance(fi);
             f = f.initializerInstance(ii);
-	    body = body.addMember(f);
+            newMembers.add(f);
 
 	    /* Add the date of the last source file modification. */
 	    long time = date.getTime();
@@ -121,7 +133,7 @@ public class ClassSerializer extends NodeVisitor
 
 	    f = f.fieldInstance(fi);
             f = f.initializerInstance(ii);
-	    body = body.addMember(f);
+            newMembers.add(f);
 
 	    /* Add the class type info. */
 	    fi = ts.fieldInstance(pos, ct,
@@ -135,16 +147,16 @@ public class ClassSerializer extends NodeVisitor
 
 	    f = f.fieldInstance(fi);
             f = f.initializerInstance(ii);
-	    body = body.addMember(f);
+            newMembers.add(f);
 
-	    return cn.body(body);
+            return newMembers;
 	}
 	catch (IOException e) {
             if (Report.should_report(Report.serialize, 1))
                 e.printStackTrace();
 	    eq.enqueue(ErrorInfo.IO_ERROR,
 		       "Unable to serialize class information.");
-	    return n;
+            return Collections.EMPTY_LIST;
 	}
     }
 }
