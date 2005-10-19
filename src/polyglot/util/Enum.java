@@ -19,8 +19,14 @@ public class Enum implements Serializable
 	this.name = name;
 
         // intern the enum and make sure this one is unique
-        if (intern() != this) {
-            throw new InternalCompilerError("Duplicate enum \"" + name + "\"");
+        Enum intern = intern();
+
+        if (intern != this) {
+            throw new InternalCompilerError("Duplicate enum \"" + name +
+                                            "\"; this=" + this + " (" +
+                                            this.getClass().getName() +
+                                            "), intern=" + intern + " (" +
+                                            intern.getClass().getName() + ")");
         }
     }
 
