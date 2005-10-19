@@ -59,9 +59,20 @@ public class TypeSystem_c implements TypeSystem
         // first tries to find the class in parsed class resolver.
         this.systemResolver = new CachingResolver(compoundResolver, extInfo);
 
+        initEnums();
         initFlags();
-
         initTypes();
+    }
+
+    protected void initEnums() {
+        // Ensure the enums in the type system are initialized and interned
+        // before any deserialization occurs.
+
+        // Just force the static initializers of ClassType and PrimitiveType
+        // to run.
+        Object o;
+        o = ClassType.TOP_LEVEL;
+        o = PrimitiveType.VOID;
     }
 
     protected void initTypes() throws SemanticException {
