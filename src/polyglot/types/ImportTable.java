@@ -194,14 +194,14 @@ public class ImportTable extends ClassResolver
                 Named n = findInPkg(name, pkgName);
                 if (n != null) {
                     if (resolved == null) {
-                        // this is the first occurance of name we've found
+                        // This is the first occurrence of name we've found
                         // in a package import.
                         // Record it, and keep going, to see if there
                         // are any conflicts.
                         resolved = n;
                     }
                     else {
-                        // this is the 2nd occurance of name we've found
+                        // This is the 2nd occurrence of name we've found
                         // in an imported package.
                         // That's bad.
                         throw new SemanticException("Reference to \"" + 
