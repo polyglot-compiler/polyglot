@@ -323,17 +323,21 @@ public abstract class Node_c implements Node
     
     /** Dump the AST for debugging. */
     public void dump(OutputStream os) {
-        NodeVisitor dumper = new DumpAst(new SimpleCodeWriter(os, 72));
+        CodeWriter cw = new OptimalCodeWriter(os, 72);
+        NodeVisitor dumper = new DumpAst(cw);
         dumper = dumper.begin();
         this.visit(dumper);
+        cw.newline();
         dumper.finish();
     }
     
     /** Dump the AST for debugging. */
     public void dump(Writer w) {
-        NodeVisitor dumper = new DumpAst(new SimpleCodeWriter(w, 72));
+        CodeWriter cw = new OptimalCodeWriter(w, 72);
+        NodeVisitor dumper = new DumpAst(cw);
         dumper = dumper.begin();
         this.visit(dumper);
+        cw.newline();
         dumper.finish();
     }
     
@@ -391,7 +395,10 @@ public abstract class Node_c implements Node
 
         w.allowBreak(4, " ");
         w.begin(0);
-        w.write("(del " + del() + ")");
+        w.write("(del ");
+        if (del() == this) w.write("*");
+        else w.write(del().toString());
+	w.write(")");
         w.end();
 
         w.allowBreak(4, " ");
