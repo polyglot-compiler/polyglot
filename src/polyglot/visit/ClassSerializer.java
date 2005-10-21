@@ -74,7 +74,7 @@ public class ClassSerializer extends NodeVisitor
             ct.interfaces();
             ct.superType();
 
-	    if (! (ct.isTopLevel() || ct.isMember())) {
+	    if (! ct.isTopLevel()) {
                 return Collections.EMPTY_LIST;
 	    }
 
