@@ -31,13 +31,14 @@ public interface TypeSystem {
      * Returns the system resolver.  This resolver can load top-level classes
      * with fully qualified names from the class path and the source path.
      */
-    TopLevelResolver systemResolver();
+    CachingResolver systemResolver();
 
     /**
-     * Return the type system's table resolver.
+     * Return the system resolver.
      * This resolver contains types parsed from source files.
+     * @deprecated
      */
-    TableResolver parsedResolver();
+    CachingResolver parsedResolver();
 
     /**
      * Return the type system's loaded resolver.
@@ -640,15 +641,15 @@ public interface TypeSystem {
 
     /**
      * Return the set of objects that should be serialized into the
-     * type information for the given ClassType.
-     * Usually only the clazz itself should get encoded, and references
+     * type information for the given TypeObject.
+     * Usually only the object itself should get encoded, and references
      * to other classes should just have their name written out.
      * If it makes sense for additional types to be fully encoded,
-     * (ie, they're necessary to correctly reconstruct the given clazz,
+     * (i.e., they're necessary to correctly reconstruct the given object,
      * and the usual class resolvers can't otherwise find them) they
-     * should be returned in the set in addition to clazz.
+     * should be returned in the set in addition to object.
      */
-    Set getTypeEncoderRootSet(Type clazz);
+    Set getTypeEncoderRootSet(TypeObject o);
 
     /**
      * Get the transformed class name of a class.

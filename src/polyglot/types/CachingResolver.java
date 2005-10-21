@@ -15,7 +15,7 @@ public class CachingResolver implements TopLevelResolver {
     Map packageCache;
     ExtensionInfo extInfo;
 
-    static Object NOT_FOUND = new Object();
+    static Object NOT_FOUND = "NOT FOUND";
 
     /**
      * Create a caching resolver.
@@ -39,6 +39,23 @@ public class CachingResolver implements TopLevelResolver {
         return "(cache " + inner.toString() + ")";
     }
 
+    /** Check if a package exists in the resolver cache. */
+    protected boolean packageExistsInCache(String name) {
+        for (Iterator i = cache.values().iterator(); i.hasNext(); ) {
+            Object o = i.next();
+            if (o instanceof Importable) {
+                Importable im = (Importable) o;
+                if (im.package_() != null) {
+                    if (im.package_().fullName().startsWith(name)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Check if a package exists.
      */
@@ -55,7 +72,11 @@ public class CachingResolver implements TopLevelResolver {
                 return false;
             }
 
-            boolean exists = inner.packageExists(name);
+            boolean exists;
+            exists = packageExistsInCache(name);
+            if (! exists) {
+                exists = inner.packageExists(name);
+            }
 
             if (exists) {
                 packageCache.put(name, Boolean.TRUE);
@@ -104,6 +125,10 @@ public class CachingResolver implements TopLevelResolver {
                 q = inner.find(name);
             }
             catch (NoClassException e) {
+                if (Report.should_report(TOPICS, 3)) {
+                    Report.report(3, "CachingResolver: " + e.getMessage());
+                    Report.report(3, "CachingResolver: installing " + name + "->" + NOT_FOUND + " in resolver cache");;
+                }
                 cache.put(name, NOT_FOUND);
                 throw e;
             }
@@ -122,11 +147,7 @@ public class CachingResolver implements TopLevelResolver {
             if (Report.should_report(TOPICS, 3))
                 Report.report(3, "CachingResolver: cached: " + name);
         }
-/*
-        if (q instanceof ParsedClassType) {
-            extInfo.addDependencyToCurrentJob(((ParsedClassType)q).fromSource());
-        }
-*/
+
 	return q;
     }
 
@@ -145,7 +166,7 @@ public class CachingResolver implements TopLevelResolver {
     public Named check(String name) {
         Object o = cache.get(name);
         if (o == NOT_FOUND) return null;
-        return (Named) cache.get(name);
+        return (Named) o;
     }
 
     /**
@@ -155,9 +176,17 @@ public class CachingResolver implements TopLevelResolver {
      */
     public void install(String name, Named q) {
         if (Report.should_report(TOPICS, 1)) {
-            Report.report(3, "Installing " + name + " in resolver cache");
+            Report.report(3, "CachingResolver: installing " + name + "->" + q + " in resolver cache");
         }
-	cache.put(name, q);
+        Object p = cache.get(name);
+        if (p != null) {
+            if (p != q) {
+                throw new InternalCompilerError("Attempt to install duplicate class in resolver cache: " + q + " duplicate of " + p);
+            }
+        }
+        else {
+            cache.put(name, q);
+        }
     }
 
     /**
@@ -176,5 +205,6 @@ public class CachingResolver implements TopLevelResolver {
 
     private static final Collection TOPICS =
                     CollectionUtil.list(Report.types,
-                                        Report.resolver);
+                                        Report.resolver,
+                                        "sysresolver");
 }

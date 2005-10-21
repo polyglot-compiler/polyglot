@@ -151,7 +151,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         }
 
         // Add unresolved class into the cache to avoid circular resolving.
-        ((CachingResolver) ts.systemResolver()).install(name, ct);
+        ts.systemResolver().addNamed(name, ct);
 
         return ct;
     }

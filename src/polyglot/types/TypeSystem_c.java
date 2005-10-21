@@ -20,8 +20,7 @@ import polyglot.util.StringUtil;
  **/
 public class TypeSystem_c implements TypeSystem
 {
-    protected TopLevelResolver systemResolver;
-    protected TableResolver parsedResolver;
+    protected CachingResolver systemResolver;
     protected LoadedClassResolver loadedResolver;
     protected Map flagsForName;
     protected ExtensionInfo extInfo;
@@ -40,24 +39,16 @@ public class TypeSystem_c implements TypeSystem
 
         this.extInfo = extInfo;
         
-        // The parsed class resolver.  This resolver contains classes parsed
-        // from source files.
-        this.parsedResolver = new TableResolver();
-
-
         // The loaded class resolver.  This resolver automatically loads types
         // from class files and from source files not mentioned on the command
         // line.
         this.loadedResolver = loadedResolver;
 
-        CompoundResolver compoundResolver =
-            new CompoundResolver(parsedResolver, loadedResolver);
-
-        // The system class resolver.  The class resolver contains a map from
-        // class names to ClassTypes.  A Job looks up classes first in its
-        // import table and then in the system resolver.  The system resolver
-        // first tries to find the class in parsed class resolver.
-        this.systemResolver = new CachingResolver(compoundResolver, extInfo);
+        // The system class resolver. The class resolver contains a map from
+        // fully qualified names to instances of Named. A pass over a
+        // compilation unit looks up classes first in its
+        // import table and then in the system resolver.
+        this.systemResolver = new CachingResolver(loadedResolver, extInfo);
 
         initEnums();
         initFlags();
@@ -109,12 +100,17 @@ public class TypeSystem_c implements TypeSystem
         return extInfo;
     }
 
-    public TopLevelResolver systemResolver() {
+    public CachingResolver systemResolver() {
       return systemResolver;
     }
 
-    public TableResolver parsedResolver() {
-        return parsedResolver;
+    /**
+     * Return the system resolver.  This used to return a different resolver.
+     * enclosed in the system resolver.
+     * @deprecated
+     */
+    public CachingResolver parsedResolver() {
+        return systemResolver;
     }
 
     public LoadedClassResolver loadedResolver() {
@@ -1524,15 +1520,27 @@ public class TypeSystem_c implements TypeSystem
     public Object placeHolder(TypeObject o, Set roots) {
         assert_(o);
 
-        if (o instanceof ClassType) {
-            ClassType ct = (ClassType) o;
+        if (o instanceof ParsedClassType) {
+            ParsedClassType ct = (ParsedClassType) o;
 
             // This should never happen: anonymous and local types cannot
             // appear in signatures.
             if (ct.isLocal() || ct.isAnonymous()) {
                 throw new InternalCompilerError("Cannot serialize " + o + ".");
             }
-
+            
+            if (ct.isMember()) {
+                for (ClassType t = ct; t != null; t = t.outer()) {
+                    if (roots.contains(t)) {
+                        // An enclosing class is in the root set.
+                        // Do not use a place holder.
+                        // This class will be serialized with it's
+                        // root.
+                        return ct;
+                    }
+                }
+            }
+            
             return new PlaceHolder_c(ct);
         }
 
@@ -1570,11 +1578,13 @@ public class TypeSystem_c implements TypeSystem
 	return packageForName(packageForName(p), s);
     }
 
+    /** @deprecated */
     public Package createPackage(Package prefix, String name) {
         assert_(prefix);
 	return new Package_c(this, prefix, name);
     }
 
+    /** @deprecated */
     public Package createPackage(String name) {
         if (name == null || name.equals("")) {
 	    return null;
@@ -1649,9 +1659,17 @@ public class TypeSystem_c implements TypeSystem
 	return (Type) systemResolver.find(clazz.getName());
     }
 
-    public Set getTypeEncoderRootSet(Type t) {
-        // The root set is now just the type itself. Previously it contained
-        // the member classes tool
+    /**
+     * Return the set of objects that should be serialized into the
+     * type information for the given TypeObject.
+     * Usually only the object itself should get encoded, and references
+     * to other classes should just have their name written out.
+     * If it makes sense for additional types to be fully encoded,
+     * (i.e., they're necessary to correctly reconstruct the given clazz,
+     * and the usual class resolvers can't otherwise find them) they
+     * should be returned in the set in addition to clazz.
+     */
+    public Set getTypeEncoderRootSet(TypeObject t) {
 	return Collections.singleton(t);
     }
 

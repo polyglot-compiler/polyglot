@@ -187,8 +187,7 @@ public class TypeBuilder extends NodeVisitor
 
             if (allMembers) {
                 String fullName = typeSystem().getTransformedClassName(ct);
-                typeSystem().parsedResolver().addNamed(fullName, ct);
-                ((CachingResolver) typeSystem().systemResolver()).addNamed(fullName, ct);
+                typeSystem().systemResolver().addNamed(fullName, ct);
             }
 
             return ct;
@@ -201,15 +200,14 @@ public class TypeBuilder extends NodeVisitor
 	      	ct.package_(currentPackage());
 	    }
 
-            Named dup = ((CachingResolver) typeSystem().systemResolver()).check(ct.fullName());
+            Named dup = typeSystem().systemResolver().check(ct.fullName());
 
             if (dup != null && dup.fullName().equals(ct.fullName())) {
                 throw new SemanticException("Duplicate class \"" +
                                             ct.fullName() + "\".", pos);
             }
 
-            typeSystem().parsedResolver().addNamed(ct.fullName(), ct);
-            ((CachingResolver) typeSystem().systemResolver()).addNamed(ct.fullName(), ct);
+            typeSystem().systemResolver().addNamed(ct.fullName(), ct);
 
 	    return ct;
 	}
