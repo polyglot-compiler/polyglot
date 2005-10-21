@@ -9,6 +9,8 @@ package polyglot.frontend.passes;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.TypeExists;
 import polyglot.types.*;
+import polyglot.util.ErrorInfo;
+import polyglot.util.ErrorQueue;
 
 
 public class TypeExistsPass extends ClassFilePass {
@@ -26,11 +28,17 @@ public class TypeExistsPass extends ClassFilePass {
     public boolean run() {
         String name = goal.typeName();
         try {
-            Type t = ts.typeForName(name);
+            // Try to resolve the type; this may throw a MissingDependencyException
+            // on the job to load the file containing the type.
+            Named n = ts.systemResolver().find(name);
+            if (n instanceof Type) {
+                return true;
+            }
         }
         catch (SemanticException e) {
-            return false;
+            ErrorQueue eq = ts.extensionInfo().compiler().errorQueue();
+            eq.enqueue(ErrorInfo.SEMANTIC_ERROR, e.getMessage(), e.position());
         }
-        return true;
+        return false;
     }
 }

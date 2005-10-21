@@ -1,5 +1,7 @@
 package polyglot.ext.jl.types;
 
+import polyglot.frontend.*;
+import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
 import polyglot.util.*;
 
@@ -20,28 +22,81 @@ public class PlaceHolder_c implements PlaceHolder
     protected PlaceHolder_c() { }
     
     /** Creates a place holder type for the type. */
-    public PlaceHolder_c(Type t) {
-	if (t.isClass()) {
-            name = t.typeSystem().getTransformedClassName(t.toClass());
+    public PlaceHolder_c(ParsedClassType t) {
+        name = t.typeSystem().getTransformedClassName(t.toClass());
+    }
+
+    public int hashCode() {
+        return name.hashCode();
+    }
+    
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o instanceof PlaceHolder_c) {
+            PlaceHolder_c p = (PlaceHolder_c) o;
+            return name.equals(p.name);
         }
-	else {
-	    throw new InternalCompilerError("Cannot serialize " + t + ".");
-	}
+        return false;
     }
-
-    /** Restore the placeholder into a proper type. */ 
-    public TypeObject resolve(TypeSystem ts) {
+    
+    /**
+     * Resolve the place holder into a TypeObject.  This method
+     * should <strong>never</strong> throw a SchedulerException.
+     * Instead, it should return null if the object cannot be resolved 
+     * until after another pass runs.  The method is responsible for setting
+     * up the appropriate dependencies to reattempt the current goal.
+     */
+    public TypeObject resolve(TypeSystem ts) throws CannotResolvePlaceHolderException {
+        return resolveUnsafe(ts);
+    }
+    
+    public TypeObject resolveUnsafe(TypeSystem ts) throws CannotResolvePlaceHolderException {
+        Scheduler scheduler = ts.extensionInfo().scheduler();
+        Goal g = scheduler.TypeExists(name);
+        
         try {
+            // find(name) should be side-effect free.  If it isn't use resolveSafe!
+            // Using find will make other passes more efficient.
             return ts.systemResolver().find(name);
-	} catch (SemanticException se) {
-	    throw new InternalCompilerError(se);
-	}
+        }
+        catch (MissingDependencyException e) {
+            // The type is in a source file that hasn't been parsed yet.
+            g = e.goal();
+        }
+        catch (SchedulerException e) {
+            // Some other scheduler error occurred.
+        }
+        catch (SemanticException e) {
+            // The type could not be found.
+        }
+        
+        scheduler.currentGoal().setUnreachableThisRun();
+        scheduler.addDependencyAndEnqueue(scheduler.currentGoal(), g, false);
+        return null;
     }
+    
+    /** A potentially safer alternative implementation of resolve. */
+    public TypeObject resolveSafe(TypeSystem ts) throws CannotResolvePlaceHolderException {
+        Named n = ts.systemResolver().check(name);
 
-    public String translate(Resolver c) {
-	throw new InternalCompilerError("Cannot translate place holder type.");
+        if (n != null) {
+            return n;
+        }
+
+        // The class has not been loaded yet.  Set up a dependency
+        // to load the class (coreq, in case this pass is the one to load it).
+        Scheduler scheduler = ts.extensionInfo().scheduler();
+        scheduler.currentGoal().setUnreachableThisRun();
+        scheduler.addDependencyAndEnqueue(scheduler.currentGoal(),
+                                          scheduler.TypeExists(name),
+                                          false);
+
+        // Return null so that deserialization can continue and other dependencies
+        // are set up.
+        return null;
     }
-
+    
     public String toString() {
 	return "PlaceHolder(" + name + ")";
     }

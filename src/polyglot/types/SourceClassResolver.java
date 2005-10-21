@@ -232,23 +232,24 @@ public class SourceClassResolver extends LoadedClassResolver
     Scheduler scheduler = ext.scheduler();
     Job job = scheduler.loadSource(source, ! compileCommandLineOnly);
 
-    if (job == null) {
-        // the source has already been compiled; what are we doing here?
-        throw new InternalCompilerError("Attempted to load source " + source + ", but it's already loaded.");
-    }
-
     if (Report.should_report("sourceloader", 3))
         new Exception("loaded " + source).printStackTrace();
-    
-    Goal g = scheduler.TypesInitialized(job);
-    
-    if (! scheduler.reached(g)) {
-        throw new MissingDependencyException(g);
+
+    if (job != null) {
+        Named n = ts.systemResolver().check(name);
+        
+        if (n != null) {
+            return n;
+        }
+        
+        Goal g = scheduler.TypesInitialized(job);
+        
+        if (! scheduler.reached(g)) {
+            throw new MissingDependencyException(g);
+        }
     }
-    
-    // Even if there was an error when compiling the source file, we may
-    // as well keep trying to compile the current class, as the error may
-    // have been with something source depended on, that we do not.
-    return ts.parsedResolver().find(name);
+  
+    // The source has already been compiled, but the type was not created there.
+    throw new SemanticException("Could not find \"" + name + "\" in " + source + ".");
   }
 }

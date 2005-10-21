@@ -28,11 +28,11 @@ class TypeDumper {
 	    new java.util.HashSet(java.util.Arrays.asList(primitiveLike));
     }
 
-    Type theType;
+    TypeObject theType;
     String rawName;
     String compilerVersion;
     Date timestamp;
-    TypeDumper(String rawName, Type t, String compilerVersion,
+    TypeDumper(String rawName, TypeObject t, String compilerVersion,
 	       Long timestamp) {
 	theType = t;
 	this.rawName = rawName;

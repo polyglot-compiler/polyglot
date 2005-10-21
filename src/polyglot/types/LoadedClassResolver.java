@@ -1,17 +1,13 @@
 package polyglot.types;
 
 import java.io.InvalidClassException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.SchedulerException;
 import polyglot.main.Report;
 import polyglot.main.Version;
 import polyglot.types.reflect.*;
-import polyglot.types.reflect.ClassFile;
-import polyglot.types.reflect.ClassFileLoader;
-import polyglot.types.reflect.ClassPathLoader;
 import polyglot.util.CollectionUtil;
 import polyglot.util.TypeEncoder;
 import polyglot.util.InternalCompilerError;
@@ -130,7 +126,7 @@ public class LoadedClassResolver extends ClassResolver implements TopLevelResolv
         + " in the language extension, try recompiling the source code.");
     
   }
-
+  
   /**
    * Extract an encoded type from a class file.
    */
@@ -154,10 +150,18 @@ public class LoadedClassResolver extends ClassResolver implements TopLevelResolv
     }
 
     // Alright, go with it!
-    ClassType dt;
+    TypeObject dt;
     
     try {
-        dt = (ClassType) te.decode(clazz.encodedClassType(version.name()));
+        dt = te.decode(clazz.encodedClassType(version.name()));
+        
+        if (dt == null) {
+            // Deserialization failed because one or more types could not
+            // be resolved.  Abort this pass.  Dependencies have already
+            // been set up so that this goal will be reattempted after
+            // the types are resolved.
+            throw new SchedulerException("Could not decode " + name);
+        }
     }
     catch (InternalCompilerError e) {
 	System.err.println("Failed decoding " + clazz.name());
@@ -167,14 +171,19 @@ public class LoadedClassResolver extends ClassResolver implements TopLevelResolv
         throw new BadSerializationException(clazz.name());
     }
 
-    // Put the decoded type into the resolver to avoid circular resolving.
-    ((CachingResolver) ts.systemResolver()).addNamed(name, dt);
-
-    if (Report.should_report(report_topics, 2))
-      Report.report(2, "Returning serialized ClassType for " +
-                    clazz.name() + ".");
-
-    return (ClassType) dt;
+    if (dt instanceof ClassType) {
+        // Put the decoded type into the resolver to avoid circular resolving.
+        ts.systemResolver().addNamed(name, (ClassType) dt);
+    
+        if (Report.should_report(report_topics, 2))
+            Report.report(2, "Returning serialized ClassType for " +
+                          clazz.name() + ".");
+        
+        return (ClassType) dt;
+    }
+    else {
+        throw new SemanticException("Class " + name + " not found in " + clazz.name() + ".");
+    }
   }
 
   /**
