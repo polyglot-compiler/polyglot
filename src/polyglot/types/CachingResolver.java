@@ -178,6 +178,7 @@ public class CachingResolver implements TopLevelResolver {
         if (Report.should_report(TOPICS, 1)) {
             Report.report(3, "CachingResolver: installing " + name + "->" + q + " in resolver cache");
         }
+        /*
         Object p = cache.get(name);
         if (p != null) {
             if (p != q) {
@@ -185,8 +186,9 @@ public class CachingResolver implements TopLevelResolver {
             }
         }
         else {
-            cache.put(name, q);
         }
+        */
+        cache.put(name, q);
     }
 
     /**
