@@ -13,7 +13,7 @@ public class TypeOutputStream extends ObjectOutputStream
   protected Set roots;
   protected Map placeHolders;
   
-  public TypeOutputStream( OutputStream out, TypeSystem ts, Type root) 
+  public TypeOutputStream(OutputStream out, TypeSystem ts, Type root) 
     throws IOException
   {
     super( out);

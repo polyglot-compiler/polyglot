@@ -15,7 +15,7 @@ public class TypeInputStream extends ObjectInputStream
   public TypeInputStream( InputStream in, TypeSystem ts) 
     throws IOException
   {
-    super( in);
+    super(in);
     enableResolveObject(true);
     this.ts = ts;
     this.cache = new HashMap();

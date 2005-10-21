@@ -1,9 +1,12 @@
 package polyglot.util;
 
+import polyglot.frontend.SchedulerException;
 import polyglot.main.Report;
 import polyglot.types.*;
 
 import java.io.*;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.zip.*;
 
 /**
@@ -120,6 +123,7 @@ public class TypeEncoder
         else {
             ois = new TypeInputStream( new ByteArrayInputStream( b), ts);
         }
+        
         return (Type)ois.readObject();
     }
     catch (InvalidClassException e) {
@@ -132,6 +136,10 @@ public class TypeEncoder
     catch (ClassNotFoundException e) {
         throw new InternalCompilerError("Unable to find one of the classes " +
             "for the serialized type info: " + e.getMessage(), e);
+    }
+    catch (SchedulerException e) {
+        throw new InternalCompilerError("SchedulerException thrown while " +
+            "decoding serialized type info: " + e.getMessage(), e);
     }
   }
 }
