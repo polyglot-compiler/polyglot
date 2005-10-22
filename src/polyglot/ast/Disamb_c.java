@@ -45,20 +45,25 @@ public class Disamb_c implements Disamb
                 "Cannot disambiguate node with ambiguous prefix.");
         }
 
+        Node result = null;
+        
         if (prefix instanceof PackageNode) {
             PackageNode pn = (PackageNode) prefix;
-            return disambiguatePackagePrefix(pn);
-        } else if (prefix instanceof TypeNode) {
+            result = disambiguatePackagePrefix(pn);
+        }
+        else if (prefix instanceof TypeNode) {
             TypeNode tn = (TypeNode) prefix;
-            return disambiguateTypeNodePrefix(tn);
-        } else if (prefix instanceof Expr) {
+            result = disambiguateTypeNodePrefix(tn);
+        }
+        else if (prefix instanceof Expr) {
             Expr e = (Expr) prefix;
-            return disambiguateExprPrefix(e);
-        } else if (prefix == null) {
-            return disambiguateNoPrefix();
+            result = disambiguateExprPrefix(e);
+        }
+        else if (prefix == null) {
+            result = disambiguateNoPrefix();
         }
 
-        return null;
+        return result;
     }
 
     protected Node disambiguatePackagePrefix(PackageNode pn) throws SemanticException {
@@ -220,5 +225,9 @@ public class Disamb_c implements Disamb
                ! (amb instanceof TypeNode) &&
               (amb instanceof Expr || amb instanceof Receiver ||
                amb instanceof Prefix);
+    }
+    
+    public String toString() {
+        return "Disamb(" + amb.getClass().getName() + ": " + amb + ")";
     }
 }
