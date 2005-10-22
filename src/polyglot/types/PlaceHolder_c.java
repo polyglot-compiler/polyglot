@@ -16,14 +16,14 @@ public class PlaceHolder_c implements PlaceHolder
     /**
      * The name of the place holder.
      */
-    String name;
+    protected String name;
 
     /** Used for deserializing types. */
     protected PlaceHolder_c() { }
     
     /** Creates a place holder type for the type. */
-    public PlaceHolder_c(ParsedClassType t) {
-        name = t.typeSystem().getTransformedClassName(t.toClass());
+    public PlaceHolder_c(Named t) {
+        name = t.fullName();
     }
 
     public int hashCode() {
@@ -31,13 +31,7 @@ public class PlaceHolder_c implements PlaceHolder
     }
     
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o instanceof PlaceHolder_c) {
-            PlaceHolder_c p = (PlaceHolder_c) o;
-            return name.equals(p.name);
-        }
-        return false;
+        return o == this || (o instanceof PlaceHolder_c && name.equals(((PlaceHolder_c) o).name));
     }
     
     /**
@@ -73,7 +67,8 @@ public class PlaceHolder_c implements PlaceHolder
         
         scheduler.currentGoal().setUnreachableThisRun();
         scheduler.addDependencyAndEnqueue(scheduler.currentGoal(), g, false);
-        return null;
+        
+        throw new CannotResolvePlaceHolderException("Could not resolve " + name);
     }
     
     /** A potentially safer alternative implementation of resolve. */
@@ -92,9 +87,7 @@ public class PlaceHolder_c implements PlaceHolder
                                           scheduler.TypeExists(name),
                                           false);
 
-        // Return null so that deserialization can continue and other dependencies
-        // are set up.
-        return null;
+        throw new CannotResolvePlaceHolderException("Could not resolve " + name);
     }
     
     public String toString() {
