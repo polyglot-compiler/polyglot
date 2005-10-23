@@ -12,6 +12,7 @@ import java.util.*;
 public class CachingResolver implements Resolver {
     Resolver inner;
     Map cache;
+    boolean cacheNotFound;
 
     static Object NOT_FOUND = "NOT FOUND";
 
@@ -19,9 +20,14 @@ public class CachingResolver implements Resolver {
      * Create a caching resolver.
      * @param inner The resolver whose results this resolver caches.
      */
-    public CachingResolver(Resolver inner) {
+    public CachingResolver(Resolver inner, boolean cacheNotFound) {
 	this.inner = inner;
+        this.cacheNotFound = cacheNotFound;
 	this.cache = new HashMap();
+    }
+
+    public CachingResolver(Resolver inner) {
+        this(inner, true);
     }
 
     /**
@@ -63,7 +69,9 @@ public class CachingResolver implements Resolver {
                     Report.report(3, "CachingResolver: " + e.getMessage());
                     Report.report(3, "CachingResolver: installing " + name + "->" + NOT_FOUND + " in resolver cache");;
                 }
-                cache.put(name, NOT_FOUND);
+                if (cacheNotFound) {
+                    cache.put(name, NOT_FOUND);
+                }
                 throw e;
             }
 
