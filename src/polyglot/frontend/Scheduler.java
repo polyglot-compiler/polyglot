@@ -124,7 +124,7 @@ public abstract class Scheduler {
     
     public void addCorequisiteDependencyAndEnqueue(Goal goal, Goal subgoal) {
         addCorequisiteDependency(goal, subgoal);
-        addGoal(subgoal);
+        // addGoal(subgoal);
     }
 
     public void addDependencyAndEnqueue(Goal goal, Goal subgoal, boolean prerequisite) {
@@ -139,7 +139,7 @@ public abstract class Scheduler {
         else {
             addCorequisiteDependency(goal, subgoal);
         }
-        addGoal(subgoal);
+        // addGoal(subgoal);
     }
 
     /**
@@ -191,24 +191,9 @@ public abstract class Scheduler {
 
     /** Add <code>goal</code> to the worklist. */
     public void addGoal(Goal goal) {
-        addGoalToWorklist(goal);
-    }
-
-    protected synchronized void addGoalToWorklist(Goal g) {
-        if (! inWorklist.contains(g)) {
-            inWorklist.add(g);
-            worklist.add(g);
-        }
-    }
-    
-    protected synchronized void prependGoal(Goal g) {
-        if (! inWorklist.contains(g)) {
-            inWorklist.add(g);
-            worklist.add(0, g);
-        }
-        else {
-            worklist.remove(g);
-            worklist.add(0, g);
+        if (! inWorklist.contains(goal)) {
+            inWorklist.add(goal);
+            worklist.add(goal);
         }
     }
     
@@ -221,58 +206,73 @@ public abstract class Scheduler {
     */
     
     public boolean reached(Goal g) {
-      /*
-        for (Iterator i = new ArrayList(g.prerequisiteGoals(this)).iterator(); i.hasNext(); ) {
-            Goal subgoal = (Goal) i.next();
-            
-            if (! reached(subgoal)) {
-                return false;
+        return g.hasBeenReached();
+    }
+
+    protected void completeJob(Job job) {
+        if (job != null) {
+            jobs.put(job.source(), COMPLETED_JOB);
+            if (Report.should_report(Report.frontend, 1)) {
+                Report.report(1, "Completed job " + job);
             }
         }
-        */
-        
-        /*
-        long t = System.currentTimeMillis();
-        
-        Job job = g.job();
-        
-        if (job != null && job.isRunning()) {
-            return false;
-        }
-        
-        Pass pass = schedulerPass(g);
-        Pass oldPass = this.currentPass;
-        this.currentPass = pass;
+    }
 
-        // Stop the timer on the old pass.
-        if (oldPass != null) {
-            oldPass.toggleTimers(true);
+    protected List worklist() {
+        return worklist;
+    }
+
+    protected static class TheEndGoal extends AbstractGoal {
+        protected Scheduler scheduler;
+
+        protected TheEndGoal(Scheduler scheduler) {
+            super(null);
+            this.scheduler = scheduler;
         }
 
-        if (job != null) {
-            job.setRunningPass(pass);
-        }
-        */
-        
-        boolean result = g.hasBeenReached();
-        
-        /*
-        if (job != null) {
-            job.setRunningPass(null);
-        }
-        
-        this.currentPass = oldPass;
-
-        // Restart the timer on the old pass.
-        if (oldPass != null) {
-            oldPass.toggleTimers(true);
+        public Collection prerequisiteGoals(Scheduler scheduler) {
+            return scheduler.worklist();
         }
 
-        t = System.currentTimeMillis() - t;
-        extInfo.getStats().accumPassTimes("scheduler.reached", t, t);
-        */
+        public String toString() {
+            return "TheEnd(" + scheduler.getClass().getName() + ")";
+        }
 
-        return result;
+        protected Collection goals() {
+            return scheduler.worklist();
+        }
+
+        public Pass createPass(ExtensionInfo extInfo) {
+            return new EndPass(this);
+        }
+
+        protected static class EndPass extends AbstractPass {
+            protected EndPass(TheEndGoal g) {
+                super(g);
+            }
+
+            public boolean run() {
+                TheEndGoal end = (TheEndGoal) goal();
+
+                for (Iterator i = end.goals().iterator(); i.hasNext(); ) {
+                    Goal goal = (Goal) i.next();
+
+                    if (! goal.hasBeenReached()) {
+                        throw new MissingDependencyException(goal, true);
+                    }
+                }
+
+                return true;
+            }
+        }
+        
+        public int hashCode() {
+            return Boolean.TRUE.hashCode();
+        }
+
+        public boolean equals(Object o) {
+            return o instanceof TheEndGoal;
+        }
     }
 
     /**
@@ -282,49 +282,12 @@ public abstract class Scheduler {
      * should be empty at return.
      */ 
     public boolean runToCompletion() {
-        boolean okay = true;
-        
-        while (! worklist.isEmpty()) {
-            if (Report.should_report(Report.frontend, 4))
-                Report.report(4, "processing next in worklist " + worklist);
-    
-            Goal goal = selectGoalFromWorklist();
-            
-            if (reached(goal)) {
-                continue;
-            }
-            
-            if (Report.should_report(Report.frontend, 2)) {
-                Report.report(2, "Selected goal " + goal);
-            }
+        Goal theEnd = internGoal(new TheEndGoal(this));
 
-            try {
-                okay &= attemptGoal(goal);
-            }
-            catch (CyclicDependencyException e) {
-                addGoalToWorklist(goal);
-                continue;
-            }
-        
-            if (! okay) {
-                break;
-            }
-            
-            if (! reached(goal)) {
-                if (Report.should_report(Report.frontend, 2)) {
-                    Report.report(2, "Failed to reach " + goal + "; will reattempt");
-                }
-            
-                addGoalToWorklist(goal);
-            }
-            else if (goal instanceof EndGoal) {
-                // the job has finished. Let's remove it from the map so it
-                // can be garbage collected, and free up the AST.
-                jobs.put(goal.job().source(), COMPLETED_JOB);
-                if (Report.should_report(Report.frontend, 1)) {
-                    Report.report(1, "Completed job " + goal.job());
-                }
-            }
+        boolean okay = true;
+
+        while (okay && ! reached(theEnd)) {
+            okay = attemptGoal(theEnd);
         }
 
         if (Report.should_report(Report.frontend, 1))
@@ -332,33 +295,6 @@ public abstract class Scheduler {
                         (okay ? "okay" : "failed"));
 
         return okay;
-    }
-
-    /**
-     * Select and remove a <code>Goal</code> from the non-empty
-     * <code>worklist</code>. Return the selected <code>Goal</code>
-     * which will be scheduled to run all of its remaining passes.
-     */
-    protected Goal selectGoalFromWorklist() {
-        // TODO: Select the goal that will cause it's associated job to complete
-        // first. This is the goal with the fewest subgoals closest to job
-        // completion. The idea is to finish a job as quickly as possible in
-        // order to free its memory.
-        
-        // Pick a goal not recently run, if available.
-//        for (Iterator i = worklist.iterator(); i.hasNext(); ) {
-//            Goal goal = (Goal) i.next();
-//            Integer progress = (Integer) progressMap.get(goal);
-//            if (progress == null || progress.intValue() < currentProgress) {
-//                i.remove();
-//                inWorklist.remove(goal);
-//                return goal;
-//            }
-//        }
-        
-        Goal goal = (Goal) worklist.removeFirst();
-        inWorklist.remove(goal);
-        return goal;
     }
     
     /**         
@@ -409,34 +345,6 @@ public abstract class Scheduler {
         return currentPass != null ? currentPass.goal() : null;
     }
 
-    boolean addPrereqsToWorklist(Goal goal) {
-        boolean runPass = true;
-
-        for (Iterator i = goal.prerequisiteGoals(this).iterator(); i.hasNext(); ) {
-            Goal subgoal = (Goal) i.next();
-            
-            if (! reached(subgoal)) {
-                if (! inWorklist.contains(subgoal)) {
-                    addPrereqsToWorklist(subgoal);
-                    addGoal(subgoal);
-                }
-                runPass = false;
-            }
-        }
-
-        return runPass;
-    }
-    
-    void addCoreqsToWorklist(Goal goal) {
-        for (Iterator i = goal.corequisiteGoals(this).iterator(); i.hasNext(); ) {
-            Goal subgoal = (Goal) i.next();
-            
-            if (! reached(subgoal)) {
-                addGoal(subgoal);
-            }
-        }
-    }
-    
     /**
      * Run a passes until the <code>goal</code> is attempted. Callers should
      * check goal.completed() and should be able to handle the goal not being
@@ -445,7 +353,11 @@ public abstract class Scheduler {
      * @return false if there was an error trying to reach the goal; true if
      *         there was no error, even if the goal was not reached.
      */ 
-    public boolean attemptGoal(Goal goal) throws CyclicDependencyException {
+    public boolean attemptGoal(Goal goal) {
+        return attemptGoal(goal, new HashSet());
+    }
+
+    protected boolean attemptGoal(Goal goal, Set above) {
         if (Report.should_report("dump-dep-graph", 2))
             dumpInFlightDependenceGraph();
 
@@ -457,56 +369,127 @@ public abstract class Scheduler {
             Report.report(4, "  Prerequisites for " + goal + " = " + goal.prerequisiteGoals(this));
             Report.report(4, "  Corequisites for " + goal + " = " + goal.corequisiteGoals(this));
         }
+
+        if (above.contains(goal)) {
+            if (Report.should_report(Report.frontend, 4))
+                Report.report(4, "aborting " + goal);
+            return true;
+        }
+
+        boolean progress = true;
+    
+        Set newAbove = new HashSet();
+        newAbove.addAll(above);
+        newAbove.add(goal);
+
+        // Loop over the goal and its coreqs as long as progress is made.
+        while (progress && ! reached(goal)) {
+            progress = false;
+
+            if (Report.should_report(Report.frontend, 4))
+                Report.report(4, "outer loop for " + goal);
+
+            // Run the prereqs of the goal.
+            List prereqs = new ArrayList(goal.prerequisiteGoals(this));
+
+            for (Iterator j = prereqs.iterator(); j.hasNext(); ) {
+                Goal subgoal = (Goal) j.next();
+
+                if (reached(subgoal)) {
+                    continue;
+                }
+
+                if (Report.should_report(Report.frontend, 4))
+                    Report.report(4, "running prereq: " + subgoal + "->" + goal);
+
+                if (! attemptGoal(subgoal, newAbove)) {
+                    return false;
+                }
+
+                if (reached(goal)) {
+                    return true;
+                }
+            }
+
+            // Make sure all prerequisite subgoals have been completed.
+            // If any has not, just return.
+            boolean runPass = true;
+
+            for (Iterator j = goal.prerequisiteGoals(this).iterator(); j.hasNext(); ) {
+                Goal subgoal = (Goal) j.next();
+                if (! reached(subgoal)) {
+                    runPass = false;
+                }
+            }
+
+            if (! runPass) {
+                return true;
+            }
+
+            // Now, run the goal itself.
+            if (Report.should_report(Report.frontend, 4))
+                Report.report(4, "running goal " + goal);
+            
+            boolean result = runGoal(goal);
+            
+            if (! result) {
+                return false;
+            }
+            
+            if (reached(goal)) {
+                if (goal instanceof EndGoal) {
+                    // The job has finished.  Let's remove it from the map
+                    // so it can be garbage collected, and free up the AST.
+                    completeJob(goal.job());
+                }
+                return true;
+            }
+
+            // If the goal was not reached, run the coreqs of the goal. 
+            List coreqs = new ArrayList(goal.corequisiteGoals(this));
+
+            for (Iterator j = coreqs.iterator(); j.hasNext(); ) {
+                Goal subgoal = (Goal) j.next();
+
+                if (reached(subgoal)) {
+                    continue;
+                }
+
+                if (Report.should_report(Report.frontend, 4))
+                    Report.report(4, "running coreq: " + subgoal + "->" + goal);
+
+                if (! attemptGoal(subgoal, newAbove)) {
+                    return false;
+                }
+
+                if (reached(subgoal)) {
+                    progress = true;
+                }
+
+                if (reached(goal)) {
+                    return true;
+                }
+            }
+        }
         
+        return true;
+    }
+
+    protected boolean runGoal(Goal goal) {
         if (reached(goal)) {
             if (Report.should_report(Report.frontend, 3))
                 Report.report(3, "Already reached goal " + goal);
             return true;
         }
-
+        
         if (! goal.isReachable()) {
             if (Report.should_report(Report.frontend, 3))
                 Report.report(3, "Cannot reach goal " + goal);
             return false;
         }
-        
-        // Another pass is being run over the same source file.  We cannot reach
-        // the goal yet, so just return and let the other pass complete.  This
-        // goal will be reattempted later, if necessary.
-        //
-        // FIXME: Should remove this; passes are not recursive.
-        if (goal.job() != null && goal.job().isRunning()) {
-            if (Report.should_report(Report.frontend, 3))
-                Report.report(3, "Job " + goal.job() + " is running");
-            throw new CyclicDependencyException();
-        }
-
-        // Make sure all prerequisite subgoals have been completed.
-        // If a subgoal has not been completed, just return and let
-        // it complete before trying this goal again.
-        boolean runPass = true;
-
-        runPass = addPrereqsToWorklist(goal);
-
-        if (! runPass) {
-            if (Report.should_report(Report.frontend, 3))
-                Report.report(3, "A prerequisite subgoal wasn't reached, delaying goal " + goal);
-
-            // Add back to the worklist, after all the prereqs.
-            addGoalToWorklist(goal);
-            return true;
-        }
-            
+      
         Pass pass = goal.createPass(extInfo);
-        boolean result = runPass(pass);
-
-        if (result && ! reached(goal)) {
-            // Add the goal and its coreqs to the worklist.
-            addCoreqsToWorklist(goal);
-            addGoalToWorklist(goal);
-        }
-        
-        return result;
+        return runPass(pass);
     }
    
     /**         
@@ -544,6 +527,8 @@ public abstract class Scheduler {
         if (count >= MAX_RUN_COUNT) {
             if (Report.should_report("dump-dep-graph", 1))
                 dumpInFlightDependenceGraph();
+            if (Report.should_report("dump-dep-graph", 1))
+                dumpDependenceGraph();
 
             String[] suffix = new String[] { "th", "st", "nd", "rd" };
             int index = count % 10;
@@ -613,7 +598,7 @@ public abstract class Scheduler {
             }
             catch (MissingDependencyException e) {
                 if (Report.should_report(Report.frontend, 1))
-                    Report.report(1, "Did not complete pass " + pass + " for " + goal);
+                    Report.report(1, "Did not complete pass " + pass + " for " + goal + " (missing " + e.goal() + ")");
 
                 if (Report.should_report(Report.frontend, 3))
                     e.printStackTrace();
@@ -834,7 +819,7 @@ public abstract class Scheduler {
             Goal g = (Goal) i.next();
             g = internGoal(g);
             
-            String h = g.getClass().getName() + System.identityHashCode(g);
+            int h = System.identityHashCode(g);
             
             // dump out this node
             Report.report(2,
@@ -845,14 +830,14 @@ public abstract class Scheduler {
             for (Iterator j = new ArrayList(g.prerequisiteGoals(this)).iterator(); j.hasNext(); ) {
                 Goal g2 = (Goal) j.next();
                 g2 = internGoal(g2);
-                String h2 = g2.getClass().getName() + System.identityHashCode(g2);
+                int h2 = System.identityHashCode(g2);
                 Report.report(2, h2 + " -> " + h + " [style=bold]");
             }
             
             for (Iterator j = new ArrayList(g.corequisiteGoals(this)).iterator(); j.hasNext(); ) {
                 Goal g2 = (Goal) j.next();
                 g2 = internGoal(g2);
-                String h2 = g2.getClass().getName() + System.identityHashCode(g2);
+                int h2 = System.identityHashCode(g2);
                 Report.report(2, h2 + " -> " + h);
             }
         }
