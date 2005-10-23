@@ -31,7 +31,7 @@ public interface TypeSystem {
      * Returns the system resolver.  This resolver can load top-level classes
      * with fully qualified names from the class path and the source path.
      */
-    CachingResolver systemResolver();
+    SystemResolver systemResolver();
 
     /**
      * Return the system resolver.
