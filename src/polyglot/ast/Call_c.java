@@ -70,6 +70,7 @@ public class Call_c extends Expr_c implements Call
 
   /** Set the method instance of the call. */
   public Call methodInstance(MethodInstance mi) {
+    if (mi == this.mi) return this;
     Call_c n = (Call_c) copy();
     n.mi = mi;
     return n;

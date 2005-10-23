@@ -53,6 +53,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     /** Set the initializer instance of the initializer. */
     public FieldDecl initializerInstance(InitializerInstance ii) {
+        if (ii == this.ii) return this;
         FieldDecl_c n = (FieldDecl_c) copy();
         n.ii = ii;
         return n;
@@ -70,6 +71,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     /** Set the flags of the declaration. */
     public FieldDecl flags(Flags flags) {
+        if (flags.equals(this.flags)) return this;
         FieldDecl_c n = (FieldDecl_c) copy();
         n.flags = flags;
         return n;
@@ -113,6 +115,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
     /** Set the field instance of the declaration. */
     public FieldDecl fieldInstance(FieldInstance fi) {
+        if (fi == this.fi) return this;
         FieldDecl_c n = (FieldDecl_c) copy();
         n.fi = fi;
         return n;

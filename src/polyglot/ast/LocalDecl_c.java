@@ -49,6 +49,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
     /** Set the flags of the declaration. */
     public LocalDecl flags(Flags flags) {
+        if (flags.equals(this.flags)) return this;
         LocalDecl_c n = (LocalDecl_c) copy();
         n.flags = flags;
         return n;

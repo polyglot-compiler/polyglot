@@ -71,6 +71,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
     /** Set the constructor we are calling. */
     public ConstructorCall constructorInstance(ConstructorInstance ci) {
+        if (ci == this.ci) return this;
 	ConstructorCall_c n = (ConstructorCall_c) copy();
 	n.ci = ci;
 	return n;

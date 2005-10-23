@@ -63,6 +63,7 @@ public class New_c extends Expr_c implements New
     }
 
     public New anonType(ParsedClassType anonType) {
+        if (anonType == this.anonType) return this;
 	New_c n = (New_c) copy();
 	n.anonType = anonType;
 	return n;
@@ -77,6 +78,7 @@ public class New_c extends Expr_c implements New
     }
 
     public New constructorInstance(ConstructorInstance ci) {
+        if (ci == this.ci) return this;
 	New_c n = (New_c) copy();
 	n.ci = ci;
 	return n;

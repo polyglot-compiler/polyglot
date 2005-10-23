@@ -76,13 +76,7 @@ public class Field_c extends Expr_c implements Field
 
   /** Set the field instance of the field. */
   public Field fieldInstance(FieldInstance fi) {
-    /*
-    if (! fi.type().isCanonical()) {
-      throw new InternalCompilerError("Type of " + fi + " in " +
-                                      fi.container() + " is not canonical.");
-    }
-    */
-
+    if (fi == this.fi) return this;
     Field_c n = (Field_c) copy();
     n.fi = fi;
     return n;

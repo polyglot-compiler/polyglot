@@ -45,6 +45,7 @@ public class Formal_c extends Term_c implements Formal
 
     /** Set the flags of the formal. */
     public Formal flags(Flags flags) {
+        if (flags.equals(this.flags)) return this;
 	Formal_c n = (Formal_c) copy();
 	n.flags = flags;
 	return n;
@@ -81,6 +82,7 @@ public class Formal_c extends Term_c implements Formal
 
     /** Set the local instance of the formal. */
     public Formal localInstance(LocalInstance li) {
+        if (li == this.li) return this;
         Formal_c n = (Formal_c) copy();
 	n.li = li;
 	return n;

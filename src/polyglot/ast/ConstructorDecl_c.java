@@ -48,6 +48,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 
     /** Set the flags of the constructor. */
     public ConstructorDecl flags(Flags flags) {
+        if (flags.equals(this.flags)) return this;
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	n.flags = flags;
 	return n;
@@ -118,6 +119,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     
     /** Set the constructorInstance of the constructor. */
     public ConstructorDecl constructorInstance(ConstructorInstance ci) {
+        if (ci == this.ci) return this;
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	n.ci = ci;
 	return n;

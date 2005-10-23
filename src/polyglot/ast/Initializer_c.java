@@ -44,6 +44,7 @@ public class Initializer_c extends Term_c implements Initializer
 
     /** Set the flags of the initializer. */
     public Initializer flags(Flags flags) {
+        if (flags.equals(this.flags)) return this;
 	Initializer_c n = (Initializer_c) copy();
 	n.flags = flags;
 	return n;
@@ -60,6 +61,7 @@ public class Initializer_c extends Term_c implements Initializer
 
     /** Set the initializer instance of the initializer. */
     public Initializer initializerInstance(InitializerInstance ii) {
+        if (ii == this.ii) return this;
 	Initializer_c n = (Initializer_c) copy();
 	n.ii = ii;
 	return n;

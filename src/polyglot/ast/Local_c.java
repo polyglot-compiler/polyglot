@@ -59,6 +59,7 @@ public class Local_c extends Expr_c implements Local
 
   /** Set the local instance of the local. */
   public Local localInstance(LocalInstance li) {
+    if (li == this.li) return this;
     Local_c n = (Local_c) copy();
     n.li = li;
     return n;

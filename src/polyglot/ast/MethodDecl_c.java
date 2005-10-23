@@ -50,6 +50,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 
     /** Set the flags of the method. */
     public MethodDecl flags(Flags flags) {
+        if (flags.equals(this.flags)) return this;
 	MethodDecl_c n = (MethodDecl_c) copy();
 	n.flags = flags;
 	return n;
@@ -122,6 +123,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 
     /** Set the method instance of the method. */
     public MethodDecl methodInstance(MethodInstance mi) {
+        if (mi == this.mi) return this;
 	MethodDecl_c n = (MethodDecl_c) copy();
 	n.mi = mi;
 	return n;

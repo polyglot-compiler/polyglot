@@ -49,6 +49,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     }
 
     public ClassDecl type(ParsedClassType type) {
+            if (type == this.type) return this;
 	    ClassDecl_c n = (ClassDecl_c) copy();
 	    n.type = type;
 	    return n;
@@ -59,6 +60,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     }
 
     public ClassDecl flags(Flags flags) {
+            if (flags.equals(this.flags)) return this;
 	    ClassDecl_c n = (ClassDecl_c) copy();
 	    n.flags = flags;
 	    return n;

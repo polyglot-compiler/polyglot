@@ -101,12 +101,12 @@ public class Binary_c extends Expr_c implements Binary
     }
     
     public Object constantValue() {
-        Object lv = left.constantValue();
-        Object rv = right.constantValue();
-
 	if (! isConstant()) {
 	    return null;
 	}
+
+        Object lv = left.constantValue();
+        Object rv = right.constantValue();
 
         if (op == ADD && (lv instanceof String || rv instanceof String)) {
             // toString() does what we want for String, Number, and Boolean
