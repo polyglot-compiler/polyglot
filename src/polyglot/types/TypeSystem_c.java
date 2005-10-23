@@ -20,7 +20,7 @@ import polyglot.util.StringUtil;
  **/
 public class TypeSystem_c implements TypeSystem
 {
-    protected CachingResolver systemResolver;
+    protected SystemResolver systemResolver;
     protected LoadedClassResolver loadedResolver;
     protected Map flagsForName;
     protected ExtensionInfo extInfo;
@@ -48,7 +48,7 @@ public class TypeSystem_c implements TypeSystem
         // fully qualified names to instances of Named. A pass over a
         // compilation unit looks up classes first in its
         // import table and then in the system resolver.
-        this.systemResolver = new CachingResolver(loadedResolver, extInfo);
+        this.systemResolver = new SystemResolver(loadedResolver, extInfo);
 
         initEnums();
         initFlags();
@@ -100,7 +100,7 @@ public class TypeSystem_c implements TypeSystem
         return extInfo;
     }
 
-    public CachingResolver systemResolver() {
+    public SystemResolver systemResolver() {
       return systemResolver;
     }
 
