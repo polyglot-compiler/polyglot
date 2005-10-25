@@ -67,7 +67,7 @@ public class CachingResolver implements Resolver {
             catch (NoClassException e) {
                 if (Report.should_report(TOPICS, 3)) {
                     Report.report(3, "CachingResolver: " + e.getMessage());
-                    Report.report(3, "CachingResolver: installing " + name + "->" + NOT_FOUND + " in resolver cache");;
+                    Report.report(3, "CachingResolver: installing " + name + "->" + NOT_FOUND + " in resolver cache");
                 }
                 if (cacheNotFound) {
                     cache.put(name, NOT_FOUND);
@@ -104,6 +104,10 @@ public class CachingResolver implements Resolver {
      * @param q The qualifier to insert.
      */
     public void install(String name, Named q) {
+        if (Report.should_report(TOPICS, 3))
+            Report.report(3, "CachingResolver: installing " + name + "->" + q + " in resolver cache");
+        if (Report.should_report(TOPICS, 5))
+            new Exception().printStackTrace();
         cache.put(name, q);
     }
 
@@ -116,7 +120,16 @@ public class CachingResolver implements Resolver {
 	install(name, q);
     }
 
+    public void dump() {
+        Report.report(1, "Dumping " + this);
+        for (Iterator i = cache.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry e = (Map.Entry) i.next();
+            Report.report(2, e.toString());
+        }
+    }
+
     private static final Collection TOPICS =
                     CollectionUtil.list(Report.types,
-                                        Report.resolver);
+                                        Report.resolver,
+                                        "sysresolver");
 }
