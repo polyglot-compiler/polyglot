@@ -85,7 +85,7 @@ public class SourceLoader
             }
         }
         
-        if (Report.should_report(Report.frontend, 2))
+        if (Report.should_report(Report.loader, 2))
             Report.report(2, "Loading class from " + sourceFile);
 
         FileSource s = (FileSource) loadedSources.get(fileKey(sourceFile));
@@ -181,7 +181,7 @@ public class SourceLoader
                     }
                     
                     try {
-                        if (Report.should_report(Report.frontend, 2))
+                        if (Report.should_report(Report.loader, 2))
                             Report.report(2, "Loading " + className + " from " + sourceFile);
                         s = new FileSource(sourceFile);
                         loadedSources.put(fileKey(sourceFile), s);
