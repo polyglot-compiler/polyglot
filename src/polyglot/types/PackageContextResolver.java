@@ -8,11 +8,9 @@ import polyglot.types.Package;
  * A <code>PackageContextResolver</code> is responsible for looking up types
  * and packages in a package by name.
  */
-public class PackageContextResolver implements Resolver
+public class PackageContextResolver extends AbstractAccessControlResolver
 {
     protected Package p;
-    protected TypeSystem ts;
-    protected Resolver cr;
 
     /**
      * Create a package context resolver.
@@ -20,10 +18,9 @@ public class PackageContextResolver implements Resolver
      * @param p The package in whose context to search.
      * @param cr The resolver to use for looking up types.
      */
-    public PackageContextResolver(TypeSystem ts, Package p, Resolver cr) {
-	this.ts = ts;
+    public PackageContextResolver(TypeSystem ts, Package p) {
+        super(ts);
 	this.p = p;
-	this.cr = cr;
     }
 
     /**
@@ -37,31 +34,46 @@ public class PackageContextResolver implements Resolver
      * The system resolver.
      */
     public Resolver outer() {
-        return cr;
+        return ts.systemResolver();
     }
 
     /**
      * Find a type object by name.
      */
-    public Named find(String name) throws SemanticException {
+    public Named find(String name, ClassType accessor) throws SemanticException {
 	if (! StringUtil.isNameShort(name)) {
 	    throw new InternalCompilerError(
 		"Cannot lookup qualified name " + name);
 	}
-
-        if (cr == null) {
-	    return ts.createPackage(p, name);
-        }
+        
+        Named n = null;
 
 	try {
-	    return cr.find(p.fullName() + "." + name);
+	    n = ts.systemResolver().find(p.fullName() + "." + name);
 	}
 	catch (NoClassException e) {
+            // Rethrow if some _other_ class or package was not found.
             if (!e.getClassName().equals(p.fullName() + "." + name)) {
                 throw e;
             }
-	    return ts.createPackage(p, name);
 	}
+
+        if (n == null) {
+            n = ts.createPackage(p, name);
+        }
+        
+        if (! canAccess(n, accessor)) {
+            throw new SemanticException("Cannot access " + n + " from " + accessor + ".");
+        }
+        
+        return n;
+    }
+
+    protected boolean canAccess(Named n, ClassType accessor) {
+        if (n instanceof ClassType) {
+            return accessor == null || ts.classAccessible((ClassType) n, accessor);
+        }
+        return true;
     }
 
     public String toString() {

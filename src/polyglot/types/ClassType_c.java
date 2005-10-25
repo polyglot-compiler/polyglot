@@ -27,6 +27,21 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         this.decl = this;
     }
     
+    protected transient Resolver memberCache;
+    
+    public Resolver resolver() {
+        if (memberCache == null) {
+            memberCache = new CachingResolver(ts.createClassContextResolver(this));
+        }
+        return memberCache;
+    }
+    
+    public Object copy() {
+        ClassType_c n = (ClassType_c) super.copy();
+        n.memberCache = null;
+        return n;
+    }
+    
     protected ClassType decl;
     
     public Declaration declaration() {

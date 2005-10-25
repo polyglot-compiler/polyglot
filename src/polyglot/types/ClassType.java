@@ -22,6 +22,11 @@ public interface ClassType extends Importable, ReferenceType, MemberInstance, De
     public static final Kind LOCAL = new Kind("local");
     public static final Kind ANONYMOUS = new Kind("anonymous");
 
+    /**
+     * A resolver to access member classes of the class.
+     */
+    Resolver resolver();
+    
     /** Get the class's kind. */
     Kind kind();
 

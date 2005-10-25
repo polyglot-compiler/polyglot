@@ -49,7 +49,7 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
     TypeSystem ts = tr.typeSystem();
 
     if (tr.outerClass() != null) {
-      w.write(type.translate(ts.classContextResolver(tr.outerClass())));
+      w.write(type.translate(tr.outerClass().resolver()));
     }
     else if (Options.global.fully_qualified_names) {
       // if a field or local variable in this context shadows the package

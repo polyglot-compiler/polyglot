@@ -67,8 +67,7 @@ public class Disamb_c implements Disamb
     }
 
     protected Node disambiguatePackagePrefix(PackageNode pn) throws SemanticException {
-        Resolver pc = ts.packageContextResolver(c.outerResolver(),
-                                                pn.package_());
+        Resolver pc = ts.packageContextResolver(pn.package_());
 
         Named n = pc.find(name);
         Qualifier q = null;
@@ -97,7 +96,7 @@ public class Disamb_c implements Disamb
 
         if (t.isReference() && exprOK()) {
             try {
-                FieldInstance fi = ts.findField(t.toReference(), name, c);
+                FieldInstance fi = ts.findField(t.toReference(), name, c.currentClass());
                 return nf.Field(pos, tn, name).fieldInstance(fi);
             } catch (NoMemberException e) {
                 if (e.getKind() != e.FIELD) {
@@ -111,7 +110,7 @@ public class Disamb_c implements Disamb
 
         // Try member classes.
         if (t.isClass() && typeOK()) {
-            Resolver tc = ts.classContextResolver(t.toClass());
+            Resolver tc = t.toClass().resolver();
             Named n = tc.find(name);
             if (n instanceof Type) {
                 Type type = (Type) n;

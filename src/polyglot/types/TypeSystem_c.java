@@ -8,9 +8,7 @@ import polyglot.frontend.Source;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.types.Package;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
-import polyglot.util.StringUtil;
+import polyglot.util.*;
 
 /**
  * TypeSystem_c
@@ -119,12 +117,12 @@ public class TypeSystem_c implements TypeSystem
 
     public ImportTable importTable(String sourceName, Package pkg) {
         assert_(pkg);
-        return new ImportTable(this, systemResolver, pkg, sourceName);
+        return new ImportTable(this, pkg, sourceName);
     }
 
     public ImportTable importTable(Package pkg) {
         assert_(pkg);
-        return new ImportTable(this, systemResolver, pkg);
+        return new ImportTable(this, pkg);
     }
 
     /**
@@ -186,12 +184,45 @@ public class TypeSystem_c implements TypeSystem
 	return new Context_c(this);
     }
 
+    /** @deprecated */
     public Resolver packageContextResolver(Resolver cr, Package p) {
+        return packageContextResolver(p);
+    }
+    
+    public AccessControlResolver createPackageContextResolver(Package p) {
         assert_(p);
-	return new PackageContextResolver(this, p, cr);
+        return new PackageContextResolver(this, p);
     }
 
+    public Resolver packageContextResolver(Package p, ClassType accessor) {
+        if (accessor == null) {
+            return p.resolver();
+        }
+        else {
+            return new AccessControlWrapperResolver(createPackageContextResolver(p), accessor);
+        }
+    }
+
+    public Resolver packageContextResolver(Package p) {
+        assert_(p);
+        return packageContextResolver(p, null);
+    }
+
+    public Resolver classContextResolver(ClassType type, ClassType accessor) {
+        assert_(type);
+        if (accessor == null) {
+            return type.resolver();
+        }
+        else {
+            return new AccessControlWrapperResolver(createClassContextResolver(type), accessor);
+        }
+    }
+    
     public Resolver classContextResolver(ClassType type) {
+        return classContextResolver(type, null);
+    }
+
+    public AccessControlResolver createClassContextResolver(ClassType type) {
         assert_(type);
 	return new ClassContextResolver(this, type);
     }
@@ -729,84 +760,14 @@ public class TypeSystem_c implements TypeSystem
                                      ClassType currClass) throws SemanticException
     {
 	assert_(container);
-	
-        /*
-        System.out.println("findMemberClasses");
-
-        if (container instanceof ParsedClassType_c) {
-                ParsedClassType_c pt = (ParsedClassType_c ) container;
-                System.out.println("pt = " + pt);
-                System.out.println("pt.super = " + pt.superType);
-                System.out.println("pt.interfaces = " + pt.interfaces);
-                System.out.println("membersAdded = " + pt.membersAdded);
-                System.out.println("signaturesResolved = " + pt.signaturesResolved);
-                System.out.println("supertypesResolved = " + pt.supertypesResolved);
-                System.out.println("allMembersAdded = " + pt.allMembersAdded);
+        
+        Named n = classContextResolver(container, currClass).find(name);
+        
+        if (n instanceof ClassType) {
+            return (ClassType) n;
         }
-        */
-	
-	Set s = findMemberClasses(container, name);
-
-	if (s.size() == 0) {
-	    throw new NoClassException(name, container);
-	}
-	
-	Iterator i = s.iterator();
-	ClassType t = (ClassType) i.next();
-	
-	if (i.hasNext()) {
-	    ClassType t2 = (ClassType) i.next();
-	    throw new SemanticException("Member type \"" + name +
-					"\" is ambiguous; it is defined in both " +
-					t.container() + " and " +
-					t2.container() + ".");
-	}
-	
-	if (currClass != null && ! isAccessible(t, currClass)) {
-	    throw new SemanticException("Cannot access member type \"" + t + "\".");
-	}
-	
-	return t;
-    }
-    
-    public Set findMemberClasses(ClassType container, String name) throws SemanticException {
-	assert_(container);
-	
-	ClassType mt = container.memberClassNamed(name);
-	
-	if (mt != null) {
-	    if (! mt.isMember()) {
-		throw new InternalCompilerError("Class " + mt +
-						" is not a member class, " +
-						" but is in " + container +
-						"\'s list of members.");
-	    }
-	    
-	    if (mt.outer() != container) {
-		throw new InternalCompilerError("Class " + mt +
-						" has outer class " +
-						mt.outer() +
-						" but is a member of " +
-						container);
-	    }
-	    
-	    return Collections.singleton(mt);
-	}
-	
-	Set memberClasses = new HashSet();
-	
-	if (container.superType() != null) {
-	    Set s = findMemberClasses(container.superType().toClass(), name);
-	    memberClasses.addAll(s);
-	}
-	
-	for (Iterator i = container.interfaces().iterator(); i.hasNext(); ) {
-	    Type it = (Type) i.next();
-	    Set s =  findMemberClasses(it.toClass(), name);
-	    memberClasses.addAll(s);
-	}
-	
-	return memberClasses;
+        
+        throw new NoClassException(name, container);
     }
     
     public ClassType findMemberClass(ClassType container, String name)
@@ -1511,10 +1472,9 @@ public class TypeSystem_c implements TypeSystem
     protected final PrimitiveType LONG_    = createPrimitive(PrimitiveType.LONG);
     protected final PrimitiveType FLOAT_   = createPrimitive(PrimitiveType.FLOAT);
     protected final PrimitiveType DOUBLE_  = createPrimitive(PrimitiveType.DOUBLE);
-
+    
     public Object placeHolder(TypeObject o) {
-        assert_(o);
-    	return placeHolder(o, new HashSet());
+        return placeHolder(o, Collections.EMPTY_SET);
     }
 
     public Object placeHolder(TypeObject o, Set roots) {

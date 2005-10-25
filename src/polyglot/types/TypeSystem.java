@@ -1,8 +1,6 @@
 package polyglot.types;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Source;
@@ -604,10 +602,17 @@ public interface TypeSystem {
     Context createContext();
 
     /** Get a resolver for looking up a type in a package. */
-    Resolver packageContextResolver(Resolver resolver, Package pkg);
+    Resolver packageContextResolver(Package pkg, ClassType accessor);
+    Resolver packageContextResolver(Package pkg);
+    AccessControlResolver createPackageContextResolver(Package pkg);
+    
+    /** @deprecated */
+    Resolver packageContextResolver(Resolver cr, Package pkg);
 
     /** Get a resolver for looking up a type in a class context. */
+    Resolver classContextResolver(ClassType ct, ClassType accessor);
     Resolver classContextResolver(ClassType ct);
+    AccessControlResolver createClassContextResolver(ClassType ct);
 
     /**
      * The default lazy class initializer.
@@ -666,7 +671,7 @@ public interface TypeSystem {
      * @param roots The root objects for the serialization.  Place holders
      * are not created for these.
      */
-    Object placeHolder(TypeObject o, java.util.Set roots);
+    Object placeHolder(TypeObject o, Set roots);
 
     /** Get a place-holder for serializing a type object.
      * @param o The object to get the place-holder for.

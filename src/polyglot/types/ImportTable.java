@@ -13,12 +13,9 @@ import java.util.*;
  * It has a set of package and class imports, which caches the results of
  * lookups for future reference.
  */
-public class ImportTable extends ClassResolver
+public class ImportTable implements Resolver
 {
     protected TypeSystem ts;
-
-    /** The underlying resolver. */
-    protected Resolver resolver;
     /** A list of all package imports. */
     protected List packageImports;
     /** Map from names to classes found, or to the NOT_FOUND object. */
@@ -44,8 +41,8 @@ public class ImportTable extends ClassResolver
      * @param base The outermost resolver to use for looking up types.
      * @param pkg The package of the source we are importing types into.
      */
-    public ImportTable(TypeSystem ts, Resolver base, Package pkg) {
-        this(ts, base, pkg, null);
+    public ImportTable(TypeSystem ts, Package pkg) {
+        this(ts, pkg, null);
     }
 
     /**
@@ -55,8 +52,7 @@ public class ImportTable extends ClassResolver
      * @param pkg The package of the source we are importing types into.
      * @param src The name of the source file we are importing into.
      */
-    public ImportTable(TypeSystem ts, Resolver base, Package pkg, String src) {
-        this.resolver = base;
+    public ImportTable(TypeSystem ts, Package pkg, String src) {
         this.ts = ts;
         this.sourceName = src;
         this.sourcePos = src != null ? new Position(null, src) : null;
@@ -133,7 +129,7 @@ public class ImportTable extends ClassResolver
             return (Named) res;
         }
 
-        Named t = resolver.find(name);
+        Named t = ts.systemResolver().find(name);
         map.put(name, t);
         return t;
     }
@@ -150,7 +146,7 @@ public class ImportTable extends ClassResolver
 
         if (!StringUtil.isNameShort(name)) {
             // The name was long.
-            return resolver.find(name);
+            return ts.systemResolver().find(name);
         }
         
         // The class name is short.
@@ -215,7 +211,7 @@ public class ImportTable extends ClassResolver
             if (resolved == null) {
                 // The name was short, but not in any imported class or package.
                 // Check the null package.
-                resolved = resolver.find(name); // may throw exception
+                resolved = ts.systemResolver().find(name); // may throw exception
 
                 if (!isVisibleFrom(resolved, "")) {
                     // Not visible.
@@ -242,10 +238,10 @@ public class ImportTable extends ClassResolver
         String fullName = pkgName + "." + name;
 
         try {
-            Named n = resolver.find(pkgName);
+            Named n = ts.systemResolver().find(pkgName);
 
             if (n instanceof ClassType) {
-                n = ts.classContextResolver((ClassType) n).find(name); 
+                n = ((ClassType) n).resolver().find(name);
                 return n;
             }
         }
@@ -254,7 +250,7 @@ public class ImportTable extends ClassResolver
         }
 
         try {
-            Named n = resolver.find(fullName);
+            Named n = ts.systemResolver().find(fullName);
 
             // Check if the type is visible in this package.
             if (isVisibleFrom(n, pkgName)) {

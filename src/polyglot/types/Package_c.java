@@ -30,9 +30,24 @@ public class Package_c extends TypeObject_c implements Package
 
     public Package_c(TypeSystem ts, Package prefix, String name) {
         super(ts);
-	this.prefix = prefix;
-	this.name = name;
-    this.decl = this;
+        this.prefix = prefix;
+        this.name = name;
+        this.decl = this;
+    }
+    
+    protected transient Resolver memberCache;
+    
+    public Resolver resolver() {
+        if (memberCache == null) {
+            memberCache = new CachingResolver(ts.createPackageContextResolver(this));
+        }
+        return memberCache;
+    }
+    
+    public Object copy() {
+        Package_c n = (Package_c) super.copy();
+        n.memberCache = null;
+        return n;
     }
     
     protected Package decl;
