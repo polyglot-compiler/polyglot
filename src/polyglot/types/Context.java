@@ -62,7 +62,8 @@ public interface Context extends Resolver, Copy
     ImportTable importTable();
 
     /** Get the outer-most resolver for the source file currently in scope.
-     * This is usually just the import table.
+     * This is usually just the system resolver.
+     * @deprecated
      */
     Resolver outerResolver();
 

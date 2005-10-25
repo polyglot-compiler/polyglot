@@ -91,10 +91,8 @@ public class Context_c implements Context
      */
     protected boolean staticContext;
 
+    /** @deprecated */
     public Resolver outerResolver() {
-        if (it != null) {
-            return it;
-        }
         return ts.systemResolver();
     }
 
@@ -292,7 +290,7 @@ public class Context_c implements Context
         if (Report.should_report(TOPICS, 3))
             Report.report(3, "find-type " + name + " in " + this);
 
-        if (isOuter()) return outerResolver().find(name);
+        if (isOuter()) return ts.systemResolver().find(name);
         if (isSource()) return it.find(name);
 
         Named type = findInThisScope(name);
