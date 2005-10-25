@@ -16,7 +16,7 @@ import polyglot.util.InternalCompilerError;
  * Loads class information from class files, or serialized class infomation
  * from within class files.  It does not load from source files.
  */
-public class LoadedClassResolver extends ClassResolver implements TopLevelResolver
+public class LoadedClassResolver implements TopLevelResolver
 {
   protected final static int NOT_COMPATIBLE = -1;
   protected final static int MINOR_NOT_COMPATIBLE = 1;
@@ -153,15 +153,23 @@ public class LoadedClassResolver extends ClassResolver implements TopLevelResolv
     TypeObject dt;
     
     try {
+        if (Report.should_report(Report.serialize, 1))
+            Report.report(1, "Decoding " + name + " in " + clazz);
+        
         dt = te.decode(clazz.encodedClassType(version.name()));
         
         if (dt == null) {
+            if (Report.should_report(Report.serialize, 1))
+                Report.report(1, "* Decoding " + name + " failed");
+            
             // Deserialization failed because one or more types could not
             // be resolved.  Abort this pass.  Dependencies have already
             // been set up so that this goal will be reattempted after
             // the types are resolved.
             throw new SchedulerException("Could not decode " + name);
         }
+        if (Report.should_report(Report.serialize, 1))
+            Report.report(1, "* Decoding " + name + " succeeded");
     }
     catch (InternalCompilerError e) {
 	System.err.println("Failed decoding " + clazz.name());
