@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import polyglot.ast.*;
+import polyglot.frontend.Job;
+import polyglot.types.*;
 import polyglot.types.SemanticException;
 
 /**
@@ -15,6 +17,10 @@ public class SupertypeDisambiguator extends Disambiguator
 {
     public SupertypeDisambiguator(DisambiguationDriver dd) {
         super(dd);
+    }
+    
+    public SupertypeDisambiguator(Job job, TypeSystem ts, NodeFactory nf, Context c) {
+        super(job, ts, nf, c);
     }
     
     public Node override(Node parent, Node n) {

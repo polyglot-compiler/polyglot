@@ -1,7 +1,11 @@
 package polyglot.visit;
 
+import polyglot.ast.*;
 import polyglot.ast.TopLevelDecl;
 import polyglot.ast.Node;
+import polyglot.frontend.Job;
+import polyglot.types.Context;
+import polyglot.types.TypeSystem;
 
 /**
  * A visitor which traverses the AST and remove ambiguities found in fields,
@@ -11,6 +15,10 @@ public class OuterScopeDisambiguator extends Disambiguator
 {
     public OuterScopeDisambiguator(DisambiguationDriver dd) {
         super(dd);
+    }
+
+    public OuterScopeDisambiguator(Job job, TypeSystem ts, NodeFactory nf, Context c) {
+        super(job, ts, nf, c);
     }
     
     public Node override(Node parent, Node n) {

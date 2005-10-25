@@ -1,6 +1,9 @@
 package polyglot.visit;
 
 import polyglot.ast.*;
+import polyglot.frontend.Job;
+import polyglot.types.Context;
+import polyglot.types.TypeSystem;
 
 /**
  * A visitor which traverses the AST and remove ambiguities found in fields,
@@ -12,6 +15,10 @@ public class SignatureDisambiguator extends Disambiguator
         super(dd);
     }
 
+    public SignatureDisambiguator(Job job, TypeSystem ts, NodeFactory nf, Context c) {
+        super(job, ts, nf, c);
+    }
+    
     public Node override(Node parent, Node n) {
         if (n instanceof Stmt || n instanceof Expr) {
             return n;
