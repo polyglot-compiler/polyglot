@@ -146,7 +146,7 @@ public abstract class Expr_c extends Term_c implements Expr
 	    w.write( ")");
 	}
         else {
-            printBlock(expr, w, pp);
+            print(expr, w, pp);
         }
     }
 }
