@@ -11,6 +11,7 @@ import polyglot.frontend.goals.TypeExists;
 import polyglot.types.*;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
+import polyglot.main.Report;
 
 
 public class TypeExistsPass extends ClassFilePass {
@@ -28,8 +29,9 @@ public class TypeExistsPass extends ClassFilePass {
     public boolean run() {
         String name = goal.typeName();
         try {
-            // Try to resolve the type; this may throw a MissingDependencyException
-            // on the job to load the file containing the type.
+            // Try to resolve the type; this may throw a
+            // MissingDependencyException on the job to load the file
+            // containing the type.
             Named n = ts.systemResolver().find(name);
             if (n instanceof Type) {
                 return true;
