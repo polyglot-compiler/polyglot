@@ -30,7 +30,37 @@ public class TypeInputStream extends ObjectInputStream {
         return ts;
     }
     
+    final static Object UNRESOLVED = new Object();
+    
+    public void installInPlaceHolderCache(PlaceHolder p, TypeObject t) {
+        cache.put(p, t);
+        
+        String s = "";
+        if (Report.should_report(Report.serialize, 2)) {
+            try {
+                s = t.toString();
+            }
+            catch (NullPointerException e) {
+                s = "<NullPointerException thrown>";
+            }
+        }
+        
+        if (Report.should_report(Report.serialize, 2)) {
+            Report.report(2, "- Installing " + p
+                          + " -> " + s + " in place holder cache");         
+        }
+    }
+    
+    boolean enableReplace = true;
+
+    public void enableReplace(boolean f) {
+        this.enableReplace = f;
+    }
+
     protected Object resolveObject(Object o) {
+        if (! enableReplace) {
+            return o;
+        }
         String s = "";
         if (Report.should_report(Report.serialize, 2)) {
             try {
@@ -40,20 +70,51 @@ public class TypeInputStream extends ObjectInputStream {
                 s = "<NullPointerException thrown>";
             }
         }	  
+
+        if (Report.should_report(Report.serialize, 2)) {
+            Report.report(2, "- Resolving " + s + " : " + o.getClass());
+        }
+
+        if (! enableReplace) {
+            return o;
+        }
+        
         if (o instanceof PlaceHolder) {
-            TypeObject t = (TypeObject) cache.get(o);
-            if (t == null) {
+            Object t = cache.get(o);
+            if (t == UNRESOLVED) {
+                // A place holder lower in the call stack is trying to resolve this
+                // place holder too.  Abort!
+                // The calling place holder should set up depedencies to ensure
+                // this pass is rerun.
+                failed = true;
+                return null;
+            }
+            else if (t == null) {
                 try {
+                    cache.put(o, UNRESOLVED);
                     t = ((PlaceHolder) o).resolve(ts);
+                    if (t == null) {
+                        throw new InternalCompilerError("Resolved " + s + " to null.");
+                    }
                     cache.put(o, t);
+                    if (Report.should_report(Report.serialize, 2)) {
+                        Report.report(2, "- Resolving " + s + " : " + o.getClass()
+                                      + " to " + t + " : " + t.getClass());      	
+                    }
                 }
                 catch (CannotResolvePlaceHolderException e) {
                     failed = true;              
+                    if (Report.should_report(Report.serialize, 2)) {
+                        Report.report(2, "- Resolving " + s + " : " + o.getClass()
+                                      + " to " + e);      	
+                    }
                 }
             }
-            if (Report.should_report(Report.serialize, 2)) {
-                Report.report(2, "- Resolving " + s + " : " + o.getClass()
-                              + " to " + t + " : " + t.getClass());      	
+            else {
+                if (Report.should_report(Report.serialize, 2)) {
+                    Report.report(2, "- Resolving " + s + " : " + o.getClass()
+                                  + " to (cached) " + t + " : " + t.getClass());      	
+                }
             }
             return t;
         }

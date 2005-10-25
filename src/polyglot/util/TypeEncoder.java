@@ -126,10 +126,10 @@ public class TypeEncoder
                 b[i] = (byte) source[i];
         }
         
-        boolean recurse = true;
-        if (placeHolderCache == null) {
-            placeHolderCache = new HashMap();
-            recurse = false;
+        Map oldCache = placeHolderCache;
+        placeHolderCache = new HashMap();
+        if (oldCache != null) {
+            placeHolderCache.putAll(oldCache);
         }
         
         try {
@@ -142,7 +142,7 @@ public class TypeEncoder
             else {
                 ois = new TypeInputStream(new ByteArrayInputStream(b), ts, placeHolderCache);
             }
-            
+      
             TypeObject o = (TypeObject) ois.readObject();
             
             if (ois.deserializationFailed()) {
@@ -167,9 +167,7 @@ public class TypeEncoder
                                             "decoding serialized type info: " + e.getMessage(), e);
         }
         finally {
-            if (! recurse) {
-                placeHolderCache = null;
-            }
+            placeHolderCache = oldCache;
         }
     }
 }

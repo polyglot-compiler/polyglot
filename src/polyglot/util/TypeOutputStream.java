@@ -29,25 +29,31 @@ public class TypeOutputStream extends ObjectOutputStream
         enableReplaceObject( true);
     }
     
-    protected Object placeHolder(TypeObject o) {
+    protected Object placeHolder(TypeObject o, boolean useRoots) {
         Object k = new IdentityKey(o);
         Object p = placeHolders.get(k);
         if (p == null) {
-            p = ts.placeHolder(o, roots);
+            p = ts.placeHolder(o, useRoots ? roots : Collections.EMPTY_SET);
             placeHolders.put(k, p);
         }
         return p;
     }
     
     protected Object replaceObject(Object o) throws IOException {
-        if (roots.contains(o)) {
-            if (Report.should_report(Report.serialize, 2)) {
-                Report.report(2, "+ In roots: " + o + " : " + o.getClass());
+        if (o instanceof TypeObject) {
+            Object r;
+            
+            if (roots.contains(o)) {
+                if (Report.should_report(Report.serialize, 2)) {
+                    Report.report(2, "+ In roots: " + o + " : " + o.getClass());
+                }
+                
+                r = o;
             }
-            return o;
-        }
-        else if (o instanceof TypeObject) {
-            Object r = placeHolder((TypeObject) o);
+            else {
+                r = placeHolder((TypeObject) o, true);
+            }
+            
             if (Report.should_report(Report.serialize, 2)) {
                 if (r != o) {
                     Report.report(2, "+ Replacing: " + o + " : " + o.getClass()
@@ -57,6 +63,7 @@ public class TypeOutputStream extends ObjectOutputStream
                     Report.report(2, "+ " + o + " : " + o.getClass());
                 }
             }
+                
             return r;
         }
         else {
