@@ -534,6 +534,7 @@ public class New_c extends Expr_c implements New
 
     protected void printArgs(CodeWriter w, PrettyPrinter tr) {
 	w.write("(");
+	w.allowBreak(2, 2, "", 0);
 	w.begin(0);
 
 	for (Iterator i = arguments.iterator(); i.hasNext();) {

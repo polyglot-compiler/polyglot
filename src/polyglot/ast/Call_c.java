@@ -333,6 +333,7 @@ public class Call_c extends Expr_c implements Call
     }
 
     w.write(name + "(");
+    w.allowBreak(2, 2, "", 0); // miser mode
     w.begin(0);
 		
     for(Iterator i = arguments.iterator(); i.hasNext();) {
