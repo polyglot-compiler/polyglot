@@ -45,7 +45,7 @@ public class OptimalCodeWriter extends CodeWriter {
         output = o;
         width = width_;
         current = input = new BlockItem(null, 0);
-        if (OptimalCodeWriter.trace) {
+        if (OptimalCodeWriter.showInput) {
             trace("new OptimalCodeWriter: width = " + width);
         }
     }
@@ -64,7 +64,7 @@ public class OptimalCodeWriter extends CodeWriter {
     }
 
     public void write(String s, int length) {
-        if (OptimalCodeWriter.trace) {
+        if (OptimalCodeWriter.showInput) {
             trace("write '" + s + "' (" + length + ")");
         }
         current.add(new TextItem(s, length));
@@ -93,7 +93,7 @@ public class OptimalCodeWriter extends CodeWriter {
      *            Requires: n >= 0.
      */         
     public void begin(int n) {
-        if (OptimalCodeWriter.trace) {
+        if (OptimalCodeWriter.showInput) {
             trace("begin " + n);
             incIndent();
         }
@@ -106,7 +106,7 @@ public class OptimalCodeWriter extends CodeWriter {
      * Terminate the most recent outstanding <code>begin</code>.
      */
     public void end() {
-        if (OptimalCodeWriter.trace) {
+        if (OptimalCodeWriter.showInput) {
             decIndent();
             trace("end");
         }
@@ -116,15 +116,15 @@ public class OptimalCodeWriter extends CodeWriter {
     }
 
     public void allowBreak(int n, int level, String alt, int altlen) {
-        if (OptimalCodeWriter.trace) {
-            trace("allowBreak " + n);
+        if (OptimalCodeWriter.showInput) {
+            trace("allowBreak " + n + " level=" + level);
         }
         current.add(new AllowBreak(n, level, alt, altlen, false));
     }
     /** @see CodeWriter.unifiedBreak */
     public void unifiedBreak(int n, int level, String alt, int altlen) {
-        if (OptimalCodeWriter.trace) {
-            trace("unifiedBreak " + n);
+        if (OptimalCodeWriter.showInput) {
+            trace("unifiedBreak " + n + " level=" + level);
         }
         current.add(new AllowBreak(n, level, alt, altlen, true));
     }
@@ -141,7 +141,7 @@ public class OptimalCodeWriter extends CodeWriter {
      * Like newline(), but forces a newline with a specified indentation.
      */
     public void newline(int n) {
-        if (OptimalCodeWriter.trace) {
+        if (OptimalCodeWriter.showInput) {
             trace("newline " + n);
         }
         current.add(new Newline(n));
@@ -165,7 +165,7 @@ public class OptimalCodeWriter extends CodeWriter {
      * @throws IOException
      */
     public boolean flush(boolean format) throws IOException {
-        if (OptimalCodeWriter.trace) {
+        if (OptimalCodeWriter.showInput) {
             trace("flush");
         }
 	boolean success = true;
@@ -209,12 +209,12 @@ public class OptimalCodeWriter extends CodeWriter {
     PrintWriter output;
     int width;
     static int format_calls = 0;
-    public static final boolean debug = false; // show everything
-    public static final boolean trace = false;  // show inputs
-    public static final boolean visualize = false; // visualize formatting
-      						  // (requires VT100 terminal)
+    public static final boolean debug = false;      // show every step
+    public static final boolean showInput = false;  // show input
+    public static final boolean visualize = false;  // visualize formatting
+      						    // (requires VT100 terminal)
 
-    public static final boolean precompute = true; // use memoization
+    public static final boolean precompute = true;  // use memoization
 
     // Debugging methods
 
@@ -255,21 +255,35 @@ class Overrun extends Exception
     private static final Overrun overrun = new Overrun();
 
     private Overrun() {}
-    static Overrun overrun(Item where, int amount, int type) {
+    static Overrun overrun(Item it, MaxLevels m, int amount, int type) {
 	if (OptimalCodeWriter.debug) System.err.println("-- Overrun: " + amount);
 	if (OptimalCodeWriter.visualize) {
 	    System.err.print("\033[H\033[2J");
 	    PrintWriter w = new PrintWriter(new OutputStreamWriter(System.err));
 	    try {	            	            
-		OptimalCodeWriter.top.sendOutput(w, 0, 0, true, where);
+		OptimalCodeWriter.top.sendOutput(w, 0, 0, true, it);
 	    }
 	    catch (IOException e) {  }
 	    w.flush();
 	    System.err.println();
-	    String type_name = "pos";
-	    if (type == 1) type_name = "width";
-	    else if (type == 2) type_name = "fin";
-	    System.err.println("Overrun: type " + type_name + " amount: " + amount);
+	    String type_name;
+	    switch (type) {
+		default:
+		case POS: type_name = "pos"; break;
+		case WIDTH: type_name = "width"; break;
+		case FIN: type_name = "fin"; break;
+	    }
+	    System.err.println("  overrun: type " + type_name + " amount: " + amount);
+
+	    System.err.println("  next item is " + it);
+	    System.err.println("  minPosWidth" + m + " of next item = " +
+			          Item.getMinPosWidth(it, m));
+	    System.err.println("  minWidth" + m + " of next item = " +
+				  Item.getMinWidth(it, m));
+	    System.err.println("  minIndent" + m + " of next item = " +
+				  Item.getMinIndent(it, m));
+	    System.err.println("  containsBreaks" + m + " of next item = " +
+				  Item.containsBreaks(it, m));
 	    try { System.in.read(); } catch (IOException e) {}
 	}
         overrun.amount = amount;
@@ -434,7 +448,7 @@ abstract class Item
 	    if (pos > fin) {
 	        if (OptimalCodeWriter.debug)
 	            System.err.println("Final position overrun: " + (pos-fin));
-	        throw Overrun.overrun(it, pos - fin, Overrun.FIN);
+	        throw Overrun.overrun(it, m, pos - fin, Overrun.FIN);
 	    }
 	    else return new FormatResult(pos, minLevelUnified);
 	}
@@ -445,7 +459,7 @@ abstract class Item
 	    if (OptimalCodeWriter.debug)
 	        System.err.println("Width overrun: " + amount2);
 	 
-	    throw Overrun.overrun(it, amount2, Overrun.WIDTH);
+	    throw Overrun.overrun(it, m, amount2, Overrun.WIDTH);
 	}
 	
 	int amount = pos + getMinPosWidth(it, m) - rmargin; // overrun on first line
@@ -453,7 +467,7 @@ abstract class Item
 	    if (OptimalCodeWriter.debug)
 	        System.err.println("Position (first line) overrun: " + amount);
 
-	    throw Overrun.overrun(it, amount, Overrun.POS);
+	    throw Overrun.overrun(it, m, amount, Overrun.POS);
 	}
 	
 
@@ -462,7 +476,7 @@ abstract class Item
 	    if (OptimalCodeWriter.debug)
 	        System.err.println("Final position (predicted) overrun: " + amount3);
 
-	    throw Overrun.overrun(it, amount3, Overrun.FIN);
+	    throw Overrun.overrun(it, m, amount3, Overrun.FIN);
 	}	
 
 	return it.formatN(lmargin, pos, rmargin, fin, m, minLevel, minLevelUnified);
@@ -486,7 +500,7 @@ abstract class Item
  *                  distance from lmargin to final position on last line
  */
 
-    static final int NO_WIDTH = -9999;    
+    public static final int NO_WIDTH = -9999;    
 
     /** Minimum lmargin-rhs width on second and following lines. 
      * A map from max levels to Integer(width). */
@@ -499,10 +513,6 @@ abstract class Item
     /** Minimum pos-rhs width (i.e., min width up to first break) */
     Map min_pos_width = new HashMap();
     
-    /** Are there any breaks in this items and following items? */
-    boolean contains_brks;
-    boolean cb_init = false;
-
     static int getMinWidth(Item it, MaxLevels m) {
 	if (it == null) return NO_WIDTH;
 	if (it.min_widths.containsKey(m))
@@ -513,7 +523,7 @@ abstract class Item
 	int p4 = getMinWidth(it.next, m);
 	
 	if (OptimalCodeWriter.debug)
-	System.err.println("minwidth: item = " + it + m + ":  p1 = " + p1 + ", p2 = " + p2 + ", p3 = " + p3 + ", p4 = " + p4);
+	System.err.println("minwidth: item = " + it + ":  p1 = " + p1 + ", p2 = " + p2 + ", p3 = " + p3 + ", p4 = " + p4);
 	int result = Math.max(Math.max(p1, p3), p4);
 	it.min_widths.put(m, new Integer(result));
 	return result;
@@ -529,11 +539,11 @@ abstract class Item
 	if (it.next == null || it.selfContainsBreaks(m)) {
 	    result = p1;
 	    if (OptimalCodeWriter.debug)
-	    System.err.println("minpos: item = " + it + m + ":  p1 = " + p1);
+	    System.err.println("minpos " + m + ": item = " + it + ":  p1 = " + p1);
 	} else {
 	    result = p1 + getMinPosWidth(it.next, m);
 	    if (OptimalCodeWriter.debug)
-	    System.err.println("minpos: item = " + it + m + ":  p1 = " + p1 + ", next.minpos = " + getMinPosWidth(it.next, m));
+	    System.err.println("minpos " + m + ": item = " + it + ":  p1 = " + p1 + " + " + getMinPosWidth(it.next, m) + " = " + result);
 	}
 	it.min_pos_width.put(m, new Integer(result));
 	return result;
@@ -557,16 +567,17 @@ abstract class Item
 
     static boolean containsBreaks(Item it, MaxLevels m) {
 	if (it == null) return false;
-	if (it.cb_init) return it.contains_brks;
 	if (it.selfContainsBreaks(m)) {
-	    it.contains_brks = true;
-	    it.cb_init = true;
+	    if (OptimalCodeWriter.debug)
+		System.err.println("containsBreaks " + it + ": true");
 	    return true;
 	}
-	if (it.next == null) return false;
-	it.contains_brks = containsBreaks(it.next, m);
-	it.cb_init = true;
-	return it.contains_brks;
+	if (it.next == null) {
+	    if (OptimalCodeWriter.debug)
+		System.err.println("containsBreaks " + it + ": false");
+	    return false;
+	}
+	return containsBreaks(it.next, m);
     }
 
     public String summarize(String s) {
@@ -739,7 +750,7 @@ class AllowBreak extends Item {
 	else return "^" + indent; }
 }
 
-/** A Newline is simply a level-1 break that resists being
+/** A Newline is simply a level-1 break that cannot be
  *  left unbroken.
  */
 class Newline extends AllowBreak {
@@ -842,7 +853,7 @@ class BlockItem extends Item {
                 new MaxLevels(m.maxLevelInner, m.maxLevelInner));
     }
     int selfMinPosWidth(MaxLevels m) {
-        return getMinPosWidth(first,
+	return getMinPosWidth(first,
                 new MaxLevels(m.maxLevelInner, m.maxLevelInner));
     }
     int selfMinIndent(MaxLevels m) {

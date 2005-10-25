@@ -32,7 +32,7 @@ public class TargetFactory
 
     public CodeWriter outputCodeWriter(File f) throws IOException {
 	Writer w = outputWriter(f);
-	return new SimpleCodeWriter(w, 80);
+	return new OptimalCodeWriter(w, 80);
     }
 
     /** Open a writer to the output file. */
