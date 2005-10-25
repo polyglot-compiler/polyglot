@@ -23,7 +23,11 @@ public class PlaceHolder_c implements PlaceHolder
     
     /** Creates a place holder type for the type. */
     public PlaceHolder_c(Named t) {
-        name = t.fullName();
+        this(t.fullName());
+    }
+    
+    public PlaceHolder_c(String name) {
+        this.name = name;
     }
 
     public int hashCode() {
@@ -51,24 +55,32 @@ public class PlaceHolder_c implements PlaceHolder
         
         try {
             // find(name) should be side-effect free.  If it isn't use resolveSafe!
-            // Using find will make other passes more efficient.
-            return ts.systemResolver().find(name);
+            // Using find reduces goal reattempts, however.
+            Named n = ts.systemResolver().find(name);
+            if (n == null) {
+                throw new InternalCompilerError("systemResolver().find(" + name + ") returned null");
+            }
+            return n;
         }
         catch (MissingDependencyException e) {
             // The type is in a source file that hasn't been parsed yet.
             g = e.goal();
+            scheduler.currentGoal().setUnreachableThisRun();
+            scheduler.addDependencyAndEnqueue(scheduler.currentGoal(), g, false);
+            throw new CannotResolvePlaceHolderException(e);
         }
         catch (SchedulerException e) {
             // Some other scheduler error occurred.
+            scheduler.currentGoal().setUnreachableThisRun();
+            scheduler.addDependencyAndEnqueue(scheduler.currentGoal(), g, false);
+            throw new CannotResolvePlaceHolderException(e);
         }
         catch (SemanticException e) {
             // The type could not be found.
+            scheduler.currentGoal().setUnreachableThisRun();
+            scheduler.addDependencyAndEnqueue(scheduler.currentGoal(), g, false);
+            throw new CannotResolvePlaceHolderException(e);
         }
-        
-        scheduler.currentGoal().setUnreachableThisRun();
-        scheduler.addDependencyAndEnqueue(scheduler.currentGoal(), g, false);
-        
-        throw new CannotResolvePlaceHolderException("Could not resolve " + name);
     }
     
     /** A potentially safer alternative implementation of resolve. */

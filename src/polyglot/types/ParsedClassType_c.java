@@ -1,7 +1,6 @@
 package polyglot.ext.jl.types;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.*;
 
 import polyglot.frontend.*;
@@ -93,11 +92,11 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     }
 
     public String name() {
-        if (isAnonymous())
-            throw new InternalCompilerError("Anonymous classes cannot have names.");
-
-        if (name == null)
-            throw new InternalCompilerError("Non-anonymous classes must have names.");
+//        if (isAnonymous())
+//            throw new InternalCompilerError("Anonymous classes cannot have names.");
+//
+//        if (name == null)
+//            throw new InternalCompilerError("Non-anonymous classes must have names.");
         return name;
     }
 
@@ -349,6 +348,9 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     }
 
     public String toString() {
+        if (kind() == null) {
+            return "<unknown class " + name + ">";
+        }
         if (isAnonymous()) {
             if (interfaces != null && ! interfaces.isEmpty()) {
                 return "<anonymous subtype of " + interfaces.get(0) + ">";
@@ -360,12 +362,42 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         return super.toString();
     }
 
+    /**
+     * When serailizing, write out the place holder as well as the object itself.
+     * This should be done in TypeOutputStream, not here, but I couldn't get it working.
+     * --Nate
+     */
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        Object o = ts.placeHolder(this);
+        if (o instanceof PlaceHolder && o != this) {
+            out.writeBoolean(true);
+            out.writeObject(o);
+        }
+        else {
+            out.writeBoolean(false);
+        }
+        out.defaultWriteObject();
+    }
+    
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         if (in instanceof TypeInputStream) {
+            TypeInputStream tin = (TypeInputStream) in;
+
+            boolean b = tin.readBoolean();
+            
+            if (b) {
+                tin.enableReplace(false);
+                PlaceHolder p = (PlaceHolder) tin.readObject();
+                tin.installInPlaceHolderCache(p, this);
+                tin.enableReplace(true);
+            }
+
             fromSource = null;
             job = null;
            
-            init = ((TypeInputStream) in).getTypeSystem().deserializedClassInitializer();
+            init = tin.getTypeSystem().deserializedClassInitializer();
+            init.setClass(this);
+            
             membersAdded = true;
             supertypesResolved = true;
             signaturesResolved = true;

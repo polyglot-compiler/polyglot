@@ -245,6 +245,7 @@ public abstract class Type_c extends TypeObject_c implements Type
         out.defaultWriteObject();
     }
 
+/*
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException
     {
@@ -265,4 +266,5 @@ public abstract class Type_c extends TypeObject_c implements Type
 
         in.defaultReadObject();
     }    
+*/
 }
