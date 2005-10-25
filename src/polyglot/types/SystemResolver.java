@@ -30,10 +30,10 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
             Object o = i.next();
             if (o instanceof Importable) {
                 Importable im = (Importable) o;
-                if (im.package_() != null) {
-                    if (im.package_().fullName().startsWith(name)) {
-                        return true;
-                    }
+                if (im.package_() != null &&
+                    im.package_().fullName() != null &&
+                    im.package_().fullName().startsWith(name)) {
+                    return true;
                 }
             }
         }
