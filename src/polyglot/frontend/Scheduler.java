@@ -291,7 +291,7 @@ public abstract class Scheduler {
         }
 
         if (Report.should_report(Report.frontend, 1))
-            Report.report(1, "Finished all passes -- " +
+            Report.report(1, "Finished all passes for " + this.getClass().getName() + " -- " +
                         (okay ? "okay" : "failed"));
 
         return okay;
