@@ -5,6 +5,7 @@ import java.util.*;
 
 import polyglot.frontend.*;
 import polyglot.frontend.goals.*;
+import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.types.Package;
 import polyglot.util.*;
@@ -334,7 +335,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
             for (Iterator i = l.iterator(); i.hasNext(); ) {
                 MemberInstance mi = (MemberInstance) i.next();
                 if (! mi.isCanonical()) {
-                    if (Report.should_report("ambcheck", 2)
+                    if (Report.should_report("ambcheck", 2))
                         Report.report(2, mi + " is ambiguous");
                     count++;
                 }
