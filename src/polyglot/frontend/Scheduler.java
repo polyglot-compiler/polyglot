@@ -517,25 +517,45 @@ public abstract class Scheduler {
             throw new InternalCompilerError("Cannot run a pass for completed goal " + goal);
         }
         
-        // final int MAX_RUN_COUNT = 20;
-        final int MAX_RUN_COUNT = 200;
         Integer countObj = (Integer) this.runCount.get(goal);
         int count = countObj != null ? countObj.intValue() : 0;
         count++;
         this.runCount.put(goal, new Integer(count));
+
         
         if (count >= MAX_RUN_COUNT) {
-            if (Report.should_report("dump-dep-graph", 1))
-                dumpInFlightDependenceGraph();
-            if (Report.should_report("dump-dep-graph", 1))
-                dumpDependenceGraph();
-
             String[] suffix = new String[] { "th", "st", "nd", "rd" };
             int index = count % 10;
             if (index > 3) index = 0;
             if (11 <= count && count <= 13) index = 0;
             String cardinal = count + suffix[index];
-            throw new InternalCompilerError("Possible infinite loop detected trying to run a pass for " + goal + " for the " + cardinal + " time.");
+            String message = "Possible infinite loop detected trying to run a pass for " + goal + " for the " + cardinal + " time.";
+        
+            // Report the infinite loop.
+            ErrorQueue eq = extInfo.compiler().errorQueue();
+
+            // Go for one last loop with reporting enabled.
+            if (goal.equals(infinteLoopGoal)) {
+                // We've gone around the loop once, abort the compiler.
+
+                if (Report.should_report("dump-dep-graph", 1))
+                    dumpInFlightDependenceGraph();
+                if (Report.should_report("dump-dep-graph", 1))
+                    dumpDependenceGraph();
+            
+                eq.enqueue(ErrorInfo.INTERNAL_ERROR, message + "  Aborting.");
+                System.exit(1);
+            }
+            else if (infinteLoopGoal == null) {
+                infinteLoopGoal = goal;
+                
+                // Enable reporting.
+                Report.enableReporting(true);
+                Report.addTopic(Report.frontend, 4);
+                Report.addTopic("deps", 1);
+                
+                eq.enqueue(ErrorInfo.DEBUG, message + "  The compiler will attempt the goal one more time with reporting enabled, then abort.");
+            }
         }
         
         pass.resetTimers();
@@ -803,6 +823,9 @@ public abstract class Scheduler {
 
     protected static int dumpCounter = 0;
 
+    protected static final int MAX_RUN_COUNT = 200;
+    protected Goal infinteLoopGoal = null;
+    
     /**
      * Dump the dependence graph to a DOT file.
      */
