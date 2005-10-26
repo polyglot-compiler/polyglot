@@ -121,13 +121,19 @@ public class If_c extends Stmt_c implements If
 	    if (consequent instanceof Block) {
 		// allow the "} else {" formatting
 		w.write(" ");
-	    }
-	    else {
+	    } else {
 		w.allowBreak(0, " ");
 	    }
 
-	    w.write ("else");
-	    printSubStmt(alternative, w, tr);
+            if (alternative instanceof Block) {
+		w.write ("else ");
+		print(alternative, w, tr);
+	    } else {
+		w.begin(4);
+		w.write("else");
+		printSubStmt(alternative, w, tr);
+		w.end();
+	    }
 	}
     }
 

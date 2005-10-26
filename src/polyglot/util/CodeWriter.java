@@ -111,11 +111,15 @@ public abstract class CodeWriter
     /**
      * Force a newline. Indentation will be preserved.
      */
-    public abstract void newline();
+    public void newline() { newline(0, 1); }
     /**
      * Like newline(), but forces a newline with a specified indentation.
      */
-    public abstract void newline(int n);
+    public void newline(int n) { newline(n, 1); }
+    /**
+     * newline with a specified indentation and level.
+     */
+    public abstract void newline(int n, int level);
 
     /**
      * Flush all formatted text to the underlying writer.

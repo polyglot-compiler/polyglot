@@ -76,7 +76,7 @@ public class SimpleCodeWriter extends CodeWriter {
     public void allowBreak(int n, int level, String alt, int altlen) {
 	if (pos > width) adjustRmargin();
 	if (breakAll || pos > rmargin) {
-	    newline(n);
+	    newline(n, 1);
 	    breakAll = true;
 	} else {
 	    output.print(alt);
@@ -99,7 +99,7 @@ public class SimpleCodeWriter extends CodeWriter {
 	    spaces(lmargin);
 	}
     }
-    public void newline(int n) {
+    public void newline(int n, int level) {
 	newline();
 	spaces(n);
 	pos += n;

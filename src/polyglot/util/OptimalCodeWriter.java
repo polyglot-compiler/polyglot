@@ -135,16 +135,16 @@ public class OptimalCodeWriter extends CodeWriter {
      * causes all breaks in containing blocks to be broken.
      */
     public void newline() {
-        newline(0);
+        newline(0, 1);
     }
     /**
      * Like newline(), but forces a newline with a specified indentation.
      */
-    public void newline(int n) {
+    public void newline(int n, int level) {
         if (OptimalCodeWriter.showInput) {
             trace("newline " + n);
         }
-        current.add(new Newline(n));
+        current.add(new Newline(n, level));
     }
 
     /**
@@ -387,8 +387,7 @@ abstract class Item
      * pos &le; rmargin, lmargin &ge; 0
      */
     abstract FormatResult formatN(int lmargin, int pos, int rmargin, int fin,
-            MaxLevels m, int minLevel, int minLevelUnified)
-    	throws Overrun;
+            MaxLevels m, int minLevel, int minLevelUnified) throws Overrun;
     /**
      * Send the output associated with this item to <code>o</code>, using the
      * current break settings.
@@ -479,7 +478,8 @@ abstract class Item
 	    throw Overrun.overrun(it, m, amount3, Overrun.FIN);
 	}	
 
-	return it.formatN(lmargin, pos, rmargin, fin, m, minLevel, minLevelUnified);
+	return it.formatN(lmargin, pos, rmargin, fin, m,
+			  minLevel, minLevelUnified);
     }
 
 /*
@@ -501,6 +501,7 @@ abstract class Item
  */
 
     public static final int NO_WIDTH = -9999;    
+    public static final int NEWLINE_VIOLATION = 9999; // a big number XXX (hack)
 
     /** Minimum lmargin-rhs width on second and following lines. 
      * A map from max levels to Integer(width). */
@@ -523,7 +524,7 @@ abstract class Item
 	int p4 = getMinWidth(it.next, m);
 	
 	if (OptimalCodeWriter.debug)
-	System.err.println("minwidth: item = " + it + ":  p1 = " + p1 + ", p2 = " + p2 + ", p3 = " + p3 + ", p4 = " + p4);
+	System.err.println("minwidth" + m + ": item = " + it + ":  p1 = " + p1 + ", p2 = " + p2 + ", p3 = " + p3 + ", p4 = " + p4);
 	int result = Math.max(Math.max(p1, p3), p4);
 	it.min_widths.put(m, new Integer(result));
 	return result;
@@ -569,12 +570,12 @@ abstract class Item
 	if (it == null) return false;
 	if (it.selfContainsBreaks(m)) {
 	    if (OptimalCodeWriter.debug)
-		System.err.println("containsBreaks " + it + ": true");
+		System.err.println("containsBreaks " + m + " of " + it + ": true");
 	    return true;
 	}
 	if (it.next == null) {
 	    if (OptimalCodeWriter.debug)
-		System.err.println("containsBreaks " + it + ": false");
+		System.err.println("containsBreaks " + m + " of " + it + ": false");
 	    return false;
 	}
 	return containsBreaks(it.next, m);
@@ -605,8 +606,7 @@ class TextItem extends Item {
     TextItem(String s_, int length_) { s = s_; length = length_; }
         
     FormatResult formatN(int lmargin, int pos, int rmargin, int fin,
-            MaxLevels m, int minLevel, int minLevelUnified)
-      throws Overrun {
+            MaxLevels m, int minLevel, int minLevelUnified) throws Overrun {
         return format(next, lmargin, pos + length, rmargin, fin,
 		      m, minLevel, minLevelUnified);
         // all overruns passed through
@@ -678,11 +678,13 @@ class AllowBreak extends Item {
             // fin overrun: similar
             catch (Overrun o) {
                 if (OptimalCodeWriter.debug) {
-                    System.err.println("not breaking caused overrun of " + o.amount);
+                    System.err.println("not breaking caused overrun of " +
+				       o.amount);
                 }
                 if (level > m.maxLevel) {
                     if (OptimalCodeWriter.debug) {
-                        System.err.println("not breaking failed, but can't break either.");
+                        System.err.println("not breaking failed, " +
+			                   "but can't break either.");
                     }
                     throw o; // can't break it
                 }
@@ -690,7 +692,7 @@ class AllowBreak extends Item {
         }
         if (canBreak(m)) { // now, we can try breaking it
             if (OptimalCodeWriter.debug)
-                System.err.println("trying breaking " + this);
+                System.err.println("trying breaking at " + this);
             broken = true;
             try {
                 return format(next, lmargin, lmargin + indent, rmargin, fin, m,
@@ -708,11 +710,14 @@ class AllowBreak extends Item {
                 o.type = Overrun.WIDTH; throw o;
             }
         }
-        throw new IllegalArgumentException("could not either break or not break");
+        throw new IllegalArgumentException(
+	  "internal error: could not either break or not break");
     }
         
-    int sendOutput(PrintWriter o, int lmargin, int pos, boolean success, Item last)
-        throws IOException {
+    int sendOutput(PrintWriter o, int lmargin, int pos, boolean success,
+		   Item last)
+      throws IOException
+    {
         if (broken || !success) {
             o.println();
             for (int i = 0; i < lmargin + indent; i++) o.print(" ");
@@ -755,7 +760,11 @@ class AllowBreak extends Item {
  */
 class Newline extends AllowBreak {
     Newline(int n) {
-	super(n, 1, "\\n", 0, true);
+	this(n, 1);
+    }
+    Newline(int n, int level) {
+	super(n, level, "\n", 0, true);
+	broken = true;
     }
     boolean canLeaveUnbroken() { return false; }
     String selfToString() {
@@ -764,10 +773,20 @@ class Newline extends AllowBreak {
     // XXX should not need to override sendOutput
     int sendOutput(PrintWriter o, int lmargin, int pos, boolean success, Item last)
         throws IOException {
-            o.println();
-            for (int i = 0; i < lmargin + indent; i++) o.print(" ");
-            //o.write("(" + (lmargin+indent) + ")");
-            return lmargin + indent;
+	    broken = true; // XXX how can this be necessary?
+	    return super.sendOutput(o, lmargin, pos, success, last);
+    }
+    int selfMinIndent(MaxLevels m) {
+        if (canBreak(m)) return indent;
+        else return NEWLINE_VIOLATION;
+    }
+    int selfMinPosWidth(MaxLevels m) {
+        if (canBreak(m)) return 0;
+        else return NEWLINE_VIOLATION;
+    }
+    int selfMinWidth(MaxLevels m) {
+        if (canBreak(m)) return indent;
+        else return NEWLINE_VIOLATION;
     }
 }
 
