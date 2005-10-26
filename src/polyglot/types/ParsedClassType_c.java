@@ -334,7 +334,8 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
             for (Iterator i = l.iterator(); i.hasNext(); ) {
                 MemberInstance mi = (MemberInstance) i.next();
                 if (! mi.isCanonical()) {
-// System.out.println(mi + " is ambiguous");
+                    if (Report.should_report("ambcheck", 2)
+                        Report.report(2, mi + " is ambiguous");
                     count++;
                 }
             }
