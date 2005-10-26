@@ -123,10 +123,24 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
      */
     public void addNamed(String name, Named q) throws SemanticException {
 	super.addNamed(name, q);
-
+        
         if (q instanceof ClassType) {
-            Package p = ((ClassType) q).package_();
-            cachePackage(p);
+            ClassType ct = (ClassType) q;
+            if (ct.isTopLevel()) {
+                Package p = ((ClassType) q).package_();
+                cachePackage(p);
+            }
+            else if (ct.isMember()) {
+                if (name.equals(ct.fullName())) {
+                    // Check that the names match; we could be installing
+                    // a member class under its class file name, not its Java
+                    // source full name.
+                    addNamed(StringUtil.getPackageComponent(name), ct.outer());
+                }
+            }
+        }
+        else if (q instanceof Package) {
+            cachePackage((Package) q);
         }
 
 	if (q instanceof Type && packageExists(name)) {
