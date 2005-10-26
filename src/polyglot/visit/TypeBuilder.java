@@ -186,8 +186,11 @@ public class TypeBuilder extends NodeVisitor
             }
 
             if (allMembers) {
-                String fullName = typeSystem().getTransformedClassName(ct);
-                typeSystem().systemResolver().addNamed(fullName, ct);
+                typeSystem().systemResolver().addNamed(ct.fullName(), ct);
+
+                // Save in the cache using the name a class file would use.
+                String classFileName = typeSystem().getTransformedClassName(ct);
+                typeSystem().systemResolver().install(classFileName, ct);
             }
 
             return ct;
