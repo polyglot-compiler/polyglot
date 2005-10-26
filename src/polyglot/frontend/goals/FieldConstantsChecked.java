@@ -33,7 +33,7 @@ public class FieldConstantsChecked extends AbstractGoal {
     
     protected FieldConstantsChecked(FieldInstance fi) {
         super(null);
-        this.vi = fi;
+        this.vi = fi.orig();
         
         ParsedClassType ct = (ParsedClassType) findContainer();
         if (ct != null) {
@@ -51,8 +51,8 @@ public class FieldConstantsChecked extends AbstractGoal {
     }
     
     protected ParsedClassType findContainer() {
-        if (vi.orig().container() instanceof ParsedClassType) {
-            return (ParsedClassType) vi.orig().container();
+        if (vi.container() instanceof ParsedClassType) {
+            return (ParsedClassType) vi.container();
         }
         return null;
     }

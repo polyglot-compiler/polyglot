@@ -372,7 +372,7 @@ public abstract class Scheduler {
 
         if (above.contains(goal)) {
             if (Report.should_report(Report.frontend, 4))
-                Report.report(4, "aborting " + goal);
+                Report.report(4, goal + " is being attempted by a caller; returning");
             return true;
         }
 
@@ -535,7 +535,7 @@ public abstract class Scheduler {
             ErrorQueue eq = extInfo.compiler().errorQueue();
 
             // Go for one last loop with reporting enabled.
-            if (goal.equals(infinteLoopGoal)) {
+            if (goal.equals(infiniteLoopGoal)) {
                 // We've gone around the loop once, abort the compiler.
 
                 if (Report.should_report("dump-dep-graph", 1))
@@ -546,11 +546,10 @@ public abstract class Scheduler {
                 eq.enqueue(ErrorInfo.INTERNAL_ERROR, message + "  Aborting.");
                 System.exit(1);
             }
-            else if (infinteLoopGoal == null) {
-                infinteLoopGoal = goal;
+            else if (infiniteLoopGoal == null) {
+                infiniteLoopGoal = goal;
                 
                 // Enable reporting.
-                Report.enableReporting(true);
                 Report.addTopic(Report.frontend, 4);
                 Report.addTopic("deps", 1);
                 
@@ -824,7 +823,11 @@ public abstract class Scheduler {
     protected static int dumpCounter = 0;
 
     protected static final int MAX_RUN_COUNT = 200;
-    protected Goal infinteLoopGoal = null;
+    protected Goal infiniteLoopGoal = null;
+    
+    public boolean inInfiniteLoop() {
+        return infiniteLoopGoal != null;
+    }
     
     /**
      * Dump the dependence graph to a DOT file.
