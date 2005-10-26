@@ -51,19 +51,13 @@ public class FieldConstantsChecked extends AbstractGoal {
     }
     
     protected ParsedClassType findContainer() {
-        if (vi.container() instanceof ParsedClassType) {
-            return (ParsedClassType) vi.container();
+        if (vi.orig().container() instanceof ParsedClassType) {
+            return (ParsedClassType) vi.orig().container();
         }
         return null;
     }
 
     public Pass createPass(ExtensionInfo extInfo) {
-        if (job() != null) {
-//          TypeSystem ts = extInfo.typeSystem();
-//          NodeFactory nf = extInfo.nodeFactory();
-//          return new ConstantCheckPass(this, new ConstantChecker(job(), ts, nf));
-            return new EmptyPass(this);
-        }
         return new CheckFieldConstantsPass(extInfo.scheduler(), this);
     }
     
