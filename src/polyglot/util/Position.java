@@ -21,6 +21,9 @@ public class Position implements Serializable
     public static final int END_UNUSED = -2;
     public static final Position COMPILER_GENERATED = new Position(null, "Compiler Generated");
     
+    public static final int THIS_METHOD = 1;
+    public static final int CALLER = THIS_METHOD + 1;
+
     /**
      * Get a compiler generated position using the caller at the given stack
      * depth.  Depth 1 is the caller.  Depth 2 is the caller's caller, etc.
@@ -37,7 +40,7 @@ public class Position implements Serializable
 
     /** Get a compiler generated position. */ 
     public static Position compilerGenerated() {
-        return compilerGenerated(2);
+        return compilerGenerated(CALLER);
     }
 
     /** For deserialization. */
