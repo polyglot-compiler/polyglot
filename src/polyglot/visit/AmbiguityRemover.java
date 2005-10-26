@@ -30,43 +30,17 @@ public class AmbiguityRemover extends DisambiguationDriver
         this.visitBodies = visitBodies;
     }
     
-    protected Context enterScope(Node parent, Node n) {
-        Context c = super.enterScope(parent, n);
-        
-        Scheduler scheduler = job.extensionInfo().scheduler();
-        ParsedClassType ct = c.currentClassScope();
-        
-        /*
-        if ((parent instanceof ProcedureDecl && n == ((ProcedureDecl) parent).body())
-         || (parent instanceof FieldDecl && n == ((FieldDecl) parent).init())) {
-            List l = new ArrayList(c.goalStack());
-            l.remove(scheduler.SupertypesResolved(ct));
-            l.remove(scheduler.SignaturesResolved(ct));
-            c = c.pushGoalStack(l);
-        }
-        else if (n instanceof FieldDecl || n instanceof MethodDecl || n instanceof ConstructorDecl) {
-            c = c.pushGoal(scheduler.SignaturesResolved(ct));
-        }
-        else if (n instanceof ClassDecl) {
-            c = c.pushGoal(scheduler.SupertypesResolved(((ClassDecl) n).type()));
-        }
-        else if (n instanceof ClassBody) {
-            List l = new ArrayList(c.goalStack());
-            l.remove(scheduler.SupertypesResolved(ct));
-            l.remove(scheduler.SignaturesResolved(ct));
-            c = c.pushGoalStack(l);
-        }
-        */
-        
-        return c;
-    }
-
     public Node override(Node parent, Node n) {
         if (! visitSigs && n instanceof ClassMember && ! (n instanceof ClassDecl)) {
             return n;
         }
-        if ((! visitBodies || ! visitSigs) && (n instanceof Expr || n instanceof Stmt)) {
-            return n;
+        if ((! visitBodies || ! visitSigs) && parent instanceof ClassMember) {
+            if (parent instanceof FieldDecl && ((FieldDecl) parent).init() == n) {
+                return n;
+            }
+            if (parent instanceof CodeDecl && ((CodeDecl) parent).body() == n) {
+                return n;
+            }
         }
         
         try {
