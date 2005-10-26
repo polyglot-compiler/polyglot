@@ -198,7 +198,7 @@ public abstract class Assign_c extends Expr_c implements Assign
     printSubExpr(left, true, w, tr);
     w.write(" ");
     w.write(op.toString());
-    w.allowBreak(2, " ");
+    w.allowBreak(2, 2, " ", 1); // miser mode
     printSubExpr(right, false, w, tr);
   }
 
