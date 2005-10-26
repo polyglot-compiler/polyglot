@@ -69,7 +69,15 @@ public class Disamb_c implements Disamb
     protected Node disambiguatePackagePrefix(PackageNode pn) throws SemanticException {
         Resolver pc = ts.packageContextResolver(pn.package_());
 
-        Named n = pc.find(name);
+        Named n;
+        
+        try {
+            n = pc.find(name);
+        }
+        catch (SemanticException e) {
+            return null;
+        }
+
         Qualifier q = null;
 
         if (n instanceof Qualifier) {
@@ -80,7 +88,8 @@ public class Disamb_c implements Disamb
         
         if (q.isPackage() && packageOK()) {
             return nf.PackageNode(pos, q.toPackage());
-        } else if (q.isType() && typeOK()) {
+        }
+        else if (q.isType() && typeOK()) {
             return nf.CanonicalTypeNode(pos, q.toType());
         }
 
@@ -111,7 +120,13 @@ public class Disamb_c implements Disamb
         // Try member classes.
         if (t.isClass() && typeOK()) {
             Resolver tc = t.toClass().resolver();
-            Named n = tc.find(name);
+            Named n;
+            try {
+                n = tc.find(name);
+            }
+            catch (SemanticException e) {
+                return null;
+            }
             if (n instanceof Type) {
                 Type type = (Type) n;
                 return nf.CanonicalTypeNode(pos, type);
