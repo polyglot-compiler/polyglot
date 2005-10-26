@@ -228,43 +228,4 @@ public abstract class Type_c extends TypeObject_c implements Type
      * in error messages and generated output.
      */
     public abstract String toString();
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        // Write out the full name first so we can install correctly
-        // when we read back.
-        if (this instanceof Named) {
-            String name = ((Named) this).fullName();
-            out.writeObject(name);
-            String memberName = null;
-            if (name != null && this.isClass() && this.toClass().isMember()) {
-                memberName = this.typeSystem().getTransformedClassName(this.toClass());
-            }
-            out.writeObject(memberName);
-        }
-
-        out.defaultWriteObject();
-    }
-
-/*
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException
-    {
-        // Store the type in the system resolver to avoid infinite loop.
-        if (this instanceof Named) {
-            String name = (String) in.readObject();
-            String memberName = (String) in.readObject();
-            TypeSystem ts = ((TypeInputStream) in).getTypeSystem();
-
-            if (name != null) {
-                ((CachingResolver) ts.systemResolver()).install(name, (Named) this);
-            }
-            
-            if (memberName != null) {
-                ((CachingResolver) ts.systemResolver()).install(memberName, (Named) this);
-            }
-        }
-
-        in.defaultReadObject();
-    }    
-*/
 }
