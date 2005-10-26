@@ -2,7 +2,6 @@ package polyglot.ext.jl.ast;
 
 import polyglot.ast.*;
 import polyglot.types.*;
-import polyglot.types.Package;
 import polyglot.util.Position;
 import polyglot.util.InternalCompilerError;
 import polyglot.visit.ContextVisitor;
@@ -119,8 +118,7 @@ public class Disamb_c implements Disamb
             }
         }
 
-        throw new NoClassException(name, t.toClass());
-//        return null;
+        return null;
     }
 
     protected Node disambiguateExprPrefix(Expr e) throws SemanticException {
