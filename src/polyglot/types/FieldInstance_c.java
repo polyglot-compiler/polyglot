@@ -139,8 +139,9 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
           v = "\"" + s + "\"";
         }
 
-        return "field " + flags.translate() + type + " " + name +
-	    (v != null ? (" = " + v) : "");
+        return "field " + flags.translate() + type + " " +
+            container + "." + name +
+	    (isConstant ? (" = " + v) : "");
     }
 
     public boolean isCanonical() {
