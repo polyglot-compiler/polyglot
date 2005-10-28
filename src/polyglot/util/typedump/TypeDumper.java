@@ -52,7 +52,7 @@ class TypeDumper {
 	    String t = (String)jlcType.get(null);
 	    TypeEncoder te = new TypeEncoder(ts);
 	    return new TypeDumper(name,
-				  te.decode(t),
+				  te.decode(t, name),
 				  (String)jlcVersion.get(null),
 				  (Long)jlcTimestamp.get(null));
 	} catch (IllegalAccessException exn) {
