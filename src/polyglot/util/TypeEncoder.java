@@ -148,7 +148,8 @@ public class TypeEncoder
             unresolved.add(name);
         }
 
-        System.out.println("TypeEncoder depth " + depth + " at " + name);
+        if (Report.should_report(Report.serialize, 1))
+            Report.report(1, "TypeEncoder depth " + depth + " at " + name);
         depth++;
         
         try {
