@@ -19,7 +19,7 @@ public interface TypeSystem {
      *                 or other source files.
      * @param extInfo The ExtensionInfo the TypeSystem is being created for.
      */
-    void initialize(LoadedClassResolver resolver, ExtensionInfo extInfo)
+    void initialize(TopLevelResolver resolver, ExtensionInfo extInfo)
                     throws SemanticException;
 
     /** Return the language extension this type system is for. */
@@ -42,7 +42,7 @@ public interface TypeSystem {
      * Return the type system's loaded resolver.
      * This resolver contains types loaded from class files.
      */
-    LoadedClassResolver loadedResolver();
+    TopLevelResolver loadedResolver();
 
     /** Create an import table for the source file.
      * @param sourceName Name of the source file to import into.  This is used

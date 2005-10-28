@@ -52,6 +52,10 @@ public class LoadedClassResolver implements TopLevelResolver
     this.allowRawClasses = allowRawClasses;
   }
 
+  public boolean allowRawClasses() {
+    return allowRawClasses;
+  }
+
   public boolean packageExists(String name) {
     return loader.packageExists(name);
   }
@@ -155,9 +159,9 @@ public class LoadedClassResolver implements TopLevelResolver
     try {
         if (Report.should_report(Report.serialize, 1))
             Report.report(1, "Decoding " + name + " in " + clazz);
-        
-        dt = te.decode(clazz.encodedClassType(version.name()));
-        
+
+        dt = te.decode(clazz.encodedClassType(version.name()), name);
+
         if (dt == null) {
             if (Report.should_report(Report.serialize, 1))
                 Report.report(1, "* Decoding " + name + " failed");
@@ -168,8 +172,27 @@ public class LoadedClassResolver implements TopLevelResolver
             // the types are resolved.
             throw new SchedulerException("Could not decode " + name);
         }
+
         if (Report.should_report(Report.serialize, 1))
             Report.report(1, "* Decoding " + name + " succeeded");
+
+        if (Report.should_report(Report.serialize, 2)) {
+          if (dt instanceof ClassType) {
+            ClassType ct = (ClassType) dt;
+            for (Iterator i = ct.methods().iterator(); i.hasNext(); ) {
+                MethodInstance mi = (MethodInstance) i.next();
+                Report.report(2, "* " + mi);
+            }
+            for (Iterator i = ct.fields().iterator(); i.hasNext(); ) {
+                FieldInstance fi = (FieldInstance) i.next();
+                Report.report(2, "* " + fi);
+            }
+            for (Iterator i = ct.constructors().iterator(); i.hasNext(); ) {
+                ConstructorInstance ci = (ConstructorInstance) i.next();
+                Report.report(2, "* " + ci);
+            }
+          }
+        }
     }
     catch (InternalCompilerError e) {
 	System.err.println("Failed decoding " + clazz.name());
@@ -181,7 +204,9 @@ public class LoadedClassResolver implements TopLevelResolver
 
     if (dt instanceof ClassType) {
         // Put the decoded type into the resolver to avoid circular resolving.
-        ts.systemResolver().addNamed(name, (ClassType) dt);
+
+        // No!  TypeEncoder will take care of this
+        // ts.systemResolver().addNamed(name, (ClassType) dt);
     
         if (Report.should_report(report_topics, 2))
             Report.report(2, "Returning serialized ClassType for " +

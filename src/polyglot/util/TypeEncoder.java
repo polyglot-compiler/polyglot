@@ -31,6 +31,8 @@ public class TypeEncoder
     protected final boolean base64 = true;
     protected final boolean test = false;
     protected Map placeHolderCache;
+    protected Set unresolved;
+    protected int depth;
     
     public TypeEncoder(TypeSystem ts) {
         this.ts = ts;
@@ -59,7 +61,7 @@ public class TypeEncoder
         else {
             oos = new TypeOutputStream(baos, ts, t);
         }
-        
+
         oos.writeObject(t);
         oos.flush();
         oos.close();
@@ -91,7 +93,11 @@ public class TypeEncoder
         if (test) {
             // Test it.
             try {
-                decode(s);
+                String name = null;
+                if (t instanceof Named) {
+                    name = ((Named) t).fullName();
+                }
+                decode(s, name);
             }
             catch (Exception e) {
                 e.printStackTrace();
@@ -102,7 +108,7 @@ public class TypeEncoder
         
         return s;
     }
-    
+
     /**
      * Decode a serialized type object.  If deserialization fails because
      * a type could not be resolved, the method returns null.  The calling
@@ -111,7 +117,7 @@ public class TypeEncoder
      * @return The decoded TypeObject, or null if deserialization fails.
      * @throws InvalidClassException If the string is malformed.
      */
-    public TypeObject decode(String s) throws InvalidClassException {
+    public TypeObject decode(String s, String name) throws InvalidClassException {
         TypeInputStream ois;
         byte[] b;
         
@@ -131,22 +137,40 @@ public class TypeEncoder
         if (oldCache != null) {
             placeHolderCache.putAll(oldCache);
         }
+
+        Set oldUnresolved = unresolved;
+        unresolved = new HashSet();
+        if (oldUnresolved != null) {
+            unresolved.addAll(oldUnresolved);
+        }
+
+        if (name != null) {
+            unresolved.add(name);
+        }
+
+        System.out.println("TypeEncoder depth " + depth + " at " + name);
+        depth++;
         
         try {
             if (zip && !base64) {
                 // The base64 decoder automatically unzips byte streams, so
                 // we only need an explicit GZIPInputStream if we are not
                 // using base64 encoding.
-                ois = new TypeInputStream(new GZIPInputStream(new ByteArrayInputStream(b)), ts, placeHolderCache);
+                ois = new TypeInputStream(new GZIPInputStream(new ByteArrayInputStream(b)), ts, placeHolderCache, unresolved);
             }
             else {
-                ois = new TypeInputStream(new ByteArrayInputStream(b), ts, placeHolderCache);
+                ois = new TypeInputStream(new ByteArrayInputStream(b), ts, placeHolderCache, unresolved);
             }
       
             TypeObject o = (TypeObject) ois.readObject();
             
             if (ois.deserializationFailed()) {
+                // rollbackSystemResolverCache(placeHolderCache, oldCache);
                 return null;
+            }
+
+            if (oldCache == null || ! ois.usedUnresolved()) {
+                updateSystemResolverCache(placeHolderCache, oldCache);
             }
             
             return o;
@@ -168,6 +192,50 @@ public class TypeEncoder
         }
         finally {
             placeHolderCache = oldCache;
+            unresolved = oldUnresolved;
+            depth--;
+        }
+    }
+
+    protected void updateSystemResolverCache(Map phc, Map oldPhc) {
+        for (Iterator i = phc.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry e = (Map.Entry) i.next();
+            PlaceHolder p = (PlaceHolder) e.getKey();
+            Object o = e.getValue();
+
+            if (oldPhc != null && oldPhc.get(p) == o) {
+                continue;
+            }
+
+            if (o instanceof Named) {
+                Named n = (Named) o;
+
+                if (Report.should_report(Report.serialize, 1))
+                    Report.report(1, "TypeEncoder: adding " + n + " to system resolver (recursive=" + (oldPhc != null) + ")");
+
+                ts.systemResolver().install(n.fullName(), n);
+            }
+        }
+    }
+
+    protected void rollbackSystemResolverCache(Map phc, Map oldPhc) {
+        for (Iterator i = phc.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry e = (Map.Entry) i.next();
+            PlaceHolder p = (PlaceHolder) e.getKey();
+            Object o = e.getValue();
+
+            if (oldPhc != null && oldPhc.get(p) == o) {
+                continue;
+            }
+
+            if (o instanceof Named) {
+                Named n = (Named) o;
+
+                if (Report.should_report(Report.serialize, 1))
+                    Report.report(1, "Removing " + n + " from system resolver");
+
+                ts.systemResolver().removeNamed(n);
+            }
         }
     }
 }

@@ -19,7 +19,7 @@ import polyglot.util.*;
 public class TypeSystem_c implements TypeSystem
 {
     protected SystemResolver systemResolver;
-    protected LoadedClassResolver loadedResolver;
+    protected TopLevelResolver loadedResolver;
     protected Map flagsForName;
     protected ExtensionInfo extInfo;
 
@@ -29,7 +29,7 @@ public class TypeSystem_c implements TypeSystem
      * Initializes the type system and its internal constants (which depend on
      * the resolver).
      */
-    public void initialize(LoadedClassResolver loadedResolver, ExtensionInfo extInfo)
+    public void initialize(TopLevelResolver loadedResolver, ExtensionInfo extInfo)
                            throws SemanticException {
 
         if (Report.should_report(Report.types, 1))
@@ -111,7 +111,7 @@ public class TypeSystem_c implements TypeSystem
         return systemResolver;
     }
 
-    public LoadedClassResolver loadedResolver() {
+    public TopLevelResolver loadedResolver() {
         return loadedResolver;
     }
 

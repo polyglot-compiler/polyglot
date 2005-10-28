@@ -121,6 +121,19 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
      * @param name The name of the qualifier to insert.
      * @param q The qualifier to insert.
      */
+    public void removeNamed(Named q) {
+        if (cache.get(q.fullName()) == q) {
+            if (Report.should_report(TOPICS, 1))
+                Report.report(3, "CachingResolver: removing " + q.fullName() + "->" + q + " from resolver cache");
+            cache.remove(q.fullName());
+        }
+    }
+
+    /**
+     * Install a qualifier in the cache.
+     * @param name The name of the qualifier to insert.
+     * @param q The qualifier to insert.
+     */
     public void addNamed(String name, Named q) throws SemanticException {
 	super.addNamed(name, q);
         

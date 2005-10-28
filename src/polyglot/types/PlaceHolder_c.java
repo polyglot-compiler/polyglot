@@ -54,12 +54,22 @@ public class PlaceHolder_c implements PlaceHolder
         Goal g = scheduler.TypeExists(name);
         
         try {
-            // find(name) should be side-effect free.  If it isn't use resolveSafe!
-            // Using find reduces goal reattempts, however.
-            Named n = ts.systemResolver().find(name);
+            // systemResolver.find(name) is not side-effect free.
+            // So first check the cache, then use the loaded resolver.
+            // Don't update the cache, since the type returned may point
+            // to partially constructed type.
+            Named n = ts.systemResolver().check(name);
+
+            if (n != null) {
+                return n;
+            }
+
+            n = ts.loadedResolver().find(name);
+
             if (n == null) {
                 throw new InternalCompilerError("systemResolver().find(" + name + ") returned null");
             }
+
             return n;
         }
         catch (MissingDependencyException e) {

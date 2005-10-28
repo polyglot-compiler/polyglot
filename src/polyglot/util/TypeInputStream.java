@@ -10,20 +10,32 @@ import java.io.*;
 public class TypeInputStream extends ObjectInputStream {
     protected TypeSystem ts;
     protected Map cache;
+    protected Set unresolved;
     protected boolean failed;
+    boolean usedUnresolved;
+    boolean enableReplace;
     
-    public TypeInputStream(InputStream in, TypeSystem ts, Map cache) 
+    public TypeInputStream(InputStream in, TypeSystem ts, Map cache, Set unresolved) 
         throws IOException
     {
         super(in);
+
         enableResolveObject(true);
+
         this.ts = ts;
         this.cache = cache;
+        this.unresolved = unresolved;
         this.failed = false;
+        this.usedUnresolved = false;
+        this.enableReplace = true;
     }
     
     public boolean deserializationFailed() {
         return failed;
+    }
+
+    public boolean usedUnresolved() {
+        return usedUnresolved;
     }
     
     public TypeSystem getTypeSystem() {
@@ -51,8 +63,6 @@ public class TypeInputStream extends ObjectInputStream {
         }
     }
     
-    boolean enableReplace = true;
-
     public void enableReplace(boolean f) {
         this.enableReplace = f;
     }
@@ -71,10 +81,6 @@ public class TypeInputStream extends ObjectInputStream {
             }
         }	  
 
-        if (Report.should_report(Report.serialize, 2)) {
-            Report.report(2, "- Resolving " + s + " : " + o.getClass());
-        }
-
         if (! enableReplace) {
             return o;
         }
@@ -82,8 +88,8 @@ public class TypeInputStream extends ObjectInputStream {
         if (o instanceof PlaceHolder) {
             Object t = cache.get(o);
             if (t == UNRESOLVED) {
-                // A place holder lower in the call stack is trying to resolve this
-                // place holder too.  Abort!
+                // A place holder lower in the call stack is trying to resolve
+                // this place holder too.  Abort!
                 // The calling place holder should set up depedencies to ensure
                 // this pass is rerun.
                 failed = true;
@@ -114,6 +120,13 @@ public class TypeInputStream extends ObjectInputStream {
                 if (Report.should_report(Report.serialize, 2)) {
                     Report.report(2, "- Resolving " + s + " : " + o.getClass()
                                   + " to (cached) " + t + " : " + t.getClass());      	
+                }
+
+                if (t instanceof Named) {
+                    Named n = (Named) t;
+                    if (unresolved.contains(n.fullName())) {
+                        usedUnresolved = true;
+                    }
                 }
             }
             return t;
