@@ -6,8 +6,9 @@
  */
 package polyglot.visit;
 
-import polyglot.ast.Cast;
-import polyglot.ast.Node;
+import java.util.*;
+
+import polyglot.ast.*;
 import polyglot.types.Type;
 
 /**
@@ -28,6 +29,32 @@ public class RedundantCastRemover extends NodeVisitor {
             if (exprType.isImplicitCastValid(castType)) {
                 // Redundant cast.
                 return c.expr();
+            }
+        }
+
+        // Do not remove redundant casts from call arguments since the
+        // cast may be there to resolve an ambiguity or to force another
+        // overloaded method to be called.
+        if (n instanceof ProcedureCall) {
+            ProcedureCall newCall = (ProcedureCall) n;
+            ProcedureCall oldCall = (ProcedureCall) old;
+            List newArgs = new ArrayList(newCall.arguments().size());
+            boolean changed = false;
+            Iterator i = newCall.arguments().iterator();
+            Iterator j = oldCall.arguments().iterator();
+            while (i.hasNext() && j.hasNext()) {
+                Expr newE = (Expr) i.next();
+                Expr oldE = (Expr) j.next();
+                if (oldE instanceof Cast) {
+                    newArgs.add(oldE);
+                    changed = true;
+                }
+                else {
+                    newArgs.add(newE);
+                }
+            }
+            if (changed) {
+                n = newCall.arguments(newArgs);
             }
         }
         return n;
