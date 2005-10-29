@@ -1,14 +1,13 @@
 package polyglot.ext.jl.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import polyglot.util.SimpleCodeWriter;
-
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.*;
+
+import polyglot.ast.*;
+import polyglot.types.*;
+import polyglot.util.*;
+import polyglot.visit.*;
 
 /**
  * A <code>Node</code> represents an AST node.  All AST nodes must implement
