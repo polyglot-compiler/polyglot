@@ -288,7 +288,7 @@ public class ImportTable implements Resolver
         }
         return isVisible;
     }
-    
+
     /**
      * Load the class imports, lazily.
      */
@@ -304,9 +304,17 @@ public class ImportTable implements Resolver
 		Report.report(2, this + ": import " + longName);
 
 	    try {
+                Named t = ts.systemResolver().find(longName);
+
+                String shortName = StringUtil.getShortNameComponent(longName);
+
+                map.put(shortName, t);
+
+/*
                 // Try to find a class named longName.
                 // The class maybe a static member class of another, so we'll
                 // make several attempts.
+
                 StringTokenizer st = new StringTokenizer(longName, ".");
                 StringBuffer name = new StringBuffer();
                 Named t = null;
@@ -323,23 +331,34 @@ public class ImportTable implements Resolver
                             break;
                         }
 
-                        if (t instanceof ClassType) {
-                            // If we find a class that is further qualfied,
-                            // search for member classes of that class.
-                            ClassType ct = (ClassType) t;
+                        while (st.hasMoreTokens()) {
+                            String n = st.nextToken();
 
-                            while (st.hasMoreTokens()) {
-                                String n = st.nextToken();
-                                t = ct = ts.findMemberClass(ct, n);
-
-                                // cache the result
-                                map.put(n, ct);
+                            if (t instanceof ClassType) {
+                                // If we find a class that is further qualfied,
+                                // search for member classes of that class.
+                                ClassType ct = (ClassType) t;
+                                t = ct.resolver().find(n);
+                                if (t instanceof ClassType) {
+                                    map.put(n, t);
+                                }
+                                else {
+                                    // In JL, the result must be a class.
+                                    throw new NoClassException(n, ct);
+                                }
                             }
-                        }
-                        else {
-                            // t, whatever it is, is further qualified, but 
-                            // should be, at least in Java, a ClassType.
-                            throw new InternalCompilerError("Qualified type \"" + t + "\" is not a class type.", sourcePos);
+                            else if (t instanceof Package) {
+                                Package p = (Package) t;
+                                t = p.resolver().find(n);
+                                if (t instanceof ClassType) {
+                                    map.put(n, p);
+                                }
+                            }
+                            else {
+                                // t, whatever it is, is further qualified, but 
+                                // should be, at least in Java, a ClassType.
+                                throw new InternalCompilerError("Qualified type \"" + t + "\" is not a class type.", sourcePos);
+                            }
                         }
                     }
                     catch (SemanticException e) {
@@ -369,6 +388,7 @@ public class ImportTable implements Resolver
 
                 // map.put(longName, t); // should already be in the cache
 		map.put(shortName, t);
+            */
 	    }
 	    catch (SemanticException e) {
                 if (e.position == null) {
