@@ -238,18 +238,6 @@ public class ImportTable implements Resolver
         String fullName = pkgName + "." + name;
 
         try {
-            Named n = ts.systemResolver().find(pkgName);
-
-            if (n instanceof ClassType) {
-                n = ((ClassType) n).resolver().find(name);
-                return n;
-            }
-        }
-        catch (NoClassException ex) {
-            // Do nothing.
-        }
-
-        try {
             Named n = ts.systemResolver().find(fullName);
 
             // Check if the type is visible in this package.
@@ -260,7 +248,20 @@ public class ImportTable implements Resolver
         catch (NoClassException ex) {
             // Do nothing.
         }
+/*
+        try {
+            Named n = ts.systemResolver().find(pkgName);
 
+            if (n instanceof ClassType) {
+                n = ((ClassType) n).resolver().find(name);
+                return n;
+            }
+        }
+        catch (NoClassException ex) {
+            // Do nothing.
+        }
+  */
+        
         return null;
     }
 

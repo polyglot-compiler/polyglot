@@ -57,8 +57,8 @@ public class CachingResolver implements Resolver {
 
         Named q = (Named) o;
 
-	if (q == null) {
-            if (Report.should_report(TOPICS, 3))
+	    if (q == null) {
+			if (Report.should_report(TOPICS, 3))
                 Report.report(3, "CachingResolver: not cached: " + name);
 
             try {
