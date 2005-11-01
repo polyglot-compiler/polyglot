@@ -14,8 +14,6 @@ public class CachingResolver implements Resolver {
     Map cache;
     boolean cacheNotFound;
 
-    static Object NOT_FOUND = "NOT FOUND";
-
     /**
      * Create a caching resolver.
      * @param inner The resolver whose results this resolver caches.
@@ -51,9 +49,7 @@ public class CachingResolver implements Resolver {
 
         Object o = cache.get(name);
 
-        if (o == NOT_FOUND) {
-            throw new NoClassException(name);
-        }
+        if (o instanceof SemanticException) throw ((SemanticException)o);
 
         Named q = (Named) o;
 
@@ -67,10 +63,10 @@ public class CachingResolver implements Resolver {
             catch (NoClassException e) {
                 if (Report.should_report(TOPICS, 3)) {
                     Report.report(3, "CachingResolver: " + e.getMessage());
-                    Report.report(3, "CachingResolver: installing " + name + "->" + NOT_FOUND + " in resolver cache");
+                    Report.report(3, "CachingResolver: installing " + name + "-> (not found) in resolver cache");
                 }
                 if (cacheNotFound) {
-                    cache.put(name, NOT_FOUND);
+                    cache.put(name, e);
                 }
                 throw e;
             }
@@ -94,7 +90,7 @@ public class CachingResolver implements Resolver {
      */
     public Named check(String name) {
         Object o = cache.get(name);
-        if (o == NOT_FOUND) return null;
+        if (o instanceof Throwable) return null;
         return (Named) o;
     }
 
