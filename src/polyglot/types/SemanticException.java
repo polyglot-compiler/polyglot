@@ -41,16 +41,16 @@ public class SemanticException extends Exception {
 	return position;
     }
     
-    static boolean init = false;
-    static boolean fill = true;
+    private static boolean init = false;
+    public static boolean fillInStackTrace = true;
     
     public synchronized Throwable fillInStackTrace() {
-        if (! fill) {
-            // fast path: init==true, fill==false
+        if (! fillInStackTrace) {
+            // fast path: init==true, fillInStackTrace==false
             return this;
         }
         if (! init) {
-            fill = Report.should_report("trace", 1);
+            fillInStackTrace = Report.should_report("trace", 1);
             init = true;
         }
         return super.fillInStackTrace();
