@@ -13,43 +13,46 @@ public class SemanticException extends Exception {
     
     public SemanticException() {
         super();
-        trace(this, 5);
     }
 
     public SemanticException(Throwable cause) {
         super(cause);
-        trace(this, 5);
     }
 
     public SemanticException(Position position) {
 	super();
 	this.position = position;
-        trace(this, 5);
     }
 
     public SemanticException(String m) {
         super(m);
-        trace(this, 5);
     }
 
     public SemanticException(String m, Throwable cause) {
         super(m, cause);
-        trace(this, 5);
     }
 
     public SemanticException(String m, Position position) {
 	super(m);
 	this.position = position;
-        trace(this, 5);
     }
 
     public Position position() {
 	return position;
     }
-
-    static void trace(Exception e, int level) {
-        if (Report.should_report(Report.errors, level)) {
-            e.printStackTrace();
+    
+    static boolean init = false;
+    static boolean fill = true;
+    
+    public synchronized Throwable fillInStackTrace() {
+        if (! fill) {
+            // fast path: init==true, fill==false
+            return this;
         }
+        if (! init) {
+            fill = Report.should_report("trace", 1);
+            init = true;
+        }
+        return super.fillInStackTrace();
     }
 }
