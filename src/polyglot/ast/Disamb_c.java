@@ -124,7 +124,7 @@ public class Disamb_c implements Disamb
             try {
                 n = tc.find(name);
             }
-            catch (SemanticException e) {
+            catch (NoClassException e) {
                 return null;
             }
             if (n instanceof Type) {
