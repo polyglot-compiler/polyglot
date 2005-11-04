@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.*;
 
 /** An enumerated type.  Enums are interned and can be compared with ==. */
-public class Enum implements Serializable
+public class Enum implements Internable, Serializable
 {
     /** The name of the enum.  Used for debugging and interning. */
     private String name;
@@ -19,7 +19,7 @@ public class Enum implements Serializable
 	this.name = name;
 
         // intern the enum and make sure this one is unique
-        Enum intern = intern();
+        Enum intern = internEnum();
 
         if (intern != this) {
             throw new InternalCompilerError("Duplicate enum \"" + name +
@@ -67,7 +67,11 @@ public class Enum implements Serializable
         }
     }
 
-    public Enum intern() {
+    public Object intern() {
+        return internEnum();
+    }
+
+    public Enum internEnum() {
         EnumKey k = new EnumKey(this);
 
 	Enum e = (Enum) cache.get(k);
