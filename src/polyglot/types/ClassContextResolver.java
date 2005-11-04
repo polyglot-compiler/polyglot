@@ -46,22 +46,60 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
         }
 
         // Check if the name is for a member class.
-        ClassType mt = type.memberClassNamed(name);
-        
-        if (mt != null) {
+        ClassType mt = null;
+
+        Named m;
+
+        String fullName = type.fullName() + "." + name;
+        String rawName = ts.getTransformedClassName(type) + "$" + name;
+
+        // First check the system resolver.
+        m = ts.systemResolver().check(fullName);
+
+        // Try the raw class file name.
+        if (m == null) {
+            m = ts.systemResolver().check(rawName);
+        }
+
+        // Check if the member was explicitly declared.
+        if (m == null) {
+            m = type.memberClassNamed(name);
+        }
+
+        // Go to disk, but only if there is no job for the type.
+        // If there is a job, all members should be in the resolver
+        // already.
+        boolean useLoadedResolver = true;;
+
+        if (type instanceof ParsedTypeObject) {
+            ParsedTypeObject pto = (ParsedTypeObject) type;
+            if (pto.job() != null) {
+                useLoadedResolver = false;
+            }
+        }
+
+        if (m == null && useLoadedResolver) {
+            try {
+                m = ts.systemResolver().find(rawName);
+            }
+            catch (SemanticException e) {
+                // Not found; will fall through to error handling code
+            }
+        }
+
+        if (m instanceof ClassType) {
+            mt = (ClassType) m;
+
             if (! mt.isMember()) {
-                throw new InternalCompilerError("Class " + mt +
-                                                " is not a member class, " +
-                                                " but is in " + type +
-                                                "\'s list of members.");
+                throw new SemanticException("Class " + mt +
+                                            " is not a member class, " +
+                                            " but was found in " + type + ".");
             }
             
             if (mt.outer() != type) {
-                throw new InternalCompilerError("Class " + mt +
-                                                " has outer class " +
-                                                mt.outer() +
-                                                " but is a member of " +
-                                                type);
+                throw new SemanticException("Class " + mt +
+                                            " is not a member class, " +
+                                            " of " + type + ".");
             }
             
             if (! canAccess(mt, accessor)) {
@@ -72,7 +110,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
         }
         
         // Collect all members of the super types.
-        // Use a HashSet to eliminate duplicates.
+        // Use a Set to eliminate duplicates.
         Set acceptable = new HashSet();
         
         if (type.superType() != null) {

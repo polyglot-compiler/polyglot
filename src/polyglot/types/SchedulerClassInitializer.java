@@ -22,6 +22,7 @@ public class SchedulerClassInitializer implements LazyClassInitializer {
     protected ParsedClassType ct;
     protected Scheduler scheduler;
 
+    protected boolean init;
     protected boolean superclassInitialized;
     protected boolean interfacesInitialized;
     protected boolean memberClassesInitialized;
@@ -43,6 +44,14 @@ public class SchedulerClassInitializer implements LazyClassInitializer {
 
     public boolean fromClassFile() {
         return false;
+    }
+
+    public void initTypeObject() {
+        this.init = true;
+    }
+
+    public boolean isTypeObjectInitialized() {
+        return this.init;
     }
 
     public void initSuperclass() {

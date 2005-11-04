@@ -22,17 +22,27 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     protected transient LazyClassInitializer init;
     protected transient Source fromSource;
     protected transient Job job;
+
     protected Type superType;
     protected List interfaces;
     protected List methods;
     protected List fields;
     protected List constructors;
-    protected List memberClasses;
     protected Package package_;
     protected Flags flags;
     protected Kind kind;
     protected String name;
     protected ClassType outer;
+
+    protected transient List memberClasses;
+
+    public LazyClassInitializer init() {
+        return init;
+    }
+
+    public void setInit(LazyClassInitializer init) {
+        this.init = init;
+    }
     
     /** Was the class declared in a static context? */
     protected boolean inStaticContext = false;
@@ -49,8 +59,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         super(ts);
         this.fromSource = fromSource;
 
-        this.init = init;
-        init.setClass(this);
+        setInitializer(init);
 
         this.interfaces = new TypedList(new LinkedList(), Type.class, false);
         this.methods = new TypedList(new LinkedList(), MethodInstance.class, false);
@@ -59,6 +68,15 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         this.memberClasses = new TypedList(new LinkedList(), Type.class, false);
     }
      
+    public LazyInitializer initializer() {
+        return this.init;
+    }
+
+    public void setInitializer(LazyInitializer init) {
+        this.init = (LazyClassInitializer) init;
+        ((LazyClassInitializer) init).setClass(this);
+    }
+        
     public Source fromSource() {
         return fromSource;
     }
@@ -214,6 +232,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     
     /** Return an immutable list of constructors */
     public List constructors() {
+        init.initConstructors();
         init.canonicalConstructors();
         return Collections.unmodifiableList(constructors);
     }
@@ -226,12 +245,14 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
 
     /** Return an immutable list of methods. */
     public List methods() {
+        init.initMethods();
         init.canonicalMethods();
         return Collections.unmodifiableList(methods);
     }
 
     /** Return an immutable list of fields */
     public List fields() {
+        init.initFields();
         init.canonicalFields();
         return Collections.unmodifiableList(fields);
     }
@@ -403,6 +424,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
             membersAdded = true;
             supertypesResolved = true;
             signaturesResolved = true;
+            memberClasses = new ArrayList();
         }
 
         in.defaultReadObject();

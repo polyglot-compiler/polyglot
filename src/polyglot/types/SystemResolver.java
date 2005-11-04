@@ -13,6 +13,8 @@ import java.util.*;
 public class SystemResolver extends CachingResolver implements TopLevelResolver {
     Map packageCache;
     ExtensionInfo extInfo;
+    SystemResolver previous;
+    Map justAdded;
 
     /**
      * Create a caching resolver.
@@ -21,12 +23,43 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
     public SystemResolver(TopLevelResolver inner, ExtensionInfo extInfo) {
         super(inner);
         this.extInfo = extInfo;
-	this.packageCache = new HashMap();
+        this.packageCache = new HashMap();
+        this.previous = null;
+        this.justAdded = new HashMap();
+    }
+
+    public SystemResolver previous() {
+        return previous;
+    }
+    
+    public Object copy() {
+        SystemResolver r = (SystemResolver) super.copy();
+        r.packageCache = new HashMap(this.packageCache);
+        r.previous = this;
+        r.justAdded = new HashMap();
+        return r;
+    }
+    
+    public void installInAll(String name, Named n) {
+        this.install(name, n);
+        if (previous != null) {
+            previous.installInAll(name, n);
+        }
+    }
+
+    public boolean installedInAll(String name, Named q) {
+        if (check(name) != q) {
+            return false;
+        }
+        if (previous != null) {
+            return previous.installedInAll(name, q);
+        }
+        return true;
     }
 
     /** Check if a package exists in the resolver cache. */
     protected boolean packageExistsInCache(String name) {
-        for (Iterator i = cache.values().iterator(); i.hasNext(); ) {
+        for (Iterator i = cachedObjects().iterator(); i.hasNext(); ) {
             Object o = i.next();
             if (o instanceof Importable) {
                 Importable im = (Importable) o;
@@ -94,39 +127,79 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
         return (Type) check(name);
     }
 
-    /**
-     * Install a qualifier in the cache.
-     * @param name The name of the qualifier to insert.
-     * @param q The qualifier to insert.
-     */
-    /*
-    public void install(String name, Named q) {
-        if (Report.should_report(TOPICS, 1)) {
-            Report.report(3, "CachingResolver: installing " + name + "->" + q + " in resolver cache");
-        }
-        Object p = cache.get(name);
-        if (p != null) {
-            if (p != q) {
-                throw new InternalCompilerError("Attempt to install duplicate class in resolver cache: " + q + " duplicate of " + p);
+    public Collection justAdded() {
+        return justAdded.values();
+    }
+
+    public void clearAdded() {
+        justAdded.clear();
+    }
+
+    public void putAll(SystemResolver r) throws SemanticException {
+        for (Iterator i = r.justAdded.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry e = (Map.Entry) i.next();
+            String name = (String) e.getKey();
+            Named n = (Named) e.getValue();
+
+            install(name, n);
+
+            if (n instanceof Package) {
+                Package p = (Package) n;
+                cachePackage(p);
             }
         }
-        else {
-        }
-        cache.put(name, q);
-    }
-    */
 
-    /**
-     * Install a qualifier in the cache.
-     * @param name The name of the qualifier to insert.
-     * @param q The qualifier to insert.
-     */
-    public void removeNamed(Named q) {
-        if (cache.get(q.fullName()) == q) {
-            if (Report.should_report(TOPICS, 1))
-                Report.report(3, "CachingResolver: removing " + q.fullName() + "->" + q + " from resolver cache");
-            cache.remove(q.fullName());
+        // cache.putAll(r.justAdded);
+        // justAdded.addAll(r.justAdded);
+    }
+
+    public Named find(String name) throws SemanticException {
+        if (previous == null) {
+            clearAdded();
         }
+
+        Named n = super.find(name);
+
+        if (previous == null) {
+          if (Report.should_report(TOPICS, 2))
+              Report.report(2, "Returning from root-level SR.find(" + name + "); added = " + justAdded);
+
+            for (Iterator i = justAdded.values().iterator(); i.hasNext(); ) {
+                Named n2 = (Named) i.next();
+                if (n2 instanceof ParsedTypeObject) {
+                    if (! ((ParsedTypeObject) n2).initializer().isTypeObjectInitialized()) {
+                        throw new InternalCompilerError(n + " is in the root system resolver, but not initialized");
+                    }
+                }
+            }
+
+            clearAdded();
+        }
+        else {
+          if (Report.should_report(TOPICS, 2))
+              Report.report(2, "Returning from non-root-level SR.find(" + name + "); added = " + justAdded);
+        }
+
+        return n;
+    }
+
+    public void install(String name, Named q) {
+        if (Report.should_report(TOPICS, 2) && check(name) == null)
+            Report.report(2, (previous == null ? "root" : "non-root") + " SR installing " + name + "->" + q);
+        
+        super.install(name, q);
+
+        if (previous == null) {
+            if (q instanceof ParsedTypeObject) {
+                if (! ((ParsedTypeObject) q).initializer().isTypeObjectInitialized()) {
+                    if (Report.should_report(TOPICS, 2))
+                        Report.report(2, "SR initializing " + q);
+                    ((ParsedTypeObject) q).initializer().initTypeObject();
+                }
+            }
+        }
+
+        justAdded.put(name, q);
     }
 
     /**
@@ -135,35 +208,40 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
      * @param q The qualifier to insert.
      */
     public void addNamed(String name, Named q) throws SemanticException {
-	super.addNamed(name, q);
-        
+        super.addNamed(name, q);
+
         if (q instanceof ClassType) {
             ClassType ct = (ClassType) q;
             String containerName = StringUtil.getPackageComponent(name);
-			if (ct.isTopLevel()) {
+            if (ct.isTopLevel()) {
                 Package p = ((ClassType) q).package_();
                 cachePackage(p);
                 if (p != null && containerName.equals(p.fullName())) {
-					addNamed(containerName, p);
-				}
-			}
+                    addNamed(containerName, p);
+                }
+            }
             else if (ct.isMember()) {
-				if (name.equals(ct.fullName())) {
-					// Check that the names match; we could be installing
-					// a member class under its class file name, not its Java
-					// source full name.
+                if (name.equals(ct.fullName())) {
+                    // Check that the names match; we could be installing
+                    // a member class under its class file name, not its Java
+                    // source full name.
                     addNamed(containerName, ct.outer());
                 }
             }
         }
         else if (q instanceof Package) {
-            cachePackage((Package) q);
+            Package p = (Package) q;
+            cachePackage(p);
+            String containerName = StringUtil.getPackageComponent(name);
+            if (p.prefix() != null && containerName.equals(p.prefix().fullName())) {
+                addNamed(containerName, p.prefix());
+            }
         }
 
-	if (q instanceof Type && packageExists(name)) {
-	    throw new SemanticException("Type \"" + name +
-					"\" clashes with package of the same name.", q.position());
-	}
+        if (q instanceof Type && packageExists(name)) {
+            throw new SemanticException("Type \"" + name +
+                        "\" clashes with package of the same name.", q.position());
+        }
     }
 
     private static final Collection TOPICS =

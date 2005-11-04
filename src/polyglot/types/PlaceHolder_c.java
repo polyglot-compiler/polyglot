@@ -11,7 +11,7 @@ import polyglot.util.*;
  * Placeholders are used to prevent serializing the class type information
  * for classes that <code>C</code> depends on.  
  */
-public class PlaceHolder_c implements PlaceHolder
+public class PlaceHolder_c implements NamedPlaceHolder
 {
     /**
      * The name of the place holder.
@@ -28,6 +28,10 @@ public class PlaceHolder_c implements PlaceHolder
     
     public PlaceHolder_c(String name) {
         this.name = name;
+    }
+
+    public String name() {
+        return name;
     }
 
     public int hashCode() {
@@ -54,23 +58,7 @@ public class PlaceHolder_c implements PlaceHolder
         Goal g = scheduler.TypeExists(name);
         
         try {
-            // systemResolver.find(name) is not side-effect free.
-            // So first check the cache, then use the loaded resolver.
-            // Don't update the cache, since the type returned may point
-            // to partially constructed type.
-            Named n = ts.systemResolver().check(name);
-
-            if (n != null) {
-                return n;
-            }
-
-            n = ts.loadedResolver().find(name);
-
-            if (n == null) {
-                throw new InternalCompilerError("systemResolver().find(" + name + ") returned null");
-            }
-
-            return n;
+            return ts.systemResolver().find(name);
         }
         catch (MissingDependencyException e) {
             // The type is in a source file that hasn't been parsed yet.

@@ -5,7 +5,7 @@ package polyglot.types;
  * a class after it has been created.  Members are initialized lazily
  * to correctly handle cyclic dependencies between classes.
  */
-public interface LazyClassInitializer
+public interface LazyClassInitializer extends LazyInitializer
 {
     /**
      * Return true if the class is from a class file.

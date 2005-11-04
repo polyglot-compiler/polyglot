@@ -10,12 +10,11 @@ import java.io.*;
 public class TypeInputStream extends ObjectInputStream {
     protected TypeSystem ts;
     protected Map cache;
-    protected Set unresolved;
     protected boolean failed;
-    boolean usedUnresolved;
     boolean enableReplace;
+    protected Set placeHoldersUsed;
     
-    public TypeInputStream(InputStream in, TypeSystem ts, Map cache, Set unresolved) 
+    public TypeInputStream(InputStream in, TypeSystem ts, Map cache)
         throws IOException
     {
         super(in);
@@ -24,20 +23,19 @@ public class TypeInputStream extends ObjectInputStream {
 
         this.ts = ts;
         this.cache = cache;
-        this.unresolved = unresolved;
         this.failed = false;
-        this.usedUnresolved = false;
         this.enableReplace = true;
+        this.placeHoldersUsed = new HashSet();
     }
     
+    public Set placeHoldersUsed() {
+        return placeHoldersUsed;
+    }
+
     public boolean deserializationFailed() {
         return failed;
     }
 
-    public boolean usedUnresolved() {
-        return usedUnresolved;
-    }
-    
     public TypeSystem getTypeSystem() {
         return ts;
     }
@@ -46,7 +44,14 @@ public class TypeInputStream extends ObjectInputStream {
     
     public void installInPlaceHolderCache(PlaceHolder p, TypeObject t) {
         cache.put(p, t);
-        
+
+        if (t instanceof Named && p instanceof NamedPlaceHolder) {
+            NamedPlaceHolder pp = (NamedPlaceHolder) p;
+            if (Report.should_report(Report.serialize, 2))
+                Report.report(2, "Forcing " + pp.name() + " into system resolver"); 
+            ts.systemResolver().install(pp.name(), (Named) t);
+        }
+
         String s = "";
         if (Report.should_report(Report.serialize, 2)) {
             try {
@@ -84,8 +89,14 @@ public class TypeInputStream extends ObjectInputStream {
         if (! enableReplace) {
             return o;
         }
-        
+
         if (o instanceof PlaceHolder) {
+            if (failed) {
+                return null;
+            }
+
+            placeHoldersUsed.add(o);
+            
             Object t = cache.get(o);
             if (t == UNRESOLVED) {
                 // A place holder lower in the call stack is trying to resolve
@@ -121,26 +132,20 @@ public class TypeInputStream extends ObjectInputStream {
                     Report.report(2, "- Resolving " + s + " : " + o.getClass()
                                   + " to (cached) " + t + " : " + t.getClass());      	
                 }
-
-                if (t instanceof Named) {
-                    Named n = (Named) t;
-                    if (unresolved.contains(n.fullName())) {
-                        usedUnresolved = true;
-                    }
-                }
             }
             return t;
         }
-        else if (o instanceof Enum) {
+        else if (o instanceof Internable) {
             if (Report.should_report(Report.serialize, 2)) {    
                 Report.report(2, "- Interning " + s + " : " + o.getClass());
             }
-            return ((Enum) o).intern();
+            return ((Internable) o).intern();
         }
         else {
             if (Report.should_report(Report.serialize, 2)) {    
                 Report.report(2, "- " + s + " : " + o.getClass());
             }
+
             return o;
         }
     }

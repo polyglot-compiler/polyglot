@@ -11,6 +11,8 @@ import polyglot.util.Position;
  * how they are related.
  */
 public interface TypeSystem {
+    public static final boolean SERIALIZE_MEMBERS_WITH_CONTAINER = false;
+
     /**
      * Initialize the type system with the compiler.  This method must be
      * called before any other type system method is called.
@@ -37,6 +39,12 @@ public interface TypeSystem {
      * @deprecated
      */
     CachingResolver parsedResolver();
+    
+    /** Create and install a duplicate of the system resolver and return the original. */
+    SystemResolver saveSystemResolver();
+   
+    /** Set the system resolver to <code>r</code>. */
+    void restoreSystemResolver(SystemResolver r);
 
     /**
      * Return the type system's loaded resolver.

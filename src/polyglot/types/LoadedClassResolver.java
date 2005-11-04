@@ -130,7 +130,9 @@ public class LoadedClassResolver implements TopLevelResolver
         + " in the language extension, try recompiling the source code.");
     
   }
-  
+
+  boolean recursive = false;
+
   /**
    * Extract an encoded type from a class file.
    */
@@ -155,67 +157,130 @@ public class LoadedClassResolver implements TopLevelResolver
 
     // Alright, go with it!
     TypeObject dt;
+    SystemResolver oldResolver = null;
+
+    if (Report.should_report(Report.serialize, 1))
+        Report.report(1, "Saving system resolver");
+    oldResolver = ts.saveSystemResolver();
+
+    boolean okay = false;
+
+    boolean oldRecursive = recursive;
+
+    if (! recursive) {
+        ts.systemResolver().clearAdded();
+    }
+
+    recursive = true;
     
     try {
-        if (Report.should_report(Report.serialize, 1))
-            Report.report(1, "Decoding " + name + " in " + clazz);
-
-        dt = te.decode(clazz.encodedClassType(version.name()), name);
-
-        if (dt == null) {
+        try {
             if (Report.should_report(Report.serialize, 1))
-                Report.report(1, "* Decoding " + name + " failed");
+                Report.report(1, "Decoding " + name + " in " + clazz);
             
-            // Deserialization failed because one or more types could not
-            // be resolved.  Abort this pass.  Dependencies have already
-            // been set up so that this goal will be reattempted after
-            // the types are resolved.
-            throw new SchedulerException("Could not decode " + name);
+            dt = te.decode(clazz.encodedClassType(version.name()), name);
+            
+            if (dt == null) {
+                if (Report.should_report(Report.serialize, 1))
+                    Report.report(1, "* Decoding " + name + " failed");
+                
+                // Deserialization failed because one or more types could not
+                // be resolved.  Abort this pass.  Dependencies have already
+                // been set up so that this goal will be reattempted after
+                // the types are resolved.
+                throw new SchedulerException("Could not decode " + name);
+            }
         }
-
-        if (Report.should_report(Report.serialize, 1))
-            Report.report(1, "* Decoding " + name + " succeeded");
-
-        if (Report.should_report(Report.serialize, 2)) {
-          if (dt instanceof ClassType) {
-            ClassType ct = (ClassType) dt;
-            for (Iterator i = ct.methods().iterator(); i.hasNext(); ) {
-                MethodInstance mi = (MethodInstance) i.next();
-                Report.report(2, "* " + mi);
-            }
-            for (Iterator i = ct.fields().iterator(); i.hasNext(); ) {
-                FieldInstance fi = (FieldInstance) i.next();
-                Report.report(2, "* " + fi);
-            }
-            for (Iterator i = ct.constructors().iterator(); i.hasNext(); ) {
-                ConstructorInstance ci = (ConstructorInstance) i.next();
-                Report.report(2, "* " + ci);
-            }
-          }
+        catch (InternalCompilerError e) {
+            throw e;
         }
-    }
-    catch (InternalCompilerError e) {
-	System.err.println("Failed decoding " + clazz.name());
-	throw e;
-    }
-    catch (InvalidClassException e) {
-        throw new BadSerializationException(clazz.name());
-    }
-
-    if (dt instanceof ClassType) {
-        // Put the decoded type into the resolver to avoid circular resolving.
-
-        // No!  TypeEncoder will take care of this
-        // ts.systemResolver().addNamed(name, (ClassType) dt);
-    
-        if (Report.should_report(report_topics, 2))
-            Report.report(2, "Returning serialized ClassType for " +
-                          clazz.name() + ".");
+        catch (InvalidClassException e) {
+            throw new BadSerializationException(clazz.name());
+        }
         
-        return (ClassType) dt;
+        if (dt instanceof ClassType) {
+            ClassType ct = (ClassType) dt;
+            // Install the decoded type into the *new* system resolver.
+            // It will be installed into the old resolver below by putAll.
+            ts.systemResolver().addNamed(name, ct);
+            
+            if (Report.should_report(Report.serialize, 1))
+                Report.report(1, "* Decoding " + name + " succeeded");
+            
+            if (Report.should_report(Report.serialize, 2)) {
+                LazyInitializer init = null;
+
+                // Save and restore the initializer to print the members.
+                // We can't access the members of ct until after we return from
+                // the resolver because the initializer may set up goals on ct,
+                // which may get discarded because of a missing dependency.
+                if (ct instanceof ParsedClassType) {
+                    ParsedClassType pct = (ParsedClassType) ct;
+                    init = pct.initializer();
+                    pct.setInitializer(new LazyClassInitializer() {
+                        public boolean fromClassFile() { return false; }
+                        public void setClass(ParsedClassType ct) { }
+                        public void initTypeObject() { }
+                        public boolean isTypeObjectInitialized() { return true; }
+                        public void initSuperclass() { }
+                        public void initInterfaces() { }
+                        public void initMemberClasses() { }
+                        public void initConstructors() { }
+                        public void initMethods() { }
+                        public void initFields() { }
+                        public void canonicalConstructors() { }
+                        public void canonicalMethods() { }
+                        public void canonicalFields() { }
+                    });
+                }
+
+                for (Iterator i = ct.methods().iterator(); i.hasNext(); ) {
+                    MethodInstance mi = (MethodInstance) i.next();
+                    Report.report(2, "* " + mi);
+                }
+                for (Iterator i = ct.fields().iterator(); i.hasNext(); ) {
+                    FieldInstance fi = (FieldInstance) i.next();
+                    Report.report(2, "* " + fi);
+                }
+                for (Iterator i = ct.constructors().iterator(); i.hasNext(); ) {
+                    ConstructorInstance ci = (ConstructorInstance) i.next();
+                    Report.report(2, "* " + ci);
+                }
+
+                if (ct instanceof ParsedClassType) {
+                    ParsedClassType pct = (ParsedClassType) ct;
+                    pct.setInitializer(init);
+                }
+            }
+
+            if (Report.should_report(report_topics, 2))
+                Report.report(2, "Returning serialized ClassType for " +
+                              clazz.name() + ".");
+
+            okay = true;
+            return ct;
+        }
+        else {
+            throw new SemanticException("Class " + name + " not found in " + clazz.name() + ".");
+        }
     }
-    else {
-        throw new SemanticException("Class " + name + " not found in " + clazz.name() + ".");
+    finally {
+        recursive = oldRecursive;
+
+        if (okay) {
+            if (Report.should_report(Report.serialize, 1))
+                Report.report(1, "Deserialization successful.  Installing " + ts.systemResolver().justAdded() + " into restored system resolver.");
+
+            oldResolver.putAll(ts.systemResolver());
+        }
+        else {
+            if (Report.should_report(Report.serialize, 1))
+                Report.report(1, "Deserialization failed.  Restoring previous system resolver.");
+            if (Report.should_report(Report.serialize, 1))
+                Report.report(1, "Discarding " + ts.systemResolver().justAdded());
+        }
+
+        ts.restoreSystemResolver(oldResolver);
     }
   }
 

@@ -31,7 +31,7 @@ public class TypeEncoder
     protected final boolean base64 = true;
     protected final boolean test = false;
     protected Map placeHolderCache;
-    protected Set unresolved;
+    protected Map dependencies;
     protected int depth;
     
     public TypeEncoder(TypeSystem ts) {
@@ -138,14 +138,9 @@ public class TypeEncoder
             placeHolderCache.putAll(oldCache);
         }
 
-        Set oldUnresolved = unresolved;
-        unresolved = new HashSet();
-        if (oldUnresolved != null) {
-            unresolved.addAll(oldUnresolved);
-        }
-
-        if (name != null) {
-            unresolved.add(name);
+        Map oldDeps = dependencies;
+        if (oldDeps == null) {
+            dependencies = new HashMap(); 
         }
 
         if (Report.should_report(Report.serialize, 1))
@@ -157,21 +152,16 @@ public class TypeEncoder
                 // The base64 decoder automatically unzips byte streams, so
                 // we only need an explicit GZIPInputStream if we are not
                 // using base64 encoding.
-                ois = new TypeInputStream(new GZIPInputStream(new ByteArrayInputStream(b)), ts, placeHolderCache, unresolved);
+                ois = new TypeInputStream(new GZIPInputStream(new ByteArrayInputStream(b)), ts, placeHolderCache);
             }
             else {
-                ois = new TypeInputStream(new ByteArrayInputStream(b), ts, placeHolderCache, unresolved);
+                ois = new TypeInputStream(new ByteArrayInputStream(b), ts, placeHolderCache);
             }
       
             TypeObject o = (TypeObject) ois.readObject();
             
             if (ois.deserializationFailed()) {
-                // rollbackSystemResolverCache(placeHolderCache, oldCache);
                 return null;
-            }
-
-            if (oldCache == null || ! ois.usedUnresolved()) {
-                updateSystemResolverCache(placeHolderCache, oldCache);
             }
             
             return o;
@@ -193,50 +183,8 @@ public class TypeEncoder
         }
         finally {
             placeHolderCache = oldCache;
-            unresolved = oldUnresolved;
+            dependencies = oldDeps;
             depth--;
-        }
-    }
-
-    protected void updateSystemResolverCache(Map phc, Map oldPhc) {
-        for (Iterator i = phc.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
-            PlaceHolder p = (PlaceHolder) e.getKey();
-            Object o = e.getValue();
-
-            if (oldPhc != null && oldPhc.get(p) == o) {
-                continue;
-            }
-
-            if (o instanceof Named) {
-                Named n = (Named) o;
-
-                if (Report.should_report(Report.serialize, 1))
-                    Report.report(1, "TypeEncoder: adding " + n + " to system resolver (recursive=" + (oldPhc != null) + ")");
-
-                ts.systemResolver().install(n.fullName(), n);
-            }
-        }
-    }
-
-    protected void rollbackSystemResolverCache(Map phc, Map oldPhc) {
-        for (Iterator i = phc.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
-            PlaceHolder p = (PlaceHolder) e.getKey();
-            Object o = e.getValue();
-
-            if (oldPhc != null && oldPhc.get(p) == o) {
-                continue;
-            }
-
-            if (o instanceof Named) {
-                Named n = (Named) o;
-
-                if (Report.should_report(Report.serialize, 1))
-                    Report.report(1, "Removing " + n + " from system resolver");
-
-                ts.systemResolver().removeNamed(n);
-            }
         }
     }
 }

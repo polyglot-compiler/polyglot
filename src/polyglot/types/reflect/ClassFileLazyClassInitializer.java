@@ -25,6 +25,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     TypeSystem ts;
     ParsedClassType ct;
 
+    boolean init;
     boolean constructorsInitialized;
     boolean fieldsInitialized;
     boolean interfacesInitialized;
@@ -288,6 +289,14 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
         if (Report.should_report(verbose, 2))
             Report.report(2, "resolving " + name);
         return (ClassType) ts.systemResolver().find(name);
+    }
+
+    public void initTypeObject() {
+        this.init = true;
+    }
+
+    public boolean isTypeObjectInitialized() {
+        return this.init;
     }
 
     public void initSuperclass() {

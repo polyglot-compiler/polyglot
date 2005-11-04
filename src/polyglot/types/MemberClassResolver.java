@@ -49,6 +49,7 @@ public class MemberClassResolver implements TopLevelResolver
     }
 
     Named n = ts.systemResolver().check(name);
+
     if (n != null) {
         return n;
     }
@@ -70,6 +71,8 @@ public class MemberClassResolver implements TopLevelResolver
         error = e;
     }
 
+    boolean install = true;
+
     // Now try the prefix of the name and look for a member class
     // within it named with the suffix.
     String prefix = StringUtil.getPackageComponent(name);
@@ -81,23 +84,27 @@ public class MemberClassResolver implements TopLevelResolver
     try {
         if (Report.should_report(report_topics, 2))
             Report.report(2, "MCR: loading prefix " + prefix);
+
         n = find(prefix);
-        return findMember(n, suffix);
+
+        // This may be called during deserialization; n's
+        // member classes might not be initialized yet.
+        if (n instanceof ParsedTypeObject) {
+            if (true || ((ParsedTypeObject) n).initializer() != null &&
+                ((ParsedTypeObject) n).initializer().isTypeObjectInitialized()) {
+                return findMember(n, suffix);
+            }
+            else {
+                install = false;
+            }
+        }
     }
     catch (SemanticException e) {
     }
 
-    /*
-    if (allowRawClasses) {
-        try {
-            return find(prefix + "$" + suffix);
-        }
-        catch (SemanticException e) {
-        }
+    if (install) {
+        nocache.add(name);
     }
-    */
-
-    nocache.add(name);
 
     throw error;
   }

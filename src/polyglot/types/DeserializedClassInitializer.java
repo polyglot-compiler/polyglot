@@ -4,6 +4,7 @@ import polyglot.frontend.*;
 import polyglot.frontend.goals.*;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
+import java.util.Iterator;
 
 /**
  * A LazyClassInitializer is responsible for initializing members of a class
@@ -13,6 +14,7 @@ import polyglot.util.InternalCompilerError;
 public class DeserializedClassInitializer implements LazyClassInitializer {
     protected TypeSystem ts;
     protected ParsedClassType ct;
+    protected boolean init;
     
     public DeserializedClassInitializer(TypeSystem ts) {
         this.ts = ts;
@@ -24,6 +26,22 @@ public class DeserializedClassInitializer implements LazyClassInitializer {
 
     public boolean fromClassFile() {
         return false;
+    }
+
+    public void initTypeObject() {
+        if (ct.isMember() && ct.outer() instanceof ParsedClassType) {
+            ParsedClassType outer = (ParsedClassType) ct.outer();
+            outer.addMemberClass(ct);
+        }
+        for (Iterator i = ct.memberClasses().iterator(); i.hasNext(); ) {
+            ParsedClassType ct = (ParsedClassType) i.next();
+            ct.initializer().initTypeObject();
+        }
+        this.init = true;
+    }
+
+    public boolean isTypeObjectInitialized() {
+        return this.init;
     }
 
     public void initSuperclass() {

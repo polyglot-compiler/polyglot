@@ -101,6 +101,19 @@ public class TypeSystem_c implements TypeSystem
     public SystemResolver systemResolver() {
       return systemResolver;
     }
+    
+    public SystemResolver saveSystemResolver() {
+        SystemResolver r = this.systemResolver;
+        this.systemResolver = (SystemResolver) r.copy();
+        return r;
+    }
+    
+    public void restoreSystemResolver(SystemResolver r) {
+        if (r != this.systemResolver.previous()) {
+            throw new InternalCompilerError("Inconsistent systemResolver.previous");
+        }
+        this.systemResolver = r;
+    }
 
     /**
      * Return the system resolver.  This used to return a different resolver.
@@ -862,7 +875,7 @@ public class TypeSystem_c implements TypeSystem
         }
     
         Collection maximal =
-            findMostSpecificProcedures(acceptable, container, argTypes, currClass);
+            findMostSpecificProcedures(acceptable);
     
 	if (maximal.size() > 1) {
 	    StringBuffer sb = new StringBuffer();
@@ -916,7 +929,7 @@ public class TypeSystem_c implements TypeSystem
                                         container + "(" + listToString(argTypes) + ").");
 	}
 
-	Collection maximal = findMostSpecificProcedures(acceptable, container, argTypes, currClass);
+	Collection maximal = findMostSpecificProcedures(acceptable);
 
 	if (maximal.size() > 1) {
 	    throw new NoMemberException(NoMemberException.CONSTRUCTOR,
@@ -933,7 +946,7 @@ public class TypeSystem_c implements TypeSystem
 					      List argTypes,
 					      ClassType currClass)
     throws SemanticException {
-        Collection maximal = findMostSpecificProcedures(acceptable, container, argTypes, currClass);
+        Collection maximal = findMostSpecificProcedures(acceptable);
         
        
         if (maximal.size() == 1) {
@@ -942,18 +955,13 @@ public class TypeSystem_c implements TypeSystem
         return null;
     }
     
-    protected Collection findMostSpecificProcedures(List acceptable,
-                                                    ReferenceType container,
-                                                    List argTypes,
-                                                    ClassType currClass)
+    protected Collection findMostSpecificProcedures(List acceptable)
 	throws SemanticException {
-
-        assert_(container);
-        assert_(argTypes);
 
 	// now, use JLS 15.11.2.2
 	// First sort from most- to least-specific.
 	MostSpecificComparator msc = new MostSpecificComparator();
+	acceptable = new ArrayList(acceptable); // make into array list to sort
 	Collections.sort(acceptable, msc);
 
 	List maximal = new ArrayList(acceptable.size());
@@ -991,7 +999,12 @@ public class TypeSystem_c implements TypeSystem
 	        first = (ProcedureInstance) j.next();
 	        while (j.hasNext()) {
 	            ProcedureInstance p = (ProcedureInstance) j.next();
-	            if (! first.hasFormals(p.formalTypes())) {
+	            
+                    // Use the declarations to compare formals.
+	            ProcedureInstance firstDecl = (ProcedureInstance) first.declaration();
+	            ProcedureInstance pDecl = (ProcedureInstance) p.declaration();
+	            
+	            if (! firstDecl.hasFormals(pDecl.formalTypes())) {
 	                // not all signatures match; must be ambiguous
 	                return maximal;
 	            }
@@ -1012,7 +1025,7 @@ public class TypeSystem_c implements TypeSystem
 	public int compare(Object o1, Object o2) {
 	    ProcedureInstance p1 = (ProcedureInstance) o1;
 	    ProcedureInstance p2 = (ProcedureInstance) o2;
-
+            
 	    if (p1.moreSpecific(p2)) return -1;
 	    if (p2.moreSpecific(p1)) return 1;
 	    return 0;
@@ -1488,20 +1501,11 @@ public class TypeSystem_c implements TypeSystem
             if (ct.isLocal() || ct.isAnonymous()) {
                 throw new InternalCompilerError("Cannot serialize " + o + ".");
             }
-            
-            if (ct.isMember()) {
-                for (ClassType t = ct; t != null; t = t.outer()) {
-                    if (roots.contains(t)) {
-                        // An enclosing class is in the root set.
-                        // Do not use a place holder.
-                        // This class will be serialized with it's
-                        // root.
-                        return ct;
-                    }
-                }
-            }
-            
-            return new PlaceHolder_c(ct);
+
+            // Use the transformed name so that member classes will
+            // be sought in the correct class file.
+            String name = getTransformedClassName(ct);
+            return new PlaceHolder_c(name);
         }
 
 	return o;

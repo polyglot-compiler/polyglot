@@ -9,10 +9,10 @@ import java.util.*;
 /**
  * A <code>CachingResolver</code> memoizes another Resolver
  */
-public class CachingResolver implements Resolver {
-    Resolver inner;
-    Map cache;
-    boolean cacheNotFound;
+public class CachingResolver implements Resolver, Copy {
+    protected Resolver inner;
+    private Map cache;
+    private boolean cacheNotFound;
 
     /**
      * Create a caching resolver.
@@ -28,6 +28,22 @@ public class CachingResolver implements Resolver {
         this(inner, true);
     }
 
+    protected boolean shouldReport(int level) {
+        return (Report.should_report("sysresolver", level) && this instanceof SystemResolver) ||
+               Report.should_report(TOPICS, level);
+    }
+
+    public Object copy() {
+        try {
+            CachingResolver r = (CachingResolver) super.clone();
+            r.cache = new HashMap(this.cache);
+            return r;
+        }
+        catch (CloneNotSupportedException e) {
+            throw new InternalCompilerError("clone failed");
+        }
+    }
+    
     /**
      * The resolver whose results this resolver caches.
      */
@@ -39,12 +55,16 @@ public class CachingResolver implements Resolver {
         return "(cache " + inner.toString() + ")";
     }
 
+    protected Collection cachedObjects() {
+        return cache.values();
+    }
+    
     /**
      * Find a type object by name.
      * @param name The name to search for.
      */
     public Named find(String name) throws SemanticException {
-        if (Report.should_report(TOPICS, 2))
+        if (shouldReport(2))
             Report.report(2, "CachingResolver: find: " + name);
 
         Object o = cache.get(name);
@@ -53,15 +73,15 @@ public class CachingResolver implements Resolver {
 
         Named q = (Named) o;
 
-	    if (q == null) {
-			if (Report.should_report(TOPICS, 3))
+        if (q == null) {
+            if (shouldReport(3))
                 Report.report(3, "CachingResolver: not cached: " + name);
 
             try {
                 q = inner.find(name);
             }
             catch (NoClassException e) {
-                if (Report.should_report(TOPICS, 3)) {
+                if (shouldReport(3)) {
                     Report.report(3, "CachingResolver: " + e.getMessage());
                     Report.report(3, "CachingResolver: installing " + name + "-> (not found) in resolver cache");
                 }
@@ -73,11 +93,11 @@ public class CachingResolver implements Resolver {
 
             addNamed(name, q);
 
-            if (Report.should_report(TOPICS, 3))
+            if (shouldReport(3))
                 Report.report(3, "CachingResolver: loaded: " + name);
 	}
         else {
-            if (Report.should_report(TOPICS, 3))
+            if (shouldReport(3))
                 Report.report(3, "CachingResolver: cached: " + name);
         }
 
@@ -90,7 +110,8 @@ public class CachingResolver implements Resolver {
      */
     public Named check(String name) {
         Object o = cache.get(name);
-        if (o instanceof Throwable) return null;
+        if (o instanceof Throwable)
+            return null;
         return (Named) o;
     }
 
@@ -100,10 +121,11 @@ public class CachingResolver implements Resolver {
      * @param q The qualifier to insert.
      */
     public void install(String name, Named q) {
-        if (Report.should_report(TOPICS, 3))
+        if (shouldReport(3))
             Report.report(3, "CachingResolver: installing " + name + "->" + q + " in resolver cache");
-        if (Report.should_report(TOPICS, 5))
+        if (shouldReport(5))
             new Exception().printStackTrace();
+
         cache.put(name, q);
     }
 
@@ -126,6 +148,5 @@ public class CachingResolver implements Resolver {
 
     private static final Collection TOPICS =
                     CollectionUtil.list(Report.types,
-                                        Report.resolver,
-                                        "sysresolver");
+                                        Report.resolver);
 }
