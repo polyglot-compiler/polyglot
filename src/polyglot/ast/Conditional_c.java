@@ -162,7 +162,7 @@ public class Conditional_c extends Expr_c implements Conditional
             }
         }
 
-        throw new SemanticException("Could not determine type of ternary conditional expression.",
+        throw new SemanticException("Could not determine type of ternary conditional expression; cannot assign " + t1 + " to " + t2 + " or vice versa.",
                                     position());
    }
 
