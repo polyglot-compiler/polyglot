@@ -74,14 +74,14 @@ public abstract class ProcedureInstance_c extends TypeObject_c
      * @param formalTypes The formalTypes to set.
      */
     public void setFormalTypes(List formalTypes) {
-        this.formalTypes = formalTypes;
+        this.formalTypes = TypedList.copyAndCheck(formalTypes, Type.class, true);
     }
     
     /**
      * @param throwTypes The throwTypes to set.
      */
     public void setThrowTypes(List throwTypes) {
-        this.throwTypes = throwTypes;
+        this.throwTypes = TypedList.copyAndCheck(throwTypes, Type.class, true);
     }
      
     public int hashCode() {
