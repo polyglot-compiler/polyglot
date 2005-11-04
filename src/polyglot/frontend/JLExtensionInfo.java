@@ -45,7 +45,9 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
 	try {
             LoadedClassResolver lr;
             lr = new SourceClassResolver(compiler, this, getOptions().constructFullClasspath(),
-                                         compiler.loader(), true, getOptions().compile_command_line_only);
+                                         compiler.loader(), true,
+                                         getOptions().compile_command_line_only,
+                                         getOptions().ignore_mod_times);
 
             TopLevelResolver r = lr;
 

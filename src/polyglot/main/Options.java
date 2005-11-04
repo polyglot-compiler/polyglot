@@ -205,6 +205,11 @@ public class Options {
             i++;
             compile_command_line_only = true;
         }
+        else if (args[i].equals("-preferclassfiles")) 
+        {
+            i++;
+            ignore_mod_times = true;
+        }
         else if (args[i].equals("-assert")) 
         {
             i++;
@@ -348,6 +353,7 @@ public class Options {
         usageForFlag(out, "-ext <extension>", "use language extension");
         usageForFlag(out, "-extclass <ext-class>", "use language extension");
         usageForFlag(out, "-commandlineonly", "only compile files named on the command-line (may also require -c)");
+        usageForFlag(out, "-preferclassfiles", "prefer class files to source files even if the source is newer");
         usageForFlag(out, "-fqcn", "use fully-qualified class names");
         usageForFlag(out, "-sx <ext>", "set source extension");
         usageForFlag(out, "-ox <ext>", "set output extension");
@@ -398,6 +404,9 @@ public class Options {
      * Used by <code>usageSubsection</code>.
      */
     protected int USAGE_SUBSECTION_INDENT = 8;
+
+    /** Ignore source and class file modification times when compiling; always prefer the class file. */
+    public boolean ignore_mod_times;
 
     /**
      * Output a flag and a description of its usage in a nice format. This 

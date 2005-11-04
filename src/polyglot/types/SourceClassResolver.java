@@ -79,6 +79,7 @@ public class SourceClassResolver extends LoadedClassResolver
   Compiler compiler;
   ExtensionInfo ext;
   boolean compileCommandLineOnly;
+  boolean ignoreModTimes;
   
   /**
    * Create a loaded class resolver.
@@ -90,16 +91,18 @@ public class SourceClassResolver extends LoadedClassResolver
    *                        Polyglot-embedded type information should be
    *                        allowed.
  * @param compileCommandLineOnly TODO
+ * @param ignoreModTimes TODO
    */
   public SourceClassResolver(Compiler compiler, ExtensionInfo ext,
                              String classpath, ClassFileLoader loader,
                              boolean allowRawClasses,
-                             boolean compileCommandLineOnly)
+                             boolean compileCommandLineOnly, boolean ignoreModTimes)
   {
     super(ext.typeSystem(), classpath, loader, ext.version(), allowRawClasses);
     this.compiler = compiler;
     this.ext = ext;
     this.compileCommandLineOnly = compileCommandLineOnly;
+    this.ignoreModTimes = ignoreModTimes;
   }
 
   public boolean packageExists(String name) {
@@ -167,7 +170,7 @@ public class SourceClassResolver extends LoadedClassResolver
 
       int comp = checkCompilerVersion(encodedClazz.compilerVersion(version.name()));
 
-      if (classModTime < sourceModTime) {
+      if (! ignoreModTimes && classModTime < sourceModTime) {
         if (Report.should_report(report_topics, 3))
 	    Report.report(3, "Source file version is newer than compiled for " +
                       name + ".");
