@@ -187,7 +187,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
 	BadOverride.jl (Semantic, "cannot override.*attempting to assign weaker access privileges");
 	BadPrim.jl (Semantic, "Method.*cannot be called with arguments"); 
 	BadProt.jl (Semantic, "Interface methods must be public");
-	BadReferences.jl (Semantic, "Member type.*ambiguous");
+	BadReferences.jl (Semantic, "Member.*ambiguous");
 	BadReferences2.jl (Semantic, "Field.*ambiguous");
 	BadStaticContext.jl (Semantic); 
         BadSwitch1.jl (Semantic, "Case label must be an integral constant");
