@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class ClassContextResolver extends AbstractAccessControlResolver {
     protected ClassType type;
-
+    
     /**
      * Construct a resolver.
      * @param ts The type system.
@@ -32,11 +32,6 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
      * @param name The name to search for.
      */
     public Named find(String name, ClassType accessor) throws SemanticException {
-        if (! StringUtil.isNameShort(name)) {
-            throw new InternalCompilerError(
-                "Cannot lookup qualified name " + name);
-        }
-        
         if (Report.should_report(TOPICS, 2))
 	    Report.report(2, "Looking for " + name + " in " + this);
 
@@ -69,7 +64,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
         // Go to disk, but only if there is no job for the type.
         // If there is a job, all members should be in the resolver
         // already.
-        boolean useLoadedResolver = true;;
+        boolean useLoadedResolver = true;
 
         if (type instanceof ParsedTypeObject) {
             ParsedTypeObject pto = (ParsedTypeObject) type;
