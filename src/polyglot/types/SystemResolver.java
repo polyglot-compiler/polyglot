@@ -132,7 +132,9 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
     }
 
     public void clearAdded() {
-        justAdded.clear();
+        justAdded = new HashMap();
+        // This is SLOW:
+        // justAdded.clear();
     }
 
     public void putAll(SystemResolver r) throws SemanticException {
