@@ -4,8 +4,6 @@ import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.*;
-import polyglot.util.CodeWriter;
-import polyglot.util.OptimalCodeWriter;
 
 import java.io.*;
 import java.util.*;
@@ -30,9 +28,9 @@ public class TargetFactory
 	return outputWriter(outputFile(packageName, className, source));
     }
 
-    public CodeWriter outputCodeWriter(File f) throws IOException {
+    public CodeWriter outputCodeWriter(File f, int width) throws IOException {
 	Writer w = outputWriter(f);
-	return new OptimalCodeWriter(w, 80);
+	return new OptimalCodeWriter(w, width);
     }
 
     /** Open a writer to the output file. */

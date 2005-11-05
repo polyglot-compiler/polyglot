@@ -217,7 +217,7 @@ public class Translator extends PrettyPrinter implements Copy
 
             String opfPath = of.getPath();
             if (!opfPath.endsWith("$")) outputFiles.add(of.getPath());
-            w = tf.outputCodeWriter(of);
+            w = tf.outputCodeWriter(of, outputWidth);
 
             writeHeader(sfn, w);
 
@@ -232,7 +232,7 @@ public class Translator extends PrettyPrinter implements Copy
 
                     of = tf.outputFile(pkg, decl.name(), sfn.source());
                     outputFiles.add(of.getPath());
-                    w = tf.outputCodeWriter(of);
+                    w = tf.outputCodeWriter(of, outputWidth);
 
                     writeHeader(sfn, w);
                 }
