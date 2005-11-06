@@ -14,7 +14,7 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
     Map packageCache;
     ExtensionInfo extInfo;
     SystemResolver previous;
-    Map justAdded;
+    Collection justAdded;
 
     /**
      * Create a caching resolver.
@@ -25,7 +25,7 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
         this.extInfo = extInfo;
         this.packageCache = new HashMap();
         this.previous = null;
-        this.justAdded = new HashMap();
+        this.justAdded = new LinkedList();
     }
 
     public SystemResolver previous() {
@@ -36,7 +36,7 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
         SystemResolver r = (SystemResolver) super.copy();
         r.packageCache = new HashMap(this.packageCache);
         r.previous = this;
-        r.justAdded = new HashMap();
+        r.justAdded = new LinkedList();
         return r;
     }
     
@@ -128,20 +128,23 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
     }
 
     public Collection justAdded() {
-        return justAdded.values();
+        return new TransformingList(justAdded, new Transformation() {
+            public Object transform(Object o) {
+                Object[] p = (Object[]) o;
+                return p[1];
+            }
+        });
     }
 
     public void clearAdded() {
-        justAdded = new HashMap();
-        // This is SLOW:
-        // justAdded.clear();
+        justAdded = new LinkedList();
     }
 
     public void putAll(SystemResolver r) throws SemanticException {
-        for (Iterator i = r.justAdded.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
-            String name = (String) e.getKey();
-            Named n = (Named) e.getValue();
+        for (Iterator i = r.justAdded.iterator(); i.hasNext(); ) {
+            Object[] e = (Object[]) i.next();
+            String name = (String) e[0];
+            Named n = (Named) e[1];
 
             install(name, n);
 
@@ -150,9 +153,6 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
                 cachePackage(p);
             }
         }
-
-        // cache.putAll(r.justAdded);
-        // justAdded.addAll(r.justAdded);
     }
 
     public Named find(String name) throws SemanticException {
@@ -163,10 +163,11 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
         Named n = super.find(name);
 
         if (previous == null) {
-          if (Report.should_report(TOPICS, 2))
-              Report.report(2, "Returning from root-level SR.find(" + name + "); added = " + justAdded);
+            if (Report.should_report(TOPICS, 2))
+                Report.report(2, "Returning from root-level SR.find(" + name + "); added = " + justAdded);
 
-            for (Iterator i = justAdded.values().iterator(); i.hasNext(); ) {
+          /*
+            for (Iterator i = justAdded.iterator(); i.hasNext(); ) {
                 Named n2 = (Named) i.next();
                 if (n2 instanceof ParsedTypeObject) {
                     if (! ((ParsedTypeObject) n2).initializer().isTypeObjectInitialized()) {
@@ -174,6 +175,7 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
                     }
                 }
             }
+            */
 
             clearAdded();
         }
@@ -200,8 +202,9 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
                 }
             }
         }
-
-        justAdded.put(name, q);
+        else {
+            justAdded.add(new Object[] { name, q });
+        }
     }
 
     /**
