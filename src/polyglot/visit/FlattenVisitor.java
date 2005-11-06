@@ -20,7 +20,48 @@ public class FlattenVisitor extends NodeVisitor
 	stack = new LinkedList();
     }
 
-    public Node override(Node n) {
+    public Node override(Node parent, Node n) {
+        // Insert Blocks when needed to allow local decls to be inserted.
+        if (n instanceof If) {
+            If s = (If) n;
+            Stmt s1 = s.consequent();
+            Stmt s2 = s.alternative();
+            if (! (s1 instanceof Block)) {
+                s = s.consequent(nf.Block(s1.position(), s1));
+            }
+            if (s2 != null && ! (s2 instanceof Block)) {
+                s = s.alternative(nf.Block(s2.position(), s2));
+            }
+            return visitEdgeNoOverride(parent, s);
+        }
+
+        if (n instanceof Do) {
+            Do s = (Do) n;
+            Stmt s1 = s.body();
+            if (! (s1 instanceof Block)) {
+                s = s.body(nf.Block(s1.position(), s1));
+            }
+            return visitEdgeNoOverride(parent, s);
+        }
+
+        if (n instanceof While) {
+            While s = (While) n;
+            Stmt s1 = s.body();
+            if (! (s1 instanceof Block)) {
+                s = s.body(nf.Block(s1.position(), s1));
+            }
+            return visitEdgeNoOverride(parent, s);
+        }
+
+        if (n instanceof For) {
+            For s = (For) n;
+            Stmt s1 = s.body();
+            if (! (s1 instanceof Block)) {
+                s = s.body(nf.Block(s1.position(), s1));
+            }
+            return visitEdgeNoOverride(parent, s);
+        }
+
 	if (n instanceof FieldDecl || n instanceof ConstructorCall) {
             if (! stack.isEmpty()) {
                 List l = (List) stack.getFirst();
@@ -28,6 +69,20 @@ public class FlattenVisitor extends NodeVisitor
             }
 	    return n;
 	}
+
+        // punt on switch statement
+        if (n instanceof Switch) {
+            return n;
+        }
+                
+
+        if (neverFlatten.contains(n)) {
+            return n;
+        }
+
+        if (n instanceof ArrayInit) {
+            return n;
+        }
 
 	return null;
     }
@@ -38,13 +93,14 @@ public class FlattenVisitor extends NodeVisitor
 	return "flat$$$" + count++;
     }
 
-    protected Node noFlatten = null;
+    protected Set noFlatten = new HashSet();
+    protected Set neverFlatten = new HashSet();
 
     /** 
      * When entering a BlockStatement, place a new StatementList
      * onto the stack
      */
-    public NodeVisitor enter(Node n) {
+    public NodeVisitor enter(Node parent, Node n) {
 	if (n instanceof Block) {
 	    stack.addFirst(new LinkedList());
 	}
@@ -53,14 +109,37 @@ public class FlattenVisitor extends NodeVisitor
 	    // Don't flatten the expression contained in the statement, but
 	    // flatten its subexpressions.
 	    Eval s = (Eval) n;
-	    noFlatten = s.expr();
+	    noFlatten.add(s.expr());
 	}
 
 	if (n instanceof LocalDecl) {
 	    // Don't flatten the expression contained in the statement, but
 	    // flatten its subexpressions.
 	    LocalDecl s = (LocalDecl) n;
-	    noFlatten = s.init();
+	    noFlatten.add(s.init());
+	}
+
+        if (n instanceof For) {
+	    For s = (For) n;
+            noFlatten.addAll(s.inits());
+            neverFlatten.addAll(s.iters());
+            neverFlatten.add(s.cond());
+        }
+
+        if (n instanceof While) {
+	    While s = (While) n;
+            neverFlatten.add(s.cond());
+        }
+
+        if (n instanceof Do) {
+	    Do s = (Do) n;
+            neverFlatten.add(s.cond());
+        }
+
+	if (n instanceof Assign) {
+	    Assign s = (Assign) n;
+	    noFlatten.add(s.left());
+	    noFlatten.add(s.right());
 	}
 
 	return this;
@@ -70,8 +149,8 @@ public class FlattenVisitor extends NodeVisitor
      * Flatten complex expressions within the AST
      */
     public Node leave(Node old, Node n, NodeVisitor v) {
-	if (old == noFlatten) {
-	    noFlatten = null;
+        if (noFlatten.contains(old)) {
+	    noFlatten.remove(old);
 	    return n;
 	}
 
