@@ -22,6 +22,10 @@ public class FlattenVisitor extends NodeVisitor
 
     public Node override(Node n) {
 	if (n instanceof FieldDecl || n instanceof ConstructorCall) {
+            if (! stack.isEmpty()) {
+                List l = (List) stack.getFirst();
+                l.add(n);
+            }
 	    return n;
 	}
 
@@ -52,6 +56,13 @@ public class FlattenVisitor extends NodeVisitor
 	    noFlatten = s.expr();
 	}
 
+	if (n instanceof LocalDecl) {
+	    // Don't flatten the expression contained in the statement, but
+	    // flatten its subexpressions.
+	    LocalDecl s = (LocalDecl) n;
+	    noFlatten = s.init();
+	}
+
 	return this;
     }
 
@@ -59,7 +70,7 @@ public class FlattenVisitor extends NodeVisitor
      * Flatten complex expressions within the AST
      */
     public Node leave(Node old, Node n, NodeVisitor v) {
-	if (n == noFlatten) {
+	if (old == noFlatten) {
 	    noFlatten = null;
 	    return n;
 	}
@@ -68,7 +79,7 @@ public class FlattenVisitor extends NodeVisitor
 	    List l = (List) stack.removeFirst();
 	    return ((Block) n).statements(l);
 	}
-	else if (n instanceof Stmt && ! (n instanceof LocalDecl)) {
+	else if (n instanceof Stmt) {
 	    List l = (List) stack.getFirst();
 	    l.add(n);
 	    return n;
@@ -81,6 +92,12 @@ public class FlattenVisitor extends NodeVisitor
 	    if (e instanceof Assign) {
 	        return n;
 	    }
+
+            /*
+            if (e.isTypeChecked() && e.type().isVoid()) {
+                return n;
+            }
+            */
 
 	    // create a local temp, initialized to the value of the complex
 	    // expression
