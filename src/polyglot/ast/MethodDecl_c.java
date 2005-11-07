@@ -409,9 +409,11 @@ public class MethodDecl_c extends Term_c implements MethodDecl
         Context c = tr.context();
 	Flags flags = flags();
 
+	if (!tr.job().extensionInfo().getOptions().output_ambiguous_nodes) {
 	if (c.currentClass().flags().isInterface()) {
 	    flags = flags.clearPublic();
 	    flags = flags.clearAbstract();
+	}
 	}
 
         prettyPrintHeader(flags, w, tr);

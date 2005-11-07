@@ -67,6 +67,10 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
   }
 
   public void translate(CodeWriter w, Translator tr) {
+	  if (tr.job().extensionInfo().getOptions().output_ambiguous_nodes) {
+		  super.translate(w, tr);
+		  return;
+	  }
     throw new InternalCompilerError(position(),
                                     "Cannot translate ambiguous node "
                                     + this + ".");

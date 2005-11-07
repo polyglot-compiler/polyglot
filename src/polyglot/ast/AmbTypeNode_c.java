@@ -101,6 +101,10 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
   }
 
   public void translate(CodeWriter w, Translator tr) {
+	  if (tr.job().extensionInfo().getOptions().output_ambiguous_nodes) {
+		  super.translate(w, tr);
+		  return;
+	  }
     throw new InternalCompilerError(position(),
                                     "Cannot translate ambiguous node "
                                     + this + ".");

@@ -107,6 +107,10 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
     }
 
     public void translate(CodeWriter w, Translator tr) {
+  	  if (tr.job().extensionInfo().getOptions().output_ambiguous_nodes) {
+		  super.translate(w, tr);
+		  return;
+	  }
       throw new InternalCompilerError(position(),
                                       "Cannot translate ambiguous node "
                                       + this + ".");

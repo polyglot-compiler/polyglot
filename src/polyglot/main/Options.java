@@ -62,7 +62,9 @@ public class Options {
     /** keep output files */
     public boolean keep_output_files = true;
   
-
+    /** Directly output code from possibly ambiguous ast nodes */
+    public boolean output_ambiguous_nodes = false;
+    
     /**
      * Constructor
      */
@@ -326,6 +328,10 @@ public class Options {
             Report.addTopic(topic, level);
             i++;
         }        
+        else if (args[i].equals("-outputamb")) {
+            output_ambiguous_nodes = true;
+            i++;
+        }
         else if (!args[i].startsWith("-")) {
             source.add(args[i]);
             File f = new File(args[i]).getParentFile();

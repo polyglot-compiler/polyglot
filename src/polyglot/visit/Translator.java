@@ -136,19 +136,26 @@ public class Translator extends PrettyPrinter implements Copy
     public void print(Node parent, Node child, CodeWriter w) {
         Translator tr;
 
-        if (parent != null) {
-            Context c = parent.del().enterChildScope(child, context);
-            tr = this.context(c);
+        if (job().extensionInfo().getOptions().output_ambiguous_nodes) {
+            tr = this;
         }
         else {
-            Context c = child.del().enterScope(context);
-            tr = this.context(c);
+	        if (parent != null) {
+	            Context c = parent.del().enterChildScope(child, context);
+	            tr = this.context(c);
+	        }
+	        else {
+	            Context c = child.del().enterScope(context);
+	            tr = this.context(c);
+	        }
         }
 
         child.del().translate(w, tr);
 
+        if (!job().extensionInfo().getOptions().output_ambiguous_nodes) {
         if (parent != null) {
             parent.addDecls(context);
+        }
         }
     }
 
