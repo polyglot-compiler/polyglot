@@ -333,20 +333,22 @@ public class Call_c extends Expr_c implements Call
     }
 
     w.write(name + "(");
-    w.allowBreak(2, 2, "", 0); // miser mode
-    w.begin(0);
-		
-    for(Iterator i = arguments.iterator(); i.hasNext();) {
-      Expr e = (Expr) i.next();
-      print(e, w, tr);
+    if (arguments.size() > 0) {
+	w.allowBreak(2, 2, "", 0); // miser mode
+	w.begin(0);
+		    
+	for(Iterator i = arguments.iterator(); i.hasNext();) {
+	    Expr e = (Expr) i.next();
+	    print(e, w, tr);
 
-      if (i.hasNext()) {
-        w.write(",");
-        w.allowBreak(0, " ");
-      }
+	    if (i.hasNext()) {
+		w.write(",");
+		w.allowBreak(0, " ");
+	    }
+	}
+
+	w.end();
     }
-
-    w.end();
     w.write(")");
   }
 

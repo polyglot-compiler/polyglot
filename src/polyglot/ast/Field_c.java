@@ -164,6 +164,7 @@ public class Field_c extends Expr_c implements Field
 
   /** Write the field to an output file. */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+    w.begin(0);
     if (!targetImplicit) {
         // explicit target.
         if (target instanceof Expr) {
@@ -174,8 +175,10 @@ public class Field_c extends Expr_c implements Field
         }
     
         w.write(".");
+	w.allowBreak(2, 3, "", 0);
     }
     w.write(name);
+    w.end();
   }
 
   public void dump(CodeWriter w) {

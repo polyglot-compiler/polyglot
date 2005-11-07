@@ -359,8 +359,10 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 	w.begin(0);
 	w.write(flags.translate());
 	print(returnType, w, tr);
-	w.write(" " + name + "(");
+	w.allowBreak(2, 2, " ", 1);
+	w.write(name + "(");
 
+	w.allowBreak(4, 2, "", 0);
 	w.begin(0);
 
 	for (Iterator i = formals.iterator(); i.hasNext(); ) {

@@ -44,7 +44,7 @@ public class Options {
     public String post_compiler;
       // compiler to run on java output file
   
-    public int output_width = 120;
+    public int output_width = 80;
     public boolean fully_qualified_names = false;
   
     /** Inject type information in serialized form into output file? */
