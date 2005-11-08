@@ -24,6 +24,9 @@ public class Binary_c extends Expr_c implements Binary
 	this.op = op;
 	this.right = right;
 	this.precedence = op.precedence();
+        if (op == ADD && (left instanceof StringLit || right instanceof StringLit)) {
+            this.precedence = Precedence.STRING_ADD;
+        }
     }
 
     /** Get the left operand of the expression. */
@@ -298,6 +301,7 @@ public class Binary_c extends Expr_c implements Binary
                                 "of type " + l + " to a String.", 
                                 left.position());
                 }
+
                 return precedence(Precedence.STRING_ADD).type(ts.String());
             }
 	}
