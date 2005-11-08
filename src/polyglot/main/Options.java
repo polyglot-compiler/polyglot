@@ -374,6 +374,7 @@ public class Options {
         usageForFlag(out, "-noserial", "disable class serialization");
         usageForFlag(out, "-nooutput", "delete output files after compilation");
         usageForFlag(out, "-c", "compile only to .java");
+        usageForFlag(out, "-outputamb", "allow generating code from ambiguous nodes");
         usageForFlag(out, "-post <compiler>", 
                           "run javac-like compiler after translation");
         usageForFlag(out, "-v -verbose", "print verbose debugging information");
