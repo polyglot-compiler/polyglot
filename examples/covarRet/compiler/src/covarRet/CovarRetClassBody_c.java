@@ -39,7 +39,7 @@ public class CovarRetClassBody_c extends ClassBody_c
                     MethodInstance mj = (MethodInstance) j.next();
 
                     if (! mi.name().equals(mj.name()) ||
-                        ! ts.hasSameArguments(mi, mj) ||
+                        ! mi.hasFormals(mj.formalTypes()) /*(qixin) ts.hasSameArguments(mi, mj) */ ||
                         ! ts.isAccessible(mj, tc.context())) {
 
                         continue;

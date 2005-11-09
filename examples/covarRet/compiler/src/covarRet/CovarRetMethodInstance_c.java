@@ -21,18 +21,24 @@ public class CovarRetMethodInstance_c extends MethodInstance_c
         super(ts, pos, container, flags, returnType, name, argTypes, excTypes);
     }
 
-    public boolean canOverrideImpl(MethodInstance mj) {
+    public boolean canOverrideImpl(MethodInstance mj, boolean quiet) throws SemanticException {
         MethodInstance mi = this;
 
         // This is the only rule that has changed.
         if (! ts.isSubtype(mi.returnType(), mj.returnType())) {
-            return false;
+        	if (quiet) return false;
+            throw new SemanticException(mi.signature() + " in " + mi.container() +
+                    " cannot override " + 
+                    mj.signature() + " in " + mj.container() + 
+                    "; incompatible " +
+                    "return types",
+                    mi.position());
         } 
 
         // Force the return types to be the same and then let the super
         // class perform the remainder of the tests.
         MethodInstance tmpMj = (MethodInstance) mj.copy();
         tmpMj.setReturnType(mi.returnType());
-        return super.canOverrideImpl(tmpMj);
+        return super.canOverrideImpl(tmpMj, quiet);
     }
 }
