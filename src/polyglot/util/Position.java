@@ -1,6 +1,7 @@
 package polyglot.util;
 
 import java.io.Serializable;
+import polyglot.main.Options;
 
 /**
  * This class represents a posiiton within a file.
@@ -29,6 +30,7 @@ public class Position implements Serializable
      * depth.  Depth 1 is the caller.  Depth 2 is the caller's caller, etc.
      */ 
     public static Position compilerGenerated(int depth) {
+    	if (Options.global.output_ambiguous_nodes) return COMPILER_GENERATED;
         StackTraceElement[] stack = new Exception().getStackTrace();
         if (depth < stack.length) {
             return new Position(null, stack[depth].getFileName() + " (compiler generated)", stack[depth].getLineNumber());
