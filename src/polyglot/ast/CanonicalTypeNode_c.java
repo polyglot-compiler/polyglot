@@ -26,9 +26,7 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
     if (type == null) {
 	w.write("<unknown-type>");
     } else {
-	w.write("[");
 	type.print(w);
-	w.write("]");
     }
   }
 
