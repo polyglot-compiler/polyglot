@@ -321,6 +321,7 @@ public class Call_c extends Expr_c implements Call
 
   /** Write the expression to an output file. */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+    w.begin(0);
     if (!targetImplicit) {
         if (target instanceof Expr) {
           printSubExpr((Expr) target, w, tr);
@@ -350,6 +351,7 @@ public class Call_c extends Expr_c implements Call
 	w.end();
     }
     w.write(")");
+    w.end();
   }
 
   /** Dumps the AST. */

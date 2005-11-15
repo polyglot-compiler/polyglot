@@ -185,8 +185,10 @@ public class Initializer_c extends Term_c implements Initializer
 
     /** Write the initializer to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+	w.begin(0);
 	w.write(flags.translate());
-	printBlock(body, w, tr);
+	print(body, w, tr);
+	w.end();
     }
 
     public void dump(CodeWriter w) {

@@ -228,4 +228,7 @@ public abstract class Type_c extends TypeObject_c implements Type
      * in error messages and generated output.
      */
     public abstract String toString();
+    public void print(CodeWriter w) {
+	w.write(toString());
+    }
 }

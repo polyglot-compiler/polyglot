@@ -101,6 +101,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 	if (qual != null) {
             print(qual, w, tr);
             w.write(".");
+	    w.allowBreak(2, 3, "", 0);
         }
                 
         w.write(name);

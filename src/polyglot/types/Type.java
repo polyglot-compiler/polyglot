@@ -1,6 +1,7 @@
 package polyglot.types;
 
 import polyglot.util.Position;
+import polyglot.util.CodeWriter;
 
 /**
  * A <code>Type</code> is the base type of all classes which represent
@@ -244,4 +245,5 @@ public interface Type extends Qualifier
      * in error messages and generated output.
      */
     String toString();
+    void print(CodeWriter w);
 }

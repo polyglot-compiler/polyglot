@@ -386,7 +386,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
         w.write(f.translate());
         print(type, w, tr);
-        w.write(" ");
+	w.allowBreak(2, 2, " ", 1);
         w.write(name);
 
         if (init != null) {

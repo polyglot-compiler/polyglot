@@ -95,6 +95,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
     if (qual != null) {
         print(qual, w, tr);
         w.write(".");
+	w.allowBreak(2, 3, "", 0);
     }
             
     w.write(name);
@@ -106,8 +107,8 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 		  return;
 	  }
     throw new InternalCompilerError(position(),
-                                    "Cannot translate ambiguous node "
-                                    + this + ".");
+                                    "Cannot translate ambiguous node " +
+                                    this + ".");
   }
 
   public String toString() {

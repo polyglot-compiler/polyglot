@@ -23,8 +23,13 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
    * source file is used.
    */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-    if (type == null) w.write("<unknown-type>");
-    else w.write(type.toString());
+    if (type == null) {
+	w.write("<unknown-type>");
+    } else {
+	w.write("[");
+	type.print(w);
+	w.write("]");
+    }
   }
 
   /** Type check the type node.  Check accessibility of class types. */

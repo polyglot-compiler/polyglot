@@ -8,6 +8,7 @@ import polyglot.types.*;
 import polyglot.types.Package;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
+import polyglot.util.CodeWriter;
 
 /**
  * A <code>ClassType</code> represents a class -- either loaded from a
@@ -384,6 +385,30 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
         }
         else {
             return "<unknown class>";
+        }
+    }
+    
+    /** Pretty-print the name of this class to w. */
+    public void print(CodeWriter w) {
+	// XXX This code duplicates the logic of toString.
+        if (isTopLevel()) {
+            if (package_() != null) {
+		package_().print(w);
+		w.write(".");
+		w.allowBreak(2, 3, "", 0);
+		w.write(name());
+            }
+        } else if (isMember()) {
+            container().print(w);
+	    w.write(".");
+	    w.allowBreak(2, 3, "", 0);
+	    w.write(name());
+        } else if (isLocal()) {
+	    w.write(name());
+        } else if (isAnonymous()) {
+	    w.write("<anonymous class>");
+        } else {
+	    w.write("<unknown class>");
         }
     }
 

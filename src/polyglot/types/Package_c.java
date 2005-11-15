@@ -2,6 +2,7 @@ package polyglot.ext.jl.types;
 
 import polyglot.types.*;
 import polyglot.types.Package;
+import polyglot.util.CodeWriter;
 
 /**
  * An <code>PackageType</code> represents a package type. It may or may
@@ -117,6 +118,14 @@ public class Package_c extends TypeObject_c implements Package
 
     public String toString() {
 	return prefix() == null ? name : prefix().toString() + "." + name;
+    }
+    public void print(CodeWriter w) {
+	if (prefix() != null) {
+	    prefix().print(w);
+	    w.write(".");
+	    w.allowBreak(2, 3, "", 0);
+	}
+	w.write(name);
     }
 
     public int hashCode() {

@@ -450,6 +450,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     }
 
     public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
+        w.begin(0);
         if (flags.isInterface()) {
             w.write(flags.clearInterface().clearAbstract().translate());
         }
@@ -457,7 +458,6 @@ public class ClassDecl_c extends Term_c implements ClassDecl
             w.write(flags.translate());
         }
 
-        w.begin(0);
         if (flags.isInterface()) {
             w.write("interface ");
         }
@@ -474,7 +474,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
         }
 
         if (! interfaces.isEmpty()) {
-	    w.allowBreak(0);
+	    w.allowBreak(2);
             if (flags.isInterface()) {
                 w.write("extends ");
             }
@@ -488,15 +488,15 @@ public class ClassDecl_c extends Term_c implements ClassDecl
                 print(tn, w, tr);
 
                 if (i.hasNext()) {
-                    w.write (",");
+                    w.write(",");
 		    w.allowBreak(0);
                 }
             }
 	    w.end();
         }
+	w.unifiedBreak(0);
 	w.end();
-
-        w.write(" {");
+        w.write("{");
     }
 
     public void prettyPrintFooter(CodeWriter w, PrettyPrinter tr) {

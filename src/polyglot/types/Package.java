@@ -1,6 +1,8 @@
 package polyglot.types;
 
 
+import polyglot.util.CodeWriter;
+
 /**
  * An <code>Package</code> represents a Java package.
  */
@@ -25,4 +27,7 @@ public interface Package extends Qualifier, Named, Declaration
     
     /** A resolver to access member packages and classes of the package. */
     Resolver resolver();
+
+    /** Pretty-print this package name to w. */
+    void print(CodeWriter w);
 }

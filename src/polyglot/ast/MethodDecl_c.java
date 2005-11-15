@@ -362,7 +362,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 	w.allowBreak(2, 2, " ", 1);
 	w.write(name + "(");
 
-	w.allowBreak(4, 2, "", 0);
+	w.allowBreak(2, 2, "", 0);
 	w.begin(0);
 
 	for (Iterator i = formals.iterator(); i.hasNext(); ) {

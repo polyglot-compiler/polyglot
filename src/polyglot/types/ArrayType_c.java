@@ -91,6 +91,11 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
         return base().toString() + "[]";
     }
 
+    public void print(CodeWriter w) {
+	base().print(w);
+	w.write("[]");
+    }
+
     /** Translate the type. */
     public String translate(Resolver c) {
         return base().translate(c) + "[]"; 

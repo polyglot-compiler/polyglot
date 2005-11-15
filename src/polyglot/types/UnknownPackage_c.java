@@ -30,4 +30,7 @@ public class UnknownPackage_c extends Package_c implements UnknownPackage
     public String toString() {
 	return "<unknown>";
     }
+    public void print(CodeWriter w) {
+	w.write(toString());
+    }
 }
