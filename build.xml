@@ -385,7 +385,7 @@ ext=""
   </target>
 
   <!-- Builds PPG -->
-  <target name="ppg">
+  <target name="ppg" description="Build the Polyglot parser generator">
     <antcall target="jflex-lexer">
       <param name="lexer.dir" value="${src}/ppg/lex"/>
       <param name="lexer.class" value="Lexer"/>
@@ -411,7 +411,7 @@ ext=""
   </target>
 
   <!-- Builds JL -->
-  <target name="jl" depends="base">
+  <target name="jl" depends="base" description="Build the base compiler">
     <antcall target="jflex-lexer">
       <param name="lexer.dir" value="${src}/polyglot/ext/jl/parse"/>
       <param name="lexer.class" value="Lexer_c"/>
@@ -628,7 +628,7 @@ ext=""
     </antcall>
   </target>
 
-  <target name="jx" depends="jl">
+  <target name="jx" depends="jl" description="Build the Jx compiler">
     <antcall target="standard-ext">
       <param name="ext" value="jx"/>
       <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
@@ -640,7 +640,7 @@ ext=""
     </javac>
   </target>
 
-  <target name="jxmi" depends="jx">
+  <target name="jxmi" depends="jx" description="Build the Jx/mi compiler">
     <antcall target="standard-ext">
       <param name="ext" value="jxmi"/>
       <param name="base.parser" value="polyglot/ext/jx/parse/jx_ppg.cup"/>
@@ -883,6 +883,11 @@ ext=""
   <target name="jx-jar" depends="jx">
     <jar jarfile="${lib}/jx.jar" basedir="${classes}" includes="polyglot/ext/jx/**"/>
     <jar jarfile="${lib}/jxrt.jar" basedir="${classes}" includes="jx/runtime/**"/>
+  </target>
+
+  <target name="jxmi-jar" depends="jxmi">
+    <jar jarfile="${lib}/jxmi.jar" basedir="${classes}" includes="polyglot/ext/jxmi/**"/>
+    <jar jarfile="${lib}/jxmirt.jar" basedir="${classes}" includes="jxmi/runtime/**"/>
   </target>
 
   <target name="jx-dist" depends="jl-dist,jx-jar"/>
