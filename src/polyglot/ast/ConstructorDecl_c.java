@@ -274,41 +274,8 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
         return this;
     }
 
-    /** Check exceptions thrown by the constructor. */
-    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-	TypeSystem ts = ec.typeSystem();
-
-	SubtypeSet s = (SubtypeSet) ec.throwsSet();
-
-	for (Iterator i = s.iterator(); i.hasNext(); ) {
-	    Type t = (Type) i.next();
-
-	    boolean throwDeclared = false;
-
-	    if (! t.isUncheckedException()) {
-		for (Iterator j = throwTypes().iterator(); j.hasNext(); ) {
-		    TypeNode tn = (TypeNode) j.next();
-		    Type tj = tn.type();
-
-		    if (ts.isSubtype(t, tj)) {
-			throwDeclared = true;
-			break;
-		    }
-		}
-
-		if (! throwDeclared) {
-                    ec.throwsSet().clear();
-                    Position pos = ec.exceptionPosition(t);
-                    throw new SemanticException("The exception \"" + t + 
-                        "\" must either be caught or declared to be thrown.",
-                        pos==null?position():pos);
-		}
-	    }
-	}
-
-	ec.throwsSet().clear();
-
-	return super.exceptionCheck(ec);
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
+        return ec.push(constructorInstance().throwTypes());
     }
 
     public String toString() {

@@ -147,41 +147,62 @@ public class Initializer_c extends Term_c implements Initializer
 	return this;
     }
 
-    /** Check exceptions thrown by the initializer. */
-    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-      	TypeSystem ts = ec.typeSystem();
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
+        if (initializerInstance().flags().isStatic()) {
+            return ec.push(new ExceptionChecker.CodeTypeReporter("static initializer block"));
+        }
+        
+        if (!initializerInstance().container().toClass().isAnonymous()) {
+            ec = ec.push(new ExceptionChecker.CodeTypeReporter("instance initializer block"));
 
-	SubtypeSet s = (SubtypeSet) ec.throwsSet();
-
-	for (Iterator i = s.iterator(); i.hasNext(); ) {
-	    Type t = (Type) i.next();
-
-	    if (! t.isUncheckedException()) {
-                // TODO: This should agree with Java Language Spec 2nd Ed. 8.6
-                // An instance initializer of a named class may not throw
-                // a checked exception unless that exception or one of its 
-                // superclasses is explicitly declared in the throws clause
-                // of each contructor or its class, and the class has at least
-                // one explicitly declared constructor.
-                if (initializerInstance().flags().isStatic()) {
-                    throw new SemanticException(
-                        "A static initializer block may not throw a " + t + ".",
-                        ec.exceptionPosition(t));
+            // An instance initializer of a named class may not throw
+            // a checked exception unless that exception or one of its 
+            // superclasses is explicitly declared in the throws clause
+            // of each contructor or its class, and the class has at least
+            // one explicitly declared constructor.
+            SubtypeSet allowed = null;
+            Type throwable = ec.typeSystem().Throwable();
+            ClassType container = initializerInstance().container().toClass();
+            for (Iterator iter = container.constructors().iterator(); iter.hasNext(); ) {
+                ConstructorInstance ci = (ConstructorInstance)iter.next();
+                if (allowed == null) {
+                    allowed = new SubtypeSet(throwable);
+                    allowed.addAll(ci.throwTypes());
                 }
-                
-                if (!initializerInstance().container().toClass().isAnonymous()) {
-                        // XXX should only throw this if it is not common to all
-                        // declared constructors, and there is at least one
-                        // declared constructor.
-        		throw new SemanticException(
-        		    "An instance initializer block may not throw a " + t + ".",
-                            ec.exceptionPosition(t));
+                else {
+                    // intersect allowed with ci.throwTypes()
+                    SubtypeSet other = new SubtypeSet(throwable);
+                    other.addAll(ci.throwTypes());
+                    SubtypeSet inter = new SubtypeSet(throwable);
+                    for (Iterator i = allowed.iterator(); i.hasNext(); ) {
+                        Type t = (Type)i.next();
+                        if (other.contains(t)) {
+                            // t or a supertype is thrown by other.
+                            inter.add(t);
+                        }
+                    }
+                    for (Iterator i = other.iterator(); i.hasNext(); ) {
+                        Type t = (Type)i.next();
+                        if (allowed.contains(t)) {
+                            // t or a supertype is thrown by the allowed.
+                            inter.add(t);
+                        }
+                    }
+                    allowed = inter;
                 }
-	    }
-	}
+            }
+            // allowed is now an intersection of the throw types of all
+            // constructors
+            
+            ec = ec.push(allowed);
+            
+            
+            return ec;
+        }
 
-	return super.exceptionCheck(ec);
+        return ec.push();
     }
+
 
     /** Write the initializer to an output file. */
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {

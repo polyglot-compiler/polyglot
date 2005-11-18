@@ -4,6 +4,7 @@ import polyglot.ast.*;
 import polyglot.util.*;
 import polyglot.types.*;
 import polyglot.visit.*;
+
 import java.util.*;
 
 /**
@@ -80,6 +81,8 @@ public class Try_c extends Stmt_c implements Try
 	return reconstruct(tryBlock, catchBlocks, finallyBlock);
     }
 
+    
+    
     /**
      * Bypass all children when peforming an exception check.
      * exceptionCheck(), called from ExceptionChecker.leave(),
@@ -106,16 +109,30 @@ public class Try_c extends Stmt_c implements Try
     {
 	TypeSystem ts = ec.typeSystem();
 
+        ExceptionChecker origEC = ec;
+        
+        if (this.finallyBlock != null && !this.finallyBlock.reachable()) {
+            // the finally block cannot terminate normally.
+            // This implies that exceptions thrown in the try and catch
+            // blocks will not propogate upwards.
+            // Prevent exceptions from propagation upwards past the finally
+            // block. (The original exception checker will be used
+            // for checking the finally block).
+            ec = ec.pushStopPropagation();
+        }
+        
+        ExceptionChecker newec = ec.push();
+        for (ListIterator i = this.catchBlocks.listIterator(catchBlocks.size()); i.hasPrevious(); ) {
+            Catch cb = (Catch) i.previous();
+            Type catchType = cb.catchType();
+            
+            newec = newec.push(catchType);
+        }
+        
 	// Visit the try block.
-        ec = ec.push();
-	Block tryBlock = (Block) visitChild(this.tryBlock, ec);
-	// First, get exceptions from the try block.
-	SubtypeSet thrown = ec.throwsSet(); 
-        SubtypeSet caught = new SubtypeSet(ts.Throwable());
-        ec = ec.pop();
+	Block tryBlock = (Block) visitChild(this.tryBlock, newec);
 
-	// Add the unchecked exceptions.
-	thrown.addAll(ts.uncheckedExceptions());
+        SubtypeSet caught = new SubtypeSet(ts.Throwable());
 
 	// Walk through our catch blocks, making sure that they each can 
 	// catch something.
@@ -123,25 +140,6 @@ public class Try_c extends Stmt_c implements Try
 	    Catch cb = (Catch) i.next();
 	    Type catchType = cb.catchType();
 
-	    // Check if the catch type is a supertype or a subtype of an
-	    // exception thrown in the try block.
-
-	    boolean match = false;
-	    for (Iterator j = thrown.iterator(); j.hasNext(); ) {
-		Type ex = (Type) j.next();
-
-		if (ts.isSubtype(ex, catchType) ||
-                    ts.isSubtype(catchType, ex)) {
-		    match = true;
-		    break;
-		}
-	    }
-
-	    if (! match) {
-		throw new SemanticException("The exception \"" +
-		    catchType + "\" is not thrown in the try block.",
-		    cb.position()); 
-	    }
 
 	    // Check if the exception has already been caught.
 	    if (caught.contains(catchType)) {
@@ -153,67 +151,38 @@ public class Try_c extends Stmt_c implements Try
 	    caught.add(catchType);
 	}
 
-	// Remove exceptions which have been caught.
-	thrown.removeAll(caught);
 
-	// "thrown" now contains any exceptions which were not caught.
-	// We now visit the catch blocks and finallyBlock to get the
-	// exceptions they throw.
-
+        // now visit the catch blocks, using the original exception checker
 	List catchBlocks = new ArrayList(this.catchBlocks.size());
 
 	for (Iterator i = this.catchBlocks.iterator(); i.hasNext(); ) {
 	    Catch cb = (Catch) i.next();
 
             ec = ec.push();
-
 	    cb = (Catch) visitChild(cb, ec);
 	    catchBlocks.add(cb);
-
-	    thrown.addAll(ec.throwsSet());
             ec = ec.pop();
 	}
 
 	Block finallyBlock = null;
 
 	if (this.finallyBlock != null) {
-            ec = ec.push();
+            ec = origEC;
 
 	    finallyBlock = (Block) visitChild(this.finallyBlock, ec);
 
-            // an interesting thing happens here...
-            // if the finally block can complete normally, then all the
-            // exceptions that the try-block and catch-blocks can throw
-            // can be thrown by the try-catch-finally block. HOWEVER, if
-            // the finally block can not complete normally, then the
-            // try-catch-finally block can only throw the exceptions thrown
-            // by the finally block. Examining the finally-block's reachability
-            // will tell us if the finally-block can complete normally.
             if (!this.finallyBlock.reachable()) {
-
-                // warn the user, and remove all the exceptions that have
-                // been added by the try and catch blocks.
-
-                if (false) {
-                      // don't warn the user; javac doesn't
-                      ec.errorQueue().enqueue(ErrorInfo.WARNING,
-                            "The finally block cannot complete normally", 
-                            finallyBlock.position());
-                }
-                
-                thrown.clear();
+                // warn the user
+// ###Don't warn, some versions of javac don't.              
+//              ec.errorQueue().enqueue(ErrorInfo.WARNING,
+//              "The finally block cannot complete normally", 
+//              finallyBlock.position());
             }
-            thrown.addAll(ec.throwsSet());
             
             ec = ec.pop();
 	}
     
-        // "thrown" now contains any exceptions which were not caught,
-        // and any exceptions thrown by the catch blocks and finallyBlock 
-        // Add these exceptions to the exception checker's throw set.
-        ec.throwsSet().addAll(thrown);
-
-	return reconstruct(tryBlock, catchBlocks, finallyBlock).exceptions(ec.throwsSet());
+	return reconstruct(tryBlock, catchBlocks, finallyBlock);
     }
 
     public String toString() {

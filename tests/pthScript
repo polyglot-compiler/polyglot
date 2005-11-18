@@ -58,6 +58,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         Except.jl ; Except2.jl ; Except3.jl ; Except4.jl ;
         Except5.jl ;
         Except6.jl ;
+        Except7.jl (Semantic, "must either be caught or declared");
         Field.jl ;
         FieldAccess.jl ;
         FieldAccess2.jl (Semantic, "Cannot access field");
@@ -105,6 +106,10 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         Initializer2.jl (Semantic, "Initializers must be able to complete normally");
         Initializer3.jl ;
         Initializer4.jl ;
+        Initializer5.jl ;
+        Initializer6.jl (Semantic, "can not throw a");
+        Initializer7.jl ;
+        Initializer8.jl ;
         Inner0.jl ; Inner1.jl ; Inner2.jl ; Inner3.jl ; Inner4.jl ;
         Inner5.jl ; Inner6.jl ; Inner7.jl ; Inner8.jl ; Inner9.jl ;
         Inner10.jl ; Inner11.jl ; Inner12.jl ; Inner13.jl ;

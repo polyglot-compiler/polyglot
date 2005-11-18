@@ -310,23 +310,8 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return this;
     }
 
-    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-        SubtypeSet s = ec.throwsSet();
-
-        for (Iterator i = s.iterator(); i.hasNext(); ) {
-            Type t = (Type) i.next();
-
-            if (! t.isUncheckedException()) {
-                ec.throwsSet().clear();
-                throw new SemanticException(
-                    "A field initializer may not throw a "
-                    + t + ".", position());
-            }
-        }
-
-        ec.throwsSet().clear();
-
-        return super.exceptionCheck(ec);
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
+        return ec.push(new ExceptionChecker.CodeTypeReporter("field initializer"));
     }
 
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
