@@ -66,7 +66,7 @@ public class Main
   }
 
   public void start(String[] argv, ErrorQueue eq) throws TerminationException {
-      source = new HashSet();
+      source = new LinkedHashSet();
       List args = explodeOptions(argv);
       ExtensionInfo ext = getExtensionInfo(args);
       Options options = ext.getOptions();
