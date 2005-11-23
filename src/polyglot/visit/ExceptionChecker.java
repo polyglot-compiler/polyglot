@@ -101,7 +101,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
      * This method is called when we are to perform a "normal" traversal of 
      * a subtree rooted at <code>n</code>.   At every node, we will push a 
      * stack frame.  Each child node will add the exceptions that it throws
-     * to this stack frame. For most nodes ( excdeption for the try / catch)
+     * to this stack frame. For most nodes ( exception for the try / catch)
      * will just aggregate the stack frames.
      *
      * @param n The root of the subtree to be traversed.
