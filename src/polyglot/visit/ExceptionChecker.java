@@ -51,12 +51,12 @@ public class ExceptionChecker extends ErrorHandlingVisitor
     /**
      * Should the propogation of eceptions upwards go past this point?
      */
-    protected boolean stopUpwardsPropagation;
+    protected boolean catchAllThrowable;
     
     public ExceptionChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
         this.outer = null;
-        this.stopUpwardsPropagation = false;
+        this.catchAllThrowable = false;
     }
     
     public ExceptionChecker push(UncaughtReporter reporter) {
@@ -77,10 +77,10 @@ public class ExceptionChecker extends ErrorHandlingVisitor
         ec.throwsSet = new SubtypeSet(ts.Throwable());
         return ec;
     }
-    public ExceptionChecker pushStopPropagation() {
+    public ExceptionChecker pushCatchAllThrowable() {
         ExceptionChecker ec = this.push();
         ec.throwsSet = new SubtypeSet(ts.Throwable());
-        ec.stopUpwardsPropagation = true;
+        ec.catchAllThrowable = true;
         return ec;
     }
     
@@ -89,7 +89,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
         ExceptionChecker ec = (ExceptionChecker) this.visitChildren();
         ec.outer = this;
         ec.catchable = null;
-        ec.stopUpwardsPropagation = false;
+        ec.catchAllThrowable = false;
         return ec;
     }
 
@@ -97,29 +97,16 @@ public class ExceptionChecker extends ErrorHandlingVisitor
         return outer;
     }
 
-    /**
-     * This method is called when we are to perform a "normal" traversal of 
-     * a subtree rooted at <code>n</code>.   At every node, we will push a 
-     * stack frame.  Each child node will add the exceptions that it throws
-     * to this stack frame. For most nodes ( exception for the try / catch)
-     * will just aggregate the stack frames.
-     *
-     * @param n The root of the subtree to be traversed.
-     * @return The <code>NodeVisitor</code> which should be used to visit the 
-     *  children of <code>n</code>.
-     *
-     */
     protected NodeVisitor enterCall(Node n) throws SemanticException {
         return n.exceptionCheckEnter(this);
     }
 
     protected NodeVisitor enterError(Node n) {
-	return push();
+        return push();
     }
 
     /**
-     * Here, we pop the stack frame that we pushed in enter and aggregate the 
-     * exceptions.
+     * Call exceptionCheck(ExceptionChecker) on the node.
      *
      * @param old The original state of root of the current subtree.
      * @param n The current state of the root of the current subtree.
@@ -132,15 +119,19 @@ public class ExceptionChecker extends ErrorHandlingVisitor
         
         ExceptionChecker inner = (ExceptionChecker) v;
 
-        // this must be an ancestor of inner
-        boolean isAncestor = false;
-        ExceptionChecker ec = inner;
-        while (!isAncestor && ec != null) {
-            isAncestor = isAncestor || (ec == this);
-            ec = ec.outer;
-        }
-        if (!isAncestor) {
-            throw new InternalCompilerError("oops!");
+        {
+            // code in this block checks the invariant that
+            // this ExceptionChecker must be an ancestor of inner, i.e.,
+            // inner must be the result of zero or more pushes.
+            boolean isAncestor = false;
+            ExceptionChecker ec = inner;
+            while (!isAncestor && ec != null) {
+                isAncestor = isAncestor || (ec == this);
+                ec = ec.outer;
+            }
+            if (!isAncestor) {
+                throw new InternalCompilerError("oops!");
+            }
         }
         
         // gather exceptions from this node.
@@ -148,23 +139,17 @@ public class ExceptionChecker extends ErrorHandlingVisitor
     }
 
     /**
-     * The ast nodes will use this callback to notify us that they throw an 
-     * exception of type t. An exception will be thrown if the type t is not
-     * allowed to be thrown at this point; the exception t will be
-     * added to the throwsSet of all exception checkers in the stack,
-     * up to (and not including) the exception checker that catches the
-     * exception.
-     *
+     * The ast nodes will use this callback to notify us that they throw an
+     * exception of type t. This method will throw a SemanticException if the
+     * type t is not allowed to be thrown at this point; the exception t will be
+     * added to the throwsSet of all exception checkers in the stack, up to (and
+     * not including) the exception checker that catches the exception.
+     * 
      * @param t The type of exception that the node throws.
-     * @throws SemanticException 
+     * @throws SemanticException
      */
     public void throwsException(Type t, Position pos) throws SemanticException {
         if (! t.isUncheckedException()) {            
-//            ExceptionChecker q = this;
-//            while (q != null) {
-//                System.err.println(q.catchable);
-//                q = q.pop();
-//            }
             // go through the stack of catches and see if the exception
             // is caught.
             boolean exceptionCaught = false;
@@ -183,7 +168,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
                     // add t to ec's throwsSet.
                     ec.throwsSet.add(t); 
                 }
-                if (ec.stopUpwardsPropagation) {
+                if (ec.catchAllThrowable) {
                     // stop the propagation
                     exceptionCaught = true;
                 }
@@ -201,6 +186,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
         }
         return this.throwsSet;
     }
+    
     protected void reportUncaughtException(Type t, Position pos) throws SemanticException {
         ExceptionChecker ec = this;
         UncaughtReporter ur = null;
