@@ -105,10 +105,9 @@ public class Try_c extends Stmt_c implements Try
      * block.
      */
     public Node exceptionCheck(ExceptionChecker ec)
-	throws SemanticException
+    throws SemanticException
     {
-	TypeSystem ts = ec.typeSystem();
-
+        TypeSystem ts = ec.typeSystem();
         ExceptionChecker origEC = ec;
         
         if (this.finallyBlock != null && !this.finallyBlock.reachable()) {
@@ -118,71 +117,75 @@ public class Try_c extends Stmt_c implements Try
             // Prevent exceptions from propagation upwards past the finally
             // block. (The original exception checker will be used
             // for checking the finally block).
-            ec = ec.pushStopPropagation();
+            ec = ec.pushCatchAllThrowable();
         }
         
         ExceptionChecker newec = ec.push();
-        for (ListIterator i = this.catchBlocks.listIterator(catchBlocks.size()); i.hasPrevious(); ) {
+        for (ListIterator i = this.catchBlocks.listIterator(this.catchBlocks.size()); i.hasPrevious(); ) {
             Catch cb = (Catch) i.previous();
             Type catchType = cb.catchType();
             
             newec = newec.push(catchType);
         }
         
-	// Visit the try block.
-	Block tryBlock = (Block) visitChild(this.tryBlock, newec);
-
+        // Visit the try block.
+        Block tryBlock = (Block) this.visitChild(this.tryBlock, newec);
+        
         SubtypeSet caught = new SubtypeSet(ts.Throwable());
-
-	// Walk through our catch blocks, making sure that they each can 
-	// catch something.
-	for (Iterator i = this.catchBlocks.iterator(); i.hasNext(); ) {
-	    Catch cb = (Catch) i.next();
-	    Type catchType = cb.catchType();
-
-
-	    // Check if the exception has already been caught.
-	    if (caught.contains(catchType)) {
-		throw new SemanticException("The exception \"" +
-		    catchType + "\" has been caught by an earlier catch block.",
-		    cb.position()); 
-	    }
-
-	    caught.add(catchType);
-	}
-
-
+        
+        // Walk through our catch blocks, making sure that they each can 
+        // catch something.
+        for (Iterator i = this.catchBlocks.iterator(); i.hasNext(); ) {
+            Catch cb = (Catch) i.next();
+            Type catchType = cb.catchType();
+            
+            
+            // Check if the exception has already been caught.
+            if (caught.contains(catchType)) {
+                throw new SemanticException("The exception \"" +
+                                            catchType + "\" has been caught by an earlier catch block.",
+                                            cb.position()); 
+            }
+            
+            caught.add(catchType);
+        }
+        
+        
         // now visit the catch blocks, using the original exception checker
-	List catchBlocks = new ArrayList(this.catchBlocks.size());
-
-	for (Iterator i = this.catchBlocks.iterator(); i.hasNext(); ) {
-	    Catch cb = (Catch) i.next();
-
+        List catchBlocks = new ArrayList(this.catchBlocks.size());
+        
+        for (Iterator i = this.catchBlocks.iterator(); i.hasNext(); ) {
+            Catch cb = (Catch) i.next();
+            
             ec = ec.push();
-	    cb = (Catch) visitChild(cb, ec);
-	    catchBlocks.add(cb);
+            cb = (Catch) this.visitChild(cb, ec);
+            catchBlocks.add(cb);
             ec = ec.pop();
-	}
-
-	Block finallyBlock = null;
-
-	if (this.finallyBlock != null) {
+        }
+        
+        Block finallyBlock = null;
+        
+        if (this.finallyBlock != null) {
             ec = origEC;
-
-	    finallyBlock = (Block) visitChild(this.finallyBlock, ec);
-
+            
+            finallyBlock = (Block) this.visitChild(this.finallyBlock, ec);
+            
             if (!this.finallyBlock.reachable()) {
                 // warn the user
-// ###Don't warn, some versions of javac don't.              
+//              ###Don't warn, some versions of javac don't.              
 //              ec.errorQueue().enqueue(ErrorInfo.WARNING,
 //              "The finally block cannot complete normally", 
 //              finallyBlock.position());
             }
             
             ec = ec.pop();
-	}
-    
-	return reconstruct(tryBlock, catchBlocks, finallyBlock);
+        }
+        // now that all the exceptions have been added to the exception checker,
+        // call the super method, which should set the exceptions field of 
+        // Term_c.
+        Try_c t = (Try_c)super.exceptionCheck(ec);
+
+        return t.reconstruct(tryBlock, catchBlocks, finallyBlock);
     }
 
     public String toString() {
