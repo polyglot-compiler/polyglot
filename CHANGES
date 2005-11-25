@@ -13,6 +13,10 @@ Nov 25, 2005: Polyglot 2.0alpha3
     PackageContextResolver to eliminate duplicate code. 
     Resolver performance improvements.
 
+    Deprecated TypeSystem.parsedResolver().  Use TypeSystem.systemResolver().
+
+    Removed outer() resolver from ImportTable.  Use TypeSystem.systemResolver().
+
     Fixed bugs with accessibility checking for member classes.
     Added AccessControlResolver interface.
 
