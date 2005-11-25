@@ -1,7 +1,6 @@
 package polyglot.types;
 
 import polyglot.util.*;
-import polyglot.ext.jl.types.TypeSystem_c;
 import polyglot.main.Report;
 import java.util.*;
 
