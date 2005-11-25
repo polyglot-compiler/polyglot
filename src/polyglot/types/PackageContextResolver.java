@@ -16,7 +16,6 @@ public class PackageContextResolver extends AbstractAccessControlResolver
      * Create a package context resolver.
      * @param ts The type system.
      * @param p The package in whose context to search.
-     * @param cr The resolver to use for looking up types.
      */
     public PackageContextResolver(TypeSystem ts, Package p) {
         super(ts);

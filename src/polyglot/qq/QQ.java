@@ -30,7 +30,7 @@ import java.io.*;
   <p>
   The format string may contain the following patterns:
   <ul>
-    <li> <code>%s</code> matches <code>String (parsed as an identifier)
+    <li> <code>%s</code> matches <code>String</code> (parsed as an identifier)
 
     <li> <code>%T</code> matches <code>Type</code> or <code>TypeNode></code>
     <li> <code>%E</code> matches <code>Expr</code>
