@@ -28,7 +28,7 @@ public interface TypeObject extends Copy, Serializable
     /**
      * Return true iff this type object is the same as <code>t</code>.
      * All Polyglot extensions should attempt to maintain pointer
-     * equality between TypeObjects.  If this cannot be done,
+     * equality between equal TypeObjects.  If this cannot be done,
      * extensions can override TypeObject_c.equalsImpl(), and
      * don't forget to override hashCode().
      *

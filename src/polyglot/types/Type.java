@@ -54,7 +54,8 @@ public interface Type extends Qualifier
     /**
      * Return true if this type is equivalent to t.
      * Usually this is the same as equalsImpl(TypeObject), but that
-     * method should return true only if the types are <i>structurally equivalent</i>.
+     * method should return true only if the types are
+     * <i>structurally equal</i>.
      * @param t Type to compare to
      * @return True if this type is equivalent to t.
      */
@@ -63,7 +64,8 @@ public interface Type extends Qualifier
     /**
      * Return true if this type is equivalent to t.
      * Usually this is the same as equalsImpl(TypeObject), but that
-     * method should return true only if the types are <i>structurally equivalent</i>.
+     * method should return true only if the types are
+     * <i>structurally equal</i>.
      * @param t Type to compare to
      * @return True if this type is equivalent to t.
      */
