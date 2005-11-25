@@ -3,8 +3,52 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
-Aug, 31, 2005: Polyglot 2.0alpha2
-=================================
+Nov 25, 2005: Polyglot 2.0alpha3
+================================
+  What's new since Polyglot 2.0alpha2:
+  --------------------------------------
+    Fixed numerous bugs with serialization of type information.
+
+    Moved (member) class lookup to ClassContextResolver and
+    PackageContextResolver to eliminate duplicate code. 
+    Resolver performance improvements.
+
+    Fixed bugs with accessibility checking for member classes.
+    Added AccessControlResolver interface.
+
+    Added Type.typeEquals and Package.packageEquals.  These methods
+    should implement semantic equality for types and packages.
+    TypeObject.equals implements structural equality.  In the base
+    compiler, the implementations are the same, but in extensions,
+    especially those with features like type aliases, the distinction
+    is important.
+
+    Fixed bugs with exception checking.  More precise exception error
+    message positions.
+
+    Bug fixes and performance enhancements in CodeWriter.
+    Improved quality of pretty-printer output.
+
+    Compiler.compile(Collection sources) takes a collection of Sources
+    rather than filenames.  Old behavior available with
+    Compiler.compileFiles(Collection filenames).
+
+    More efficient pass scheduling.  Better infinite loop reporting.
+    Moved goal dependencies from scheduler to Goal classes.
+
+    Restored Node.isTypeChecked().
+
+    Added ErrorInfo.DEBUG.
+
+    Fixed bugs with constant checking.
+
+    Fixed bugs with disambiguation of anonymous classes.
+
+    Fixed bugs with switch statement semantic checking.
+
+
+Aug 31, 2005: Polyglot 2.0alpha2
+================================
   What's new since Polyglot 2.0alpha[1]:
   --------------------------------------
     Simplified scheduler interface.  See Scheduler.java for details. 
