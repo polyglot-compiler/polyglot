@@ -38,7 +38,6 @@ public class ImportTable implements Resolver
     /**
      * Create an import table.
      * @param ts The type system
-     * @param base The outermost resolver to use for looking up types.
      * @param pkg The package of the source we are importing types into.
      */
     public ImportTable(TypeSystem ts, Package pkg) {
@@ -48,7 +47,6 @@ public class ImportTable implements Resolver
     /**
      * Create an import table.
      * @param ts The type system
-     * @param base The outermost resolver to use for looking up types.
      * @param pkg The package of the source we are importing types into.
      * @param src The name of the source file we are importing into.
      */

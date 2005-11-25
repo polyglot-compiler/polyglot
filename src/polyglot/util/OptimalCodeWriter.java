@@ -121,7 +121,8 @@ public class OptimalCodeWriter extends CodeWriter {
         }
         current.add(new AllowBreak(n, level, alt, altlen, false));
     }
-    /** @see CodeWriter.unifiedBreak */
+
+    /** @see polyglot.util.CodeWriter#unifiedBreak */
     public void unifiedBreak(int n, int level, String alt, int altlen) {
         if (OptimalCodeWriter.showInput) {
             trace("unifiedBreak " + n + " level=" + level);
