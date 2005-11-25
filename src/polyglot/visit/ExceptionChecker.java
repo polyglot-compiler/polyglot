@@ -98,7 +98,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
     }
 
     protected NodeVisitor enterCall(Node n) throws SemanticException {
-        return n.exceptionCheckEnter(this);
+        return n.del().exceptionCheckEnter(this);
     }
 
     protected NodeVisitor enterError(Node n) {
