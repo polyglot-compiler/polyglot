@@ -16,22 +16,6 @@ public interface ParamTypeSystem extends TypeSystem {
     MuPClass mutablePClass(Position pos);
 
     /**
-     * Instantiate a parametric type on its own formals.
-     *
-     * @param pos The position of the instantiated type
-     * @param base The parameterized type
-     */
-    ClassType nullInstantiate(Position pos, PClass base);
-
-    /**
-     * Null instantiate <code>base</code>, using the same Position
-     * as <code>base</code>.
-     *
-     * @param base The parameterized type
-     */
-    ClassType nullInstantiate(PClass base);
-
-    /**
      * Instantiate a parametric type on a list of actual parameters.
      *
      * @param pos The position of the instantiated type

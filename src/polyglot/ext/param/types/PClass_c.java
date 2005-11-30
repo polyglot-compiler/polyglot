@@ -34,16 +34,6 @@ public abstract class PClass_c extends TypeObject_c implements PClass {
 	ParamTypeSystem pts = (ParamTypeSystem) typeSystem();
         return pts.instantiate(pos, this, actuals);
     }
-
-    public ClassType nullInstantiate(Position pos) {
-	ParamTypeSystem pts = (ParamTypeSystem) typeSystem();
-        return pts.nullInstantiate(pos, this);
-    }
-    
-    public ClassType nullInstantiate() {
-	ParamTypeSystem pts = (ParamTypeSystem) typeSystem();
-        return pts.nullInstantiate(this);
-    }
     
     
     /////////////////////////////////////////////////////////////////////////

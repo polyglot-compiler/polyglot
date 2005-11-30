@@ -92,20 +92,6 @@ public abstract class ParamTypeSystem_c extends TypeSystem_c
         return inst.toClass();
     }
 
-    /**
-     * Instantiate a parametric type on its own formals.
-     *
-     * @param pos The position of the instantiated type
-     * @param base The parameterized type
-     */
-    public ClassType nullInstantiate(Position pos, PClass base) {
-        return base.clazz();
-        // return uncheckedInstantiate(pos, base, base.formals());
-    }
-
-    public ClassType nullInstantiate(PClass base) {
-        return nullInstantiate(base.position(), base);
-    }
     
     /**
      * Apply a parameter substitution to a type.

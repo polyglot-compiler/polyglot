@@ -28,17 +28,4 @@ public interface PClass extends Importable {
      * @param actuals The actual type parameters for the instantiation
      */
     ClassType instantiate(Position pos, List actuals) throws SemanticException;
-    
-    /**
-     * Null instantiate <code>this</code> at the position of
-     * <code>clazz()</code>.
-     */
-    ClassType nullInstantiate();
-    
-    /**
-     * Null instantiate <code>this</code>.  A null instantiation is an
-     * instantiation where the actuals are identical to the formals.
-     * @param pos The position of the instantiation
-     */
-    ClassType nullInstantiate(Position pos);
 }
