@@ -53,7 +53,9 @@ public class SimpleCodeWriter extends CodeWriter {
     }
         
     public void write(String s) {
-       if (s.length() > 0)
+       if (s == null)
+	    write("null", 4);
+       else if (s.length() > 0)
 	    write(s, s.length());
     }
 
