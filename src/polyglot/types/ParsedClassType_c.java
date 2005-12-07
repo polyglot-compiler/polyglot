@@ -249,12 +249,57 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         init.canonicalMethods();
         return Collections.unmodifiableList(methods);
     }
+    
+    public List methodsNamed(String name) {
+        // Override to NOT call methods(). Do not check that all
+        // fields are canonical, just that the particular field
+        // returned is canonical.
+        init.initMethods();
+
+        List l = new LinkedList();
+        
+        for (Iterator i = methods.iterator(); i.hasNext(); ) {
+            MethodInstance mi = (MethodInstance) i.next();
+            if (mi.name().equals(name)) {
+                if (! mi.isCanonical()) {
+                    // Force an exception to get thrown.
+                    init.canonicalMethods();
+                }
+                l.add(mi);
+            }
+        }
+
+        return l;
+    }
 
     /** Return an immutable list of fields */
     public List fields() {
         init.initFields();
         init.canonicalFields();
         return Collections.unmodifiableList(fields);
+    }
+    
+    /** Get a field of the class by name. */
+    public FieldInstance fieldNamed(String name) {
+        // Override to NOT call fields(). Do not check that all
+        // fields are canonical, just that the particular field
+        // returned is canonical.  This avoids an infinite loop
+        // during disambiguation of path-dependent types like
+        // in Jx or Jif.
+        init.initFields();
+        
+        for (Iterator i = fields.iterator(); i.hasNext(); ) {
+            FieldInstance fi = (FieldInstance) i.next();
+            if (fi.name().equals(name)) {
+                if (! fi.isCanonical()) {
+                    // Force an exception to get thrown.
+                    init.canonicalFields();
+                }
+                return fi;
+            }
+        }
+
+        return null;
     }
 
     /** Return an immutable list of interfaces */
