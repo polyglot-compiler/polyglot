@@ -199,7 +199,7 @@ ext=""
   <target name="compile-ext">
     <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/ext/${ext}/**"
-      excludes="**/qq/**,**/test/**,**/tests/**,**/runtime/**">
+      excludes="**/qq/**,**/test/**,**/tests/**,**/runtime/**,**/doc/**">
       <classpath refid="standard.classpath"/>
       <!-- HACK: the excludes above wouldn't be necessary if we
            reorganized the source tree -->
