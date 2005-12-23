@@ -64,6 +64,7 @@ public class Subst_c implements Subst
 
             Map newSubst = new HashMap();
 
+            // go through the map, and perform substitution on the actuals
             for (Iterator i = tsubst.entrySet().iterator(); i.hasNext(); ) {
                 Map.Entry e = (Map.Entry) i.next();
                 Object formal = e.getKey();
@@ -72,13 +73,7 @@ public class Subst_c implements Subst
                 newSubst.put(formal, substSubstValue(actual));
             }
 
-            // Now add our substitutions, overriding any substitutions
-            // performed in t.subst
-            newSubst.putAll(subst);
-
-            // We can use the same cache, since newSubst is compatible with
-            // this.subst.
-            return ts.subst(tbase, newSubst, cache);
+            return ts.subst(tbase, newSubst);
         }
 
         if (t instanceof ClassType) {
