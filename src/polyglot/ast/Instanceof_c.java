@@ -75,13 +75,13 @@ public class Instanceof_c extends Expr_c implements Instanceof
 
         if (! compareType.type().isReference()) {
 	    throw new SemanticException(
-		"Type operand of \"instanceof\" must be a reference type.",
+		"Type operand " + compareType.type() + " must be a reference type.",
 		compareType.position());
 	}
 
 	if (! ts.isCastValid(expr.type(), compareType.type())) {
 	    throw new SemanticException(
-		"Expression operand incompatible with type in \"instanceof\".",
+		"Expression operand type " + expr.type() + " incompatible with type operand " + compareType.type() + ".",
 		expr.position());
 	}
 
