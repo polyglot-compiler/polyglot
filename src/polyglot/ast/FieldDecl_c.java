@@ -17,12 +17,12 @@ import polyglot.visit.*;
  * of a field of a class.
  */
 public class FieldDecl_c extends Term_c implements FieldDecl {
-    Flags flags;
-    TypeNode type;
-    String name;
-    Expr init;
-    FieldInstance fi;
-    InitializerInstance ii;
+    protected Flags flags;
+    protected TypeNode type;
+    protected String name;
+    protected Expr init;
+    protected FieldInstance fi;
+    protected InitializerInstance ii;
 
     public FieldDecl_c(Position pos, Flags flags, TypeNode type,
                        String name, Expr init)

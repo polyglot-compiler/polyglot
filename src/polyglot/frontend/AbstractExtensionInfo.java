@@ -1,12 +1,14 @@
 package polyglot.frontend;
 
 import java.io.Reader;
+import java.io.File;
 
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
 import polyglot.main.Version;
 import polyglot.types.TypeSystem;
+import polyglot.types.reflect.ClassFile;
 import polyglot.util.ErrorQueue;
 
 /**
@@ -157,5 +159,9 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     public String toString() {
         return getClass().getName();
+    }
+
+    public ClassFile createClassFile(File classFileSource, byte[] code){
+        return new ClassFile(classFileSource, code, this);
     }
 }

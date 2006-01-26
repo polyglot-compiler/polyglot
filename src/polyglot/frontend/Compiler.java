@@ -56,7 +56,7 @@ public class Compiler
         this.eq = eq;
         this.allExtensions = new ArrayList(2);
 
-        loader = new ClassFileLoader();
+        loader = new ClassFileLoader(extensionInfo);
 
         // This must be done last.
         extensionInfo.initCompiler(this);

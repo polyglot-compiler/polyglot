@@ -27,7 +27,7 @@ public abstract class Attribute {
    * @param length
    *        The length of the attribute, excluding the header.
    */
-  Attribute(int nameIndex, int length) {
+  public Attribute(int nameIndex, int length) {
     this.nameIndex = nameIndex;
     this.length = length;
   }

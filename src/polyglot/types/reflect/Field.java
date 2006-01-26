@@ -17,13 +17,14 @@ import java.io.*;
  *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)
  */
 public class Field {
-    private ClassFile clazz; 
-    private int modifiers;
-    private int name;
-    private int type;
-    private Attribute[] attrs;
-    private ConstantValue constantValue;
-    private boolean synthetic;
+    protected DataInputStream in;
+    protected ClassFile clazz; 
+    protected int modifiers;
+    protected int name;
+    protected int type;
+    protected Attribute[] attrs;
+    protected ConstantValue constantValue;
+    protected boolean synthetic;
 
     /**
      * Constructor.  Read a field from a class file.
@@ -39,7 +40,10 @@ public class Field {
         throws IOException
     {
         this.clazz = clazz;
+        this.in = in;
+    }
 
+    public void initialize() throws IOException {
         modifiers = in.readUnsignedShort();
 
         name = in.readUnsignedShort();

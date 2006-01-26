@@ -8,7 +8,7 @@ import java.io.*;
  * @author Nate Nystrom
  *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)
  */
-class Constant
+public class Constant
 {
     int tag;
     Object value;
@@ -115,7 +115,7 @@ class Constant
      * @return
      *        The value.
      */
-    final Object value()
+    public final Object value()
     {
 	return value;
     }

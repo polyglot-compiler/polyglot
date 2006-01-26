@@ -14,11 +14,11 @@ import java.util.*;
  */
 public class Formal_c extends Term_c implements Formal
 {
-    LocalInstance li;
-    Flags flags;
-    TypeNode type;
-    String name;
-    boolean reachable;
+    protected LocalInstance li;
+    protected Flags flags;
+    protected TypeNode type;
+    protected String name;
+    protected boolean reachable;
 
     public Formal_c(Position pos, Flags flags, TypeNode type,
                     String name)

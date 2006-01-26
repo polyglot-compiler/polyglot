@@ -2,6 +2,7 @@ package polyglot.types.reflect;
 
 import polyglot.main.Report;
 import polyglot.util.InternalCompilerError;
+import polyglot.frontend.ExtensionInfo;
 
 import java.io.*;
 import java.util.*;
@@ -14,6 +15,10 @@ import java.util.jar.*;
  */
 public class ClassFileLoader
 {
+
+    /** The extension info */
+    ExtensionInfo extensionInfo;
+
     /**
      * Keep a cache of the zips and jars so we don't have to keep
      * opening them from the file system.
@@ -33,10 +38,11 @@ public class ClassFileLoader
 
     final static Object not_found = new Object();
 
-    public ClassFileLoader() {
+    public ClassFileLoader(ExtensionInfo ext) {
         this.zipCache = new HashMap();
         this.dirContentsCache = new HashMap();
 	this.packageCache = new HashSet();
+        this.extensionInfo = ext;
     }
 
     /**
@@ -100,7 +106,7 @@ public class ClassFileLoader
 
                 ZipFile zip = loadZip(dir);
                 String entryName = name.replace('.', '/') + ".class";
-                return loadFromZip(zip, entryName);
+                return loadFromZip(dir, zip, entryName);
             }
             else {
                 return loadFromFile(name, dir);
@@ -161,7 +167,7 @@ public class ClassFileLoader
         throw new FileNotFoundException(dir.getAbsolutePath());
     }
 
-    ClassFile loadFromZip(ZipFile zip, String entryName) throws IOException {
+    ClassFile loadFromZip(File source, ZipFile zip, String entryName) throws IOException {
         if (Report.should_report(verbose, 2))
             Report.report(2, "Looking for " + entryName + " in " + zip.getName());
         if (zip != null) {
@@ -170,7 +176,7 @@ public class ClassFileLoader
                 if (Report.should_report(verbose, 3))
                     Report.report(3, "found zip entry " + entry);
                 InputStream in = zip.getInputStream(entry);
-                ClassFile c = loadFromStream(in, entryName);
+                ClassFile c = loadFromStream(source, in, entryName);
                 in.close();
                 return c;
             }
@@ -221,7 +227,7 @@ public class ClassFileLoader
         FileInputStream in = new FileInputStream(file);
         if (Report.should_report(verbose, 3))
             Report.report(3, "found " + file);
-        ClassFile c = loadFromStream(in, name);
+        ClassFile c = loadFromStream(file, in, name);
         in.close();
         return c;
     }
@@ -229,7 +235,7 @@ public class ClassFileLoader
     /**
      * Load a class from an input stream.
      */
-    ClassFile loadFromStream(InputStream in, String name) throws IOException {
+    ClassFile loadFromStream(File source, InputStream in, String name) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         byte[] buf = new byte[4096];
@@ -245,7 +251,7 @@ public class ClassFileLoader
         try {
             if (Report.should_report(verbose, 3))
 		Report.report(3, "defining class " + name);
-            return new ClassFile(bytecode);
+            return extensionInfo.createClassFile(source, bytecode);
         }
         catch (ClassFormatError e) {
             throw new IOException(e.getMessage());

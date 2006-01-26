@@ -2,6 +2,7 @@ package polyglot.types.reflect;
 
 import java.io.*;
 import java.util.*;
+import polyglot.frontend.*;
 
 import polyglot.types.*;
 import polyglot.util.*;
@@ -20,17 +21,19 @@ import polyglot.util.*;
  * @author Nate Nystrom
  */
 public class ClassFile {
-    private Constant[] constants; // The constant pool
-    private int modifiers;        // This class's modifer bit field
-    private int thisClass;              
-    private int superClass;             
-    private int[] interfaces;           
-    private Field[] fields;
-    private Method[] methods;
-    private Attribute[] attrs;
-    private InnerClasses innerClasses;
+    protected Constant[] constants; // The constant pool
+    protected int modifiers;        // This class's modifer bit field
+    protected int thisClass;              
+    protected int superClass;             
+    protected int[] interfaces;           
+    protected Field[] fields;
+    protected Method[] methods;
+    protected Attribute[] attrs;
+    protected InnerClasses innerClasses;
+    protected File classFileSource;
+    protected ExtensionInfo extensionInfo;
     
-    private Map jlcInfoCache = new HashMap();
+    protected Map jlcInfoCache = new HashMap();
    
     static Collection verbose = ClassFileLoader.verbose;
   
@@ -40,7 +43,10 @@ public class ClassFile {
      * @param code
      *        A byte array containing the class data
      */
-    public ClassFile(byte[] code) {
+    public ClassFile(File classFileSource, byte[] code, ExtensionInfo ext) {
+        this.classFileSource = classFileSource;
+        this.extensionInfo = ext;
+
         try {
             ByteArrayInputStream bin = new ByteArrayInputStream(code);
             DataInputStream in = new DataInputStream(bin);
@@ -344,7 +350,7 @@ public class ClassFile {
     fields = new Field[numFields];
     
     for (int i = 0; i < numFields; i++) {
-      fields[i] = new Field(in, this);
+      fields[i] = createField(in);
     }
   }
   
@@ -364,7 +370,7 @@ public class ClassFile {
     methods = new Method[numMethods];
     
     for (int i = 0; i < numMethods; i++) {
-      methods[i] = new Method(in, this);
+      methods[i] = createMethod(in);
     }
   }
   
@@ -378,7 +384,7 @@ public class ClassFile {
    * @exception IOException
    *        If an error occurs while reading.
    */
-  void readAttributes(DataInputStream in)
+  public void readAttributes(DataInputStream in)
        throws IOException
   {
     int numAttributes = in.readUnsignedShort();
@@ -388,9 +394,10 @@ public class ClassFile {
     for (int i = 0; i < numAttributes; i++) {
       int nameIndex = in.readUnsignedShort();
       int length = in.readInt();
-      if ("InnerClasses".equals(constants[nameIndex].value())) {
-          innerClasses = new InnerClasses(in, nameIndex, length);
-          attrs[i] = innerClasses;
+      String name = (String) constants[nameIndex].value();
+      Attribute a = createAttribute(in, name, nameIndex, length);
+      if (a != null) {
+          attrs[i] = a;
       }
       else {
           long n = in.skip(length);
@@ -400,6 +407,29 @@ public class ClassFile {
       }
     }
   }
+
+    public Method createMethod(DataInputStream in) throws IOException {
+      Method m = new Method(in, this);
+      m.initialize();
+      return m;
+    }
+
+    public Field createField(DataInputStream in) throws IOException {
+      Field f = new Field(in, this);
+      f.initialize();
+      return f;
+    }
+
+    public Attribute createAttribute(DataInputStream in, String name,
+                                    int nameIndex, int length)
+                                    throws IOException {
+      if (name.equals("InnerClasses")) {
+        innerClasses = new InnerClasses(in, nameIndex, length);
+        return innerClasses;
+      }
+      return null;
+    }
+
     public Attribute[] getAttrs() {
         return attrs;
     }

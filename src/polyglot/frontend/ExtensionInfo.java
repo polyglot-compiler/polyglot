@@ -2,11 +2,13 @@ package polyglot.frontend;
 
 import java.io.Reader;
 import java.io.OutputStream;
+import java.io.File;
 
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
 import polyglot.types.TypeSystem;
+import polyglot.types.reflect.ClassFile;
 import polyglot.util.ErrorQueue;
 import polyglot.util.CodeWriter;
 
@@ -87,4 +89,7 @@ public interface ExtensionInfo {
 
     /** Get a parser for this language extension. */
     Parser parser(Reader reader, FileSource source, ErrorQueue eq);
+
+    /** Create class file */ 
+    ClassFile createClassFile(File classFileSource, byte[] code);
 }
