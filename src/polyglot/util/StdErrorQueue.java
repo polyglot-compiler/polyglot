@@ -26,6 +26,10 @@ public class StdErrorQueue extends AbstractErrorQueue
 	  		? position.nameAndLineString()
 			: name;
 
+        if (prefix == null) {
+            prefix = "jlc";
+        }
+
         /*
 
         // This doesn't work: it breaks the error message into one word

@@ -49,11 +49,11 @@ public class Position implements Serializable
     protected Position() { }
 
     public Position(String path, String file) {
-    this(path, file, UNKNOWN, UNKNOWN);
+        this(path, file, UNKNOWN, UNKNOWN);
     }
 
     public Position(String path, String file, int line) {
-    this(path, file, line, UNKNOWN);
+        this(path, file, line, UNKNOWN);
     }
 
     public Position(String path, String file, int line, int column) {
@@ -74,11 +74,11 @@ public class Position implements Serializable
     }
     
     public int line() {
-    return line;
+        return line;
     }
 
     public int column() {
-    return column;
+        return column;
     }
 
     public int endLine() {
@@ -105,7 +105,15 @@ public class Position implements Serializable
 
     public String nameAndLineString() {
         // Maybe we should use path here, if it isn't too long...
-        String s = file;
+        String s = path;
+
+        if (s == null) {
+            s = file;
+        }
+
+        if (s == null) {
+            s = "unknown file";
+        }
         
         if (line != UNKNOWN) {
             s += ":" + line;
@@ -119,7 +127,15 @@ public class Position implements Serializable
     }
 
     public String toString() {
-        String s = file;
+        String s = path;
+
+        if (s == null) {
+            s = file;
+        }
+
+        if (s == null) {
+            s = "unknown file";
+        }
 
         if (line != UNKNOWN) {
             s += ":" + line;
