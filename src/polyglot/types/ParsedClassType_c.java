@@ -250,9 +250,10 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         return Collections.unmodifiableList(methods);
     }
     
+    /** Return a list of all methods with the given name. */
     public List methodsNamed(String name) {
         // Override to NOT call methods(). Do not check that all
-        // fields are canonical, just that the particular field
+        // methods are canonical, just that the particular method
         // returned is canonical.
         init.initMethods();
 
