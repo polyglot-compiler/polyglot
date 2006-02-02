@@ -150,7 +150,7 @@ public class Constant
     /**
      * Check if an object is equal to this constant.
      *
-     * @param obj
+     * @param other
      *        The object to compare against.
      * @return
      *        true if equal, false if not.
