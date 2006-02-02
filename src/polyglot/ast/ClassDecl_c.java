@@ -23,6 +23,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     protected TypeNode superClass;
     protected List interfaces;
     protected ClassBody body;
+    protected ConstructorInstance defaultCI;
 
     protected ParsedClassType type;
 
@@ -171,8 +172,27 @@ public class ClassDecl_c extends Term_c implements ClassDecl
             return this;
 	}
 
+        // Add a default constructor to the ClassType, but not to the
+        // ClassDecl; that will be added later.
+        ConstructorInstance ci = null;
+
+        // Mark members added before adding the constructor
+        // to prevent a MissingDependencyException.
         type.setMembersAdded(true);
-        return type(type).flags(type.flags());
+
+        if (type.defaultConstructorNeeded()) {
+            ci = tb.typeSystem().defaultConstructor(position(), type);
+            type.addConstructor(ci);
+        }
+
+        ClassDecl_c n = this;
+        
+        if (n.defaultCI != ci) {
+            n = (ClassDecl_c) copy();
+            n.defaultCI = ci;
+        }
+
+        return n.type(type).flags(type.flags());
     }
 
     public Context enterChildScope(Node child, Context c) {
@@ -292,7 +312,9 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     }
 
     protected Node addDefaultConstructorIfNeeded(TypeSystem ts,
-                                                 NodeFactory nf) {
+                                                 NodeFactory nf)
+        throws SemanticException
+    {
         if (defaultConstructorNeeded()) {
             return addDefaultConstructor(ts, nf);
         }
@@ -300,16 +322,40 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     }
 
     protected boolean defaultConstructorNeeded() {
-        return type().defaultConstructorNeeded();
+        if (defaultCI == null) {
+            // It wasn't needed when we checked during buildTypes.
+            return false;
+        }
+
+        // We added it to the type, check if it's in the class body.
+        for (Iterator i = body().members().iterator(); i.hasNext(); ) {
+            ClassMember cm = (ClassMember) i.next();
+            if (cm instanceof ConstructorDecl) {
+                ConstructorDecl cd = (ConstructorDecl) cm;
+                if (cd.constructorInstance() == defaultCI) {
+                    // Already added
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
-    protected Node addDefaultConstructor(TypeSystem ts, NodeFactory nf) {
-        ConstructorInstance ci = ts.defaultConstructor(position(), this.type);
-        this.type.addConstructor(ci);
+    protected Node addDefaultConstructor(TypeSystem ts, NodeFactory nf)
+        throws SemanticException
+    {
+        ConstructorInstance ci = this.defaultCI;
+        if (ci == null) {
+            throw new InternalCompilerError("addDefaultConstructor called without defaultCI set");
+        }
+
         Block block = null;
         if (this.type.superType() instanceof ClassType) {
-            ConstructorInstance sci = ts.defaultConstructor(position(),
-                                                (ClassType) this.type.superType());
+            ConstructorInstance sci = ts.findConstructor(
+                (ClassType) this.type.superType(), Collections.EMPTY_LIST,
+                this.type);
+
             ConstructorCall cc = nf.SuperCall(position(), 
                                               Collections.EMPTY_LIST);
             cc = cc.constructorInstance(sci);
