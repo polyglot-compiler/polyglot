@@ -49,6 +49,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         Constants11.jl ;
         Constants13.jl ;
         Ctor.jl ;
+        DefaultCtor.jl ;
         Dep1.jl ;
         DiamondInh.jl ; DiamondInh2.jl ;
         Empty.jl ;
@@ -179,7 +180,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         BadInner2.jl (Semantic, "Cannot provide a containing instance for non-inner class");
         BadInner3.jl (Semantic, "The nested class .* does not have an enclosing instance of type .*");
         BadInner4.jl (Semantic, "The type of the qualifier .* does not match the immediately enclosing class  of the super class .*");
-	BadInner5.jl (Semantic, "Class .* not found in scope of ");
+	BadInner5.jl (Semantic, "Could not find type");
 	BadInner6.jl (Semantic, "The nested class .* does not have an enclosing instance of type");
 	BadInner7.jl (Semantic, "Cannot declare member class .* inside class with the same name");
 	BadInner8.jl (Semantic, "The nested class .* does not have an enclosing instance of type");
@@ -207,8 +208,7 @@ polyglot.ext.jl.ExtensionInfo "-cp ." {
         CircularInheritance2.jl (Semantic, "Circular inheritance");
         CircularInheritance3.jl (Semantic, "Circular inheritance");
 	Errors.jl (Semantic, "Method.*cannot be called with arguments");
-	Errors2.jl (Semantic, "Could not find type"),
-                   (Semantic, "Could not find type"); 
+	Errors2.jl (Semantic, "Could not find type"); 
 	LabeledBreak2.jl (Semantic, "Unreachable statement"); 
 	NoInit1.jl (Semantic, "Local variable .* may not have been initialized"); 
 	NoInit10.jl (Semantic, "Local variable .* may not have been initialized"); 
