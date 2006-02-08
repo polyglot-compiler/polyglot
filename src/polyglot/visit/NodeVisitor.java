@@ -241,7 +241,7 @@ public abstract class NodeVisitor implements Copy
             throw new InternalCompilerError("NodeVisitor.enter() returned null.");
         }
 
-        Node n = child.visitChildren(v_);
+        Node n = child.del().visitChildren(v_);
 	    
         if (n == null) {
             throw new InternalCompilerError("Node.visitChildren() returned null.");

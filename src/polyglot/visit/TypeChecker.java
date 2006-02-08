@@ -91,7 +91,7 @@ public class TypeChecker extends DisambiguationDriver
             Report.report(2, ">> " + this + "::leave " + n);
 
         AmbChecker ac = new AmbChecker();
-        n.visitChildren(ac);
+        n.del().visitChildren(ac);
         
         Node m = n;
         

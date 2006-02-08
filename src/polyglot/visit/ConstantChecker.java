@@ -54,7 +54,7 @@ public class ConstantChecker extends ContextVisitor
         }
 
         if (tcc.checked) {
-            n.visitChildren(tcc);
+            n.del().visitChildren(tcc);
         }
         
         Node m = n;
