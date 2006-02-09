@@ -57,7 +57,7 @@ public abstract class OutputController {
     public abstract void displayTestResults(TestResult tr, String testName);
         
     protected DateFormat getDefaultDateFormat() {
-        return new SimpleDateFormat("d-MMM-YY");
+        return new SimpleDateFormat("d-MMM-yy");
     }
     protected DateFormat getSameYearDateFormat() {
         return new SimpleDateFormat("d-MMM");
