@@ -32,7 +32,9 @@ public class Options {
     public Collection source_path; // List[String]
     public File output_directory;
     public String default_classpath;
+    public String default_output_classpath;
     public String classpath;
+    public String output_classpath;
     public String bootclasspath = null;
     public boolean assertions = false;
     
@@ -89,6 +91,8 @@ public class Options {
                             File.pathSeparator + default_bootpath;
         classpath = default_classpath;        
 
+        default_output_classpath = System.getProperty("java.class.path");
+        output_classpath = default_output_classpath;
 
         String java_home = System.getProperty("java.home");
         String current_dir = System.getProperty("user.dir");
@@ -183,6 +187,8 @@ public class Options {
             i++;
             classpath = args[i] + System.getProperty("path.separator") +
                         default_classpath;
+            output_classpath = args[i] + System.getProperty("path.separator") +
+                        default_output_classpath;
             i++;
         }
         else if (args[i].equals("-bootclasspath")) {
@@ -532,6 +538,6 @@ public class Options {
   public String constructPostCompilerClasspath() {
       return output_directory + File.pathSeparator
               + "." + File.pathSeparator
-              + System.getProperty("java.class.path");
+              + output_classpath;
   }
 }
