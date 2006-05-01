@@ -224,6 +224,7 @@ public class SourceFileTest extends AbstractTest {
                 if (pathSep != ':' && sas.indexOf(':') >= 0) {
                     sas = replacePathSep(sas, pathSep);
                 }
+                sas = replaceEnvVariables(sas);
                 args.add(sas);
             }
         }
@@ -258,6 +259,25 @@ public class SourceFileTest extends AbstractTest {
         return sb.toString();
     }
 
+    
+    private String replaceEnvVariables(String sas) {
+        int start;
+        while ((start = sas.indexOf('$')) >= 0) {
+            // we have an environment variable
+            int end = start+1;
+            while (end < sas.length() && 
+                    (Character.isUnicodeIdentifierStart(sas.charAt(end)) ||
+                    Character.isUnicodeIdentifierPart(sas.charAt(end)))) {
+                end++;
+            }
+            // the identifier is now from start+1 to end-1 inclusive.
+            
+            String v = System.getenv(sas.substring(start+1, end));
+//            System.out.println("$" + sas.substring(start+1, end) + " = " + v);
+            sas = sas.substring(0, start) + v + sas.substring(end); 
+        }
+        return sas;
+    }
     protected String getExtensionClassname() {
         return extensionClassname;
     }
