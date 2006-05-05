@@ -17,10 +17,13 @@ public class SourceFileTest extends AbstractTest {
     protected final List sourceFilenames;
     protected String extensionClassname = null;
     protected String[] extraArgs;
+    protected List mainExtraArgs;
     protected final SilentErrorQueue eq;
     protected String destDir;
     
     protected List expectedFailures;
+    
+    protected Set undefinedEnvVars = new HashSet();
         
     public SourceFileTest(String filename) {
         super(new File(filename).getName());
@@ -168,16 +171,25 @@ public class SourceFileTest extends AbstractTest {
     }
 
     protected void deleteDir(File dir) {
+//        System.out.println("Deleting " + dir.toString());
         File[] list = dir.listFiles();
         for (int i = 0; i < list.length; i++) {
+//            System.out.println("  containing " + list[i]);
             if (list[i].isDirectory()) {
                 deleteDir(list[i]);
             }
             else {
-                list[i].delete();
+                if (!list[i].delete()) {
+                    list[i].deleteOnExit();
+//                    System.out.println("Failed to delete " + list[i]);
+                }
+                
             }
         }
-        dir.delete();
+        if (!dir.delete()) {
+            dir.deleteOnExit();
+//            System.out.println("Failed to delete " + dir);
+        }
     }
 
     protected String[] buildCmdLine(String[] files) {
@@ -206,16 +218,21 @@ public class SourceFileTest extends AbstractTest {
             args.add(s);                        
         }
 
-        char pathSep = File.pathSeparatorChar;            
-        if ((s = Main.options.extraArgs) != null) {
+        char pathSep = File.pathSeparatorChar;
+        
+        if (mainExtraArgs == null && (s = Main.options.extraArgs) != null) {
+            mainExtraArgs = new ArrayList();
             sa = breakString(Main.options.extraArgs);
             for (int i = 0; i < sa.length; i++) {
                 String sas = sa[i];
                 if (pathSep != ':' && sas.indexOf(':') >= 0) {
                     sas = replacePathSep(sas, pathSep);
                 }
-                args.add(sas);
+                mainExtraArgs.add(sas);
             }
+        }
+        if (mainExtraArgs != null) {
+            args.addAll(mainExtraArgs);
         }
 
         if ((sa = getExtraCmdLineArgs()) != null) {
@@ -272,8 +289,13 @@ public class SourceFileTest extends AbstractTest {
             }
             // the identifier is now from start+1 to end-1 inclusive.
             
-            String v = System.getenv(sas.substring(start+1, end));
-//            System.out.println("$" + sas.substring(start+1, end) + " = " + v);
+            String var = sas.substring(start+1, end);
+            String v = System.getenv(var);
+            if (v == null && !undefinedEnvVars.contains(var)) {
+                undefinedEnvVars.add(var);
+                output.warning("environment variable $" + var + " undefined.");
+                v = "";
+            }
             sas = sas.substring(0, start) + v + sas.substring(end); 
         }
         return sas;
@@ -290,13 +312,30 @@ public class SourceFileTest extends AbstractTest {
         return this.extraArgs;
     }
     
-    protected static String[] breakString(String s) {
-        StringTokenizer st = new StringTokenizer(s);
-        ArrayList l = new ArrayList(st.countTokens());
-        while (st.hasMoreTokens()) {
-            l.add(st.nextToken());
+    protected static String[] breakString(String s) {        
+        ArrayList l = new ArrayList();
+        int i = 0;
+        String token = "";
+        while (i < s.length()) {
+            char c = s.charAt(i);
+            if (c == '\\') {
+                c = s.charAt(++i);
+                token += c;
+            }
+            else if (Character.isWhitespace(c)) {
+                if (token.length() > 0) {
+                    l.add(token);                    
+                }
+                token = "";
+            }
+            else {
+                token += c;
+            }
+            i++;
         }
-            
+        if (token.length() > 0) {
+            l.add(token);                    
+        }
         return (String[])l.toArray(new String[l.size()]);
     }
     protected void setExtraCmdLineArgs(String args) {

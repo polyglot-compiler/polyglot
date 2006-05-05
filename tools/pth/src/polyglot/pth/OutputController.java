@@ -90,4 +90,5 @@ public abstract class OutputController {
 
         return df.format(d);
     }    
+    public abstract void warning(String w);    
 }

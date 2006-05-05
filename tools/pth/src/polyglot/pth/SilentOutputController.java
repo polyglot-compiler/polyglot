@@ -27,4 +27,6 @@ public class SilentOutputController extends OutputController{
     protected void finishSourceFileTest(SourceFileTest sft, ErrorQueue eq) { }
     public void displayTestSuiteResults(String suiteName, TestSuite ts) { }
     public void displayTestResults(TestResult tr, String testName) { }
+
+    public void warning(String w) { }
 }

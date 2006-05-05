@@ -108,4 +108,7 @@ public class StdOutputController extends OutputController{
         sb.append(getDateDisplay(tr==null?null:tr.dateLastSuccess));
         out.println(sb.toString());
     }
+    public void warning(String w) {
+        out.println("Warning: " + w);
+    }
 }

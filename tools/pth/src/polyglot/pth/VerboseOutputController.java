@@ -12,9 +12,6 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import polyglot.util.*;
-import polyglot.util.ErrorQueue;
-import polyglot.util.SilentErrorQueue;
-import polyglot.util.StdErrorQueue;
 
 /**
  * 
@@ -133,5 +130,9 @@ public class VerboseOutputController extends OutputController{
         out.println("    " + testName);
         out.println("      Last run    : " + getDateDisplay(tr==null?null:tr.dateTestRun));
         out.println("      Last success: " + getDateDisplay(tr==null?null:tr.dateLastSuccess));
+    }
+
+    public void warning(String w) {
+        out.println("Warning: " + w);
     }
 }
