@@ -132,8 +132,8 @@ public class Main
               outputFiles.append(" ");
           }
 
-          String command = options.post_compiler + " -classpath " +
-                        options.constructPostCompilerClasspath() + " "
+          String command = options.post_compiler + " -nowarn -classpath \"" +
+                        options.constructPostCompilerClasspath() + "\" "
                         + outputFiles.toString();
 
           if (Report.should_report(verbose, 1))
