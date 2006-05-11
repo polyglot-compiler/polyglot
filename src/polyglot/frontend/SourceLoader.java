@@ -94,7 +94,7 @@ public class SourceLoader
             return s;
         }
         
-        s = new FileSource(sourceFile);
+        s = sourceExt.createFileSource(sourceFile);
         loadedSources.put(fileKey(sourceFile), s);
         return s;
     }
@@ -183,7 +183,7 @@ public class SourceLoader
                     try {
                         if (Report.should_report(Report.loader, 2))
                             Report.report(2, "Loading " + className + " from " + sourceFile);
-                        s = new FileSource(sourceFile);
+                        s = sourceExt.createFileSource(sourceFile);
                         loadedSources.put(fileKey(sourceFile), s);
                         return s;
                     }

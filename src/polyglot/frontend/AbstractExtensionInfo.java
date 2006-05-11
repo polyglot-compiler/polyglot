@@ -2,6 +2,7 @@ package polyglot.frontend;
 
 import java.io.Reader;
 import java.io.File;
+import java.io.IOException;
 
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.goals.Goal;
@@ -163,5 +164,9 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 
     public ClassFile createClassFile(File classFileSource, byte[] code){
         return new ClassFile(classFileSource, code, this);
+    }
+
+    public FileSource createFileSource(File f) throws IOException {
+	return new FileSource(f);
     }
 }

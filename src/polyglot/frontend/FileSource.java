@@ -9,7 +9,7 @@ import polyglot.util.InternalCompilerError;
 public class FileSource extends Source
 {
     protected final File file;
-    protected FileReader reader;
+    protected Reader reader;
 
     public FileSource(File file) throws IOException {
         this(file, false);
@@ -43,10 +43,21 @@ public class FileSource extends Source
     /** Open the source file. */
     public Reader open() throws IOException {
 	if (reader == null) {
-	    reader = new FileReader(file);
+	    FileInputStream str = new FileInputStream(file);
+	    reader = createReader(str);
 	}
 
 	return reader;
+    }
+
+    /** This method defines the character encoding used by
+        a file source. By default, it is ASCII with Unicode escapes,
+	but it may be overridden. */
+    protected Reader createReader(InputStream str) {
+      try {
+	return new polyglot.lex.EscapedUnicodeReader(
+	             new InputStreamReader(str, "US-ASCII"));
+      } catch (UnsupportedEncodingException e) { return null; }
     }
 
     /** Close the source file. */

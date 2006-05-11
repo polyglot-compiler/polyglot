@@ -3,6 +3,7 @@ package polyglot.frontend;
 import java.io.Reader;
 import java.io.OutputStream;
 import java.io.File;
+import java.io.IOException;
 
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.goals.Goal;
@@ -92,4 +93,9 @@ public interface ExtensionInfo {
 
     /** Create class file */ 
     ClassFile createClassFile(File classFileSource, byte[] code);
+
+    /** Create file source for a file. The main purpose is to allow
+        the character encoding to be defined. */
+    FileSource createFileSource(File sourceFile) throws IOException;
+
 }
