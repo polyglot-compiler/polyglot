@@ -589,6 +589,18 @@ ext=""
   <target name="j0-jar" depends="j0">
     <jar jarfile="${lib}/j0.jar" basedir="${classes}" includes="polyglot/ext/j0/**"/>
   </target>
+  
+  <target name="jshell" depends="jl">
+    <antcall target="standard-ext">
+      <param name="ext" value="jshell"/>
+      <param name="parser.type" value="ppg"/>
+      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
+    </antcall>
+  </target>
+
+  <target name="jshell-jar" depends="jshell">
+    <jar jarfile="${lib}/jshell.jar" basedir="${classes}" includes="polyglot/ext/jshell/**"/>
+  </target>
 
   <target name="param"
   	      depends="jl"
