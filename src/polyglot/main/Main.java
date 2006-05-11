@@ -124,23 +124,24 @@ public class Main
                                     ErrorQueue eq) {
       if (options.post_compiler != null && !options.output_stdout) {
           Runtime runtime = Runtime.getRuntime();
+          String[] javacCmd = new String[3+compiler.outputFiles().size()];
+          javacCmd[0] = options.post_compiler;
+          javacCmd[1] = "-classpath";
+          javacCmd[2] = options.constructPostCompilerClasspath();
 
           Iterator iter = compiler.outputFiles().iterator();
-          StringBuffer outputFiles = new StringBuffer();
-          while(iter.hasNext()) {
-              outputFiles.append((String)iter.next());
-              outputFiles.append(" ");
+          for (int i = 3; iter.hasNext(); i++)
+              javacCmd[i] = (String)iter.next();
+
+          if (Report.should_report(verbose, 1)) {
+              StringBuffer cmdStr = new StringBuffer();
+              for (int i = 0; i < javacCmd.length; i++)
+                  cmdStr.append(javacCmd[i]+" ");
+              Report.report(1, "Executing post-compiler " + cmdStr);
           }
 
-          String command = options.post_compiler + " -nowarn -classpath \"" +
-                        options.constructPostCompilerClasspath() + "\" "
-                        + outputFiles.toString();
-
-          if (Report.should_report(verbose, 1))
-              Report.report(1, "Executing post-compiler " + command);
-
           try {
-              Process proc = runtime.exec(command);
+              Process proc = runtime.exec(javacCmd);
 
               InputStreamReader err = null;
 
@@ -164,8 +165,11 @@ public class Main
               proc.waitFor();
 
               if (!options.keep_output_files) {
-                String command2 = "rm " + outputFiles.toString();
-                runtime.exec(command2);
+                String[] rmCmd = new String[1+compiler.outputFiles().size()];
+                rmCmd[0] = "rm";
+                for (int i = 1; i < rmCmd.length; i++)
+                    rmCmd[i] = javacCmd[i+2];
+                runtime.exec(rmCmd);
               }
 
               if (proc.exitValue() > 0) {
@@ -239,8 +243,7 @@ public class Main
       catch (ClassNotFoundException e) {
           throw new TerminationException(
             "Extension " + ext +
-            " not found: could not find class " + ext + "." +
-                e.getMessage());
+            " not found: could not find class " + ext + ".");
       }
 
       try {

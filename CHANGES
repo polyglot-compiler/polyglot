@@ -3,6 +3,28 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
+XXX: Polyglot 2.0
+================================
+  What's new since Polyglot 2.0alpha4:
+  --------------------------------------
+    Fixed bug with post compiler not handling spaces in file names.
+    Patch from Igor Peshansky (igorp@us.ibm.com).
+
+Feb 2, 2006: Polyglot 2.0alpha4
+================================
+  What's new since Polyglot 2.0alpha3:
+  --------------------------------------
+    Fixed numerous bugs with serialization of type information.
+
+    Fixed bug where MembersAdded goal was reached before
+    default constructor was added.
+
+    Added factory method in ExtensionInfo for
+    polyglot.types.reflect.ClassFile (thanks to Jennifer Lhotak
+    for the patch).
+
+    Miscellaneous minor bug fixes.
+
 Nov 25, 2005: Polyglot 2.0alpha3
 ================================
   What's new since Polyglot 2.0alpha2:
