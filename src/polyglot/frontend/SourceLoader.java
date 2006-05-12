@@ -35,6 +35,9 @@ public class SourceLoader
 
     /** Load a source from a specific file. */
     public FileSource fileSource(String fileName) throws IOException {
+        return fileSource(fileName, false);
+    }
+    public FileSource fileSource(String fileName, boolean userSpecified) throws IOException {
         // If we haven't done so already,
         // determine if the file system is case insensitive
         setCaseInsensitive(fileName);
@@ -91,10 +94,13 @@ public class SourceLoader
         FileSource s = (FileSource) loadedSources.get(fileKey(sourceFile));
         
         if (s != null) {
+            if (!s.userSpecified && userSpecified) {
+                s.setUserSpecified(true);
+            }
             return s;
         }
         
-        s = sourceExt.createFileSource(sourceFile);
+        s = sourceExt.createFileSource(sourceFile, userSpecified);
         loadedSources.put(fileKey(sourceFile), s);
         return s;
     }
@@ -183,7 +189,7 @@ public class SourceLoader
                     try {
                         if (Report.should_report(Report.loader, 2))
                             Report.report(2, "Loading " + className + " from " + sourceFile);
-                        s = sourceExt.createFileSource(sourceFile);
+                        s = sourceExt.createFileSource(sourceFile, false);
                         loadedSources.put(fileKey(sourceFile), s);
                         return s;
                     }
