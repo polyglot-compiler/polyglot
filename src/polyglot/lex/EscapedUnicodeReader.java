@@ -42,8 +42,20 @@ public class EscapedUnicodeReader extends FilterReader {
       int val=0;
       for (int i=0; i<4; i++, r=in.read()) {
 	int d=Character.digit((char)r, 16);
-	if (r<0 || d<0)
-	  throw new Error("Invalid unicode escape character.");
+	if (r<0 || d<0) {
+            // invalid unicode character. Spend some time getting a 
+            // meaningful error message
+            String code = "";
+            for (int j = 0; j < i; j++) {
+                code = Character.forDigit(val % 16, 16) + code;
+                val = val/16;
+            }
+            for (; i<4; i++, r=in.read()) {
+                code += ((char)r);
+            }
+            
+	    throw new IOException("Invalid unicode escape character: \\u" + code);
+        }
 	val = (val*16) + d;
       }
       // yeah, we made it.
