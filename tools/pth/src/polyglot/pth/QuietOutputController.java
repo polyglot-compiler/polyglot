@@ -57,7 +57,7 @@ public class QuietOutputController extends StdOutputController{
         }
         else if (showScriptProgress) {
             out.print(sft.success() ? PROGRESS_PASS_CHAR : PROGRESS_FAIL_CHAR);
-            if (count++ >= PROGRESS_LIMIT) {
+            if (++count >= PROGRESS_LIMIT) {
                 out.println();
                 count = 0;                
             }
