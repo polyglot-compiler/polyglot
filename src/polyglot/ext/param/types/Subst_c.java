@@ -18,7 +18,7 @@ public class Subst_c implements Subst
     /** Map from formal parameters (of type Param) to actuals. */
     protected Map subst;
 
-    /** Cache of types. */
+    /** Cache of types. From CacheTypeWrapper(t) to subst(t)*/
     protected transient Map cache;
 
     protected transient ParamTypeSystem ts;
@@ -109,11 +109,11 @@ public class Subst_c implements Subst
         if (t == null || t == this)
             return t;
 
-        Type cached = (Type) cache.get(t);
+        Type cached = cacheGet(t);
 
         if (cached == null) {
             cached = uncachedSubstType(t);
-            cache.put(t, cached);
+            cachePut(t, cached);
 
             if (Report.should_report(Topics.subst, 2))
                 Report.report(2, "substType(" +
@@ -124,6 +124,43 @@ public class Subst_c implements Subst
         return cached;
     }
 
+    protected void cachePut(Type t, Type cached) {
+        cache.put(new CacheTypeWrapper(t), cached);        
+    }
+
+    protected Type cacheGet(Type t) {
+        return (Type)cache.get(new CacheTypeWrapper(t));
+    }
+
+    class CacheTypeWrapper {
+        final Type t;
+        CacheTypeWrapper(Type t) { this.t = t; }
+        
+        public boolean equals(Object o) {
+            if (o instanceof CacheTypeWrapper) {
+                return Subst_c.this.cacheTypeEquality(t, ((CacheTypeWrapper)o).t);
+            }
+            if (o instanceof Type) {
+                return Subst_c.this.cacheTypeEquality(t, (Type)o);
+            }
+            return false;
+        }
+        public String toString() {
+            return String.valueOf(t);
+        }
+        public int hashCode() {
+            return t==null?0:t.hashCode();           
+        }
+    }
+    
+    /**
+     * This method is used by the cache lookup to test type equality.
+     * May be overridden by subclasses as appropriate.
+     */
+    protected boolean cacheTypeEquality(Type t1, Type t2) {
+        return ts.equals(t1, t2);
+    }
+
     /** Perform substitution on a PClass. */
     public PClass substPClass(PClass pclazz) {
         MuPClass newPclazz = ts.mutablePClass(pclazz.position());
@@ -131,6 +168,7 @@ public class Subst_c implements Subst
         newPclazz.clazz((ClassType) substType(pclazz.clazz()));
         return newPclazz;
     }
+
 
     /** Perform substititions on a field. */
     public FieldInstance substField(FieldInstance fi) {
