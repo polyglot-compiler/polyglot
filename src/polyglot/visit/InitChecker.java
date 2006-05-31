@@ -618,10 +618,10 @@ public class InitChecker extends DataFlow
     protected Map flowFormal(DataFlowItem inItem, FlowGraph graph, Formal f, Set succEdgeKeys) {
         Map m = new HashMap(inItem.initStatus);
         // a formal argument is always defined.            
-        m.put(f.localInstance(), new MinMaxInitCount(InitCount.ONE,InitCount.ONE));
+        m.put(f.localInstance().orig(), new MinMaxInitCount(InitCount.ONE,InitCount.ONE));
             
         // record the fact that we have seen the formal declaration
-        currCBI.localDeclarations.add(f.localInstance());
+        currCBI.localDeclarations.add(f.localInstance().orig());
 
         return itemToMap(new DataFlowItem(m), succEdgeKeys);
     }
@@ -635,7 +635,7 @@ public class InitChecker extends DataFlow
                                 LocalDecl ld, 
                                 Set succEdgeKeys) {
         Map m = new HashMap(inItem.initStatus);
-        MinMaxInitCount initCount = (MinMaxInitCount)m.get(ld.localInstance());
+        MinMaxInitCount initCount = (MinMaxInitCount)m.get(ld.localInstance().orig());
         //if (initCount == null) {
             if (ld.init() != null) {
                 // declaration of local var with initialization.
@@ -647,7 +647,7 @@ public class InitChecker extends DataFlow
                 initCount = new MinMaxInitCount(InitCount.ZERO,InitCount.ZERO);
             }     
 
-            m.put(ld.localInstance(), initCount);
+            m.put(ld.localInstance().orig(), initCount);
 //        }
 //        else {
             // the initCount is not null. We now have a problem. Why is the
@@ -687,7 +687,7 @@ public class InitChecker extends DataFlow
           initCount = new MinMaxInitCount(initCount.getMin().increment(),
                                           initCount.getMax().increment());
 
-          m.put(l.localInstance(), initCount);
+          m.put(l.localInstance().orig(), initCount);
           return itemToMap(new DataFlowItem(m), succEdgeKeys);  
     }
 
@@ -730,7 +730,8 @@ public class InitChecker extends DataFlow
             // is the only place constructor calls are allowed
             // record the fact that the current constructor calls the other
             // constructor
-            currCBI.constructorCalls.put(((ConstructorDecl)currCBI.currCodeDecl).constructorInstance(), 
+            currCBI.constructorCalls.put(
+                ((ConstructorDecl)currCBI.currCodeDecl).constructorInstance().orig(), 
                                  cc.constructorInstance().orig());
         }
         return null;
@@ -998,7 +999,7 @@ public class InitChecker extends DataFlow
                 // So a final field in this situation can be 
                 // assigned to at most once.                    
                 MinMaxInitCount initCount = (MinMaxInitCount) 
-                                       dfOut.initStatus.get(fi.orig());                                
+                                       dfOut.initStatus.get(fi.orig());
                 if (InitCount.MANY.equals(initCount.getMax())) {
                     throw new SemanticException("field \"" + fi.name() +
                             "\" might already have been assigned to",
