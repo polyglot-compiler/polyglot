@@ -121,13 +121,13 @@ public class ReachChecker extends DataFlow
         return DataFlowItem.NOT_REACHABLE;
     }
 
-    public Node leaveCall(Node n) throws SemanticException {
+    public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         // check for reachability.
         if (n instanceof Term) {
            n = checkReachability((Term)n);
         }
          
-        return super.leaveCall(n);
+        return super.leaveCall(old, n, v);
     }
 
     protected Node checkReachability(Term n) throws SemanticException {

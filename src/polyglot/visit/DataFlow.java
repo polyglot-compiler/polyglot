@@ -690,14 +690,14 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * Overridden superclass method, to pop from the stack of
      * <code>FlowGraph</code>s if necessary.
      */
-    protected Node leaveCall(Node n) throws SemanticException {
+    protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (n instanceof CodeDecl) {
             if (!dataflowOnEntry) {
                 dataflow((CodeDecl)n);
             }
             else if (dataflowOnEntry && !flowgraphStack.isEmpty()) {
                 FlowGraphSource fgs = (FlowGraphSource)flowgraphStack.getFirst();
-                if (fgs.source.equals(n)) {
+                if (fgs.source.equals(old)) {
                     // we are leaving the code decl that pushed this flowgraph 
                     // on the stack. pop tbe stack.
                     flowgraphStack.removeFirst();
