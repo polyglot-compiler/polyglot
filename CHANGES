@@ -3,12 +3,17 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
-XXX: Polyglot 2.0
-================================
-  What's new since Polyglot 2.0alpha4:
+Jun 8, 2006: Polyglot 2.0rc1
+============================
+  What's new since Polyglot 2.0rc1:
   --------------------------------------
     Fixed bug with post compiler not handling spaces in file names.
     Patch from Igor Peshansky (igorp@us.ibm.com).
+
+    Moved classes in polyglot.ext.jl.* to polyglot.*.
+    Renamed polyglot.ext.jl.ExtensionInfo to polyglot.frontend.JLExtensionInfo.
+    Renamed polyglot.ext.jl.Version to polyglot.frontend.JLVersion.
+    Renamed polyglot.ext.jl.JLScheduler to polyglot.frontend.JLScheduler.
 
 Feb 2, 2006: Polyglot 2.0alpha4
 ================================
