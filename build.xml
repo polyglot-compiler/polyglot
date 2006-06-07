@@ -175,7 +175,7 @@ ext=""
   <target name="compile-base">
     <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/**"
-      excludes="polyglot/ext/**,polyglot/tests/**,ppg/test/**">
+      excludes="polyglot/qq/**,polyglot/*/Lexer_c.java,polyglot/*/sym.java,polyglot/*/Grm.java,polyglot/ext/**,polyglot/tests/**,ppg/test/**">
       <classpath refid="standard.classpath"/>
     </javac>
   </target>
@@ -381,7 +381,7 @@ ext=""
                file="${lexer.dir}/${lexer.class}.java"/>
   </target>
 
-  <target name="base" depends="bin,cup,init,ppg,compile-base">
+  <target name="base" depends="bin,cup,init,ppg,base-parser,compile-base">
   </target>
 
   <!-- Builds PPG -->
@@ -411,27 +411,37 @@ ext=""
   </target>
 
   <!-- Builds JL -->
-  <target name="jl" depends="base" description="Build the base compiler">
+  <target name="jl" depends="base-parser,base,base-qq" description="Build the base compiler">
+  </target>
+
+  <target name="base-parser" depends="bin,cup,init" description="Build the base compiler parser">
     <antcall target="jflex-lexer">
-      <param name="lexer.dir" value="${src}/polyglot/ext/jl/parse"/>
+      <param name="lexer.dir" value="${src}/polyglot/parse"/>
       <param name="lexer.class" value="Lexer_c"/>
       <param name="jflex.file" value="java.flex"/>
     </antcall>
     <antcall target="cup-parser">
-      <param name="parser.dir" value="${src}/polyglot/ext/jl/parse"/>
+      <param name="parser.dir" value="${src}/polyglot/parse"/>
       <param name="cup.file" value="java12.cup"/>
       <param name="parser.class" value="Grm"/>
       <param name="symbol.class" value="sym"/>
     </antcall>
-    <copy file="${src}/polyglot/ext/jl/parse/java12.cup" todir="${classes}/polyglot/ext/jl/parse"/>
-    <antcall target="standard-ext-qq">
-      <param name="ext" value="jl"/>
+    <copy file="${src}/polyglot/parse/java12.cup" todir="${classes}/polyglot/parse"/>
+  </target>
+
+  <target name="base-qq" depends="bin,cup,init,ppg,base-parser,base" description="Build the base compiler parser">
+    <antcall target="jflex-lexer">
+      <param name="lexer.dir" value="${src}/polyglot/qq"/>
+      <param name="lexer.class" value="Lexer_c"/>
+      <param name="jflex.file" value="qq.flex"/>
     </antcall>
-    <antcall target="compile-ext">
-      <param name="ext" value="jl"/>
-    </antcall>
-    <antcall target="compile-ext-qq">
-      <param name="ext" value="jl"/>
+    <antcall target="ppg-parser">
+      <param name="parser.dir" value="${src}/polyglot/qq"/>
+      <param name="ppg.file" value="qq.ppg"/>
+      <param name="base.parser" value="${src}/polyglot/parse/java12.cup"/>
+      <param name="cup.file" value="qq_ppg.cup"/>
+      <param name="parser.class" value="Grm"/>
+      <param name="symbol.class" value="sym"/>
     </antcall>
   </target>
 
@@ -547,7 +557,7 @@ ext=""
     <antcall target="standard-ext">
       <param name="ext" value="ibex"/>
       <param name="parser.type" value="ppg"/>
-      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
+      <param name="base.parser" value="polyglot/parse/java12.cup"/>
     </antcall>
     <antcall target="ibex-runtime"/>
   </target>
@@ -568,7 +578,7 @@ ext=""
     <antcall target="standard-ext">
       <param name="ext" value="skel"/>
       <param name="parser.type" value="ppg"/>
-      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
+      <param name="base.parser" value="polyglot/parse/java12.cup"/>
     </antcall>
   </target>
 
@@ -582,7 +592,7 @@ ext=""
     <antcall target="standard-ext">
       <param name="ext" value="j0"/>
       <param name="parser.type" value="ppg"/>
-      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
+      <param name="base.parser" value="polyglot/parse/java12.cup"/>
     </antcall>
   </target>
 
@@ -614,7 +624,7 @@ ext=""
     <antcall target="standard-ext">
       <param name="ext" value="polyj"/>
       <param name="parser.type" value="ppg"/>
-      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
+      <param name="base.parser" value="polyglot/parse/java12.cup"/>
       <param name="has-qq" value=""/>
     </antcall>
   </target>
@@ -622,7 +632,7 @@ ext=""
   <target name="jmatch" depends="jl">
     <antcall target="standard-ext">
       <param name="ext" value="jmatch"/>
-      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
+      <param name="base.parser" value="polyglot/parse/java12.cup"/>
       <param name="parser.type" value="ppg"/>
     </antcall>
     <!-- compile the JMatch runtime -->
@@ -635,7 +645,7 @@ ext=""
   <target name="jx-compile">
     <antcall target="compile-ext">
       <param name="ext" value="jx"/>
-      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
+      <param name="base.parser" value="polyglot/parse/java12.cup"/>
       <param name="parser.type" value="ppg"/>
     </antcall>
   </target>
@@ -643,7 +653,7 @@ ext=""
   <target name="jx" depends="jl" description="Build the Jx compiler">
     <antcall target="standard-ext">
       <param name="ext" value="jx"/>
-      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
+      <param name="base.parser" value="polyglot/parse/java12.cup"/>
       <param name="parser.type" value="ppg"/>
     </antcall>
     <javac srcdir="${src}/polyglot/ext/jx/runtime/src" destdir="${classes}" debug="on"
@@ -669,7 +679,7 @@ ext=""
   	      description="Builds the pao extension">
     <antcall target="standard-ext">
       <param name="ext" value="pao"/>
-      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
+      <param name="base.parser" value="polyglot/parse/java12.cup"/>
       <param name="parser.type" value="ppg"/>
     </antcall>
     <!-- compile the PAO runtime -->
@@ -684,14 +694,14 @@ ext=""
   	depends="param">
     <antcall target="standard-ext">
       <param name="ext" value="coffer"/>
-      <param name="base.parser" value="polyglot/ext/jl/parse/java12.cup"/>
+      <param name="base.parser" value="polyglot/parse/java12.cup"/>
       <param name="parser.type" value="ppg"/>
     </antcall>
   </target>
 
   <target name="polyglot-jar" depends="jl,param,ppg" description="Builds polyglot.jar">
     <jar jarfile="${lib}/polyglot.jar" basedir="${classes}"
-      includes="polyglot/ast/**,polyglot/ext/jl/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**"/>
+      includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**"/>
   </target>
 
   <target name="pao-jar" depends="pao" description="Builds pao.jar">
@@ -769,11 +779,6 @@ ext=""
       <fileset dir="${src}/polyglot/ast" excludes="**/Makefile"/>
     </copy>
 
-    <copy todir="${dist}/src/polyglot/ext/jl" includeEmptyDirs="false">
-      <fileset dir="${src}/polyglot/ext/jl"
-        excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/**/*.results"/>
-    </copy>
-
     <copy todir="${dist}/src/polyglot/frontend" includeEmptyDirs="false">
       <fileset dir="${src}/polyglot/frontend" excludes="**/Makefile"/>
     </copy>
@@ -788,6 +793,10 @@ ext=""
 
     <copy todir="${dist}/src/polyglot/parse" includeEmptyDirs="false">
       <fileset dir="${src}/polyglot/parse" excludes="**/Makefile"/>
+    </copy>
+
+    <copy todir="${dist}/src/polyglot/qq" includeEmptyDirs="false">
+      <fileset dir="${src}/polyglot/qq" excludes="**/Makefile"/>
     </copy>
 
     <copy todir="${dist}/src/polyglot/types" includeEmptyDirs="false">
@@ -811,7 +820,7 @@ ext=""
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/**/*.results"/>
     </copy>
 
-    <copy todir="${dist}/src/polyglot/ext/jl/tests" file="${src}/polyglot/ext/jl/tests/Makefile"/>
+    <copy todir="${dist}/src/polyglot/tests" file="${src}/polyglot/tests/Makefile"/>
 
     <copy todir="${dist}/tools" includeEmptyDirs="false">
       <fileset dir="tools"/>
