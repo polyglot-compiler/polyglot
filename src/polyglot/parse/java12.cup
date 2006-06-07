@@ -1,4 +1,4 @@
-package polyglot.ext.jl.parse;
+package polyglot.parse;
 
 import java.util.*;
 

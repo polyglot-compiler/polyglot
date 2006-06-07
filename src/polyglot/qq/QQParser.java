@@ -1,4 +1,4 @@
-package polyglot.ext.jl.qq;
+package polyglot.qq;
 
 import java_cup.runtime.Symbol;
 import polyglot.ast.*;

@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import polyglot.ext.jl.types.TypeSystem_c;
+import polyglot.types.TypeSystem_c;
 import polyglot.frontend.Source;
 import polyglot.types.*;
 import polyglot.util.InternalCompilerError;

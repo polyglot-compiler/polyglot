@@ -1,4 +1,4 @@
-package polyglot.ext.jl.types;
+package polyglot.types;
 
 import java.io.*;
 import java.util.*;

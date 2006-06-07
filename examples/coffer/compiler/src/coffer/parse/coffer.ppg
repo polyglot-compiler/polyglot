@@ -1,12 +1,12 @@
-include "../../jl/parse/java12.cup"
+include "../../../parse/java12.cup"
 
 package polyglot.ext.coffer.parse;
 
 import polyglot.ext.coffer.types.*;
 import polyglot.ext.coffer.ast.*;
-import polyglot.ext.jl.parse.Name;
+import polyglot.parse.Name;
 
-parser Grm extends polyglot.ext.jl.parse.Grm {:
+parser Grm extends polyglot.parse.Grm {:
     public final CofferTypeSystem ts;
     public final CofferNodeFactory nf;
 

@@ -1,4 +1,4 @@
-package polyglot.ext.jl.qq;
+package polyglot.qq;
 
 import polyglot.ast.*;
 import polyglot.types.*;
@@ -8,8 +8,8 @@ import polyglot.frontend.*;
 import polyglot.main.Report;
 import polyglot.lex.Lexer;
 
-import polyglot.ext.jl.qq.Lexer_c;
-import polyglot.ext.jl.qq.Grm;
+import polyglot.qq.Lexer_c;
+import polyglot.qq.Grm;
 
 import java.util.*;
 import java.io.*;
@@ -675,12 +675,12 @@ public class QQ {
 
     /** Create a lexer that performs the substitutions in <code>subst</code>. */
     protected Lexer lexer(String fmt, Position pos, List subst) {
-        return new polyglot.ext.jl.qq.Lexer_c(fmt, pos, subst);
+        return new polyglot.qq.Lexer_c(fmt, pos, subst);
     }
 
     /** Create a quasiquoting parser. */
     protected QQParser parser(Lexer lexer, TypeSystem ts, NodeFactory nf, ErrorQueue eq) {
-        return new polyglot.ext.jl.qq.Grm(lexer, ts, nf, eq);
+        return new polyglot.qq.Grm(lexer, ts, nf, eq);
     }
 
     /** Parse a string into an AST node of the given type,
@@ -724,7 +724,7 @@ public class QQ {
         polyglot.lex.Lexer lexer = lexer(fmt, pos, subst);
         QQParser grm = parser(lexer, ts, nf, eq);
 
-        if (Report.should_report(polyglot.ext.jl.Topics.qq, 1)) {
+        if (Report.should_report(polyglot.frontend.Topics.qq, 1)) {
 	    Report.report(1, "qq: " + fmt);
 	    Report.report(1, "subst: " + subst);
 	}
@@ -757,7 +757,7 @@ public class QQ {
 
             if (sym != null && sym.value instanceof Node) {
                 Node n = (Node) sym.value;
-                if (Report.should_report(polyglot.ext.jl.Topics.qq, 1))
+                if (Report.should_report(polyglot.frontend.Topics.qq, 1))
 		    Report.report(1, "result: " + n);
                 return n;
             }

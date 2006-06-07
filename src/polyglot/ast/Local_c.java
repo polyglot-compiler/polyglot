@@ -1,4 +1,4 @@
-package polyglot.ext.jl.ast;
+package polyglot.ast;
 
 import polyglot.ast.Local;
 import polyglot.ast.Node;

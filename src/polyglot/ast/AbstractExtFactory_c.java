@@ -1,4 +1,4 @@
-package polyglot.ext.jl.ast;
+package polyglot.ast;
 
 import polyglot.ast.Ext;
 import polyglot.ast.ExtFactory;
@@ -23,7 +23,7 @@ import polyglot.ast.ExtFactory;
  * superclass of <code>N</code>. Similarly, the default implementation of
  * <code>postExtN(Ext)</code> is to call <code>postExtM(Ext)</code>.
  * 
- * @see polyglot.ext.jl.ast.AbstractDelFactory_c has a very similar structure. 
+ * @see polyglot.ast.AbstractDelFactory_c has a very similar structure. 
  */
 public abstract class AbstractExtFactory_c implements ExtFactory
 {

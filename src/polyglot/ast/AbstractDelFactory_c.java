@@ -1,4 +1,4 @@
-package polyglot.ext.jl.ast;
+package polyglot.ast;
 
 import polyglot.ast.DelFactory;
 import polyglot.ast.JL;
@@ -24,7 +24,7 @@ import polyglot.util.InternalCompilerError;
  * superclass of <code>N</code>. Similarly, the default implementation of
  * <code>postDelN(JL)</code> is to call <code>postDelM(JL)</code>.
  * 
- * @see polyglot.ext.jl.ast.AbstractExtFactory_c has a very similar structure. 
+ * @see polyglot.ast.AbstractExtFactory_c has a very similar structure. 
  */
 public abstract class AbstractDelFactory_c implements DelFactory
 {

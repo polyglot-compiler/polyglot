@@ -32,7 +32,7 @@ public interface TypeObject extends Copy, Serializable
      * extensions can override TypeObject_c.equalsImpl(), and
      * don't forget to override hashCode().
      *
-     * @see polyglot.ext.jl.types.TypeObject_c#equalsImpl(TypeObject)
+     * @see polyglot.types.TypeObject_c#equalsImpl(TypeObject)
      * @see java.lang.Object#hashCode()
      */
     boolean equalsImpl(TypeObject t);

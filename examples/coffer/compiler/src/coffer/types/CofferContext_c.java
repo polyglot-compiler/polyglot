@@ -1,6 +1,5 @@
 package polyglot.ext.coffer.types;
 
-import polyglot.ext.jl.types.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import java.util.*;

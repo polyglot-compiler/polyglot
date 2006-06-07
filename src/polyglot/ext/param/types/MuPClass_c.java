@@ -3,8 +3,6 @@ package polyglot.ext.param.types;
 import polyglot.types.*;
 import polyglot.util.*;
 
-import polyglot.ext.jl.types.*;
-
 import java.util.*;
 
 /**

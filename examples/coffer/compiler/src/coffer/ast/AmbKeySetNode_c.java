@@ -4,7 +4,6 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
-import polyglot.ext.jl.ast.*;
 import polyglot.ext.coffer.types.*;
 import java.util.*;
 

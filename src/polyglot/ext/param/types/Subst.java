@@ -1,6 +1,5 @@
 package polyglot.ext.param.types;
 
-import polyglot.ext.jl.types.*;
 import polyglot.types.*;
 import polyglot.types.Package;
 import polyglot.util.*;

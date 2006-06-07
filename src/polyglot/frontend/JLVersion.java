@@ -1,9 +1,9 @@
-package polyglot.ext.jl;
+package polyglot.frontend;
 
 /**
  * Version information for the base compiler.
  */
-public class Version extends polyglot.main.Version {
+public class JLVersion extends polyglot.main.Version {
     public String name()
         { return "jl"; }
     public int major()

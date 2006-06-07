@@ -1,11 +1,11 @@
 include "../parse/java12.cup"
 
-package polyglot.ext.jl.qq;
+package polyglot.qq;
 
-import polyglot.ext.jl.parse.Name;
+import polyglot.parse.Name;
 import polyglot.lex.Lexer;
 
-parser Grm extends polyglot.ext.jl.parse.Grm implements QQParser {:
+parser Grm extends polyglot.parse.Grm implements QQParser {:
     public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue eq) {
 	super(l, t, n, eq);
     }

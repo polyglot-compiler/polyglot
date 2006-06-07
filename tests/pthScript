@@ -25,7 +25,7 @@
 #      CmdLineArgs  :   additional command line args for the Polyglot 
 #                       compiler; is always enclosed in quotes.
 
-polyglot.ext.jl.ExtensionInfo "-cp ." {
+polyglot.frontend.JLExtensionInfo "-cp ." {
         ArrayInit.jl ;
         BoolTest.jl ;
         BoolTest2.jl (Semantic, "may not have been initialized");

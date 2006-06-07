@@ -1,7 +1,7 @@
 package polyglot.ext.pao.ast;
 
 import polyglot.ast.JL;
-import polyglot.ext.jl.ast.AbstractDelFactory_c;
+import polyglot.ast.AbstractDelFactory_c;
 import polyglot.ext.pao.extension.PaoInstanceofDel_c;
 
 /**

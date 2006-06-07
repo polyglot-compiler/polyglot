@@ -58,7 +58,7 @@ public class Main
       if (ext != null) {
           return ext;
       }
-      return loadExtension("polyglot.ext.jl.ExtensionInfo");
+      return loadExtension("polyglot.frontend.JLExtensionInfo");
   }
 
   public void start(String[] argv) throws TerminationException {

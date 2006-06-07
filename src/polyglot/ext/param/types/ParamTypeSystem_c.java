@@ -1,6 +1,6 @@
 package polyglot.ext.param.types;
 
-import polyglot.ext.jl.types.TypeSystem_c;
+import polyglot.types.TypeSystem_c;
 import polyglot.types.*;
 import polyglot.util.*;
 

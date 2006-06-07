@@ -38,6 +38,7 @@ polyglot.ext.coffer.ExtensionInfo {
     SimpleTest6.cof (Semantic, "Can evaluate expression.*only if key.*I.*is held") ;
     SimpleTest7.cof (Semantic, "Can evaluate expression.*only if key.*I.*is held") ;
     SimpleTest8.cof ;
+    SimpleTest9.cof ;
     Subclassing.cof ;
     TestIS.cof
 }

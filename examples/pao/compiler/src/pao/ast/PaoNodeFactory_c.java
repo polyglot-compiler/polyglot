@@ -1,6 +1,6 @@
 package polyglot.ext.pao.ast;
 
-import polyglot.ext.jl.ast.NodeFactory_c;
+import polyglot.ast.NodeFactory_c;
 
 /**
  * <code>NodeFactory</code> implementation for the pao extension.

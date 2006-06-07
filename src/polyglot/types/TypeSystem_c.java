@@ -1,4 +1,4 @@
-package polyglot.ext.jl.types;
+package polyglot.types;
 
 import java.lang.reflect.Modifier;
 import java.util.*;

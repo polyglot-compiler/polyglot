@@ -4,7 +4,7 @@
  * Author: nystrom
  * Creation date: Feb 6, 2005
  */
-package polyglot.ext.jl;
+package polyglot.frontend;
 
 import java.util.*;
 

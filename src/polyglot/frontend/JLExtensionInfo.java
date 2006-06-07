@@ -1,16 +1,17 @@
-package polyglot.ext.jl;
+package polyglot.frontend;
 
 import java.io.Reader;
 import java.io.OutputStream;
 import java.util.*;
 
 import polyglot.ast.NodeFactory;
-import polyglot.ext.jl.ast.NodeFactory_c;
-import polyglot.ext.jl.parse.Grm;
-import polyglot.ext.jl.parse.Lexer_c;
-import polyglot.ext.jl.types.TypeSystem_c;
+import polyglot.ast.NodeFactory_c;
+import polyglot.parse.Grm;
+import polyglot.parse.Lexer_c;
+import polyglot.types.TypeSystem_c;
 import polyglot.frontend.*;
 import polyglot.frontend.goals.*;
+import polyglot.main.Version;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -40,7 +41,7 @@ import polyglot.visit.*;
  * <li> translation (Translator) </li>
  * </ol>
  */
-public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
+public class JLExtensionInfo extends AbstractExtensionInfo {
     protected void initTypeSystem() {
 	try {
             LoadedClassResolver lr;
@@ -77,8 +78,8 @@ public class ExtensionInfo extends polyglot.frontend.AbstractExtensionInfo {
 	return "jlc";
     }
 
-    public polyglot.main.Version version() {
-	return new Version();
+    public Version version() {
+	return new JLVersion();
     }
 
     /** Create the type system for this extension. */

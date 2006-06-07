@@ -1,4 +1,4 @@
-package polyglot.ext.jl.ast;
+package polyglot.ast;
 
 import java.util.Collections;
 import java.util.List;

@@ -4,8 +4,6 @@ import polyglot.types.*;
 import polyglot.types.Package;
 import polyglot.util.*;
 
-import polyglot.ext.jl.types.*;
-
 import java.util.*;
 
 /**

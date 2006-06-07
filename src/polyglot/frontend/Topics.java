@@ -1,4 +1,4 @@
-package polyglot.ext.jl;
+package polyglot.frontend;
 
 import polyglot.main.Report;
 

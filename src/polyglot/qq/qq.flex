@@ -2,7 +2,7 @@
  * Based on JLS, 2ed, Chapter 3.
  */
 
-package polyglot.ext.jl.qq;
+package polyglot.qq;
 
 import java_cup.runtime.Symbol;
 import polyglot.lex.Lexer;

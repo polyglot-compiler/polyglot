@@ -11,7 +11,6 @@ import polyglot.ext.pao.parse.Grm;
 import polyglot.ext.pao.parse.Lexer_c;
 import polyglot.ext.pao.types.PaoTypeSystem_c;
 import polyglot.ext.pao.visit.PaoBoxer;
-import polyglot.ext.jl.JLScheduler;
 import polyglot.frontend.*;
 import polyglot.frontend.goals.*;
 import polyglot.frontend.goals.Goal;
@@ -30,7 +29,7 @@ import polyglot.util.ErrorQueue;
  * @see polyglot.ext.pao.types.PaoTypeSystem 
  * @see polyglot.ext.pao.types.PaoTypeSystem_c 
  */
-public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
+public class ExtensionInfo extends polyglot.frontend.JLExtensionInfo {
     public String defaultFileExtension() {
         return "pao";
     }

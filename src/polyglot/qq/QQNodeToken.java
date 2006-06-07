@@ -1,4 +1,4 @@
-package polyglot.ext.jl.qq;
+package polyglot.qq;
 
 import polyglot.lex.*;
 import polyglot.ast.*;

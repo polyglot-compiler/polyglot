@@ -14,7 +14,6 @@ import polyglot.frontend.*;
 import polyglot.frontend.goals.*;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.Serialized;
-import polyglot.ext.jl.JLScheduler;
 import polyglot.main.*;
 import polyglot.lex.Lexer;
 

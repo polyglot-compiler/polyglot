@@ -1,4 +1,4 @@
-package polyglot.ext.jl.types;
+package polyglot.types;
 
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.FieldConstantsChecked;

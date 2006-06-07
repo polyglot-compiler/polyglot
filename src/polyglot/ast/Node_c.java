@@ -1,4 +1,4 @@
-package polyglot.ext.jl.ast;
+package polyglot.ast;
 
 import java.io.OutputStream;
 import java.io.Writer;

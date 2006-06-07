@@ -2,7 +2,7 @@ package polyglot.ext.pao.extension;
 
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.ext.jl.ast.Ext_c;
+import polyglot.ast.Ext_c;
 import polyglot.ext.pao.types.PaoTypeSystem;
 
 /**

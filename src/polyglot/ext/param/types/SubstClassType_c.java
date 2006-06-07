@@ -3,9 +3,9 @@ package polyglot.ext.param.types;
 import java.util.Iterator;
 import java.util.List;
 
-import polyglot.ext.jl.types.ClassType_c;
 import polyglot.frontend.Job;
 import polyglot.types.*;
+import polyglot.types.ClassType_c;
 import polyglot.types.ClassType;
 import polyglot.types.Flags;
 import polyglot.types.Package;

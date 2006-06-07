@@ -1,4 +1,4 @@
-package polyglot.ext.jl.types;
+package polyglot.types;
 
 import polyglot.frontend.*;
 import polyglot.frontend.goals.Goal;

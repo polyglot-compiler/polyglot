@@ -1,4 +1,4 @@
-package polyglot.ext.jl.qq;
+package polyglot.qq;
 
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;

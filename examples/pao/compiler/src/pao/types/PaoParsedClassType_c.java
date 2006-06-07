@@ -1,6 +1,6 @@
 package polyglot.ext.pao.types;
 
-import polyglot.ext.jl.types.ParsedClassType_c;
+import polyglot.types.ParsedClassType_c;
 import polyglot.frontend.Source;
 import polyglot.types.LazyClassInitializer;
 import polyglot.types.Type;
@@ -26,7 +26,7 @@ public class PaoParsedClassType_c extends ParsedClassType_c {
      * if this <code>ClassType</code> is <code>Object</code> and the 
      * <code>toType</code> is a primitive.
      * 
-     * @see polyglot.ext.jl.types.ClassType_c#isCastValidImpl(Type)
+     * @see polyglot.types.ClassType_c#isCastValidImpl(Type)
      */
     public boolean isCastValidImpl(Type toType) {
         return toType.isPrimitive() && ts.equals(this, ts.Object())

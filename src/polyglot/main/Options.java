@@ -173,7 +173,7 @@ public class Options {
                           " version " + extension.version() + "\n");
             }
             sb.append("Polyglot compiler toolkit version " +
-                               new polyglot.ext.jl.Version());
+                               new polyglot.frontend.JLVersion());
             throw new Main.TerminationException(sb.toString(), 0);
         }
         else if (args[i].equals("-d"))
