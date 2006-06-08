@@ -701,7 +701,7 @@ ext=""
 
   <target name="polyglot-jar" depends="jl,param,ppg" description="Builds polyglot.jar">
     <jar jarfile="${lib}/polyglot.jar" basedir="${classes}"
-      includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**"/>
+      includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/qq/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**"/>
   </target>
 
   <target name="pao-jar" depends="pao" description="Builds pao.jar">
