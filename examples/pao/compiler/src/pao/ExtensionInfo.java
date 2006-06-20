@@ -29,7 +29,7 @@ import polyglot.util.ErrorQueue;
  * @see polyglot.ext.pao.types.PaoTypeSystem 
  * @see polyglot.ext.pao.types.PaoTypeSystem_c 
  */
-public class ExtensionInfo extends polyglot.frontend.JLExtensionInfo {
+public class ExtensionInfo extends JLExtensionInfo {
     public String defaultFileExtension() {
         return "pao";
     }
