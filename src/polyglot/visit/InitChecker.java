@@ -295,7 +295,7 @@ public class InitChecker extends DataFlow
      * taking into account the constructor calls.
      * 
      */
-    public Node leaveCall(Node n) throws SemanticException {
+    protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (n instanceof ConstructorDecl) {
             // postpone the checking of the constructors until all the 
             // initializer blocks have been processed.
@@ -334,7 +334,7 @@ public class InitChecker extends DataFlow
             currCBI = currCBI.outer;
         }
 
-        return super.leaveCall(n);
+        return super.leaveCall(old, n, v);
     }
 
     protected void setupClassBody(ClassBody n) throws SemanticException {
@@ -416,7 +416,7 @@ public class InitChecker extends DataFlow
                 // it must be initialized exactly once.
                 // navigate up through all of the the constructors
                 // that this constructor calls.
-                    
+                                    
                 boolean fieldInitializedBeforeConstructors = false;
                 MinMaxInitCount ic = (MinMaxInitCount)
                     currCBI.currClassFinalFieldInitCounts.get(fi.orig());
@@ -796,22 +796,26 @@ public class InitChecker extends DataFlow
             // due to the flow equations, all DataFlowItems in the outItems map
             // are the same, so just take the first one.
             dfOut = (DataFlowItem)outItems.values().iterator().next(); 
-        }
         
-        if (n instanceof Local) {
-            checkLocal(graph, (Local)n, dfIn, dfOut);
-        }
-        else if (n instanceof LocalAssign) {
-            checkLocalAssign(graph, (LocalAssign)n, dfIn, dfOut);
-        }
-        else if (n instanceof FieldAssign) {
-            checkFieldAssign(graph, (FieldAssign)n, dfIn, dfOut);
-        }
-        else if (n instanceof ClassBody) {
-            checkClassBody(graph, (ClassBody)n, dfIn, dfOut);
+            if (n instanceof Local) {
+                checkLocal(graph, (Local)n, dfIn, dfOut);
+            }
+            else if (n instanceof LocalAssign) {
+                checkLocalAssign(graph, (LocalAssign)n, dfIn, dfOut);
+            }
+            else if (n instanceof FieldAssign) {
+                checkFieldAssign(graph, (FieldAssign)n, dfIn, dfOut);
+            }
+            else if (n instanceof ClassBody) {
+                checkClassBody(graph, (ClassBody)n, dfIn, dfOut);
+            }
+            else {
+                checkOther(graph, n, dfIn, dfOut);            
+            }
         }
         else {
-            checkOther(graph, n, dfIn, dfOut);            
+            // this local assign node has not had data flow performed over it.
+            // probably a node in a finally block. Just ignore it.
         }
         
         if (n == graph.finishNode()) {            
@@ -967,7 +971,7 @@ public class InitChecker extends DataFlow
                     "\" cannot be assigned to in an inner class.",
                     a.position());                     
         }
-
+        
         MinMaxInitCount initCount = (MinMaxInitCount) 
                                dfOut.initStatus.get(li.orig());                                
 
@@ -986,6 +990,7 @@ public class InitChecker extends DataFlow
                                     DataFlowItem dfIn, 
                                     DataFlowItem dfOut) 
         throws SemanticException {
+
         Field f = (Field)a.left();
         FieldInstance fi = f.fieldInstance();
         if (fi.flags().isFinal()) {
