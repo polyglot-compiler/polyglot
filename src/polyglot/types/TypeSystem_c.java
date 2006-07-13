@@ -1995,8 +1995,8 @@ public class TypeSystem_c implements TypeSystem
      * correctly.
      */
     public void checkClassConformance(ClassType ct) throws SemanticException {
-        if (ct.flags().isInterface()) {
-            // don't need to check interfaces            
+        if (ct.flags().isAbstract()) {
+            // don't need to check interfaces or abstract classes           
             return;
         }
 
