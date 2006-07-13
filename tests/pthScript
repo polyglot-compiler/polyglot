@@ -211,6 +211,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
 	Errors.jl (Semantic, "Method.*cannot be called with arguments");
 	Errors2.jl (Semantic, "Could not find type"); 
 	LabeledBreak2.jl (Semantic, "Unreachable statement"); 
+        InitCheckerBug.jl ;
 	NoInit1.jl (Semantic, "Local variable .* may not have been initialized"); 
 	NoInit10.jl (Semantic, "Local variable .* may not have been initialized"); 
 	NoInit11.jl (Semantic, "Local variable .* may not have been initialized"); 
