@@ -5,6 +5,7 @@ import polyglot.frontend.ExtensionInfo;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
 import polyglot.util.StdErrorQueue;
+import polyglot.util.QuotedStringTokenizer;
 
 import java.io.*;
 import java.util.*;
@@ -124,14 +125,20 @@ public class Main
                                     ErrorQueue eq) {
       if (options.post_compiler != null && !options.output_stdout) {
           Runtime runtime = Runtime.getRuntime();
-          String[] javacCmd = new String[3+compiler.outputFiles().size()];
-          javacCmd[0] = options.post_compiler;
-          javacCmd[1] = "-classpath";
-          javacCmd[2] = options.constructPostCompilerClasspath();
+          QuotedStringTokenizer st = new QuotedStringTokenizer(options.post_compiler);
+          int pc_size = st.countTokens();
+          String[] javacCmd = new String[pc_size+2+compiler.outputFiles().size()];
+          int j = 0;
+          for (int i = 0; i < pc_size; i++) {
+              javacCmd[j++] = st.nextToken();
+          }
+          javacCmd[j++] = "-classpath";
+          javacCmd[j++] = options.constructPostCompilerClasspath();
 
           Iterator iter = compiler.outputFiles().iterator();
-          for (int i = 3; iter.hasNext(); i++)
-              javacCmd[i] = (String)iter.next();
+          for (; iter.hasNext(); j++) {
+              javacCmd[j] = (String) iter.next();
+          }
 
           if (Report.should_report(verbose, 1)) {
               StringBuffer cmdStr = new StringBuffer();
