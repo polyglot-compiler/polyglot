@@ -674,6 +674,19 @@ ext=""
     </javac>
   </target>
 
+  <target name="jxnt" depends="jx" description="Build the Jx/nt compiler">
+    <antcall target="configure-ext">
+      <param name="ext" value="jxnt"/>
+    </antcall>
+    <antcall target="compile-ext">
+      <param name="ext" value="jxnt"/>
+    </antcall>
+    <javac srcdir="${src}/polyglot/ext/jxnt/runtime/src" destdir="${classes}" debug="on"
+      includes="jxnt/runtime/**">
+      <classpath refid="standard.classpath"/>
+    </javac>
+  </target>
+
   <target name="pao"
   	      depends="jl"
   	      description="Builds the pao extension">
@@ -909,6 +922,11 @@ ext=""
   <target name="jxmi-jar" depends="jxmi">
     <jar jarfile="${lib}/jxmi.jar" basedir="${classes}" includes="polyglot/ext/jxmi/**"/>
     <jar jarfile="${lib}/jxmirt.jar" basedir="${classes}" includes="jxmi/runtime/**"/>
+  </target>
+
+  <target name="jxnt-jar" depends="jxnt">
+    <jar jarfile="${lib}/jxnt.jar" basedir="${classes}" includes="polyglot/ext/jxnt/**"/>
+    <jar jarfile="${lib}/jxntrt.jar" basedir="${classes}" includes="jxnt/runtime/**"/>
   </target>
 
   <target name="jx-dist" depends="jl-dist,jx-jar"/>
