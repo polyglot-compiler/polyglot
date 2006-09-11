@@ -67,6 +67,9 @@ public class Options {
     /** Directly output code from possibly ambiguous ast nodes */
     public boolean output_ambiguous_nodes = false;
     
+    /** Use SimpleCodeWriter instead of OptimalCodeWriter */
+    public boolean use_simple_code_writer = false;
+    
     /**
      * Constructor
      */
@@ -338,6 +341,10 @@ public class Options {
             output_ambiguous_nodes = true;
             i++;
         }
+        else if (args[i].equals("-simpleoutput")) {
+        	use_simple_code_writer = true;
+        	i++;
+        }
         else if (!args[i].startsWith("-")) {
             source.add(args[i]);
             File f = new File(args[i]).getParentFile();
@@ -383,6 +390,7 @@ public class Options {
         usageForFlag(out, "-outputamb", "allow generating code from ambiguous nodes");
         usageForFlag(out, "-post <compiler>", 
                           "run javac-like compiler after translation");
+        usageForFlag(out, "-simpleoutput", "use SimpleCodeWriter");
         usageForFlag(out, "-v -verbose", "print verbose debugging information");
         usageForFlag(out, "-report <topic>=<level>", 
                           "print verbose debugging information about " +
