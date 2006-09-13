@@ -141,9 +141,9 @@ public abstract class Expr_c extends Term_c implements Expr
                              CodeWriter w, PrettyPrinter pp) {
         if (! associative && precedence().equals(expr.precedence()) ||
 	    precedence().isTighter(expr.precedence())) {
-	    w.write("(");
-            printBlock(expr, w, pp);
-	    w.write( ")");
+    		w.write("(");
+    		printBlock(expr, w, pp);
+    		w.write(")");
 	}
         else {
             print(expr, w, pp);
