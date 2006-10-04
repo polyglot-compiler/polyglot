@@ -54,8 +54,14 @@ qq_expr ::=
     ;
 
 qq_stmt ::=
-    	statement:a
-     	    {: RESULT = a; :}
+    	block_statement:a
+     	    {: if (a.size() == 1) {
+                RESULT = (Stmt) a.get(0);
+               }
+               else {
+                RESULT = parser.nf.Block(parser.pos(a), a);
+               }
+            :}
     ;
 
 qq_type ::=
