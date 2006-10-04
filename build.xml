@@ -689,6 +689,24 @@ ext=""
     </javac>
   </target>
 
+  <target name="jet" depends="jxnt,jxmi" description="Build the Jet compiler">
+    <antcall target="standard-ext">
+      <param name="ext" value="jet"/>
+      <param name="base.parser" value="polyglot/ext/jxmi/parse/jxmi_ppg.cup"/>
+      <param name="parser.type" value="ppg"/>
+    </antcall>
+    <antcall target="configure-ext">
+      <param name="ext" value="jet"/>
+    </antcall>
+    <antcall target="compile-ext">
+      <param name="ext" value="jet"/>
+    </antcall>
+    <javac srcdir="${src}/polyglot/ext/jet/runtime/src" destdir="${classes}" debug="on"
+      includes="jet/runtime/**">
+      <classpath refid="standard.classpath"/>
+    </javac>
+  </target>
+	
   <target name="pao"
   	      depends="jl"
   	      description="Builds the pao extension">
