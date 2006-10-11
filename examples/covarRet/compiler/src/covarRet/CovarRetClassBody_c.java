@@ -1,6 +1,5 @@
 package polyglot.ext.covarRet;
 
-import polyglot.ext.jl.ast.ClassBody_c;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;

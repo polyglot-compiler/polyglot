@@ -1,6 +1,5 @@
 package polyglot.ext.covarRet;
 
-import polyglot.ext.jl.types.TypeSystem_c;
 import polyglot.types.*;
 import polyglot.util.*;
 import java.util.*;

@@ -11,7 +11,7 @@ import polyglot.ext.jl.*;
 import java.util.*;
 import java.io.*;
 
-public class ExtensionInfo extends polyglot.ext.jl.ExtensionInfo {
+public class ExtensionInfo extends JLExtensionInfo {
     public String defaultFileExtension() {
 	return "jl";
     }
