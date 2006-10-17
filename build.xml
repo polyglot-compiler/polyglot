@@ -689,6 +689,12 @@ ext=""
     </javac>
   </target>
 
+  <target name="configure-jet">
+  	<antcall target="configure-ext">
+  	  <param name="ext" value="jet"/>
+    </antcall>
+  </target>
+  	
   <target name="jet" depends="jxnt,jxmi" description="Build the Jet compiler">
     <antcall target="standard-ext">
       <param name="ext" value="jet"/>
@@ -948,7 +954,59 @@ ext=""
     <jar jarfile="${lib}/jxnt.jar" basedir="${classes}" includes="polyglot/ext/jxnt/**"/>
     <jar jarfile="${lib}/jxntrt.jar" basedir="${classes}" includes="jxnt/runtime/**"/>
   </target>
+	
+  <target name="jet-jar" depends="jet">
+  	<jar jarfile="${lib}/jet.jar" basedir="${classes}" includes="polyglot/ext/jet/**,polyglot/ext/jxnt/**,polyglot/ext/jxmi/**,polyglot/ext/jx/**"/>
+  	<jar jarfile="${lib}/jetrt.jar" basedir="${classes}" includes="jet/runtime/**"/>
+  </target>
 
+  <target name="jet-dist" depends="jl-dist,jet-jar">
+	<!-- copy in Jet jar files -->
+	<copy todir="${dist}/lib" file="${lib}/jet.jar"/>
+	<copy todir="${dist}/lib" file="${lib}/jetrt.jar"/>
+  	
+  	<!-- copy in Jet sources -->
+  	<copy todir="${dist}/src/polyglot/ext/jet">
+  	  <fileset dir="${src}/polyglot/ext/jet" excludes="**/tests/**,**/doc/**"/>
+  	</copy>
+  	<!-- copy in Jxnt sources -->
+  	<copy todir="${dist}/src/polyglot/ext/jxnt">
+  	  <fileset dir="${src}/polyglot/ext/jxnt" excludes="**/tests/**,**/doc/**"/>
+  	</copy>
+  	<!-- copy in Jxmi sources -->
+  	<copy todir="${dist}/src/polyglot/ext/jxmi">
+  	  <fileset dir="${src}/polyglot/ext/jxmi" excludes="**/tests/**,**/doc/**"/>
+  	</copy>
+  	<!-- copy in Jx sources -->
+  	<copy todir="${dist}/src/polyglot/ext/jx">
+  	  <fileset dir="${src}/polyglot/ext/jx" excludes="**/tests/**,**/doc/**"/>
+  	</copy>
+
+  	<!-- copy in Jet examples -->
+  	<copy todir="${dist}/examples">
+  	  <fileset dir="${src}/polyglot/ext/jet/tests"/>
+  	</copy>
+
+  	<!-- copy in Jet Ant files -->
+    <copy file="${basedir}/configure-jet.xml" tofile="${dist}/configure-jet.xml"/>
+  	
+  	<!-- README, License, etc. -->
+    <copy file="${dist}/README" tofile="${dist}/README-POLYGLOT"/>
+    <copy file="${src}/polyglot/ext/jet/doc/README" tofile="${dist}/README"/>
+    <delete file="${dist}/CHANGES"/>
+    <delete file="${dist}/LICENSE"/>
+    <copy file="${src}/polyglot/ext/jmatch/doc/LICENSE" tofile="${dist}/LICENSE"/>
+  	
+  	<!-- executables -->
+  	<copy file="${bin}/jetc.in" todir="${dist}/bin"/>
+  	<copy file="${bin}/jet.in" todir="${dist}/bin"/>
+  	
+  	<!-- omit JFlex -->
+    <delete file="${dist}/lib/JFlex.jar"/>
+  	<!-- omit the tools directory -->
+  	<delete dir="${dist}/tools"/>
+  </target>
+  	
   <target name="jx-dist" depends="jl-dist,jx-jar"/>
 
   <target name="jmatch-jar" depends="jmatch">
