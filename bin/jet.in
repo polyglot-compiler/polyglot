@@ -1,0 +1,20 @@
+while true; do
+    case "$1" in
+        "") break;;
+	-profile)
+	  shift; hprof="-Xrunhprof:cpu=samples,file=$1,depth=10"; shift;;
+        -classpath) shift; extra_cp=$1; shift;;
+        -cp) shift; extra_cp=$1; shift;;
+        *) args="$args '$1'"; shift;;
+    esac
+done
+
+if [ -n "$extra_cp" ]
+then
+    extra_cp="${PATH_SEP}${extra_cp}"
+fi
+
+classpath="${TOP}${FILE_SEP}classes${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}polyglot.jar${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}jetrt.jar${PATH_SEP}${extra_cp}"
+command="\"$JAVA\" $hprof -classpath \"$classpath\" $args"
+
+eval "$command"
