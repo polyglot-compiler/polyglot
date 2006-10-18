@@ -992,6 +992,7 @@ ext=""
   	
   	<!-- README, License, etc. -->
     <copy file="${dist}/README" tofile="${dist}/README-POLYGLOT"/>
+  	<delete file="${dist}/README"/>
     <copy file="${src}/polyglot/ext/jet/doc/README" tofile="${dist}/README"/>
     <delete file="${dist}/CHANGES"/>
     <delete file="${dist}/LICENSE"/>
