@@ -1,0 +1,89 @@
+/* style sheet for Jif documentation
+ */
+body {
+    background-color: rgb(240,240,240)
+}
+body.toc {
+    background-color: rgb(230,230,240)
+}
+
+p {
+    text-indent: 2ex;
+    width: 80ex;
+    font-size: 100%;
+}
+table {
+    width: 80ex;
+}
+table.bigtable {
+    width: 120ex;
+}
+td {
+    vertical-align: top;
+}
+.math {
+    font-family: serif;
+}
+ul.ulpara {
+    width: 75ex;
+    font-size: 100%;
+}
+.toc ul {
+    padding-left: 1.5ex
+}
+
+body.toc { margin: 2em 1.5em }
+div.toc { padding-left: 1em }
+
+p.cont {
+    text-indent: 0ex;
+}
+ol {
+    font-size: 100%;
+    width: 80ex
+}
+.code {
+      width: 90ex;
+      font-family: Courier New, courier, System, fixed;
+      font-size: 90%;
+      background-color: rgb(230,230,230);
+      border: solid;
+      border-color: rgb(200,200,200);
+      border-width: 1;
+      margin: 5;
+      padding: 5;
+      color: rgb(20,20,30);
+}
+
+.mathdisplay {
+      width: 90ex;
+      font-size: 90%;
+      background-color: rgb(230,230,230);
+      border: solid;
+      border-color: rgb(200,200,200);
+      border-width: 1;
+      margin: 5;
+      padding: 5;
+      color: rgb(20,20,30);
+}
+
+span.comment {
+    color: rgb(150,0,0)
+}
+span.bibtitle {
+    font-weight: bold;
+}
+span.bibbook {
+    font-style: italic;
+}
+
+h1, h2, h3, h4, a.secref { font-family: sans-serif; font-weight: bold }
+
+a.secref { font-size: 90% }
+
+li.sec, li.ssec, li.sssec, li.ssssec { list-style-type: none; font-family: sans-serif }
+
+li.sec a { font-size: 100% }
+li.ssec a { font-size: 90% }
+li.sssec a { font-size: 85% }
+li.ssssec a { font-size: 85% }
