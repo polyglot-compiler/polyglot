@@ -16,7 +16,7 @@ with new language extensions.
 </p>
 
 <p>
-The base polyglot compiler, jlc ("Java language compiler"), is a
+The base polyglot compiler, <tt class="fname">jlc</tt> (&ldquo;Java language compiler&rdquo;), is a
 mostly-complete Java front end; that is, it parses and performs semantic
 checking on Java source code.  The compiler outputs Java source code.  Thus,
 the base compiler implements the identity translation.
@@ -27,7 +27,8 @@ Language extensions are implemented on top of the base compiler by
 extending the concrete and abstract syntax and the type system.
 After type checking the language extension, the abstract syntax
 tree (AST) is translated into a Java AST and the existing code is output
-into a Java source file which can then be compiled with javac.  For
+into a Java source file which can then be compiled with <tt
+class="fname">javac</tt>.  For
 historical reasons, some extensions just override some portions of
 the Java output code to handle the extended syntax of the particular
 language extension being compiled rather than rewriting the AST.
@@ -47,13 +48,13 @@ AST, then output the AST as Java source code.
 </p>
 
 <p>
-When the compiler is invoked (through polyglot.main.Main.main()), it
-parses the command line (setting options in polyglot.main.Options), then
-creates a compiler object (an instance of polyglot.frontend.Compiler) to
+When the compiler is invoked (through <code>polyglot.main.Main.main()</code>), it
+parses the command line (setting options in <code>polyglot.main.Options</code>), then
+creates a compiler object (an instance of <code>polyglot.frontend.Compiler</code>) to
 manage the compilation process.  An important job of the command line
 parser is to identify the language extension (specified on the command
 line with -ext <i>L</i>, where <i>L</i> is the name of the extension), and load the
-extension (from polyglot.ext.L.ExtensionInfo).  The compiler uses the
+extension (from <code>polyglot.ext.L.ExtensionInfo</code>). The compiler uses the
 extension to determine several important features of the language,
 including its source file extension, AST node factory, type system, and
 pass schedule.
@@ -83,9 +84,9 @@ default set of passes is:
 
 <ul>
 <li> <b>parsing</b>, as described above
-<li> <b>build-types</b> (<code>TypeBuilder</code>):  Constructs a Type object representing
-      each type in the source file and stores it in a Resolver associated
-      with the source file.  Resolvers are used to lookup types by name.
+<li> <b>build-types</b> (<code>TypeBuilder</code>):  Constructs a <code>Type</code> object representing
+      each type in the source file and stores it in a <code>Resolver</code> associated
+      with the source file.  <code>Resolver</code>s are used to lookup types by name.
 <li>
     <b>clean-super</b> (<code>AmbiguityRemover</code>):  Removes any ambiguities found
       in the declaration of the supertypes of a type (e.g., the <code>extends</code>
@@ -236,7 +237,7 @@ Their purpose is to allow a uniform extension of many AST nodes, not to be the
 primary vehicle through which a language extension is implemented.  Delegate
 objects are similar to extension objects and are used for overriding existing
 methods of many different AST nodes.  For more details, see the tech report
-(Cornell CS-TR 2002-1883).
+(<a href="http://techreports.library.cornell.edu:8081/Dienst/UI/1.0/Display/cul.cs/TR2002-1883">Cornell CS-TR 2002-1883</a>).
 </p>
 
 <p>
