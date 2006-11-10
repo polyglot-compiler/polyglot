@@ -72,6 +72,14 @@ public class Position implements Serializable
     public Position(Position start, Position end) {
         this(start.path(), start.file(), start.line, start.column, end.endLine, end.endColumn);
     }
+
+    public Position startOf() {
+        return new Position(path, file, line, column, line, column);
+    }
+
+    public Position endOf() {
+        return new Position(path, file, endLine, endColumn, endLine, endColumn);
+    }
     
     public int line() {
         return line;
