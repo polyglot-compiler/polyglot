@@ -396,8 +396,8 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
 		package_().print(w);
 		w.write(".");
 		w.allowBreak(2, 3, "", 0);
-		w.write(name());
             }
+            w.write(name());
         } else if (isMember()) {
             container().print(w);
 	    w.write(".");
