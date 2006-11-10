@@ -232,8 +232,9 @@ ext=""
           fork="true"
 	  failonerror="true">
       <classpath refid="standard.classpath"/>
-      <arg line="${parser.dir}/${ppg.file}"/>
-      <arg line="-o ${parser.dir}/${cup.file}"/>
+      <arg value="${parser.dir}/${ppg.file}"/>
+      <arg value="-o"/>
+      <arg value="${parser.dir}/${cup.file}"/>
     </java>
     <antcall target="cup-parser"/>
   </target>
@@ -274,15 +275,21 @@ ext=""
           fork="true"
           failonerror="true">
       <classpath refid="standard.classpath"/>
-      <arg line="-c"/>
-      <arg line="-classpath ${classes}"/>
-      <arg line="-sourcepath ${src}"/>
-      <arg line="-d ${src}"/>
-      <arg line="-ext ibex"/>
-      <arg line="-nomergecheck"/>
-      <arg line="-report dump-lr=1"/>
-      <arg line="-report ibex=1"/>
-      <arg line="${parser.dir}/${ibex.file}"/>
+      <arg value="-c"/>
+      <arg value="-classpath"/>
+      <arg value="${classes}"/>
+      <arg value="-sourcepath"/>
+      <arg value="${src}"/>
+      <arg value="-d"/>
+      <arg value="${src}"/>
+      <arg value="-ext"/>
+      <arg value="ibex"/>
+      <arg value="-nomergecheck"/>
+      <arg value="-report"/>
+      <arg value="dump-lr=1"/>
+      <arg value="-report"/>
+      <arg value="ibex=1"/>
+      <arg value="${parser.dir}/${ibex.file}"/>
     </java>
   </target>
 
@@ -328,7 +335,11 @@ ext=""
           dir="${parser.dir}"
 	  failonerror="true">
       <classpath refid="standard.classpath"/>
-      <arg line="-parser ${parser.class} -symbols ${symbol.class} ${cup.file}"/>
+      <arg value="-parser"/>
+      <arg value="${parser.class}"/>
+      <arg value="-symbols"/>
+      <arg value="${symbol.class}"/>
+      <arg value="${cup.file}"/>
     </java>
   </target>
 
@@ -365,7 +376,7 @@ ext=""
 	  dir="${lexer.dir}"
 	  failonerror="true">
       <classpath refid="standard.classpath"/>
-      <arg line="${jflex.file}"/>
+      <arg value="${jflex.file}"/>
     </java>
   </target>
 
