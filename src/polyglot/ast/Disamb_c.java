@@ -213,9 +213,9 @@ public class Disamb_c implements Disamb
             ClassType scope = c.findFieldScope(name);
 
             if (! ts.equals(scope, c.currentClass())) {
-                r = nf.This(pos, nf.CanonicalTypeNode(pos, scope));
+                r = nf.This(pos.startOf(), nf.CanonicalTypeNode(pos, scope));
             } else {
-                r = nf.This(pos);
+                r = nf.This(pos.startOf());
             }
         }
 

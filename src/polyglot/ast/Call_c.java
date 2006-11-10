@@ -160,7 +160,7 @@ public class Call_c extends Expr_c implements Call
         Receiver r;
         if (mi.flags().isStatic()) {
             Type container = findContainer(ts, mi);            
-            r = nf.CanonicalTypeNode(position(), container).type(container);
+            r = nf.CanonicalTypeNode(position().startOf(), container).type(container);
         } else {
             // The method is non-static, so we must prepend with "this", but we
             // need to determine if the "this" should be qualified.  Get the
@@ -170,11 +170,11 @@ public class Call_c extends Expr_c implements Call
             ClassType scope = c.findMethodScope(name);
 
             if (! ts.equals(scope, c.currentClass())) {
-                r = nf.This(position(),
-                            nf.CanonicalTypeNode(position(), scope)).type(scope);
+                r = nf.This(position().startOf(),
+                            nf.CanonicalTypeNode(position().startOf(), scope)).type(scope);
             }
             else {
-                r = nf.This(position()).type(scope);
+                r = nf.This(position().startOf()).type(scope);
             }
         }
 

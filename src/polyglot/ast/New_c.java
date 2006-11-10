@@ -352,10 +352,10 @@ public class New_c extends Expr_c implements New
         Expr q;
 
         if (outer.equals(c.currentClass())) {
-            q = nf.This(position());
+            q = nf.This(position().startOf());
         }
         else {
-            q = nf.This(position(),
+            q = nf.This(position().startOf(),
                         nf.CanonicalTypeNode(position(),
                                              outer));
         }
