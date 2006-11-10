@@ -59,10 +59,10 @@ public class InitImportsVisitor extends ErrorHandlingVisitor
             Import im = (Import) n;
             
             if (im.kind() == Import.CLASS) {
-                this.importTable.addClassImport(im.name());
+                this.importTable.addClassImport(im.name(), im.position());
             }
             else if (im.kind() == Import.PACKAGE) {
-                this.importTable.addPackageImport(im.name());
+                this.importTable.addPackageImport(im.name(), im.position());
             }
         }
 

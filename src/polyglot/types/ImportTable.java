@@ -23,6 +23,8 @@ public class ImportTable implements Resolver
     /** List of class imports which will be lazily added to the table at the
      * next lookup. */
     protected List lazyImports;
+    /** Parallel list of positions for lazyImports. */
+    protected List lazyImportPositions;
     /** List of explicitly imported classes added to the table or pending in
      * the lazyImports list. */
     protected List classImports;
@@ -59,6 +61,7 @@ public class ImportTable implements Resolver
 	this.map = new HashMap();
 	this.packageImports = new ArrayList();
 	this.lazyImports = new ArrayList();
+	this.lazyImportPositions = new ArrayList();
 	this.classImports = new ArrayList();
     }
 
@@ -73,11 +76,27 @@ public class ImportTable implements Resolver
      * Add a class import.
      */
     public void addClassImport(String className) {
+        addClassImport(className, null);
+    }
+
+    /**
+     * Add a class import.
+     */
+    public void addClassImport(String className, Position pos) {
         if (Report.should_report(TOPICS, 2))
             Report.report(2, this + ": lazy import " + className);
 
 	lazyImports.add(className);
+	lazyImportPositions.add(pos);
         classImports.add(className);
+    }
+
+    /**
+     * Add a package import.
+     */
+    public void addPackageImport(String pkgName, Position pos) {
+        // pos ignored since it's never used
+        addPackageImport(pkgName);
     }
 
     /**
@@ -390,6 +409,9 @@ public class ImportTable implements Resolver
 	    }
 	    catch (SemanticException e) {
                 if (e.position == null) {
+                    e.position = (Position) lazyImportPositions.get(i);
+                }
+                if (e.position == null) {
                     e.position = sourcePos;
                 }
 
@@ -398,6 +420,7 @@ public class ImportTable implements Resolver
 	}
 
 	lazyImports = new ArrayList();
+	lazyImportPositions = new ArrayList();
     }
 
     public String toString() {
