@@ -65,7 +65,8 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
                 Importable im = (Importable) o;
                 if (im.package_() != null &&
                     im.package_().fullName() != null &&
-                    im.package_().fullName().startsWith(name)) {
+                    (im.package_().fullName().equals(name) ||
+                     im.package_().fullName().startsWith(name + "."))) {
                     return true;
                 }
             }

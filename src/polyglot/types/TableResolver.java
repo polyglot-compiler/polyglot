@@ -42,7 +42,8 @@ public class TableResolver implements TopLevelResolver {
             if (type instanceof Importable) {
                 Importable im = (Importable) type;
                 if (im.package_() != null &&
-                    im.package_().fullName().startsWith(name)) {
+                    (im.package_().fullName().equals(name) ||
+                     im.package_().fullName().startsWith(name + "."))) {
                     return true;
                 }
             }
