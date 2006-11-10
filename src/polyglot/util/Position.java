@@ -12,11 +12,17 @@ public class Position implements Serializable
 
     private String path;
     private String file;
+
     private int line;
     private int column;
     
     private int endLine;
     private int endColumn;
+
+    // Position in characters from the beginning of the containing character
+    // stream
+    private int offset;
+    private int endOffset;
 
     public static final int UNKNOWN = -1;
     public static final int END_UNUSED = -2;
@@ -46,7 +52,11 @@ public class Position implements Serializable
     }
 
     /** For deserialization. */
-    protected Position() { }
+    protected Position() {
+        line = endLine = 0;
+        column = endColumn = 0;
+        offset = endOffset = 0;
+    }
 
     public Position(String path, String file) {
         this(path, file, UNKNOWN, UNKNOWN);
@@ -61,16 +71,22 @@ public class Position implements Serializable
     }
     
     public Position(String path, String file, int line, int column, int endLine, int endColumn) {
+        this(path, file, line, column, endLine, endColumn, 0, 0);
+    }
+
+    public Position(String path, String file, int line, int column, int endLine, int endColumn, int offset, int endOffset) {
         this.file = file;
         this.path = path;
         this.line = line;
         this.column = column;
         this.endLine = endLine;
         this.endColumn = endColumn;
+        this.offset = offset;
+        this.endOffset = endOffset;
     }
 
     public Position(Position start, Position end) {
-        this(start.path(), start.file(), start.line, start.column, end.endLine, end.endColumn);
+        this(start.path(), start.file(), start.line, start.column, end.endLine, end.endColumn, start.offset, end.endOffset);
     }
 
     public Position startOf() {
@@ -80,7 +96,7 @@ public class Position implements Serializable
     public Position endOf() {
         return new Position(path, file, endLine, endColumn, endLine, endColumn);
     }
-    
+
     public int line() {
         return line;
     }
@@ -103,6 +119,17 @@ public class Position implements Serializable
         return endColumn;
     }
 
+    public int offset() {
+        return offset;
+    }
+
+    public int endOffset() {
+        if (endOffset == UNKNOWN || (offset != UNKNOWN && endOffset < offset)) {
+            return offset;
+        }
+        return endOffset;
+    }
+    
     public String file() {
         return file;
     }
@@ -115,7 +142,7 @@ public class Position implements Serializable
         // Maybe we should use path here, if it isn't too long...
         String s = path;
 
-        if (s == null) {
+        if (s == null || s.length() == 0) {
             s = file;
         }
 
