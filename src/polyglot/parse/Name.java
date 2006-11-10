@@ -12,8 +12,8 @@ public class Name {
 	public final Name prefix;
 	public final String name;
 	public final Position pos;
-	NodeFactory nf;
-	TypeSystem ts;
+	public final NodeFactory nf;
+	public final TypeSystem ts;
 
 	public Name(BaseParser parser, Position pos, String name) {
 		this(parser, pos, null, name);
