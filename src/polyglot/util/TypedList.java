@@ -34,6 +34,8 @@ public class TypedList implements List, java.io.Serializable, Cloneable
    * modifications are allowed.
    **/
   public static TypedList copy(List list, Class c, boolean immutable) {
+    if (list == null)
+      return null;
     return new TypedList(new ArrayList(list), c, immutable);
   }
 
@@ -57,6 +59,8 @@ public class TypedList implements List, java.io.Serializable, Cloneable
    * may not be cast to class <c>. Otherwise does nothing.
    **/
   public static void check(List list, Class c) {
+    if (list == null)
+      return;
     for (Iterator i = list.iterator(); i.hasNext(); ) {
       Object o = i.next();
       if (o != null && !c.isAssignableFrom(o.getClass())) {
