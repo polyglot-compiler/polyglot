@@ -1,0 +1,23 @@
+// Assumes polyglot.jar is in classpath
+include "polyglot/parse/java12.cup"
+
+package skel.parse;
+
+import skel.types.SkelTypeSystem;
+import skel.ast.SkelNodeFactory;
+import polyglot.parse.Name;
+
+parser Grm extends polyglot.parse.Grm {:
+    public final SkelTypeSystem ts;
+    public final SkelNodeFactory nf;
+
+    public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
+        super(l, t, n, q);
+        ts = (SkelTypeSystem) t;
+        nf = (SkelNodeFactory) n;
+    }
+:};
+
+start with goal;
+
+// TODO: modify the default Java grammar using PPG operations
