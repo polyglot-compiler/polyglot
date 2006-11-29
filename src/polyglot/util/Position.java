@@ -89,6 +89,34 @@ public class Position implements Serializable
         this(start.path(), start.file(), start.line, start.column, end.endLine, end.endColumn, start.offset, end.endOffset);
     }
 
+    public Position truncateEnd(int len) {
+	int eo = endOffset;
+	int el = endLine;
+	int ec = endColumn;
+	
+	if (eo >= offset + len)
+	    eo -= len;
+	else
+	    eo = offset;
+	
+	if (line == el) {
+	    if (ec >= column + len)
+		ec -= len;
+	    else
+		ec = column;
+	}
+	else {
+	    if (ec >= len)
+		ec -= len;
+	    else {
+		el = line;
+		ec = column;
+	    }
+	}
+	
+	return new Position(path, file, line, column, el, ec, offset, eo);
+    }
+    
     public Position startOf() {
         return new Position(path, file, line, column, line, column);
     }
