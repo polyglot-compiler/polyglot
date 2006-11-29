@@ -23,8 +23,20 @@ public class Name {
 		this.nf = parser.nf;
 		this.ts = parser.ts;
 		this.pos = pos;
-		this.prefix = prefix;
-		this.name = name;
+		
+		if (! StringUtil.isNameShort(name)) {
+		    if (prefix == null) {
+			this.prefix = new Name(parser, pos, StringUtil.getPackageComponent(name));
+			this.name = StringUtil.getShortNameComponent(name);
+		    }
+		    else {
+			throw new InternalCompilerError("Can only construct a qualified Name with a short name string: " + name + " is not short.");
+		    }
+		}
+		else {
+		    this.prefix = null;
+		    this.name = name;
+		}
 	}
 
 	// expr
