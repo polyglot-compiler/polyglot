@@ -7,6 +7,7 @@ import polyglot.types.Package;
 import polyglot.types.Type;
 import polyglot.types.Qualifier;
 import polyglot.util.*;
+
 import java.util.*;
 
 /**
@@ -61,6 +62,72 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return null;
     }
 
+    public Prefix PrefixFromQualifiedName(Position pos, String qualifiedName) {
+	if (StringUtil.isNameShort(qualifiedName)) {
+	    return AmbPrefix(pos, null, qualifiedName);
+	}
+	
+	String container = StringUtil.getPackageComponent(qualifiedName);
+	String name = StringUtil.getShortNameComponent(qualifiedName);
+	
+	Position pos2 = pos.truncateEnd(name.length()+1);
+	
+	return AmbPrefix(pos, PrefixFromQualifiedName(pos2, container), name);
+    }
+    
+    public TypeNode TypeNodeFromQualifiedName(Position pos, String qualifiedName) {
+	if (StringUtil.isNameShort(qualifiedName)) {
+	    return AmbTypeNode(pos, null, qualifiedName);
+	}
+	
+	String container = StringUtil.getPackageComponent(qualifiedName);
+	String name = StringUtil.getShortNameComponent(qualifiedName);
+	
+	Position pos2 = pos.truncateEnd(name.length()+1);
+	
+	return AmbTypeNode(pos, QualifierNodeFromQualifiedName(pos2, container), name);
+    }
+    
+    public Receiver ReceiverFromQualifiedName(Position pos, String qualifiedName) {
+	if (StringUtil.isNameShort(qualifiedName)) {
+	    return AmbReceiver(pos, null, qualifiedName);
+	}
+	
+	String container = StringUtil.getPackageComponent(qualifiedName);
+	String name = StringUtil.getShortNameComponent(qualifiedName);
+	
+	Position pos2 = pos.truncateEnd(name.length()+1);
+	
+	return AmbReceiver(pos, PrefixFromQualifiedName(pos2, container), name);
+  
+    }
+    
+    public Expr ExprFromQualifiedName(Position pos, String qualifiedName) {
+	if (StringUtil.isNameShort(qualifiedName)) {
+	    return AmbExpr(pos, qualifiedName);
+	}
+	
+	String container = StringUtil.getPackageComponent(qualifiedName);
+	String name = StringUtil.getShortNameComponent(qualifiedName);
+	
+	Position pos2 = pos.truncateEnd(name.length()+1);
+	
+	return Field(pos, ReceiverFromQualifiedName(pos2, container), name);
+    }
+    
+    public QualifierNode QualifierNodeFromQualifiedName(Position pos, String qualifiedName) {
+	if (StringUtil.isNameShort(qualifiedName)) {
+	    return AmbQualifierNode(pos, null, qualifiedName);
+	}
+	
+	String container = StringUtil.getPackageComponent(qualifiedName);
+	String name = StringUtil.getShortNameComponent(qualifiedName);
+	
+	Position pos2 = pos.truncateEnd(name.length()+1);
+	
+	return AmbQualifierNode(pos, QualifierNodeFromQualifiedName(pos2, container), name);
+    }
+    
     public AmbPrefix AmbPrefix(Position pos, Prefix prefix, String name) {
         AmbPrefix n = new AmbPrefix_c(pos, prefix, name);
         n = (AmbPrefix)n.ext(extFactory.extAmbPrefix());

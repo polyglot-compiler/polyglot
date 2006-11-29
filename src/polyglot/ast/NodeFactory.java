@@ -19,28 +19,33 @@ public interface NodeFactory
      * Returns a disambiguator for nodes from this factory.
      */
     Disamb disamb();
-
-    //////////////////////////////////////////////////////////////////
+    
+        //////////////////////////////////////////////////////////////////
     // Factory Methods
     //////////////////////////////////////////////////////////////////
 
     AmbExpr AmbExpr(Position pos, String name);
-
+    Expr ExprFromQualifiedName(Position pos, String qualifiedName);
+    
     // type or expr
     AmbReceiver AmbReceiver(Position pos, String name);
     AmbReceiver AmbReceiver(Position pos, Prefix prefix, String name);
-
+    Receiver ReceiverFromQualifiedName(Position pos, String qualifiedName);
+    
     // package or type
     AmbQualifierNode AmbQualifierNode(Position pos, String name);
     AmbQualifierNode AmbQualifierNode(Position pos, QualifierNode qual, String name);
-
+    QualifierNode QualifierNodeFromQualifiedName(Position pos, String qualifiedName);
+    
     // package or type or expr
     AmbPrefix AmbPrefix(Position pos, String name);
     AmbPrefix AmbPrefix(Position pos, Prefix prefix, String name);
-
+    Prefix PrefixFromQualifiedName(Position pos, String qualifiedName);
+    
     AmbTypeNode AmbTypeNode(Position pos, String name);
     AmbTypeNode AmbTypeNode(Position pos, QualifierNode qualifier, String name);
-
+    TypeNode TypeNodeFromQualifiedName(Position pos, String qualifiedName);
+    
     ArrayTypeNode ArrayTypeNode(Position pos, TypeNode base);
     CanonicalTypeNode CanonicalTypeNode(Position pos, Type type);
 
