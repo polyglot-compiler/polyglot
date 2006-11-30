@@ -1,8 +1,7 @@
 package polyglot.parse;
 
 import polyglot.ast.*;
-import polyglot.parse.*;
-import polyglot.types.*;
+import polyglot.types.TypeSystem;
 import polyglot.util.*;
 
 /**
@@ -16,17 +15,25 @@ public class Name {
     public final TypeSystem ts;
 
     public Name(BaseParser parser, Position pos, String name) {
-        this(parser, pos, null, name);
+    	this(parser, pos, null, name);
+    }
+
+    public Name(NodeFactory nf, TypeSystem ts, Position pos, String name) {
+        this(nf, ts, pos, null, name);
     }
 
     public Name(BaseParser parser, Position pos, Name prefix, String name) {
-        this.nf = parser.nf;
-        this.ts = parser.ts;
+    	this(parser.nf, parser.ts, pos, prefix, name);
+    }
+    
+    public Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix, String name) {
+    	this.nf = nf;
+        this.ts = ts;
         this.pos = pos;
         
         if (! StringUtil.isNameShort(name)) {
             if (prefix == null) {
-                this.prefix = new Name(parser, pos, null, StringUtil.getPackageComponent(name));
+                this.prefix = new Name(nf, ts, pos, null, StringUtil.getPackageComponent(name));
                 this.name = StringUtil.getShortNameComponent(name);
             }
             else {
