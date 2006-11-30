@@ -9,96 +9,96 @@ import polyglot.util.*;
  * Represents an ambiguous, possibly qualified, identifier encountered while parsing.
  */
 public class Name {
-	public final Name prefix;
-	public final String name;
-	public final Position pos;
-	public final NodeFactory nf;
-	public final TypeSystem ts;
+    public final Name prefix;
+    public final String name;
+    public final Position pos;
+    public final NodeFactory nf;
+    public final TypeSystem ts;
 
-	public Name(BaseParser parser, Position pos, String name) {
-		this(parser, pos, null, name);
-	}
+    public Name(BaseParser parser, Position pos, String name) {
+        this(parser, pos, null, name);
+    }
 
-	public Name(BaseParser parser, Position pos, Name prefix, String name) {
-		this.nf = parser.nf;
-		this.ts = parser.ts;
-		this.pos = pos;
-		
-		if (! StringUtil.isNameShort(name)) {
-		    if (prefix == null) {
-			this.prefix = new Name(parser, pos, StringUtil.getPackageComponent(name));
-			this.name = StringUtil.getShortNameComponent(name);
-		    }
-		    else {
-			throw new InternalCompilerError("Can only construct a qualified Name with a short name string: " + name + " is not short.");
-		    }
-		}
-		else {
-		    this.prefix = null;
-		    this.name = name;
-		}
-	}
+    public Name(BaseParser parser, Position pos, Name prefix, String name) {
+        this.nf = parser.nf;
+        this.ts = parser.ts;
+        this.pos = pos;
+        
+        if (! StringUtil.isNameShort(name)) {
+            if (prefix == null) {
+                this.prefix = new Name(parser, pos, null, StringUtil.getPackageComponent(name));
+                this.name = StringUtil.getShortNameComponent(name);
+            }
+            else {
+                throw new InternalCompilerError("Can only construct a qualified Name with a short name string: " + name + " is not short.");
+            }
+        }
+        else {
+            this.prefix = prefix;
+            this.name = name;
+        }
+    }
 
-	// expr
-	public Expr toExpr() {
-		if (prefix == null) {
-			return nf.AmbExpr(pos, name);
-		}
+    // expr
+    public Expr toExpr() {
+        if (prefix == null) {
+            return nf.AmbExpr(pos, name);
+        }
 
-		return nf.Field(pos, prefix.toReceiver(), name);
-	}
+        return nf.Field(pos, prefix.toReceiver(), name);
+    }
 
-	// expr or type
-	public Receiver toReceiver() {
-		if (prefix == null) {
-			return nf.AmbReceiver(pos, name);
-		}
+    // expr or type
+    public Receiver toReceiver() {
+        if (prefix == null) {
+            return nf.AmbReceiver(pos, name);
+        }
 
-		return nf.AmbReceiver(pos, prefix.toPrefix(), name);
-	}
+        return nf.AmbReceiver(pos, prefix.toPrefix(), name);
+    }
 
-	// expr, type, or package
-	public Prefix toPrefix() {
-		if (prefix == null) {
-			return nf.AmbPrefix(pos, name);
-		}
+    // expr, type, or package
+    public Prefix toPrefix() {
+        if (prefix == null) {
+            return nf.AmbPrefix(pos, name);
+        }
 
-		return nf.AmbPrefix(pos, prefix.toPrefix(), name);
-	}
+        return nf.AmbPrefix(pos, prefix.toPrefix(), name);
+    }
 
-	// type or package
-	public QualifierNode toQualifier() {
-		if (prefix == null) {
-			return nf.AmbQualifierNode(pos, name);
-		}
+    // type or package
+    public QualifierNode toQualifier() {
+        if (prefix == null) {
+            return nf.AmbQualifierNode(pos, name);
+        }
 
-		return nf.AmbQualifierNode(pos, prefix.toQualifier(), name);
-	}
+        return nf.AmbQualifierNode(pos, prefix.toQualifier(), name);
+    }
 
-	// package
-	public PackageNode toPackage() {
-                if (prefix == null) {
-                    return nf.PackageNode(pos, ts.createPackage(null, name));
-                }
-                else {
-                    return nf.PackageNode(pos, ts.createPackage(prefix.toPackage().package_(), name));
-                }
-	}
+    // package
+    public PackageNode toPackage() {
+        if (prefix == null) {
+            return nf.PackageNode(pos, ts.createPackage(null, name));
+        }
+        else {
+            return nf.PackageNode(pos, ts.createPackage(prefix.toPackage().package_(), name));
+        }
+    }
 
-	// type
-	public TypeNode toType() {
-		if (prefix == null) {
-			return nf.AmbTypeNode(pos, name);
-		}
+    // type
+    public TypeNode toType() {
+        if (prefix == null) {
+            return nf.AmbTypeNode(pos, name);
+        }
 
-		return nf.AmbTypeNode(pos, prefix.toQualifier(), name);
-	}
+        return nf.AmbTypeNode(pos, prefix.toQualifier(), name);
+    }
 
-	public String toString() {
-		if (prefix == null) {
-			return name;
-		}
+    public String toString() {
+        if (prefix == null) {
+            return name;
+        }
 
-		return prefix.toString() + "." + name;
-	}
+        return prefix.toString() + "." + name;
+    }
 }
