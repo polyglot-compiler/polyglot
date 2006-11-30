@@ -62,6 +62,12 @@ public class Flags implements Serializable
      *        if we should print at the end.
      */
     public static Flags createFlag(String name, Flags after) {
+        addToOrder(name, after);
+
+        return new Flags(name);
+    }
+
+    public static void addToOrder(String name, Flags after) {
         List order = FlagComparator.order;
         boolean added = false;
 
@@ -87,8 +93,6 @@ public class Flags implements Serializable
                 order.add(name);
             }
         }
-
-        return new Flags(name);
     }
 
     /**
@@ -101,6 +105,10 @@ public class Flags implements Serializable
     protected Flags(String name) {
         this();
         flags.add(name);
+    }
+
+    public Set flags() {
+        return this.flags;
     }
 
     /**
