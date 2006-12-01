@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Stack;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
+import polyglot.util.Position;
 import polyglot.util.SimpleErrorQueue;
 
 /** Class used for reporting debug messages. */
@@ -150,16 +151,31 @@ public class Report {
   /** This is the standard way to report debugging information in the
    *  compiler.  It reports a message of the specified level (which
    *  controls the presentation of the message. To test whether such
-   *  message should be reported, use "should_report"
+   *  message should be reported, use "should_report".
    *
    *  NOTE: This is a change of spec from earlier versions of Report.
+   *  NOTE: If position information is available, call report(int, String, Position)
+   *  instead, to ensure the error is associated with the right file/location.
    */
   public static void report(int level, String message) {
-    StringBuffer buf = new StringBuffer(message.length() + level);
-    for (int j = 1; j < level; j++) {
-        buf.append(" ");
-    }
-    buf.append(message);
-    getQueue().enqueue(ErrorInfo.DEBUG, buf.toString());
+      report(level, message, null);
+  }
+
+  /** This is the standard way to report debugging information in the
+   *  compiler.  It reports a message of the specified level (which
+   *  controls the presentation of the message. To test whether such
+   *  message should be reported, use "should_report".
+   *
+   *  NOTE: This is a change of spec from earlier versions of Report.
+   *  NOTE: This version takes an explicit Position, so that position info gets
+   *  properly associated with the ErrorInfo that gets created by enqueue().
+   */
+  public static void report(int level, String message, Position pos) {
+      StringBuffer buf = new StringBuffer(message.length() + level);
+      for (int j = 1; j < level; j++) {
+          buf.append(" ");
+      }
+      buf.append(message);
+      getQueue().enqueue(ErrorInfo.DEBUG, buf.toString(), pos);
   }
 }
