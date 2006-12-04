@@ -2,6 +2,7 @@ package polyglot.types;
 
 import java.util.*;
 
+import polyglot.main.Options;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.CollectionUtil;
@@ -229,8 +230,23 @@ public class MethodInstance_c extends ProcedureInstance_c
                                         "parameter types",
                                         mi.position());
         }
-
-        if (! ts.equals(mi.returnType(), mj.returnType())) {
+        
+        // HACK: Java5 allows return types to be covariant.  We'll allow covariant
+        // return if we mj is defined in a class file.
+        boolean allowCovariantReturn = false;
+        
+        if (mj.container() instanceof ParsedClassType) {
+        	ParsedClassType ct = (ParsedClassType) mj.container();
+        	if (ct.initializer() instanceof LazyClassInitializer) {
+        		LazyClassInitializer init = (LazyClassInitializer) ct.initializer();
+        		if (init.fromClassFile()) {
+        			allowCovariantReturn = true;
+        		}
+        	}
+        }
+        
+        if ((allowCovariantReturn && ! ts.isSubtype(mi.returnType(), mj.returnType())) ||
+       		(! allowCovariantReturn && ! ts.typeEquals(mi.returnType(), mj.returnType()))) {
             if (Report.should_report(Report.types, 3))
                 Report.report(3, "return type " + mi.returnType() +
                               " != " + mj.returnType());
