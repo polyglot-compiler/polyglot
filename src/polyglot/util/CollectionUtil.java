@@ -5,7 +5,7 @@ import java.util.*;
 /** Collection utilities. */
 public class CollectionUtil
 {
-	/** Return a new list with <code>o</code> appended to <code>l</code>. */
+	/** Append <code>o</code> to <code>l</code>, returning <code>l</code>. */
 	public static List add(List l, Object o) {
 		l.add(o);
 		return l;
@@ -45,6 +45,11 @@ public class CollectionUtil
 		return true;
 	}
 
+	/** Return an empty list. */
+	public static List list() {
+		return Collections.EMPTY_LIST;
+	}
+	
 	/** Return a singleton list containing <code>o</code>. */
 	public static List list(Object o) {
 		return Collections.singletonList(o);
@@ -111,4 +116,15 @@ public class CollectionUtil
 		return m;
 	}
 
+	/**
+	 * Return an empty non-null list if the argument list is null.
+	 * 
+	 * @param l a possibly null list
+	 * @return a non-null list
+	 */
+	public static List nonNullList(List l) {
+		if (l != null)
+			return l;
+		return Collections.EMPTY_LIST;
+	}
 }
