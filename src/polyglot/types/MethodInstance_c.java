@@ -236,17 +236,17 @@ public class MethodInstance_c extends ProcedureInstance_c
         boolean allowCovariantReturn = false;
         
         if (mj.container() instanceof ParsedClassType) {
-        	ParsedClassType ct = (ParsedClassType) mj.container();
-        	if (ct.initializer() instanceof LazyClassInitializer) {
-        		LazyClassInitializer init = (LazyClassInitializer) ct.initializer();
-        		if (init.fromClassFile()) {
-        			allowCovariantReturn = true;
-        		}
-        	}
+            ParsedClassType ct = (ParsedClassType) mj.container();
+            if (ct.initializer() instanceof LazyClassInitializer) {
+                LazyClassInitializer init = (LazyClassInitializer) ct.initializer();
+                if (init.fromClassFile()) {
+                    allowCovariantReturn = true;
+                }
+            }
         }
         
         if ((allowCovariantReturn && ! ts.isSubtype(mi.returnType(), mj.returnType())) ||
-       		(! allowCovariantReturn && ! ts.typeEquals(mi.returnType(), mj.returnType()))) {
+            (! allowCovariantReturn && ! ts.typeEquals(mi.returnType(), mj.returnType()))) {
             if (Report.should_report(Report.types, 3))
                 Report.report(3, "return type " + mi.returnType() +
                               " != " + mj.returnType());
