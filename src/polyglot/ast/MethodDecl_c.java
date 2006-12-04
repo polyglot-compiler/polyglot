@@ -2,14 +2,9 @@ package polyglot.ast;
 
 import java.util.*;
 
-import polyglot.ast.*;
 import polyglot.main.Report;
 import polyglot.types.*;
-import polyglot.util.CodeWriter;
-import polyglot.util.CollectionUtil;
-import polyglot.util.Position;
-import polyglot.util.SubtypeSet;
-import polyglot.util.TypedList;
+import polyglot.util.*;
 import polyglot.visit.*;
 
 /**
@@ -202,8 +197,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl
             // already done
             return this;
         }
-
-        Context c = ar.context();
 
         if (! returnType.isDisambiguated()) {
             return this;

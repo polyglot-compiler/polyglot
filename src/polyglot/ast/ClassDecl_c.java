@@ -2,10 +2,9 @@ package polyglot.ast;
 
 import java.util.*;
 
-import polyglot.ast.*;
-import polyglot.frontend.*;
+import polyglot.frontend.MissingDependencyException;
+import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
-import polyglot.frontend.goals.SupertypesResolved;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.*;
@@ -228,9 +227,6 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     }
 
     protected ClassDecl_c disambiguateSupertypes(AmbiguityRemover ar) throws SemanticException {
-        TypeNode newSuperClass;
-        List newInterfaces;
- 
         boolean supertypesResolved = true;
         
 //        System.out.println("  " + ar + ".disamsuper: " + this);

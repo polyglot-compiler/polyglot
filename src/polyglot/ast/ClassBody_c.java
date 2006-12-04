@@ -2,13 +2,6 @@ package polyglot.ast;
 
 import java.util.*;
 
-import polyglot.ast.ClassBody;
-import polyglot.ast.ClassDecl;
-import polyglot.ast.ClassMember;
-import polyglot.ast.Node;
-import polyglot.ast.Term;
-import polyglot.frontend.Job;
-import polyglot.frontend.Pass;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.util.*;
@@ -127,7 +120,6 @@ public class ClassBody_c extends Term_c implements ClassBody
 
     protected void duplicateMemberClassCheck(TypeChecker tc) throws SemanticException {
         ClassType type = tc.context().currentClass();
-        TypeSystem ts = tc.typeSystem();
 
         ArrayList l = new ArrayList(type.memberClasses());
 

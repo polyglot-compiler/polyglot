@@ -1,10 +1,8 @@
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
-import polyglot.util.*;
-import java.util.*;
+import polyglot.util.InternalCompilerError;
+import polyglot.util.Position;
+import polyglot.visit.CFGBuilder;
 
 /**
  * A <code>LocalAssign_c</code> represents a Java assignment expression
@@ -40,9 +38,8 @@ public class LocalAssign_c extends Assign_c implements LocalAssign
   }
   
   protected void acceptCFGAssign(CFGBuilder v) {
-      Local l = (Local)left();
-
-      // x OP= e: visit e -> (l OP= e)      
+	  // do not visit left()
+      // l = e: visit e -> (l = e)      
       v.visitCFG(right(), this);
   }
   

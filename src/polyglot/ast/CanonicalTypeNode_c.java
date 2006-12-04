@@ -1,10 +1,10 @@
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.util.*;
-import polyglot.visit.*;
 import polyglot.main.Options;
+import polyglot.types.*;
+import polyglot.util.CodeWriter;
+import polyglot.util.Position;
+import polyglot.visit.*;
 
 /**
  * A <code>CanonicalTypeNode</code> is a type node for a canonical type.
@@ -49,8 +49,6 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
   }
 
   public void translate(CodeWriter w, Translator tr) {
-    TypeSystem ts = tr.typeSystem();
-
     if (tr.outerClass() != null) {
       w.write(type.translate(tr.outerClass().resolver()));
     }
