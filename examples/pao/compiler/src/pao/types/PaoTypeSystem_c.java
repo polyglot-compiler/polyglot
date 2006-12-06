@@ -1,4 +1,4 @@
-package polyglot.ext.pao.types;
+package pao.types;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -37,10 +37,10 @@ public class PaoTypeSystem_c extends TypeSystem_c implements PaoTypeSystem {
      * The package that contains the runtime classes for boxing primitive
      * values as objects.
      */
-    private static final String RUNTIME_PACKAGE = "polyglot.ext.pao.runtime";
+    private static final String RUNTIME_PACKAGE = "pao.runtime";
 
     /**
-     * @see polyglot.ext.pao.types.PaoTypeSystem#primitiveEquals()
+     * @see pao.types.PaoTypeSystem#primitiveEquals()
      */
     public MethodInstance primitiveEquals() {
         // The method instance could be cached for greater efficiency,

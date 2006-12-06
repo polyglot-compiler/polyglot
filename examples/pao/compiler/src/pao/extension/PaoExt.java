@@ -1,9 +1,9 @@
-package polyglot.ext.pao.extension;
+package pao.extension;
 
 import polyglot.ast.Ext;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.ext.pao.types.PaoTypeSystem;
+import pao.types.PaoTypeSystem;
 
 /**
  * The <code>Ext</code> interface for the pao extension. The

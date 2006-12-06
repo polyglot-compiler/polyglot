@@ -1,4 +1,4 @@
-package polyglot.ext.pao.types;
+package pao.types;
 
 import polyglot.types.*;
 
@@ -14,7 +14,7 @@ public interface PaoTypeSystem extends TypeSystem {
      * @return the method instance for the runtime method that tests two boxed
      *         primitive values for equality.
      * 
-     * @see polyglot.ext.pao.runtime.Primitive#equals(Object, Object)
+     * @see pao.runtime.Primitive#equals(Object, Object)
      */
     MethodInstance primitiveEquals();
 
@@ -27,14 +27,14 @@ public interface PaoTypeSystem extends TypeSystem {
      * @return the method instance for getting the primitive value from a boxed
      *         representation of primitive values of type <code>t</code>.
      * 
-     * @see polyglot.ext.pao.runtime.Boolean#booleanValue()
-     * @see polyglot.ext.pao.runtime.Byte#byteValue()
-     * @see polyglot.ext.pao.runtime.Character#charValue()
-     * @see polyglot.ext.pao.runtime.Double#doubleValue()
-     * @see polyglot.ext.pao.runtime.Float#floatValue()
-     * @see polyglot.ext.pao.runtime.Integer#intValue()
-     * @see polyglot.ext.pao.runtime.Long#longValue()
-     * @see polyglot.ext.pao.runtime.Short#shortValue()
+     * @see pao.runtime.Boolean#booleanValue()
+     * @see pao.runtime.Byte#byteValue()
+     * @see pao.runtime.Character#charValue()
+     * @see pao.runtime.Double#doubleValue()
+     * @see pao.runtime.Float#floatValue()
+     * @see pao.runtime.Integer#intValue()
+     * @see pao.runtime.Long#longValue()
+     * @see pao.runtime.Short#shortValue()
      */
     MethodInstance getter(PrimitiveType t);
 

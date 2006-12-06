@@ -1,4 +1,4 @@
-package polyglot.ext.pao.types;
+package pao.types;
 
 import polyglot.types.ParsedClassType_c;
 import polyglot.frontend.Source;

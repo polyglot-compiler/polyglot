@@ -1,11 +1,11 @@
-package polyglot.ext.pao.ast;
+package pao.ast;
 
 import polyglot.ast.Ext;
 import polyglot.ast.AbstractExtFactory_c;
-import polyglot.ext.pao.extension.PaoBinaryExt_c;
-import polyglot.ext.pao.extension.PaoCastExt_c;
-import polyglot.ext.pao.extension.PaoExt_c;
-import polyglot.ext.pao.extension.PaoInstanceofExt_c;
+import pao.extension.PaoBinaryExt_c;
+import pao.extension.PaoCastExt_c;
+import pao.extension.PaoExt_c;
+import pao.extension.PaoInstanceofExt_c;
 
 /**
  * Extension factory for the pao extension. The extension factory 

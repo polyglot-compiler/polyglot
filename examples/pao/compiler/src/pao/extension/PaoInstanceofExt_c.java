@@ -1,9 +1,9 @@
-package polyglot.ext.pao.extension;
+package pao.extension;
 
 import polyglot.ast.Instanceof;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.ext.pao.types.PaoTypeSystem;
+import pao.types.PaoTypeSystem;
 import polyglot.types.Type;
 
 /**
@@ -15,7 +15,7 @@ public class PaoInstanceofExt_c extends PaoExt_c {
 	 * Rewrites <code>instanceof</code> checks where the comparison type is
 	 * a primitive type to use the boxed type instead. For example,
 	 * "e instanceof int" gets rewritten to 
-	 * "e instanceof polyglot.ext.pao.runtime.Integer".
+	 * "e instanceof pao.runtime.Integer".
 	 * 
 	 * @see PaoExt#rewrite(PaoTypeSystem, NodeFactory)
 	 */

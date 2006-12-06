@@ -1,8 +1,8 @@
-package polyglot.ext.pao.ast;
+package pao.ast;
 
 import polyglot.ast.JL;
 import polyglot.ast.AbstractDelFactory_c;
-import polyglot.ext.pao.extension.PaoInstanceofDel_c;
+import pao.extension.PaoInstanceofDel_c;
 
 /**
  * Delegate factory for the pao extension. The delegate factory 

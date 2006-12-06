@@ -1,8 +1,8 @@
-include "../../../parse/java12.cup"
+include "polyglot/parse/java12.cup"
 
-package polyglot.ext.pao.parse;
+package pao.parse;
 
-import polyglot.ext.pao.types.PaoTypeSystem;
+import pao.types.PaoTypeSystem;
 import polyglot.parse.Name;
 /**
  * Parser for the PAO extension.

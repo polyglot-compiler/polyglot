@@ -1,4 +1,4 @@
-package polyglot.ext.pao;
+package pao;
 
 import java.io.Reader;
 import java.util.*;
@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import polyglot.ast.NodeFactory;
-import polyglot.ext.pao.ast.PaoNodeFactory_c;
-import polyglot.ext.pao.parse.Grm;
-import polyglot.ext.pao.parse.Lexer_c;
-import polyglot.ext.pao.types.PaoTypeSystem_c;
-import polyglot.ext.pao.visit.PaoBoxer;
+import pao.ast.PaoNodeFactory_c;
+import pao.parse.Grm;
+import pao.parse.Lexer_c;
+import pao.types.PaoTypeSystem_c;
+import pao.visit.PaoBoxer;
 import polyglot.frontend.*;
 import polyglot.frontend.goals.*;
 import polyglot.frontend.goals.Goal;
@@ -24,10 +24,10 @@ import polyglot.util.ErrorQueue;
  * appropriate parser, <code>NodeFactory</code> and <code>TypeSystem</code>
  * to use, as well as inserting a new pass: <code>PaoBoxer</code>.
  * 
- * @see polyglot.ext.pao.visit.PaoBoxer
- * @see polyglot.ext.pao.ast.PaoNodeFactory_c 
- * @see polyglot.ext.pao.types.PaoTypeSystem 
- * @see polyglot.ext.pao.types.PaoTypeSystem_c 
+ * @see pao.visit.PaoBoxer
+ * @see pao.ast.PaoNodeFactory_c 
+ * @see pao.types.PaoTypeSystem 
+ * @see pao.types.PaoTypeSystem_c 
  */
 public class ExtensionInfo extends JLExtensionInfo {
     public String defaultFileExtension() {

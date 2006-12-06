@@ -1,11 +1,11 @@
-package polyglot.ext.pao.extension;
+package pao.extension;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import polyglot.ast.*;
-import polyglot.ext.pao.types.PaoTypeSystem;
+import pao.types.PaoTypeSystem;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.MethodInstance;
 import polyglot.types.Type;
@@ -19,7 +19,7 @@ public class PaoCastExt_c extends PaoExt_c {
      * Insert boxing and unboxing code for the casts inserted by the
      * <code>PaoBoxer</code>. 
      * @see PaoExt_c#rewrite(PaoTypeSystem, NodeFactory)
-     * @see polyglot.ext.pao.visit.PaoBoxer
+     * @see pao.visit.PaoBoxer
      */
 	public Node rewrite(PaoTypeSystem ts, NodeFactory nf) {
 
@@ -33,7 +33,7 @@ public class PaoCastExt_c extends PaoExt_c {
         	// We need to unbox.
         	
         	// e.g., "(int)e", where e is of type Integer gets rewritten to
-        	// "((polyglot.ext.pao.runtime.Integer)e).getInt()"
+        	// "((pao.runtime.Integer)e).getInt()"
 
         	MethodInstance mi = ts.getter(ltype.toPrimitive());
 
@@ -54,7 +54,7 @@ public class PaoCastExt_c extends PaoExt_c {
         	// We need to box.
         	
         	// e.g., "(Integer)e", where e is of type int gets rewritten to
-        	// "new polyglot.ext.pao.runtime.Integer(e)"
+        	// "new pao.runtime.Integer(e)"
 
             ConstructorInstance ci = ts.wrapper(rtype.toPrimitive());
 

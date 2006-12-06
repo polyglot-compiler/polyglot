@@ -1,4 +1,4 @@
-package polyglot.ext.pao.ast;
+package pao.ast;
 
 import polyglot.ast.NodeFactory_c;
 

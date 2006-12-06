@@ -1,10 +1,10 @@
-package polyglot.ext.pao.visit;
+package pao.visit;
 
 import polyglot.ast.Expr;
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.ext.pao.extension.PaoExt;
-import polyglot.ext.pao.types.PaoTypeSystem;
+import pao.extension.PaoExt;
+import pao.types.PaoTypeSystem;
 import polyglot.frontend.Job;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;

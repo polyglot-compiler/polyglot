@@ -1,4 +1,4 @@
-package polyglot.ext.pao;
+package pao;
 
 /**
  * Version information for PAO extension

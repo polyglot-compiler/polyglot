@@ -1,4 +1,4 @@
-package polyglot.ext.pao;
+package pao;
 
 import polyglot.main.Report;
 

@@ -1,4 +1,4 @@
-package polyglot.ext.pao.extension;
+package pao.extension;
 
 import polyglot.ast.Instanceof;
 import polyglot.ast.Node;
