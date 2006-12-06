@@ -44,11 +44,14 @@ sed_opt="-e $subst_small -e $subst_large -e $subst_ext"
 base=`pwd`
 (
 cd `dirname $0`/..
-for i in `find skel \( -path '*/CVS/*' -o -name CVS \) -prune -o -print`; do
+find skel \( -path '*/CVS/*' -o -name CVS \) -prune -o -print | while read i; do
     if [ -d "$i" ]; then
         j=`echo "$i" | sed $sed_opt`
         mkdir "$base/$j"
-    elif [ -f $i ]; then
+    elif [ "$i" = "skel/README" ]; then
+        j=`echo "$i" | sed $sed_opt`
+        cp "$i" "$base/$j"
+    elif [ -f "$i" ]; then
         j=`echo "$i" | sed $sed_opt`
         sed $sed_opt "$i" > "$base/$j"
     fi
