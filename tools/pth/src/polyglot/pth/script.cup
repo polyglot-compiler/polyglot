@@ -7,7 +7,7 @@ action code {:
 :}
 
 parser code {:
-    Lexer_c lexer;
+    Lexer lexer;
     public Grm(String filename) {
         this(new File(filename));
     }

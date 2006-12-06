@@ -63,13 +63,23 @@ public class Main
   }
 
   public void start(String[] argv) throws TerminationException {
-      start(argv, null);
+      start(argv, null, null);
+  }
+
+  public void start(String[] argv, ExtensionInfo ext) throws TerminationException {
+      start(argv, ext, null);
   }
 
   public void start(String[] argv, ErrorQueue eq) throws TerminationException {
+      start(argv, null, eq);
+  }
+
+  public void start(String[] argv, ExtensionInfo ext, ErrorQueue eq) throws TerminationException {
       source = new LinkedHashSet();
       List args = explodeOptions(argv);
-      ExtensionInfo ext = getExtensionInfo(args);
+      if (ext == null) {
+          ext = getExtensionInfo(args);
+      }
       Options options = ext.getOptions();
 
       // Allow all objects to get access to the Options object. This hack should
