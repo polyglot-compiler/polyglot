@@ -1,4 +1,4 @@
-package polyglot.ext.pao.runtime;
+package .pao.runtime;
 
 /**
  * Boxed longs.
