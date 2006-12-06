@@ -1,4 +1,4 @@
-package .pao.runtime;
+package pao.runtime;
 
 /**
  * Boxed primitives. This is the abstract superclass of the classes used to box

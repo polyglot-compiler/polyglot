@@ -1,4 +1,4 @@
-package .pao.runtime;
+package pao.runtime;
 
 /**
  * Boxed ints.
