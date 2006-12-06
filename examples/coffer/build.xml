@@ -9,22 +9,20 @@
        ****************************************  -->
 
     <!-- extension package name -->
-    <property name="ext.package" value="coffer"/>
+    <property name="package" value="coffer"/>
 
     <!-- extension language name -->
-    <property name="ext.name" value="Coffer"/>
+    <property name="name" value="Coffer"/>
 
     <!-- extension compiler script name -->
-    <property name="ext.compiler.name" value="${ext.package}c"/>
-    <property name="ext.compiler" location="${bin}/${ext.compiler.name}"/>
-    <property name="runtime.jar.name" value="${ext.package}-rt.jar"/>
-    <property name="compiler.jar.name" value="${ext.package}.jar"/>
-    <property name="runtime.jar" location="${lib}/${runtime.jar}"/>
-    <property name="compiler.jar" location="${lib}/${compiler.jar}"/>
+    <property name="compiler.name" value="${package}c"/>
 
     <!-- extension interpreter script name -->
-    <property name="ext.interp.name" value="${ext.package}"/>
-    <property name="ext.interp" location="${bin}/${ext.interp.name}"/>
+    <property name="interp.sh.name" value="${package}"/>
+
+    <!-- jar file names -->
+    <property name="runtime.jar.name" value="${package}-rt.jar"/>
+    <property name="compiler.jar.name" value="${package}.jar"/>
 
     <!-- source directory -->
     <property name="compiler.src" location="${basedir}/compiler/src" />
@@ -32,8 +30,14 @@
     <!-- directory for class file targets -->
     <property name="compiler.classes" location="${basedir}/compiler/classes" />
 
+    <!-- polyglot directory -->
+    <property name="polyglot.dir" location="${basedir}/../.."/>
+
+    <!-- binaries directory -->
+    <property name="bin.dir" location="${basedir}/bin" />
+
     <!-- directory for shared libraries -->
-    <property name="lib" location="${basedir}/lib" />
+    <property name="lib.dir" location="${basedir}/lib" />
 
     <!-- runtime source directory -->
     <property name="runtime.src" location="${basedir}/runtime/src" />
@@ -44,13 +48,14 @@
     <!-- distribution directory -->
     <property name="dist" location="${basedir}/dist" />
 
-    <!-- binaries directory -->
-    <property name="bin" location="${basedir}/bin" />
+    <property name="compiler.sh" location="${bin.dir}/${compiler.name}"/>
+    <property name="compiler.bat" location="${bin.dir}/${compiler.name}.bat"/>
+    <property name="interp.sh" location="${bin.dir}/${interp.sh.name}"/>
+    <property name="compiler.jar" location="${lib.dir}/${compiler.jar.name}"/>
+    <property name="runtime.jar" location="${lib.dir}/${runtime.jar.name}"/>
 
     <!-- set the prefix for accessing environment variables -->
     <property environment="env" />
-
-    <!-- set to true if a runtime directory exists -->
 
     <!-- the standard classpath -->
     <path id="standard.classpath">
@@ -62,16 +67,16 @@
         <pathelement path="${java.class.path}" />
 
         <!-- polyglot classes, assuming a cvs checkout -->
-        <pathelement path="${basedir}/../../classes" />
-        <fileset dir="${basedir}/../../lib">
+        <pathelement path="${polyglot.dir}/classes" />
+        <fileset dir="${polyglot.dir}/lib">
           <include name="*.jar"/>
         </fileset>
 
         <!-- jar files in the lib directory -->
-        <fileset dir="${lib}">
+        <fileset dir="${lib.dir}">
             <include name="*.jar" />
-            <exclude name="${ext.package}.jar" />
-            <exclude name="${ext.package}-rt.jar" />
+            <exclude name="${package}.jar" />
+            <exclude name="${package}-rt.jar" />
         </fileset>
     </path>
 
@@ -103,14 +108,14 @@
                 <include name="**/Lexer_c.java" />
                 <include name="**/*_ppg.cup" />
             </fileset>
-            <fileset dir="${lib}">
+            <fileset dir="${lib.dir}">
                 <include name="${compiler.jar.name}" />
                 <include name="${runtime.jar.name}" />
             </fileset>
         </delete>
-        <delete file="${ext.interp}" />
-        <delete file="${ext.compiler}" />
-        <delete file="${ext.compiler.batch}" />
+        <delete file="${interp.sh}" />
+        <delete file="${compiler.sh}" />
+        <delete file="${compiler.bat}" />
     </target>
 
     <!-- initialize the build -->
@@ -146,13 +151,6 @@
 	           classpathref="standard.classpath"
 	           property="cp_existence.jflex"/>
 
-
-        <!-- uncomment if param extension required
-        <available classname="polyglot.ext.param.ExtensionInfo"
-	           classpathref="standard.classpath"
-	           property="cp_existence.polyglot.param"/>
-        -->
-
         <fail unless="cp_existence.polyglot"
 	      message="The polyglot classes must be on the classpath. Try adding polyglot.jar to the classpath."/>
         <fail unless="cp_existence.java_cup"
@@ -163,11 +161,11 @@
 
     <target name="executables">
         <uptodate property="executables.up-to-date">
-            <srcfiles dir="${bin}" includes="*.in" />
+            <srcfiles dir="${bin.dir}" includes="*.in" />
             <mapper type="glob" from="*.in" to="*" />
         </uptodate>
         <antcall target="executable" />
-        <delete file="${bin}/defs" />
+        <delete file="${bin.dir}/defs" />
     </target>
 
     <target name="executable-defs">
@@ -178,14 +176,14 @@
             <os family="unix" />
         </condition>
 
-        <echo file="${bin}/defs" append="no">#!/bin/sh
+        <echo file="${bin.dir}/defs" append="no">#!/bin/sh
 # DO NOT EDIT - This file was automatically generated.
 
 JAVA='${java.home}/bin/java'
 FILE_SEP='${file.separator}'
 PATH_SEP='${path.separator}'
 TOP='${basedir}'
-RT_LIB_PATH='${lib}${path.separator}'$$${defs.load_library_path}
+RT_LIB_PATH='${lib.dir}${path.separator}'$$${defs.load_library_path}
         </echo>
     </target>
 
@@ -197,19 +195,19 @@ RT_LIB_PATH='${lib}${path.separator}'$$${defs.load_library_path}
         <antcall target="executable-defs" />
 
         <!-- Create the compiler script -->
-        <concat destfile="${ext.compiler}" append="no">
-            <filelist dir="${bin}" files="defs,${ext.compiler}.in" />
+        <concat destfile="${compiler.sh}" append="no">
+            <filelist dir="${bin.dir}" files="defs,${compiler.sh}.in" />
         </concat>
-        <chmod perm="+x" file="${ext.compiler}" />
+        <chmod perm="+x" file="${compiler.sh}" />
 
 
         <!-- Create the interpreter script -->
-        <concat destfile="${ext.interp}" append="no">
-            <filelist dir="${bin}" files="defs,${ext.interp}.in" />
+        <concat destfile="${interp.sh}" append="no">
+            <filelist dir="${bin.dir}" files="defs,${interp.sh}.in" />
         </concat>
-        <chmod perm="+x" file="${ext.interp}" />
+        <chmod perm="+x" file="${interp.sh}" />
 
-        <!-- Create ${ext.compiler.bat} -->
+        <!-- Create ${compiler.bat} -->
         <condition property="os.isWindows">
             <os family="windows" />
         </condition>
@@ -220,7 +218,7 @@ RT_LIB_PATH='${lib}${path.separator}'$$${defs.load_library_path}
     <!-- Create .bat file if needed -->
     <target name="executable-bat" 
             if="os.isWindows">
-        <concat destfile="${ext.compiler.batch}" append="no">
+        <concat destfile="${compiler.bat}" append="no">
 @echo off
 rem DO NOT EDIT - This file was automatically generated.
 
@@ -233,7 +231,7 @@ set CMD_LINE_ARGS=%CMD_LINE_ARGS% %1
 shift
 goto setupArgs
 :doneStart
-sh ${ext.compiler} %CMD_LINE_ARGS%
+sh ${compiler.sh} %CMD_LINE_ARGS%
     </concat>
     </target>
 
@@ -245,7 +243,7 @@ sh ${ext.compiler} %CMD_LINE_ARGS%
 
     <target name="compiler" depends="init,configure">
         <antcall target="standard-ext">
-            <param name="ext" value="${ext.package}" />
+            <param name="ext" value="${package}" />
             <param name="parser.type" value="ppg" />
         </antcall>
     </target>
@@ -265,18 +263,18 @@ sh ${ext.compiler} %CMD_LINE_ARGS%
        ****************************************  -->
 
     <target name="jar" depends="compile-all">
-        <jar jarfile="${compiler.jar}" basedir="${compiler.classes}" includes="${ext.package}/**" />
-        <jar jarfile="${runtime.jar}" basedir="${runtime.classes}" includes="${ext.package}/**" />
+        <jar jarfile="${compiler.jar}" basedir="${compiler.classes}" includes="${package}/**" />
+        <jar jarfile="${runtime.jar}" basedir="${runtime.classes}" includes="${package}/**" />
     </target>
 
 
     <target name="javadoc" depends="compiler">
-        <javadoc sourcepath="${compiler.src}" destdir="${basedir}/doc/${ext.package}-api" defaultexcludes="yes" classpathref="standard.classpath">
+        <javadoc sourcepath="${compiler.src}" destdir="${basedir}/doc/${package}-api" defaultexcludes="yes" classpathref="standard.classpath">
             <packageset dir="${compiler.src}" defaultexcludes="yes">
                 <include name="**" />
             </packageset>
         </javadoc>
-        <javadoc sourcepath="${runtime.src}" destdir="${basedir}/doc/${ext.package}-runtime-api" defaultexcludes="yes" classpathref="standard.classpath">
+        <javadoc sourcepath="${runtime.src}" destdir="${basedir}/doc/${package}-runtime-api" defaultexcludes="yes" classpathref="standard.classpath">
           <packageset dir="${runtime.src}" defaultexcludes="yes">
                 <include name="**" />
             </packageset>
