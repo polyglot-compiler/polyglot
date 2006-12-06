@@ -1,18 +1,28 @@
-<project name="skel" default="skel" basedir=".">
+<project name="skel" default="compile-all" basedir=".">
     <description>
-    Skel build file
-  </description>
+      Skel build file
+    </description>
 
 
     <!-- ****************************************
        set global properties for this build
        ****************************************  -->
 
-    <!-- extension short name -->
-    <property name="ext.short" location="skel"/>
+    <!-- extension package name -->
+    <property name="package" value="skel"/>
 
-    <!-- extension long name -->
-    <property name="ext.long" location="Skel"/>
+    <!-- extension language name -->
+    <property name="name" value="Skel"/>
+
+    <!-- extension compiler script name -->
+    <property name="compiler.name" value="${package}c"/>
+
+    <!-- extension interpreter script name -->
+    <property name="interp.sh.name" value="${package}"/>
+
+    <!-- jar file names -->
+    <property name="runtime.jar.name" value="${package}-rt.jar"/>
+    <property name="compiler.jar.name" value="${package}.jar"/>
 
     <!-- source directory -->
     <property name="compiler.src" location="${basedir}/compiler/src" />
@@ -20,8 +30,14 @@
     <!-- directory for class file targets -->
     <property name="compiler.classes" location="${basedir}/compiler/classes" />
 
+    <!-- polyglot directory -->
+    <property name="polyglot.dir" location="${basedir}/../.."/>
+
+    <!-- binaries directory -->
+    <property name="bin.dir" location="${basedir}/bin" />
+
     <!-- directory for shared libraries -->
-    <property name="lib" location="${basedir}/lib" />
+    <property name="lib.dir" location="${basedir}/lib" />
 
     <!-- runtime source directory -->
     <property name="runtime.src" location="${basedir}/runtime/src" />
@@ -32,14 +48,11 @@
     <!-- distribution directory -->
     <property name="dist" location="${basedir}/dist" />
 
-    <!-- binaries directory -->
-    <property name="bin" location="${basedir}/bin" />
-
-    <!-- skelc executable -->
-    <property name="skelc" location="${bin}/${ext.short}c" />
-
-    <!-- skel executable -->
-    <property name="skel" location="${bin}/${ext.short}" />
+    <property name="compiler.sh" location="${bin.dir}/${compiler.name}"/>
+    <property name="compiler.bat" location="${bin.dir}/${compiler.name}.bat"/>
+    <property name="interp.sh" location="${bin.dir}/${interp.sh.name}"/>
+    <property name="compiler.jar" location="${lib.dir}/${compiler.jar.name}"/>
+    <property name="runtime.jar" location="${lib.dir}/${runtime.jar.name}"/>
 
     <!-- set the prefix for accessing environment variables -->
     <property environment="env" />
@@ -54,16 +67,16 @@
         <pathelement path="${java.class.path}" />
 
         <!-- polyglot classes, assuming a cvs checkout -->
-        <pathelement path="${basedir}/../../classes" />
-        <fileset dir="${basedir}/../../lib">
+        <pathelement path="${polyglot.dir}/classes" />
+        <fileset dir="${polyglot.dir}/lib">
           <include name="*.jar"/>
         </fileset>
 
         <!-- jar files in the lib directory -->
-        <fileset dir="${lib}">
+        <fileset dir="${lib.dir}">
             <include name="*.jar" />
-            <exclude name="${ext.short}.jar" />
-            <exclude name="${ext.short}-rt.jar" />
+            <exclude name="${package}.jar" />
+            <exclude name="${package}-rt.jar" />
         </fileset>
     </path>
 
@@ -95,15 +108,14 @@
                 <include name="**/Lexer_c.java" />
                 <include name="**/*_ppg.cup" />
             </fileset>
-            <fileset dir="${lib}">
-                <include name="*skelrt.*" />
-                <include name="skel.jar" />
-                <include name="skelrt.jar" />
+            <fileset dir="${lib.dir}">
+                <include name="${compiler.jar.name}" />
+                <include name="${runtime.jar.name}" />
             </fileset>
         </delete>
-        <delete file="${bin}/skel" />
-        <delete file="${skelc}" />
-        <delete file="${skelc}.bat" />
+        <delete file="${interp.sh}" />
+        <delete file="${compiler.sh}" />
+        <delete file="${compiler.bat}" />
     </target>
 
     <!-- initialize the build -->
@@ -113,14 +125,17 @@
         <!-- Create the build directory structures used by compile -->
         <mkdir dir="${compiler.classes}" />
         <mkdir dir="${runtime.classes}" />
+        <!-- Check if runtime exists -->
+        <condition property="has-runtime">
+            <available file="${runtime.src}" type="dir"/>
+        </condition>
     </target>
-
 
 
     <!-- ****************************************
        Configuration
        ****************************************  -->
-    <target name="configure" description="Configure skel">
+    <target name="configure" description="Configure the extension">
         <antcall target="check-classpath" />
         <antcall target="executables" />
     </target>
@@ -136,13 +151,6 @@
 	           classpathref="standard.classpath"
 	           property="cp_existence.jflex"/>
 
-
-        <!-- uncomment if param extension required
-        <available classname="polyglot.ext.param.ExtensionInfo"
-	           classpathref="standard.classpath"
-	           property="cp_existence.polyglot.param"/>
-        -->
-
         <fail unless="cp_existence.polyglot"
 	      message="The polyglot classes must be on the classpath. Try adding polyglot.jar to the classpath."/>
         <fail unless="cp_existence.java_cup"
@@ -153,11 +161,11 @@
 
     <target name="executables">
         <uptodate property="executables.up-to-date">
-            <srcfiles dir="${bin}" includes="*.in" />
+            <srcfiles dir="${bin.dir}" includes="*.in" />
             <mapper type="glob" from="*.in" to="*" />
         </uptodate>
-        <antcall target="skel-executable" />
-        <delete file="${bin}/defs" />
+        <antcall target="executable" />
+        <delete file="${bin.dir}/defs" />
     </target>
 
     <target name="executable-defs">
@@ -168,54 +176,49 @@
             <os family="unix" />
         </condition>
 
-        <echo file="${bin}/defs" append="no">#!/bin/sh
+        <echo file="${bin.dir}/defs" append="no">#!/bin/sh
 # DO NOT EDIT - This file was automatically generated.
 
 JAVA='${java.home}/bin/java'
 FILE_SEP='${file.separator}'
 PATH_SEP='${path.separator}'
 TOP='${basedir}'
-RT_LIB_PATH='${lib}${path.separator}'$$${defs.load_library_path}
-    </echo>
+RT_LIB_PATH='${lib.dir}${path.separator}'$$${defs.load_library_path}
+        </echo>
     </target>
 
-    <!-- creates the executable scripts skelc and skel -->
-    <target name="skel-executable"
+    <!-- creates the executable scripts -->
+    <target name="executable"
 		unless="executables.up-to-date">
 
         <!-- make sure the definitions file is around -->
         <antcall target="executable-defs" />
 
-        <!-- Create skelc -->
-        <concat destfile="${skelc}" append="no">
-            <filelist dir="${bin}" files="defs" />
+        <!-- Create the compiler script -->
+        <concat destfile="${compiler.sh}" append="no">
+            <filelist dir="${bin.dir}" files="defs,${compiler.sh}.in" />
         </concat>
-        <concat destfile="${skelc}" append="yes">
-ext="-extclass skel.ExtensionInfo"
-    </concat>
-        <concat destfile="${skelc}" append="yes">
-            <filelist dir="${bin}" files="skelc.in" />
+        <chmod perm="+x" file="${compiler.sh}" />
+
+
+        <!-- Create the interpreter script -->
+        <concat destfile="${interp.sh}" append="no">
+            <filelist dir="${bin.dir}" files="defs,${interp.sh}.in" />
         </concat>
-        <chmod perm="+x" file="${skelc}" />
+        <chmod perm="+x" file="${interp.sh}" />
 
-
-
-        <!-- Create skel -->
-        <concat destfile="${skel}" append="no">
-            <filelist dir="${bin}" files="defs,skel.in" />
-        </concat>
-        <chmod perm="+x" file="${skel}" />
-
+        <!-- Create ${compiler.bat} -->
         <condition property="os.isWindows">
             <os family="windows" />
         </condition>
-        <antcall target="skel-executable-bat" />
+
+        <antcall target="executable-bat" />
     </target>
 
-    <!-- Create skel.bat if needed -->
-    <target name="skel-executable-bat" 
+    <!-- Create .bat file if needed -->
+    <target name="executable-bat" 
             if="os.isWindows">
-        <concat destfile="${skelc}.bat" append="no">
+        <concat destfile="${compiler.bat}" append="no">
 @echo off
 rem DO NOT EDIT - This file was automatically generated.
 
@@ -228,24 +231,24 @@ set CMD_LINE_ARGS=%CMD_LINE_ARGS% %1
 shift
 goto setupArgs
 :doneStart
-sh ${skelc} %CMD_LINE_ARGS%
+sh ${compiler.sh} %CMD_LINE_ARGS%
     </concat>
     </target>
 
     <!-- ****************************************
-       Skel targets
+       targets
        ****************************************  -->
 
-    <target name="skel" depends="skel-base,skel-runtime" description="Build the Skel compiler and libraries"/>
+    <target name="compile-all" depends="compiler,runtime" description="Build the compiler and libraries"/>
 
-    <target name="skel-base" depends="init,configure">
+    <target name="compiler" depends="init,configure">
         <antcall target="standard-ext">
-            <param name="ext" value="skel" />
+            <param name="ext" value="${package}" />
             <param name="parser.type" value="ppg" />
         </antcall>
     </target>
 
-    <target name="skel-runtime" depends="init,configure" description="compile the skel runtime">
+    <target name="runtime" depends="init,configure" description="compile the runtime" if="has-runtime">
         <mkdir dir="${runtime.classes}" />
         <javac srcdir="${runtime.src}" destdir="${runtime.classes}" debug="on" includes="**">
             <classpath>
@@ -259,26 +262,26 @@ sh ${skelc} %CMD_LINE_ARGS%
        Javadoc and distribution targets
        ****************************************  -->
 
-    <target name="jar" depends="skel">
-        <jar jarfile="${lib}/skel.jar" basedir="${compiler.classes}" includes="skel/**" />
-        <jar jarfile="${lib}/skelrt.jar" basedir="${runtime.classes}" includes="skel/**" />
+    <target name="jar" depends="compile-all">
+        <jar jarfile="${compiler.jar}" basedir="${compiler.classes}" includes="${package}/**" />
+        <jar jarfile="${runtime.jar}" basedir="${runtime.classes}" includes="${package}/**" />
     </target>
 
 
-    <target name="javadoc" depends="skel-base">
-        <javadoc sourcepath="${compiler.src}" destdir="${basedir}/doc/${ext.short}-api" defaultexcludes="yes" classpathref="standard.classpath">
+    <target name="javadoc" depends="compiler">
+        <javadoc sourcepath="${compiler.src}" destdir="${basedir}/doc/${package}-api" defaultexcludes="yes" classpathref="standard.classpath">
             <packageset dir="${compiler.src}" defaultexcludes="yes">
                 <include name="**" />
             </packageset>
         </javadoc>
-        <javadoc sourcepath="${runtime.src}" destdir="${basedir}/doc/${ext.short}-runtime-api" defaultexcludes="yes" classpathref="standard.classpath">
+        <javadoc sourcepath="${runtime.src}" destdir="${basedir}/doc/${package}-runtime-api" defaultexcludes="yes" classpathref="standard.classpath">
           <packageset dir="${runtime.src}" defaultexcludes="yes">
                 <include name="**" />
             </packageset>
         </javadoc>
     </target>
 
-    <!-- generate the Skel distribution -->
+    <!-- generate the distribution -->
     <target name="dist" description="generate the distribution">
         <!-- Create the distribution directory -->
         <mkdir dir="${dist}" />
@@ -311,7 +314,7 @@ sh ${skelc} %CMD_LINE_ARGS%
             </fileset>
         </copy>
 
-        <!-- Create skel.jar and copy all the jars over -->
+        <!-- Create the jar files and copy all the jars over -->
         <antcall target="jar" />
         <copy todir="${dist}" includeEmptyDirs="no">
             <fileset dir="${basedir}" defaultexcludes="yes">

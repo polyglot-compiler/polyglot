@@ -15,7 +15,7 @@ then
     extra_cp="${PATH_SEP}${extra_cp}"
 fi
 
-classpath="${TOP}${FILE_SEP}classes${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}polyglot.jar${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}java_cup.jar${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}${ext}rt.jar${extra_cp}"
+classpath="${TOP}${FILE_SEP}classes${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}polyglot.jar${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}java_cup.jar${PATH_SEP}${TOP}${FILE_SEP}lib${FILE_SEP}${ext}-rt.jar${extra_cp}"
 command="\"$JAVA\" $vmargs -classpath \"$classpath\" $args"
 
 if [ -n "$verbose" ]
