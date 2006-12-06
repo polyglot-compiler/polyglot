@@ -151,6 +151,24 @@ ext=""
   <!-- compile the base compiler -->
   <target name="compile" depends="base,jl" description="Builds the base compiler"/>
 
+  <!-- build the examples -->
+  <target name="compile-examples">
+    <ant inheritAll="false" antfile="${basedir}/examples/coffer/build.xml" dir="${basedir}/examples/coffer" target="compile-all"/>
+    <ant inheritAll="false" antfile="${basedir}/examples/pao/build.xml" dir="${basedir}/examples/pao" target="compile-all"/>
+  </target>
+
+  <!-- clean the examples -->
+  <target name="clean-examples">
+    <ant inheritAll="false" antfile="${basedir}/examples/coffer/build.xml" dir="${basedir}/examples/coffer" target="clean"/>
+    <ant inheritAll="false" antfile="${basedir}/examples/pao/build.xml" dir="${basedir}/examples/pao" target="clean"/>
+  </target>
+
+  <!-- clobber the examples -->
+  <target name="clobber-examples">
+    <ant inheritAll="false" antfile="${basedir}/examples/coffer/build.xml" dir="${basedir}/examples/coffer" target="clobber"/>
+    <ant inheritAll="false" antfile="${basedir}/examples/pao/build.xml" dir="${basedir}/examples/pao" target="clobber"/>
+  </target>
+
   <!-- Create the distribution directory -->
   <target name="dist-dir" depends="compile">
     <mkdir dir="${dist}/lib"/>
@@ -160,6 +178,9 @@ ext=""
   	      description="Cleans up the directory tree: deletes the distribution directory and the classes directories">
     <!-- Delete the ${classes} and ${dist} directory trees -->
     <delete dir="${classes}"/>
+    <delete dir="${pthdir}/classes"/>
+    <delete dir="${ppgdir}/classes"/>
+    <delete dir="${cupdir}/classes"/>
     <delete dir="${cup-classes}"/>
     <delete dir="${dist}"/>
   </target>
@@ -168,10 +189,9 @@ ext=""
 	description="Cleans up the directory tree and deletes generated files">
     <delete>
       <fileset dir="${src}">
-        <include name="**/Grm.java"/>
-	<include name="**/sym.java"/>
-	<include name="**/Lexer_c.java"/>
-	<include name="**/*_ppg.cup"/>
+        <include name="polyglot/parse/Grm.java"/>
+        <include name="polyglot/parse/sym.java"/>
+        <include name="polyglot/parse/Lexer_c.java"/>
       </fileset>
     </delete>
     <delete>
@@ -200,7 +220,7 @@ ext=""
   <target name="compile-base">
     <javac srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/**"
-      excludes="polyglot/qq/**,polyglot/*/Lexer_c.java,polyglot/*/sym.java,polyglot/*/Grm.java,polyglot/ext/**,polyglot/tests/**,ppg/test/**">
+      excludes="polyglot/qq/**,polyglot/parse/Lexer_c.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/tests/**">
       <classpath refid="standard.classpath"/>
     </javac>
   </target>
@@ -291,7 +311,7 @@ ext=""
   <!-- Build an Ibex parser based on parameters supplied to the target.
        @param parser.dir    The directory, relative to $basedir, in which
                             the Ibex file is located.
-       @param ppg.file      The name of the Ibex file.
+       @param ibex.file     The name of the Ibex file.
        @param cup.file      The name of the CUP file to output.
    -->
   <target name="ibex-parser" depends="ibex-parser-deps" 
@@ -517,6 +537,10 @@ ext=""
       <fileset dir="${src}/polyglot/visit" excludes="**/Makefile"/>
     </copy>
 
+    <copy todir="${dist}/src/polyglot/ext/param" includeEmptyDirs="false">
+      <fileset dir="${src}/polyglot/ext/param" excludes="**/Makefile"/>
+    </copy>
+
     <copy todir="${dist}/skel" includeEmptyDirs="false">
       <fileset dir="skel"/>
     </copy>
@@ -534,7 +558,9 @@ ext=""
         excludes="**/Makefile,**/tests/**/*.java,**/tests/**/*.class,**/tests/**/*.results"/>
     </copy>
 
-    <copy todir="${dist}/tests" file="tests"/>
+    <copy todir="${dist}/tests" includeEmptyDirs="false">
+      <fileset dir="tests"/>
+    </copy>
 
     <copy todir="${dist}/tools" includeEmptyDirs="false">
       <fileset dir="tools"/>
@@ -565,10 +591,20 @@ ext=""
     <javadoc sourcepath="${basedir}" destdir="doc/api" encoding="iso-8859-1">
       <packageset dir="${src}" defaultexcludes="yes">
         <include name="polyglot/**"/>
+        <exclude name="**/tests"/>
+        <exclude name="**/test"/>
+      </packageset>
+      <packageset dir="${ppgdir}/src" defaultexcludes="yes">
         <include name="ppg/**"/>
         <exclude name="**/tests"/>
         <exclude name="**/test"/>
       </packageset>
+      <packageset dir="${pthdir}/src" defaultexcludes="yes">
+        <include name="polyglot/pth/**"/>
+        <exclude name="**/tests"/>
+        <exclude name="**/test"/>
+      </packageset>
+      <classpath refid="standard.classpath"/>
     </javadoc>
   </target>
 
@@ -600,7 +636,7 @@ ext=""
   <!-- create jar pth (Polyglot Test Harness) -->
   <target name="pth-jar" depends="pth-compile"
           description="Builds pth.jar">
-    <jar jarfile="${lib}/pth.jar" basedir="${classes}" includes="polyglot/pth/**"/>
+      <jar jarfile="${lib}/pth.jar" basedir="${pthdir}/classes" includes="polyglot/pth/**"/>
   </target>
 
   <!-- Create pth executable -->
