@@ -1,4 +1,4 @@
-package polyglot.ext.coffer;
+package coffer;
 
 /**
  * Version information for coffer extension

@@ -1,4 +1,4 @@
-package polyglot.ext.coffer.ast;
+package coffer.ast;
 
 import polyglot.ast.*;
 

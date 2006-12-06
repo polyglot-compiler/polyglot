@@ -1,10 +1,10 @@
-package polyglot.ext.coffer;
+package coffer;
 
-import polyglot.ext.coffer.parse.Lexer_c;
-import polyglot.ext.coffer.parse.Grm;
-import polyglot.ext.coffer.ast.*;
-import polyglot.ext.coffer.types.*;
-import polyglot.ext.coffer.visit.*;
+import coffer.parse.Lexer_c;
+import coffer.parse.Grm;
+import coffer.ast.*;
+import coffer.types.*;
+import coffer.visit.*;
 
 import polyglot.ast.*;
 import polyglot.types.*;

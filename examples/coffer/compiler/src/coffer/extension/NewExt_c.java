@@ -1,10 +1,10 @@
-package polyglot.ext.coffer.extension;
+package coffer.extension;
 
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
-import polyglot.ext.coffer.ast.*;
-import polyglot.ext.coffer.types.*;
+import coffer.ast.*;
+import coffer.types.*;
 
 import java.util.*;
 

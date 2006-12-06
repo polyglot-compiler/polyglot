@@ -1,4 +1,4 @@
-package polyglot.ext.coffer.visit;
+package coffer.visit;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -6,14 +6,14 @@ import java.util.Map.Entry;
 import polyglot.ast.NodeFactory;
 import polyglot.ast.ProcedureDecl;
 import polyglot.ast.Term;
-import polyglot.ext.coffer.Topics;
-import polyglot.ext.coffer.extension.CofferExt;
-import polyglot.ext.coffer.extension.ProcedureDeclExt_c;
-import polyglot.ext.coffer.types.*;
-import polyglot.ext.coffer.types.CofferClassType;
-import polyglot.ext.coffer.types.CofferProcedureInstance;
-import polyglot.ext.coffer.types.CofferTypeSystem;
-import polyglot.ext.coffer.types.KeySet;
+import coffer.Topics;
+import coffer.extension.CofferExt;
+import coffer.extension.ProcedureDeclExt_c;
+import coffer.types.*;
+import coffer.types.CofferClassType;
+import coffer.types.CofferProcedureInstance;
+import coffer.types.CofferTypeSystem;
+import coffer.types.KeySet;
 import polyglot.frontend.Job;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;

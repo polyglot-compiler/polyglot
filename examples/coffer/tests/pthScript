@@ -25,7 +25,7 @@
 #      CmdLineArgs  :   additional command line args for the Polyglot 
 #                       compiler; is always enclosed in quotes.
 
-polyglot.ext.coffer.ExtensionInfo {
+coffer.ExtensionInfo {
     Exc.cof ;
     Exc2.cof ;
     Hello.cof ;
@@ -38,7 +38,6 @@ polyglot.ext.coffer.ExtensionInfo {
     SimpleTest6.cof (Semantic, "Can evaluate expression.*only if key.*I.*is held") ;
     SimpleTest7.cof (Semantic, "Can evaluate expression.*only if key.*I.*is held") ;
     SimpleTest8.cof ;
-    SimpleTest9.cof ;
     Subclassing.cof ;
     TestIS.cof
 }

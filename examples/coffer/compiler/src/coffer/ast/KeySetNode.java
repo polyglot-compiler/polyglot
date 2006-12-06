@@ -1,9 +1,9 @@
-package polyglot.ext.coffer.ast;
+package coffer.ast;
 
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
-import polyglot.ext.coffer.types.*;
+import coffer.types.*;
 
 /**
  * An AST node for a <code>KeySet</code>.  The key set may be ambiguous. 

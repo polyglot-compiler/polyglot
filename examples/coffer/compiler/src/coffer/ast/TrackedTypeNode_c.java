@@ -1,6 +1,6 @@
-package polyglot.ext.coffer.ast;
+package coffer.ast;
 
-import polyglot.ext.coffer.types.*;
+import coffer.types.*;
 import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;

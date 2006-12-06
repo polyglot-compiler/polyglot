@@ -1,7 +1,7 @@
-package polyglot.ext.coffer.ast;
+package coffer.ast;
 
 import polyglot.ast.*;
-import polyglot.ext.coffer.types.*;
+import coffer.types.*;
 
 /**
  * An AST node for an exception throw declaration annotated with a key set.

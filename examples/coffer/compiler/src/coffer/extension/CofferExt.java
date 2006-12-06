@@ -1,8 +1,8 @@
-package polyglot.ext.coffer.extension;
+package coffer.extension;
 
 import polyglot.ast.*;
 import polyglot.types.*;
-import polyglot.ext.coffer.types.*;
+import coffer.types.*;
 import java.util.*;
 
 /** An immutable representation of the Coffer class declaration.

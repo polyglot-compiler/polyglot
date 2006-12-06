@@ -1,4 +1,4 @@
-package polyglot.ext.coffer.types;
+package coffer.types;
 
 import polyglot.types.*;
 import java.util.*;

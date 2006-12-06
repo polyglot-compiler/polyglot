@@ -1,4 +1,4 @@
-package polyglot.ext.coffer;
+package coffer;
 
 import polyglot.main.Report;
 
