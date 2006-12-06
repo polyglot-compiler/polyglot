@@ -26,7 +26,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
         interfaces = null;
     }
 
-    void init() {
+    protected void init() {
         if (methods == null) {
             methods = new ArrayList(1);
 
