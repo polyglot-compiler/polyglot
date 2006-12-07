@@ -5,8 +5,6 @@ import java.util.List;
 
 import polyglot.ast.*;
 import polyglot.frontend.*;
-import polyglot.frontend.CyclicDependencyException;
-import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
 import polyglot.util.*;
@@ -260,6 +258,10 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     public Node typeCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
+        // Get the fi flags, not the node flags since the fi flags
+        // account for being nested within an interface.
+        Flags flags = fi.flags();
+        
         try {
             ts.checkFieldFlags(flags);
         }

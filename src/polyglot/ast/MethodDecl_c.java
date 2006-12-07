@@ -189,7 +189,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
                                               ts.unknownType(position()),
                                               name, formalTypes, throwTypes);
         ct.addMethod(mi);
-        return flags(f).methodInstance(mi);
+        return methodInstance(mi);
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
@@ -241,30 +241,34 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     public Node typeCheck(TypeChecker tc) throws SemanticException {
 	TypeSystem ts = tc.typeSystem();
 
+        // Get the mi flags, not the node flags since the mi flags
+        // account for being nested within an interface.
+        Flags flags = mi.flags();
+        
         if (tc.context().currentClass().flags().isInterface()) {
-            if (flags().isProtected() || flags().isPrivate()) {
+            if (flags.isProtected() || flags.isPrivate()) {
                 throw new SemanticException("Interface methods must be public.",
                                             position());
             }
         }
 
         try {
-            ts.checkMethodFlags(flags());
+            ts.checkMethodFlags(flags);
         }
         catch (SemanticException e) {
             throw new SemanticException(e.getMessage(), position());
         }
 
-	if (body == null && ! (flags().isAbstract() || flags().isNative())) {
+	if (body == null && ! (flags.isAbstract() || flags.isNative())) {
 	    throw new SemanticException("Missing method body.", position());
 	}
 
-	if (body != null && (flags().isAbstract() || flags.isNative())) {
+	if (body != null && (flags.isAbstract() || flags.isNative())) {
 	    throw new SemanticException(
 		"An abstract method cannot have a body.", position());
 	}
 
-	if (body != null && flags().isNative()) {
+	if (body != null && flags.isNative()) {
 	    throw new SemanticException(
 		"A native method cannot have a body.", position());
 	}
@@ -280,7 +284,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
         }
 
         // check that inner classes do not declare static methods
-        if (flags().isStatic() &&
+        if (flags.isStatic() &&
               methodInstance().container().toClass().isInnerClass()) {
             // it's a static method in an inner class.
             throw new SemanticException("Inner classes cannot declare " + 
@@ -358,27 +362,6 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         prettyPrintHeader(flags(), w, tr);
-
-	if (body != null) {
-	    printSubStmt(body, w, tr);
-	}
-	else {
-	    w.write(";");
-	}
-    }
-
-    public void translate(CodeWriter w, Translator tr) {
-        Context c = tr.context();
-	Flags flags = flags();
-
-	if (!tr.job().extensionInfo().getOptions().output_ambiguous_nodes) {
-	if (c.currentClass().flags().isInterface()) {
-	    flags = flags.clearPublic();
-	    flags = flags.clearAbstract();
-	}
-	}
-
-        prettyPrintHeader(flags, w, tr);
 
 	if (body != null) {
 	    printSubStmt(body, w, tr);

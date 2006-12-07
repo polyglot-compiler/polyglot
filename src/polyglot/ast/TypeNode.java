@@ -10,4 +10,7 @@ public interface TypeNode extends Receiver, QualifierNode, Term
 {
     /** Set the type object for this node. */
     TypeNode type(Type type);
+    
+    /** Short name of the type, or null if not a <code>Named</code> type. */
+    String name();
 }

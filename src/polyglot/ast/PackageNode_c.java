@@ -50,8 +50,14 @@ public class PackageNode_c extends Node_c implements PackageNode
         }
     }
 
+
     public void translate(CodeWriter w, Translator tr) {
-        w.write(tr.typeSystem().translatePackage(tr.context(), package_));
+        if (tr instanceof TypedTranslator) {
+            w.write(package_.translate(((TypedTranslator) tr).context()));
+        }
+        else {
+            w.write(package_.translate(null));
+        }
     }
 
     public String toString() {

@@ -69,4 +69,11 @@ public abstract class TypeNode_c extends Term_c implements TypeNode
     }
 
     public abstract void prettyPrint(CodeWriter w, PrettyPrinter tr);
+
+    public String name() {
+          if (type instanceof Named) {
+              return ((Named) type).name();
+          }
+          return null;
+      }
 }

@@ -563,36 +563,23 @@ public class New_c extends Expr_c implements New
     public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
         printQualifier(w, tr);
 	w.write("new ");
-        print(tn, w, tr);
-        printArgs(w, tr);
-        printBody(w, tr);
-    }
-
-    public void translate(CodeWriter w, Translator tr) {
-        printQualifier(w, tr);
-
-	w.write("new ");
-
+       
+	// We need to be careful when pretty printing "new" expressions for
+        // member classes.  For the expression "e.new C()" where "e" has
+        // static type "T", the TypeNode for "C" is actually the type "T.C".
+        // But, if we print "T.C", the post compiler will try to lookup "T"
+        // in "T".  Instead, we print just "C".
         if (qualifier != null) {
-            ClassType ct = tn.type().toClass();
-
-            if (! ct.isMember()) {
-                throw new InternalCompilerError("Cannot qualify a non-member " +
-                                                "class.", position());
-            }
-
-            tr.setOuterClass(ct.outer());
-            print(tn, w, tr);
-            tr.setOuterClass(null);
+            w.write(tn.name());
         }
         else {
             print(tn, w, tr);
         }
-
+        
         printArgs(w, tr);
         printBody(w, tr);
     }
-
+    
     public Term entry() {
         if (qualifier != null) return qualifier.entry();
         return tn.entry();

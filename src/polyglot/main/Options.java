@@ -63,9 +63,9 @@ public class Options {
   
     /** keep output files */
     public boolean keep_output_files = true;
-  
-    /** Directly output code from possibly ambiguous ast nodes */
-    public boolean output_ambiguous_nodes = false;
+    
+    /** Generate position information for compiler-generated code. */
+    public boolean precise_compiler_generated_positions = false;
     
     /** Use SimpleCodeWriter instead of OptimalCodeWriter */
     public boolean use_simple_code_writer = false;
@@ -337,8 +337,8 @@ public class Options {
             Report.addTopic(topic, level);
             i++;
         }        
-        else if (args[i].equals("-outputamb")) {
-            output_ambiguous_nodes = true;
+        else if (args[i].equals("-debugpositions")) {
+            precise_compiler_generated_positions = true;
             i++;
         }
         else if (args[i].equals("-simpleoutput")) {
@@ -387,9 +387,9 @@ public class Options {
         usageForFlag(out, "-noserial", "disable class serialization");
         usageForFlag(out, "-nooutput", "delete output files after compilation");
         usageForFlag(out, "-c", "compile only to .java");
-        usageForFlag(out, "-outputamb", "allow generating code from ambiguous nodes");
         usageForFlag(out, "-post <compiler>", 
                           "run javac-like compiler after translation");
+        usageForFlag(out, "-debugpositions", "generate position information for compiler-generated code");
         usageForFlag(out, "-simpleoutput", "use SimpleCodeWriter");
         usageForFlag(out, "-v -verbose", "print verbose debugging information");
         usageForFlag(out, "-report <topic>=<level>", 

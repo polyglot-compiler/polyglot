@@ -382,7 +382,7 @@ public abstract class Node_c implements Node
     public void print(Node child, CodeWriter w, PrettyPrinter pp) {
         pp.print(this, child, w);
     }
-
+    
     /** Translate the AST using the given <code>CodeWriter</code>. */
     public void translate(CodeWriter w, Translator tr) {
         // By default, just rely on the pretty printer.

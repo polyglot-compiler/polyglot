@@ -4,8 +4,6 @@ import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.frontend.*;
-import polyglot.frontend.Job;
-import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
 import java.util.*;
@@ -91,8 +89,12 @@ public class ContextVisitor extends ErrorHandlingVisitor
     protected void addDecls(Node n) {
         n.addDecls(context);
     }
-
-    public NodeVisitor enter(Node parent, Node n) {
+    
+    public final NodeVisitor enter(Node n) {
+    	throw new InternalCompilerError("Cannot call enter(Node n) on a ContextVisitor; use enter(Node parent, Node n) instead");
+    }
+    
+    public final NodeVisitor enter(Node parent, Node n) {
         if (Report.should_report(Report.visit, 5))
 	    Report.report(5, "enter(" + n + ")");
 
@@ -138,7 +140,7 @@ public class ContextVisitor extends ErrorHandlingVisitor
         return super.enter(parent, n);
     }
 
-    public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
+    public final Node leave(Node parent, Node old, Node n, NodeVisitor v) {
         // If the traversal was pruned, just return n since leaveCall
         // might expect a ContextVisitor, not a PruningVisitor.
         if (v instanceof PruningVisitor || prune) {

@@ -36,7 +36,8 @@ public class Position implements Serializable
      * depth.  Depth 1 is the caller.  Depth 2 is the caller's caller, etc.
      */ 
     public static Position compilerGenerated(int depth) {
-    	if (Options.global.output_ambiguous_nodes) return COMPILER_GENERATED;
+    	if (! Options.global.precise_compiler_generated_positions)
+            return COMPILER_GENERATED;
         StackTraceElement[] stack = new Exception().getStackTrace();
         if (depth < stack.length) {
             return new Position(null, stack[depth].getFileName() + " (compiler generated)", stack[depth].getLineNumber());

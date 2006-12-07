@@ -53,8 +53,6 @@ public class Translator extends PrettyPrinter implements Copy
     protected NodeFactory nf;
     protected TargetFactory tf;
     protected TypeSystem ts;
-    protected Context context;
-    protected ClassType outerClass = null;
 
     /**
      * Create a Translator.  The output of the visitor is a collection of files
@@ -62,12 +60,10 @@ public class Translator extends PrettyPrinter implements Copy
      */
     public Translator(Job job, TypeSystem ts, NodeFactory nf, TargetFactory tf) {
         super();
-
         this.job = job;
         this.nf = nf;
         this.tf = tf;
         this.ts = ts;
-        this.context = ts.createContext();
     }
 
     /**
@@ -75,17 +71,6 @@ public class Translator extends PrettyPrinter implements Copy
      */
     public Job job() { 
         return job;
-    }
-    
-    /** Create a new <code>Translator</code> identical to <code>this</code> but
-     * with new context <code>c</code> */
-    public Translator context(Context c) {
-        if (c == this.context) {
-            return this;
-        }
-        Translator tr = (Translator) copy();
-        tr.context = c;
-        return tr;
     }
 
     /** Copy the translator. */
@@ -98,29 +83,9 @@ public class Translator extends PrettyPrinter implements Copy
         }
     }
 
-    /** Set the outer class context of the translator.  This class is used when
-     * translating "new" expressions for nested classes.  For the expression
-     * "e.new C()", the name "C" needs to be looked up in the context of the
-     * static type of expression "e" (i.e., <code>outerClass</code>), rather
-     * than in the current context returned by <code>context()</code>.
-     */
-    public ClassType outerClass() {
-        return outerClass;
-    }
-
-    /** Destructively set the outer class context of the translator. */
-    public void setOuterClass(ClassType ct) {
-        this.outerClass = ct;
-    }
-
     /** Get the extension's type system. */
     public TypeSystem typeSystem() {
         return ts;
-    }
-
-    /** Get the current context in which we are translating. */
-    public Context context() {
-        return context;
     }
 
     /** Get the extension's node factory. */
@@ -134,29 +99,7 @@ public class Translator extends PrettyPrinter implements Copy
      * by nodes to print their children.
      */
     public void print(Node parent, Node child, CodeWriter w) {
-        Translator tr;
-
-        if (job().extensionInfo().getOptions().output_ambiguous_nodes) {
-            tr = this;
-        }
-        else {
-	        if (parent != null) {
-	            Context c = parent.del().enterChildScope(child, context);
-	            tr = this.context(c);
-	        }
-	        else {
-	            Context c = child.del().enterScope(context);
-	            tr = this.context(c);
-	        }
-        }
-
-        child.del().translate(w, tr);
-
-        if (!job().extensionInfo().getOptions().output_ambiguous_nodes) {
-        if (parent != null) {
-            parent.addDecls(context);
-        }
-        }
+    	child.del().translate(w, this);
     }
 
     /** Translate the entire AST. */
@@ -185,66 +128,64 @@ public class Translator extends PrettyPrinter implements Copy
 
     /** Translate a single SourceFile node */
     protected boolean translateSource(SourceFile sfn) {
-        TypeSystem ts = typeSystem();
-        NodeFactory nf = nodeFactory();
-	TargetFactory tf = this.tf;
-	int outputWidth = job.compiler().outputWidth();
-	Collection outputFiles = job.compiler().outputFiles();
-
-        // Find the public declarations in the file.  We'll use these to
-        // derive the names of the target files.  There will be one
-        // target file per public declaration.  If there are no public
-        // declarations, we'll use the source file name to derive the
-        // target file name.
-        List exports = exports(sfn);
-
-        try {
-            File of;
-            CodeWriter w;
-
-            String pkg = "";
-
-            if (sfn.package_() != null) {
-                Package p = sfn.package_().package_();
-                pkg = p.toString();
-            }
-
-            Context c = sfn.del().enterScope(context);
-
-            TopLevelDecl first = null;
-
-            if (exports.size() == 0) {
-                // Use the source name to derive a default output file name.
-                of = tf.outputFile(pkg, sfn.source());
-            }
-            else {
-                first = (TopLevelDecl) exports.get(0);
-                of = tf.outputFile(pkg, first.name(), sfn.source());
-            }
-
-            String opfPath = of.getPath();
-            if (!opfPath.endsWith("$")) outputFiles.add(of.getPath());
-            w = tf.outputCodeWriter(of, outputWidth);
-
-            writeHeader(sfn, w);
-
-            for (Iterator i = sfn.decls().iterator(); i.hasNext(); ) {
-                TopLevelDecl decl = (TopLevelDecl) i.next();
-
-                if (decl.flags().isPublic() && decl != first) {
-                    // We hit a new exported declaration, open a new file.
-                    // But, first close the old file.
-                    w.flush();
-		    w.close();
-
-                    of = tf.outputFile(pkg, decl.name(), sfn.source());
-                    outputFiles.add(of.getPath());
-                    w = tf.outputCodeWriter(of, outputWidth);
+    	TypeSystem ts = typeSystem();
+    	NodeFactory nf = nodeFactory();
+    	TargetFactory tf = this.tf;
+    	int outputWidth = job.compiler().outputWidth();
+    	Collection outputFiles = job.compiler().outputFiles();
+    	
+    	// Find the public declarations in the file.  We'll use these to
+    	// derive the names of the target files.  There will be one
+    	// target file per public declaration.  If there are no public
+    	// declarations, we'll use the source file name to derive the
+    	// target file name.
+    	List exports = exports(sfn);
+    	
+    	try {
+    		File of;
+    		CodeWriter w;
+    		
+    		String pkg = "";
+    		
+    		if (sfn.package_() != null) {
+    			Package p = sfn.package_().package_();
+    			pkg = p.toString();
+    		}
+    		
+    		TopLevelDecl first = null;
+    		
+    		if (exports.size() == 0) {
+    			// Use the source name to derive a default output file name.
+    			of = tf.outputFile(pkg, sfn.source());
+    		}
+    		else {
+    			first = (TopLevelDecl) exports.get(0);
+    			of = tf.outputFile(pkg, first.name(), sfn.source());
+    		}
+    		
+    		String opfPath = of.getPath();
+    		if (!opfPath.endsWith("$")) outputFiles.add(of.getPath());
+    		w = tf.outputCodeWriter(of, outputWidth);
+    		
+    		writeHeader(sfn, w);
+    		
+    		for (Iterator i = sfn.decls().iterator(); i.hasNext(); ) {
+    			TopLevelDecl decl = (TopLevelDecl) i.next();
+    			
+    			if (decl.flags().isPublic() && decl != first) {
+    				// We hit a new exported declaration, open a new file.
+    				// But, first close the old file.
+    				w.flush();
+    				w.close();
+    				
+    				of = tf.outputFile(pkg, decl.name(), sfn.source());
+    				outputFiles.add(of.getPath());
+    				w = tf.outputCodeWriter(of, outputWidth);
 
                     writeHeader(sfn, w);
                 }
 
-                decl.del().translate(w, this.context(c));
+    			translateTopLevelDecl(w, sfn, decl);
 
                 if (i.hasNext()) {
                     w.newline(0);
@@ -261,6 +202,16 @@ public class Translator extends PrettyPrinter implements Copy
         }
     }
 
+
+	/**
+	 * @param w
+	 * @param source
+	 * @param decl
+	 */
+	protected void translateTopLevelDecl(CodeWriter w, SourceFile source, TopLevelDecl decl) {
+		decl.del().translate(w, this);
+	}
+	
     /** Write the package and import declarations for a source file. */
     protected void writeHeader(SourceFile sfn, CodeWriter w) {
 	if (sfn.package_() != null) {

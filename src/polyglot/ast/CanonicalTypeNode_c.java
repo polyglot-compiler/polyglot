@@ -47,26 +47,14 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
 
       return this;
   }
-
+  
   public void translate(CodeWriter w, Translator tr) {
-    if (tr.outerClass() != null) {
-      w.write(type.translate(tr.outerClass().resolver()));
-    }
-    else if (Options.global.fully_qualified_names) {
-      // if a field or local variable in this context shadows the package
-      // name of the type, then the output code may not compile, e.g.
-      //   ...
-      //   java.lang.Object foo;
-      //   foo.package.Bar = new foo.package.Bar();
-      //   ...
-      // 
-      // But, the user asked for fully qualified names, so that's what they
-      // get.
-      w.write(type.translate(null));
-    }
-    else { 
-      w.write(type.translate(tr.context()));
-    }
+      if (tr instanceof TypedTranslator) {
+          w.write(type.translate(((TypedTranslator) tr).context()));
+      }
+      else {
+          w.write(type.translate(null));
+      }
   }
 
   public String toString() {

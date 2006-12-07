@@ -547,7 +547,7 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         n = (ArrayTypeNode)n.del(delFactory.delArrayTypeNode());
         return n;
     }
-
+    
     public CanonicalTypeNode CanonicalTypeNode(Position pos, Type type) {
         if (! type.isCanonical()) {
             throw new InternalCompilerError("Cannot construct a canonical " +
