@@ -3,9 +3,28 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
-Jun 8, 2006: Polyglot 2.0rc1
+Dec 7, 2004: Polyglot 2.0rc2
 ============================
   What's new since Polyglot 2.0rc1:
+  ---------------------------------
+    Allow code generation of untyped ASTs using Translator.
+    Previous behavior of Translator is now implemented with TypedTranslator.
+
+    Moved example extensions to top-level examples directory.
+
+    Moved skeleton extension to top-level.
+
+    Added file offsets to Position.
+
+    More precise Position annotations for some nodes.
+
+    Don't assume String is final in Binary.
+
+    Bug fixes.
+    
+Jun 8, 2006: Polyglot 2.0rc1
+============================
+  What's new since Polyglot 2.0alpha4:
   --------------------------------------
     Fixed bug with post compiler not handling spaces in file names.
     Patch from Igor Peshansky (igorp@us.ibm.com).
