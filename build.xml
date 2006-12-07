@@ -104,14 +104,7 @@ TOP='${basedir}'
           depends="executable-defs">
     <echo message="Creating ${bin}/jlc"/>
     <concat destfile="${bin}/jlc" append="no">
-      <filelist dir="${bin}" files="defs"/>
-    </concat>
-    <echo file="${bin}/jlc" append="yes">
-ext=""
-
-</echo>
-    <concat destfile="${bin}/jlc" append="yes">
-      <filelist dir="${bin}" files="jlc.in"/>
+      <filelist dir="${bin}" files="defs,jlc.in"/>
     </concat>
 
     <chmod perm="+x" file="${bin}/jlc"/>
@@ -372,6 +365,8 @@ ext=""
           dir="${parser.dir}"
 	  failonerror="true">
       <classpath refid="standard.classpath"/>
+      <arg value="-max_actions"/>
+      <arg value="100"/>
       <arg value="-parser"/>
       <arg value="${parser.class}"/>
       <arg value="-symbols"/>
