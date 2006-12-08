@@ -21,8 +21,8 @@ public class ReachChecker extends DataFlow
     }
 
     protected static class DataFlowItem extends Item {
-        final boolean reachable;
-        final boolean normalReachable;
+        public final boolean reachable;
+        public final boolean normalReachable;
 
         protected DataFlowItem(boolean reachable, boolean normalReachable) {
             this.reachable = reachable;

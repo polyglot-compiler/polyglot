@@ -221,7 +221,7 @@ public class InitChecker extends DataFlow
      * This class is immutable.
      */
     protected static class DataFlowItem extends Item {
-        Map initStatus; // map of VarInstances to MinMaxInitCount
+        public Map initStatus; // map of VarInstances to MinMaxInitCount
 
         DataFlowItem(Map m) {
             this.initStatus = Collections.unmodifiableMap(m);
