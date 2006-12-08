@@ -45,10 +45,10 @@ public class CopyPropagator extends DataFlow {
 	}
 
 	protected static class CopyInfo {
-	    final LocalInstance li; // Local instance this node pertains to.
-	    CopyInfo from;    // In edge.
-	    Set to;	      // Out edges.
-	    CopyInfo root;    // Root CopyInfo node for this tree.
+	    final public LocalInstance li; // Local instance this node pertains to.
+	    public CopyInfo from;    // In edge.
+	    public Set to;	      // Out edges.
+	    public CopyInfo root;    // Root CopyInfo node for this tree.
 
 	    protected CopyInfo(LocalInstance li) {
 		if (li == null) {

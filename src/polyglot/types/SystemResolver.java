@@ -11,11 +11,11 @@ import java.util.*;
  * fully-qualified names.
  */
 public class SystemResolver extends CachingResolver implements TopLevelResolver {
-    Map packageCache;
-    ExtensionInfo extInfo;
-    SystemResolver previous;
-    Collection justAdded;
-
+    protected Map packageCache;
+    protected ExtensionInfo extInfo;
+    protected SystemResolver previous;
+    protected Collection justAdded;
+    
     /**
      * Create a caching resolver.
      * @param inner The resolver whose results this resolver caches.

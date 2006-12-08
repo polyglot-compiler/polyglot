@@ -46,42 +46,42 @@ public class InitChecker extends DataFlow
          * The info for the outer ClassBody. The <code>ClassBodyInfo</code>s
          * form a stack. 
          */
-        ClassBodyInfo outer = null;
+        public ClassBodyInfo outer = null;
         
         /** The current CodeDecl being processed by the dataflow equations */
-        CodeDecl currCodeDecl = null;
+        public CodeDecl currCodeDecl = null;
         /** 
          * A Map of all the final fields in the class currently being processed
          * to MinMaxInitCounts. This Map is used as the basis for the Maps returned
          * in createInitialItem(). 
          * */
-        Map currClassFinalFieldInitCounts = new HashMap();
+        public Map currClassFinalFieldInitCounts = new HashMap();
         /**
          * List of all the constructors. These will be checked once all the
          * initializer blocks have been processed.
          */
-        List allConstructors = new ArrayList();
+        public List allConstructors = new ArrayList();
 
         /**
          * Map from ConstructorInstances to ConstructorInstances detailing
          * which constructors call which constructors.
          * This is used in checking the initialization of final fields.
          */
-        Map constructorCalls = new HashMap();
+        public Map constructorCalls = new HashMap();
         
         /**
          * Map from ConstructorInstances to Sets of FieldInstances, detailing
          * which final non-static fields each constructor initializes. 
          * This is used in checking the initialization of final fields.
          */
-        Map fieldsConstructorInitializes = new HashMap();
+        public Map fieldsConstructorInitializes = new HashMap();
         
         /**
          * Set of LocalInstances from the outer class body that were used
          * during the declaration of this class. We need to track this
          * in order to correctly populate <code>localsUsedInClassBodies</code>
          */
-        Set outerLocalsUsed = new HashSet();
+        public Set outerLocalsUsed = new HashSet();
         
         /**
          * Map from <code>ClassBody</code>s to <code>Set</code>s of 
@@ -93,7 +93,7 @@ public class InitChecker extends DataFlow
          * these local variables are definitely assigned before the class
          * declaration of C. 
          */
-        Map localsUsedInClassBodies = new HashMap();
+        public Map localsUsedInClassBodies = new HashMap();
         
         /**
          * Set of LocalInstances that we have seen declarations for in this 
@@ -102,7 +102,7 @@ public class InitChecker extends DataFlow
          * their own initialization) or are locals declared in an enclosing 
          * class.
          */
-        Set localDeclarations = new HashSet();
+        public Set localDeclarations = new HashSet();
     }
 
 
@@ -112,10 +112,10 @@ public class InitChecker extends DataFlow
      * ONE and MANY.
      */
     protected static class InitCount {
-        static InitCount ZERO = new InitCount(0); 
-        static InitCount ONE = new InitCount(1); 
-        static InitCount MANY = new InitCount(2); 
-        protected int count;
+        public static InitCount ZERO = new InitCount(0); 
+        public static InitCount ONE = new InitCount(1); 
+        public static InitCount MANY = new InitCount(2); 
+        public int count;
         protected InitCount(int i) {
             count = i;
         }

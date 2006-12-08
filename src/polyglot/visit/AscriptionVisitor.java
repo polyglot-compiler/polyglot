@@ -21,8 +21,8 @@ import java.util.*;
     */
 public class AscriptionVisitor extends ContextVisitor
 {
-    Type type;
-    AscriptionVisitor outer;
+    protected Type type;
+    protected AscriptionVisitor outer;
 
     /**
      *  Default constructor. See the constructor in <code> ErrorHandingVisitor
