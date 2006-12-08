@@ -3,24 +3,24 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
-Dec 7, 2004: Polyglot 2.0rc2
-============================
+Dec 8, 2004: Polyglot 2.0
+=========================
   What's new since Polyglot 2.0rc1:
   ---------------------------------
     Allow code generation of untyped ASTs using Translator.
-    Previous behavior of Translator is now implemented with TypedTranslator.
+    TypedTranslator can be used for type-directed code generation.
 
     Moved example extensions to top-level examples directory.
 
     Moved skeleton extension to top-level.
 
-    Added file offsets to Position.
+    Added file offsets to Position (patch from Bob Fuhrer).
 
-    More precise Position annotations for some nodes.
+    More precise Position annotations for some nodes (patch from Bob Fuhrer).
 
-    Don't assume String is final in Binary.
+    Don't assume String is final in Binary (patch from Bob Fuhrer).
 
-    Bug fixes.
+    Numerous bug fixes.
     
 Jun 8, 2006: Polyglot 2.0rc1
 ============================
