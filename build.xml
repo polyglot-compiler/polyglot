@@ -191,7 +191,7 @@
 
 	<!-- compile the base compiler except for the quasiquoter and generated parser -->
 	<target name="compile-base" depends="init,base-parser">
-		<javac srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/qq/**,polyglot/parse/Lexer_c.java,polyglot/parse/sym.java,polyglot/parse/Grm.java">
+		<javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/qq/**,polyglot/parse/Lexer_c.java,polyglot/parse/sym.java,polyglot/parse/Grm.java">
 			<classpath refid="standard.classpath" />
 		</javac>
 	</target>
@@ -203,7 +203,7 @@
 			<param name="parser.class" value="parser" />
 			<param name="symbol.class" value="sym" />
 		</antcall>
-		<javac srcdir="${cup.src}" destdir="${cup.classes}" debug="on" includes="java_cup/**">
+		<javac source="1.4" target="1.4" srcdir="${cup.src}" destdir="${cup.classes}" debug="on" includes="java_cup/**">
 			<classpath refid="cup.jar.classpath" />
 		</javac>
 
@@ -347,7 +347,7 @@
 			<param name="symbol.class" value="sym"/>
 		</antcall>
 		<copy file="${src}/polyglot/parse/java12.cup" todir="${classes}/polyglot/parse"/>
-		<javac srcdir="${src}" destdir="${classes}" debug="on"
+		<javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/parse/**">
 			<classpath refid="standard.classpath"/>
 		</javac>
@@ -367,7 +367,7 @@
 			<param name="parser.class" value="Grm"/>
 			<param name="symbol.class" value="sym"/>
 		</antcall>
-		<javac srcdir="${src}" destdir="${classes}" debug="on"
+		<javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on"
       includes="polyglot/qq/**">
 			<classpath refid="standard.classpath"/>
 		</javac>
@@ -500,21 +500,6 @@
 	<target name="dist" depends="polyglot-dist-javadoc"
                       description="Builds the Polyglot distribution"/>
 
-	<target name="polyglot-epl-jar">
-		<jar jarfile="${lib}/polyglot-epl.jar" basedir="${classes}"
-		      includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**"
-		excludes="polyglot/frontend/JLExtensionInfo.class"/>
-	</target>
-
-	<target name="eclipse-dist" depends="polyglot-epl-jar"
-		description="Builds a distribution that can be used as an Eclipse JDT plugin licensed under EPL">
-
-		<copy todir="/tmp/JUNK" includeEmptyDirs="false">
-			<fileset dir="${src}" includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**" excludes="polyglot/frontend/JLExtensionInfo.java" />
-		</copy>
-
-	</target>
-
 	<!-- compile pth (Polyglot Test Harness) -->
 	<target name="pth-compile" depends="compile-base">
 		<antcall target="jflex-lexer">
@@ -528,7 +513,7 @@
 			<param name="symbol.class" value="sym"/>
 			<param name="cup.file" value="script.cup"/>
 		</antcall>
-		<javac srcdir="${pth.src}" destdir="${pth.classes}" debug="on"
+		<javac source="1.4" target="1.4" srcdir="${pth.src}" destdir="${pth.classes}" debug="on"
       includes="polyglot/**">
 			<classpath refid="standard.classpath"/>
 		</javac>
@@ -561,7 +546,7 @@
 			<param name="symbol.class" value="Constant"/>
 			<param name="cup.file" value="ppg.cup"/>
 		</antcall>
-		<javac srcdir="${ppg.src}" destdir="${ppg.classes}" debug="on"
+		<javac source="1.4" target="1.4" srcdir="${ppg.src}" destdir="${ppg.classes}" debug="on"
       includes="ppg/**">
 			<classpath refid="standard.classpath"/>
 		</javac>
