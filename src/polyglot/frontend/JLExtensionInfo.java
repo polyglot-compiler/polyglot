@@ -41,60 +41,8 @@ import polyglot.visit.*;
  * <li> translation (Translator) </li>
  * </ol>
  */
-public class JLExtensionInfo extends AbstractExtensionInfo {
-    protected void initTypeSystem() {
-	try {
-            LoadedClassResolver lr;
-            lr = new SourceClassResolver(compiler, this, getOptions().constructFullClasspath(),
-                                         compiler.loader(), true,
-                                         getOptions().compile_command_line_only,
-                                         getOptions().ignore_mod_times);
+public class JLExtensionInfo extends ParserlessJLExtensionInfo {
 
-            TopLevelResolver r = lr;
-
-            // Resolver to handle lookups of member classes.
-            if (TypeSystem.SERIALIZE_MEMBERS_WITH_CONTAINER) {
-                MemberClassResolver mcr = new MemberClassResolver(ts, lr, true);
-                r = mcr;
-            }
-
-            ts.initialize(r, this);
-	}
-	catch (SemanticException e) {
-	    throw new InternalCompilerError(
-		"Unable to initialize type system: " + e.getMessage());
-	}
-    }
-    
-    protected polyglot.frontend.Scheduler createScheduler() {
-        return new JLScheduler(this);
-    }
-
-    public String defaultFileExtension() {
-        return "jl";
-    }
-
-    public String compilerName() {
-	return "jlc";
-    }
-
-    public Version version() {
-	return new JLVersion();
-    }
-
-    /** Create the type system for this extension. */
-    protected TypeSystem createTypeSystem() {
-	return new TypeSystem_c();
-    }
-
-    /** Create the node factory for this extension. */
-    protected NodeFactory createNodeFactory() {
-	return new NodeFactory_c();
-    }
-
-    public JobExt jobExt() {
-      return null;
-    }
 
     /**
      * Return a parser for <code>source</code> using the given
@@ -107,15 +55,5 @@ public class JLExtensionInfo extends AbstractExtensionInfo {
 	return new CupParser(parser, source, eq);
     }
     
-    /**
-     * Return the <code>Goal</code> to compile the source file associated with
-     * <code>job</code> to completion.
-     */
-    public Goal getCompileGoal(Job job) {
-        return scheduler.CodeGenerated(job);
-    }
-
-    static { Topics t = new Topics(); }
-
 
 }
