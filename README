@@ -156,9 +156,10 @@ Several other people have contributed to the development:
         Lantian Zheng
 
 The Polyglot class file parsing code (src/polyglot/types/reflect)
-is derived from the BLOAT bytecode optimizer written by Nathaniel
-Nystrom, David Whitlock, and Antony Hosking at Purdue University.  See
-http://www.cs.purdue.edu/s3/projects/bloat/.
+is derived from code written for the BLOAT bytecode optimizer written
+by Nathaniel Nystrom, David Whitlock, and Antony Hosking at
+Purdue University.  See http://sourceforge.net/projects/javabloat.
+The code is used here and released under both LGPL and EPL by permission.
 
 The Base64 code (polyglot.util.Base64) is derived from public domain
 code by Robert Harder <rob@iharder.net>.  See http://iharder.net/base64.
