@@ -54,6 +54,9 @@ public class Translator extends PrettyPrinter implements Copy
     protected TargetFactory tf;
     protected TypeSystem ts;
 
+    /** The current typing context, or null if type information is unavailable in this subtree of the AST. */
+    protected Context context;
+
     /**
      * Create a Translator.  The output of the visitor is a collection of files
      * whose names are added to the collection <code>outputFiles</code>.
@@ -64,8 +67,13 @@ public class Translator extends PrettyPrinter implements Copy
         this.nf = nf;
         this.tf = tf;
         this.ts = ts;
+        this.context = ts.createContext();
     }
+    
+    
 
+
+   
     /**
      * Return the job associated with this Translator.
      */
@@ -92,16 +100,59 @@ public class Translator extends PrettyPrinter implements Copy
     public NodeFactory nodeFactory() {
         return nf;
     }
+    
+    /** Get the current typing context, or null. */
+    public Context context() {
+        return this.context;
+    }
 
+    /** Create a new <code>Translator</code> identical to <code>this</code> but
+     * with new context <code>c</code> */
+    public Translator context(Context c) {
+        if (c == this.context) {
+            return this;
+        }
+        Translator tr = (Translator) copy();
+        tr.context = c;
+        return tr;
+    }
+    
     /** Print an ast node using the given code writer.  This method should not
      * be called directly to translate a source file AST; use
      * <code>translate(Node)</code> instead.  This method should only be called
      * by nodes to print their children.
      */
     public void print(Node parent, Node child, CodeWriter w) {
-    	child.del().translate(w, this);
+        Translator tr = this;
+        
+        if (context != null) {
+            if (child.isDisambiguated() && child.isTypeChecked()) {
+                if (parent == null) {
+                    Context c = child.del().enterScope(context);
+                    tr = this.context(c);
+                }
+                else if (parent.isDisambiguated() && parent.isTypeChecked()) {
+                    Context c = parent.del().enterChildScope(child, context);
+                    tr = this.context(c);
+                }
+                else {
+                    tr = this.context(null);
+                }
+            }
+            else {
+                tr = this.context(null);
+            }
+        }
+        
+        child.del().translate(w, tr);
+        
+        if (parent != null) {
+            if (parent.isDisambiguated() && parent.isTypeChecked()) {
+                parent.addDecls(context);
+            }
+        }
     }
-
+    
     /** Translate the entire AST. */
     public boolean translate(Node ast) {
         if (ast instanceof SourceFile) {
@@ -142,75 +193,84 @@ public class Translator extends PrettyPrinter implements Copy
     	List exports = exports(sfn);
     	
     	try {
-    		File of;
-    		CodeWriter w;
-    		
-    		String pkg = "";
-    		
-    		if (sfn.package_() != null) {
-    			Package p = sfn.package_().package_();
-    			pkg = p.toString();
-    		}
-    		
-    		TopLevelDecl first = null;
-    		
-    		if (exports.size() == 0) {
-    			// Use the source name to derive a default output file name.
-    			of = tf.outputFile(pkg, sfn.source());
-    		}
-    		else {
-    			first = (TopLevelDecl) exports.get(0);
-    			of = tf.outputFile(pkg, first.name(), sfn.source());
-    		}
-    		
-    		String opfPath = of.getPath();
-    		if (!opfPath.endsWith("$")) outputFiles.add(of.getPath());
-    		w = tf.outputCodeWriter(of, outputWidth);
-    		
-    		writeHeader(sfn, w);
-    		
-    		for (Iterator i = sfn.decls().iterator(); i.hasNext(); ) {
-    			TopLevelDecl decl = (TopLevelDecl) i.next();
-    			
-    			if (decl.flags().isPublic() && decl != first) {
-    				// We hit a new exported declaration, open a new file.
-    				// But, first close the old file.
-    				w.flush();
-    				w.close();
-    				
-    				of = tf.outputFile(pkg, decl.name(), sfn.source());
-    				outputFiles.add(of.getPath());
-    				w = tf.outputCodeWriter(of, outputWidth);
-
-                    writeHeader(sfn, w);
-                }
-
-    			translateTopLevelDecl(w, sfn, decl);
-
-                if (i.hasNext()) {
-                    w.newline(0);
-                }
-            }
-
-            w.flush();
-            return true;
-        }
-        catch (IOException e) {
-            job.compiler().errorQueue().enqueue(ErrorInfo.IO_ERROR,
-                      "I/O error while translating: " + e.getMessage());
-            return false;
-        }
+    	    File of;
+    	    CodeWriter w;
+    	    
+    	    String pkg = "";
+    	    
+    	    if (sfn.package_() != null) {
+    	        Package p = sfn.package_().package_();
+    	        pkg = p.toString();
+    	    }
+    	    
+    	    TopLevelDecl first = null;
+    	    
+    	    if (exports.size() == 0) {
+    	        // Use the source name to derive a default output file name.
+    	        of = tf.outputFile(pkg, sfn.source());
+    	    }
+    	    else {
+    	        first = (TopLevelDecl) exports.get(0);
+    	        of = tf.outputFile(pkg, first.name(), sfn.source());
+    	    }
+    	    
+    	    String opfPath = of.getPath();
+    	    if (!opfPath.endsWith("$")) outputFiles.add(of.getPath());
+    	    w = tf.outputCodeWriter(of, outputWidth);
+    	    
+    	    writeHeader(sfn, w);
+    	    
+    	    for (Iterator i = sfn.decls().iterator(); i.hasNext(); ) {
+    	        TopLevelDecl decl = (TopLevelDecl) i.next();
+    	        
+    	        if (decl.flags().isPublic() && decl != first) {
+    	            // We hit a new exported declaration, open a new file.
+    	            // But, first close the old file.
+    	            w.flush();
+    	            w.close();
+    	            
+    	            of = tf.outputFile(pkg, decl.name(), sfn.source());
+    	            outputFiles.add(of.getPath());
+    	            w = tf.outputCodeWriter(of, outputWidth);
+    	            
+    	            writeHeader(sfn, w);
+    	        }
+    	        
+    	        translateTopLevelDecl(w, sfn, decl);
+    	        
+    	        if (i.hasNext()) {
+    	            w.newline(0);
+    	        }
+    	    }
+    	    
+    	    w.flush();
+    	    return true;
+    	}
+    	catch (IOException e) {
+    	    job.compiler().errorQueue().enqueue(ErrorInfo.IO_ERROR,
+    	            "I/O error while translating: " + e.getMessage());
+    	    return false;
+    	}
     }
 
+    /**
+     * Translate a top-level declaration <code>decl</code> of source file <code>source</code>.
+     * @param w
+     * @param source
+     * @param decl
+     */
+    protected void translateTopLevelDecl(CodeWriter w, SourceFile source, TopLevelDecl decl) {
+        Translator tr;
+        if (source.isDisambiguated() && source.isTypeChecked()) {
+            Context c = source.del().enterScope(context);
+            tr = this.context(c);
+        }
+        else {
+            tr = this.context(null);
+        }
+        decl.del().translate(w, tr);
+    }
 
-	/**
-	 * @param w
-	 * @param source
-	 * @param decl
-	 */
-	protected void translateTopLevelDecl(CodeWriter w, SourceFile source, TopLevelDecl decl) {
-		decl.del().translate(w, this);
-	}
 	
     /** Write the package and import declarations for a source file. */
     protected void writeHeader(SourceFile sfn, CodeWriter w) {

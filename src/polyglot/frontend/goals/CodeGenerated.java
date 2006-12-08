@@ -11,7 +11,7 @@ import java.util.*;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
 import polyglot.types.TypeSystem;
-import polyglot.visit.TypedTranslator;
+import polyglot.visit.Translator;
 
 /**
  * Comment for <code>CompileGoal</code>
@@ -33,7 +33,7 @@ public class CodeGenerated extends SourceFileGoal implements EndGoal {
     public Pass createPass(ExtensionInfo extInfo) {
         TypeSystem ts = extInfo.typeSystem();
         NodeFactory nf = extInfo.nodeFactory();
-        return new OutputPass(this, new TypedTranslator(job(), ts, nf,
+        return new OutputPass(this, new Translator(job(), ts, nf,
                                                    extInfo.targetFactory()));
     }
     

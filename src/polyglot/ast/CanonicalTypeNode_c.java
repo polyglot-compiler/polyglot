@@ -16,20 +16,6 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
     this.type = type;
   }
   
-  /**
-   * If the "use-fully-qualified-class-names" options is used, then the
-   * fully qualified names is written out (<code>java.lang.Object</code>).
-   * Otherwise, the string that originally represented the type in the
-   * source file is used.
-   */
-  public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-    if (type == null) {
-	w.write("<unknown-type>");
-    } else {
-	type.print(w);
-    }
-  }
-
   /** Type check the type node.  Check accessibility of class types. */
   public Node typeCheck(TypeChecker tc) throws SemanticException {
       TypeSystem ts = tc.typeSystem();
@@ -48,13 +34,23 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
       return this;
   }
   
+  public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+    if (type == null) {
+        w.write("<unknown-type>");
+    } else {
+        type.print(w);
+    }
+  }
+  
+  /**
+   * Translate the type.
+   * If the "use-fully-qualified-class-names" options is used, then the
+   * fully qualified names is written out (<code>java.lang.Object</code>).
+   * Otherwise, the string that originally represented the type in the
+   * source file is used.
+   */
   public void translate(CodeWriter w, Translator tr) {
-      if (tr instanceof TypedTranslator) {
-          w.write(type.translate(((TypedTranslator) tr).context()));
-      }
-      else {
-          w.write(type.translate(null));
-      }
+      w.write(type.translate(tr.context()));
   }
 
   public String toString() {
