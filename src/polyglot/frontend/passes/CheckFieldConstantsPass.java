@@ -14,8 +14,8 @@ import polyglot.types.FieldInstance;
 
 
 public class CheckFieldConstantsPass extends ClassFilePass {
-    Scheduler scheduler;
-    FieldConstantsChecked goal;
+    protected Scheduler scheduler;
+    protected FieldConstantsChecked goal;
   
     public CheckFieldConstantsPass(Scheduler scheduler, FieldConstantsChecked goal) {
         super(goal);

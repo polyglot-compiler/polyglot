@@ -11,8 +11,8 @@ import java.util.*;
  */
 public class ClassPathLoader
 {
-    List classpath;
-    ClassFileLoader loader;
+    protected List classpath;
+    protected ClassFileLoader loader;
 
     public ClassPathLoader(List classpath, ClassFileLoader loader) {
         this.classpath = new ArrayList(classpath);
@@ -68,7 +68,7 @@ public class ClassPathLoader
         return null;
     }
 
-    static Collection verbose;
+    protected static Collection verbose;
 
     static {
         verbose = new HashSet();

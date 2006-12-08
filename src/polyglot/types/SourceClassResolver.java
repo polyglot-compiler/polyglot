@@ -76,10 +76,10 @@ import polyglot.util.InternalCompilerError;
  */
 public class SourceClassResolver extends LoadedClassResolver
 {
-  Compiler compiler;
-  ExtensionInfo ext;
-  boolean compileCommandLineOnly;
-  boolean ignoreModTimes;
+  protected Compiler compiler;
+  protected ExtensionInfo ext;
+  protected boolean compileCommandLineOnly;
+  protected boolean ignoreModTimes;
   
   /**
    * Create a loaded class resolver.

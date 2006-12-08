@@ -82,11 +82,11 @@ public final class TransformingIterator implements Iterator {
   //      those elements e of backing_iterator[index] transformed by TRANS.
   // RI: current_iter = backing_iterators[index], or null if no 
   //     backing_iterator hasNext.
-  Object next_item;
-  Iterator current_iter;
-  int index;
-  Iterator[] backing_iterators;
-  Transformation transformation;
+  protected Object next_item;
+  protected Iterator current_iter;
+  protected int index;
+  protected Iterator[] backing_iterators;
+  protected Transformation transformation;
 }
 
 

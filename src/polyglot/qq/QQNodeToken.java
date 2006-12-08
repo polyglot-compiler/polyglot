@@ -7,7 +7,7 @@ import polyglot.util.Position;
 
 /** A token class for int literals. */
 public class QQNodeToken extends Token {
-  Node node;
+    protected Node node;
 
   public QQNodeToken(Position position, Node node, int sym) {
       super(position, sym);

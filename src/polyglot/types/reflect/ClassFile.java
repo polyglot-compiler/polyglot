@@ -35,7 +35,7 @@ public class ClassFile {
     
     protected Map jlcInfoCache = new HashMap();
    
-    static Collection verbose = ClassFileLoader.verbose;
+    protected static Collection verbose = ClassFileLoader.verbose;
   
     /**
      * Constructor.  This constructor parses the class file from the byte array

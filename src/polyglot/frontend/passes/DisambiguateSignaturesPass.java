@@ -12,8 +12,8 @@ import polyglot.types.ParsedClassType;
 
 
 public class DisambiguateSignaturesPass extends ClassFilePass {
-    Scheduler scheduler;
-    SignaturesResolved goal;
+    protected Scheduler scheduler;
+    protected SignaturesResolved goal;
     
     public DisambiguateSignaturesPass(Scheduler scheduler, SignaturesResolved goal) {
         super(goal);

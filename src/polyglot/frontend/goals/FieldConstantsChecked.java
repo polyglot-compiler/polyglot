@@ -28,8 +28,8 @@ public class FieldConstantsChecked extends AbstractGoal {
         return scheduler.internGoal(new FieldConstantsChecked(fi));
     }
 
-    FieldInstance vi;
-    ParsedClassType ct;
+    protected FieldInstance vi;
+    protected ParsedClassType ct;
     
     protected FieldConstantsChecked(FieldInstance fi) {
         super(null);

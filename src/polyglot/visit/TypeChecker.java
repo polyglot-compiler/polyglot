@@ -73,7 +73,7 @@ public class TypeChecker extends DisambiguationDriver
     }
     
     protected static class AmbChecker extends NodeVisitor {
-        boolean amb;
+        public boolean amb;
         
         public Node override(Node n) {   
             if (! n.isDisambiguated() || ! n.isTypeChecked()) {

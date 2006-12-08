@@ -76,9 +76,9 @@ public final class ConcatenatedIterator implements Iterator {
   //      otherwise, this iterator will yield next_item, followed by the 
   //      remaining elements of backing_iterators[index], followed by the
   //      elements of backing_iterators[index+1]...
-  Object next_item;
-  Iterator[] backing_iterators;
-  int index;
+  protected Object next_item;
+  protected Iterator[] backing_iterators;
+  protected int index;
 }
 
 

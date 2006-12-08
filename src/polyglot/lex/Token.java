@@ -4,8 +4,8 @@ import polyglot.util.Position;
  
 /** The base class of all tokens. */
 public abstract class Token {
-  Position position;
-  int symbol;
+    protected Position position;
+    protected int symbol;
 
   public Token(Position position, int symbol)
   {

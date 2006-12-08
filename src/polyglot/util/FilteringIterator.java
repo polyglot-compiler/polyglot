@@ -66,9 +66,9 @@ public final class FilteringIterator implements Iterator {
   // AF:  if next_item==null, this iterator has no more elts to yield.
   //      otherwise, this iterator will yield next_item, followed by
   //      those elements e of backing_iterator such that predicate.isTrue(e).
-  Object next_item;
-  Iterator backing_iterator;
-  Predicate predicate;
+  protected Object next_item;
+  protected Iterator backing_iterator;
+  protected Predicate predicate;
 }
 
 

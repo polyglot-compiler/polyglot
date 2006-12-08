@@ -194,7 +194,7 @@ public class CFGBuilder implements Copy
       edge(last_visitor, last, graph.exitNode(), FlowGraph.EDGE_KEY_OTHER);
     }
 
-    static int counter = 0;
+    protected static int counter = 0;
 
     /** Visit the AST, constructing the CFG. */
     public void visitGraph() {
@@ -290,8 +290,8 @@ public class CFGBuilder implements Copy
             this.edgeKey = edgeKey;
             this.term = term;
         }
-        FlowGraph.EdgeKey edgeKey;
-        Term term;        
+        public FlowGraph.EdgeKey edgeKey;
+        public Term term;        
 
 	public String toString() {
 	    return "{edgeKey=" + edgeKey + ",term=" + term + "}";

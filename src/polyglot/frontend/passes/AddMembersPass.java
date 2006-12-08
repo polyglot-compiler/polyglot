@@ -11,8 +11,8 @@ import polyglot.frontend.goals.MembersAdded;
 import polyglot.types.ParsedClassType;
 
 public class AddMembersPass extends ClassFilePass {
-    Scheduler scheduler;
-    MembersAdded goal;
+    protected Scheduler scheduler;
+    protected MembersAdded goal;
     
     public AddMembersPass(Scheduler scheduler, MembersAdded goal) {
         super(goal);

@@ -14,8 +14,8 @@ import polyglot.main.Report;
 public class Stats
 {
     protected static class Times {
-        long inclusive;
-        long exclusive;
+        public long inclusive;
+        public long exclusive;
     }
 
     /** Extension we're collecting stats for. */

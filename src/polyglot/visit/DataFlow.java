@@ -54,8 +54,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             flowgraph = g;
             source = s;
         }
-        FlowGraph flowgraph;
-        CodeDecl source;
+        private FlowGraph flowgraph;
+        private CodeDecl source;
         public FlowGraph flowGraph() { return flowgraph; }
         public CodeDecl source() { return source; }
     }
@@ -421,8 +421,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 
     /** A "stack frame" for recursive DFS */
     static private class Frame {
-	Peer peer;
-	Iterator edges;
+	private Peer peer;
+	private Iterator edges;
 	Frame(Peer p, boolean forward) {
 	    peer = p;
 	    if (forward) edges = p.succs().iterator();
@@ -1067,8 +1067,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             this.trueItem = trueItem;
             this.falseItem = falseItem;            
         }
-        Item trueItem;
-        Item falseItem;
+        private Item trueItem;
+        private Item falseItem;
         public Item trueItem() { return trueItem; }
         public Item falseItem() { return falseItem; }
         public String toString() {

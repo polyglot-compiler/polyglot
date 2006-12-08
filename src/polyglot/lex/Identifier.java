@@ -5,7 +5,7 @@ import polyglot.util.Position;
 
 /** A token class for identifiers. */
 public class Identifier extends Token {
-  String identifier;
+    protected String identifier;
   public Identifier(Position position, String identifier, int sym)
   {
 	super(position, sym);

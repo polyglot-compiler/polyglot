@@ -11,7 +11,7 @@ import polyglot.visit.NodeVisitor;
 /** A pass which runs a visitor. */
 public class VisitorPass extends AbstractPass
 {
-    NodeVisitor v;
+    protected NodeVisitor v;
 
     public VisitorPass(Goal goal) {
 	this(goal, null);

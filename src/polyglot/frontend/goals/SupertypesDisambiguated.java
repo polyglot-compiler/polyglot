@@ -43,8 +43,8 @@ public class SupertypesDisambiguated extends VisitorGoal {
      * reached.
      */
     protected static class MyPass extends VisitorPass {
-        Goal allDisam;
-        Goal sigDisam;
+        public Goal allDisam;
+        public Goal sigDisam;
 
         public MyPass(Goal goal, Goal sigDisam, Goal allDisam, NodeVisitor v) {
             super(goal, v);

@@ -9,8 +9,8 @@ import java.util.*;
  * context.
  */
 public class CompoundResolver implements TopLevelResolver {
-    TopLevelResolver head;
-    TopLevelResolver tail;
+    protected TopLevelResolver head;
+    protected TopLevelResolver tail;
 
     /**
      * Create a compound resolver.

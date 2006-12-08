@@ -31,7 +31,7 @@ public class ConstantChecker extends ContextVisitor
     */
     
     protected static class TypeCheckChecker extends NodeVisitor {
-        boolean checked = true;
+        public boolean checked = true;
         public Node override(Node n) {   
             if (! n.isTypeChecked()) {
                 checked = false;

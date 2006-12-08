@@ -4,7 +4,7 @@ import polyglot.util.Position;
 
 /** A token class for numerical literals. */
 public abstract class NumericLiteral extends Literal {
-  Number val;
+    protected Number val;
 
   public NumericLiteral(Position position, int sym) { super(position, sym); }
 

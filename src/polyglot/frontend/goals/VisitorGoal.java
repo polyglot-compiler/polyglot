@@ -13,7 +13,7 @@ import polyglot.visit.NodeVisitor;
 import polyglot.util.StringUtil;
 
 public class VisitorGoal extends SourceFileGoal {
-    NodeVisitor v;
+    protected NodeVisitor v;
     
     public VisitorGoal(Job job, NodeVisitor v) {
         super(job);

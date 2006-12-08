@@ -4,8 +4,8 @@ package polyglot.util;
  */
 public class Pair
 {
-    Object part1;
-    Object part2;
+    protected Object part1;
+    protected Object part2;
     
     public Pair(Object p1, Object p2) {
 	this.part1 = p1;

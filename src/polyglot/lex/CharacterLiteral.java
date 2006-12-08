@@ -5,7 +5,7 @@ import polyglot.util.Position;
 
 /** Token class for char literals. */
 public class CharacterLiteral extends Literal {
-  Character val;
+    protected Character val;
 
   public CharacterLiteral(Position position, char c, int sym)
   {

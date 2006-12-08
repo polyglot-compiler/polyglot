@@ -17,8 +17,8 @@ import polyglot.util.Position;
  * @author nystrom
  */
 public class UnavailableTypeException extends SchedulerException {
-    Job job;
-    Position position;
+    protected Job job;
+    protected Position position;
     
     /**
      * @param job

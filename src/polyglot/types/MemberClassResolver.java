@@ -13,10 +13,10 @@ import polyglot.util.InternalCompilerError;
  */
 public class MemberClassResolver implements TopLevelResolver
 {
-  TypeSystem ts;
-  TopLevelResolver inner;
-  boolean allowRawClasses;
-  Set nocache;
+    protected TypeSystem ts;
+    protected TopLevelResolver inner;
+    protected boolean allowRawClasses;
+    protected Set nocache;
 
   protected final static Collection report_topics = CollectionUtil.list(
     Report.types, Report.resolver, Report.loader, "mcr");

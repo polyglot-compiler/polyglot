@@ -15,9 +15,9 @@ import polyglot.main.Report;
 
 
 public class TypeExistsPass extends ClassFilePass {
-    Scheduler scheduler;
-    TypeExists goal;
-    TypeSystem ts;
+    protected Scheduler scheduler;
+    protected TypeExists goal;
+    protected TypeSystem ts;
     
     public TypeExistsPass(Scheduler scheduler, TypeSystem ts, TypeExists goal) {
         super(goal);

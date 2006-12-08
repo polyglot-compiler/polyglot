@@ -25,7 +25,7 @@ import polyglot.types.TypeSystem;
 public class FinalLocalExtractor extends NodeVisitor {
 
     /** Set of LocalInstances declared final; these should not be made non-final. */
-    Set isFinal;
+    protected Set isFinal;
     
     /**
      * @param job

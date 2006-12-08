@@ -10,8 +10,8 @@ public interface Unary extends Expr
 {
     /** Unary expression operator. */
     public static class Operator extends Enum {
-	boolean prefix;
-        String name;
+	protected boolean prefix;
+        protected String name;
 
         public Operator(String name, boolean prefix) {
 	    super(name + (prefix ? "" : "post"));

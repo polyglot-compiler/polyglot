@@ -87,7 +87,7 @@ public class FlattenVisitor extends NodeVisitor
 	return null;
     }
 
-    static int count = 0;
+    protected static int count = 0;
 
     protected static String newID() {
 	return "flat$$$" + count++;

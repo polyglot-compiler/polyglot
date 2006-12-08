@@ -10,7 +10,7 @@ public interface Binary extends Expr
 {
     /** Binary expression operator. */
     public static class Operator extends Enum {
-	Precedence prec;
+	protected Precedence prec;
 
         public Operator(String name, Precedence prec) {
 	    super(name);

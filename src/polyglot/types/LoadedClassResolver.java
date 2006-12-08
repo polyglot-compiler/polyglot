@@ -22,14 +22,14 @@ public class LoadedClassResolver implements TopLevelResolver
   protected final static int MINOR_NOT_COMPATIBLE = 1;
   protected final static int COMPATIBLE = 0;
 
-  TypeSystem ts;
-  TypeEncoder te;
-  ClassPathLoader loader;
-  Version version;
-  Set nocache;
-  boolean allowRawClasses;
+  protected TypeSystem ts;
+  protected TypeEncoder te;
+  protected ClassPathLoader loader;
+  protected Version version;
+  protected Set nocache;
+  protected boolean allowRawClasses;
 
-  final static Collection report_topics = CollectionUtil.list(
+  protected final static Collection report_topics = CollectionUtil.list(
     Report.types, Report.resolver, Report.loader);
 
   /**
@@ -131,7 +131,7 @@ public class LoadedClassResolver implements TopLevelResolver
     
   }
 
-  boolean recursive = false;
+  protected boolean recursive = false;
 
   /**
    * Extract an encoded type from a class file.

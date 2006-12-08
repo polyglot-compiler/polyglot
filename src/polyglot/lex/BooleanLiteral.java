@@ -5,7 +5,7 @@ import polyglot.util.Position;
 
 /** Token class for boolean literals. */
 public class BooleanLiteral extends Literal {
-  Boolean val;
+    protected Boolean val;
   public BooleanLiteral(Position position, boolean b, int sym) {
       super(position, sym);
       this.val = Boolean.valueOf(b);

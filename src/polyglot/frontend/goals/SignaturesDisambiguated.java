@@ -42,7 +42,7 @@ public class SignaturesDisambiguated extends VisitorGoal {
      * reached.
      */
     protected static class MyPass extends VisitorPass {
-        Goal allDisam;
+        public Goal allDisam;
 
         public MyPass(Goal goal, Goal allDisam, NodeVisitor v) {
             super(goal, v);

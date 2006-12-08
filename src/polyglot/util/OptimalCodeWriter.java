@@ -202,14 +202,14 @@ public class OptimalCodeWriter extends CodeWriter {
 	return input.toString();
     }
 
-    BlockItem input;
-    BlockItem current;
+    protected BlockItem input;
+    protected BlockItem current;
     
-    static Item top;
+    protected static Item top;
 
-    PrintWriter output;
-    int width;
-    static int format_calls = 0;
+    protected PrintWriter output;
+    protected int width;
+    protected static int format_calls = 0;
     public static final boolean debug = false;      // show every step
     public static final boolean showInput = false;  // show input
     public static final boolean visualize = false;  // visualize formatting
@@ -220,7 +220,7 @@ public class OptimalCodeWriter extends CodeWriter {
     // Debugging methods
 
     /** Amount to indent during tracing. */
-    int trace_indent = 0;
+    protected int trace_indent = 0;
 
     /** Increment tracing indentation. */
     void incIndent() { trace_indent++; }

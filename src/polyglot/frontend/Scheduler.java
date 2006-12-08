@@ -68,7 +68,7 @@ public abstract class Scheduler {
     protected Map runCount;
     
     /** True if any pass has failed. */
-    boolean failed;
+    protected boolean failed;
 
     protected static final Object COMPLETED_JOB = "COMPLETED JOB";
 

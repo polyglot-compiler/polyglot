@@ -15,7 +15,7 @@ import polyglot.util.Position;
  * @author nystrom
  */
 public class SourceLoadException extends NoClassException {
-    Job job;
+    protected Job job;
     
     /**
      * @param className

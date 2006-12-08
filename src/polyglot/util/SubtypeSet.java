@@ -1,6 +1,7 @@
 package polyglot.util;
 
 import java.util.*;
+
 import polyglot.types.*;
 
 /**
@@ -15,9 +16,9 @@ import polyglot.types.*;
  */
 public class SubtypeSet implements java.util.Set
 {
-    Vector v; 
-    TypeSystem ts;
-    Type topType;  // Everything in the set must be a subtype of topType.
+    protected List v; 
+    protected TypeSystem ts;
+    protected Type topType;  // Everything in the set must be a subtype of topType.
 
     /**
      * Creates an empty SubtypeSet
@@ -27,7 +28,7 @@ public class SubtypeSet implements java.util.Set
     }
 
     public SubtypeSet(Type top) {
-	v = new Vector();
+	v = new ArrayList();
         this.ts = top.typeSystem();
 	this.topType = top;
     }

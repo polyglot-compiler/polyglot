@@ -10,7 +10,7 @@ import java.util.*;
  * element of the underlying list at most once.
  */
 public class CachingTransformingList extends TransformingList {
-    ArrayList cache;
+    protected ArrayList cache;
 
     public CachingTransformingList(Collection underlying,
 				   Transformation trans)

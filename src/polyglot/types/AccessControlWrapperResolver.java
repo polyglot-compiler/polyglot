@@ -8,8 +8,8 @@ package polyglot.types;
 
 /** A Resolver that wraps an AccessControlResolver. */
 public class AccessControlWrapperResolver implements Resolver {
-    AccessControlResolver inner;
-    ClassType accessor;
+    protected AccessControlResolver inner;
+    protected ClassType accessor;
     
     public AccessControlWrapperResolver(AccessControlResolver inner, ClassType accessor) {
         this.inner = inner;

@@ -10,7 +10,7 @@ import polyglot.util.*;
 /** Visitor which performs type checking on the AST. */
 public class Disambiguator extends AmbiguityRemover
 {
-    Context beginContext;
+    protected Context beginContext;
  
     public Disambiguator(DisambiguationDriver dd) {
         this(dd.job(), dd.typeSystem(), dd.nodeFactory(), dd.context());

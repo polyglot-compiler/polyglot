@@ -12,9 +12,9 @@ import polyglot.util.ErrorQueue;
  */
 public class CupParser implements Parser
 {
-    java_cup.runtime.lr_parser grm;
-    Source source;
-    ErrorQueue eq;
+    protected java_cup.runtime.lr_parser grm;
+    protected Source source;
+    protected ErrorQueue eq;
 
     public CupParser(java_cup.runtime.lr_parser grm, Source source, ErrorQueue eq) {
 	this.grm = grm;

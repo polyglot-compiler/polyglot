@@ -21,7 +21,7 @@ import polyglot.visit.NodeVisitor;
 
 
 public class ConstantsCheckedForFile extends SourceFileGoal {
-    boolean reached;
+    protected boolean reached;
     
     public ConstantsCheckedForFile(Job job) {
         super(job);

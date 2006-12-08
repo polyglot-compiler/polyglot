@@ -11,8 +11,8 @@ import java.util.*;
  */
 public abstract class HaltingVisitor extends NodeVisitor
 {
-    Node bypassParent;
-    Collection bypass;
+    protected Node bypassParent;
+    protected Collection bypass;
 
     public HaltingVisitor bypassChildren(Node n) {
         HaltingVisitor v = (HaltingVisitor) copy();

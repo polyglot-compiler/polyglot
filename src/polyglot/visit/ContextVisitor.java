@@ -134,7 +134,7 @@ public class ContextVisitor extends ErrorHandlingVisitor
         }
     }
 
-    boolean prune;
+    protected boolean prune;
 
     public NodeVisitor superEnter(Node parent, Node n) {
         return super.enter(parent, n);

@@ -17,8 +17,8 @@ import polyglot.util.*;
  */
 public class AmbiguityRemover extends DisambiguationDriver
 {
-    boolean visitSigs;
-    boolean visitBodies;
+    protected boolean visitSigs;
+    protected boolean visitBodies;
     
     public AmbiguityRemover(Job job, TypeSystem ts, NodeFactory nf) {
         this(job, ts, nf, true, true);
@@ -129,7 +129,7 @@ public class AmbiguityRemover extends DisambiguationDriver
     }
 
     protected static class AmbChecker extends NodeVisitor {
-        int notOkCount;
+        public int notOkCount;
 
         public Node override(Node parent, Node n) {
             final Collection TOPICS = Arrays.asList(new String[] { Report.types, Report.frontend, "disam-check" });

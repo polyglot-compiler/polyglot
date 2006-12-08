@@ -43,7 +43,7 @@ public abstract class Barrier extends AbstractGoal {
     }
 
     protected static class BarrierPass extends AbstractPass {
-        Scheduler scheduler;
+        public Scheduler scheduler;
         
         protected BarrierPass(Scheduler scheduler, Barrier barrier) {
             super(barrier);

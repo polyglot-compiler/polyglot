@@ -14,8 +14,8 @@ import polyglot.util.InternalCompilerError;
 
 
 public class ResolveSuperTypesPass extends ClassFilePass {
-    Scheduler scheduler;
-    SupertypesResolved goal;
+    protected Scheduler scheduler;
+    protected SupertypesResolved goal;
     
     public ResolveSuperTypesPass(Scheduler scheduler, SupertypesResolved goal) {
         super(goal);

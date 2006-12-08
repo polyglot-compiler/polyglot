@@ -11,7 +11,7 @@ public class TypeInputStream extends ObjectInputStream {
     protected TypeSystem ts;
     protected Map cache;
     protected boolean failed;
-    boolean enableReplace;
+    protected boolean enableReplace;
     protected Set placeHoldersUsed;
     
     public TypeInputStream(InputStream in, TypeSystem ts, Map cache)
@@ -40,7 +40,7 @@ public class TypeInputStream extends ObjectInputStream {
         return ts;
     }
     
-    final static Object UNRESOLVED = new Object();
+    private final static Object UNRESOLVED = new Object();
     
     public void installInPlaceHolderCache(PlaceHolder p, TypeObject t) {
         cache.put(p, t);

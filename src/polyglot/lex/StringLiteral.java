@@ -5,7 +5,7 @@ import polyglot.util.Position;
 
 /** A token class for string literals. */
 public class StringLiteral extends Literal {
-  String val;
+    protected String val;
   public StringLiteral(Position position, String s, int sym) {
       super(position, sym);
       this.val = s;

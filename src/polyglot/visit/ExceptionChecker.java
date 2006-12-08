@@ -212,7 +212,7 @@ public class ExceptionChecker extends ErrorHandlingVisitor
         }
     }
     public static class CodeTypeReporter extends UncaughtReporter {
-        final String codeType;
+        public final String codeType;
         public CodeTypeReporter(String codeType) {
             this.codeType = codeType;
         }

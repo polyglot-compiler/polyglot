@@ -21,19 +21,19 @@ import polyglot.util.*;
  * @author Nate Nystrom
  */
 public class ClassFileLazyClassInitializer implements LazyClassInitializer {
-    ClassFile clazz;
-    TypeSystem ts;
-    ParsedClassType ct;
+    protected ClassFile clazz;
+    protected TypeSystem ts;
+    protected ParsedClassType ct;
 
-    boolean init;
-    boolean constructorsInitialized;
-    boolean fieldsInitialized;
-    boolean interfacesInitialized;
-    boolean memberClassesInitialized;
-    boolean methodsInitialized;
-    boolean superclassInitialized;
+    protected boolean init;
+    protected boolean constructorsInitialized;
+    protected boolean fieldsInitialized;
+    protected  boolean interfacesInitialized;
+    protected boolean memberClassesInitialized;
+    protected boolean methodsInitialized;
+    protected boolean superclassInitialized;
 
-    static Collection verbose = ClassFileLoader.verbose;
+    protected static Collection verbose = ClassFileLoader.verbose;
 
     public ClassFileLazyClassInitializer(ClassFile file, TypeSystem ts) {
         this.clazz = file;

@@ -309,9 +309,9 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
         return Collections.unmodifiableList(interfaces);
     }
     
-    boolean membersAdded;
-    boolean supertypesResolved;
-    boolean signaturesResolved;
+    protected boolean membersAdded;
+    protected boolean supertypesResolved;
+    protected boolean signaturesResolved;
 
     /**
      * @return Returns the membersAdded.

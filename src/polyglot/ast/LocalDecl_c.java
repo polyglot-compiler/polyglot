@@ -231,8 +231,8 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     protected static class AddDependenciesVisitor extends NodeVisitor {
-        ConstantChecker cc;
-        LocalInstance li;
+        protected ConstantChecker cc;
+        protected LocalInstance li;
 
         AddDependenciesVisitor(ConstantChecker cc, LocalInstance li) {
             this.cc = cc;

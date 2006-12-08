@@ -39,7 +39,7 @@ public class ExitChecker extends DataFlow
     }
 
     protected static class DataFlowItem extends Item {
-        final boolean exits; // whether all paths leaving this node lead to an exit 
+        public final boolean exits; // whether all paths leaving this node lead to an exit 
 
         protected DataFlowItem(boolean exits) {
             this.exits = exits;

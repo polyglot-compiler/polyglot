@@ -30,7 +30,7 @@ public class Report {
   protected final static Map reportTopics = new HashMap(); // Map[String, Integer]
   
   /** Error queue to which to write messages. */
-  static ErrorQueue eq;
+  protected static ErrorQueue eq;
 
   /**
    * Indicates if there is no reporting at all.
@@ -39,7 +39,7 @@ public class Report {
    * this flag to bypass a lot of the checking. When the options are processed,
    * this flag should be changed.
    */
-  static boolean noReporting = true;
+  protected static boolean noReporting = true;
   
   /** Report topics understood by the base compiler. */
   public final static String cfg = "cfg";

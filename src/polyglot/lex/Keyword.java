@@ -5,7 +5,7 @@ import polyglot.util.Position;
 
 /** A token class for keywords. */
 public class Keyword extends Token {
-  String keyword;
+    protected String keyword;
 
   public Keyword(Position position, String s, int sym) {
       super(position, sym);

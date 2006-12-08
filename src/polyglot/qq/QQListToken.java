@@ -8,7 +8,7 @@ import java.util.List;
 
 /** A token class for int literals. */
 public class QQListToken extends Token {
-  List list;
+    protected List list;
 
   public QQListToken(Position position, List list, int sym) {
       super(position, sym);

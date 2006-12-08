@@ -46,7 +46,7 @@ public class Enum implements Internable, Serializable
     }
 
     private static class EnumKey {
-	Enum e;
+        private Enum e;
 
 	EnumKey(Enum e) {
 	    this.e = e;

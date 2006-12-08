@@ -203,8 +203,8 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     }
    
     public static class AddDependenciesVisitor extends NodeVisitor {
-        Scheduler scheduler;
-        FieldInstance fi;
+        protected Scheduler scheduler;
+        protected FieldInstance fi;
         
         AddDependenciesVisitor(Scheduler scheduler, FieldInstance fi) {
             this.scheduler = scheduler;

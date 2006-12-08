@@ -6,7 +6,7 @@ import java_cup.runtime.Symbol;
 
 /** A token class for operators. */
 public class Operator extends Token {
-  String which;
+    protected String which;
   public Operator(Position position, String which, int sym) {
       super(position, sym);
       this.which = which;

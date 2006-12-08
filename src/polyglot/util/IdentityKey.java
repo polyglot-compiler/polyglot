@@ -5,7 +5,7 @@ package polyglot.util;
  */
 public class IdentityKey
 {
-    Object obj;
+    private Object obj;
 
     public IdentityKey(Object obj) {
         this.obj = obj;

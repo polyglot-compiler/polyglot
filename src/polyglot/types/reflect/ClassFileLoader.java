@@ -17,26 +17,26 @@ public class ClassFileLoader
 {
 
     /** The extension info */
-    ExtensionInfo extensionInfo;
+    protected ExtensionInfo extensionInfo;
 
     /**
      * Keep a cache of the zips and jars so we don't have to keep
      * opening them from the file system.
      */
-    Map zipCache;
+    protected Map zipCache;
 
     /**
      * A cache of directories found in zip files.
      */
-    Set packageCache;
+    protected Set packageCache;
 
     /**
      * Directory contents cache. Cache the first level of the directory
      * so that we get less FileNotFoundExceptions
      */
-    Map dirContentsCache;
+    protected Map dirContentsCache;
 
-    final static Object not_found = new Object();
+    protected final static Object not_found = new Object();
 
     public ClassFileLoader(ExtensionInfo ext) {
         this.zipCache = new HashMap();
@@ -258,7 +258,7 @@ public class ClassFileLoader
         }
     }
 
-    static Collection verbose;
+    protected static Collection verbose;
 
     static {
         verbose = new HashSet();

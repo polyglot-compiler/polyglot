@@ -11,9 +11,9 @@ import java.util.*;
 /** A <code>TargetFactory</code> is responsible for opening output files. */
 public class TargetFactory
 {
-    File outputDirectory;
-    String outputExtension;
-    boolean outputStdout;
+    protected File outputDirectory;
+    protected String outputExtension;
+    protected boolean outputStdout;
 
     public TargetFactory(File outDir, String outExt, boolean so) {
 	outputDirectory = outDir;

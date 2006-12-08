@@ -19,7 +19,7 @@ public class Main
   /** Source files specified on the command line */
   private Set source;
 
-  final static String verbose = "verbose";
+  public final static String verbose = "verbose";
 
   /* modifies args */
   protected ExtensionInfo getExtensionInfo(List args) throws TerminationException {

@@ -16,7 +16,7 @@ import polyglot.util.ErrorQueue;
  */
 public class ParserPass extends AbstractPass
 {
-    Compiler compiler;
+    protected Compiler compiler;
 
     public ParserPass(Compiler compiler, Goal goal) {
         super(goal);

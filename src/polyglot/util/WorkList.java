@@ -105,12 +105,12 @@ public class WorkList {
 
   // The list of objects to be calculated on.  The oldest element is first.
   // RI: Every member of <pending> is a key in <results>.
-  LinkedList pending;
+  protected LinkedList pending;
   // A map from all objects to their results.  Any object with no result
   // maps to NOT_CALCULATED.
-  HashMap results;
+  protected HashMap results;
   // The number of elements in pending.
-  int size;
+  protected int size;
 
   public static final Object NOT_CALCULATED = new Object();
 }

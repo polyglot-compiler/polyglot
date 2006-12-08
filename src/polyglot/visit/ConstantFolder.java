@@ -8,8 +8,8 @@ import polyglot.util.Position;
 /** Visitor which performs constant folding. */
 public class ConstantFolder extends NodeVisitor
 {
-    TypeSystem ts;
-    NodeFactory nf;
+    protected TypeSystem ts;
+    protected NodeFactory nf;
 
     public ConstantFolder(TypeSystem ts, NodeFactory nf) {
         this.ts = ts;

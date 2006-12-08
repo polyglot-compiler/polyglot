@@ -109,7 +109,7 @@ public class SourceLoader
      * The current user directory. We make it static so we don't need to
      * keep on making copies of it. 
      */
-    static File current_dir = null;
+    protected static File current_dir = null;
 
     /**
      * The current user directory.

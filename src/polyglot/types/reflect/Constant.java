@@ -10,8 +10,8 @@ import java.io.*;
  */
 public class Constant
 {
-    int tag;
-    Object value;
+    protected int tag;
+    protected Object value;
 
     /**
      * Constant tag for class types.
@@ -20,7 +20,7 @@ public class Constant
      * The Fieldref, Methodref and InterfaceMethodref constant types
      * refer to this constant type.
      */
-    static final byte CLASS              = 7;
+    public static final byte CLASS              = 7;
 
     /**
      * Constant tag for field references.
@@ -28,7 +28,7 @@ public class Constant
      * The getfield, putfield, getstatic, and putstatic instructions use
      * this constant type.
      */
-    static final byte FIELD_REF           = 9;
+    public static final byte FIELD_REF           = 9;
 
     /**
      * Constant tag for method references.
@@ -36,47 +36,47 @@ public class Constant
      * The invokevirtual, invokespecial, and invokestatic instructions use
      * this constant type.
      */
-    static final byte METHOD_REF          = 10;
+    public static final byte METHOD_REF          = 10;
 
     /**
      * Constant tag for java.lang.String constants.
      * The actual string value is stored indirectly in a Utf8 constant.
      */
-    static final byte STRING             = 8;
+    public static final byte STRING             = 8;
 
     /**
      * Constant tag for int, short, byte, char, and boolean constants. 
      */
-    static final byte INTEGER            = 3;
+    public static final byte INTEGER            = 3;
 
     /**
      * Constant tag for float constants. 
      */
-    static final byte FLOAT              = 4;
+    public static final byte FLOAT              = 4;
 
     /**
      * Constant tag for long constants. 
      */
-    static final byte LONG               = 5;
+    public static final byte LONG               = 5;
 
     /**
      * Constant tag for double constants. 
      */
-    static final byte DOUBLE             = 6;
+    public static final byte DOUBLE             = 6;
 
     /**
      * Constant tag for method references.
      * This is used to reference a method in an interface.
      * The invokeinterface instruction uses this constant type.
      */
-    static final byte INTERFACE_METHOD_REF = 11;
+    public static final byte INTERFACE_METHOD_REF = 11;
 
     /**
      * Constant tag for holding the name and type of a field or method.
      * The Fieldref, Methodref and InterfaceMethodref constant types
      * refer to this constant type.
      */
-    static final byte NAME_AND_TYPE        = 12;
+    public static final byte NAME_AND_TYPE        = 12;
 
     /**
      * Constant tag for holding the a UTF8 format string.
@@ -84,7 +84,7 @@ public class Constant
      * NameandType constants, the class name for Class constants,
      * the string value for String constants.
      */
-    static final byte UTF8               = 1;
+    public static final byte UTF8               = 1;
 
     /**
      * @param tag

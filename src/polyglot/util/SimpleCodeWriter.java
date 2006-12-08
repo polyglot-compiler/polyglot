@@ -14,21 +14,21 @@ import java.util.Stack;
  * appealing output is desired, use OptimalCodeWriter.
  */
 public class SimpleCodeWriter extends CodeWriter {
-    PrintWriter output;
-    int width;
-    int rmargin;
-    int lmargin;
-    boolean breakAll;
-    Stack lmargins;
-    int pos;
+    protected PrintWriter output;
+    protected int width;
+    protected int rmargin;
+    protected int lmargin;
+    protected boolean breakAll;
+    protected Stack lmargins;
+    protected int pos;
 
     public SimpleCodeWriter(OutputStream o, int width_) {
         this(new PrintWriter(new OutputStreamWriter(o)), width_);
     }
 
-    class State {
-	int lmargin;
-	boolean breakAll;
+    protected class State {
+	public int lmargin;
+	public boolean breakAll;
 
 	State(int m, boolean b) { lmargin = m; b = breakAll; }
     }

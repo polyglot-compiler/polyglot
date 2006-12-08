@@ -16,8 +16,8 @@ import polyglot.frontend.goals.Goal;
  * @author nystrom
  */
 public class MissingDependencyException extends SchedulerException {
-    Goal goal;
-    boolean prerequisite;
+    protected Goal goal;
+    protected boolean prerequisite;
     
     public MissingDependencyException(Goal goal) {
         this(goal, false);
