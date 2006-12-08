@@ -3,8 +3,8 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
-Dec 8, 2004: Polyglot 2.0
-=========================
+Dec 8, 2006: Polyglot 2.0.0
+===========================
   What's new since Polyglot 2.0rc1:
   ---------------------------------
     Allow code generation of untyped ASTs using Translator.
