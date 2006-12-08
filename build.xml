@@ -439,7 +439,7 @@
 		</copy>
 
 		<copy todir="${dist}/tests" includeEmptyDirs="false">
-			<fileset dir="tests" exclude="**/pthOutput*,**/*.java,**/*.java,**/*.results" />
+			<fileset dir="tests" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results" />
 		</copy>
 
 		<copy todir="${dist}/tools" includeEmptyDirs="false">
@@ -499,6 +499,21 @@
 	<target name="polyglot-dist-javadoc" depends="polyglot-dist,dist-javadoc"/>
 	<target name="dist" depends="polyglot-dist-javadoc"
                       description="Builds the Polyglot distribution"/>
+
+	<target name="polyglot-epl-jar">
+		<jar jarfile="${lib}/polyglot-epl.jar" basedir="${classes}"
+		      includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**"
+		excludes="polyglot/frontend/JLExtensionInfo.class"/>
+	</target>
+
+	<target name="eclipse-dist" depends="polyglot-epl-jar"
+		description="Builds a distribution that can be used as an Eclipse JDT plugin licensed under EPL">
+
+		<copy todir="/tmp/JUNK" includeEmptyDirs="false">
+			<fileset dir="${src}" includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**" excludes="polyglot/frontend/JLExtensionInfo.java" />
+		</copy>
+
+	</target>
 
 	<!-- compile pth (Polyglot Test Harness) -->
 	<target name="pth-compile" depends="compile-base">
