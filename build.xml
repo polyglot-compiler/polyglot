@@ -117,10 +117,16 @@
 	</target>
 
 	<!-- build the examples -->
-	<target name="compile-examples" depends="install-jars">
+        <target name="examples" depends="compile-examples"/>
+        <target name="compile-examples" depends="pao,coffer"/>
+
+        <target name="pao" depends="install-jars">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="compile-all"/>
+        </target>
+
+        <target name="coffer" depends="install-jars">
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="compile-all"/>
-	</target>
+        </target>
 
 	<!-- clean the examples -->
 	<target name="clean-examples">
@@ -464,6 +470,7 @@
 		<copy file="build.xml" todir="${dist}"/>
 		<copy file="README" todir="${dist}"/>
 		<copy file="CHANGES" todir="${dist}"/>
+		<copy file="LICENSE" todir="${dist}"/>
 		<copy file="LICENSE.LGPL" todir="${dist}"/>
 		<copy file="LICENSE.Eclipse" todir="${dist}"/>
 	</target>
