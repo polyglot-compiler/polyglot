@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature id="polyglot2" label="polyglot2" version="@version@" provider-name="nystrom@us.ibm.com">
+
+   <description url="http://www.cs.cornell.edu/Projects/polyglot/">
+      The Polyglot extensible compiler framework
+   </description>
+
+   <copyright url="http://www.cs.cornell.edu/Projects/polyglot/eclipse/copyright.html">
+     Copyright (C) 2000-2006 Polyglot project group, Cornell University
+   </copyright>
+
+   <license url="http://www.cs.cornell.edu/Projects/polyglot/eclipse/license.html">
+      This release of the Polyglot distribution is governed by the Eclipse
+      Public License.
+   </license>
+
+   <url>
+      <update url="http://www.cs.cornell.edu/Projects/polyglot/eclipseUpdates/features/polyglot2_@version@.jar"/>
+   </url>
+
+   <plugin id="polyglot2" download-size="0" install-size="0" version="@version@" unpack="false"/>
+
+</feature>

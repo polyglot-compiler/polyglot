@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="export" default="all" basedir=".">
+  <description>
+    Polyglot plugin build file
+  </description>
+
+  <property name="version" value="2.0.0"/>
+
+  <property name="polyglot.dir" location="${basedir}/.."/>
+
+  <target name="all" depends="deploy"/>
+
+  <target name="build-site">
+    <filter token="version" value="${version}"/>
+    <copy tofile="${basedir}/site.xml" file="${basedir}/site.xml.in" filtering="true"/>
+  </target>
+
+  <target name="build-plugin">
+    <mkdir dir="${basedir}/plugins"/>
+
+    <!-- create a directory with the jar contents -->
+    <mkdir dir="${basedir}/tmp"/>
+
+    <copy todir="${basedir}/tmp">
+      <fileset dir="${polyglot.dir}/classes"
+        includes="**/*.class"
+        excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/frontend/JLExtensionInfo.class" />
+    </copy>
+
+    <copy todir="${basedir}/tmp/META-INF">
+      <fileset dir="${basedir}/META-INF"/>
+    </copy>
+
+    <jar destfile="${basedir}/plugins/polyglot2_${version}.jar"
+        basedir="${basedir}/tmp"/>
+
+    <delete dir="${basedir}/tmp"/>
+  </target>
+
+  <target name="build-features">
+    <filter token="version" value="${version}"/>
+    <copy tofile="${basedir}/feature.xml" file="${basedir}/feature.xml.in" filtering="true"/>
+
+    <mkdir dir="${basedir}/features"/>
+    <jar destfile="${basedir}/features/polyglot2_${version}.jar"
+      basedir="${basedir}"
+      includes="feature.xml" />
+  </target>
+
+  <target name="deploy" depends="build-features,build-site,build-plugin">
+    <mkdir dir="${basedir}/deploy"/>
+    <copy todir="${basedir}/deploy/features">
+      <fileset dir="${basedir}/features"/>
+    </copy>
+    <copy todir="${basedir}/deploy/plugins">
+      <fileset dir="${basedir}/plugins"/>
+    </copy>
+    <copy todir="${basedir}/deploy" file="${basedir}/site.xml"/>
+  </target>
+
+  <target name="clobber" depends="clean">
+    <delete dir="${basedir}/deploy"/>
+  </target>
+
+  <target name="clean">
+    <delete dir="${basedir}/tmp"/>
+    <delete dir="${basedir}/plugins"/>
+    <delete dir="${basedir}/features"/>
+    <delete file="${basedir}/feature.xml"/>
+    <delete file="${basedir}/site.xml"/>
+  </target>
+
+</project>
