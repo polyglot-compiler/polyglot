@@ -8,7 +8,7 @@
 
   <property name="polyglot.dir" location="${basedir}/.."/>
 
-  <target name="all" depends="deploy"/>
+  <target name="all" depends="dist"/>
 
   <target name="build-site">
     <filter token="version" value="${version}"/>
@@ -47,19 +47,19 @@
       includes="feature.xml" />
   </target>
 
-  <target name="deploy" depends="build-features,build-site,build-plugin">
-    <mkdir dir="${basedir}/deploy"/>
-    <copy todir="${basedir}/deploy/features">
+  <target name="dist" depends="build-features,build-site,build-plugin">
+    <mkdir dir="${basedir}/dist"/>
+    <copy todir="${basedir}/dist/features">
       <fileset dir="${basedir}/features"/>
     </copy>
-    <copy todir="${basedir}/deploy/plugins">
+    <copy todir="${basedir}/dist/plugins">
       <fileset dir="${basedir}/plugins"/>
     </copy>
-    <copy todir="${basedir}/deploy" file="${basedir}/site.xml"/>
+    <copy todir="${basedir}/dist" file="${basedir}/site.xml"/>
   </target>
 
   <target name="clobber" depends="clean">
-    <delete dir="${basedir}/deploy"/>
+    <delete dir="${basedir}/dist"/>
   </target>
 
   <target name="clean">

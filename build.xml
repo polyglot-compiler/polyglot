@@ -504,6 +504,17 @@
 	<target name="jar" depends="polyglot-jar"/>
 	<target name="polyglot-dist" depends="jl-dist,ppg-dist,pth-dist"/>
 	<target name="polyglot-dist-javadoc" depends="polyglot-dist,dist-javadoc"/>
+
+        <target name="eclipse-dist" depends="compile-base">
+          <ant inheritAll="false" antfile="${basedir}/eclipse/build.xml" dir="${basedir}/eclipse" target="all"/>
+          <ant inheritAll="false" antfile="${basedir}/eclipse/build.xml" dir="${basedir}/eclipse" target="clean"/>
+          <echo>
+            
+Eclipse distribution files are in ${basedir}/eclipse/dist
+
+          </echo>
+        </target>
+
 	<target name="dist" depends="polyglot-dist-javadoc"
                       description="Builds the Polyglot distribution"/>
 
