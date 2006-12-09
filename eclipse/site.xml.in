@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <description url="http://www.cs.cornell.edu/Projects/polyglot">
+   <description url="http://www.cs.cornell.edu/Projects/polyglot/">
       This Eclipse update site hosts the distribution for the Polyglot extensible compiler framework.
    </description>
 

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature id="polyglot2" label="polyglot2" version="@version@" provider-name="nystrom@us.ibm.com">
+<feature
+      id="polyglot2"
+      label="Polyglot"
+      version="@version@"
+      provider-name="nystrom@cs.cornell.edu">
 
    <description url="http://www.cs.cornell.edu/Projects/polyglot/">
       The Polyglot extensible compiler framework
@@ -18,6 +22,11 @@
       <update url="http://www.cs.cornell.edu/Projects/polyglot/eclipseUpdates/features/polyglot2_@version@.jar"/>
    </url>
 
-   <plugin id="polyglot2" download-size="0" install-size="0" version="@version@" unpack="false"/>
+   <plugin
+         id="polyglot2"
+         download-size="0"
+         install-size="0"
+         version="@version@"
+         unpack="false"/>
 
 </feature>
