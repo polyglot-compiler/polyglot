@@ -200,7 +200,7 @@ public class Translator extends PrettyPrinter implements Copy
     	    
     	    if (sfn.package_() != null) {
     	        Package p = sfn.package_().package_();
-    	        pkg = p.toString();
+    	        pkg = p.fullName();
     	    }
     	    
     	    TopLevelDecl first = null;

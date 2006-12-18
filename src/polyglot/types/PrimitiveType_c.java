@@ -69,7 +69,7 @@ public class PrimitiveType_c extends Type_c implements PrimitiveType
     }
     
     public String name() {
-            return toString();	
+            return kind.toString();	
     }
     
     public String fullName() {
