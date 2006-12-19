@@ -30,9 +30,6 @@
     <!-- directory for class file targets -->
     <property name="compiler.classes" location="${basedir}/compiler/classes" />
 
-    <!-- polyglot directory -->
-    <property name="polyglot.dir" location="${basedir}/../.."/>
-
     <!-- binaries directory -->
     <property name="bin.dir" location="${basedir}/bin" />
 
@@ -66,13 +63,7 @@
         <!-- the java classpath -->
         <pathelement path="${java.class.path}" />
 
-        <!-- polyglot classes, assuming a cvs checkout -->
-        <pathelement path="${polyglot.dir}/classes" />
-        <fileset dir="${polyglot.dir}/lib">
-          <include name="*.jar"/>
-        </fileset>
-
-        <!-- jar files in the lib directory -->
+        <!-- jar files in the lib directory, excluding generated jars -->
         <fileset dir="${lib.dir}">
             <include name="*.jar" />
             <exclude name="${package}.jar" />
