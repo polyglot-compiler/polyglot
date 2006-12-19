@@ -1,3 +1,10 @@
+/*
+ * This file is part of the Polyglot extensible compiler framework.
+ *
+ * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * 
+ */
+
 package polyglot.main;
 import java.io.File;
 import java.io.PrintStream;

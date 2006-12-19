@@ -1,4 +1,11 @@
 /*
+ * This file is part of the Polyglot extensible compiler framework.
+ *
+ * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * 
+ */
+
+/*
  * Created on May 16, 2005
  */
 package polyglot.visit;

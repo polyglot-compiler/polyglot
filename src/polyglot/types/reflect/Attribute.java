@@ -1,3 +1,11 @@
+/*
+ * This file is part of the Polyglot extensible compiler framework.
+ *
+ * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 1997-2001 Purdue Research Foundation, Purdue University
+ * 
+ */
+
 package polyglot.types.reflect;
 
 import java.util.*;

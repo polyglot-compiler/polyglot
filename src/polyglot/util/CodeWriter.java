@@ -1,3 +1,10 @@
+/*
+ * This file is part of the Polyglot extensible compiler framework.
+ *
+ * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * 
+ */
+
 /**
  * CodeWriter -- Andrew C. Myers, May 2005
  *   Originally developed for use in Cornell University Computer Science

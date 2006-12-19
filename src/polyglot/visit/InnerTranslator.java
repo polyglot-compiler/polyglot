@@ -1,4 +1,11 @@
 /*
+ * This file is part of the Polyglot extensible compiler framework.
+ *
+ * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * 
+ */
+
+/*
  * Created on Mar 13, 2005
  *
  * TODO To change the template for this generated file go to

@@ -1,3 +1,24 @@
+/*
+ * This file is part of the Polyglot extensible compiler framework.
+ *
+ * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
+ *
+ * This file is based on:
+ * Java 1.2 parser for CUP.
+ * Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
+ * This program is released under the terms of the GPL; see the file
+ * COPYING for more details.  There is NO WARRANTY on this code.
+ *
+ * As a special exception, C. Scott Ananian additionally permits the
+ * distribution of this modified version of the parser and its derivatives
+ * under the terms of the LGPL.
+ *
+ * NOTE: Unlike most files in the Polyglot distribution, this file is
+ * NOT released under the Eclipse Public License.
+ * 
+ */
+
 package polyglot.parse;
 
 import java.util.*;
@@ -12,22 +33,7 @@ import polyglot.types.*;
 import polyglot.*;
 import polyglot.ast.Assert;
 
-// This parser is based on:
-/* Java 1.2 parser for CUP.
- * Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
- * This program is released under the terms of the GPL; see the file
- * COPYING for more details.  There is NO WARRANTY on this code.
- *
- * As a special exception, C. Scott Ananian additionally permits the
- * distribution of this modified version of the parser and its derivatives
- * under the terms of the LGPL.
- *
- * NOTE: Unlike most files in the Polyglot distribution, this file is
- * NOT released under the Eclipse Public License.
- *
- * extended to support Java 1.4 (assert keyword).
- */
-
+/** Java Parser for CUP */
 parser Grm extends BaseParser {:
 
   public Grm(Lexer l, TypeSystem t, NodeFactory n, ErrorQueue q) {
