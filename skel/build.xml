@@ -83,7 +83,6 @@
         <delete includeemptydirs="true">
             <fileset dir="${basedir}/tests">
                 <include name="**/*.class" />
-                <include name="**/*.java" />
                 <include name="**/*~" />
                 <include name="pthOutput*/**/*" />
                 <include name="pthOutput*" />
@@ -128,7 +127,6 @@
        ****************************************  -->
     <target name="configure" description="Configure the extension">
         <antcall target="check-classpath" />
-        <antcall target="executables" />
     </target>
 
     <target name="check-classpath" description="Check the classpath contains the appropriate directories/jars">
@@ -150,82 +148,6 @@
 	      message="The JFlex classes must be on the classpath. Try adding JFlex.jar to the classpath."/>
     </target>
 
-    <target name="executables">
-        <uptodate property="executables.up-to-date">
-            <srcfiles dir="${bin.dir}" includes="*.in" />
-            <mapper type="glob" from="*.in" to="*" />
-        </uptodate>
-        <antcall target="executable" />
-        <delete file="${bin.dir}/defs" />
-    </target>
-
-    <target name="executable-defs">
-        <condition property="defs.load_library_path" value="PATH">
-            <os family="windows" />
-        </condition>
-        <condition property="defs.load_library_path" value="LD_LIBRARY_PATH">
-            <os family="unix" />
-        </condition>
-
-        <echo file="${bin.dir}/defs" append="no">#!/bin/sh
-# DO NOT EDIT - This file was automatically generated.
-
-JAVA='${java.home}/bin/java'
-FILE_SEP='${file.separator}'
-PATH_SEP='${path.separator}'
-TOP='${basedir}'
-RT_LIB_PATH='${lib.dir}${path.separator}'$$${defs.load_library_path}
-        </echo>
-    </target>
-
-    <!-- creates the executable scripts -->
-    <target name="executable"
-		unless="executables.up-to-date">
-
-        <!-- make sure the definitions file is around -->
-        <antcall target="executable-defs" />
-
-        <!-- Create the compiler script -->
-        <concat destfile="${compiler.sh}" append="no">
-            <filelist dir="${bin.dir}" files="defs,${compiler.sh}.in" />
-        </concat>
-        <chmod perm="+x" file="${compiler.sh}" />
-
-
-        <!-- Create the interpreter script -->
-        <concat destfile="${interp.sh}" append="no">
-            <filelist dir="${bin.dir}" files="defs,${interp.sh}.in" />
-        </concat>
-        <chmod perm="+x" file="${interp.sh}" />
-
-        <!-- Create ${compiler.bat} -->
-        <condition property="os.isWindows">
-            <os family="windows" />
-        </condition>
-
-        <antcall target="executable-bat" />
-    </target>
-
-    <!-- Create .bat file if needed -->
-    <target name="executable-bat" 
-            if="os.isWindows">
-        <concat destfile="${compiler.bat}" append="no">
-@echo off
-rem DO NOT EDIT - This file was automatically generated.
-
-set CMD_LINE_ARGS=%1
-if ""%1""=="""" goto doneStart
-shift
-:setupArgs
-if ""%1""=="""" goto doneStart
-set CMD_LINE_ARGS=%CMD_LINE_ARGS% %1
-shift
-goto setupArgs
-:doneStart
-sh ${compiler.sh} %CMD_LINE_ARGS%
-    </concat>
-    </target>
-
     <!-- ****************************************
        targets
        ****************************************  -->
@@ -241,7 +163,7 @@ sh ${compiler.sh} %CMD_LINE_ARGS%
 
     <target name="runtime" depends="init,configure" description="compile the runtime" if="has-runtime">
         <mkdir dir="${runtime.classes}" />
-        <javac srcdir="${runtime.src}" destdir="${runtime.classes}" debug="on" includes="**">
+        <javac source="1.4" target="1.4" srcdir="${runtime.src}" destdir="${runtime.classes}" debug="on" includes="**">
             <classpath>
                 <path refid="standard.classpath" />
             </classpath>
@@ -285,7 +207,6 @@ sh ${compiler.sh} %CMD_LINE_ARGS%
             <fileset dir="${basedir}" defaultexcludes="yes">
                 <include name="compiler/src/**" />
                 <include name="runtime/src/**" />
-                <include name="bin/*.in" />
 
                 <include name="tests/*" />
                 <include name="README" />
@@ -325,7 +246,7 @@ sh ${compiler.sh} %CMD_LINE_ARGS%
        @param ${ext}         the name of the extension
     -->
     <target name="compile-ext">
-        <javac srcdir="${compiler.src}" destdir="${compiler.classes}" debug="on" includes="${ext}/**">
+        <javac source="1.4" target="1.4" srcdir="${compiler.src}" destdir="${compiler.classes}" debug="on" includes="${ext}/**">
             <classpath refid="standard.classpath" />
         </javac>
     </target>
