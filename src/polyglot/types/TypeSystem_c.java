@@ -1581,11 +1581,18 @@ public class TypeSystem_c implements TypeSystem
 	return arrayType(pos, type);
     }
 
+    Map arrayTypeCache = new HashMap();
+
     /**
      * Factory method for ArrayTypes.
      */
     protected ArrayType arrayType(Position pos, Type type) {
-	return new ArrayType_c(this, pos, type);
+        ArrayType t = (ArrayType) arrayTypeCache.get(type);
+        if (t == null) {
+            t = new ArrayType_c(this, pos, type);
+            arrayTypeCache.put(type, t);
+        }
+        return t;
     }
 
     public ArrayType arrayOf(Type type, int dims) {
