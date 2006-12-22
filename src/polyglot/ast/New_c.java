@@ -201,7 +201,13 @@ public class New_c extends Expr_c implements New
         New old = nn;
         
         BodyDisambiguator bd = new BodyDisambiguator(ar);
-        BodyDisambiguator childbd = (BodyDisambiguator) bd.enter(parent, this);
+        NodeVisitor childv = bd.enter(parent, this);
+
+        if (childv instanceof PruningVisitor) {
+            return nn;
+        }
+
+        BodyDisambiguator childbd = (BodyDisambiguator) childv;
 
         // Disambiguate the qualifier and object type, if possible.
         if (nn.qualifier() == null) {
@@ -629,7 +635,13 @@ public class New_c extends Expr_c implements New
         New old = nn;
         
         BodyDisambiguator bd = new BodyDisambiguator(tc);
-        TypeChecker childtc = (TypeChecker) tc.enter(parent, this);
+        NodeVisitor childv = tc.enter(parent, this);
+
+        if (childv instanceof PruningVisitor) {
+            return nn;
+        }
+
+        TypeChecker childtc = (TypeChecker) childv;
         
         if (nn.qualifier() != null) {
             nn = nn.qualifier((Expr) nn.visitChild(nn.qualifier(), childtc));
