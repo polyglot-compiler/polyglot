@@ -27,14 +27,15 @@
         excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class" />
     </copy>
 
-    <copy todir="${basedir}/tmp/META-INF">
-      <fileset dir="${basedir}/META-INF"/>
+    <filter token="version" value="${version}"/>
+    <copy todir="${basedir}/tmp/META-INF" filtering="true">
+      <fileset dir="${basedir}/META-INF" includes="**/MANIFEST.MF"/>
     </copy>
 
     <jar destfile="${basedir}/plugins/polyglot2_${version}.jar"
-      basedir="${basedir}/tmp" manifest="META-INF/MANIFEST.MF"/>
+      basedir="${basedir}/tmp" manifest="${basedir}/tmp/META-INF/MANIFEST.MF"/>
 
-    <delete dir="${basedir}/tmp"/>
+    <!-- <delete dir="${basedir}/tmp"/> -->
   </target>
 
   <target name="build-features">
