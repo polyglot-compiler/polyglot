@@ -2,6 +2,7 @@
  * This file is part of the Polyglot extensible compiler framework.
  *
  * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2006 IBM Corporation
  * 
  */
 
@@ -55,8 +56,10 @@ public class ParserPass extends AbstractPass
 	    return false;
 	}
 	catch (IOException e) {
-	    eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage());
-	    return false;
+	    eq.enqueue(ErrorInfo.IO_ERROR, e.getMessage(),
+                new Position(goal.job().source().path(),
+                             goal.job().source().name(), 1, 1, 1, 1));
+
 	}
     }
 
