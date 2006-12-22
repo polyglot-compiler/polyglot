@@ -452,11 +452,11 @@
 			<fileset dir="tools"/>
 		</copy>
 
-		<copy todir="${dist}/examples/pao" includeEmptyDirs="false">
+                <copy todir="${dist}/examples/pao">
 			<fileset dir="${pao.dir}" />
 		</copy>
 
-		<copy todir="${dist}/examples/coffer" includeEmptyDirs="false">
+                <copy todir="${dist}/examples/coffer">
 			<fileset dir="${coffer.dir}" />
 		</copy>
 
