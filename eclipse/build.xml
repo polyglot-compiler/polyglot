@@ -4,7 +4,7 @@
     Polyglot plugin build file
   </description>
 
-  <property name="version" value="2.0.0"/>
+  <property name="version" value="2.0.1"/>
 
   <property name="polyglot.dir" location="${basedir}/.."/>
 
@@ -24,7 +24,7 @@
     <copy todir="${basedir}/tmp">
       <fileset dir="${polyglot.dir}/classes"
         includes="**/*.class"
-        excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/frontend/JLExtensionInfo.class" />
+        excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class" />
     </copy>
 
     <copy todir="${basedir}/tmp/META-INF">
