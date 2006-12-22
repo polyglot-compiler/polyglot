@@ -17,6 +17,7 @@ import polyglot.frontend.goals.SourceFileGoal;
 import polyglot.main.Report;
 import polyglot.util.ErrorInfo;
 import polyglot.util.ErrorQueue;
+import polyglot.util.Position;
 
 /**
  * A pass which runs a parser.  After parsing it stores the AST in the Job.
@@ -60,6 +61,7 @@ public class ParserPass extends AbstractPass
                 new Position(goal.job().source().path(),
                              goal.job().source().name(), 1, 1, 1, 1));
 
+            return false;
 	}
     }
 
