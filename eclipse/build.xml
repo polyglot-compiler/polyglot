@@ -32,7 +32,7 @@
     </copy>
 
     <jar destfile="${basedir}/plugins/polyglot2_${version}.jar"
-        basedir="${basedir}/tmp"/>
+      basedir="${basedir}/tmp" manifest="META-INF/MANIFEST.MF"/>
 
     <delete dir="${basedir}/tmp"/>
   </target>
