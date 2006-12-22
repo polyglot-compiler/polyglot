@@ -121,7 +121,6 @@ public abstract class Expr_c extends Term_c implements Expr
      * we do not parenthesize.
      *
      * @param expr The subexpression.
-     * (right-) associative operator.
      * @param w The output writer.
      * @param pp The pretty printer.
      */
