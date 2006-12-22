@@ -22,18 +22,10 @@ public class Name {
     public final NodeFactory nf;
     public final TypeSystem ts;
 
-    public Name(BaseParser parser, Position pos, String name) {
-    	this(parser, pos, null, name);
-    }
-
     public Name(NodeFactory nf, TypeSystem ts, Position pos, String name) {
         this(nf, ts, pos, null, name);
     }
 
-    public Name(BaseParser parser, Position pos, Name prefix, String name) {
-    	this(parser.nf, parser.ts, pos, prefix, name);
-    }
-    
     public Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix, String name) {
     	this.nf = nf;
         this.ts = ts;
