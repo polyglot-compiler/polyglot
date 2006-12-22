@@ -3,6 +3,18 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
+Dec 22, 2006: Polyglot 2.0.1
+============================
+  What's new since Polyglot 2.0.0:
+  --------------------------------
+    Removed references from to BaseParser in polyglot.parse.Name
+    so extensions can use Name without pulling in java_cup.
+
+    Fixes to build.xml.
+
+    Miscellaneous bug fixes.
+
+
 Dec 8, 2006: Polyglot 2.0.0
 ===========================
   What's new since Polyglot 2.0rc1:
