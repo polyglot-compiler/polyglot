@@ -17,7 +17,6 @@ import java.util.*;
 
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
-import polyglot.frontend.goals.SignaturesResolved.SignaturesResolvedPass;
 import polyglot.frontend.passes.*;
 import polyglot.types.ParsedClassType;
 import polyglot.types.TypeSystem;
