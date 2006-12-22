@@ -8,7 +8,7 @@
 package polyglot.visit;
 
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import polyglot.ast.*;
 import polyglot.frontend.Job;
@@ -897,7 +897,7 @@ public class InitChecker extends DataFlow
         // go through every final non-static field in dfOut.initStatus
         Iterator iter = dfOut.initStatus.entrySet().iterator();
         while (iter.hasNext()) {
-            Entry e = (Entry)iter.next();
+            Map.Entry e = (Map.Entry)iter.next();
             if (e.getKey() instanceof FieldInstance && 
                     ((FieldInstance)e.getKey()).flags().isFinal() && 
                     !((FieldInstance)e.getKey()).flags().isStatic()) {
