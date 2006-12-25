@@ -17,13 +17,13 @@ import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 
 /**
- * TypedTranslator extends Translator for type-directed code generation. The
- * base Translator uses types only to generate more readable code. If an
- * ambiguous or untyped AST node is encountered, code generation continues. In
- * contrast, with TypedTranslator, encountering an ambiguous or untyped node is
- * considered internal compiler error. TypedTranslator should be used when the
- * output AST is expected to be (or required to be) type-checked before code
- * generation.
+ * TypedTranslator extends Translator for type-directed code generation.
+ * The base Translator uses types only to generate more readable code.
+ * If an ambiguous or untyped AST node is encountered, code generation
+ * continues. In contrast, with TypedTranslator, encountering an
+ * ambiguous or untyped node is considered internal compiler error.
+ * TypedTranslator should be used when the output AST is expected to be
+ * (or required to be) type-checked before code generation.
  */
 public class TypedTranslator extends Translator {
 
