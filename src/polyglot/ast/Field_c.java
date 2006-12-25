@@ -260,18 +260,27 @@ public class Field_c extends Expr_c implements Field
     return null;
   }
   
-  // check that the implicit target setting is correct.
+  /**
+   * Check the consistency of the implicit target inserted by the compiler by
+   * asserting that the FieldInstance in the Context for this field's name is
+   * the same as the FieldInstance we assigned to this field.
+   */
   protected void checkConsistency(Context c) {
       if (targetImplicit) {
           VarInstance vi = c.findVariableSilent(name);
           if (vi instanceof FieldInstance) {
               FieldInstance rfi = (FieldInstance) vi;
-              if (c.typeSystem().equals(rfi, fi)) {
+              // Compare the original (declaration) fis, not the actuals.
+              // We do this because some extensions that do type substitutions
+              // perform the substitution
+              // on the fi after lookup and some extensions modify lookup
+              // itself to do the substitution.
+              if (c.typeSystem().equals(rfi.orig(), fi.orig())) {
                   // all is OK.
                   return;
               }
-              System.out.println("(found) rfi is " + rfi);
-              System.out.println("(actual) fi is " + fi);
+              System.out.println("(found) rfi is " + rfi.orig());
+              System.out.println("(actual) fi is " + fi.orig());
           }
           throw new InternalCompilerError("Field " + this + " has an " +
                "implicit target, but the name " + name + " resolves to " +
