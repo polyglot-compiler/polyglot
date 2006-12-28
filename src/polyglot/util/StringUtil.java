@@ -16,18 +16,18 @@ public class StringUtil
      * the last dot, or no characters if the name has no dot.
      **/
     public static String getPackageComponent(String fullName) {
-	int lastDot = fullName.lastIndexOf('.');
-	return lastDot >= 0 ? fullName.substring(0,lastDot) : "";
+        int lastDot = fullName.lastIndexOf('.');
+        return lastDot >= 0 ? fullName.substring(0,lastDot) : "";
     }
-   
+
     /**
      * Given the name for a class, returns the portion which appears to
      * constitute the package -- i.e., all characters after the last
      * dot, or all the characters if the name has no dot.
      **/
     public static String getShortNameComponent(String fullName) {
-	int lastDot = fullName.lastIndexOf('.');
-	return lastDot >= 0 ? fullName.substring(lastDot+1) : fullName;
+        int lastDot = fullName.lastIndexOf('.');
+        return lastDot >= 0 ? fullName.substring(lastDot+1) : fullName;
     }
 
     /**
@@ -35,25 +35,27 @@ public class StringUtil
      * qualified (i.e., it has no dot.)
      **/
     public static boolean isNameShort(String name) {
-	return name.indexOf('.') < 0;
+        return name.indexOf('.') < 0;
     }
 
     public static String getFirstComponent(String fullName) {
-	int firstDot = fullName.indexOf('.');
-	return firstDot >= 0 ? fullName.substring(0,firstDot) : fullName;
+        int firstDot = fullName.indexOf('.');
+        return firstDot >= 0 ? fullName.substring(0,firstDot) : fullName;
     }
 
     public static String removeFirstComponent(String fullName) {
-	int firstDot = fullName.indexOf('.');
-	return firstDot >= 0 ? fullName.substring(firstDot+1) : "";
+        int firstDot = fullName.indexOf('.');
+        return firstDot >= 0 ? fullName.substring(firstDot+1) : "";
     }
- 
+
     public static String escape(String s) {
         return escape(s, false);
     }
 
     public static String escape(char c) {
-        return escape(String.valueOf(c), false);
+        String t = escape(c, false);
+        if (t != null) return t;
+        return String.valueOf(c);
     }
 
     public static String unicodeEscape(String s) {
@@ -61,54 +63,76 @@ public class StringUtil
     }
 
     public static String unicodeEscape(char c) {
-        return escape(String.valueOf(c), true);
+        String t = escape(c, true);
+        if (t != null) return t;
+        return String.valueOf(c);
     }
 
     public static String escape(String s, boolean unicode) {
-        StringBuffer sb = new StringBuffer(s.length());
+        StringBuffer sb = null;
 
-	for (int i = 0; i < s.length(); i++) {
-	    char c = s.charAt(i);
-	    escape(sb, c, unicode);
-	}
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            String t = escape(c, unicode);
+            if (sb == null && t != null) {
+                // string to return will not be the same
+                // as the original.
+                sb = new StringBuffer(s.length() + 10);
+                sb.append(s.substring(0, i));
+            }
+            
+            if (sb != null) {
+                if (t != null) {
+                    sb.append(t);
+                }
+                else {
+                    sb.append(c);
+                }
+            }
+        }
 
-	return sb.toString();
+        if (sb != null) return sb.toString();
+        return s;
     }
 
-    private static void escape(StringBuffer sb, char c, boolean unicode) {
+    /**
+     * Returns the string that c escapes to, null if
+     * c does not require escaping.
+     */
+    private static String escape(char c, boolean unicode) {
         if (c > 0xff) {
             if (unicode) {
-                String s = Integer.toHexString(c);
-                while (s.length() < 4) s = "0" + s;
-                sb.append("\\u" + s);
+                StringBuffer sb = new StringBuffer(8);
+                sb.append(Integer.toHexString(c));
+                while (sb.length() < 4) sb.insert(0, '0');
+                sb.insert(0, "\\u");
+                return sb.toString();
             }
             else {
-                sb.append(c);
+                return null;
             }
-	    return;
-	}
+        }
 
-	switch (c) {
-	    case '\b': sb.append("\\b"); return;
-	    case '\t': sb.append("\\t"); return;
-	    case '\n': sb.append("\\n"); return;
-	    case '\f': sb.append("\\f"); return;
-	    case '\r': sb.append("\\r"); return;
-	    case '\"': sb.append("\\" + c); return; // "\\\"";
-	    case '\'': sb.append("\\" + c); return; // "\\\'";
-	    case '\\': sb.append("\\" + c); return; // "\\\\";
-	}
+        switch (c) {
+        case '\b': return ("\\b");
+        case '\t': return ("\\t");
+        case '\n': return ("\\n");
+        case '\f': return ("\\f");
+        case '\r': return ("\\r");
+        case '\"': return ("\\\""); // "\\\"";
+        case '\'': return ("\\\'"); // "\\\'";
+        case '\\': return ("\\\\"); // "\\\\";
+        }
 
         if (c >= 0x20 && c < 0x7f) {
-            sb.append(c);
-	    return;
-	}
+            return null;
+        }
 
-        sb.append("\\" + (char) ('0' + c / 64)
-                       + (char) ('0' + (c & 63) / 8)
-                       + (char) ('0' + (c & 7)));
+        return ("\\" + (char) ('0' + c / 64)
+                  + (char) ('0' + (c & 63) / 8)
+                  + (char) ('0' + (c & 7)));
     }
-    
+
     public static String nth(int n) {
         StringBuffer s = new StringBuffer(String.valueOf(n));
         if (s.length() > 1) {
@@ -118,21 +142,21 @@ public class StringUtil
                 return s.toString();                
             }            
         }
-        
+
         char last = s.charAt(s.length()-1);
         switch (last) {
-            case '1':
-                s.append("st");
-                break;
-            case '2':
-                s.append("nd");
-                break;
-            case '3':
-                s.append("rd");
-                break;
-            default:
-                s.append("th");
-                            
+        case '1':
+            s.append("st");
+            break;
+        case '2':
+            s.append("nd");
+            break;
+        case '3':
+            s.append("rd");
+            break;
+        default:
+            s.append("th");
+
         }
         return s.toString();
     }
