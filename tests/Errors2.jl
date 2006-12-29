@@ -1,5 +1,5 @@
 class Errors2 {
-  void m(foo x) {
-      bar y;
+  void m(Errors2.foo x) {
+      Errors2.bar y;
   }
 }
