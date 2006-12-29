@@ -21,9 +21,9 @@ fixclasspath() {
 
   cp="$1"
   if [ "$windows" = 1 ]; then 
-      echo ":$cp" | sed -e 's!/!\\!g' -e 's!:!;!g' -e 's/\\cygdrive\\\([a-z]\)/\1:/g'
+    cygpath -pw "$cp"
   else
-      echo "$cp"
+    echo "$cp"
   fi
 }
 
