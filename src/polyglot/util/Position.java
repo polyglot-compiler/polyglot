@@ -99,6 +99,9 @@ public class Position implements Serializable
     }
 
     public Position truncateEnd(int len) {
+    	if (this == COMPILER_GENERATED)
+    	    return this;
+    	
 	int eo = endOffset;
 	int el = endLine;
 	int ec = endColumn;
@@ -127,10 +130,14 @@ public class Position implements Serializable
     }
     
     public Position startOf() {
+    	if (this == COMPILER_GENERATED)
+    	    return this;
         return new Position(path, file, line, column, line, column);
     }
 
     public Position endOf() {
+    	if (this == COMPILER_GENERATED)
+    	    return this;
         return new Position(path, file, endLine, endColumn, endLine, endColumn);
     }
 
