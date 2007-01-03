@@ -113,6 +113,44 @@ public class TypeBuilder extends NodeVisitor
 	}
     }
 
+    public TypeBuilder pushContext(Context c) throws SemanticException {
+        LinkedList stack = new LinkedList();
+        while (c != null) {
+            stack.addFirst(c);
+            c = c.pop();
+        }
+        
+        TypeBuilder tb = this;
+        boolean inCode = false;
+        for (Iterator i = stack.iterator(); i.hasNext(); ) {
+            c = (Context) i.next();
+            if (c.inCode()) {
+                if (! inCode) {
+                    // entering code
+                    inCode = true;
+                    tb = tb.pushCode();
+                }
+            }
+            else {
+                if (c.importTable() != null && tb.importTable() == null) {
+                    // entering class file
+                    tb.setImportTable(c.importTable());
+                }
+                if (c.importTable() != null && c.package_() != null &&
+                    tb.currentPackage() == null) {
+                    // entering package context in source
+                    tb = tb.pushPackage(c.package_());
+                }
+                if (c.currentClassScope() != tb.currentClass()) {
+                    // entering class
+                    tb = tb.pushClass(c.currentClassScope());
+                }
+            }
+        }
+        
+        return tb;
+    }
+        
     public TypeBuilder pushPackage(Package p) {
         if (Report.should_report(Report.visit, 4))
 	    Report.report(4, "TB pushing package " + p + ": " + context());
