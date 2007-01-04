@@ -23,11 +23,6 @@
 	<!-- tools directory -->
 	<property name="tools.dir" location="${basedir}/tools"/>
 
-	<!-- version -->
-	<property name="jl.version.major" value="2"/>
-	<property name="jl.version.minor" value="0"/>
-	<property name="jl.version.patch" value="1"/>
-
 	<!-- pth (Polyglot Test Harness) directory -->
 	<property name="pth.dir"  location="${tools.dir}/pth"/>
 	<property name="pth.classes"  location="${pth.dir}/classes"/>
@@ -47,12 +42,6 @@
 	<property name="examples.dir" location="${basedir}/examples" />
 	<property name="pao.dir" location="${examples.dir}/pao"/>
 	<property name="coffer.dir" location="${examples.dir}/coffer"/>
-
-	<!-- examples to build -->
-	<path id="examples.list">
-		<pathelement location="${examples.dir}/pao" />
-		<pathelement location="${examples.dir}/coffer" />
-	</path>
 
 	<!-- classpath to use when compiling polyglot -->
 	<path id="standard.classpath">
@@ -422,4 +411,24 @@
 		<echo>Version bump</echo>
 	</target>
 
+
+	<target name="gen-version">
+		<echo file="${basedir}/src/polyglot/frontend/JLVersion.java">/*
+ * This file is part of the Polyglot extensible compiler framework.
+ *
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ */
+package polyglot.frontend;
+
+/**
+ * Version information for the base compiler.
+ */
+public class JLVersion extends polyglot.main.Version {
+    public String name() { return "jl"; }
+    public int major() { return ${jl.version.major}; }
+    public int minor() { return ${jl.version.minor}; }
+    public int patch_level() { return ${jl.version.patch}; }
+}
+</echo>
+	</target>
 </project>
