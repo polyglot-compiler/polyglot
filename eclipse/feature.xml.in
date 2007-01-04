@@ -3,14 +3,15 @@
       id="polyglot2"
       label="Polyglot"
       version="@version@"
-      provider-name="nystrom@cs.cornell.edu">
+      provider-name="nate@nanocow.com">
 
    <description url="http://www.cs.cornell.edu/Projects/polyglot/">
       The Polyglot extensible compiler framework
    </description>
 
    <copyright url="http://www.cs.cornell.edu/Projects/polyglot/eclipse/copyright.html">
-     Copyright (C) 2000-2006 Polyglot project group, Cornell University
+     Copyright (C) 2000-2007 Polyglot project group, Cornell University
+     Copyright (C) 2006-2007 IBM Corporation
    </copyright>
 
    <license url="http://www.cs.cornell.edu/Projects/polyglot/eclipse/license.html">
