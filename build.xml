@@ -153,7 +153,7 @@
 	<target name="clean-all" depends="clean,clean-examples"/>
 	<target name="clobber-all" depends="clobber,clobber-examples" />
 
-	<target name="dust" depends="clobber">
+	<target name="dust" depends="clobber-all">
 		<delete file="${lib}/polyglot.jar"/>
 		<delete file="${lib}/java_cup.jar"/>
 		<delete file="${lib}/ppg.jar"/>
@@ -163,11 +163,12 @@
 	<target name="clean"
   	      description="Cleans up the directory tree: deletes the distribution directory and the classes directories">
 		<!-- Delete the ${classes} and ${dist} directory trees -->
-		<delete dir="${classes}"/>
-		<delete dir="${pth.classes}"/>
-		<delete dir="${ppg.classes}"/>
-		<delete dir="${cup.classes}"/>
-		<delete dir="${dist}"/>
+		<delete dir="${classes}" includeemptydirs="true" failonerror="false" />
+		<delete dir="${pth.classes}" includeemptydirs="true" failonerror="false" />
+		<delete dir="${ppg.classes}" includeemptydirs="true" failonerror="false" />
+		<delete dir="${cup.classes}" includeemptydirs="true" failonerror="false" />
+		<delete dir="${tmp}" includeemptydirs="true" failonerror="false" />
+		<delete dir="${tmp}2" includeemptydirs="true" failonerror="false" />
 	</target>
 
 	<target name="clobber" depends="clean,clobber-examples" description="Cleans up the directory tree and deletes generated files">
@@ -506,10 +507,13 @@
 	</target>
 
 	<!-- generate a source tarball from CVS to put up on the web page -->
-	<target name="source-tarball-stable">
+	<target name="source-tarball-stable" depends="configure-buildstring">
 		<antcall target="cvs-checkout"/>
 		<antcall target="sub-ant-cvs">
 			<param name="sub-ant.target" value="gen-version"/>
+		</antcall>
+		<antcall target="sub-ant-cvs">
+			<param name="sub-ant.target" value="javadoc"/>
 		</antcall>
 		<antcall target="sub-ant-cvs">
 			<param name="sub-ant.target" value="src.tar"/>
@@ -519,7 +523,7 @@
 	</target>
 
 	<!--
-	<target name="source-tarball-nightly">
+	<target name="source-tarball-nightly" depends="configure-buildstring">
 		<antcall target="cvs-checkout"/>
 		<antcall target="sub-ant-cvs">
 			<param name="sub-ant.target" value="gen-version"/>
@@ -531,7 +535,7 @@
 		<antcall target="rmdir-tmp"/>
 	</target>
 
-	<target name="source-tarball-epl-stable">
+	<target name="source-tarball-epl-stable" depends="configure-buildstring">
 		<antcall target="cvs-checkout"/>
 		<antcall target="sub-ant-cvs">
 			<param name="sub-ant.target" value="gen-version"/>
@@ -543,7 +547,7 @@
 		<antcall target="rmdir-tmp"/>
 	</target>
 
-	<target name="source-tarball-epl-nightly">
+	<target name="source-tarball-epl-nightly" depends="configure-buildstring">
 		<antcall target="cvs-checkout"/>
 		<antcall target="sub-ant-cvs">
 			<param name="sub-ant.target" value="gen-version"/>
@@ -557,7 +561,7 @@
 	-->
 
 	<!-- generate an EPL jar file from CVS to put on the web page -->
-	<target name="binary-jar-epl-stable">
+	<target name="binary-jar-epl-stable" depends="configure-buildstring">
 		<antcall target="cvs-checkout"/>
 		<antcall target="sub-ant-cvs">
 			<param name="sub-ant.target" value="gen-version"/>
@@ -570,7 +574,7 @@
 	</target>
 
 	<!-- generate a nightly EPL jar file from CVS to put on the web page -->
-	<target name="binary-jar-epl-nightly">
+	<target name="binary-jar-epl-nightly" depends="configure-buildstring">
 		<antcall target="cvs-checkout"/>
 		<antcall target="sub-ant-cvs">
 			<param name="sub-ant.target" value="gen-version"/>
@@ -583,7 +587,7 @@
 	</target>
 
 	<!-- generate an EPL source jar from CVS to pair with the binary jar generated via binary-jar-epl-stable -->
-	<target name="source-jar-epl-stable">
+	<target name="source-jar-epl-stable" depends="configure-buildstring">
 		<antcall target="cvs-checkout"/>
 		<antcall target="sub-ant-cvs">
 			<param name="sub-ant.target" value="gen-version"/>
@@ -596,7 +600,7 @@
 	</target>
 
 	<!-- generate an EPL source jar from CVS to pair with the binary jar generated via binary-jar-epl-nightly -->
-	<target name="source-jar-epl-nightly">
+	<target name="source-jar-epl-nightly" depends="configure-buildstring">
 		<antcall target="cvs-checkout"/>
 		<antcall target="sub-ant-cvs">
 			<param name="sub-ant.target" value="gen-version"/>
@@ -609,7 +613,7 @@
 	</target>
 
 	<!-- generate an EPL source jar from CVS to pair with the binary jar generated via binary-jar-epl-nightly -->
-	<target name="eclipse-update-stable">
+	<target name="eclipse-update-stable" depends="configure-buildstring">
 		<antcall target="cvs-checkout"/>
 		<antcall target="sub-ant-cvs">
 			<param name="sub-ant.target" value="gen-version"/>
@@ -634,18 +638,18 @@
 
 	<!-- make the LGPL source distribution and install into dist -->
 	<target name="src.tar" depends="configure-buildstring,src-dist-tmp">
-		<delete failonerror="false">
-			<fileset dir="${basedir}/polyglot-${jl.version}-src"/>
-		</delete>
-		<ant inheritall="false" antfile="${tmp}/build.xml" target="javadoc"/>
+		<antcall target="rmdir">
+			<param name="dir" value="${basedir}/polyglot-${jl.version}-src"/>
+		</antcall>
+		<!-- <ant inheritall="false" antfile="${tmp}/build.xml" target="javadoc"/> -->
 		<move tofile="${basedir}/polyglot-${jl.version}-src" file="${tmp}"/>
 		<tar destfile="${basedir}/polyglot-${jl.version}-src.tar.gz" basedir="${basedir}/polyglot-${jl.version}-src" compression="gzip"/>
 	</target>
 
 	<target name="src-epl.tar" depends="configure-buildstring,src-dist-epl-tmp">
-		<delete failonerror="false">
-			<fileset dir="${basedir}/polyglot-${jl.version}-epl-src"/>
-		</delete>
+		<antcall target="rmdir">
+			<param name="dir" value="${basedir}/polyglot-${jl.version}-epl-src" />
+		</antcall>
 		<move tofile="${basedir}/polyglot-${jl.version}-epl-src" file="${tmp}"/>
 		<tar destfile="${basedir}/polyglot-${jl.version}-epl-src.tar.gz" basedir="${basedir}/polyglot-${jl.version}-epl-src" compression="gzip"/>
 	</target>
@@ -810,24 +814,30 @@
       includes="feature.xml" />
 	</target>
 
-	<target name="mkdir-tmp" depends="rmdir-tmp">
-		<mkdir dir="${tmp}"/>
+	<target name="mkdir-tmp">
+		<antcall target="rmdir-tmp"/>
+		<mkdir dir="${tmp}" />
+	</target>
+
+	<target name="rmdir">
+		<delete failonerror="false" includeemptydirs="true"  dir="${dir}" />
 	</target>
 
 	<target name="rmdir-tmp">
-		<delete failonerror="false">
-			<fileset dir="${tmp}" />
-		</delete>
+		<antcall target="rmdir">
+			<param name="dir" value="${tmp}" />
+		</antcall>
 	</target>
 
-	<target name="mkdir-tmp2" depends="rmdir-tmp2">
-		<mkdir dir="${tmp}2"/>
+	<target name="mkdir-tmp2">
+		<antcall target="rmdir-tmp2" />
+		<mkdir dir="${tmp}2" />
 	</target>
 
 	<target name="rmdir-tmp2">
-		<delete failonerror="false">
-			<fileset dir="${tmp}2" />
-		</delete>
+		<antcall target="">
+			<param name="dir" value="${tmp}2" />
+		</antcall>
 	</target>
 
 	<property name="cvs.root" value=":pserver:anonymous@gforge.cis.cornell.edu:/cvsroot/polyglot" />
