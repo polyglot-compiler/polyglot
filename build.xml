@@ -608,6 +608,19 @@
 		<antcall target="rmdir-tmp"/>
 	</target>
 
+	<!-- generate an EPL source jar from CVS to pair with the binary jar generated via binary-jar-epl-nightly -->
+	<target name="eclipse-update-stable">
+		<antcall target="cvs-checkout"/>
+		<antcall target="sub-ant-cvs">
+			<param name="sub-ant.target" value="gen-version"/>
+		</antcall>
+		<antcall target="sub-ant-cvs">
+			<param name="sub-ant.target" value="eclipse-update-dist" />
+		</antcall>
+		<move tofile="${basedir}/polyglot2_src_latest.jar" file="${tmp}/polyglot/polyglot2_src_latest.jar"/>
+		<antcall target="rmdir-tmp"/>
+	</target>
+
 	<!--
 	<target name="src.jar" depends="compile-base">
 		<jar destfile="${basedir}/polyglot2_src.jar" basedir="${basedir}" includes="${src}/**/*.java"/>
@@ -751,9 +764,7 @@
 	</target>
 
 	<!-- make the Eclipse update distribution and install into dist -->
-	<target name="eclipse-update-dist">
-		<antcall target="build" />
-		<antcall target="mkdir-dist"/>
+	<target name="eclipse-update-dist" depends="mkdir-tmp">
 		<antcall target="build-features"/>
 		<antcall target="build-site"/>
 		<antcall target="build-plugin"/>
@@ -761,39 +772,40 @@
 
 	<target name="build-site" depends="configure-buildstring">
 		<filter token="version" value="${jl.version}"/>
-		<copy tofile="${basedir}/dist/site.xml" file="${basedir}/eclipse/site.xml.in" filtering="true"/>
+		<copy tofile="${tmp}/site.xml" file="${basedir}/eclipse/site.xml.in" filtering="true"/>
 	</target>
 
-	<target name="build-plugin">
-		<mkdir dir="${basedir}/dist/plugins"/>
+	<target name="build-plugin" depends="configure-buildstring">
+		<mkdir dir="${tmp}/plugins"/>
 
 		<!-- create a directory with the jar contents -->
-		<antcall target="mkdir-tmp"/>
+		<antcall target="mkdir-tmp2"/>
 
-		<copy todir="${tmp}">
+		<copy todir="${tmp}2">
 			<fileset dir="${basedir}/classes"
         includes="**/*.class"
         excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class" />
 		</copy>
 
-		<copy todir="${tmp}/META-INF">
+		<filter token="version" value="${jl.version}"/>
+		<copy todir="${tmp}2/META-INF" filtering="true">
 			<fileset dir="${basedir}/eclipse/META-INF"/>
 		</copy>
 
-		<jar destfile="${basedir}/dist/plugins/polyglot2_${jl.version}.jar"
-      basedir="${tmp}"
-      manifest="META-INF/MANIFEST.MF"/>
+		<jar destfile="${tmp}/plugins/polyglot2_${jl.version}.jar"
+      basedir="${tmp}2"
+      manifest="${tmp}2/META-INF/MANIFEST.MF"/>
 
-		<antcall target="rmdir-tmp"/>
+		<antcall target="rmdir-tmp2"/>
 	</target>
 
 	<target name="build-features" depends="configure-buildstring">
 		<filter token="version" value="${jl.version}"/>
-		<copy tofile="${basedir}/dist/feature.xml" file="${basedir}/eclipse/feature.xml.in" filtering="true"/>
+		<copy tofile="${basedir}/tmp/feature.xml" file="${basedir}/eclipse/feature.xml.in" filtering="true"/>
 
-		<mkdir dir="${basedir}/dist/features"/>
+		<mkdir dir="${tmp}/features"/>
 
-		<jar destfile="${basedir}/dist/features/polyglot2_${jl.version}.jar"
+		<jar destfile="${tmp}/features/polyglot2_${jl.version}.jar"
       basedir="${basedir}/eclipse"
       includes="feature.xml" />
 	</target>
@@ -808,60 +820,14 @@
 		</delete>
 	</target>
 
-	<target name="rmdir-dist">
+	<target name="mkdir-tmp2" depends="rmdir-tmp2">
+		<mkdir dir="${tmp}2"/>
+	</target>
+
+	<target name="rmdir-tmp2">
 		<delete failonerror="false">
-			<fileset dir="${basedir}/dist" />
+			<fileset dir="${tmp}2" />
 		</delete>
-	</target>
-
-	<!-- Create the distribution directory -->
-	<target name="mkdir-dist" depends="rmdir-dist">
-		<mkdir dir="${dist}"/>
-	</target>
-
-	<target name="dist-tmp" depends="configure-buildstring">
-		<delete>
-			<fileset dir="${basedir}/polyglot-${jl.version}-src" />
-		</delete>
-		<delete>
-			<fileset file="${basedir}/polyglot-${jl.version}-src.tar.gz" />
-		</delete>
-		<ant inheritAll="false" antfile="${tmp}/polyglot/dist.xml" dir="${tmp}/polyglot" target="jl-dist" />
-		<copy tofile="${basedir}/polyglot-${jl.version}.jar" file="${tmp}/polyglot/dist/lib/polyglot.jar"/>
-		<move tofile="${basedir}/polyglot-${jl.version}-src" file="${tmp}/polyglot/dist" />
-		<tar destfile="${basedir}/polyglot-${jl.version}-src.tar.gz" basedir="${basedir}/polyglot-${jl.version}-src" compression="gzip" />
-	</target>
-
-	<target name="dist-epl-tmp">
-		<copy tofile="${basedir}/polyglot-${jl.version}-epl-src" file="${tmp}/polyglot/src"
-		exclude="polyglot/parse/java12.cup,polyglot/parser/BaseParser.java,polyglot/frontend/JLExtensionInfo.java"/>
-		<tar destfile="${basedir}/polyglot-${jl.version}-epl-src.tar.gz" basedir="${basedir}/polyglot-${jl.version}-epl-src" compression="gzip" />
-		<ant inheritAll="false" antfile="${tmp}/polyglot/eclipse/build.xml" dir="${tmp}/polyglot/eclipse" target="all"/>
-		<copy tofile="${basedir}/polyglot2_${jl.version}.jar" file="${tmp}/polyglot/eclipse/dist/plugins/polyglot2_${jl.version}.jar" />
-	</target>
-
-	<target name="dist-nightly-tmp">
-		<delete>
-			<fileset dir="${basedir}/polyglot2" />
-		</delete>
-		<delete>
-			<fileset file="${basedir}/polyglot-nightly.tar.gz" />
-		</delete>
-		<ant inheritAll="false" antfile="${tmp}/polyglot/dist.xml" dir="${tmp}/polyglot" target="jl-dist" />
-		<move tofile="${basedir}/polyglot2" file="${tmp}/polyglot/dist" />
-		<tar destfile="${basedir}/polyglot-nightly-src.tar.gz" basedir="${basedir}/polyglot2" compression="gzip" />
-	</target>
-
-	<target name="dist-nightly-epl-tmp">
-		<delete>
-			<fileset dir="${basedir}/polyglot2" />
-		</delete>
-		<delete>
-			<fileset file="${basedir}/polyglot-nightly.tar.gz" />
-		</delete>
-		<ant inheritAll="false" antfile="${tmp}/polyglot/dist.xml" dir="${tmp}/polyglot" target="jl-dist" />
-		<move tofile="${basedir}/polyglot2" file="${tmp}/polyglot/dist" />
-		<tar destfile="${basedir}/polyglot-nightly-src.tar.gz" basedir="${basedir}/polyglot2" compression="gzip" />
 	</target>
 
 	<property name="cvs.root" value=":pserver:anonymous@gforge.cis.cornell.edu:/cvsroot/polyglot" />
