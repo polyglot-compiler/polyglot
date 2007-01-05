@@ -778,6 +778,7 @@
 
 	<!-- make the Eclipse update distribution and install into dist -->
 	<target name="eclipse-update-dist" depends="mkdir-tmp">
+                <mkdir dir="${basedir}/eclipseUpdates"/>
 		<antcall target="build-features"/>
 		<antcall target="build-site"/>
 		<antcall target="build-plugin"/>
@@ -785,40 +786,41 @@
 
 	<target name="build-site" depends="configure-buildstring">
 		<filter token="version" value="${jl.version}"/>
-		<copy tofile="${tmp}/site.xml" file="${basedir}/eclipse/site.xml.in" filtering="true"/>
+                <copy tofile="${basedir}/eclipseUpdates/site.xml" file="${basedir}/eclipse/site.xml.in" filtering="true"/>
 	</target>
 
 	<target name="build-plugin" depends="configure-buildstring">
-		<mkdir dir="${tmp}/plugins"/>
+          <mkdir dir="${basedir}/eclipseUpdates/plugins"/>
 
 		<!-- create a directory with the jar contents -->
-		<antcall target="mkdir-tmp2"/>
+		<antcall target="mkdir-tmp"/>
 
-		<copy todir="${tmp}2">
+		<copy todir="${tmp}">
 			<fileset dir="${basedir}/classes"
         includes="**/*.class"
         excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/ext/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class" />
 		</copy>
 
+                <mkdir dir="${tmp}/META-INF"/>
 		<filter token="version" value="${jl.version}"/>
-		<copy todir="${tmp}2/META-INF" filtering="true">
-			<fileset dir="${basedir}/eclipse/META-INF"/>
+                <copy tofile="${tmp}/META-INF/MANIFEST.MF" filtering="true">
+                    <fileset file="${basedir}/META-INF/MANIFEST.MF.in"/>
 		</copy>
 
-		<jar destfile="${tmp}/plugins/polyglot2_${jl.version}.jar"
-      basedir="${tmp}2"
-      manifest="${tmp}2/META-INF/MANIFEST.MF"/>
+                <jar destfile="${basedir}/eclipseUpdates/plugins/polyglot2_${jl.version}.jar"
+      basedir="${tmp}"
+      manifest="${tmp}/META-INF/MANIFEST.MF"/>
 
-		<antcall target="rmdir-tmp2"/>
+		<antcall target="rmdir-tmp"/>
 	</target>
 
 	<target name="build-features" depends="configure-buildstring">
 		<filter token="version" value="${jl.version}"/>
-		<copy tofile="${basedir}/tmp/feature.xml" file="${basedir}/eclipse/feature.xml.in" filtering="true"/>
+		<copy tofile="${basedir}/eclipseUpdates/feature.xml" file="${basedir}/eclipse/feature.xml.in" filtering="true"/>
 
-		<mkdir dir="${tmp}/features"/>
+                <mkdir dir="${basedir}/eclipseUpdates/features"/>
 
-		<jar destfile="${tmp}/features/polyglot2_${jl.version}.jar"
+                <jar destfile="${basedir}/eclipseUpdates/features/polyglot2_${jl.version}.jar"
       basedir="${basedir}/eclipse"
       includes="feature.xml" />
 	</target>
@@ -835,17 +837,6 @@
 	<target name="rmdir-tmp">
 		<antcall target="rmdir">
 			<param name="dir" value="${tmp}" />
-		</antcall>
-	</target>
-
-	<target name="mkdir-tmp2">
-		<antcall target="rmdir-tmp2" />
-		<mkdir dir="${tmp}2" />
-	</target>
-
-	<target name="rmdir-tmp2">
-		<antcall target="">
-			<param name="dir" value="${tmp}2" />
 		</antcall>
 	</target>
 
