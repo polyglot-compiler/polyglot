@@ -163,6 +163,7 @@
 	<target name="clean"
   	      description="Cleans up the directory tree: deletes the distribution directory and the classes directories">
 		<!-- Delete the ${classes} and ${dist} directory trees -->
+                <delete dir="${lib}/polyglot.jar"/>
 		<delete dir="${classes}" includeemptydirs="true" failonerror="false" />
 		<delete dir="${pth.classes}" includeemptydirs="true" failonerror="false" />
 		<delete dir="${ppg.classes}" includeemptydirs="true" failonerror="false" />
@@ -200,8 +201,15 @@
 	</target>
 
 	<!-- compile the base compiler except for the quasiquoter and generated parser -->
-	<target name="compile-base" depends="init,base-parser">
+        <target name="compile-base" depends="init,base-parser">
 		<javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/qq/**,polyglot/parse/Lexer_c.java,polyglot/parse/sym.java,polyglot/parse/Grm.java">
+			<classpath refid="standard.classpath" />
+		</javac>
+	</target>
+
+        <target name="compile-epl-base" depends="init">
+          <javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**"
+            excludes="polyglot/ext/**,polyglot/qq/**,polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/frontend/JLExtensionInfo.java">
 			<classpath refid="standard.classpath" />
 		</javac>
 	</target>
@@ -344,7 +352,7 @@
 	<!-- Builds base compiler -->
 	<target name="jl" depends="base-parser,base,base-qq" description="Build the base compiler"/>
 
-	<target name="base-parser" depends="bin,cup,init" description="Build the base compiler parser">
+        <target name="base-parser" depends="bin,cup,init" description="Build the base compiler parser">
 		<antcall target="jflex-lexer">
 			<param name="lexer.dir" value="${src}/polyglot/parse"/>
 			<param name="lexer.class" value="Lexer_c"/>
@@ -363,7 +371,7 @@
 		</javac>
 	</target>
 
-	<target name="base-qq" depends="bin,cup,init,ppg,base-parser,compile-base" description="Build the base compiler parser">
+        <target name="base-qq" depends="bin,cup,init,ppg,base-parser,compile-base" description="Build the base compiler parser">
 		<antcall target="jflex-lexer">
 			<param name="lexer.dir" value="${src}/polyglot/qq"/>
 			<param name="lexer.class" value="Lexer_c"/>
@@ -385,8 +393,8 @@
 	<target name="jar" description="Builds polyglot.jar" depends="jar-base"/>
 
 	<target name="jar-base" depends="jl,ppg,configure-buildstring">
-		<delete file="${lib}/polyglot.jar" />
-		<delete file="${classes}/MANIFEST.MF" />
+		<delete file="${lib}/polyglot.jar" failonerror="false"/>
+		<delete file="${classes}/MANIFEST.MF" failonerror="false"/>
 
 		<manifest file="${classes}/MANIFEST.MF">
 			<attribute name="Built-By" value="${user.name}" />
@@ -399,12 +407,12 @@
 
 		<jar destfile="${lib}/polyglot.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF" includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/qq/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**" />
 
-		<delete file="${classes}/MANIFEST.MF" />
+		<delete file="${classes}/MANIFEST.MF" failonerror="false"/>
 	</target>
 
 	<target name="jar-epl-base" depends="jl,ppg,configure-buildstring">
-		<delete file="${lib}/polyglot-epl.jar" />
-		<delete file="${classes}/MANIFEST.MF" />
+		<delete file="${lib}/polyglot-epl.jar" failonerror="false"/>
+		<delete file="${classes}/MANIFEST.MF" failonerror="false"/>
 
 		<manifest file="${classes}/MANIFEST.MF">
 			<attribute name="Built-By" value="${user.name}" />
@@ -415,10 +423,10 @@
 			<attribute name="Class-Path" value="java_cup.jar polyglot.jar ppg.jar" />
 		</manifest>
 
-		<jar destfile="${lib}/polyglot.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF" includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/qq/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**"
-		      excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class" />
+                <jar destfile="${lib}/polyglot.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF" includes="polyglot/**/*.class"
+                  excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/ext/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class" />
 
-		<!-- <delete file="${classes}/MANIFEST.MF" /> -->
+		<delete file="${classes}/MANIFEST.MF" failonerror="false"/>
 	</target>
 
 	<target name="javadoc" description="Runs javadoc over the Polyglot source code" depends="jl">
@@ -631,9 +639,10 @@
 	</target>
 	-->
 
+	<!-- make the LGPL source distribution and install into dist -->
 	<target name="src-epl.jar" depends="compile-base">
 		<jar destfile="${basedir}/polyglot2_src_latest.jar" basedir="${basedir}" includes="src/**/*.java"
-			excludes="src/polyglot/parse/BaseParser.java,src/polyglot/parse/sym.java,src/polyglot/parse/Grm.java,src/polyglot/parse/Lexer_c.java,src/polyglot/frontend/JLExtensionInfo.java"/>
+                  excludes="src/polyglot/qq/**,src/polyglot/ext/**,src/polyglot/parse/BaseParser.java,src/polyglot/parse/sym.java,src/polyglot/parse/Grm.java,src/polyglot/parse/Lexer_c.java,src/polyglot/frontend/JLExtensionInfo.java"/>
 	</target>
 
 	<!-- make the LGPL source distribution and install into dist -->
@@ -709,7 +718,7 @@
 	<target name="src-dist-epl-tmp" depends="jar-epl-base,mkdir-tmp">
 		<copy todir="${tmp}/src" includeemptydirs="false">
 			<fileset dir="${src}" includes="polyglot/**/*.java,polyglot/**/package.html"
-			excludes="polyglot/qq/**,polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/frontend/JLExtensionInfo.java"/>
+                          excludes="polyglot/qq/**,polyglot/ext/**,polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/frontend/JLExtensionInfo.java"/>
 		</copy>
 
 		<copy file="${bin}/jlc" todir="${tmp}/bin" />
@@ -730,7 +739,7 @@
 	<!-- build a combined source and binary jar file -->
 	<target name="epl.jar" depends="compile-base,configure-buildstring,mkdir-tmp">
 		<copy todir="${tmp}">
-			<fileset dir="${basedir}/classes" includes="**/*.class" excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class" />
+                  <fileset dir="${basedir}/classes" includes="**/*.class" excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/ext/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class" />
 		</copy>
 
 		<manifest file="${tmp}/MANIFEST.MF">
@@ -740,7 +749,7 @@
 		</manifest>
 
 		<copy todir="${tmp}/src">
-			<fileset dir="${basedir}/src" includes="**/*.java" excludes="polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/frontend/JLExtensionInfo.java" />
+                  <fileset dir="${basedir}/src" includes="**/*.java" excludes="polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/frontend/JLExtensionInfo.java,polyglot/qq/**,polyglot/ext/**" />
 		</copy>
 
 		<jar destfile="${basedir}/polyglot2_latest.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF" includes="src/**,polyglot/**" />
@@ -750,7 +759,7 @@
 
 	<target name="bin-epl.jar" depends="compile-base,configure-buildstring,mkdir-tmp">
 		<copy todir="${tmp}">
-			<fileset dir="${basedir}/classes" includes="**/*.class" excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class" />
+                  <fileset dir="${basedir}/classes" includes="**/*.class" excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/ext/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class" />
 		</copy>
 
 		<manifest file="${tmp}/MANIFEST.MF">
@@ -788,7 +797,7 @@
 		<copy todir="${tmp}2">
 			<fileset dir="${basedir}/classes"
         includes="**/*.class"
-        excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class" />
+        excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/ext/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class" />
 		</copy>
 
 		<filter token="version" value="${jl.version}"/>
