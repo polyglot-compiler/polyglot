@@ -40,6 +40,8 @@
 	<property name="pao.dir" location="${examples.dir}/pao"/>
 	<property name="coffer.dir" location="${examples.dir}/coffer"/>
 
+	<property name="cvs.root" value=":pserver:anonymous@gforge.cis.cornell.edu:/cvsroot/polyglot" />
+
 	<!-- temporary directory -->
 	<property name="tmp" location="${basedir}/tmp" />
 
@@ -840,11 +842,14 @@
 		</antcall>
 	</target>
 
-	<property name="cvs.root" value=":pserver:anonymous@gforge.cis.cornell.edu:/cvsroot/polyglot" />
-
 	<target name="cvs-checkout" depends="mkdir-tmp">
 		<cvs command="checkout polyglot" quiet="true" cvsRsh="ssh" cvsRoot="${cvs.root}" dest="${tmp}" failonerror="true" />
 	</target>
+
+        <target name="cvs-tag" depends="configure-buildstring">
+            <cvs command="checkout rtag -F -rRELEASE_${jl.version.major}_${jl.version.minor}_${jl.version.patch} polyglot" cvsRoot="${cvs.root}" failonerror="true" />
+          </target>
+                
 
 	<target name="dist-checklist">
 		<echo>Builds and runs</echo>
@@ -861,6 +866,33 @@
                 <copy tofile="META-INF/MANIFEST.MF" filtering="true">
                     <fileset file="${basedir}/META-INF/MANIFEST.MF.in"/>
 		</copy>
+        </target>
+
+        <target name="bump-version">
+            <propertyfile file="${basedir}/build.properties">
+                <entry key="${key}" type="int" operation="+" value="1" pattern="0"/>
+            </propertyfile>
+            <!-- reread -->
+            <antcall target="configure-buildstring"/>
+            <antcall target="gen-version"/>
+        </target>
+
+        <target name="bump-major">
+          <antcall target="bump-version">
+            <param name="key" value="version.major"/>
+          </antcall>
+        </target>
+
+        <target name="bump-minor">
+          <antcall target="bump-version">
+            <param name="key" value="version.minor"/>
+          </antcall>
+        </target>
+
+        <target name="bump-patch">
+          <antcall target="bump-version">
+            <param name="key" value="version.patch"/>
+          </antcall>
         </target>
 
         <target name="gen-version-java" depends="configure-buildstring">
