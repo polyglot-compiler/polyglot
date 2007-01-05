@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="polyglot2"
+      id="polyglot"
       label="Polyglot"
       version="@version@"
       provider-name="nate@nanocow.com">
@@ -20,11 +20,11 @@
    </license>
 
    <url>
-      <update url="http://www.cs.cornell.edu/Projects/polyglot/eclipseUpdates/features/polyglot2_@version@.jar"/>
+      <update url="http://www.cs.cornell.edu/Projects/polyglot/eclipseUpdates/features/polyglot_@version@.jar"/>
    </url>
 
    <plugin
-         id="polyglot2"
+         id="polyglot"
          download-size="0"
          install-size="0"
          version="@version@"

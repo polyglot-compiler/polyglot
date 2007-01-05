@@ -4,7 +4,7 @@
       This Eclipse update site hosts the distribution for the Polyglot extensible compiler framework.
    </description>
 
-   <feature url="features/polyglot2_@version@.jar" id="polyglot2" version="@version@">
+   <feature url="features/polyglot_@version@.jar" id="polyglot" version="@version@">
       <category name="Compiler Meta-Tools"/>
    </feature>
 </site>
