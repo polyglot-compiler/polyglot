@@ -63,7 +63,7 @@
 
 	<target name="configure-buildstring" depends="configure-version" unless="jl.version.build">
 		<tstamp>
-			<format property="now" pattern="yyyy-MM-dd hh:mm:ss" />
+			<format property="now" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
 		<property name="jl.version.build" value="${jl.version} (${now})"/>
 	</target>
@@ -854,7 +854,16 @@
 		<echo>Version bump</echo>
 	</target>
 
-	<target name="gen-version" depends="configure-buildstring">
+        <target name="gen-version" depends="gen-version-java,gen-version-manifest"/>
+
+        <target name="gen-version-manifest" depends="configure-buildstring">
+		<filter token="version" value="${jl.version}"/>
+                <copy tofile="META-INF/MANIFEST.MF" filtering="true">
+                    <fileset file="${basedir}/META-INF/MANIFEST.MF.in"/>
+		</copy>
+        </target>
+
+        <target name="gen-version-java" depends="configure-buildstring">
 		<echo file="${basedir}/src/polyglot/frontend/JLVersion.java">/*
  * This file is part of the Polyglot extensible compiler framework.
  *
