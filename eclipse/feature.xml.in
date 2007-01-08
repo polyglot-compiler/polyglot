@@ -9,12 +9,12 @@
       The Polyglot extensible compiler framework
    </description>
 
-   <copyright url="http://www.cs.cornell.edu/Projects/polyglot/eclipse/copyright.html">
+   <copyright url="http://www.cs.cornell.edu/Projects/polyglot/eclipseUpdates/copyright.html">
      Copyright (C) 2000-2007 Polyglot project group, Cornell University
      Copyright (C) 2006-2007 IBM Corporation
    </copyright>
 
-   <license url="http://www.cs.cornell.edu/Projects/polyglot/eclipse/license.html">
+   <license url="http://www.cs.cornell.edu/Projects/polyglot/eclipseUpdates/license.html">
       This release of the Polyglot distribution is governed by the Eclipse
       Public License.
    </license>
