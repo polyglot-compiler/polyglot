@@ -691,7 +691,7 @@
 		<filter token="version" value="${jl.version}" />
 		<copy tofile="${basedir}/eclipseUpdates/feature.xml" file="${basedir}/eclipse/feature.xml.in" filtering="true" />
 		<mkdir dir="${basedir}/eclipseUpdates/features" />
-		<jar destfile="${basedir}/eclipseUpdates/features/polyglot2_${jl.version}.jar" basedir="${basedir}/eclipse" includes="feature.xml" />
+		<jar destfile="${basedir}/eclipseUpdates/features/polyglot_${jl.version}.jar" basedir="${basedir}/eclipse" includes="feature.xml" />
 	</target>
 
 	<target name="mkdir-tmp">
