@@ -14,5 +14,5 @@ public class JLVersion extends polyglot.main.Version {
     public int major() { return 2; }
     public int minor() { return 0; }
     public int patch_level() { return 2; }
-    public String toString() { return "2.0.2"; }
+    public String toString() { return "2.0.2 (2007-01-08 15:35:14)"; }
 }
