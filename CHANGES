@@ -9,6 +9,8 @@ Jan 8, 2007: Polyglot 2.0.2
   --------------------------------
     Cleaned up build.xml
 
+    Added TypeBuilder.pushContext.
+
     Miscellaneous bug fixes.
 
 Dec 22, 2006: Polyglot 2.0.1
