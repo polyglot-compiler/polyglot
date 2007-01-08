@@ -301,7 +301,7 @@
            @param parser.class  The name to be passed to CUP with -parser.
            @param symbol.class  The name to be passed to CUP with -symbols.
        -->
-	<target name="ppg.parser" depends="ppg.parser.deps" unless="ppg.parser.up-to-date">
+	<target name="ppg-parser" depends="ppg-parser.deps" unless="ppg-parser.up-to-date">
 		<java classname="ppg.PPG" fork="true" failonerror="true">
 			<classpath refid="standard.classpath" />
 			<arg value="${parser.dir}/${ppg.file}" />
@@ -311,10 +311,10 @@
 		<antcall target="cup-parser" />
 	</target>
 
-	<!-- Set the property ppg.parser.up-to-date if the parser is in fact
-           up to date.  Called by the ppg.parser target.
+	<!-- Set the property ppg-parser.up-to-date if the parser is in fact
+           up to date.  Called by the ppg-parser target.
        -->
-	<target name="ppg.parser.deps">
+	<target name="ppg-parser.deps">
 		<dependset>
 			<srcfileset dir="${parser.dir}">
 				<include name="${ppg.file}" />
@@ -326,7 +326,7 @@
 				<include name="${symbol.class}.java" />
 			</targetfileset>
 		</dependset>
-		<condition property="ppg.parser.up-to-date">
+		<condition property="ppg-parser.up-to-date">
 			<and>
 				<available file="${parser.dir}/${cup.file}" />
 				<available file="${parser.dir}/${parser.class}.java" />
@@ -384,7 +384,7 @@
 			<param name="lexer.class" value="Lexer_c" />
 			<param name="jflex.file" value="qq.flex" />
 		</antcall>
-		<antcall target="ppg.parser">
+		<antcall target="ppg-parser">
 			<param name="parser.dir" value="${src}/polyglot/qq" />
 			<param name="ppg.file" value="qq.ppg" />
 			<param name="base-parser" value="${src}/polyglot/parse/java12.cup" />
