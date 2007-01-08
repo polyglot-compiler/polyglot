@@ -3,6 +3,14 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
+Jan 8, 2007: Polyglot 2.0.2
+============================
+  What's new since Polyglot 2.0.1:
+  --------------------------------
+    Cleaned up build.xml
+
+    Miscellaneous bug fixes.
+
 Dec 22, 2006: Polyglot 2.0.1
 ============================
   What's new since Polyglot 2.0.0:
