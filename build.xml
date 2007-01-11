@@ -558,7 +558,7 @@
 		</antcall>
 		<!-- <ant inheritall="false" antfile="${tmp}/build.xml" target="javadoc"/> -->
 		<move tofile="${basedir}/polyglot-${jl.version}-src" file="${tmp}" />
-		<tar destfile="${basedir}/polyglot-${jl.version}-src.tar.gz" basedir="${basedir}/polyglot-${jl.version}-src" compression="gzip" />
+		<tar destfile="${basedir}/polyglot-${jl.version}-src.tar.gz" basedir="${basedir}" includes="polyglot-${jl.version}-src" compression="gzip" />
 	</target>
 
 	<target name="src-epl.tar" depends="configure-buildstring,src-dist-epl-tmp">
@@ -570,7 +570,7 @@
 	</target>
 
 	<!-- make the LGPL source distribution in a tmp directory -->
-	<target name="src-dist-tmp" depends="jar-base,jar-pth,jar-ppg,mkdir-tmp">
+	<target name="src-dist-tmp" depends="jar-base,jar-pth,jar-ppg,javadoc,mkdir-tmp">
 		<copy todir="${tmp}/src" includeemptydirs="false">
 			<fileset dir="${src}" includes="polyglot/**/*.java,polyglot/qq/qq.ppg,polyglot/qq/qq.flex,polyglot/qq/qq_ppg.cup,polyglot/parse/java12.cup,polyglot/parse/java.flex,polyglot/**/package.html" />
 		</copy>
@@ -584,15 +584,15 @@
 		</copy>
 
 		<copy todir="${tmp}/doc/api" includeEmptyDirs="false">
-			<fileset dir="${basedir}/doc/api" />
+                    <fileset dir="${basedir}/doc/api" />
 		</copy>
 
 		<copy todir="${tmp}/tests" includeEmptyDirs="false">
-			<fileset dir="tests" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results" />
+                    <fileset dir="tests" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results" />
 		</copy>
 
 		<copy todir="${tmp}/examples" includeEmptyDirs="true">
-			<fileset dir="${examples.dir}" includes="pao,coffer" />
+                    <fileset dir="${examples.dir}" includes="pao/**,coffer/**" />
 		</copy>
 
 		<copy file="${bin}/jlc" todir="${tmp}/bin" />
