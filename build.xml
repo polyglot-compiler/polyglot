@@ -558,7 +558,7 @@
 		</antcall>
 		<!-- <ant inheritall="false" antfile="${tmp}/build.xml" target="javadoc"/> -->
 		<move tofile="${basedir}/polyglot-${jl.version}-src" file="${tmp}" />
-		<tar destfile="${basedir}/polyglot-${jl.version}-src.tar.gz" basedir="${basedir}" includes="polyglot-${jl.version}-src" compression="gzip" />
+                <tar destfile="${basedir}/polyglot-${jl.version}-src.tar.gz" basedir="${basedir}" includes="polyglot-${jl.version}-src/**" compression="gzip" />
 	</target>
 
 	<target name="src-epl.tar" depends="configure-buildstring,src-dist-epl-tmp">
@@ -566,7 +566,7 @@
 			<param name="dir" value="${basedir}/polyglot-${jl.version}-epl-src" />
 		</antcall>
 		<move tofile="${basedir}/polyglot-${jl.version}-epl-src" file="${tmp}" />
-		<tar destfile="${basedir}/polyglot-${jl.version}-epl-src.tar.gz" basedir="${basedir}/polyglot-${jl.version}-epl-src" compression="gzip" />
+                <tar destfile="${basedir}/polyglot-${jl.version}-epl-src.tar.gz" basedir="${basedir}" includes="polyglot-${jl.version}-epl-src/**" compression="gzip" />
 	</target>
 
 	<!-- make the LGPL source distribution in a tmp directory -->
