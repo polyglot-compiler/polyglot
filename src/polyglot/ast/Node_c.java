@@ -245,9 +245,7 @@ public abstract class Node_c implements Node
      * @param c the current <code>Context</code>
      * @return the <code>Context</code> to be used for visiting this node. 
      */
-    public Context enterScope(Context c) {
-System.out.println(this + ".enterScope()");
-      return c; }
+    public Context enterScope(Context c) { return c; }
 
     /**
      * Push a new scope for visiting the child node <code>child</code>. 
@@ -260,7 +258,6 @@ System.out.println(this + ".enterScope()");
      *           <code>child</code>
      */
     public Context enterChildScope(Node child, Context c) { 
-System.out.println(this + ".enterChildScope(" + child + ")");
         return child.del().enterScope(c); 
     }
 
