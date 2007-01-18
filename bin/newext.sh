@@ -31,6 +31,7 @@ check() {
 
 skel_small="skel"
 skel_pkg="skelpkg"
+skel_pkgdir="skelpkgdir"
 skel_large="Skel"
 skel_ext="sx"
 
@@ -38,23 +39,24 @@ ext_small=$1; check "$ext_small"; shift
 ext_pkg=$1; check "$ext_pkg"; shift
 ext_large=$1; check "$ext_large"; shift
 ext_ext=$1; check "$ext_ext"; shift
-
 ext_srcdir=`echo "$ext_pkg" | sed 's%\.%/%g'`
 
-subst_srcdir="s%/src/$skel_pkg%/src/$ext_srcdir%g"
+subst_srcdir="s%/src/$skel_small%/src/$ext_srcdir%g"
+subst_pkgdir="s%$skel_pkgdir%$ext_srcdir%g"
 subst_pkg="s%$skel_pkg%$ext_pkg%g"
 subst_small="s%$skel_small%$ext_small%g"
 subst_large="s%$skel_large%$ext_large%g"
 subst_ext="s%$skel_ext%$ext_ext%g"
 
-sed_opt="-e $subst_pkg -e $subst_small -e $subst_large -e $subst_ext"
+sed_opt="-e $subst_pkgdir -e $subst_pkg -e $subst_small -e $subst_large -e $subst_ext"
 sed_fopt="-e $subst_srcdir -e $subst_small -e $subst_large -e $subst_ext"
 
+set -x
 base=`pwd`
 (
 cd `dirname $0`/..
 find skel \( -path '*/CVS/*' -o -name CVS \) -prune -o -print | while read i; do
-    j=`echo "$i" | sed $sed_fopt $sed_opt`
+    j=`echo "$i" | sed $sed_fopt`
     if [ -d "$i" ]; then
         mkdir -p "$base/$j"
     elif [ "$i" = "skel/README" ]; then
