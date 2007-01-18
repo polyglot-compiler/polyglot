@@ -1,4 +1,4 @@
-package skel;
+package skelpkg;
 
 /**
  * Version information for skel extension

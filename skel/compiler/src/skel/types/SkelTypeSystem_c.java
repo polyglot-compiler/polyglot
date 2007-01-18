@@ -1,4 +1,4 @@
-package skel.types;
+package skelpkg.types;
 
 import polyglot.types.*;
 

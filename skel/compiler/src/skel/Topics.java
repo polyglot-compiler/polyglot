@@ -1,4 +1,4 @@
-package skel;
+package skelpkg;
 
 import polyglot.main.Report;
 

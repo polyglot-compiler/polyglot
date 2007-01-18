@@ -2,7 +2,7 @@
  * Based on JLS, 2ed, Chapter 3.
  */
 
-package skel.parse;
+package skelpkg.parse;
 
 import java_cup.runtime.Symbol;
 import polyglot.lex.Lexer;

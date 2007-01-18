@@ -1,10 +1,10 @@
 // Assumes polyglot.jar is in classpath
 include "polyglot/parse/java12.cup"
 
-package skel.parse;
+package skelpkg.parse;
 
-import skel.types.SkelTypeSystem;
-import skel.ast.SkelNodeFactory;
+import skelpkg.types.SkelTypeSystem;
+import skelpkg.ast.SkelNodeFactory;
 import polyglot.parse.Name;
 
 parser Grm extends polyglot.parse.Grm {:

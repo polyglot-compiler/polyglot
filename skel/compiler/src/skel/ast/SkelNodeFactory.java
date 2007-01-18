@@ -1,4 +1,4 @@
-package skel.ast;
+package skelpkg.ast;
 
 import polyglot.ast.*;
 import polyglot.types.Flags;

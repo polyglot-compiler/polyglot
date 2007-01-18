@@ -25,6 +25,6 @@
 #      CmdLineArgs  :   additional command line args for the Polyglot 
 #                       compiler; is always enclosed in quotes.
 
-skel.ExtensionInfo {
+skelpkg.ExtensionInfo {
     Hello.sx ;
 }

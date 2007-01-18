@@ -1,10 +1,10 @@
-package skel;
+package skelpkg;
 
 import polyglot.lex.Lexer;
-import skel.parse.Lexer_c;
-import skel.parse.Grm;
-import skel.ast.*;
-import skel.types.*;
+import skelpkg.parse.Lexer_c;
+import skelpkg.parse.Grm;
+import skelpkg.ast.*;
+import skelpkg.types.*;
 
 import polyglot.ast.*;
 import polyglot.types.*;

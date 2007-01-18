@@ -1,4 +1,4 @@
-package skel;
+package skelpkg;
 
 /**
  * Main is the main program of the compiler extension.
@@ -11,7 +11,7 @@ public class Main
       polyglot.main.Main polyglotMain = new polyglot.main.Main();
 
       try {
-          polyglotMain.start(args, new skel.ExtensionInfo());
+          polyglotMain.start(args, new skelpkg.ExtensionInfo());
       }
       catch (polyglot.main.Main.TerminationException e) {
           System.err.println(e.getMessage());
