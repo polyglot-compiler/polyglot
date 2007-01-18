@@ -77,6 +77,11 @@ public class Field_c extends Expr_c implements Field
   }
 
   /** Get the field instance of the field. */
+  public VarInstance varInstance() {
+    return fi;
+  }
+
+  /** Get the field instance of the field. */
   public FieldInstance fieldInstance() {
     return fi;
   }

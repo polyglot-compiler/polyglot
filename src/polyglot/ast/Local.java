@@ -12,7 +12,7 @@ import polyglot.types.LocalInstance;
 /** 
  * A local variable expression.
  */
-public interface Local extends Variable
+public interface Local extends NamedVariable
 {
     /** Get the name of the local variable. */
     String name();

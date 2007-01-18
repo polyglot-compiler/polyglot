@@ -13,6 +13,7 @@ import polyglot.ast.Term;
 import polyglot.ast.Precedence;
 import polyglot.types.Context;
 import polyglot.types.Flags;
+import polyglot.types.VarInstance;
 import polyglot.types.LocalInstance;
 import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
@@ -57,6 +58,11 @@ public class Local_c extends Expr_c implements Local
   /** Return the access flags of the variable. */
   public Flags flags() {
     return li.flags();
+  }
+
+  /** Get the local instance of the local. */
+  public VarInstance varInstance() {
+    return li;
   }
 
   /** Get the local instance of the local. */
