@@ -97,6 +97,26 @@ public interface NodeOps
     Node buildTypes(TypeBuilder tb) throws SemanticException;
 
     /**
+     * Disambiguate the AST.
+     *
+     * This method is called by the <code>override()</code> method of the
+     * visitor.  If this method returns non-null, the node's children
+     * will not be visited automatically.  Thus, the method should check
+     * both the node <code>this</code> and it's children, usually by
+     * invoking <code>visitChildren</code> with <code>tc</code> or
+     * with another visitor, returning a non-null node.  OR, the method
+     * should do nothing and simply return <code>null</code> to allow
+     * <code>enter</code>, <code>visitChildren</code>, and <code>leave</code>
+     * to be invoked on the node.
+     *
+     * The default implementation returns <code>null</code>.
+     * Overriding of this method is discouraged, but sometimes necessary.
+     *
+     * @param ar The visitor which disambiguates.
+     */
+    Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException;
+
+    /**
      * Remove any remaining ambiguities from the AST.
      *
      * This method is called by the <code>enter()</code> method of the
@@ -108,7 +128,6 @@ public interface NodeOps
      *
      * @param ar The visitor which disambiguates.
      */
-    Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException;
     NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException;
 
     /**
@@ -145,6 +164,26 @@ public interface NodeOps
     /**
      * Type check the AST.
      *
+     * This method is called by the <code>override()</code> method of the
+     * visitor.  If this method returns non-null, the node's children
+     * will not be visited automatically.  Thus, the method should check
+     * both the node <code>this</code> and it's children, usually by
+     * invoking <code>visitChildren</code> with <code>tc</code> or
+     * with another visitor, returning a non-null node.  OR, the method
+     * should do nothing and simply return <code>null</code> to allow
+     * <code>enter</code>, <code>visitChildren</code>, and <code>leave</code>
+     * to be invoked on the node.
+     *
+     * The default implementation returns <code>null</code>.
+     * Overriding of this method is discouraged, but sometimes necessary.
+     *
+     * @param tc The type checking visitor.
+     */
+    Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException;
+
+    /**
+     * Type check the AST.
+     *
      * This method is called by the <code>leave()</code> method of the
      * visitor.  The method should perform work that should be done
      * after visiting the children of the node.  The method may return
@@ -153,9 +192,19 @@ public interface NodeOps
      *
      * @param tc The type checking visitor.
      */
-    Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException;
     Node typeCheck(TypeChecker tc) throws SemanticException;
 
+    /**
+     * Check if the node is a compile-time constant.
+     *
+     * This method is called by the <code>leave()</code> method of the
+     * visitor.  The method should perform work that should be done
+     * after visiting the children of the node.  The method may return
+     * <code>this</code> or a new copy of the node which will be
+     * installed as a child of the node's parent.
+     *
+     * @param cc The constant checking visitor.
+     */
     Node checkConstants(ConstantChecker cc) throws SemanticException;
     
     /**
