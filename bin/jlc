@@ -28,6 +28,23 @@ fixclasspath() {
   fi
 }
 
+unixfilename() {
+  windows=0
+
+  if [ `uname | grep -c CYGWIN` -ne 0 ]; then
+    windows=1
+  fi
+
+  cp="$1"
+
+  if [ "$windows" = 1 ]; then 
+    cygpath -u "$cp"
+  else
+    echo "$cp"
+  fi
+}
+
+
 extra_cp=
 args=
 vmargs=
@@ -37,6 +54,8 @@ java=java
 polyglot() {
   eval "$java" "$vmargs" -classpath "'$classpath'" polyglot.main.Main "$@"
 }
+
+dir=`unixfilename "$dir"`
 
 while true; do
     case "$1" in
