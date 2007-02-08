@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.util.CodeWriter;
@@ -25,6 +25,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 
     public AbstractBlock_c(Position pos, List statements) {
 	super(pos);
+	assert(statements != null);
 	this.statements = TypedList.copyAndCheck(statements, Stmt.class, true);
     }
 

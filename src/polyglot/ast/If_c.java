@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
@@ -26,6 +26,7 @@ public class If_c extends Stmt_c implements If
 
     public If_c(Position pos, Expr cond, Stmt consequent, Stmt alternative) {
 	super(pos);
+	assert(cond != null && consequent != null); // alternative may be null;
 	this.cond = cond;
 	this.consequent = consequent;
 	this.alternative = alternative;

@@ -28,9 +28,7 @@ import java_cup.runtime.*;
 import polyglot.ast.*;
 import polyglot.lex.*;
 import polyglot.util.*;
-import polyglot.parse.*;
 import polyglot.types.*;
-import polyglot.*;
 import polyglot.ast.Assert;
 
 /** Java Parser for CUP */
@@ -410,12 +408,12 @@ name    ::=
 simple_name ::=
                     // Name
         IDENTIFIER:a
-            {: RESULT = new Name(parser.nf, parser.ts, parser.pos(a), a.getIdentifier()); :}
+            {: RESULT = new Name(parser.nf, parser.ts, parser.pos(a), parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
     ;
 qualified_name ::=
                     // Name
         name:a DOT IDENTIFIER:b
-            {: RESULT = new Name(parser.nf, parser.ts, parser.pos(a, b), a, b.getIdentifier()); :}
+            {: RESULT = new Name(parser.nf, parser.ts, parser.pos(a, b), a, parser.nf.Id(parser.pos(b), b.getIdentifier())); :}
     ;
 // 19.6) Packages
 compilation_unit ::=
@@ -555,7 +553,7 @@ class_declaration ::=
         modifiers_opt:a CLASS:n IDENTIFIER:b 
                 super_opt:c interfaces_opt:d class_body:e
             {: RESULT = parser.nf.ClassDecl(parser.pos(n, e),
-                a, b.getIdentifier(), c, d, e); :}
+                a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e); :}
     ;
 super ::=
                     // TypeNode
@@ -646,7 +644,7 @@ class_member_declaration ::=
                     super_opt:c interfaces_opt:d class_body:e
             {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
                l.add(parser.nf.ClassDecl(parser.pos(n, e),
-                        a, b.getIdentifier(), c, d, e));
+                        a, parser.nf.Id(parser.pos(b), b.getIdentifier()), c, d, e));
                RESULT = l; :}
     |   interface_declaration:a
             {: List l = new TypedList(new LinkedList(), ClassMember.class, false);
@@ -689,7 +687,7 @@ variable_declarator_id ::=
                 // VarDeclarator
         IDENTIFIER:a
             {: RESULT = new VarDeclarator(parser.pos(a),
-                            a.getIdentifier()); :}
+                            parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
     |   variable_declarator_id:a LBRACK RBRACK
             {: RESULT = a;
                a.dims++; :}
@@ -713,13 +711,13 @@ method_header ::=
         modifiers_opt:a type:b IDENTIFIER:c LPAREN 
                 formal_parameter_list_opt:d RPAREN:g dims_opt:e throws_opt:f
             {: RESULT = parser.nf.MethodDecl(parser.pos(b, g, c), a,
-                parser.array(b, e.intValue()), c.getIdentifier(),
+                parser.array(b, e.intValue()), parser.nf.Id(parser.pos(c), c.getIdentifier()),
                 d, f, null); :}
     |   modifiers_opt:a VOID:b IDENTIFIER:c LPAREN
                 formal_parameter_list_opt:d RPAREN:g throws_opt:f
             {: RESULT = parser.nf.MethodDecl(parser.pos(b, g, c), a,
                 parser.nf.CanonicalTypeNode(parser.pos(b),
-                parser.ts.Void()), c.getIdentifier(), d, f, null); :}
+                parser.ts.Void()), parser.nf.Id(parser.pos(c), c.getIdentifier()), d, f, null); :}
     ;
 formal_parameter_list_opt ::=        
                     // List of Formal
@@ -787,7 +785,7 @@ constructor_declaration ::=
                     // ConstructorDecl
         modifiers_opt:m simple_name:a LPAREN formal_parameter_list_opt:b RPAREN
             throws_opt:c constructor_body:d
-            {: RESULT = parser.nf.ConstructorDecl(parser.pos(a, d), m, a.toString(), b,
+            {: RESULT = parser.nf.ConstructorDecl(parser.pos(a, d), m, parser.nf.Id(parser.pos(a), a.toString()), b,
                 c, d); :}
     ;
 constructor_body ::=
@@ -829,7 +827,7 @@ interface_declaration ::=
                 extends_interfaces_opt:c interface_body:d
             {: RESULT = parser.nf.ClassDecl(
                     parser.pos(n, d), a.Interface(),
-                        b.getIdentifier(), null, c, d); :}
+                        parser.nf.Id(parser.pos(b), b.getIdentifier()), null, c, d); :}
     ;
 extends_interfaces_opt ::=
                     // List of TypeNode
@@ -1035,13 +1033,13 @@ labeled_statement ::=
                     // Labeled
         IDENTIFIER:a COLON statement:b
             {: RESULT = parser.nf.Labeled(parser.pos(a, b),
-                                      a.getIdentifier(), b); :}
+                                      parser.nf.Id(parser.pos(a), a.getIdentifier()), b); :}
     ;
 labeled_statement_no_short_if ::=
                     // Labeled
         IDENTIFIER:a COLON statement_no_short_if:b
             {: RESULT = parser.nf.Labeled(parser.pos(a, b),
-                                      a.getIdentifier(), b); :}
+                                      parser.nf.Id(parser.pos(a), a.getIdentifier()), b); :}
     ;
 expression_statement ::=
                     // Stmt
@@ -1202,7 +1200,7 @@ identifier_opt ::=
             {: RESULT = null; :}
     |   IDENTIFIER:a
             {: RESULT = new Name(parser.nf, parser.ts, parser.pos(a), 
-                a.getIdentifier()); :}
+                parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
     ;
 
 break_statement ::=
@@ -1211,7 +1209,7 @@ break_statement ::=
             {: if (a == null)
                    RESULT = parser.nf.Break(parser.pos(n, d));
                else
-                   RESULT = parser.nf.Break(parser.pos(n, d), a.toString()); :}
+                   RESULT = parser.nf.Break(parser.pos(n, d), parser.nf.Id(parser.pos(a), a.toString())); :}
     ;
 
 continue_statement ::=
@@ -1220,7 +1218,7 @@ continue_statement ::=
             {: if (a == null)
                    RESULT = parser.nf.Continue(parser.pos(n, d));
                else
-                   RESULT = parser.nf.Continue(parser.pos(n, d), a.toString()); :}
+                   RESULT = parser.nf.Continue(parser.pos(n, d), parser.nf.Id(parser.pos(a), a.toString())); :}
     ;
 return_statement ::=
                     // Return
@@ -1398,15 +1396,15 @@ field_access ::=
                     // Field
         primary:a DOT IDENTIFIER:b
             {: RESULT = parser.nf.Field(parser.pos(a, b, b), a,
-                b.getIdentifier()); :}
+                parser.nf.Id(parser.pos(b), b.getIdentifier())); :}
     |   SUPER:n DOT IDENTIFIER:a
             {: RESULT = parser.nf.Field(parser.pos(a),
                 parser.nf.Super(parser.pos(n)),
-                a.getIdentifier()); :}
+                parser.nf.Id(parser.pos(a), a.getIdentifier())); :}
     |   name:a DOT SUPER:n DOT IDENTIFIER:b
             {: RESULT = parser.nf.Field(parser.pos(b),
                 parser.nf.Super(parser.pos(n), a.toType()),
-                b.getIdentifier()); :}
+                parser.nf.Id(parser.pos(b), b.getIdentifier())); :}
     ;
 method_invocation ::=
                     // Call
@@ -1416,15 +1414,15 @@ method_invocation ::=
                 a.name, b); :}
     |   primary:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN:d
             {: RESULT = parser.nf.Call(parser.pos(b,d), a,
-                b.getIdentifier(), c); :}
+                parser.nf.Id(parser.pos(b), b.getIdentifier()), c); :}
     |   SUPER:a DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN:d
             {: RESULT = parser.nf.Call(parser.pos(a,d, b),
                 parser.nf.Super(parser.pos(a)),
-                b.getIdentifier(), c); :}
+                parser.nf.Id(parser.pos(b), b.getIdentifier()), c); :}
     |   name:a DOT SUPER:n DOT IDENTIFIER:b LPAREN argument_list_opt:c RPAREN:d
             {: RESULT = parser.nf.Call(parser.pos(b,d),
                 parser.nf.Super(parser.pos(n), a.toType()),
-                b.getIdentifier(), c); :}
+                parser.nf.Id(parser.pos(b), b.getIdentifier()), c); :}
     ;
 array_access ::=
                     // ArrayAccess

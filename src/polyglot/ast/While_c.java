@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -25,6 +26,7 @@ public class While_c extends Loop_c implements While
 
     public While_c(Position pos, Expr cond, Stmt body) {
 	super(pos);
+	assert(cond != null && body != null);
 	this.cond = cond;
 	this.body = body;
     }

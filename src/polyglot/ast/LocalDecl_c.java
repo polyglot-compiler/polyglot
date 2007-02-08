@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -9,9 +10,7 @@ package polyglot.ast;
 
 import java.util.List;
 
-import polyglot.ast.*;
 import polyglot.frontend.*;
-import polyglot.frontend.CyclicDependencyException;
 import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
@@ -26,14 +25,15 @@ import polyglot.visit.*;
 public class LocalDecl_c extends Stmt_c implements LocalDecl {
     protected Flags flags;
     protected TypeNode type;
-    protected String name;
+    protected Id name;
     protected Expr init;
     protected LocalInstance li;
 
     public LocalDecl_c(Position pos, Flags flags, TypeNode type,
-                       String name, Expr init)
+                       Id name, Expr init)
     {
         super(pos);
+        assert(flags != null && type != null && name != null); // init may be null
         this.flags = flags;
         this.type = type;
         this.name = name;
@@ -74,18 +74,27 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         n.type = type;
         return n;
     }
+    
+    /** Get the name of the declaration. */
+    public Id id() {
+        return name;
+    }
+    
+    /** Set the name of the declaration. */
+    public LocalDecl id(Id name) {
+        LocalDecl_c n = (LocalDecl_c) copy();
+        n.name = name;
+        return n;
+    }
 
     /** Get the name of the declaration. */
     public String name() {
-        return name;
+        return name.id();
     }
 
     /** Set the name of the declaration. */
     public LocalDecl name(String name) {
-        if (name.equals(this.name)) return this;
-        LocalDecl_c n = (LocalDecl_c) copy();
-        n.name = name;
-        return n;
+        return id(this.name.id(name));
     }
 
     /** Get the initializer of the declaration. */
@@ -119,10 +128,11 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
 
     /** Reconstruct the declaration. */
-    protected LocalDecl_c reconstruct(TypeNode type, Expr init) {
-        if (this.type != type || this.init != init) {
+    protected LocalDecl_c reconstruct(TypeNode type, Id name, Expr init) {
+        if (this.type != type || this.name != name || this.init != init) {
             LocalDecl_c n = (LocalDecl_c) copy();
             n.type = type;
+            n.name = name;
             n.init = init;
             return n;
         }
@@ -133,8 +143,9 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     /** Visit the children of the declaration. */
     public Node visitChildren(NodeVisitor v) {
         TypeNode type = (TypeNode) visitChild(this.type, v);
+        Id name = (Id) visitChild(this.name, v);
         Expr init = (Expr) visitChild(this.init, v);
-        return reconstruct(type, init);
+        return reconstruct(type, name, init);
     }
 
     /**
@@ -318,7 +329,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
             print(type, w, tr);
             w.write(" ");
         }
-        w.write(name);
+        tr.print(this, name, w);
 
         if (init != null) {
             w.write(" =");
@@ -343,11 +354,6 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
             w.write("(instance " + li + ")");
             w.end();
         }
-
-	w.allowBreak(4, " ");
-	w.begin(0);
-	w.write("(name " + name + ")");
-	w.end();
     }
 
     public Term entry() {

@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -9,7 +10,6 @@ package polyglot.ast;
 
 import java.util.List;
 
-import polyglot.ast.*;
 import polyglot.types.SemanticException;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
@@ -27,6 +27,7 @@ public class ClassLit_c extends Lit_c implements ClassLit
 
   public ClassLit_c(Position pos, TypeNode typeNode) {
     super(pos);
+    assert(typeNode != null);
     this.typeNode = typeNode;
   }
 

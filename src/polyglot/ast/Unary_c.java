@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -24,6 +25,7 @@ public class Unary_c extends Expr_c implements Unary
 
     public Unary_c(Position pos, Unary.Operator op, Expr expr) {
 	super(pos);
+	assert(op != null && expr != null);
 	this.op = op;
 	this.expr = expr;
     }

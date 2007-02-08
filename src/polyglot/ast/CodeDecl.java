@@ -7,10 +7,7 @@
 
 package polyglot.ast;
 
-import polyglot.types.ProcedureInstance;
 import polyglot.types.CodeInstance;
-import polyglot.types.Flags;
-import java.util.List;
 
 /**
  * A code declaration.  A "code" is the supertype of methods,

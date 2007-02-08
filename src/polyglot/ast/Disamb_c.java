@@ -8,7 +8,6 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.Position;
 import polyglot.util.InternalCompilerError;
@@ -23,7 +22,7 @@ public class Disamb_c implements Disamb
     protected ContextVisitor v;
     protected Position pos;
     protected Prefix prefix;
-    protected String name;
+    protected Id name;
 
     protected NodeFactory nf;
     protected TypeSystem ts;
@@ -37,6 +36,16 @@ public class Disamb_c implements Disamb
      */
     public Node disambiguate(Ambiguous amb, ContextVisitor v, Position pos,
             Prefix prefix, String name) throws SemanticException {
+        return disambiguate(amb, v, pos, prefix, v.nodeFactory().Id(pos, name));
+    }
+    
+    /**
+     * Disambiguate the prefix and name into a unambiguous node.
+     * @return An unambiguous AST node, or null if disambiguation
+     *         fails.
+     */
+    public Node disambiguate(Ambiguous amb, ContextVisitor v, Position pos,
+            Prefix prefix, Id name) throws SemanticException {
 
         this.v = v;
         this.pos = pos;
@@ -80,7 +89,7 @@ public class Disamb_c implements Disamb
         Named n;
         
         try {
-            n = pc.find(name);
+            n = pc.find(name.id());
         }
         catch (SemanticException e) {
             return null;
@@ -113,10 +122,10 @@ public class Disamb_c implements Disamb
 
         if (t.isReference() && exprOK()) {
             try {
-                FieldInstance fi = ts.findField(t.toReference(), name, c.currentClass());
+                FieldInstance fi = ts.findField(t.toReference(), name.id(), c.currentClass());
                 return nf.Field(pos, tn, name).fieldInstance(fi);
             } catch (NoMemberException e) {
-                if (e.getKind() != e.FIELD) {
+                if (e.getKind() != NoMemberException.FIELD) {
                     // something went wrong...
                     throw e;
                 }
@@ -130,7 +139,7 @@ public class Disamb_c implements Disamb
             Resolver tc = t.toClass().resolver();
             Named n;
             try {
-                n = tc.find(name);
+                n = tc.find(name.id());
             }
             catch (NoClassException e) {
                 return null;
@@ -155,7 +164,7 @@ public class Disamb_c implements Disamb
     protected Node disambiguateNoPrefix() throws SemanticException {
         if (exprOK()) {
             // First try local variables and fields.
-            VarInstance vi = c.findVariableSilent(name);
+            VarInstance vi = c.findVariableSilent(name.id());
             
             if (vi != null) {
                 Node n = disambiguateVarInstance(vi);
@@ -166,7 +175,7 @@ public class Disamb_c implements Disamb
         // no variable found. try types.
         if (typeOK()) {
             try {
-                Named n = c.find(name);
+                Named n = c.find(name.id());
                 if (n instanceof Type) {
                     Type type = (Type) n;
                     if (! type.isCanonical()) {
@@ -175,7 +184,7 @@ public class Disamb_c implements Disamb
                     return nf.CanonicalTypeNode(pos, type);
                 }
             } catch (NoClassException e) {
-                if (!name.equals(e.getClassName())) {
+                if (!name.id().equals(e.getClassName())) {
                     // hmm, something else must have gone wrong
                     // rethrow the exception
                     throw e;
@@ -188,7 +197,7 @@ public class Disamb_c implements Disamb
 
         // Must be a package then...
         if (packageOK()) {
-            return nf.PackageNode(pos, ts.packageForName(name));
+            return nf.PackageNode(pos, ts.packageForName(name.id()));
         }
 
         return null;
@@ -218,7 +227,7 @@ public class Disamb_c implements Disamb
             // brought the field into scope.  This is different
             // from fi.container().  fi.container() returns a super
             // type of the class we want.
-            ClassType scope = c.findFieldScope(name);
+            ClassType scope = c.findFieldScope(name.id());
 
             if (! ts.equals(scope, c.currentClass())) {
                 r = nf.This(pos.startOf(), nf.CanonicalTypeNode(pos, scope));

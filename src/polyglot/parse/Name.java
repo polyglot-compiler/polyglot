@@ -17,35 +17,54 @@ import polyglot.util.*;
  */
 public class Name {
     public final Name prefix;
-    public final String name;
+    public final Id name;
     public final Position pos;
     public final NodeFactory nf;
     public final TypeSystem ts;
 
-    public Name(NodeFactory nf, TypeSystem ts, Position pos, String name) {
+    public Name(NodeFactory nf, TypeSystem ts, Position pos, Id name) {
         this(nf, ts, pos, null, name);
     }
+    
+    public Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix, Id name) {
+        this.nf = nf;
+        this.ts = ts;
+        this.pos = pos != null ? pos : Position.COMPILER_GENERATED;
+        this.prefix = prefix;
+        this.name = name;
+    }
 
-    public Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix, String name) {
+    /** @deprecated */
+    private Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix, String qualifiedName) {
     	this.nf = nf;
         this.ts = ts;
-        this.pos = pos;
+        this.pos = pos != null ? pos : Position.COMPILER_GENERATED;
         
-        if (! StringUtil.isNameShort(name)) {
+        if (! StringUtil.isNameShort(qualifiedName)) {
             if (prefix == null) {
-                this.prefix = new Name(nf, ts, pos, null, StringUtil.getPackageComponent(name));
-                this.name = StringUtil.getShortNameComponent(name);
+                Position prefixPos = pos.truncateEnd(qualifiedName.length()+1);
+                Position namePos = new Position(pos.truncateEnd(qualifiedName.length()).endOf(), pos.endOf());
+                this.prefix = new Name(nf, ts, prefixPos, null, StringUtil.getPackageComponent(qualifiedName));
+                this.name = nf.Id(namePos, StringUtil.getShortNameComponent(qualifiedName));
             }
             else {
-                throw new InternalCompilerError("Can only construct a qualified Name with a short name string: " + name + " is not short.");
+                throw new InternalCompilerError("Can only construct a qualified Name with a short name string: " + qualifiedName + " is not short.");
             }
         }
         else {
+        	Position idPos;
+        	
+            if (prefix == null) {
+              idPos = pos;
+            }
+            else {
+             idPos = new Position(pos.truncateEnd(qualifiedName.length()).endOf(), pos.endOf());
+            }
             this.prefix = prefix;
-            this.name = name;
+            this.name = nf.Id(idPos, qualifiedName);
         }
     }
-
+    
     // expr
     public Expr toExpr() {
         if (prefix == null) {
@@ -85,10 +104,10 @@ public class Name {
     // package
     public PackageNode toPackage() {
         if (prefix == null) {
-            return nf.PackageNode(pos, ts.createPackage(null, name));
+            return nf.PackageNode(pos, ts.createPackage(null, name.id()));
         }
         else {
-            return nf.PackageNode(pos, ts.createPackage(prefix.toPackage().package_(), name));
+            return nf.PackageNode(pos, ts.createPackage(prefix.toPackage().package_(), name.id()));
         }
     }
 
@@ -103,9 +122,9 @@ public class Name {
 
     public String toString() {
         if (prefix == null) {
-            return name;
+            return name.toString();
         }
 
-        return prefix.toString() + "." + name;
+        return prefix.toString() + "." + name.toString();
     }
 }

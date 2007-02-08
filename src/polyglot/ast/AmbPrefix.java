@@ -22,4 +22,6 @@ public interface AmbPrefix extends Prefix, Ambiguous
      * Ambiguous name.
      */
     String name();
+    
+    Id nameNode();
 }

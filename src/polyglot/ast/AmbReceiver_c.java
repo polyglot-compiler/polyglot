@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
@@ -20,8 +20,9 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver
 {
     protected Type type;
 
-    public AmbReceiver_c(Position pos, Prefix prefix, String name) {
+    public AmbReceiver_c(Position pos, Prefix prefix, Id name) {
 	super(pos, prefix, name);
+	assert(name != null); // prefix may be null
     }
 
     public Type type() {
@@ -48,7 +49,7 @@ public class AmbReceiver_c extends AmbPrefix_c implements AmbReceiver
 
 	throw new SemanticException("Could not find type, field, or " +
 	    "local variable \"" + 
-            (prefix == null ? name : prefix.toString() + "." + name) +
+            (prefix == null ? name.toString() : prefix.toString() + "." + name.toString()) +
             "\".", position());
     }
     

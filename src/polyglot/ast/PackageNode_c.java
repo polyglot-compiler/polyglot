@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -23,6 +24,7 @@ public class PackageNode_c extends Node_c implements PackageNode
 
     public PackageNode_c(Position pos, Package package_) {
 	super(pos);
+	assert(package_ != null);
 	this.package_ = package_;
     }
     

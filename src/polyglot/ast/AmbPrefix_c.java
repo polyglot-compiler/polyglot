@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
@@ -19,24 +19,35 @@ import polyglot.util.*;
 public class AmbPrefix_c extends Node_c implements AmbPrefix
 {
     protected Prefix prefix;
-    protected String name;
+    protected Id name;
 
-    public AmbPrefix_c(Position pos, Prefix prefix, String name) {
-	super(pos);
-	this.prefix = prefix;
-	this.name = name;
+    public AmbPrefix_c(Position pos, Prefix prefix, Id name) {
+        super(pos);
+        assert(name != null); // prefix may be null
+        this.prefix = prefix;
+        this.name = name;
     }
     
     /** Get the name of the prefix. */
+    public Id nameNode() {
+        return this.name;
+    }
+    
+    /** Set the name of the prefix. */
+    public AmbPrefix id(Id name) {
+        AmbPrefix_c n = (AmbPrefix_c) copy();
+        n.name = name;
+        return n;
+    }
+
+    /** Get the name of the prefix. */
     public String name() {
-	return this.name;
+	return this.name.id();
     }
 
     /** Set the name of the prefix. */
     public AmbPrefix name(String name) {
-	AmbPrefix_c n = (AmbPrefix_c) copy();
-	n.name = name;
-	return n;
+        return id(this.name.id(name));
     }
 
     /** Get the prefix of the prefix. */
@@ -52,10 +63,11 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
     }
 
     /** Reconstruct the prefix. */
-    protected AmbPrefix_c reconstruct(Prefix prefix) {
-	if (prefix != this.prefix) {
+    protected AmbPrefix_c reconstruct(Prefix prefix, Id name) {
+	if (prefix != this.prefix || name != this.name) {
 	    AmbPrefix_c n = (AmbPrefix_c) copy();
 	    n.prefix = prefix;
+            n.name = name;
 	    return n;
 	}
 
@@ -65,7 +77,8 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
     /** Visit the children of the prefix. */
     public Node visitChildren(NodeVisitor v) {
 	Prefix prefix = (Prefix) visitChild(this.prefix, v);
-	return reconstruct(prefix);
+        Id name = (Id) visitChild(this.name, v);
+        return reconstruct(prefix, name);
     }
 
     /** Disambiguate the prefix. */
@@ -95,12 +108,12 @@ public class AmbPrefix_c extends Node_c implements AmbPrefix
             w.write(".");
         }
                 
-        w.write(name);
+        tr.print(this, name, w);
     }
 
     public String toString() {
 	return (prefix == null
-		? name
-		: prefix.toString() + "." + name) + "{amb}";
+		? name.toString()
+		: prefix.toString() + "." + name.toString()) + "{amb}";
     }
 }

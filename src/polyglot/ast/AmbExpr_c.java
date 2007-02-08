@@ -1,16 +1,17 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+
 import java.util.*;
 
 /**
@@ -19,10 +20,11 @@ import java.util.*;
  */
 public class AmbExpr_c extends Expr_c implements AmbExpr
 {
-  protected String name;
+  protected Id name;
 
-  public AmbExpr_c(Position pos, String name) {
+  public AmbExpr_c(Position pos, Id name) {
     super(pos);
+    assert(name != null);
     this.name = name;
   }
 
@@ -30,17 +32,43 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
   public Precedence precedence() {
     return Precedence.LITERAL;
   }
+  
+  /** Get the name of the expression. */
+  public Id id() {
+      return this.name;
+  }
+  
+  /** Set the name of the expression. */
+  public AmbExpr id(Id id) {
+      AmbExpr_c n = (AmbExpr_c) copy();
+      n.name = id;
+      return n;
+  }
 
   /** Get the name of the expression. */
   public String name() {
-    return this.name;
+    return this.name.id();
   }
 
   /** Set the name of the expression. */
   public AmbExpr name(String name) {
-    AmbExpr_c n = (AmbExpr_c) copy();
-    n.name = name;
-    return n;
+      return id(this.name.id(name));
+  }
+  
+  /** Reconstruct the expression. */
+  protected AmbExpr_c reconstruct(Id name) {
+      if (name != this.name) {
+          AmbExpr_c n = (AmbExpr_c) copy();
+          n.name = name;
+          return n;
+      }
+      return this;
+  }
+  
+  /** Visit the children of the constructor. */
+  public Node visitChildren(NodeVisitor v) {
+      Id name = (Id) visitChild(this.name, v);
+      return reconstruct(name);
   }
 
   /** Disambiguate the expression. */
@@ -70,11 +98,11 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
 
   /** Write the expression to an output file. */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-    w.write(name);
+      tr.print(this, name, w);
   }
 
   public String toString() {
-    return name + "{amb}";
+    return name.toString() + "{amb}";
   }
 
   /**
@@ -90,13 +118,5 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
    */
   public List acceptCFG(CFGBuilder v, List succs) {
       return succs;
-  }
-
-  public void dump(CodeWriter w) {
-    super.dump(w);
-    w.allowBreak(4, " ");
-    w.begin(0);
-    w.write("(name \"" + name + "\")");
-    w.end();
   }
 }

@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -22,6 +23,7 @@ public class SourceCollection_c extends Node_c implements SourceCollection
 
     public SourceCollection_c(Position pos, List sources) {
 	super(pos);
+	assert(sources != null);
 	this.sources = TypedList.copyAndCheck(sources, SourceFile.class, true);
     }
 

@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -11,7 +12,6 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.*;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -30,6 +30,7 @@ public abstract class Node_c implements Node
     protected boolean error;
 
     public Node_c(Position pos) {
+    	assert(pos != null);
         this.position = pos;
         this.error = false;
     }

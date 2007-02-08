@@ -1,14 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
 import java.util.*;
@@ -19,25 +18,36 @@ import java.util.*;
  */
 public class Labeled_c extends Stmt_c implements Labeled
 {
-    protected String label;
+    protected Id label;
     protected Stmt statement;
 
-    public Labeled_c(Position pos, String label, Stmt statement) {
+    public Labeled_c(Position pos, Id label, Stmt statement) {
 	super(pos);
+	assert(label != null && statement != null);
 	this.label = label;
 	this.statement = statement;
+    }
+    
+    /** Get the label of the statement. */
+    public Id labelNode() {
+        return this.label;
+    }
+    
+    /** Set the label of the statement. */
+    public Labeled labelNode(Id label) {
+        Labeled_c n = (Labeled_c) copy();
+        n.label = label;
+        return n;
     }
 
     /** Get the label of the statement. */
     public String label() {
-	return this.label;
+	return this.label.id();
     }
 
     /** Set the label of the statement. */
     public Labeled label(String label) {
-	Labeled_c n = (Labeled_c) copy();
-	n.label = label;
-	return n;
+	return labelNode(this.label.id(label));
     }
 
     /** Get the sub-statement of the statement. */
@@ -53,9 +63,10 @@ public class Labeled_c extends Stmt_c implements Labeled
     }
 
     /** Reconstruct the statement. */
-    protected Labeled_c reconstruct(Stmt statement) {
-	if (statement != this.statement) {
+    protected Labeled_c reconstruct(Id label, Stmt statement) {
+	if (label != this.label || statement != this.statement) {
 	    Labeled_c n = (Labeled_c) copy();
+            n.label = label;
 	    n.statement = statement;
 	    return n;
 	}
@@ -65,8 +76,9 @@ public class Labeled_c extends Stmt_c implements Labeled
 
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
+        Id label = (Id) visitChild(this.label, v);
 	Stmt statement = (Stmt) visitChild(this.statement, v);
-	return reconstruct(statement);
+	return reconstruct(label, statement);
     }
 
     public String toString() {

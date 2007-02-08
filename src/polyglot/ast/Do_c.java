@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
@@ -25,6 +25,7 @@ public class Do_c extends Loop_c implements Do
 
     public Do_c(Position pos, Stmt body, Expr cond) {
 	super(pos);
+	assert(body != null && cond != null);
 	this.body = body;
 	this.cond = cond;
     }

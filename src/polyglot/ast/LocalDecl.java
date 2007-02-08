@@ -10,7 +10,6 @@ package polyglot.ast;
 import polyglot.types.Type;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
-import polyglot.types.SemanticException;
 
 /** 
  * A local variable declaration statement: a type, a name and an optional
@@ -23,6 +22,9 @@ public interface LocalDecl extends ForInit, VarDecl, VarInit
 
     /** Set the declaration's type. */
     LocalDecl type(TypeNode type);
+
+    /** Set the declaration's name. */
+    LocalDecl id(Id name);
 
     /** Set the declaration's name. */
     LocalDecl name(String name);

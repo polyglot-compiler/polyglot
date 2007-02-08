@@ -32,6 +32,16 @@ public interface Branch extends Stmt
      * Set the kind of branch.
      */
     Branch kind(Kind kind);
+    
+    /**
+     * Target label of the branch.
+     */
+    Id labelNode();
+    
+    /**
+     * Set the target label of the branch.
+     */
+    Branch labelNode(Id label);
 
     /**
      * Target label of the branch.

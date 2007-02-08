@@ -1,13 +1,12 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
-
-import polyglot.ast.*;
 
 import polyglot.types.*;
 import polyglot.util.*;
@@ -24,13 +23,14 @@ public class Formal_c extends Term_c implements Formal
     protected LocalInstance li;
     protected Flags flags;
     protected TypeNode type;
-    protected String name;
+    protected Id name;
     protected boolean reachable;
 
     public Formal_c(Position pos, Flags flags, TypeNode type,
-                    String name)
+                    Id name)
     {
 	super(pos);
+	assert(flags != null && type != null && name != null);
         this.flags = flags;
         this.type = type;
         this.name = name;
@@ -69,17 +69,27 @@ public class Formal_c extends Term_c implements Formal
 	n.type = type;
 	return n;
     }
+    
+    /** Get the name of the formal. */
+    public Id id() {
+        return name;
+    }
+    
+    /** Set the name of the formal. */
+    public Formal id(Id name) {
+        Formal_c n = (Formal_c) copy();
+        n.name = name;
+        return n;
+    }
 
     /** Get the name of the formal. */
     public String name() {
-	return name;
+	return name.id();
     }
 
     /** Set the name of the formal. */
     public Formal name(String name) {
-	Formal_c n = (Formal_c) copy();
-	n.name = name;
-	return n;
+        return id(this.name.id(name));
     }
 
     /** Get the local instance of the formal. */
@@ -96,10 +106,11 @@ public class Formal_c extends Term_c implements Formal
     }
 
     /** Reconstruct the formal. */
-    protected Formal_c reconstruct(TypeNode type) {
+    protected Formal_c reconstruct(TypeNode type, Id name) {
 	if (this.type != type) {
 	    Formal_c n = (Formal_c) copy();
 	    n.type = type;
+            n.name = name;
 	    return n;
 	}
 
@@ -109,7 +120,8 @@ public class Formal_c extends Term_c implements Formal
     /** Visit the children of the formal. */
     public Node visitChildren(NodeVisitor v) {
 	TypeNode type = (TypeNode) visitChild(this.type, v);
-	return reconstruct(type);
+        Id name = (Id) visitChild(this.name, v);
+	return reconstruct(type, name);
     }
 
     public void addDecls(Context c) {
@@ -121,7 +133,7 @@ public class Formal_c extends Term_c implements Formal
         w.write(flags.translate());
         print(type, w, tr);
         w.write(" ");
-        w.write(name);
+        tr.print(this, name, w);
     }
 
     /** Build type objects for the formal. */

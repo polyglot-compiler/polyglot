@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -28,6 +29,7 @@ public class Special_c extends Expr_c implements Special
 
     public Special_c(Position pos, Special.Kind kind, TypeNode qualifier) {
 	super(pos);
+	assert(kind != null); // qualifier may be null
 	this.kind = kind;
 	this.qualifier = qualifier;
     }

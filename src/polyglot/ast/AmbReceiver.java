@@ -22,4 +22,5 @@ public interface AmbReceiver extends Ambiguous, Receiver
      * Ambiguous name.
      */
     String name();
+    Id nameNode();
 }

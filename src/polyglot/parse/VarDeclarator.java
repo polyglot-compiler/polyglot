@@ -15,11 +15,11 @@ import polyglot.util.*;
  */
 public class VarDeclarator {
 	public Position pos;
-	public String name;
+	public Id name;
 	public int dims;
 	public Expr init;
 
-	public VarDeclarator(Position pos, String name) {
+	public VarDeclarator(Position pos, Id name) {
 		this.pos = pos;
 		this.name = name;
 		this.dims = 0;

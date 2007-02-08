@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -26,6 +27,8 @@ public class Try_c extends Stmt_c implements Try
 
     public Try_c(Position pos, Block tryBlock, List catchBlocks, Block finallyBlock) {
 	super(pos);
+	assert(tryBlock != null && catchBlocks != null); // finallyBlock may be null, catchBlocks empty
+	assert(! catchBlocks.isEmpty() || finallyBlock != null); // must be either try-catch or try(-catch)-finally
 	this.tryBlock = tryBlock;
 	this.catchBlocks = TypedList.copyAndCheck(catchBlocks, Catch.class, true);
 	this.finallyBlock = finallyBlock;

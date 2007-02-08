@@ -1,17 +1,16 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
-import polyglot.frontend.*;
 import java.util.*;
 
 /**
@@ -24,6 +23,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
 
     public LocalClassDecl_c(Position pos, ClassDecl decl) {
 	super(pos);
+	assert(decl != null);
 	this.decl = decl;
     }
 

@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -25,6 +25,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 
     public ArrayInit_c(Position pos, List elements) {
 	super(pos);
+	assert(elements != null);
 	this.elements = TypedList.copyAndCheck(elements, Expr.class, true);
     }
 

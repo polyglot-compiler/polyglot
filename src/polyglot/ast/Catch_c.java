@@ -1,13 +1,12 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
-
-import polyglot.ast.*;
 
 import polyglot.util.*;
 import polyglot.types.*;
@@ -26,6 +25,7 @@ public class Catch_c extends Stmt_c implements Catch
 
     public Catch_c(Position pos, Formal formal, Block body) {
 	super(pos);
+	assert(formal != null && body != null);
 	this.formal = formal;
 	this.body = body;
     }

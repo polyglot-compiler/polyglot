@@ -28,6 +28,9 @@ public interface VarDecl extends Term
     TypeNode type();
 
     /** Get the declaration's name. */
+    Id id();
+    
+    /** Get the declaration's name. */
     String name();
 
     /**

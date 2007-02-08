@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -19,6 +20,7 @@ import polyglot.types.SemanticException;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
+import polyglot.visit.NodeVisitor;
 import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeBuilder;
 import polyglot.visit.TypeChecker;
@@ -30,11 +32,12 @@ import java.util.List;
  */
 public class Local_c extends Expr_c implements Local
 {
-  protected String name;
+  protected Id name;
   protected LocalInstance li;
 
-  public Local_c(Position pos, String name) {
+  public Local_c(Position pos, Id name) {
     super(pos);
+    assert(name != null);
     this.name = name;
   }
 
@@ -44,15 +47,25 @@ public class Local_c extends Expr_c implements Local
   }
 
   /** Get the name of the local. */
-  public String name() {
+  public Id id() {
     return this.name;
   }
-
+  
+  /** Set the name of the local. */
+  public Local id(Id name) {
+      Local_c n = (Local_c) copy();
+      n.name = name;
+      return n;
+  }
+  
+  /** Get the name of the local. */
+  public String name() {
+      return this.name.id();
+  }
+  
   /** Set the name of the local. */
   public Local name(String name) {
-    Local_c n = (Local_c) copy();
-    n.name = name;
-    return n;
+      return id(this.name.id(name));
   }
 
   /** Return the access flags of the variable. */
@@ -78,20 +91,37 @@ public class Local_c extends Expr_c implements Local
     return n;
   }
 
+  /** Reconstruct the expression. */
+  protected Local_c reconstruct(Id name) {
+      if (name != this.name) {
+          Local_c n = (Local_c) copy();
+          n.name = name;
+          return n;
+      }
+      
+      return this;
+  }
+  
+  /** Visit the children of the constructor. */
+  public Node visitChildren(NodeVisitor v) {
+      Id name = (Id) visitChild(this.name, v);
+      return reconstruct(name);
+  }
+
   public Node buildTypes(TypeBuilder tb) throws SemanticException {
       Local_c n = (Local_c) super.buildTypes(tb);
 
       TypeSystem ts = tb.typeSystem();
 
       LocalInstance li = ts.localInstance(position(), Flags.NONE,
-                                          ts.unknownType(position()), name);
+                                          ts.unknownType(position()), name.id());
       return n.localInstance(li);
   }
 
   /** Type check the local. */
   public Node typeCheck(TypeChecker tc) throws SemanticException {
     Context c = tc.context();
-    LocalInstance li = c.findLocal(name);
+    LocalInstance li = c.findLocal(name.id());
     
     // if the local is defined in an outer class, then it must be final
     if (!c.isLocal(li.name())) {
@@ -123,12 +153,12 @@ public class Local_c extends Expr_c implements Local
   }
 
   public String toString() {
-    return name;
+    return name.toString();
   }
 
   /** Write the local to an output file. */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-    w.write(name);
+      tr.print(this, name, w);
   }
 
   /** Dumps the AST. */
@@ -141,11 +171,6 @@ public class Local_c extends Expr_c implements Local
 	w.write("(instance " + li + ")");
 	w.end();
     }
-
-    w.allowBreak(4, " ");
-    w.begin(0);
-    w.write("(name " + name + ")");
-    w.end();
   }
   
   public boolean constantValueSet() {

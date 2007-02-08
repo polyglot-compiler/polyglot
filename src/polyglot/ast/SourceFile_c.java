@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -30,6 +31,7 @@ public class SourceFile_c extends Node_c implements SourceFile
 
     public SourceFile_c(Position pos, PackageNode package_, List imports, List decls) {
 	super(pos);
+	assert(imports != null && decls != null && ! decls.isEmpty()); // package_ may be null, imports empty
 	this.package_ = package_;
 	this.imports = TypedList.copyAndCheck(imports, Import.class, true);
 	this.decls = TypedList.copyAndCheck(decls, TopLevelDecl.class, true);

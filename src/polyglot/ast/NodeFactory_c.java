@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -64,102 +65,43 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         }
         return null;
     }
+    
+    public Id Id(Position pos, String name) {
+        Id n = new Id_c(pos, name);
+        n = (Id) n.ext(extFactory.extId());
+        n = (Id) n.del(delFactory.delId());
+        return n;
+    }
 
-    public Prefix PrefixFromQualifiedName(Position pos, String qualifiedName) {
-	if (StringUtil.isNameShort(qualifiedName)) {
-	    return AmbPrefix(pos, null, qualifiedName);
-	}
-	
-	String container = StringUtil.getPackageComponent(qualifiedName);
-	String name = StringUtil.getShortNameComponent(qualifiedName);
-	
-	Position pos2 = pos.truncateEnd(name.length()+1);
-	
-	return AmbPrefix(pos, PrefixFromQualifiedName(pos2, container), name);
-    }
-    
-    public TypeNode TypeNodeFromQualifiedName(Position pos, String qualifiedName) {
-	if (StringUtil.isNameShort(qualifiedName)) {
-	    return AmbTypeNode(pos, null, qualifiedName);
-	}
-	
-	String container = StringUtil.getPackageComponent(qualifiedName);
-	String name = StringUtil.getShortNameComponent(qualifiedName);
-	
-	Position pos2 = pos.truncateEnd(name.length()+1);
-	
-	return AmbTypeNode(pos, QualifierNodeFromQualifiedName(pos2, container), name);
-    }
-    
-    public Receiver ReceiverFromQualifiedName(Position pos, String qualifiedName) {
-	if (StringUtil.isNameShort(qualifiedName)) {
-	    return AmbReceiver(pos, null, qualifiedName);
-	}
-	
-	String container = StringUtil.getPackageComponent(qualifiedName);
-	String name = StringUtil.getShortNameComponent(qualifiedName);
-	
-	Position pos2 = pos.truncateEnd(name.length()+1);
-	
-	return AmbReceiver(pos, PrefixFromQualifiedName(pos2, container), name);
-  
-    }
-    
-    public Expr ExprFromQualifiedName(Position pos, String qualifiedName) {
-	if (StringUtil.isNameShort(qualifiedName)) {
-	    return AmbExpr(pos, qualifiedName);
-	}
-	
-	String container = StringUtil.getPackageComponent(qualifiedName);
-	String name = StringUtil.getShortNameComponent(qualifiedName);
-	
-	Position pos2 = pos.truncateEnd(name.length()+1);
-	
-	return Field(pos, ReceiverFromQualifiedName(pos2, container), name);
-    }
-    
-    public QualifierNode QualifierNodeFromQualifiedName(Position pos, String qualifiedName) {
-	if (StringUtil.isNameShort(qualifiedName)) {
-	    return AmbQualifierNode(pos, null, qualifiedName);
-	}
-	
-	String container = StringUtil.getPackageComponent(qualifiedName);
-	String name = StringUtil.getShortNameComponent(qualifiedName);
-	
-	Position pos2 = pos.truncateEnd(name.length()+1);
-	
-	return AmbQualifierNode(pos, QualifierNodeFromQualifiedName(pos2, container), name);
-    }
-    
-    public AmbPrefix AmbPrefix(Position pos, Prefix prefix, String name) {
+    public AmbPrefix AmbPrefix(Position pos, Prefix prefix, Id name) {
         AmbPrefix n = new AmbPrefix_c(pos, prefix, name);
         n = (AmbPrefix)n.ext(extFactory.extAmbPrefix());
         n = (AmbPrefix)n.del(delFactory.delAmbPrefix());
         return n;
     }
-
-    public AmbReceiver AmbReceiver(Position pos, Prefix prefix, String name) {
+    
+    public AmbReceiver AmbReceiver(Position pos, Prefix prefix, Id name) {
         AmbReceiver n = new AmbReceiver_c(pos, prefix, name);
         n = (AmbReceiver)n.ext(extFactory.extAmbReceiver());
         n = (AmbReceiver)n.del(delFactory.delAmbReceiver());
         return n;
     }
 
-    public AmbQualifierNode AmbQualifierNode(Position pos, QualifierNode qualifier, String name) {
+    public AmbQualifierNode AmbQualifierNode(Position pos, QualifierNode qualifier, Id name) {
         AmbQualifierNode n = new AmbQualifierNode_c(pos, qualifier, name);
         n = (AmbQualifierNode)n.ext(extFactory.extAmbQualifierNode());
         n = (AmbQualifierNode)n.del(delFactory.delAmbQualifierNode());
         return n;
     }
-
-    public AmbExpr AmbExpr(Position pos, String name) {
+    
+    public AmbExpr AmbExpr(Position pos, Id name) {
         AmbExpr n = new AmbExpr_c(pos, name);
         n = (AmbExpr)n.ext(extFactory.extAmbExpr());
         n = (AmbExpr)n.del(delFactory.delAmbExpr());
         return n;
     }
-
-    public AmbTypeNode AmbTypeNode(Position pos, QualifierNode qualifier, String name) {
+    
+    public AmbTypeNode AmbTypeNode(Position pos, QualifierNode qualifier, Id name) {
         AmbTypeNode n = new AmbTypeNode_c(pos, qualifier, name);
         n = (AmbTypeNode)n.ext(extFactory.extAmbTypeNode());
         n = (AmbTypeNode)n.del(delFactory.delAmbTypeNode());
@@ -225,7 +167,6 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-
     public Binary Binary(Position pos, Expr left, Binary.Operator op, Expr right) {
         Binary n = new Binary_c(pos, left, op, right);
         n = (Binary)n.ext(extFactory.extBinary());
@@ -254,14 +195,14 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public Branch Branch(Position pos, Branch.Kind kind, String label) {
+    public Branch Branch(Position pos, Branch.Kind kind, Id label) {
         Branch n = new Branch_c(pos, kind, label);
         n = (Branch)n.ext(extFactory.extBranch());
         n = (Branch)n.del(delFactory.delBranch());
         return n;
     }
 
-    public Call Call(Position pos, Receiver target, String name, List args) {
+    public Call Call(Position pos, Receiver target, Id name, List args) {
         Call n = new Call_c(pos, target, name, CollectionUtil.nonNullList(args));
         n = (Call)n.ext(extFactory.extCall());
         n = (Call)n.del(delFactory.delCall());
@@ -302,8 +243,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         n = (ClassBody)n.del(delFactory.delClassBody());
         return n;
     }
-
-    public ClassDecl ClassDecl(Position pos, Flags flags, String name, TypeNode superClass, List interfaces, ClassBody body) {
+    
+    public ClassDecl ClassDecl(Position pos, Flags flags, Id name, TypeNode superClass, List interfaces, ClassBody body) {
         ClassDecl n = new ClassDecl_c(pos, flags, name, superClass, CollectionUtil.nonNullList(interfaces), body);
         n = (ClassDecl)n.ext(extFactory.extClassDecl());
         n = (ClassDecl)n.del(delFactory.delClassDecl());
@@ -330,15 +271,15 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         n = (ConstructorCall)n.del(delFactory.delConstructorCall());
         return n;
     }
-
-    public ConstructorDecl ConstructorDecl(Position pos, Flags flags, String name, List formals, List throwTypes, Block body) {
+    
+    public ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name, List formals, List throwTypes, Block body) {
         ConstructorDecl n = new ConstructorDecl_c(pos, flags, name, CollectionUtil.nonNullList(formals), CollectionUtil.nonNullList(throwTypes), body);
         n = (ConstructorDecl)n.ext(extFactory.extConstructorDecl());
         n = (ConstructorDecl)n.del(delFactory.delConstructorDecl());
         return n;
     }
 
-    public FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, String name, Expr init) {
+    public FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, Id name, Expr init) {
         FieldDecl n = new FieldDecl_c(pos, flags, type, name, init);
         n = (FieldDecl)n.ext(extFactory.extFieldDecl());
         n = (FieldDecl)n.del(delFactory.delFieldDecl());
@@ -365,8 +306,8 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         n = (Eval)n.del(delFactory.delEval());
         return n;
     }
-
-    public Field Field(Position pos, Receiver target, String name) {
+    
+    public Field Field(Position pos, Receiver target, Id name) {
         Field n = new Field_c(pos, target, name);
         n = (Field)n.ext(extFactory.extField());
         n = (Field)n.del(delFactory.delField());
@@ -387,20 +328,20 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public Formal Formal(Position pos, Flags flags, TypeNode type, String name) {
+    public Formal Formal(Position pos, Flags flags, TypeNode type, Id name) {
         Formal n = new Formal_c(pos, flags, type, name);
         n = (Formal)n.ext(extFactory.extFormal());
         n = (Formal)n.del(delFactory.delFormal());
         return n;
     }
-
+    
     public If If(Position pos, Expr cond, Stmt consequent, Stmt alternative) {
         If n = new If_c(pos, cond, consequent, alternative);
         n = (If)n.ext(extFactory.extIf());
         n = (If)n.del(delFactory.delIf());
         return n;
     }
-
+    
     public Import Import(Position pos, Import.Kind kind, String name) {
         Import n = new Import_c(pos, kind, name);
         n = (Import)n.ext(extFactory.extImport());
@@ -429,14 +370,14 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         return n;
     }
 
-    public Labeled Labeled(Position pos, String label, Stmt body) {
+    public Labeled Labeled(Position pos, Id label, Stmt body) {
         Labeled n = new Labeled_c(pos, label, body);
         n = (Labeled)n.ext(extFactory.extLabeled());
         n = (Labeled)n.del(delFactory.delLabeled());
         return n;
     }
 
-    public Local Local(Position pos, String name) {
+    public Local Local(Position pos, Id name) {
         Local n = new Local_c(pos, name);
         n = (Local)n.ext(extFactory.extLocal());
         n = (Local)n.del(delFactory.delLocal());
@@ -449,15 +390,15 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         n = (LocalClassDecl)n.del(delFactory.delLocalClassDecl());
         return n;
     }
-
-    public LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, String name, Expr init) {
+    
+    public LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, Id name, Expr init) {
         LocalDecl n = new LocalDecl_c(pos, flags, type, name, init);
         n = (LocalDecl)n.ext(extFactory.extLocalDecl());
         n = (LocalDecl)n.del(delFactory.delLocalDecl());
         return n;
     }
 
-    public MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType, String name, List formals, List throwTypes, Block body) {
+    public MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType, Id name, List formals, List throwTypes, Block body) {
         MethodDecl n = new MethodDecl_c(pos, flags, returnType, name, CollectionUtil.nonNullList(formals), CollectionUtil.nonNullList(throwTypes), body);
         n = (MethodDecl)n.ext(extFactory.extMethodDecl());
         n = (MethodDecl)n.del(delFactory.delMethodDecl());

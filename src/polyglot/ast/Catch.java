@@ -8,7 +8,6 @@
 package polyglot.ast;
 
 import polyglot.types.Type;
-import polyglot.types.SemanticException;
 
 /**
  * A <code>Catch</code> represents one half of a <code>try-catch</code>

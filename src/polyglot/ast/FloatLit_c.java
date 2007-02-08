@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
@@ -23,6 +23,7 @@ public class FloatLit_c extends Lit_c implements FloatLit
 
     public FloatLit_c(Position pos, FloatLit.Kind kind, double value) {
 	super(pos);
+	assert(kind != null);
 	this.kind = kind;
 	this.value = value;
     }

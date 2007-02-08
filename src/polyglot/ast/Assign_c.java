@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
@@ -24,6 +24,7 @@ public abstract class Assign_c extends Expr_c implements Assign
 
   public Assign_c(Position pos, Expr left, Operator op, Expr right) {
     super(pos);
+    assert(left != null && op != null && right != null);
     this.left = left;
     this.op = op;
     this.right = right;

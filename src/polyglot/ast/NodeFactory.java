@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -27,29 +28,49 @@ public interface NodeFactory
      */
     Disamb disamb();
     
-        //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
     // Factory Methods
     //////////////////////////////////////////////////////////////////
 
+    Id Id(Position pos, String id);
+    
+    AmbExpr AmbExpr(Position pos, Id name);
+    /** @deprecated */
     AmbExpr AmbExpr(Position pos, String name);
     Expr ExprFromQualifiedName(Position pos, String qualifiedName);
     
     // type or expr
+    AmbReceiver AmbReceiver(Position pos, Id name);
+    AmbReceiver AmbReceiver(Position pos, Prefix prefix, Id name);
+    /** @deprecated */
     AmbReceiver AmbReceiver(Position pos, String name);
+    /** @deprecated */
     AmbReceiver AmbReceiver(Position pos, Prefix prefix, String name);
     Receiver ReceiverFromQualifiedName(Position pos, String qualifiedName);
     
     // package or type
+    AmbQualifierNode AmbQualifierNode(Position pos, Id name);
+    AmbQualifierNode AmbQualifierNode(Position pos, QualifierNode qual, Id name);
+    /** @deprecated */
     AmbQualifierNode AmbQualifierNode(Position pos, String name);
+    /** @deprecated */
     AmbQualifierNode AmbQualifierNode(Position pos, QualifierNode qual, String name);
     QualifierNode QualifierNodeFromQualifiedName(Position pos, String qualifiedName);
     
     // package or type or expr
+    AmbPrefix AmbPrefix(Position pos, Id name);
+    AmbPrefix AmbPrefix(Position pos, Prefix prefix, Id name);
+    /** @deprecated */
     AmbPrefix AmbPrefix(Position pos, String name);
+    /** @deprecated */
     AmbPrefix AmbPrefix(Position pos, Prefix prefix, String name);
     Prefix PrefixFromQualifiedName(Position pos, String qualifiedName);
     
+    AmbTypeNode AmbTypeNode(Position pos, Id name);
+    AmbTypeNode AmbTypeNode(Position pos, QualifierNode qualifier, Id name);
+    /** @deprecated */
     AmbTypeNode AmbTypeNode(Position pos, String name);
+    /** @deprecated */
     AmbTypeNode AmbTypeNode(Position pos, QualifierNode qualifier, String name);
     TypeNode TypeNodeFromQualifiedName(Position pos, String qualifiedName);
     
@@ -84,25 +105,58 @@ public interface NodeFactory
     BooleanLit BooleanLit(Position pos, boolean value);
 
     Branch Break(Position pos);
+    Branch Break(Position pos, Id label);
+    /** @deprecated */
     Branch Break(Position pos, String label);
 
     Branch Continue(Position pos);
+    Branch Continue(Position pos, Id label);
+    /** @deprecated */
     Branch Continue(Position pos, String label);
+
     Branch Branch(Position pos, Branch.Kind kind);
+    Branch Branch(Position pos, Branch.Kind kind, Id label);
+    /** @deprecated */
     Branch Branch(Position pos, Branch.Kind kind, String label);
 
+    Call Call(Position pos, Id name);
+    Call Call(Position pos, Id name, Expr a1);
+    Call Call(Position pos, Id name, Expr a1, Expr a2);
+    Call Call(Position pos, Id name, Expr a1, Expr a2, Expr a3);
+    Call Call(Position pos, Id name, Expr a1, Expr a2, Expr a3, Expr a4);
+    Call Call(Position pos, Id name, List args);
+    
+    Call Call(Position pos, Receiver target, Id name);
+    Call Call(Position pos, Receiver target, Id name, Expr a1);
+    Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2);
+    Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2, Expr a3);
+    Call Call(Position pos, Receiver target, Id name, Expr a1, Expr a2, Expr a3, Expr a4);
+    Call Call(Position pos, Receiver target, Id name, List args);
+
+    /** @deprecated */
     Call Call(Position pos, String name);
+    /** @deprecated */
     Call Call(Position pos, String name, Expr a1);
+    /** @deprecated */
     Call Call(Position pos, String name, Expr a1, Expr a2);
+    /** @deprecated */
     Call Call(Position pos, String name, Expr a1, Expr a2, Expr a3);
+    /** @deprecated */
     Call Call(Position pos, String name, Expr a1, Expr a2, Expr a3, Expr a4);
+    /** @deprecated */
     Call Call(Position pos, String name, List args);
 
+    /** @deprecated */
     Call Call(Position pos, Receiver target, String name);
+    /** @deprecated */
     Call Call(Position pos, Receiver target, String name, Expr a1);
+    /** @deprecated */
     Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2);
+    /** @deprecated */
     Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2, Expr a3);
+    /** @deprecated */
     Call Call(Position pos, Receiver target, String name, Expr a1, Expr a2, Expr a3, Expr a4);
+    /** @deprecated */
     Call Call(Position pos, Receiver target, String name, List args);
 
     Case Default(Position pos);
@@ -116,6 +170,9 @@ public interface NodeFactory
 
     ClassBody ClassBody(Position pos, List members);
 
+    ClassDecl ClassDecl(Position pos, Flags flags, Id name,
+            TypeNode superClass, List interfaces, ClassBody body);
+    /** @deprecated */
     ClassDecl ClassDecl(Position pos, Flags flags, String name,
 	                TypeNode superClass, List interfaces, ClassBody body);
 
@@ -131,11 +188,19 @@ public interface NodeFactory
     ConstructorCall ConstructorCall(Position pos, ConstructorCall.Kind kind,
 	                            Expr outer, List args);
 
+    ConstructorDecl ConstructorDecl(Position pos, Flags flags, Id name,
+            List formals, List throwTypes,
+            Block body);
+    /** @deprecated */
     ConstructorDecl ConstructorDecl(Position pos, Flags flags, String name,
-	                            List formals, List throwTypes,
-				    Block body);
+            List formals, List throwTypes,
+            Block body);
 
+    FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, Id name);
+    FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, Id name, Expr init);
+    /** @deprecated */
     FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, String name);
+    /** @deprecated */
     FieldDecl FieldDecl(Position pos, Flags flags, TypeNode type, String name, Expr init);
 
     Do Do(Position pos, Stmt body, Expr cond);
@@ -144,13 +209,19 @@ public interface NodeFactory
 
     Eval Eval(Position pos, Expr expr);
 
+    Field Field(Position pos, Id name);
+    Field Field(Position pos, Receiver target, Id name);
+    /** @deprecated */
     Field Field(Position pos, String name);
+    /** @deprecated */
     Field Field(Position pos, Receiver target, String name);
 
     FloatLit FloatLit(Position pos, FloatLit.Kind kind, double value);
 
     For For(Position pos, List inits, Expr cond, List iters, Stmt body);
 
+    Formal Formal(Position pos, Flags flags, TypeNode type, Id name);
+    /** @deprecated */
     Formal Formal(Position pos, Flags flags, TypeNode type, String name);
 
     If If(Position pos, Expr cond, Stmt consequent);
@@ -164,15 +235,26 @@ public interface NodeFactory
 
     IntLit IntLit(Position pos, IntLit.Kind kind, long value);
 
+    Labeled Labeled(Position pos, Id label, Stmt body);
+    /** @deprecated */
     Labeled Labeled(Position pos, String label, Stmt body);
 
+    Local Local(Position pos, Id name);
+    /** @deprecated */
     Local Local(Position pos, String name);
 
     LocalClassDecl LocalClassDecl(Position pos, ClassDecl decl);
 
+    LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, Id name);
+    LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, Id name, Expr init);
+    /** @deprecated */
     LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, String name);
+    /** @deprecated */
     LocalDecl LocalDecl(Position pos, Flags flags, TypeNode type, String name, Expr init);
 
+    MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType, Id name,
+            List formals, List throwTypes, Block body);
+    /** @deprecated */
     MethodDecl MethodDecl(Position pos, Flags flags, TypeNode returnType, String name,
 	                  List formals, List throwTypes, Block body);
 
@@ -223,5 +305,4 @@ public interface NodeFactory
     Unary Unary(Position pos, Expr expr, Unary.Operator op);
 
     While While(Position pos, Expr cond, Stmt body);
-    
 }

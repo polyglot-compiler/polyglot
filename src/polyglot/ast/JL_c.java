@@ -7,12 +7,10 @@
 
 package polyglot.ast;
 
-import java.util.Collections;
 import java.util.List;
 import java.io.OutputStream;
 import java.io.Writer;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;

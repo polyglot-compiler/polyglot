@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -10,7 +11,6 @@ package polyglot.ast;
 import java.util.Collections;
 import java.util.List;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -24,12 +24,13 @@ import polyglot.visit.*;
 public class Field_c extends Expr_c implements Field
 {
   protected Receiver target;
-  protected String name;
+  protected Id name;
   protected FieldInstance fi;
   protected boolean targetImplicit;
   
-  public Field_c(Position pos, Receiver target, String name) {
+  public Field_c(Position pos, Receiver target, Id name) {
     super(pos);
+    assert(target != null && name != null);
     this.target = target;
     this.name = name;
     this.targetImplicit = false;
@@ -58,17 +59,27 @@ public class Field_c extends Expr_c implements Field
     n.target = target;
     return n;
   }
+  
+  /** Get the name of the field. */
+  public Id id() {
+      return this.name;
+  }
+  
+  /** Set the name of the field. */
+  public Field id(Id name) {
+      Field_c n = (Field_c) copy();
+      n.name = name;
+      return n;
+  }
 
   /** Get the name of the field. */
   public String name() {
-    return this.name;
+    return this.name.id();
   }
 
   /** Set the name of the field. */
   public Field name(String name) {
-    Field_c n = (Field_c) copy();
-    n.name = name;
-    return n;
+      return id(this.name.id(name));
   }
 
   /** Return the access flags of the variable. */
@@ -105,10 +116,11 @@ public class Field_c extends Expr_c implements Field
   }
 
   /** Reconstruct the field. */
-  protected Field_c reconstruct(Receiver target) {
-    if (target != this.target) {
+  protected Field_c reconstruct(Receiver target, Id name) {
+    if (target != this.target || name != this.name) {
       Field_c n = (Field_c) copy();
       n.target = target;
+      n.name = name;
       return n;
     }
 
@@ -118,7 +130,8 @@ public class Field_c extends Expr_c implements Field
   /** Visit the children of the field. */
   public Node visitChildren(NodeVisitor v) {
     Receiver target = (Receiver) visitChild(this.target, v);
-    return reconstruct(target);
+    Id name = (Id) visitChild(this.name, v);
+    return reconstruct(target, name);
   }
 
   public Node buildTypes(TypeBuilder tb) throws SemanticException {
@@ -127,7 +140,7 @@ public class Field_c extends Expr_c implements Field
       TypeSystem ts = tb.typeSystem();
 
       FieldInstance fi = ts.fieldInstance(position(), ts.Object(), Flags.NONE,
-                                          ts.unknownType(position()), name);
+                                          ts.unknownType(position()), name.id());
       return n.fieldInstance(fi);
   }
 
@@ -137,7 +150,7 @@ public class Field_c extends Expr_c implements Field
       TypeSystem ts = tc.typeSystem();
       
       if (target.type().isReference()) {
-	  FieldInstance fi = ts.findField(target.type().toReference(), name, c.currentClass());
+	  FieldInstance fi = ts.findField(target.type().toReference(), name.id(), c.currentClass());
 	  
 	  if (fi == null) {
 	      throw new InternalCompilerError("Cannot access field on node of type " +
@@ -150,7 +163,7 @@ public class Field_c extends Expr_c implements Field
 	  return f; 
       }
 
-      throw new SemanticException("Cannot access field \"" + name +
+      throw new SemanticException("Cannot access field \"" + name.id() +
                                   "\" " + (target instanceof Expr
                                           ? "on an expression "
                                                   : "") +
@@ -189,7 +202,7 @@ public class Field_c extends Expr_c implements Field
         w.write(".");
 	w.allowBreak(2, 3, "", 0);
     }
-    w.write(name);
+    tr.print(this, name, w);
     w.end();
   }
 
@@ -272,7 +285,7 @@ public class Field_c extends Expr_c implements Field
    */
   protected void checkConsistency(Context c) {
       if (targetImplicit) {
-          VarInstance vi = c.findVariableSilent(name);
+          VarInstance vi = c.findVariableSilent(name.id());
           if (vi instanceof FieldInstance) {
               FieldInstance rfi = (FieldInstance) vi;
               // Compare the original (declaration) fis, not the actuals.
@@ -288,7 +301,7 @@ public class Field_c extends Expr_c implements Field
               System.out.println("(actual) fi is " + fi.orig());
           }
           throw new InternalCompilerError("Field " + this + " has an " +
-               "implicit target, but the name " + name + " resolves to " +
+               "implicit target, but the name " + name.id() + " resolves to " +
                vi + " instead of " + target, position());
       }      
   }

@@ -15,6 +15,12 @@ import polyglot.types.LocalInstance;
 public interface Local extends NamedVariable
 {
     /** Get the name of the local variable. */
+    Id id();
+    
+    /** Set the name of the local variable. */
+    Local id(Id name);
+
+    /** Get the name of the local variable. */
     String name();
 
     /** Set the name of the local variable. */

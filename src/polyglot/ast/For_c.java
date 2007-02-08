@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
@@ -27,6 +27,7 @@ public class For_c extends Loop_c implements For
 
     public For_c(Position pos, List inits, Expr cond, List iters, Stmt body) {
 	super(pos);
+	assert(inits != null && iters != null && body != null); // cond may be null, inits and iters may be empty
 	this.inits = TypedList.copyAndCheck(inits, ForInit.class, true);
 	this.cond = cond;
 	this.iters = TypedList.copyAndCheck(iters, ForUpdate.class, true);

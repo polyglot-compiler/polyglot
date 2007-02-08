@@ -7,10 +7,8 @@
 
 package polyglot.ast;
 
-import polyglot.types.Type;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
-import polyglot.types.SemanticException;
 
 /**
  * A <code>Formal</code> represents a formal parameter to a method
@@ -19,17 +17,33 @@ import polyglot.types.SemanticException;
  */
 public interface Formal extends VarDecl
 {
-    /** Set the declaration's flags. */
-    Formal flags(Flags flags);
+    /** Get the flags of the formal. */
+    public Flags flags();
 
-    /** Set the declaration's type. */
-    Formal type(TypeNode type);
+    /** Set the flags of the formal. */
+    public Formal flags(Flags flags);
+    
+    /** Get the type node of the formal. */
+    public TypeNode type();
 
-    /** Set the declaration's name. */
-    Formal name(String name);
+    /** Set the type node of the formal. */
+    public Formal type(TypeNode type);
+    
+    /** Get the name of the formal. */
+    public Id id();
+    
+    /** Set the name of the formal. */
+    public Formal id(Id name);
 
-    /**
-     * Set the type object for the local we are declaring.
-     */
-    Formal localInstance(LocalInstance li);
+    /** Get the name of the formal. */
+    public String name();
+    
+    /** Set the name of the formal. */
+    public Formal name(String name);
+
+    /** Get the local instance of the formal. */
+    public LocalInstance localInstance();
+
+    /** Set the local instance of the formal. */
+    public Formal localInstance(LocalInstance li);
 }

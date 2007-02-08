@@ -7,9 +7,6 @@
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.types.*;
-import polyglot.visit.*;
 import polyglot.util.*;
 
 /**

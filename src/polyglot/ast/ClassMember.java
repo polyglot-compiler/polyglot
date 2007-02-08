@@ -7,7 +7,6 @@
 
 package polyglot.ast;
 
-import polyglot.types.Context;
 import polyglot.types.MemberInstance;
 
 /**

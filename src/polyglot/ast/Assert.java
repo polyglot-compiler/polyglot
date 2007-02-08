@@ -7,8 +7,6 @@
 
 package polyglot.ast;
 
-import java.util.List;
-
 /**
  * An immutable representation of a <code>assert</code> statement.
  */

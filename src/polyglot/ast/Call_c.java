@@ -1,8 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
- * Copyright (c) 2006 IBM Corporation
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -10,7 +10,6 @@ package polyglot.ast;
 
 import java.util.*;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -24,14 +23,15 @@ import polyglot.visit.*;
 public class Call_c extends Expr_c implements Call
 {
   protected Receiver target;
-  protected String name;
+  protected Id name;
   protected List arguments;
   protected MethodInstance mi;
   protected boolean targetImplicit;
 
-  public Call_c(Position pos, Receiver target, String name,
+  public Call_c(Position pos, Receiver target, Id name,
                 List arguments) {
     super(pos);
+    assert(name != null && arguments != null); // target may be null
     this.target = target;
     this.name = name;
     this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
@@ -54,17 +54,27 @@ public class Call_c extends Expr_c implements Call
     n.target = target;
     return n;
   }
+  
+  /** Get the name of the call. */
+  public Id id() {
+      return this.name;
+  }
+  
+  /** Set the name of the call. */
+  public Call id(Id name) {
+      Call_c n = (Call_c) copy();
+      n.name = name;
+      return n;
+  }
 
   /** Get the name of the call. */
   public String name() {
-    return this.name;
+    return this.name.id();
   }
 
   /** Set the name of the call. */
   public Call name(String name) {
-    Call_c n = (Call_c) copy();
-    n.name = name;
-    return n;
+      return id(this.name.id(name));
   }
 
   public ProcedureInstance procedureInstance() {
@@ -111,11 +121,12 @@ public class Call_c extends Expr_c implements Call
   }
 
   /** Reconstruct the call. */
-  protected Call_c reconstruct(Receiver target, List arguments) {
-    if (target != this.target || ! CollectionUtil.equals(arguments,
+  protected Call_c reconstruct(Receiver target, Id name, List arguments) {
+    if (target != this.target || name != this.name || ! CollectionUtil.equals(arguments,
                                                          this.arguments)) {
       Call_c n = (Call_c) copy();
       n.target = target;
+      n.name = name;
       n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
       return n;
     }
@@ -125,9 +136,10 @@ public class Call_c extends Expr_c implements Call
 
   /** Visit the children of the call. */
   public Node visitChildren(NodeVisitor v) {
-    Receiver target = (Receiver) visitChild(this.target, v);
-    List arguments = visitList(this.arguments, v);
-    return reconstruct(target, arguments);
+      Receiver target = (Receiver) visitChild(this.target, v);
+      Id name = (Id) visitChild(this.name, v);
+      List arguments = visitList(this.arguments, v);
+      return reconstruct(target, name, arguments);
   }
 
   public Node buildTypes(TypeBuilder tb) throws SemanticException {
@@ -143,7 +155,7 @@ public class Call_c extends Expr_c implements Call
     MethodInstance mi = ts.methodInstance(position(), ts.Object(),
                                           Flags.NONE,
                                           ts.unknownType(position()),
-                                          name, l,
+                                          name.id(), l,
                                           Collections.EMPTY_LIST);
     return n.methodInstance(mi);
   }
@@ -163,7 +175,7 @@ public class Call_c extends Expr_c implements Call
         // let's find the target, using the context, and
         // set the target appropriately, and then type check
         // the result
-        MethodInstance mi =  c.findMethod(this.name, argTypes);
+        MethodInstance mi =  c.findMethod(this.name.id(), argTypes);
         
         Receiver r;
         if (mi.flags().isStatic()) {
@@ -175,7 +187,7 @@ public class Call_c extends Expr_c implements Call
             // enclosing class which brought the method into scope.  This is
             // different from mi.container().  mi.container() returns a super type
             // of the class we want.
-            ClassType scope = c.findMethodScope(name);
+            ClassType scope = c.findMethodScope(name.id());
 
             if (! ts.equals(scope, c.currentClass())) {
                 r = nf.This(position().startOf(),
@@ -225,7 +237,7 @@ public class Call_c extends Expr_c implements Call
         
         ReferenceType targetType = this.findTargetType();
         MethodInstance mi = ts.findMethod(targetType, 
-                                          this.name, 
+                                          this.name.id(), 
                                           argTypes, 
                                           c.currentClass());
         
@@ -235,7 +247,7 @@ public class Call_c extends Expr_c implements Call
         boolean staticContext = (this.target instanceof TypeNode);
 
         if (staticContext && !mi.flags().isStatic()) {
-            throw new SemanticException("Cannot call non-static method " + this.name
+            throw new SemanticException("Cannot call non-static method " + this.name.id()
                                   + " of " + target.type() + " in static "
                                   + "context.", this.position());
         }
@@ -436,7 +448,7 @@ public class Call_c extends Expr_c implements Call
           
           // as exception will be thrown if no appropriate method
           // exists. 
-          MethodInstance ctxtMI = c.findMethod(name, mi.formalTypes());
+          MethodInstance ctxtMI = c.findMethod(name.id(), mi.formalTypes());
           
           // cannot perform this check due to the context's findMethod returning a 
           // different method instance than the typeSystem in some situations

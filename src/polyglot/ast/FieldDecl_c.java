@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -10,7 +11,6 @@ package polyglot.ast;
 import java.util.Iterator;
 import java.util.List;
 
-import polyglot.ast.*;
 import polyglot.frontend.*;
 import polyglot.frontend.goals.Goal;
 import polyglot.types.*;
@@ -24,15 +24,16 @@ import polyglot.visit.*;
 public class FieldDecl_c extends Term_c implements FieldDecl {
     protected Flags flags;
     protected TypeNode type;
-    protected String name;
+    protected Id name;
     protected Expr init;
     protected FieldInstance fi;
     protected InitializerInstance ii;
 
     public FieldDecl_c(Position pos, Flags flags, TypeNode type,
-                       String name, Expr init)
+                       Id name, Expr init)
     {
         super(pos);
+        assert(flags != null && type != null && name != null); // init may be null
         this.flags = flags;
         this.type = type;
         this.name = name;
@@ -93,17 +94,27 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         n.type = type;
         return n;
     }
+    
+    /** Get the name of the declaration. */
+    public Id id() {
+        return name;
+    }
+    
+    /** Set the name of the declaration. */
+    public FieldDecl id(Id name) {
+        FieldDecl_c n = (FieldDecl_c) copy();
+        n.name = name;
+        return n;
+    }
 
     /** Get the name of the declaration. */
     public String name() {
-        return name;
+        return name.id();
     }
 
     /** Set the name of the declaration. */
     public FieldDecl name(String name) {
-        FieldDecl_c n = (FieldDecl_c) copy();
-        n.name = name;
-        return n;
+        return id(this.name.id(name));
     }
 
     /** Get the initializer of the declaration. */
@@ -132,10 +143,11 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     }
 
     /** Reconstruct the declaration. */
-    protected FieldDecl_c reconstruct(TypeNode type, Expr init) {
-        if (this.type != type || this.init != init) {
+    protected FieldDecl_c reconstruct(TypeNode type, Id name, Expr init) {
+        if (this.type != type || this.name != name || this.init != init) {
             FieldDecl_c n = (FieldDecl_c) copy();
             n.type = type;
+            n.name = name;
             n.init = init;
             return n;
         }
@@ -146,8 +158,9 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     /** Visit the children of the declaration. */
     public Node visitChildren(NodeVisitor v) {
         TypeNode type = (TypeNode) visitChild(this.type, v);
+        Id name = (Id) visitChild(this.name, v);
         Expr init = (Expr) visitChild(this.init, v);
-        return reconstruct(type, init);
+        return reconstruct(type, name, init);
     }
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
@@ -183,7 +196,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
 
         // XXX: MutableFieldInstance
         FieldInstance fi = ts.fieldInstance(position(), ct, f,
-                                            ts.unknownType(position()), name);
+                                            ts.unknownType(position()), name.id());
         ct.addField(fi);
 
         return n.flags(f).fieldInstance(fi);
@@ -381,7 +394,7 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         w.write(f.translate());
         print(type, w, tr);
 	w.allowBreak(2, 2, " ", 1);
-        w.write(name);
+        tr.print(this, name, w);
 
         if (init != null) {
             w.write(" =");

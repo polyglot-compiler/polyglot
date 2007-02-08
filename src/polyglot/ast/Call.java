@@ -27,6 +27,16 @@ public interface Call extends Expr, ProcedureCall
      * Set the call's target.
      */
     Call target(Receiver target);
+    
+    /**
+     * The name of the method to call.
+     */
+    Id id();
+    
+    /**
+     * Set the name of the method to call.
+     */
+    Call id(Id name);
 
     /**
      * The name of the method to call.

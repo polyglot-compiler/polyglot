@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.ast.Assert;
 import polyglot.types.*;
 import polyglot.visit.*;
@@ -25,6 +25,7 @@ public class Assert_c extends Stmt_c implements Assert
 
     public Assert_c(Position pos, Expr cond, Expr errorMessage) {
 	super(pos);
+	assert(cond != null); // errorMessage may be null
 	this.cond = cond;
 	this.errorMessage = errorMessage;
     }

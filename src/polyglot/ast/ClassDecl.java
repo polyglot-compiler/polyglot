@@ -40,6 +40,16 @@ public interface ClassDecl extends Term, TopLevelDecl, ClassMember
     /**
      * The class declaration's name.
      */
+    Id id();
+    
+    /**
+     * Set the class declaration's name.
+     */
+    ClassDecl id(Id name);
+    
+    /**
+     * The class declaration's name.
+     */
     String name();
 
     /**

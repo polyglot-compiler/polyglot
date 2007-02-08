@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -10,7 +11,6 @@ package polyglot.ast;
 import java.util.Collections;
 import java.util.List;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
@@ -28,6 +28,7 @@ public class Cast_c extends Expr_c implements Cast
 
     public Cast_c(Position pos, TypeNode castType, Expr expr) {
 	super(pos);
+	assert(castType != null && expr != null);
 	this.castType = castType;
 	this.expr = expr;
     }

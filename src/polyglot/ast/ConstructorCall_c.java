@@ -1,14 +1,14 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
 import java.util.*;
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -26,6 +26,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
     public ConstructorCall_c(Position pos, Kind kind, Expr qualifier, List arguments) {
 	super(pos);
+	assert(kind != null && arguments != null); // qualifier may be null
 	this.kind = kind;
 	this.qualifier = qualifier;
 	this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);

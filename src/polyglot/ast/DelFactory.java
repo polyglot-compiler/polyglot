@@ -7,13 +7,6 @@
 
 package polyglot.ast;
 
-import polyglot.types.Flags;
-import polyglot.types.Type;
-import polyglot.types.Type;
-import polyglot.types.Package;
-import polyglot.util.Position;
-import java.util.List;
-
 /**
  * A <code>DelFactory</code> constructs delegates. It is only used by
  * a <code>NodeFactory</code>, during the creation of AST nodes.
@@ -24,6 +17,8 @@ public interface DelFactory
     //////////////////////////////////////////////////////////////////
     // Factory Methods
     //////////////////////////////////////////////////////////////////
+    
+    JL delId();
     
     JL delAmbAssign();
 

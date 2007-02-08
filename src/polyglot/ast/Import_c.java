@@ -1,13 +1,12 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
-
-import polyglot.ast.*;
 
 import polyglot.types.*;
 import polyglot.util.*;
@@ -27,6 +26,7 @@ public class Import_c extends Node_c implements Import
 
     public Import_c(Position pos, Kind kind, String name) {
 	super(pos);
+	assert(kind != null && name != null);
 	this.name = name;
 	this.kind = kind;
     }

@@ -1,8 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
- * Copyright (c) 2006 IBM Corporation
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -26,7 +26,7 @@ import polyglot.visit.*;
 public class ClassDecl_c extends Term_c implements ClassDecl
 {
     protected Flags flags;
-    protected String name;
+    protected Id name;
     protected TypeNode superClass;
     protected List interfaces;
     protected ClassBody body;
@@ -34,9 +34,10 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 
     protected ParsedClassType type;
 
-    public ClassDecl_c(Position pos, Flags flags, String name,
+    public ClassDecl_c(Position pos, Flags flags, Id name,
                        TypeNode superClass, List interfaces, ClassBody body) {
 	    super(pos);
+	    assert(flags != null && name != null && interfaces != null && body != null); // superClass may be null, interfaces may be empty
 	    this.flags = flags;
 	    this.name = name;
 	    this.superClass = superClass;
@@ -73,15 +74,23 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 	    n.flags = flags;
 	    return n;
     }
+    
+    public Id id() {
+        return this.name;
+    }
+    
+    public ClassDecl id(Id name) {
+        ClassDecl_c n = (ClassDecl_c) copy();
+        n.name = name;
+        return n;
+    }
 
     public String name() {
-	    return this.name;
+	    return this.name.id();
     }
 
     public ClassDecl name(String name) {
-	    ClassDecl_c n = (ClassDecl_c) copy();
-	    n.name = name;
-	    return n;
+        return id(this.name.id(name));
     }
 
     public TypeNode superClass() {
@@ -114,9 +123,10 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 	    return n;
     }
 
-    protected ClassDecl_c reconstruct(TypeNode superClass, List interfaces, ClassBody body) {
-	    if (superClass != this.superClass || ! CollectionUtil.equals(interfaces, this.interfaces) || body != this.body) {
+    protected ClassDecl_c reconstruct(Id name, TypeNode superClass, List interfaces, ClassBody body) {
+	    if (name != this.name || superClass != this.superClass || ! CollectionUtil.equals(interfaces, this.interfaces) || body != this.body) {
 		    ClassDecl_c n = (ClassDecl_c) copy();
+		    n.name = name;
 		    n.superClass = superClass;
 		    n.interfaces = TypedList.copyAndCheck(interfaces, TypeNode.class, true);
 		    n.body = body;
@@ -143,14 +153,15 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     }
 
     public Node visitChildren(NodeVisitor v) {
-	    TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
-	    List interfaces = visitList(this.interfaces, v);
-	    ClassBody body = (ClassBody) visitChild(this.body, v);
-	    return reconstruct(superClass, interfaces, body);
+        Id name = (Id) visitChild(this.name, v);
+        TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
+        List interfaces = visitList(this.interfaces, v);
+        ClassBody body = (ClassBody) visitChild(this.body, v);
+        return reconstruct(name, superClass, interfaces, body);
     }
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
-	tb = tb.pushClass(position(), flags, name);
+	tb = tb.pushClass(position(), flags, name.id());
         
         ParsedClassType type = tb.currentClass();
 
@@ -386,7 +397,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
                 if (!container.isAnonymous()) {
                     String name = ((Named) container).name();
     
-                    if (name.equals(this.name)) {
+                    if (name.equals(this.name.id())) {
                         throw new SemanticException("Cannot declare member " +
                                                     "class \"" + this.type +
                                                     "\" inside class with the " +
@@ -406,10 +417,10 @@ public class ClassDecl_c extends Term_c implements ClassDecl
                 // method, constructor or initializer, and within its scope                
                 Context ctxt = tc.context();
 
-                if (ctxt.isLocal(this.name)) {
+                if (ctxt.isLocal(this.name.id())) {
                     // something with the same name was declared locally.
                     // (but not in an enclosing class)                                    
-                    Named nm = ctxt.find(this.name);
+                    Named nm = ctxt.find(this.name.id());
                     if (nm instanceof Type) {
                         Type another = (Type)nm;
                         if (another.isClass() && another.toClass().isLocal()) {
@@ -516,7 +527,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
             w.write("class ");
         }
 
-        w.write(name);
+        tr.print(this, name, w);
 
         if (superClass() != null) {
 	    w.allowBreak(0);

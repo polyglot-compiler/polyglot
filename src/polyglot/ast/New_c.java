@@ -36,6 +36,7 @@ public class New_c extends Expr_c implements New
 
     public New_c(Position pos, Expr qualifier, TypeNode tn, List arguments, ClassBody body) {
 	super(pos);
+        assert(tn != null && arguments != null); // qualifier and body may be null
         this.qualifier = qualifier;
         this.tn = tn;
 	this.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);

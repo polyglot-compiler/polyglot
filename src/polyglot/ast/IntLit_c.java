@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
@@ -23,6 +23,7 @@ public class IntLit_c extends NumLit_c implements IntLit
 
     public IntLit_c(Position pos, Kind kind, long value) {
 	super(pos, value);
+	assert(kind != null);
         this.kind = kind;
     }
 
@@ -82,6 +83,9 @@ public class IntLit_c extends NumLit_c implements IntLit
                 // the literal is negative, but print it as positive.
                 return "9223372036854775808L";
             }
+            else if (value < 0) {
+                return "0x" + Long.toHexString(value) + "L";
+            }
             else {
                 return Long.toString(value) + "L";
             }
@@ -91,8 +95,11 @@ public class IntLit_c extends NumLit_c implements IntLit
                 // the literal is negative, but print it as positive.
                 return "2147483648";
             }
+            else if ((int) value < 0) {
+                return "0x" + Integer.toHexString((int) value);
+            }
             else {
-                return Long.toString(value);
+                return Integer.toString((int) value);
             }
 	}
     }
@@ -102,7 +109,7 @@ public class IntLit_c extends NumLit_c implements IntLit
             return Long.toString(value) + "L";
 	}
 	else {
-            return Long.toString(value);
+            return Long.toString((int) value);
 	}
     }
 

@@ -11,7 +11,6 @@ import polyglot.types.Type;
 import polyglot.types.Flags;
 import polyglot.types.FieldInstance;
 import polyglot.types.InitializerInstance;
-import polyglot.types.SemanticException;
 
 /**
  * A <code>FieldDecl</code> is an immutable representation of the declaration
@@ -32,6 +31,11 @@ public interface FieldDecl extends ClassMember, VarInit
     TypeNode type();
     /** Set the declaration's type. */
     FieldDecl type(TypeNode type);
+    
+    /** Get the declaration's name. */
+    Id id();
+    /** Set the declaration's name. */
+    FieldDecl id(Id name);
 
     /** Get the declaration's name. */
     String name();

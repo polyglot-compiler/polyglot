@@ -14,6 +14,11 @@ package polyglot.ast;
 public interface Labeled extends CompoundStmt 
 {
     /** The label. */
+    Id labelNode();
+    /** Set the label. */
+    Labeled labelNode(Id label);
+    
+    /** The label. */
     String label();
     /** Set the label. */
     Labeled label(String label);

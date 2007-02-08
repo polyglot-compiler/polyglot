@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.visit.*;
 import polyglot.types.*;
 import polyglot.util.*;
@@ -25,6 +25,7 @@ public class Conditional_c extends Expr_c implements Conditional
 
     public Conditional_c(Position pos, Expr cond, Expr consequent, Expr alternative) {
 	super(pos);
+	assert(cond != null && consequent != null && alternative != null);
 	this.cond = cond;
 	this.consequent = consequent;
 	this.alternative = alternative;

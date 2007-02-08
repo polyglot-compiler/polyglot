@@ -1,8 +1,9 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
- * 
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
+ *
  */
 
 package polyglot.ast;
@@ -10,7 +11,6 @@ package polyglot.ast;
 import java.util.Iterator;
 import java.util.List;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.CodeWriter;
 import polyglot.util.Position;
@@ -32,6 +32,7 @@ public class Initializer_c extends Term_c implements Initializer
 
     public Initializer_c(Position pos, Flags flags, Block body) {
 	super(pos);
+	assert(flags != null && body != null);
 	this.flags = flags;
 	this.body = body;
     }

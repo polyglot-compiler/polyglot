@@ -7,13 +7,6 @@
 
 package polyglot.ast;
 
-import polyglot.types.Flags;
-import polyglot.types.Type;
-import polyglot.types.Type;
-import polyglot.types.Package;
-import polyglot.util.Position;
-import java.util.List;
-
 /**
  * An <code>ExtFactory</code> constructs extensions. It is only used by
  * a <code>NodeFactory</code>, during the creation of AST nodes. ExtFactories
@@ -31,6 +24,8 @@ public interface ExtFactory
     //////////////////////////////////////////////////////////////////
     // Factory Methods
     //////////////////////////////////////////////////////////////////
+    
+    Ext extId();
     
     Ext extAmbAssign();
 

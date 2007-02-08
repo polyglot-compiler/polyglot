@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -20,6 +21,7 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
 {
   public CanonicalTypeNode_c(Position pos, Type type) {
     super(pos);
+    assert(type != null);
     this.type = type;
   }
   

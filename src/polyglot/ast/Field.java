@@ -48,6 +48,11 @@ public interface Field extends NamedVariable
     Field targetImplicit(boolean implicit);
     
     /** Get the field's name. */
+    Id id();
+    /** Set the field's name. */
+    Field id(Id name);
+    
+    /** Get the field's name. */
     String name();
     /** Set the field's name. */
     Field name(String name);

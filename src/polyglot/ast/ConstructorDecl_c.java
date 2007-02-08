@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -20,14 +21,15 @@ import polyglot.visit.*;
 public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 {
     protected Flags flags;
-    protected String name;
+    protected Id name;
     protected List formals;
     protected List throwTypes;
     protected Block body;
     protected ConstructorInstance ci;
 
-    public ConstructorDecl_c(Position pos, Flags flags, String name, List formals, List throwTypes, Block body) {
+    public ConstructorDecl_c(Position pos, Flags flags, Id name, List formals, List throwTypes, Block body) {
 	super(pos);
+	assert(flags != null && name != null && formals != null && throwTypes != null); // body may be null
 	this.flags = flags;
 	this.name = name;
 	this.formals = TypedList.copyAndCheck(formals, Formal.class, true);
@@ -55,17 +57,27 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	n.flags = flags;
 	return n;
     }
+    
+    /** Get the name of the constructor. */
+    public Id id() {
+        return this.name;
+    }
+    
+    /** Set the name of the constructor. */
+    public ConstructorDecl id(Id name) {
+        ConstructorDecl_c n = (ConstructorDecl_c) copy();
+        n.name = name;
+        return n;
+    }
 
     /** Get the name of the constructor. */
     public String name() {
-	return this.name;
+	return this.name.id();
     }
 
     /** Set the name of the constructor. */
     public ConstructorDecl name(String name) {
-	ConstructorDecl_c n = (ConstructorDecl_c) copy();
-	n.name = name;
-	return n;
+        return id(this.name.id(name));
     }
 
     /** Get the formals of the constructor. */
@@ -128,9 +140,10 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
     }
 
     /** Reconstruct the constructor. */
-    protected ConstructorDecl_c reconstruct(List formals, List throwTypes, Block body) {
-	if (! CollectionUtil.equals(formals, this.formals) || ! CollectionUtil.equals(throwTypes, this.throwTypes) || body != this.body) {
+    protected ConstructorDecl_c reconstruct(Id name, List formals, List throwTypes, Block body) {
+	if (name != this.name || ! CollectionUtil.equals(formals, this.formals) || ! CollectionUtil.equals(throwTypes, this.throwTypes) || body != this.body) {
 	    ConstructorDecl_c n = (ConstructorDecl_c) copy();
+	    n.name = name;
 	    n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
 	    n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
 	    n.body = body;
@@ -142,10 +155,11 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 
     /** Visit the children of the constructor. */
     public Node visitChildren(NodeVisitor v) {
+        Id name = (Id) visitChild(this.name, v);
 	List formals = visitList(this.formals, v);
 	List throwTypes = visitList(this.throwTypes, v);
 	Block body = (Block) visitChild(this.body, v);
-	return reconstruct(formals, throwTypes, body);
+	return reconstruct(name, formals, throwTypes, body);
     }
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
@@ -235,7 +249,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 
         String ctName = ct.name();
 
-        if (! ctName.equals(name)) {
+        if (! ctName.equals(name.id())) {
 	    throw new SemanticException("Constructor name \"" + name +
                 "\" does not match name of containing class \"" +
                 ctName + "\".", position());
@@ -284,7 +298,7 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	w.begin(0);
 	w.write(flags().translate());
 
-	w.write(name);
+        tr.print(this, name, w);
 	w.write("(");
 
 	w.begin(0);

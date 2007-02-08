@@ -1,16 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
-import polyglot.frontend.*;
-import polyglot.frontend.CyclicDependencyException;
-import polyglot.frontend.Scheduler;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
@@ -21,24 +18,32 @@ import polyglot.util.*;
  */
 public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
   protected QualifierNode qual;
-  protected String name;
+  protected Id name;
 
   public AmbTypeNode_c(Position pos, QualifierNode qual,
-                       String name) {
+                       Id name) {
     super(pos);
-
+assert(name != null); // qual may be null
     this.qual = qual;
     this.name = name;
   }
 
+  public Id id() {
+      return this.name;
+  }
+  
+  public AmbTypeNode id(Id name) {
+      AmbTypeNode_c n = (AmbTypeNode_c) copy();
+      n.name = name;
+      return n;
+  }
+  
   public String name() {
-    return this.name;
+    return this.name.id();
   }
 
   public AmbTypeNode name(String name) {
-    AmbTypeNode_c n = (AmbTypeNode_c) copy();
-    n.name = name;
-    return n;
+      return id(this.name.id(name));
   }
 
   public QualifierNode qual() {
@@ -51,10 +56,11 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
     return n;
   }
 
-  protected AmbTypeNode_c reconstruct(QualifierNode qual) {
-    if (qual != this.qual) {
+  protected AmbTypeNode_c reconstruct(QualifierNode qual, Id name) {
+    if (qual != this.qual || name != this.name) {
       AmbTypeNode_c n = (AmbTypeNode_c) copy();
       n.qual = qual;
+      n.name = name;
       return n;
     }
 
@@ -66,8 +72,9 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
   }
 
   public Node visitChildren(NodeVisitor v) {
-    QualifierNode qual = (QualifierNode) visitChild(this.qual, v);
-    return reconstruct(qual);
+      QualifierNode qual = (QualifierNode) visitChild(this.qual, v);
+      Id name = (Id) visitChild(this.name, v);
+      return reconstruct(qual, name);
   }
 
   public Node disambiguate(AmbiguityRemover sc) throws SemanticException {
@@ -83,7 +90,7 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
       }
       
       throw new SemanticException("Could not find type \"" +
-                                  (qual == null ? name : qual.toString() + "." + name) +
+                                  (qual == null ? name.toString() : qual.toString() + "." + name.toString()) +
                                   "\".", position());
   }
 
@@ -105,21 +112,12 @@ public class AmbTypeNode_c extends TypeNode_c implements AmbTypeNode {
 	w.allowBreak(2, 3, "", 0);
     }
             
-    w.write(name);
+    tr.print(this, name, w);
   }
 
   public String toString() {
     return (qual == null
-            ? name
-            : qual.toString() + "." + name) + "{amb}";
-  }
-
-  public void dump(CodeWriter w) {
-    super.dump(w);
-
-    w.allowBreak(4, " ");
-    w.begin(0);
-    w.write("(name \"" + name + "\")");
-    w.end();
+            ? name.toString()
+            : qual.toString() + "." + name.toString()) + "{amb}";
   }
 }

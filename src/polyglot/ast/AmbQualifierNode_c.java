@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
@@ -20,10 +20,11 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 {
     protected Qualifier qualifier;
     protected QualifierNode qual;
-    protected String name;
+    protected Id name;
 
-    public AmbQualifierNode_c(Position pos, QualifierNode qual, String name) {
+    public AmbQualifierNode_c(Position pos, QualifierNode qual, Id name) {
 	super(pos);
+	assert(name != null); // qual may be null
 
 	this.qual = qual;
 	this.name = name;
@@ -32,15 +33,23 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
     public Qualifier qualifier() {
 	return this.qualifier;
     }
+    
+    public Id id() {
+        return this.name;
+    }
+    
+    public AmbQualifierNode id(Id name) {
+        AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
+        n.name = name;
+        return n;
+    }
 
     public String name() {
-	return this.name;
+	return this.name.id();
     }
 
     public AmbQualifierNode name(String name) {
-	AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
-	n.name = name;
-	return n;
+        return id(this.name.id(name));
     }
 
     public QualifierNode qual() {
@@ -59,8 +68,8 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 	return n;
     }
 
-    protected AmbQualifierNode_c reconstruct(QualifierNode qual) {
-	if (qual != this.qual) {
+    protected AmbQualifierNode_c reconstruct(QualifierNode qual, Id name) {
+	if (qual != this.qual || name != this.name) {
 	    AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
 	    n.qual = qual;
 	    return n;
@@ -70,8 +79,9 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
     }
 
     public Node visitChildren(NodeVisitor v) {
+        Id name = (Id) visitChild(this.name, v);
 	QualifierNode qual = (QualifierNode) visitChild(this.qual, v);
-	return reconstruct(qual);
+	return reconstruct(qual, name);
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
@@ -90,7 +100,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 	}
 
 	throw new SemanticException("Could not find type or package \"" +
-            (qual == null ? name : qual.toString() + "." + name) +
+            (qual == null ? name.toString() : qual.toString() + "." + name.toString()) +
 	    "\".", position());
     }
 
@@ -110,22 +120,13 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
             w.write(".");
 	    w.allowBreak(2, 3, "", 0);
         }
-                
-        w.write(name);
+             
+        tr.print(this, name, w);
     }
 
     public String toString() {
 	return (qual == null
-		? name
-		: qual.toString() + "." + name) + "{amb}";
+		? name.toString()
+		: qual.toString() + "." + name.toString()) + "{amb}";
     }
-
-  public void dump(CodeWriter w) {
-    super.dump(w);
-
-    w.allowBreak(4, " ");
-    w.begin(0);
-    w.write("(name \"" + name + "\")");
-    w.end();
-  }
 }

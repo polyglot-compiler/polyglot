@@ -22,6 +22,15 @@ public interface ConstructorDecl extends ProcedureDecl
 
     /** Set the constructor's flags. */
     ConstructorDecl flags(Flags flags);
+    
+    /**
+     * The constructor's name.  This should be the short name of the
+     * containing class.
+     */
+    Id id();
+    
+    /** Set the constructor's name. */
+    ConstructorDecl id(Id name);
 
     /**
      * The constructor's name.  This should be the short name of the

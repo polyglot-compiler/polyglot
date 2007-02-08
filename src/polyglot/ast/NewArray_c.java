@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
@@ -30,6 +30,12 @@ public class NewArray_c extends Expr_c implements NewArray
 
     public NewArray_c(Position pos, TypeNode baseType, List dims, int addDims, ArrayInit init) {
 	super(pos);
+	assert(baseType != null && dims != null); // init may be null
+	assert(addDims >= 0);
+	assert(! dims.isEmpty() || init != null); // dims may be empty only if there is an initializer
+	assert(addDims > 0 || init == null); // init may be non-null only if addDims > 0
+	assert(dims.size() + addDims > 0); // must allocate something
+	
 	this.baseType = baseType;
 	this.dims = TypedList.copyAndCheck(dims, Expr.class, true);
 	this.addDims = addDims;

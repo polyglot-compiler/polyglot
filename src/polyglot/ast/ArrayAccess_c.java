@@ -1,13 +1,12 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
-
-import polyglot.ast.*;
 
 import polyglot.util.*;
 import polyglot.types.*;
@@ -25,6 +24,7 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 
     public ArrayAccess_c(Position pos, Expr array, Expr index) {
 	super(pos);
+	assert(array != null && index != null);
 	this.array = array;
 	this.index = index;
     }

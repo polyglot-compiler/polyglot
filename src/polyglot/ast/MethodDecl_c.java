@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -21,14 +22,15 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 {
     protected Flags flags;
     protected TypeNode returnType;
-    protected String name;
+    protected Id name;
     protected List formals;
     protected List throwTypes;
     protected Block body;
     protected MethodInstance mi;
 
-    public MethodDecl_c(Position pos, Flags flags, TypeNode returnType, String name, List formals, List throwTypes, Block body) {
+    public MethodDecl_c(Position pos, Flags flags, TypeNode returnType, Id name, List formals, List throwTypes, Block body) {
 	super(pos);
+	assert(flags != null && returnType != null && name != null && formals != null && throwTypes != null); // body may be null
 	this.flags = flags;
 	this.returnType = returnType;
 	this.name = name;
@@ -71,15 +73,25 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     }
 
     /** Get the name of the method. */
+    public Id id() {
+        return this.name;
+    }
+    
+    /** Set the name of the method. */
+    public MethodDecl id(Id name) {
+        MethodDecl_c n = (MethodDecl_c) copy();
+        n.name = name;
+        return n;
+    }
+    
+    /** Get the name of the method. */
     public String name() {
-	return this.name;
+        return this.name.id();
     }
 
     /** Set the name of the method. */
     public MethodDecl name(String name) {
-	MethodDecl_c n = (MethodDecl_c) copy();
-	n.name = name;
-	return n;
+        return id(this.name.id(name));
     }
 
     /** Get the formals of the method. */
@@ -141,10 +153,11 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     }
 
     /** Reconstruct the method. */
-    protected MethodDecl_c reconstruct(TypeNode returnType, List formals, List throwTypes, Block body) {
-	if (returnType != this.returnType || ! CollectionUtil.equals(formals, this.formals) || ! CollectionUtil.equals(throwTypes, this.throwTypes) || body != this.body) {
+    protected MethodDecl_c reconstruct(TypeNode returnType, Id name, List formals, List throwTypes, Block body) {
+	if (returnType != this.returnType || name != this.name || ! CollectionUtil.equals(formals, this.formals) || ! CollectionUtil.equals(throwTypes, this.throwTypes) || body != this.body) {
 	    MethodDecl_c n = (MethodDecl_c) copy();
 	    n.returnType = returnType;
+            n.name = name;
 	    n.formals = TypedList.copyAndCheck(formals, Formal.class, true);
 	    n.throwTypes = TypedList.copyAndCheck(throwTypes, TypeNode.class, true);
 	    n.body = body;
@@ -156,11 +169,12 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 
     /** Visit the children of the method. */
     public Node visitChildren(NodeVisitor v) {
+        Id name = (Id) visitChild(this.name, v);
         List formals = visitList(this.formals, v);
 	TypeNode returnType = (TypeNode) visitChild(this.returnType, v);
 	List throwTypes = visitList(this.throwTypes, v);
 	Block body = (Block) visitChild(this.body, v);
-	return reconstruct(returnType, formals, throwTypes, body);
+	return reconstruct(returnType, name, formals, throwTypes, body);
     }
 
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
@@ -194,7 +208,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 
         MethodInstance mi = ts.methodInstance(position(), ct, f,
                                               ts.unknownType(position()),
-                                              name, formalTypes, throwTypes);
+                                              name.id(), formalTypes, throwTypes);
         ct.addMethod(mi);
         return methodInstance(mi);
     }

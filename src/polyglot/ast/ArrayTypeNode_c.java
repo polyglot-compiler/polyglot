@@ -1,13 +1,13 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
 package polyglot.ast;
 
-import polyglot.ast.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -22,6 +22,7 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
 
     public ArrayTypeNode_c(Position pos, TypeNode base) {
 	super(pos);
+	assert(base != null);
 	this.base = base;
     }
 

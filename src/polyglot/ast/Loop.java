@@ -7,8 +7,6 @@
 
 package polyglot.ast;
 
-import java.util.*;
-
 /**
  * An immutable representation of a Java language <code>for</code>
  * statement.  Contains a statement to be executed and an expression

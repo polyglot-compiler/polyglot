@@ -29,6 +29,12 @@ public interface MethodDecl extends ProcedureDecl
     MethodDecl returnType(TypeNode returnType);
 
     /** The method's name. */
+    Id id();
+    
+    /** Set the method's name. */
+    MethodDecl id(Id name);
+    
+    /** The method's name. */
     String name();
 
     /** Set the method's name. */

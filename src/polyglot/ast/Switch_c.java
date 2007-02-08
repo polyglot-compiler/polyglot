@@ -1,7 +1,8 @@
 /*
  * This file is part of the Polyglot extensible compiler framework.
  *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
  * 
  */
 
@@ -28,6 +29,7 @@ public class Switch_c extends Stmt_c implements Switch
 
     public Switch_c(Position pos, Expr expr, List elements) {
 	super(pos);
+	assert(expr != null && elements != null);
 	this.expr = expr;
 	this.elements = TypedList.copyAndCheck(elements, SwitchElement.class, true);
     }
