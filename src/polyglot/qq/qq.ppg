@@ -5,11 +5,12 @@
  * 
  */
 
-include "../parse/java12.cup"
+include "polyglot/parse/java12.cup"
 
 package polyglot.qq;
 
 import polyglot.parse.Name;
+import polyglot.parse.VarDeclarator;
 import polyglot.lex.Lexer;
 
 parser Grm extends polyglot.parse.Grm implements QQParser {:
