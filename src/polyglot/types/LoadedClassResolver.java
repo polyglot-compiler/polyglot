@@ -16,6 +16,8 @@ import polyglot.main.Report;
 import polyglot.main.Version;
 import polyglot.types.reflect.*;
 import polyglot.util.CollectionUtil;
+import polyglot.util.ObjectDumper;
+import polyglot.util.SimpleCodeWriter;
 import polyglot.util.TypeEncoder;
 import polyglot.util.InternalCompilerError;
 
@@ -214,6 +216,10 @@ public class LoadedClassResolver implements TopLevelResolver
             if (Report.should_report(Report.serialize, 1))
                 Report.report(1, "* Decoding " + name + " succeeded");
             
+            if (Report.should_report("typedump", 1)) {
+                new ObjectDumper(new SimpleCodeWriter(System.out, 72)).dump(dt);
+            }
+
             if (Report.should_report(Report.serialize, 2)) {
                 LazyInitializer init = null;
 
