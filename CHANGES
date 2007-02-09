@@ -3,6 +3,21 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
+Feb 8, 2007: Polyglot 2.1.0
+============================
+
+To provide better position information for identifiers in the AST, replaced
+Strings in the AST with an Id node.  The old factory methods and accessor
+methods for the Strings should still work, but the node constructor signatures
+for Local, LocalDecl, Formal, ConstructorDecl, MethodDecl, Call, Field,
+FieldDecl, ClassDecl, Branch, Labeled, and Amb* have changed Subclasses may
+break if they access the old String fields directly rather than through
+accessors.  Be especially careful to check visitChildren and calls to equals
+on the old String field.
+
+Miscellaneous bug fixes.
+
+
 Jan 8, 2007: Polyglot 2.0.2
 ============================
 
