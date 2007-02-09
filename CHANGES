@@ -15,6 +15,8 @@ break if they access the old String fields directly rather than through
 accessors.  Be especially careful to check visitChildren and calls to equals
 on the old String field.
 
+Added NamedVariable super-interface of Field and Local. 
+
 Miscellaneous bug fixes.
 
 
