@@ -279,12 +279,23 @@ public class ClassDecl_c extends Term_c implements ClassDecl
 
     protected void checkSupertypeCycles(TypeSystem ts) throws SemanticException {
         if (type.superType() != null) {
+            if (! type.superType().isReference()) {
+                throw new SemanticException("Cannot extend type " +
+                    type.superType() + ".",
+                    superClass != null ? superClass.position() : position());
+            }
             ReferenceType t = (ReferenceType) type.superType();
             ts.checkCycles(t);
         }
         
         for (Iterator i = type.interfaces().iterator(); i.hasNext(); ) {
-            ReferenceType t = (ReferenceType) i.next();
+            Type it = (Type) i.next();
+            if (! it.isReference()) {
+                String s = type.flags().isInterface() ? "extend" : "implement";
+                throw new SemanticException("Cannot " + s + " type " + it + ".",
+                    position());
+            }
+            ReferenceType t = (ReferenceType) it;
             ts.checkCycles(t);
         }
     }
