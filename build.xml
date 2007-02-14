@@ -247,7 +247,7 @@
        @param symbol.class  The name to be passed to CUP with -symbols.
        @param cup.file      The name of the CUP file.
    -->
-	<target name="cup-parser" depends="cup,cup-parser-deps" unless="cup.parser.up-to-date">
+	<target name="cup-parser" depends="cup,cup-parser-deps" unless="cup-parser.up-to-date">
 		<java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
 			<classpath refid="standard.classpath" />
 			<arg value="-max_actions" />
@@ -263,7 +263,7 @@
 	<!-- The following target builds a cup parser using the version of
        cup already sitting in the java_cup.jar file. This is needed to
        bootstrap the build of cup. -->
-	<target name="cup-parser-using-jar" depends="cup-parser-deps" unless="cup.parser.up-to-date">
+	<target name="cup-parser-using-jar" depends="cup-parser-deps" unless="cup-parser.up-to-date">
 		<java classname="java_cup.Main" fork="true" dir="${parser.dir}" failonerror="true">
 			<classpath refid="cup.jar.classpath" />
 			<arg value="-parser" />
@@ -274,8 +274,8 @@
 		</java>
 	</target>
 
-	<!-- Set the property cup.parser.up-to-date if the parser is in fact
-       up to date.  Called by the cup.parser.using.jar target.
+	<!-- Set the property cup-parser.up-to-date if the parser is in fact
+       up to date.  Called by the cup-parser-using-jar target.
    -->
 	<target name="cup-parser-deps">
 		<dependset>
@@ -342,14 +342,14 @@
                             in the JFlex file.
        @param jflex.file    The name of the JFlex file.
       -->
-	<target name="jflex-lexer" depends="jflex-lexer-deps" unless="jflex.lexer.up-to-date">
+	<target name="jflex-lexer" depends="jflex-lexer-deps" unless="jflex-lexer.up-to-date">
 		<java classname="JFlex.Main" fork="true" dir="${lexer.dir}" failonerror="true">
 			<classpath refid="standard.classpath" />
 			<arg value="${jflex.file}" />
 		</java>
 	</target>
 
-	<!-- Set the property jflex.lexer.up-to-date if the lexer is in fact
+	<!-- Set the property jflex-lexer.up-to-date if the lexer is in fact
        up to date.  Called by the jflex.lexer target.
    -->
 	<target name="jflex-lexer-deps">
@@ -690,8 +690,10 @@
 
 	<target name="build-features" depends="configure-buildstring">
 		<filter token="version" value="${jl.version}" />
+                <echo>version = ${jl.version}</echo>
 		<copy tofile="${basedir}/eclipseUpdates/feature.xml" file="${basedir}/eclipse/feature.xml.in" filtering="true" />
                 <antcall target="mkdir-tmp"/>
+                <copy tofile="${basedir}/eclipseUpdates/feature.xml" file="${basedir}/eclipse/feature.xml.in" filtering="true" />
                 <copy tofile="${tmp}/feature.xml" file="${basedir}/eclipse/feature.xml.in" filtering="true" />
 		<mkdir dir="${basedir}/eclipseUpdates/features" />
 		<jar destfile="${basedir}/eclipseUpdates/features/polyglot_${jl.version}.jar" basedir="${tmp}" includes="feature.xml" />
