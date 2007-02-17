@@ -1,3 +1,4 @@
 *.class
+Lexer_c.java
 Grm.java
 sym.java
