@@ -1259,7 +1259,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
      * @return the delegate for a <code>LocalDecl</code> AST node.
      */
     protected JL delLocalDeclImpl() {
-        return delNodeImpl();
+        return delStmtImpl();
     }
 
     /**
@@ -1671,7 +1671,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelLocalDecl(JL del) {
-        return postDelNode(del);
+        return postDelStmt(del);
     }
 
     protected JL postDelLoop(JL del) {

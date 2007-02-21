@@ -1676,7 +1676,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtLocalDecl(Ext ext) {
-        return postExtNode(ext);
+        return postExtStmt(ext);
     }
 
     protected Ext postExtLoop(Ext ext) {
