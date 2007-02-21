@@ -213,7 +213,7 @@ public class Options {
             while(st.hasMoreTokens())
             {
                 File f = new File(st.nextToken());
-                if (f != null && !source_path.contains(f))
+                if (!source_path.contains(f))
                     source_path.add(f);
             }
             i++;

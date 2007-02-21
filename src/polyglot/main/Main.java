@@ -168,10 +168,9 @@ public class Main
           try {
               Process proc = runtime.exec(javacCmd);
 
-              InputStreamReader err = null;
+              InputStreamReader err = new InputStreamReader(proc.getErrorStream());
 
               try {
-                  err = new InputStreamReader(proc.getErrorStream());
                   char[] c = new char[72];
                   int len;
                   StringBuffer sb = new StringBuffer();

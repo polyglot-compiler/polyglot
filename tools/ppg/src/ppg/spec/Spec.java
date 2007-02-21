@@ -36,11 +36,11 @@ public abstract class Spec implements Unparse
 		for (int i=0; i < codeParts.size(); i++) {
 			try {
 				code = (Code) codeParts.elementAt(i);
-				if (code instanceof ActionCode && code != null) {
+				if (code instanceof ActionCode) {
 					actionCode = (ActionCode) code.clone();
-				} else if (code instanceof InitCode && code != null) {
+				} else if (code instanceof InitCode) {
 					initCode = (InitCode) code.clone();
-				} else if (code instanceof ParserCode && code != null) {
+				} else if (code instanceof ParserCode) {
 					parserCode = (ParserCode) code.clone();
 				} else { // must be ScanCode
 					if (code != null)
