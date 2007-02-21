@@ -1008,10 +1008,16 @@ public class TypeSystem_c implements TypeSystem
 	            ProcedureInstance p = (ProcedureInstance) j.next();
 	            
                     // Use the declarations to compare formals.
-	            ProcedureInstance firstDecl = (ProcedureInstance) first.declaration();
-	            ProcedureInstance pDecl = (ProcedureInstance) p.declaration();
-	            
-	            if (! firstDecl.hasFormals(pDecl.formalTypes())) {
+	            ProcedureInstance firstDecl = first;
+	            ProcedureInstance pDecl = p;
+	            if (first instanceof Declaration) {
+	                firstDecl = (ProcedureInstance) ((Declaration) first).declaration();
+	            }
+	            if (p instanceof Declaration) {
+	                pDecl = (ProcedureInstance) ((Declaration) p).declaration();
+	            }
+
+                    if (! firstDecl.hasFormals(pDecl.formalTypes())) {
 	                // not all signatures match; must be ambiguous
 	                return maximal;
 	            }

@@ -34,19 +34,8 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 	this.flags = flags;
 	this.formalTypes = TypedList.copyAndCheck(formalTypes, Type.class, true);
 	this.throwTypes = TypedList.copyAndCheck(excTypes, Type.class, true);
-    this.decl = this;
     }
     
-    protected ProcedureInstance decl;
-    
-    public Declaration declaration() {
-        return decl;
-    }
-    
-    public void setDeclaration(Declaration decl) {
-        this.decl = (ProcedureInstance) decl;        
-    }
-
     public ReferenceType container() {
         return container;
     }
@@ -100,7 +89,6 @@ public abstract class ProcedureInstance_c extends TypeObject_c
 	    ProcedureInstance i = (ProcedureInstance) o;
 	    // FIXME: Check excTypes too?
 	    return flags.equals(i.flags())
-	        && ts.equals(container, i.container())
 	        && ts.hasFormals(this, i.formalTypes());
 	}
 
@@ -137,18 +125,37 @@ public abstract class ProcedureInstance_c extends TypeObject_c
         ProcedureInstance p2 = p;
 
         // rule 1:
-        ReferenceType t1 = ((ProcedureInstance) p1.declaration()).container();
-        ReferenceType t2 = ((ProcedureInstance) p2.declaration()).container();
-
-        if (t1.isClass() && t2.isClass()) {
-            if (! t1.isSubtype(t2) &&
-                ! t1.toClass().isEnclosed(t2.toClass())) {
-                return false;
+        ReferenceType t1 = null;
+        ReferenceType t2 = null;
+        
+        if (p1 instanceof MemberInstance) {
+            if (p1 instanceof Declaration) {
+                t1 = ((MemberInstance) ((Declaration) p1).declaration()).container();
+            }
+            else {
+                t1 = ((MemberInstance) p1).container();
             }
         }
-        else {
-            if (! t1.isSubtype(t2)) {
-                return false;
+        if (p2 instanceof MemberInstance) {
+            if (p2 instanceof Declaration) {
+                t2 = ((MemberInstance) ((Declaration) p2).declaration()).container();
+            }
+            else {
+                t2 = ((MemberInstance) p2).container();
+            }
+        }
+        
+        if (t1 != null && t2 != null) {
+            if (t1.isClass() && t2.isClass()) {
+                if (! t1.isSubtype(t2) &&
+                        ! t1.toClass().isEnclosed(t2.toClass())) {
+                    return false;
+                }
+            }
+            else {
+                if (! t1.isSubtype(t2)) {
+                    return false;
+                }
             }
         }
 

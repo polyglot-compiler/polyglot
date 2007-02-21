@@ -16,19 +16,8 @@ import polyglot.util.CollectionUtil;
  * A <code>MethodInstance</code> represents the type information for a Java
  * method.
  */
-public interface MethodInstance extends ProcedureInstance
+public interface MethodInstance extends FunctionInstance, MemberInstance, Declaration
 {
-    /**
-     * The method's return type.
-     */
-    Type returnType();
-    
-    /**
-     * Destructively set the method's return type.
-     * @param type
-     */
-    void setReturnType(Type type);
-   
     /**
      * The method's name.
      */

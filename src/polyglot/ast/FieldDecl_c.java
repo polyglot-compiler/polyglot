@@ -51,6 +51,10 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     public VarInstance varInstance() {
         return fi;
     }
+    
+    public CodeInstance codeInstance() {
+        return ii;
+    }
 
     /** Get the initializer instance of the initializer. */
     public InitializerInstance initializerInstance() {
@@ -115,6 +119,10 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     /** Set the name of the declaration. */
     public FieldDecl name(String name) {
         return id(this.name.id(name));
+    }
+    
+    public Term codeBody() {
+        return init;
     }
 
     /** Get the initializer of the declaration. */

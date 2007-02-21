@@ -35,8 +35,20 @@ public class MethodInstance_c extends ProcedureInstance_c
         super(ts, pos, container, flags, formalTypes, excTypes);
 	this.returnType = returnType;
 	this.name = name;
+
+        this.decl = this;
     }
     
+    protected MethodInstance decl;
+    
+    public Declaration declaration() {
+        return decl;
+    }
+    
+    public void setDeclaration(Declaration decl) {
+        this.decl = (MethodInstance) decl;        
+    }
+ 
     public MethodInstance orig() {
         return (MethodInstance) declaration();
     }
@@ -129,6 +141,7 @@ public class MethodInstance_c extends ProcedureInstance_c
 	    MethodInstance i = (MethodInstance) o;
 	    return ts.equals(returnType, i.returnType())
 	        && name.equals(i.name())
+                && ts.equals(container, i.container())
 		&& super.equalsImpl(i);
 	}
 

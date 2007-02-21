@@ -13,7 +13,7 @@ import java.util.List;
  * A <code>ProcedureInstance</code> contains the type information for a Java
  * procedure (either a method or a constructor).
  */
-public interface ProcedureInstance extends CodeInstance, Declaration
+public interface ProcedureInstance extends CodeInstance
 {
     /**
      * List of formal parameter types.
@@ -39,7 +39,7 @@ public interface ProcedureInstance extends CodeInstance, Declaration
     String signature();
 
     /**
-     * Returns either "method" or "constructor".
+     * String describing the kind of procedure, (e.g., "method" or "constructor").
      */
     String designator();
 

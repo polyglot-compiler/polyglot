@@ -104,13 +104,17 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	return n;
     }
 
+    public Term codeBody() {
+        return this.body;
+    }
+    
     /** Get the body of the constructor. */
     public Block body() {
 	return this.body;
     }
 
     /** Set the body of the constructor. */
-    public CodeDecl body(Block body) {
+    public CodeBlock body(Block body) {
 	ConstructorDecl_c n = (ConstructorDecl_c) copy();
 	n.body = body;
 	return n;

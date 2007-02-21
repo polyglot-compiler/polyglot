@@ -20,13 +20,13 @@ import polyglot.types.TypeSystem;
  */
 public class ExitChecker extends DataFlow
 {
-    protected CodeDecl code;
+    protected CodeNode code;
 
     public ExitChecker(Job job, TypeSystem ts, NodeFactory nf) {
 	super(job, ts, nf, false /* backward analysis */);
     }
 
-    protected FlowGraph initGraph(CodeDecl code, Term root) {
+    protected FlowGraph initGraph(CodeNode code, Term root) {
         boolean returnsValue;
 
         this.code = code;

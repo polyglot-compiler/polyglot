@@ -118,13 +118,17 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 	return n;
     }
 
+    public Term codeBody() {
+        return this.body;
+    }
+    
     /** Get the body of the method. */
     public Block body() {
 	return this.body;
     }
 
     /** Set the body of the method. */
-    public CodeDecl body(Block body) {
+    public CodeBlock body(Block body) {
 	MethodDecl_c n = (MethodDecl_c) copy();
 	n.body = body;
 	return n;

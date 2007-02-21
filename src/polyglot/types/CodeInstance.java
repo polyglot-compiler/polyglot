@@ -9,8 +9,9 @@ package polyglot.types;
 
 /**
  * A <code>CodeInstance</code> contains the type information for a Java
- * code-chunk (a method, a constructor, or initializer).
+ * code-chunk (method, constructor, initializer, closure).
  */
-public interface CodeInstance extends MemberInstance
+public interface CodeInstance extends TypeObject
 {
+    Flags flags();
 }

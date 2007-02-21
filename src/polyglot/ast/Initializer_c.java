@@ -75,13 +75,17 @@ public class Initializer_c extends Term_c implements Initializer
 	return n;
     }
 
+    public Term codeBody() {
+        return this.body;
+    }
+    
     /** Get the body of the initializer. */
     public Block body() {
 	return this.body;
     }
 
     /** Set the body of the initializer. */
-    public CodeDecl body(Block body) {
+    public CodeBlock body(Block body) {
 	Initializer_c n = (Initializer_c) copy();
 	n.body = body;
 	return n;

@@ -8,11 +8,11 @@
 package polyglot.visit;
 
 import java.util.*;
-import java.util.Map;
 
 import polyglot.ast.*;
 import polyglot.frontend.Job;
 import polyglot.types.*;
+import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
 
 /**
@@ -55,8 +55,12 @@ public class InitChecker extends DataFlow
          */
         public ClassBodyInfo outer = null;
         
-        /** The current CodeDecl being processed by the dataflow equations */
-        public CodeDecl currCodeDecl = null;
+        /** The current CodeNode being processed by the dataflow equations */
+        public CodeNode currCodeDecl = null;
+        
+        /** The current class being processed. */
+        public ClassType currClass = null;
+        
         /** 
          * A Map of all the final fields in the class currently being processed
          * to MinMaxInitCounts. This Map is used as the basis for the Maps returned
@@ -268,7 +272,7 @@ public class InitChecker extends DataFlow
      *         code declaration; otherwise, an apropriately initialized
      *         FlowGraph.
      */
-    protected FlowGraph initGraph(CodeDecl code, Term root) {
+    protected FlowGraph initGraph(CodeNode code, Term root) {
         currCBI.currCodeDecl = code;
         return new FlowGraph(root, forward);
     }
@@ -278,14 +282,24 @@ public class InitChecker extends DataFlow
      * 
      * Set up the state that must be tracked during a Class Declaration.
      */
-    protected NodeVisitor enterCall(Node n) throws SemanticException {
+    protected NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
         if (n instanceof ClassBody) {
             // we are starting to process a class declaration, but have yet
             // to do any of the dataflow analysis.
             
             // set up the new ClassBodyInfo, and make sure that it forms
             // a stack.
-            setupClassBody((ClassBody)n);
+            ClassType ct = null;
+            if (parent instanceof ClassDecl) {
+                ct = ((ClassDecl) parent).type();
+            }
+            else if (parent instanceof New) {
+                ct = ((New) parent).anonType();
+            }
+            if (ct == null) {
+                throw new InternalCompilerError("ClassBody found but cannot find the class.", n.position());
+            }
+            setupClassBody(ct, (ClassBody)n);
         }
       
         return super.enterCall(n);
@@ -344,9 +358,10 @@ public class InitChecker extends DataFlow
         return super.leaveCall(old, n, v);
     }
 
-    protected void setupClassBody(ClassBody n) throws SemanticException {
+    protected void setupClassBody(ClassType ct, ClassBody n) throws SemanticException {
         ClassBodyInfo newCDI = new ClassBodyInfo();
         newCDI.outer = currCBI;  
+        newCDI.currClass = ct;
         currCBI = newCDI;
             
 
@@ -759,7 +774,8 @@ public class InitChecker extends DataFlow
      */
     protected boolean isFieldsTargetAppropriate(Field f) {
         if (f.fieldInstance().flags().isStatic()) {
-            ClassType containingClass = (ClassType)currCBI.currCodeDecl.codeInstance().container();
+            CodeInstance ci = currCBI.currCodeDecl.codeInstance();
+            ClassType containingClass = currCBI.currClass;
             return containingClass.equals(f.fieldInstance().orig().container());
         }
         else {

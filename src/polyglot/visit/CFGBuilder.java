@@ -11,6 +11,7 @@ import java.util.*;
 
 import polyglot.ast.*;
 import polyglot.main.Report;
+import polyglot.types.MemberInstance;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.*;
@@ -210,10 +211,12 @@ public class CFGBuilder implements Copy
 
 	if (Report.should_report(Report.cfg, 2)) {
             String rootName = "";
-            if (graph.root() instanceof CodeDecl) {
-                CodeDecl cd = (CodeDecl)graph.root();
-                rootName = cd.codeInstance().toString() + " in " + 
-                            cd.codeInstance().container().toString();
+            if (graph.root() instanceof CodeNode) {
+                CodeNode cd = (CodeNode)graph.root();
+                rootName = cd.codeInstance().toString();
+                if (cd.codeInstance() instanceof MemberInstance) {
+                    rootName += " in " + ((MemberInstance) cd.codeInstance()).container().toString();
+                }
             }
 
             Report.report(2, "digraph CFGBuild" + name + " {");

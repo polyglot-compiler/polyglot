@@ -25,8 +25,19 @@ public class ConstructorInstance_c extends ProcedureInstance_c
 	                         ClassType container,
 				 Flags flags, List formalTypes, List excTypes) {
         super(ts, pos, container, flags, formalTypes, excTypes);
+        this.decl = this;
     }
 
+    protected ConstructorInstance decl;
+    
+    public Declaration declaration() {
+        return decl;
+    }
+    
+    public void setDeclaration(Declaration decl) {
+        this.decl = (ConstructorInstance) decl;        
+    }
+    
     public ConstructorInstance orig() {
         return (ConstructorInstance) declaration();
     }
@@ -80,8 +91,13 @@ public class ConstructorInstance_c extends ProcedureInstance_c
     }
 
     public boolean equalsImpl(TypeObject o) {
-        if (! (o instanceof ConstructorInstance) ) return false;
-        return super.equalsImpl(o);
+        if (o instanceof ConstructorInstance) {
+            ConstructorInstance i = (ConstructorInstance) o;
+            return ts.equals(container, i.container())
+                && super.equalsImpl(i);
+        }
+
+        return false;
     }
 
     public boolean isCanonical() {
