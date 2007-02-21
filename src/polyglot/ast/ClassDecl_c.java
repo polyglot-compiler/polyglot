@@ -218,6 +218,13 @@ public class ClassDecl_c extends Term_c implements ClassDecl
             TypeSystem ts = c.typeSystem();
             c = c.pushClass(type, ts.staticTarget(type).toClass());
         }
+        else {
+            // Add this class to the context, but don't push a class scope.
+            // This allows us to detect loops in the inheritance
+            // hierarchy, but avoids an infinite loop.
+            c = c.pushBlock();
+            c.addNamed(this.type);
+        }
         return super.enterChildScope(child, c);
     }
     
