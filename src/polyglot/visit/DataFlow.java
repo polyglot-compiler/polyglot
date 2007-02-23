@@ -59,6 +59,9 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     protected LinkedList flowgraphStack;
     
     protected static class FlowGraphSource {
+        FlowGraphSource(FlowGraph g, CodeDecl s) {
+            this(g, s);
+        }
         FlowGraphSource(FlowGraph g, CodeNode s) {
             flowgraph = g;
             source = s;
@@ -400,6 +403,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * the <code>FlowGraph</code> onto the stack of <code>FlowGraph</code>s if
      * dataflow analysis is performed on entry to <code>CodeNode</code> nodes.
      */
+    protected void dataflow(CodeDecl cd) throws SemanticException {
+        this.dataflow((CodeNode) cd);
+    }
+
     protected void dataflow(CodeNode cd) throws SemanticException {
         // only bother to do the flow analysis if the body is not null...
         if (cd.codeBody() != null) {
@@ -650,6 +657,18 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      */
     protected FlowGraph initGraph(CodeNode code, Term root) {
         return new FlowGraph(root, forward);
+    }
+
+    /**
+     * Initialise the <code>FlowGraph</code> to be used in the dataflow
+     * analysis.
+     *
+     * @return null if no dataflow analysis should be performed for this
+     *         code declaration; otherwise, an apropriately initialized
+     *         <code>FlowGraph.</code>
+     */
+    protected FlowGraph initGraph(CodeDecl code, Term root) {
+        return initGraph((CodeNode) code, root);
     }
 
     /**
