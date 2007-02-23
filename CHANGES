@@ -3,8 +3,26 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
-Feb 8, 2007: Polyglot 2.1.0
+Feb 23, 2007: Polyglot 2.2.0
 ============================
+
+Added CodeNode and CodeBlock as a super-interfaces of CodeDecl that are
+not a ClassMembers.  This is to help extensions with things like
+closures.  Changed DataFlow to use CodeNode.  This change may break some
+extensions.
+
+Removed MemberInstance as a super-interface of CodeInstance and
+ProcedureInstance.  This change may break some extensions.  Replacing
+uses of CodeInstance with MemberCodeInstance and ProcedureInstance with
+MemberProcedureInstance should fix the problems in most cases.
+
+Added FunctionInstance interface: procedures with return types that are
+not methods.
+
+Miscellaneous bug fixes.
+
+Feb 8, 2007: Polyglot 2.1.0
+===========================
 
 To provide better position information for identifiers in the AST, replaced
 Strings in the AST with an Id node.  The old factory methods and accessor
@@ -21,7 +39,7 @@ Miscellaneous bug fixes.
 
 
 Jan 8, 2007: Polyglot 2.0.2
-============================
+===========================
 
 Cleaned up build.xml
 
