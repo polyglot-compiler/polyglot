@@ -132,13 +132,13 @@ public class Position implements Serializable
     public Position startOf() {
     	if (this == COMPILER_GENERATED)
     	    return this;
-        return new Position(path, file, line, column, line, column);
+        return new Position(path, file, line, column, line, column, offset, offset);
     }
 
     public Position endOf() {
     	if (this == COMPILER_GENERATED)
     	    return this;
-        return new Position(path, file, endLine, endColumn, endLine, endColumn);
+        return new Position(path, file, endLine, endColumn, endLine, endColumn, endOffset, endOffset);
     }
 
     public int line() {
