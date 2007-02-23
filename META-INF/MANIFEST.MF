@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Polyglot
 Main-Class: polyglot.main.Main
 Bundle-SymbolicName: polyglot
-Bundle-Version: 2.0.2
+Bundle-Version: 2.2.0
 Bundle-Localization: plugin
 Export-Package: polyglot.ast,
  polyglot.frontend,
