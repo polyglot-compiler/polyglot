@@ -60,7 +60,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     
     protected static class FlowGraphSource {
         FlowGraphSource(FlowGraph g, CodeDecl s) {
-            this(g, s);
+            this(g, (CodeNode) s);
         }
         FlowGraphSource(FlowGraph g, CodeNode s) {
             flowgraph = g;
