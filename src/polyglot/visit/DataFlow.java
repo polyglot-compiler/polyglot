@@ -809,7 +809,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *           <code>EdgeKey</code> in <code>edgeKeys</code> to the
      *           <code>Item i</code>.
      */
-    protected static final Map itemToMap(Item i, Set edgeKeys) {
+    public static final Map itemToMap(Item i, Set edgeKeys) {
         Map m = new HashMap();
         for (Iterator iter = edgeKeys.iterator(); iter.hasNext(); ) {
             Object o = iter.next();
