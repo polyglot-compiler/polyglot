@@ -374,6 +374,16 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         }
         return postExtCodeDecl(e);
     }
+    
+    public final Ext extCompoundStmt() {
+        Ext e = extCompoundStmtImpl();
+      
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extCompoundStmt();
+            e = composeExts(e, e2);
+        }
+        return postExtCompoundStmt(e);
+    }
 
     public final Ext extConditional() {
         Ext e = extConditionalImpl();
@@ -982,7 +992,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      * @return the <code>Ext</code> object for a <code>Block</code> AST node.
      */
     protected Ext extBlockImpl() {
-        return extStmtImpl();
+        return extCompoundStmtImpl();
     }
 
     /**
@@ -1038,7 +1048,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      * @return the <code>Ext</code> object for a <code>Catch</code> AST node.
      */
     protected Ext extCatchImpl() {
-        return extStmtImpl();
+        return extCompoundStmtImpl();
     }
 
     /**
@@ -1089,6 +1099,14 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         return extClassMemberImpl();
     }
 
+    /**
+     * Create the <code>Ext</code> object for a <code>CompoundStmt</code> AST node.
+     * @return the <code>Ext</code> object for a <code>CompoundStmt</code> AST node.
+     */
+    protected Ext extCompoundStmtImpl() {
+        return extStmtImpl();
+    }
+    
     /**
      * Create the <code>Ext</code> object for a <code>Conditional</code> AST node.
      * @return the <code>Ext</code> object for a <code>Conditional</code> AST node.
@@ -1190,7 +1208,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      * @return the <code>Ext</code> object for a <code>If</code> AST node.
      */
     protected Ext extIfImpl() {
-        return extStmtImpl();
+        return extCompoundStmtImpl();
     }
 
     /**
@@ -1230,7 +1248,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      * @return the <code>Ext</code> object for a <code>Labeled</code> AST node.
      */
     protected Ext extLabeledImpl() {
-        return extStmtImpl();
+        return extCompoundStmtImpl();
     }
 
     /**
@@ -1254,7 +1272,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      * @return the <code>Ext</code> object for a <code>LocalClassDecl</code> AST node.
      */
     protected Ext extLocalClassDeclImpl() {
-        return extStmtImpl();
+        return extCompoundStmtImpl();
     }
 
     /**
@@ -1270,7 +1288,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      * @return the <code>Ext</code> object for a <code>Loop</code> AST node.
      */
     protected Ext extLoopImpl() {
-        return extStmtImpl();
+        return extCompoundStmtImpl();
     }
 
     /**
@@ -1406,7 +1424,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      * @return the <code>Ext</code> object for a <code>Switch</code> AST node.
      */
     protected Ext extSwitchImpl() {
-        return extStmtImpl();
+        return extCompoundStmtImpl();
     }
 
     /**
@@ -1414,7 +1432,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      * @return the <code>Ext</code> object for a <code>Synchronized</code> AST node.
      */
     protected Ext extSynchronizedImpl() {
-        return extStmtImpl();
+        return extCompoundStmtImpl();
     }
 
     /**
@@ -1438,7 +1456,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      * @return the <code>Ext</code> object for a <code>Try</code> AST node.
      */
     protected Ext extTryImpl() {
-        return extStmtImpl();
+        return extCompoundStmtImpl();
     }
 
     /**
@@ -1536,7 +1554,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtBlock(Ext ext) {
-        return postExtStmt(ext);
+        return postExtCompoundStmt(ext);
     }
 
     protected Ext postExtBooleanLit(Ext ext) {
@@ -1564,7 +1582,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtCatch(Ext ext) {
-        return postExtStmt(ext);
+        return postExtCompoundStmt(ext);
     }
 
     protected Ext postExtCharLit(Ext ext) {
@@ -1589,6 +1607,10 @@ public abstract class AbstractExtFactory_c implements ExtFactory
 
     protected Ext postExtCodeDecl(Ext ext) {
         return postExtClassMember(ext);
+    }
+    
+    protected Ext postExtCompoundStmt(Ext ext) {
+        return postExtStmt(ext);
     }
 
     protected Ext postExtConditional(Ext ext) {
@@ -1640,7 +1662,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtIf(Ext ext) {
-        return postExtStmt(ext);
+        return postExtCompoundStmt(ext);
     }
 
     protected Ext postExtImport(Ext ext) {
@@ -1660,7 +1682,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtLabeled(Ext ext) {
-        return postExtStmt(ext);
+        return postExtCompoundStmt(ext);
     }
 
     protected Ext postExtLit(Ext ext) {
@@ -1672,7 +1694,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtLocalClassDecl(Ext ext) {
-        return postExtStmt(ext);
+        return postExtCompoundStmt(ext);
     }
 
     protected Ext postExtLocalDecl(Ext ext) {
@@ -1680,7 +1702,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtLoop(Ext ext) {
-        return postExtStmt(ext);
+        return postExtCompoundStmt(ext);
     }
 
     protected Ext postExtMethodDecl(Ext ext) {
@@ -1748,11 +1770,11 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtSwitch(Ext ext) {
-        return postExtStmt(ext);
+        return postExtCompoundStmt(ext);
     }
 
     protected Ext postExtSynchronized(Ext ext) {
-        return postExtStmt(ext);
+        return postExtCompoundStmt(ext);
     }
 
     protected Ext postExtTerm(Ext ext) {
@@ -1764,7 +1786,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtTry(Ext ext) {
-        return postExtStmt(ext);
+        return postExtCompoundStmt(ext);
     }
 
     protected Ext postExtTypeNode(Ext ext) {

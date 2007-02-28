@@ -377,6 +377,16 @@ public abstract class AbstractDelFactory_c implements DelFactory
         return postDelCodeDecl(e);
     }
 
+    public final JL delCompoundStmt() {
+        JL e = delCompoundStmtImpl();
+        
+        if (nextDelFactory != null) {
+            JL e2 = nextDelFactory.delCompoundStmt();
+            e = composeDels(e, e2);
+        }
+        return postDelCompoundStmt(e);
+    }
+    
     public final JL delConditional() {
         JL e = delConditionalImpl();
 
@@ -979,7 +989,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
      * @return the delegate for a <code>Block</code> AST node.
      */
     protected JL delBlockImpl() {
-        return delStmtImpl();
+        return delCompoundStmtImpl();
     }
 
     /**
@@ -1035,7 +1045,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
      * @return the delegate for a <code>Catch</code> AST node.
      */
     protected JL delCatchImpl() {
-        return delStmtImpl();
+        return delCompoundStmtImpl();
     }
 
     /**
@@ -1084,6 +1094,14 @@ public abstract class AbstractDelFactory_c implements DelFactory
      */
     protected JL delCodeDeclImpl() {
         return delClassMemberImpl();
+    }
+
+    /**
+     * Create the delegate for a <code>CompoundStmt</code> AST node.
+     * @return the delegate for a <code>CompoundStmt</code> AST node.
+     */
+    protected JL delCompoundStmtImpl() {
+        return delStmtImpl();
     }
 
     /**
@@ -1187,7 +1205,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
      * @return the delegate for a <code>If</code> AST node.
      */
     protected JL delIfImpl() {
-        return delStmtImpl();
+        return delCompoundStmtImpl();
     }
 
     /**
@@ -1227,7 +1245,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
      * @return the delegate for a <code>Labeled</code> AST node.
      */
     protected JL delLabeledImpl() {
-        return delStmtImpl();
+        return delCompoundStmtImpl();
     }
 
     /**
@@ -1251,7 +1269,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
      * @return the delegate for a <code>LocalClassDecl</code> AST node.
      */
     protected JL delLocalClassDeclImpl() {
-        return delStmtImpl();
+        return delCompoundStmtImpl();
     }
 
     /**
@@ -1267,7 +1285,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
      * @return the delegate for a <code>Loop</code> AST node.
      */
     protected JL delLoopImpl() {
-        return delStmtImpl();
+        return delCompoundStmtImpl();
     }
 
     /**
@@ -1403,7 +1421,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
      * @return the delegate for a <code>Switch</code> AST node.
      */
     protected JL delSwitchImpl() {
-        return delStmtImpl();
+        return delCompoundStmtImpl();
     }
 
     /**
@@ -1411,7 +1429,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
      * @return the delegate for a <code>Synchronized</code> AST node.
      */
     protected JL delSynchronizedImpl() {
-        return delStmtImpl();
+        return delCompoundStmtImpl();
     }
 
     /**
@@ -1435,7 +1453,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
      * @return the delegate for a <code>Try</code> AST node.
      */
     protected JL delTryImpl() {
-        return delStmtImpl();
+        return delCompoundStmtImpl();
     }
 
     /**
@@ -1531,7 +1549,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelBlock(JL del) {
-        return postDelStmt(del);
+        return postDelCompoundStmt(del);
     }
 
     protected JL postDelBooleanLit(JL del) {
@@ -1559,7 +1577,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelCatch(JL del) {
-        return postDelStmt(del);
+        return postDelCompoundStmt(del);
     }
 
     protected JL postDelCharLit(JL del) {
@@ -1586,6 +1604,10 @@ public abstract class AbstractDelFactory_c implements DelFactory
         return postDelClassMember(del);
     }
 
+    protected JL postDelCompoundStmt(JL del) {
+        return postDelStmt(del);
+    }
+    
     protected JL postDelConditional(JL del) {
         return postDelExpr(del);
     }
@@ -1635,7 +1657,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelIf(JL del) {
-        return postDelStmt(del);
+        return postDelCompoundStmt(del);
     }
 
     protected JL postDelImport(JL del) {
@@ -1655,7 +1677,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelLabeled(JL del) {
-        return postDelStmt(del);
+        return postDelCompoundStmt(del);
     }
 
     protected JL postDelLit(JL del) {
@@ -1667,7 +1689,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelLocalClassDecl(JL del) {
-        return postDelStmt(del);
+        return postDelCompoundStmt(del);
     }
 
     protected JL postDelLocalDecl(JL del) {
@@ -1675,7 +1697,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelLoop(JL del) {
-        return postDelStmt(del);
+        return postDelCompoundStmt(del);
     }
 
     protected JL postDelMethodDecl(JL del) {
@@ -1743,11 +1765,11 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelSwitch(JL del) {
-        return postDelStmt(del);
+        return postDelCompoundStmt(del);
     }
 
     protected JL postDelSynchronized(JL del) {
-        return postDelStmt(del);
+        return postDelCompoundStmt(del);
     }
 
     protected JL postDelTerm(JL del) {
@@ -1759,7 +1781,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelTry(JL del) {
-        return postDelStmt(del);
+        return postDelCompoundStmt(del);
     }
 
     protected JL postDelTypeNode(JL del) {

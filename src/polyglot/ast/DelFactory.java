@@ -75,6 +75,8 @@ public interface DelFactory
     JL delClassMember();
 
     JL delCodeDecl();
+    
+    JL delCompoundStmt();
 
     JL delConditional();
     

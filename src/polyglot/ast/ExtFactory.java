@@ -83,6 +83,8 @@ public interface ExtFactory
 
     Ext extCodeDecl();
     
+    Ext extCompoundStmt();
+    
     Ext extConditional();
     
     Ext extConstructorCall();
