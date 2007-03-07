@@ -60,7 +60,7 @@ public class Source
 	return name;
     }
 
-    /** The name of the source file. */
+    /** The path of the source file. */
     public String path() {
 	return path;
     }
