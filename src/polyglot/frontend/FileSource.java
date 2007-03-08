@@ -21,13 +21,7 @@ public class FileSource extends Source
     public FileSource(File file) throws IOException {
         this(file, false);
     }
-    
-    public FileSource(String name) {
-    	super(name, name, null, false);
-    	file = new File(name); // This file doesn't really need to exist
-    }
-
-    
+        
     public FileSource(File file, boolean userSpecified) throws IOException {
         super(file.getName(), userSpecified);
         this.file = file;
