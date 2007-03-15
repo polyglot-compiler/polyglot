@@ -80,13 +80,13 @@ public class Return_c extends Stmt_c implements Return
 	    return this;
 	}
 
-	if (ci instanceof MethodInstance) {
-	    MethodInstance mi = (MethodInstance) ci;
+	if (ci instanceof FunctionInstance) {
+	    FunctionInstance fi = (FunctionInstance) ci;
 
-	    if (mi.returnType().isVoid()) {
+	    if (fi.returnType().isVoid()) {
                 if (expr != null) {
                     throw new SemanticException("Cannot return a value from " +
-                        mi + ".", position());
+                        fi + ".", position());
                 }
                 else {
                     return this;
@@ -94,20 +94,20 @@ public class Return_c extends Stmt_c implements Return
 	    }
             else if (expr == null) {
                 throw new SemanticException("Must return a value from " +
-                    mi + ".", position());
+                    fi + ".", position());
             }
 
-	    if (ts.isImplicitCastValid(expr.type(), mi.returnType())) {
+	    if (ts.isImplicitCastValid(expr.type(), fi.returnType())) {
 	        return this;
 	    }
 
-            if (ts.numericConversionValid(mi.returnType(),
+            if (ts.numericConversionValid(fi.returnType(),
                                           expr.constantValue())) {
                 return this;
             }
 
 	    throw new SemanticException("Cannot return expression of type " +
-		expr.type() + " from " + mi + ".", expr.position());
+		expr.type() + " from " + fi + ".", expr.position());
 	}
 
 	throw new InternalCompilerError("Unrecognized code type.");
