@@ -45,14 +45,15 @@ public class Source
     public boolean equals(Object o) {
 	if (o instanceof Source) {
 	    Source s = (Source) o;
-	    return name.equals(s.name) && path.equals(s.path);
+	    return name.equals(s.name) && 
+                 (path == s.path || (path != null && path.equals(s.path)));
 	}
 
 	return false;
     }
 
     public int hashCode() {
-	return path.hashCode() + name.hashCode();
+	return (path==null?0:path.hashCode()) ^ name.hashCode();
     }
 
     /** The name of the source file. */
