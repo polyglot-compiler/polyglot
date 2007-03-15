@@ -417,7 +417,7 @@ public class MethodDecl_c extends Term_c implements MethodDecl
      * term.
      */
     public Term entry() {
-        return listEntry(formals(), (body()==null? this : body().entry()));
+        return listEntry(formals(), returnType.entry());
     }
 
     /**
