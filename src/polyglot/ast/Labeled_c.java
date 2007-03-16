@@ -99,4 +99,9 @@ public class Labeled_c extends Stmt_c implements Labeled
         v.push(this).visitCFG(statement, this);
         return succs;
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.Labeled(this.position, this.label, this.statement);
+    }
+
 }

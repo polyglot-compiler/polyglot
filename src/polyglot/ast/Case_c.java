@@ -167,4 +167,8 @@ public class Case_c extends Stmt_c implements Case
 
         return succs;
     }
+    public Node copy(NodeFactory nf) {
+        return nf.Case(this.position, this.expr).value(value);
+    }
+
 }

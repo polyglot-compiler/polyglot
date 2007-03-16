@@ -39,4 +39,9 @@ public class SwitchBlock_c extends AbstractBlock_c implements SwitchBlock
     public Context enterScope(Context c) {
         return c;
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.SwitchBlock(this.position, statements);
+    }
+
 }

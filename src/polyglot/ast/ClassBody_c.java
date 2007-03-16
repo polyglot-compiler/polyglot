@@ -202,6 +202,9 @@ public class ClassBody_c extends Term_c implements ClassBody
     public List acceptCFG(CFGBuilder v, List succs) {
         return succs;
     }
+    public Node copy(NodeFactory nf) {
+        return nf.ClassBody(this.position, this.members);
+    }
 
     private static final Collection TOPICS = 
                 CollectionUtil.list(Report.types, Report.context);

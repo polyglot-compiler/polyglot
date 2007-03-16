@@ -250,4 +250,8 @@ public abstract class Assign_c extends Expr_c implements Assign
 
     return l;
   }
+  public Node copy(NodeFactory nf) {
+      return nf.Assign(this.position, this.left, this.op, this.right);
+  }
+  
 }

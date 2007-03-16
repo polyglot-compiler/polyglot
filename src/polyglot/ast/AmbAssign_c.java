@@ -63,4 +63,7 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
       // Didn't finish disambiguation; just return.
       return this;
   }
+  public Node copy(NodeFactory nf) {
+      return nf.AmbAssign(this.position, this.left, this.op, this.right);
+  }
 }

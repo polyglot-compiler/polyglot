@@ -128,4 +128,9 @@ public class StringLit_c extends Lit_c implements StringLit
     public Object constantValue() {
 	return value;
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.StringLit(this.position, this.value);
+    }
+
 }

@@ -107,4 +107,9 @@ public class Throw_c extends Stmt_c implements Throw
         // then a NullPointerException will be thrown.
         return CollectionUtil.list(expr.type(), ts.NullPointerException());
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.Throw(this.position, this.expr);
+    }
+
 }

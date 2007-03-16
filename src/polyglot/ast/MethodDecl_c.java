@@ -437,5 +437,8 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 
     private static final Collection TOPICS = 
             CollectionUtil.list(Report.types, Report.context);
+    public Node copy(NodeFactory nf) {
+        return nf.MethodDecl(this.position, this.flags, this.returnType, this.name, this.formals, this.throwTypes, this.body);
+    }
 
 }

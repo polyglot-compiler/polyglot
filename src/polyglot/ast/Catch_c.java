@@ -117,4 +117,8 @@ public class Catch_c extends Stmt_c implements Catch
         v.visitCFG(body, this);
         return succs;
     }
+    public Node copy(NodeFactory nf) {
+        return nf.Catch(this.position, this.formal, this.body);
+    }
+
 }

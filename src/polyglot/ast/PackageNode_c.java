@@ -9,6 +9,7 @@
 package polyglot.ast;
 
 import polyglot.ast.*;
+import polyglot.frontend.ExtensionInfo;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
@@ -66,4 +67,17 @@ public class PackageNode_c extends Node_c implements PackageNode
     public String toString() {
         return package_.toString();
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.PackageNode(this.position, this.package_);
+    }
+    public Node copy(ExtensionInfo extInfo) throws SemanticException {
+        PackageNode pn = (PackageNode)this.del().copy(extInfo.nodeFactory());
+        if (pn.package_() != null) {
+            pn = pn.package_(extInfo.typeSystem().packageForName(pn.package_().name()));
+        }
+        return pn;
+    }
+
+
 }

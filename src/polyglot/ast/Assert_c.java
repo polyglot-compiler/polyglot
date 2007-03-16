@@ -160,4 +160,8 @@ public class Assert_c extends Stmt_c implements Assert
 
         return succs;
     }
+    public Node copy(NodeFactory nf) {
+        return nf.Assert(this.position, this.cond, this.errorMessage);
+    }
+
 }

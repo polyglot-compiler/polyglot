@@ -238,4 +238,8 @@ public class Conditional_c extends Expr_c implements Conditional
 
         return null;
     }
+    public Node copy(NodeFactory nf) {
+        return nf.Conditional(this.position, this.cond, this.consequent, this.alternative);
+    }
+
 }

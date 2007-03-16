@@ -104,4 +104,8 @@ public class Branch_c extends Stmt_c implements Branch
         v.visitBranchTarget(this);
         return Collections.EMPTY_LIST;
     }
+    public Node copy(NodeFactory nf) {
+        return nf.Branch(this.position, this.kind, this.label);
+    }
+
 }

@@ -32,4 +32,7 @@ public class Block_c extends AbstractBlock_c implements Block
 	w.unifiedBreak(0, 1, " ", 1);
 	w.write("}");
     }
+    public Node copy(NodeFactory nf) {
+        return nf.Block(this.position, this.statements);
+    }
 }

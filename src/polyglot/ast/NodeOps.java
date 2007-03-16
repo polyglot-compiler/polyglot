@@ -12,6 +12,7 @@ import java.io.Writer;
 import java.util.List;
 
 import polyglot.util.CodeWriter;
+import polyglot.frontend.ExtensionInfo;
 import polyglot.types.SemanticException;
 import polyglot.types.Context;
 import polyglot.types.TypeSystem;
@@ -267,4 +268,19 @@ public interface NodeOps
      * @param tr The translation pass.  This is <i>not</i> a visitor.
      */
     void translate(CodeWriter w, Translator tr);
+    
+    /**
+     * Produce a copy of this node using the given NodeFactory.
+     */
+    Node copy(NodeFactory nf);
+    /**
+     * Produce a copy of this node using the given ExtensionInfo.
+     * This will typically be implemented by calling
+     * copy(NodeFactory nf), and then potentially copying over
+     * type information.
+     * @throws SemanticException If the type information cannot be copied.
+     */
+    Node copy(ExtensionInfo extInfo) throws SemanticException;
+    
+
 }

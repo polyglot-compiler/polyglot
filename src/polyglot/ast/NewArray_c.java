@@ -184,4 +184,9 @@ public class NewArray_c extends Expr_c implements NewArray
         }
         return succs;
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.NewArray(this.position, this.baseType, this.dims, this.addDims, this.init);
+    }
+
 }

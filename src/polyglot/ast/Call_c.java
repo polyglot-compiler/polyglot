@@ -459,5 +459,8 @@ public class Call_c extends Expr_c implements Call
 //          }
       }      
   }
+  public Node copy(NodeFactory nf) {
+      return nf.Call(this.position, this.target, this.name, this.arguments);
+  }
   
 }

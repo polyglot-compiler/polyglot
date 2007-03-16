@@ -79,5 +79,4 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign
   public boolean throwsArrayStoreException() {
     return op == ASSIGN && left.type().isReference();
   }
-
 }

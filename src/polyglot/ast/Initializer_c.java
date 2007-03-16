@@ -238,4 +238,9 @@ public class Initializer_c extends Term_c implements Initializer
     public String toString() {
 	return flags.translate() + "{ ... }";
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.Initializer(this.position, this.flags, this.body);
+    }
+
 }

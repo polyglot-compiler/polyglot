@@ -679,4 +679,9 @@ public class New_c extends Expr_c implements New
         
         return nn;
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.New(this.position, this.qualifier, this.tn, this.arguments, this.body);
+    }
+
 }

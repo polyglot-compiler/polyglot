@@ -96,4 +96,7 @@ public class ArrayTypeNode_c extends TypeNode_c implements ArrayTypeNode
     public String toString() {
         return base.toString() + "[]";
     }
+    public Node copy(NodeFactory nf) {
+        return nf.ArrayTypeNode(this.position, this.base);
+    }
 }

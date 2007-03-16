@@ -130,4 +130,9 @@ public class While_c extends Loop_c implements While
     public Term continueTarget() {
         return cond.entry();
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.While(this.position, this.cond, this.body);
+    }
+
 }

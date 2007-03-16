@@ -120,4 +120,9 @@ public class Import_c extends Node_c implements Import
 	    w.newline(0);
 	}
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.Import(this.position, this.kind, this.name);
+    }
+
 }

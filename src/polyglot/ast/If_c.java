@@ -164,4 +164,9 @@ public class If_c extends Stmt_c implements If
 
         return succs;
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.If(this.position, this.cond, this.consequent, this.alternative);
+    }
+
 }

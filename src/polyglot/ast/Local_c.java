@@ -185,5 +185,10 @@ public class Local_c extends Expr_c implements Local
     if (! isConstant()) return null;
     return li.constantValue();
   }
+  
+  public Node copy(NodeFactory nf) {
+      return nf.Local(this.position, this.name);
+  }
+
 
 }

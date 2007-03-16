@@ -280,4 +280,9 @@ public class Try_c extends Stmt_c implements Try
 
         return succs;
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.Try(this.position, this.tryBlock, this.catchBlocks, this.finallyBlock);
+    }
+
 }

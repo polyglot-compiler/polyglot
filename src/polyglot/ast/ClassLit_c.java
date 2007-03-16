@@ -95,4 +95,8 @@ public class ClassLit_c extends Lit_c implements ClassLit
   public Object constantValue() {
     return null;
   }
+  public Node copy(NodeFactory nf) {
+      return nf.ClassLit(this.position, this.typeNode);
+  }
+
 }

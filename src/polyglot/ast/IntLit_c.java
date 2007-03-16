@@ -134,4 +134,9 @@ public class IntLit_c extends NumLit_c implements IntLit
             return Precedence.LITERAL;
         }
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.IntLit(this.position, this.kind, this.value);
+    }
+
 }

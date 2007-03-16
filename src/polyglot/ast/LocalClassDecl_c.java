@@ -90,4 +90,9 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
         printBlock(decl, w, tr);
 	w.write(";");
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.LocalClassDecl(this.position, this.decl);
+    }
+
 }

@@ -68,4 +68,9 @@ public class SourceCollection_c extends Node_c implements SourceCollection
             w.newline(0);
         }
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.SourceCollection(this.position, this.sources);
+    }
+
 }

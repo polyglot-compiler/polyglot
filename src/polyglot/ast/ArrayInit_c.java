@@ -173,4 +173,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
         v.visitCFGList(elements, this);
         return succs;
     }
+    public Node copy(NodeFactory nf) {
+        return nf.ArrayInit(this.position, this.elements);
+    }
 }

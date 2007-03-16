@@ -53,4 +53,9 @@ public class Id_c extends Node_c implements Id
   public void dump(CodeWriter w) {
     w.write("(Id \"" + id + "\")");
   }
+  
+  public Node copy(NodeFactory nf) {
+      return nf.Id(this.position, this.id);
+  }
+
 }

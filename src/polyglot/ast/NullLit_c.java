@@ -43,4 +43,9 @@ public class NullLit_c extends Lit_c implements NullLit
     public Object constantValue() {
         return null;
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.NullLit(this.position);
+    }
+
 }

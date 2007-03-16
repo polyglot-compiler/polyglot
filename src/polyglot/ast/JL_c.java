@@ -11,6 +11,7 @@ import java.util.List;
 import java.io.OutputStream;
 import java.io.Writer;
 
+import polyglot.frontend.ExtensionInfo;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
@@ -268,4 +269,12 @@ public class JL_c extends Ext_c implements JL {
     public void translate(CodeWriter w, Translator tr) {
         jl().translate(w, tr);
     }
+    
+    public Node copy(NodeFactory nf) {
+        return jl().copy(nf);
+    }
+    public Node copy(ExtensionInfo extInfo) throws SemanticException {
+        return jl().copy(extInfo);
+    }
+    
 }

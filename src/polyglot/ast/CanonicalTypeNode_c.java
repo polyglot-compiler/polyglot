@@ -8,6 +8,7 @@
 
 package polyglot.ast;
 
+import polyglot.frontend.ExtensionInfo;
 import polyglot.main.Options;
 import polyglot.types.*;
 import polyglot.util.CodeWriter;
@@ -74,4 +75,54 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
     w.write("(type " + type + ")");
     w.end();
   }
+  public Node copy(NodeFactory nf) {
+      return nf.CanonicalTypeNode(this.position, this.type);
+  }
+  public Node copy(ExtensionInfo extInfo) throws SemanticException {
+      TypeNode tn = (TypeNode)this.del().copy(extInfo.nodeFactory());
+      Type t = tn.type();
+      if (t != null) {
+          // try to copy over type information
+          // This should really use a type visitor, if
+          // they existed.
+          TypeSystem ts = extInfo.typeSystem();
+          if (t.isVoid()) {
+              t = ts.Void();
+          }
+          else if (t.isBoolean()) {
+              t = ts.Boolean();
+          }
+          else if (t.isByte()) {
+              t = ts.Byte();
+          }
+          else if (t.isChar()) {
+              t = ts.Char();
+          }
+          else if (t.isDouble()) {
+              t = ts.Double();
+          }
+          else if (t.isFloat()) {
+              t = ts.Float();
+          }
+          else if (t.isInt()) {
+              t = ts.Int();
+          }
+          else if (t.isLong()) {
+              t = ts.Long();
+          }
+          else if (t.isNull()) {
+              t = ts.Null();
+          }
+          else if (t.isShort()) {
+              t = ts.Short();
+          }
+          else if (t.isThrowable()) {
+              t = ts.Throwable();
+          }          
+          tn = tn.type(t);
+      }
+
+      return tn;
+  }
+
 }

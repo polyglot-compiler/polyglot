@@ -133,4 +133,8 @@ public class Do_c extends Loop_c implements Do
     public Term continueTarget() {
         return cond.entry();
     }
+    public Node copy(NodeFactory nf) {
+        return nf.Do(this.position, this.body, this.cond);
+    }
+
 }

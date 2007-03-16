@@ -173,4 +173,8 @@ public class Special_c extends Expr_c implements Special
         w.end();
       }
     }
+    
+    public Node copy(NodeFactory nf) {
+        return nf.Special(this.position, this.kind, this.qualifier);
+    }
 }

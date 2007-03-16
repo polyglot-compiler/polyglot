@@ -120,4 +120,7 @@ assert(name != null); // qual may be null
             ? name.toString()
             : qual.toString() + "." + name.toString()) + "{amb}";
   }
+  public Node copy(NodeFactory nf) {
+      return nf.AmbTypeNode(this.position, this.qual, this.name);
+  }
 }

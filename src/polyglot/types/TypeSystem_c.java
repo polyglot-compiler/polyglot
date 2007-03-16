@@ -161,7 +161,7 @@ public class TypeSystem_c implements TypeSystem
 
     protected void assert_(TypeObject o) {
         if (o != null && o.typeSystem() != this) {
-            throw new InternalCompilerError("we are " + this + " but " + o +
+            throw new InternalCompilerError("we are " + this + " but " + o + " ("+o.getClass()+")" +
                                             " is from " + o.typeSystem());
         }
     }

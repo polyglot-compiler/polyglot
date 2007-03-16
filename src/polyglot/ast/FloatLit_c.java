@@ -101,4 +101,8 @@ public class FloatLit_c extends Lit_c implements FloatLit
             return Precedence.LITERAL;
         }
     }
+    public Node copy(NodeFactory nf) {
+        return nf.FloatLit(this.position, this.kind, this.value);
+    }
+
 }
