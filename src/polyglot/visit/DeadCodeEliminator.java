@@ -17,7 +17,8 @@ import polyglot.util.Position;
 import java.util.*;
 
 /**
- * Visitor which performs dead code elimination.
+ * Visitor which performs dead code elimination.  (Note that "dead code" is not
+ * unreachable code, but is actually code that has no effect.)
  */
 public class DeadCodeEliminator extends DataFlow {
     public DeadCodeEliminator(Job job, TypeSystem ts, NodeFactory nf) {
