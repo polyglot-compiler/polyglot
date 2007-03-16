@@ -132,6 +132,21 @@ public class ReachChecker extends DataFlow
         // check for reachability.
         if (n instanceof Term) {
            n = checkReachability((Term)n);
+           if (!((Term)n).reachable()) {
+               // Do we throw an exception or not?
+               
+               // Compound statements are allowed to be unreachable
+               // (e.g., "{ // return; }" or "while (true) S").  If a compound
+               // statement is truly unreachable, one of its sub-statements will
+               // be also and we will report an error there.
+
+               if ((n instanceof Block && ((Block) n).statements().isEmpty()) ||
+                       (n instanceof Stmt && ! (n instanceof CompoundStmt))) {
+                   throw new SemanticException("Unreachable statement.",
+                                               n.position());
+               }
+           }
+           
         }
          
         return super.leaveCall(old, n, v);
@@ -179,18 +194,7 @@ public class ReachChecker extends DataFlow
                 }
                 
                 // if we fall through to here, then no peer for n was reachable.
-                n = n.reachable(false);
-                
-                // Compound statements are allowed to be unreachable
-                // (e.g., "{ // return; }" or "while (true) S").  If a compound
-                // statement is truly unreachable, one of its sub-statements will
-                // be also and we will report an error there.
-    
-                if ((n instanceof Block && ((Block) n).statements().isEmpty()) ||
-                    (n instanceof Stmt && ! (n instanceof CompoundStmt))) {
-                    throw new SemanticException("Unreachable statement.",
-                                                n.position());
-                }
+                n = n.reachable(false);                
             }
         }        
         return n;
