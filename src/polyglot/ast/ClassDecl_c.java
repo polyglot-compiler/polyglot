@@ -58,7 +58,6 @@ public class ClassDecl_c extends Term_c implements ClassDecl
     }
 
     public ClassDecl type(ParsedClassType type) {
-        System.err.println("setting type: " + type);
             if (type == this.type) return this;
 	    ClassDecl_c n = (ClassDecl_c) copy();
 	    n.type = type;
