@@ -8,6 +8,7 @@
 package polyglot.visit;
 
 import polyglot.ast.*;
+import polyglot.frontend.Compiler;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.util.*;
@@ -50,7 +51,7 @@ public class NodeScrambler extends NodeVisitor
     this.pairs = new HashMap();
     this.nodes = new LinkedList();
     this.currentParents = new LinkedList();
-    this.cw = new OptimalCodeWriter( System.err, 72);
+    this.cw = Compiler.createCodeWriter(System.err, 72);
     this.seed = seed;
     
     this.ran = new Random( seed);

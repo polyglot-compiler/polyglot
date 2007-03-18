@@ -119,6 +119,10 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
           else if (t.isThrowable()) {
               t = ts.Throwable();
           }          
+          else {
+              // Should do something here.
+              // return an amb type node?
+          }
           tn = tn.type(t);
       }
 

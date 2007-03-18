@@ -37,12 +37,7 @@ public class TargetFactory
 
     public CodeWriter outputCodeWriter(File f, int width) throws IOException {
     	Writer w = outputWriter(f);
-    	if (Options.global.use_simple_code_writer) {
-    		return new SimpleCodeWriter(w, width);
-    	}
-    	else {
-    		return new OptimalCodeWriter(w, width);
-    	}
+        return Compiler.createCodeWriter(w, width);
     }
 
     /** Open a writer to the output file. */

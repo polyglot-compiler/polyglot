@@ -8,6 +8,7 @@
 package polyglot.visit;
 
 import polyglot.ast.Node;
+import polyglot.frontend.Compiler;
 import polyglot.util.CodeWriter;
 import polyglot.util.SimpleCodeWriter;
 import polyglot.types.SemanticException;
@@ -27,11 +28,11 @@ public class DumpAst extends NodeVisitor
     /** @deprecated Use the other constructor. */
     public DumpAst(String name, int width) throws IOException {
         this.fw = new PrintWriter(new FileWriter(name));
-	this.w = new SimpleCodeWriter(fw, width);
+        this.w = Compiler.createCodeWriter(fw, width);
     }
 
     public DumpAst(CodeWriter w) {
-	this.w = w;
+        this.w = w;
     }
 
     /** 
@@ -40,11 +41,11 @@ public class DumpAst extends NodeVisitor
      * the children.
      */
     public NodeVisitor enter(Node n) {
-	w.write("(");
-	n.dump(w);
-	w.allowBreak(4);
-	w.begin(0);
-	return this;
+        w.write("(");
+        n.dump(w);
+        w.allowBreak(4);
+        w.begin(0);
+        return this;
     }
 
     /**
@@ -53,23 +54,23 @@ public class DumpAst extends NodeVisitor
      * <code>enter</code>.
      */
     public Node leave(Node old, Node n, NodeVisitor v) {
-	w.end();
-	w.write(")");
-	w.allowBreak(0);
-	return n;
+        w.end();
+        w.write(")");
+        w.allowBreak(0);
+        return n;
     }
 
     public void finish() {
-	try {
-	    w.flush();
+        try {
+            w.flush();
 
-	    if (fw != null) {
-		fw.flush();
-		fw.close();
-	    }
-	}
-	catch (IOException e) {
-	    e.printStackTrace();
-	}
+            if (fw != null) {
+                fw.flush();
+                fw.close();
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
