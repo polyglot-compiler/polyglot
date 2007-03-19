@@ -207,7 +207,9 @@ public abstract class Assign_c extends Expr_c implements Assign
     w.write(" ");
     w.write(op.toString());
     w.allowBreak(2, 2, " ", 1); // miser mode
+    w.begin(0);
     printSubExpr(right, false, w, tr);
+    w.end();
   }
 
   /** Dumps the AST. */
