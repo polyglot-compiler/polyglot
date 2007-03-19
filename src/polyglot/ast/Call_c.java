@@ -345,12 +345,12 @@ public class Call_c extends Expr_c implements Call
     if (!targetImplicit) {
         if (target instanceof Expr) {
           printSubExpr((Expr) target, w, tr);
-          w.write(".");
         }
         else if (target != null) {
           print(target, w, tr);
-          w.write(".");
         }
+	w.write(".");
+	w.allowBreak(2, 3, "", 0);
     }
 
     w.write(name + "(");

@@ -56,7 +56,7 @@ public class PackageNode_c extends Node_c implements PackageNode
             w.write("<unknown-package>");
         }
         else {
-            w.write(package_.toString());
+	    package_.print(w);
         }
     }
     
