@@ -7,16 +7,14 @@
 
 package polyglot.visit;
 
-import polyglot.main.*;
+import java.io.IOException;
+import java.util.*;
+
 import polyglot.ast.*;
-import polyglot.frontend.*;
-import polyglot.frontend.Job;
-import polyglot.frontend.goals.Goal;
+import polyglot.main.Report;
+import polyglot.main.Version;
 import polyglot.types.*;
 import polyglot.util.*;
-
-import java.io.*;
-import java.util.*;
 
 /**
  * Visitor which serializes class objects and adds a field to the class
@@ -24,6 +22,12 @@ import java.util.*;
  */
 public class ClassSerializer extends NodeVisitor
 {
+    /**
+     * The maximum number of characters that will be assigned to an encoded type string field.
+     * More characters than this will be broken up over several fields.
+     */
+    private static final int MAX_ENCODED_TYPE_INFO_STRING_LENGTH = 8192;
+    
     protected TypeEncoder te;
     protected ErrorQueue eq;
     protected Date date;
@@ -120,7 +124,7 @@ public class ClassSerializer extends NodeVisitor
             ii = ts.initializerInstance(pos, ct, Flags.STATIC);
 	    f = nf.FieldDecl(fi.position(), fi.flags(),
 		             nf.CanonicalTypeNode(fi.position(), fi.type()),
-			     fi.name(),
+                             nf.Id(fi.position(), fi.name()),
 			     nf.StringLit(pos, version).type(ts.String()));
 
 	    f = f.fieldInstance(fi);
@@ -136,27 +140,44 @@ public class ClassSerializer extends NodeVisitor
             ii = ts.initializerInstance(pos, ct, Flags.STATIC);
 	    f = nf.FieldDecl(fi.position(), fi.flags(),
 		             nf.CanonicalTypeNode(fi.position(), fi.type()),
-			     fi.name(),
+                             nf.Id(fi.position(), fi.name()),
 			     nf.IntLit(pos, IntLit.LONG, time).type(ts.Long()));
 
 	    f = f.fieldInstance(fi);
             f = f.initializerInstance(ii);
             newMembers.add(f);
 
-	    /* Add the class type info. */
-	    fi = ts.fieldInstance(pos, ct,
-                                  flags, ts.String(),
-                                  "jlc$ClassType$" + suffix);
-            ii = ts.initializerInstance(pos, ct, Flags.STATIC);
-	    f = nf.FieldDecl(fi.position(), fi.flags(),
-		             nf.CanonicalTypeNode(fi.position(), fi.type()),
-			     fi.name(),
-			     nf.StringLit(pos, te.encode(ct)).type(ts.String()));
+            // output the encoded type info, over several fields if needed.
+            String encodedTypeInfo = te.encode(ct);
+            int etiStart = 0;
+            int etiEnd = 0;
+            int numberETIFields = 0;
+            do {
+                etiEnd = encodedTypeInfo.length();
+                if (etiEnd - etiStart > MAX_ENCODED_TYPE_INFO_STRING_LENGTH) {
+                    etiEnd = etiStart + MAX_ENCODED_TYPE_INFO_STRING_LENGTH;
+                }
+                // add an additional suffix to distinguish fields.
+                String additionalFieldSuffix = numberETIFields==0?"":("$" + (char)('a' + numberETIFields - 1));
+                fi = ts.fieldInstance(pos, ct,
+                                      flags, ts.String(),
+                                      "jlc$ClassType$" + suffix + additionalFieldSuffix);
+                ii = ts.initializerInstance(pos, ct, Flags.STATIC);
 
-	    f = f.fieldInstance(fi);
-            f = f.initializerInstance(ii);
-            newMembers.add(f);
+                f = nf.FieldDecl(fi.position(), fi.flags(),
+                                 nf.CanonicalTypeNode(fi.position(), fi.type()),
+                                 nf.Id(fi.position(), fi.name()),
+                                 nf.StringLit(pos, encodedTypeInfo.substring(etiStart, etiEnd)).type(ts.String()));
 
+                f = f.fieldInstance(fi);
+                f = f.initializerInstance(ii);
+                newMembers.add(f);
+                
+                numberETIFields++;
+                etiStart = etiEnd;
+            }
+            while (etiEnd != encodedTypeInfo.length());
+            
             return newMembers;
 	}
 	catch (IOException e) {

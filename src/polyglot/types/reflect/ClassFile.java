@@ -91,7 +91,25 @@ public class ClassFile {
             mask |= 2;
           }
           else if (fields[i].name().equals("jlc$ClassType$" + typeSystemKey)) {
-            jlc.encodedClassType = fields[i].getString();
+            // there is encoded class type information.
+            StringBuffer encodedClassTypeInfo = new StringBuffer(fields[i].getString());
+            // check to see if there are more fields.
+            int seeking = 0;
+            boolean found;
+            do {
+                found = false;
+                String suffix = ("$" + (char)('a' + seeking));
+                String seekingFieldName = "jlc$ClassType$" + typeSystemKey + suffix;
+                for (int j = 0; j < fields.length; j++) {
+                    if (fields[j].name().equals(seekingFieldName)) {
+                        encodedClassTypeInfo.append(fields[j].getString());
+                        found = true;
+                        seeking++;
+                        break;
+                    }
+                }
+            } while (found);
+            jlc.encodedClassType = encodedClassTypeInfo.toString();
             mask |= 4;
           }
         }
