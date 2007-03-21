@@ -68,6 +68,9 @@ public class AmbiguityRemover extends DisambiguationDriver
             Goal g = scheduler.currentGoal();
             scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
             g.setUnreachableThisRun();
+            if (this.rethrowMissingDependencies) {
+                throw e;
+            }
             return n;
         }
         catch (SemanticException e) {

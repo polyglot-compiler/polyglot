@@ -35,6 +35,13 @@ import java.util.*;
 public class ContextVisitor extends ErrorHandlingVisitor
 {
     protected ContextVisitor outer;
+    
+    /**
+     * Should MissingDependencyExceptions be rethrown? If not,
+     * then the dependency is added to the scheduler, and
+     * the visitor continues.
+     */
+    protected boolean rethrowMissingDependencies = false;
 
     /** The current context of this visitor. */
     protected Context context;
@@ -43,6 +50,15 @@ public class ContextVisitor extends ErrorHandlingVisitor
         super(job, ts, nf);
         this.outer = null;
         this.context = null;
+    }
+
+    public ContextVisitor rethrowMissingDependencies(boolean rethrow) {
+        if (rethrow == this.rethrowMissingDependencies) {
+            return this;
+        }
+        ContextVisitor cv = (ContextVisitor)this.copy();
+        cv.rethrowMissingDependencies = rethrow;
+        return cv;
     }
 
     public NodeVisitor begin() {
@@ -136,7 +152,10 @@ public class ContextVisitor extends ErrorHandlingVisitor
             // The context might also be incorrect for later siblings
             // of this node, so set a flag to prune until the scope
             // is popped.
-            this.prune = true;
+            this.prune = true;            
+            if (this.rethrowMissingDependencies) {
+                throw e;
+            }
             return new PruningVisitor();
         }
     }
@@ -166,6 +185,9 @@ public class ContextVisitor extends ErrorHandlingVisitor
             Goal g = scheduler.currentGoal();
             scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
             g.setUnreachableThisRun();
+            if (this.rethrowMissingDependencies) {
+                throw e;
+            }
         }
         return n;
     }

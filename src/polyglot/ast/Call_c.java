@@ -199,8 +199,8 @@ public class Call_c extends Expr_c implements Call
         }
 
         // we call computeTypes on the reciever too.
-        Call_c call = (Call_c) this.targetImplicit(true).target(r);
-        return call.visit(tc);
+        Call_c call = (Call_c) this.targetImplicit(true).target(r);        
+        return call.visit(tc.rethrowMissingDependencies(true));
     }
 
     /**

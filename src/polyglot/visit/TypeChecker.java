@@ -11,8 +11,6 @@ import java.util.Iterator;
 
 import polyglot.ast.*;
 import polyglot.frontend.*;
-import polyglot.frontend.Job;
-import polyglot.frontend.MissingDependencyException;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Report;
 import polyglot.types.SemanticException;
@@ -25,7 +23,7 @@ public class TypeChecker extends DisambiguationDriver
     public TypeChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
-   
+       
     public Node override(Node parent, Node n) {
         try {
             if (Report.should_report(Report.visit, 2))
@@ -45,6 +43,9 @@ public class TypeChecker extends DisambiguationDriver
             Goal g = scheduler.currentGoal();
             scheduler.addDependencyAndEnqueue(g, e.goal(), e.prerequisite());
             g.setUnreachableThisRun();
+            if (this.rethrowMissingDependencies) {
+                throw e;
+            }
             return n;
         }
         catch (SemanticException e) {
