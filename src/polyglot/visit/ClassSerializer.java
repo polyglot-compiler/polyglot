@@ -158,7 +158,7 @@ public class ClassSerializer extends NodeVisitor
                     etiEnd = etiStart + MAX_ENCODED_TYPE_INFO_STRING_LENGTH;
                 }
                 // add an additional suffix to distinguish fields.
-                String additionalFieldSuffix = numberETIFields==0?"":("$" + (char)('a' + numberETIFields - 1));
+                String additionalFieldSuffix = numberETIFields==0?"":("$" + numberETIFields);
                 fi = ts.fieldInstance(pos, ct,
                                       flags, ts.String(),
                                       "jlc$ClassType$" + suffix + additionalFieldSuffix);

@@ -94,11 +94,11 @@ public class ClassFile {
             // there is encoded class type information.
             StringBuffer encodedClassTypeInfo = new StringBuffer(fields[i].getString());
             // check to see if there are more fields.
-            int seeking = 0;
+            int seeking = 1;
             boolean found;
             do {
                 found = false;
-                String suffix = ("$" + (char)('a' + seeking));
+                String suffix = ("$" + seeking);
                 String seekingFieldName = "jlc$ClassType$" + typeSystemKey + suffix;
                 for (int j = 0; j < fields.length; j++) {
                     if (fields[j].name().equals(seekingFieldName)) {
