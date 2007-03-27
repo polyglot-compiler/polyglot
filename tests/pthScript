@@ -150,6 +150,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
         TernaryPrimitiveOps.jl ;
         TypeShadowing.jl ;
         xIterator.jl ;
+        FormalsDup.jl (Semantic, "multiply defined"), (Semantic, "multiply defined");
         AbstractSuperMethod.jl (Semantic, "Cannot call an abstract method of the super class");
         BadAbstract.jl (Semantic, "should be declared abstract");
         BadAlloc.jl (Semantic, "Cannot instantiate an interface");
