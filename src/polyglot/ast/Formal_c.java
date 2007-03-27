@@ -160,6 +160,28 @@ public class Formal_c extends Term_c implements Formal
 
     /** Type check the formal. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
+        // Check if the variable is multiply defined.
+        // we do it in type check enter, instead of type check since
+        // we add the declaration before we enter the scope of the
+        // initializer.
+        Context c = tc.context();
+
+        LocalInstance outerLocal = null;
+
+        try {
+            outerLocal = c.findLocal(li.name());
+        }
+        catch (SemanticException e) {
+            // not found, so not multiply defined
+        }
+
+        if (outerLocal != null && c.isLocal(li.name())) {
+            throw new SemanticException(
+                "Local variable \"" + name + "\" multiply defined.  "
+                    + "Previous definition at " + outerLocal.position() + ".",
+                position());
+        }
+
 	TypeSystem ts = tc.typeSystem();
 
 	try {
