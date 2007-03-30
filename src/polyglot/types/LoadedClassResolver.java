@@ -110,7 +110,9 @@ public class LoadedClassResolver implements TopLevelResolver
   public Named find(String name) throws SemanticException {
     if (Report.should_report(report_topics, 3))
       Report.report(3, "LoadedCR.find(" + name + ")");
-
+ 
+    Named result = null;
+    
     // First try the class file.
     ClassFile clazz = loadFile(name);
     if (clazz == null) {
@@ -121,13 +123,21 @@ public class LoadedClassResolver implements TopLevelResolver
     if (clazz.encodedClassType(version.name()) != null) {
       if (Report.should_report(report_topics, 4))
 	Report.report(4, "Using encoded class type for " + name);
-      return getEncodedType(clazz, name);
+      result = getEncodedType(clazz, name);
     }
     
     if (allowRawClasses) {
       if (Report.should_report(report_topics, 4))
 	Report.report(4, "Using raw class file for " + name);
-      return new ClassFileLazyClassInitializer(clazz, ts).type();
+      result = new ClassFileLazyClassInitializer(clazz, ts).type();
+    }
+    
+    // Verify that the type we loaded has the right name.  This prevents,
+    // for example, requesting a type through its mangled (class file) name.
+    if (result != null) {
+        if (name.equals(result.fullName())) {
+            return result;
+        }
     }
 
     // We have a raw class, but are not allowed to use it, and
