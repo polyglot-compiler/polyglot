@@ -27,6 +27,33 @@ fixclasspath() {
   fi
 }
 
+unixfilename() {
+  if [ `uname | grep -c CYGWIN` -ne 0 ]; then
+    windows=1
+  fi
+
+  cp="$1"
+  if [ "$windows" = 1 ]; then 
+    cygpath -u "$cp"
+  else
+    echo "$cp"
+  fi
+}
+
+unixpath() {
+  if [ `uname | grep -c CYGWIN` -ne 0 ]; then
+    windows=1
+  fi
+
+  cp="$1"
+  if [ "$windows" = 1 ]; then 
+    cygpath -pu "$cp"
+  else
+    echo "$cp"
+  fi
+  cp="$1"
+}
+
 extra_cp=
 args=
 vmargs=
@@ -36,6 +63,8 @@ java=java
 polyglot() {
   eval "$java" "$vmargs" -classpath "'$classpath'" polyglot.pth.Main "$@"
 }
+
+dir=`unixfilename "$dir"`
 
 while true; do
     case "$1" in
@@ -48,7 +77,9 @@ while true; do
             ;;
         -classpath)
             shift
-            extra_cp="$extra_cp:$1"
+            extra_cp_arg=`unixpath "$1"`
+            extra_cp="$extra_cp:$extra_cp_arg"
+            
             shift
             ;;
         -j)
@@ -82,8 +113,8 @@ if [ "$usage" = 1 ]; then
   exit 0
 fi
 
-if [ "$verbose" = 1 ]; then
+#if [ "$verbose" = 1 ]; then
   echo "$java" "$vmargs" -classpath "'$classpath'" polyglot.main.Main "$@"
-fi
+#fi
 
 polyglot "$args"
