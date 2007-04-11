@@ -113,8 +113,8 @@ if [ "$usage" = 1 ]; then
   exit 0
 fi
 
-#if [ "$verbose" = 1 ]; then
+if [ "$verbose" = 1 ]; then
   echo "$java" "$vmargs" -classpath "'$classpath'" polyglot.main.Main "$@"
-#fi
+fi
 
 polyglot "$args"
