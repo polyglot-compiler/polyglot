@@ -191,8 +191,9 @@ public class Main
               if (!options.keep_output_files) {
                 String[] rmCmd = new String[1+compiler.outputFiles().size()];
                 rmCmd[0] = "rm";
-                for (int i = 1; i < rmCmd.length; i++)
-                    rmCmd[i] = javacCmd[i+2];
+                iter = compiler.outputFiles().iterator();
+                for (int i = 1; iter.hasNext(); i++)
+                  rmCmd[i] = (String) iter.next();
                 runtime.exec(rmCmd);
               }
 
