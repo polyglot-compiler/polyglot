@@ -262,22 +262,18 @@ public class Compiler
         return createCodeWriter(w, Options.global.output_width);
     }
     public static CodeWriter createCodeWriter(OutputStream w, int width) {
-        if (Options.global.use_simple_code_writer) {
+        if (Options.global.use_simple_code_writer)
             return new SimpleCodeWriter(w, width);
-        }
-        else {
-            return new OptimalCodeWriter(w, width);
-        }        
+        else
+	    return new OptimalCodeWriter(w, width);
     }
     public static CodeWriter createCodeWriter(Writer w) {
         return createCodeWriter(w, Options.global.output_width);
     }
     public static CodeWriter createCodeWriter(Writer w, int width) {
-        if (Options.global.use_simple_code_writer) {
+        if (Options.global.use_simple_code_writer)
             return new SimpleCodeWriter(w, width);
-        }
-        else {
+        else
             return new OptimalCodeWriter(w, width);
-        }        
     }
 }

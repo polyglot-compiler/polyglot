@@ -63,7 +63,7 @@ public class Main {
 	    TypeSystem ts = extInfo.typeSystem();
 	    TypeDumper t = TypeDumper.load(className, ts);
 
-	    CodeWriter cw = new SimpleCodeWriter(System.out, 72);
+	    CodeWriter cw = new OptimalCodeWriter(System.out, 72);
 	    
 	    t.dump(cw);
 	    cw.newline(0);
