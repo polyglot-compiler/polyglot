@@ -264,8 +264,8 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
 	BadForwardRef.jl (Semantic, "Illegal forward ref"); 
 	BadForwardRef2.jl (Semantic, "Illegal forward ref"); 
 	BadForwardRef3.jl (Semantic, "Illegal forward ref"); 
-        Continue1.jl (Semantic, "Target.*not found");
-        Continue2.jl (Semantic, "must be a loop");
+        Continue1.jl (Semantic, "Target.*not found"), (), (), ();
+        Continue2.jl (Semantic, "must be a loop"), (), (), ();
 	ForwardRef4.jl (Semantic, "Illegal forward ref"); 
 	ForwardRef5.jl; 
 	// the following test has exactly 4 errors in it
