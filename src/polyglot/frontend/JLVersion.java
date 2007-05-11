@@ -13,6 +13,6 @@ public class JLVersion extends polyglot.main.Version {
     public String name() { return "jl"; }
     public int major() { return 2; }
     public int minor() { return 2; }
-    public int patch_level() { return 0; }
-    public String toString() { return "2.2.0 (2007-02-23 15:54:14)"; }
+    public int patch_level() { return 1; }
+    public String toString() { return "2.2.1 (2007-05-11 11:49:45)"; }
 }
