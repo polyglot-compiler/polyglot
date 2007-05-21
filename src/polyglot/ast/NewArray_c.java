@@ -11,6 +11,7 @@ package polyglot.ast;
 import polyglot.types.*;
 import polyglot.visit.*;
 import polyglot.util.*;
+
 import java.util.*;
 
 /**
@@ -183,6 +184,20 @@ public class NewArray_c extends Expr_c implements NewArray
             v.visitCFG(init, this);
         }
         return succs;
+    }
+    
+    public List throwTypes(TypeSystem ts) {
+        if (dims != null && !dims.isEmpty()) {
+            // if dimension expressions are given, then
+            // a NegativeArraySizeException may be thrown.
+            try {
+                return CollectionUtil.list(ts.typeForName("java.lang.NegativeArraySizeException"));
+            }
+            catch (SemanticException e) {
+                throw new InternalCompilerError("Cannot find class java.lang.NegativeArraySizeException", e);
+            }
+        }
+        return Collections.EMPTY_LIST;
     }
     
     public Node copy(NodeFactory nf) {
