@@ -595,6 +595,7 @@
                     <fileset dir="${examples.dir}" includes="pao/**,coffer/**" />
 		</copy>
 
+                <copy file="META-INF/MANIFEST.MF" todir="${tmp}/META-INF" />
                 <copy file="${bin}/newext.sh" todir="${tmp}/bin" />
 		<copy file="${bin}/jlc" todir="${tmp}/bin" />
 		<copy file="${bin}/pth" todir="${tmp}/bin" />
