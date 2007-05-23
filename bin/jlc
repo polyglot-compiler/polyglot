@@ -51,10 +51,6 @@ vmargs=
 classpath=
 java=java
 
-polyglot() {
-  eval "$java" "$vmargs" -classpath "'$classpath'" polyglot.main.Main "$@"
-}
-
 dir=`unixfilename "$dir"`
 
 while true; do
@@ -72,6 +68,7 @@ while true; do
             shift
             ;;
         -ext)
+            shift
             ext="$1"
             shift
             ;;
@@ -115,7 +112,8 @@ if [ "$usage" = 1 ]; then
 fi
 
 if [ "$verbose" = 1 ]; then
-  echo "$java" "$vmargs" -classpath "'$classpath'" polyglot.main.Main "$@"
+  echo "$java" "$vmargs" -classpath "'$classpath'" polyglot.main.Main -classpath "'$classpath'" "$args"
 fi
 
-polyglot "$args"
+  eval "$java" "$vmargs" -classpath "'$classpath'" polyglot.main.Main -classpath "'$classpath'" "$args"
+

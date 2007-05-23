@@ -68,6 +68,7 @@ while true; do
             shift
             ;;
         -ext)
+            shift
             ext="$1"
             shift
             ;;
