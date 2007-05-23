@@ -16,21 +16,28 @@ public interface Assign extends Expr
 {
     /** Assignment operator. */
     public static class Operator extends Enum {
-	public Operator(String name) { super(name); } 
+        private final Binary.Operator binOp;
+        public Operator(String name, Binary.Operator binOp) { 
+            super(name);
+            this.binOp = binOp;
+        }
+        public Binary.Operator binaryOperator() {
+            return binOp;
+        }
     }
 
-    public static final Operator ASSIGN         = new Operator("=");
-    public static final Operator ADD_ASSIGN     = new Operator("+=");
-    public static final Operator SUB_ASSIGN     = new Operator("-=");
-    public static final Operator MUL_ASSIGN     = new Operator("*=");
-    public static final Operator DIV_ASSIGN     = new Operator("/=");
-    public static final Operator MOD_ASSIGN     = new Operator("%=");
-    public static final Operator BIT_AND_ASSIGN = new Operator("&=");
-    public static final Operator BIT_OR_ASSIGN  = new Operator("|=");
-    public static final Operator BIT_XOR_ASSIGN = new Operator("^=");
-    public static final Operator SHL_ASSIGN     = new Operator("<<=");
-    public static final Operator SHR_ASSIGN     = new Operator(">>=");
-    public static final Operator USHR_ASSIGN    = new Operator(">>>=");
+    public static final Operator ASSIGN         = new Operator("=", null);
+    public static final Operator ADD_ASSIGN     = new Operator("+=", Binary.ADD);
+    public static final Operator SUB_ASSIGN     = new Operator("-=", Binary.SUB);
+    public static final Operator MUL_ASSIGN     = new Operator("*=", Binary.MUL);
+    public static final Operator DIV_ASSIGN     = new Operator("/=", Binary.DIV);
+    public static final Operator MOD_ASSIGN     = new Operator("%=", Binary.MOD);
+    public static final Operator BIT_AND_ASSIGN = new Operator("&=", Binary.BIT_AND);
+    public static final Operator BIT_OR_ASSIGN  = new Operator("|=", Binary.BIT_OR);
+    public static final Operator BIT_XOR_ASSIGN = new Operator("^=", Binary.BIT_XOR);
+    public static final Operator SHL_ASSIGN     = new Operator("<<=", Binary.SHL);
+    public static final Operator SHR_ASSIGN     = new Operator(">>=", Binary.SHR);
+    public static final Operator USHR_ASSIGN    = new Operator(">>>=", Binary.USHR);
 
     /**
      * Left child (target) of the assignment.
