@@ -282,7 +282,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
             return (ClassType) ts.systemResolver().find(name);
         }
         catch (SemanticException e) {
-            throw new InternalCompilerError("could not load " + name);
+            throw new InternalCompilerError("could not load " + name, e);
         }
     }
 

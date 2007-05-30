@@ -46,7 +46,7 @@ public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
         }
         catch (SemanticException e) {
             throw new InternalCompilerError(
-                "Unable to initialize type system: " + e.getMessage());
+                "Unable to initialize type system: " + e.getMessage(), e);
         }
     }
     
