@@ -163,6 +163,12 @@ public class SystemResolver extends CachingResolver implements TopLevelResolver 
         }
     }
 
+    /**
+     * Find a type (or package) by name. For most code, this should be called
+     * with the Java source name (p.A.B), not the class file name (p.A$B). The
+     * exceptions are for resolving names in deserialized types and in types
+     * loaded from raw class files.
+     */
     public Named find(String name) throws SemanticException {
         if (previous == null) {
             clearAdded();

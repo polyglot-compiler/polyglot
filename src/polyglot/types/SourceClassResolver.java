@@ -190,12 +190,14 @@ public class SourceClassResolver extends LoadedClassResolver
         encodedClazz = null;
       }
     }
+    
+    Named result = null;
 
     if (encodedClazz != null) {
       if (Report.should_report(report_topics, 4))
 	Report.report(4, "Using encoded class type for " + name);
       try {
-        return getEncodedType(encodedClazz, name);
+        result = getEncodedType(encodedClazz, name);
       }
       catch (BadSerializationException e) {
       	throw e;
@@ -208,19 +210,29 @@ public class SourceClassResolver extends LoadedClassResolver
     }
 
     // At this point, at most one of clazz and source should be set.
-
-    if (clazz != null && this.allowRawClasses) {
+    if (result == null && clazz != null && this.allowRawClasses) {
       if (Report.should_report(report_topics, 4))
 	Report.report(4, "Using raw class file for " + name);
-      return new ClassFileLazyClassInitializer(clazz, ts).type();
+      result = new ClassFileLazyClassInitializer(clazz, ts).type();
     }
 
-    if (source != null) {
+    if (result == null && source != null) {
       if (Report.should_report(report_topics, 4))
 	Report.report(4, "Using source file for " + name);
-      return getTypeFromSource(source, name);
+      result = getTypeFromSource(source, name);
     }
-
+    
+    // Verify that the type we loaded has the right name.  This prevents,
+    // for example, requesting a type through its mangled (class file) name.
+    if (result != null) {
+        if (name.equals(result.fullName())) {
+            return result;
+        }
+        if (result instanceof ClassType && name.equals(ts.getTransformedClassName((ClassType) result))) {
+            return result;
+        }
+    }
+    
     if (clazz != null && !this.allowRawClasses) {
         // We have a raw class only. We do not have the source code,
         // or encoded class information. 

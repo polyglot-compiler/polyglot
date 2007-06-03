@@ -138,6 +138,9 @@ public class LoadedClassResolver implements TopLevelResolver
         if (name.equals(result.fullName())) {
             return result;
         }
+        if (result instanceof ClassType && name.equals(ts.getTransformedClassName((ClassType) result))) {
+            return result;
+        }
     }
 
     // We have a raw class, but are not allowed to use it, and
