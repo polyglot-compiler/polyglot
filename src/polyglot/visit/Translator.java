@@ -153,9 +153,9 @@ public class Translator extends PrettyPrinter implements Copy
         
         child.del().translate(w, tr);
         
-        if (parent != null) {
-            if (parent.isDisambiguated() && parent.isTypeChecked()) {
-                parent.addDecls(context);
+        if (child != null) {
+            if (child.isDisambiguated() && child.isTypeChecked()) {
+                child.addDecls(context);
             }
         }
     }
