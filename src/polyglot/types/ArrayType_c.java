@@ -48,7 +48,7 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
         }
 
         if (fields == null) {
-            fields = new ArrayList(2);
+            fields = new ArrayList(1);
 
             // Add field public final int length
             FieldInstance fi = ts.fieldInstance(position(),
