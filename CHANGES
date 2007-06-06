@@ -3,6 +3,21 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
+Jun 5, 2007: Polyglot 2.2.2
+===========================
+
+Miscellaneous bug fixes.
+
+May 11, 2007: Polyglot 2.2.1
+============================
+
+Fixed assumption that return statements occur only within methods.
+
+Added copy(NodeFactory) method to Node interface to generate a new
+version of a node with a different node factory.
+
+Miscellaneous bug fixes.
+
 Feb 23, 2007: Polyglot 2.2.0
 ============================
 
@@ -19,7 +34,7 @@ MemberProcedureInstance should fix the problems in most cases.
 Added FunctionInstance interface: procedures with return types that are
 not methods.
 
-Miscellaneous bug fixes.
+Miscellaneous bug fixes.  Patch from Bob Fuhrer (rfuhrer@us.ibm.com).
 
 Feb 8, 2007: Polyglot 2.1.0
 ===========================
