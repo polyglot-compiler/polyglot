@@ -204,15 +204,15 @@ public class Conditional_c extends Expr_c implements Conditional
 	printSubExpr(alternative, false, w, tr);
     }
 
-    public Term entry() {
-        return cond.entry();
+    public Term firstChild() {
+        return cond;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent.entry(),
-                         FlowGraph.EDGE_KEY_FALSE, alternative.entry());
-        v.visitCFG(consequent, this);
-        v.visitCFG(alternative, this);
+        v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, true,
+                         FlowGraph.EDGE_KEY_FALSE, alternative, true);
+        v.visitCFG(consequent, this, false);
+        v.visitCFG(alternative, this, false);
 
         return succs;
     }

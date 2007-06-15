@@ -91,12 +91,12 @@ public class Throw_c extends Stmt_c implements Throw
 	w.write(";");
     }
 
-    public Term entry() {
-        return expr.entry();
+    public Term firstChild() {
+        return expr;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(expr, this);
+        v.visitCFG(expr, this, false);
 
         // Throw edges will be handled by visitor.
         return Collections.EMPTY_LIST;

@@ -130,13 +130,13 @@ public class Cast_c extends Expr_c implements Cast
 	w.end();
     }
 
-    public Term entry() {
-        return expr.entry();
+    public Term firstChild() {
+        return expr;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(expr, castType.entry());
-        v.visitCFG(castType, this);
+        v.visitCFG(expr, castType, true);
+        v.visitCFG(castType, this, false);
         return succs;
     }
 

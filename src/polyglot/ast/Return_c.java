@@ -152,14 +152,14 @@ public class Return_c extends Stmt_c implements Return
 	w.write(";");
     }
 
-    public Term entry() {
-        if (expr != null) return expr.entry();
-        return this;
+    public Term firstChild() {
+        if (expr != null) return expr;
+        return null;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (expr != null) {
-            v.visitCFG(expr, this);
+            v.visitCFG(expr, this, false);
         }
 
         v.visitReturn(this);

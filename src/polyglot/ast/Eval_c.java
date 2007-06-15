@@ -83,12 +83,12 @@ public class Eval_c extends Stmt_c implements Eval
 	tr.appendSemicolon(semi);
     }
 
-    public Term entry() {
-        return expr.entry();
+    public Term firstChild() {
+        return expr;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(expr, this);
+        v.visitCFG(expr, this, false);
         return succs;
     }
     public Node copy(NodeFactory nf) {

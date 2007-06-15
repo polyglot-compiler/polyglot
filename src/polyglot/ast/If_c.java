@@ -145,21 +145,21 @@ public class If_c extends Stmt_c implements If
 	}
     }
 
-    public Term entry() {
-        return cond.entry();
+    public Term firstChild() {
+        return cond;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (alternative == null) {
-            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent.entry(), 
-                             FlowGraph.EDGE_KEY_FALSE, this);
-            v.visitCFG(consequent, this);
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, true, 
+                             FlowGraph.EDGE_KEY_FALSE, this, false);
+            v.visitCFG(consequent, this, false);
         }
         else {
-            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent.entry(),
-                             FlowGraph.EDGE_KEY_FALSE, alternative.entry());
-            v.visitCFG(consequent, this);
-            v.visitCFG(alternative, this);
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, true,
+                             FlowGraph.EDGE_KEY_FALSE, alternative, true);
+            v.visitCFG(consequent, this, false);
+            v.visitCFG(alternative, this, false);
         }
 
         return succs;

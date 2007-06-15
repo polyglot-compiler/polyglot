@@ -199,18 +199,18 @@ public class Unary_c extends Expr_c implements Unary
 	}
     }
 
-    public Term entry() {
-        return expr.entry();
+    public Term firstChild() {
+        return expr;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (expr.type().isBoolean()) {
-            v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this,
-                             FlowGraph.EDGE_KEY_FALSE, this);
+            v.visitCFG(expr, FlowGraph.EDGE_KEY_TRUE, this, false,
+                             FlowGraph.EDGE_KEY_FALSE, this, false);
+        } else {
+            v.visitCFG(expr, this, false);
         }
-        else {
-            v.visitCFG(expr, this);
-        }
+        
         return succs;
     }
     

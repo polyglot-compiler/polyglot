@@ -109,8 +109,8 @@ public class AmbExpr_c extends Expr_c implements AmbExpr
    * Return the first (sub)term performed when evaluating this
    * term.
    */
-  public Term entry() {
-      return this;
+  public Term firstChild() {
+      return null;
   }
 
   /**

@@ -29,8 +29,13 @@ public abstract class Term_c extends Node_c implements Term
     /**
      * Return the first (sub)term performed when evaluating this
      * term.
+     * 
+     * @deprecated Should not be used any more for dataflow.
+     * @see firstChild().
      */
-    public abstract Term entry();
+    public Term entry() {
+        return null;
+    }
 
     /**
      * Visit this term in evaluation order.
@@ -60,11 +65,23 @@ public abstract class Term_c extends Node_c implements Term
         return t;
     }
 
-    /** Utility function to get the first entry of a list, or else alt. */
+    /** 
+     * Utility function to get the first entry of a list, or else alt.
+     * 
+     * @deprecated Since entry() is deprecated, this method should not be used
+     * either. Use listChild() in firstChild() and the like.
+     * @see listChild().
+     */
     public static Term listEntry(List l, Term alt) {
         Term c = (Term) CollectionUtil.firstOrElse(l, alt);
         if (c != alt) return c.entry();
         return alt;
+    }
+
+    /** Utility function to get the first entry of a list, or else alt. */
+    public static Term listChild(List l, Term alt) {
+        Term c = (Term) CollectionUtil.firstOrElse(l, alt);
+        return c;
     }
     
     protected SubtypeSet exceptions;

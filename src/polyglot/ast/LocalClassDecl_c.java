@@ -54,15 +54,15 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
      * Return the first (sub)term performed when evaluating this
      * term.
      */
-    public Term entry() {
-        return this.decl().entry();
+    public Term firstChild() {
+        return decl();
     }
 
     /**
      * Visit this term in evaluation order.
      */
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(this.decl(), this);
+        v.visitCFG(decl(), this, false);
         return succs;
     }
 

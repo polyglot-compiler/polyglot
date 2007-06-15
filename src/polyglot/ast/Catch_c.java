@@ -108,13 +108,13 @@ public class Catch_c extends Stmt_c implements Catch
 	printSubStmt(body, w, tr);
     }
 
-    public Term entry() {
-        return formal.entry();
+    public Term firstChild() {
+        return formal;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(formal, body.entry());
-        v.visitCFG(body, this);
+        v.visitCFG(formal, body, true);
+        v.visitCFG(body, this, false);
         return succs;
     }
     public Node copy(NodeFactory nf) {

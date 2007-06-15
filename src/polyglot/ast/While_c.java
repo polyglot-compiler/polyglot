@@ -109,26 +109,26 @@ public class While_c extends Loop_c implements While
 	printSubStmt(body, w, tr);
     }
 
-    public Term entry() {
-        return cond.entry();
+    public Term firstChild() {
+        return cond;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (condIsConstantTrue()) {
-            v.visitCFG(cond, body.entry());
+            v.visitCFG(cond, body, true);
         }
         else {
-            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body.entry(), 
-                             FlowGraph.EDGE_KEY_FALSE, this);
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, true, 
+                             FlowGraph.EDGE_KEY_FALSE, this, false);
         }
 
-        v.push(this).visitCFG(body, cond.entry());
+        v.push(this).visitCFG(body, cond, true);
 
         return succs;
     }
 
     public Term continueTarget() {
-        return cond.entry();
+        return cond;
     }
     
     public Node copy(NodeFactory nf) {

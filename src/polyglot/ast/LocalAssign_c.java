@@ -36,26 +36,31 @@ public class LocalAssign_c extends Assign_c implements LocalAssign
       }
   }
 
-  public Term entry() {
+  public Term firstChild() {
     if (operator() != Assign.ASSIGN) {
       return left();
     }
 
-    return right().entry();
+    return right();
   }
   
   protected void acceptCFGAssign(CFGBuilder v) {
 	  // do not visit left()
       // l = e: visit e -> (l = e)      
-      v.visitCFG(right(), this);
+      v.visitCFG(right(), this, false);
   }
   
   protected void acceptCFGOpAssign(CFGBuilder v) {
+      /*
       Local l = (Local)left();
       
       // l OP= e: visit l -> e -> (l OP= e)
       v.visitThrow(l);
       v.edge(l, right().entry());
       v.visitCFG(right(), this);
+      */
+      
+      v.visitCFG(left(), right(), true);
+      v.visitCFG(right(), this, false);
   }
 }

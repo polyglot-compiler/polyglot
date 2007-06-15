@@ -290,19 +290,22 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	w.write(");");
     }
 
-    public Term entry() {
+    public Term firstChild() {
         if (qualifier != null) {
-            return qualifier.entry();
+            return qualifier;
         }
-        return listEntry(arguments, this);
+        return listChild(arguments, null);
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (qualifier != null) {
-            v.visitCFG(qualifier, listEntry(arguments, this));
+            if (!arguments.isEmpty()) {
+                v.visitCFG(qualifier, listChild(arguments, null), true);
+                v.visitCFGList(arguments, this, false);
+            } else {
+                v.visitCFG(qualifier, this, false);
+            }
         }
-
-        v.visitCFGList(arguments, this);
 
         return succs;
     }

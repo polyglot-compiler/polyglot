@@ -191,12 +191,12 @@ public class Formal_c extends Term_c implements Formal
 	return this;
     }
 
-    public Term entry() {
-        return type.entry();
+    public Term firstChild() {
+        return type;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(type, this);        
+        v.visitCFG(type, this, false);        
         return succs;
     }
 

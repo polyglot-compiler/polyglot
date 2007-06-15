@@ -155,14 +155,14 @@ public class Case_c extends Stmt_c implements Case
 	}
     }
 
-    public Term entry() {
+    public Term firstChild() {
         if (expr != null) return expr;
-        return this;
+        return null;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (expr != null) {
-            v.visitCFG(expr, this);
+            v.visitCFG(expr, this, false);
         }
 
         return succs;

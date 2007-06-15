@@ -242,8 +242,8 @@ public class Try_c extends Stmt_c implements Try
 	}
     }
 
-    public Term entry() {
-        return tryBlock.entry();
+    public Term firstChild() {
+        return tryBlock;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
@@ -256,26 +256,25 @@ public class Try_c extends Stmt_c implements Try
 
         for (Iterator i = ts.uncheckedExceptions().iterator(); i.hasNext(); ) {
             Type type = (Type) i.next();
-            v1.visitThrow(tryBlock.entry(), type);
+            v1.visitThrow(tryBlock, type);
         }
-
-        Term next;
 
         // Handle the normal return case.  The throw case will be handled
         // specially.
-        if (finallyBlock == null) {
-            next = this;
+        if (finallyBlock != null) {
+            v1.visitCFG(tryBlock, finallyBlock, true);
+            v.visitCFG(finallyBlock, this, false);
+        } else {
+            v1.visitCFG(tryBlock, this, false);
         }
-        else {
-            next = finallyBlock.entry();
-            v.visitCFG(finallyBlock, this);
-        }
-
-        v1.visitCFG(tryBlock, next);
 
         for (Iterator it = catchBlocks.iterator(); it.hasNext(); ) {
             Catch cb = (Catch) it.next();
-            v2.visitCFG(cb, next);
+            if (finallyBlock != null) {
+                v2.visitCFG(cb, finallyBlock, true);
+            } else {
+                v2.visitCFG(cb, this, false);
+            }
         }
 
         return succs;

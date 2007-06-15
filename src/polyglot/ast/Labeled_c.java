@@ -91,12 +91,12 @@ public class Labeled_c extends Stmt_c implements Labeled
 	print(statement, w, tr);
     }
 
-    public Term entry() {
-        return statement.entry();
+    public Term firstChild() {
+        return statement;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.push(this).visitCFG(statement, this);
+        v.push(this).visitCFG(statement, this, false);
         return succs;
     }
     
