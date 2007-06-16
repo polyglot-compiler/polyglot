@@ -445,18 +445,18 @@ public class CFGBuilder implements Copy
 
     protected static class EntryTerm extends Term_c implements Term {
         
-        protected final Term body;
+        protected final Term term;
 
         protected EntryTerm(Term body) {
             super(body.position());
-            this.body = body;
+            this.term = body;
         }
 
         /**
          * Returns the actual Term for which this is the EntryTerm.
          */
-        public Term body() {
-            return body;
+        public Term term() {
+            return term;
         }
 
         public List acceptCFG(CFGBuilder v, List succs) {
@@ -468,7 +468,7 @@ public class CFGBuilder implements Copy
         }
         
         public String toString() {
-            return "entry(" + body + ")";
+            return "entry(" + term + ")";
         }
         
     }
