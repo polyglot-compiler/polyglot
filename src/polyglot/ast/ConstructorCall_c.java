@@ -293,8 +293,9 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     public Term firstChild() {
         if (qualifier != null) {
             return qualifier;
+        } else {
+            return listChild(arguments, null);
         }
-        return listChild(arguments, null);
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
@@ -304,6 +305,10 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
                 v.visitCFGList(arguments, this, false);
             } else {
                 v.visitCFG(qualifier, this, false);
+            }
+        } else {
+            if (!arguments.isEmpty()) {
+                v.visitCFGList(arguments, this, false);
             }
         }
 

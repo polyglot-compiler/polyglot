@@ -71,7 +71,7 @@ public class CFGBuilder implements Copy
     /**
      * Map from Terms to their EntryTerms.
      */
-    protected final Map<Term, EntryTerm> entryTerms = new HashMap<Term, EntryTerm>();
+    protected final Map entryTerms = new HashMap();
     
     public CFGBuilder(TypeSystem ts, FlowGraph graph, DataFlow df) {
         this.ts = ts;
@@ -391,10 +391,11 @@ public class CFGBuilder implements Copy
      * as entry nodes.
      */
     public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, 
-            List<Term> succ, boolean entry) {
+            List succ, boolean entry) {
         List l = new ArrayList(succ.size());
         
-        for (Term t : succ) {
+        for (Iterator i = succ.iterator(); i.hasNext();) {
+            Term t = (Term) i.next();
             t = entryTerm(t, entry);
             l.add(new EdgeKeyTermPair(edgeKey, t));
         }
@@ -403,15 +404,16 @@ public class CFGBuilder implements Copy
     }
 
     /**
-     * Create edges from node <code>a</code> to all successors <code>succ</code> 
-     * with the EdgeKey <code>edgeKey</code> for all edges created.
+     * Create edges from node <code>a</code> to all successors
+     * <code>succ</code> with the EdgeKey <code>edgeKey</code> for all edges
+     * created.
      * 
-     * The <code>entry</code> list must have the same size as <code>succ</code>,
-     * and each corresponding element determines whether a successor is an
-     * entry or exit node.
+     * The <code>entry</code> list must have the same size as
+     * <code>succ</code>, and each corresponding Boolean element determines
+     * whether a successor is an entry or exit node.
      */
     public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, 
-            List<Term> succ, List<Boolean> entry) {
+            List succ, List entry) {
         if (succ.size() != entry.size()) {
             throw new IllegalArgumentException();
         }
@@ -419,8 +421,8 @@ public class CFGBuilder implements Copy
         List l = new ArrayList(succ.size());
         
         for (int i = 0; i < succ.size(); i++) {
-            Term t = succ.get(i);
-            t = entryTerm(t, entry.get(i));
+            Term t = (Term) succ.get(i);
+            t = entryTerm(t, ((Boolean) entry.get(i)).booleanValue());
             l.add(new EdgeKeyTermPair(edgeKey, t));
         }
         
@@ -481,7 +483,7 @@ public class CFGBuilder implements Copy
             return (EntryTerm) t;
         }
         
-        EntryTerm c = entryTerms.get(t);
+        EntryTerm c = (EntryTerm) entryTerms.get(t);
         
         if (c == null) {
             c = new EntryTerm(t);
@@ -521,7 +523,7 @@ public class CFGBuilder implements Copy
         visitThrow(a);
     }
     
-    protected void visitCFGEntry(Term a, List<Term> succs) {
+    protected void visitCFGEntry(Term a, List succs) {
         Term child = a.firstChild();
         
         if (child == null) {

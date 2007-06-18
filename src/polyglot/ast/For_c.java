@@ -222,11 +222,11 @@ public class For_c extends Loop_c implements For
     }
 
     public Term firstChild() {
-        return listChild(inits, cond != null ? cond : body);
+        return listChild(inits, cond != null ? (Term) cond : body);
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFGList(inits, cond != null ? cond : body, true);
+        v.visitCFGList(inits, cond != null ? (Term) cond : body, true);
 
         if (cond != null) {
             if (condIsConstantTrue()) {
@@ -239,13 +239,13 @@ public class For_c extends Loop_c implements For
         }
 
         v.push(this).visitCFG(body, continueTarget(), true);
-        v.visitCFGList(iters, cond != null ? cond : body, true);
+        v.visitCFGList(iters, cond != null ? (Term) cond : body, true);
 
         return succs;
     }
 
     public Term continueTarget() {
-        return listChild(iters, cond != null ? cond : body);
+        return listChild(iters, cond != null ? (Term) cond : body);
     }
     public Node copy(NodeFactory nf) {
         return nf.For(this.position, this.inits, this.cond, this.iters, this.body);

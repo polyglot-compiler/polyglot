@@ -596,7 +596,7 @@ public class New_c extends Expr_c implements New
     }
     
     public Term firstChild() {
-        return qualifier != null ? qualifier : tn;
+        return qualifier != null ? (Term) qualifier : tn;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
