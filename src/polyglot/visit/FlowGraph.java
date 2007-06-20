@@ -44,35 +44,17 @@ public class FlowGraph {
    * Is the flow in this flow graph forward or backward?
    */
   protected boolean forward;
-  
-  /**
-   * The entry term.
-   */
-  protected Term entry;
-  
-  /**
-   * The exit term.
-   */
-  protected Term exit;
 
   FlowGraph(Term root, boolean forward) {
     this.root = root;
     this.forward = forward;
     this.peerMap = new HashMap();
   }
-  
-  public void setEntryNode(Term entry) {
-      this.entry = entry;
-  }
-  
-  public void setExitNode(Term exit) {
-      this.exit = exit;
-  }
 
-  public Term startNode() { return forward ? entry : exit; }
-  public Term finishNode() { return forward ? exit : entry; }
-  public Term entryNode() { return entry; }
-  public Term exitNode() { return exit; }
+  public Term startNode() { return forward ? root.entry() : root; }
+  public Term finishNode() { return forward ? root : root.entry(); }
+  public Term entryNode() { return root.entry(); }
+  public Term exitNode() { return root; }
   public Term root() { return root; }
   public boolean forward() { return forward; }
 

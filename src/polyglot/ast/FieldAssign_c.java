@@ -37,17 +37,17 @@ public class FieldAssign_c extends Assign_c implements FieldAssign
       }
   }
   
-  public Term firstChild() {
+  public Term entry() {
       Field f = (Field)left();
       if (f.target() instanceof Expr) {
-          return ((Expr) f.target());
+          return ((Expr) f.target()).entry();
       }
       else {
           if (operator() != Assign.ASSIGN) {
               return f;
           }
           else {
-              return right();
+              return right().entry();
           }
       }
   }
@@ -58,17 +58,16 @@ public class FieldAssign_c extends Assign_c implements FieldAssign
           Expr o = (Expr) f.target();
 
               //     o.f = e: visit o -> e -> (o.f = e)
-              v.visitCFG(o, right(), true);              
-              v.visitCFG(right(), this, false);
+              v.visitCFG(o, right().entry());              
+              v.visitCFG(right(), this);
       }
       else {
               //       T.f = e: visit e -> (T.f OP= e)
-              v.visitCFG(right(), this, false);
+              v.visitCFG(right(), this);
       }
       
   }
   protected void acceptCFGOpAssign(CFGBuilder v) {
-      /*
       Field f = (Field)left();
       if (f.target() instanceof Expr) {
           Expr o = (Expr) f.target();
@@ -84,11 +83,7 @@ public class FieldAssign_c extends Assign_c implements FieldAssign
           v.visitThrow(f);
           v.edge(f, right().entry());
           v.visitCFG(right(), this);
-      }
-      */
-      
-      v.visitCFG(left(), right(), true);
-      v.visitCFG(right(), this, false);
+      }      
   }
 
   public List throwTypes(TypeSystem ts) {

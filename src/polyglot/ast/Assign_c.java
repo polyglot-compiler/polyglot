@@ -221,7 +221,7 @@ public abstract class Assign_c extends Expr_c implements Assign
     w.end();
   }
 
-  abstract public Term firstChild();
+  abstract public Term entry();
 
   public List acceptCFG(CFGBuilder v, List succs) {
       if (operator() == ASSIGN) {

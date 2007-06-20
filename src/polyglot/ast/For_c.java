@@ -221,31 +221,31 @@ public class For_c extends Loop_c implements For
         tr.appendSemicolon(oldSemiColon);
     }
 
-    public Term firstChild() {
-        return listChild(inits, cond != null ? (Term) cond : body);
+    public Term entry() {
+        return listEntry(inits, (cond != null ? cond.entry() : body.entry()));
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFGList(inits, cond != null ? (Term) cond : body, true);
+        v.visitCFGList(inits, (cond != null ? cond.entry() : body.entry()));
 
         if (cond != null) {
             if (condIsConstantTrue()) {
-                v.visitCFG(cond, body, true);
+                v.visitCFG(cond, body.entry());
             }
             else {
-                v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, true, 
-                                 FlowGraph.EDGE_KEY_FALSE, this, false);
+                v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body.entry(), 
+                                 FlowGraph.EDGE_KEY_FALSE, this);
             }
         }
 
-        v.push(this).visitCFG(body, continueTarget(), true);
-        v.visitCFGList(iters, cond != null ? (Term) cond : body, true);
+        v.push(this).visitCFG(body, continueTarget());
+        v.visitCFGList(iters, (cond != null ? cond.entry() : body.entry()));
 
         return succs;
     }
 
     public Term continueTarget() {
-        return listChild(iters, cond != null ? (Term) cond : body);
+        return listEntry(iters, (cond != null ? cond.entry() : body.entry()));
     }
     public Node copy(NodeFactory nf) {
         return nf.For(this.position, this.inits, this.cond, this.iters, this.body);

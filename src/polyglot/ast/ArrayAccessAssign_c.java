@@ -39,24 +39,19 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign
       }
   }
   
-  public Term firstChild() {
-      if (operator() == ASSIGN) {
-          return ((ArrayAccess) left()).array();
-      } else {
-          return left();
-      }
+  public Term entry() {
+      return left().entry();
   }
   
   protected void acceptCFGAssign(CFGBuilder v) {
-      ArrayAccess a = (ArrayAccess) left();
+      ArrayAccess a = (ArrayAccess)left();
       
       //    a[i] = e: visit a -> i -> e -> (a[i] = e)
-      v.visitCFG(a.array(), a.index(), true);
-      v.visitCFG(a.index(), right(), true);
-      v.visitCFG(right(), this, false);
+      v.visitCFG(a.array(), a.index().entry());
+      v.visitCFG(a.index(), right().entry());
+      v.visitCFG(right(), this);
   }
   protected void acceptCFGOpAssign(CFGBuilder v) {
-      /*
       ArrayAccess a = (ArrayAccess)left();
       
       // a[i] OP= e: visit a -> i -> a[i] -> e -> (a[i] OP= e)
@@ -65,10 +60,6 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign
       v.visitThrow(a);
       v.edge(a, right().entry());
       v.visitCFG(right(), this);
-      */
-      
-      v.visitCFG(left(), right(), true);
-      v.visitCFG(right(), this, false);
   }
 
   public List throwTypes(TypeSystem ts) {

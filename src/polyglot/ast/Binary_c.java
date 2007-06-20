@@ -536,8 +536,8 @@ public class Binary_c extends Expr_c implements Binary
     w.end();
   }
 
-  public Term firstChild() {
-    return left;
+  public Term entry() {
+    return left.entry();
   }
 
   public List acceptCFG(CFGBuilder v, List succs) {
@@ -546,40 +546,40 @@ public class Binary_c extends Expr_c implements Binary
       if (left instanceof BooleanLit) {
         BooleanLit b = (BooleanLit) left;
         if ((b.value() && op == COND_OR) || (! b.value() && op == COND_AND)) {
-          v.visitCFG(left, this, false);
+          v.visitCFG(left, this);
         }
         else {
-          v.visitCFG(left, right, true);
-          v.visitCFG(right, this, false);
+          v.visitCFG(left, right.entry());
+          v.visitCFG(right, this);
         }
       }
       else {
         if (op == COND_AND) {
           // AND operator
           // short circuit means that left is false
-          v.visitCFG(left, FlowGraph.EDGE_KEY_TRUE, right, true, 
-                           FlowGraph.EDGE_KEY_FALSE, this, false);
+          v.visitCFG(left, FlowGraph.EDGE_KEY_TRUE, right.entry(), 
+                           FlowGraph.EDGE_KEY_FALSE, this);
         }
         else {
           // OR operator
           // short circuit means that left is true
-          v.visitCFG(left, FlowGraph.EDGE_KEY_FALSE, right, true, 
-                           FlowGraph.EDGE_KEY_TRUE, this, false);
+          v.visitCFG(left, FlowGraph.EDGE_KEY_FALSE, right.entry(), 
+                           FlowGraph.EDGE_KEY_TRUE, this);            
         }
-        v.visitCFG(right, FlowGraph.EDGE_KEY_TRUE, this, false,
-                          FlowGraph.EDGE_KEY_FALSE, this, false);
+        v.visitCFG(right, FlowGraph.EDGE_KEY_TRUE, this,
+                          FlowGraph.EDGE_KEY_FALSE, this);
       }
     }
     else {
       if (left.type().isBoolean() && right.type().isBoolean()) {        
-          v.visitCFG(left, FlowGraph.EDGE_KEY_TRUE, right, true,
-                           FlowGraph.EDGE_KEY_FALSE, right, true);
-          v.visitCFG(right, FlowGraph.EDGE_KEY_TRUE, this, false,
-                            FlowGraph.EDGE_KEY_FALSE, this, false);
+          v.visitCFG(left, FlowGraph.EDGE_KEY_TRUE, right.entry(),
+                           FlowGraph.EDGE_KEY_FALSE, right.entry());
+          v.visitCFG(right, FlowGraph.EDGE_KEY_TRUE, this,
+                            FlowGraph.EDGE_KEY_FALSE, this);
       }
       else {
-          v.visitCFG(left, right, true);
-          v.visitCFG(right, this, false);
+          v.visitCFG(left, right.entry());
+          v.visitCFG(right, this);
       }
     }
 

@@ -140,15 +140,15 @@ public class ClassDecl_c extends Term_c implements ClassDecl
      * Return the first (sub)term performed when evaluating this
      * term.
      */
-    public Term firstChild() {
-        return body();
+    public Term entry() {
+        return this.body().entry();
     }
 
     /**
      * Visit this term in evaluation order.
      */
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(this.body(), this, false);
+        v.visitCFG(this.body(), this);
         return succs;
     }
 

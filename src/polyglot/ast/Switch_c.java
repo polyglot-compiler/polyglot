@@ -180,24 +180,21 @@ public class Switch_c extends Stmt_c implements Switch
 	w.write("}");
     }
 
-    public Term firstChild() {
-        return expr;
+    public Term entry() {
+        return expr.entry();
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
         SwitchElement prev = null;
 
         List cases = new LinkedList();
-        List entry = new LinkedList();
         boolean hasDefault = false;
 
         for (Iterator i = elements.iterator(); i.hasNext(); ) {
             SwitchElement s = (SwitchElement) i.next();
 
             if (s instanceof Case) {
-                cases.add(s);
-                entry.add(Boolean.TRUE);
-                
+                cases.add(s.entry());
                 if (((Case) s).expr() == null) {
                     hasDefault = true;
                 }
@@ -207,11 +204,10 @@ public class Switch_c extends Stmt_c implements Switch
         // If there is no default case, add an edge to the end of the switch.
         if (! hasDefault) {
             cases.add(this);
-            entry.add(Boolean.FALSE);
         }
 
-        v.visitCFG(expr, FlowGraph.EDGE_KEY_OTHER, cases, entry);
-        v.push(this).visitCFGList(elements, this, false);
+        v.visitCFG(expr, FlowGraph.EDGE_KEY_OTHER, cases);
+        v.push(this).visitCFGList(elements, this);
 
         return succs;
     }

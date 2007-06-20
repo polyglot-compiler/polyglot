@@ -360,19 +360,25 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 	}
     }
 
-    public Term firstChild() {
-        return listChild(formals(), body() != null ? body() : null);
+    /**
+     * Return the first (sub)term performed when evaluating this
+     * term.
+     */
+    public Term entry() {
+        return listEntry(formals(), (body()==null? this : body().entry()));
     }
 
+    /**
+     * Visit this term in evaluation order.
+     */
     public List acceptCFG(CFGBuilder v, List succs) {
-        if (body() != null) {
-            v.visitCFGList(formals(), body(), true);
-            v.visitCFG(body(), this, false);
+        if (body() == null) {
+            v.visitCFGList(formals(), this);
         }
         else {
-            v.visitCFGList(formals(), this, false);
+            v.visitCFGList(formals(), body().entry());
+            v.visitCFG(body(), this);
         }
-        
         return succs;
     }
     public Node copy(NodeFactory nf) {

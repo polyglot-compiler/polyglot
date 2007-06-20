@@ -68,11 +68,6 @@ public class CFGBuilder implements Copy
      */
     protected boolean errorEdgesToExitNode;
 
-    /**
-     * Map from Terms to their EntryTerms.
-     */
-    protected final Map entryTerms = new HashMap();
-    
     public CFGBuilder(TypeSystem ts, FlowGraph graph, DataFlow df) {
         this.ts = ts;
         this.graph = graph;
@@ -82,9 +77,6 @@ public class CFGBuilder implements Copy
         this.innermostTarget = null;
         this.skipInnermostCatches = false;
         this.errorEdgesToExitNode = false;
-        
-        graph.setEntryNode(entryTerm(graph.root()));
-        graph.setExitNode(graph.root());
     }
 
     /** Get the type system. */
@@ -152,7 +144,7 @@ public class CFGBuilder implements Copy
                 Stmt s = l.statement();
                 if (s instanceof Loop) {
                   Loop loop = (Loop) s;
-                  edge(last_visitor, last, entryTerm(loop.continueTarget()), FlowGraph.EDGE_KEY_OTHER);
+                  edge(last_visitor, last, loop.continueTarget(), FlowGraph.EDGE_KEY_OTHER);
                 }
                 else {
                   throw new CFGBuildError("Target of continue statement must " +
@@ -168,7 +160,7 @@ public class CFGBuilder implements Copy
           if (c instanceof Loop) {
             Loop l = (Loop) c;
             if (b.kind() == Branch.CONTINUE) {
-              edge(last_visitor, last, entryTerm(l.continueTarget()), FlowGraph.EDGE_KEY_OTHER);
+              edge(last_visitor, last, l.continueTarget(), FlowGraph.EDGE_KEY_OTHER);
             }
             else {
               edge(last_visitor, last, l, FlowGraph.EDGE_KEY_OTHER);
@@ -237,17 +229,13 @@ public class CFGBuilder implements Copy
         graph.peer(graph.entryNode(), Collections.EMPTY_LIST, df);
         graph.peer(graph.exitNode(), Collections.EMPTY_LIST, df);
 
-        this.visitCFGEntry(graph.root(), Collections.EMPTY_LIST);
+        this.visitCFG(graph.root(), Collections.EMPTY_LIST);
 
 	if (Report.should_report(Report.cfg, 2))
 	    Report.report(2, "}");
     }
 
-    /** 
-     * Utility function to visit all edges in a list.
-     * 
-     * @deprecated Use visitCFGList(List, Term, boolean) instead.
-     */
+    /** Utility function to visit all edges in a list. */
     public void visitCFGList(List elements, Term after) {
         Term prev = null;
 
@@ -272,8 +260,6 @@ public class CFGBuilder implements Copy
      * 
      * The EdgeKey used for the edge from <code>a</code> to <code>succ</code>
      * will be FlowGraph.EDGE_KEY_OTHER
-     * 
-     * @deprecated Use visitCFG(Term, Term, boolean).
      */
     public void visitCFG(Term a, Term succ) {
         visitCFG(a, FlowGraph.EDGE_KEY_OTHER, succ);
@@ -282,8 +268,6 @@ public class CFGBuilder implements Copy
     /**
      * Create an edge for a node <code>a</code> with a single successor
      * <code>succ</code>, and EdgeKey <code>edgeKey</code>
-     * 
-     * @deprecated Use visitCFG(Term, EdgeKey, Term, boolean).
      */
     public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, Term succ) {
         visitCFG(a, CollectionUtil.list(new EdgeKeyTermPair(edgeKey, succ)));
@@ -293,8 +277,6 @@ public class CFGBuilder implements Copy
      * Create edges from node <code>a</code> to successors <code>succ1</code> 
      * and <code>succ2</code> with EdgeKeys <code>edgeKey1</code> and
      * <code>edgeKey2</code> respecitvely.
-     * 
-     * @deprecated Use visitCFG(Term, EdgeKey, Term, boolean, ...).
      */
     public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey1, Term succ1, 
                                  FlowGraph.EdgeKey edgeKey2, Term succ2) {
@@ -305,8 +287,6 @@ public class CFGBuilder implements Copy
     /**
      * Create edges from node <code>a</code> to all successors <code>succ</code> 
      * with the EdgeKey <code>edgeKey</code> for all edges created.
-     * 
-     * @deprecated Use visitCFG(Term, EdgeKey, List, boolean).
      */
     public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, List succ) {
         List l = new ArrayList(2*succ.size());
@@ -316,203 +296,29 @@ public class CFGBuilder implements Copy
         visitCFG(a, l);
     }
 
-    /**
-     * Utility function to visit all edges in a list.
-     * 
-     * If <code>entry</code> is true, the final successor is
-     * <code>after</code>'s entry node; otherwise, it's <code>after</code>'s
-     * exit.
-     */
-    public void visitCFGList(List elements, Term after, boolean entry) {
-        Term prev = null;
-
-        for (Iterator i = elements.iterator(); i.hasNext(); ) {
-            Term c = (Term) i.next();
-
-            if (prev != null) {
-                visitCFG(prev, c, true);
-            }
-
-            prev = c;
-        }
-
-        if (prev != null) {
-            visitCFG(prev, after, entry);
-        }
-    }
-
-    /**
-     * Create an edge for a node <code>a</code> with a single successor
-     * <code>succ</code>.
-     * 
-     * The EdgeKey used for the edge from <code>a</code> to <code>succ</code>
-     * will be FlowGraph.EDGE_KEY_OTHER.
-     * 
-     * If <code>entry</code> is true, the successor is <code>succ</code>'s
-     * entry node; otherwise, it's <code>succ</code>'s exit.
-     */
-    public void visitCFG(Term a, Term succ, boolean entry) {
-        visitCFG(a, FlowGraph.EDGE_KEY_OTHER, succ, entry);
-    }
-
-    /**
-     * Create an edge for a node <code>a</code> with a single successor
-     * <code>succ</code>, and EdgeKey <code>edgeKey</code>.
-     * 
-     * If <code>entry</code> is true, the successor is <code>succ</code>'s
-     * entry node; otherwise, it's <code>succ</code>'s exit.
-     */
-    public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, Term succ, boolean entry) {
-        succ = entryTerm(succ, entry);
-        visitCFGEntry(a, CollectionUtil.list(new EdgeKeyTermPair(edgeKey, succ)));
-    }
-
-    /**
-     * Create edges from node <code>a</code> to successors <code>succ1</code> 
-     * and <code>succ2</code> with EdgeKeys <code>edgeKey1</code> and
-     * <code>edgeKey2</code> respecitvely.
-     * 
-     * <code>entry1</code> and <code>entry2</code> determine whether the
-     * successors are entry or exit nodes.
-     */
-    public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey1, Term succ1, boolean entry1,
-                                 FlowGraph.EdgeKey edgeKey2, Term succ2, boolean entry2) {
-        succ1 = entryTerm(succ1, entry1);
-        succ2 = entryTerm(succ2, entry2);
-        visitCFGEntry(a, CollectionUtil.list(new EdgeKeyTermPair(edgeKey1, succ1), 
-                                        new EdgeKeyTermPair(edgeKey2, succ2)));
-    }
-
-    /**
-     * Create edges from node <code>a</code> to all successors <code>succ</code> 
-     * with the EdgeKey <code>edgeKey</code> for all edges created.
-     * 
-     * If <code>entry</code> is true, all terms in <code>succ</code> are treated
-     * as entry nodes.
-     */
-    public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, 
-            List succ, boolean entry) {
-        List l = new ArrayList(succ.size());
-        
-        for (Iterator i = succ.iterator(); i.hasNext();) {
-            Term t = (Term) i.next();
-            t = entryTerm(t, entry);
-            l.add(new EdgeKeyTermPair(edgeKey, t));
-        }
-        
-        visitCFGEntry(a, l);
-    }
-
-    /**
-     * Create edges from node <code>a</code> to all successors
-     * <code>succ</code> with the EdgeKey <code>edgeKey</code> for all edges
-     * created.
-     * 
-     * The <code>entry</code> list must have the same size as
-     * <code>succ</code>, and each corresponding Boolean element determines
-     * whether a successor is an entry or exit node.
-     */
-    public void visitCFG(Term a, FlowGraph.EdgeKey edgeKey, 
-            List succ, List entry) {
-        if (succ.size() != entry.size()) {
-            throw new IllegalArgumentException();
-        }
-        
-        List l = new ArrayList(succ.size());
-        
-        for (int i = 0; i < succ.size(); i++) {
-            Term t = (Term) succ.get(i);
-            t = entryTerm(t, ((Boolean) entry.get(i)).booleanValue());
-            l.add(new EdgeKeyTermPair(edgeKey, t));
-        }
-        
-        visitCFGEntry(a, l);
-    }
-
     protected static class EdgeKeyTermPair {
-
-        public final FlowGraph.EdgeKey edgeKey;
-        public final Term term;
-
         public EdgeKeyTermPair(FlowGraph.EdgeKey edgeKey, Term term) {
             this.edgeKey = edgeKey;
             this.term = term;
         }
-        
-        public String toString() {
-            return "{edgeKey=" + edgeKey + ",term=" + term + "}";
-        }
-        
+        public FlowGraph.EdgeKey edgeKey;
+        public Term term;        
+
+	public String toString() {
+	    return "{edgeKey=" + edgeKey + ",term=" + term + "}";
+	}
     }
-
-    protected static class EntryTerm extends Term_c implements Term {
-        
-        protected final Term term;
-
-        protected EntryTerm(Term body) {
-            super(body.position());
-            this.term = body;
-        }
-
-        /**
-         * Returns the actual Term for which this is the EntryTerm.
-         */
-        public Term term() {
-            return term;
-        }
-
-        public List acceptCFG(CFGBuilder v, List succs) {
-            return succs;
-        }
-
-        public Term firstChild() {
-            return null;
-        }
-        
-        public String toString() {
-            return "entry(" + term + ")";
-        }
-        
-    }
-
-    /**
-     * Returns the EntryTerm corresponding to Term t.
-     */
-    protected EntryTerm entryTerm(Term t) {
-        if (t instanceof EntryTerm) {
-            return (EntryTerm) t;
-        }
-        
-        EntryTerm c = (EntryTerm) entryTerms.get(t);
-        
-        if (c == null) {
-            c = new EntryTerm(t);
-            entryTerms.put(t, c);
-        }
-        
-        return c;
-    }
-    
-    /**
-     * Returns the entry term for t is entry is true. Otherwise, t is returned.
-     */
-    protected Term entryTerm(Term t, boolean entry) {
-        return entry ? entryTerm(t) : t;
-    }
-    
     /**
      * Create edges for a node <code>a</code> with successors
      * <code>succs</code>.
      * 
      * @param a the source node for the edges.
      * @param succs a list of <code>EdgeKeyTermPair</code>s
-     * 
-     * @deprecated Use visitCFGEntry.
      */
     protected void visitCFG(Term a, List succs) {
         if (Report.should_report(Report.cfg, 2))
             Report.report(2, "// node " + a + " -> " + succs);
-        
+
         succs = a.acceptCFG(this, succs);
 
         for (Iterator i = succs.iterator(); i.hasNext(); ) {
@@ -521,18 +327,6 @@ public class CFGBuilder implements Copy
         }
 
         visitThrow(a);
-    }
-    
-    protected void visitCFGEntry(Term a, List succs) {
-        Term child = a.firstChild();
-        
-        if (child == null) {
-            edge(entryTerm(a), a);
-        } else {
-            edge(entryTerm(a), entryTerm(child));
-        }
-        
-        visitCFG(a, succs);
     }
 
     public void visitThrow(Term a) {
@@ -571,12 +365,12 @@ public class CFGBuilder implements Copy
 
                         // definite catch
                         if (type.isImplicitCastValid(cb.catchType())) {
-                            edge(last_visitor, last, entryTerm(cb), new FlowGraph.ExceptionEdgeKey(type));
+                            edge(last_visitor, last, cb.entry(), new FlowGraph.ExceptionEdgeKey(type));
                             definiteCatch = true;
                         }
                         // possible catch
                         else if (cb.catchType().isImplicitCastValid(type)) { 
-                            edge(last_visitor, last, entryTerm(cb), new FlowGraph.ExceptionEdgeKey(cb.catchType()));
+                            edge(last_visitor, last, cb.entry(), new FlowGraph.ExceptionEdgeKey(cb.catchType()));
                         }
                     }
                     if (definiteCatch) {
@@ -615,10 +409,10 @@ public class CFGBuilder implements Copy
         CFGBuilder v_ = v.outer.enterFinally(last);
         
         // @@@XXX
-        v_.edge(last_visitor, last, v_.entryTerm(finallyBlock), FlowGraph.EDGE_KEY_OTHER);
+        v_.edge(last_visitor, last, finallyBlock.entry(), FlowGraph.EDGE_KEY_OTHER);
         
         // visit the finally block.  
-        v_.visitCFGEntry(finallyBlock, Collections.EMPTY_LIST);
+        v_.visitCFG(finallyBlock, Collections.EMPTY_LIST);
         return v_;
     }
 
@@ -697,5 +491,4 @@ public class CFGBuilder implements Copy
             pp.preds.add(new FlowGraph.Edge(edgeKey, pq));
         }
     }
-    
 }

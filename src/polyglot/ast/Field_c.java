@@ -222,17 +222,16 @@ public class Field_c extends Expr_c implements Field
     w.end();
   }
 
-  public Term firstChild() {
+  public Term entry() {
       if (target instanceof Term) {
-          return (Term) target;
+          return ((Term) target).entry();
       }
-      
-      return null;
+      return this;
   }
 
   public List acceptCFG(CFGBuilder v, List succs) {
       if (target instanceof Term) {
-          v.visitCFG((Term) target, this, false);
+          v.visitCFG((Term) target, this);
       }
       
       return succs;

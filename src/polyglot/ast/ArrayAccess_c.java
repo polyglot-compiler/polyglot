@@ -125,13 +125,13 @@ public class ArrayAccess_c extends Expr_c implements ArrayAccess
 	w.write ("]");
     }
 
-    public Term firstChild() {
-        return array;
+    public Term entry() {
+        return array.entry();
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(array, index, true);
-        v.visitCFG(index, this, false);
+        v.visitCFG(array, index.entry());
+        v.visitCFG(index, this);
         return succs;
     }
 

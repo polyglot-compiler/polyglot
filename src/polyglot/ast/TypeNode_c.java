@@ -58,8 +58,8 @@ public abstract class TypeNode_c extends Term_c implements TypeNode
         }
     }
 
-    public Term firstChild() {
-        return null;
+    public Term entry() {
+        return this;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {

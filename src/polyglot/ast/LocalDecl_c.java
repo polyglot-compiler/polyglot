@@ -355,21 +355,22 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         }
     }
 
-    public Term firstChild() {
-        return type();
+    public Term entry() {
+        return type.entry();
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
+        Term next = this;
         if (init() != null) {
-            v.visitCFG(type(), init(), true);
-            v.visitCFG(init(), this, false);
-        } else {
-            v.visitCFG(type(), this, false);
+            next = init().entry();
+        }
+        v.visitCFG(type, next);
+        if (init() != null) {
+            v.visitCFG(init(), this);
         }
 
         return succs;
     }
-    
     public Node copy(NodeFactory nf) {
         return nf.LocalDecl(this.position, this.flags, this.type, this.name, this.init);
     }

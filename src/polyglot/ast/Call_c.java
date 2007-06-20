@@ -396,24 +396,20 @@ public class Call_c extends Expr_c implements Call
     w.end();
   }
 
-  public Term firstChild() {
+  public Term entry() {
       if (target instanceof Term) {
-          return (Term) target;
+          return ((Term) target).entry();
       }
-      return listChild(arguments, null);
+      return listEntry(arguments, this);
   }
 
   public List acceptCFG(CFGBuilder v, List succs) {
       if (target instanceof Term) {
           Term t = (Term) target;
-          
-          if (!arguments.isEmpty()) {
-              v.visitCFG(t, listChild(arguments, null), true);
-              v.visitCFGList(arguments, this, false);
-          } else {
-              v.visitCFG(t, this, false);
-          }
+          v.visitCFG(t, listEntry(arguments, this));
       }
+
+      v.visitCFGList(arguments, this);
 
       return succs;
   }

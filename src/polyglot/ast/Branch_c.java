@@ -96,8 +96,8 @@ public class Branch_c extends Stmt_c implements Branch
      * Return the first (sub)term performed when evaluating this
      * term.
      */
-    public Term firstChild() {
-        return null;
+    public Term entry() {
+        return this;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {

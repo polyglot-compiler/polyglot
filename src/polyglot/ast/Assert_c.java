@@ -145,17 +145,17 @@ public class Assert_c extends Stmt_c implements Assert
         }
     }
 
-    public Term firstChild() {
-        return cond;
+    public Term entry() {
+        return cond.entry();
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (errorMessage != null) {
-            v.visitCFG(cond, errorMessage, true);
-            v.visitCFG(errorMessage, this, false);
+            v.visitCFG(cond, errorMessage.entry());
+            v.visitCFG(errorMessage, this);
         }
         else {
-            v.visitCFG(cond, this, false);
+            v.visitCFG(cond, this);
         }
 
         return succs;

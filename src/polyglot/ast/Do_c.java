@@ -112,26 +112,26 @@ public class Do_c extends Loop_c implements Do
     }
 
 
-    public Term firstChild() {
-        return body;
+    public Term entry() {
+        return body.entry();
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.push(this).visitCFG(body, cond, true);
+        v.push(this).visitCFG(body, cond.entry());
 
         if (condIsConstantTrue()) {
-            v.visitCFG(cond, body, true);
+            v.visitCFG(cond, body.entry());
         }
         else {
-            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, true, 
-                             FlowGraph.EDGE_KEY_FALSE, this, false);
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body.entry(), 
+                             FlowGraph.EDGE_KEY_FALSE, this);
         }
 
         return succs;
     }
 
     public Term continueTarget() {
-        return cond;
+        return cond.entry();
     }
     public Node copy(NodeFactory nf) {
         return nf.Do(this.position, this.body, this.cond);

@@ -128,19 +128,24 @@ public class Special_c extends Expr_c implements Special
         return this;
     }
 
-    public Term firstChild() {
+    /**
+     * Return the first (sub)term performed when evaluating this
+     * term.
+     */
+    public Term entry() {
         if (qualifier != null) {
-            return qualifier;
+            return qualifier.entry();
         }
-        
-        return null;
+        return this;
     }
 
+    /**
+     * Visit this term in evaluation order.
+     */
     public List acceptCFG(CFGBuilder v, List succs) {
         if (qualifier != null) {
-            v.visitCFG(qualifier, this, false);
+            v.visitCFG(qualifier, this);
         }
-        
         return succs;
     }
 

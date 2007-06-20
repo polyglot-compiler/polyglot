@@ -52,12 +52,12 @@ public class ClassLit_c extends Lit_c implements ClassLit
     return null;
   }
 
-  public Term firstChild() {
-      return typeNode;
+  public Term entry() {
+      return typeNode.entry();
   }
 
   public List acceptCFG(CFGBuilder v, List succs) {
-      v.visitCFG(typeNode, this, false);
+      v.visitCFG(typeNode, this);
       return succs;
   }
 
