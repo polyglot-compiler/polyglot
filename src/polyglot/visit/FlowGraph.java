@@ -13,139 +13,150 @@ import polyglot.util.*;
 import java.util.*;
 
 public class FlowGraph {
-  /**
-   * Maps from AST nodes to path maps and hence to <code>Peer</code>s
-   * that represent occurrences of the
-   * AST node in the flow graph.  In particular, <code>peerMap</code>
-   * maps <code>IdentityKey(Node)</code>s to path maps.  A path map is a
-   * map from paths (<code>ListKey(List of Terms)</code>) to
-   * <code>Peer</code>s.  In particular, if <code>n</code> is an AST
-   * node in a finally block, then there will be a <code>Peer</code> of
-   * <code>n</code> for each possible path to the finally block, and the
-   * path map records which <code>Peer</code> corresponds to which path.
-   * If <code>n</code> does not occur in a finally block, then the path
-   * map should have only a single entry, from an empty list to the
-   * unique <code>Peer</code> for <code>n</code>.
-   *
-   * <p>
-   * <b>WARNING</b>: the AST must be a tree, not a DAG.  Otherwise the
-   * same peer may be used for a node that appears at multiple points in
-   * the AST.  These points may have different data flows.
-   * </p>
-   */  
-  protected Map peerMap;
-  
-  /**
-   * The root of the AST that this is a flow graph for.
-   */
-  protected Term root;
-  
-  /**
-   * Is the flow in this flow graph forward or backward?
-   */
-  protected boolean forward;
-  
-  /**
-   * The entry term.
-   */
-  protected Term entry;
-  
-  /**
-   * The exit term.
-   */
-  protected Term exit;
 
-  FlowGraph(Term root, boolean forward) {
-    this.root = root;
-    this.forward = forward;
-    this.peerMap = new HashMap();
-  }
-  
-  public void setEntryNode(Term entry) {
-      this.entry = entry;
-  }
-  
-  public void setExitNode(Term exit) {
-      this.exit = exit;
-  }
+    /**
+     * Maps from AST nodes to path maps and hence to <code>Peer</code>s that
+     * represent occurrences of the AST node in the flow graph. In particular,
+     * <code>peerMap</code> maps <code>IdentityKey(Node)</code>s to path
+     * maps. A path map is a map from paths (<code>ListKey(List of Terms)</code>)
+     * to <code>Peer</code>s. In particular, if <code>n</code> is an AST
+     * node in a finally block, then there will be a <code>Peer</code> of
+     * <code>n</code> for each possible path to the finally block, and the
+     * path map records which <code>Peer</code> corresponds to which path. If
+     * <code>n</code> does not occur in a finally block, then the path map
+     * should have only a single entry, from an empty list to the unique
+     * <code>Peer</code> for <code>n</code>.
+     * 
+     * <p>
+     * <b>WARNING</b>: the AST must be a tree, not a DAG. Otherwise the same
+     * peer may be used for a node that appears at multiple points in the AST.
+     * These points may have different data flows.
+     * </p>
+     */
+    protected Map peerMap;
 
-  public Term startNode() { return forward ? entry : exit; }
-  public Term finishNode() { return forward ? exit : entry; }
-  public Term entryNode() { return entry; }
-  public Term exitNode() { return exit; }
-  public Term root() { return root; }
-  public boolean forward() { return forward; }
+    /**
+     * The root of the AST that this is a flow graph for.
+     */
+    protected Term root;
 
-  public Collection pathMaps() {
-    return peerMap.values();
-  }
+    /**
+     * Is the flow in this flow graph forward or backward?
+     */
+    protected boolean forward;
 
-  public Map pathMap(Node n) {
-    return (Map) peerMap.get(new IdentityKey(n));
-  }
-
-  /**
-   * Return a collection of all <code>Peer</code>s in this flow graph.
-   */
-  public Collection peers() {
-    Collection c = new ArrayList();
-    for (Iterator i = peerMap.values().iterator(); i.hasNext(); ) {
-      Map m = (Map) i.next();
-      for (Iterator j = m.values().iterator(); j.hasNext(); ) {
-        c.add(j.next());
-      }
-    }
-    return c;
-  }
-
-  /**
-   * Retrieve the <code>Peer</code> for the <code>Term n</code>, where 
-   * <code>n</code> does not appear in a finally block. If no such Peer 
-   * exists, then one will be created.
-   * 
-   * @param df unused; for legacy purposes only?
-   */
-  public Peer peer(Term n, DataFlow df) {
-    return peer(n, Collections.EMPTY_LIST, df);
-  }
-
-  /**
-   * Return a collection of all of the <code>Peer</code>s for the given 
-   * <code>Term n</code>. 
-   */
-  public Collection peers(Term n) {
-    IdentityKey k = new IdentityKey(n);
-    Map pathMap = (Map) peerMap.get(k);
-    if (pathMap == null) {
-        return Collections.EMPTY_LIST;
-    }
-    return pathMap.values();
-  }
-
-  /**
-   * Retrieve the <code>Peer</code> for the <code>Term n</code> that is 
-   * associated with the given path to the finally block. (A term that occurs
-   * in a finally block has one Peer for each possible path to that finally
-   * block.) If no such Peer exists, then one will be created.
-   * 
-   * @param df unused; for legacy purposes only?
-   */
-  public Peer peer(Term n, List path_to_finally, DataFlow df) {
-    IdentityKey k = new IdentityKey(n);
-    Map pathMap = (Map) peerMap.get(k);
-    if (pathMap == null) {
-      pathMap = new HashMap();
-      peerMap.put(k, pathMap);
+    FlowGraph(Term root, boolean forward) {
+        this.root = root;
+        this.forward = forward;
+        this.peerMap = new HashMap();
     }
 
-    ListKey lk = new ListKey(path_to_finally);
-    Peer p = (Peer) pathMap.get(lk);
-    if (p == null) {
-      p = new Peer(n, path_to_finally);
-      pathMap.put(lk, p);
+    public Term root() {
+        return root;
     }
-    return p;
-  }
+
+    public boolean forward() {
+        return forward;
+    }
+
+    public Collection entryPeers() {
+        return peers(root, true);
+    }
+    
+    public Collection exitPeers() {
+        return peers(root, false);
+    }
+    
+    public Collection startPeers() {
+        return forward ? entryPeers() : exitPeers();
+    }
+    
+    public Collection finishPeers() {
+        return forward ? exitPeers() : entryPeers();
+    }
+
+    public Collection pathMaps() {
+        return peerMap.values();
+    }
+
+    public Map pathMap(Node n) {
+        return (Map) peerMap.get(new IdentityKey(n));
+    }
+
+    /**
+     * Return a collection of all <code>Peer</code>s in this flow graph.
+     */
+    public Collection peers() {
+        Collection c = new ArrayList();
+        for (Iterator i = peerMap.values().iterator(); i.hasNext();) {
+            Map m = (Map) i.next();
+            for (Iterator j = m.values().iterator(); j.hasNext();) {
+                c.add(j.next());
+            }
+        }
+        return c;
+    }
+
+    /**
+     * Retrieve the entry or exit <code>Peer</code> for the
+     * <code>Term n</code>, where <code>n</code> does not appear in a
+     * finally block. If no such Peer exists, then one will be created.
+     */
+    public Peer peer(Term n, boolean entry) {
+        return peer(n, Collections.EMPTY_LIST, entry);
+    }
+
+    /**
+     * Return a collection of all of the entry or exit <code>Peer</code>s for
+     * the given <code>Term n</code>.
+     */
+    public Collection peers(Term n, boolean entry) {
+        IdentityKey k = new IdentityKey(n);
+        Map pathMap = (Map) peerMap.get(k);
+        
+        if (pathMap == null) {
+            return Collections.EMPTY_LIST;
+        }
+        
+        Collection peers = pathMap.values();
+        List l = new ArrayList(peers.size());
+        
+        for (Iterator i = peers.iterator(); i.hasNext();) {
+            Peer p = (Peer) i.next();
+            
+            if (p.entry == entry) {
+                l.add(p);
+            }
+        }
+        
+        return l;
+    }
+
+    /**
+     * Retrieve the <code>Peer</code> for the <code>Term n</code> that is
+     * associated with the given path to the finally block. (A term that occurs
+     * in a finally block has one Peer for each possible path to that finally
+     * block.) If no such Peer exists, then one will be created.
+     */
+    public Peer peer(Term n, List path_to_finally, boolean entry) {
+        IdentityKey k = new IdentityKey(n);
+        Map pathMap = (Map) peerMap.get(k);
+        
+        if (pathMap == null) {
+            pathMap = new HashMap();
+            peerMap.put(k, pathMap);
+        }
+
+        PeerKey lk = new PeerKey(path_to_finally, entry);
+        Peer p = (Peer) pathMap.get(lk);
+        
+        if (p == null) {
+            p = new Peer(n, path_to_finally, entry);
+            pathMap.put(lk, p);
+        }
+        
+        return p;
+    }
 
   /**
    * This class provides an identifying label for edges in the flow graph.
@@ -276,6 +287,8 @@ public class FlowGraph {
                                     // uniquely distinguishes this Peer
                                     // from the other Peers for the AST node.
 
+    protected boolean entry; // true if this is an entry peer
+    
     /**
      * Set of all the different EdgeKeys that occur in the Edges in the 
      * succs. This Set is lazily constructed, as needed, by the 
@@ -283,13 +296,14 @@ public class FlowGraph {
      */     
     private Set succEdgeKeys;
 
-    public Peer(Term node, List path_to_finally) {
+    public Peer(Term node, List path_to_finally, boolean entry) {
       this.node = node;
       this.path_to_finally = path_to_finally;
       this.inItem = null;
       this.outItems = null;
       this.succs = new ArrayList();
       this.preds = new ArrayList();
+      this.entry = entry;
       this.succEdgeKeys = null;
     }
 
@@ -317,7 +331,7 @@ public class FlowGraph {
     }
 
     public String toString() {
-      return node + "[" + hashCode() + ": " + path_to_finally + "]";
+      return (entry ? "entry: " : "") + node + path_to_finally;
     }
 
     public Set succEdgeKeys() {
@@ -340,36 +354,41 @@ public class FlowGraph {
     }
   }
 
-  /**
-   * Class to be used for inserting Lists in hashtables using collection
-   * equality (as defined in {@link polyglot.util.CollectionUtil CollectionUtil}).
-   */
-  protected static class ListKey {
-    protected List list;
+    /**
+     * Class to be used for inserting Lists in hashtables using collection
+     * equality (as defined in
+     * {@link polyglot.util.CollectionUtil CollectionUtil}).
+     */
+    protected static class PeerKey {
 
-    ListKey(List list) {
-      this.list = list;
+        protected List list;
+        protected boolean entry;
+
+        public PeerKey(List list, boolean entry) {
+            this.list = list;
+            this.entry = entry;
+        }
+
+        public int hashCode() {
+            return list.hashCode() ^ Boolean.valueOf(entry).hashCode();
+        }
+
+        public boolean equals(Object other) {
+            if (other instanceof PeerKey) {
+                PeerKey k = (PeerKey) other;
+                return CollectionUtil.equals(list, k.list) && entry == k.entry;
+            } else {
+                return false;
+            }
+        }
+        
     }
-
-    public int hashCode() {
-      return list.hashCode();
-    }
-
-    public boolean equals(Object other) {
-      if (other instanceof ListKey) {
-          ListKey k = (ListKey) other;
-          return CollectionUtil.equals(list, k.list);
-      }
-
-      return false;
-    }
-  }
   
   public String toString() {
     
     StringBuffer sb = new StringBuffer();
     Set todo = new HashSet(this.peers());
-    LinkedList queue = new LinkedList(this.peers(this.startNode()));
+    LinkedList queue = new LinkedList(startPeers());
     
     while (!queue.isEmpty()) {
         Peer p = (Peer)queue.removeFirst();

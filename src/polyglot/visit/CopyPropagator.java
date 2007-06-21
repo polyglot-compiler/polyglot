@@ -294,11 +294,11 @@ public class CopyPropagator extends DataFlow {
 	}
     }
 
-    public Item createInitialItem(FlowGraph graph, Term node) {
+    public Item createInitialItem(FlowGraph graph, Term node, boolean entry) {
 	return new DataFlowItem();
     }
 
-    public Item confluence(List inItems, Term node, FlowGraph graph) {
+    public Item confluence(List inItems, Term node, boolean entry, FlowGraph graph) {
 	DataFlowItem result = null;
 	for (Iterator it = inItems.iterator(); it.hasNext(); ) {
 	    DataFlowItem inItem = (DataFlowItem)it.next();
@@ -318,8 +318,12 @@ public class CopyPropagator extends DataFlow {
 	}
     }
 
-    protected DataFlowItem flow(Item in, FlowGraph graph, Term t) {
+    protected DataFlowItem flow(Item in, FlowGraph graph, Term t, boolean entry) {
 	DataFlowItem result = new DataFlowItem((DataFlowItem)in);
+    
+    if (entry) {
+        return result;
+    }
 
 	if (t instanceof Assign) {
 	    Assign n = (Assign)t;
@@ -391,8 +395,8 @@ public class CopyPropagator extends DataFlow {
 	return result;
     }
 
-    public Map flow(Item in, FlowGraph graph, Term t, Set succEdgeKeys) {
-	return itemToMap(flow(in, graph, t), succEdgeKeys);
+    public Map flow(Item in, FlowGraph graph, Term t, boolean entry, Set succEdgeKeys) {
+	return itemToMap(flow(in, graph, t, entry), succEdgeKeys);
     }
 
     public void post(FlowGraph graph, Term root) throws SemanticException {
@@ -402,7 +406,7 @@ public class CopyPropagator extends DataFlow {
 	}
     }
 
-    public void check(FlowGraph graph, Term n, Item inItem, Map outItems)
+    public void check(FlowGraph graph, Term n, boolean entry, Item inItem, Map outItems)
 	throws SemanticException {
 
 	throw new InternalCompilerError("CopyPropagator.check should never be "
@@ -417,7 +421,7 @@ public class CopyPropagator extends DataFlow {
 	    if (g == null) return n;
 
 	    Local l = (Local)n;
-	    Collection peers = g.peers(l);
+	    Collection peers = g.peers(l, false);
 	    if (peers == null || peers.isEmpty()) return n;
 
 	    List items = new ArrayList();
@@ -426,7 +430,7 @@ public class CopyPropagator extends DataFlow {
 		if (p.inItem() != null) items.add(p.inItem());
 	    }
 
-	    DataFlowItem in = (DataFlowItem)confluence(items, l, g);
+	    DataFlowItem in = (DataFlowItem)confluence(items, l, false, g);
 	    if (in == null) return n;
 
 	    LocalInstance root = in.getRoot(l.localInstance().orig());

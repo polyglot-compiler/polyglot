@@ -42,7 +42,7 @@ public class ExitChecker extends DataFlow
         return null;
     }
 
-    public Item createInitialItem(FlowGraph graph, Term node) {
+    public Item createInitialItem(FlowGraph graph, Term node, boolean entry) {
         return DataFlowItem.EXITS;
     }
 
@@ -71,7 +71,7 @@ public class ExitChecker extends DataFlow
         
     }
     
-    public Map flow(Item in, FlowGraph graph, Term n, Set succEdgeKeys) {
+    public Map flow(Item in, FlowGraph graph, Term n, boolean entry, Set succEdgeKeys) {
         // If every path from the exit node to the entry goes through a return,
         // we're okay.  So make the exit bit false at exit and true at every return;
         // the confluence operation is &&. 
@@ -81,7 +81,7 @@ public class ExitChecker extends DataFlow
             return itemToMap(DataFlowItem.EXITS, succEdgeKeys);
         }
 
-        if (n == graph.exitNode()) {           
+        if (n == graph.root() && !entry) {           
             // all exception edges to the exit node are regarded as exiting
             // correctly. Make sure non-exception edges have the
             // exit bit false.
@@ -103,7 +103,7 @@ public class ExitChecker extends DataFlow
     }
 
 
-    public Item confluence(List inItems, Term node, FlowGraph graph) {
+    public Item confluence(List inItems, Term node, boolean entry, FlowGraph graph) {
         // all paths must have an exit
         for (Iterator i = inItems.iterator(); i.hasNext(); ) {
             if (!((DataFlowItem)i.next()).exits) {
@@ -113,13 +113,13 @@ public class ExitChecker extends DataFlow
         return DataFlowItem.EXITS; 
     }
 
-    public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
+    public void check(FlowGraph graph, Term n, boolean entry, Item inItem, Map outItems) throws SemanticException {
         // Check for statements not on the path to exit; compound
         // statements are allowed to be off the path.  (e.g., "{ return; }"
         // or "while (true) S").  If a compound statement is truly
         // unreachable, one of its sub-statements will be also and we will
         // report an error there.
-        if (n == graph.entryNode()) {
+        if (n == graph.root() && entry) {
             if (outItems != null && !outItems.isEmpty()) {
                 // due to the flow equations, all DataFlowItems in the outItems map
                 // are the same, so just take the first one.

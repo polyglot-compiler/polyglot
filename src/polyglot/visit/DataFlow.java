@@ -114,13 +114,13 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
 
     /**
-     * Create an initial Item for the term node. This is generally how the Item that will be given
-     * to the start node of a graph is created, although this method may also be called for other
-     * (non-start) nodes.
+     * Create an initial Item for the term node. This is generally how the Item
+     * that will be given to the start node of a graph is created, although this
+     * method may also be called for other (non-start) nodes.
      * 
      * @return a (possibly null) Item.
      */
-    protected abstract Item createInitialItem(FlowGraph graph, Term node);
+    protected abstract Item createInitialItem(FlowGraph graph, Term node, boolean entry);
     
     /**
      * Produce new <code>Item</code>s as appropriate for the
@@ -131,13 +131,14 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *           of a call to confluence(List, List, Term)
      * @param graph the FlowGraph which the dataflow is operating on
      * @param n the Term which this method must calculate the flow for.
+     * @param entry indicates whether we are looking at the entry or exit of n.
      * @param edgeKeys a set of FlowGraph.EdgeKeys, being all the 
      *          EdgeKeys of the edges leaving this node. The 
      *          returned Map must have mappings for all objects in this set.
      * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
      *          entries for all EdgeKeys in edgeKeys. 
      */
-    protected Map flow(Item in, FlowGraph graph, Term n, Set edgeKeys) {
+    protected Map flow(Item in, FlowGraph graph, Term n, boolean entry, Set edgeKeys) {
         throw new InternalCompilerError("Unimplemented: should be " +
                                         "implemented by subclasses if " +
                                         "needed");
@@ -156,16 +157,18 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @param inItemKeys the FlowGraph.EdgeKeys for the items in the list inItems 
      * @param graph the FlowGraph which the dataflow is operating on
      * @param n the Term which this method must calculate the flow for.
+     * @param entry indicates whether we are looking at the entry or exit of n.
      * @param edgeKeys a set of FlowGraph.EdgeKeys, being all the 
      *          EdgeKeys of the edges leaving this node. The 
      *          returned Map must have mappings for all objects in this set.
      * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
      *          entries for all EdgeKeys in edgeKeys. 
      */
-    protected Map flow(List inItems, List inItemKeys, FlowGraph graph, Term n, Set edgeKeys) {
-        Item inItem = this.safeConfluence(inItems, inItemKeys, n, graph);
+    protected Map flow(List inItems, List inItemKeys, FlowGraph graph, 
+            Term n, boolean entry, Set edgeKeys) {
+        Item inItem = this.safeConfluence(inItems, inItemKeys, n, entry, graph);
         
-        return this.flow(inItem, graph, n, edgeKeys);
+        return this.flow(inItem, graph, n, entry, edgeKeys);
     }
 
         
@@ -185,13 +188,15 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @param inItemKeys the FlowGraph.EdgeKeys for the items in the list inItems 
      * @param graph the FlowGraph which the dataflow is operating on
      * @param n the Term which this method must calculate the flow for.
+     * @param entry indicates whether we are looking at the entry or exit of n.
      * @param edgeKeys a set of FlowGraph.EdgeKeys, being all the 
      *          EdgeKeys of the edges leaving this node. The 
      *          returned Map must have mappings for all objects in this set.
      * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
      *          entries for all EdgeKeys in edgeKeys. 
      */
-    protected final Map flowToBooleanFlow(List inItems, List inItemKeys, FlowGraph graph, Term n, Set edgeKeys) {
+    protected final Map flowToBooleanFlow(List inItems, List inItemKeys, 
+            FlowGraph graph, Term n, boolean entry, Set edgeKeys) {
         List trueItems = new ArrayList();
         List trueItemKeys = new ArrayList();
         List falseItems = new ArrayList();
@@ -219,15 +224,15 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             }
         }
         
-        Item trueItem = trueItems.isEmpty() ? null : this.safeConfluence(trueItems, trueItemKeys, n, graph);
-        Item falseItem = falseItems.isEmpty() ? null : this.safeConfluence(falseItems, falseItemKeys, n, graph);
-        Item otherItem = otherItems.isEmpty() ? null : this.safeConfluence(otherItems, otherItemKeys, n, graph);
+        Item trueItem = trueItems.isEmpty() ? null : this.safeConfluence(trueItems, trueItemKeys, n, entry, graph);
+        Item falseItem = falseItems.isEmpty() ? null : this.safeConfluence(falseItems, falseItemKeys, n, entry, graph);
+        Item otherItem = otherItems.isEmpty() ? null : this.safeConfluence(otherItems, otherItemKeys, n, entry, graph);
 
-        return this.flow(trueItem, falseItem, otherItem, graph, n, edgeKeys);
+        return this.flow(trueItem, falseItem, otherItem, graph, n, entry, edgeKeys);
     }
 
     protected Map flow(Item trueItem, Item falseItem, Item otherItem, 
-                       FlowGraph graph, Term n, Set edgeKeys) {
+                       FlowGraph graph, Term n, boolean entry, Set edgeKeys) {
        throw new InternalCompilerError("Unimplemented: should be " +
                                        "implemented by subclasses if " +
                                        "needed");        
@@ -281,7 +286,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                 Item bitANDFalse = 
                      this.safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE,
                                          falseItem, FlowGraph.EDGE_KEY_FALSE, 
-                                         n, graph);
+                                         n, false, graph);
                 return itemsToMap(trueItem, bitANDFalse, otherItem, edgeKeys);                
             }
             else if (b.operator() == Binary.BIT_OR) {
@@ -291,7 +296,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                 Item bitORTrue = 
                     this.safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE,
                                         falseItem, FlowGraph.EDGE_KEY_FALSE, 
-                                        n, graph);
+                                        n, false, graph);
                 return itemsToMap(bitORTrue, falseItem, otherItem, edgeKeys);                
             }
         }
@@ -308,9 +313,12 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *            elements.
      * @param node <code>Term</code> for which the <code>items</code> are 
      *          flowing into.
+     * @param entry indicates whether we are looking at the entry or exit of 
+     *          node.
      * @return a non-null Item.
      */
-    protected abstract Item confluence(List items, Term node, FlowGraph graph);
+    protected abstract Item confluence(List items, Term node, boolean entry, 
+            FlowGraph graph);
     
     /**
      * The confluence operator for many flows. This method produces a single
@@ -325,10 +333,13 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *              <code>items</code> flowed from.
      * @param node <code>Term</code> for which the <code>items</code> are 
      *          flowing into.
+     * @param entry indicates whether we are looking at the entry or exit of
+     *          node.
      * @return a non-null Item.
      */
-    protected Item confluence(List items, List itemKeys, Term node, FlowGraph graph) {
-        return confluence(items, node, graph); 
+    protected Item confluence(List items, List itemKeys, Term node, boolean entry, 
+            FlowGraph graph) {
+        return confluence(items, node, entry, graph); 
     }
     
     /**
@@ -344,28 +355,31 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      *              <code>items</code> flowed from.
      * @param node <code>Term</code> for which the <code>items</code> are 
      *          flowing into.
+     * @param entry indicates whether we are looking at the entry or exit of
+     *          node.
      * @return a non-null Item.
      */
-    protected Item safeConfluence(List items, List itemKeys, Term node, FlowGraph graph) {
+    protected Item safeConfluence(List items, List itemKeys, Term node, 
+            boolean entry, FlowGraph graph) {
         if (items.isEmpty()) {
-            return this.createInitialItem(graph, node);
+            return this.createInitialItem(graph, node, entry);
         }
         if (items.size() == 1) {
             return (Item)items.get(0);
         }
-        return confluence(items, itemKeys, node, graph); 
+        return confluence(items, itemKeys, node, entry, graph); 
     }
 
     protected Item safeConfluence(Item item1, FlowGraph.EdgeKey key1,
                                   Item item2, FlowGraph.EdgeKey key2,
-                                  Term node, FlowGraph graph) {
-        return safeConfluence(item1, key1, item2, key2, null, null, node, graph);
+                                  Term node, boolean entry, FlowGraph graph) {
+        return safeConfluence(item1, key1, item2, key2, null, null, node, entry, graph);
     }
                                   
     protected Item safeConfluence(Item item1, FlowGraph.EdgeKey key1,
                                   Item item2, FlowGraph.EdgeKey key2,
                                   Item item3, FlowGraph.EdgeKey key3,
-                                  Term node, FlowGraph graph) {
+                                  Term node, boolean entry, FlowGraph graph) {
         List items = new ArrayList(3);
         List itemKeys = new ArrayList(3);
         
@@ -381,7 +395,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             items.add(item3);
             itemKeys.add(key3);
         }
-        return safeConfluence(items, itemKeys, node, graph); 
+        return safeConfluence(items, itemKeys, node, entry, graph); 
     }
     
     /**
@@ -393,7 +407,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @throws SemanticException if the properties this dataflow
      *         analysis is checking for is not satisfied.
      */
-    protected abstract void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException;
+    protected abstract void check(FlowGraph graph, Term n, boolean entry, 
+            Item inItem, Map outItems) throws SemanticException;
 
     /**
      * Construct a flow graph for the <code>CodeNode</code> provided, and call 
@@ -455,7 +470,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     protected LinkedList findSCCs(FlowGraph graph) {
 	Collection peers = graph.peers();
 	Peer[] sorted = new Peer[peers.size()];
-        Collection start = graph.peers(graph.startNode());
+        Collection start = graph.startPeers();
 	  // if start == peers, making all nodes reachable,
 	  // the problem still arises.
 
@@ -617,8 +632,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                 
             // calculate the out item
             Map oldOutItems = p.outItems;
-            p.inItem = this.safeConfluence(inItems, inItemKeys, p.node, graph);
-            p.outItems = this.flow(inItems, inItemKeys, graph, p.node, p.succEdgeKeys());
+            p.inItem = this.safeConfluence(inItems, inItemKeys, p.node, p.entry, 
+                    graph);
+            p.outItems = this.flow(inItems, inItemKeys, graph, p.node, p.entry,
+                    p.succEdgeKeys());
                     
             if (!p.succEdgeKeys().equals(p.outItems.keySet())) {
                 // This check is more for developers to ensure that they
@@ -746,12 +763,12 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         
         // Check the nodes in approximately flow order.
         Set uncheckedPeers = new HashSet(graph.peers());
-        LinkedList peersToCheck = new LinkedList(graph.peers(graph.startNode()));
+        LinkedList peersToCheck = new LinkedList(graph.startPeers());
         while (!peersToCheck.isEmpty()) {
             Peer p = (Peer) peersToCheck.removeFirst();
             uncheckedPeers.remove(p);
 
-            this.check(graph, p.node, p.inItem, p.outItems);
+            this.check(graph, p.node, p.entry, p.inItem, p.outItems);
             
             for (Iterator iter = p.succs.iterator(); iter.hasNext(); ) {
                 Peer q = ((Edge)iter.next()).getTarget();

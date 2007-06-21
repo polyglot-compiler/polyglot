@@ -499,8 +499,8 @@ public class InitChecker extends DataFlow
      * The initial item to be given to the entry point of the dataflow contains
      * the init counts for the final fields.
      */
-    public Item createInitialItem(FlowGraph graph, Term node) {
-        if (node == graph.startNode()) {
+    public Item createInitialItem(FlowGraph graph, Term node, boolean entry) {
+        if (node == graph.root() && entry) {
             return createInitDFI();
         }
         return BOTTOM;
@@ -519,7 +519,8 @@ public class InitChecker extends DataFlow
      * for these <code>Term</code>s, otherwise 
      * <code>confluence(List, Term)</code> is called instead. 
      */
-    protected Item confluence(List items, List itemKeys, Term node, FlowGraph graph) {
+    protected Item confluence(List items, List itemKeys, 
+            Term node, boolean entry, FlowGraph graph) {
         if (node instanceof Initializer || node instanceof ConstructorDecl) {
             List filtered = filterItemsNonException(items, itemKeys);
             if (filtered.isEmpty()) {
@@ -529,10 +530,10 @@ public class InitChecker extends DataFlow
                 return (Item)filtered.get(0);
             }
             else {
-               return confluence(filtered, node, graph);
+               return confluence(filtered, node, entry, graph);
             } 
         }
-        return confluence(items, node, graph); 
+        return confluence(items, node, entry, graph); 
     }
 
     /**
@@ -542,7 +543,7 @@ public class InitChecker extends DataFlow
      * VarInstance, the conflict must be resolved, by using the
      * minimum of all mins and the maximum of all maxs. 
      */
-    public Item confluence(List inItems, Term node, FlowGraph graph) {        
+    public Item confluence(List inItems, Term node, boolean entry, FlowGraph graph) {        
         // Resolve any conflicts pairwise.
         Iterator iter = inItems.iterator();
         Map m = null;
@@ -555,10 +556,10 @@ public class InitChecker extends DataFlow
             else { 
                 Map n = ((DataFlowItem)itm).initStatus;
                 for (Iterator iter2 = n.entrySet().iterator(); iter2.hasNext(); ) {
-                    Map.Entry entry = (Map.Entry)iter2.next();
-                    VarInstance v = (VarInstance)entry.getKey();
+                    Map.Entry e = (Map.Entry)iter2.next();
+                    VarInstance v = (VarInstance)e.getKey();
                     MinMaxInitCount initCount1 = (MinMaxInitCount)m.get(v);
-                    MinMaxInitCount initCount2 = (MinMaxInitCount)entry.getValue();
+                    MinMaxInitCount initCount2 = (MinMaxInitCount)e.getValue();
                     m.put(v, MinMaxInitCount.join(initCount1, initCount2));                                        
                 }
             }
@@ -570,8 +571,9 @@ public class InitChecker extends DataFlow
     }
     
 
-    protected Map flow(List inItems, List inItemKeys, FlowGraph graph, Term n, Set edgeKeys) {
-        return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, edgeKeys);
+    protected Map flow(List inItems, List inItemKeys, FlowGraph graph, 
+            Term n, boolean entry, Set edgeKeys) {
+        return this.flowToBooleanFlow(inItems, inItemKeys, graph, n, entry, edgeKeys);
     }
 
     /**
@@ -588,11 +590,16 @@ public class InitChecker extends DataFlow
      *              are interested in, then increment the min and max counts
      *              for that local var or field.   
      */
-    public Map flow(Item trueItem, Item falseItem, Item otherItem, FlowGraph graph, Term n, Set succEdgeKeys) {
+    public Map flow(Item trueItem, Item falseItem, Item otherItem,
+            FlowGraph graph, Term n, boolean entry, Set succEdgeKeys) {
         Item inItem = safeConfluence(trueItem, FlowGraph.EDGE_KEY_TRUE, 
                                      falseItem, FlowGraph.EDGE_KEY_FALSE,
                                      otherItem, FlowGraph.EDGE_KEY_OTHER,
-                                     n, graph);
+                                     n, entry, graph);
+        if (entry) {
+            return itemToMap(inItem, succEdgeKeys);
+        }
+        
         if (inItem == BOTTOM) {
             return itemToMap(BOTTOM, succEdgeKeys);           
         }                                     
@@ -801,7 +808,7 @@ public class InitChecker extends DataFlow
      * dataflows over Initializers, by copying back the appropriate 
      * MinMaxInitCounts to the map currClassFinalFieldInitCounts.
      */
-    public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
+    public void check(FlowGraph graph, Term n, boolean entry, Item inItem, Map outItems) throws SemanticException {
         DataFlowItem dfIn = (DataFlowItem)inItem;        
         if (dfIn == null) {
             // There is no input data flow item. This can happen if we are 
@@ -816,7 +823,7 @@ public class InitChecker extends DataFlow
         }
         
         DataFlowItem dfOut = null;
-        if (outItems != null && !outItems.isEmpty()) {
+        if (!entry && outItems != null && !outItems.isEmpty()) {
             // due to the flow equations, all DataFlowItems in the outItems map
             // are the same, so just take the first one.
             dfOut = (DataFlowItem)outItems.values().iterator().next(); 
@@ -842,7 +849,7 @@ public class InitChecker extends DataFlow
             // probably a node in a finally block. Just ignore it.
         }
         
-        if (n == graph.finishNode()) {            
+        if (n == graph.root() && !entry) {            
             if (currCBI.currCodeDecl instanceof Initializer) {
                 finishInitializer(graph, 
                                 (Initializer)currCBI.currCodeDecl, 
