@@ -393,7 +393,7 @@ public class CFGBuilder implements Copy
     public void visitThrow(Term a) {
         for (Iterator i = a.del().throwTypes(ts).iterator(); i.hasNext(); ) {
             Type type = (Type) i.next();
-            visitThrow(a, type);
+            visitThrow(a, false, type);
         }
 
         // Every statement can throw an error.
@@ -401,14 +401,14 @@ public class CFGBuilder implements Copy
         if ((a instanceof Stmt && ! (a instanceof CompoundStmt)) ||
             (a instanceof Block && ((Block) a).statements().isEmpty())) {
             
-            visitThrow(a, ts.Error());
+            visitThrow(a, false, ts.Error());
         }
     }
     
     /**
      * Create edges for an exception thrown from term <code>t</code>.
      */
-    public void visitThrow(Term t, Type type) {
+    public void visitThrow(Term t, boolean entry, Type type) {
         Term last = t;
         CFGBuilder last_visitor = this;
 
@@ -426,13 +426,13 @@ public class CFGBuilder implements Copy
 
                         // definite catch
                         if (type.isImplicitCastValid(cb.catchType())) {
-                            edge(last_visitor, last, cb, true, 
+                            edge(last_visitor, last, last == t && entry, cb, true, 
                                     new FlowGraph.ExceptionEdgeKey(type));
                             definiteCatch = true;
                         }
                         // possible catch
                         else if (cb.catchType().isImplicitCastValid(type)) { 
-                            edge(last_visitor, last, cb, true, 
+                            edge(last_visitor, last, last == t && entry, cb, true, 
                                     new FlowGraph.ExceptionEdgeKey(cb.catchType()));
                         }
                     }
@@ -452,7 +452,7 @@ public class CFGBuilder implements Copy
 
         // If not caught, insert a node from the thrower to exit.
         if (errorEdgesToExitNode || !type.isSubtype(ts.Error())) {
-            edge(last_visitor, last, graph.root(), false, 
+            edge(last_visitor, last, last == t && entry, graph.root(), false, 
                     new FlowGraph.ExceptionEdgeKey(type));
         }
     }

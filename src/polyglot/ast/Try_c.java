@@ -256,7 +256,7 @@ public class Try_c extends Stmt_c implements Try
 
         for (Iterator i = ts.uncheckedExceptions().iterator(); i.hasNext(); ) {
             Type type = (Type) i.next();
-            v1.visitThrow(tryBlock, type);
+            v1.visitThrow(tryBlock, true, type);
         }
 
         // Handle the normal return case.  The throw case will be handled
