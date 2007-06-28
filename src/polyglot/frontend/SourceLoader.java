@@ -157,12 +157,17 @@ public class SourceLoader
 
             for (Iterator i = sourcePath.iterator(); i.hasNext(); ) {
                 File directory = (File) i.next();
+                if (! directory.isDirectory())
+                    continue;
                 Set dirContents = (Set)directoryContentsCache.get(directory);
                 if (dirContents == null) {
                     dirContents = new HashSet();
                     directoryContentsCache.put(directory, dirContents);
                     if (directory.exists()) {
                         String[] contents = directory.list();
+                        // May return null if directory is not found
+                        if (contents == null)
+                            continue;
                         for (int j = 0; j < contents.length; j++) {
                             dirContents.add(contents[j]);
                         }
@@ -254,13 +259,18 @@ public class SourceLoader
             }
 
             File[] ls = dir.listFiles();
-            for (int i = 0; i < ls.length; i++) {
-                if (f1.equals(ls[i])) {
-                    f1Exists = true;
+            if (ls != null) {
+                for (int i = 0; i < ls.length; i++) {
+                    if (f1.equals(ls[i])) {
+                        f1Exists = true;
+                    }
+                    if (f2.equals(ls[i])) {
+                        f2Exists = true;
+                    }
                 }
-                if (f2.equals(ls[i])) {
-                    f2Exists = true;
-                }
+            }
+            else {
+                // dir not found
             }
 
             if (! f1Exists || ! f2Exists) {
