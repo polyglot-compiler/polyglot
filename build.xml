@@ -741,7 +741,8 @@
 
 	<target name="bump-version">
 		<propertyfile file="${basedir}/build.properties">
-			<entry key="${key}" type="int" operation="+" value="1" pattern="0" />
+                  <entry key="version.patch"
+                    type="int" operation="+" value="1" pattern="0" />
 		</propertyfile>
 		<!-- reread -->
 		<antcall target="configure-buildstring" />
@@ -749,21 +750,27 @@
 	</target>
 
 	<target name="bump-major">
-		<antcall target="bump-version">
-			<param name="key" value="version.major" />
-		</antcall>
+		<propertyfile file="${basedir}/build.properties">
+                  <entry key="version.major"
+                    type="int" operation="+" value="1" pattern="0" />
+                  <entry key="version.minor" value="0" />
+                  <entry key="version.patch" value="0" />
+		</propertyfile>
 	</target>
 
 	<target name="bump-minor">
-		<antcall target="bump-version">
-			<param name="key" value="version.minor" />
-		</antcall>
+		<propertyfile file="${basedir}/build.properties">
+                  <entry key="version.minor"
+                    type="int" operation="+" value="1" pattern="0" />
+                  <entry key="version.patch" value="0" />
+		</propertyfile>
 	</target>
 
 	<target name="bump-patch">
-		<antcall target="bump-version">
-			<param name="key" value="version.patch" />
-		</antcall>
+		<propertyfile file="${basedir}/build.properties">
+                  <entry key="version.patch"
+                    type="int" operation="+" value="1" pattern="0" />
+		</propertyfile>
 	</target>
 
 	<target name="gen-version" depends="gen-version-java,gen-version-manifest" />
