@@ -140,10 +140,12 @@
 
 	<target name="pao" depends="install-jars-in-examples" description="Build the pao example">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="compile-all" />
+		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="jar" />
 	</target>
 
 	<target name="coffer" depends="install-jars-in-examples" description="Build the coffer example">
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="compile-all" />
+		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="jar" />
 	</target>
 
 	<!-- clean the examples -->
