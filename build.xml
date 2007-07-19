@@ -131,6 +131,8 @@
 	<target name="install-jars-in-examples" depends="jar">
 		<copy file="${lib}/polyglot.jar" todir="${pao.dir}/lib" />
 		<copy file="${lib}/polyglot.jar" todir="${coffer.dir}/lib" />
+		<copy file="${lib}/java_cup.jar" todir="${pao.dir}/lib" />
+		<copy file="${lib}/java_cup.jar" todir="${coffer.dir}/lib" />
 	</target>
 
 	<!-- build the examples -->
@@ -138,10 +140,12 @@
 
 	<target name="pao" depends="install-jars-in-examples" description="Build the pao example">
 		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="compile-all" />
+		<ant inheritAll="false" antfile="${pao.dir}/build.xml" dir="${pao.dir}" target="jar" />
 	</target>
 
 	<target name="coffer" depends="install-jars-in-examples" description="Build the coffer example">
 		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="compile-all" />
+		<ant inheritAll="false" antfile="${coffer.dir}/build.xml" dir="${coffer.dir}" target="jar" />
 	</target>
 
 	<!-- clean the examples -->
@@ -672,6 +676,7 @@
 
 	<!-- make the Eclipse update distribution and install into dist -->
 	<target name="eclipse-update-dist" depends="mkdir-tmp" description="Build the files to put on the eclipse update site">
+                <delete dir="${basedir}/eclipseUpdates" failonerror="false" includeemptydirs="true"/>
 		<mkdir dir="${basedir}/eclipseUpdates" />
 		<antcall target="build-features" />
 		<antcall target="build-site" />
@@ -680,6 +685,7 @@
 
 	<target name="build-site" depends="configure-buildstring">
 		<filter token="version" value="${jl.version}" />
+                <delete file="${basedir}/eclipseUpdates/site.xml" failonerror="false"/>
 		<copy tofile="${basedir}/eclipseUpdates/site.xml" file="${basedir}/eclipse/site.xml.in" filtering="true" />
 	</target>
 
@@ -735,37 +741,49 @@
 
 	<target name="dist" depends="source-tarball-stable,dist-checklist" />
 
-	<target name="bump-version">
+        <target name="gen-version">
+		<antcall target="configure-buildstring" />
+		<antcall target="gen-version-java" />
+		<antcall target="gen-version-manifest" />
+	</target>
+
+        <target name="bump-version">
+                <antcall target="bump-patch"/>
+        </target>
+
+	<target name="bump-major">
 		<propertyfile file="${basedir}/build.properties">
-			<entry key="${key}" type="int" operation="+" value="1" pattern="0" />
+			<entry key="version.major" type="int" operation="+" value="1" pattern="0" />
+                        <entry key="version.minor" type="int" value="0"/>
+                        <entry key="version.patch" type="int" value="0"/>
 		</propertyfile>
 		<!-- reread -->
 		<antcall target="configure-buildstring" />
 		<antcall target="gen-version" />
 	</target>
 
-	<target name="bump-major">
-		<antcall target="bump-version">
-			<param name="key" value="version.major" />
-		</antcall>
-	</target>
-
 	<target name="bump-minor">
-		<antcall target="bump-version">
-			<param name="key" value="version.minor" />
-		</antcall>
+		<propertyfile file="${basedir}/build.properties">
+			<entry key="version.minor" type="int" operation="+" value="1" pattern="0" />
+                        <entry key="version.patch" type="int" value="0"/>
+		</propertyfile>
+		<!-- reread -->
+		<antcall target="configure-buildstring" />
+		<antcall target="gen-version" />
 	</target>
 
 	<target name="bump-patch">
-		<antcall target="bump-version">
-			<param name="key" value="version.patch" />
-		</antcall>
+		<propertyfile file="${basedir}/build.properties">
+			<entry key="version.patch" type="int" operation="+" value="1" pattern="0" />
+		</propertyfile>
+		<!-- reread -->
+		<antcall target="configure-buildstring" />
+		<antcall target="gen-version" />
 	</target>
-
-	<target name="gen-version" depends="gen-version-java,gen-version-manifest" />
 
 	<target name="gen-version-manifest" depends="configure-buildstring">
 		<filter token="version" value="${jl.version}" />
+                <delete file="META-INF/MANIFEST.MF" />
 		<copy tofile="META-INF/MANIFEST.MF" filtering="true">
 			<fileset file="${basedir}/META-INF/MANIFEST.MF.in" />
 		</copy>

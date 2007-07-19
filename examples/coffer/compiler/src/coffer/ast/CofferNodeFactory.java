@@ -31,17 +31,17 @@ public interface CofferNodeFactory extends NodeFactory {
     ThrowConstraintNode ThrowConstraintNode(Position pos, TypeNode tn, KeySetNode keys);
 
     CofferMethodDecl CofferMethodDecl(Position pos, Flags flags, TypeNode
-                                    returnType, String name, List argTypes,
+                                    returnType, Id name, List argTypes,
                                     KeySetNode entryKeys, KeySetNode returnKeys,
                                     List throwConstraints, Block body);
 
-    CofferConstructorDecl CofferConstructorDecl(Position pos, Flags flags, String name, List
+    CofferConstructorDecl CofferConstructorDecl(Position pos, Flags flags, Id name, List
                                               argTypes, KeySetNode entryKeys,
                                               KeySetNode returnKeys, List
                                               throwConstraints, Block body);
 
 
-    CofferClassDecl CofferClassDecl(Position pos, Flags flags, String name,
+    CofferClassDecl CofferClassDecl(Position pos, Flags flags, Id name,
                                   KeyNode key, TypeNode superClass, List
                                   interfaces, ClassBody body);
 }

@@ -160,58 +160,8 @@
     </target>
 
     <target name="executables">
-        <uptodate property="executables.up-to-date">
-            <srcfiles dir="${bin.dir}" includes="*.in" />
-            <mapper type="glob" from="*.in" to="*" />
-        </uptodate>
-        <antcall target="executable" />
-        <delete file="${bin.dir}/defs" />
-    </target>
-
-    <target name="executable-defs">
-        <condition property="defs.load_library_path" value="PATH">
-            <os family="windows" />
-        </condition>
-        <condition property="defs.load_library_path" value="LD_LIBRARY_PATH">
-            <os family="unix" />
-        </condition>
-
-        <echo file="${bin.dir}/defs" append="no">#!/bin/sh
-# DO NOT EDIT - This file was automatically generated.
-
-JAVA='${java.home}/bin/java'
-FILE_SEP='${file.separator}'
-PATH_SEP='${path.separator}'
-TOP='${basedir}'
-RT_LIB_PATH='${lib.dir}${path.separator}'$$${defs.load_library_path}
-        </echo>
-    </target>
-
-    <!-- creates the executable scripts -->
-    <target name="executable"
-		unless="executables.up-to-date">
-
-        <!-- make sure the definitions file is around -->
-        <antcall target="executable-defs" />
-
-        <!-- Create the compiler script -->
-        <concat destfile="${compiler.sh}" append="no">
-            <filelist dir="${bin.dir}" files="defs,${compiler.sh}.in" />
-        </concat>
         <chmod perm="+x" file="${compiler.sh}" />
-
-
-        <!-- Create the interpreter script -->
-        <concat destfile="${interp.sh}" append="no">
-            <filelist dir="${bin.dir}" files="defs,${interp.sh}.in" />
-        </concat>
         <chmod perm="+x" file="${interp.sh}" />
-
-        <!-- Create ${compiler.bat} -->
-        <condition property="os.isWindows">
-            <os family="windows" />
-        </condition>
-
         <antcall target="executable-bat" />
     </target>
 
@@ -232,7 +182,7 @@ shift
 goto setupArgs
 :doneStart
 sh ${compiler.sh} %CMD_LINE_ARGS%
-    </concat>
+        </concat>
     </target>
 
     <!-- ****************************************

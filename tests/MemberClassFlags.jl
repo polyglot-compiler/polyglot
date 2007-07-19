@@ -8,7 +8,8 @@ import java.awt.geom.*;
  * should fail.
  */
 class MemberClassFlags {
-    void f() {
-          Object o = new Rectangle2D.Float(0,0,0,0);
+    float f() {
+          Rectangle2D.Float o = new Rectangle2D.Float(0,0,0,0);
+          return o.width;
     }
 }

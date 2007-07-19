@@ -35,7 +35,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     protected boolean init;
     protected boolean constructorsInitialized;
     protected boolean fieldsInitialized;
-    protected  boolean interfacesInitialized;
+    protected boolean interfacesInitialized;
     protected boolean memberClassesInitialized;
     protected boolean methodsInitialized;
     protected boolean superclassInitialized;
@@ -160,6 +160,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
 
         // Add unresolved class into the cache to avoid circular resolving.
         ts.systemResolver().addNamed(name, ct);
+        ts.systemResolver().addNamed(ct.fullName(), ct);
 
         return ct;
     }

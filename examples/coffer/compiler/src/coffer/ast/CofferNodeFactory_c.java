@@ -63,7 +63,7 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
         return n;
     }
 
-    public ClassDecl ClassDecl(Position pos, Flags flags, String name,
+    public ClassDecl ClassDecl(Position pos, Flags flags, Id name,
                                TypeNode superClass, List interfaces,
                                ClassBody body)
     {
@@ -72,7 +72,7 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
     }
 
     public CofferClassDecl CofferClassDecl(Position pos, Flags flags,
-                                         String name, KeyNode key,
+                                         Id name, KeyNode key,
                                          TypeNode superClass, List interfaces,
                                          ClassBody body)
     {
@@ -89,7 +89,7 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
     }
 
     public MethodDecl MethodDecl(Position pos, Flags flags,
-                                 TypeNode returnType, String name,
+                                 TypeNode returnType, Id name,
                                  List argTypes, List excTypes, Block body)
     {
         List l = new LinkedList();
@@ -105,7 +105,7 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
     }
 
     public ConstructorDecl ConstructorDecl(Position pos, Flags flags,
-                                           String name, List argTypes,
+                                           Id name, List argTypes,
                                            List excTypes, Block body)
     {
         List l = new LinkedList();
@@ -120,7 +120,7 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
     }
 
     public CofferMethodDecl CofferMethodDecl(Position pos, Flags flags,
-                                              TypeNode returnType, String name,
+                                              TypeNode returnType, Id name,
                                               List argTypes,
                                               KeySetNode entryKeys,
                                               KeySetNode returnKeys,
@@ -135,7 +135,7 @@ public class CofferNodeFactory_c extends NodeFactory_c implements CofferNodeFact
 
     public CofferConstructorDecl CofferConstructorDecl(Position pos,
                                                         Flags flags,
-                                                        String name,
+                                                        Id name,
                                                         List argTypes,
                                                         KeySetNode entryKeys,
                                                         KeySetNode returnKeys,
