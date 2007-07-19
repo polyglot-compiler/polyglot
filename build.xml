@@ -131,6 +131,8 @@
 	<target name="install-jars-in-examples" depends="jar">
 		<copy file="${lib}/polyglot.jar" todir="${pao.dir}/lib" />
 		<copy file="${lib}/polyglot.jar" todir="${coffer.dir}/lib" />
+		<copy file="${lib}/java_cup.jar" todir="${pao.dir}/lib" />
+		<copy file="${lib}/java_cup.jar" todir="${coffer.dir}/lib" />
 	</target>
 
 	<!-- build the examples -->
