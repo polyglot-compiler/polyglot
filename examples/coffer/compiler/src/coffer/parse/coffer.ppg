@@ -5,6 +5,7 @@ package coffer.parse;
 import coffer.types.*;
 import coffer.ast.*;
 import polyglot.parse.Name;
+import polyglot.parse.VarDeclarator;
 
 parser Grm extends polyglot.parse.Grm {:
     public final CofferTypeSystem ts;
@@ -109,7 +110,7 @@ extend constructor_declaration ::=
             e = new Grm.KeySpec(null, null);
           }
            RESULT = parser.nf.CofferConstructorDecl(parser.pos(a),
-                                              m, a.toString(), b,
+                                              m, parser.nf.Id(parser.pos(a), a.toString()), b,
                                               e.entryKeys, e.returnKeys,
                                               c, d); :}
     ;
@@ -136,7 +137,7 @@ extend method_header ::=
                 e = new Grm.KeySpec(null, null);
               }
                RESULT = parser.nf.CofferMethodDecl(parser.pos(c), a, b,
-                                            c.getIdentifier(), d,
+                                            parser.nf.Id(parser.pos(c), c.getIdentifier()), d,
                                             e.entryKeys, e.returnKeys,
                                             f, null); :}
     |   modifiers_opt:a VOID:b IDENTIFIER:c LPAREN
@@ -148,7 +149,7 @@ extend method_header ::=
               }
                RESULT = parser.nf.CofferMethodDecl(parser.pos(c), a,
                                             parser.nf.CanonicalTypeNode(parser.pos(b), parser.ts.Void()),
-                                            c.getIdentifier(), d,
+                                            parser.nf.Id(parser.pos(c), c.getIdentifier()), d,
                                             e.entryKeys, e.returnKeys,
                                             f, null); :}
     ;
@@ -200,7 +201,8 @@ class_declaration ::=
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
            RESULT = parser.nf.CofferClassDecl(parser.pos(n), a,
-                                        b.getIdentifier(), k, c, d, e);
+                                        parser.nf.Id(parser.pos(c), b.getIdentifier()),
+                                        k, c, d, e);
         :}
     ;
 
@@ -211,8 +213,9 @@ interface_declaration ::=
         {: k = parser.nf.KeyNode(k.position(),
                                  parser.ts.paramKey(k.position(), k.name()));
            RESULT = parser.nf.CofferClassDecl(parser.pos(n),
-                                        a.Interface(), b.getIdentifier(), k,
-                                        null, c, d); 
+                                        a.Interface(),
+                                        parser.nf.Id(parser.pos(c), b.getIdentifier()),
+                                        k, null, c, d); 
         :}
     ;
 
@@ -225,7 +228,8 @@ block_statement ::=
            List l = new LinkedList();
            l.add(   parser.nf.LocalClassDecl(parser.pos(n),
                         parser.nf.CofferClassDecl(parser.pos(n), Flags.NONE,
-                                        b.getIdentifier(), k, c, d, e)) );
+                                        parser.nf.Id(parser.pos(c), b.getIdentifier()),
+                                        k, c, d, e)) );
            RESULT = l;
         :}
     |
@@ -236,7 +240,8 @@ block_statement ::=
            List l = new LinkedList();
            l.add(   parser.nf.LocalClassDecl(parser.pos(n),
                         parser.nf.CofferClassDecl(parser.pos(n), Flags.ABSTRACT,
-                                        b.getIdentifier(), k, c, d, e)) );
+                                        parser.nf.Id(parser.pos(c), b.getIdentifier()),
+                                        k, c, d, e)) );
            RESULT = l;
         :}
     |
@@ -247,7 +252,8 @@ block_statement ::=
            List l = new LinkedList();
            l.add(   parser.nf.LocalClassDecl(parser.pos(n),
                         parser.nf.CofferClassDecl(parser.pos(n), Flags.FINAL.Abstract(),
-                                        b.getIdentifier(), k, c, d, e)) );
+                                        parser.nf.Id(parser.pos(c), b.getIdentifier()),
+                                        k, c, d, e)) );
            RESULT = l;
         :}
     |
@@ -258,7 +264,8 @@ block_statement ::=
            List l = new LinkedList();
            l.add(   parser.nf.LocalClassDecl(parser.pos(n),
                         parser.nf.CofferClassDecl(parser.pos(n), Flags.FINAL,
-                                        b.getIdentifier(), k, c, d, e)) );
+                                        parser.nf.Id(parser.pos(c), b.getIdentifier()),
+                                        k, c, d, e)) );
            RESULT = l;
         :}
     |
@@ -269,7 +276,8 @@ block_statement ::=
            List l = new LinkedList();
            l.add(   parser.nf.LocalClassDecl(parser.pos(n),
                         parser.nf.CofferClassDecl(parser.pos(n), Flags.FINAL.Abstract(),
-                                        b.getIdentifier(), k, c, d, e)) );
+                                        parser.nf.Id(parser.pos(c), b.getIdentifier()),
+                                        k, c, d, e)) );
            RESULT = l;
         :}
     ;
@@ -283,8 +291,9 @@ block_statement ::=
            List l = new LinkedList();
            l.add(   parser.nf.LocalClassDecl(parser.pos(n),
                         parser.nf.CofferClassDecl(parser.pos(n),
-                                        Flags.INTERFACE, b.getIdentifier(), k,
-                                        null, c, d)) ); 
+                                        Flags.INTERFACE,
+                                        parser.nf.Id(parser.pos(c), b.getIdentifier()),
+                                        k, null, c, d)) ); 
            RESULT = l;
         :}
     |
@@ -295,8 +304,9 @@ block_statement ::=
            List l = new LinkedList();
            l.add( parser.nf.LocalClassDecl(parser.pos(n),
                         parser.nf.CofferClassDecl(parser.pos(n),
-                                        Flags.ABSTRACT.Interface(), b.getIdentifier(), k,
-                                        null, c, d)) ); 
+                                        Flags.ABSTRACT.Interface(),
+                                        parser.nf.Id(parser.pos(c), b.getIdentifier()),
+                                        k, null, c, d)) ); 
            RESULT = l;
         :}
     |
@@ -307,8 +317,9 @@ block_statement ::=
            List l = new LinkedList();
            l.add( parser.nf.LocalClassDecl(parser.pos(n),
                         parser.nf.CofferClassDecl(parser.pos(n),
-                                        Flags.FINAL.Abstract().Interface(), b.getIdentifier(), k,
-                                        null, c, d)) ); 
+                                        Flags.FINAL.Abstract().Interface(),
+                                        parser.nf.Id(parser.pos(c), b.getIdentifier()),
+                                        k, null, c, d)) ); 
            RESULT = l;
         :}
     |
@@ -319,8 +330,9 @@ block_statement ::=
            List l = new LinkedList();
            l.add( parser.nf.LocalClassDecl(parser.pos(n),
                         parser.nf.CofferClassDecl(parser.pos(n),
-                                        Flags.FINAL.Interface(), b.getIdentifier(), k,
-                                        null, c, d)) ); 
+                                        Flags.FINAL.Interface(),
+                                        parser.nf.Id(parser.pos(c), b.getIdentifier()),
+                                        k, null, c, d)) ); 
            RESULT = l;
         :}
     |
@@ -331,8 +343,9 @@ block_statement ::=
            List l = new LinkedList();
            l.add( parser.nf.LocalClassDecl(parser.pos(n),
                         parser.nf.CofferClassDecl(parser.pos(n),
-                                        Flags.FINAL.Abstract().Interface(), b.getIdentifier(), k,
-                                        null, c, d)) ); 
+                                        Flags.FINAL.Abstract().Interface(),
+                                        parser.nf.Id(parser.pos(c), b.getIdentifier()),
+                                        k, null, c, d)) ); 
            RESULT = l;
         :}
     ;
@@ -345,7 +358,8 @@ class_member_declaration ::=
                                  parser.ts.paramKey(k.position(), k.name()));
            List l = new LinkedList();
            l.add( parser.nf.CofferClassDecl(parser.pos(n), a,
-                                        b.getIdentifier(), k, c, d, e) );
+                                        parser.nf.Id(parser.pos(c), b.getIdentifier()),
+                                        k, c, d, e) );
            RESULT = l;
         :}
     ;

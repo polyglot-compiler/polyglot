@@ -25,7 +25,7 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
     protected List throwConstraints;
 
     public CofferMethodDecl_c(Position pos, Flags flags, TypeNode returnType,
-	    String name, List formals, KeySetNode entryKeys, KeySetNode returnKeys,
+	    Id name, List formals, KeySetNode entryKeys, KeySetNode returnKeys,
 	    List throwConstraints, Block body) {
 	super(pos, flags, returnType, name, formals, Collections.EMPTY_LIST, body);
 	this.entryKeys = entryKeys;
@@ -94,26 +94,27 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
     }
     */
 
-    protected CofferMethodDecl_c reconstruct(TypeNode returnType, List formals, KeySetNode entryKeys, KeySetNode returnKeys, List throwConstraints, Block body) {
+    protected CofferMethodDecl_c reconstruct(TypeNode returnType, Id name, List formals, KeySetNode entryKeys, KeySetNode returnKeys, List throwConstraints, Block body) {
       if (entryKeys != this.entryKeys || returnKeys != this.returnKeys || ! CollectionUtil.equals(throwConstraints, this.throwConstraints)) {
           CofferMethodDecl_c n = (CofferMethodDecl_c) copy();
           n.entryKeys = entryKeys;
           n.returnKeys = returnKeys;
           n.throwConstraints = TypedList.copyAndCheck(throwConstraints, ThrowConstraintNode.class, true);
-          return (CofferMethodDecl_c) n.reconstruct(returnType, formals, Collections.EMPTY_LIST, body);
+          return (CofferMethodDecl_c) n.reconstruct(returnType, name, formals, Collections.EMPTY_LIST, body);
       }
 
-      return (CofferMethodDecl_c) super.reconstruct(returnType, formals, Collections.EMPTY_LIST, body);
+      return (CofferMethodDecl_c) super.reconstruct(returnType, name, formals, Collections.EMPTY_LIST, body);
     }
 
     public Node visitChildren(NodeVisitor v) {
         TypeNode returnType = (TypeNode) visitChild(this.returnType, v);
+        Id name = (Id) visitChild(this.name, v);
         List formals = visitList(this.formals, v);
 	KeySetNode entryKeys = (KeySetNode) visitChild(this.entryKeys, v);
 	KeySetNode returnKeys = (KeySetNode) visitChild(this.returnKeys, v);
 	List throwConstraints = visitList(this.throwConstraints, v);
 	Block body = (Block) visitChild(this.body, v);
-	return reconstruct(returnType, formals, entryKeys, returnKeys, throwConstraints, body);
+	return reconstruct(returnType, name, formals, entryKeys, returnKeys, throwConstraints, body);
     }
 
     public Node buildTypes(TypeBuilder tb) throws SemanticException {
@@ -251,7 +252,9 @@ public class CofferMethodDecl_c extends MethodDecl_c implements CofferMethodDecl
 	w.begin(0);
 	w.write(flags.translate());
 	print(returnType, w, tr);
-	w.write(" " + name + "(");
+	w.write(" ");
+        print(name, w, tr);
+	w.write("(");
 
 	w.begin(0);
 

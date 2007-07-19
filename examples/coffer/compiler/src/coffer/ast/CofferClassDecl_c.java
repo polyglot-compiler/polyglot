@@ -23,7 +23,7 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
 {
     protected KeyNode key;
 
-    public CofferClassDecl_c(Position pos, Flags flags, String name,
+    public CofferClassDecl_c(Position pos, Flags flags, Id name,
 	    KeyNode key, TypeNode superClass, List interfaces,
 	    ClassBody body) {
 	super(pos, flags, name, superClass, interfaces, body);
@@ -40,7 +40,7 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
 	return n;
     }
 
-    protected CofferClassDecl_c reconstruct(KeyNode key, TypeNode superClass,
+    protected CofferClassDecl_c reconstruct(Id name, KeyNode key, TypeNode superClass,
                                            List interfaces, ClassBody body) {
         CofferClassDecl_c n = this;
 
@@ -49,15 +49,16 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
 	    n.key = key;
 	}
 
-        return (CofferClassDecl_c) n.reconstruct(superClass, interfaces, body);
+        return (CofferClassDecl_c) n.reconstruct(name, superClass, interfaces, body);
     }
 
     public Node visitChildren(NodeVisitor v) {
+	Id name = (Id) visitChild(this.name, v);
 	KeyNode key = (KeyNode) visitChild(this.key, v);
 	TypeNode superClass = (TypeNode) visitChild(this.superClass, v);
 	List interfaces = visitList(this.interfaces, v);
 	ClassBody body = (ClassBody) visitChild(this.body, v);
-	return reconstruct(key, superClass, interfaces, body);
+	return reconstruct(name, key, superClass, interfaces, body);
     }
     
     public Context enterChildScope(Node child, Context context) {
@@ -116,7 +117,7 @@ public class CofferClassDecl_c extends ClassDecl_c implements CofferClassDecl
             w.write("class ");
         }
 
-        w.write(name);
+        print(name, w, tr);
 
         if (superClass() != null) {
             w.write(" extends ");
