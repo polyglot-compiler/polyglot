@@ -213,7 +213,7 @@ public class SourceClassResolver extends LoadedClassResolver
     if (result == null && clazz != null && this.allowRawClasses) {
       if (Report.should_report(report_topics, 4))
 	Report.report(4, "Using raw class file for " + name);
-      result = new ClassFileLazyClassInitializer(clazz, ts).type();
+      result = ts.classFileLazyClassInitializer(clazz).type();
     }
 
     if (result == null && source != null) {

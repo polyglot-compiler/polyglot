@@ -11,6 +11,8 @@ import java.util.*;
 
 import polyglot.frontend.ExtensionInfo;
 import polyglot.frontend.Source;
+import polyglot.types.reflect.ClassFile;
+import polyglot.types.reflect.ClassFileLazyClassInitializer;
 import polyglot.util.Position;
 
 /**
@@ -58,6 +60,11 @@ public interface TypeSystem {
      * This resolver contains types loaded from class files.
      */
     TopLevelResolver loadedResolver();
+
+    /**
+     * Constructs a new ClassFileLazyClassInitializer for the given class file.
+     */
+    ClassFileLazyClassInitializer classFileLazyClassInitializer(ClassFile clazz);
 
     /** Create an import table for the source file.
      * @param sourceName Name of the source file to import into.  This is used

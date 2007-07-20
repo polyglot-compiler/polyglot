@@ -65,7 +65,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
     /**
      * Create the type for this class file.
      */
-    ParsedClassType createType() throws SemanticException {
+    protected ParsedClassType createType() throws SemanticException {
         // The name is of the form "p.q.C$I$J".
         String name = clazz.classNameCP(clazz.getThisClass());
 
@@ -179,7 +179,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @param dims The number of dimensions of the array.
      * @return An array type.
      */
-    Type arrayOf(Type t, int dims) {
+    protected Type arrayOf(Type t, int dims) {
         if (dims == 0) {
             return t;
         }
@@ -193,7 +193,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @param str The type descriptor.
      * @return The corresponding list of types.
      */
-    List typeListForString(String str) {
+    protected List typeListForString(String str) {
         List types = new ArrayList();
 
         for (int i = 0; i < str.length(); i++) {
@@ -259,7 +259,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @param str The type descriptor.
      * @return The corresponding type.
      */
-    Type typeForString(String str) {
+    protected Type typeForString(String str) {
         List l = typeListForString(str);
 
         if (l.size() == 1) {
@@ -275,7 +275,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @return A ClassType with the given name.
      * @throws InternalCompilerError if the class does not exist.
      */
-    ClassType quietTypeForName(String name) {
+    protected ClassType quietTypeForName(String name) {
         if (Report.should_report(verbose, 2))
             Report.report(2, "resolving " + name);
 
@@ -293,7 +293,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @return A ClassType with the given name.
      * @throws SemanticException if the class does not exist.
      */
-    ClassType typeForName(String name) throws SemanticException {
+    protected ClassType typeForName(String name) throws SemanticException {
         if (Report.should_report(verbose, 2))
             Report.report(2, "resolving " + name);
         return (ClassType) ts.systemResolver().find(name);
@@ -500,7 +500,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @param method The JVM Method data structure.
      * @param ct The class containing the method.
      */
-    MethodInstance methodInstance(Method method, ClassType ct) {
+    protected MethodInstance methodInstance(Method method, ClassType ct) {
         Constant[] constants = clazz.getConstants();
         String name = (String) constants[method.getName()].value();
         String type = (String) constants[method.getType()].value();
@@ -536,7 +536,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @param fields The constructor's fields, needed to remove parameters
      * passed to initialize synthetic fields.
      */
-    ConstructorInstance constructorInstance(Method method, ClassType ct, Field[] fields) {
+    protected ConstructorInstance constructorInstance(Method method, ClassType ct, Field[] fields) {
         // Get a method instance for the <init> method.
         MethodInstance mi = methodInstance(method, ct);
     
@@ -571,7 +571,7 @@ public class ClassFileLazyClassInitializer implements LazyClassInitializer {
      * @param field The JVM Field data structure for the field.
      * @param ct The class containing the field.
      */
-    FieldInstance fieldInstance(Field field, ClassType ct) {
+    protected FieldInstance fieldInstance(Field field, ClassType ct) {
       Constant[] constants = clazz.getConstants();
       String name = (String) constants[field.getName()].value();
       String type = (String) constants[field.getType()].value();

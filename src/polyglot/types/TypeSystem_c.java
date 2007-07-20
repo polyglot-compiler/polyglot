@@ -15,6 +15,8 @@ import polyglot.frontend.Source;
 import polyglot.main.Report;
 import polyglot.types.*;
 import polyglot.types.Package;
+import polyglot.types.reflect.ClassFile;
+import polyglot.types.reflect.ClassFileLazyClassInitializer;
 import polyglot.util.*;
 
 /**
@@ -133,6 +135,10 @@ public class TypeSystem_c implements TypeSystem
 
     public TopLevelResolver loadedResolver() {
         return loadedResolver;
+    }
+    
+    public ClassFileLazyClassInitializer classFileLazyClassInitializer(ClassFile clazz) {
+        return new ClassFileLazyClassInitializer(clazz, this);
     }
 
     public ImportTable importTable(String sourceName, Package pkg) {
