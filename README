@@ -7,8 +7,9 @@ contains the following sub-directories:
 
   - src: the complete source code of Polyglot
   - src/polyglot: the Polyglot base compiler and some simple extensions 
-  - src/ppg: the Polyglot parser generator, an extension of Java CUP
-  - src/java_cup: tweaked version of the Java CUP parser generator 0.10k.
+  - tools/java_cup: tweaked version of the Java CUP parser generator 0.10k.
+  - tools/ppg: the Polyglot parser generator, an extension of Java CUP
+  - tools/pth: Polyglot test harness
   - doc: documentation about writing Polyglot extensions
   - doc/api: Javadoc descriptions of Polyglot classes
 
@@ -25,7 +26,7 @@ writing better documentation.  Watch the web page:
 
 for further updates.  If you use Polyglot, we'd appreciate your letting
 us know.  Send your comments and bug reports to Nate Nystrom at
-nystrom@cs.cornell.edu.
+nate@nanocow.com.
 
 Requirements
 ------------
@@ -114,7 +115,7 @@ directory.
 
     $ ant
 
-Optionally, create some extensions:
+Optionally, create some extensions in the examples directory:
 
     $ ant coffer pao
   
@@ -144,7 +145,8 @@ The current Polyglot developers are:
         Nathaniel Nystrom
 
 The Polyglot project group is supervised by Prof. Andrew Myers at the
-Cornell University Computer Science Department.
+Cornell University Computer Science Department.  Nathaniel Nystrom is
+currently at IBM Research.
 
 Several other people have contributed to the development:
 
@@ -172,6 +174,8 @@ The following people have provided patches:
         Oege de Moor <Oege.de.Moor@comlab.ox.ac.uk>
         Pavel Avgustinov <pavel.avgustinov@magdalen.oxford.ac.uk>
         Alessandro Warth <alexwarth@gmail.com>
+        Igor Peshansky <igorp@us.ibm.com>
+        Robert Fuhrer <rfuhrer@us.ibm.com>
 
 The development of the Polyglot project has been supported by a
 number of funding sources, including DARPA Contract F30602-99-1-0533,
@@ -186,7 +190,8 @@ This release of the Polyglot distribution is governed by the LGPL
 license as described by the following copyright notice.
 
 Polyglot extensible compiler framework
-Copyright (C) 2000-2006 Polyglot project group, Cornell University
+Copyright (C) 2000-2007 Polyglot project group, Cornell University
+Copyright (C) 2006-2007 IBM Corporation
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -260,4 +265,3 @@ code by Robert Harder <rob@iharder.net>.  See http://iharder.net/base64.
 
 
 Java is a trademark of Sun Microsystems, Inc.
-
