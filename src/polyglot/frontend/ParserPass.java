@@ -39,8 +39,8 @@ public class ParserPass extends AbstractPass
 
 	try {
 	    Reader reader = source.open();
-
-	    Parser p = compiler.sourceExtension().parser(reader, source, eq);
+            
+            Parser p = goal.job().extensionInfo().parser(reader, source, eq);
 
 	    if (Report.should_report(Report.frontend, 2))
 		Report.report(2, "Using parser " + p);
