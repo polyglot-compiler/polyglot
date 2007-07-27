@@ -36,7 +36,7 @@ public class Options {
      * Fields for storing values for options.
      */
     public int error_count = 100;
-    public Collection source_path; // List[String]
+    public Collection source_path; // List<File>
     public File output_directory;
     public String default_classpath;
     public String default_output_classpath;
