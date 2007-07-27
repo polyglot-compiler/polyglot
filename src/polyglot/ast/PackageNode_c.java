@@ -27,9 +27,6 @@ public class PackageNode_c extends Node_c implements PackageNode
 	super(pos);
 	assert(package_ != null);
 	this.package_ = package_;
-        if (package_.fullName().equals("def")) {
-            Thread.dumpStack();
-        }
     }
     
     public boolean isDisambiguated() {
