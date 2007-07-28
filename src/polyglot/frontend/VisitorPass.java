@@ -41,7 +41,7 @@ public class VisitorPass extends AbstractPass
 	Node ast = goal.job().ast();
 
 	if (ast == null) {
-	    throw new InternalCompilerError("Null AST: did the parser run?");
+	    throw new InternalCompilerError("Null AST for job " + goal.job() + ": did the parser run?");
 	}
 
         NodeVisitor v_ = v.begin();

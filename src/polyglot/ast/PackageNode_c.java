@@ -74,7 +74,7 @@ public class PackageNode_c extends Node_c implements PackageNode
     public Node copy(ExtensionInfo extInfo) throws SemanticException {
         PackageNode pn = (PackageNode)this.del().copy(extInfo.nodeFactory());
         if (pn.package_() != null) {
-            pn = pn.package_(extInfo.typeSystem().packageForName(pn.package_().name()));
+            pn = pn.package_(extInfo.typeSystem().packageForName(pn.package_().fullName()));
         }
         return pn;
     }
