@@ -7,15 +7,16 @@
 
 package polyglot.types;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import polyglot.frontend.Job;
-import polyglot.frontend.goals.SupertypesResolved;
-import polyglot.types.*;
-import polyglot.types.Package;
+import polyglot.main.Options;
+import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import polyglot.util.CodeWriter;
 
 /**
  * A <code>ClassType</code> represents a class -- either loaded from a
@@ -331,7 +332,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             }
 
             // Use the short name if it is unique.
-            if (c != null) {
+            if (c != null && !Options.global.fully_qualified_names) {
                 try {
                     Named x = c.find(name());
 
@@ -352,7 +353,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             }
 
             // Use the short name if it is unique.
-            if (c != null) {
+            if (c != null && !Options.global.fully_qualified_names) {
                 try {
                     Named x = c.find(name());
 
