@@ -89,9 +89,9 @@ public class AlphaRenamer extends NodeVisitor {
       // Update the local instance as necessary.
       String newName = (String) renamingMap.get(name);
       LocalInstance li = l.localInstance();
-      if (li != null) li = li.name(newName);
+      if (li != null) li.setName(newName);
 
-      return l.name(newName).localInstance(li);
+      return l.name(newName);
     }
 
     if ( n instanceof LocalDecl ) {
@@ -111,8 +111,8 @@ public class AlphaRenamer extends NodeVisitor {
       // Update the local instance as necessary.
       String newName = (String) renamingMap.get(name);
       LocalInstance li = l.localInstance();
-      if (li != null) li = li.name(newName);
-      return l.name(newName).localInstance(li);
+      if (li != null) li.setName(newName);
+      return l.name(newName);
     }
 
     return n;
