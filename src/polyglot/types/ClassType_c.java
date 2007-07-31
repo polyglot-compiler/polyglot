@@ -11,6 +11,7 @@ import java.util.*;
 
 import polyglot.frontend.Job;
 import polyglot.frontend.goals.SupertypesResolved;
+import polyglot.main.Options;
 import polyglot.types.*;
 import polyglot.types.Package;
 import polyglot.util.InternalCompilerError;
@@ -331,7 +332,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             }
 
             // Use the short name if it is unique.
-            if (c != null) {
+            if (c != null && !Options.global.fully_qualified_names) {
                 try {
                     Named x = c.find(name());
 
@@ -352,7 +353,7 @@ public abstract class ClassType_c extends ReferenceType_c implements ClassType
             }
 
             // Use the short name if it is unique.
-            if (c != null) {
+            if (c != null && !Options.global.fully_qualified_names) {
                 try {
                     Named x = c.find(name());
 
