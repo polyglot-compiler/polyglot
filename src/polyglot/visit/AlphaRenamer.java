@@ -8,6 +8,7 @@
 package polyglot.visit;
 
 import polyglot.ast.*;
+import polyglot.types.LocalInstance;
 import polyglot.util.*;
 import java.util.*;
 
@@ -84,8 +85,13 @@ public class AlphaRenamer extends NodeVisitor {
       if ( !renamingMap.containsKey(name) ) {
 	return n;
       }
+      
+      // Update the local instance as necessary.
+      String newName = (String) renamingMap.get(name);
+      LocalInstance li = l.localInstance();
+      if (li != null) li = li.name(newName);
 
-      return l.name( (String)renamingMap.get(name) );
+      return l.name(newName).localInstance(li);
     }
 
     if ( n instanceof LocalDecl ) {
@@ -102,7 +108,11 @@ public class AlphaRenamer extends NodeVisitor {
 					 + "alpha-renaming." );
       }
 
-      return l.name( (String)renamingMap.get(name) );
+      // Update the local instance as necessary.
+      String newName = (String) renamingMap.get(name);
+      LocalInstance li = l.localInstance();
+      if (li != null) li = li.name(newName);
+      return l.name(newName).localInstance(li);
     }
 
     return n;
