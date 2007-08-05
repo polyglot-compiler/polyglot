@@ -24,7 +24,7 @@ public class Formal_c extends Term_c implements Formal
     protected Flags flags;
     protected TypeNode type;
     protected Id name;
-    protected boolean reachable;
+//    protected boolean reachable;
 
     public Formal_c(Position pos, Flags flags, TypeNode type,
                     Id name)
