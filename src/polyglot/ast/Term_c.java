@@ -27,17 +27,6 @@ public abstract class Term_c extends Node_c implements Term
     protected boolean reachable;
 
     /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     * 
-     * @deprecated Should not be used any more for dataflow.
-     * @see firstChild().
-     */
-    public Term entry() {
-        return null;
-    }
-
-    /**
      * Visit this term in evaluation order.
      */
     public abstract List acceptCFG(CFGBuilder v, List succs);
@@ -63,19 +52,6 @@ public abstract class Term_c extends Node_c implements Term
         Term_c t = (Term_c) copy();
         t.reachable = reachability;
         return t;
-    }
-
-    /** 
-     * Utility function to get the first entry of a list, or else alt.
-     * 
-     * @deprecated Since entry() is deprecated, this method should not be used
-     * either. Use listChild() in firstChild() and the like.
-     * @see listChild().
-     */
-    public static Term listEntry(List l, Term alt) {
-        Term c = (Term) CollectionUtil.firstOrElse(l, alt);
-        if (c != alt) return c.entry();
-        return alt;
     }
 
     /** Utility function to get the first entry of a list, or else alt. */

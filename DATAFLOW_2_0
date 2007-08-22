@@ -1,0 +1,62 @@
+
+*** Dataflow framework changes in the DATAFLOW_2_0 branch ***
+
+The CFGBuilder and DataFlow classes were modified in the DATAFLOW_2_0 branch
+to add new functionality that hopefully makes some dataflow analyses easier
+in Polyglot.
+
+In the previous dataflow framework, Terms appear only once in the CFG, at the
+point where execution essentially "exits" the term. For example, the node for
+an If statement would be inserted at the point where control flow merges
+after the separate branches.
+
+The new framework inserts an additional node into the CFG at the "entry" of a
+term. An if statement, for example, will have an entry node before the nodes
+for the condition or the statements in the branches.
+
+*** Specific changes in various classes
+
+CFGBilder: In order to provide this functionality, several visit methods now
+have an additional boolean argument to indicate whether we wish to visit the
+entry or the exit of a term.
+
+DataFlow: Most methods working with the CFG now have an additional boolean
+argument to indicate whether we are looking at the entry node or the exit.
+
+FlowGraph: The entry, exit, start, and finish methods were removed since they
+will all return the same thing: the root node. In their place, there are
+entryPeers, exitPeers, startPeers, and finishPeers that return the set of peers
+at those points.
+
+Term: The entry method has been removed, since the entry of a term is simply
+itself. Instead, the method firstChild should be implemented. The difference
+between entry and firstChild is that firstChild is not expected to recursively
+drill down to the innermost sub-term to be evaluated first. It should return
+the direct sub-term instead.
+
+*** What it means for extensions
+
+The major update that extensions will have to make is to AST nodes that override
+acceptCFG or entry. Changing entry should be straightforward. First, rename it
+to firstChild. Second, if it previously returned someChild.entry(), just return
+someChild instead; in situations where it return "this", return null instead.
+
+For the acceptCFG methods, we need to change the calls to the CFGBuilder.visit
+methods to use the new signatures.
+
+If there was a call to visitCFG(from, to), it should be replaced with
+visitCFG(from, to, false) to indicate that we mean the exit of the "to" term.
+(The exit of the "from" term is implied.)
+
+A call to visitCFG(from, to.entry()) should be changed to
+visitCFG(from, to, true), indicating that the entry of the "to" term is meant.
+
+Examples of the acceptCFG and firstChild methods in terms such as If_c should be
+helpful.
+
+The preceding changes would allow CFGs to be built correctly. Now, to use new
+CFGs, subclasses of DataFlow need to be updated to add the "entry" parameter
+to methods such as flow and check. This parameter indicates whether we are
+flowing over the entry or the exit node. To keep analyses working as they are,
+void methods can simply return when entry is true; flow methods should return
+the in-item unchanged when entry is true.

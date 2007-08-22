@@ -28,15 +28,6 @@ public interface Term extends Node
     public Term firstChild();
 
     /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     * 
-     * @deprecated Should not be used any more for dataflow.
-     * @see firstChild().
-     */
-    public Term entry();
-    
-    /**
      * Visit this node, calling calling v.edge() for each successor in succs,
      * if data flows on that edge.
      */
