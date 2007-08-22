@@ -76,7 +76,9 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
     w.end();
   }
   public Node copy(NodeFactory nf) {
-      return nf.CanonicalTypeNode(this.position, this.type);
+    CanonicalTypeNode result =
+      nf.CanonicalTypeNode(this.position, this.type);
+    return result;
   }
   public Node copy(ExtensionInfo extInfo) throws SemanticException {
       TypeNode tn = (TypeNode)this.del().copy(extInfo.nodeFactory());
@@ -116,13 +118,11 @@ public class CanonicalTypeNode_c extends TypeNode_c implements CanonicalTypeNode
           else if (t.isShort()) {
               t = ts.Short();
           }
-          else if (t.isThrowable()) {
-              t = ts.Throwable();
-          }          
           else {
               // Should do something here.
               // return an amb type node?
           }
+
           tn = tn.type(t);
       }
 
