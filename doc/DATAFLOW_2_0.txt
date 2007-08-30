@@ -1,5 +1,4 @@
-
-*** Dataflow framework changes in the DATAFLOW_2_0 branch ***
+=== Dataflow framework changes in the DATAFLOW_2_0 branch ===
 
 The CFGBuilder and DataFlow classes were modified in the DATAFLOW_2_0 branch
 to add new functionality that hopefully makes some dataflow analyses easier
@@ -14,7 +13,8 @@ The new framework inserts an additional node into the CFG at the "entry" of a
 term. An if statement, for example, will have an entry node before the nodes
 for the condition or the statements in the branches.
 
-*** Specific changes in various classes
+
+=== Specific changes in various classes ===
 
 CFGBilder: In order to provide this functionality, several visit methods now
 have an additional boolean argument to indicate whether we wish to visit the
@@ -34,7 +34,8 @@ between entry and firstChild is that firstChild is not expected to recursively
 drill down to the innermost sub-term to be evaluated first. It should return
 the direct sub-term instead.
 
-*** What it means for extensions
+
+=== What it means for extensions ===
 
 The major update that extensions will have to make is to AST nodes that override
 acceptCFG or entry. Changing entry should be straightforward. First, rename it
@@ -52,7 +53,51 @@ A call to visitCFG(from, to.entry()) should be changed to
 visitCFG(from, to, true), indicating that the entry of the "to" term is meant.
 
 Examples of the acceptCFG and firstChild methods in terms such as If_c should be
-helpful.
+helpful. Here is a snippet of the before and after versions of If_c:
+
+** Old code **
+
+    public Term entry() {
+        return cond.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        if (alternative == null) {
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent.entry(), 
+                             FlowGraph.EDGE_KEY_FALSE, this);
+            v.visitCFG(consequent, this);
+        }
+        else {
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent.entry(),
+                             FlowGraph.EDGE_KEY_FALSE, alternative.entry());
+            v.visitCFG(consequent, this);
+            v.visitCFG(alternative, this);
+        }
+
+        return succs;
+    }
+
+** New code **
+
+    public Term firstChild() {
+        return cond;
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        if (alternative == null) {
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, true, 
+                             FlowGraph.EDGE_KEY_FALSE, this, false);
+            v.visitCFG(consequent, this, false);
+        }
+        else {
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, true,
+                             FlowGraph.EDGE_KEY_FALSE, alternative, true);
+            v.visitCFG(consequent, this, false);
+            v.visitCFG(alternative, this, false);
+        }
+
+        return succs;
+    }
 
 The preceding changes would allow CFGs to be built correctly. Now, to use new
 CFGs, subclasses of DataFlow need to be updated to add the "entry" parameter
@@ -60,3 +105,19 @@ to methods such as flow and check. This parameter indicates whether we are
 flowing over the entry or the exit node. To keep analyses working as they are,
 void methods can simply return when entry is true; flow methods should return
 the in-item unchanged when entry is true.
+
+Here is an example flow() method:
+
+    public Map flow(Item in, 
+                    FlowGraph graph, 
+                    Term n, 
+                    boolean entry,  /* New parameter */
+                    Set succEdgeKeys) {
+
+        /* To preserve old behavior, just return if entry is true */
+        if (entry) {
+            return itemToMap(in, succEdgeKeys);
+        }
+
+        /* ... Code as before */
+    }
