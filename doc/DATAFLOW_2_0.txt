@@ -39,7 +39,7 @@ the direct sub-term instead.
 The major update that extensions will have to make is to AST nodes that override
 acceptCFG or entry. Changing entry should be straightforward. First, rename it
 to firstChild. Second, if it previously returned someChild.entry(), just return
-someChild instead; in situations where it return "this", return null instead.
+someChild instead; in situations where it returned "this", return null instead.
 
 For the acceptCFG methods, we need to change the calls to the CFGBuilder.visit
 methods to use the new signatures.
