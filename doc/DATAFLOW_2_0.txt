@@ -4,14 +4,14 @@ The CFGBuilder and DataFlow classes were modified in the DATAFLOW_2_0 branch
 to add new functionality that hopefully makes some dataflow analyses easier
 in Polyglot.
 
-In the previous dataflow framework, Terms appear only once in the CFG, at the
-point where execution essentially "exits" the term. For example, the node for
-an If statement would be inserted at the point where control flow merges
-after the separate branches.
+In the old framework, Terms appear only once in the CFG, at the point where
+execution essentially "exits" the term. For example, the node for an If
+statement would be inserted at the point where control flow merges after the
+separate branches.
 
 The new framework inserts an additional node into the CFG at the "entry" of a
-term. An if statement, for example, will have an entry node before the nodes
-for the condition or the statements in the branches.
+term. An if statement, for example, will now have an entry node before the nodes
+for the condition expression and the statements in the branches.
 
 
 === Specific changes in various classes ===
@@ -99,8 +99,8 @@ helpful. Here is a snippet of the before and after versions of If_c:
         return succs;
     }
 
-The preceding changes would allow CFGs to be built correctly. Now, to use new
-CFGs, subclasses of DataFlow need to be updated to add the "entry" parameter
+The preceding changes would allow CFGs to be built correctly. Now, to use the
+new CFGs, subclasses of DataFlow need to be updated to add the "entry" parameter
 to methods such as flow and check. This parameter indicates whether we are
 flowing over the entry or the exit node. To keep analyses working as they are,
 void methods can simply return when entry is true; flow methods should return
@@ -121,3 +121,6 @@ Here is an example flow() method:
 
         /* ... Code as before */
     }
+
+Note: A convention was taken to consistently add the "entry" parameter
+immediately after the "Term n" parameter, since it is closely tied to the term.
