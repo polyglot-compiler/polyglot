@@ -10,7 +10,7 @@ Dataflow framework changed to add functionality. CFGs now have two nodes per
 term, one representing the "entry" into that term, another the "exit".
 Extensions will have to be updated to work with this new framework.
 
-Refer to doc/DATAFLOW_2_0.txt for a more detail explanation of the changes.
+See doc/DATAFLOW_2_0.txt for a more detailed explanation of the changes.
 
 Jul 27, 2007: Polyglot 2.2.3
 ============================
