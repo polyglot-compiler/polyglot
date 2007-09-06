@@ -99,6 +99,8 @@ public interface Node extends JL, Copy
      * @param parent The parent of <code>this</code> in the AST.
      * @param v The visitor which will traverse/rewrite the AST.
      * @return A new AST if a change was made, or <code>this</code>.
+     * 
+     * @deprecated Call {@link Node#visitChild(Node, NodeVisitor)} instead.
      */
     Node visitEdge(Node parent, NodeVisitor v);
 
