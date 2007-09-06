@@ -177,6 +177,10 @@ public abstract class Node_c implements Node
 	return v.visitEdge(null, this);
     }
 
+    /**
+     * @deprecated Why is this here? No one calls it! Call visitChild instead?
+     *             Sooo confuused....
+     */
     public Node visitEdge(Node parent, NodeVisitor v) {
 	Node n = v.override(parent, this);
 
