@@ -1,7 +1,9 @@
 /*
- * This file is part of the Polyglot extensible compiler framework. Copyright
- * (c) 2000-2007 Polyglot project group, Cornell University Copyright (c)
- * 2006-2007 IBM Corporation
+ * This file is part of the Polyglot extensible compiler framework.
+ *
+ * Copyright (c) 2000-2007 Polyglot project group, Cornell University
+ * Copyright (c) 2006-2007 IBM Corporation
+ * 
  */
 
 package polyglot.ast;
@@ -18,445 +20,432 @@ import polyglot.util.*;
 import polyglot.visit.*;
 
 /**
- * A <code>Node</code> represents an AST node. All AST nodes must implement
- * this interface. Nodes should be immutable: methods which set fields of the
- * node should copy the node, set the field in the copy, and then return the
- * copy.
+ * A <code>Node</code> represents an AST node.  All AST nodes must implement
+ * this interface.  Nodes should be immutable: methods which set fields
+ * of the node should copy the node, set the field in the copy, and then
+ * return the copy.
  */
-public abstract class Node_c implements Node {
-  protected Position position;
-  protected JL del;
-  protected Ext ext;
-  protected boolean error;
+public abstract class Node_c implements Node
+{
+    protected Position position;
+    protected JL del;
+    protected Ext ext;
+    protected boolean error;
 
-  public Node_c(Position pos) {
-    assert (pos != null);
-    this.position = pos;
-    this.error = false;
-  }
-
-  public void init(Node node) {
-    if (node != this) {
-      throw new InternalCompilerError(
-          "Cannot use a Node as a delegate or extension.");
-    }
-  }
-
-  public Node node() {
-    return this;
-  }
-
-  public JL del() {
-    return del != null ? del : this;
-  }
-
-  public Node del(JL del) {
-    if (this.del == del) {
-      return this;
+    public Node_c(Position pos) {
+    	assert(pos != null);
+        this.position = pos;
+        this.error = false;
     }
 
-    JL old = this.del;
-    this.del = null;
-
-    Node_c n = (Node_c) copy();
-
-    n.del = del != this ? del : null;
-
-    if (n.del != null) {
-      n.del.init(n);
+    public void init(Node node) {
+        if (node != this) {
+            throw new InternalCompilerError("Cannot use a Node as a delegate or extension.");
+        }
     }
 
-    this.del = old;
-
-    return n;
-  }
-
-  public Ext ext(int n) {
-    if (n < 1) throw new InternalCompilerError("n must be >= 1");
-    if (n == 1) return ext();
-    return ext(n - 1).ext();
-  }
-
-  public Node ext(int n, Ext ext) {
-    if (n < 1) throw new InternalCompilerError("n must be >= 1");
-    if (n == 1) return ext(ext);
-
-    Ext prev = this.ext(n - 1);
-    if (prev == null)
-      throw new InternalCompilerError(
-          "cannot set the nth extension if there is no (n-1)st extension");
-    return this.ext(n - 1, prev.ext(ext));
-  }
-
-  public Ext ext() {
-    return ext;
-  }
-
-  public Node ext(Ext ext) {
-    if (this.ext == ext) {
-      return this;
+    public Node node() {
+        return this;
     }
 
-    Ext old = this.ext;
-    this.ext = null;
-
-    Node_c n = (Node_c) copy();
-
-    n.ext = ext;
-
-    if (n.ext != null) {
-      n.ext.init(n);
+    public JL del() {
+        return del != null ? del : this;
     }
 
-    this.ext = old;
+    public Node del(JL del) {
+        if (this.del == del) {
+            return this;
+        }
 
-    return n;
-  }
+        JL old = this.del;
+        this.del = null;
 
-  public Object copy() {
-    try {
-      Node_c n = (Node_c) super.clone();
+        Node_c n = (Node_c) copy();
 
-      if (this.del != null) {
-        n.del = (JL) this.del.copy();
-        n.del.init(n);
-      }
+        n.del = del != this ? del : null;
 
-      if (this.ext != null) {
-        n.ext = (Ext) this.ext.copy();
-        n.ext.init(n);
-      }
+        if (n.del != null) {
+            n.del.init(n);
+        }
 
-      return n;
-    } catch (CloneNotSupportedException e) {
-      throw new InternalCompilerError("Java clone() weirdness.");
-    }
-  }
+        this.del = old;
 
-  public Position position() {
-    return this.position;
-  }
-
-  public Node position(Position position) {
-    Node_c n = (Node_c) copy();
-    n.position = position;
-    return n;
-  }
-
-  public boolean isDisambiguated() {
-    return !(this instanceof Ambiguous);
-  }
-
-  public boolean isTypeChecked() {
-    return isDisambiguated();
-  }
-
-  public boolean error() {
-    return error;
-  }
-
-  public Node error(boolean flag) {
-    Node_c n = (Node_c) copy();
-    n.error = flag;
-    return n;
-  }
-
-  public Node visitChild(Node n, NodeVisitor v) {
-    if (n == null) {
-      return null;
+        return n;
     }
 
-    return v.visitEdge(this, n);
-  }
-
-  public Node visit(NodeVisitor v) {
-    return v.visitEdge(null, this);
-  }
-
-  /**
-   * @deprecated Why is this here? No one calls it! Call visitChild instead?
-   *             Sooo confuused....
-   */
-  public Node visitEdge(Node parent, NodeVisitor v) {
-    Node n = v.override(parent, this);
-
-    if (n == null) {
-      NodeVisitor v_ = v.enter(parent, this);
-
-      if (v_ == null) {
-        throw new InternalCompilerError("NodeVisitor.enter() returned null.");
-      }
-
-      n = this.del().visitChildren(v_);
-
-      if (n == null) {
-        throw new InternalCompilerError("Node_c.visitChildren() returned null.");
-      }
-
-      n = v.leave(parent, this, n, v_);
-
-      if (n == null) {
-        throw new InternalCompilerError("NodeVisitor.leave() returned null.");
-      }
+    public Ext ext(int n) {
+        if (n < 1) throw new InternalCompilerError("n must be >= 1");
+        if (n == 1) return ext();
+        return ext(n-1).ext();
     }
 
-    return n;
-  }
+    public Node ext(int n, Ext ext) {
+        if (n < 1)
+            throw new InternalCompilerError("n must be >= 1");
+        if (n == 1)
+            return ext(ext);
 
-  /**
-   * Visit all the elements of a list.
-   * 
-   * @param l
-   *          The list to visit.
-   * @param v
-   *          The visitor to use.
-   * @return A new list with each element from the old list replaced by the
-   *         result of visiting that element. If <code>l</code> is a
-   *         <code>TypedList</code>, the new list will also be typed with the
-   *         same type as <code>l</code>. If <code>l</code> is
-   *         <code>null</code>, <code>null</code> is returned.
-   */
-  public List visitList(List l, NodeVisitor v) {
-    if (l == null) {
-      return null;
+        Ext prev = this.ext(n-1);
+        if (prev == null)
+            throw new InternalCompilerError("cannot set the nth extension if there is no (n-1)st extension");
+        return this.ext(n-1, prev.ext(ext));
     }
 
-    List result = l;
-    List vl = new ArrayList(l.size());
-
-    for (Iterator i = l.iterator(); i.hasNext();) {
-      Node n = (Node) i.next();
-      Node m = visitChild(n, v);
-      if (n != m) {
-        result = vl;
-      }
-      if (m != null) {
-        vl.add(m);
-      }
+    public Ext ext() {
+        return ext;
     }
 
-    return result;
-  }
+    public Node ext(Ext ext) {
+        if (this.ext == ext) {
+            return this;
+        }
 
-  public Node visitChildren(NodeVisitor v) {
-    return this;
-  }
+        Ext old = this.ext;
+        this.ext = null;
 
-  /**
-   * Push a new scope upon entering this node, and add any declarations to the
-   * context that should be in scope when visiting children of this node.
-   * 
-   * @param c
-   *          the current <code>Context</code>
-   * @return the <code>Context</code> to be used for visiting this node.
-   */
-  public Context enterScope(Context c) {
-    return c;
-  }
+        Node_c n = (Node_c) copy();
 
-  /**
-   * Push a new scope for visiting the child node <code>child</code>. The
-   * default behavior is to delegate the call to the child node, and let it add
-   * appropriate declarations that should be in scope. However, this method
-   * gives parent nodes have the ability to modify this behavior.
-   * 
-   * @param child
-   *          the child node about to be entered.
-   * @param c
-   *          the current <code>Context</code>
-   * @return the <code>Context</code> to be used for visiting node
-   *         <code>child</code>
-   */
-  public Context enterChildScope(Node child, Context c) {
-    return child.del().enterScope(c);
-  }
+        n.ext = ext;
 
-  /**
-   * Add any declarations to the context that should be in scope when visiting
-   * later sibling nodes.
-   */
-  public void addDecls(Context c) {
-  }
+        if (n.ext != null) {
+            n.ext.init(n);
+        }
 
-  // These methods override the methods in Ext_c.
-  // These are the default implementation of these passes.
+        this.ext = old;
 
-  public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
-    return tb;
-  }
-
-  public Node buildTypes(TypeBuilder tb) throws SemanticException {
-    return this;
-  }
-
-  public Node disambiguateOverride(Node parent, AmbiguityRemover ar)
-      throws SemanticException {
-    return null;
-  }
-
-  public NodeVisitor disambiguateEnter(AmbiguityRemover ar)
-      throws SemanticException {
-    return ar;
-  }
-
-  public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-    return this;
-  }
-
-  /** Type check the AST. */
-  public Node typeCheckOverride(Node parent, TypeChecker tc)
-      throws SemanticException {
-    return null;
-  }
-
-  public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
-    return tc;
-  }
-
-  public Node typeCheck(TypeChecker tc) throws SemanticException {
-    return this;
-  }
-
-  public Node checkConstants(ConstantChecker cc) throws SemanticException {
-    return this;
-  }
-
-  public Type childExpectedType(Expr child, AscriptionVisitor av) {
-    return child.type();
-  }
-
-  public NodeVisitor exceptionCheckEnter(ExceptionChecker ec)
-      throws SemanticException {
-    return ec.push();
-  }
-
-  public Node exceptionCheck(ExceptionChecker ec) throws SemanticException {
-    List l = this.del().throwTypes(ec.typeSystem());
-    for (Iterator i = l.iterator(); i.hasNext();) {
-      ec.throwsException((Type) i.next(), position());
+        return n;
     }
-    return this;
-  }
 
-  public List throwTypes(TypeSystem ts) {
-    return Collections.EMPTY_LIST;
-  }
+    public Object copy() {
+        try {
+            Node_c n = (Node_c) super.clone();
 
-  /** Dump the AST for debugging. */
-  public void dump(OutputStream os) {
-    CodeWriter cw = Compiler.createCodeWriter(os);
-    NodeVisitor dumper = new DumpAst(cw);
-    dumper = dumper.begin();
-    this.visit(dumper);
-    cw.newline();
-    dumper.finish();
-  }
+            if (this.del != null) {
+                n.del = (JL) this.del.copy();
+                n.del.init(n);
+            }
 
-  /** Dump the AST for debugging. */
-  public void dump(Writer w) {
-    CodeWriter cw = Compiler.createCodeWriter(w);
-    NodeVisitor dumper = new DumpAst(cw);
-    dumper = dumper.begin();
-    this.visit(dumper);
-    cw.newline();
-    dumper.finish();
-  }
+            if (this.ext != null) {
+                n.ext = (Ext) this.ext.copy();
+                n.ext.init(n);
+            }
 
-  /** Pretty-print the AST for debugging. */
-  public void prettyPrint(OutputStream os) {
-    try {
-      CodeWriter cw = Compiler.createCodeWriter(os);
-      this.del().prettyPrint(cw, new PrettyPrinter());
-      cw.flush();
-    } catch (java.io.IOException e) {
+            return n;
+        }
+        catch (CloneNotSupportedException e) {
+            throw new InternalCompilerError("Java clone() weirdness.");
+        }
     }
-  }
 
-  /** Pretty-print the AST for debugging. */
-  public void prettyPrint(Writer w) {
-    try {
-      CodeWriter cw = Compiler.createCodeWriter(w);
-      this.del().prettyPrint(cw, new PrettyPrinter());
-      cw.flush();
-    } catch (java.io.IOException e) {
+    public Position position() {
+	return this.position;
     }
-  }
 
-  /** Pretty-print the AST using the given <code>CodeWriter</code>. */
-  public void prettyPrint(CodeWriter w, PrettyPrinter pp) {
-  }
-
-  public void printBlock(Node n, CodeWriter w, PrettyPrinter pp) {
-    w.begin(0);
-    print(n, w, pp);
-    w.end();
-  }
-
-  public void printSubStmt(Stmt stmt, CodeWriter w, PrettyPrinter pp) {
-    if (stmt instanceof Block) {
-      w.write(" ");
-      print(stmt, w, pp);
-    } else {
-      w.allowBreak(4, " ");
-      printBlock(stmt, w, pp);
+    public Node position(Position position) {
+	Node_c n = (Node_c) copy();
+	n.position = position;
+	return n;
     }
-  }
+        
+    public boolean isDisambiguated() {
+        return !(this instanceof Ambiguous);
+    }
+    
+    public boolean isTypeChecked() {
+        return isDisambiguated();
+    }
+    
+    public boolean error() {
+        return error;
+    }
 
-  public void print(Node child, CodeWriter w, PrettyPrinter pp) {
-    pp.print(this, child, w);
-  }
+    public Node error(boolean flag) {
+        Node_c n = (Node_c) copy();
+        n.error = flag;
+        return n;
+    }
+    
+    public Node visitChild(Node n, NodeVisitor v) {
+	if (n == null) {
+	    return null;
+	}
 
-  /** Translate the AST using the given <code>CodeWriter</code>. */
-  public void translate(CodeWriter w, Translator tr) {
-    // By default, just rely on the pretty printer.
-    this.del().prettyPrint(w, tr);
-  }
+	return v.visitEdge(this, n);
+    }
 
-  public void dump(CodeWriter w) {
-    w.write(StringUtil.getShortNameComponent(getClass().getName()));
+    public Node visit(NodeVisitor v) {
+	return v.visitEdge(null, this);
+    }
 
-    w.allowBreak(4, " ");
-    w.begin(0);
-    w.write("(del ");
-    if (del() == this)
-      w.write("*");
-    else w.write(del().toString());
-    w.write(")");
-    w.end();
+    /**
+     * @deprecated Why is this here? No one calls it! Call visitChild instead?
+     *             Sooo confuused....
+     */
+    public Node visitEdge(Node parent, NodeVisitor v) {
+	Node n = v.override(parent, this);
 
-    w.allowBreak(4, " ");
-    w.begin(0);
-    w.write("(ext ");
-    if (ext() == null)
-      w.write("null");
-    else ext().dump(w);
-    w.write(")");
-    w.end();
+	if (n == null) {
+	    NodeVisitor v_ = v.enter(parent, this);
 
-    w.allowBreak(4, " ");
-    w.begin(0);
-    w.write("(position " + (position != null ? position.toString() : "UNKNOWN")
-        + ")");
-    w.end();
-  }
+	    if (v_ == null) {
+		throw new InternalCompilerError(
+		    "NodeVisitor.enter() returned null.");
+	    }
 
-  public String toString() {
-    // This is really slow and so you are encouraged to override.
-    // return new StringPrettyPrinter(5).toString(this);
+	    n = this.del().visitChildren(v_);
 
-    // Not slow anymore.
-    return getClass().getName();
-  }
+	    if (n == null) {
+		throw new InternalCompilerError(
+		    "Node_c.visitChildren() returned null.");
+	    }
 
-  public Node copy(NodeFactory nf) {
-    throw new InternalCompilerError("Unimplemented operation. This class "
-        + "(" + this.getClass().getName() + ") does "
-        + "not implement copy(NodeFactory). This compiler extension should"
-        + " either implement the method, or not invoke this method.");
-  }
+	    n = v.leave(parent, this, n, v_);
 
-  public Node copy(ExtensionInfo extInfo) throws SemanticException {
-    return this.del().copy(extInfo.nodeFactory());
-  }
+	    if (n == null) {
+		throw new InternalCompilerError(
+		    "NodeVisitor.leave() returned null.");
+	    }
+	}
+    
+	return n;
+    }
+
+    /**
+     * Visit all the elements of a list.
+     * @param l The list to visit.
+     * @param v The visitor to use.
+     * @return A new list with each element from the old list
+     *         replaced by the result of visiting that element.
+     *         If <code>l</code> is a <code>TypedList</code>, the
+     *         new list will also be typed with the same type as 
+     *         <code>l</code>.  If <code>l</code> is <code>null</code>,
+     *         <code>null</code> is returned.
+     */
+    public List visitList(List l, NodeVisitor v) {
+	if (l == null) {
+	    return null;
+	}
+
+	List result = l;
+	List vl = new ArrayList(l.size());
+	
+	for (Iterator i = l.iterator(); i.hasNext(); ) {
+	    Node n = (Node) i.next();
+	    Node m = visitChild(n, v);
+	    if (n != m) {
+	        result = vl;
+	    }
+	    if (m != null) {
+	        vl.add(m);
+	    }
+	}
+
+	return result;
+    }
+
+    public Node visitChildren(NodeVisitor v) {
+	return this;
+    }
+
+    /**
+     * Push a new scope upon entering this node, and add any declarations to the
+     * context that should be in scope when visiting children of this node.
+     * @param c the current <code>Context</code>
+     * @return the <code>Context</code> to be used for visiting this node. 
+     */
+    public Context enterScope(Context c) { return c; }
+
+    /**
+     * Push a new scope for visiting the child node <code>child</code>. 
+     * The default behavior is to delegate the call to the child node, and let
+     * it add appropriate declarations that should be in scope. However,
+     * this method gives parent nodes have the ability to modify this behavior.
+     * @param child the child node about to be entered.
+     * @param c the current <code>Context</code>
+     * @return the <code>Context</code> to be used for visiting node 
+     *           <code>child</code>
+     */
+    public Context enterChildScope(Node child, Context c) { 
+        return child.del().enterScope(c); 
+    }
+
+    /**
+     * Add any declarations to the context that should be in scope when
+     * visiting later sibling nodes.
+     */
+    public void addDecls(Context c) { }
+
+    // These methods override the methods in Ext_c.
+    // These are the default implementation of these passes.
+
+    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
+	return tb;
+    }
+
+    public Node buildTypes(TypeBuilder tb) throws SemanticException {
+	return this;
+    }
+
+    public Node disambiguateOverride(Node parent, AmbiguityRemover ar) throws SemanticException {
+	return null;
+    }
+    
+    public NodeVisitor disambiguateEnter(AmbiguityRemover ar) throws SemanticException {
+	return ar;
+    }
+
+    public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
+	return this;
+    }
+
+    /** Type check the AST. */
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+        return null;
+    }
+    
+    public NodeVisitor typeCheckEnter(TypeChecker tc) throws SemanticException {
+	return tc;
+    }
+
+    public Node typeCheck(TypeChecker tc) throws SemanticException {
+	return this;
+    }
+    
+    public Node checkConstants(ConstantChecker cc) throws SemanticException {
+        return this;
+    }
+
+    public Type childExpectedType(Expr child, AscriptionVisitor av) {
+	return child.type();
+    }
+
+    public NodeVisitor exceptionCheckEnter(ExceptionChecker ec) throws SemanticException {
+	return ec.push();
+    }
+
+    public Node exceptionCheck(ExceptionChecker ec) throws SemanticException { 
+        List l = this.del().throwTypes(ec.typeSystem());
+        for (Iterator i = l.iterator(); i.hasNext(); ) {
+            ec.throwsException((Type)i.next(), position());
+        }
+    	return this;
+    }
+
+    public List throwTypes(TypeSystem ts) {
+       return Collections.EMPTY_LIST;
+    }
+    
+    /** Dump the AST for debugging. */
+    public void dump(OutputStream os) {
+        CodeWriter cw = Compiler.createCodeWriter(os);
+        NodeVisitor dumper = new DumpAst(cw);
+        dumper = dumper.begin();
+        this.visit(dumper);
+        cw.newline();
+        dumper.finish();
+    }
+    
+    /** Dump the AST for debugging. */
+    public void dump(Writer w) {
+        CodeWriter cw = Compiler.createCodeWriter(w);
+        NodeVisitor dumper = new DumpAst(cw);
+        dumper = dumper.begin();
+        this.visit(dumper);
+        cw.newline();
+        dumper.finish();
+    }
+    
+    /** Pretty-print the AST for debugging. */
+    public void prettyPrint(OutputStream os) {
+        try {
+            CodeWriter cw = Compiler.createCodeWriter(os);
+            this.del().prettyPrint(cw, new PrettyPrinter());
+            cw.flush();
+        }
+        catch (java.io.IOException e) { }
+    }
+    
+    /** Pretty-print the AST for debugging. */
+    public void prettyPrint(Writer w) {
+        try {
+            CodeWriter cw = Compiler.createCodeWriter(w);
+            this.del().prettyPrint(cw, new PrettyPrinter());
+            cw.flush();
+        }
+        catch (java.io.IOException e) { }
+    }
+
+    /** Pretty-print the AST using the given <code>CodeWriter</code>. */
+    public void prettyPrint(CodeWriter w, PrettyPrinter pp) { }
+
+    public void printBlock(Node n, CodeWriter w, PrettyPrinter pp) {
+        w.begin(0);
+        print(n, w, pp);
+        w.end();
+    }
+
+    public void printSubStmt(Stmt stmt, CodeWriter w, PrettyPrinter pp) {
+        if (stmt instanceof Block) {
+            w.write(" ");
+            print(stmt, w, pp);
+        } else {
+            w.allowBreak(4, " ");
+            printBlock(stmt, w, pp);
+        }
+    }
+
+    public void print(Node child, CodeWriter w, PrettyPrinter pp) {
+        pp.print(this, child, w);
+    }
+    
+    /** Translate the AST using the given <code>CodeWriter</code>. */
+    public void translate(CodeWriter w, Translator tr) {
+        // By default, just rely on the pretty printer.
+        this.del().prettyPrint(w, tr);
+    }
+
+    public void dump(CodeWriter w) {
+        w.write(StringUtil.getShortNameComponent(getClass().getName()));
+
+        w.allowBreak(4, " ");
+        w.begin(0);
+        w.write("(del ");
+        if (del() == this) w.write("*");
+        else w.write(del().toString());
+	w.write(")");
+        w.end();
+
+        w.allowBreak(4, " ");
+        w.begin(0);
+        w.write("(ext ");
+	if (ext() == null) w.write("null");
+	else ext().dump(w);
+	w.write(")");
+        w.end();
+
+        w.allowBreak(4, " ");
+        w.begin(0);
+        w.write("(position " + (position != null ? position.toString()
+                                                  : "UNKNOWN") + ")");
+        w.end();
+    }
+
+    public String toString() {
+          // This is really slow and so you are encouraged to override.
+          // return new StringPrettyPrinter(5).toString(this);
+
+          // Not slow anymore.
+          return getClass().getName();
+    }
+    public Node copy(NodeFactory nf) {
+        throw new InternalCompilerError("Unimplemented operation. This class " +
+                                        "(" + this.getClass().getName() + ") does " +
+                                        "not implement copy(NodeFactory). This compiler extension should" +
+                                        " either implement the method, or not invoke this method.");
+    }
+    
+    public Node copy(ExtensionInfo extInfo) throws SemanticException {
+        return this.del().copy(extInfo.nodeFactory());
+    }
 
 }
