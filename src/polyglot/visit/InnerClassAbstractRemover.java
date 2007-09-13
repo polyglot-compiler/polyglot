@@ -89,7 +89,7 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor
         List actuals = new ArrayList();
         for (Iterator i = env.iterator(); i.hasNext(); ) {
             ClassType ct = (ClassType) i.next();
-            if (outer != null && ct.equals(outer)) {
+            if (outer != null && qualifier != null && ct.equals(outer)) {
                 actuals.add(qualifier);
                 continue;
             }
