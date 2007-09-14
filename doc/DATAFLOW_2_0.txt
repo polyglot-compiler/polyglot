@@ -17,7 +17,7 @@ for the condition expression and the statements in the branches.
 === Specific changes in various classes ===
 
 CFGBilder: In order to provide this functionality, several visit methods now
-have an additional boolean argument to indicate whether we wish to visit the
+have an additional int enum argument to indicate whether we wish to visit the
 entry or the exit of a term.
 
 DataFlow: Most methods working with the CFG now have an additional boolean
@@ -38,19 +38,20 @@ the direct sub-term instead.
 === What it means for extensions ===
 
 The major update that extensions will have to make is to AST nodes that override
-acceptCFG or entry. Changing entry should be straightforward. First, rename it
-to firstChild. Second, if it previously returned someChild.entry(), just return
-someChild instead; in situations where it returned "this", return null instead.
+acceptCFG or entry. Changing entry() should be straightforward. First, rename it
+to firstChild(). Second, if it previously returned someChild.entry(), just
+return someChild instead; in situations where it returned "this", return null
+instead.
 
 For the acceptCFG methods, we need to change the calls to the CFGBuilder.visit
 methods to use the new signatures.
 
 If there was a call to visitCFG(from, to), it should be replaced with
-visitCFG(from, to, false) to indicate that we mean the exit of the "to" term.
+visitCFG(from, to, EXIT) to indicate that we mean the exit of the "to" term.
 (The exit of the "from" term is implied.)
 
 A call to visitCFG(from, to.entry()) should be changed to
-visitCFG(from, to, true), indicating that the entry of the "to" term is meant.
+visitCFG(from, to, ENTRY), indicating that the entry of the "to" term is meant.
 
 Examples of the acceptCFG and firstChild methods in terms such as If_c should be
 helpful. Here is a snippet of the before and after versions of If_c:
@@ -85,15 +86,15 @@ helpful. Here is a snippet of the before and after versions of If_c:
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (alternative == null) {
-            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, true, 
-                             FlowGraph.EDGE_KEY_FALSE, this, false);
-            v.visitCFG(consequent, this, false);
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY, 
+                             FlowGraph.EDGE_KEY_FALSE, this, EXIT);
+            v.visitCFG(consequent, this, EXIT);
         }
         else {
-            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, true,
-                             FlowGraph.EDGE_KEY_FALSE, alternative, true);
-            v.visitCFG(consequent, this, false);
-            v.visitCFG(alternative, this, false);
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY,
+                             FlowGraph.EDGE_KEY_FALSE, alternative, ENTRY);
+            v.visitCFG(consequent, this, EXIT);
+            v.visitCFG(alternative, this, EXIT);
         }
 
         return succs;
