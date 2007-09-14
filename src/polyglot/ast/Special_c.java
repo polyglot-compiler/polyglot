@@ -138,7 +138,7 @@ public class Special_c extends Expr_c implements Special
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (qualifier != null) {
-            v.visitCFG(qualifier, this, false);
+            v.visitCFG(qualifier, this, EXIT);
         }
         
         return succs;

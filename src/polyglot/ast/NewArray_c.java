@@ -178,12 +178,12 @@ public class NewArray_c extends Expr_c implements NewArray
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (init != null) {
-            v.visitCFG(baseType, listChild(dims, init), true);
-            v.visitCFGList(dims, init, true);
-            v.visitCFG(init, this, false);
+            v.visitCFG(baseType, listChild(dims, init), ENTRY);
+            v.visitCFGList(dims, init, ENTRY);
+            v.visitCFG(init, this, EXIT);
         } else {
-            v.visitCFG(baseType, listChild(dims, null), true);
-            v.visitCFGList(dims, this, false);
+            v.visitCFG(baseType, listChild(dims, null), ENTRY);
+            v.visitCFGList(dims, this, EXIT);
         }
         
         return succs;

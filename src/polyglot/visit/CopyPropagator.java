@@ -421,7 +421,7 @@ public class CopyPropagator extends DataFlow {
 	    if (g == null) return n;
 
 	    Local l = (Local)n;
-	    Collection peers = g.peers(l, false);
+	    Collection peers = g.peers(l, Term.EXIT);
 	    if (peers == null || peers.isEmpty()) return n;
 
 	    List items = new ArrayList();

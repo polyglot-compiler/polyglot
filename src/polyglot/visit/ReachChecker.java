@@ -157,7 +157,7 @@ public class ReachChecker extends DataFlow
     protected Node checkReachability(Term n) throws SemanticException {
         FlowGraph g = currentFlowGraph();
         if (g != null) {   
-            Collection peers = g.peers(n, false);
+            Collection peers = g.peers(n, Term.EXIT);
             if (peers != null && !peers.isEmpty()) {
                 boolean isInitializer = (n instanceof Initializer);
                 

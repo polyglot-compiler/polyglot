@@ -170,7 +170,7 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFGList(elements, this, false);
+        v.visitCFGList(elements, this, EXIT);
         return succs;
     }
     public Node copy(NodeFactory nf) {

@@ -151,11 +151,11 @@ public class Assert_c extends Stmt_c implements Assert
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (errorMessage != null) {
-            v.visitCFG(cond, errorMessage, true);
-            v.visitCFG(errorMessage, this, false);
+            v.visitCFG(cond, errorMessage, ENTRY);
+            v.visitCFG(errorMessage, this, EXIT);
         }
         else {
-            v.visitCFG(cond, this, false);
+            v.visitCFG(cond, this, EXIT);
         }
 
         return succs;

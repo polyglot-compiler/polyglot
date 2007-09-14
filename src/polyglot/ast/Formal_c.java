@@ -196,7 +196,7 @@ public class Formal_c extends Term_c implements Formal
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(type, this, false);        
+        v.visitCFG(type, this, EXIT);        
         return succs;
     }
 

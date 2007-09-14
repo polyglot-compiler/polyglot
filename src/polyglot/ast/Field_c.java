@@ -232,7 +232,7 @@ public class Field_c extends Expr_c implements Field
 
   public List acceptCFG(CFGBuilder v, List succs) {
       if (target instanceof Term) {
-          v.visitCFG((Term) target, this, false);
+          v.visitCFG((Term) target, this, EXIT);
       }
       
       return succs;

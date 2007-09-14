@@ -601,19 +601,19 @@ public class New_c extends Expr_c implements New
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (qualifier != null) {
-            v.visitCFG(qualifier, tn, true);
+            v.visitCFG(qualifier, tn, ENTRY);
         }
         
         if (body() != null) {
-            v.visitCFG(tn, listChild(arguments, body()), true);
-            v.visitCFGList(arguments, body(), true);
-            v.visitCFG(body(), this, false);
+            v.visitCFG(tn, listChild(arguments, body()), ENTRY);
+            v.visitCFGList(arguments, body(), ENTRY);
+            v.visitCFG(body(), this, EXIT);
         } else {
             if (!arguments.isEmpty()) {
-                v.visitCFG(tn, listChild(arguments, null), true);
-                v.visitCFGList(arguments, this, false);
+                v.visitCFG(tn, listChild(arguments, null), ENTRY);
+                v.visitCFGList(arguments, this, EXIT);
             } else {
-                v.visitCFG(tn, this, false);
+                v.visitCFG(tn, this, EXIT);
             }
         }
 

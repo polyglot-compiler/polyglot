@@ -361,10 +361,10 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (init() != null) {
-            v.visitCFG(type(), init(), true);
-            v.visitCFG(init(), this, false);
+            v.visitCFG(type(), init(), ENTRY);
+            v.visitCFG(init(), this, EXIT);
         } else {
-            v.visitCFG(type(), this, false);
+            v.visitCFG(type(), this, EXIT);
         }
 
         return succs;

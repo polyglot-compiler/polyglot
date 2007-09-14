@@ -122,8 +122,8 @@ public class Instanceof_c extends Expr_c implements Instanceof
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(expr, compareType, true);
-        v.visitCFG(compareType, this, false);
+        v.visitCFG(expr, compareType, ENTRY);
+        v.visitCFG(compareType, this, EXIT);
         return succs;
     }
     

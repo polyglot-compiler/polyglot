@@ -632,10 +632,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                 
             // calculate the out item
             Map oldOutItems = p.outItems;
-            p.inItem = this.safeConfluence(inItems, inItemKeys, p.node, p.entry, 
-                    graph);
-            p.outItems = this.flow(inItems, inItemKeys, graph, p.node, p.entry,
-                    p.succEdgeKeys());
+            p.inItem = this.safeConfluence(inItems, inItemKeys, p.node, 
+                    p.entry == Term.ENTRY, graph);
+            p.outItems = this.flow(inItems, inItemKeys, graph, p.node, 
+                    p.entry == Term.ENTRY, p.succEdgeKeys());
                     
             if (!p.succEdgeKeys().equals(p.outItems.keySet())) {
                 // This check is more for developers to ensure that they
@@ -768,7 +768,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             Peer p = (Peer) peersToCheck.removeFirst();
             uncheckedPeers.remove(p);
 
-            this.check(graph, p.node, p.entry, p.inItem, p.outItems);
+            this.check(graph, p.node, p.entry == Term.ENTRY, p.inItem, p.outItems);
             
             for (Iterator iter = p.succs.iterator(); iter.hasNext(); ) {
                 Peer q = ((Edge)iter.next()).getTarget();

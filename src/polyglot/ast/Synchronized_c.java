@@ -114,8 +114,8 @@ public class Synchronized_c extends Stmt_c implements Synchronized
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(expr, body, true);
-        v.visitCFG(body, this, false);
+        v.visitCFG(expr, body, ENTRY);
+        v.visitCFG(body, this, EXIT);
         return succs;
     }
     

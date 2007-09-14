@@ -57,7 +57,7 @@ public class ClassLit_c extends Lit_c implements ClassLit
   }
 
   public List acceptCFG(CFGBuilder v, List succs) {
-      v.visitCFG(typeNode, this, false);
+      v.visitCFG(typeNode, this, EXIT);
       return succs;
   }
 

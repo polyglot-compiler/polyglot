@@ -96,7 +96,7 @@ public class Labeled_c extends Stmt_c implements Labeled
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.push(this).visitCFG(statement, this, false);
+        v.push(this).visitCFG(statement, this, EXIT);
         return succs;
     }
     

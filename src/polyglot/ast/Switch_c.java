@@ -196,7 +196,7 @@ public class Switch_c extends Stmt_c implements Switch
 
             if (s instanceof Case) {
                 cases.add(s);
-                entry.add(Boolean.TRUE);
+                entry.add(ENTRY);
                 
                 if (((Case) s).expr() == null) {
                     hasDefault = true;
@@ -207,11 +207,11 @@ public class Switch_c extends Stmt_c implements Switch
         // If there is no default case, add an edge to the end of the switch.
         if (! hasDefault) {
             cases.add(this);
-            entry.add(Boolean.FALSE);
+            entry.add(EXIT);
         }
 
         v.visitCFG(expr, FlowGraph.EDGE_KEY_OTHER, cases, entry);
-        v.push(this).visitCFGList(elements, this, false);
+        v.push(this).visitCFGList(elements, this, EXIT);
 
         return succs;
     }

@@ -162,7 +162,7 @@ public class Case_c extends Stmt_c implements Case
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (expr != null) {
-            v.visitCFG(expr, this, false);
+            v.visitCFG(expr, this, EXIT);
         }
 
         return succs;

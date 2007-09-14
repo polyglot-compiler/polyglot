@@ -58,12 +58,12 @@ public class FieldAssign_c extends Assign_c implements FieldAssign
           Expr o = (Expr) f.target();
 
               //     o.f = e: visit o -> e -> (o.f = e)
-              v.visitCFG(o, right(), true);              
-              v.visitCFG(right(), this, false);
+              v.visitCFG(o, right(), ENTRY);              
+              v.visitCFG(right(), this, EXIT);
       }
       else {
               //       T.f = e: visit e -> (T.f OP= e)
-              v.visitCFG(right(), this, false);
+              v.visitCFG(right(), this, EXIT);
       }
       
   }
@@ -87,8 +87,8 @@ public class FieldAssign_c extends Assign_c implements FieldAssign
       }
       */
       
-      v.visitCFG(left(), right(), true);
-      v.visitCFG(right(), this, false);
+      v.visitCFG(left(), right(), ENTRY);
+      v.visitCFG(right(), this, EXIT);
   }
 
   public List throwTypes(TypeSystem ts) {

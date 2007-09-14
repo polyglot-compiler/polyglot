@@ -135,8 +135,8 @@ public class Cast_c extends Expr_c implements Cast
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(expr, castType, true);
-        v.visitCFG(castType, this, false);
+        v.visitCFG(expr, castType, ENTRY);
+        v.visitCFG(castType, this, EXIT);
         return succs;
     }
 

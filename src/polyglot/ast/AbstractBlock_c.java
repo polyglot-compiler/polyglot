@@ -99,7 +99,7 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFGList(statements, this, false);
+        v.visitCFGList(statements, this, EXIT);
         return succs;
     }
 

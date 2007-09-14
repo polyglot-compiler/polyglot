@@ -159,7 +159,7 @@ public class Return_c extends Stmt_c implements Return
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (expr != null) {
-            v.visitCFG(expr, this, false);
+            v.visitCFG(expr, this, EXIT);
         }
 
         v.visitReturn(this);

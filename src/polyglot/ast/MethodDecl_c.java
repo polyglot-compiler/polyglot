@@ -417,14 +417,14 @@ public class MethodDecl_c extends Term_c implements MethodDecl
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFGList(formals(), returnType(), true);
+        v.visitCFGList(formals(), returnType(), ENTRY);
         
         if (body() == null) {
-            v.visitCFG(returnType(), this, false);
+            v.visitCFG(returnType(), this, EXIT);
         }
         else {
-            v.visitCFG(returnType(), body(), true);
-            v.visitCFG(body(), this, false);
+            v.visitCFG(returnType(), body(), ENTRY);
+            v.visitCFG(body(), this, EXIT);
         }
         
         return succs;

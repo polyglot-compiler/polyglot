@@ -148,7 +148,7 @@ public class ClassDecl_c extends Term_c implements ClassDecl
      * Visit this term in evaluation order.
      */
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(this.body(), this, false);
+        v.visitCFG(this.body(), this, EXIT);
         return succs;
     }
 

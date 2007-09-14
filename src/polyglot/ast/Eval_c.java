@@ -88,7 +88,7 @@ public class Eval_c extends Stmt_c implements Eval
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(expr, this, false);
+        v.visitCFG(expr, this, EXIT);
         return succs;
     }
     public Node copy(NodeFactory nf) {

@@ -117,14 +117,14 @@ public class Do_c extends Loop_c implements Do
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.push(this).visitCFG(body, cond, true);
+        v.push(this).visitCFG(body, cond, ENTRY);
 
         if (condIsConstantTrue()) {
-            v.visitCFG(cond, body, true);
+            v.visitCFG(cond, body, ENTRY);
         }
         else {
-            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, true, 
-                             FlowGraph.EDGE_KEY_FALSE, this, false);
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, ENTRY, 
+                             FlowGraph.EDGE_KEY_FALSE, this, EXIT);
         }
 
         return succs;

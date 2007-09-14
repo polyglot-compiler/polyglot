@@ -62,7 +62,7 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
      * Visit this term in evaluation order.
      */
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(decl(), this, false);
+        v.visitCFG(decl(), this, EXIT);
         return succs;
     }
 

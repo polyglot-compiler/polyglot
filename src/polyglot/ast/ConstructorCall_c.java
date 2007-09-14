@@ -301,14 +301,14 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
     public List acceptCFG(CFGBuilder v, List succs) {
         if (qualifier != null) {
             if (!arguments.isEmpty()) {
-                v.visitCFG(qualifier, listChild(arguments, null), true);
-                v.visitCFGList(arguments, this, false);
+                v.visitCFG(qualifier, listChild(arguments, null), ENTRY);
+                v.visitCFGList(arguments, this, EXIT);
             } else {
-                v.visitCFG(qualifier, this, false);
+                v.visitCFG(qualifier, this, EXIT);
             }
         } else {
             if (!arguments.isEmpty()) {
-                v.visitCFGList(arguments, this, false);
+                v.visitCFGList(arguments, this, EXIT);
             }
         }
 

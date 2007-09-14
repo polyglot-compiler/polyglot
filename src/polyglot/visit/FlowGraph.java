@@ -60,11 +60,11 @@ public class FlowGraph {
     }
 
     public Collection entryPeers() {
-        return peers(root, true);
+        return peers(root, Term.ENTRY);
     }
     
     public Collection exitPeers() {
-        return peers(root, false);
+        return peers(root, Term.EXIT);
     }
     
     public Collection startPeers() {
@@ -101,16 +101,20 @@ public class FlowGraph {
      * Retrieve the entry or exit <code>Peer</code> for the
      * <code>Term n</code>, where <code>n</code> does not appear in a
      * finally block. If no such Peer exists, then one will be created.
+     * 
+     * <code>entry</code> can be Term.ENTRY or Term.EXIT.
      */
-    public Peer peer(Term n, boolean entry) {
+    public Peer peer(Term n, int entry) {
         return peer(n, Collections.EMPTY_LIST, entry);
     }
 
     /**
      * Return a collection of all of the entry or exit <code>Peer</code>s for
      * the given <code>Term n</code>.
+     * 
+     * <code>entry</code> can be Term.ENTRY or Term.EXIT.
      */
-    public Collection peers(Term n, boolean entry) {
+    public Collection peers(Term n, int entry) {
         IdentityKey k = new IdentityKey(n);
         Map pathMap = (Map) peerMap.get(k);
         
@@ -137,8 +141,10 @@ public class FlowGraph {
      * associated with the given path to the finally block. (A term that occurs
      * in a finally block has one Peer for each possible path to that finally
      * block.) If no such Peer exists, then one will be created.
+     * 
+     * <code>entry</code> can be Term.ENTRY or Term.EXIT.
      */
-    public Peer peer(Term n, List path_to_finally, boolean entry) {
+    public Peer peer(Term n, List path_to_finally, int entry) {
         IdentityKey k = new IdentityKey(n);
         Map pathMap = (Map) peerMap.get(k);
         
@@ -287,7 +293,7 @@ public class FlowGraph {
                                     // uniquely distinguishes this Peer
                                     // from the other Peers for the AST node.
 
-    protected boolean entry; // true if this is an entry peer
+    protected int entry; // Term.ENTRY or Term.EXIT
     
     /**
      * Set of all the different EdgeKeys that occur in the Edges in the 
@@ -296,7 +302,7 @@ public class FlowGraph {
      */     
     private Set succEdgeKeys;
 
-    public Peer(Term node, List path_to_finally, boolean entry) {
+    public Peer(Term node, List path_to_finally, int entry) {
       this.node = node;
       this.path_to_finally = path_to_finally;
       this.inItem = null;
@@ -331,7 +337,7 @@ public class FlowGraph {
     }
 
     public String toString() {
-      return (entry ? "entry: " : "") + node + path_to_finally;
+      return (entry == Term.ENTRY ? "entry: " : "") + node + path_to_finally;
     }
 
     public Set succEdgeKeys() {
@@ -362,15 +368,15 @@ public class FlowGraph {
     protected static class PeerKey {
 
         protected List list;
-        protected boolean entry;
+        protected int entry;
 
-        public PeerKey(List list, boolean entry) {
+        public PeerKey(List list, int entry) {
             this.list = list;
             this.entry = entry;
         }
 
         public int hashCode() {
-            return list.hashCode() ^ Boolean.valueOf(entry).hashCode();
+            return list.hashCode() ^ entry;
         }
 
         public boolean equals(Object other) {

@@ -193,7 +193,7 @@ public class DeadCodeEliminator extends DataFlow {
 	FlowGraph g = currentFlowGraph();
 	if (g == null) return null;
 
-	Collection peers = g.peers(n, false);
+	Collection peers = g.peers(n, Term.EXIT);
 	if (peers == null || peers.isEmpty()) return null;
 
 	List items = new ArrayList();

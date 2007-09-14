@@ -256,24 +256,24 @@ public class Try_c extends Stmt_c implements Try
 
         for (Iterator i = ts.uncheckedExceptions().iterator(); i.hasNext(); ) {
             Type type = (Type) i.next();
-            v1.visitThrow(tryBlock, true, type);
+            v1.visitThrow(tryBlock, ENTRY, type);
         }
 
         // Handle the normal return case.  The throw case will be handled
         // specially.
         if (finallyBlock != null) {
-            v1.visitCFG(tryBlock, finallyBlock, true);
-            v.visitCFG(finallyBlock, this, false);
+            v1.visitCFG(tryBlock, finallyBlock, ENTRY);
+            v.visitCFG(finallyBlock, this, EXIT);
         } else {
-            v1.visitCFG(tryBlock, this, false);
+            v1.visitCFG(tryBlock, this, EXIT);
         }
 
         for (Iterator it = catchBlocks.iterator(); it.hasNext(); ) {
             Catch cb = (Catch) it.next();
             if (finallyBlock != null) {
-                v2.visitCFG(cb, finallyBlock, true);
+                v2.visitCFG(cb, finallyBlock, ENTRY);
             } else {
-                v2.visitCFG(cb, this, false);
+                v2.visitCFG(cb, this, EXIT);
             }
         }
 

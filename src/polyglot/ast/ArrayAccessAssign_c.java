@@ -51,9 +51,9 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign
       ArrayAccess a = (ArrayAccess) left();
       
       //    a[i] = e: visit a -> i -> e -> (a[i] = e)
-      v.visitCFG(a.array(), a.index(), true);
-      v.visitCFG(a.index(), right(), true);
-      v.visitCFG(right(), this, false);
+      v.visitCFG(a.array(), a.index(), ENTRY);
+      v.visitCFG(a.index(), right(), ENTRY);
+      v.visitCFG(right(), this, EXIT);
   }
   protected void acceptCFGOpAssign(CFGBuilder v) {
       /*
@@ -67,8 +67,8 @@ public class ArrayAccessAssign_c extends Assign_c implements ArrayAccessAssign
       v.visitCFG(right(), this);
       */
       
-      v.visitCFG(left(), right(), true);
-      v.visitCFG(right(), this, false);
+      v.visitCFG(left(), right(), ENTRY);
+      v.visitCFG(right(), this, EXIT);
   }
 
   public List throwTypes(TypeSystem ts) {

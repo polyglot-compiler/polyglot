@@ -47,7 +47,7 @@ public class LocalAssign_c extends Assign_c implements LocalAssign
   protected void acceptCFGAssign(CFGBuilder v) {
 	  // do not visit left()
       // l = e: visit e -> (l = e)      
-      v.visitCFG(right(), this, false);
+      v.visitCFG(right(), this, EXIT);
   }
   
   protected void acceptCFGOpAssign(CFGBuilder v) {
@@ -60,7 +60,7 @@ public class LocalAssign_c extends Assign_c implements LocalAssign
       v.visitCFG(right(), this);
       */
       
-      v.visitCFG(left(), right(), true);
-      v.visitCFG(right(), this, false);
+      v.visitCFG(left(), right(), ENTRY);
+      v.visitCFG(right(), this, EXIT);
   }
 }

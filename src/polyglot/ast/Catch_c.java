@@ -113,8 +113,8 @@ public class Catch_c extends Stmt_c implements Catch
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(formal, body, true);
-        v.visitCFG(body, this, false);
+        v.visitCFG(formal, body, ENTRY);
+        v.visitCFG(body, this, EXIT);
         return succs;
     }
     public Node copy(NodeFactory nf) {

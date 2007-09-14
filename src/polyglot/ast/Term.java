@@ -18,6 +18,16 @@ import java.util.*;
 public interface Term extends Node
 {
     /**
+     * Indicates to dataflow methods that we are looking at the entry of a term.
+     */
+    public static final int ENTRY = 1;
+    
+    /**
+     * Indicates to dataflow methods that we are looking at the exit of a term.
+     */
+    public static final int EXIT = 0;
+    
+    /**
      * Return the first direct subterm performed when evaluating this term. If
      * this term has no subterms, this should return null.
      * 

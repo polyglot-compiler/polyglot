@@ -226,20 +226,20 @@ public class For_c extends Loop_c implements For
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFGList(inits, cond != null ? (Term) cond : body, true);
+        v.visitCFGList(inits, cond != null ? (Term) cond : body, ENTRY);
 
         if (cond != null) {
             if (condIsConstantTrue()) {
-                v.visitCFG(cond, body, true);
+                v.visitCFG(cond, body, ENTRY);
             }
             else {
-                v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, true, 
-                                 FlowGraph.EDGE_KEY_FALSE, this, false);
+                v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, body, ENTRY, 
+                                 FlowGraph.EDGE_KEY_FALSE, this, EXIT);
             }
         }
 
-        v.push(this).visitCFG(body, continueTarget(), true);
-        v.visitCFGList(iters, cond != null ? (Term) cond : body, true);
+        v.push(this).visitCFG(body, continueTarget(), ENTRY);
+        v.visitCFGList(iters, cond != null ? (Term) cond : body, ENTRY);
 
         return succs;
     }

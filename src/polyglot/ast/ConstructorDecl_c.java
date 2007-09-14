@@ -366,11 +366,11 @@ public class ConstructorDecl_c extends Term_c implements ConstructorDecl
 
     public List acceptCFG(CFGBuilder v, List succs) {
         if (body() != null) {
-            v.visitCFGList(formals(), body(), true);
-            v.visitCFG(body(), this, false);
+            v.visitCFGList(formals(), body(), ENTRY);
+            v.visitCFG(body(), this, EXIT);
         }
         else {
-            v.visitCFGList(formals(), this, false);
+            v.visitCFGList(formals(), this, EXIT);
         }
         
         return succs;

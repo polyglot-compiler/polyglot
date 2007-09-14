@@ -32,12 +32,12 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
   }
   
   protected void acceptCFGAssign(CFGBuilder v) {
-      v.visitCFG(right(), this, false);
+      v.visitCFG(right(), this, EXIT);
   }
   
   protected void acceptCFGOpAssign(CFGBuilder v) {
-      v.visitCFG(left(), right(), true);
-      v.visitCFG(right(), this, false);
+      v.visitCFG(left(), right(), ENTRY);
+      v.visitCFG(right(), this, EXIT);
   }
   
   public Node disambiguate(AmbiguityRemover ar) throws SemanticException {

@@ -96,7 +96,7 @@ public class Throw_c extends Stmt_c implements Throw
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(expr, this, false);
+        v.visitCFG(expr, this, EXIT);
 
         // Throw edges will be handled by visitor.
         return Collections.EMPTY_LIST;
