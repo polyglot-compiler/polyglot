@@ -163,7 +163,12 @@ public class FlattenVisitor extends NodeVisitor
 
 	if (n instanceof Block) {
 	    List l = (List) stack.removeFirst();
-	    return ((Block) n).statements(l);
+            Block block = ((Block) n).statements(l);
+            if (!stack.isEmpty()) {
+              l = (List) stack.getFirst();
+              l.add(block);
+            }
+	    return block;
 	}
 	else if (n instanceof Stmt) {
 	    List l = (List) stack.getFirst();
