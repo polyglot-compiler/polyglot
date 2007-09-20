@@ -78,7 +78,7 @@ if [ -n "$ext" ]; then
 fi
 
 
-classpath="$dir/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar"
+classpath="$dir/compiler/classes:$dir/runtime/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar"
 if [ -n "$ext" ]; then
   classpath="$classpath:$dir/lib/$ext.jar"
 fi

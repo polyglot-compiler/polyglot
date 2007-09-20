@@ -17,7 +17,7 @@ import java.util.*;
 
 import polyglot.ast.Node;
 import polyglot.frontend.goals.*;
-import polyglot.main.Report;
+import polyglot.main.*;
 import polyglot.types.FieldInstance;
 import polyglot.types.ParsedClassType;
 import polyglot.util.*;
@@ -551,7 +551,7 @@ public abstract class Scheduler {
                     dumpDependenceGraph();
             
                 eq.enqueue(ErrorInfo.INTERNAL_ERROR, message + "  Aborting.");
-                System.exit(1);
+                throw new Main.TerminationException(1);
             }
             else if (infiniteLoopGoal == null) {
                 infiniteLoopGoal = goal;
