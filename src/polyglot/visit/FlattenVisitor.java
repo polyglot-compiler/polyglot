@@ -148,6 +148,11 @@ public class FlattenVisitor extends NodeVisitor
 	    noFlatten.add(s.left());
 	    noFlatten.add(s.right());
 	}
+        
+        if (n instanceof Unary) {
+          Unary u = (Unary) n;
+          noFlatten.add(u.expr());
+        }
 
 	return this;
     }
@@ -155,7 +160,7 @@ public class FlattenVisitor extends NodeVisitor
     /** 
      * Flatten complex expressions within the AST
      */
-    public Node leave(Node old, Node n, NodeVisitor v) {
+    public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
         if (noFlatten.contains(old)) {
 	    noFlatten.remove(old);
 	    return n;
@@ -164,7 +169,7 @@ public class FlattenVisitor extends NodeVisitor
 	if (n instanceof Block) {
 	    List l = (List) stack.removeFirst();
             Block block = ((Block) n).statements(l);
-            if (!stack.isEmpty()) {
+            if (parent instanceof Block && !stack.isEmpty()) {
               l = (List) stack.getFirst();
               l.add(block);
             }
