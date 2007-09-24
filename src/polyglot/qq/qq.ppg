@@ -95,6 +95,8 @@ qq_member ::=
 	    {: RESULT = parser.nf.FieldDecl(parser.pos(b), 
 					    a, parser.array(b, d.dims),
 					    d.name, d.init); :}
+|   constructor_declaration:a
+		{: RESULT = a; :}
     ;
 
 extend left_hand_side ::=
