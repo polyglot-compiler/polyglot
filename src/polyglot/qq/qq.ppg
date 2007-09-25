@@ -95,8 +95,8 @@ qq_member ::=
 	    {: RESULT = parser.nf.FieldDecl(parser.pos(b), 
 					    a, parser.array(b, d.dims),
 					    d.name, d.init); :}
-|   constructor_declaration:a
-		{: RESULT = a; :}
+	|   constructor_declaration:a
+			{: RESULT = a; :}
     ;
 
 extend left_hand_side ::=
@@ -132,13 +132,16 @@ extend statement ::=
 
 // now ambiguous	
 drop {
-    constructor_body ::= LBRACE explicit_constructor_invocation block_statements RBRACE;
+    constructor_body ::= LBRACE explicit_constructor_invocation block_statements RBRACE
+                       | LBRACE explicit_constructor_invocation RBRACE
+                       | LBRACE block_statements RBRACE;
 }
-    
-drop {
-    constructor_body ::= LBRACE explicit_constructor_invocation RBRACE;
-}
-                       
+
+extend constructor_body ::=
+	LBRACE:n block_statements:a RBRACE:d
+        {: RESULT = parser.nf.Block(parser.pos(n, d), a); :}
+    ;
+
 extend class_or_interface_type ::=
 	COMMA_TYPE:a
 	    {: RESULT = (TypeNode) a.node(); :}
