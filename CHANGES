@@ -3,14 +3,16 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
-Aug 31, 2007: Polyglot 2.2.4
-============================
+Oct 2, 2007: Polyglot 2.3
+=========================
 
 Dataflow framework changed to add functionality. CFGs now have two nodes per
 term, one representing the "entry" into that term, another the "exit".
 Extensions will have to be updated to work with this new framework.
-
 See doc/DATAFLOW_2_0.txt for a more detailed explanation of the changes.
+Contributed by Xin Zheng.
+
+Miscellaneous bug fixes.
 
 Jul 27, 2007: Polyglot 2.2.3
 ============================
