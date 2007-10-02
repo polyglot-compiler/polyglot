@@ -14,11 +14,11 @@ term. An if statement, for example, will now have an entry node before the nodes
 for the condition expression and the statements in the branches.
 
 
-=== Specific changes in various classes ===
+=== Summary of changes in various classes ===
 
 CFGBilder: In order to provide this functionality, several visit methods now
 have an additional int enum argument to indicate whether we wish to visit the
-entry or the exit of a term.
+entry or the exit of a term. The possible values are Term.ENTRY and TERM.EXIT.
 
 DataFlow: Most methods working with the CFG now have an additional boolean
 argument to indicate whether we are looking at the entry node or the exit.
@@ -36,6 +36,8 @@ the direct sub-term instead.
 
 
 === What it means for extensions ===
+
+1. AST changes
 
 The major update that extensions will have to make is to AST nodes that override
 acceptCFG or entry. Changing entry() should be straightforward. First, rename it
@@ -100,14 +102,24 @@ helpful. Here is a snippet of the before and after versions of If_c:
         return succs;
     }
 
-The preceding changes would allow CFGs to be built correctly. Now, to use the
+2. DataFlow changes
+
+The AST changes would allow CFGs to be built correctly. Now, to use the
 new CFGs, subclasses of DataFlow need to be updated to add the "entry" parameter
 to methods such as flow and check. This parameter indicates whether we are
 flowing over the entry or the exit node. To keep analyses working as they are,
 void methods can simply return when entry is true; flow methods should return
 the in-item unchanged when entry is true.
 
-Here is an example flow() method:
+We describe here how to change specific methods in DataFlow subclasses so they
+are compatible with the new framework. These are the minimal changes needed to
+make the methods function in essentially the same way as they did under the old
+framework.
+
+** flow() **
+
+To retain old behavior, a flow method should return the in-item unchanged if
+entry is true. For example:
 
     public Map flow(Item in, 
                     FlowGraph graph, 
@@ -125,3 +137,45 @@ Here is an example flow() method:
 
 Note: A convention was taken to consistently add the "entry" parameter
 immediately after the "Term n" parameter, since it is closely tied to the term.
+
+** createInitialItem() **
+
+In most cases, this method can be left unchanged except for adding the boolean
+entry parameter to the signature.
+
+Some analyses check the term to determine what item to return. Most of the time,
+this checks whether the term is the entry to the flow graph:
+
+    if (node == graph.entry()) { ... }
+
+The entry() method was removed from FlowGraph, since it is now meaningless (it
+would return the same thing as exit()). Instead, use
+
+    if (node == graph.root() && entry) { ... }
+    
+Similarly, (node == graph.root() && !entry) would indicate the equivalent of
+exit().
+
+** confluence() **
+
+Most analyses perform confluence without regard to which term the item is
+flowing into. In such cases, there is no need to change confluence() except for
+the method signature. If an analysis does perform confluence in different ways
+depending on the term, then changes specific to the analysis might have to be
+made.
+
+** check() **
+
+One can simply return if entry is true.
+
+    protected void check(FlowGraph graph, 
+                         Term n, 
+                         boolean entry, 
+                         Item inItem,
+                         Map outItems) throws SemanticException {
+        if (entry) {
+            return;
+        }
+        
+        /* ... Code as before */
+    }
