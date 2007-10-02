@@ -155,7 +155,7 @@ Several other people have contributed to the development:
         Aleksey Kliger          Jed Liu
         Naveen Sastry           Dan Spoonhower 
         Xin Qi                  Steve Zdancewic         
-        Lantian Zheng
+        Lantian Zheng           Xin Zheng
 
 The Polyglot class file parsing code (src/polyglot/types/reflect)
 is derived from code written for the BLOAT bytecode optimizer written
