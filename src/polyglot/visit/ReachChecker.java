@@ -138,12 +138,12 @@ public class ReachChecker extends DataFlow
                // Do we throw an exception or not?
                
                // Compound statements are allowed to be unreachable
-               // (e.g., "{ // return; }" or "while (true) S").  If a compound
-               // statement is truly unreachable, one of its sub-statements will
-               // be also and we will report an error there.
+               // (e.g., "{ return; }" or "while (true) S").  If a compound
+               // statement is truly unreachable, one of its sub-statements
+               // will be also and we will report an error there.
 
                if ((n instanceof Block && ((Block) n).statements().isEmpty()) ||
-                       (n instanceof Stmt && ! (n instanceof CompoundStmt))) {
+                   (n instanceof Stmt && ! (n instanceof CompoundStmt))) {
                    throw new SemanticException("Unreachable statement.",
                                                n.position());
                }
