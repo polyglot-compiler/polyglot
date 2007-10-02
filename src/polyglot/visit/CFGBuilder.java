@@ -79,6 +79,10 @@ public class CFGBuilder implements Copy
         this.errorEdgesToExitNode = false;
     }
 
+    public FlowGraph graph() { return graph; }
+    public DataFlow dataflow() { return df; }
+    public CFGBuilder outer() { return outer; }
+
     /** Get the type system. */
     public TypeSystem typeSystem() {
         return ts;
