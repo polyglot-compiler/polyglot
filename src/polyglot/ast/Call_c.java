@@ -125,6 +125,10 @@ public class Call_c extends Expr_c implements Call
     if (target != this.target || name != this.name || ! CollectionUtil.equals(arguments,
                                                          this.arguments)) {
       Call_c n = (Call_c) copy();
+      
+      // If the target changes, assume we want it to be an explicit target.
+      n.targetImplicit &= target == n.target;
+      
       n.target = target;
       n.name = name;
       n.arguments = TypedList.copyAndCheck(arguments, Expr.class, true);
