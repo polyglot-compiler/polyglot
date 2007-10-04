@@ -29,6 +29,16 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor
         super(job, ts, nf);
     }
 
+    /**
+     * Returns the inner class environment of the given class type and,
+     * optionally, its super types. The "inner class environment" of a class
+     * type is defined recursively as:
+     * <ul>
+     * <li>empty, if the class type is not an inner class; otherwise,</li>
+     * <li>the class type itself and the inner class environment of its outer
+     * class type.</li>
+     * </ul>
+     */
     List env(ClassType ct, boolean includeSuper) {
         if (ct == null || ! ct.isInnerClass()) {
             return Collections.EMPTY_LIST;
