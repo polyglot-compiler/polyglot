@@ -167,7 +167,7 @@ public abstract class AbstractGoal implements Goal {
     }
     
     public String toString() {
-        return job + ":" + job.extensionInfo() + ":" + name + " ("
-            + stateString() + ")";
+        return job + ":" + (job != null ? job.extensionInfo() + ":" : "")
+            + name + " (" + stateString() + ")";
     }
 }
