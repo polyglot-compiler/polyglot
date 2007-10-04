@@ -378,6 +378,11 @@ public class Call_c extends Expr_c implements Call
   public void dump(CodeWriter w) {
     super.dump(w);
 
+    w.allowBreak(4, " ");
+    w.begin(0);
+    w.write("(targetImplicit " + targetImplicit + ")");
+    w.end();
+
     if ( mi != null ) {
       w.allowBreak(4, " ");
       w.begin(0);
