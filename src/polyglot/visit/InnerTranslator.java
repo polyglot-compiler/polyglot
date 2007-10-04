@@ -601,7 +601,7 @@ public class InnerTranslator extends NodeVisitor {
 				tThis = (ClassType)tThis.outer();
 			}
 			Call nc = c.target(t).targetImplicit(false);
-			return c;
+			return nc;
 		}
 		
 		return c;
