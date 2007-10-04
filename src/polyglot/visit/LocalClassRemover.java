@@ -85,7 +85,7 @@ public class LocalClassRemover extends ContextVisitor
         public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
             if (n instanceof Local) {
                 Local local = (Local) n;
-                System.out.println("checking " + n + "\nin " + context + "\nin " + outerContext);
+//                System.out.println("checking " + n + "\nin " + context + "\nin " + outerContext);
                 
                 // The variable should be in the environment if it's not in the local
                 // scope here, but is in the local scope of outerContext.
@@ -93,20 +93,20 @@ public class LocalClassRemover extends ContextVisitor
                     try {
                         LocalInstance li = outerContext.findLocal(local.name());
                         // found!
-                        System.out.println("  found " + li);
+//                        System.out.println("  found " + li);
                         if (outerContext.isLocal(local.name())) {
                             // and not local to the outer context too
-                        System.out.println("  defined in enclosing method: " + n);
+//                        System.out.println("  defined in enclosing method: " + n);
                             env.add(local.localInstance().orig());
                         }
                     }
                     catch (SemanticException e) {
-                        System.out.println("  not in scope of enclosing method: " + n);
+//                        System.out.println("  not in scope of enclosing method: " + n);
                         // The local was defined somewhere within the class body.
                     }
                 }
                 else {
-                    System.out.println("  is local to the inner scope " + n);
+//                    System.out.println("  is local to the inner scope " + n);
                 }
             }
 
@@ -120,9 +120,9 @@ public class LocalClassRemover extends ContextVisitor
         body.visit(v);
         v.finish();
         
-        System.out.println("env of:");
-        body.del().prettyPrint(System.out);
-        System.out.println(" = " + v.env());
+//        System.out.println("env of:");
+//        body.del().prettyPrint(System.out);
+//        System.out.println(" = " + v.env());
 
         return v.env();
     }
@@ -636,10 +636,10 @@ public class LocalClassRemover extends ContextVisitor
         body = (ClassBody) body.visit(v);
         v.finish();
 
-        System.out.println("----------------------------------");
-        System.out.println("new class body:");
-        body.del().prettyPrint(System.out);
-        System.out.println("----------------------------------");
+//        System.out.println("----------------------------------");
+//        System.out.println("new class body:");
+//        body.del().prettyPrint(System.out);
+//        System.out.println("----------------------------------");
 
         ClassDecl cd = createMemberClass(ct, body);
         cd = cd.type(ct);
