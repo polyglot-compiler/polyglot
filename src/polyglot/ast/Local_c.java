@@ -137,17 +137,10 @@ public class Local_c extends Expr_c implements Local
     return localInstance(li).type(li.type());
   }
 
-  /**
-   * Return the first (sub)term performed when evaluating this
-   * term.
-   */
-  public Term entry() {
-      return this;
+  public Term firstChild() {
+      return null;
   }
 
-  /**
-   * Visit this term in evaluation order.
-   */
   public List acceptCFG(CFGBuilder v, List succs) {
       return succs;
   }

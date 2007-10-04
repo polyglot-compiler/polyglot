@@ -109,13 +109,13 @@ public class Synchronized_c extends Stmt_c implements Synchronized
 	printSubStmt(body, w, tr);
     }
 
-    public Term entry() {
-        return expr.entry();
+    public Term firstChild() {
+        return expr;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(expr, body.entry());
-        v.visitCFG(body, this);
+        v.visitCFG(expr, body, ENTRY);
+        v.visitCFG(body, this, EXIT);
         return succs;
     }
     

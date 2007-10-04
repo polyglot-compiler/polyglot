@@ -595,26 +595,26 @@ public class New_c extends Expr_c implements New
         printBody(w, tr);
     }
     
-    public Term entry() {
-        if (qualifier != null) return qualifier.entry();
-        return tn.entry();
+    public Term firstChild() {
+        return qualifier != null ? (Term) qualifier : tn;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        Term afterArgs = this;
-        if (body() != null) {
-            afterArgs = body();
-        }
-
         if (qualifier != null) {
-            v.visitCFG(qualifier, tn.entry());
+            v.visitCFG(qualifier, tn, ENTRY);
         }
-        v.visitCFG(tn, listEntry(arguments, afterArgs));
-
-        v.visitCFGList(arguments, afterArgs);
-
+        
         if (body() != null) {
-            v.visitCFG(body(), this);
+            v.visitCFG(tn, listChild(arguments, body()), ENTRY);
+            v.visitCFGList(arguments, body(), ENTRY);
+            v.visitCFG(body(), this, EXIT);
+        } else {
+            if (!arguments.isEmpty()) {
+                v.visitCFG(tn, listChild(arguments, null), ENTRY);
+                v.visitCFGList(arguments, this, EXIT);
+            } else {
+                v.visitCFG(tn, this, EXIT);
+            }
         }
 
         return succs;

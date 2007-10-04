@@ -23,21 +23,21 @@ public class AmbAssign_c extends Assign_c implements AmbAssign
     super(pos, left, op, right);
   }
   
-  public Term entry() {
+  public Term firstChild() {
     if (operator() != Assign.ASSIGN) {
       return left();
     }
 
-    return right().entry();
+    return right();
   }
   
   protected void acceptCFGAssign(CFGBuilder v) {
-      v.visitCFG(right(), this);
+      v.visitCFG(right(), this, EXIT);
   }
   
   protected void acceptCFGOpAssign(CFGBuilder v) {
-      v.edge(left(), right().entry());
-      v.visitCFG(right(), this);
+      v.visitCFG(left(), right(), ENTRY);
+      v.visitCFG(right(), this, EXIT);
   }
   
   public Node disambiguate(AmbiguityRemover ar) throws SemanticException {

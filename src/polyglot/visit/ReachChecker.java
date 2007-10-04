@@ -63,15 +63,16 @@ public class ReachChecker extends DataFlow
         }
     }
 
-    public Item createInitialItem(FlowGraph graph, Term node) {
-        if (node == graph.entryNode()) {
+    public Item createInitialItem(FlowGraph graph, Term node, boolean entry) {
+        if (node == graph.root() && entry) {
             return DataFlowItem.REACHABLE;
         }
         else {
             return DataFlowItem.NOT_REACHABLE;
         }
     }
-    public Map flow(Item in, FlowGraph graph, Term n, Set succEdgeKeys) {
+    
+    public Map flow(Item in, FlowGraph graph, Term n, boolean entry, Set succEdgeKeys) {
         if (in == DataFlowItem.NOT_REACHABLE) {
             return itemToMap(in, succEdgeKeys);
         }
@@ -94,11 +95,12 @@ public class ReachChecker extends DataFlow
         return m;
     }
 
-    public Item confluence(List inItems, Term node, FlowGraph graph) {
+    public Item confluence(List inItems, Term node, boolean entry, FlowGraph graph) {
         throw new InternalCompilerError("Should never be called.");
     }
 
-    public Item confluence(List inItems, List itemKeys, Term node, FlowGraph graph) {
+    public Item confluence(List inItems, List itemKeys, 
+            Term node, boolean entry, FlowGraph graph) {
         // if any predecessor is reachable, so is this one, and if any
         // predecessor is normal reachable, and the edge key is not an 
         // exception edge key, then so is this one.
@@ -136,12 +138,12 @@ public class ReachChecker extends DataFlow
                // Do we throw an exception or not?
                
                // Compound statements are allowed to be unreachable
-               // (e.g., "{ // return; }" or "while (true) S").  If a compound
-               // statement is truly unreachable, one of its sub-statements will
-               // be also and we will report an error there.
+               // (e.g., "{ return; }" or "while (true) S").  If a compound
+               // statement is truly unreachable, one of its sub-statements
+               // will be also and we will report an error there.
 
                if ((n instanceof Block && ((Block) n).statements().isEmpty()) ||
-                       (n instanceof Stmt && ! (n instanceof CompoundStmt))) {
+                   (n instanceof Stmt && ! (n instanceof CompoundStmt))) {
                    throw new SemanticException("Unreachable statement.",
                                                n.position());
                }
@@ -155,7 +157,7 @@ public class ReachChecker extends DataFlow
     protected Node checkReachability(Term n) throws SemanticException {
         FlowGraph g = currentFlowGraph();
         if (g != null) {   
-            Collection peers = g.peers(n);
+            Collection peers = g.peers(n, Term.EXIT);
             if (peers != null && !peers.isEmpty()) {
                 boolean isInitializer = (n instanceof Initializer);
                 
@@ -208,7 +210,8 @@ public class ReachChecker extends DataFlow
         }
     } 
 
-    public void check(FlowGraph graph, Term n, Item inItem, Map outItems) throws SemanticException {
+    public void check(FlowGraph graph, Term n, boolean entry, 
+            Item inItem, Map outItems) throws SemanticException {
         throw new InternalCompilerError("ReachChecker.check should " +
                 "never be called.");
     }

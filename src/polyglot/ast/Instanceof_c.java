@@ -117,13 +117,13 @@ public class Instanceof_c extends Expr_c implements Instanceof
 	print(compareType, w, tr);
     }
 
-    public Term entry() {
-        return expr.entry();
+    public Term firstChild() {
+        return expr;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(expr, compareType.entry());
-        v.visitCFG(compareType, this);
+        v.visitCFG(expr, compareType, ENTRY);
+        v.visitCFG(compareType, this, EXIT);
         return succs;
     }
     

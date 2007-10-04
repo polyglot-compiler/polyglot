@@ -191,9 +191,9 @@ public class ClassBody_c extends Term_c implements ClassBody
      * Return the first (sub)term performed when evaluating this
      * term.
      */
-    public Term entry() {
+    public Term firstChild() {
         // Do _not_ visit class members.
-        return this;
+        return null;
     }
 
     /**

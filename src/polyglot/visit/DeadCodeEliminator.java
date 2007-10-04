@@ -113,11 +113,11 @@ public class DeadCodeEliminator extends DataFlow {
 	}
     }
 
-    public Item createInitialItem(FlowGraph graph, Term node) {
+    public Item createInitialItem(FlowGraph graph, Term node, boolean entry) {
 	return new DataFlowItem();
     }
 
-    public Item confluence(List inItems, Term node, FlowGraph graph) {
+    public Item confluence(List inItems, Term node, boolean entry, FlowGraph graph) {
 	DataFlowItem result = null;
 	for (Iterator it = inItems.iterator(); it.hasNext(); ) {
 	    DataFlowItem inItem = (DataFlowItem)it.next();
@@ -131,12 +131,16 @@ public class DeadCodeEliminator extends DataFlow {
 	return result;
     }
 
-    public Map flow(Item in, FlowGraph graph, Term t, Set succEdgeKeys) {
-	return itemToMap(flow(in, graph, t), succEdgeKeys);
+    public Map flow(Item in, FlowGraph graph, Term t, boolean entry, Set succEdgeKeys) {
+	return itemToMap(flow(in, graph, t, entry), succEdgeKeys);
     }
 
-    protected DataFlowItem flow(Item in, FlowGraph graph, Term t) {
+    protected DataFlowItem flow(Item in, FlowGraph graph, Term t, boolean entry) {
 	DataFlowItem result = new DataFlowItem((DataFlowItem)in);
+    
+    if (entry) {
+        return result;
+    }
 
 	Set[] du = null;
 
@@ -178,7 +182,7 @@ public class DeadCodeEliminator extends DataFlow {
 	}
     }
 
-    public void check(FlowGraph graph, Term n, Item inItem, Map outItems)
+    public void check(FlowGraph graph, Term n, boolean entry, Item inItem, Map outItems)
 	throws SemanticException {
 
 	throw new InternalCompilerError("DeadCodeEliminator.check should "
@@ -189,7 +193,7 @@ public class DeadCodeEliminator extends DataFlow {
 	FlowGraph g = currentFlowGraph();
 	if (g == null) return null;
 
-	Collection peers = g.peers(n);
+	Collection peers = g.peers(n, Term.EXIT);
 	if (peers == null || peers.isEmpty()) return null;
 
 	List items = new ArrayList();
@@ -198,7 +202,7 @@ public class DeadCodeEliminator extends DataFlow {
 	    if (p.inItem() != null) items.add(p.inItem());
 	}
 
-	return (DataFlowItem)confluence(items, n, g);
+	return (DataFlowItem)confluence(items, n, false, g);
     }
 
     public Node leaveCall(Node old, Node n, NodeVisitor v)

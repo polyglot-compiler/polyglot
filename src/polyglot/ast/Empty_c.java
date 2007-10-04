@@ -26,17 +26,10 @@ public class Empty_c extends Stmt_c implements Empty
 	w.write(";");
     }
 
-    /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     */
-    public Term entry() {
-        return this;
+    public Term firstChild() {
+        return null;
     }
 
-    /**
-     * Visit this term in evaluation order.
-     */
     public List acceptCFG(CFGBuilder v, List succs) {
         return succs;
     }

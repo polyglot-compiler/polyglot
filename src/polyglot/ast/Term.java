@@ -18,10 +18,24 @@ import java.util.*;
 public interface Term extends Node
 {
     /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
+     * Indicates to dataflow methods that we are looking at the entry of a term.
      */
-    public Term entry();
+    public static final int ENTRY = 1;
+    
+    /**
+     * Indicates to dataflow methods that we are looking at the exit of a term.
+     */
+    public static final int EXIT = 0;
+    
+    /**
+     * Return the first direct subterm performed when evaluating this term. If
+     * this term has no subterms, this should return null.
+     * 
+     * This method is similar to the deprecated entry(), but it should *not*
+     * recursively drill down to the innermost subterm. The direct child visited
+     * first in this term's dataflow should be returned.
+     */
+    public Term firstChild();
 
     /**
      * Visit this node, calling calling v.edge() for each successor in succs,

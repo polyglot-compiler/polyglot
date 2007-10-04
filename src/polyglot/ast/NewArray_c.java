@@ -172,17 +172,20 @@ public class NewArray_c extends Expr_c implements NewArray
 	}
     }
 
-    public Term entry() {
-        return baseType.entry();
+    public Term firstChild() {
+        return baseType;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        Term next = init != null ? init.entry() : this;
-        v.visitCFG(baseType, listEntry(dims, next));
-        v.visitCFGList(dims, next);
         if (init != null) {
-            v.visitCFG(init, this);
+            v.visitCFG(baseType, listChild(dims, init), ENTRY);
+            v.visitCFGList(dims, init, ENTRY);
+            v.visitCFG(init, this, EXIT);
+        } else {
+            v.visitCFG(baseType, listChild(dims, null), ENTRY);
+            v.visitCFGList(dims, this, EXIT);
         }
+        
         return succs;
     }
     

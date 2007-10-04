@@ -7,16 +7,16 @@
 
 package polyglot.types;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import polyglot.frontend.Job;
-import polyglot.frontend.goals.SupertypesResolved;
 import polyglot.main.Options;
-import polyglot.types.*;
-import polyglot.types.Package;
+import polyglot.util.CodeWriter;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
-import polyglot.util.CodeWriter;
 
 /**
  * A <code>ClassType</code> represents a class -- either loaded from a

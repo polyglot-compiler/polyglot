@@ -94,12 +94,12 @@ public abstract class AbstractBlock_c extends Stmt_c implements Block
 	w.end();
     }
 
-    public Term entry() {
-        return listEntry(statements, this);
+    public Term firstChild() {
+        return listChild(statements, null);
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFGList(statements, this);
+        v.visitCFGList(statements, this, EXIT);
         return succs;
     }
 

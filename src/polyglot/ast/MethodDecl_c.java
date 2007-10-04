@@ -412,26 +412,21 @@ public class MethodDecl_c extends Term_c implements MethodDecl
         w.end();
     }
 
-    /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     */
-    public Term entry() {
-        return listEntry(formals(), returnType.entry());
+    public Term firstChild() {
+        return listChild(formals(), returnType());
     }
 
-    /**
-     * Visit this term in evaluation order.
-     */
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFGList(formals(), returnType.entry());
+        v.visitCFGList(formals(), returnType(), ENTRY);
+        
         if (body() == null) {
-            v.visitCFG(returnType, this);
+            v.visitCFG(returnType(), this, EXIT);
         }
         else {
-            v.visitCFG(returnType, body().entry());
-            v.visitCFG(body(), this);
+            v.visitCFG(returnType(), body(), ENTRY);
+            v.visitCFG(body(), this, EXIT);
         }
+        
         return succs;
     }
 

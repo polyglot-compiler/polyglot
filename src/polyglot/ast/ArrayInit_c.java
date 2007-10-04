@@ -165,12 +165,12 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 	w.write(" }");
     }
 
-    public Term entry() {
-        return listEntry(elements, this);
+    public Term firstChild() {
+        return listChild(elements, null);
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFGList(elements, this);
+        v.visitCFGList(elements, this, EXIT);
         return succs;
     }
     public Node copy(NodeFactory nf) {

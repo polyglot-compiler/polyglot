@@ -361,23 +361,18 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
         return child.type();
     }
 
-    /**
-     * Return the first (sub)term performed when evaluating this
-     * term.
-     */
-    public Term entry() {
-        return type.entry();
+    public Term firstChild() {
+        return type;
     }
 
-    /**
-     * Visit this term in evaluation order.
-     */
-    public List acceptCFG(CFGBuilder v, List succs) {        
-        Term next = init != null ? init.entry() : this;
-        v.visitCFG(type, next);
+    public List acceptCFG(CFGBuilder v, List succs) {
         if (init != null) {
-            v.visitCFG(init, this);
+            v.visitCFG(type, init, ENTRY);
+            v.visitCFG(init, this, EXIT);
+        } else {
+            v.visitCFG(type, this, EXIT);
         }
+        
         return succs;
     }
 

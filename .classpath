@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry output="tools/java_cup/classes" kind="src" path="tools/java_cup/src"/>
-	<classpathentry output="tools/ppg/classes" kind="src" path="tools/ppg/src"/>
-	<classpathentry output="tools/pth/classes" kind="src" path="tools/pth/src"/>
+	<classpathentry kind="src" output="tools/java_cup/classes" path="tools/java_cup/src"/>
+	<classpathentry kind="src" output="tools/ppg/classes" path="tools/ppg/src"/>
+	<classpathentry kind="src" output="tools/pth/classes" path="tools/pth/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

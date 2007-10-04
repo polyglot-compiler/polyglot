@@ -1,0 +1,181 @@
+=== Dataflow framework changes in the DATAFLOW_2_0 branch ===
+
+The CFGBuilder and DataFlow classes were modified in the DATAFLOW_2_0 branch
+to add new functionality that hopefully makes some dataflow analyses easier
+in Polyglot.
+
+In the old framework, Terms appear only once in the CFG, at the point where
+execution essentially "exits" the term. For example, the node for an If
+statement would be inserted at the point where control flow merges after the
+separate branches.
+
+The new framework inserts an additional node into the CFG at the "entry" of a
+term. An if statement, for example, will now have an entry node before the nodes
+for the condition expression and the statements in the branches.
+
+
+=== Summary of changes in various classes ===
+
+CFGBilder: In order to provide this functionality, several visit methods now
+have an additional int enum argument to indicate whether we wish to visit the
+entry or the exit of a term. The possible values are Term.ENTRY and TERM.EXIT.
+
+DataFlow: Most methods working with the CFG now have an additional boolean
+argument to indicate whether we are looking at the entry node or the exit.
+
+FlowGraph: The entry, exit, start, and finish methods were removed since they
+will all return the same thing: the root node. In their place, there are
+entryPeers, exitPeers, startPeers, and finishPeers that return the set of peers
+at those points.
+
+Term: The entry method has been removed, since the entry of a term is simply
+itself. Instead, the method firstChild should be implemented. The difference
+between entry and firstChild is that firstChild is not expected to recursively
+drill down to the innermost sub-term to be evaluated first. It should return
+the direct sub-term instead.
+
+
+=== What it means for extensions ===
+
+1. AST changes
+
+The major update that extensions will have to make is to AST nodes that override
+acceptCFG or entry. Changing entry() should be straightforward. First, rename it
+to firstChild(). Second, if it previously returned someChild.entry(), just
+return someChild instead; in situations where it returned "this", return null
+instead.
+
+For the acceptCFG methods, we need to change the calls to the CFGBuilder.visit
+methods to use the new signatures.
+
+If there was a call to visitCFG(from, to), it should be replaced with
+visitCFG(from, to, EXIT) to indicate that we mean the exit of the "to" term.
+(The exit of the "from" term is implied.)
+
+A call to visitCFG(from, to.entry()) should be changed to
+visitCFG(from, to, ENTRY), indicating that the entry of the "to" term is meant.
+
+Examples of the acceptCFG and firstChild methods in terms such as If_c should be
+helpful. Here is a snippet of the before and after versions of If_c:
+
+** Old code **
+
+    public Term entry() {
+        return cond.entry();
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        if (alternative == null) {
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent.entry(), 
+                             FlowGraph.EDGE_KEY_FALSE, this);
+            v.visitCFG(consequent, this);
+        }
+        else {
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent.entry(),
+                             FlowGraph.EDGE_KEY_FALSE, alternative.entry());
+            v.visitCFG(consequent, this);
+            v.visitCFG(alternative, this);
+        }
+
+        return succs;
+    }
+
+** New code **
+
+    public Term firstChild() {
+        return cond;
+    }
+
+    public List acceptCFG(CFGBuilder v, List succs) {
+        if (alternative == null) {
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY, 
+                             FlowGraph.EDGE_KEY_FALSE, this, EXIT);
+            v.visitCFG(consequent, this, EXIT);
+        }
+        else {
+            v.visitCFG(cond, FlowGraph.EDGE_KEY_TRUE, consequent, ENTRY,
+                             FlowGraph.EDGE_KEY_FALSE, alternative, ENTRY);
+            v.visitCFG(consequent, this, EXIT);
+            v.visitCFG(alternative, this, EXIT);
+        }
+
+        return succs;
+    }
+
+2. DataFlow changes
+
+The AST changes would allow CFGs to be built correctly. Now, to use the
+new CFGs, subclasses of DataFlow need to be updated to add the "entry" parameter
+to methods such as flow and check. This parameter indicates whether we are
+flowing over the entry or the exit node. To keep analyses working as they are,
+void methods can simply return when entry is true; flow methods should return
+the in-item unchanged when entry is true.
+
+We describe here how to change specific methods in DataFlow subclasses so they
+are compatible with the new framework. These are the minimal changes needed to
+make the methods function in essentially the same way as they did under the old
+framework.
+
+** flow() **
+
+To retain old behavior, a flow method should return the in-item unchanged if
+entry is true. For example:
+
+    public Map flow(Item in, 
+                    FlowGraph graph, 
+                    Term n, 
+                    boolean entry,  /* New parameter */
+                    Set succEdgeKeys) {
+
+        /* To preserve old behavior, just return if entry is true */
+        if (entry) {
+            return itemToMap(in, succEdgeKeys);
+        }
+
+        /* ... Code as before */
+    }
+
+Note: A convention was taken to consistently add the "entry" parameter
+immediately after the "Term n" parameter, since it is closely tied to the term.
+
+** createInitialItem() **
+
+In most cases, this method can be left unchanged except for adding the boolean
+entry parameter to the signature.
+
+Some analyses check the term to determine what item to return. Most of the time,
+this checks whether the term is the entry to the flow graph:
+
+    if (node == graph.entry()) { ... }
+
+The entry() method was removed from FlowGraph, since it is now meaningless (it
+would return the same thing as exit()). Instead, use
+
+    if (node == graph.root() && entry) { ... }
+    
+Similarly, (node == graph.root() && !entry) would indicate the equivalent of
+exit().
+
+** confluence() **
+
+Most analyses perform confluence without regard to which term the item is
+flowing into. In such cases, there is no need to change confluence() except for
+the method signature. If an analysis does perform confluence in different ways
+depending on the term, then changes specific to the analysis might have to be
+made.
+
+** check() **
+
+One can simply return if entry is true.
+
+    protected void check(FlowGraph graph, 
+                         Term n, 
+                         boolean entry, 
+                         Item inItem,
+                         Map outItems) throws SemanticException {
+        if (entry) {
+            return;
+        }
+        
+        /* ... Code as before */
+    }

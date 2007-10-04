@@ -120,12 +120,12 @@ public class Initializer_c extends Term_c implements Initializer
      * Return the first (sub)term performed when evaluating this
      * term.
      */
-    public Term entry() {
-        return this.body().entry();
+    public Term firstChild() {
+        return body();
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(this.body(), this);
+        v.visitCFG(body(), this, EXIT);
         return succs;
     }
 
