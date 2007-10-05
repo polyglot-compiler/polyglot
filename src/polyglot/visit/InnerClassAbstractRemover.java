@@ -29,8 +29,19 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor
         super(job, ts, nf);
     }
 
+    protected String namePrefix() {
+        return "jl$";
+    }
+    
     /**
-     * Returns the inner class environment of the given class type and,
+     * Mangles the name of the given class.  Used to produce names of fields.
+     */
+    String mangleClassName(ClassType ct) {
+      return namePrefix() + ct.fullName().replace('.', '$');
+    }
+
+    /**
+     * Returns the inner-class environment of the given class type and,
      * optionally, its super types. The "inner class environment" of a class
      * type is defined recursively as:
      * <ul>
@@ -95,6 +106,18 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor
         return formals;
     }
     
+    /**
+     * Turns an inner class's environment into a list of actual arguments to be
+     * used when constructing the inner class.
+     * 
+     * @param env
+     *          the inner class's environment.
+     * @param outer
+     *          the class enclosing the inner class.
+     * @param qualifier
+     *          the <code>new</code> expression's qualifier.
+     * @see polyglot.visit.InnerClassAbstractRemover#env(ClassType, boolean)
+     */
     List envAsActuals(List env, ClassType outer, Expr qualifier) {
         List actuals = new ArrayList();
         for (Iterator i = env.iterator(); i.hasNext(); ) {
@@ -103,6 +126,26 @@ public abstract class InnerClassAbstractRemover extends ContextVisitor
                 actuals.add(qualifier);
                 continue;
             }
+            
+            if (outer != null) {
+              // XXX Search "outer" for a field whose name and type matches "ct".
+              String name = mangleClassName(ct);
+              FieldInstance fi = outer.fieldNamed(name);
+              if (fi != null && fi.type().equals(ct)) {
+                // Use the field.
+                Special this_ =
+                  nf.Special(Position.compilerGenerated(), Special.THIS);
+                this_ = (Special) this_.type(ct);
+                Field field =
+                  nf.Field(Position.compilerGenerated(), this_, nf.Id(Position
+                      .compilerGenerated(), name));
+                field = field.fieldInstance(fi);
+                field = (Field) field.type(fi.type());
+                actuals.add(field);
+                continue;
+              }
+            }
+            
             TypeNode tn = nf.CanonicalTypeNode(Position.compilerGenerated(), ct);
             Special this_ = nf.Special(Position.compilerGenerated(), Special.THIS, tn);
             this_ = (Special) this_.type(ct);

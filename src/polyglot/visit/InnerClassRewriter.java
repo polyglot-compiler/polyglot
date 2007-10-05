@@ -29,14 +29,18 @@ public class InnerClassRewriter extends InnerClassAbstractRemover
         super(job, ts, nf);
     }
 
-    protected String namePrefix() {
-        return "jl$";
-    }
-
-    FieldInstance localToField(ParsedClassType ct, ClassType outer, int i) {
+    /**
+     * Translates a local class type into a field instance.
+     * 
+     * @param ct
+     *          the class type that will contain the field.
+     * @param outer
+     *          the class type for which a field is to be created.
+     */
+    FieldInstance localToField(ParsedClassType ct, ClassType outer) {
         FieldInstance fi = ts.fieldInstance(Position.compilerGenerated(), ct,
                                             Flags.FINAL.Protected(), outer,
-                                            namePrefix() + outer.fullName().replace('.', '$'));
+                                            mangleClassName(outer));
         return fi;
     }
     
@@ -204,10 +208,9 @@ public class InnerClassRewriter extends InnerClassAbstractRemover
 
         Map fieldMap = new HashMap();
 
-        int index = 1;
-        for (Iterator i = env.iterator(); i.hasNext(); index++) {
+        for (Iterator i = env.iterator(); i.hasNext(); ) {
             ClassType outer = (ClassType) i.next();
-            FieldInstance fi = localToField(ct, outer, index);
+            FieldInstance fi = localToField(ct, outer);
             fieldMap.put(outer, fi);
             ct.addField(fi);
             members.add(createFieldDecl(fi));
