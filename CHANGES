@@ -3,7 +3,7 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
-Oct 2, 2007: Polyglot 2.3
+Oct 5, 2007: Polyglot 2.3
 =========================
 
 Dataflow framework changed to add functionality. CFGs now have two nodes per
