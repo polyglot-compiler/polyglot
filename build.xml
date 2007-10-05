@@ -1,4 +1,4 @@
-<project name="polyglot" default="base" basedir=".">
+<project name="polyglot" default="compile" basedir=".">
 	<description>
     Polyglot build file
   </description>
@@ -116,6 +116,9 @@
 
 	<!-- build everything -->
 	<target name="all" depends="jar-all" description="Build everything" />
+
+        <!-- build the base compiler, qq, and pth -->
+        <target name="compile" depends="base,base-qq,pth" description="Build the base compiler, qq, and pth" />
 
 	<!-- build the base compiler -->
 	<target name="base" depends="bin,base-parser,compile-base,base-qq" description="Build the base compiler" />
