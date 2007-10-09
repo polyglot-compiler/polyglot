@@ -130,6 +130,8 @@ public interface DelFactory
     
     JL delNode();
     
+    JL delNodeList();
+    
     JL delNew();
     
     JL delNullLit();

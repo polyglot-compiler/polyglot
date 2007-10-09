@@ -644,6 +644,16 @@ public abstract class AbstractExtFactory_c implements ExtFactory
         }
         return postExtNode(e);
     }
+    
+    public final Ext extNodeList() {
+        Ext e = extNodeListImpl();
+        
+        if (nextExtFactory != null) {
+            Ext e2 = nextExtFactory.extNode();
+            e = composeExts(e, e2);
+        }
+        return postExtNodeList(e);
+    }
 
     public final Ext extNew() {
         Ext e = extNewImpl();
@@ -1314,6 +1324,14 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     protected Ext extNodeImpl() {
         return null;
     }
+    
+    /**
+     * Create the <code>Ext</code> object for a <code>NodeList</code> AST node.
+     * @return the <code>Ext</code> object for a <code>NodeList</code> AST node.
+     */
+    protected Ext extNodeListImpl() {
+        return extNodeImpl();
+    }
 
     /**
      * Create the <code>Ext</code> object for a <code>New</code> AST node.
@@ -1715,6 +1733,10 @@ public abstract class AbstractExtFactory_c implements ExtFactory
 
     protected Ext postExtNode(Ext ext) {
         return ext;
+    }
+    
+    protected Ext postExtNodeList(Ext ext) {
+        return postExtNode(ext);
     }
 
     protected Ext postExtNew(Ext ext) {

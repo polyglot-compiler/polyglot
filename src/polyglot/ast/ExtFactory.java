@@ -137,6 +137,8 @@ public interface ExtFactory
     
     Ext extNode();
     
+    Ext extNodeList();
+    
     Ext extNew();
     
     Ext extNullLit();

@@ -68,9 +68,10 @@ public class Do_c extends Loop_c implements Do
 
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
-	Stmt body = (Stmt) visitChild(this.body, v);
+        Node body = visitChild(this.body, v);
+        if (body instanceof NodeList) body = ((NodeList) body).toBlock();
 	Expr cond = (Expr) visitChild(this.cond, v);
-	return reconstruct(body, cond);
+	return reconstruct((Stmt) body, cond);
     }
 
     /** Type check the statement. */

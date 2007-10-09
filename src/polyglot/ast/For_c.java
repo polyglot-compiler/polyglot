@@ -101,8 +101,9 @@ public class For_c extends Loop_c implements For
 	List inits = visitList(this.inits, v);
 	Expr cond = (Expr) visitChild(this.cond, v);
 	List iters = visitList(this.iters, v);
-	Stmt body = (Stmt) visitChild(this.body, v);
-	return reconstruct(inits, cond, iters, body);
+        Node body = visitChild(this.body, v);
+	if (body instanceof NodeList) body = ((NodeList) body).toBlock();
+	return reconstruct(inits, cond, iters, (Stmt) body);
     }
 
     public Context enterScope(Context c) {

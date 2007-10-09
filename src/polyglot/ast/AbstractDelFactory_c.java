@@ -647,6 +647,16 @@ public abstract class AbstractDelFactory_c implements DelFactory
         return postDelNode(e);
     }
 
+    public final JL delNodeList() {
+        JL e = delNodeListImpl();
+
+        if (nextDelFactory != null) {
+            JL e2 = nextDelFactory.delNode();
+            e = composeDels(e, e2);
+        }
+        return postDelNodeList(e);
+    }
+
     public final JL delNew() {
         JL e = delNewImpl();
 
@@ -1313,6 +1323,14 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     /**
+     * Create the delegate for a <code>NodeList</code> AST node.
+     * @return the delegate for a <code>NodeList</code> AST node.
+     */
+    protected JL delNodeListImpl() {
+        return delNodeImpl();
+    }
+
+    /**
      * Create the delegate for a <code>New</code> AST node.
      * @return the delegate for a <code>New</code> AST node.
      */
@@ -1710,6 +1728,10 @@ public abstract class AbstractDelFactory_c implements DelFactory
 
     protected JL postDelNode(JL del) {
         return del;
+    }
+
+    protected JL postDelNodeList(JL del) {
+        return postDelNode(del);
     }
 
     protected JL postDelNew(JL del) {

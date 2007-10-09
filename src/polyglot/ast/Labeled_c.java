@@ -77,8 +77,22 @@ public class Labeled_c extends Stmt_c implements Labeled
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
         Id label = (Id) visitChild(this.label, v);
-	Stmt statement = (Stmt) visitChild(this.statement, v);
-	return reconstruct(label, statement);
+	Node statement = visitChild(this.statement, v);
+        
+        if (statement instanceof NodeList) {
+          // Return a NodeList of statements, applying the label to the first
+          // statement.
+          NodeList nl = (NodeList) statement;
+          List stmts = new ArrayList(nl.nodes());
+          
+          Stmt first = (Stmt) stmts.get(0);
+          first = reconstruct(label, first);
+          stmts.set(0, first);
+          
+          return nl.nodes(stmts);
+        }
+        
+	return reconstruct(label, (Stmt) statement);
     }
 
     public String toString() {

@@ -68,8 +68,19 @@ public class LocalClassDecl_c extends Stmt_c implements LocalClassDecl
 
     /** Visit the children of the statement. */
     public Node visitChildren(NodeVisitor v) {
-        ClassDecl decl = (ClassDecl) visitChild(this.decl, v);
-        return reconstruct(decl);
+        Node decl = visitChild(this.decl, v);
+        if (decl instanceof NodeList) {
+          // Return a NodeList of LocalClassDecls.
+          NodeList nl = (NodeList) decl;
+          List decls = new ArrayList(nl.nodes());
+          for (ListIterator it = decls.listIterator(); it.hasNext(); ) {
+            ClassDecl cd = (ClassDecl) it.next();
+            it.set(reconstruct(cd));
+          }
+          return nl.nodes(decls);
+        }
+        
+        return reconstruct((ClassDecl) decl);
     }
 
     public void addDecls(Context c) {

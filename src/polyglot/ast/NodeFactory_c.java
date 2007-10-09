@@ -418,6 +418,13 @@ public class NodeFactory_c extends AbstractNodeFactory_c
         n = (NewArray)n.del(delFactory.delNewArray());
         return n;
     }
+    
+    public NodeList NodeList(Position pos, NodeFactory nf, List nodes) {
+        NodeList n = new NodeList_c(pos, nf, nodes);
+        n = (NodeList) n.ext(extFactory.extNodeList());
+        n = (NodeList) n.del(delFactory.delNodeList());
+        return n;
+    }
 
     public NullLit NullLit(Position pos) {
         NullLit n = new NullLit_c(pos);

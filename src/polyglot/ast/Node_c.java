@@ -234,7 +234,9 @@ public abstract class Node_c implements Node
 	    if (n != m) {
 	        result = vl;
 	    }
-	    if (m != null) {
+            if (m instanceof NodeList) {
+                vl.addAll(((NodeList) m).nodes());
+            } else if (m != null) {
 	        vl.add(m);
 	    }
 	}
