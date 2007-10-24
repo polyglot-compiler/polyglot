@@ -330,30 +330,35 @@ public class InitChecker extends DataFlow
             // be sure that all of the initializer blocks have been processed,
             // we can now process the constructors.
             
-            for (Iterator iter = currCBI.allConstructors.iterator(); 
-                    iter.hasNext(); ) {
-                ConstructorDecl cd = (ConstructorDecl)iter.next();
+            try {
+                for (Iterator iter = currCBI.allConstructors.iterator(); 
+                        iter.hasNext(); ) {
+                    ConstructorDecl cd = (ConstructorDecl)iter.next();
+                    
+                    // rely on the fact that our dataflow does not change the
+                    // AST, so we can discard the result of this call.
+
+                    dataflow(cd);
+                }
                 
-                // rely on the fact that our dataflow does not change the AST,
-                // so we can discard the result of this call.
-                dataflow(cd);                
+                // check that all static fields have been initialized exactly
+                // once 
+                checkStaticFinalFieldsInit((ClassBody)n);
+                
+                // check that at the end of each constructor all non-static
+                // final fields are initialzed.
+                checkNonStaticFinalFieldsInit((ClassBody)n);
+                
+                // copy the locals used to the outer scope
+                if (currCBI.outer != null) {
+                    currCBI.outer.localsUsedInClassBodies.put(n, 
+                                                  currCBI.outerLocalsUsed);
+                }
             }
-            
-            // check that all static fields have been initialized exactly once 
-            checkStaticFinalFieldsInit((ClassBody)n);
-            
-            // check that at the end of each constructor all non-static final
-            // fields are initialzed.
-            checkNonStaticFinalFieldsInit((ClassBody)n);
-            
-            // copy the locals used to the outer scope
-            if (currCBI.outer != null) {
-                currCBI.outer.localsUsedInClassBodies.put(n, 
-                                                    currCBI.outerLocalsUsed);
+            finally { 
+                // pop the stack
+                currCBI = currCBI.outer;
             }
-            
-            // pop the stack
-            currCBI = currCBI.outer;
         }
 
         return super.leaveCall(old, n, v);
@@ -411,7 +416,7 @@ public class InitChecker extends DataFlow
                 if (fi.flags().isStatic() && fi.flags().isFinal()) {
                     MinMaxInitCount initCount = (MinMaxInitCount)e.getValue();
                     if (InitCount.ZERO.equals(initCount.getMin())) {
-                        throw new SemanticException("field \"" + fi.name() +
+                        throw new SemanticException("Final field \"" + fi.name() +
                             "\" might not have been initialized",
                             cb.position());                                
                     }
@@ -459,7 +464,7 @@ public class InitChecker extends DataFlow
                         Set s = (Set)currCBI.fieldsConstructorInitializes.get(ci.orig());
                         if (s != null && s.contains(fi)) {
                             if (isInitialized) {
-                                throw new SemanticException("field \"" + fi.name() +
+                                throw new SemanticException("Final field \"" + fi.name() +
                                         "\" might have already been initialized",
                                         cd.position());                                                                        
                             }
@@ -468,7 +473,7 @@ public class InitChecker extends DataFlow
                         ci = (ConstructorInstance)currCBI.constructorCalls.get(ci.orig());
                     }
                     if (!isInitialized) {
-                        throw new SemanticException("field \"" + fi.name() +
+                        throw new SemanticException("Final field \"" + fi.name() +
                                 "\" might not have been initialized",
                                 ciStart.position());                                
                                 
@@ -1014,8 +1019,8 @@ public class InitChecker extends DataFlow
                                dfOut.initStatus.get(li.orig());                                
 
         if (li.flags().isFinal() && InitCount.MANY.equals(initCount.getMax())) {
-            throw new SemanticException("variable \"" + li.name() +
-                                        "\" might already have been assigned to",
+            throw new SemanticException("Final variable \"" + li.name() +
+                                        "\" might already have been initialized",
                                         a.position());
         }
     }
