@@ -781,14 +781,21 @@ public class InitChecker extends DataFlow
      * the field is not static then the target must be "this".
      */
     protected boolean isFieldsTargetAppropriate(Field f) {
+        CodeInstance ci = currCBI.currCodeDecl.codeInstance();
+        ClassType containingClass = currCBI.currClass;
+
         if (f.fieldInstance().flags().isStatic()) {
-            CodeInstance ci = currCBI.currCodeDecl.codeInstance();
-            ClassType containingClass = currCBI.currClass;
             return containingClass.equals(f.fieldInstance().orig().container());
         }
         else {
-            return (f.target() instanceof Special && 
-                    Special.THIS.equals(((Special)f.target()).kind()));
+            if (f.target() instanceof Special) {
+                Special s = (Special) f.target();
+                if (Special.THIS.equals(s.kind())) {
+                    return s.qualifier() == null
+                        || containingClass.equals(s.qualifier().type());
+                }
+            }
+            return false;
         }
     }
     /**
@@ -1036,9 +1043,16 @@ public class InitChecker extends DataFlow
                 // assigned to at most once.                    
                 MinMaxInitCount initCount = (MinMaxInitCount) 
                                        dfOut.initStatus.get(fi.orig());
+                if (initCount == null) {
+                    // This should not happen.
+                    throw new InternalCompilerError(
+                            "Dataflow information not found for field \"" +
+                            fi.name() + "\".",
+                            a.position());
+                }
                 if (InitCount.MANY.equals(initCount.getMax())) {
-                    throw new SemanticException("field \"" + fi.name() +
-                            "\" might already have been assigned to",
+                    throw new SemanticException("Final field \"" + fi.name() +
+                            "\" might already have been initialized",
                             a.position());
                 }                                    
             }
@@ -1047,7 +1061,8 @@ public class InitChecker extends DataFlow
                 // not appropriate. So we cannot assign 
                 // to a final field at all.
                 throw new SemanticException("Cannot assign a value " +
-                           "to final field \"" + fi.name() + "\"",
+                           "to final field \"" + fi.name() + "\" of \"" +
+                           fi.orig().container() + "\".",
                            a.position());
             }
         }                        
