@@ -121,6 +121,7 @@ public class ClassSerializer extends NodeVisitor
 	    fi = ts.fieldInstance(pos, ct,
                                   flags, ts.String(),
                                   "jlc$CompilerVersion$" + suffix);
+            fi.setConstantValue(version);
             ii = ts.initializerInstance(pos, ct, Flags.STATIC);
 	    f = nf.FieldDecl(fi.position(), fi.flags(),
 		             nf.CanonicalTypeNode(fi.position(), fi.type()),
@@ -137,6 +138,7 @@ public class ClassSerializer extends NodeVisitor
 	    fi = ts.fieldInstance(pos, ct,
                                   flags, ts.Long(),
                                   "jlc$SourceLastModified$" + suffix);
+            fi.setConstantValue(new Long(time));
             ii = ts.initializerInstance(pos, ct, Flags.STATIC);
 	    f = nf.FieldDecl(fi.position(), fi.flags(),
 		             nf.CanonicalTypeNode(fi.position(), fi.type()),
@@ -159,15 +161,17 @@ public class ClassSerializer extends NodeVisitor
                 }
                 // add an additional suffix to distinguish fields.
                 String additionalFieldSuffix = numberETIFields==0?"":("$" + numberETIFields);
+                String encoded = encodedTypeInfo.substring(etiStart, etiEnd);
                 fi = ts.fieldInstance(pos, ct,
                                       flags, ts.String(),
                                       "jlc$ClassType$" + suffix + additionalFieldSuffix);
+                fi.setConstantValue(encoded);
                 ii = ts.initializerInstance(pos, ct, Flags.STATIC);
 
                 f = nf.FieldDecl(fi.position(), fi.flags(),
                                  nf.CanonicalTypeNode(fi.position(), fi.type()),
                                  nf.Id(fi.position(), fi.name()),
-                                 nf.StringLit(pos, encodedTypeInfo.substring(etiStart, etiEnd)).type(ts.String()));
+                                 nf.StringLit(pos, encoded).type(ts.String()));
 
                 f = f.fieldInstance(fi);
                 f = f.initializerInstance(ii);
