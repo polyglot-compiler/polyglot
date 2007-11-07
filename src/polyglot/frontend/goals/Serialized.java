@@ -19,7 +19,9 @@ import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.*;
 import polyglot.frontend.Compiler;
+import polyglot.main.Version;
 import polyglot.types.TypeSystem;
+import polyglot.util.ErrorQueue;
 import polyglot.visit.ClassSerializer;
 import polyglot.visit.NodeVisitor;
 
@@ -37,15 +39,20 @@ public class Serialized extends SourceFileGoal {
             TypeSystem ts = extInfo.typeSystem();
             NodeFactory nf = extInfo.nodeFactory();
             return new VisitorPass(this,
-                                   new ClassSerializer(ts,
-                                                       nf,
-                                                       job().source().lastModified(),
-                                                       compiler.errorQueue(),
-                                                       extInfo.version()));
+                                   createSerializer(ts,
+                                                    nf,
+                                                    job().source().lastModified(),
+                                                    compiler.errorQueue(),
+                                                    extInfo.version()));
         }
         else {
             return new EmptyPass(this);
         }
+    }
+    
+    protected ClassSerializer createSerializer(TypeSystem ts, NodeFactory nf,
+            Date lastModified, ErrorQueue eq, Version version) {
+        return new ClassSerializer(ts, nf, lastModified, eq, version);
     }
     
     public Collection prerequisiteGoals(Scheduler scheduler) {
