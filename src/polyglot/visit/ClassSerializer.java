@@ -58,19 +58,23 @@ public class ClassSerializer extends NodeVisitor
 	    return n;
 	}
 
-        ClassDecl cn = (ClassDecl) n;
-        ClassBody body = cn.body();
+        ClassDecl cd = (ClassDecl) n;
+        ClassBody body = cd.body();
 
-        List l = createSerializationMembers(cn.type());
+        List l = createSerializationMembers(cd);
 
         for (Iterator i = l.iterator(); i.hasNext(); ) {
             ClassMember m = (ClassMember) i.next();
 	    body = body.addMember(m);
         }
 
-        return cn.body(body);
+        return cd.body(body);
     }
 
+    public List createSerializationMembers(ClassDecl cd) {
+        return createSerializationMembers(cd.type());
+    }
+    
     public List createSerializationMembers(ClassType ct) {
 	try {
 	    byte[] b;
