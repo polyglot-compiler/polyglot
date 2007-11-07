@@ -127,6 +127,10 @@ public class Context_c implements Context
             return true;
         }
 
+        if (isCode()) {
+            return false;
+        }
+
         if (outer == null) {
             return false;
         }
