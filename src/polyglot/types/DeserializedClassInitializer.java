@@ -36,6 +36,7 @@ public class DeserializedClassInitializer implements LazyClassInitializer {
     }
 
     public void initTypeObject() {
+        if (this.init) return;
         if (ct.isMember() && ct.outer() instanceof ParsedClassType) {
             ParsedClassType outer = (ParsedClassType) ct.outer();
             outer.addMemberClass(ct);
