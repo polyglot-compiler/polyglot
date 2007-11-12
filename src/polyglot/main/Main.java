@@ -247,7 +247,7 @@ public class Main
       return ll;
   }
 
-  public static final void main(String args[]) {
+  public static void main(String args[]) {
       try {
           new Main().start(args);
       }
@@ -258,7 +258,7 @@ public class Main
       }
   }
 
-  static final ExtensionInfo loadExtension(String ext) throws TerminationException {
+  static ExtensionInfo loadExtension(String ext) throws TerminationException {
     if (ext != null && ! ext.equals("")) {
       Class extClass = null;
 
