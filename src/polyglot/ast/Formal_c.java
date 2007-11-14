@@ -149,11 +149,13 @@ public class Formal_c extends Term_c implements Formal
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (type.isDisambiguated() && ! li.type().isCanonical()) {
-            li.setFlags(flags());
-            li.setType(declType());
-            li.setNotConstant();
+        if (li.isCanonical()) {
+            return this;
         }
+        if (declType().isCanonical()) {
+            li.setType(declType());
+        }
+        li.setNotConstant();
 
         return this;
     }

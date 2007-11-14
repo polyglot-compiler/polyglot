@@ -169,14 +169,16 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
 
         TypeSystem ts = tb.typeSystem();
 
-        LocalInstance li = ts.localInstance(position(), Flags.NONE,
+        LocalInstance li = ts.localInstance(position(), flags(),
                                             ts.unknownType(position()), name());
         return n.localInstance(li);
     }
 
     public Node disambiguate(AmbiguityRemover ar) throws SemanticException {
-        if (type.isDisambiguated() && ! li.type().isCanonical()) {
-            li.setFlags(flags());
+        if (li.isCanonical()) {
+            return this;
+        }
+        if (declType().isCanonical()) {
             li.setType(declType());
         }
         return this;
