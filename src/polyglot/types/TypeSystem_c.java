@@ -1598,10 +1598,14 @@ public class TypeSystem_c implements TypeSystem
     /**
      * Factory method for ArrayTypes.
      */
+    protected ArrayType createArrayType(Position pos, Type type) {
+      return new ArrayType_c(this, pos, type);
+    }
+    
     protected ArrayType arrayType(Position pos, Type type) {
         ArrayType t = (ArrayType) arrayTypeCache.get(type);
         if (t == null) {
-            t = new ArrayType_c(this, pos, type);
+            t = createArrayType(pos, type);
             arrayTypeCache.put(type, t);
         }
         return t;
