@@ -26,13 +26,20 @@ import polyglot.util.InternalCompilerError;
  */
 public abstract class ParserlessJLExtensionInfo extends AbstractExtensionInfo {
 
+    /**
+     * The LoadedClassResolver to use when initializing the type system.
+     * 
+     * @see polyglot.frontend.ParserlessJLExtensionInfo#initTypeSystem()
+     */
+    protected LoadedClassResolver makeLoadedClassResolver() {
+        return new SourceClassResolver(compiler, this, getOptions().constructFullClasspath(),
+            compiler.loader(), true, getOptions().compile_command_line_only,
+            getOptions().ignore_mod_times);
+    }
+  
     protected void initTypeSystem() {
         try {
-            LoadedClassResolver lr;
-            lr = new SourceClassResolver(compiler, this, getOptions().constructFullClasspath(),
-                                         compiler.loader(), true,
-                                         getOptions().compile_command_line_only,
-                                         getOptions().ignore_mod_times);
+            LoadedClassResolver lr = makeLoadedClassResolver();
 
             TopLevelResolver r = lr;
 
