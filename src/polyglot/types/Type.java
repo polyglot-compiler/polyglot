@@ -100,12 +100,14 @@ public interface Type extends Qualifier
     boolean isImplicitCastValid(Type toType);
 
     /**
-     * Return true a literal <code>value</code> can be converted to this type.
+     * Return true if a literal <code>value</code> can be converted to
+     * this type.
      */
     boolean numericConversionValid(Object value);
 
     /**
-     * Return true a literal <code>value</code> can be converted to this type.
+     * Return true if a literal <code>value</code> can be converted to
+     * this type.
      */
     boolean numericConversionValid(long value);
 
@@ -131,13 +133,17 @@ public interface Type extends Qualifier
     boolean isImplicitCastValidImpl(Type t);
 
     /**
-     * Return true a literal <code>value</code> can be converted to this type.
+     * Return true if a literal <code>value</code> can be converted to
+     * this type.
      */
     boolean numericConversionValidImpl(Object value);
 
     /**
-     * Return true a literal <code>value</code> can be converted to this type.
-     * This method should be removed.  It is kept for backward compatibility.
+     * Return true if a literal <code>value</code> can be converted to
+     * this type.
+     *
+     * This method should be removed.  It is kept for
+     * backward compatibility.
      */
     boolean numericConversionValidImpl(long value);
 
