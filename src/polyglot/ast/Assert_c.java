@@ -141,7 +141,7 @@ public class Assert_c extends Stmt_c implements Assert
             w.write(";");
         }
         else {
-            prettyPrint(w, tr);
+            this.del().prettyPrint(w, tr);
         }
     }
 

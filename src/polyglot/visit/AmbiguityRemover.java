@@ -105,9 +105,27 @@ public class AmbiguityRemover extends DisambiguationDriver
         return v;
     }
     
+    protected static class AmbChecker2 extends NodeVisitor {
+        public boolean amb;
+        public Node override(Node n) {
+            if (! n.isDisambiguated()) {
+                amb = true;
+            }
+            return n;
+        }
+    }
+
     protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         if (Report.should_report(Report.visit, 2))
             Report.report(2, ">> " + this + "::leave " + n + " (" + n.getClass().getName() + ")");
+
+        AmbChecker2 ac = new AmbChecker2();
+        n.visitChildren(ac);
+        if (ac.amb) {
+            Goal g = job.extensionInfo().scheduler().currentGoal();
+            g.setUnreachableThisRun();
+            return n;
+        }
 
         Node m = n.del().disambiguate((AmbiguityRemover) v);
 
