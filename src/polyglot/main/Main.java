@@ -145,13 +145,21 @@ public class Main
           Runtime runtime = Runtime.getRuntime();
           QuotedStringTokenizer st = new QuotedStringTokenizer(options.post_compiler);
           int pc_size = st.countTokens();
-          String[] javacCmd = new String[pc_size+2+compiler.outputFiles().size()];
+          int options_size = 2;
+          if (options.class_output_directory != null) {
+              options_size +=2;
+          }
+          String[] javacCmd = new String[pc_size+options_size+compiler.outputFiles().size()];
           int j = 0;
           for (int i = 0; i < pc_size; i++) {
               javacCmd[j++] = st.nextToken();
           }
           javacCmd[j++] = "-classpath";
           javacCmd[j++] = options.constructPostCompilerClasspath();
+          if (options.class_output_directory != null) {
+              javacCmd[j++] = "-d";
+              javacCmd[j++] = options.class_output_directory.toString();
+          }
 
           Iterator iter = compiler.outputFiles().iterator();
           for (; iter.hasNext(); j++) {
@@ -166,6 +174,9 @@ public class Main
           }
 
           try {
+              if (options.class_output_directory != null) {
+                  options.class_output_directory.mkdirs();
+              }
               Process proc = runtime.exec(javacCmd);
 
               InputStreamReader err = new InputStreamReader(proc.getErrorStream());

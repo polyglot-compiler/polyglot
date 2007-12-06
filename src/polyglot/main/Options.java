@@ -38,6 +38,7 @@ public class Options {
     public int error_count = 100;
     public Collection source_path; // List<File>
     public File output_directory;
+    public File class_output_directory;
     public String default_classpath;
     public String default_output_classpath;
     public String classpath;
@@ -76,6 +77,8 @@ public class Options {
     
     /** Use SimpleCodeWriter instead of OptimalCodeWriter */
     public boolean use_simple_code_writer = false;
+    
+    private boolean java_output_given = false;
     
     /**
      * Constructor
@@ -189,7 +192,18 @@ public class Options {
         else if (args[i].equals("-d"))
         {
             i++;
+            class_output_directory = new File(args[i]);
+            // if -D has not been specified, default -D to -d
+            if (!java_output_given) {
+                output_directory = new File(args[i]);
+            }
+            i++;
+        }
+        else if (args[i].equals("-D"))
+        {
+            i++;
             output_directory = new File(args[i]);
+            java_output_given = true;
             i++;
         }
         else if (args[i].equals("-classpath") ||
@@ -392,6 +406,7 @@ public class Options {
         usageForFlag(out, "-disable <pass>", "disable pass <pass>");
 //        usageForFlag(out, "-scramble [seed]", "scramble the ast (for testing)");
         usageForFlag(out, "-noserial", "disable class serialization");
+        usageForFlag(out, "-D <directory>", "output directory for .java files");
         usageForFlag(out, "-nooutput", "delete output files after compilation");
         usageForFlag(out, "-c", "compile only to .java");
         usageForFlag(out, "-post <compiler>", 

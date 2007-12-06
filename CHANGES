@@ -3,6 +3,15 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
+Polyglot 2.3.1?
+===============
+
+New command line options for output directories: -D can be used to specify the
+output directory for *.java files, while -d remains the output directory for
+*.class files. If only one of the two is given, both directories are set to be
+the same. That is, if only -d is given, the current behavior of placing both the
+*.java and *.class files into the specified directory is maintained.
+
 Oct 5, 2007: Polyglot 2.3
 =========================
 
