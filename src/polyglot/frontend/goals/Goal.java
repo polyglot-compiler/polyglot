@@ -18,7 +18,10 @@ import java.util.Collection;
 import polyglot.frontend.*;
 
 /**
- * Comment for <code>Goal</code>
+ * A goal abstractly represents something that the compiler is supposed to
+ * achieve by automatically scheduling passes.  Goals may depend on each other,
+ * and a goal is not attempted until its prerequisites are achieved. Goals may
+ * also be corequisites (mutally dependent).
  *
  * @author nystrom
  */

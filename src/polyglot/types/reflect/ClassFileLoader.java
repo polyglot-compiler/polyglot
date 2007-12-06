@@ -17,8 +17,8 @@ import java.util.zip.*;
 import java.util.jar.*;
 
 /**
- * We implement our own class loader.  All this pain is so
- * we can define the classpath on the command line.
+ * Polyglot has its own class loader just so
+ * the classpath can be specified on the command line.
  */
 public class ClassFileLoader
 {
