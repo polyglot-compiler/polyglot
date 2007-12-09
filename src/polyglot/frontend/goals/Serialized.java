@@ -25,7 +25,10 @@ import polyglot.util.ErrorQueue;
 import polyglot.visit.ClassSerializer;
 import polyglot.visit.NodeVisitor;
 
-
+/**
+ * The <code>Serialized</code> goal is reached after typing information is serialized
+ * into the compiled code. 
+ */
 public class Serialized extends SourceFileGoal {
     public static Goal create(Scheduler scheduler, Job job) {
         return scheduler.internGoal(new Serialized(job));

@@ -15,8 +15,9 @@ package polyglot.frontend.goals;
 
 import polyglot.frontend.*;
 
-
-
+/**
+ * The <code>Parsed</code> is reached when a type is parsed. 
+ */
 public class Parsed extends SourceFileGoal {
     public static Goal create(Scheduler scheduler, Job job) {
         return scheduler.internGoal(new Parsed(job));

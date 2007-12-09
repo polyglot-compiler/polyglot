@@ -17,6 +17,10 @@ import polyglot.frontend.Scheduler;
 import polyglot.frontend.goals.MembersAdded;
 import polyglot.types.ParsedClassType;
 
+/**
+ * This pass sets members of parsed classes, i.e., fields, methods, constructors, 
+ * and nested classes. 
+ */
 public class AddMembersPass extends ClassFilePass {
     protected Scheduler scheduler;
     protected MembersAdded goal;

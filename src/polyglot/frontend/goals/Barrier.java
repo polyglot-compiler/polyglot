@@ -21,7 +21,7 @@ import polyglot.frontend.*;
 import polyglot.util.InternalCompilerError;
 
 /**
- * Comment for <code>Barrier</code>
+ * A <code>Barrier</code> goal synchronizes all the jobs to reach the same goal. 
  *
  * @author nystrom
  */

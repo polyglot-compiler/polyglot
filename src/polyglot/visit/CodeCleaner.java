@@ -8,6 +8,8 @@
 package polyglot.visit;
 
 import polyglot.ast.*;
+import polyglot.util.Position;
+
 import java.util.*;
 
 /**
@@ -57,7 +59,8 @@ public class CodeCleaner extends NodeVisitor {
 
       // Alpha-rename local decls in the block that we're flattening.
       b = (Block)b.visit(alphaRen);
-      return nf.Labeled( l.position(), l.label(),
+      return nf.Labeled( l.position(), 
+    	                 nf.Id(Position.compilerGenerated(), l.label()),
                          (Stmt)b.statements().get(0) );
     }
 

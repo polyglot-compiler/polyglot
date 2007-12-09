@@ -19,7 +19,9 @@ import polyglot.frontend.goals.SupertypesResolved;
 import polyglot.types.ParsedClassType;
 import polyglot.util.InternalCompilerError;
 
-
+/**
+ * A pass that resolves the supertype and interfaces of every parsed class type.  
+ */
 public class ResolveSuperTypesPass extends ClassFilePass {
     protected Scheduler scheduler;
     protected SupertypesResolved goal;

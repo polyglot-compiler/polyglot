@@ -9,11 +9,12 @@ package polyglot.visit;
 
 import polyglot.ast.*;
 import polyglot.types.*;
+import polyglot.util.Position;
 
 import java.util.*;
 
 /**
- * The FlattenVisitor flattens the AST,
+ * The <code>FlattenVisitor</code> flattens the AST,
  */
 public class FlattenVisitor extends NodeVisitor
 {
@@ -202,7 +203,8 @@ public class FlattenVisitor extends NodeVisitor
 	    LocalDecl def = nf.LocalDecl(e.position(), Flags.FINAL,
 					 nf.CanonicalTypeNode(e.position(),
 					                      e.type()),
-					 name, e);
+					 nf.Id(Position.compilerGenerated(), name), 
+					 e);
 	    def = def.localInstance(ts.localInstance(e.position(), Flags.FINAL,
 						     e.type(), name));
 
@@ -210,7 +212,8 @@ public class FlattenVisitor extends NodeVisitor
 	    l.add(def);
 
 	    // return the local temp instead of the complex expression
-	    Local use = nf.Local(e.position(), name);
+	    Local use = nf.Local(e.position(), 
+	    		nf.Id(Position.compilerGenerated(), name));
 	    use = (Local) use.type(e.type());
 	    use = use.localInstance(ts.localInstance(e.position(), Flags.FINAL,
 						     e.type(), name));

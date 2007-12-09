@@ -21,6 +21,9 @@ import polyglot.frontend.Scheduler;
 import polyglot.types.TypeSystem;
 import polyglot.visit.TypeChecker;
 
+/**
+ * a <code>TypeChecked</code> is reached after typechecking.
+ */
 public class TypeChecked extends VisitorGoal {
     public static Goal create(Scheduler scheduler, Job job, TypeSystem ts, NodeFactory nf) {
         return scheduler.internGoal(new TypeChecked(job, ts, nf));
