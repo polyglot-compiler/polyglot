@@ -316,13 +316,25 @@ public class SourceFileTest extends AbstractTest {
         ArrayList l = new ArrayList();
         int i = 0;
         String token = "";
+        // if endChar != 0, then we are parsing a long token that may
+        // include whitespace
+        char endChar = 0;  
         while (i < s.length()) {
             char c = s.charAt(i);
-            if (c == '\\') {
+            if (endChar != 0 && c == endChar) {
+                // we have finished reading the long token.
+                endChar = 0;
+            }
+            else if (c == '\\') {
+                // a literal character
                 c = s.charAt(++i);
                 token += c;
             }
-            else if (Character.isWhitespace(c)) {
+            else if (c =='\"' || c == '\'') {
+                // a quoted string, treat as a single token
+                endChar = c;           
+            }
+            else if (endChar == 0 && Character.isWhitespace(c)) {
                 if (token.length() > 0) {
                     l.add(token);                    
                 }
@@ -336,6 +348,7 @@ public class SourceFileTest extends AbstractTest {
         if (token.length() > 0) {
             l.add(token);                    
         }
+
         return (String[])l.toArray(new String[l.size()]);
     }
     protected void setExtraCmdLineArgs(String args) {
