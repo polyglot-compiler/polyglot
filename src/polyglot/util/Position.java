@@ -12,7 +12,9 @@ import java.io.Serializable;
 import polyglot.main.Options;
 
 /**
- * This class represents a posiiton within a file.
+ * This class represents a position within a source file. It is used to record
+ * where each AST node is located in a source file; this is used, for
+ * example, for generating error messages.
  **/
 public class Position implements Serializable
 {
