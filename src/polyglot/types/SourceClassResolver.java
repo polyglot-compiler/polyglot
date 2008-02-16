@@ -225,12 +225,13 @@ public class SourceClassResolver extends LoadedClassResolver
     // Verify that the type we loaded has the right name.  This prevents,
     // for example, requesting a type through its mangled (class file) name.
     if (result != null) {
-        if (name.equals(result.fullName())) {
-            return result;
-        }
-        if (result instanceof ClassType && name.equals(ts.getTransformedClassName((ClassType) result))) {
-            return result;
-        }
+    	return result;
+//        if (name.equals(result.fullName())) {
+//            return result;
+//        }
+//        if (result instanceof ClassType && name.equals(ts.getTransformedClassName((ClassType) result))) {
+//            return result;
+//        }
     }
     
     if (clazz != null && !this.allowRawClasses) {
