@@ -146,8 +146,26 @@ public class SourceLoader
         return false;
     }
     
-    /** Load the source file for the given class name using the source path. */
+    /** Load the source file for the given (possibly nested) class name
+        using the source path. */
     public FileSource classSource(String className) {
+    	String name = className;
+    	boolean done = false;
+    	while (!done) {
+    		FileSource source = checkForSource(name);
+			if (source != null)
+    			return source;
+			int dot = name.lastIndexOf('.');
+			if (dot == -1)
+				done = true;
+			else
+				name = name.substring(0, dot);
+		}
+    	return null;
+    }
+
+    /** Load the source file for the given class name using the source path. */
+    private FileSource checkForSource(String className) {
 	/* Search the source path. */
         String[] exts = sourceExt.fileExtensions();
 
