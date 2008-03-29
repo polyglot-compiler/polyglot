@@ -238,7 +238,8 @@ public class SourceClassResolver extends LoadedClassResolver
         // We have a raw class only. We do not have the source code,
         // or encoded class information. 
         throw new SemanticException("Class \"" + name + "\" not found."
-            + " A class file was found, but it did not contain appropriate" 
+            + " A class file was found at " + clazz.getClassFileLocation()
+            + ", but it did not contain appropriate" 
             + " information for the Polyglot-based compiler " + 
             ext.compilerName() + ". Try using " + ext.compilerName() 
             + " to recompile the source code.");

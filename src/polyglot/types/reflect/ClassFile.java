@@ -66,6 +66,10 @@ public class ClassFile {
             throw new InternalCompilerError("I/O exception on ByteArrayInputStream");
         }
     }
+    
+    public String getClassFileLocation() {
+        return classFileSource.toString();
+    }
 
     JLCInfo getJLCInfo(String typeSystemKey) {
       // Check if already set.
