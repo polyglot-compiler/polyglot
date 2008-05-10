@@ -93,35 +93,26 @@ public class ExpressionFlattener extends NodeVisitor {
 
         if (n instanceof While) {
             While s = (While) n;
-            Stmt s1 = s.body();
-
-            if (!(s1 instanceof Block)) {
-                s = s.body(createBlock(s1));
-            }
-
-            return visitEdgeNoOverride(parent, s);
+            Stmt b = (Stmt) visitEdge(s, createBlock(s.body()));
+            s = s.body(b);
+            addStmt(s);
+            return s;
         }
 
         if (n instanceof Do) {
             Do s = (Do) n;
-            Stmt s1 = s.body();
-
-            if (!(s1 instanceof Block)) {
-                s = s.body(createBlock(s1));
-            }
-
-            return visitEdgeNoOverride(parent, s);
+            Stmt b = (Stmt) visitEdge(s, createBlock(s.body()));
+            s = s.body(b);
+            addStmt(s);
+            return s;
         }
 
         if (n instanceof For) {
             For s = (For) n;
-            Stmt s1 = s.body();
-
-            if (!(s1 instanceof Block)) {
-                s = s.body(createBlock(s1));
-            }
-
-            return visitEdgeNoOverride(parent, s);
+            Stmt b = (Stmt) visitEdge(s, createBlock(s.body()));
+            s = s.body(b);
+            addStmt(s);
+            return s;
         }
 
         // short circuit boolean && and ||
@@ -149,6 +140,11 @@ public class ExpressionFlattener extends NodeVisitor {
         if (n instanceof ConstructorCall) {
             addStmt((Stmt) n);
             return n;
+        }
+        
+        // can't flatten initializers in field decls
+        if (n instanceof FieldDecl) {
+        	return n;
         }
 
         return null;
@@ -474,6 +470,10 @@ public class ExpressionFlattener extends NodeVisitor {
     }
 
     protected Block createBlock(Stmt s) {
+    	if (s instanceof Block) {
+    		return (Block) s;
+    	}
+    	
         Block b = nf.Block(s.position(), s);
         b = postCreate(b);
         return b;
