@@ -52,12 +52,12 @@ public class ExpressionFlattener extends NodeVisitor {
     protected final NodeFactory nf;
 
     /** Stack of nested blocks we are currently in. */
-    protected final Stack<List<Stmt>> blockStack = new Stack<List<Stmt>>();
+    protected final Stack blockStack = new Stack();
     
     /** Set of expressions not to flatten. Only applies to the expressions
       * themselves, and not their subexpressions (unless they are also in
       * the set explicitly). */
-    protected final Set<Node> dontFlatten = new HashSet<Node>();
+    protected final Set dontFlatten = new HashSet();
     
     /** Used to copy a whole AST subtree. */
     protected final DeepCopier deepCopier = new DeepCopier();
@@ -72,7 +72,6 @@ public class ExpressionFlattener extends NodeVisitor {
             nf.Id(Position.compilerGenerated(), "dummy"));
     }
 
-    @Override
     public Node override(Node parent, Node n) {
         // insert blocks when needed to allow local decls to be inserted.
         if (n instanceof If) {
@@ -150,7 +149,6 @@ public class ExpressionFlattener extends NodeVisitor {
         return null;
     }
 
-    @Override
     public NodeVisitor enter(Node n) {
         // push a new statement list for each block
         if (n instanceof Block) {
@@ -202,7 +200,6 @@ public class ExpressionFlattener extends NodeVisitor {
         return this;
     }
 
-    @Override
     public Node leave(Node parent, Node old, Node n, NodeVisitor v) {
         // replace blocks with list of replacement statements
         if (n instanceof Block) {
@@ -296,7 +293,7 @@ public class ExpressionFlattener extends NodeVisitor {
                 // if e is an assign, new value comes from lhs
                 if (e instanceof Assign) {
                     Assign a = (Assign) e;
-                    val = deepCopy(a.left());
+                    val = (Expr) deepCopy(a.left());
                     Eval s = createEval(a);
                     addStmt(s);
                 }
@@ -413,12 +410,12 @@ public class ExpressionFlattener extends NodeVisitor {
     
     /** Pushes a new (nested) block onto the stack. */
     protected void pushBlock() {
-        blockStack.push(new ArrayList<Stmt>());
+        blockStack.push(new ArrayList());
     }
     
     /** Pops a block off the stack. */
-    protected List<Stmt> popBlock() {
-        return blockStack.pop();
+    protected List popBlock() {
+        return (List) blockStack.pop();
     }
     
     /** Checks to see if we are in a block. */
@@ -428,12 +425,12 @@ public class ExpressionFlattener extends NodeVisitor {
     
     /** Adds a statement to the current block. */
     protected void addStmt(Stmt s) {
-        blockStack.peek().add(s);
+        ((List) blockStack.peek()).add(s);
     }
     
     /** Whenever a new node is created, this method is called and should do
       * additional processing of the node as needed. */
-    protected <N extends Node> N postCreate(N n) {
+    protected Node postCreate(Node n) {
         return n;
     }
 
@@ -464,9 +461,8 @@ public class ExpressionFlattener extends NodeVisitor {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    protected <N extends Node> N deepCopy(N n) {
-        return (N) n.visit(deepCopier);
+    protected Node deepCopy(Node n) {
+        return n.visit(deepCopier);
     }
 
     protected Block createBlock(Stmt s) {
@@ -475,19 +471,19 @@ public class ExpressionFlattener extends NodeVisitor {
     	}
     	
         Block b = nf.Block(s.position(), s);
-        b = postCreate(b);
+        b = (Block) postCreate(b);
         return b;
     }
     
     protected Empty createEmpty() {
         Empty s = nf.Empty(Position.compilerGenerated());
-        s = postCreate(s);
+        s = (Empty) postCreate(s);
         return s;
     }
     
     protected Eval createEval(Expr e) {
         Eval s = nf.Eval(e.position(), e);
-        s = postCreate(s);
+        s = (Eval) postCreate(s);
         return s;
     }
     
@@ -502,10 +498,11 @@ public class ExpressionFlattener extends NodeVisitor {
         Position pos = e.position();
         LocalInstance li = ts.localInstance(pos, Flags.NONE,
                 typeOf(e), name);
-        LocalDecl d = nf.LocalDecl(pos, Flags.NONE, postCreate(
-            nf.CanonicalTypeNode(pos, typeOf(e))), postCreate(nf.Id(pos, name)), init);
+        LocalDecl d = nf.LocalDecl(pos, Flags.NONE, (TypeNode) postCreate(
+            nf.CanonicalTypeNode(pos, typeOf(e))),
+            (Id) postCreate(nf.Id(pos, name)), init);
         d = d.localInstance(li);
-        d = postCreate(d);
+        d = (LocalDecl) postCreate(d);
         return d;
     }
     
@@ -515,9 +512,9 @@ public class ExpressionFlattener extends NodeVisitor {
     protected Local createLocal(LocalDecl d) {
         Position pos = d.position();
         LocalInstance li = d.localInstance();
-        Local l = (Local) nf.Local(pos, postCreate(nf.Id(pos, d.name()))).type(typeOf(li));
+        Local l = (Local) nf.Local(pos, (Id) postCreate(nf.Id(pos, d.name()))).type(typeOf(li));
         l = l.localInstance(li);
-        l = postCreate(l);
+        l = (Local) postCreate(l);
         return l;
     }
 
@@ -529,9 +526,9 @@ public class ExpressionFlattener extends NodeVisitor {
      */
     protected Eval createAssign(Expr l, Expr r) {
         Position pos = l.position();
-        l = deepCopy(l);
-        Eval a = nf.Eval(pos, postCreate(nf.Assign(pos, l, Assign.ASSIGN, r)).type(typeOf(l)));
-        a = postCreate(a);
+        l = (Expr) deepCopy(l);
+        Eval a = nf.Eval(pos, ((Assign) postCreate(nf.Assign(pos, l, Assign.ASSIGN, r))).type(typeOf(l)));
+        a = (Eval) postCreate(a);
         return a;
     }
 
@@ -541,9 +538,9 @@ public class ExpressionFlattener extends NodeVisitor {
     protected Assign createSimpleAssign(Assign a) {
         Position pos = a.position();
         Operator op = a.operator().binaryOperator();
-        a = (Assign) nf.Assign(pos, a.left(), Assign.ASSIGN, postCreate(nf.Binary(pos, 
-            deepCopy(a.left()), op, a.right())).type(typeOf(a))).type(typeOf(a));
-        a = postCreate(a);
+        a = (Assign) nf.Assign(pos, a.left(), Assign.ASSIGN, ((Binary) postCreate(nf.Binary(pos, 
+            (Expr) deepCopy(a.left()), op, a.right()))).type(typeOf(a))).type(typeOf(a));
+        a = (Assign) postCreate(a);
         return a;
     }
 
@@ -562,8 +559,8 @@ public class ExpressionFlattener extends NodeVisitor {
         }
 
         Expr e = u.expr();
-        Eval a = createAssign(e, postCreate(nf.Binary(pos, 
-            deepCopy(e), op, createInt(1))).type(typeOf(e)));
+        Eval a = createAssign(e, ((Binary) postCreate(nf.Binary(pos, 
+            (Expr) deepCopy(e), op, createInt(1)))).type(typeOf(e)));
         return a;
     }
     
@@ -574,10 +571,10 @@ public class ExpressionFlattener extends NodeVisitor {
      */
     protected If createAndIf(Expr cond, Local l, Expr e, Binary original) {
         Position pos = l.position();
-        cond = deepCopy(cond);
+        cond = (Expr) deepCopy(cond);
         If s = nf.If(pos, cond, createAssign(l, e), 
             createAssign(l, createBool(false)));
-        s = postCreate(s);
+        s = (If) postCreate(s);
         return s;
     }
 
@@ -588,10 +585,10 @@ public class ExpressionFlattener extends NodeVisitor {
      */
     protected If createOrIf(Expr cond, Local l, Expr e, Binary original) {
         Position pos = l.position();
-        cond = deepCopy(cond);
+        cond = (Expr) deepCopy(cond);
         If s = nf.If(pos, cond, createAssign(l, createBool(true)), 
             createAssign(l, e));
-        s = postCreate(s);
+        s = (If) postCreate(s);
         return s;
     }
     
@@ -603,7 +600,7 @@ public class ExpressionFlattener extends NodeVisitor {
     protected If createCondIf(Expr cond, Local l, Expr e1, Expr e2, Conditional original) {
         Position pos = l.position();
         If s = nf.If(pos, cond, createAssign(l, e1), createAssign(l, e2));
-        s = postCreate(s);
+        s = (If) postCreate(s);
         return s;
     }
     
@@ -611,16 +608,16 @@ public class ExpressionFlattener extends NodeVisitor {
      * Create a boolean literal
      */
     protected BooleanLit createBool(boolean val) {
-        return (BooleanLit) postCreate(nf.BooleanLit(Position.compilerGenerated(), 
-            val)).type(ts.Boolean());
+        return (BooleanLit) ((BooleanLit) postCreate(nf.BooleanLit(Position.compilerGenerated(), 
+            val))).type(ts.Boolean());
     }
     
     /**
      * Create an int literal
      */
     protected IntLit createInt(int val) {
-        return (IntLit) postCreate(nf.IntLit(Position.compilerGenerated(), 
-            IntLit.INT, val)).type(ts.Int());
+        return (IntLit) ((IntLit) postCreate(nf.IntLit(Position.compilerGenerated(), 
+            IntLit.INT, val))).type(ts.Int());
     }
     
     protected Type typeOf(Expr e) {
@@ -633,7 +630,6 @@ public class ExpressionFlattener extends NodeVisitor {
     /** Makes a deep copy of an AST node. */
     protected class DeepCopier extends NodeVisitor {
         
-        @Override
         public Node leave(Node old, Node n, NodeVisitor v) {
             return (Node) n.copy();
         }
