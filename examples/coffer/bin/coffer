@@ -73,7 +73,7 @@ while true; do
     esac
 done
 
-classpath="$dir/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar"
+classpath="$dir/runtime/classes:$dir/lib/polyglot.jar:$dir/lib/java_cup.jar"
 classpath="$classpath:$dir/lib/$ext.jar"
 classpath="$classpath:$dir/lib/$ext-rt.jar"
 classpath="$classpath:$extra_cp"
