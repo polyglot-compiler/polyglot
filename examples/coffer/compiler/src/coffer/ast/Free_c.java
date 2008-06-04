@@ -12,6 +12,7 @@ import coffer.types.*;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
+
 import java.util.*;
 
 /**
@@ -77,12 +78,12 @@ public class Free_c extends Stmt_c implements Free
         return "free " + expr + ";";
     }
 
-    public Term entry() {
-        return expr.entry();
+    public Term firstChild() {
+        return expr;
     }
 
     public List acceptCFG(CFGBuilder v, List succs) {
-        v.visitCFG(expr, this);
+        v.visitCFG(expr, this, EXIT);
         return succs;
     }
 }

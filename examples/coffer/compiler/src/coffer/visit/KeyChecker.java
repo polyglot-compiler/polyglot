@@ -44,7 +44,7 @@ public class KeyChecker extends DataFlow
         EMPTY = vts.emptyKeySet(Position.COMPILER_GENERATED);
     }
 
-    public Item createInitialItem(FlowGraph graph, Term node) {
+    public Item createInitialItem(FlowGraph graph, Term node, boolean entry) {
         ProcedureDecl decl = (ProcedureDecl) graph.root();
         CofferProcedureInstance pi = (CofferProcedureInstance)
             decl.procedureInstance();
@@ -131,7 +131,8 @@ public class KeyChecker extends DataFlow
         }
     }
 
-    public Map flow(Item in, FlowGraph graph, Term n, Set succEdgeKeys) {
+    public Map flow(Item in, FlowGraph graph, Term n, boolean entry, Set succEdgeKeys) {
+        if (entry) return itemToMap(in, succEdgeKeys);
         if (in instanceof ExitTermItem) {
             return itemToMap(in, succEdgeKeys);
         }
@@ -177,18 +178,18 @@ public class KeyChecker extends DataFlow
         return itemToMap(in, succEdgeKeys);
     }
 
-    protected Item safeConfluence(List items, List itemKeys, Term node, FlowGraph graph) {
-        if (node == graph.exitNode()) {
+    protected Item safeConfluence(List items, List itemKeys, Term node, boolean entry, FlowGraph graph) {
+        if (!entry && graph.root().equals(node)) {
             return confluenceExitTerm(items, itemKeys, graph);
         }
-        return super.safeConfluence(items, itemKeys, node, graph);
+        return super.safeConfluence(items, itemKeys, node, entry, graph);
     }
 
-    protected Item confluence(List items, List itemKeys, Term node, FlowGraph graph) {
-        if (node == graph.exitNode()) {
+    protected Item confluence(List items, List itemKeys, Term node, boolean entry, FlowGraph graph) {
+        if (!entry && graph.root().equals(node)) {
             return confluenceExitTerm(items, itemKeys, graph);
         }
-        return confluence(items, node, graph);
+        return confluence(items, node, entry, graph);
     }
 
     protected Item confluenceExitTerm(List items, List itemKeys, FlowGraph graph) {
@@ -199,7 +200,7 @@ public class KeyChecker extends DataFlow
             nonExc = new DataFlowItem();
         }
         else {
-            nonExc = (DataFlowItem)confluence(nonExcItems, graph.exitNode(), graph);
+            nonExc = (DataFlowItem)confluence(nonExcItems, graph.root(), false, graph);
         }
 
         Map excItemLists = new HashMap();
@@ -220,12 +221,12 @@ public class KeyChecker extends DataFlow
         Map excItems = new HashMap(excItemLists.size());
         for (Iterator i = excItemLists.entrySet().iterator(); i.hasNext(); ) {
                 Map.Entry e = (Entry)i.next();
-                excItems.put(e.getKey(), confluence((List)e.getValue(), graph.exitNode(), graph));
+                excItems.put(e.getKey(), confluence((List)e.getValue(), graph.root(), false, graph));
         }
         return new ExitTermItem(nonExc, excItems);
     }
 
-    protected Item confluence(List inItems, Term node, FlowGraph graph) {
+    protected Item confluence(List inItems, Term node, boolean entry, FlowGraph graph) {
         DataFlowItem outItem = null;
 
         for (Iterator i = inItems.iterator(); i.hasNext(); ) {
@@ -264,15 +265,17 @@ public class KeyChecker extends DataFlow
         return outItem;
     }
 
-    public void check(FlowGraph graph, Term n, Item inItem, Map outItems)
+    public void check(FlowGraph graph, Term n, boolean entry, Item inItem, Map outItems)
         throws SemanticException
     {
-        if (n == graph.exitNode()) {
-            checkExitTerm(graph, (ExitTermItem)inItem);
-        }
-        else {
-            DataFlowItem df = (DataFlowItem) inItem;
-            check(n, df, true);
+        if (!entry) {
+            if (graph.root().equals(n)) {
+                checkExitTerm(graph, (ExitTermItem)inItem);
+            }
+            else {
+                DataFlowItem df = (DataFlowItem) inItem;
+                check(n, df, true);
+            }
         }
     }
 
@@ -307,13 +310,13 @@ public class KeyChecker extends DataFlow
     private void checkExitTerm(FlowGraph graph, ExitTermItem item)
         throws SemanticException
     {
-        check(graph.exitNode(), item.nonExItem, true);
+        check(graph.root(), item.nonExItem, true);
 
         List excepts;
         ProcedureDeclExt_c ext = null;
         
-        if (graph.exitNode() instanceof ProcedureDecl) {
-            ProcedureDecl pd = (ProcedureDecl)graph.exitNode();
+        if (graph.root() instanceof ProcedureDecl) {
+            ProcedureDecl pd = (ProcedureDecl)graph.root();
             CofferProcedureInstance pi = (CofferProcedureInstance)pd.procedureInstance();
             excepts = pi.throwConstraints();
             ext = (ProcedureDeclExt_c)pd.ext();
@@ -348,8 +351,8 @@ public class KeyChecker extends DataFlow
             }
             List matchingExc = filterItemsExceptionSubclass(excItems, excKeys, excType);
             if (!matchingExc.isEmpty()) {
-                DataFlowItem df = (DataFlowItem)confluence(matchingExc, graph.exitNode(), graph);
-                check(graph.exitNode(), df, false);
+                DataFlowItem df = (DataFlowItem)confluence(matchingExc, graph.root(), false, graph);
+                check(graph.root(), df, false);
 
                 if (ext != null && tc != null) {
                     ext.checkHeldKeysThrowConstraint(tc, df.must_held, df.must_stored);
