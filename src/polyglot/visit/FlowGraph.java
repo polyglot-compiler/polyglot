@@ -276,17 +276,17 @@ public class FlowGraph {
   }
   
   /**
-   * A <code>Peer</code> is an occurance of an AST node in a flow graph. 
+   * A <code>Peer</code> is an occurrence of an AST node in a flow graph. 
    * For most AST nodes, there will be only one Peer for each AST node. 
    * However, if the AST node occurs in a finally block, then there will be
    * multiple <code>Peer</code>s for that AST node, one for each possible
-   * path to the finally block. This is becuase flow graphs for finally blocks 
+   * path to the finally block. This is because flow graphs for finally blocks 
    * are copied, one copy for each possible path to the finally block.
    */
   public static class Peer {
     protected DataFlow.Item inItem;  // Input Item for dataflow analysis
     protected Map outItems; // Output Items for dataflow analysis, a map from EdgeKeys to DataFlowlItems
-    protected Term node; // The AST node that this peer is an occurance of.
+    protected Term node; // The AST node that this peer is an occurrence of.
     protected List succs; // List of successor Edges 
     protected List preds; // List of predecessor Edges 
     protected List path_to_finally; // the path to the finally block that 
