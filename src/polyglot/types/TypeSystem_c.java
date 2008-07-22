@@ -1435,8 +1435,12 @@ public class TypeSystem_c implements TypeSystem
     }
     
     public Named forName(String name) throws SemanticException {
+        return forName(systemResolver, name);
+    }
+    
+    protected Named forName(Resolver resolver, String name) throws SemanticException {
         try {
-            return systemResolver.find(name);
+            return resolver.find(name);
         }
         catch (SemanticException e) {
             if (! StringUtil.isNameShort(name)) {
@@ -1444,7 +1448,7 @@ public class TypeSystem_c implements TypeSystem
                 String shortName = StringUtil.getShortNameComponent(name);
                 
                 try {
-                    Named container = forName(containerName);
+                    Named container = forName(resolver, containerName);
 		    if (container instanceof ClassType) {
 			return classContextResolver((ClassType) container).find(shortName);
 		    }
@@ -1634,8 +1638,12 @@ public class TypeSystem_c implements TypeSystem
      * registered in this typeSystem.  Does not register the type in
      * this TypeSystem.  For use only by JavaClass implementations.
      **/
-    public Type typeForClass(Class clazz) throws SemanticException
-    {
+    public Type typeForClass(Class clazz) throws SemanticException {
+        return typeForClass(systemResolver, clazz);
+    }
+    
+    protected Type typeForClass(Resolver resolver, Class clazz)
+    throws SemanticException {
 	if (clazz == Void.TYPE)      return VOID_;
 	if (clazz == Boolean.TYPE)   return BOOLEAN_;
 	if (clazz == Byte.TYPE)      return BYTE_;
@@ -1650,7 +1658,7 @@ public class TypeSystem_c implements TypeSystem
 	    return arrayOf(typeForClass(clazz.getComponentType()));
 	}
 
-	return (Type) systemResolver.find(clazz.getName());
+	return (Type) resolver.find(clazz.getName());
     }
 
     /**
