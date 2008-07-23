@@ -87,6 +87,7 @@ public class Method
         }
       }
     }
+    this.in = null; // RMF 7/23/2008 - Don't need the input stream any more, so don't hang onto it
   }
 
   public boolean isSynthetic() {
