@@ -506,7 +506,7 @@ public class LocalClassRemover extends ContextVisitor
 
                   Context c = newExp.del().enterChildScope(newExp.body(), context);
                   ClassBody body = newExp.body();
-                  translateLocalClassBody(pct, body, c);
+                  translateAnonClassBody(pct, newExp.arguments(), body, c);
 
                   newExp = newExp.body(null);
                   newExp = newExp.anonType(null);
@@ -586,6 +586,72 @@ public class LocalClassRemover extends ContextVisitor
         return super.enterCall(n);
     }
     
+    protected void translateAnonClassBody(ParsedClassType ct, List arguments,
+      ClassBody body, Context context) {
+      // Create a constructor for the class based on the argument list.
+      List stmts = new ArrayList(1);
+      
+      // First, find the ConstructorInstance for the super call.
+      ClassType superCT = (ClassType) ct.superType();
+      List argTypes = new ArrayList(arguments.size());
+      for (Iterator it = arguments.iterator(); it.hasNext();)
+        argTypes.add(((Expr) it.next()).type());
+      ConstructorInstance superCI = null;
+      try {
+        superCI = ts.findConstructor(superCT, argTypes, ct);
+      } catch (SemanticException e) {
+        // Shouldn't happen.
+      }
+      
+      // From the super's ConstructorInstance, create a list of formals and
+      // actuals.
+      List formals = new ArrayList(argTypes.size());
+      List actuals = new ArrayList(argTypes.size());
+      for (Iterator it = superCI.formalTypes().iterator(); it.hasNext();) {
+        Type type = (Type) it.next();
+        String name = "jl$arg" + formals.size();
+        Id id = nf.Id(Position.compilerGenerated(), name);
+        TypeNode tn = nf.CanonicalTypeNode(Position.compilerGenerated(), type);
+        Formal formal =
+          nf.Formal(Position.compilerGenerated(), Flags.NONE, tn, id);
+        LocalInstance li =
+          ts.localInstance(Position.compilerGenerated(), formal.flags(), type,
+              name);
+        formal = formal.localInstance(li);
+        formals.add(formal);
+        
+        Local actual = nf.Local(Position.compilerGenerated(), id);
+        actual = (Local) actual.type(type);
+        actual = actual.localInstance(li);
+        actuals.add(actual);
+      }
+      
+      // Create the super call.
+      Special this_ = nf.Special(Position.compilerGenerated(), Special.THIS,
+          nf.CanonicalTypeNode(Position.compilerGenerated(), ct.container()));
+      this_ = (Special) this_.type(ct.container());
+      ConstructorCall superCall =
+        nf.SuperCall(Position.compilerGenerated(), this_, actuals);
+      superCall = superCall.constructorInstance(superCI);
+      stmts.add(superCall);
+      
+      // Create the constructor declaration.
+      ConstructorInstance ci =
+        ts.constructorInstance(ct.position(), ct, Flags.PRIVATE, superCI
+            .formalTypes(), superCI.throwTypes());
+      ConstructorDecl decl =
+        nf.ConstructorDecl(Position.compilerGenerated(), ci.flags(), nf.Id(
+            Position.compilerGenerated(), ct.name()), formals, ci.throwTypes(),
+            nf.Block(Position.compilerGenerated(), stmts));
+      decl = decl.constructorInstance(ci);
+      
+      // Add the constructor to the body and pass to translateLocalClassBody.
+      List members = new ArrayList(body.members());
+      members.add(decl);
+      body = body.members(members);
+      translateLocalClassBody(ct, body, context);
+    }
+    
     protected void translateLocalClassBody(ParsedClassType ct, ClassBody body, Context context) {
         List members = new ArrayList();
 
@@ -600,14 +666,6 @@ public class LocalClassRemover extends ContextVisitor
 
             ct.addField(fi);
             members.add(createFieldDecl(fi));
-        }
-
-        // Add a default constructor if there isn't one; that should only
-        // happen if ct was anonymous.
-        if (ct.constructors().size() == 0) {
-            ConstructorInstance ci = createEmptyCI(ct);
-            ConstructorDecl ctd = createEmptyConstructorDecl(ct, ci);
-            members.add(ctd);
         }
 
         // Now add existing members, making sure constructors appear
