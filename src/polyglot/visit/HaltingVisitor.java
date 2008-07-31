@@ -88,6 +88,6 @@ public abstract class HaltingVisitor extends NodeVisitor
             }
         }
 
-        return super.override(parent, n);
+        return null;
     }
 }
