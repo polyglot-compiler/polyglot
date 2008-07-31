@@ -1,706 +1,522 @@
-/*
- * This file is part of the Polyglot extensible compiler framework.
- *
- * Copyright (c) 2000-2006 Polyglot project group, Cornell University
- * 
- */
-
-/*
- * Created on May 16, 2005
- */
 package polyglot.visit;
 
-import polyglot.ast.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import polyglot.ast.Assign;
+import polyglot.ast.Block;
+import polyglot.ast.ClassBody;
+import polyglot.ast.ClassDecl;
+import polyglot.ast.ClassMember;
+import polyglot.ast.CodeNode;
+import polyglot.ast.ConstructorCall;
+import polyglot.ast.ConstructorDecl;
+import polyglot.ast.Eval;
+import polyglot.ast.Expr;
+import polyglot.ast.Field;
+import polyglot.ast.FieldDecl;
+import polyglot.ast.Formal;
+import polyglot.ast.Id;
+import polyglot.ast.Local;
+import polyglot.ast.LocalClassDecl;
+import polyglot.ast.New;
+import polyglot.ast.Node;
+import polyglot.ast.NodeFactory;
+import polyglot.ast.ProcedureCall;
+import polyglot.ast.Receiver;
+import polyglot.ast.Stmt;
+import polyglot.ast.TypeNode;
 import polyglot.frontend.Job;
-import polyglot.types.*;
-import polyglot.util.*;
+import polyglot.types.ClassType;
+import polyglot.types.ConstructorInstance;
+import polyglot.types.Context;
+import polyglot.types.FieldInstance;
+import polyglot.types.Flags;
+import polyglot.types.LocalInstance;
+import polyglot.types.ParsedClassType;
+import polyglot.types.SemanticException;
+import polyglot.types.Type;
+import polyglot.types.TypeSystem;
+import polyglot.util.Pair;
+import polyglot.util.Position;
+import polyglot.util.UniqueID;
 
-import java.util.*;
+// TODO:
+//Convert closures to anon
+//Add frame classes around anon and local
+//now all classes access only final locals
+//Convert local and anon to member
+//Dup inner member to static
+//Remove inner member
 
-/**
- * @author nystrom
- *
- * This class translates local classes and anonymous classes to member classes.
- * It adds fields to the classes for each local variable in the enclosing method
- * that is used in the class body.
- */
-public class LocalClassRemover extends ContextVisitor
-{
-    List unclaimedDecls;
-    Map envMap;
-    int[] count;
-    
+public class LocalClassRemover extends ContextVisitor {
     public LocalClassRemover(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
-        envMap = new HashMap();
-        unclaimedDecls = new ArrayList();
-        count = new int[1];
     }
 
-    protected String newFieldName(String name) {
-        return namePrefix() + name;
-    }
+    Map<LocalInstance,FieldInstance> env = new HashMap();
 
-    /*
-     * Generate the new name for a field that comes from a final local variable.
-     */
-    protected String namePrefix() {
-        return "jl$";
-    }
+    Map<ClassType,List<ClassMember>> orphans = new HashMap();
+    Map<ClassType,List<FieldInstance>> newFields = new HashMap();
 
-    static class EnvCollector extends ContextVisitor {
-        List env;
-        Context outerContext;
-        Context innerContext;
-
-        EnvCollector(Job job, TypeSystem ts, NodeFactory nf, Context context, Context innerContext) {
-            super(job, ts, nf);
-            this.env = new ArrayList();
-            this.outerContext = context;
-            this.innerContext = innerContext;
+    @Override
+    public Node override(Node parent, Node n) {
+        if (n instanceof ConstructorCall) {
+            // Don't rewrite locals in constructor calls; we'll handle that later.
+//            return n;
         }
 
-        List env() {
-            return env;
-        }
+        // Find local classes in a block and remove them.
+        // Rewrite local classes to instance member classes.
+        // Add a field to the local class for each captured local variable.
+        // Add a formal to each constructor for each introduced field.
+        // Add a field initializer to each constructor for each introduced field.
+        // Rewrite constructor calls to pass in the locals.
 
-        public NodeVisitor begin() {
-            ContextVisitor v = (ContextVisitor) super.begin();
-            v.context = innerContext;
-            return v;
-        }
-        
-        /*
-        public Node override(Node parent, Node n) {
-            if (n instanceof LocalClassDecl) {
-                return n;
-            }
-            if (parent instanceof New && n instanceof ClassBody) {
-                return n;
-            }
-            return super.override(n);
-        }
-        */
+        if (n instanceof Block) {
+            Block b = (Block) n;
+            List<Stmt> ss = new ArrayList<Stmt>(b.statements());
+            for (int i = 0; i < ss.size(); i++) {
+                Stmt s = (Stmt) ss.get(i);
+                if (s instanceof LocalClassDecl) {
+                    s = (Stmt) n.visitChild(s, this);
 
-        public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
-            if (n instanceof Local) {
-                Local local = (Local) n;
-//                System.out.println("checking " + n + "\nin " + context + "\nin " + outerContext);
-                
-                // The variable should be in the environment if it's not in the local
-                // scope here, but is in the local scope of outerContext.
-                if (! context.isLocal(local.name())) {
-                    try {
-                        LocalInstance li = outerContext.findLocal(local.name());
-                        // found!
-//                        System.out.println("  found " + li);
-                        if (outerContext.isLocal(local.name())) {
-                            // and not local to the outer context too
-//                        System.out.println("  defined in enclosing method: " + n);
-                            env.add(local.localInstance().orig());
+                    LocalClassDecl lcd = (LocalClassDecl) s;                    
+                    ClassDecl cd = lcd.decl();
+                    Flags flags = context.inStaticContext() ? Flags.PRIVATE.Static() : Flags.PRIVATE;
+                    cd = cd.flags(flags);
+                    cd.type().flags(flags);
+                    cd.type().kind(ClassType.MEMBER);
+
+                    Map<ConstructorInstance,List<LocalInstance>> ciLocals = new HashMap<ConstructorInstance,List<LocalInstance>>();
+                    cd = rewriteLocalClass(cd, ciLocals, hashGet(newFields, cd.type(), Collections.EMPTY_LIST));
+                    
+                    if (cd != lcd.decl()) {
+                        for (int j = i+1; j < ss.size(); j++) {
+                            Stmt sj = ss.get(j);
+                            sj = (Stmt) rewriteConstructorCalls(sj, ciLocals);
+                            ss.set(j, sj);
                         }
                     }
-                    catch (SemanticException e) {
-//                        System.out.println("  not in scope of enclosing method: " + n);
-                        // The local was defined somewhere within the class body.
-                    }
+
+                    hashAdd(orphans, context.currentClassScope(), cd);
+
+                    ss.remove(i);
+                    i--;
                 }
                 else {
-//                    System.out.println("  is local to the inner scope " + n);
+                    s = (Stmt) n.visitChild(s, this);
+                    ss.set(i, s);
                 }
             }
 
-            return super.leaveCall(old, n, v);
-        }
-    }
-    
-    List computeClosure(ClassBody body, Context context, Context innerContext) {
-        EnvCollector v = new EnvCollector(job, ts, nf, context, innerContext);
-        v = (EnvCollector) v.begin();
-        body.visit(v);
-        v.finish();
-        
-//        System.out.println("env of:");
-//        body.del().prettyPrint(System.out);
-//        System.out.println(" = " + v.env());
-
-        return v.env();
-    }
-    
-    String generateName() {
-        return generateName("Anon");
-    }
-
-    String generateName(String base) {
-        return base + "$jl" + count[0]++;
-    }
-    
-    FieldInstance localToField(ParsedClassType ct, LocalInstance li) {
-        FieldInstance fi = ts.fieldInstance(li.position(), ct, li.flags().Protected(), li.type(), namePrefix() + li.name());
-        return fi;
-    }
-    
-    FieldDecl createFieldDecl(FieldInstance fi) {
-        FieldDecl fd = nf.FieldDecl(fi.position(), fi.flags(), nf.CanonicalTypeNode(fi.position(), fi.type()), fi.name());
-        fd = fd.fieldInstance(fi);
-        return fd;
-    }
-    
-    class ClassBodyTranslator extends ContextVisitor { 
-        ParsedClassType ct;
-        Map fieldMap;
-        Context outerContext;
-        
-        ClassBodyTranslator(Job job, TypeSystem ts, NodeFactory nf, Context context, ParsedClassType ct, Map fieldMap) {
-            super(job, ts, nf);
-            this.ct = ct;
-            this.fieldMap = fieldMap;
-            this.outerContext = context;
-        }
-       
-        public NodeVisitor begin() {
-            ContextVisitor v = (ContextVisitor) super.begin();
-            v.context = outerContext;
-            return v;
-        } 
-   
-        public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
-            if (n instanceof Local) {
-                Local l = (Local) n;
-                FieldInstance fi = (FieldInstance) fieldMap.get(new IdentityKey(l.localInstance().orig()));
-                if (fi != null) {
-                    Special this_;
-                    if (ct.equals(context.currentClass())) {
-                        this_ = nf.Special(l.position(), Special.THIS);
-                    }
-                    else {
-                        this_ = nf.Special(l.position(), Special.THIS, nf.CanonicalTypeNode(l.position(), ct));
-                    }
-                    this_ = (Special) this_.type(ct);
-                    Field f = nf.Field(l.position(), this_, fi.name());
-                    f = f.fieldInstance(fi);
-                    f = (Field) f.type(fi.type());
-                    n = f;
-                }
-            }
-            if (n instanceof ConstructorDecl) {
-                ConstructorDecl ctd = (ConstructorDecl) n;
-                ClassType ct2 = (ClassType)
-                    ctd.constructorInstance().container();
-                if (ct2.equals(ct)) {
-                    ctd = translateConstructorDecl(ct, ctd, fieldMap);
-                }
-                n = ctd;
-            }
-            return super.leaveCall(old, n, v);
-        }
-    }
-    
-    ConstructorInstance createEmptyCI(ParsedClassType ct) {
-        ConstructorInstance ci = ts.constructorInstance(ct.position(), ct,
-                                                        Flags.PRIVATE,
-                                                        Collections.EMPTY_LIST,
-                                                        Collections.EMPTY_LIST);
-        ct.addConstructor(ci);
-        return ci;
-    }
-
-    ConstructorDecl createEmptyConstructorDecl(ParsedClassType ct, ConstructorInstance ci) {
-        List stmts = new ArrayList();
-        
-        try {
-            ConstructorInstance superCI = ct.typeSystem().findConstructor((ClassType) ct.superType(),
-                                                                          Collections.EMPTY_LIST,
-                                                                          ct);
-            ConstructorCall superCall;
-
-            if (!ct.flags().isStatic()) {
-                Special this_ = nf.Special(ci.position(), Special.THIS, nf.CanonicalTypeNode(ci.position(), ct.container()));
-                this_ = (Special) this_.type(ct.container());
-                superCall = nf.SuperCall(ci.position(), this_,
-                                         Collections.EMPTY_LIST);
-            }
-            else {
-                superCall = nf.SuperCall(ci.position(), Collections.EMPTY_LIST);
-            }
-
-            superCall = superCall.constructorInstance(superCI);
-            stmts.add(superCall);
-        }
-        catch (SemanticException e) {
+            return b.statements(ss);
         }
 
-        Block b = nf.Block(ci.position(), stmts);
-        
-        ConstructorDecl cd = nf.ConstructorDecl(ci.position(), ci.flags(), ct.name(), Collections.EMPTY_LIST, Collections.EMPTY_LIST, b);
-        cd = cd.constructorInstance(ci);
-        
-        return cd;
-    }
-    
-    void addEnvToCI(ConstructorInstance ci, List env) {
-        List formals = new ArrayList(ci.formalTypes());
-        formals.addAll(envAsFormalTypes(env));
-        ci.setFormalTypes(formals);
+        return null;
     }
 
-    ConstructorDecl translateConstructorDecl(ParsedClassType ct, ConstructorDecl cd, Map m) {
-        List env = env(ct);
-
-        addEnvToCI(cd.constructorInstance(), env);
-
-        cd = cd.name(ct.name());
-        
-        List envAsFormals = envAsFormals(env);
-
-        // Add the new formals.
-        List newFormals = new ArrayList();
-        newFormals.addAll(cd.formals());
-        newFormals.addAll(envAsFormals);
-        cd = cd.formals(newFormals);
-
-        if (cd.body() == null) {
-            // Must be a native constructor; just let the programmer
-            // deal with it.
+    ClassDecl rewriteLocalClass(ClassDecl cd, Map ciLocals, List<FieldInstance> newFields) {
+        if (newFields.isEmpty()) {
             return cd;
         }
 
-        List oldStmts = cd.body().statements();
-        List newStmts = new ArrayList();
+        ClassBody b = cd.body();
 
-        // Check if this constructor invokes another with a this call.
-        // If so, don't initialize the fields, but do pass the environment
-        // to the other constructor.
-        ConstructorCall cc = null;
-
-        if (oldStmts.size() >= 1) {
-            Stmt s = (Stmt) oldStmts.get(0);
-            if (s instanceof ConstructorCall) {
-                cc = (ConstructorCall) s;
-            }
+        // Add the new fields to the class.
+        List newMembers = new ArrayList();
+        for (FieldInstance fi : newFields) {
+            Position pos = fi.position();
+            FieldDecl fd = nf.FieldDecl(pos, fi.flags(), nf.CanonicalTypeNode(pos, fi.type()), nf.Id(pos, fi.name()));
+            fd = fd.fieldInstance(fi);
+            newMembers.add(fd);
         }
 
-        if (cc != null && cc.kind() == ConstructorCall.THIS) {
-            List newArgs = new ArrayList();
-            newArgs.addAll(cc.arguments());
-            newArgs.addAll(envAsLocalActuals(envAsFormals));
+        for (ClassMember m : (List<ClassMember>) b.members()) {
+            if (m instanceof ConstructorDecl) {
+                ConstructorDecl td = (ConstructorDecl) m;
 
-            ConstructorCall newCC = (ConstructorCall) cc.arguments(newArgs);
-            newStmts.add(newCC);
-        }
-        else if (cc != null) {
-            // adjust the super call arguments
-            List newArgs = new ArrayList();
-            newArgs.addAll(cc.arguments());
-            
-            List superEnvAsFormals = new ArrayList();
-            List superEnv = env((ClassType) ct.superType());
-            for (Iterator i = superEnv.iterator(); i.hasNext(); ) {
-                LocalInstance li = (LocalInstance) i.next();
-                Iterator j = envAsFormals.iterator();
-                Iterator k = env.iterator();
-                while (j.hasNext()) {
-                    Formal f = (Formal) j.next();
-                    LocalInstance li2 = (LocalInstance) k.next();
-                    // f.localInstance() is a copy of li2.
-                    if (li.equals(li2)) {
-                        superEnvAsFormals.add(f);
-                    }
+                // Create a list of formals to add to the constructor.
+                List formals = new ArrayList();
+                List locals = new ArrayList();
+                
+                for (FieldInstance fi : newFields) {
+                    Position pos = fi.position();
+                    LocalInstance li = ts.localInstance(pos, Flags.FINAL, fi.type(), fi.name());
+                    li.setNotConstant();                    
+                    Formal formal = nf.Formal(pos, li.flags(), nf.CanonicalTypeNode(pos, li.type()), nf.Id(pos, li.name()));
+                    formal = formal.localInstance(li);
+                    formals.add(formal);
+                    locals.add(li);
                 }
-            }
-            newArgs.addAll(envAsLocalActuals(superEnvAsFormals));
-
-            ConstructorCall newCC = (ConstructorCall) cc.arguments(newArgs);
-            newStmts.add(newCC);
-        }
-
-        // Initialize the new fields.
-        if (cc == null || cc.kind() == ConstructorCall.SUPER) {
-            for (Iterator i = env.iterator(); i.hasNext(); ) {
-                LocalInstance li = (LocalInstance) i.next();
-                FieldInstance fi = (FieldInstance) m.get(new IdentityKey(li));
                 
-                if (fi == null) continue;
-                if (! fi.container().equals(ct)) continue;
+                ciLocals.put(td.constructorInstance().declaration(), locals);
                 
-                Special this_ = nf.Special(cd.position(), Special.THIS);
-                this_ = (Special) this_.type(ct);
+                List newFormals = new ArrayList();
+                newFormals.addAll(formals);
+                newFormals.addAll(td.formals());
+                td = td.formals(newFormals);
+
+                // Create a list of field assignments.
+                List statements = new ArrayList();
+
+                for (int i = 0; i < newFields.size(); i++) {
+                    FieldInstance fi = newFields.get(i);
+                    LocalInstance li = ((Formal) formals.get(i)).localInstance();
+
+                    Position pos = fi.position();
+
+                    Field f = nf.Field(pos, nf.This(pos).type(fi.container()), nf.Id(pos, fi.name()));
+                    f = (Field) f.type(fi.type());
+                    f = (Field) f.fieldInstance(fi);
+                    f = f.targetImplicit(false);
+
+                    Local l = nf.Local(pos, nf.Id(pos, fi.name()));
+                    l = (Local) l.type(li.type());
+                    l = l.localInstance(li);
+
+                    Assign a = nf.FieldAssign(pos, f, Assign.ASSIGN, l);
+                    a = (Assign) a.type(li.type());
+
+                    Eval e = nf.Eval(pos, a);
+                    statements.add(e);
+                }
                 
-                Field target = nf.Field(cd.position(), this_, fi.name());
-                target = target.fieldInstance(fi);
-                target = (Field) target.type(fi.type());
+                // Add the assignments to the constructor body after the super call.
+                // Or, add pass the locals to another constructor if a this call.
+                Block block = td.body();
+                if (block.statements().size() > 0) {
+                    Stmt s0 = (Stmt) block.statements().get(0);
+                    if (s0 instanceof ConstructorCall) {
+                        ConstructorCall cc = (ConstructorCall) s0;
+                        if (cc.kind() == ConstructorCall.THIS) {
+                            // Not a super call.  Pass the locals as arguments.
+                            ConstructorInstance ci = cc.constructorInstance();
+                            List<Expr> arguments = new ArrayList();
+                            for (Stmt si : (List<Stmt>) statements) {
+                                Eval e = (Eval) si;
+                                Assign a = (Assign) e.expr();
+                                arguments.add(a.right());
+                            }
+                            
+                            // Modify the CI if it is a copy of the declaration CI.
+                            // If not a copy, it will get modified at the declaration.
+                            if (ci != ci.declaration()) {
+                                List newFormalTypes = new ArrayList();
+                                for (int i = 0; i < newFields.size(); i++) {
+                                    FieldInstance fi = newFields.get(i);
+                                    newFormalTypes.add(fi.type());
+                                }
+                                newFormalTypes.addAll(ci.formalTypes());
+                                ci.setFormalTypes(newFormalTypes);
+                            }
+                            
+                            arguments.addAll(cc.arguments());
+                            cc = (ConstructorCall) cc.arguments(arguments);
+                            statements.add(0, cc);
+                        }
+                        else {
+                            // A super call.  Don't rewrite it.
+                            statements.add(0, cc);
+                        }
+                    }
+                    
+                    statements.addAll(block.statements().subList(1, block.statements().size()));
+                }
+                else {
+                    statements.addAll(block.statements());
+                }
+
+                block = block.statements(statements);
+                td = (ConstructorDecl) td.body(block);
+
+                newMembers.add(td);
+
+                List newFormalTypes = new ArrayList();
+                for (Formal f : (List<Formal>) newFormals) {
+                    newFormalTypes.add(f.declType());
+                }
                 
-                Local source = nf.Local(cd.position(), li.name());
-                source = source.localInstance(li);
-                source = (Local) source.type(li.type());
+                ConstructorInstance ci = td.constructorInstance();
+                assert ci.declaration() == ci;
                 
-                FieldAssign assign = nf.FieldAssign(cd.position(), target, Assign.ASSIGN, source);
-                assign = (FieldAssign) assign.type(target.type());
-                
-                newStmts.add(nf.Eval(cd.position(), assign));
-            }
-        }
-
-        if (cc != null) {
-            for (int i = 1; i < oldStmts.size(); i++) {
-                newStmts.add(oldStmts.get(i));
-            }
-        }
-        else {
-            newStmts.addAll(oldStmts);
-        }
-
-        Block b = cd.body().statements(newStmts);
-        cd = (ConstructorDecl) cd.body(b);
-        return cd;
-
-        /*
-        void m() {
-            final T x;
-            class C {
-                C(y) { super(y); ... x ... }
-                C() { this(0); ... x ... }
-            }
-            new C(e);
-        }
-
-        ->
-
-        class C {
-            T x;
-            C(y) { super(y); this.x = x; ... this.x ... }
-            C() { this(0); ... this.x ... }
-        }
-        void m() {
-            final T x;
-            new C(e, x);
-        }
-        */
-    }
-    
-    ClassDecl createMemberClass(ParsedClassType ct, ClassBody body) {
-        TypeNode superClass = nf.CanonicalTypeNode(ct.position(), ct.superType());
-        List interfaces = new TransformingList(ct.interfaces(),
-                                               new Transformation() {
-            public Object transform(Object o) {
-                Type t = (Type) o;
-                return nf.CanonicalTypeNode(t.position(), t);
-            }
-        });
-
-        ClassDecl cd = nf.ClassDecl(ct.position(), ct.flags(), ct.name(), superClass, interfaces, body);
-        cd.type(ct);
-        return cd;
-    }
-    
-    List env(ClassType ct) {
-        if (ct != null) {
-            List superEnv = env((ClassType) ct.superType());
-            List env = (List) envMap.get(ct);
-            if (env == null || env.isEmpty()) {
-                return superEnv;
-            }
-            if (superEnv.isEmpty()) {
-                return env;
-            }
-            List l = new ArrayList();
-            l.addAll(superEnv);
-            l.removeAll(env);
-            l.addAll(env);
-            return l;
-        }
-        return Collections.EMPTY_LIST;
-    }
-    
-    List envAsFormalTypes(List env) {
-        List formals = new ArrayList();
-        for (Iterator i = env.iterator(); i.hasNext(); ) {
-            LocalInstance li = (LocalInstance) i.next();
-            formals.add(li.type());
-        }
-        return formals;
-    }
-    
-    List envAsFormals(List env) {
-        List formals = new ArrayList();
-        for (Iterator i = env.iterator(); i.hasNext(); ) {
-            LocalInstance li = (LocalInstance) i.next();
-            Formal f = nf.Formal(Position.compilerGenerated(), li.flags(),
-                                 nf.CanonicalTypeNode(li.position(), li.type()),
-                                 li.name());
-            f = f.localInstance((LocalInstance) li.copy());
-            formals.add(f);
-        }
-        return formals;
-    }
-    
-    List envAsLocalActuals(List envAsFormals) {
-        List actuals = new ArrayList();
-        for (Iterator i = envAsFormals.iterator(); i.hasNext(); ) {
-            Formal f = (Formal) i.next();
-            LocalInstance li = f.localInstance();
-            Local local = nf.Local(li.position(), li.name());
-            local = local.localInstance(li);
-            local = (Local) local.type(li.type());
-            actuals.add(local);
-        }
-        return actuals;
-    }
-
-    List envAsActuals(List env) {
-        List actuals = new ArrayList();
-        for (Iterator i = env.iterator(); i.hasNext(); ) {
-            LocalInstance li = (LocalInstance) i.next();
-            Local local = nf.Local(li.position(), li.name());
-            local = local.localInstance(li);
-            local = (Local) local.type(li.type());
-            actuals.add(local);
-        }
-        return actuals;
-    }
-
-    protected boolean isLocal(ClassType ct) {
-        for (ClassType sup = ct; sup != null; sup = (ClassType) sup.superType()) {
-            if (sup.isLocal()) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    protected Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
-          Context innerContext = ((LocalClassRemover) v).context();
-
-          // If this class extends a local class, we need to change its constructor
-          // to pass in the environment.  Need to split into two passes.
-          if (n instanceof ConstructorDecl) {
-              ParsedClassType ct = context.currentClassScope();
-              if (isLocal(ct) && ! ct.isLocal()) {
-                  n = translateConstructorDecl(ct, (ConstructorDecl) n, Collections.EMPTY_MAP);
-              }
-          }
-          if (n instanceof New) {
-              New newExp = (New) n;
-              ClassType ct = (ClassType) newExp.objectType().type();
-              
-              if (newExp.body() != null) {
-                  ParsedClassType pct = (ParsedClassType) newExp.anonType();
-                  pct.kind(ClassType.MEMBER);
-                  pct.name(generateName());
-                  
-                  ParsedClassType container = context.currentClassScope();
-                  container.addMemberClass(pct);
-                  pct.setContainer(container);
-                  pct.outer(container);
-
-                  if (pct.inStaticContext()) {
-                      pct.setFlags(Flags.PRIVATE.Static());
-                  }
-                  else {
-                      pct.setFlags(Flags.PRIVATE);
-                  }
-
-                  if (context.inStaticContext()) {
-                      pct.setFlags(pct.flags().Static());
-                  }
-
-                  Context c = newExp.del().enterChildScope(newExp.body(), context);
-                  ClassBody body = newExp.body();
-                  translateAnonClassBody(pct, newExp.arguments(), body, c);
-
-                  newExp = newExp.body(null);
-                  newExp = newExp.anonType(null);
-                  newExp = newExp.objectType(nf.CanonicalTypeNode(newExp.position(), pct));
-
-                  ct = pct;
-              }
-              
-              // If instantiating a local class, pass in the environment at
-              // the class declaration.  env(ct) will be empty of the class
-              // was not local.
-              List newArgs = new ArrayList(newExp.arguments());
-              newArgs.addAll(envAsActuals(env(ct)));
-              newExp = (New) newExp.arguments(newArgs);
-              
-              n = newExp;
-          }
-          if (n instanceof LocalClassDecl) {
-              LocalClassDecl lcd = (LocalClassDecl) n;
-              ClassDecl cd = lcd.decl();
-              ParsedClassType pct = cd.type();
-              if (pct.isLocal()) {
-                  pct.kind(ClassType.MEMBER);
-                  pct.name(generateName(pct.name()));
-
-                  ParsedClassType container = context.currentClassScope();
-                  container.addMemberClass(pct);
-                  pct.setContainer(container);
-                  pct.outer(container);
-
-                  if (pct.inStaticContext()) {
-                      pct.setFlags(pct.flags().Private().Static());
-                  }
-                  else {
-                      pct.setFlags(pct.flags().Private());
-                  }
-
-                  if (context.inStaticContext()) {
-                      pct.setFlags(pct.flags().Static());
-                  }
-
-                  ClassBody body = cd.body();
-                  Context c = cd.del().enterChildScope(body, context);
-                  translateLocalClassBody(pct, body, c);
-              }
-              return nf.Empty(lcd.position());
-          }
-          if (n instanceof ClassBody) {
-              ClassBody cb = (ClassBody) n;
-              List members = new ArrayList(cb.members());
-              for (Iterator i = unclaimedDecls.iterator(); i.hasNext(); ) {
-                  ClassDecl cd = (ClassDecl) i.next();
-                  ClassType container = cd.type().outer();
-                  if (container.equals(innerContext.currentClass())) {
-                      members.add(cd);
-                      i.remove();
-                  }
-              }
-              cb = cb.members(members);
-              n = cb;
-          }
-
-          n = super.leaveCall(old, n, v);
-          return n;
-    }
-
-    protected NodeVisitor enterCall(Node n) throws SemanticException {
-        if (n instanceof LocalClassDecl) {
-            LocalClassDecl lcd = (LocalClassDecl) n;
-            ClassDecl cd = lcd.decl();
-            ParsedClassType pct = cd.type();
-            ClassBody body = cd.body();
-            Context c = cd.del().enterChildScope(body, context);
-            List env = computeClosure(body, context, c);
-            envMap.put(pct, env);
-        }
-        return super.enterCall(n);
-    }
-    
-    protected void translateAnonClassBody(ParsedClassType ct, List arguments,
-      ClassBody body, Context context) {
-      // Create a constructor for the class based on the argument list.
-      List stmts = new ArrayList(1);
-      
-      // First, find the ConstructorInstance for the super call.
-      ClassType superCT = (ClassType) ct.superType();
-      List argTypes = new ArrayList(arguments.size());
-      for (Iterator it = arguments.iterator(); it.hasNext();)
-        argTypes.add(((Expr) it.next()).type());
-      ConstructorInstance superCI = null;
-      try {
-        superCI = ts.findConstructor(superCT, argTypes, ct);
-      } catch (SemanticException e) {
-        // Shouldn't happen.
-      }
-      
-      // From the super's ConstructorInstance, create a list of formals and
-      // actuals.
-      List formals = new ArrayList(argTypes.size());
-      List actuals = new ArrayList(argTypes.size());
-      for (Iterator it = superCI.formalTypes().iterator(); it.hasNext();) {
-        Type type = (Type) it.next();
-        String name = "jl$arg" + formals.size();
-        Id id = nf.Id(Position.compilerGenerated(), name);
-        TypeNode tn = nf.CanonicalTypeNode(Position.compilerGenerated(), type);
-        Formal formal =
-          nf.Formal(Position.compilerGenerated(), Flags.NONE, tn, id);
-        LocalInstance li =
-          ts.localInstance(Position.compilerGenerated(), formal.flags(), type,
-              name);
-        formal = formal.localInstance(li);
-        formals.add(formal);
-        
-        Local actual = nf.Local(Position.compilerGenerated(), id);
-        actual = (Local) actual.type(type);
-        actual = actual.localInstance(li);
-        actuals.add(actual);
-      }
-      
-      // Create the super call.
-      Special this_ = nf.Special(Position.compilerGenerated(), Special.THIS,
-          nf.CanonicalTypeNode(Position.compilerGenerated(), ct.container()));
-      this_ = (Special) this_.type(ct.container());
-      ConstructorCall superCall =
-        nf.SuperCall(Position.compilerGenerated(), this_, actuals);
-      superCall = superCall.constructorInstance(superCI);
-      stmts.add(superCall);
-      
-      // Create the constructor declaration.
-      ConstructorInstance ci =
-        ts.constructorInstance(ct.position(), ct, Flags.PRIVATE, superCI
-            .formalTypes(), superCI.throwTypes());
-      ConstructorDecl decl =
-        nf.ConstructorDecl(Position.compilerGenerated(), ci.flags(), nf.Id(
-            Position.compilerGenerated(), ct.name()), formals, ci.throwTypes(),
-            nf.Block(Position.compilerGenerated(), stmts));
-      decl = decl.constructorInstance(ci);
-      
-      // Add the constructor to the body and pass to translateLocalClassBody.
-      List members = new ArrayList(body.members());
-      members.add(decl);
-      body = body.members(members);
-      translateLocalClassBody(ct, body, context);
-    }
-    
-    protected void translateLocalClassBody(ParsedClassType ct, ClassBody body, Context context) {
-        List members = new ArrayList();
-
-        List env = env(ct);
-
-        Map fieldMap = new HashMap();
-
-        for (Iterator i = env.iterator(); i.hasNext(); ) {
-            LocalInstance li = (LocalInstance) i.next();
-            FieldInstance fi = localToField(ct, li);
-            fieldMap.put(new IdentityKey(li), fi);
-
-            ct.addField(fi);
-            members.add(createFieldDecl(fi));
-        }
-
-        // Now add existing members, making sure constructors appear
-        // first.  The constructors may have field
-        // initializers which must be run before other initializers.
-        List ctors = new ArrayList();
-        List others = new ArrayList();
-        for (Iterator i = body.members().iterator(); i.hasNext(); ) {
-            ClassMember cm = (ClassMember) i.next();
-            if (cm instanceof ConstructorDecl) {
-                ctors.add(cm);
+                ci.setFormalTypes(newFormalTypes);
             }
             else {
-                others.add(cm);
+                newMembers.add(m);
+            }
+        }
+
+        b = b.members(newMembers);
+        return cd.body(b);
+    }
+
+
+    Node rewriteConstructorCalls(Node s, final Map ciLocals) {
+        s = s.visit(new NodeVisitor() {
+            public Node leave(Node old, Node n, NodeVisitor v) {
+                if (n instanceof New) {
+                    New neu = (New) n;
+                    ConstructorInstance ci = neu.constructorInstance();
+                    ConstructorInstance nci = (ConstructorInstance) ci.declaration();
+                    neu = (New) neu.arguments(addArgs(neu, nci, (List) ciLocals.get(nci)));
+                    return neu;
+                }
+                if (n instanceof ConstructorCall) {
+                    ConstructorCall neu = (ConstructorCall) n;
+                    ConstructorInstance ci = neu.constructorInstance();       
+                    ConstructorInstance nci = (ConstructorInstance) ci.declaration();
+                    neu = (ConstructorCall) neu.arguments(addArgs(neu, nci, (List) ciLocals.get(nci)));
+                    return neu;
+                }
+
+                return n;
+            } 
+        });
+
+        return s;
+    }
+    
+    boolean inConstructorCall;
+    
+    protected NodeVisitor enterCall(Node parent, Node n) throws SemanticException {
+        LocalClassRemover v = (LocalClassRemover) super.enterCall(parent, n);
+        if (n instanceof ConstructorCall) {
+            if (! inConstructorCall) {
+                v = (LocalClassRemover) v.copy();
+                v.inConstructorCall = true;
+                return v;
+            }
+        }
+        if (n instanceof ClassBody || n instanceof CodeNode) {
+            if (v.inConstructorCall) {
+                v = (LocalClassRemover) v.copy();
+                v.inConstructorCall = false;
+                return v;
+            }
+        }
+        return v;
+    }
+
+    @Override
+    protected Node leaveCall(Node old, Node n, NodeVisitor v)
+    throws SemanticException {
+
+        Context c = this.context();
+
+        Position pos = n.position();
+
+        if (n instanceof Local && ! inConstructorCall) {
+            Local l = (Local) n;
+            if (! context.isLocal(l.name())) {
+                FieldInstance fi = boxLocal(l.localInstance());
+                Field f = nf.Field(pos, makeMissingFieldTarget(fi, pos), l.id());
+                return f;
             }
         }
         
-        members.addAll(ctors);
-        members.addAll(others);
+        // Convert anonymous classes into member classes
+        if (n instanceof New) {
+            New neu = (New) n;
 
-        body = body.members(members);
+            if (neu.body() == null)
+                return neu;
 
-        // Rewrite the class body.
-        ClassBodyTranslator v = new ClassBodyTranslator(job, ts, nf, context, ct, fieldMap);
-        v = (ClassBodyTranslator) v.begin();
-        body = (ClassBody) body.visit(v);
-        v.finish();
+            // Check if extending a class or an interface.
+            TypeNode superClass = neu.objectType();
+            List<TypeNode> interfaces = Collections.EMPTY_LIST;
 
-//        System.out.println("----------------------------------");
-//        System.out.println("new class body:");
-//        body.del().prettyPrint(System.out);
-//        System.out.println("----------------------------------");
+            Type supertype = neu.objectType().type();
+            if (supertype instanceof ClassType) {
+                ClassType s = (ClassType) supertype;
+                if (s.flags().isInterface()) {
+                    superClass = nf.CanonicalTypeNode(pos, ts.Object());
+                    interfaces = Collections.singletonList(neu.objectType());
+                }
+            }
 
-        ClassDecl cd = createMemberClass(ct, body);
-        cd = cd.type(ct);
-        unclaimedDecls.add(cd);
+            ClassBody body = neu.body();
+
+            Id name = nf.Id(pos, UniqueID.newID("Anonymous"));
+            ClassDecl cd = nf.ClassDecl(pos, Flags.PRIVATE, name, superClass, interfaces, body);
+            
+            ParsedClassType type = neu.anonType();
+            type.kind(ClassType.MEMBER);
+            type.name(cd.name());
+
+            Flags flags = context.inStaticContext() ? Flags.PRIVATE.Static() : Flags.PRIVATE;
+            type.flags(flags);
+
+            cd = cd.type(type);
+            cd = cd.flags(flags);
+            cd = addConstructor(cd, neu);
+            
+            ConstructorDecl td = (ConstructorDecl) cd.body().members().get(cd.body().members().size()-1);
+            ConstructorInstance oldCi = neu.constructorInstance();
+            neu = neu.constructorInstance(td.constructorInstance());
+            neu = neu.anonType(null);
+
+            Map<ConstructorInstance,List<LocalInstance>> ciLocals = new HashMap<ConstructorInstance,List<LocalInstance>>();
+
+            cd = rewriteLocalClass(cd, ciLocals, hashGet(newFields, cd.type(), Collections.EMPTY_LIST));
+//            ciLocals.put(neu.constructorInstance(), ciLocals.get(oldCi));
+            hashAdd(orphans, context.currentClassScope(), cd);
+            neu = neu.objectType(nf.CanonicalTypeNode(pos, type)).body(null);
+            neu = (New) rewriteConstructorCalls(neu, ciLocals);
+            return neu;
+        }
+
+        // Add any orphaned declarations created below to the class body
+        if (n instanceof ClassDecl) {
+            ClassDecl cd = (ClassDecl) n;
+            List<ClassMember> o = orphans.get(cd.type());
+            if (o == null)
+                return cd;
+            ClassBody b = cd.body();
+            List members = new ArrayList();
+            members.addAll(b.members());
+            members.addAll(o);
+            b = b.members(members);
+            return cd.body(b);
+        }
+
+        return n;
+    }
+    
+    // Create a new constructor for an anonymous class.
+    ClassDecl addConstructor(ClassDecl cd, New neu) {
+        // Build the list of formal parameters and list of arguments for the super call.
+        List formals = new ArrayList();
+        List args = new ArrayList();
+        List argTypes = new ArrayList();
+        int i = 1;
+        for (Expr e :  (List<Expr>) neu.arguments()) {
+            Position pos = e.position();
+            Id name = nf.Id(pos, "a" + i);
+            i++;
+            Formal f = nf.Formal(pos, Flags.FINAL, nf.CanonicalTypeNode(pos, e.type()), name);
+            Local l = nf.Local(pos, name);
+
+            LocalInstance li = ts.localInstance(pos, f.flags(), f.declType(), name.id());
+            li.setNotConstant();
+            f = f.localInstance(li);
+            l = l.localInstance(li);
+            l = (Local) l.type(li.type());
+            
+            formals.add(f);
+            args.add(l);
+            argTypes.add(li.type());
+        }
+        
+        Position pos = cd.position();
+
+        // Create the super call.
+        ConstructorCall cc = nf.ConstructorCall(pos, ConstructorCall.SUPER, args);
+        cc = cc.constructorInstance(neu.constructorInstance());
+        
+        List statements = new ArrayList();
+        statements.add(cc);
+        
+        // Build the list of throw types, copied from the new expression's constructor (now the superclass constructor).
+        List throwTypeNodes = new ArrayList();
+        List throwTypes = new ArrayList();
+        for (Type t : (List<Type>) neu.constructorInstance().throwTypes()) {
+            throwTypes.add(t);
+            throwTypeNodes.add(nf.CanonicalTypeNode(pos, t));
+        }
+        
+        // Create the constructor declaration node and the CI.
+        ConstructorDecl td = nf.ConstructorDecl(pos, Flags.PRIVATE, cd.id(), formals, throwTypeNodes, nf.Block(pos, statements));
+        ConstructorInstance ci = ts.constructorInstance(pos, context.currentClass(), Flags.PRIVATE, argTypes, throwTypes);
+        td = td.constructorInstance(ci);
+        
+        // Append the constructor to the body.
+        ClassBody b = cd.body();
+        List members = new ArrayList();
+        members.addAll(b.members());
+        members.add(td);
+        b = b.members(members);
+        cd = cd.body(b);
+        return cd;
+    }
+
+    // Add local variables to the argument list until it matches the declaration.
+    List<Expr> addArgs(ProcedureCall n, ConstructorInstance nci, List locals) {
+        if (nci == null || locals == null || locals.isEmpty() || n.arguments().size() == nci.formalTypes().size())
+            return n.arguments();
+        List<Expr> args = new ArrayList<Expr>();
+        for (LocalInstance li : (List<LocalInstance>) locals) {
+            args.add(nf.Local(li.position(), nf.Id(li.position(), li.name())));
+        }
+        args.addAll(n.arguments());
+        assert args.size() == nci.formalTypes().size();
+        return args;
+    }
+
+    // Create a field instance for a local.
+    private FieldInstance boxLocal(LocalInstance li) {
+        FieldInstance fi = env.get(li);
+        if (fi != null) return fi;
+
+        Position pos = li.position();
+
+        fi = ts.fieldInstance(pos, context.currentClass(), li.flags().Private(), li.type(), li.name());
+        fi.setNotConstant();
+        
+        ParsedClassType ct = context.currentClassScope();
+        ct.addField(fi);
+
+        List l = hashGet(newFields, ct, new ArrayList());
+        l.add(fi);
+
+        env.put(li, fi);
+        return fi;
+    }
+
+    protected Receiver makeMissingFieldTarget(FieldInstance fi, Position pos) throws SemanticException {
+        Receiver r;
+
+        Context c = context();
+
+        if (fi.flags().isStatic()) {
+            r = nf.CanonicalTypeNode(pos, fi.container());
+        } else {
+            // The field is non-static, so we must prepend with
+            // "this", but we need to determine if the "this"
+            // should be qualified.  Get the enclosing class which
+            // brought the field into scope.  This is different
+            // from fi.container().  fi.container() returns a super
+            // type of the class we want.
+            ClassType scope = c.findFieldScope(fi.name());
+
+            if (! ts.equals(scope, c.currentClass())) {
+                r = nf.This(pos.startOf(), nf.CanonicalTypeNode(pos, scope)).type(scope);
+            } else {
+                r = nf.This(pos.startOf()).type(scope);
+            }
+        }
+
+        return r;
+    }
+    
+    public static <K,V> V hashGet(Map<K,V> map, K k, V v) {
+        V x = map.get(k);
+        if (x != null)
+            return x;
+        map.put(k, v);
+        return v;
+    }
+    
+    public static <K,V> void hashAdd(Map<K,List<V>> map, K k, V v) {
+        List<V> l = map.get(k);
+        if (l == null) {
+            l = new ArrayList<V>();
+            map.put(k, l);
+        }
+        l.add(v);
     }
 }
