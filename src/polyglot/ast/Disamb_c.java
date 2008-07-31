@@ -156,8 +156,7 @@ public class Disamb_c implements Disamb
     protected Node disambiguateExprPrefix(Expr e) throws SemanticException {
         // Must be a non-static field.
         if (exprOK()) {
-            assert (amb instanceof Expr);
-            return nf.Field(pos, e, name).type(((Expr) amb).type());
+            return nf.Field(pos, e, name).type(((Typed) amb).type());
         }
         return null;
     }
