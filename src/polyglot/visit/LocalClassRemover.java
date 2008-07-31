@@ -435,7 +435,7 @@ public class LocalClassRemover extends ContextVisitor {
         
         // Create the constructor declaration node and the CI.
         ConstructorDecl td = nf.ConstructorDecl(pos, Flags.PRIVATE, cd.id(), formals, throwTypeNodes, nf.Block(pos, statements));
-        ConstructorInstance ci = ts.constructorInstance(pos, context.currentClass(), Flags.PRIVATE, argTypes, throwTypes);
+        ConstructorInstance ci = ts.constructorInstance(pos, cd.type(), Flags.PRIVATE, argTypes, throwTypes);
         td = td.constructorInstance(ci);
         
         // Append the constructor to the body.
