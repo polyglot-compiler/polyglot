@@ -62,7 +62,6 @@ public class LocalClassRemover extends ContextVisitor {
     Map orphans = new HashMap();
     Map newFields = new HashMap();
 
-    @Override
     public Node override(Node parent, Node n) {
         if (n instanceof ConstructorCall) {
             // Don't rewrite locals in constructor calls; we'll handle that later.
@@ -306,7 +305,6 @@ public class LocalClassRemover extends ContextVisitor {
         return v;
     }
 
-    @Override
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
     throws SemanticException {
 
