@@ -293,7 +293,11 @@ public abstract class Scheduler {
 
         boolean okay = true;
 
-        while (okay && ! reached(theEnd)) {
+        while (okay) {
+            if (theEnd.state() == Goal.UNREACHABLE)
+                break;
+            if (theEnd.state() == Goal.REACHED)
+                break;
             okay = attemptGoal(theEnd);
         }
 
@@ -398,6 +402,7 @@ public abstract class Scheduler {
 
             // Run the prereqs of the goal.
             List prereqs = new ArrayList(goal.prerequisiteGoals(this));
+            boolean fail = false;
 
             for (Iterator j = prereqs.iterator(); j.hasNext(); ) {
                 Goal subgoal = (Goal) j.next();
@@ -410,12 +415,18 @@ public abstract class Scheduler {
                     Report.report(4, "running prereq: " + subgoal + "->" + goal);
 
                 if (! attemptGoal(subgoal, newAbove)) {
-                    return false;
+                    fail = true;
+                    continue;
                 }
 
                 if (reached(goal)) {
                     return true;
                 }
+            }
+
+            if (fail) {
+                goal.setState(Goal.UNREACHABLE);
+                return false;
             }
 
             // Make sure all prerequisite subgoals have been completed.
@@ -433,25 +444,6 @@ public abstract class Scheduler {
                 return true;
             }
 
-            // Now, run the goal itself.
-            if (Report.should_report(Report.frontend, 4))
-                Report.report(4, "running goal " + goal);
-            
-            boolean result = runGoal(goal);
-            
-            if (! result) {
-                return false;
-            }
-            
-            if (reached(goal)) {
-                if (goal instanceof EndGoal) {
-                    // The job has finished.  Let's remove it from the map
-                    // so it can be garbage collected, and free up the AST.
-                    completeJob(goal.job());
-                }
-                return true;
-            }
-
             // If the goal was not reached, run the coreqs of the goal. 
             List coreqs = new ArrayList(goal.corequisiteGoals(this));
 
@@ -466,6 +458,54 @@ public abstract class Scheduler {
                     Report.report(4, "running coreq: " + subgoal + "->" + goal);
 
                 if (! attemptGoal(subgoal, newAbove)) {
+                    goal.setState(Goal.UNREACHABLE);
+                    return false;
+                }
+
+                if (reached(subgoal)) {
+                    progress = true;
+                }
+
+                if (reached(goal)) {
+                    return true;
+                }
+            }
+
+            // Now, run the goal itself.
+            if (Report.should_report(Report.frontend, 4))
+                Report.report(4, "running goal " + goal);
+            
+            boolean result = runGoal(goal);
+            
+            if (! result) {
+                goal.setState(Goal.UNREACHABLE);
+                return false;
+            }
+            
+            if (reached(goal)) {
+                if (goal instanceof EndGoal) {
+                    // The job has finished.  Let's remove it from the map
+                    // so it can be garbage collected, and free up the AST.
+                    completeJob(goal.job());
+                }
+                return true;
+            }
+
+            // If the goal was not reached, run the coreqs of the goal. 
+            coreqs = new ArrayList(goal.corequisiteGoals(this));
+
+            for (Iterator j = coreqs.iterator(); j.hasNext(); ) {
+                Goal subgoal = (Goal) j.next();
+
+                if (reached(subgoal)) {
+                    continue;
+                }
+
+                if (Report.should_report(Report.frontend, 4))
+                    Report.report(4, "running coreq: " + subgoal + "->" + goal);
+
+                if (! attemptGoal(subgoal, newAbove)) {
+                    goal.setState(Goal.UNREACHABLE);
                     return false;
                 }
 
