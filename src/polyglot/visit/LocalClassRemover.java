@@ -303,16 +303,11 @@ public class LocalClassRemover extends ContextVisitor {
             return cd.body(b);
         }
         
-        if (n instanceof SourceFile) {
-            n.prettyPrint(System.out);
-            return n.visit(new InnerClassRemover2(job, ts, nf).context(context));
-        }
-
         return n;
     }
     
     ClassDecl rewriteLocalClass(ClassDecl cd, List newFields) {
-        return InnerClassRemover2.addFieldsToClass(cd, newFields, ts, nf, false);
+        return InnerClassRemover.addFieldsToClass(cd, newFields, ts, nf, false);
     }
 
     Node rewriteConstructorCalls(Node s, final ClassType ct, final List fields) {
