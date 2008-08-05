@@ -135,12 +135,17 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 
     /** Type check the call. */
     public Node typeCheck(TypeChecker tc) throws SemanticException {
+        ConstructorCall_c n = this;
+        
 	TypeSystem ts = tc.typeSystem();
 	Context c = tc.context();
 
 	ClassType ct = c.currentClass();
 	Type superType = ct.superType();
 
+	Expr qualifier = n.qualifier;
+	Kind kind = n.kind;
+	
         // The qualifier specifies the enclosing instance of this inner class.
         // The type of the qualifier must be the outer class of this
         // inner class or one of its super types.
@@ -156,7 +161,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
         // }
         if (qualifier != null) {
             if (! qualifier.isDisambiguated()) {
-                return this;
+                return n;
             }
           
             if (kind != SUPER) {
@@ -188,12 +193,14 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	        throw new SemanticException("Super type of " + ct +
 		    " is not a class.", position());
 	    }
+	    
+	    Expr q = qualifier;
 
             // If the super class is an inner class (i.e., has an enclosing
             // instance of its container class), then either a qualifier 
             // must be provided, or ct must have an enclosing instance of the
             // super class's container class, or a subclass thereof.
-            if (qualifier == null && superType.isClass() && superType.toClass().isInnerClass()) {
+            if (q == null && superType.isClass() && superType.toClass().isInnerClass()) {
                 ClassType superContainer = superType.toClass().outer();
                 // ct needs an enclosing instance of superContainer, 
                 // or a subclass of superContainer.
@@ -201,6 +208,8 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
                 
                 while (e != null) {
                     if (e.isSubtype(superContainer) && ct.hasEnclosingInstance(e)) {
+                        NodeFactory nf = tc.nodeFactory();
+                        q = nf.This(position(), nf.CanonicalTypeNode(position(), e)).type(e);
                         break; 
                     }
                     e = e.outer();
@@ -216,11 +225,14 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
                         " must be specified in the super constructor call.", position());
                 }
             }
+            
+            if (qualifier != q)
+                n = (ConstructorCall_c) n.qualifier(q);
 	}
 
 	List argTypes = new LinkedList();
 	
-	for (Iterator iter = this.arguments.iterator(); iter.hasNext();) {
+	for (Iterator iter = n.arguments.iterator(); iter.hasNext();) {
 	    Expr e = (Expr) iter.next();
 	    if (! e.isDisambiguated()) {
 	        return this;
@@ -233,8 +245,7 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
 	}
 	
 	ConstructorInstance ci = ts.findConstructor(ct, argTypes, c.currentClass());
-
-	return constructorInstance(ci);
+	return n.constructorInstance(ci);
     }
 
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
