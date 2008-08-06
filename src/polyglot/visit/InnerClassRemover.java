@@ -80,7 +80,6 @@ public class InnerClassRemover extends ContextVisitor {
         return getContainer(pos, f, curr.outer(), ct);
     }
     
-    @Override
     public Node override(Node parent, Node n) {
         if (n instanceof SourceFile) {
             LocalClassRemover lcv = new LocalClassRemover(job, ts, nf);
