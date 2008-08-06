@@ -244,7 +244,7 @@ public class LocalClassRemover extends ContextVisitor {
             if (supertype instanceof ClassType) {
                 ClassType s = (ClassType) supertype;
                 if (s.flags().isInterface()) {
-                    superClass = nf.CanonicalTypeNode(pos, ts.Object());
+                    superClass = null;
                     interfaces = Collections.singletonList(neu.objectType());
                 }
             }
@@ -363,7 +363,7 @@ public class LocalClassRemover extends ContextVisitor {
         
         // Create the constructor declaration node and the CI.
         ConstructorDecl td = nf.ConstructorDecl(pos, Flags.PRIVATE, cd.id(), formals, throwTypeNodes, nf.Block(pos, statements));
-        ConstructorInstance ci = ts.constructorInstance(pos, context.currentClass(), Flags.PRIVATE, argTypes, throwTypes);
+        ConstructorInstance ci = ts.constructorInstance(pos, cd.type(), Flags.PRIVATE, argTypes, throwTypes);
         td = td.constructorInstance(ci);
         
         return td;
