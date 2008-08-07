@@ -97,6 +97,12 @@ qq_member ::=
 					    d.name, d.init); :}
 	|   constructor_declaration:a
 			{: RESULT = a; :}
+	|   static_initializer:a
+			{: RESULT = parser.nf.Initializer(parser.pos(a),
+			                                  Flags.STATIC, a); :}
+	|   block:a
+	                {: RESULT = parser.nf.Initializer(parser.pos(a),
+	                                                  Flags.NONE, a); :}
     ;
 
 extend left_hand_side ::=
