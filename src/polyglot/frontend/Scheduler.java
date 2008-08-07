@@ -571,7 +571,7 @@ public abstract class Scheduler {
         if (job == null || job.status()) {
             Pass oldPass = this.currentPass;
             this.currentPass = pass;
-            Report.should_report.push(pass.name());
+            Report.pushTopic(pass.name());
 
             // Stop the timer on the old pass. */
             if (oldPass != null) {
@@ -647,22 +647,23 @@ public abstract class Scheduler {
                 goal.setState(Goal.ATTEMPTED);
                 result = true;
             }
-            
-            t = System.currentTimeMillis() - t;
-            extInfo.getStats().accumPassTimes(key, t, t);
-            
-            pass.toggleTimers(false);
-            
-            if (job != null) {
-                job.setRunningPass(null);
-            }
+            finally {
+                t = System.currentTimeMillis() - t;
+                extInfo.getStats().accumPassTimes(key, t, t);
+                
+                pass.toggleTimers(false);
+                
+                if (job != null) {
+                    job.setRunningPass(null);
+                }
 
-            Report.should_report.pop();
-            this.currentPass = oldPass;
+                Report.popTopic();
+                this.currentPass = oldPass;
 
-            // Restart the timer on the old pass. */
-            if (oldPass != null) {
-                oldPass.toggleTimers(true);
+                // Restart the timer on the old pass. */
+                if (oldPass != null) {
+                    oldPass.toggleTimers(true);
+                }
             }
 
             // pretty-print this pass if we need to.

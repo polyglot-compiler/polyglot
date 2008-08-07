@@ -83,7 +83,7 @@ public class Report {
     topics.add(verbose);
     topics.add(debug);
 
-    should_report.push(verbose);
+    pushTopic(verbose);
   }
 
   /**
@@ -108,6 +108,16 @@ public class Report {
     return should_report(Arrays.asList(topics), level);
   }
 
+  public static void pushTopic(String topic) {
+      should_report.push(topic);
+  }
+
+  public static void popTopic() {
+      if (should_report.isEmpty())
+          return;
+      should_report.pop();
+  }
+
   /**
    * Return whether a message on <code>topics</code> of obscurity
    * <code>level</code> should be reported, based on use of the
@@ -116,17 +126,19 @@ public class Report {
   public static boolean should_report(Collection topics, int level) {
       if (noReporting)
           return false;
-    for (Iterator i = should_report.iterator(); i.hasNext();) {
-        String topic = (String) i.next();
-        if (level(topic) >= level) return true;
-    }
-    if (topics != null) {
-	for (Iterator i = topics.iterator(); i.hasNext();) {
-	    String topic = (String) i.next();
-	    if (level(topic) >= level) return true;
-	}
-    }
-    return false;
+      synchronized (should_report) {
+          for (Iterator i = should_report.iterator(); i.hasNext();) {
+              String topic = (String) i.next();
+              if (level(topic) >= level) return true;
+          }
+      }
+      if (topics != null) {
+          for (Iterator i = topics.iterator(); i.hasNext();) {
+              String topic = (String) i.next();
+              if (level(topic) >= level) return true;
+          }
+      }
+      return false;
   }
   
   public static void addTopic(String topic, int level) {
