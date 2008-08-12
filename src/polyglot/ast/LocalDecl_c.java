@@ -279,11 +279,11 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
     }
     
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        if (init != null && ! init.constantValueSet()) {
-            // HACK to add dependencies for computing the constant value.
-            init.visit(new AddDependenciesVisitor(cc, li));
-            return this;
-        }
+//        if (init != null && ! init.constantValueSet()) {
+//            // HACK to add dependencies for computing the constant value.
+//            init.visit(new AddDependenciesVisitor(cc, li));
+//            return this;
+//        }
         
         if (init == null || ! init.isConstant() || ! li.flags().isFinal()) {
             li.setNotConstant();

@@ -80,7 +80,7 @@ public class FieldConstantsChecked extends AbstractGoal {
     public Collection corequisiteGoals(Scheduler scheduler) {
         List l = new ArrayList();
         if (ct != null && ct.job() != null) {
-            l.add(scheduler.ConstantsChecked(ct.job()));
+            l.add(scheduler.TypeChecked(ct.job()));
         }
         l.addAll(super.corequisiteGoals(scheduler));
         return l;

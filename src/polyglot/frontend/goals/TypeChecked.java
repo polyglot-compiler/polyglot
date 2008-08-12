@@ -40,10 +40,10 @@ public class TypeChecked extends VisitorGoal {
         return l;
     }
 
-    public Collection corequisiteGoals(Scheduler scheduler) {
-        List l = new ArrayList();
-        l.add(scheduler.ConstantsChecked(job));
-        l.addAll(super.corequisiteGoals(scheduler));
-        return l;
-    }
+//    public Collection corequisiteGoals(Scheduler scheduler) {
+//        List l = new ArrayList();
+//        l.add(scheduler.ConstantsChecked(job));
+//        l.addAll(super.corequisiteGoals(scheduler));
+//        return l;
+//    }
 }

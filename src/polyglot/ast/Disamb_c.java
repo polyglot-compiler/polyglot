@@ -123,7 +123,7 @@ public class Disamb_c implements Disamb
         if (t.isReference() && exprOK()) {
             try {
                 FieldInstance fi = ts.findField(t.toReference(), name.id(), c.currentClass());
-                return nf.Field(pos, tn, name).fieldInstance(fi).type(fi.type());
+                return nf.Field(pos, tn, name).fieldInstance(fi).type(ts.unknownType(pos));
             } catch (NoMemberException e) {
                 if (e.getKind() != NoMemberException.FIELD) {
                     // something went wrong...
@@ -156,7 +156,7 @@ public class Disamb_c implements Disamb
     protected Node disambiguateExprPrefix(Expr e) throws SemanticException {
         // Must be a non-static field.
         if (exprOK()) {
-            return nf.Field(pos, e, name).type(((Typed) amb).type());
+                return nf.Field(pos, e, name).type(ts.unknownType(pos));
         }
         return null;
     }
@@ -207,10 +207,10 @@ public class Disamb_c implements Disamb
         if (vi instanceof FieldInstance) {
             FieldInstance fi = (FieldInstance) vi;
             Receiver r = makeMissingFieldTarget(fi);
-            return nf.Field(pos, r, name).fieldInstance(fi).targetImplicit(true).type(fi.type());
+            return nf.Field(pos, r, name).fieldInstance(fi).targetImplicit(true).type(ts.unknownType(pos));
         } else if (vi instanceof LocalInstance) {
             LocalInstance li = (LocalInstance) vi;
-            return nf.Local(pos, name).localInstance(li).type(li.type());
+            return nf.Local(pos, name).localInstance(li).type(ts.unknownType(pos));
         }
         return null;
     }

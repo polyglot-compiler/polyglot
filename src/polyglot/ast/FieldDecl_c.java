@@ -261,12 +261,12 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     }
 
     public Node checkConstants(ConstantChecker cc) throws SemanticException {
-        if (init != null && ! init.constantValueSet()) {
-            // HACK to add dependencies for computing the constant value.
-            Scheduler scheduler = cc.typeSystem().extensionInfo().scheduler();
-            init.visit(new AddDependenciesVisitor(scheduler, this.fi));
-            return this;
-        }
+//        if (init != null && ! init.constantValueSet()) {
+//            // HACK to add dependencies for computing the constant value.
+//            Scheduler scheduler = cc.typeSystem().extensionInfo().scheduler();
+//            init.visit(new AddDependenciesVisitor(scheduler, this.fi));
+//            return this;
+//        }
         
         if (init == null || ! init.isConstant() || ! fi.flags().isFinal()) {
             fi.setNotConstant();
@@ -280,6 +280,38 @@ public class FieldDecl_c extends Term_c implements FieldDecl {
     
     public boolean constantValueSet() {
         return fi != null && fi.constantValueSet();
+    }
+
+    public Node typeCheckOverride(Node parent, TypeChecker tc) throws SemanticException {
+        FieldDecl nn = this;
+        FieldDecl old = this;
+        
+        NodeVisitor childv = tc.enter(parent, this);
+
+        if (childv instanceof PruningVisitor) {
+            return nn;
+        }
+
+        boolean constantValueSet = false;
+        FieldInstance fi = nn.fieldInstance();
+        if (fi.constantValueSet()) {
+            constantValueSet = true;
+        }
+        else {
+            fi.setNotConstant();
+        }
+
+        TypeChecker childtc = (TypeChecker) childv;
+        nn = (FieldDecl) nn.visitChildren(childtc);
+        nn = (FieldDecl) tc.leave(parent, old, nn, childtc);
+
+        if (! constantValueSet) {
+            ConstantChecker cc = new ConstantChecker(tc.job(), tc.typeSystem(), tc.nodeFactory());
+            cc = (ConstantChecker) cc.context(childtc.context());
+            nn = (FieldDecl) nn.del().checkConstants(cc);
+        }
+        
+        return nn;
     }
 
     /** Type check the declaration. */

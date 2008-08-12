@@ -676,7 +676,11 @@ public class New_c extends Expr_c implements New
         if (childtc.hasErrors()) throw new SemanticException();
     
         nn = (New) tc.leave(parent, old, nn, childtc);
-        
+    
+        ConstantChecker cc = new ConstantChecker(tc.job(), tc.typeSystem(), tc.nodeFactory());
+        cc = (ConstantChecker) cc.context(childtc.context());
+        nn = (New) nn.del().checkConstants(cc);
+
         return nn;
     }
     

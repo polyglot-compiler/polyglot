@@ -13,17 +13,24 @@
  */
 package polyglot.frontend.goals;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
-import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
-import polyglot.frontend.*;
 import polyglot.frontend.Compiler;
+import polyglot.frontend.EmptyPass;
+import polyglot.frontend.ExtensionInfo;
+import polyglot.frontend.Job;
+import polyglot.frontend.Pass;
+import polyglot.frontend.Scheduler;
+import polyglot.frontend.VisitorPass;
 import polyglot.main.Version;
 import polyglot.types.TypeSystem;
 import polyglot.util.ErrorQueue;
 import polyglot.visit.ClassSerializer;
-import polyglot.visit.NodeVisitor;
+import polyglot.visit.InnerClassRemover;
 
 /**
  * The <code>Serialized</code> goal is reached after typing information is serialized
@@ -41,6 +48,9 @@ public class Serialized extends SourceFileGoal {
         if (compiler.serializeClassInfo()) {
             TypeSystem ts = extInfo.typeSystem();
             NodeFactory nf = extInfo.nodeFactory();
+            if (false)
+            return new VisitorPass(this,
+                     new InnerClassRemover(job, ts, nf));
             return new VisitorPass(this,
                                    createSerializer(ts,
                                                     nf,
@@ -61,7 +71,7 @@ public class Serialized extends SourceFileGoal {
     public Collection prerequisiteGoals(Scheduler scheduler) {
         List l = new ArrayList();
         l.add(scheduler.TypeChecked(job));
-        l.add(scheduler.ConstantsChecked(job));
+//        l.add(scheduler.ConstantsChecked(job));
         l.add(scheduler.ReachabilityChecked(job));
         l.add(scheduler.ExceptionsChecked(job));
         l.add(scheduler.ExitPathsChecked(job));

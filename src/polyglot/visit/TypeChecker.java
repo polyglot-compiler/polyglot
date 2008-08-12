@@ -105,7 +105,11 @@ public class TypeChecker extends DisambiguationDriver
         
         if (! ac.amb && m.isDisambiguated()) {
 //          System.out.println("running typeCheck for " + m);
-            m = m.del().typeCheck((TypeChecker) v);
+            TypeChecker childTc = (TypeChecker) v;
+            m = m.del().typeCheck(childTc);
+            ConstantChecker cc = new ConstantChecker(job, ts, nf);
+            cc = (ConstantChecker) cc.context(childTc.context());
+            m = m.del().checkConstants(cc);
             
 //            if (! m.isTypeChecked()) {
 //                throw new InternalCompilerError("Type checking failed for " + m + " (" + m.getClass().getName() + ")", m.position());
