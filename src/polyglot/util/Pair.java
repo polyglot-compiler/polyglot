@@ -26,4 +26,8 @@ public class Pair
     public Object part2() {
 	return part2;
     }
+    
+    public String toString() {
+    	return "(" + part1 + ", " + part2 + ")";
+    }
 }
