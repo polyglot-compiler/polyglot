@@ -111,6 +111,20 @@ public class Context_c implements Context
     public Package package_() {
         return importTable().package_();
     }
+    
+    /** Return the code def that defines the local variable or type with the given name. */
+    public CodeInstance definingCodeDef(String name) {
+        if ((isBlock() || isCode()) &&
+                (findVariableInThisScope(name) != null || findInThisScope(name) != null)) {
+                return currentCode();
+            }
+        
+        if (outer == null) {
+            return null;
+        }
+
+        return outer.definingCodeDef(name);
+    }
 
     /**
      * Returns whether the particular symbol is defined locally.  If it isn't

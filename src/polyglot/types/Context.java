@@ -101,6 +101,9 @@ public interface Context extends Resolver, Copy
     /** Returns whether the symbol is defined within the current method. */
     boolean isLocal(String name);
 
+    /** Return the code instance that defines the local symbol with the given name, or null. */
+    CodeInstance definingCodeDef(String name);
+
     /** 
      * Returns whether the current context is a static context.
      * A statement of expression occurs in a static context if and only if the
