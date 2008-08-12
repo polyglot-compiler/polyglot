@@ -34,6 +34,7 @@ import polyglot.ast.Stmt;
 import polyglot.ast.SwitchBlock;
 import polyglot.ast.TypeNode;
 import polyglot.frontend.Job;
+import polyglot.main.Report;
 import polyglot.types.ClassType;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
@@ -69,24 +70,51 @@ public class InnerClassRemover extends ContextVisitor {
 
     Map outerFieldInstance = new HashMap();
     
-    Expr getContainer(Position pos, Expr this_, ClassType curr, ClassType ct) {
-        if (ct == curr)
+    /** Get a reference to the enclosing instance of the current class that is of type containerClass */
+    Expr getContainer(Position pos, Expr this_, ClassType currentClass, ClassType containerClass) {
+        if (containerClass == currentClass)
             return this_;
-        FieldInstance fi = boxThis(curr, curr.outer());
+        FieldInstance fi = boxThis(currentClass, currentClass.outer());
         Field f = nf.Field(pos, this_, nf.Id(pos, OUTER_FIELD_NAME));
         f = f.fieldInstance(fi);
         f = (Field) f.type(fi.type());
         f = f.targetImplicit(false);
-        return getContainer(pos, f, curr.outer(), ct);
+        return getContainer(pos, f, currentClass.outer(), containerClass);
     }
     
+    protected ContextVisitor localClassRemover() {
+    	LocalClassRemover lcv = new LocalClassRemover(job, ts, nf);
+    	return lcv;
+    }
+
     public Node override(Node parent, Node n) {
         if (n instanceof SourceFile) {
-            LocalClassRemover lcv = new LocalClassRemover(job, ts, nf);
-            lcv = (LocalClassRemover) lcv.begin();
-            lcv = (LocalClassRemover) lcv.context(context);
+        	ContextVisitor lcv = localClassRemover();
+            lcv = (ContextVisitor) lcv.begin();
+            lcv = (ContextVisitor) lcv.context(context);
+
+            if (Report.should_report("innerremover", 1)) {
+            	System.out.println(">>> output ----------------------");
+            	n.prettyPrint(System.out);
+            	System.out.println("<<< output ----------------------");
+            }
+
             n = n.visit(lcv);
+
+            if (Report.should_report("innerremover", 1)) {
+            	System.out.println(">>> locals removed ----------------------");
+            	n.prettyPrint(System.out);
+            	System.out.println("<<< locals removed ----------------------");
+            }
+
             n = this.visitEdgeNoOverride(parent, n);
+
+            if (Report.should_report("innerremover", 1)) {
+            	System.out.println(">>> inners removed ----------------------");
+            	n.prettyPrint(System.out);
+            	System.out.println("<<< inners removed ----------------------");
+            }
+
             return n;
         }
         else {
@@ -96,7 +124,6 @@ public class InnerClassRemover extends ContextVisitor {
 
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
             throws SemanticException {
-
         Context context = this.context();
 
         Position pos = n.position();
@@ -449,16 +476,16 @@ public class InnerClassRemover extends ContextVisitor {
     }
 
     // Create a field instance for a qualified this.
-    private FieldInstance boxThis(ClassType curr, ClassType t) {
-        FieldInstance fi = (FieldInstance) outerFieldInstance.get(curr);
+    private FieldInstance boxThis(ClassType currClass, ClassType outerClass) {
+        FieldInstance fi = (FieldInstance) outerFieldInstance.get(currClass);
         if (fi != null) return fi;
         
-        Position pos = t.position();
+        Position pos = outerClass.position();
         
-        fi = ts.fieldInstance(pos, curr, Flags.FINAL.Private(), t, OUTER_FIELD_NAME);
+        fi = ts.fieldInstance(pos, currClass, Flags.FINAL.Private(), outerClass, OUTER_FIELD_NAME);
         fi.setNotConstant();
         
-        ParsedClassType currDecl = (ParsedClassType) curr.declaration();
+        ParsedClassType currDecl = (ParsedClassType) currClass.declaration();
         currDecl.addField(fi);
         
         outerFieldInstance.put(currDecl, fi);

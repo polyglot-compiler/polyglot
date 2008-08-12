@@ -35,11 +35,15 @@ import polyglot.ast.SwitchBlock;
 import polyglot.ast.TypeNode;
 import polyglot.frontend.Job;
 import polyglot.types.ClassType;
+import polyglot.types.CodeInstance;
 import polyglot.types.ConstructorInstance;
 import polyglot.types.Context;
 import polyglot.types.FieldInstance;
 import polyglot.types.Flags;
+import polyglot.types.InitializerInstance;
 import polyglot.types.LocalInstance;
+import polyglot.types.MemberInstance;
+import polyglot.types.MethodInstance;
 import polyglot.types.ParsedClassType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
@@ -209,6 +213,10 @@ public class LocalClassRemover extends ContextVisitor {
         return v;
     }
 
+    protected boolean isLocal(Context c, String name) {
+    	return c.isLocal(name);
+    }
+
     protected Node leaveCall(Node old, Node n, NodeVisitor v)
             throws SemanticException {
 
@@ -218,12 +226,14 @@ public class LocalClassRemover extends ContextVisitor {
 
         if (n instanceof Local && ! inConstructorCall) {
             Local l = (Local) n;
-            if (! context.isLocal(l.name())) {
+            if (! isLocal(context, l.name())) {
                 FieldInstance fi = boxLocal(l.localInstance());
-                Field f = nf.Field(pos, makeMissingFieldTarget(fi, pos), nf.Id(pos, fi.name()));
-                f = f.fieldInstance(fi);
-                f = (Field) f.type(fi.type());
-                return f;
+                if (fi != null) {
+                	Field f = nf.Field(pos, makeMissingFieldTarget(fi, pos), nf.Id(pos, fi.name()));
+                	f = f.fieldInstance(fi);
+                	f = (Field) f.type(fi.type());
+                	return f;
+                }
             }
         }
         
@@ -255,6 +265,8 @@ public class LocalClassRemover extends ContextVisitor {
             ParsedClassType type = neu.anonType();
             type.kind(ClassType.MEMBER);
             type.name(cd.name());
+            type.setContainer(context.currentClass());
+            type.package_(context.package_());
 
             Flags flags = context.inStaticContext() ? Flags.PRIVATE.Static() : Flags.PRIVATE;
             type.flags(flags);
@@ -263,6 +275,9 @@ public class LocalClassRemover extends ContextVisitor {
             cd = cd.flags(flags);
 
             ConstructorDecl td = addConstructor(cd, neu);
+            
+            // Add the CI to the class.
+            cd.type().addConstructor(td.constructorInstance());
         
             {
                 // Append the constructor to the body.
@@ -419,13 +434,21 @@ public class LocalClassRemover extends ContextVisitor {
 
     // Create a field instance for a local.
     private FieldInstance boxLocal(LocalInstance li) {
-        FieldInstance fi = (FieldInstance) fieldForLocal.get(li);
-        if (fi != null) return fi;
+    	ClassType curr = currLocalClass();
+    	
+    	if (curr == null)
+    		// not defined in a local class
+    		return null;
+    	
+    	li = (LocalInstance) li.declaration();
+    	
+        Pair key = new Pair(li, curr);
+		FieldInstance fi = (FieldInstance) fieldForLocal.get(key);
+        if (fi != null)
+			return fi;
 
         Position pos = li.position();
         
-        ClassType curr = currLocalClass();
-
         fi = ts.fieldInstance(pos, curr, li.flags().Private(), li.type(), li.name());
         fi.setNotConstant();
         
@@ -436,7 +459,7 @@ public class LocalClassRemover extends ContextVisitor {
         l.add(fi);
         
         localOfField.put(fi, li);
-        fieldForLocal.put(li, fi);
+        fieldForLocal.put(key, fi);
         return fi;
     }
 
