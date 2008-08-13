@@ -254,7 +254,7 @@ public class LocalClassRemover extends ContextVisitor {
             if (supertype instanceof ClassType) {
                 ClassType s = (ClassType) supertype;
                 if (s.flags().isInterface()) {
-                    superClass = null;
+                    superClass = nf.CanonicalTypeNode(pos, ts.Object());
                     interfaces = Collections.singletonList(neu.objectType());
                 }
             }
