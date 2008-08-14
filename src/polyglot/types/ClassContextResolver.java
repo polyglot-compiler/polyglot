@@ -97,7 +97,7 @@ public class ClassContextResolver extends AbstractAccessControlResolver {
                                             " but was found in " + type + ".");
             }
             
-            if (!ts.typeEquals(mt.outer(), type)) {
+            if (mt.outer().declaration() != type.declaration()) {
                 throw new SemanticException("Class " + mt +
                                             " is not a member class " +
                                             " of " + type + ".");
