@@ -3,14 +3,20 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
-Polyglot 2.3.1?
-===============
+Aug 14, 2008: Polyglot 2.4.0
+============================
 
 New command line options for output directories: -D can be used to specify the
 output directory for *.java files, while -d remains the output directory for
 *.class files. If only one of the two is given, both directories are set to be
 the same. That is, if only -d is given, the current behavior of placing both the
 *.java and *.class files into the specified directory is maintained.
+
+Combined type-check and constant-check passes since they're interdependent.
+
+Added visitor InnerClassRemover to remove inner classes.
+
+Miscellaneous bug fixes.
 
 Oct 5, 2007: Polyglot 2.3
 =========================
