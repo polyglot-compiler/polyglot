@@ -229,7 +229,7 @@ public class Position implements Serializable
                 }
                 if (line != endLine && 
                       endColumn != UNKNOWN && endColumn != END_UNUSED) {
-                    s += "-" + endLine + ":" + endColumn;
+                    s += "-" + endLine + "," + endColumn;
                 }
             }
         }
