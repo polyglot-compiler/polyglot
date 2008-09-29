@@ -21,12 +21,14 @@ public abstract class HaltingVisitor extends NodeVisitor
     protected Node bypassParent;
     protected Collection bypass;
 
+    /** Return a new visitor that will bypass all children of node n. */ 
     public HaltingVisitor bypassChildren(Node n) {
         HaltingVisitor v = (HaltingVisitor) copy();
         v.bypassParent = n;
         return v;
     }
 
+    /** Return a new visitor that will visit all children. */
     public HaltingVisitor visitChildren() {
         HaltingVisitor v = (HaltingVisitor) copy();
         v.bypassParent = null;
@@ -34,6 +36,7 @@ public abstract class HaltingVisitor extends NodeVisitor
         return v;
     }
 
+    /** Return a new visitor that bypasses node n during visit children. */
     public HaltingVisitor bypass(Node n) {
         if (n == null) return this;
 
@@ -53,6 +56,7 @@ public abstract class HaltingVisitor extends NodeVisitor
         return v;
     }
 
+    /** Return a new visitor that will bypass all nodes in collection c. */
     public HaltingVisitor bypass(Collection c) {
         if (c == null) return this;
 
