@@ -72,6 +72,7 @@ public class AmbQualifierNode_c extends Node_c implements AmbQualifierNode
 	if (qual != this.qual || name != this.name) {
 	    AmbQualifierNode_c n = (AmbQualifierNode_c) copy();
 	    n.qual = qual;
+	    n.name = name;
 	    return n;
 	}
 
