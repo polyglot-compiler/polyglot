@@ -105,7 +105,8 @@ public class FieldInstance_c extends VarInstance_c implements FieldInstance
         }
     
         if (! constantValueSet) {
-            if (! flags.isFinal()) {
+            if (! flags.isFinal() || !type.isPrimitive() && !type.equals(ts.String())) {
+            	// Only primitive-typed or String-typed fields can be constant.
                 setNotConstant();
                 return isConstant;
             }
