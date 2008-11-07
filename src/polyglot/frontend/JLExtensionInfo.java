@@ -18,6 +18,7 @@ import polyglot.parse.Lexer_c;
 import polyglot.types.TypeSystem_c;
 import polyglot.frontend.*;
 import polyglot.frontend.goals.*;
+import polyglot.lex.EscapedUnicodeReader;
 import polyglot.main.Version;
 import polyglot.types.*;
 import polyglot.util.*;
@@ -56,6 +57,8 @@ public class JLExtensionInfo extends ParserlessJLExtensionInfo {
      * <code>reader</code>.
      */
     public Parser parser(Reader reader, FileSource source, ErrorQueue eq) {
+        reader = new EscapedUnicodeReader(reader);
+
 	polyglot.lex.Lexer lexer = new Lexer_c(reader, source, eq);
 	polyglot.parse.BaseParser parser = new Grm(lexer, ts, nf, eq);
 

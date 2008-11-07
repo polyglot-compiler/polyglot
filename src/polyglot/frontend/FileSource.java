@@ -58,12 +58,11 @@ public class FileSource extends Source
     }
 
     /** This method defines the character encoding used by
-        a file source. By default, it is ASCII with Unicode escapes,
+        a file source. By default, it is US-ASCII
 	but it may be overridden. */
     protected Reader createReader(InputStream str) {
       try {
-	return new polyglot.lex.EscapedUnicodeReader(
-	             new InputStreamReader(str, "US-ASCII"));
+          return new InputStreamReader(str, "US-ASCII");
       } catch (UnsupportedEncodingException e) { return null; }
     }
 
