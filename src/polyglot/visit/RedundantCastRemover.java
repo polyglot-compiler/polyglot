@@ -33,7 +33,7 @@ public class RedundantCastRemover extends NodeVisitor {
             Cast c = (Cast) n;
             Type castType = c.castType().type();
             Type exprType = c.expr().type();
-            if (exprType.isImplicitCastValid(castType)) {
+            if (exprType.isImplicitCastValid(castType) && !castType.isPrimitive()) {
                 // Redundant cast.
                 return c.expr();
             }
