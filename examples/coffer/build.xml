@@ -101,7 +101,7 @@
     </target>
 
     <target name="clobber" depends="clean" description="removes all generated files">
-        <delete includeemptydirs="true">
+        <delete includeemptydirs="true" failonerror="false">
             <fileset dir="${compiler.src}">
                 <include name="**/Grm.java" />
                 <include name="**/sym.java" />
