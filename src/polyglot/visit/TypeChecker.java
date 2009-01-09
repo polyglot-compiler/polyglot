@@ -38,10 +38,16 @@ import polyglot.util.*;
 /** Visitor which performs type checking on the AST. */
 public class TypeChecker extends DisambiguationDriver
 {
+    protected boolean checkConstants = true;
+	
     public TypeChecker(Job job, TypeSystem ts, NodeFactory nf) {
         super(job, ts, nf);
     }
-       
+
+    public void setCheckConstants(boolean check) {
+        this.checkConstants = check;
+    }
+
     public Node override(Node parent, Node n) {
         try {
             if (Report.should_report(Report.visit, 2))
@@ -125,9 +131,12 @@ public class TypeChecker extends DisambiguationDriver
 //          System.out.println("running typeCheck for " + m);
             TypeChecker childTc = (TypeChecker) v;
             m = m.del().typeCheck(childTc);
-            ConstantChecker cc = new ConstantChecker(job, ts, nf);
-            cc = (ConstantChecker) cc.context(childTc.context());
-            m = m.del().checkConstants(cc);
+            
+            if (checkConstants) {
+	            ConstantChecker cc = new ConstantChecker(job, ts, nf);
+	            cc = (ConstantChecker) cc.context(childTc.context());
+	            m = m.del().checkConstants(cc);
+            }
             
 //            if (! m.isTypeChecked()) {
 //                throw new InternalCompilerError("Type checking failed for " + m + " (" + m.getClass().getName() + ")", m.position());
