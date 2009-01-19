@@ -235,7 +235,7 @@ public class LoadedClassResolver implements TopLevelResolver
             throw e;
         }
         catch (InvalidClassException e) {
-            throw new BadSerializationException(clazz.name());
+            throw new BadSerializationException(clazz.name() + "@" + clazz.getClassFileLocation());
         }
         
         if (dt instanceof ClassType) {
