@@ -191,6 +191,10 @@
 		<antcall target="mkdirs" />
 	</target>
 
+	<target name="clean-jars" description="Clean up the jars">
+		<delete dir="${lib}/polyglot.jar" />
+	</target>
+
 	<target name="clobber" depends="clean,clobber-examples" description="Cleans up the directory tree and deletes generated files">
 		<delete>
 			<fileset dir="${src}">
