@@ -659,7 +659,7 @@
 	<!-- build a combined source and binary jar file -->
 	<target name="bin-epl.jar" depends="compile-epl-base,configure-buildstring,mkdir-tmp">
 		<copy todir="${tmp}">
-                  <fileset dir="${basedir}/classes" includes="**/*.class" excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/ext/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class,polyglot/lex/EscapedUnicodeReader.class" />
+            <fileset dir="${basedir}/classes" includes="**/*.class" excludes="polyglot/parse/Grm.class,polyglot/parse/CUP$Grm$actions.class,polyglot/parse/sym.class,polyglot/parse/Lexer_c.class,polyglot/qq/**,polyglot/ext/**,polyglot/frontend/JLExtensionInfo.class,polyglot/parse/BaseParser.class,polyglot/lex/EscapedUnicodeReader.class" />
 		</copy>
 
 		<mkdir dir="${tmp}/META-INF" />
@@ -675,7 +675,7 @@
 		</manifest>
 
 		<copy todir="${tmp}/src">
-			<fileset dir="${basedir}/src" includes="**/*.java" excludes="polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/frontend/JLExtensionInfo.java,polyglot/qq/**,polyglot/ext/**" />
+			<fileset dir="${basedir}/src" includes="**/*.java" excludes="polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/qq/**,polyglot/ext/**,polyglot/frontend/JLExtensionInfo.java,polyglot/lex/EscapedUnicodeReader.java" />
 		</copy>
 
 		<jar destfile="${lib}/polyglot-epl.jar" basedir="${tmp}" manifest="${tmp}/META-INF/MANIFEST.MF" includes="src/**,polyglot/**" />
