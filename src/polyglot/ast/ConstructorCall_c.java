@@ -133,7 +133,9 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
         TypeSystem ts = tb.typeSystem();
 
         // Remove super() calls for java.lang.Object.
-        if (kind == SUPER && tb.currentClass() == ts.Object()) {
+        // XXX Avoid using ts.Object(), which might throw MissingDependencyException,
+        // and cause everything before the constructor declaration to be added twice.
+        if (kind == SUPER && tb.currentClass().fullName().equals("java.lang.Object")) {
             return tb.nodeFactory().Empty(position());
         }
 
@@ -144,7 +146,8 @@ public class ConstructorCall_c extends Stmt_c implements ConstructorCall
           l.add(ts.unknownType(position()));
         }
 
-        ConstructorInstance ci = ts.constructorInstance(position(), ts.Object(),
+        ConstructorInstance ci = ts.constructorInstance(position(), 
+                                                        tb.currentClass(),
                                                         Flags.NONE, l,
                                                         Collections.EMPTY_LIST);
         return n.constructorInstance(ci);

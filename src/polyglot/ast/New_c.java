@@ -186,7 +186,8 @@ public class New_c extends Expr_c implements New
             l.add(ts.unknownType(position()));
         }
 
-        ConstructorInstance ci = ts.constructorInstance(position(), ts.Object(),
+        ConstructorInstance ci = ts.constructorInstance(position(), 
+                                                        tb.currentClass(),
                                                         Flags.NONE, l,
                                                         Collections.EMPTY_LIST);
         n = (New_c) n.constructorInstance(ci);

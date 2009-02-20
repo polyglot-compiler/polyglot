@@ -173,7 +173,8 @@ public class Call_c extends Expr_c implements Call
       l.add(ts.unknownType(position()));
     }
 
-    MethodInstance mi = ts.methodInstance(position(), ts.Object(),
+    MethodInstance mi = ts.methodInstance(position(), 
+                                          tb.currentClass(),
                                           Flags.NONE,
                                           ts.unknownType(position()),
                                           name.id(), l,

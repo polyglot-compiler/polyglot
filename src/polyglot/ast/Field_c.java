@@ -156,7 +156,7 @@ public class Field_c extends Expr_c implements Field
 
       TypeSystem ts = tb.typeSystem();
 
-      FieldInstance fi = ts.fieldInstance(position(), ts.Object(), Flags.NONE,
+      FieldInstance fi = ts.fieldInstance(position(), tb.currentClass(), Flags.NONE,
                                           ts.unknownType(position()), name.id());
       return n.fieldInstance(fi);
   }
