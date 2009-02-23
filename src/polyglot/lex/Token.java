@@ -43,8 +43,8 @@ public abstract class Token {
     return position;
   }
 
-  public java_cup.runtime.Symbol symbol() {
-      return new java_cup.runtime.Symbol(symbol, this);
+  public int symbol() {
+      return symbol;
   }
 
   protected static String escape(String s) {
