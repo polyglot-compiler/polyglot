@@ -27,7 +27,6 @@ package polyglot.lex;
 
 import java.util.Hashtable;
 import polyglot.util.Position;
-import java_cup.runtime.Symbol;
 
 /** A token class for operators. */
 public class Operator extends Token {

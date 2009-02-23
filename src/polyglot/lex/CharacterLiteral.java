@@ -25,7 +25,6 @@
 
 package polyglot.lex;
 
-import java_cup.runtime.Symbol;
 import polyglot.util.Position;
 
 /** Token class for char literals. */
