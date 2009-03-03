@@ -138,7 +138,7 @@ public class ClassSerializer extends NodeVisitor
 			     ver.minor() + "." +
 			     ver.patch_level();
 
-            Position pos = Position.COMPILER_GENERATED;
+            Position pos = Position.compilerGenerated();
 
 	    fi = ts.fieldInstance(pos, ct,
                                   flags, ts.String(),

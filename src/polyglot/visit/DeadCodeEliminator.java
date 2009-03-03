@@ -262,7 +262,7 @@ public class DeadCodeEliminator extends DataFlow {
 		return getEffects(right);
 	    }
 
-	    return nf.Empty(Position.COMPILER_GENERATED);
+	    return nf.Empty(Position.compilerGenerated());
 	}
 
 	if (n instanceof Block) {
@@ -335,11 +335,11 @@ public class DeadCodeEliminator extends DataFlow {
      * expression.
      */
     protected Stmt getEffects(Expr expr) {
-	Stmt empty = nf.Empty(Position.COMPILER_GENERATED);
+	Stmt empty = nf.Empty(Position.compilerGenerated());
 	if (expr == null) return empty;
 
 	final List result = new LinkedList();
-	final Position pos = Position.COMPILER_GENERATED;
+	final Position pos = Position.compilerGenerated();
 
 	NodeVisitor v = new HaltingVisitor() {
 	    public NodeVisitor enter(Node n) {
@@ -383,7 +383,7 @@ public class DeadCodeEliminator extends DataFlow {
 
 	if (result.isEmpty()) return empty;
 	if (result.size() == 1) return (Stmt)result.get(0);
-	return nf.Block(Position.COMPILER_GENERATED, result);
+	return nf.Block(Position.compilerGenerated(), result);
     }
 }
 
