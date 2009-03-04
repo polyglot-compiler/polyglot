@@ -39,6 +39,7 @@ public class Position implements Serializable
 
     private String path;
     private String file;
+    private String info;
 
     private int line;
     private int column;
@@ -77,6 +78,16 @@ public class Position implements Serializable
     /** Get a compiler generated position. */ 
     public static Position compilerGenerated() {
         return compilerGenerated(CALLER);
+    }
+    
+    public static Position compilerGenerated(String info) {
+    	Position pos = compilerGenerated(CALLER);
+    	pos.setInfo(info);
+    	return pos;
+    }
+    
+    public void setInfo(String info) {
+    	this.info = info;
     }
 
     /** For deserialization. */
@@ -220,6 +231,10 @@ public class Position implements Serializable
                 s += "-" + endLine;
             }
         }
+
+        if(info != null) {
+        	s += " (" + info + ")";
+        }
         
         return s;
     }
@@ -249,6 +264,10 @@ public class Position implements Serializable
                     s += "-" + endLine + "," + endColumn;
                 }
             }
+        }
+        
+        if(info != null) {
+        	s += " (" + info + ")";
         }
         
         return s;
