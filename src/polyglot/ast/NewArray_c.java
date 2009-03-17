@@ -146,13 +146,17 @@ public class NewArray_c extends Expr_c implements NewArray
             }
         }
 
-        ArrayType type = ts.arrayOf(baseType.type(), dims.size() + addDims);
+        ArrayType type = arrayOf(ts, baseType.type(), dims.size() + addDims);
 
 	if (init != null) {
             init.typeCheckElements(type);
 	}
 
 	return type(type);
+    }
+
+    protected ArrayType arrayOf(TypeSystem ts, Type baseType, int dims) {
+        return ts.arrayOf(baseType, dims);
     }
 
     public Type childExpectedType(Expr child, AscriptionVisitor av) {

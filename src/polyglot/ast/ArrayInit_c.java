@@ -96,8 +96,12 @@ public class ArrayInit_c extends Expr_c implements ArrayInit
 	    return type(ts.Null());
 	}
 	else {
-	    return type(ts.arrayOf(type));
+	    return type(arrayOf(ts, type));
 	}
+    }
+
+    protected Type arrayOf(TypeSystem ts, Type baseType) {
+        return ts.arrayOf(baseType);
     }
 
     public Type childExpectedType(Expr child, AscriptionVisitor av) {
