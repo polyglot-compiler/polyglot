@@ -20,7 +20,7 @@
    </license>
 
    <url>
-      <update url="http://www.cs.cornell.edu/Projects/polyglot/eclipseUpdates/features/polyglot_@version@.jar"/>
+      <update url="http://www.cs.cornell.edu/Projects/polyglot/eclipseUpdates/"/>
    </url>
 
    <plugin
