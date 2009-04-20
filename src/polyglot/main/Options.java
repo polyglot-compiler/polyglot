@@ -96,7 +96,7 @@ public class Options {
     /** Use SimpleCodeWriter instead of OptimalCodeWriter */
     public boolean use_simple_code_writer = false;
     
-    private boolean java_output_given = false;
+    protected boolean java_output_given = false;
     
     /**
      * Constructor
