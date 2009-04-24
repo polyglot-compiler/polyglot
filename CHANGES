@@ -3,6 +3,11 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
+? : Polyglot 2.4.1
+============================
+
+Precedence of = vs. ?: fixed.
+
 Aug 14, 2008: Polyglot 2.4.0
 ============================
 
