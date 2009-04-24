@@ -28,7 +28,7 @@ package polyglot.ast;
 import polyglot.util.Enum;
 
 /**
- * Constants defining the precedence of an expression.  Higher
+ * Constants defining the precedence of an expression.  Lower
  * values denote higher precedence (i.e., tighter binding).
  */
 public class Precedence extends Enum {
@@ -92,7 +92,7 @@ public class Precedence extends Enum {
     /** The precedence of ternary conditional expressions. */
     public static final Precedence CONDITIONAL = new Precedence("?:", 140);
     /** The precedence of assignment expressions. */
-    public static final Precedence ASSIGN      = new Precedence("=", 130);
+    public static final Precedence ASSIGN      = new Precedence("=", 150);
     /** The precedence of all other expressions. This has the lowest precedence to ensure the expression is parenthesized on output. */
     public static final Precedence UNKNOWN     = new Precedence("unknown", 999);
 }
