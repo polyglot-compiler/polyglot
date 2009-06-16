@@ -17,11 +17,11 @@ public class LexTest
 			fileInput = new FileInputStream(filename);
 		}
 		catch (FileNotFoundException e) {
-			System.out.println("Error: "+filename+" is not found.");
+			System.err.println("Error: "+filename+" is not found.");
 			return;
 		}
 		catch (ArrayIndexOutOfBoundsException e) {
-			System.out.println(HEADER+"Error: No file name given.");
+			System.err.println(HEADER+"Error: No file name given.");
 			return;
 		}
 
@@ -41,10 +41,10 @@ public class LexTest
 			}
 			fileInput.close();
 		} catch (Error e) {
-			System.out.println(e.getMessage());
+			System.err.println(e.getMessage());
 			System.exit(1);
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.err.println(e.getMessage());
 			System.exit(1);
 		}
 	}

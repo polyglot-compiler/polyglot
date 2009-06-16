@@ -18,7 +18,7 @@ public class PPG
     public static void DEBUG (String s)
     {
 	if (debug)
-	    System.out.println (DEBUG_HEADER + s);
+	    System.err.println (DEBUG_HEADER + s);
     }
 
     public static void main (String args[])
@@ -87,12 +87,12 @@ public class PPG
 	}
 	catch (FileNotFoundException e)
 	{
-	    System.out.println ("Error: " + filename + " is not found.");
+	    System.err.println ("Error: " + filename + " is not found.");
 	    return;
 	}
 	catch (ArrayIndexOutOfBoundsException e)
 	{
-	    System.out.println (HEADER + "Error: No file name given.");
+	    System.err.println (HEADER + "Error: No file name given.");
 	    return;
 	}
 
@@ -105,7 +105,7 @@ public class PPG
 	}
 	catch (Exception e)
 	{
-	    System.out.println (HEADER + "Exception: " + e.getMessage ());
+	    System.err.println (HEADER + "Exception: " + e.getMessage ());
 	    return;
 	}
 	Spec spec = (Spec) parser.getProgramNode ();
@@ -134,12 +134,12 @@ public class PPG
 	}
 	catch (PPGError e)
 	{
-	    System.out.println (e.getMessage ());
+	    System.err.println (e.getMessage ());
 	    System.exit (1);
 	}
 	catch (IOException e)
 	{
-	    System.out.println (HEADER + "exception: " + e.getMessage ());
+	    System.err.println (HEADER + "exception: " + e.getMessage ());
 	    System.exit (1);
 	}
     }

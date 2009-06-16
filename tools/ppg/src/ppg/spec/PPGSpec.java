@@ -215,10 +215,10 @@ public class PPGSpec extends Spec
                 is.close();
 
             } catch (FileNotFoundException e) {
-                System.out.println(PPG.HEADER + simpleName + " not found.");
+                System.err.println(PPG.HEADER + simpleName + " not found.");
                 System.exit(1);
             } catch (Exception e) {
-                System.out.println(PPG.HEADER+"Exception: "+e.getMessage());
+                System.err.println(PPG.HEADER+"Exception: "+e.getMessage());
                 System.exit(1);
             }
             parent.setChild(this);

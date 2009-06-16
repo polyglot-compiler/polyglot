@@ -102,7 +102,7 @@ public class Token /* extends Symbol */ implements LexerResult {
 			case Constant.error:				return "ERROR";
 
 			default: {
-				System.out.println("Invalid token conversion: "+type);
+				System.err.println("Invalid token conversion: "+type);
 				System.exit(2);
 			}
 		}

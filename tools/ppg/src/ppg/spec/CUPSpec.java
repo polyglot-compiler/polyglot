@@ -294,7 +294,7 @@ public class CUPSpec extends Spec
 		try {
 			export(System.out);
 		} catch (Exception e) {
-			System.out.println(HEADER+"Exception: "+e.getMessage());
+			System.err.println(HEADER+"Exception: "+e.getMessage());
 			return;
 		}
 		*/
