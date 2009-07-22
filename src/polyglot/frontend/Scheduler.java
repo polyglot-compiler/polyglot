@@ -365,7 +365,7 @@ public abstract class Scheduler {
     }
 
     /**
-     * Run a passes until the <code>goal</code> is attempted. Callers should
+     * Run a pass until the <code>goal</code> is attempted. Callers should
      * check goal.completed() and should be able to handle the goal not being
      * reached.
      * 
