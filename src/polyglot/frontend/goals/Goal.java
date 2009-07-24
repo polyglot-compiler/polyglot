@@ -34,6 +34,10 @@ import polyglot.frontend.*;
  * achieve by automatically scheduling passes.  Goals may depend on each other,
  * and a goal is not attempted until its prerequisites are achieved. Goals may
  * also be corequisites (mutually dependent).
+ * 
+ * Once all the prerequisites of a goal are reached, the goal's
+ * <code>Pass</code> is run. It keeps trying until it is successful or
+ * it fails and the compiler quits with an error.
  *
  * @author nystrom
  */

@@ -25,7 +25,9 @@
 
 package polyglot.ast;
 
-/** A name represents a simple identifier in the AST. */
+/** An Id represents a simple identifier in the AST. Because it is a
+  * full-fledged node, extensions have the opportunity to attach additional
+  * information. */
 public interface Id extends Node {
     String id();
     Id id(String id);

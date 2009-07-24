@@ -28,9 +28,11 @@ package polyglot.frontend;
 import polyglot.frontend.goals.Goal;
 
 
-/** A <code>Pass</code> represents a compiler pass.
- * A <code>Job</code> runs a series of passes over the AST. 
- * A pass is run to attempt to satisfy a goal.
+/** A <code>Pass</code> represents a compiler pass that runs on a
+ * <code>Job</code>. All work in the compiler is done by passes, which are
+ * scheduled by the scheduler (<code>Scheduler</code>) to satisfy goals
+ * (<code>Goal</code>).
+ * 
  */
 public interface Pass
 {
