@@ -195,7 +195,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * A utility method that simply collects together all the 
      * TRUE items, FALSE items, and all other items (including ExceptionEdgeKey
      * items), calls <code>confluence</code> on each of these three collections
-     * as neccessary, and passes the results to 
+     * as necessary, and passes the results to 
      * flow(Item, Item, Item, FlowGraph, Term, Set). It is expected that 
      * this method will typically be called by subclasses overriding the
      * flow(List, List, FlowGraph, Term, Set) method, due to the need for
@@ -682,11 +682,11 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
 
     /**
-     * Initialise the <code>FlowGraph</code> to be used in the dataflow
+     * Initialize the <code>FlowGraph</code> to be used in the dataflow
      * analysis.
      *
      * @return null if no dataflow analysis should be performed for this
-     *         code declaration; otherwise, an apropriately initialized
+     *         code declaration; otherwise, an appropriately initialized
      *         <code>FlowGraph.</code>
      */
     protected FlowGraph initGraph(CodeNode code, Term root) {
@@ -694,11 +694,11 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
 
     /**
-     * Initialise the <code>FlowGraph</code> to be used in the dataflow
+     * Initialize the <code>FlowGraph</code> to be used in the dataflow
      * analysis.
      *
      * @return null if no dataflow analysis should be performed for this
-     *         code declaration; otherwise, an apropriately initialized
+     *         code declaration; otherwise, an appropriately initialized
      *         <code>FlowGraph.</code>
      */
     protected FlowGraph initGraph(CodeDecl code, Term root) {
