@@ -433,13 +433,24 @@ public abstract class Node_c implements Node
 	w.write(")");
         w.end();
 
-        w.allowBreak(4, " ");
-        w.begin(0);
-        w.write("(ext ");
-	if (ext() == null) w.write("null");
-	else ext().dump(w);
-	w.write(")");
-        w.end();
+        Ext ext = ext();
+        while (true) {
+            w.allowBreak(4, " ");
+            w.begin(0);
+            w.write("(ext ");
+            if (ext == null) {
+                w.write("null");
+            }
+            else {
+                ext().dump(w);
+            }
+            w.write(")");
+            w.end();
+            ext = ext.ext();
+            if (ext == null) {
+                break;
+            }
+        } 
 
         w.allowBreak(4, " ");
         w.begin(0);
