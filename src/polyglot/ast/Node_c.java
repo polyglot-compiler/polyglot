@@ -442,7 +442,7 @@ public abstract class Node_c implements Node
                 w.write("null");
             }
             else {
-                ext().dump(w);
+                ext.dump(w);
             }
             w.write(")");
             w.end();
