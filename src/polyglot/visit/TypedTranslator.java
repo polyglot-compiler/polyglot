@@ -64,6 +64,6 @@ public class TypedTranslator extends Translator {
             throw new InternalCompilerError("Untyped AST node found during type-directed code generation.", child.position());
         }
         
-        super.print(parent, child, w);
+        super.print(parent, child, w); // XXX This won't work -- child is null (Findbugs)
     }
 }

@@ -105,7 +105,7 @@ public class PPGSpec extends Spec
 		// Generate token names
 		Vector tokens = new Vector();
 		for (int i=0; i < startSyms.size(); i+=2) {
-			tokens.addElement(new String("JLGEN_TOKEN_"+String.valueOf(i/2)));
+			tokens.addElement("JLGEN_TOKEN_"+String.valueOf(i/2));
 		}
 		
 		String startSym, method, token;

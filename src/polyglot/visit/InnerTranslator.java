@@ -302,7 +302,7 @@ public class InnerTranslator extends NodeVisitor {
 			enterLocalDecl(ld);
 		}
 		else if (n instanceof ClassBody) {
-			insideCode.push(new Boolean(false));
+			insideCode.push(Boolean.valueOf(false));
 		}
 		else if (n instanceof FieldDecl) {
 			FieldDecl fd = (FieldDecl)n;
@@ -313,10 +313,10 @@ public class InnerTranslator extends NodeVisitor {
 
 	protected void enterFieldDecl(FieldDecl fd) {
 		if (fd.flags().isStatic()) {
-			staticFieldDecl.push(new Boolean(true));
+			staticFieldDecl.push(Boolean.valueOf(true));
 		}
 		else {
-			staticFieldDecl.push(new Boolean(false));
+			staticFieldDecl.push(Boolean.valueOf(false));
 		}
 	}
 	
@@ -443,7 +443,7 @@ public class InnerTranslator extends NodeVisitor {
 		}
 		
 		codeContext.push(cinfo);
-		insideCode.push(new Boolean(true));
+		insideCode.push(Boolean.valueOf(true));
 	}
 	
 	protected void enterLocalDecl(LocalDecl ld) {

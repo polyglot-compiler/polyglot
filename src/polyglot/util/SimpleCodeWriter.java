@@ -55,7 +55,7 @@ public class SimpleCodeWriter extends CodeWriter {
 	public int lmargin;
 	public boolean breakAll;
 
-	State(int m, boolean b) { lmargin = m; b = breakAll; }
+	State(int m, boolean b) { lmargin = m; breakAll = b; }
     }
 
     public SimpleCodeWriter(PrintWriter o, int width_) {

@@ -131,7 +131,7 @@ public class Subst_c implements Subst
 
     /** Perform substitutions on a type. */
     public Type substType(Type t) {
-        if (t == null || t == this)
+        if (t == null || t == this) // XXX comparison t == this can't succeed! (Findbugs)
             return t;
 
         Type cached = cacheGet(t);
