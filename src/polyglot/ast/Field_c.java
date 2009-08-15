@@ -177,6 +177,11 @@ public class Field_c extends Expr_c implements Field
 	  Field_c f = (Field_c)fieldInstance(fi).type(fi.type());  
 	  f.checkConsistency(c);
 	  
+	  if (!fi.flags().isStatic() && target instanceof TypeNode) {
+		  throw new SemanticException("Non-static field " + name.id() + " cannot be referenced " +
+		  		"from a static context.", f.position());
+	  }
+	  
 	  return f; 
       }
 

@@ -123,5 +123,4 @@ public interface ExtensionInfo {
         the character encoding to be defined. */
     FileSource createFileSource(File sourceFile, boolean userSpecified)
 	throws IOException;
-
 }
