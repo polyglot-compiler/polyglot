@@ -82,6 +82,13 @@ while true; do
             
             shift
             ;;
+        -cp)
+            shift
+            extra_cp_arg=`unixpath "$1"`
+            extra_cp="$extra_cp:$extra_cp_arg"
+            
+            shift
+            ;;            
         -j)
             shift
             vmargs="$vmargs '$1'"
