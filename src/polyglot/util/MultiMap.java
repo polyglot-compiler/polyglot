@@ -2,9 +2,15 @@ package polyglot.util;
 
 import java.util.*;
 
+/** A MultiMap is a map that allows the same key to be used to map to multiple values.
+    It is therefore an arbitrary binary relation on keys and values.
+*/
 public class MultiMap extends AbstractMap {
+	/* The representation is a mapping from each key to the set of values that that key
+	   maps to. */
 	private Map map = new HashMap(); // Map <Object, Set <Object> >
 	
+	/** The set of values associated with a key. */
 	private Set getValueSet(Object key) {
 		Set values = (Set)map.get(key);
 		if (values == null) {
