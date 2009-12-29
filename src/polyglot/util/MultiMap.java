@@ -2,15 +2,16 @@ package polyglot.util;
 
 import java.util.*;
 
-/** A MultiMap is a map that allows the same key to be used to map to multiple values.
-    It is therefore an arbitrary binary relation on keys and values.
-*/
+/** 
+ * A <code>MultiMap</code> is a map that allows the same key to be used to map 
+ * to multiple values. 
+ * It is therefore an arbitrary binary relation on keys and values.
+ */
 public class MultiMap extends AbstractMap {
-	/* The representation is a mapping from each key to the set of values that that key
-	   maps to. */
+	/* The representation is a mapping from each key to the set of values that 
+	 * that key maps to. */
 	private Map map = new HashMap(); // Map <Object, Set <Object> >
 	
-	/** The set of values associated with a key. */
 	private Set getValueSet(Object key) {
 		Set values = (Set)map.get(key);
 		if (values == null) {
@@ -41,6 +42,7 @@ public class MultiMap extends AbstractMap {
 		return map.get(key);
 	}
 	
+	/** The set of values associated with a key. Not modifiable. */
 	public Set getValues(Object key) {
 		Set s = (Set)map.get(key);
 		if (s == null) {
@@ -50,6 +52,10 @@ public class MultiMap extends AbstractMap {
 		}
 	}
 	
+	/** 
+	 * Makes <code>key</code> map to <code>value</code>, where <code>value</code>
+	 * has to be a collection of objects.
+	 */
 	public Object put(Object key, Object value) {
 		if (value instanceof Collection) {
 			Object original = map.get(key);
@@ -60,11 +66,18 @@ public class MultiMap extends AbstractMap {
 		}
 		throw new IllegalArgumentException(value.getClass().toString());
 	}
-	
+
+	/**
+	 * Adds a single value into the set associated with <code>key</code>.
+	 */
 	public boolean add(Object key, Object value) {
 		return getValueSet(key).add(value);
 	}
 	
+	/**
+	 * Adds all the values in <code>values</code> into the set associated with 
+	 * <code>key</code>.
+	 */
 	public boolean addAll(Object key, Collection values) {
 		return getValueSet(key).addAll(values);
 	}
