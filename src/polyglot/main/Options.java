@@ -13,7 +13,7 @@
  * This program and the accompanying materials are made available under
  * the terms of the Lesser GNU Public License v2.0 which accompanies this
  * distribution.
- * 
+ *
  * The development of the Polyglot project has been supported by a
  * number of funding sources, including DARPA Contract F30602-99-1-0533,
  * monitored by USAF Rome Laboratory, ONR Grant N00014-01-1-0968, NSF
@@ -35,8 +35,8 @@ import java.util.StringTokenizer;
 
 import polyglot.frontend.ExtensionInfo;
 
-/** 
- * This object encapsulates various polyglot options. 
+/**
+ * This object encapsulates various polyglot options.
  */
 public class Options {
     /**
@@ -44,12 +44,12 @@ public class Options {
      * object. This should be fixed. XXX###@@@
      */
     public static Options global;
-    
+
     /**
      * Back pointer to the extension that owns this options
      */
     protected ExtensionInfo extension = null;
-    
+
     /*
      * Fields for storing values for options.
      */
@@ -63,7 +63,7 @@ public class Options {
     public String output_classpath;
     public String bootclasspath = null;
     public boolean assertions = false;
-    
+
     public boolean compile_command_line_only = false;
 
     public String[] source_ext = null; // e.g., java, jl, pj
@@ -71,33 +71,39 @@ public class Options {
     public boolean output_stdout = false; // whether to output to stdout
     public String post_compiler;
       // compiler to run on java output file
-  
+
     public int output_width = 80;
     public boolean fully_qualified_names = false;
-  
+
     /** Inject type information in serialized form into output file? */
     public boolean serialize_type_info = true;
-  
+
     /** Dump the AST after the following passes? */
     public Set dump_ast = new HashSet();
-  
+
     /** Pretty-print the AST after the following passes? */
     public Set print_ast = new HashSet();
- 
+
     /** Disable the following passes? */
     public Set disable_passes = new HashSet();
-  
+
     /** keep output files */
     public boolean keep_output_files = true;
-    
+
     /** Generate position information for compiler-generated code. */
     public boolean precise_compiler_generated_positions = false;
-    
+
     /** Use SimpleCodeWriter instead of OptimalCodeWriter */
     public boolean use_simple_code_writer = false;
-    
+
+    /**
+     * Parse "a" + "b" as "ab" to avoid very deep AST, e.g., for action tables,
+     * and for serialization.
+     */
+    public boolean merge_strings = false;
+
     protected boolean java_output_given = false;
-    
+
     /**
      * Constructor
      */
@@ -105,7 +111,7 @@ public class Options {
         this.extension = extension;
         setDefaultValues();
     }
-    
+
     /**
      * Set default values for options
      */
@@ -117,22 +123,22 @@ public class Options {
                      File.separator + "lib" +
                      File.separator + "rt.jar";
         }
-    
+
         default_classpath = System.getProperty("java.class.path") +
                             File.pathSeparator + default_bootpath;
-        classpath = default_classpath;        
+        classpath = default_classpath;
 
         default_output_classpath = System.getProperty("java.class.path");
         output_classpath = default_output_classpath;
 
         String java_home = System.getProperty("java.home");
         String current_dir = System.getProperty("user.dir");
-    
+
         source_path = new LinkedList();
         source_path.add(new File(current_dir));
-    
+
         output_directory = new File(current_dir);
-    
+
         // First try: $JAVA_HOME/../bin/javac
         // This should work with JDK 1.2 and 1.3
         //
@@ -143,34 +149,34 @@ public class Options {
         //
         post_compiler = java_home + File.separator + ".." + File.separator +
                             "bin" + File.separator + "javac";
-    
+
         if (! new File(post_compiler).exists()) {
           post_compiler = java_home + File.separator +
                               "bin" + File.separator + "javac";
-    
+
           if (! new File(post_compiler).exists()) {
             post_compiler = "javac";
           }
         }
     }
-    
+
     /**
      * Parse the command line
-     * 
+     *
      * @throws UsageError if the usage is incorrect.
      */
     public void parseCommandLine(String args[], Set source) throws UsageError {
         if(args.length < 1) {
             throw new UsageError("No command line arguments given");
         }
-    
+
         for(int i = 0; i < args.length; ) {
             try {
-                int ni = parseCommand(args, i, source);                
+                int ni = parseCommand(args, i, source);
                 if (ni == i) {
                     throw new UsageError("illegal option -- " + args[i]);
                 }
-                
+
                 i = ni;
 
             }
@@ -178,29 +184,29 @@ public class Options {
                 throw new UsageError("missing argument");
             }
         }
-                    
+
         if (source.size() < 1) {
           throw new UsageError("must specify at least one source file");
         }
     }
-    
+
     /**
      * Parse a command
      * @return the next index to process. i.e., if calling this method
      *         processes two commands, then the return value should be index+2
      */
-    protected int parseCommand(String args[], int index, Set source) 
+    protected int parseCommand(String args[], int index, Set source)
             throws UsageError, Main.TerminationException {
         int i = index;
-        if (args[i].equals("-h") || 
-            args[i].equals("-help") || 
+        if (args[i].equals("-h") ||
+            args[i].equals("-help") ||
             args[i].equals("--help")) {
             throw new UsageError("", 0);
         }
         else if (args[i].equals("-version")) {
             StringBuffer sb = new StringBuffer();
             if (extension != null) {
-                sb.append(extension.compilerName() + 
+                sb.append(extension.compilerName() +
                           " version " + extension.version() + "\n");
             }
             sb.append("Polyglot compiler toolkit version " +
@@ -250,22 +256,22 @@ public class Options {
             }
             i++;
         }
-        else if (args[i].equals("-commandlineonly")) 
+        else if (args[i].equals("-commandlineonly"))
         {
             i++;
             compile_command_line_only = true;
         }
-        else if (args[i].equals("-preferclassfiles")) 
+        else if (args[i].equals("-preferclassfiles"))
         {
             i++;
             ignore_mod_times = true;
         }
-        else if (args[i].equals("-assert")) 
+        else if (args[i].equals("-assert"))
         {
             i++;
             assertions = true;
         }
-        else if (args[i].equals("-fqcn")) 
+        else if (args[i].equals("-fqcn"))
         {
             i++;
             fully_qualified_names = true;
@@ -297,12 +303,12 @@ public class Options {
             post_compiler = args[i];
             i++;
         }
-        else if (args[i].equals("-stdout")) 
+        else if (args[i].equals("-stdout"))
         {
             i++;
             output_stdout = true;
         }
-        else if (args[i].equals("-sx")) 
+        else if (args[i].equals("-sx"))
         {
             i++;
             if (source_ext == null) {
@@ -354,7 +360,7 @@ public class Options {
             keep_output_files = false;
             output_width = 1000; // we do not keep the output files, so
                                  // set the output_width to a large number
-                                 // to reduce the time spent pretty-printing 
+                                 // to reduce the time spent pretty-printing
         }
         else if (args[i].equals("-v") || args[i].equals("-verbose"))
         {
@@ -370,12 +376,12 @@ public class Options {
             if (st.hasMoreTokens()) {
                 try {
                     level = Integer.parseInt(st.nextToken());
-                } 
+                }
                 catch (NumberFormatException e) {}
             }
             Report.addTopic(topic, level);
             i++;
-        }        
+        }
         else if (args[i].equals("-debugpositions")) {
             precise_compiler_generated_positions = true;
             i++;
@@ -384,6 +390,10 @@ public class Options {
         	use_simple_code_writer = true;
         	i++;
         }
+        else if (args[i].equals("-mergestrings")) {
+            merge_strings = true;
+            i++;
+        }
         else if (!args[i].startsWith("-")) {
             source.add(args[i]);
             File f = new File(args[i]).getParentFile();
@@ -391,10 +401,10 @@ public class Options {
                 source_path.add(f);
             i++;
         }
-        
+
         return i;
     }
-    
+
     /**
      * Print usage information
      */
@@ -406,7 +416,7 @@ public class Options {
         usageForFlag(out, "-d <directory>", "output directory");
         usageForFlag(out, "-assert", "recognize the assert keyword");
         usageForFlag(out, "-sourcepath <path>", "source path");
-        usageForFlag(out, "-bootclasspath <path>", 
+        usageForFlag(out, "-bootclasspath <path>",
                           "path for bootstrap class files");
         usageForFlag(out, "-ext <extension>", "use language extension");
         usageForFlag(out, "-extclass <ext-class>", "use language extension");
@@ -416,7 +426,7 @@ public class Options {
         usageForFlag(out, "-sx <ext>", "set source extension");
         usageForFlag(out, "-ox <ext>", "set output extension");
         usageForFlag(out, "-errors <num>", "set the maximum number of errors");
-        usageForFlag(out, "-w <num>", 
+        usageForFlag(out, "-w <num>",
                           "set the maximum width of the .java output files");
         usageForFlag(out, "-dump <pass>", "dump the ast after pass <pass>");
         usageForFlag(out, "-print <pass>",
@@ -427,12 +437,13 @@ public class Options {
         usageForFlag(out, "-D <directory>", "output directory for .java files");
         usageForFlag(out, "-nooutput", "delete output files after compilation");
         usageForFlag(out, "-c", "compile only to .java");
-        usageForFlag(out, "-post <compiler>", 
+        usageForFlag(out, "-post <compiler>",
                           "run javac-like compiler after translation");
         usageForFlag(out, "-debugpositions", "generate position information for compiler-generated code");
         usageForFlag(out, "-simpleoutput", "use SimpleCodeWriter");
+        usageForFlag(out, "-mergestrings", "parse concatenated string literals as one single string literal");
         usageForFlag(out, "-v -verbose", "print verbose debugging information");
-        usageForFlag(out, "-report <topic>=<level>", 
+        usageForFlag(out, "-report <topic>=<level>",
                           "print verbose debugging information about " +
                           "topic at specified verbosity");
 
@@ -444,11 +455,11 @@ public class Options {
             }
         }
         usageSubsection(out, allowedTopics.toString());
-        
+
         usageForFlag(out, "-version", "print version info");
         usageForFlag(out, "-h", "print this message");
     }
-    
+
     /**
      * The maximum width of a line when printing usage information. Used
      * by <code>usageForFlag</code> and <code>usageSubsection</code>.
@@ -470,20 +481,20 @@ public class Options {
     public boolean ignore_mod_times;
 
     /**
-     * Output a flag and a description of its usage in a nice format. This 
+     * Output a flag and a description of its usage in a nice format. This
      * makes it easier for extensions to output their usage in a consistent
      * format.
-     * 
+     *
      * @param out output PrintStream
-     * @param flag 
+     * @param flag
      * @param description description of the flag.
      */
-    protected void usageForFlag(PrintStream out, String flag, String description) {        
+    protected void usageForFlag(PrintStream out, String flag, String description) {
         out.print("  ");
         out.print(flag);
         // cur is where the cursor is on the screen.
         int cur = flag.length() + 2;
-        
+
         // print space to get up to indentation level
         if (cur < USAGE_FLAG_WIDTH) {
             printSpaces(out, USAGE_FLAG_WIDTH - cur);
@@ -495,7 +506,7 @@ public class Options {
             printSpaces(out, USAGE_FLAG_WIDTH);
         }
         cur = USAGE_FLAG_WIDTH;
-        
+
         // break up the description.
         StringTokenizer st = new StringTokenizer(description);
         while (st.hasMoreTokens()) {
@@ -521,22 +532,22 @@ public class Options {
         }
         out.println();
     }
-    
+
     /**
      * Output a section of text for usage information. This text will be
      * displayed indented a certain amount from the left, controlled by
      * the field <code>USAGE_SUBSECTION_INDENT</code>
-     * 
+     *
      * @param out the output PrintStream
      * @param text the text to output.
      */
-    protected void usageSubsection(PrintStream out, String text) {        
+    protected void usageSubsection(PrintStream out, String text) {
         // print space to get up to indentation level
         printSpaces(out, USAGE_SUBSECTION_INDENT);
 
         // cur is where the cursor is on the screen.
         int cur = USAGE_SUBSECTION_INDENT;
-        
+
         // break up the description.
         StringTokenizer st = new StringTokenizer(text);
         while (st.hasMoreTokens()) {
@@ -562,7 +573,7 @@ public class Options {
         }
         out.println();
     }
-    
+
     /**
      * Utility method to print a number of spaces to a PrintStream.
      * @param out output PrintStream
@@ -572,7 +583,7 @@ public class Options {
         while (n-- > 0) {
             out.print(' ');
         }
-    } 
+    }
 
   public String constructFullClasspath() {
       StringBuffer fullcp = new StringBuffer();
