@@ -315,16 +315,9 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 		"A native method cannot have a body.", position());
 	}
 
-        for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
-            TypeNode tn = (TypeNode) i.next();
-            Type t = tn.type();
-            if (! t.isThrowable()) {
-                throw new SemanticException("Type \"" + t +
-                    "\" is not a subclass of \"" + ts.Throwable() + "\".",
-                    tn.position());
-            }
-        }
-
+		// check that all the thrown types are subtypes of Throwable
+		throwsCheck(tc);
+		
         // check that inner classes do not declare static methods
         if (flags.isStatic() &&
               methodInstance().container().toClass().isInnerClass()) {
@@ -338,6 +331,19 @@ public class MethodDecl_c extends Term_c implements MethodDecl
 	return this;
     }
 
+    protected void throwsCheck(TypeChecker tc) throws SemanticException {
+    	TypeSystem ts = tc.typeSystem(); 
+        for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
+            TypeNode tn = (TypeNode) i.next();
+            Type t = tn.type();
+            if (! t.isThrowable()) {
+                throw new SemanticException("Type \"" + t +
+                    "\" is not a subclass of \"" + ts.Throwable() + "\".",
+                    tn.position());
+            }
+        }    	
+    }
+    
     protected void overrideMethodCheck(TypeChecker tc) throws SemanticException {
         TypeSystem ts = tc.typeSystem();
 
