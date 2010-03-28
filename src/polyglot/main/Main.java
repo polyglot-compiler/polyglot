@@ -166,6 +166,7 @@ public class Main
           if (options.class_output_directory != null) {
               options_size +=2;
           }
+          if (options.generate_debugging_info) options_size++;
           String[] javacCmd = new String[pc_size+options_size+compiler.outputFiles().size()];
           int j = 0;
           for (int i = 0; i < pc_size; i++) {
