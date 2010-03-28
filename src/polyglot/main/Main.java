@@ -177,6 +177,9 @@ public class Main
               javacCmd[j++] = "-d";
               javacCmd[j++] = options.class_output_directory.toString();
           }
+          if (options.generate_debugging_info) {
+              javacCmd[j++] = "-g";
+          }
 
           Iterator iter = compiler.outputFiles().iterator();
           for (; iter.hasNext(); j++) {

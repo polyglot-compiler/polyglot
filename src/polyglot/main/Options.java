@@ -63,6 +63,7 @@ public class Options {
     public String output_classpath;
     public String bootclasspath = null;
     public boolean assertions = false;
+    public boolean generate_debugging_info = false;
 
     public boolean compile_command_line_only = false;
 
@@ -276,6 +277,11 @@ public class Options {
             i++;
             fully_qualified_names = true;
         }
+        else if (args[i].equals("-g"))
+        {
+            i++;
+            generate_debugging_info = true;
+        }
         else if (args[i].equals("-c"))
         {
             post_compiler = null;
@@ -413,6 +419,7 @@ public class Options {
                            "<source-file>." + extension.fileExtensions()[0] + " ...");
         out.println("where [options] includes:");
         usageForFlag(out, "@<file>", "read options from <file>");
+        usageForFlag(out, "-g", "generate debugging info in class files");
         usageForFlag(out, "-d <directory>", "output directory");
         usageForFlag(out, "-assert", "recognize the assert keyword");
         usageForFlag(out, "-sourcepath <path>", "source path");
