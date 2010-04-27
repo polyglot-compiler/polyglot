@@ -480,7 +480,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 
     /** Returns the linked list [by_scc, scc_head] where
      *  by_scc is an array in which SCCs occur in topologically
-     *  order. 
+     *  sorted order.
      *  scc_head[n] where n is the first peer in an SCC is set to -1.
      *  scc_head[n] where n is the last peer in a (non-singleton) SCC is set
      *  to the index of the first peer. Otherwise it is -2. */
