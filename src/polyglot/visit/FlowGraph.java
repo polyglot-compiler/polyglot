@@ -351,13 +351,18 @@ public class FlowGraph {
      * after data flow analysis is performed.
      */
     public DataFlow.Item outItem(EdgeKey key) {
-      return (DataFlow.Item) outItems.get(key);
+        if (outItems == null) return null;
+        return (DataFlow.Item) outItems.get(key);
     }
 
     public String toString() {
       return (entry == Term.ENTRY ? "entry: " : "") + node + path_to_finally;
     }
 
+    public boolean isEntry() {
+        return entry == Term.ENTRY;
+    }
+    
     public Set succEdgeKeys() {
         if (this.succEdgeKeys == null) {
             // the successor edge keys have not yet been calculated. do it
