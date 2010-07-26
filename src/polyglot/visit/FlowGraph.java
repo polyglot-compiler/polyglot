@@ -340,6 +340,9 @@ public class FlowGraph {
     /** The node for which this is a peer. */
     public Term node()  { return node; }
 
+    /** Create a PeerKey for this Peer */
+    public PeerKey peerKey() { return new PeerKey(path_to_finally, entry); }
+    
     /**
      * The input data flow item.  Should only be called
      * after data flow analysis is performed.
@@ -388,7 +391,7 @@ public class FlowGraph {
      * equality (as defined in
      * {@link polyglot.util.CollectionUtil CollectionUtil}).
      */
-    protected static class PeerKey {
+    public static class PeerKey {
 
         protected List list;
         protected int entry;
