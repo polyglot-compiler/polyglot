@@ -163,6 +163,22 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     
     /**
      * Produce new <code>Item</code>s as appropriate for the
+     * <code>Peer</code> and the input <code>Item</code>s. 
+     * 
+     * @param inItems all the Items flowing into the node. 
+     * @param inItemKeys the FlowGraph.EdgeKeys for the items in the list inItems 
+     * @param graph the FlowGraph which the dataflow is operating on
+     * @param peer the Peer which this method must calculate the flow for.
+     * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
+     *          entries for all EdgeKeys in edgeKeys. 
+     */
+    protected Map flow(List inItems, List inItemKeys, FlowGraph graph, Peer peer) {
+        return this.flow(inItems, inItemKeys, graph, peer.node, peer.isEntry(), peer.succEdgeKeys());
+    }
+
+    
+    /**
+     * Produce new <code>Item</code>s as appropriate for the
      * <code>Term n</code> and the input <code>Item</code>s. The default
      * implementation of this method is simply to call <code>confluence</code> 
      * for the list of inItems, and pass the result to flow(Item, FlowGraph,
@@ -370,6 +386,24 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @param itemKeys List of <code>FlowGraph.ExceptionEdgeKey</code>s for
      *              the edges that the corresponding <code>Item</code>s in
      *              <code>items</code> flowed from.
+     * @param peer <code>Peer</code> for which the <code>items</code> are 
+     *          flowing into.
+     */
+    protected Item safeConfluence(List items, List itemKeys, Peer peer, FlowGraph graph) {
+        return this.safeConfluence(items, itemKeys, peer.node(), peer.isEntry(), graph);        
+    }
+
+    /**
+     * The confluence operator for many flows. This method produces a single
+     * Item from a List of Items, for the confluence just before flow enters 
+     * node.
+     * 
+     * @param items List of <code>Item</code>s that flow into <code>node</code>.
+     *               This method will only be called if the list has at least 2
+     *               elements.
+     * @param itemKeys List of <code>FlowGraph.ExceptionEdgeKey</code>s for
+     *              the edges that the corresponding <code>Item</code>s in
+     *              <code>items</code> flowed from.
      * @param node <code>Term</code> for which the <code>items</code> are 
      *          flowing into.
      * @param entry indicates whether we are looking at the entry or exit of
@@ -417,6 +451,19 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     
     /**
      * Check that the term n satisfies whatever properties this
+     * dataflow is checking for. Provided the method 
+     * check(FlowGraph, Peer) is not overridden, this 
+     * method is called for each term in a code declaration block
+     * after the dataflow for that block of code has been performed.
+     * 
+     * @throws SemanticException if the properties this dataflow
+     *         analysis is checking for is not satisfied.
+     */
+    protected abstract void check(FlowGraph graph, Term n, boolean entry, 
+            Item inItem, Map outItems) throws SemanticException;
+
+    /**
+     * Check that the term n satisfies whatever properties this
      * dataflow is checking for. This method is called for each term
      * in a code declaration block after the dataflow for that block of code 
      * has been performed.
@@ -424,8 +471,9 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @throws SemanticException if the properties this dataflow
      *         analysis is checking for is not satisfied.
      */
-    protected abstract void check(FlowGraph graph, Term n, boolean entry, 
-            Item inItem, Map outItems) throws SemanticException;
+    protected void check(FlowGraph graph, Peer p) throws SemanticException {
+        check(graph, p.node(), p.isEntry(), p.inItem(), p.outItems);
+    }
 
     /**
      * Construct a flow graph for the <code>CodeNode</code> provided, and call 
@@ -649,10 +697,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                 
             // calculate the out item
             Map oldOutItems = p.outItems;
-            p.inItem = this.safeConfluence(inItems, inItemKeys, p.node, 
-                    p.entry == Term.ENTRY, graph);
-            p.outItems = this.flow(inItems, inItemKeys, graph, p.node, 
-                    p.entry == Term.ENTRY, p.succEdgeKeys());
+            p.inItem = this.safeConfluence(inItems, inItemKeys, p, graph);
+            p.outItems = this.flow(inItems, inItemKeys, graph, p);
                     
             if (!p.succEdgeKeys().equals(p.outItems.keySet())) {
                 // This check is more for developers to ensure that they
@@ -785,7 +831,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             Peer p = (Peer) peersToCheck.removeFirst();
             uncheckedPeers.remove(p);
 
-            this.check(graph, p.node, p.entry == Term.ENTRY, p.inItem, p.outItems);
+            this.check(graph, p);
             
             for (Iterator iter = p.succs.iterator(); iter.hasNext(); ) {
                 Peer q = ((Edge)iter.next()).getTarget();
