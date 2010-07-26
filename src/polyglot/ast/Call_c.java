@@ -433,13 +433,16 @@ public class Call_c extends Expr_c implements Call
   public List acceptCFG(CFGBuilder v, List succs) {
       if (target instanceof Term) {
           Term t = (Term) target;
-          
+
           if (!arguments.isEmpty()) {
               v.visitCFG(t, listChild(arguments, null), ENTRY);
               v.visitCFGList(arguments, this, EXIT);
           } else {
               v.visitCFG(t, this, EXIT);
           }
+      }
+      else {
+          v.visitCFGList(arguments, this, EXIT);
       }
 
       return succs;
