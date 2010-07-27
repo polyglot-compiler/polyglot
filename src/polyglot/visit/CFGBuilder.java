@@ -99,6 +99,8 @@ public class CFGBuilder implements Copy
     public FlowGraph graph() { return graph; }
     public DataFlow dataflow() { return df; }
     public CFGBuilder outer() { return outer; }
+    public Stmt innermostTarget() { return innermostTarget; }
+    public boolean skipInnermostCatches() { return skipInnermostCatches; }
 
     /** Get the type system. */
     public TypeSystem typeSystem() {
