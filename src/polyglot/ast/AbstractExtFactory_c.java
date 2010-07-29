@@ -1500,7 +1500,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      * @return the <code>Ext</code> object for a <code>TypeNode</code> AST node.
      */
     protected Ext extTypeNodeImpl() {
-        return extNodeImpl();
+        return extTermImpl();
     }
 
     /**
