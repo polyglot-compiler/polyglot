@@ -251,12 +251,14 @@ public abstract class Assign_c extends Expr_c implements Assign
   }
 
   /**
-   * ###@@@DOCO TODO
+   * Construct a CFG for this assignment when the assignment operator
+   * is ASSIGN (i.e., the normal, simple assignment =).
    */
   protected abstract void acceptCFGAssign(CFGBuilder v);
 
   /**
-   * ###@@@DOCO TODO
+   * Construct a CFG for this assignment when the assignment operator
+   * is of the form op= for some operation op.
    */
   protected abstract void acceptCFGOpAssign(CFGBuilder v);
   
