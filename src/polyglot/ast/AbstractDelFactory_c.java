@@ -1113,7 +1113,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
      * @return the delegate for a <code>ClassMember</code> AST node.
      */
     protected JL delClassMemberImpl() {
-        return delNodeImpl();
+        return delTermImpl();
     }
 
     /**
@@ -1225,7 +1225,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
      * @return the delegate for a <code>Formal</code> AST node.
      */
     protected JL delFormalImpl() {
-        return delNodeImpl();
+        return delTermImpl();
     }
 
     /**
@@ -1497,7 +1497,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
      * @return the delegate for a <code>TypeNode</code> AST node.
      */
     protected JL delTypeNodeImpl() {
-        return delNodeImpl();
+        return delTermImpl();
     }
 
     /**
@@ -1633,7 +1633,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelClassMember(JL del) {
-        return postDelNode(del);
+        return postDelTerm(del);
     }
 
     protected JL postDelCodeDecl(JL del) {
@@ -1689,7 +1689,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelFormal(JL del) {
-        return postDelNode(del);
+        return postDelTerm(del);
     }
 
     protected JL postDelIf(JL del) {
@@ -1825,7 +1825,7 @@ public abstract class AbstractDelFactory_c implements DelFactory
     }
 
     protected JL postDelTypeNode(JL del) {
-        return postDelNode(del);
+        return postDelTerm(del);
     }
 
     protected JL postDelUnary(JL del) {

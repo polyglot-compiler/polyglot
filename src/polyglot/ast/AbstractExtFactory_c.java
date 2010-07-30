@@ -1116,7 +1116,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      * @return the <code>Ext</code> object for a <code>ClassMember</code> AST node.
      */
     protected Ext extClassMemberImpl() {
-        return extNodeImpl();
+        return extTermImpl();
     }
 
     /**
@@ -1228,7 +1228,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
      * @return the <code>Ext</code> object for a <code>Formal</code> AST node.
      */
     protected Ext extFormalImpl() {
-        return extNodeImpl();
+        return extTermImpl();
     }
 
     /**
@@ -1638,7 +1638,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtClassMember(Ext ext) {
-        return postExtNode(ext);
+        return postExtTerm(ext);
     }
 
     protected Ext postExtCodeDecl(Ext ext) {
@@ -1694,7 +1694,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtFormal(Ext ext) {
-        return postExtNode(ext);
+        return postExtTerm(ext);
     }
 
     protected Ext postExtIf(Ext ext) {
@@ -1830,7 +1830,7 @@ public abstract class AbstractExtFactory_c implements ExtFactory
     }
 
     protected Ext postExtTypeNode(Ext ext) {
-        return postExtNode(ext);
+        return postExtTerm(ext);
     }
 
     protected Ext postExtUnary(Ext ext) {
