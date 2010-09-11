@@ -163,6 +163,14 @@ public class FlowGraph {
      * <code>entry</code> can be Term.ENTRY or Term.EXIT.
      */
     public Peer peer(Term n, List path_to_finally, int entry) {
+        PeerKey lk = new PeerKey(path_to_finally, entry);
+        return peer(n, lk);
+    }
+    /**
+     * Retrieve the <code>Peer</code> for the <code>Term n</code> that is
+     * associated with the given PeerKey.
+     */
+    public Peer peer(Term n, PeerKey peerKey) {
         IdentityKey k = new IdentityKey(n);
         Map pathMap = (Map) peerMap.get(k);
         
@@ -171,12 +179,11 @@ public class FlowGraph {
             peerMap.put(k, pathMap);
         }
 
-        PeerKey lk = new PeerKey(path_to_finally, entry);
-        Peer p = (Peer) pathMap.get(lk);
+        Peer p = (Peer) pathMap.get(peerKey);
         
         if (p == null) {
-            p = new Peer(n, path_to_finally, entry);
-            pathMap.put(lk, p);
+            p = new Peer(n, peerKey.list, peerKey.entry);
+            pathMap.put(peerKey, p);
         }
         
         return p;
@@ -275,7 +282,7 @@ public class FlowGraph {
    * the flow graph. See EdgeKey for more information.
    */
   public static class Edge {
-      protected Edge(EdgeKey key, Peer target) {
+      public Edge(EdgeKey key, Peer target) {
           this.key = key;
           this.target = target;
       }

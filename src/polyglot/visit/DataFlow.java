@@ -515,10 +515,14 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         }
     }
 
+    protected Frame createFrame(Peer p, boolean forward, FlowGraph grahp) {
+        return new Frame(p, forward);
+    }
     /** A "stack frame" for recursive DFS */
-    static private class Frame {
-	private Peer peer;
-	private Iterator edges;
+    static protected class Frame {
+        protected Peer peer;
+        protected Iterator edges;
+        protected Frame() { }
 	Frame(Peer p, boolean forward) {
 	    peer = p;
 	    if (forward) edges = p.succs().iterator();
@@ -549,7 +553,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 	  Peer peer = (Peer)i.next();
 	  if (!reachable.contains(peer)) {
 	    reachable.add(peer);
-	    stack.addFirst(new Frame(peer, true));
+	    stack.addFirst(createFrame(peer, true, graph));
 	    while (stack.size() != 0) {
 		Frame top = (Frame)stack.getFirst();
 		if (top.edges.hasNext()) {
@@ -557,7 +561,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 		    Peer q = e.getTarget();
 		    if (!reachable.contains(q)) {
 			reachable.add(q);
-			stack.addFirst(new Frame(q, true));
+			stack.addFirst(createFrame(q, true, graph));
 		    }
 		} else {
 		    stack.removeFirst();
@@ -579,7 +583,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 		// First, find all the nodes in the SCC
 		Set SCC = new HashSet();
 		visited.add(sorted[i]);
-		stack.add(new Frame(sorted[i], false));
+		stack.add(createFrame(sorted[i], false, graph));
 		while (stack.size() != 0) {
 		    Frame top = (Frame)stack.getFirst();
 		    if (top.edges.hasNext()) {
@@ -587,7 +591,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 			Peer q = e.getTarget();
 			if (reachable.contains(q) && !visited.contains(q)) {
 			    visited.add(q);
-			    Frame f = new Frame(q, false);
+			    Frame f = createFrame(q, false, graph);
 			    stack.addFirst(f);
 			}
 		    } else {
@@ -597,7 +601,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 		}
 		// Now, topologically sort the SCC (as much as possible)
 		// and place into by_scc[head..head+scc_size-1]
-		stack.add(new Frame(sorted[i], true));
+		stack.add(createFrame(sorted[i], true, graph));
 		Set revisited = new HashSet();
 		revisited.add(sorted[i]);
 		int scc_size = SCC.size();
@@ -609,7 +613,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 			Peer q = e.getTarget();
 			if (SCC.contains(q) && !revisited.contains(q)) {
 			    revisited.add(q);
-			    Frame f = new Frame(q, true);
+			    Frame f = createFrame(q, true, graph);
 			    stack.addFirst(f);
 			}
 		    } else {
