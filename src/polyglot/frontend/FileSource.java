@@ -51,18 +51,26 @@ public class FileSource extends Source
         path = file.getPath();
         lastModified = new Date(file.lastModified());
     }
+    
+    public FileSource(String path, String name, Date lastModified, boolean userSpecified) throws IOException {
+        super(name, userSpecified);
+        this.file = null;
+        this.path = path;
+        this.lastModified = lastModified;
+    }
 
     public boolean equals(Object o) {
 	if (o instanceof FileSource) {
 	    FileSource s = (FileSource) o;
-	    return file.equals(s.file);
+	    return (file != null && file.equals(s.file))
+	    	|| (file == null && s.file == null && super.equals(s));
 	}
 
 	return false;
     }
 
     public int hashCode() {
-	return file.getPath().hashCode();
+    	return path.hashCode();
     }
 
     /** Open the source file. */
@@ -93,6 +101,6 @@ public class FileSource extends Source
     }
 
     public String toString() {
-	return file.getPath();
+	return path;
     }
 }
