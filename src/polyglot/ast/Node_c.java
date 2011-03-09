@@ -446,7 +446,7 @@ public abstract class Node_c implements Node
             }
             w.write(")");
             w.end();
-            ext = ext.ext();
+            if (ext != null) ext = ext.ext();
             if (ext == null) {
                 break;
             }
