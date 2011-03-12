@@ -266,11 +266,21 @@ public interface Type extends Qualifier
      * if this.equals(anotherType), then it should be
      * that this.toString().equals(anotherType.toString()).
      *
-     * The string does not have to be a legal Java identifier.
-     * It is suggested, but not required, that it be an
-     * easily human readable representation, and thus useful
-     * in error messages and generated output.
+     * The string is not necessarily a legal type expression
+     * in the language, such as a Java identifier. It is
+     * suggested, but not required, that it be an easily
+     * human-readable representation that can be used
+     * both in error messages and in generated output.
      */
     String toString();
+
+    /**
+     * Output a compilable representation of this type to w.
+     * For generated output, this method should be used
+     * rather than toString().  It is suggested, but not
+     * required, that it be an easily human-readable
+     * representation that can be used both in error
+     * messages and in generated output.
+     */
     void print(CodeWriter w);
 }
