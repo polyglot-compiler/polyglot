@@ -204,7 +204,7 @@ public abstract class Type_c extends TypeObject_c implements Type
     }
 
     /**
-     * Return true a literal <code>value</code> can be converted to this type.
+     * Return true if a literal <code>value</code> can be converted to this type.
      * This method should be removed.  It is kept for backward compatibility.
      */
     public final boolean numericConversionValid(long value) {
@@ -212,7 +212,7 @@ public abstract class Type_c extends TypeObject_c implements Type
     }
     
     /**
-     * Return true a literal <code>value</code> can be converted to this type.
+     * Return true if a literal <code>value</code> can be converted to this type.
      * This method should be removed.  It is kept for backward compatibility.
      */
     public boolean numericConversionValidImpl(long value) {
@@ -220,14 +220,14 @@ public abstract class Type_c extends TypeObject_c implements Type
     }
     
     /**
-     * Return true a literal <code>value</code> can be converted to this type.
+     * Return true if a literal <code>value</code> can be converted to this type.
      */
     public final boolean numericConversionValid(Object value) {
         return ts.numericConversionValid(this, value);
     }
     
     /**
-     * Return true a literal <code>value</code> can be converted to this type.
+     * Return true if a literal <code>value</code> can be converted to this type.
      */
     public boolean numericConversionValidImpl(Object value) {
         return false;
@@ -241,18 +241,15 @@ public abstract class Type_c extends TypeObject_c implements Type
 	return t.typeSystem() == ts;
     }
 
-    /**
-     * Yields a string representing this type.  The string
-     * should be consistent with equality.  That is,
-     * if this.equals(anotherType), then it should be
-     * that this.toString().equals(anotherType.toString()).
-     *
-     * The string does not have to be a legal Java identifier.
-     * It is suggested, but not required, that it be an
-     * easily human readable representation, and thus useful
-     * in error messages and generated output.
-     */
     public abstract String toString();
+
+    /**
+     * Output a compilable representation of this type to <code>w</code>.
+     * This implementation generates whatever representation is produced
+     * by <code>toString()</code>. To satisfy the specification of
+     * <code>Type.toString()</code>, this implementation needs to be overridden
+     * if <code>toString</code> does not produce a compilable representation.
+     */
     public void print(CodeWriter w) {
 	w.write(toString());
     }
