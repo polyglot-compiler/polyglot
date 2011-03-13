@@ -2,6 +2,7 @@
 <title>How to Use Polyglot</title>
 <link rel="stylesheet" href="overview.css" type="text/css">
 </head>
+<div class="contents">
 <h1>How to Use Polyglot</h1>
 
 <h2>
@@ -9,11 +10,8 @@ Introduction
 </h2>
 
 <p>
-Polyglot is an extensible Java compiler toolkit designed for experimentation
-with new language extensions.
-</p>
-
-<p>
+<a href="http://www.cs.cornell.edu/Projects/polyglot">Polyglot</a>
+is an extensible Java compiler front end.
 The base polyglot compiler, <tt class="fname">jlc</tt> (&ldquo;Java language compiler&rdquo;), is a
 mostly-complete Java front end; that is, it parses and performs semantic
 checking on Java source code.  The compiler outputs Java source code.  Thus,
@@ -22,14 +20,15 @@ the base compiler implements the identity translation.
 
 <p>
 Language extensions are implemented on top of the base compiler by
-extending the concrete and abstract syntax and the type system.
-After type checking the language extension, the abstract syntax
-tree (AST) is translated into a Java AST and the existing code is output
-into a Java source file which can then be compiled with <tt
-class="fname">javac</tt>.  For
+extending the concrete and abstract syntax and the type system, and
+by defining new code transformations.
+The end product is a Java abstract syntax tree (AST)
+that is output
+into a Java source file, which is compiled with <tt
+class="fname">javac</tt>. (For
 historical reasons, some extensions just override some portions of
 the Java output code to handle the extended syntax of the particular
-language extension being compiled rather than rewriting the AST.
+language extension being compiled rather than rewriting the AST.)
 </p>
 
 
@@ -44,6 +43,8 @@ original source language and create an AST, rewrite the AST to eliminate
 any ambiguities, type check the AST, possibly rewrite the AST to another
 AST, then output the AST as Java source code.
 </p>
+
+<img style="float: right" src="images/passes.png">
 
 <p>
 When the compiler is invoked (through <code>polyglot.main.Main.main()</code>), it
@@ -672,3 +673,6 @@ of <code>&lt;<i>node</i>&gt;</code>.
 The structure of the delegate factory AbstractDelFactory_c class is
 analogous to that of <code>AbstractExtFactory_c.
 </p>
+</div>
+</body>
+</html>
