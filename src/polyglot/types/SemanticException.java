@@ -43,6 +43,11 @@ public class SemanticException extends Exception {
     public SemanticException(Throwable cause) {
         super(cause);
     }
+    
+    public SemanticException(Position position, Throwable cause) {
+        super(cause);
+        this.position = position;
+    }
 
     public SemanticException(Position position) {
 	super();
