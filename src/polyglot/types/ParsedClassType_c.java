@@ -457,7 +457,7 @@ public class ParsedClassType_c extends ClassType_c implements ParsedClassType
     }
 
     /**
-     * When serailizing, write out the place holder as well as the object itself.
+     * When serializing, write out the place holder as well as the object itself.
      * This should be done in TypeOutputStream, not here, but I couldn't get it working.
      * --Nate
      */
