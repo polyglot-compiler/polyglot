@@ -175,6 +175,25 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     protected Map flow(List inItems, List inItemKeys, FlowGraph graph, Peer peer) {
         return this.flow(inItems, inItemKeys, graph, peer.node, peer.isEntry(), peer.succEdgeKeys());
     }
+    
+    /**
+     * Produce new <code>Item</code>s as appropriate for the
+     * <code>Peer</code> and the input <code>Item</code>s.
+     * Subclasses should override if flow behavior needs to distinguish
+     * between source peers.
+     * 
+     * @param inItems all the Items flowing into the node. 
+     * @param inItemKeys the FlowGraph.EdgeKeys for the items in the list inItems
+     * @param inItemPeers the Peers from which the Items flowed into the node
+     * @param graph the FlowGraph which the dataflow is operating on
+     * @param peer the Peer which this method must calculate the flow for.
+     * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
+     *          entries for all EdgeKeys in edgeKeys. 
+     */
+    protected Map flow(List inItems, List inItemKeys, List inItemPeers,
+            FlowGraph graph, Peer p) {
+        return flow(inItems,inItemKeys,graph,p);
+    }
 
     
     /**
@@ -202,9 +221,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         Item inItem = this.safeConfluence(inItems, inItemKeys, n, entry, graph);
         
         return this.flow(inItem, graph, n, entry, edgeKeys);
-    }
-
-        
+    }  
     
 
     /**
@@ -681,6 +698,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             // the predecessors of p
             List inItems = new ArrayList(p.preds.size());
             List inItemKeys = new ArrayList(p.preds.size());
+            List inItemPeers = new ArrayList(p.preds.size());
             for (Iterator i = p.preds.iterator(); i.hasNext(); ) {
                 Edge e = (Edge)i.next();
                 Peer o = e.getTarget();
@@ -695,6 +713,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                     if (it != null) {
                         inItems.add(it);
                         inItemKeys.add(e.getKey());
+                        inItemPeers.add(o);
                     }
                 }
             }
@@ -702,7 +721,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
             // calculate the out item
             Map oldOutItems = p.outItems;
             p.inItem = this.safeConfluence(inItems, inItemKeys, p, graph);
-            p.outItems = this.flow(inItems, inItemKeys, graph, p);
+            p.outItems = this.flow(inItems, inItemKeys, inItemPeers, graph, p);
                     
             if (!p.succEdgeKeys().equals(p.outItems.keySet())) {
                 // This check is more for developers to ensure that they
@@ -731,7 +750,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 	}
     }
 
-    /**
+	/**
      * Initialize the <code>FlowGraph</code> to be used in the dataflow
      * analysis.
      *
