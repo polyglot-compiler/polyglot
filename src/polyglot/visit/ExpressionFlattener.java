@@ -388,8 +388,8 @@ public class ExpressionFlattener extends NodeVisitor {
     protected Node translateLocalDecl(LocalDecl d) {
         Node n = d;
         Expr e = d.init();
-
-        if (e != null) {
+        //TODO: deal appropriately with ArrayInits
+        if (e != null && !(e instanceof ArrayInit)) {
             d = d.init(null);
             addStmt(d);
 

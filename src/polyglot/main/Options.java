@@ -25,13 +25,24 @@
 
 package polyglot.main;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileManager;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardLocation;
+import javax.tools.ToolProvider;
 
 import polyglot.frontend.ExtensionInfo;
 
@@ -54,14 +65,13 @@ public class Options {
      * Fields for storing values for options.
      */
     public int error_count = 100;
-    public Collection source_path; // List<File>
-    public File output_directory;
-    public File class_output_directory;
-    public String default_classpath;
-    public String default_output_classpath;
-    public String classpath;
-    public String output_classpath;
-    public String bootclasspath = null;
+    protected List<File> source_path_directories = null;
+    public JavaFileManager.Location source_path = StandardLocation.SOURCE_PATH; // List<File>
+    public JavaFileManager.Location output_directory = StandardLocation.SOURCE_OUTPUT;
+    public JavaFileManager.Location class_output_directory = StandardLocation.CLASS_OUTPUT;
+    public JavaFileManager.Location classpath = StandardLocation.CLASS_PATH;
+    public JavaFileManager.Location output_classpath;
+    public JavaFileManager.Location bootclasspath = StandardLocation.PLATFORM_CLASS_PATH;
     public boolean assertions = false;
     public boolean generate_debugging_info = false;
 
@@ -70,8 +80,10 @@ public class Options {
     public String[] source_ext = null; // e.g., java, jl, pj
     public String output_ext = "java"; // java, by default
     public boolean output_stdout = false; // whether to output to stdout
-    public String post_compiler;
-      // compiler to run on java output file
+    // compiler to run on java output file
+    public JavaCompiler post_compiler;
+    // arguments passed to post compiler
+	public String post_compiler_args;
 
     public int output_width = 80;
     public boolean fully_qualified_names = false;
@@ -80,13 +92,13 @@ public class Options {
     public boolean serialize_type_info = true;
 
     /** Dump the AST after the following passes? */
-    public Set dump_ast = new HashSet();
+    public Set<String> dump_ast = new HashSet<String>();
 
     /** Pretty-print the AST after the following passes? */
-    public Set print_ast = new HashSet();
+    public Set<String> print_ast = new HashSet<String>();
 
     /** Disable the following passes? */
-    public Set disable_passes = new HashSet();
+    public Set<String> disable_passes = new HashSet<String>();
 
     /** keep output files */
     public boolean keep_output_files = true;
@@ -117,48 +129,22 @@ public class Options {
      * Set default values for options
      */
     public void setDefaultValues() {
-        String default_bootpath = System.getProperty("sun.boot.class.path");
-        if (default_bootpath == null) {
-          default_bootpath = System.getProperty("java.home") +
-                     File.separator + "jre" +
-                     File.separator + "lib" +
-                     File.separator + "rt.jar";
-        }
+        source_path = StandardLocation.SOURCE_PATH; // List<File>
+        source_path_directories = new ArrayList<File>();
+        source_path_directories.add(new File("."));
+        
+        output_directory = StandardLocation.SOURCE_OUTPUT;
+        class_output_directory = StandardLocation.CLASS_OUTPUT;
 
-        default_classpath = System.getProperty("java.class.path") +
-                            File.pathSeparator + default_bootpath;
-        classpath = default_classpath;
-
-        default_output_classpath = System.getProperty("java.class.path");
-        output_classpath = default_output_classpath;
+        classpath = StandardLocation.CLASS_PATH;
+        output_classpath = StandardLocation.CLASS_PATH;
+        bootclasspath = StandardLocation.PLATFORM_CLASS_PATH;
 
         String java_home = System.getProperty("java.home");
         String current_dir = System.getProperty("user.dir");
 
-        source_path = new LinkedList();
-        source_path.add(new File(current_dir));
-
-        output_directory = new File(current_dir);
-
-        // First try: $JAVA_HOME/../bin/javac
-        // This should work with JDK 1.2 and 1.3
-        //
-        // If not found, try: $JAVA_HOME/bin/javac
-        // This should work for JDK 1.1.
-        //
-        // If neither found, assume "javac" is in the path.
-        //
-        post_compiler = java_home + File.separator + ".." + File.separator +
-                            "bin" + File.separator + "javac";
-
-        if (! new File(post_compiler).exists()) {
-          post_compiler = java_home + File.separator +
-                              "bin" + File.separator + "javac";
-
-          if (! new File(post_compiler).exists()) {
-            post_compiler = "javac";
-          }
-        }
+        post_compiler = ToolProvider.getSystemJavaCompiler();
+        post_compiler_args = "";
     }
 
     /**
@@ -166,7 +152,7 @@ public class Options {
      *
      * @throws UsageError if the usage is incorrect.
      */
-    public void parseCommandLine(String args[], Set source) throws UsageError {
+    public void parseCommandLine(String args[], Set<String> source) throws UsageError {
         if(args.length < 1) {
             throw new UsageError("No command line arguments given");
         }
@@ -196,7 +182,7 @@ public class Options {
      * @return the next index to process. i.e., if calling this method
      *         processes two commands, then the return value should be index+2
      */
-    protected int parseCommand(String args[], int index, Set source)
+    protected int parseCommand(String args[], int index, Set<String> source)
             throws UsageError, Main.TerminationException {
         int i = index;
         if (args[i].equals("-h") ||
@@ -217,44 +203,78 @@ public class Options {
         else if (args[i].equals("-d"))
         {
             i++;
-            class_output_directory = new File(args[i]);
-            // if -D has not been specified, default -D to -d
-            if (!java_output_given) {
-                output_directory = new File(args[i]);
-            }
+            Collection<File> od = Collections.singleton(new File(args[i]));
+			try {
+				extension.fileManager().setLocation(class_output_directory,od);
+	            // if -D has not been specified, default -D to -d
+	            if (!java_output_given) {
+					extension.fileManager().setLocation(output_directory,od);
+	            }
+			} catch (IOException e) {
+				throw new UsageError(e.getMessage());
+			}
             i++;
         }
         else if (args[i].equals("-D"))
         {
             i++;
-            output_directory = new File(args[i]);
+            Collection<File> od = Collections.singleton(new File(args[i]));
+            try {
+				extension.fileManager().setLocation(output_directory,od);
+			} catch (IOException e) {
+				throw new UsageError(e.getMessage());
+			}
             java_output_given = true;
             i++;
         }
         else if (args[i].equals("-classpath") ||
                  args[i].equals("-cp")) {
             i++;
-            classpath = args[i] + System.getProperty("path.separator") +
-                        default_classpath;
-            output_classpath = args[i] + System.getProperty("path.separator") +
-                        default_output_classpath;
+            List<File> path = new ArrayList<File>();
+            StringTokenizer st = new StringTokenizer(args[i], File.pathSeparator);
+            while(st.hasMoreTokens())
+            {
+                path.add(new File(st.nextToken()));
+            }
+
+            try {
+				extension.fileManager().setLocation(classpath, path);
+	            extension.fileManager().setLocation(output_classpath,path);
+			} catch (IOException e) {
+				throw new UsageError(e.getMessage());
+			}
+
             i++;
         }
         else if (args[i].equals("-bootclasspath")) {
             i++;
-            bootclasspath = args[i];
+            List<File> path = new ArrayList<File>();
+            StringTokenizer st = new StringTokenizer(args[i], File.pathSeparator);
+            while(st.hasMoreTokens())
+            {
+                path.add(new File(st.nextToken()));
+            }
+            try {
+				extension.fileManager().setLocation(bootclasspath, path);
+			} catch (IOException e) {
+				throw new UsageError(e.getMessage());
+			}
             i++;
         }
         else if (args[i].equals("-sourcepath"))
         {
             i++;
+            source_path_directories = new ArrayList<File>();
             StringTokenizer st = new StringTokenizer(args[i], File.pathSeparator);
             while(st.hasMoreTokens())
             {
-                File f = new File(st.nextToken());
-                if (!source_path.contains(f))
-                    source_path.add(f);
+            	source_path_directories.add(new File(st.nextToken()));
             }
+            try {
+				extension.fileManager().setLocation(source_path, source_path_directories);
+			} catch (IOException e) {
+				throw new UsageError(e.getMessage());
+			}
             i++;
         }
         else if (args[i].equals("-commandlineonly"))
@@ -306,8 +326,23 @@ public class Options {
         else if (args[i].equals("-post"))
         {
             i++;
-            post_compiler = args[i];
+			ServiceLoader<JavaCompiler> loader = java.util.ServiceLoader
+					.load(JavaCompiler.class, extension.classLoader());
+			JavaCompiler javac = null;
+			for(JavaCompiler c : loader) {
+				if(c.getClass().getName().equals(args[i]))
+					javac = c;
+			}
+			if(javac==null)
+				throw new UsageError("Compiler " + args[i] + " not found.");
+			post_compiler = javac;
             i++;
+        }
+        else if (args[i].equals("-post_args"))
+        {
+        	i++;
+        	post_compiler_args = args[i];
+        	i++;
         }
         else if (args[i].equals("-stdout"))
         {
@@ -401,11 +436,17 @@ public class Options {
             i++;
         }
         else if (!args[i].startsWith("-")) {
-            source.add(args[i]);
-            File f = new File(args[i]).getParentFile();
-            if (f != null && !source_path.contains(f))
-                source_path.add(f);
-            i++;
+			source.add(args[i]);
+			File f = new File(args[i]).getParentFile();
+			if (f != null && !source_path_directories.contains(f))
+				source_path_directories.add(f);
+			try {
+				extension.fileManager().setLocation(source_path,
+						source_path_directories);
+			} catch (IOException e) {
+				throw new UsageError(e.getMessage());
+			}
+			i++;
         }
 
         return i;
@@ -455,7 +496,7 @@ public class Options {
                           "topic at specified verbosity");
 
         StringBuffer allowedTopics = new StringBuffer("Allowed topics: ");
-        for (Iterator iter = Report.topics.iterator(); iter.hasNext(); ) {
+        for (Iterator<String> iter = Report.topics.iterator(); iter.hasNext(); ) {
             allowedTopics.append(iter.next().toString());
             if (iter.hasNext()) {
                 allowedTopics.append(", ");

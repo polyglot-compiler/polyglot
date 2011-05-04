@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="polyglot/types/reflect/ClassPathLoader.java" kind="src" path="src"/>
 	<classpathentry kind="src" output="tools/java_cup/classes" path="tools/java_cup/src"/>
 	<classpathentry kind="src" output="tools/ppg/classes" path="tools/ppg/src"/>
 	<classpathentry kind="src" output="tools/pth/classes" path="tools/pth/src"/>

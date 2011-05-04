@@ -30,11 +30,18 @@ import java.io.OutputStream;
 import java.io.File;
 import java.io.IOException;
 
+import javax.tools.FileObject;
+import javax.tools.JavaFileManager;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.JavaFileManager.Location;
+
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
 import polyglot.types.TypeSystem;
 import polyglot.types.reflect.ClassFile;
+import polyglot.types.reflect.ClassFileLoader;
 import polyglot.util.ErrorQueue;
 import polyglot.util.CodeWriter;
 
@@ -117,10 +124,29 @@ public interface ExtensionInfo {
     Parser parser(Reader reader, FileSource source, ErrorQueue eq);
 
     /** Create class file */ 
+    @Deprecated
     ClassFile createClassFile(File classFileSource, byte[] code);
 
     /** Create file source for a file. The main purpose is to allow
         the character encoding to be defined. */
+    @Deprecated
     FileSource createFileSource(File sourceFile, boolean userSpecified)
-	throws IOException;
+    	throws IOException;
+
+    /** Get the file manager used by this extension. */
+	StandardJavaFileManager fileManager();
+	
+	/** Get the classLoader used by this extension. */
+	ClassLoader classLoader();
+	
+    /** Create class file for a file object. */ 
+	ClassFile createClassFile(FileObject f, byte[] code) throws IOException;
+    
+	/** Create file source for a file object. */
+	FileSource createFileSource(FileObject fo, boolean userSpecified)
+		throws IOException;
+
+    /** Produce a class factory for this language extension. */
+	ClassFileLoader classFileLoader();
+
 }

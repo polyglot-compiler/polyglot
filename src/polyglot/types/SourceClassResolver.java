@@ -118,12 +118,23 @@ public class SourceClassResolver extends LoadedClassResolver
  * @param compileCommandLineOnly TODO
  * @param ignoreModTimes TODO
    */
+	public SourceClassResolver(Compiler compiler, ExtensionInfo ext,
+			boolean allowRawClasses, boolean compileCommandLineOnly,
+			boolean ignoreModTimes) {
+		super(ext, allowRawClasses);
+		this.compiler = compiler;
+		this.ext = ext;
+		this.compileCommandLineOnly = compileCommandLineOnly;
+		this.ignoreModTimes = ignoreModTimes;
+	}
+
+  @Deprecated
   public SourceClassResolver(Compiler compiler, ExtensionInfo ext,
                              String classpath, ClassFileLoader loader,
                              boolean allowRawClasses,
                              boolean compileCommandLineOnly, boolean ignoreModTimes)
   {
-    super(ext.typeSystem(), classpath, loader, ext.version(), allowRawClasses);
+    super(ext, allowRawClasses);
     this.compiler = compiler;
     this.ext = ext;
     this.compileCommandLineOnly = compileCommandLineOnly;

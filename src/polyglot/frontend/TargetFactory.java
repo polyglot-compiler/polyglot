@@ -33,28 +33,52 @@ import polyglot.util.*;
 import java.io.*;
 import java.util.*;
 
+import javax.tools.FileObject;
+import javax.tools.ForwardingJavaFileObject;
+import javax.tools.JavaFileManager;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardLocation;
+import javax.tools.JavaFileObject.Kind;
+
 /** A <code>TargetFactory</code> is responsible for opening output files. */
 public class TargetFactory
 {
-    protected File outputDirectory;
-    protected String outputExtension;
+	@Deprecated
+    protected File outputDirectory = null;
+	protected JavaFileManager fileManager = null;
+	protected JavaFileManager.Location outputLocation = null;
+	protected String outputExtension;
     protected boolean outputStdout;
 
+    @Deprecated
     public TargetFactory(File outDir, String outExt, boolean so) {
-	outputDirectory = outDir;
-	outputExtension = outExt;
-	outputStdout = so;
+    	outputExtension = outExt;
+    	outputStdout = so;
     }
 
-    /** Open a writer to the output file for the class in the given package. */
+	public TargetFactory(JavaFileManager fileManager,
+			JavaFileManager.Location outputLocation, String outExt, boolean so) {
+		this.fileManager = fileManager;
+		this.outputLocation = outputLocation;
+    	this.outputExtension = outExt;
+    	this.outputStdout = so;
+	}
+
+	/** Open a writer to the output file for the class in the given package. */
     public Writer outputWriter(String packageName, String className,
 	    Source source) throws IOException 
     {
 	return outputWriter(outputFile(packageName, className, source));
     }
 
+    @Deprecated
     public CodeWriter outputCodeWriter(File f, int width) throws IOException {
     	Writer w = outputWriter(f);
+        return Compiler.createCodeWriter(w, width);
+    }
+
+    public CodeWriter outputCodeWriter(FileObject f, int width) throws IOException {
+    	Writer w = f.openWriter();
         return Compiler.createCodeWriter(w, width);
     }
 
@@ -76,6 +100,7 @@ public class TargetFactory
     }
 
     /** Return a file object for the output of the source file in the given package. */
+    @Deprecated
     public File outputFile(String packageName, Source source) {
 	String name;
 	name = new File(source.name()).getName();
@@ -84,26 +109,65 @@ public class TargetFactory
     }
 
     /** Return a file object for the output of the class in the given package. */
+    @Deprecated
     public File outputFile(String packageName, String className, Source source)
     {
-	if (outputDirectory == null) {
-	      throw new InternalCompilerError("Output directory not set.");
-	}
-
-	if (packageName == null) {
-	    packageName = "";
-	}
-
-	File outputFile = new File(outputDirectory,
-				   packageName.replace('.', File.separatorChar)
-				   + File.separatorChar
-				   + className
-				   + "." + outputExtension);
-
-        if (source != null && outputFile.getPath().equals(source.path())) {
-	    throw new InternalCompilerError("The output file is the same as the source file");
-	}
+		if (outputDirectory == null) {
+		      throw new InternalCompilerError("Output directory not set.");
+		}
 	
-	return outputFile;
+		if (packageName == null) {
+		    packageName = "";
+		}
+	
+		File outputFile = new File(outputDirectory,
+					   packageName.replace('.', File.separatorChar)
+					   + File.separatorChar
+					   + className
+					   + "." + outputExtension);
+	
+	        if (source != null && outputFile.getPath().equals(source.path())) {
+		    throw new InternalCompilerError("The output file is the same as the source file");
+		}
+		
+		return outputFile;
     }
+    
+    /** Return a file object for the output of the source file in the given package. */
+    public JavaFileObject outputFileObject(String packageName, Source source) {
+		String name;
+		name = source.getName();
+		name = name.substring(0, name.lastIndexOf('.'));
+		return outputFileObject(packageName, name, source);
+    }
+
+    /** Return a file object for the output of the class in the given package. */
+    public JavaFileObject outputFileObject(String packageName, String className, Source source)
+    {
+		if (outputLocation == null) {
+		      throw new InternalCompilerError("Output location not set.");
+		}
+	
+		if (packageName == null) {
+		    packageName = "";
+		}
+		try {
+			if(outputExtension.equals("java"))
+				return fileManager.getJavaFileForOutput(outputLocation, packageName +"."+className, Kind.SOURCE, null);
+			else {
+				FileObject outputFile = fileManager.getFileForOutput(outputLocation, packageName, className + "." + outputExtension, null);
+		
+			    if (source != null && source.equals(outputFile)/*fileManager.isSameFile(source, outputFile)*/) {
+				    throw new InternalCompilerError("The output file is the same as the source file");
+				}
+		
+				if(outputFile != null)
+					return new JavaFileObjectWrapper(outputFile, outputExtension, Kind.SOURCE);
+			}
+		} catch(IOException e) {
+			throw new InternalCompilerError("Error creating output file for " + source, e);
+		}
+		return null;
+    }
+
 }
