@@ -10,6 +10,7 @@ import java.util.Date;
 
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileObject;
+import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import javax.tools.SimpleJavaFileObject;
 import javax.tools.JavaFileObject.Kind;
@@ -61,5 +62,24 @@ public class Source_c extends ForwardingJavaFileObject<JavaFileObject>
 	public Reader openReader(boolean ignoreEncodingErrors) throws IOException {
 		return new InputStreamReader(openInputStream());
 	}
+		
+	@Override
+	public String toString() {
+		return getName();
+	}
 	
+	public boolean equals(Object o) {
+		if(o instanceof FileObject) {
+
+			FileObject fo = (FileObject) o;
+			return toUri().equals(fo.toUri());
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public int hashCode() {
+		return toUri().hashCode();
+	}
 }

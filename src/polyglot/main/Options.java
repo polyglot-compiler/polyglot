@@ -45,6 +45,7 @@ import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
 import polyglot.frontend.ExtensionInfo;
+import polyglot.util.InternalCompilerError;
 
 /**
  * This object encapsulates various polyglot options.
@@ -129,19 +130,26 @@ public class Options {
      * Set default values for options
      */
     public void setDefaultValues() {
+        String java_home = System.getProperty("java.home");
+        String current_dir = System.getProperty("user.dir");
+
         source_path = StandardLocation.SOURCE_PATH; // List<File>
         source_path_directories = new ArrayList<File>();
         source_path_directories.add(new File("."));
         
         output_directory = StandardLocation.SOURCE_OUTPUT;
+		try {
+			extension.fileManager().setLocation(output_directory,
+					Collections.singleton(new File(current_dir)));
+		} catch (IOException e) {
+			throw new InternalCompilerError("Error setting default output directory", e);
+		}
         class_output_directory = StandardLocation.CLASS_OUTPUT;
 
         classpath = StandardLocation.CLASS_PATH;
         output_classpath = StandardLocation.CLASS_PATH;
         bootclasspath = StandardLocation.PLATFORM_CLASS_PATH;
 
-        String java_home = System.getProperty("java.home");
-        String current_dir = System.getProperty("user.dir");
 
         post_compiler = ToolProvider.getSystemJavaCompiler();
         post_compiler_args = "";

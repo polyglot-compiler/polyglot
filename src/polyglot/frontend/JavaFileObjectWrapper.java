@@ -48,6 +48,7 @@ public class JavaFileObjectWrapper extends ForwardingFileObject<FileObject> impl
 
 	@Override
 	public boolean equals(Object obj) {
+		System.out.println("WRAPPED SOURCE " + this + " equal to " + obj +  "? " + this.fileObject.equals(obj));
 		return this.fileObject.equals(obj);	
 	}
 

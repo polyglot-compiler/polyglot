@@ -259,7 +259,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     		List<Location> locations = new ArrayList<Location>();
     		locations.add(getOptions().bootclasspath);
     		locations.add(getOptions().classpath);
-    		locations.add(getOptions().output_classpath);
+    		locations.add(getOptions().class_output_directory);
     		classFileLoader = new ClassFileLoader_c(this,locations);
     	}
 		return classFileLoader;

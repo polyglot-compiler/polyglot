@@ -157,17 +157,18 @@ public class TargetFactory
 			else {
 				FileObject outputFile = fileManager.getFileForOutput(outputLocation, packageName, className + "." + outputExtension, null);
 		
-			    if (source != null && source.equals(outputFile)/*fileManager.isSameFile(source, outputFile)*/) {
+			    if (source != null && fileManager.isSameFile(source, outputFile)) {
 				    throw new InternalCompilerError("The output file is the same as the source file");
 				}
-		
-				if(outputFile != null)
-					return new JavaFileObjectWrapper(outputFile, outputExtension, Kind.SOURCE);
+			    return (JavaFileObject) outputFile;
+			    //Maybe this is unnecessary?
+//				if(outputFile != null)
+//					return new JavaFileObjectWrapper(outputFile, outputExtension, Kind.SOURCE);
 			}
 		} catch(IOException e) {
 			throw new InternalCompilerError("Error creating output file for " + source, e);
 		}
-		return null;
+//		return null;
     }
 
 }
