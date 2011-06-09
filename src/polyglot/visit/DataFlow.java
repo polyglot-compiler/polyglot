@@ -54,6 +54,14 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     protected final boolean forward;
     
     /**
+     * Indicates whether the dataflow should detect back edges. Detecting
+     * back edges allows clients to use a widening operator just on confluences
+     * from back edges, which permits analyses to use data flow lattices of
+     * infinite height and guarantee termination.
+     */
+    protected final boolean detectBackEdges;
+    
+    /**
      * Indicates whether the dataflow should be performed on entering a
      * <code>CodeNode</code>, or on leaving a <code>CodeNode</code>.
      * If dataflow is performed on entry, then the control flow graph
@@ -104,8 +112,20 @@ public abstract class DataFlow extends ErrorHandlingVisitor
                     NodeFactory nf, 
                     boolean forward, 
                     boolean dataflowOnEntry) {
+    	this(job, ts, nf, forward, dataflowOnEntry, false);
+    }
+    /**
+     * Constructor.
+     */
+    public DataFlow(Job job, 
+                    TypeSystem ts, 
+                    NodeFactory nf, 
+                    boolean forward, 
+                    boolean dataflowOnEntry,
+                    boolean detectBackEdges) {
         super(job, ts, nf);
         this.forward = forward;
+        this.detectBackEdges = detectBackEdges;
         this.dataflowOnEntry = dataflowOnEntry;
         if (dataflowOnEntry)
             this.flowgraphStack = new LinkedList();
@@ -192,9 +212,42 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      */
     protected Map flow(List inItems, List inItemKeys, List inItemPeers,
             FlowGraph graph, Peer p) {
+    	if (this.detectBackEdges) {
+    		// determine for each inItemPeer whether it represents a back edge or not,
+    		// and record the results in a list.
+    		List isBackEdges = new ArrayList(inItemPeers.size());
+    		
+		  	int currentPeerOrder = ((Integer)preordering.get(p)).intValue();
+
+		  	Iterator inPeers = inItemPeers.iterator();
+    		while (inPeers.hasNext()) {
+    		  	Peer inPeer = (Peer) inPeers.next();
+    		  	int inPeerOrder = ((Integer)preordering.get(inPeer)).intValue();
+    		  	isBackEdges.add(Boolean.valueOf(inPeerOrder > currentPeerOrder));
+    		}
+            return flow(inItems,inItemKeys,inItemPeers,isBackEdges,graph,p);
+    	}
         return flow(inItems,inItemKeys,graph,p);
     }
 
+    /**
+     * 
+     * @param inItems all the Items flowing into the node. 
+     * @param inItemKeys the FlowGraph.EdgeKeys for the items in the list inItems
+     * @param inItemPeers the Peers from which the Items flowed into the node
+     * @param isBackEdge list of Booleans indicating whether the edge represented
+     *              by the corresponding element in inItems is a back edge or not.
+     * @param graph the FlowGraph which the dataflow is operating on
+     * @param peer the Peer which this method must calculate the flow for.
+     * @return a Map from FlowGraph.EdgeKeys to Items. The map must have 
+     *          entries for all EdgeKeys in edgeKeys. 
+     */
+    protected Map flow(List inItems, List inItemKeys, List inItemPeers, List isBackEdges,
+            FlowGraph graph, Peer p) {
+    	throw new InternalCompilerError("Unimplemented. Should be implemented if a subclass wants to detect back edges." +
+    			" The standard thing to do in this method is to merge the inItems by item key, using the widening operator " +
+    			"for back edges, and the standard merge operator otherwise.");
+    }
     
     /**
      * Produce new <code>Item</code>s as appropriate for the
@@ -665,6 +718,39 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
 
     /**
+     * Map form Peers to Integers, that will contain a preordering of Peers
+     * if this.detectBackEdges is true.
+     */
+    protected Map preordering = null;
+    
+    /**
+     * create a preorder on Peer p and all Peers reachable from p
+     * (that are reachable without going through any peer in the
+     * set visited. The preorder will start from count
+     * 
+     * @param p
+     * @param count
+     * @param visited Set of Peer
+     * @return
+     */
+    private int preorder(Peer p, int count, Set visited) {
+        if (visited.contains(p)) return count;
+        
+        // visit p
+        this.preordering.put(p, Integer.valueOf(count++));
+        visited.add(p);
+        
+        // visit all the successors of p
+        Iterator iter = p.succs().iterator();
+        while (iter.hasNext()) {
+        	Edge e = (Edge) iter.next();
+            count = preorder(e.getTarget(), count, visited); 
+        }
+        
+        return count;        
+    }
+
+    /**
      * Perform the dataflow on the flowgraph provided.
      */
     protected void dataflow(FlowGraph graph) {
@@ -681,6 +767,19 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 	   begins with a -1 and ends with the index of
 	   the beginning of the SCC.
 	*/
+	
+	if (this.detectBackEdges) {
+		// construct a preordering of the peers by visiting each peer in a depth first manner
+		this.preordering = new HashMap();
+		int count = 0;
+		Set visited = new HashSet();
+		Iterator iter = graph.startPeers().iterator();
+		while (iter.hasNext()) {
+			Peer p = (Peer) iter.next();
+			count =  preorder(p, 0, visited);
+		}
+	}
+	
 	if (Report.should_report(Report.dataflow, 1)) {
 	    Report.report(1, "Iterating dataflow equations");
 	}
