@@ -56,8 +56,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     /**
      * Indicates whether the dataflow should detect back edges. Detecting
      * back edges allows clients to use a widening operator just on confluences
-     * from back edges, which permits analyses to use data flow lattices of
-     * infinite height and guarantee termination.
+     * from back edges, permitting analyses to use data flow lattices of
+     * infinite height while guaranteeing termination.
      */
     protected final boolean detectBackEdges;
     
@@ -78,7 +78,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * upon entering a CodeNode AST node, and dataflow performed on that flow 
      * graph immediately. The flow graph is available during the visiting of 
      * children of the CodeNode, if subclasses want to use this information
-     * to update AST nodes. The stack is only maintained if 
+     * to update AST nodes. The stack is maintained only if 
      * <code>dataflowOnEntry</code> is true.
      */
     protected LinkedList flowgraphStack;
@@ -134,15 +134,15 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
 
     /**
-     * An <code>Item</code> contains the data which flows during the dataflow
-     * analysis. Each
-     * node in the flow graph will have two items associated with it: the input
-     * item, and the output item, which results from calling flow with the
-     * input item. The input item may itself be the result of a call to the 
-     * confluence method, if many paths flow into the same node.
+     * An <code>Item</code> contains the data which flows during dataflow
+     * analysis. Each node in the flow graph has two items associated with it:
+     * the input item, and the output item, which results from calling
+     * <code>flow</code> with the input item. The input item may itself be the
+     * result of a call to the confluence method, if many paths flow into the
+     * same node.
      * 
      * NOTE: the <code>equals(Item)</code> method and <code>hashCode()</code>
-     * method must be implemented to ensure that the dataflow algorithm works
+     * methods must be implemented to ensure that the dataflow algorithm works
      * correctly.
      */
     public static abstract class Item {
@@ -165,7 +165,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * 
      * @param in the Item flowing into the node. Note that if the Term n 
      *           has many flows going into it, the Item in may be the result 
-     *           of a call to confluence(List, List, Term)
+     *           of a call to confluence(List, List, Term).
      * @param graph the FlowGraph which the dataflow is operating on
      * @param n the Term which this method must calculate the flow for.
      * @param entry indicates whether we are looking at the entry or exit of n.
@@ -254,7 +254,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * <code>Term n</code> and the input <code>Item</code>s. The default
      * implementation of this method is simply to call <code>confluence</code> 
      * for the list of inItems, and pass the result to flow(Item, FlowGraph,
-     * Term, Set). Subclasses may want to override this method if a finer grain
+     * Term, Set). Subclasses may want to override this method if a finer-grained
      * dataflow is required. Some subclasses may wish to override this method
      * to call <code>flowToBooleanFlow</code>.
      * 
@@ -285,7 +285,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * flow(Item, Item, Item, FlowGraph, Term, Set). It is expected that 
      * this method will typically be called by subclasses overriding the
      * flow(List, List, FlowGraph, Term, Set) method, due to the need for
-     * a finer grain dataflow analysis.
+     * a finer-grained dataflow analysis.
      * 
      * @param inItems all the Items flowing into the node. 
      * @param inItemKeys the FlowGraph.EdgeKeys for the items in the list inItems 
@@ -718,15 +718,15 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
 
     /**
-     * Map form Peers to Integers, that will contain a preordering of Peers
-     * if this.detectBackEdges is true.
+     * Map from <code>Peer</code>s to <code>Integer</code>s that contains a preordering
+     * of <code>Peer</code>s if <code>this.detectBackEdges</code> is true.
      */
     protected Map preordering = null;
     
     /**
-     * create a preorder on Peer p and all Peers reachable from p
+     * Create a preorder on Peer p and all Peers reachable from p
      * (that are reachable without going through any peer in the
-     * set visited. The preorder will start from count
+     * set visited). The preorder will start from count.
      * 
      * @param p
      * @param count
@@ -751,7 +751,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
 
     /**
-     * Perform the dataflow on the flowgraph provided.
+     * Perform the dataflow on flowgraph <code>graph</code>.
      */
     protected void dataflow(FlowGraph graph) {
 	if (Report.should_report(Report.dataflow, 1)) {
@@ -1482,3 +1482,4 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         Report.report(2, "}");
     }
 }
+// vim: ts=4 sw=4
