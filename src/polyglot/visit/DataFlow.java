@@ -724,9 +724,10 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     protected Map preordering = null;
     
     /**
-     * Create a preorder on Peer p and all Peers reachable from p
-     * (that are reachable without going through any peer in the
-     * set visited). The preorder will start from count.
+     * Create a preorder on <code>Peer p</code> and all <code>Peer</code>s 
+     * reachable from p (that are reachable without going through any 
+     * peer in the set <code>visited</code>). The preorder will start from 
+     * <code>count</code>.
      * 
      * @param p
      * @param count
@@ -776,7 +777,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 		Iterator iter = graph.startPeers().iterator();
 		while (iter.hasNext()) {
 			Peer p = (Peer) iter.next();
-			count =  preorder(p, 0, visited);
+			count =  preorder(p, count, visited);
 		}
 	}
 	
