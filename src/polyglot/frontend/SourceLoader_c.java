@@ -187,6 +187,6 @@ public class SourceLoader_c implements SourceLoader
     }
 
     protected Object fileKey(FileObject fo) {
-    	return fo;
+    	return fo.getName();
 	}
 }

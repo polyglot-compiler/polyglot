@@ -3,6 +3,7 @@ package polyglot.types.reflect;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,11 +54,18 @@ public class ClassFileLoader_c implements ClassFileLoader {
 
 	public ClassFileLoader_c(ExtensionInfo extInfo, List<Location> locations) {
 		this.extInfo = extInfo;
-		this.locations = locations;
+		this.locations = new ArrayList<Location>(locations);
 		this.packageCache = new HashMap<String,Boolean>();
 		this.nocache = new HashSet<String>();
 	}
 
+	public void addLocation(Location loc) {
+		List<Location> newLocs = new ArrayList<Location>(locations.size()+1);
+		newLocs.add(loc);
+		newLocs.addAll(locations);
+		locations = newLocs;
+	}
+	
 	public boolean packageExists(String name) {
 		Boolean exists = packageCache.get(name);
 		if (exists != null)
@@ -106,7 +114,7 @@ public class ClassFileLoader_c implements ClassFileLoader {
 				if(jfo != null) {
 					if (Report.should_report(report_topics, 4)) {
 						Report.report(4, "Class " + name + " found in "
-								+ l);
+								+ l + " at " + jfo.toUri());
 					}
 					break;
 				}

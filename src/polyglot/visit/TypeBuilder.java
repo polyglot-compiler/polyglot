@@ -270,7 +270,7 @@ public class TypeBuilder extends NodeVisitor
 
             if (dup != null && dup.fullName().equals(ct.fullName())) {
                 throw new SemanticException("Duplicate class \"" +
-                                            ct.fullName() + "\".", pos);
+                                            ct.fullName() + "\". For extension: " + this.typeSystem().getClass() , pos);
             }
 
             typeSystem().systemResolver().addNamed(ct.fullName(), ct);

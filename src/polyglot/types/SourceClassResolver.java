@@ -173,6 +173,11 @@ public class SourceClassResolver extends LoadedClassResolver
           Report.report(4, "Class " + name + " has encoded type info");
         encodedClazz = clazz;
       }
+      else {
+    	if (Report.should_report(report_topics, 4))
+          Report.report(4, "Class " + name + " has no encoded type info for " + version.name());
+      }
+
     }
 
     // Now, try and find the source file.
@@ -290,13 +295,12 @@ public class SourceClassResolver extends LoadedClassResolver
 
     if (job != null) {
         Named n = ts.systemResolver().check(name);
-        
         if (n != null) {
             return n;
         }
         
         Goal g = scheduler.TypesInitialized(job);
-        
+
         if (! scheduler.reached(g)) {
             throw new MissingDependencyException(g);
         }

@@ -1,4 +1,4 @@
-class BadIncrement1 {
+class BadIncrement2 {
   int m() {
     --1;
 
