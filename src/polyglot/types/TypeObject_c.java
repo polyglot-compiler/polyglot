@@ -102,7 +102,7 @@ public abstract class TypeObject_c implements TypeObject
     }
 
     /**
-     * Overload equalsImpl to find inadvertant overridding errors.
+     * Overload equalsImpl to find inadvertent overriding errors.
      * Make package-scope and void to break callers.
      */ 
     final void equalsImpl(Object o) { }
