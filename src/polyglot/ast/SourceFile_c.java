@@ -145,46 +145,16 @@ public class SourceFile_c extends Node_c implements SourceFile
      */
     public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
         TypeSystem ts = tb.typeSystem();
+        Package pkg = null;
         if (package_ != null) {
-            return tb.pushPackage(package_.package_());
+        	pkg = package_.package_();
         }
-        return tb;
-    }
 
-    /**
-     * Build type objects for the source file.  Set the visitor's import table
-     * field before we recurse into the declarations.
-    public NodeVisitor buildTypesEnter(TypeBuilder tb) throws SemanticException {
-        TypeSystem ts = tb.typeSystem();
-
-        ImportTable it;
-
-        if (package_ != null) {
-            it = ts.importTable(source.name(), package_.package_());
-	}
-	else {
-            it = ts.importTable(source.name(), null);
-	}
-
+        ImportTable it = ts.importTable(source.name(), pkg);
+        tb = tb.pushPackage(pkg);
         tb.setImportTable(it);
-
         return tb;
     }
-     */
-
-    /**
-     * Build type objects for the source file.  Sets the import table field for
-     * the source.
-    public Node buildTypes(TypeBuilder tb) throws SemanticException {
-        ImportTable it = tb.importTable();
-
-        // Clear the import table in case we use the same visitor
-        // to visit a different source file.
-        tb.setImportTable(null);
-
-        return importTable(it);
-    }
-     */
 
     public Context enterScope(Context c) {
         return c.pushSource(importTable);
