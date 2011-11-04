@@ -49,6 +49,7 @@ terminal LPAREN, RPAREN;
 terminal LBRACK, RBRACK;
 terminal LBRACE, RBRACE;
 terminal SEMICOLON, COMMA;
+terminal PLUS;
 
 non terminal List goal;                    // List of SourceFileTest
 non terminal List compilertest_list;           // List of SourceFileTest
@@ -145,8 +146,14 @@ description_opt ::=
     ;
 
 sentence ::=
-        STRING_LITERAL:a
-            {: RESULT = a; :}
+    STRING_LITERAL:a
+		{:
+			RESULT = a;
+		:}
+    |   sentence:a PLUS STRING_LITERAL:b
+        {:
+            RESULT = a + b; 
+        :}
     ;
 
 failure_set_opt ::=

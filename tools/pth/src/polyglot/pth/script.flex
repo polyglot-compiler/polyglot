@@ -44,6 +44,7 @@ IDENT                = [a-zA-Z0-9\:\.\$\/\\]*
    {WHITE_SPACE}                  { /* ignore white space. */ }
 
    /* symbols */
+   "+"                            { return new Symbol(sym.PLUS); }
    ";"                            { return new Symbol(sym.SEMICOLON); }
    ","                            { return new Symbol(sym.COMMA); }
    "("                            { return new Symbol(sym.LPAREN); }
