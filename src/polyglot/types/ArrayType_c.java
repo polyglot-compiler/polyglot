@@ -56,26 +56,14 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
             methods = new ArrayList(1);
 
             // Add method public Object clone()
-            methods.add(ts.methodInstance(position(),
-                                          this,
-                                          ts.Public(),
-                                          ts.Object(),
-                                          "clone",
-                                          Collections.EMPTY_LIST,
-                                          Collections.EMPTY_LIST));
+            methods.add(createCloneMethodInstance());
         }
 
         if (fields == null) {
             fields = new ArrayList(1);
 
             // Add field public final int length
-            FieldInstance fi = ts.fieldInstance(position(),
-                                        this,
-                                        ts.Public().Final(),
-                                        ts.Int(),
-                                        "length");
-            fi.setNotConstant();
-            fields.add(fi);
+            fields.add(createLengthFieldInstance());
         }
 
         if (interfaces == null) {
@@ -83,6 +71,26 @@ public class ArrayType_c extends ReferenceType_c implements ArrayType
             interfaces.add(ts.Cloneable());
             interfaces.add(ts.Serializable());
         }
+    }
+
+    protected Object createLengthFieldInstance() {
+        FieldInstance fi = ts.fieldInstance(position(),
+                this,
+                ts.Public().Final(),
+                ts.Int(),
+                "length");
+        fi.setNotConstant();
+        return fi;
+    }
+
+    protected MethodInstance createCloneMethodInstance() {
+        return ts.methodInstance(position(),
+                this,
+                ts.Public(),
+                ts.Object(),
+                "clone",
+                Collections.EMPTY_LIST,
+                Collections.EMPTY_LIST);
     }
 
     /** Get the base type of the array. */
