@@ -46,6 +46,11 @@ public class AlphaRenamer extends NodeVisitor {
 
   // Tracks the set of variables known to be fresh.
   protected Set freshVars;
+  
+  /**
+   * Should we also alpha-rename catch formals?
+   */
+  protected boolean renameCatchFormals;
 
   /**
    * Creates a visitor for alpha-renaming locals.
@@ -53,6 +58,9 @@ public class AlphaRenamer extends NodeVisitor {
    * @param nf  The node factory to be used when generating new nodes.
    **/
   public AlphaRenamer(NodeFactory nf) {
+      this(nf, false);
+  }
+  public AlphaRenamer(NodeFactory nf, boolean renameCatchFormals) {
     this.nf = nf;
 
     this.setStack = new Stack();
@@ -60,6 +68,8 @@ public class AlphaRenamer extends NodeVisitor {
 
     this.renamingMap = new HashMap();
     this.freshVars = new HashSet();
+    
+    this.renameCatchFormals = renameCatchFormals;
   }
 
   public NodeVisitor enter( Node n ) {
@@ -68,23 +78,29 @@ public class AlphaRenamer extends NodeVisitor {
       setStack.push( new HashSet() );
     }
 
+    if (this.renameCatchFormals && n instanceof Catch) {
+      Catch c = (Catch)n;
+      addToRenamingMap(c.formal().name());
+    }
     if ( n instanceof LocalDecl ) {
       LocalDecl l = (LocalDecl)n;
-      String name = l.name();
-
-      if ( !freshVars.contains(name) ) {
-	// Add a new entry to the current renaming map.
-	String name_ = UniqueID.newID(name);
-
-	freshVars.add(name_);
-
-	((Set)setStack.peek()).add( name );
-	renamingMap.put( name, name_ );
-      }
+      addToRenamingMap(l.name());
     }
 
     return this;
   }
+  protected void addToRenamingMap(String name) {
+    if ( !freshVars.contains(name) ) {
+      // Add a new entry to the current renaming map.
+      String name_ = UniqueID.newID(name);
+
+      freshVars.add(name_);
+
+      ((Set)setStack.peek()).add( name );
+      renamingMap.put( name, name_ );
+    }
+  }
+  
 
   public Node leave( Node old, Node n, NodeVisitor v ) {
     if ( n instanceof Block ) {
@@ -101,7 +117,7 @@ public class AlphaRenamer extends NodeVisitor {
       String name = l.name();
 
       if ( !renamingMap.containsKey(name) ) {
-	return n;
+        return n;
       }
       
       // Update the local instance as necessary.
@@ -118,12 +134,12 @@ public class AlphaRenamer extends NodeVisitor {
       String name = l.name();
 
       if ( freshVars.contains(name) ) {
-	return n;
+        return n;
       }
 
       if ( !renamingMap.containsKey(name) ) {
-	throw new InternalCompilerError( "Unexpected error encountered while "
-					 + "alpha-renaming." );
+        throw new InternalCompilerError( "Unexpected error encountered while "
+                                         + "alpha-renaming." );
       }
 
       // Update the local instance as necessary.
@@ -132,6 +148,27 @@ public class AlphaRenamer extends NodeVisitor {
       if (li != null) li.setName(newName);
       return l.name(newName);
     }
+
+    if ( n instanceof Catch && this.renameCatchFormals ) {
+        // Rename the catch formal.
+        Catch c = (Catch)n;
+        String name = c.formal().name();
+
+        if ( freshVars.contains(name) ) {
+          return n;
+        }
+
+        if ( !renamingMap.containsKey(name) ) {
+          throw new InternalCompilerError( "Unexpected error encountered while "
+                                           + "alpha-renaming." );
+        }
+
+        // Update the local instance as necessary.
+        String newName = (String) renamingMap.get(name);
+        LocalInstance li = c.formal().localInstance();
+        if (li != null) li.setName(newName);
+        return c.formal(c.formal().name(newName));
+      }
 
     return n;
   }
