@@ -55,7 +55,7 @@ public class ConstantValue extends Attribute
    * @exception IOException
    *        If an error occurs while reading.
    */
-  ConstantValue(DataInputStream in, int nameIndex, int length)
+  public ConstantValue(DataInputStream in, int nameIndex, int length)
     throws IOException
   {
     super(nameIndex, length);

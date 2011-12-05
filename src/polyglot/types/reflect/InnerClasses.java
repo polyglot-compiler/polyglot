@@ -39,7 +39,7 @@ import java.io.*;
  * @author Nate Nystrom
  *         (<a href="mailto:nystrom@cs.purdue.edu">nystrom@cs.purdue.edu</a>)
  */
-class InnerClasses extends Attribute {
+public class InnerClasses extends Attribute {
   private Info[] classes;
 
   public static class Info {
