@@ -25,57 +25,13 @@
 
 package polyglot.visit;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import polyglot.ast.Assign;
-import polyglot.ast.Block;
-import polyglot.ast.ClassBody;
-import polyglot.ast.ClassDecl;
-import polyglot.ast.ClassMember;
-import polyglot.ast.CodeNode;
-import polyglot.ast.ConstructorCall;
-import polyglot.ast.ConstructorDecl;
-import polyglot.ast.Eval;
-import polyglot.ast.Expr;
-import polyglot.ast.Field;
-import polyglot.ast.FieldDecl;
-import polyglot.ast.Formal;
-import polyglot.ast.Id;
-import polyglot.ast.Local;
-import polyglot.ast.LocalClassDecl;
-import polyglot.ast.New;
-import polyglot.ast.Node;
-import polyglot.ast.NodeFactory;
-import polyglot.ast.ProcedureCall;
-import polyglot.ast.Receiver;
-import polyglot.ast.SourceFile;
-import polyglot.ast.Special;
-import polyglot.ast.Stmt;
-import polyglot.ast.SwitchBlock;
-import polyglot.ast.TypeNode;
+import polyglot.ast.*;
 import polyglot.frontend.Job;
 import polyglot.main.Report;
-import polyglot.types.ClassType;
-import polyglot.types.ConstructorInstance;
-import polyglot.types.Context;
-import polyglot.types.Declaration;
-import polyglot.types.FieldInstance;
-import polyglot.types.Flags;
-import polyglot.types.LocalInstance;
-import polyglot.types.ParsedClassType;
-import polyglot.types.SemanticException;
-import polyglot.types.Type;
-import polyglot.types.TypeObject;
-import polyglot.types.TypeSystem;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Pair;
+import polyglot.types.*;
 import polyglot.util.Position;
-import polyglot.util.UniqueID;
 
 // TODO:
 //Convert closures to anon
@@ -97,8 +53,9 @@ public class InnerClassRemover extends ContextVisitor {
     
     /** Get a reference to the enclosing instance of the current class that is of type containerClass */
     Expr getContainer(Position pos, Expr this_, ClassType currentClass, ClassType containerClass) {
-        if (containerClass == currentClass)
+        if (containerClass == currentClass) {
             return this_;
+        }
         FieldInstance fi = boxThis(currentClass, currentClass.outer());
         Field f = nf.Field(pos, this_, nf.Id(pos, OUTER_FIELD_NAME));
         f = f.fieldInstance(fi);
@@ -160,7 +117,8 @@ public class InnerClassRemover extends ContextVisitor {
             assert s.qualifier().type().toClass() != null;
             if (s.qualifier().type().toClass().declaration() == context.currentClassScope())
                 return s;
-            return getContainer(pos, nf.This(pos).type(context.currentClass()), context.currentClass(), s.qualifier().type().toClass());
+            Node ret = getContainer(pos, nf.This(pos).type(context.currentClass()), context.currentClass(), s.qualifier().type().toClass());
+            return ret;
         }
         
         // Add the qualifier as an argument to constructor calls.
@@ -271,6 +229,25 @@ public class InnerClassRemover extends ContextVisitor {
             
             return cd;
         }
+        
+        if (n instanceof Field) {
+            Field f = (Field) n;
+            if (f.isTargetImplicit() && f.target() instanceof Field) {
+                // we translated the target from "this" to a field
+                f = f.targetImplicit(false);
+            }
+            return f;
+        }
+
+        if (n instanceof Call) {
+            Call c = (Call) n;
+            if (c.isTargetImplicit() && c.target() instanceof Field) {
+                // we translated the target, from "this" to a field
+                c = c.targetImplicit(false);
+            }
+            return c;
+        }
+
         
         return n;
     }
