@@ -130,7 +130,7 @@ public class Constant
      * @return
      *        The tag.
      */
-    final int tag()
+    public final int tag()
     {
 	return tag;
     }
