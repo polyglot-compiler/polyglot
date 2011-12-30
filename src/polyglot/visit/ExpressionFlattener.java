@@ -30,6 +30,7 @@ import java.util.*;
 import polyglot.ast.*;
 import polyglot.ast.Binary.Operator;
 import polyglot.frontend.Job;
+import polyglot.types.ArrayType;
 import polyglot.types.Flags;
 import polyglot.types.LocalInstance;
 import polyglot.types.Type;
@@ -392,14 +393,30 @@ public class ExpressionFlattener extends NodeVisitor {
         if (e != null) {
             d = d.init(null);
             addStmt(d);
-
+            // create new array expression 
+            // if initializer is an arrayinit
+            if ( e instanceof ArrayInit ) {
+            	e = createNewArray((ArrayInit)e);
+            }
             Local l = createLocal(d);
             n = createAssign(l, e);
         }
         return n;
     }
 
-    /**
+	/**
+	 * Create a NewArray expression from an ArrayInit. Raw ArrayInits are only
+	 * allowed in declarations.
+	 */
+    private Expr createNewArray(ArrayInit e) {
+        Position pos = e.position();
+        ArrayType at = (ArrayType) e.type();
+        TypeNode base = nf.CanonicalTypeNode(pos, at.base());
+        NewArray na = nf.NewArray(pos, base, at.dims(), e);
+        return na.type(at);
+	}
+
+	/**
      * Create a local declaration that can take a value of the
      * same type as e, and initialize it to the expression val.
      * Return the new local that was declared.
