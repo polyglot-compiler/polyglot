@@ -30,9 +30,11 @@ import java.io.OutputStream;
 import java.io.File;
 import java.io.IOException;
 
+import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
+import polyglot.translate.ext.ToExt;
 import polyglot.types.TypeSystem;
 import polyglot.types.reflect.ClassFile;
 import polyglot.util.ErrorQueue;
@@ -123,4 +125,6 @@ public interface ExtensionInfo {
         the character encoding to be defined. */
     FileSource createFileSource(File sourceFile, boolean userSpecified)
 	throws IOException;
+
+	ToExt getToExt(ExtensionInfo to_ext, Node n);
 }

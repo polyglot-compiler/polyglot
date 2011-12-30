@@ -29,10 +29,13 @@ import java.io.Reader;
 import java.io.File;
 import java.io.IOException;
 
+import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.goals.Goal;
 import polyglot.main.Options;
 import polyglot.main.Version;
+import polyglot.translate.ext.ToExt;
+import polyglot.translate.ext.ToExt_c;
 import polyglot.types.TypeSystem;
 import polyglot.types.reflect.ClassFile;
 import polyglot.util.ErrorQueue;
@@ -195,5 +198,14 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
 	throws IOException
     {
 	return new FileSource(f, user);
+    }
+
+	/**
+	 * Get the ToExt extension object used for translating AST nodes to the
+	 * to_ext language.
+	 */
+    public ToExt getToExt(ExtensionInfo to_ext, Node n) {
+    	//just return the first ToExt extension we find.
+    	return ToExt_c.ext(n);
     }
 }
