@@ -77,11 +77,13 @@ public abstract class CodeWriter
      * @param n
      *            indentation relative to the current block if the newline is
      *            inserted. Requires: n >= 0
+     * @param level
+     *            the level of the break. Requires: level >= 0
      * @param alt
      *            if no newline is inserted, the string <code>alt</code> is
      *            output instead. Requires: alt != null
-     * @param level
-     *            the level of the break. Requires: level >= 0
+     * @param altlen
+     *            the length of 'alt' in characters
      */ 
     public abstract void allowBreak(int n, int level, String alt, int altlen);
 
@@ -99,6 +101,8 @@ public abstract class CodeWriter
      *            the level of the break
      * @param alt
      *            the alternative text
+     * @param altlen
+     *            the length in characters that 'alt' will be treated as taking up.
      * @see polyglot.util.CodeWriter#allowBreak
      */
     public abstract void unifiedBreak(int n, int level, String alt, int altlen);
