@@ -363,7 +363,6 @@ public class Call_c extends Expr_c implements Call
 
   /** Write the expression to an output file. */
   public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
-    w.begin(0);
     if (!targetImplicit) {
         if (target instanceof Expr) {
           printSubExpr((Expr) target, w, tr);
@@ -375,6 +374,7 @@ public class Call_c extends Expr_c implements Call
 	w.allowBreak(2, 3, "", 0);
     }
 
+    w.begin(0);
     w.write(name + "(");
     if (arguments.size() > 0) {
 	w.allowBreak(2, 2, "", 0); // miser mode

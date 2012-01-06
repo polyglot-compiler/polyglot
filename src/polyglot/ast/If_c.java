@@ -148,8 +148,8 @@ public class If_c extends Stmt_c implements If
 
 	if (alternative != null) {
 	    if (consequent instanceof Block) {
-		// allow the "} else {" formatting
-		w.write(" ");
+		// allow the "} else {" formatting except in emergencies
+                w.allowBreak(0, 2, " ", 1);
 	    } else {
 		w.allowBreak(0, " ");
 	    }
@@ -158,10 +158,8 @@ public class If_c extends Stmt_c implements If
 		w.write ("else ");
 		print(alternative, w, tr);
 	    } else {
-		w.begin(4);
 		w.write("else");
 		printSubStmt(alternative, w, tr);
-		w.end();
 	    }
 	}
     }
