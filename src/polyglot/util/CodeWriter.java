@@ -129,7 +129,9 @@ public abstract class CodeWriter
     }
 
     /**
-     * Force a newline. Indentation will be preserved.
+     * Force a newline. Indentation will be preserved. This method
+     * should be used sparingly; a call to allowBreak() gives the
+     * pretty-printer much more flexibility to do a good job.
      */
     public void newline() { newline(0, 1); }
     /**

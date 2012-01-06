@@ -40,9 +40,9 @@ import java.util.Map;
  *
  * OptimalCodeWriter follows the "break from root" rule: if a break is broken,
  * breaks of equal or lower level in all containing blocks must also be
- * broken, and breaks of strictly lower level in the same block must also
- * be broken.
- * 
+ * broken, and breaks in the same block must also be broken if they are
+ * of strictly lower level or if they are of the same level but marked as
+ * "unified".
  */
 public class OptimalCodeWriter extends CodeWriter {
     /**
@@ -198,7 +198,7 @@ public class OptimalCodeWriter extends CodeWriter {
 	    } catch (Overrun o) { success = false; }
 	} else success = false;
 	
-        input.sendOutput(output, 0, 0, success, null);
+        input.sendOutput(output, 0, 0, width, success, null);
         output.flush();
         if (OptimalCodeWriter.debug) {
             System.err.println("Total calls to format = " + format_calls);
@@ -281,7 +281,7 @@ class Overrun extends Exception
 	    System.err.print("\033[H\033[2J");
 	    PrintWriter w = new PrintWriter(new OutputStreamWriter(System.err));
 	    try {	            	            
-		OptimalCodeWriter.top.sendOutput(w, 0, 0, true, it);
+		OptimalCodeWriter.top.sendOutput(w, 0, 0, 200, true, it);
 	    }
 	    catch (IOException e) {  }
 	    w.flush();
@@ -414,7 +414,7 @@ abstract class Item
      * 
      * @param success
      */
-    abstract int sendOutput(PrintWriter o, int lmargin, int pos, boolean success, Item last)
+    abstract int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin, boolean success, Item last)
       throws IOException;
     
     // XXX
@@ -444,7 +444,7 @@ abstract class Item
 	        System.err.println("SNAPSHOT:");
 	        PrintWriter w = new PrintWriter(new OutputStreamWriter(System.err));
 	        try {	            	            
-	            OptimalCodeWriter.top.sendOutput(w, 0, 0, true, it);
+	            OptimalCodeWriter.top.sendOutput(w, 0, 0, rmargin, true, it);
 	        }
 	        catch (IOException e) {  }
 	        w.write("<END>\n");
@@ -631,7 +631,7 @@ class TextItem extends Item {
 		      m, minLevel, minLevelUnified);
         // all overruns passed through
     }
-    int sendOutput(PrintWriter o, int lm, int pos, boolean success, Item last) throws IOException {
+    int sendOutput(PrintWriter o, int lm, int pos, int rm, boolean success, Item last) throws IOException {
         o.write(s);
         return pos + length;
     }
@@ -734,11 +734,11 @@ class AllowBreak extends Item {
 	  "internal error: could not either break or not break");
     }
         
-    int sendOutput(PrintWriter o, int lmargin, int pos, boolean success,
+    int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin, boolean success,
 		   Item last)
       throws IOException
     {
-        if (broken || !success) {
+        if (broken || !success && pos >= rmargin) {
             o.println();
             for (int i = 0; i < lmargin + indent; i++) o.print(" ");
             //o.write("(" + (lmargin+indent) + ")");
@@ -791,10 +791,10 @@ class Newline extends AllowBreak {
 	if (indent == 0) return "\\n";
 	else return "\\n[" + indent + "]"; }
     // XXX should not need to override sendOutput
-    int sendOutput(PrintWriter o, int lmargin, int pos, boolean success, Item last)
+    int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin, boolean success, Item last)
         throws IOException {
 	    broken = true; // XXX how can this be necessary?
-	    return super.sendOutput(o, lmargin, pos, success, last);
+	    return super.sendOutput(o, lmargin, pos, rmargin, success, last);
     }
     int selfMinIndent(MaxLevels m) {
         if (canBreak(m)) return indent;
@@ -870,12 +870,12 @@ class BlockItem extends Item {
         }
     }
 
-    int sendOutput(PrintWriter o, int lmargin, int pos, boolean success, Item last) throws IOException {
+    int sendOutput(PrintWriter o, int lmargin, int pos, int rmargin, boolean success, Item last) throws IOException {
         Item it = first;
         lmargin = pos + indent;
 	if (last != this) {
           while (it != null) {
-            pos = it.sendOutput(o, lmargin, pos, success, last);
+            pos = it.sendOutput(o, lmargin, pos, rmargin, success, last);
             if (last != null && it == last) {
                 throw new IOException();
             }
