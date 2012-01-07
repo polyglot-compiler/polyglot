@@ -127,4 +127,6 @@ public interface ExtensionInfo {
 	throws IOException;
 
 	ToExt getToExt(ExtensionInfo to_ext, Node n);
+
+	Options getOptionsFor(ExtensionInfo to_ext);
 }
