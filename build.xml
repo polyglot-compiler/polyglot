@@ -118,10 +118,10 @@
 	<target name="all" depends="jar-all" description="Build everything" />
 
         <!-- build the base compiler, qq, and pth -->
-        <target name="compile" depends="base,base-qq,pth" description="Build the base compiler, qq, and pth" />
+        <target name="compile" depends="base,pth" description="Build the base compiler, qq, and pth" />
 
 	<!-- build the base compiler -->
-	<target name="base" depends="bin,base-parser,compile-base,base-qq" description="Build the base compiler" />
+	<target name="base" depends="bin,base-parser,compile-base" description="Build the base compiler" />
 	<target name="jl" depends="base" description="Build the base compiler" />
 
 	<!-- compile everything -->
@@ -372,6 +372,7 @@
 	</target>
 
 	<target name="base-parser" depends="bin,cup,init" description="Build the base compiler parser">
+		<!-- generate parser source -->
 		<antcall target="jflex-lexer">
 			<param name="lexer.dir" value="${src}/polyglot/parse" />
 			<param name="lexer.class" value="Lexer_c" />
@@ -384,12 +385,7 @@
 			<param name="symbol.class" value="sym" />
 		</antcall>
 		<copy file="${src}/polyglot/parse/java12.cup" todir="${classes}/polyglot/parse" />
-		<javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/parse/**">
-			<classpath refid="standard.classpath" />
-		</javac>
-	</target>
-
-	<target name="base-qq" depends="bin,cup,init,ppg,base-parser,compile-base" description="Build the base compiler parser">
+		<!-- generate QQ parser source -->
 		<antcall target="jflex-lexer">
 			<param name="lexer.dir" value="${src}/polyglot/qq" />
 			<param name="lexer.class" value="Lexer_c" />
@@ -403,7 +399,7 @@
 			<param name="parser.class" value="Grm" />
 			<param name="symbol.class" value="sym" />
 		</antcall>
-		<javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/qq/**">
+		<javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/parse/**,polyglot/qq/**">
 			<classpath refid="standard.classpath" />
 		</javac>
 	</target>
