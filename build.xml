@@ -371,7 +371,7 @@
 		<available property="jflex-lexer.up-to-date" file="${lexer.dir}/${lexer.class}.java" />
 	</target>
 
-	<target name="base-parser" depends="bin,cup,init" description="Build the base compiler parser">
+	<target name="base-parser" depends="bin,cup,ppg,init" description="Build the base compiler parser">
 		<!-- generate parser source -->
 		<antcall target="jflex-lexer">
 			<param name="lexer.dir" value="${src}/polyglot/parse" />
