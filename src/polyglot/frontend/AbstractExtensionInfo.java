@@ -209,11 +209,4 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     	return ToExt_c.ext(n);
     }
     
-    /**
-     * Get options for a target extension.
-     */
-    public Options getOptionsFor(ExtensionInfo to_ext) {
-    	// by default, use the options for this extension
-    	return getOptions();
-    }
 }
