@@ -89,13 +89,21 @@ public class ExpressionFlattener extends NodeVisitor {
     protected final DeepCopier deepCopier = new DeepCopier();
     /** Dummy value returned when there is no expression to return. */
     protected final Local dummyLocal;
+    
+    /** Whether to move initializers of created localDecls to assignments */
+	protected boolean flatten_all_decls;
 
     public ExpressionFlattener(Job job, TypeSystem ts, NodeFactory nf) {
+    	this(job, ts, nf, false);
+    }
+    
+    public ExpressionFlattener(Job job, TypeSystem ts, NodeFactory nf, boolean flatten_all_decls) {
         this.job = job;
         this.ts = ts;
         this.nf = nf;
         this.dummyLocal = nf.Local(Position.compilerGenerated(), 
             nf.Id(Position.compilerGenerated(), "dummy"));
+        this.flatten_all_decls = flatten_all_decls;
     }
 
     public Node override(Node parent, Node n) {
@@ -325,7 +333,16 @@ public class ExpressionFlattener extends NodeVisitor {
                 }
                 
                 // create a local temp for the expression
-                return createDeclWithInit(e, val);
+                if (!flatten_all_decls) {
+                	return createDeclWithInit(e, val);
+                }
+                else {
+                	LocalDecl d = createDecl(val, null);
+                	addStmt(d);
+                    Local l = createLocal(d);
+                    addStmt(createAssign(l, val));
+                    return createLocal(d);
+                }
             }
         }
 
