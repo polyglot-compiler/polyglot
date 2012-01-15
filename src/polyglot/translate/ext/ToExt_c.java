@@ -11,7 +11,7 @@ import polyglot.visit.NodeVisitor;
 public class ToExt_c extends Ext_c implements ToExt {
     public static ToExt ext(Node n) {
         Ext e = n.ext();
-        while (!(e instanceof ToExt)) {
+        while (e != null && !(e instanceof ToExt)) {
             e = e.ext();
         }
         return (ToExt)e;
@@ -24,5 +24,4 @@ public class ToExt_c extends Ext_c implements ToExt {
     public Node toExt(ExtensionRewriter rw) throws SemanticException {
         throw new InternalCompilerError("Cannot transalate " + node() +":" + node().ext().getClass());
     }    
-
 }

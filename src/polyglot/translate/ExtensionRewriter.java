@@ -44,7 +44,7 @@ public class ExtensionRewriter extends ContextVisitor
         this.qq = new QQ(to_ext);
     }
 
-    public NodeVisitor enterCall(Node n) {
+    public NodeVisitor enterCall(Node n) throws SemanticException {
         try {
             ToExt ext = from_ext.getToExt(to_ext, n);
             return ext.toExtEnter(this);
@@ -63,7 +63,7 @@ public class ExtensionRewriter extends ContextVisitor
         }
     }
 
-    public Node leaveCall(Node old, Node n, NodeVisitor v) {
+    public Node leaveCall(Node old, Node n, NodeVisitor v) throws SemanticException {
         try {
             ToExt ext = from_ext.getToExt(to_ext, n);            
             return ext.toExt(this);
