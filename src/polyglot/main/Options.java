@@ -114,6 +114,39 @@ public class Options {
     }
 
     /**
+     * Set values using another options object
+     */
+    public void setValuesFrom(Options opt) {
+        this.error_count = opt.error_count;
+        this.source_path = opt.source_path;
+        this.output_directory = opt.output_directory;
+        this.class_output_directory = opt.class_output_directory;
+        this.default_classpath = opt.default_classpath;
+        this.default_output_classpath = opt.default_output_classpath;
+        this.classpath = opt.classpath;
+        this.output_classpath = opt.output_classpath;
+        this.bootclasspath = opt.bootclasspath;
+        this.assertions = opt.assertions;
+        this.generate_debugging_info = opt.generate_debugging_info;
+        this.compile_command_line_only = opt.compile_command_line_only;
+        this.source_ext = opt.source_ext;
+        this.output_ext = opt.output_ext;
+        this.output_stdout = opt.output_stdout;
+        this.post_compiler = opt.post_compiler;
+        this.output_width = opt.output_width;
+        this.fully_qualified_names = opt.fully_qualified_names;
+        this.serialize_type_info = opt.serialize_type_info;
+        this.dump_ast = opt.dump_ast;
+        this.print_ast = opt.print_ast;
+        this.disable_passes = opt.disable_passes;
+        this.keep_output_files = opt.keep_output_files;
+        this.precise_compiler_generated_positions = opt.precise_compiler_generated_positions;
+        this.use_simple_code_writer = opt.use_simple_code_writer;
+        this.merge_strings = opt.merge_strings;
+        this.java_output_given = opt.java_output_given;
+    }
+    
+    /**
      * Set default values for options
      */
     public void setDefaultValues() {
