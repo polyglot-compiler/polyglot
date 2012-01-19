@@ -131,7 +131,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
         LocalClass.jl ; LocalClass2.jl ; LocalClass3.jl ; LocalClass4.jl ;
         LocalInners2.jl ;
         LocalInit.jl ;
-        MemberClassFlags.jl ;
+       MemberClassFlags.jl ;
         Narrowing.jl ;
         # Output.jl ;
         Prim.jl ;
@@ -275,4 +275,8 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
 		       (Semantic, "Illegal forward ref"), 
 		       (Semantic, "Illegal forward ref"), 
 		       (Semantic, "Illegal forward ref"); 
+}
+
+polyglot.frontend.JLExtensionInfo {
+	package3/name/ClassPackConflict.jl;
 }
