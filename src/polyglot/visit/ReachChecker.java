@@ -177,7 +177,8 @@ public class ReachChecker extends DataFlow
         if (g != null) {   
             Collection peers = g.peers(n, Term.EXIT);
             if (peers != null && !peers.isEmpty()) {
-                boolean isInitializer = (n instanceof Initializer);
+                boolean isReachable = false;
+                boolean isNormalReachable = false;
                 
                 for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
                     FlowGraph.Peer p = (FlowGraph.Peer) iter.next();
@@ -191,13 +192,13 @@ public class ReachChecker extends DataFlow
                         DataFlowItem dfi = (DataFlowItem)p.inItem();
                         // there will only be one peer for an initializer,
                         // as it cannot occur in a finally block.
-                        if (isInitializer && !dfi.normalReachable) {
-                            throw new SemanticException("Initializers must be able to complete normally.",
-                                                        n.position());
-                        }
-
                         if (dfi.reachable) {
-                            return n.reachable(true);
+                            isReachable = true;
+                        }
+                        if (dfi.normalReachable) {
+                            isNormalReachable = true;
+                            // no point in doing more.
+                            break;
                         }
                     }
                     
@@ -207,14 +208,19 @@ public class ReachChecker extends DataFlow
                         
                             if (item != null && item.reachable) {
                                 // n is reachable.
-                                return n.reachable(true);
+                                isReachable = true;
+                                break;
                             }                    
                         }
                     }
                 }
                 
-                // if we fall through to here, then no peer for n was reachable.
-                n = n.reachable(false);                
+                if (!isNormalReachable && n instanceof Initializer) {
+                    throw new SemanticException("Initializers must be able to complete normally.",
+                                                n.position());
+                }
+
+                n = n.reachable(isReachable);                
             }
         }        
         return n;
