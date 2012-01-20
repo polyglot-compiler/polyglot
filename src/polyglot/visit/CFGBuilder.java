@@ -33,6 +33,7 @@ import polyglot.types.MemberInstance;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.*;
+import polyglot.visit.FlowGraph.Peer;
 
 /**
  * Class used to construct a CFG.
@@ -225,7 +226,7 @@ public class CFGBuilder implements Copy
       }
 
       // Add an edge to the exit node.
-      edge(last_visitor, last, graph.root(), Term.EXIT, FlowGraph.EDGE_KEY_OTHER);
+      edge(last_visitor, last, exitPeer(), FlowGraph.EDGE_KEY_OTHER);
     }
 
     protected static int counter = 0;
@@ -251,14 +252,29 @@ public class CFGBuilder implements Copy
         }
 
         // create peers for the entry and exit nodes.
-        graph.peer(graph.root(), Collections.EMPTY_LIST, Term.ENTRY);
-        graph.peer(graph.root(), Collections.EMPTY_LIST, Term.EXIT);
+        entryPeer();
+        exitPeer();
 
         this.visitCFG(graph.root(), Collections.EMPTY_LIST);
 
 	if (Report.should_report(Report.cfg, 2))
 	    Report.report(2, "}");
     }
+    
+    /**
+     * Utility method to get the peer for the entry of the flow graph.
+     */
+    protected Peer entryPeer() {
+        return graph.peer(graph.root(), Collections.EMPTY_LIST, Term.ENTRY);
+    }
+
+    /**
+     * Utility method to get the peer for the exit of the flow graph.
+     */
+    protected Peer exitPeer() {
+        return graph.peer(graph.root(), Collections.EMPTY_LIST, Term.EXIT);
+    }
+
 
     /**
      * Utility function to visit all edges in a list.
@@ -482,8 +498,8 @@ public class CFGBuilder implements Copy
         
         // If not caught, insert a node from the thrower to exit.
         if (errorEdgesToExitNode || !type.isSubtype(ts.Error())) {
-            edge(last_visitor, last, e, graph.root(), Term.EXIT, 
-                    new FlowGraph.ExceptionEdgeKey(type));
+            FlowGraph.Peer pp = graph.peer(last, last_visitor.path_to_finally, e);
+            edge(pp, exitPeer(), new FlowGraph.ExceptionEdgeKey(type));
         }
     }
 
@@ -548,7 +564,15 @@ public class CFGBuilder implements Copy
             Term q, int qEntry, FlowGraph.EdgeKey edgeKey) {
         edge(p_visitor, p, Term.EXIT, q, qEntry, edgeKey);
     }
-    
+
+    /**
+     * Add an edge to the CFG from the exit of <code>p</code> to peer pq.
+     */
+    public void edge(CFGBuilder p_visitor, Term p, Peer pq, FlowGraph.EdgeKey edgeKey) {
+        FlowGraph.Peer pp = graph.peer(p, p_visitor.path_to_finally, Term.EXIT);
+        edge(pp, pq, edgeKey);
+    }
+
     /**
      * @param p_visitor The visitor used to create p ("this" is the visitor
      *                  that created q) 
@@ -561,11 +585,14 @@ public class CFGBuilder implements Copy
      */
     public void edge(CFGBuilder p_visitor, Term p, int pEntry, 
             Term q, int qEntry, FlowGraph.EdgeKey edgeKey) {
-        if (Report.should_report(Report.cfg, 2))
-            Report.report(2, "//     edge " + p + " -> " + q);
         
         FlowGraph.Peer pp = graph.peer(p, p_visitor.path_to_finally, pEntry);
         FlowGraph.Peer pq = graph.peer(q, path_to_finally, qEntry);
+        edge(pp, pq, edgeKey);
+    }
+    protected void edge(FlowGraph.Peer pp, FlowGraph.Peer pq, FlowGraph.EdgeKey edgeKey) {        
+        if (Report.should_report(Report.cfg, 2))
+            Report.report(2, "//     edge " + pp.node() + " -> " + pq.node());
         
         if (Report.should_report(Report.cfg, 3)) {
             // at level 3, use Peer.toString() as the label for the nodes
