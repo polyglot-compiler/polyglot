@@ -104,6 +104,7 @@ polyglot.frontend.JLExtensionInfo "-cp ." {
         Init6.jl ;
         Init7.jl ; Init8.jl ; Init9.jl ;
 	Init10.jl; 
+	Init11.jl; 
         InitializerType1.jl ;
         Initializer1.jl (Semantic, "Initializers must be able to complete normally");
         Initializer2.jl (Semantic, "Initializers must be able to complete normally");
