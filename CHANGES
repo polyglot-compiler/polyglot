@@ -8,6 +8,15 @@ This file documents changes between releases of Polyglot.
 
 Precedence of = vs. ?: fixed.
 
+Added JL5 extension (polyglot.ext.jl5) to support Java 1.5 language features. 
+Based on the "Polyglot for Java 5" project by Milan Stanojevic and Todd 
+Millstein (http://www.cs.ucla.edu/~todd/research/polyglot5.html), with 
+additional input from Vincent Cavé.
+
+Based on the "Polyglot for Java 5" project by Milan Stanojevic and Todd Millstein, with 
+
+Miscellanious bug fixes.
+
 Aug 14, 2008: Polyglot 2.4.0
 ============================
 
