@@ -14,6 +14,7 @@ import polyglot.util.SilentErrorQueue;
  * 
  */
 public class SourceFileTest extends AbstractTest {
+    private static final String JAVAC = "javac";
     protected final List sourceFilenames;
     protected String extensionClassname = null;
     protected String[] extraArgs;
@@ -57,7 +58,13 @@ public class SourceFileTest extends AbstractTest {
         
         // invoke the compiler on the file.
         try {
-            invokePolyglot(getSourceFileNames());
+            if (JAVAC.equals(this.getExtensionClassname())) {
+                // invoke javac on the program
+                invokeJavac(getSourceFileNames());
+            }
+            else {
+                invokePolyglot(getSourceFileNames());
+            }
         }
         catch (polyglot.main.Main.TerminationException e) {
             if (e.getMessage() != null) {
@@ -170,6 +177,34 @@ public class SourceFileTest extends AbstractTest {
         }
     }
 
+    protected void invokeJavac(String[] files) {
+        File tmpdir = new File("pthOutput");
+
+        int i = 1;
+        while (tmpdir.exists()) {
+            tmpdir = new File("pthOutput." + i);
+            i++;
+        }
+
+        tmpdir.mkdir();
+
+        setDestDir(tmpdir.getPath());
+
+        String[] cmdLine = buildCmdLine(files);
+        com.sun.tools.javac.Main compiler = new com.sun.tools.javac.Main();
+
+        try {
+            compiler.compile(cmdLine);
+        }
+        finally {
+            if (Main.options.deleteOutputFiles) {
+                deleteDir(tmpdir);
+            }
+
+            setDestDir(null);
+        }
+    }
+
     protected void deleteDir(File dir) {
 //        System.out.println("Deleting " + dir.toString());
         File[] list = dir.listFiles();
@@ -198,7 +233,7 @@ public class SourceFileTest extends AbstractTest {
         String s;
         String[] sa;
         
-        if ((s = getExtensionClassname()) != null) {
+        if ((s = getExtensionClassname()) != null && !s.equals(JAVAC)) {
             args.add("-extclass");
             args.add(s);
         }
