@@ -94,7 +94,8 @@
 
 	<!-- create appropriate executables in the bin directory -->
 	<target name="bin" depends="configure" unless="bin.up-to-date">
-		<chmod perm="+x" file="${bin}/jlc" />
+        <chmod perm="+x" file="${bin}/jlc" />
+        <chmod perm="+x" file="${bin}/jl5c" />
 		<chmod perm="+x" file="${bin}/pth" />
 		<property name="bin.up-to-date" value="true" />
 	</target>
@@ -122,7 +123,7 @@
 
 	<!-- build the base compiler -->
 	<target name="base" depends="bin,base-parser,compile-base" description="Build the base compiler" />
-	<target name="jl" depends="base" description="Build the base compiler" />
+    <target name="jl" depends="base" description="Build the base compiler" />
 
 	<!-- compile everything -->
 	<target name="compile-all" depends="base,compile-ppg,compile-pth,examples" description="Compile the base compiler, ppg, pth, and the examples" />
@@ -205,6 +206,9 @@
 				<include name="polyglot/qq/sym.java" />
 				<include name="polyglot/qq/Lexer_c.java" />
 				<include name="polyglot/qq/qq_ppg.cup" />
+                <include name="polyglot/ext/jl5/parse/Grm.java" />
+                <include name="polyglot/ext/jl5/parse/sym.java" />
+                <include name="polyglot/ext/jl5/parse/Lexer_c.java" />
 			</fileset>
 		</delete>
 		<delete>
@@ -225,12 +229,16 @@
 
 	<!-- compile the base compiler except for the quasiquoter and generated parser -->
 	<target name="compile-base" depends="init,base-parser">
-		<javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/qq/**,polyglot/parse/Lexer_c.java,polyglot/parse/sym.java,polyglot/parse/Grm.java">
-			<classpath refid="standard.classpath" />
-		</javac>
-	</target>
+        <javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/ext/jl5/**,polyglot/qq/**,polyglot/parse/Lexer_c.java,polyglot/parse/sym.java,polyglot/parse/Grm.java">
+            <classpath refid="standard.classpath" />
+        </javac>
+		<!-- Compile the JL5 code -->
+        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/**" excludes="polyglot/ext/jl5/parse/Lexer_c.java,polyglot/ext/jl5/parse/sym.java,polyglot/ext/jl5/parse/Grm.java">
+            <classpath refid="standard.classpath" />
+        </javac>
+    </target>
 
-	<target name="compile-epl-base" depends="init">
+    	<target name="compile-epl-base" depends="init">
           <javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/**" excludes="polyglot/ext/**,polyglot/qq/**,polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/frontend/JLExtensionInfo.java,polyglot/lex/EscapedUnicodeReader.java">
 			<classpath refid="standard.classpath" />
 		</javac>
@@ -402,7 +410,25 @@
 		<javac source="1.4" target="1.4" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/parse/**,polyglot/qq/**">
 			<classpath refid="standard.classpath" />
 		</javac>
-	</target>
+
+		<!-- JL5 compiler parser -->
+        <antcall target="jflex-lexer">
+            <param name="lexer.dir" value="${src}/polyglot/ext/jl5/parse" />
+            <param name="lexer.class" value="Lexer_c" />
+            <param name="jflex.file" value="jl5.flex" />
+        </antcall>
+        <antcall target="ppg-parser">
+            <param name="parser.dir" value="${src}/polyglot/ext/jl5/parse" />
+            <param name="ppg.file" value="jl5.ppg" />
+            <param name="cup.file" value="jl5_ppg.cup" />
+            <param name="parser.class" value="Grm" />
+            <param name="symbol.class" value="sym" />
+        </antcall>
+        <copy file="${src}/polyglot/parse/java12.cup" todir="${classes}/polyglot/ext/jl5/parse" />
+        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/parse/**">
+            <classpath refid="standard.classpath" />
+        </javac>
+    </target>
 
 	<target name="jar" description="Build polyglot.jar" depends="jar-base" />
 
@@ -419,7 +445,7 @@
 			<attribute name="Class-Path" value="java_cup.jar polyglot.jar ppg.jar" />
 		</manifest>
 
-		<jar destfile="${lib}/polyglot.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF" includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/qq/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**" />
+		<jar destfile="${lib}/polyglot.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF" includes="polyglot/ast/**,polyglot/frontend/**,polyglot/lex/**,polyglot/main/**,polyglot/parse/**,polyglot/qq/**,polyglot/types/**,polyglot/util/**,polyglot/visit/**,ppg/**,polyglot/ext/param/**,polyglot/ext/jl5/**" />
 
 		<delete file="${classes}/MANIFEST.MF" failonerror="false" />
 	</target>
@@ -579,7 +605,7 @@
 	<!-- make the LGPL source distribution in a tmp directory -->
 	<target name="src-dist-tmp" depends="jar-base,jar-pth,jar-ppg,javadoc,mkdir-tmp">
 		<copy todir="${tmp}/src" includeemptydirs="false">
-			<fileset dir="${src}" includes="polyglot/**/*.java,polyglot/qq/qq.ppg,polyglot/qq/qq.flex,polyglot/qq/qq_ppg.cup,polyglot/parse/java12.cup,polyglot/parse/java.flex,polyglot/**/package.html" />
+			<fileset dir="${src}" includes="polyglot/**/*.java,polyglot/qq/qq.ppg,polyglot/qq/qq.flex,polyglot/qq/qq_ppg.cup,polyglot/parse/java12.cup,polyglot/parse/java.flex,polyglot/**/package.html,polyglot/ext/jl5/parse/jl5_ppg.cup,polyglot/ext/jl5/parse/jl5.flex,polyglot/ext/jl5/parse/jl5.ppg" />
 		</copy>
 
 		<copy todir="${tmp}/skel" includeEmptyDirs="false">
@@ -604,7 +630,8 @@
 
                 <copy file="META-INF/MANIFEST.MF" todir="${tmp}/META-INF" />
                 <copy file="${bin}/newext.sh" todir="${tmp}/bin" />
-		<copy file="${bin}/jlc" todir="${tmp}/bin" />
+        <copy file="${bin}/jlc" todir="${tmp}/bin" />
+        <copy file="${bin}/jl5c" todir="${tmp}/bin" />
 		<copy file="${bin}/pth" todir="${tmp}/bin" />
 		<copy file="doc/Upgrade.txt" todir="${tmp}/doc" />
 		<copy file="doc/Overview.txt" todir="${tmp}/doc" />
@@ -626,8 +653,8 @@
 		<copy file="LICENSE.Eclipse" todir="${tmp}" />
 
 		<!-- these don't seem to work on Windows -->
-		<chmod perm="ug=rw,o=" dir="${tmp}" excludes="${bin}/jlc,${bin}/pth" verbose="true" />
-		<chmod perm="ug=rwx,o=" dir="${tmp}" includes="${bin}/jlc,${bin}/pth" />
+		<chmod perm="ug=rw,o=" dir="${tmp}" excludes="${bin}/jlc,${bin}/jl5c,${bin}/pth" verbose="true" />
+		<chmod perm="ug=rwx,o=" dir="${tmp}" includes="${bin}/jlc,${bin}/jl5c,${bin}/pth" />
 	</target>
 
 	<!-- make the EPL source distribution in a tmp directory -->
@@ -636,7 +663,8 @@
                   <fileset dir="${src}" includes="polyglot/**/*.java,polyglot/**/package.html" excludes="polyglot/qq/**,polyglot/ext/**,polyglot/parse/BaseParser.java,polyglot/parse/sym.java,polyglot/parse/Grm.java,polyglot/parse/Lexer_c.java,polyglot/frontend/JLExtensionInfo.java,polyglot/lex/EscapedUnicodeReader.java" />
 		</copy>
 
-		<copy file="${bin}/jlc" todir="${tmp}/bin" />
+        <copy file="${bin}/jlc" todir="${tmp}/bin" />
+        <copy file="${bin}/jl5c" todir="${tmp}/bin" />
 		<copy file="doc/Upgrade.txt" todir="${tmp}/doc" />
 		<copy file="doc/Overview.txt" todir="${tmp}/doc" />
 		<copy file="doc/DATAFLOW_2_0.txt" todir="${tmp}/doc" />
@@ -648,8 +676,8 @@
 		<copy file="LICENSE.Eclipse" todir="${tmp}" />
 
 		<!-- these don't seem to work on Windows -->
-		<chmod perm="ug=rw,o=" dir="${tmp}" excludes="${bin}/jlc" verbose="true" />
-		<chmod perm="ug=rwx,o=" dir="${tmp}" includes="${bin}/jlc" />
+		<chmod perm="ug=rw,o=" dir="${tmp}" excludes="${bin}/jlc,${bin}/jl5c" verbose="true" />
+		<chmod perm="ug=rwx,o=" dir="${tmp}" includes="${bin}/jlc,${bin}/jl5c" />
 	</target>
 
 	<!-- build a combined source and binary jar file -->
