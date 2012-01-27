@@ -1,0 +1,34 @@
+class Box< T > {
+  public T t; 
+  public boolean equalTo( Box< T > other) { return this.t.equals(other.t); }
+  public Box< T > copy() { return new Box<T>(t); }
+      public Box(T t) { this.t = t; }
+      public void put( T t) { this.t = t;}
+      public T take() { return t; }
+
+      public boolean contains( T t) { return this.t == t; }
+      public String toString() { return "Box["+t.toString()+"]"; }
+  public void takeContentFrom( Box<? extends T > box) { t = box.t; }
+  public Class<? extends T > getContentType() { return null;} 
+}
+
+class Test {
+  public static void main(String[] args) {
+    Box<Long>   longBox   = new Box<Long>(0L);
+    Box<Number> numberBox = new Box<Number>(0L); 
+    Box<Object> objectBox = new Box<Object>(5L);
+    Box<? extends Number> unknownNumberBox = numberBox; 
+    Box<? super Number>    unknownBox       = numberBox; 
+
+    unknownBox.takeContentFrom(longBox); // ok
+    unknownBox.takeContentFrom(numberBox); // ok
+    unknownBox.takeContentFrom(objectBox); // error
+    unknownBox.takeContentFrom(unknownNumberBox); // ok
+    unknownBox.takeContentFrom(unknownBox); // error
+
+    Class<Number> type1 = unknownBox.getContentType();       // error
+    Class<? extends Number> type2 = unknownBox.getContentType(); // error
+    Class<? super Number> type3 = unknownBox.getContentType();   // error
+    Class<?> type4 = unknownBox.getContentType();    // ok
+    }
+} 

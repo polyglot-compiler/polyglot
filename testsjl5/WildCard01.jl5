@@ -1,0 +1,6 @@
+class C<T> {
+  void f() {
+    C<String> x = null;
+    C<? extends Object> y = x;
+  }
+}

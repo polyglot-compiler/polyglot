@@ -1,0 +1,12 @@
+import java.io.IOException;
+
+class C {
+  void n() {
+    MyMethodThrowing x = new MyMethodThrowing();
+    try {
+	x.foobar(null, 0, null);
+    }
+    catch (MyExc e) {
+    }
+  }
+}

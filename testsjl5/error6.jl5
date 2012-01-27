@@ -1,0 +1,28 @@
+
+// multi level sub classing with generics.
+// m2 in the mytype interface is of type int but the m2 in parent is of type S
+// should be and error.
+
+interface mytype<T1,T2> {// an inter face with generic
+    public void m1(T1 input) ;
+    public void m2(T2 input) ;
+}
+
+class parent<S> implements mytype<S,Integer> {
+   public void m1(S input){ }
+   public void m2(S input){ }
+}
+
+class child1<S1> extends parent<String>{
+    private void m3(S1 input){
+        System.out.println("testing");
+    }
+}
+class child2<S2> extends child1<Integer>{
+     private void m3(S2 input){
+        System.out.println("testing");
+     }
+}
+class child3<S3> extends child2<S3>{ }
+
+

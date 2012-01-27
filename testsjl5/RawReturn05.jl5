@@ -1,0 +1,20 @@
+interface I<T> {
+    public T run();
+} 
+
+class D {
+    public static <T> T doSomething(I<T> anI) {
+	return anI.run();
+    }
+
+    public static <T> T doSomething(I<T> anI, Object o) {
+	return anI.run();
+    }
+}
+
+class C {
+    public static void main(String[] args) {
+	I instance = new I() { public Object run() { return "hello"; } };
+	String s = (String) D.doSomething(instance);
+    }
+}

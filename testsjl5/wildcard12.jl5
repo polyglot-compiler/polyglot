@@ -1,0 +1,35 @@
+class Box< T > {
+  public T t; 
+  public boolean equalTo( Box< T > other) { return this.t.equals(other.t); }
+  
+      public Box(T t) { this.t = t; }
+      public void put( T t) { this.t = t;}
+      public T take() { return t; }
+
+      public boolean contains( T t) { return this.t == t; }
+      public String toString() { return "Box["+t.toString()+"]"; }
+  public void takeContentFrom( Box<? extends T > box) { t = box.t; }
+  public Class<? extends T > getContentType() { return null;} 
+  public int compareTo( Comparable<? super T > other) { return other.compareTo(t); }
+  public Box<? super T > copy() { return new Box<T>(t); }  
+}
+
+class Test {
+  public static void main(String[] args) {
+    Box<Number> numberBox = new Box<Number>(5L); 
+    Box<?> unknownBox = numberBox; 
+
+    Comparable<?> comparableToUnknown = new Integer(1);
+    Comparable<Object> comparableToObject = null;
+    Comparable<? super Number> comparableToNumber = comparableToObject;
+
+    int compared = 0;
+    compared = unknownBox.compareTo(comparableToUnknown); // error
+    compared = unknownBox.compareTo(comparableToObject); // ok
+    compared = unknownBox.compareTo(comparableToNumber); // error
+
+    Box<?>                box1 = unknownBox.copy(); // ok
+    Box<? extends Number> box2 = unknownBox.copy(); // error
+    Box<? super Number>   box3 = unknownBox.copy();  // error
+    }
+} 

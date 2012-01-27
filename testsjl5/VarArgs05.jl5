@@ -1,0 +1,11 @@
+
+class C {
+    public void foo(String format, Object ... args) {
+    }
+    void m(String s1, String[] a) {
+	foo("abasdf");
+	foo("abasdf", null);
+	foo("abasdf", null, null);
+	foo("abasdf", null, null, null);
+   }
+}

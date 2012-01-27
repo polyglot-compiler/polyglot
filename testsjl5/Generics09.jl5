@@ -1,0 +1,7 @@
+class C<T> {
+    class D { }
+    void foo() {
+	C<String>.D[] foo = new C.D[42];
+    }
+}
+

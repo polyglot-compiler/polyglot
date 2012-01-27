@@ -1,0 +1,7 @@
+enum Color {
+        RED, GREEN, BLUE;
+       static {
+            for (Color c : Color.values())
+	    	;
+        }
+    } 

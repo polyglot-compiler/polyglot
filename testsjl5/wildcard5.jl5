@@ -1,0 +1,24 @@
+    class Box<T> {
+      private T t; 
+
+      public Box(T t) { this.t = t; }
+      public void put( T t) { this.t = t;}
+      public T take() { return t; }
+
+      public boolean contains( T t) { return this.t == t; }
+      public String toString() { return "Box["+t.toString()+"]"; }
+    }
+    class Test {
+      public static void main(String[] args) {
+        Box<? extends Number > box = new Box<Long>(0L);
+
+        box.put(1L);      // error
+        box.put(null);    // ok
+
+        box.contains(0L);     // error
+        box.toString();   // ok
+
+        Long   l = box.take(); // error
+        Number n = box.take(); // ok
+      }
+    } 

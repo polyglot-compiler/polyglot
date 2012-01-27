@@ -1,0 +1,18 @@
+
+class GenCons { 
+  private double val; 
+  <T extends Number> GenCons(T arg) { 
+    val = arg.doubleValue(); 
+  } 
+  void showval() { 
+    System.out.println("val: " + val); 
+  } 
+}
+ class GenericMethod9 {
+  public static void main(String args[]) { 
+    GenCons test = new <Integer>GenCons(100); 
+    GenCons test2 = new <String> GenCons(""); 
+    test.showval(); 
+    test2.showval();
+  } 
+}

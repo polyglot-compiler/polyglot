@@ -1,0 +1,19 @@
+import java.util.*;
+
+// declearing a generic method with more then one parameter.
+//With out involing the method.
+
+class c {
+   public  <T, V> boolean bothContain( T a , V b, Collection<T> l1, Collection<V>l2 ){
+       boolean temp1= false , temp2=true ; 
+       for(T t: l1)  {
+	   temp1 = (temp1 || t.equals(a) ); 
+	}
+       for(V e: l2)  {
+	   temp1 = (temp1 || e.equals(b) ); 
+	}
+       return (temp1 && temp2) ;
+    }
+
+
+   }

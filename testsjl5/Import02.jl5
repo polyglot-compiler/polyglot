@@ -1,0 +1,9 @@
+import static java.util.Collections.EMPTY_SET;
+import java.util.*;
+
+class A {
+    void m() {
+    	Set s = EMPTY_SET;
+    }
+}
+

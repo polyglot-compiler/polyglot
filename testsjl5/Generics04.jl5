@@ -1,0 +1,11 @@
+class Seq<T> { 
+    T head; 
+    Seq<T> tail; 
+    Seq() { this(null, null); } 
+    boolean isEmpty() { return tail == null; }
+    Seq(T head, Seq<T> tail) { this.head = head; this.tail = tail; }
+    class Zipper<S> { 
+	void zip(Seq<S> that) { 
+	}
+   }
+}

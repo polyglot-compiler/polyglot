@@ -1,0 +1,19 @@
+
+
+// invoking a generic constructor without providing an explicit Type
+class GenCons { 
+  private double val; 
+    <T> GenCons(T arg) {  
+} 
+  void showval() { 
+    System.out.println("val: " + val); 
+  } 
+}
+ class GenericMethod9 {
+  public static void main(String args[]) { 
+    GenCons test = new GenCons(100); 
+    GenCons test2 = new GenCons(123.5F); 
+    //    test.showval(); 
+    // test2.showval();
+  } 
+}

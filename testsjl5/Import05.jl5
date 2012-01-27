@@ -1,0 +1,12 @@
+import static java.util.HashMap.entrySet;
+import java.util.*;
+
+class A {
+    void m() {
+    	
+    }
+}
+
+class entrySet {
+}
+

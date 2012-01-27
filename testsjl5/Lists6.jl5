@@ -1,0 +1,10 @@
+import java.util.*;
+
+class MyList extends LinkedList<String> {}
+
+class C {
+    void m() {
+	List<String> l = new MyList();
+	l.add("hello");
+    }
+}

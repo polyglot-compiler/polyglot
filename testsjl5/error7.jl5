@@ -1,0 +1,18 @@
+
+
+/**
+ *
+ * @author Farazz
+ */
+//sub typing in type parameters
+// S has to be String or a sub type of a String
+
+interface mytype<T1 extends String> {// an inter face with generic
+    public void m1(T1 input) ;
+
+}
+
+class parent<S> implements mytype<S> {
+   public void m1(S input){ }
+
+}

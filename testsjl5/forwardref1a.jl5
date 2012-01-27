@@ -1,0 +1,6 @@
+class B<T, S extends T> {} //fine
+
+class C<T extends C<T>> {} //fine
+
+class D<T extends D<S,S>, S extends T> {} //fine
+

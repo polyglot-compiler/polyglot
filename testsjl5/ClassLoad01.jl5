@@ -1,0 +1,3 @@
+class Foo {
+	CCC<String> foo = new DDD<String>();
+}

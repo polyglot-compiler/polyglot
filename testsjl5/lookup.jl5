@@ -1,0 +1,21 @@
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class Main {
+
+       static LinkedBlockingQueue<Object> q = new
+LinkedBlockingQueue<Object>();
+
+       static int x ;
+
+       static {
+               x = 1; // "Could not find field or local variable"
+       }
+
+       public static void foo() {
+       }
+
+       public static void main(String[] args) {
+               foo();
+       }
+
+}

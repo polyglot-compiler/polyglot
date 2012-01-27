@@ -1,0 +1,24 @@
+
+
+
+// making an instance of a class with type parameters
+
+interface mytype<T> {// an inter face with generic
+    public void m(T input) ;
+}
+
+class parent<S> implements mytype<S> {
+   public void m(S input){
+       // system.out.printf("testing");
+    }
+}
+public class test4 {
+    
+    public static void main(String[] args) {
+        
+        mytype<String> myclass1 = new parent<String>();
+       
+    }
+    
+}
+

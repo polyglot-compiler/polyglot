@@ -1,0 +1,5 @@
+import java.util.*;
+
+class C {
+	List t = new LinkedList<String>();
+}

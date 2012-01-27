@@ -1,0 +1,10 @@
+class A<T extends Number> {}
+
+class Test {
+
+   A<? extends Object> a = null; //fine
+   A<? extends Long> b = null; //fine
+   A<? extends String> c = null; //error
+   
+}
+

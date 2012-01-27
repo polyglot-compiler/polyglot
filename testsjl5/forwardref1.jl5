@@ -1,0 +1,9 @@
+class A<T extends S, S> {} //error
+
+class B<T, S extends T> {} //fine
+
+class C<T extends C<T>> {} //fine
+
+class D<T extends D<S,S>, S extends T> {} //fine
+
+class E<T extends T> {} //error

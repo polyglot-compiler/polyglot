@@ -1,0 +1,6 @@
+class C<T> {
+    void foo() {
+	C<String>[] foo = new C[42];
+    }
+}
+

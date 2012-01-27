@@ -1,0 +1,23 @@
+
+
+//making the instance of a class with generic.
+
+class mytype<T> {
+    public void m(T input) {}
+}
+
+class parent2<S,U> extends mytype<U> {
+   public void m(U input){
+       // system.out.printf("testing");
+    }
+}
+class d {}
+
+class error3 {
+    
+    public static void main(String[] args) {
+        
+        mytype<d> myclass = new parent2();
+    }
+    
+}

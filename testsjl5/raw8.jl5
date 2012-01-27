@@ -1,0 +1,19 @@
+
+interface Drawable {}
+
+interface Compare<T> {
+    int comp(T t);
+}
+
+class mytype<T extends Drawable & Compare<T>> {
+    public void m(T input) {
+	int i = input.comp(input);
+    }
+}
+
+class C extends mytype {
+   public void m(Drawable input){
+       super.m(input);
+    }
+}
+

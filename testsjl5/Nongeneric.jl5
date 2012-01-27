@@ -1,0 +1,8 @@
+
+interface I {
+    void m(Object o);
+}
+
+class C implements I {
+    public void m(Object o) {}
+}

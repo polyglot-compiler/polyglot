@@ -1,0 +1,22 @@
+
+import java.util.* ;
+
+// invoking a generic method that uses the parmeter as a return type,
+// with providing an explicit parameter.
+
+class test {
+
+
+    public  <V> V  firstElement ( List<V> a ){
+
+	return a.get(1);
+    }
+
+    public  void main (String [] args){
+    
+        List<Integer> l = new ArrayList<Integer>();
+	l.add(2);
+
+	Integer a = this.<Integer>firstElement(l);
+	}
+}

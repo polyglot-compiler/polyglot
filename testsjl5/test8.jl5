@@ -1,0 +1,23 @@
+
+//checking two level sub classing 
+
+interface mytype<T1,T2> {// an inter face with generic
+    public void m1(T1 input) ;
+    public void m2(T2 input) ;
+}
+
+class parent<S> implements mytype<S,S> { // super class
+   public void m1(S input){ }
+   public void m2(S input){ }
+}
+class child1<K> extends parent<K>{ } //first level child
+
+public class test8{
+
+    public static void main(String[] args) {
+        
+        mytype<String,String> myclass1 = new child1<String>();
+    }
+    
+}
+

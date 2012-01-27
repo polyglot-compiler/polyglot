@@ -1,0 +1,15 @@
+
+
+interface Compare<T> {
+    int comp(T t);
+}
+
+interface mytype<S, T extends Compare<S>> {
+    public void m(T input) ;
+}
+
+class C implements mytype {
+   public void m(Compare input){
+    }
+}
+

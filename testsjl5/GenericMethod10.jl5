@@ -1,0 +1,12 @@
+class foo<S> {
+
+    <T extends S> S m(T t) {
+	return t;
+    }
+
+    public static void main(String[] args) {
+	foo<String> f = new foo<String>();
+	String s = f.<String>m("hello");
+    }
+    
+}

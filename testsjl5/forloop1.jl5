@@ -1,0 +1,37 @@
+import java.util.*;
+
+class B<R> implements Iterable<R> {
+
+	public Iterator<R> iterator() {
+		return null;
+	}
+	
+}
+class A<T,S> extends B<S> {
+}
+
+class Test {
+	public void main(String[] args) {
+		List<String> list = new ArrayList<String>();
+		for (String p : args) {
+			System.out.println(p);
+		}
+		for (Object p : list) {
+			System.out.println(p);
+		}
+		for (Integer p : list) {
+			System.out.println(p);
+		}
+		A<Object,String> a = new A<Object,String>();
+		for (String p : a) {
+			System.out.println(p);
+		}
+		for (Object p : a) {
+			System.out.println(p);
+		}
+		for (Integer p : a) {
+			System.out.println(p);
+		}
+				
+	}
+}

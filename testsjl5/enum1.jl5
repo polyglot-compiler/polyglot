@@ -1,0 +1,16 @@
+
+class nested {
+	
+	public enum SortableProperty {CATALOG_ID, NAME, WIDTH, DEPTH, HEIGHT, MOVABLE}; 
+                              
+	private boolean enumError(SortableProperty p) {
+	    switch (p) {
+	      case NAME : 
+	      case WIDTH : 
+			return true;
+	      default :
+		return false;
+	    }
+	}
+
+}

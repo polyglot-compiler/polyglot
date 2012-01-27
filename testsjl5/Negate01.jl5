@@ -1,0 +1,6 @@
+class C {
+  boolean m() {
+    Boolean b = true;
+    return !b;
+  }
+}

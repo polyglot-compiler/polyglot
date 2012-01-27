@@ -1,0 +1,13 @@
+
+import java.util.* ;
+
+// decleration of a generic method that uses the parmeter as a return type.
+
+class test {
+
+
+    public  <V> V  firstElement ( List<V> a ){
+
+	return a.get(1);
+    }
+}

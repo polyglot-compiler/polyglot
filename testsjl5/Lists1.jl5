@@ -1,0 +1,8 @@
+import java.util.*;
+
+class C {
+    void m() {
+	List<String> l = new LinkedList<String>();
+	l.add("hello");
+    }
+}

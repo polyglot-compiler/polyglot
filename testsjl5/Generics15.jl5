@@ -1,0 +1,7 @@
+interface Comp<T> {
+  int compare(T x);
+}
+class D<E> { }
+class C implements Comp<D<C>> {
+  public int compare(D<C> x) { return 0; }
+}

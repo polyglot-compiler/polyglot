@@ -1,0 +1,7 @@
+class C<T> {
+    static class D<S> { 
+	T foo = null; // illegal use of T.
+	S bar = null; // OK
+    }
+}
+

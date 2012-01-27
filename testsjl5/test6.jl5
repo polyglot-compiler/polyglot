@@ -1,0 +1,14 @@
+
+// checking sub typing where more than one type parameters are involed
+
+
+interface mytype<T1,T2> {// an inter face with generic
+    public void m1(T1 input) ;
+    public void m2(T2 input) ;
+}
+
+class parent<S1,S2> implements mytype<S1,String> {
+   public void m1(S1 input){ }
+   public void m2(String input){ }
+}
+

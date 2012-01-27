@@ -1,0 +1,8 @@
+
+public class clz {
+
+    public void m() {
+	Class<clz> cz = clz.class;
+    }
+    
+}

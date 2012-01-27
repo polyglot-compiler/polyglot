@@ -1,0 +1,24 @@
+
+
+// 1) creating a interface with two type parameters
+// 2) sub typing a interface with two paremeters to a class with one parameter
+
+
+interface mytype<T1,T2> {// an inter face with generic
+    public void m1(T1 input) ;
+    public void m2(T2 input) ;
+}
+
+class parent<S> implements mytype<S,S> {
+   public void m1(S input){ }
+   public void m2(S input){ }
+}
+public class error5{
+    
+    public static void main(String[] args) {
+        
+        mytype<String,Integer> myclass1 = new parent<String>();
+
+    }
+    
+}

@@ -1,0 +1,29 @@
+
+import java.util.* ;
+
+class Wildcard2{
+    
+    public static int  sum (List<? extends Integer> myList){
+	int i = 0;
+	int sum = 0;
+	for(Integer e : myList){
+	    i++;
+	    sum = sum + e ;
+	}
+	return sum;
+    }
+
+    public static void test(){
+	//	List<String> l1  = new Vector<String>() ;
+	// l1.add("hello"); l1.add("world");
+
+	List<Integer> l2  = new Vector<Integer>() ;
+	l2.add(1); l2.add(2);
+
+	sum(l2);
+    }
+    public static void  main(String [] args){
+
+	test();
+    }
+}

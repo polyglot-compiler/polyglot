@@ -1,0 +1,25 @@
+class Box< T > {
+  public T t; 
+  public boolean equalTo( Box< T > other) { return this.t.equals(other.t); }
+  public Box< T > copy() { return new Box<T>(t); }
+      public Box(T t) { this.t = t; }
+      public void put( T t) { this.t = t;}
+      public T take() { return t; }
+
+      public boolean contains( T t) { return this.t == t; }
+      public String toString() { return "Box["+t.toString()+"]"; }
+  public void takeContentFrom( Box<? extends T > box) { t = box.t; }
+  public Class<? extends T > getContentType() { return null;} 
+}
+class Test {
+  public static void main(String[] args) {
+    Box<Number> numberBox = new Box<Number>(5L); 
+    Box<? extends Number> unknownBox = numberBox; 
+
+    unknownBox.takeContentFrom(numberBox); // error
+    unknownBox.takeContentFrom(unknownBox); // error
+
+    Class<Number> type0 = unknownBox.getContentType();       // error
+    Class<? extends Number> type1 = unknownBox.getContentType(); // ok
+    }
+} 

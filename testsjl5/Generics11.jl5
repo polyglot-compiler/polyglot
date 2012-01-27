@@ -1,0 +1,19 @@
+// Wildcards
+class C<T> {
+    void foo1(C<?> x) {
+	x.foo1(null);
+    }
+    void foo2(C<? extends D> x) {
+	x.foo2(null);
+    }
+    void foo3(C<? super E> x) {
+	x.foo2(null);
+    }
+    void foo5(C<?>[] a) {
+	a[0].foo5(null);
+    }
+
+}
+
+class D { }
+class E extends D { }

@@ -1,0 +1,6 @@
+import java.util.List;
+
+class wildcard22 {
+    public void m(List<?> lst) {}
+    public void m2(List<String> lst) { m(lst); }
+}

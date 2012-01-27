@@ -1,0 +1,17 @@
+import java.util.*;
+
+interface Test<P>  {
+    Collection<P> testMethod(P[] t);
+}
+
+public class Simple<K, V>  implements Test<K> {
+//    Map<K, V> p = new HashMap<K, V>();
+    
+//    Map<V, K> t = new HashMap<V, K>();
+    
+//    Map<K, V> r = new HashMap<V, K>();
+    
+    public Collection<K> testMethod(K[] t) { return new ArrayList<K>(); }
+    
+//    public Simple() { super(); }
+}

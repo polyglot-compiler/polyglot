@@ -1,0 +1,5 @@
+import java.util.HashMap;
+public class InfiniteLoop extends HashMap {
+       public InfiniteLoop(Object m){
+       }
+}

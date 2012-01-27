@@ -1,0 +1,10 @@
+
+//E extending the parameter of a parameterized type form a paramiterixed type .
+interface I<U> {
+}
+
+class C1<X,T extends I<X>> {
+}
+
+class C2<U,S extends I<U>> extends C1<U,S> {
+}

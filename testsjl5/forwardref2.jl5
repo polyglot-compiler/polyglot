@@ -1,0 +1,17 @@
+class A<X> {
+
+<T extends S, S> void m1() {} //error
+
+<T, S extends T> void m2() {} //fine
+
+<T extends A<T>> void m3() {} //fine
+
+<T extends A<S>, S> void m4() {} //fine
+
+<T extends T> void m5() {} //error
+
+<T extends X> void m6() {} //fine
+
+<T extends X, X> void m7() {} //error
+
+}

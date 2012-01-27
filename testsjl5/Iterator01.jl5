@@ -1,0 +1,11 @@
+import java.util.Map;
+
+class C {
+  public static void main(String[] args) {
+    Map<String, String> env = System.getenv();
+    int i = 0;
+    for (String envName : env.keySet()) {
+      i++;
+    }
+  }
+}

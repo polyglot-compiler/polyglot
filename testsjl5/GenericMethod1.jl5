@@ -1,0 +1,19 @@
+import java.util.*;
+
+// simple generic method using arrays as parameters
+// and invoking it without explicit type parameter
+class test {
+   public static <T> void fromArrayToList( T[] input, List<T> c){
+       int i = 0;
+       for( i=0; i < input.length;i++){
+	    c.add(input[i]);
+	}
+    }
+
+    public static void main( String [] args){
+
+	String a[] = {"hello", "World"};
+
+	test.<String>fromArrayToList(a ,new ArrayList<String>());
+    }
+}

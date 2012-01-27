@@ -1,0 +1,17 @@
+import java.util.Arrays;
+
+
+ 
+public class Counter {
+    public static void main(String[] args) {
+        test();
+        test(new int[]{2,3});
+        test(2,3,4);
+        test(new int[]{1},2);
+        test(1);
+    }
+    
+    static void test(int... a) {
+        System.out.println(Arrays.toString(a));
+    }
+}

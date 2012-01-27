@@ -1,0 +1,11 @@
+class C {
+	public C(int i) {
+		if (i > 0) {
+			throw new NullPointerException();
+		}
+	}
+
+	public static void main(String[] args) {
+		new C(1);
+	}
+}

@@ -1,0 +1,7 @@
+import testpackage.TestEnum;
+
+class C {
+  void m() {
+    Object o = TestEnum.GUI;
+  }
+}

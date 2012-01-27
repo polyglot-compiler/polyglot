@@ -1,0 +1,12 @@
+import java.lang.reflect.*;
+
+class C {
+    public static void main(String[] args) {
+	System.out.format("%s\n", (Object[])null);
+	try {
+	    Class.forName("C").getClass().getDeclaredMethod("something", (Class[])null);
+	} catch (Exception e) {
+
+	}
+    }
+}

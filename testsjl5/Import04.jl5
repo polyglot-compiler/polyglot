@@ -1,0 +1,9 @@
+import static java.util.HashMap.Entry;
+import java.util.*;
+
+class A {
+    void m() {
+    	
+    }
+}
+

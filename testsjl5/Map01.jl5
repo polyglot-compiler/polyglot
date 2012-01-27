@@ -1,0 +1,7 @@
+import java.util.*;
+class C {
+  void m() {
+    HashMap m = new HashMap();
+    Integer i = (Integer)m.get("hi");
+  }
+}

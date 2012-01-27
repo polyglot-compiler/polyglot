@@ -1,0 +1,13 @@
+public class enum2 {
+
+    // error 1
+    void foo(int j) {
+	switch (j) {
+	case 2:
+	    break;
+	}
+    }
+
+
+}
+

@@ -1,0 +1,12 @@
+
+interface Drawable {
+    void draw();
+}
+
+interface mytype<T extends Drawable> {
+    void m(T t);
+}
+
+class parent2 implements mytype {
+    public void m(Drawable t) {}
+}

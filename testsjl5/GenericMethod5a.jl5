@@ -1,0 +1,26 @@
+
+import java.util.* ;
+
+// invoking a generic method with parameter that have a upper bound.
+
+
+class test {
+
+
+    public static <V extends Comparable<V>> V  max ( V a , V b ) {
+		if( a.compareTo(b) > 0 ) return a;
+		return b ;
+    }
+    
+    public void main( String [] args){
+        double a = 2.3 , b = 3.0 ;
+		int    c = 3   , d = 5   ;
+		float  e = 5   , f = 6   ;
+
+       	double r1 = max(a,b);
+		int    r2 = max(c,d);
+       	float  r3 = max(e,f);
+       	max(a,c);
+       	
+    }
+}

@@ -1,0 +1,9 @@
+class C {
+  void f(int c) { }
+  void f(char c) { }
+}
+class D {
+  void m() { char c = 'A';
+  C o = new C();
+  o.f(c); }
+}

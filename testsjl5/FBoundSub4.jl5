@@ -1,0 +1,19 @@
+
+
+//E extending the parameter of a parameterized type class form a Parameterized type.
+interface I<U> {
+    void foo(U u);
+}
+
+class C1<T extends I<T>> {
+    void m(T t) {
+	t.foo(t);
+    }
+}
+
+class C2<S extends I<S>> extends C1<S> {
+    void m(S s) {
+	super.m(new Object());
+    }
+}
+

@@ -1,0 +1,6 @@
+import java.util.List;
+
+class wildcard21<T extends String[]> {
+    public void m(List<T> lst) {}
+    public void m2(List<T> lst) { m(lst); }
+}

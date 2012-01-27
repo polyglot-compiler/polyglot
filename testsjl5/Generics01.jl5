@@ -1,0 +1,3 @@
+class C<T> {
+  T f(T o) { return o; }
+}

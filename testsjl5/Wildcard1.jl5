@@ -1,0 +1,28 @@
+
+import java.util.* ;
+
+class MyClass {
+    
+    public static void printlist(List<?> myList){
+	int i = 0;
+	for(Object e : myList){
+	    i++;
+	    System.out.println( i + " : " + e );
+	}
+    }
+
+    public static void test(){
+	List<String> l1  = new Vector<String>() ;
+        l1.add("hello"); l1.add("world");
+
+	List<Integer> l2  = new Vector<Integer>() ;
+	l2.add(1); l2.add(2);
+
+		printlist(l1) ;
+		printlist(l2);
+    }
+    public static void  main(String [] args){
+
+	test();
+    }
+}

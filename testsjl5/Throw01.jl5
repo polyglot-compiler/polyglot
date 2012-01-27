@@ -1,0 +1,11 @@
+class C {
+	public C(int i) {
+		if (i > 0) {
+			throw new IllegalArgumentException("i must be <= 0");
+		}
+	}
+
+	public static void main(String[] args) {
+		new C(1);
+	}
+}

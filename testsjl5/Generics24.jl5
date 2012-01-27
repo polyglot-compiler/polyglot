@@ -1,0 +1,8 @@
+class C<T, U> {
+    C<String> x; // error
+    C<String,String,String> y;  //error
+    D<String> z; //error
+}
+
+class D {
+}

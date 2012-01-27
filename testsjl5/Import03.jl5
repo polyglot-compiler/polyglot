@@ -1,0 +1,9 @@
+import static java.util.Collections.BINARYSEARCH_THRESHOLD;
+import java.util.*;
+
+class A {
+    void m() {
+	//    	int i = BINARYSEARCH_THRESHOLD;
+    }
+}
+

@@ -1,0 +1,10 @@
+class C<T> {
+    T bar() { return null; }
+}
+
+class D {
+    void foo() {
+	C<String> x = new C<String>();
+	int l = x.bar().length();
+    }
+}

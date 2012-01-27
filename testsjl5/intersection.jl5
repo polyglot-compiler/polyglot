@@ -1,0 +1,37 @@
+
+class C {
+    void mCDefault() {
+    }
+
+    public void mCPublic() {
+    }
+
+    private void mCPrivate() {
+    }
+    
+    protected void mCProtected() {
+    }
+
+}
+
+abstract class CT extends C implements I {
+}
+
+interface I {
+    void mI();
+}
+
+class Test {
+    <T extends C & I> void test(T t, CT ct) {
+        t.mI(); // OK
+        ct.mI();
+        t.mCDefault(); // OK
+        ct.mCDefault();
+        t.mCPublic(); // OK
+        ct.mCPublic();
+        t.mCPrivate(); // compile-time error
+        ct.mCPrivate();
+        t.mCProtected();
+        ct.mCProtected();
+    }
+}

@@ -1,0 +1,9 @@
+class C<T> {
+  void f() {
+   C<? extends D> x = null;
+   C<D> y = x;
+  }
+}
+
+class D { }
+class E extends D { }

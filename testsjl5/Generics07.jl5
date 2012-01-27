@@ -1,0 +1,8 @@
+class C<T> {
+    C foo(T x) { return new C(); }
+}
+
+// D.foo overrides C.foo
+class D extends C<String> {
+    D foo(String y) { return new D(); }
+}

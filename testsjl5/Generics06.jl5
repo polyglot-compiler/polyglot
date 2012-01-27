@@ -1,0 +1,11 @@
+class C<T> {
+  int foo(T x) { return 0; }
+  public static void main(String[] args) {
+      System.out.println(new D().foo(null) == 1 ? "Passed" : "Failed");
+  }
+}
+
+// D.foo overrides C.foo
+class D extends C<String> {
+  int foo(String y) { return 1; }
+}

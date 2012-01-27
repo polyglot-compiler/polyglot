@@ -1,0 +1,9 @@
+import java.util.Map;
+
+class Main {
+    public static void main(String[] args) {
+	String[] array = new String[3]; 
+    	Map<String, String> env = System.getenv();
+        array[0] = env.get(args[0]);
+    }
+}

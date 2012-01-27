@@ -1,0 +1,15 @@
+import java.util.*;
+
+class A {
+    void m() {
+   }
+}
+
+class C {
+    void m(String t) {}
+    class B extends A {
+        void test () {
+            m("t");
+        }
+    }
+}  

@@ -1,0 +1,3 @@
+class C<T> {
+    static  T x = null; // error
+}

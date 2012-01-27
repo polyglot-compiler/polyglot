@@ -1,0 +1,8 @@
+class C<T> {
+    class D { 
+      T foo;
+    }
+      void m() {
+       C<String>.D x = new C.D();
+     }
+}

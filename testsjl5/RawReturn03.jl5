@@ -1,0 +1,9 @@
+interface I {
+    public int run();
+} 
+
+class C implements I {
+    public Integer run() {
+	return 5;
+    }
+}

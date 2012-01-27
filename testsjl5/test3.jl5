@@ -1,0 +1,38 @@
+/*
+ * test3.java
+ *
+ * Created on June 20, 2006, 1:31 PM
+ */
+
+/**
+ *
+ * @author Farazz
+ */
+
+//making the instance of a class with generic.
+
+interface mytype<T> {// an inter face with generic
+    public void m(T input) ;
+}
+
+class parent2<S> implements mytype<S> {
+   public void m(S input){
+       // system.out.printf("testing");
+    }
+}
+class d {}
+
+public class test3 {
+    
+    /** Creates a new instance of test3 */
+    public test3() {}
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        
+        mytype<d> myclass = new parent2<d>();
+    }
+    
+}

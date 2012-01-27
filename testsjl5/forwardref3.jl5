@@ -1,0 +1,17 @@
+class A<X> {
+
+<T extends S, S> A(int i) {} //error
+
+<T, S extends T> A(byte b) {} //fine
+
+<T extends A<T>> A(char c) {} //fine
+
+<T extends A<S>, S> A(String s) {} //fine
+
+<T extends T> A(Object o) {} //error
+
+<T extends X> A(Integer a) {} //fine
+
+<T extends X, X> A() {} //error
+
+}

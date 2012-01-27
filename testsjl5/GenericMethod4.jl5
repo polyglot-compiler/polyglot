@@ -1,0 +1,31 @@
+
+import java.util.* ;
+
+// Basice generic method with one parameter and void return type.
+
+class MyClass {
+    
+    public static <T> void printlist(List<T> myList){
+		int i = 0;
+		for(T e : myList){
+	    	i++;
+	    	System.out.println( i + " : " + e );
+		}
+    }
+
+    public static void test(){
+		Vector<String> l1  = new Vector<String>() ;
+        l1.add("hello"); l1.add("world");
+
+		List<Integer> l2  = new Vector<Integer>() ;
+		l2.add(1); l2.add(2);
+
+		printlist(l1) ;
+		printlist(l2);
+    }
+    
+    public static void  main(String [] args){
+
+		test();
+    }
+}

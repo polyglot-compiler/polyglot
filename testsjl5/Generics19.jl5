@@ -1,0 +1,6 @@
+class C {
+  <T> T foo(T x) { return x; }
+  void m() {
+    String s = foo("Hello");
+  }
+}

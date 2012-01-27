@@ -1,0 +1,14 @@
+import java.util.*;
+
+class C {
+
+public static void main(String[] args) {
+//    ArrayList<String> swapA = new ArrayList<String>();
+    ArrayList<String> swapM = new ArrayList<String>();
+    ArrayList<String> swapB = new ArrayList<String>();
+		
+    swapB.addAll(swapM);
+//    swapB.addAll(swapA);
+}
+
+}

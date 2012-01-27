@@ -1,0 +1,12 @@
+class A<T extends Number, S extends T> {
+
+	T t;
+	S s;
+	A<? extends Long, ? extends S> f = null; //fine
+	A<? extends Long, ? extends String> e = null; //error
+	void test(A<? extends Long, ? extends S> a) {
+		this.t = this.s; //fine
+		a.t = a.s; //error;
+	}
+	
+}

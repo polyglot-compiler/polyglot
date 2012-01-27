@@ -1,0 +1,19 @@
+
+
+//checking generic in one level inharitance.
+
+interface test1< T > {// an inter face with generic
+    public void m(T input) ;
+}
+
+class c {} // just a test type
+
+class parent<S> implements test1<S> {
+   public void m(S input){
+       // system.out.printf("testing");
+    }
+}
+
+class sub extends parent<c> {
+    // inharit form the parentx
+}

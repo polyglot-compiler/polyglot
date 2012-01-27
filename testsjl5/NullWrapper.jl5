@@ -1,0 +1,6 @@
+public class NullWrapper {
+  public static void main(String[] args) {
+    Integer i = 5;
+    if (i != null) System.out.println("not null");
+  }
+}

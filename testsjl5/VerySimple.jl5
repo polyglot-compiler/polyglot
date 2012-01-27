@@ -1,0 +1,4 @@
+
+class VerySimple<T> {
+    void m(T t) {}
+}

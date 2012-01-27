@@ -1,0 +1,17 @@
+// Wildcards
+class Listie<T> { 
+    T o;
+    int size() { return 1; }
+    T get(int i) { return o; }
+    void set(T x) { o = x; }
+}
+class C {
+    public static void reverse(Listie<?> list) { rev(list); }
+    private static <T> void rev(Listie<T> list) {
+        Listie<T> tmp = new Listie<T>();
+        for (int i = 0; i < list.size(); i++) {
+	    list.set(tmp.get(list.size() - i - 1));
+        }
+    }
+}
+

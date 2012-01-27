@@ -1,0 +1,9 @@
+class C {
+  <T> T m(T o) { return o; }
+
+  <U> C(U o) { }
+  void foo() {
+      String s = this.<String>m("Hello");
+      C x = new <String>C("Hello");
+  }
+}

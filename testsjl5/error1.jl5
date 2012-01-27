@@ -1,0 +1,13 @@
+
+
+
+//most simple test case for generics.
+interface test1< T > {
+    public void m(T input) ;
+}
+
+class test_c<S> implements test1<S> {
+   public void m(String input){
+       // system.out.printf("testing");
+    }
+}

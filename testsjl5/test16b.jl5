@@ -1,0 +1,21 @@
+class c extends Object{}
+class d extends c {}
+
+interface mytype<T1 extends c > {// an inter face with generic
+    public void m1(T1 input) ;
+
+}
+
+class parent<T2 extends c> implements mytype<T2> {
+   public void m1(T2 input){ }
+}
+class child1<S extends d> extends parent<S>{
+    
+}
+
+public class test16 {
+  public int main (){
+    mytype<d> myClass = new child1<d>();
+    return 0;
+  }
+}

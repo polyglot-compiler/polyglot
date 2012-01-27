@@ -1,0 +1,9 @@
+import java.util.*;
+
+interface Test<P>  {
+    void testMethod(P[] t);
+}
+
+class TestA<S,T> implements Test<S> {
+    public void testMethod(T[] s) {}
+}

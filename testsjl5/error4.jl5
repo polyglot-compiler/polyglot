@@ -1,0 +1,24 @@
+
+
+
+// even Sting is an sub type of Object still cannot use them the following code
+
+interface mytype<T> {// an inter face with generic
+    public void m(T input) ;
+}
+
+class parent<S> implements mytype<S> {
+   public void m(S input){
+       // system.out.printf("testing");
+    }
+}
+public class error4 {
+    
+    public static void main(String[] args) {
+        
+        mytype<Object> myclass1 =  new parent<String>();
+       
+    }
+    
+}
+

@@ -1,0 +1,15 @@
+
+
+//sub typing an interface with more than one parameters.
+
+interface mytype<T1,T2> {// an interface with generic
+    public void m1(T1 input) ;
+    public void m2(T2 input) ;
+}
+
+class parent<S> implements mytype<Integer,String> {
+   public void m1(Integer input){ }
+   public void m2(String input){ }
+   public void m3(S input){ }
+}
+

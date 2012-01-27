@@ -1,0 +1,14 @@
+interface I<T> {
+    public T run();
+} 
+
+class C implements I {
+    public Object run() {
+	return "hello";
+    }
+
+    public static void main(String[] args) {
+	I instance = new C();
+	String s = (String) instance.run();
+    }
+}

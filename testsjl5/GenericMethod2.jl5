@@ -1,0 +1,32 @@
+import java.util.*;
+
+// simple generic method using arrays as an arrgument.
+
+class  MyClass{}
+
+class test {
+   public static <T> List<T> fromArrayToList( T[] input ){
+       int i = 0;
+       List<T> l = new ArrayList<T>();
+       for( i=0; i < input.length; i++){
+	    l.add(input[i]);
+	}
+       return l ;
+    }
+
+    public static void main( String [] args){
+
+	String a[] = {"hello", "World"};
+	Integer    b[] = {1,2,3,4};
+	Double    c[] = {1.0,2.0,3.0,4.0};
+
+	//	MyClass    d[] ;
+	//	for(int i=0;i<3;i++)
+	//	    d[i]= new MyClass();
+
+	List<String> l1 = fromArrayToList(a);
+	List<Integer> l2 = fromArrayToList(b);
+	List<Double> l3 = fromArrayToList(c);
+	List<String> l4 = fromArrayToList(c);
+    }
+}

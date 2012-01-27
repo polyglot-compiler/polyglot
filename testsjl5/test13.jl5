@@ -1,0 +1,28 @@
+
+/**
+ *
+ * @author Farazz
+ */
+//sub typing the type parameters and making a instace of a class with generics
+
+class c {  }
+
+class d extends c {}
+
+interface mytype<T1 extends c > {// an inter face with generic
+    public void m1(T1 input) ;
+
+}
+
+
+class parent<S extends d> implements mytype<S> {
+   public void m1(S input){ }
+}
+
+
+public class test13 {
+  public int main (){
+    mytype<d> myClass = new parent<d>();
+    return 0;
+  }
+}

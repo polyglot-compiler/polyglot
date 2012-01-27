@@ -1,0 +1,27 @@
+/**
+ *
+ * @author Farazz
+ */
+
+//making type parameter a sub type of the owner class.
+class c {  }
+
+class d extends c {}
+
+interface mytype<T1 extends mytype> {// an inter face with generic
+    public void m1(T1 input) ;
+
+}
+
+
+class parent implements mytype<mytype> {
+   public void m1(mytype input){ }
+}
+
+
+class test14 {
+  public int main (){
+    mytype<mytype> myClass = new parent();
+    return 0;
+  }
+}

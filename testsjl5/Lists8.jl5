@@ -1,0 +1,10 @@
+import java.util.*;
+
+class MyList extends LinkedList {}
+
+class C {
+    void m() {
+	List<String> l = new MyList();
+	l.add(new Integer(3));
+    }
+}
