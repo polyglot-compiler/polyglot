@@ -213,12 +213,12 @@ public class TypeBuilder extends NodeVisitor
         ct.position(pos);
         ct.flags(flags);
         ct.name(name);
+	    ct.setJob(job());
 //        ct.superType(ts.unknownType(pos));
 
 	if (inCode) {
             ct.kind(ClassType.LOCAL);
 	    ct.outer(currentClass());
-	    ct.setJob(job());
 
 	    if (currentPackage() != null) {
 	      	ct.package_(currentPackage());
@@ -229,7 +229,6 @@ public class TypeBuilder extends NodeVisitor
 	else if (currentClass() != null) {
             ct.kind(ClassType.MEMBER);
 	    ct.outer(currentClass());
-	    ct.setJob(job());
 
 	    currentClass().addMemberClass(ct);
 
@@ -260,7 +259,6 @@ public class TypeBuilder extends NodeVisitor
 	}
 	else {
             ct.kind(ClassType.TOP_LEVEL);
-            ct.setJob(job());
 
 	    if (currentPackage() != null) {
 	      	ct.package_(currentPackage());
