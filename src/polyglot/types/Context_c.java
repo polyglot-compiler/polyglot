@@ -204,13 +204,13 @@ public class Context_c implements Context
      * Gets a local of a particular name.
      */
     public LocalInstance findLocal(String name) throws SemanticException {
-	VarInstance vi = findVariableSilent(name);
+    	VarInstance vi = findVariableSilent(name);
 
-	if (vi instanceof LocalInstance) {
-	    return (LocalInstance) vi;
-	}
+    	if (vi instanceof LocalInstance) {
+    		return (LocalInstance) vi;
+    	}
 
-        throw new SemanticException("Local " + name + " not found.");
+    	throw new SemanticException("Local " + name + " not found.");
     }
 
     /**
