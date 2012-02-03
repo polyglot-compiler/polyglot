@@ -94,6 +94,10 @@ public class ExtensionRewriter extends ContextVisitor
             to_ext.scheduler().addJob(job.source(), ast);
         }
     }
+    
+    public ExtensionInfo from_ext() {
+        return from_ext;
+    }
 
     public TypeSystem from_ts() {
         return from_ext.typeSystem();
@@ -101,6 +105,10 @@ public class ExtensionRewriter extends ContextVisitor
 
     public NodeFactory from_nf() {
         return from_ext.nodeFactory();
+    }
+    
+    public ExtensionInfo to_ext() {
+        return to_ext;
     }
 
     public TypeSystem to_ts() {
