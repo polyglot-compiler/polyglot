@@ -112,11 +112,9 @@ public abstract class VarInstance_c extends TypeObject_c implements VarInstance
         return name;
     }
 
-//XXX: What benefit does this hashCode implementation give?
-//    This causes collisions with varinstances from different scopes
-//    public int hashCode() {
-//        return flags.hashCode() + name.hashCode();
-//    }
+    public int hashCode() {
+        return flags.hashCode() + name.hashCode();
+    }
 
     public boolean equalsImpl(TypeObject o) {
         if (o instanceof VarInstance) {
