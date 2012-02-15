@@ -7,11 +7,10 @@ import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.frontend.Job;
 import polyglot.frontend.TargetFactory;
-import polyglot.types.SemanticException;
+import polyglot.types.ArrayType;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
-import polyglot.util.InternalCompilerError;
 import polyglot.visit.Translator;
 
 public class JL5Translator extends Translator {
@@ -33,7 +32,7 @@ public class JL5Translator extends Translator {
     
     public void translateNode(Node n, CodeWriter w) {
         if (n instanceof ClassDecl) {
-            if (removeJava5isms && !translateEnums) {
+            if (removeJava5isms && translateEnums) {
                 ClassDecl cd = (ClassDecl) n;
                 if (cd.superClass() != null && cd.superClass().type().isClass() && cd.superClass().type().toClass().fullName().equals("java.lang.Enum")) {
                     // The super class is Enum, so this is really an enum declaration.
@@ -47,15 +46,8 @@ public class JL5Translator extends Translator {
             if (removeJava5isms) {
                 // Print out the erasure type
                 Type t = tn.type();
-                if (t instanceof JL5SubstClassType) {
-                    // For C<T1,...,Tn>, just print C.
-                    JL5SubstClassType jct = (JL5SubstClassType)t;
-                    w.write(jct.base().translate(this.context));
-                }
-                else {
-                    Type erastype = ((JL5TypeSystem)ts).erasureType(t); 
-                    w.write(erastype.translate(this.context()));
-                }
+                Type erastype = ((JL5TypeSystem)ts).erasureType(t); 
+                w.write(translateType(erastype));
                 return;
             }
             else {
@@ -72,6 +64,21 @@ public class JL5Translator extends Translator {
 //        }
         
         n.del().prettyPrint(w, this);
+    }
+    
+    private String translateType(Type t) {
+        if (t instanceof JL5SubstClassType) {
+            // For C<T1,...,Tn>, just print C.
+            JL5SubstClassType jct = (JL5SubstClassType)t;
+            return jct.base().translate(this.context);
+        }
+        else if (t instanceof ArrayType) {
+            ArrayType at = (ArrayType)t;
+            return translateType(at.base()) + "[]";
+        }
+        else {
+            return t.translate(this.context());
+        }        
     }
 
     public void printReceiver(Receiver target, CodeWriter w) {

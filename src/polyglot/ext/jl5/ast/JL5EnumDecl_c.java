@@ -64,7 +64,15 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
         	n = this.flags(this.flags().Static());
         	n.type().flags(n.type().flags().Static());
         }
-
+        
+        for (ClassMember m : (List<ClassMember>)this.body().members()) {
+            if (m.memberInstance().flags().isAbstract()) {
+                n = this.flags(this.flags().Abstract());
+                n.type().flags(n.type().flags().Abstract());                
+                break;
+            }
+        }
+        
         return n;
 	}
 	
@@ -149,7 +157,7 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
     
     @Override
 	public void prettyPrintModifiers(CodeWriter w, PrettyPrinter tr) {
-    	w.write(flags.translate());
+    	w.write(flags.clearAbstract().translate());
 		// do not write out class
 	}        
 }
