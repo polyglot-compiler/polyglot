@@ -87,7 +87,7 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
 		args.add(nf.NullLit(Position.COMPILER_GENERATED));// XXX the right thing to do is change the type of java.lang.Enum instead of adding these dummy params
 		args.add(nf.IntLit(Position.COMPILER_GENERATED, IntLit.INT, 0));
         Block block = nf.Block(position().startOf(),
-        		nf.ConstructorCall(position.startOf(), ConstructorCall.SUPER, args));
+        		((JL5NodeFactory)nf).ConstructorCall(position.startOf(), ConstructorCall.SUPER, null, args, true));
         
 
         //Default constructor of an enum is private 

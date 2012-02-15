@@ -6,6 +6,7 @@ import java.util.List;
 
 import polyglot.ast.*;
 import polyglot.ext.jl5.types.*;
+import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.ext.param.types.MuPClass;
 import polyglot.types.Context;
 import polyglot.types.Flags;
@@ -184,8 +185,11 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
 			w.write(flags.translate());
 		}
 
-		if (flags.isInterface()) {
-			w.write("interface ");
+        if (flags.isInterface()) {
+            w.write("interface ");
+        }
+        else if (JL5Flags.isEnum(flags)) {
+            w.write("enum ");
 		} else {
 			w.write("class ");
 		}
@@ -225,7 +229,23 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
 	public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
 		prettyPrintModifiers(w, tr);
 		prettyPrintName(w, tr);
-		//NB: Dropping the type parameters
+		// print type variables
+		boolean printTypeVars = true;
+		if (tr instanceof JL5Translator) {
+		    JL5Translator jl5tr = (JL5Translator)tr;
+		    printTypeVars = !jl5tr.removeJava5isms();
+		}
+		if (printTypeVars && !this.paramTypes().isEmpty()) {
+            w.write("<");
+            for (Iterator<ParamTypeNode> iter = this.paramTypes.iterator(); iter.hasNext(); ) {
+                ParamTypeNode ptn = iter.next();
+                ptn.prettyPrint(w, tr);
+                if (iter.hasNext()) {
+                    w.write(", ");                    
+                }
+            }
+            w.write(">");
+		}
 		prettyPrintHeaderRest(w, tr);
 
 	}	

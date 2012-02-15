@@ -1,31 +1,39 @@
 package polyglot.ext.jl5.visit;
 
-import polyglot.ast.ClassDecl;
-import polyglot.ast.Node;
-import polyglot.ast.NodeFactory;
-import polyglot.ast.TypeNode;
+import polyglot.ast.*;
 import polyglot.ext.jl5.JL5Options;
+import polyglot.ext.jl5.types.JL5ClassType;
+import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.frontend.Job;
 import polyglot.frontend.TargetFactory;
+import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.types.TypeSystem;
 import polyglot.util.CodeWriter;
+import polyglot.util.InternalCompilerError;
 import polyglot.visit.Translator;
 
 public class JL5Translator extends Translator {
 
     private final boolean translateEnums;
 
+    private final boolean removeJava5isms;
+    
     public JL5Translator(Job job, TypeSystem ts, NodeFactory nf,
             TargetFactory tf) {
         super(job, ts, nf, tf);
         translateEnums = ((JL5Options)job.extensionInfo().getOptions()).enumImplClass == null;
+        removeJava5isms = ((JL5Options)job.extensionInfo().getOptions()).removeJava5isms;
     }
 
+    public boolean removeJava5isms() {
+        return this.removeJava5isms;
+    }
+    
     public void translateNode(Node n, CodeWriter w) {
         if (n instanceof ClassDecl) {
-            if (translateEnums) {
+            if (removeJava5isms && !translateEnums) {
                 ClassDecl cd = (ClassDecl) n;
                 if (cd.superClass() != null && cd.superClass().type().isClass() && cd.superClass().type().toClass().fullName().equals("java.lang.Enum")) {
                     // The super class is Enum, so this is really an enum declaration.
@@ -35,11 +43,25 @@ public class JL5Translator extends Translator {
             }
         }
         if (n instanceof TypeNode) {
-            // Don't print out the type variable, print out its superclass.
             TypeNode tn = (TypeNode) n;
-            Type type = ((JL5TypeSystem)ts).erasureType(tn.type()); 
-            w.write(type.translate(this.context()));
-            return;
+            if (removeJava5isms) {
+                // Print out the erasure type
+                Type t = tn.type();
+                if (t instanceof JL5SubstClassType) {
+                    // For C<T1,...,Tn>, just print C.
+                    JL5SubstClassType jct = (JL5SubstClassType)t;
+                    w.write(jct.base().translate(this.context));
+                }
+                else {
+                    Type erastype = ((JL5TypeSystem)ts).erasureType(t); 
+                    w.write(erastype.translate(this.context()));
+                }
+                return;
+            }
+            else {
+                w.write(tn.type().translate(this.context()));
+                return;                
+            }
         }
 //        if (n instanceof TypeNode && ((TypeNode)n).type() instanceof TypeVariable) {
 //            // Don't print out the type variable, print out its superclass.
@@ -50,5 +72,19 @@ public class JL5Translator extends Translator {
 //        }
         
         n.del().prettyPrint(w, this);
+    }
+
+    public void printReceiver(Receiver target, CodeWriter w) {
+        if (target == null) {
+            return;
+        }
+        if (target instanceof TypeNode) {
+            Type t = ((TypeNode)target).type();
+            if (t instanceof JL5ClassType) {
+                JL5ClassType ct = (JL5ClassType)t;
+                ct.translateAsReceiver(this.context());
+            }
+        }
+        this.translateNode(target, w);                
     }
 }

@@ -4,8 +4,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import polyglot.ast.*;
+import polyglot.ext.jl5.types.JL5ParsedClassType;
+import polyglot.ext.jl5.types.JL5SubstClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.Context;
+import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
 import polyglot.util.CodeWriter;
@@ -109,6 +112,20 @@ public class ExtendedFor_c extends Loop_c implements ExtendedFor {
 		}
 		
 		// Check that type is the same as elements in expr
+		Type declType = decl().localInstance().type();
+		Type elementType;
+		if (expr.type().isArray()) {
+		    elementType = expr.type().toArray().base();
+		}
+		else {
+    		JL5SubstClassType iterableType = ts.findGenericSupertype((JL5ParsedClassType)ts.Iterable(), t.toReference());
+            elementType = (Type)iterableType.actuals().get(0);
+		}
+        if (!elementType.isImplicitCastValid(declType)) {
+            throw new SemanticException("Incompatible types: required " + declType + " but found " + elementType, this.position());
+        }
+		
+		
 		if (expr instanceof Local
 				&& decl.localInstance().equals(((Local) expr).localInstance())) {
 			throw new SemanticException("Variable: " + expr

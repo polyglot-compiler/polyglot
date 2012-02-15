@@ -1,20 +1,16 @@
 package polyglot.ext.jl5.ast;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import polyglot.ast.*;
 import polyglot.ext.jl5.types.*;
+import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.*;
-import polyglot.util.CollectionUtil;
-import polyglot.util.InternalCompilerError;
-import polyglot.util.Position;
-import polyglot.util.TypedList;
-import polyglot.visit.AmbiguityRemover;
-import polyglot.visit.NodeVisitor;
-import polyglot.visit.TypeBuilder;
-import polyglot.visit.TypeChecker;
+import polyglot.util.*;
+import polyglot.visit.*;
 
 public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5ConstructorDecl {
 
@@ -125,6 +121,65 @@ public class JL5ConstructorDecl_c extends ConstructorDecl_c implements JL5Constr
             c = ((JL5Context)c).addTypeVariable((TypeVariable)pn.type());
         }
         return c;
+    }
+    
+    @Override
+    public void prettyPrintHeader(CodeWriter w, PrettyPrinter tr) {
+        w.begin(0);
+        w.write(JL5Flags.clearVarArgs(flags).translate());
+
+        // type params
+        boolean printTypeVars = true;
+        if (tr instanceof JL5Translator) {
+            JL5Translator jl5tr = (JL5Translator)tr;
+            printTypeVars = !jl5tr.removeJava5isms();
+        }
+        if (printTypeVars && !this.typeParams().isEmpty()) {
+            w.write("<");
+            for (Iterator<ParamTypeNode> iter = this.typeParams().iterator(); iter.hasNext(); ) {
+                ParamTypeNode ptn = iter.next();
+                ptn.prettyPrint(w, tr);
+                if (iter.hasNext()) {
+                    w.write(",");
+                    w.allowBreak(0, " ");
+                }
+            }
+            w.write("> ");
+        }
+
+        tr.print(this, name, w);
+        w.write("(");
+
+        w.begin(0);
+
+        for (Iterator i = formals.iterator(); i.hasNext(); ) {
+            Formal f = (Formal) i.next();
+            print(f, w, tr);
+
+            if (i.hasNext()) {
+                w.write(",");
+                w.allowBreak(0, " ");
+            }
+        }
+        w.end();
+        w.write(")");
+
+        if (! throwTypes().isEmpty()) {
+            w.allowBreak(6);
+            w.write("throws ");
+
+            for (Iterator i = throwTypes().iterator(); i.hasNext(); ) {
+                TypeNode tn = (TypeNode) i.next();
+                print(tn, w, tr);
+
+                if (i.hasNext()) {
+                    w.write(",");
+                    w.allowBreak(4, " ");
+                }
+            }
+        }
+
+        w.end();
     }
        
     @Override

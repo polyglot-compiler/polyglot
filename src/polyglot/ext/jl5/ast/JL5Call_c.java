@@ -7,12 +7,15 @@ import java.util.List;
 import polyglot.ast.*;
 import polyglot.ext.jl5.types.JL5ParsedClassType;
 import polyglot.ext.jl5.types.JL5TypeSystem;
+import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.Context;
 import polyglot.types.MethodInstance;
 import polyglot.types.ReferenceType;
 import polyglot.types.SemanticException;
+import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.NodeVisitor;
+import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class JL5Call_c extends Call_c implements JL5Call {
@@ -132,5 +135,47 @@ public class JL5Call_c extends Call_c implements JL5Call {
 
         return call;
     }
+
+    @Override
+    public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+        if (!targetImplicit) {
+            if (target instanceof Expr) {
+                printSubExpr((Expr) target, w, tr);
+            }
+            else if (target != null) {
+                if (tr instanceof JL5Translator) {
+                    JL5Translator jltr = (JL5Translator)tr;
+                    jltr.printReceiver(target, w);                    
+                }
+                else {
+                    print(target, w, tr);
+                }
+            }
+            w.write(".");
+            w.allowBreak(2, 3, "", 0);
+        }
+
+        w.begin(0);
+        w.write(name + "(");
+        if (arguments.size() > 0) {
+            w.allowBreak(2, 2, "", 0); // miser mode
+            w.begin(0);
+
+            for(Iterator i = arguments.iterator(); i.hasNext();) {
+                Expr e = (Expr) i.next();
+                print(e, w, tr);
+
+                if (i.hasNext()) {
+                    w.write(",");
+                    w.allowBreak(0, " ");
+                }
+            }
+
+            w.end();
+        }
+        w.write(")");
+        w.end();
+    }
+
 
 }

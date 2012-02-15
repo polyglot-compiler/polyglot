@@ -154,4 +154,25 @@ public class JL5ParsedClassType_c extends ParsedClassType_c implements JL5Parsed
     public boolean isRawClass() {
         return !this.typeVars.isEmpty();
     }
+    @Override
+    public String translateAsReceiver(Resolver c) {        
+        return this.name();
+    }
+    
+    @Override
+    public String translate(Resolver c) {
+        // it is a nested class of a parameterized class, use the full name.
+        if (isMember()) {
+            ClassType container = container().toClass(); 
+            if (container instanceof JL5SubstClassType) {
+                container = ((JL5SubstClassType)container).base();
+            }
+            if (container instanceof JL5ParsedClassType && !((JL5ParsedClassType)container).typeVariables().isEmpty()) {
+                return container().translate(c) + "." + name();                
+            }
+        }
+        return super.translate(c);
+    }
+
+
 }

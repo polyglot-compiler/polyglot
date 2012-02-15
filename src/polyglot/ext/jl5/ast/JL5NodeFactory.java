@@ -3,6 +3,7 @@ package polyglot.ext.jl5.ast;
 import java.util.List;
 
 import polyglot.ast.*;
+import polyglot.ast.ConstructorCall.Kind;
 import polyglot.qq.QQ;
 import polyglot.types.Flags;
 import polyglot.util.Position;
@@ -46,6 +47,7 @@ public interface JL5NodeFactory extends NodeFactory {
     Call Call(Position pos, Receiver target, List typeArgs, Id name, List args);
     New New(Position pos, List<TypeNode> typeArgs, TypeNode type, List args, ClassBody body);
     New New(Position pos, Expr outer, List<TypeNode> typeArgs, TypeNode objectType, List args, ClassBody body);
+    ConstructorCall ConstructorCall(Position pos, Kind kind, Expr outer, List args, boolean isEnumSuperCall);
 
 }
 

@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import polyglot.types.ClassType;
+import polyglot.types.Resolver;
 import polyglot.types.Type;
 
 public interface JL5ClassType extends ClassType {
@@ -25,4 +26,11 @@ public interface JL5ClassType extends ClassType {
      *    adds an element to the list.
      */
     LinkedList<Type> isImplicitCastValidChainImpl(Type toType);
+
+    /**
+     * Translate the type as it should be if it where the receiver
+     * of a field or method call.
+     * @param context
+     */
+    String translateAsReceiver(Resolver resolver);
 }

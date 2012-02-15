@@ -824,48 +824,68 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
 
     @Override
     public Type erasureType(Type t) {
+       return this.erasureType(t, new HashSet<TypeVariable>(), true);
+    }
+
+    /**
+     * Utility method to implement erasureType, that tracks which type variables
+     * we are in the middle of finding the erasure of.
+     */
+    protected Type erasureType(Type t, Set<TypeVariable> visitedTVs, boolean recurseErasureOfUpperBounds) {
         if (t.isArray()) {
             ArrayType at = t.toArray();
-            return at.base(this.erasureType(at.base()));
+            return at.base(this.erasureType(at.base(), visitedTVs, recurseErasureOfUpperBounds));
         }
         if (t instanceof TypeVariable) {
             TypeVariable tv = (TypeVariable) t;
-            return this.erasureType((Type) tv.upperBound());
+            if (visitedTVs.contains(tv)) {
+                return this.Object();
+            }
+            Set<TypeVariable> newVisited = new HashSet(visitedTVs);
+            newVisited.add(tv);
+            return this.erasureType((Type) tv.upperBound(), newVisited, recurseErasureOfUpperBounds);
         }
         if (t instanceof IntersectionType) {
             IntersectionType it = (IntersectionType) t;
-            return this.erasureType((Type) it.bounds().get(0));
+            return this.erasureType((Type) it.bounds().get(0), visitedTVs, recurseErasureOfUpperBounds);
         }
         if (t instanceof WildCardType) {
             WildCardType tv = (WildCardType) t;
             if(tv.upperBound() == null) {
                 return this.Object();
             }
-            return this.erasureType(tv.upperBound());
+            return this.erasureType(tv.upperBound(), visitedTVs, recurseErasureOfUpperBounds);
         }
         if (t instanceof JL5SubstType) {
-            return this.erasureType(((JL5SubstType)t).base());
+            JL5SubstType jst = (JL5SubstType)t;            
+            return this.erasureType(jst.base(), visitedTVs, recurseErasureOfUpperBounds);
         }
         if (t instanceof JL5ParsedClassType) {
+            if (!recurseErasureOfUpperBounds) {
+                return t;
+            }
             JL5ParsedClassType ct = (JL5ParsedClassType) t;
             Map<TypeVariable, Type> m = new LinkedHashMap();
             Set<TypeVariable> selfReferences = new LinkedHashSet();
             for (TypeVariable tv : ct.typeVariables()) {
-
                 Type b = tv.upperBound();
                 if (b instanceof IntersectionType) {
                     IntersectionType it = (IntersectionType) b;
                     b = (Type) it.bounds().get(0);
                 }
-                if (b == ct) {
+                
+                if (ct == b || selfInstantiation(ct).equals(b)) {
                     // it's this type
                     selfReferences.add(tv);
                 }
                 else {
-                    m.put(tv, tv.erasureType());
+                    m.put(tv, this.erasureType(tv, new HashSet<TypeVariable>(), false));
                 }
             }
             if (!m.isEmpty()) {
+                for (TypeVariable selfRef : selfReferences) {
+                    m.put(selfRef, this.Object());
+                }
                 Subst subst = this.subst(m, new HashMap());
                 Type ret = subst.substType(ct);
                 // tie the knot with any self references...
@@ -876,6 +896,14 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             }
         }
         return t;
+    }
+
+    private JL5ClassType selfInstantiation(JL5ParsedClassType ct) {
+        Map m = new HashMap();
+        for (TypeVariable tv : ct.typeVariables()) {
+            m.put(tv, tv);
+        }
+        return (JL5ClassType)this.subst(ct, m);
     }
 
     @Override
@@ -1313,6 +1341,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
             }
             JL5SubstClassType instantiatedType = (JL5SubstClassType) a;
             JL5ParsedClassType instBase = (JL5ParsedClassType) instantiatedType.base();
+            
             if (typeEquals(base, instBase)) {
                 return instantiatedType;
             }

@@ -7,6 +7,7 @@ import java.util.List;
 
 import polyglot.ast.*;
 import polyglot.ext.jl5.types.*;
+import polyglot.ext.jl5.visit.JL5Translator;
 import polyglot.types.*;
 import polyglot.util.*;
 import polyglot.visit.*;
@@ -239,8 +240,27 @@ public class JL5MethodDecl_c extends MethodDecl_c implements JL5MethodDecl {
     @Override
 	public void prettyPrintHeader(Flags flags, CodeWriter w, PrettyPrinter tr) {
         w.begin(0);
-        w.write(flags.translate());
+        w.write(JL5Flags.clearVarArgs(flags).translate());
 
+        // type params
+        boolean printTypeVars = true;
+        if (tr instanceof JL5Translator) {
+            JL5Translator jl5tr = (JL5Translator)tr;
+            printTypeVars = !jl5tr.removeJava5isms();
+        }
+        if (printTypeVars && !this.typeParams().isEmpty()) {
+            w.write("<");
+            for (Iterator<ParamTypeNode> iter = this.typeParams().iterator(); iter.hasNext(); ) {
+                ParamTypeNode ptn = iter.next();
+                ptn.prettyPrint(w, tr);
+                if (iter.hasNext()) {
+                    w.write(",");
+                    w.allowBreak(0, " ");
+                }
+            }
+            w.write("> ");
+        }
+        
         print(returnType, w, tr);
         w.write(" " + name + "(");
         w.begin(0);

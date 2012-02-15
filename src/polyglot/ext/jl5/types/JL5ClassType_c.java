@@ -4,10 +4,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import polyglot.types.ClassType;
-import polyglot.types.ClassType_c;
-import polyglot.types.PrimitiveType;
-import polyglot.types.Type;
+import polyglot.main.Options;
+import polyglot.types.*;
 import polyglot.util.InternalCompilerError;
 
 public abstract class JL5ClassType_c extends ClassType_c implements JL5ClassType {
@@ -48,4 +46,20 @@ public abstract class JL5ClassType_c extends ClassType_c implements JL5ClassType
         }
         return chain;
     }
+    
+    @Override
+    public String translate(Resolver c) {
+        // it is a nested class of a parameterized class, use the full name.
+        if (isMember()) {
+            ClassType container = container().toClass(); 
+            if (container instanceof JL5SubstClassType) {
+                container = ((JL5SubstClassType)container).base();
+            }
+            if (container instanceof JL5ParsedClassType && !((JL5ParsedClassType)container).typeVariables().isEmpty()) {
+                return container().translate(c) + "." + name();                
+            }
+        }
+        return super.translate(c);
+    }
+
 }

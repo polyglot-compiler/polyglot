@@ -13,6 +13,7 @@ import java.util.List;
 
 import polyglot.ext.param.types.PClass;
 import polyglot.ext.param.types.SubstClassType_c;
+import polyglot.types.Resolver;
 import polyglot.types.Type;
 import polyglot.util.InternalCompilerError;
 import polyglot.util.Position;
@@ -173,4 +174,31 @@ public class JL5SubstClassType_c extends SubstClassType_c implements JL5SubstCla
     public JL5ParsedClassType base() {
         return (JL5ParsedClassType) this.base;
     }
+    
+    @Override
+    public String translate(Resolver c) {
+        JL5ParsedClassType ct = this.base();
+        if (ct.typeVariables().isEmpty()) {
+            return ct.name();
+        }
+        StringBuffer sb = new StringBuffer(ct.name());
+        sb.append('<');
+        Iterator<TypeVariable> iter = ct.typeVariables().iterator();
+        while (iter.hasNext()) {
+            TypeVariable act = iter.next();            
+            sb.append(this.subst().substType(act).translate(c));
+            if (iter.hasNext()) {
+                sb.append(',');                    
+            }
+        }
+        sb.append('>');
+        return sb.toString();
+    }
+
+    @Override
+    public String translateAsReceiver(Resolver c) {        
+        JL5ParsedClassType ct = this.base();
+        return ct.name();
+    }
+
 }

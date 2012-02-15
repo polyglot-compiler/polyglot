@@ -2,6 +2,7 @@ package polyglot.ext.jl5.types;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import polyglot.ext.param.types.ParamTypeSystem;
 import polyglot.frontend.Source;

@@ -8,6 +8,7 @@ import polyglot.frontend.goals.CodeGenerated;
 import polyglot.frontend.goals.EmptyGoal;
 import polyglot.frontend.goals.Goal;
 import polyglot.frontend.goals.VisitorGoal;
+import polyglot.main.Options;
 import polyglot.types.TypeSystem;
 import polyglot.util.InternalCompilerError;
 
@@ -168,10 +169,14 @@ public class JL5Scheduler extends JLScheduler {
     @Override
     public Goal Serialized(Job job) {
         Goal g = super.Serialized(job);
-        try {
-            g.addPrerequisiteGoal(RemoveJava5isms(job), this);
-        } catch (CyclicDependencyException e) {
-            throw new InternalCompilerError(e);
+        Options opts = extInfo.getOptions();
+        if (opts instanceof JL5Options && ((JL5Options)opts).removeJava5isms) {
+            try {
+                g.addPrerequisiteGoal(RemoveJava5isms(job), this);
+            }
+            catch (CyclicDependencyException e) {
+                throw new InternalCompilerError(e);
+            }
         }
         return this.internGoal(g);
     }
