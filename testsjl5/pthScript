@@ -150,7 +150,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	error7.jl5 (Semantic, "not a subtype");
 	exn1.jl5;
 	exn2.jl5;
-	forloop1.jl5 (Semantic, "Incompatible");
+	forloop1.jl5 (Semantic, "Incompatible"), (Semantic, "Incompatible");
 	forloop1a.jl5;
 	forloop1b.jl5 (Semantic, "Incompatible");
 	forloop1c.jl5 (Semantic, "Incompatible");
@@ -349,7 +349,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
     error7.jl5 (Semantic, "not a subtype");
     exn1.jl5;
     exn2.jl5;
-    forloop1.jl5 (Semantic, "Incompatible");
+    forloop1.jl5 (Semantic, "Incompatible"), (Semantic, "Incompatible");
     forloop1a.jl5;
     forloop1b.jl5 (Semantic, "Incompatible");
     forloop1c.jl5 (Semantic, "Incompatible");

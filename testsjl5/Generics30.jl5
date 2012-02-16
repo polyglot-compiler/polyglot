@@ -1,0 +1,7 @@
+class C<T> {
+    class D { }
+    void foo() {
+	D[] foo = new D[42]; // error? Depends on whether D is reifiable (See JLS 3rd edition Section 10.3 and 4.7.)
+    }
+}
+
