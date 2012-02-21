@@ -30,6 +30,8 @@ import java.io.OutputStream;
 import java.io.File;
 import java.io.IOException;
 
+import javax.tools.JavaFileManager;
+
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.goals.Goal;
@@ -127,5 +129,17 @@ public interface ExtensionInfo {
 	throws IOException;
 
 	ToExt getToExt(ExtensionInfo to_ext, Node n);
+	
+	/**
+     * Get the file manager for translating language extension to java.
+     */
+	JavaFileManager extFileManager();
+	
+	/**
+     * Get the file manager for compiling .java files.
+     */
+	JavaFileManager javaFileManager();
+
+	ClassLoader classLoader();
 
 }
