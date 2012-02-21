@@ -33,17 +33,28 @@ import polyglot.util.*;
 import java.io.*;
 import java.util.*;
 
+import javax.tools.FileObject;
+import javax.tools.JavaFileManager;
+import javax.tools.JavaFileObject;
+import javax.tools.JavaFileObject.Kind;
+
 /** A <code>TargetFactory</code> is responsible for opening output files. */
 public class TargetFactory
 {
     protected File outputDirectory;
     protected String outputExtension;
     protected boolean outputStdout;
+    protected JavaFileManager fm;
 
     public TargetFactory(File outDir, String outExt, boolean so) {
 	outputDirectory = outDir;
 	outputExtension = outExt;
 	outputStdout = so;
+    }
+    
+    public TargetFactory(JavaFileManager fm, File outDir, String outExt, boolean so) {
+    	this(outDir, outExt, so);
+    	this.fm = fm;
     }
 
     /** Open a writer to the output file for the class in the given package. */
@@ -58,6 +69,10 @@ public class TargetFactory
         return Compiler.createCodeWriter(w, width);
     }
 
+    public CodeWriter outputCodeWriter(JavaFileObject f, int width) throws IOException {
+    	return Compiler.createCodeWriter(f.openWriter(), width);
+    }
+    
     /** Open a writer to the output file. */
     public Writer outputWriter(File outputFile) throws IOException {
 	if (Report.should_report(Report.frontend, 2))
@@ -82,7 +97,7 @@ public class TargetFactory
 	name = name.substring(0, name.lastIndexOf('.'));
 	return outputFile(packageName, name, source);
     }
-
+    
     /** Return a file object for the output of the class in the given package. */
     public File outputFile(String packageName, String className, Source source)
     {
@@ -106,4 +121,21 @@ public class TargetFactory
 	
 	return outputFile;
     }
+    
+    public JavaFileObject outputFileObject(String packageName, Source source) {
+    	String name = source.name;
+		name = name.substring(0, name.lastIndexOf('.'));
+		return outputFileObject(packageName, name, source);
+    }
+    
+    public JavaFileObject outputFileObject(String packageName, String className, Source source) {
+    	if(packageName == null)
+    		packageName = "";
+    	try {
+			return fm.getJavaFileForOutput(null, packageName + "." + className, Kind.SOURCE, null);
+		} catch (IOException e) {
+			throw new InternalCompilerError("Error creating output file object for " + source, e);
+		}
+    }
+    
 }
