@@ -30,8 +30,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 
 import polyglot.frontend.ExtensionInfo;
 
@@ -70,7 +74,8 @@ public class Options {
     public String[] source_ext = null; // e.g., java, jl, pj
     public String output_ext = "java"; // java, by default
     public boolean output_stdout = false; // whether to output to stdout
-    public String post_compiler;
+    public JavaCompiler post_compiler;
+    public String post_compiler_args;
       // compiler to run on java output file
 
     public int output_width = 80;
@@ -181,7 +186,7 @@ public class Options {
         //
         // If neither found, assume "javac" is in the path.
         //
-        post_compiler = java_home + File.separator + ".." + File.separator +
+        /*post_compiler = java_home + File.separator + ".." + File.separator +
                             "bin" + File.separator + "javac";
 
         if (! new File(post_compiler).exists()) {
@@ -191,7 +196,10 @@ public class Options {
           if (! new File(post_compiler).exists()) {
             post_compiler = "javac";
           }
-        }
+        }*/
+        
+        post_compiler = ToolProvider.getSystemJavaCompiler();
+        post_compiler_args = "";
     }
 
     /**
@@ -339,8 +347,23 @@ public class Options {
         else if (args[i].equals("-post"))
         {
             i++;
-            post_compiler = args[i];
+            ServiceLoader<JavaCompiler> loader = java.util.ServiceLoader
+					.load(JavaCompiler.class, extension.classLoader());
+			JavaCompiler javac = null;
+			for(JavaCompiler c : loader) {
+				if(c.getClass().getName().equals(args[i]))
+					javac = c;
+			}
+			if(javac==null)
+				throw new UsageError("Compiler " + args[i] + " not found.");
+			post_compiler = javac;
             i++;
+        }
+        else if (args[i].equals("-post_args"))
+        {
+        	i++;
+        	post_compiler_args = args[i];
+        	i++;
         }
         else if (args[i].equals("-stdout"))
         {
