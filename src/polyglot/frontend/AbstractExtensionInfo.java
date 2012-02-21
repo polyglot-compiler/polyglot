@@ -29,6 +29,9 @@ import java.io.Reader;
 import java.io.File;
 import java.io.IOException;
 
+import javax.tools.JavaFileManager;
+import javax.tools.ToolProvider;
+
 import polyglot.ast.Node;
 import polyglot.ast.NodeFactory;
 import polyglot.frontend.goals.Goal;
@@ -38,6 +41,8 @@ import polyglot.translate.ext.ToExt;
 import polyglot.translate.ext.ToExt_c;
 import polyglot.types.TypeSystem;
 import polyglot.types.reflect.ClassFile;
+import polyglot.util.CustomExtFileManager;
+import polyglot.util.CustomJavaFileManager;
 import polyglot.util.ErrorQueue;
 
 /**
@@ -52,6 +57,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected TargetFactory target_factory = null;
     protected Stats stats;
     protected Scheduler scheduler;
+    protected JavaFileManager ext_fm;
+    protected JavaFileManager java_fm;
 
     public abstract Goal getCompileGoal(Job job);
     public abstract String compilerName();
@@ -134,7 +141,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     /** Get the target factory object for this extension. */
     public TargetFactory targetFactory() {
         if (target_factory == null) {
-            target_factory = new TargetFactory(getOptions().output_directory,
+            target_factory = new TargetFactory(extFileManager(),
+            								   getOptions().output_directory,
                                                getOptions().output_ext,
                                                getOptions().output_stdout);
         }
@@ -209,4 +217,19 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     	return ToExt_c.ext(n);
     }
     
+    public JavaFileManager extFileManager() {
+    	if(ext_fm == null)
+    		ext_fm = new CustomExtFileManager();
+    	return ext_fm;
+    }
+    
+    public JavaFileManager javaFileManager() {
+    	if(java_fm == null)
+    		java_fm = new CustomJavaFileManager(ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null));
+    	return java_fm;
+    }
+    
+    public ClassLoader classLoader() {
+    	return ToolProvider.getSystemToolClassLoader();
+    }
 }
