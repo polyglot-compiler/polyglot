@@ -626,7 +626,7 @@
 		</copy>
 
 		<copy todir="${tmp}/testsjl5" includeEmptyDirs="false">
-                    <fileset dir="testsjl5" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results,out"/>
+                    <fileset dir="testsjl5" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results,out" includes="java-src/*.java" />
 		</copy>
 
 		<copy todir="${tmp}/examples" includeEmptyDirs="true">
