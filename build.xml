@@ -625,9 +625,10 @@
                     <fileset dir="tests" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results" />
 		</copy>
 
-		<copy todir="${tmp}/testsjl5" includeEmptyDirs="false">
-                    <fileset dir="testsjl5" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results,out" includes="java-src/*.java,**/*.*" />
+		<copy todir="${tmp}" includeEmptyDirs="false">
+                    <fileset dir="testsjl5" includes="java-src/*.java,**/*.*,pthScript" excludes="**/pthOutput*/**,*.java,**/*.results,out/**,**/*.class" />
 		</copy>
+		<mkdir dir="${tmp}/testsjl5/java-out" />
 
 		<copy todir="${tmp}/examples" includeEmptyDirs="true">
                     <fileset dir="${examples.dir}" includes="pao/**,coffer/**" />
