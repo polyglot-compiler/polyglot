@@ -215,14 +215,17 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     	if (this.detectBackEdges) {
     		// determine for each inItemPeer whether it represents a back edge or not,
     		// and record the results in a list.
+    	    // Since there is an edge from inItemPeer to the current peer p, the edge
+    	    // is a back edge if the post-order number of inItemPeer is less than
+    	    // the post-order number of the peer p.
     		List isBackEdges = new ArrayList(inItemPeers.size());
     		
-		  	int currentPeerOrder = ((Integer)preordering.get(p)).intValue();
+		  	int currentPeerOrder = ((Integer)postordering.get(p)).intValue();
 
 		  	Iterator inPeers = inItemPeers.iterator();
     		while (inPeers.hasNext()) {
     		  	Peer inPeer = (Peer) inPeers.next();
-    		  	int inPeerOrder = ((Integer)preordering.get(inPeer)).intValue();
+    		  	int inPeerOrder = ((Integer)postordering.get(inPeer)).intValue();
     		  	isBackEdges.add(Boolean.valueOf(inPeerOrder < currentPeerOrder));
     		}
             return flow(inItems,inItemKeys,inItemPeers,isBackEdges,graph,p);
@@ -718,15 +721,15 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     }
 
     /**
-     * Map from <code>Peer</code>s to <code>Integer</code>s that contains a preordering
+     * Map from <code>Peer</code>s to <code>Integer</code>s that contains a post-ordering
      * of <code>Peer</code>s if <code>this.detectBackEdges</code> is true.
      */
-    protected Map preordering = null;
+    protected Map postordering = null;
     
     /**
-     * Create a preorder on <code>Peer p</code> and all <code>Peer</code>s 
+     * Create a postorder on <code>Peer p</code> and all <code>Peer</code>s 
      * reachable from p (that are reachable without going through any 
-     * peer in the set <code>visited</code>). The preorder will start from 
+     * peer in the set <code>visited</code>). The postorder will start from 
      * <code>count</code>.
      * 
      * @param p
@@ -734,20 +737,21 @@ public abstract class DataFlow extends ErrorHandlingVisitor
      * @param visited Set of Peer
      * @return
      */
-    private int preorder(Peer p, int count, Set visited) {
+    private int postorder(Peer p, int count, Set visited) {
         if (visited.contains(p)) return count;
         
         // visit p
-
         visited.add(p);
         
         // visit all the successors of p
         Iterator iter = p.succs().iterator();
         while (iter.hasNext()) {
         	Edge e = (Edge) iter.next();
-            count = preorder(e.getTarget(), count, visited); 
+            count = postorder(e.getTarget(), count, visited); 
         }
-        this.preordering.put(p, Integer.valueOf(count++));
+        
+        // number p
+        this.postordering.put(p, Integer.valueOf(count++));
 
         return count;        
     }
@@ -771,14 +775,14 @@ public abstract class DataFlow extends ErrorHandlingVisitor
 	*/
 	
 	if (this.detectBackEdges) {
-		// construct a preordering of the peers by visiting each peer in a depth first manner
-		this.preordering = new HashMap();
+		// construct a postordering of the peers by visiting each peer in a depth first manner
+		this.postordering = new HashMap();
 		int count = 0;
 		Set visited = new HashSet();
 		Iterator iter = graph.startPeers().iterator();
 		while (iter.hasNext()) {
 			Peer p = (Peer) iter.next();
-			count =  preorder(p, count, visited);
+			count =  postorder(p, count, visited);
 		}
 	}
 	
