@@ -154,6 +154,10 @@
 			<fileset dir="tests" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results" />
 		</copy>
 
+		<copy todir="${tmp}/testsjl5" includeEmptyDirs="false">
+                    <fileset dir="testsjl5" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results,out" includes="java-src/*.java"/>
+		</copy>
+
 		<copy todir="${dist}/tools" includeEmptyDirs="false">
 			<fileset dir="tools"/>
 		</copy>

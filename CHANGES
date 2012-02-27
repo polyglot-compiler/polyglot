@@ -17,6 +17,12 @@ Based on the "Polyglot for Java 5" project by Milan Stanojevic and Todd Millstei
 
 Miscellanious bug fixes.
 
+Added -mergestrings option.
+
+Class polyglot.visit.DataFlow refactored to allow detection of back
+edges in control flow graphs, which allows subclasses to use a
+widening operator.
+
 Aug 14, 2008: Polyglot 2.4.0
 ============================
 

@@ -233,7 +233,7 @@
             <classpath refid="standard.classpath" />
         </javac>
 		<!-- Compile the JL5 code -->
-        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/**" excludes="polyglot/ext/jl5/parse/Lexer_c.java,polyglot/ext/jl5/parse/sym.java,polyglot/ext/jl5/parse/Grm.java">
+        <javac source="1.5" target="1.5" srcdir="${src}" destdir="${classes}" debug="on" includes="polyglot/ext/jl5/**" includeAntRuntime="true" excludes="polyglot/ext/jl5/parse/Lexer_c.java,polyglot/ext/jl5/parse/sym.java,polyglot/ext/jl5/parse/Grm.java">
             <classpath refid="standard.classpath" />
         </javac>
     </target>
@@ -459,6 +459,7 @@
 			<packageset dir="${src}" defaultexcludes="yes">
 				<include name="polyglot/**" />
 				<exclude name="**/tests" />
+				<exclude name="**/testsjl5" />
 				<exclude name="**/test" />
 			</packageset>
 			<packageset dir="${ppg.src}" defaultexcludes="yes">
@@ -622,6 +623,10 @@
 
 		<copy todir="${tmp}/tests" includeEmptyDirs="false">
                     <fileset dir="tests" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results" />
+		</copy>
+
+		<copy todir="${tmp}/testsjl5" includeEmptyDirs="false">
+                    <fileset dir="testsjl5" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results,out"/>
 		</copy>
 
 		<copy todir="${tmp}/examples" includeEmptyDirs="true">

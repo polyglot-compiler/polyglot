@@ -12,6 +12,8 @@ contains the following sub-directories:
   - tools/pth: Polyglot test harness
   - doc: documentation about writing Polyglot extensions
   - doc/api: Javadoc descriptions of Polyglot classes
+  - tests: test cases for the Polyglot Java language extension
+  - testsjl5: test cases for the Polyglot Java5 language extension
 
 Disclaimer
 ----------
@@ -32,11 +34,10 @@ Requirements
 ------------
 
 Polyglot builds on Unix and on Windows using the Cygwin environment.  We
-recommend that you use JDK 1.3 or later.  We have experienced problems
-with versions of the JDK older than 1.3.  You must ensure that java and
+recommend that you use JDK 1.5 or later.  You will experience problems
+with versions of the JDK older than 1.5.  You must ensure that java and
 javac are in your path.  Polyglot is compiled with the Ant build tool
-(http://jakarta.apache.org/ant).  GNU make is used for compiling and
-running test cases.  We are phasing out the use of make in favor of Ant.
+(http://jakarta.apache.org/ant).
 
 Polyglot uses the JFlex scanner generator.  The JFlex jar file is
 included in the Polyglot distribution.  Polyglot is distributed
