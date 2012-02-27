@@ -223,7 +223,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
     		while (inPeers.hasNext()) {
     		  	Peer inPeer = (Peer) inPeers.next();
     		  	int inPeerOrder = ((Integer)preordering.get(inPeer)).intValue();
-    		  	isBackEdges.add(Boolean.valueOf(inPeerOrder > currentPeerOrder));
+    		  	isBackEdges.add(Boolean.valueOf(inPeerOrder < currentPeerOrder));
     		}
             return flow(inItems,inItemKeys,inItemPeers,isBackEdges,graph,p);
     	}
@@ -738,7 +738,7 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         if (visited.contains(p)) return count;
         
         // visit p
-        this.preordering.put(p, Integer.valueOf(count++));
+
         visited.add(p);
         
         // visit all the successors of p
@@ -747,7 +747,8 @@ public abstract class DataFlow extends ErrorHandlingVisitor
         	Edge e = (Edge) iter.next();
             count = preorder(e.getTarget(), count, visited); 
         }
-        
+        this.preordering.put(p, Integer.valueOf(count++));
+
         return count;        
     }
 
