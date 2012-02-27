@@ -6,7 +6,10 @@ unpacked the Polyglot distribution.  Your installation directory
 contains the following sub-directories:
 
   - src: the complete source code of Polyglot
-  - src/polyglot: the Polyglot base compiler and some simple extensions 
+  - src/polyglot: the Polyglot base compiler and Java5 extension
+  - examples: some example Polyglot extensions
+  - bin: scripts for invoking the base Polyglot compiler, Java5
+         Polyglot extension, and the Polyglot test harness
   - tools/java_cup: tweaked version of the Java CUP parser generator 0.10k.
   - tools/ppg: the Polyglot parser generator, an extension of Java CUP
   - tools/pth: Polyglot test harness
@@ -14,6 +17,8 @@ contains the following sub-directories:
   - doc/api: Javadoc descriptions of Polyglot classes
   - tests: test cases for the Polyglot Java language extension
   - testsjl5: test cases for the Polyglot Java5 language extension
+  - skel: a skeleton Polyglot extension, useful for creating new
+          extensions
 
 Disclaimer
 ----------
