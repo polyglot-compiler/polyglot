@@ -5,8 +5,8 @@ Polyglot is an extensible Java compiler toolkit designed for experimentation
 with new language extensions.
 
 The base polyglot compiler, jlc ("Java language compiler"), is a
-mostly-complete Java front end; that is, it parses and performs semantic
-checking on Java source code.  The compiler outputs Java source code.  Thus,
+mostly-complete Java 1.4 front end; that is, it parses and performs semantic
+checking on Java 1.4 source code.  The compiler outputs Java source code.  Thus,
 the base compiler implements the identity translation.
 
 Language extensions are implemented on top of the base compiler by
@@ -17,6 +17,11 @@ into a Java source file which can then be compiled with javac.  For
 historical reasons, some extensions just override some portions of
 the Java output code to handle the extended syntax of the particular
 language extension being compiled rather than rewriting the AST.
+
+The compiler, jl5c ("Java5 language compiler"), is a Polyglot language
+extension that provides a mostly-complete Java 1.5 front end. Like the
+base compiler, it implements the identity translation.
+
 
 
 Architecture
