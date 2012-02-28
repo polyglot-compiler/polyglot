@@ -625,7 +625,7 @@
                     <fileset dir="tests" excludes="**/pthOutput*,**/*.java,**/*.java,**/*.results" />
 		</copy>
 
-		<copy todir="${tmp}" includeEmptyDirs="false">
+		<copy todir="${tmp}/testsjl5" includeEmptyDirs="false">
                     <fileset dir="testsjl5" includes="java-src/*.java,**/*.*,pthScript" excludes="**/pthOutput*/**,*.java,**/*.results,out/**,**/*.class" />
 		</copy>
 		<mkdir dir="${tmp}/testsjl5/java-out" />
