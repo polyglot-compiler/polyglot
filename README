@@ -201,8 +201,8 @@ This release of the Polyglot distribution is governed by the LGPL
 license as described by the following copyright notice.
 
 Polyglot extensible compiler framework
-Copyright (C) 2000-2010 Polyglot project group, Cornell University
-Copyright (C) 2006-2010 IBM Corporation
+Copyright (C) 2000-2012 Polyglot project group, Cornell University
+Copyright (C) 2006-2012 IBM Corporation
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
