@@ -34,20 +34,31 @@ import polyglot.util.Position;
 public class NoClassException extends SemanticException {
     private String className;
     
+    private static String message(String className, Named scope) {
+        if (scope == null) {
+            return "Class \"" + className + "\" not found.";
+        }
+        return "Class \"" + className + "\" not found"
+        + (scope != null ? (" in scope of " + scope.toString())
+                : ".");
+    }
     public NoClassException(String className) {
-        super("Class \"" + className + "\" not found."); 
+        super(message(className, null)); 
+        this.className = className;
+    }
+    
+    public NoClassException(String className, String msg) {
+        super(msg); 
         this.className = className;
     }
     
     public NoClassException(String className, Named scope) {
-        super("Class \"" + className + "\" not found"
-                + (scope != null ? (" in scope of " + scope.toString())
-                                 : "."));
+        super(message(className, scope));
         this.className = className;
     }
   
     public NoClassException(String className, Position position) {
-        super("Class \"" + className + "\" not found.", position);
+        super(message(className, null), position);
         this.className = className;
     }
     
