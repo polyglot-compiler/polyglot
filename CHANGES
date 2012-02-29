@@ -6,17 +6,16 @@ This file documents changes between releases of Polyglot.
 ? : Polyglot 2.4.1
 ============================
 
-Precedence of = vs. ?: fixed.
-
 Added JL5 extension (polyglot.ext.jl5) to support Java 1.5 language features. 
 Based on the "Polyglot for Java 5" project by Milan Stanojevic and Todd 
 Millstein (http://www.cs.ucla.edu/~todd/research/polyglot5.html), with 
-additional input from Vincent Cavé.
+additional input from Vincent Cavé. The extension currently
+supports all Java 5 langage features, except for annotations.
 
-Based on the "Polyglot for Java 5" project by Milan Stanojevic and Todd Millstein, with 
+Miscellaneous bug fixes.
 
-Miscellanious bug fixes.
-
+Precedence of = vs. ?: fixed.
+ 
 Added -mergestrings option.
 
 Class polyglot.visit.DataFlow refactored to allow detection of back
