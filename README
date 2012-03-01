@@ -23,7 +23,7 @@ contains the following sub-directories:
 Disclaimer
 ----------
 
-Polglot is research software.  Over time, some of the interfaces in the
+Polyglot is research software.  Over time, some of the interfaces in the
 framework may change.  This may require some extensions to be changed to
 conform to the new interfaces.  Also, Polyglot is not well-documented; in
 particular, some of the javadoc is missing or out-of-date.  We are working on
@@ -103,6 +103,35 @@ To compile using the base compiler, just leave out the -ext option:
 
 This should produce a file called File.java that is almost identical to
 File.jl.
+
+Java 5 language extension
+-------------------------
+
+Polyglot supports Java 5 language extensions with a Polyglot compiler
+extension, which can be found in the directory
+$POLYGLOT/src/polyglot/ext/jl5. This compiler extension currently
+suports all of the Java 5 language extensions except for annotations.
+
+To compile a Java 5 source file, invoke the Polyglot compiler with the
+jl5 extension:
+
+    $ jlc -extclass polyglot.ext.jl5.ExtensionInfo \
+         testsjl5/Generics01.jl5
+
+The script jl5c in the $POLYGLOT/bin directory provides a convenient
+way to invoke the jl5 extension.
+
+    $ jl5c testsjl5/Generics01.jl5
+
+By default, jl5c will translate Java 1.5 code to Java 1.5 code. With
+the command line option "-removeJava5isms", jl5c will translate Java
+1.5 code to Java 1.4. It will, however, translate enumerations using
+the class java.lang.Enum as the superclass of enumeration classes. The
+command line option "-enumImplClass <fully-qualified-class-name>"
+allows the user to specify a different class to user as the superclass
+of enumeration classes. See $POLYGLOT/testsjl5/java-src/MyEnum.java
+for an example of a suitable class to use as the superclass of
+enumeration classes.
 
 Building Polyglot
 -----------------

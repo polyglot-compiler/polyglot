@@ -3,7 +3,7 @@ Polyglot Change Log
 
 This file documents changes between releases of Polyglot.
 
-? : Polyglot 2.4.1
+? : Polyglot 2.5.0
 ============================
 
 Added JL5 extension (polyglot.ext.jl5) to support Java 1.5 language features. 
