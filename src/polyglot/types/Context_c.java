@@ -202,15 +202,34 @@ public class Context_c implements Context
 
     /**
      * Gets a local of a particular name.
+     * 
+     * @return
+     * 		     the local instance
+     * @throws SemanticException
+     *           if there is no such local 
      */
     public LocalInstance findLocal(String name) throws SemanticException {
-    	VarInstance vi = findVariableSilent(name);
+    	LocalInstance vi = findLocalSilent(name);
 
+    	if (vi == null)
+    		throw new SemanticException("Local " + name + " not found.");
+
+    	return vi;
+    }
+    
+    /**
+     * Gets a local of a particular name.
+     * 
+     * @return the local instance, or null if none exists
+     */
+    public LocalInstance findLocalSilent(String name) {
+    	VarInstance vi = findVariableSilent(name);
+    	
     	if (vi instanceof LocalInstance) {
     		return (LocalInstance) vi;
     	}
-
-    	throw new SemanticException("Local " + name + " not found.");
+    	
+    	return null;
     }
 
     /**

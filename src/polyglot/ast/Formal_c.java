@@ -182,14 +182,7 @@ public class Formal_c extends Term_c implements Formal
         // Check if the variable is multiply defined.
         Context c = tc.context();
 
-        LocalInstance outerLocal = null;
-
-        try {
-            outerLocal = c.findLocal(li.name());
-        }
-        catch (SemanticException e) {
-            // not found, so not multiply defined
-        }
+        LocalInstance outerLocal = c.findLocalSilent(li.name());
 
         if (outerLocal != null && outerLocal != li && c.isLocal(li.name())) {
             throw new SemanticException(

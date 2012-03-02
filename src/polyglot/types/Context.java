@@ -67,6 +67,9 @@ public interface Context extends Resolver, Copy
 
     /** Looks up a local variable in the current scope. */
     LocalInstance findLocal(String name) throws SemanticException;
+    
+    /** Looks up a local variable in the current scope. */
+    LocalInstance findLocalSilent(String name);
 
     /** Looks up a field in the current scope. */
     FieldInstance findField(String name) throws SemanticException;

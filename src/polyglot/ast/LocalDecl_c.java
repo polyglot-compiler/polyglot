@@ -212,14 +212,7 @@ public class LocalDecl_c extends Stmt_c implements LocalDecl {
         // initializer.
         Context c = tc.context();
 
-        LocalInstance outerLocal = null;
-
-        try {
-            outerLocal = c.findLocal(li.name());
-        }
-        catch (SemanticException e) {
-            // not found, so not multiply defined
-        }
+        LocalInstance outerLocal = c.findLocalSilent(li.name());
 
         if (outerLocal != null && c.isLocal(li.name())) {
             throw new SemanticException(
