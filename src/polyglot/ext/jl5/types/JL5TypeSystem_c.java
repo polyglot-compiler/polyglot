@@ -1450,7 +1450,7 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
                 return this.Object();
             }
             else {
-                return this.intersectionType(Position.COMPILER_GENERATED, l);
+                return this.intersectionType(Position.compilerGenerated(), l);
             }
         } catch (SemanticException e) {
             return this.Object();

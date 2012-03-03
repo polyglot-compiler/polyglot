@@ -92,8 +92,8 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
 
         // insert call to appropriate super constructor
 		List args = new ArrayList(2);
-		args.add(nf.NullLit(Position.COMPILER_GENERATED));// XXX the right thing to do is change the type of java.lang.Enum instead of adding these dummy params
-		args.add(nf.IntLit(Position.COMPILER_GENERATED, IntLit.INT, 0));
+		args.add(nf.NullLit(Position.compilerGenerated()));// XXX the right thing to do is change the type of java.lang.Enum instead of adding these dummy params
+		args.add(nf.IntLit(Position.compilerGenerated(), IntLit.INT, 0));
         Block block = nf.Block(position().startOf(),
         		((JL5NodeFactory)nf).ConstructorCall(position.startOf(), ConstructorCall.SUPER, null, args, true));
         

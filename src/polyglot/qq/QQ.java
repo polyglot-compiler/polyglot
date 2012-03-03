@@ -96,7 +96,7 @@ public class QQ {
     /** Create a new quasiquoter to create AST nodes of the given
       language extension. */
     public QQ(ExtensionInfo ext) {
-        this(ext, Position.COMPILER_GENERATED);
+        this(ext, Position.compilerGenerated());
     }
 
     /** Create a new quasiquoter to create AST nodes of the given
@@ -739,7 +739,7 @@ public class QQ {
 
         Position pos = this.pos;
 
-        if (pos == Position.COMPILER_GENERATED) {
+        if (pos == Position.compilerGenerated()) {
             // this method is frame 1
             // parseXXX is frame 2
             // the client of QQ is frame 3

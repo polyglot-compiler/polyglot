@@ -158,7 +158,7 @@ public class RemoveEnums extends ContextVisitor {
      * the super class. 
      */
     private Node tranlsateEnumConstructor(ConstructorDecl n) {		
-        Position pos = Position.COMPILER_GENERATED;
+        Position pos = Position.compilerGenerated();
         Id enumName = nodeFactory().Id(pos, "enum$name");
         Id enumOrdinal = nodeFactory().Id(pos, "enum$ordinal");
 
@@ -200,7 +200,7 @@ public class RemoveEnums extends ContextVisitor {
 
     private ClassBody addValuesField(ClassBody body) {
         // private static final T[] values = {decl1, decl2, ...};
-        Position pos = Position.COMPILER_GENERATED;
+        Position pos = Position.compilerGenerated();
         List<Expr> decls = new ArrayList<Expr>();
         for (MemberInstance mi : (Collection<MemberInstance>)enumDeclType.toClass().members()) {
             if (mi instanceof EnumInstance) {
@@ -225,7 +225,7 @@ public class RemoveEnums extends ContextVisitor {
     }
     private ClassBody addValuesMethod(ClassBody body) {
         // public static T[] values() { return (T[])T.values.clone(); }
-        Position pos = Position.COMPILER_GENERATED;
+        Position pos = Position.compilerGenerated();
         Field f = nf.Field(pos, nf.CanonicalTypeNode(pos, enumDeclType), nf.Id(pos, "values"));
         Call cl = nf.Call(pos, f, "clone");
         Cast cst = nf.Cast(pos, nf.CanonicalTypeNode(pos, ts.arrayOf(enumDeclType)), cl);
@@ -246,7 +246,7 @@ public class RemoveEnums extends ContextVisitor {
 
     private ClassBody addValueOfMethod(ClassBody body) throws SemanticException {
         // public static T valueOf(String s) { return (T)Enum.valueOf(T.class, s); }
-        Position pos = Position.COMPILER_GENERATED;
+        Position pos = Position.compilerGenerated();
         Local arg = nf.Local(pos, nf.Id(pos, "s"));
         Field clazz = nf.Field(pos, nf.CanonicalTypeNode(pos, enumDeclType), nf.Id(pos, "class"));
 
@@ -282,8 +282,8 @@ public class RemoveEnums extends ContextVisitor {
         //		System.err.println("  " + ecd.ordinal());
         List args = new ArrayList();
         // add the name and ordinal
-        args.add(nf.StringLit(Position.COMPILER_GENERATED, ecd.name().id()));
-        args.add(nf.IntLit(Position.COMPILER_GENERATED, IntLit.INT, ecd.ordinal()));
+        args.add(nf.StringLit(Position.compilerGenerated(), ecd.name().id()));
+        args.add(nf.IntLit(Position.compilerGenerated(), IntLit.INT, ecd.ordinal()));
         args.addAll(ecd.args());
         Expr init = nf.New(Position.compilerGenerated(), 
                 nf.CanonicalTypeNode(Position.compilerGenerated(), enumDeclType),
@@ -293,7 +293,7 @@ public class RemoveEnums extends ContextVisitor {
 
         FieldDecl fd = nf.FieldDecl(ecd.position(), 
                 Flags.FINAL.Public().Static(),
-                nf.CanonicalTypeNode(Position.COMPILER_GENERATED, enumDeclType), 
+                nf.CanonicalTypeNode(Position.compilerGenerated(), enumDeclType), 
                 ecd.name(), 
                 init);
 
@@ -548,7 +548,7 @@ public class RemoveEnums extends ContextVisitor {
             // nothing to do with this switch
             return n;            
         }        
-        n = n.expr(nodeFactory().IntLit(Position.COMPILER_GENERATED, IntLit.INT, n.value()));
+        n = n.expr(nodeFactory().IntLit(Position.compilerGenerated(), IntLit.INT, n.value()));
         return n;
     }
 }

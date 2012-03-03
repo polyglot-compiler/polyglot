@@ -46,7 +46,7 @@ public class Name {
     public Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix, Id name) {
         this.nf = nf;
         this.ts = ts;
-        this.pos = pos != null ? pos : Position.COMPILER_GENERATED;
+        this.pos = pos != null ? pos : Position.compilerGenerated();
         this.prefix = prefix;
         this.name = name;
     }
@@ -55,7 +55,7 @@ public class Name {
     private Name(NodeFactory nf, TypeSystem ts, Position pos, Name prefix, String qualifiedName) {
     	this.nf = nf;
         this.ts = ts;
-        this.pos = pos != null ? pos : Position.COMPILER_GENERATED;
+        this.pos = pos != null ? pos : Position.compilerGenerated();
         
         if (! StringUtil.isNameShort(qualifiedName)) {
             if (prefix == null) {

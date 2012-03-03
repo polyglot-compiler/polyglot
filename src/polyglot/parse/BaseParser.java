@@ -47,8 +47,8 @@ public abstract class BaseParser extends java_cup.runtime.lr_parser
     eq = q;
     ts = t;
     nf = n;
-    prev_pos = Position.COMPILER_GENERATED;
-    position = Position.COMPILER_GENERATED;
+    prev_pos = Position.compilerGenerated();
+    position = Position.compilerGenerated();
   }
 
   /**

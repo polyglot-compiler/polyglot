@@ -36,8 +36,8 @@ public class JL5ConstructorCall_c extends ConstructorCall_c {
 				// this is an enum decl, so we need to replace a call to the default
 				// constructor with a call to java.lang.Enum.Enum(String, int)
 				List args = new ArrayList(2);// XXX the right thing to do is change the type of java.lang.Enum instead of adding these dummy params
-				args.add(ar.nodeFactory().NullLit(Position.COMPILER_GENERATED));
-				args.add(ar.nodeFactory().IntLit(Position.COMPILER_GENERATED, IntLit.INT, 0));
+				args.add(ar.nodeFactory().NullLit(Position.compilerGenerated()));
+				args.add(ar.nodeFactory().IntLit(Position.compilerGenerated(), IntLit.INT, 0));
 				JL5ConstructorCall_c n = (JL5ConstructorCall_c) this.arguments(args);
 				return n.disambiguate(ar);				
 			}

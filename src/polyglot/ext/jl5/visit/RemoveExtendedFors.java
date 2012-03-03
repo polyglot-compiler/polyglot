@@ -119,9 +119,9 @@ public class RemoveExtendedFors extends ContextVisitor {
         int count = varCount.removeLast();
         varCount.addLast(count+1);
         if (count == 0) {
-            return nodeFactory().Id(Position.COMPILER_GENERATED, "extfor$" + desc);
+            return nodeFactory().Id(Position.compilerGenerated(), "extfor$" + desc);
         }
-        return nodeFactory().Id(Position.COMPILER_GENERATED, "extfor$" + desc + "$" + count);
+        return nodeFactory().Id(Position.compilerGenerated(), "extfor$" + desc + "$" + count);
     }
     
     private Node translateExtForArray(ExtendedFor n, List<String> labels) throws SemanticException {    
@@ -200,7 +200,7 @@ public class RemoveExtendedFors extends ContextVisitor {
      */
     private Stmt labelStmt(Stmt s, List<String> labels) {
         for (int i = labels.size()-1; i >= 0; i--) {
-            s = nodeFactory().Labeled(Position.COMPILER_GENERATED, labels.get(i), s);
+            s = nodeFactory().Labeled(Position.compilerGenerated(), labels.get(i), s);
         }
         return s;
     }
