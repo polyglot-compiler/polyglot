@@ -59,23 +59,14 @@ public class SourceLoader_c implements SourceLoader
     }
 
     public FileSource fileSource(String fileName, boolean userSpecified) throws IOException {
-        StandardJavaFileManager jf_mgr = sourceExt.fileManager();
-		Iterable<? extends JavaFileObject> jfos = jf_mgr
-				.getJavaFileObjects(fileName);
-		JavaFileObject jfo = null;
-		for(JavaFileObject f : jfos) {
-			if(jfo != null)
-				throw new InternalCompilerError(
-						"File manager returned multiple file objects for "
-								+ fileName);
-			jfo = f;
-		}
+        StandardJavaFileManager jf_mgr = sourceExt.extFileManager();
+		FileObject fo = jf_mgr.getFileForInput(sourcePath, "", fileName);
 		
-		FileSource sourceFile = loadedSources.get(fileKey(jfo));
+		FileSource sourceFile = loadedSources.get(fileKey(fo));
 		if(sourceFile != null)
 			return sourceFile;
 
-		sourceFile = sourceExt.createFileSource(jfo, userSpecified);
+		sourceFile = sourceExt.createFileSource(fo, userSpecified);
 		
         String[] exts = sourceExt.fileExtensions();
         boolean ok = false;
@@ -128,7 +119,7 @@ public class SourceLoader_c implements SourceLoader
             return sourceFile;
         }
         
-		loadedSources.put(fileKey(jfo), sourceFile);
+		loadedSources.put(fileKey(fo), sourceFile);
         return sourceFile;
     }
 
@@ -152,7 +143,7 @@ public class SourceLoader_c implements SourceLoader
     protected FileSource checkForSource(String className) {
     	/* Search the source path. */
         String[] exts = sourceExt.fileExtensions();
-        JavaFileManager file_mgr = sourceExt.fileManager();
+        JavaFileManager file_mgr = sourceExt.extFileManager();
         for (int k = 0; k < exts.length; k++) {
         	String pkgName = StringUtil.getPackageComponent(className);
             String shortName = StringUtil.getShortNameComponent(className);

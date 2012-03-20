@@ -9,20 +9,19 @@ import java.net.URI;
 import java.util.Date;
 
 import javax.tools.FileObject;
-import javax.tools.ForwardingJavaFileObject;
+import javax.tools.ForwardingFileObject;
 import javax.tools.JavaFileManager;
-import javax.tools.JavaFileObject;
 import javax.tools.SimpleJavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 
-public class Source_c extends ForwardingJavaFileObject<JavaFileObject>
+public class Source_c extends ForwardingFileObject<FileObject>
 	implements FileSource {
 	@Deprecated
 	protected Date last_modified = null;
 	protected boolean user_specified;
-	protected JavaFileObject file;
+	protected FileObject file;
 
-	protected Source_c(JavaFileObject f, boolean userSpecified) {
+	protected Source_c(FileObject f, boolean userSpecified) {
 		super(f);
 		this.user_specified = userSpecified;
 	}

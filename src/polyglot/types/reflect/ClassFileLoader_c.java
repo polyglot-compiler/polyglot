@@ -71,7 +71,7 @@ public class ClassFileLoader_c implements ClassFileLoader {
 		if (exists != null)
 			return exists;
 		else {
-			StandardJavaFileManager fm = extInfo.fileManager();
+			StandardJavaFileManager fm = extInfo.extFileManager();
 			exists = false;
 			for(Location l : locations) {
 				Iterable<JavaFileObject> contents;
@@ -100,7 +100,7 @@ public class ClassFileLoader_c implements ClassFileLoader {
 		}
 
 		try {
-			StandardJavaFileManager fm = extInfo.fileManager();
+			StandardJavaFileManager fm = extInfo.extFileManager();
 
 			JavaFileObject jfo = null;
 			for(Location l : locations) {
@@ -134,8 +134,7 @@ public class ClassFileLoader_c implements ClassFileLoader {
 				while ((len = is.read(buf, 0, BUF_SIZE)) != -1)
 					bos.write(buf, 0, len);
 
-				ClassFile clazz = extInfo.createClassFile(jfo, bos
-						.toByteArray());
+				ClassFile clazz = extInfo.createClassFile(jfo, bos.toByteArray());
 
 				return clazz;
 			}

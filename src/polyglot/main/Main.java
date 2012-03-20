@@ -33,6 +33,7 @@ import java.io.PrintStream;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -42,8 +43,9 @@ import java.util.StringTokenizer;
 
 import javax.tools.FileObject;
 import javax.tools.JavaCompiler;
-import javax.tools.StandardJavaFileManager;
+import javax.tools.JavaFileManager;
 import javax.tools.JavaCompiler.CompilationTask;
+import javax.tools.JavaFileObject;
 
 import polyglot.frontend.Compiler;
 import polyglot.frontend.ExtensionInfo;
@@ -200,9 +202,15 @@ public class Main {
 				ByteArrayOutputStream err = new ByteArrayOutputStream();
 				Writer javac_err = new OutputStreamWriter(err);
 				JavaCompiler javac = options.post_compiler;
-				StandardJavaFileManager fileManager = compiler
-						.sourceExtension().fileManager();
+				JavaFileManager fileManager = compiler
+						.sourceExtension().javaFileManager();
 
+				/*Set<JavaFileObject> s = new HashSet<JavaFileObject>();
+				for (JavaFileObject jfo : compiler.outputFiles())
+					if(jfo.getName().endsWith("A2.java"))
+						s.add(jfo);*/
+				/*for(FileObject fo : compiler.outputFiles())
+					System.out.println(fo.getName());*/
 				CompilationTask task = javac.getTask(javac_err, fileManager,
 						null, javacArgs, null, compiler.outputFiles());
 

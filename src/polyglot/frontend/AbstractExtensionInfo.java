@@ -55,6 +55,9 @@ import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLoader;
 import polyglot.types.reflect.ClassFileLoader_c;
 import polyglot.types.reflect.ClassFile_c;
+import polyglot.util.CustomExtFileManager;
+import polyglot.util.CustomJavaFileManager;
+import polyglot.util.CustomJavaFileManager_;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
 
@@ -71,6 +74,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     protected Stats stats;
     protected Scheduler scheduler;
 	protected StandardJavaFileManager file_manager;
+	protected StandardJavaFileManager ext_fm;
+	protected StandardJavaFileManager java_fm;
 	protected ClassFileLoader classFileLoader;
 
     public abstract Goal getCompileGoal(Job job);
@@ -155,8 +160,8 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     public TargetFactory targetFactory() {
         if (target_factory == null) {
 			target_factory = new TargetFactory(
-					file_manager,
-					getOptions().output_directory, 
+					ext_fm,
+					getOptions().source_output, 
 					getOptions().output_ext,
 					getOptions().output_stdout);
         }
@@ -239,7 +244,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     
     public FileSource createFileSource(FileObject f, boolean user) throws IOException
 	{
-    	return new Source_c((JavaFileObject) f, user);
+    	return new Source_c(f, user);
     }    
     
     public StandardJavaFileManager fileManager() {
@@ -248,6 +253,22 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
             file_manager = compiler.getStandardFileManager(null, null, null);
     	}
     	return file_manager;
+    }
+    
+    public StandardJavaFileManager extFileManager() {
+    	if(ext_fm == null)
+    		ext_fm = new CustomExtFileManager();
+    	return ext_fm;
+    }
+    
+    public StandardJavaFileManager javaFileManager() {
+    	if(java_fm == null) {
+    		//java_fm = new CustomJavaFileManager(ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null));
+    		java_fm = new CustomJavaFileManager_(ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null));
+    		//java_fm = ToolProvider.getSystemJavaCompiler().getStandardFileManager(null, null, null);
+    		//System.out.println(java_fm.getClass().getName());
+    	}
+    	return java_fm;
     }
     
     public ClassLoader classLoader() {
@@ -259,7 +280,7 @@ public abstract class AbstractExtensionInfo implements ExtensionInfo {
     		List<Location> locations = new ArrayList<Location>();
     		locations.add(getOptions().bootclasspath);
     		locations.add(getOptions().classpath);
-    		locations.add(getOptions().class_output_directory);
+    		locations.add(getOptions().class_output);
     		classFileLoader = new ClassFileLoader_c(this,locations);
     	}
 		return classFileLoader;

@@ -42,6 +42,7 @@ import polyglot.main.Options;
 import polyglot.types.TypeSystem;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLoader;
+import polyglot.util.CustomJavaFileManager;
 import polyglot.util.ErrorQueue;
 import polyglot.util.CodeWriter;
 
@@ -135,6 +136,18 @@ public interface ExtensionInfo {
 
     /** Get the file manager used by this extension. */
 	StandardJavaFileManager fileManager();
+	
+	/** Get the extension file mananger used by this extension. This 
+	 *  file manager manages the extension source files and translated 
+	 *  java code. 
+	 */
+	StandardJavaFileManager extFileManager();
+	
+	/** Get the java file manager used by this extension. This file 
+	 *  manager manages the translated java code and generated class files
+	 *  by javac.
+	 */
+	StandardJavaFileManager javaFileManager();
 	
 	/** Get the classLoader used by this extension. */
 	ClassLoader classLoader();

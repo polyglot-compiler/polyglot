@@ -21,16 +21,13 @@ public class CustomJavaFileManager_ implements StandardJavaFileManager {
 	private final String separator = File.separator;
 	private final char separatorChar = File.separatorChar;
 	
-	private final Map<Location, Iterable<? extends File>> locationPathMap;
-	//private final Map<String, Set<JavaFileObject>> pathObjectMap;
-	//private final Map<String, JavaFileObject> fileObjMap;
+	private final Map<Location, Iterable<? extends File>> locationPathMap = new HashMap<Location, Iterable<? extends File>>();
+	//private final Map<String, Set<JavaFileObject>> pathObjectMap = new HashMap<String, Set<JavaFileObject>>();
+	//private final Map<String, JavaFileObject> fileObjMap = new HashMap<String, JavaFileObject>();
 	private final StandardJavaFileManager fm;
 	
 	public CustomJavaFileManager_(StandardJavaFileManager fm) {
 		this.fm = fm;
-		locationPathMap = new HashMap<Location, Iterable<? extends File>>();
-		//pathObjectMap = new HashMap<String, Set<JavaFileObject>>();
-		//fileObjMap = new HashMap<String, JavaFileObject>();
 	}
 
 	public int isSupportedOption(String option) {

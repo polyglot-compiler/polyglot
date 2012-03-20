@@ -148,12 +148,15 @@ public class TargetFactory
 		      throw new InternalCompilerError("Output location not set.");
 		}
 	
-		if (packageName == null) {
+		/*if (packageName == null) {
 		    packageName = "";
-		}
+		}*/
 		try {
-			if(outputExtension.equals("java"))
-				return fileManager.getJavaFileForOutput(outputLocation, packageName +"."+className, Kind.SOURCE, null);
+			if(outputExtension.equals("java")) {
+				if(packageName != null && !packageName.equals(""))
+					return fileManager.getJavaFileForOutput(outputLocation, packageName + "." + className, Kind.SOURCE, null);
+				return fileManager.getJavaFileForOutput(outputLocation, className, Kind.SOURCE, null);
+			}
 			else {
 				FileObject outputFile = fileManager.getFileForOutput(outputLocation, packageName, className + "." + outputExtension, null);
 		
