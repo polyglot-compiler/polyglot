@@ -36,6 +36,7 @@ javac "-d java-out -cp ." {
 }
  
 polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"javac -source 1.5\"" {
+        HexFloatingPoint.jl5;
         Generics01.jl5;
 	Generics02.jl5;
 	Generics03.jl5;
