@@ -42,7 +42,6 @@ import polyglot.main.Options;
 import polyglot.types.TypeSystem;
 import polyglot.types.reflect.ClassFile;
 import polyglot.types.reflect.ClassFileLoader;
-import polyglot.util.CustomJavaFileManager;
 import polyglot.util.ErrorQueue;
 import polyglot.util.CodeWriter;
 

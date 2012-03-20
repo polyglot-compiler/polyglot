@@ -48,7 +48,6 @@ import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
 import polyglot.frontend.ExtensionInfo;
-import polyglot.util.CustomJavaFileManager;
 import polyglot.util.InternalCompilerError;
 
 /**

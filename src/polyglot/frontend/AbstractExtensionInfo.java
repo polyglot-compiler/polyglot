@@ -56,7 +56,6 @@ import polyglot.types.reflect.ClassFileLoader;
 import polyglot.types.reflect.ClassFileLoader_c;
 import polyglot.types.reflect.ClassFile_c;
 import polyglot.util.CustomExtFileManager;
-import polyglot.util.CustomJavaFileManager;
 import polyglot.util.CustomJavaFileManager_;
 import polyglot.util.ErrorQueue;
 import polyglot.util.InternalCompilerError;
