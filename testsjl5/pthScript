@@ -225,6 +225,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
 	RawReturn03.jl5 (Semantic);
 	RawReturn04.jl5 (Semantic);
 	RawReturn05.jl5;
+	RawReturn06.jl5;
 	EnumTest1.jl5;
 	EnumTest2.jl5;
 	EnumTest3.jl5;

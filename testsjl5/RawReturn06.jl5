@@ -1,0 +1,6 @@
+class C<T> {
+    static native C getPrimitiveClass(String name);
+}
+class D {
+    C<Character> ch = C.getPrimitiveClass("char");
+}
