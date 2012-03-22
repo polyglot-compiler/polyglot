@@ -306,6 +306,15 @@ public class TypeVariable_c extends ReferenceType_c implements TypeVariable {
         return false;
     }
     
+    public boolean isCastValidImpl(Type toType) {
+        if (super.isCastValidImpl(toType)) {
+            return true;
+        }
+        
+        return ts.isCastValid(this.upperBound(), toType);
+    }
+
+    
     @Override
     public boolean descendsFromImpl(Type ancestor) {
         if (super.descendsFromImpl(ancestor)) {
