@@ -1,0 +1,14 @@
+class C<K,V> {
+    private abstract class HashIterator<E>  {
+        HashIterator() {
+        }
+    }
+
+    private final class ValueIterator extends HashIterator<V> {
+    }
+
+    private final class KeyIterator extends HashIterator<K> {
+
+    }
+
+}

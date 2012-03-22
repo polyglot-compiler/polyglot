@@ -70,6 +70,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -noserial -post \"jav
         Generics29.jl5;
         Generics30.jl5 (Semantic);
      StaticInit01.jl5;
+     Constructor01.jl5;
 	Anonymous01.jl5;
 	Import01.jl5;
 	Import02.jl5;
@@ -270,6 +271,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
         Generics29.jl5;
         Generics30.jl5 (Semantic);
         StaticInit01.jl5;
+     Constructor01.jl5;
     Anonymous01.jl5;
     Import01.jl5;
     Import02.jl5;
@@ -425,6 +427,7 @@ polyglot.ext.jl5.ExtensionInfo "-d out -classpath java-out -removeJava5isms -enu
     RawReturn03.jl5 (Semantic);
     RawReturn04.jl5 (Semantic);
     RawReturn05.jl5;
+    RawReturn06.jl5;
     EnumTest1.jl5;
     EnumTest2.jl5;
     EnumTest3.jl5;
