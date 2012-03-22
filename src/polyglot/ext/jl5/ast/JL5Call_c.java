@@ -91,14 +91,6 @@ public class JL5Call_c extends Call_c implements JL5Call {
                 
         ReferenceType targetType = this.findTargetType();
         
-        // SC: semi correct fix for dealing with raw types?
-        if (this.target != null && !(this.target instanceof Special) && targetType instanceof JL5ParsedClassType) {
-            if (!ts.typeEquals(targetType, tc.context().currentClass())) {
-                // it's a raw type of some other class.
-                // use its erasure subst
-                targetType = (ReferenceType) ts.erasureType(targetType);
-            }
-        }
 
         MethodInstance mi = ts.findMethod(targetType, 
                                           this.name.id(), 
