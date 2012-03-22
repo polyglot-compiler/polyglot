@@ -33,6 +33,8 @@ import java.math.BigInteger;
 %line
 %column
 
+%buffer 1048576
+
 %state STRING, CHARACTER, TRADITIONAL_COMMENT, END_OF_LINE_COMMENT
 
 %{
