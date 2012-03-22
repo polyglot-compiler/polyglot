@@ -155,9 +155,4 @@ public class JL5EnumDecl_c extends JL5ClassDecl_c implements JL5EnumDecl {
         return this;
     }
     
-    @Override
-	public void prettyPrintModifiers(CodeWriter w, PrettyPrinter tr) {
-    	w.write(flags.clearAbstract().translate());
-		// do not write out class
-	}        
 }

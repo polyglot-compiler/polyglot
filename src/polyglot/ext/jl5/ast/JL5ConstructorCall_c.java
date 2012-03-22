@@ -39,6 +39,7 @@ public class JL5ConstructorCall_c extends ConstructorCall_c {
 				args.add(ar.nodeFactory().NullLit(Position.compilerGenerated()));
 				args.add(ar.nodeFactory().IntLit(Position.compilerGenerated(), IntLit.INT, 0));
 				JL5ConstructorCall_c n = (JL5ConstructorCall_c) this.arguments(args);
+				n.isEnumConstructorCall = true;
 				return n.disambiguate(ar);				
 			}
 		}

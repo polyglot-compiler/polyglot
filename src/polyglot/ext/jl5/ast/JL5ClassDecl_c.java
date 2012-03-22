@@ -177,13 +177,15 @@ public class JL5ClassDecl_c extends ClassDecl_c implements JL5ClassDecl {
 		return super.typeCheck(tc);
 	}
 
-	// XXX: pretty printing is not fixed up yet.
 	public void prettyPrintModifiers(CodeWriter w, PrettyPrinter tr) {
-		if (flags.isInterface()) {
-			w.write(flags.clearInterface().clearAbstract().translate());
-		} else {
-			w.write(flags.translate());
-		}
+	    Flags f = this.flags;
+	    if (f.isInterface()) {
+	        f = f.clearInterface().clearAbstract();
+	    }
+	    else if (JL5Flags.isEnum(f)) {
+	        f = JL5Flags.clearEnum(f).clearStatic().clearAbstract();
+	    }
+	    w.write(f.translate());
 
         if (flags.isInterface()) {
             w.write("interface ");

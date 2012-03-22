@@ -5,8 +5,10 @@ import polyglot.ext.jl5.types.EnumInstance;
 import polyglot.ext.jl5.types.JL5TypeSystem;
 import polyglot.types.SemanticException;
 import polyglot.types.Type;
+import polyglot.util.CodeWriter;
 import polyglot.util.Position;
 import polyglot.visit.AmbiguityRemover;
+import polyglot.visit.PrettyPrinter;
 import polyglot.visit.TypeChecker;
 
 public class JL5Case_c extends Case_c implements JL5Case {
@@ -92,4 +94,25 @@ public class JL5Case_c extends Case_c implements JL5Case {
 		throw new SemanticException("Case label must be an integral constant.",
 				position());
 	}
+
+	@Override
+	public void prettyPrint(CodeWriter w, PrettyPrinter tr) {
+	    if (expr == null) {
+	        w.write("default:");
+	    }
+	    else {
+	        w.write("case ");
+	        JL5TypeSystem ts = expr.type() == null ? null : (JL5TypeSystem)expr.type().typeSystem();
+	        if (ts != null && expr.type().isReference() && expr.type().isSubtype(ts.Enum())) {
+	            // this is an enum	            
+	            Field f = (Field)expr;
+	            w.write(f.name());
+	        }
+	        else {
+	            print(expr, w, tr);
+	        }
+	        w.write(":");
+	    }
+	}
+
 }
