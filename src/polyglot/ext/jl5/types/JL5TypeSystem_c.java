@@ -1267,6 +1267,70 @@ public class JL5TypeSystem_c extends ParamTypeSystem_c implements JL5TypeSystem 
         throw error;
     }
 
+
+    @Override
+    public boolean isAccessible(MemberInstance mi, ClassType contextClass) {
+        assert_(mi);
+
+        ReferenceType target = mi.container();
+        Flags flags = mi.flags();
+
+        if (! target.isClass()) {
+            // public members of non-classes are accessible;
+            // non-public members of non-classes are inaccessible
+            return flags.isPublic();
+        }
+
+        JL5ClassType targetClass = (JL5ClassType)target.toClass();
+        // make sure we strip away any parameters.
+        if (!targetClass.isRawClass() && targetClass instanceof JL5SubstClassType) {
+            targetClass = ((JL5SubstClassType)targetClass).base();
+        }
+
+        
+        if (! classAccessible(targetClass, contextClass)) {
+            return false;
+        }
+
+        if (equals(targetClass, contextClass))
+            return true;
+
+        // If the current class and the target class are both in the
+        // same class body, then protection doesn't matter, i.e.
+        // protected and private members may be accessed. Do this by
+        // working up through contextClass's containers.
+        if (isEnclosed(contextClass, targetClass) || isEnclosed(targetClass, contextClass))
+            return true;
+
+        ClassType ct = contextClass;
+        while (!ct.isTopLevel()) {
+            ct = ct.outer();
+            if (isEnclosed(targetClass, ct))
+                return true;
+        }
+
+        // protected
+        if (flags.isProtected()) {
+            // If the current class is in a
+            // class body that extends/implements the target class, then
+            // protected members can be accessed. Do this by
+            // working up through contextClass's containers.
+            if (descendsFrom(contextClass, targetClass)) {
+                return true;
+            }
+
+            ct = contextClass;
+            while (!ct.isTopLevel()) {
+                ct = ct.outer();
+                if (descendsFrom(ct, targetClass)) {
+                    return true;
+                }
+            }
+        }
+
+        return accessibleFromPackage(flags, targetClass.package_(), contextClass.package_());
+    }
+
     @Override
     public WildCardType wildCardType(Position position) {
         return wildCardType(position, null, null);
